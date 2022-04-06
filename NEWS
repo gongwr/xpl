@@ -27,7 +27,7 @@ Overview of changes in GLib 2.72.0
 Overview of changes in GLib 2.71.3
 ==================================
 
-* Fix flaky `GDebugController` tests (!2504)
+* Fix flaky `xdebug_controller_t` tests (!2504)
 
 * Numerous small documentation updates
 
@@ -169,7 +169,7 @@ Overview of changes in GLib 2.71.1
   Marc-André Lureau, with contributions from Xavier Claessens, Nirbheek Chauhan,
   Charlie Barto, Luca Bacci, Amos Wenger) (#692, #2585, !2442)
 
-* Add `GDebugController` and a D-Bus implementation which exposes whether
+* Add `xdebug_controller_t` and a D-Bus implementation which exposes whether
   debug output is enabled in a process using the `org.gtk.Debugging` D-Bus
   interface (work by Philip Withnall) (#1190)
 
@@ -246,7 +246,7 @@ Overview of changes in GLib 2.71.1
  - !2440 Improve g_ascii_formatd docs and preconditions
  - !2441 Reduce the amount of compile-time warnings
  - !2442 Fix tests with static build on Windows
- - !2447 giowin32: use gint64 and _lseeki64
+ - !2447 giowin32: use sint64_t and _lseeki64
  - !2448 Add reStructuredText documentation generator for gdbus-codegen
  - !2452 gio/win32: add GMemoryMonitorWin32
  - !2453 Add `(array length)` annotation to `xtls_certificate_new_from_pkcs12()`
@@ -304,9 +304,9 @@ Overview of changes in GLib 2.71.0
 
 * Make `xdbus_proxy_t::g-signal` signal detailed with D-Bus signal names (#2536) (work by Aleksandr Mezin)
 
-* Emit `launched` signal for D-Bus activation of apps with `GDesktopAppInfo` (!2227) (work by Guido Günther)
+* Emit `launched` signal for D-Bus activation of apps with `xdesktop_app_info_t` (!2227) (work by Guido Günther)
 
-* Fix IDs of `GDesktopAppInfo`s which are constructed from a `.desktop` file in a subdirectory (!2283) (work by Ivalyo Dimitrov)
+* Fix IDs of `xdesktop_app_info_t`s which are constructed from a `.desktop` file in a subdirectory (!2283) (work by Ivalyo Dimitrov)
 
 * Add `--interactive` option to `gdbus call` (!2329)
 
@@ -338,7 +338,7 @@ Overview of changes in GLib 2.71.0
  - #2498 GIR: Remove non-existing IOModule methods `load`, `unload`
  - #2500 Able to export object manager and object on root path, but not other paths
  - #2503 gspawn.c may clobber target fds
- - #2505 g_network_monitor_nm never updates on connection change (listens for signal on wrong dbus interface)
+ - #2505 xnetwork_monitor_nm never updates on connection change (listens for signal on wrong dbus interface)
  - #2506 gspawn.c fails to close child_err_report_fd if it is duped to avoid conflation with one of the target_fds
  - #2507 Strange behavior of xfile_enumerator_t with xvfs_t locations
  - #2514 test suite failure in glib/tests/gdatetime.c if German locale de_DE.ISO-8859-1 is available
@@ -378,7 +378,7 @@ Overview of changes in GLib 2.71.0
  - !2266 fix uninitial variable
  - !2273 Fix more (Windows) warnings
  - !2277 Revert "Don't compile some unused functions in gio/xdgmime/"
- - !2283 GDesktopAppInfo: Try to always correctly set id
+ - !2283 xdesktop_app_info_t: Try to always correctly set id
  - !2284 update the proxy-libintl subproject to the latest release
  - !2285 fix issues found by svace static code analyzer
  - !2286 meson: fix warnings for extract_all_objects function
@@ -426,7 +426,7 @@ Overview of changes in GLib 2.71.0
  - !2373 glib.supp: Suppress one-time allocation in g_get_home_dir()
  - !2376 xsource_t: move test to glib/tests/
  - !2379 Merging tests/bit-test.c into glib/tests/utils.c
- - !2381 tests: Test the function forms of g_bit_*() APIs too
+ - !2381 tests: test_t the function forms of g_bit_*() APIs too
  - !2382 gfileutils: Correctly reset start value when canonicalising paths
  - !2385 gfileutils: Fix transfer annotation and whitespace issues
  - !2386 docs: Add API documentation links to the README
@@ -784,7 +784,7 @@ Overview of changes in GLib 2.69.0
  - !2047 Fix more warnings
  - !2048 Fix more warnings
  - !2049 Fix typo in xsocket_listener_accept_async()'s comment
- - !2050 gdbus: document completion after idle action for g_dbus_connection_signal_unsubscribe()
+ - !2050 gdbus: document completion after idle action for xdbus_connection_signal_unsubscribe()
  - !2051 Add nullable annotations in GUnixMountEntry
  - !2052 xstring_replace(): Fix documentation of 'limit' parameter
  - !2054 docs: Fix formatting of code block
@@ -1391,7 +1391,7 @@ Overview of changes in GLib 2.67.0
  - !1687 uri: add missing (not)nullable annotations
  - !1688 gspawn: Use close_range() if available to close FDs between fork/exec
  - !1691 gmain: Fix possible locking issue in source unref
- - !1692 gsignal: Plug g_signal_connect_object leak
+ - !1692 gsignal: Plug xsignal_connect_object leak
  - !1695 gfile: Clarify refcount handling for xfile_replace_contents_bytes_async()
  - !1696 Fix various minor scan build warnings
  - !1706 Add various missing nullable annotations
@@ -1894,7 +1894,7 @@ Overview of changes in GLib 2.63.5
  - #1925 Large number of routes installed into kernel cause high cpu usage
  - #1993 Rename gdbus-codegen --glib-min-version argument to --glib-min-required and add --glib-max-allowed
  - #2012 spawn_thread_queue not initialised in GThreadPool
- - #2020 g_network_monitor_base_add_network() improperly unrefs xinet_address_mask_t
+ - #2020 xnetwork_monitor_base_add_network() improperly unrefs xinet_address_mask_t
  - !978 Various fixes to make gtkdoc-check pass on glib
  - !1018 docs: tag enclose 'all' and 'help' values
  - !1170 Avoid C++20 deprecated assignment to volatile
@@ -2004,7 +2004,7 @@ Overview of changes in GLib 2.63.3
 * Fix installation path of GIO modules on MSVC to be the bindir (!1254)
 
 * Bugs fixed:
- - #650 g_signal_lookup gives too many warnings
+ - #650 xsignal_lookup gives too many warnings
  - #1011 xlist_store_t, easily find if the item is already inserted
  - #1130 gdbus-codegen: Add an option to strictly generate markdown in source comments
  - #1687 glocalvfs.c uses non-thread-safe getpwnam()
@@ -2079,7 +2079,7 @@ Overview of changes in GLib 2.63.2
  - #1750 Switch from  __sync_fetch_*() to __atomic_*() in glib/gatomic.h
  - #1777 xsize_t: improper typedef on (at least) OpenBSD
  - #1895 Regression: glib does not compile on centos 6: "objcopy: unrecognized option '--add-symbol'"
- - #1917 Test utf8-pointer fails with static build, LTO, optimisations, and new GCC
+ - #1917 test_t utf8-pointer fails with static build, LTO, optimisations, and new GCC
  - #1930 glib/tests/bookmarkfile.c:385:test_modify: assertion failed: (stamp == now)
  - #1934 ostree tests broken since bfdc5fc4fc84ef8518d2d1a328c8482cf5a38e98: File '/tmp/test-tmp-libostree_test-basic-user.sh.test-QB4SA0/diff-test2' is not empty
  - #1938 xdatetime_t doesn't support leap seconds
@@ -2141,8 +2141,8 @@ Overview of changes in GLib 2.63.1
  - #1831 No reply on private socket due to auth problem
  - #1836 gobject.c uses undefined annotation “(not optional)”
  - #1858 docs/reference/gobject/tut_gobject.xml: object properties example uses deprecated API
- - #1877 g_cancellable_source_new annotated with 'skip'
- - #1896 Use after free when calling g_dbus_connection_flush_sync() in a dedicated thread
+ - #1877 xcancellable_source_new annotated with 'skip'
+ - #1896 Use after free when calling xdbus_connection_flush_sync() in a dedicated thread
  - #1897 glib 2.62.0 fails test 'test_writev_no_vectors' wih gcc7
  - #1903 use-after-free in mimeapps test causes intermittent segfault during testing
  - #1906 test_os_info fails on FreeBSD
@@ -2221,7 +2221,7 @@ Overview of changes in GLib 2.63.0
  - #35 add g_fsync to API
  - #174 xfile_copy always preserves  permissions, even if XFILE_COPY_ALL_METADATA flag is not set
  - #259 docs: fix a misunderstanding in xtype_add_interface_*
- - #767 g_signal_lookup fails if class is not referenced
+ - #767 xsignal_lookup fails if class is not referenced
  - #1052 g_io_write_chars calls abort when given a null byte as input
  - #1449 glib fallback atomic int/ptr get/set have memory barrier in wrong place
  - #1565 Signedness of atomic operations
@@ -2448,7 +2448,7 @@ Overview of changes in GLib 2.61.2
  - #1796 Add gio-querymodules variable to pkg-config file
  - #1797 glib/tests/win32 test failing on 64-bit Visual Studio builds
  - #1798 /contenttype/tree reliably fails on FreeBSD since !863
- - #1807 g_dbus_server_new_sync() documentation references nonexistent function
+ - #1807 xdbus_server_new_sync() documentation references nonexistent function
  - #1808 Stopping a xdbus_server_t should clean up Unix socket paths (if not abstract) and nonce-tcp nonce files
  - #1811 Introspection info for xunichar_compose's 3rd arg should be OUT
  - #1822 keyfile gsettings backend not loading
@@ -2491,7 +2491,7 @@ Overview of changes in GLib 2.61.2
  - !923 Check if compiler symbols are defined before using them
  - !924 Bump the required version of Meson
  - !930 glib/tests/convert.c: Skip tests that aren't meaningful for Windows
- - !931 glib/tests/fileutils.c: Fix stdio Wrapper Test on Windows
+ - !931 glib/tests/fileutils.c: Fix stdio Wrapper test_t on Windows
  - !934 build: Increase the slow test timeout to 180s
  - !935 Ignore */__pycache__/* directories
  - !937 Fix module tests on Visual Studio builds
@@ -2678,7 +2678,7 @@ Overview of changes in GLib 2.61.0
  - #1614 GIO tests fail on FreeBSD CI with: Unexpected error from C library during 'pthread_mutex_lock': Invalid argument
  - #1708 Building GLib with G_DISABLE_ASSERT fails
  - #1709 xresource_t generation test incompatible with stable LLVM on Linux
- - #1710 Crash in g_cancellable_cancel
+ - #1710 Crash in xcancellable_cancel
  - #1712 gdbus-proxy test is flaky
  - #1724 unconditional check in fuzzing/meson.build
  - #1725 gosxappinfo.h is not installed on macOS
@@ -3080,7 +3080,7 @@ Overview of changes in GLib 2.59.0
  - #1588 Moving a bookmark item to the same URI causes a crash
  - #1589 g_log_writer_is_journald memoizes a single result, even though it accepts a parameter
  - #1590 tests: g-file-info-filesystem-readonly fails if run more than once with fuse & bindfs installed
- - #1594 Return value of g_dbus_connection_get_unique_name not annotated as nullable
+ - #1594 Return value of xdbus_connection_get_unique_name not annotated as nullable
  - #1600 g_timeout_source_new_seconds overflows when given interval > (G_MAXUINT / 1000)
  - #1601 appinfo test fix is defective
  - #1605 xdate_time_format fails when used with non ASCII format string on POSIX locale
@@ -3118,7 +3118,7 @@ Overview of changes in GLib 2.59.0
  - !332 gmarkup: Make the documentation even more explicit about untrusted input
  - !334 gio: automake: Add libgmodule dependency
  - !338 gcharset: fix leaking g_get_language_names_with_category
- - !339 Add g_desktop_app_info_get_string_list(); fix xkey_file_free()
+ - !339 Add xdesktop_app_info_get_string_list(); fix xkey_file_free()
  - !340 tests: Mark two more tests as slow
  - !345 Fix build failure on systems without POSIX spawn
  - !347 Use Meson 0.48.0 for CI
@@ -3126,7 +3126,7 @@ Overview of changes in GLib 2.59.0
  - !353 Meson: Do not run tests/refcount with --tap
  - !354 Fix spelling mistakes detected by Debian's Lintian tool
  - !358 Autotools: Move libmount from Libs.private to Requires.private
- - !360 CI: Test static build on installed glib
+ - !360 CI: test_t static build on installed glib
  - !363 Tests: Mark printf wrappers with G_GNUC_PRINTF
  - !364 ci: Enable FreeBSD CI
  - !366 gunixmounts: Mark mounts as system internal instead of filtering out
@@ -3287,7 +3287,7 @@ Overview of changes in GLib 2.57.3
 
 * Many minor documentation fixes.
 
-* Fix for gint64 and int64_t compatibility on macOS and BSD. See #972.
+* Fix for sint64_t and int64_t compatibility on macOS and BSD. See #972.
 
 * Fix free space metadata on some file systems (notably FAT). See #328.
 
@@ -3313,7 +3313,7 @@ Bugs fixed:
  #1465 Many uses of G_GNUC_MALLOC are incorrect
  #1448 xerror does not abort() as documented
  #1494 g_clear_pointer may not use the correct calling convention with its callback
- #972 Mismatch between gint64 and int64_t on 64-bit macOS/BSD
+ #972 Mismatch between sint64_t and int64_t on 64-bit macOS/BSD
  !251 gtestdbus: Fix watcher crash on FreeBSD
  #1492 gcc-8: -Wcast-function-type: new warnings for xlist_copy_deep()
  !252 tests: fix gnotification tests broken due to the recent icon name fallback changes
@@ -3337,7 +3337,7 @@ Bugs fixed:
  !199 Update TLS documentation
  #1474 g_test_incomplete() makes test_case_run() return FALSE
  #1475 glib/tests/atomic.c test_types() trips -Werror=bad-function-cast on Debian armel
- #1472 Test for BROKEN_IP_MREQ_SOURCE_STRUCT is broken on Windows / Mingw
+ #1472 test_t for BROKEN_IP_MREQ_SOURCE_STRUCT is broken on Windows / Mingw
  !220 date test: Use g_test_skip(), not g_test_incomplete()
  #1467 malloc difference causes refstring test to fail on FreeBSD
  !230 gbookmarkfile: Fix some more minor leaks when metadata elements are repeated
@@ -3404,7 +3404,7 @@ Overview of changes in GLib 2.57.1
  788773 meson does not install correct pc files
  789968 Add x_autoptr() support for xtype_class_t
  794325 Various fixes to compile on OSX
- 795152 gdesktopappinfo: Mark GDesktopAppInfo constructors as nullable.
+ 795152 gdesktopappinfo: Mark xdesktop_app_info_t constructors as nullable.
  795165 Add xdate_time_get_timezone() and xtime_zone_get_identifier()
  795180 Investigate performance impacts of recent compiler features on hot functions
  795302 Add xhash_table_steal_extended() API
@@ -3637,7 +3637,7 @@ Overview of changes in GLib 2.55.1
  791318 xbytes_t: Improve documentation
  791325 Gio handling of thumbnail:: attribute namespace causes inconsistent b...
  791334 gbinding.c:898: The target object of type xnetwork_address_t has no prop...
- 791337 Crash opening URIs with g_desktop_app_info_launch_uris_with_spawn()
+ 791337 Crash opening URIs with xdesktop_app_info_launch_uris_with_spawn()
  791342 Add autoptr support for lists
  791460 meson: fixes for OSX
  791532 Implicit declaration of function ‘memcmp’ in gtestutils.h
@@ -3985,7 +3985,7 @@ Overview of changes in GLib 2.53.2
  732000 gdatetime: Remove an unnecessary NULL pointer check
  734946 Implement GContentType on OSX
  741335 Possible differences in use of XDG_DATA_DIRS versus XDG base directory specification
- 748263 Use-after-free in g_dbus_connection_call_internal()
+ 748263 Use-after-free in xdbus_connection_call_internal()
  776876 gmodule – Various Android bug-fixes
  777030 build error where minor() and major() cant be resolved in gio/gdbusmessage.c
  780300 gio/gosxappinfo.c uses deprecated LSFindApplicationForInfo
@@ -4176,7 +4176,7 @@ Overview of changes in GLib 2.51.1
  735731 gobject: Document behaviour of xtype_t checking macros on NULL
  736810 gdbus: Fix leak in xdbus_message_print()
  762283 xsocket_t – Fix race conditions on Win32 if multiple threads are waiting on cond...
- 767609 Test suite problems
+ 767609 test_t suite problems
  767952 xdbus_method_invocation_return_*, xdbus_method_invocation_take_error: They d...
  769672 Assert threads for testcase 642026 are sucessfully created
  769745 gtask: Add guards for public functions
@@ -4442,8 +4442,8 @@ Bugs fixed:
  768357 Build the gio tool on Windows/MSVC
  768498 portal support for glib
  768504 keyfile: xkey_file_get_double behavior doesn't follow documentation
- 768549 Test failure: test_ip_sync_dgram
- 768551 Test failure: test_socket_address_to_string
+ 768549 test_t failure: test_ip_sync_dgram
+ 768551 test_t failure: test_socket_address_to_string
  768560 gio/tests/gsettings: fix xsettings_t reference leaks in some tests
  768780 O_PATH is a non-standard flag which may be unavailable on non-Lin...
  768806 gdbus tool must swallow -- argument
@@ -4482,7 +4482,7 @@ Translation updates:
 Overview of changes in GLib 2.49.1
 ==================================
 
- * GDesktopAppInfo now allows bus activation with dashes. This is
+ * xdesktop_app_info_t now allows bus activation with dashes. This is
    not technically allowed per the Desktop Entry specification, but
    it happens in the wild. Rather than forcing people to go through
    another traumatic desktop file rename, accept it and translate - to _.
@@ -4510,7 +4510,7 @@ Bugs fixed:
  749606 tests: always remove app.desktop
  755898 [PATCH] settings: add get/set uint64
  758174 Fix documentation typos
- 758738 Usage of xtype_t properties causes crashes due to gulong/xpointer_t mismatch
+ 758738 Usage of xtype_t properties causes crashes due to xulong_t/xpointer_t mismatch
  760186 namespace clash with gdb pretty-printing code
  762994 Race condition in GIO/AppFileChooser crashes Firefox/Gtk3
  763379 codegen: Add support for x_autoptr to gdbus-codegen–generated objects
@@ -4700,7 +4700,7 @@ Overview of changes in GLib 2.47.4
 * Bugs fixed:
  749092 gdb pretty-printers fail on Python 3 with a TypeError...
  757374 macros: clean up "inline" mess
- 758641 Memory leak in g_dbus_proxy_new_for_bus_sync()
+ 758641 Memory leak in xdbus_proxy_new_for_bus_sync()
  759134 Add missing checks for gnulib vasnprintf()
  759408 Do not use uninitialized var
  756475 Stop supporting non-POSIX getpwuid_r, getgrgid_r
@@ -4770,7 +4770,7 @@ Overview of changes in GLib 2.47.1
 
 * The Unicode support has been updated to version 8.0 of the Unicode standard
 
-* GDesktopAppInfo no longer sets the DISPLAY environment variable when
+* xdesktop_app_info_t no longer sets the DISPLAY environment variable when
   launching apps. This is now done in the xapp_launch_context_t implementations
   when appropriate
 
@@ -4790,7 +4790,7 @@ Overview of changes in GLib 2.47.1
  753310 Remove `#pragma GCC system_header` from gmessages.h
  753935 Update example namespace and class names in xobject_t tutorial
  754855 Object instantiation documentation refers to example that no longer ex...
- 754983 Wayland: g_desktop_app_info_launch_uris_with_spawn() forces DISPLAY va...
+ 754983 Wayland: xdesktop_app_info_launch_uris_with_spawn() forces DISPLAY va...
  754994 xdate_time_get_second () sometimes returns an off-by-one result
  755083 Clarify in G_ADD_PRIVATE that it is safe to call _get_instance_private...
  755351 Example still contains x_autoptr(xchar)
@@ -4901,7 +4901,7 @@ Overview of changes in GLib 2.45.7
 
 * xlist_store_t has a sort function now
 
-* Test infrastructure:
+* test_t infrastructure:
  - Tests are now required to have unique names
  - TAP support has been improved
  - A macro for asserting that two memory regions have identical content
@@ -4956,7 +4956,7 @@ Overview of changes in GLib 2.45.5
  741822 Fails to build with VS 2015
  742386 gdbusconnection: Don't g_printerr() when exiting
  743018 gobject: Add more cross-links between documentation pages
- 750282 Add g_network_monitor_get_network_metered() to get if the connection...
+ 750282 Add xnetwork_monitor_get_network_metered() to get if the connection...
  751358 xfile_monitor_t doesn't react to "mv some-file watched-file"
  751592 Stop using GMemVtable
  751598 Stop 'handle-local-options' propagation when callback reports an err...
@@ -5011,7 +5011,7 @@ Overview of changes in GLib 2.45.4
 Overview of changes in GLib 2.45.3
 ==================================
 
-* Improve performance of g_signal_handler_disconnect for signals
+* Improve performance of xsignal_handler_disconnect for signals
   with many handlers
 
 * GDBus has gained a new call flag to allow interactive authorization
@@ -5278,7 +5278,7 @@ Overview of changes in GLib 2.43.90
 * xoption_group_t: add binding support (boxed type, annotation fixes, etc.)
 
 Bugs fixed:
- 739724 Test functions should have async scope
+ 739724 test_t functions should have async scope
  741024 glist: Mention that xlist_length() is bad for checking list emptiness
  741630 Add xsimple_io_stream_t class
  743349 goption: Add boxed type for xoption_group_t
@@ -5516,9 +5516,9 @@ Overview of changes in GLib 2.41.5
 * Bug fixes:
  735819 single native credential struct used for two purposes
  735915 glib-building.html uses --enable-gcov instead of --enable-coverage
- 736350 GDesktopAppInfo: avoid polling on missing desktop dirs
+ 736350 xdesktop_app_info_t: avoid polling on missing desktop dirs
  736351 Don't use issetugid() on Android
-        Fix the default application logic in GDesktopAppInfo
+        Fix the default application logic in xdesktop_app_info_t
  736458 Only use rand_s() when targetting Visual Studio >= 2005
 
 * Translation updates
@@ -5631,7 +5631,7 @@ Overview of changes in GLib 2.41.2
  732704 Docs: various fixes and improvements
  732739 ginetsocketaddress: Explicitly initialise flags for getaddr...
  732754 xdbus_message_t: optimise (de)serialisation of fixed arrays
- 732984 xobject_ref(NULL) in g_dbus_object_manager_client_finalize
+ 732984 xobject_ref(NULL) in xdbus_object_manager_client_finalize
  733084 Typos in xbytes_hash() and xtime_zone_find_interval() docs
  733146 spawn helper does not use correctly the parameters
 
@@ -5664,7 +5664,7 @@ Overview of changes in GLib 2.41.1
  732002 gwakeup: Clarify buffer sizing in g_wakeup_signal()
  732005 Remove unused assignments
  732019 gtestdbus: Don’t close stdout for dbus-daemon
- 732068 gsignal: Add an example to the g_signal_connect_swapped() documentation
+ 732068 gsignal: Add an example to the xsignal_connect_swapped() documentation
  732081 gsocket: Document that xsocket_create_source() holds a socket ref
  732107 gsocketlistener: Reconsider closing sockets on listener finalisation
 
@@ -5679,9 +5679,9 @@ Overview of changes in GLib 2.41.0
   now that it is supported (mostly from porting Vala metadata).
 
 * use XDG_CURRENT_DESKTOP for OnlyShowIn/NotShowIn handling of desktop
-  files, deprecating g_desktop_app_info_set_desktop_env()
+  files, deprecating xdesktop_app_info_set_desktop_env()
 
-* add support for g_desktop_app_info_get_implementations() to find
+* add support for xdesktop_app_info_get_implementations() to find
   desktop files that have an Implements= line for a given interface
 
 * xhmac_t has gained SHA-512 support
@@ -5699,7 +5699,7 @@ Overview of changes in GLib 2.41.0
  667468 glib-2.30.2: ipv6 tests fail when no ipv6 support is available
  668152 -framework Carbon linker flag not passed to pkg-config .pc files
  707298 libgobject should be linked with -Wl,-z,nodelete
- 712391 Add g_desktop_app_info_get_implementors()
+ 712391 Add xdesktop_app_info_get_implementors()
  722723 Infinite recursion when calling g_io_stream_close_async() from libsoup
  724741 hmac: Fix support for SHA-512 in xhmac_t
  726040 networkaddress: fix parsing of uri with @ after authority
@@ -6014,7 +6014,7 @@ Overview of changes from GLib 2.39.1 to GLib 2.39.2
  708274 Added xobject_t Introspection annotations to genums.c
  710519 Portability schmortability
  710741 some mainloop instrumentation
- 710983 Test failures on powerpc
+ 710983 test_t failures on powerpc
  711047 Enable the build of the various test programs on Windo...
  711051 Add basic test for the xnotification_t gtk backend
  711088 gbacktrace: Don't close stderr when running gdb
@@ -6101,13 +6101,13 @@ Overview of changes from GLib 2.39.0 to GLib 2.39.1
 
  * Appinfo
 
-   - substantially rework GDesktopAppInfo to reduce the amount of disk
+   - substantially rework xdesktop_app_info_t to reduce the amount of disk
      accesses that are performed in common situations
 
    - add a new class: xapp_info_monitor_t for discovering when applications
      are installed/removed
 
-   - add a new g_desktop_app_info_search() API for searching for
+   - add a new xdesktop_app_info_search() API for searching for
      installed applications by name, keywords, etc.
 
  * GMarkup: add new G_MARKUP_IGNORE_QUALIFIED flag for skipping over
@@ -6179,9 +6179,9 @@ Bugs fixed:
  711064 Adding child source to blocked source can cause a segfault
  711070 Copying a symlink over another one segfaults
  711099 gapplication test failure
- 711520 GDesktopAppInfo: allow more than one level of legacy folder prefixes
+ 711520 xdesktop_app_info_t: allow more than one level of legacy folder prefixes
  711556 Add xapp_info_monitor_t
- 711557 Add g_desktop_app_info_search()
+ 711557 Add xdesktop_app_info_search()
  711600 trivial portability fix
  711632 The desktop-app-info test fails during make check
  711754 gmain: Fix use of uninitialized memory in sigaction structure
@@ -6226,7 +6226,7 @@ Overview of changes from GLib 2.38.0 to GLib 2.39.0
 
    - bash tab completion is supported
 
- * GDesktopAppInfo changes:
+ * xdesktop_app_info_t changes:
 
    - xfile_get_path() can implicitly cause a FUSE mount so don't call
      it until we know we need it (for an app that doesn't support URIs)
@@ -6381,7 +6381,7 @@ Bugs fixed:
  709113 [PATCH] Main loop dispatch path has needless linked list
  709227 Update to unicode 6.3.0
  709301 goutputstream: Add clear warning about short writes to _write_bytes() and async version
- 709326 GDesktopAppInfo crashes creating a DBusActivatable app without a filename
+ 709326 xdesktop_app_info_t crashes creating a DBusActivatable app without a filename
  709440 Fix overloading of "source" and "target" terminology in xbinding_t
  709615 Cannot use g_test_expect_message with xerror
  709753 Add helpers for string matches when using GtkSearchBar-like widget
@@ -6418,7 +6418,7 @@ What's new in Glib 2.38
     interface as per the desktop entry specification, allowing for
     standards-based D-Bus launching of GLib-based applications
 
-  - GDesktopAppInfo now supports DBusActivatable as per the desktop
+  - xdesktop_app_info_t now supports DBusActivatable as per the desktop
     entry specification, allowing GLib-based applications to use D-Bus
     to launch other applications
 
@@ -6757,7 +6757,7 @@ Overview of changes from GLib 2.37.1 to 2.37.2
  698614 xobject_t: prevent installing properties after init
  699259 add org.freedesktop.Application support to GIO
  699959 xfile_copy(): Ensure we create private files by default
- 700123 Test failure: g_inet_socket_address_get_scope_id
+ 700123 test_t failure: g_inet_socket_address_get_scope_id
  700725 xicon_t: NULLify the `type' out param in the sync methods too
  701401 gtest: add function for testing for WINE
  701456 Error in gnome/glib/gio/tests/file.c
@@ -6961,7 +6961,7 @@ reasons).  This change only affects Windows.
 * Bugs fixed:
  682896 glib doesn't build on mingw32
  693204 split up g_get_{hostname,username,realname,home_dir} etc.
- 694181 Handle xnetwork_address_t better in g_network_monitor_base_...
+ 694181 Handle xnetwork_address_t better in xnetwork_monitor_base_...
  694253 occasional /gdbus/unref-pending test failure
  694350 Add type names to gsignal warnings
  694757 Use separate XPL_WARN_CFLAGS that can be overridden ext...
@@ -7319,7 +7319,7 @@ Bugs closed:
  686920 gdbus: Allow xdbus_object_manager_client_t to work on peer connections
  686921 Remove some of the repetition from gio/tests/Makefile.am
  687075 g_spawn_sync diagnostic incorrectly complains about SIGCHLD
- 687089 g_dbus_connection_export_menu_model(): fix a crash
+ 687089 xdbus_connection_export_menu_model(): fix a crash
  687098 Repeated g_timeout_add* use can lead to xuint_t overflow
  687385 Add some stricter CFLAGS, fix up the code
  687441 ABI break in master: xmenu_attribute_hash_iter_get_type, xmenu_link_hash_iter_get_type removed
@@ -7346,7 +7346,7 @@ Overview of changes from GLib 2.34.0 to 2.35.1
 These two changes in particular may be slightly incompatible.  Please
 give feedback if they cause trouble:
 
-  * Signal handlers connected with g_signal_connect_object() are now
+  * Signal handlers connected with xsignal_connect_object() are now
     automatically disconnected on target object destruction
 
   * The ->constructed vfunc is now called after all properties are set
@@ -7371,7 +7371,7 @@ The remaining changes should not cause problems.
     GBusNameVanishedCallback and document this situation
 
 * Bugs fixed:
- 118536 Make g_signal_connect_object'ed handlers disconnect when the data object is destroyed
+ 118536 Make xsignal_connect_object'ed handlers disconnect when the data object is destroyed
  661767 merge/improve various bits of run-in-thread functionality
  682950 xfile_monitor_t crashing on high event count when running in different thread
  683642 Missing g_content_type_get_symbolic_icon
@@ -7511,7 +7511,7 @@ Overview of changes from GLib 2.33.10 to 2.33.12
  682075 gdbus: Fix double free and use after free of ob...
  682101 Provide a way to get a symbolic icon for a device
  682222 test_method_calls_on_proxy: assertion failed (e...
- 682284 mount-op: use gint64 instead of xuint64_t for tim...
+ 682284 mount-op: use sint64_t instead of xuint64_t for tim...
  682386 "make check" fails due to sys/resource.h not be...
  682560 leak fixes
  682586 gsettings-tool: make list-recursively really re...
@@ -7611,7 +7611,7 @@ Overview of changes from GLib 2.33.6 to 2.33.8
 * Bugs fixed:
  661767 merge/improve various bits of run-in-thread functionality
  680074 undefined symbol "get_C_locale"
- 680121 g_cancellable_source_new: don't use a file descriptor
+ 680121 xcancellable_source_new: don't use a file descriptor
  680148 gthread: check for definition of PR_SET_NAME
  680310 Sorting of access points by strengh not working
  680704 xutf8_strup() crash
@@ -7625,7 +7625,7 @@ Overview of changes from GLib 2.33.6 to 2.33.8
  674314 Make gtk-doc not a hard dependency of GLib
  674800 gclosure: generic marshaller leaks return value
  675524 gsocket: FIONREAD undeclared (needs sys/filio.h)
- 679509 use after free in g_dbus_action_group_describe_all_done()
+ 679509 use after free in xdbus_action_group_describe_all_done()
  679996 gobject docs minor cleanup
  680459 Extra newline char in local implementation of g_applic...
  680505 object_path memory leak in gdbusobjectproxy.c
@@ -7689,7 +7689,7 @@ Overview of changes from GLib 2.33.3 to 2.33.4
  678576 GIOScheduler performance enhancements
  678758 xtls_interaction_t unlocks an unlocked mutex
  678808 xtest_dbus_t issues
- 678881 Test failures in /socket/timed_wait in some cas...
+ 678881 test_t failures in /socket/timed_wait in some cas...
  678941 /contenttype/guess test case failure
  678944 gio returns the wrong default applications for ...
  678949 wrong definition of ulong_bool for 64 bit big e...
@@ -7725,7 +7725,7 @@ Coverity).  There are a few notable externally-visible changes:
 
 * Thumbnails are now in XDG_CACHE_HOME
 
-* new GDBus API: per-thread g_dbus_connection_get_last_serial()
+* new GDBus API: per-thread xdbus_connection_get_last_serial()
 
 * GUnixOutputStream now has a can_poll() implementation
 
@@ -7740,7 +7740,7 @@ Coverity).  There are a few notable externally-visible changes:
  675168 prepare for thumbnails to move to XDG_CACHE_HOME
  675966 gresolver: More robust parsing of DNS responses
  676594 [Patch] fix g_reload_user_special_dirs_cache
- 676825 Implement g_dbus_connection_get_last_serial ()
+ 676825 Implement xdbus_connection_get_last_serial ()
  677235 Clarify the comment at the top of gmarshal.list
  677527 OS X: gthread/spawn-async selftest failure
  677718 xdbus_proxy_t: treat org.freedesktop.systemd1.Masked error as non-fatal
@@ -7989,7 +7989,7 @@ Overview of changes from GLib 2.31.20 to 2.31.22
 * Bugs fixed:
  531901 Use __builtin_bswap* for GUINT*_SWAP_LE_BE if building...
  653167 Out of tree build is broken on windows
- 668973 Test /gvariant/parser fails on Solaris 10
+ 668973 test_t /gvariant/parser fails on Solaris 10
  669797 gvfs now lists its fuse mounts
  670846 deadlock: GStreamer-WARNING **: wrong STREAM_LOCK count 0
  671664 gio-querymodules: unlink instead of writing empty cache
@@ -8001,7 +8001,7 @@ Overview of changes from GLib 2.31.20 to 2.31.22
  672026 default log output should include pid and/or prgname
  672095 glib needs stable sort function
  672201 G_SPAWN_SEARCH_PATH should continue on ENODEV and ETIMEDOUT
- 672239 request NO_REPLY from g_dbus_connection_call() with no as...
+ 672239 request NO_REPLY from xdbus_connection_call() with no as...
  672249 gdbusproxy leaks asyncresult in an error case instead of...
 
 * Translation updates:
@@ -8053,7 +8053,7 @@ Overview of changes from GLib 2.31.18 to 2.31.20
  670557 gvaluetransform: Fix an infinite loop with xflags_value_t...
  670721 global variable for signal ID should be hidden
  670751 IceWM build fails due to the G_DEPRECATED_FOR macro
- 670909 g_dbus_connection_call leaks when it receives an error...
+ 670909 xdbus_connection_call leaks when it receives an error...
  670922 Include path to gdbus-codegen in the pkgconfig file
  670969 xsequence_t lookup may fail if there was no sort prior to...
  671025 Constants and identifiers starting with a number are no...
@@ -8202,7 +8202,7 @@ Overview of changes from GLib 2.31.10 to 2.31.12
  668118 the big appmenu switcheroo
  668158 base64 encode and line termination
  668163 xdbus_connection_t: note that exit-on-close is sometimes TRUE
- 668269 gsignal: add g_signal_handlers_disconnect_by_data
+ 668269 gsignal: add xsignal_handlers_disconnect_by_data
  668279 create xaction_t from xsettings_t
 
 * Translation updates:
@@ -8367,7 +8367,7 @@ Overview of changes from GLib 2.31.2 to 2.31.4
  641720 Misleading definition for local_command_line() in GApplic...
  648516 Little comment error and 2 useless lines of code
  651997 Dummy backend for gapplication
- 652560 Test for g_ascii_strtod is failing
+ 652560 test_t for g_ascii_strtod is failing
  662208 failure to initialize a xinitable_t should be considered...
  662718 xdbus_interface_skeleton_t should be able to export on multi...
  663291 xbytes_t: Immutable, refcounted sequence of bytes
@@ -8617,7 +8617,7 @@ list below attempts to summarise, but not every change is listed.
  661763 desktop-app-info: Add support for X-GNOME-Keywords
  661896 /gdbus/connection/life-cycle is racy
  661914 Gstreamer/Totem locks up
- 662100 regression: g_dbus_connection_close() triggers exit-on-close logic
+ 662100 regression: xdbus_connection_close() triggers exit-on-close logic
 
 * Translations updates:
  Belarusian
@@ -8652,7 +8652,7 @@ Overview of changes from GLib 2.29.18 to 2.29.90
 ================================================
 
 * xobject_t includes a generic marshaller, g_cclosure_marshal_generic.
-  To use it, simply specify NULL as the marshaller in g_signal_new().
+  To use it, simply specify NULL as the marshaller in xsignal_new().
   The generic marshaller is implemented with libffi, and consequently
   xobject_t depends on libffi now.
 
@@ -8727,7 +8727,7 @@ Overview of changes from GLib 2.29.16 to 2.29.18
  657084 gfileutils: fix docs/annotations for temp file methods
  657138 Some files missing in POTFILES.in
  657206 xinput_stream_t leaked in xfile_icon_load_async()
- 657243 g_cancellable_set_error_if_cancelled() documentation
+ 657243 xcancellable_set_error_if_cancelled() documentation
  657274 Use detected PYTHON variable as shebang for gdbus-codegen
  657336 Speling fixes for glib found with codespell
  657452 plural forms needed
@@ -8762,7 +8762,7 @@ Overview of changes from GLib 2.29.14 to 2.29.16
 * Misc new API:
  - xptr_array_add_full: creates a xptr_array_t with
    a preallocated size and a destroy function
- - g_desktop_app_info_get_show_in: checks if a GDesktopAppInfo
+ - xdesktop_app_info_get_show_in: checks if a xdesktop_app_info_t
    should be shown in a given desktop environment
  - g_mkdtemp, g_mkdtemp_full, g_dir_make_tmp: create
    temporary directories
@@ -8781,10 +8781,10 @@ Overview of changes from GLib 2.29.14 to 2.29.16
  654078 Fail to static linking with Glib library
  654450 New functions: xptr_array_new_full()
  654793 Add G_VALUE_INIT
- 655044 GDesktopAppInfo: Add g_desktop_app_info_get_show_in()
+ 655044 xdesktop_app_info_t: Add xdesktop_app_info_get_show_in()
  655148 gdbusconnection is broken when compiling with mingw
  655241 glocalfile.c no longer compiles with MinGW GCC
- 655598 g_cancellable_get_fd: silently return -1 for NULL cancellable
+ 655598 xcancellable_get_fd: silently return -1 for NULL cancellable
  655664 gdbus should not abort if no dbus session is available
  655769 Use ZLIB_CFLAGS when compiling gio
  656031 Improve xvariant_t annotations
@@ -8902,8 +8902,8 @@ Overview of changes from GLib 2.29.8 to 2.29.10
 ===============================================
 
 * New features:
- - g_desktop_app_info_get_nodisplay: a function that is required
-   to port gnome-menus to GDesktopAppInfo
+ - xdesktop_app_info_get_nodisplay: a function that is required
+   to port gnome-menus to xdesktop_app_info_t
  - g_hash_Table_iter_replace: new function to replace a value
    while iterating over a hash table
  - xutf8_substring: convenience API to extract substrings from
@@ -8952,7 +8952,7 @@ Overview of changes from GLib 2.29.6 to 2.29.8
  651998 gdbus-codegen: Use relative Python imports
  652000 Fix for gatomic.c on Windows/MSVC
  652002 Proposal to clean up gvaluetransform.c for MSVC
- 652025 g_dbus_connection_register_object: error is not set...
+ 652025 xdbus_connection_register_object: error is not set...
  652081 Typos in a xbinding_t warning message
  652197 Improper handling of double values in xdbus_message_t
         Fix a deadlock in gobject finalization
@@ -9064,11 +9064,11 @@ Overview of changes from GLib 2.29.2 to 2.29.4
  - There is now a g_test_fail() function to mark
    tests as failed
 
-* GDesktopAppInfo
+* xdesktop_app_info_t
  - Now has a binding-friendly filename property
  - Other new API to more fully expose desktop file contents:
-   g_desktop_app_info_get_categories(),
-   g_desktop_app_info_get_generic_name()
+   xdesktop_app_info_get_categories(),
+   xdesktop_app_info_get_generic_name()
 
 * xhashtable_t:
  - Several optimizations to reduce space consumption of
@@ -9099,10 +9099,10 @@ Overview of changes from GLib 2.29.2 to 2.29.4
  647602 Cannot connect to remote message bus via TCP
  647746 The xsocket_service_t documentation is incomplete.
  647826 API: gtester: Add g_test_fail()
- 647903 GDesktopAppInfo: Add g_desktop_app_info_get_categories()
+ 647903 xdesktop_app_info_t: Add xdesktop_app_info_get_categories()
  648416 xapp_info_create_from_commandline ignores SUPPORTS_STARTUP_NOTIFICATION
  648423 Support G_DEBUG=trap-warnings
- 648425 GDesktopAppInfo: Add "filename" property for bindings
+ 648425 xdesktop_app_info_t: Add "filename" property for bindings
  648966 Update xunichar_iswide and xunichar_iswide_cjk
 
 * Updated translations
@@ -9158,7 +9158,7 @@ Overview of Changes from GLib 2.28.0 to 2.29.2
  624943 G_VALUE_NOCOPY_CONTENTS is undocumented
  637738 object_interface_check_properties never actually executes
  638185 xio_condition_t should be annotated as "flags"
- 639478 xdbus_server_t's g_dbus_server_new_sync() function should just...
+ 639478 xdbus_server_t's xdbus_server_new_sync() function should just...
  641755 Add g_settings_get/set_uint() helpers
  641768 dconf gsettings backend silently drops writes if it can't...
  642797 xapp_info_get_default_for_type() broken for subtypes
@@ -9301,13 +9301,13 @@ Overview of Changes from GLib 2.27.90 to 2.27.91
 Overview of Changes from GLib 2.27.5 to 2.27.90
 ===============================================
 
-* Test reports created by gtester-report can now
+* test_t reports created by gtester-report can now
   include revision information
 
-* The g_desktop_app_info_launch_* family of functions
+* The xdesktop_app_info_launch_* family of functions
   now emit a DBus signal when an application is launched.
   Additionally, there is a new variant
-  g_desktop_app_info_launch_uris_as_manager(), which
+  xdesktop_app_info_launch_uris_as_manager(), which
   gives more control over the launched process.
 
 * The memory and null xsettings_t backends are now available
@@ -9361,7 +9361,7 @@ Overview of Changes from GLib 2.27.4 to 2.27.5
 
 * Bugs fixed:
  617254 Missing g_sequence_lookup
- 632544 g_dbus_connection_send_message can not send a locked message...
+ 632544 xdbus_connection_send_message can not send a locked message...
  633350 g_hostname_to_ascii() ignores non-ascii dots
  634583 Better error reporting for xvariant_parse()
  635007 gsetting enum rule don't work for out-of-srcdir builds
@@ -9395,7 +9395,7 @@ Overview of Changes from GLib 2.27.3 to 2.27.4
    that starts with a dot
  - xapp_info_t gained API to differentiate between recommended
    and fallback mime handlers
- - g_cancellable_create_source: creates a xsource_t that triggers
+ - xcancellable_create_source: creates a xsource_t that triggers
    when the xcancellable_t is canceled
  - GPollableInput/OutputStream: Interfaces for pollable streams
  - TLS support has landed, with an extension point that is
@@ -9857,7 +9857,7 @@ Bugs closed:
  625472 Valgrind claims uninitialized bytes used
  625500 xdate_set_time_val documentation doesn't mention local time
  625628 xdbus_proxy_t: wrong property name sorting
- 625753 Incorrect flags used in g_dbus_connection_call_sync()
+ 625753 Incorrect flags used in xdbus_connection_call_sync()
  625827 Expand documentation about error quark naming
  625988 builddir != srcdir issues
  626107 glibconfig.h is being disted
@@ -10205,7 +10205,7 @@ Overview of Changes from GLib 2.25.8 to GLib 2.25.9
    of the boxed type, so this should not cause any applications
    to break.
 
-* Test framework
+* test_t framework
  - Add package and version to the test report XML
  - Use optparse to parse gtester-report commandline
  - Add subunit support to gtester-report
@@ -10292,7 +10292,7 @@ Overview of Changes from GLib 2.25.6 to GLib 2.25.7
 ===================================================
 
 * NOTE: API/ABI breaks since 2.25.6 release:
-  - g_dbus_connection_sync{,_sync} takes a new 'reply_type' argument
+  - xdbus_connection_sync{,_sync} takes a new 'reply_type' argument
   - GSettingsBackendClass 'list' virtual function changed
 
   xsettings_t backends and things using GDBus may need to be rebuilt.
@@ -10527,12 +10527,12 @@ Overview of Changes from GLib 2.23.5 to GLib 2.23.6
   - drop unmaintained Visual Studio 8 support
 
 * Minor API addition:
-  - g_desktop_app_info_get_filename()
+  - xdesktop_app_info_get_filename()
 
 * Bugs fixed:
  521707 Class private data
  612502 build fails on glib/tests/gvariant.c
- 612832 [GDesktopAppInfo] New function g_desktop_app_info_get_filename
+ 612832 [xdesktop_app_info_t] New function xdesktop_app_info_get_filename
  612702 [PATCH] Fix xsocket_t-related crash on Windows
  612736 Improve the documentation about single include
  610858 gvariant test fails sometimes
@@ -10798,7 +10798,7 @@ Overview of Changes from GLib 2.22.x to GLib 2.23.0
  600141 Add -pthread to gmodule pkg-config
  593856 file and directory monitors don't work when glib is compiled...
  324930 Nautilus should disallow copying of symlink to FAT drive early
- 587300 Deadlock when calling g_cancellable_disconnect in a...
+ 587300 Deadlock when calling xcancellable_disconnect in a...
  595138 xfile_t not robust with invalid input
  591216 Warning building resolver.o
  590016 Does not compile under MinGW32 + Wine
@@ -10842,7 +10842,7 @@ Overview of Changes from GLib 2.22.0 to GLib 2.22.1
 ===================================================
 
 * Bugs fixed:
- 596064 Test file marked for translation
+ 596064 test_t file marked for translation
  595972 possibly invalid search in mime_info_cache_dir_add_...
  596561 C99 style of declaration of variable in gmessages.c
  596314 xutf16_to_utf8 returns an invalid UTF8 string
@@ -10952,15 +10952,15 @@ Overview of Changes from GLib 2.21.4 to GLib 2.21.5
 * xresolver_t now invalidates the libc resolv.conf cache as needed
 
 * Minor api additions:
- - g_cancellable_make_pollfd returns a boolean now. And there is a
-   new function g_cancellable_release_fd that can be used to released
+ - xcancellable_make_pollfd returns a boolean now. And there is a
+   new function xcancellable_release_fd that can be used to released
    the resources used by a xcancellable_t.
 
 * Bugs fixed:
  589988 Compilation error on Solaris 9 (missing stdint.h)
  588901 gtcpconnection.c won't compile
  584246 xresolver_t needs to call res_init() when network state changes
- 591714 Figure out failure handling for g_cancellable_make_pollfd()
+ 591714 Figure out failure handling for xcancellable_make_pollfd()
  591532 redundent '/' returned from xfile_resolve_relative_path
  591378 Use MSG_NOSIGNAL in xsocket_t if it's available
  589649 API documentation migration for Base64 Encoding
@@ -11072,7 +11072,7 @@ Overview of Changes from GLib 2.21.1 to GLib 2.21.2
  580301	network: a few issues on old darwin
  583398	SRV weight sorting is incorrect
  584176	build fixes on FreeBSD
- 585189	g_cancellable_reset() must be called in same thread as g_...
+ 585189	xcancellable_reset() must be called in same thread as g_...
  585280	compilation dies on gio/gsocket.c, needs sys/uio.h to con...
  585281	gio/gunixfdmessage.c needs sys/types.h for platforms that...
  585478	don't leak the inotify fd
@@ -11106,8 +11106,8 @@ Overview of Changes from GLib 2.21.0 to GLib 2.21.1
  578769 implement GWinHttpFileInputStream::close_fn
  582856	gsocket.c doesn't compile on Solaris
  569375	g[u]intptr undocumented
- 573246	[FIX] g_desktop_app_info_dup() can access NULL pointer
- 575013	g_cancellable_push_current() does not allow NULL
+ 573246	[FIX] xdesktop_app_info_dup() can access NULL pointer
+ 575013	xcancellable_push_current() does not allow NULL
  577884	live-g-file.c:461: error: format ‘%d’ expects type ...
  578499	xoutput_stream_splice and stream closing with gnio strea...
  579558	Application employing gvfs crashes with only libgvfscommo...
@@ -11136,7 +11136,7 @@ Overview of Changes from GLib 2.20.x to GLib 2.21.0
 ===================================================
 
 * GIO:
- - New helper functions g_cancellable_connect/disconnect to avoid
+ - New helper functions xcancellable_connect/disconnect to avoid
    race conditions when connecting to the "cancelled" signal on
    xcancellable_t.
  - New types and methods for dealing with IPv4 and IPv6 addresses (and
@@ -11157,7 +11157,7 @@ Overview of Changes from GLib 2.20.x to GLib 2.21.0
  548466 async/cancellable DNS resolver
  579830 param spec strings should use P_()
  579862 requesting xattr::foo ends up calling getxattr(..., user...
- 580453 Hash and equal functions for gint64 and xdouble_t
+ 580453 Hash and equal functions for sint64_t and xdouble_t
  580450 Reference counting and boxed types for arrays
  580194 gresolver doesn't build on Solaris
  580301 network: a few issues on old darwin
@@ -11527,7 +11527,7 @@ Overview of Changes from GLib 2.18.1 to GLib 2.19.0
 * New macros g_assert_error and g_assert_no_error to assert
   that a xerror_t is set or unset
 
-* g_cancellable_make_pollfd: New method to make a xpollfd_t for a cancellable
+* xcancellable_make_pollfd: New method to make a xpollfd_t for a cancellable
 
 * xapp_info_can_delete, xapp_info_delete, xapp_info_reset_type_associations:
   New functions to clean up app infos and content types
@@ -11591,7 +11591,7 @@ Overview of Changes from GLib 2.18.0 to GLib 2.18.1
  548321 <string.h> is not included in gi18n-lib.h
  551149 xdgmime mem leak
  550647 synchronous pipe I/O when reading mount reply
- 551887 Docs for g_desktop_app_info_new_from_filename aren't...
+ 551887 Docs for xdesktop_app_info_new_from_filename aren't...
  551681 g_content_type_guess() too naive with filenames
  552352 xapp_info_launch doesn't work if "Path" key...
  551408 gmodule.def generated to builddir...
@@ -11670,7 +11670,7 @@ Overview of Changes from GLib 2.17.6 to GLib 2.17.7
  547637 unconditional #include of sys/statfs.h in configure
  547337 G_DISABLE_DEPRECATED breaks tests build
  547832 gtk+-2.12.11 fails to build - AC_PROG_MMAP too strict
- 502498 Test framework assertion failures should follow gcc
+ 502498 test_t framework assertion failures should follow gcc
  546371 Improve docs re xfile_monitor
  546483 xthemed_icon_t:use-default-fallbacks is not readable without...
  546132 xfile_icon_t is bindings-unfriendly
@@ -11753,7 +11753,7 @@ Overview of Changes from GLib 2.17.3 to GLib 2.17.4
 
 * xobject_t:
  - New API to handle signals without slots in the class structure:
-   g_signal_new_class_handler, g_signal_override_class_handler
+   xsignal_new_class_handler, xsignal_override_class_handler
 
 * Internationalization:
  - Add an NC_ macro that is a no-op equivalent of C_
@@ -11824,7 +11824,7 @@ Overview of Changes from GLib 2.17.1 to GLib 2.17.3
  538836 make check failure on PPC and ALPHA: pltcheck.sh on g_atomic_pointer_get
  539090 g_content_type_from_mime_type() should unalias
  540331 xfile_append_to () documentation: can return NULL
- 534639 add g_desktop_app_info_new_from_keyfile
+ 534639 add xdesktop_app_info_new_from_keyfile
  536733 gio build failure on Irix
  536160 Add xfile_monitor()
  538127 FileChooser broken on win32
@@ -11870,7 +11870,7 @@ Overview of Changes from GLib 2.17.0 to GLib 2.17.1
  537546 'desktop' shortcut in file chooser looks like a generic folder
  537392 Additional colon in xattr name
  536641 Filesystem querying in gio does not list AFS and autofs file systems
- 528600 g_dummy_file_get_parent("scheme://example.com/")
+ 528600 xdummy_file_get_parent("scheme://example.com/")
  503071 Application direction changes to right to left even if theres no
         translation
  502511 g_assert_cmphex prints invalid message
@@ -13475,7 +13475,7 @@ Overview of Changes from GLib 2.4.x to GLib 2.6.0
   maximum portability, you should structure your code to fork all
   child processes that you want to wait for from the main thread.
 
-* A problem was recently discovered with g_signal_connect_object();
+* A problem was recently discovered with xsignal_connect_object();
   it doesn't actually disconnect the signal handler once the object being
   connected to dies, just disables it. See the API docs for the function
   for further details and the correct workaround that will continue to
@@ -13778,7 +13778,7 @@ Overview of Changes from GLib 2.3.0 to GLib-2.3.1
 * Add G_STRFUNC as a portable wrapper for __func__ [Tim Janik]
 * Documentation improvements [Matthias]
 * xobject_t [Tim Janik]
- - Support '-' in g_signal_connect()/disconnect() names
+ - Support '-' in xsignal_connect()/disconnect() names
    like 'swapped-signal'.
  - Add xtype_class_peek_static() and use to optimize
    xobject_new() for static types [Tim]
@@ -13968,7 +13968,7 @@ Overview of Changes in GLib 2.0.1
 * Actually check interface prerequisites [Matthias Clasen,
   Miroslaw Dobrzanski-Neumann]
 * Fix problem with glib-mkenums taking huge amounts of stack. [Owen Taylor]
-* Fix g_signal_handlers_disconnect_by_func() for C++ [Damien Sandras]
+* Fix xsignal_handlers_disconnect_by_func() for C++ [Damien Sandras]
 * Fixes for g_log() and threading.
   [Sebastian Wilhelmi, Miroslaw Dobrzanski-Neumann, Tim Janik]
 * Make g_print(), g_printerr(), g_warning(), etc, convert from
@@ -14021,7 +14021,7 @@ Other contributors: James Henstridge, Ryan Lovett, Morten Welinder,
 Overview of Changes in GLib 1.3.14:
 ===================================
 
-* Register value transformations for gint64, xuint64_t [Andy Wingo]
+* Register value transformations for sint64_t, xuint64_t [Andy Wingo]
 * Build with large-file support [Sven Neumann, Owen Taylor]
 * Fix handling of hostnames in URI's [Darin Adler]
 * Main loop bug fixes [Havoc Pennington, Owen]

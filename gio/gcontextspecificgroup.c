@@ -51,7 +51,7 @@ g_context_specific_source_dispatch (xsource_t     *source,
 
   g_mutex_unlock (&css->lock);
 
-  g_signal_emit (css->instance, signal_id, 0);
+  xsignal_emit (css->instance, signal_id, 0);
 
   return TRUE;
 }

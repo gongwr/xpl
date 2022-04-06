@@ -2482,7 +2482,7 @@ main (int argc, char *argv[])
   /* This failed with PCRE 7.2 (gnome bug #455640) */
   TEST_MATCH(".*$", 0, 0, "\xe1\xbb\x85", -1, 0, 0, TRUE);
 
-  /* Test that othercasing in our pcre/glib integration is bug-for-bug compatible
+  /* test_t that othercasing in our pcre/glib integration is bug-for-bug compatible
    * with pcre's internal tables. Bug #678273 */
   TEST_MATCH("[Ǆ]", XREGEX_CASELESS, 0, "Ǆ", -1, 0, 0, TRUE);
   TEST_MATCH("[Ǆ]", XREGEX_CASELESS, 0, "ǆ", -1, 0, 0, TRUE);
@@ -2537,7 +2537,7 @@ main (int argc, char *argv[])
   TEST_PARTIAL("(a)+b", "aa", TRUE);
   TEST_PARTIAL("a?b", "a", TRUE);
 
-  /* Test soft vs. hard partial matching */
+  /* test_t soft vs. hard partial matching */
   TEST_PARTIAL_FULL("cat(fish)?", "cat", XREGEX_MATCH_PARTIAL_SOFT, FALSE);
   TEST_PARTIAL_FULL("cat(fish)?", "cat", XREGEX_MATCH_PARTIAL_HARD, TRUE);
 

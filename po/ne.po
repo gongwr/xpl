@@ -270,7 +270,7 @@ msgstr "आधार स्ट्रिममा खोजी समर्थि
 
 #: gio/gbufferedinputstream.c:938
 #, fuzzy
-msgid "Cannot truncate xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
 msgstr "सूपबडीइनपुटस्ट्रीम ट्रंक गर्न सकिँदैन"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1237 gio/giostream.c:300
@@ -3194,7 +3194,7 @@ msgstr "लक्ष्य फाइल हटाउँदा त्रुटि
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:772
 #, fuzzy
-msgid "Invalid GSeekType supplied"
+msgid "Invalid xseek_type_t supplied"
 msgstr "पासवर्ड पूर्ति गरिएको छैन"
 
 #: gio/gmemoryinputstream.c:484

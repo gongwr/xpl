@@ -79,7 +79,7 @@ G_BEGIN_DECLS
 /**
  * XTYPE_UCHAR:
  *
- * The fundamental type corresponding to #guchar.
+ * The fundamental type corresponding to #xuchar_t.
  */
 #define XTYPE_UCHAR			XTYPE_MAKE_FUNDAMENTAL (4)
 /**
@@ -109,13 +109,13 @@ G_BEGIN_DECLS
 /**
  * XTYPE_ULONG:
  *
- * The fundamental type corresponding to #gulong.
+ * The fundamental type corresponding to #xulong_t.
  */
 #define XTYPE_ULONG			XTYPE_MAKE_FUNDAMENTAL (9)
 /**
  * XTYPE_INT64:
  *
- * The fundamental type corresponding to #gint64.
+ * The fundamental type corresponding to #sint64_t.
  */
 #define XTYPE_INT64			XTYPE_MAKE_FUNDAMENTAL (10)
 /**
@@ -398,8 +398,8 @@ G_BEGIN_DECLS
  */
 #if     XPL_SIZEOF_SIZE_T != XPL_SIZEOF_LONG || !defined __cplusplus
 typedef xsize_t                           xtype_t;
-#else   /* for historic reasons, C++ links against gulong GTypes */
-typedef gulong                          xtype_t;
+#else   /* for historic reasons, C++ links against xulong_t GTypes */
+typedef xulong_t                          xtype_t;
 #endif
 typedef struct _GValue                  xvalue_t;
 typedef union  _xtype_c_value             xtype_c_value_t;
@@ -2036,7 +2036,7 @@ xuint_t     xtype_get_type_registration_serial (void);
  */
 #define G_ADD_PRIVATE(TypeName) { \
   TypeName##_private_offset = \
-    xtype_add_instance_private (g_define_type_id, sizeof (TypeName##Private)); \
+    xtype_add_instance_private (g_define_type_id, sizeof (TypeName##_private_t)); \
 }
 
 /**

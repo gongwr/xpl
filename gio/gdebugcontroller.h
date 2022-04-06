@@ -18,8 +18,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#ifndef __G_DEBUG_CONTROLLER_H__
-#define __G_DEBUG_CONTROLLER_H__
+#ifndef __XDEBUG_CONTROLLER_H__
+#define __XDEBUG_CONTROLLER_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -30,50 +30,50 @@
 G_BEGIN_DECLS
 
 /**
- * G_DEBUG_CONTROLLER_EXTENSION_POINT_NAME:
+ * XDEBUG_CONTROLLER_EXTENSION_POINT_NAME:
  *
  * Extension point for debug control functionality.
  * See [Extending GIO][extending-gio].
  *
  * Since: 2.72
  */
-#define G_DEBUG_CONTROLLER_EXTENSION_POINT_NAME "gio-debug-controller"
+#define XDEBUG_CONTROLLER_EXTENSION_POINT_NAME "gio-debug-controller"
 
 /**
- * GDebugController:
+ * xdebug_controller_t:
  *
- * #GDebugController is an interface to expose control of debugging features and
+ * #xdebug_controller_t is an interface to expose control of debugging features and
  * debug output.
  *
  * Since: 2.72
  */
-#define XTYPE_DEBUG_CONTROLLER             (g_debug_controller_get_type ())
+#define XTYPE_DEBUG_CONTROLLER             (xdebug_controller_get_type ())
 XPL_AVAILABLE_IN_2_72
-G_DECLARE_INTERFACE(GDebugController, g_debug_controller, g, debug_controller, xobject_t)
+G_DECLARE_INTERFACE(xdebug_controller, xdebug_controller, g, debug_controller, xobject)
 
-#define G_DEBUG_CONTROLLER(o)               (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DEBUG_CONTROLLER, GDebugController))
+#define XDEBUG_CONTROLLER(o)               (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DEBUG_CONTROLLER, xdebug_controller_t))
 #define X_IS_DEBUG_CONTROLLER(o)            (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DEBUG_CONTROLLER))
-#define G_DEBUG_CONTROLLER_GET_INTERFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_DEBUG_CONTROLLER, GDebugControllerInterface))
+#define XDEBUG_CONTROLLER_GET_INTERFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_DEBUG_CONTROLLER, xdebug_controller_tInterface))
 
 /**
- * GDebugControllerInterface:
+ * xdebug_controller_tInterface:
  * @x_iface: The parent interface.
  *
- * The virtual function table for #GDebugController.
+ * The virtual function table for #xdebug_controller_t.
  *
  * Since: 2.72
  */
-struct _GDebugControllerInterface {
+struct _xdebug_controller_tInterface {
   /*< private >*/
   xtype_interface_t x_iface;
 };
 
 XPL_AVAILABLE_IN_2_72
-xboolean_t               g_debug_controller_get_debug_enabled     (GDebugController *self);
+xboolean_t               xdebug_controller_get_debug_enabled     (xdebug_controller_t *self);
 XPL_AVAILABLE_IN_2_72
-void                   g_debug_controller_set_debug_enabled     (GDebugController *self,
+void                   xdebug_controller_set_debug_enabled     (xdebug_controller_t *self,
                                                                  xboolean_t          debug_enabled);
 
 G_END_DECLS
 
-#endif /* __G_DEBUG_CONTROLLER_H__ */
+#endif /* __XDEBUG_CONTROLLER_H__ */

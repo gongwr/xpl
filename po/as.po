@@ -269,8 +269,8 @@ msgid "Seek not supported on base stream"
 msgstr "ভিত্তি স্ৰোতত Seek সমৰ্থিত নহয়"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "xbuffered_input_stream ক truncate কৰিব নোৱাৰি"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "xbuffered_input_stream_t ক truncate কৰিব নোৱাৰি"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1017
 #: ../gio/giostream.c:277 ../gio/goutputstream.c:1464
@@ -2115,8 +2115,8 @@ msgid "Error removing old file: %s"
 msgstr "পুৰনি ফাইল আঁতৰাবলৈ সমস্যা: %s"
 
 #: ../gio/gmemoryinputstream.c:471 ../gio/gmemoryoutputstream.c:771
-msgid "Invalid GSeekType supplied"
-msgstr "অৱৈধ GSeekType উল্লিখিত হৈছে"
+msgid "Invalid xseek_type_t supplied"
+msgstr "অৱৈধ xseek_type_t উল্লিখিত হৈছে"
 
 #: ../gio/gmemoryinputstream.c:481
 msgid "Invalid seek request"

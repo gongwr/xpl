@@ -170,18 +170,18 @@ typedef struct {
   xdbus_connection_t *client;
   xmain_loop_t *loop;
   xasync_result_t *result;
-} Test;
+} test_t;
 
 static void
 on_server_connection (xobject_t *source,
                       xasync_result_t *result,
                       xpointer_t user_data)
 {
-  Test *test = user_data;
+  test_t *test = user_data;
   xerror_t *error = NULL;
 
   g_assert (test->server == NULL);
-  test->server = g_dbus_connection_new_finish (result, &error);
+  test->server = xdbus_connection_new_finish (result, &error);
   g_assert_no_error (error);
   g_assert (test->server != NULL);
 
@@ -194,11 +194,11 @@ on_client_connection (xobject_t *source,
                       xasync_result_t *result,
                       xpointer_t user_data)
 {
-  Test *test = user_data;
+  test_t *test = user_data;
   xerror_t *error = NULL;
 
   g_assert (test->client == NULL);
-  test->client = g_dbus_connection_new_finish (result, &error);
+  test->client = xdbus_connection_new_finish (result, &error);
   g_assert_no_error (error);
   g_assert (test->client != NULL);
 
@@ -207,7 +207,7 @@ on_client_connection (xobject_t *source,
 }
 
 static void
-setup (Test *test,
+setup (test_t *test,
        xconstpointer unused)
 {
   xerror_t *error = NULL;
@@ -235,7 +235,7 @@ setup (Test *test,
   xobject_unref (socket);
 
   guid = g_dbus_generate_guid ();
-  g_dbus_connection_new (XIO_STREAM (stream), guid,
+  xdbus_connection_new (XIO_STREAM (stream), guid,
                          G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER |
                          G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS,
                          NULL, NULL, on_server_connection, test);
@@ -250,7 +250,7 @@ setup (Test *test,
   g_assert (stream != NULL);
   xobject_unref (socket);
 
-  g_dbus_connection_new (XIO_STREAM (stream), NULL,
+  xdbus_connection_new (XIO_STREAM (stream), NULL,
                          G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT |
                          G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS,
                          NULL, NULL, on_client_connection, test);
@@ -264,7 +264,7 @@ setup (Test *test,
 }
 
 static void
-teardown (Test *test,
+teardown (test_t *test,
           xconstpointer unused)
 {
   g_clear_object (&test->client);
@@ -277,7 +277,7 @@ on_result (xobject_t *source,
            xasync_result_t *result,
            xpointer_t user_data)
 {
-  Test *test = user_data;
+  test_t *test = user_data;
   g_assert (test->result == NULL);
   test->result = xobject_ref (result);
   xmain_loop_quit (test->loop);
@@ -285,7 +285,7 @@ on_result (xobject_t *source,
 }
 
 static void
-test_object_manager (Test *test,
+test_object_manager (test_t *test,
                      xconstpointer test_data)
 {
   xdbus_object_manager_t *client;
@@ -310,40 +310,40 @@ test_object_manager (Test *test,
       number2_path = xstrdup_printf ("%s/number_2", object_path);
     }
 
-  server = g_dbus_object_manager_server_new (object_path);
+  server = xdbus_object_manager_server_new (object_path);
 
   mock = xobject_new (mock_interface_get_type (), NULL);
   mock->number = 1;
-  skeleton = g_dbus_object_skeleton_new (number1_path);
-  g_dbus_object_skeleton_add_interface (skeleton, G_DBUS_INTERFACE_SKELETON (mock));
-  g_dbus_object_manager_server_export (server, skeleton);
+  skeleton = xdbus_object_skeleton_new (number1_path);
+  xdbus_object_skeleton_add_interface (skeleton, G_DBUS_INTERFACE_SKELETON (mock));
+  xdbus_object_manager_server_export (server, skeleton);
 
   mock = xobject_new (mock_interface_get_type (), NULL);
   mock->number = 2;
-  skeleton = g_dbus_object_skeleton_new (number2_path);
-  g_dbus_object_skeleton_add_interface (skeleton, G_DBUS_INTERFACE_SKELETON (mock));
-  g_dbus_object_manager_server_export (server, skeleton);
+  skeleton = xdbus_object_skeleton_new (number2_path);
+  xdbus_object_skeleton_add_interface (skeleton, G_DBUS_INTERFACE_SKELETON (mock));
+  xdbus_object_manager_server_export (server, skeleton);
 
-  g_dbus_object_manager_server_set_connection (server, test->server);
+  xdbus_object_manager_server_set_connection (server, test->server);
 
   dbus_name = NULL;
 
-  g_dbus_object_manager_client_new (test->client, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_DO_NOT_AUTO_START,
+  xdbus_object_manager_client_new (test->client, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_DO_NOT_AUTO_START,
                                     dbus_name, object_path, NULL, NULL, NULL, NULL, on_result, test);
 
   xmain_loop_run (test->loop);
-  client = g_dbus_object_manager_client_new_finish (test->result, &error);
+  client = xdbus_object_manager_client_new_finish (test->result, &error);
   g_assert_no_error (error);
   g_clear_object (&test->result);
 
   proxy = g_dbus_object_manager_get_interface (client, number1_path, "org.mock.Interface");
   g_assert (proxy != NULL);
-  prop = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "Path");
+  prop = xdbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "Path");
   g_assert (prop != NULL);
   g_assert_cmpstr ((xchar_t *)xvariant_get_type (prop), ==, (xchar_t *)G_VARIANT_TYPE_OBJECT_PATH);
   g_assert_cmpstr (xvariant_get_string (prop, NULL), ==, number1_path);
   xvariant_unref (prop);
-  prop = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "Number");
+  prop = xdbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "Number");
   g_assert (prop != NULL);
   g_assert_cmpstr ((xchar_t *)xvariant_get_type (prop), ==, (xchar_t *)G_VARIANT_TYPE_INT32);
   g_assert_cmpint (xvariant_get_int32 (prop), ==, 1);
@@ -352,12 +352,12 @@ test_object_manager (Test *test,
 
   proxy = g_dbus_object_manager_get_interface (client, number2_path, "org.mock.Interface");
   g_assert (proxy != NULL);
-  prop = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "Path");
+  prop = xdbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "Path");
   g_assert (prop != NULL);
   g_assert_cmpstr ((xchar_t *)xvariant_get_type (prop), ==, (xchar_t *)G_VARIANT_TYPE_OBJECT_PATH);
   g_assert_cmpstr (xvariant_get_string (prop, NULL), ==, number2_path);
   xvariant_unref (prop);
-  prop = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "Number");
+  prop = xdbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "Number");
   g_assert (prop != NULL);
   g_assert_cmpstr ((xchar_t *)xvariant_get_type (prop), ==, (xchar_t *)G_VARIANT_TYPE_INT32);
   g_assert_cmpint (xvariant_get_int32 (prop), ==, 2);
@@ -377,9 +377,9 @@ main (int   argc,
 {
   g_test_init (&argc, &argv, NULL);
 
-  g_test_add ("/gdbus/peer-object-manager/normal", Test, "/objects",
+  g_test_add ("/gdbus/peer-object-manager/normal", test_t, "/objects",
               setup, test_object_manager, teardown);
-  g_test_add ("/gdbus/peer-object-manager/root", Test, "/",
+  g_test_add ("/gdbus/peer-object-manager/root", test_t, "/",
               setup, test_object_manager, teardown);
 
   return g_test_run();

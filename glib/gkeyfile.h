@@ -178,7 +178,7 @@ void      xkey_file_set_integer            (xkey_file_t             *key_file,
 					     const xchar_t          *key,
 					     xint_t                  value);
 XPL_AVAILABLE_IN_ALL
-gint64    xkey_file_get_int64              (xkey_file_t             *key_file,
+sint64_t    xkey_file_get_int64              (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xerror_t              **error);
@@ -186,7 +186,7 @@ XPL_AVAILABLE_IN_ALL
 void      xkey_file_set_int64              (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
-					     gint64                value);
+					     sint64_t                value);
 XPL_AVAILABLE_IN_ALL
 xuint64_t   xkey_file_get_uint64             (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,

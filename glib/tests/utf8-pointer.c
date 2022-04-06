@@ -25,7 +25,7 @@
 #include <string.h>
 #include <glib.h>
 
-/* Test conversions between offsets and pointers */
+/* test_t conversions between offsets and pointers */
 
 static void test_utf8 (xconstpointer d)
 {

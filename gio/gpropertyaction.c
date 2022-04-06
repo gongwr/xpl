@@ -331,7 +331,7 @@ g_property_action_set_property_name (xproperty_action_t *paction,
 
   detailed = xstrconcat ("notify::", paction->pspec->name, NULL);
   paction->state_type = g_property_action_determine_type (paction->pspec);
-  g_signal_connect (paction->object, detailed, G_CALLBACK (g_property_action_notify), paction);
+  xsignal_connect (paction->object, detailed, G_CALLBACK (g_property_action_notify), paction);
   g_free (detailed);
 }
 
@@ -410,7 +410,7 @@ g_property_action_finalize (xobject_t *object)
 {
   xproperty_action_t *paction = G_PROPERTY_ACTION (object);
 
-  g_signal_handlers_disconnect_by_func (paction->object, g_property_action_notify, paction);
+  xsignal_handlers_disconnect_by_func (paction->object, g_property_action_notify, paction);
   xobject_unref (paction->object);
   g_free (paction->name);
 

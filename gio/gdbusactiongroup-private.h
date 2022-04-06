@@ -26,7 +26,7 @@
 G_BEGIN_DECLS
 
 xboolean_t
-g_dbus_action_group_sync (xdbus_action_group_t  *group,
+xdbus_action_group_sync (xdbus_action_group_t  *group,
                           xcancellable_t      *cancellable,
                           xerror_t           **error);
 

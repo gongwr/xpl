@@ -139,12 +139,12 @@ xboolean_t                g_settings_set_int                              (xsett
                                                                          const xchar_t        *key,
                                                                          xint_t                value);
 XPL_AVAILABLE_IN_2_50
-gint64                  g_settings_get_int64                            (xsettings_t          *settings,
+sint64_t                  g_settings_get_int64                            (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 XPL_AVAILABLE_IN_2_50
 xboolean_t                g_settings_set_int64                            (xsettings_t          *settings,
                                                                          const xchar_t        *key,
-                                                                         gint64              value);
+                                                                         sint64_t              value);
 XPL_AVAILABLE_IN_2_32
 xuint_t                   g_settings_get_uint                             (xsettings_t          *settings,
                                                                          const xchar_t        *key);

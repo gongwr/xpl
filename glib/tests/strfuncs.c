@@ -124,7 +124,7 @@ test_to_function (const char *name,
 
   for (c = 0; c <= 0x7F; c++)
     {
-      int ascii_result = (guchar) ascii_function ((xchar_t) c);
+      int ascii_result = (xuchar_t) ascii_function ((xchar_t) c);
       int c_library_result = c_library_function (c);
       int unicode_result = unicode_function ((xunichar_t) c);
       if (ascii_result != c_library_result)
@@ -140,7 +140,7 @@ test_to_function (const char *name,
     }
   for (c = 0x80; c <= 0xFF; c++)
     {
-      int ascii_result = (guchar) ascii_function ((xchar_t) c);
+      int ascii_result = (xuchar_t) ascii_function ((xchar_t) c);
       if (ascii_result != c)
 	{
 	  xerror ("g_ascii_%s returned 0x%X for 0x%X",
@@ -766,7 +766,7 @@ test_strcompress_strescape (void)
   g_free (tmp);
   g_free (str);
 
-  /* Test expanding invalid escapes */
+  /* test_t expanding invalid escapes */
   str = xstrcompress ("\\11/ \\118 \\8aa \\19");
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "\t/ \t8 8aa \0019");
@@ -1658,10 +1658,10 @@ static void
 check_int64 (const xchar_t *str,
 	     const xchar_t *end,
 	     xint_t         base,
-	     gint64       result,
+	     sint64_t       result,
 	     xint_t         error)
 {
-  gint64 actual;
+  sint64_t actual;
   xchar_t *endptr = NULL;
   xint_t err;
 
@@ -1943,7 +1943,7 @@ test_strip_context (void)
   g_assert_true (s == msgval + 7);
 }
 
-/* Test the strings returned by xstrerror() are valid and unique. On Windows,
+/* test_t the strings returned by xstrerror() are valid and unique. On Windows,
  * fewer than 200 error numbers are used, so we expect some strings to
  * return a generic ‘unknown error code’ message. */
 static void
@@ -2032,17 +2032,17 @@ test_transliteration (void)
   /* ...to test the defaults */
   setlocale (LC_ALL, "C");
 
-  /* Test something trivial */
+  /* test_t something trivial */
   out = xstr_to_ascii ("hello", NULL);
   g_assert_cmpstr (out, ==, "hello");
   g_free (out);
 
-  /* Test something above 0xffff */
+  /* test_t something above 0xffff */
   out = xstr_to_ascii ("𝐀𝐀𝐀", NULL);
   g_assert_cmpstr (out, ==, "AAA");
   g_free (out);
 
-  /* Test something with no good match */
+  /* test_t something with no good match */
   out = xstr_to_ascii ("a ∧ ¬a", NULL);
   g_assert_cmpstr (out, ==, "a ? ?a");
   g_free (out);
@@ -2077,7 +2077,7 @@ test_transliteration (void)
   g_assert_cmpstr (out, ==, "oe");
   g_free (out);
 
-  /* Test some invalid locale names */
+  /* test_t some invalid locale names */
   out = xstr_to_ascii ("ö", "de_DE@euro.UTF-8");
   g_assert_cmpstr (out, ==, "o");
   g_free (out);
@@ -2166,7 +2166,7 @@ test_strv_contains (void)
   g_assert_false (xstrv_contains (strv_empty, ""));
 }
 
-/* Test xstrv_equal() works for various inputs. */
+/* test_t xstrv_equal() works for various inputs. */
 static void
 test_strv_equal (void)
 {
@@ -2306,7 +2306,7 @@ test_ascii_string_to_number_usual (void)
   xerror_t *error = NULL;
   const TestData *data;
   xint_t value;
-  gint64 value64 = 0;
+  sint64_t value64 = 0;
   xuint64_t valueu64 = 0;
 
   /*** g_ascii_string_to_signed() ***/
@@ -2481,7 +2481,7 @@ test_ascii_string_to_number_pathological (void)
   const xchar_t *max_int64 = "9223372036854775807";
   const xchar_t *min_int64 = "-9223372036854775808";
   xuint64_t uvalue = 0;
-  gint64 svalue = 0;
+  sint64_t svalue = 0;
 
   g_assert_false (g_ascii_string_to_unsigned (crazy_high,
                                               10,

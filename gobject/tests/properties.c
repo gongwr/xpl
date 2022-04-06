@@ -238,7 +238,7 @@ properties_notify (void)
 
   g_assert (properties[PROP_FOO] != NULL);
   g_assert (properties[PROP_QUUX] != NULL);
-  g_signal_connect (obj, "notify", G_CALLBACK (on_notify), &closure);
+  xsignal_connect (obj, "notify", G_CALLBACK (on_notify), &closure);
 
   closure.name = "foo";
   closure.pspec = properties[PROP_FOO];
@@ -303,7 +303,7 @@ properties_notify_queue (void)
   n.pspec[2] = properties[PROP_FOO];
   n.pos = 0;
 
-  g_signal_connect (obj, "notify", G_CALLBACK (on_notify2), &n);
+  xsignal_connect (obj, "notify", G_CALLBACK (on_notify2), &n);
 
   xobject_freeze_notify (G_OBJECT (obj));
   xobject_set (obj, "foo", 47, NULL);
@@ -367,7 +367,7 @@ properties_testv_with_no_properties (void)
   xvalue_t values_out[4] = { G_VALUE_INIT };
   xuint_t i;
 
-  /* Test newv_with_properties && getv */
+  /* test_t newv_with_properties && getv */
   test_obj = (test_object_t *) xobject_new_with_properties (
       test_object_get_type (), 0, NULL, NULL);
   xobject_getv (G_OBJECT (test_obj), 4, prop_names, values_out);
@@ -405,7 +405,7 @@ properties_testv_with_valid_properties (void)
   xvalue_init (&(values_in[3]), XTYPE_STRING);
   xvalue_set_string (&(values_in[3]), "fly");
 
-  /* Test newv_with_properties && getv */
+  /* test_t newv_with_properties && getv */
   test_obj = (test_object_t *) xobject_new_with_properties (
       test_object_get_type (), 4, prop_names, values_in);
   xobject_getv (G_OBJECT (test_obj), 4, prop_names, values_out);
@@ -418,7 +418,7 @@ properties_testv_with_valid_properties (void)
   for (i = 0; i < G_N_ELEMENTS (values_out); i++)
     xvalue_unset (&values_out[i]);
 
-  /* Test newv2 && getv */
+  /* test_t newv2 && getv */
   xvalue_set_string (&(values_in[2]), "Elmo knows");
   xvalue_set_string (&(values_in[3]), "where you live");
   xobject_setv (G_OBJECT (test_obj), 4, prop_names, values_in);
@@ -517,7 +517,7 @@ properties_testv_getv (void)
   test_obj = (test_object_t *) xobject_new_with_properties (
       test_object_get_type (), 0, NULL, NULL);
 
-  /* Test xobject_getv for an initialized values array */
+  /* test_t xobject_getv for an initialized values array */
   xobject_getv (G_OBJECT (test_obj), 4, prop_names, values_out_initialized);
   /* It should have init values */
   g_assert_cmpint (xvalue_get_int (&values_out_initialized[0]), ==, 42);
@@ -525,7 +525,7 @@ properties_testv_getv (void)
   g_assert_cmpstr (xvalue_get_string (&values_out_initialized[2]), ==, "Hello");
   g_assert_cmpstr (xvalue_get_string (&values_out_initialized[3]), ==, NULL);
 
-  /* Test xobject_getv for an uninitialized values array */
+  /* test_t xobject_getv for an uninitialized values array */
   xobject_getv (G_OBJECT (test_obj), 4, prop_names, values_out_uninitialized);
   /* It should have init values */
   g_assert_cmpint (xvalue_get_int (&values_out_uninitialized[0]), ==, 42);
@@ -567,15 +567,15 @@ properties_get_property (void)
 
   test_obj = (test_object_t *) xobject_new_with_properties (test_object_get_type (), 0, NULL, NULL);
 
-  g_test_message ("Test xobject_get_property with an initialized value");
+  g_test_message ("test_t xobject_get_property with an initialized value");
   xobject_get_property (G_OBJECT (test_obj), test_props[0].name, &(test_props[0].value));
   g_assert_cmpint (xvalue_get_int (&(test_props[0].value)), ==, 42);
 
-  g_test_message ("Test xobject_get_property with an uninitialized value");
+  g_test_message ("test_t xobject_get_property with an uninitialized value");
   xobject_get_property (G_OBJECT (test_obj), test_props[1].name, &(test_props[1].value));
   g_assert_true (xvalue_get_boolean (&(test_props[1].value)));
 
-  g_test_message ("Test xobject_get_property with a transformable value");
+  g_test_message ("test_t xobject_get_property with a transformable value");
   xobject_get_property (G_OBJECT (test_obj), test_props[2].name, &(test_props[2].value));
   g_assert_true (G_VALUE_HOLDS_STRING (&(test_props[2].value)));
   g_assert_cmpstr (xvalue_get_string (&(test_props[2].value)), ==, "TRUE");
@@ -604,7 +604,7 @@ properties_testv_notify_queue (void)
   xvalue_init (&(values_in[2]), XTYPE_STRING);
   xvalue_set_string (&(values_in[2]), "");
 
-  /* Test newv_with_properties && getv */
+  /* test_t newv_with_properties && getv */
   test_obj = (test_object_t *) xobject_new_with_properties (
       test_object_get_type (), 0, NULL, NULL);
 
@@ -615,7 +615,7 @@ properties_testv_notify_queue (void)
   n.pspec[2] = properties[PROP_FOO];
   n.pos = 0;
 
-  g_signal_connect (test_obj, "notify", G_CALLBACK (on_notify2), &n);
+  xsignal_connect (test_obj, "notify", G_CALLBACK (on_notify2), &n);
 
   xobject_freeze_notify (G_OBJECT (test_obj));
   {

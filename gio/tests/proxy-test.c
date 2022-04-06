@@ -80,7 +80,7 @@ static xsocket_client_t *client;
 
 
 /**************************************/
-/* Test xproxy_resolver_t implementation */
+/* test_t xproxy_resolver_t implementation */
 /**************************************/
 
 typedef struct {
@@ -124,7 +124,7 @@ g_test_proxy_resolver_lookup (xproxy_resolver_t  *resolver,
 
   g_assert (last_proxies == NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   proxies = g_new (xchar_t *, 3);
@@ -247,7 +247,7 @@ g_test_alt_proxy_resolver_iface_init (xproxy_resolver_interface_t *iface)
 
 
 /****************************************/
-/* Test proxy implementation base class */
+/* test_t proxy implementation base class */
 /****************************************/
 
 typedef struct {
@@ -356,7 +356,7 @@ xproxy_base_class_init (xproxy_base_class_t *class)
 
 
 /********************************************/
-/* Test proxy implementation #1 ("Proxy A") */
+/* test_t proxy implementation #1 ("Proxy A") */
 /********************************************/
 
 typedef xproxy_base_t GProxyA;
@@ -401,7 +401,7 @@ xproxy_a_iface_init (xproxy_interface_t *proxy_iface)
 }
 
 /********************************************/
-/* Test proxy implementation #2 ("Proxy B") */
+/* test_t proxy implementation #2 ("Proxy B") */
 /********************************************/
 
 typedef xproxy_base_t GProxyB;
@@ -1356,7 +1356,7 @@ main (int   argc,
   fake_resolver = xobject_new (g_fake_resolver_get_type (), NULL);
   g_resolver_set_default (fake_resolver);
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
   create_server (&server, cancellable);
   create_proxy (&proxy_a, 'a', "alpha", cancellable);
   create_proxy (&proxy_b, 'b', "beta", cancellable);
@@ -1378,7 +1378,7 @@ main (int   argc,
 
   xobject_unref (client);
 
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   xthread_join (proxy_a.thread);
   xthread_join (proxy_b.thread);
   xthread_join (server.server_thread);

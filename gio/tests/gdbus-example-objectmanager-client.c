@@ -53,7 +53,7 @@ on_object_added (xdbus_object_manager_t *manager,
                  xpointer_t            user_data)
 {
   xchar_t *owner;
-  owner = g_dbus_object_manager_client_get_name_owner (G_DBUS_OBJECT_MANAGER_CLIENT (manager));
+  owner = xdbus_object_manager_client_get_name_owner (G_DBUS_OBJECT_MANAGER_CLIENT (manager));
   g_print ("Added object at %s (owner %s)\n", g_dbus_object_get_object_path (object), owner);
   g_free (owner);
 }
@@ -64,7 +64,7 @@ on_object_removed (xdbus_object_manager_t *manager,
                    xpointer_t            user_data)
 {
   xchar_t *owner;
-  owner = g_dbus_object_manager_client_get_name_owner (G_DBUS_OBJECT_MANAGER_CLIENT (manager));
+  owner = xdbus_object_manager_client_get_name_owner (G_DBUS_OBJECT_MANAGER_CLIENT (manager));
   g_print ("Removed object at %s (owner %s)\n", g_dbus_object_get_object_path (object), owner);
   g_free (owner);
 }
@@ -77,7 +77,7 @@ on_notify_name_owner (xobject_t    *object,
   xdbus_object_manager_client_t *manager = G_DBUS_OBJECT_MANAGER_CLIENT (object);
   xchar_t *name_owner;
 
-  name_owner = g_dbus_object_manager_client_get_name_owner (manager);
+  name_owner = xdbus_object_manager_client_get_name_owner (manager);
   g_print ("name-owner: %s\n", name_owner);
   g_free (name_owner);
 }
@@ -133,25 +133,25 @@ main (xint_t argc, xchar_t *argv[])
       goto out;
     }
 
-  name_owner = g_dbus_object_manager_client_get_name_owner (G_DBUS_OBJECT_MANAGER_CLIENT (manager));
+  name_owner = xdbus_object_manager_client_get_name_owner (G_DBUS_OBJECT_MANAGER_CLIENT (manager));
   g_print ("name-owner: %s\n", name_owner);
   g_free (name_owner);
 
   print_objects (manager);
 
-  g_signal_connect (manager,
+  xsignal_connect (manager,
                     "notify::name-owner",
                     G_CALLBACK (on_notify_name_owner),
                     NULL);
-  g_signal_connect (manager,
+  xsignal_connect (manager,
                     "object-added",
                     G_CALLBACK (on_object_added),
                     NULL);
-  g_signal_connect (manager,
+  xsignal_connect (manager,
                     "object-removed",
                     G_CALLBACK (on_object_removed),
                     NULL);
-  g_signal_connect (manager,
+  xsignal_connect (manager,
                     "interface-proxy-properties-changed",
                     G_CALLBACK (on_interface_proxy_properties_changed),
                     NULL);

@@ -3071,8 +3071,8 @@ msgid "Error removing old file: %s"
 msgstr "Fallu al desaniciar el ficheru antiguu: %s"
 
 #: ../gio/gmemoryinputstream.c:486 ../gio/gmemoryoutputstream.c:746
-msgid "Invalid GSeekType supplied"
-msgstr "Proporcionóse un GSeekType non válidu"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Proporcionóse un xseek_type_t non válidu"
 
 #: ../gio/gmemoryinputstream.c:496
 msgid "Invalid seek request"

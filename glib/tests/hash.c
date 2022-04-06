@@ -433,8 +433,8 @@ int64_hash_test (void)
 {
   xint_t       i, rc;
   xhashtable_t     *h;
-  gint64     values[20];
-  gint64 key;
+  sint64_t     values[20];
+  sint64_t key;
 
   h = xhash_table_new (g_int64_hash, g_int64_equal);
   g_assert (h != NULL);
@@ -801,7 +801,7 @@ test_remove_all (void)
   g_assert_cmpint (destroy_counter, ==, 0);
   g_assert_cmpint (destroy_key_counter, ==, 0);
 
-  /* Test stealing on an empty hash table. */
+  /* test_t stealing on an empty hash table. */
   xhash_table_steal_all (h);
   g_assert_cmpint (destroy_counter, ==, 0);
   g_assert_cmpint (destroy_key_counter, ==, 0);
@@ -1192,7 +1192,7 @@ test_foreach_steal (void)
   xhash_table_unref (hash2);
 }
 
-/* Test xhash_table_steal_extended() works properly with existing and
+/* test_t xhash_table_steal_extended() works properly with existing and
  * non-existing keys. */
 static void
 test_steal_extended (void)
@@ -1236,7 +1236,7 @@ test_steal_extended (void)
   xhash_table_unref (hash);
 }
 
-/* Test that passing %NULL to the optional xhash_table_steal_extended()
+/* test_t that passing %NULL to the optional xhash_table_steal_extended()
  * arguments works. */
 static void
 test_steal_extended_optional (void)
@@ -1287,7 +1287,7 @@ test_steal_extended_optional (void)
   xhash_table_unref (hash);
 }
 
-/* Test xhash_table_lookup_extended() works with its optional parameters
+/* test_t xhash_table_lookup_extended() works with its optional parameters
  * sometimes set to %NULL. */
 static void
 test_lookup_extended (void)

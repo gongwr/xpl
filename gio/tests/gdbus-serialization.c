@@ -30,9 +30,9 @@
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-hexdump (const guchar *str, xsize_t len)
+hexdump (const xuchar_t *str, xsize_t len)
 {
-  const guchar *data = (const guchar *) str;
+  const xuchar_t *data = (const xuchar_t *) str;
   xuint_t n, m;
 
   for (n = 0; n < len; n += 16)
@@ -100,7 +100,7 @@ append_gv_to_dbus_iter (DBusMessageIter  *iter,
     }
   else if (xvariant_type_equal (type, G_VARIANT_TYPE_INT64))
     {
-      gint64 v = xvariant_get_int64 (value);
+      sint64_t v = xvariant_get_int64 (value);
       dbus_message_iter_append_basic (iter, DBUS_TYPE_INT64, &v);
     }
   else if (xvariant_type_equal (type, G_VARIANT_TYPE_UINT64))
@@ -290,7 +290,7 @@ print_gv_dbus_message (xvariant_t *value)
 
   dbus_message_marshal (message, &blob, &blob_len);
   g_printerr ("\n");
-  hexdump ((guchar *) blob, blob_len);
+  hexdump ((xuchar_t *) blob, blob_len);
  out:
   dbus_message_unref (message);
 }
@@ -320,7 +320,7 @@ dbus_1_message_append (xstring_t *s,
 
      case DBUS_TYPE_BYTE:
       {
-        guchar value;
+        xuchar_t value;
         dbus_message_iter_get_basic (iter, &value);
         xstring_append_printf (s, "byte: 0x%02x\n", (xuint_t) value);
         break;
@@ -360,7 +360,7 @@ dbus_1_message_append (xstring_t *s,
 
      case DBUS_TYPE_INT64:
       {
-        gint64 value;
+        sint64_t value;
         dbus_message_iter_get_basic (iter, &value);
         xstring_append_printf (s, "int64: %" G_GINT64_FORMAT "\n", value);
         break;
@@ -517,7 +517,7 @@ get_body_signature (xvariant_t *value)
 static xchar_t *
 get_and_check_serialization (xvariant_t *value)
 {
-  guchar *blob;
+  xuchar_t *blob;
   xsize_t blob_size;
   DBusMessage *dbus_1_message;
   xdbus_message_t *message;
@@ -875,7 +875,7 @@ test_message_serialize_invalid (void)
       replace (blob, blob_len, valid_signature, invalid_signature);
 
       error = NULL;
-      message = xdbus_message_new_from_blob ((guchar *) blob,
+      message = xdbus_message_new_from_blob ((xuchar_t *) blob,
                                               blob_len,
                                               G_DBUS_CAPABILITY_FLAGS_NONE,
                                               &error);
@@ -897,7 +897,7 @@ test_message_serialize_header_checks (void)
   xdbus_message_t *message;
   xdbus_message_t *reply;
   xerror_t *error = NULL;
-  guchar *blob;
+  xuchar_t *blob;
   xsize_t blob_size;
 
   /*
@@ -1125,7 +1125,7 @@ test_message_serialize_double_array (void)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* Test that an invalid header in a D-Bus message (specifically, with a type
+/* test_t that an invalid header in a D-Bus message (specifically, with a type
  * which doesn’t match what’s expected for the given header) is gracefully
  * handled with an error rather than a crash. */
 static void
@@ -1163,7 +1163,7 @@ test_message_parse_non_signature_header (void)
   xdbus_message_t *message = NULL;
   xerror_t *local_error = NULL;
 
-  message = xdbus_message_new_from_blob ((guchar *) data, size,
+  message = xdbus_message_new_from_blob ((xuchar_t *) data, size,
                                           G_DBUS_CAPABILITY_FLAGS_NONE,
                                           &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -1174,7 +1174,7 @@ test_message_parse_non_signature_header (void)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* Test that an invalid header in a D-Bus message (specifically, containing a
+/* test_t that an invalid header in a D-Bus message (specifically, containing a
  * variant with an empty type signature) is gracefully handled with an error
  * rather than a crash. */
 static void
@@ -1211,7 +1211,7 @@ test_message_parse_empty_signature_header (void)
   xdbus_message_t *message = NULL;
   xerror_t *local_error = NULL;
 
-  message = xdbus_message_new_from_blob ((guchar *) data, size,
+  message = xdbus_message_new_from_blob ((xuchar_t *) data, size,
                                           G_DBUS_CAPABILITY_FLAGS_NONE,
                                           &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -1222,7 +1222,7 @@ test_message_parse_empty_signature_header (void)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* Test that an invalid header in a D-Bus message (specifically, containing a
+/* test_t that an invalid header in a D-Bus message (specifically, containing a
  * variant with a type signature containing multiple complete types) is
  * gracefully handled with an error rather than a crash. */
 static void
@@ -1260,7 +1260,7 @@ test_message_parse_multiple_signature_header (void)
   xdbus_message_t *message = NULL;
   xerror_t *local_error = NULL;
 
-  message = xdbus_message_new_from_blob ((guchar *) data, size,
+  message = xdbus_message_new_from_blob ((xuchar_t *) data, size,
                                           G_DBUS_CAPABILITY_FLAGS_NONE,
                                           &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -1271,7 +1271,7 @@ test_message_parse_multiple_signature_header (void)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* Test that an invalid header in a D-Bus message (specifically, containing a
+/* test_t that an invalid header in a D-Bus message (specifically, containing a
  * variant with a valid type signature that is too long to be a valid
  * #xvariant_type_t due to exceeding the array nesting limits) is gracefully
  * handled with an error rather than a crash. */
@@ -1325,7 +1325,7 @@ test_message_parse_over_long_signature_header (void)
   xdbus_message_t *message = NULL;
   xerror_t *local_error = NULL;
 
-  message = xdbus_message_new_from_blob ((guchar *) data, size,
+  message = xdbus_message_new_from_blob ((xuchar_t *) data, size,
                                           G_DBUS_CAPABILITY_FLAGS_NONE,
                                           &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -1336,7 +1336,7 @@ test_message_parse_over_long_signature_header (void)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* Test that an invalid header in a D-Bus message (specifically, containing too
+/* test_t that an invalid header in a D-Bus message (specifically, containing too
  * many levels of nested variant) is gracefully handled with an error rather
  * than a crash. */
 static void
@@ -1393,7 +1393,7 @@ test_message_parse_deep_header_nesting (void)
   xdbus_message_t *message = NULL;
   xerror_t *local_error = NULL;
 
-  message = xdbus_message_new_from_blob ((guchar *) data, size,
+  message = xdbus_message_new_from_blob ((xuchar_t *) data, size,
                                           G_DBUS_CAPABILITY_FLAGS_NONE,
                                           &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -1404,7 +1404,7 @@ test_message_parse_deep_header_nesting (void)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* Test that an invalid body in a D-Bus message (specifically, containing too
+/* test_t that an invalid body in a D-Bus message (specifically, containing too
  * many levels of nested variant) is gracefully handled with an error rather
  * than a crash. The set of bytes here are a modified version of the bytes from
  * test_message_parse_deep_header_nesting(). */
@@ -1461,7 +1461,7 @@ test_message_parse_deep_body_nesting (void)
   xdbus_message_t *message = NULL;
   xerror_t *local_error = NULL;
 
-  message = xdbus_message_new_from_blob ((guchar *) data, size,
+  message = xdbus_message_new_from_blob ((xuchar_t *) data, size,
                                           G_DBUS_CAPABILITY_FLAGS_NONE,
                                           &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -1478,11 +1478,11 @@ test_message_parse_truncated (void)
   xdbus_message_t *message = NULL;
   xdbus_message_t *message2 = NULL;
   xvariant_builder_t builder;
-  guchar *blob = NULL;
+  xuchar_t *blob = NULL;
   xsize_t size = 0;
   xerror_t *error = NULL;
 
-  g_test_summary ("Test that truncated messages are properly rejected.");
+  g_test_summary ("test_t that truncated messages are properly rejected.");
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2528");
 
   message = xdbus_message_new ();
@@ -1569,10 +1569,10 @@ test_message_parse_empty_structure (void)
   xdbus_message_t *message = NULL;
   xerror_t *local_error = NULL;
 
-  g_test_summary ("Test that empty structures are rejected when parsing.");
+  g_test_summary ("test_t that empty structures are rejected when parsing.");
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2557");
 
-  message = xdbus_message_new_from_blob ((guchar *) data, size,
+  message = xdbus_message_new_from_blob ((xuchar_t *) data, size,
                                           G_DBUS_CAPABILITY_FLAGS_NONE,
                                           &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -1590,7 +1590,7 @@ test_message_serialize_empty_structure (void)
   xsize_t size = 0;
   xerror_t *local_error = NULL;
 
-  g_test_summary ("Test that empty structures are rejected when serializing.");
+  g_test_summary ("test_t that empty structures are rejected when serializing.");
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2557");
 
   message = xdbus_message_new ();

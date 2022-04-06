@@ -100,7 +100,7 @@ xfilename_completer_class_init (xfilename_completer_class_t *klass)
    *
    * Emitted when the file name completion information comes available.
    **/
-  signals[GOT_COMPLETION_DATA] = g_signal_new (I_("got-completion-data"),
+  signals[GOT_COMPLETION_DATA] = xsignal_new (I_("got-completion-data"),
 					  XTYPE_FILENAME_COMPLETER,
 					  G_SIGNAL_RUN_LAST,
 					  G_STRUCT_OFFSET (xfilename_completer_class_t, got_completion_data),
@@ -248,7 +248,7 @@ got_more_files (xobject_t *source_object,
 
       xfile_enumerator_close_async (data->enumerator, 0, NULL, NULL, NULL);
 
-      g_signal_emit (data->completer, signals[GOT_COMPLETION_DATA], 0);
+      xsignal_emit (data->completer, signals[GOT_COMPLETION_DATA], 0);
       load_basenames_data_free (data);
     }
 }
@@ -305,7 +305,7 @@ schedule_load_basenames (xfilename_completer_t *completer,
 
   data = g_new0 (LoadBasenamesData, 1);
   data->completer = completer;
-  data->cancellable = g_cancellable_new ();
+  data->cancellable = xcancellable_new ();
   data->dir = xobject_ref (dir);
   data->should_escape = should_escape;
   data->dirs_only = completer->dirs_only;
@@ -329,7 +329,7 @@ cancel_load_basenames (xfilename_completer_t *completer)
       loader = completer->basename_loader;
       loader->completer = NULL;
 
-      g_cancellable_cancel (loader->cancellable);
+      xcancellable_cancel (loader->cancellable);
 
       completer->basename_loader = NULL;
     }

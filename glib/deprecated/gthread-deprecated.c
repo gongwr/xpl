@@ -365,7 +365,7 @@ xthread_create (GThreadFunc   func,
 xthread_t *
 xthread_create_full (GThreadFunc       func,
                       xpointer_t          data,
-                      gulong            stack_size,
+                      xulong_t            stack_size,
                       xboolean_t          joinable,
                       xboolean_t          bound,
                       GThreadPriority   priority,
@@ -1554,7 +1554,7 @@ g_cond_timed_wait (xcond_t    *cond,
                    xmutex_t   *mutex,
                    GTimeVal *abs_time)
 {
-  gint64 end_time;
+  sint64_t end_time;
 
   if (abs_time == NULL)
     {

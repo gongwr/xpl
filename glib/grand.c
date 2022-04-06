@@ -255,7 +255,7 @@ g_rand_new (void)
 
   if (!dev_urandom_exists)
     {
-      gint64 now_us = g_get_real_time ();
+      sint64_t now_us = g_get_real_time ();
       seed[0] = now_us / G_USEC_PER_SEC;
       seed[1] = now_us % G_USEC_PER_SEC;
       seed[2] = getpid ();

@@ -182,12 +182,12 @@ perform (xconstpointer data)
   GrindFunc grind_func = gd->func;
   const char *str = gd->str;
   xsize_t len;
-  gulong bytes_ground;
+  xulong_t bytes_ground;
   xdouble_t time_elapsed;
   xdouble_t result;
 
   len = strlen (str);
-  bytes_ground = (gulong) len * NUM_ITERATIONS;
+  bytes_ground = (xulong_t) len * NUM_ITERATIONS;
 
   g_test_timer_start ();
 

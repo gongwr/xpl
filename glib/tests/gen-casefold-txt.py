@@ -39,7 +39,7 @@ def main(argv):
 
     print(
         """\
-# Test cases generated from Unicode {} data
+# test_t cases generated from Unicode {} data
 # by gen-casefold-txt.py. Do not edit.
 #
 # Some special hand crafted tests

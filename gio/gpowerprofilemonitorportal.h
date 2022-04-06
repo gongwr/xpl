@@ -23,8 +23,8 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_POWER_PROFILE_MONITOR_PORTAL         (g_power_profile_monitor_portal_get_type ())
-G_DECLARE_FINAL_TYPE (xpower_profile_monitor_portal_t, g_power_profile_monitor_portal, G, POWER_PROFILE_MONITOR_PORTAL, xobject_t)
+#define XTYPE_POWER_PROFILE_MONITOR_PORTAL         (xpower_profile_monitor_portal_get_type ())
+G_DECLARE_FINAL_TYPE (xpower_profile_monitor_portal_t, xpower_profile_monitor_portal, G, POWER_PROFILE_MONITOR_PORTAL, xobject_t)
 
 G_END_DECLS
 

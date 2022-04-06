@@ -257,7 +257,7 @@ test_basic_types (void)
   xuint16_t u16;
   gint32 i32;
   xuint32_t u32;
-  gint64 i64;
+  sint64_t i64;
   xuint64_t u64;
   xdouble_t d;
   xchar_t *str;
@@ -429,7 +429,7 @@ changed_cb (xsettings_t   *settings,
   g_assert_cmpstr (key, ==, data);
 }
 
-/* Test that basic change notification with the changed signal works.
+/* test_t that basic change notification with the changed signal works.
  */
 static void
 test_changes (void)
@@ -439,7 +439,7 @@ test_changes (void)
 
   settings = g_settings_new ("org.gtk.test");
 
-  g_signal_connect (settings, "changed",
+  xsignal_connect (settings, "changed",
                     G_CALLBACK (changed_cb), "greeting");
 
   changed_cb_called = FALSE;
@@ -470,7 +470,7 @@ changed_cb2 (xsettings_t   *settings,
   *p = TRUE;
 }
 
-/* Test that changes done to a delay-mode instance
+/* test_t that changes done to a delay-mode instance
  * don't appear to the outside world until apply. Also
  * check that we get change notification when they are
  * applied.
@@ -494,9 +494,9 @@ test_delay_apply (void)
   changed_cb_called = FALSE;
   changed_cb_called2 = FALSE;
 
-  g_signal_connect (settings, "changed",
+  xsignal_connect (settings, "changed",
                     G_CALLBACK (changed_cb2), &changed_cb_called);
-  g_signal_connect (settings2, "changed",
+  xsignal_connect (settings2, "changed",
                     G_CALLBACK (changed_cb2), &changed_cb_called2);
 
   g_settings_delay (settings);
@@ -562,7 +562,7 @@ test_delay_apply (void)
   xobject_unref (settings);
 }
 
-/* Test that reverting unapplied changes in a delay-apply
+/* test_t that reverting unapplied changes in a delay-apply
  * settings instance works.
  */
 static void
@@ -645,7 +645,7 @@ test_delay_reset_key (void)
 {
   xsettings_t *direct_settings = NULL, *delayed_settings = NULL;
 
-  g_test_summary ("Test that resetting a key on a delayed settings instance works");
+  g_test_summary ("test_t that resetting a key on a delayed settings instance works");
 
   delayed_settings = g_settings_new ("org.gtk.test");
   direct_settings = g_settings_new ("org.gtk.test");
@@ -719,7 +719,7 @@ test_atomic (void)
   changed_cb_called = FALSE;
   changed_cb_called2 = FALSE;
 
-  g_signal_connect (settings2, "change-event",
+  xsignal_connect (settings2, "change-event",
                     G_CALLBACK (keys_changed_cb), NULL);
 
   g_settings_delay (settings);
@@ -757,7 +757,7 @@ test_atomic (void)
  * wouldn't have the same C library locale anyway.)
  */
 
-/* Test that translations work for schema defaults.
+/* test_t that translations work for schema defaults.
  *
  * This test relies on the de.po file in the same directory
  * to be compiled into ./de/LC_MESSAGES/test.mo
@@ -806,7 +806,7 @@ test_l10n (void)
   xobject_unref (settings);
 }
 
-/* Test that message context works as expected with translated
+/* test_t that message context works as expected with translated
  * schema defaults. Also, verify that non-ASCII UTF-8 content
  * works.
  *
@@ -883,7 +883,7 @@ typedef struct
   xuint16_t uint16_prop;
   xint_t int_prop;
   xuint_t uint_prop;
-  gint64 int64_prop;
+  sint64_t int64_prop;
   xuint64_t uint64_prop;
   xdouble_t double_prop;
   xchar_t *string_prop;
@@ -1134,7 +1134,7 @@ test_object_new (void)
   return (test_object_t*)xobject_new (test_object_get_type (), NULL);
 }
 
-/* Test basic binding functionality for simple types.
+/* test_t basic binding functionality for simple types.
  * Verify that with bidirectional bindings, changes on either side
  * are notified on the other end.
  */
@@ -1151,7 +1151,7 @@ test_simple_binding (void)
   xuint16_t q;
   xint_t n2;
   xuint_t q2;
-  gint64 i64;
+  sint64_t i64;
   xuint64_t u64;
   xdouble_t d;
   xchar_t *s;
@@ -1248,12 +1248,12 @@ test_simple_binding (void)
 
   g_settings_bind (settings, "int64", obj, "int64", G_SETTINGS_BIND_DEFAULT);
 
-  xobject_set (obj, "int64", (gint64) G_MAXINT64, NULL);
+  xobject_set (obj, "int64", (sint64_t) G_MAXINT64, NULL);
   i64 = 1111;
   g_settings_get (settings, "int64", "x", &i64);
   g_assert_cmpint (i64, ==, G_MAXINT64);
 
-  g_settings_set (settings, "int64", "x", (gint64) G_MININT64);
+  g_settings_set (settings, "int64", "x", (sint64_t) G_MININT64);
   i64 = 1111;
   xobject_get (obj, "int64", &i64, NULL);
   g_assert_cmpint (i64, ==, G_MININT64);
@@ -1443,7 +1443,7 @@ test_bind_writable (void)
   xobject_unref (settings);
 }
 
-/* Test one-way bindings.
+/* test_t one-way bindings.
  * Verify that changes on one side show up on the other,
  * but not vice versa
  */
@@ -1486,7 +1486,7 @@ test_directional_binding (void)
   xobject_unref (settings);
 }
 
-/* Test that type mismatch is caught when creating a binding */
+/* test_t that type mismatch is caught when creating a binding */
 static void
 test_typesafe_binding (void)
 {
@@ -1544,7 +1544,7 @@ bool_to_bool (const xvalue_t       *value,
   return xvariant_new_boolean (xvalue_get_boolean (value));
 }
 
-/* Test custom bindings.
+/* test_t custom bindings.
  * Translate strings to booleans and back
  */
 static void
@@ -1595,7 +1595,7 @@ test_custom_binding (void)
   xobject_unref (settings);
 }
 
-/* Test that with G_SETTINGS_BIND_NO_CHANGES, the
+/* test_t that with G_SETTINGS_BIND_NO_CHANGES, the
  * initial settings value is transported to the object
  * side, but later settings changes do not affect the
  * object
@@ -1631,7 +1631,7 @@ test_no_change_binding (void)
   xobject_unref (settings);
 }
 
-/* Test that binding a non-readable property only
+/* test_t that binding a non-readable property only
  * works in 'GET' mode.
  */
 static void
@@ -1674,7 +1674,7 @@ test_no_read_binding (void)
   g_test_trap_assert_passed ();
 }
 
-/* Test that binding a non-writable property only
+/* test_t that binding a non-writable property only
  * works in 'SET' mode.
  */
 static void
@@ -1733,7 +1733,7 @@ typedef struct
 } KeyfileTestData;
 
 /*
- * Test that using a keyfile works
+ * test_t that using a keyfile works
  */
 static void
 test_keyfile (Fixture       *fixture,
@@ -1794,7 +1794,7 @@ test_keyfile (Fixture       *fixture,
   g_assert_null (str);
 
   called = FALSE;
-  g_signal_connect (settings, "changed::greeting", G_CALLBACK (key_changed_cb), &called);
+  xsignal_connect (settings, "changed::greeting", G_CALLBACK (key_changed_cb), &called);
 
   xkey_file_set_string (keyfile, "tests", "greeting", "'howdy'");
   data = xkey_file_to_data (keyfile, &len, NULL);
@@ -1802,7 +1802,7 @@ test_keyfile (Fixture       *fixture,
   g_assert_no_error (error);
   while (!called)
     xmain_context_iteration (NULL, FALSE);
-  g_signal_handlers_disconnect_by_func (settings, key_changed_cb, &called);
+  xsignal_handlers_disconnect_by_func (settings, key_changed_cb, &called);
 
   str = g_settings_get_string (settings, "greeting");
   g_assert_cmpstr (str, ==, "howdy");
@@ -1810,7 +1810,7 @@ test_keyfile (Fixture       *fixture,
 
   /* Now check setting a string without quotes */
   called = FALSE;
-  g_signal_connect (settings, "changed::greeting", G_CALLBACK (key_changed_cb), &called);
+  xsignal_connect (settings, "changed::greeting", G_CALLBACK (key_changed_cb), &called);
 
   xkey_file_set_string (keyfile, "tests", "greeting", "he\"l🤗uń");
   g_free (data);
@@ -1819,7 +1819,7 @@ test_keyfile (Fixture       *fixture,
   g_assert_no_error (error);
   while (!called)
     xmain_context_iteration (NULL, FALSE);
-  g_signal_handlers_disconnect_by_func (settings, key_changed_cb, &called);
+  xsignal_handlers_disconnect_by_func (settings, key_changed_cb, &called);
 
   str = g_settings_get_string (settings, "greeting");
   g_assert_cmpstr (str, ==, "he\"l🤗uń");
@@ -1837,13 +1837,13 @@ test_keyfile (Fixture       *fixture,
   if (geteuid () != 0)
     {
       called = FALSE;
-      g_signal_connect (settings, "writable-changed::greeting",
+      xsignal_connect (settings, "writable-changed::greeting",
                         G_CALLBACK (key_changed_cb), &called);
 
       g_assert_no_errno (g_chmod (keyfile_path, 0500));
       while (!called)
         xmain_context_iteration (NULL, FALSE);
-      g_signal_handlers_disconnect_by_func (settings, key_changed_cb, &called);
+      xsignal_handlers_disconnect_by_func (settings, key_changed_cb, &called);
 
       writable = g_settings_is_writable (settings, "greeting");
       g_assert_false (writable);
@@ -1863,7 +1863,7 @@ test_keyfile (Fixture       *fixture,
 }
 
 /*
- * Test that using a keyfile works with a schema with no path set.
+ * test_t that using a keyfile works with a schema with no path set.
  */
 static void
 test_keyfile_no_path (Fixture       *fixture,
@@ -1947,7 +1947,7 @@ test_keyfile_no_path (Fixture       *fixture,
 }
 
 /*
- * Test that a keyfile rejects writes to keys outside its root path.
+ * test_t that a keyfile rejects writes to keys outside its root path.
  */
 static void
 test_keyfile_outside_root_path (Fixture       *fixture,
@@ -1976,7 +1976,7 @@ test_keyfile_outside_root_path (Fixture       *fixture,
 }
 
 /*
- * Test that a keyfile rejects writes to keys in the root if no root group is set.
+ * test_t that a keyfile rejects writes to keys in the root if no root group is set.
  */
 static void
 test_keyfile_no_root_group (Fixture       *fixture,
@@ -2005,7 +2005,7 @@ test_keyfile_no_root_group (Fixture       *fixture,
   g_free (keyfile_path);
 }
 
-/* Test that getting child schemas works
+/* test_t that getting child schemas works
  */
 static void
 test_child_schema (void)
@@ -2568,13 +2568,13 @@ test_schema_source (void)
   g_assert_error (error, XFILE_ERROR, XFILE_ERROR_NOENT);
   g_clear_error (&error);
 
-  /* Test error handling of corrupt compiled files. */
+  /* test_t error handling of corrupt compiled files. */
   source = g_settings_schema_source_new_from_directory ("schema-source-corrupt", parent, TRUE, &error);
   g_assert_error (error, XFILE_ERROR, XFILE_ERROR_INVAL);
   g_assert_null (source);
   g_clear_error (&error);
 
-  /* Test error handling of empty compiled files. */
+  /* test_t error handling of empty compiled files. */
   source = g_settings_schema_source_new_from_directory ("schema-source-empty", parent, TRUE, &error);
   g_assert_error (error, XFILE_ERROR, XFILE_ERROR_INVAL);
   g_assert_null (source);
@@ -2684,9 +2684,9 @@ test_actions (void)
   toggle = g_settings_create_action (settings, "test-boolean");
   xobject_unref (settings); /* should be held by the actions */
 
-  g_signal_connect (settings, "changed", G_CALLBACK (changed_cb2), &c1);
-  g_signal_connect (string, "notify::state", G_CALLBACK (changed_cb2), &c2);
-  g_signal_connect (toggle, "notify::state", G_CALLBACK (changed_cb2), &c3);
+  xsignal_connect (settings, "changed", G_CALLBACK (changed_cb2), &c1);
+  xsignal_connect (string, "notify::state", G_CALLBACK (changed_cb2), &c2);
+  xsignal_connect (toggle, "notify::state", G_CALLBACK (changed_cb2), &c3);
 
   c1 = c2 = c3 = FALSE;
   g_settings_set_string (settings, "test-string", "hello world");
@@ -2775,7 +2775,7 @@ test_memory_backend (void)
 {
   xsettings_backend_t *backend;
 
-  backend = g_memory_settings_backend_new ();
+  backend = xmemory_settings_backend_new ();
   g_assert_true (X_IS_SETTINGS_BACKEND (backend));
   xobject_unref (backend);
 }
@@ -2878,7 +2878,7 @@ string_map_func (xvariant_t *value,
   return TRUE;
 }
 
-/* Test that per-desktop values from org.gtk.test.gschema.override
+/* test_t that per-desktop values from org.gtk.test.gschema.override
  * does not change default value if current desktop is not listed in
  * $XDG_CURRENT_DESKTOP.
  */
@@ -2921,7 +2921,7 @@ test_per_desktop (void)
   xobject_unref (obj);
 }
 
-/* Test that per-desktop values from org.gtk.test.gschema.override
+/* test_t that per-desktop values from org.gtk.test.gschema.override
  * are successfully loaded based on the value of $XDG_CURRENT_DESKTOP.
  */
 static void

@@ -79,7 +79,7 @@ typedef enum
   G_SEEK_CUR,
   G_SEEK_SET,
   G_SEEK_END
-} GSeekType;
+} xseek_type_t;
 
 typedef enum
 {
@@ -141,8 +141,8 @@ struct _GIOFuncs
 				  xsize_t        *bytes_written,
 				  xerror_t      **err);
   GIOStatus (*io_seek)           (xio_channel_t   *channel,
-				  gint64        offset,
-				  GSeekType     type,
+				  sint64_t        offset,
+				  xseek_type_t     type,
 				  xerror_t      **err);
   GIOStatus  (*io_close)         (xio_channel_t   *channel,
 				  xerror_t      **err);
@@ -176,8 +176,8 @@ GIOError  g_io_channel_write    (xio_channel_t    *channel,
 
 XPL_DEPRECATED_FOR(g_io_channel_seek_position)
 GIOError  g_io_channel_seek     (xio_channel_t    *channel,
-                                 gint64         offset,
-                                 GSeekType      type);
+                                 sint64_t         offset,
+                                 xseek_type_t      type);
 
 XPL_DEPRECATED_FOR(g_io_channel_shutdown)
 void      g_io_channel_close    (xio_channel_t    *channel);
@@ -284,8 +284,8 @@ GIOStatus   g_io_channel_write_unichar    (xio_channel_t   *channel,
 					   xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
 GIOStatus   g_io_channel_seek_position    (xio_channel_t   *channel,
-					   gint64        offset,
-					   GSeekType     type,
+					   sint64_t        offset,
+					   xseek_type_t     type,
 					   xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
 xio_channel_t* g_io_channel_new_file         (const xchar_t  *filename,

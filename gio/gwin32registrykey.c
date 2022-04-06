@@ -76,7 +76,7 @@ typedef struct _KEY_BASIC_INFORMATION {
 typedef struct _UNICODE_STRING {
   USHORT Length;
   USHORT MaximumLength;
-  PWSTR  Buffer;
+  PWSTR  buffer_t;
 } UNICODE_STRING, *PUNICODE_STRING;
 #endif
 typedef const UNICODE_STRING* PCUNICODE_STRING;

@@ -951,7 +951,7 @@ run_random_tests (xconstpointer d)
 
                 check_integrity (seq);
 
-                /* Test basic functionality */
+                /* test_t basic functionality */
                 item = new_item (seq);
                 g_sequence_set (iter, item);
                 g_assert (g_sequence_get (iter) == item);
@@ -1165,7 +1165,7 @@ run_random_tests (xconstpointer d)
 
 /* Random seeds known to have failed at one point
  */
-static gulong seeds[] =
+static xulong_t seeds[] =
   {
     825541564u,
     801678400u,

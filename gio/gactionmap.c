@@ -272,11 +272,11 @@ xaction_map_add_action_entries (xaction_map_t         *action_map,
         }
 
       if (entry->activate != NULL)
-        g_signal_connect (action, "activate",
+        xsignal_connect (action, "activate",
                           G_CALLBACK (entry->activate), user_data);
 
       if (entry->change_state != NULL)
-        g_signal_connect (action, "change-state",
+        xsignal_connect (action, "change-state",
                           G_CALLBACK (entry->change_state), user_data);
 
       xaction_map_add_action (action_map, G_ACTION (action));

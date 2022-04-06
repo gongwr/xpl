@@ -47,8 +47,8 @@
  * a `.desktop` file. For example:
  * |[
  *  [Desktop Entry]
- *   Name=Test Application
- *   Comment=Description of what Test Application does
+ *   Name=test_t Application
+ *   Comment=Description of what test_t Application does
  *   Exec=gnome-test-application
  *   Icon=org.gnome.TestApplication
  *   Terminal=false

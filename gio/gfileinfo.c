@@ -1062,7 +1062,7 @@ xfile_info_get_attribute_uint64 (xfile_info_t  *info,
  *
  * Returns: a signed 64-bit integer from the attribute.
  **/
-gint64
+sint64_t
 xfile_info_get_attribute_int64  (xfile_info_t  *info,
 				  const char *attribute)
 {
@@ -1421,7 +1421,7 @@ xfile_info_set_attribute_uint64 (xfile_info_t  *info,
 void
 _xfile_info_set_attribute_int64_by_id (xfile_info_t *info,
                                         xuint32_t    attribute,
-				        gint64     attr_value)
+				        sint64_t     attr_value)
 {
   GFileAttributeValue *value;
 
@@ -1443,7 +1443,7 @@ _xfile_info_set_attribute_int64_by_id (xfile_info_t *info,
 void
 xfile_info_set_attribute_int64  (xfile_info_t  *info,
 				  const char *attribute,
-				  gint64      attr_value)
+				  sint64_t      attr_value)
 {
   g_return_if_fail (X_IS_FILE_INFO (info));
   g_return_if_fail (attribute != NULL && *attribute != '\0');

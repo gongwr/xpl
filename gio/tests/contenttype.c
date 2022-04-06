@@ -20,7 +20,7 @@ test_guess (void)
   xchar_t *expected;
   xchar_t *existing_directory;
   xboolean_t uncertain;
-  guchar data[] =
+  xuchar_t data[] =
     "[Desktop Entry]\n"
     "Type=Application\n"
     "Name=appinfo-test\n"
@@ -81,21 +81,21 @@ test_guess (void)
 
   /* this is potentially ambiguous: it does not match the PO template format,
    * but looks like text so it can't be Powerpoint */
-  res = g_content_type_guess ("test.pot", (guchar *)"ABC abc", 7, &uncertain);
+  res = g_content_type_guess ("test.pot", (xuchar_t *)"ABC abc", 7, &uncertain);
   expected = g_content_type_from_mime_type ("text/x-gettext-translation-template");
   g_assert_content_type_equals (expected, res);
   g_assert_false (uncertain);
   g_free (res);
   g_free (expected);
 
-  res = g_content_type_guess ("test.pot", (guchar *)"msgid \"", 7, &uncertain);
+  res = g_content_type_guess ("test.pot", (xuchar_t *)"msgid \"", 7, &uncertain);
   expected = g_content_type_from_mime_type ("text/x-gettext-translation-template");
   g_assert_content_type_equals (expected, res);
   g_assert_false (uncertain);
   g_free (res);
   g_free (expected);
 
-  res = g_content_type_guess ("test.pot", (guchar *)"\xCF\xD0\xE0\x11", 4, &uncertain);
+  res = g_content_type_guess ("test.pot", (xuchar_t *)"\xCF\xD0\xE0\x11", 4, &uncertain);
   expected = g_content_type_from_mime_type ("application/vnd.ms-powerpoint");
   g_assert_content_type_equals (expected, res);
   /* we cannot reliably detect binary powerpoint files as long as there is no
@@ -104,7 +104,7 @@ test_guess (void)
   g_free (res);
   g_free (expected);
 
-  res = g_content_type_guess ("test.otf", (guchar *)"OTTO", 4, &uncertain);
+  res = g_content_type_guess ("test.otf", (xuchar_t *)"OTTO", 4, &uncertain);
   expected = g_content_type_from_mime_type ("application/x-font-otf");
   g_assert_content_type_equals (expected, res);
   g_assert_false (uncertain);
@@ -112,7 +112,7 @@ test_guess (void)
   g_free (expected);
 #endif
 
-  res = g_content_type_guess (NULL, (guchar *)"%!PS-Adobe-2.0 EPSF-1.2", 23, &uncertain);
+  res = g_content_type_guess (NULL, (xuchar_t *)"%!PS-Adobe-2.0 EPSF-1.2", 23, &uncertain);
   expected = g_content_type_from_mime_type ("image/x-eps");
   g_assert_content_type_equals (expected, res);
   g_assert_false (uncertain);
@@ -120,7 +120,7 @@ test_guess (void)
   g_free (expected);
 
   /* The data below would be detected as a valid content type, but shouldn’t be read at all. */
-  res = g_content_type_guess (NULL, (guchar *)"%!PS-Adobe-2.0 EPSF-1.2", 0, &uncertain);
+  res = g_content_type_guess (NULL, (xuchar_t *)"%!PS-Adobe-2.0 EPSF-1.2", 0, &uncertain);
   expected = g_content_type_from_mime_type ("application/x-zerosize");
   g_assert_content_type_equals (expected, res);
   g_assert_false (uncertain);
@@ -371,7 +371,7 @@ test_guess_svg_from_data (void)
 </svg>\n";
 
   xboolean_t uncertain = TRUE;
-  xchar_t *res = g_content_type_guess (NULL, (guchar *)svgfilecontent,
+  xchar_t *res = g_content_type_guess (NULL, (xuchar_t *)svgfilecontent,
                                      sizeof (svgfilecontent) - 1, &uncertain);
 #ifdef __APPLE__
   g_assert_cmpstr (res, ==, "public.svg-image");

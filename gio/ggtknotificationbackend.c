@@ -58,7 +58,7 @@ g_gtk_notification_backend_is_supported (void)
   if (session_bus == NULL)
     return FALSE;
 
-  reply = g_dbus_connection_call_sync (session_bus, "org.freedesktop.DBus", "/org/freedesktop/DBus",
+  reply = xdbus_connection_call_sync (session_bus, "org.freedesktop.DBus", "/org/freedesktop/DBus",
                                        "org.freedesktop.DBus",
                                        "GetNameOwner", xvariant_new ("(s)", "org.gtk.Notifications"),
                                        G_VARIANT_TYPE ("(s)"), G_DBUS_CALL_FLAGS_NONE, -1, NULL, NULL);
@@ -85,7 +85,7 @@ g_gtk_notification_backend_send_notification (xnotification_backend_t *backend,
                                         id,
                                         xnotification_serialize (notification));
 
-  g_dbus_connection_call (backend->dbus_connection,
+  xdbus_connection_call (backend->dbus_connection,
                           "org.gtk.Notifications", "/org/gtk/Notifications",
                           "org.gtk.Notifications", "AddNotification", params,
                           G_VARIANT_TYPE_UNIT,
@@ -100,7 +100,7 @@ g_gtk_notification_backend_withdraw_notification (xnotification_backend_t *backe
 
   params = xvariant_new ("(ss)", xapplication_get_application_id (backend->application), id);
 
-  g_dbus_connection_call (backend->dbus_connection, "org.gtk.Notifications",
+  xdbus_connection_call (backend->dbus_connection, "org.gtk.Notifications",
                           "/org/gtk/Notifications", "org.gtk.Notifications",
                           "RemoveNotification", params, G_VARIANT_TYPE_UNIT,
                           G_DBUS_CALL_FLAGS_NONE, -1, NULL, NULL, NULL);

@@ -3047,8 +3047,8 @@ msgid "Error removing old file: %s"
 msgstr "পুরোনো ফাইল মুছে ফেলতে সমস্যা: %s"
 
 #: ../gio/gmemoryinputstream.c:486 ../gio/gmemoryoutputstream.c:746
-msgid "Invalid GSeekType supplied"
-msgstr "অবৈধ GSeekType উল্লিখিত হয়েছে"
+msgid "Invalid xseek_type_t supplied"
+msgstr "অবৈধ xseek_type_t উল্লিখিত হয়েছে"
 
 #: ../gio/gmemoryinputstream.c:496
 msgid "Invalid seek request"

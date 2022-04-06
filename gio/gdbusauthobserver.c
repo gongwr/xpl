@@ -195,18 +195,18 @@ xdbus_auth_observer_class_init (GDBusAuthObserverClass *klass)
    * Since: 2.26
    */
   signals[AUTHORIZE_AUTHENTICATED_PEER_SIGNAL] =
-    g_signal_new (I_("authorize-authenticated-peer"),
+    xsignal_new (I_("authorize-authenticated-peer"),
                   XTYPE_DBUS_AUTH_OBSERVER,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GDBusAuthObserverClass, authorize_authenticated_peer),
-                  _g_signal_accumulator_false_handled,
+                  _xsignal_accumulator_false_handled,
                   NULL, /* accu_data */
                   _g_cclosure_marshal_BOOLEAN__OBJECT_OBJECT,
                   XTYPE_BOOLEAN,
                   2,
                   XTYPE_IO_STREAM,
                   XTYPE_CREDENTIALS);
-  g_signal_set_va_marshaller (signals[AUTHORIZE_AUTHENTICATED_PEER_SIGNAL],
+  xsignal_set_va_marshaller (signals[AUTHORIZE_AUTHENTICATED_PEER_SIGNAL],
                               XTYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_BOOLEAN__OBJECT_OBJECTv);
 
@@ -222,17 +222,17 @@ xdbus_auth_observer_class_init (GDBusAuthObserverClass *klass)
    * Since: 2.34
    */
   signals[ALLOW_MECHANISM_SIGNAL] =
-    g_signal_new (I_("allow-mechanism"),
+    xsignal_new (I_("allow-mechanism"),
                   XTYPE_DBUS_AUTH_OBSERVER,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GDBusAuthObserverClass, allow_mechanism),
-                  _g_signal_accumulator_false_handled,
+                  _xsignal_accumulator_false_handled,
                   NULL, /* accu_data */
                   _g_cclosure_marshal_BOOLEAN__STRING,
                   XTYPE_BOOLEAN,
                   1,
                   XTYPE_STRING);
-  g_signal_set_va_marshaller (signals[ALLOW_MECHANISM_SIGNAL],
+  xsignal_set_va_marshaller (signals[ALLOW_MECHANISM_SIGNAL],
                               XTYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_BOOLEAN__STRINGv);
 }
@@ -279,7 +279,7 @@ xdbus_auth_observer_authorize_authenticated_peer (xdbus_auth_observer_t  *observ
   xboolean_t denied;
 
   denied = FALSE;
-  g_signal_emit (observer,
+  xsignal_emit (observer,
                  signals[AUTHORIZE_AUTHENTICATED_PEER_SIGNAL],
                  0,
                  stream,
@@ -306,7 +306,7 @@ xdbus_auth_observer_allow_mechanism (xdbus_auth_observer_t  *observer,
   xboolean_t ret;
 
   ret = FALSE;
-  g_signal_emit (observer,
+  xsignal_emit (observer,
                  signals[ALLOW_MECHANISM_SIGNAL],
                  0,
                  mechanism,

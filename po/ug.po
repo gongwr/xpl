@@ -34,8 +34,8 @@ msgid "Seek not supported on base stream"
 msgstr "ئاساسىي ئېقىم يۆتكىلىش(Seek) نى قوللىمايدۇ"
 
 #: ../gio/gbufferedinputstream.c:945
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "ئېقىم xbuffered_input_stream نى قىسقارتقىلى بولمىدى"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "ئېقىم xbuffered_input_stream_t نى قىسقارتقىلى بولمىدى"
 
 #: ../gio/gbufferedinputstream.c:990 ../gio/ginputstream.c:1023
 #: ../gio/giostream.c:291 ../gio/goutputstream.c:1334
@@ -1832,8 +1832,8 @@ msgid "Error removing old file: %s"
 msgstr "كونا ھۆججەتنى ئۆچۈرۈۋاتقاندا خاتالىق كۆرۈلدى: %s"
 
 #: ../gio/gmemoryinputstream.c:476 ../gio/gmemoryoutputstream.c:739
-msgid "Invalid GSeekType supplied"
-msgstr "تەمىنلەنگەن GSeekType ئىناۋەتسىز"
+msgid "Invalid xseek_type_t supplied"
+msgstr "تەمىنلەنگەن xseek_type_t ئىناۋەتسىز"
 
 #: ../gio/gmemoryinputstream.c:486
 msgid "Invalid seek request"

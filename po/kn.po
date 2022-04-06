@@ -265,8 +265,8 @@ msgid "Seek not supported on base stream"
 msgstr "ಮೂಲ ಸ್ಟ್ರೀಮ್‍ನಲ್ಲಿ ಕೋರುವಿಕೆಗೆ ಬೆಂಬಲವಿಲ್ಲ"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "xbuffered_input_stream ಅನ್ನು ಕಡಿತಗೊಳಿಸಲಾಗಿಲ್ಲ"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "xbuffered_input_stream_t ಅನ್ನು ಕಡಿತಗೊಳಿಸಲಾಗಿಲ್ಲ"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1202
 #: ../gio/giostream.c:277 ../gio/goutputstream.c:1654
@@ -2174,8 +2174,8 @@ msgid "Error removing old file: %s"
 msgstr "ಹಳೆಯ ಕಡತವನ್ನು ತೆಗೆದು ಹಾಕುವಲ್ಲಿ ದೋಷ: %s"
 
 #: ../gio/gmemoryinputstream.c:471 ../gio/gmemoryoutputstream.c:769
-msgid "Invalid GSeekType supplied"
-msgstr "ಅಮಾನ್ಯವಾದ GSeekType ಅನ್ನು ಒದಗಿಸಲಾಗಿದೆ"
+msgid "Invalid xseek_type_t supplied"
+msgstr "ಅಮಾನ್ಯವಾದ xseek_type_t ಅನ್ನು ಒದಗಿಸಲಾಗಿದೆ"
 
 #: ../gio/gmemoryinputstream.c:481
 msgid "Invalid seek request"

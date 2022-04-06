@@ -90,7 +90,7 @@ xvariant_t *                      xvariant_new_int32                     (gint32
 XPL_AVAILABLE_IN_ALL
 xvariant_t *                      xvariant_new_uint32                    (xuint32_t               value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      xvariant_new_int64                     (gint64                value);
+xvariant_t *                      xvariant_new_int64                     (sint64_t                value);
 XPL_AVAILABLE_IN_ALL
 xvariant_t *                      xvariant_new_uint64                    (xuint64_t               value);
 XPL_AVAILABLE_IN_ALL
@@ -143,7 +143,7 @@ gint32                          xvariant_get_int32                     (xvariant
 XPL_AVAILABLE_IN_ALL
 xuint32_t                         xvariant_get_uint32                    (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-gint64                          xvariant_get_int64                     (xvariant_t             *value);
+sint64_t                          xvariant_get_int64                     (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
 xuint64_t                         xvariant_get_uint64                    (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL

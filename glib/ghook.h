@@ -62,7 +62,7 @@ typedef enum
 /* --- structures --- */
 struct _GHookList
 {
-  gulong	    seq_id;
+  xulong_t	    seq_id;
   xuint_t		    hook_size : 16;
   xuint_t		    is_setup : 1;
   GHook		   *hooks;
@@ -76,7 +76,7 @@ struct _GHook
   GHook		*next;
   GHook		*prev;
   xuint_t		 ref_count;
-  gulong	 hook_id;
+  xulong_t	 hook_id;
   xuint_t		 flags;
   xpointer_t	 func;
   xdestroy_notify_t destroy;
@@ -119,7 +119,7 @@ void	 g_hook_unref			(GHookList		*hook_list,
 					 GHook			*hook);
 XPL_AVAILABLE_IN_ALL
 xboolean_t g_hook_destroy			(GHookList		*hook_list,
-					 gulong			 hook_id);
+					 xulong_t			 hook_id);
 XPL_AVAILABLE_IN_ALL
 void	 g_hook_destroy_link		(GHookList		*hook_list,
 					 GHook			*hook);
@@ -136,7 +136,7 @@ void	 g_hook_insert_sorted		(GHookList		*hook_list,
 					 GHookCompareFunc	 func);
 XPL_AVAILABLE_IN_ALL
 GHook*	 g_hook_get			(GHookList		*hook_list,
-					 gulong			 hook_id);
+					 xulong_t			 hook_id);
 XPL_AVAILABLE_IN_ALL
 GHook*	 g_hook_find			(GHookList		*hook_list,
 					 xboolean_t		 need_valids,

@@ -32,7 +32,7 @@ try:
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
     class TestLowMemoryMonitor(dbusmock.DBusTestCase):
-        '''Test GMemoryMonitorDBus'''
+        '''test_t GMemoryMonitorDBus'''
 
         @classmethod
         def setUpClass(klass):

@@ -235,7 +235,7 @@ static void
 xsocket_output_stream_class_init (GSocketOutputStreamClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
-  GOutputStreamClass *goutputstream_class = G_OUTPUT_STREAM_CLASS (klass);
+  xoutput_stream_class_t *goutputstream_class = G_OUTPUT_STREAM_CLASS (klass);
 
   gobject_class->finalize = xsocket_output_stream_finalize;
   gobject_class->get_property = xsocket_output_stream_get_property;

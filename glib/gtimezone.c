@@ -97,8 +97,8 @@ typedef struct { xchar_t bytes[8]; } gint64_be;
 typedef struct { xchar_t bytes[4]; } gint32_be;
 typedef struct { xchar_t bytes[4]; } guint32_be;
 
-static inline gint64 gint64_from_be (const gint64_be be) {
-  gint64 tmp; memcpy (&tmp, &be, sizeof tmp); return GINT64_FROM_BE (tmp);
+static inline sint64_t gint64_from_be (const gint64_be be) {
+  sint64_t tmp; memcpy (&tmp, &be, sizeof tmp); return GINT64_FROM_BE (tmp);
 }
 
 static inline gint32 gint32_from_be (const gint32_be be) {
@@ -114,7 +114,7 @@ struct tzhead
 {
   xchar_t      tzh_magic[4];
   xchar_t      tzh_version;
-  guchar     tzh_reserved[15];
+  xuchar_t     tzh_reserved[15];
 
   guint32_be tzh_ttisgmtcnt;
   guint32_be tzh_ttisstdcnt;
@@ -180,7 +180,7 @@ typedef struct
    Savings (Summer) time and Standard time for the zone. */
 typedef struct
 {
-  gint64 time;
+  sint64_t time;
   xint_t   info_index;
 } Transition;
 
@@ -669,7 +669,7 @@ init_zone_from_iana_info (xtimezone_t *gtz,
   const struct tzhead *header = header_data;
   xtimezone_t *footertz = NULL;
   xuint_t extra_time_count = 0, extra_type_count = 0;
-  gint64 last_explicit_transition_time;
+  sint64_t last_explicit_transition_time;
 
   g_return_if_fail (size >= sizeof (struct tzhead) &&
                     memcmp (header, "TZif", 4) == 0);
@@ -687,7 +687,7 @@ init_zone_from_iana_info (xtimezone_t *gtz,
            5 * guint32_from_be(header->tzh_timecnt) +
            6 * guint32_from_be(header->tzh_typecnt) +
            guint32_from_be(header->tzh_charcnt));
-        timesize = sizeof (gint64);
+        timesize = sizeof (sint64_t);
       }
   time_count = guint32_from_be(header->tzh_timecnt);
   type_count = guint32_from_be(header->tzh_typecnt);
@@ -1146,7 +1146,7 @@ find_relative_date (TimeZoneDate *buffer)
 }
 
 /* Offset is previous offset of local time. Returns 0 if month is 0 */
-static gint64
+static sint64_t
 boundary_for_year (TimeZoneDate *boundary,
                    xint_t          year,
                    gint32        offset)
@@ -1249,7 +1249,7 @@ init_zone_from_rules (xtimezone_t    *gtz,
                  starts the year with DST, so we need to add a
                  transition to return to standard time */
               xuint_t year = rules[ri].start_year;
-              gint64 std_time =  boundary_for_year (&rules[ri].dlt_end,
+              sint64_t std_time =  boundary_for_year (&rules[ri].dlt_end,
                                                     year, last_offset);
               Transition std_trans = {std_time, info_index};
               g_array_append_val (gtz->transitions, std_trans);
@@ -1289,9 +1289,9 @@ init_zone_from_rules (xtimezone_t    *gtz,
               gint32 std_offset = (dlt_first ? rules[ri].std_offset :
                                    last_offset);
               /* NB: boundary_for_year returns 0 if mon == 0 */
-              gint64 std_time =  boundary_for_year (&rules[ri].dlt_end,
+              sint64_t std_time =  boundary_for_year (&rules[ri].dlt_end,
                                                     year, dlt_offset);
-              gint64 dlt_time = boundary_for_year (&rules[ri].dlt_start,
+              sint64_t dlt_time = boundary_for_year (&rules[ri].dlt_start,
                                                    year, std_offset);
               Transition std_trans = {std_time, info_index};
               Transition dlt_trans = {dlt_time, info_index + 1};
@@ -2100,7 +2100,7 @@ interval_info (xtimezone_t *tz,
   return &(TRANSITION_INFO(index));
 }
 
-inline static gint64
+inline static sint64_t
 interval_start (xtimezone_t *tz,
                 xuint_t      interval)
 {
@@ -2111,13 +2111,13 @@ interval_start (xtimezone_t *tz,
   return (TRANSITION(interval - 1)).time;
 }
 
-inline static gint64
+inline static sint64_t
 interval_end (xtimezone_t *tz,
               xuint_t      interval)
 {
   if (tz->transitions && interval < tz->transitions->len)
     {
-      gint64 lim = (TRANSITION(interval)).time;
+      sint64_t lim = (TRANSITION(interval)).time;
       return lim - (lim != G_MININT64);
     }
   return G_MAXINT64;
@@ -2148,7 +2148,7 @@ interval_abbrev (xtimezone_t *tz,
   return interval_info (tz, interval)->abbrev;
 }
 
-inline static gint64
+inline static sint64_t
 interval_local_start (xtimezone_t *tz,
                       xuint_t      interval)
 {
@@ -2158,7 +2158,7 @@ interval_local_start (xtimezone_t *tz,
   return G_MININT64;
 }
 
-inline static gint64
+inline static sint64_t
 interval_local_end (xtimezone_t *tz,
                     xuint_t      interval)
 {
@@ -2209,7 +2209,7 @@ interval_valid (xtimezone_t *tz,
 xint_t
 xtime_zone_adjust_time (xtimezone_t *tz,
                          GTimeType  type,
-                         gint64    *time_)
+                         sint64_t    *time_)
 {
   xuint_t i, intervals;
   xboolean_t interval_is_dst;
@@ -2307,7 +2307,7 @@ xtime_zone_adjust_time (xtimezone_t *tz,
 xint_t
 xtime_zone_find_interval (xtimezone_t *tz,
                            GTimeType  type,
-                           gint64     time_)
+                           sint64_t     time_)
 {
   xuint_t i, intervals;
   xboolean_t interval_is_dst;

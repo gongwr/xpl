@@ -55,7 +55,7 @@ static void
 handle_created (void *udata, const char *path, ino_t inode)
 {
   handle_ctx *ctx = NULL;
-  gint64 now;
+  sint64_t now;
   xchar_t *fullname;
   struct stat st;
 

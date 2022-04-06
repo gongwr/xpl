@@ -66,11 +66,11 @@ typedef struct
   xuint32_t bits[2];
 
   union {
-    guchar data[MD5_DATASIZE];
+    xuchar_t data[MD5_DATASIZE];
     xuint32_t data32[MD5_DATASIZE / 4];
   } u;
 
-  guchar digest[MD5_DIGEST_LEN];
+  xuchar_t digest[MD5_DIGEST_LEN];
 } Md5sum;
 
 #define SHA1_DATASIZE   64
@@ -84,7 +84,7 @@ typedef struct
   /* we pack 64 unsigned chars into 16 32-bit unsigned integers */
   xuint32_t data[16];
 
-  guchar digest[SHA1_DIGEST_LEN];
+  xuchar_t digest[SHA1_DIGEST_LEN];
 } Sha1sum;
 
 #define SHA256_DATASIZE         64
@@ -97,7 +97,7 @@ typedef struct
 
   xuint8_t data[SHA256_DATASIZE];
 
-  guchar digest[SHA256_DIGEST_LEN];
+  xuchar_t digest[SHA256_DIGEST_LEN];
 } Sha256sum;
 
 /* SHA2 is common thing for SHA-384, SHA-512, SHA-512/224 and SHA-512/256 */
@@ -114,7 +114,7 @@ typedef struct
 
   xuint64_t data_len[2];
 
-  guchar digest[SHA512_DIGEST_LEN];
+  xuchar_t digest[SHA512_DIGEST_LEN];
 } Sha512sum;
 
 struct _GChecksum
@@ -141,8 +141,8 @@ struct _GChecksum
 #else
 /* assume that the passed buffer is integer aligned */
 static inline void
-md5_byte_reverse (guchar *buffer,
-                  gulong  length)
+md5_byte_reverse (xuchar_t *buffer,
+                  xulong_t  length)
 {
   xuint32_t bit;
 
@@ -333,7 +333,7 @@ md5_transform (xuint32_t       buf[4],
 
 static void
 md5_sum_update (Md5sum       *md5,
-                const guchar *data,
+                const xuchar_t *data,
                 xsize_t         length)
 {
   xuint32_t bit;
@@ -353,7 +353,7 @@ md5_sum_update (Md5sum       *md5,
   /* handle any leading odd-sized chunks */
   if (bit)
     {
-      guchar *p = md5->u.data + bit;
+      xuchar_t *p = md5->u.data + bit;
 
       bit = MD5_DATASIZE - bit;
       if (length < bit)
@@ -392,7 +392,7 @@ static void
 md5_sum_close (Md5sum *md5)
 {
   xuint_t count;
-  guchar *p;
+  xuchar_t *p;
 
   /* Compute number of bytes mod 64 */
   count = (md5->bits[0] >> 3) & 0x3F;
@@ -431,7 +431,7 @@ md5_sum_close (Md5sum *md5)
   md5->u.data32[15] = md5->bits[1];
 
   md5_transform (md5->buf, md5->u.data32);
-  md5_byte_reverse ((guchar *) md5->buf, 4);
+  md5_byte_reverse ((xuchar_t *) md5->buf, 4);
 
   memcpy (md5->digest, md5->buf, 16);
 
@@ -689,7 +689,7 @@ sha1_transform (xuint32_t  buf[5],
 
 static void
 sha1_sum_update (Sha1sum      *sha1,
-                 const guchar *buffer,
+                 const xuchar_t *buffer,
                  xsize_t         count)
 {
   xuint32_t tmp;
@@ -707,7 +707,7 @@ sha1_sum_update (Sha1sum      *sha1,
   /* Handle any leading odd-sized chunks */
   if (dataCount)
     {
-      guchar *p = (guchar *) sha1->data + dataCount;
+      xuchar_t *p = (xuchar_t *) sha1->data + dataCount;
 
       dataCount = SHA1_DATASIZE - dataCount;
       if (count < dataCount)
@@ -747,14 +747,14 @@ static void
 sha1_sum_close (Sha1sum *sha1)
 {
   xint_t count;
-  guchar *data_p;
+  xuchar_t *data_p;
 
   /* Compute number of bytes mod 64 */
   count = (xint_t) ((sha1->bits[0] >> 3) & 0x3f);
 
   /* Set the first char of padding to 0x80.  This is safe since there is
      always at least one byte free */
-  data_p = (guchar *) sha1->data + count;
+  data_p = (xuchar_t *) sha1->data + count;
   *data_p++ = 0x80;
 
   /* Bytes of padding needed to make 64 bytes */
@@ -986,7 +986,7 @@ sha256_transform (xuint32_t      buf[8],
 
 static void
 sha256_sum_update (Sha256sum    *sha256,
-                   const guchar *buffer,
+                   const xuchar_t *buffer,
                    xsize_t         length)
 {
   xuint32_t left, fill;
@@ -1271,7 +1271,7 @@ sha512_transform (xuint64_t      H[8],
 
 static void
 sha512_sum_update (Sha512sum    *sha512,
-                   const guchar *buffer,
+                   const xuchar_t *buffer,
                    xsize_t         length)
 {
   xsize_t block_left, offset = 0;
@@ -1582,7 +1582,7 @@ xchecksum_free (xchecksum_t *checksum)
  */
 void
 xchecksum_update (xchecksum_t    *checksum,
-                   const guchar *data,
+                   const xuchar_t *data,
                    xssize_t        length)
 {
   g_return_if_fail (checksum != NULL);
@@ -1784,7 +1784,7 @@ xchecksum_get_digest (xchecksum_t  *checksum,
  */
 xchar_t *
 g_compute_checksum_for_data (GChecksumType  checksum_type,
-                             const guchar  *data,
+                             const xuchar_t  *data,
                              xsize_t          length)
 {
   xchecksum_t *checksum;
@@ -1829,7 +1829,7 @@ g_compute_checksum_for_string (GChecksumType  checksum_type,
   if (length < 0)
     length = strlen (str);
 
-  return g_compute_checksum_for_data (checksum_type, (const guchar *) str, length);
+  return g_compute_checksum_for_data (checksum_type, (const xuchar_t *) str, length);
 }
 
 /**

@@ -32,7 +32,7 @@ G_BEGIN_DECLS
 #define XTYPE_LOADABLE_ICON            (g_loadable_icon_get_type ())
 #define G_LOADABLE_ICON(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_LOADABLE_ICON, xloadable_icon))
 #define X_IS_LOADABLE_ICON(obj)	        (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_LOADABLE_ICON))
-#define G_LOADABLE_ICON_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_LOADABLE_ICON, GLoadableIconIface))
+#define G_LOADABLE_ICON_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_LOADABLE_ICON, xloadable_icon_iface_t))
 
 /**
  * xloadable_icon_t:
@@ -40,10 +40,10 @@ G_BEGIN_DECLS
  * Generic type for all kinds of icons that can be loaded
  * as a stream.
  **/
-typedef struct _GLoadableIconIface    		GLoadableIconIface;
+typedef struct _xloadable_icon_iface    		xloadable_icon_iface_t;
 
 /**
- * GLoadableIconIface:
+ * xloadable_icon_iface_t:
  * @x_iface: The parent interface.
  * @load: Loads an icon.
  * @load_async: Loads an icon asynchronously.
@@ -51,7 +51,7 @@ typedef struct _GLoadableIconIface    		GLoadableIconIface;
  *
  * Interface for icons that can be loaded as a stream.
  **/
-struct _GLoadableIconIface
+struct _xloadable_icon_iface
 {
   xtype_interface_t x_iface;
 

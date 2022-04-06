@@ -45,7 +45,7 @@ test_assigned_values (xfile_info_t *info)
   xuint64_t size;
   xfile_type_t type;
 
-  /*  Test for attributes presence */
+  /*  test_t for attributes presence */
   g_assert_true (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_NAME));
   g_assert_true (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_DISPLAY_NAME));
   g_assert_true (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_SIZE));
@@ -82,7 +82,7 @@ test_xfile_info (void)
 
   info = xfile_info_new ();
 
-  /*  Test for empty instance */
+  /*  test_t for empty instance */
   attr_list = xfile_info_list_attributes (info, NULL);
   g_assert_nonnull (attr_list);
   g_assert_null (*attr_list);
@@ -101,7 +101,7 @@ test_xfile_info (void)
 
   test_assigned_values (info);
 
-  /*  Test dups */
+  /*  test_t dups */
   info_dup = xfile_info_dup (info);
   g_assert_nonnull (info_dup);
   test_assigned_values (info_dup);
@@ -111,7 +111,7 @@ test_xfile_info (void)
   g_assert_nonnull (info_copy);
   test_assigned_values (info_copy);
 
-  /*  Test remove attribute */
+  /*  test_t remove attribute */
   g_assert_false (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_SORT_ORDER));
   xfile_info_set_attribute_int32 (info, XFILE_ATTRIBUTE_STANDARD_SORT_ORDER, 10);
   g_assert_true (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_SORT_ORDER));
@@ -151,7 +151,7 @@ test_xfile_info_modification_time (void)
   GTimeSpan ts;
   xerror_t *error = NULL;
 
-  g_test_summary ("Test that getting the modification time of a file works.");
+  g_test_summary ("test_t that getting the modification time of a file works.");
 
   file = xfile_new_tmp ("g-file-info-test-XXXXXX", &io_stream, &error);
   g_assert_no_error (error);
@@ -212,7 +212,7 @@ test_xfile_info_access_time (void)
   GTimeSpan ts;
   xerror_t *error = NULL;
 
-  g_test_summary ("Test that getting the access time of a file works.");
+  g_test_summary ("test_t that getting the access time of a file works.");
 
   file = xfile_new_tmp ("g-file-info-test-XXXXXX", &io_stream, &error);
   g_assert_no_error (error);
@@ -282,7 +282,7 @@ test_xfile_info_creation_time (void)
   GTimeSpan ts;
   xerror_t *error = NULL;
 
-  g_test_summary ("Test that getting the creation time of a file works.");
+  g_test_summary ("test_t that getting the creation time of a file works.");
 
   file = xfile_new_tmp ("g-file-info-test-XXXXXX", &io_stream, &error);
   g_assert_no_error (error);
@@ -379,7 +379,7 @@ test_internal_enhanced_stdio (void)
   xdatetime_t *dt = NULL, *dt2 = NULL;
   GTimeSpan ts;
   /* Just before SYSTEMTIME limit (Jan 1 30827) */
-  const gint64 one_sec_before_systemtime_limit = 910670515199;
+  const sint64_t one_sec_before_systemtime_limit = 910670515199;
   xboolean_t retval;
   xerror_t *local_error = NULL;
 
@@ -832,7 +832,7 @@ test_xattrs (void)
   xfile_info_t *file_info0 = NULL, *file_info1 = NULL;
   xerror_t *local_error = NULL;
 
-  g_test_summary ("Test setting and getting escaped xattrs");
+  g_test_summary ("test_t setting and getting escaped xattrs");
 
   /* Create a temporary file; no need to write anything to it. */
   file = xfile_new_tmp ("g-file-info-test-xattrs-XXXXXX", &stream, &local_error);

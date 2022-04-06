@@ -268,14 +268,14 @@ test_exit1_cancel (void)
   g_assert_no_error (local_error);
 
   data.loop = xmain_loop_new (NULL, FALSE);
-  data.cancellable = g_cancellable_new ();
+  data.cancellable = xcancellable_new ();
   xsubprocess_wait_check_async (proc, data.cancellable, test_exit1_cancel_wait_check_cb, &data);
 
   xsubprocess_wait_check (proc, NULL, error);
   g_assert_error (local_error, G_SPAWN_EXIT_ERROR, 1);
   g_clear_error (error);
 
-  g_cancellable_cancel (data.cancellable);
+  xcancellable_cancel (data.cancellable);
   xmain_loop_run (data.loop);
 
   xobject_unref (proc);
@@ -301,7 +301,7 @@ test_exit1_cancel_in_cb_wait_check_cb (xobject_t      *source,
   g_assert_error (error, G_SPAWN_EXIT_ERROR, 1);
   g_clear_error (&error);
 
-  g_cancellable_cancel (data->cancellable);
+  xcancellable_cancel (data->cancellable);
 
   g_idle_add (test_exit1_cancel_idle_quit_cb, data->loop);
 }
@@ -323,7 +323,7 @@ test_exit1_cancel_in_cb (void)
   g_assert_no_error (local_error);
 
   data.loop = xmain_loop_new (NULL, FALSE);
-  data.cancellable = g_cancellable_new ();
+  data.cancellable = xcancellable_new ();
   xsubprocess_wait_check_async (proc, data.cancellable, test_exit1_cancel_in_cb_wait_check_cb, &data);
 
   xsubprocess_wait_check (proc, NULL, error);
@@ -503,7 +503,7 @@ cancel_soon (xpointer_t user_data)
   xcancellable_t *cancellable = user_data;
 
   g_usleep (G_TIME_SPAN_SECOND);
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   xobject_unref (cancellable);
 
   return NULL;
@@ -530,7 +530,7 @@ test_cat_eof (void)
   g_assert_nonnull (cat);
 
   /* Make sure that reading stdout blocks (until we cancel) */
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
   xthread_unref (xthread_new ("cancel thread", cancel_soon, xobject_ref (cancellable)));
   s = xinput_stream_read (xsubprocess_get_stdout_pipe (cat), &buffer, sizeof buffer, cancellable, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
@@ -790,7 +790,7 @@ on_communicate_complete (xobject_t               *proc,
   g_free (stderr_str);
 }
 
-/* Test xsubprocess_communicate_async() works correctly with a variety of flags,
+/* test_t xsubprocess_communicate_async() works correctly with a variety of flags,
  * as passed in via @test_data. */
 static void
 test_communicate_async (xconstpointer test_data)
@@ -831,7 +831,7 @@ test_communicate_async (xconstpointer test_data)
   xobject_unref (proc);
 }
 
-/* Test xsubprocess_communicate() works correctly with a variety of flags,
+/* test_t xsubprocess_communicate() works correctly with a variety of flags,
  * as passed in via @test_data. */
 static void
 test_communicate (xconstpointer test_data)
@@ -927,7 +927,7 @@ on_test_communicate_cancelled_idle (xpointer_t user_data)
   return G_SOURCE_REMOVE;
 }
 
-/* Test xsubprocess_communicate() can be cancelled correctly */
+/* test_t xsubprocess_communicate() can be cancelled correctly */
 static void
 test_communicate_cancelled (xconstpointer test_data)
 {
@@ -945,13 +945,13 @@ test_communicate_cancelled (xconstpointer test_data)
   g_assert_no_error (error);
   xptr_array_free (args, TRUE);
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
 
   data.proc = proc;
   data.cancellable = cancellable;
   data.error = error;
 
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   g_idle_add (on_test_communicate_cancelled_idle, &data);
 
   data.running = TRUE;
@@ -994,7 +994,7 @@ on_communicate_cancelled_complete (xobject_t               *proc,
     }
 }
 
-/* Test xsubprocess_communicate_async() can be cancelled correctly,
+/* test_t xsubprocess_communicate_async() can be cancelled correctly,
  * as passed in via @test_data. */
 static void
 test_communicate_cancelled_async (xconstpointer test_data)
@@ -1020,14 +1020,14 @@ test_communicate_cancelled_async (xconstpointer test_data)
   hellostring = "# hello world\n";
   input = xbytes_new_static (hellostring, strlen (hellostring));
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
 
   xsubprocess_communicate_async (proc, input,
                                   cancellable,
                                   on_communicate_cancelled_complete,
                                   &data);
 
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
 
   data.running = TRUE;
   while (data.running)
@@ -1041,7 +1041,7 @@ test_communicate_cancelled_async (xconstpointer test_data)
   xobject_unref (proc);
 }
 
-/* Test xsubprocess_communicate_utf8_async() works correctly with a variety of
+/* test_t xsubprocess_communicate_utf8_async() works correctly with a variety of
  * flags, as passed in via @test_data. */
 static void
 test_communicate_utf8_async (xconstpointer test_data)
@@ -1075,7 +1075,7 @@ test_communicate_utf8_async (xconstpointer test_data)
   xobject_unref (proc);
 }
 
-/* Test xsubprocess_communicate_utf8_async() can be cancelled correctly. */
+/* test_t xsubprocess_communicate_utf8_async() can be cancelled correctly. */
 static void
 test_communicate_utf8_cancelled_async (xconstpointer test_data)
 {
@@ -1093,14 +1093,14 @@ test_communicate_utf8_cancelled_async (xconstpointer test_data)
   g_assert_no_error (error);
   xptr_array_free (args, TRUE);
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
   data.is_utf8 = TRUE;
   xsubprocess_communicate_utf8_async (proc, "# hello world\n",
                                        cancellable,
                                        on_communicate_cancelled_complete,
                                        &data);
 
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
 
   data.running = TRUE;
   while (data.running)
@@ -1113,7 +1113,7 @@ test_communicate_utf8_cancelled_async (xconstpointer test_data)
   xobject_unref (proc);
 }
 
-/* Test xsubprocess_communicate_utf8() works correctly with a variety of flags,
+/* test_t xsubprocess_communicate_utf8() works correctly with a variety of flags,
  * as passed in via @test_data. */
 static void
 test_communicate_utf8 (xconstpointer test_data)
@@ -1153,7 +1153,7 @@ test_communicate_utf8 (xconstpointer test_data)
   xobject_unref (proc);
 }
 
-/* Test xsubprocess_communicate_utf8() can be cancelled correctly */
+/* test_t xsubprocess_communicate_utf8() can be cancelled correctly */
 static void
 test_communicate_utf8_cancelled (xconstpointer test_data)
 {
@@ -1171,13 +1171,13 @@ test_communicate_utf8_cancelled (xconstpointer test_data)
   g_assert_no_error (error);
   xptr_array_free (args, TRUE);
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
 
   data.proc = proc;
   data.cancellable = cancellable;
   data.error = error;
 
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   g_idle_add (on_test_communicate_cancelled_idle, &data);
 
   data.is_utf8 = TRUE;
@@ -1253,7 +1253,7 @@ test_communicate_utf8_async_invalid (void)
   xobject_unref (proc);
 }
 
-/* Test that invalid UTF-8 received using xsubprocess_communicate_utf8()
+/* test_t that invalid UTF-8 received using xsubprocess_communicate_utf8()
  * results in an error. */
 static void
 test_communicate_utf8_invalid (void)
@@ -1427,7 +1427,7 @@ test_env (void)
   xobject_unref (launcher);
 }
 
-/* Test that explicitly inheriting and modifying the parent process’
+/* test_t that explicitly inheriting and modifying the parent process’
  * environment works. */
 static void
 test_env_inherit (void)

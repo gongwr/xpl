@@ -56,7 +56,7 @@ xio_stream_t           *g_dbus_address_get_stream_sync   (const xchar_t         
                                                        xerror_t              **error);
 
 XPL_AVAILABLE_IN_ALL
-xchar_t               *g_dbus_address_get_for_bus_sync  (GBusType              bus_type,
+xchar_t               *g_dbus_address_get_for_bus_sync  (xbus_type_t              bus_type,
                                                        xcancellable_t  *cancellable,
                                                        xerror_t              **error);
 

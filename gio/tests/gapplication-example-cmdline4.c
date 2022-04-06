@@ -73,8 +73,8 @@ main (int argc, char **argv)
                                                 "It does nothing at all except displaying information "
                                                 "when invoked with --help argument...\n");
 
-  g_signal_connect (app, "handle-local-options", G_CALLBACK (handle_local_options), NULL);
-  g_signal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
+  xsignal_connect (app, "handle-local-options", G_CALLBACK (handle_local_options), NULL);
+  xsignal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
 
   /* This application does absolutely nothing, except if a command line is given */
   status = xapplication_run (app, argc, argv);

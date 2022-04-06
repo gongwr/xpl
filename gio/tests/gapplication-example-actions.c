@@ -48,13 +48,13 @@ add_actions (xapplication_t *app)
   xsimple_action_t *action;
 
   action = g_simple_action_new ("simple-action", NULL);
-  g_signal_connect (action, "activate", G_CALLBACK (activate_action), app);
+  xsignal_connect (action, "activate", G_CALLBACK (activate_action), app);
   xaction_map_add_action (G_ACTION_MAP (app), G_ACTION (action));
   xobject_unref (action);
 
   action = g_simple_action_new_stateful ("toggle-action", NULL,
                                          xvariant_new_boolean (FALSE));
-  g_signal_connect (action, "activate", G_CALLBACK (activate_toggle_action), app);
+  xsignal_connect (action, "activate", G_CALLBACK (activate_toggle_action), app);
   xaction_map_add_action (G_ACTION_MAP (app), G_ACTION (action));
   xobject_unref (action);
 }
@@ -96,7 +96,7 @@ main (int argc, char **argv)
   int status;
 
   app = xapplication_new ("org.gtk.TestApplication", 0);
-  g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
+  xsignal_connect (app, "activate", G_CALLBACK (activate), NULL);
   xapplication_set_inactivity_timeout (app, 10000);
 
   add_actions (app);

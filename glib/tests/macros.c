@@ -20,7 +20,7 @@
 
 #include <glib.h>
 
-/* Test that G_STATIC_ASSERT_EXPR can be used as an expression */
+/* test_t that G_STATIC_ASSERT_EXPR can be used as an expression */
 static void
 test_assert_static (void)
 {
@@ -29,7 +29,7 @@ test_assert_static (void)
     g_assert_not_reached ();
 }
 
-/* Test G_ALIGNOF() gives the same results as the G_STRUCT_OFFSET fallback. This
+/* test_t G_ALIGNOF() gives the same results as the G_STRUCT_OFFSET fallback. This
  * should be the minimal alignment for the given type.
  *
  * This is necessary because the implementation of G_ALIGNOF() varies depending

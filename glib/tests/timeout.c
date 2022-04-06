@@ -29,7 +29,7 @@ test_seconds (void)
   /* Bug 642052 mentions that g_timeout_add_seconds(21475) schedules a
    * job that runs once per second.
    *
-   * Test that that isn't true anymore by scheduling two jobs:
+   * test_t that that isn't true anymore by scheduling two jobs:
    *   - one, as above
    *   - another that runs in 2100ms
    *
@@ -66,7 +66,7 @@ test_weeks_overflow (void)
    * On a system with 32-bit xuint_t, the interval (G_MAXUINT / 1000) + 1 seconds
    * (49.7 days) would end wrapping to 704 milliseconds.
    *
-   * Test that that isn't true anymore by scheduling two jobs:
+   * test_t that that isn't true anymore by scheduling two jobs:
    *   - one, as above
    *   - another that runs in 2100ms
    *
@@ -91,7 +91,7 @@ test_weeks_overflow (void)
   xsource_remove (id);
 }
 
-/* The ready_time for a xsource_t is stored as a gint64, as an absolute monotonic
+/* The ready_time for a xsource_t is stored as a sint64_t, as an absolute monotonic
  * time in microseconds. To call poll(), this must be converted to a relative
  * timeout, in milliseconds, as a xint_t. If the ready_time is sufficiently far
  * in the future, the timeout will not fit. Previously, it would be narrowed in
@@ -140,13 +140,13 @@ test_far_future_ready_time (void)
   xsource_unref (source);
 }
 
-static gint64 last_time;
+static sint64_t last_time;
 static xint_t count;
 
 static xboolean_t
 test_func (xpointer_t data)
 {
-  gint64 current_time;
+  sint64_t current_time;
 
   current_time = g_get_monotonic_time ();
 

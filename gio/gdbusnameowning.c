@@ -69,7 +69,7 @@ typedef struct
   PreviousCall              previous_call;
 
   xdbus_connection_t          *connection;
-  gulong                    disconnected_signal_handler_id;
+  xulong_t                    disconnected_signal_handler_id;
   xuint_t                     name_acquired_subscription_id;
   xuint_t                     name_lost_subscription_id;
 
@@ -97,11 +97,11 @@ client_unref (Client *client)
       if (client->connection != NULL)
         {
           if (client->disconnected_signal_handler_id > 0)
-            g_signal_handler_disconnect (client->connection, client->disconnected_signal_handler_id);
+            xsignal_handler_disconnect (client->connection, client->disconnected_signal_handler_id);
           if (client->name_acquired_subscription_id > 0)
-            g_dbus_connection_signal_unsubscribe (client->connection, client->name_acquired_subscription_id);
+            xdbus_connection_signal_unsubscribe (client->connection, client->name_acquired_subscription_id);
           if (client->name_lost_subscription_id > 0)
-            g_dbus_connection_signal_unsubscribe (client->connection, client->name_lost_subscription_id);
+            xdbus_connection_signal_unsubscribe (client->connection, client->name_lost_subscription_id);
           xobject_unref (client->connection);
         }
       xmain_context_unref (client->main_context);
@@ -316,7 +316,7 @@ request_name_cb (xobject_t      *source_object,
   result = NULL;
 
   /* don't use client->connection - it may be NULL already */
-  result = g_dbus_connection_call_finish (G_DBUS_CONNECTION (source_object),
+  result = xdbus_connection_call_finish (G_DBUS_CONNECTION (source_object),
                                           res,
                                           NULL);
   if (result != NULL)
@@ -367,9 +367,9 @@ request_name_cb (xobject_t      *source_object,
       if (connection != NULL)
         {
           if (client->name_acquired_subscription_id > 0)
-            g_dbus_connection_signal_unsubscribe (client->connection, client->name_acquired_subscription_id);
+            xdbus_connection_signal_unsubscribe (client->connection, client->name_acquired_subscription_id);
           if (client->name_lost_subscription_id > 0)
-            g_dbus_connection_signal_unsubscribe (client->connection, client->name_lost_subscription_id);
+            xdbus_connection_signal_unsubscribe (client->connection, client->name_lost_subscription_id);
           client->name_acquired_subscription_id = 0;
           client->name_lost_subscription_id = 0;
 
@@ -391,11 +391,11 @@ on_connection_disconnected (xdbus_connection_t *connection,
   Client *client = user_data;
 
   if (client->disconnected_signal_handler_id > 0)
-    g_signal_handler_disconnect (client->connection, client->disconnected_signal_handler_id);
+    xsignal_handler_disconnect (client->connection, client->disconnected_signal_handler_id);
   if (client->name_acquired_subscription_id > 0)
-    g_dbus_connection_signal_unsubscribe (client->connection, client->name_acquired_subscription_id);
+    xdbus_connection_signal_unsubscribe (client->connection, client->name_acquired_subscription_id);
   if (client->name_lost_subscription_id > 0)
-    g_dbus_connection_signal_unsubscribe (client->connection, client->name_lost_subscription_id);
+    xdbus_connection_signal_unsubscribe (client->connection, client->name_lost_subscription_id);
   xobject_unref (client->connection);
   client->disconnected_signal_handler_id = 0;
   client->name_acquired_subscription_id = 0;
@@ -411,7 +411,7 @@ static void
 has_connection (Client *client)
 {
   /* listen for disconnection */
-  client->disconnected_signal_handler_id = g_signal_connect (client->connection,
+  client->disconnected_signal_handler_id = xsignal_connect (client->connection,
                                                              "closed",
                                                              G_CALLBACK (on_connection_disconnected),
                                                              client);
@@ -428,7 +428,7 @@ has_connection (Client *client)
    * RequestName() and subscribing to NameLost. The #PreviousCall state will
    * ensure that the user callbacks get called an appropriate number of times. */
   client->name_lost_subscription_id =
-    g_dbus_connection_signal_subscribe (client->connection,
+    xdbus_connection_signal_subscribe (client->connection,
                                         "org.freedesktop.DBus",
                                         "org.freedesktop.DBus",
                                         "NameLost",
@@ -439,7 +439,7 @@ has_connection (Client *client)
                                         client_ref (client),
                                         (xdestroy_notify_t) client_unref);
   client->name_acquired_subscription_id =
-    g_dbus_connection_signal_subscribe (client->connection,
+    xdbus_connection_signal_subscribe (client->connection,
                                         "org.freedesktop.DBus",
                                         "org.freedesktop.DBus",
                                         "NameAcquired",
@@ -452,7 +452,7 @@ has_connection (Client *client)
 
   /* attempt to acquire the name */
   client->needs_release = TRUE;
-  g_dbus_connection_call (client->connection,
+  xdbus_connection_call (client->connection,
                           "org.freedesktop.DBus",  /* bus name */
                           "/org/freedesktop/DBus", /* object path */
                           "org.freedesktop.DBus",  /* interface name */
@@ -525,7 +525,7 @@ connection_get_cb (xobject_t      *source_object,
  * @user_data_free_func: (nullable): function for freeing @user_data or %NULL
  *
  * Like g_bus_own_name() but takes a #xdbus_connection_t instead of a
- * #GBusType.
+ * #xbus_type_t.
  *
  * Returns: an identifier (never 0) that can be used with
  *     g_bus_unown_name() to stop owning the name
@@ -627,7 +627,7 @@ g_bus_own_name_on_connection (xdbus_connection_t          *connection,
  * will be @name_lost_handler. The reverse is also true.
  *
  * If you plan on exporting objects (using e.g.
- * g_dbus_connection_register_object()), note that it is generally too late
+ * xdbus_connection_register_object()), note that it is generally too late
  * to export the objects in @name_acquired_handler. Instead, you can do this
  * in @bus_acquired_handler since you are guaranteed that this will run
  * before @name is requested from the bus.
@@ -643,7 +643,7 @@ g_bus_own_name_on_connection (xdbus_connection_t          *connection,
  * Since: 2.26
  */
 xuint_t
-g_bus_own_name (GBusType                  bus_type,
+g_bus_own_name (xbus_type_t                  bus_type,
                 const xchar_t              *name,
                 GBusNameOwnerFlags        flags,
                 GBusAcquiredCallback      bus_acquired_handler,
@@ -828,7 +828,7 @@ bus_own_name_free_func (xpointer_t user_data)
  * Since: 2.26
  */
 xuint_t
-g_bus_own_name_with_closures (GBusType            bus_type,
+g_bus_own_name_with_closures (xbus_type_t            bus_type,
                               const xchar_t        *name,
                               GBusNameOwnerFlags  flags,
                               xclosure_t           *bus_acquired_closure,
@@ -927,7 +927,7 @@ g_bus_unown_name (xuint_t owner_id)
       /* Release the name if needed */
       if (client->needs_release &&
           client->connection != NULL &&
-          !g_dbus_connection_is_closed (client->connection))
+          !xdbus_connection_is_closed (client->connection))
         {
           xvariant_t *result;
           xerror_t *error;
@@ -940,7 +940,7 @@ g_bus_unown_name (xuint_t owner_id)
            * I believe this is a bug in the bus daemon.
            */
           error = NULL;
-          result = g_dbus_connection_call_sync (client->connection,
+          result = xdbus_connection_call_sync (client->connection,
                                                 "org.freedesktop.DBus",  /* bus name */
                                                 "/org/freedesktop/DBus", /* object path */
                                                 "org.freedesktop.DBus",  /* interface name */
@@ -972,11 +972,11 @@ g_bus_unown_name (xuint_t owner_id)
         }
 
       if (client->disconnected_signal_handler_id > 0)
-        g_signal_handler_disconnect (client->connection, client->disconnected_signal_handler_id);
+        xsignal_handler_disconnect (client->connection, client->disconnected_signal_handler_id);
       if (client->name_acquired_subscription_id > 0)
-        g_dbus_connection_signal_unsubscribe (client->connection, client->name_acquired_subscription_id);
+        xdbus_connection_signal_unsubscribe (client->connection, client->name_acquired_subscription_id);
       if (client->name_lost_subscription_id > 0)
-        g_dbus_connection_signal_unsubscribe (client->connection, client->name_lost_subscription_id);
+        xdbus_connection_signal_unsubscribe (client->connection, client->name_lost_subscription_id);
       client->disconnected_signal_handler_id = 0;
       client->name_acquired_subscription_id = 0;
       client->name_lost_subscription_id = 0;

@@ -234,7 +234,7 @@ xclosure_t* g_cclosure_new_swap			(xcallback_t	callback_func,
 						 xpointer_t	user_data,
 						 xclosure_notify_t destroy_data);
 XPL_AVAILABLE_IN_ALL
-xclosure_t* g_signal_type_cclosure_new		(xtype_t          itype,
+xclosure_t* xsignal_type_cclosure_new		(xtype_t          itype,
 						 xuint_t          struct_offset);
 
 

@@ -61,7 +61,7 @@ test_launch (void)
   const xchar_t *path;
 
   path = g_test_get_filename (G_TEST_BUILT, "appinfo-test.desktop", NULL);
-  appinfo = (xapp_info_t*)g_desktop_app_info_new_from_filename (path);
+  appinfo = (xapp_info_t*)xdesktop_app_info_new_from_filename (path);
 
   if (appinfo == NULL)
     {
@@ -126,7 +126,7 @@ test_launch_no_app_id (void)
       loaded = xkey_file_load_from_data (fake_desktop_file, desktop_file_contents, -1, G_KEY_FILE_NONE, NULL);
       g_assert_true (loaded);
 
-      appinfo = (xapp_info_t*)g_desktop_app_info_new_from_keyfile (fake_desktop_file);
+      appinfo = (xapp_info_t*)xdesktop_app_info_new_from_keyfile (fake_desktop_file);
       g_assert_nonnull (appinfo);
 
       test_launch_for_app_info (appinfo);
@@ -152,7 +152,7 @@ test_locale (const char *locale)
   setlocale (LC_ALL, "");
 
   path = g_test_get_filename (G_TEST_DIST, "appinfo-test-static.desktop", NULL);
-  appinfo = (xapp_info_t*)g_desktop_app_info_new_from_filename (path);
+  appinfo = (xapp_info_t*)xdesktop_app_info_new_from_filename (path);
 
   if (xstrcmp0 (locale, "C") == 0)
     {
@@ -198,7 +198,7 @@ test_basic (void)
   const xchar_t *path;
 
   path = g_test_get_filename (G_TEST_DIST, "appinfo-test-static.desktop", NULL);
-  appinfo = (xapp_info_t*)g_desktop_app_info_new_from_filename (path);
+  appinfo = (xapp_info_t*)xdesktop_app_info_new_from_filename (path);
   g_assert_nonnull (appinfo);
 
   g_assert_cmpstr (xapp_info_get_id (appinfo), ==, "appinfo-test-static.desktop");
@@ -225,7 +225,7 @@ test_show_in (void)
   const xchar_t *path;
 
   path = g_test_get_filename (G_TEST_BUILT, "appinfo-test.desktop", NULL);
-  appinfo = (xapp_info_t*)g_desktop_app_info_new_from_filename (path);
+  appinfo = (xapp_info_t*)xdesktop_app_info_new_from_filename (path);
 
   if (appinfo == NULL)
     {
@@ -237,12 +237,12 @@ test_show_in (void)
   xobject_unref (appinfo);
 
   path = g_test_get_filename (G_TEST_BUILT, "appinfo-test-gnome.desktop", NULL);
-  appinfo = (xapp_info_t*)g_desktop_app_info_new_from_filename (path);
+  appinfo = (xapp_info_t*)xdesktop_app_info_new_from_filename (path);
   g_assert_true (xapp_info_should_show (appinfo));
   xobject_unref (appinfo);
 
   path = g_test_get_filename (G_TEST_BUILT, "appinfo-test-notgnome.desktop", NULL);
-  appinfo = (xapp_info_t*)g_desktop_app_info_new_from_filename (path);
+  appinfo = (xapp_info_t*)xdesktop_app_info_new_from_filename (path);
   g_assert_false (xapp_info_should_show (appinfo));
   xobject_unref (appinfo);
 }
@@ -357,8 +357,8 @@ test_launch_context_signals (void)
   cmdline = xstrconcat (g_test_get_dir (G_TEST_BUILT), "/appinfo-test --option", NULL);
 
   context = xapp_launch_context_new ();
-  g_signal_connect (context, "launched", G_CALLBACK (launched), NULL);
-  g_signal_connect (context, "launch_failed", G_CALLBACK (launch_failed), NULL);
+  xsignal_connect (context, "launched", G_CALLBACK (launched), NULL);
+  xsignal_connect (context, "launch_failed", G_CALLBACK (launch_failed), NULL);
   appinfo = xapp_info_create_from_commandline (cmdline,
                                                 "cmdline-app-test",
                                                 G_APP_INFO_CREATE_SUPPORTS_URIS,
@@ -383,12 +383,12 @@ test_tryexec (void)
   const xchar_t *path;
 
   path = g_test_get_filename (G_TEST_BUILT, "appinfo-test2.desktop", NULL);
-  appinfo = (xapp_info_t*)g_desktop_app_info_new_from_filename (path);
+  appinfo = (xapp_info_t*)xdesktop_app_info_new_from_filename (path);
 
   g_assert_null (appinfo);
 }
 
-/* Test that we can set an appinfo as default for a mime type or
+/* test_t that we can set an appinfo as default for a mime type or
  * file extension, and also add and remove handled mime types.
  */
 static void
@@ -499,13 +499,13 @@ test_environment (void)
 static void
 test_startup_wm_class (void)
 {
-  GDesktopAppInfo *appinfo;
+  xdesktop_app_info_t *appinfo;
   const char *wm_class;
   const xchar_t *path;
 
   path = g_test_get_filename (G_TEST_DIST, "appinfo-test-static.desktop", NULL);
-  appinfo = g_desktop_app_info_new_from_filename (path);
-  wm_class = g_desktop_app_info_get_startup_wm_class (appinfo);
+  appinfo = xdesktop_app_info_new_from_filename (path);
+  wm_class = xdesktop_app_info_get_startup_wm_class (appinfo);
 
   g_assert_cmpstr (wm_class, ==, "appinfo-class");
 
@@ -520,7 +520,7 @@ test_supported_types (void)
   const xchar_t *path;
 
   path = g_test_get_filename (G_TEST_DIST, "appinfo-test-static.desktop", NULL);
-  appinfo = G_APP_INFO (g_desktop_app_info_new_from_filename (path));
+  appinfo = G_APP_INFO (xdesktop_app_info_new_from_filename (path));
   content_types = xapp_info_get_supported_types (appinfo);
 
   g_assert_cmpint (xstrv_length ((char**)content_types), ==, 2);
@@ -532,7 +532,7 @@ test_supported_types (void)
 static void
 test_from_keyfile (void)
 {
-  GDesktopAppInfo *info;
+  xdesktop_app_info_t *info;
   xkey_file_t *kf;
   xerror_t *error = NULL;
   const xchar_t *categories;
@@ -547,29 +547,29 @@ test_from_keyfile (void)
   kf = xkey_file_new ();
   xkey_file_load_from_file (kf, path, G_KEY_FILE_NONE, &error);
   g_assert_no_error (error);
-  info = g_desktop_app_info_new_from_keyfile (kf);
+  info = xdesktop_app_info_new_from_keyfile (kf);
   xkey_file_unref (kf);
   g_assert_nonnull (info);
 
   xobject_get (info, "filename", &file, NULL);
   g_assert_null (file);
 
-  file = g_desktop_app_info_get_filename (info);
+  file = xdesktop_app_info_get_filename (info);
   g_assert_null (file);
-  categories = g_desktop_app_info_get_categories (info);
+  categories = xdesktop_app_info_get_categories (info);
   g_assert_cmpstr (categories, ==, "GNOME;GTK;");
-  categories_list = g_desktop_app_info_get_string_list (info, "Categories", &categories_count);
+  categories_list = xdesktop_app_info_get_string_list (info, "Categories", &categories_count);
   g_assert_cmpint (categories_count, ==, 2);
   g_assert_cmpint (xstrv_length (categories_list), ==, 2);
   g_assert_cmpstr (categories_list[0], ==, "GNOME");
   g_assert_cmpstr (categories_list[1], ==, "GTK");
-  keywords = (xchar_t **)g_desktop_app_info_get_keywords (info);
+  keywords = (xchar_t **)xdesktop_app_info_get_keywords (info);
   g_assert_cmpint (xstrv_length (keywords), ==, 2);
   g_assert_cmpstr (keywords[0], ==, "keyword1");
   g_assert_cmpstr (keywords[1], ==, "test keyword");
-  name = g_desktop_app_info_get_generic_name (info);
+  name = xdesktop_app_info_get_generic_name (info);
   g_assert_cmpstr (name, ==, "generic-appinfo-test");
-  g_assert_false (g_desktop_app_info_get_nodisplay (info));
+  g_assert_false (xdesktop_app_info_get_nodisplay (info));
 
   xstrfreev (categories_list);
   xobject_unref (info);

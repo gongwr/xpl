@@ -877,7 +877,7 @@ sub print_decomp
 
     my ($count, @row);
     $table_index = 0;
-    printf OUT "static const guchar cclass_data[][256] = {\n";
+    printf OUT "static const xuchar_t cclass_data[][256] = {\n";
     for ($count = 0; $count <= $last; $count += 256)
     {
 	$row[$count / 256] = &print_row ($count, 1, \&fetch_cclass);
@@ -1486,7 +1486,7 @@ EOT
     print OUT<<EOT;
 #define G_EASY_SCRIPTS_RANGE $easy_range
 
-static const guchar g_script_easy_table[$easy_range] = {
+static const xuchar_t g_script_easy_table[$easy_range] = {
 EOT
 
     $i = 0;

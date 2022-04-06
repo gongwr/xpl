@@ -1374,7 +1374,7 @@ xfilename_from_utf8 (const xchar_t *utf8string,
                             bytes_read, bytes_written, error);
 }
 
-/* Test of haystack has the needle prefix, comparing case
+/* test_t of haystack has the needle prefix, comparing case
  * insensitive. haystack may be UTF-8, but needle must
  * contain only ascii. */
 static xboolean_t
@@ -1404,7 +1404,7 @@ typedef enum {
   UNSAFE_SLASHES    = 0x20  /* Allows all characters except for '/' and '%' */
 } UnsafeCharacterSet;
 
-static const guchar acceptable[96] = {
+static const xuchar_t acceptable[96] = {
   /* A table of the ASCII chars from space (32) to DEL (127) */
   /*      !    "    #    $    %    &    '    (    )    *    +    ,    -    .    / */
   0x00,0x3F,0x20,0x20,0x28,0x00,0x2C,0x3F,0x3F,0x3F,0x3F,0x2A,0x28,0x3F,0x3F,0x1C,
@@ -1447,7 +1447,7 @@ g_escape_uri_string (const xchar_t *string,
   use_mask = mask;
   for (p = string; *p != '\0'; p++)
     {
-      c = (guchar) *p;
+      c = (xuchar_t) *p;
       if (!ACCEPTABLE (c))
 	unacceptable++;
     }
@@ -1457,7 +1457,7 @@ g_escape_uri_string (const xchar_t *string,
   use_mask = mask;
   for (q = result, p = string; *p != '\0'; p++)
     {
-      c = (guchar) *p;
+      c = (xuchar_t) *p;
 
       if (!ACCEPTABLE (c))
 	{

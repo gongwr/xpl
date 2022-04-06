@@ -151,14 +151,14 @@ static xint_t     xsocket_datagram_based_receive_messages (xdatagram_based_t  *s
                                                           xinput_message_t   *messages,
                                                           xuint_t            num_messages,
                                                           xint_t             flags,
-                                                          gint64           timeout_us,
+                                                          sint64_t           timeout_us,
                                                           xcancellable_t    *cancellable,
                                                           xerror_t         **error);
 static xint_t     xsocket_datagram_based_send_messages    (xdatagram_based_t  *self,
                                                           xoutput_message_t  *messages,
                                                           xuint_t            num_messages,
                                                           xint_t             flags,
-                                                          gint64           timeout_us,
+                                                          sint64_t           timeout_us,
                                                           xcancellable_t    *cancellable,
                                                           xerror_t         **error);
 static xsource_t *xsocket_datagram_based_create_source    (xdatagram_based_t           *self,
@@ -168,7 +168,7 @@ static xio_condition_t xsocket_datagram_based_condition_check      (xdatagram_ba
                                                                   xio_condition_t      condition);
 static xboolean_t     xsocket_datagram_based_condition_wait       (xdatagram_based_t   *datagram_based,
                                                                   xio_condition_t      condition,
-                                                                  gint64            timeout_us,
+                                                                  sint64_t            timeout_us,
                                                                   xcancellable_t     *cancellable,
                                                                   xerror_t          **error);
 
@@ -183,7 +183,7 @@ xsocket_receive_message_with_timeout  (xsocket_t                 *socket,
                                         xsocket_control_message_t ***messages,
                                         xint_t                    *num_messages,
                                         xint_t                    *flags,
-                                        gint64                   timeout_us,
+                                        sint64_t                   timeout_us,
                                         xcancellable_t            *cancellable,
                                         xerror_t                 **error);
 static xint_t
@@ -191,7 +191,7 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
                                         xinput_message_t  *messages,
                                         xuint_t           num_messages,
                                         xint_t            flags,
-                                        gint64          timeout_us,
+                                        sint64_t          timeout_us,
                                         xcancellable_t   *cancellable,
                                         xerror_t        **error);
 static xint_t
@@ -199,7 +199,7 @@ xsocket_send_messages_with_timeout    (xsocket_t        *socket,
                                         xoutput_message_t *messages,
                                         xuint_t           num_messages,
                                         xint_t            flags,
-                                        gint64          timeout_us,
+                                        sint64_t          timeout_us,
                                         xcancellable_t   *cancellable,
                                         xerror_t        **error);
 
@@ -707,7 +707,7 @@ xsocket_constructed (xobject_t *object)
 #ifndef G_OS_WIN32
       xerror_t *error = NULL;
 #else
-      gulong arg;
+      xulong_t arg;
 #endif
 
       /* Always use native nonblocking sockets, as Windows sets sockets to
@@ -1200,7 +1200,7 @@ xsocket_datagram_based_receive_messages (xdatagram_based_t  *self,
                                           xinput_message_t   *messages,
                                           xuint_t            num_messages,
                                           xint_t             flags,
-                                          gint64           timeout_us,
+                                          sint64_t           timeout_us,
                                           xcancellable_t    *cancellable,
                                           xerror_t         **error)
 {
@@ -1217,7 +1217,7 @@ xsocket_datagram_based_send_messages (xdatagram_based_t  *self,
                                        xoutput_message_t  *messages,
                                        xuint_t            num_messages,
                                        xint_t             flags,
-                                       gint64           timeout_us,
+                                       sint64_t           timeout_us,
                                        xcancellable_t    *cancellable,
                                        xerror_t         **error)
 {
@@ -1253,7 +1253,7 @@ xsocket_datagram_based_condition_check (xdatagram_based_t  *datagram_based,
 static xboolean_t
 xsocket_datagram_based_condition_wait (xdatagram_based_t  *datagram_based,
                                         xio_condition_t     condition,
-                                        gint64           timeout_us,
+                                        sint64_t           timeout_us,
                                         xcancellable_t    *cancellable,
                                         xerror_t         **error)
 {
@@ -2220,7 +2220,7 @@ xsocket_bind (xsocket_t         *socket,
 }
 
 #ifdef G_OS_WIN32
-static gulong
+static xulong_t
 xsocket_w32_get_adapter_ipv4_addr (const xchar_t *name_or_ip)
 {
   ULONG bufsize = 15000; /* MS-recommended initial bufsize */
@@ -2228,7 +2228,7 @@ xsocket_w32_get_adapter_ipv4_addr (const xchar_t *name_or_ip)
   unsigned int malloc_iterations = 0;
   PIP_ADAPTER_ADDRESSES addr_buf = NULL, eth_adapter;
   wchar_t *wchar_name_or_ip = NULL;
-  gulong ip_result;
+  xulong_t ip_result;
   NET_IFINDEX if_index;
 
   /*
@@ -2273,7 +2273,7 @@ xsocket_w32_get_adapter_ipv4_addr (const xchar_t *name_or_ip)
 
   /*
    *  Step 4: Allocate memory and get adapter addresses.
-   *  Buffer allocation loop recommended by MS, since size can be dynamic
+   *  buffer_t allocation loop recommended by MS, since size can be dynamic
    *  https://docs.microsoft.com/en-us/windows/desktop/api/iphlpapi/nf-iphlpapi-getadaptersaddresses
    */
   #define MAX_ALLOC_ITERATIONS 3
@@ -3116,7 +3116,7 @@ xsocket_get_available_bytes (xsocket_t *socket)
 {
 #ifndef SO_NREAD
   const xint_t bufsize = 64 * 1024;
-  static guchar *buf = NULL;
+  static xuchar_t *buf = NULL;
 #endif
 #ifdef G_OS_WIN32
   u_long avail;
@@ -3173,19 +3173,19 @@ xsocket_get_available_bytes (xsocket_t *socket)
 static xboolean_t
 block_on_timeout (xsocket_t       *socket,
                   xio_condition_t   condition,
-                  gint64         timeout_us,
-                  gint64         start_time,
+                  sint64_t         timeout_us,
+                  sint64_t         start_time,
                   xcancellable_t  *cancellable,
                   xerror_t       **error)
 {
-  gint64 wait_timeout = -1;
+  sint64_t wait_timeout = -1;
 
   g_return_val_if_fail (timeout_us != 0, TRUE);
 
   /* check if we've timed out or how much time to wait at most */
   if (timeout_us >= 0)
     {
-      gint64 elapsed = g_get_monotonic_time () - start_time;
+      sint64_t elapsed = g_get_monotonic_time () - start_time;
 
       if (elapsed >= timeout_us)
         {
@@ -3206,12 +3206,12 @@ static xssize_t
 xsocket_receive_with_timeout (xsocket_t       *socket,
                                xuint8_t        *buffer,
                                xsize_t          size,
-                               gint64         timeout_us,
+                               sint64_t         timeout_us,
                                xcancellable_t  *cancellable,
                                xerror_t       **error)
 {
   xssize_t ret;
-  gint64 start_time;
+  sint64_t start_time;
 
   g_return_val_if_fail (X_IS_SOCKET (socket) && buffer != NULL, -1);
 
@@ -3223,7 +3223,7 @@ xsocket_receive_with_timeout (xsocket_t       *socket,
   if (!check_timeout (socket, error))
     return -1;
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return -1;
 
   while (1)
@@ -3405,12 +3405,12 @@ static xssize_t
 xsocket_send_with_timeout (xsocket_t       *socket,
                             const xuint8_t  *buffer,
                             xsize_t          size,
-                            gint64         timeout_us,
+                            sint64_t         timeout_us,
                             xcancellable_t  *cancellable,
                             xerror_t       **error)
 {
   xssize_t ret;
-  gint64 start_time;
+  sint64_t start_time;
 
   g_return_val_if_fail (X_IS_SOCKET (socket) && buffer != NULL, -1);
 
@@ -3422,7 +3422,7 @@ xsocket_send_with_timeout (xsocket_t       *socket,
   if (!check_timeout (socket, error))
     return -1;
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return -1;
 
   while (1)
@@ -3996,7 +3996,7 @@ socket_source_dispatch (xsource_t     *source,
   xsocket_source_func_t func = (xsocket_source_func_t)callback;
   GSocketSource *socket_source = (GSocketSource *)source;
   xsocket_t *socket = socket_source->socket;
-  gint64 timeout;
+  sint64_t timeout;
   xuint_t events;
   xboolean_t ret;
 
@@ -4131,7 +4131,7 @@ socket_source_new (xsocket_t      *socket,
     {
       xsource_t *cancellable_source;
 
-      cancellable_source = g_cancellable_source_new (cancellable);
+      cancellable_source = xcancellable_source_new (cancellable);
       xsource_add_child_source (source, cancellable_source);
       xsource_set_dummy_callback (cancellable_source);
       xsource_unref (cancellable_source);
@@ -4174,7 +4174,7 @@ socket_source_new (xsocket_t      *socket,
  * cause the source to trigger, reporting the current condition (which
  * is likely 0 unless cancellation happened at the same time as a
  * condition change). You can check for this in the callback using
- * g_cancellable_is_cancelled().
+ * xcancellable_is_cancelled().
  *
  * If @socket has a timeout set, and it is reached before @condition
  * occurs, the source will then trigger anyway, reporting %G_IO_IN or
@@ -4326,24 +4326,24 @@ xsocket_condition_wait (xsocket_t       *socket,
 xboolean_t
 xsocket_condition_timed_wait (xsocket_t       *socket,
 			       xio_condition_t   condition,
-			       gint64         timeout_us,
+			       sint64_t         timeout_us,
 			       xcancellable_t  *cancellable,
 			       xerror_t       **error)
 {
-  gint64 start_time;
-  gint64 timeout_ms;
+  sint64_t start_time;
+  sint64_t timeout_ms;
 
   g_return_val_if_fail (X_IS_SOCKET (socket), FALSE);
 
   if (!check_socket (socket, error))
     return FALSE;
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
   if (socket->priv->timeout &&
       (timeout_us < 0 || socket->priv->timeout < timeout_us / G_USEC_PER_SEC))
-    timeout_ms = (gint64) socket->priv->timeout * 1000;
+    timeout_ms = (sint64_t) socket->priv->timeout * 1000;
   else if (timeout_us != -1)
     timeout_ms = timeout_us / 1000;
   else
@@ -4367,7 +4367,7 @@ xsocket_condition_timed_wait (xsocket_t       *socket,
     num_events = 0;
     events[num_events++] = socket->priv->event;
 
-    if (g_cancellable_make_pollfd (cancellable, &cancel_fd))
+    if (xcancellable_make_pollfd (cancellable, &cancel_fd))
       events[num_events++] = (WSAEVENT)cancel_fd.fd;
 
     if (timeout_ms == -1)
@@ -4428,7 +4428,7 @@ xsocket_condition_timed_wait (xsocket_t       *socket,
 	    break;
 	  }
 
-	if (g_cancellable_set_error_if_cancelled (cancellable, error))
+	if (xcancellable_set_error_if_cancelled (cancellable, error))
 	  break;
 
         current_condition = update_condition_unlocked (socket);
@@ -4443,7 +4443,7 @@ xsocket_condition_timed_wait (xsocket_t       *socket,
     g_mutex_unlock (&socket->priv->win32_source_lock);
     remove_condition_watch (socket, &condition);
     if (num_events > 1)
-      g_cancellable_release_fd (cancellable);
+      xcancellable_release_fd (cancellable);
 
     return (condition & current_condition) != 0;
   }
@@ -4457,7 +4457,7 @@ xsocket_condition_timed_wait (xsocket_t       *socket,
     poll_fd[0].events = condition;
     num = 1;
 
-    if (g_cancellable_make_pollfd (cancellable, &poll_fd[1]))
+    if (xcancellable_make_pollfd (cancellable, &poll_fd[1]))
       num++;
 
     while (TRUE)
@@ -4477,7 +4477,7 @@ xsocket_condition_timed_wait (xsocket_t       *socket,
       }
 
     if (num > 1)
-      g_cancellable_release_fd (cancellable);
+      xcancellable_release_fd (cancellable);
 
     if (result == 0)
       {
@@ -4486,7 +4486,7 @@ xsocket_condition_timed_wait (xsocket_t       *socket,
 	return FALSE;
       }
 
-    return !g_cancellable_set_error_if_cancelled (cancellable, error);
+    return !xcancellable_set_error_if_cancelled (cancellable, error);
   }
   #endif
 }
@@ -4900,14 +4900,14 @@ xsocket_send_message_with_timeout (xsocket_t                *socket,
                                     xsocket_control_message_t **messages,
                                     xint_t                    num_messages,
                                     xint_t                    flags,
-                                    gint64                  timeout_us,
+                                    sint64_t                  timeout_us,
                                     xsize_t                  *bytes_written,
                                     xcancellable_t           *cancellable,
                                     xerror_t                **error)
 {
   xoutput_vector_t one_vector;
   char zero;
-  gint64 start_time;
+  sint64_t start_time;
 
   if (bytes_written)
     *bytes_written = 0;
@@ -4927,7 +4927,7 @@ xsocket_send_message_with_timeout (xsocket_t                *socket,
   if (!check_timeout (socket, error))
     return G_POLLABLE_RETURN_FAILED;
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return G_POLLABLE_RETURN_FAILED;
 
   if (num_vectors == -1)
@@ -5038,7 +5038,7 @@ xsocket_send_message_with_timeout (xsocket_t                *socket,
     for (i = 0; i < num_vectors; i++)
       {
 	bufs[i].buf = (char *)vectors[i].buffer;
-	bufs[i].len = (gulong)vectors[i].size;
+	bufs[i].len = (xulong_t)vectors[i].size;
       }
 
     /* name */
@@ -5171,11 +5171,11 @@ xsocket_send_messages_with_timeout (xsocket_t        *socket,
                                      xoutput_message_t *messages,
                                      xuint_t           num_messages,
                                      xint_t            flags,
-                                     gint64          timeout_us,
+                                     sint64_t          timeout_us,
                                      xcancellable_t   *cancellable,
                                      xerror_t        **error)
 {
-  gint64 start_time;
+  sint64_t start_time;
 
   g_return_val_if_fail (X_IS_SOCKET (socket), -1);
   g_return_val_if_fail (num_messages == 0 || messages != NULL, -1);
@@ -5190,7 +5190,7 @@ xsocket_send_messages_with_timeout (xsocket_t        *socket,
   if (!check_timeout (socket, error))
     return -1;
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return -1;
 
   if (num_messages == 0)
@@ -5282,7 +5282,7 @@ xsocket_send_messages_with_timeout (xsocket_t        *socket,
   {
     xssize_t result;
     xuint_t i;
-    gint64 wait_timeout;
+    sint64_t wait_timeout;
 
     wait_timeout = timeout_us;
 
@@ -5320,7 +5320,7 @@ xsocket_send_messages_with_timeout (xsocket_t        *socket,
         /* check if we've timed out or how much time to wait at most */
         if (timeout_us > 0)
           {
-            gint64 elapsed = g_get_monotonic_time () - start_time;
+            sint64_t elapsed = g_get_monotonic_time () - start_time;
             wait_timeout = MAX (timeout_us - elapsed, 1);
           }
 
@@ -5410,13 +5410,13 @@ xsocket_receive_message_with_timeout (xsocket_t                 *socket,
                                        xsocket_control_message_t ***messages,
                                        xint_t                    *num_messages,
                                        xint_t                    *flags,
-                                       gint64                   timeout_us,
+                                       sint64_t                   timeout_us,
                                        xcancellable_t            *cancellable,
                                        xerror_t                 **error)
 {
   xinput_vector_t one_vector;
   char one_byte;
-  gint64 start_time;
+  sint64_t start_time;
 
   g_return_val_if_fail (X_IS_SOCKET (socket), -1);
 
@@ -5428,7 +5428,7 @@ xsocket_receive_message_with_timeout (xsocket_t                 *socket,
   if (!check_timeout (socket, error))
     return -1;
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return -1;
 
   if (num_vectors == -1)
@@ -5530,7 +5530,7 @@ xsocket_receive_message_with_timeout (xsocket_t                 *socket,
     for (i = 0; i < num_vectors; i++)
       {
 	bufs[i].buf = (char *)vectors[i].buffer;
-	bufs[i].len = (gulong)vectors[i].size;
+	bufs[i].len = (xulong_t)vectors[i].size;
       }
 
     /* flags */
@@ -5696,11 +5696,11 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
                                         xinput_message_t  *messages,
                                         xuint_t           num_messages,
                                         xint_t            flags,
-                                        gint64          timeout_us,
+                                        sint64_t          timeout_us,
                                         xcancellable_t   *cancellable,
                                         xerror_t        **error)
 {
-  gint64 start_time;
+  sint64_t start_time;
 
   g_return_val_if_fail (X_IS_SOCKET (socket), -1);
   g_return_val_if_fail (num_messages == 0 || messages != NULL, -1);
@@ -5716,7 +5716,7 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
   if (!check_timeout (socket, error))
     return -1;
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return -1;
 
   if (num_messages == 0)
@@ -5828,7 +5828,7 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
 #else
   {
     xuint_t i;
-    gint64 wait_timeout;
+    sint64_t wait_timeout;
 
     wait_timeout = timeout_us;
 
@@ -5854,7 +5854,7 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
         /* check if we've timed out or how much time to wait at most */
         if (timeout_us > 0)
           {
-            gint64 elapsed = g_get_monotonic_time () - start_time;
+            sint64_t elapsed = g_get_monotonic_time () - start_time;
             wait_timeout = MAX (timeout_us - elapsed, 1);
           }
 
@@ -6195,7 +6195,7 @@ xsocket_get_credentials (xsocket_t   *socket,
  * headers.
  *
  * Note that even for socket options that are a single byte in size,
- * @value is still a pointer to a #xint_t variable, not a #guchar;
+ * @value is still a pointer to a #xint_t variable, not a #xuchar_t;
  * xsocket_get_option() will handle the conversion internally.
  *
  * Returns: success or failure. On failure, @error will be set, and

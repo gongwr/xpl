@@ -29,8 +29,8 @@
 
 #define G_POWER_PROFILE_MONITOR_PORTAL_GET_INITABLE_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_INITABLE, xinitable_t))
 
-static void g_power_profile_monitor_portal_iface_init (xpower_profile_monitor_tInterface *iface);
-static void g_power_profile_monitor_portal_initable_iface_init (xinitable_iface_t *iface);
+static void xpower_profile_monitor_portal_iface_init (xpower_profile_monitor_tInterface *iface);
+static void xpower_profile_monitor_portal_initable_iface_init (xinitable_iface_t *iface);
 
 typedef enum
 {
@@ -42,15 +42,15 @@ struct _xpower_profile_monitor_portal_t
   xobject_t parent_instance;
 
   xdbus_proxy_t *proxy;
-  gulong signal_id;
+  xulong_t signal_id;
   xboolean_t power_saver_enabled;
 };
 
-G_DEFINE_TYPE_WITH_CODE (xpower_profile_monitor_portal_t, g_power_profile_monitor_portal, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (xpower_profile_monitor_portal_t, xpower_profile_monitor_portal, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (XTYPE_INITABLE,
-                                                g_power_profile_monitor_portal_initable_iface_init)
+                                                xpower_profile_monitor_portal_initable_iface_init)
                          G_IMPLEMENT_INTERFACE (XTYPE_POWER_PROFILE_MONITOR,
-                                                g_power_profile_monitor_portal_iface_init)
+                                                xpower_profile_monitor_portal_iface_init)
                          _xio_modules_ensure_extension_points_registered ();
                          g_io_extension_point_implement (G_POWER_PROFILE_MONITOR_EXTENSION_POINT_NAME,
                                                          g_define_type_id,
@@ -58,7 +58,7 @@ G_DEFINE_TYPE_WITH_CODE (xpower_profile_monitor_portal_t, g_power_profile_monito
                                                          40))
 
 static void
-g_power_profile_monitor_portal_init (xpower_profile_monitor_portal_t *portal)
+xpower_profile_monitor_portal_init (xpower_profile_monitor_portal_t *portal)
 {
 }
 
@@ -82,7 +82,7 @@ proxy_properties_changed (xdbus_proxy_t *proxy,
 }
 
 static void
-g_power_profile_monitor_portal_get_property (xobject_t    *object,
+xpower_profile_monitor_portal_get_property (xobject_t    *object,
                                              xuint_t       prop_id,
                                              xvalue_t     *value,
                                              xparam_spec_t *pspec)
@@ -101,7 +101,7 @@ g_power_profile_monitor_portal_get_property (xobject_t    *object,
 }
 
 static xboolean_t
-g_power_profile_monitor_portal_initable_init (xinitable_t     *initable,
+xpower_profile_monitor_portal_initable_init (xinitable_t     *initable,
                                               xcancellable_t  *cancellable,
                                               xerror_t       **error)
 {
@@ -116,7 +116,7 @@ g_power_profile_monitor_portal_initable_init (xinitable_t     *initable,
       return FALSE;
     }
 
-  proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+  proxy = xdbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
                                          G_DBUS_PROXY_FLAGS_NONE,
                                          NULL,
                                          "org.freedesktop.portal.Desktop",
@@ -127,7 +127,7 @@ g_power_profile_monitor_portal_initable_init (xinitable_t     *initable,
   if (!proxy)
     return FALSE;
 
-  name_owner = g_dbus_proxy_get_name_owner (proxy);
+  name_owner = xdbus_proxy_get_name_owner (proxy);
 
   if (name_owner == NULL)
     {
@@ -141,10 +141,10 @@ g_power_profile_monitor_portal_initable_init (xinitable_t     *initable,
 
   g_free (name_owner);
 
-  ppm->signal_id = g_signal_connect (proxy, "g-properties-changed",
+  ppm->signal_id = xsignal_connect (proxy, "g-properties-changed",
                                      G_CALLBACK (proxy_properties_changed), ppm);
 
-  power_saver_enabled_v = g_dbus_proxy_get_cached_property (proxy, "power-saver-enabled");
+  power_saver_enabled_v = xdbus_proxy_get_cached_property (proxy, "power-saver-enabled");
   if (power_saver_enabled_v != NULL &&
       xvariant_is_of_type (power_saver_enabled_v, G_VARIANT_TYPE_BOOLEAN))
     ppm->power_saver_enabled = xvariant_get_boolean (power_saver_enabled_v);
@@ -156,34 +156,34 @@ g_power_profile_monitor_portal_initable_init (xinitable_t     *initable,
 }
 
 static void
-g_power_profile_monitor_portal_finalize (xobject_t *object)
+xpower_profile_monitor_portal_finalize (xobject_t *object)
 {
   xpower_profile_monitor_portal_t *ppm = G_POWER_PROFILE_MONITOR_PORTAL (object);
 
   g_clear_signal_handler (&ppm->signal_id, ppm->proxy);
   g_clear_object (&ppm->proxy);
 
-  G_OBJECT_CLASS (g_power_profile_monitor_portal_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xpower_profile_monitor_portal_parent_class)->finalize (object);
 }
 
 static void
-g_power_profile_monitor_portal_class_init (xpower_profile_monitor_portal_tClass *nl_class)
+xpower_profile_monitor_portal_class_init (xpower_profile_monitor_portal_tClass *nl_class)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (nl_class);
 
-  gobject_class->get_property = g_power_profile_monitor_portal_get_property;
-  gobject_class->finalize  = g_power_profile_monitor_portal_finalize;
+  gobject_class->get_property = xpower_profile_monitor_portal_get_property;
+  gobject_class->finalize  = xpower_profile_monitor_portal_finalize;
 
   xobject_class_override_property (gobject_class, PROP_POWER_SAVER_ENABLED, "power-saver-enabled");
 }
 
 static void
-g_power_profile_monitor_portal_iface_init (xpower_profile_monitor_tInterface *monitor_iface)
+xpower_profile_monitor_portal_iface_init (xpower_profile_monitor_tInterface *monitor_iface)
 {
 }
 
 static void
-g_power_profile_monitor_portal_initable_iface_init (xinitable_iface_t *iface)
+xpower_profile_monitor_portal_initable_iface_init (xinitable_iface_t *iface)
 {
-  iface->init = g_power_profile_monitor_portal_initable_init;
+  iface->init = xpower_profile_monitor_portal_initable_init;
 }

@@ -477,7 +477,7 @@ test_get_region (void)
 static void
 test_unref_null (void)
 {
-  g_test_summary ("Test that calling xbytes_unref() on NULL is a no-op");
+  g_test_summary ("test_t that calling xbytes_unref() on NULL is a no-op");
   xbytes_unref (NULL);
 }
 

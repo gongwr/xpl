@@ -68,7 +68,7 @@ on_bus_acquired (xdbus_connection_t *connection,
   g_print ("Acquired a message bus connection\n");
 
   /* Create a new org.freedesktop.DBus.ObjectManager rooted at /example/Animals */
-  manager = g_dbus_object_manager_server_new ("/example/Animals");
+  manager = xdbus_object_manager_server_new ("/example/Animals");
 
   for (n = 0; n < 10; n++)
     {
@@ -102,18 +102,18 @@ on_bus_acquired (xdbus_connection_t *connection,
         }
 
       /* Handle Poke() D-Bus method invocations on the .Animal interface */
-      g_signal_connect (animal,
+      xsignal_connect (animal,
                         "handle-poke",
                         G_CALLBACK (on_animal_poke),
                         NULL); /* user_data */
 
       /* Export the object (@manager takes its own reference to @object) */
-      g_dbus_object_manager_server_export (manager, G_DBUS_OBJECT_SKELETON (object));
+      xdbus_object_manager_server_export (manager, G_DBUS_OBJECT_SKELETON (object));
       xobject_unref (object);
     }
 
   /* Export all objects */
-  g_dbus_object_manager_server_set_connection (manager, connection);
+  xdbus_object_manager_server_set_connection (manager, connection);
 }
 
 static void

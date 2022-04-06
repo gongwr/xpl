@@ -26,13 +26,13 @@
 G_BEGIN_DECLS
 
 XPL_AVAILABLE_IN_2_32
-xuint_t                   g_dbus_connection_export_menu_model             (xdbus_connection_t  *connection,
+xuint_t                   xdbus_connection_export_menu_model             (xdbus_connection_t  *connection,
                                                                          const xchar_t      *object_path,
                                                                          xmenu_model_t       *menu,
                                                                          xerror_t          **error);
 
 XPL_AVAILABLE_IN_2_32
-void                    g_dbus_connection_unexport_menu_model           (xdbus_connection_t  *connection,
+void                    xdbus_connection_unexport_menu_model           (xdbus_connection_t  *connection,
                                                                          xuint_t             export_id);
 
 G_END_DECLS

@@ -103,7 +103,7 @@ xinput_stream_dispose (xobject_t *object)
 
 
 static void
-xinput_stream_class_init (GInputStreamClass *klass)
+xinput_stream_class_init (xinput_stream_class_t *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
@@ -164,7 +164,7 @@ xinput_stream_read  (xinput_stream_t  *stream,
 		      xcancellable_t  *cancellable,
 		      xerror_t       **error)
 {
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
   xssize_t res;
 
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
@@ -193,12 +193,12 @@ xinput_stream_read  (xinput_stream_t  *stream,
     return -1;
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   res = class->read_fn (stream, buffer, count, cancellable, error);
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   xinput_stream_clear_pending (stream);
 
@@ -316,7 +316,7 @@ xinput_stream_read_bytes (xinput_stream_t  *stream,
 			   xcancellable_t  *cancellable,
 			   xerror_t       **error)
 {
-  guchar *buf;
+  xuchar_t *buf;
   xssize_t nread;
 
   buf = g_malloc (count);
@@ -365,7 +365,7 @@ xinput_stream_skip (xinput_stream_t  *stream,
 		     xcancellable_t  *cancellable,
 		     xerror_t       **error)
 {
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
   xssize_t res;
 
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
@@ -386,12 +386,12 @@ xinput_stream_skip (xinput_stream_t  *stream,
     return -1;
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   res = class->skip (stream, count, cancellable, error);
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   xinput_stream_clear_pending (stream);
 
@@ -404,7 +404,7 @@ xinput_stream_real_skip (xinput_stream_t  *stream,
 			  xcancellable_t  *cancellable,
 			  xerror_t       **error)
 {
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
   xssize_t ret, read_bytes;
   char buffer[8192];
   xerror_t *my_error;
@@ -520,7 +520,7 @@ xinput_stream_close (xinput_stream_t  *stream,
 		      xcancellable_t  *cancellable,
 		      xerror_t       **error)
 {
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
   xboolean_t res;
 
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
@@ -536,13 +536,13 @@ xinput_stream_close (xinput_stream_t  *stream,
     return FALSE;
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   if (class->close_fn)
     res = class->close_fn (stream, cancellable, error);
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   xinput_stream_clear_pending (stream);
 
@@ -623,7 +623,7 @@ xinput_stream_read_async (xinput_stream_t        *stream,
 			   xasync_ready_callback_t  callback,
 			   xpointer_t             user_data)
 {
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
   xerror_t *error = NULL;
 
   g_return_if_fail (X_IS_INPUT_STREAM (stream));
@@ -681,7 +681,7 @@ xinput_stream_read_finish (xinput_stream_t  *stream,
 			    xasync_result_t  *result,
 			    xerror_t       **error)
 {
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
 
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), -1);
@@ -881,7 +881,7 @@ read_bytes_callback (xobject_t      *stream,
 		     xpointer_t      user_data)
 {
   xtask_t *task = user_data;
-  guchar *buf = xtask_get_task_data (task);
+  xuchar_t *buf = xtask_get_task_data (task);
   xerror_t *error = NULL;
   xssize_t nread;
   xbytes_t *bytes = NULL;
@@ -948,7 +948,7 @@ xinput_stream_read_bytes_async (xinput_stream_t          *stream,
 				 xpointer_t               user_data)
 {
   xtask_t *task;
-  guchar *buf;
+  xuchar_t *buf;
 
   task = xtask_new (stream, cancellable, callback, user_data);
   xtask_set_source_tag (task, xinput_stream_read_bytes_async);
@@ -1026,7 +1026,7 @@ xinput_stream_skip_async (xinput_stream_t        *stream,
 			   xasync_ready_callback_t  callback,
 			   xpointer_t             user_data)
 {
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
   xerror_t *error = NULL;
 
   g_return_if_fail (X_IS_INPUT_STREAM (stream));
@@ -1083,7 +1083,7 @@ xinput_stream_skip_finish (xinput_stream_t  *stream,
 			    xasync_result_t  *result,
 			    xerror_t       **error)
 {
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
 
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), -1);
@@ -1123,7 +1123,7 @@ xinput_stream_close_async (xinput_stream_t        *stream,
 			    xasync_ready_callback_t  callback,
 			    xpointer_t             user_data)
 {
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
   xerror_t *error = NULL;
 
   g_return_if_fail (X_IS_INPUT_STREAM (stream));
@@ -1170,7 +1170,7 @@ xinput_stream_close_finish (xinput_stream_t  *stream,
 			     xasync_result_t  *result,
 			     xerror_t       **error)
 {
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
 
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
@@ -1279,7 +1279,7 @@ xinput_stream_clear_pending (xinput_stream_t *stream)
 xboolean_t
 xinput_stream_async_read_is_via_threads (xinput_stream_t *stream)
 {
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
 
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
 
@@ -1301,7 +1301,7 @@ xinput_stream_async_read_is_via_threads (xinput_stream_t *stream)
 xboolean_t
 xinput_stream_async_close_is_via_threads (xinput_stream_t *stream)
 {
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
 
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
 
@@ -1333,7 +1333,7 @@ read_async_thread (xtask_t        *task,
 {
   xinput_stream_t *stream = source_object;
   ReadData *op = task_data;
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
   xerror_t *error = NULL;
   xssize_t nread;
 
@@ -1444,7 +1444,7 @@ skip_async_thread (xtask_t        *task,
 {
   xinput_stream_t *stream = source_object;
   xsize_t count = GPOINTER_TO_SIZE (task_data);
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
   xerror_t *error = NULL;
   xssize_t ret;
 
@@ -1469,7 +1469,7 @@ skip_callback_wrapper (xobject_t      *source_object,
 		       xasync_result_t *res,
 		       xpointer_t      user_data)
 {
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
   xtask_t *task = user_data;
   SkipFallbackAsyncData *data = xtask_get_task_data (task);
   xerror_t *error = NULL;
@@ -1517,7 +1517,7 @@ xinput_stream_real_skip_async (xinput_stream_t        *stream,
 				xasync_ready_callback_t  callback,
 				xpointer_t             user_data)
 {
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
   SkipFallbackAsyncData *data;
   xtask_t *task;
 
@@ -1570,7 +1570,7 @@ close_async_thread (xtask_t        *task,
                     xcancellable_t *cancellable)
 {
   xinput_stream_t *stream = source_object;
-  GInputStreamClass *class;
+  xinput_stream_class_t *class;
   xerror_t *error = NULL;
   xboolean_t result;
 

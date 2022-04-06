@@ -98,7 +98,7 @@ xseekable_can_seek (xseekable__t *seekable)
  * xseekable_seek:
  * @seekable: a #xseekable__t.
  * @offset: a #xoffset_t.
- * @type: a #GSeekType.
+ * @type: a #xseek_type_t.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  * ignore.
@@ -125,7 +125,7 @@ xseekable_can_seek (xseekable__t *seekable)
 xboolean_t
 xseekable_seek (xseekable__t     *seekable,
 		 xoffset_t        offset,
-		 GSeekType      type,
+		 xseek_type_t      type,
 		 xcancellable_t  *cancellable,
 		 xerror_t       **error)
 {

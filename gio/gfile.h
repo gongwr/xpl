@@ -1047,7 +1047,7 @@ xboolean_t                xfile_set_attribute_uint64       (xfile_t             
 XPL_AVAILABLE_IN_ALL
 xboolean_t                xfile_set_attribute_int64        (xfile_t                      *file,
 							   const char                 *attribute,
-							   gint64                      value,
+							   sint64_t                      value,
 							   xfile_query_info_flags_t         flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);

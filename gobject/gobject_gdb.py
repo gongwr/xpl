@@ -148,7 +148,7 @@ def get_signal_name(id):
     id = long(id)
     if id == 0:
         return None
-    val = read_global_var("g_signal_nodes")
+    val = read_global_var("xsignal_nodes")
     max_s = read_global_var("g_n_signal_nodes")
     max_s = long(max_s)
     if id < max_s:
@@ -231,7 +231,7 @@ class SignalFrame(FrameDecorator):
                     signal = self.get_detailed_signal_from_frame(frame, signal)
                     self.append(signals, signal)
 
-            if name == "g_signal_emitv":
+            if name == "xsignal_emitv":
                 instance_and_params = self.read_var(frame, "instance_and_params")
                 if instance_and_params:
                     instance = instance_and_params[0]["v_pointer"].cast(
@@ -244,7 +244,7 @@ class SignalFrame(FrameDecorator):
                     signal = self.get_detailed_signal_from_frame(frame, signal)
                     self.append(signals, signal)
 
-            if name == "g_signal_emit_valist" or name == "g_signal_emit":
+            if name == "xsignal_emit_valist" or name == "xsignal_emit":
                 self.read_object(frame, "instance", instances)
                 id = self.read_var(frame, "signal_id")
                 signal = get_signal_name(id)
@@ -252,7 +252,7 @@ class SignalFrame(FrameDecorator):
                     signal = self.get_detailed_signal_from_frame(frame, signal)
                     self.append(signals, signal)
 
-            if name == "g_signal_emit_by_name":
+            if name == "xsignal_emit_by_name":
                 self.read_object(frame, "instance", instances)
                 self.read_var(frame, "detailed_signal", signals)
                 break
@@ -313,10 +313,10 @@ class GFrameDecorator:
             end = emission + 1
             while end < len(self.queue):
                 if frame_name(self.queue[end]) in [
-                    "g_signal_emitv",
-                    "g_signal_emit_valist",
-                    "g_signal_emit",
-                    "g_signal_emit_by_name",
+                    "xsignal_emitv",
+                    "xsignal_emit_valist",
+                    "xsignal_emit",
+                    "xsignal_emit_by_name",
                     "_xclosure_invoke_va",
                 ]:
                     end = end + 1

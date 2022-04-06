@@ -30,7 +30,7 @@ G_BEGIN_DECLS
 #define XTYPE_POLLABLE_INPUT_STREAM               (g_pollable_input_stream_get_type ())
 #define G_POLLABLE_INPUT_STREAM(obj)               (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_POLLABLE_INPUT_STREAM, xpollable_input_stream))
 #define X_IS_POLLABLE_INPUT_STREAM(obj)            (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_POLLABLE_INPUT_STREAM))
-#define G_POLLABLE_INPUT_STREAM_GET_INTERFACE(obj) (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_POLLABLE_INPUT_STREAM, GPollableInputStreamInterface))
+#define G_POLLABLE_INPUT_STREAM_GET_INTERFACE(obj) (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_POLLABLE_INPUT_STREAM, xpollable_input_stream_interface_t))
 
 /**
  * xpollable_input_stream_t:
@@ -39,10 +39,10 @@ G_BEGIN_DECLS
  *
  * Since: 2.28
  */
-typedef struct _GPollableInputStreamInterface GPollableInputStreamInterface;
+typedef struct _xpollable_input_stream_interface xpollable_input_stream_interface_t;
 
 /**
- * GPollableInputStreamInterface:
+ * xpollable_input_stream_interface_t:
  * @x_iface: The parent interface.
  * @can_poll: Checks if the #xpollable_input_stream_t instance is actually pollable
  * @is_readable: Checks if the stream is readable
@@ -63,7 +63,7 @@ typedef struct _GPollableInputStreamInterface GPollableInputStreamInterface;
  *
  * Since: 2.28
  */
-struct _GPollableInputStreamInterface
+struct _xpollable_input_stream_interface
 {
   xtype_interface_t x_iface;
 

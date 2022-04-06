@@ -81,7 +81,7 @@ g_local_vfs_get_file_for_path (xvfs_t       *vfs,
                                const char *path)
 {
   if (*path == '\0')
-    return _g_dummy_file_new (path);
+    return _xdummy_file_new (path);
   else
     return _g_local_file_new (path);
 }
@@ -111,7 +111,7 @@ g_local_vfs_get_file_for_uri (xvfs_t       *vfs,
   if (path != NULL)
     file = _g_local_file_new (path);
   else
-    file = _g_dummy_file_new (uri);
+    file = _xdummy_file_new (uri);
 
   g_free (path);
 

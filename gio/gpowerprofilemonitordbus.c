@@ -32,8 +32,8 @@
 
 #define G_POWER_PROFILE_MONITOR_DBUS_GET_INITABLE_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_INITABLE, xinitable_t))
 
-static void g_power_profile_monitor_dbus_iface_init (xpower_profile_monitor_tInterface *iface);
-static void g_power_profile_monitor_dbus_initable_iface_init (xinitable_iface_t *iface);
+static void xpower_profile_monitor_dbus_iface_init (xpower_profile_monitor_tInterface *iface);
+static void xpower_profile_monitor_dbus_initable_iface_init (xinitable_iface_t *iface);
 
 struct _xpower_profile_monitor_dbus_t
 {
@@ -42,7 +42,7 @@ struct _xpower_profile_monitor_dbus_t
   xuint_t watch_id;
   xcancellable_t *cancellable;
   xdbus_proxy_t *proxy;
-  gulong signal_id;
+  xulong_t signal_id;
 
   xboolean_t power_saver_enabled;
 };
@@ -56,11 +56,11 @@ typedef enum
 #define POWERPROFILES_DBUS_IFACE "net.hadess.PowerProfiles"
 #define POWERPROFILES_DBUS_PATH "/net/hadess/PowerProfiles"
 
-G_DEFINE_TYPE_WITH_CODE (xpower_profile_monitor_dbus_t, g_power_profile_monitor_dbus, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (xpower_profile_monitor_dbus_t, xpower_profile_monitor_dbus, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (XTYPE_INITABLE,
-                                                g_power_profile_monitor_dbus_initable_iface_init)
+                                                xpower_profile_monitor_dbus_initable_iface_init)
                          G_IMPLEMENT_INTERFACE (XTYPE_POWER_PROFILE_MONITOR,
-                                                g_power_profile_monitor_dbus_iface_init)
+                                                xpower_profile_monitor_dbus_iface_init)
                          _xio_modules_ensure_extension_points_registered ();
                          g_io_extension_point_implement (G_POWER_PROFILE_MONITOR_EXTENSION_POINT_NAME,
                                                          g_define_type_id,
@@ -68,7 +68,7 @@ G_DEFINE_TYPE_WITH_CODE (xpower_profile_monitor_dbus_t, g_power_profile_monitor_
                                                          30))
 
 static void
-g_power_profile_monitor_dbus_init (xpower_profile_monitor_dbus_t *dbus)
+xpower_profile_monitor_dbus_init (xpower_profile_monitor_dbus_t *dbus)
 {
   dbus->power_saver_enabled = FALSE;
 }
@@ -106,7 +106,7 @@ ppd_proxy_cb (xobject_t      *source_object,
   const char *active_profile;
   xboolean_t power_saver_enabled;
 
-  proxy = g_dbus_proxy_new_finish (res, &error);
+  proxy = xdbus_proxy_new_finish (res, &error);
   if (!proxy)
     {
       g_debug ("xpower_profile_monitor_dbus_t: Failed to create PowerProfiles D-Bus proxy: %s",
@@ -115,7 +115,7 @@ ppd_proxy_cb (xobject_t      *source_object,
       return;
     }
 
-  active_profile_variant = g_dbus_proxy_get_cached_property (proxy, "ActiveProfile");
+  active_profile_variant = xdbus_proxy_get_cached_property (proxy, "ActiveProfile");
   if (active_profile_variant != NULL &&
       xvariant_is_of_type (active_profile_variant, G_VARIANT_TYPE_STRING))
     {
@@ -129,7 +129,7 @@ ppd_proxy_cb (xobject_t      *source_object,
     }
   g_clear_pointer (&active_profile_variant, xvariant_unref);
 
-  dbus->signal_id = g_signal_connect (G_OBJECT (proxy), "g-properties-changed",
+  dbus->signal_id = xsignal_connect (G_OBJECT (proxy), "g-properties-changed",
                                       G_CALLBACK (ppd_properties_changed_cb), dbus);
   dbus->proxy = g_steal_pointer (&proxy);
 }
@@ -142,7 +142,7 @@ ppd_appeared_cb (xdbus_connection_t *connection,
 {
   xpower_profile_monitor_dbus_t *dbus = user_data;
 
-  g_dbus_proxy_new (connection,
+  xdbus_proxy_new (connection,
                     G_DBUS_PROXY_FLAGS_NONE,
                     NULL,
                     POWERPROFILES_DBUS_NAME,
@@ -168,7 +168,7 @@ ppd_vanished_cb (xdbus_connection_t *connection,
 }
 
 static void
-g_power_profile_monitor_dbus_get_property (xobject_t    *object,
+xpower_profile_monitor_dbus_get_property (xobject_t    *object,
                                            xuint_t       prop_id,
                                            xvalue_t     *value,
                                            xparam_spec_t *pspec)
@@ -187,13 +187,13 @@ g_power_profile_monitor_dbus_get_property (xobject_t    *object,
 }
 
 static xboolean_t
-g_power_profile_monitor_dbus_initable_init (xinitable_t     *initable,
+xpower_profile_monitor_dbus_initable_init (xinitable_t     *initable,
                                             xcancellable_t  *cancellable,
                                             xerror_t       **error)
 {
   xpower_profile_monitor_dbus_t *dbus = G_POWER_PROFILE_MONITOR_DBUS (initable);
 
-  dbus->cancellable = g_cancellable_new ();
+  dbus->cancellable = xcancellable_new ();
   dbus->watch_id = g_bus_watch_name (G_BUS_TYPE_SYSTEM,
                                      POWERPROFILES_DBUS_NAME,
                                      G_BUS_NAME_WATCHER_FLAGS_AUTO_START,
@@ -206,37 +206,37 @@ g_power_profile_monitor_dbus_initable_init (xinitable_t     *initable,
 }
 
 static void
-g_power_profile_monitor_dbus_finalize (xobject_t *object)
+xpower_profile_monitor_dbus_finalize (xobject_t *object)
 {
   xpower_profile_monitor_dbus_t *dbus = G_POWER_PROFILE_MONITOR_DBUS (object);
 
-  g_cancellable_cancel (dbus->cancellable);
+  xcancellable_cancel (dbus->cancellable);
   g_clear_object (&dbus->cancellable);
   g_clear_signal_handler (&dbus->signal_id, dbus->proxy);
   g_clear_object (&dbus->proxy);
   g_clear_handle_id (&dbus->watch_id, g_bus_unwatch_name);
 
-  G_OBJECT_CLASS (g_power_profile_monitor_dbus_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xpower_profile_monitor_dbus_parent_class)->finalize (object);
 }
 
 static void
-g_power_profile_monitor_dbus_class_init (xpower_profile_monitor_dbus_tClass *nl_class)
+xpower_profile_monitor_dbus_class_init (xpower_profile_monitor_dbus_tClass *nl_class)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (nl_class);
 
-  gobject_class->get_property = g_power_profile_monitor_dbus_get_property;
-  gobject_class->finalize = g_power_profile_monitor_dbus_finalize;
+  gobject_class->get_property = xpower_profile_monitor_dbus_get_property;
+  gobject_class->finalize = xpower_profile_monitor_dbus_finalize;
 
   xobject_class_override_property (gobject_class, PROP_POWER_SAVER_ENABLED, "power-saver-enabled");
 }
 
 static void
-g_power_profile_monitor_dbus_iface_init (xpower_profile_monitor_tInterface *monitor_iface)
+xpower_profile_monitor_dbus_iface_init (xpower_profile_monitor_tInterface *monitor_iface)
 {
 }
 
 static void
-g_power_profile_monitor_dbus_initable_iface_init (xinitable_iface_t *iface)
+xpower_profile_monitor_dbus_initable_iface_init (xinitable_iface_t *iface)
 {
-  iface->init = g_power_profile_monitor_dbus_initable_init;
+  iface->init = xpower_profile_monitor_dbus_initable_init;
 }

@@ -29,7 +29,7 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DATA_OUTPUT_STREAM         (g_data_output_stream_get_type ())
+#define XTYPE_DATA_OUTPUT_STREAM         (xdata_output_stream_get_type ())
 #define G_DATA_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DATA_OUTPUT_STREAM, xdata_output_stream_t))
 #define G_DATA_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DATA_OUTPUT_STREAM, xdata_output_stream_class_t))
 #define X_IS_DATA_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DATA_OUTPUT_STREAM))
@@ -69,53 +69,53 @@ struct _xdata_output_stream_class
 
 
 XPL_AVAILABLE_IN_ALL
-xtype_t                g_data_output_stream_get_type       (void) G_GNUC_CONST;
+xtype_t                xdata_output_stream_get_type       (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xdata_output_stream_t *  g_data_output_stream_new            (xoutput_stream_t         *base_stream);
+xdata_output_stream_t *  xdata_output_stream_new            (xoutput_stream_t         *base_stream);
 
 XPL_AVAILABLE_IN_ALL
-void                 g_data_output_stream_set_byte_order (xdata_output_stream_t     *stream,
+void                 xdata_output_stream_set_byte_order (xdata_output_stream_t     *stream,
 							  GDataStreamByteOrder   order);
 XPL_AVAILABLE_IN_ALL
-GDataStreamByteOrder g_data_output_stream_get_byte_order (xdata_output_stream_t     *stream);
+GDataStreamByteOrder xdata_output_stream_get_byte_order (xdata_output_stream_t     *stream);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t             g_data_output_stream_put_byte       (xdata_output_stream_t     *stream,
-							  guchar                 data,
+xboolean_t             xdata_output_stream_put_byte       (xdata_output_stream_t     *stream,
+							  xuchar_t                 data,
 							  xcancellable_t          *cancellable,
 							  xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t             g_data_output_stream_put_int16      (xdata_output_stream_t     *stream,
+xboolean_t             xdata_output_stream_put_int16      (xdata_output_stream_t     *stream,
 							  gint16                 data,
 							  xcancellable_t          *cancellable,
 							  xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t             g_data_output_stream_put_uint16     (xdata_output_stream_t     *stream,
+xboolean_t             xdata_output_stream_put_uint16     (xdata_output_stream_t     *stream,
 							  xuint16_t                data,
 							  xcancellable_t          *cancellable,
 							  xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t             g_data_output_stream_put_int32      (xdata_output_stream_t     *stream,
+xboolean_t             xdata_output_stream_put_int32      (xdata_output_stream_t     *stream,
 							  gint32                 data,
 							  xcancellable_t          *cancellable,
 							  xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t             g_data_output_stream_put_uint32     (xdata_output_stream_t     *stream,
+xboolean_t             xdata_output_stream_put_uint32     (xdata_output_stream_t     *stream,
 							  xuint32_t                data,
 							  xcancellable_t          *cancellable,
 							  xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t             g_data_output_stream_put_int64      (xdata_output_stream_t     *stream,
-							  gint64                 data,
+xboolean_t             xdata_output_stream_put_int64      (xdata_output_stream_t     *stream,
+							  sint64_t                 data,
 							  xcancellable_t          *cancellable,
 							  xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t             g_data_output_stream_put_uint64     (xdata_output_stream_t     *stream,
+xboolean_t             xdata_output_stream_put_uint64     (xdata_output_stream_t     *stream,
 							  xuint64_t                data,
 							  xcancellable_t          *cancellable,
 							  xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t             g_data_output_stream_put_string     (xdata_output_stream_t     *stream,
+xboolean_t             xdata_output_stream_put_string     (xdata_output_stream_t     *stream,
 							  const char            *str,
 							  xcancellable_t          *cancellable,
 							  xerror_t               **error);

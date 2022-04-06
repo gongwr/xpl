@@ -33,7 +33,7 @@ typedef struct _GAppLaunchContext             xapp_launch_context_t;
 typedef struct _GAppInfo                      xapp_info_t; /* Dummy typedef */
 typedef struct _GAsyncResult                  xasync_result_t; /* Dummy typedef */
 typedef struct _GAsyncInitable                xasync_initable_t;
-typedef struct _GBufferedInputStream          xbuffered_input_stream;
+typedef struct _GBufferedInputStream          xbuffered_input_stream_t;
 typedef struct _GBufferedOutputStream         xbuffered_output_stream_t;
 typedef struct _GCancellable                  xcancellable_t;
 typedef struct _GCharsetConverter             xcharset_converter_t;
@@ -119,7 +119,7 @@ typedef struct _GIOExtension                  xio_extension_t;
 typedef struct _GIOSchedulerJob               xio_scheduler_job_t;
 typedef struct _GIOStreamAdapter              xio_stream_adapter_t;
 typedef struct _GLoadableIcon                 xloadable_icon_t; /* Dummy typedef */
-typedef struct _GBytesIcon                    xbytes_icon_t;
+typedef struct _xbytes_icon                    xbytes_icon_t;
 typedef struct _GMemoryInputStream            xmemory_input_stream_t;
 typedef struct _GMemoryOutputStream           xmemory_output_stream_t;
 
@@ -133,7 +133,7 @@ typedef struct _GMountOperation               xmount_operation_t;
 typedef struct _GNetworkAddress               xnetwork_address_t;
 typedef struct _GNetworkMonitor               xnetwork_monitor_t;
 typedef struct _GNetworkService               xnetwork_service_t;
-typedef struct _GOutputStream                 xoutput_stream_t;
+typedef struct _xoutput_stream                 xoutput_stream_t;
 typedef struct _xio_stream                    xio_stream_t;
 typedef struct _GSimpleIOStream               xsimple_io_stream_t;
 typedef struct _GPollableInputStream          xpollable_input_stream_t; /* Dummy typedef */
@@ -555,7 +555,7 @@ typedef struct _GDBusMessage                  xdbus_message_t;
 typedef struct _GDBusConnection               xdbus_connection_t;
 typedef struct _GDBusProxy                    xdbus_proxy_t;
 typedef struct _GDBusMethodInvocation         xdbus_method_invocation_t;
-typedef struct _GDBusServer                   xdbus_server_t;
+typedef struct _xdbus_server                   xdbus_server_t;
 typedef struct _GDBusAuthObserver             xdbus_auth_observer_t;
 typedef struct _GDBusErrorEntry               xdbus_error_entry_t;
 typedef struct _GDBusInterfaceVTable          xdbus_interface_vtable_t;
@@ -574,7 +574,7 @@ typedef struct _GDBusNodeInfo                 xdbus_node_info_t;
  * @user_data: data passed in by the user.
  *
  * This is the function type of the callback used for the #xsource_t
- * returned by g_cancellable_source_new().
+ * returned by xcancellable_source_new().
  *
  * Returns: it should return %FALSE if the source should be removed.
  *

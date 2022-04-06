@@ -374,16 +374,16 @@ g_dtls_connection_default_init (GDtlsConnectionInterface *iface)
    * Since: 2.48
    */
   signals[ACCEPT_CERTIFICATE] =
-    g_signal_new (I_("accept-certificate"),
+    xsignal_new (I_("accept-certificate"),
                   XTYPE_DTLS_CONNECTION,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GDtlsConnectionInterface, accept_certificate),
-                  g_signal_accumulator_true_handled, NULL,
+                  xsignal_accumulator_true_handled, NULL,
                   _g_cclosure_marshal_BOOLEAN__OBJECT_FLAGS,
                   XTYPE_BOOLEAN, 2,
                   XTYPE_TLS_CERTIFICATE,
                   XTYPE_TLS_CERTIFICATE_FLAGS);
-  g_signal_set_va_marshaller (signals[ACCEPT_CERTIFICATE],
+  xsignal_set_va_marshaller (signals[ACCEPT_CERTIFICATE],
                               XTYPE_FROM_INTERFACE (iface),
                               _g_cclosure_marshal_BOOLEAN__OBJECT_FLAGSv);
 }
@@ -1076,7 +1076,7 @@ g_dtls_connection_emit_accept_certificate (xdtls_connection_t      *conn,
 {
   xboolean_t accept = FALSE;
 
-  g_signal_emit (conn, signals[ACCEPT_CERTIFICATE], 0,
+  xsignal_emit (conn, signals[ACCEPT_CERTIFICATE], 0,
                  peer_cert, errors, &accept);
   return accept;
 }

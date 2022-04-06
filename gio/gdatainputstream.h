@@ -39,7 +39,7 @@ G_BEGIN_DECLS
 /**
  * xdata_input_stream_t:
  *
- * An implementation of #xbuffered_input_stream that allows for high-level
+ * An implementation of #xbuffered_input_stream_t that allows for high-level
  * data manipulation of arbitrary data (including binary operations).
  **/
 typedef struct _GDataInputStreamClass    GDataInputStreamClass;
@@ -47,7 +47,7 @@ typedef struct _GDataInputStreamPrivate  GDataInputStreamPrivate;
 
 struct _GDataInputStream
 {
-  xbuffered_input_stream parent_instance;
+  xbuffered_input_stream_t parent_instance;
 
   /*< private >*/
   GDataInputStreamPrivate *priv;
@@ -82,7 +82,7 @@ void                   g_data_input_stream_set_newline_type     (xdata_input_str
 XPL_AVAILABLE_IN_ALL
 GDataStreamNewlineType g_data_input_stream_get_newline_type     (xdata_input_stream_t        *stream);
 XPL_AVAILABLE_IN_ALL
-guchar                 g_data_input_stream_read_byte            (xdata_input_stream_t        *stream,
+xuchar_t                 g_data_input_stream_read_byte            (xdata_input_stream_t        *stream,
                                                                  xcancellable_t            *cancellable,
                                                                  xerror_t                 **error);
 XPL_AVAILABLE_IN_ALL
@@ -102,7 +102,7 @@ xuint32_t                g_data_input_stream_read_uint32          (xdata_input_s
                                                                  xcancellable_t            *cancellable,
                                                                  xerror_t                 **error);
 XPL_AVAILABLE_IN_ALL
-gint64                 g_data_input_stream_read_int64           (xdata_input_stream_t        *stream,
+sint64_t                 g_data_input_stream_read_int64           (xdata_input_stream_t        *stream,
                                                                  xcancellable_t            *cancellable,
                                                                  xerror_t                 **error);
 XPL_AVAILABLE_IN_ALL

@@ -154,7 +154,7 @@ g_tcp_connection_close (xio_stream_t     *stream,
   had_error = FALSE;
 
   if (connection->priv->graceful_disconnect &&
-      !g_cancellable_is_cancelled (cancellable) /* Cancelled -> close fast */)
+      !xcancellable_is_cancelled (cancellable) /* Cancelled -> close fast */)
     {
       if (!xsocket_shutdown (socket, FALSE, TRUE, error))
 	{
@@ -258,7 +258,7 @@ g_tcp_connection_close_async (xio_stream_t           *stream,
   xtask_t *task;
 
   if (connection->priv->graceful_disconnect &&
-      !g_cancellable_is_cancelled (cancellable) /* Cancelled -> close fast */)
+      !xcancellable_is_cancelled (cancellable) /* Cancelled -> close fast */)
     {
       task = xtask_new (stream, cancellable, callback, user_data);
       xtask_set_source_tag (task, g_tcp_connection_close_async);

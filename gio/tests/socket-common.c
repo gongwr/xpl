@@ -118,6 +118,6 @@ cancel_thread (xpointer_t data)
 
   g_usleep (1000*1000*cancel_timeout);
   g_print ("Cancelling\n");
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   return NULL;
 }

@@ -65,8 +65,8 @@
 struct _GVariantTypeInfo
 {
   xsize_t fixed_size;
-  guchar alignment;
-  guchar container_class;
+  xuchar_t alignment;
+  xuchar_t container_class;
 };
 
 /* Container types are reference counted.  They also need to have their

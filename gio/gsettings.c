@@ -146,7 +146,7 @@
  * An example for default value:
  * |[
  * <schemalist>
- *   <schema id="org.gtk.Test" path="/org/gtk/Test/" gettext-domain="test">
+ *   <schema id="org.gtk.test_t" path="/org/gtk/test_t/" gettext-domain="test">
  *
  *     <key name="greeting" type="s">
  *       <default l10n="messages">"Hello, earthlings"</default>
@@ -173,18 +173,18 @@
  * |[
  * <schemalist>
  *
- *   <enum id="org.gtk.Test.myenum">
+ *   <enum id="org.gtk.test_t.myenum">
  *     <value nick="first" value="1"/>
  *     <value nick="second" value="2"/>
  *   </enum>
  *
- *   <flags id="org.gtk.Test.myflags">
+ *   <flags id="org.gtk.test_t.myflags">
  *     <value nick="flag1" value="1"/>
  *     <value nick="flag2" value="2"/>
  *     <value nick="flag3" value="4"/>
  *   </flags>
  *
- *   <schema id="org.gtk.Test">
+ *   <schema id="org.gtk.test_t">
  *
  *     <key name="key-with-range" type="i">
  *       <range min="1" max="100"/>
@@ -204,11 +204,11 @@
  *       <default>'Joe'</default>
  *     </key>
  *
- *     <key name='enumerated-key' enum='org.gtk.Test.myenum'>
+ *     <key name='enumerated-key' enum='org.gtk.test_t.myenum'>
  *       <default>'first'</default>
  *     </key>
  *
- *     <key name='flags-key' flags='org.gtk.Test.myflags'>
+ *     <key name='flags-key' flags='org.gtk.test_t.myflags'>
  *       <default>["flag1","flag2"]</default>
  *     </key>
  *   </schema>
@@ -387,7 +387,7 @@ g_settings_real_change_event (xsettings_t    *settings,
       if (xstr_has_suffix (key, "/"))
         continue;
 
-      g_signal_emit (settings, g_settings_signals[SIGNAL_CHANGED], keys[i], key);
+      xsignal_emit (settings, g_settings_signals[SIGNAL_CHANGED], keys[i], key);
     }
 
   return FALSE;
@@ -411,7 +411,7 @@ g_settings_real_writable_change_event (xsettings_t *settings,
       if (xstr_has_suffix (key, "/"))
         continue;
 
-      g_signal_emit (settings, g_settings_signals[SIGNAL_WRITABLE_CHANGED], keys[i], key);
+      xsignal_emit (settings, g_settings_signals[SIGNAL_WRITABLE_CHANGED], keys[i], key);
     }
 
   return FALSE;
@@ -447,7 +447,7 @@ settings_backend_changed (xobject_t             *target,
       xquark quark;
 
       quark = g_quark_from_string (key + i);
-      g_signal_emit (settings, g_settings_signals[SIGNAL_CHANGE_EVENT],
+      xsignal_emit (settings, g_settings_signals[SIGNAL_CHANGE_EVENT],
                      0, &quark, 1, &ignore_this);
     }
 }
@@ -462,7 +462,7 @@ settings_backend_path_changed (xobject_t          *target,
   xboolean_t ignore_this;
 
   if (xstr_has_prefix (settings->priv->path, path))
-    g_signal_emit (settings, g_settings_signals[SIGNAL_CHANGE_EVENT],
+    xsignal_emit (settings, g_settings_signals[SIGNAL_CHANGE_EVENT],
                    0, NULL, 0, &ignore_this);
 }
 
@@ -503,7 +503,7 @@ settings_backend_keys_changed (xobject_t             *target,
          }
 
       if (l > 0)
-        g_signal_emit (settings, g_settings_signals[SIGNAL_CHANGE_EVENT],
+        xsignal_emit (settings, g_settings_signals[SIGNAL_CHANGE_EVENT],
                        0, quarks, l, &ignore_this);
     }
 }
@@ -521,7 +521,7 @@ settings_backend_writable_changed (xobject_t          *target,
 
   if (settings->priv->path[i] == '\0' &&
       g_settings_schema_has_key (settings->priv->schema, key + i))
-    g_signal_emit (settings, g_settings_signals[SIGNAL_WRITABLE_CHANGE_EVENT],
+    xsignal_emit (settings, g_settings_signals[SIGNAL_WRITABLE_CHANGE_EVENT],
                    0, g_quark_from_string (key + i), &ignore_this);
 }
 
@@ -534,7 +534,7 @@ settings_backend_path_writable_changed (xobject_t          *target,
   xboolean_t ignore_this;
 
   if (xstr_has_prefix (settings->priv->path, path))
-    g_signal_emit (settings, g_settings_signals[SIGNAL_WRITABLE_CHANGE_EVENT],
+    xsignal_emit (settings, g_settings_signals[SIGNAL_WRITABLE_CHANGE_EVENT],
                    0, (xquark) 0, &ignore_this);
 }
 
@@ -739,7 +739,7 @@ g_settings_class_init (GSettingsClass *class)
    * least once while a signal handler was already connected for @key.
    */
   g_settings_signals[SIGNAL_CHANGED] =
-    g_signal_new (I_("changed"), XTYPE_SETTINGS,
+    xsignal_new (I_("changed"), XTYPE_SETTINGS,
                   G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED,
                   G_STRUCT_OFFSET (GSettingsClass, changed),
                   NULL, NULL, NULL, XTYPE_NONE,
@@ -772,13 +772,13 @@ g_settings_class_init (GSettingsClass *class)
    *          event. FALSE to propagate the event further.
    */
   g_settings_signals[SIGNAL_CHANGE_EVENT] =
-    g_signal_new (I_("change-event"), XTYPE_SETTINGS,
+    xsignal_new (I_("change-event"), XTYPE_SETTINGS,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GSettingsClass, change_event),
-                  g_signal_accumulator_true_handled, NULL,
+                  xsignal_accumulator_true_handled, NULL,
                   _g_cclosure_marshal_BOOLEAN__POINTER_INT,
                   XTYPE_BOOLEAN, 2, XTYPE_POINTER, XTYPE_INT);
-  g_signal_set_va_marshaller (g_settings_signals[SIGNAL_CHANGE_EVENT],
+  xsignal_set_va_marshaller (g_settings_signals[SIGNAL_CHANGE_EVENT],
                               XTYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_BOOLEAN__POINTER_INTv);
 
@@ -796,7 +796,7 @@ g_settings_class_init (GSettingsClass *class)
    * callbacks when the writability of "x" changes.
    */
   g_settings_signals[SIGNAL_WRITABLE_CHANGED] =
-    g_signal_new (I_("writable-changed"), XTYPE_SETTINGS,
+    xsignal_new (I_("writable-changed"), XTYPE_SETTINGS,
                   G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED,
                   G_STRUCT_OFFSET (GSettingsClass, writable_changed),
                   NULL, NULL, NULL, XTYPE_NONE,
@@ -830,13 +830,13 @@ g_settings_class_init (GSettingsClass *class)
    *          event. FALSE to propagate the event further.
    */
   g_settings_signals[SIGNAL_WRITABLE_CHANGE_EVENT] =
-    g_signal_new (I_("writable-change-event"), XTYPE_SETTINGS,
+    xsignal_new (I_("writable-change-event"), XTYPE_SETTINGS,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GSettingsClass, writable_change_event),
-                  g_signal_accumulator_true_handled, NULL,
+                  xsignal_accumulator_true_handled, NULL,
                   _g_cclosure_marshal_BOOLEAN__UINT,
                   XTYPE_BOOLEAN, 1, XTYPE_UINT);
-  g_signal_set_va_marshaller (g_settings_signals[SIGNAL_WRITABLE_CHANGE_EVENT],
+  xsignal_set_va_marshaller (g_settings_signals[SIGNAL_WRITABLE_CHANGE_EVENT],
                               XTYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_BOOLEAN__UINTv);
 
@@ -1908,12 +1908,12 @@ g_settings_set_int (xsettings_t   *settings,
  *
  * Since: 2.50
  */
-gint64
+sint64_t
 g_settings_get_int64 (xsettings_t   *settings,
                       const xchar_t *key)
 {
   xvariant_t *value;
-  gint64 result;
+  sint64_t result;
 
   value = g_settings_get_value (settings, key);
   result = xvariant_get_int64 (value);
@@ -1943,7 +1943,7 @@ g_settings_get_int64 (xsettings_t   *settings,
 xboolean_t
 g_settings_set_int64 (xsettings_t   *settings,
                       const xchar_t *key,
-                      gint64       value)
+                      sint64_t       value)
 {
   return g_settings_set_value (settings, key, xvariant_new_int64 (value));
 }
@@ -2590,16 +2590,16 @@ g_settings_binding_free (xpointer_t data)
   g_assert (!binding->running);
 
   if (binding->writable_handler_id)
-    g_signal_handler_disconnect (binding->settings,
+    xsignal_handler_disconnect (binding->settings,
                                  binding->writable_handler_id);
 
   if (binding->key_handler_id)
-    g_signal_handler_disconnect (binding->settings,
+    xsignal_handler_disconnect (binding->settings,
                                  binding->key_handler_id);
 
-  if (g_signal_handler_is_connected (binding->object,
+  if (xsignal_handler_is_connected (binding->object,
                                      binding->property_handler_id))
-  g_signal_handler_disconnect (binding->object,
+  xsignal_handler_disconnect (binding->object,
                                binding->property_handler_id);
 
   g_settings_schema_key_clear (&binding->key);
@@ -2979,7 +2979,7 @@ g_settings_bind_with_mapping (xsettings_t               *settings,
     {
       detailed_signal = xstrdup_printf ("notify::%s", binding->property->name);
       binding->property_handler_id =
-        g_signal_connect (object, detailed_signal,
+        xsignal_connect (object, detailed_signal,
                           G_CALLBACK (g_settings_binding_property_changed),
                           binding);
       g_free (detailed_signal);
@@ -2996,7 +2996,7 @@ g_settings_bind_with_mapping (xsettings_t               *settings,
         {
           detailed_signal = xstrdup_printf ("changed::%s", key);
           binding->key_handler_id =
-            g_signal_connect (settings, detailed_signal,
+            xsignal_connect (settings, detailed_signal,
                               G_CALLBACK (g_settings_binding_key_changed),
                               binding);
           g_free (detailed_signal);
@@ -3018,7 +3018,7 @@ typedef struct
   const xchar_t *key;
   const xchar_t *property;
   xboolean_t inverted;
-  gulong handler_id;
+  xulong_t handler_id;
 } GSettingsWritableBinding;
 
 static void
@@ -3026,7 +3026,7 @@ g_settings_writable_binding_free (xpointer_t data)
 {
   GSettingsWritableBinding *binding = data;
 
-  g_signal_handler_disconnect (binding->settings, binding->handler_id);
+  xsignal_handler_disconnect (binding->settings, binding->handler_id);
   xobject_unref (binding->settings);
   g_slice_free (GSettingsWritableBinding, binding);
 }
@@ -3114,7 +3114,7 @@ g_settings_bind_writable (xsettings_t   *settings,
 
   detailed_signal = xstrdup_printf ("writable-changed::%s", key);
   binding->handler_id =
-    g_signal_connect (settings, detailed_signal,
+    xsignal_connect (settings, detailed_signal,
                       G_CALLBACK (g_settings_binding_writable_changed),
                       binding);
   g_free (detailed_signal);
@@ -3307,7 +3307,7 @@ g_settings_action_finalize (xobject_t *object)
 {
   GSettingsAction *gsa = (GSettingsAction *) object;
 
-  g_signal_handlers_disconnect_by_data (gsa->settings, gsa);
+  xsignal_handlers_disconnect_by_data (gsa->settings, gsa);
   xobject_unref (gsa->settings);
   g_settings_schema_key_clear (&gsa->key);
 
@@ -3401,10 +3401,10 @@ g_settings_create_action (xsettings_t   *settings,
   g_settings_schema_key_init (&gsa->key, settings->priv->schema, key);
 
   detailed_signal = xstrdup_printf ("changed::%s", key);
-  g_signal_connect (settings, detailed_signal, G_CALLBACK (g_settings_action_changed), gsa);
+  xsignal_connect (settings, detailed_signal, G_CALLBACK (g_settings_action_changed), gsa);
   g_free (detailed_signal);
   detailed_signal = xstrdup_printf ("writable-changed::%s", key);
-  g_signal_connect (settings, detailed_signal, G_CALLBACK (g_settings_action_enabled_changed), gsa);
+  xsignal_connect (settings, detailed_signal, G_CALLBACK (g_settings_action_enabled_changed), gsa);
   g_free (detailed_signal);
 
   return G_ACTION (gsa);

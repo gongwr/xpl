@@ -53,7 +53,7 @@ struct _GUnixInputStream
 
 struct _GUnixInputStreamClass
 {
-  GInputStreamClass parent_class;
+  xinput_stream_class_t parent_class;
 
   /*< private >*/
   /* Padding for future expansion */

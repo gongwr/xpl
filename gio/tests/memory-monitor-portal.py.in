@@ -34,7 +34,7 @@ try:
     XDG_DESKTOP_PORTAL_PATH = "@libexecdir@/xdg-desktop-portal"
 
     class TestLowMemoryMonitorPortal(dbusmock.DBusTestCase):
-        '''Test GMemoryMonitorPortal'''
+        '''test_t GMemoryMonitorPortal'''
 
         @classmethod
         def setUpClass(klass):

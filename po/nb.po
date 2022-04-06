@@ -265,8 +265,8 @@ msgid "Seek not supported on base stream"
 msgstr "Søk er ikke støttet på grunnstrøm"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "Kan ikke avkorte xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "Kan ikke avkorte xbuffered_input_stream_t"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1208
 #: ../gio/giostream.c:300 ../gio/goutputstream.c:1660
@@ -3048,8 +3048,8 @@ msgid "Error removing old file: %s"
 msgstr "Feil ved fjerning av gammel fil: %s"
 
 #: ../gio/gmemoryinputstream.c:474 ../gio/gmemoryoutputstream.c:772
-msgid "Invalid GSeekType supplied"
-msgstr "Ugyldig GSeekType oppgitt"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Ugyldig xseek_type_t oppgitt"
 
 #: ../gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"

@@ -853,7 +853,7 @@ g_cond_broadcast (xcond_t *cond)
  * xpointer_t
  * pop_data_timed (void)
  * {
- *   gint64 end_time;
+ *   sint64_t end_time;
  *   xpointer_t data;
  *
  *   g_mutex_lock (&data_mutex);
@@ -890,7 +890,7 @@ g_cond_broadcast (xcond_t *cond)
 xboolean_t
 g_cond_wait_until (xcond_t  *cond,
                    xmutex_t *mutex,
-                   gint64  end_time)
+                   sint64_t  end_time)
 {
   struct timespec ts;
   xint_t status;
@@ -902,8 +902,8 @@ g_cond_wait_until (xcond_t  *cond,
    * Since this pthreads wants the relative time, convert it back again.
    */
   {
-    gint64 now = g_get_monotonic_time ();
-    gint64 relative;
+    sint64_t now = g_get_monotonic_time ();
+    sint64_t relative;
 
     if (end_time <= now)
       return FALSE;
@@ -1272,7 +1272,7 @@ linux_pthread_proxy (void *data)
 
 GRealThread *
 g_system_thread_new (GThreadFunc proxy,
-                     gulong stack_size,
+                     xulong_t stack_size,
                      const GThreadSchedulerSettings *scheduler_settings,
                      const char *name,
                      GThreadFunc func,
@@ -1303,7 +1303,7 @@ g_system_thread_new (GThreadFunc proxy,
 #ifdef _SC_THREAD_STACK_MIN
       long min_stack_size = sysconf (_SC_THREAD_STACK_MIN);
       if (min_stack_size >= 0)
-        stack_size = MAX ((gulong) min_stack_size, stack_size);
+        stack_size = MAX ((xulong_t) min_stack_size, stack_size);
 #endif /* _SC_THREAD_STACK_MIN */
       /* No error check here, because some systems can't do it and
        * we simply don't want threads to fail because of that. */
@@ -1595,7 +1595,7 @@ g_cond_broadcast (xcond_t *cond)
 xboolean_t
 g_cond_wait_until (xcond_t  *cond,
                    xmutex_t *mutex,
-                   gint64  end_time)
+                   sint64_t  end_time)
 {
   struct timespec now;
   struct timespec span;

@@ -290,7 +290,7 @@ param_ulong_validate (xparam_spec_t *pspec,
 		      xvalue_t     *value)
 {
   GParamSpecULong *uspec = G_PARAM_SPEC_ULONG (pspec);
-  gulong oval = value->data[0].v_ulong;
+  xulong_t oval = value->data[0].v_ulong;
 
   value->data[0].v_ulong = CLAMP (value->data[0].v_ulong, uspec->minimum, uspec->maximum);
 
@@ -330,7 +330,7 @@ param_int64_validate (xparam_spec_t *pspec,
 		     xvalue_t     *value)
 {
   GParamSpecInt64 *lspec = G_PARAM_SPEC_INT64 (pspec);
-  gint64 oval = value->data[0].v_int64;
+  sint64_t oval = value->data[0].v_int64;
 
   value->data[0].v_int64 = CLAMP (value->data[0].v_int64, lspec->minimum, lspec->maximum);
 
@@ -511,7 +511,7 @@ param_flags_validate (xparam_spec_t *pspec,
 		      xvalue_t     *value)
 {
   GParamSpecFlags *fspec = G_PARAM_SPEC_FLAGS (pspec);
-  gulong oval = value->data[0].v_ulong;
+  xulong_t oval = value->data[0].v_ulong;
 
   if (fspec->flags_class)
     value->data[0].v_ulong &= fspec->flags_class->mask;
@@ -1910,9 +1910,9 @@ xparam_spec_t*
 g_param_spec_ulong (const xchar_t *name,
 		    const xchar_t *nick,
 		    const xchar_t *blurb,
-		    gulong	 minimum,
-		    gulong	 maximum,
-		    gulong	 default_value,
+		    xulong_t	 minimum,
+		    xulong_t	 maximum,
+		    xulong_t	 default_value,
 		    GParamFlags	 flags)
 {
   GParamSpecULong *uspec;
@@ -1954,9 +1954,9 @@ xparam_spec_t*
 g_param_spec_int64 (const xchar_t *name,
 		    const xchar_t *nick,
 		    const xchar_t *blurb,
-		    gint64	 minimum,
-		    gint64	 maximum,
-		    gint64	 default_value,
+		    sint64_t	 minimum,
+		    sint64_t	 maximum,
+		    sint64_t	 default_value,
 		    GParamFlags	 flags)
 {
   GParamSpecInt64 *lspec;

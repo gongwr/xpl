@@ -225,7 +225,7 @@ my_slow_close_output_stream_close_finish  (xoutput_stream_t  *stream,
 static void
 my_slow_close_output_stream_class_init (MySlowCloseOutputStreamClass *klass)
 {
-  GOutputStreamClass *ostream_class;
+  xoutput_stream_class_t *ostream_class;
 
   ostream_class = G_OUTPUT_STREAM_CLASS (klass);
   ostream_class->close_fn = my_slow_close_output_stream_close;
@@ -293,7 +293,7 @@ on_new_conn (xobject_t      *source,
   xdbus_connection_t **connection = user_data;
   xerror_t *error = NULL;
 
-  *connection = g_dbus_connection_new_for_address_finish (res, &error);
+  *connection = xdbus_connection_new_for_address_finish (res, &error);
   g_assert_no_error (error);
 }
 
@@ -314,7 +314,7 @@ test_once (Fixture       *f,
   f->iostream = my_io_stream_new_for_fds (f->server_to_client[0],
                                           f->client_to_server[1]);
 
-  g_dbus_connection_new (f->server_iostream,
+  xdbus_connection_new (f->server_iostream,
                          f->guid,
                          (G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER |
                           G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS),
@@ -322,7 +322,7 @@ test_once (Fixture       *f,
                          NULL /* cancellable */,
                          on_new_conn, &f->server_conn);
 
-  g_dbus_connection_new (f->iostream,
+  xdbus_connection_new (f->iostream,
                          NULL,
                          G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
                          NULL /* auth observer */,
@@ -337,7 +337,7 @@ test_once (Fixture       *f,
    * triggering the bug
    */
   message = xdbus_message_new_signal ("/", "com.example.foo_t", "Bar");
-  g_dbus_connection_send_message (f->connection, message, 0, NULL, &f->error);
+  xdbus_connection_send_message (f->connection, message, 0, NULL, &f->error);
   g_assert_no_error (f->error);
   xobject_unref (message);
 
@@ -348,12 +348,12 @@ test_once (Fixture       *f,
     }
   else
     {
-      g_dbus_connection_close_sync (f->connection, NULL, &f->error);
+      xdbus_connection_close_sync (f->connection, NULL, &f->error);
       g_assert_no_error (f->error);
     }
 
   /* either way, wait for the connection to close */
-  while (!g_dbus_connection_is_closed (f->server_conn))
+  while (!xdbus_connection_is_closed (f->server_conn))
     xmain_context_iteration (NULL, TRUE);
 
   /* clean up before the next run */

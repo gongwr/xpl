@@ -3092,8 +3092,8 @@ msgstr "Feil under fjerning av fila: %s"
 
 #: ../gio/gmemoryinputstream.c:486
 #: ../gio/gmemoryoutputstream.c:746
-msgid "Invalid GSeekType supplied"
-msgstr "Ugyldig GSeekType sendt med"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Ugyldig xseek_type_t sendt med"
 
 #: ../gio/gmemoryinputstream.c:496
 msgid "Invalid seek request"

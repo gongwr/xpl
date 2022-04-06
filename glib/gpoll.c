@@ -415,7 +415,7 @@ g_poll (xpollfd_t *fds,
     }
 
 #if XPL_SIZEOF_VOID_P == 8
-  stop_event.fd = (gint64)CreateEventW (NULL, TRUE, FALSE, NULL);
+  stop_event.fd = (sint64_t)CreateEventW (NULL, TRUE, FALSE, NULL);
 #else
   stop_event.fd = (xint_t)CreateEventW (NULL, TRUE, FALSE, NULL);
 #endif

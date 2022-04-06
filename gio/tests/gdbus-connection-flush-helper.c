@@ -35,7 +35,7 @@ main (int   argc,
   g_assert_no_error (error);
 
   error = NULL;
-  g_dbus_connection_emit_signal (c,
+  xdbus_connection_emit_signal (c,
                                  NULL, /* const xchar_t *destination_bus_name */
                                  "/org/gtk/GDBus/FlushObject",
                                  "org.gtk.GDBus.FlushInterface",
@@ -45,7 +45,7 @@ main (int   argc,
   g_assert_no_error (error);
 
   error = NULL;
-  ret = g_dbus_connection_flush_sync (c,
+  ret = xdbus_connection_flush_sync (c,
                                       NULL, /* xcancellable_t* */
                                       &error);
   g_assert_no_error (error);

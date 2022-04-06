@@ -290,7 +290,7 @@ msgstr "Voogu pole võimalik kerida"
 
 #: ../gio/gbufferedinputstream.c:937
 #, fuzzy
-msgid "Cannot truncate xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
 msgstr "xmemory_input_stream_t'i pole võimalik kärpida"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1208
@@ -3080,8 +3080,8 @@ msgid "Error removing old file: %s"
 msgstr "Viga vana faili eemaldamisel: %s"
 
 #: ../gio/gmemoryinputstream.c:474 ../gio/gmemoryoutputstream.c:772
-msgid "Invalid GSeekType supplied"
-msgstr "Pakutud GSeekType pole sobiv"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Pakutud xseek_type_t pole sobiv"
 
 #: ../gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"

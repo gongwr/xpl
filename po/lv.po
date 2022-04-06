@@ -269,8 +269,8 @@ msgid "Seek not supported on base stream"
 msgstr "Uz bāzes plūsmas meklēšana netiek atbalstīta"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "Nevar apraut xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "Nevar apraut xbuffered_input_stream_t"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -3306,8 +3306,8 @@ msgid "Error removing old file: %s"
 msgstr "Kļūda, dzēšot veco datni — %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:772
-msgid "Invalid GSeekType supplied"
-msgstr "Piegādāts nederīgs GSeekType"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Piegādāts nederīgs xseek_type_t"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"

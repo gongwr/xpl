@@ -63,7 +63,7 @@ struct _xseekable_iface
   xboolean_t    (* can_seek)       (xseekable__t    *seekable);
   xboolean_t    (* seek)	         (xseekable__t    *seekable,
 				  xoffset_t       offset,
-				  GSeekType     type,
+				  xseek_type_t     type,
 				  xcancellable_t *cancellable,
 				  xerror_t      **error);
 
@@ -86,7 +86,7 @@ xboolean_t xseekable_can_seek     (xseekable__t     *seekable);
 XPL_AVAILABLE_IN_ALL
 xboolean_t xseekable_seek         (xseekable__t     *seekable,
 				  xoffset_t        offset,
-				  GSeekType      type,
+				  xseek_type_t      type,
 				  xcancellable_t  *cancellable,
 				  xerror_t       **error);
 XPL_AVAILABLE_IN_ALL

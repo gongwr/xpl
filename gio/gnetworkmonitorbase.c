@@ -31,8 +31,8 @@
 #include "gtask.h"
 #include "glibintl.h"
 
-static void g_network_monitor_base_iface_init (GNetworkMonitorInterface *iface);
-static void g_network_monitor_base_initable_iface_init (xinitable_iface_t *iface);
+static void xnetwork_monitor_base_iface_init (GNetworkMonitorInterface *iface);
+static void xnetwork_monitor_base_initable_iface_init (xinitable_iface_t *iface);
 
 enum
 {
@@ -62,12 +62,12 @@ static xuint_t inet_address_mask_hash (xconstpointer key);
 static xboolean_t inet_address_mask_equal (xconstpointer a,
                                          xconstpointer b);
 
-G_DEFINE_TYPE_WITH_CODE (xnetwork_monitor_base_t, g_network_monitor_base, XTYPE_OBJECT,
-                         G_ADD_PRIVATE (xnetwork_monitor_base_t)
+G_DEFINE_TYPE_WITH_CODE (xnetwork_monitor_base, xnetwork_monitor_base, XTYPE_OBJECT,
+                         G_ADD_PRIVATE (xnetwork_monitor_base)
                          G_IMPLEMENT_INTERFACE (XTYPE_INITABLE,
-                                                g_network_monitor_base_initable_iface_init)
+                                                xnetwork_monitor_base_initable_iface_init)
                          G_IMPLEMENT_INTERFACE (XTYPE_NETWORK_MONITOR,
-                                                g_network_monitor_base_iface_init)
+                                                xnetwork_monitor_base_iface_init)
                          _xio_modules_ensure_extension_points_registered ();
                          g_io_extension_point_implement (G_NETWORK_MONITOR_EXTENSION_POINT_NAME,
                                                          g_define_type_id,
@@ -75,9 +75,9 @@ G_DEFINE_TYPE_WITH_CODE (xnetwork_monitor_base_t, g_network_monitor_base, XTYPE_
                                                          0))
 
 static void
-g_network_monitor_base_init (xnetwork_monitor_base_t *monitor)
+xnetwork_monitor_base_init (xnetwork_monitor_base_t *monitor)
 {
-  monitor->priv = g_network_monitor_base_get_instance_private (monitor);
+  monitor->priv = xnetwork_monitor_base_get_instance_private (monitor);
   monitor->priv->networks = xhash_table_new_full (inet_address_mask_hash,
                                                    inet_address_mask_equal,
                                                    xobject_unref, NULL);
@@ -89,7 +89,7 @@ g_network_monitor_base_init (xnetwork_monitor_base_t *monitor)
 }
 
 static void
-g_network_monitor_base_constructed (xobject_t *object)
+xnetwork_monitor_base_constructed (xobject_t *object)
 {
   xnetwork_monitor_base_t *monitor = G_NETWORK_MONITOR_BASE (object);
 
@@ -101,7 +101,7 @@ g_network_monitor_base_constructed (xobject_t *object)
        * assume that the network is available.
        */
       mask = xinet_address_mask_new_from_string ("0.0.0.0/0", NULL);
-      g_network_monitor_base_add_network (monitor, mask);
+      xnetwork_monitor_base_add_network (monitor, mask);
       xobject_unref (mask);
 
       mask = xinet_address_mask_new_from_string ("::/0", NULL);
@@ -110,14 +110,14 @@ g_network_monitor_base_constructed (xobject_t *object)
           /* On some environments (for example Windows without IPv6 support
            * enabled) the string "::/0" can't be processed and causes
            * xinet_address_mask_new_from_string to return NULL */
-          g_network_monitor_base_add_network (monitor, mask);
+          xnetwork_monitor_base_add_network (monitor, mask);
           xobject_unref (mask);
         }
     }
 }
 
 static void
-g_network_monitor_base_get_property (xobject_t    *object,
+xnetwork_monitor_base_get_property (xobject_t    *object,
                                      xuint_t       prop_id,
                                      xvalue_t     *value,
                                      xparam_spec_t *pspec)
@@ -150,7 +150,7 @@ g_network_monitor_base_get_property (xobject_t    *object,
 }
 
 static void
-g_network_monitor_base_finalize (xobject_t *object)
+xnetwork_monitor_base_finalize (xobject_t *object)
 {
   xnetwork_monitor_base_t *monitor = G_NETWORK_MONITOR_BASE (object);
 
@@ -163,17 +163,17 @@ g_network_monitor_base_finalize (xobject_t *object)
   if (monitor->priv->context)
     xmain_context_unref (monitor->priv->context);
 
-  G_OBJECT_CLASS (g_network_monitor_base_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xnetwork_monitor_base_parent_class)->finalize (object);
 }
 
 static void
-g_network_monitor_base_class_init (xnetwork_monitor_base_class_t *monitor_class)
+xnetwork_monitor_base_class_init (xnetwork_monitor_base_class_t *monitor_class)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (monitor_class);
 
-  gobject_class->constructed  = g_network_monitor_base_constructed;
-  gobject_class->get_property = g_network_monitor_base_get_property;
-  gobject_class->finalize     = g_network_monitor_base_finalize;
+  gobject_class->constructed  = xnetwork_monitor_base_constructed;
+  gobject_class->get_property = xnetwork_monitor_base_get_property;
+  gobject_class->finalize     = xnetwork_monitor_base_finalize;
 
   xobject_class_override_property (gobject_class, PROP_NETWORK_AVAILABLE, "network-available");
   xobject_class_override_property (gobject_class, PROP_NETWORK_METERED, "network-metered");
@@ -181,7 +181,7 @@ g_network_monitor_base_class_init (xnetwork_monitor_base_class_t *monitor_class)
 }
 
 static xboolean_t
-g_network_monitor_base_can_reach_sockaddr (xnetwork_monitor_base_t *base,
+xnetwork_monitor_base_can_reach_sockaddr (xnetwork_monitor_base_t *base,
                                            xsocket_address_t *sockaddr)
 {
   xinet_address_t *iaddr;
@@ -204,7 +204,7 @@ g_network_monitor_base_can_reach_sockaddr (xnetwork_monitor_base_t *base,
 }
 
 static xboolean_t
-g_network_monitor_base_can_reach (xnetwork_monitor_t      *monitor,
+xnetwork_monitor_base_can_reach (xnetwork_monitor_t      *monitor,
                                   xsocket_connectable_t   *connectable,
                                   xcancellable_t         *cancellable,
                                   xerror_t              **error)
@@ -239,7 +239,7 @@ g_network_monitor_base_can_reach (xnetwork_monitor_t      *monitor,
 
   while (addr)
     {
-      if (g_network_monitor_base_can_reach_sockaddr (base, addr))
+      if (xnetwork_monitor_base_can_reach_sockaddr (base, addr))
         {
           xobject_unref (addr);
           xobject_unref (enumerator);
@@ -290,7 +290,7 @@ can_reach_async_got_address (xobject_t      *object,
         }
     }
 
-  if (g_network_monitor_base_can_reach_sockaddr (base, addr))
+  if (xnetwork_monitor_base_can_reach_sockaddr (base, addr))
     {
       xobject_unref (addr);
       xtask_return_boolean (task, TRUE);
@@ -305,7 +305,7 @@ can_reach_async_got_address (xobject_t      *object,
 }
 
 static void
-g_network_monitor_base_can_reach_async (xnetwork_monitor_t     *monitor,
+xnetwork_monitor_base_can_reach_async (xnetwork_monitor_t     *monitor,
                                         xsocket_connectable_t  *connectable,
                                         xcancellable_t        *cancellable,
                                         xasync_ready_callback_t  callback,
@@ -315,7 +315,7 @@ g_network_monitor_base_can_reach_async (xnetwork_monitor_t     *monitor,
   xsocket_address_enumerator_t *enumerator;
 
   task = xtask_new (monitor, cancellable, callback, user_data);
-  xtask_set_source_tag (task, g_network_monitor_base_can_reach_async);
+  xtask_set_source_tag (task, xnetwork_monitor_base_can_reach_async);
 
   if (xhash_table_size (G_NETWORK_MONITOR_BASE (monitor)->priv->networks) == 0)
     {
@@ -332,7 +332,7 @@ g_network_monitor_base_can_reach_async (xnetwork_monitor_t     *monitor,
 }
 
 static xboolean_t
-g_network_monitor_base_can_reach_finish (xnetwork_monitor_t  *monitor,
+xnetwork_monitor_base_can_reach_finish (xnetwork_monitor_t  *monitor,
                                          xasync_result_t     *result,
                                          xerror_t          **error)
 {
@@ -342,17 +342,17 @@ g_network_monitor_base_can_reach_finish (xnetwork_monitor_t  *monitor,
 }
 
 static void
-g_network_monitor_base_iface_init (GNetworkMonitorInterface *monitor_iface)
+xnetwork_monitor_base_iface_init (GNetworkMonitorInterface *monitor_iface)
 {
-  monitor_iface->can_reach = g_network_monitor_base_can_reach;
-  monitor_iface->can_reach_async = g_network_monitor_base_can_reach_async;
-  monitor_iface->can_reach_finish = g_network_monitor_base_can_reach_finish;
+  monitor_iface->can_reach = xnetwork_monitor_base_can_reach;
+  monitor_iface->can_reach_async = xnetwork_monitor_base_can_reach_async;
+  monitor_iface->can_reach_finish = xnetwork_monitor_base_can_reach_finish;
 
-  network_changed_signal = g_signal_lookup ("network-changed", XTYPE_NETWORK_MONITOR);
+  network_changed_signal = xsignal_lookup ("network-changed", XTYPE_NETWORK_MONITOR);
 }
 
 static xboolean_t
-g_network_monitor_base_initable_init (xinitable_t     *initable,
+xnetwork_monitor_base_initable_init (xinitable_t     *initable,
                                       xcancellable_t  *cancellable,
                                       xerror_t       **error)
 {
@@ -364,9 +364,9 @@ g_network_monitor_base_initable_init (xinitable_t     *initable,
 }
 
 static void
-g_network_monitor_base_initable_iface_init (xinitable_iface_t *iface)
+xnetwork_monitor_base_initable_iface_init (xinitable_iface_t *iface)
 {
-  iface->init = g_network_monitor_base_initable_init;
+  iface->init = xnetwork_monitor_base_initable_init;
 }
 
 static xuint_t
@@ -442,7 +442,7 @@ emit_network_changed (xpointer_t user_data)
       xobject_notify (G_OBJECT (monitor), "network-available");
     }
 
-  g_signal_emit (monitor, network_changed_signal, 0, is_available);
+  xsignal_emit (monitor, network_changed_signal, 0, is_available);
 
   xsource_unref (monitor->priv->network_changed_source);
   monitor->priv->network_changed_source = NULL;
@@ -484,7 +484,7 @@ queue_network_changed (xnetwork_monitor_base_t *monitor)
 }
 
 /**
- * g_network_monitor_base_add_network:
+ * xnetwork_monitor_base_add_network:
  * @monitor: the #xnetwork_monitor_base_t
  * @network: (transfer none): a #xinet_address_mask_t
  *
@@ -493,7 +493,7 @@ queue_network_changed (xnetwork_monitor_base_t *monitor)
  * Since: 2.32
  */
 void
-g_network_monitor_base_add_network (xnetwork_monitor_base_t *monitor,
+xnetwork_monitor_base_add_network (xnetwork_monitor_base_t *monitor,
                                     xinet_address_mask_t    *network)
 {
   if (!xhash_table_add (monitor->priv->networks, xobject_ref (network)))
@@ -525,7 +525,7 @@ g_network_monitor_base_add_network (xnetwork_monitor_base_t *monitor,
 }
 
 /**
- * g_network_monitor_base_remove_network:
+ * xnetwork_monitor_base_remove_network:
  * @monitor: the #xnetwork_monitor_base_t
  * @network: a #xinet_address_mask_t
  *
@@ -534,7 +534,7 @@ g_network_monitor_base_add_network (xnetwork_monitor_base_t *monitor,
  * Since: 2.32
  */
 void
-g_network_monitor_base_remove_network (xnetwork_monitor_base_t *monitor,
+xnetwork_monitor_base_remove_network (xnetwork_monitor_base_t *monitor,
                                        xinet_address_mask_t    *network)
 {
   if (!xhash_table_remove (monitor->priv->networks, network))
@@ -559,7 +559,7 @@ g_network_monitor_base_remove_network (xnetwork_monitor_base_t *monitor,
 }
 
 /**
- * g_network_monitor_base_set_networks:
+ * xnetwork_monitor_base_set_networks:
  * @monitor: the #xnetwork_monitor_base_t
  * @networks: (array length=length): an array of #xinet_address_mask_t
  * @length: length of @networks
@@ -568,7 +568,7 @@ g_network_monitor_base_remove_network (xnetwork_monitor_base_t *monitor,
  * it with @networks.
  */
 void
-g_network_monitor_base_set_networks (xnetwork_monitor_base_t  *monitor,
+xnetwork_monitor_base_set_networks (xnetwork_monitor_base_t  *monitor,
                                      xinet_address_mask_t    **networks,
                                      xint_t                  length)
 {
@@ -579,5 +579,5 @@ g_network_monitor_base_set_networks (xnetwork_monitor_base_t  *monitor,
   monitor->priv->have_ipv6_default_route = FALSE;
 
   for (i = 0; i < length; i++)
-    g_network_monitor_base_add_network (monitor, networks[i]);
+    xnetwork_monitor_base_add_network (monitor, networks[i]);
 }

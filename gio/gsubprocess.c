@@ -313,7 +313,7 @@ initable_init (xinitable_t     *initable,
   if (!self->argv || !self->argv[0] || !self->argv[0][0])
     return FALSE;
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
   /* We must setup the three fds that will end up in the child as stdin,
@@ -754,7 +754,7 @@ xsubprocess_wait_async (xsubprocess_t         *subprocess,
        * see the cancellation in the _finish().
        */
       if (cancellable)
-        g_signal_connect_object (cancellable, "cancelled", G_CALLBACK (xsubprocess_wait_cancelled), task, 0);
+        xsignal_connect_object (cancellable, "cancelled", G_CALLBACK (xsubprocess_wait_cancelled), task, 0);
 
       subprocess->pending_waits = xslist_prepend (subprocess->pending_waits, task);
       task = NULL;
@@ -861,7 +861,7 @@ xsubprocess_wait (xsubprocess_t   *subprocess,
    * So we make one and then do this async...
    */
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
   /* We can shortcut in the case that the process already quit (but only
@@ -1357,7 +1357,7 @@ xsubprocess_communicate_made_progress (xobject_t      *source_object,
       if (!state->reported_error)
         {
           state->reported_error = TRUE;
-          g_cancellable_cancel (state->cancellable);
+          xcancellable_cancel (state->cancellable);
           xtask_return_error (task, error);
         }
       else
@@ -1378,7 +1378,7 @@ xsubprocess_communicate_cancelled (xcancellable_t *cancellable,
 {
   CommunicateState *state = user_data;
 
-  g_cancellable_cancel (state->cancellable);
+  xcancellable_cancel (state->cancellable);
 
   return FALSE;
 }
@@ -1419,12 +1419,12 @@ xsubprocess_communicate_internal (xsubprocess_t         *subprocess,
   state = g_slice_new0 (CommunicateState);
   xtask_set_task_data (task, state, xsubprocess_communicate_state_free);
 
-  state->cancellable = g_cancellable_new ();
+  state->cancellable = xcancellable_new ();
   state->add_nul = add_nul;
 
   if (cancellable)
     {
-      state->cancellable_source = g_cancellable_source_new (cancellable);
+      state->cancellable_source = xcancellable_source_new (cancellable);
       /* No ref held here, but we unref the source from state's free function */
       xsource_set_callback (state->cancellable_source,
                              G_SOURCE_FUNC (xsubprocess_communicate_cancelled),

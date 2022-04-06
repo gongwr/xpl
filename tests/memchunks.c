@@ -49,8 +49,8 @@ static xuint_t mem_chunk_recursion = 0;
 
 /* --- old memchunk prototypes --- */
 GMemChunk*      old_mem_chunk_new       (const xchar_t  *name,
-                                         gulong        atom_size,
-                                         gulong        area_size,
+                                         xulong_t        atom_size,
+                                         xulong_t        area_size,
                                          xint_t          type);
 void            old_mem_chunk_destroy   (GMemChunk *mem_chunk);
 xpointer_t        old_mem_chunk_alloc     (GMemChunk *mem_chunk);
@@ -83,10 +83,10 @@ struct _GMemArea
 {
   GMemArea *next;            /* the next mem area */
   GMemArea *prev;            /* the previous mem area */
-  gulong index;              /* the current index into the "mem" array */
-  gulong free;               /* the number of free bytes in this mem area */
-  gulong allocated;          /* the number of atoms allocated from this area */
-  gulong mark;               /* is this mem area marked for deletion */
+  xulong_t index;              /* the current index into the "mem" array */
+  xulong_t free;               /* the number of free bytes in this mem area */
+  xulong_t allocated;          /* the number of atoms allocated from this area */
+  xulong_t mark;               /* is this mem area marked for deletion */
   xchar_t mem[MEM_AREA_SIZE];  /* the mem array from which atoms get allocated
 			      * the actual size of this array is determined by
 			      *  the mem chunk "area_size". ANSI says that it
@@ -103,7 +103,7 @@ struct _GMemChunk
   xint_t num_mem_areas;        /* the number of memory areas */
   xint_t num_marked_areas;     /* the number of areas marked for deletion */
   xuint_t atom_size;           /* the size of an atom */
-  gulong area_size;          /* the size of a memory area */
+  xulong_t area_size;          /* the size of a memory area */
   GMemArea *mem_area;        /* the current memory area */
   GMemArea *mem_areas;       /* a list of all the mem areas owned by this chunk */
   GMemArea *free_mem_area;   /* the free area...which is about to be destroyed */
@@ -114,8 +114,8 @@ struct _GMemChunk
 };
 
 
-static gulong old_mem_chunk_compute_size (gulong    size,
-                                          gulong    min_size) G_GNUC_CONST;
+static xulong_t old_mem_chunk_compute_size (xulong_t    size,
+                                          xulong_t    min_size) G_GNUC_CONST;
 static xint_t   old_mem_chunk_area_compare (GMemArea *a,
                                           GMemArea *b);
 static xint_t   old_mem_chunk_area_search  (GMemArea *a,
@@ -129,12 +129,12 @@ static GMemChunk     *mem_chunks = NULL;
 
 GMemChunk*
 old_mem_chunk_new (const xchar_t  *name,
-                   gulong        atom_size,
-                   gulong        area_size,
+                   xulong_t        atom_size,
+                   xulong_t        area_size,
                    xint_t          type)
 {
   GMemChunk *mem_chunk;
-  gulong rarea_size;
+  xulong_t rarea_size;
 
   g_return_val_if_fail (atom_size > 0, NULL);
   g_return_val_if_fail (area_size >= atom_size, NULL);
@@ -511,7 +511,7 @@ void
 old_mem_chunk_print (GMemChunk *mem_chunk)
 {
   GMemArea *mem_areas;
-  gulong mem;
+  xulong_t mem;
 
   g_return_if_fail (mem_chunk != NULL);
 
@@ -558,12 +558,12 @@ old_mem_chunk_info (void)
     }
 }
 
-static gulong
-old_mem_chunk_compute_size (gulong size,
-                            gulong min_size)
+static xulong_t
+old_mem_chunk_compute_size (xulong_t size,
+                            xulong_t min_size)
 {
-  gulong power_of_2;
-  gulong lower, upper;
+  xulong_t power_of_2;
+  xulong_t lower, upper;
 
   power_of_2 = 16;
   while (power_of_2 < size)

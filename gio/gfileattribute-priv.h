@@ -33,7 +33,7 @@ typedef struct  {
     xboolean_t boolean;
     gint32 int32;
     xuint32_t uint32;
-    gint64 int64;
+    sint64_t int64;
     xuint64_t uint64;
     char *string;
     xobject_t *obj;
@@ -57,7 +57,7 @@ xboolean_t             _xfile_attribute_value_get_boolean     (const GFileAttrib
 xuint32_t              _xfile_attribute_value_get_uint32      (const GFileAttributeValue *attr);
 gint32               _xfile_attribute_value_get_int32       (const GFileAttributeValue *attr);
 xuint64_t              _xfile_attribute_value_get_uint64      (const GFileAttributeValue *attr);
-gint64               _xfile_attribute_value_get_int64       (const GFileAttributeValue *attr);
+sint64_t               _xfile_attribute_value_get_int64       (const GFileAttributeValue *attr);
 xobject_t *            _xfile_attribute_value_get_object      (const GFileAttributeValue *attr);
 char **              _xfile_attribute_value_get_stringv     (const GFileAttributeValue *attr);
 
@@ -78,7 +78,7 @@ void                 _xfile_attribute_value_set_int32       (GFileAttributeValue
 void                 _xfile_attribute_value_set_uint64      (GFileAttributeValue *attr,
 							      xuint64_t              value);
 void                 _xfile_attribute_value_set_int64       (GFileAttributeValue *attr,
-							      gint64               value);
+							      sint64_t               value);
 void                 _xfile_attribute_value_set_object      (GFileAttributeValue *attr,
 							      xobject_t             *obj);
 void                 _xfile_attribute_value_set_stringv     (GFileAttributeValue *attr,

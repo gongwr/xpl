@@ -86,7 +86,7 @@ test_app_monitor (Fixture       *fixture,
   monitor = xapp_info_monitor_get ();
   loop = xmain_loop_new (NULL, FALSE);
 
-  g_signal_connect (monitor, "changed", G_CALLBACK (changed_cb), loop);
+  xsignal_connect (monitor, "changed", G_CALLBACK (changed_cb), loop);
 
   g_idle_add (create_app, app_path);
   g_timeout_add_seconds (3, quit_loop, loop);

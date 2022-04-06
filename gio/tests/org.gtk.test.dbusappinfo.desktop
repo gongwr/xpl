@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Test
+Name=test_t
 Actions=frob;tweak;twiddle;quit;
 StartupNotify=true
 DBusActivatable=true

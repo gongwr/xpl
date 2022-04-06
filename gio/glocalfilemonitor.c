@@ -54,7 +54,7 @@ struct _GFileMonitorSource {
   xsequence_t    *pending_changes; /* sorted by ready time */
   xhashtable_t   *pending_changes_table;
   xqueue_t        event_queue;
-  gint64        rate_limit;
+  sint64_t        rate_limit;
 };
 
 /* PendingChange is a struct to keep track of a file that needs to have
@@ -82,7 +82,7 @@ typedef struct
   xfile_t *other;
 } QueuedEvent;
 
-static gint64
+static sint64_t
 pending_change_get_ready_time (const PendingChange *change,
                                GFileMonitorSource  *fms)
 {
@@ -100,8 +100,8 @@ pending_change_compare_ready_time (xconstpointer a_p,
   GFileMonitorSource *fms = user_data;
   const PendingChange *a = a_p;
   const PendingChange *b = b_p;
-  gint64 ready_time_a;
-  gint64 ready_time_b;
+  sint64_t ready_time_a;
+  sint64_t ready_time_b;
 
   ready_time_a = pending_change_get_ready_time (a, fms);
   ready_time_b = pending_change_get_ready_time (b, fms);
@@ -132,7 +132,7 @@ queued_event_free (QueuedEvent *event)
   g_slice_free (QueuedEvent, event);
 }
 
-static gint64
+static sint64_t
 xfile_monitor_source_get_ready_time (GFileMonitorSource *fms)
 {
   GSequenceIter *iter;
@@ -163,7 +163,7 @@ xfile_monitor_source_find_pending_change (GFileMonitorSource *fms,
 static void
 xfile_monitor_source_add_pending_change (GFileMonitorSource *fms,
                                           const xchar_t        *child,
-                                          gint64              now)
+                                          sint64_t              now)
 {
   PendingChange *change;
   GSequenceIter *iter;
@@ -251,7 +251,7 @@ xfile_monitor_source_queue_event (GFileMonitorSource *fms,
 static xboolean_t
 xfile_monitor_source_file_changed (GFileMonitorSource *fms,
                                     const xchar_t        *child,
-                                    gint64              now)
+                                    sint64_t              now)
 {
   GSequenceIter *pending;
   xboolean_t interesting;
@@ -296,7 +296,7 @@ xfile_monitor_source_file_changes_done (GFileMonitorSource *fms,
 static void
 xfile_monitor_source_file_created (GFileMonitorSource *fms,
                                     const xchar_t        *child,
-                                    gint64              event_time)
+                                    sint64_t              event_time)
 {
   /* Unlikely, but if we have pending changes for this filename, make
    * sure we flush those out first, before creating the new ones.
@@ -345,7 +345,7 @@ xfile_monitor_source_handle_event (GFileMonitorSource *fms,
                                     const xchar_t        *child,
                                     const xchar_t        *rename_to,
                                     xfile_t              *other,
-                                    gint64              event_time)
+                                    sint64_t              event_time)
 {
   xboolean_t interesting = TRUE;
   xfile_monitor_t *instance = NULL;
@@ -457,10 +457,10 @@ xfile_monitor_source_handle_event (GFileMonitorSource *fms,
   return interesting;
 }
 
-static gint64
+static sint64_t
 xfile_monitor_source_get_rate_limit (GFileMonitorSource *fms)
 {
-  gint64 rate_limit;
+  sint64_t rate_limit;
 
   g_mutex_lock (&fms->lock);
   rate_limit = fms->rate_limit;
@@ -471,7 +471,7 @@ xfile_monitor_source_get_rate_limit (GFileMonitorSource *fms)
 
 static xboolean_t
 xfile_monitor_source_set_rate_limit (GFileMonitorSource *fms,
-                                      gint64              rate_limit)
+                                      sint64_t              rate_limit)
 {
   xboolean_t changed;
 
@@ -502,7 +502,7 @@ xfile_monitor_source_dispatch (xsource_t     *source,
   GFileMonitorSource *fms = (GFileMonitorSource *) source;
   QueuedEvent *event;
   xqueue_t event_queue;
-  gint64 now;
+  sint64_t now;
   xfile_monitor_t *instance = NULL;
 
   /* make sure the monitor still exists */
@@ -701,7 +701,7 @@ g_local_file_monitor_get_property (xobject_t *object, xuint_t prop_id,
                                    xvalue_t *value, xparam_spec_t *pspec)
 {
   xlocal_file_monitor_t *monitor = G_LOCAL_FILE_MONITOR (object);
-  gint64 rate_limit;
+  sint64_t rate_limit;
 
   g_assert (prop_id == PROP_RATE_LIMIT);
 
@@ -716,7 +716,7 @@ g_local_file_monitor_set_property (xobject_t *object, xuint_t prop_id,
                                    const xvalue_t *value, xparam_spec_t *pspec)
 {
   xlocal_file_monitor_t *monitor = G_LOCAL_FILE_MONITOR (object);
-  gint64 rate_limit;
+  sint64_t rate_limit;
 
   g_assert (prop_id == PROP_RATE_LIMIT);
 
@@ -793,7 +793,7 @@ g_local_file_monitor_start (xlocal_file_monitor_t *local_monitor,
         g_unix_mount_free (mount);
 
       local_monitor->mount_monitor = g_unix_mount_monitor_get ();
-      g_signal_connect_object (local_monitor->mount_monitor, "mounts-changed",
+      xsignal_connect_object (local_monitor->mount_monitor, "mounts-changed",
                                G_CALLBACK (g_local_file_monitor_mounts_changed), local_monitor, 0);
 #endif
     }
@@ -908,7 +908,7 @@ g_local_file_monitor_new_in_worker (const xchar_t           *pathname,
   if (monitor)
     {
       if (callback)
-        g_signal_connect_data (monitor, "changed", G_CALLBACK (callback),
+        xsignal_connect_data (monitor, "changed", G_CALLBACK (callback),
                                user_data, destroy_user_data, 0  /* flags */);
 
       g_local_file_monitor_start (monitor, pathname, is_directory, flags, XPL_PRIVATE_CALL(g_get_worker_context) ());

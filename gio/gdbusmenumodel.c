@@ -34,7 +34,7 @@
  *
  * #xdbus_menu_model_t is an implementation of #xmenu_model_t that can be used
  * as a proxy for a menu model that is exported over D-Bus with
- * g_dbus_connection_export_menu_model().
+ * xdbus_connection_export_menu_model().
  */
 
 /**
@@ -304,7 +304,7 @@ static void
 g_dbus_menu_path_activate (GDBusMenuPath *path)
 {
   if (path->active++ == 0)
-    path->watch_id = g_dbus_connection_signal_subscribe (path->id->connection, path->id->bus_name,
+    path->watch_id = xdbus_connection_signal_subscribe (path->id->connection, path->id->bus_name,
                                                          "org.gtk.Menus", "Changed", path->id->object_path,
                                                          NULL, G_DBUS_SIGNAL_FLAGS_NONE,
                                                          g_dbus_menu_path_signal, path, NULL);
@@ -314,7 +314,7 @@ static void
 g_dbus_menu_path_deactivate (GDBusMenuPath *path)
 {
   if (--path->active == 0)
-    g_dbus_connection_signal_unsubscribe (path->id->connection, path->watch_id);
+    xdbus_connection_signal_unsubscribe (path->id->connection, path->watch_id);
 }
 
 static GDBusMenuPath *
@@ -482,7 +482,7 @@ static void
 g_dbus_menu_group_go_offline (GDBusMenuGroup *group)
 {
   g_dbus_menu_path_deactivate (group->path);
-  g_dbus_connection_call (group->path->id->connection,
+  xdbus_connection_call (group->path->id->connection,
                           group->path->id->bus_name,
                           group->path->id->object_path,
                           "org.gtk.Menus", "End",
@@ -504,7 +504,7 @@ g_dbus_menu_group_start_ready (xobject_t      *source_object,
 
   g_assert (group->state == GROUP_PENDING);
 
-  reply = g_dbus_connection_call_finish (connection, result, NULL);
+  reply = xdbus_connection_call_finish (connection, result, NULL);
 
   if (group->active)
     {
@@ -545,7 +545,7 @@ g_dbus_menu_group_activate (GDBusMenuGroup *group)
         {
           g_dbus_menu_path_activate (group->path);
 
-          g_dbus_connection_call (group->path->id->connection,
+          xdbus_connection_call (group->path->id->connection,
                                   group->path->id->bus_name,
                                   group->path->id->object_path,
                                   "org.gtk.Menus", "Start",
@@ -884,7 +884,7 @@ g_dbus_menu_model_get (xdbus_connection_t *connection,
   xdbus_menu_model_t *proxy;
   xmain_context_t *context;
 
-  g_return_val_if_fail (bus_name != NULL || g_dbus_connection_get_unique_name (connection) == NULL, NULL);
+  g_return_val_if_fail (bus_name != NULL || xdbus_connection_get_unique_name (connection) == NULL, NULL);
 
   context = xmain_context_get_thread_default ();
   if (context == NULL)

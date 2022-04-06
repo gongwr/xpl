@@ -23,7 +23,7 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_NETWORK_MONITOR_BASE         (g_network_monitor_base_get_type ())
+#define XTYPE_NETWORK_MONITOR_BASE         (xnetwork_monitor_base_get_type ())
 #define G_NETWORK_MONITOR_BASE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NETWORK_MONITOR_BASE, xnetwork_monitor_base))
 #define G_NETWORK_MONITOR_BASE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NETWORK_MONITOR_BASE, xnetwork_monitor_base_class))
 #define X_IS_NETWORK_MONITOR_BASE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NETWORK_MONITOR_BASE))
@@ -49,17 +49,17 @@ struct _Xnetwork_monitor_base_class_t {
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t g_network_monitor_base_get_type (void);
+xtype_t xnetwork_monitor_base_get_type (void);
 
 /*< protected >*/
 XPL_AVAILABLE_IN_2_32
-void g_network_monitor_base_add_network    (xnetwork_monitor_base_t  *monitor,
+void xnetwork_monitor_base_add_network    (xnetwork_monitor_base_t  *monitor,
 					    xinet_address_mask_t     *network);
 XPL_AVAILABLE_IN_2_32
-void g_network_monitor_base_remove_network (xnetwork_monitor_base_t  *monitor,
+void xnetwork_monitor_base_remove_network (xnetwork_monitor_base_t  *monitor,
 					    xinet_address_mask_t     *network);
 XPL_AVAILABLE_IN_ALL
-void g_network_monitor_base_set_networks   (xnetwork_monitor_base_t  *monitor,
+void xnetwork_monitor_base_set_networks   (xnetwork_monitor_base_t  *monitor,
 					    xinet_address_mask_t    **networks,
 					    xint_t                  length);
 

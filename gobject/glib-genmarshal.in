@@ -270,7 +270,7 @@ IN_ARGS = {
     },
     'UCHAR': {
         'signal': 'UCHAR',
-        'ctype': 'guchar',
+        'ctype': 'xuchar_t',
         'promoted': 'xuint_t',
         'getter': 'g_marshal_value_peek_uchar',
     },
@@ -291,12 +291,12 @@ IN_ARGS = {
     },
     'ULONG': {
         'signal': 'ULONG',
-        'ctype': 'gulong',
+        'ctype': 'xulong_t',
         'getter': 'g_marshal_value_peek_ulong',
     },
     'INT64': {
         'signal': 'INT64',
-        'ctype': 'gint64',
+        'ctype': 'sint64_t',
         'getter': 'g_marshal_value_peek_int64',
     },
     'UINT64': {
@@ -412,7 +412,7 @@ OUT_ARGS = {
     },
     'UCHAR': {
         'signal': 'UCHAR',
-        'ctype': 'guchar',
+        'ctype': 'xuchar_t',
         'setter': 'xvalue_set_uchar',
     },
     'INT': {
@@ -432,12 +432,12 @@ OUT_ARGS = {
     },
     'ULONG': {
         'signal': 'ULONG',
-        'ctype': 'gulong',
+        'ctype': 'xulong_t',
         'setter': 'xvalue_set_ulong',
     },
     'INT64': {
         'signal': 'INT64',
-        'ctype': 'gint64',
+        'ctype': 'sint64_t',
         'setter': 'xvalue_set_int64',
     },
     'UINT64': {

@@ -765,7 +765,7 @@ g_keyfile_settings_backend_constructed (xobject_t *object)
     }
   else
     {
-      g_signal_connect (kfsb->file_monitor, "changed",
+      xsignal_connect (kfsb->file_monitor, "changed",
                         G_CALLBACK (file_changed), kfsb);
     }
 
@@ -777,7 +777,7 @@ g_keyfile_settings_backend_constructed (xobject_t *object)
     }
   else
     {
-      g_signal_connect (kfsb->dir_monitor, "changed",
+      xsignal_connect (kfsb->dir_monitor, "changed",
                         G_CALLBACK (dir_changed), kfsb);
     }
 

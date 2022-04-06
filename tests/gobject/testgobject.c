@@ -207,7 +207,7 @@ test_object_class_init (test_object_class_t *class)
 
   class->test_signal = test_object_test_signal;
 
-  g_signal_new ("test-signal",
+  xsignal_new ("test-signal",
 		G_OBJECT_CLASS_TYPE (class),
 		G_SIGNAL_RUN_FIRST | G_SIGNAL_RUN_LAST | G_SIGNAL_RUN_CLEANUP,
 		G_STRUCT_OFFSET (test_object_class_t, test_signal),
@@ -423,7 +423,7 @@ main (int   argc,
   sigarg = xobject_new (TEST_TYPE_OBJECT, NULL);
 
   g_print ("MAIN: emit test-signal:\n");
-  g_signal_emit_by_name (dobject, "test-signal", sigarg, NULL, &string);
+  xsignal_emit_by_name (dobject, "test-signal", sigarg, NULL, &string);
   g_message ("signal return: \"%s\"", string);
   g_assert_cmpstr (string, ==, "<default_handler><default_handler><default_handler>");
   g_free (string);

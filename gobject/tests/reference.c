@@ -624,7 +624,7 @@ test_weak_ref_on_dispose (void)
   GWeakRef weak = { { GUINT_TO_POINTER (0xDEADBEEFU) } };
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2390");
-  g_test_summary ("Test that a weak ref set during dispose vfunc is cleared");
+  g_test_summary ("test_t that a weak ref set during dispose vfunc is cleared");
 
   g_weak_ref_init (&weak, NULL);
 
@@ -644,7 +644,7 @@ test_weak_ref_on_run_dispose (void)
   GWeakRef weak = { { GUINT_TO_POINTER (0xDEADBEEFU) } };
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/865");
-  g_test_summary ("Test that a weak ref is cleared on xobject_run_dispose()");
+  g_test_summary ("test_t that a weak ref is cleared on xobject_run_dispose()");
 
   obj = xobject_new (XTYPE_OBJECT, NULL);
   g_weak_ref_init (&weak, obj);
@@ -687,7 +687,7 @@ test_weak_ref_on_toggle_notify (void)
   GWeakRef weak = { { GUINT_TO_POINTER (0xDEADBEEFU) } };
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2390");
-  g_test_summary ("Test that a weak ref set on toggle notify is cleared");
+  g_test_summary ("test_t that a weak ref set on toggle notify is cleared");
 
   g_weak_ref_init (&weak, NULL);
 

@@ -328,7 +328,7 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
     <para>
       If you are using GIO on UNIX-like systems, you may want to use
       UNIX-specific GIO interfaces such as #GUnixInputStream,
-      #GUnixOutputStream, #GUnixMount or #GDesktopAppInfo.
+      #GUnixOutputStream, #GUnixMount or #xdesktop_app_info_t.
       To do so, use the <filename>gio-unix-2.0.pc</filename> file
       instead of <filename>gio-2.0.pc</filename>
     </para>
@@ -536,7 +536,7 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
            </varlistentry>
            <varlistentry>
              <term>call</term>
-             <listitem><para>Trace g_dbus_connection_call() and g_dbus_connection_call_sync() API usage</para></listitem>
+             <listitem><para>Trace xdbus_connection_call() and xdbus_connection_call_sync() API usage</para></listitem>
            </varlistentry>
            <varlistentry>
              <term>signal</term>
@@ -552,7 +552,7 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
            </varlistentry>
            <varlistentry>
              <term>emission</term>
-             <listitem><para>Trace g_dbus_connection_emit_signal() API usage</para></listitem>
+             <listitem><para>Trace xdbus_connection_emit_signal() API usage</para></listitem>
            </varlistentry>
            <varlistentry>
              <term>authentication</term>

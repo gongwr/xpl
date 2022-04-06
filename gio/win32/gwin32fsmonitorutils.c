@@ -121,7 +121,7 @@ g_win32_fs_monitor_callback (DWORD        error,
                              DWORD        nBytes,
                              LPOVERLAPPED lpOverlapped)
 {
-  gulong offset;
+  xulong_t offset;
   PFILE_NOTIFY_INFORMATION pfile_notify_walker;
   GWin32FSMonitorPrivate *monitor = (GWin32FSMonitorPrivate *) lpOverlapped;
 

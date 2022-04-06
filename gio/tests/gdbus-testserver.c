@@ -257,13 +257,13 @@ handle_method_call (xdbus_connection_t       *connection,
     }
   else if (xstrcmp0 (method_name, "TestPrimitiveTypes") == 0)
     {
-      guchar val_byte;
+      xuchar_t val_byte;
       xboolean_t val_boolean;
       gint16 val_int16;
       xuint16_t val_uint16;
       gint32 val_int32;
       xuint32_t val_uint32;
-      gint64 val_int64;
+      sint64_t val_int64;
       xuint64_t val_uint64;
       xdouble_t val_double;
       const xchar_t *val_string;
@@ -313,12 +313,12 @@ handle_method_call (xdbus_connection_t       *connection,
   else if (xstrcmp0 (method_name, "TestArrayOfPrimitiveTypes") == 0)
     {
       xvariant_t *v;
-      const guchar *bytes;
+      const xuchar_t *bytes;
       const gint16 *int16s;
       const xuint16_t *uint16s;
       const gint32 *int32s;
       const xuint32_t *uint32s;
-      const gint64 *int64s;
+      const sint64_t *int64s;
       const xuint64_t *uint64s;
       const xdouble_t *doubles;
       xsize_t n_elts;
@@ -472,7 +472,7 @@ handle_method_call (xdbus_connection_t       *connection,
       xuint16_t q1, q2;
       xint_t i1, i2;
       xuint_t u1, u2;
-      gint64 x1, x2;
+      sint64_t x1, x2;
       xuint64_t t1, t2;
       xdouble_t d1, d2;
       xchar_t *s1, *s2;
@@ -685,7 +685,7 @@ handle_method_call (xdbus_connection_t       *connection,
       xvariant_t *value;
       xvariant_get (parameters, "(sv)", &name, &value);
       xhash_table_replace (properties, name, value);
-      g_dbus_connection_emit_signal (connection,
+      xdbus_connection_emit_signal (connection,
                                      NULL,
                                      "/com/example/test_object_t",
                                      "org.freedesktop.DBus.Properties",
@@ -700,7 +700,7 @@ handle_method_call (xdbus_connection_t       *connection,
       xvariant_get (parameters, "(&s)", &value);
       xhash_table_replace (properties, xstrdup ("PropertyThatWillBeInvalidated"), xvariant_ref_sink (xvariant_new_string (value)));
 
-      g_dbus_connection_emit_signal (connection,
+      xdbus_connection_emit_signal (connection,
                                      NULL,
                                      "/com/example/test_object_t",
                                      "org.freedesktop.DBus.Properties",
@@ -718,7 +718,7 @@ handle_method_call (xdbus_connection_t       *connection,
       xvariant_get (parameters, "(&s&o)", &str, &path);
       str_ret = xstrconcat (str, " .. in bed!", NULL);
       path_ret = xstrconcat (path, "/in/bed", NULL);
-      g_dbus_connection_emit_signal (connection,
+      xdbus_connection_emit_signal (connection,
                                      NULL,
                                      "/com/example/test_object_t",
                                      "com.example.Frob",
@@ -731,7 +731,7 @@ handle_method_call (xdbus_connection_t       *connection,
     }
   else if (xstrcmp0 (method_name, "EmitSignal2") == 0)
     {
-      g_dbus_connection_emit_signal (connection,
+      xdbus_connection_emit_signal (connection,
                                      NULL,
                                      "/com/example/test_object_t",
                                      "com.example.Frob",
@@ -813,7 +813,7 @@ on_bus_acquired (xdbus_connection_t *connection,
 {
   xuint_t id;
 
-  id = g_dbus_connection_register_object (connection,
+  id = xdbus_connection_register_object (connection,
                                           "/com/example/test_object_t",
                                           introspection_data->interfaces[0],
                                           &interface_vtable,

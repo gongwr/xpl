@@ -215,7 +215,7 @@ test_async_queue_timed (void)
 {
   xasync_queue_t *q;
   GTimeVal tv;
-  gint64 start, end, diff;
+  sint64_t start, end, diff;
   xpointer_t val;
 
   g_get_current_time (&tv);

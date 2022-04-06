@@ -9,7 +9,7 @@ typedef struct
   xvariant_type_t *parameter_type;
   xboolean_t      enabled;
   xvariant_t     *state;
-} RemoteActionInfo;
+} remote_action_info_t;
 
 void                    xapplication_impl_destroy                      (GApplicationImpl   *impl);
 

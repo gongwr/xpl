@@ -569,7 +569,7 @@ utf8_str (const xchar_t *utf8,
   xunichar_t c = xutf8_get_char_validated (utf8, max_len);
   if (c == (xunichar_t) -1 || c == (xunichar_t) -2)
     {
-      guchar ch = (max_len > 0) ? (guchar) *utf8 : 0;
+      xuchar_t ch = (max_len > 0) ? (xuchar_t) *utf8 : 0;
       xchar_t *temp = xstrdup_printf ("\\x%02x", (xuint_t) ch);
       memset (buf, 0, 8);
       memcpy (buf, temp, strlen (temp));
@@ -669,7 +669,7 @@ unescape_xstring_inplace (xmarkup_parse_context_t  *context,
           if (*from == '#')
             {
               xint_t base = 10;
-              gulong l;
+              xulong_t l;
               xchar_t *end = NULL;
 
               from++;
@@ -2213,7 +2213,7 @@ append_escaped_text (xstring_t     *str,
 
   while (p < end && pending < end)
     {
-      guchar c = (guchar) *pending;
+      xuchar_t c = (xuchar_t) *pending;
 
       switch (c)
         {
@@ -2362,7 +2362,7 @@ find_conversion (const char  *format,
       return NULL;
     }
 
-  /* Test for positional argument.  */
+  /* test_t for positional argument.  */
   if (*cp >= '0' && *cp <= '9')
     {
       const char *np;
@@ -2392,7 +2392,7 @@ find_conversion (const char  *format,
     {
       cp++;
 
-      /* Test for positional argument.  */
+      /* test_t for positional argument.  */
       if (*cp >= '0' && *cp <= '9')
         {
           const char *np;
@@ -2415,7 +2415,7 @@ find_conversion (const char  *format,
       cp++;
       if (*cp == '*')
         {
-          /* Test for positional argument.  */
+          /* test_t for positional argument.  */
           if (*cp >= '0' && *cp <= '9')
             {
               const char *np;

@@ -84,11 +84,11 @@ on_bus_acquired (xdbus_connection_t *connection,
   g_test_message ("Acquired a message bus connection");
 
   interface = fake_documents_skeleton_new ();
-  g_signal_connect (interface,
+  xsignal_connect (interface,
                     "handle-get-mount-point",
                     G_CALLBACK (on_handle_get_mount_point),
                     NULL);
-  g_signal_connect (interface,
+  xsignal_connect (interface,
                     "handle-add-full",
                     G_CALLBACK (on_handle_add_full),
                     NULL);

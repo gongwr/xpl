@@ -141,7 +141,7 @@ test_new_valist_invalid_va (xpointer_t dummy,
     };
   xsize_t i;
 
-  g_test_summary ("Test that xerror_new_valist() rejects invalid input");
+  g_test_summary ("test_t that xerror_new_valist() rejects invalid input");
 
   if (!g_test_undefined ())
     {
@@ -154,7 +154,7 @@ test_new_valist_invalid_va (xpointer_t dummy,
       xerror_t *error = NULL, *error_copy = NULL;
       va_list ap;
 
-      g_test_message ("Test %" G_GSIZE_FORMAT, i);
+      g_test_message ("test_t %" G_GSIZE_FORMAT, i);
 
       va_start (ap, dummy);
 
@@ -199,7 +199,7 @@ test_matches (void)
 {
   xerror_t *error = NULL;
 
-  g_test_summary ("Test xerror_matches()");
+  g_test_summary ("test_t xerror_matches()");
 
   error = xerror_new (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "Oh no!");
 
@@ -217,7 +217,7 @@ test_clear (void)
 {
   xerror_t *error = NULL;
 
-  g_test_summary ("Test xerror_clear()");
+  g_test_summary ("test_t xerror_clear()");
 
   g_clear_error (&error);
   g_assert_null (error);
@@ -331,7 +331,7 @@ test_extended (void)
 static void
 test_extended_duplicate (void)
 {
-  g_test_summary ("Test that registering a duplicate extended error domain doesn’t work");
+  g_test_summary ("test_t that registering a duplicate extended error domain doesn’t work");
 
   if (!g_test_subprocess ())
     {
@@ -373,7 +373,7 @@ test_extended_non_static (void)
   xquark q;
   xerror_t *error = NULL;
 
-  g_test_summary ("Test registering an extended error domain with a non-static name");
+  g_test_summary ("test_t registering an extended error domain with a non-static name");
 
   q = xerror_domain_register (domain_name,
                                sizeof (TestErrorNonStaticPrivate),
@@ -382,7 +382,7 @@ test_extended_non_static (void)
                                test_error_non_static_private_clear);
   g_free (domain_name);
 
-  error = xerror_new (q, 0, "Test error: %s", "hello");
+  error = xerror_new (q, 0, "test_t error: %s", "hello");
   g_assert_true (xerror_matches (error, q, 0));
   g_assert_cmpstr (g_quark_to_string (q), ==, "TestErrorNonStatic");
   xerror_free (error);

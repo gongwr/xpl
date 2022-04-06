@@ -55,7 +55,7 @@ g_portal_notification_backend_send_notification (xnotification_backend_t *backen
                                                  const xchar_t          *id,
                                                  xnotification_t        *notification)
 {
-  g_dbus_connection_call (backend->dbus_connection,
+  xdbus_connection_call (backend->dbus_connection,
                           "org.freedesktop.portal.Desktop",
                           "/org/freedesktop/portal/desktop",
                           "org.freedesktop.portal.Notification",
@@ -71,7 +71,7 @@ static void
 g_portal_notification_backend_withdraw_notification (xnotification_backend_t *backend,
                                                      const xchar_t          *id)
 {
-  g_dbus_connection_call (backend->dbus_connection,
+  xdbus_connection_call (backend->dbus_connection,
                           "org.freedesktop.portal.Desktop",
                           "/org/freedesktop/portal/desktop",
                           "org.freedesktop.portal.Notification",

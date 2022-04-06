@@ -282,8 +282,8 @@ msgid "Seek not supported on base stream"
 msgstr "No està implementada la busca en el flux base"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "No es pot truncar el xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "No es pot truncar el xbuffered_input_stream_t"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1208
 #: ../gio/giostream.c:300 ../gio/goutputstream.c:1660
@@ -3207,8 +3207,8 @@ msgid "Error removing old file: %s"
 msgstr "S'ha produït un error en suprimir el fitxer vell: %s"
 
 #: ../gio/gmemoryinputstream.c:474 ../gio/gmemoryoutputstream.c:772
-msgid "Invalid GSeekType supplied"
-msgstr "El GSeekType proporcionat no és vàlid"
+msgid "Invalid xseek_type_t supplied"
+msgstr "El xseek_type_t proporcionat no és vàlid"
 
 #: ../gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"

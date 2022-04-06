@@ -46,7 +46,7 @@
  * #xdbus_action_group_t implements #xremote_action_group_t.  This provides a
  * mechanism to send platform data for action invocations over D-Bus.
  *
- * Additionally, g_dbus_connection_export_action_group() will check if
+ * Additionally, xdbus_connection_export_action_group() will check if
  * the exported #xaction_group_t implements #xremote_action_group_t and use the
  * `_full` variants of the calls if available.  This
  * provides a mechanism by which to receive platform data for action

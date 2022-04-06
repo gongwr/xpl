@@ -42,7 +42,7 @@ main (int argc, char *argv[])
   xoption_context_t *context;
   xerror_t *error = NULL;
 
-  context = g_option_context_new (" - Test xsocket_t server stuff");
+  context = g_option_context_new (" - test_t xsocket_t server stuff");
   g_option_context_add_main_entries (context, cmd_entries, NULL);
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
@@ -63,7 +63,7 @@ main (int argc, char *argv[])
 
   g_print ("Echo service listening on port %d\n", port);
 
-  g_signal_connect (service, "run", G_CALLBACK (handler), NULL);
+  xsignal_connect (service, "run", G_CALLBACK (handler), NULL);
 
   xmain_loop_run (xmain_loop_new (NULL, FALSE));
   g_assert_not_reached ();

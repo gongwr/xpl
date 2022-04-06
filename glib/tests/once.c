@@ -45,7 +45,7 @@ test_once_single_threaded (void)
   GOnce once = G_ONCE_INIT;
   xpointer_t res;
 
-  g_test_summary ("Test g_once() usage from a single thread");
+  g_test_summary ("test_t g_once() usage from a single thread");
 
   g_assert (once.status == G_ONCE_STATUS_NOTCALLED);
 
@@ -109,7 +109,7 @@ test_once_multi_threaded (void)
   xuint_t i;
   xthread_t *threads[THREADS];
 
-  g_test_summary ("Test g_once() usage from multiple threads");
+  g_test_summary ("test_t g_once() usage from multiple threads");
 
   for (i = 0; i < G_N_ELEMENTS (threads); i++)
     threads[i] = xthread_new ("once-multi-threaded",
@@ -130,7 +130,7 @@ test_once_init_single_threaded (void)
 {
   static xsize_t init = 0;
 
-  g_test_summary ("Test g_once_init_{enter,leave}() usage from a single thread");
+  g_test_summary ("test_t g_once_init_{enter,leave}() usage from a single thread");
 
   if (g_once_init_enter (&init))
     {
@@ -147,7 +147,7 @@ test_once_init_single_threaded (void)
   g_assert_cmpint (init, ==, 1);
 }
 
-static gint64 shared;
+static sint64_t shared;
 
 static void
 init_shared (void)
@@ -176,7 +176,7 @@ test_once_init_multi_threaded (void)
   xsize_t i;
   xthread_t *threads[THREADS];
 
-  g_test_summary ("Test g_once_init_{enter,leave}() usage from multiple threads");
+  g_test_summary ("test_t g_once_init_{enter,leave}() usage from multiple threads");
 
   shared = 0;
 
@@ -194,7 +194,7 @@ test_once_init_string (void)
 {
   static xchar_t *val;
 
-  g_test_summary ("Test g_once_init_{enter,leave}() usage with a string");
+  g_test_summary ("test_t g_once_init_{enter,leave}() usage with a string");
 
   if (g_once_init_enter (&val))
     g_once_init_leave (&val, "foo");

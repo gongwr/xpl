@@ -75,7 +75,7 @@ struct _GThreadFunctions
                                    xpointer_t              data);
   void      (*thread_create)      (GThreadFunc           func,
                                    xpointer_t              data,
-                                   gulong                stack_size,
+                                   xulong_t                stack_size,
                                    xboolean_t              joinable,
                                    xboolean_t              bound,
                                    GThreadPriority       priority,
@@ -105,7 +105,7 @@ xthread_t *xthread_create       (GThreadFunc       func,
 XPL_DEPRECATED_IN_2_32_FOR(xthread_new)
 xthread_t *xthread_create_full  (GThreadFunc       func,
                                 xpointer_t          data,
-                                gulong            stack_size,
+                                xulong_t            stack_size,
                                 xboolean_t          joinable,
                                 xboolean_t          bound,
                                 GThreadPriority   priority,

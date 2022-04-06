@@ -36,7 +36,7 @@ list_model_get (xlist_model_t *model,
   return g_steal_pointer (&item);
 }
 
-/* Test that constructing/getting/setting properties on a #xlist_store_t works. */
+/* test_t that constructing/getting/setting properties on a #xlist_store_t works. */
 static void
 test_store_properties (void)
 {
@@ -50,7 +50,7 @@ test_store_properties (void)
   g_clear_object (&store);
 }
 
-/* Test that #xlist_store_t rejects non-xobject_t item types. */
+/* test_t that #xlist_store_t rejects non-xobject_t item types. */
 static void
 test_store_non_gobjects (void)
 {
@@ -261,7 +261,7 @@ test_store_sorted (void)
   xobject_unref (store);
 }
 
-/* Test that using splice() to replace the middle element in a list store works. */
+/* test_t that using splice() to replace the middle element in a list store works. */
 static void
 test_store_splice_replace_middle (void)
 {
@@ -317,7 +317,7 @@ test_store_splice_replace_middle (void)
   xobject_unref (store);
 }
 
-/* Test that using splice() to replace the whole list store works. */
+/* test_t that using splice() to replace the whole list store works. */
 static void
 test_store_splice_replace_all (void)
 {
@@ -363,7 +363,7 @@ test_store_splice_replace_all (void)
   xobject_unref (store);
 }
 
-/* Test that using splice() without removing or adding anything works */
+/* test_t that using splice() without removing or adding anything works */
 static void
 test_store_splice_noop (void)
 {
@@ -419,7 +419,7 @@ model_array_equal (xlist_model_t *model, xptr_array_t *array)
   return TRUE;
 }
 
-/* Test that using splice() to remove multiple items at different
+/* test_t that using splice() to remove multiple items at different
  * positions works */
 static void
 test_store_splice_remove_multiple (void)
@@ -472,7 +472,7 @@ test_store_splice_remove_multiple (void)
   xobject_unref (store);
 }
 
-/* Test that using splice() to add multiple items at different
+/* test_t that using splice() to add multiple items at different
  * positions works */
 static void
 test_store_splice_add_multiple (void)
@@ -507,7 +507,7 @@ test_store_splice_add_multiple (void)
   xobject_unref (store);
 }
 
-/* Test that get_item_type() returns the right type */
+/* test_t that get_item_type() returns the right type */
 static void
 test_store_item_type (void)
 {
@@ -521,7 +521,7 @@ test_store_item_type (void)
   xobject_unref (store);
 }
 
-/* Test that remove_all() removes all items */
+/* test_t that remove_all() removes all items */
 static void
 test_store_remove_all (void)
 {
@@ -532,11 +532,11 @@ test_store_remove_all (void)
   store = xlist_store_new (XTYPE_SIMPLE_ACTION);
   model = XLIST_MODEL (store);
 
-  /* Test with an empty list */
+  /* test_t with an empty list */
   xlist_store_remove_all (store);
   g_assert_cmpuint (xlist_model_get_n_items (model), ==, 0);
 
-  /* Test with a non-empty list */
+  /* test_t with a non-empty list */
   item = g_simple_action_new ("42", NULL);
   xlist_store_append (store, item);
   xlist_store_append (store, item);
@@ -548,7 +548,7 @@ test_store_remove_all (void)
   xobject_unref (store);
 }
 
-/* Test that splice() logs an error when passed the wrong item type */
+/* test_t that splice() logs an error when passed the wrong item type */
 static void
 test_store_splice_wrong_type (void)
 {
@@ -576,7 +576,7 @@ list_model_cmp_action_by_name (xaction_t *a, xaction_t *b, xpointer_t user_data)
   return xstrcmp0 (g_action_get_name (a), g_action_get_name (b));
 }
 
-/* Test if sort() works */
+/* test_t if sort() works */
 static void
 test_store_sort (void)
 {
@@ -615,7 +615,7 @@ test_store_sort (void)
   xobject_unref (store);
 }
 
-/* Test the cases where the item store tries to speed up item access by caching
+/* test_t the cases where the item store tries to speed up item access by caching
  * the last iter/position */
 static void
 test_store_get_item_cache (void)
@@ -703,7 +703,7 @@ on_items_changed (xlist_model_t *model,
   expected->called = TRUE;
 }
 
-/* Test that all operations on the list emit the items-changed signal */
+/* test_t that all operations on the list emit the items-changed signal */
 static void
 test_store_signal_items_changed (void)
 {
@@ -813,7 +813,7 @@ list_model_casecmp_action_by_name (xconstpointer a,
                              g_action_get_name (G_ACTION (b))) == 0;
 }
 
-/* Test if find() and find_with_equal_func() works */
+/* test_t if find() and find_with_equal_func() works */
 static void
 test_store_find (void)
 {

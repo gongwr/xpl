@@ -538,7 +538,7 @@ xvariant_new_from_bytes (const xvariant_type_t *type,
    * in testing). Callers can always actively ensure they use the correct
    * alignment to avoid the performance hit. */
   serialised.type_info = value->type_info;
-  serialised.data = (guchar *) xbytes_get_data (bytes, &serialised.size);
+  serialised.data = (xuchar_t *) xbytes_get_data (bytes, &serialised.size);
   serialised.depth = 0;
 
   if (!xvariant_serialised_check (serialised))

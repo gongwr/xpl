@@ -106,7 +106,7 @@ handle_method_call (xdbus_connection_t       *connection,
       speed_as_string = xstrdup_printf ("%g mph!", speed_in_mph);
 
       local_error = NULL;
-      g_dbus_connection_emit_signal (connection,
+      xdbus_connection_emit_signal (connection,
                                      NULL,
                                      object_path,
                                      interface_name,
@@ -123,7 +123,7 @@ handle_method_call (xdbus_connection_t       *connection,
   else if (xstrcmp0 (method_name, "GimmeStdout") == 0)
     {
 #ifdef G_OS_UNIX
-      if (g_dbus_connection_get_capabilities (connection) & G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING)
+      if (xdbus_connection_get_capabilities (connection) & G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING)
         {
           xdbus_message_t *reply;
           xunix_fd_list_t *fd_list;
@@ -138,7 +138,7 @@ handle_method_call (xdbus_connection_t       *connection,
           xdbus_message_set_unix_fd_list (reply, fd_list);
 
           error = NULL;
-          g_dbus_connection_send_message (connection,
+          xdbus_connection_send_message (connection,
                                           reply,
                                           G_DBUS_SEND_MESSAGE_FLAGS_NONE,
                                           NULL, /* out_serial */
@@ -240,7 +240,7 @@ handle_set_property (xdbus_connection_t  *connection,
                                  "{sv}",
                                  "Title",
                                  xvariant_new_string (_global_title));
-          g_dbus_connection_emit_signal (connection,
+          xdbus_connection_emit_signal (connection,
                                          NULL,
                                          object_path,
                                          "org.freedesktop.DBus.Properties",
@@ -303,7 +303,7 @@ on_timeout_cb (xpointer_t user_data)
                          "{sv}",
                          "Bar",
                          xvariant_new_string (swap_a_and_b ? "Tick" : "Tock"));
-  g_dbus_connection_emit_signal (connection,
+  xdbus_connection_emit_signal (connection,
                                  NULL,
                                  "/org/gtk/GDBus/test_object_t",
                                  "org.freedesktop.DBus.Properties",
@@ -328,7 +328,7 @@ on_bus_acquired (xdbus_connection_t *connection,
 {
   xuint_t registration_id;
 
-  registration_id = g_dbus_connection_register_object (connection,
+  registration_id = xdbus_connection_register_object (connection,
                                                        "/org/gtk/GDBus/test_object_t",
                                                        introspection_data->interfaces[0],
                                                        &interface_vtable,

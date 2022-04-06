@@ -2990,7 +2990,7 @@ msgid "Error removing old file: %s"
 msgstr "%s :د زړې دوتنې ړنګولو کې ستونزه"
 
 #: ../gio/gmemoryinputstream.c:486 ../gio/gmemoryoutputstream.c:746
-msgid "Invalid GSeekType supplied"
+msgid "Invalid xseek_type_t supplied"
 msgstr ""
 
 #: ../gio/gmemoryinputstream.c:496

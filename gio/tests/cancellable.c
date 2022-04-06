@@ -53,7 +53,7 @@ mock_operation_thread (xtask_t        *task,
 
   for (i = 0; i < data->iterations_requested; i++)
     {
-      if (g_cancellable_is_cancelled (cancellable))
+      if (xcancellable_is_cancelled (cancellable))
         break;
       if (g_test_verbose ())
         g_test_message ("THRD: %u iteration %u", data->iterations_requested, i);
@@ -82,7 +82,7 @@ mock_operation_timeout (xpointer_t user_data)
   if (iterations_done >= data->iterations_requested)
       done = TRUE;
 
-  if (g_cancellable_is_cancelled (xtask_get_cancellable (task)))
+  if (xcancellable_is_cancelled (xtask_get_cancellable (task)))
       done = TRUE;
 
   if (done)
@@ -186,7 +186,7 @@ test_cancel_multiple_concurrent (void)
       return;
     }
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
 
   for (i = 0; i < 45; i++)
     {
@@ -203,8 +203,8 @@ test_cancel_multiple_concurrent (void)
 
   if (g_test_verbose ())
     g_test_message ("CANCEL: %d operations", num_async_operations);
-  g_cancellable_cancel (cancellable);
-  g_assert_true (g_cancellable_is_cancelled (cancellable));
+  xcancellable_cancel (cancellable);
+  g_assert_true (xcancellable_is_cancelled (cancellable));
 
   /* Wait for all operations to be cancelled */
   while (num_async_operations != 0)
@@ -217,7 +217,7 @@ test_cancel_multiple_concurrent (void)
 static void
 test_cancel_null (void)
 {
-  g_cancellable_cancel (NULL);
+  xcancellable_cancel (NULL);
 }
 
 typedef struct
@@ -269,7 +269,7 @@ test_cancellable_source_threaded_dispose (void)
   xuint_t i;
   xptr_array_t *cancellables_pending_unref = xptr_array_new_with_free_func (xobject_unref);
 
-  g_test_summary ("Test a thread race between disposing of a GCancellableSource "
+  g_test_summary ("test_t a thread race between disposing of a GCancellableSource "
                   "(in one thread) and cancelling the xcancellable_t it refers "
                   "to (in another thread)");
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/issues/1841");
@@ -296,8 +296,8 @@ test_cancellable_source_threaded_dispose (void)
 
       /* Create a cancellable and a cancellable source for it. For this test,
        * there’s no need to attach the source to a #xmain_context_t. */
-      cancellable = g_cancellable_new ();
-      cancellable_source = g_cancellable_source_new (cancellable);
+      cancellable = xcancellable_new ();
+      cancellable_source = xcancellable_source_new (cancellable);
       xsource_set_callback (cancellable_source, G_SOURCE_FUNC (cancelled_cb), NULL, NULL);
 
       /* Send it to the thread and wait until it’s ready to execute before
@@ -305,7 +305,7 @@ test_cancellable_source_threaded_dispose (void)
       g_async_queue_push (data.cancellable_source_queue, g_steal_pointer (&cancellable_source));
 
       /* Race with disposal of the cancellable source. */
-      g_cancellable_cancel (cancellable);
+      xcancellable_cancel (cancellable);
 
       /* This thread can’t drop its reference to the #xcancellable_t here, as it
        * might not be the final reference (depending on how the race is

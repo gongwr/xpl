@@ -140,7 +140,7 @@ xlist_model_default_init (xlist_model_interface_t *iface)
    *
    * Since: 2.44
    */
-  xlist_model_changed_signal = g_signal_new (I_("items-changed"),
+  xlist_model_changed_signal = xsignal_new (I_("items-changed"),
                                               XTYPE_LIST_MODEL,
                                               G_SIGNAL_RUN_LAST,
                                               0,
@@ -148,7 +148,7 @@ xlist_model_default_init (xlist_model_interface_t *iface)
                                               _g_cclosure_marshal_VOID__UINT_UINT_UINT,
                                               XTYPE_NONE,
                                               3, XTYPE_UINT, XTYPE_UINT, XTYPE_UINT);
-  g_signal_set_va_marshaller (xlist_model_changed_signal,
+  xsignal_set_va_marshaller (xlist_model_changed_signal,
                               XTYPE_FROM_INTERFACE (iface),
                               _g_cclosure_marshal_VOID__UINT_UINT_UINTv);
 }
@@ -301,5 +301,5 @@ xlist_model_items_changed (xlist_model_t *list,
 {
   g_return_if_fail (X_IS_LIST_MODEL (list));
 
-  g_signal_emit (list, xlist_model_changed_signal, 0, position, removed, added);
+  xsignal_emit (list, xlist_model_changed_signal, 0, position, removed, added);
 }

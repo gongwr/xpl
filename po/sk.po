@@ -276,8 +276,8 @@ msgid "Seek not supported on base stream"
 msgstr "Presúvanie v základnom prúde nie je podporované"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "xbuffered_input_stream sa nedá skrátiť"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "xbuffered_input_stream_t sa nedá skrátiť"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -3432,8 +3432,8 @@ msgid "Error removing old file: %s"
 msgstr "Chyba pri odstraňovaní starého súboru: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:772
-msgid "Invalid GSeekType supplied"
-msgstr "Poskytnutý neplatný GSeekType"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Poskytnutý neplatný xseek_type_t"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"

@@ -55,12 +55,12 @@ XPL_AVAILABLE_IN_ALL
 void	 g_timer_continue        (xtimer_t      *timer);
 XPL_AVAILABLE_IN_ALL
 xdouble_t  g_timer_elapsed         (xtimer_t      *timer,
-				  gulong      *microseconds);
+				  xulong_t      *microseconds);
 XPL_AVAILABLE_IN_2_62
 xboolean_t g_timer_is_active       (xtimer_t      *timer);
 
 XPL_AVAILABLE_IN_ALL
-void     g_usleep                (gulong       microseconds);
+void     g_usleep                (xulong_t       microseconds);
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 XPL_DEPRECATED_IN_2_62

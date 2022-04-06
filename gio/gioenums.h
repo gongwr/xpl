@@ -950,7 +950,7 @@ typedef enum {
 } GUnixSocketAddressType;
 
 /**
- * GBusType:
+ * xbus_type_t:
  * @G_BUS_TYPE_STARTER: An alias for the message bus that activated the process, if any.
  * @G_BUS_TYPE_NONE: Not a message bus.
  * @G_BUS_TYPE_SYSTEM: The system-wide message bus.
@@ -966,7 +966,7 @@ typedef enum
   G_BUS_TYPE_NONE = 0,
   G_BUS_TYPE_SYSTEM  = 1,
   G_BUS_TYPE_SESSION = 2
-} GBusType;
+} xbus_type_t;
 
 /**
  * GBusNameOwnerFlags:
@@ -1009,7 +1009,7 @@ typedef enum
 } GBusNameWatcherFlags;
 
 /**
- * GDBusProxyFlags:
+ * xdbus_proxy_flags_t:
  * @G_DBUS_PROXY_FLAGS_NONE: No flags set.
  * @G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES: Don't load properties.
  * @G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS: Don't connect to signals on the remote object.
@@ -1038,7 +1038,7 @@ typedef enum
   G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES = (1<<3),
   G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START_AT_CONSTRUCTION = (1<<4),
   G_DBUS_PROXY_FLAGS_NO_MATCH_RULE XPL_AVAILABLE_ENUMERATOR_IN_2_72 = (1<<5)
-} GDBusProxyFlags;
+} xdbus_proxy_flags_t;
 
 /**
  * GDBusError:
@@ -1209,7 +1209,7 @@ typedef enum
  * @G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION: Pass this flag if connecting to a peer that is a
  * message bus. This means that the Hello() method will be invoked as part of the connection setup.
  * @G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING: If set, processing of D-Bus messages is
- * delayed until g_dbus_connection_start_message_processing() is called.
+ * delayed until xdbus_connection_start_message_processing() is called.
  * @G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER: When authenticating
  * as a server, require the UID of the peer to be the same as the UID of the server. (Since: 2.68)
  *
@@ -1251,7 +1251,7 @@ typedef enum {
  * @G_DBUS_CALL_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION: the caller is prepared to
  * wait for interactive authorization. Since 2.46.
  *
- * Flags used in g_dbus_connection_call() and similar APIs.
+ * Flags used in xdbus_connection_call() and similar APIs.
  *
  * Since: 2.26
  */
@@ -1357,7 +1357,7 @@ typedef enum
  *                                                       will still be dispatched. This is useful if you want
  *                                                       to dynamically spawn objects in the subtree.
  *
- * Flags passed to g_dbus_connection_register_subtree().
+ * Flags passed to xdbus_connection_register_subtree().
  *
  * Since: 2.26
  */
@@ -1368,7 +1368,7 @@ typedef enum
 } GDBusSubtreeFlags;
 
 /**
- * GDBusServerFlags:
+ * xdbus_server_flags_t:
  * @G_DBUS_SERVER_FLAGS_NONE: No flags set.
  * @G_DBUS_SERVER_FLAGS_RUN_IN_THREAD: All #xdbus_server_t::new-connection
  * signals will run in separated dedicated threads (see signal for
@@ -1388,7 +1388,7 @@ typedef enum
   G_DBUS_SERVER_FLAGS_RUN_IN_THREAD = (1<<0),
   G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS = (1<<1),
   G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER XPL_AVAILABLE_ENUMERATOR_IN_2_68 = (1<<2)
-} GDBusServerFlags;
+} xdbus_server_flags_t;
 
 /**
  * GDBusSignalFlags:
@@ -1402,7 +1402,7 @@ typedef enum
  * contain an object path that is either equivalent to the given path,
  * or one of the paths is a subpath of the other.
  *
- * Flags used when subscribing to signals via g_dbus_connection_signal_subscribe().
+ * Flags used when subscribing to signals via xdbus_connection_signal_subscribe().
  *
  * Since: 2.26
  */

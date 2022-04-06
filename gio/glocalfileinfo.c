@@ -1352,7 +1352,7 @@ get_content_type (const char          *basename,
 #if !defined(G_OS_WIN32) && !defined(HAVE_COCOA)
       if (!fast && result_uncertain && path != NULL)
 	{
-	  guchar sniff_buffer[4096];
+	  xuchar_t sniff_buffer[4096];
 	  xsize_t sniff_length;
 	  int fd, errsv;
 
@@ -1401,7 +1401,7 @@ get_thumbnail_attributes (const char     *path,
   uri = xfilename_to_uri (path, NULL, NULL);
 
   checksum = xchecksum_new (G_CHECKSUM_MD5);
-  xchecksum_update (checksum, (const guchar *) uri, strlen (uri));
+  xchecksum_update (checksum, (const xuchar_t *) uri, strlen (uri));
 
   basename = xstrconcat (xchecksum_get_string (checksum), ".png", NULL);
   xchecksum_free (checksum);
@@ -1554,7 +1554,7 @@ static xuint_t hidden_cache_ttl_jitter_secs = 2;
 typedef struct
 {
   xhashtable_t *hidden_files;
-  gint64 timestamp_secs;
+  sint64_t timestamp_secs;
 } HiddenCacheData;
 
 static xboolean_t
@@ -1563,7 +1563,7 @@ remove_from_hidden_cache (xpointer_t user_data)
   HiddenCacheData *data;
   xhash_table_iter_t iter;
   xboolean_t retval;
-  gint64 timestamp_secs;
+  sint64_t timestamp_secs;
 
   G_LOCK (hidden_cache);
   timestamp_secs = xsource_get_time (hidden_cache_source) / G_USEC_PER_SEC;
@@ -2433,25 +2433,25 @@ set_symlink (char                       *filename,
  * glib/gstdio.c.
  */
 static xboolean_t
-_g_win32_unix_time_to_filetime (gint64     ut,
+_g_win32_unix_time_to_filetime (sint64_t     ut,
                                 gint32     nsec,
                                 FILETIME  *ft,
                                 xerror_t   **error)
 {
-  gint64 result;
+  sint64_t result;
   /* 1 unit of FILETIME is 100ns */
-  const gint64 hundreds_of_nsec_per_sec = 10000000;
+  const sint64_t hundreds_of_nsec_per_sec = 10000000;
   /* The difference between January 1, 1601 UTC (FILETIME epoch) and UNIX epoch
    * in hundreds of nanoseconds.
    */
-  const gint64 filetime_unix_epoch_offset = 116444736000000000;
+  const sint64_t filetime_unix_epoch_offset = 116444736000000000;
   /* This is the maximum timestamp that SYSTEMTIME can
    * represent (last millisecond of the year 30827).
    * Since FILETIME and SYSTEMTIME are both used on Windows,
    * we use this as a limit (FILETIME can support slightly
    * larger interval, up to year 30828).
    */
-  const gint64 max_systemtime = 0x7fff35f4f06c58f0;
+  const sint64_t max_systemtime = 0x7fff35f4f06c58f0;
 
   g_return_val_if_fail (ft != NULL, FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);

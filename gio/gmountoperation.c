@@ -281,8 +281,8 @@ show_processes (xmount_operation_t      *op,
 static void
 show_unmount_progress (xmount_operation_t *op,
                        const xchar_t     *message,
-                       gint64           time_left,
-                       gint64           bytes_left)
+                       sint64_t           time_left,
+                       sint64_t           bytes_left)
 {
   /* nothing to do */
 }
@@ -317,7 +317,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    * primary text in a #GtkMessageDialog.
    */
   signals[ASK_PASSWORD] =
-    g_signal_new (I_("ask-password"),
+    xsignal_new (I_("ask-password"),
 		  XTYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GMountOperationClass, ask_password),
@@ -325,7 +325,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
 		  _g_cclosure_marshal_VOID__STRING_STRING_STRING_FLAGS,
 		  XTYPE_NONE, 4,
 		  XTYPE_STRING, XTYPE_STRING, XTYPE_STRING, XTYPE_ASK_PASSWORD_FLAGS);
-  g_signal_set_va_marshaller (signals[ASK_PASSWORD],
+  xsignal_set_va_marshaller (signals[ASK_PASSWORD],
                               XTYPE_FROM_CLASS (object_class),
                               _g_cclosure_marshal_VOID__STRING_STRING_STRING_FLAGSv);
 
@@ -343,7 +343,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    * primary text in a #GtkMessageDialog.
    */
   signals[ASK_QUESTION] =
-    g_signal_new (I_("ask-question"),
+    xsignal_new (I_("ask-question"),
 		  XTYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GMountOperationClass, ask_question),
@@ -351,7 +351,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
 		  _g_cclosure_marshal_VOID__STRING_BOXED,
 		  XTYPE_NONE, 2,
 		  XTYPE_STRING, XTYPE_STRV);
-  g_signal_set_va_marshaller (signals[ASK_QUESTION],
+  xsignal_set_va_marshaller (signals[ASK_QUESTION],
                               XTYPE_FROM_CLASS (object_class),
                               _g_cclosure_marshal_VOID__STRING_BOXEDv);
 
@@ -363,7 +363,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    * Emitted when the user has replied to the mount operation.
    */
   signals[REPLY] =
-    g_signal_new (I_("reply"),
+    xsignal_new (I_("reply"),
 		  XTYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GMountOperationClass, reply),
@@ -384,7 +384,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    * Since: 2.20
    */
   signals[ABORTED] =
-    g_signal_new (I_("aborted"),
+    xsignal_new (I_("aborted"),
 		  XTYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GMountOperationClass, aborted),
@@ -416,7 +416,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    * Since: 2.22
    */
   signals[SHOW_PROCESSES] =
-    g_signal_new (I_("show-processes"),
+    xsignal_new (I_("show-processes"),
 		  XTYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GMountOperationClass, show_processes),
@@ -424,7 +424,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
 		  _g_cclosure_marshal_VOID__STRING_BOXED_BOXED,
 		  XTYPE_NONE, 3,
 		  XTYPE_STRING, XTYPE_ARRAY, XTYPE_STRV);
-  g_signal_set_va_marshaller (signals[SHOW_PROCESSES],
+  xsignal_set_va_marshaller (signals[SHOW_PROCESSES],
                               XTYPE_FROM_CLASS (object_class),
                               _g_cclosure_marshal_VOID__STRING_BOXED_BOXEDv);
 
@@ -458,7 +458,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    * Since: 2.34
    */
   signals[SHOW_UNMOUNT_PROGRESS] =
-    g_signal_new (I_("show-unmount-progress"),
+    xsignal_new (I_("show-unmount-progress"),
                   XTYPE_FROM_CLASS (object_class),
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GMountOperationClass, show_unmount_progress),
@@ -466,7 +466,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
                   _g_cclosure_marshal_VOID__STRING_INT64_INT64,
                   XTYPE_NONE, 3,
                   XTYPE_STRING, XTYPE_INT64, XTYPE_INT64);
-  g_signal_set_va_marshaller (signals[SHOW_UNMOUNT_PROGRESS],
+  xsignal_set_va_marshaller (signals[SHOW_UNMOUNT_PROGRESS],
                               XTYPE_FROM_CLASS (object_class),
                               _g_cclosure_marshal_VOID__STRING_INT64_INT64v);
 
@@ -979,5 +979,5 @@ g_mount_operation_reply (xmount_operation_t *op,
 			 GMountOperationResult result)
 {
   g_return_if_fail (X_IS_MOUNT_OPERATION (op));
-  g_signal_emit (op, signals[REPLY], 0, result);
+  xsignal_emit (op, signals[REPLY], 0, result);
 }

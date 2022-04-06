@@ -34,7 +34,7 @@ test_construction (void)
   xobject_unref (op);
 }
 
-/* Test the property getters and setters on #xmount_operation_t work correctly. */
+/* test_t the property getters and setters on #xmount_operation_t work correctly. */
 static void
 test_properties (void)
 {

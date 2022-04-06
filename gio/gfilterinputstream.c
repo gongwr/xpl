@@ -77,7 +77,7 @@ static void
 g_filter_input_stream_class_init (GFilterInputStreamClass *klass)
 {
   xobject_class_t *object_class;
-  GInputStreamClass *istream_class;
+  xinput_stream_class_t *istream_class;
 
   object_class = G_OBJECT_CLASS (klass);
   object_class->get_property = g_filter_input_stream_get_property;

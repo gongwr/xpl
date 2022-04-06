@@ -287,12 +287,12 @@ resolve_arg (const xboolean_t is_uri_only, const char *arg)
   file1 = xfile_new_for_commandline_arg (arg);
   g_assert (file1 != NULL);
 
-  /*  Test if we get URI string */
+  /*  test_t if we get URI string */
   uri = xfile_get_uri (file1);
   g_assert_cmpstr (uri, !=, NULL);
   g_printerr ("%s\n",uri);
 
-  /*  Test if we get correct value of the local path */
+  /*  test_t if we get correct value of the local path */
   path = xfile_get_path (file1);
   if (is_uri_only)
     g_assert_cmpstr (path, ==, NULL);

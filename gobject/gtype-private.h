@@ -70,7 +70,7 @@ void    _xboxed_type_init       (void); /* sync with gboxed.c */
 void    _xobject_type_init      (void); /* sync with gobject.c */
 void    _g_param_spec_types_init (void); /* sync with gparamspecs.c */
 void    _xvalue_transforms_init (void); /* sync with gvaluetransform.c */
-void    _g_signal_init           (void); /* sync with gsignal.c */
+void    _xsignal_init           (void); /* sync with gsignal.c */
 
 /* for gboxed.c */
 xpointer_t        _xtype_boxed_copy      (xtype_t          type,

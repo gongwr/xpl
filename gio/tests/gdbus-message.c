@@ -40,7 +40,7 @@ message_lock (void)
 
   count = 0;
   m = xdbus_message_new ();
-  g_signal_connect (m,
+  xsignal_connect (m,
                     "notify::locked",
                     G_CALLBACK (on_notify_locked),
                     &count);
@@ -93,8 +93,8 @@ message_copy (void)
   xdbus_message_t *m;
   xdbus_message_t *copy;
   xerror_t *error;
-  guchar *m_headers;
-  guchar *copy_headers;
+  xuchar_t *m_headers;
+  xuchar_t *copy_headers;
   xuint_t n;
 
   m = xdbus_message_new_method_call ("org.example.Name",
@@ -141,7 +141,7 @@ message_copy (void)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* Test xdbus_message_bytes_needed() returns correct results for a variety of
+/* test_t xdbus_message_bytes_needed() returns correct results for a variety of
  * arbitrary binary inputs.*/
 static void
 message_bytes_needed (void)
@@ -193,7 +193,7 @@ message_bytes_needed (void)
 
       g_test_message ("Vector: %" G_GSIZE_FORMAT, i);
 
-      bytes_needed = xdbus_message_bytes_needed ((guchar *) vectors[i].blob,
+      bytes_needed = xdbus_message_bytes_needed ((xuchar_t *) vectors[i].blob,
                                                   G_N_ELEMENTS (vectors[i].blob),
                                                   &local_error);
 

@@ -247,7 +247,7 @@ _g_win32_mount_unmounted (GWin32Mount *mount)
       _g_win32_volume_unset_mount (mount->volume, mount);
 #endif
       mount->volume = NULL;
-      g_signal_emit_by_name (mount, "changed");
+      xsignal_emit_by_name (mount, "changed");
       /* there's really no need to emit mount_changed on the volume monitor
        * as we're going to be deleted.. */
     }
@@ -261,9 +261,9 @@ _g_win32_mount_unset_volume (GWin32Mount  *mount,
     {
       mount->volume = NULL;
       /* TODO: Emit changed in idle to avoid locking issues */
-      g_signal_emit_by_name (mount, "changed");
+      xsignal_emit_by_name (mount, "changed");
       if (mount->volume_monitor != NULL)
-        g_signal_emit_by_name (mount->volume_monitor, "mount-changed", mount);
+        xsignal_emit_by_name (mount->volume_monitor, "mount-changed", mount);
     }
 }
 
@@ -345,7 +345,7 @@ get_icon_name_index (wchar_t  *mount_path,
                         {
                           if (name_buffer_size < arbitrary_reasonable_limit)
                             {
-                              /* Buffer was too small, keep going */
+                              /* buffer_t was too small, keep going */
                               keep_going = TRUE;
                               continue;
                             }

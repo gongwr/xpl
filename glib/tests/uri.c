@@ -358,7 +358,7 @@ test_uri_unescape_string (void)
     {
       xchar_t *s = NULL;
 
-      g_test_message ("Test %" G_GSIZE_FORMAT ": %s", i, tests[i].escaped);
+      g_test_message ("test_t %" G_GSIZE_FORMAT ": %s", i, tests[i].escaped);
 
       s = xuri_unescape_string (tests[i].escaped, tests[i].illegal_characters);
       g_assert_cmpstr (s, ==, tests[i].expected_unescaped);
@@ -396,7 +396,7 @@ test_uri_unescape_bytes (xconstpointer test_data)
       xchar_t *escaped = NULL;
       xbytes_t *bytes = NULL;
 
-      g_test_message ("Test %" G_GSIZE_FORMAT ": %s", i, tests[i].escaped);
+      g_test_message ("test_t %" G_GSIZE_FORMAT ": %s", i, tests[i].escaped);
 
       /* The tests get run twice: once with the length unspecified, using a
        * nul-terminated string; and once with the length specified and a copy of
@@ -478,7 +478,7 @@ test_uri_escape_string (void)
     {
       xchar_t *s = NULL;
 
-      g_test_message ("Test %" G_GSIZE_FORMAT ": %s", i, tests[i].unescaped);
+      g_test_message ("test_t %" G_GSIZE_FORMAT ": %s", i, tests[i].unescaped);
 
       s = xuri_escape_string (tests[i].unescaped,
                                tests[i].reserved_chars_allowed,
@@ -493,7 +493,7 @@ test_uri_escape_bytes (void)
 {
   xchar_t *s = NULL;
 
-  s = xuri_escape_bytes ((guchar*)"\0\0", 2, NULL);
+  s = xuri_escape_bytes ((xuchar_t*)"\0\0", 2, NULL);
   g_assert_cmpstr (s, ==, "%00%00");
   g_free (s);
 }
@@ -775,7 +775,7 @@ test_uri_parsing_absolute (void)
       xerror_t *error = NULL;
       xuri_t *uri;
 
-      g_test_message ("Test %" G_GSIZE_FORMAT ": %s", i, test->orig);
+      g_test_message ("test_t %" G_GSIZE_FORMAT ": %s", i, test->orig);
 
       uri = xuri_parse (test->orig, test->flags, &error);
       if (test->expected_success)
@@ -898,7 +898,7 @@ static const UriRelativeTest relative_tests[] = {
   { "ScHeMe://User:P%61ss@HOST.%63om:1234/path/./from/../to%7d/item%2dobj?qu%65ry=something#fr%61gment",
     "scheme://User:Pass@HOST.com:1234/path/to%7D/item-obj?query=something#fragment",
     { "scheme", "User:Pass", "HOST.com", 1234, "/path/to}/item-obj", "query=something", "fragment" } },
-  /* Test corner cases of remove_dot_segments */
+  /* test_t corner cases of remove_dot_segments */
   { "http:..", "http:",
     { "http", NULL, NULL, -1, "", NULL, NULL } },
   { "http:../", "http:",
@@ -1744,7 +1744,7 @@ test_uri_join_split_round_trip (void)
   xuri_flags_t flags = XURI_FLAGS_HAS_PASSWORD | XURI_FLAGS_HAS_AUTH_PARAMS;
   xuint_t i;
 
-  g_test_summary ("Test that joining different URI components survives a round trip");
+  g_test_summary ("test_t that joining different URI components survives a round trip");
 
   /* Each bit in @i indicates whether the corresponding URI field should be set
    * or %NULL. */

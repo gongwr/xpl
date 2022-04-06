@@ -1,4 +1,4 @@
-/* Test case for GNOME #662395
+/* test_t case for GNOME #662395
  *
  * Copyright (C) 2008-2010 Red Hat, Inc.
  * Copyright (C) 2011 Nokia Corporation
@@ -145,7 +145,7 @@ my_output_stream_init (MyOutputStream *self)
 static void
 my_output_stream_class_init (MyOutputStreamClass *cls)
 {
-  GOutputStreamClass *ostream_class = (GOutputStreamClass *) cls;
+  xoutput_stream_class_t *ostream_class = (xoutput_stream_class_t *) cls;
 
   ostream_class->write_fn = my_output_stream_write;
   ostream_class->flush = my_output_stream_flush;
@@ -177,7 +177,7 @@ setup_client_cb (xobject_t      *source,
 {
   Fixture *f = user_data;
 
-  f->client_conn = g_dbus_connection_new_finish (res, &f->error);
+  f->client_conn = xdbus_connection_new_finish (res, &f->error);
   g_assert_no_error (f->error);
   g_assert_true (X_IS_DBUS_CONNECTION (f->client_conn));
   g_assert_true (f->client_conn == G_DBUS_CONNECTION (source));
@@ -190,7 +190,7 @@ setup_server_cb (xobject_t      *source,
 {
   Fixture *f = user_data;
 
-  f->server_conn = g_dbus_connection_new_finish (res, &f->error);
+  f->server_conn = xdbus_connection_new_finish (res, &f->error);
   g_assert_no_error (f->error);
   g_assert_true (X_IS_DBUS_CONNECTION (f->server_conn));
   g_assert_true (f->server_conn == G_DBUS_CONNECTION (source));
@@ -225,10 +225,10 @@ setup (Fixture       *f,
   f->client_stream = test_io_stream_new (f->client_istream, f->client_ostream);
   f->server_stream = test_io_stream_new (f->server_istream, f->server_ostream);
 
-  g_dbus_connection_new (f->client_stream, NULL,
+  xdbus_connection_new (f->client_stream, NULL,
                          G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
                          NULL, NULL, setup_client_cb, f);
-  g_dbus_connection_new (f->server_stream, f->guid,
+  xdbus_connection_new (f->server_stream, f->guid,
                          G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER,
                          NULL, NULL, setup_server_cb, f);
 
@@ -248,7 +248,7 @@ flush_cb (xobject_t      *source,
   g_assert_true (X_IS_DBUS_CONNECTION (f->client_conn));
   g_assert_cmpuint ((guintptr) f->client_conn, ==, (guintptr) G_DBUS_CONNECTION (source));
 
-  ok = g_dbus_connection_flush_finish (f->client_conn, res, &f->error);
+  ok = xdbus_connection_flush_finish (f->client_conn, res, &f->error);
   g_assert_no_error (f->error);
   g_assert_true (ok);
 
@@ -266,7 +266,7 @@ test_flush_busy (Fixture       *f,
   /* make sure the actual write will block */
   G_LOCK (write);
 
-  ok = g_dbus_connection_emit_signal (f->client_conn, NULL, "/",
+  ok = xdbus_connection_emit_signal (f->client_conn, NULL, "/",
                                       "com.example.foo_t", "SomeSignal", NULL,
                                       &f->error);
   g_assert_no_error (f->error);
@@ -285,7 +285,7 @@ test_flush_busy (Fixture       *f,
                    <=, initial);
 
   /* start to flush: it can't happen til the write finishes */
-  g_dbus_connection_flush (f->client_conn, NULL, flush_cb, f);
+  xdbus_connection_flush (f->client_conn, NULL, flush_cb, f);
 
   /* we still haven't actually flushed anything */
   g_assert_cmpint (my_output_stream_get_bytes_flushed (f->client_ostream),
@@ -314,7 +314,7 @@ test_flush_idle (Fixture       *f,
 
   initial = my_output_stream_get_bytes_finished (f->client_ostream);
 
-  ok = g_dbus_connection_emit_signal (f->client_conn, NULL, "/",
+  ok = xdbus_connection_emit_signal (f->client_conn, NULL, "/",
                                       "com.example.foo_t", "SomeSignal", NULL,
                                       &f->error);
   g_assert_no_error (f->error);
@@ -331,7 +331,7 @@ test_flush_idle (Fixture       *f,
                    <=, initial);
 
   /* flush with fully-written, but unflushed, messages */
-  ok = g_dbus_connection_flush_sync (f->client_conn, NULL, &f->error);
+  ok = xdbus_connection_flush_sync (f->client_conn, NULL, &f->error);
 
   /* now we have flushed at least what we'd written - but before fixing
    * GNOME#662395 this assertion would fail

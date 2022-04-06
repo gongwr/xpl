@@ -272,7 +272,7 @@ contains_non_ascii (const xchar_t *str,
 
   for (p = str; len == -1 ? *p : p < str + len; p++)
     {
-      if ((guchar)*p > 0x80)
+      if ((xuchar_t)*p > 0x80)
 	return TRUE;
     }
   return FALSE;
@@ -401,10 +401,10 @@ nameprep (const xchar_t *hostname,
  * label-separating dots. @str must be '\0'-terminated.
  */
 #define idna_is_dot(str) ( \
-  ((guchar)(str)[0] == '.') ||                                                 \
-  ((guchar)(str)[0] == 0xE3 && (guchar)(str)[1] == 0x80 && (guchar)(str)[2] == 0x82) || \
-  ((guchar)(str)[0] == 0xEF && (guchar)(str)[1] == 0xBC && (guchar)(str)[2] == 0x8E) || \
-  ((guchar)(str)[0] == 0xEF && (guchar)(str)[1] == 0xBD && (guchar)(str)[2] == 0xA1) )
+  ((xuchar_t)(str)[0] == '.') ||                                                 \
+  ((xuchar_t)(str)[0] == 0xE3 && (xuchar_t)(str)[1] == 0x80 && (xuchar_t)(str)[2] == 0x82) || \
+  ((xuchar_t)(str)[0] == 0xEF && (xuchar_t)(str)[1] == 0xBC && (xuchar_t)(str)[2] == 0x8E) || \
+  ((xuchar_t)(str)[0] == 0xEF && (xuchar_t)(str)[1] == 0xBD && (xuchar_t)(str)[2] == 0xA1) )
 
 static const xchar_t *
 idna_end_of_label (const xchar_t *str)
@@ -514,7 +514,7 @@ g_hostname_to_ascii (const xchar_t *hostname)
       unicode = FALSE;
       for (p = label; *p && !idna_is_dot (p); p++)
 	{
-	  if ((guchar)*p > 0x80)
+	  if ((xuchar_t)*p > 0x80)
 	    unicode = TRUE;
 	}
 

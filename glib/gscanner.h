@@ -112,15 +112,15 @@ union	_GTokenValue
 {
   xpointer_t	v_symbol;
   xchar_t		*v_identifier;
-  gulong	v_binary;
-  gulong	v_octal;
-  gulong	v_int;
+  xulong_t	v_binary;
+  xulong_t	v_octal;
+  xulong_t	v_int;
   xuint64_t       v_int64;
   xdouble_t	v_float;
-  gulong	v_hex;
+  xulong_t	v_hex;
   xchar_t		*v_string;
   xchar_t		*v_comment;
-  guchar	v_char;
+  xuchar_t	v_char;
   xuint_t		v_error;
 };
 

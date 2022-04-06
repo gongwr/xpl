@@ -337,7 +337,7 @@ on_bus_acquired (xdbus_connection_t *connection,
 {
   xuint_t registration_id;
 
-  registration_id = g_dbus_connection_register_subtree (connection,
+  registration_id = xdbus_connection_register_subtree (connection,
                                                         "/org/gtk/GDBus/TestSubtree/Devices",
                                                         &subtree_vtable,
                                                         G_DBUS_SUBTREE_FLAGS_NONE,

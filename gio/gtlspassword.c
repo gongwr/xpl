@@ -55,7 +55,7 @@ enum
 
 struct _GTlsPasswordPrivate
 {
-  guchar *value;
+  xuchar_t *value;
   xsize_t length;
   xdestroy_notify_t destroy;
   GTlsPasswordFlags flags;
@@ -71,7 +71,7 @@ xtls_password_init (xtls_password_t *password)
   password->priv = xtls_password_get_instance_private (password);
 }
 
-static const guchar *
+static const xuchar_t *
 xtls_password_real_get_value (xtls_password_t  *password,
                                xsize_t         *length)
 {
@@ -82,7 +82,7 @@ xtls_password_real_get_value (xtls_password_t  *password,
 
 static void
 xtls_password_real_set_value (xtls_password_t   *password,
-                               guchar         *value,
+                               xuchar_t         *value,
                                xssize_t          length,
                                xdestroy_notify_t  destroy)
 {
@@ -255,7 +255,7 @@ xtls_password_new (GTlsPasswordFlags  flags,
  *
  * Since: 2.30
  */
-const guchar *
+const xuchar_t *
 xtls_password_get_value (xtls_password_t  *password,
                           xsize_t         *length)
 {
@@ -281,7 +281,7 @@ xtls_password_get_value (xtls_password_t  *password,
  */
 void
 xtls_password_set_value (xtls_password_t  *password,
-                          const guchar  *value,
+                          const xuchar_t  *value,
                           xssize_t         length)
 {
   g_return_if_fail (X_IS_TLS_PASSWORD (password));
@@ -319,7 +319,7 @@ xtls_password_set_value (xtls_password_t  *password,
  */
 void
 xtls_password_set_value_full (xtls_password_t   *password,
-                               guchar         *value,
+                               xuchar_t         *value,
                                xssize_t          length,
                                xdestroy_notify_t  destroy)
 {

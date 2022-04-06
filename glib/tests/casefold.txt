@@ -1,4 +1,4 @@
-# Test cases generated from Unicode 13.0.0 data
+# test_t cases generated from Unicode 13.0.0 data
 # by gen-casefold-txt.py. Do not edit.
 #
 # Some special hand crafted tests

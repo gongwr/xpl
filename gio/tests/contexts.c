@@ -47,7 +47,7 @@ opened_for_read (xobject_t *source, xasync_result_t *result, xpointer_t loop)
   xobject_unref (in);
 }
 
-/* Test 1: Async I/O started in a thread with a thread-default context
+/* test_t 1: Async I/O started in a thread with a thread-default context
  * will stick to that thread, and will complete even if the default
  * main loop is blocked. (NB: the last part would not be true if we
  * were testing xfile_monitor_t!)
@@ -74,7 +74,7 @@ test_thread_independence (void)
 static xboolean_t
 idle_start_test1_thread (xpointer_t loop)
 {
-  gint64 time;
+  sint64_t time;
   xthread_t *thread;
   xboolean_t io_completed;
 
@@ -129,7 +129,7 @@ test1_thread (xpointer_t user_data)
   return NULL;
 }
 
-/* Test 2: If we push a thread-default context in the main thread, we
+/* test_t 2: If we push a thread-default context in the main thread, we
  * can run async ops in that context without running the default
  * context.
  */
@@ -237,7 +237,7 @@ per_thread_thing_class_init (PerThreadThingClass *class)
 {
   class->finalize = per_thread_thing_finalize;
 
-  g_signal_new ("changed", per_thread_thing_get_type (), G_SIGNAL_RUN_FIRST, 0,
+  xsignal_new ("changed", per_thread_thing_get_type (), G_SIGNAL_RUN_FIRST, 0,
                 NULL, NULL, g_cclosure_marshal_VOID__VOID, XTYPE_NONE, 0);
 }
 
@@ -338,7 +338,7 @@ test_emit_thread (xpointer_t user_data)
   instance = per_thread_thing_get ();
   g_assert (g_atomic_int_get (&is_running));
 
-  g_signal_connect (instance, "changed", G_CALLBACK (changed_emitted), observed_value);
+  xsignal_connect (instance, "changed", G_CALLBACK (changed_emitted), observed_value);
 
   /* observe after connection */
   g_atomic_int_set (observed_value, g_atomic_int_get (&current_value));
@@ -369,7 +369,7 @@ test_context_specific_emit (void)
   /* make changes and ensure that they are observed */
   for (n = 0; n < 1000; n++)
     {
-      gint64 expiry;
+      sint64_t expiry;
 
       /* don't burn CPU forever */
       expiry = g_get_monotonic_time () + 10 * G_TIME_SPAN_SECOND;
@@ -378,7 +378,7 @@ test_context_specific_emit (void)
 
       /* wake them to notice */
       for (k = 0; k < g_test_rand_int_range (1, 5); k++)
-        g_context_specific_group_emit (&group, g_signal_lookup ("changed", per_thread_thing_get_type ()));
+        g_context_specific_group_emit (&group, xsignal_lookup ("changed", per_thread_thing_get_type ()));
 
       for (i = 0; i < N_THREADS; i++)
         while (g_atomic_int_get (&observed_values[i]) != n)
@@ -392,7 +392,7 @@ test_context_specific_emit (void)
 
   /* tell them to quit */
   g_atomic_int_set (&current_value, -1);
-  g_context_specific_group_emit (&group, g_signal_lookup ("notify", XTYPE_OBJECT));
+  g_context_specific_group_emit (&group, xsignal_lookup ("notify", XTYPE_OBJECT));
 
   for (i = 0; i < N_THREADS; i++)
     exited |= GPOINTER_TO_UINT (xthread_join (threads[i]));
@@ -406,7 +406,7 @@ test_context_specific_emit_and_unref (void)
   xpointer_t obj;
 
   obj = per_thread_thing_get ();
-  g_context_specific_group_emit (&group, g_signal_lookup ("changed", per_thread_thing_get_type ()));
+  g_context_specific_group_emit (&group, xsignal_lookup ("changed", per_thread_thing_get_type ()));
   xobject_unref (obj);
 
   while (xmain_context_iteration (NULL, 0))

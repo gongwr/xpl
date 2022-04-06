@@ -40,7 +40,7 @@
  * Buffered input stream implements #xfilter_input_stream_t and provides
  * for buffered reads.
  *
- * By default, #xbuffered_input_stream's buffer size is set at 4 kilobytes.
+ * By default, #xbuffered_input_stream_t's buffer size is set at 4 kilobytes.
  *
  * To create a buffered input stream, use xbuffered_input_stream_new(),
  * or xbuffered_input_stream_new_sized() to specify the buffer's size at
@@ -99,17 +99,17 @@ static xssize_t xbuffered_input_stream_read             (xinput_stream_t        
                                                         xsize_t                  count,
                                                         xcancellable_t          *cancellable,
                                                         xerror_t               **error);
-static xssize_t xbuffered_input_stream_real_fill        (xbuffered_input_stream  *stream,
+static xssize_t xbuffered_input_stream_real_fill        (xbuffered_input_stream_t  *stream,
                                                         xssize_t                 count,
                                                         xcancellable_t          *cancellable,
                                                         xerror_t               **error);
-static void   xbuffered_input_stream_real_fill_async  (xbuffered_input_stream  *stream,
+static void   xbuffered_input_stream_real_fill_async  (xbuffered_input_stream_t  *stream,
                                                         xssize_t                 count,
                                                         int                    io_priority,
                                                         xcancellable_t          *cancellable,
                                                         xasync_ready_callback_t    callback,
                                                         xpointer_t               user_data);
-static xssize_t xbuffered_input_stream_real_fill_finish (xbuffered_input_stream  *stream,
+static xssize_t xbuffered_input_stream_real_fill_finish (xbuffered_input_stream_t  *stream,
                                                         xasync_result_t          *result,
                                                         xerror_t               **error);
 
@@ -118,7 +118,7 @@ static xoffset_t  xbuffered_input_stream_tell                (xseekable__t      
 static xboolean_t xbuffered_input_stream_can_seek            (xseekable__t       *seekable);
 static xboolean_t xbuffered_input_stream_seek                (xseekable__t       *seekable,
 							     xoffset_t          offset,
-							     GSeekType        type,
+							     xseek_type_t        type,
 							     xcancellable_t    *cancellable,
 							     xerror_t         **error);
 static xboolean_t xbuffered_input_stream_can_truncate        (xseekable__t       *seekable);
@@ -127,12 +127,12 @@ static xboolean_t xbuffered_input_stream_truncate            (xseekable__t      
 							     xcancellable_t    *cancellable,
 							     xerror_t         **error);
 
-static void compact_buffer (xbuffered_input_stream *stream);
+static void compact_buffer (xbuffered_input_stream_t *stream);
 
-G_DEFINE_TYPE_WITH_CODE (xbuffered_input_stream,
-			 xbuffered_input_stream,
+G_DEFINE_TYPE_WITH_CODE (xbuffered_input_stream_t,
+			 xbuffered_input_stream_t,
 			 XTYPE_FILTER_INPUT_STREAM,
-                         G_ADD_PRIVATE (xbuffered_input_stream)
+                         G_ADD_PRIVATE (xbuffered_input_stream_t)
 			 G_IMPLEMENT_INTERFACE (XTYPE_SEEKABLE,
 						xbuffered_input_stream_seekable_iface_init))
 
@@ -140,7 +140,7 @@ static void
 xbuffered_input_stream_class_init (xbuffered_input_stream_class_t *klass)
 {
   xobject_class_t *object_class;
-  GInputStreamClass *istream_class;
+  xinput_stream_class_t *istream_class;
   xbuffered_input_stream_class_t *bstream_class;
 
   object_class = G_OBJECT_CLASS (klass);
@@ -162,7 +162,7 @@ xbuffered_input_stream_class_init (xbuffered_input_stream_class_t *klass)
   xobject_class_install_property (object_class,
                                    PROP_BUFSIZE,
                                    g_param_spec_uint ("buffer-size",
-                                                      P_("Buffer Size"),
+                                                      P_("buffer_t Size"),
                                                       P_("The size of the backend buffer"),
                                                       1,
                                                       G_MAXUINT,
@@ -175,14 +175,14 @@ xbuffered_input_stream_class_init (xbuffered_input_stream_class_t *klass)
 
 /**
  * xbuffered_input_stream_get_buffer_size:
- * @stream: a #xbuffered_input_stream
+ * @stream: a #xbuffered_input_stream_t
  *
  * Gets the size of the input buffer.
  *
  * Returns: the current buffer size.
  */
 xsize_t
-xbuffered_input_stream_get_buffer_size (xbuffered_input_stream  *stream)
+xbuffered_input_stream_get_buffer_size (xbuffered_input_stream_t  *stream)
 {
   g_return_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), 0);
 
@@ -191,7 +191,7 @@ xbuffered_input_stream_get_buffer_size (xbuffered_input_stream  *stream)
 
 /**
  * xbuffered_input_stream_set_buffer_size:
- * @stream: a #xbuffered_input_stream
+ * @stream: a #xbuffered_input_stream_t
  * @size: a #xsize_t
  *
  * Sets the size of the internal buffer of @stream to @size, or to the
@@ -199,7 +199,7 @@ xbuffered_input_stream_get_buffer_size (xbuffered_input_stream  *stream)
  * smaller than its current contents.
  */
 void
-xbuffered_input_stream_set_buffer_size (xbuffered_input_stream *stream,
+xbuffered_input_stream_set_buffer_size (xbuffered_input_stream_t *stream,
                                          xsize_t                 size)
 {
   xbuffered_input_stream_private_t *priv;
@@ -245,7 +245,7 @@ xbuffered_input_stream_set_property (xobject_t      *object,
                                       const xvalue_t *value,
                                       xparam_spec_t   *pspec)
 {
-  xbuffered_input_stream        *bstream;
+  xbuffered_input_stream_t        *bstream;
 
   bstream = G_BUFFERED_INPUT_STREAM (object);
 
@@ -268,7 +268,7 @@ xbuffered_input_stream_get_property (xobject_t    *object,
                                       xparam_spec_t *pspec)
 {
   xbuffered_input_stream_private_t *priv;
-  xbuffered_input_stream        *bstream;
+  xbuffered_input_stream_t        *bstream;
 
   bstream = G_BUFFERED_INPUT_STREAM (object);
   priv = bstream->priv;
@@ -289,7 +289,7 @@ static void
 xbuffered_input_stream_finalize (xobject_t *object)
 {
   xbuffered_input_stream_private_t *priv;
-  xbuffered_input_stream        *stream;
+  xbuffered_input_stream_t        *stream;
 
   stream = G_BUFFERED_INPUT_STREAM (object);
   priv = stream->priv;
@@ -310,7 +310,7 @@ xbuffered_input_stream_seekable_iface_init (xseekable_iface_t *iface)
 }
 
 static void
-xbuffered_input_stream_init (xbuffered_input_stream *stream)
+xbuffered_input_stream_init (xbuffered_input_stream_t *stream)
 {
   stream->priv = xbuffered_input_stream_get_instance_private (stream);
 }
@@ -344,7 +344,7 @@ xbuffered_input_stream_new (xinput_stream_t *base_stream)
  * @base_stream: a #xinput_stream_t
  * @size: a #xsize_t
  *
- * Creates a new #xbuffered_input_stream from the given @base_stream,
+ * Creates a new #xbuffered_input_stream_t from the given @base_stream,
  * with a buffer set to @size.
  *
  * Returns: a #xinput_stream_t.
@@ -367,7 +367,7 @@ xbuffered_input_stream_new_sized (xinput_stream_t *base_stream,
 
 /**
  * xbuffered_input_stream_fill:
- * @stream: a #xbuffered_input_stream
+ * @stream: a #xbuffered_input_stream_t
  * @count: the number of bytes that will be read from the stream
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore
  * @error: location to store the error occurring, or %NULL to ignore
@@ -401,7 +401,7 @@ xbuffered_input_stream_new_sized (xinput_stream_t *base_stream,
  *     or -1 on error.
  */
 xssize_t
-xbuffered_input_stream_fill (xbuffered_input_stream  *stream,
+xbuffered_input_stream_fill (xbuffered_input_stream_t  *stream,
                               xssize_t                 count,
                               xcancellable_t          *cancellable,
                               xerror_t               **error)
@@ -425,13 +425,13 @@ xbuffered_input_stream_fill (xbuffered_input_stream  *stream,
     return -1;
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   class = G_BUFFERED_INPUT_STREAM_GET_CLASS (stream);
   res = class->fill (stream, count, cancellable, error);
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   xinput_stream_clear_pending (input_stream);
 
@@ -443,7 +443,7 @@ async_fill_callback_wrapper (xobject_t      *source_object,
                              xasync_result_t *res,
                              xpointer_t      user_data)
 {
-  xbuffered_input_stream *stream = G_BUFFERED_INPUT_STREAM (source_object);
+  xbuffered_input_stream_t *stream = G_BUFFERED_INPUT_STREAM (source_object);
 
   xinput_stream_clear_pending (G_INPUT_STREAM (stream));
   (*stream->priv->outstanding_callback) (source_object, res, user_data);
@@ -452,7 +452,7 @@ async_fill_callback_wrapper (xobject_t      *source_object,
 
 /**
  * xbuffered_input_stream_fill_async:
- * @stream: a #xbuffered_input_stream
+ * @stream: a #xbuffered_input_stream_t
  * @count: the number of bytes that will be read from the stream
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object
@@ -467,7 +467,7 @@ async_fill_callback_wrapper (xobject_t      *source_object,
  * of bytes that are required to fill the buffer.
  */
 void
-xbuffered_input_stream_fill_async (xbuffered_input_stream *stream,
+xbuffered_input_stream_fill_async (xbuffered_input_stream_t *stream,
                                     xssize_t                count,
                                     int                   io_priority,
                                     xcancellable_t         *cancellable,
@@ -518,7 +518,7 @@ xbuffered_input_stream_fill_async (xbuffered_input_stream *stream,
 
 /**
  * xbuffered_input_stream_fill_finish:
- * @stream: a #xbuffered_input_stream
+ * @stream: a #xbuffered_input_stream_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t
  *
@@ -527,7 +527,7 @@ xbuffered_input_stream_fill_async (xbuffered_input_stream *stream,
  * Returns: a #xssize_t of the read stream, or `-1` on an error.
  */
 xssize_t
-xbuffered_input_stream_fill_finish (xbuffered_input_stream  *stream,
+xbuffered_input_stream_fill_finish (xbuffered_input_stream_t  *stream,
                                      xasync_result_t          *result,
                                      xerror_t               **error)
 {
@@ -547,14 +547,14 @@ xbuffered_input_stream_fill_finish (xbuffered_input_stream  *stream,
 
 /**
  * xbuffered_input_stream_get_available:
- * @stream: #xbuffered_input_stream
+ * @stream: #xbuffered_input_stream_t
  *
  * Gets the size of the available data within the stream.
  *
  * Returns: size of the available stream.
  */
 xsize_t
-xbuffered_input_stream_get_available (xbuffered_input_stream *stream)
+xbuffered_input_stream_get_available (xbuffered_input_stream_t *stream)
 {
   g_return_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), -1);
 
@@ -563,7 +563,7 @@ xbuffered_input_stream_get_available (xbuffered_input_stream *stream)
 
 /**
  * xbuffered_input_stream_peek:
- * @stream: a #xbuffered_input_stream
+ * @stream: a #xbuffered_input_stream_t
  * @buffer: (array length=count) (element-type xuint8_t): a pointer to
  *   an allocated chunk of memory
  * @offset: a #xsize_t
@@ -575,7 +575,7 @@ xbuffered_input_stream_get_available (xbuffered_input_stream *stream)
  * Returns: a #xsize_t of the number of bytes peeked, or -1 on error.
  */
 xsize_t
-xbuffered_input_stream_peek (xbuffered_input_stream *stream,
+xbuffered_input_stream_peek (xbuffered_input_stream_t *stream,
                               void                 *buffer,
                               xsize_t                 offset,
                               xsize_t                 count)
@@ -600,7 +600,7 @@ xbuffered_input_stream_peek (xbuffered_input_stream *stream,
 
 /**
  * xbuffered_input_stream_peek_buffer:
- * @stream: a #xbuffered_input_stream
+ * @stream: a #xbuffered_input_stream_t
  * @count: (out): a #xsize_t to get the number of bytes available in the buffer
  *
  * Returns the buffer with the currently available bytes. The returned
@@ -611,7 +611,7 @@ xbuffered_input_stream_peek (xbuffered_input_stream *stream,
  *          read-only buffer
  */
 const void*
-xbuffered_input_stream_peek_buffer (xbuffered_input_stream *stream,
+xbuffered_input_stream_peek_buffer (xbuffered_input_stream_t *stream,
                                      xsize_t                *count)
 {
   xbuffered_input_stream_private_t *priv;
@@ -627,7 +627,7 @@ xbuffered_input_stream_peek_buffer (xbuffered_input_stream *stream,
 }
 
 static void
-compact_buffer (xbuffered_input_stream *stream)
+compact_buffer (xbuffered_input_stream_t *stream)
 {
   xbuffered_input_stream_private_t *priv;
   xsize_t current_size;
@@ -643,7 +643,7 @@ compact_buffer (xbuffered_input_stream *stream)
 }
 
 static xssize_t
-xbuffered_input_stream_real_fill (xbuffered_input_stream  *stream,
+xbuffered_input_stream_real_fill (xbuffered_input_stream_t  *stream,
                                    xssize_t                 count,
                                    xcancellable_t          *cancellable,
                                    xerror_t               **error)
@@ -686,7 +686,7 @@ xbuffered_input_stream_skip (xinput_stream_t  *stream,
                               xcancellable_t  *cancellable,
                               xerror_t       **error)
 {
-  xbuffered_input_stream        *bstream;
+  xbuffered_input_stream_t        *bstream;
   xbuffered_input_stream_private_t *priv;
   xbuffered_input_stream_class_t *class;
   xinput_stream_t *base_stream;
@@ -763,7 +763,7 @@ xbuffered_input_stream_read (xinput_stream_t *stream,
                               xcancellable_t *cancellable,
                               xerror_t      **error)
 {
-  xbuffered_input_stream        *bstream;
+  xbuffered_input_stream_t        *bstream;
   xbuffered_input_stream_private_t *priv;
   xbuffered_input_stream_class_t *class;
   xinput_stream_t *base_stream;
@@ -839,7 +839,7 @@ xbuffered_input_stream_read (xinput_stream_t *stream,
 static xoffset_t
 xbuffered_input_stream_tell (xseekable__t *seekable)
 {
-  xbuffered_input_stream        *bstream;
+  xbuffered_input_stream_t        *bstream;
   xbuffered_input_stream_private_t *priv;
   xinput_stream_t *base_stream;
   xseekable__t    *base_stream_seekable;
@@ -872,11 +872,11 @@ xbuffered_input_stream_can_seek (xseekable__t *seekable)
 static xboolean_t
 xbuffered_input_stream_seek (xseekable__t     *seekable,
 			      xoffset_t        offset,
-			      GSeekType      type,
+			      xseek_type_t      type,
 			      xcancellable_t  *cancellable,
 			      xerror_t       **error)
 {
-  xbuffered_input_stream        *bstream;
+  xbuffered_input_stream_t        *bstream;
   xbuffered_input_stream_private_t *priv;
   xinput_stream_t *base_stream;
   xseekable__t *base_stream_seekable;
@@ -935,13 +935,13 @@ xbuffered_input_stream_truncate (xseekable__t     *seekable,
   g_set_error_literal (error,
 		       G_IO_ERROR,
 		       G_IO_ERROR_NOT_SUPPORTED,
-		       _("Cannot truncate xbuffered_input_stream"));
+		       _("Cannot truncate xbuffered_input_stream_t"));
   return FALSE;
 }
 
 /**
  * xbuffered_input_stream_read_byte:
- * @stream: a #xbuffered_input_stream
+ * @stream: a #xbuffered_input_stream_t
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore
  * @error: location to store the error occurring, or %NULL to ignore
  *
@@ -962,7 +962,7 @@ xbuffered_input_stream_truncate (xseekable__t     *seekable,
  * Returns: the byte read from the @stream, or -1 on end of stream or error.
  */
 int
-xbuffered_input_stream_read_byte (xbuffered_input_stream  *stream,
+xbuffered_input_stream_read_byte (xbuffered_input_stream_t  *stream,
                                    xcancellable_t          *cancellable,
                                    xerror_t               **error)
 {
@@ -998,7 +998,7 @@ xbuffered_input_stream_read_byte (xbuffered_input_stream  *stream,
   /* Byte not available, request refill for more */
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   priv->pos = 0;
   priv->end = 0;
@@ -1007,7 +1007,7 @@ xbuffered_input_stream_read_byte (xbuffered_input_stream  *stream,
   nread = class->fill (stream, priv->len, cancellable, error);
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   xinput_stream_clear_pending (input_stream);
 
@@ -1037,7 +1037,7 @@ fill_async_callback (xobject_t      *source_object,
     xtask_return_error (task, error);
   else
     {
-      xbuffered_input_stream *stream;
+      xbuffered_input_stream_t *stream;
       xbuffered_input_stream_private_t *priv;
 
       stream = xtask_get_source_object (task);
@@ -1053,7 +1053,7 @@ fill_async_callback (xobject_t      *source_object,
 }
 
 static void
-xbuffered_input_stream_real_fill_async (xbuffered_input_stream *stream,
+xbuffered_input_stream_real_fill_async (xbuffered_input_stream_t *stream,
                                          xssize_t                count,
                                          int                   io_priority,
                                          xcancellable_t         *cancellable,
@@ -1093,7 +1093,7 @@ xbuffered_input_stream_real_fill_async (xbuffered_input_stream *stream,
 }
 
 static xssize_t
-xbuffered_input_stream_real_fill_finish (xbuffered_input_stream *stream,
+xbuffered_input_stream_real_fill_finish (xbuffered_input_stream_t *stream,
                                           xasync_result_t         *result,
                                           xerror_t              **error)
 {
@@ -1154,7 +1154,7 @@ skip_fill_buffer_callback (xobject_t      *source_object,
                            xpointer_t      user_data)
 {
   xtask_t *task = XTASK (user_data);
-  xbuffered_input_stream *bstream;
+  xbuffered_input_stream_t *bstream;
   xbuffered_input_stream_private_t *priv;
   SkipAsyncData *data;
   xerror_t *error;
@@ -1201,7 +1201,7 @@ xbuffered_input_stream_skip_async (xinput_stream_t        *stream,
                                     xasync_ready_callback_t  callback,
                                     xpointer_t             user_data)
 {
-  xbuffered_input_stream *bstream;
+  xbuffered_input_stream_t *bstream;
   xbuffered_input_stream_private_t *priv;
   xbuffered_input_stream_class_t *class;
   xinput_stream_t *base_stream;

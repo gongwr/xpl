@@ -73,7 +73,7 @@ struct _GNetworkAddressPrivate {
   xlist_t *cached_sockaddrs;
   xchar_t *scheme;
 
-  gint64 resolver_serial;
+  sint64_t resolver_serial;
 };
 
 enum {
@@ -98,7 +98,7 @@ static xsocket_address_enumerator_t	*g_network_address_connectable_proxy_enumera
 static xchar_t                    *g_network_address_connectable_to_string        (xsocket_connectable_t      *connectable);
 
 G_DEFINE_TYPE_WITH_CODE (xnetwork_address, g_network_address, XTYPE_OBJECT,
-                         G_ADD_PRIVATE (xnetwork_address_t)
+                         G_ADD_PRIVATE (xnetwork_address)
                          G_IMPLEMENT_INTERFACE (XTYPE_SOCKET_CONNECTABLE,
                                                 g_network_address_connectable_iface_init))
 
@@ -876,7 +876,7 @@ xnetwork_address_address_enumerator_next (xsocket_address_enumerator_t  *enumera
     {
       xnetwork_address_t *addr = addr_enum->addr;
       xresolver_t *resolver = g_resolver_get_default ();
-      gint64 serial = g_resolver_get_serial (resolver);
+      sint64_t serial = g_resolver_get_serial (resolver);
 
       if (addr->priv->resolver_serial != 0 &&
           addr->priv->resolver_serial != serial)
@@ -1074,7 +1074,7 @@ xnetwork_address_address_enumerator_next_async (xsocket_address_enumerator_t  *e
     {
       xnetwork_address_t *addr = addr_enum->addr;
       xresolver_t *resolver = g_resolver_get_default ();
-      gint64 serial = g_resolver_get_serial (resolver);
+      sint64_t serial = g_resolver_get_serial (resolver);
 
       if (addr->priv->resolver_serial != 0 &&
           addr->priv->resolver_serial != serial)

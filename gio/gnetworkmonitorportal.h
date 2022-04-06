@@ -23,7 +23,7 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_NETWORK_MONITOR_PORTAL         (g_network_monitor_portal_get_type ())
+#define XTYPE_NETWORK_MONITOR_PORTAL         (xnetwork_monitor_portal_get_type ())
 #define G_NETWORK_MONITOR_PORTAL(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NETWORK_MONITOR_PORTAL, GNetworkMonitorPortal))
 #define G_NETWORK_MONITOR_PORTAL_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NETWORK_MONITOR_PORTAL, GNetworkMonitorPortalClass))
 #define X_IS_NETWORK_MONITOR_PORTAL(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NETWORK_MONITOR_PORTAL))
@@ -46,7 +46,7 @@ struct _GNetworkMonitorPortalClass {
   xnetwork_monitor_base_class_t parent_class;
 };
 
-xtype_t g_network_monitor_portal_get_type (void);
+xtype_t xnetwork_monitor_portal_get_type (void);
 
 G_END_DECLS
 

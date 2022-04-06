@@ -178,7 +178,7 @@ xsocket_listener_class_init (GSocketListenerClass *klass)
    * Since: 2.46
    */
   signals[EVENT] =
-    g_signal_new (I_("event"),
+    xsignal_new (I_("event"),
                   XTYPE_FROM_CLASS (gobject_class),
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GSocketListenerClass, event),
@@ -187,7 +187,7 @@ xsocket_listener_class_init (GSocketListenerClass *klass)
                   XTYPE_NONE, 2,
                   XTYPE_SOCKET_LISTENER_EVENT,
                   XTYPE_SOCKET);
-  g_signal_set_va_marshaller (signals[EVENT],
+  xsignal_set_va_marshaller (signals[EVENT],
                               XTYPE_FROM_CLASS (gobject_class),
                               _g_cclosure_marshal_VOID__ENUM_OBJECTv);
 
@@ -352,7 +352,7 @@ xsocket_listener_add_address (xsocket_listener_t  *listener,
 
   xsocket_set_listen_backlog (socket, listener->priv->listen_backlog);
 
-  g_signal_emit (listener, signals[EVENT], 0,
+  xsignal_emit (listener, signals[EVENT], 0,
                  XSOCKET_LISTENER_BINDING, socket);
 
   if (!xsocket_bind (socket, address, TRUE, error))
@@ -361,9 +361,9 @@ xsocket_listener_add_address (xsocket_listener_t  *listener,
       return FALSE;
     }
 
-  g_signal_emit (listener, signals[EVENT], 0,
+  xsignal_emit (listener, signals[EVENT], 0,
                  XSOCKET_LISTENER_BOUND, socket);
-  g_signal_emit (listener, signals[EVENT], 0,
+  xsignal_emit (listener, signals[EVENT], 0,
                  XSOCKET_LISTENER_LISTENING, socket);
 
   if (!xsocket_listen (socket, error))
@@ -372,7 +372,7 @@ xsocket_listener_add_address (xsocket_listener_t  *listener,
       return FALSE;
     }
 
-  g_signal_emit (listener, signals[EVENT], 0,
+  xsignal_emit (listener, signals[EVENT], 0,
                  XSOCKET_LISTENER_LISTENED, socket);
 
   local_address = NULL;
@@ -465,7 +465,7 @@ xsocket_listener_add_inet_port (xsocket_listener_t  *listener,
 
       xsocket_set_listen_backlog (socket6, listener->priv->listen_backlog);
 
-      g_signal_emit (listener, signals[EVENT], 0,
+      xsignal_emit (listener, signals[EVENT], 0,
                      XSOCKET_LISTENER_BINDING, socket6);
 
       if (!xsocket_bind (socket6, address, TRUE, error))
@@ -477,9 +477,9 @@ xsocket_listener_add_inet_port (xsocket_listener_t  *listener,
 
       xobject_unref (address);
 
-      g_signal_emit (listener, signals[EVENT], 0,
+      xsignal_emit (listener, signals[EVENT], 0,
                      XSOCKET_LISTENER_BOUND, socket6);
-      g_signal_emit (listener, signals[EVENT], 0,
+      xsignal_emit (listener, signals[EVENT], 0,
                      XSOCKET_LISTENER_LISTENING, socket6);
 
       if (!xsocket_listen (socket6, error))
@@ -488,7 +488,7 @@ xsocket_listener_add_inet_port (xsocket_listener_t  *listener,
           return FALSE;
         }
 
-      g_signal_emit (listener, signals[EVENT], 0,
+      xsignal_emit (listener, signals[EVENT], 0,
                      XSOCKET_LISTENER_LISTENED, socket6);
 
       if (source_object)
@@ -532,7 +532,7 @@ xsocket_listener_add_inet_port (xsocket_listener_t  *listener,
           xsocket_set_listen_backlog (socket4,
                                        listener->priv->listen_backlog);
 
-          g_signal_emit (listener, signals[EVENT], 0,
+          xsignal_emit (listener, signals[EVENT], 0,
                          XSOCKET_LISTENER_BINDING, socket4);
 
           if (!xsocket_bind (socket4, address, TRUE, error))
@@ -547,9 +547,9 @@ xsocket_listener_add_inet_port (xsocket_listener_t  *listener,
 
           xobject_unref (address);
 
-          g_signal_emit (listener, signals[EVENT], 0,
+          xsignal_emit (listener, signals[EVENT], 0,
                          XSOCKET_LISTENER_BOUND, socket4);
-          g_signal_emit (listener, signals[EVENT], 0,
+          xsignal_emit (listener, signals[EVENT], 0,
                          XSOCKET_LISTENER_LISTENING, socket4);
 
           if (!xsocket_listen (socket4, error))
@@ -561,7 +561,7 @@ xsocket_listener_add_inet_port (xsocket_listener_t  *listener,
               return FALSE;
             }
 
-          g_signal_emit (listener, signals[EVENT], 0,
+          xsignal_emit (listener, signals[EVENT], 0,
                          XSOCKET_LISTENER_LISTENED, socket4);
 
           if (source_object)
@@ -1088,7 +1088,7 @@ xsocket_listener_add_any_inet_port (xsocket_listener_t  *listener,
           address = g_inet_socket_address_new (inet_address, 0);
           xobject_unref (inet_address);
 
-          g_signal_emit (listener, signals[EVENT], 0,
+          xsignal_emit (listener, signals[EVENT], 0,
                          XSOCKET_LISTENER_BINDING, socket6);
 
           result = xsocket_bind (socket6, address, TRUE, error);
@@ -1102,7 +1102,7 @@ xsocket_listener_add_any_inet_port (xsocket_listener_t  *listener,
               break;
             }
 
-          g_signal_emit (listener, signals[EVENT], 0,
+          xsignal_emit (listener, signals[EVENT], 0,
                          XSOCKET_LISTENER_BOUND, socket6);
 
           g_assert (X_IS_INET_SOCKET_ADDRESS (address));
@@ -1134,7 +1134,7 @@ xsocket_listener_add_any_inet_port (xsocket_listener_t  *listener,
       address = g_inet_socket_address_new (inet_address, candidate_port);
       xobject_unref (inet_address);
 
-      g_signal_emit (listener, signals[EVENT], 0,
+      xsignal_emit (listener, signals[EVENT], 0,
                      XSOCKET_LISTENER_BINDING, socket4);
 
       /* a note on the 'error' clause below:
@@ -1163,7 +1163,7 @@ xsocket_listener_add_any_inet_port (xsocket_listener_t  *listener,
           if (result)
             /* got our candidate port successfully */
             {
-              g_signal_emit (listener, signals[EVENT], 0,
+              xsignal_emit (listener, signals[EVENT], 0,
                              XSOCKET_LISTENER_BOUND, socket4);
               break;
             }
@@ -1196,7 +1196,7 @@ xsocket_listener_add_any_inet_port (xsocket_listener_t  *listener,
               break;
             }
 
-            g_signal_emit (listener, signals[EVENT], 0,
+            xsignal_emit (listener, signals[EVENT], 0,
                            XSOCKET_LISTENER_BOUND, socket4);
 
             g_assert (X_IS_INET_SOCKET_ADDRESS (address));
@@ -1223,7 +1223,7 @@ xsocket_listener_add_any_inet_port (xsocket_listener_t  *listener,
     {
       xsocket_set_listen_backlog (socket6, listener->priv->listen_backlog);
 
-      g_signal_emit (listener, signals[EVENT], 0,
+      xsignal_emit (listener, signals[EVENT], 0,
                      XSOCKET_LISTENER_LISTENING, socket6);
 
       if (!xsocket_listen (socket6, error))
@@ -1235,7 +1235,7 @@ xsocket_listener_add_any_inet_port (xsocket_listener_t  *listener,
           return 0;
         }
 
-      g_signal_emit (listener, signals[EVENT], 0,
+      xsignal_emit (listener, signals[EVENT], 0,
                      XSOCKET_LISTENER_LISTENED, socket6);
 
       if (source_object)
@@ -1250,7 +1250,7 @@ xsocket_listener_add_any_inet_port (xsocket_listener_t  *listener,
     {
       xsocket_set_listen_backlog (socket4, listener->priv->listen_backlog);
 
-      g_signal_emit (listener, signals[EVENT], 0,
+      xsignal_emit (listener, signals[EVENT], 0,
                      XSOCKET_LISTENER_LISTENING, socket4);
 
       if (!xsocket_listen (socket4, error))
@@ -1262,7 +1262,7 @@ xsocket_listener_add_any_inet_port (xsocket_listener_t  *listener,
           return 0;
         }
 
-      g_signal_emit (listener, signals[EVENT], 0,
+      xsignal_emit (listener, signals[EVENT], 0,
                      XSOCKET_LISTENER_LISTENED, socket4);
 
       if (source_object)

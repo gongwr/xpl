@@ -85,7 +85,7 @@ void                    g_settings_backend_sync_default                 (void);
 
 xtype_t                   g_null_settings_backend_get_type                (void);
 
-xtype_t                   g_memory_settings_backend_get_type              (void);
+xtype_t                   xmemory_settings_backend_get_type              (void);
 
 xtype_t                   g_keyfile_settings_backend_get_type             (void);
 

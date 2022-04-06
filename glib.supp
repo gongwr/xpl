@@ -275,7 +275,7 @@
 	Memcheck:Leak
 	match-leak-kinds:reachable
 	...
-	fun:g_signal_new
+	fun:xsignal_new
 	...
 	fun:type_class_init_Wm
 }
@@ -777,7 +777,7 @@
 {
 	g-cancellable-is-cancelled
 	Helgrind:Race
-	fun:g_cancellable_is_cancelled
+	fun:xcancellable_is_cancelled
 }
 
 # False positive

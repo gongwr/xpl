@@ -192,7 +192,7 @@ xboolean_t               xsocket_condition_wait          (xsocket_t             
 XPL_AVAILABLE_IN_2_32
 xboolean_t               xsocket_condition_timed_wait    (xsocket_t                 *socket,
 							 xio_condition_t             condition,
-							 gint64                   timeout_us,
+							 sint64_t                   timeout_us,
 							 xcancellable_t            *cancellable,
 							 xerror_t                 **error);
 XPL_AVAILABLE_IN_ALL
@@ -306,7 +306,7 @@ GPollableReturn        xsocket_send_message_with_timeout (xsocket_t             
 							   xsocket_control_message_t **messages,
 							   xint_t                    num_messages,
 							   xint_t                    flags,
-							   gint64                  timeout_us,
+							   sint64_t                  timeout_us,
 							   xsize_t                  *bytes_written,
 							   xcancellable_t           *cancellable,
 							   xerror_t                **error);

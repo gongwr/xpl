@@ -56,7 +56,7 @@
  * By default, #xdbus_proxy_t will cache all properties (and listen to
  * changes) of the remote object, and proxy all signals that get
  * emitted. This behaviour can be changed by passing suitable
- * #GDBusProxyFlags when the proxy is created. If the proxy is for a
+ * #xdbus_proxy_flags_t when the proxy is created. If the proxy is for a
  * well-known name, the property cache is flushed when the name owner
  * vanishes and reloaded when a name owner appears.
  *
@@ -119,10 +119,10 @@ weak_ref_free (GWeakRef *weak_ref)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-struct _GDBusProxyPrivate
+struct _xdbus_proxy_private
 {
-  GBusType bus_type;
-  GDBusProxyFlags flags;
+  xbus_type_t bus_type;
+  xdbus_proxy_flags_t flags;
   xdbus_connection_t *connection;
 
   xchar_t *name;
@@ -175,33 +175,33 @@ enum
 
 static xuint_t signals[LAST_SIGNAL] = {0};
 
-static void dbus_interface_iface_init (GDBusInterfaceIface *dbus_interface_iface);
+static void dbus_interface_iface_init (xdbus_interface_iface_t *dbus_interface_iface);
 static void initable_iface_init       (xinitable_iface_t *initable_iface);
 static void async_initable_iface_init (xasync_initable_iface_t *async_initable_iface);
 
-G_DEFINE_TYPE_WITH_CODE (xdbus_proxy, g_dbus_proxy, XTYPE_OBJECT,
-                         G_ADD_PRIVATE (xdbus_proxy_t)
+G_DEFINE_TYPE_WITH_CODE (xdbus_proxy, xdbus_proxy, XTYPE_OBJECT,
+                         G_ADD_PRIVATE (xdbus_proxy)
                          G_IMPLEMENT_INTERFACE (XTYPE_DBUS_INTERFACE, dbus_interface_iface_init)
                          G_IMPLEMENT_INTERFACE (XTYPE_INITABLE, initable_iface_init)
                          G_IMPLEMENT_INTERFACE (XTYPE_ASYNC_INITABLE, async_initable_iface_init))
 
 static void
-g_dbus_proxy_finalize (xobject_t *object)
+xdbus_proxy_finalize (xobject_t *object)
 {
   xdbus_proxy_t *proxy = G_DBUS_PROXY (object);
 
   g_warn_if_fail (proxy->priv->get_all_cancellable == NULL);
 
   if (proxy->priv->name_owner_changed_subscription_id > 0)
-    g_dbus_connection_signal_unsubscribe (proxy->priv->connection,
+    xdbus_connection_signal_unsubscribe (proxy->priv->connection,
                                           proxy->priv->name_owner_changed_subscription_id);
 
   if (proxy->priv->properties_changed_subscription_id > 0)
-    g_dbus_connection_signal_unsubscribe (proxy->priv->connection,
+    xdbus_connection_signal_unsubscribe (proxy->priv->connection,
                                           proxy->priv->properties_changed_subscription_id);
 
   if (proxy->priv->signals_subscription_id > 0)
-    g_dbus_connection_signal_unsubscribe (proxy->priv->connection,
+    xdbus_connection_signal_unsubscribe (proxy->priv->connection,
                                           proxy->priv->signals_subscription_id);
 
   if (proxy->priv->connection != NULL)
@@ -222,11 +222,11 @@ g_dbus_proxy_finalize (xobject_t *object)
   if (proxy->priv->object != NULL)
     xobject_remove_weak_pointer (G_OBJECT (proxy->priv->object), (xpointer_t *) &proxy->priv->object);
 
-  G_OBJECT_CLASS (g_dbus_proxy_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xdbus_proxy_parent_class)->finalize (object);
 }
 
 static void
-g_dbus_proxy_get_property (xobject_t    *object,
+xdbus_proxy_get_property (xobject_t    *object,
                            xuint_t       prop_id,
                            xvalue_t     *value,
                            xparam_spec_t *pspec)
@@ -248,7 +248,7 @@ g_dbus_proxy_get_property (xobject_t    *object,
       break;
 
     case PROP_G_NAME_OWNER:
-      xvalue_take_string (value, g_dbus_proxy_get_name_owner (proxy));
+      xvalue_take_string (value, xdbus_proxy_get_name_owner (proxy));
       break;
 
     case PROP_G_OBJECT_PATH:
@@ -260,11 +260,11 @@ g_dbus_proxy_get_property (xobject_t    *object,
       break;
 
     case PROP_G_DEFAULT_TIMEOUT:
-      xvalue_set_int (value, g_dbus_proxy_get_default_timeout (proxy));
+      xvalue_set_int (value, xdbus_proxy_get_default_timeout (proxy));
       break;
 
     case PROP_G_INTERFACE_INFO:
-      xvalue_set_boxed (value, g_dbus_proxy_get_interface_info (proxy));
+      xvalue_set_boxed (value, xdbus_proxy_get_interface_info (proxy));
       break;
 
     default:
@@ -274,7 +274,7 @@ g_dbus_proxy_get_property (xobject_t    *object,
 }
 
 static void
-g_dbus_proxy_set_property (xobject_t      *object,
+xdbus_proxy_set_property (xobject_t      *object,
                            xuint_t         prop_id,
                            const xvalue_t *value,
                            xparam_spec_t   *pspec)
@@ -304,11 +304,11 @@ g_dbus_proxy_set_property (xobject_t      *object,
       break;
 
     case PROP_G_DEFAULT_TIMEOUT:
-      g_dbus_proxy_set_default_timeout (proxy, xvalue_get_int (value));
+      xdbus_proxy_set_default_timeout (proxy, xvalue_get_int (value));
       break;
 
     case PROP_G_INTERFACE_INFO:
-      g_dbus_proxy_set_interface_info (proxy, xvalue_get_boxed (value));
+      xdbus_proxy_set_interface_info (proxy, xvalue_get_boxed (value));
       break;
 
     case PROP_G_BUS_TYPE:
@@ -322,13 +322,13 @@ g_dbus_proxy_set_property (xobject_t      *object,
 }
 
 static void
-g_dbus_proxy_class_init (GDBusProxyClass *klass)
+xdbus_proxy_class_init (GDBusProxyClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->finalize     = g_dbus_proxy_finalize;
-  gobject_class->set_property = g_dbus_proxy_set_property;
-  gobject_class->get_property = g_dbus_proxy_get_property;
+  gobject_class->finalize     = xdbus_proxy_finalize;
+  gobject_class->set_property = xdbus_proxy_set_property;
+  gobject_class->get_property = xdbus_proxy_get_property;
 
   /* Note that all property names are prefixed to avoid collisions with D-Bus property names
    * in derived classes */
@@ -352,7 +352,7 @@ g_dbus_proxy_class_init (GDBusProxyClass *klass)
    * - Properties received via the initial `GetAll()` call or via the
    *   `::PropertiesChanged` signal (on the
    *   [org.freedesktop.DBus.Properties](http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-properties)
-   *   interface) or set using g_dbus_proxy_set_cached_property()
+   *   interface) or set using xdbus_proxy_set_cached_property()
    *   with a type signature mismatch are ignored and a warning is
    *   logged via g_warning().
    *
@@ -421,7 +421,7 @@ g_dbus_proxy_class_init (GDBusProxyClass *klass)
   /**
    * xdbus_proxy_t:g-flags:
    *
-   * Flags from the #GDBusProxyFlags enumeration.
+   * Flags from the #xdbus_proxy_flags_t enumeration.
    *
    * Since: 2.26
    */
@@ -523,8 +523,8 @@ g_dbus_proxy_class_init (GDBusProxyClass *klass)
    * xdbus_proxy_t:g-default-timeout:
    *
    * The timeout to use if -1 (specifying default timeout) is passed
-   * as @timeout_msec in the g_dbus_proxy_call() and
-   * g_dbus_proxy_call_sync() functions.
+   * as @timeout_msec in the xdbus_proxy_call() and
+   * xdbus_proxy_call_sync() functions.
    *
    * This allows applications to set a proxy-wide timeout for all
    * remote method invocations on the proxy. If this property is -1,
@@ -569,7 +569,7 @@ g_dbus_proxy_class_init (GDBusProxyClass *klass)
    *
    * Since: 2.26
    */
-  signals[PROPERTIES_CHANGED_SIGNAL] = g_signal_new (I_("g-properties-changed"),
+  signals[PROPERTIES_CHANGED_SIGNAL] = xsignal_new (I_("g-properties-changed"),
                                                      XTYPE_DBUS_PROXY,
                                                      G_SIGNAL_RUN_LAST | G_SIGNAL_MUST_COLLECT,
                                                      G_STRUCT_OFFSET (GDBusProxyClass, g_properties_changed),
@@ -580,7 +580,7 @@ g_dbus_proxy_class_init (GDBusProxyClass *klass)
                                                      2,
                                                      XTYPE_VARIANT,
                                                      XTYPE_STRV | G_SIGNAL_TYPE_STATIC_SCOPE);
-  g_signal_set_va_marshaller (signals[PROPERTIES_CHANGED_SIGNAL],
+  xsignal_set_va_marshaller (signals[PROPERTIES_CHANGED_SIGNAL],
                               XTYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_VOID__VARIANT_BOXEDv);
 
@@ -599,7 +599,7 @@ g_dbus_proxy_class_init (GDBusProxyClass *klass)
    *
    * Since: 2.26
    */
-  signals[SIGNAL_SIGNAL] = g_signal_new (I_("g-signal"),
+  signals[SIGNAL_SIGNAL] = xsignal_new (I_("g-signal"),
                                          XTYPE_DBUS_PROXY,
                                          G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED | G_SIGNAL_MUST_COLLECT,
                                          G_STRUCT_OFFSET (GDBusProxyClass, g_signal),
@@ -611,16 +611,16 @@ g_dbus_proxy_class_init (GDBusProxyClass *klass)
                                          XTYPE_STRING,
                                          XTYPE_STRING,
                                          XTYPE_VARIANT);
-  g_signal_set_va_marshaller (signals[SIGNAL_SIGNAL],
+  xsignal_set_va_marshaller (signals[SIGNAL_SIGNAL],
                               XTYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_VOID__STRING_STRING_VARIANTv);
 
 }
 
 static void
-g_dbus_proxy_init (xdbus_proxy_t *proxy)
+xdbus_proxy_init (xdbus_proxy_t *proxy)
 {
-  proxy->priv = g_dbus_proxy_get_instance_private (proxy);
+  proxy->priv = xdbus_proxy_get_instance_private (proxy);
   proxy->priv->properties = xhash_table_new_full (xstr_hash,
                                                    xstr_equal,
                                                    g_free,
@@ -637,7 +637,7 @@ property_name_sort_func (const xchar_t **a,
 }
 
 /**
- * g_dbus_proxy_get_cached_property_names:
+ * xdbus_proxy_get_cached_property_names:
  * @proxy: A #xdbus_proxy_t.
  *
  * Gets the names of all cached properties on @proxy.
@@ -650,7 +650,7 @@ property_name_sort_func (const xchar_t **a,
  * Since: 2.26
  */
 xchar_t **
-g_dbus_proxy_get_cached_property_names (xdbus_proxy_t  *proxy)
+xdbus_proxy_get_cached_property_names (xdbus_proxy_t  *proxy)
 {
   xchar_t **names;
   xptr_array_t *p;
@@ -699,7 +699,7 @@ lookup_property_info (xdbus_proxy_t  *proxy,
 }
 
 /**
- * g_dbus_proxy_get_cached_property:
+ * xdbus_proxy_get_cached_property:
  * @proxy: A #xdbus_proxy_t.
  * @property_name: Property name.
  *
@@ -717,7 +717,7 @@ lookup_property_info (xdbus_proxy_t  *proxy,
  * Since: 2.26
  */
 xvariant_t *
-g_dbus_proxy_get_cached_property (xdbus_proxy_t   *proxy,
+xdbus_proxy_get_cached_property (xdbus_proxy_t   *proxy,
                                   const xchar_t  *property_name)
 {
   const xdbus_property_info_t *info;
@@ -756,7 +756,7 @@ g_dbus_proxy_get_cached_property (xdbus_proxy_t   *proxy,
 }
 
 /**
- * g_dbus_proxy_set_cached_property:
+ * xdbus_proxy_set_cached_property:
  * @proxy: A #xdbus_proxy_t
  * @property_name: Property name.
  * @value: (nullable): Value for the property or %NULL to remove it from the cache.
@@ -774,7 +774,7 @@ g_dbus_proxy_get_cached_property (xdbus_proxy_t   *proxy,
  * If the @value #xvariant_t is floating, it is consumed. This allows
  * convenient 'inline' use of xvariant_new(), e.g.
  * |[<!-- language="C" -->
- *  g_dbus_proxy_set_cached_property (proxy,
+ *  xdbus_proxy_set_cached_property (proxy,
  *                                    "SomeProperty",
  *                                    xvariant_new ("(si)",
  *                                                  "A String",
@@ -798,7 +798,7 @@ g_dbus_proxy_get_cached_property (xdbus_proxy_t   *proxy,
  * Since: 2.26
  */
 void
-g_dbus_proxy_set_cached_property (xdbus_proxy_t   *proxy,
+xdbus_proxy_set_cached_property (xdbus_proxy_t   *proxy,
                                   const xchar_t  *property_name,
                                   xvariant_t     *value)
 {
@@ -892,7 +892,7 @@ on_signal_received (xdbus_connection_t *connection,
 
   G_UNLOCK (properties_lock);
 
-  g_signal_emit (proxy,
+  xsignal_emit (proxy,
                  signals[SIGNAL_SIGNAL],
                  g_quark_try_string (signal_name),
                  sender_name,
@@ -960,7 +960,7 @@ invalidated_property_get_cb (xdbus_connection_t *connection,
   xvariant_t *unpacked_value = NULL;
 
   /* errors are fine, the other end could have disconnected */
-  value = g_dbus_connection_call_finish (connection, res, NULL);
+  value = xdbus_connection_call_finish (connection, res, NULL);
   if (value == NULL)
     {
       goto out;
@@ -985,7 +985,7 @@ invalidated_property_get_cb (xdbus_connection_t *connection,
   data->prop_name = NULL;
   G_UNLOCK (properties_lock);
 
-  g_signal_emit (data->proxy,
+  xsignal_emit (data->proxy,
                  signals[PROPERTIES_CHANGED_SIGNAL], 0,
                  xvariant_builder_end (&builder), /* consumed */
                  invalidated_properties);
@@ -1076,7 +1076,7 @@ on_properties_changed (xdbus_connection_t *connection,
               data = g_slice_new0 (InvalidatedPropGetData);
               data->proxy = xobject_ref (proxy);
               data->prop_name = xstrdup (invalidated_properties[n]);
-              g_dbus_connection_call (proxy->priv->connection,
+              xdbus_connection_call (proxy->priv->connection,
                                       proxy->priv->name_owner,
                                       proxy->priv->object_path,
                                       "org.freedesktop.DBus.Properties",
@@ -1104,7 +1104,7 @@ on_properties_changed (xdbus_connection_t *connection,
 
   if (emit_g_signal)
     {
-      g_signal_emit (proxy, signals[PROPERTIES_CHANGED_SIGNAL],
+      xsignal_emit (proxy, signals[PROPERTIES_CHANGED_SIGNAL],
                      0,
                      changed_properties,
                      invalidated_properties);
@@ -1157,7 +1157,7 @@ process_get_all_reply (xdbus_proxy_t *proxy,
       xvariant_get (result,
                      "(@a{sv})",
                      &changed_properties);
-      g_signal_emit (proxy, signals[PROPERTIES_CHANGED_SIGNAL],
+      xsignal_emit (proxy, signals[PROPERTIES_CHANGED_SIGNAL],
                      0,
                      changed_properties,
                      invalidated_properties);
@@ -1173,14 +1173,14 @@ typedef struct
   xdbus_proxy_t *proxy;
   xcancellable_t *cancellable;
   xchar_t *name_owner;
-} LoadPropertiesOnNameOwnerChangedData;
+} load_properties_on_name_owner_changed_data_t;
 
 static void
 on_name_owner_changed_get_all_cb (xdbus_connection_t *connection,
                                   xasync_result_t    *res,
                                   xpointer_t         user_data)
 {
-  LoadPropertiesOnNameOwnerChangedData *data = user_data;
+  load_properties_on_name_owner_changed_data_t *data = user_data;
   xvariant_t *result;
   xerror_t *error;
   xboolean_t cancelled;
@@ -1188,7 +1188,7 @@ on_name_owner_changed_get_all_cb (xdbus_connection_t *connection,
   cancelled = FALSE;
 
   error = NULL;
-  result = g_dbus_connection_call_finish (connection,
+  result = xdbus_connection_call_finish (connection,
                                           res,
                                           &error);
   if (result == NULL)
@@ -1259,7 +1259,7 @@ on_name_owner_changed (xdbus_connection_t *connection,
   /* if we are already trying to load properties, cancel that */
   if (proxy->priv->get_all_cancellable != NULL)
     {
-      g_cancellable_cancel (proxy->priv->get_all_cancellable);
+      xcancellable_cancel (proxy->priv->get_all_cancellable);
       proxy->priv->get_all_cancellable = NULL;
     }
 
@@ -1299,7 +1299,7 @@ on_name_owner_changed (xdbus_connection_t *connection,
           G_UNLOCK (properties_lock);
 
           /* ... and finally emit the ::g-properties-changed signal */
-          g_signal_emit (proxy, signals[PROPERTIES_CHANGED_SIGNAL],
+          xsignal_emit (proxy, signals[PROPERTIES_CHANGED_SIGNAL],
                          0,
                          xvariant_builder_end (&builder) /* consumed */,
                          (const xchar_t* const *) invalidated_properties->pdata);
@@ -1333,7 +1333,7 @@ on_name_owner_changed (xdbus_connection_t *connection,
         }
       else
         {
-          LoadPropertiesOnNameOwnerChangedData *data;
+          load_properties_on_name_owner_changed_data_t *data;
 
           G_UNLOCK (properties_lock);
 
@@ -1343,12 +1343,12 @@ on_name_owner_changed (xdbus_connection_t *connection,
            */
 
           g_assert (proxy->priv->get_all_cancellable == NULL);
-          proxy->priv->get_all_cancellable = g_cancellable_new ();
-          data = g_new0 (LoadPropertiesOnNameOwnerChangedData, 1);
+          proxy->priv->get_all_cancellable = xcancellable_new ();
+          data = g_new0 (load_properties_on_name_owner_changed_data_t, 1);
           data->proxy = xobject_ref (proxy);
           data->cancellable = proxy->priv->get_all_cancellable;
           data->name_owner = xstrdup (new_owner);
-          g_dbus_connection_call (proxy->priv->connection,
+          xdbus_connection_call (proxy->priv->connection,
                                   data->name_owner,
                                   proxy->priv->object_path,
                                   "org.freedesktop.DBus.Properties",
@@ -1379,7 +1379,7 @@ async_init_get_all_cb (xdbus_connection_t *connection,
   xerror_t *error;
 
   error = NULL;
-  result = g_dbus_connection_call_finish (connection,
+  result = xdbus_connection_call_finish (connection,
                                           res,
                                           &error);
   if (result == NULL)
@@ -1442,7 +1442,7 @@ async_init_data_set_name_owner (xtask_t       *task,
   if (get_all)
     {
       /* load all properties asynchronously */
-      g_dbus_connection_call (proxy->priv->connection,
+      xdbus_connection_call (proxy->priv->connection,
                               name_owner,
                               proxy->priv->object_path,
                               "org.freedesktop.DBus.Properties",
@@ -1472,7 +1472,7 @@ async_init_get_name_owner_cb (xdbus_connection_t *connection,
   xvariant_t *result;
 
   error = NULL;
-  result = g_dbus_connection_call_finish (connection,
+  result = xdbus_connection_call_finish (connection,
                                           res,
                                           &error);
   if (result == NULL)
@@ -1505,7 +1505,7 @@ async_init_call_get_name_owner (xtask_t *task)
 {
   xdbus_proxy_t *proxy = xtask_get_source_object (task);
 
-  g_dbus_connection_call (proxy->priv->connection,
+  xdbus_connection_call (proxy->priv->connection,
                           "org.freedesktop.DBus",  /* name */
                           "/org/freedesktop/DBus", /* object path */
                           "org.freedesktop.DBus",  /* interface */
@@ -1531,7 +1531,7 @@ async_init_start_service_by_name_cb (xdbus_connection_t *connection,
   xvariant_t *result;
 
   error = NULL;
-  result = g_dbus_connection_call_finish (connection,
+  result = xdbus_connection_call_finish (connection,
                                           res,
                                           &error);
   if (result == NULL)
@@ -1614,7 +1614,7 @@ async_init_call_start_service_by_name (xtask_t *task)
 {
   xdbus_proxy_t *proxy = xtask_get_source_object (task);
 
-  g_dbus_connection_call (proxy->priv->connection,
+  xdbus_connection_call (proxy->priv->connection,
                           "org.freedesktop.DBus",  /* name */
                           "/org/freedesktop/DBus", /* object path */
                           "org.freedesktop.DBus",  /* interface */
@@ -1707,7 +1707,7 @@ async_initable_init_first (xasync_initable_t *initable)
     {
       /* subscribe to PropertiesChanged() */
       proxy->priv->properties_changed_subscription_id =
-        g_dbus_connection_signal_subscribe (proxy->priv->connection,
+        xdbus_connection_signal_subscribe (proxy->priv->connection,
                                             proxy->priv->name,
                                             "org.freedesktop.DBus.Properties",
                                             "PropertiesChanged",
@@ -1723,7 +1723,7 @@ async_initable_init_first (xasync_initable_t *initable)
     {
       /* subscribe to all signals for the object */
       proxy->priv->signals_subscription_id =
-        g_dbus_connection_signal_subscribe (proxy->priv->connection,
+        xdbus_connection_signal_subscribe (proxy->priv->connection,
                                             proxy->priv->name,
                                             proxy->priv->interface_name,
                                             NULL,                        /* member */
@@ -1736,10 +1736,10 @@ async_initable_init_first (xasync_initable_t *initable)
     }
 
   if (proxy->priv->name != NULL &&
-      (g_dbus_connection_get_flags (proxy->priv->connection) & G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION))
+      (xdbus_connection_get_flags (proxy->priv->connection) & G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION))
     {
       proxy->priv->name_owner_changed_subscription_id =
-        g_dbus_connection_signal_subscribe (proxy->priv->connection,
+        xdbus_connection_signal_subscribe (proxy->priv->connection,
                                             "org.freedesktop.DBus",  /* name */
                                             "org.freedesktop.DBus",  /* interface */
                                             "NameOwnerChanged",      /* signal name */
@@ -1942,7 +1942,7 @@ initable_iface_init (xinitable_iface_t *initable_iface)
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_proxy_new:
+ * xdbus_proxy_new:
  * @connection: A #xdbus_connection_t.
  * @flags: Flags used when constructing the proxy.
  * @info: (nullable): A #xdbus_interface_info_t specifying the minimal interface that @proxy conforms to or %NULL.
@@ -1975,17 +1975,17 @@ initable_iface_init (xinitable_iface_t *initable_iface)
  *
  * This is a failable asynchronous constructor - when the proxy is
  * ready, @callback will be invoked and you can use
- * g_dbus_proxy_new_finish() to get the result.
+ * xdbus_proxy_new_finish() to get the result.
  *
- * See g_dbus_proxy_new_sync() and for a synchronous version of this constructor.
+ * See xdbus_proxy_new_sync() and for a synchronous version of this constructor.
  *
  * #xdbus_proxy_t is used in this [example][gdbus-wellknown-proxy].
  *
  * Since: 2.26
  */
 void
-g_dbus_proxy_new (xdbus_connection_t     *connection,
-                  GDBusProxyFlags      flags,
+xdbus_proxy_new (xdbus_connection_t     *connection,
+                  xdbus_proxy_flags_t      flags,
                   xdbus_interface_info_t  *info,
                   const xchar_t         *name,
                   const xchar_t         *object_path,
@@ -1997,7 +1997,7 @@ g_dbus_proxy_new (xdbus_connection_t     *connection,
   _g_dbus_initialize ();
 
   g_return_if_fail (X_IS_DBUS_CONNECTION (connection));
-  g_return_if_fail ((name == NULL && g_dbus_connection_get_unique_name (connection) == NULL) || g_dbus_is_name (name));
+  g_return_if_fail ((name == NULL && xdbus_connection_get_unique_name (connection) == NULL) || g_dbus_is_name (name));
   g_return_if_fail (xvariant_is_object_path (object_path));
   g_return_if_fail (g_dbus_is_interface_name (interface_name));
 
@@ -2016,8 +2016,8 @@ g_dbus_proxy_new (xdbus_connection_t     *connection,
 }
 
 /**
- * g_dbus_proxy_new_finish:
- * @res: A #xasync_result_t obtained from the #xasync_ready_callback_t function passed to g_dbus_proxy_new().
+ * xdbus_proxy_new_finish:
+ * @res: A #xasync_result_t obtained from the #xasync_ready_callback_t function passed to xdbus_proxy_new().
  * @error: Return location for error or %NULL.
  *
  * Finishes creating a #xdbus_proxy_t.
@@ -2028,7 +2028,7 @@ g_dbus_proxy_new (xdbus_connection_t     *connection,
  * Since: 2.26
  */
 xdbus_proxy_t *
-g_dbus_proxy_new_finish (xasync_result_t  *res,
+xdbus_proxy_new_finish (xasync_result_t  *res,
                          xerror_t       **error)
 {
   xobject_t *object;
@@ -2049,7 +2049,7 @@ g_dbus_proxy_new_finish (xasync_result_t  *res,
 }
 
 /**
- * g_dbus_proxy_new_sync:
+ * xdbus_proxy_new_sync:
  * @connection: A #xdbus_connection_t.
  * @flags: Flags used when constructing the proxy.
  * @info: (nullable): A #xdbus_interface_info_t specifying the minimal interface that @proxy conforms to or %NULL.
@@ -2077,8 +2077,8 @@ g_dbus_proxy_new_finish (xasync_result_t  *res,
  * flags aren't set and no name owner currently exists, the message bus
  * will be requested to launch a name owner for the name.
  *
- * This is a synchronous failable constructor. See g_dbus_proxy_new()
- * and g_dbus_proxy_new_finish() for the asynchronous version.
+ * This is a synchronous failable constructor. See xdbus_proxy_new()
+ * and xdbus_proxy_new_finish() for the asynchronous version.
  *
  * #xdbus_proxy_t is used in this [example][gdbus-wellknown-proxy].
  *
@@ -2088,8 +2088,8 @@ g_dbus_proxy_new_finish (xasync_result_t  *res,
  * Since: 2.26
  */
 xdbus_proxy_t *
-g_dbus_proxy_new_sync (xdbus_connection_t     *connection,
-                       GDBusProxyFlags      flags,
+xdbus_proxy_new_sync (xdbus_connection_t     *connection,
+                       xdbus_proxy_flags_t      flags,
                        xdbus_interface_info_t  *info,
                        const xchar_t         *name,
                        const xchar_t         *object_path,
@@ -2100,7 +2100,7 @@ g_dbus_proxy_new_sync (xdbus_connection_t     *connection,
   xinitable_t *initable;
 
   g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
-  g_return_val_if_fail ((name == NULL && g_dbus_connection_get_unique_name (connection) == NULL) ||
+  g_return_val_if_fail ((name == NULL && xdbus_connection_get_unique_name (connection) == NULL) ||
                         g_dbus_is_name (name), NULL);
   g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
   g_return_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
@@ -2124,8 +2124,8 @@ g_dbus_proxy_new_sync (xdbus_connection_t     *connection,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_proxy_new_for_bus:
- * @bus_type: A #GBusType.
+ * xdbus_proxy_new_for_bus:
+ * @bus_type: A #xbus_type_t.
  * @flags: Flags used when constructing the proxy.
  * @info: (nullable): A #xdbus_interface_info_t specifying the minimal interface that @proxy conforms to or %NULL.
  * @name: A bus name (well-known or unique).
@@ -2135,15 +2135,15 @@ g_dbus_proxy_new_sync (xdbus_connection_t     *connection,
  * @callback: Callback function to invoke when the proxy is ready.
  * @user_data: User data to pass to @callback.
  *
- * Like g_dbus_proxy_new() but takes a #GBusType instead of a #xdbus_connection_t.
+ * Like xdbus_proxy_new() but takes a #xbus_type_t instead of a #xdbus_connection_t.
  *
  * #xdbus_proxy_t is used in this [example][gdbus-wellknown-proxy].
  *
  * Since: 2.26
  */
 void
-g_dbus_proxy_new_for_bus (GBusType             bus_type,
-                          GDBusProxyFlags      flags,
+xdbus_proxy_new_for_bus (xbus_type_t             bus_type,
+                          xdbus_proxy_flags_t      flags,
                           xdbus_interface_info_t  *info,
                           const xchar_t         *name,
                           const xchar_t         *object_path,
@@ -2173,8 +2173,8 @@ g_dbus_proxy_new_for_bus (GBusType             bus_type,
 }
 
 /**
- * g_dbus_proxy_new_for_bus_finish:
- * @res: A #xasync_result_t obtained from the #xasync_ready_callback_t function passed to g_dbus_proxy_new_for_bus().
+ * xdbus_proxy_new_for_bus_finish:
+ * @res: A #xasync_result_t obtained from the #xasync_ready_callback_t function passed to xdbus_proxy_new_for_bus().
  * @error: Return location for error or %NULL.
  *
  * Finishes creating a #xdbus_proxy_t.
@@ -2185,15 +2185,15 @@ g_dbus_proxy_new_for_bus (GBusType             bus_type,
  * Since: 2.26
  */
 xdbus_proxy_t *
-g_dbus_proxy_new_for_bus_finish (xasync_result_t  *res,
+xdbus_proxy_new_for_bus_finish (xasync_result_t  *res,
                                  xerror_t       **error)
 {
-  return g_dbus_proxy_new_finish (res, error);
+  return xdbus_proxy_new_finish (res, error);
 }
 
 /**
- * g_dbus_proxy_new_for_bus_sync:
- * @bus_type: A #GBusType.
+ * xdbus_proxy_new_for_bus_sync:
+ * @bus_type: A #xbus_type_t.
  * @flags: Flags used when constructing the proxy.
  * @info: (nullable): A #xdbus_interface_info_t specifying the minimal interface
  *        that @proxy conforms to or %NULL.
@@ -2203,7 +2203,7 @@ g_dbus_proxy_new_for_bus_finish (xasync_result_t  *res,
  * @cancellable: (nullable): A #xcancellable_t or %NULL.
  * @error: Return location for error or %NULL.
  *
- * Like g_dbus_proxy_new_sync() but takes a #GBusType instead of a #xdbus_connection_t.
+ * Like xdbus_proxy_new_sync() but takes a #xbus_type_t instead of a #xdbus_connection_t.
  *
  * #xdbus_proxy_t is used in this [example][gdbus-wellknown-proxy].
  *
@@ -2213,8 +2213,8 @@ g_dbus_proxy_new_for_bus_finish (xasync_result_t  *res,
  * Since: 2.26
  */
 xdbus_proxy_t *
-g_dbus_proxy_new_for_bus_sync (GBusType             bus_type,
-                               GDBusProxyFlags      flags,
+xdbus_proxy_new_for_bus_sync (xbus_type_t             bus_type,
+                               xdbus_proxy_flags_t      flags,
                                xdbus_interface_info_t  *info,
                                const xchar_t         *name,
                                const xchar_t         *object_path,
@@ -2249,7 +2249,7 @@ g_dbus_proxy_new_for_bus_sync (GBusType             bus_type,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_proxy_get_connection:
+ * xdbus_proxy_get_connection:
  * @proxy: A #xdbus_proxy_t.
  *
  * Gets the connection @proxy is for.
@@ -2259,31 +2259,31 @@ g_dbus_proxy_new_for_bus_sync (GBusType             bus_type,
  * Since: 2.26
  */
 xdbus_connection_t *
-g_dbus_proxy_get_connection (xdbus_proxy_t *proxy)
+xdbus_proxy_get_connection (xdbus_proxy_t *proxy)
 {
   g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
   return proxy->priv->connection;
 }
 
 /**
- * g_dbus_proxy_get_flags:
+ * xdbus_proxy_get_flags:
  * @proxy: A #xdbus_proxy_t.
  *
  * Gets the flags that @proxy was constructed with.
  *
- * Returns: Flags from the #GDBusProxyFlags enumeration.
+ * Returns: Flags from the #xdbus_proxy_flags_t enumeration.
  *
  * Since: 2.26
  */
-GDBusProxyFlags
-g_dbus_proxy_get_flags (xdbus_proxy_t *proxy)
+xdbus_proxy_flags_t
+xdbus_proxy_get_flags (xdbus_proxy_t *proxy)
 {
   g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), 0);
   return proxy->priv->flags;
 }
 
 /**
- * g_dbus_proxy_get_name:
+ * xdbus_proxy_get_name:
  * @proxy: A #xdbus_proxy_t.
  *
  * Gets the name that @proxy was constructed for.
@@ -2297,14 +2297,14 @@ g_dbus_proxy_get_flags (xdbus_proxy_t *proxy)
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_proxy_get_name (xdbus_proxy_t *proxy)
+xdbus_proxy_get_name (xdbus_proxy_t *proxy)
 {
   g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
   return proxy->priv->name;
 }
 
 /**
- * g_dbus_proxy_get_name_owner:
+ * xdbus_proxy_get_name_owner:
  * @proxy: A #xdbus_proxy_t.
  *
  * The unique name that owns the name that @proxy is for or %NULL if
@@ -2318,7 +2318,7 @@ g_dbus_proxy_get_name (xdbus_proxy_t *proxy)
  * Since: 2.26
  */
 xchar_t *
-g_dbus_proxy_get_name_owner (xdbus_proxy_t *proxy)
+xdbus_proxy_get_name_owner (xdbus_proxy_t *proxy)
 {
   xchar_t *ret;
 
@@ -2331,7 +2331,7 @@ g_dbus_proxy_get_name_owner (xdbus_proxy_t *proxy)
 }
 
 /**
- * g_dbus_proxy_get_object_path:
+ * xdbus_proxy_get_object_path:
  * @proxy: A #xdbus_proxy_t.
  *
  * Gets the object path @proxy is for.
@@ -2341,14 +2341,14 @@ g_dbus_proxy_get_name_owner (xdbus_proxy_t *proxy)
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_proxy_get_object_path (xdbus_proxy_t *proxy)
+xdbus_proxy_get_object_path (xdbus_proxy_t *proxy)
 {
   g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
   return proxy->priv->object_path;
 }
 
 /**
- * g_dbus_proxy_get_interface_name:
+ * xdbus_proxy_get_interface_name:
  * @proxy: A #xdbus_proxy_t.
  *
  * Gets the D-Bus interface name @proxy is for.
@@ -2358,19 +2358,19 @@ g_dbus_proxy_get_object_path (xdbus_proxy_t *proxy)
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_proxy_get_interface_name (xdbus_proxy_t *proxy)
+xdbus_proxy_get_interface_name (xdbus_proxy_t *proxy)
 {
   g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
   return proxy->priv->interface_name;
 }
 
 /**
- * g_dbus_proxy_get_default_timeout:
+ * xdbus_proxy_get_default_timeout:
  * @proxy: A #xdbus_proxy_t.
  *
  * Gets the timeout to use if -1 (specifying default timeout) is
- * passed as @timeout_msec in the g_dbus_proxy_call() and
- * g_dbus_proxy_call_sync() functions.
+ * passed as @timeout_msec in the xdbus_proxy_call() and
+ * xdbus_proxy_call_sync() functions.
  *
  * See the #xdbus_proxy_t:g-default-timeout property for more details.
  *
@@ -2379,7 +2379,7 @@ g_dbus_proxy_get_interface_name (xdbus_proxy_t *proxy)
  * Since: 2.26
  */
 xint_t
-g_dbus_proxy_get_default_timeout (xdbus_proxy_t *proxy)
+xdbus_proxy_get_default_timeout (xdbus_proxy_t *proxy)
 {
   xint_t ret;
 
@@ -2392,20 +2392,20 @@ g_dbus_proxy_get_default_timeout (xdbus_proxy_t *proxy)
 }
 
 /**
- * g_dbus_proxy_set_default_timeout:
+ * xdbus_proxy_set_default_timeout:
  * @proxy: A #xdbus_proxy_t.
  * @timeout_msec: Timeout in milliseconds.
  *
  * Sets the timeout to use if -1 (specifying default timeout) is
- * passed as @timeout_msec in the g_dbus_proxy_call() and
- * g_dbus_proxy_call_sync() functions.
+ * passed as @timeout_msec in the xdbus_proxy_call() and
+ * xdbus_proxy_call_sync() functions.
  *
  * See the #xdbus_proxy_t:g-default-timeout property for more details.
  *
  * Since: 2.26
  */
 void
-g_dbus_proxy_set_default_timeout (xdbus_proxy_t *proxy,
+xdbus_proxy_set_default_timeout (xdbus_proxy_t *proxy,
                                   xint_t        timeout_msec)
 {
   g_return_if_fail (X_IS_DBUS_PROXY (proxy));
@@ -2427,7 +2427,7 @@ g_dbus_proxy_set_default_timeout (xdbus_proxy_t *proxy,
 }
 
 /**
- * g_dbus_proxy_get_interface_info:
+ * xdbus_proxy_get_interface_info:
  * @proxy: A #xdbus_proxy_t
  *
  * Returns the #xdbus_interface_info_t, if any, specifying the interface
@@ -2440,7 +2440,7 @@ g_dbus_proxy_set_default_timeout (xdbus_proxy_t *proxy,
  * Since: 2.26
  */
 xdbus_interface_info_t *
-g_dbus_proxy_get_interface_info (xdbus_proxy_t *proxy)
+xdbus_proxy_get_interface_info (xdbus_proxy_t *proxy)
 {
   xdbus_interface_info_t *ret;
 
@@ -2450,13 +2450,13 @@ g_dbus_proxy_get_interface_info (xdbus_proxy_t *proxy)
   ret = proxy->priv->expected_interface;
   G_UNLOCK (properties_lock);
   /* FIXME: returning a borrowed ref with no guarantee that nobody will
-   * call g_dbus_proxy_set_interface_info() and make it invalid...
+   * call xdbus_proxy_set_interface_info() and make it invalid...
    */
   return ret;
 }
 
 /**
- * g_dbus_proxy_set_interface_info:
+ * xdbus_proxy_set_interface_info:
  * @proxy: A #xdbus_proxy_t
  * @info: (transfer none) (nullable): Minimum interface this proxy conforms to
  *    or %NULL to unset.
@@ -2468,7 +2468,7 @@ g_dbus_proxy_get_interface_info (xdbus_proxy_t *proxy)
  * Since: 2.26
  */
 void
-g_dbus_proxy_set_interface_info (xdbus_proxy_t         *proxy,
+xdbus_proxy_set_interface_info (xdbus_proxy_t         *proxy,
                                  xdbus_interface_info_t *info)
 {
   g_return_if_fail (X_IS_DBUS_PROXY (proxy));
@@ -2552,12 +2552,12 @@ reply_cb (xdbus_connection_t *connection,
 
   error = NULL;
 #ifdef G_OS_UNIX
-  value = g_dbus_connection_call_with_unix_fd_list_finish (connection,
+  value = xdbus_connection_call_with_unix_fd_list_finish (connection,
                                                            &fd_list,
                                                            res,
                                                            &error);
 #else
-  value = g_dbus_connection_call_finish (connection,
+  value = xdbus_connection_call_finish (connection,
                                          res,
                                          &error);
 #endif
@@ -2628,7 +2628,7 @@ get_destination_for_call (xdbus_proxy_t *proxy)
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-g_dbus_proxy_call_internal (xdbus_proxy_t          *proxy,
+xdbus_proxy_call_internal (xdbus_proxy_t          *proxy,
                             const xchar_t         *method_name,
                             xvariant_t            *parameters,
                             GDBusCallFlags       flags,
@@ -2661,7 +2661,7 @@ g_dbus_proxy_call_internal (xdbus_proxy_t          *proxy,
   reply_type = NULL;
   split_interface_name = NULL;
 
-  /* g_dbus_connection_call() is optimised for the case of a NULL
+  /* xdbus_connection_call() is optimised for the case of a NULL
    * callback.  If we get a NULL callback from our user then make sure
    * we pass along a NULL callback for ourselves as well.
    */
@@ -2669,7 +2669,7 @@ g_dbus_proxy_call_internal (xdbus_proxy_t          *proxy,
     {
       my_callback = (xasync_ready_callback_t) reply_cb;
       task = xtask_new (proxy, cancellable, callback, user_data);
-      xtask_set_source_tag (task, g_dbus_proxy_call_internal);
+      xtask_set_source_tag (task, xdbus_proxy_call_internal);
       xtask_set_name (task, "[gio] D-Bus proxy call");
     }
   else
@@ -2716,7 +2716,7 @@ g_dbus_proxy_call_internal (xdbus_proxy_t          *proxy,
   G_UNLOCK (properties_lock);
 
 #ifdef G_OS_UNIX
-  g_dbus_connection_call_with_unix_fd_list (proxy->priv->connection,
+  xdbus_connection_call_with_unix_fd_list (proxy->priv->connection,
                                             destination,
                                             proxy->priv->object_path,
                                             target_interface_name,
@@ -2730,7 +2730,7 @@ g_dbus_proxy_call_internal (xdbus_proxy_t          *proxy,
                                             my_callback,
                                             task);
 #else
-  g_dbus_connection_call (proxy->priv->connection,
+  xdbus_connection_call (proxy->priv->connection,
                           destination,
                           proxy->priv->object_path,
                           target_interface_name,
@@ -2753,7 +2753,7 @@ g_dbus_proxy_call_internal (xdbus_proxy_t          *proxy,
 }
 
 static xvariant_t *
-g_dbus_proxy_call_finish_internal (xdbus_proxy_t    *proxy,
+xdbus_proxy_call_finish_internal (xdbus_proxy_t    *proxy,
                                    xunix_fd_list_t  **out_fd_list,
                                    xasync_result_t  *res,
                                    xerror_t       **error)
@@ -2783,7 +2783,7 @@ g_dbus_proxy_call_finish_internal (xdbus_proxy_t    *proxy,
 }
 
 static xvariant_t *
-g_dbus_proxy_call_sync_internal (xdbus_proxy_t      *proxy,
+xdbus_proxy_call_sync_internal (xdbus_proxy_t      *proxy,
                                  const xchar_t     *method_name,
                                  xvariant_t        *parameters,
                                  GDBusCallFlags   flags,
@@ -2850,7 +2850,7 @@ g_dbus_proxy_call_sync_internal (xdbus_proxy_t      *proxy,
   G_UNLOCK (properties_lock);
 
 #ifdef G_OS_UNIX
-  ret = g_dbus_connection_call_with_unix_fd_list_sync (proxy->priv->connection,
+  ret = xdbus_connection_call_with_unix_fd_list_sync (proxy->priv->connection,
                                                        destination,
                                                        proxy->priv->object_path,
                                                        target_interface_name,
@@ -2864,7 +2864,7 @@ g_dbus_proxy_call_sync_internal (xdbus_proxy_t      *proxy,
                                                        cancellable,
                                                        error);
 #else
-  ret = g_dbus_connection_call_sync (proxy->priv->connection,
+  ret = xdbus_connection_call_sync (proxy->priv->connection,
                                      destination,
                                      proxy->priv->object_path,
                                      target_interface_name,
@@ -2890,7 +2890,7 @@ g_dbus_proxy_call_sync_internal (xdbus_proxy_t      *proxy,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_proxy_call:
+ * xdbus_proxy_call:
  * @proxy: A #xdbus_proxy_t.
  * @method_name: Name of method to invoke.
  * @parameters: (nullable): A #xvariant_t tuple with parameters for the signal or %NULL if not passing parameters.
@@ -2918,7 +2918,7 @@ g_dbus_proxy_call_sync_internal (xdbus_proxy_t      *proxy,
  * If the @parameters #xvariant_t is floating, it is consumed. This allows
  * convenient 'inline' use of xvariant_new(), e.g.:
  * |[<!-- language="C" -->
- *  g_dbus_proxy_call (proxy,
+ *  xdbus_proxy_call (proxy,
  *                     "TwoStrings",
  *                     xvariant_new ("(ss)",
  *                                    "Thing One",
@@ -2938,8 +2938,8 @@ g_dbus_proxy_call_sync_internal (xdbus_proxy_t      *proxy,
  * @callback will be invoked in the
  * [thread-default main context][g-main-context-push-thread-default]
  * of the thread you are calling this method from.
- * You can then call g_dbus_proxy_call_finish() to get the result of
- * the operation. See g_dbus_proxy_call_sync() for the synchronous
+ * You can then call xdbus_proxy_call_finish() to get the result of
+ * the operation. See xdbus_proxy_call_sync() for the synchronous
  * version of this method.
  *
  * If @callback is %NULL then the D-Bus method call message will be sent with
@@ -2948,7 +2948,7 @@ g_dbus_proxy_call_sync_internal (xdbus_proxy_t      *proxy,
  * Since: 2.26
  */
 void
-g_dbus_proxy_call (xdbus_proxy_t          *proxy,
+xdbus_proxy_call (xdbus_proxy_t          *proxy,
                    const xchar_t         *method_name,
                    xvariant_t            *parameters,
                    GDBusCallFlags       flags,
@@ -2957,16 +2957,16 @@ g_dbus_proxy_call (xdbus_proxy_t          *proxy,
                    xasync_ready_callback_t  callback,
                    xpointer_t             user_data)
 {
-  g_dbus_proxy_call_internal (proxy, method_name, parameters, flags, timeout_msec, NULL, cancellable, callback, user_data);
+  xdbus_proxy_call_internal (proxy, method_name, parameters, flags, timeout_msec, NULL, cancellable, callback, user_data);
 }
 
 /**
- * g_dbus_proxy_call_finish:
+ * xdbus_proxy_call_finish:
  * @proxy: A #xdbus_proxy_t.
- * @res: A #xasync_result_t obtained from the #xasync_ready_callback_t passed to g_dbus_proxy_call().
+ * @res: A #xasync_result_t obtained from the #xasync_ready_callback_t passed to xdbus_proxy_call().
  * @error: Return location for error or %NULL.
  *
- * Finishes an operation started with g_dbus_proxy_call().
+ * Finishes an operation started with xdbus_proxy_call().
  *
  * Returns: %NULL if @error is set. Otherwise a #xvariant_t tuple with
  * return values. Free with xvariant_unref().
@@ -2974,15 +2974,15 @@ g_dbus_proxy_call (xdbus_proxy_t          *proxy,
  * Since: 2.26
  */
 xvariant_t *
-g_dbus_proxy_call_finish (xdbus_proxy_t    *proxy,
+xdbus_proxy_call_finish (xdbus_proxy_t    *proxy,
                           xasync_result_t  *res,
                           xerror_t       **error)
 {
-  return g_dbus_proxy_call_finish_internal (proxy, NULL, res, error);
+  return xdbus_proxy_call_finish_internal (proxy, NULL, res, error);
 }
 
 /**
- * g_dbus_proxy_call_sync:
+ * xdbus_proxy_call_sync:
  * @proxy: A #xdbus_proxy_t.
  * @method_name: Name of method to invoke.
  * @parameters: (nullable): A #xvariant_t tuple with parameters for the signal
@@ -3009,7 +3009,7 @@ g_dbus_proxy_call_finish (xdbus_proxy_t    *proxy,
  * If the @parameters #xvariant_t is floating, it is consumed. This allows
  * convenient 'inline' use of xvariant_new(), e.g.:
  * |[<!-- language="C" -->
- *  g_dbus_proxy_call_sync (proxy,
+ *  xdbus_proxy_call_sync (proxy,
  *                          "TwoStrings",
  *                          xvariant_new ("(ss)",
  *                                         "Thing One",
@@ -3021,7 +3021,7 @@ g_dbus_proxy_call_finish (xdbus_proxy_t    *proxy,
  * ]|
  *
  * The calling thread is blocked until a reply is received. See
- * g_dbus_proxy_call() for the asynchronous version of this
+ * xdbus_proxy_call() for the asynchronous version of this
  * method.
  *
  * If @proxy has an expected interface (see
@@ -3034,7 +3034,7 @@ g_dbus_proxy_call_finish (xdbus_proxy_t    *proxy,
  * Since: 2.26
  */
 xvariant_t *
-g_dbus_proxy_call_sync (xdbus_proxy_t      *proxy,
+xdbus_proxy_call_sync (xdbus_proxy_t      *proxy,
                         const xchar_t     *method_name,
                         xvariant_t        *parameters,
                         GDBusCallFlags   flags,
@@ -3042,7 +3042,7 @@ g_dbus_proxy_call_sync (xdbus_proxy_t      *proxy,
                         xcancellable_t    *cancellable,
                         xerror_t         **error)
 {
-  return g_dbus_proxy_call_sync_internal (proxy, method_name, parameters, flags, timeout_msec, NULL, NULL, cancellable, error);
+  return xdbus_proxy_call_sync_internal (proxy, method_name, parameters, flags, timeout_msec, NULL, NULL, cancellable, error);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -3050,7 +3050,7 @@ g_dbus_proxy_call_sync (xdbus_proxy_t      *proxy,
 #ifdef G_OS_UNIX
 
 /**
- * g_dbus_proxy_call_with_unix_fd_list:
+ * xdbus_proxy_call_with_unix_fd_list:
  * @proxy: A #xdbus_proxy_t.
  * @method_name: Name of method to invoke.
  * @parameters: (nullable): A #xvariant_t tuple with parameters for the signal or %NULL if not passing parameters.
@@ -3063,14 +3063,14 @@ g_dbus_proxy_call_sync (xdbus_proxy_t      *proxy,
  * care about the result of the method invocation.
  * @user_data: The data to pass to @callback.
  *
- * Like g_dbus_proxy_call() but also takes a #xunix_fd_list_t object.
+ * Like xdbus_proxy_call() but also takes a #xunix_fd_list_t object.
  *
  * This method is only available on UNIX.
  *
  * Since: 2.30
  */
 void
-g_dbus_proxy_call_with_unix_fd_list (xdbus_proxy_t          *proxy,
+xdbus_proxy_call_with_unix_fd_list (xdbus_proxy_t          *proxy,
                                      const xchar_t         *method_name,
                                      xvariant_t            *parameters,
                                      GDBusCallFlags       flags,
@@ -3080,17 +3080,17 @@ g_dbus_proxy_call_with_unix_fd_list (xdbus_proxy_t          *proxy,
                                      xasync_ready_callback_t  callback,
                                      xpointer_t             user_data)
 {
-  g_dbus_proxy_call_internal (proxy, method_name, parameters, flags, timeout_msec, fd_list, cancellable, callback, user_data);
+  xdbus_proxy_call_internal (proxy, method_name, parameters, flags, timeout_msec, fd_list, cancellable, callback, user_data);
 }
 
 /**
- * g_dbus_proxy_call_with_unix_fd_list_finish:
+ * xdbus_proxy_call_with_unix_fd_list_finish:
  * @proxy: A #xdbus_proxy_t.
  * @out_fd_list: (out) (optional): Return location for a #xunix_fd_list_t or %NULL.
- * @res: A #xasync_result_t obtained from the #xasync_ready_callback_t passed to g_dbus_proxy_call_with_unix_fd_list().
+ * @res: A #xasync_result_t obtained from the #xasync_ready_callback_t passed to xdbus_proxy_call_with_unix_fd_list().
  * @error: Return location for error or %NULL.
  *
- * Finishes an operation started with g_dbus_proxy_call_with_unix_fd_list().
+ * Finishes an operation started with xdbus_proxy_call_with_unix_fd_list().
  *
  * Returns: %NULL if @error is set. Otherwise a #xvariant_t tuple with
  * return values. Free with xvariant_unref().
@@ -3098,16 +3098,16 @@ g_dbus_proxy_call_with_unix_fd_list (xdbus_proxy_t          *proxy,
  * Since: 2.30
  */
 xvariant_t *
-g_dbus_proxy_call_with_unix_fd_list_finish (xdbus_proxy_t    *proxy,
+xdbus_proxy_call_with_unix_fd_list_finish (xdbus_proxy_t    *proxy,
                                             xunix_fd_list_t  **out_fd_list,
                                             xasync_result_t  *res,
                                             xerror_t       **error)
 {
-  return g_dbus_proxy_call_finish_internal (proxy, out_fd_list, res, error);
+  return xdbus_proxy_call_finish_internal (proxy, out_fd_list, res, error);
 }
 
 /**
- * g_dbus_proxy_call_with_unix_fd_list_sync:
+ * xdbus_proxy_call_with_unix_fd_list_sync:
  * @proxy: A #xdbus_proxy_t.
  * @method_name: Name of method to invoke.
  * @parameters: (nullable): A #xvariant_t tuple with parameters for the signal
@@ -3120,7 +3120,7 @@ g_dbus_proxy_call_with_unix_fd_list_finish (xdbus_proxy_t    *proxy,
  * @cancellable: (nullable): A #xcancellable_t or %NULL.
  * @error: Return location for error or %NULL.
  *
- * Like g_dbus_proxy_call_sync() but also takes and returns #xunix_fd_list_t objects.
+ * Like xdbus_proxy_call_sync() but also takes and returns #xunix_fd_list_t objects.
  *
  * This method is only available on UNIX.
  *
@@ -3130,7 +3130,7 @@ g_dbus_proxy_call_with_unix_fd_list_finish (xdbus_proxy_t    *proxy,
  * Since: 2.30
  */
 xvariant_t *
-g_dbus_proxy_call_with_unix_fd_list_sync (xdbus_proxy_t      *proxy,
+xdbus_proxy_call_with_unix_fd_list_sync (xdbus_proxy_t      *proxy,
                                           const xchar_t     *method_name,
                                           xvariant_t        *parameters,
                                           GDBusCallFlags   flags,
@@ -3140,7 +3140,7 @@ g_dbus_proxy_call_with_unix_fd_list_sync (xdbus_proxy_t      *proxy,
                                           xcancellable_t    *cancellable,
                                           xerror_t         **error)
 {
-  return g_dbus_proxy_call_sync_internal (proxy, method_name, parameters, flags, timeout_msec, fd_list, out_fd_list, cancellable, error);
+  return xdbus_proxy_call_sync_internal (proxy, method_name, parameters, flags, timeout_msec, fd_list, out_fd_list, cancellable, error);
 }
 
 #endif /* G_OS_UNIX */
@@ -3148,21 +3148,21 @@ g_dbus_proxy_call_with_unix_fd_list_sync (xdbus_proxy_t      *proxy,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static xdbus_interface_info_t *
-_g_dbus_proxy_get_info (xdbus_interface_t *interface)
+_xdbus_proxy_get_info (xdbus_interface_t *interface)
 {
   xdbus_proxy_t *proxy = G_DBUS_PROXY (interface);
-  return g_dbus_proxy_get_interface_info (proxy);
+  return xdbus_proxy_get_interface_info (proxy);
 }
 
 static xdbus_object_t *
-_g_dbus_proxy_get_object (xdbus_interface_t *interface)
+_xdbus_proxy_get_object (xdbus_interface_t *interface)
 {
   xdbus_proxy_t *proxy = G_DBUS_PROXY (interface);
   return proxy->priv->object;
 }
 
 static xdbus_object_t *
-_g_dbus_proxy_dup_object (xdbus_interface_t *interface)
+_xdbus_proxy_dup_object (xdbus_interface_t *interface)
 {
   xdbus_proxy_t *proxy = G_DBUS_PROXY (interface);
   xdbus_object_t *ret = NULL;
@@ -3175,7 +3175,7 @@ _g_dbus_proxy_dup_object (xdbus_interface_t *interface)
 }
 
 static void
-_g_dbus_proxy_set_object (xdbus_interface_t *interface,
+_xdbus_proxy_set_object (xdbus_interface_t *interface,
                           xdbus_object_t    *object)
 {
   xdbus_proxy_t *proxy = G_DBUS_PROXY (interface);
@@ -3189,12 +3189,12 @@ _g_dbus_proxy_set_object (xdbus_interface_t *interface,
 }
 
 static void
-dbus_interface_iface_init (GDBusInterfaceIface *dbus_interface_iface)
+dbus_interface_iface_init (xdbus_interface_iface_t *dbus_interface_iface)
 {
-  dbus_interface_iface->get_info   = _g_dbus_proxy_get_info;
-  dbus_interface_iface->get_object = _g_dbus_proxy_get_object;
-  dbus_interface_iface->dup_object = _g_dbus_proxy_dup_object;
-  dbus_interface_iface->set_object = _g_dbus_proxy_set_object;
+  dbus_interface_iface->get_info   = _xdbus_proxy_get_info;
+  dbus_interface_iface->get_object = _xdbus_proxy_get_object;
+  dbus_interface_iface->dup_object = _xdbus_proxy_dup_object;
+  dbus_interface_iface->set_object = _xdbus_proxy_set_object;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */

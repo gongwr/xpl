@@ -22,7 +22,7 @@
 
 #include "gdbus-sessionbus.h"
 
-static GDesktopAppInfo *appinfo;
+static xdesktop_app_info_t *appinfo;
 static int current_state;
 static xboolean_t saw_startup_id;
 static xboolean_t requested_startup_id;
@@ -93,13 +93,13 @@ saw_action (const xchar_t *action)
       current_state = 2; return; case 2: g_assert_cmpstr (action, ==, "open");
 
       /* Now action activations... */
-      g_desktop_app_info_launch_action (appinfo, "frob", NULL);
+      xdesktop_app_info_launch_action (appinfo, "frob", NULL);
       current_state = 3; return; case 3: g_assert_cmpstr (action, ==, "frob");
 
-      g_desktop_app_info_launch_action (appinfo, "tweak", NULL);
+      xdesktop_app_info_launch_action (appinfo, "tweak", NULL);
       current_state = 4; return; case 4: g_assert_cmpstr (action, ==, "tweak");
 
-      g_desktop_app_info_launch_action (appinfo, "twiddle", NULL);
+      xdesktop_app_info_launch_action (appinfo, "twiddle", NULL);
       current_state = 5; return; case 5: g_assert_cmpstr (action, ==, "twiddle");
 
       /* Now launch the app with startup notification */
@@ -122,7 +122,7 @@ saw_action (const xchar_t *action)
 
         g_assert (saw_startup_id == FALSE);
         ctx = xobject_new (test_app_launch_context_get_type (), NULL);
-        g_desktop_app_info_launch_action (appinfo, "frob", ctx);
+        xdesktop_app_info_launch_action (appinfo, "frob", ctx);
         g_assert (requested_startup_id);
         requested_startup_id = FALSE;
         xobject_unref (ctx);
@@ -131,7 +131,7 @@ saw_action (const xchar_t *action)
       saw_startup_id = FALSE;
 
       /* Now quit... */
-      g_desktop_app_info_launch_action (appinfo, "quit", NULL);
+      xdesktop_app_info_launch_action (appinfo, "quit", NULL);
       current_state = 8; return; case 8: g_assert_not_reached ();
     }
 }
@@ -259,7 +259,7 @@ test_dbus_appinfo (void)
   desktop_file = g_test_build_filename (G_TEST_DIST,
                                         "org.gtk.test.dbusappinfo.desktop",
                                         NULL);
-  appinfo = g_desktop_app_info_new_from_filename (desktop_file);
+  appinfo = xdesktop_app_info_new_from_filename (desktop_file);
   g_assert (appinfo != NULL);
   g_free (desktop_file);
 
@@ -294,14 +294,14 @@ static void
 on_flatpak_activate (xapplication_t *app,
                      xpointer_t user_data)
 {
-  GDesktopAppInfo *flatpak_appinfo = user_data;
+  xdesktop_app_info_t *flatpak_appinfo = user_data;
   char *uri;
   xlist_t *uris;
 
   /* The app will be released in on_flatpak_launch_uris_finish */
   xapplication_hold (app);
 
-  uri = xfilename_to_uri (g_desktop_app_info_get_filename (flatpak_appinfo), NULL, NULL);
+  uri = xfilename_to_uri (xdesktop_app_info_get_filename (flatpak_appinfo), NULL, NULL);
   g_assert_nonnull (uri);
   uris = xlist_prepend (NULL, uri);
   xapp_info_launch_uris_async (G_APP_INFO (flatpak_appinfo), uris, NULL,
@@ -332,24 +332,24 @@ test_flatpak_doc_export (void)
 {
   const xchar_t *argv[] = { "myapp", NULL };
   xchar_t *desktop_file = NULL;
-  GDesktopAppInfo *flatpak_appinfo;
+  xdesktop_app_info_t *flatpak_appinfo;
   xapplication_t *app;
   int status;
 
-  g_test_summary ("Test that files launched via Flatpak apps are made available via the document portal.");
+  g_test_summary ("test_t that files launched via Flatpak apps are made available via the document portal.");
 
   desktop_file = g_test_build_filename (G_TEST_DIST,
                                         "org.gtk.test.dbusappinfo.flatpak.desktop",
                                         NULL);
-  flatpak_appinfo = g_desktop_app_info_new_from_filename (desktop_file);
+  flatpak_appinfo = xdesktop_app_info_new_from_filename (desktop_file);
   g_assert_nonnull (flatpak_appinfo);
   g_free (desktop_file);
 
   app = xapplication_new ("org.gtk.test.dbusappinfo.flatpak",
                            G_APPLICATION_HANDLES_OPEN);
-  g_signal_connect (app, "activate", G_CALLBACK (on_flatpak_activate),
+  xsignal_connect (app, "activate", G_CALLBACK (on_flatpak_activate),
                     flatpak_appinfo);
-  g_signal_connect (app, "open", G_CALLBACK (on_flatpak_open), NULL);
+  xsignal_connect (app, "open", G_CALLBACK (on_flatpak_open), NULL);
 
   status = xapplication_run (app, 1, (xchar_t **) argv);
   g_assert_cmpint (status, ==, 0);

@@ -1787,7 +1787,7 @@ bytestring_parse (TokenStream  *stream,
           case '4': case '5': case '6': case '7':
             {
               /* up to 3 characters */
-              guchar val = token[i++] - '0';
+              xuchar_t val = token[i++] - '0';
 
               if ('0' <= token[i] && token[i] < '8')
                 val = (val << 3) | (token[i++] - '0');
@@ -1973,7 +1973,7 @@ number_get_value (AST                 *ast,
       if (negative && abs_val > G_MAXINT64)
         return xvariant_new_int64 (G_MININT64);
       return xvariant_new_int64 (negative ?
-                                  -((gint64) abs_val) : ((gint64) abs_val));
+                                  -((sint64_t) abs_val) : ((sint64_t) abs_val));
 
     case 't':
       if (negative)
@@ -2661,7 +2661,7 @@ parse_num (const xchar_t *num,
            xuint_t       *result)
 {
   xchar_t *endptr;
-  gint64 bignum;
+  sint64_t bignum;
 
   bignum = g_ascii_strtoll (num, &endptr, 10);
 

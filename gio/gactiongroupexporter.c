@@ -41,7 +41,7 @@
  * detail.
  *
  * To access an exported #xaction_group_t remotely, use
- * g_dbus_action_group_get() to obtain a #xdbus_action_group_t.
+ * xdbus_action_group_get() to obtain a #xdbus_action_group_t.
  */
 
 static xvariant_t *
@@ -196,7 +196,7 @@ xaction_group_exporter_dispatch_events (xpointer_t user_data)
 
   xhash_table_remove_all (exporter->pending_changes);
 
-  g_dbus_connection_emit_signal (exporter->connection, NULL, exporter->object_path,
+  xdbus_connection_emit_signal (exporter->connection, NULL, exporter->object_path,
                                  "org.gtk.Actions", "Changed",
                                  xvariant_new ("(asa{sb}a{sv}a{s(bgav)})",
                                                 &removes, &enabled_changes,
@@ -477,13 +477,13 @@ xaction_group_exporter_free (xpointer_t user_data)
 {
   GActionGroupExporter *exporter = user_data;
 
-  g_signal_handlers_disconnect_by_func (exporter->action_group,
+  xsignal_handlers_disconnect_by_func (exporter->action_group,
                                         xaction_group_exporter_action_added, exporter);
-  g_signal_handlers_disconnect_by_func (exporter->action_group,
+  xsignal_handlers_disconnect_by_func (exporter->action_group,
                                         xaction_group_exporter_action_enabled_changed, exporter);
-  g_signal_handlers_disconnect_by_func (exporter->action_group,
+  xsignal_handlers_disconnect_by_func (exporter->action_group,
                                         xaction_group_exporter_action_state_changed, exporter);
-  g_signal_handlers_disconnect_by_func (exporter->action_group,
+  xsignal_handlers_disconnect_by_func (exporter->action_group,
                                         xaction_group_exporter_action_removed, exporter);
 
   xhash_table_unref (exporter->pending_changes);
@@ -499,7 +499,7 @@ xaction_group_exporter_free (xpointer_t user_data)
 }
 
 /**
- * g_dbus_connection_export_action_group:
+ * xdbus_connection_export_action_group:
  * @connection: a #xdbus_connection_t
  * @object_path: a D-Bus object path
  * @action_group: a #xaction_group_t
@@ -515,7 +515,7 @@ xaction_group_exporter_free (xpointer_t user_data)
  * returned (with @error set accordingly).
  *
  * You can unexport the action group using
- * g_dbus_connection_unexport_action_group() with the return value of
+ * xdbus_connection_unexport_action_group() with the return value of
  * this function.
  *
  * The thread default main context is taken at the time of this call.
@@ -532,7 +532,7 @@ xaction_group_exporter_free (xpointer_t user_data)
  * Since: 2.32
  **/
 xuint_t
-g_dbus_connection_export_action_group (xdbus_connection_t  *connection,
+xdbus_connection_export_action_group (xdbus_connection_t  *connection,
                                        const xchar_t      *object_path,
                                        xaction_group_t     *action_group,
                                        xerror_t          **error)
@@ -558,7 +558,7 @@ g_dbus_connection_export_action_group (xdbus_connection_t  *connection,
     }
 
   exporter = g_slice_new (GActionGroupExporter);
-  id = g_dbus_connection_register_object (connection, object_path, org_gtk_Actions, &vtable,
+  id = xdbus_connection_register_object (connection, object_path, org_gtk_Actions, &vtable,
                                           exporter, xaction_group_exporter_free, error);
 
   if (id == 0)
@@ -574,35 +574,35 @@ g_dbus_connection_export_action_group (xdbus_connection_t  *connection,
   exporter->connection = xobject_ref (connection);
   exporter->object_path = xstrdup (object_path);
 
-  g_signal_connect (action_group, "action-added",
+  xsignal_connect (action_group, "action-added",
                     G_CALLBACK (xaction_group_exporter_action_added), exporter);
-  g_signal_connect (action_group, "action-removed",
+  xsignal_connect (action_group, "action-removed",
                     G_CALLBACK (xaction_group_exporter_action_removed), exporter);
-  g_signal_connect (action_group, "action-state-changed",
+  xsignal_connect (action_group, "action-state-changed",
                     G_CALLBACK (xaction_group_exporter_action_state_changed), exporter);
-  g_signal_connect (action_group, "action-enabled-changed",
+  xsignal_connect (action_group, "action-enabled-changed",
                     G_CALLBACK (xaction_group_exporter_action_enabled_changed), exporter);
 
   return id;
 }
 
 /**
- * g_dbus_connection_unexport_action_group:
+ * xdbus_connection_unexport_action_group:
  * @connection: a #xdbus_connection_t
- * @export_id: the ID from g_dbus_connection_export_action_group()
+ * @export_id: the ID from xdbus_connection_export_action_group()
  *
  * Reverses the effect of a previous call to
- * g_dbus_connection_export_action_group().
+ * xdbus_connection_export_action_group().
  *
  * It is an error to call this function with an ID that wasn't returned
- * from g_dbus_connection_export_action_group() or to call it with the
+ * from xdbus_connection_export_action_group() or to call it with the
  * same ID more than once.
  *
  * Since: 2.32
  **/
 void
-g_dbus_connection_unexport_action_group (xdbus_connection_t *connection,
+xdbus_connection_unexport_action_group (xdbus_connection_t *connection,
                                          xuint_t            export_id)
 {
-  g_dbus_connection_unregister_object (connection, export_id);
+  xdbus_connection_unregister_object (connection, export_id);
 }

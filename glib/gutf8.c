@@ -591,7 +591,7 @@ xutf8_get_char_extended (const  xchar_t *p,
 {
   xsize_t i, len;
   xunichar_t min_code;
-  xunichar_t wc = (guchar) *p;
+  xunichar_t wc = (xuchar_t) *p;
   const xunichar_t partial_sequence = (xunichar_t) -2;
   const xunichar_t malformed_sequence = (xunichar_t) -1;
 
@@ -642,7 +642,7 @@ xutf8_get_char_extended (const  xchar_t *p,
     {
       for (i = 1; i < (xsize_t) max_len; i++)
 	{
-	  if ((((guchar *)p)[i] & 0xc0) != 0x80)
+	  if ((((xuchar_t *)p)[i] & 0xc0) != 0x80)
 	    return malformed_sequence;
 	}
       return partial_sequence;
@@ -650,7 +650,7 @@ xutf8_get_char_extended (const  xchar_t *p,
 
   for (i = 1; i < len; ++i)
     {
-      xunichar_t ch = ((guchar *)p)[i];
+      xunichar_t ch = ((xuchar_t *)p)[i];
 
       if (G_UNLIKELY ((ch & 0xc0) != 0x80))
 	{
@@ -714,7 +714,7 @@ xutf8_get_char_validated (const xchar_t *p,
     return result;
 }
 
-#define CONT_BYTE_FAST(p) ((guchar)*p++ & 0x3f)
+#define CONT_BYTE_FAST(p) ((xuchar_t)*p++ & 0x3f)
 
 /**
  * xutf8_to_ucs4_fast:
@@ -768,7 +768,7 @@ xutf8_to_ucs4_fast (const xchar_t *str,
   p = str;
   for (i=0; i < n_chars; i++)
     {
-      guchar first = (guchar)*p++;
+      xuchar_t first = (xuchar_t)*p++;
       xunichar_t wc;
 
       if (first < 0xc0)
@@ -1499,7 +1499,7 @@ g_ucs4_to_utf16 (const xunichar_t  *str,
 
 #define VALIDATE_BYTE(mask, expect)                      \
   G_STMT_START {                                         \
-    if (G_UNLIKELY((*(guchar *)p & (mask)) != (expect))) \
+    if (G_UNLIKELY((*(xuchar_t *)p & (mask)) != (expect))) \
       goto error;                                        \
   } G_STMT_END
 
@@ -1513,23 +1513,23 @@ fast_validate (const char *str)
 
   for (p = str; *p; p++)
     {
-      if (*(guchar *)p < 128)
+      if (*(xuchar_t *)p < 128)
 	/* done */;
       else
 	{
 	  const xchar_t *last;
 
 	  last = p;
-	  if (*(guchar *)p < 0xe0) /* 110xxxxx */
+	  if (*(xuchar_t *)p < 0xe0) /* 110xxxxx */
 	    {
-	      if (G_UNLIKELY (*(guchar *)p < 0xc2))
+	      if (G_UNLIKELY (*(xuchar_t *)p < 0xc2))
 		goto error;
 	    }
 	  else
 	    {
-	      if (*(guchar *)p < 0xf0) /* 1110xxxx */
+	      if (*(xuchar_t *)p < 0xf0) /* 1110xxxx */
 		{
-		  switch (*(guchar *)p++ & 0x0f)
+		  switch (*(xuchar_t *)p++ & 0x0f)
 		    {
 		    case 0:
 		      VALIDATE_BYTE(0xe0, 0xa0); /* 0xa0 ... 0xbf */
@@ -1541,13 +1541,13 @@ fast_validate (const char *str)
 		      VALIDATE_BYTE(0xc0, 0x80); /* 10xxxxxx */
 		    }
 		}
-	      else if (*(guchar *)p < 0xf5) /* 11110xxx excluding out-of-range */
+	      else if (*(xuchar_t *)p < 0xf5) /* 11110xxx excluding out-of-range */
 		{
-		  switch (*(guchar *)p++ & 0x07)
+		  switch (*(xuchar_t *)p++ & 0x07)
 		    {
 		    case 0:
 		      VALIDATE_BYTE(0xc0, 0x80); /* 10xxxxxx */
-		      if (G_UNLIKELY((*(guchar *)p & 0x30) == 0))
+		      if (G_UNLIKELY((*(xuchar_t *)p & 0x30) == 0))
 			goto error;
 		      break;
 		    case 4:
@@ -1587,29 +1587,29 @@ fast_validate_len (const char *str,
 
   for (p = str; ((p - str) < max_len) && *p; p++)
     {
-      if (*(guchar *)p < 128)
+      if (*(xuchar_t *)p < 128)
 	/* done */;
       else
 	{
 	  const xchar_t *last;
 
 	  last = p;
-	  if (*(guchar *)p < 0xe0) /* 110xxxxx */
+	  if (*(xuchar_t *)p < 0xe0) /* 110xxxxx */
 	    {
 	      if (G_UNLIKELY (max_len - (p - str) < 2))
 		goto error;
 
-	      if (G_UNLIKELY (*(guchar *)p < 0xc2))
+	      if (G_UNLIKELY (*(xuchar_t *)p < 0xc2))
 		goto error;
 	    }
 	  else
 	    {
-	      if (*(guchar *)p < 0xf0) /* 1110xxxx */
+	      if (*(xuchar_t *)p < 0xf0) /* 1110xxxx */
 		{
 		  if (G_UNLIKELY (max_len - (p - str) < 3))
 		    goto error;
 
-		  switch (*(guchar *)p++ & 0x0f)
+		  switch (*(xuchar_t *)p++ & 0x0f)
 		    {
 		    case 0:
 		      VALIDATE_BYTE(0xe0, 0xa0); /* 0xa0 ... 0xbf */
@@ -1621,16 +1621,16 @@ fast_validate_len (const char *str,
 		      VALIDATE_BYTE(0xc0, 0x80); /* 10xxxxxx */
 		    }
 		}
-	      else if (*(guchar *)p < 0xf5) /* 11110xxx excluding out-of-range */
+	      else if (*(xuchar_t *)p < 0xf5) /* 11110xxx excluding out-of-range */
 		{
 		  if (G_UNLIKELY (max_len - (p - str) < 4))
 		    goto error;
 
-		  switch (*(guchar *)p++ & 0x07)
+		  switch (*(xuchar_t *)p++ & 0x07)
 		    {
 		    case 0:
 		      VALIDATE_BYTE(0xc0, 0x80); /* 10xxxxxx */
-		      if (G_UNLIKELY((*(guchar *)p & 0x30) == 0))
+		      if (G_UNLIKELY((*(xuchar_t *)p & 0x30) == 0))
 			goto error;
 		      break;
 		    case 4:
@@ -1793,7 +1793,7 @@ xutf8_strreverse (const xchar_t *str,
   p = str;
   while (r > result)
     {
-      xchar_t *m, skip = xutf8_skip[*(guchar*) p];
+      xchar_t *m, skip = xutf8_skip[*(xuchar_t*) p];
       r -= skip;
       g_assert (r >= result);
       for (m = r; skip; skip--)

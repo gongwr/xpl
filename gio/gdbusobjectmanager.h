@@ -28,12 +28,12 @@ G_BEGIN_DECLS
 #define XTYPE_DBUS_OBJECT_MANAGER         (g_dbus_object_manager_get_type())
 #define G_DBUS_OBJECT_MANAGER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_OBJECT_MANAGER, xdbus_object_manager))
 #define X_IS_DBUS_OBJECT_MANAGER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_OBJECT_MANAGER))
-#define G_DBUS_OBJECT_MANAGER_GET_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE((o), XTYPE_DBUS_OBJECT_MANAGER, GDBusObjectManagerIface))
+#define G_DBUS_OBJECT_MANAGER_GET_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE((o), XTYPE_DBUS_OBJECT_MANAGER, xdbus_object_manager_iface_t))
 
-typedef struct _GDBusObjectManagerIface GDBusObjectManagerIface;
+typedef struct _xdbus_object_manager_iface xdbus_object_manager_iface_t;
 
 /**
- * GDBusObjectManagerIface:
+ * xdbus_object_manager_iface_t:
  * @parent_iface: The parent interface.
  * @get_object_path: Virtual function for g_dbus_object_manager_get_object_path().
  * @get_objects: Virtual function for g_dbus_object_manager_get_objects().
@@ -48,7 +48,7 @@ typedef struct _GDBusObjectManagerIface GDBusObjectManagerIface;
  *
  * Since: 2.30
  */
-struct _GDBusObjectManagerIface
+struct _xdbus_object_manager_iface
 {
   xtype_interface_t parent_iface;
 

@@ -268,8 +268,8 @@ msgid "Seek not supported on base stream"
 msgstr "สตรีมฐานไม่รองรับการเลื่อนตำแหน่งอ่านเขียน"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "ไม่สามารถตัดท้าย xbuffered_input_stream ทิ้ง"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "ไม่สามารถตัดท้าย xbuffered_input_stream_t ทิ้ง"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1208
 #: ../gio/giostream.c:300 ../gio/goutputstream.c:1660
@@ -2835,8 +2835,8 @@ msgid "Error removing old file: %s"
 msgstr "เกิดข้อผิดพลาดขณะลบแฟ้มเดิม: %s"
 
 #: ../gio/gmemoryinputstream.c:474 ../gio/gmemoryoutputstream.c:772
-msgid "Invalid GSeekType supplied"
-msgstr "ได้รับค่า GSeekType ที่ใช้การไม่ได้"
+msgid "Invalid xseek_type_t supplied"
+msgstr "ได้รับค่า xseek_type_t ที่ใช้การไม่ได้"
 
 #: ../gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"

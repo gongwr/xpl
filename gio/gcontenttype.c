@@ -689,7 +689,7 @@ g_content_type_can_be_executable (const xchar_t *type)
 }
 
 static xboolean_t
-looks_like_text (const guchar *data, xsize_t data_size)
+looks_like_text (const xuchar_t *data, xsize_t data_size)
 {
   xsize_t i;
   char c;
@@ -752,7 +752,7 @@ g_content_type_from_mime_type (const xchar_t *mime_type)
  */
 xchar_t *
 g_content_type_guess (const xchar_t  *filename,
-                      const guchar *data,
+                      const xuchar_t *data,
                       xsize_t         data_size,
                       xboolean_t     *result_uncertain)
 {

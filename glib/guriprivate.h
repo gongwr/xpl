@@ -26,7 +26,7 @@ G_BEGIN_DECLS
 
 void
 _uri_encoder (xstring_t      *out,
-              const guchar *start,
+              const xuchar_t *start,
               xsize_t         length,
               const xchar_t  *reserved_chars_allowed,
               xboolean_t      allow_utf8);

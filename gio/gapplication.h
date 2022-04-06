@@ -46,7 +46,7 @@ struct _xapplication
   /*< private >*/
   xobject_t parent_instance;
 
-  xapplication_private *priv;
+  xapplication_private_t *priv;
 };
 
 struct _xapplication_class

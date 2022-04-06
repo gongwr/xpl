@@ -53,7 +53,7 @@ struct _GFilterInputStream
 
 struct _GFilterInputStreamClass
 {
-  GInputStreamClass parent_class;
+  xinput_stream_class_t parent_class;
 
   /*< private >*/
   /* Padding for future expansion */

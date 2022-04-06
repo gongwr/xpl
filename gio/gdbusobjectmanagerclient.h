@@ -25,7 +25,7 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_OBJECT_MANAGER_CLIENT         (g_dbus_object_manager_client_get_type ())
+#define XTYPE_DBUS_OBJECT_MANAGER_CLIENT         (xdbus_object_manager_client_get_type ())
 #define G_DBUS_OBJECT_MANAGER_CLIENT(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_OBJECT_MANAGER_CLIENT, xdbus_object_manager_client))
 #define G_DBUS_OBJECT_MANAGER_CLIENT_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DBUS_OBJECT_MANAGER_CLIENT, GDBusObjectManagerClientClass))
 #define G_DBUS_OBJECT_MANAGER_CLIENT_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DBUS_OBJECT_MANAGER_CLIENT, GDBusObjectManagerClientClass))
@@ -83,9 +83,9 @@ struct _GDBusObjectManagerClientClass
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t                         g_dbus_object_manager_client_get_type           (void) G_GNUC_CONST;
+xtype_t                         xdbus_object_manager_client_get_type           (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-void                          g_dbus_object_manager_client_new                (xdbus_connection_t               *connection,
+void                          xdbus_object_manager_client_new                (xdbus_connection_t               *connection,
                                                                                GDBusObjectManagerClientFlags  flags,
                                                                                const xchar_t                   *name,
                                                                                const xchar_t                   *object_path,
@@ -96,10 +96,10 @@ void                          g_dbus_object_manager_client_new                (x
                                                                                xasync_ready_callback_t            callback,
                                                                                xpointer_t                       user_data);
 XPL_AVAILABLE_IN_ALL
-xdbus_object_manager_t           *g_dbus_object_manager_client_new_finish         (xasync_result_t                  *res,
+xdbus_object_manager_t           *xdbus_object_manager_client_new_finish         (xasync_result_t                  *res,
                                                                                xerror_t                       **error);
 XPL_AVAILABLE_IN_ALL
-xdbus_object_manager_t           *g_dbus_object_manager_client_new_sync           (xdbus_connection_t               *connection,
+xdbus_object_manager_t           *xdbus_object_manager_client_new_sync           (xdbus_connection_t               *connection,
                                                                                GDBusObjectManagerClientFlags  flags,
                                                                                const xchar_t                   *name,
                                                                                const xchar_t                   *object_path,
@@ -109,7 +109,7 @@ xdbus_object_manager_t           *g_dbus_object_manager_client_new_sync         
                                                                                xcancellable_t                  *cancellable,
                                                                                xerror_t                       **error);
 XPL_AVAILABLE_IN_ALL
-void                          g_dbus_object_manager_client_new_for_bus        (GBusType                       bus_type,
+void                          xdbus_object_manager_client_new_for_bus        (xbus_type_t                       bus_type,
                                                                                GDBusObjectManagerClientFlags  flags,
                                                                                const xchar_t                   *name,
                                                                                const xchar_t                   *object_path,
@@ -120,10 +120,10 @@ void                          g_dbus_object_manager_client_new_for_bus        (G
                                                                                xasync_ready_callback_t            callback,
                                                                                xpointer_t                       user_data);
 XPL_AVAILABLE_IN_ALL
-xdbus_object_manager_t           *g_dbus_object_manager_client_new_for_bus_finish (xasync_result_t                  *res,
+xdbus_object_manager_t           *xdbus_object_manager_client_new_for_bus_finish (xasync_result_t                  *res,
                                                                                xerror_t                       **error);
 XPL_AVAILABLE_IN_ALL
-xdbus_object_manager_t           *g_dbus_object_manager_client_new_for_bus_sync   (GBusType                       bus_type,
+xdbus_object_manager_t           *xdbus_object_manager_client_new_for_bus_sync   (xbus_type_t                       bus_type,
                                                                                GDBusObjectManagerClientFlags  flags,
                                                                                const xchar_t                   *name,
                                                                                const xchar_t                   *object_path,
@@ -133,13 +133,13 @@ xdbus_object_manager_t           *g_dbus_object_manager_client_new_for_bus_sync 
                                                                                xcancellable_t                  *cancellable,
                                                                                xerror_t                       **error);
 XPL_AVAILABLE_IN_ALL
-xdbus_connection_t              *g_dbus_object_manager_client_get_connection     (xdbus_object_manager_client_t      *manager);
+xdbus_connection_t              *xdbus_object_manager_client_get_connection     (xdbus_object_manager_client_t      *manager);
 XPL_AVAILABLE_IN_ALL
-GDBusObjectManagerClientFlags g_dbus_object_manager_client_get_flags          (xdbus_object_manager_client_t      *manager);
+GDBusObjectManagerClientFlags xdbus_object_manager_client_get_flags          (xdbus_object_manager_client_t      *manager);
 XPL_AVAILABLE_IN_ALL
-const xchar_t                  *g_dbus_object_manager_client_get_name           (xdbus_object_manager_client_t      *manager);
+const xchar_t                  *xdbus_object_manager_client_get_name           (xdbus_object_manager_client_t      *manager);
 XPL_AVAILABLE_IN_ALL
-xchar_t                        *g_dbus_object_manager_client_get_name_owner     (xdbus_object_manager_client_t      *manager);
+xchar_t                        *xdbus_object_manager_client_get_name_owner     (xdbus_object_manager_client_t      *manager);
 
 G_END_DECLS
 

@@ -46,7 +46,7 @@ test_language_names_with_category (void)
 
   for (i = 0; TEST_TABLE[i]; ++i)
     {
-      g_test_message ("Test %" G_GSIZE_FORMAT, i);
+      g_test_message ("test_t %" G_GSIZE_FORMAT, i);
       g_assert_true (g_setenv (TEST_TABLE[i], TEST_LOCALE, TRUE));
       language_names = g_get_language_names_with_category ("LC_CTYPE");
       g_assert_cmpuint (xstrv_length ((xchar_t **)language_names), ==, xstrv_length ((xchar_t **)TEST_RESULT));

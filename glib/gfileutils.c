@@ -730,8 +730,8 @@ get_contents_stdio (const xchar_t  *filename,
               g_set_error (error,
                            XFILE_ERROR,
                            XFILE_ERROR_NOMEM,
-                           g_dngettext (GETTEXT_PACKAGE, "Could not allocate %lu byte to read file “%s”", "Could not allocate %lu bytes to read file “%s”", (gulong)total_allocated),
-                           (gulong) total_allocated,
+                           g_dngettext (GETTEXT_PACKAGE, "Could not allocate %lu byte to read file “%s”", "Could not allocate %lu bytes to read file “%s”", (xulong_t)total_allocated),
+                           (xulong_t) total_allocated,
 			   display_filename);
               g_free (display_filename);
 
@@ -822,8 +822,8 @@ get_contents_regfile (const xchar_t  *filename,
       g_set_error (error,
                    XFILE_ERROR,
                    XFILE_ERROR_NOMEM,
-                           g_dngettext (GETTEXT_PACKAGE, "Could not allocate %lu byte to read file “%s”", "Could not allocate %lu bytes to read file “%s”", (gulong)alloc_size),
-                   (gulong) alloc_size,
+                           g_dngettext (GETTEXT_PACKAGE, "Could not allocate %lu byte to read file “%s”", "Could not allocate %lu bytes to read file “%s”", (xulong_t)alloc_size),
+                   (xulong_t) alloc_size,
 		   display_filename);
       g_free (display_filename);
       goto error;
@@ -1476,7 +1476,7 @@ get_tmp_file (xchar_t            *tmpl,
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   static const int NLETTERS = sizeof (letters) - 1;
   xlong_t value;
-  gint64 now_us;
+  sint64_t now_us;
   static int counter = 0;
 
   g_return_val_if_fail (tmpl != NULL, -1);
@@ -2880,7 +2880,7 @@ g_get_current_dir (void)
   const xchar_t *pwd;
   xchar_t *buffer = NULL;
   xchar_t *dir = NULL;
-  static gulong max_len = 0;
+  static xulong_t max_len = 0;
   struct stat pwdbuf, dotbuf;
 
   pwd = g_getenv ("PWD");

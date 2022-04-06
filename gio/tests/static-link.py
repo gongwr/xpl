@@ -25,7 +25,7 @@ import subprocess
 
 if "XPL_TEST_COMPILATION" not in os.environ:
     print(
-        """Test disabled because XPL_TEST_COMPILATION is not set in the env.
+        """test_t disabled because XPL_TEST_COMPILATION is not set in the env.
 If you wish to run this test, set XPL_TEST_COMPILATION=1 in the env,
 and make sure you have glib build dependencies installed, including
 meson."""

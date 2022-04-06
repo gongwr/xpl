@@ -31,17 +31,17 @@ G_BEGIN_DECLS
 
 #define XTYPE_INPUT_STREAM         (xinput_stream_get_type ())
 #define G_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_INPUT_STREAM, xinput_stream))
-#define G_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_INPUT_STREAM, GInputStreamClass))
+#define G_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_INPUT_STREAM, xinput_stream_class_t))
 #define X_IS_INPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_INPUT_STREAM))
 #define X_IS_INPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_INPUT_STREAM))
-#define G_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_INPUT_STREAM, GInputStreamClass))
+#define G_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_INPUT_STREAM, xinput_stream_class_t))
 
 /**
  * xinput_stream_t:
  *
  * Base class for streaming input operations.
  **/
-typedef struct _GInputStreamClass    GInputStreamClass;
+typedef struct _xinput_stream_class    xinput_stream_class_t;
 typedef struct _GInputStreamPrivate  GInputStreamPrivate;
 
 struct _GInputStream
@@ -52,7 +52,7 @@ struct _GInputStream
   GInputStreamPrivate *priv;
 };
 
-struct _GInputStreamClass
+struct _xinput_stream_class
 {
   xobject_class_t parent_class;
 

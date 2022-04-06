@@ -68,7 +68,7 @@ test_slist_sort_with_data (void)
   xslist_free (slist);
 }
 
-/* Test that the sort is stable. */
+/* test_t that the sort is stable. */
 static void
 test_slist_sort_stable (void)
 {

@@ -35,7 +35,7 @@
  *
  * #xdbus_action_group_t is an implementation of the #xaction_group_t
  * interface that can be used as a proxy for an action group
- * that is exported over D-Bus with g_dbus_connection_export_action_group().
+ * that is exported over D-Bus with xdbus_connection_export_action_group().
  */
 
 /**
@@ -72,7 +72,7 @@ struct _GDBusActionGroup
   xboolean_t         strict;
 };
 
-typedef xobject_class_t GDBusActionGroupClass;
+typedef xobject_class_t xdbus_action_group_class_t;
 
 typedef struct
 {
@@ -80,12 +80,12 @@ typedef struct
   xvariant_type_t *parameter_type;
   xboolean_t      enabled;
   xvariant_t     *state;
-} ActionInfo;
+} action_info_t;
 
 static void
 action_info_free (xpointer_t user_data)
 {
-  ActionInfo *info = user_data;
+  action_info_t *info = user_data;
 
   g_free (info->name);
 
@@ -95,14 +95,14 @@ action_info_free (xpointer_t user_data)
   if (info->parameter_type)
     xvariant_type_free (info->parameter_type);
 
-  g_slice_free (ActionInfo, info);
+  g_slice_free (action_info_t, info);
 }
 
-static ActionInfo *
+static action_info_t *
 action_info_new_from_iter (xvariant_iter_t *iter)
 {
   const xchar_t *param_str;
-  ActionInfo *info;
+  action_info_t *info;
   xboolean_t enabled;
   xvariant_t *state;
   xchar_t *name;
@@ -111,7 +111,7 @@ action_info_new_from_iter (xvariant_iter_t *iter)
                             &enabled, &param_str, &state))
     return NULL;
 
-  info = g_slice_new (ActionInfo);
+  info = g_slice_new (action_info_t);
   info->name = name;
   info->enabled = enabled;
 
@@ -129,14 +129,14 @@ action_info_new_from_iter (xvariant_iter_t *iter)
   return info;
 }
 
-static void g_dbus_action_group_remote_iface_init (xremote_action_group_interface_t *iface);
-static void g_dbus_action_group_iface_init        (xaction_group_interface_t       *iface);
-G_DEFINE_TYPE_WITH_CODE (xdbus_action_group, g_dbus_action_group, XTYPE_OBJECT,
-  G_IMPLEMENT_INTERFACE (XTYPE_ACTION_GROUP, g_dbus_action_group_iface_init)
-  G_IMPLEMENT_INTERFACE (XTYPE_REMOTE_ACTION_GROUP, g_dbus_action_group_remote_iface_init))
+static void xdbus_action_group_remote_iface_init (xremote_action_group_interface_t *iface);
+static void xdbus_action_group_iface_init        (xaction_group_interface_t       *iface);
+G_DEFINE_TYPE_WITH_CODE (xdbus_action_group, xdbus_action_group, XTYPE_OBJECT,
+  G_IMPLEMENT_INTERFACE (XTYPE_ACTION_GROUP, xdbus_action_group_iface_init)
+  G_IMPLEMENT_INTERFACE (XTYPE_REMOTE_ACTION_GROUP, xdbus_action_group_remote_iface_init))
 
 static void
-g_dbus_action_group_changed (xdbus_connection_t *connection,
+xdbus_action_group_changed (xdbus_connection_t *connection,
                              const xchar_t     *sender,
                              const xchar_t     *object_path,
                              const xchar_t     *interface_name,
@@ -180,7 +180,7 @@ g_dbus_action_group_changed (xdbus_connection_t *connection,
         xvariant_get_child (parameters, 1, "a{sb}", &iter);
         while (xvariant_iter_next (iter, "{&sb}", &name, &enabled))
           {
-            ActionInfo *info;
+            action_info_t *info;
 
             info = xhash_table_lookup (group->actions, name);
 
@@ -202,7 +202,7 @@ g_dbus_action_group_changed (xdbus_connection_t *connection,
         xvariant_get_child (parameters, 2, "a{sv}", &iter);
         while (xvariant_iter_next (iter, "{&sv}", &name, &state))
           {
-            ActionInfo *info;
+            action_info_t *info;
 
             info = xhash_table_lookup (group->actions, name);
 
@@ -223,7 +223,7 @@ g_dbus_action_group_changed (xdbus_connection_t *connection,
       /* Additions */
       {
         xvariant_iter_t *iter;
-        ActionInfo *info;
+        action_info_t *info;
 
         xvariant_get_child (parameters, 3, "a{s(bgav)}", &iter);
         while ((info = action_info_new_from_iter (iter)))
@@ -245,7 +245,7 @@ g_dbus_action_group_changed (xdbus_connection_t *connection,
 
 
 static void
-g_dbus_action_group_describe_all_done (xobject_t      *source,
+xdbus_action_group_describe_all_done (xobject_t      *source,
                                        xasync_result_t *result,
                                        xpointer_t      user_data)
 {
@@ -256,12 +256,12 @@ g_dbus_action_group_describe_all_done (xobject_t      *source,
   group->actions = xhash_table_new_full (xstr_hash, xstr_equal, NULL, action_info_free);
 
   g_assert (group->connection == (xpointer_t) source);
-  reply = g_dbus_connection_call_finish (group->connection, result, NULL);
+  reply = xdbus_connection_call_finish (group->connection, result, NULL);
 
   if (reply != NULL)
     {
       xvariant_iter_t *iter;
-      ActionInfo *action;
+      action_info_t *action;
 
       xvariant_get (reply, "(a{s(bgav)})", &iter);
       while ((action = action_info_new_from_iter (iter)))
@@ -280,22 +280,22 @@ g_dbus_action_group_describe_all_done (xobject_t      *source,
 
 
 static void
-g_dbus_action_group_async_init (xdbus_action_group_t *group)
+xdbus_action_group_async_init (xdbus_action_group_t *group)
 {
   if (group->subscription_id != 0)
     return;
 
   group->subscription_id =
-    g_dbus_connection_signal_subscribe (group->connection, group->bus_name, "org.gtk.Actions", "Changed", group->object_path,
-                                        NULL, G_DBUS_SIGNAL_FLAGS_NONE, g_dbus_action_group_changed, group, NULL);
+    xdbus_connection_signal_subscribe (group->connection, group->bus_name, "org.gtk.Actions", "Changed", group->object_path,
+                                        NULL, G_DBUS_SIGNAL_FLAGS_NONE, xdbus_action_group_changed, group, NULL);
 
-  g_dbus_connection_call (group->connection, group->bus_name, group->object_path, "org.gtk.Actions", "DescribeAll", NULL,
+  xdbus_connection_call (group->connection, group->bus_name, group->object_path, "org.gtk.Actions", "DescribeAll", NULL,
                           G_VARIANT_TYPE ("(a{s(bgav)})"), G_DBUS_CALL_FLAGS_NONE, -1, NULL,
-                          g_dbus_action_group_describe_all_done, xobject_ref (group));
+                          xdbus_action_group_describe_all_done, xobject_ref (group));
 }
 
 static xchar_t **
-g_dbus_action_group_list_actions (xaction_group_t *g_group)
+xdbus_action_group_list_actions (xaction_group_t *g_group)
 {
   xdbus_action_group_t *group = G_DBUS_ACTION_GROUP (g_group);
   xchar_t **keys;
@@ -317,7 +317,7 @@ g_dbus_action_group_list_actions (xaction_group_t *g_group)
     }
   else
     {
-      g_dbus_action_group_async_init (group);
+      xdbus_action_group_async_init (group);
       keys = g_new0 (xchar_t *, 1);
     }
 
@@ -327,7 +327,7 @@ g_dbus_action_group_list_actions (xaction_group_t *g_group)
 }
 
 static xboolean_t
-g_dbus_action_group_query_action (xaction_group_t        *g_group,
+xdbus_action_group_query_action (xaction_group_t        *g_group,
                                   const xchar_t         *action_name,
                                   xboolean_t            *enabled,
                                   const xvariant_type_t **parameter_type,
@@ -336,7 +336,7 @@ g_dbus_action_group_query_action (xaction_group_t        *g_group,
                                   xvariant_t           **state)
 {
   xdbus_action_group_t *group = G_DBUS_ACTION_GROUP (g_group);
-  ActionInfo *info;
+  action_info_t *info;
 
   if (group->actions != NULL)
     {
@@ -367,7 +367,7 @@ g_dbus_action_group_query_action (xaction_group_t        *g_group,
     }
   else
     {
-      g_dbus_action_group_async_init (group);
+      xdbus_action_group_async_init (group);
       group->strict = TRUE;
 
       return FALSE;
@@ -375,7 +375,7 @@ g_dbus_action_group_query_action (xaction_group_t        *g_group,
 }
 
 static void
-g_dbus_action_group_activate_action_full (xremote_action_group_t *remote,
+xdbus_action_group_activate_action_full (xremote_action_group_t *remote,
                                           const xchar_t        *action_name,
                                           xvariant_t           *parameter,
                                           xvariant_t           *platform_data)
@@ -388,49 +388,49 @@ g_dbus_action_group_activate_action_full (xremote_action_group_t *remote,
   if (parameter)
     xvariant_builder_add (&builder, "v", parameter);
 
-  g_dbus_connection_call (group->connection, group->bus_name, group->object_path, "org.gtk.Actions", "Activate",
+  xdbus_connection_call (group->connection, group->bus_name, group->object_path, "org.gtk.Actions", "Activate",
                           xvariant_new ("(sav@a{sv})", action_name, &builder, platform_data),
                           NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, NULL, NULL);
 }
 
 static void
-g_dbus_action_group_change_action_state_full (xremote_action_group_t *remote,
+xdbus_action_group_change_action_state_full (xremote_action_group_t *remote,
                                               const xchar_t        *action_name,
                                               xvariant_t           *value,
                                               xvariant_t           *platform_data)
 {
   xdbus_action_group_t *group = G_DBUS_ACTION_GROUP (remote);
 
-  g_dbus_connection_call (group->connection, group->bus_name, group->object_path, "org.gtk.Actions", "SetState",
+  xdbus_connection_call (group->connection, group->bus_name, group->object_path, "org.gtk.Actions", "SetState",
                           xvariant_new ("(sv@a{sv})", action_name, value, platform_data),
                           NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, NULL, NULL);
 }
 
 static void
-g_dbus_action_group_change_state (xaction_group_t *group,
+xdbus_action_group_change_state (xaction_group_t *group,
                                   const xchar_t  *action_name,
                                   xvariant_t     *value)
 {
-  g_dbus_action_group_change_action_state_full (G_REMOTE_ACTION_GROUP (group),
+  xdbus_action_group_change_action_state_full (G_REMOTE_ACTION_GROUP (group),
                                                 action_name, value, xvariant_new ("a{sv}", NULL));
 }
 
 static void
-g_dbus_action_group_activate (xaction_group_t *group,
+xdbus_action_group_activate (xaction_group_t *group,
                               const xchar_t  *action_name,
                               xvariant_t     *parameter)
 {
-  g_dbus_action_group_activate_action_full (G_REMOTE_ACTION_GROUP (group),
+  xdbus_action_group_activate_action_full (G_REMOTE_ACTION_GROUP (group),
                                             action_name, parameter, xvariant_new ("a{sv}", NULL));
 }
 
 static void
-g_dbus_action_group_finalize (xobject_t *object)
+xdbus_action_group_finalize (xobject_t *object)
 {
   xdbus_action_group_t *group = G_DBUS_ACTION_GROUP (object);
 
   if (group->subscription_id)
-    g_dbus_connection_signal_unsubscribe (group->connection, group->subscription_id);
+    xdbus_connection_signal_unsubscribe (group->connection, group->subscription_id);
 
   if (group->actions)
     xhash_table_unref (group->actions);
@@ -439,41 +439,41 @@ g_dbus_action_group_finalize (xobject_t *object)
   g_free (group->object_path);
   g_free (group->bus_name);
 
-  G_OBJECT_CLASS (g_dbus_action_group_parent_class)
+  G_OBJECT_CLASS (xdbus_action_group_parent_class)
     ->finalize (object);
 }
 
 static void
-g_dbus_action_group_init (xdbus_action_group_t *group)
+xdbus_action_group_init (xdbus_action_group_t *group)
 {
 }
 
 static void
-g_dbus_action_group_class_init (GDBusActionGroupClass *class)
+xdbus_action_group_class_init (xdbus_action_group_class_t *class)
 {
   xobject_class_t *object_class = G_OBJECT_CLASS (class);
 
-  object_class->finalize = g_dbus_action_group_finalize;
+  object_class->finalize = xdbus_action_group_finalize;
 }
 
 static void
-g_dbus_action_group_remote_iface_init (xremote_action_group_interface_t *iface)
+xdbus_action_group_remote_iface_init (xremote_action_group_interface_t *iface)
 {
-  iface->activate_action_full = g_dbus_action_group_activate_action_full;
-  iface->change_action_state_full = g_dbus_action_group_change_action_state_full;
+  iface->activate_action_full = xdbus_action_group_activate_action_full;
+  iface->change_action_state_full = xdbus_action_group_change_action_state_full;
 }
 
 static void
-g_dbus_action_group_iface_init (xaction_group_interface_t *iface)
+xdbus_action_group_iface_init (xaction_group_interface_t *iface)
 {
-  iface->list_actions = g_dbus_action_group_list_actions;
-  iface->query_action = g_dbus_action_group_query_action;
-  iface->change_action_state = g_dbus_action_group_change_state;
-  iface->activate_action = g_dbus_action_group_activate;
+  iface->list_actions = xdbus_action_group_list_actions;
+  iface->query_action = xdbus_action_group_query_action;
+  iface->change_action_state = xdbus_action_group_change_state;
+  iface->activate_action = xdbus_action_group_activate;
 }
 
 /**
- * g_dbus_action_group_get:
+ * xdbus_action_group_get:
  * @connection: A #xdbus_connection_t
  * @bus_name: (nullable): the bus name which exports the action
  *     group or %NULL if @connection is not a message bus connection
@@ -498,13 +498,13 @@ g_dbus_action_group_iface_init (xaction_group_interface_t *iface)
  * Since: 2.32
  */
 xdbus_action_group_t *
-g_dbus_action_group_get (xdbus_connection_t *connection,
+xdbus_action_group_get (xdbus_connection_t *connection,
                          const xchar_t     *bus_name,
                          const xchar_t     *object_path)
 {
   xdbus_action_group_t *group;
 
-  g_return_val_if_fail (bus_name != NULL || g_dbus_connection_get_unique_name (connection) == NULL, NULL);
+  g_return_val_if_fail (bus_name != NULL || xdbus_connection_get_unique_name (connection) == NULL, NULL);
 
   group = xobject_new (XTYPE_DBUS_ACTION_GROUP, NULL);
   group->connection = xobject_ref (connection);
@@ -515,7 +515,7 @@ g_dbus_action_group_get (xdbus_connection_t *connection,
 }
 
 xboolean_t
-g_dbus_action_group_sync (xdbus_action_group_t  *group,
+xdbus_action_group_sync (xdbus_action_group_t  *group,
                           xcancellable_t      *cancellable,
                           xerror_t           **error)
 {
@@ -524,17 +524,17 @@ g_dbus_action_group_sync (xdbus_action_group_t  *group,
   g_assert (group->subscription_id == 0);
 
   group->subscription_id =
-    g_dbus_connection_signal_subscribe (group->connection, group->bus_name, "org.gtk.Actions", "Changed", group->object_path,
-                                        NULL, G_DBUS_SIGNAL_FLAGS_NONE, g_dbus_action_group_changed, group, NULL);
+    xdbus_connection_signal_subscribe (group->connection, group->bus_name, "org.gtk.Actions", "Changed", group->object_path,
+                                        NULL, G_DBUS_SIGNAL_FLAGS_NONE, xdbus_action_group_changed, group, NULL);
 
-  reply = g_dbus_connection_call_sync (group->connection, group->bus_name, group->object_path, "org.gtk.Actions",
+  reply = xdbus_connection_call_sync (group->connection, group->bus_name, group->object_path, "org.gtk.Actions",
                                        "DescribeAll", NULL, G_VARIANT_TYPE ("(a{s(bgav)})"),
                                        G_DBUS_CALL_FLAGS_NONE, -1, cancellable, error);
 
   if (reply != NULL)
     {
       xvariant_iter_t *iter;
-      ActionInfo *action;
+      action_info_t *action;
 
       g_assert (group->actions == NULL);
       group->actions = xhash_table_new_full (xstr_hash, xstr_equal, NULL, action_info_free);

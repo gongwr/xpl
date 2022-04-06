@@ -75,7 +75,7 @@ static xoffset_t    g_local_file_input_stream_tell       (xfile_input_stream_t  
 static xboolean_t   g_local_file_input_stream_can_seek   (xfile_input_stream_t  *stream);
 static xboolean_t   g_local_file_input_stream_seek       (xfile_input_stream_t  *stream,
 							xoffset_t            offset,
-							GSeekType          type,
+							xseek_type_t          type,
 							xcancellable_t      *cancellable,
 							xerror_t           **error);
 static xfile_info_t *g_local_file_input_stream_query_info (xfile_input_stream_t  *stream,
@@ -96,7 +96,7 @@ _g_local_file_input_stream_set_do_close (GLocalFileInputStream *in,
 static void
 g_local_file_input_stream_class_init (GLocalFileInputStreamClass *klass)
 {
-  GInputStreamClass *stream_class = G_INPUT_STREAM_CLASS (klass);
+  xinput_stream_class_t *stream_class = G_INPUT_STREAM_CLASS (klass);
   GFileInputStreamClass *file_stream_class = XFILE_INPUT_STREAM_CLASS (klass);
 
   stream_class->read_fn = g_local_file_input_stream_read;
@@ -148,7 +148,7 @@ g_local_file_input_stream_read (xinput_stream_t  *stream,
   res = -1;
   while (1)
     {
-      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+      if (xcancellable_set_error_if_cancelled (cancellable, error))
 	break;
       res = read (file->priv->fd, buffer, count);
       if (res == -1)
@@ -233,7 +233,7 @@ g_local_file_input_stream_can_seek (xfile_input_stream_t *stream)
 }
 
 static int
-seek_type_to_lseek (GSeekType type)
+seek_type_to_lseek (xseek_type_t type)
 {
   switch (type)
     {
@@ -252,7 +252,7 @@ seek_type_to_lseek (GSeekType type)
 static xboolean_t
 g_local_file_input_stream_seek (xfile_input_stream_t  *stream,
 				xoffset_t            offset,
-				GSeekType          type,
+				xseek_type_t          type,
 				xcancellable_t      *cancellable,
 				xerror_t           **error)
 {
@@ -287,7 +287,7 @@ g_local_file_input_stream_query_info (xfile_input_stream_t  *stream,
 
   file = G_LOCAL_FILE_INPUT_STREAM (stream);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   return _g_local_file_info_get_from_fd (file->priv->fd,

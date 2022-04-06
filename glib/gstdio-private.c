@@ -77,7 +77,7 @@ _g_win32_strip_extended_ntobjm_prefix (xunichar2_t *str,
 }
 
 static int
-_g_win32_copy_and_maybe_terminate (const guchar *data,
+_g_win32_copy_and_maybe_terminate (const xuchar_t *data,
                                    xsize_t         in_to_copy,
                                    xunichar2_t    *buf,
                                    xsize_t         buf_size,

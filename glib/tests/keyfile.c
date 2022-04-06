@@ -1368,7 +1368,7 @@ test_int64 (void)
   xkey_file_t *file;
   xboolean_t ok;
   xuint64_t c;
-  gint64 d;
+  sint64_t d;
   xchar_t *value;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=614864");

@@ -1,4 +1,4 @@
-/* Test case for GNOME #651133
+/* test_t case for GNOME #651133
  *
  * Copyright (C) 2008-2010 Red Hat, Inc.
  * Copyright (C) 2011 Nokia Corporation
@@ -38,7 +38,7 @@
 # define DBUS_RELEASE_NAME_REPLY_RELEASED 1
 #endif
 
-#define MY_NAME "com.example.Test.Myself"
+#define MY_NAME "com.example.test_t.Myself"
 /* This many threads create and destroy xdbus_proxy_t instances, in addition
  * to the main thread processing their NameOwnerChanged signals.
  * N_THREADS_MAX is used with "-m slow", N_THREADS otherwise.
@@ -74,7 +74,7 @@ run_proxy_thread (xpointer_t data)
       if (g_test_verbose ())
         g_printerr (".");
 
-      proxy = g_dbus_proxy_new_sync (connection,
+      proxy = xdbus_proxy_new_sync (connection,
                                      G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START |
                                      G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                      NULL,
@@ -85,9 +85,9 @@ run_proxy_thread (xpointer_t data)
                                      &error);
       g_assert_no_error (error);
       g_assert (proxy != NULL);
-      g_dbus_proxy_set_default_timeout (proxy, G_MAXINT);
+      xdbus_proxy_set_default_timeout (proxy, G_MAXINT);
 
-      ret = g_dbus_proxy_call_sync (proxy, "StupidMethod", NULL,
+      ret = xdbus_proxy_call_sync (proxy, "StupidMethod", NULL,
                                     G_DBUS_CALL_FLAGS_NO_AUTO_START, -1,
                                     NULL, NULL);
       /*
@@ -118,7 +118,7 @@ request_name_cb (xobject_t *source,
   xerror_t *error = NULL;
   xvariant_t *var;
 
-  var = g_dbus_connection_call_finish (connection, res, &error);
+  var = xdbus_connection_call_finish (connection, res, &error);
   g_assert_no_error (error);
   g_assert_cmpuint (xvariant_get_uint32 (xvariant_get_child_value (var, 0)),
                     ==, DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER);
@@ -130,7 +130,7 @@ static void
 request_name (xdbus_connection_t *connection,
               xboolean_t         wait)
 {
-  g_dbus_connection_call (connection,
+  xdbus_connection_call (connection,
                           DBUS_SERVICE_DBUS,
                           DBUS_PATH_DBUS,
                           DBUS_INTERFACE_DBUS,
@@ -154,7 +154,7 @@ release_name_cb (xobject_t *source,
   xvariant_t *var;
   int i;
 
-  var = g_dbus_connection_call_finish (connection, res, &error);
+  var = xdbus_connection_call_finish (connection, res, &error);
   g_assert_no_error (error);
   g_assert_cmpuint (xvariant_get_uint32 (xvariant_get_child_value (var, 0)),
                     ==, DBUS_RELEASE_NAME_REPLY_RELEASED);
@@ -174,7 +174,7 @@ static void
 release_name (xdbus_connection_t *connection,
               xboolean_t         wait)
 {
-  g_dbus_connection_call (connection,
+  xdbus_connection_call (connection,
                           DBUS_SERVICE_DBUS,
                           DBUS_PATH_DBUS,
                           DBUS_INTERFACE_DBUS,

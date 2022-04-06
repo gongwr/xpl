@@ -81,7 +81,7 @@ G_BEGIN_DECLS
                                G_STRFUNC,                               \
                                "Not a xobject_t instance");               \
         }                                                               \
-      if (g_signal_lookup (signal_name,                                 \
+      if (xsignal_lookup (signal_name,                                 \
                            XTYPE_FROM_INSTANCE (object)) == 0)         \
         {                                                               \
           g_assertion_message (G_LOG_DOMAIN,                            \
@@ -110,7 +110,7 @@ xboolean_t _g_assert_property_notify_run (xpointer_t     object,
 xboolean_t _g_assert_signal_received_run (xpointer_t     object,
                                         const xchar_t *signal_name);
 
-xdbus_connection_t *_g_bus_get_priv (GBusType            bus_type,
+xdbus_connection_t *_g_bus_get_priv (xbus_type_t            bus_type,
                                   xcancellable_t       *cancellable,
                                   xerror_t            **error);
 

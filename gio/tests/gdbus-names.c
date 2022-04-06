@@ -26,7 +26,7 @@
 #include "gdbus-tests.h"
 
 /* ---------------------------------------------------------------------------------------------------- */
-/* Test that g_bus_own_name() works correctly */
+/* test_t that g_bus_own_name() works correctly */
 /* ---------------------------------------------------------------------------------------------------- */
 
 typedef struct
@@ -52,7 +52,7 @@ bus_acquired_handler (xdbus_connection_t *connection,
                       xpointer_t         user_data)
 {
   OwnNameData *data = user_data;
-  g_dbus_connection_set_exit_on_close (connection, FALSE);
+  xdbus_connection_set_exit_on_close (connection, FALSE);
   data->num_bus_acquired += 1;
   xmain_context_wakeup (data->main_context);
 }
@@ -80,7 +80,7 @@ name_lost_handler (xdbus_connection_t *connection,
   else
     {
       g_assert (connection != NULL);
-      g_dbus_connection_set_exit_on_close (connection, FALSE);
+      xdbus_connection_set_exit_on_close (connection, FALSE);
     }
   data->num_lost += 1;
   xmain_context_wakeup (data->main_context);
@@ -177,8 +177,8 @@ test_bus_own_name (void)
    */
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
   g_assert (c != NULL);
-  g_assert (!g_dbus_connection_is_closed (c));
-  result = g_dbus_connection_call_sync (c,
+  g_assert (!xdbus_connection_is_closed (c));
+  result = xdbus_connection_call_sync (c,
                                         "org.freedesktop.DBus",  /* bus name */
                                         "/org/freedesktop/DBus", /* object path */
                                         "org.freedesktop.DBus",  /* interface name */
@@ -206,7 +206,7 @@ test_bus_own_name (void)
   /*
    * Check that the name was actually released.
    */
-  result = g_dbus_connection_call_sync (c,
+  result = xdbus_connection_call_sync (c,
                                         "org.freedesktop.DBus",  /* bus name */
                                         "/org/freedesktop/DBus", /* object path */
                                         "org.freedesktop.DBus",  /* interface name */
@@ -341,7 +341,7 @@ test_bus_own_name (void)
    */
   c2 = _g_bus_get_priv (G_BUS_TYPE_SESSION, NULL, NULL);
   g_assert (c2 != NULL);
-  g_assert (!g_dbus_connection_is_closed (c2));
+  g_assert (!xdbus_connection_is_closed (c2));
   /* first without _REPLACE */
   data2.num_bus_acquired = 0;
   data2.num_acquired = 0;
@@ -548,7 +548,7 @@ test_bus_own_name (void)
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
-/* Test that g_bus_watch_name() works correctly */
+/* test_t that g_bus_watch_name() works correctly */
 /* ---------------------------------------------------------------------------------------------------- */
 
 typedef struct
@@ -626,7 +626,7 @@ name_appeared_handler (xdbus_connection_t *connection,
   else
     {
       g_assert (connection != NULL);
-      g_dbus_connection_set_exit_on_close (connection, FALSE);
+      xdbus_connection_set_exit_on_close (connection, FALSE);
     }
   data->num_appeared += 1;
   xmain_context_wakeup (data->main_context);
@@ -646,7 +646,7 @@ name_vanished_handler (xdbus_connection_t *connection,
   else
     {
       g_assert (connection != NULL);
-      g_dbus_connection_set_exit_on_close (connection, FALSE);
+      xdbus_connection_set_exit_on_close (connection, FALSE);
     }
   data->num_vanished += 1;
   xmain_context_wakeup (data->main_context);
@@ -700,7 +700,7 @@ stop_service (xdbus_connection_t *connection,
 
   data->num_vanished = 0;
 
-  proxy = g_dbus_proxy_new_sync (connection,
+  proxy = xdbus_proxy_new_sync (connection,
                                  G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START,
                                  NULL,
                                  "org.gtk.GDBus.FakeService",
@@ -710,7 +710,7 @@ stop_service (xdbus_connection_t *connection,
                                  &error);
   g_assert_no_error (error);
 
-  result = g_dbus_proxy_call_sync (proxy,
+  result = xdbus_proxy_call_sync (proxy,
                                    "Quit",
                                    NULL,
                                    G_DBUS_CALL_FLAGS_NO_AUTO_START,
@@ -1059,8 +1059,8 @@ watcher_thread (xpointer_t user_data)
   thread_data->data.num_appeared = 0;
   thread_data->data.num_vanished = 0;
   thread_data->data.num_free_func = 0;
-  // g_signal_connect_after is important to have default handler be called before our code
-  g_signal_connect_after (thread_data->connection, "closed", G_CALLBACK (connection_closed_cb), thread_data);
+  // xsignal_connect_after is important to have default handler be called before our code
+  xsignal_connect_after (thread_data->connection, "closed", G_CALLBACK (connection_closed_cb), thread_data);
 
   g_mutex_lock (&thread_data->mutex);
   thread_data->watch_id = g_bus_watch_name_on_connection (thread_data->connection,
@@ -1085,7 +1085,7 @@ watcher_thread (xpointer_t user_data)
    *  - or check that unwatching the bus when a vanished had been scheduled
    *    make it correctly unscheduled (unwatch_early condition)
    */
-  g_dbus_connection_close_sync (thread_data->connection, NULL, NULL);
+  xdbus_connection_close_sync (thread_data->connection, NULL, NULL);
   if (thread_data->unwatch_early)
     {
       // Wait for the main thread to iterate in order to have close connection handled
@@ -1129,7 +1129,7 @@ watcher_thread (xpointer_t user_data)
   g_cond_signal (&thread_data->cond);
   g_mutex_unlock (&thread_data->cond_mutex);
 
-  g_signal_handlers_disconnect_by_func (thread_data->connection, connection_closed_cb, thread_data);
+  xsignal_handlers_disconnect_by_func (thread_data->connection, connection_closed_cb, thread_data);
   xobject_unref (thread_data->connection);
   xmain_context_pop_thread_default (thread_context);
   xmain_context_unref (thread_context);
@@ -1211,7 +1211,7 @@ watch_with_different_context (xboolean_t unwatch_early)
   g_cond_clear (&thread_data.cond);
 
   session_bus_stop ();
-  g_assert_true (g_dbus_connection_is_closed (connection));
+  g_assert_true (xdbus_connection_is_closed (connection));
   xobject_unref (connection);
   session_bus_down ();
 }

@@ -181,7 +181,7 @@ test_non_socket (void)
        * though) so in rare cases the parent sends the message before
        * we (the first child) register the object
        */
-      connection = g_dbus_connection_new_sync (streams[0],
+      connection = xdbus_connection_new_sync (streams[0],
                                                guid,
                                                G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER |
                                                G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING,
@@ -193,10 +193,10 @@ test_non_socket (void)
       xobject_unref (streams[0]);
 
       /* make sure we exit along with the parent */
-      g_dbus_connection_set_exit_on_close (connection, TRUE);
+      xdbus_connection_set_exit_on_close (connection, TRUE);
 
       error = NULL;
-      g_dbus_connection_register_object (connection,
+      xdbus_connection_register_object (connection,
                                          "/pokee",
                                          (xdbus_interface_info_t *) &pokee_object_info,
                                          &pokee_vtable,
@@ -206,7 +206,7 @@ test_non_socket (void)
       g_assert_no_error (error);
 
       /* and now start message processing */
-      g_dbus_connection_start_message_processing (connection);
+      xdbus_connection_start_message_processing (connection);
 
       xmain_loop_run (loop);
 
@@ -244,7 +244,7 @@ test_non_socket (void)
   g_assert (ok);
   xobject_unref (streams[0]);
 
-  connection = g_dbus_connection_new_sync (streams[1],
+  connection = xdbus_connection_new_sync (streams[1],
                                            NULL, /* guid */
                                            G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
                                            NULL, /* xdbus_auth_observer_t */
@@ -255,7 +255,7 @@ test_non_socket (void)
 
   /* poke the first child */
   error = NULL;
-  ret = g_dbus_connection_call_sync (connection,
+  ret = xdbus_connection_call_sync (connection,
                                      NULL, /* name */
                                      "/pokee",
                                      "org.gtk.GDBus.Pokee",

@@ -9,16 +9,16 @@ test_write (void)
   const xchar_t buffer[] = "abcdefghijklmnopqrstuvwxyz";
 
   base = g_memory_output_stream_new (g_malloc0 (20), 20, NULL, g_free);
-  out = g_buffered_output_stream_new (base);
+  out = xbuffered_output_stream_new (base);
 
-  g_assert_cmpint (g_buffered_output_stream_get_buffer_size (G_BUFFERED_OUTPUT_STREAM (out)), ==, 4096);
-  g_assert (!g_buffered_output_stream_get_auto_grow (G_BUFFERED_OUTPUT_STREAM (out)));
+  g_assert_cmpint (xbuffered_output_stream_get_buffer_size (G_BUFFERED_OUTPUT_STREAM (out)), ==, 4096);
+  g_assert (!xbuffered_output_stream_get_auto_grow (G_BUFFERED_OUTPUT_STREAM (out)));
   xobject_set (out, "auto-grow", TRUE, NULL);
-  g_assert (g_buffered_output_stream_get_auto_grow (G_BUFFERED_OUTPUT_STREAM (out)));
+  g_assert (xbuffered_output_stream_get_auto_grow (G_BUFFERED_OUTPUT_STREAM (out)));
   xobject_set (out, "auto-grow", FALSE, NULL);
 
-  g_buffered_output_stream_set_buffer_size (G_BUFFERED_OUTPUT_STREAM (out), 16);
-  g_assert_cmpint (g_buffered_output_stream_get_buffer_size (G_BUFFERED_OUTPUT_STREAM (out)), ==, 16);
+  xbuffered_output_stream_set_buffer_size (G_BUFFERED_OUTPUT_STREAM (out), 16);
+  g_assert_cmpint (xbuffered_output_stream_get_buffer_size (G_BUFFERED_OUTPUT_STREAM (out)), ==, 16);
 
   error = NULL;
   g_assert_cmpint (xoutput_stream_write (out, buffer, 10, NULL, &error), ==, 10);
@@ -51,9 +51,9 @@ test_grow (void)
   xboolean_t grow;
 
   base = g_memory_output_stream_new (g_malloc0 (30), 30, g_realloc, g_free);
-  out = g_buffered_output_stream_new_sized (base, 16);
+  out = xbuffered_output_stream_new_sized (base, 16);
 
-  g_buffered_output_stream_set_auto_grow (G_BUFFERED_OUTPUT_STREAM (out), TRUE);
+  xbuffered_output_stream_set_auto_grow (G_BUFFERED_OUTPUT_STREAM (out), TRUE);
 
   xobject_get (out, "buffer-size", &size, "auto-grow", &grow, NULL);
   g_assert_cmpint (size, ==, 16);
@@ -65,13 +65,13 @@ test_grow (void)
   g_assert_cmpint (xoutput_stream_write (out, buffer, 10, NULL, &error), ==, 10);
   g_assert_no_error (error);
 
-  g_assert_cmpint (g_buffered_output_stream_get_buffer_size (G_BUFFERED_OUTPUT_STREAM (out)), ==, 16);
+  g_assert_cmpint (xbuffered_output_stream_get_buffer_size (G_BUFFERED_OUTPUT_STREAM (out)), ==, 16);
   g_assert_cmpint (g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (base)), ==, 0);
 
   g_assert_cmpint (xoutput_stream_write (out, buffer + 10, 10, NULL, &error), ==, 10);
   g_assert_no_error (error);
 
-  g_assert_cmpint (g_buffered_output_stream_get_buffer_size (G_BUFFERED_OUTPUT_STREAM (out)), >=, 20);
+  g_assert_cmpint (xbuffered_output_stream_get_buffer_size (G_BUFFERED_OUTPUT_STREAM (out)), >=, 20);
   g_assert_cmpint (g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (base)), ==, 0);
 
   g_assert (xoutput_stream_flush (out, NULL, &error));
@@ -91,7 +91,7 @@ test_close (void)
   xerror_t *error;
 
   base = g_memory_output_stream_new (g_malloc0 (30), 30, g_realloc, g_free);
-  out = g_buffered_output_stream_new (base);
+  out = xbuffered_output_stream_new (base);
 
   g_assert (g_filter_output_stream_get_close_base_stream (G_FILTER_OUTPUT_STREAM (out)));
 
@@ -104,7 +104,7 @@ test_close (void)
   xobject_unref (base);
 
   base = g_memory_output_stream_new (g_malloc0 (30), 30, g_realloc, g_free);
-  out = g_buffered_output_stream_new (base);
+  out = xbuffered_output_stream_new (base);
 
   g_filter_output_stream_set_close_base_stream (G_FILTER_OUTPUT_STREAM (out), FALSE);
 
@@ -129,7 +129,7 @@ test_seek (void)
   const xchar_t buffer[] = "abcdefghijklmnopqrstuvwxyz";
 
   base = G_MEMORY_OUTPUT_STREAM (g_memory_output_stream_new (g_malloc0 (30), 30, NULL, g_free));
-  out = g_buffered_output_stream_new_sized (G_OUTPUT_STREAM (base), 8);
+  out = xbuffered_output_stream_new_sized (G_OUTPUT_STREAM (base), 8);
   seekable = G_SEEKABLE (out);
   error = NULL;
 
@@ -238,7 +238,7 @@ test_truncate(void)
   xseekable__t *seekable;
   xerror_t *error;
   xsize_t bytes_written;
-  guchar *stream_data;
+  xuchar_t *stream_data;
   xsize_t len;
   xboolean_t res;
 
@@ -247,7 +247,7 @@ test_truncate(void)
   /* Create objects */
   stream_data = g_malloc0 (len);
   base_stream = G_MEMORY_OUTPUT_STREAM (g_memory_output_stream_new (stream_data, len, g_realloc, g_free));
-  stream = g_buffered_output_stream_new_sized (G_OUTPUT_STREAM (base_stream), 8);
+  stream = xbuffered_output_stream_new_sized (G_OUTPUT_STREAM (base_stream), 8);
   seekable = G_SEEKABLE (stream);
 
   g_assert (xseekable_can_truncate (seekable));

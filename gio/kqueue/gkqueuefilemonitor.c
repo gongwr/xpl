@@ -256,7 +256,7 @@ g_kqueue_file_monitor_start (xlocal_file_monitor_t *local_monitor,
       g_free (file_basename);
       kqueue_monitor->fbfile = file;
       kqueue_monitor->fallback = _g_poll_file_monitor_new (file);
-      g_signal_connect (kqueue_monitor->fallback, "changed",
+      xsignal_connect (kqueue_monitor->fallback, "changed",
 			G_CALLBACK (_fallback_callback), kqueue_monitor);
       return;
     }
@@ -318,7 +318,7 @@ g_kqueue_file_monitor_init (GKqueueFileMonitor *monitor)
 static xboolean_t
 g_kqueue_file_monitor_callback (xint_t fd, xio_condition_t condition, xpointer_t user_data)
 {
-  gint64 now = xsource_get_time (kq_source);
+  sint64_t now = xsource_get_time (kq_source);
   kqueue_sub *sub;
   GFileMonitorSource *source;
   struct kevent ev;
@@ -506,7 +506,7 @@ g_kqueue_file_monitor_cancel (xfile_monitor_t *monitor)
 #ifndef O_EVTONLY
   if (kqueue_monitor->fallback)
     {
-      g_signal_handlers_disconnect_by_func (kqueue_monitor->fallback, _fallback_callback, kqueue_monitor);
+      xsignal_handlers_disconnect_by_func (kqueue_monitor->fallback, _fallback_callback, kqueue_monitor);
       xfile_monitor_cancel (kqueue_monitor->fallback);
     }
 #endif

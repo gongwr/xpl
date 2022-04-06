@@ -319,8 +319,8 @@ test_expander (void)
   mem = g_memory_input_stream_new_from_data (unexpanded_data,
 					     sizeof (unexpanded_data),
 					     NULL);
-  cstream = g_converter_input_stream_new (mem, expander);
-  g_assert_true (g_converter_input_stream_get_converter (G_CONVERTER_INPUT_STREAM (cstream)) == expander);
+  cstream = xconverter_input_stream_new (mem, expander);
+  g_assert_true (xconverter_input_stream_get_converter (G_CONVERTER_INPUT_STREAM (cstream)) == expander);
   xobject_get (cstream, "converter", &converter, NULL);
   g_assert_true (converter == expander);
   xobject_unref (converter);
@@ -346,8 +346,8 @@ test_expander (void)
   g_converter_reset (expander);
 
   mem_out = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
-  cstream_out = g_converter_output_stream_new (mem_out, expander);
-  g_assert_true (g_converter_output_stream_get_converter (G_CONVERTER_OUTPUT_STREAM (cstream_out)) == expander);
+  cstream_out = xconverter_output_stream_new (mem_out, expander);
+  g_assert_true (xconverter_output_stream_get_converter (G_CONVERTER_OUTPUT_STREAM (cstream_out)) == expander);
   xobject_get (cstream_out, "converter", &converter, NULL);
   g_assert_true (converter == expander);
   xobject_unref (converter);
@@ -413,7 +413,7 @@ test_compressor (void)
   mem = g_memory_input_stream_new_from_data (expanded,
 					     expanded_size,
 					     NULL);
-  cstream = g_converter_input_stream_new (mem, compressor);
+  cstream = xconverter_input_stream_new (mem, compressor);
   xobject_unref (mem);
 
   total_read = 0;
@@ -439,7 +439,7 @@ test_compressor (void)
   g_converter_reset (compressor);
 
   mem_out = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
-  cstream_out = g_converter_output_stream_new (mem_out, compressor);
+  cstream_out = xconverter_output_stream_new (mem_out, compressor);
   xobject_unref (mem_out);
 
   for (i = 0; i < expanded_size; i++)
@@ -474,7 +474,7 @@ test_compressor (void)
   mem = g_memory_input_stream_new_from_data (expanded,
 					     5*1000,
 					     NULL);
-  cstream = g_converter_input_stream_new (mem, compressor);
+  cstream = xconverter_input_stream_new (mem, compressor);
   xobject_unref (mem);
 
   total_read = 0;
@@ -500,7 +500,7 @@ test_compressor (void)
   mem = g_memory_input_stream_new_from_data (expanded,
 					     5*1000 * 2,
 					     NULL);
-  cstream = g_converter_input_stream_new (mem, compressor);
+  cstream = xconverter_input_stream_new (mem, compressor);
   xobject_unref (mem);
 
   total_read = 0;
@@ -529,7 +529,7 @@ test_compressor (void)
   mem = g_memory_input_stream_new_from_data (expanded,
 					     5*1000 * 2 - 1,
 					     NULL);
-  cstream = g_converter_input_stream_new (mem, compressor);
+  cstream = xconverter_input_stream_new (mem, compressor);
   xobject_unref (mem);
 
   total_read = 0;
@@ -682,7 +682,7 @@ test_converter_leftover (void)
     orig[i] = i % 64 + 32;
 
   mem = g_memory_input_stream_new_from_data (orig, LEFTOVER_BUFSIZE, NULL);
-  cstream = g_converter_input_stream_new (mem, G_CONVERTER (converter));
+  cstream = xconverter_input_stream_new (mem, G_CONVERTER (converter));
   xobject_unref (mem);
 
   total_read = 0;
@@ -765,8 +765,8 @@ test_roundtrip (xconstpointer data)
   info2 = g_zlib_compressor_get_file_info (G_ZLIB_COMPRESSOR (compressor));
   g_assert_true (info == info2);
   xobject_unref (info);
-  costream1 = g_converter_output_stream_new (ostream1, compressor);
-  g_assert_true (g_converter_output_stream_get_converter (G_CONVERTER_OUTPUT_STREAM (costream1)) == compressor);
+  costream1 = xconverter_output_stream_new (ostream1, compressor);
+  g_assert_true (xconverter_output_stream_get_converter (G_CONVERTER_OUTPUT_STREAM (costream1)) == compressor);
 
   xoutput_stream_splice (costream1, istream0, 0, NULL, &error);
   g_assert_no_error (error);
@@ -786,7 +786,7 @@ test_roundtrip (xconstpointer data)
 
   istream1 = g_memory_input_stream_new_from_data (data1, data1_size, g_free);
   decompressor = G_CONVERTER (g_zlib_decompressor_new (test->format));
-  cistream1 = g_converter_input_stream_new (istream1, decompressor);
+  cistream1 = xconverter_input_stream_new (istream1, decompressor);
 
   ostream2 = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
 
@@ -832,7 +832,7 @@ test_charset (xconstpointer data)
   g_assert_false (fallback);
 
   in = g_memory_input_stream_new_from_data (test->text_in, -1, NULL);
-  in2 = g_converter_input_stream_new (in, conv);
+  in2 = xconverter_input_stream_new (in, conv);
 
   count = 2 * strlen (test->text_out);
   buffer = g_malloc0 (count);
@@ -866,7 +866,7 @@ test_charset (xconstpointer data)
   g_charset_converter_set_use_fallback (G_CHARSET_CONVERTER (conv), TRUE);
 
   in = g_memory_input_stream_new_from_data (test->text_in, -1, NULL);
-  in2 = g_converter_input_stream_new (in, conv);
+  in2 = xconverter_input_stream_new (in, conv);
 
   count = 2 * strlen (test->text_out);
   buffer = g_malloc0 (count);
@@ -992,7 +992,7 @@ test_converter_pollable (void)
 
   converted = g_malloc (100*1000); /* Large enough */
 
-  cstream = g_converter_input_stream_new (g_io_stream_get_input_stream (left),
+  cstream = xconverter_input_stream_new (g_io_stream_get_input_stream (left),
 					  compressor);
   pollable_in = G_POLLABLE_INPUT_STREAM (cstream);
   g_assert_true (g_pollable_input_stream_can_poll (pollable_in));
@@ -1072,7 +1072,7 @@ test_converter_pollable (void)
    */
 
   mem_out = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
-  cstream_out = g_converter_output_stream_new (mem_out, compressor);
+  cstream_out = xconverter_output_stream_new (mem_out, compressor);
   xobject_unref (mem_out);
   pollable_out = G_POLLABLE_OUTPUT_STREAM (cstream_out);
   g_assert_true (xpollable_output_stream_can_poll (pollable_out));
@@ -1130,8 +1130,8 @@ test_truncation (xconstpointer data)
 
   ostream1 = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
   compressor = G_CONVERTER (g_zlib_compressor_new (test->format, -1));
-  costream1 = g_converter_output_stream_new (ostream1, compressor);
-  g_assert_true (g_converter_output_stream_get_converter (G_CONVERTER_OUTPUT_STREAM (costream1)) == compressor);
+  costream1 = xconverter_output_stream_new (ostream1, compressor);
+  g_assert_true (xconverter_output_stream_get_converter (G_CONVERTER_OUTPUT_STREAM (costream1)) == compressor);
 
   xoutput_stream_splice (costream1, istream0, 0, NULL, &error);
   g_assert_no_error (error);
@@ -1150,7 +1150,7 @@ test_truncation (xconstpointer data)
 
   istream1 = g_memory_input_stream_new_from_data (data1, data1_size, g_free);
   decompressor = G_CONVERTER (g_zlib_decompressor_new (test->format));
-  cistream1 = g_converter_input_stream_new (istream1, decompressor);
+  cistream1 = xconverter_input_stream_new (istream1, decompressor);
 
   ostream2 = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
 

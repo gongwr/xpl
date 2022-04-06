@@ -54,7 +54,7 @@ struct _GMemoryOutputStream
 
 struct _GMemoryOutputStreamClass
 {
-  GOutputStreamClass parent_class;
+  xoutput_stream_class_t parent_class;
 
   /*< private >*/
   /* Padding for future expansion */

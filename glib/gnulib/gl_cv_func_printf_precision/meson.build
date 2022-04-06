@@ -3,7 +3,7 @@
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# Test whether the *printf family of functions supports large precisions.
+# test_t whether the *printf family of functions supports large precisions.
 # On mingw, precisions larger than 512 are treated like 512, in integer,
 # floating-point or pointer output. On Solaris 10/x86, precisions larger
 # than 510 in floating-point output crash the program. On Solaris 10/SPARC,
@@ -47,7 +47,7 @@ else
   if (host_system == 'windows' or
       host_system == 'beos' or
       host_system == 'haiku' or
-      host_system == 'sunos' or 
+      host_system == 'sunos' or
       host_system == 'solaris')
     gl_cv_func_printf_precision = false
   endif

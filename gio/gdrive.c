@@ -61,11 +61,11 @@
  * #xdrive_t in that API.
  **/
 
-typedef xdrive_iface_t GDriveInterface;
-G_DEFINE_INTERFACE(xdrive_t, g_drive, XTYPE_OBJECT)
+typedef xdrive_iface_t xdrive_interface_t;
+G_DEFINE_INTERFACE(xdrive, xdrive, XTYPE_OBJECT)
 
 static void
-xdrive_default_init (GDriveInterface *iface)
+xdrive_default_init (xdrive_interface_t *iface)
 {
   /**
    * xdrive_t::changed:
@@ -73,7 +73,7 @@ xdrive_default_init (GDriveInterface *iface)
    *
    * Emitted when the drive's state has changed.
    **/
-  g_signal_new (I_("changed"),
+  xsignal_new (I_("changed"),
 		XTYPE_DRIVE,
 		G_SIGNAL_RUN_LAST,
 		G_STRUCT_OFFSET (xdrive_iface_t, changed),
@@ -90,7 +90,7 @@ xdrive_default_init (GDriveInterface *iface)
    * object they should release them so the object can be
    * finalized.
    **/
-  g_signal_new (I_("disconnected"),
+  xsignal_new (I_("disconnected"),
 		XTYPE_DRIVE,
 		G_SIGNAL_RUN_LAST,
 		G_STRUCT_OFFSET (xdrive_iface_t, disconnected),
@@ -105,7 +105,7 @@ xdrive_default_init (GDriveInterface *iface)
    * Emitted when the physical eject button (if any) of a drive has
    * been pressed.
    **/
-  g_signal_new (I_("eject-button"),
+  xsignal_new (I_("eject-button"),
 		XTYPE_DRIVE,
 		G_SIGNAL_RUN_LAST,
 		G_STRUCT_OFFSET (xdrive_iface_t, eject_button),
@@ -122,7 +122,7 @@ xdrive_default_init (GDriveInterface *iface)
    *
    * Since: 2.22
    **/
-  g_signal_new (I_("stop-button"),
+  xsignal_new (I_("stop-button"),
 		XTYPE_DRIVE,
 		G_SIGNAL_RUN_LAST,
 		G_STRUCT_OFFSET (xdrive_iface_t, stop_button),

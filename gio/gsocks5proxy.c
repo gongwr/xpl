@@ -323,7 +323,7 @@ set_connect_msg (xuint8_t       *msg,
  * +----+-----+-------+------+----------+----------+
  * | 1  |  1  | X'00' |  1   | Variable |    2     |
  * +----+-----+-------+------+----------+----------+
- * This reply need to be read by small part to determine size. Buffer
+ * This reply need to be read by small part to determine size. buffer_t
  * size is determined in function of the biggest part to read.
  *
  * The parser only requires 4 bytes.

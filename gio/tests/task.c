@@ -46,7 +46,7 @@ wait_for_completed_notification (xtask_t *task)
   /* Hold a ref. so we can check the :completed property afterwards. */
   xobject_ref (task);
 
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &notification_emitted);
   g_idle_add (idle_quit_loop, NULL);
   xmain_loop_run (loop);
@@ -113,7 +113,7 @@ test_basic (void)
   task = xtask_new (NULL, NULL, basic_callback, &result);
   xtask_set_task_data (task, &task_data_destroyed, basic_destroy_notify);
   xobject_add_weak_pointer (G_OBJECT (task), (xpointer_t *)&task);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &notification_emitted);
 
   g_idle_add (basic_return, task);
@@ -182,7 +182,7 @@ test_error (void)
 
   task = xtask_new (NULL, NULL, error_callback, &result);
   xobject_add_weak_pointer (G_OBJECT (task), (xpointer_t *)&task);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &notification_emitted);
 
   g_assert (first_task_data_destroyed == FALSE);
@@ -241,7 +241,7 @@ same_start (xpointer_t user_data)
   task = xtask_new (NULL, NULL, same_callback, &same_result);
   *weak_pointer = task;
   xobject_add_weak_pointer (G_OBJECT (task), weak_pointer);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &same_notification_emitted);
 
   xtask_return_boolean (task, TRUE);
@@ -303,7 +303,7 @@ test_return_from_toplevel (void)
 
   task = xtask_new (NULL, NULL, toplevel_callback, &result);
   xobject_add_weak_pointer (G_OBJECT (task), (xpointer_t *)&task);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &toplevel_notification_emitted);
 
   xtask_return_boolean (task, TRUE);
@@ -382,7 +382,7 @@ test_return_from_anon_thread (void)
 
   task = xtask_new (NULL, NULL, anon_callback, &result);
   xobject_add_weak_pointer (G_OBJECT (task), (xpointer_t *)&task);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb,
                     &anon_thread_notification_emitted);
 
@@ -466,7 +466,7 @@ test_return_from_wronxthread (void)
 
   task = xtask_new (NULL, NULL, wrong_callback, &result);
   xobject_add_weak_pointer (G_OBJECT (task), (xpointer_t *)&task);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb,
                     &wronxthread_notification_emitted);
 
@@ -531,7 +531,7 @@ report_callback (xobject_t      *object,
 
   *weak_pointer = result;
   xobject_add_weak_pointer (G_OBJECT (result), weak_pointer);
-  g_signal_connect (result, "notify::completed",
+  xsignal_connect (result, "notify::completed",
                     (xcallback_t) completed_cb, &error_notification_emitted);
 
   xmain_loop_quit (loop);
@@ -614,7 +614,7 @@ test_priority (void)
   g_assert_cmpint (ret3, ==, 3);
 }
 
-/* Test that getting and setting the task name works. */
+/* test_t that getting and setting the task name works. */
 static void name_callback (xobject_t      *object,
                            xasync_result_t *result,
                            xpointer_t      user_data);
@@ -704,7 +704,7 @@ asynchronous_cancellation_cancel_task (xpointer_t user_data)
   cancellable = xtask_get_cancellable (task);
   g_assert_true (X_IS_CANCELLABLE (cancellable));
 
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   g_assert_false (xtask_get_completed (task));
 
   return G_SOURCE_REMOVE;
@@ -746,12 +746,12 @@ asynchronous_cancellation_run_task (xpointer_t user_data)
 
   cancellable = xtask_get_cancellable (task);
   g_assert_true (X_IS_CANCELLABLE (cancellable));
-  g_assert_false (g_cancellable_is_cancelled (cancellable));
+  g_assert_false (xcancellable_is_cancelled (cancellable));
 
   return G_SOURCE_CONTINUE;
 }
 
-/* Test that cancellation is always asynchronous. The completion callback for
+/* test_t that cancellation is always asynchronous. The completion callback for
  * a #xtask_t must not be called from inside the cancellation handler.
  *
  * The body of the loop inside test_asynchronous_cancellation
@@ -777,11 +777,11 @@ test_asynchronous_cancellation (void)
       xboolean_t notification_emitted = FALSE;
       xuint_t run_task_id;
 
-      cancellable = g_cancellable_new ();
+      cancellable = xcancellable_new ();
 
       task = xtask_new (NULL, cancellable, asynchronous_cancellation_callback, NULL);
-      g_cancellable_connect (cancellable, (xcallback_t) asynchronous_cancellation_cancelled, task, NULL);
-      g_signal_connect (task, "notify::completed", (xcallback_t) completed_cb, &notification_emitted);
+      xcancellable_connect (cancellable, (xcallback_t) asynchronous_cancellation_cancelled, task, NULL);
+      xsignal_connect (task, "notify::completed", (xcallback_t) completed_cb, &notification_emitted);
 
       run_task_id = g_idle_add (asynchronous_cancellation_run_task, task);
       xsource_set_name_by_id (run_task_id, "[test_asynchronous_cancellation] run_task");
@@ -827,9 +827,9 @@ cancel_callback (xobject_t      *object,
   g_assert (X_IS_CANCELLABLE (cancellable));
 
   if (state & (CANCEL_BEFORE | CANCEL_AFTER))
-    g_assert (g_cancellable_is_cancelled (cancellable));
+    g_assert (xcancellable_is_cancelled (cancellable));
   else
-    g_assert (!g_cancellable_is_cancelled (cancellable));
+    g_assert (!xcancellable_is_cancelled (cancellable));
 
   if (state & CHECK_CANCELLABLE)
     g_assert (xtask_get_check_cancellable (task));
@@ -838,12 +838,12 @@ cancel_callback (xobject_t      *object,
 
   if (xtask_propagate_boolean (task, &error))
     {
-      g_assert (!g_cancellable_is_cancelled (cancellable) ||
+      g_assert (!xcancellable_is_cancelled (cancellable) ||
                 !xtask_get_check_cancellable (task));
     }
   else
     {
-      g_assert (g_cancellable_is_cancelled (cancellable) &&
+      g_assert (xcancellable_is_cancelled (cancellable) &&
                 xtask_get_check_cancellable (task));
       g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
       xerror_free (error);
@@ -859,7 +859,7 @@ test_check_cancellable (void)
   xcancellable_t *cancellable;
   int state;
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
 
   for (state = 0; state <= NUM_CANCEL_TESTS; state++)
     {
@@ -868,14 +868,14 @@ test_check_cancellable (void)
       xtask_set_check_cancellable (task, (state & CHECK_CANCELLABLE) != 0);
 
       if (state & CANCEL_BEFORE)
-        g_cancellable_cancel (cancellable);
+        xcancellable_cancel (cancellable);
       xtask_return_boolean (task, TRUE);
       if (state & CANCEL_AFTER)
-        g_cancellable_cancel (cancellable);
+        xcancellable_cancel (cancellable);
 
       xmain_loop_run (loop);
       xobject_unref (task);
-      g_cancellable_reset (cancellable);
+      xcancellable_reset (cancellable);
     }
 
   xobject_unref (cancellable);
@@ -913,29 +913,29 @@ test_return_if_cancelled (void)
   xboolean_t cancelled;
   xboolean_t notification_emitted = FALSE;
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
 
   task = xtask_new (NULL, cancellable, return_if_cancelled_callback, NULL);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &notification_emitted);
 
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   cancelled = xtask_return_error_if_cancelled (task);
   g_assert (cancelled);
   g_assert_false (notification_emitted);
   xmain_loop_run (loop);
   xobject_unref (task);
   g_assert_true (notification_emitted);
-  g_cancellable_reset (cancellable);
+  xcancellable_reset (cancellable);
 
   notification_emitted = FALSE;
 
   task = xtask_new (NULL, cancellable, return_if_cancelled_callback, NULL);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &notification_emitted);
 
   xtask_set_check_cancellable (task, FALSE);
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   cancelled = xtask_return_error_if_cancelled (task);
   g_assert (cancelled);
   g_assert_false (notification_emitted);
@@ -1026,7 +1026,7 @@ test_run_in_thread (void)
   task = xtask_new (NULL, NULL, run_in_thread_callback, &done);
   xtask_set_name (task, "test_run_in_thread name");
   xobject_weak_ref (G_OBJECT (task), task_weak_notify, (xpointer_t)&weak_notify_ran);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &notification_emitted);
 
   xtask_set_task_data (task, (xpointer_t)&thread_ran, NULL);
@@ -1095,7 +1095,7 @@ test_run_in_thread_sync (void)
   xerror_t *error = NULL;
 
   task = xtask_new (NULL, NULL, run_in_thread_sync_callback, NULL);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb,
                     &notification_emitted);
 
@@ -1247,11 +1247,11 @@ test_run_in_thread_priority (void)
   xtask_run_in_thread (task, set_sequence_number_thread);
   xobject_unref (task);
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
   task = xtask_new (NULL, cancellable, NULL, NULL);
   xtask_set_task_data (task, &seq_d, NULL);
   xtask_run_in_thread (task, set_sequence_number_thread);
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   xobject_unref (cancellable);
   xobject_unref (task);
 
@@ -1364,7 +1364,7 @@ test_run_in_thread_overflow (void)
    */
 
   memset (buf, 0, sizeof (buf));
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
 
   g_mutex_lock (&overflow_mutex);
 
@@ -1380,7 +1380,7 @@ test_run_in_thread_overflow (void)
     g_usleep (5000000); /* 5 s */
   else
     g_usleep (500000);  /* 0.5 s */
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   xobject_unref (cancellable);
 
   g_mutex_unlock (&overflow_mutex);
@@ -1492,7 +1492,7 @@ test_return_on_cancel (void)
   xboolean_t callback_ran;
   xboolean_t notification_emitted = FALSE;
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
 
   /* If return-on-cancel is FALSE (default), the task does not return
    * early.
@@ -1500,7 +1500,7 @@ test_return_on_cancel (void)
   callback_ran = FALSE;
   g_atomic_int_set (&thread_state, THREAD_STARTING);
   task = xtask_new (NULL, cancellable, return_on_cancel_callback, &callback_ran);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &notification_emitted);
 
   xtask_set_task_data (task, (xpointer_t)&thread_state, NULL);
@@ -1516,7 +1516,7 @@ test_return_on_cancel (void)
   g_assert_cmpint (g_atomic_int_get (&thread_state), ==, THREAD_RUNNING);
   g_assert (callback_ran == FALSE);
 
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   g_mutex_unlock (&roc_finish_mutex);
   xmain_loop_run (loop);
 
@@ -1524,7 +1524,7 @@ test_return_on_cancel (void)
   g_assert (callback_ran == TRUE);
   g_assert_true (notification_emitted);
 
-  g_cancellable_reset (cancellable);
+  xcancellable_reset (cancellable);
 
   /* If return-on-cancel is TRUE, it does return early */
   callback_ran = FALSE;
@@ -1532,7 +1532,7 @@ test_return_on_cancel (void)
   g_atomic_int_set (&thread_state, THREAD_STARTING);
   task = xtask_new (NULL, cancellable, return_on_cancel_callback, &callback_ran);
   xobject_weak_ref (G_OBJECT (task), task_weak_notify, (xpointer_t)&weak_notify_ran);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &notification_emitted);
   xtask_set_return_on_cancel (task, TRUE);
 
@@ -1549,7 +1549,7 @@ test_return_on_cancel (void)
   g_assert_cmpint (g_atomic_int_get (&thread_state), ==, THREAD_RUNNING);
   g_assert (callback_ran == FALSE);
 
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   xmain_loop_run (loop);
   g_assert_cmpint (g_atomic_int_get (&thread_state), ==, THREAD_RUNNING);
   g_assert (callback_ran == TRUE);
@@ -1567,7 +1567,7 @@ test_return_on_cancel (void)
   g_mutex_unlock (&run_in_thread_mutex);
 
   g_assert_true (notification_emitted);
-  g_cancellable_reset (cancellable);
+  xcancellable_reset (cancellable);
 
   /* If the task is already cancelled before it starts, it returns
    * immediately, but the thread func still runs.
@@ -1576,11 +1576,11 @@ test_return_on_cancel (void)
   notification_emitted = FALSE;
   g_atomic_int_set (&thread_state, THREAD_STARTING);
   task = xtask_new (NULL, cancellable, return_on_cancel_callback, &callback_ran);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &notification_emitted);
   xtask_set_return_on_cancel (task, TRUE);
 
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
 
   xtask_set_task_data (task, (xpointer_t)&thread_state, NULL);
   g_mutex_lock (&roc_init_mutex);
@@ -1626,7 +1626,7 @@ test_return_on_cancel_sync (void)
   xssize_t ret;
   xerror_t *error = NULL;
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
 
   /* If return-on-cancel is FALSE, the task does not return early.
    */
@@ -1645,7 +1645,7 @@ test_return_on_cancel_sync (void)
 
   g_assert_cmpint (g_atomic_int_get (&thread_state), ==, THREAD_RUNNING);
 
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   g_mutex_unlock (&roc_finish_mutex);
   xthread_join (runner_thread);
   g_assert_cmpint (g_atomic_int_get (&thread_state), ==, THREAD_COMPLETED);
@@ -1657,7 +1657,7 @@ test_return_on_cancel_sync (void)
 
   xobject_unref (task);
 
-  g_cancellable_reset (cancellable);
+  xcancellable_reset (cancellable);
 
   /* If return-on-cancel is TRUE, it does return early */
   g_atomic_int_set (&thread_state, THREAD_STARTING);
@@ -1676,7 +1676,7 @@ test_return_on_cancel_sync (void)
 
   g_assert_cmpint (g_atomic_int_get (&thread_state), ==, THREAD_RUNNING);
 
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   xthread_join (runner_thread);
   g_assert_cmpint (g_atomic_int_get (&thread_state), ==, THREAD_RUNNING);
 
@@ -1693,7 +1693,7 @@ test_return_on_cancel_sync (void)
 
   g_assert_cmpint (g_atomic_int_get (&thread_state), ==, THREAD_CANCELLED);
 
-  g_cancellable_reset (cancellable);
+  xcancellable_reset (cancellable);
 
   /* If the task is already cancelled before it starts, it returns
    * immediately, but the thread func still runs.
@@ -1702,7 +1702,7 @@ test_return_on_cancel_sync (void)
   task = xtask_new (NULL, cancellable, run_in_thread_sync_callback, NULL);
   xtask_set_return_on_cancel (task, TRUE);
 
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
 
   xtask_set_task_data (task, (xpointer_t)&thread_state, NULL);
   g_mutex_lock (&roc_init_mutex);
@@ -1827,7 +1827,7 @@ test_return_on_cancel_atomic (void)
   xboolean_t notification_emitted = FALSE;
   xboolean_t callback_ran;
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
   g_mutex_lock (&roca_mutex_1);
   g_mutex_lock (&roca_mutex_2);
 
@@ -1836,7 +1836,7 @@ test_return_on_cancel_atomic (void)
   callback_ran = FALSE;
   task = xtask_new (NULL, cancellable, return_on_cancel_atomic_callback, &callback_ran);
   xtask_set_return_on_cancel (task, TRUE);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &notification_emitted);
 
   xtask_set_task_data (task, (xpointer_t)&state, NULL);
@@ -1862,14 +1862,14 @@ test_return_on_cancel_atomic (void)
   g_assert_cmpint (g_atomic_int_get (&state), ==, 6);
 
   /* callback assumes there'll be a cancelled error */
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
 
   g_assert (callback_ran == FALSE);
   xmain_loop_run (loop);
   g_assert (callback_ran == TRUE);
   g_assert_true (notification_emitted);
 
-  g_cancellable_reset (cancellable);
+  xcancellable_reset (cancellable);
 
 
   /* If we cancel while it's temporarily not return-on-cancel, the
@@ -1881,7 +1881,7 @@ test_return_on_cancel_atomic (void)
   notification_emitted = FALSE;
   task = xtask_new (NULL, cancellable, return_on_cancel_atomic_callback, &callback_ran);
   xtask_set_return_on_cancel (task, TRUE);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &notification_emitted);
 
   xtask_set_task_data (task, (xpointer_t)&state, NULL);
@@ -1899,7 +1899,7 @@ test_return_on_cancel_atomic (void)
   g_assert_cmpint (g_atomic_int_get (&state), ==, 2);
   g_assert (!xtask_get_return_on_cancel (task));
 
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   g_idle_add (idle_quit_loop, NULL);
   xmain_loop_run (loop);
   g_assert (callback_ran == FALSE);
@@ -1960,12 +1960,12 @@ test_return_pointer (void)
   g_assert_cmpint (object->ref_count, ==, 1);
   xobject_add_weak_pointer (object, (xpointer_t *)&object);
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
   task = xtask_new (NULL, cancellable, NULL, NULL);
   xobject_add_weak_pointer (G_OBJECT (task), (xpointer_t *)&task);
   xtask_return_pointer (task, object, xobject_unref);
   g_assert_cmpint (object->ref_count, ==, 1);
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   g_assert_cmpint (object->ref_count, ==, 1);
 
   ret = xtask_propagate_pointer (task, &error);
@@ -2090,7 +2090,7 @@ test_object_keepalive (void)
 
   task = xtask_new (object, NULL, keepalive_callback, &result);
   xobject_add_weak_pointer (G_OBJECT (task), (xpointer_t *)&task);
-  g_signal_connect (task, "notify::completed",
+  xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &notification_emitted);
 
   ref_count = object->ref_count;
@@ -2292,7 +2292,7 @@ test_return_permutation (xboolean_t error_first,
   xobject_unref (task);
 }
 
-/* Test that calling xtask_return_boolean() after xtask_return_error(), when
+/* test_t that calling xtask_return_boolean() after xtask_return_error(), when
  * returning in an idle callback, correctly results in a critical warning. */
 static void
 test_return_in_idle_error_first (void)
@@ -2308,7 +2308,7 @@ test_return_in_idle_error_first (void)
   g_test_trap_assert_stderr ("*CRITICAL*assertion '!task->ever_returned' failed*");
 }
 
-/* Test that calling xtask_return_error() after xtask_return_boolean(), when
+/* test_t that calling xtask_return_error() after xtask_return_boolean(), when
  * returning in an idle callback, correctly results in a critical warning. */
 static void
 test_return_in_idle_value_first (void)
@@ -2324,7 +2324,7 @@ test_return_in_idle_value_first (void)
   g_test_trap_assert_stderr ("*CRITICAL*assertion '!task->ever_returned' failed*");
 }
 
-/* Test that calling xtask_return_boolean() after xtask_return_error(), when
+/* test_t that calling xtask_return_boolean() after xtask_return_error(), when
  * returning synchronously, correctly results in a critical warning. */
 static void
 test_return_error_first (void)
@@ -2340,7 +2340,7 @@ test_return_error_first (void)
   g_test_trap_assert_stderr ("*CRITICAL*assertion '!task->ever_returned' failed*");
 }
 
-/* Test that calling xtask_return_error() after xtask_return_boolean(), when
+/* test_t that calling xtask_return_error() after xtask_return_boolean(), when
  * returning synchronously, correctly results in a critical warning. */
 static void
 test_return_value_first (void)

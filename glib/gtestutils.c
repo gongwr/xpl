@@ -67,7 +67,7 @@
  * to established concepts found in the other test frameworks (JUnit, NUnit,
  * RUnit), which in turn is based on smalltalk unit testing concepts.
  *
- * - Test case: Tests (test methods) are grouped together with their
+ * - test_t case: Tests (test methods) are grouped together with their
  *   fixture into test cases.
  *
  * - Fixture: A test fixture consists of fixture data and setup and
@@ -76,8 +76,8 @@
  *   up and torn down around each test invocation to avoid dependencies
  *   between tests.
  *
- * - Test suite: Test cases can be grouped into test suites, to allow
- *   subsets of the available tests to be run. Test suites can be
+ * - test_t suite: test_t cases can be grouped into test suites, to allow
+ *   subsets of the available tests to be run. test_t suites can be
  *   grouped into other test suites as well.
  *
  * The API is designed to handle creation and registration of test suites
@@ -1354,7 +1354,7 @@ parse_args (xint_t    *argc_p,
                   "  %s [OPTION...]\n\n"
                   "Help Options:\n"
                   "  -h, --help                     Show help options\n\n"
-                  "Test Options:\n"
+                  "test_t Options:\n"
                   "  --g-fatal-warnings             Make all warnings fatal\n"
                   "  -l                             List test cases available in a test executable\n"
                   "  -m {perf|slow|thorough|quick}  Execute tests according to mode\n"
@@ -2130,7 +2130,7 @@ g_test_bug (const char *buxuri_snippet)
  * static void
  * test_array_sort (void)
  * {
- *   g_test_summary ("Test my_array_sort() sorts the array correctly and stably, "
+ *   g_test_summary ("test_t my_array_sort() sorts the array correctly and stably, "
  *                   "including testing zero length and one-element arrays.");
  *
  *   …
@@ -2666,7 +2666,7 @@ g_test_add_func (const char *testpath,
 /**
  * g_test_add_data_func:
  * @testpath:  /-separated test case path name for the test.
- * @test_data: Test data argument for the test function.
+ * @test_data: test_t data argument for the test function.
  * @test_func: (scope async): The test function to invoke for this test.
  *
  * Create a new test case, similar to g_test_create_case(). However
@@ -2700,7 +2700,7 @@ g_test_add_data_func (const char     *testpath,
 /**
  * g_test_add_data_func_full:
  * @testpath: /-separated test case path name for the test.
- * @test_data: Test data argument for the test function.
+ * @test_data: test_t data argument for the test function.
  * @test_func: The test function to invoke for this test.
  * @data_free_func: #xdestroy_notify_t for @test_data.
  *
@@ -3304,7 +3304,7 @@ g_assertion_message_cmpnum (const char     *domain,
 
   switch (numtype)
     {
-    case 'i':   s = xstrdup_printf ("assertion failed (%s): (%" G_GINT64_MODIFIER "i %s %" G_GINT64_MODIFIER "i)", expr, (gint64) arg1, cmp, (gint64) arg2); break;
+    case 'i':   s = xstrdup_printf ("assertion failed (%s): (%" G_GINT64_MODIFIER "i %s %" G_GINT64_MODIFIER "i)", expr, (sint64_t) arg1, cmp, (sint64_t) arg2); break;
     case 'x':   s = xstrdup_printf ("assertion failed (%s): (0x%08" G_GINT64_MODIFIER "x %s 0x%08" G_GINT64_MODIFIER "x)", expr, (xuint64_t) arg1, cmp, (xuint64_t) arg2); break;
     case 'f':   s = xstrdup_printf ("assertion failed (%s): (%.9g %s %.9g)", expr, (double) arg1, cmp, (double) arg2); break;
       /* ideally use: floats=%.7g double=%.17g */
@@ -3730,7 +3730,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
  * g_test_trap_subprocess:
- * @test_path: (nullable): Test to run in a subprocess
+ * @test_path: (nullable): test_t to run in a subprocess
  * @usec_timeout: Timeout for the subprocess test in micro seconds.
  * @test_flags:   Flags to modify subprocess behaviour.
  *

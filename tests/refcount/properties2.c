@@ -186,7 +186,7 @@ main (int argc, char **argv)
 
   test = xobject_new (XTYPE_TEST, NULL);
 
-  g_signal_connect (test, "notify::dummy", G_CALLBACK (dummy_notify), NULL);
+  xsignal_connect (test, "notify::dummy", G_CALLBACK (dummy_notify), NULL);
 
   g_assert (count == test->dummy);
 

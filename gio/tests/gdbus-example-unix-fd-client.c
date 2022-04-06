@@ -28,7 +28,7 @@ get_server_stdout (xdbus_connection_t  *connection,
                                                         "/org/gtk/GDBus/test_object_t",
                                                         "org.gtk.GDBus.test_interface_t",
                                                         "GimmeStdout");
-  method_reply_message = g_dbus_connection_send_message_with_reply_sync (connection,
+  method_reply_message = xdbus_connection_send_message_with_reply_sync (connection,
                                                                          method_call_message,
                                                                          G_DBUS_SEND_MESSAGE_FLAGS_NONE,
                                                                          -1,

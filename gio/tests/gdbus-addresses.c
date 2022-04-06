@@ -39,7 +39,7 @@ test_empty_address (void)
   xerror_free (error);
 }
 
-/* Test that g_dbus_is_supported_address() returns FALSE for an unparsable
+/* test_t that g_dbus_is_supported_address() returns FALSE for an unparsable
  * address. */
 static void
 test_unsupported_address (void)
@@ -76,7 +76,7 @@ assert_not_supported_address (const xchar_t *address)
   g_clear_error (&error);
 }
 
-/* Test that g_dbus_is_address() returns FALSE for various differently invalid
+/* test_t that g_dbus_is_address() returns FALSE for various differently invalid
  * input strings. */
 static void
 test_address_parsing (void)

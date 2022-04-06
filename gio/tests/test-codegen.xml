@@ -170,7 +170,7 @@
     <property name="Type" type="s" access="read"/>
   </interface>
 
-  <!-- Test interface for forcing use of xvariant_t -->
+  <!-- test_t interface for forcing use of xvariant_t -->
   <interface name="org.project.Bat">
 
     <!-- Forcing xvariant_t for types that would be mapped -->
@@ -231,14 +231,14 @@
 
   </interface> <!-- End org.project.Bat -->
 
-  <!-- Test interface for g-authorized-method -->
+  <!-- test_t interface for g-authorized-method -->
   <interface name="org.project.Authorize">
     <method name="CheckNotAuthorized"/>
     <method name="CheckAuthorized"/>
     <method name="CheckNotAuthorizedFromObject"/>
   </interface> <!-- End org.project.Authorize -->
 
-  <!-- Test interfaces for handling methods in a thread -->
+  <!-- test_t interfaces for handling methods in a thread -->
   <interface name="org.project.MethodThreads">
     <method name="GetSelf">
       <arg name="self_pointer" direction="out" type="s"/>
@@ -264,7 +264,7 @@
 
       Multi-paragraph.
 
-      Test of inline links: The #org.project.Bar D-Bus interface,
+      test_t of inline links: The #org.project.Bar D-Bus interface,
       org.project.Bar.HelloWorld() method, the
       #org.project.Bar::TestSignal, the
       #org.project.InlineDocs:Property3 property.

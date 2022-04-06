@@ -294,7 +294,7 @@ static xmutex_t      smc_tree_mutex; /* mutex for G_SLICE=debug-blocks */
 /* --- auxiliary functions --- */
 void
 g_slice_set_config (GSliceConfig ckey,
-                    gint64       value)
+                    sint64_t       value)
 {
   g_return_if_fail (sys_page_size == 0);
   switch (ckey)
@@ -315,7 +315,7 @@ g_slice_set_config (GSliceConfig ckey,
     }
 }
 
-gint64
+sint64_t
 g_slice_get_config (GSliceConfig ckey)
 {
   switch (ckey)
@@ -335,9 +335,9 @@ g_slice_get_config (GSliceConfig ckey)
     }
 }
 
-gint64*
+sint64_t*
 g_slice_get_config_state (GSliceConfig ckey,
-                          gint64       address,
+                          sint64_t       address,
                           xuint_t       *n_values)
 {
   xuint_t i = 0;
@@ -345,7 +345,7 @@ g_slice_get_config_state (GSliceConfig ckey,
   *n_values = 0;
   switch (ckey)
     {
-      gint64 array[64];
+      sint64_t array[64];
     case G_SLICE_CONFIG_CONTENTION_COUNTER:
       array[i++] = SLAB_CHUNK_SIZE (allocator, address);
       array[i++] = allocator->contention_counters[address];
@@ -640,7 +640,7 @@ magazine_cache_update_stamp (void)
 {
   if (allocator->stamp_counter >= MAX_STAMP_COUNTER)
     {
-      gint64 now_us = g_get_real_time ();
+      sint64_t now_us = g_get_real_time ();
       allocator->last_stamp = now_us / 1000; /* milli seconds */
       allocator->stamp_counter = 0;
     }

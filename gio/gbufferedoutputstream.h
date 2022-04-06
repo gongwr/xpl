@@ -29,7 +29,7 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_BUFFERED_OUTPUT_STREAM         (g_buffered_output_stream_get_type ())
+#define XTYPE_BUFFERED_OUTPUT_STREAM         (xbuffered_output_stream_get_type ())
 #define G_BUFFERED_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_BUFFERED_OUTPUT_STREAM, xbuffered_output_stream_t))
 #define G_BUFFERED_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_BUFFERED_OUTPUT_STREAM, GBufferedOutputStreamClass))
 #define X_IS_BUFFERED_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_BUFFERED_OUTPUT_STREAM))
@@ -64,21 +64,21 @@ struct _GBufferedOutputStreamClass
 
 
 XPL_AVAILABLE_IN_ALL
-xtype_t          g_buffered_output_stream_get_type        (void) G_GNUC_CONST;
+xtype_t          xbuffered_output_stream_get_type        (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xoutput_stream_t* g_buffered_output_stream_new             (xoutput_stream_t         *base_stream);
+xoutput_stream_t* xbuffered_output_stream_new             (xoutput_stream_t         *base_stream);
 XPL_AVAILABLE_IN_ALL
-xoutput_stream_t* g_buffered_output_stream_new_sized       (xoutput_stream_t         *base_stream,
+xoutput_stream_t* xbuffered_output_stream_new_sized       (xoutput_stream_t         *base_stream,
 							 xsize_t                  size);
 XPL_AVAILABLE_IN_ALL
-xsize_t          g_buffered_output_stream_get_buffer_size (xbuffered_output_stream_t *stream);
+xsize_t          xbuffered_output_stream_get_buffer_size (xbuffered_output_stream_t *stream);
 XPL_AVAILABLE_IN_ALL
-void           g_buffered_output_stream_set_buffer_size (xbuffered_output_stream_t *stream,
+void           xbuffered_output_stream_set_buffer_size (xbuffered_output_stream_t *stream,
 							 xsize_t                  size);
 XPL_AVAILABLE_IN_ALL
-xboolean_t       g_buffered_output_stream_get_auto_grow   (xbuffered_output_stream_t *stream);
+xboolean_t       xbuffered_output_stream_get_auto_grow   (xbuffered_output_stream_t *stream);
 XPL_AVAILABLE_IN_ALL
-void           g_buffered_output_stream_set_auto_grow   (xbuffered_output_stream_t *stream,
+void           xbuffered_output_stream_set_auto_grow   (xbuffered_output_stream_t *stream,
 							 xboolean_t               auto_grow);
 
 G_END_DECLS

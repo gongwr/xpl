@@ -118,8 +118,8 @@ test_copy_chunks_start (TestThreadedFlags flags)
 
   if (data.flags & TEST_CANCEL)
     {
-      cancellable = g_cancellable_new ();
-      g_cancellable_cancel (cancellable);
+      cancellable = xcancellable_new ();
+      xcancellable_cancel (cancellable);
     }
 
   if (data.flags & TEST_THREADED_ISTREAM)

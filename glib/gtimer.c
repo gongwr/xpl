@@ -216,10 +216,10 @@ g_timer_continue (xtimer_t *timer)
  **/
 xdouble_t
 g_timer_elapsed (xtimer_t *timer,
-		 gulong *microseconds)
+		 xulong_t *microseconds)
 {
   xdouble_t total;
-  gint64 elapsed;
+  sint64_t elapsed;
 
   g_return_val_if_fail (timer != NULL, 0);
 
@@ -265,7 +265,7 @@ g_timer_is_active (xtimer_t *timer)
  * length of the sleep.
  */
 void
-g_usleep (gulong microseconds)
+g_usleep (xulong_t microseconds)
 {
 #ifdef G_OS_WIN32
   /* Round up to the next millisecond */
@@ -375,7 +375,7 @@ mktime_utc (struct tm *tm)
  * Equivalent functionality is available using code like:
  * |[
  * xdatetime_t *dt = xdate_time_new_from_iso8601 (iso8601_string, NULL);
- * gint64 time_val = xdate_time_to_unix (dt);
+ * sint64_t time_val = xdate_time_to_unix (dt);
  * xdate_time_unref (dt);
  * ]|
  *
@@ -532,7 +532,7 @@ g_time_val_from_iso8601 (const xchar_t *iso_date,
       if (min > 59)
         return FALSE;
 
-      time_->tv_sec = mktime_utc (&tm) + (time_t) (60 * (gint64) (60 * hour + min) * sign);
+      time_->tv_sec = mktime_utc (&tm) + (time_t) (60 * (sint64_t) (60 * hour + min) * sign);
     }
   else
     {

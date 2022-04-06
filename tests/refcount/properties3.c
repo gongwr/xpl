@@ -166,7 +166,7 @@ main (int argc, char **argv)
   test = xobject_new (XTYPE_TEST, NULL);
 
   g_assert (test->count == test->dummy);
-  g_signal_connect (test, "notify::dummy", G_CALLBACK (dummy_notify), NULL);
+  xsignal_connect (test, "notify::dummy", G_CALLBACK (dummy_notify), NULL);
 
   test_threads = g_array_new (FALSE, FALSE, sizeof (xthread_t *));
 

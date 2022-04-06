@@ -287,7 +287,7 @@ msgid "Seek not supported on base stream"
 msgstr "ఆధార ప్రవాహం కు మద్దతు లేదు అర్థించు"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
 msgstr "GBuffered ఇన్పుట్ ప్రవాహ ఖండించు సాధ్యం కాదు"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1017
@@ -2143,8 +2143,8 @@ msgid "Error removing old file: %s"
 msgstr "పాత దస్త్రమును తొలగించుటలో దోషము: %s"
 
 #: ../gio/gmemoryinputstream.c:471 ../gio/gmemoryoutputstream.c:771
-msgid "Invalid GSeekType supplied"
-msgstr "చెల్లని GSeekType పంపిణీచేయబడింది"
+msgid "Invalid xseek_type_t supplied"
+msgstr "చెల్లని xseek_type_t పంపిణీచేయబడింది"
 
 #: ../gio/gmemoryinputstream.c:481
 msgid "Invalid seek request"

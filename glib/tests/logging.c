@@ -3,7 +3,7 @@
 #define G_LOG_USE_STRUCTURED 1
 #include <glib.h>
 
-/* Test g_warn macros */
+/* test_t g_warn macros */
 static void
 test_warnings (void)
 {
@@ -415,7 +415,7 @@ compare_fields (const GLogField *f1, xsize_t n1, const GLogField *f2, xsize_t n2
 }
 
 static xslist_t *expected_messages = NULL;
-static const guchar binary_field[] = {1, 2, 3, 4, 5};
+static const xuchar_t binary_field[] = {1, 2, 3, 4, 5};
 
 
 static GLogWriterOutput
@@ -486,8 +486,8 @@ test_structured_logging_robustness (void)
   g_log_set_writer_func (null_log_writer, NULL, NULL);
 
   /* NULL log_domain shouldn't crash */
-  g_log (NULL, G_LOG_LEVEL_MESSAGE, "Test");
-  g_loxstructured (NULL, G_LOG_LEVEL_MESSAGE, "MESSAGE", "Test");
+  g_log (NULL, G_LOG_LEVEL_MESSAGE, "test_t");
+  g_loxstructured (NULL, G_LOG_LEVEL_MESSAGE, "MESSAGE", "test_t");
 
   g_assert_cmpint (log_count, ==, 1);
 }
@@ -564,7 +564,7 @@ test_structured_logging_roundtrip3 (void)
   const GLogField fields[] = {
     { "XPL_DOMAIN", "some-domain", -1 },
     { "PRIORITY", "4", -1 },
-    { "MESSAGE", "Test test test.", -1 }
+    { "MESSAGE", "test_t test test.", -1 }
   };
   ExpectedMessage expected = { fields, 3 };
 
@@ -572,7 +572,7 @@ test_structured_logging_roundtrip3 (void)
   g_log_set_writer_func (expect_log_writer, NULL, NULL);
 
   g_loxstructured ("some-domain", G_LOG_LEVEL_WARNING,
-                    "MESSAGE", "Test test test.");
+                    "MESSAGE", "test_t test test.");
 
   g_assert (expected_messages == NULL);
 }

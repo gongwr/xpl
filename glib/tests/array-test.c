@@ -29,7 +29,7 @@
 #include <string.h>
 #include "glib.h"
 
-/* Test data to be passed to any function which calls g_array_new(), providing
+/* test_t data to be passed to any function which calls g_array_new(), providing
  * the parameters for that call. Most #xarray_t tests should be repeated for all
  * possible values of #ArrayTestData. */
 typedef struct
@@ -238,7 +238,7 @@ array_prepend_val (xconstpointer test_data)
   g_array_free (garray, TRUE);
 }
 
-/* Test that g_array_prepend_vals() works correctly with various array
+/* test_t that g_array_prepend_vals() works correctly with various array
  * configurations. */
 static void
 array_prepend_vals (xconstpointer test_data)
@@ -287,7 +287,7 @@ array_prepend_vals (xconstpointer test_data)
   g_array_free (garray, TRUE);
 }
 
-/* Test that g_array_insert_vals() works correctly with various array
+/* test_t that g_array_insert_vals() works correctly with various array
  * configurations. */
 static void
 array_insert_vals (xconstpointer test_data)
@@ -802,7 +802,7 @@ test_array_binary_search (void)
 
   g_array_free (garray, TRUE);
 
-  /* Test for a not-found element in the middle of the array. */
+  /* test_t for a not-found element in the middle of the array. */
   garray = g_array_sized_new (FALSE, FALSE, sizeof (xuint_t), 3);
   for (i = 1; i < 10; i += 2)
     g_array_append_val (garray, i);
@@ -825,7 +825,7 @@ test_array_copy_sized (void)
   xarray_t *array1 = NULL, *array2 = NULL, *array3 = NULL;
   int val = 5;
 
-  g_test_summary ("Test that copying a newly-allocated sized array works.");
+  g_test_summary ("test_t that copying a newly-allocated sized array works.");
 
   array1 = g_array_sized_new (FALSE, FALSE, sizeof (int), 1);
   array2 = g_array_copy (array1);
@@ -1104,7 +1104,7 @@ ptr_array_copy_func (xconstpointer src, xpointer_t userdata)
   return dst;
 }
 
-/* Test the xptr_array_copy() function */
+/* test_t the xptr_array_copy() function */
 static void
 pointer_array_copy (void)
 {
@@ -1131,7 +1131,7 @@ pointer_array_copy (void)
   for (i = 0; i < array_size; i++)
     array_test[i] = i;
 
-  /* Test copy an empty array */
+  /* test_t copy an empty array */
   ptr_array = xptr_array_sized_new (0);
   ptr_array2 = xptr_array_copy (ptr_array, NULL, NULL);
 
@@ -1140,7 +1140,7 @@ pointer_array_copy (void)
   xptr_array_unref (ptr_array);
   xptr_array_unref (ptr_array2);
 
-  /* Test simple copy */
+  /* test_t simple copy */
   ptr_array = xptr_array_sized_new (array_size);
 
   for (i = 0; i < array_size; i++)
@@ -1158,7 +1158,7 @@ pointer_array_copy (void)
 
   xptr_array_free (ptr_array2, TRUE);
 
-  /* Test copy through GCopyFunc */
+  /* test_t copy through GCopyFunc */
   ptr_array2 = xptr_array_copy (ptr_array, ptr_array_copy_func, NULL);
   xptr_array_set_free_func (ptr_array2, g_free);
 
@@ -1177,7 +1177,7 @@ pointer_array_copy (void)
   g_free (array_test);
 }
 
-/* Test the xptr_array_extend() function */
+/* test_t the xptr_array_extend() function */
 static void
 pointer_array_extend (void)
 {
@@ -1295,7 +1295,7 @@ pointer_array_extend (void)
   g_free (array_test);
 }
 
-/* Test the xptr_array_extend_and_steal() function */
+/* test_t the xptr_array_extend_and_steal() function */
 static void
 pointer_array_extend_and_steal (void)
 {
@@ -1636,7 +1636,7 @@ steal_destroy_notify (xpointer_t data)
   *counter = *counter + 1;
 }
 
-/* Test that xptr_array_steal_index() and xptr_array_steal_index_fast() can
+/* test_t that xptr_array_steal_index() and xptr_array_steal_index_fast() can
  * remove elements from a pointer array without the #xdestroy_notify_t being called. */
 static void
 pointer_array_steal_index (void)
@@ -2038,7 +2038,7 @@ add_array_test (const xchar_t         *test_path,
 int
 main (int argc, char *argv[])
 {
-  /* Test all possible combinations of g_array_new() parameters. */
+  /* test_t all possible combinations of g_array_new() parameters. */
   const ArrayTestData array_configurations[] =
     {
       { FALSE, FALSE },

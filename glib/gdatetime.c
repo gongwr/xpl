@@ -143,13 +143,13 @@ struct _GDateTime
 #define INSTANT_TO_UNIX_USECS(instant) \
   ((instant) - UNIX_EPOCH_START * SEC_PER_DAY * USEC_PER_SECOND)
 #define UNIX_TO_INSTANT(unix) \
-  (((gint64) (unix) + UNIX_EPOCH_START * SEC_PER_DAY) * USEC_PER_SECOND)
+  (((sint64_t) (unix) + UNIX_EPOCH_START * SEC_PER_DAY) * USEC_PER_SECOND)
 #define UNIX_USECS_TO_INSTANT(unix_usecs) \
-  ((gint64) (unix_usecs) + UNIX_EPOCH_START * SEC_PER_DAY * USEC_PER_SECOND)
+  ((sint64_t) (unix_usecs) + UNIX_EPOCH_START * SEC_PER_DAY * USEC_PER_SECOND)
 #define UNIX_TO_INSTANT_IS_VALID(unix) \
-  ((gint64) (unix) <= INSTANT_TO_UNIX (G_MAXINT64))
+  ((sint64_t) (unix) <= INSTANT_TO_UNIX (G_MAXINT64))
 #define UNIX_USECS_TO_INSTANT_IS_VALID(unix_usecs) \
-  ((gint64) (unix_usecs) <= INSTANT_TO_UNIX_USECS (G_MAXINT64))
+  ((sint64_t) (unix_usecs) <= INSTANT_TO_UNIX_USECS (G_MAXINT64))
 
 #define DAYS_IN_4YEARS    1461    /* days in 4 years */
 #define DAYS_IN_100YEARS  36524   /* days in 100 years */
@@ -602,9 +602,9 @@ ymd_to_days (xint_t year,
              xint_t month,
              xint_t day)
 {
-  gint64 days;
+  sint64_t days;
 
-  days = ((gint64) year - 1) * 365 + ((year - 1) / 4) - ((year - 1) / 100)
+  days = ((sint64_t) year - 1) * 365 + ((year - 1) / 4) - ((year - 1) / 100)
       + ((year - 1) / 400);
 
   days += days_in_year[0][month - 1];
@@ -739,10 +739,10 @@ xdate_time_unref (xdatetime_t *datetime)
  * An instant is always positive but we use a signed return value to
  * avoid troubles with C.
  */
-static gint64
+static sint64_t
 xdate_time_to_instant (xdatetime_t *datetime)
 {
-  gint64 offset;
+  sint64_t offset;
 
   offset = xtime_zone_get_offset (datetime->tz, datetime->interval);
   offset *= USEC_PER_SECOND;
@@ -761,10 +761,10 @@ xdate_time_to_instant (xdatetime_t *datetime)
  */
 static xdatetime_t *
 xdate_time_from_instant (xtimezone_t *tz,
-                          gint64     instant)
+                          sint64_t     instant)
 {
   xdatetime_t *datetime;
-  gint64 offset;
+  sint64_t offset;
 
   if (instant < 0 || instant > G_GINT64_CONSTANT (1000000000000000000))
     return NULL;
@@ -814,8 +814,8 @@ static xboolean_t
 xdate_time_deal_with_date_change (xdatetime_t *datetime)
 {
   GTimeType was_dst;
-  gint64 full_time;
-  gint64 usec;
+  sint64_t full_time;
+  sint64_t usec;
 
   if (datetime->days < 1 || datetime->days > 3652059)
     return FALSE;
@@ -893,7 +893,7 @@ static xdatetime_t *
 xdate_time_new_from_timeval (xtimezone_t      *tz,
                               const GTimeVal *tv)
 {
-  gint64 tv_sec = tv->tv_sec;
+  sint64_t tv_sec = tv->tv_sec;
 
   if (tv_sec > G_MAXINT64 - 1 || !UNIX_TO_INSTANT_IS_VALID (tv_sec + 1))
     return NULL;
@@ -926,7 +926,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  **/
 static xdatetime_t *
 xdate_time_new_from_unix (xtimezone_t *tz,
-                           gint64     usecs)
+                           sint64_t     usecs)
 {
   if (!UNIX_USECS_TO_INSTANT_IS_VALID (usecs))
     return NULL;
@@ -955,7 +955,7 @@ xdate_time_new_from_unix (xtimezone_t *tz,
 xdatetime_t *
 xdate_time_new_now (xtimezone_t *tz)
 {
-  gint64 now_us;
+  sint64_t now_us;
 
   now_us = g_get_real_time ();
 
@@ -1034,7 +1034,7 @@ xdate_time_new_now_utc (void)
  * Since: 2.26
  **/
 xdatetime_t *
-xdate_time_new_from_unix_local (gint64 t)
+xdate_time_new_from_unix_local (sint64_t t)
 {
   xdatetime_t *datetime;
   xtimezone_t *local;
@@ -1070,7 +1070,7 @@ xdate_time_new_from_unix_local (gint64 t)
  * Since: 2.26
  **/
 xdatetime_t *
-xdate_time_new_from_unix_utc (gint64 t)
+xdate_time_new_from_unix_utc (sint64_t t)
 {
   xdatetime_t *datetime;
   xtimezone_t *utc;
@@ -1245,7 +1245,7 @@ xdate_time_new_ordinal (xtimezone_t *tz, xint_t year, xint_t ordinal_day, xint_t
 static xdatetime_t *
 xdate_time_new_week (xtimezone_t *tz, xint_t year, xint_t week, xint_t week_day, xint_t hour, xint_t minute, xdouble_t seconds)
 {
-  gint64 p;
+  sint64_t p;
   xint_t max_week, jan4_week_day, ordinal_day;
   xdatetime_t *dt;
 
@@ -1580,11 +1580,11 @@ xdate_time_new (xtimezone_t *tz,
                  xdouble_t    seconds)
 {
   xdatetime_t *datetime;
-  gint64 full_time;
+  sint64_t full_time;
   /* keep these variables as volatile. We do not want them ending up in
    * registers - them doing so may cause us to hit precision problems on i386.
    * See: https://bugzilla.gnome.org/show_bug.cgi?id=792410 */
-  volatile gint64 usec;
+  volatile sint64_t usec;
   volatile xdouble_t usecd;
 
   g_return_val_if_fail (tz != NULL, NULL);
@@ -1602,7 +1602,7 @@ xdate_time_new (xtimezone_t *tz,
   datetime->days = ymd_to_days (year, month, day);
   datetime->usec = (hour   * USEC_PER_HOUR)
                  + (minute * USEC_PER_MINUTE)
-                 + (gint64) (seconds * USEC_PER_SECOND);
+                 + (sint64_t) (seconds * USEC_PER_SECOND);
 
   full_time = SEC_PER_DAY *
                 (ymd_to_days (year, month, day) - UNIX_EPOCH_START) +
@@ -1953,7 +1953,7 @@ xdate_time_add_full (xdatetime_t *datetime,
                       xdouble_t    seconds)
 {
   xint_t year, month, day;
-  gint64 full_time;
+  sint64_t full_time;
   xdatetime_t *new;
   xint_t interval;
 
@@ -2003,7 +2003,7 @@ xdate_time_add_full (xdatetime_t *datetime,
   /* do the actual addition now */
   full_time += (hours * USEC_PER_HOUR) +
                (minutes * USEC_PER_MINUTE) +
-               (gint64) (seconds * USEC_PER_SECOND);
+               (sint64_t) (seconds * USEC_PER_SECOND);
 
   /* find the new interval */
   interval = xtime_zone_find_interval (datetime->tz,
@@ -2043,7 +2043,7 @@ xint_t
 xdate_time_compare (xconstpointer dt1,
                      xconstpointer dt2)
 {
-  gint64 difference;
+  sint64_t difference;
 
   difference = xdate_time_difference ((xdatetime_t *) dt1, (xdatetime_t *) dt2);
 
@@ -2561,7 +2561,7 @@ xdate_time_get_seconds (xdatetime_t *datetime)
  *
  * Since: 2.26
  **/
-gint64
+sint64_t
 xdate_time_to_unix (xdatetime_t *datetime)
 {
   g_return_val_if_fail (datetime != NULL, 0);
@@ -2636,7 +2636,7 @@ xdate_time_get_utc_offset (xdatetime_t *datetime)
 
   offset = xtime_zone_get_offset (datetime->tz, datetime->interval);
 
-  return (gint64) offset * USEC_PER_SECOND;
+  return (sint64_t) offset * USEC_PER_SECOND;
 }
 
 /**
@@ -3288,7 +3288,7 @@ xdate_time_format_utf8 (xdatetime_t   *datetime,
 	  break;
 	case 'z':
 	  {
-	    gint64 offset;
+	    sint64_t offset;
 	    offset = xdate_time_get_utc_offset (datetime) / USEC_PER_SECOND;
 	    if (!format_z (outstr, (int) offset, colons))
 	      return FALSE;
@@ -3491,7 +3491,7 @@ xdate_time_format_iso8601 (xdatetime_t *datetime)
 {
   xstring_t *outstr = NULL;
   xchar_t *main_date = NULL;
-  gint64 offset;
+  sint64_t offset;
   xchar_t *format = "%Y-%m-%dT%H:%M:%S";
 
   /* if datetime has sub-second non-zero values below the second precision we

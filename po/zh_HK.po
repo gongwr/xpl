@@ -265,8 +265,8 @@ msgid "Seek not supported on base stream"
 msgstr "不支援在基礎串流中搜尋"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "不能截短 xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "不能截短 xbuffered_input_stream_t"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1017
 #: ../gio/giostream.c:277 ../gio/goutputstream.c:1464
@@ -2055,7 +2055,7 @@ msgid "Error removing old file: %s"
 msgstr "移除舊檔案時發生錯誤：%s"
 
 #: ../gio/gmemoryinputstream.c:471 ../gio/gmemoryoutputstream.c:771
-msgid "Invalid GSeekType supplied"
+msgid "Invalid xseek_type_t supplied"
 msgstr "提供了無效的 GSeek 類型"
 
 #: ../gio/gmemoryinputstream.c:481

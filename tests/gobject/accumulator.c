@@ -33,7 +33,7 @@
  * Two accumulators are tested:
  *
  * 1: A custom accumulator that appends the returned strings
- * 2: The standard g_signal_accumulator_true_handled that stops
+ * 2: The standard xsignal_accumulator_true_handled that stops
  *    emission on TRUE returns.
  */
 
@@ -220,21 +220,21 @@ test_object_class_init (test_object_class_t *class)
   class->test_signal2 = test_object_real_signal2;
   class->test_signal3 = test_object_real_signal3;
 
-  g_signal_new ("test-signal1",
+  xsignal_new ("test-signal1",
 		G_OBJECT_CLASS_TYPE (class),
 		G_SIGNAL_RUN_LAST,
 		G_STRUCT_OFFSET (test_object_class_t, test_signal1),
 		test_signal1_accumulator, NULL,
 		test_marshal_STRING__INT,
 		XTYPE_STRING, 1, XTYPE_INT);
-  g_signal_new ("test-signal2",
+  xsignal_new ("test-signal2",
 		G_OBJECT_CLASS_TYPE (class),
 		G_SIGNAL_RUN_LAST,
 		G_STRUCT_OFFSET (test_object_class_t, test_signal2),
-		g_signal_accumulator_true_handled, NULL,
+		xsignal_accumulator_true_handled, NULL,
 		test_marshal_BOOLEAN__INT,
 		XTYPE_BOOLEAN, 1, XTYPE_INT);
-  g_signal_new ("test-signal3",
+  xsignal_new ("test-signal3",
 		G_OBJECT_CLASS_TYPE (class),
 		G_SIGNAL_RUN_LAST,
 		G_STRUCT_OFFSET (test_object_class_t, test_signal3),
@@ -263,40 +263,40 @@ main (int   argc,
 
   object = xobject_new (TEST_TYPE_OBJECT, NULL);
 
-  g_signal_connect (object, "test-signal1",
+  xsignal_connect (object, "test-signal1",
 		    G_CALLBACK (test_object_signal1_callback_before), NULL);
-  g_signal_connect_after (object, "test-signal1",
+  xsignal_connect_after (object, "test-signal1",
 			  G_CALLBACK (test_object_signal1_callback_after), NULL);
 
-  g_signal_emit_by_name (object, "test-signal1", 0, &string_result);
+  xsignal_emit_by_name (object, "test-signal1", 0, &string_result);
   g_assert (strcmp (string_result, "<before><default><after>") == 0);
   g_free (string_result);
 
-  g_signal_connect (object, "test-signal2",
+  xsignal_connect (object, "test-signal2",
 		    G_CALLBACK (test_object_signal2_callback_before), NULL);
-  g_signal_connect_after (object, "test-signal2",
+  xsignal_connect_after (object, "test-signal2",
 			  G_CALLBACK (test_object_signal2_callback_after), NULL);
 
   bool_result = FALSE;
-  g_signal_emit_by_name (object, "test-signal2", 1, &bool_result);
+  xsignal_emit_by_name (object, "test-signal2", 1, &bool_result);
   g_assert (bool_result == TRUE);
   bool_result = FALSE;
-  g_signal_emit_by_name (object, "test-signal2", 2, &bool_result);
+  xsignal_emit_by_name (object, "test-signal2", 2, &bool_result);
   g_assert (bool_result == TRUE);
   bool_result = FALSE;
-  g_signal_emit_by_name (object, "test-signal2", 3, &bool_result);
+  xsignal_emit_by_name (object, "test-signal2", 3, &bool_result);
   g_assert (bool_result == TRUE);
   bool_result = TRUE;
-  g_signal_emit_by_name (object, "test-signal2", 4, &bool_result);
+  xsignal_emit_by_name (object, "test-signal2", 4, &bool_result);
   g_assert (bool_result == FALSE);
 
   variant_finalised = FALSE;
   variant_result = NULL;
-  g_signal_emit_by_name (object, "test-signal3", &variant_finalised, &variant_result);
+  xsignal_emit_by_name (object, "test-signal3", &variant_finalised, &variant_result);
   g_assert (variant_result != NULL);
   g_assert (!xvariant_is_floating (variant_result));
 
-  /* Test that variant_result had refcount 1 */
+  /* test_t that variant_result had refcount 1 */
   g_assert (!variant_finalised);
   xvariant_unref (variant_result);
   g_assert (variant_finalised);

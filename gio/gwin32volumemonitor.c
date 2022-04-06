@@ -241,11 +241,11 @@ g_win32_volume_monitor_init (GWin32VolumeMonitor *win32_monitor)
 #if 0
   unix_monitor->mount_monitor = g_win32_mount_monitor_new ();
 
-  g_signal_connect (win32_monitor->mount_monitor,
+  xsignal_connect (win32_monitor->mount_monitor,
 		    "mounts-changed", G_CALLBACK (mounts_changed),
 		    win32_monitor);
 
-  g_signal_connect (win32_monitor->mount_monitor,
+  xsignal_connect (win32_monitor->mount_monitor,
 		    "mountpoints-changed", G_CALLBACK (mountpoints_changed),
 		    win32_monitor);
 

@@ -341,11 +341,11 @@ test_create_structure (xconstpointer test_data)
   g_assert_no_error (error);
 
   g_assert_nonnull (outs);
-  outds = g_data_output_stream_new (G_OUTPUT_STREAM (outs));
+  outds = xdata_output_stream_new (G_OUTPUT_STREAM (outs));
   g_assert_nonnull (outds);
   for (i = 0; i < PATTERN_FILE_SIZE; i++)
     {
-      g_data_output_stream_put_byte (outds, i % 256, NULL, &error);
+      xdata_output_stream_put_byte (outds, i % 256, NULL, &error);
       g_assert_no_error (error);
     }
 
@@ -496,7 +496,7 @@ test_initial_structure (xconstpointer test_data)
   xuint_t i;
   xfile_info_t *info;
   xuint32_t size;
-  guchar *buffer;
+  xuchar_t *buffer;
   xssize_t read, total_read;
   struct StructureItem item;
 
@@ -693,7 +693,7 @@ test_enumerate (xconstpointer test_data)
 
 
   g_assert_nonnull (test_data);
-  log ("\n  Test enumerate '%s'...\n", (char *) test_data);
+  log ("\n  test_t enumerate '%s'...\n", (char *) test_data);
 
   root = xfile_new_for_commandline_arg ((char *) test_data);
   g_assert_nonnull (root);
@@ -926,7 +926,7 @@ test_copy_move (xconstpointer test_data)
   xobject_unref (root);
 }
 
-/* Test that XFILE_ATTRIBUTE_UNIX_IS_MOUNTPOINT is TRUE for / and for another
+/* test_t that XFILE_ATTRIBUTE_UNIX_IS_MOUNTPOINT is TRUE for / and for another
  * known mountpoint. The FALSE case is tested for many directories and files by
  * test_initial_structure(), via test_attributes().
  */
@@ -1370,7 +1370,7 @@ main (int argc, char *argv[])
      "Only create testing structure (no tests)", NULL},
     {"verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, "Be verbose", NULL},
     {"posix", 'x', 0, G_OPTION_ARG_NONE, &posix_compat,
-     "Test POSIX-specific features (unix permissions, symlinks)", NULL},
+     "test_t POSIX-specific features (unix permissions, symlinks)", NULL},
     G_OPTION_ENTRY_NULL
   };
 

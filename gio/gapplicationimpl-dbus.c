@@ -158,7 +158,7 @@ send_property_change (GApplicationImpl *impl)
                          "{sv}",
                          "Busy", xvariant_new_boolean (impl->busy));
 
-  g_dbus_connection_emit_signal (impl->session_bus,
+  xdbus_connection_emit_signal (impl->session_bus,
                                  NULL,
                                  impl->object_path,
                                  "org.freedesktop.DBus.Properties",
@@ -194,7 +194,7 @@ xapplication_impl_method_call (xdbus_connection_t       *connection,
       xvariant_get (parameters, "(@a{sv})", &platform_data);
 
       class->before_emit (impl->app, platform_data);
-      g_signal_emit_by_name (impl->app, "activate");
+      xsignal_emit_by_name (impl->app, "activate");
       class->after_emit (impl->app, platform_data);
       xvariant_unref (platform_data);
 
@@ -240,7 +240,7 @@ xapplication_impl_method_call (xdbus_connection_t       *connection,
       files[n] = NULL;
 
       class->before_emit (impl->app, platform_data);
-      g_signal_emit_by_name (impl->app, "open", files, n, hint);
+      xsignal_emit_by_name (impl->app, "open", files, n, hint);
       class->after_emit (impl->app, platform_data);
 
       xvariant_unref (platform_data);
@@ -272,7 +272,7 @@ xapplication_impl_method_call (xdbus_connection_t       *connection,
       cmdline = xdbus_command_line_new (invocation);
       platform_data = xvariant_get_child_value (parameters, 2);
       class->before_emit (impl->app, platform_data);
-      g_signal_emit_by_name (impl->app, "command-line", cmdline, &status);
+      xsignal_emit_by_name (impl->app, "command-line", cmdline, &status);
       xapplication_command_line_set_exit_status (cmdline, status);
       class->after_emit (impl->app, platform_data);
       xvariant_unref (platform_data);
@@ -344,7 +344,7 @@ name_lost (xdbus_connection_t *bus,
 
   impl->primary = FALSE;
   xapplication_impl_stop_primary (impl);
-  g_signal_emit_by_name (impl->app, "name-lost", &handled);
+  xsignal_emit_by_name (impl->app, "name-lost", &handled);
 }
 
 /* Attempt to become the primary instance.
@@ -410,19 +410,19 @@ xapplication_impl_attempt_primary (GApplicationImpl  *impl,
    * receiving 'activate' or 'open' signals until after 'startup' runs,
    * for the same reason.
    */
-  impl->object_id = g_dbus_connection_register_object (impl->session_bus, impl->object_path,
+  impl->object_id = xdbus_connection_register_object (impl->session_bus, impl->object_path,
                                                        org_gtk_Application, &vtable, impl, NULL, error);
 
   if (impl->object_id == 0)
     return FALSE;
 
-  impl->fdo_object_id = g_dbus_connection_register_object (impl->session_bus, impl->object_path,
+  impl->fdo_object_id = xdbus_connection_register_object (impl->session_bus, impl->object_path,
                                                            org_freedesktop_Application, &vtable, impl, NULL, error);
 
   if (impl->fdo_object_id == 0)
     return FALSE;
 
-  impl->actions_id = g_dbus_connection_export_action_group (impl->session_bus, impl->object_path,
+  impl->actions_id = xdbus_connection_export_action_group (impl->session_bus, impl->object_path,
                                                             impl->exported_actions, error);
 
   if (impl->actions_id == 0)
@@ -461,7 +461,7 @@ xapplication_impl_attempt_primary (GApplicationImpl  *impl,
 
   if (app_flags & G_APPLICATION_ALLOW_REPLACEMENT)
     {
-      impl->name_lost_signal = g_dbus_connection_signal_subscribe (impl->session_bus,
+      impl->name_lost_signal = xdbus_connection_signal_subscribe (impl->session_bus,
                                                                    "org.freedesktop.DBus",
                                                                    "org.freedesktop.DBus",
                                                                    "NameLost",
@@ -477,7 +477,7 @@ xapplication_impl_attempt_primary (GApplicationImpl  *impl,
   if (app_flags & G_APPLICATION_REPLACE)
     name_owner_flags |= G_BUS_NAME_OWNER_FLAGS_REPLACE;
 
-  reply = g_dbus_connection_call_sync (impl->session_bus,
+  reply = xdbus_connection_call_sync (impl->session_bus,
                                        "org.freedesktop.DBus",
                                        "/org/freedesktop/DBus",
                                        "org.freedesktop.DBus",
@@ -497,7 +497,7 @@ xapplication_impl_attempt_primary (GApplicationImpl  *impl,
 
   if (!impl->primary && impl->name_lost_signal)
     {
-      g_dbus_connection_signal_unsubscribe (impl->session_bus, impl->name_lost_signal);
+      xdbus_connection_signal_unsubscribe (impl->session_bus, impl->name_lost_signal);
       impl->name_lost_signal = 0;
     }
 
@@ -527,31 +527,31 @@ xapplication_impl_stop_primary (GApplicationImpl *impl)
 
   if (impl->object_id)
     {
-      g_dbus_connection_unregister_object (impl->session_bus, impl->object_id);
+      xdbus_connection_unregister_object (impl->session_bus, impl->object_id);
       impl->object_id = 0;
     }
 
   if (impl->fdo_object_id)
     {
-      g_dbus_connection_unregister_object (impl->session_bus, impl->fdo_object_id);
+      xdbus_connection_unregister_object (impl->session_bus, impl->fdo_object_id);
       impl->fdo_object_id = 0;
     }
 
   if (impl->actions_id)
     {
-      g_dbus_connection_unexport_action_group (impl->session_bus, impl->actions_id);
+      xdbus_connection_unexport_action_group (impl->session_bus, impl->actions_id);
       impl->actions_id = 0;
     }
 
   if (impl->name_lost_signal)
     {
-      g_dbus_connection_signal_unsubscribe (impl->session_bus, impl->name_lost_signal);
+      xdbus_connection_signal_unsubscribe (impl->session_bus, impl->name_lost_signal);
       impl->name_lost_signal = 0;
     }
 
   if (impl->primary && impl->bus_name)
     {
-      g_dbus_connection_call (impl->session_bus, "org.freedesktop.DBus",
+      xdbus_connection_call (impl->session_bus, "org.freedesktop.DBus",
                               "/org/freedesktop/DBus", "org.freedesktop.DBus",
                               "ReleaseName", xvariant_new ("(s)", impl->bus_name),
                               NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, NULL, NULL);
@@ -650,8 +650,8 @@ xapplication_impl_register (xapplication_t        *application,
    * This also serves as a mechanism to ensure that the primary exists
    * (ie: D-Bus service files installed correctly, etc).
    */
-  actions = g_dbus_action_group_get (impl->session_bus, impl->bus_name, impl->object_path);
-  if (!g_dbus_action_group_sync (actions, cancellable, error))
+  actions = xdbus_action_group_get (impl->session_bus, impl->bus_name, impl->object_path);
+  if (!xdbus_action_group_sync (actions, cancellable, error))
     {
       /* The primary appears not to exist.  Fail the registration. */
       xapplication_impl_destroy (impl);
@@ -669,7 +669,7 @@ void
 xapplication_impl_activate (GApplicationImpl *impl,
                              xvariant_t         *platform_data)
 {
-  g_dbus_connection_call (impl->session_bus,
+  xdbus_connection_call (impl->session_bus,
                           impl->bus_name,
                           impl->object_path,
                           "org.gtk.Application",
@@ -700,7 +700,7 @@ xapplication_impl_open (GApplicationImpl  *impl,
   xvariant_builder_add (&builder, "s", hint);
   xvariant_builder_add_value (&builder, platform_data);
 
-  g_dbus_connection_call (impl->session_bus,
+  xdbus_connection_call (impl->session_bus,
                           impl->bus_name,
                           impl->object_path,
                           "org.gtk.Application",
@@ -749,9 +749,9 @@ xapplication_impl_cmdline_done (xobject_t      *source,
   xvariant_t *reply;
 
 #ifdef G_OS_UNIX
-  reply = g_dbus_connection_call_with_unix_fd_list_finish (G_DBUS_CONNECTION (source), NULL, result, &error);
+  reply = xdbus_connection_call_with_unix_fd_list_finish (G_DBUS_CONNECTION (source), NULL, result, &error);
 #else
-  reply = g_dbus_connection_call_finish (G_DBUS_CONNECTION (source), result, &error);
+  reply = xdbus_connection_call_finish (G_DBUS_CONNECTION (source), result, &error);
 #endif
 
 
@@ -802,7 +802,7 @@ xapplication_impl_command_line (GApplicationImpl    *impl,
       g_dbus_node_info_unref (info);
     }
 
-  object_id = g_dbus_connection_register_object (impl->session_bus, object_path,
+  object_id = xdbus_connection_register_object (impl->session_bus, object_path,
                                                  org_gtk_private_CommandLine,
                                                  &vtable, &data, NULL, NULL);
   /* In theory we should try other paths... */
@@ -820,7 +820,7 @@ xapplication_impl_command_line (GApplicationImpl    *impl,
     g_unix_fd_list_append (fd_list, 0, &error);
     g_assert_no_error (error);
 
-    g_dbus_connection_call_with_unix_fd_list (impl->session_bus, impl->bus_name, impl->object_path,
+    xdbus_connection_call_with_unix_fd_list (impl->session_bus, impl->bus_name, impl->object_path,
                                               "org.gtk.Application", "CommandLine",
                                               xvariant_new ("(o^aay@a{sv})", object_path, arguments, platform_data),
                                               G_VARIANT_TYPE ("(i)"), 0, G_MAXINT, fd_list, NULL,
@@ -828,7 +828,7 @@ xapplication_impl_command_line (GApplicationImpl    *impl,
     xobject_unref (fd_list);
   }
 #else
-  g_dbus_connection_call (impl->session_bus, impl->bus_name, impl->object_path,
+  xdbus_connection_call (impl->session_bus, impl->bus_name, impl->object_path,
                           "org.gtk.Application", "CommandLine",
                           xvariant_new ("(o^aay@a{sv})", object_path, arguments, platform_data),
                           G_VARIANT_TYPE ("(i)"), 0, G_MAXINT, NULL,
@@ -848,7 +848,7 @@ void
 xapplication_impl_flush (GApplicationImpl *impl)
 {
   if (impl->session_bus)
-    g_dbus_connection_flush_sync (impl->session_bus, NULL, NULL);
+    xdbus_connection_flush_sync (impl->session_bus, NULL, NULL);
 }
 
 xdbus_connection_t *
@@ -888,7 +888,7 @@ xdbus_command_line_print_literal (xapplication_command_line_t *cmdline,
 {
   xdbus_command_line_t *gdbcl = (xdbus_command_line_t *) cmdline;
 
-  g_dbus_connection_call (gdbcl->connection,
+  xdbus_connection_call (gdbcl->connection,
                           gdbcl->bus_name,
                           gdbcl->object_path,
                           "org.gtk.private.CommandLine", "Print",
@@ -902,7 +902,7 @@ xdbus_command_line_printerr_literal (xapplication_command_line_t *cmdline,
 {
   xdbus_command_line_t *gdbcl = (xdbus_command_line_t *) cmdline;
 
-  g_dbus_connection_call (gdbcl->connection,
+  xdbus_connection_call (gdbcl->connection,
                           gdbcl->bus_name,
                           gdbcl->object_path,
                           "org.gtk.private.CommandLine", "PrintError",

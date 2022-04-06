@@ -608,5 +608,5 @@ xbytes_get_region (xbytes_t *bytes,
    *   0 <= offset <= end_offset <= bytes->size
    */
 
-  return ((guchar *) bytes->data) + offset;
+  return ((xuchar_t *) bytes->data) + offset;
 }

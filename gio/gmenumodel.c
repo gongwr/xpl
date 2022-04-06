@@ -451,12 +451,12 @@ xmenu_model_class_init (xmenu_model_class_t *class)
    * reported.  The signal is emitted after the modification.
    **/
   xmenu_model_items_changed_signal =
-    g_signal_new (I_("items-changed"), XTYPE_MENU_MODEL,
+    xsignal_new (I_("items-changed"), XTYPE_MENU_MODEL,
                   G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                   _g_cclosure_marshal_VOID__INT_INT_INT,
                   XTYPE_NONE,
                   3, XTYPE_INT, XTYPE_INT, XTYPE_INT);
-  g_signal_set_va_marshaller (xmenu_model_items_changed_signal,
+  xsignal_set_va_marshaller (xmenu_model_items_changed_signal,
                               XTYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_VOID__INT_INT_INTv);
 }
@@ -692,7 +692,7 @@ xmenu_model_items_changed (xmenu_model_t *model,
                             xint_t        removed,
                             xint_t        added)
 {
-  g_signal_emit (model, xmenu_model_items_changed_signal, 0, position, removed, added);
+  xsignal_emit (model, xmenu_model_items_changed_signal, 0, position, removed, added);
 }
 
 struct _GMenuAttributeIterPrivate

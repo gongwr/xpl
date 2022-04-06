@@ -72,9 +72,9 @@ writer_thread (xpointer_t user_data)
     }
   while (err == NULL);
 
-  if (g_cancellable_is_cancelled (writer_cancel))
+  if (xcancellable_is_cancelled (writer_cancel))
     {
-      g_cancellable_cancel (main_cancel);
+      xcancellable_cancel (main_cancel);
       xobject_unref (out);
       return NULL;
     }
@@ -126,7 +126,7 @@ reader_thread (xpointer_t user_data)
 	}
 
       g_assert_cmpstr (buf, ==, DATA);
-      g_assert (!g_cancellable_is_cancelled (reader_cancel));
+      g_assert (!xcancellable_is_cancelled (reader_cancel));
     }
   while (err == NULL);
 
@@ -156,7 +156,7 @@ readable (xobject_t *source, xasync_result_t *res, xpointer_t user_data)
 
   main_len = xinput_stream_read_finish (in, res, &err);
 
-  if (g_cancellable_is_cancelled (main_cancel))
+  if (xcancellable_is_cancelled (main_cancel))
     {
       do_main_cancel (out);
       return;
@@ -180,7 +180,7 @@ writable (xobject_t *source, xasync_result_t *res, xpointer_t user_data)
 
   nwrote = xoutput_stream_write_finish (out, res, &err);
 
-  if (g_cancellable_is_cancelled (main_cancel))
+  if (xcancellable_is_cancelled (main_cancel))
     {
       do_main_cancel (out);
       return;
@@ -208,7 +208,7 @@ writable (xobject_t *source, xasync_result_t *res, xpointer_t user_data)
 static xboolean_t
 timeout (xpointer_t cancellable)
 {
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   return FALSE;
 }
 
@@ -232,9 +232,9 @@ test_pipe_io (void)
 
   g_assert (_pipe (writer_pipe, 10, _O_BINARY) == 0 && _pipe (reader_pipe, 10, _O_BINARY) == 0);
 
-  writer_cancel = g_cancellable_new ();
-  reader_cancel = g_cancellable_new ();
-  main_cancel = g_cancellable_new ();
+  writer_cancel = xcancellable_new ();
+  reader_cancel = xcancellable_new ();
+  main_cancel = xcancellable_new ();
 
   writer = xthread_new ("writer", writer_thread, NULL);
   reader = xthread_new ("reader", reader_thread, NULL);
@@ -432,12 +432,12 @@ test_pipe_io_concurrent (void)
 
   rc1.in = g_win32_input_stream_new (client, TRUE);
   rc1.success = FALSE;
-  rc1.cancellable = g_cancellable_new ();
+  rc1.cancellable = xcancellable_new ();
   rc1.thread = xthread_new ("reader_client", pipe_io_concurrent_reader_thread, &rc1);
 
   rc2.in = g_win32_input_stream_new (client, TRUE);
   rc2.success = FALSE;
-  rc2.cancellable = g_cancellable_new ();
+  rc2.cancellable = xcancellable_new ();
   rc2.thread = xthread_new ("reader_client", pipe_io_concurrent_reader_thread, &rc2);
 
   /* FIXME: how to synchronize on both reader thread waiting in read,
@@ -451,8 +451,8 @@ test_pipe_io_concurrent (void)
 
   g_assert (rc1.success ^ rc2.success);
 
-  g_cancellable_cancel (rc1.cancellable);
-  g_cancellable_cancel (rc2.cancellable);
+  xcancellable_cancel (rc1.cancellable);
+  xcancellable_cancel (rc2.cancellable);
 
   xthread_join (writer_server);
   xthread_join (rc1.thread);
@@ -504,7 +504,7 @@ test_pipe_io_cancel (void)
   in = g_win32_input_stream_new (in_handle, TRUE);
   out = g_win32_output_stream_new (out_handle, TRUE);
 
-  reader_cancel = g_cancellable_new ();
+  reader_cancel = xcancellable_new ();
   xinput_stream_read_async (in, main_buf, sizeof (main_buf),
                              G_PRIORITY_DEFAULT, reader_cancel,
                              readable_cancel, out);

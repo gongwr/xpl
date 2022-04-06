@@ -4,7 +4,7 @@
 
 /* HMAC-MD5 test vectors as per RFC 2202 */
 
-/* Test 1 */
+/* test_t 1 */
 xuint8_t key_md5_test1[] = {
     0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
     0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b };
@@ -12,12 +12,12 @@ xuint8_t result_md5_test1[] = {
     0x92, 0x94, 0x72, 0x7a, 0x36, 0x38, 0xbb, 0x1c, 0x13, 0xf4,
     0x8e, 0xf8, 0x15, 0x8b, 0xfc, 0x9d };
 
-/* Test 2 */
+/* test_t 2 */
 xuint8_t result_md5_test2[] = {
     0x75, 0x0c, 0x78, 0x3e, 0x6a, 0xb0, 0xb5, 0x03, 0xea, 0xa8,
     0x6e, 0x31, 0x0a, 0x5d, 0xb7, 0x38 };
 
-/* Test 3 */
+/* test_t 3 */
 xuint8_t key_md5_test3[] = {
     0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
     0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa };
@@ -31,7 +31,7 @@ xuint8_t result_md5_test3[] = {
     0x56, 0xbe, 0x34, 0x52, 0x1d, 0x14, 0x4c, 0x88, 0xdb, 0xb8,
     0xc7, 0x33, 0xf0, 0xe8, 0xb3, 0xf6 };
 
-/* Test 4 */
+/* test_t 4 */
 xuint8_t key_md5_test4[] = {
     0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a,
     0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
@@ -46,7 +46,7 @@ xuint8_t result_md5_test4[] = {
     0x69, 0x7e, 0xaf, 0x0a, 0xca, 0x3a, 0x3a, 0xea, 0x3a, 0x75,
     0x16, 0x47, 0x46, 0xff, 0xaa, 0x79 };
 
-/* Test 5 */
+/* test_t 5 */
 xuint8_t key_md5_test5[] = {
     0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
     0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c};
@@ -54,7 +54,7 @@ xuint8_t result_md5_test5[] = {
     0x56, 0x46, 0x1e, 0xf2, 0x34, 0x2e, 0xdc, 0x00, 0xf9, 0xba,
     0xb9, 0x95, 0x69, 0x0e, 0xfd, 0x4c };
 
-/* Test 6 */
+/* test_t 6 */
 xuint8_t key_md5_test6[] = {
     0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
     0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
@@ -68,7 +68,7 @@ xuint8_t result_md5_test6[] = {
     0x6b, 0x1a, 0xb7, 0xfe, 0x4b, 0xd7, 0xbf, 0x8f, 0x0b, 0x62,
     0xe6, 0xce, 0x61, 0xb9, 0xd0, 0xcd };
 
-/* Test 6 */
+/* test_t 6 */
 xuint8_t key_md5_test7[] = {
     0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
     0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
@@ -87,7 +87,7 @@ xuint8_t result_md5_test7[] = {
  *
  * See: https://tools.ietf.org/html/rfc4868#section-2.7.1 */
 
-/* Test 1 */
+/* test_t 1 */
 xuint8_t key_sha_test1[] = {
     0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
     0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b };
@@ -114,7 +114,7 @@ xuint8_t result_sha512_test1[] = {
     0x91, 0x4e, 0xeb, 0x61, 0xf1, 0x70, 0x2e, 0x69, 0x6c, 0x20,
     0x3a, 0x12, 0x68, 0x54 };
 
-/* Test 2 */
+/* test_t 2 */
 xuint8_t result_sha1_test2[] = {
     0xef, 0xfc, 0xdf, 0x6a, 0xe5, 0xeb, 0x2f, 0xa2, 0xd2, 0x74,
     0x16, 0xd5, 0xf1, 0x84, 0xdf, 0x9c, 0x25, 0x9a, 0x7c, 0x79 };
@@ -138,7 +138,7 @@ xuint8_t result_sha512_test2[] = {
     0xb1, 0xa3, 0x4d, 0x4a, 0x6b, 0x4b, 0x63, 0x6e, 0x07, 0x0a,
     0x38, 0xbc, 0xe7, 0x37 };
 
-/* Test 3 */
+/* test_t 3 */
 xuint8_t key_sha_test3[] = {
     0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
     0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa };
@@ -171,7 +171,7 @@ xuint8_t result_sha512_test3[] = {
     0xa3, 0x37, 0xbe, 0xe8, 0x94, 0x26, 0x74, 0x27, 0x88, 0x59,
     0xe1, 0x32, 0x92, 0xfb };
 
-/* Test 4 */
+/* test_t 4 */
 xuint8_t key_sha_test4[] = {
     0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a,
     0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
@@ -205,7 +205,7 @@ xuint8_t result_sha512_test4[] = {
     0x97, 0x41, 0x12, 0x0c, 0x4f, 0x2d, 0xe2, 0xad, 0xeb, 0xeb,
     0x10, 0xa2, 0x98, 0xdd };
 
-/* Test 5 (note: different for SHA-256/SHA-512) */
+/* test_t 5 (note: different for SHA-256/SHA-512) */
 xuint8_t key_sha1_test5[] = {
     0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
     0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c };
@@ -213,7 +213,7 @@ xuint8_t result_sha1_test5[] = {
     0x4c, 0x1a, 0x03, 0x42, 0x4b, 0x55, 0xe0, 0x7f, 0xe7, 0xf2,
     0x7b, 0xe1, 0xd5, 0x8b, 0xb9, 0x32, 0x4a, 0x9a, 0x5a, 0x04 };
 
-/* Test 6 & 7 (note: different for SHA-1 and SHA-256/SHA-512) */
+/* test_t 6 & 7 (note: different for SHA-1 and SHA-256/SHA-512) */
 xuint8_t key_sha1_test6_7[] = {
     0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
     0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
@@ -232,7 +232,7 @@ xuint8_t result_sha1_test7[] = {
     0xe8, 0xe9, 0x9d, 0xf, 0x45, 0x23, 0x7d, 0x78, 0x6d, 0x6b,
     0xba, 0xa7, 0x96, 0x5c, 0x78, 0x8, 0xbb, 0xff, 0x1a, 0x91 };
 
-/* Test 5 & 6 for SHA-256 and SHA-512. */
+/* test_t 5 & 6 for SHA-256 and SHA-512. */
 xuint8_t key_sha256_test5_6[] = {
     0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
     0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
@@ -307,13 +307,13 @@ HmacCase hmac_md5_tests[] = {
       result_md5_test3 },
   { G_CHECKSUM_MD5, key_md5_test4, 25, data_md5_test4, 50,
       result_md5_test4 },
-  { G_CHECKSUM_MD5, key_md5_test5, 16, "Test With Truncation", 20,
+  { G_CHECKSUM_MD5, key_md5_test5, 16, "test_t With Truncation", 20,
       result_md5_test5 },
   { G_CHECKSUM_MD5, key_md5_test6, 80,
-      "Test Using Larger Than Block-Size Key - Hash Key First", 54,
+      "test_t Using Larger Than Block-Size Key - Hash Key First", 54,
       result_md5_test6 },
   { G_CHECKSUM_MD5, key_md5_test7, 80,
-      "Test Using Larger Than Block-Size Key and Larger Than One Block-Size Data",
+      "test_t Using Larger Than Block-Size Key and Larger Than One Block-Size Data",
       73, result_md5_test7 },
   { -1, NULL, 0, NULL, 0, NULL },
 };
@@ -326,13 +326,13 @@ HmacCase hmac_sha1_tests[] = {
       result_sha1_test3 },
   { G_CHECKSUM_SHA1, key_sha_test4, 25, data_sha_test4, 50,
       result_sha1_test4 },
-  { G_CHECKSUM_SHA1, key_sha1_test5, 20, "Test With Truncation", 20,
+  { G_CHECKSUM_SHA1, key_sha1_test5, 20, "test_t With Truncation", 20,
     result_sha1_test5 },
   { G_CHECKSUM_SHA1, key_sha1_test6_7, 80,
-      "Test Using Larger Than Block-Size Key - Hash Key First", 54,
+      "test_t Using Larger Than Block-Size Key - Hash Key First", 54,
       result_sha1_test6 },
   { G_CHECKSUM_SHA1, key_sha1_test6_7, 80,
-      "Test Using Larger Than Block-Size Key and Larger" \
+      "test_t Using Larger Than Block-Size Key and Larger" \
                " Than One Block-Size Data", 73, result_sha1_test7, },
   { -1, NULL, 0, NULL, 0, NULL },
 };
@@ -346,7 +346,7 @@ HmacCase hmac_sha256_tests[] = {
   { G_CHECKSUM_SHA256, key_sha_test4, 25, data_sha_test4, 50,
       result_sha256_test4 },
   { G_CHECKSUM_SHA256, key_sha256_test5_6, 131,
-      "Test Using Larger Than Block-Size Key - Hash Key First", 54,
+      "test_t Using Larger Than Block-Size Key - Hash Key First", 54,
       result_sha256_test5 },
   { G_CHECKSUM_SHA256, key_sha256_test5_6, 131,
       "This is a test using a larger than block-size key and a larger than "
@@ -364,7 +364,7 @@ HmacCase hmac_sha384_tests[] = {
   { G_CHECKSUM_SHA384, key_sha_test4, 25, data_sha_test4, 50,
       result_sha384_test4 },
   { G_CHECKSUM_SHA384, key_sha256_test5_6, 131,
-      "Test Using Larger Than Block-Size Key - Hash Key First", 54,
+      "test_t Using Larger Than Block-Size Key - Hash Key First", 54,
       result_sha384_test5 },
   { G_CHECKSUM_SHA384, key_sha256_test5_6, 131,
       "This is a test using a larger than block-size key and a larger than "
@@ -382,7 +382,7 @@ HmacCase hmac_sha512_tests[] = {
   { G_CHECKSUM_SHA512, key_sha_test4, 25, data_sha_test4, 50,
       result_sha512_test4 },
   { G_CHECKSUM_SHA512, key_sha256_test5_6, 131,
-      "Test Using Larger Than Block-Size Key - Hash Key First", 54,
+      "test_t Using Larger Than Block-Size Key - Hash Key First", 54,
       result_sha512_test5 },
   { G_CHECKSUM_SHA512, key_sha256_test5_6, 131,
       "This is a test using a larger than block-size key and a larger than "
@@ -417,7 +417,7 @@ test_hmac_ref_unref (void)
 {
   xhmac_t *hmac, *check;
 
-  hmac = g_hmac_new (G_CHECKSUM_SHA1, (guchar*)"aaa", 3);
+  hmac = g_hmac_new (G_CHECKSUM_SHA1, (xuchar_t*)"aaa", 3);
   check = g_hmac_ref (hmac);
   g_assert (check == hmac);
   g_hmac_unref (check);
@@ -429,7 +429,7 @@ test_hmac_copy (void)
 {
   xhmac_t *hmac, *check;
 
-  hmac = g_hmac_new (G_CHECKSUM_SHA256, (guchar*)"aaa", 3);
+  hmac = g_hmac_new (G_CHECKSUM_SHA256, (xuchar_t*)"aaa", 3);
   check = g_hmac_copy (hmac);
   g_assert (check != hmac);
   g_assert_cmpstr (g_hmac_get_string (hmac), ==, g_hmac_get_string (check));
@@ -444,11 +444,11 @@ test_hmac_for_data (void)
   xhmac_t *hmac;
 
   string = g_compute_hmac_for_data (G_CHECKSUM_SHA1,
-                                    (guchar*)"aaa", 3,
-                                    (guchar*)"bcdef", 5);
+                                    (xuchar_t*)"aaa", 3,
+                                    (xuchar_t*)"bcdef", 5);
 
-  hmac = g_hmac_new (G_CHECKSUM_SHA1, (guchar*)"aaa", 3);
-  g_hmac_update (hmac, (guchar*)"bcdef", 5);
+  hmac = g_hmac_new (G_CHECKSUM_SHA1, (xuchar_t*)"aaa", 3);
+  g_hmac_update (hmac, (xuchar_t*)"bcdef", 5);
   g_assert_cmpstr (string, ==, g_hmac_get_string (hmac));
   g_hmac_unref (hmac);
   g_free (string);
@@ -461,11 +461,11 @@ test_hmac_for_string (void)
   xhmac_t *hmac;
 
   string = g_compute_hmac_for_string (G_CHECKSUM_SHA1,
-                                      (guchar*)"aaa", 3,
+                                      (xuchar_t*)"aaa", 3,
                                       "bcdef", -1);
 
-  hmac = g_hmac_new (G_CHECKSUM_SHA1, (guchar*)"aaa", 3);
-  g_hmac_update (hmac, (guchar*)"bcdef", 5);
+  hmac = g_hmac_new (G_CHECKSUM_SHA1, (xuchar_t*)"aaa", 3);
+  g_hmac_update (hmac, (xuchar_t*)"bcdef", 5);
   g_assert_cmpstr (string, ==, g_hmac_get_string (hmac));
   g_hmac_unref (hmac);
   g_free (string);
@@ -483,8 +483,8 @@ test_hmac_for_bytes (void)
 
   string = g_compute_hmac_for_bytes (G_CHECKSUM_SHA1, key, data);
 
-  hmac = g_hmac_new (G_CHECKSUM_SHA1, (guchar*)"aaa", 3);
-  g_hmac_update (hmac, (guchar*)"bcdef", 5);
+  hmac = g_hmac_new (G_CHECKSUM_SHA1, (xuchar_t*)"aaa", 3);
+  g_hmac_update (hmac, (xuchar_t*)"bcdef", 5);
   g_assert_cmpstr (string, ==, g_hmac_get_string (hmac));
   g_hmac_unref (hmac);
   g_free (string);

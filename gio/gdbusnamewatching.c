@@ -68,7 +68,7 @@ typedef struct
   xmain_context_t             *main_context;
 
   xdbus_connection_t          *connection;
-  gulong                    disconnected_signal_handler_id;
+  xulong_t                    disconnected_signal_handler_id;
   xuint_t                     name_owner_changed_subscription_id;
 
   PreviousCall              previous_call;
@@ -105,9 +105,9 @@ client_unref (Client *client)
       if (client->connection != NULL)
         {
           if (client->name_owner_changed_subscription_id > 0)
-            g_dbus_connection_signal_unsubscribe (client->connection, client->name_owner_changed_subscription_id);
+            xdbus_connection_signal_unsubscribe (client->connection, client->name_owner_changed_subscription_id);
           if (client->disconnected_signal_handler_id > 0)
-            g_signal_handler_disconnect (client->connection, client->disconnected_signal_handler_id);
+            xsignal_handler_disconnect (client->connection, client->disconnected_signal_handler_id);
           xobject_unref (client->connection);
         }
       g_free (client->name);
@@ -316,9 +316,9 @@ on_connection_disconnected (xdbus_connection_t *connection,
     return;
 
   if (client->name_owner_changed_subscription_id > 0)
-    g_dbus_connection_signal_unsubscribe (client->connection, client->name_owner_changed_subscription_id);
+    xdbus_connection_signal_unsubscribe (client->connection, client->name_owner_changed_subscription_id);
   if (client->disconnected_signal_handler_id > 0)
-    g_signal_handler_disconnect (client->connection, client->disconnected_signal_handler_id);
+    xsignal_handler_disconnect (client->connection, client->disconnected_signal_handler_id);
   xobject_unref (client->connection);
   client->disconnected_signal_handler_id = 0;
   client->name_owner_changed_subscription_id = 0;
@@ -402,7 +402,7 @@ get_name_owner_cb (xobject_t      *source_object,
   name_owner = NULL;
   result = NULL;
 
-  result = g_dbus_connection_call_finish (client->connection,
+  result = xdbus_connection_call_finish (client->connection,
                                           res,
                                           NULL);
   if (result != NULL)
@@ -433,7 +433,7 @@ get_name_owner_cb (xobject_t      *source_object,
 static void
 invoke_get_name_owner (Client *client)
 {
-  g_dbus_connection_call (client->connection,
+  xdbus_connection_call (client->connection,
                           "org.freedesktop.DBus",  /* bus name */
                           "/org/freedesktop/DBus", /* object path */
                           "org.freedesktop.DBus",  /* interface name */
@@ -459,7 +459,7 @@ start_service_by_name_cb (xobject_t      *source_object,
 
   result = NULL;
 
-  result = g_dbus_connection_call_finish (client->connection,
+  result = xdbus_connection_call_finish (client->connection,
                                           res,
                                           NULL);
   if (result != NULL)
@@ -507,13 +507,13 @@ static void
 has_connection (Client *client)
 {
   /* listen for disconnection */
-  client->disconnected_signal_handler_id = g_signal_connect (client->connection,
+  client->disconnected_signal_handler_id = xsignal_connect (client->connection,
                                                              "closed",
                                                              G_CALLBACK (on_connection_disconnected),
                                                              GUINT_TO_POINTER (client->id));
 
   /* start listening to NameOwnerChanged messages immediately */
-  client->name_owner_changed_subscription_id = g_dbus_connection_signal_subscribe (client->connection,
+  client->name_owner_changed_subscription_id = xdbus_connection_signal_subscribe (client->connection,
                                                                                    "org.freedesktop.DBus",  /* name */
                                                                                    "org.freedesktop.DBus",  /* if */
                                                                                    "NameOwnerChanged",      /* signal */
@@ -526,7 +526,7 @@ has_connection (Client *client)
 
   if (client->flags & G_BUS_NAME_WATCHER_FLAGS_AUTO_START)
     {
-      g_dbus_connection_call (client->connection,
+      xdbus_connection_call (client->connection,
                               "org.freedesktop.DBus",  /* bus name */
                               "/org/freedesktop/DBus", /* object path */
                               "org.freedesktop.DBus",  /* interface name */
@@ -615,7 +615,7 @@ connection_get_cb (xobject_t      *source_object,
  * Since: 2.26
  */
 xuint_t
-g_bus_watch_name (GBusType                  bus_type,
+g_bus_watch_name (xbus_type_t                  bus_type,
                   const xchar_t              *name,
                   GBusNameWatcherFlags      flags,
                   GBusNameAppearedCallback  name_appeared_handler,
@@ -669,7 +669,7 @@ g_bus_watch_name (GBusType                  bus_type,
  * @user_data_free_func: (nullable): Function for freeing @user_data or %NULL.
  *
  * Like g_bus_watch_name() but takes a #xdbus_connection_t instead of a
- * #GBusType.
+ * #xbus_type_t.
  *
  * Returns: An identifier (never 0) that can be used with
  * g_bus_unwatch_name() to stop watching the name.
@@ -827,7 +827,7 @@ bus_watch_name_free_func (xpointer_t user_data)
  * Since: 2.26
  */
 xuint_t
-g_bus_watch_name_with_closures (GBusType                 bus_type,
+g_bus_watch_name_with_closures (xbus_type_t                 bus_type,
                                 const xchar_t             *name,
                                 GBusNameWatcherFlags     flags,
                                 xclosure_t                *name_appeared_closure,

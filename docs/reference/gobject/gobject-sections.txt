@@ -581,7 +581,7 @@ xvalue_get_char
 xvalue_get_schar
 xvalue_set_schar
 
-<SUBSECTION guchar>
+<SUBSECTION xuchar_t>
 X_IS_PARAM_SPEC_UCHAR
 G_PARAM_SPEC_UCHAR
 G_VALUE_HOLDS_UCHAR
@@ -621,7 +621,7 @@ g_param_spec_long
 xvalue_set_long
 xvalue_get_long
 
-<SUBSECTION gulong>
+<SUBSECTION xulong_t>
 X_IS_PARAM_SPEC_ULONG
 G_PARAM_SPEC_ULONG
 G_VALUE_HOLDS_ULONG
@@ -631,7 +631,7 @@ g_param_spec_ulong
 xvalue_set_ulong
 xvalue_get_ulong
 
-<SUBSECTION gint64>
+<SUBSECTION sint64_t>
 X_IS_PARAM_SPEC_INT64
 G_PARAM_SPEC_INT64
 G_VALUE_HOLDS_INT64
@@ -833,57 +833,57 @@ GSignalQuery
 G_SIGNAL_TYPE_STATIC_SCOPE
 G_SIGNAL_MATCH_MASK
 G_SIGNAL_FLAGS_MASK
-g_signal_new
-g_signal_newv
-g_signal_new_valist
-g_signal_set_va_marshaller
-g_signal_query
-g_signal_lookup
-g_signal_name
-g_signal_list_ids
-g_signal_emit
-g_signal_emit_by_name
-g_signal_emitv
-g_signal_emit_valist
-g_signal_connect
-g_signal_connect_after
-g_signal_connect_swapped
-g_signal_connect_object
+xsignal_new
+xsignal_newv
+xsignal_new_valist
+xsignal_set_va_marshaller
+xsignal_query
+xsignal_lookup
+xsignal_name
+xsignal_list_ids
+xsignal_emit
+xsignal_emit_by_name
+xsignal_emitv
+xsignal_emit_valist
+xsignal_connect
+xsignal_connect_after
+xsignal_connect_swapped
+xsignal_connect_object
 GConnectFlags
-g_signal_connect_data
-g_signal_connect_closure
-g_signal_connect_closure_by_id
-g_signal_handler_block
-g_signal_handler_unblock
-g_signal_handler_disconnect
-g_signal_handler_find
-g_signal_handlers_block_matched
-g_signal_handlers_unblock_matched
-g_signal_handlers_disconnect_matched
-g_signal_handler_is_connected
-g_signal_handlers_block_by_func
-g_signal_handlers_unblock_by_func
-g_signal_handlers_disconnect_by_func
-g_signal_handlers_disconnect_by_data
-g_signal_has_handler_pending
-g_signal_stop_emission
-g_signal_stop_emission_by_name
-g_signal_override_class_closure
-g_signal_chain_from_overridden
-g_signal_new_class_handler
-g_signal_override_class_handler
-g_signal_chain_from_overridden_handler
-g_signal_add_emission_hook
-g_signal_remove_emission_hook
-g_signal_is_valid_name
-g_signal_parse_name
-g_signal_get_invocation_hint
-g_signal_type_cclosure_new
-g_signal_accumulator_first_wins
-g_signal_accumulator_true_handled
+xsignal_connect_data
+xsignal_connect_closure
+xsignal_connect_closure_by_id
+xsignal_handler_block
+xsignal_handler_unblock
+xsignal_handler_disconnect
+xsignal_handler_find
+xsignal_handlers_block_matched
+xsignal_handlers_unblock_matched
+xsignal_handlers_disconnect_matched
+xsignal_handler_is_connected
+xsignal_handlers_block_by_func
+xsignal_handlers_unblock_by_func
+xsignal_handlers_disconnect_by_func
+xsignal_handlers_disconnect_by_data
+xsignal_has_handler_pending
+xsignal_stop_emission
+xsignal_stop_emission_by_name
+xsignal_override_class_closure
+xsignal_chain_from_overridden
+xsignal_new_class_handler
+xsignal_override_class_handler
+xsignal_chain_from_overridden_handler
+xsignal_add_emission_hook
+xsignal_remove_emission_hook
+xsignal_is_valid_name
+xsignal_parse_name
+xsignal_get_invocation_hint
+xsignal_type_cclosure_new
+xsignal_accumulator_first_wins
+xsignal_accumulator_true_handled
 g_clear_signal_handler
 <SUBSECTION Private>
-g_signal_handlers_destroy
+xsignal_handlers_destroy
 </SECTION>
 
 <SECTION>

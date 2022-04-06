@@ -44,8 +44,8 @@ main (int argc, char **argv)
 
   app = xapplication_new ("org.gtk.TestApplication",
                            G_APPLICATION_HANDLES_OPEN);
-  g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
-  g_signal_connect (app, "open", G_CALLBACK (open), NULL);
+  xsignal_connect (app, "activate", G_CALLBACK (activate), NULL);
+  xsignal_connect (app, "open", G_CALLBACK (open), NULL);
   xapplication_set_inactivity_timeout (app, 10000);
 
   status = xapplication_run (app, argc, argv);

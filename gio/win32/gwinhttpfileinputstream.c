@@ -79,7 +79,7 @@ static void
 g_winhttp_file_input_stream_class_init (GWinHttpFileInputStreamClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
-  GInputStreamClass *stream_class = G_INPUT_STREAM_CLASS (klass);
+  xinput_stream_class_t *stream_class = G_INPUT_STREAM_CLASS (klass);
 
   gobject_class->finalize = g_winhttp_file_input_stream_finalize;
 

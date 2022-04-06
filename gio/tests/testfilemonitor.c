@@ -373,7 +373,7 @@ test_atomic_replace (Fixture       *fixture,
   g_test_message ("Using xfile_monitor_t %s", G_OBJECT_TYPE_NAME (data.monitor));
 
   xfile_monitor_set_rate_limit (data.monitor, 200);
-  g_signal_connect (data.monitor, "changed", G_CALLBACK (monitor_changed), &data);
+  xsignal_connect (data.monitor, "changed", G_CALLBACK (monitor_changed), &data);
 
   data.loop = xmain_loop_new (NULL, TRUE);
 
@@ -478,7 +478,7 @@ test_file_changes (Fixture       *fixture,
   g_test_message ("Using xfile_monitor_t %s", G_OBJECT_TYPE_NAME (data.monitor));
 
   xfile_monitor_set_rate_limit (data.monitor, 200);
-  g_signal_connect (data.monitor, "changed", G_CALLBACK (monitor_changed), &data);
+  xsignal_connect (data.monitor, "changed", G_CALLBACK (monitor_changed), &data);
 
   data.loop = xmain_loop_new (NULL, TRUE);
 
@@ -596,7 +596,7 @@ test_dir_monitor (Fixture       *fixture,
   g_test_message ("Using xfile_monitor_t %s", G_OBJECT_TYPE_NAME (data.monitor));
 
   xfile_monitor_set_rate_limit (data.monitor, 200);
-  g_signal_connect (data.monitor, "changed", G_CALLBACK (monitor_changed), &data);
+  xsignal_connect (data.monitor, "changed", G_CALLBACK (monitor_changed), &data);
 
   data.loop = xmain_loop_new (NULL, TRUE);
 
@@ -690,7 +690,7 @@ test_dir_non_existent (Fixture       *fixture,
   g_test_message ("Using xfile_monitor_t %s", G_OBJECT_TYPE_NAME (data.monitor));
 
   xfile_monitor_set_rate_limit (data.monitor, 200);
-  g_signal_connect (data.monitor, "changed", G_CALLBACK (monitor_changed), &data);
+  xsignal_connect (data.monitor, "changed", G_CALLBACK (monitor_changed), &data);
 
   data.loop = xmain_loop_new (NULL, TRUE);
 
@@ -802,7 +802,7 @@ test_cross_dir_moves (Fixture       *fixture,
   g_test_message ("Using xfile_monitor_t 0 %s", G_OBJECT_TYPE_NAME (data[0].monitor));
 
   xfile_monitor_set_rate_limit (data[0].monitor, 200);
-  g_signal_connect (data[0].monitor, "changed", G_CALLBACK (monitor_changed), &data[0]);
+  xsignal_connect (data[0].monitor, "changed", G_CALLBACK (monitor_changed), &data[0]);
 
   data[1].step = 0;
   data[1].events = NULL;
@@ -817,7 +817,7 @@ test_cross_dir_moves (Fixture       *fixture,
   g_test_message ("Using xfile_monitor_t 1 %s", G_OBJECT_TYPE_NAME (data[1].monitor));
 
   xfile_monitor_set_rate_limit (data[1].monitor, 200);
-  g_signal_connect (data[1].monitor, "changed", G_CALLBACK (monitor_changed), &data[1]);
+  xsignal_connect (data[1].monitor, "changed", G_CALLBACK (monitor_changed), &data[1]);
 
   data[0].loop = xmain_loop_new (NULL, TRUE);
 
@@ -989,7 +989,7 @@ test_file_hard_links (Fixture       *fixture,
 
   /* Change the file a bit. */
   xfile_monitor_set_rate_limit (data.monitor, 200);
-  g_signal_connect (data.monitor, "changed", (xcallback_t) monitor_changed, &data);
+  xsignal_connect (data.monitor, "changed", (xcallback_t) monitor_changed, &data);
 
   data.loop = xmain_loop_new (NULL, TRUE);
   g_timeout_add (500, file_hard_links_step, &data);

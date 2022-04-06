@@ -99,11 +99,11 @@ typedef enum {
 } GSliceConfig;
 
 XPL_DEPRECATED_IN_2_34
-void     g_slice_set_config	   (GSliceConfig ckey, gint64 value);
+void     g_slice_set_config	   (GSliceConfig ckey, sint64_t value);
 XPL_DEPRECATED_IN_2_34
-gint64   g_slice_get_config	   (GSliceConfig ckey);
+sint64_t   g_slice_get_config	   (GSliceConfig ckey);
 XPL_DEPRECATED_IN_2_34
-gint64*  g_slice_get_config_state  (GSliceConfig ckey, gint64 address, xuint_t *n_values);
+sint64_t*  g_slice_get_config_state  (GSliceConfig ckey, sint64_t address, xuint_t *n_values);
 
 #ifdef G_ENABLE_DEBUG
 XPL_AVAILABLE_IN_ALL

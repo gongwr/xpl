@@ -90,7 +90,7 @@ static const char base64_alphabet[] =
  * Since: 2.12
  */
 xsize_t
-g_base64_encode_step (const guchar *in,
+g_base64_encode_step (const xuchar_t *in,
                       xsize_t         len,
                       xboolean_t      break_lines,
                       xchar_t        *out,
@@ -98,7 +98,7 @@ g_base64_encode_step (const guchar *in,
                       xint_t         *save)
 {
   char *outptr;
-  const guchar *inptr;
+  const xuchar_t *inptr;
 
   g_return_val_if_fail (in != NULL || len == 0, 0);
   g_return_val_if_fail (out != NULL, 0);
@@ -113,7 +113,7 @@ g_base64_encode_step (const guchar *in,
 
   if (len + ((char *) save) [0] > 2)
     {
-      const guchar *inend = in+len-2;
+      const xuchar_t *inend = in+len-2;
       int c1, c2, c3;
       int already;
 
@@ -258,7 +258,7 @@ g_base64_encode_close (xboolean_t  break_lines,
  * Since: 2.12
  */
 xchar_t *
-g_base64_encode (const guchar *data,
+g_base64_encode (const xuchar_t *data,
                  xsize_t         len)
 {
   xchar_t *out;
@@ -323,15 +323,15 @@ static const unsigned char mime_base64_rank[256] = {
 xsize_t
 g_base64_decode_step (const xchar_t  *in,
                       xsize_t         len,
-                      guchar       *out,
+                      xuchar_t       *out,
                       xint_t         *state,
                       xuint_t        *save)
 {
-  const guchar *inptr;
-  guchar *outptr;
-  const guchar *inend;
-  guchar c, rank;
-  guchar last[2];
+  const xuchar_t *inptr;
+  xuchar_t *outptr;
+  const xuchar_t *inend;
+  xuchar_t c, rank;
+  xuchar_t last[2];
   unsigned int v;
   int i;
 
@@ -343,7 +343,7 @@ g_base64_decode_step (const xchar_t  *in,
   if (len == 0)
     return 0;
 
-  inend = (const guchar *)in+len;
+  inend = (const xuchar_t *)in+len;
   outptr = out;
 
   /* convert 4 base64 bytes to 3 normal bytes */
@@ -360,7 +360,7 @@ g_base64_decode_step (const xchar_t  *in,
       last[0] = '=';
     }
 
-  inptr = (const guchar *)in;
+  inptr = (const xuchar_t *)in;
   while (inptr < inend)
     {
       c = *inptr++;
@@ -405,11 +405,11 @@ g_base64_decode_step (const xchar_t  *in,
  *
  * Since: 2.12
  */
-guchar *
+xuchar_t *
 g_base64_decode (const xchar_t *text,
                  xsize_t       *out_len)
 {
-  guchar *ret;
+  xuchar_t *ret;
   xsize_t input_length;
   xint_t state = 0;
   xuint_t save = 0;
@@ -442,7 +442,7 @@ g_base64_decode (const xchar_t *text,
  *
  * Since: 2.20
  */
-guchar *
+xuchar_t *
 g_base64_decode_inplace (xchar_t *text,
                          xsize_t *out_len)
 {
@@ -456,7 +456,7 @@ g_base64_decode_inplace (xchar_t *text,
 
   g_return_val_if_fail (input_length > 1, NULL);
 
-  *out_len = g_base64_decode_step (text, input_length, (guchar *) text, &state, &save);
+  *out_len = g_base64_decode_step (text, input_length, (xuchar_t *) text, &state, &save);
 
-  return (guchar *) text;
+  return (xuchar_t *) text;
 }

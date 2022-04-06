@@ -617,8 +617,8 @@ main (xint_t argc, xchar_t **argv)
 
   if (cancel)
     {
-      cancellable = g_cancellable_new ();
-      g_cancellable_cancel (cancellable);
+      cancellable = xcancellable_new ();
+      xcancellable_cancel (cancellable);
     }
 
   switch (type)

@@ -152,7 +152,7 @@ tuple_hash_2 (xconstpointer v_a)
 #else
   xpointer_t* a = (xpointer_t*) v_a;
 
-  return (gulong)a[0] ^ (gulong)a[1];
+  return (xulong_t)a[0] ^ (xulong_t)a[1];
 #endif
 }
 

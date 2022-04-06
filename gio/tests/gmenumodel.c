@@ -372,7 +372,7 @@ typedef struct {
 
   xmenu_model_t *clone_of;
   xsequence_t *items;
-  gulong handler_id;
+  xulong_t handler_id;
 } MirrorMenu;
 
 typedef xmenu_model_class_t MirrorMenuClass;
@@ -426,7 +426,7 @@ mirror_menu_finalize (xobject_t *object)
   MirrorMenu *menu = (MirrorMenu *) object;
 
   if (menu->handler_id)
-    g_signal_handler_disconnect (menu->clone_of, menu->handler_id);
+    xsignal_handler_disconnect (menu->clone_of, menu->handler_id);
 
   g_sequence_free (menu->items);
   xobject_unref (menu->clone_of);
@@ -524,7 +524,7 @@ mirror_menu_new (xmenu_model_t *clone_of)
   menu->clone_of = xobject_ref (clone_of);
 
   if (xmenu_model_is_mutable (clone_of))
-    menu->handler_id = g_signal_connect (clone_of, "items-changed", G_CALLBACK (mirror_menu_changed), menu);
+    menu->handler_id = xsignal_connect (clone_of, "items-changed", G_CALLBACK (mirror_menu_changed), menu);
   mirror_menu_changed (clone_of, 0, 0, xmenu_model_get_n_items (clone_of), menu);
 
   return menu;
@@ -661,7 +661,7 @@ assert_menuitem_equal (xmenu_item_t  *item,
   xobject_unref (link_iter);
 }
 
-/* Test cases {{{1 */
+/* test_t cases {{{1 */
 static void
 test_equality (void)
 {
@@ -821,7 +821,7 @@ service_thread_func (xpointer_t user_data)
   xerror_t *error;
   xchar_t *address;
   xchar_t *tmpdir;
-  GDBusServerFlags flags;
+  xdbus_server_flags_t flags;
   xchar_t *guid;
 
   service_context = xmain_context_new ();
@@ -846,7 +846,7 @@ service_thread_func (xpointer_t user_data)
   guid = g_dbus_generate_guid ();
 
   error = NULL;
-  data->server = g_dbus_server_new_sync (address,
+  data->server = xdbus_server_new_sync (address,
                                          flags,
                                          guid,
                                          NULL,
@@ -856,12 +856,12 @@ service_thread_func (xpointer_t user_data)
   g_free (address);
   g_free (guid);
 
-  g_signal_connect (data->server,
+  xsignal_connect (data->server,
                     "new-connection",
                     G_CALLBACK (on_new_connection),
                     data);
 
-  g_dbus_server_start (data->server);
+  xdbus_server_start (data->server);
 
   create_service_loop (service_context, data);
   xmain_loop_run (data->service_loop);
@@ -901,7 +901,7 @@ peer_connection_up (PeerConnection *data)
   /* bring up a connection and accept it */
   error = NULL;
   data->client_connection =
-    g_dbus_connection_new_for_address_sync (g_dbus_server_get_client_address (data->server),
+    xdbus_connection_new_for_address_sync (xdbus_server_get_client_address (data->server),
                                             G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
                                             NULL, /* xdbus_auth_observer_t */
                                             NULL, /* cancellable */
@@ -917,7 +917,7 @@ peer_connection_down (PeerConnection *data)
   xobject_unref (data->client_connection);
   xobject_unref (data->server_connection);
 
-  g_dbus_server_stop (data->server);
+  xdbus_server_stop (data->server);
   xobject_unref (data->server);
 
   xmain_loop_quit (data->service_loop);
@@ -976,12 +976,12 @@ do_roundtrip (xdbus_connection_t *exporter_connection,
   state.rand = g_rand_new_with_seed (g_test_rand_int ());
 
   state.random = random_menu_new (state.rand, 2);
-  export_id = g_dbus_connection_export_menu_model (exporter_connection,
+  export_id = xdbus_connection_export_menu_model (exporter_connection,
                                                    "/",
                                                    XMENU_MODEL (state.random),
                                                    NULL);
   state.proxy = g_dbus_menu_model_get (proxy_connection,
-                                       g_dbus_connection_get_unique_name (proxy_connection),
+                                       xdbus_connection_get_unique_name (proxy_connection),
                                        "/");
   state.proxy_mirror = mirror_menu_new (XMENU_MODEL (state.proxy));
   state.count = 0;
@@ -995,7 +995,7 @@ do_roundtrip (xdbus_connection_t *exporter_connection,
   xmain_loop_unref (state.loop);
   xsource_remove (id);
   xobject_unref (state.proxy);
-  g_dbus_connection_unexport_menu_model (exporter_connection, export_id);
+  xdbus_connection_unexport_menu_model (exporter_connection, export_id);
   xobject_unref (state.random);
   xobject_unref (state.proxy_mirror);
   g_rand_free (state.rand);
@@ -1065,17 +1065,17 @@ do_subscriptions (xdbus_connection_t *exporter_connection,
 
   menu = xmenu_new ();
 
-  export_id = g_dbus_connection_export_menu_model (exporter_connection,
+  export_id = xdbus_connection_export_menu_model (exporter_connection,
                                                    "/",
                                                    XMENU_MODEL (menu),
                                                    &error);
   g_assert_no_error (error);
 
   proxy = g_dbus_menu_model_get (proxy_connection,
-                                 g_dbus_connection_get_unique_name (proxy_connection),
+                                 xdbus_connection_get_unique_name (proxy_connection),
                                  "/");
   items_changed_count = 0;
-  g_signal_connect (proxy, "items-changed",
+  xsignal_connect (proxy, "items-changed",
                     G_CALLBACK (items_changed), NULL);
 
   xmenu_append (menu, "item1", NULL);
@@ -1133,7 +1133,7 @@ do_subscriptions (xdbus_connection_t *exporter_connection,
 
   g_assert_cmpint (items_changed_count, ==, 6);
 
-  g_dbus_connection_unexport_menu_model (exporter_connection, export_id);
+  xdbus_connection_unexport_menu_model (exporter_connection, export_id);
   xobject_unref (menu);
 
   xmain_loop_unref (loop);
@@ -1200,9 +1200,9 @@ do_export (xpointer_t data)
 
   for (i = 0; i < 10000; i++)
     {
-      id = g_dbus_connection_export_menu_model (bus, path, menu, &error);
+      id = xdbus_connection_export_menu_model (bus, path, menu, &error);
       g_assert_no_error (error);
-      g_dbus_connection_unexport_menu_model (bus, id);
+      xdbus_connection_unexport_menu_model (bus, id);
       while (xmain_context_iteration (NULL, FALSE));
     }
 

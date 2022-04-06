@@ -37,8 +37,8 @@ msgid "Seek not supported on base stream"
 msgstr "عملية السعي غير مُدعمة على الدَفق الأساسي"
 
 #: ../gio/gbufferedinputstream.c:955
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "تعذر بَتْرُ xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "تعذر بَتْرُ xbuffered_input_stream_t"
 
 #: ../gio/gbufferedinputstream.c:1000 ../gio/ginputstream.c:1062
 #: ../gio/giostream.c:292 ../gio/goutputstream.c:1385
@@ -1812,8 +1812,8 @@ msgid "Error removing old file: %s"
 msgstr "خطأ عند حذف الملف القديم: %s"
 
 #: ../gio/gmemoryinputstream.c:483 ../gio/gmemoryoutputstream.c:734
-msgid "Invalid GSeekType supplied"
-msgstr "تم تقديم GSeekType غير سليم"
+msgid "Invalid xseek_type_t supplied"
+msgstr "تم تقديم xseek_type_t غير سليم"
 
 #: ../gio/gmemoryinputstream.c:493
 msgid "Invalid seek request"

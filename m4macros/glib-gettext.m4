@@ -311,7 +311,7 @@ msgstr ""
         [always defined to indicate that i18n is enabled])
     fi
 
-    dnl Test whether we really found GNU xgettext.
+    dnl test_t whether we really found GNU xgettext.
     if test "$XGETTEXT" != ":"; then
       dnl If it is not GNU xgettext we define it as : so that the
       dnl Makefiles still can work.

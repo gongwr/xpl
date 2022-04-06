@@ -26,7 +26,7 @@ static void
 test_typeof (void)
 {
 #if __cplusplus >= 201103L
-  // Test that with C++11 we don't get those kind of errors:
+  // test_t that with C++11 we don't get those kind of errors:
   // error: invalid conversion from ‘xpointer_t’ {aka ‘void*’} to ‘xobject_t*’ [-fpermissive]
   xobject_t *obj = g_rc_box_new0 (xobject_t);
   xobject_t *obj2 = g_rc_box_acquire (obj);

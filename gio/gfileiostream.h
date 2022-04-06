@@ -63,7 +63,7 @@ struct _GFileIOStreamClass
   xboolean_t    (* can_seek)          (xfile_io_stream_t    *stream);
   xboolean_t    (* seek)	            (xfile_io_stream_t    *stream,
                                      xoffset_t               offset,
-                                     GSeekType             type,
+                                     xseek_type_t             type,
                                      xcancellable_t         *cancellable,
                                      xerror_t              **error);
   xboolean_t    (* can_truncate)      (xfile_io_stream_t    *stream);

@@ -167,12 +167,12 @@ base_object_constructor (xtype_t                  type,
   g_assert (strcmp (g_param_spec_get_name (pspec), "prop1") == 0);
   g_assert (g_param_spec_get_redirect_target (pspec) == iface_spec1);
 
-  /* Test redirection of the nick and blurb to the redirect target
+  /* test_t redirection of the nick and blurb to the redirect target
    */
   g_assert (strcmp (g_param_spec_get_nick (pspec), "Prop1") == 0);
   g_assert (strcmp (g_param_spec_get_blurb (pspec), "Property 1") == 0);
 
-  /* Test forwarding of the various xparam_spec_t methods to the redirect target
+  /* test_t forwarding of the various xparam_spec_t methods to the redirect target
    */
   xvalue_init (&value1, XTYPE_INT);
   xvalue_init (&value2, XTYPE_INT);
@@ -408,7 +408,7 @@ assert_in_properties (xparam_spec_t  *param_spec,
   g_assert (found);
 }
 
-/* Test setting and getting the properties */
+/* test_t setting and getting the properties */
 static void
 test_set (void)
 {
@@ -438,7 +438,7 @@ test_set (void)
   xobject_unref (object);
 }
 
-/* Test that the right spec is passed on explicit notifications */
+/* test_t that the right spec is passed on explicit notifications */
 static void
 test_notify (void)
 {
@@ -456,7 +456,7 @@ test_notify (void)
   xobject_unref (object);
 }
 
-/* Test xobject_class_find_property() for overridden properties */
+/* test_t xobject_class_find_property() for overridden properties */
 static void
 test_find_overridden (void)
 {
@@ -470,7 +470,7 @@ test_find_overridden (void)
   g_assert (xobject_class_find_property (object_class, "prop4") == inherited_spec4);
 }
 
-/* Test xobject_class_list_properties() for overridden properties */
+/* test_t xobject_class_list_properties() for overridden properties */
 static void
 test_list_overridden (void)
 {
@@ -489,7 +489,7 @@ test_list_overridden (void)
   g_free (properties);
 }
 
-/* Test xobject_interface_find_property() */
+/* test_t xobject_interface_find_property() */
 static void
 test_find_interface (void)
 {
@@ -502,7 +502,7 @@ test_find_interface (void)
   g_assert (xobject_interface_find_property (iface, "prop3") == iface_spec3);
 }
 
-/* Test xobject_interface_list_properties() */
+/* test_t xobject_interface_list_properties() */
 static void
 test_list_interface (void)
 {

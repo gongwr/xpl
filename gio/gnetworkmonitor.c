@@ -56,18 +56,18 @@
  * @x_iface: The parent interface.
  * @network_changed: the virtual function pointer for the
  *  xnetwork_monitor_t::network-changed signal.
- * @can_reach: the virtual function pointer for g_network_monitor_can_reach()
+ * @can_reach: the virtual function pointer for xnetwork_monitor_can_reach()
  * @can_reach_async: the virtual function pointer for
- *  g_network_monitor_can_reach_async()
+ *  xnetwork_monitor_can_reach_async()
  * @can_reach_finish: the virtual function pointer for
- *  g_network_monitor_can_reach_finish()
+ *  xnetwork_monitor_can_reach_finish()
  *
  * The virtual function table for #xnetwork_monitor_t.
  *
  * Since: 2.32
  */
 
-G_DEFINE_INTERFACE_WITH_CODE (xnetwork_monitor_t, g_network_monitor, XTYPE_OBJECT,
+G_DEFINE_INTERFACE_WITH_CODE (xnetwork_monitor, xnetwork_monitor, XTYPE_OBJECT,
                               xtype_interface_add_prerequisite (g_define_type_id, XTYPE_INITABLE))
 
 
@@ -80,7 +80,7 @@ static xuint_t signals[LAST_SIGNAL] = { 0 };
 static xnetwork_monitor_t *network_monitor_default_singleton = NULL;  /* (owned) (atomic) */
 
 /**
- * g_network_monitor_get_default:
+ * xnetwork_monitor_get_default:
  *
  * Gets the default #xnetwork_monitor_t for the system.
  *
@@ -90,7 +90,7 @@ static xnetwork_monitor_t *network_monitor_default_singleton = NULL;  /* (owned)
  * Since: 2.32
  */
 xnetwork_monitor_t *
-g_network_monitor_get_default (void)
+xnetwork_monitor_get_default (void)
 {
   if (g_once_init_enter (&network_monitor_default_singleton))
     {
@@ -107,7 +107,7 @@ g_network_monitor_get_default (void)
 }
 
 /**
- * g_network_monitor_get_network_available:
+ * xnetwork_monitor_get_network_available:
  * @monitor: the #xnetwork_monitor_t
  *
  * Checks if the network is available. "Available" here means that the
@@ -120,7 +120,7 @@ g_network_monitor_get_default (void)
  * Since: 2.32
  */
 xboolean_t
-g_network_monitor_get_network_available (xnetwork_monitor_t *monitor)
+xnetwork_monitor_get_network_available (xnetwork_monitor_t *monitor)
 {
   xboolean_t available = FALSE;
 
@@ -129,7 +129,7 @@ g_network_monitor_get_network_available (xnetwork_monitor_t *monitor)
 }
 
 /**
- * g_network_monitor_get_network_metered:
+ * xnetwork_monitor_get_network_metered:
  * @monitor: the #xnetwork_monitor_t
  *
  * Checks if the network is metered.
@@ -140,7 +140,7 @@ g_network_monitor_get_network_available (xnetwork_monitor_t *monitor)
  * Since: 2.46
  */
 xboolean_t
-g_network_monitor_get_network_metered (xnetwork_monitor_t *monitor)
+xnetwork_monitor_get_network_metered (xnetwork_monitor_t *monitor)
 {
   xboolean_t metered = FALSE;
 
@@ -149,11 +149,11 @@ g_network_monitor_get_network_metered (xnetwork_monitor_t *monitor)
 }
 
 /**
- * g_network_monitor_get_connectivity:
+ * xnetwork_monitor_get_connectivity:
  * @monitor: the #xnetwork_monitor_t
  *
  * Gets a more detailed networking state than
- * g_network_monitor_get_network_available().
+ * xnetwork_monitor_get_network_available().
  *
  * If #xnetwork_monitor_t:network-available is %FALSE, then the
  * connectivity state will be %G_NETWORK_CONNECTIVITY_LOCAL.
@@ -177,7 +177,7 @@ g_network_monitor_get_network_metered (xnetwork_monitor_t *monitor)
  * Since: 2.44
  */
 GNetworkConnectivity
-g_network_monitor_get_connectivity (xnetwork_monitor_t *monitor)
+xnetwork_monitor_get_connectivity (xnetwork_monitor_t *monitor)
 {
   GNetworkConnectivity connectivity;
 
@@ -187,7 +187,7 @@ g_network_monitor_get_connectivity (xnetwork_monitor_t *monitor)
 }
 
 /**
- * g_network_monitor_can_reach:
+ * xnetwork_monitor_can_reach:
  * @monitor: a #xnetwork_monitor_t
  * @connectable: a #xsocket_connectable_t
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
@@ -209,14 +209,14 @@ g_network_monitor_get_connectivity (xnetwork_monitor_t *monitor)
  * Note that although this does not attempt to connect to
  * @connectable, it may still block for a brief period of time (eg,
  * trying to do multicast DNS on the local network), so if you do not
- * want to block, you should use g_network_monitor_can_reach_async().
+ * want to block, you should use xnetwork_monitor_can_reach_async().
  *
  * Returns: %TRUE if @connectable is reachable, %FALSE if not.
  *
  * Since: 2.32
  */
 xboolean_t
-g_network_monitor_can_reach (xnetwork_monitor_t     *monitor,
+xnetwork_monitor_can_reach (xnetwork_monitor_t     *monitor,
                              xsocket_connectable_t  *connectable,
                              xcancellable_t        *cancellable,
                              xerror_t             **error)
@@ -228,7 +228,7 @@ g_network_monitor_can_reach (xnetwork_monitor_t     *monitor,
 }
 
 static void
-g_network_monitor_real_can_reach_async (xnetwork_monitor_t     *monitor,
+xnetwork_monitor_real_can_reach_async (xnetwork_monitor_t     *monitor,
                                         xsocket_connectable_t  *connectable,
                                         xcancellable_t        *cancellable,
                                         xasync_ready_callback_t  callback,
@@ -238,9 +238,9 @@ g_network_monitor_real_can_reach_async (xnetwork_monitor_t     *monitor,
   xerror_t *error = NULL;
 
   task = xtask_new (monitor, cancellable, callback, user_data);
-  xtask_set_source_tag (task, g_network_monitor_real_can_reach_async);
+  xtask_set_source_tag (task, xnetwork_monitor_real_can_reach_async);
 
-  if (g_network_monitor_can_reach (monitor, connectable, cancellable, &error))
+  if (xnetwork_monitor_can_reach (monitor, connectable, cancellable, &error))
     xtask_return_boolean (task, TRUE);
   else
     xtask_return_error (task, error);
@@ -248,7 +248,7 @@ g_network_monitor_real_can_reach_async (xnetwork_monitor_t     *monitor,
 }
 
 /**
- * g_network_monitor_can_reach_async:
+ * xnetwork_monitor_can_reach_async:
  * @monitor: a #xnetwork_monitor_t
  * @connectable: a #xsocket_connectable_t
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
@@ -260,14 +260,14 @@ g_network_monitor_real_can_reach_async (xnetwork_monitor_t     *monitor,
  * pointed to by @connectable can be reached, without actually
  * trying to connect to it.
  *
- * For more details, see g_network_monitor_can_reach().
+ * For more details, see xnetwork_monitor_can_reach().
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_network_monitor_can_reach_finish()
+ * You can then call xnetwork_monitor_can_reach_finish()
  * to get the result of the operation.
  */
 void
-g_network_monitor_can_reach_async (xnetwork_monitor_t     *monitor,
+xnetwork_monitor_can_reach_async (xnetwork_monitor_t     *monitor,
                                    xsocket_connectable_t  *connectable,
                                    xcancellable_t        *cancellable,
                                    xasync_ready_callback_t  callback,
@@ -280,7 +280,7 @@ g_network_monitor_can_reach_async (xnetwork_monitor_t     *monitor,
 }
 
 static xboolean_t
-g_network_monitor_real_can_reach_finish (xnetwork_monitor_t  *monitor,
+xnetwork_monitor_real_can_reach_finish (xnetwork_monitor_t  *monitor,
                                          xasync_result_t     *result,
                                          xerror_t          **error)
 {
@@ -290,18 +290,18 @@ g_network_monitor_real_can_reach_finish (xnetwork_monitor_t  *monitor,
 }
 
 /**
- * g_network_monitor_can_reach_finish:
+ * xnetwork_monitor_can_reach_finish:
  * @monitor: a #xnetwork_monitor_t
  * @result: a #xasync_result_t
  * @error: return location for errors, or %NULL
  *
  * Finishes an async network connectivity test.
- * See g_network_monitor_can_reach_async().
+ * See xnetwork_monitor_can_reach_async().
  *
  * Returns: %TRUE if network is reachable, %FALSE if not.
  */
 xboolean_t
-g_network_monitor_can_reach_finish (xnetwork_monitor_t     *monitor,
+xnetwork_monitor_can_reach_finish (xnetwork_monitor_t     *monitor,
                                     xasync_result_t        *result,
                                     xerror_t             **error)
 {
@@ -312,10 +312,10 @@ g_network_monitor_can_reach_finish (xnetwork_monitor_t     *monitor,
 }
 
 static void
-g_network_monitor_default_init (GNetworkMonitorInterface *iface)
+xnetwork_monitor_default_init (GNetworkMonitorInterface *iface)
 {
-  iface->can_reach_async  = g_network_monitor_real_can_reach_async;
-  iface->can_reach_finish = g_network_monitor_real_can_reach_finish;
+  iface->can_reach_async  = xnetwork_monitor_real_can_reach_async;
+  iface->can_reach_finish = xnetwork_monitor_real_can_reach_finish;
 
   /**
    * xnetwork_monitor_t::network-changed:
@@ -327,7 +327,7 @@ g_network_monitor_default_init (GNetworkMonitorInterface *iface)
    * Since: 2.32
    */
   signals[NETWORK_CHANGED] =
-    g_signal_new (I_("network-changed"),
+    xsignal_new (I_("network-changed"),
                   XTYPE_NETWORK_MONITOR,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GNetworkMonitorInterface, network_changed),
@@ -348,8 +348,8 @@ g_network_monitor_default_init (GNetworkMonitorInterface *iface)
    * connected to a functioning router that has lost its own upstream
    * connectivity. Some hosts might only be accessible when a VPN is
    * active. Other hosts might only be accessible when the VPN is
-   * not active. Thus, it is best to use g_network_monitor_can_reach()
-   * or g_network_monitor_can_reach_async() to test for reachability
+   * not active. Thus, it is best to use xnetwork_monitor_can_reach()
+   * or xnetwork_monitor_can_reach_async() to test for reachability
    * on a host-by-host basis. (On the other hand, when the property is
    * %FALSE, the application can reasonably expect that no remote
    * hosts at all are reachable, and should indicate this to the user
@@ -402,7 +402,7 @@ g_network_monitor_default_init (GNetworkMonitorInterface *iface)
    * xnetwork_monitor_t:connectivity:
    *
    * More detailed information about the host's network connectivity.
-   * See g_network_monitor_get_connectivity() and
+   * See xnetwork_monitor_get_connectivity() and
    * #GNetworkConnectivity for more details.
    *
    * Since: 2.44

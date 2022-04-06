@@ -61,11 +61,11 @@ struct _GTlsPasswordClass
 
   /* methods */
 
-  const guchar *    ( *get_value)            (xtls_password_t  *password,
+  const xuchar_t *    ( *get_value)            (xtls_password_t  *password,
                                               xsize_t         *length);
 
   void              ( *set_value)            (xtls_password_t  *password,
-                                              guchar        *value,
+                                              xuchar_t        *value,
                                               xssize_t         length,
                                               xdestroy_notify_t destroy);
 
@@ -84,15 +84,15 @@ xtls_password_t *    xtls_password_new                 (GTlsPasswordFlags  flags
                                                       const xchar_t       *description);
 
 XPL_AVAILABLE_IN_ALL
-const guchar *    xtls_password_get_value           (xtls_password_t      *password,
+const xuchar_t *    xtls_password_get_value           (xtls_password_t      *password,
                                                       xsize_t             *length);
 XPL_AVAILABLE_IN_ALL
 void              xtls_password_set_value           (xtls_password_t      *password,
-                                                      const guchar      *value,
+                                                      const xuchar_t      *value,
                                                       xssize_t             length);
 XPL_AVAILABLE_IN_ALL
 void              xtls_password_set_value_full      (xtls_password_t      *password,
-                                                      guchar            *value,
+                                                      xuchar_t            *value,
                                                       xssize_t             length,
                                                       xdestroy_notify_t     destroy);
 

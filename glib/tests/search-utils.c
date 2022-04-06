@@ -11,7 +11,7 @@ typedef struct
   xboolean_t should_match;
 } SearchTest;
 
-/* Test word separators and case */
+/* test_t word separators and case */
 SearchTest basic[] = {
   { "Hello World", "he", "C", TRUE },
   { "Hello World", "wo", "C", TRUE },
@@ -22,7 +22,7 @@ SearchTest basic[] = {
   { NULL, NULL, NULL, FALSE }
 };
 
-/* Test composed chars (accentued letters) */
+/* test_t composed chars (accentued letters) */
 SearchTest composed[] = {
   { "Jörgen", "jor", "sv_SE.UTF-8", TRUE },
   { "Gaëtan", "gaetan", "fr_FR.UTF-8", TRUE },
@@ -32,7 +32,7 @@ SearchTest composed[] = {
   { NULL, NULL, NULL, FALSE }
 };
 
-/* Test decomposed chars, they looks the same, but are actually
+/* test_t decomposed chars, they looks the same, but are actually
  * composed of multiple unicodes */
 SearchTest decomposed[] = {
   { "Jorgen", "Jör", "sv_SE.UTF-8", FALSE },
@@ -47,7 +47,7 @@ SearchTest turkish[] = {
   { NULL, NULL, NULL, FALSE }
 };
 
-/* Test unicode chars when no locale is available */
+/* test_t unicode chars when no locale is available */
 SearchTest c_locale_unicode[] = {
   { "Jörgen", "jor", "C", TRUE },
   { "Jorgen", "Jör", "C", FALSE },

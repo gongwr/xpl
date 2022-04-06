@@ -351,7 +351,7 @@ uri_decoder (xchar_t       **out,
         xstring_append_c (decoded, ' ');
       /* Normalize any illegal characters. */
       else if (just_normalize && (!g_ascii_isgraph (*s)))
-        xstring_append_printf (decoded, "%%%02X", (guchar)*s);
+        xstring_append_printf (decoded, "%%%02X", (xuchar_t)*s);
       else
         xstring_append_c (decoded, *s);
     }
@@ -403,7 +403,7 @@ uri_normalize (xchar_t       **out,
 }
 
 static xboolean_t
-is_valid (guchar       c,
+is_valid (xuchar_t       c,
           const xchar_t *reserved_chars_allowed)
 {
   if (xuri_char_is_unreserved (c))
@@ -417,14 +417,14 @@ is_valid (guchar       c,
 
 void
 _uri_encoder (xstring_t      *out,
-              const guchar *start,
+              const xuchar_t *start,
               xsize_t         length,
               const xchar_t  *reserved_chars_allowed,
               xboolean_t      allow_utf8)
 {
   static const xchar_t hex[] = "0123456789ABCDEF";
-  const guchar *p = start;
-  const guchar *end = p + length;
+  const xuchar_t *p = start;
+  const xuchar_t *end = p + length;
 
   while (p < end)
     {
@@ -636,7 +636,7 @@ parse_port (const xchar_t  *start,
             xerror_t      **error)
 {
   xchar_t *end;
-  gulong parsed_port;
+  xulong_t parsed_port;
 
   /* strtoul() allows leading + or -, so we have to check this first. */
   if (!g_ascii_isdigit (*start))
@@ -2168,7 +2168,7 @@ xuri_params_iter_init (xuri_params_iter_t *iter,
 
   memset (ri->sep_table, FALSE, sizeof (ri->sep_table));
   for (s = separators; *s != '\0'; ++s)
-    ri->sep_table[*(guchar *)s] = TRUE;
+    ri->sep_table[*(xuchar_t *)s] = TRUE;
 
   ri->attr = params;
 }
@@ -2228,7 +2228,7 @@ xuri_params_iter_next (xuri_params_iter_t *iter,
    * character value into the @sep_table, which has value 1 stored at an
    * index if that index is a separator. */
   for (val_end = ri->attr; val_end < ri->end; val_end++)
-    if (ri->sep_table[*(guchar *)val_end])
+    if (ri->sep_table[*(xuchar_t *)val_end])
       break;
 
   attr_end = memchr (ri->attr, '=', val_end - ri->attr);

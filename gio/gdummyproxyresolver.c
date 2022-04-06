@@ -74,7 +74,7 @@ xdummy_proxy_resolver_lookup (xproxy_resolver_t  *resolver,
 {
   xchar_t **proxies;
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   proxies = g_new0 (xchar_t *, 2);

@@ -273,8 +273,8 @@ msgstr ""
 "Chức năng seek (di chuyển vị trí đọc) không được hỗ trợ trên luồng cơ bản"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "Không thể cắt xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "Không thể cắt xbuffered_input_stream_t"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1205
 #: ../gio/giostream.c:300 ../gio/goutputstream.c:1658
@@ -2179,8 +2179,8 @@ msgid "Error removing old file: %s"
 msgstr "Gặp lỗi khi xóa tập tin cũ: %s"
 
 #: ../gio/gmemoryinputstream.c:471 ../gio/gmemoryoutputstream.c:771
-msgid "Invalid GSeekType supplied"
-msgstr "GSeekType được cung cấp không hợp lệ"
+msgid "Invalid xseek_type_t supplied"
+msgstr "xseek_type_t được cung cấp không hợp lệ"
 
 #: ../gio/gmemoryinputstream.c:481
 msgid "Invalid seek request"

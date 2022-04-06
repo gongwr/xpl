@@ -237,7 +237,7 @@ test_cond2 (void)
 static void
 test_wait_until (void)
 {
-  gint64 until;
+  sint64_t until;
   xmutex_t lock;
   xcond_t cond;
 

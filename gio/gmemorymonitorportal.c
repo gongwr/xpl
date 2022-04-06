@@ -35,7 +35,7 @@ struct _GMemoryMonitorPortal
   xobject_t parent_instance;
 
   xdbus_proxy_t *proxy;
-  gulong signal_id;
+  xulong_t signal_id;
 };
 
 G_DEFINE_TYPE_WITH_CODE (GMemoryMonitorPortal, xmemory_monitor_portal, XTYPE_OBJECT,
@@ -69,7 +69,7 @@ proxy_signal (xdbus_proxy_t            *proxy,
     return;
 
   xvariant_get (parameters, "(y)", &level);
-  g_signal_emit_by_name (portal, "low-memory-warning", level);
+  xsignal_emit_by_name (portal, "low-memory-warning", level);
 }
 
 static xboolean_t
@@ -87,7 +87,7 @@ xmemory_monitor_portal_initable_init (xinitable_t     *initable,
       return FALSE;
     }
 
-  proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+  proxy = xdbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
                                          G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                          NULL,
                                          "org.freedesktop.portal.Desktop",
@@ -98,7 +98,7 @@ xmemory_monitor_portal_initable_init (xinitable_t     *initable,
   if (!proxy)
     return FALSE;
 
-  name_owner = g_dbus_proxy_get_name_owner (proxy);
+  name_owner = xdbus_proxy_get_name_owner (proxy);
 
   if (name_owner == NULL)
     {
@@ -112,7 +112,7 @@ xmemory_monitor_portal_initable_init (xinitable_t     *initable,
 
   g_free (name_owner);
 
-  portal->signal_id = g_signal_connect (proxy, "g-signal",
+  portal->signal_id = xsignal_connect (proxy, "g-signal",
                                         G_CALLBACK (proxy_signal), portal);
 
   portal->proxy = proxy;

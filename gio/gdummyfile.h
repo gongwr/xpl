@@ -25,24 +25,24 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DUMMY_FILE         (_g_dummy_file_get_type ())
-#define G_DUMMY_FILE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DUMMY_FILE, GDummyFile))
-#define G_DUMMY_FILE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DUMMY_FILE, GDummyFileClass))
+#define XTYPE_DUMMY_FILE         (_xdummy_file_get_type ())
+#define G_DUMMY_FILE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DUMMY_FILE, xdummy_file_t))
+#define G_DUMMY_FILE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DUMMY_FILE, xdummy_file_class_t))
 #define X_IS_DUMMY_FILE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DUMMY_FILE))
 #define X_IS_DUMMY_FILE_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_DUMMY_FILE))
-#define G_DUMMY_FILE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DUMMY_FILE, GDummyFileClass))
+#define G_DUMMY_FILE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DUMMY_FILE, xdummy_file_class_t))
 
-typedef struct _GDummyFile        GDummyFile;
-typedef struct _GDummyFileClass   GDummyFileClass;
+typedef struct _GDummyFile        xdummy_file_t;
+typedef struct _xdummy_file_class   xdummy_file_class_t;
 
-struct _GDummyFileClass
+struct _xdummy_file_class
 {
   xobject_class_t parent_class;
 };
 
-xtype_t   _g_dummy_file_get_type (void) G_GNUC_CONST;
+xtype_t   _xdummy_file_get_type (void) G_GNUC_CONST;
 
-xfile_t * _g_dummy_file_new      (const char *uri);
+xfile_t * _xdummy_file_new      (const char *uri);
 
 G_END_DECLS
 

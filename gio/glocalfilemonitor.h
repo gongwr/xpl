@@ -98,7 +98,7 @@ xfile_monitor_source_handle_event (GFileMonitorSource *fms,
                                     const xchar_t        *child,
                                     const xchar_t        *rename_to,
                                     xfile_t              *other,
-                                    gint64              event_time);
+                                    sint64_t              event_time);
 
 
 G_END_DECLS

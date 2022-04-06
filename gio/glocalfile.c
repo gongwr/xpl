@@ -2345,8 +2345,8 @@ g_local_file_trash (xfile_t         *file,
 
   if (success && op.fAnyOperationsAborted)
     {
-      if (cancellable && !g_cancellable_is_cancelled (cancellable))
-	g_cancellable_cancel (cancellable);
+      if (cancellable && !xcancellable_is_cancelled (cancellable))
+	xcancellable_cancel (cancellable);
       g_set_io_error (error,
                       _("Unable to trash file %s: %s"),
                       file, ECANCELED);
@@ -2754,7 +2754,7 @@ g_local_file_measure_size_of_file (xint_t           parent_fd,
 {
   GLocalFileStat buf;
 
-  if (g_cancellable_set_error_if_cancelled (state->cancellable, error))
+  if (xcancellable_set_error_if_cancelled (state->cancellable, error))
     return FALSE;
 
 #if defined (AT_FDCWD)
@@ -2849,7 +2849,7 @@ g_local_file_measure_size_of_file (xint_t           parent_fd,
       int errsv;
 #endif
 
-      if (g_cancellable_set_error_if_cancelled (state->cancellable, error))
+      if (xcancellable_set_error_if_cancelled (state->cancellable, error))
         return FALSE;
 
 #ifdef AT_FDCWD

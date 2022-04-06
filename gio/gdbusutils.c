@@ -300,7 +300,7 @@ g_dbus_is_error_name (const xchar_t *string)
  * g_dbus_generate_guid:
  *
  * Generate a D-Bus GUID that can be used with
- * e.g. g_dbus_connection_new().
+ * e.g. xdbus_connection_new().
  *
  * See the
  * [D-Bus specification](https://dbus.freedesktop.org/doc/dbus-specification.html#uuids)
@@ -322,7 +322,7 @@ g_dbus_generate_guid (void)
   xuint32_t r1;
   xuint32_t r2;
   xuint32_t r3;
-  gint64 now_us;
+  sint64_t now_us;
 
   s = xstring_new (NULL);
 

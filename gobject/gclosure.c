@@ -61,15 +61,15 @@
  *
  * Within xobject_t, closures play an important role in the
  * implementation of signals. When a signal is registered, the
- * @c_marshaller argument to g_signal_new() specifies the default C
+ * @c_marshaller argument to xsignal_new() specifies the default C
  * marshaller for any closure which is connected to this
  * signal. xobject_t provides a number of C marshallers for this
  * purpose, see the g_cclosure_marshal_*() functions. Additional C
  * marshallers can be generated with the [glib-genmarshal][glib-genmarshal]
  * utility.  Closures can be explicitly connected to signals with
- * g_signal_connect_closure(), but it usually more convenient to let
+ * xsignal_connect_closure(), but it usually more convenient to let
  * xobject_t create a closure automatically by using one of the
- * g_signal_connect_*() functions which take a callback function/user
+ * xsignal_connect_*() functions which take a callback function/user
  * data pair.
  *
  * Using closures has a number of important advantages over a simple
@@ -342,7 +342,7 @@ xclosure_set_meta_va_marshal (xclosure_t       *closure,
  * callback function.
  *
  * For example, class closures for signals (see
- * g_signal_type_cclosure_new()) retrieve the callback function from a
+ * xsignal_type_cclosure_new()) retrieve the callback function from a
  * fixed offset in the class structure.  The meta marshaller retrieves
  * the right callback and passes it to the marshaller as the
  * @marshal_data argument.
@@ -1151,7 +1151,7 @@ xtype_iface_meta_marshalv (xclosure_t *closure,
 }
 
 /**
- * g_signal_type_cclosure_new:
+ * xsignal_type_cclosure_new:
  * @itype: the #xtype_t identifier of an interface or classed type
  * @struct_offset: the offset of the member function of @itype's class
  *  structure which is to be invoked by the new closure
@@ -1163,7 +1163,7 @@ xtype_iface_meta_marshalv (xclosure_t *closure,
  * Returns: (transfer none): a floating reference to a new #GCClosure
  */
 xclosure_t*
-g_signal_type_cclosure_new (xtype_t    itype,
+xsignal_type_cclosure_new (xtype_t    itype,
 			    xuint_t    struct_offset)
 {
   xclosure_t *closure;
@@ -1308,7 +1308,7 @@ restart:
       xvalue_set_schar (gvalue, (gint8) *int_val);
       break;
     case XTYPE_UCHAR:
-      xvalue_set_uchar (gvalue, (guchar) *int_val);
+      xvalue_set_uchar (gvalue, (xuchar_t) *int_val);
       break;
     case XTYPE_UINT:
       xvalue_set_uint (gvalue, (xuint_t) *int_val);
@@ -1320,10 +1320,10 @@ restart:
       xvalue_set_long (gvalue, (xlong_t) *int_val);
       break;
     case XTYPE_ULONG:
-      xvalue_set_ulong (gvalue, (gulong) *int_val);
+      xvalue_set_ulong (gvalue, (xulong_t) *int_val);
       break;
     case XTYPE_INT64:
-      xvalue_set_int64 (gvalue, (gint64) *int_val);
+      xvalue_set_int64 (gvalue, (sint64_t) *int_val);
       break;
     case XTYPE_UINT64:
       xvalue_set_uint64 (gvalue, (xuint64_t) *int_val);
@@ -1365,8 +1365,8 @@ typedef union {
   xint_t _gint;
   xuint_t _guint;
   xlong_t _glong;
-  gulong _gulong;
-  gint64 _gint64;
+  xulong_t _gulong;
+  sint64_t _gint64;
   xuint64_t _guint64;
 } va_arg_storage;
 
@@ -1419,11 +1419,11 @@ va_to_ffi_type (xtype_t gtype,
       break;
     case XTYPE_ULONG:
       rettype = &ffi_type_ulong;
-      storage->_gulong = va_arg (*va, gulong);
+      storage->_gulong = va_arg (*va, xulong_t);
       break;
     case XTYPE_INT64:
       rettype = &ffi_type_sint64;
-      storage->_gint64 = va_arg (*va, gint64);
+      storage->_gint64 = va_arg (*va, sint64_t);
       break;
     case XTYPE_UINT64:
       rettype = &ffi_type_uint64;
@@ -1455,7 +1455,7 @@ va_to_ffi_type (xtype_t gtype,
  * A generic marshaller function implemented via
  * [libffi](http://sourceware.org/libffi/).
  *
- * Normally this function is not passed explicitly to g_signal_new(),
+ * Normally this function is not passed explicitly to xsignal_new(),
  * but used automatically by GLib when specifying a %NULL marshaller.
  *
  * Since: 2.30
@@ -1719,13 +1719,13 @@ g_cclosure_marshal_generic_va (xclosure_t *closure,
  * @closure: the #xclosure_t to which the marshaller belongs
  * @return_value: ignored
  * @n_param_values: 2
- * @param_values: a #xvalue_t array holding the instance and the #guchar parameter
+ * @param_values: a #xvalue_t array holding the instance and the #xuchar_t parameter
  * @invocation_hint: the invocation hint given as the last argument
  *  to xclosure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * `void (*callback) (xpointer_t instance, guchar arg1, xpointer_t user_data)`.
+ * `void (*callback) (xpointer_t instance, xuchar_t arg1, xpointer_t user_data)`.
  */
 
 /**
@@ -1775,13 +1775,13 @@ g_cclosure_marshal_generic_va (xclosure_t *closure,
  * @closure: the #xclosure_t to which the marshaller belongs
  * @return_value: ignored
  * @n_param_values: 2
- * @param_values: a #xvalue_t array holding the instance and the #gulong parameter
+ * @param_values: a #xvalue_t array holding the instance and the #xulong_t parameter
  * @invocation_hint: the invocation hint given as the last argument
  *  to xclosure_invoke()
  * @marshal_data: additional data specified when registering the marshaller
  *
  * A marshaller for a #GCClosure with a callback of type
- * `void (*callback) (xpointer_t instance, gulong arg1, xpointer_t user_data)`.
+ * `void (*callback) (xpointer_t instance, xulong_t arg1, xpointer_t user_data)`.
  */
 
 /**

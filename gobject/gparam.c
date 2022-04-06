@@ -44,7 +44,7 @@
  * A property name consists of one or more segments consisting of ASCII letters
  * and digits, separated by either the `-` or `_` character. The first
  * character of a property name must be a letter. These are the same rules as
- * for signal naming (see g_signal_new()).
+ * for signal naming (see xsignal_new()).
  *
  * When creating and looking up a #xparam_spec_t, either separator can be
  * used, but they cannot be mixed. Using `-` is considerably more

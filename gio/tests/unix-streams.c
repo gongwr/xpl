@@ -66,10 +66,10 @@ writer_thread (xpointer_t user_data)
     }
   while (err == NULL);
 
-  if (g_cancellable_is_cancelled (writer_cancel))
+  if (xcancellable_is_cancelled (writer_cancel))
     {
       g_clear_error (&err);
-      g_cancellable_cancel (main_cancel);
+      xcancellable_cancel (main_cancel);
       xobject_unref (out);
       return NULL;
     }
@@ -112,7 +112,7 @@ reader_thread (xpointer_t user_data)
 	}
 
       g_assert_cmpstr (buf, ==, DATA);
-      g_assert (!g_cancellable_is_cancelled (reader_cancel));
+      g_assert (!xcancellable_is_cancelled (reader_cancel));
     }
   while (err == NULL);
 
@@ -144,7 +144,7 @@ main_thread_skipped (xobject_t *source, xasync_result_t *res, xpointer_t user_da
 
   nskipped = xinput_stream_skip_finish (in, res, &err);
 
-  if (g_cancellable_is_cancelled (main_cancel))
+  if (xcancellable_is_cancelled (main_cancel))
     {
       do_main_cancel (out);
       return;
@@ -178,7 +178,7 @@ main_thread_read (xobject_t *source, xasync_result_t *res, xpointer_t user_data)
 
   nread = xinput_stream_read_finish (in, res, &err);
 
-  if (g_cancellable_is_cancelled (main_cancel))
+  if (xcancellable_is_cancelled (main_cancel))
     {
       do_main_cancel (out);
       g_clear_error (&err);
@@ -215,7 +215,7 @@ main_thread_wrote (xobject_t *source, xasync_result_t *res, xpointer_t user_data
 
   nwrote = xoutput_stream_write_finish (out, res, &err);
 
-  if (g_cancellable_is_cancelled (main_cancel))
+  if (xcancellable_is_cancelled (main_cancel))
     {
       do_main_cancel (out);
       g_clear_error (&err);
@@ -245,7 +245,7 @@ main_thread_wrote (xobject_t *source, xasync_result_t *res, xpointer_t user_data
 static xboolean_t
 timeout (xpointer_t cancellable)
 {
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   return FALSE;
 }
 
@@ -283,9 +283,9 @@ test_pipe_io (xconstpointer nonblocking)
       g_assert_no_error (error);
     }
 
-  writer_cancel = g_cancellable_new ();
-  reader_cancel = g_cancellable_new ();
-  main_cancel = g_cancellable_new ();
+  writer_cancel = xcancellable_new ();
+  reader_cancel = xcancellable_new ();
+  main_cancel = xcancellable_new ();
 
   writer = xthread_new ("writer", writer_thread, NULL);
   reader = xthread_new ("reader", reader_thread, NULL);

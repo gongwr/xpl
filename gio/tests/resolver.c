@@ -496,7 +496,7 @@ start_async_lookups (char **argv, int argc)
 	}
 
       /* Stress-test the reloading code */
-      g_signal_emit_by_name (resolver, "reload");
+      xsignal_emit_by_name (resolver, "reload");
     }
 }
 
@@ -639,7 +639,7 @@ interrupted (int sig)
 static xboolean_t
 async_cancel (xio_channel_t *source, xio_condition_t cond, xpointer_t cancel)
 {
-  g_cancellable_cancel (cancel);
+  xcancellable_cancel (cancel);
   return FALSE;
 }
 #endif
@@ -699,7 +699,7 @@ main (int argc, char **argv)
 
   resolver = g_resolver_get_default ();
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
 
 #ifdef G_OS_UNIX
   /* Set up cancellation; we want to cancel if the user ^C's the

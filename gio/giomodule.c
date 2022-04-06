@@ -1077,25 +1077,25 @@ extern xtype_t _g_win32_volume_monitor_get_type (void);
 extern xtype_t _g_winhttp_vfs_get_type (void);
 
 extern xtype_t _xdummy_proxy_resolver_get_type (void);
-extern xtype_t _g_dummy_tls_backend_get_type (void);
-extern xtype_t g_network_monitor_base_get_type (void);
+extern xtype_t _xdummy_tls_backend_get_type (void);
+extern xtype_t xnetwork_monitor_base_get_type (void);
 #ifdef HAVE_NETLINK
 extern xtype_t _xnetwork_monitor_netlink_get_type (void);
-extern xtype_t _g_network_monitor_nm_get_type (void);
+extern xtype_t _xnetwork_monitor_nm_get_type (void);
 #endif
 
-extern xtype_t g_debug_controller_dbus_get_type (void);
+extern xtype_t xdebug_controller_dbus_get_type (void);
 extern xtype_t xmemory_monitor_dbus_get_type (void);
 extern xtype_t xmemory_monitor_portal_get_type (void);
 extern xtype_t xmemory_monitor_win32_get_type (void);
-extern xtype_t g_power_profile_monitor_dbus_get_type (void);
+extern xtype_t xpower_profile_monitor_dbus_get_type (void);
 
 #ifdef G_OS_UNIX
 extern xtype_t g_fdo_notification_backend_get_type (void);
 extern xtype_t g_gtk_notification_backend_get_type (void);
 extern xtype_t g_portal_notification_backend_get_type (void);
 extern xtype_t xproxy_resolver_portal_get_type (void);
-extern xtype_t g_network_monitor_portal_get_type (void);
+extern xtype_t xnetwork_monitor_portal_get_type (void);
 #endif
 
 #if MAC_OS_X_VERSION_MIN_REQUIRED >= 1090
@@ -1229,7 +1229,7 @@ _xio_modules_ensure_extension_points_registered (void)
       ep = g_io_extension_point_register (G_NOTIFICATION_BACKEND_EXTENSION_POINT_NAME);
       g_io_extension_point_set_required_type (ep, XTYPE_NOTIFICATION_BACKEND);
 
-      ep = g_io_extension_point_register (G_DEBUG_CONTROLLER_EXTENSION_POINT_NAME);
+      ep = g_io_extension_point_register (XDEBUG_CONTROLLER_EXTENSION_POINT_NAME);
       g_io_extension_point_set_required_type (ep, XTYPE_DEBUG_CONTROLLER);
 
       ep = g_io_extension_point_register (G_MEMORY_MONITOR_EXTENSION_POINT_NAME);
@@ -1320,9 +1320,9 @@ _xio_modules_ensure_loaded (void)
 
       /* Initialize types from built-in "modules" */
       xtype_ensure (g_null_settings_backend_get_type ());
-      xtype_ensure (g_memory_settings_backend_get_type ());
+      xtype_ensure (xmemory_settings_backend_get_type ());
       xtype_ensure (g_keyfile_settings_backend_get_type ());
-      xtype_ensure (g_power_profile_monitor_dbus_get_type ());
+      xtype_ensure (xpower_profile_monitor_dbus_get_type ());
 #if defined(HAVE_INOTIFY_INIT1)
       xtype_ensure (g_inotify_file_monitor_get_type ());
 #endif
@@ -1343,14 +1343,14 @@ _xio_modules_ensure_loaded (void)
 #endif
 #ifdef G_OS_UNIX
       xtype_ensure (_g_unix_volume_monitor_get_type ());
-      xtype_ensure (g_debug_controller_dbus_get_type ());
+      xtype_ensure (xdebug_controller_dbus_get_type ());
       xtype_ensure (g_fdo_notification_backend_get_type ());
       xtype_ensure (g_gtk_notification_backend_get_type ());
       xtype_ensure (g_portal_notification_backend_get_type ());
       xtype_ensure (xmemory_monitor_dbus_get_type ());
       xtype_ensure (xmemory_monitor_portal_get_type ());
-      xtype_ensure (g_network_monitor_portal_get_type ());
-      xtype_ensure (g_power_profile_monitor_portal_get_type ());
+      xtype_ensure (xnetwork_monitor_portal_get_type ());
+      xtype_ensure (xpower_profile_monitor_portal_get_type ());
       xtype_ensure (xproxy_resolver_portal_get_type ());
 #endif
 #if MAC_OS_X_VERSION_MIN_REQUIRED >= 1090
@@ -1368,11 +1368,11 @@ _xio_modules_ensure_loaded (void)
       xtype_ensure (_g_socks4a_proxy_get_type ());
       xtype_ensure (_g_socks4_proxy_get_type ());
       xtype_ensure (_g_socks5_proxy_get_type ());
-      xtype_ensure (_g_dummy_tls_backend_get_type ());
-      xtype_ensure (g_network_monitor_base_get_type ());
+      xtype_ensure (_xdummy_tls_backend_get_type ());
+      xtype_ensure (xnetwork_monitor_base_get_type ());
 #ifdef HAVE_NETLINK
       xtype_ensure (_xnetwork_monitor_netlink_get_type ());
-      xtype_ensure (_g_network_monitor_nm_get_type ());
+      xtype_ensure (_xnetwork_monitor_nm_get_type ());
 #endif
 #ifdef G_OS_WIN32
       xtype_ensure (_g_win32_network_monitor_get_type ());

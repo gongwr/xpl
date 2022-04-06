@@ -82,7 +82,7 @@ test_delete (void)
 
   if (xfile_test ("/usr/share/applications/gedit.desktop", XFILE_TEST_EXISTS))
     {
-      info = (xapp_info_t*)g_desktop_app_info_new_from_filename ("/usr/share/applications/gedit.desktop");
+      info = (xapp_info_t*)xdesktop_app_info_new_from_filename ("/usr/share/applications/gedit.desktop");
       g_assert_nonnull (info);
 
       res = xapp_info_can_delete (info);
@@ -161,7 +161,7 @@ test_fallback (void)
   xint_t old_length;
 
   info1 = create_app_info ("Test1");
-  info2 = create_app_info ("Test2");
+  info2 = create_app_info ("test2_t");
 
   g_assert_true (g_content_type_is_a ("text/x-python", "text/plain"));
 
@@ -191,7 +191,7 @@ test_fallback (void)
   g_assert_nonnull (app);
   g_assert_true (xapp_info_equal (info1, app));
 
-  /* and that Test2 is among the fallback apps */
+  /* and that test2_t is among the fallback apps */
   fallback = xapp_info_get_fallback_for_type ("text/x-python");
   g_assert_nonnull (fallback);
   for (l = fallback; l; l = l->next)
@@ -200,7 +200,7 @@ test_fallback (void)
       if (xapp_info_equal (info2, app))
         break;
     }
-  g_assert_cmpstr (xapp_info_get_name (app), ==, "Test2");
+  g_assert_cmpstr (xapp_info_get_name (app), ==, "test2_t");
 
   /* check that recomm + fallback = all applications */
   list = xlist_concat (xlist_copy (recomm), xlist_copy (fallback));
@@ -235,7 +235,7 @@ test_last_used (void)
   xerror_t *error = NULL;
 
   info1 = create_app_info ("Test1");
-  info2 = create_app_info ("Test2");
+  info2 = create_app_info ("test2_t");
 
   xapp_info_set_as_default_for_type (info1, "application/x-test", &error);
   g_assert_no_error (error);
@@ -280,7 +280,7 @@ test_last_used (void)
 static void
 test_extra_getters (void)
 {
-  GDesktopAppInfo *appinfo;
+  xdesktop_app_info_t *appinfo;
   const xchar_t *lang;
   xchar_t *s;
   xboolean_t b;
@@ -289,28 +289,28 @@ test_extra_getters (void)
   g_setenv ("LANGUAGE", "de_DE.UTF8", TRUE);
   setlocale (LC_ALL, "");
 
-  appinfo = g_desktop_app_info_new_from_filename (g_test_get_filename (G_TEST_DIST, "appinfo-test-static.desktop", NULL));
+  appinfo = xdesktop_app_info_new_from_filename (g_test_get_filename (G_TEST_DIST, "appinfo-test-static.desktop", NULL));
   g_assert_nonnull (appinfo);
 
-  g_assert_true (g_desktop_app_info_has_key (appinfo, "Terminal"));
-  g_assert_false (g_desktop_app_info_has_key (appinfo, "Bratwurst"));
+  g_assert_true (xdesktop_app_info_has_key (appinfo, "Terminal"));
+  g_assert_false (xdesktop_app_info_has_key (appinfo, "Bratwurst"));
 
-  s = g_desktop_app_info_get_string (appinfo, "StartupWMClass");
+  s = xdesktop_app_info_get_string (appinfo, "StartupWMClass");
   g_assert_cmpstr (s, ==, "appinfo-class");
   g_free (s);
 
-  s = g_desktop_app_info_get_locale_string (appinfo, "X-JunkFood");
+  s = xdesktop_app_info_get_locale_string (appinfo, "X-JunkFood");
   g_assert_cmpstr (s, ==, "Bratwurst");
   g_free (s);
 
   g_setenv ("LANGUAGE", "sv_SE.UTF8", TRUE);
   setlocale (LC_ALL, "");
 
-  s = g_desktop_app_info_get_locale_string (appinfo, "X-JunkFood");
+  s = xdesktop_app_info_get_locale_string (appinfo, "X-JunkFood");
   g_assert_cmpstr (s, ==, "Burger"); /* fallback */
   g_free (s);
 
-  b = g_desktop_app_info_get_boolean (appinfo, "Terminal");
+  b = xdesktop_app_info_get_boolean (appinfo, "Terminal");
   g_assert_true (b);
 
   xobject_unref (appinfo);
@@ -352,41 +352,41 @@ test_actions (void)
 {
   const char *expected[] = { "frob", "tweak", "twiddle", "broken", NULL };
   const xchar_t * const *actions;
-  GDesktopAppInfo *appinfo;
+  xdesktop_app_info_t *appinfo;
   xchar_t *name;
 
-  appinfo = g_desktop_app_info_new_from_filename (g_test_get_filename (G_TEST_DIST, "appinfo-test-actions.desktop", NULL));
+  appinfo = xdesktop_app_info_new_from_filename (g_test_get_filename (G_TEST_DIST, "appinfo-test-actions.desktop", NULL));
   g_assert_nonnull (appinfo);
 
-  actions = g_desktop_app_info_list_actions (appinfo);
+  actions = xdesktop_app_info_list_actions (appinfo);
   g_assert_cmpstrv (actions, expected);
 
-  name = g_desktop_app_info_get_action_name (appinfo, "frob");
+  name = xdesktop_app_info_get_action_name (appinfo, "frob");
   g_assert_cmpstr (name, ==, "Frobnicate");
   g_free (name);
 
-  name = g_desktop_app_info_get_action_name (appinfo, "tweak");
+  name = xdesktop_app_info_get_action_name (appinfo, "tweak");
   g_assert_cmpstr (name, ==, "Tweak");
   g_free (name);
 
-  name = g_desktop_app_info_get_action_name (appinfo, "twiddle");
+  name = xdesktop_app_info_get_action_name (appinfo, "twiddle");
   g_assert_cmpstr (name, ==, "Twiddle");
   g_free (name);
 
-  name = g_desktop_app_info_get_action_name (appinfo, "broken");
+  name = xdesktop_app_info_get_action_name (appinfo, "broken");
   g_assert_nonnull (name);
   g_assert_true (xutf8_validate (name, -1, NULL));
   g_free (name);
 
   unlink ("frob"); unlink ("tweak"); unlink ("twiddle");
 
-  g_desktop_app_info_launch_action (appinfo, "frob", NULL);
+  xdesktop_app_info_launch_action (appinfo, "frob", NULL);
   wait_for_file ("frob", "tweak", "twiddle");
 
-  g_desktop_app_info_launch_action (appinfo, "tweak", NULL);
+  xdesktop_app_info_launch_action (appinfo, "tweak", NULL);
   wait_for_file ("tweak", "frob", "twiddle");
 
-  g_desktop_app_info_launch_action (appinfo, "twiddle", NULL);
+  xdesktop_app_info_launch_action (appinfo, "twiddle", NULL);
   wait_for_file ("twiddle", "frob", "tweak");
 
   xobject_unref (appinfo);
@@ -742,13 +742,13 @@ on_launch_started (xapp_launch_context_t *context, xapp_info_t *info, xvariant_t
   *invoked = TRUE;
 }
 
-/* Test g_desktop_app_info_launch_uris_as_manager() and
- * g_desktop_app_info_launch_uris_as_manager_with_fds()
+/* test_t xdesktop_app_info_launch_uris_as_manager() and
+ * xdesktop_app_info_launch_uris_as_manager_with_fds()
  */
 static void
 test_launch_as_manager (void)
 {
-  GDesktopAppInfo *appinfo;
+  xdesktop_app_info_t *appinfo;
   xerror_t *error = NULL;
   xboolean_t retval;
   const xchar_t *path;
@@ -762,7 +762,7 @@ test_launch_as_manager (void)
     }
 
   path = g_test_get_filename (G_TEST_BUILT, "appinfo-test.desktop", NULL);
-  appinfo = g_desktop_app_info_new_from_filename (path);
+  appinfo = xdesktop_app_info_new_from_filename (path);
 
   if (appinfo == NULL)
     {
@@ -771,10 +771,10 @@ test_launch_as_manager (void)
     }
 
   context = xapp_launch_context_new ();
-  g_signal_connect (context, "launch-started",
+  xsignal_connect (context, "launch-started",
                     G_CALLBACK (on_launch_started),
                     &invoked);
-  retval = g_desktop_app_info_launch_uris_as_manager (appinfo, NULL, context, 0,
+  retval = xdesktop_app_info_launch_uris_as_manager (appinfo, NULL, context, 0,
                                                       NULL, NULL,
                                                       NULL, NULL,
                                                       &error);
@@ -783,7 +783,7 @@ test_launch_as_manager (void)
   g_assert_true (invoked);
 
   invoked = FALSE;
-  retval = g_desktop_app_info_launch_uris_as_manager_with_fds (appinfo,
+  retval = xdesktop_app_info_launch_uris_as_manager_with_fds (appinfo,
                                                                NULL, context, 0,
                                                                NULL, NULL,
                                                                NULL, NULL,
@@ -797,7 +797,7 @@ test_launch_as_manager (void)
   g_assert_finalize_object (context);
 }
 
-/* Test if Desktop-File Id is correctly formed */
+/* test_t if Desktop-File Id is correctly formed */
 static void
 test_id (void)
 {

@@ -34,7 +34,7 @@ msgid "Seek not supported on base stream"
 msgstr ""
 
 #: ../gio/gbufferedinputstream.c:945
-msgid "Cannot truncate xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
 msgstr ""
 
 #: ../gio/gbufferedinputstream.c:990 ../gio/ginputstream.c:1023
@@ -1828,7 +1828,7 @@ msgid "Error removing old file: %s"
 msgstr ""
 
 #: ../gio/gmemoryinputstream.c:476 ../gio/gmemoryoutputstream.c:739
-msgid "Invalid GSeekType supplied"
+msgid "Invalid xseek_type_t supplied"
 msgstr ""
 
 #: ../gio/gmemoryinputstream.c:486

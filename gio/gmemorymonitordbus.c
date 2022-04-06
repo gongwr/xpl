@@ -41,7 +41,7 @@ struct _GMemoryMonitorDBus
   xuint_t watch_id;
   xcancellable_t *cancellable;
   xdbus_proxy_t *proxy;
-  gulong signal_id;
+  xulong_t signal_id;
 };
 
 G_DEFINE_TYPE_WITH_CODE (GMemoryMonitorDBus, xmemory_monitor_dbus, XTYPE_OBJECT,
@@ -75,7 +75,7 @@ proxy_signal_cb (xdbus_proxy_t         *proxy,
     return;
 
   xvariant_get (parameters, "(y)", &level);
-  g_signal_emit_by_name (dbus, "low-memory-warning", level);
+  xsignal_emit_by_name (dbus, "low-memory-warning", level);
 }
 
 static void
@@ -87,7 +87,7 @@ lmm_proxy_cb (xobject_t      *source_object,
   xdbus_proxy_t *proxy;
   xerror_t *error = NULL;
 
-  proxy = g_dbus_proxy_new_finish (res, &error);
+  proxy = xdbus_proxy_new_finish (res, &error);
   if (!proxy)
     {
       g_debug ("Failed to create LowMemoryMonitor D-Bus proxy: %s",
@@ -96,7 +96,7 @@ lmm_proxy_cb (xobject_t      *source_object,
       return;
     }
 
-  dbus->signal_id = g_signal_connect (G_OBJECT (proxy), "g-signal",
+  dbus->signal_id = xsignal_connect (G_OBJECT (proxy), "g-signal",
                                       G_CALLBACK (proxy_signal_cb), dbus);
   dbus->proxy = proxy;
 
@@ -110,7 +110,7 @@ lmm_appeared_cb (xdbus_connection_t *connection,
 {
   GMemoryMonitorDBus *dbus = user_data;
 
-  g_dbus_proxy_new (connection,
+  xdbus_proxy_new (connection,
                     G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START,
                     NULL,
                     "org.freedesktop.LowMemoryMonitor",
@@ -139,7 +139,7 @@ xmemory_monitor_dbus_initable_init (xinitable_t     *initable,
 {
   GMemoryMonitorDBus *dbus = G_MEMORY_MONITOR_DBUS (initable);
 
-  dbus->cancellable = g_cancellable_new ();
+  dbus->cancellable = xcancellable_new ();
   dbus->watch_id = g_bus_watch_name (G_BUS_TYPE_SYSTEM,
                                      "org.freedesktop.LowMemoryMonitor",
                                      G_BUS_NAME_WATCHER_FLAGS_AUTO_START,
@@ -156,7 +156,7 @@ xmemory_monitor_dbus_finalize (xobject_t *object)
 {
   GMemoryMonitorDBus *dbus = G_MEMORY_MONITOR_DBUS (object);
 
-  g_cancellable_cancel (dbus->cancellable);
+  xcancellable_cancel (dbus->cancellable);
   g_clear_object (&dbus->cancellable);
   g_clear_signal_handler (&dbus->signal_id, dbus->proxy);
   g_clear_object (&dbus->proxy);

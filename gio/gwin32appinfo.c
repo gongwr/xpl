@@ -4865,7 +4865,7 @@ g_win32_app_info_launch_internal (GWin32AppInfo      *info,
           xvariant_builder_add (&builder, "{sv}", "pid", xvariant_new_int32 ((xsize_t) pid));
 
           platform_data = xvariant_ref_sink (xvariant_builder_end (&builder));
-          g_signal_emit_by_name (launch_context, "launched", info, platform_data);
+          xsignal_emit_by_name (launch_context, "launched", info, platform_data);
           xvariant_unref (platform_data);
         }
 

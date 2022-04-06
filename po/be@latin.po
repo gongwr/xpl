@@ -3251,8 +3251,8 @@ msgid "Error removing old file: %s"
 msgstr "Pamyłka vydaleńnia fajłu: %s"
 
 #: ../gio/gmemoryinputstream.c:486 ../gio/gmemoryoutputstream.c:746
-msgid "Invalid GSeekType supplied"
-msgstr "Akreśleny niapravilny GSeekType"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Akreśleny niapravilny xseek_type_t"
 
 # glib/gconvert.c:1729
 #: ../gio/gmemoryinputstream.c:496

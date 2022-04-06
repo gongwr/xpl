@@ -31,10 +31,10 @@ G_BEGIN_DECLS
 
 #define XTYPE_OUTPUT_STREAM         (xoutput_stream_get_type ())
 #define G_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_OUTPUT_STREAM, xoutput_stream))
-#define G_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_OUTPUT_STREAM, GOutputStreamClass))
+#define G_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_OUTPUT_STREAM, xoutput_stream_class_t))
 #define X_IS_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_OUTPUT_STREAM))
 #define X_IS_OUTPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_OUTPUT_STREAM))
-#define G_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_OUTPUT_STREAM, GOutputStreamClass))
+#define G_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_OUTPUT_STREAM, xoutput_stream_class_t))
 
 /**
  * xoutput_stream_t:
@@ -45,10 +45,10 @@ G_BEGIN_DECLS
  * writing, splicing, flushing and closing streams, but may implement
  * asynchronous versions.
  **/
-typedef struct _GOutputStreamClass    GOutputStreamClass;
-typedef struct _GOutputStreamPrivate  GOutputStreamPrivate;
+typedef struct _xoutput_stream_class    xoutput_stream_class_t;
+typedef struct _xoutput_stream_private  GOutputStreamPrivate;
 
-struct _GOutputStream
+struct _xoutput_stream
 {
   xobject_t parent_instance;
 
@@ -57,7 +57,7 @@ struct _GOutputStream
 };
 
 
-struct _GOutputStreamClass
+struct _xoutput_stream_class
 {
   xobject_class_t parent_class;
 

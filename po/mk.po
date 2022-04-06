@@ -3066,8 +3066,8 @@ msgid "Error removing old file: %s"
 msgstr "Грешка при отстранувањето на датотеката: %s"
 
 #: ../gio/gmemoryinputstream.c:486 ../gio/gmemoryoutputstream.c:746
-msgid "Invalid GSeekType supplied"
-msgstr "Обезбеден е невалиден GSeekType"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Обезбеден е невалиден xseek_type_t"
 
 #: ../gio/gmemoryinputstream.c:496
 msgid "Invalid seek request"

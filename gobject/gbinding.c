@@ -88,8 +88,8 @@
  * can be avoided if the objects emit the #xobject_t::notify signal only
  * if the value has effectively been changed. A binding is implemented
  * using the #xobject_t::notify signal, so it is susceptible to all the
- * various ways of blocking a signal emission, like g_signal_stop_emission()
- * or g_signal_handler_block().
+ * various ways of blocking a signal emission, like xsignal_stop_emission()
+ * or xsignal_handler_block().
  *
  * A binding will be severed, and the resources it allocates freed, whenever
  * either one of the #xobject_t instances it refers to are finalized, or when
@@ -313,7 +313,7 @@ unbind_internal_locked (BindingContext *context, xbinding_t *binding, xobject_t 
        * of the source at the same time, and should only ever do that once. */
       if (binding->source_notify != 0)
         {
-          g_signal_handler_disconnect (source, binding->source_notify);
+          xsignal_handler_disconnect (source, binding->source_notify);
 
           xobject_weak_unref (source, weak_unbind, context);
           binding_context_unref (context);
@@ -333,7 +333,7 @@ unbind_internal_locked (BindingContext *context, xbinding_t *binding, xobject_t 
        * independently here unlike for the source. */
       if (binding->target_notify != 0)
         {
-          g_signal_handler_disconnect (target, binding->target_notify);
+          xsignal_handler_disconnect (target, binding->target_notify);
 
           binding->target_notify = 0;
         }
@@ -852,7 +852,7 @@ xbinding_constructed (xobject_t *gobject)
   source_notify_closure = g_cclosure_new (G_CALLBACK (on_source_notify),
                                           binding_context_ref (binding->context),
                                           (xclosure_notify_t) binding_context_unref);
-  binding->source_notify = g_signal_connect_closure_by_id (source,
+  binding->source_notify = xsignal_connect_closure_by_id (source,
                                                            gobject_notify_signal_id,
                                                            source_property_detail,
                                                            source_notify_closure,
@@ -869,7 +869,7 @@ xbinding_constructed (xobject_t *gobject)
       target_notify_closure = g_cclosure_new (G_CALLBACK (on_target_notify),
                                               binding_context_ref (binding->context),
                                               (xclosure_notify_t) binding_context_unref);
-      binding->target_notify = g_signal_connect_closure_by_id (target,
+      binding->target_notify = xsignal_connect_closure_by_id (target,
                                                                gobject_notify_signal_id,
                                                                target_property_detail,
                                                                target_notify_closure,
@@ -895,7 +895,7 @@ xbinding_class_init (xbinding_class_t *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_notify_signal_id = g_signal_lookup ("notify", XTYPE_OBJECT);
+  gobject_notify_signal_id = xsignal_lookup ("notify", XTYPE_OBJECT);
   g_assert (gobject_notify_signal_id != 0);
 
   gobject_class->constructed = xbinding_constructed;

@@ -272,7 +272,7 @@ test_param_spec_variant (void)
   g_param_spec_unref (pspec);
 }
 
-/* Test g_param_values_cmp() for #GParamSpecVariant. */
+/* test_t g_param_values_cmp() for #GParamSpecVariant. */
 static void
 test_param_spec_variant_cmp (void)
 {
@@ -460,7 +460,7 @@ test_param_invalid_name (xconstpointer test_data)
 {
   const xchar_t *invalid_name = test_data;
 
-  g_test_summary ("Test that properties cannot be created with invalid names");
+  g_test_summary ("test_t that properties cannot be created with invalid names");
 
   if (g_test_subprocess ())
     {

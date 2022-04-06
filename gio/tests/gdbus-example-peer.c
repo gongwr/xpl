@@ -141,7 +141,7 @@ on_new_connection (xdbus_server_t *server,
   xcredentials_t *credentials;
   xchar_t *s;
 
-  credentials = g_dbus_connection_get_peer_credentials (connection);
+  credentials = xdbus_connection_get_peer_credentials (connection);
   if (credentials == NULL)
     s = xstrdup ("(no credentials received)");
   else
@@ -152,11 +152,11 @@ on_new_connection (xdbus_server_t *server,
            "Peer credentials: %s\n"
            "Negotiated capabilities: unix-fd-passing=%d\n",
            s,
-           g_dbus_connection_get_capabilities (connection) & G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING);
+           xdbus_connection_get_capabilities (connection) & G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING);
 
   xobject_ref (connection);
-  g_signal_connect (connection, "closed", G_CALLBACK (connection_closed), NULL);
-  registration_id = g_dbus_connection_register_object (connection,
+  xsignal_connect (connection, "closed", G_CALLBACK (connection_closed), NULL);
+  registration_id = xdbus_connection_register_object (connection,
                                                        "/org/gtk/GDBus/test_object_t",
                                                        introspection_data->interfaces[0],
                                                        &interface_vtable,
@@ -294,7 +294,7 @@ main (int argc, char *argv[])
       xdbus_server_t *server;
       xchar_t *guid;
       xmain_loop_t *loop;
-      GDBusServerFlags server_flags;
+      xdbus_server_flags_t server_flags;
 
       guid = g_dbus_generate_guid ();
 
@@ -303,17 +303,17 @@ main (int argc, char *argv[])
         server_flags |= G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS;
 
       observer = xdbus_auth_observer_new ();
-      g_signal_connect (observer, "allow-mechanism", G_CALLBACK (allow_mechanism_cb), NULL);
-      g_signal_connect (observer, "authorize-authenticated-peer", G_CALLBACK (authorize_authenticated_peer_cb), NULL);
+      xsignal_connect (observer, "allow-mechanism", G_CALLBACK (allow_mechanism_cb), NULL);
+      xsignal_connect (observer, "authorize-authenticated-peer", G_CALLBACK (authorize_authenticated_peer_cb), NULL);
 
       error = NULL;
-      server = g_dbus_server_new_sync (opt_address,
+      server = xdbus_server_new_sync (opt_address,
                                        server_flags,
                                        guid,
                                        observer,
                                        NULL, /* xcancellable_t */
                                        &error);
-      g_dbus_server_start (server);
+      xdbus_server_start (server);
 
       xobject_unref (observer);
       g_free (guid);
@@ -324,8 +324,8 @@ main (int argc, char *argv[])
           xerror_free (error);
           goto out;
         }
-      g_print ("Server is listening at: %s\n", g_dbus_server_get_client_address (server));
-      g_signal_connect (server,
+      g_print ("Server is listening at: %s\n", xdbus_server_get_client_address (server));
+      xsignal_connect (server,
                         "new-connection",
                         G_CALLBACK (on_new_connection),
                         NULL);
@@ -344,7 +344,7 @@ main (int argc, char *argv[])
       xchar_t *greeting;
 
       error = NULL;
-      connection = g_dbus_connection_new_for_address_sync (opt_address,
+      connection = xdbus_connection_new_for_address_sync (opt_address,
                                                            G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
                                                            NULL, /* xdbus_auth_observer_t */
                                                            NULL, /* xcancellable_t */
@@ -358,11 +358,11 @@ main (int argc, char *argv[])
 
       g_print ("Connected.\n"
                "Negotiated capabilities: unix-fd-passing=%d\n",
-               g_dbus_connection_get_capabilities (connection) & G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING);
+               xdbus_connection_get_capabilities (connection) & G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING);
 
       greeting = xstrdup_printf ("Hey, it's %" G_GINT64_FORMAT " already!",
                                   g_get_real_time () / G_USEC_PER_SEC);
-      value = g_dbus_connection_call_sync (connection,
+      value = xdbus_connection_call_sync (connection,
                                            NULL, /* bus_name */
                                            "/org/gtk/GDBus/test_object_t",
                                            "org.gtk.GDBus.TestPeerInterface",

@@ -30,7 +30,7 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_CONVERTER_OUTPUT_STREAM         (g_converter_output_stream_get_type ())
+#define XTYPE_CONVERTER_OUTPUT_STREAM         (xconverter_output_stream_get_type ())
 #define G_CONVERTER_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CONVERTER_OUTPUT_STREAM, xconverter_output_stream))
 #define G_CONVERTER_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CONVERTER_OUTPUT_STREAM, GConverterOutputStreamClass))
 #define X_IS_CONVERTER_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_CONVERTER_OUTPUT_STREAM))
@@ -68,12 +68,12 @@ struct _GConverterOutputStreamClass
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t                   g_converter_output_stream_get_type      (void) G_GNUC_CONST;
+xtype_t                   xconverter_output_stream_get_type      (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xoutput_stream_t          *g_converter_output_stream_new           (xoutput_stream_t         *base_stream,
+xoutput_stream_t          *xconverter_output_stream_new           (xoutput_stream_t         *base_stream,
                                                                  xconverter_t            *converter);
 XPL_AVAILABLE_IN_ALL
-xconverter_t             *g_converter_output_stream_get_converter (xconverter_output_stream_t *converter_stream);
+xconverter_t             *xconverter_output_stream_get_converter (xconverter_output_stream_t *converter_stream);
 
 G_END_DECLS
 

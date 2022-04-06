@@ -172,7 +172,7 @@ test_file (const xchar_t       *filename,
   if (contents_unterminated != NULL)
     memcpy (contents_unterminated, contents, length_bytes);
 
-  /* Test with nul termination. */
+  /* test_t with nul termination. */
   context = xmarkup_parse_context_new (&parser, flags, NULL, NULL);
   g_assert (xmarkup_parse_context_get_user_data (context) == NULL);
   xmarkup_parse_context_get_position (context, &line, &col);

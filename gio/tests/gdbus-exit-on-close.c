@@ -90,7 +90,7 @@ close_async_cb (xobject_t *source G_GNUC_UNUSED,
 {
   xerror_t *error = NULL;
 
-  if (g_dbus_connection_close_finish (G_DBUS_CONNECTION (source),
+  if (xdbus_connection_close_finish (G_DBUS_CONNECTION (source),
                                       res,
                                       &error))
     {
@@ -119,23 +119,23 @@ test_exit_on_close_subprocess (xconstpointer test_data)
 
   /* the default is meant to be TRUE */
   if (td->exit_on_close != IMPLICITLY_TRUE)
-    g_dbus_connection_set_exit_on_close (c, td->exit_on_close);
+    xdbus_connection_set_exit_on_close (c, td->exit_on_close);
 
-  g_assert_cmpint (g_dbus_connection_get_exit_on_close (c), ==,
+  g_assert_cmpint (xdbus_connection_get_exit_on_close (c), ==,
                    (td->exit_on_close != EXPLICITLY_FALSE));
-  g_assert (!g_dbus_connection_is_closed (c));
+  g_assert (!xdbus_connection_is_closed (c));
 
   g_timeout_add (50, quit_later_cb, NULL);
   xmain_loop_run (loop);
 
-  g_signal_connect (c, "closed", G_CALLBACK (closed_cb), (xpointer_t) td);
+  xsignal_connect (c, "closed", G_CALLBACK (closed_cb), (xpointer_t) td);
 
   if (td->who_closes == LOCAL)
     {
       xvariant_t *v;
       xerror_t *error = NULL;
 
-      v = g_dbus_connection_call_sync (c, "org.freedesktop.DBus",
+      v = xdbus_connection_call_sync (c, "org.freedesktop.DBus",
                                        "/org/freedesktop/DBus",
                                        "org.freedesktop.DBus",
                                        "ListNames",
@@ -149,7 +149,7 @@ test_exit_on_close_subprocess (xconstpointer test_data)
       g_assert (v != NULL);
       xvariant_unref (v);
 
-      g_dbus_connection_close (c, NULL, close_async_cb, NULL);
+      xdbus_connection_close (c, NULL, close_async_cb, NULL);
     }
   else
     {

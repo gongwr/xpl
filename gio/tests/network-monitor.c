@@ -24,7 +24,7 @@
 
 #include <string.h>
 
-/* Test data; the GInetAddresses and GInetAddressMasks get filled in
+/* test_t data; the GInetAddresses and GInetAddressMasks get filled in
  * in main(). Each address in a TestAddress matches the mask in its
  * corresponding TestMask, and none of them match any of the other
  * masks. The addresses in unmatched don't match any of the masks.
@@ -131,22 +131,22 @@ assert_signals (xnetwork_monitor_t *monitor,
   xboolean_t emitted_notify = FALSE, emitted_network_changed = FALSE;
   xuint_t h1, h2;
 
-  h1 = g_signal_connect (monitor, "notify::network-available",
+  h1 = xsignal_connect (monitor, "notify::network-available",
                          G_CALLBACK (notify_handler),
                          &emitted_notify);
-  h2 = g_signal_connect (monitor, "network-changed",
+  h2 = xsignal_connect (monitor, "network-changed",
                          G_CALLBACK (network_changed_handler),
                          &emitted_network_changed);
 
   xmain_context_iteration (NULL, FALSE);
 
-  g_signal_handler_disconnect (monitor, h1);
-  g_signal_handler_disconnect (monitor, h2);
+  xsignal_handler_disconnect (monitor, h1);
+  xsignal_handler_disconnect (monitor, h2);
 
   g_assert (emitted_notify == should_emit_notify);
   g_assert (emitted_network_changed == should_emit_network_changed);
 
-  g_assert (g_network_monitor_get_network_available (monitor) == expected_network_available);
+  g_assert (xnetwork_monitor_get_network_available (monitor) == expected_network_available);
 }
 
 typedef struct {
@@ -165,7 +165,7 @@ reach_cb (xobject_t      *source,
   xboolean_t reachable;
   CanReachData *data = user_data;
 
-  reachable = g_network_monitor_can_reach_finish (data->monitor, res, &error);
+  reachable = xnetwork_monitor_can_reach_finish (data->monitor, res, &error);
 
   if (data->should_be_reachable)
     g_assert_no_error (error);
@@ -184,7 +184,7 @@ test_reach_async (xpointer_t user_data)
 {
   CanReachData *data = user_data;
 
-  g_network_monitor_can_reach_async (data->monitor,
+  xnetwork_monitor_can_reach_async (data->monitor,
                                      XSOCKET_CONNECTABLE (data->sockaddr),
                                      NULL,
                                      reach_cb,
@@ -209,7 +209,7 @@ run_tests (xnetwork_monitor_t *monitor,
   for (i = 0; addresses[i].address; i++)
     {
       sockaddr = g_inet_socket_address_new (addresses[i].address, 0);
-      reachable = g_network_monitor_can_reach (monitor,
+      reachable = xnetwork_monitor_can_reach (monitor,
                                                XSOCKET_CONNECTABLE (sockaddr),
                                                NULL, &error);
       data.sockaddr = sockaddr;
@@ -238,7 +238,7 @@ test_default (void)
   xnetwork_monitor_t *monitor, *m;
   xerror_t *error = NULL;
 
-  m = g_network_monitor_get_default ();
+  m = xnetwork_monitor_get_default ();
   g_assert (X_IS_NETWORK_MONITOR (m));
 
   monitor = xobject_new (XTYPE_NETWORK_MONITOR_BASE, NULL);
@@ -268,10 +268,10 @@ test_remove_default (void)
   g_assert_no_error (error);
   assert_signals (monitor, FALSE, FALSE, TRUE);
 
-  g_network_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
                                          ip4_default);
   assert_signals (monitor, FALSE, TRUE, TRUE);
-  g_network_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
                                          ip6_default);
   assert_signals (monitor, TRUE, TRUE, FALSE);
 
@@ -296,16 +296,16 @@ test_add_networks (void)
   g_assert_no_error (error);
   assert_signals (monitor, FALSE, FALSE, TRUE);
 
-  g_network_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
                                          ip4_default);
   assert_signals (monitor, FALSE, TRUE, TRUE);
-  g_network_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
                                          ip6_default);
   assert_signals (monitor, TRUE, TRUE, FALSE);
 
   /* Now add the masks one by one */
 
-  g_network_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
                                       net127.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
 
@@ -316,7 +316,7 @@ test_add_networks (void)
   run_tests (monitor, netfe80.addresses, FALSE);
   run_tests (monitor, unmatched, FALSE);
 
-  g_network_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
                                       net10.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
   run_tests (monitor, net127.addresses, TRUE);
@@ -326,7 +326,7 @@ test_add_networks (void)
   run_tests (monitor, netfe80.addresses, FALSE);
   run_tests (monitor, unmatched, FALSE);
 
-  g_network_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
                                       net192.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
   run_tests (monitor, net127.addresses, TRUE);
@@ -336,7 +336,7 @@ test_add_networks (void)
   run_tests (monitor, netfe80.addresses, FALSE);
   run_tests (monitor, unmatched, FALSE);
 
-  g_network_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
                                       netlocal6.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
   run_tests (monitor, net127.addresses, TRUE);
@@ -346,7 +346,7 @@ test_add_networks (void)
   run_tests (monitor, netfe80.addresses, FALSE);
   run_tests (monitor, unmatched, FALSE);
 
-  g_network_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
                                       netfe80.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
   run_tests (monitor, net127.addresses, TRUE);
@@ -369,27 +369,27 @@ test_remove_networks (void)
   g_assert_no_error (error);
   assert_signals (monitor, FALSE, FALSE, TRUE);
 
-  g_network_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
                                          ip4_default);
   assert_signals (monitor, FALSE, TRUE, TRUE);
-  g_network_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
                                          ip6_default);
   assert_signals (monitor, TRUE, TRUE, FALSE);
 
   /* First add them */
-  g_network_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
                                       net127.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
-  g_network_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
                                       net10.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
-  g_network_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
                                       net192.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
-  g_network_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
                                       netlocal6.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
-  g_network_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_add_network (G_NETWORK_MONITOR_BASE (monitor),
                                       netfe80.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
 
@@ -401,7 +401,7 @@ test_remove_networks (void)
   run_tests (monitor, unmatched, FALSE);
 
   /* Now remove them one by one */
-  g_network_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
                                          net127.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
   run_tests (monitor, net127.addresses, FALSE);
@@ -411,7 +411,7 @@ test_remove_networks (void)
   run_tests (monitor, netfe80.addresses, TRUE);
   run_tests (monitor, unmatched, FALSE);
 
-  g_network_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
                                          net10.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
   run_tests (monitor, net127.addresses, FALSE);
@@ -421,7 +421,7 @@ test_remove_networks (void)
   run_tests (monitor, netfe80.addresses, TRUE);
   run_tests (monitor, unmatched, FALSE);
 
-  g_network_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
                                          net192.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
   run_tests (monitor, net127.addresses, FALSE);
@@ -431,7 +431,7 @@ test_remove_networks (void)
   run_tests (monitor, netfe80.addresses, TRUE);
   run_tests (monitor, unmatched, FALSE);
 
-  g_network_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
                                          netlocal6.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
   run_tests (monitor, net127.addresses, FALSE);
@@ -441,7 +441,7 @@ test_remove_networks (void)
   run_tests (monitor, netfe80.addresses, TRUE);
   run_tests (monitor, unmatched, FALSE);
 
-  g_network_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
+  xnetwork_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (monitor),
                                          netfe80.mask);
   assert_signals (monitor, FALSE, TRUE, FALSE);
   run_tests (monitor, net127.addresses, FALSE);
@@ -497,7 +497,7 @@ watch_connectivity_changed (xnetwork_monitor_t *monitor,
 			    xparam_spec_t      *pspec,
 			    xpointer_t         user_data)
 {
-  g_print ("Connectivity is %d\n", g_network_monitor_get_connectivity (monitor));
+  g_print ("Connectivity is %d\n", xnetwork_monitor_get_connectivity (monitor));
 }
 
 static void
@@ -505,24 +505,24 @@ watch_metered_changed (xnetwork_monitor_t *monitor,
                        xparam_spec_t      *pspec,
                        xpointer_t         user_data)
 {
-  g_print ("Metered is %d\n", g_network_monitor_get_network_metered (monitor));
+  g_print ("Metered is %d\n", xnetwork_monitor_get_network_metered (monitor));
 }
 
 static void
 do_watch_network (void)
 {
-  xnetwork_monitor_t *monitor = g_network_monitor_get_default ();
+  xnetwork_monitor_t *monitor = xnetwork_monitor_get_default ();
   xmain_loop_t *loop;
 
   g_print ("Monitoring via %s\n", xtype_name_from_instance ((GTypeInstance *) monitor));
 
-  g_signal_connect (monitor, "network-changed",
+  xsignal_connect (monitor, "network-changed",
                     G_CALLBACK (watch_network_changed), NULL);
-  g_signal_connect (monitor, "notify::connectivity",
+  xsignal_connect (monitor, "notify::connectivity",
                     G_CALLBACK (watch_connectivity_changed), NULL);
-  g_signal_connect (monitor, "notify::network-metered",
+  xsignal_connect (monitor, "notify::network-metered",
                     G_CALLBACK (watch_metered_changed), NULL);
-  watch_network_changed (monitor, g_network_monitor_get_network_available (monitor), NULL);
+  watch_network_changed (monitor, xnetwork_monitor_get_network_available (monitor), NULL);
   watch_connectivity_changed (monitor, NULL, NULL);
   watch_metered_changed (monitor, NULL, NULL);
 

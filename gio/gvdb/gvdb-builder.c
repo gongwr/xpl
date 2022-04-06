@@ -313,7 +313,7 @@ file_builder_allocate_for_hash (FileBuilder            *fb,
                                 struct gvdb_pointer    *pointer)
 {
   guint32_le bloom_hdr, table_hdr;
-  guchar *data;
+  xuchar_t *data;
   xsize_t size;
 
   g_assert (n_bloom_words < (1u << 27));

@@ -249,7 +249,7 @@ main (int argc, char **argv)
   const char *mode;
   xboolean_t ret;
 
-  context = g_option_context_new ("MODE - Test xsubprocess_t stuff");
+  context = g_option_context_new ("MODE - test_t xsubprocess_t stuff");
   g_option_context_add_main_entries (context, options, NULL);
   ret = g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);

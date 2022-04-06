@@ -207,10 +207,10 @@ app_list (xchar_t **args)
 
   while (apps)
     {
-      GDesktopAppInfo *info = apps->data;
+      xdesktop_app_info_t *info = apps->data;
 
       if (X_IS_DESKTOP_APP_INFO (info))
-        if (g_desktop_app_info_get_boolean (info, "DBusActivatable"))
+        if (xdesktop_app_info_get_boolean (info, "DBusActivatable"))
           {
             const xchar_t *filename;
 
@@ -272,7 +272,7 @@ app_call (const xchar_t *app_id,
 
   object_path = app_path_for_id (app_id);
 
-  result = g_dbus_connection_call_sync (session, app_id, object_path, "org.freedesktop.Application",
+  result = xdbus_connection_call_sync (session, app_id, object_path, "org.freedesktop.Application",
                                         method_name, parameters, G_VARIANT_TYPE_UNIT,
                                         G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error);
 
@@ -401,7 +401,7 @@ static int
 app_list_actions (xchar_t **args)
 {
   const xchar_t * const *actions;
-  GDesktopAppInfo *app_info;
+  xdesktop_app_info_t *app_info;
   xchar_t *filename;
   xint_t i;
 
@@ -415,7 +415,7 @@ app_list_actions (xchar_t **args)
     }
 
   filename = xstrconcat (args[0], ".desktop", NULL);
-  app_info = g_desktop_app_info_new (filename);
+  app_info = xdesktop_app_info_new (filename);
   g_free (filename);
 
   if (app_info == NULL)
@@ -424,7 +424,7 @@ app_list_actions (xchar_t **args)
       return 1;
     }
 
-  actions = g_desktop_app_info_list_actions (app_info);
+  actions = xdesktop_app_info_list_actions (app_info);
 
   for (i = 0; actions[i]; i++)
     g_print ("%s\n", actions[i]);

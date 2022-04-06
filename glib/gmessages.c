@@ -1044,16 +1044,16 @@ strdup_convert (const xchar_t *string,
   if (!xutf8_validate (string, -1, NULL))
     {
       xstring_t *xstring = xstring_new ("[Invalid UTF-8] ");
-      guchar *p;
+      xuchar_t *p;
 
-      for (p = (guchar *)string; *p; p++)
+      for (p = (xuchar_t *)string; *p; p++)
 	{
 	  if (CHAR_IS_SAFE(*p) &&
 	      !(*p == '\r' && *(p + 1) != '\n') &&
 	      *p < 0x80)
 	    xstring_append_c (xstring, *p);
 	  else
-	    xstring_append_printf (xstring, "\\x%02x", (xuint_t)(guchar)*p);
+	    xstring_append_printf (xstring, "\\x%02x", (xuint_t)(xuchar_t)*p);
 	}
 
       return xstring_free (xstring, FALSE);
@@ -1090,10 +1090,10 @@ strdup_convert (const xchar_t *string,
 
 static void
 format_unsigned (xchar_t  *buf,
-		 gulong  num,
+		 xulong_t  num,
 		 xuint_t   radix)
 {
-  gulong tmp;
+  xulong_t tmp;
   xchar_t c;
   xint_t i, n;
 
@@ -1876,7 +1876,7 @@ g_log_variant (const xchar_t    *log_domain,
       else if (xvariant_is_of_type (value, G_VARIANT_TYPE_BYTESTRING))
         {
           xsize_t s;
-          field.value = xvariant_get_fixed_array (value, &s, sizeof (guchar));
+          field.value = xvariant_get_fixed_array (value, &s, sizeof (xuchar_t));
           if (G_LIKELY (s <= G_MAXSSIZE))
             {
               field.length = s;
@@ -2276,7 +2276,7 @@ g_log_writer_format_fields (GLogLevelFlags   log_level,
   const xchar_t *log_domain = NULL;
   xchar_t level_prefix[STRING_BUFFER_SIZE];
   xstring_t *xstring;
-  gint64 now;
+  sint64_t now;
   time_t now_secs;
   struct tm *now_tm;
   xchar_t time_buf[128];
@@ -2305,7 +2305,7 @@ g_log_writer_format_fields (GLogLevelFlags   log_level,
       (log_level & G_LOG_LEVEL_MASK))
     {
       const xchar_t *prg_name = g_get_prgname ();
-      gulong pid = getpid ();
+      xulong_t pid = getpid ();
 
       if (prg_name == NULL)
         xstring_append_printf (xstring, "(process:%lu): ", pid);
@@ -3173,7 +3173,7 @@ escape_string (xstring_t *string)
 
 	  /* Emit invalid UTF-8 as hex escapes
            */
-	  tmp = xstrdup_printf ("\\x%02x", (xuint_t)(guchar)*p);
+	  tmp = xstrdup_printf ("\\x%02x", (xuint_t)(xuchar_t)*p);
 	  xstring_erase (string, pos, 1);
 	  xstring_insert (string, pos, tmp);
 

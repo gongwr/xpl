@@ -247,10 +247,10 @@ main (int argc, char **argv)
                            (xstrcmp0 (argv[1], "./cmd") == 0
                              ? G_APPLICATION_HANDLES_COMMAND_LINE
                              : G_APPLICATION_HANDLES_OPEN));
-  g_signal_connect (app, "startup", G_CALLBACK (startup), NULL);
-  g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
-  g_signal_connect (app, "open", G_CALLBACK (open), NULL);
-  g_signal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
+  xsignal_connect (app, "startup", G_CALLBACK (startup), NULL);
+  xsignal_connect (app, "activate", G_CALLBACK (activate), NULL);
+  xsignal_connect (app, "open", G_CALLBACK (open), NULL);
+  xsignal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
 #ifdef STANDALONE
   xapplication_set_inactivity_timeout (app, 10000);
 #else

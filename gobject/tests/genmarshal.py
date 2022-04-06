@@ -197,18 +197,18 @@ class TestGenmarshal(unittest.TestCase):
             return (header_result, body_result)
 
     def test_help(self):
-        """Test the --help argument."""
+        """test_t the --help argument."""
         result = self.runGenmarshal("--help")
         self.assertIn("usage: glib-genmarshal", result.out)
 
     def test_no_args(self):
-        """Test running with no arguments at all."""
+        """test_t running with no arguments at all."""
         result = self.runGenmarshal()
         self.assertEqual("", result.err)
         self.assertEqual("", result.out)
 
     def test_empty_list(self):
-        """Test running with an empty list."""
+        """test_t running with an empty list."""
         (header_result, body_result) = self.runGenmarshalWithList("", "--quiet")
 
         self.assertEqual("", header_result.err)
@@ -250,7 +250,7 @@ class TestGenmarshal(unittest.TestCase):
         )
 
     def test_void_boolean(self):
-        """Test running with a basic VOID:BOOLEAN list."""
+        """test_t running with a basic VOID:BOOLEAN list."""
         (header_result, body_result) = self.runGenmarshalWithList(
             "VOID:BOOLEAN", "--quiet"
         )
@@ -297,7 +297,7 @@ class TestGenmarshal(unittest.TestCase):
         )
 
     def test_void_boolean_int64(self):
-        """Test running with a non-trivial VOID:BOOLEAN,INT64 list."""
+        """test_t running with a non-trivial VOID:BOOLEAN,INT64 list."""
         (header_result, body_result) = self.runGenmarshalWithList(
             "VOID:BOOLEAN,INT64", "--quiet"
         )
@@ -354,7 +354,7 @@ class TestGenmarshal(unittest.TestCase):
             {{
               typedef void (*GMarshalFunc_VOID__BOOLEAN_INT64) (xpointer_t data1,
                                                                 xboolean_t arg1,
-                                                                gint64 arg2,
+                                                                sint64_t arg2,
                                                                 xpointer_t data2);
               GCClosure *cc = (GCClosure *) closure;
               xpointer_t data1, data2;
@@ -387,7 +387,7 @@ class TestGenmarshal(unittest.TestCase):
         )
 
     def test_void_variant_nostdinc_valist_marshaller(self):
-        """Test running with a basic VOID:VARIANT list, but without the
+        """test_t running with a basic VOID:VARIANT list, but without the
         standard marshallers, and with valist support enabled. This checks that
         the valist marshaller for VARIANT correctly sinks floating variants.
 
@@ -528,7 +528,7 @@ class TestGenmarshal(unittest.TestCase):
         )
 
     def test_void_string_nostdinc(self):
-        """Test running with a basic VOID:STRING list, but without the
+        """test_t running with a basic VOID:STRING list, but without the
         standard marshallers, and with valist support enabled. This checks that
         the valist marshaller for STRING correctly skips a string copy if the
         argument is static.
@@ -670,7 +670,7 @@ class TestGenmarshal(unittest.TestCase):
         )
 
     def test_void_param_nostdinc(self):
-        """Test running with a basic VOID:PARAM list, but without the
+        """test_t running with a basic VOID:PARAM list, but without the
         standard marshallers, and with valist support enabled. This checks that
         the valist marshaller for PARAM correctly skips a param copy if the
         argument is static.

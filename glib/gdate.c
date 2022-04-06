@@ -980,14 +980,14 @@ xdate_fill_parse_tokens (const xchar_t *str, GDateParseTokens *pt)
 {
   xchar_t num[4][NUM_LEN+1];
   xint_t i;
-  const guchar *s;
+  const xuchar_t *s;
 
   /* We count 4, but store 3; so we can give an error
    * if there are 4.
    */
   num[0][0] = num[1][0] = num[2][0] = num[3][0] = '\0';
 
-  s = (const guchar *) str;
+  s = (const xuchar_t *) str;
   pt->num_ints = 0;
   while (*s && pt->num_ints < 4)
     {

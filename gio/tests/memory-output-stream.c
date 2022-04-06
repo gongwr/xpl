@@ -37,10 +37,10 @@ test_truncate (void)
 
   mo = g_memory_output_stream_new_resizable ();
   g_assert (xseekable_can_truncate (G_SEEKABLE (mo)));
-  o = g_data_output_stream_new (mo);
+  o = xdata_output_stream_new (mo);
   for (i = 0; i < 1000; i++)
     {
-      g_data_output_stream_put_byte (o, 1, NULL, &error);
+      xdata_output_stream_put_byte (o, 1, NULL, &error);
       g_assert_no_error (error);
     }
   g_assert_cmpint (g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mo)), ==, 1000);
@@ -51,7 +51,7 @@ test_truncate (void)
   g_assert_cmpint (g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mo)), ==, 0);
   for (i = 0; i < 2000; i++)
     {
-      g_data_output_stream_put_byte (o, 2, NULL, &error);
+      xdata_output_stream_put_byte (o, 2, NULL, &error);
       g_assert_no_error (error);
     }
   g_assert_cmpint (g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mo)), ==, 3000);
@@ -202,8 +202,8 @@ test_data_size (void)
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=540459");
 
   mo = g_memory_output_stream_new_resizable ();
-  o = g_data_output_stream_new (mo);
-  g_data_output_stream_put_byte (o, 1, NULL, NULL);
+  o = xdata_output_stream_new (mo);
+  xdata_output_stream_put_byte (o, 1, NULL, NULL);
   pos = g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mo));
   g_assert_cmpint (pos, ==, 1);
 
@@ -245,11 +245,11 @@ test_properties (void)
                                       "realloc-function", g_realloc,
                                       "destroy-function", g_free,
                                       NULL);
-  o = g_data_output_stream_new (mo);
+  o = xdata_output_stream_new (mo);
 
   for (i = 0; i < 1000; i++)
     {
-      g_data_output_stream_put_byte (o, 1, NULL, &error);
+      xdata_output_stream_put_byte (o, 1, NULL, &error);
       g_assert_no_error (error);
     }
 
@@ -319,7 +319,7 @@ test_write_null (void)
   xobject_unref (mo);
 }
 
-/* Test that writev() works on #xmemory_output_stream_t with a non-empty set of vectors. This
+/* test_t that writev() works on #xmemory_output_stream_t with a non-empty set of vectors. This
  * covers the default writev() implementation around write(). */
 static void
 test_writev (void)
@@ -362,7 +362,7 @@ test_writev (void)
   xobject_unref (mo);
 }
 
-/* Test that writev_nonblocking() works on #xmemory_output_stream_t with a non-empty set of vectors. This
+/* test_t that writev_nonblocking() works on #xmemory_output_stream_t with a non-empty set of vectors. This
  * covers the default writev_nonblocking() implementation around write_nonblocking(). */
 static void
 test_writev_nonblocking (void)
@@ -420,15 +420,15 @@ test_steal_as_bytes (void)
                                       "realloc-function", g_realloc,
                                       "destroy-function", g_free,
                                       NULL);
-  o = g_data_output_stream_new (mo);
+  o = xdata_output_stream_new (mo);
 
-  g_data_output_stream_put_string (o, "hello ", NULL, &error);
+  xdata_output_stream_put_string (o, "hello ", NULL, &error);
   g_assert_no_error (error);
 
-  g_data_output_stream_put_string (o, "world!", NULL, &error);
+  xdata_output_stream_put_string (o, "world!", NULL, &error);
   g_assert_no_error (error);
 
-  g_data_output_stream_put_byte (o, '\0', NULL, &error);
+  xdata_output_stream_put_byte (o, '\0', NULL, &error);
   g_assert_no_error (error);
 
   xoutput_stream_close ((xoutput_stream_t*) o, NULL, &error);

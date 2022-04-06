@@ -3,7 +3,7 @@
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# Test whether the *printf family of functions supports padding of non-finite
+# test_t whether the *printf family of functions supports padding of non-finite
 # values with the 0 flag correctly. (ISO C99 + TC1 + TC2.) See
 # <https://lists.gnu.org/r/bug-gnulib/2007-04/msg00107.html>
 # Result is gl_cv_func_printf_flag_zero.

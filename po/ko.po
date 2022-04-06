@@ -280,7 +280,7 @@ msgid "Seek not supported on base stream"
 msgstr "기반 스트림에서 탐색을 지원하지 않습니다"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
 msgstr "GMemoryInputStream을 자를 수 없습니다"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
@@ -3308,8 +3308,8 @@ msgid "Error removing old file: %s"
 msgstr "예전 파일을 제거하는 중 오류: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:762
-msgid "Invalid GSeekType supplied"
-msgstr "잘못된 GSeekType이 주어졌습니다"
+msgid "Invalid xseek_type_t supplied"
+msgstr "잘못된 xseek_type_t이 주어졌습니다"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"

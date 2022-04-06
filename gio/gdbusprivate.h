@@ -141,24 +141,24 @@ xdbus_method_invocation_t *_xdbus_method_invocation_new (const xchar_t          
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-xboolean_t _g_signal_accumulator_false_handled (xsignal_invocation_hint_t *ihint,
+xboolean_t _xsignal_accumulator_false_handled (xsignal_invocation_hint_t *ihint,
                                               xvalue_t                *return_accu,
                                               const xvalue_t          *handler_return,
                                               xpointer_t               dummy);
 
-xboolean_t _g_dbus_object_skeleton_has_authorize_method_handlers (xdbus_object_skeleton_t *object);
+xboolean_t _xdbus_object_skeleton_has_authorize_method_handlers (xdbus_object_skeleton_t *object);
 
-void _g_dbus_object_proxy_add_interface (xdbus_object_proxy_t *proxy,
+void _xdbus_object_proxy_add_interface (xdbus_object_proxy_t *proxy,
                                          xdbus_proxy_t       *interface_proxy);
-void _g_dbus_object_proxy_remove_interface (xdbus_object_proxy_t *proxy,
+void _xdbus_object_proxy_remove_interface (xdbus_object_proxy_t *proxy,
                                             const xchar_t      *interface_name);
 
 xchar_t *_g_dbus_hexencode (const xchar_t *str,
                           xsize_t        str_len);
 
 /* Implemented in gdbusconnection.c */
-xdbus_connection_t *_g_bus_get_singleton_if_exists (GBusType bus_type);
-void             _g_bus_forget_singleton        (GBusType bus_type);
+xdbus_connection_t *_g_bus_get_singleton_if_exists (xbus_type_t bus_type);
+void             _g_bus_forget_singleton        (xbus_type_t bus_type);
 
 G_END_DECLS
 

@@ -49,7 +49,7 @@
  * using the following functions.
  */
 
-typedef GDBusObjectManagerIface GDBusObjectManagerInterface;
+typedef xdbus_object_manager_iface_t GDBusObjectManagerInterface;
 G_DEFINE_INTERFACE (xdbus_object_manager, g_dbus_object_manager, XTYPE_OBJECT)
 
 enum {
@@ -63,7 +63,7 @@ enum {
 static xuint_t signals[N_SIGNALS];
 
 static void
-g_dbus_object_manager_default_init (GDBusObjectManagerIface *iface)
+g_dbus_object_manager_default_init (xdbus_object_manager_iface_t *iface)
 {
   /**
    * xdbus_object_manager_t::object-added:
@@ -75,10 +75,10 @@ g_dbus_object_manager_default_init (GDBusObjectManagerIface *iface)
    * Since: 2.30
    */
   signals[OBJECT_ADDED] =
-    g_signal_new (I_("object-added"),
+    xsignal_new (I_("object-added"),
                   XTYPE_FROM_INTERFACE (iface),
                   G_SIGNAL_RUN_LAST,
-                  G_STRUCT_OFFSET (GDBusObjectManagerIface, object_added),
+                  G_STRUCT_OFFSET (xdbus_object_manager_iface_t, object_added),
                   NULL,
                   NULL,
                   NULL,
@@ -96,10 +96,10 @@ g_dbus_object_manager_default_init (GDBusObjectManagerIface *iface)
    * Since: 2.30
    */
   signals[OBJECT_REMOVED] =
-    g_signal_new (I_("object-removed"),
+    xsignal_new (I_("object-removed"),
                   XTYPE_FROM_INTERFACE (iface),
                   G_SIGNAL_RUN_LAST,
-                  G_STRUCT_OFFSET (GDBusObjectManagerIface, object_removed),
+                  G_STRUCT_OFFSET (xdbus_object_manager_iface_t, object_removed),
                   NULL,
                   NULL,
                   NULL,
@@ -121,10 +121,10 @@ g_dbus_object_manager_default_init (GDBusObjectManagerIface *iface)
    * Since: 2.30
    */
   signals[INTERFACE_ADDED] =
-    g_signal_new (I_("interface-added"),
+    xsignal_new (I_("interface-added"),
                   XTYPE_FROM_INTERFACE (iface),
                   G_SIGNAL_RUN_LAST,
-                  G_STRUCT_OFFSET (GDBusObjectManagerIface, interface_added),
+                  G_STRUCT_OFFSET (xdbus_object_manager_iface_t, interface_added),
                   NULL,
                   NULL,
                   _g_cclosure_marshal_VOID__OBJECT_OBJECT,
@@ -132,7 +132,7 @@ g_dbus_object_manager_default_init (GDBusObjectManagerIface *iface)
                   2,
                   XTYPE_DBUS_OBJECT,
                   XTYPE_DBUS_INTERFACE);
-  g_signal_set_va_marshaller (signals[INTERFACE_ADDED],
+  xsignal_set_va_marshaller (signals[INTERFACE_ADDED],
                               XTYPE_FROM_INTERFACE (iface),
                               _g_cclosure_marshal_VOID__OBJECT_OBJECTv);
 
@@ -150,10 +150,10 @@ g_dbus_object_manager_default_init (GDBusObjectManagerIface *iface)
    * Since: 2.30
    */
   signals[INTERFACE_REMOVED] =
-    g_signal_new (I_("interface-removed"),
+    xsignal_new (I_("interface-removed"),
                   XTYPE_FROM_INTERFACE (iface),
                   G_SIGNAL_RUN_LAST,
-                  G_STRUCT_OFFSET (GDBusObjectManagerIface, interface_removed),
+                  G_STRUCT_OFFSET (xdbus_object_manager_iface_t, interface_removed),
                   NULL,
                   NULL,
                   _g_cclosure_marshal_VOID__OBJECT_OBJECT,
@@ -161,7 +161,7 @@ g_dbus_object_manager_default_init (GDBusObjectManagerIface *iface)
                   2,
                   XTYPE_DBUS_OBJECT,
                   XTYPE_DBUS_INTERFACE);
-  g_signal_set_va_marshaller (signals[INTERFACE_REMOVED],
+  xsignal_set_va_marshaller (signals[INTERFACE_REMOVED],
                               XTYPE_FROM_INTERFACE (iface),
                               _g_cclosure_marshal_VOID__OBJECT_OBJECTv);
 
@@ -182,7 +182,7 @@ g_dbus_object_manager_default_init (GDBusObjectManagerIface *iface)
 const xchar_t *
 g_dbus_object_manager_get_object_path (xdbus_object_manager_t *manager)
 {
-  GDBusObjectManagerIface *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
+  xdbus_object_manager_iface_t *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
   return iface->get_object_path (manager);
 }
 
@@ -202,7 +202,7 @@ g_dbus_object_manager_get_object_path (xdbus_object_manager_t *manager)
 xlist_t *
 g_dbus_object_manager_get_objects (xdbus_object_manager_t *manager)
 {
-  GDBusObjectManagerIface *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
+  xdbus_object_manager_iface_t *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
   return iface->get_objects (manager);
 }
 
@@ -222,7 +222,7 @@ xdbus_object_t *
 g_dbus_object_manager_get_object (xdbus_object_manager_t *manager,
                                   const xchar_t        *object_path)
 {
-  GDBusObjectManagerIface *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
+  xdbus_object_manager_iface_t *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
   g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
   return iface->get_object (manager, object_path);
 }
@@ -246,7 +246,7 @@ g_dbus_object_manager_get_interface (xdbus_object_manager_t *manager,
                                      const xchar_t        *object_path,
                                      const xchar_t        *interface_name)
 {
-  GDBusObjectManagerIface *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
+  xdbus_object_manager_iface_t *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
   g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
   g_return_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
   return iface->get_interface (manager, object_path, interface_name);

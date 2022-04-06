@@ -116,7 +116,7 @@ create_request (xproxy_address_t  *proxy_address,
         *has_cred = TRUE;
 
       cred = xstrdup_printf ("%s:%s", username, password);
-      base64_cred = g_base64_encode ((guchar *) cred, strlen (cred));
+      base64_cred = g_base64_encode ((xuchar_t *) cred, strlen (cred));
       g_free (cred);
       xstring_append_printf (request,
                               "Proxy-Authorization: Basic %s\r\n",

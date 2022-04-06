@@ -326,12 +326,12 @@ read_data (xdata_input_stream_t  *stream,
  * Returns: an unsigned 8-bit/1-byte value read from the @stream or `0`
  * if an error occurred.
  **/
-guchar
+xuchar_t
 g_data_input_stream_read_byte (xdata_input_stream_t  *stream,
 			       xcancellable_t       *cancellable,
 			       xerror_t            **error)
 {
-  guchar c;
+  xuchar_t c;
 
   g_return_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), '\0');
 
@@ -544,12 +544,12 @@ g_data_input_stream_read_uint32 (xdata_input_stream_t  *stream,
  * Returns: a signed 64-bit/8-byte value read from @stream or `0` if
  * an error occurred.
  **/
-gint64
+sint64_t
 g_data_input_stream_read_int64 (xdata_input_stream_t  *stream,
 			       xcancellable_t       *cancellable,
 			       xerror_t            **error)
 {
-  gint64 v;
+  sint64_t v;
 
   g_return_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), 0);
 
@@ -627,7 +627,7 @@ scan_for_newline (xdata_input_stream_t *stream,
 		  xboolean_t         *last_saw_cr_out,
 		  int              *newline_len_out)
 {
-  xbuffered_input_stream *bstream;
+  xbuffered_input_stream_t *bstream;
   GDataInputStreamPrivate *priv;
   const char *buffer;
   xsize_t start, end, peeked;
@@ -748,7 +748,7 @@ g_data_input_stream_read_line (xdata_input_stream_t  *stream,
 			       xcancellable_t      *cancellable,
 			       xerror_t           **error)
 {
-  xbuffered_input_stream *bstream;
+  xbuffered_input_stream_t *bstream;
   xsize_t checked;
   xboolean_t last_saw_cr;
   xssize_t found_pos;
@@ -858,7 +858,7 @@ scan_for_chars (xdata_input_stream_t *stream,
 		const char       *stop_chars,
                 xsize_t             stop_chars_len)
 {
-  xbuffered_input_stream *bstream;
+  xbuffered_input_stream_t *bstream;
   const char *buffer;
   xsize_t start, end, peeked;
   xsize_t i;
@@ -925,7 +925,7 @@ g_data_input_stream_read_until (xdata_input_stream_t  *stream,
 			       xcancellable_t       *cancellable,
 			       xerror_t            **error)
 {
-  xbuffered_input_stream *bstream;
+  xbuffered_input_stream_t *bstream;
   xchar_t *result;
 
   bstream = G_BUFFERED_INPUT_STREAM (stream);
@@ -992,7 +992,7 @@ g_data_input_stream_read_line_ready (xobject_t      *object,
 {
   xtask_t *task = user_data;
   GDataInputStreamReadData *data = xtask_get_task_data (task);
-  xbuffered_input_stream *buffer = xtask_get_source_object (task);
+  xbuffered_input_stream_t *buffer = xtask_get_source_object (task);
   xssize_t found_pos;
   xint_t newline_len;
 
@@ -1338,7 +1338,7 @@ g_data_input_stream_read_upto (xdata_input_stream_t  *stream,
                                xcancellable_t      *cancellable,
                                xerror_t           **error)
 {
-  xbuffered_input_stream *bstream;
+  xbuffered_input_stream_t *bstream;
   xsize_t checked;
   xssize_t found_pos;
   xssize_t res;

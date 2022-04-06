@@ -214,7 +214,7 @@ make_connection (const char       *argument,
           return FALSE;
         }
 
-      g_signal_connect (tls_conn, "accept-certificate",
+      xsignal_connect (tls_conn, "accept-certificate",
                         G_CALLBACK (accept_certificate), NULL);
 
       interaction = xtls_console_interaction_new ();
@@ -264,7 +264,7 @@ main (int argc,
   address = NULL;
   connection = NULL;
 
-  context = g_option_context_new (" <hostname>[:port] - Test xsocket_t client stuff");
+  context = g_option_context_new (" <hostname>[:port] - test_t xsocket_t client stuff");
   g_option_context_add_main_entries (context, cmd_entries, NULL);
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
@@ -287,7 +287,7 @@ main (int argc,
   if (cancel_timeout)
     {
       xthread_t *thread;
-      cancellable = g_cancellable_new ();
+      cancellable = xcancellable_new ();
       thread = xthread_new ("cancel", cancel_thread, cancellable);
       xthread_unref (thread);
     }
@@ -316,7 +316,7 @@ main (int argc,
       return 1;
     }
 
-  /* TODO: Test non-blocking connect/handshake */
+  /* TODO: test_t non-blocking connect/handshake */
   if (non_blocking)
     xsocket_set_blocking (socket, FALSE);
 

@@ -282,8 +282,8 @@ msgid "Seek not supported on base stream"
 msgstr "Ricercje no supuartade sul flus di base"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "Impussibil cjonçâ xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "Impussibil cjonçâ xbuffered_input_stream_t"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -3340,8 +3340,8 @@ msgid "Error removing old file: %s"
 msgstr "Erôr tal gjavâ il file vecjo: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:762
-msgid "Invalid GSeekType supplied"
-msgstr "Furnît GSeekType no valit"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Furnît xseek_type_t no valit"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"
@@ -5712,7 +5712,7 @@ msgstr "Il test al è finît juste dopo un caratar “/”. (Il test al jere “
 #, c-format
 msgid "Text ended before matching quote was found for %c. (The text was “%s”)"
 msgstr ""
-"Test finît prime di cjatâ la citazion corispondent par %c. (Il test al jere "
+"test_t finît prime di cjatâ la citazion corispondent par %c. (Il test al jere "
 "“%s”)"
 
 #: glib/gshell.c:611

@@ -4,7 +4,7 @@ dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
 
-# Test for the GNU C Library, version 2.1 or newer.
+# test_t for the GNU C Library, version 2.1 or newer.
 # From Bruno Haible.
 
 AC_DEFUN([gl_XPLC21],

@@ -467,7 +467,7 @@ end_element (xmarkup_parse_context_t  *context,
 	  xoutput_stream_t *out = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
 	  xzlib_compressor_t *compressor =
 	    g_zlib_compressor_new (G_ZLIB_COMPRESSOR_FORMAT_ZLIB, 9);
-	  xoutput_stream_t *out2 = g_converter_output_stream_new (out, G_CONVERTER (compressor));
+	  xoutput_stream_t *out2 = xconverter_output_stream_new (out, G_CONVERTER (compressor));
 
 	  if (!xoutput_stream_write_all (out2, data->content, data->size,
 					  NULL, NULL, NULL) ||

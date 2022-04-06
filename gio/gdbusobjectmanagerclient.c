@@ -126,7 +126,7 @@ struct _GDBusObjectManagerClientPrivate
 {
   xmutex_t lock;
 
-  GBusType bus_type;
+  xbus_type_t bus_type;
   xdbus_connection_t *connection;
   xchar_t *object_path;
   xchar_t *name;
@@ -144,8 +144,8 @@ struct _GDBusObjectManagerClientPrivate
   xpointer_t get_proxy_type_user_data;
   xdestroy_notify_t get_proxy_type_destroy_notify;
 
-  gulong name_owner_signal_id;
-  gulong signal_signal_id;
+  xulong_t name_owner_signal_id;
+  xulong_t signal_signal_id;
   xcancellable_t *cancel;
 };
 
@@ -174,10 +174,10 @@ static xuint_t signals[LAST_SIGNAL] = { 0 };
 
 static void initable_iface_init       (xinitable_iface_t *initable_iface);
 static void async_initable_iface_init (xasync_initable_iface_t *async_initable_iface);
-static void dbus_object_manager_interface_init (GDBusObjectManagerIface *iface);
+static void dbus_object_manager_interface_init (xdbus_object_manager_iface_t *iface);
 
-G_DEFINE_TYPE_WITH_CODE (xdbus_object_manager_client, g_dbus_object_manager_client, XTYPE_OBJECT,
-                         G_ADD_PRIVATE (xdbus_object_manager_client_t)
+G_DEFINE_TYPE_WITH_CODE (xdbus_object_manager_client, xdbus_object_manager_client, XTYPE_OBJECT,
+                         G_ADD_PRIVATE (xdbus_object_manager_client)
                          G_IMPLEMENT_INTERFACE (XTYPE_INITABLE, initable_iface_init)
                          G_IMPLEMENT_INTERFACE (XTYPE_ASYNC_INITABLE, async_initable_iface_init)
                          G_IMPLEMENT_INTERFACE (XTYPE_DBUS_OBJECT_MANAGER, dbus_object_manager_interface_init))
@@ -195,21 +195,21 @@ static void process_get_all_result (xdbus_object_manager_client_t *manager,
                                     const xchar_t       *name_owner);
 
 static void
-g_dbus_object_manager_client_dispose (xobject_t *object)
+xdbus_object_manager_client_dispose (xobject_t *object)
 {
   xdbus_object_manager_client_t *manager = G_DBUS_OBJECT_MANAGER_CLIENT (object);
 
   if (manager->priv->cancel != NULL)
     {
-      g_cancellable_cancel (manager->priv->cancel);
+      xcancellable_cancel (manager->priv->cancel);
       g_clear_object (&manager->priv->cancel);
     }
 
-  G_OBJECT_CLASS (g_dbus_object_manager_client_parent_class)->dispose (object);
+  G_OBJECT_CLASS (xdbus_object_manager_client_parent_class)->dispose (object);
 }
 
 static void
-g_dbus_object_manager_client_finalize (xobject_t *object)
+xdbus_object_manager_client_finalize (xobject_t *object)
 {
   xdbus_object_manager_client_t *manager = G_DBUS_OBJECT_MANAGER_CLIENT (object);
 
@@ -218,12 +218,12 @@ g_dbus_object_manager_client_finalize (xobject_t *object)
   xhash_table_unref (manager->priv->map_object_path_to_object_proxy);
 
   if (manager->priv->control_proxy != NULL && manager->priv->signal_signal_id != 0)
-    g_signal_handler_disconnect (manager->priv->control_proxy,
+    xsignal_handler_disconnect (manager->priv->control_proxy,
                                  manager->priv->signal_signal_id);
   manager->priv->signal_signal_id = 0;
 
   if (manager->priv->control_proxy != NULL && manager->priv->name_owner_signal_id != 0)
-    g_signal_handler_disconnect (manager->priv->control_proxy,
+    xsignal_handler_disconnect (manager->priv->control_proxy,
                                  manager->priv->name_owner_signal_id);
   manager->priv->name_owner_signal_id = 0;
 
@@ -240,12 +240,12 @@ g_dbus_object_manager_client_finalize (xobject_t *object)
 
   g_mutex_clear (&manager->priv->lock);
 
-  if (G_OBJECT_CLASS (g_dbus_object_manager_client_parent_class)->finalize != NULL)
-    G_OBJECT_CLASS (g_dbus_object_manager_client_parent_class)->finalize (object);
+  if (G_OBJECT_CLASS (xdbus_object_manager_client_parent_class)->finalize != NULL)
+    G_OBJECT_CLASS (xdbus_object_manager_client_parent_class)->finalize (object);
 }
 
 static void
-g_dbus_object_manager_client_get_property (xobject_t    *_object,
+xdbus_object_manager_client_get_property (xobject_t    *_object,
                                            xuint_t       prop_id,
                                            xvalue_t     *value,
                                            xparam_spec_t *pspec)
@@ -255,7 +255,7 @@ g_dbus_object_manager_client_get_property (xobject_t    *_object,
   switch (prop_id)
     {
     case PROP_CONNECTION:
-      xvalue_set_object (value, g_dbus_object_manager_client_get_connection (manager));
+      xvalue_set_object (value, xdbus_object_manager_client_get_connection (manager));
       break;
 
     case PROP_OBJECT_PATH:
@@ -263,15 +263,15 @@ g_dbus_object_manager_client_get_property (xobject_t    *_object,
       break;
 
     case PROP_NAME:
-      xvalue_set_string (value, g_dbus_object_manager_client_get_name (manager));
+      xvalue_set_string (value, xdbus_object_manager_client_get_name (manager));
       break;
 
     case PROP_FLAGS:
-      xvalue_set_flags (value, g_dbus_object_manager_client_get_flags (manager));
+      xvalue_set_flags (value, xdbus_object_manager_client_get_flags (manager));
       break;
 
     case PROP_NAME_OWNER:
-      xvalue_take_string (value, g_dbus_object_manager_client_get_name_owner (manager));
+      xvalue_take_string (value, xdbus_object_manager_client_get_name_owner (manager));
       break;
 
     default:
@@ -281,7 +281,7 @@ g_dbus_object_manager_client_get_property (xobject_t    *_object,
 }
 
 static void
-g_dbus_object_manager_client_set_property (xobject_t       *_object,
+xdbus_object_manager_client_set_property (xobject_t       *_object,
                                            xuint_t          prop_id,
                                            const xvalue_t  *value,
                                            xparam_spec_t    *pspec)
@@ -340,14 +340,14 @@ g_dbus_object_manager_client_set_property (xobject_t       *_object,
 }
 
 static void
-g_dbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
+xdbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->dispose      = g_dbus_object_manager_client_dispose;
-  gobject_class->finalize     = g_dbus_object_manager_client_finalize;
-  gobject_class->set_property = g_dbus_object_manager_client_set_property;
-  gobject_class->get_property = g_dbus_object_manager_client_get_property;
+  gobject_class->dispose      = xdbus_object_manager_client_dispose;
+  gobject_class->finalize     = xdbus_object_manager_client_finalize;
+  gobject_class->set_property = xdbus_object_manager_client_set_property;
+  gobject_class->get_property = xdbus_object_manager_client_get_property;
 
   /**
    * xdbus_object_manager_client_t:connection:
@@ -538,7 +538,7 @@ g_dbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
    * Since: 2.30
    */
   signals[INTERFACE_PROXY_SIGNAL_SIGNAL] =
-    g_signal_new (I_("interface-proxy-signal"),
+    xsignal_new (I_("interface-proxy-signal"),
                   XTYPE_DBUS_OBJECT_MANAGER_CLIENT,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GDBusObjectManagerClientClass, interface_proxy_signal),
@@ -552,7 +552,7 @@ g_dbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
                   XTYPE_STRING,
                   XTYPE_STRING,
                   XTYPE_VARIANT);
-  g_signal_set_va_marshaller (signals[INTERFACE_PROXY_SIGNAL_SIGNAL],
+  xsignal_set_va_marshaller (signals[INTERFACE_PROXY_SIGNAL_SIGNAL],
                               XTYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_VOID__OBJECT_OBJECT_STRING_STRING_VARIANTv);
 
@@ -580,7 +580,7 @@ g_dbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
    * Since: 2.30
    */
   signals[INTERFACE_PROXY_PROPERTIES_CHANGED_SIGNAL] =
-    g_signal_new (I_("interface-proxy-properties-changed"),
+    xsignal_new (I_("interface-proxy-properties-changed"),
                   XTYPE_DBUS_OBJECT_MANAGER_CLIENT,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GDBusObjectManagerClientClass, interface_proxy_properties_changed),
@@ -593,27 +593,27 @@ g_dbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
                   XTYPE_DBUS_PROXY,
                   XTYPE_VARIANT,
                   XTYPE_STRV);
-  g_signal_set_va_marshaller (signals[INTERFACE_PROXY_PROPERTIES_CHANGED_SIGNAL],
+  xsignal_set_va_marshaller (signals[INTERFACE_PROXY_PROPERTIES_CHANGED_SIGNAL],
                               XTYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_VOID__OBJECT_OBJECT_VARIANT_BOXEDv);
 }
 
 static void
-g_dbus_object_manager_client_init (xdbus_object_manager_client_t *manager)
+xdbus_object_manager_client_init (xdbus_object_manager_client_t *manager)
 {
-  manager->priv = g_dbus_object_manager_client_get_instance_private (manager);
+  manager->priv = xdbus_object_manager_client_get_instance_private (manager);
   g_mutex_init (&manager->priv->lock);
   manager->priv->map_object_path_to_object_proxy = xhash_table_new_full (xstr_hash,
                                                                           xstr_equal,
                                                                           g_free,
                                                                           (xdestroy_notify_t) xobject_unref);
-  manager->priv->cancel = g_cancellable_new ();
+  manager->priv->cancel = xcancellable_new ();
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_object_manager_client_new_sync:
+ * xdbus_object_manager_client_new_sync:
  * @connection: A #xdbus_connection_t.
  * @flags: Zero or more flags from the #GDBusObjectManagerClientFlags enumeration.
  * @name: (nullable): The owner of the control object (unique or well-known name), or %NULL when not using a message bus connection.
@@ -627,7 +627,7 @@ g_dbus_object_manager_client_init (xdbus_object_manager_client_t *manager)
  * Creates a new #xdbus_object_manager_client_t object.
  *
  * This is a synchronous failable constructor - the calling thread is
- * blocked until a reply is received. See g_dbus_object_manager_client_new()
+ * blocked until a reply is received. See xdbus_object_manager_client_new()
  * for the asynchronous version.
  *
  * Returns: (transfer full) (type xdbus_object_manager_client_t): A
@@ -637,7 +637,7 @@ g_dbus_object_manager_client_init (xdbus_object_manager_client_t *manager)
  * Since: 2.30
  */
 xdbus_object_manager_t *
-g_dbus_object_manager_client_new_sync (xdbus_connection_t               *connection,
+xdbus_object_manager_client_new_sync (xdbus_connection_t               *connection,
                                        GDBusObjectManagerClientFlags  flags,
                                        const xchar_t                   *name,
                                        const xchar_t                   *object_path,
@@ -650,7 +650,7 @@ g_dbus_object_manager_client_new_sync (xdbus_connection_t               *connect
   xinitable_t *initable;
 
   g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
-  g_return_val_if_fail ((name == NULL && g_dbus_connection_get_unique_name (connection) == NULL) ||
+  g_return_val_if_fail ((name == NULL && xdbus_connection_get_unique_name (connection) == NULL) ||
                         g_dbus_is_name (name), NULL);
   g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
@@ -673,7 +673,7 @@ g_dbus_object_manager_client_new_sync (xdbus_connection_t               *connect
 }
 
 /**
- * g_dbus_object_manager_client_new:
+ * xdbus_object_manager_client_new:
  * @connection: A #xdbus_connection_t.
  * @flags: Zero or more flags from the #GDBusObjectManagerClientFlags enumeration.
  * @name: The owner of the control object (unique or well-known name).
@@ -691,13 +691,13 @@ g_dbus_object_manager_client_new_sync (xdbus_connection_t               *connect
  * ready, @callback will be invoked in the
  * [thread-default main context][g-main-context-push-thread-default]
  * of the thread you are calling this method from. You can
- * then call g_dbus_object_manager_client_new_finish() to get the result. See
- * g_dbus_object_manager_client_new_sync() for the synchronous version.
+ * then call xdbus_object_manager_client_new_finish() to get the result. See
+ * xdbus_object_manager_client_new_sync() for the synchronous version.
  *
  * Since: 2.30
  */
 void
-g_dbus_object_manager_client_new (xdbus_connection_t               *connection,
+xdbus_object_manager_client_new (xdbus_connection_t               *connection,
                                   GDBusObjectManagerClientFlags  flags,
                                   const xchar_t                   *name,
                                   const xchar_t                   *object_path,
@@ -709,7 +709,7 @@ g_dbus_object_manager_client_new (xdbus_connection_t               *connection,
                                   xpointer_t                       user_data)
 {
   g_return_if_fail (X_IS_DBUS_CONNECTION (connection));
-  g_return_if_fail ((name == NULL && g_dbus_connection_get_unique_name (connection) == NULL) ||
+  g_return_if_fail ((name == NULL && xdbus_connection_get_unique_name (connection) == NULL) ||
                         g_dbus_is_name (name));
   g_return_if_fail (xvariant_is_object_path (object_path));
 
@@ -729,11 +729,11 @@ g_dbus_object_manager_client_new (xdbus_connection_t               *connection,
 }
 
 /**
- * g_dbus_object_manager_client_new_finish:
- * @res: A #xasync_result_t obtained from the #xasync_ready_callback_t passed to g_dbus_object_manager_client_new().
+ * xdbus_object_manager_client_new_finish:
+ * @res: A #xasync_result_t obtained from the #xasync_ready_callback_t passed to xdbus_object_manager_client_new().
  * @error: Return location for error or %NULL.
  *
- * Finishes an operation started with g_dbus_object_manager_client_new().
+ * Finishes an operation started with xdbus_object_manager_client_new().
  *
  * Returns: (transfer full) (type xdbus_object_manager_client_t): A
  *   #xdbus_object_manager_client_t object or %NULL if @error is set. Free
@@ -742,7 +742,7 @@ g_dbus_object_manager_client_new (xdbus_connection_t               *connection,
  * Since: 2.30
  */
 xdbus_object_manager_t *
-g_dbus_object_manager_client_new_finish (xasync_result_t   *res,
+xdbus_object_manager_client_new_finish (xasync_result_t   *res,
                                          xerror_t        **error)
 {
   xobject_t *object;
@@ -765,8 +765,8 @@ g_dbus_object_manager_client_new_finish (xasync_result_t   *res,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_object_manager_client_new_for_bus_sync:
- * @bus_type: A #GBusType.
+ * xdbus_object_manager_client_new_for_bus_sync:
+ * @bus_type: A #xbus_type_t.
  * @flags: Zero or more flags from the #GDBusObjectManagerClientFlags enumeration.
  * @name: The owner of the control object (unique or well-known name).
  * @object_path: The object path of the control object.
@@ -776,11 +776,11 @@ g_dbus_object_manager_client_new_finish (xasync_result_t   *res,
  * @cancellable: (nullable): A #xcancellable_t or %NULL
  * @error: Return location for error or %NULL.
  *
- * Like g_dbus_object_manager_client_new_sync() but takes a #GBusType instead
+ * Like xdbus_object_manager_client_new_sync() but takes a #xbus_type_t instead
  * of a #xdbus_connection_t.
  *
  * This is a synchronous failable constructor - the calling thread is
- * blocked until a reply is received. See g_dbus_object_manager_client_new_for_bus()
+ * blocked until a reply is received. See xdbus_object_manager_client_new_for_bus()
  * for the asynchronous version.
  *
  * Returns: (transfer full) (type xdbus_object_manager_client_t): A
@@ -790,7 +790,7 @@ g_dbus_object_manager_client_new_finish (xasync_result_t   *res,
  * Since: 2.30
  */
 xdbus_object_manager_t *
-g_dbus_object_manager_client_new_for_bus_sync (GBusType                       bus_type,
+xdbus_object_manager_client_new_for_bus_sync (xbus_type_t                       bus_type,
                                                GDBusObjectManagerClientFlags  flags,
                                                const xchar_t                   *name,
                                                const xchar_t                   *object_path,
@@ -825,8 +825,8 @@ g_dbus_object_manager_client_new_for_bus_sync (GBusType                       bu
 }
 
 /**
- * g_dbus_object_manager_client_new_for_bus:
- * @bus_type: A #GBusType.
+ * xdbus_object_manager_client_new_for_bus:
+ * @bus_type: A #xbus_type_t.
  * @flags: Zero or more flags from the #GDBusObjectManagerClientFlags enumeration.
  * @name: The owner of the control object (unique or well-known name).
  * @object_path: The object path of the control object.
@@ -837,20 +837,20 @@ g_dbus_object_manager_client_new_for_bus_sync (GBusType                       bu
  * @callback: A #xasync_ready_callback_t to call when the request is satisfied.
  * @user_data: The data to pass to @callback.
  *
- * Like g_dbus_object_manager_client_new() but takes a #GBusType instead of a
+ * Like xdbus_object_manager_client_new() but takes a #xbus_type_t instead of a
  * #xdbus_connection_t.
  *
  * This is an asynchronous failable constructor. When the result is
  * ready, @callback will be invoked in the
  * [thread-default main loop][g-main-context-push-thread-default]
  * of the thread you are calling this method from. You can
- * then call g_dbus_object_manager_client_new_for_bus_finish() to get the result. See
- * g_dbus_object_manager_client_new_for_bus_sync() for the synchronous version.
+ * then call xdbus_object_manager_client_new_for_bus_finish() to get the result. See
+ * xdbus_object_manager_client_new_for_bus_sync() for the synchronous version.
  *
  * Since: 2.30
  */
 void
-g_dbus_object_manager_client_new_for_bus (GBusType                       bus_type,
+xdbus_object_manager_client_new_for_bus (xbus_type_t                       bus_type,
                                           GDBusObjectManagerClientFlags  flags,
                                           const xchar_t                   *name,
                                           const xchar_t                   *object_path,
@@ -881,11 +881,11 @@ g_dbus_object_manager_client_new_for_bus (GBusType                       bus_typ
 }
 
 /**
- * g_dbus_object_manager_client_new_for_bus_finish:
- * @res: A #xasync_result_t obtained from the #xasync_ready_callback_t passed to g_dbus_object_manager_client_new_for_bus().
+ * xdbus_object_manager_client_new_for_bus_finish:
+ * @res: A #xasync_result_t obtained from the #xasync_ready_callback_t passed to xdbus_object_manager_client_new_for_bus().
  * @error: Return location for error or %NULL.
  *
- * Finishes an operation started with g_dbus_object_manager_client_new_for_bus().
+ * Finishes an operation started with xdbus_object_manager_client_new_for_bus().
  *
  * Returns: (transfer full) (type xdbus_object_manager_client_t): A
  *   #xdbus_object_manager_client_t object or %NULL if @error is set. Free
@@ -894,7 +894,7 @@ g_dbus_object_manager_client_new_for_bus (GBusType                       bus_typ
  * Since: 2.30
  */
 xdbus_object_manager_t *
-g_dbus_object_manager_client_new_for_bus_finish (xasync_result_t   *res,
+xdbus_object_manager_client_new_for_bus_finish (xasync_result_t   *res,
                                                  xerror_t        **error)
 {
   xobject_t *object;
@@ -917,7 +917,7 @@ g_dbus_object_manager_client_new_for_bus_finish (xasync_result_t   *res,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_object_manager_client_get_connection:
+ * xdbus_object_manager_client_get_connection:
  * @manager: A #xdbus_object_manager_client_t
  *
  * Gets the #xdbus_connection_t used by @manager.
@@ -928,7 +928,7 @@ g_dbus_object_manager_client_new_for_bus_finish (xasync_result_t   *res,
  * Since: 2.30
  */
 xdbus_connection_t *
-g_dbus_object_manager_client_get_connection (xdbus_object_manager_client_t *manager)
+xdbus_object_manager_client_get_connection (xdbus_object_manager_client_t *manager)
 {
   xdbus_connection_t *ret;
   g_return_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_CLIENT (manager), NULL);
@@ -939,7 +939,7 @@ g_dbus_object_manager_client_get_connection (xdbus_object_manager_client_t *mana
 }
 
 /**
- * g_dbus_object_manager_client_get_name:
+ * xdbus_object_manager_client_get_name:
  * @manager: A #xdbus_object_manager_client_t
  *
  * Gets the name that @manager is for, or %NULL if not a message bus
@@ -951,7 +951,7 @@ g_dbus_object_manager_client_get_connection (xdbus_object_manager_client_t *mana
  * Since: 2.30
  */
 const xchar_t *
-g_dbus_object_manager_client_get_name (xdbus_object_manager_client_t *manager)
+xdbus_object_manager_client_get_name (xdbus_object_manager_client_t *manager)
 {
   const xchar_t *ret;
   g_return_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_CLIENT (manager), NULL);
@@ -962,7 +962,7 @@ g_dbus_object_manager_client_get_name (xdbus_object_manager_client_t *manager)
 }
 
 /**
- * g_dbus_object_manager_client_get_flags:
+ * xdbus_object_manager_client_get_flags:
  * @manager: A #xdbus_object_manager_client_t
  *
  * Gets the flags that @manager was constructed with.
@@ -973,7 +973,7 @@ g_dbus_object_manager_client_get_name (xdbus_object_manager_client_t *manager)
  * Since: 2.30
  */
 GDBusObjectManagerClientFlags
-g_dbus_object_manager_client_get_flags (xdbus_object_manager_client_t *manager)
+xdbus_object_manager_client_get_flags (xdbus_object_manager_client_t *manager)
 {
   GDBusObjectManagerClientFlags ret;
   g_return_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_CLIENT (manager), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE);
@@ -984,7 +984,7 @@ g_dbus_object_manager_client_get_flags (xdbus_object_manager_client_t *manager)
 }
 
 /**
- * g_dbus_object_manager_client_get_name_owner:
+ * xdbus_object_manager_client_get_name_owner:
  * @manager: A #xdbus_object_manager_client_t.
  *
  * The unique name that owns the name that @manager is for or %NULL if
@@ -998,7 +998,7 @@ g_dbus_object_manager_client_get_flags (xdbus_object_manager_client_t *manager)
  * Since: 2.30
  */
 xchar_t *
-g_dbus_object_manager_client_get_name_owner (xdbus_object_manager_client_t *manager)
+xdbus_object_manager_client_get_name_owner (xdbus_object_manager_client_t *manager)
 {
   xchar_t *ret;
   g_return_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_CLIENT (manager), NULL);
@@ -1068,7 +1068,7 @@ signal_cb (xdbus_connection_t *connection,
                                           &property_name,
                                           &property_value))
                 {
-                  g_dbus_proxy_set_cached_property (G_DBUS_PROXY (interface),
+                  xdbus_proxy_set_cached_property (G_DBUS_PROXY (interface),
                                                     property_name,
                                                     property_value);
                   xvariant_unref (property_value);
@@ -1076,16 +1076,16 @@ signal_cb (xdbus_connection_t *connection,
 
               for (n = 0; invalidated_properties[n] != NULL; n++)
                 {
-                  g_dbus_proxy_set_cached_property (G_DBUS_PROXY (interface),
+                  xdbus_proxy_set_cached_property (G_DBUS_PROXY (interface),
                                                     invalidated_properties[n],
                                                     NULL);
                 }
               /* ... and then synthesize the signal */
-              g_signal_emit_by_name (interface,
+              xsignal_emit_by_name (interface,
                                      "g-properties-changed",
                                      changed_properties,
                                      invalidated_properties);
-              g_signal_emit (manager,
+              xsignal_emit (manager,
                              signals[INTERFACE_PROXY_PROPERTIES_CHANGED_SIGNAL],
                              0,
                              object_proxy,
@@ -1104,12 +1104,12 @@ signal_cb (xdbus_connection_t *connection,
       interface = g_dbus_object_get_interface (G_DBUS_OBJECT (object_proxy), interface_name);
       if (interface != NULL)
         {
-          g_signal_emit_by_name (interface,
+          xsignal_emit_by_name (interface,
                                  "g-signal",
                                  sender_name,
                                  signal_name,
                                  parameters);
-          g_signal_emit (manager,
+          xsignal_emit (manager,
                          signals[INTERFACE_PROXY_SIGNAL_SIGNAL],
                          0,
                          object_proxy,
@@ -1157,7 +1157,7 @@ subscribe_signals (xdbus_object_manager_client_t *manager,
 
       /* The bus daemon may not implement path_namespace so gracefully
        * handle this by using a fallback triggered if @error is set. */
-      ret = g_dbus_connection_call_sync (manager->priv->connection,
+      ret = xdbus_connection_call_sync (manager->priv->connection,
                                          "org.freedesktop.DBus",
                                          "/org/freedesktop/DBus",
                                          "org.freedesktop.DBus",
@@ -1179,7 +1179,7 @@ subscribe_signals (xdbus_object_manager_client_t *manager,
     {
       /* still need to ask xdbus_connection_t for the callbacks */
       manager->priv->signal_subscription_id =
-        g_dbus_connection_signal_subscribe (manager->priv->connection,
+        xdbus_connection_signal_subscribe (manager->priv->connection,
                                             name_owner,
                                             NULL, /* interface */
                                             NULL, /* member */
@@ -1212,7 +1212,7 @@ subscribe_signals (xdbus_object_manager_client_t *manager,
        * users typically want all objects that the name owner supplies.
        */
       manager->priv->signal_subscription_id =
-        g_dbus_connection_signal_subscribe (manager->priv->connection,
+        xdbus_connection_signal_subscribe (manager->priv->connection,
                                             name_owner,
                                             NULL, /* interface */
                                             NULL, /* member */
@@ -1232,7 +1232,7 @@ maybe_unsubscribe_signals (xdbus_object_manager_client_t *manager)
 
   if (manager->priv->signal_subscription_id > 0)
     {
-      g_dbus_connection_signal_unsubscribe (manager->priv->connection,
+      xdbus_connection_signal_unsubscribe (manager->priv->connection,
                                             manager->priv->signal_subscription_id);
       manager->priv->signal_subscription_id = 0;
     }
@@ -1242,7 +1242,7 @@ maybe_unsubscribe_signals (xdbus_object_manager_client_t *manager)
       /* Since the AddMatch call succeeded this is guaranteed to not
        * fail - therefore, don't bother checking the return value
        */
-      g_dbus_connection_call (manager->priv->connection,
+      xdbus_connection_call (manager->priv->connection,
                               "org.freedesktop.DBus",
                               "/org/freedesktop/DBus",
                               "org.freedesktop.DBus",
@@ -1291,7 +1291,7 @@ on_get_managed_objects_finish (xobject_t      *source,
   xvariant_t *value = NULL;
   xchar_t *new_name_owner = NULL;
 
-  value = g_dbus_proxy_call_finish (proxy, result, &error);
+  value = xdbus_proxy_call_finish (proxy, result, &error);
 
   manager = G_DBUS_OBJECT_MANAGER_CLIENT (g_weak_ref_get (manager_weak));
   /* Manager got disposed, nothing to do */
@@ -1300,7 +1300,7 @@ on_get_managed_objects_finish (xobject_t      *source,
       goto out;
     }
 
-  new_name_owner = g_dbus_proxy_get_name_owner (manager->priv->control_proxy);
+  new_name_owner = xdbus_proxy_get_name_owner (manager->priv->control_proxy);
   if (value == NULL)
     {
       maybe_unsubscribe_signals (manager);
@@ -1348,7 +1348,7 @@ on_notify_g_name_owner (xobject_t    *object,
 
   g_mutex_lock (&manager->priv->lock);
   old_name_owner = manager->priv->name_owner;
-  new_name_owner = g_dbus_proxy_get_name_owner (manager->priv->control_proxy);
+  new_name_owner = xdbus_proxy_get_name_owner (manager->priv->control_proxy);
   manager->priv->name_owner = NULL;
 
   if (xstrcmp0 (old_name_owner, new_name_owner) != 0)
@@ -1372,7 +1372,7 @@ on_notify_g_name_owner (xobject_t    *object,
       for (l = proxies; l != NULL; l = l->next)
         {
           xdbus_object_proxy_t *object_proxy = G_DBUS_OBJECT_PROXY (l->data);
-          g_signal_emit_by_name (manager, "object-removed", object_proxy);
+          xsignal_emit_by_name (manager, "object-removed", object_proxy);
         }
       xlist_free_full (proxies, xobject_unref);
 
@@ -1390,7 +1390,7 @@ on_notify_g_name_owner (xobject_t    *object,
 
       subscribe_signals (manager,
                          new_name_owner);
-      g_dbus_proxy_call (manager->priv->control_proxy,
+      xdbus_proxy_call (manager->priv->control_proxy,
                          "GetManagedObjects",
                          NULL, /* parameters */
                          G_DBUS_CALL_FLAGS_NONE,
@@ -1412,7 +1412,7 @@ initable_init (xinitable_t     *initable,
   xdbus_object_manager_client_t *manager = G_DBUS_OBJECT_MANAGER_CLIENT (initable);
   xboolean_t ret;
   xvariant_t *value;
-  GDBusProxyFlags proxy_flags;
+  xdbus_proxy_flags_t proxy_flags;
 
   ret = FALSE;
 
@@ -1428,7 +1428,7 @@ initable_init (xinitable_t     *initable,
   if (manager->priv->flags & G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_DO_NOT_AUTO_START)
     proxy_flags |= G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START;
 
-  manager->priv->control_proxy = g_dbus_proxy_new_sync (manager->priv->connection,
+  manager->priv->control_proxy = xdbus_proxy_new_sync (manager->priv->connection,
                                                         proxy_flags,
                                                         NULL, /* xdbus_interface_info_t* */
                                                         manager->priv->name,
@@ -1445,11 +1445,11 @@ initable_init (xinitable_t     *initable,
    * another thread between a signal being emitted and scheduled in an idle
    * callback in this #xmain_context_t, and that idle callback being invoked. We
    * can’t use a strong reference here, as there’s no
-   * g_dbus_object_manager_client_disconnect() (or similar) method to tell us
+   * xdbus_object_manager_client_disconnect() (or similar) method to tell us
    * when the last external reference to this object has been dropped, so we
    * can’t break a strong reference count cycle. So use weak refs. */
   manager->priv->name_owner_signal_id =
-      g_signal_connect_data (G_OBJECT (manager->priv->control_proxy),
+      xsignal_connect_data (G_OBJECT (manager->priv->control_proxy),
                             "notify::g-name-owner",
                             G_CALLBACK (on_notify_g_name_owner),
                             weak_ref_new (G_OBJECT (manager)),
@@ -1457,14 +1457,14 @@ initable_init (xinitable_t     *initable,
                             0  /* flags */);
 
   manager->priv->signal_signal_id =
-      g_signal_connect_data (manager->priv->control_proxy,
+      xsignal_connect_data (manager->priv->control_proxy,
                             "g-signal",
                             G_CALLBACK (on_control_proxy_g_signal),
                             weak_ref_new (G_OBJECT (manager)),
                             (xclosure_notify_t) weak_ref_free,
                             0  /* flags */);
 
-  manager->priv->name_owner = g_dbus_proxy_get_name_owner (manager->priv->control_proxy);
+  manager->priv->name_owner = xdbus_proxy_get_name_owner (manager->priv->control_proxy);
   if (manager->priv->name_owner == NULL && manager->priv->name != NULL)
     {
       /* it's perfectly fine if there's no name owner.. we're just going to
@@ -1476,7 +1476,7 @@ initable_init (xinitable_t     *initable,
       /* yay, we can get the objects */
       subscribe_signals (manager,
                          manager->priv->name_owner);
-      value = g_dbus_proxy_call_sync (manager->priv->control_proxy,
+      value = xdbus_proxy_call_sync (manager->priv->control_proxy,
                                       "GetManagedObjects",
                                       NULL, /* parameters */
                                       G_DBUS_CALL_FLAGS_NONE,
@@ -1488,12 +1488,12 @@ initable_init (xinitable_t     *initable,
           maybe_unsubscribe_signals (manager);
 
           g_warn_if_fail (manager->priv->signal_signal_id != 0);
-          g_signal_handler_disconnect (manager->priv->control_proxy,
+          xsignal_handler_disconnect (manager->priv->control_proxy,
                                        manager->priv->signal_signal_id);
           manager->priv->signal_signal_id = 0;
 
           g_warn_if_fail (manager->priv->name_owner_signal_id != 0);
-          g_signal_handler_disconnect (manager->priv->control_proxy,
+          xsignal_handler_disconnect (manager->priv->control_proxy,
                                        manager->priv->name_owner_signal_id);
           manager->priv->name_owner_signal_id = 0;
 
@@ -1633,13 +1633,13 @@ add_interfaces (xdbus_object_manager_client_t *manager,
                                       &property_name,
                                       &property_value))
             {
-              g_dbus_proxy_set_cached_property (interface_proxy,
+              xdbus_proxy_set_cached_property (interface_proxy,
                                                 property_name,
                                                 property_value);
               xvariant_unref (property_value);
             }
 
-          _g_dbus_object_proxy_add_interface (op, interface_proxy);
+          _xdbus_object_proxy_add_interface (op, interface_proxy);
           if (!added)
             interface_added_signals = xlist_append (interface_added_signals, xobject_ref (interface_proxy));
           xobject_unref (interface_proxy);
@@ -1661,13 +1661,13 @@ add_interfaces (xdbus_object_manager_client_t *manager,
   for (l = interface_added_signals; l != NULL; l = l->next)
     {
       interface_proxy = G_DBUS_PROXY (l->data);
-      g_signal_emit_by_name (manager, "interface-added", op, interface_proxy);
+      xsignal_emit_by_name (manager, "interface-added", op, interface_proxy);
       xobject_unref (interface_proxy);
     }
   xlist_free (interface_added_signals);
 
   if (added)
-    g_signal_emit_by_name (manager, "object-added", op);
+    xsignal_emit_by_name (manager, "object-added", op);
 
   xobject_unref (manager);
   xobject_unref (op);
@@ -1709,7 +1709,7 @@ remove_interfaces (xdbus_object_manager_client_t   *manager,
       xobject_ref (op);
       g_warn_if_fail (xhash_table_remove (manager->priv->map_object_path_to_object_proxy, object_path));
       g_mutex_unlock (&manager->priv->lock);
-      g_signal_emit_by_name (manager, "object-removed", op);
+      xsignal_emit_by_name (manager, "object-removed", op);
       xobject_unref (op);
     }
   else
@@ -1720,10 +1720,10 @@ remove_interfaces (xdbus_object_manager_client_t   *manager,
         {
           xdbus_interface_t *interface;
           interface = g_dbus_object_get_interface (G_DBUS_OBJECT (op), interface_names[n]);
-          _g_dbus_object_proxy_remove_interface (op, interface_names[n]);
+          _xdbus_object_proxy_remove_interface (op, interface_names[n]);
           if (interface != NULL)
             {
-              g_signal_emit_by_name (manager, "interface-removed", op, interface);
+              xsignal_emit_by_name (manager, "interface-removed", op, interface);
               xobject_unref (interface);
             }
         }
@@ -1801,14 +1801,14 @@ on_control_proxy_g_signal (xdbus_proxy_t   *proxy,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static const xchar_t *
-g_dbus_object_manager_client_get_object_path (xdbus_object_manager_t *_manager)
+xdbus_object_manager_client_get_object_path (xdbus_object_manager_t *_manager)
 {
   xdbus_object_manager_client_t *manager = G_DBUS_OBJECT_MANAGER_CLIENT (_manager);
   return manager->priv->object_path;
 }
 
 static xdbus_object_t *
-g_dbus_object_manager_client_get_object (xdbus_object_manager_t *_manager,
+xdbus_object_manager_client_get_object (xdbus_object_manager_t *_manager,
                                          const xchar_t        *object_path)
 {
   xdbus_object_manager_client_t *manager = G_DBUS_OBJECT_MANAGER_CLIENT (_manager);
@@ -1823,7 +1823,7 @@ g_dbus_object_manager_client_get_object (xdbus_object_manager_t *_manager,
 }
 
 static xdbus_interface_t *
-g_dbus_object_manager_client_get_interface  (xdbus_object_manager_t  *_manager,
+xdbus_object_manager_client_get_interface  (xdbus_object_manager_t  *_manager,
                                              const xchar_t         *object_path,
                                              const xchar_t         *interface_name)
 {
@@ -1844,7 +1844,7 @@ g_dbus_object_manager_client_get_interface  (xdbus_object_manager_t  *_manager,
 }
 
 static xlist_t *
-g_dbus_object_manager_client_get_objects (xdbus_object_manager_t *_manager)
+xdbus_object_manager_client_get_objects (xdbus_object_manager_t *_manager)
 {
   xdbus_object_manager_client_t *manager = G_DBUS_OBJECT_MANAGER_CLIENT (_manager);
   xlist_t *ret;
@@ -1861,12 +1861,12 @@ g_dbus_object_manager_client_get_objects (xdbus_object_manager_t *_manager)
 
 
 static void
-dbus_object_manager_interface_init (GDBusObjectManagerIface *iface)
+dbus_object_manager_interface_init (xdbus_object_manager_iface_t *iface)
 {
-  iface->get_object_path = g_dbus_object_manager_client_get_object_path;
-  iface->get_objects     = g_dbus_object_manager_client_get_objects;
-  iface->get_object      = g_dbus_object_manager_client_get_object;
-  iface->get_interface   = g_dbus_object_manager_client_get_interface;
+  iface->get_object_path = xdbus_object_manager_client_get_object_path;
+  iface->get_objects     = xdbus_object_manager_client_get_objects;
+  iface->get_object      = xdbus_object_manager_client_get_object;
+  iface->get_interface   = xdbus_object_manager_client_get_interface;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */

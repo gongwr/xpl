@@ -286,7 +286,7 @@ msgid "Seek not supported on base stream"
 msgstr "Није подржавано премотавање основног тока"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
 msgstr "Не могу да скратим улазни ток у Гмеђумеморији"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
@@ -3355,7 +3355,7 @@ msgid "Error removing old file: %s"
 msgstr "Грешка приликом уклањања старе датотеке: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:762
-msgid "Invalid GSeekType supplied"
+msgid "Invalid xseek_type_t supplied"
 msgstr "Није исправно одређена врста ГПретраге"
 
 #: gio/gmemoryinputstream.c:484

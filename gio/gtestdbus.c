@@ -761,7 +761,7 @@ g_test_dbus_get_flags (xtest_dbus_t *self)
  *
  * Get the address on which dbus-daemon is running. If g_test_dbus_up() has not
  * been called yet, %NULL is returned. This can be used with
- * g_dbus_connection_new_for_address().
+ * xdbus_connection_new_for_address().
  *
  * Returns: (nullable): the address of the bus, or %NULL.
  */
@@ -859,7 +859,7 @@ g_test_dbus_down (xtest_dbus_t *self)
 
   connection = _g_bus_get_singleton_if_exists (G_BUS_TYPE_SESSION);
   if (connection != NULL)
-    g_dbus_connection_set_exit_on_close (connection, FALSE);
+    xdbus_connection_set_exit_on_close (connection, FALSE);
 
   if (self->priv->bus_address != NULL)
     stop_daemon (self);

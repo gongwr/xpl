@@ -104,7 +104,7 @@
  * recognizes standard ASCII letters and ignores the locale,
  * returning %FALSE for all non-ASCII characters. Also, unlike
  * the standard library function, this takes a char, not an int,
- * so don't call it on %EOF, but no need to cast to #guchar before
+ * so don't call it on %EOF, but no need to cast to #xuchar_t before
  * passing a possibly non-ASCII character in.
  *
  * Returns: %TRUE if @c is an ASCII alphanumeric character
@@ -120,7 +120,7 @@
  * recognizes standard ASCII letters and ignores the locale,
  * returning %FALSE for all non-ASCII characters. Also, unlike
  * the standard library function, this takes a char, not an int,
- * so don't call it on %EOF, but no need to cast to #guchar before
+ * so don't call it on %EOF, but no need to cast to #xuchar_t before
  * passing a possibly non-ASCII character in.
  *
  * Returns: %TRUE if @c is an ASCII alphabetic character
@@ -136,7 +136,7 @@
  * recognizes standard ASCII control characters and ignores the
  * locale, returning %FALSE for all non-ASCII characters. Also,
  * unlike the standard library function, this takes a char, not
- * an int, so don't call it on %EOF, but no need to cast to #guchar
+ * an int, so don't call it on %EOF, but no need to cast to #xuchar_t
  * before passing a possibly non-ASCII character in.
  *
  * Returns: %TRUE if @c is an ASCII control character.
@@ -150,7 +150,7 @@
  *
  * Unlike the standard C library isdigit() function, this takes
  * a char, not an int, so don't call it  on %EOF, but no need to
- * cast to #guchar before passing a possibly non-ASCII character in.
+ * cast to #xuchar_t before passing a possibly non-ASCII character in.
  *
  * Returns: %TRUE if @c is an ASCII digit.
  */
@@ -165,7 +165,7 @@
  * recognizes standard ASCII characters and ignores the locale,
  * returning %FALSE for all non-ASCII characters. Also, unlike
  * the standard library function, this takes a char, not an int,
- * so don't call it on %EOF, but no need to cast to #guchar before
+ * so don't call it on %EOF, but no need to cast to #xuchar_t before
  * passing a possibly non-ASCII character in.
  *
  * Returns: %TRUE if @c is an ASCII printing character other than space.
@@ -182,7 +182,7 @@
  * returning %FALSE for all non-ASCII characters. Also, unlike
  * the standard library function, this takes a char, not an int,
  * so don't call it on %EOF, but no need to worry about casting
- * to #guchar before passing a possibly non-ASCII character in.
+ * to #xuchar_t before passing a possibly non-ASCII character in.
  *
  * Returns: %TRUE if @c is an ASCII lower case letter
  */
@@ -197,7 +197,7 @@
  * recognizes standard ASCII characters and ignores the locale,
  * returning %FALSE for all non-ASCII characters. Also, unlike
  * the standard library function, this takes a char, not an int,
- * so don't call it on %EOF, but no need to cast to #guchar before
+ * so don't call it on %EOF, but no need to cast to #xuchar_t before
  * passing a possibly non-ASCII character in.
  *
  * Returns: %TRUE if @c is an ASCII printing character.
@@ -213,7 +213,7 @@
  * recognizes standard ASCII letters and ignores the locale,
  * returning %FALSE for all non-ASCII characters. Also, unlike
  * the standard library function, this takes a char, not an int,
- * so don't call it on %EOF, but no need to cast to #guchar before
+ * so don't call it on %EOF, but no need to cast to #xuchar_t before
  * passing a possibly non-ASCII character in.
  *
  * Returns: %TRUE if @c is an ASCII punctuation character.
@@ -229,7 +229,7 @@
  * recognizes standard ASCII white-space and ignores the locale,
  * returning %FALSE for all non-ASCII characters. Also, unlike
  * the standard library function, this takes a char, not an int,
- * so don't call it on %EOF, but no need to cast to #guchar before
+ * so don't call it on %EOF, but no need to cast to #xuchar_t before
  * passing a possibly non-ASCII character in.
  *
  * Returns: %TRUE if @c is an ASCII white-space character
@@ -246,7 +246,7 @@
  * returning %FALSE for all non-ASCII characters. Also, unlike
  * the standard library function, this takes a char, not an int,
  * so don't call it on %EOF, but no need to worry about casting
- * to #guchar before passing a possibly non-ASCII character in.
+ * to #xuchar_t before passing a possibly non-ASCII character in.
  *
  * Returns: %TRUE if @c is an ASCII upper case letter
  */
@@ -259,7 +259,7 @@
  *
  * Unlike the standard C library isxdigit() function, this takes
  * a char, not an int, so don't call it on %EOF, but no need to
- * cast to #guchar before passing a possibly non-ASCII character in.
+ * cast to #xuchar_t before passing a possibly non-ASCII character in.
  *
  * Returns: %TRUE if @c is an ASCII hexadecimal-digit character.
  */
@@ -482,7 +482,7 @@ xstrnfill (xsize_t length,
   xchar_t *str;
 
   str = g_new (xchar_t, length + 1);
-  memset (str, (guchar)fill_char, length);
+  memset (str, (xuchar_t)fill_char, length);
   str[length] = '\0';
 
   return str;
@@ -1019,7 +1019,7 @@ g_ascii_formatd (xchar_t       *buffer,
       if (*p == '+' || *p == '-')
         p++;
 
-      while (isdigit ((guchar)*p))
+      while (isdigit ((xuchar_t)*p))
         p++;
 
       if (strncmp (p, decimal_point, decimal_point_len) == 0)
@@ -1067,7 +1067,7 @@ g_parse_long_long (const xchar_t  *nptr,
   xuint64_t cutlim;
   xuint64_t ui64;
   const xchar_t *s, *save;
-  guchar c;
+  xuchar_t c;
 
   g_return_val_if_fail (nptr != NULL, 0);
 
@@ -1234,7 +1234,7 @@ g_ascii_strtoull (const xchar_t *nptr,
  *           character after the last character used in the conversion.
  * @base:    to be used for the conversion, 2..36 or 0
  *
- * Converts a string to a #gint64 value.
+ * Converts a string to a #sint64_t value.
  * This function behaves like the standard strtoll() function
  * does in the C locale. It does this without actually
  * changing the current locale, since that would not be
@@ -1252,11 +1252,11 @@ g_ascii_strtoull (const xchar_t *nptr,
  * string conversion fails, zero is returned, and @endptr returns @nptr
  * (if @endptr is non-%NULL).
  *
- * Returns: the #gint64 value or zero on error.
+ * Returns: the #sint64_t value or zero on error.
  *
  * Since: 2.12
  */
-gint64
+sint64_t
 g_ascii_strtoll (const xchar_t *nptr,
                  xchar_t      **endptr,
                  xuint_t        base)
@@ -1280,9 +1280,9 @@ g_ascii_strtoll (const xchar_t *nptr,
       return G_MAXINT64;
     }
   else if (negative)
-    return - (gint64) result;
+    return - (sint64_t) result;
   else
-    return (gint64) result;
+    return (sint64_t) result;
 #endif
 }
 
@@ -1652,11 +1652,11 @@ xstr_is_ascii (const xchar_t *str)
 xchar_t*
 xstrdown (xchar_t *string)
 {
-  guchar *s;
+  xuchar_t *s;
 
   g_return_val_if_fail (string != NULL, NULL);
 
-  s = (guchar *) string;
+  s = (xuchar_t *) string;
 
   while (*s)
     {
@@ -1683,11 +1683,11 @@ xstrdown (xchar_t *string)
 xchar_t*
 xstrup (xchar_t *string)
 {
-  guchar *s;
+  xuchar_t *s;
 
   g_return_val_if_fail (string != NULL, NULL);
 
-  s = (guchar *) string;
+  s = (xuchar_t *) string;
 
   while (*s)
     {
@@ -1750,7 +1750,7 @@ xstrreverse (xchar_t *string)
  * all non-ASCII characters unchanged, even if they are lower case
  * letters in a particular character set. Also unlike the standard
  * library function, this takes and returns a char, not an int, so
- * don't call it on %EOF but no need to worry about casting to #guchar
+ * don't call it on %EOF but no need to worry about casting to #xuchar_t
  * before passing a possibly non-ASCII character in.
  *
  * Returns: the result of converting @c to lower case. If @c is
@@ -1773,7 +1773,7 @@ g_ascii_tolower (xchar_t c)
  * all non-ASCII characters unchanged, even if they are upper case
  * letters in a particular character set. Also unlike the standard
  * library function, this takes and returns a char, not an int, so
- * don't call it on %EOF but no need to worry about casting to #guchar
+ * don't call it on %EOF but no need to worry about casting to #xuchar_t
  * before passing a possibly non-ASCII character in.
  *
  * Returns: the result of converting @c to upper case. If @c is not
@@ -1861,14 +1861,14 @@ g_ascii_strcasecmp (const xchar_t *s1,
 
   while (*s1 && *s2)
     {
-      c1 = (xint_t)(guchar) TOLOWER (*s1);
-      c2 = (xint_t)(guchar) TOLOWER (*s2);
+      c1 = (xint_t)(xuchar_t) TOLOWER (*s1);
+      c2 = (xint_t)(xuchar_t) TOLOWER (*s2);
       if (c1 != c2)
         return (c1 - c2);
       s1++; s2++;
     }
 
-  return (((xint_t)(guchar) *s1) - ((xint_t)(guchar) *s2));
+  return (((xint_t)(xuchar_t) *s1) - ((xint_t)(xuchar_t) *s2));
 }
 
 /**
@@ -1906,15 +1906,15 @@ g_ascii_strncasecmp (const xchar_t *s1,
   while (n && *s1 && *s2)
     {
       n -= 1;
-      c1 = (xint_t)(guchar) TOLOWER (*s1);
-      c2 = (xint_t)(guchar) TOLOWER (*s2);
+      c1 = (xint_t)(xuchar_t) TOLOWER (*s1);
+      c2 = (xint_t)(xuchar_t) TOLOWER (*s2);
       if (c1 != c2)
         return (c1 - c2);
       s1++; s2++;
     }
 
   if (n)
-    return (((xint_t) (guchar) *s1) - ((xint_t) (guchar) *s2));
+    return (((xint_t) (xuchar_t) *s1) - ((xint_t) (xuchar_t) *s2));
   else
     return 0;
 }
@@ -1953,14 +1953,14 @@ xstrcasecmp (const xchar_t *s1,
       /* According to A. Cox, some platforms have islower's that
        * don't work right on non-uppercase
        */
-      c1 = isupper ((guchar)*s1) ? tolower ((guchar)*s1) : *s1;
-      c2 = isupper ((guchar)*s2) ? tolower ((guchar)*s2) : *s2;
+      c1 = isupper ((xuchar_t)*s1) ? tolower ((xuchar_t)*s1) : *s1;
+      c2 = isupper ((xuchar_t)*s2) ? tolower ((xuchar_t)*s2) : *s2;
       if (c1 != c2)
         return (c1 - c2);
       s1++; s2++;
     }
 
-  return (((xint_t)(guchar) *s1) - ((xint_t)(guchar) *s2));
+  return (((xint_t)(xuchar_t) *s1) - ((xint_t)(xuchar_t) *s2));
 #endif
 }
 
@@ -2012,15 +2012,15 @@ xstrncasecmp (const xchar_t *s1,
       /* According to A. Cox, some platforms have islower's that
        * don't work right on non-uppercase
        */
-      c1 = isupper ((guchar)*s1) ? tolower ((guchar)*s1) : *s1;
-      c2 = isupper ((guchar)*s2) ? tolower ((guchar)*s2) : *s2;
+      c1 = isupper ((xuchar_t)*s1) ? tolower ((xuchar_t)*s1) : *s1;
+      c2 = isupper ((xuchar_t)*s2) ? tolower ((xuchar_t)*s2) : *s2;
       if (c1 != c2)
         return (c1 - c2);
       s1++; s2++;
     }
 
   if (n)
-    return (((xint_t) (guchar) *s1) - ((xint_t) (guchar) *s2));
+    return (((xint_t) (xuchar_t) *s1) - ((xint_t) (xuchar_t) *s2));
   else
     return 0;
 #endif
@@ -2220,21 +2220,21 @@ xchar_t *
 xstrescape (const xchar_t *source,
              const xchar_t *exceptions)
 {
-  const guchar *p;
+  const xuchar_t *p;
   xchar_t *dest;
   xchar_t *q;
-  guchar excmap[256];
+  xuchar_t excmap[256];
 
   g_return_val_if_fail (source != NULL, NULL);
 
-  p = (guchar *) source;
+  p = (xuchar_t *) source;
   /* Each source byte needs maximally four destination chars (\777) */
   q = dest = g_malloc (strlen (source) * 4 + 1);
 
   memset (excmap, 0, 256);
   if (exceptions)
     {
-      guchar *e = (guchar *) exceptions;
+      xuchar_t *e = (xuchar_t *) exceptions;
 
       while (*e)
         {
@@ -2322,11 +2322,11 @@ xstrescape (const xchar_t *source,
 xchar_t *
 xstrchug (xchar_t *string)
 {
-  guchar *start;
+  xuchar_t *start;
 
   g_return_val_if_fail (string != NULL, NULL);
 
-  for (start = (guchar*) string; *start && g_ascii_isspace (*start); start++)
+  for (start = (xuchar_t*) string; *start && g_ascii_isspace (*start); start++)
     ;
 
   memmove (string, start, strlen ((xchar_t *) start) + 1);
@@ -2360,7 +2360,7 @@ xstrchomp (xchar_t *string)
   len = strlen (string);
   while (len--)
     {
-      if (g_ascii_isspace ((guchar) string[len]))
+      if (g_ascii_isspace ((xuchar_t) string[len]))
         string[len] = '\0';
       else
         break;
@@ -2504,7 +2504,7 @@ xstrsplit_set (const xchar_t *string,
    * if that index is a separator. */
   memset (delim_table, FALSE, sizeof (delim_table));
   for (s = delimiters; *s != '\0'; ++s)
-    delim_table[*(guchar *)s] = TRUE;
+    delim_table[*(xuchar_t *)s] = TRUE;
 
   tokens = NULL;
   n_tokens = 0;
@@ -2512,7 +2512,7 @@ xstrsplit_set (const xchar_t *string,
   s = current = string;
   while (*s != '\0')
     {
-      if (delim_table[*(guchar *)s] && n_tokens + 1 < max_tokens)
+      if (delim_table[*(xuchar_t *)s] && n_tokens + 1 < max_tokens)
         {
           token = xstrndup (current, s - current);
           tokens = xslist_prepend (tokens, token);
@@ -3330,12 +3330,12 @@ str_has_hex_prefix (const xchar_t *str)
 xboolean_t
 g_ascii_string_to_signed (const xchar_t  *str,
                           xuint_t         base,
-                          gint64        min,
-                          gint64        max,
-                          gint64       *out_num,
+                          sint64_t        min,
+                          sint64_t        max,
+                          sint64_t       *out_num,
                           xerror_t      **error)
 {
-  gint64 number;
+  sint64_t number;
   const xchar_t *end_ptr = NULL;
   xint_t saved_errno = 0;
 

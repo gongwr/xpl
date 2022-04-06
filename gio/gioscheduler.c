@@ -45,7 +45,7 @@ struct _GIOSchedulerJob {
   xdestroy_notify_t destroy_notify;
 
   xcancellable_t *cancellable;
-  gulong cancellable_id;
+  xulong_t cancellable_id;
   xmain_context_t *context;
 };
 
@@ -78,7 +78,7 @@ io_job_thread (xtask_t         *task,
   xboolean_t result;
 
   if (job->cancellable)
-    g_cancellable_push_current (job->cancellable);
+    xcancellable_push_current (job->cancellable);
 
   do
     {
@@ -87,7 +87,7 @@ io_job_thread (xtask_t         *task,
   while (result);
 
   if (job->cancellable)
-    g_cancellable_pop_current (job->cancellable);
+    xcancellable_pop_current (job->cancellable);
 }
 
 /**
@@ -105,7 +105,7 @@ io_job_thread (xtask_t         *task,
  * regardless whether the job was cancelled or has run to completion.
  *
  * If @cancellable is not %NULL, it can be used to cancel the I/O job
- * by calling g_cancellable_cancel() or by calling
+ * by calling xcancellable_cancel() or by calling
  * g_io_scheduler_cancel_all_jobs().
  *
  * Deprecated: use #GThreadPool or xtask_run_in_thread()
@@ -178,7 +178,7 @@ g_io_scheduler_cancel_all_jobs (void)
   for (l = cancellable_list; l != NULL; l = l->next)
     {
       xcancellable_t *c = l->data;
-      g_cancellable_cancel (c);
+      xcancellable_cancel (c);
       xobject_unref (c);
     }
   xlist_free (cancellable_list);

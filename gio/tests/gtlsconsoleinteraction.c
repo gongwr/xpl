@@ -84,10 +84,10 @@ xtls_console_interaction_ask_password (xtls_interaction_t    *interaction,
   value = getpass (prompt);
   g_free (prompt);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return G_TLS_INTERACTION_FAILED;
 
-  xtls_password_set_value (password, (guchar *)value, -1);
+  xtls_password_set_value (password, (xuchar_t *)value, -1);
   return G_TLS_INTERACTION_HANDLED;
 }
 

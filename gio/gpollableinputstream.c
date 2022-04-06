@@ -47,7 +47,7 @@ static xssize_t   g_pollable_input_stream_default_read_nonblocking (xpollable_in
 								  xerror_t               **error);
 
 static void
-g_pollable_input_stream_default_init (GPollableInputStreamInterface *iface)
+g_pollable_input_stream_default_init (xpollable_input_stream_interface_t *iface)
 {
   iface->can_poll         = g_pollable_input_stream_default_can_poll;
   iface->read_nonblocking = g_pollable_input_stream_default_read_nonblocking;
@@ -193,7 +193,7 @@ g_pollable_input_stream_read_nonblocking (xpollable_input_stream_t  *stream,
   g_return_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (stream), -1);
   g_return_val_if_fail (buffer != NULL, 0);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return -1;
 
   if (count == 0)
@@ -207,13 +207,13 @@ g_pollable_input_stream_read_nonblocking (xpollable_input_stream_t  *stream,
     }
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   res = G_POLLABLE_INPUT_STREAM_GET_INTERFACE (stream)->
     read_nonblocking (stream, buffer, count, error);
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   return res;
 }

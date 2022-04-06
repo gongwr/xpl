@@ -82,8 +82,8 @@ static GIOStatus	g_io_unix_write		(xio_channel_t   *channel,
 						 xsize_t        *bytes_written,
 						 xerror_t      **err);
 static GIOStatus	g_io_unix_seek		(xio_channel_t   *channel,
-						 gint64        offset,
-						 GSeekType     type,
+						 sint64_t        offset,
+						 xseek_type_t     type,
 						 xerror_t      **err);
 static GIOStatus	g_io_unix_close		(xio_channel_t   *channel,
 						 xerror_t      **err);
@@ -263,8 +263,8 @@ g_io_unix_write (xio_channel_t  *channel,
 
 static GIOStatus
 g_io_unix_seek (xio_channel_t *channel,
-		gint64      offset,
-		GSeekType   type,
+		sint64_t      offset,
+		xseek_type_t   type,
                 xerror_t    **err)
 {
   GIOUnixChannel *unix_channel = (GIOUnixChannel *)channel;

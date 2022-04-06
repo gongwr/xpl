@@ -318,8 +318,8 @@ new_mount_op (void)
 
   xobject_set_data (G_OBJECT (op), "state", GINT_TO_POINTER (MOUNT_OP_NONE));
 
-  g_signal_connect (op, "ask_password", G_CALLBACK (ask_password_cb), NULL);
-  g_signal_connect (op, "ask_question", G_CALLBACK (ask_question_cb), NULL);
+  xsignal_connect (op, "ask_password", G_CALLBACK (ask_password_cb), NULL);
+  xsignal_connect (op, "ask_question", G_CALLBACK (ask_question_cb), NULL);
 
   /* TODO: we *should* also connect to the "aborted" signal but since the
    * main thread is blocked handling input we won't get that signal anyway...
@@ -1167,17 +1167,17 @@ monitor_drive_eject_button (xvolume_monitor_t *volume_monitor, xdrive_t *drive)
 static void
 monitor (void)
 {
-  g_signal_connect (volume_monitor, "mount-added", (xcallback_t) monitor_mount_added, NULL);
-  g_signal_connect (volume_monitor, "mount-removed", (xcallback_t) monitor_mount_removed, NULL);
-  g_signal_connect (volume_monitor, "mount-changed", (xcallback_t) monitor_mount_changed, NULL);
-  g_signal_connect (volume_monitor, "mount-pre-unmount", (xcallback_t) monitor_mount_pre_unmount, NULL);
-  g_signal_connect (volume_monitor, "volume-added", (xcallback_t) monitor_volume_added, NULL);
-  g_signal_connect (volume_monitor, "volume-removed", (xcallback_t) monitor_volume_removed, NULL);
-  g_signal_connect (volume_monitor, "volume-changed", (xcallback_t) monitor_volume_changed, NULL);
-  g_signal_connect (volume_monitor, "drive-connected", (xcallback_t) monitor_drive_connected, NULL);
-  g_signal_connect (volume_monitor, "drive-disconnected", (xcallback_t) monitor_drive_disconnected, NULL);
-  g_signal_connect (volume_monitor, "drive-changed", (xcallback_t) monitor_drive_changed, NULL);
-  g_signal_connect (volume_monitor, "drive-eject-button", (xcallback_t) monitor_drive_eject_button, NULL);
+  xsignal_connect (volume_monitor, "mount-added", (xcallback_t) monitor_mount_added, NULL);
+  xsignal_connect (volume_monitor, "mount-removed", (xcallback_t) monitor_mount_removed, NULL);
+  xsignal_connect (volume_monitor, "mount-changed", (xcallback_t) monitor_mount_changed, NULL);
+  xsignal_connect (volume_monitor, "mount-pre-unmount", (xcallback_t) monitor_mount_pre_unmount, NULL);
+  xsignal_connect (volume_monitor, "volume-added", (xcallback_t) monitor_volume_added, NULL);
+  xsignal_connect (volume_monitor, "volume-removed", (xcallback_t) monitor_volume_removed, NULL);
+  xsignal_connect (volume_monitor, "volume-changed", (xcallback_t) monitor_volume_changed, NULL);
+  xsignal_connect (volume_monitor, "drive-connected", (xcallback_t) monitor_drive_connected, NULL);
+  xsignal_connect (volume_monitor, "drive-disconnected", (xcallback_t) monitor_drive_disconnected, NULL);
+  xsignal_connect (volume_monitor, "drive-changed", (xcallback_t) monitor_drive_changed, NULL);
+  xsignal_connect (volume_monitor, "drive-eject-button", (xcallback_t) monitor_drive_eject_button, NULL);
 
   g_print ("Monitoring events. Press Ctrl+C to quit.\n");
 

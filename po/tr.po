@@ -283,7 +283,7 @@ msgid "Seek not supported on base stream"
 msgstr "Taban akış üzerinde arama desteklenmez"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
 msgstr "GBufferedInputStreamsonu kesilemiyor"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
@@ -3326,8 +3326,8 @@ msgid "Error removing old file: %s"
 msgstr "Eski dosya silinirken hata: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:762
-msgid "Invalid GSeekType supplied"
-msgstr "Geçersiz GSeekType sağlandı"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Geçersiz xseek_type_t sağlandı"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"

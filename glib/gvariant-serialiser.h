@@ -26,7 +26,7 @@
 typedef struct
 {
   GVariantTypeInfo *type_info;
-  guchar           *data;
+  xuchar_t           *data;
   xsize_t             size;
   xsize_t             depth;  /* same semantics as xvariant_t.depth */
 } GVariantSerialised;

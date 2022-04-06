@@ -203,7 +203,7 @@ data_matches_credentials (const xchar_t  *data,
 
 #if defined(G_OS_UNIX)
   {
-    gint64 alleged_uid;
+    sint64_t alleged_uid;
     xchar_t *endp;
 
     /* on UNIX, this is the uid as a string in base 10 */
@@ -356,7 +356,7 @@ mechanism_client_initiate (GDBusAuthMechanism   *mechanism,
   credentials = _g_dbus_auth_mechanism_get_credentials (mechanism);
   g_assert (credentials != NULL);
 
-  initial_response = xstrdup_printf ("%" G_GINT64_FORMAT, (gint64) xcredentials_get_unix_user (credentials, NULL));
+  initial_response = xstrdup_printf ("%" G_GINT64_FORMAT, (sint64_t) xcredentials_get_unix_user (credentials, NULL));
 #elif defined(G_OS_WIN32)
   initial_response = _g_win32_current_process_sid_string (NULL);
 #else

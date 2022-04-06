@@ -103,8 +103,8 @@ cat (xfile_t * file)
       xinput_stream_t *old;
       conv = (xconverter_t *)g_zlib_decompressor_new (gzip?G_ZLIB_COMPRESSOR_FORMAT_GZIP:G_ZLIB_COMPRESSOR_FORMAT_ZLIB);
       old = in;
-      in = (xinput_stream_t *) g_converter_input_stream_new (in, conv);
-      g_signal_connect (conv, "notify::file-info", G_CALLBACK (decompressor_file_info_notify_cb), NULL);
+      in = (xinput_stream_t *) xconverter_input_stream_new (in, conv);
+      xsignal_connect (conv, "notify::file-info", G_CALLBACK (decompressor_file_info_notify_cb), NULL);
       xobject_unref (conv);
       xobject_unref (old);
     }
@@ -120,7 +120,7 @@ cat (xfile_t * file)
 	  g_charset_converter_set_use_fallback (cconv, fallback);
 
 	  old = in;
-	  in = (xinput_stream_t *) g_converter_input_stream_new (in, conv);
+	  in = (xinput_stream_t *) xconverter_input_stream_new (in, conv);
 	  xobject_unref (conv);
 	  xobject_unref (old);
 	}
@@ -153,7 +153,7 @@ cat (xfile_t * file)
       conv = (xconverter_t *)g_zlib_compressor_new(gzip?G_ZLIB_COMPRESSOR_FORMAT_GZIP:G_ZLIB_COMPRESSOR_FORMAT_ZLIB, -1);
       g_zlib_compressor_set_file_info (G_ZLIB_COMPRESSOR (conv), in_file_info);
       old = in;
-      in = (xinput_stream_t *) g_converter_input_stream_new (in, conv);
+      in = (xinput_stream_t *) xconverter_input_stream_new (in, conv);
       xobject_unref (conv);
       xobject_unref (old);
       xobject_unref (in_file_info);

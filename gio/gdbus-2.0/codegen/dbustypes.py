@@ -99,9 +99,9 @@ class Arg:
                 self.gvariant_get = "xvariant_get_boolean"
                 self.gvalue_get = "xvalue_get_boolean"
             elif self.signature == "y":
-                self.ctype_in_g = "guchar "
-                self.ctype_in = "guchar "
-                self.ctype_out = "guchar *"
+                self.ctype_in_g = "xuchar_t "
+                self.ctype_in = "xuchar_t "
+                self.ctype_out = "xuchar_t *"
                 self.gtype = "XTYPE_UCHAR"
                 self.free_func = None
                 self.format_in = "y"
@@ -149,9 +149,9 @@ class Arg:
                 self.gvariant_get = "xvariant_get_uint32"
                 self.gvalue_get = "xvalue_get_uint"
             elif self.signature == "x":
-                self.ctype_in_g = "gint64 "
-                self.ctype_in = "gint64 "
-                self.ctype_out = "gint64 *"
+                self.ctype_in_g = "sint64_t "
+                self.ctype_in = "sint64_t "
+                self.ctype_out = "sint64_t *"
                 self.gtype = "XTYPE_INT64"
                 self.free_func = None
                 self.format_in = "x"

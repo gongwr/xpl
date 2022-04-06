@@ -1277,7 +1277,7 @@ g_settings_schema_key_init (xsettings_schema_key_t *key,
 {
   xvariant_iter_t *iter;
   xvariant_t *data;
-  guchar code;
+  xuchar_t code;
 
   memset (key, 0, sizeof *key);
 

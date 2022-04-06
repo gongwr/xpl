@@ -256,7 +256,7 @@ xaction_group_default_init (xaction_group_interface_t *iface)
    * Since: 2.28
    **/
   xaction_group_signals[SIGNAL_ACTION_ADDED] =
-    g_signal_new (I_("action-added"),
+    xsignal_new (I_("action-added"),
                   XTYPE_ACTION_GROUP,
                   G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED,
                   G_STRUCT_OFFSET (xaction_group_interface_t, action_added),
@@ -277,7 +277,7 @@ xaction_group_default_init (xaction_group_interface_t *iface)
    * Since: 2.28
    **/
   xaction_group_signals[SIGNAL_ACTION_REMOVED] =
-    g_signal_new (I_("action-removed"),
+    xsignal_new (I_("action-removed"),
                   XTYPE_ACTION_GROUP,
                   G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED,
                   G_STRUCT_OFFSET (xaction_group_interface_t, action_removed),
@@ -298,7 +298,7 @@ xaction_group_default_init (xaction_group_interface_t *iface)
    * Since: 2.28
    **/
   xaction_group_signals[SIGNAL_ACTION_ENABLED_CHANGED] =
-    g_signal_new (I_("action-enabled-changed"),
+    xsignal_new (I_("action-enabled-changed"),
                   XTYPE_ACTION_GROUP,
                   G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED,
                   G_STRUCT_OFFSET (xaction_group_interface_t,
@@ -308,7 +308,7 @@ xaction_group_default_init (xaction_group_interface_t *iface)
                   XTYPE_NONE, 2,
                   XTYPE_STRING,
                   XTYPE_BOOLEAN);
-  g_signal_set_va_marshaller (xaction_group_signals[SIGNAL_ACTION_ENABLED_CHANGED],
+  xsignal_set_va_marshaller (xaction_group_signals[SIGNAL_ACTION_ENABLED_CHANGED],
                               XTYPE_FROM_INTERFACE (iface),
                               _g_cclosure_marshal_VOID__STRING_BOOLEANv);
 
@@ -323,7 +323,7 @@ xaction_group_default_init (xaction_group_interface_t *iface)
    * Since: 2.28
    **/
   xaction_group_signals[SIGNAL_ACTION_STATE_CHANGED] =
-    g_signal_new (I_("action-state-changed"),
+    xsignal_new (I_("action-state-changed"),
                   XTYPE_ACTION_GROUP,
                   G_SIGNAL_RUN_LAST |
                   G_SIGNAL_DETAILED |
@@ -335,7 +335,7 @@ xaction_group_default_init (xaction_group_interface_t *iface)
                   XTYPE_NONE, 2,
                   XTYPE_STRING,
                   XTYPE_VARIANT);
-  g_signal_set_va_marshaller (xaction_group_signals[SIGNAL_ACTION_STATE_CHANGED],
+  xsignal_set_va_marshaller (xaction_group_signals[SIGNAL_ACTION_STATE_CHANGED],
                               XTYPE_FROM_INTERFACE (iface),
                               _g_cclosure_marshal_VOID__STRING_VARIANTv);
 }
@@ -593,15 +593,15 @@ xaction_group_change_action_state (xaction_group_t *action_group,
  * activation over D-Bus, this call may return before the relevant
  * D-Bus traffic has been sent, or any replies have been received. In
  * order to block on such asynchronous activation calls,
- * g_dbus_connection_flush() should be called prior to the code, which
+ * xdbus_connection_flush() should be called prior to the code, which
  * depends on the result of the action activation. Without flushing
  * the D-Bus connection, there is no guarantee that the action would
  * have been activated.
  *
  * The following code which runs in a remote app instance, shows an
  * example of a "quit" action being activated on the primary app
- * instance over D-Bus. Here g_dbus_connection_flush() is called
- * before `exit()`. Without g_dbus_connection_flush(), the "quit" action
+ * instance over D-Bus. Here xdbus_connection_flush() is called
+ * before `exit()`. Without xdbus_connection_flush(), the "quit" action
  * may fail to be activated on the primary instance.
  *
  * |[<!-- language="C" -->
@@ -609,7 +609,7 @@ xaction_group_change_action_state (xaction_group_t *action_group,
  * xaction_group_activate_action (XACTION_GROUP (app), "quit", NULL);
  *
  * // make sure the action is activated now
- * g_dbus_connection_flush (...);
+ * xdbus_connection_flush (...);
  *
  * g_debug ("application has been terminated. exiting.");
  *
@@ -648,7 +648,7 @@ xaction_group_action_added (xaction_group_t *action_group,
   g_return_if_fail (X_IS_ACTION_GROUP (action_group));
   g_return_if_fail (action_name != NULL);
 
-  g_signal_emit (action_group,
+  xsignal_emit (action_group,
                  xaction_group_signals[SIGNAL_ACTION_ADDED],
                  g_quark_try_string (action_name),
                  action_name);
@@ -672,7 +672,7 @@ xaction_group_action_removed (xaction_group_t *action_group,
   g_return_if_fail (X_IS_ACTION_GROUP (action_group));
   g_return_if_fail (action_name != NULL);
 
-  g_signal_emit (action_group,
+  xsignal_emit (action_group,
                  xaction_group_signals[SIGNAL_ACTION_REMOVED],
                  g_quark_try_string (action_name),
                  action_name);
@@ -700,7 +700,7 @@ xaction_group_action_enabled_changed (xaction_group_t *action_group,
 
   enabled = !!enabled;
 
-  g_signal_emit (action_group,
+  xsignal_emit (action_group,
                  xaction_group_signals[SIGNAL_ACTION_ENABLED_CHANGED],
                  g_quark_try_string (action_name),
                  action_name,
@@ -727,7 +727,7 @@ xaction_group_action_state_changed (xaction_group_t *action_group,
   g_return_if_fail (X_IS_ACTION_GROUP (action_group));
   g_return_if_fail (action_name != NULL);
 
-  g_signal_emit (action_group,
+  xsignal_emit (action_group,
                  xaction_group_signals[SIGNAL_ACTION_STATE_CHANGED],
                  g_quark_try_string (action_name),
                  action_name,

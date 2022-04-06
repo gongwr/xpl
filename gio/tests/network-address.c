@@ -361,7 +361,7 @@ test_loopback_basic (void)
 
   addr = G_NETWORK_ADDRESS (g_network_address_new_loopback (666));
 
-  /* Test basic properties. */
+  /* test_t basic properties. */
   g_assert_cmpstr (g_network_address_get_hostname (addr), ==, "localhost");
   g_assert_cmpuint (g_network_address_get_port (addr), ==, 666);
   g_assert_null (g_network_address_get_scheme (addr));

@@ -6,7 +6,7 @@
 int
 main (int argc, char *argv[])
 {
-  GDBusDaemon *daemon;
+  xdbus_daemon_t *daemon;
   xmain_loop_t *loop;
   const char *address = NULL;
   const char *config_file = NULL;
@@ -49,7 +49,7 @@ main (int argc, char *argv[])
   if (argc >= 2)
     address = argv[1];
 
-  daemon = _g_dbus_daemon_new (address, NULL, &error);
+  daemon = _xdbus_daemon_new (address, NULL, &error);
   if (daemon == NULL)
     {
       g_printerr ("Can't init bus: %s\n", error->message);
@@ -57,10 +57,10 @@ main (int argc, char *argv[])
     }
 
   if (print_env)
-    g_print ("export DBUS_SESSION_BUS_ADDRESS=\"%s\"\n", _g_dbus_daemon_get_address (daemon));
+    g_print ("export DBUS_SESSION_BUS_ADDRESS=\"%s\"\n", _xdbus_daemon_get_address (daemon));
 
   if (print_address)
-    g_print ("%s\n", _g_dbus_daemon_get_address (daemon));
+    g_print ("%s\n", _xdbus_daemon_get_address (daemon));
 
   xmain_loop_run (loop);
 

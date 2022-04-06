@@ -399,16 +399,16 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    * Since: 2.28
    */
   signals[ACCEPT_CERTIFICATE] =
-    g_signal_new (I_("accept-certificate"),
+    xsignal_new (I_("accept-certificate"),
 		  XTYPE_TLS_CONNECTION,
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GTlsConnectionClass, accept_certificate),
-		  g_signal_accumulator_true_handled, NULL,
+		  xsignal_accumulator_true_handled, NULL,
 		  _g_cclosure_marshal_BOOLEAN__OBJECT_FLAGS,
 		  XTYPE_BOOLEAN, 2,
 		  XTYPE_TLS_CERTIFICATE,
 		  XTYPE_TLS_CERTIFICATE_FLAGS);
-  g_signal_set_va_marshaller (signals[ACCEPT_CERTIFICATE],
+  xsignal_set_va_marshaller (signals[ACCEPT_CERTIFICATE],
                               XTYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_BOOLEAN__OBJECT_FLAGSv);
 }
@@ -1157,7 +1157,7 @@ xtls_connection_emit_accept_certificate (xtls_connection_t       *conn,
 {
   xboolean_t accept = FALSE;
 
-  g_signal_emit (conn, signals[ACCEPT_CERTIFICATE], 0,
+  xsignal_emit (conn, signals[ACCEPT_CERTIFICATE], 0,
 		 peer_cert, errors, &accept);
   return accept;
 }

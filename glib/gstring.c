@@ -514,7 +514,7 @@ xstring_append_uri_escaped (xstring_t     *string,
                              const xchar_t *reserved_chars_allowed,
                              xboolean_t     allow_utf8)
 {
-  _uri_encoder (string, (const guchar *) unescaped, strlen (unescaped),
+  _uri_encoder (string, (const xuchar_t *) unescaped, strlen (unescaped),
                 reserved_chars_allowed, allow_utf8);
   return string;
 }
@@ -1080,13 +1080,13 @@ xstring_ascii_up (xstring_t *string)
 xstring_t *
 xstring_down (xstring_t *string)
 {
-  guchar *s;
+  xuchar_t *s;
   xlong_t n;
 
   g_return_val_if_fail (string != NULL, NULL);
 
   n = string->len;
-  s = (guchar *) string->str;
+  s = (xuchar_t *) string->str;
 
   while (n)
     {
@@ -1114,13 +1114,13 @@ xstring_down (xstring_t *string)
 xstring_t *
 xstring_up (xstring_t *string)
 {
-  guchar *s;
+  xuchar_t *s;
   xlong_t n;
 
   g_return_val_if_fail (string != NULL, NULL);
 
   n = string->len;
-  s = (guchar *) string->str;
+  s = (xuchar_t *) string->str;
 
   while (n)
     {

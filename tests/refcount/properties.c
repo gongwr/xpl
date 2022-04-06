@@ -207,7 +207,7 @@ main (int argc, char **argv)
     test_objects[i] = test;
 
     g_assert (test->count == test->dummy);
-    g_signal_connect (test, "notify::dummy", G_CALLBACK (dummy_notify), NULL);
+    xsignal_connect (test, "notify::dummy", G_CALLBACK (dummy_notify), NULL);
   }
 
   g_atomic_int_set (&stopping, FALSE);

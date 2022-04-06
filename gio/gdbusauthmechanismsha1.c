@@ -510,7 +510,7 @@ _log (const xchar_t *message,
  * and was created successfully) */
 static xint_t
 create_lock_exclusive (const xchar_t  *lock_path,
-                       gint64       *mtime_nsec,
+                       sint64_t       *mtime_nsec,
                        xerror_t      **error)
 {
   int errsv;
@@ -550,7 +550,7 @@ keyring_acquire_lock (const xchar_t  *path,
   xint_t ret;
   xuint_t num_tries;
   int errsv;
-  gint64 lock_mtime_nsec = 0, lock_mtime_nsec_prev = 0;
+  sint64_t lock_mtime_nsec = 0, lock_mtime_nsec_prev = 0;
 
   /* Total possible sleep period = max_tries * timeout_usec = 0.5s */
   const xuint_t max_tries = 50;
@@ -685,7 +685,7 @@ keyring_generate_entry (const xchar_t  *cookie_context,
   xchar_t **lines;
   xint_t max_line_id;
   xstring_t *new_contents;
-  gint64 now;
+  sint64_t now;
   xboolean_t have_id;
   xint_t use_id;
   xchar_t *use_cookie;
@@ -754,7 +754,7 @@ keyring_generate_entry (const xchar_t  *cookie_context,
           xchar_t **tokens;
           xchar_t *endp;
           xint_t line_id;
-          gint64 line_when;
+          sint64_t line_when;
           xboolean_t keep_entry;
 
           if (line[0] == '\0')
@@ -1000,7 +1000,7 @@ mechanism_server_initiate (GDBusAuthMechanism   *mechanism,
   if (initial_response != NULL && initial_response_len > 0)
     {
 #ifdef G_OS_UNIX
-      gint64 uid;
+      sint64_t uid;
       xchar_t *endp;
 
       uid = g_ascii_strtoll (initial_response, &endp, 10);
@@ -1172,7 +1172,7 @@ mechanism_client_initiate (GDBusAuthMechanism   *mechanism,
   *out_initial_response_len = 0;
 
 #ifdef G_OS_UNIX
-  initial_response = xstrdup_printf ("%" G_GINT64_FORMAT, (gint64) getuid ());
+  initial_response = xstrdup_printf ("%" G_GINT64_FORMAT, (sint64_t) getuid ());
 #elif defined (G_OS_WIN32)
   initial_response = _g_win32_current_process_sid_string (NULL);
 #else

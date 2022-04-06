@@ -41,7 +41,7 @@ typedef struct _GHmac       xhmac_t;
 
 XPL_AVAILABLE_IN_2_30
 xhmac_t *               g_hmac_new                    (GChecksumType  digest_type,
-                                                     const guchar  *key,
+                                                     const xuchar_t  *key,
                                                      xsize_t          key_len);
 XPL_AVAILABLE_IN_2_30
 xhmac_t *               g_hmac_copy                   (const xhmac_t   *hmac);
@@ -51,7 +51,7 @@ XPL_AVAILABLE_IN_2_30
 void                  g_hmac_unref                  (xhmac_t         *hmac);
 XPL_AVAILABLE_IN_2_30
 void                  g_hmac_update                 (xhmac_t         *hmac,
-                                                     const guchar  *data,
+                                                     const xuchar_t  *data,
                                                      xssize_t         length);
 XPL_AVAILABLE_IN_2_30
 const xchar_t *         g_hmac_get_string             (xhmac_t         *hmac);
@@ -62,13 +62,13 @@ void                  g_hmac_get_digest             (xhmac_t         *hmac,
 
 XPL_AVAILABLE_IN_2_30
 xchar_t                *g_compute_hmac_for_data       (GChecksumType  digest_type,
-                                                     const guchar  *key,
+                                                     const xuchar_t  *key,
                                                      xsize_t          key_len,
-                                                     const guchar  *data,
+                                                     const xuchar_t  *data,
                                                      xsize_t          length);
 XPL_AVAILABLE_IN_2_30
 xchar_t                *g_compute_hmac_for_string     (GChecksumType  digest_type,
-                                                     const guchar  *key,
+                                                     const xuchar_t  *key,
                                                      xsize_t          key_len,
                                                      const xchar_t   *str,
                                                      xssize_t         length);

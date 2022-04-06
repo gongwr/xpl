@@ -446,19 +446,19 @@ g_find_program_in_path (const xchar_t *program)
 
 /**
  * g_bit_nth_lsf:
- * @mask: a #gulong containing flags
+ * @mask: a #xulong_t containing flags
  * @nth_bit: the index of the bit to start the search from
  *
  * Find the position of the first bit set in @mask, searching
  * from (but not including) @nth_bit upwards. Bits are numbered
- * from 0 (least significant) to sizeof(#gulong) * 8 - 1 (31 or 63,
+ * from 0 (least significant) to sizeof(#xulong_t) * 8 - 1 (31 or 63,
  * usually). To start searching from the 0th bit, set @nth_bit to -1.
  *
  * Returns: the index of the first bit set which is higher than @nth_bit, or -1
  *    if no higher bits are set
  */
 xint_t
-(g_bit_nth_lsf) (gulong mask,
+(g_bit_nth_lsf) (xulong_t mask,
                  xint_t   nth_bit)
 {
   return g_bit_nth_lsf_impl (mask, nth_bit);
@@ -466,12 +466,12 @@ xint_t
 
 /**
  * g_bit_nth_msf:
- * @mask: a #gulong containing flags
+ * @mask: a #xulong_t containing flags
  * @nth_bit: the index of the bit to start the search from
  *
  * Find the position of the first bit set in @mask, searching
  * from (but not including) @nth_bit downwards. Bits are numbered
- * from 0 (least significant) to sizeof(#gulong) * 8 - 1 (31 or 63,
+ * from 0 (least significant) to sizeof(#xulong_t) * 8 - 1 (31 or 63,
  * usually). To start searching from the last bit, set @nth_bit to
  * -1 or XPL_SIZEOF_LONG * 8.
  *
@@ -479,7 +479,7 @@ xint_t
  *    if no lower bits are set
  */
 xint_t
-(g_bit_nth_msf) (gulong mask,
+(g_bit_nth_msf) (xulong_t mask,
                  xint_t   nth_bit)
 {
   return g_bit_nth_msf_impl (mask, nth_bit);
@@ -496,7 +496,7 @@ xint_t
  * Returns: the number of bits used to hold @number
  */
 xuint_t
-(g_bit_storage) (gulong number)
+(g_bit_storage) (xulong_t number)
 {
   return g_bit_storage_impl (number);
 }
@@ -631,7 +631,7 @@ g_get_user_database_entry (void)
                 if (error == 0 || error == ENOENT)
                   {
                     g_warning ("getpwuid_r(): failed due to unknown user id (%lu)",
-                               (gulong) getuid ());
+                               (xulong_t) getuid ());
                     break;
                   }
                 if (bufsize > 32 * 1024)

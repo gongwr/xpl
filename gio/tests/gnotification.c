@@ -29,7 +29,7 @@ activate_app (xapplication_t *application,
   xnotification_t *notification;
   xicon_t *icon;
 
-  notification = xnotification_new ("Test");
+  notification = xnotification_new ("test_t");
 
   xapplication_send_notification (application, "test1", notification);
   xapplication_send_notification (application, "test2", notification);
@@ -48,7 +48,7 @@ activate_app (xapplication_t *application,
   xapplication_send_notification (application, "test4", notification);
   xapplication_send_notification (application, NULL, notification);
 
-  g_dbus_connection_flush_sync (xapplication_get_dbus_connection (application), NULL, NULL);
+  xdbus_connection_flush_sync (xapplication_get_dbus_connection (application), NULL, NULL);
 
   xobject_unref (notification);
 }
@@ -70,7 +70,7 @@ notification_received (GNotificationServer *server,
     case 0:
       g_assert_cmpstr (notification_id, ==, "test1");
       g_assert (xvariant_lookup (notification, "title", "&s", &title));
-      g_assert_cmpstr (title, ==, "Test");
+      g_assert_cmpstr (title, ==, "test_t");
       break;
 
     case 1:
@@ -122,7 +122,7 @@ server_notify_is_running (xobject_t    *object,
       xapplication_t *app;
 
       app = xapplication_new ("org.gtk.TestApplication", G_APPLICATION_FLAGS_NONE);
-      g_signal_connect (app, "activate", G_CALLBACK (activate_app), NULL);
+      xsignal_connect (app, "activate", G_CALLBACK (activate_app), NULL);
 
       xapplication_run (app, 0, NULL);
 
@@ -157,9 +157,9 @@ basic (void)
   loop = xmain_loop_new (NULL, FALSE);
 
   server = xnotification_server_new ();
-  g_signal_connect (server, "notification-received", G_CALLBACK (notification_received), &received_count);
-  g_signal_connect (server, "notification-removed", G_CALLBACK (notification_removed), &removed_count);
-  g_signal_connect (server, "notify::is-running", G_CALLBACK (server_notify_is_running), loop);
+  xsignal_connect (server, "notification-received", G_CALLBACK (notification_received), &received_count);
+  xsignal_connect (server, "notification-removed", G_CALLBACK (notification_removed), &removed_count);
+  xsignal_connect (server, "notify::is-running", G_CALLBACK (server_notify_is_running), loop);
   g_timeout_add_seconds (1, timeout, server);
 
   xmain_loop_run (loop);
@@ -202,7 +202,7 @@ test_properties (void)
   const xchar_t * const *names;
   Button *b;
 
-  n = xnotification_new ("Test");
+  n = xnotification_new ("test_t");
 
   xnotification_set_title (n, "title");
   xnotification_set_body (n, "body");

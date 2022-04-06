@@ -40,7 +40,7 @@ giotypefuncs_inc = custom_target(
   input : gio_headers + [gioenumtypes_h] + gobject_install_headers,
   command: [gengiotypefuncs_prog, '@OUTPUT@', '@INPUT@'])
 
-#  Test programs buildable on all platforms
+#  test_t programs buildable on all platforms
 gio_tests = {
   'appmonitor' : {
     # FIXME: https://gitlab.gnome.org/GNOME/glib/-/issues/1392
@@ -171,7 +171,7 @@ else
   }
 endif
 
-#  Test programs buildable on UNIX only
+#  test_t programs buildable on UNIX only
 if host_machine.system() != 'windows'
   gio_tests += {
     'file' : {},
@@ -244,7 +244,7 @@ if host_machine.system() != 'windows'
     }
   endif
 
-  #  Test programs that need to bring up a session bus (requires dbus-daemon)
+  #  test_t programs that need to bring up a session bus (requires dbus-daemon)
   have_dbus_daemon = find_program('dbus-daemon', required : false).found()
   if have_dbus_daemon
     annotate_args = [
@@ -429,7 +429,7 @@ if host_machine.system() != 'windows'
   endif
 endif # unix
 
-#  Test programs buildable on Windows only
+#  test_t programs buildable on Windows only
 if host_machine.system() == 'windows'
   gio_tests += {'win32-streams' : {}}
 endif

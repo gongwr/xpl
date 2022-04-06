@@ -157,7 +157,7 @@ g_pollable_source_new_full (xpointer_t      pollable_stream,
     }
   if (cancellable)
     {
-      xsource_t *cancellable_source = g_cancellable_source_new (cancellable);
+      xsource_t *cancellable_source = xcancellable_source_new (cancellable);
 
       xsource_set_dummy_callback (cancellable_source);
       xsource_add_child_source (source, cancellable_source);

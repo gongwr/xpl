@@ -342,7 +342,7 @@ g_unix_connection_send_credentials (GUnixConnection      *connection,
   xsocket_t *socket;
   xboolean_t ret;
   xoutput_vector_t vector;
-  guchar nul_byte[1] = {'\0'};
+  xuchar_t nul_byte[1] = {'\0'};
   xint_t num_messages;
 
   g_return_val_if_fail (X_IS_UNIX_CONNECTION (connection), FALSE);

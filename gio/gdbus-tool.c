@@ -186,7 +186,7 @@ print_methods_and_signals (xdbus_connection_t *c,
   xuint_t m;
 
   error = NULL;
-  result = g_dbus_connection_call_sync (c,
+  result = xdbus_connection_call_sync (c,
                                         name,
                                         path,
                                         "org.freedesktop.DBus.Introspectable",
@@ -258,7 +258,7 @@ print_paths (xdbus_connection_t *c,
     }
 
   error = NULL;
-  result = g_dbus_connection_call_sync (c,
+  result = xdbus_connection_call_sync (c,
                                         name,
                                         path,
                                         "org.freedesktop.DBus.Introspectable",
@@ -330,7 +330,7 @@ print_names (xdbus_connection_t *c,
   name_set = xhash_table_new_full (xstr_hash, xstr_equal, g_free, NULL);
 
   error = NULL;
-  result = g_dbus_connection_call_sync (c,
+  result = xdbus_connection_call_sync (c,
                                         "org.freedesktop.DBus",
                                         "/org/freedesktop/DBus",
                                         "org.freedesktop.DBus",
@@ -354,7 +354,7 @@ print_names (xdbus_connection_t *c,
   xvariant_unref (result);
 
   error = NULL;
-  result = g_dbus_connection_call_sync (c,
+  result = xdbus_connection_call_sync (c,
                                         "org.freedesktop.DBus",
                                         "/org/freedesktop/DBus",
                                         "org.freedesktop.DBus",
@@ -464,7 +464,7 @@ connection_get_dbus_connection (xboolean_t   require_message_bus,
       GDBusConnectionFlags flags = G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT;
       if (require_message_bus)
         flags |= G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION;
-      c = g_dbus_connection_new_for_address_sync (opt_connection_address,
+      c = xdbus_connection_new_for_address_sync (opt_connection_address,
                                                   flags,
                                                   NULL, /* xdbus_auth_observer_t */
                                                   NULL, /* xcancellable_t */
@@ -497,7 +497,7 @@ call_helper_get_method_in_signature (xdbus_connection_t  *c,
   result = NULL;
   node_info = NULL;
 
-  result = g_dbus_connection_call_sync (c,
+  result = xdbus_connection_call_sync (c,
                                         dest,
                                         path,
                                         "org.freedesktop.DBus.Introspectable",
@@ -849,7 +849,7 @@ handle_emit (xint_t        *argc,
 
   if (parameters != NULL)
     parameters = xvariant_ref_sink (parameters);
-  if (!g_dbus_connection_emit_signal (c,
+  if (!xdbus_connection_emit_signal (c,
                                       opt_emit_dest,
                                       opt_emit_object_path,
                                       interface_name,
@@ -862,7 +862,7 @@ handle_emit (xint_t        *argc,
       goto out;
     }
 
-  if (!g_dbus_connection_flush_sync (c, NULL, &error))
+  if (!xdbus_connection_flush_sync (c, NULL, &error))
     {
       g_printerr (_("Error flushing connection: %s\n"), error->message);
       xerror_free (error);
@@ -1214,7 +1214,7 @@ handle_call (xint_t        *argc,
     flags |= G_DBUS_CALL_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION;
 
 #ifdef G_OS_UNIX
-  result = g_dbus_connection_call_with_unix_fd_list_sync (c,
+  result = xdbus_connection_call_with_unix_fd_list_sync (c,
                                                           opt_call_dest,
                                                           opt_call_object_path,
                                                           interface_name,
@@ -1228,7 +1228,7 @@ handle_call (xint_t        *argc,
                                                           NULL,
                                                           &error);
 #else
-  result = g_dbus_connection_call_sync (c,
+  result = xdbus_connection_call_sync (c,
 		  			opt_call_dest,
 					opt_call_object_path,
 					interface_name,
@@ -1496,7 +1496,7 @@ dump_interface (xdbus_connection_t          *c,
   if (c != NULL && name != NULL && object_path != NULL && o->properties != NULL)
     {
       xvariant_t *result;
-      result = g_dbus_connection_call_sync (c,
+      result = xdbus_connection_call_sync (c,
                                             name,
                                             object_path,
                                             "org.freedesktop.DBus.Properties",
@@ -1535,7 +1535,7 @@ dump_interface (xdbus_connection_t          *c,
           xuint_t n;
           for (n = 0; o->properties != NULL && o->properties[n] != NULL; n++)
             {
-              result = g_dbus_connection_call_sync (c,
+              result = xdbus_connection_call_sync (c,
                                                     name,
                                                     object_path,
                                                     "org.freedesktop.DBus.Properties",
@@ -1717,7 +1717,7 @@ introspect_do (xdbus_connection_t *c,
   result = NULL;
 
   error = NULL;
-  result = g_dbus_connection_call_sync (c,
+  result = xdbus_connection_call_sync (c,
                                         opt_introspect_dest,
                                         object_path,
                                         "org.freedesktop.DBus.Introspectable",
@@ -1963,7 +1963,7 @@ monitor_on_name_appeared (xdbus_connection_t *connection,
 {
   g_print ("The name %s is owned by %s\n", name, name_owner);
   g_assert (monitor_filter_id == 0);
-  monitor_filter_id = g_dbus_connection_signal_subscribe (connection,
+  monitor_filter_id = xdbus_connection_signal_subscribe (connection,
                                                           name_owner,
                                                           NULL,  /* any interface */
                                                           NULL,  /* any member */
@@ -1984,7 +1984,7 @@ monitor_on_name_vanished (xdbus_connection_t *connection,
 
   if (monitor_filter_id != 0)
     {
-      g_dbus_connection_signal_unsubscribe (connection, monitor_filter_id);
+      xdbus_connection_signal_unsubscribe (connection, monitor_filter_id);
       monitor_filter_id = 0;
     }
 }
@@ -2072,7 +2072,7 @@ handle_monitor (xint_t        *argc,
     }
 
   /* Monitoring doesn’t make sense on a non-message-bus connection. */
-  if (g_dbus_connection_get_unique_name (c) == NULL)
+  if (xdbus_connection_get_unique_name (c) == NULL)
     {
       if (!request_completion)
         g_printerr (_("Error: can’t monitor a non-message-bus connection\n"));
@@ -2174,7 +2174,7 @@ handle_monitor (xint_t        *argc,
 
 static xboolean_t opt_wait_activate_set = FALSE;
 static xchar_t *opt_wait_activate_name = NULL;
-static gint64 opt_wait_timeout_secs = 0;  /* no timeout */
+static sint64_t opt_wait_timeout_secs = 0;  /* no timeout */
 
 typedef enum {
   WAIT_STATE_RUNNING,  /* waiting to see the service */

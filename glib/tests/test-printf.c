@@ -136,7 +136,7 @@ test_d (void)
   g_assert_cmpint (res, ==, 1);
   g_assert_cmpstr (buf, ==, "5");
 
-  res = g_snprintf (buf, 128, "%" G_GINT64_FORMAT, (gint64)-5);
+  res = g_snprintf (buf, 128, "%" G_GINT64_FORMAT, (sint64_t)-5);
   g_assert_cmpint (res, ==, 2);
   g_assert_cmpstr (buf, ==, "-5");
 
@@ -685,11 +685,11 @@ test_64bit (void)
   xchar_t buf[128];
   xint_t res;
 
-  res = g_snprintf (buf, 128, "%" G_GINT64_FORMAT, (gint64)123456);
+  res = g_snprintf (buf, 128, "%" G_GINT64_FORMAT, (sint64_t)123456);
   g_assert_cmpint (res, ==, 6);
   g_assert_cmpstr (buf, ==, "123456");
 
-  res = g_snprintf (buf, 128, "%" G_GINT64_FORMAT, (gint64)-123456);
+  res = g_snprintf (buf, 128, "%" G_GINT64_FORMAT, (sint64_t)-123456);
   g_assert_cmpint (res, ==, 7);
   g_assert_cmpstr (buf, ==, "-123456");
 
@@ -697,23 +697,23 @@ test_64bit (void)
   g_assert_cmpint (res, ==, 6);
   g_assert_cmpstr (buf, ==, "123456");
 
-  res = g_snprintf (buf, 128, "%" G_GINT64_MODIFIER "o", (gint64)123456);
+  res = g_snprintf (buf, 128, "%" G_GINT64_MODIFIER "o", (sint64_t)123456);
   g_assert_cmpint (res, ==, 6);
   g_assert_cmpstr (buf, ==, "361100");
 
-  res = g_snprintf (buf, 128, "%#" G_GINT64_MODIFIER "o", (gint64)123456);
+  res = g_snprintf (buf, 128, "%#" G_GINT64_MODIFIER "o", (sint64_t)123456);
   g_assert_cmpint (res, ==, 7);
   g_assert_cmpstr (buf, ==, "0361100");
 
-  res = g_snprintf (buf, 128, "%" G_GINT64_MODIFIER "x", (gint64)123456);
+  res = g_snprintf (buf, 128, "%" G_GINT64_MODIFIER "x", (sint64_t)123456);
   g_assert_cmpint (res, ==, 5);
   g_assert_cmpstr (buf, ==, "1e240");
 
-  res = g_snprintf (buf, 128, "%#" G_GINT64_MODIFIER "x", (gint64)123456);
+  res = g_snprintf (buf, 128, "%#" G_GINT64_MODIFIER "x", (sint64_t)123456);
   g_assert_cmpint (res, ==, 7);
   g_assert_cmpstr (buf, ==, "0x1e240");
 
-  res = g_snprintf (buf, 128, "%" G_GINT64_MODIFIER "X", (gint64)123456);
+  res = g_snprintf (buf, 128, "%" G_GINT64_MODIFIER "X", (sint64_t)123456);
   g_assert_cmpint (res, ==, 5);
   g_assert_cmpstr (buf, ==, "1E240");
 
@@ -734,11 +734,11 @@ _Pragma ("GCC diagnostic ignored \"-Wformat\"")
 _Pragma ("GCC diagnostic ignored \"-Wformat-extra-args\"")
 #endif
 
-  res = g_snprintf (buf, 128, "%" "lli", (gint64)123456);
+  res = g_snprintf (buf, 128, "%" "lli", (sint64_t)123456);
   g_assert_cmpint (res, ==, 6);
   g_assert_cmpstr (buf, ==, "123456");
 
-  res = g_snprintf (buf, 128, "%" "lli", (gint64)-123456);
+  res = g_snprintf (buf, 128, "%" "lli", (sint64_t)-123456);
   g_assert_cmpint (res, ==, 7);
   g_assert_cmpstr (buf, ==, "-123456");
 
@@ -746,23 +746,23 @@ _Pragma ("GCC diagnostic ignored \"-Wformat-extra-args\"")
   g_assert_cmpint (res, ==, 6);
   g_assert_cmpstr (buf, ==, "123456");
 
-  res = g_snprintf (buf, 128, "%" "ll" "o", (gint64)123456);
+  res = g_snprintf (buf, 128, "%" "ll" "o", (sint64_t)123456);
   g_assert_cmpint (res, ==, 6);
   g_assert_cmpstr (buf, ==, "361100");
 
-  res = g_snprintf (buf, 128, "%#" "ll" "o", (gint64)123456);
+  res = g_snprintf (buf, 128, "%#" "ll" "o", (sint64_t)123456);
   g_assert_cmpint (res, ==, 7);
   g_assert_cmpstr (buf, ==, "0361100");
 
-  res = g_snprintf (buf, 128, "%" "ll" "x", (gint64)123456);
+  res = g_snprintf (buf, 128, "%" "ll" "x", (sint64_t)123456);
   g_assert_cmpint (res, ==, 5);
   g_assert_cmpstr (buf, ==, "1e240");
 
-  res = g_snprintf (buf, 128, "%#" "ll" "x", (gint64)123456);
+  res = g_snprintf (buf, 128, "%#" "ll" "x", (sint64_t)123456);
   g_assert_cmpint (res, ==, 7);
   g_assert_cmpstr (buf, ==, "0x1e240");
 
-  res = g_snprintf (buf, 128, "%" "ll" "X", (gint64)123456);
+  res = g_snprintf (buf, 128, "%" "ll" "X", (sint64_t)123456);
   g_assert_cmpint (res, ==, 5);
   g_assert_cmpstr (buf, ==, "1E240");
 
@@ -778,28 +778,28 @@ test_64bit2_base (void)
 {
   xint_t res;
 
-  res = g_printf ("%" G_GINT64_FORMAT "\n", (gint64)123456);
+  res = g_printf ("%" G_GINT64_FORMAT "\n", (sint64_t)123456);
   g_assert_cmpint (res, ==, 7);
 
-  res = g_printf ("%" G_GINT64_FORMAT "\n", (gint64)-123456);
+  res = g_printf ("%" G_GINT64_FORMAT "\n", (sint64_t)-123456);
   g_assert_cmpint (res, ==, 8);
 
   res = g_printf ("%" G_GUINT64_FORMAT "\n", (xuint64_t)123456);
   g_assert_cmpint (res, ==, 7);
 
-  res = g_printf ("%" G_GINT64_MODIFIER "o\n", (gint64)123456);
+  res = g_printf ("%" G_GINT64_MODIFIER "o\n", (sint64_t)123456);
   g_assert_cmpint (res, ==, 7);
 
-  res = g_printf ("%#" G_GINT64_MODIFIER "o\n", (gint64)123456);
+  res = g_printf ("%#" G_GINT64_MODIFIER "o\n", (sint64_t)123456);
   g_assert_cmpint (res, ==, 8);
 
-  res = g_printf ("%" G_GINT64_MODIFIER "x\n", (gint64)123456);
+  res = g_printf ("%" G_GINT64_MODIFIER "x\n", (sint64_t)123456);
   g_assert_cmpint (res, ==, 6);
 
-  res = g_printf ("%#" G_GINT64_MODIFIER "x\n", (gint64)123456);
+  res = g_printf ("%#" G_GINT64_MODIFIER "x\n", (sint64_t)123456);
   g_assert_cmpint (res, ==, 8);
 
-  res = g_printf ("%" G_GINT64_MODIFIER "X\n", (gint64)123456);
+  res = g_printf ("%" G_GINT64_MODIFIER "X\n", (sint64_t)123456);
   g_assert_cmpint (res, ==, 6);
 }
 
@@ -825,28 +825,28 @@ _Pragma ("GCC diagnostic ignored \"-Wformat\"")
 _Pragma ("GCC diagnostic ignored \"-Wformat-extra-args\"")
 #endif
 
-  res = g_printf ("%" "lli\n", (gint64)123456);
+  res = g_printf ("%" "lli\n", (sint64_t)123456);
   g_assert_cmpint (res, ==, 7);
 
-  res = g_printf ("%" "lli\n", (gint64)-123456);
+  res = g_printf ("%" "lli\n", (sint64_t)-123456);
   g_assert_cmpint (res, ==, 8);
 
   res = g_printf ("%" "llu\n", (xuint64_t)123456);
   g_assert_cmpint (res, ==, 7);
 
-  res = g_printf ("%" "ll" "o\n", (gint64)123456);
+  res = g_printf ("%" "ll" "o\n", (sint64_t)123456);
   g_assert_cmpint (res, ==, 7);
 
-  res = g_printf ("%#" "ll" "o\n", (gint64)123456);
+  res = g_printf ("%#" "ll" "o\n", (sint64_t)123456);
   g_assert_cmpint (res, ==, 8);
 
-  res = g_printf ("%" "ll" "x\n", (gint64)123456);
+  res = g_printf ("%" "ll" "x\n", (sint64_t)123456);
   g_assert_cmpint (res, ==, 6);
 
-  res = g_printf ("%#" "ll" "x\n", (gint64)123456);
+  res = g_printf ("%#" "ll" "x\n", (sint64_t)123456);
   g_assert_cmpint (res, ==, 8);
 
-  res = g_printf ("%" "ll" "X\n", (gint64)123456);
+  res = g_printf ("%" "ll" "X\n", (sint64_t)123456);
   g_assert_cmpint (res, ==, 6);
 
 #if G_GNUC_CHECK_VERSION(4, 6)
@@ -925,7 +925,7 @@ test_vasprintf_invalid_format_placeholder (void)
   xchar_t *buf = "some non-null string";
 #endif
 
-  g_test_summary ("Test error handling for invalid format placeholder in g_vasprintf()");
+  g_test_summary ("test_t error handling for invalid format placeholder in g_vasprintf()");
 
 #if !defined(__APPLE__) && !defined(__FreeBSD__)
 #pragma GCC diagnostic push

@@ -64,7 +64,7 @@ test_event_signal (void)
 
   listener = xsocket_listener_new ();
 
-  g_signal_connect (listener, "event", G_CALLBACK (event_cb), &success);
+  xsignal_connect (listener, "event", G_CALLBACK (event_cb), &success);
 
   xsocket_listener_add_address (listener,
                                  saddr,

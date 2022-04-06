@@ -181,7 +181,7 @@ main (int argc, char *argv[])
 
   g_print ("Http server listening on port %d\n", port);
 
-  g_signal_connect (service, "run", G_CALLBACK (handler), NULL);
+  xsignal_connect (service, "run", G_CALLBACK (handler), NULL);
 
   xmain_loop_run (xmain_loop_new (NULL, FALSE));
   g_assert_not_reached ();

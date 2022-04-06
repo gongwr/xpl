@@ -78,7 +78,7 @@ typedef struct _xsignal_group_class
 typedef struct
 {
   xsignal_group_t *group;
-  gulong             handler_id;
+  xulong_t             handler_id;
   xclosure_t          *closure;
   xuint_t              signal_id;
   xquark             signal_detail;
@@ -114,7 +114,7 @@ xsignal_group_set_target_type (xsignal_group_t *self,
   self->target_type = target_type;
 
   /* The class must be created at least once for the signals
-   * to be registered, otherwise g_signal_parse_name() will fail
+   * to be registered, otherwise xsignal_parse_name() will fail
    */
   if (XTYPE_IS_INTERFACE (target_type))
     {
@@ -174,7 +174,7 @@ xsignal_group__target_weak_notify (xpointer_t  data,
       handler->handler_id = 0;
     }
 
-  g_signal_emit (self, signals[UNBIND], 0);
+  xsignal_emit (self, signals[UNBIND], 0);
   xobject_notify_by_pspec (G_OBJECT (self), properties[PROP_TARGET]);
 
   g_rec_mutex_unlock (&self->mutex);
@@ -195,7 +195,7 @@ xsignal_group_bind_handler (xsignal_group_t  *self,
   g_assert (handler->closure->is_invalid == 0);
   g_assert (handler->handler_id == 0);
 
-  handler->handler_id = g_signal_connect_closure_by_id (target,
+  handler->handler_id = xsignal_connect_closure_by_id (target,
                                                         handler->signal_id,
                                                         handler->signal_detail,
                                                         handler->closure,
@@ -204,7 +204,7 @@ xsignal_group_bind_handler (xsignal_group_t  *self,
   g_assert (handler->handler_id != 0);
 
   for (i = 0; i < self->block_count; i++)
-    g_signal_handler_block (target, handler->handler_id);
+    xsignal_handler_block (target, handler->handler_id);
 }
 
 static void
@@ -236,7 +236,7 @@ xsignal_group_bind (xsignal_group_t *self,
       xsignal_group_bind_handler (self, handler, hold);
     }
 
-  g_signal_emit (self, signals [BIND], 0, hold);
+  xsignal_emit (self, signals [BIND], 0, hold);
 
   xobject_unref (hold);
 }
@@ -275,7 +275,7 @@ xsignal_group_unbind (xsignal_group_t *self)
   for (i = 0; i < self->handlers->len; i++)
     {
       SignalHandler *handler;
-      gulong handler_id;
+      xulong_t handler_id;
 
       handler = xptr_array_index (self->handlers, i);
 
@@ -293,10 +293,10 @@ xsignal_group_unbind (xsignal_group_t *self)
        */
 
       if (target != NULL && handler_id != 0)
-        g_signal_handler_disconnect (target, handler_id);
+        xsignal_handler_disconnect (target, handler_id);
     }
 
-  g_signal_emit (self, signals [UNBIND], 0);
+  xsignal_emit (self, signals [UNBIND], 0);
 
   g_clear_object (&target);
 }
@@ -357,7 +357,7 @@ xsignal_group_block (xsignal_group_t *self)
       g_assert (handler->closure != NULL);
       g_assert (handler->handler_id != 0);
 
-      g_signal_handler_block (target, handler->handler_id);
+      xsignal_handler_block (target, handler->handler_id);
     }
 
   xobject_unref (target);
@@ -403,7 +403,7 @@ xsignal_group_unblock (xsignal_group_t *self)
       g_assert (handler->closure != NULL);
       g_assert (handler->handler_id != 0);
 
-      g_signal_handler_unblock (target, handler->handler_id);
+      xsignal_handler_unblock (target, handler->handler_id);
     }
 
   xobject_unref (target);
@@ -646,7 +646,7 @@ xsignal_group_class_init (xsignal_group_class_t *klass)
    * Since: 2.72
    */
   signals[BIND] =
-      g_signal_new ("bind",
+      xsignal_new ("bind",
                     XTYPE_FROM_CLASS (klass),
                     G_SIGNAL_RUN_LAST,
                     0,
@@ -668,7 +668,7 @@ xsignal_group_class_init (xsignal_group_class_t *klass)
    * Since: 2.72
    */
   signals[UNBIND] =
-      g_signal_new ("unbind",
+      xsignal_new ("unbind",
                     XTYPE_FROM_CLASS (klass),
                     G_SIGNAL_RUN_LAST,
                     0,
@@ -722,7 +722,7 @@ xsignal_group_connect_full (xsignal_group_t   *self,
 
   g_return_if_fail (X_IS_SIGNAL_GROUP (self));
   g_return_if_fail (detailed_signal != NULL);
-  g_return_if_fail (g_signal_parse_name (detailed_signal, self->target_type,
+  g_return_if_fail (xsignal_parse_name (detailed_signal, self->target_type,
                                          &signal_id, &signal_detail, TRUE) != 0);
   g_return_if_fail (c_handler != NULL);
   g_return_if_fail (!is_object || X_IS_OBJECT (data));

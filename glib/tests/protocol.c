@@ -88,7 +88,7 @@ test_message_cb1 (xio_channel_t  * channel,
                   xpointer_t      user_data)
 {
   GIOStatus  status;
-  guchar     buf[512];
+  xuchar_t     buf[512];
   xsize_t      read_bytes = 0;
 
   g_assert_cmpuint (condition, ==, G_IO_IN);
@@ -132,8 +132,8 @@ test_message (void)
   xio_channel_t    * channel;
   xmain_loop_t     * loop;
   xerror_t        * error = NULL;
-  gulong          child_source;
-  gulong          io_source;
+  xulong_t          child_source;
+  xulong_t          io_source;
   xpid_t            pid = 0;
   int             pipes[2];
   int             passed = 0;
@@ -263,8 +263,8 @@ test_error (void)
       xio_channel_t    * channel;
       xmain_loop_t     * loop;
       xerror_t        * error = NULL;
-      gulong          child_source;
-      gulong          io_source;
+      xulong_t          child_source;
+      xulong_t          io_source;
       xpid_t            pid = 0;
       int             pipes[2];
 

@@ -28,13 +28,13 @@ print_properties (xdbus_proxy_t *proxy)
 
   g_print ("    properties:\n");
 
-  property_names = g_dbus_proxy_get_cached_property_names (proxy);
+  property_names = xdbus_proxy_get_cached_property_names (proxy);
   for (n = 0; property_names != NULL && property_names[n] != NULL; n++)
     {
       const xchar_t *key = property_names[n];
       xvariant_t *value;
       xchar_t *value_str;
-      value = g_dbus_proxy_get_cached_property (proxy, key);
+      value = xdbus_proxy_get_cached_property (proxy, key);
       value_str = xvariant_print (value, TRUE);
       g_print ("      %s -> %s\n", key, value_str);
       xvariant_unref (value);
@@ -106,7 +106,7 @@ print_proxy (xdbus_proxy_t *proxy)
 {
   xchar_t *name_owner;
 
-  name_owner = g_dbus_proxy_get_name_owner (proxy);
+  name_owner = xdbus_proxy_get_name_owner (proxy);
   if (name_owner != NULL)
     {
       g_print ("+++ Proxy object points to remote object owned by %s\n"
@@ -150,7 +150,7 @@ main (int argc, char *argv[])
 {
   xoption_context_t *opt_context;
   xerror_t *error;
-  GDBusProxyFlags flags;
+  xdbus_proxy_flags_t flags;
   xdbus_proxy_t *proxy;
 
   loop = NULL;
@@ -185,7 +185,7 @@ main (int argc, char *argv[])
   loop = xmain_loop_new (NULL, FALSE);
 
   error = NULL;
-  proxy = g_dbus_proxy_new_for_bus_sync (opt_system_bus ? G_BUS_TYPE_SYSTEM : G_BUS_TYPE_SESSION,
+  proxy = xdbus_proxy_new_for_bus_sync (opt_system_bus ? G_BUS_TYPE_SYSTEM : G_BUS_TYPE_SESSION,
                                          flags,
                                          NULL, /* xdbus_interface_info_t */
                                          opt_name,
@@ -200,15 +200,15 @@ main (int argc, char *argv[])
       goto out;
     }
 
-  g_signal_connect (proxy,
+  xsignal_connect (proxy,
                     "g-properties-changed",
                     G_CALLBACK (on_properties_changed),
                     NULL);
-  g_signal_connect (proxy,
+  xsignal_connect (proxy,
                     "g-signal",
                     G_CALLBACK (on_signal),
                     NULL);
-  g_signal_connect (proxy,
+  xsignal_connect (proxy,
                     "notify::g-name-owner",
                     G_CALLBACK (on_name_owner_notify),
                     NULL);

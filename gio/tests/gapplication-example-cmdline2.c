@@ -96,7 +96,7 @@ main (int argc, char **argv)
 
   app = test_application_new ("org.gtk.TestApplication", 0);
   xapplication_set_inactivity_timeout (app, 10000);
-  g_signal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
+  xsignal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
 
   status = xapplication_run (app, argc, argv);
 

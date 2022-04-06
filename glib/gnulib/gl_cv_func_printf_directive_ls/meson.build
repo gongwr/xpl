@@ -3,7 +3,7 @@
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# Test whether the *printf family of functions supports the %ls format
+# test_t whether the *printf family of functions supports the %ls format
 # directive and in particular, when a precision is specified, whether
 # the functions stop converting the wide string argument when the number
 # of bytes that have been produced by this conversion equals or exceeds
@@ -24,7 +24,7 @@ int main ()
 {
   int result = 0;
   char buf[100];
-  /* Test whether %ls works at all.
+  /* test_t whether %ls works at all.
      This test fails on OpenBSD 4.0, IRIX 6.5, Solaris 2.6, Haiku, but not on
      Cygwin 1.5.  */
   {
@@ -43,7 +43,7 @@ int main ()
         || strcmp (buf, "a") != 0)
       result |= 2;
   }
-  /* Test whether precisions in %ls are supported as specified in ISO C 99
+  /* test_t whether precisions in %ls are supported as specified in ISO C 99
      section 7.19.6.1:
        "If a precision is specified, no more than that many bytes are written
         (including shift sequences, if any), and the array shall contain a

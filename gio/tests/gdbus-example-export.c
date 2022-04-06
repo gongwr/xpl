@@ -250,7 +250,7 @@ send_property_change (xobject_t         *obj,
                            "{sv}",
                            "Name", xvariant_new_string (myobj->name ? myobj->name : ""));
 
-  g_dbus_connection_emit_signal (connection,
+  xdbus_connection_emit_signal (connection,
                                  NULL,
                                  "/org/myorg/xobject_t",
                                  "org.freedesktop.DBus.Properties",
@@ -270,9 +270,9 @@ on_bus_acquired (xdbus_connection_t *connection,
   xobject_t *myobj = user_data;
   xuint_t registration_id;
 
-  g_signal_connect (myobj, "notify",
+  xsignal_connect (myobj, "notify",
                     G_CALLBACK (send_property_change), connection);
-  registration_id = g_dbus_connection_register_object (connection,
+  registration_id = xdbus_connection_register_object (connection,
                                                        "/org/myorg/xobject_t",
                                                        introspection_data->interfaces[0],
                                                        &interface_vtable,

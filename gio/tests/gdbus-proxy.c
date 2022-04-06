@@ -28,7 +28,7 @@
 static xmain_loop_t *loop = NULL;
 
 /* ---------------------------------------------------------------------------------------------------- */
-/* Test that the method aspects of xdbus_proxy_t works */
+/* test_t that the method aspects of xdbus_proxy_t works */
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
@@ -41,7 +41,7 @@ test_methods (xdbus_proxy_t *proxy)
 
   /* check that we can invoke a method */
   error = NULL;
-  result = g_dbus_proxy_call_sync (proxy,
+  result = xdbus_proxy_call_sync (proxy,
                                    "HelloWorld",
                                    xvariant_new ("(s)", "Hey"),
                                    G_DBUS_CALL_FLAGS_NONE,
@@ -56,7 +56,7 @@ test_methods (xdbus_proxy_t *proxy)
   xvariant_unref (result);
 
   /* Check that we can completely recover the returned error */
-  result = g_dbus_proxy_call_sync (proxy,
+  result = xdbus_proxy_call_sync (proxy,
                                    "HelloWorld",
                                    xvariant_new ("(s)", "Yo"),
                                    G_DBUS_CALL_FLAGS_NONE,
@@ -80,7 +80,7 @@ test_methods (xdbus_proxy_t *proxy)
    * build, there's no guarantee we'll be scheduled in the window between
    * the timeout being hit and the sleep finishing. */
   error = NULL;
-  result = g_dbus_proxy_call_sync (proxy,
+  result = xdbus_proxy_call_sync (proxy,
                                    "Sleep",
                                    xvariant_new ("(i)", 10000 /* msec */),
                                    G_DBUS_CALL_FLAGS_NONE,
@@ -93,10 +93,10 @@ test_methods (xdbus_proxy_t *proxy)
   g_clear_error (&error);
 
   /* Check that proxy-default timeouts work. */
-  g_assert_cmpint (g_dbus_proxy_get_default_timeout (proxy), ==, -1);
+  g_assert_cmpint (xdbus_proxy_get_default_timeout (proxy), ==, -1);
 
   /* the default timeout is 25000 msec so this should work */
-  result = g_dbus_proxy_call_sync (proxy,
+  result = xdbus_proxy_call_sync (proxy,
                                    "Sleep",
                                    xvariant_new ("(i)", 500 /* msec */),
                                    G_DBUS_CALL_FLAGS_NONE,
@@ -111,9 +111,9 @@ test_methods (xdbus_proxy_t *proxy)
   /* Now set the proxy-default timeout to 250 msec and try the 10000 msec
    * call - this should FAIL. Again, we use such a long sleep because on slow
    * machines there's no guarantee we'll be scheduled when we want to be. */
-  g_dbus_proxy_set_default_timeout (proxy, 250);
-  g_assert_cmpint (g_dbus_proxy_get_default_timeout (proxy), ==, 250);
-  result = g_dbus_proxy_call_sync (proxy,
+  xdbus_proxy_set_default_timeout (proxy, 250);
+  g_assert_cmpint (xdbus_proxy_get_default_timeout (proxy), ==, 250);
+  result = xdbus_proxy_call_sync (proxy,
                                    "Sleep",
                                    xvariant_new ("(i)", 10000 /* msec */),
                                    G_DBUS_CALL_FLAGS_NONE,
@@ -126,7 +126,7 @@ test_methods (xdbus_proxy_t *proxy)
   g_clear_error (&error);
 
   /* clean up after ourselves */
-  g_dbus_proxy_set_default_timeout (proxy, -1);
+  xdbus_proxy_set_default_timeout (proxy, -1);
 }
 
 static xboolean_t
@@ -161,7 +161,7 @@ strv_equal (xchar_t **strv, ...)
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
-/* Test that the property aspects of xdbus_proxy_t works */
+/* test_t that the property aspects of xdbus_proxy_t works */
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
@@ -177,16 +177,16 @@ test_properties (xdbus_proxy_t *proxy)
 
   error = NULL;
 
-  if (g_dbus_proxy_get_flags (proxy) & G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES)
+  if (xdbus_proxy_get_flags (proxy) & G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES)
     {
-       g_assert_null (g_dbus_proxy_get_cached_property_names (proxy));
+       g_assert_null (xdbus_proxy_get_cached_property_names (proxy));
        return;
     }
 
   /*
    * Check that we can list all cached properties.
    */
-  names = g_dbus_proxy_get_cached_property_names (proxy);
+  names = xdbus_proxy_get_cached_property_names (proxy);
 
   g_assert_true (strv_equal (names,
                              "PropertyThatWillBeInvalidated",
@@ -222,11 +222,11 @@ test_properties (xdbus_proxy_t *proxy)
    *
    * No need to test all properties - xvariant_t has already been tested
    */
-  variant = g_dbus_proxy_get_cached_property (proxy, "y");
+  variant = xdbus_proxy_get_cached_property (proxy, "y");
   g_assert_nonnull (variant);
   g_assert_cmpint (xvariant_get_byte (variant), ==, 1);
   xvariant_unref (variant);
-  variant = g_dbus_proxy_get_cached_property (proxy, "o");
+  variant = xdbus_proxy_get_cached_property (proxy, "o");
   g_assert_nonnull (variant);
   g_assert_cmpstr (xvariant_get_string (variant, NULL), ==, "/some/path");
   xvariant_unref (variant);
@@ -236,7 +236,7 @@ test_properties (xdbus_proxy_t *proxy)
    * is received. Also check that the cache is updated.
    */
   variant2 = xvariant_new_byte (42);
-  result = g_dbus_proxy_call_sync (proxy,
+  result = xdbus_proxy_call_sync (proxy,
                                    "FrobSetProperty",
                                    xvariant_new ("(sv)",
                                                   "y",
@@ -250,26 +250,26 @@ test_properties (xdbus_proxy_t *proxy)
   g_assert_cmpstr (xvariant_get_type_string (result), ==, "()");
   xvariant_unref (result);
   _g_assert_signal_received (proxy, "g-properties-changed");
-  variant = g_dbus_proxy_get_cached_property (proxy, "y");
+  variant = xdbus_proxy_get_cached_property (proxy, "y");
   g_assert_nonnull (variant);
   g_assert_cmpint (xvariant_get_byte (variant), ==, 42);
   xvariant_unref (variant);
 
-  g_dbus_proxy_set_cached_property (proxy, "y", xvariant_new_byte (142));
-  variant = g_dbus_proxy_get_cached_property (proxy, "y");
+  xdbus_proxy_set_cached_property (proxy, "y", xvariant_new_byte (142));
+  variant = xdbus_proxy_get_cached_property (proxy, "y");
   g_assert_nonnull (variant);
   g_assert_cmpint (xvariant_get_byte (variant), ==, 142);
   xvariant_unref (variant);
 
-  g_dbus_proxy_set_cached_property (proxy, "y", NULL);
-  variant = g_dbus_proxy_get_cached_property (proxy, "y");
+  xdbus_proxy_set_cached_property (proxy, "y", NULL);
+  variant = xdbus_proxy_get_cached_property (proxy, "y");
   g_assert_null (variant);
 
   /* Check that the invalidation feature of the PropertiesChanged()
    * signal works... First, check that we have a cached value of the
    * property (from the initial GetAll() call)
    */
-  variant = g_dbus_proxy_get_cached_property (proxy, "PropertyThatWillBeInvalidated");
+  variant = xdbus_proxy_get_cached_property (proxy, "PropertyThatWillBeInvalidated");
   g_assert_nonnull (variant);
   g_assert_cmpstr (xvariant_get_string (variant, NULL), ==, "InitialValue");
   xvariant_unref (variant);
@@ -284,7 +284,7 @@ test_properties (xdbus_proxy_t *proxy)
    * the same thread as we're doing this synchronous call, we'll get
    * the method reply before...
    */
-  result = g_dbus_proxy_call_sync (proxy,
+  result = xdbus_proxy_call_sync (proxy,
                                    "FrobInvalidateProperty",
                                    xvariant_new ("(s)", "OMGInvalidated"),
                                    G_DBUS_CALL_FLAGS_NONE,
@@ -298,12 +298,12 @@ test_properties (xdbus_proxy_t *proxy)
   /* ... hence we wait for the g-properties-changed signal to be delivered */
   _g_assert_signal_received (proxy, "g-properties-changed");
   /* ... and now we finally, check that the cached value has been invalidated */
-  variant = g_dbus_proxy_get_cached_property (proxy, "PropertyThatWillBeInvalidated");
+  variant = xdbus_proxy_get_cached_property (proxy, "PropertyThatWillBeInvalidated");
   g_assert_null (variant);
 
   /* Now test that G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES works - we need a new proxy for that */
   error = NULL;
-  proxy2 = g_dbus_proxy_new_sync (g_dbus_proxy_get_connection (proxy),
+  proxy2 = xdbus_proxy_new_sync (xdbus_proxy_get_connection (proxy),
                                   G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES,
                                   NULL,                      /* xdbus_interface_info_t */
                                   "com.example.TestService", /* name */
@@ -313,16 +313,16 @@ test_properties (xdbus_proxy_t *proxy)
                                   &error);
   g_assert_no_error (error);
 
-  name_owner = g_dbus_proxy_get_name_owner (proxy2);
+  name_owner = xdbus_proxy_get_name_owner (proxy2);
   g_assert_nonnull (name_owner);
   g_free (name_owner);
 
-  variant = g_dbus_proxy_get_cached_property (proxy2, "PropertyThatWillBeInvalidated");
+  variant = xdbus_proxy_get_cached_property (proxy2, "PropertyThatWillBeInvalidated");
   g_assert_nonnull (variant);
   g_assert_cmpstr (xvariant_get_string (variant, NULL), ==, "OMGInvalidated"); /* from previous test */
   xvariant_unref (variant);
 
-  result = g_dbus_proxy_call_sync (proxy2,
+  result = xdbus_proxy_call_sync (proxy2,
                                    "FrobInvalidateProperty",
                                    xvariant_new ("(s)", "OMGInvalidated2"),
                                    G_DBUS_CALL_FLAGS_NONE,
@@ -337,7 +337,7 @@ test_properties (xdbus_proxy_t *proxy)
   /* this time we should get the ::g-properties-changed _with_ the value */
   _g_assert_signal_received (proxy2, "g-properties-changed");
 
-  variant = g_dbus_proxy_get_cached_property (proxy2, "PropertyThatWillBeInvalidated");
+  variant = xdbus_proxy_get_cached_property (proxy2, "PropertyThatWillBeInvalidated");
   g_assert_nonnull (variant);
   g_assert_cmpstr (xvariant_get_string (variant, NULL), ==, "OMGInvalidated2");
   xvariant_unref (variant);
@@ -346,7 +346,7 @@ test_properties (xdbus_proxy_t *proxy)
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
-/* Test that the signal aspects of xdbus_proxy_t works */
+/* test_t that the signal aspects of xdbus_proxy_t works */
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
@@ -380,7 +380,7 @@ test_proxy_signals_on_emit_signal_cb (xdbus_proxy_t   *proxy,
   xvariant_t *result;
 
   error = NULL;
-  result = g_dbus_proxy_call_finish (proxy,
+  result = xdbus_proxy_call_finish (proxy,
                                      res,
                                      &error);
   g_assert_no_error (error);
@@ -400,7 +400,7 @@ test_signals (xdbus_proxy_t *proxy)
 {
   xerror_t *error;
   xstring_t *s;
-  gulong signal_handler_id;
+  xulong_t signal_handler_id;
   TestSignalData data;
   xvariant_t *result;
 
@@ -413,12 +413,12 @@ test_signals (xdbus_proxy_t *proxy)
    * is dispatched before the method reply)
    */
   s = xstring_new (NULL);
-  signal_handler_id = g_signal_connect (proxy,
+  signal_handler_id = xsignal_connect (proxy,
                                         "g-signal",
                                         G_CALLBACK (test_proxy_signals_on_signal),
                                         s);
 
-  result = g_dbus_proxy_call_sync (proxy,
+  result = xdbus_proxy_call_sync (proxy,
                                    "EmitSignal",
                                    xvariant_new ("(so)",
                                                   "Accept the next proposition you hear",
@@ -438,7 +438,7 @@ test_signals (xdbus_proxy_t *proxy)
   g_assert_cmpstr (s->str,
                    ==,
                    "('Accept the next proposition you hear .. in bed!', objectpath '/some/path/in/bed', <'a variant'>)");
-  g_signal_handler_disconnect (proxy, signal_handler_id);
+  xsignal_handler_disconnect (proxy, signal_handler_id);
   xstring_free (s, TRUE);
 
   /*
@@ -447,11 +447,11 @@ test_signals (xdbus_proxy_t *proxy)
   s = xstring_new (NULL);
   data.internal_loop = xmain_loop_new (NULL, FALSE);
   data.s = s;
-  signal_handler_id = g_signal_connect (proxy,
+  signal_handler_id = xsignal_connect (proxy,
                                         "g-signal",
                                         G_CALLBACK (test_proxy_signals_on_signal),
                                         s);
-  g_dbus_proxy_call (proxy,
+  xdbus_proxy_call (proxy,
                      "EmitSignal",
                      xvariant_new ("(so)",
                                     "You will make a great programmer",
@@ -466,7 +466,7 @@ test_signals (xdbus_proxy_t *proxy)
   g_assert_cmpstr (s->str,
                    ==,
                    "('You will make a great programmer .. in bed!', objectpath '/some/other/path/in/bed', <'a variant'>)");
-  g_signal_handler_disconnect (proxy, signal_handler_id);
+  xsignal_handler_disconnect (proxy, signal_handler_id);
   xstring_free (s, TRUE);
 }
 
@@ -478,7 +478,7 @@ test_bogus_method_return (xdbus_proxy_t *proxy)
   xerror_t *error = NULL;
   xvariant_t *result;
 
-  result = g_dbus_proxy_call_sync (proxy,
+  result = xdbus_proxy_call_sync (proxy,
                                    "PairReturn",
                                    NULL,
                                    G_DBUS_CALL_FLAGS_NONE,
@@ -498,7 +498,7 @@ test_bogus_signal (xdbus_proxy_t *proxy)
   xvariant_t *result;
   xdbus_interface_info_t *old_iface_info;
 
-  result = g_dbus_proxy_call_sync (proxy,
+  result = xdbus_proxy_call_sync (proxy,
                                    "EmitSignal2",
                                    NULL,
                                    G_DBUS_CALL_FLAGS_NONE,
@@ -521,10 +521,10 @@ test_bogus_signal (xdbus_proxy_t *proxy)
   /* Our main branch will also do g_warning() when running the mainloop so
    * temporarily remove the expected interface
    */
-  old_iface_info = g_dbus_proxy_get_interface_info (proxy);
-  g_dbus_proxy_set_interface_info (proxy, NULL);
+  old_iface_info = xdbus_proxy_get_interface_info (proxy);
+  xdbus_proxy_set_interface_info (proxy, NULL);
   _g_assert_signal_received (proxy, "g-signal");
-  g_dbus_proxy_set_interface_info (proxy, old_iface_info);
+  xdbus_proxy_set_interface_info (proxy, old_iface_info);
 }
 
 static void
@@ -537,7 +537,7 @@ test_bogus_property (xdbus_proxy_t *proxy)
   /* Make the service emit a PropertiesChanged signal for property 'i' of type 'i' - since
    * our introspection data has this as type 'u' we should get a warning on stderr.
    */
-  result = g_dbus_proxy_call_sync (proxy,
+  result = xdbus_proxy_call_sync (proxy,
                                    "FrobSetProperty",
                                    xvariant_new ("(sv)",
                                                   "i", xvariant_new_int32 (42)),
@@ -561,10 +561,10 @@ test_bogus_property (xdbus_proxy_t *proxy)
   /* Our main branch will also do g_warning() when running the mainloop so
    * temporarily remove the expected interface
    */
-  old_iface_info = g_dbus_proxy_get_interface_info (proxy);
-  g_dbus_proxy_set_interface_info (proxy, NULL);
+  old_iface_info = xdbus_proxy_get_interface_info (proxy);
+  xdbus_proxy_set_interface_info (proxy, NULL);
   _g_assert_signal_received (proxy, "g-properties-changed");
-  g_dbus_proxy_set_interface_info (proxy, old_iface_info);
+  xdbus_proxy_set_interface_info (proxy, old_iface_info);
 }
 #endif /* Disabled: see https://bugzilla.gnome.org/show_bug.cgi?id=658999 */
 
@@ -604,13 +604,13 @@ test_expected_interface (xdbus_proxy_t *proxy)
   xerror_t *error;
 
   /* This is obviously wrong but expected interface is not set so we don't fail... */
-  g_dbus_proxy_set_cached_property (proxy, "y", xvariant_new_string ("error_me_out!"));
-  g_dbus_proxy_set_cached_property (proxy, "y", xvariant_new_byte (42));
-  g_dbus_proxy_set_cached_property (proxy, "does-not-exist", xvariant_new_string ("something"));
-  g_dbus_proxy_set_cached_property (proxy, "does-not-exist", NULL);
+  xdbus_proxy_set_cached_property (proxy, "y", xvariant_new_string ("error_me_out!"));
+  xdbus_proxy_set_cached_property (proxy, "y", xvariant_new_byte (42));
+  xdbus_proxy_set_cached_property (proxy, "does-not-exist", xvariant_new_string ("something"));
+  xdbus_proxy_set_cached_property (proxy, "does-not-exist", NULL);
 
   /* Now repeat the method tests, with an expected interface set */
-  g_dbus_proxy_set_interface_info (proxy, frob_dbus_interface_info);
+  xdbus_proxy_set_interface_info (proxy, frob_dbus_interface_info);
   test_methods (proxy);
   test_signals (proxy);
 
@@ -627,13 +627,13 @@ test_expected_interface (xdbus_proxy_t *proxy)
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
                              "*Trying to set property y of type s but according to the expected interface the type is y*");
       value = xvariant_ref_sink (xvariant_new_string ("error_me_out!"));
-      g_dbus_proxy_set_cached_property (proxy, "y", value);
+      xdbus_proxy_set_cached_property (proxy, "y", value);
       xvariant_unref (value);
       g_test_assert_expected_messages ();
     }
 
   /* this should work, however (since the type is correct) */
-  g_dbus_proxy_set_cached_property (proxy, "y", xvariant_new_byte (42));
+  xdbus_proxy_set_cached_property (proxy, "y", xvariant_new_byte (42));
 
   if (g_test_undefined ())
     {
@@ -642,33 +642,33 @@ test_expected_interface (xdbus_proxy_t *proxy)
        */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
                              "*Trying to get property i with type i but according to the expected interface the type is u*");
-      value = g_dbus_proxy_get_cached_property (proxy, "i");
+      value = xdbus_proxy_get_cached_property (proxy, "i");
       g_test_assert_expected_messages ();
     }
 
   /* Even if a property does not exist in expected_interface, looking it
    * up, or setting it, should never fail. Because it could be that the
    * property has been added to the service but the xdbus_interface_info_t*
-   * passed to g_dbus_proxy_set_interface_info() just haven't been updated.
+   * passed to xdbus_proxy_set_interface_info() just haven't been updated.
    *
    * See https://bugzilla.gnome.org/show_bug.cgi?id=660886
    */
-  value = g_dbus_proxy_get_cached_property (proxy, "d");
+  value = xdbus_proxy_get_cached_property (proxy, "d");
   g_assert_nonnull (value);
   g_assert_true (xvariant_is_of_type (value, G_VARIANT_TYPE_DOUBLE));
   g_assert_cmpfloat (xvariant_get_double (value), ==, 7.5);
   xvariant_unref (value);
   /* update it via the cached property... */
-  g_dbus_proxy_set_cached_property (proxy, "d", xvariant_new_double (75.0));
+  xdbus_proxy_set_cached_property (proxy, "d", xvariant_new_double (75.0));
   /* ... and finally check that it has changed */
-  value = g_dbus_proxy_get_cached_property (proxy, "d");
+  value = xdbus_proxy_get_cached_property (proxy, "d");
   g_assert_nonnull (value);
   g_assert_true (xvariant_is_of_type (value, G_VARIANT_TYPE_DOUBLE));
   g_assert_cmpfloat (xvariant_get_double (value), ==, 75.0);
   xvariant_unref (value);
   /* now update it via the D-Bus interface... */
   error = NULL;
-  value = g_dbus_proxy_call_sync (proxy, "FrobSetProperty",
+  value = xdbus_proxy_call_sync (proxy, "FrobSetProperty",
                                   xvariant_new ("(sv)", "d", xvariant_new_double (85.0)),
                                   G_DBUS_CALL_FLAGS_NONE,
                                   -1, NULL, &error);
@@ -679,7 +679,7 @@ test_expected_interface (xdbus_proxy_t *proxy)
   /* ...ensure we receive the ::PropertiesChanged signal... */
   _g_assert_signal_received (proxy, "g-properties-changed");
   /* ... and finally check that it has changed */
-  value = g_dbus_proxy_get_cached_property (proxy, "d");
+  value = xdbus_proxy_get_cached_property (proxy, "d");
   g_assert_nonnull (value);
   g_assert_true (xvariant_is_of_type (value, G_VARIANT_TYPE_DOUBLE));
   g_assert_cmpfloat (xvariant_get_double (value), ==, 85.0);
@@ -691,7 +691,7 @@ test_basic (xdbus_proxy_t *proxy)
 {
   xdbus_connection_t *connection;
   xdbus_connection_t *conn;
-  GDBusProxyFlags flags;
+  xdbus_proxy_flags_t flags;
   xdbus_interface_info_t *info;
   xchar_t *name;
   xchar_t *path;
@@ -700,12 +700,12 @@ test_basic (xdbus_proxy_t *proxy)
 
   connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
 
-  g_assert_true (g_dbus_proxy_get_connection (proxy) == connection);
-  g_assert_null (g_dbus_proxy_get_interface_info (proxy));
-  g_assert_cmpstr (g_dbus_proxy_get_name (proxy), ==, "com.example.TestService");
-  g_assert_cmpstr (g_dbus_proxy_get_object_path (proxy), ==, "/com/example/test_object_t");
-  g_assert_cmpstr (g_dbus_proxy_get_interface_name (proxy), ==, "com.example.Frob");
-  g_assert_cmpint (g_dbus_proxy_get_default_timeout (proxy), ==, -1);
+  g_assert_true (xdbus_proxy_get_connection (proxy) == connection);
+  g_assert_null (xdbus_proxy_get_interface_info (proxy));
+  g_assert_cmpstr (xdbus_proxy_get_name (proxy), ==, "com.example.TestService");
+  g_assert_cmpstr (xdbus_proxy_get_object_path (proxy), ==, "/com/example/test_object_t");
+  g_assert_cmpstr (xdbus_proxy_get_interface_name (proxy), ==, "com.example.Frob");
+  g_assert_cmpint (xdbus_proxy_get_default_timeout (proxy), ==, -1);
 
   xobject_get (proxy,
                 "g-connection", &conn,
@@ -719,7 +719,7 @@ test_basic (xdbus_proxy_t *proxy)
 
   g_assert_true (conn == connection);
   g_assert_null (info);
-  g_assert_cmpint (flags, ==, g_dbus_proxy_get_flags (proxy));
+  g_assert_cmpint (flags, ==, xdbus_proxy_get_flags (proxy));
   g_assert_cmpstr (name, ==, "com.example.TestService");
   g_assert_cmpstr (path, ==, "/com/example/test_object_t");
   g_assert_cmpstr (interface, ==, "com.example.Frob");
@@ -754,7 +754,7 @@ kill_test_service (xdbus_connection_t *connection)
   xuint_t watch_id;
   xboolean_t name_disappeared = FALSE;
 
-  ret = g_dbus_connection_call_sync (connection,
+  ret = xdbus_connection_call_sync (connection,
                                      "org.freedesktop.DBus",
                                      "/org/freedesktop/DBus",
                                      "org.freedesktop.DBus",
@@ -785,7 +785,7 @@ kill_test_service (xdbus_connection_t *connection)
 }
 
 static void
-test_proxy_with_flags (GDBusProxyFlags flags)
+test_proxy_with_flags (xdbus_proxy_flags_t flags)
 {
   xdbus_proxy_t *proxy;
   xdbus_connection_t *connection;
@@ -798,7 +798,7 @@ test_proxy_with_flags (GDBusProxyFlags flags)
                                &error);
   g_assert_no_error (error);
   error = NULL;
-  proxy = g_dbus_proxy_new_sync (connection,
+  proxy = xdbus_proxy_new_sync (connection,
                                  flags,
                                  NULL,                      /* xdbus_interface_info_t */
                                  "com.example.TestService", /* name */
@@ -821,7 +821,7 @@ test_proxy_with_flags (GDBusProxyFlags flags)
 
   kill_test_service (connection);
 
-  owner = g_dbus_proxy_get_name_owner (proxy);
+  owner = xdbus_proxy_get_name_owner (proxy);
   g_assert_null (owner);
   g_free (owner);
 
@@ -847,10 +847,10 @@ proxy_ready (xobject_t      *source,
   xchar_t *owner;
 
   error = NULL;
-  proxy = g_dbus_proxy_new_for_bus_finish (result, &error);
+  proxy = xdbus_proxy_new_for_bus_finish (result, &error);
   g_assert_no_error (error);
 
-  owner = g_dbus_proxy_get_name_owner (proxy);
+  owner = xdbus_proxy_get_name_owner (proxy);
   g_assert_null (owner);
   g_free (owner);
 
@@ -865,7 +865,7 @@ proxy_ready (xobject_t      *source,
   test_signals (proxy);
   test_expected_interface (proxy);
 
-  kill_test_service (g_dbus_proxy_get_connection (proxy));
+  kill_test_service (xdbus_proxy_get_connection (proxy));
   xobject_unref (proxy);
   xmain_loop_quit (loop);
 }
@@ -881,7 +881,7 @@ test_async (void)
 {
   xuint_t id;
 
-  g_dbus_proxy_new_for_bus (G_BUS_TYPE_SESSION,
+  xdbus_proxy_new_for_bus (G_BUS_TYPE_SESSION,
                             G_DBUS_PROXY_FLAGS_NONE,
                             NULL,                      /* xdbus_interface_info_t */
                             "com.example.TestService", /* name */
@@ -904,7 +904,7 @@ test_no_properties (void)
   xerror_t *error;
 
   error = NULL;
-  proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+  proxy = xdbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
                                          G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                          NULL,                      /* xdbus_interface_info_t */
                                          "com.example.TestService", /* name */
@@ -927,7 +927,7 @@ check_error (xobject_t      *source,
   xerror_t *error = NULL;
   xvariant_t *reply;
 
-  reply = g_dbus_proxy_call_finish (G_DBUS_PROXY (source), result, &error);
+  reply = xdbus_proxy_call_finish (G_DBUS_PROXY (source), result, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_FAILED);
   g_assert_null (reply);
   xerror_free (error);
@@ -942,14 +942,14 @@ test_wellknown_noauto (void)
   xdbus_proxy_t *proxy;
   xuint_t id;
 
-  proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+  proxy = xdbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
                                          G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START,
                                          NULL, "some.name.that.does.not.exist",
                                          "/", "some.interface", NULL, &error);
   g_assert_no_error (error);
   g_assert_nonnull (proxy);
 
-  g_dbus_proxy_call (proxy, "method", NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, check_error, NULL);
+  xdbus_proxy_call (proxy, "method", NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, check_error, NULL);
   id = g_timeout_add (10000, fail_test, NULL);
   xmain_loop_run (loop);
   xobject_unref (proxy);
@@ -974,7 +974,7 @@ add_or_remove_match_rule (xdbus_connection_t *connection,
                                             "org.freedesktop.DBus", /* interface */
                                             (add_or_remove == ADD_MATCH) ? "AddMatch" : "RemoveMatch");
   xdbus_message_set_body (message, match_rule);
-  g_dbus_connection_send_message (connection,
+  xdbus_connection_send_message (connection,
                                   message,
                                   G_DBUS_SEND_MESSAGE_FLAGS_NONE,
                                   NULL,
@@ -989,7 +989,7 @@ test_proxy_no_match_rule (void)
   xdbus_connection_t *connection = NULL;
   xvariant_t *match_rule = NULL;
 
-  g_test_summary ("Test that G_DBUS_PROXY_FLAGS_NO_MATCH_RULE works");
+  g_test_summary ("test_t that G_DBUS_PROXY_FLAGS_NO_MATCH_RULE works");
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/1109");
 
   connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);

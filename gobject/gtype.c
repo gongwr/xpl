@@ -4518,7 +4518,7 @@ gobject_init (void)
 
   /* Signal system
    */
-  _g_signal_init ();
+  _xsignal_init ();
 }
 
 #ifdef XPLATFORM_WIN32

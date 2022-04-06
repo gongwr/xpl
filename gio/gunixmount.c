@@ -141,7 +141,7 @@ _g_unix_mount_unmounted (GUnixMount *mount)
     {
       _g_unix_volume_unset_mount (mount->volume, mount);
       mount->volume = NULL;
-      g_signal_emit_by_name (mount, "changed");
+      xsignal_emit_by_name (mount, "changed");
       /* there's really no need to emit mount_changed on the volume monitor
        * as we're going to be deleted.. */
     }
@@ -155,9 +155,9 @@ _g_unix_mount_unset_volume (GUnixMount *mount,
     {
       mount->volume = NULL;
       /* TODO: Emit changed in idle to avoid locking issues */
-      g_signal_emit_by_name (mount, "changed");
+      xsignal_emit_by_name (mount, "changed");
       if (mount->volume_monitor != NULL)
-        g_signal_emit_by_name (mount->volume_monitor, "mount-changed", mount);
+        xsignal_emit_by_name (mount->volume_monitor, "mount-changed", mount);
     }
 }
 
@@ -315,9 +315,9 @@ eject_unmount_do (xmount_t              *mount,
   xtask_set_task_data (task, xstrdupv (argv), (xdestroy_notify_t) xstrfreev);
 
   if (unix_mount->volume_monitor != NULL)
-    g_signal_emit_by_name (unix_mount->volume_monitor, "mount-pre-unmount", mount);
+    xsignal_emit_by_name (unix_mount->volume_monitor, "mount-pre-unmount", mount);
 
-  g_signal_emit_by_name (mount, "pre-unmount", 0);
+  xsignal_emit_by_name (mount, "pre-unmount", 0);
 
   timeout = g_timeout_source_new (500);
   xtask_attach_source (task, timeout, (xsource_func_t) eject_unmount_do_cb);

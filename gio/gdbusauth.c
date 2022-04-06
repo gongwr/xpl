@@ -530,7 +530,7 @@ client_choose_mech_and_send_initial_response (GDBusAuth           *auth,
       s = xstrdup_printf ("AUTH %s\r\n", _g_dbus_auth_mechanism_get_name (auth_mech_to_use_gtype));
     }
   debug_print ("CLIENT: writing '%s'", s);
-  if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+  if (!xdata_output_stream_put_string (dos, s, cancellable, error))
     {
       xobject_unref (mech);
       mech = NULL;
@@ -587,7 +587,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
   credentials = NULL;
 
   dis = G_DATA_INPUT_STREAM (g_data_input_stream_new (g_io_stream_get_input_stream (auth->priv->stream)));
-  dos = G_DATA_OUTPUT_STREAM (g_data_output_stream_new (g_io_stream_get_output_stream (auth->priv->stream)));
+  dos = G_DATA_OUTPUT_STREAM (xdata_output_stream_new (g_io_stream_get_output_stream (auth->priv->stream)));
   g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (dis), FALSE);
   g_filter_output_stream_set_close_base_stream (G_FILTER_OUTPUT_STREAM (dos), FALSE);
 
@@ -604,11 +604,11 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
     }
   else
     {
-      if (!g_data_output_stream_put_byte (dos, '\0', cancellable, error))
+      if (!xdata_output_stream_put_byte (dos, '\0', cancellable, error))
         goto out;
     }
 #else
-  if (!g_data_output_stream_put_byte (dos, '\0', cancellable, error))
+  if (!xdata_output_stream_put_byte (dos, '\0', cancellable, error))
     goto out;
 #endif
 
@@ -631,7 +631,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
   /* Get list of supported authentication mechanisms */
   s = "AUTH\r\n";
   debug_print ("CLIENT: writing '%s'", s);
-  if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+  if (!xdata_output_stream_put_string (dos, s, cancellable, error))
     goto out;
   state = CLIENT_STATE_WAITING_FOR_REJECT;
 
@@ -706,7 +706,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
                 {
                   s = "NEGOTIATE_UNIX_FD\r\n";
                   debug_print ("CLIENT: writing '%s'", s);
-                  if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+                  if (!xdata_output_stream_put_string (dos, s, cancellable, error))
                     goto out;
                   state = CLIENT_STATE_WAITING_FOR_AGREE_UNIX_FD;
                 }
@@ -714,7 +714,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
                 {
                   s = "BEGIN\r\n";
                   debug_print ("CLIENT: writing '%s'", s);
-                  if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+                  if (!xdata_output_stream_put_string (dos, s, cancellable, error))
                     goto out;
                   /* and we're done! */
                   goto out;
@@ -749,7 +749,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
               negotiated_capabilities |= G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING;
               s = "BEGIN\r\n";
               debug_print ("CLIENT: writing '%s'", s);
-              if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+              if (!xdata_output_stream_put_string (dos, s, cancellable, error))
                 goto out;
               /* and we're done! */
               goto out;
@@ -760,7 +760,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
               g_free (line);
               s = "BEGIN\r\n";
               debug_print ("CLIENT: writing '%s'", s);
-              if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+              if (!xdata_output_stream_put_string (dos, s, cancellable, error))
                 goto out;
               /* and we're done! */
               goto out;
@@ -815,7 +815,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
                   g_free (encoded_data);
                   g_free (data);
                   debug_print ("CLIENT: writing '%s'", s);
-                  if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+                  if (!xdata_output_stream_put_string (dos, s, cancellable, error))
                     {
                       g_free (s);
                       goto out;
@@ -966,7 +966,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
     }
 
   dis = G_DATA_INPUT_STREAM (g_data_input_stream_new (g_io_stream_get_input_stream (auth->priv->stream)));
-  dos = G_DATA_OUTPUT_STREAM (g_data_output_stream_new (g_io_stream_get_output_stream (auth->priv->stream)));
+  dos = G_DATA_OUTPUT_STREAM (xdata_output_stream_new (g_io_stream_get_output_stream (auth->priv->stream)));
   g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (dis), FALSE);
   g_filter_output_stream_set_close_base_stream (G_FILTER_OUTPUT_STREAM (dos), FALSE);
 
@@ -1059,7 +1059,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
             {
               s = get_auth_mechanisms (auth, allow_anonymous, "REJECTED ", "\r\n", " ");
               debug_print ("SERVER: writing '%s'", s);
-              if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+              if (!xdata_output_stream_put_string (dos, s, cancellable, error))
                 {
                   g_free (s);
                   g_free (line);
@@ -1115,7 +1115,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
                   xstrfreev (tokens);
                   s = get_auth_mechanisms (auth, allow_anonymous, "REJECTED ", "\r\n", " ");
                   debug_print ("SERVER: writing '%s'", s);
-                  if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+                  if (!xdata_output_stream_put_string (dos, s, cancellable, error))
                     {
                       g_free (s);
                       goto out;
@@ -1187,7 +1187,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
                         {
                           s = xstrdup_printf ("OK %s\r\n", guid);
                           debug_print ("SERVER: writing '%s'", s);
-                          if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+                          if (!xdata_output_stream_put_string (dos, s, cancellable, error))
                             {
                               g_free (s);
                               goto out;
@@ -1200,7 +1200,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
                     case G_DBUS_AUTH_MECHANISM_STATE_REJECTED:
                       s = get_auth_mechanisms (auth, allow_anonymous, "REJECTED ", "\r\n", " ");
                       debug_print ("SERVER: writing '%s'", s);
-                      if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+                      if (!xdata_output_stream_put_string (dos, s, cancellable, error))
                         {
                           g_free (s);
                           goto out;
@@ -1229,7 +1229,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
                             g_free (data);
 
                             debug_print ("SERVER: writing '%s'", s);
-                            if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+                            if (!xdata_output_stream_put_string (dos, s, cancellable, error))
                               {
                                 g_free (s);
                                 goto out;
@@ -1329,14 +1329,14 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
                   negotiated_capabilities |= G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING;
                   s = "AGREE_UNIX_FD\r\n";
                   debug_print ("SERVER: writing '%s'", s);
-                  if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+                  if (!xdata_output_stream_put_string (dos, s, cancellable, error))
                     goto out;
                 }
               else
                 {
                   s = "ERROR \"fd passing not offered\"\r\n";
                   debug_print ("SERVER: writing '%s'", s);
-                  if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+                  if (!xdata_output_stream_put_string (dos, s, cancellable, error))
                     goto out;
                 }
             }
@@ -1346,7 +1346,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
               g_free (line);
               s = "ERROR \"Unknown Command\"\r\n";
               debug_print ("SERVER: writing '%s'", s);
-              if (!g_data_output_stream_put_string (dos, s, cancellable, error))
+              if (!xdata_output_stream_put_string (dos, s, cancellable, error))
                 goto out;
             }
           break;

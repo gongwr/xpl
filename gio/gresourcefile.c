@@ -515,7 +515,7 @@ g_resource_file_query_info (xfile_t                *file,
             _xfile_attribute_matcher_matches_id (matcher, XFILE_ATTRIBUTE_ID_STANDARD_FAST_CONTENT_TYPE))) &&
           (bytes = g_resources_lookup_data (resource->path, 0, NULL)))
         {
-          const guchar *data;
+          const xuchar_t *data;
           xsize_t data_size;
 
           data = xbytes_get_data (bytes, &data_size);
@@ -819,7 +819,7 @@ static xoffset_t    g_resource_file_input_stream_tell       (xfile_input_stream_
 static xboolean_t   g_resource_file_input_stream_can_seek   (xfile_input_stream_t  *stream);
 static xboolean_t   g_resource_file_input_stream_seek       (xfile_input_stream_t  *stream,
 							   xoffset_t            offset,
-							   GSeekType          type,
+							   xseek_type_t          type,
 							   xcancellable_t      *cancellable,
 							   xerror_t           **error);
 static xfile_info_t *g_resource_file_input_stream_query_info (xfile_input_stream_t  *stream,
@@ -841,7 +841,7 @@ static void
 g_resource_file_input_stream_class_init (GResourceFileInputStreamClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
-  GInputStreamClass *stream_class = G_INPUT_STREAM_CLASS (klass);
+  xinput_stream_class_t *stream_class = G_INPUT_STREAM_CLASS (klass);
   GFileInputStreamClass *file_stream_class = XFILE_INPUT_STREAM_CLASS (klass);
 
   gobject_class->finalize = g_resource_file_input_stream_finalize;
@@ -928,7 +928,7 @@ g_resource_file_input_stream_can_seek (xfile_input_stream_t *stream)
 static xboolean_t
 g_resource_file_input_stream_seek (xfile_input_stream_t  *stream,
 				   xoffset_t            offset,
-				   GSeekType          type,
+				   xseek_type_t          type,
 				   xcancellable_t      *cancellable,
 				   xerror_t           **error)
 {

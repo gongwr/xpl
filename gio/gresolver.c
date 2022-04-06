@@ -181,7 +181,7 @@ g_resolver_class_init (GResolverClass *resolver_class)
    * configuration has changed.
    **/
   signals[RELOAD] =
-    g_signal_new (I_("reload"),
+    xsignal_new (I_("reload"),
 		  XTYPE_RESOLVER,
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GResolverClass, reload),
@@ -274,7 +274,7 @@ maybe_emit_reload (xresolver_t *resolver)
         {
           resolver->priv->resolv_conf_timestamp = st.st_mtime;
           g_mutex_unlock (&resolver->priv->mutex);
-          g_signal_emit (resolver, signals[RELOAD], 0);
+          xsignal_emit (resolver, signals[RELOAD], 0);
         }
       else
         g_mutex_unlock (&resolver->priv->mutex);

@@ -170,9 +170,9 @@ cleanup_sockets (SOCKET sockets[],
 }
 
 static void
-bucketize (gint64 val,
+bucketize (sint64_t val,
            xint_t   buckets[],
-           gint64 bucket_limits[],
+           sint64_t bucket_limits[],
            xint_t   count)
 {
   xint_t i;
@@ -195,7 +195,7 @@ bucketize (gint64 val,
 
 static void
 print_buckets (xint_t   buckets[],
-               gint64 bucket_limits[],
+               sint64_t bucket_limits[],
                xint_t   count)
 {
   xint_t i;
@@ -244,11 +244,11 @@ test_gpoll (void)
   SOCKET opp_sockets[NUM_POLLEES];
   xint_t i;
   xint_t activatable;
-  gint64 times[REPEAT][2];
+  sint64_t times[REPEAT][2];
 #define BUCKET_COUNT 25
-  gint64 bucket_limits[BUCKET_COUNT] = {3, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100, 120, 150, 180, 220, 280, 350, 450, 600, 800, 1000};
+  sint64_t bucket_limits[BUCKET_COUNT] = {3, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100, 120, 150, 180, 220, 280, 350, 450, 600, 800, 1000};
   xint_t   buckets[BUCKET_COUNT];
-  gint64 times_avg = 0, times_min = G_MAXINT64, times_max = 0;
+  sint64_t times_avg = 0, times_min = G_MAXINT64, times_max = 0;
 
   prepare_sockets (sockets, opp_sockets, fds, NUM_POLLEES);
   prepare_fds (sockets, fds, NUM_POLLEES);
@@ -261,7 +261,7 @@ test_gpoll (void)
   for (i = 0; i < REPEAT; i++)
     {
       xint_t r;
-      gint64 diff;
+      sint64_t diff;
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
@@ -292,7 +292,7 @@ test_gpoll (void)
   for (i = 0; i < REPEAT; i++)
     {
       xint_t r, s, v, t;
-      gint64 diff;
+      sint64_t diff;
       MSG msg;
       xboolean_t found_app;
 
@@ -347,7 +347,7 @@ test_gpoll (void)
   for (i = 0; i < REPEAT; i++)
     {
       xint_t r, s, v, t;
-      gint64 diff;
+      sint64_t diff;
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
@@ -393,7 +393,7 @@ test_gpoll (void)
   for (i = 0; i < REPEAT; i++)
     {
       xint_t r, s, v, t;
-      gint64 diff;
+      sint64_t diff;
       xint_t j;
 
       reset_fds (fds, NUM_POLLEES);
@@ -442,7 +442,7 @@ test_gpoll (void)
   for (i = 0; i < REPEAT; i++)
     {
       xint_t r, s, v, t;
-      gint64 diff;
+      sint64_t diff;
       xint_t j;
       MSG msg;
       xboolean_t found_app;
@@ -500,7 +500,7 @@ test_gpoll (void)
   for (i = 0; i < REPEAT; i++)
     {
       xint_t r, s, v, t;
-      gint64 diff;
+      sint64_t diff;
       xint_t j;
 
       reset_fds (fds, NUM_POLLEES);
@@ -550,7 +550,7 @@ test_gpoll (void)
   for (i = 0; i < REPEAT; i++)
     {
       xint_t r, s, v, t;
-      gint64 diff;
+      sint64_t diff;
       xint_t j;
       MSG msg;
       xboolean_t found_app;

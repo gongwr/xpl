@@ -616,11 +616,11 @@ test_modify (xbookmark_file_t *bookmark)
 
   if (g_test_verbose ())
     g_printerr ("\t=> check groups...");
-  g_assert_false (g_bookmark_file_has_group (bookmark, TEST_URI_1, "Test", NULL));
-  g_bookmark_file_add_group (bookmark, TEST_URI_1, "Test");
-  g_assert_true (g_bookmark_file_has_group (bookmark, TEST_URI_1, "Test", NULL));
+  g_assert_false (g_bookmark_file_has_group (bookmark, TEST_URI_1, "test_t", NULL));
+  g_bookmark_file_add_group (bookmark, TEST_URI_1, "test_t");
+  g_assert_true (g_bookmark_file_has_group (bookmark, TEST_URI_1, "test_t", NULL));
   g_assert_false (g_bookmark_file_has_group (bookmark, TEST_URI_1, "Fail", NULL));
-  g_assert_true (g_bookmark_file_remove_group (bookmark, TEST_URI_1, "Test", &error));
+  g_assert_true (g_bookmark_file_remove_group (bookmark, TEST_URI_1, "test_t", &error));
   g_assert_no_error (error);
   groups = g_bookmark_file_get_groups (bookmark, TEST_URI_1, NULL, &error);
   g_assert_cmpint (xstrv_length (groups), ==, 0);

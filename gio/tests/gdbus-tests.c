@@ -56,14 +56,14 @@ _g_assert_property_notify_run (xpointer_t     object,
                                const xchar_t *property_name)
 {
   xchar_t *s;
-  gulong handler_id;
+  xulong_t handler_id;
   xuint_t timeout_id;
   PropertyNotifyData data;
 
   data.loop = xmain_loop_new (xmain_context_get_thread_default (), FALSE);
   data.timed_out = FALSE;
   s = xstrdup_printf ("notify::%s", property_name);
-  handler_id = g_signal_connect (object,
+  handler_id = xsignal_connect (object,
                                  s,
                                  G_CALLBACK (on_property_notify),
                                  &data);
@@ -72,7 +72,7 @@ _g_assert_property_notify_run (xpointer_t     object,
                                       on_property_notify_timeout,
                                       &data);
   xmain_loop_run (data.loop);
-  g_signal_handler_disconnect (object, handler_id);
+  xsignal_handler_disconnect (object, handler_id);
   xsource_remove (timeout_id);
   xmain_loop_unref (data.loop);
 
@@ -182,13 +182,13 @@ xboolean_t
 _g_assert_signal_received_run (xpointer_t     object,
                                const xchar_t *signal_name)
 {
-  gulong handler_id;
+  xulong_t handler_id;
   xuint_t timeout_id;
   SignalReceivedData data;
 
   data.loop = xmain_loop_new (xmain_context_get_thread_default (), FALSE);
   data.timed_out = FALSE;
-  handler_id = g_signal_connect_swapped (object,
+  handler_id = xsignal_connect_swapped (object,
                                          signal_name,
                                          G_CALLBACK (on_signal_received),
                                          &data);
@@ -196,7 +196,7 @@ _g_assert_signal_received_run (xpointer_t     object,
                                       on_signal_received_timeout,
                                       &data);
   xmain_loop_run (data.loop);
-  g_signal_handler_disconnect (object, handler_id);
+  xsignal_handler_disconnect (object, handler_id);
   xsource_remove (timeout_id);
   xmain_loop_unref (data.loop);
 
@@ -206,7 +206,7 @@ _g_assert_signal_received_run (xpointer_t     object,
 /* ---------------------------------------------------------------------------------------------------- */
 
 xdbus_connection_t *
-_g_bus_get_priv (GBusType            bus_type,
+_g_bus_get_priv (xbus_type_t            bus_type,
                  xcancellable_t       *cancellable,
                  xerror_t            **error)
 {
@@ -219,7 +219,7 @@ _g_bus_get_priv (GBusType            bus_type,
   if (address == NULL)
     goto out;
 
-  ret = g_dbus_connection_new_for_address_sync (address,
+  ret = xdbus_connection_new_for_address_sync (address,
                                                 G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT |
                                                 G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION,
                                                 NULL, /* xdbus_auth_observer_t */

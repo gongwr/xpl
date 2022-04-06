@@ -225,7 +225,7 @@ name_vanished_handler_cb (xdbus_connection_t *connection,
 /* Converts a GNotificationPriority to an urgency level as defined by
  * the freedesktop spec (0: low, 1: normal, 2: critical).
  */
-static guchar
+static xuchar_t
 urgency_from_priority (GNotificationPriority priority)
 {
   switch (priority)
@@ -259,7 +259,7 @@ call_notify (xdbus_connection_t     *con,
   xvariant_t *parameters;
   const xchar_t *app_name;
   const xchar_t *body;
-  guchar urgency;
+  xuchar_t urgency;
 
   xvariant_builder_init (&action_builder, G_VARIANT_TYPE_STRING_ARRAY);
   if (xnotification_get_default_action (notification, NULL, NULL))
@@ -342,7 +342,7 @@ call_notify (xdbus_connection_t     *con,
                               &hints_builder,
                               -1);          /* expire_timeout */
 
-  g_dbus_connection_call (con, "org.freedesktop.Notifications", "/org/freedesktop/Notifications",
+  xdbus_connection_call (con, "org.freedesktop.Notifications", "/org/freedesktop/Notifications",
                           "org.freedesktop.Notifications", "Notify",
                           parameters, G_VARIANT_TYPE ("(u)"),
                           G_DBUS_CALL_FLAGS_NONE, -1, NULL,
@@ -359,7 +359,7 @@ notification_sent (xobject_t      *source_object,
   xerror_t *error = NULL;
   static xboolean_t warning_printed = FALSE;
 
-  val = g_dbus_connection_call_finish (G_DBUS_CONNECTION (source_object), result, &error);
+  val = xdbus_connection_call_finish (G_DBUS_CONNECTION (source_object), result, &error);
   if (val)
     {
       GFdoNotificationBackend *backend = n->backend;
@@ -406,7 +406,7 @@ g_fdo_notification_backend_dispose (xobject_t *object)
       xdbus_connection_t *session_bus;
 
       session_bus = G_NOTIFICATION_BACKEND (backend)->dbus_connection;
-      g_dbus_connection_signal_unsubscribe (session_bus, backend->notify_subscription);
+      xdbus_connection_signal_unsubscribe (session_bus, backend->notify_subscription);
       backend->notify_subscription = 0;
     }
 
@@ -452,7 +452,7 @@ g_fdo_notification_backend_send_notification (xnotification_backend_t *backend,
   if (self->notify_subscription == 0)
     {
       self->notify_subscription =
-        g_dbus_connection_signal_subscribe (backend->dbus_connection,
+        xdbus_connection_signal_subscribe (backend->dbus_connection,
                                             "org.freedesktop.Notifications",
                                             "org.freedesktop.Notifications", NULL,
                                             "/org/freedesktop/Notifications", NULL,
@@ -481,7 +481,7 @@ g_fdo_notification_backend_withdraw_notification (xnotification_backend_t *backe
     {
       if (n->notify_id > 0)
         {
-          g_dbus_connection_call (backend->dbus_connection,
+          xdbus_connection_call (backend->dbus_connection,
                                   "org.freedesktop.Notifications",
                                   "/org/freedesktop/Notifications",
                                   "org.freedesktop.Notifications", "CloseNotification",

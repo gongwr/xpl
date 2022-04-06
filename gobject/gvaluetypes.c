@@ -160,7 +160,7 @@ value_lcopy_int64 (const xvalue_t *value,
 		   xtype_c_value_t  *collect_values,
 		   xuint_t         collect_flags)
 {
-  gint64 *int64_p = collect_values[0].v_pointer;
+  sint64_t *int64_p = collect_values[0].v_pointer;
 
   g_return_val_if_fail (int64_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
@@ -452,7 +452,7 @@ _xvalue_types_init (void)
     info.value_table = &value_table;
     type = xtype_register_fundamental (XTYPE_CHAR, g_intern_static_string ("xchar_t"), &info, &finfo, 0);
     g_assert (type == XTYPE_CHAR);
-    type = xtype_register_fundamental (XTYPE_UCHAR, g_intern_static_string ("guchar"), &info, &finfo, 0);
+    type = xtype_register_fundamental (XTYPE_UCHAR, g_intern_static_string ("xuchar_t"), &info, &finfo, 0);
     g_assert (type == XTYPE_UCHAR);
   }
 
@@ -510,7 +510,7 @@ _xvalue_types_init (void)
     info.value_table = &value_table;
     type = xtype_register_fundamental (XTYPE_LONG, g_intern_static_string ("xlong_t"), &info, &finfo, 0);
     g_assert (type == XTYPE_LONG);
-    type = xtype_register_fundamental (XTYPE_ULONG, g_intern_static_string ("gulong"), &info, &finfo, 0);
+    type = xtype_register_fundamental (XTYPE_ULONG, g_intern_static_string ("xulong_t"), &info, &finfo, 0);
     g_assert (type == XTYPE_ULONG);
   }
 
@@ -528,7 +528,7 @@ _xvalue_types_init (void)
       value_lcopy_int64,	/* lcopy_value */
     };
     info.value_table = &value_table;
-    type = xtype_register_fundamental (XTYPE_INT64, g_intern_static_string ("gint64"), &info, &finfo, 0);
+    type = xtype_register_fundamental (XTYPE_INT64, g_intern_static_string ("sint64_t"), &info, &finfo, 0);
     g_assert (type == XTYPE_INT64);
     type = xtype_register_fundamental (XTYPE_UINT64, g_intern_static_string ("xuint64_t"), &info, &finfo, 0);
     g_assert (type == XTYPE_UINT64);
@@ -708,7 +708,7 @@ xvalue_get_schar (const xvalue_t *value)
  */
 void
 xvalue_set_uchar (xvalue_t *value,
-		   guchar  v_uchar)
+		   xuchar_t  v_uchar)
 {
   g_return_if_fail (G_VALUE_HOLDS_UCHAR (value));
 
@@ -723,7 +723,7 @@ xvalue_set_uchar (xvalue_t *value,
  *
  * Returns: unsigned character contents of @value
  */
-guchar
+xuchar_t
 xvalue_get_uchar (const xvalue_t *value)
 {
   g_return_val_if_fail (G_VALUE_HOLDS_UCHAR (value), 0);
@@ -868,7 +868,7 @@ xvalue_get_long (const xvalue_t *value)
  */
 void
 xvalue_set_ulong (xvalue_t *value,
-		   gulong  v_ulong)
+		   xulong_t  v_ulong)
 {
   g_return_if_fail (G_VALUE_HOLDS_ULONG (value));
 
@@ -883,7 +883,7 @@ xvalue_set_ulong (xvalue_t *value,
  *
  * Returns: unsigned long integer contents of @value
  */
-gulong
+xulong_t
 xvalue_get_ulong (const xvalue_t *value)
 {
   g_return_val_if_fail (G_VALUE_HOLDS_ULONG (value), 0);
@@ -901,7 +901,7 @@ xvalue_get_ulong (const xvalue_t *value)
  */
 void
 xvalue_set_int64 (xvalue_t *value,
-		   gint64  v_int64)
+		   sint64_t  v_int64)
 {
   g_return_if_fail (G_VALUE_HOLDS_INT64 (value));
 
@@ -915,7 +915,7 @@ xvalue_set_int64 (xvalue_t *value,
  *
  * Set the contents of a %XTYPE_INT64 #xvalue_t to @v_int64.
  */
-gint64
+sint64_t
 xvalue_get_int64 (const xvalue_t *value)
 {
   g_return_val_if_fail (G_VALUE_HOLDS_INT64 (value), 0);

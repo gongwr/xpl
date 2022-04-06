@@ -170,7 +170,7 @@ response_received (xdbus_connection_t *connection,
   xuint_t signal_id;
 
   signal_id = GPOINTER_TO_UINT (xobject_get_data (G_OBJECT (task), "signal-id"));
-  g_dbus_connection_signal_unsubscribe (connection, signal_id);
+  xdbus_connection_signal_unsubscribe (connection, signal_id);
 
   xvariant_get (parameters, "(u@a{sv})", &response, NULL);
 
@@ -206,7 +206,7 @@ open_call_done (xobject_t      *source,
   const char *handle;
   xuint_t signal_id;
 
-  connection = g_dbus_proxy_get_connection (G_DBUS_PROXY (openuri));
+  connection = xdbus_proxy_get_connection (G_DBUS_PROXY (openuri));
   open_file = GPOINTER_TO_INT (xobject_get_data (G_OBJECT (task), "open-file"));
 
   if (open_file)
@@ -226,9 +226,9 @@ open_call_done (xobject_t      *source,
   if (xstrcmp0 (handle, path) != 0)
     {
       signal_id = GPOINTER_TO_UINT (xobject_get_data (G_OBJECT (task), "signal-id"));
-      g_dbus_connection_signal_unsubscribe (connection, signal_id);
+      xdbus_connection_signal_unsubscribe (connection, signal_id);
 
-      signal_id = g_dbus_connection_signal_subscribe (connection,
+      signal_id = xdbus_connection_signal_subscribe (connection,
                                                       "org.freedesktop.portal.Desktop",
                                                       "org.freedesktop.portal.Request",
                                                       "Response",
@@ -264,7 +264,7 @@ g_openuri_portal_open_uri_async (const char          *uri,
       return;
     }
 
-  connection = g_dbus_proxy_get_connection (G_DBUS_PROXY (openuri));
+  connection = xdbus_proxy_get_connection (G_DBUS_PROXY (openuri));
 
   if (callback)
     {
@@ -276,7 +276,7 @@ g_openuri_portal_open_uri_async (const char          *uri,
       task = xtask_new (NULL, cancellable, callback, user_data);
 
       token = xstrdup_printf ("gio%d", g_random_int_range (0, G_MAXINT));
-      sender = xstrdup (g_dbus_connection_get_unique_name (connection) + 1);
+      sender = xstrdup (xdbus_connection_get_unique_name (connection) + 1);
       for (i = 0; sender[i]; i++)
         if (sender[i] == '.')
           sender[i] = '_';
@@ -285,7 +285,7 @@ g_openuri_portal_open_uri_async (const char          *uri,
       xobject_set_data_full (G_OBJECT (task), "handle", handle, g_free);
       g_free (sender);
 
-      signal_id = g_dbus_connection_signal_subscribe (connection,
+      signal_id = xdbus_connection_signal_subscribe (connection,
                                                       "org.freedesktop.portal.Desktop",
                                                       "org.freedesktop.portal.Request",
                                                       "Response",

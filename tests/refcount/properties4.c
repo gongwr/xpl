@@ -70,7 +70,7 @@ my_badger_class_init (MyBadgerClass * klass)
 static void
 my_badger_init (MyBadger * self)
 {
-  g_signal_connect (self, "notify::mama", G_CALLBACK (my_badger_mama_notify),
+  xsignal_connect (self, "notify::mama", G_CALLBACK (my_badger_mama_notify),
       NULL);
 }
 

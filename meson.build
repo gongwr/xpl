@@ -1274,7 +1274,7 @@ else
   have_long_long = false
 endif
 
-# Test whether the compiler supports the 'long double' type.
+# test_t whether the compiler supports the 'long double' type.
 if cc.compiles('''/* The Stardent Vistra knows sizeof(long double), but does not support it.  */
                   long double foo = 0.0;
                   /* On Ultrix 4.3 cc, long double is 4 and double is 8.  */
@@ -1283,12 +1283,12 @@ if cc.compiles('''/* The Stardent Vistra knows sizeof(long double), but does not
   glib_conf.set('HAVE_LONG_DOUBLE', 1)
 endif
 
-# Test whether <stddef.h> has the 'wchar_t' type.
+# test_t whether <stddef.h> has the 'wchar_t' type.
 if cc.has_header_symbol('stddef.h', 'wchar_t')
   glib_conf.set('HAVE_WCHAR_T', 1)
 endif
 
-# Test whether <wchar.h> has the 'wint_t' type.
+# test_t whether <wchar.h> has the 'wint_t' type.
 if cc.has_header_symbol('wchar.h', 'wint_t')
   glib_conf.set('HAVE_WINT_T', 1)
 endif
@@ -1351,7 +1351,7 @@ endif
 # Some platforms (Apple) hard-code int64_t to long long instead of
 # using long on 64-bit architectures. This can cause type mismatch
 # warnings when trying to interface with code using the standard
-# library type. Test for the warnings and set gint64 to whichever
+# library type. test_t for the warnings and set sint64_t to whichever
 # works.
 if long_long_size == long_size
   if cc.compiles('''#if defined(_AIX) && !defined(__GNUC__)
@@ -1450,7 +1450,7 @@ glibconfig_conf.set_quoted('guint32_format', guint32_format)
 glib_conf.set('ALIGNOF_GUINT32', guint32_align)
 
 if int_size == 8
-  gint64 = 'int'
+  sint64_t = 'int'
   gint64_modifier=''
   gint64_format='i'
   guint64_format='u'
@@ -1459,7 +1459,7 @@ if int_size == 8
   guint64_constant='(val)'
   guint64_align = int_align
 elif long_size == 8 and (long_long_size != long_size or int64_t_typedef == 'long')
-  gint64 = 'long'
+  sint64_t = 'long'
   glib_extension=''
   gint64_modifier='l'
   gint64_format='li'
@@ -1468,7 +1468,7 @@ elif long_size == 8 and (long_long_size != long_size or int64_t_typedef == 'long
   guint64_constant='(val##UL)'
   guint64_align = long_align
 elif long_long_size == 8 and (long_long_size != long_size or int64_t_typedef == 'long long')
-  gint64 = 'long long'
+  sint64_t = 'long long'
   glib_extension='G_GNUC_EXTENSION '
   gint64_modifier=int64_m
   gint64_format=int64_m + 'i'
@@ -1480,7 +1480,7 @@ else
   error('Compiler provides no native 64-bit integer type')
 endif
 glibconfig_conf.set('glib_extension', glib_extension)
-glibconfig_conf.set('gint64', gint64)
+glibconfig_conf.set('sint64_t', sint64_t)
 glibconfig_conf.set_quoted('gint64_modifier', gint64_modifier)
 glibconfig_conf.set_quoted('gint64_format', gint64_format)
 glibconfig_conf.set_quoted('guint64_format', guint64_format)
@@ -1609,13 +1609,13 @@ elif voidp_size == long_size
   glibconfig_conf.set_quoted('gintptr_format', 'li')
   glibconfig_conf.set_quoted('guintptr_format', 'lu')
   glibconfig_conf.set('glib_gpi_cast', '(xlong_t)')
-  glibconfig_conf.set('glib_gpui_cast', '(gulong)')
+  glibconfig_conf.set('glib_gpui_cast', '(xulong_t)')
 elif voidp_size == long_long_size
   glibconfig_conf.set('glib_intptr_type_define', 'long long')
   glibconfig_conf.set_quoted('gintptr_modifier', int64_m)
   glibconfig_conf.set_quoted('gintptr_format', int64_m + 'i')
   glibconfig_conf.set_quoted('guintptr_format', int64_m + 'u')
-  glibconfig_conf.set('glib_gpi_cast', '(gint64)')
+  glibconfig_conf.set('glib_gpi_cast', '(sint64_t)')
   glibconfig_conf.set('glib_gpui_cast', '(xuint64_t)')
 else
   error('Could not determine size of void *')

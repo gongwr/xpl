@@ -276,11 +276,11 @@
 
 /* --- defines --- */
 #define	to_lower(c)				( \
-	(guchar) (							\
-	  ( (((guchar)(c))>='A' && ((guchar)(c))<='Z') * ('a'-'A') ) |	\
-	  ( (((guchar)(c))>=192 && ((guchar)(c))<=214) * (224-192) ) |	\
-	  ( (((guchar)(c))>=216 && ((guchar)(c))<=222) * (248-216) ) |	\
-	  ((guchar)(c))							\
+	(xuchar_t) (							\
+	  ( (((xuchar_t)(c))>='A' && ((xuchar_t)(c))<='Z') * ('a'-'A') ) |	\
+	  ( (((xuchar_t)(c))>=192 && ((xuchar_t)(c))<=214) * (224-192) ) |	\
+	  ( (((xuchar_t)(c))>=216 && ((xuchar_t)(c))<=222) * (248-216) ) |	\
+	  ((xuchar_t)(c))							\
 	)								\
 )
 #define	READ_BUFFER_SIZE	(4000)
@@ -364,8 +364,8 @@ static void	g_scanner_get_token_i	  (xscanner_t	*scanner,
 					   xuint_t	*line_p,
 					   xuint_t	*position_p);
 
-static guchar	g_scanner_peek_next_char  (xscanner_t	*scanner);
-static guchar	g_scanner_get_char	  (xscanner_t	*scanner,
+static xuchar_t	g_scanner_peek_next_char  (xscanner_t	*scanner);
+static xuchar_t	g_scanner_get_char	  (xscanner_t	*scanner,
 					   xuint_t	*line_p,
 					   xuint_t	*position_p);
 static void	g_scanner_msg_handler	  (xscanner_t	*scanner,
@@ -375,8 +375,8 @@ static void	g_scanner_msg_handler	  (xscanner_t	*scanner,
 
 /* --- functions --- */
 static inline xint_t
-g_scanner_char_2_num (guchar	c,
-		      guchar	base)
+g_scanner_char_2_num (xuchar_t	c,
+		      xuchar_t	base)
 {
   if (c >= '0' && c <= '9')
     c -= '0';
@@ -1166,7 +1166,7 @@ g_scanner_input_text (xscanner_t	  *scanner,
     }
 }
 
-static guchar
+static xuchar_t
 g_scanner_peek_next_char (xscanner_t *scanner)
 {
   if (scanner->text < scanner->text_end)
@@ -1239,12 +1239,12 @@ g_scanner_sync_file_offset (xscanner_t *scanner)
     }
 }
 
-static guchar
+static xuchar_t
 g_scanner_get_char (xscanner_t	*scanner,
 		    xuint_t	*line_p,
 		    xuint_t	*position_p)
 {
-  guchar fchar;
+  xuchar_t fchar;
 
   if (scanner->text < scanner->text_end)
     fchar = *(scanner->text++);
@@ -1701,7 +1701,7 @@ g_scanner_get_token_i (xscanner_t	*scanner,
        * by copying between potentially-overlapping union members. */
       if (scanner->config->store_int64)
         {
-          gint64 temp = value_p->v_int64;
+          sint64_t temp = value_p->v_int64;
           value_p->v_float = temp;
         }
       else
@@ -1729,7 +1729,7 @@ g_scanner_get_token_ll	(xscanner_t	*scanner,
   xboolean_t	   in_string_dq;
   xstring_t	  *xstring;
   GTokenValue	   value;
-  guchar	   ch;
+  xuchar_t	   ch;
 
   config = scanner->config;
   (*value_p).v_int64 = 0;

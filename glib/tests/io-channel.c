@@ -173,7 +173,7 @@ test_read_line_embedded_nuls (void)
   xsize_t line_length, terminator_pos;
   GIOStatus status;
 
-  g_test_summary ("Test that reading a line containing embedded nuls works "
+  g_test_summary ("test_t that reading a line containing embedded nuls works "
                   "when using non-standard line terminators.");
 
   /* Write out a temporary file. */

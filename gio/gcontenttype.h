@@ -59,7 +59,7 @@ xchar_t *  g_content_type_from_mime_type    (const xchar_t  *mime_type);
 
 XPL_AVAILABLE_IN_ALL
 xchar_t *  g_content_type_guess             (const xchar_t  *filename,
-                                           const guchar *data,
+                                           const xuchar_t *data,
                                            xsize_t         data_size,
                                            xboolean_t     *result_uncertain);
 

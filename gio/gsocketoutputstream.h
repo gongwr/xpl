@@ -41,7 +41,7 @@ typedef struct _GSocketOutputStream                         GSocketOutputStream;
 
 struct _GSocketOutputStreamClass
 {
-  GOutputStreamClass parent_class;
+  xoutput_stream_class_t parent_class;
 };
 
 struct _GSocketOutputStream

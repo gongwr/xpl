@@ -362,7 +362,7 @@ complex_object_class_init (ComplexObjectClass *class)
   class->signal = complex_object_real_signal;
 
   complex_signals[COMPLEX_SIGNAL] =
-    g_signal_new ("signal",
+    xsignal_new ("signal",
 		  XTYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_FIRST,
 		  G_STRUCT_OFFSET (ComplexObjectClass, signal),
@@ -371,7 +371,7 @@ complex_object_class_init (ComplexObjectClass *class)
 		  XTYPE_NONE, 0);
 
   complex_signals[COMPLEX_SIGNAL_EMPTY] =
-    g_signal_new ("signal-empty",
+    xsignal_new ("signal-empty",
 		  XTYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_FIRST,
 		  G_STRUCT_OFFSET (ComplexObjectClass, signal_empty),
@@ -380,7 +380,7 @@ complex_object_class_init (ComplexObjectClass *class)
 		  XTYPE_NONE, 0);
 
   complex_signals[COMPLEX_SIGNAL_GENERIC] =
-    g_signal_new ("signal-generic",
+    xsignal_new ("signal-generic",
 		  XTYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_FIRST,
 		  G_STRUCT_OFFSET (ComplexObjectClass, signal),
@@ -388,7 +388,7 @@ complex_object_class_init (ComplexObjectClass *class)
 		  NULL,
 		  XTYPE_NONE, 0);
   complex_signals[COMPLEX_SIGNAL_GENERIC_EMPTY] =
-    g_signal_new ("signal-generic-empty",
+    xsignal_new ("signal-generic-empty",
 		  XTYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_FIRST,
 		  G_STRUCT_OFFSET (ComplexObjectClass, signal_empty),
@@ -397,7 +397,7 @@ complex_object_class_init (ComplexObjectClass *class)
 		  XTYPE_NONE, 0);
 
   complex_signals[COMPLEX_SIGNAL_ARGS] =
-    g_signal_new ("signal-args",
+    xsignal_new ("signal-args",
                   XTYPE_FROM_CLASS (object_class),
                   G_SIGNAL_RUN_FIRST,
                   G_STRUCT_OFFSET (ComplexObjectClass, signal),
@@ -449,7 +449,7 @@ complex_object_init (ComplexObject *complex_object)
 }
 
 /*************************************************************
- * Test object construction performance
+ * test_t object construction performance
  *************************************************************/
 
 #define NUM_OBJECT_TO_CONSTRUCT 10000
@@ -533,7 +533,7 @@ test_construction_print_result (PerformanceTest *test,
 }
 
 /*************************************************************
- * Test runtime type check performance
+ * test_t runtime type check performance
  *************************************************************/
 
 #define NUM_KILO_CHECKS_PER_ROUND 50
@@ -623,7 +623,7 @@ test_type_check_teardown (PerformanceTest *test,
 }
 
 /*************************************************************
- * Test signal emissions performance (common code)
+ * test_t signal emissions performance (common code)
  *************************************************************/
 
 #define NUM_EMISSIONS_PER_ROUND 10000
@@ -643,7 +643,7 @@ test_emission_run (PerformanceTest *test,
   int i;
 
   for (i = 0; i < data->n_checks; i++)
-    g_signal_emit (object, data->signal_id, 0);
+    xsignal_emit (object, data->signal_id, 0);
 }
 
 static void
@@ -655,11 +655,11 @@ test_emission_run_args (PerformanceTest *test,
   int i;
 
   for (i = 0; i < data->n_checks; i++)
-    g_signal_emit (object, data->signal_id, 0, 0, NULL);
+    xsignal_emit (object, data->signal_id, 0, 0, NULL);
 }
 
 /*************************************************************
- * Test signal unhandled emissions performance
+ * test_t signal unhandled emissions performance
  *************************************************************/
 
 static xpointer_t
@@ -711,7 +711,7 @@ test_emission_unhandled_teardown (PerformanceTest *test,
 }
 
 /*************************************************************
- * Test signal handled emissions performance
+ * test_t signal handled emissions performance
  *************************************************************/
 
 static void
@@ -727,19 +727,19 @@ test_emission_handled_setup (PerformanceTest *test)
   data = g_new0 (struct EmissionTest, 1);
   data->object = xobject_new (COMPLEX_TYPE_OBJECT, NULL);
   data->signal_id = complex_signals[GPOINTER_TO_INT (test->extra_data)];
-  g_signal_connect (data->object, "signal",
+  xsignal_connect (data->object, "signal",
                     G_CALLBACK (test_emission_handled_handler),
                     NULL);
-  g_signal_connect (data->object, "signal-empty",
+  xsignal_connect (data->object, "signal-empty",
                     G_CALLBACK (test_emission_handled_handler),
                     NULL);
-  g_signal_connect (data->object, "signal-generic",
+  xsignal_connect (data->object, "signal-generic",
                     G_CALLBACK (test_emission_handled_handler),
                     NULL);
-  g_signal_connect (data->object, "signal-generic-empty",
+  xsignal_connect (data->object, "signal-generic-empty",
                     G_CALLBACK (test_emission_handled_handler),
                     NULL);
-  g_signal_connect (data->object, "signal-args",
+  xsignal_connect (data->object, "signal-args",
                     G_CALLBACK (test_emission_handled_handler),
                     NULL);
 
@@ -784,7 +784,7 @@ test_emission_handled_teardown (PerformanceTest *test,
 }
 
 /*************************************************************
- * Test object refcount performance
+ * test_t object refcount performance
  *************************************************************/
 
 #define NUM_KILO_REFS_PER_ROUND 100000

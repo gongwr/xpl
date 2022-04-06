@@ -699,7 +699,7 @@ divide (mpn_t a, mpn_t b, mpn_t *q)
               {
                 /* Overflow, hence r[j+n]*beta+r[j+n-1] >= beta*b[n-1].  */
                 q_star = (mp_limb_t)~(mp_limb_t)0; /* q* = beta-1 */
-                /* Test whether r[j+n]*beta+r[j+n-1] - (beta-1)*b[n-1] >= beta
+                /* test_t whether r[j+n]*beta+r[j+n-1] - (beta-1)*b[n-1] >= beta
                    <==> r[j+n]*beta+r[j+n-1] + b[n-1] >= beta*b[n-1]+beta
                    <==> b[n-1] < floor((r[j+n]*beta+r[j+n-1]+b[n-1])/beta)
                         {<= beta !}.

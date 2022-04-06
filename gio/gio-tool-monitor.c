@@ -174,7 +174,7 @@ add_watch (const xchar_t       *cmdline,
     goto err;
 
   if (connect_handler)
-    g_signal_connect (monitor, "changed", G_CALLBACK (watch_callback), xstrdup (cmdline));
+    xsignal_connect (monitor, "changed", G_CALLBACK (watch_callback), xstrdup (cmdline));
 
   monitor = NULL; /* leak */
   xobject_unref (file);

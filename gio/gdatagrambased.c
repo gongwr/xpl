@@ -169,7 +169,7 @@ g_datagram_based_receive_messages (xdatagram_based_t  *datagram_based,
                                    xinput_message_t   *messages,
                                    xuint_t            num_messages,
                                    xint_t             flags,
-                                   gint64           timeout,
+                                   sint64_t           timeout,
                                    xcancellable_t    *cancellable,
                                    xerror_t         **error)
 {
@@ -270,7 +270,7 @@ g_datagram_based_send_messages (xdatagram_based_t   *datagram_based,
                                 xoutput_message_t   *messages,
                                 xuint_t             num_messages,
                                 xint_t              flags,
-                                gint64            timeout,
+                                sint64_t            timeout,
                                 xcancellable_t     *cancellable,
                                 xerror_t          **error)
 {
@@ -326,7 +326,7 @@ g_datagram_based_send_messages (xdatagram_based_t   *datagram_based,
  * cause the source to trigger, reporting the current condition (which is
  * likely 0 unless cancellation happened at the same time as a condition
  * change). You can check for this in the callback using
- * g_cancellable_is_cancelled().
+ * xcancellable_is_cancelled().
  *
  * Returns: (transfer full): a newly allocated #xsource_t
  *
@@ -445,7 +445,7 @@ g_datagram_based_condition_check (xdatagram_based_t *datagram_based,
 xboolean_t
 g_datagram_based_condition_wait (xdatagram_based_t  *datagram_based,
                                  xio_condition_t     condition,
-                                 gint64           timeout,
+                                 sint64_t           timeout,
                                  xcancellable_t    *cancellable,
                                  xerror_t         **error)
 {

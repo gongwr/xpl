@@ -289,12 +289,12 @@ xuint_t                 g_parse_debuxstring (const xchar_t     *string,
 
 XPL_AVAILABLE_IN_ALL
 xint_t                  g_snprintf           (xchar_t       *string,
-					    gulong       n,
+					    xulong_t       n,
 					    xchar_t const *format,
 					    ...) G_GNUC_PRINTF (3, 4);
 XPL_AVAILABLE_IN_ALL
 xint_t                  g_vsnprintf          (xchar_t       *string,
-					    gulong       n,
+					    xulong_t       n,
 					    xchar_t const *format,
 					    va_list      args)
 					    G_GNUC_PRINTF(3, 0);
@@ -372,16 +372,16 @@ xchar_t*  g_find_program_in_path  (const xchar_t *program);
 #define g_bit_storage(number)        g_bit_storage_impl(number)
 
 XPL_AVAILABLE_IN_ALL
-xint_t    (g_bit_nth_lsf)         (gulong mask,
+xint_t    (g_bit_nth_lsf)         (xulong_t mask,
                                  xint_t   nth_bit);
 XPL_AVAILABLE_IN_ALL
-xint_t    (g_bit_nth_msf)         (gulong mask,
+xint_t    (g_bit_nth_msf)         (xulong_t mask,
                                  xint_t   nth_bit);
 XPL_AVAILABLE_IN_ALL
-xuint_t   (g_bit_storage)         (gulong number);
+xuint_t   (g_bit_storage)         (xulong_t number);
 
 static inline xint_t
-g_bit_nth_lsf_impl (gulong mask,
+g_bit_nth_lsf_impl (xulong_t mask,
                     xint_t   nth_bit)
 {
   if (G_UNLIKELY (nth_bit < -1))
@@ -396,7 +396,7 @@ g_bit_nth_lsf_impl (gulong mask,
 }
 
 static inline xint_t
-g_bit_nth_msf_impl (gulong mask,
+g_bit_nth_msf_impl (xulong_t mask,
                     xint_t   nth_bit)
 {
   if (nth_bit < 0 || G_UNLIKELY (nth_bit > XPL_SIZEOF_LONG * 8))
@@ -411,7 +411,7 @@ g_bit_nth_msf_impl (gulong mask,
 }
 
 static inline xuint_t
-g_bit_storage_impl (gulong number)
+g_bit_storage_impl (xulong_t number)
 {
 #if defined(__GNUC__) && (__GNUC__ >= 4) && defined(__OPTIMIZE__)
   return G_LIKELY (number) ?

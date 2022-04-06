@@ -80,7 +80,7 @@ handle_set (int argc, char *argv[], xboolean_t do_help)
   xuint32_t uint32;
   gint32 int32;
   xuint64_t uint64;
-  gint64 int64;
+  sint64_t int64;
   xchar_t *param;
 
   g_set_prgname ("gio set");

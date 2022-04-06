@@ -92,7 +92,7 @@ struct _GPollFD
 {
 #if defined (G_OS_WIN32) && XPL_SIZEOF_VOID_P == 8
 #ifndef __GTK_DOC_IGNORE__
-  gint64	fd;
+  sint64_t	fd;
 #endif
 #else
   xint_t		fd;

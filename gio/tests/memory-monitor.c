@@ -44,7 +44,7 @@ do_watch_memory (void)
   xmain_loop_t *loop;
 
   m = xmemory_monitor_dup_default ();
-  g_signal_connect (G_OBJECT (m), "low-memory-warning",
+  xsignal_connect (G_OBJECT (m), "low-memory-warning",
 		    G_CALLBACK (warning_cb), NULL);
 
   loop = xmain_loop_new (NULL, TRUE);

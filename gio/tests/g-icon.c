@@ -583,7 +583,7 @@ test_bytes_icon (void)
   icon = xbytes_icon_new (bytes);
   icon2 = xbytes_icon_new (bytes);
 
-  g_assert (xbytes_icon_get_bytes (G_BYTES_ICON (icon)) == bytes);
+  g_assert (xbytes_icon_get_bytes (XBYTES_ICON (icon)) == bytes);
   g_assert (xicon_equal (icon, icon2));
   g_assert (xicon_hash (icon) == xicon_hash (icon2));
 

@@ -265,7 +265,7 @@ static void test_object (void)
         write the following trivial code to declare the macros:
 <informalexample><programlisting>
 #define VIEWER_TYPE_FILE viewer_file_get_type ()
-G_DECLARE_FINAL_TYPE (ViewerFile, viewer_file, VIEWER, FILE, xobject_t)
+G_DECLARE_FINAL_TYPE (viewer_file_t, viewer_file, VIEWER, FILE, xobject_t)
 </programlisting></informalexample>
       </para>
 
@@ -274,7 +274,7 @@ G_DECLARE_FINAL_TYPE (ViewerFile, viewer_file, VIEWER, FILE, xobject_t)
         <function><link linkend="G-DEFINE-TYPE:CAPS">G_DEFINE_TYPE</link></function>
 	macro to define a class:
 <informalexample><programlisting>
-G_DEFINE_TYPE (ViewerFile, viewer_file, XTYPE_OBJECT)
+G_DEFINE_TYPE (viewer_file_t, viewer_file, XTYPE_OBJECT)
 </programlisting></informalexample>
       </para>
 
@@ -290,7 +290,7 @@ xtype_t viewer_file_get_type (void)
       /* You fill this structure. */
     };
     type = xtype_register_static (XTYPE_OBJECT,
-                                   "ViewerFile",
+                                   "viewer_file_t",
                                    &amp;info, 0);
   }
   return type;
@@ -383,18 +383,18 @@ typedef struct {
 
   /* instance members */
   xchar_t *filename;
-} ViewerFile;
+} viewer_file_t;
 
 typedef struct {
   xobject_class_t parent;
 
   /* class members */
   /* the first is public, pure and virtual */
-  void (*open)  (ViewerFile  *self,
+  void (*open)  (viewer_file_t  *self,
                  xerror_t     **error);
 
   /* the second is public and virtual */
-  void (*close) (ViewerFile  *self,
+  void (*close) (viewer_file_t  *self,
                  xerror_t     **error);
 } ViewerFileClass;
 
@@ -412,19 +412,19 @@ viewer_file_get_type (void)
       (xclass_init_func_t) viewer_file_class_init,
       NULL,           /* class_finalize */
       NULL,           /* class_data */
-      sizeof (ViewerFile),
+      sizeof (viewer_file_t),
       0,              /* n_preallocs */
       (xinstance_init_func_t) NULL /* instance_init */
     };
     type = xtype_register_static (XTYPE_OBJECT,
-                                   "ViewerFile",
+                                   "viewer_file_t",
                                    &amp;info, 0);
   }
   return type;
 }
 </programlisting></informalexample>
           Upon the first call to <function>viewer_file_get_type</function>, the type named
-          <emphasis>ViewerFile</emphasis> will be registered in the type system as inheriting
+          <emphasis>viewer_file_t</emphasis> will be registered in the type system as inheriting
           from the type <emphasis>XTYPE_OBJECT</emphasis>.
         </para>
 
@@ -713,7 +713,7 @@ viewer_file_editable_interface_init (ViewerEditableInterface *iface)
   iface->save = viewer_file_save;
 }
 
-G_DEFINE_TYPE_WITH_CODE (ViewerFile, viewer_file, VIEWER_TYPE_FILE,
+G_DEFINE_TYPE_WITH_CODE (viewer_file, viewer_file, VIEWER_TYPE_FILE,
                          G_IMPLEMENT_INTERFACE (VIEWER_TYPE_EDITABLE,
                                                 viewer_file_editable_interface_init))
 </programlisting></informalexample>
@@ -724,7 +724,7 @@ G_DEFINE_TYPE_WITH_CODE (ViewerFile, viewer_file, VIEWER_TYPE_FILE,
           <function>get_type</function> function to register your xtype_t which
           inherits from some <link linkend="xobject_t"><type>xobject_t</type></link>
           and which implements the interface <type>ViewerEditable</type>. For
-          example, this code registers a new <type>ViewerFile</type> class which
+          example, this code registers a new <type>viewer_file_t</type> class which
           implements <type>ViewerEditable</type>:
 <informalexample><programlisting>
 static void
@@ -754,7 +754,7 @@ viewer_file_get_type (void)
       NULL,   /* class_init */
       NULL,   /* class_finalize */
       NULL,   /* class_data */
-      sizeof (ViewerFile),
+      sizeof (viewer_file_t),
       0,      /* n_preallocs */
       NULL    /* instance_init */
     };
@@ -764,7 +764,7 @@ viewer_file_get_type (void)
       NULL    /* interface_data */
     };
     type = xtype_register_static (VIEWER_TYPE_FILE,
-                                   "ViewerFile",
+                                   "viewer_file_t",
                                    &amp;info, 0);
     xtype_add_interface_static (type,
                                  VIEWER_TYPE_EDITABLE,

@@ -397,7 +397,7 @@ binding_canonicalisation (void)
   xbinding_t *binding;
   xobject_t *tmp;
 
-  g_test_summary ("Test that bindings set up with non-canonical property names work");
+  g_test_summary ("test_t that bindings set up with non-canonical property names work");
 
   binding = xobject_bind_property (source, "double_value",
                                     target, "double_value",
@@ -784,7 +784,7 @@ binding_unbind_weak (void)
   g_assert_null (binding);
 }
 
-/* Test that every call to unbind() after the first is a noop */
+/* test_t that every call to unbind() after the first is a noop */
 static void
 binding_unbind_multiple (void)
 {
@@ -929,7 +929,7 @@ binding_concurrent_unbind (void)
 {
   xuint_t i, j;
 
-  g_test_summary ("Test that unbinding from multiple threads concurrently works correctly");
+  g_test_summary ("test_t that unbinding from multiple threads concurrently works correctly");
 
   for (i = 0; i < 50; i++)
     {
@@ -1018,7 +1018,7 @@ binding_concurrent_finalizing (void)
 {
   xuint_t i;
 
-  g_test_summary ("Test that finalizing source/target from multiple threads concurrently works correctly");
+  g_test_summary ("test_t that finalizing source/target from multiple threads concurrently works correctly");
 
   for (i = 0; i < 50; i++)
     {

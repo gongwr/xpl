@@ -72,7 +72,7 @@
  * {
  *   xmemory_monitor_t *m;
  *   m = xmemory_monitor_dup_default ();
- *   g_signal_connect (G_OBJECT (m), "low-memory-warning",
+ *   xsignal_connect (G_OBJECT (m), "low-memory-warning",
  *                     G_CALLBACK (warning_cb), NULL);
  *   return m;
  * }
@@ -104,7 +104,7 @@
  * Since: 2.64
  */
 
-G_DEFINE_INTERFACE_WITH_CODE (xmemory_monitor_t, xmemory_monitor, XTYPE_OBJECT,
+G_DEFINE_INTERFACE_WITH_CODE (xmemory_monitor, xmemory_monitor, XTYPE_OBJECT,
                               xtype_interface_add_prerequisite (g_define_type_id, XTYPE_INITABLE))
 
 enum {
@@ -147,7 +147,7 @@ xmemory_monitor_default_init (GMemoryMonitorInterface *iface)
    * Since: 2.64
    */
   signals[LOW_MEMORY_WARNING] =
-    g_signal_new (I_("low-memory-warning"),
+    xsignal_new (I_("low-memory-warning"),
                   XTYPE_MEMORY_MONITOR,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GMemoryMonitorInterface, low_memory_warning),

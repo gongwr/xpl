@@ -713,7 +713,7 @@ test_locale_to_utf8_embedded_nul (void)
   g_test_trap_assert_passed ();
 }
 
-/* Test that embedded nul characters in UTF-8 input to g_locale_to_utf8()
+/* test_t that embedded nul characters in UTF-8 input to g_locale_to_utf8()
  * result in an error.
  */
 static void
@@ -735,7 +735,7 @@ test_locale_to_utf8_embedded_nul_utf8 (void)
   xerror_free (error);
 }
 
-/* Test that embedded nul characters in output of g_locale_to_utf8(),
+/* test_t that embedded nul characters in output of g_locale_to_utf8(),
  * when converted from non-UTF8 input, result in an error.
  */
 static void
@@ -764,7 +764,7 @@ test_locale_from_utf8_embedded_nul (void)
   g_test_trap_assert_passed ();
 }
 
-/* Test that embedded nul characters in input to g_locale_from_utf8(),
+/* test_t that embedded nul characters in input to g_locale_from_utf8(),
  * when converting (copying) to UTF-8 output, result in an error.
  */
 static void
@@ -786,7 +786,7 @@ test_locale_from_utf8_embedded_nul_utf8 (void)
   xerror_free (error);
 }
 
-/* Test that embedded nul characters in input to g_locale_from_utf8(),
+/* test_t that embedded nul characters in input to g_locale_from_utf8(),
  * when converting to non-UTF-8 output, result in an error.
  */
 static void
@@ -817,7 +817,7 @@ test_filename_to_utf8_embedded_nul (void)
   g_test_trap_assert_passed ();
 }
 
-/* Test that embedded nul characters in UTF-8 input to xfilename_to_utf8()
+/* test_t that embedded nul characters in UTF-8 input to xfilename_to_utf8()
  * result in an error.
  */
 static void
@@ -841,7 +841,7 @@ test_filename_to_utf8_embedded_nul_utf8 (void)
   xerror_free (error);
 }
 
-/* Test that embedded nul characters in non-UTF-8 input of xfilename_to_utf8()
+/* test_t that embedded nul characters in non-UTF-8 input of xfilename_to_utf8()
  * result in an error.
  */
 static void
@@ -874,7 +874,7 @@ test_filename_from_utf8_embedded_nul (void)
   g_test_trap_assert_passed ();
 }
 
-/* Test that embedded nul characters in input to xfilename_from_utf8(),
+/* test_t that embedded nul characters in input to xfilename_from_utf8(),
  * when converting (copying) to UTF-8 output, result in an error.
  */
 static void
@@ -898,7 +898,7 @@ test_filename_from_utf8_embedded_nul_utf8 (void)
   xerror_free (error);
 }
 
-/* Test that embedded nul characters in input to xfilename_from_utf8(),
+/* test_t that embedded nul characters in input to xfilename_from_utf8(),
  * when converting to non-UTF-8 output, result in an error.
  */
 static void

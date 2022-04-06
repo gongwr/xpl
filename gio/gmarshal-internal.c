@@ -2080,8 +2080,8 @@ _g_cclosure_marshal_VOID__STRING_INT64_INT64 (xclosure_t     *closure,
 {
   typedef void (*GMarshalFunc_VOID__STRING_INT64_INT64) (xpointer_t data1,
                                                          xpointer_t arg1,
-                                                         gint64 arg2,
-                                                         gint64 arg3,
+                                                         sint64_t arg2,
+                                                         sint64_t arg3,
                                                          xpointer_t data2);
   GCClosure *cc = (GCClosure *) closure;
   xpointer_t data1, data2;
@@ -2119,23 +2119,23 @@ _g_cclosure_marshal_VOID__STRING_INT64_INT64v (xclosure_t *closure,
 {
   typedef void (*GMarshalFunc_VOID__STRING_INT64_INT64) (xpointer_t data1,
                                                          xpointer_t arg1,
-                                                         gint64 arg2,
-                                                         gint64 arg3,
+                                                         sint64_t arg2,
+                                                         sint64_t arg3,
                                                          xpointer_t data2);
   GCClosure *cc = (GCClosure *) closure;
   xpointer_t data1, data2;
   GMarshalFunc_VOID__STRING_INT64_INT64 callback;
   xpointer_t arg0;
-  gint64 arg1;
-  gint64 arg2;
+  sint64_t arg1;
+  sint64_t arg2;
   va_list args_copy;
 
   G_VA_COPY (args_copy, args);
   arg0 = (xpointer_t) va_arg (args_copy, xpointer_t);
   if ((param_types[0] & G_SIGNAL_TYPE_STATIC_SCOPE) == 0 && arg0 != NULL)
     arg0 = xstrdup (arg0);
-  arg1 = (gint64) va_arg (args_copy, gint64);
-  arg2 = (gint64) va_arg (args_copy, gint64);
+  arg1 = (sint64_t) va_arg (args_copy, sint64_t);
+  arg2 = (sint64_t) va_arg (args_copy, sint64_t);
   va_end (args_copy);
 
 

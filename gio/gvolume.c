@@ -88,7 +88,7 @@ g_volume_default_init (GVolumeInterface *iface)
    *
    * Emitted when the volume has been changed.
    */
-  g_signal_new (I_("changed"),
+  xsignal_new (I_("changed"),
 		XTYPE_VOLUME,
 		G_SIGNAL_RUN_LAST,
 		G_STRUCT_OFFSET (GVolumeIface, changed),
@@ -103,7 +103,7 @@ g_volume_default_init (GVolumeInterface *iface)
    * the recipient is holding references to the object they should
    * release them so the object can be finalized.
    */
-  g_signal_new (I_("removed"),
+  xsignal_new (I_("removed"),
 		XTYPE_VOLUME,
 		G_SIGNAL_RUN_LAST,
 		G_STRUCT_OFFSET (GVolumeIface, removed),

@@ -28,7 +28,7 @@
 static xmain_loop_t *loop = NULL;
 
 /* ---------------------------------------------------------------------------------------------------- */
-/* Test introspection parser */
+/* test_t introspection parser */
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
@@ -47,7 +47,7 @@ test_introspection (xdbus_proxy_t *proxy)
   /*
    * Invoke Introspect(), then parse the output.
    */
-  result = g_dbus_proxy_call_sync (proxy,
+  result = xdbus_proxy_call_sync (proxy,
                                    "org.freedesktop.DBus.Introspectable.Introspect",
                                    NULL,
                                    G_DBUS_CALL_FLAGS_NONE,
@@ -112,7 +112,7 @@ test_introspection_parser (void)
                                &error);
   g_assert_no_error (error);
   error = NULL;
-  proxy = g_dbus_proxy_new_sync (connection,
+  proxy = xdbus_proxy_new_sync (connection,
                                  G_DBUS_PROXY_FLAGS_NONE,
                                  NULL,                      /* xdbus_interface_info_t */
                                  "com.example.TestService", /* name */

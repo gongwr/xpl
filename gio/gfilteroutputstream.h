@@ -53,7 +53,7 @@ struct _GFilterOutputStream
 
 struct _GFilterOutputStreamClass
 {
-  GOutputStreamClass parent_class;
+  xoutput_stream_class_t parent_class;
 
   /*< private >*/
   /* Padding for future expansion */

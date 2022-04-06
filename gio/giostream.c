@@ -76,7 +76,7 @@
  *
  * GIO may run operations on #GIOStreams from other (worker) threads, and this
  * may be exposed to application code in the behaviour of wrapper streams, such
- * as #xbuffered_input_stream or #xtls_connection_t. With such wrapper APIs,
+ * as #xbuffered_input_stream_t or #xtls_connection_t. With such wrapper APIs,
  * application code may only run operations on the base (wrapped) stream when
  * the wrapper stream is idle. Note that the semantics of such operations may
  * not be well-defined due to the state the wrapper stream leaves the base
@@ -415,14 +415,14 @@ g_io_stream_close (xio_stream_t     *stream,
     return FALSE;
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   res = TRUE;
   if (class->close_fn)
     res = class->close_fn (stream, cancellable, error);
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   stream->priv->closed = TRUE;
   g_io_stream_clear_pending (stream);
@@ -675,7 +675,7 @@ typedef struct
   xio_stream_splice_flags_t flags;
   xint_t io_priority;
   xcancellable_t *cancellable;
-  gulong cancelled_id;
+  xulong_t cancelled_id;
   xcancellable_t *op1_cancellable;
   xcancellable_t *op2_cancellable;
   xuint_t completed;
@@ -700,7 +700,7 @@ splice_complete (xtask_t         *task,
                  SpliceContext *ctx)
 {
   if (ctx->cancelled_id != 0)
-    g_cancellable_disconnect (ctx->cancellable, ctx->cancelled_id);
+    xcancellable_disconnect (ctx->cancellable, ctx->cancelled_id);
   ctx->cancelled_id = 0;
 
   if (ctx->error != NULL)
@@ -755,7 +755,7 @@ splice_cb (xobject_t      *ostream,
   if (error != NULL &&
       xerror_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED) &&
       (ctx->cancellable == NULL ||
-       !g_cancellable_is_cancelled (ctx->cancellable)))
+       !xcancellable_is_cancelled (ctx->cancellable)))
     g_clear_error (&error);
 
   /* Keep the first error that occurred */
@@ -768,16 +768,16 @@ splice_cb (xobject_t      *ostream,
        (ctx->flags & G_IO_STREAM_SPLICE_WAIT_FOR_BOTH) == 0)
     {
       /* We don't want to wait for the 2nd operation to finish, cancel it */
-      g_cancellable_cancel (ctx->op1_cancellable);
-      g_cancellable_cancel (ctx->op2_cancellable);
+      xcancellable_cancel (ctx->op1_cancellable);
+      xcancellable_cancel (ctx->op2_cancellable);
     }
   else if (ctx->completed == 2)
     {
       if (ctx->cancellable == NULL ||
-          !g_cancellable_is_cancelled (ctx->cancellable))
+          !xcancellable_is_cancelled (ctx->cancellable))
         {
-          g_cancellable_reset (ctx->op1_cancellable);
-          g_cancellable_reset (ctx->op2_cancellable);
+          xcancellable_reset (ctx->op1_cancellable);
+          xcancellable_reset (ctx->op2_cancellable);
         }
 
       /* Close the IO streams if needed */
@@ -816,8 +816,8 @@ splice_cancelled_cb (xcancellable_t *cancellable,
   SpliceContext *ctx;
 
   ctx = xtask_get_task_data (task);
-  g_cancellable_cancel (ctx->op1_cancellable);
-  g_cancellable_cancel (ctx->op2_cancellable);
+  xcancellable_cancel (ctx->op1_cancellable);
+  xcancellable_cancel (ctx->op2_cancellable);
 }
 
 /**
@@ -854,7 +854,7 @@ g_io_stream_splice_async (xio_stream_t            *stream1,
   xinput_stream_t *istream;
   xoutput_stream_t *ostream;
 
-  if (cancellable != NULL && g_cancellable_is_cancelled (cancellable))
+  if (cancellable != NULL && xcancellable_is_cancelled (cancellable))
     {
       xtask_report_new_error (NULL, callback, user_data,
                                g_io_stream_splice_async,
@@ -867,8 +867,8 @@ g_io_stream_splice_async (xio_stream_t            *stream1,
   ctx->stream1 = xobject_ref (stream1);
   ctx->stream2 = xobject_ref (stream2);
   ctx->flags = flags;
-  ctx->op1_cancellable = g_cancellable_new ();
-  ctx->op2_cancellable = g_cancellable_new ();
+  ctx->op1_cancellable = xcancellable_new ();
+  ctx->op2_cancellable = xcancellable_new ();
   ctx->completed = 0;
 
   task = xtask_new (NULL, cancellable, callback, user_data);
@@ -878,7 +878,7 @@ g_io_stream_splice_async (xio_stream_t            *stream1,
   if (cancellable != NULL)
     {
       ctx->cancellable = xobject_ref (cancellable);
-      ctx->cancelled_id = g_cancellable_connect (cancellable,
+      ctx->cancelled_id = xcancellable_connect (cancellable,
           G_CALLBACK (splice_cancelled_cb), xobject_ref (task),
           xobject_unref);
     }

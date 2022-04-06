@@ -83,10 +83,10 @@ test_object_signal_callback1 (test_object_t *object,
                               xpointer_t    data)
 {
   callback1_ran = TRUE;
-  g_signal_handlers_disconnect_by_func (G_OBJECT (object),
+  xsignal_handlers_disconnect_by_func (G_OBJECT (object),
                                         test_object_signal_callback2,
                                         data);
-  g_signal_connect (object, "test-signal",
+  xsignal_connect (object, "test-signal",
                     G_CALLBACK (test_object_signal_callback3), NULL);
 }
 
@@ -95,7 +95,7 @@ test_object_class_init (test_object_class_t *class)
 {
   class->test_signal = test_object_real_signal;
 
-  g_signal_new ("test-signal",
+  xsignal_new ("test-signal",
                 G_OBJECT_CLASS_TYPE (class),
                 G_SIGNAL_RUN_LAST,
                 G_STRUCT_OFFSET (test_object_class_t, test_signal),
@@ -118,11 +118,11 @@ main (int   argc,
 
   object = xobject_new (TEST_TYPE_OBJECT, NULL);
 
-  g_signal_connect (object, "test-signal",
+  xsignal_connect (object, "test-signal",
                     G_CALLBACK (test_object_signal_callback1), NULL);
-  g_signal_connect (object, "test-signal",
+  xsignal_connect (object, "test-signal",
                     G_CALLBACK (test_object_signal_callback2), NULL);
-  g_signal_emit_by_name (object, "test-signal");
+  xsignal_emit_by_name (object, "test-signal");
 
   g_assert (callback1_ran);
   g_assert (!callback2_ran);

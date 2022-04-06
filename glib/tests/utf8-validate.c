@@ -30,9 +30,9 @@ typedef struct {
   xint_t max_len;
   xint_t offset;
   xboolean_t valid;
-} Test;
+} test_t;
 
-static Test global_test[] = {
+static test_t global_test[] = {
   /* some tests to check max_len handling */
   /* length 1 */
   { "abcde", -1, 5, TRUE },
@@ -274,7 +274,7 @@ static Test global_test[] = {
 static void
 do_test (xconstpointer d)
 {
-  const Test *test = d;
+  const test_t *test = d;
   const xchar_t *end;
   xboolean_t result;
 
@@ -299,7 +299,7 @@ do_test (xconstpointer d)
     }
 }
 
-/* Test the behaviour of xutf8_get_char_validated() with various inputs and
+/* test_t the behaviour of xutf8_get_char_validated() with various inputs and
  * length restrictions. */
 static void
 test_utf8_get_char_validated (void)

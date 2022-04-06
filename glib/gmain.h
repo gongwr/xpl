@@ -640,9 +640,9 @@ void                 xsource_set_name_by_id (xuint_t           tag,
 
 XPL_AVAILABLE_IN_2_36
 void                 xsource_set_ready_time (xsource_t        *source,
-                                              gint64          ready_time);
+                                              sint64_t          ready_time);
 XPL_AVAILABLE_IN_2_36
-gint64               xsource_get_ready_time (xsource_t        *source);
+sint64_t               xsource_get_ready_time (xsource_t        *source);
 
 #ifdef G_OS_UNIX
 XPL_AVAILABLE_IN_2_36
@@ -688,7 +688,7 @@ void     xsource_get_current_time (xsource_t        *source,
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 XPL_AVAILABLE_IN_ALL
-gint64   xsource_get_time         (xsource_t        *source);
+sint64_t   xsource_get_time         (xsource_t        *source);
 
  /* void xsource_connect_closure (xsource_t        *source,
                                   xclosure_t       *closure);
@@ -713,9 +713,9 @@ void   g_get_current_time                 (GTimeVal       *result);
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 XPL_AVAILABLE_IN_ALL
-gint64 g_get_monotonic_time               (void);
+sint64_t g_get_monotonic_time               (void);
 XPL_AVAILABLE_IN_ALL
-gint64 g_get_real_time                    (void);
+sint64_t g_get_real_time                    (void);
 
 
 /* Source manipulation by ID */

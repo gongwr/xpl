@@ -183,14 +183,14 @@ test_read_write_all_async_pipe (void)
     }
 
   /* Now start a blocking write_all; nothing should happen. */
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
   xoutput_stream_write_all_async (out, "0123456789", 10, 0, cancellable, write_done, NULL);
   while (xmain_context_iteration (NULL, FALSE))
     ;
   g_assert (!got_write_done);
 
   /* Cancel that to make sure it works */
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   xobject_unref (cancellable);
   wait_for_write (FALSE, 0);
 

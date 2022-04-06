@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-/* Test xchecksum_t by computing the checksums of every initial
+/* test_t xchecksum_t by computing the checksums of every initial
  * substring of this string, calling xchecksum_update with chunks of
  * every possible size. That is, first it computes the checksums of
  * "", then "T". Then it computes the checksums of "Th", first by
@@ -971,7 +971,7 @@ test_checksum (xconstpointer d)
       checksum = xchecksum_new (test->checksum_type);
       for (p = FIXED_STR; p < FIXED_STR + test->length; p += chunk_length)
 	{
-	  xchecksum_update (checksum, (const guchar *)p,
+	  xchecksum_update (checksum, (const xuchar_t *)p,
 			     MIN (chunk_length, test->length - (p - FIXED_STR)));
 	}
       checksum2 = xchecksum_copy (checksum);
@@ -1045,7 +1045,7 @@ test_checksum_reset (xconstpointer d)
     {
       for (p = FIXED_STR; p < FIXED_STR + test->length; p += chunk_length)
 	{
-	  xchecksum_update (checksum, (const guchar *)p,
+	  xchecksum_update (checksum, (const xuchar_t *)p,
 			     MIN (chunk_length, test->length - (p - FIXED_STR)));
 	}
 

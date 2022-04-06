@@ -17,7 +17,7 @@ test_enum_basic (void)
   xvalue_t value = G_VALUE_INIT;
   xchar_t *to_string;
 
-  type = xenum_register_static ("MyEnum", my_enum_values);
+  type = xenum_register_static ("my_enum_t", my_enum_values);
 
   xvalue_init (&value, type);
   g_assert (G_VALUE_HOLDS_ENUM (&value));
@@ -95,7 +95,7 @@ test_flags_basic (void)
   xvalue_t value = G_VALUE_INIT;
   xchar_t *to_string;
 
-  type = xflags_register_static ("MyFlags", my_flaxvalues);
+  type = xflags_register_static ("my_flags_t", my_flaxvalues);
   no_default_type = xflags_register_static ("NoDefaultFlags",
                                              no_default_flaxvalues);
 

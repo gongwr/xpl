@@ -25,7 +25,7 @@
 #include <gio/gio.h>
 #include <gio/gunixmounts.h>
 
-/* Test that xfile_trash() returns G_IO_ERROR_NOT_SUPPORTED for files on system mounts. */
+/* test_t that xfile_trash() returns G_IO_ERROR_NOT_SUPPORTED for files on system mounts. */
 static void
 test_trash_not_supported (void)
 {
@@ -96,7 +96,7 @@ test_trash_not_supported (void)
   xobject_unref (file);
 }
 
-/* Test that symlinks are properly expaned when looking for topdir (e.g. for trash folder). */
+/* test_t that symlinks are properly expaned when looking for topdir (e.g. for trash folder). */
 static void
 test_trash_symlinks (void)
 {

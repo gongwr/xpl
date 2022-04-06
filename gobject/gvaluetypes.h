@@ -200,9 +200,9 @@ XPL_AVAILABLE_IN_ALL
 gint8		      xvalue_get_schar		(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
 void		      xvalue_set_uchar		(xvalue_t	      *value,
-						 guchar	       v_uchar);
+						 xuchar_t	       v_uchar);
 XPL_AVAILABLE_IN_ALL
-guchar		      xvalue_get_uchar		(const xvalue_t *value);
+xuchar_t		      xvalue_get_uchar		(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
 void		      xvalue_set_boolean	(xvalue_t	      *value,
 						 xboolean_t      v_boolean);
@@ -225,14 +225,14 @@ XPL_AVAILABLE_IN_ALL
 xlong_t		      xvalue_get_long		(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
 void		      xvalue_set_ulong		(xvalue_t	      *value,
-						 gulong	       v_ulong);
+						 xulong_t	       v_ulong);
 XPL_AVAILABLE_IN_ALL
-gulong		      xvalue_get_ulong		(const xvalue_t *value);
+xulong_t		      xvalue_get_ulong		(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
 void		      xvalue_set_int64		(xvalue_t	      *value,
-						 gint64	       v_int64);
+						 sint64_t	       v_int64);
 XPL_AVAILABLE_IN_ALL
-gint64		      xvalue_get_int64		(const xvalue_t *value);
+sint64_t		      xvalue_get_int64		(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
 void		      xvalue_set_uint64	(xvalue_t	      *value,
 						 xuint64_t      v_uint64);

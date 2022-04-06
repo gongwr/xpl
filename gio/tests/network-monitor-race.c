@@ -31,7 +31,7 @@ quit_loop (xpointer_t user_data)
 static xpointer_t
 thread_func (xpointer_t user_data)
 {
-  g_network_monitor_get_default ();
+  xnetwork_monitor_get_default ();
   g_timeout_add (100, quit_loop, user_data);
 
   return NULL;
@@ -48,10 +48,10 @@ call_func (xpointer_t user_data)
   return FALSE;
 }
 
-/* Test that calling g_network_monitor_get_default() in a thread doesn’t cause
+/* test_t that calling xnetwork_monitor_get_default() in a thread doesn’t cause
  * a crash. This is a probabilistic test; since it’s testing a race condition,
  * it can’t deterministically reproduce the problem. The threading has to
- * happen in subprocesses, since the result of g_network_monitor_get_default()
+ * happen in subprocesses, since the result of xnetwork_monitor_get_default()
  * is unavoidably cached once created. */
 static void
 test_network_monitor (void)

@@ -177,7 +177,7 @@ xfile_monitor_class_init (xfile_monitor_class_t *klass)
    *
    * In all the other cases, @other_file will be set to #NULL.
    **/
-  xfile_monitor_changed_signal = g_signal_new (I_("changed"),
+  xfile_monitor_changed_signal = xsignal_new (I_("changed"),
                                                 XTYPE_FILE_MONITOR,
                                                 G_SIGNAL_RUN_LAST,
                                                 G_STRUCT_OFFSET (xfile_monitor_class_t, changed),
@@ -185,7 +185,7 @@ xfile_monitor_class_init (xfile_monitor_class_t *klass)
                                                 _g_cclosure_marshal_VOID__OBJECT_OBJECT_ENUM,
                                                 XTYPE_NONE, 3,
                                                 XTYPE_FILE, XTYPE_FILE, XTYPE_FILE_MONITOR_EVENT);
-  g_signal_set_va_marshaller (xfile_monitor_changed_signal,
+  xsignal_set_va_marshaller (xfile_monitor_changed_signal,
                               XTYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_VOID__OBJECT_OBJECT_ENUMv);
 
@@ -291,5 +291,5 @@ xfile_monitor_emit_event (xfile_monitor_t      *monitor,
   if (monitor->priv->cancelled)
     return;
 
-  g_signal_emit (monitor, xfile_monitor_changed_signal, 0, child, other_file, event_type);
+  xsignal_emit (monitor, xfile_monitor_changed_signal, 0, child, other_file, event_type);
 }

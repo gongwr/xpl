@@ -1125,7 +1125,7 @@ test_clear_full_noop (void)
   g_queue_free (queue);
 }
 
-/* Test g_queue_push_nth_link() with various combinations of position (before,
+/* test_t g_queue_push_nth_link() with various combinations of position (before,
  * in the middle of, or at the end of the queue) and various existing queues
  * (empty, single element, multiple elements). */
 static void

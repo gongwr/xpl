@@ -37,7 +37,7 @@ G_BEGIN_DECLS
 #define G_BUFFERED_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_BUFFERED_INPUT_STREAM, xbuffered_input_stream_class_t))
 
 /**
- * xbuffered_input_stream:
+ * xbuffered_input_stream_t:
  *
  * Implements #xfilter_input_stream_t with a sized input buffer.
  **/
@@ -56,19 +56,19 @@ struct _GBufferedInputStreamClass
 {
   GFilterInputStreamClass parent_class;
 
-  xssize_t   (* fill)        (xbuffered_input_stream *stream,
+  xssize_t   (* fill)        (xbuffered_input_stream_t *stream,
 			    xssize_t                count,
 			    xcancellable_t         *cancellable,
 			    xerror_t              **error);
 
   /* Async ops: (optional in derived classes) */
-  void     (* fill_async)  (xbuffered_input_stream *stream,
+  void     (* fill_async)  (xbuffered_input_stream_t *stream,
 			    xssize_t                count,
 			    int                   io_priority,
 			    xcancellable_t         *cancellable,
 			    xasync_ready_callback_t   callback,
 			    xpointer_t              user_data);
-  xssize_t   (* fill_finish) (xbuffered_input_stream *stream,
+  xssize_t   (* fill_finish) (xbuffered_input_stream_t *stream,
 			    xasync_result_t         *result,
 			    xerror_t              **error);
 
@@ -91,40 +91,40 @@ xinput_stream_t* xbuffered_input_stream_new_sized       (xinput_stream_t        
 						       xsize_t                  size);
 
 XPL_AVAILABLE_IN_ALL
-xsize_t         xbuffered_input_stream_get_buffer_size (xbuffered_input_stream  *stream);
+xsize_t         xbuffered_input_stream_get_buffer_size (xbuffered_input_stream_t  *stream);
 XPL_AVAILABLE_IN_ALL
-void          xbuffered_input_stream_set_buffer_size (xbuffered_input_stream  *stream,
+void          xbuffered_input_stream_set_buffer_size (xbuffered_input_stream_t  *stream,
 						       xsize_t                  size);
 XPL_AVAILABLE_IN_ALL
-xsize_t         xbuffered_input_stream_get_available   (xbuffered_input_stream  *stream);
+xsize_t         xbuffered_input_stream_get_available   (xbuffered_input_stream_t  *stream);
 XPL_AVAILABLE_IN_ALL
-xsize_t         xbuffered_input_stream_peek            (xbuffered_input_stream  *stream,
+xsize_t         xbuffered_input_stream_peek            (xbuffered_input_stream_t  *stream,
 						       void                  *buffer,
 						       xsize_t                  offset,
 						       xsize_t                  count);
 XPL_AVAILABLE_IN_ALL
-const void*   xbuffered_input_stream_peek_buffer     (xbuffered_input_stream  *stream,
+const void*   xbuffered_input_stream_peek_buffer     (xbuffered_input_stream_t  *stream,
 						       xsize_t                 *count);
 
 XPL_AVAILABLE_IN_ALL
-xssize_t        xbuffered_input_stream_fill            (xbuffered_input_stream  *stream,
+xssize_t        xbuffered_input_stream_fill            (xbuffered_input_stream_t  *stream,
 						       xssize_t                 count,
 						       xcancellable_t          *cancellable,
 						       xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-void          xbuffered_input_stream_fill_async      (xbuffered_input_stream  *stream,
+void          xbuffered_input_stream_fill_async      (xbuffered_input_stream_t  *stream,
 						       xssize_t                 count,
 						       int                    io_priority,
 						       xcancellable_t          *cancellable,
 						       xasync_ready_callback_t    callback,
 						       xpointer_t               user_data);
 XPL_AVAILABLE_IN_ALL
-xssize_t        xbuffered_input_stream_fill_finish     (xbuffered_input_stream  *stream,
+xssize_t        xbuffered_input_stream_fill_finish     (xbuffered_input_stream_t  *stream,
 						       xasync_result_t          *result,
 						       xerror_t               **error);
 
 XPL_AVAILABLE_IN_ALL
-int           xbuffered_input_stream_read_byte       (xbuffered_input_stream  *stream,
+int           xbuffered_input_stream_read_byte       (xbuffered_input_stream_t  *stream,
 						       xcancellable_t          *cancellable,
 						       xerror_t               **error);
 

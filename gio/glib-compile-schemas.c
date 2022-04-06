@@ -82,7 +82,7 @@ enum_state_add_value (EnumState    *state,
                       const xchar_t  *valuestr,
                       xerror_t      **error)
 {
-  gint64 value;
+  sint64_t value;
   xchar_t *end;
 
   if (nick[0] == '\0' || nick[1] == '\0')

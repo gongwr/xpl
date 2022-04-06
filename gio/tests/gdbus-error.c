@@ -23,7 +23,7 @@
 #include <string.h>
 
 /* ---------------------------------------------------------------------------------------------------- */
-/* Test that registered errors are properly mapped */
+/* test_t that registered errors are properly mapped */
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void

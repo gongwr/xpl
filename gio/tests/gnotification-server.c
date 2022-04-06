@@ -101,7 +101,7 @@ xnotification_server_notification_added (GNotificationServer *server,
 
   xhash_table_replace (notifications, xstrdup (notification_id), xvariant_ref (notification));
 
-  g_signal_emit_by_name (server, "notification-received", app_id, notification_id, notification);
+  xsignal_emit_by_name (server, "notification-received", app_id, notification_id, notification);
 }
 
 static void
@@ -119,7 +119,7 @@ xnotification_server_notification_removed (GNotificationServer *server,
         xhash_table_remove (server->applications, app_id);
     }
 
-  g_signal_emit_by_name (server, "notification-removed", app_id, notification_id);
+  xsignal_emit_by_name (server, "notification-removed", app_id, notification_id);
 }
 
 static void
@@ -205,11 +205,11 @@ xnotification_server_class_init (GNotificationServerClass *class)
                                    g_param_spec_boolean ("is-running", "", "", FALSE,
                                                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
-  g_signal_new ("notification-received", XTYPE_NOTIFICATION_SERVER, G_SIGNAL_RUN_FIRST,
+  xsignal_new ("notification-received", XTYPE_NOTIFICATION_SERVER, G_SIGNAL_RUN_FIRST,
                 0, NULL, NULL, g_cclosure_marshal_generic, XTYPE_NONE, 3,
                 XTYPE_STRING, XTYPE_STRING, XTYPE_VARIANT);
 
-  g_signal_new ("notification-removed", XTYPE_NOTIFICATION_SERVER, G_SIGNAL_RUN_FIRST,
+  xsignal_new ("notification-removed", XTYPE_NOTIFICATION_SERVER, G_SIGNAL_RUN_FIRST,
                 0, NULL, NULL, g_cclosure_marshal_generic, XTYPE_NONE, 2,
                 XTYPE_STRING, XTYPE_STRING);
 }
@@ -224,7 +224,7 @@ xnotification_server_bus_acquired (xdbus_connection_t *connection,
   };
   GNotificationServer *server = user_data;
 
-  server->object_id = g_dbus_connection_register_object (connection, "/org/gtk/Notifications",
+  server->object_id = xdbus_connection_register_object (connection, "/org/gtk/Notifications",
                                                          org_gtk_Notifications_get_interface (),
                                                          &vtable, server, NULL, NULL);
 
@@ -292,7 +292,7 @@ xnotification_server_stop (GNotificationServer *server)
 
   if (server->object_id && server->connection)
     {
-      g_dbus_connection_unregister_object (server->connection, server->object_id);
+      xdbus_connection_unregister_object (server->connection, server->object_id);
       server->object_id = 0;
     }
 

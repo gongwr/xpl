@@ -79,12 +79,12 @@
  * Since: 2.70
  */
 
-G_DEFINE_INTERFACE_WITH_CODE (xpower_profile_monitor_t, g_power_profile_monitor, XTYPE_OBJECT,
+G_DEFINE_INTERFACE_WITH_CODE (xpower_profile_monitor, xpower_profile_monitor, XTYPE_OBJECT,
                               xtype_interface_add_prerequisite (g_define_type_id, XTYPE_INITABLE))
 
 
 /**
- * g_power_profile_monitor_dup_default:
+ * xpower_profile_monitor_dup_default:
  *
  * Gets a reference to the default #xpower_profile_monitor_t for the system.
  *
@@ -93,7 +93,7 @@ G_DEFINE_INTERFACE_WITH_CODE (xpower_profile_monitor_t, g_power_profile_monitor,
  * Since: 2.70
  */
 xpower_profile_monitor_t *
-g_power_profile_monitor_dup_default (void)
+xpower_profile_monitor_dup_default (void)
 {
   return xobject_ref (_xio_module_get_default (G_POWER_PROFILE_MONITOR_EXTENSION_POINT_NAME,
                                                  "GIO_USE_POWER_PROFILE_MONITOR",
@@ -101,7 +101,7 @@ g_power_profile_monitor_dup_default (void)
 }
 
 /**
- * g_power_profile_monitor_get_power_saver_enabled:
+ * xpower_profile_monitor_get_power_saver_enabled:
  * @monitor: a #xpower_profile_monitor_t
  *
  * Gets whether the system is in “Power Saver” mode.
@@ -115,7 +115,7 @@ g_power_profile_monitor_dup_default (void)
  * Since: 2.70
  */
 xboolean_t
-g_power_profile_monitor_get_power_saver_enabled (xpower_profile_monitor_t *monitor)
+xpower_profile_monitor_get_power_saver_enabled (xpower_profile_monitor_t *monitor)
 {
   xboolean_t enabled;
   xobject_get (monitor, "power-saver-enabled", &enabled, NULL);
@@ -123,7 +123,7 @@ g_power_profile_monitor_get_power_saver_enabled (xpower_profile_monitor_t *monit
 }
 
 static void
-g_power_profile_monitor_default_init (xpower_profile_monitor_tInterface *iface)
+xpower_profile_monitor_default_init (xpower_profile_monitor_tInterface *iface)
 {
   /**
    * xpower_profile_monitor_t:power-saver-enabled:

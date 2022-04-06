@@ -83,7 +83,7 @@ typedef struct
   const xchar_t *current;
 } SleepyStream;
 
-typedef GInputStreamClass SleepyStreamClass;
+typedef xinput_stream_class_t SleepyStreamClass;
 
 xtype_t sleepy_stream_get_type (void);
 

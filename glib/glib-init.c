@@ -73,14 +73,14 @@ G_STATIC_ASSERT (G_ALIGNOF (TestShort) == G_ALIGNOF (int));
 G_STATIC_ASSERT (G_ALIGNOF (TestInt) == G_ALIGNOF (int));
 
 G_STATIC_ASSERT (sizeof (xchar_t) == 1);
-G_STATIC_ASSERT (sizeof (guchar) == 1);
+G_STATIC_ASSERT (sizeof (xuchar_t) == 1);
 G_STATIC_ASSERT (sizeof (gint8) * CHAR_BIT == 8);
 G_STATIC_ASSERT (sizeof (xuint8_t) * CHAR_BIT == 8);
 G_STATIC_ASSERT (sizeof (gint16) * CHAR_BIT == 16);
 G_STATIC_ASSERT (sizeof (xuint16_t) * CHAR_BIT == 16);
 G_STATIC_ASSERT (sizeof (gint32) * CHAR_BIT == 32);
 G_STATIC_ASSERT (sizeof (xuint32_t) * CHAR_BIT == 32);
-G_STATIC_ASSERT (sizeof (gint64) * CHAR_BIT == 64);
+G_STATIC_ASSERT (sizeof (sint64_t) * CHAR_BIT == 64);
 G_STATIC_ASSERT (sizeof (xuint64_t) * CHAR_BIT == 64);
 
 G_STATIC_ASSERT (sizeof (void *) == XPL_SIZEOF_VOID_P);
@@ -104,8 +104,8 @@ G_STATIC_ASSERT (G_ALIGNOF (xssize_t) == G_ALIGNOF (size_t));
 
 /* xoffset_t is always 64-bit, even if off_t is only 32-bit
  * (compiling without large-file-support on 32-bit) */
-G_STATIC_ASSERT (sizeof (xoffset_t) == sizeof (gint64));
-G_STATIC_ASSERT (G_ALIGNOF (xoffset_t) == G_ALIGNOF (gint64));
+G_STATIC_ASSERT (sizeof (xoffset_t) == sizeof (sint64_t));
+G_STATIC_ASSERT (G_ALIGNOF (xoffset_t) == G_ALIGNOF (sint64_t));
 
 G_STATIC_ASSERT (sizeof (gfloat) == sizeof (float));
 G_STATIC_ASSERT (G_ALIGNOF (gfloat) == G_ALIGNOF (float));
@@ -132,9 +132,9 @@ G_STATIC_ASSERT (sizeof (xuint32_t) == sizeof (uint32_t));
 G_STATIC_ASSERT (G_ALIGNOF (gint32) == G_ALIGNOF (int32_t));
 G_STATIC_ASSERT (G_ALIGNOF (xuint32_t) == G_ALIGNOF (uint32_t));
 
-G_STATIC_ASSERT (sizeof (gint64) == sizeof (int64_t));
+G_STATIC_ASSERT (sizeof (sint64_t) == sizeof (int64_t));
 G_STATIC_ASSERT (sizeof (xuint64_t) == sizeof (uint64_t));
-G_STATIC_ASSERT (G_ALIGNOF (gint64) == G_ALIGNOF (int64_t));
+G_STATIC_ASSERT (G_ALIGNOF (sint64_t) == G_ALIGNOF (int64_t));
 G_STATIC_ASSERT (G_ALIGNOF (xuint64_t) == G_ALIGNOF (uint64_t));
 
 /**

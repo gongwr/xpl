@@ -83,7 +83,7 @@ g_memory_buffer_is_byteswapped (GMemoryBuffer *mbuf)
 #endif
 }
 
-static guchar
+static xuchar_t
 g_memory_buffer_read_byte (GMemoryBuffer  *mbuf,
                            xerror_t        **error)
 {
@@ -204,11 +204,11 @@ g_memory_buffer_read_uint32 (GMemoryBuffer  *mbuf,
   return v;
 }
 
-static gint64
+static sint64_t
 g_memory_buffer_read_int64 (GMemoryBuffer  *mbuf,
                             xerror_t        **error)
 {
-  gint64 v;
+  sint64_t v;
 
   g_return_val_if_fail (error == NULL || *error == NULL, -1);
 
@@ -326,7 +326,7 @@ g_memory_buffer_write (GMemoryBuffer  *mbuf,
 
 static xboolean_t
 g_memory_buffer_put_byte (GMemoryBuffer  *mbuf,
-			  guchar          data)
+			  xuchar_t          data)
 {
   return g_memory_buffer_write (mbuf, &data, 1);
 }
@@ -413,7 +413,7 @@ g_memory_buffer_put_uint32 (GMemoryBuffer  *mbuf,
 
 static xboolean_t
 g_memory_buffer_put_int64 (GMemoryBuffer  *mbuf,
-			   gint64          data)
+			   sint64_t          data)
 {
   switch (mbuf->byte_order)
     {
@@ -502,7 +502,7 @@ struct _GDBusMessage
   GDBusMessageFlags flags;
   xboolean_t locked;
   GDBusMessageByteOrder byte_order;
-  guchar major_protocol_version;
+  xuchar_t major_protocol_version;
   xuint32_t serial;
   xhashtable_t *headers;
   xvariant_t *body;
@@ -879,7 +879,7 @@ xdbus_message_set_byte_order (xdbus_message_t          *message,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* TODO: need GI annotations to specify that any guchar value goes for the type */
+/* TODO: need GI annotations to specify that any xuchar_t value goes for the type */
 
 /**
  * xdbus_message_get_message_type:
@@ -925,7 +925,7 @@ xdbus_message_set_message_type (xdbus_message_t      *message,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* TODO: need GI annotations to specify that any guchar value goes for flags */
+/* TODO: need GI annotations to specify that any xuchar_t value goes for flags */
 
 /**
  * xdbus_message_get_flags:
@@ -1015,7 +1015,7 @@ xdbus_message_set_serial (xdbus_message_t  *message,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* TODO: need GI annotations to specify that any guchar value goes for header_field */
+/* TODO: need GI annotations to specify that any xuchar_t value goes for header_field */
 
 /**
  * xdbus_message_get_header:
@@ -1085,15 +1085,15 @@ xdbus_message_set_header (xdbus_message_t             *message,
  *
  * Returns: (array zero-terminated=1): An array of header fields
  * terminated by %G_DBUS_MESSAGE_HEADER_FIELD_INVALID.  Each element
- * is a #guchar. Free with g_free().
+ * is a #xuchar_t. Free with g_free().
  *
  * Since: 2.26
  */
-guchar *
+xuchar_t *
 xdbus_message_get_header_fields (xdbus_message_t  *message)
 {
   xlist_t *keys;
-  guchar *ret;
+  xuchar_t *ret;
   xuint_t num_keys;
   xlist_t *l;
   xuint_t n;
@@ -1102,7 +1102,7 @@ xdbus_message_get_header_fields (xdbus_message_t  *message)
 
   keys = xhash_table_get_keys (message->headers);
   num_keys = xlist_length (keys);
-  ret = g_new (guchar, num_keys + 1);
+  ret = g_new (xuchar_t, num_keys + 1);
   for (l = keys, n = 0; l != NULL; l = l->next, n++)
     ret[n] = GPOINTER_TO_UINT (l->data);
   g_assert (n == num_keys);
@@ -1411,9 +1411,9 @@ read_string (GMemoryBuffer  *mbuf,
                    g_dngettext (GETTEXT_PACKAGE,
                                 "Wanted to read %lu byte but only got %lu",
                                 "Wanted to read %lu bytes but only got %lu",
-                                (gulong)len),
-                                (gulong)len,
-                   (gulong)(mbuf->valid_len - mbuf->pos));
+                                (xulong_t)len),
+                                (xulong_t)len,
+                   (xulong_t)(mbuf->valid_len - mbuf->pos));
       return NULL;
     }
 
@@ -1471,9 +1471,9 @@ read_bytes (GMemoryBuffer  *mbuf,
                    g_dngettext (GETTEXT_PACKAGE,
                                 "Wanted to read %lu byte but only got %lu",
                                 "Wanted to read %lu bytes but only got %lu",
-                                (gulong)len),
-                                (gulong)len,
-                   (gulong)(mbuf->valid_len - mbuf->pos));
+                                (xulong_t)len),
+                                (xulong_t)len,
+                   (xulong_t)(mbuf->valid_len - mbuf->pos));
       return NULL;
     }
 
@@ -1545,7 +1545,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
     case 'y': /* G_VARIANT_TYPE_BYTE */
       if (!just_align)
         {
-          guchar v;
+          xuchar_t v;
           v = g_memory_buffer_read_byte (buf, &local_error);
           if (local_error)
             goto fail;
@@ -1605,7 +1605,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
       ensure_input_padding (buf, 8);
       if (!just_align)
         {
-          gint64 v;
+          sint64_t v;
           v = g_memory_buffer_read_int64 (buf, &local_error);
           if (local_error)
             goto fail;
@@ -1685,7 +1685,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
     case 'g': /* G_VARIANT_TYPE_SIGNATURE */
       if (!just_align)
         {
-          guchar len;
+          xuchar_t len;
           const xchar_t *v;
           len = g_memory_buffer_read_byte (buf, &local_error);
           if (local_error)
@@ -1958,7 +1958,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
 
           if (!just_align)
             {
-              guchar siglen;
+              xuchar_t siglen;
               const xchar_t *sig;
               xvariant_type_t *variant_type;
               xvariant_t *value;
@@ -2086,7 +2086,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
  * Since: 2.26
  */
 xssize_t
-xdbus_message_bytes_needed (guchar  *blob,
+xdbus_message_bytes_needed (xuchar_t  *blob,
                              xsize_t    blob_len,
                              xerror_t **error)
 {
@@ -2158,7 +2158,7 @@ xdbus_message_bytes_needed (guchar  *blob,
  * Since: 2.26
  */
 xdbus_message_t *
-xdbus_message_new_from_blob (guchar                *blob,
+xdbus_message_new_from_blob (xuchar_t                *blob,
                               xsize_t                  blob_len,
                               GDBusCapabilityFlags   capabilities,
                               xerror_t               **error)
@@ -2166,8 +2166,8 @@ xdbus_message_new_from_blob (guchar                *blob,
   xerror_t *local_error = NULL;
   GMemoryBuffer mbuf;
   xdbus_message_t *message;
-  guchar endianness;
-  guchar major_protocol_version;
+  xuchar_t endianness;
+  xuchar_t major_protocol_version;
   xuint32_t message_body_len;
   xvariant_t *headers;
   xvariant_t *item;
@@ -2257,7 +2257,7 @@ xdbus_message_new_from_blob (guchar                *blob,
   xvariant_iter_init (&iter, headers);
   while ((item = xvariant_iter_next_value (&iter)) != NULL)
     {
-      guchar header_field;
+      xuchar_t header_field;
       xvariant_t *value;
       xvariant_get (item,
                      "{yv}",
@@ -2456,7 +2456,7 @@ append_value_to_blob (xvariant_t            *value,
       padding_added = ensure_output_padding (mbuf, 8);
       if (value != NULL)
         {
-          gint64 v = xvariant_get_int64 (value);
+          sint64_t v = xvariant_get_int64 (value);
           g_memory_buffer_put_int64 (mbuf, v);
         }
       break;
@@ -2766,14 +2766,14 @@ append_body_to_blob (xvariant_t       *value,
  *
  * Since: 2.26
  */
-guchar *
+xuchar_t *
 xdbus_message_to_blob (xdbus_message_t          *message,
                         xsize_t                 *out_size,
                         GDBusCapabilityFlags   capabilities,
                         xerror_t               **error)
 {
   GMemoryBuffer mbuf;
-  guchar *ret;
+  xuchar_t *ret;
   xsize_t size;
   xoffset_t body_len_offset;
   xoffset_t body_start_offset;
@@ -2812,7 +2812,7 @@ xdbus_message_to_blob (xdbus_message_t          *message,
     }
 
   /* Core header */
-  g_memory_buffer_put_byte (&mbuf, (guchar) message->byte_order);
+  g_memory_buffer_put_byte (&mbuf, (xuchar_t) message->byte_order);
   g_memory_buffer_put_byte (&mbuf, message->type);
   g_memory_buffer_put_byte (&mbuf, message->flags);
   g_memory_buffer_put_byte (&mbuf, 1); /* major protocol version */
@@ -2850,7 +2850,7 @@ xdbus_message_to_blob (xdbus_message_t          *message,
     {
       xvariant_builder_add (&builder,
                              "{yv}",
-                             (guchar) GPOINTER_TO_UINT (key),
+                             (xuchar_t) GPOINTER_TO_UINT (key),
                              header_value);
     }
   header_fields = xvariant_builder_end (&builder);
@@ -2934,7 +2934,7 @@ xdbus_message_to_blob (xdbus_message_t          *message,
   g_memory_buffer_put_uint32 (&mbuf, body_size);
 
   *out_size = size;
-  ret = (guchar *)mbuf.data;
+  ret = (xuchar_t *)mbuf.data;
 
  out:
   if (ret == NULL)

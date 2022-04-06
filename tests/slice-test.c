@@ -28,8 +28,8 @@ static xboolean_t want_corruption = FALSE;
 
 /* --- old memchunk prototypes (memchunks.c) --- */
 GMemChunk*      old_mem_chunk_new       (const xchar_t  *name,
-                                         gulong        atom_size,
-                                         gulong        area_size,
+                                         xulong_t        atom_size,
+                                         xulong_t        area_size,
                                          xint_t          type);
 void            old_mem_chunk_destroy   (GMemChunk *mem_chunk);
 xpointer_t        old_mem_chunk_alloc     (GMemChunk *mem_chunk);
@@ -291,7 +291,7 @@ main (int   argc,
         g_print ("    ChunkSize | MagazineSize | Contention\n");
         for (i = 0; i < n_chunks; i++)
           {
-            gint64 *vals = g_slice_get_config_state (G_SLICE_CONFIG_CONTENTION_COUNTER, i, &n);
+            sint64_t *vals = g_slice_get_config_state (G_SLICE_CONFIG_CONTENTION_COUNTER, i, &n);
             g_print ("  %9" G_GINT64_FORMAT "   |  %9" G_GINT64_FORMAT "   |  %9" G_GINT64_FORMAT "\n", vals[0], vals[2], vals[1]);
             g_free (vals);
           }

@@ -67,7 +67,7 @@ test_start_stop (void)
   service = xobject_new (XTYPE_SOCKET_SERVICE, "active", FALSE, NULL);
   g_assert_false (xsocket_service_is_active (service));
 
-  g_signal_connect (service, "notify::active", G_CALLBACK (active_notify_cb), &success);
+  xsignal_connect (service, "notify::active", G_CALLBACK (active_notify_cb), &success);
 
   xsocket_listener_add_address (XSOCKET_LISTENER (service),
                                  saddr,
@@ -200,7 +200,7 @@ test_threaded_712570 (void)
   xobject_unref (addr);
 
   loop = xmain_loop_new (NULL, FALSE);
-  g_signal_connect (service, "run", G_CALLBACK (connection_cb), loop);
+  xsignal_connect (service, "run", G_CALLBACK (connection_cb), loop);
 
   client = xsocket_client_new ();
   xsocket_client_connect_async (client,
@@ -492,7 +492,7 @@ test_read_write_async_internal (xboolean_t writev)
   g_assert_no_error (error);
   xobject_unref (saddr);
 
-  g_signal_connect (service, "incoming", G_CALLBACK (incoming_read_write_async_cb), &sconn);
+  xsignal_connect (service, "incoming", G_CALLBACK (incoming_read_write_async_cb), &sconn);
 
   client = xsocket_client_new ();
 
@@ -530,7 +530,7 @@ test_read_write_async_internal (xboolean_t writev)
   xobject_unref (service);
 }
 
-/* Test if connecting to a socket service and asynchronously writing data on
+/* test_t if connecting to a socket service and asynchronously writing data on
  * one side followed by reading the same data on the other side of the
  * connection works correctly
  */
@@ -540,7 +540,7 @@ test_read_write_async (void)
   test_read_write_async_internal (FALSE);
 }
 
-/* Test if connecting to a socket service and asynchronously writing data on
+/* test_t if connecting to a socket service and asynchronously writing data on
  * one side followed by reading the same data on the other side of the
  * connection works correctly. This uses writev() instead of normal write().
  */

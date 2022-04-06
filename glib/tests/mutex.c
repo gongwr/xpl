@@ -188,7 +188,7 @@ test_mutex_perf (xconstpointer data)
 {
   xuint_t n_threads = GPOINTER_TO_UINT (data);
   xthread_t *threads[THREADS];
-  gint64 start_time;
+  sint64_t start_time;
   xdouble_t rate;
   xint_t x = -1;
   xuint_t i;

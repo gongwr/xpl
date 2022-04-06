@@ -1126,7 +1126,7 @@ XPL_AVAILABLE_IN_ALL
 xuint64_t            xfile_info_get_attribute_uint64      (xfile_info_t  *info,
 							  const char *attribute);
 XPL_AVAILABLE_IN_ALL
-gint64             xfile_info_get_attribute_int64       (xfile_info_t  *info,
+sint64_t             xfile_info_get_attribute_int64       (xfile_info_t  *info,
 							  const char *attribute);
 XPL_AVAILABLE_IN_ALL
 xobject_t *          xfile_info_get_attribute_object      (xfile_info_t  *info,
@@ -1167,7 +1167,7 @@ void               xfile_info_set_attribute_uint64      (xfile_info_t  *info,
 XPL_AVAILABLE_IN_ALL
 void               xfile_info_set_attribute_int64       (xfile_info_t  *info,
 							  const char *attribute,
-							  gint64      attr_value);
+							  sint64_t      attr_value);
 XPL_AVAILABLE_IN_ALL
 void               xfile_info_set_attribute_object      (xfile_info_t  *info,
 							  const char *attribute,

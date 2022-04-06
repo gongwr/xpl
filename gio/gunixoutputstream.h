@@ -53,7 +53,7 @@ struct _GUnixOutputStream
 
 struct _GUnixOutputStreamClass
 {
-  GOutputStreamClass parent_class;
+  xoutput_stream_class_t parent_class;
 
   /*< private >*/
   /* Padding for future expansion */

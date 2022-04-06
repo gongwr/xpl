@@ -49,9 +49,9 @@ typedef long   xlong_t;
 typedef int    xint_t;
 typedef xint_t   xboolean_t;
 
-typedef unsigned char   guchar;
+typedef unsigned char   xuchar_t;
 typedef unsigned short  gushort;
-typedef unsigned long   gulong;
+typedef unsigned long   xulong_t;
 typedef unsigned int    xuint_t;
 
 typedef float   gfloat;
@@ -94,9 +94,9 @@ typedef double  xdouble_t;
 /**
  * G_MININT64: (value -9223372036854775808)
  *
- * The minimum value which can be held in a #gint64.
+ * The minimum value which can be held in a #sint64_t.
  */
-#define G_MININT64	((gint64) (-G_MAXINT64 - G_GINT64_CONSTANT(1)))
+#define G_MININT64	((sint64_t) (-G_MAXINT64 - G_GINT64_CONSTANT(1)))
 #define G_MAXINT64	G_GINT64_CONSTANT(0x7fffffffffffffff)
 #define G_MAXUINT64	G_GUINT64_CONSTANT(0xffffffffffffffff)
 

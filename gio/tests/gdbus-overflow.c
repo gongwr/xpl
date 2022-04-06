@@ -119,24 +119,24 @@ test_overflow (void)
   socket_connection = xsocket_connection_factory_create_connection (socket);
   g_assert (socket_connection != NULL);
   xobject_unref (socket);
-  producer = g_dbus_connection_new_sync (XIO_STREAM (socket_connection),
+  producer = xdbus_connection_new_sync (XIO_STREAM (socket_connection),
 					 NULL, /* guid */
 					 G_DBUS_CONNECTION_FLAGS_NONE,
 					 NULL, /* xdbus_auth_observer_t */
 					 NULL, /* xcancellable_t */
 
 					 &error);
-  g_dbus_connection_set_exit_on_close (producer, TRUE);
+  xdbus_connection_set_exit_on_close (producer, TRUE);
   g_assert_no_error (error);
   xobject_unref (socket_connection);
   g_atomic_int_set (&n_messages_sent, 0);
-  g_dbus_connection_add_filter (producer, overflow_filter_func, (xpointer_t) &n_messages_sent, NULL);
+  xdbus_connection_add_filter (producer, overflow_filter_func, (xpointer_t) &n_messages_sent, NULL);
 
   /* send enough data that we get an EAGAIN */
   for (n = 0; n < OVERFLOW_NUM_SIGNALS; n++)
     {
       error = NULL;
-      g_dbus_connection_emit_signal (producer,
+      xdbus_connection_emit_signal (producer,
                                      NULL, /* destination */
                                      "/org/foo/Object",
                                      "org.foo.Interface",
@@ -163,7 +163,7 @@ test_overflow (void)
   socket_connection = xsocket_connection_factory_create_connection (socket);
   g_assert (socket_connection != NULL);
   xobject_unref (socket);
-  consumer = g_dbus_connection_new_sync (XIO_STREAM (socket_connection),
+  consumer = xdbus_connection_new_sync (XIO_STREAM (socket_connection),
 					 NULL, /* guid */
 					 G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING,
 					 NULL, /* xdbus_auth_observer_t */
@@ -172,8 +172,8 @@ test_overflow (void)
   g_assert_no_error (error);
   xobject_unref (socket_connection);
   g_atomic_int_set (&n_messages_received, 0);
-  g_dbus_connection_add_filter (consumer, overflow_filter_func, (xpointer_t) &n_messages_received, NULL);
-  g_dbus_connection_start_message_processing (consumer);
+  xdbus_connection_add_filter (consumer, overflow_filter_func, (xpointer_t) &n_messages_received, NULL);
+  xdbus_connection_start_message_processing (consumer);
 
   timer = g_timer_new ();
   g_timer_start (timer);

@@ -93,7 +93,7 @@ xthreaded_socket_service_func (xpointer_t job_data,
   GThreadedSocketServiceData *data = job_data;
   xboolean_t result;
 
-  g_signal_emit (data->service, xthreaded_socket_service_run_signal,
+  xsignal_emit (data->service, xthreaded_socket_service_run_signal,
                  0, data->connection, data->source_object, &result);
 
   G_LOCK (job_count);
@@ -236,13 +236,13 @@ xthreaded_socket_service_class_init (GThreadedSocketServiceClass *class)
    * Returns: %TRUE to stop further signal handlers from being called
    */
   xthreaded_socket_service_run_signal =
-    g_signal_new (I_("run"), XTYPE_FROM_CLASS (class), G_SIGNAL_RUN_LAST,
+    xsignal_new (I_("run"), XTYPE_FROM_CLASS (class), G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GThreadedSocketServiceClass, run),
-		  g_signal_accumulator_true_handled, NULL,
+		  xsignal_accumulator_true_handled, NULL,
 		  _g_cclosure_marshal_BOOLEAN__OBJECT_OBJECT,
 		  XTYPE_BOOLEAN,
 		  2, XTYPE_SOCKET_CONNECTION, XTYPE_OBJECT);
-  g_signal_set_va_marshaller (xthreaded_socket_service_run_signal,
+  xsignal_set_va_marshaller (xthreaded_socket_service_run_signal,
 			      XTYPE_FROM_CLASS (class),
 			      _g_cclosure_marshal_BOOLEAN__OBJECT_OBJECTv);
 

@@ -50,15 +50,15 @@ static const GOptionEntry entries[] = {
   G_OPTION_ENTRY_NULL
 };
 
-static gint64 start_time;
-static gint64 previous_time;
+static sint64_t start_time;
+static sint64_t previous_time;
 
 static void
 show_progress (xoffset_t current_num_bytes,
                xoffset_t total_num_bytes,
                xpointer_t user_data)
 {
-  gint64 tv;
+  sint64_t tv;
   char *current_size, *total_size, *rate;
 
   tv = g_get_monotonic_time ();

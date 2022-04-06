@@ -648,7 +648,7 @@ xpointer_t    xvalue_get_object                (const xvalue_t   *value);
 XPL_AVAILABLE_IN_ALL
 xpointer_t    xvalue_dup_object                (const xvalue_t   *value);
 XPL_AVAILABLE_IN_ALL
-gulong	    g_signal_connect_object           (xpointer_t	       instance,
+xulong_t	    xsignal_connect_object           (xpointer_t	       instance,
 					       const xchar_t    *detailed_signal,
 					       xcallback_t       c_handler,
 					       xpointer_t	       gobject,

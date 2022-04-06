@@ -64,7 +64,7 @@ on_bus_acquired (xdbus_connection_t *connection,
   xerror_t *error = NULL;
   g_test_message ("Acquired a message bus connection");
 
-  registration_id = g_dbus_connection_register_object (connection,
+  registration_id = xdbus_connection_register_object (connection,
                                                        "/org/gtk/GDBus/FakeService",
                                                        introspection_data->interfaces[0],
                                                        &interface_vtable,

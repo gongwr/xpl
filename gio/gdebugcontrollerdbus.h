@@ -18,8 +18,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#ifndef __G_DEBUG_CONTROLLER_DBUS_H__
-#define __G_DEBUG_CONTROLLER_DBUS_H__
+#ifndef __XDEBUG_CONTROLLER_DBUS_H__
+#define __XDEBUG_CONTROLLER_DBUS_H__
 
 #include <glib.h>
 #include <glib-object.h>
@@ -27,43 +27,43 @@
 G_BEGIN_DECLS
 
 /**
- * GDebugControllerDBus:
+ * xdebug_controller_dbus_t:
  *
- * #GDebugControllerDBus is an implementation of #GDebugController over D-Bus.
+ * #xdebug_controller_dbus_t is an implementation of #xdebug_controller_t over D-Bus.
  *
  * Since: 2.72
  */
-#define XTYPE_DEBUG_CONTROLLER_DBUS (g_debug_controller_dbus_get_type ())
+#define XTYPE_DEBUG_CONTROLLER_DBUS (xdebug_controller_dbus_get_type ())
 XPL_AVAILABLE_IN_2_72
-G_DECLARE_DERIVABLE_TYPE (GDebugControllerDBus, g_debug_controller_dbus, G, DEBUG_CONTROLLER_DBUS, xobject_t)
+G_DECLARE_DERIVABLE_TYPE (xdebug_controller_dbus_t, xdebug_controller_dbus, G, DEBUG_CONTROLLER_DBUS, xobject_t)
 
 /**
- * GDebugControllerDBusClass:
+ * xdebug_controller_tDBusClass:
  * @parent_class: The parent class.
- * @authorize: Default handler for the #GDebugControllerDBus::authorize signal.
+ * @authorize: Default handler for the #xdebug_controller_dbus_t::authorize signal.
  *
- * The virtual function table for #GDebugControllerDBus.
+ * The virtual function table for #xdebug_controller_dbus_t.
  *
  * Since: 2.72
  */
-struct _GDebugControllerDBusClass
+struct _xdebug_controller_tDBusClass
 {
   xobject_class_t parent_class;
 
-  xboolean_t (*authorize)  (GDebugControllerDBus  *controller,
+  xboolean_t (*authorize)  (xdebug_controller_dbus_t  *controller,
                           xdbus_method_invocation_t *invocation);
 
   xpointer_t padding[12];
 };
 
 XPL_AVAILABLE_IN_2_72
-GDebugControllerDBus *g_debug_controller_dbus_new (xdbus_connection_t  *connection,
+xdebug_controller_dbus_t *xdebug_controller_dbus_new (xdbus_connection_t  *connection,
                                                    xcancellable_t     *cancellable,
                                                    xerror_t          **error);
 
 XPL_AVAILABLE_IN_2_72
-void g_debug_controller_dbus_stop (GDebugControllerDBus *self);
+void xdebug_controller_dbus_stop (xdebug_controller_dbus_t *self);
 
 G_END_DECLS
 
-#endif /* __G_DEBUG_CONTROLLER_DBUS_H__ */
+#endif /* __XDEBUG_CONTROLLER_DBUS_H__ */

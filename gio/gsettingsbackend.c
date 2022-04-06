@@ -981,7 +981,7 @@ g_settings_backend_verify (xpointer_t impl)
 {
   xsettings_backend_t *backend = impl;
 
-  if (strcmp (G_OBJECT_TYPE_NAME (backend), "GMemorySettingsBackend") == 0 &&
+  if (strcmp (G_OBJECT_TYPE_NAME (backend), "xmemory_settings_backend_t") == 0 &&
       xstrcmp0 (g_getenv ("GSETTINGS_BACKEND"), "memory") != 0)
     {
       g_message ("Using the 'memory' xsettings_t backend.  Your settings "
@@ -993,7 +993,7 @@ g_settings_backend_verify (xpointer_t impl)
 }
 
 /* We need to cache the default #xsettings_backend_t for the entire process
- * lifetime, especially if the backend is #GMemorySettingsBackend: it needs to
+ * lifetime, especially if the backend is #xmemory_settings_backend_t: it needs to
  * keep the in-memory settings around even while there are no #xsettings_t
  * instances alive. */
 static xsettings_backend_t *settings_backend_default_singleton = NULL;  /* (owned) (atomic) */

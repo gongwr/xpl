@@ -524,7 +524,7 @@ _xfile_attribute_value_get_uint64 (const GFileAttributeValue *attr)
  *
  * Returns: the signed 64-bit integer from the attribute, or 0.
  */
-gint64
+sint64_t
 _xfile_attribute_value_get_int64 (const GFileAttributeValue *attr)
 {
   if (attr == NULL)
@@ -605,7 +605,7 @@ _xfile_attribute_value_set_from_pointer (GFileAttributeValue *value,
       break;
 
     case XFILE_ATTRIBUTE_TYPE_INT64:
-      value->u.int64 = *(gint64 *)value_p;
+      value->u.int64 = *(sint64_t *)value_p;
       break;
 
     case XFILE_ATTRIBUTE_TYPE_INVALID:
@@ -743,13 +743,13 @@ _xfile_attribute_value_set_uint64 (GFileAttributeValue *attr,
 /**
  * _xfile_attribute_value_set_int64:
  * @attr: a #GFileAttributeValue.
- * @value: a #gint64 to set within the type.
+ * @value: a #sint64_t to set within the type.
  *
  * Sets the attribute value to a given signed 64-bit integer.
  */
 void
 _xfile_attribute_value_set_int64 (GFileAttributeValue *attr,
-				   gint64               value)
+				   sint64_t               value)
 {
   g_return_if_fail (attr != NULL);
 

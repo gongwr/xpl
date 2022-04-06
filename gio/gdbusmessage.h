@@ -101,7 +101,7 @@ void                      xdbus_message_set_header         (xdbus_message_t     
                                                              GDBusMessageHeaderField   header_field,
                                                              xvariant_t                 *value);
 XPL_AVAILABLE_IN_ALL
-guchar                   *xdbus_message_get_header_fields  (xdbus_message_t             *message);
+xuchar_t                   *xdbus_message_get_header_fields  (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
 xvariant_t                 *xdbus_message_get_body           (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
@@ -172,18 +172,18 @@ const xchar_t              *xdbus_message_get_arg0           (xdbus_message_t   
 
 
 XPL_AVAILABLE_IN_ALL
-xdbus_message_t             *xdbus_message_new_from_blob      (guchar                   *blob,
+xdbus_message_t             *xdbus_message_new_from_blob      (xuchar_t                   *blob,
                                                              xsize_t                     blob_len,
                                                              GDBusCapabilityFlags      capabilities,
                                                              xerror_t                  **error);
 
 XPL_AVAILABLE_IN_ALL
-xssize_t                    xdbus_message_bytes_needed       (guchar                   *blob,
+xssize_t                    xdbus_message_bytes_needed       (xuchar_t                   *blob,
                                                              xsize_t                     blob_len,
                                                              xerror_t                  **error);
 
 XPL_AVAILABLE_IN_ALL
-guchar                   *xdbus_message_to_blob            (xdbus_message_t             *message,
+xuchar_t                   *xdbus_message_to_blob            (xdbus_message_t             *message,
                                                              xsize_t                    *out_size,
                                                              GDBusCapabilityFlags      capabilities,
                                                              xerror_t                  **error);

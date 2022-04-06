@@ -298,8 +298,8 @@ msgid "Seek not supported on base stream"
 msgstr "ମୂଳ ଧାରାରେ ଦୁର୍ବଳତା ସମର୍ଥିତ ନୁହଁ"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "xbuffered_input_stream କୁ ବିଚ୍ଛିନ୍ନ କରିହେବ ନାହିଁ"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "xbuffered_input_stream_t କୁ ବିଚ୍ଛିନ୍ନ କରିହେବ ନାହିଁ"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1017
 #: ../gio/giostream.c:277 ../gio/goutputstream.c:1464
@@ -2172,8 +2172,8 @@ msgid "Error removing old file: %s"
 msgstr "ପୁରୁଣା ଫାଇଲକୁ ଅପସାରଣରେ ତ୍ରୁଟି: %s"
 
 #: ../gio/gmemoryinputstream.c:471 ../gio/gmemoryoutputstream.c:771
-msgid "Invalid GSeekType supplied"
-msgstr "ଅବୈଧ GSeekType ଦିଆଯାଇଅଛି"
+msgid "Invalid xseek_type_t supplied"
+msgstr "ଅବୈଧ xseek_type_t ଦିଆଯାଇଅଛି"
 
 #: ../gio/gmemoryinputstream.c:481
 msgid "Invalid seek request"

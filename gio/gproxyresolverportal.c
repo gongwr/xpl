@@ -78,7 +78,7 @@ xproxy_resolver_portal_is_supported (xproxy_resolver_t *object)
   if (!ensure_resolver_proxy (resolver))
     return FALSE;
 
-  name_owner = g_dbus_proxy_get_name_owner (G_DBUS_PROXY (resolver->resolver));
+  name_owner = xdbus_proxy_get_name_owner (G_DBUS_PROXY (resolver->resolver));
   has_portal = name_owner != NULL;
   g_free (name_owner);
 

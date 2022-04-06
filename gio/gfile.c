@@ -1068,7 +1068,7 @@ xfile_enumerate_children (xfile_t                *file,
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -1306,7 +1306,7 @@ xfile_query_info (xfile_t                *file,
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -1444,7 +1444,7 @@ xfile_query_filesystem_info (xfile_t         *file,
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -1564,7 +1564,7 @@ xfile_find_enclosing_mount (xfile_t         *file,
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -1682,7 +1682,7 @@ xfile_read (xfile_t         *file,
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -1737,7 +1737,7 @@ xfile_append_to (xfile_t             *file,
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -1795,7 +1795,7 @@ xfile_create (xfile_t             *file,
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -1879,7 +1879,7 @@ xfile_replace (xfile_t             *file,
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -1936,7 +1936,7 @@ xfile_open_readwrite (xfile_t         *file,
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -2000,7 +2000,7 @@ xfile_create_readwrite (xfile_t             *file,
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -2055,7 +2055,7 @@ xfile_replace_readwrite (xfile_t             *file,
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -2779,11 +2779,11 @@ xfile_build_attribute_list_for_copy (xfile_t                  *file,
    * nothing to copy.  We still honor the cancellable though.
    */
   attributes = xfile_query_settable_attributes (file, cancellable, NULL);
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     goto out;
 
   namespaces = xfile_query_writable_namespaces (file, cancellable, NULL);
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     goto out;
 
   if (attributes == NULL && namespaces == NULL)
@@ -3086,7 +3086,7 @@ splice_stream_with_progress (xinput_stream_t           *in,
       long n_read;
       long n_written;
 
-      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+      if (xcancellable_set_error_if_cancelled (cancellable, error))
         break;
 
       if (!do_splice (fd_in, &offset_in, buffer[1], NULL, buffer_size, &n_read, error))
@@ -3100,7 +3100,7 @@ splice_stream_with_progress (xinput_stream_t           *in,
 
       while (n_read > 0)
         {
-          if (g_cancellable_set_error_if_cancelled (cancellable, error))
+          if (xcancellable_set_error_if_cancelled (cancellable, error))
             goto out;
 
           if (!do_splice (buffer[0], NULL, fd_out, &offset_out, n_read, &n_written, error))
@@ -3511,7 +3511,7 @@ xfile_copy (xfile_t                  *source,
   g_return_val_if_fail (X_IS_FILE (source), FALSE);
   g_return_val_if_fail (X_IS_FILE (destination), FALSE);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
   iface = XFILE_GET_IFACE (destination);
@@ -3713,7 +3713,7 @@ xfile_move (xfile_t                  *source,
   g_return_val_if_fail (X_IS_FILE (source), FALSE);
   g_return_val_if_fail (X_IS_FILE (destination), FALSE);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
   iface = XFILE_GET_IFACE (destination);
@@ -3900,7 +3900,7 @@ xfile_make_directory (xfile_t         *file,
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
   iface = XFILE_GET_IFACE (file);
@@ -4014,7 +4014,7 @@ xfile_make_directory_with_parents (xfile_t         *file,
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
   /* Try for the simple case of not having to create any parent
@@ -4128,7 +4128,7 @@ xfile_make_symbolic_link (xfile_t         *file,
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (symlink_value != NULL, FALSE);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
   if (*symlink_value == '\0')
@@ -4193,7 +4193,7 @@ xfile_delete (xfile_t         *file,
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
   iface = XFILE_GET_IFACE (file);
@@ -4304,7 +4304,7 @@ xfile_trash (xfile_t         *file,
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
   iface = XFILE_GET_IFACE (file);
@@ -4429,7 +4429,7 @@ xfile_set_display_name (xfile_t         *file,
       return NULL;
     }
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -4541,7 +4541,7 @@ xfile_query_settable_attributes (xfile_t         *file,
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -4596,7 +4596,7 @@ xfile_query_writable_namespaces (xfile_t         *file,
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -4663,7 +4663,7 @@ xfile_set_attribute (xfile_t                *file,
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
   iface = XFILE_GET_IFACE (file);
@@ -4715,7 +4715,7 @@ xfile_set_attributes_from_info (xfile_t                *file,
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_FILE_INFO (info), FALSE);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
   xfile_info_clear_status (info);
@@ -5030,7 +5030,7 @@ xfile_set_attribute_uint64 (xfile_t                *file,
 xboolean_t
 xfile_set_attribute_int64 (xfile_t                *file,
                             const xchar_t          *attribute,
-                            gint64                value,
+                            sint64_t                value,
                             xfile_query_info_flags_t   flags,
                             xcancellable_t         *cancellable,
                             xerror_t              **error)
@@ -5534,7 +5534,7 @@ xfile_monitor_directory (xfile_t              *file,
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (~flags & XFILE_MONITOR_WATCH_HARD_LINKS, NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);
@@ -5588,7 +5588,7 @@ xfile_monitor_file (xfile_t              *file,
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   iface = XFILE_GET_IFACE (file);

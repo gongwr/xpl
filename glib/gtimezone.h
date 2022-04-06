@@ -72,12 +72,12 @@ void                    xtime_zone_unref                               (xtimezon
 XPL_AVAILABLE_IN_ALL
 xint_t                    xtime_zone_find_interval                       (xtimezone_t   *tz,
                                                                          GTimeType    type,
-                                                                         gint64       time_);
+                                                                         sint64_t       time_);
 
 XPL_AVAILABLE_IN_ALL
 xint_t                    xtime_zone_adjust_time                         (xtimezone_t   *tz,
                                                                          GTimeType    type,
-                                                                         gint64      *time_);
+                                                                         sint64_t      *time_);
 
 XPL_AVAILABLE_IN_ALL
 const xchar_t *           xtime_zone_get_abbreviation                    (xtimezone_t   *tz,

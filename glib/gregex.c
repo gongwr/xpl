@@ -1075,7 +1075,7 @@ get_matched_substring_number (const xmatch_info_t *match_info,
 {
   xint_t entrysize;
   xchar_t *first, *last;
-  guchar *entry;
+  xuchar_t *entry;
 
   if (!(match_info->regex->compile_opts & XREGEX_DUPNAMES))
     return pcre_get_stringnumber (match_info->regex->pcre_re, name);
@@ -1089,7 +1089,7 @@ get_matched_substring_number (const xmatch_info_t *match_info,
   if (entrysize <= 0)
     return entrysize;
 
-  for (entry = (guchar*) first; entry <= (guchar*) last; entry += entrysize)
+  for (entry = (xuchar_t*) first; entry <= (xuchar_t*) last; entry += entrysize)
     {
       xint_t n = (entry[0] << 8) + entry[1];
       if (match_info->offsets[n*2] >= 0)
@@ -2605,7 +2605,7 @@ expand_escape (const xchar_t        *replacement,
                            _("Error while parsing replacement "
                              "text “%s” at char %lu: %s"),
                            replacement,
-                           (gulong)(p - replacement),
+                           (xulong_t)(p - replacement),
                            error_detail);
   g_propagate_error (error, tmp_error);
 

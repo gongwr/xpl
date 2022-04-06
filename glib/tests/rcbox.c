@@ -24,7 +24,7 @@ typedef struct {
 
 static Point *global_point;
 
-/* test_rcbox_new: Test g_rc_box_new() */
+/* test_rcbox_new: test_t g_rc_box_new() */
 static void
 test_rcbox_new (void)
 {
@@ -43,7 +43,7 @@ test_rcbox_new (void)
   g_rc_box_release (a);
 }
 
-/* test_atomic_rcbox_new: Test g_atomic_rc_box_new() */
+/* test_atomic_rcbox_new: test_t g_atomic_rc_box_new() */
 static void
 test_atomic_rcbox_new (void)
 {

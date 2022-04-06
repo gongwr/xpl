@@ -69,8 +69,8 @@ g_unix_volume_monitor_finalize (xobject_t *object)
 
   monitor = G_UNIX_VOLUME_MONITOR (object);
 
-  g_signal_handlers_disconnect_by_func (monitor->mount_monitor, mountpoints_changed, monitor);
-  g_signal_handlers_disconnect_by_func (monitor->mount_monitor, mounts_changed, monitor);
+  xsignal_handlers_disconnect_by_func (monitor->mount_monitor, mountpoints_changed, monitor);
+  xsignal_handlers_disconnect_by_func (monitor->mount_monitor, mounts_changed, monitor);
 
   xobject_unref (monitor->mount_monitor);
 
@@ -215,11 +215,11 @@ g_unix_volume_monitor_init (GUnixVolumeMonitor *unix_monitor)
 
   unix_monitor->mount_monitor = g_unix_mount_monitor_get ();
 
-  g_signal_connect (unix_monitor->mount_monitor,
+  xsignal_connect (unix_monitor->mount_monitor,
 		    "mounts-changed", G_CALLBACK (mounts_changed),
 		    unix_monitor);
 
-  g_signal_connect (unix_monitor->mount_monitor,
+  xsignal_connect (unix_monitor->mount_monitor,
 		    "mountpoints-changed", G_CALLBACK (mountpoints_changed),
 		    unix_monitor);
 
@@ -340,8 +340,8 @@ update_volumes (GUnixVolumeMonitor *monitor)
 	{
 	  _g_unix_volume_disconnected (volume);
 	  monitor->volumes = xlist_remove (monitor->volumes, volume);
-	  g_signal_emit_by_name (monitor, "volume-removed", volume);
-	  g_signal_emit_by_name (volume, "removed");
+	  xsignal_emit_by_name (monitor, "volume-removed", volume);
+	  xsignal_emit_by_name (volume, "removed");
 	  xobject_unref (volume);
 	}
     }
@@ -354,7 +354,7 @@ update_volumes (GUnixVolumeMonitor *monitor)
       if (volume)
 	{
 	  monitor->volumes = xlist_prepend (monitor->volumes, volume);
-	  g_signal_emit_by_name (monitor, "volume-added", volume);
+	  xsignal_emit_by_name (monitor, "volume-added", volume);
 	}
     }
 
@@ -391,8 +391,8 @@ update_mounts (GUnixVolumeMonitor *monitor)
 	{
 	  _g_unix_mount_unmounted (mount);
 	  monitor->mounts = xlist_remove (monitor->mounts, mount);
-	  g_signal_emit_by_name (monitor, "mount-removed", mount);
-	  g_signal_emit_by_name (mount, "unmounted");
+	  xsignal_emit_by_name (monitor, "mount-removed", mount);
+	  xsignal_emit_by_name (mount, "unmounted");
 	  xobject_unref (mount);
 	}
     }
@@ -408,7 +408,7 @@ update_mounts (GUnixVolumeMonitor *monitor)
       if (mount)
 	{
 	  monitor->mounts = xlist_prepend (monitor->mounts, mount);
-	  g_signal_emit_by_name (monitor, "mount-added", mount);
+	  xsignal_emit_by_name (monitor, "mount-added", mount);
 	}
     }
 

@@ -34,7 +34,7 @@
 
 #include "glib/gunidecomp.h"
 
-/* Test that xunichar_validate() returns the correct value for various
+/* test_t that xunichar_validate() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_unichar_validate (void)
@@ -47,7 +47,7 @@ test_unichar_validate (void)
   g_assert_false (xunichar_validate (0x110000));
 }
 
-/* Test that xunichar_type() returns the correct value for various
+/* test_t that xunichar_type() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_unichar_character_type (void)
@@ -106,7 +106,7 @@ test_unichar_character_type (void)
   g_assert_cmpint (xunichar_type (XUNICODE_LAST_CHAR_PART1 + 1), ==, 0x02);
 }
 
-/* Test that xunichar_break_type() returns the correct value for various
+/* test_t that xunichar_break_type() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_unichar_break_type (void)
@@ -167,7 +167,7 @@ test_unichar_break_type (void)
     }
 }
 
-/* Test that xunichar_get_script() returns the correct value for various
+/* test_t that xunichar_get_script() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_unichar_script (void)
@@ -348,7 +348,7 @@ test_unichar_script (void)
     g_assert_cmpint (xunichar_get_script (examples[i].c), ==, examples[i].script);
 }
 
-/* Test that xunichar_combining_class() returns the correct value for
+/* test_t that xunichar_combining_class() returns the correct value for
  * various ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_combining_class (void)
@@ -398,7 +398,7 @@ test_combining_class (void)
     }
 }
 
-/* Test that xunichar_get_mirror() returns the correct value for various
+/* test_t that xunichar_get_mirror() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_mirror (void)
@@ -420,7 +420,7 @@ test_mirror (void)
   g_assert_false (xunichar_get_mirror_char ('a', &mirror));
 }
 
-/* Test that xutf8_strup() returns the correct value for various
+/* test_t that xutf8_strup() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_strup (void)
@@ -445,7 +445,7 @@ test_strup (void)
   g_free (str_up);
 }
 
-/* Test that xutf8_strdown() returns the correct value for various
+/* test_t that xutf8_strdown() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_strdown (void)
@@ -470,7 +470,7 @@ test_strdown (void)
   g_free (str_down);
 }
 
-/* Test that xutf8_strup() and xutf8_strdown() return the correct
+/* test_t that xutf8_strup() and xutf8_strdown() return the correct
  * value for Turkish 'i' with and without dot above. */
 static void
 test_turkish_strupdown (void)
@@ -511,7 +511,7 @@ test_turkish_strupdown (void)
   g_free (oldlocale);
 }
 
-/* Test that xutf8_casefold() returns the correct value for various
+/* test_t that xutf8_casefold() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_casefold (void)
@@ -629,7 +629,7 @@ test_casemap_and_casefold (void)
   g_free (filename);
 }
 
-/* Test that xunichar_ismark() returns the correct value for various
+/* test_t that xunichar_ismark() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_mark (void)
@@ -651,7 +651,7 @@ test_mark (void)
   g_assert_false (xunichar_ismark (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_isspace() returns the correct value for various
+/* test_t that xunichar_isspace() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_space (void)
@@ -679,7 +679,7 @@ test_space (void)
   g_assert_false (xunichar_isspace (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_isalnum() returns the correct value for various
+/* test_t that xunichar_isalnum() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_alnum (void)
@@ -713,7 +713,7 @@ test_alnum (void)
   g_assert_false (xunichar_isalnum (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_isalpha() returns the correct value for various
+/* test_t that xunichar_isalpha() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_alpha (void)
@@ -747,7 +747,7 @@ test_alpha (void)
   g_assert_false (xunichar_isalpha (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_isdigit() returns the correct value for various
+/* test_t that xunichar_isdigit() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_digit (void)
@@ -779,7 +779,7 @@ test_digit (void)
   g_assert_false (xunichar_isdigit (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_digit_value() returns the correct value for various
+/* test_t that xunichar_digit_value() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_digit_value (void)
@@ -810,7 +810,7 @@ test_digit_value (void)
   g_assert_cmpint (xunichar_digit_value (XUNICODE_LAST_CHAR_PART1 + 1), ==, -1);
 }
 
-/* Test that xunichar_isxdigit() returns the correct value for various
+/* test_t that xunichar_isxdigit() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_xdigit (void)
@@ -852,7 +852,7 @@ test_xdigit (void)
   g_assert_false (xunichar_isxdigit (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_xdigit_value() returns the correct value for various
+/* test_t that xunichar_xdigit_value() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_xdigit_value (void)
@@ -891,7 +891,7 @@ test_xdigit_value (void)
   g_assert_cmpint (xunichar_xdigit_value (XUNICODE_LAST_CHAR_PART1 + 1), ==, -1);
 }
 
-/* Test that xunichar_ispunct() returns the correct value for various
+/* test_t that xunichar_ispunct() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_punctuation (void)
@@ -920,7 +920,7 @@ test_punctuation (void)
   g_assert_false (xunichar_ispunct (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_iscntrl() returns the correct value for various
+/* test_t that xunichar_iscntrl() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_cntrl (void)
@@ -942,7 +942,7 @@ test_cntrl (void)
   g_assert_false (xunichar_iscntrl (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_isgraph() returns the correct value for various
+/* test_t that xunichar_isgraph() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_graph (void)
@@ -977,7 +977,7 @@ test_graph (void)
   g_assert_false (xunichar_isgraph (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_iszerowidth() returns the correct value for various
+/* test_t that xunichar_iszerowidth() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_zerowidth (void)
@@ -1010,7 +1010,7 @@ test_zerowidth (void)
   g_assert_true (xunichar_iszerowidth (0xD7FB));
 }
 
-/* Test that xunichar_istitle() returns the correct value for various
+/* test_t that xunichar_istitle() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_title (void)
@@ -1059,7 +1059,7 @@ test_title (void)
                    (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_isupper() returns the correct value for various
+/* test_t that xunichar_isupper() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_upper (void)
@@ -1083,7 +1083,7 @@ test_upper (void)
   g_assert_false (xunichar_isupper (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_islower() returns the correct value for various
+/* test_t that xunichar_islower() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_lower (void)
@@ -1107,7 +1107,7 @@ test_lower (void)
   g_assert_false (xunichar_islower (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_isprint() returns the correct value for various
+/* test_t that xunichar_isprint() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_print (void)
@@ -1131,7 +1131,7 @@ test_print (void)
   g_assert_false (xunichar_isprint (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_toupper() and xunichar_tolower() return the
+/* test_t that xunichar_toupper() and xunichar_tolower() return the
  * correct values for various ASCII and Unicode alphabetic, numeric,
  * and other, codepoints. */
 static void
@@ -1203,7 +1203,7 @@ test_cases (void)
                    (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_isdefined() returns the correct value for various
+/* test_t that xunichar_isdefined() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_defined (void)
@@ -1229,7 +1229,7 @@ test_defined (void)
   g_assert_false (xunichar_isdefined (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that xunichar_iswide() returns the correct value for various
+/* test_t that xunichar_iswide() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_wide (void)
@@ -1317,7 +1317,7 @@ test_wide (void)
     }
 };
 
-/* Test that xunichar_compose() returns the correct value for various
+/* test_t that xunichar_compose() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_compose (void)
@@ -1354,7 +1354,7 @@ test_compose (void)
   g_assert_true (xunichar_compose (0x110E, 0x1173, &ch) && ch == 0xCE20);
 }
 
-/* Test that xunichar_decompose() returns the correct value for various
+/* test_t that xunichar_decompose() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_decompose (void)
@@ -1388,7 +1388,7 @@ test_decompose (void)
   g_assert_true (xunichar_decompose (0xCE20, &a, &b) && a == 0x110E && b == 0x1173);
 }
 
-/* Test that xunichar_fully_decompose() returns the correct value for
+/* test_t that xunichar_fully_decompose() returns the correct value for
  * various ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_fully_decompose_canonical (void)
@@ -1439,7 +1439,7 @@ test_fully_decompose_canonical (void)
 #undef TEST_DECOMP
 }
 
-/* Test that xunicode_canonical_decomposition() returns the correct
+/* test_t that xunicode_canonical_decomposition() returns the correct
  * value for various ASCII and Unicode alphabetic, numeric, and other,
  * codepoints. */
 static void
@@ -1492,14 +1492,14 @@ test_canonical_decomposition (void)
 #undef TEST_DECOMP
 }
 
-/* Test that xunichar_decompose() whenever encouttering a char ch
+/* test_t that xunichar_decompose() whenever encouttering a char ch
  * decomposes into a and b, b itself won't decompose any further. */
 static void
 test_decompose_tail (void)
 {
   xunichar_t ch, a, b, c, d;
 
-  /* Test that whenever a char ch decomposes into a and b, b itself
+  /* test_t that whenever a char ch decomposes into a and b, b itself
    * won't decompose any further. */
 
   for (ch = 0; ch < 0x110000; ch++)
@@ -1512,7 +1512,7 @@ test_decompose_tail (void)
       }
 }
 
-/* Test that all canonical decompositions of xunichar_fully_decompose()
+/* test_t that all canonical decompositions of xunichar_fully_decompose()
  * are at most 4 in length, and compatibility decompositions are
  * at most 18 in length. */
 static void
@@ -1520,7 +1520,7 @@ test_fully_decompose_len (void)
 {
   xunichar_t ch;
 
-  /* Test that all canonical decompositions are at most 4 in length,
+  /* test_t that all canonical decompositions are at most 4 in length,
    * and compatibility decompositions are at most 18 in length.
    */
 

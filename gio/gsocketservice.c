@@ -101,7 +101,7 @@ static void
 xsocket_service_init (xsocket_service_t *service)
 {
   service->priv = xsocket_service_get_instance_private (service);
-  service->priv->cancellable = g_cancellable_new ();
+  service->priv->cancellable = xcancellable_new ();
   service->priv->active = TRUE;
 }
 
@@ -154,14 +154,14 @@ set_active (xsocket_service_t *service, xboolean_t active)
       if (active)
         {
           if (service->priv->outstanding_accept)
-            g_cancellable_cancel (service->priv->cancellable);
+            xcancellable_cancel (service->priv->cancellable);
           else
             do_accept (service);
         }
       else
         {
           if (service->priv->outstanding_accept)
-            g_cancellable_cancel (service->priv->cancellable);
+            xcancellable_cancel (service->priv->cancellable);
         }
     }
 
@@ -219,7 +219,7 @@ xsocket_service_changed (xsocket_listener_t *listener)
   if (service->priv->active)
     {
       if (service->priv->outstanding_accept)
-	g_cancellable_cancel (service->priv->cancellable);
+	xcancellable_cancel (service->priv->cancellable);
       else
 	do_accept (service);
     }
@@ -307,7 +307,7 @@ xsocket_service_incoming (xsocket_service_t    *service,
 {
   xboolean_t result;
 
-  g_signal_emit (service, xsocket_service_incoming_signal,
+  xsignal_emit (service, xsocket_service_incoming_signal,
                  0, connection, source_object, &result);
   return result;
 }
@@ -344,13 +344,13 @@ xsocket_service_class_init (GSocketServiceClass *class)
    * Since: 2.22
    */
   xsocket_service_incoming_signal =
-    g_signal_new (I_("incoming"), XTYPE_FROM_CLASS (class), G_SIGNAL_RUN_LAST,
+    xsignal_new (I_("incoming"), XTYPE_FROM_CLASS (class), G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GSocketServiceClass, incoming),
-                  g_signal_accumulator_true_handled, NULL,
+                  xsignal_accumulator_true_handled, NULL,
                   _g_cclosure_marshal_BOOLEAN__OBJECT_OBJECT,
                   XTYPE_BOOLEAN,
                   2, XTYPE_SOCKET_CONNECTION, XTYPE_OBJECT);
-  g_signal_set_va_marshaller (xsocket_service_incoming_signal,
+  xsignal_set_va_marshaller (xsocket_service_incoming_signal,
                               XTYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_BOOLEAN__OBJECT_OBJECTv);
 
@@ -395,7 +395,7 @@ xsocket_service_ready (xobject_t      *object,
 
   G_LOCK (active);
 
-  g_cancellable_reset (service->priv->cancellable);
+  xcancellable_reset (service->priv->cancellable);
 
   /* requeue */
   service->priv->outstanding_accept = FALSE;

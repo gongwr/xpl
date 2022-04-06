@@ -568,12 +568,12 @@ gvs_fixed_sized_array_is_normal (GVariantSerialised value)
 
 /* bytes may be NULL if (size == 0). */
 static inline xsize_t
-gvs_read_unaligned_le (guchar *bytes,
+gvs_read_unaligned_le (xuchar_t *bytes,
                        xuint_t   size)
 {
   union
   {
-    guchar bytes[XPL_SIZEOF_SIZE_T];
+    xuchar_t bytes[XPL_SIZEOF_SIZE_T];
     xsize_t integer;
   } tmpvalue;
 
@@ -585,13 +585,13 @@ gvs_read_unaligned_le (guchar *bytes,
 }
 
 static inline void
-gvs_write_unaligned_le (guchar *bytes,
+gvs_write_unaligned_le (xuchar_t *bytes,
                         xsize_t   value,
                         xuint_t   size)
 {
   union
   {
-    guchar bytes[XPL_SIZEOF_SIZE_T];
+    xuchar_t bytes[XPL_SIZEOF_SIZE_T];
     xsize_t integer;
   } tmpvalue;
 
@@ -736,7 +736,7 @@ gvs_variable_sized_array_serialise (GVariantSerialised        value,
                                     const xpointer_t           *children,
                                     xsize_t                     n_children)
 {
-  guchar *offset_ptr;
+  xuchar_t *offset_ptr;
   xsize_t offset_size;
   xuint_t alignment;
   xsize_t offset;
@@ -769,7 +769,7 @@ gvs_variable_sized_array_is_normal (GVariantSerialised value)
 {
   GVariantSerialised child = { 0, };
   xsize_t offsets_array_size;
-  guchar *offsets_array;
+  xuchar_t *offsets_array;
   xuint_t offset_size;
   xuint_t alignment;
   xsize_t last_end;

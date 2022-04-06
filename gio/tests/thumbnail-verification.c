@@ -45,26 +45,26 @@ test_validity (void)
        * however, and that's all we care about.
        */
 
-      /* Test that validation succeeds against a valid PNG file with URI,
+      /* test_t that validation succeeds against a valid PNG file with URI,
        * mtime and size which match the expected values. */
       { "valid.png", 1382429848, 93654, TRUE },
-      /* Test that validation succeeds with URI and mtime, but no size in the
+      /* test_t that validation succeeds with URI and mtime, but no size in the
        * tEXt data. */
       { "valid-no-size.png", 1382429848, 93633, TRUE },
-      /* Test that a missing file fails validation. */
+      /* test_t that a missing file fails validation. */
       { "missing.png", 123456789, 12345, FALSE },
-      /* Test that an existing file with no tEXt data fails validation. */
+      /* test_t that an existing file with no tEXt data fails validation. */
       { "no-text-data.png", 123 /* invalid */, 26378, FALSE },
-      /* Test that a URI mismatch fails validation. */
+      /* test_t that a URI mismatch fails validation. */
       { "uri-mismatch.png" /* invalid */, 1382429848, 93654, FALSE },
-      /* Test that an mtime mismatch fails validation. */
+      /* test_t that an mtime mismatch fails validation. */
       { "valid.png", 123 /* invalid */, 93654, FALSE },
-      /* Test that a valid URI and mtime, but a mismatched size, fails
+      /* test_t that a valid URI and mtime, but a mismatched size, fails
        * validation. */
       { "valid.png", 1382429848, 123 /* invalid */, FALSE },
-      /* Test that validation succeeds with an mtime of 0. */
+      /* test_t that validation succeeds with an mtime of 0. */
       { "mtime-zero.png", 0, 93621, TRUE },
-      /* Test that validation fails if the mtime is only a prefix match. */
+      /* test_t that validation fails if the mtime is only a prefix match. */
       { "valid.png", 9848 /* invalid */, 93654, FALSE },
 
       /*

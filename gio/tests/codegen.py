@@ -272,17 +272,17 @@ class TestCodegen(unittest.TestCase):
             return self.runCodegen(interface_file.name, *args)
 
     def test_help(self):
-        """Test the --help argument."""
+        """test_t the --help argument."""
         result = self.runCodegen("--help")
         self.assertIn("usage: gdbus-codegen", result.out)
 
     def test_no_args(self):
-        """Test running with no arguments at all."""
+        """test_t running with no arguments at all."""
         with self.assertRaises(subprocess.CalledProcessError):
             self.runCodegen()
 
     def test_empty_interface_header(self):
-        """Test generating a header with an empty interface file."""
+        """test_t generating a header with an empty interface file."""
         result = self.runCodegenWithInterface("", "--output", "/dev/stdout", "--header")
         self.assertEqual("", result.err)
         self.assertEqual(
@@ -305,7 +305,7 @@ G_END_DECLS
         )
 
     def test_empty_interface_body(self):
-        """Test generating a body with an empty interface file."""
+        """test_t generating a body with an empty interface file."""
         result = self.runCodegenWithInterface("", "--output", "/dev/stdout", "--body")
         self.assertEqual("", result.err)
         self.assertEqual(
@@ -324,7 +324,7 @@ G_END_DECLS
         )
 
     def test_reproducible(self):
-        """Test builds are reproducible regardless of file ordering."""
+        """test_t builds are reproducible regardless of file ordering."""
         xml_contents1 = """
         <node>
           <interface name="com.acme.Coyote">
@@ -383,7 +383,7 @@ G_END_DECLS
                 self.assertEqual(result1.out, result2.out)
 
     def test_generate_docbook(self):
-        """Test the basic functionality of the docbook generator."""
+        """test_t the basic functionality of the docbook generator."""
         xml_contents = """
         <node>
           <interface name="org.project.Bar.Frobnicator">
@@ -403,7 +403,7 @@ G_END_DECLS
             self.assertTrue(len(xml_data) != 0)
 
     def test_generate_rst(self):
-        """Test the basic functionality of the rst generator."""
+        """test_t the basic functionality of the rst generator."""
         xml_contents = """
         <node>
           <interface name="org.project.Bar.Frobnicator">
@@ -423,7 +423,7 @@ G_END_DECLS
             self.assertTrue(len(rst) != 0)
 
     def test_glib_min_required_invalid(self):
-        """Test running with an invalid --glib-min-required."""
+        """test_t running with an invalid --glib-min-required."""
         with self.assertRaises(subprocess.CalledProcessError):
             self.runCodegenWithInterface(
                 "",
@@ -435,7 +435,7 @@ G_END_DECLS
             )
 
     def test_glib_min_required_too_low(self):
-        """Test running with a --glib-min-required which is too low (and hence
+        """test_t running with a --glib-min-required which is too low (and hence
         probably a typo)."""
         with self.assertRaises(subprocess.CalledProcessError):
             self.runCodegenWithInterface(
@@ -443,7 +443,7 @@ G_END_DECLS
             )
 
     def test_glib_min_required_major_only(self):
-        """Test running with a --glib-min-required which contains only a major version."""
+        """test_t running with a --glib-min-required which contains only a major version."""
         result = self.runCodegenWithInterface(
             "",
             "--output",
@@ -458,7 +458,7 @@ G_END_DECLS
         self.assertNotEqual("", result.out.strip())
 
     def test_glib_min_required_with_micro(self):
-        """Test running with a --glib-min-required which contains a micro version."""
+        """test_t running with a --glib-min-required which contains a micro version."""
         result = self.runCodegenWithInterface(
             "", "--output", "/dev/stdout", "--header", "--glib-min-required", "2.46.2"
         )
@@ -466,7 +466,7 @@ G_END_DECLS
         self.assertNotEqual("", result.out.strip())
 
     def test_glib_max_allowed_too_low(self):
-        """Test running with a --glib-max-allowed which is too low (and hence
+        """test_t running with a --glib-max-allowed which is too low (and hence
         probably a typo)."""
         with self.assertRaises(subprocess.CalledProcessError):
             self.runCodegenWithInterface(
@@ -474,7 +474,7 @@ G_END_DECLS
             )
 
     def test_glib_max_allowed_major_only(self):
-        """Test running with a --glib-max-allowed which contains only a major version."""
+        """test_t running with a --glib-max-allowed which contains only a major version."""
         result = self.runCodegenWithInterface(
             "", "--output", "/dev/stdout", "--header", "--glib-max-allowed", "3"
         )
@@ -482,7 +482,7 @@ G_END_DECLS
         self.assertNotEqual("", result.out.strip())
 
     def test_glib_max_allowed_with_micro(self):
-        """Test running with a --glib-max-allowed which contains a micro version."""
+        """test_t running with a --glib-max-allowed which contains a micro version."""
         result = self.runCodegenWithInterface(
             "", "--output", "/dev/stdout", "--header", "--glib-max-allowed", "2.46.2"
         )
@@ -490,7 +490,7 @@ G_END_DECLS
         self.assertNotEqual("", result.out.strip())
 
     def test_glib_max_allowed_unstable(self):
-        """Test running with a --glib-max-allowed which is unstable. It should
+        """test_t running with a --glib-max-allowed which is unstable. It should
         be rounded up to the next stable version number, and hence should not
         end up less than --glib-min-required."""
         result = self.runCodegenWithInterface(
@@ -507,7 +507,7 @@ G_END_DECLS
         self.assertNotEqual("", result.out.strip())
 
     def test_glib_max_allowed_less_than_min_required(self):
-        """Test running with a --glib-max-allowed which is less than
+        """test_t running with a --glib-max-allowed which is less than
         --glib-min-required."""
         with self.assertRaises(subprocess.CalledProcessError):
             self.runCodegenWithInterface(
@@ -522,7 +522,7 @@ G_END_DECLS
             )
 
     def test_unix_fd_types_and_annotations(self):
-        """Test an interface with `h` arguments, no annotation, and GLib < 2.64.
+        """test_t an interface with `h` arguments, no annotation, and GLib < 2.64.
 
         See issue #1726.
         """
@@ -580,7 +580,7 @@ G_END_DECLS
         self.assertEqual(result.out.strip().count("xunix_fd_list_t"), 18)
 
     def test_call_flags_and_timeout_method_args(self):
-        """Test that generated method call functions have @call_flags and
+        """test_t that generated method call functions have @call_flags and
         @timeout_msec args if and only if GLib >= 2.64.
         """
         interface_xml = """
@@ -626,7 +626,7 @@ G_END_DECLS
         self.assertEqual(result.out.strip().count("xint_t timeout_msec,"), 2)
 
     def test_generate_valid_docbook(self):
-        """Test the basic functionality of the docbook generator."""
+        """test_t the basic functionality of the docbook generator."""
         xml_contents = """
         <node>
           <interface name="org.project.Bar.Frobnicator">

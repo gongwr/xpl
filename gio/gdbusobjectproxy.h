@@ -25,15 +25,15 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_OBJECT_PROXY         (g_dbus_object_proxy_get_type ())
+#define XTYPE_DBUS_OBJECT_PROXY         (xdbus_object_proxy_get_type ())
 #define G_DBUS_OBJECT_PROXY(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_OBJECT_PROXY, xdbus_object_proxy))
-#define G_DBUS_OBJECT_PROXY_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DBUS_OBJECT_PROXY, GDBusObjectProxyClass))
-#define G_DBUS_OBJECT_PROXY_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DBUS_OBJECT_PROXY, GDBusObjectProxyClass))
+#define G_DBUS_OBJECT_PROXY_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DBUS_OBJECT_PROXY, xdbus_object_proxy_class_t))
+#define G_DBUS_OBJECT_PROXY_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DBUS_OBJECT_PROXY, xdbus_object_proxy_class_t))
 #define X_IS_DBUS_OBJECT_PROXY(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_OBJECT_PROXY))
 #define X_IS_DBUS_OBJECT_PROXY_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_DBUS_OBJECT_PROXY))
 
-typedef struct _GDBusObjectProxyClass   GDBusObjectProxyClass;
-typedef struct _GDBusObjectProxyPrivate GDBusObjectProxyPrivate;
+typedef struct _xdbus_object_proxy_class   xdbus_object_proxy_class_t;
+typedef struct _xdbus_object_proxy_private xdbus_object_proxy_private;
 
 /**
  * xdbus_object_proxy_t:
@@ -47,18 +47,18 @@ struct _GDBusObjectProxy
 {
   /*< private >*/
   xobject_t parent_instance;
-  GDBusObjectProxyPrivate *priv;
+  xdbus_object_proxy_private *priv;
 };
 
 /**
- * GDBusObjectProxyClass:
+ * xdbus_object_proxy_class_t:
  * @parent_class: The parent class.
  *
  * Class structure for #xdbus_object_proxy_t.
  *
  * Since: 2.30
  */
-struct _GDBusObjectProxyClass
+struct _xdbus_object_proxy_class
 {
   xobject_class_t parent_class;
 
@@ -67,12 +67,12 @@ struct _GDBusObjectProxyClass
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t             g_dbus_object_proxy_get_type       (void) G_GNUC_CONST;
+xtype_t             xdbus_object_proxy_get_type       (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xdbus_object_proxy_t *g_dbus_object_proxy_new            (xdbus_connection_t   *connection,
+xdbus_object_proxy_t *xdbus_object_proxy_new            (xdbus_connection_t   *connection,
                                                       const xchar_t       *object_path);
 XPL_AVAILABLE_IN_ALL
-xdbus_connection_t  *g_dbus_object_proxy_get_connection (xdbus_object_proxy_t  *proxy);
+xdbus_connection_t  *xdbus_object_proxy_get_connection (xdbus_object_proxy_t  *proxy);
 
 G_END_DECLS
 

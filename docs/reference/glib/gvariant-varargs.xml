@@ -349,7 +349,7 @@
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         <link linkend='guchar'><type>guchar</type></link>
+         <link linkend='xuchar_t'><type>xuchar_t</type></link>
         </para>
        </entry>
       </row>
@@ -419,7 +419,7 @@
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         <link linkend='gint64'><type>gint64</type></link>
+         <link linkend='sint64_t'><type>sint64_t</type></link>
         </para>
        </entry>
       </row>
@@ -506,7 +506,7 @@ value4 = xvariant_new ("x", G_GINT64_CONSTANT (998877665544332211));
 {
   xdouble_t floating;
   xboolean_t truth;
-  gint64 bignum;
+  sint64_t bignum;
 
 
   xvariant_get (value1, "y", NULL);      /* ignore the value. */

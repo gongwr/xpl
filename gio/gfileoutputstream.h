@@ -57,13 +57,13 @@ struct _GFileOutputStream
 
 struct _GFileOutputStreamClass
 {
-  GOutputStreamClass parent_class;
+  xoutput_stream_class_t parent_class;
 
   xoffset_t     (* tell)              (xfile_output_stream_t    *stream);
   xboolean_t    (* can_seek)          (xfile_output_stream_t    *stream);
   xboolean_t    (* seek)	            (xfile_output_stream_t    *stream,
                                      xoffset_t               offset,
-                                     GSeekType             type,
+                                     xseek_type_t             type,
                                      xcancellable_t         *cancellable,
                                      xerror_t              **error);
   xboolean_t    (* can_truncate)      (xfile_output_stream_t    *stream);

@@ -66,7 +66,7 @@ typedef void (*GBusNameVanishedCallback) (xdbus_connection_t *connection,
 
 
 XPL_AVAILABLE_IN_ALL
-xuint_t g_bus_watch_name               (GBusType                  bus_type,
+xuint_t g_bus_watch_name               (xbus_type_t                  bus_type,
                                       const xchar_t              *name,
                                       GBusNameWatcherFlags      flags,
                                       GBusNameAppearedCallback  name_appeared_handler,
@@ -82,7 +82,7 @@ xuint_t g_bus_watch_name_on_connection (xdbus_connection_t          *connection,
                                       xpointer_t                  user_data,
                                       xdestroy_notify_t            user_data_free_func);
 XPL_AVAILABLE_IN_ALL
-xuint_t g_bus_watch_name_with_closures (GBusType                  bus_type,
+xuint_t g_bus_watch_name_with_closures (xbus_type_t                  bus_type,
                                       const xchar_t              *name,
                                       GBusNameWatcherFlags      flags,
                                       xclosure_t                 *name_appeared_closure,

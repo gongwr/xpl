@@ -311,7 +311,7 @@ struct _GMainContext
 
   GPollFunc poll_func;
 
-  gint64   time;
+  sint64_t   time;
   xboolean_t time_is_fresh;
 };
 
@@ -370,7 +370,7 @@ struct _GSourcePrivate
   xslist_t *child_sources;
   xsource_t *parent_source;
 
-  gint64 ready_time;
+  sint64_t ready_time;
 
   /* This is currently only used on UNIX, but we always declare it (and
    * let it remain empty on Windows) to avoid #ifdef all over the place.
@@ -1992,7 +1992,7 @@ xsource_get_priority (xsource_t *source)
  **/
 void
 xsource_set_ready_time (xsource_t *source,
-                         gint64   ready_time)
+                         sint64_t   ready_time)
 {
   xmain_context_t *context;
 
@@ -2037,7 +2037,7 @@ xsource_set_ready_time (xsource_t *source,
  *
  * Returns: the monotonic ready time, -1 for "never"
  **/
-gint64
+sint64_t
 xsource_get_ready_time (xsource_t *source)
 {
   g_return_val_if_fail (source != NULL, -1);
@@ -2867,7 +2867,7 @@ G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 void
 g_get_current_time (GTimeVal *result)
 {
-  gint64 tv;
+  sint64_t tv;
 
   g_return_if_fail (result != NULL);
 
@@ -2895,7 +2895,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  *
  * Since: 2.28
  **/
-gint64
+sint64_t
 g_get_real_time (void)
 {
 #ifndef G_OS_WIN32
@@ -2905,7 +2905,7 @@ g_get_real_time (void)
    * not longs and a cast only would fail horribly */
   gettimeofday (&r, NULL);
 
-  return (((gint64) r.tv_sec) * 1000000) + r.tv_usec;
+  return (((sint64_t) r.tv_sec) * 1000000) + r.tv_usec;
 #else
   FILETIME ft;
   xuint64_t time64;
@@ -2966,7 +2966,7 @@ g_clock_win32_init (void)
   g_monotonic_usec_per_tick = (xdouble_t)G_USEC_PER_SEC / freq.QuadPart;
 }
 
-gint64
+sint64_t
 g_get_monotonic_time (void)
 {
   if (G_LIKELY (g_monotonic_usec_per_tick != 0))
@@ -2974,7 +2974,7 @@ g_get_monotonic_time (void)
       LARGE_INTEGER ticks;
 
       if (QueryPerformanceCounter (&ticks))
-        return (gint64)(ticks.QuadPart * g_monotonic_usec_per_tick);
+        return (sint64_t)(ticks.QuadPart * g_monotonic_usec_per_tick);
 
       g_warning ("QueryPerformanceCounter Failed (%lu)", GetLastError ());
       g_monotonic_usec_per_tick = 0;
@@ -2983,7 +2983,7 @@ g_get_monotonic_time (void)
   return 0;
 }
 #elif defined(HAVE_MACH_MACH_TIME_H) /* Mac OS */
-gint64
+sint64_t
 g_get_monotonic_time (void)
 {
   mach_timebase_info_data_t timebase_info;
@@ -3022,7 +3022,7 @@ g_get_monotonic_time (void)
   return val;
 }
 #else
-gint64
+sint64_t
 g_get_monotonic_time (void)
 {
   struct timespec ts;
@@ -3033,7 +3033,7 @@ g_get_monotonic_time (void)
   if G_UNLIKELY (result != 0)
     xerror ("GLib requires working CLOCK_MONOTONIC");
 
-  return (((gint64) ts.tv_sec) * 1000000) + (ts.tv_nsec / 1000);
+  return (((sint64_t) ts.tv_sec) * 1000000) + (ts.tv_nsec / 1000);
 }
 #endif
 
@@ -3383,7 +3383,7 @@ g_main_dispatch (xmain_context_t *context)
 				xsource_func_t,
 				xpointer_t);
           xsource_t *prev_source;
-          gint64 begin_time_nsec G_GNUC_UNUSED;
+          sint64_t begin_time_nsec G_GNUC_UNUSED;
 
 	  dispatch = source->source_funcs->dispatch;
 	  cb_funcs = source->callback_funcs;
@@ -3727,7 +3727,7 @@ xmain_context_prepare (xmain_context_t *context,
 
           if (prepare)
             {
-              gint64 begin_time_nsec G_GNUC_UNUSED;
+              sint64_t begin_time_nsec G_GNUC_UNUSED;
 
               context->in_check_or_prepare++;
               UNLOCK_CONTEXT (context);
@@ -3767,7 +3767,7 @@ xmain_context_prepare (xmain_context_t *context,
                 }
               else
                 {
-                  gint64 timeout;
+                  sint64_t timeout;
 
                   /* rounding down will lead to spinning, so always round up */
                   timeout = (source->priv->ready_time - context->time + 999) / 1000;
@@ -4024,7 +4024,7 @@ xmain_context_check (xmain_context_t *context,
 
           if (check)
             {
-              gint64 begin_time_nsec G_GNUC_UNUSED;
+              sint64_t begin_time_nsec G_GNUC_UNUSED;
 
               /* If the check function is set, call it. */
               context->in_check_or_prepare++;
@@ -4152,7 +4152,7 @@ xmain_context_iterate (xmain_context_t *context,
   xboolean_t some_ready;
   xint_t nfds, allocated_nfds;
   xpollfd_t *fds = NULL;
-  gint64 begin_time_nsec G_GNUC_UNUSED;
+  sint64_t begin_time_nsec G_GNUC_UNUSED;
 
   UNLOCK_CONTEXT (context);
 
@@ -4741,11 +4741,11 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  *
  * Since: 2.28
  **/
-gint64
+sint64_t
 xsource_get_time (xsource_t *source)
 {
   xmain_context_t *context;
-  gint64 result;
+  sint64_t result;
 
   g_return_val_if_fail (source != NULL, 0);
   g_return_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, 0);
@@ -4903,13 +4903,13 @@ xmain_context_is_owner (xmain_context_t *context)
 
 static void
 g_timeout_set_expiration (GTimeoutSource *timeout_source,
-                          gint64          current_time)
+                          sint64_t          current_time)
 {
-  gint64 expiration;
+  sint64_t expiration;
 
   if (timeout_source->seconds)
     {
-      gint64 remainder;
+      sint64_t remainder;
       static xint_t timer_perturb = -1;
 
       if (timer_perturb == -1)

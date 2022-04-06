@@ -489,10 +489,10 @@ gsettings_monitor (void)
       xchar_t *name;
 
       name = xstrdup_printf ("changed::%s", global_key);
-      g_signal_connect (global_settings, name, G_CALLBACK (value_changed), NULL);
+      xsignal_connect (global_settings, name, G_CALLBACK (value_changed), NULL);
     }
   else
-    g_signal_connect (global_settings, "changed", G_CALLBACK (value_changed), NULL);
+    xsignal_connect (global_settings, "changed", G_CALLBACK (value_changed), NULL);
 
   for (;;)
     xmain_context_iteration (NULL, TRUE);

@@ -214,8 +214,8 @@ test_mime_api (Fixture       *fixture,
   /* clear things out */
   xapp_info_reset_type_associations (contenttype);
 
-  appinfo = (xapp_info_t*)g_desktop_app_info_new ("myapp.desktop");
-  appinfo2 = (xapp_info_t*)g_desktop_app_info_new ("myapp2.desktop");
+  appinfo = (xapp_info_t*)xdesktop_app_info_new ("myapp.desktop");
+  appinfo2 = (xapp_info_t*)xdesktop_app_info_new ("myapp2.desktop");
 
   def = xapp_info_get_default_for_type (contenttype, FALSE);
   list = xapp_info_get_recommended_for_type (contenttype);
@@ -308,8 +308,8 @@ test_mime_file (Fixture       *fixture,
   /* clear things out */
   xapp_info_reset_type_associations (contenttype);
 
-  appinfo = (xapp_info_t*)g_desktop_app_info_new ("myapp.desktop");
-  appinfo2 = (xapp_info_t*)g_desktop_app_info_new ("myapp2.desktop");
+  appinfo = (xapp_info_t*)xdesktop_app_info_new ("myapp.desktop");
+  appinfo2 = (xapp_info_t*)xdesktop_app_info_new ("myapp2.desktop");
 
   def = xapp_info_get_default_for_type (contenttype, FALSE);
   list = xapp_info_get_recommended_for_type (contenttype);
@@ -425,9 +425,9 @@ test_mime_default (Fixture       *fixture,
   /* clear things out */
   xapp_info_reset_type_associations (contenttype);
 
-  appinfo = (xapp_info_t*)g_desktop_app_info_new ("myapp.desktop");
-  appinfo2 = (xapp_info_t*)g_desktop_app_info_new ("myapp2.desktop");
-  appinfo3 = (xapp_info_t*)g_desktop_app_info_new ("myapp3.desktop");
+  appinfo = (xapp_info_t*)xdesktop_app_info_new ("myapp.desktop");
+  appinfo2 = (xapp_info_t*)xdesktop_app_info_new ("myapp2.desktop");
+  appinfo3 = (xapp_info_t*)xdesktop_app_info_new ("myapp3.desktop");
 
   /* myapp3 is set as the default in defaults.list */
   def = xapp_info_get_default_for_type (contenttype, FALSE);
@@ -502,8 +502,8 @@ test_mime_default_last_used (Fixture       *fixture,
   /* clear things out */
   xapp_info_reset_type_associations (contenttype);
 
-  appinfo4 = (xapp_info_t*)g_desktop_app_info_new ("myapp4.desktop");
-  appinfo5 = (xapp_info_t*)g_desktop_app_info_new ("myapp5.desktop");
+  appinfo4 = (xapp_info_t*)xdesktop_app_info_new ("myapp4.desktop");
+  appinfo5 = (xapp_info_t*)xdesktop_app_info_new ("myapp5.desktop");
 
   /* myapp4 is set as the default in defaults.list */
   /* myapp4 and myapp5 can both handle image/bmp */
@@ -591,7 +591,7 @@ test_scheme_handler (Fixture       *fixture,
 {
   xapp_info_t *info, *info5;
 
-  info5 = (xapp_info_t*)g_desktop_app_info_new ("myapp5.desktop");
+  info5 = (xapp_info_t*)xdesktop_app_info_new ("myapp5.desktop");
   info = xapp_info_get_default_for_uri_scheme ("ftp");
   g_assert_true (xapp_info_equal (info, info5));
 
@@ -607,7 +607,7 @@ test_mime_ignore_nonexisting (Fixture       *fixture,
 {
   xapp_info_t *appinfo;
 
-  appinfo = (xapp_info_t*)g_desktop_app_info_new ("nosuchapp.desktop");
+  appinfo = (xapp_info_t*)xdesktop_app_info_new ("nosuchapp.desktop");
   g_assert_null (appinfo);
 }
 

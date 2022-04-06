@@ -424,7 +424,7 @@ created_cb (xobject_t      *source,
   if (data->buffersize == 0)
     data->ostream = G_OUTPUT_STREAM (xobject_ref (base));
   else
-    data->ostream = g_buffered_output_stream_new_sized (G_OUTPUT_STREAM (base), data->buffersize);
+    data->ostream = xbuffered_output_stream_new_sized (G_OUTPUT_STREAM (base), data->buffersize);
   xobject_unref (base);
 
   xoutput_stream_write_async (data->ostream,
@@ -506,7 +506,7 @@ test_create_delete (xconstpointer d)
 
   xfile_monitor_set_rate_limit (data->monitor, 100);
 
-  g_signal_connect (data->monitor, "changed", G_CALLBACK (monitor_changed), data);
+  xsignal_connect (data->monitor, "changed", G_CALLBACK (monitor_changed), data);
 
   /* Use the global default main context */
   data->context = NULL;
@@ -796,8 +796,8 @@ test_replace_cancel (void)
   xobject_unref (fenum);
 
   /* Make sure the temporary gets deleted even if we cancel. */
-  cancellable = g_cancellable_new ();
-  g_cancellable_cancel (cancellable);
+  cancellable = xcancellable_new ();
+  xcancellable_cancel (cancellable);
   xoutput_stream_close (G_OUTPUT_STREAM (ostream), cancellable, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
   g_clear_error (&error);
@@ -842,7 +842,7 @@ test_replace_symlink (void)
   xerror_t *local_error = NULL;
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2325");
-  g_test_summary ("Test that XFILE_CREATE_REPLACE_DESTINATION doesn’t follow symlinks");
+  g_test_summary ("test_t that XFILE_CREATE_REPLACE_DESTINATION doesn’t follow symlinks");
 
   /* Create a fresh, empty working directory. */
   tmpdir_path = g_dir_make_tmp ("xfile_replace_symlink_XXXXXX", &local_error);
@@ -950,7 +950,7 @@ test_replace_symlink_using_etag (void)
   xerror_t *local_error = NULL;
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2417");
-  g_test_summary ("Test that ETag checks work when replacing a file through a symlink");
+  g_test_summary ("test_t that ETag checks work when replacing a file through a symlink");
 
   /* Create a fresh, empty working directory. */
   tmpdir_path = g_dir_make_tmp ("xfile_replace_symlink_using_etag_XXXXXX", &local_error);
@@ -1800,7 +1800,7 @@ test_replace (xconstpointer test_data)
     };
   xsize_t i;
 
-  g_test_summary ("Test various situations for xfile_replace()");
+  g_test_summary ("test_t various situations for xfile_replace()");
 
   /* Reset the umask after querying it above. There’s no way to query it without
    * changing it. */
@@ -1823,7 +1823,7 @@ test_replace (xconstpointer test_data)
       g_assert_no_error (local_error);
       tmpdir = xfile_new_for_path (tmpdir_path);
 
-      g_test_message ("Test %" G_GSIZE_FORMAT ", using temporary directory %s", i, tmpdir_path);
+      g_test_message ("test_t %" G_GSIZE_FORMAT ", using temporary directory %s", i, tmpdir_path);
       g_free (tmpdir_path);
 
       /* Set up the test directory. */
@@ -2424,7 +2424,7 @@ test_writev_helper (xoutput_vector_t *vectors,
   xobject_unref (file);
 }
 
-/* Test that writev() on local file output streams works on a non-empty vector */
+/* test_t that writev() on local file output streams works on a non-empty vector */
 static void
 test_writev (void)
 {
@@ -2445,7 +2445,7 @@ test_writev (void)
   test_writev_helper (vectors, G_N_ELEMENTS (vectors), TRUE, buffer, sizeof buffer);
 }
 
-/* Test that writev() on local file output streams works on a non-empty vector without returning bytes_written */
+/* test_t that writev() on local file output streams works on a non-empty vector without returning bytes_written */
 static void
 test_writev_no_bytes_written (void)
 {
@@ -2466,14 +2466,14 @@ test_writev_no_bytes_written (void)
   test_writev_helper (vectors, G_N_ELEMENTS (vectors), FALSE, buffer, sizeof buffer);
 }
 
-/* Test that writev() on local file output streams works on 0 vectors */
+/* test_t that writev() on local file output streams works on 0 vectors */
 static void
 test_writev_no_vectors (void)
 {
   test_writev_helper (NULL, 0, TRUE, NULL, 0);
 }
 
-/* Test that writev() on local file output streams works on empty vectors */
+/* test_t that writev() on local file output streams works on empty vectors */
 static void
 test_writev_empty_vectors (void)
 {
@@ -2489,7 +2489,7 @@ test_writev_empty_vectors (void)
   test_writev_helper (vectors, G_N_ELEMENTS (vectors), TRUE, NULL, 0);
 }
 
-/* Test that writev() fails if the sum of sizes in the vector is too big */
+/* test_t that writev() fails if the sum of sizes in the vector is too big */
 static void
 test_writev_too_big_vectors (void)
 {
@@ -2585,7 +2585,7 @@ test_writev_async_cb (xobject_t      *object,
     xoutput_stream_writev_async (ostream, data->vectors, data->n_vectors, 0, NULL, test_writev_async_cb, &data);
 }
 
-/* Test that writev_async() on local file output streams works on a non-empty vector */
+/* test_t that writev_async() on local file output streams works on a non-empty vector */
 static void
 test_writev_async (void)
 {
@@ -2657,7 +2657,7 @@ test_writev_all_cb (xobject_t      *object,
   data->done = TRUE;
 }
 
-/* Test that writev_async_all() on local file output streams works on a non-empty vector */
+/* test_t that writev_async_all() on local file output streams works on a non-empty vector */
 static void
 test_writev_async_all (void)
 {
@@ -2715,7 +2715,7 @@ test_writev_async_all (void)
   xobject_unref (file);
 }
 
-/* Test that writev_async_all() on local file output streams handles cancellation correctly */
+/* test_t that writev_async_all() on local file output streams handles cancellation correctly */
 static void
 test_writev_async_all_cancellation (void)
 {
@@ -2749,8 +2749,8 @@ test_writev_async_all_cancellation (void)
 
   ostream = g_io_stream_get_output_stream (XIO_STREAM (iostream));
 
-  cancellable = g_cancellable_new ();
-  g_cancellable_cancel (cancellable);
+  cancellable = xcancellable_new ();
+  xcancellable_cancel (cancellable);
 
   xoutput_stream_writev_all_async (ostream, vectors, G_N_ELEMENTS (vectors), 0, cancellable, test_writev_all_cb, &data);
 
@@ -2778,7 +2778,7 @@ test_writev_async_all_cancellation (void)
   xobject_unref (cancellable);
 }
 
-/* Test that writev_async_all() with empty vectors is handled correctly */
+/* test_t that writev_async_all() with empty vectors is handled correctly */
 static void
 test_writev_async_all_empty_vectors (void)
 {
@@ -2833,7 +2833,7 @@ test_writev_async_all_empty_vectors (void)
   xobject_unref (file);
 }
 
-/* Test that writev_async_all() with no vectors is handled correctly */
+/* test_t that writev_async_all() with no vectors is handled correctly */
 static void
 test_writev_async_all_no_vectors (void)
 {
@@ -2878,7 +2878,7 @@ test_writev_async_all_no_vectors (void)
   xobject_unref (file);
 }
 
-/* Test that writev_async_all() with too big vectors is handled correctly */
+/* test_t that writev_async_all() with too big vectors is handled correctly */
 static void
 test_writev_async_all_too_big_vectors (void)
 {
@@ -3041,7 +3041,7 @@ test_move_async_progress_cb (xoffset_t  current_num_bytes,
   data->total_num_bytes = total_num_bytes;
 }
 
-/* Test that move_async() moves the file correctly */
+/* test_t that move_async() moves the file correctly */
 static void
 test_move_async (void)
 {

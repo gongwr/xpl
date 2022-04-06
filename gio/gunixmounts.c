@@ -1981,7 +1981,7 @@ mount_monitor_start (void)
       fstab_monitor = xfile_monitor_file (file, 0, NULL, NULL);
       xobject_unref (file);
 
-      g_signal_connect (fstab_monitor, "changed", (xcallback_t)fstab_file_changed, NULL);
+      xsignal_connect (fstab_monitor, "changed", (xcallback_t)fstab_file_changed, NULL);
     }
 
   if (get_mtab_monitor_file () != NULL)
@@ -2025,7 +2025,7 @@ mount_monitor_start (void)
           file = xfile_new_for_path (mtab_path);
           mtab_monitor = xfile_monitor_file (file, 0, NULL, NULL);
           xobject_unref (file);
-          g_signal_connect (mtab_monitor, "changed", (xcallback_t)mtab_file_changed, NULL);
+          xsignal_connect (mtab_monitor, "changed", (xcallback_t)mtab_file_changed, NULL);
         }
     }
   else
@@ -2072,7 +2072,7 @@ g_unix_mount_monitor_class_init (GUnixMountMonitorClass *klass)
    * Emitted when the unix mounts have changed.
    */
   signals[MOUNTS_CHANGED] =
-    g_signal_new (I_("mounts-changed"),
+    xsignal_new (I_("mounts-changed"),
 		  XTYPE_FROM_CLASS (klass),
 		  G_SIGNAL_RUN_LAST,
 		  0,
@@ -2087,7 +2087,7 @@ g_unix_mount_monitor_class_init (GUnixMountMonitorClass *klass)
    * Emitted when the unix mount points have changed.
    */
   signals[MOUNTPOINTS_CHANGED] =
-    g_signal_new (I_("mountpoints-changed"),
+    xsignal_new (I_("mountpoints-changed"),
 		  XTYPE_FROM_CLASS (klass),
 		  G_SIGNAL_RUN_LAST,
 		  0,

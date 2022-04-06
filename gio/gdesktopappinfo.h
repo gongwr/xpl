@@ -25,14 +25,14 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DESKTOP_APP_INFO         (g_desktop_app_info_get_type ())
-#define G_DESKTOP_APP_INFO(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DESKTOP_APP_INFO, GDesktopAppInfo))
+#define XTYPE_DESKTOP_APP_INFO         (xdesktop_app_info_get_type ())
+#define G_DESKTOP_APP_INFO(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DESKTOP_APP_INFO, xdesktop_app_info_t))
 #define G_DESKTOP_APP_INFO_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DESKTOP_APP_INFO, GDesktopAppInfoClass))
 #define X_IS_DESKTOP_APP_INFO(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DESKTOP_APP_INFO))
 #define X_IS_DESKTOP_APP_INFO_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_DESKTOP_APP_INFO))
 #define G_DESKTOP_APP_INFO_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DESKTOP_APP_INFO, GDesktopAppInfoClass))
 
-typedef struct _GDesktopAppInfo        GDesktopAppInfo;
+typedef struct _GDesktopAppInfo        xdesktop_app_info_t;
 typedef struct _GDesktopAppInfoClass   GDesktopAppInfoClass;
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(xdesktop_app_info, xobject_unref)
@@ -44,69 +44,69 @@ struct _GDesktopAppInfoClass
 
 
 XPL_AVAILABLE_IN_ALL
-xtype_t            g_desktop_app_info_get_type          (void) G_GNUC_CONST;
+xtype_t            xdesktop_app_info_get_type          (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GDesktopAppInfo *g_desktop_app_info_new_from_filename (const char      *filename);
+xdesktop_app_info_t *xdesktop_app_info_new_from_filename (const char      *filename);
 XPL_AVAILABLE_IN_ALL
-GDesktopAppInfo *g_desktop_app_info_new_from_keyfile  (xkey_file_t        *key_file);
+xdesktop_app_info_t *xdesktop_app_info_new_from_keyfile  (xkey_file_t        *key_file);
 
 XPL_AVAILABLE_IN_ALL
-const char *     g_desktop_app_info_get_filename      (GDesktopAppInfo *info);
+const char *     xdesktop_app_info_get_filename      (xdesktop_app_info_t *info);
 
 XPL_AVAILABLE_IN_2_30
-const char *     g_desktop_app_info_get_generic_name  (GDesktopAppInfo *info);
+const char *     xdesktop_app_info_get_generic_name  (xdesktop_app_info_t *info);
 XPL_AVAILABLE_IN_2_30
-const char *     g_desktop_app_info_get_categories    (GDesktopAppInfo *info);
+const char *     xdesktop_app_info_get_categories    (xdesktop_app_info_t *info);
 XPL_AVAILABLE_IN_2_30
-const char * const *g_desktop_app_info_get_keywords   (GDesktopAppInfo *info);
+const char * const *xdesktop_app_info_get_keywords   (xdesktop_app_info_t *info);
 XPL_AVAILABLE_IN_2_30
-xboolean_t         g_desktop_app_info_get_nodisplay     (GDesktopAppInfo *info);
+xboolean_t         xdesktop_app_info_get_nodisplay     (xdesktop_app_info_t *info);
 XPL_AVAILABLE_IN_2_30
-xboolean_t         g_desktop_app_info_get_show_in       (GDesktopAppInfo *info,
+xboolean_t         xdesktop_app_info_get_show_in       (xdesktop_app_info_t *info,
                                                        const xchar_t     *desktop_env);
 XPL_AVAILABLE_IN_2_34
-const char *     g_desktop_app_info_get_startup_wm_class (GDesktopAppInfo *info);
+const char *     xdesktop_app_info_get_startup_wm_class (xdesktop_app_info_t *info);
 
 XPL_AVAILABLE_IN_ALL
-GDesktopAppInfo *g_desktop_app_info_new               (const char      *desktop_id);
+xdesktop_app_info_t *xdesktop_app_info_new               (const char      *desktop_id);
 XPL_AVAILABLE_IN_ALL
-xboolean_t         g_desktop_app_info_get_is_hidden     (GDesktopAppInfo *info);
+xboolean_t         xdesktop_app_info_get_is_hidden     (xdesktop_app_info_t *info);
 
 XPL_DEPRECATED_IN_2_42
-void             g_desktop_app_info_set_desktop_env   (const char      *desktop_env);
+void             xdesktop_app_info_set_desktop_env   (const char      *desktop_env);
 
 XPL_AVAILABLE_IN_2_36
-xboolean_t         g_desktop_app_info_has_key           (GDesktopAppInfo *info,
+xboolean_t         xdesktop_app_info_has_key           (xdesktop_app_info_t *info,
                                                        const char      *key);
 XPL_AVAILABLE_IN_2_36
-char *           g_desktop_app_info_get_string        (GDesktopAppInfo *info,
+char *           xdesktop_app_info_get_string        (xdesktop_app_info_t *info,
                                                        const char      *key);
 XPL_AVAILABLE_IN_2_56
-char *           g_desktop_app_info_get_locale_string (GDesktopAppInfo *info,
+char *           xdesktop_app_info_get_locale_string (xdesktop_app_info_t *info,
                                                        const char      *key);
 XPL_AVAILABLE_IN_2_36
-xboolean_t         g_desktop_app_info_get_boolean       (GDesktopAppInfo *info,
+xboolean_t         xdesktop_app_info_get_boolean       (xdesktop_app_info_t *info,
                                                        const char      *key);
 
 XPL_AVAILABLE_IN_2_60
-xchar_t **         g_desktop_app_info_get_string_list (GDesktopAppInfo *info,
+xchar_t **         xdesktop_app_info_get_string_list (xdesktop_app_info_t *info,
                                                      const char      *key,
                                                      xsize_t           *length);
 
 XPL_AVAILABLE_IN_2_38
-const xchar_t * const *   g_desktop_app_info_list_actions                 (GDesktopAppInfo   *info);
+const xchar_t * const *   xdesktop_app_info_list_actions                 (xdesktop_app_info_t   *info);
 
 XPL_AVAILABLE_IN_2_38
-void                    g_desktop_app_info_launch_action                (GDesktopAppInfo   *info,
+void                    xdesktop_app_info_launch_action                (xdesktop_app_info_t   *info,
                                                                          const xchar_t       *action_name,
                                                                          xapp_launch_context_t *launch_context);
 
 XPL_AVAILABLE_IN_2_38
-xchar_t *                 g_desktop_app_info_get_action_name              (GDesktopAppInfo   *info,
+xchar_t *                 xdesktop_app_info_get_action_name              (xdesktop_app_info_t   *info,
                                                                          const xchar_t       *action_name);
 
-#define XTYPE_DESKTOP_APP_INFO_LOOKUP           (g_desktop_app_info_lookup_get_type ()) XPL_DEPRECATED_MACRO_IN_2_28
+#define XTYPE_DESKTOP_APP_INFO_LOOKUP           (xdesktop_app_info_lookup_get_type ()) XPL_DEPRECATED_MACRO_IN_2_28
 #define G_DESKTOP_APP_INFO_LOOKUP(obj)           (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_DESKTOP_APP_INFO_LOOKUP, GDesktopAppInfoLookup)) XPL_DEPRECATED_MACRO_IN_2_28
 #define X_IS_DESKTOP_APP_INFO_LOOKUP(obj)	 (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_DESKTOP_APP_INFO_LOOKUP)) XPL_DEPRECATED_MACRO_IN_2_28
 #define G_DESKTOP_APP_INFO_LOOKUP_GET_IFACE(obj) (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_DESKTOP_APP_INFO_LOOKUP, GDesktopAppInfoLookupIface)) XPL_DEPRECATED_MACRO_IN_2_28
@@ -125,7 +125,7 @@ xchar_t *                 g_desktop_app_info_get_action_name              (GDesk
 /**
  * GDesktopAppInfoLookupIface:
  * @get_default_for_uri_scheme: Virtual method for
- *  g_desktop_app_info_lookup_get_default_for_uri_scheme().
+ *  xdesktop_app_info_lookup_get_default_for_uri_scheme().
  *
  * Interface that is used by backends to associate default
  * handlers with URI schemes.
@@ -142,28 +142,28 @@ struct _GDesktopAppInfoLookupIface
 };
 
 XPL_DEPRECATED
-xtype_t     g_desktop_app_info_lookup_get_type                   (void) G_GNUC_CONST;
+xtype_t     xdesktop_app_info_lookup_get_type                   (void) G_GNUC_CONST;
 
 XPL_DEPRECATED
-xapp_info_t *g_desktop_app_info_lookup_get_default_for_uri_scheme (GDesktopAppInfoLookup *lookup,
+xapp_info_t *xdesktop_app_info_lookup_get_default_for_uri_scheme (GDesktopAppInfoLookup *lookup,
                                                                 const char            *uri_scheme);
 
 /**
  * GDesktopAppLaunchCallback:
- * @appinfo: a #GDesktopAppInfo
+ * @appinfo: a #xdesktop_app_info_t
  * @pid: Process identifier
  * @user_data: User data
  *
- * During invocation, g_desktop_app_info_launch_uris_as_manager() may
+ * During invocation, xdesktop_app_info_launch_uris_as_manager() may
  * create one or more child processes.  This callback is invoked once
  * for each, providing the process ID.
  */
-typedef void (*GDesktopAppLaunchCallback) (GDesktopAppInfo  *appinfo,
+typedef void (*GDesktopAppLaunchCallback) (xdesktop_app_info_t  *appinfo,
 					   xpid_t              pid,
 					   xpointer_t          user_data);
 
 XPL_AVAILABLE_IN_2_28
-xboolean_t    g_desktop_app_info_launch_uris_as_manager (GDesktopAppInfo            *appinfo,
+xboolean_t    xdesktop_app_info_launch_uris_as_manager (xdesktop_app_info_t            *appinfo,
 						       xlist_t                      *uris,
 						       xapp_launch_context_t          *launch_context,
 						       GSpawnFlags                 spawn_flags,
@@ -174,7 +174,7 @@ xboolean_t    g_desktop_app_info_launch_uris_as_manager (GDesktopAppInfo        
 						       xerror_t                    **error);
 
 XPL_AVAILABLE_IN_2_58
-xboolean_t    g_desktop_app_info_launch_uris_as_manager_with_fds (GDesktopAppInfo            *appinfo,
+xboolean_t    xdesktop_app_info_launch_uris_as_manager_with_fds (xdesktop_app_info_t            *appinfo,
 								xlist_t                      *uris,
 								xapp_launch_context_t          *launch_context,
 								GSpawnFlags                 spawn_flags,
@@ -188,10 +188,10 @@ xboolean_t    g_desktop_app_info_launch_uris_as_manager_with_fds (GDesktopAppInf
 								xerror_t                    **error);
 
 XPL_AVAILABLE_IN_2_40
-xchar_t *** g_desktop_app_info_search (const xchar_t *search_string);
+xchar_t *** xdesktop_app_info_search (const xchar_t *search_string);
 
 XPL_AVAILABLE_IN_2_42
-xlist_t *g_desktop_app_info_get_implementations (const xchar_t *interface);
+xlist_t *xdesktop_app_info_get_implementations (const xchar_t *interface);
 
 G_END_DECLS
 

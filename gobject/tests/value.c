@@ -244,7 +244,7 @@ test_copying (void)
   }
 
   {
-    guchar c = 0;
+    xuchar_t c = 0;
 
     xvalue_unset (&value);
     xvalue_init (&value, XTYPE_UCHAR);
@@ -288,7 +288,7 @@ test_copying (void)
   }
 
   {
-    gulong c = 0;
+    xulong_t c = 0;
 
     xvalue_unset (&value);
     xvalue_init (&value, XTYPE_ULONG);
@@ -299,7 +299,7 @@ test_copying (void)
   }
 
   {
-    gint64 c = 0;
+    sint64_t c = 0;
 
     xvalue_unset (&value);
     xvalue_init (&value, XTYPE_INT64);
@@ -422,7 +422,7 @@ test_value_string (void)
   xvalue_t value = G_VALUE_INIT;
   xvalue_t copy = G_VALUE_INIT;
 
-  g_test_summary ("Test that XTYPE_STRING xvalue_t copy properly");
+  g_test_summary ("test_t that XTYPE_STRING xvalue_t copy properly");
 
   /*
    * Regular strings (ownership not passed)
@@ -674,17 +674,17 @@ static void test_object_b_class_init (test_object_b_class_t *class) { }
 static void test_object_b_init (test_object_b_t *b) { }
 
 static xtype_t test_object_a1_get_type (void);
-typedef xobject_t test_object_a1_t; typedef xobject_class_t TestObjectA1Class;
+typedef xobject_t test_object_a1_t; typedef xobject_class_t test_object_a1_class_t;
 G_DEFINE_TYPE (test_object_a1, test_object_a1, test_object_a_get_type ())
-static void test_object_a1_class_init (TestObjectA1Class *class) { }
+static void test_object_a1_class_init (test_object_a1_class_t *class) { }
 static void test_object_a1_init (test_object_a1_t *c) { }
 
 static xtype_t test_object_a2_get_type (void);
-typedef xobject_t test_object_a2_t; typedef xobject_class_t TestObjectA2Class;
+typedef xobject_t test_object_a2_t; typedef xobject_class_t test_object_a2_class_t;
 static void test_object_a2_iface_init (test_interface_interface_t *iface) { }
 G_DEFINE_TYPE_WITH_CODE (test_object_a2, test_object_a2, test_object_a_get_type (),
                          G_IMPLEMENT_INTERFACE (test_interface_get_type (), test_object_a2_iface_init))
-static void test_object_a2_class_init (TestObjectA2Class *class) { }
+static void test_object_a2_class_init (test_object_a2_class_t *class) { }
 static void test_object_a2_init (test_object_a2_t *b) { }
 
 static void

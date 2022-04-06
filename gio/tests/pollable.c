@@ -168,7 +168,7 @@ test_pollable_unix_pipe (void)
 {
   int pipefds[2], status;
 
-  g_test_summary ("Test that pipes are considered pollable, just like sockets");
+  g_test_summary ("test_t that pipes are considered pollable, just like sockets");
 
   status = pipe (pipefds);
   g_assert_cmpint (status, ==, 0);
@@ -191,7 +191,7 @@ test_pollable_unix_pty (void)
   void *handle;
 #endif
 
-  g_test_summary ("Test that PTYs are considered pollable");
+  g_test_summary ("test_t that PTYs are considered pollable");
 
 #ifdef LIBUTIL_SONAME
   handle = dlopen (LIBUTIL_SONAME, RTLD_GLOBAL | RTLD_LAZY);
@@ -236,7 +236,7 @@ test_pollable_unix_file (void)
 {
   int fd;
 
-  g_test_summary ("Test that regular files are not considered pollable");
+  g_test_summary ("test_t that regular files are not considered pollable");
 
   fd = g_open ("/etc/hosts", O_RDONLY, 0);
   if (fd == -1)
@@ -255,7 +255,7 @@ test_pollable_unix_nulldev (void)
 {
   int fd;
 
-  g_test_summary ("Test that /dev/null is not considered pollable, but only if "
+  g_test_summary ("test_t that /dev/null is not considered pollable, but only if "
                   "on a system where we are able to tell it apart from devices "
                   "that actually implement poll");
 
@@ -286,7 +286,7 @@ test_pollable_converter (void)
   converter = G_CONVERTER (g_charset_converter_new ("UTF-8", "UTF-8", &error));
   g_assert_no_error (error);
 
-  in = G_POLLABLE_INPUT_STREAM (g_converter_input_stream_new (ibase, converter));
+  in = G_POLLABLE_INPUT_STREAM (xconverter_input_stream_new (ibase, converter));
   xobject_unref (converter);
   xobject_unref (ibase);
 

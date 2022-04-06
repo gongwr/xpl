@@ -48,7 +48,7 @@ XPL_AVAILABLE_IN_ALL
 const xchar_t *g_dngettext     (const xchar_t *domain,
                               const xchar_t *msgid,
                               const xchar_t *msgid_plural,
-                              gulong       n) G_GNUC_FORMAT(3);
+                              xulong_t       n) G_GNUC_FORMAT(3);
 XPL_AVAILABLE_IN_ALL
 const xchar_t *g_dpgettext     (const xchar_t *domain,
                               const xchar_t *msgctxtid,

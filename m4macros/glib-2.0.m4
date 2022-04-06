@@ -5,7 +5,7 @@
 #serial 4
 
 dnl AM_PATH_XPL_2_0([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND [, MODULES]]]])
-dnl Test for XPL, and define XPL_CFLAGS and XPL_LIBS, if gmodule, gobject,
+dnl test_t for XPL, and define XPL_CFLAGS and XPL_LIBS, if gmodule, gobject,
 dnl gthread, or gio is specified in MODULES, pass to pkg-config
 dnl
 AC_DEFUN([AM_PATH_XPL_2_0],

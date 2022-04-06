@@ -89,7 +89,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
    *
    * Emitted when a mountable volume is added to the system.
    **/
-  signals[VOLUME_ADDED] = g_signal_new (I_("volume-added"),
+  signals[VOLUME_ADDED] = xsignal_new (I_("volume-added"),
                                         XTYPE_VOLUME_MONITOR,
                                         G_SIGNAL_RUN_LAST,
                                         G_STRUCT_OFFSET (GVolumeMonitorClass, volume_added),
@@ -104,7 +104,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
    *
    * Emitted when a mountable volume is removed from the system.
    **/
-  signals[VOLUME_REMOVED] = g_signal_new (I_("volume-removed"),
+  signals[VOLUME_REMOVED] = xsignal_new (I_("volume-removed"),
                                           XTYPE_VOLUME_MONITOR,
                                           G_SIGNAL_RUN_LAST,
                                           G_STRUCT_OFFSET (GVolumeMonitorClass, volume_removed),
@@ -119,7 +119,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
    *
    * Emitted when mountable volume is changed.
    **/
-  signals[VOLUME_CHANGED] = g_signal_new (I_("volume-changed"),
+  signals[VOLUME_CHANGED] = xsignal_new (I_("volume-changed"),
                                           XTYPE_VOLUME_MONITOR,
                                           G_SIGNAL_RUN_LAST,
                                           G_STRUCT_OFFSET (GVolumeMonitorClass, volume_changed),
@@ -134,7 +134,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
    *
    * Emitted when a mount is added.
    **/
-  signals[MOUNT_ADDED] = g_signal_new (I_("mount-added"),
+  signals[MOUNT_ADDED] = xsignal_new (I_("mount-added"),
                                        XTYPE_VOLUME_MONITOR,
                                        G_SIGNAL_RUN_LAST,
                                        G_STRUCT_OFFSET (GVolumeMonitorClass, mount_added),
@@ -149,7 +149,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
    *
    * Emitted when a mount is removed.
    **/
-  signals[MOUNT_REMOVED] = g_signal_new (I_("mount-removed"),
+  signals[MOUNT_REMOVED] = xsignal_new (I_("mount-removed"),
                                          XTYPE_VOLUME_MONITOR,
                                          G_SIGNAL_RUN_LAST,
                                          G_STRUCT_OFFSET (GVolumeMonitorClass, mount_removed),
@@ -167,7 +167,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
    * This signal depends on the backend and is only emitted if
    * GIO was used to unmount.
    **/
-  signals[MOUNT_PRE_UNMOUNT] = g_signal_new (I_("mount-pre-unmount"),
+  signals[MOUNT_PRE_UNMOUNT] = xsignal_new (I_("mount-pre-unmount"),
                                              XTYPE_VOLUME_MONITOR,
                                              G_SIGNAL_RUN_LAST,
                                              G_STRUCT_OFFSET (GVolumeMonitorClass, mount_pre_unmount),
@@ -182,7 +182,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
    *
    * Emitted when a mount changes.
    **/
-  signals[MOUNT_CHANGED] = g_signal_new (I_("mount-changed"),
+  signals[MOUNT_CHANGED] = xsignal_new (I_("mount-changed"),
                                          XTYPE_VOLUME_MONITOR,
                                          G_SIGNAL_RUN_LAST,
                                          G_STRUCT_OFFSET (GVolumeMonitorClass, mount_changed),
@@ -197,7 +197,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
    *
    * Emitted when a drive is connected to the system.
    **/
-  signals[DRIVE_CONNECTED] = g_signal_new (I_("drive-connected"),
+  signals[DRIVE_CONNECTED] = xsignal_new (I_("drive-connected"),
 					   XTYPE_VOLUME_MONITOR,
 					   G_SIGNAL_RUN_LAST,
 					   G_STRUCT_OFFSET (GVolumeMonitorClass, drive_connected),
@@ -212,7 +212,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
    *
    * Emitted when a drive is disconnected from the system.
    **/
-  signals[DRIVE_DISCONNECTED] = g_signal_new (I_("drive-disconnected"),
+  signals[DRIVE_DISCONNECTED] = xsignal_new (I_("drive-disconnected"),
 					      XTYPE_VOLUME_MONITOR,
 					      G_SIGNAL_RUN_LAST,
 					      G_STRUCT_OFFSET (GVolumeMonitorClass, drive_disconnected),
@@ -227,7 +227,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
    *
    * Emitted when a drive changes.
    **/
-  signals[DRIVE_CHANGED] = g_signal_new (I_("drive-changed"),
+  signals[DRIVE_CHANGED] = xsignal_new (I_("drive-changed"),
                                          XTYPE_VOLUME_MONITOR,
                                          G_SIGNAL_RUN_LAST,
                                          G_STRUCT_OFFSET (GVolumeMonitorClass, drive_changed),
@@ -244,7 +244,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
    *
    * Since: 2.18
    **/
-  signals[DRIVE_EJECT_BUTTON] = g_signal_new (I_("drive-eject-button"),
+  signals[DRIVE_EJECT_BUTTON] = xsignal_new (I_("drive-eject-button"),
                                               XTYPE_VOLUME_MONITOR,
                                               G_SIGNAL_RUN_LAST,
                                               G_STRUCT_OFFSET (GVolumeMonitorClass, drive_eject_button),
@@ -261,7 +261,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
    *
    * Since: 2.22
    **/
-  signals[DRIVE_STOP_BUTTON] = g_signal_new (I_("drive-stop-button"),
+  signals[DRIVE_STOP_BUTTON] = xsignal_new (I_("drive-stop-button"),
                                              XTYPE_VOLUME_MONITOR,
                                              G_SIGNAL_RUN_LAST,
                                              G_STRUCT_OFFSET (GVolumeMonitorClass, drive_stop_button),

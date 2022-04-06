@@ -54,7 +54,7 @@ struct _GWin32OutputStream
 
 struct _GWin32OutputStreamClass
 {
-  GOutputStreamClass parent_class;
+  xoutput_stream_class_t parent_class;
 
   /*< private >*/
   /* Padding for future expansion */

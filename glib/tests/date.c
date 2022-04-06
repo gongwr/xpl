@@ -488,7 +488,7 @@ test_dates (void)
     }
   xdate_free (d);
 
-  /* Test on leap years */
+  /* test_t on leap years */
   g_assert_cmpint (xdate_get_monday_weeks_in_year (1764), ==, 53);
   g_assert_cmpint (xdate_get_monday_weeks_in_year (1776), ==, 53);
 
@@ -792,7 +792,7 @@ test_strftime (void)
   g_assert_cmpstr (buf, ==, "");
 #endif
 
-  /* Test positive cases */
+  /* test_t positive cases */
   xdate_set_dmy (d, 1, 1, 1);
 
   for (i = 0; i < G_N_ELEMENTS (strftime_checks); i++)
@@ -1038,7 +1038,7 @@ test_parse_invalid (void)
     {
       xdate_t *d = xdate_new ();
 
-      g_test_message ("Test %" G_GSIZE_FORMAT, i);
+      g_test_message ("test_t %" G_GSIZE_FORMAT, i);
       xdate_set_parse (d, strs[i]);
 
       g_assert_false (xdate_valid (d));

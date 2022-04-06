@@ -903,7 +903,7 @@ real_toupper (const xchar_t *str,
 	}
       else
 	{
-	  xsize_t char_len = xutf8_skip[*(guchar *)last];
+	  xsize_t char_len = xutf8_skip[*(xuchar_t *)last];
 
 	  if (out_buffer)
 	    memcpy (out_buffer + len, last, char_len);
@@ -1098,7 +1098,7 @@ real_tolower (const xchar_t *str,
 	}
       else
 	{
-	  xsize_t char_len = xutf8_skip[*(guchar *)last];
+	  xsize_t char_len = xutf8_skip[*(xuchar_t *)last];
 
 	  if (out_buffer)
 	    memcpy (out_buffer + len, last, char_len);

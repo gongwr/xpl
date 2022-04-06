@@ -39,7 +39,7 @@
  * in some code.
  *
  * |[<!-- language="C" -->
- * gint64 begin_time_nsec G_GNUC_UNUSED;
+ * sint64_t begin_time_nsec G_GNUC_UNUSED;
  *
  * begin_time_nsec = G_TRACE_CURRENT_TIME;
  *
@@ -81,8 +81,8 @@
  * Since: 2.66
  */
 void
-(g_trace_mark) (gint64       begin_time_nsec,
-                gint64       duration_nsec,
+(g_trace_mark) (sint64_t       begin_time_nsec,
+                sint64_t       duration_nsec,
                 const xchar_t *group,
                 const xchar_t *name,
                 const xchar_t *message_format,
@@ -160,7 +160,7 @@ xuint_t
  */
 void
 (g_trace_set_int64_counter) (xuint_t  id,
-                             gint64 val)
+                             sint64_t val)
 {
 #ifdef HAVE_SYSPROF
   SysprofCaptureCounterValue value;

@@ -55,7 +55,7 @@ typedef struct
 void            g_system_thread_wait            (GRealThread  *thread);
 
 GRealThread *g_system_thread_new (GThreadFunc proxy,
-                                  gulong stack_size,
+                                  xulong_t stack_size,
                                   const GThreadSchedulerSettings *scheduler_settings,
                                   const char *name,
                                   GThreadFunc func,

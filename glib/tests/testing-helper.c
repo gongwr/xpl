@@ -108,7 +108,7 @@ main (int   argc,
       char *test_argva[1] = { NULL };
       char **test_argv = test_argva;
 
-      /* Test that `g_test_init()` can handle being called with an empty argv
+      /* test_t that `g_test_init()` can handle being called with an empty argv
        * and argc == 0. While this isn’t recommended, it is possible for another
        * process to use execve() to call a gtest process this way, so we’d
        * better handle it gracefully.

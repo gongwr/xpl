@@ -94,7 +94,7 @@ on_event (xsocket_client_t      *client,
 {
   if (data->cancellable && event == XSOCKET_CLIENT_CONNECTED)
     {
-      g_cancellable_cancel (data->cancellable);
+      xcancellable_cancel (data->cancellable);
     }
   else if (event == XSOCKET_CLIENT_COMPLETE)
     {
@@ -124,9 +124,9 @@ test_happy_eyeballs_cancel_delayed (void)
   xsocket_service_start (service);
 
   client = xsocket_client_new ();
-  data.cancellable = g_cancellable_new ();
+  data.cancellable = xcancellable_new ();
   xsocket_client_connect_to_host_async (client, "localhost", port, data.cancellable, on_connected_cancelled, loop);
-  g_signal_connect (client, "event", G_CALLBACK (on_event), &data);
+  xsignal_connect (client, "event", G_CALLBACK (on_event), &data);
   xmain_loop_run (loop);
 
   g_assert_true (data.completed);
@@ -158,10 +158,10 @@ test_happy_eyeballs_cancel_instant (void)
   xsocket_service_start (service);
 
   client = xsocket_client_new ();
-  cancel = g_cancellable_new ();
-  g_cancellable_cancel (cancel);
+  cancel = xcancellable_new ();
+  xcancellable_cancel (cancel);
   xsocket_client_connect_to_host_async (client, "localhost", port, cancel, on_connected_cancelled, loop);
-  g_signal_connect (client, "event", G_CALLBACK (on_event), &data);
+  xsignal_connect (client, "event", G_CALLBACK (on_event), &data);
   xmain_loop_run (loop);
 
   g_assert_true (data.completed);

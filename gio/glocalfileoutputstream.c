@@ -126,7 +126,7 @@ static xoffset_t    g_local_file_output_stream_tell         (xfile_output_stream
 static xboolean_t   g_local_file_output_stream_can_seek     (xfile_output_stream_t  *stream);
 static xboolean_t   g_local_file_output_stream_seek         (xfile_output_stream_t  *stream,
 							   xoffset_t             offset,
-							   GSeekType           type,
+							   xseek_type_t           type,
 							   xcancellable_t       *cancellable,
 							   xerror_t            **error);
 static xboolean_t   g_local_file_output_stream_can_truncate (xfile_output_stream_t  *stream);
@@ -157,7 +157,7 @@ static void
 g_local_file_output_stream_class_init (GLocalFileOutputStreamClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
-  GOutputStreamClass *stream_class = G_OUTPUT_STREAM_CLASS (klass);
+  xoutput_stream_class_t *stream_class = G_OUTPUT_STREAM_CLASS (klass);
   GFileOutputStreamClass *file_stream_class = XFILE_OUTPUT_STREAM_CLASS (klass);
 
   gobject_class->finalize = g_local_file_output_stream_finalize;
@@ -205,7 +205,7 @@ g_local_file_output_stream_write (xoutput_stream_t  *stream,
 
   while (1)
     {
-      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+      if (xcancellable_set_error_if_cancelled (cancellable, error))
 	return -1;
       res = write (file->priv->fd, buffer, count);
       if (res == -1)
@@ -283,7 +283,7 @@ g_local_file_output_stream_writev (xoutput_stream_t        *stream,
 
   while (1)
     {
-      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+      if (xcancellable_set_error_if_cancelled (cancellable, error))
         return FALSE;
       res = writev (file->priv->fd, iov, n_vectors);
       if (res == -1)
@@ -365,7 +365,7 @@ _g_local_file_output_stream_really_close (GLocalFileOutputStream *file,
 
       if (file->priv->backup_filename)
 	{
-	  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+	  if (xcancellable_set_error_if_cancelled (cancellable, error))
 	    goto err_out;
 
 #ifdef G_OS_UNIX
@@ -412,7 +412,7 @@ _g_local_file_output_stream_really_close (GLocalFileOutputStream *file,
 	}
 
 
-      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+      if (xcancellable_set_error_if_cancelled (cancellable, error))
 	goto err_out;
 
       /* tmp -> original */
@@ -430,7 +430,7 @@ _g_local_file_output_stream_really_close (GLocalFileOutputStream *file,
       g_clear_pointer (&file->priv->tmp_filename, g_free);
     }
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     goto err_out;
 
 #ifndef G_OS_WIN32		/* Already did the fstat() and close() above on Win32 */
@@ -524,7 +524,7 @@ g_local_file_output_stream_can_seek (xfile_output_stream_t *stream)
 }
 
 static int
-seek_type_to_lseek (GSeekType type)
+seek_type_to_lseek (xseek_type_t type)
 {
   switch (type)
     {
@@ -543,7 +543,7 @@ seek_type_to_lseek (GSeekType type)
 static xboolean_t
 g_local_file_output_stream_seek (xfile_output_stream_t  *stream,
 				 xoffset_t             offset,
-				 GSeekType           type,
+				 xseek_type_t           type,
 				 xcancellable_t       *cancellable,
 				 xerror_t            **error)
 {
@@ -599,7 +599,7 @@ g_local_file_output_stream_truncate (xfile_output_stream_t  *stream,
 
       if (errsv == EINTR)
 	{
-	  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+	  if (xcancellable_set_error_if_cancelled (cancellable, error))
 	    return FALSE;
 	  goto restart;
 	}
@@ -625,7 +625,7 @@ g_local_file_output_stream_query_info (xfile_output_stream_t  *stream,
 
   file = G_LOCAL_FILE_OUTPUT_STREAM (stream);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   return _g_local_file_info_get_from_fd (file->priv->fd,
@@ -695,7 +695,7 @@ _g_local_file_output_stream_open  (const char        *filename,
 {
   int open_flags;
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   open_flags = O_BINARY;
@@ -730,7 +730,7 @@ _g_local_file_output_stream_create  (const char        *filename,
   int mode;
   int open_flags;
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   mode = mode_from_flags_or_info (flags, reference_info);
@@ -752,7 +752,7 @@ _g_local_file_output_stream_append  (const char        *filename,
 {
   int mode;
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   if (flags & XFILE_CREATE_PRIVATE)
@@ -1266,7 +1266,7 @@ _g_local_file_output_stream_replace (const char        *filename,
   xboolean_t sync_on_close;
   int open_flags;
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
   temp_file = NULL;

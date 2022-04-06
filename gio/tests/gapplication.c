@@ -308,9 +308,9 @@ make_app (xboolean_t non_unique)
   xapplication_t *app;
   xboolean_t ok;
 
-  app = xapplication_new ("org.gtk.Test-Application",
+  app = xapplication_new ("org.gtk.test_t-Application",
                            non_unique ? G_APPLICATION_NON_UNIQUE : 0);
-  g_signal_connect (app, "activate", G_CALLBACK (nonunique_activate), NULL);
+  xsignal_connect (app, "activate", G_CALLBACK (nonunique_activate), NULL);
   ok = xapplication_register (app, NULL, NULL);
   if (!ok)
     {
@@ -488,7 +488,7 @@ test_nodbus (void)
   xapplication_t *app;
 
   app = xapplication_new ("org.gtk.Unimportant", G_APPLICATION_FLAGS_NONE);
-  g_signal_connect (app, "activate", G_CALLBACK (nodbus_activate), NULL);
+  xsignal_connect (app, "activate", G_CALLBACK (nodbus_activate), NULL);
   xapplication_run (app, 1, argv);
   xobject_unref (app);
 
@@ -518,7 +518,7 @@ test_noappid (void)
   xapplication_t *app;
 
   app = xapplication_new (NULL, G_APPLICATION_FLAGS_NONE);
-  g_signal_connect (app, "activate", G_CALLBACK (noappid_activate), NULL);
+  xsignal_connect (app, "activate", G_CALLBACK (noappid_activate), NULL);
   xapplication_run (app, 1, argv);
   xobject_unref (app);
 
@@ -564,7 +564,7 @@ test_quit (void)
                            G_APPLICATION_FLAGS_NONE);
   activated = FALSE;
   quitted = FALSE;
-  g_signal_connect (app, "activate", G_CALLBACK (quit_activate), NULL);
+  xsignal_connect (app, "activate", G_CALLBACK (quit_activate), NULL);
   xapplication_run (app, 1, argv);
   xobject_unref (app);
   xobject_unref (c);
@@ -614,9 +614,9 @@ test_registered (void)
   xapplication_t *app;
 
   app = xapplication_new (NULL, G_APPLICATION_FLAGS_NONE);
-  g_signal_connect (app, "activate", G_CALLBACK (noappid_activate), NULL);
-  g_signal_connect (app, "shutdown", G_CALLBACK (on_registered_shutdown), &registered_data);
-  g_signal_connect (app, "notify::is-registered", G_CALLBACK (on_registered_notify), &registered_data);
+  xsignal_connect (app, "activate", G_CALLBACK (noappid_activate), NULL);
+  xsignal_connect (app, "shutdown", G_CALLBACK (on_registered_shutdown), &registered_data);
+  xsignal_connect (app, "notify::is-registered", G_CALLBACK (on_registered_notify), &registered_data);
 
   g_assert_null (registered_data.notify_spec);
 
@@ -694,7 +694,7 @@ test_local_actions (void)
 
   app = xapplication_new ("org.gtk.Unimportant",
                            G_APPLICATION_FLAGS_NONE);
-  g_signal_connect (app, "activate", G_CALLBACK (on_activate), NULL);
+  xsignal_connect (app, "activate", G_CALLBACK (on_activate), NULL);
   xapplication_run (app, 1, argv);
   xobject_unref (app);
   g_free (binpath);
@@ -800,7 +800,7 @@ test_help_command_line (xapplication_t            *app,
   return 0;
 }
 
-/* Test whether --help is handled when HANDLES_COMMND_LINE is set and
+/* test_t whether --help is handled when HANDLES_COMMND_LINE is set and
  * options have been added.
  */
 static void
@@ -816,7 +816,7 @@ test_help (void)
 
       app = xapplication_new ("org.gtk.TestApplication", G_APPLICATION_HANDLES_COMMAND_LINE);
       xapplication_add_main_option (app, "foo", 'f', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
-      g_signal_connect (app, "command-line", G_CALLBACK (test_help_command_line), &called);
+      xsignal_connect (app, "command-line", G_CALLBACK (test_help_command_line), &called);
 
       status = xapplication_run (app, G_N_ELEMENTS (argv) -1, argv);
       g_assert (called == TRUE);
@@ -892,7 +892,7 @@ test_busy (void)
 }
 
 /*
- * Test that handle-local-options works as expected
+ * test_t that handle-local-options works as expected
  */
 
 static xint_t
@@ -939,8 +939,8 @@ test_handle_local_options_success (void)
       app = xapplication_new ("org.gtk.TestApplication", 0);
       xapplication_add_main_option (app, "success", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
       xapplication_add_main_option (app, "failure", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
-      g_signal_connect (app, "handle-local-options", G_CALLBACK (test_local_options), &called);
-      g_signal_connect (app, "handle-local-options", G_CALLBACK (second_handler), &called2);
+      xsignal_connect (app, "handle-local-options", G_CALLBACK (test_local_options), &called);
+      xsignal_connect (app, "handle-local-options", G_CALLBACK (second_handler), &called2);
 
       status = xapplication_run (app, G_N_ELEMENTS (argv) -1, argv);
       g_assert (called);
@@ -971,8 +971,8 @@ test_handle_local_options_failure (void)
       app = xapplication_new ("org.gtk.TestApplication", 0);
       xapplication_add_main_option (app, "success", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
       xapplication_add_main_option (app, "failure", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
-      g_signal_connect (app, "handle-local-options", G_CALLBACK (test_local_options), &called);
-      g_signal_connect (app, "handle-local-options", G_CALLBACK (second_handler), &called2);
+      xsignal_connect (app, "handle-local-options", G_CALLBACK (test_local_options), &called);
+      xsignal_connect (app, "handle-local-options", G_CALLBACK (second_handler), &called2);
 
       status = xapplication_run (app, G_N_ELEMENTS (argv) -1, argv);
       g_assert (called);
@@ -1003,8 +1003,8 @@ test_handle_local_options_passthrough (void)
       app = xapplication_new ("org.gtk.TestApplication", 0);
       xapplication_add_main_option (app, "success", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
       xapplication_add_main_option (app, "failure", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
-      g_signal_connect (app, "handle-local-options", G_CALLBACK (test_local_options), &called);
-      g_signal_connect (app, "handle-local-options", G_CALLBACK (second_handler), &called2);
+      xsignal_connect (app, "handle-local-options", G_CALLBACK (test_local_options), &called);
+      xsignal_connect (app, "handle-local-options", G_CALLBACK (second_handler), &called2);
 
       status = xapplication_run (app, G_N_ELEMENTS (argv) -1, argv);
       g_assert (called);
@@ -1138,8 +1138,8 @@ test_replace (xconstpointer data)
       xboolean_t startup = FALSE;
 
       app = xapplication_new ("org.gtk.TestApplication.Replace", G_APPLICATION_ALLOW_REPLACEMENT);
-      g_signal_connect (app, "startup", G_CALLBACK (startup_in_subprocess), &startup);
-      g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
+      xsignal_connect (app, "startup", G_CALLBACK (startup_in_subprocess), &startup);
+      xsignal_connect (app, "activate", G_CALLBACK (activate), NULL);
 
       xapplication_run (app, G_N_ELEMENTS (argv) - 1, argv);
 
@@ -1168,9 +1168,9 @@ test_replace (xconstpointer data)
 
       app = xapplication_new ("org.gtk.TestApplication.Replace", allow ? G_APPLICATION_ALLOW_REPLACEMENT : G_APPLICATION_FLAGS_NONE);
       xapplication_set_inactivity_timeout (app, 500);
-      g_signal_connect (app, "name-lost", G_CALLBACK (name_was_lost), &name_lost);
-      g_signal_connect (app, "startup", G_CALLBACK (startup_cb), &data);
-      g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
+      xsignal_connect (app, "name-lost", G_CALLBACK (name_was_lost), &name_lost);
+      xsignal_connect (app, "startup", G_CALLBACK (startup_cb), &data);
+      xsignal_connect (app, "activate", G_CALLBACK (activate), NULL);
 
       if (!allow)
         g_timeout_add_seconds (1, quit_already, app);

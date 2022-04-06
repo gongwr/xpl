@@ -101,7 +101,7 @@ test_read_lines (GDataStreamNewlineType newline_type)
   /*  Seek to the start */
   test_seek_to_start (base_stream);
 
-  /*  Test read line */
+  /*  test_t read line */
   error = NULL;
   data = (char*)1;
   line = 0;
@@ -165,7 +165,7 @@ test_read_lines_LF_valid_utf8 (void)
   g_memory_input_stream_add_data (G_MEMORY_INPUT_STREAM (base_stream),
 				  "foo\nthis is valid UTF-8 ☺!\nbar\n", -1, NULL);
 
-  /*  Test read line */
+  /*  test_t read line */
   error = NULL;
   while (TRUE)
     {
@@ -198,7 +198,7 @@ test_read_lines_LF_invalid_utf8 (void)
   g_memory_input_stream_add_data (G_MEMORY_INPUT_STREAM (base_stream),
 				  "foo\nthis is not valid UTF-8 \xE5 =(\nbar\n", -1, NULL);
 
-  /*  Test read line */
+  /*  test_t read line */
   error = NULL;
   while (TRUE)
     {
@@ -247,7 +247,7 @@ test_read_until (void)
   for (i = 0; i < REPEATS; i++)
     g_memory_input_stream_add_data (G_MEMORY_INPUT_STREAM (base_stream), DATA_STRING, -1, NULL);
 
-  /*  Test stop characters */
+  /*  test_t stop characters */
   error = NULL;
   data = (char*)1;
   line = 0;
@@ -281,7 +281,7 @@ test_read_upto (void)
   char *data;
   int line;
   int i;
-  guchar stop_char;
+  xuchar_t stop_char;
 
 #undef REPEATS
 #undef DATA_STRING
@@ -301,7 +301,7 @@ test_read_upto (void)
   for (i = 0; i < REPEATS; i++)
     g_memory_input_stream_add_data (G_MEMORY_INPUT_STREAM (base_stream), DATA_STRING, 32, NULL);
 
-  /*  Test stop characters */
+  /*  test_t stop characters */
   error = NULL;
   data = (char*)1;
   line = 0;
@@ -340,12 +340,12 @@ enum TestDataType {
 /* The order is reversed to avoid -Wduplicated-branches. */
 #define TEST_DATA_RETYPE_BUFF(a, t, v)	\
 	 (a == TEST_DATA_UINT64	? (t) *(xuint64_t*)v :	\
-	 (a == TEST_DATA_INT64	? (t) *(gint64*)v :	\
+	 (a == TEST_DATA_INT64	? (t) *(sint64_t*)v :	\
 	 (a == TEST_DATA_UINT32	? (t) *(xuint32_t*)v :	\
 	 (a == TEST_DATA_INT32	? (t) *(gint32*)v :	\
 	 (a == TEST_DATA_UINT16	? (t) *(xuint16_t*)v :	\
 	 (a == TEST_DATA_INT16	? (t) *(gint16*)v :	\
-	 (t) *(guchar*)v ))))))
+	 (t) *(xuchar_t*)v ))))))
 
 
 static void
@@ -356,7 +356,7 @@ test_data_array (xinput_stream_t *stream, xinput_stream_t *base_stream,
   xerror_t *error = NULL;
   int pos = 0;
   int data_size = 1;
-  gint64 data;
+  sint64_t data;
   GDataStreamByteOrder native;
   xboolean_t swap;
 
@@ -421,7 +421,7 @@ test_data_array (xinput_stream_t *stream, xinput_stream_t *base_stream,
 	case TEST_DATA_INT64:
 	  data = g_data_input_stream_read_int64 (G_DATA_INPUT_STREAM (stream), NULL, &error);
 	  if (swap)
-	    data = (gint64)GUINT64_SWAP_LE_BE((gint64)data);
+	    data = (sint64_t)GUINT64_SWAP_LE_BE((sint64_t)data);
 	  break;
 	case TEST_DATA_UINT64:
 	  data = g_data_input_stream_read_uint64 (G_DATA_INPUT_STREAM (stream), NULL, &error);
@@ -433,7 +433,7 @@ test_data_array (xinput_stream_t *stream, xinput_stream_t *base_stream,
           break;
 	}
       if (!error)
-	g_assert_cmpint (data, ==, TEST_DATA_RETYPE_BUFF(data_type, gint64, ((guchar*)buffer + pos)));
+	g_assert_cmpint (data, ==, TEST_DATA_RETYPE_BUFF(data_type, sint64_t, ((xuchar_t*)buffer + pos)));
 
       pos += data_size;
     }
@@ -459,10 +459,10 @@ test_read_int (void)
   /*  Fill in some random data */
   for (i = 0; i < MAX_BYTES; i++)
     {
-      guchar x = 0;
+      xuchar_t x = 0;
       while (! x)
-	x = (guchar)g_rand_int (randomizer);
-      *(guchar*)((guchar*)buffer + sizeof(guchar) * i) = x;
+	x = (xuchar_t)g_rand_int (randomizer);
+      *(xuchar_t*)((xuchar_t*)buffer + sizeof(xuchar_t) * i) = x;
     }
 
   base_stream = g_memory_input_stream_new ();

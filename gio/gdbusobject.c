@@ -44,11 +44,11 @@
  * using the following functions.
  */
 
-typedef GDBusObjectIface GDBusObjectInterface;
+typedef xdbus_object_iface_t GDBusObjectInterface;
 G_DEFINE_INTERFACE (xdbus_object, g_dbus_object, XTYPE_OBJECT)
 
 static void
-g_dbus_object_default_init (GDBusObjectIface *iface)
+g_dbus_object_default_init (xdbus_object_iface_t *iface)
 {
   /**
    * xdbus_object_t::interface-added:
@@ -59,10 +59,10 @@ g_dbus_object_default_init (GDBusObjectIface *iface)
    *
    * Since: 2.30
    */
-  g_signal_new (I_("interface-added"),
+  xsignal_new (I_("interface-added"),
                 XTYPE_FROM_INTERFACE (iface),
                 G_SIGNAL_RUN_LAST,
-                G_STRUCT_OFFSET (GDBusObjectIface, interface_added),
+                G_STRUCT_OFFSET (xdbus_object_iface_t, interface_added),
                 NULL,
                 NULL,
                 NULL,
@@ -79,10 +79,10 @@ g_dbus_object_default_init (GDBusObjectIface *iface)
    *
    * Since: 2.30
    */
-  g_signal_new (I_("interface-removed"),
+  xsignal_new (I_("interface-removed"),
                 XTYPE_FROM_INTERFACE (iface),
                 G_SIGNAL_RUN_LAST,
-                G_STRUCT_OFFSET (GDBusObjectIface, interface_removed),
+                G_STRUCT_OFFSET (xdbus_object_iface_t, interface_removed),
                 NULL,
                 NULL,
                 NULL,
@@ -106,7 +106,7 @@ g_dbus_object_default_init (GDBusObjectIface *iface)
 const xchar_t *
 g_dbus_object_get_object_path (xdbus_object_t *object)
 {
-  GDBusObjectIface *iface = G_DBUS_OBJECT_GET_IFACE (object);
+  xdbus_object_iface_t *iface = G_DBUS_OBJECT_GET_IFACE (object);
   return iface->get_object_path (object);
 }
 
@@ -125,7 +125,7 @@ g_dbus_object_get_object_path (xdbus_object_t *object)
 xlist_t *
 g_dbus_object_get_interfaces (xdbus_object_t *object)
 {
-  GDBusObjectIface *iface = G_DBUS_OBJECT_GET_IFACE (object);
+  xdbus_object_iface_t *iface = G_DBUS_OBJECT_GET_IFACE (object);
   return iface->get_interfaces (object);
 }
 
@@ -146,7 +146,7 @@ xdbus_interface_t *
 g_dbus_object_get_interface (xdbus_object_t *object,
                              const xchar_t *interface_name)
 {
-  GDBusObjectIface *iface = G_DBUS_OBJECT_GET_IFACE (object);
+  xdbus_object_iface_t *iface = G_DBUS_OBJECT_GET_IFACE (object);
   g_return_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
   return iface->get_interface (object, interface_name);
 }

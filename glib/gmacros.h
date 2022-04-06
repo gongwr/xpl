@@ -377,7 +377,7 @@
  *
  * |[<!-- language="C" -->
  * xint_t g_snprintf (xchar_t  *string,
- *                  gulong       n,
+ *                  xulong_t       n,
  *                  xchar_t const *format,
  *                  ...) G_GNUC_PRINTF (3, 4);
  * ]|

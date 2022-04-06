@@ -50,14 +50,14 @@ typedef struct {
   xsize_t start;
   xsize_t end;
   xsize_t size;
-} Buffer;
+} buffer_t;
 
 struct _GConverterOutputStreamPrivate {
   xboolean_t at_output_end;
   xboolean_t finished;
   xconverter_t *converter;
-  Buffer output_buffer; /* To be converted and written */
-  Buffer converted_buffer; /* Already converted */
+  buffer_t output_buffer; /* To be converted and written */
+  buffer_t converted_buffer; /* Already converted */
 };
 
 /* Buffering strategy:
@@ -78,57 +78,57 @@ enum {
   PROP_CONVERTER
 };
 
-static void   g_converter_output_stream_set_property (xobject_t        *object,
+static void   xconverter_output_stream_set_property (xobject_t        *object,
 						      xuint_t           prop_id,
 						      const xvalue_t   *value,
 						      xparam_spec_t     *pspec);
-static void   g_converter_output_stream_get_property (xobject_t        *object,
+static void   xconverter_output_stream_get_property (xobject_t        *object,
 						      xuint_t           prop_id,
 						      xvalue_t         *value,
 						      xparam_spec_t     *pspec);
-static void   g_converter_output_stream_finalize     (xobject_t        *object);
-static xssize_t g_converter_output_stream_write        (xoutput_stream_t  *stream,
+static void   xconverter_output_stream_finalize     (xobject_t        *object);
+static xssize_t xconverter_output_stream_write        (xoutput_stream_t  *stream,
 						      const void     *buffer,
 						      xsize_t           count,
 						      xcancellable_t   *cancellable,
 						      xerror_t        **error);
-static xboolean_t g_converter_output_stream_flush      (xoutput_stream_t  *stream,
+static xboolean_t xconverter_output_stream_flush      (xoutput_stream_t  *stream,
 						      xcancellable_t   *cancellable,
 						      xerror_t        **error);
 
-static xboolean_t g_converter_output_stream_can_poll          (xpollable_output_stream_t *stream);
-static xboolean_t g_converter_output_stream_is_writable       (xpollable_output_stream_t *stream);
-static xssize_t   g_converter_output_stream_write_nonblocking (xpollable_output_stream_t  *stream,
+static xboolean_t xconverter_output_stream_can_poll          (xpollable_output_stream_t *stream);
+static xboolean_t xconverter_output_stream_is_writable       (xpollable_output_stream_t *stream);
+static xssize_t   xconverter_output_stream_write_nonblocking (xpollable_output_stream_t  *stream,
 							     const void             *buffer,
 							     xsize_t                  size,
 							     xerror_t               **error);
 
-static xsource_t *g_converter_output_stream_create_source     (xpollable_output_stream_t *stream,
+static xsource_t *xconverter_output_stream_create_source     (xpollable_output_stream_t *stream,
 							     xcancellable_t          *cancellable);
 
-static void g_converter_output_stream_pollable_iface_init (xpollable_output_stream_interface_t *iface);
+static void xconverter_output_stream_pollable_iface_init (xpollable_output_stream_interface_t *iface);
 
 G_DEFINE_TYPE_WITH_CODE (xconverter_output_stream,
-			 g_converter_output_stream,
+			 xconverter_output_stream,
 			 XTYPE_FILTER_OUTPUT_STREAM,
-                         G_ADD_PRIVATE (xconverter_output_stream_t)
+                         G_ADD_PRIVATE (xconverter_output_stream)
 			 G_IMPLEMENT_INTERFACE (XTYPE_POLLABLE_OUTPUT_STREAM,
-						g_converter_output_stream_pollable_iface_init))
+						xconverter_output_stream_pollable_iface_init))
 
 static void
-g_converter_output_stream_class_init (GConverterOutputStreamClass *klass)
+xconverter_output_stream_class_init (GConverterOutputStreamClass *klass)
 {
   xobject_class_t *object_class;
-  GOutputStreamClass *istream_class;
+  xoutput_stream_class_t *istream_class;
 
   object_class = G_OBJECT_CLASS (klass);
-  object_class->get_property = g_converter_output_stream_get_property;
-  object_class->set_property = g_converter_output_stream_set_property;
-  object_class->finalize     = g_converter_output_stream_finalize;
+  object_class->get_property = xconverter_output_stream_get_property;
+  object_class->set_property = xconverter_output_stream_set_property;
+  object_class->finalize     = xconverter_output_stream_finalize;
 
   istream_class = G_OUTPUT_STREAM_CLASS (klass);
-  istream_class->write_fn = g_converter_output_stream_write;
-  istream_class->flush = g_converter_output_stream_flush;
+  istream_class->write_fn = xconverter_output_stream_write;
+  istream_class->flush = xconverter_output_stream_flush;
 
   xobject_class_install_property (object_class,
 				   PROP_CONVERTER,
@@ -143,16 +143,16 @@ g_converter_output_stream_class_init (GConverterOutputStreamClass *klass)
 }
 
 static void
-g_converter_output_stream_pollable_iface_init (xpollable_output_stream_interface_t *iface)
+xconverter_output_stream_pollable_iface_init (xpollable_output_stream_interface_t *iface)
 {
-  iface->can_poll = g_converter_output_stream_can_poll;
-  iface->is_writable = g_converter_output_stream_is_writable;
-  iface->write_nonblocking = g_converter_output_stream_write_nonblocking;
-  iface->create_source = g_converter_output_stream_create_source;
+  iface->can_poll = xconverter_output_stream_can_poll;
+  iface->is_writable = xconverter_output_stream_is_writable;
+  iface->write_nonblocking = xconverter_output_stream_write_nonblocking;
+  iface->create_source = xconverter_output_stream_create_source;
 }
 
 static void
-g_converter_output_stream_finalize (xobject_t *object)
+xconverter_output_stream_finalize (xobject_t *object)
 {
   GConverterOutputStreamPrivate *priv;
   xconverter_output_stream_t        *stream;
@@ -165,11 +165,11 @@ g_converter_output_stream_finalize (xobject_t *object)
   if (priv->converter)
     xobject_unref (priv->converter);
 
-  G_OBJECT_CLASS (g_converter_output_stream_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xconverter_output_stream_parent_class)->finalize (object);
 }
 
 static void
-g_converter_output_stream_set_property (xobject_t      *object,
+xconverter_output_stream_set_property (xobject_t      *object,
 				       xuint_t         prop_id,
 				       const xvalue_t *value,
 				       xparam_spec_t   *pspec)
@@ -192,7 +192,7 @@ g_converter_output_stream_set_property (xobject_t      *object,
 }
 
 static void
-g_converter_output_stream_get_property (xobject_t    *object,
+xconverter_output_stream_get_property (xobject_t    *object,
 				       xuint_t       prop_id,
 				       xvalue_t     *value,
 				       xparam_spec_t *pspec)
@@ -216,13 +216,13 @@ g_converter_output_stream_get_property (xobject_t    *object,
 }
 
 static void
-g_converter_output_stream_init (xconverter_output_stream_t *stream)
+xconverter_output_stream_init (xconverter_output_stream_t *stream)
 {
-  stream->priv = g_converter_output_stream_get_instance_private (stream);
+  stream->priv = xconverter_output_stream_get_instance_private (stream);
 }
 
 /**
- * g_converter_output_stream_new:
+ * xconverter_output_stream_new:
  * @base_stream: a #xoutput_stream_t
  * @converter: a #xconverter_t
  *
@@ -231,7 +231,7 @@ g_converter_output_stream_init (xconverter_output_stream_t *stream)
  * Returns: a new #xoutput_stream_t.
  **/
 xoutput_stream_t *
-g_converter_output_stream_new (xoutput_stream_t *base_stream,
+xconverter_output_stream_new (xoutput_stream_t *base_stream,
                                xconverter_t    *converter)
 {
   xoutput_stream_t *stream;
@@ -247,25 +247,25 @@ g_converter_output_stream_new (xoutput_stream_t *base_stream,
 }
 
 static xsize_t
-buffer_data_size (Buffer *buffer)
+buffer_data_size (buffer_t *buffer)
 {
   return buffer->end - buffer->start;
 }
 
 static xsize_t
-buffer_tailspace (Buffer *buffer)
+buffer_tailspace (buffer_t *buffer)
 {
   return buffer->size - buffer->end;
 }
 
 static char *
-buffer_data (Buffer *buffer)
+buffer_data (buffer_t *buffer)
 {
   return buffer->data + buffer->start;
 }
 
 static void
-buffer_consumed (Buffer *buffer,
+buffer_consumed (buffer_t *buffer,
 		 xsize_t count)
 {
   buffer->start += count;
@@ -274,7 +274,7 @@ buffer_consumed (Buffer *buffer,
 }
 
 static void
-compact_buffer (Buffer *buffer)
+compact_buffer (buffer_t *buffer)
 {
   xsize_t in_buffer;
 
@@ -287,7 +287,7 @@ compact_buffer (Buffer *buffer)
 }
 
 static void
-grow_buffer (Buffer *buffer)
+grow_buffer (buffer_t *buffer)
 {
   char *data;
   xsize_t size, in_buffer;
@@ -315,7 +315,7 @@ grow_buffer (Buffer *buffer)
 /* Ensures that the buffer can fit at_least_size bytes,
  * *including* the current in-buffer data */
 static void
-buffer_ensure_space (Buffer *buffer,
+buffer_ensure_space (buffer_t *buffer,
 		     xsize_t at_least_size)
 {
   xsize_t in_buffer, left_to_fill;
@@ -348,7 +348,7 @@ buffer_ensure_space (Buffer *buffer,
 }
 
 static void
-buffer_append (Buffer *buffer,
+buffer_append (buffer_t *buffer,
 	       const char *data,
 	       xsize_t data_size)
 {
@@ -529,7 +529,7 @@ write_internal (xoutput_stream_t  *stream,
 }
 
 static xssize_t
-g_converter_output_stream_write (xoutput_stream_t  *stream,
+xconverter_output_stream_write (xoutput_stream_t  *stream,
 				 const void     *buffer,
 				 xsize_t           count,
 				 xcancellable_t   *cancellable,
@@ -539,7 +539,7 @@ g_converter_output_stream_write (xoutput_stream_t  *stream,
 }
 
 static xboolean_t
-g_converter_output_stream_flush (xoutput_stream_t  *stream,
+xconverter_output_stream_flush (xoutput_stream_t  *stream,
 				 xcancellable_t   *cancellable,
 				 xerror_t        **error)
 {
@@ -631,7 +631,7 @@ g_converter_output_stream_flush (xoutput_stream_t  *stream,
 }
 
 static xboolean_t
-g_converter_output_stream_can_poll (xpollable_output_stream_t *stream)
+xconverter_output_stream_can_poll (xpollable_output_stream_t *stream)
 {
   xoutput_stream_t *base_stream = G_FILTER_OUTPUT_STREAM (stream)->base_stream;
 
@@ -640,7 +640,7 @@ g_converter_output_stream_can_poll (xpollable_output_stream_t *stream)
 }
 
 static xboolean_t
-g_converter_output_stream_is_writable (xpollable_output_stream_t *stream)
+xconverter_output_stream_is_writable (xpollable_output_stream_t *stream)
 {
   xoutput_stream_t *base_stream = G_FILTER_OUTPUT_STREAM (stream)->base_stream;
 
@@ -648,7 +648,7 @@ g_converter_output_stream_is_writable (xpollable_output_stream_t *stream)
 }
 
 static xssize_t
-g_converter_output_stream_write_nonblocking (xpollable_output_stream_t  *stream,
+xconverter_output_stream_write_nonblocking (xpollable_output_stream_t  *stream,
 					     const void             *buffer,
 					     xsize_t                   count,
 					     xerror_t                **error)
@@ -658,7 +658,7 @@ g_converter_output_stream_write_nonblocking (xpollable_output_stream_t  *stream,
 }
 
 static xsource_t *
-g_converter_output_stream_create_source (xpollable_output_stream_t *stream,
+xconverter_output_stream_create_source (xpollable_output_stream_t *stream,
 					 xcancellable_t          *cancellable)
 {
   xoutput_stream_t *base_stream = G_FILTER_OUTPUT_STREAM (stream)->base_stream;
@@ -673,7 +673,7 @@ g_converter_output_stream_create_source (xpollable_output_stream_t *stream,
 }
 
 /**
- * g_converter_output_stream_get_converter:
+ * xconverter_output_stream_get_converter:
  * @converter_stream: a #xconverter_output_stream_t
  *
  * Gets the #xconverter_t that is used by @converter_stream.
@@ -683,7 +683,7 @@ g_converter_output_stream_create_source (xpollable_output_stream_t *stream,
  * Since: 2.24
  */
 xconverter_t *
-g_converter_output_stream_get_converter (xconverter_output_stream_t *converter_stream)
+xconverter_output_stream_get_converter (xconverter_output_stream_t *converter_stream)
 {
   return converter_stream->priv->converter;
 }

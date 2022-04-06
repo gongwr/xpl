@@ -466,7 +466,7 @@ test_random_conversions (void)
   /* very simple conversion test using random numbers */
   int vint = g_test_rand_int();
   char *err, *str = xstrdup_printf ("%d", vint);
-  gint64 vint64 = g_ascii_strtoll (str, &err, 10);
+  sint64_t vint64 = g_ascii_strtoll (str, &err, 10);
   g_assert_cmphex (vint, ==, vint64);
   g_assert_true (!err || *err == 0);
   g_free (str);
@@ -486,14 +486,14 @@ test_fatal_log_handler_critical_pass (void)
 {
   g_test_log_set_fatal_handler (fatal_handler, NULL);
   xstr_has_prefix (NULL, "file://");
-  g_critical ("Test passing");
+  g_critical ("test_t passing");
   exit (0);
 }
 
 static void
 test_fatal_log_handler_error_fail (void)
 {
-  xerror ("Test failing");
+  xerror ("test_t failing");
   exit (0);
 }
 
@@ -501,7 +501,7 @@ static void
 test_fatal_log_handler_critical_fail (void)
 {
   xstr_has_prefix (NULL, "file://");
-  g_critical ("Test passing");
+  g_critical ("test_t passing");
   exit (0);
 }
 
@@ -511,16 +511,16 @@ test_fatal_log_handler (void)
   g_test_trap_subprocess ("/misc/fatal-log-handler/subprocess/critical-pass", 0, 0);
   g_test_trap_assert_passed ();
   g_test_trap_assert_stderr ("*CRITICAL*xstr_has_prefix*");
-  g_test_trap_assert_stderr ("*CRITICAL*Test passing*");
+  g_test_trap_assert_stderr ("*CRITICAL*test_t passing*");
 
   g_test_trap_subprocess ("/misc/fatal-log-handler/subprocess/error-fail", 0, 0);
   g_test_trap_assert_failed ();
-  g_test_trap_assert_stderr ("*ERROR*Test failing*");
+  g_test_trap_assert_stderr ("*ERROR*test_t failing*");
 
   g_test_trap_subprocess ("/misc/fatal-log-handler/subprocess/critical-fail", 0, 0);
   g_test_trap_assert_failed ();
   g_test_trap_assert_stderr ("*CRITICAL*xstr_has_prefix*");
-  g_test_trap_assert_stderr_unmatched ("*CRITICAL*Test passing*");
+  g_test_trap_assert_stderr_unmatched ("*CRITICAL*test_t passing*");
 }
 
 static void
@@ -647,13 +647,13 @@ test_expected_messages (void)
 static void
 test_expected_messages_debug (void)
 {
-  g_test_expect_message ("Test", G_LOG_LEVEL_WARNING, "warning message");
-  g_log ("Test", G_LOG_LEVEL_DEBUG, "should be ignored");
-  g_log ("Test", G_LOG_LEVEL_WARNING, "warning message");
+  g_test_expect_message ("test_t", G_LOG_LEVEL_WARNING, "warning message");
+  g_log ("test_t", G_LOG_LEVEL_DEBUG, "should be ignored");
+  g_log ("test_t", G_LOG_LEVEL_WARNING, "warning message");
   g_test_assert_expected_messages ();
 
-  g_test_expect_message ("Test", G_LOG_LEVEL_DEBUG, "debug message");
-  g_log ("Test", G_LOG_LEVEL_DEBUG, "debug message");
+  g_test_expect_message ("test_t", G_LOG_LEVEL_DEBUG, "debug message");
+  g_log ("test_t", G_LOG_LEVEL_DEBUG, "debug message");
   g_test_assert_expected_messages ();
 }
 
@@ -663,7 +663,7 @@ test_dash_p_hidden (void)
   if (!g_test_subprocess ())
     g_assert_not_reached ();
 
-  g_print ("Test /misc/dash-p/subprocess/hidden ran\n");
+  g_print ("test_t /misc/dash-p/subprocess/hidden ran\n");
 }
 
 static void
@@ -672,7 +672,7 @@ test_dash_p_hidden_sub (void)
   if (!g_test_subprocess ())
     g_assert_not_reached ();
 
-  g_print ("Test /misc/dash-p/subprocess/hidden/sub ran\n");
+  g_print ("test_t /misc/dash-p/subprocess/hidden/sub ran\n");
 }
 
 /* The rest of the dash_p tests will get run by the toplevel test
@@ -685,7 +685,7 @@ test_dash_p_child (void)
   if (!g_test_subprocess ())
     return;
 
-  g_print ("Test /misc/dash-p/child ran\n");
+  g_print ("test_t /misc/dash-p/child ran\n");
 }
 
 static void
@@ -694,7 +694,7 @@ test_dash_p_child_sub (void)
   if (!g_test_subprocess ())
     return;
 
-  g_print ("Test /misc/dash-p/child/sub ran\n");
+  g_print ("test_t /misc/dash-p/child/sub ran\n");
 }
 
 static void
@@ -703,7 +703,7 @@ test_dash_p_child_sub2 (void)
   if (!g_test_subprocess ())
     return;
 
-  g_print ("Test /misc/dash-p/child/sub2 ran\n");
+  g_print ("test_t /misc/dash-p/child/sub2 ran\n");
 }
 
 static void
@@ -712,7 +712,7 @@ test_dash_p_child_sub_child (void)
   if (!g_test_subprocess ())
     return;
 
-  g_print ("Test /misc/dash-p/child/subprocess ran\n");
+  g_print ("test_t /misc/dash-p/child/subprocess ran\n");
 }
 
 static void
@@ -720,35 +720,35 @@ test_dash_p (void)
 {
   g_test_trap_subprocess ("/misc/dash-p/subprocess/hidden", 0, 0);
   g_test_trap_assert_passed ();
-  g_test_trap_assert_stdout ("*Test /misc/dash-p/subprocess/hidden ran*");
-  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden/sub ran*");
-  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden/sub2 ran*");
-  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden/sub/subprocess ran*");
-  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/child*");
+  g_test_trap_assert_stdout ("*test_t /misc/dash-p/subprocess/hidden ran*");
+  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden/sub ran*");
+  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden/sub2 ran*");
+  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden/sub/subprocess ran*");
+  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/child*");
 
   g_test_trap_subprocess ("/misc/dash-p/subprocess/hidden/sub", 0, 0);
   g_test_trap_assert_passed ();
-  g_test_trap_assert_stdout ("*Test /misc/dash-p/subprocess/hidden/sub ran*");
-  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden ran*");
-  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden/sub2 ran*");
-  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden/subprocess ran*");
-  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/child*");
+  g_test_trap_assert_stdout ("*test_t /misc/dash-p/subprocess/hidden/sub ran*");
+  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden ran*");
+  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden/sub2 ran*");
+  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden/subprocess ran*");
+  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/child*");
 
   g_test_trap_subprocess ("/misc/dash-p/child", 0, 0);
   g_test_trap_assert_passed ();
-  g_test_trap_assert_stdout ("*Test /misc/dash-p/child ran*");
-  g_test_trap_assert_stdout ("*Test /misc/dash-p/child/sub ran*");
-  g_test_trap_assert_stdout ("*Test /misc/dash-p/child/sub2 ran*");
-  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/child/subprocess ran*");
-  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden*");
+  g_test_trap_assert_stdout ("*test_t /misc/dash-p/child ran*");
+  g_test_trap_assert_stdout ("*test_t /misc/dash-p/child/sub ran*");
+  g_test_trap_assert_stdout ("*test_t /misc/dash-p/child/sub2 ran*");
+  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/child/subprocess ran*");
+  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden*");
 
   g_test_trap_subprocess ("/misc/dash-p/child/sub", 0, 0);
   g_test_trap_assert_passed ();
-  g_test_trap_assert_stdout ("*Test /misc/dash-p/child/sub ran*");
-  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/child ran*");
-  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/child/sub2 ran*");
-  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/child/subprocess ran*");
-  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden*");
+  g_test_trap_assert_stdout ("*test_t /misc/dash-p/child/sub ran*");
+  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/child ran*");
+  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/child/sub2 ran*");
+  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/child/subprocess ran*");
+  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden*");
 }
 
 static void
@@ -1050,7 +1050,7 @@ test_combining (void)
   xptr_array_unref (argv);
 }
 
-/* Test the TAP output when a test suite is run with --tap. */
+/* test_t the TAP output when a test suite is run with --tap. */
 static void
 test_tap (void)
 {
@@ -1557,7 +1557,7 @@ test_tap_summary (void)
   int status;
   xchar_t *output;
 
-  g_test_summary ("Test the output of g_test_summary() from the TAP output of a test.");
+  g_test_summary ("test_t the output of g_test_summary() from the TAP output of a test.");
 
   testing_helper = g_test_get_filename (G_TEST_BUILT, "testing-helper" EXEEXT, NULL);
 
@@ -1594,7 +1594,7 @@ test_init_no_argv0 (void)
   int status;
   xchar_t *output;
 
-  g_test_summary ("Test that g_test_init() can be called safely with argc == 0.");
+  g_test_summary ("test_t that g_test_init() can be called safely with argc == 0.");
 
   testing_helper = g_test_get_filename (G_TEST_BUILT, "testing-helper" EXEEXT, NULL);
 

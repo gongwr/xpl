@@ -19,7 +19,7 @@
 #include <glib.h>
 #include <string.h>
 
-/* test_refstring_base: Test the base API of xref_string_t */
+/* test_refstring_base: test_t the base API of xref_string_t */
 static void
 test_refstring_base (void)
 {
@@ -36,7 +36,7 @@ test_refstring_base (void)
   g_ref_string_release (s);
 }
 
-/* test_refstring_length: Test the _len variant */
+/* test_refstring_length: test_t the _len variant */
 static void
 test_refstring_length (void)
 {
@@ -49,7 +49,7 @@ test_refstring_length (void)
   g_ref_string_release (s);
 }
 
-/* test_refstring_length: Test the _len variant with no size set */
+/* test_refstring_length: test_t the _len variant with no size set */
 static void
 test_refstring_length_auto (void)
 {
@@ -59,7 +59,7 @@ test_refstring_length_auto (void)
   g_ref_string_release (s);
 }
 
-/* test_refstring_length_nuls: Test the _len variant */
+/* test_refstring_length_nuls: test_t the _len variant */
 static void
 test_refstring_length_nuls (void)
 {
@@ -72,7 +72,7 @@ test_refstring_length_nuls (void)
   g_ref_string_release (s);
 }
 
-/* test_refstring_intern: Test the interning API of xref_string_t */
+/* test_refstring_intern: test_t the interning API of xref_string_t */
 static void
 test_refstring_intern (void)
 {

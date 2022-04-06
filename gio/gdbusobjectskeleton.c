@@ -43,7 +43,7 @@
  * This type is intended to be used with #xdbus_object_manager_t.
  */
 
-struct _GDBusObjectSkeletonPrivate
+struct _xdbus_object_skeleton_private
 {
   xmutex_t lock;
   xchar_t *object_path;
@@ -64,15 +64,15 @@ enum
 
 static xuint_t signals[LAST_SIGNAL] = {0};
 
-static void dbus_object_interface_init (GDBusObjectIface *iface);
+static void dbus_object_interface_init (xdbus_object_iface_t *iface);
 
-G_DEFINE_TYPE_WITH_CODE (xdbus_object_skeleton, g_dbus_object_skeleton, XTYPE_OBJECT,
-                         G_ADD_PRIVATE (xdbus_object_skeleton_t)
+G_DEFINE_TYPE_WITH_CODE (xdbus_object_skeleton, xdbus_object_skeleton, XTYPE_OBJECT,
+                         G_ADD_PRIVATE (xdbus_object_skeleton)
                          G_IMPLEMENT_INTERFACE (XTYPE_DBUS_OBJECT, dbus_object_interface_init))
 
 
 static void
-g_dbus_object_skeleton_finalize (xobject_t *_object)
+xdbus_object_skeleton_finalize (xobject_t *_object)
 {
   xdbus_object_skeleton_t *object = G_DBUS_OBJECT_SKELETON (_object);
 
@@ -81,12 +81,12 @@ g_dbus_object_skeleton_finalize (xobject_t *_object)
 
   g_mutex_clear (&object->priv->lock);
 
-  if (G_OBJECT_CLASS (g_dbus_object_skeleton_parent_class)->finalize != NULL)
-    G_OBJECT_CLASS (g_dbus_object_skeleton_parent_class)->finalize (_object);
+  if (G_OBJECT_CLASS (xdbus_object_skeleton_parent_class)->finalize != NULL)
+    G_OBJECT_CLASS (xdbus_object_skeleton_parent_class)->finalize (_object);
 }
 
 static void
-g_dbus_object_skeleton_get_property (xobject_t    *_object,
+xdbus_object_skeleton_get_property (xobject_t    *_object,
                                      xuint_t       prop_id,
                                      xvalue_t     *value,
                                      xparam_spec_t *pspec)
@@ -108,7 +108,7 @@ g_dbus_object_skeleton_get_property (xobject_t    *_object,
 }
 
 static void
-g_dbus_object_skeleton_set_property (xobject_t       *_object,
+xdbus_object_skeleton_set_property (xobject_t       *_object,
                                      xuint_t          prop_id,
                                      const xvalue_t  *value,
                                      xparam_spec_t    *pspec)
@@ -118,7 +118,7 @@ g_dbus_object_skeleton_set_property (xobject_t       *_object,
   switch (prop_id)
     {
     case PROP_G_OBJECT_PATH:
-      g_dbus_object_skeleton_set_object_path (object, xvalue_get_string (value));
+      xdbus_object_skeleton_set_object_path (object, xvalue_get_string (value));
       break;
 
     default:
@@ -128,7 +128,7 @@ g_dbus_object_skeleton_set_property (xobject_t       *_object,
 }
 
 static xboolean_t
-g_dbus_object_skeleton_authorize_method_default (xdbus_object_skeleton_t    *object,
+xdbus_object_skeleton_authorize_method_default (xdbus_object_skeleton_t    *object,
                                                  xdbus_interface_skeleton_t *interface,
                                                  xdbus_method_invocation_t  *invocation)
 {
@@ -136,15 +136,15 @@ g_dbus_object_skeleton_authorize_method_default (xdbus_object_skeleton_t    *obj
 }
 
 static void
-g_dbus_object_skeleton_class_init (GDBusObjectSkeletonClass *klass)
+xdbus_object_skeleton_class_init (GDBusObjectSkeletonClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->finalize     = g_dbus_object_skeleton_finalize;
-  gobject_class->set_property = g_dbus_object_skeleton_set_property;
-  gobject_class->get_property = g_dbus_object_skeleton_get_property;
+  gobject_class->finalize     = xdbus_object_skeleton_finalize;
+  gobject_class->set_property = xdbus_object_skeleton_set_property;
+  gobject_class->get_property = xdbus_object_skeleton_get_property;
 
-  klass->authorize_method = g_dbus_object_skeleton_authorize_method_default;
+  klass->authorize_method = xdbus_object_skeleton_authorize_method_default;
 
   /**
    * xdbus_object_skeleton_t:g-object-path:
@@ -184,11 +184,11 @@ g_dbus_object_skeleton_class_init (GDBusObjectSkeletonClass *klass)
    * Since: 2.30
    */
   signals[AUTHORIZE_METHOD_SIGNAL] =
-    g_signal_new (I_("authorize-method"),
+    xsignal_new (I_("authorize-method"),
                   XTYPE_DBUS_OBJECT_SKELETON,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GDBusObjectSkeletonClass, authorize_method),
-                  _g_signal_accumulator_false_handled,
+                  _xsignal_accumulator_false_handled,
                   NULL,
                   NULL,
                   XTYPE_BOOLEAN,
@@ -198,9 +198,9 @@ g_dbus_object_skeleton_class_init (GDBusObjectSkeletonClass *klass)
 }
 
 static void
-g_dbus_object_skeleton_init (xdbus_object_skeleton_t *object)
+xdbus_object_skeleton_init (xdbus_object_skeleton_t *object)
 {
-  object->priv = g_dbus_object_skeleton_get_instance_private (object);
+  object->priv = xdbus_object_skeleton_get_instance_private (object);
   g_mutex_init (&object->priv->lock);
   object->priv->map_name_to_iface = xhash_table_new_full (xstr_hash,
                                                            xstr_equal,
@@ -209,7 +209,7 @@ g_dbus_object_skeleton_init (xdbus_object_skeleton_t *object)
 }
 
 /**
- * g_dbus_object_skeleton_new:
+ * xdbus_object_skeleton_new:
  * @object_path: An object path.
  *
  * Creates a new #xdbus_object_skeleton_t.
@@ -219,7 +219,7 @@ g_dbus_object_skeleton_init (xdbus_object_skeleton_t *object)
  * Since: 2.30
  */
 xdbus_object_skeleton_t *
-g_dbus_object_skeleton_new (const xchar_t *object_path)
+xdbus_object_skeleton_new (const xchar_t *object_path)
 {
   g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
   return G_DBUS_OBJECT_SKELETON (xobject_new (XTYPE_DBUS_OBJECT_SKELETON,
@@ -228,7 +228,7 @@ g_dbus_object_skeleton_new (const xchar_t *object_path)
 }
 
 /**
- * g_dbus_object_skeleton_set_object_path:
+ * xdbus_object_skeleton_set_object_path:
  * @object: A #xdbus_object_skeleton_t.
  * @object_path: A valid D-Bus object path.
  *
@@ -237,7 +237,7 @@ g_dbus_object_skeleton_new (const xchar_t *object_path)
  * Since: 2.30
  */
 void
-g_dbus_object_skeleton_set_object_path (xdbus_object_skeleton_t *object,
+xdbus_object_skeleton_set_object_path (xdbus_object_skeleton_t *object,
                                         const xchar_t     *object_path)
 {
   g_return_if_fail (X_IS_DBUS_OBJECT_SKELETON (object));
@@ -258,7 +258,7 @@ g_dbus_object_skeleton_set_object_path (xdbus_object_skeleton_t *object,
 }
 
 static const xchar_t *
-g_dbus_object_skeleton_get_object_path (xdbus_object_t *_object)
+xdbus_object_skeleton_get_object_path (xdbus_object_t *_object)
 {
   xdbus_object_skeleton_t *object = G_DBUS_OBJECT_SKELETON (_object);
   const xchar_t *ret;
@@ -269,7 +269,7 @@ g_dbus_object_skeleton_get_object_path (xdbus_object_t *_object)
 }
 
 /**
- * g_dbus_object_skeleton_add_interface:
+ * xdbus_object_skeleton_add_interface:
  * @object: A #xdbus_object_skeleton_t.
  * @interface_: A #xdbus_interface_skeleton_t.
  *
@@ -284,7 +284,7 @@ g_dbus_object_skeleton_get_object_path (xdbus_object_t *_object)
  * Since: 2.30
  */
 void
-g_dbus_object_skeleton_add_interface (xdbus_object_skeleton_t     *object,
+xdbus_object_skeleton_add_interface (xdbus_object_skeleton_t     *object,
                                       xdbus_interface_skeleton_t  *interface_)
 {
   xdbus_interface_info_t *info;
@@ -314,20 +314,20 @@ g_dbus_object_skeleton_add_interface (xdbus_object_skeleton_t     *object,
   if (interface_to_remove != NULL)
     {
       g_dbus_interface_set_object (interface_to_remove, NULL);
-      g_signal_emit_by_name (object,
+      xsignal_emit_by_name (object,
                              "interface-removed",
                              interface_to_remove);
       xobject_unref (interface_to_remove);
     }
 
-  g_signal_emit_by_name (object,
+  xsignal_emit_by_name (object,
                          "interface-added",
                          interface_);
   xobject_unref (interface_);
 }
 
 /**
- * g_dbus_object_skeleton_remove_interface:
+ * xdbus_object_skeleton_remove_interface:
  * @object: A #xdbus_object_skeleton_t.
  * @interface_: A #xdbus_interface_skeleton_t.
  *
@@ -336,7 +336,7 @@ g_dbus_object_skeleton_add_interface (xdbus_object_skeleton_t     *object,
  * Since: 2.30
  */
 void
-g_dbus_object_skeleton_remove_interface  (xdbus_object_skeleton_t    *object,
+xdbus_object_skeleton_remove_interface  (xdbus_object_skeleton_t    *object,
                                           xdbus_interface_skeleton_t *interface_)
 {
   xdbus_interface_skeleton_t *other_interface;
@@ -374,7 +374,7 @@ g_dbus_object_skeleton_remove_interface  (xdbus_object_skeleton_t    *object,
       g_warn_if_fail (xhash_table_remove (object->priv->map_name_to_iface, info->name));
       g_mutex_unlock (&object->priv->lock);
       g_dbus_interface_set_object (G_DBUS_INTERFACE (interface_), NULL);
-      g_signal_emit_by_name (object,
+      xsignal_emit_by_name (object,
                              "interface-removed",
                              interface_);
       xobject_unref (interface_);
@@ -383,7 +383,7 @@ g_dbus_object_skeleton_remove_interface  (xdbus_object_skeleton_t    *object,
 
 
 /**
- * g_dbus_object_skeleton_remove_interface_by_name:
+ * xdbus_object_skeleton_remove_interface_by_name:
  * @object: A #xdbus_object_skeleton_t.
  * @interface_name: A D-Bus interface name.
  *
@@ -395,7 +395,7 @@ g_dbus_object_skeleton_remove_interface  (xdbus_object_skeleton_t    *object,
  * Since: 2.30
  */
 void
-g_dbus_object_skeleton_remove_interface_by_name (xdbus_object_skeleton_t *object,
+xdbus_object_skeleton_remove_interface_by_name (xdbus_object_skeleton_t *object,
                                                  const xchar_t         *interface_name)
 {
   xdbus_interface_t *interface;
@@ -411,7 +411,7 @@ g_dbus_object_skeleton_remove_interface_by_name (xdbus_object_skeleton_t *object
       g_warn_if_fail (xhash_table_remove (object->priv->map_name_to_iface, interface_name));
       g_mutex_unlock (&object->priv->lock);
       g_dbus_interface_set_object (interface, NULL);
-      g_signal_emit_by_name (object,
+      xsignal_emit_by_name (object,
                              "interface-removed",
                              interface);
       xobject_unref (interface);
@@ -423,7 +423,7 @@ g_dbus_object_skeleton_remove_interface_by_name (xdbus_object_skeleton_t *object
 }
 
 static xdbus_interface_t *
-g_dbus_object_skeleton_get_interface (xdbus_object_t  *_object,
+xdbus_object_skeleton_get_interface (xdbus_object_t  *_object,
                                       const xchar_t  *interface_name)
 {
   xdbus_object_skeleton_t *object = G_DBUS_OBJECT_SKELETON (_object);
@@ -441,7 +441,7 @@ g_dbus_object_skeleton_get_interface (xdbus_object_t  *_object,
 }
 
 static xlist_t *
-g_dbus_object_skeleton_get_interfaces (xdbus_object_t *_object)
+xdbus_object_skeleton_get_interfaces (xdbus_object_t *_object)
 {
   xdbus_object_skeleton_t *object = G_DBUS_OBJECT_SKELETON (_object);
   xlist_t *ret;
@@ -459,7 +459,7 @@ g_dbus_object_skeleton_get_interfaces (xdbus_object_t *_object)
 }
 
 /**
- * g_dbus_object_skeleton_flush:
+ * xdbus_object_skeleton_flush:
  * @object: A #xdbus_object_skeleton_t.
  *
  * This method simply calls g_dbus_interface_skeleton_flush() on all
@@ -469,7 +469,7 @@ g_dbus_object_skeleton_get_interfaces (xdbus_object_t *_object)
  * Since: 2.30
  */
 void
-g_dbus_object_skeleton_flush (xdbus_object_skeleton_t *object)
+xdbus_object_skeleton_flush (xdbus_object_skeleton_t *object)
 {
   xlist_t *to_flush, *l;
 
@@ -485,25 +485,25 @@ g_dbus_object_skeleton_flush (xdbus_object_skeleton_t *object)
 }
 
 static void
-dbus_object_interface_init (GDBusObjectIface *iface)
+dbus_object_interface_init (xdbus_object_iface_t *iface)
 {
-  iface->get_object_path = g_dbus_object_skeleton_get_object_path;
-  iface->get_interfaces  = g_dbus_object_skeleton_get_interfaces;
-  iface->get_interface  = g_dbus_object_skeleton_get_interface;
+  iface->get_object_path = xdbus_object_skeleton_get_object_path;
+  iface->get_interfaces  = xdbus_object_skeleton_get_interfaces;
+  iface->get_interface  = xdbus_object_skeleton_get_interface;
 }
 
 xboolean_t
-_g_dbus_object_skeleton_has_authorize_method_handlers (xdbus_object_skeleton_t *object)
+_xdbus_object_skeleton_has_authorize_method_handlers (xdbus_object_skeleton_t *object)
 {
   xboolean_t has_handlers;
   xboolean_t has_default_class_handler;
 
-  has_handlers = g_signal_has_handler_pending (object,
+  has_handlers = xsignal_has_handler_pending (object,
                                                signals[AUTHORIZE_METHOD_SIGNAL],
                                                0,
                                                TRUE);
   has_default_class_handler = (G_DBUS_OBJECT_SKELETON_GET_CLASS (object)->authorize_method ==
-                               g_dbus_object_skeleton_authorize_method_default);
+                               xdbus_object_skeleton_authorize_method_default);
 
   return has_handlers || !has_default_class_handler;
 }

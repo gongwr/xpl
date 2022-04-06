@@ -1391,7 +1391,7 @@ static void
 test_GDateTime_new_from_unix_utc (void)
 {
   xdatetime_t *dt;
-  gint64 t;
+  sint64_t t;
 
   t = g_get_real_time ();
 
@@ -1756,7 +1756,7 @@ test_format_unrepresentable (void)
   /* We are using Unicode ratio symbol here, which is outside ASCII. */
   TEST_PRINTF_TIME (23, 15, 0, "%H∶%M", "23∶15");
 
-  /* Test again, this time in locale with non ASCII charset. */
+  /* test_t again, this time in locale with non ASCII charset. */
   if (setlocale (LC_ALL, "pl_PL.ISO-8859-2") != NULL)
     TEST_PRINTF_TIME (23, 15, 0, "%H∶%M", "23∶15");
   else
@@ -1835,7 +1835,7 @@ test_modifiers (void)
   g_free (oldlocale);
 }
 
-/* Test that the `O` modifier for xdate_time_format() works with %B, %b and %h;
+/* test_t that the `O` modifier for xdate_time_format() works with %B, %b and %h;
  * i.e. whether genitive month names are supported. */
 static void
 test_month_names (void)
@@ -2052,7 +2052,7 @@ test_all_dates (void)
 {
   xint_t year, month, day;
   xtimezone_t *timezone;
-  gint64 unix_time;
+  sint64_t unix_time;
   xint_t day_of_year;
   xint_t week_year;
   xint_t week_num;
@@ -2507,7 +2507,7 @@ test_find_interval (void)
 {
   xtimezone_t *tz;
   xdatetime_t *dt;
-  gint64 u;
+  sint64_t u;
   xint_t i1, i2;
 
 #ifdef G_OS_UNIX
@@ -2541,7 +2541,7 @@ test_adjust_time (void)
 {
   xtimezone_t *tz;
   xdatetime_t *dt;
-  gint64 u, u2;
+  sint64_t u, u2;
   xint_t i1, i2;
 
 #ifdef G_OS_UNIX
@@ -2936,7 +2936,7 @@ test_identifier (void)
   g_free (old_tz);
 }
 
-/* Test various calls to xtime_zone_new_offset(). */
+/* test_t various calls to xtime_zone_new_offset(). */
 static void
 test_new_offset (void)
 {
@@ -3000,7 +3000,7 @@ test_time_zone_parse_rfc8536 (void)
     };
   xsize_t i;
 
-  g_test_summary ("Test parsing time zone files in RFC 8536 version 3 format");
+  g_test_summary ("test_t parsing time zone files in RFC 8536 version 3 format");
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2129");
 
   for (i = 0; i < G_N_ELEMENTS (test_files); i++)

@@ -1014,7 +1014,7 @@ xkey_file_load_from_bytes (xkey_file_t       *key_file,
                             GKeyFileFlags   flags,
                             xerror_t        **error)
 {
-  const guchar *data;
+  const xuchar_t *data;
   xsize_t size;
 
   g_return_val_if_fail (key_file != NULL, FALSE);
@@ -2809,14 +2809,14 @@ xkey_file_set_integer (xkey_file_t    *key_file,
  *
  * Since: 2.26
  */
-gint64
+sint64_t
 xkey_file_get_int64 (xkey_file_t     *key_file,
                       const xchar_t  *group_name,
                       const xchar_t  *key,
                       xerror_t      **error)
 {
   xchar_t *s, *end;
-  gint64 v;
+  sint64_t v;
 
   g_return_val_if_fail (key_file != NULL, -1);
   g_return_val_if_fail (group_name != NULL, -1);
@@ -2859,7 +2859,7 @@ void
 xkey_file_set_int64 (xkey_file_t    *key_file,
                       const xchar_t *group_name,
                       const xchar_t *key,
-                      gint64       value)
+                      sint64_t       value)
 {
   xchar_t *result;
 

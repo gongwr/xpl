@@ -20,7 +20,7 @@
           <row><entry>GnomeVFSDrive</entry><entry>xvolume_t</entry></row>
           <row><entry>-</entry><entry>xdrive_t</entry></row>
           <row><entry>GnomeVFSContext</entry><entry>xcancellable_t</entry></row>
-          <row><entry>gnome_vfs_async_cancel</entry><entry>g_cancellable_cancel</entry></row>
+          <row><entry>gnome_vfs_async_cancel</entry><entry>xcancellable_cancel</entry></row>
         </tbody>
       </tgroup>
     </table>
@@ -77,7 +77,7 @@ start_monitoring_trash (void)
   monitor = xfile_monitor_directory (file, 0, NULL, NULL);
   xobject_unref (file);
 
-  g_signal_connect (monitor, "changed", G_CALLBACK (file_changed), NULL);
+  xsignal_connect (monitor, "changed", G_CALLBACK (file_changed), NULL);
 
   /* ... */
 

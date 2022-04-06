@@ -660,7 +660,7 @@ test_gvarianttype (void)
     }
 }
 
-/* Test that scanning a deeply recursive type string doesn’t exhaust our
+/* test_t that scanning a deeply recursive type string doesn’t exhaust our
  * stack space (which it would if the type string scanner was recursive). */
 static void
 test_gvarianttype_string_scan_recursion_tuple (void)
@@ -1103,8 +1103,8 @@ test_gvarianttypeinfo (void)
 static xchar_t *
 random_type_string (void)
 {
-  const guchar base_types[] = "ynix";
-  guchar base_type;
+  const xuchar_t base_types[] = "ynix";
+  xuchar_t base_type;
 
   base_type = base_types[g_test_rand_int_range (0, 4)];
 
@@ -1195,7 +1195,7 @@ append_instance_size (RandomInstance *instance,
 
 static void
 random_instance_write (RandomInstance *instance,
-                       guchar         *buffer)
+                       xuchar_t         *buffer)
 {
   xrand_t *rand;
   xsize_t i;
@@ -1210,7 +1210,7 @@ random_instance_write (RandomInstance *instance,
 
 static void
 append_instance_data (RandomInstance  *instance,
-                      guchar         **buffer)
+                      xuchar_t         **buffer)
 {
   while (((xsize_t) *buffer) & instance->alignment)
     *(*buffer)++ = '\0';
@@ -1221,7 +1221,7 @@ append_instance_data (RandomInstance  *instance,
 
 static xboolean_t
 random_instance_assert (RandomInstance *instance,
-                        guchar         *buffer,
+                        xuchar_t         *buffer,
                         xsize_t           size)
 {
   xrand_t *rand;
@@ -1233,7 +1233,7 @@ random_instance_assert (RandomInstance *instance,
   rand = g_rand_new_with_seed (instance->seed);
   for (i = 0; i < instance->size; i++)
     {
-      guchar byte = g_rand_int (rand);
+      xuchar_t byte = g_rand_int (rand);
 
       g_assert_cmpuint (buffer[i], ==, byte);
     }
@@ -1244,7 +1244,7 @@ random_instance_assert (RandomInstance *instance,
 
 static xboolean_t
 random_instance_check (RandomInstance *instance,
-                       guchar         *buffer,
+                       xuchar_t         *buffer,
                        xsize_t           size)
 {
   xrand_t *rand;
@@ -1257,7 +1257,7 @@ random_instance_check (RandomInstance *instance,
 
   rand = g_rand_new_with_seed (instance->seed);
   for (i = 0; i < instance->size; i++)
-    if (buffer[i] != (guchar) g_rand_int (rand))
+    if (buffer[i] != (xuchar_t) g_rand_int (rand))
       break;
   g_rand_free (rand);
 
@@ -1353,13 +1353,13 @@ align_free (xpointer_t mem)
 }
 
 static void
-append_offset (guchar **offset_ptr,
+append_offset (xuchar_t **offset_ptr,
                xsize_t    offset,
                xuint_t    offset_size)
 {
   union
   {
-    guchar bytes[sizeof (xsize_t)];
+    xuchar_t bytes[sizeof (xsize_t)];
     xsize_t integer;
   } tmpvalue;
 
@@ -1369,13 +1369,13 @@ append_offset (guchar **offset_ptr,
 }
 
 static void
-prepend_offset (guchar **offset_ptr,
+prepend_offset (xuchar_t **offset_ptr,
                 xsize_t    offset,
                 xuint_t    offset_size)
 {
   union
   {
-    guchar bytes[sizeof (xsize_t)];
+    xuchar_t bytes[sizeof (xsize_t)];
     xsize_t integer;
   } tmpvalue;
 
@@ -1390,7 +1390,7 @@ test_maybe (void)
   GVariantTypeInfo *type_info;
   RandomInstance *instance;
   xsize_t needed_size;
-  guchar *data;
+  xuchar_t *data;
 
   instance = random_instance (NULL);
 
@@ -1419,7 +1419,7 @@ test_maybe (void)
     g_assert_cmpint (needed_size, ==, instance->size + 1);
 
   {
-    guchar *ptr;
+    xuchar_t *ptr;
 
     ptr = data = align_malloc (needed_size);
     append_instance_data (instance, &ptr);
@@ -1482,7 +1482,7 @@ test_array (void)
   xsize_t needed_size;
   xsize_t offset_size;
   xuint_t n_children;
-  guchar *data;
+  xuchar_t *data;
 
   {
     xchar_t *element_type, *array_type;
@@ -1536,7 +1536,7 @@ test_array (void)
   }
 
   {
-    guchar *offset_ptr, *body_ptr;
+    xuchar_t *offset_ptr, *body_ptr;
     xsize_t i;
 
     body_ptr = data = align_malloc (needed_size);
@@ -1625,7 +1625,7 @@ test_tuple (void)
   xsize_t offset_size;
   xuint_t n_children;
   xuint_t alignment;
-  guchar *data;
+  xuchar_t *data;
 
   n_children = g_test_rand_int_range (0, MAX_TUPLE_CHILDREN);
   instances = g_new (RandomInstance *, n_children);
@@ -1688,8 +1688,8 @@ test_tuple (void)
   }
 
   {
-    guchar *body_ptr;
-    guchar *ofs_ptr;
+    xuchar_t *body_ptr;
+    xuchar_t *ofs_ptr;
     xsize_t i;
 
     body_ptr = data = align_malloc (needed_size);
@@ -1785,7 +1785,7 @@ test_variant (void)
   RandomInstance *instance;
   const xchar_t *type_string;
   xsize_t needed_size;
-  guchar *data;
+  xuchar_t *data;
   xsize_t len;
 
   type_info = xvariant_type_info_get (G_VARIANT_TYPE_VARIANT);
@@ -1801,7 +1801,7 @@ test_variant (void)
   g_assert_cmpint (needed_size, ==, instance->size + 1 + len);
 
   {
-    guchar *ptr;
+    xuchar_t *ptr;
 
     ptr = data = align_malloc (needed_size);
     append_instance_data (instance, &ptr);
@@ -2308,7 +2308,7 @@ test_serialiser_children (void)
   xvariant_t *variant, *child;
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/issues/1865");
-  g_test_summary ("Test that getting a child variant before and after "
+  g_test_summary ("test_t that getting a child variant before and after "
                   "serialisation of the parent works");
 
   /* Construct a variable sized array containing a child which serializes to a
@@ -2636,7 +2636,7 @@ tree_instance_check_gvariant (TreeInstance *tree,
       return xvariant_get_boolean (value) == (xboolean_t) tree->data.integer;
 
     case 'y':
-      return xvariant_get_byte (value) == (guchar) tree->data.integer;
+      return xvariant_get_byte (value) == (xuchar_t) tree->data.integer;
 
     case 'n':
       return xvariant_get_int16 (value) == (gint16) tree->data.integer;
@@ -2651,7 +2651,7 @@ tree_instance_check_gvariant (TreeInstance *tree,
       return xvariant_get_uint32 (value) == (xuint32_t) tree->data.integer;
 
     case 'x':
-      return xvariant_get_int64 (value) == (gint64) tree->data.integer;
+      return xvariant_get_int64 (value) == (sint64_t) tree->data.integer;
 
     case 't':
       return xvariant_get_uint64 (value) == (xuint64_t) tree->data.integer;
@@ -2821,7 +2821,7 @@ test_container (void)
 static void
 test_string (void)
 {
-  /* Test some different methods of creating strings */
+  /* test_t some different methods of creating strings */
   xvariant_t *v;
 
   v = xvariant_new_string ("foo");
@@ -3001,7 +3001,7 @@ test_varargs (void)
     xvariant_builder_init (&array, G_VARIANT_TYPE_ARRAY);
     xvariant_builder_add_parsed (&array, "{'size', <(%i, %i)> }", 800, 600);
     xvariant_builder_add (&array, "{sv}", "title",
-                           xvariant_new_string ("Test case"));
+                           xvariant_new_string ("test_t case"));
     xvariant_builder_add_value (&array,
       xvariant_new_dict_entry (xvariant_new_string ("temperature"),
                                 xvariant_new_variant (
@@ -3009,7 +3009,7 @@ test_varargs (void)
     check_and_free (xvariant_new ("(ma{sv}m(a{sv})ma{sv}ii)",
                                    NULL, FALSE, NULL, &array, 7777, 8888),
                     "(nothing, nothing, {'size': <(800, 600)>, "
-                                        "'title': <'Test case'>, "
+                                        "'title': <'test_t case'>, "
                                         "'temperature': <37.5>}, "
                      "7777, 8888)");
 
@@ -3368,13 +3368,13 @@ test_varargs (void)
     xvariant_t *value;
 
     xvariant_t *vval;
-    guchar byteval;
+    xuchar_t byteval;
     xboolean_t bval;
     gint16 i16val;
     xuint16_t u16val;
     gint32 i32val;
     xuint32_t u32val;
-    gint64 i64val;
+    sint64_t i64val;
     xuint64_t u64val;
     xdouble_t dval;
     gint32 hval;
@@ -3387,7 +3387,7 @@ test_varargs (void)
                            FALSE, (xuint16_t) 123,
                            FALSE, (gint32) 123,
                            FALSE, (xuint32_t) 123,
-                           FALSE, (gint64) 123,
+                           FALSE, (sint64_t) 123,
                            FALSE, (xuint64_t) 123,
                            FALSE, (gint32) -1,
                            FALSE, (xdouble_t) 37.5,
@@ -3484,7 +3484,7 @@ test_varargs (void)
                            TRUE, (xuint16_t) 123,
                            TRUE, (gint32) 123,
                            TRUE, (xuint32_t) 123,
-                           TRUE, (gint64) 123,
+                           TRUE, (sint64_t) 123,
                            TRUE, (xuint64_t) 123,
                            TRUE, (gint32) -1,
                            TRUE, (xdouble_t) 37.5,
@@ -3749,11 +3749,11 @@ test_gv_byteswap (void)
    *
    * just test a few simple cases here to make sure they each work
    */
-  guchar validbytes[] = { 'a', '\0', swapped16(66), 2,
+  xuchar_t validbytes[] = { 'a', '\0', swapped16(66), 2,
                           0,
                           'b', '\0', swapped16(77), 2,
                           5, 11 };
-  guchar corruptbytes[] = { 'a', '\0', swapped16(66), 2,
+  xuchar_t corruptbytes[] = { 'a', '\0', swapped16(66), 2,
                             0,
                             'b', '\0', swapped16(77), 2,
                             6, 11 };
@@ -4118,7 +4118,7 @@ test_parse_failures (void)
         xerror ("test %u: Expected location '%s' in '%s'", i / 3,
                  test[i+1], error1->message);
 
-      /* Test again with the nul terminator this time. The behaviour should be
+      /* test_t again with the nul terminator this time. The behaviour should be
        * the same. */
       value = xvariant_parse (NULL, test[i], NULL, NULL, &error2);
       g_assert_null (value);
@@ -4132,7 +4132,7 @@ test_parse_failures (void)
     }
 }
 
-/* Test that parsing xvariant_t text format integers works at the boundaries of
+/* test_t that parsing xvariant_t text format integers works at the boundaries of
  * those integer types. We’re especially interested in the handling of the most
  * negative numbers, since those can’t be represented in sign + absolute value
  * form. */
@@ -4164,7 +4164,7 @@ test_parser_integer_bounds (void)
 #undef test_bound
 }
 
-/* Test that #GVariants which recurse too deeply are rejected. */
+/* test_t that #GVariants which recurse too deeply are rejected. */
 static void
 test_parser_recursion (void)
 {
@@ -4873,7 +4873,7 @@ test_stack_dict_init (void)
   xvariant_unref (variant);
 }
 
-/* Test checking arbitrary binary data for normal form. This time, it’s a tuple
+/* test_t checking arbitrary binary data for normal form. This time, it’s a tuple
  * with invalid element ends. */
 static void
 test_normal_checking_tuples (void)
@@ -4999,7 +4999,7 @@ test_recursion_limits_array_in_variant (void)
   xvariant_unref (wrapper_variant);
 }
 
-/* Test that an array with invalidly large values in its offset table is
+/* test_t that an array with invalidly large values in its offset table is
  * normalised successfully without looping infinitely. */
 static void
 test_normal_checking_array_offsets (void)
@@ -5023,7 +5023,7 @@ test_normal_checking_array_offsets (void)
   xvariant_unref (variant);
 }
 
-/* Test that a tuple with invalidly large values in its offset table is
+/* test_t that a tuple with invalidly large values in its offset table is
  * normalised successfully without looping infinitely. */
 static void
 test_normal_checking_tuple_offsets (void)
@@ -5047,7 +5047,7 @@ test_normal_checking_tuple_offsets (void)
   xvariant_unref (variant);
 }
 
-/* Test that an empty object path is normalised successfully to the base object
+/* test_t that an empty object path is normalised successfully to the base object
  * path, ‘/’. */
 static void
 test_normal_checking_empty_object_path (void)
@@ -5071,7 +5071,7 @@ test_normal_checking_empty_object_path (void)
   xvariant_unref (variant);
 }
 
-/* Test that constructing a #xvariant_t from data which is not correctly aligned
+/* test_t that constructing a #xvariant_t from data which is not correctly aligned
  * for the variant type is OK, by loading a variant from data at various offsets
  * which are aligned and unaligned. When unaligned, a slow construction path
  * should be taken. */

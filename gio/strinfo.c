@@ -193,7 +193,7 @@ strinfo_find_integer (const xuint32_t *strinfo,
   for (i = 0; i < length; i++)
     if (strinfo[i] == GUINT32_TO_LE (value))
       {
-        const guchar *charinfo = (const guchar *) &strinfo[i];
+        const xuchar_t *charinfo = (const xuchar_t *) &strinfo[i];
 
         /* make sure it has 0xff on either side */
         if ((i == 0 || charinfo[-1] == 0xff) && charinfo[4] == 0xff)

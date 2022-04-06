@@ -60,8 +60,8 @@ typedef unsigned @gint32@ xuint32_t;
 
 #define G_HAVE_GINT64 1          /* deprecated, always true */
 
-@glib_extension@typedef signed @gint64@ gint64;
-@glib_extension@typedef unsigned @gint64@ xuint64_t;
+@glib_extension@typedef signed @sint64_t@ sint64_t;
+@glib_extension@typedef unsigned @sint64_t@ xuint64_t;
 
 #define G_GINT64_CONSTANT(val)	@gint64_constant@
 #define G_GUINT64_CONSTANT(val)	@guint64_constant@
@@ -87,7 +87,7 @@ typedef unsigned @glib_size_type_define@ xsize_t;
 #define G_MINSSIZE	G_MIN@glib_msize_type@
 #define G_MAXSSIZE	G_MAX@glib_msize_type@
 
-typedef gint64 xoffset_t;
+typedef sint64_t xoffset_t;
 #define G_MINOFFSET	G_MININT64
 #define G_MAXOFFSET	G_MAXINT64
 
@@ -161,15 +161,15 @@ typedef unsigned @glib_intptr_type_define@ guintptr;
 #define GINT32_TO_@g_bs_alien@(val)	((gint32) GUINT32_SWAP_LE_BE (val))
 #define GUINT32_TO_@g_bs_alien@(val)	(GUINT32_SWAP_LE_BE (val))
 
-#define GINT64_TO_@g_bs_native@(val)	((gint64) (val))
+#define GINT64_TO_@g_bs_native@(val)	((sint64_t) (val))
 #define GUINT64_TO_@g_bs_native@(val)	((xuint64_t) (val))
-#define GINT64_TO_@g_bs_alien@(val)	((gint64) GUINT64_SWAP_LE_BE (val))
+#define GINT64_TO_@g_bs_alien@(val)	((sint64_t) GUINT64_SWAP_LE_BE (val))
 #define GUINT64_TO_@g_bs_alien@(val)	(GUINT64_SWAP_LE_BE (val))
 
 #define GLONG_TO_LE(val)	((xlong_t) GINT@glongbits@_TO_LE (val))
-#define GULONG_TO_LE(val)	((gulong) GUINT@glongbits@_TO_LE (val))
+#define GULONG_TO_LE(val)	((xulong_t) GUINT@glongbits@_TO_LE (val))
 #define GLONG_TO_BE(val)	((xlong_t) GINT@glongbits@_TO_BE (val))
-#define GULONG_TO_BE(val)	((gulong) GUINT@glongbits@_TO_BE (val))
+#define GULONG_TO_BE(val)	((xulong_t) GUINT@glongbits@_TO_BE (val))
 #define GINT_TO_LE(val)		((xint_t) GINT@gintbits@_TO_LE (val))
 #define GUINT_TO_LE(val)	((xuint_t) GUINT@gintbits@_TO_LE (val))
 #define GINT_TO_BE(val)		((xint_t) GINT@gintbits@_TO_BE (val))

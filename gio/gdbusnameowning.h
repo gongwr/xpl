@@ -73,7 +73,7 @@ typedef void (*GBusNameLostCallback) (xdbus_connection_t *connection,
                                       xpointer_t         user_data);
 
 XPL_AVAILABLE_IN_ALL
-xuint_t g_bus_own_name                 (GBusType                  bus_type,
+xuint_t g_bus_own_name                 (xbus_type_t                  bus_type,
                                       const xchar_t              *name,
                                       GBusNameOwnerFlags        flags,
                                       GBusAcquiredCallback      bus_acquired_handler,
@@ -92,7 +92,7 @@ xuint_t g_bus_own_name_on_connection   (xdbus_connection_t          *connection,
                                       xdestroy_notify_t            user_data_free_func);
 
 XPL_AVAILABLE_IN_ALL
-xuint_t g_bus_own_name_with_closures   (GBusType                  bus_type,
+xuint_t g_bus_own_name_with_closures   (xbus_type_t                  bus_type,
                                       const xchar_t              *name,
                                       GBusNameOwnerFlags        flags,
                                       xclosure_t                 *bus_acquired_closure,

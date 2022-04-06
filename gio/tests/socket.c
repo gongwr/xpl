@@ -183,7 +183,7 @@ create_server_full (xsocket_family_t   family,
     }
   else
     {
-      data->cancellable = g_cancellable_new ();
+      data->cancellable = xcancellable_new ();
     }
 
   data->thread = xthread_new ("server", server_thread, data);
@@ -398,7 +398,7 @@ test_ip_async (xsocket_family_t family)
 
   if (family == XSOCKET_FAMILY_IPV4)
     {
-      /* Test that reading on a remote-closed socket gets back 0 bytes. */
+      /* test_t that reading on a remote-closed socket gets back 0 bytes. */
       len = xsocket_receive_with_blocking (client, buf, sizeof (buf),
 					    TRUE, NULL, &error);
       g_assert_no_error (error);
@@ -406,7 +406,7 @@ test_ip_async (xsocket_family_t family)
     }
   else
     {
-      /* Test that writing to a remote-closed socket gets back CONNECTION_CLOSED. */
+      /* test_t that writing to a remote-closed socket gets back CONNECTION_CLOSED. */
       len = xsocket_send_with_blocking (client, testbuf, strlen (testbuf) + 1,
 					 TRUE, NULL, &error);
       g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CONNECTION_CLOSED);
@@ -539,14 +539,14 @@ test_ip_sync (xsocket_family_t family)
 
   if (family == XSOCKET_FAMILY_IPV4)
     {
-      /* Test that reading on a remote-closed socket gets back 0 bytes. */
+      /* test_t that reading on a remote-closed socket gets back 0 bytes. */
       len = xsocket_receive (client, buf, sizeof (buf), NULL, &error);
       g_assert_no_error (error);
       g_assert_cmpint (len, ==, 0);
     }
   else
     {
-      /* Test that writing to a remote-closed socket gets back CONNECTION_CLOSED. */
+      /* test_t that writing to a remote-closed socket gets back CONNECTION_CLOSED. */
       len = xsocket_send (client, testbuf, strlen (testbuf) + 1, NULL, &error);
       g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CONNECTION_CLOSED);
       g_assert_cmpint (len, ==, -1);
@@ -780,7 +780,7 @@ test_ip_sync_dgram (xsocket_family_t family)
     g_assert_cmpint (len, ==, 3);
   }
 
-  g_cancellable_cancel (data->cancellable);
+  xcancellable_cancel (data->cancellable);
 
   xthread_join (data->thread);
 
@@ -821,7 +821,7 @@ cancellable_thread_cb (xpointer_t data)
   xcancellable_t *cancellable = data;
 
   g_usleep (0.1 * G_USEC_PER_SEC);
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   xobject_unref (cancellable);
 
   return NULL;
@@ -863,11 +863,11 @@ test_ip_sync_dgram_timeouts (xsocket_family_t family)
   /* No overall timeout: test the per-operation timeouts instead. */
   xsocket_set_timeout (client, 0);
 
-  cancellable = g_cancellable_new ();
+  cancellable = xcancellable_new ();
 
   /* Check for timeouts when no server is running. */
   {
-    gint64 start_time;
+    sint64_t start_time;
     xinput_message_t im = { NULL, NULL, 0, 0, 0, NULL, 0 };
     xinput_vector_t iv = { NULL, 0 };
     xuint8_t buf[128];
@@ -1129,7 +1129,7 @@ test_timed_wait (void)
   xerror_t *error = NULL;
   xsocket_t *client;
   xsocket_address_t *addr;
-  gint64 start_time;
+  sint64_t start_time;
   xint_t poll_duration;
 
   if (!g_test_thorough ())
@@ -1532,7 +1532,7 @@ test_source_postmortem (void)
   g_assert_no_error (error);
   xobject_unref (socket);
 
-  /* Test that, after a socket is closed, its source callback should be called
+  /* test_t that, after a socket is closed, its source callback should be called
    * exactly once. */
   xmain_context_iteration (context, FALSE);
   g_assert (callback_visited);

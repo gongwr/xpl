@@ -43,7 +43,7 @@ sleep_cb (xobject_t      *source_object,
   xerror_t **error = user_data;
   xvariant_t *result;
 
-  result = g_dbus_proxy_call_finish (G_DBUS_PROXY (source_object), res, error);
+  result = xdbus_proxy_call_finish (G_DBUS_PROXY (source_object), res, error);
   g_assert (result == NULL);
   xmain_loop_quit (loop);
 }
@@ -63,7 +63,7 @@ test_connection_loss (void)
   xerror_t *error;
 
   error = NULL;
-  proxy = g_dbus_proxy_new_sync (c,
+  proxy = xdbus_proxy_new_sync (c,
                                  G_DBUS_PROXY_FLAGS_NONE,
                                  NULL,                      /* xdbus_interface_info_t */
                                  "com.example.TestService", /* name */
@@ -74,7 +74,7 @@ test_connection_loss (void)
   g_assert_no_error (error);
 
   error = NULL;
-  g_dbus_proxy_call (proxy,
+  xdbus_proxy_call (proxy,
                      "Sleep",
                      xvariant_new ("(i)", 100 * 1000 /* msec */),
                      G_DBUS_CALL_FLAGS_NONE,
@@ -84,7 +84,7 @@ test_connection_loss (void)
                      &error);
 
   /* Make sure we don't exit when the bus goes away */
-  g_dbus_connection_set_exit_on_close (c, FALSE);
+  xdbus_connection_set_exit_on_close (c, FALSE);
 
   /* Nuke the connection to the bus */
   g_timeout_add (100 /* ms */, on_timeout, NULL);

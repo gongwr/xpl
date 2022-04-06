@@ -31,7 +31,7 @@ test_timer_basic (void)
 {
   xtimer_t *timer;
   xdouble_t elapsed;
-  gulong micros;
+  xulong_t micros;
 
   timer = g_timer_new ();
 
@@ -322,7 +322,7 @@ test_timeval_to_iso8601 (void)
     }
 }
 
-/* Test error handling for g_time_val_to_iso8601() on dates which are too large. */
+/* test_t error handling for g_time_val_to_iso8601() on dates which are too large. */
 static void
 test_timeval_to_iso8601_overflow (void)
 {

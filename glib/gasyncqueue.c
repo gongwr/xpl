@@ -406,7 +406,7 @@ g_async_queue_push_sorted_unlocked (xasync_queue_t      *queue,
 static xpointer_t
 g_async_queue_pop_intern_unlocked (xasync_queue_t *queue,
                                    xboolean_t     wait,
-                                   gint64       end_time)
+                                   sint64_t       end_time)
 {
   xpointer_t retval;
 
@@ -536,7 +536,7 @@ xpointer_t
 g_async_queue_timeout_pop (xasync_queue_t *queue,
 			   xuint64_t      timeout)
 {
-  gint64 end_time = g_get_monotonic_time () + timeout;
+  sint64_t end_time = g_get_monotonic_time () + timeout;
   xpointer_t retval;
 
   g_return_val_if_fail (queue != NULL, NULL);
@@ -567,7 +567,7 @@ xpointer_t
 g_async_queue_timeout_pop_unlocked (xasync_queue_t *queue,
 				    xuint64_t      timeout)
 {
-  gint64 end_time = g_get_monotonic_time () + timeout;
+  sint64_t end_time = g_get_monotonic_time () + timeout;
 
   g_return_val_if_fail (queue != NULL, NULL);
 
@@ -597,7 +597,7 @@ xpointer_t
 g_async_queue_timed_pop (xasync_queue_t *queue,
                          GTimeVal    *end_time)
 {
-  gint64 m_end_time;
+  sint64_t m_end_time;
   xpointer_t retval;
 
   g_return_val_if_fail (queue, NULL);
@@ -605,7 +605,7 @@ g_async_queue_timed_pop (xasync_queue_t *queue,
   if (end_time != NULL)
     {
       m_end_time = g_get_monotonic_time () +
-        ((gint64) end_time->tv_sec * G_USEC_PER_SEC + end_time->tv_usec - g_get_real_time ());
+        ((sint64_t) end_time->tv_sec * G_USEC_PER_SEC + end_time->tv_usec - g_get_real_time ());
     }
   else
     m_end_time = -1;
@@ -643,14 +643,14 @@ xpointer_t
 g_async_queue_timed_pop_unlocked (xasync_queue_t *queue,
                                   GTimeVal    *end_time)
 {
-  gint64 m_end_time;
+  sint64_t m_end_time;
 
   g_return_val_if_fail (queue, NULL);
 
   if (end_time != NULL)
     {
       m_end_time = g_get_monotonic_time () +
-        ((gint64) end_time->tv_sec * G_USEC_PER_SEC + end_time->tv_usec - g_get_real_time ());
+        ((sint64_t) end_time->tv_sec * G_USEC_PER_SEC + end_time->tv_usec - g_get_real_time ());
     }
   else
     m_end_time = -1;

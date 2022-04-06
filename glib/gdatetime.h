@@ -84,7 +84,7 @@ G_BEGIN_DECLS
  *
  * Since: 2.26
  */
-typedef gint64 GTimeSpan;
+typedef sint64_t GTimeSpan;
 
 /**
  * xdatetime_t:
@@ -108,9 +108,9 @@ XPL_AVAILABLE_IN_ALL
 xdatetime_t *             xdate_time_new_now_utc                         (void);
 
 XPL_AVAILABLE_IN_ALL
-xdatetime_t *             xdate_time_new_from_unix_local                 (gint64          t);
+xdatetime_t *             xdate_time_new_from_unix_local                 (sint64_t          t);
 XPL_AVAILABLE_IN_ALL
-xdatetime_t *             xdate_time_new_from_unix_utc                   (gint64          t);
+xdatetime_t *             xdate_time_new_from_unix_utc                   (sint64_t          t);
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 XPL_DEPRECATED_IN_2_62_FOR(xdate_time_new_from_unix_local)
@@ -238,7 +238,7 @@ XPL_AVAILABLE_IN_ALL
 xdouble_t                 xdate_time_get_seconds                         (xdatetime_t      *datetime);
 
 XPL_AVAILABLE_IN_ALL
-gint64                  xdate_time_to_unix                             (xdatetime_t      *datetime);
+sint64_t                  xdate_time_to_unix                             (xdatetime_t      *datetime);
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 XPL_DEPRECATED_IN_2_62_FOR(xdate_time_to_unix)
 xboolean_t                xdate_time_to_timeval                          (xdatetime_t      *datetime,

@@ -18,8 +18,8 @@
  * Author: Ryan Lortie <desrt@desrt.ca>
  */
 
-#ifndef __G_BYTES_ICON_H__
-#define __G_BYTES_ICON_H__
+#ifndef __XBYTES_ICON_H__
+#define __XBYTES_ICON_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -30,7 +30,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_BYTES_ICON         (xbytes_icon_get_type ())
-#define G_BYTES_ICON(inst)        (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_BYTES_ICON, xbytes_icon))
+#define XBYTES_ICON(inst)        (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_BYTES_ICON, xbytes_icon))
 #define X_IS_BYTES_ICON(inst)     (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_BYTES_ICON))
 
 /**
@@ -49,4 +49,4 @@ xbytes_t * xbytes_icon_get_bytes (xbytes_icon_t *icon);
 
 G_END_DECLS
 
-#endif /* __G_BYTES_ICON_H__ */
+#endif /* __XBYTES_ICON_H__ */

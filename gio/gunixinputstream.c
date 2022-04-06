@@ -65,7 +65,7 @@ struct _GUnixInputStreamPrivate {
   xuint_t can_poll : 1;
 };
 
-static void g_unix_input_stream_pollable_iface_init (GPollableInputStreamInterface *iface);
+static void g_unix_input_stream_pollable_iface_init (xpollable_input_stream_interface_t *iface);
 static void g_unix_input_stream_file_descriptor_based_iface_init (GFileDescriptorBasedIface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (GUnixInputStream, g_unix_input_stream, XTYPE_INPUT_STREAM,
@@ -111,7 +111,7 @@ static void
 g_unix_input_stream_class_init (GUnixInputStreamClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
-  GInputStreamClass *stream_class = G_INPUT_STREAM_CLASS (klass);
+  xinput_stream_class_t *stream_class = G_INPUT_STREAM_CLASS (klass);
 
   gobject_class->get_property = g_unix_input_stream_get_property;
   gobject_class->set_property = g_unix_input_stream_set_property;
@@ -157,7 +157,7 @@ g_unix_input_stream_class_init (GUnixInputStreamClass *klass)
 }
 
 static void
-g_unix_input_stream_pollable_iface_init (GPollableInputStreamInterface *iface)
+g_unix_input_stream_pollable_iface_init (xpollable_input_stream_interface_t *iface)
 {
   iface->can_poll = g_unix_input_stream_pollable_can_poll;
   iface->is_readable = g_unix_input_stream_pollable_is_readable;
@@ -333,7 +333,7 @@ g_unix_input_stream_read (xinput_stream_t  *stream,
   poll_fds[0].fd = unix_stream->priv->fd;
   poll_fds[0].events = G_IO_IN;
   if (unix_stream->priv->can_poll &&
-      g_cancellable_make_pollfd (cancellable, &poll_fds[1]))
+      xcancellable_make_pollfd (cancellable, &poll_fds[1]))
     nfds = 2;
   else
     nfds = 1;
@@ -359,7 +359,7 @@ g_unix_input_stream_read (xinput_stream_t  *stream,
 	  break;
 	}
 
-      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+      if (xcancellable_set_error_if_cancelled (cancellable, error))
 	break;
 
       if (!poll_fds[0].revents)
@@ -383,7 +383,7 @@ g_unix_input_stream_read (xinput_stream_t  *stream,
     }
 
   if (nfds == 2)
-    g_cancellable_release_fd (cancellable);
+    xcancellable_release_fd (cancellable);
   return res;
 }
 
@@ -477,7 +477,7 @@ g_unix_input_stream_pollable_create_source (xpollable_input_stream_t *stream,
 
   if (cancellable)
     {
-      cancellable_source = g_cancellable_source_new (cancellable);
+      cancellable_source = xcancellable_source_new (cancellable);
       xsource_set_dummy_callback (cancellable_source);
       xsource_add_child_source (pollable_source, cancellable_source);
       xsource_unref (cancellable_source);

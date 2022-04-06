@@ -26,7 +26,7 @@ g_settings_set_mapping_int (const xvalue_t       *value,
                             const xvariant_type_t *expected_type)
 {
   xvariant_t *variant = NULL;
-  gint64 l;
+  sint64_t l;
 
   if (G_VALUE_HOLDS_INT (value))
     l = xvalue_get_int (value);
@@ -58,7 +58,7 @@ g_settings_set_mapping_int (const xvalue_t       *value,
   else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_INT64))
     {
       if (G_MININT64 <= l && l <= G_MAXINT64)
-        variant = xvariant_new_int64 ((gint64) l);
+        variant = xvariant_new_int64 ((sint64_t) l);
     }
   else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_UINT64))
     {
@@ -82,14 +82,14 @@ g_settings_set_mapping_float (const xvalue_t       *value,
 {
   xvariant_t *variant = NULL;
   xdouble_t d;
-  gint64 l;
+  sint64_t l;
 
   if (G_VALUE_HOLDS_DOUBLE (value))
     d = xvalue_get_double (value);
   else
     return NULL;
 
-  l = (gint64) d;
+  l = (sint64_t) d;
   if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_INT16))
     {
       if (G_MININT16 <= l && l <= G_MAXINT16)
@@ -113,7 +113,7 @@ g_settings_set_mapping_float (const xvalue_t       *value,
   else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_INT64))
     {
       if (G_MININT64 <= l && l <= G_MAXINT64)
-        variant = xvariant_new_int64 ((gint64) l);
+        variant = xvariant_new_int64 ((sint64_t) l);
     }
   else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_UINT64))
     {
@@ -167,7 +167,7 @@ g_settings_set_mapping_unsigned_int (const xvalue_t       *value,
   else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_INT64))
     {
       if (u <= G_MAXINT64)
-        variant = xvariant_new_int64 ((gint64) u);
+        variant = xvariant_new_int64 ((sint64_t) u);
     }
   else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_UINT64))
     {
@@ -190,7 +190,7 @@ g_settings_get_mapping_int (xvalue_t   *value,
                             xvariant_t *variant)
 {
   const xvariant_type_t *type;
-  gint64 l;
+  sint64_t l;
 
   type = xvariant_get_type (variant);
 
@@ -240,7 +240,7 @@ g_settings_get_mapping_float (xvalue_t   *value,
 {
   const xvariant_type_t *type;
   xdouble_t d;
-  gint64 l;
+  sint64_t l;
 
   type = xvariant_get_type (variant);
 
@@ -249,7 +249,7 @@ g_settings_get_mapping_float (xvalue_t   *value,
   else
     return FALSE;
 
-  l = (gint64)d;
+  l = (sint64_t)d;
   if (G_VALUE_HOLDS_INT (value))
     {
       xvalue_set_int (value, l);

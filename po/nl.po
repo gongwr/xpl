@@ -268,7 +268,7 @@ msgid "Seek not supported on base stream"
 msgstr "Zoeken binnen datastroom niet mogelijk"
 
 #: gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
 msgstr "Kan xmemory_input_stream_t niet afkappen"
 
 #: gio/gbufferedinputstream.c:982 gio/ginputstream.c:1208 gio/giostream.c:300
@@ -3212,8 +3212,8 @@ msgid "Error removing old file: %s"
 msgstr "Fout bij verwijderen van oude bestand: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:772
-msgid "Invalid GSeekType supplied"
-msgstr "Ongeldig GSeekType geleverd"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Ongeldig xseek_type_t geleverd"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"

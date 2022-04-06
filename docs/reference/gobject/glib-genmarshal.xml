@@ -104,7 +104,7 @@ for signed char types (xchar_t)
 <varlistentry>
 <term><replaceable>UCHAR</replaceable></term>
 <listitem><para>
-for unsigned char types (guchar)
+for unsigned char types (xuchar_t)
 </para></listitem>
 </varlistentry>
 
@@ -132,14 +132,14 @@ for signed long integer types (xlong_t)
 <varlistentry>
 <term><replaceable>ULONG</replaceable></term>
 <listitem><para>
-for unsigned long integer types (gulong)
+for unsigned long integer types (xulong_t)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>INT64</replaceable></term>
 <listitem><para>
-for signed 64bit integer types (gint64)
+for signed 64bit integer types (sint64_t)
 </para></listitem>
 </varlistentry>
 
@@ -300,7 +300,7 @@ Mark generated functions as internal, using <literal>G_GNUC_INTERNAL</literal>.
 <varlistentry>
 <term><option>--valist-marshallers</option></term>
 <listitem><para>
-Generate valist marshallers, for use with <function>g_signal_set_va_marshaller()</function>.
+Generate valist marshallers, for use with <function>xsignal_set_va_marshaller()</function>.
 </para></listitem>
 </varlistentry>
 
@@ -526,7 +526,7 @@ void   bar (xpointer_t data1,
             xpointer_t data2);
 gfloat baz (xpointer_t data1,
             xboolean_t param1,
-            guchar   param2,
+            xuchar_t   param2,
             xpointer_t data2);
 </programlisting></informalexample>
 <para>

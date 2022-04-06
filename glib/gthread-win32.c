@@ -254,9 +254,9 @@ g_cond_wait (xcond_t  *cond,
 xboolean_t
 g_cond_wait_until (xcond_t  *cond,
                    xmutex_t *entered_mutex,
-                   gint64  end_time)
+                   sint64_t  end_time)
 {
-  gint64 span, start_time;
+  sint64_t span, start_time;
   DWORD span_millis;
   xboolean_t signalled;
 
@@ -472,7 +472,7 @@ g_system_thread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_sett
 
 GRealThread *
 g_system_thread_new (GThreadFunc proxy,
-                     gulong stack_size,
+                     xulong_t stack_size,
                      const GThreadSchedulerSettings *scheduler_settings,
                      const char *name,
                      GThreadFunc func,

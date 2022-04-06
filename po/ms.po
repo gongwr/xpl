@@ -263,8 +263,8 @@ msgid "Seek not supported on base stream"
 msgstr "Jangkau tidak disokong pada strim asas"
 
 #: gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "Tidak dapat pangkas xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "Tidak dapat pangkas xbuffered_input_stream_t"
 
 #: gio/gbufferedinputstream.c:982 gio/ginputstream.c:1208 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -3184,8 +3184,8 @@ msgid "Error removing old file: %s"
 msgstr "Ralat membuang fail lama: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:772
-msgid "Invalid GSeekType supplied"
-msgstr "GSeekType dibekalkan tidak sah"
+msgid "Invalid xseek_type_t supplied"
+msgstr "xseek_type_t dibekalkan tidak sah"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"

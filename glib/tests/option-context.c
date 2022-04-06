@@ -56,7 +56,7 @@ make_options (int test_number)
     g_option_context_add_main_entries (options, global_main_entries, NULL);
   if (have_test_entries)
     {
-      group = xoption_group_new ("test", "Test Options",
+      group = xoption_group_new ("test", "test_t Options",
                                   "Show all test options",
                                   NULL, NULL);
       g_option_context_add_group (options, group);
@@ -179,9 +179,9 @@ test_group_captions (void)
             g_test_trap_assert_stdout_unmatched ("*--main-switch*");
 
           if (expect_test_description)
-            g_test_trap_assert_stdout           ("*Test Options*");
+            g_test_trap_assert_stdout           ("*test_t Options*");
           else
-            g_test_trap_assert_stdout_unmatched ("*Test Options*");
+            g_test_trap_assert_stdout_unmatched ("*test_t Options*");
           if (expect_test_switch)
             g_test_trap_assert_stdout           ("*--test-switch*");
           else
@@ -204,8 +204,8 @@ xchar_t *arg_test2_string;
 xchar_t *arg_test3_filename;
 xdouble_t arg_test4_double;
 xdouble_t arg_test5_double;
-gint64 arg_test6_int64;
-gint64 arg_test6_int64_2;
+sint64_t arg_test6_int64;
+sint64_t arg_test6_int64_2;
 
 xchar_t *callback_test1_string;
 int callback_test2_int;
@@ -2080,7 +2080,7 @@ test_help (void)
   xchar_t *arg = NULL;
   xchar_t **sarr = NULL;
   GOptionEntry entries[] = {
-    { "test", 't', 0, G_OPTION_ARG_STRING, &arg, "Test tests", "Argument to use in test" },
+    { "test", 't', 0, G_OPTION_ARG_STRING, &arg, "test_t tests", "Argument to use in test" },
     { "test2", 0, G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_NONE, NULL, "Tests also", NULL },
     { "frob", 0, 0, G_OPTION_ARG_NONE, NULL, "Main frob", NULL },
     { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_STRING_ARRAY, &sarr, "Rest goes here", "REST" },
@@ -2104,7 +2104,7 @@ test_help (void)
 
   str = g_option_context_get_help (context, FALSE, NULL);
   g_assert (strstr (str, "blabla") != NULL);
-  g_assert (strstr (str, "Test tests") != NULL);
+  g_assert (strstr (str, "test_t tests") != NULL);
   g_assert (strstr (str, "Argument to use in test") != NULL);
   g_assert (strstr (str, "Tests also") == NULL);
   g_assert (strstr (str, "REST") != NULL);
@@ -2159,7 +2159,7 @@ test_help_no_help_options (void)
   xchar_t *arg = NULL;
   xchar_t **sarr = NULL;
   GOptionEntry entries[] = {
-    { "test", 't', 0, G_OPTION_ARG_STRING, &arg, "Test tests", "Argument to use in test" },
+    { "test", 't', 0, G_OPTION_ARG_STRING, &arg, "test_t tests", "Argument to use in test" },
     { "test2", 0, G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_NONE, NULL, "Tests also", NULL },
     { "frob", 0, 0, G_OPTION_ARG_NONE, NULL, "Main frob", NULL },
     { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_STRING_ARRAY, &sarr, "Rest goes here", "REST" },
@@ -2186,7 +2186,7 @@ test_help_no_help_options (void)
 
   str = g_option_context_get_help (context, FALSE, NULL);
   g_assert (strstr (str, "blabla") != NULL);
-  g_assert (strstr (str, "Test tests") != NULL);
+  g_assert (strstr (str, "test_t tests") != NULL);
   g_assert (strstr (str, "Argument to use in test") != NULL);
   g_assert (strstr (str, "Tests also") == NULL);
   g_assert (strstr (str, "REST") != NULL);
@@ -2633,12 +2633,12 @@ main (int   argc,
   g_test_add_func ("/option/group/parse", test_group_parse);
   g_test_add_func ("/option/strict-posix", test_strict_posix);
 
-  /* Test that restoration on failure works */
+  /* test_t that restoration on failure works */
   g_test_add_func ("/option/restoration/int", error_test1);
   g_test_add_func ("/option/restoration/string", error_test2);
   g_test_add_func ("/option/restoration/boolean", error_test3);
 
-  /* Test that special argument parsing works */
+  /* test_t that special argument parsing works */
   g_test_add_func ("/option/arg/repetition/int", arg_test1);
   g_test_add_func ("/option/arg/repetition/string", arg_test2);
   g_test_add_func ("/option/arg/repetition/filename", arg_test3);
@@ -2646,14 +2646,14 @@ main (int   argc,
   g_test_add_func ("/option/arg/repetition/locale", arg_test5);
   g_test_add_func ("/option/arg/repetition/int64", arg_test6);
 
-  /* Test string arrays */
+  /* test_t string arrays */
   g_test_add_func ("/option/arg/array/string", array_test1);
 
-  /* Test callback args */
+  /* test_t callback args */
   g_test_add_func ("/option/arg/callback/string", callback_test1);
   g_test_add_func ("/option/arg/callback/count", callback_test2);
 
-  /* Test optional arg flag for callback */
+  /* test_t optional arg flag for callback */
   g_test_add_func ("/option/arg/callback/optional1", callback_test_optional_1);
   g_test_add_func ("/option/arg/callback/optional2", callback_test_optional_2);
   g_test_add_func ("/option/arg/callback/optional3", callback_test_optional_3);
@@ -2663,26 +2663,26 @@ main (int   argc,
   g_test_add_func ("/option/arg/callback/optional7", callback_test_optional_7);
   g_test_add_func ("/option/arg/callback/optional8", callback_test_optional_8);
 
-  /* Test callback with G_OPTION_REMAINING */
+  /* test_t callback with G_OPTION_REMAINING */
   g_test_add_func ("/option/arg/remaining/callback", callback_remaining_test1);
 
-  /* Test callbacks which return FALSE */
+  /* test_t callbacks which return FALSE */
   g_test_add_func ("/option/arg/remaining/callback-false", callback_returns_false);
 
-  /* Test ignoring options */
+  /* test_t ignoring options */
   g_test_add_func ("/option/arg/ignore/long", ignore_test1);
   g_test_add_func ("/option/arg/ignore/short", ignore_test2);
   g_test_add_func ("/option/arg/ignore/arg", ignore_test3);
   g_test_add_func ("/option/context/add", add_test1);
 
-  /* Test parsing empty args */
+  /* test_t parsing empty args */
   /* Note there used to be an empty1 here, but it effectively moved
    * to option-argv0.c.
    */
   g_test_add_func ("/option/context/empty2", empty_test2);
   g_test_add_func ("/option/context/empty3", empty_test3);
 
-  /* Test handling of rest args */
+  /* test_t handling of rest args */
   g_test_add_func ("/option/arg/rest/non-option", rest_test1);
   g_test_add_func ("/option/arg/rest/separator1", rest_test2);
   g_test_add_func ("/option/arg/rest/separator2", rest_test2a);
@@ -2693,7 +2693,7 @@ main (int   argc,
   g_test_add_func ("/option/arg/remaining/separator", rest_test4);
   g_test_add_func ("/option/arg/remaining/array", rest_test5);
 
-  /* Test some invalid flag combinations */
+  /* test_t some invalid flag combinations */
   g_test_add_func ("/option/arg/reverse-string", flag_reverse_string);
   g_test_add_func ("/option/arg/optional-int", flag_optional_int);
 

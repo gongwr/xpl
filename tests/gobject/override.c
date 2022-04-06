@@ -63,7 +63,7 @@ test_i_foo (TestI *self)
 static void
 test_i_default_init (xpointer_t g_class)
 {
-  foo_signal_id = g_signal_newv ("foo",
+  foo_signal_id = xsignal_newv ("foo",
 				 TEST_TYPE_I,
 				 G_SIGNAL_RUN_LAST,
 				 g_cclosure_new(G_CALLBACK(test_i_foo),
@@ -99,8 +99,8 @@ test_a_foo (TestI *self)
   xvalue_init (&args[0], TEST_TYPE_A);
   xvalue_set_object (&args[0], self);
 
-  g_assert (g_signal_get_invocation_hint (self)->signal_id == foo_signal_id);
-  g_signal_chain_from_overridden (args, NULL);
+  g_assert (xsignal_get_invocation_hint (self)->signal_id == foo_signal_id);
+  xsignal_chain_from_overridden (args, NULL);
 
   xvalue_unset (&args[0]);
 }
@@ -129,7 +129,7 @@ test_a_class_init (TestAClass *class)
 {
   class->bar = test_a_bar;
 
-  bar_signal_id = g_signal_new ("bar",
+  bar_signal_id = xsignal_new ("bar",
 				TEST_TYPE_A,
 				G_SIGNAL_RUN_LAST,
 				G_STRUCT_OFFSET (TestAClass, bar),
@@ -137,7 +137,7 @@ test_a_class_init (TestAClass *class)
 				g_cclosure_marshal_VOID__VOID,
 				XTYPE_NONE, 0, NULL);
 
-  baz_signal_id = g_signal_new_class_handler ("baz",
+  baz_signal_id = xsignal_new_class_handler ("baz",
                                               TEST_TYPE_A,
                                               G_SIGNAL_RUN_LAST,
                                               G_CALLBACK (test_a_baz),
@@ -151,7 +151,7 @@ test_a_class_init (TestAClass *class)
 static void
 test_a_interface_init (TestIClass *iface)
 {
-  g_signal_override_class_closure (foo_signal_id,
+  xsignal_override_class_closure (foo_signal_id,
 				   TEST_TYPE_A,
 				   g_cclosure_new (G_CALLBACK (test_a_foo),
 						   NULL, NULL));
@@ -184,8 +184,8 @@ test_b_foo (TestI *self)
   xvalue_init (&args[0], TEST_TYPE_A);
   xvalue_set_object (&args[0], self);
 
-  g_assert (g_signal_get_invocation_hint (self)->signal_id == foo_signal_id);
-  g_signal_chain_from_overridden (args, NULL);
+  g_assert (xsignal_get_invocation_hint (self)->signal_id == foo_signal_id);
+  xsignal_chain_from_overridden (args, NULL);
 
   xvalue_unset (&args[0]);
 }
@@ -200,8 +200,8 @@ test_b_bar (TestA *self)
   xvalue_init (&args[0], TEST_TYPE_A);
   xvalue_set_object (&args[0], self);
 
-  g_assert (g_signal_get_invocation_hint (self)->signal_id == bar_signal_id);
-  g_signal_chain_from_overridden (args, NULL);
+  g_assert (xsignal_get_invocation_hint (self)->signal_id == bar_signal_id);
+  xsignal_chain_from_overridden (args, NULL);
 
   xvalue_unset (&args[0]);
 }
@@ -218,7 +218,7 @@ test_b_baz (TestA    *self,
   g_assert (object == G_OBJECT (self));
   g_assert (GPOINTER_TO_INT (pointer) == 23);
 
-  g_signal_chain_from_overridden_handler (self, object, pointer, &retval);
+  xsignal_chain_from_overridden_handler (self, object, pointer, &retval);
 
   if (retval)
     {
@@ -233,15 +233,15 @@ test_b_baz (TestA    *self,
 static void
 test_b_class_init (TestBClass *class)
 {
-  g_signal_override_class_closure (foo_signal_id,
+  xsignal_override_class_closure (foo_signal_id,
 				   TEST_TYPE_B,
 				   g_cclosure_new (G_CALLBACK (test_b_foo),
 						   NULL, NULL));
-  g_signal_override_class_closure (bar_signal_id,
+  xsignal_override_class_closure (bar_signal_id,
 				   TEST_TYPE_B,
 				   g_cclosure_new (G_CALLBACK (test_b_bar),
 						   NULL, NULL));
-  g_signal_override_class_handler ("baz",
+  xsignal_override_class_handler ("baz",
 				   TEST_TYPE_B,
 				   G_CALLBACK (test_b_baz));
 }
@@ -272,8 +272,8 @@ test_c_foo (TestI *self)
   xvalue_init (&args[0], TEST_TYPE_A);
   xvalue_set_object (&args[0], self);
 
-  g_assert (g_signal_get_invocation_hint (self)->signal_id == foo_signal_id);
-  g_signal_chain_from_overridden (args, NULL);
+  g_assert (xsignal_get_invocation_hint (self)->signal_id == foo_signal_id);
+  xsignal_chain_from_overridden (args, NULL);
 
   xvalue_unset (&args[0]);
 }
@@ -288,8 +288,8 @@ test_c_bar (TestA *self)
   xvalue_init (&args[0], TEST_TYPE_A);
   xvalue_set_object (&args[0], self);
 
-  g_assert (g_signal_get_invocation_hint (self)->signal_id == bar_signal_id);
-  g_signal_chain_from_overridden (args, NULL);
+  g_assert (xsignal_get_invocation_hint (self)->signal_id == bar_signal_id);
+  xsignal_chain_from_overridden (args, NULL);
 
   xvalue_unset (&args[0]);
 }
@@ -306,7 +306,7 @@ test_c_baz (TestA    *self,
   g_assert (object == G_OBJECT (self));
   g_assert (GPOINTER_TO_INT (pointer) == 23);
 
-  g_signal_chain_from_overridden_handler (self, object, pointer, &retval);
+  xsignal_chain_from_overridden_handler (self, object, pointer, &retval);
 
   if (retval)
     {
@@ -321,15 +321,15 @@ test_c_baz (TestA    *self,
 static void
 test_c_class_init (TestBClass *class)
 {
-  g_signal_override_class_closure (foo_signal_id,
+  xsignal_override_class_closure (foo_signal_id,
 				   TEST_TYPE_C,
 				   g_cclosure_new (G_CALLBACK (test_c_foo),
 						   NULL, NULL));
-  g_signal_override_class_closure (bar_signal_id,
+  xsignal_override_class_closure (bar_signal_id,
 				   TEST_TYPE_C,
 				   g_cclosure_new (G_CALLBACK (test_c_bar),
 						   NULL, NULL));
-  g_signal_override_class_handler ("baz",
+  xsignal_override_class_handler ("baz",
 				   TEST_TYPE_C,
 				   G_CALLBACK (test_c_baz));
 }
@@ -362,13 +362,13 @@ test (xtype_t        type,
 
   if (strcmp (signal, "baz"))
     {
-      g_signal_emit_by_name (self, signal);
+      xsignal_emit_by_name (self, signal);
     }
   else
     {
       xchar_t *ret;
 
-      g_signal_emit_by_name (self, signal, self, GINT_TO_POINTER (23), &ret);
+      xsignal_emit_by_name (self, signal, self, GINT_TO_POINTER (23), &ret);
 
       if (strcmp (ret, expected_retval) != 0)
         failed = TRUE;

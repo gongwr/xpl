@@ -2451,10 +2451,10 @@ g_int_hash (xconstpointer v)
 
 /**
  * g_int64_equal:
- * @v1: (not nullable): a pointer to a #gint64 key
- * @v2: (not nullable): a pointer to a #gint64 key to compare with @v1
+ * @v1: (not nullable): a pointer to a #sint64_t key
+ * @v2: (not nullable): a pointer to a #sint64_t key to compare with @v1
  *
- * Compares the two #gint64 values being pointed to and returns
+ * Compares the two #sint64_t values being pointed to and returns
  * %TRUE if they are equal.
  * It can be passed to xhash_table_new() as the @key_equal_func
  * parameter, when using non-%NULL pointers to 64-bit integers as keys in a
@@ -2468,14 +2468,14 @@ xboolean_t
 g_int64_equal (xconstpointer v1,
                xconstpointer v2)
 {
-  return *((const gint64*) v1) == *((const gint64*) v2);
+  return *((const sint64_t*) v1) == *((const sint64_t*) v2);
 }
 
 /**
  * g_int64_hash:
- * @v: (not nullable): a pointer to a #gint64 key
+ * @v: (not nullable): a pointer to a #sint64_t key
  *
- * Converts a pointer to a #gint64 to a hash value.
+ * Converts a pointer to a #sint64_t to a hash value.
  *
  * It can be passed to xhash_table_new() as the @hash_func parameter,
  * when using non-%NULL pointers to 64-bit integer values as keys in a
@@ -2488,7 +2488,7 @@ g_int64_equal (xconstpointer v1,
 xuint_t
 g_int64_hash (xconstpointer v)
 {
-  return (xuint_t) *(const gint64*) v;
+  return (xuint_t) *(const sint64_t*) v;
 }
 
 /**

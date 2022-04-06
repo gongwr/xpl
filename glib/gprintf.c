@@ -160,7 +160,7 @@ g_sprintf (xchar_t       *string,
  **/
 xint_t
 g_snprintf (xchar_t	*string,
-	    gulong	 n,
+	    xulong_t	 n,
 	    xchar_t const *format,
 	    ...)
 {
@@ -283,7 +283,7 @@ g_vsprintf (xchar_t	 *string,
  */
 xint_t
 g_vsnprintf (xchar_t	 *string,
-	     gulong	  n,
+	     xulong_t	  n,
 	     xchar_t const *format,
 	     va_list      args)
 {

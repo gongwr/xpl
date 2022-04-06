@@ -788,7 +788,7 @@ XPL_VAR const xchar_t * const xutf8_skip;
  * Before using this macro, use xutf8_validate() to validate strings
  * that may contain invalid UTF-8.
  */
-#define xutf8_next_char(p) (char *)((p) + xutf8_skip[*(const guchar *)(p)])
+#define xutf8_next_char(p) (char *)((p) + xutf8_skip[*(const xuchar_t *)(p)])
 
 XPL_AVAILABLE_IN_ALL
 xunichar_t xutf8_get_char           (const xchar_t  *p) G_GNUC_PURE;

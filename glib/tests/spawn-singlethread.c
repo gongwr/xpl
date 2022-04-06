@@ -177,7 +177,7 @@ safe_close (int fd)
     close (fd);
 }
 
-/* Test g_spawn_async_with_fds() with a variety of different inputs */
+/* test_t g_spawn_async_with_fds() with a variety of different inputs */
 static void
 test_spawn_async_with_fds (void)
 {
@@ -193,10 +193,10 @@ test_spawn_async_with_fds (void)
     PIPE,         /* pass fd of new/unique pipe */
     STDOUT_PIPE,  /* pass the same pipe as stdout */
   } tests[][3] = {
-    { NO_FD, NO_FD, NO_FD },       /* Test with no fds passed */
-    { NO_FD, FD_NEGATIVE, NO_FD }, /* Test another negative fd value */
-    { PIPE, PIPE, PIPE },          /* Test with unique fds passed */
-    { NO_FD, PIPE, STDOUT_PIPE },  /* Test the same fd for stdout + stderr */
+    { NO_FD, NO_FD, NO_FD },       /* test_t with no fds passed */
+    { NO_FD, FD_NEGATIVE, NO_FD }, /* test_t another negative fd value */
+    { PIPE, PIPE, PIPE },          /* test_t with unique fds passed */
+    { NO_FD, PIPE, STDOUT_PIPE },  /* test_t the same fd for stdout + stderr */
   };
 
   arg = xstrdup_printf ("thread %d", tnum);
@@ -401,7 +401,7 @@ test_spawn_script (void)
   xptr_array_free (argv, TRUE);
 }
 
-/* Test that spawning a non-existent executable returns %G_SPAWN_ERROR_NOENT. */
+/* test_t that spawning a non-existent executable returns %G_SPAWN_ERROR_NOENT. */
 static void
 test_spawn_nonexistent (void)
 {
@@ -425,7 +425,7 @@ test_spawn_nonexistent (void)
   g_clear_error (&error);
 }
 
-/* Test that FD assignments in a spawned process don’t overwrite and break the
+/* test_t that FD assignments in a spawned process don’t overwrite and break the
  * child_err_report_fd which is used to report error information back from the
  * intermediate child process to the parent.
  *

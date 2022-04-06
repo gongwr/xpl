@@ -28,7 +28,7 @@
 G_BEGIN_DECLS
 
 XPL_AVAILABLE_IN_ALL
-xsize_t   g_base64_encode_step    (const guchar *in,
+xsize_t   g_base64_encode_step    (const xuchar_t *in,
                                  xsize_t         len,
                                  xboolean_t      break_lines,
                                  xchar_t        *out,
@@ -40,19 +40,19 @@ xsize_t   g_base64_encode_close   (xboolean_t      break_lines,
                                  xint_t         *state,
                                  xint_t         *save);
 XPL_AVAILABLE_IN_ALL
-xchar_t*  g_base64_encode         (const guchar *data,
+xchar_t*  g_base64_encode         (const xuchar_t *data,
                                  xsize_t         len) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
 xsize_t   g_base64_decode_step    (const xchar_t  *in,
                                  xsize_t         len,
-                                 guchar       *out,
+                                 xuchar_t       *out,
                                  xint_t         *state,
                                  xuint_t        *save);
 XPL_AVAILABLE_IN_ALL
-guchar *g_base64_decode         (const xchar_t  *text,
+xuchar_t *g_base64_decode         (const xchar_t  *text,
                                  xsize_t        *out_len) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-guchar *g_base64_decode_inplace (xchar_t        *text,
+xuchar_t *g_base64_decode_inplace (xchar_t        *text,
                                  xsize_t        *out_len);
 
 

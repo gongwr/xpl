@@ -24,31 +24,31 @@
 #include "giomodule.h"
 
 
-#define XTYPE_MEMORY_SETTINGS_BACKEND  (g_memory_settings_backend_get_type())
-#define G_MEMORY_SETTINGS_BACKEND(inst) (XTYPE_CHECK_INSTANCE_CAST ((inst), \
+#define XTYPE_MEMORY_SETTINGS_BACKEND  (xmemory_settings_backend_get_type())
+#define XMEMORY_SETTINGS_BACKEND(inst) (XTYPE_CHECK_INSTANCE_CAST ((inst), \
                                          XTYPE_MEMORY_SETTINGS_BACKEND,     \
-                                         GMemorySettingsBackend))
+                                         xmemory_settings_backend_t))
 
-typedef GSettingsBackendClass GMemorySettingsBackendClass;
+typedef GSettingsBackendClass xmemory_settings_backend_class_t;
 typedef struct
 {
   xsettings_backend_t parent_instance;
   xhashtable_t *table;
-} GMemorySettingsBackend;
+} xmemory_settings_backend_t;
 
-G_DEFINE_TYPE_WITH_CODE (GMemorySettingsBackend,
-                         g_memory_settings_backend,
+G_DEFINE_TYPE_WITH_CODE (xmemory_settings_backend,
+                         xmemory_settings_backend,
                          XTYPE_SETTINGS_BACKEND,
                          g_io_extension_point_implement (G_SETTINGS_BACKEND_EXTENSION_POINT_NAME,
                                                          g_define_type_id, "memory", 10))
 
 static xvariant_t *
-g_memory_settings_backend_read (xsettings_backend_t   *backend,
+xmemory_settings_backend_read (xsettings_backend_t   *backend,
                                 const xchar_t        *key,
                                 const xvariant_type_t *expected_type,
                                 xboolean_t            default_value)
 {
-  GMemorySettingsBackend *memory = G_MEMORY_SETTINGS_BACKEND (backend);
+  xmemory_settings_backend_t *memory = XMEMORY_SETTINGS_BACKEND (backend);
   xvariant_t *value;
 
   if (default_value)
@@ -63,12 +63,12 @@ g_memory_settings_backend_read (xsettings_backend_t   *backend,
 }
 
 static xboolean_t
-g_memory_settings_backend_write (xsettings_backend_t *backend,
+xmemory_settings_backend_write (xsettings_backend_t *backend,
                                  const xchar_t      *key,
                                  xvariant_t         *value,
                                  xpointer_t          origin_tag)
 {
-  GMemorySettingsBackend *memory = G_MEMORY_SETTINGS_BACKEND (backend);
+  xmemory_settings_backend_t *memory = XMEMORY_SETTINGS_BACKEND (backend);
   xvariant_t *old_value;
 
   old_value = xhash_table_lookup (memory->table, key);
@@ -86,11 +86,11 @@ g_memory_settings_backend_write (xsettings_backend_t *backend,
 }
 
 static xboolean_t
-g_memory_settings_backend_write_one (xpointer_t key,
+xmemory_settings_backend_write_one (xpointer_t key,
                                      xpointer_t value,
                                      xpointer_t data)
 {
-  GMemorySettingsBackend *memory = data;
+  xmemory_settings_backend_t *memory = data;
 
   if (value != NULL)
     xhash_table_insert (memory->table, xstrdup (key), xvariant_ref (value));
@@ -101,22 +101,22 @@ g_memory_settings_backend_write_one (xpointer_t key,
 }
 
 static xboolean_t
-g_memory_settings_backend_write_tree (xsettings_backend_t *backend,
+xmemory_settings_backend_write_tree (xsettings_backend_t *backend,
                                       xtree_t            *tree,
                                       xpointer_t          origin_tag)
 {
-  xtree_foreach (tree, g_memory_settings_backend_write_one, backend);
+  xtree_foreach (tree, xmemory_settings_backend_write_one, backend);
   g_settings_backend_changed_tree (backend, tree, origin_tag);
 
   return TRUE;
 }
 
 static void
-g_memory_settings_backend_reset (xsettings_backend_t *backend,
+xmemory_settings_backend_reset (xsettings_backend_t *backend,
                                  const xchar_t      *key,
                                  xpointer_t          origin_tag)
 {
-  GMemorySettingsBackend *memory = G_MEMORY_SETTINGS_BACKEND (backend);
+  xmemory_settings_backend_t *memory = XMEMORY_SETTINGS_BACKEND (backend);
 
   if (xhash_table_lookup (memory->table, key))
     {
@@ -126,54 +126,54 @@ g_memory_settings_backend_reset (xsettings_backend_t *backend,
 }
 
 static xboolean_t
-g_memory_settings_backend_get_writable (xsettings_backend_t *backend,
+xmemory_settings_backend_get_writable (xsettings_backend_t *backend,
                                         const xchar_t      *name)
 {
   return TRUE;
 }
 
 static xpermission_t *
-g_memory_settings_backend_get_permission (xsettings_backend_t *backend,
+xmemory_settings_backend_get_permission (xsettings_backend_t *backend,
                                           const xchar_t      *path)
 {
   return g_simple_permission_new (TRUE);
 }
 
 static void
-g_memory_settings_backend_finalize (xobject_t *object)
+xmemory_settings_backend_finalize (xobject_t *object)
 {
-  GMemorySettingsBackend *memory = G_MEMORY_SETTINGS_BACKEND (object);
+  xmemory_settings_backend_t *memory = XMEMORY_SETTINGS_BACKEND (object);
 
   xhash_table_unref (memory->table);
 
-  G_OBJECT_CLASS (g_memory_settings_backend_parent_class)
+  G_OBJECT_CLASS (xmemory_settings_backend_parent_class)
     ->finalize (object);
 }
 
 static void
-g_memory_settings_backend_init (GMemorySettingsBackend *memory)
+xmemory_settings_backend_init (xmemory_settings_backend_t *memory)
 {
   memory->table = xhash_table_new_full (xstr_hash, xstr_equal, g_free,
                                          (xdestroy_notify_t) xvariant_unref);
 }
 
 static void
-g_memory_settings_backend_class_init (GMemorySettingsBackendClass *class)
+xmemory_settings_backend_class_init (xmemory_settings_backend_class_t *class)
 {
   GSettingsBackendClass *backend_class = G_SETTINGS_BACKEND_CLASS (class);
   xobject_class_t *object_class = G_OBJECT_CLASS (class);
 
-  backend_class->read = g_memory_settings_backend_read;
-  backend_class->write = g_memory_settings_backend_write;
-  backend_class->write_tree = g_memory_settings_backend_write_tree;
-  backend_class->reset = g_memory_settings_backend_reset;
-  backend_class->get_writable = g_memory_settings_backend_get_writable;
-  backend_class->get_permission = g_memory_settings_backend_get_permission;
-  object_class->finalize = g_memory_settings_backend_finalize;
+  backend_class->read = xmemory_settings_backend_read;
+  backend_class->write = xmemory_settings_backend_write;
+  backend_class->write_tree = xmemory_settings_backend_write_tree;
+  backend_class->reset = xmemory_settings_backend_reset;
+  backend_class->get_writable = xmemory_settings_backend_get_writable;
+  backend_class->get_permission = xmemory_settings_backend_get_permission;
+  object_class->finalize = xmemory_settings_backend_finalize;
 }
 
 /**
- * g_memory_settings_backend_new:
+ * xmemory_settings_backend_new:
  *
  * Creates a memory-backed #xsettings_backend_t.
  *
@@ -186,7 +186,7 @@ g_memory_settings_backend_class_init (GMemorySettingsBackendClass *class)
  * Since: 2.28
  */
 xsettings_backend_t *
-g_memory_settings_backend_new (void)
+xmemory_settings_backend_new (void)
 {
   return xobject_new (XTYPE_MEMORY_SETTINGS_BACKEND, NULL);
 }

@@ -167,9 +167,9 @@ g_simple_action_group_disconnect (xpointer_t key,
                                   xpointer_t value,
                                   xpointer_t user_data)
 {
-  g_signal_handlers_disconnect_by_func (value, action_enabled_notify,
+  xsignal_handlers_disconnect_by_func (value, action_enabled_notify,
                                         user_data);
-  g_signal_handlers_disconnect_by_func (value, action_state_notify,
+  xsignal_handlers_disconnect_by_func (value, action_state_notify,
                                         user_data);
 }
 
@@ -209,11 +209,11 @@ g_simple_action_group_add_action (xaction_map_t *action_map,
           g_simple_action_group_disconnect (NULL, old_action, simple);
         }
 
-      g_signal_connect (action, "notify::enabled",
+      xsignal_connect (action, "notify::enabled",
                         G_CALLBACK (action_enabled_notify), simple);
 
       if (g_action_get_state_type (action) != NULL)
-        g_signal_connect (action, "notify::state",
+        xsignal_connect (action, "notify::state",
                           G_CALLBACK (action_state_notify), simple);
 
       xhash_table_insert (simple->priv->table,

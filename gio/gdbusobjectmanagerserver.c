@@ -69,26 +69,26 @@ typedef struct
   xdbus_object_manager_server_t *manager;
   xhashtable_t *map_iface_name_to_iface;
   xboolean_t exported;
-} RegistrationData;
+} registration_data_t;
 
-static void registration_data_free (RegistrationData *data);
+static void registration_data_free (registration_data_t *data);
 
 static void export_all (xdbus_object_manager_server_t *manager);
 static void unexport_all (xdbus_object_manager_server_t *manager, xboolean_t only_manager);
 
-static void g_dbus_object_manager_server_emit_interfaces_added (xdbus_object_manager_server_t *manager,
-                                                         RegistrationData   *data,
+static void xdbus_object_manager_server_emit_interfaces_added (xdbus_object_manager_server_t *manager,
+                                                         registration_data_t   *data,
                                                          const xchar_t *const *interfaces,
                                                          const xchar_t *object_path);
 
-static void g_dbus_object_manager_server_emit_interfaces_removed (xdbus_object_manager_server_t *manager,
-                                                           RegistrationData   *data,
+static void xdbus_object_manager_server_emit_interfaces_removed (xdbus_object_manager_server_t *manager,
+                                                           registration_data_t   *data,
                                                            const xchar_t *const *interfaces);
 
-static xboolean_t g_dbus_object_manager_server_unexport_unlocked (xdbus_object_manager_server_t  *manager,
+static xboolean_t xdbus_object_manager_server_unexport_unlocked (xdbus_object_manager_server_t  *manager,
                                                                 const xchar_t               *object_path);
 
-struct _GDBusObjectManagerServerPrivate
+struct _xdbus_object_manager_server_private
 {
   xmutex_t lock;
   xdbus_connection_t *connection;
@@ -105,16 +105,16 @@ enum
   PROP_OBJECT_PATH
 };
 
-static void dbus_object_manager_interface_init (GDBusObjectManagerIface *iface);
+static void dbus_object_manager_interface_init (xdbus_object_manager_iface_t *iface);
 
-G_DEFINE_TYPE_WITH_CODE (xdbus_object_manager_server, g_dbus_object_manager_server, XTYPE_OBJECT,
-                         G_ADD_PRIVATE (xdbus_object_manager_server_t)
+G_DEFINE_TYPE_WITH_CODE (xdbus_object_manager_server, xdbus_object_manager_server, XTYPE_OBJECT,
+                         G_ADD_PRIVATE (xdbus_object_manager_server)
                          G_IMPLEMENT_INTERFACE (XTYPE_DBUS_OBJECT_MANAGER, dbus_object_manager_interface_init))
 
-static void g_dbus_object_manager_server_constructed (xobject_t *object);
+static void xdbus_object_manager_server_constructed (xobject_t *object);
 
 static void
-g_dbus_object_manager_server_finalize (xobject_t *object)
+xdbus_object_manager_server_finalize (xobject_t *object)
 {
   xdbus_object_manager_server_t *manager = G_DBUS_OBJECT_MANAGER_SERVER (object);
 
@@ -129,12 +129,12 @@ g_dbus_object_manager_server_finalize (xobject_t *object)
 
   g_mutex_clear (&manager->priv->lock);
 
-  if (G_OBJECT_CLASS (g_dbus_object_manager_server_parent_class)->finalize != NULL)
-    G_OBJECT_CLASS (g_dbus_object_manager_server_parent_class)->finalize (object);
+  if (G_OBJECT_CLASS (xdbus_object_manager_server_parent_class)->finalize != NULL)
+    G_OBJECT_CLASS (xdbus_object_manager_server_parent_class)->finalize (object);
 }
 
 static void
-g_dbus_object_manager_server_get_property (xobject_t    *object,
+xdbus_object_manager_server_get_property (xobject_t    *object,
                                            xuint_t       prop_id,
                                            xvalue_t     *value,
                                            xparam_spec_t *pspec)
@@ -160,7 +160,7 @@ g_dbus_object_manager_server_get_property (xobject_t    *object,
 }
 
 static void
-g_dbus_object_manager_server_set_property (xobject_t       *object,
+xdbus_object_manager_server_set_property (xobject_t       *object,
                                            xuint_t          prop_id,
                                            const xvalue_t  *value,
                                            xparam_spec_t    *pspec)
@@ -170,7 +170,7 @@ g_dbus_object_manager_server_set_property (xobject_t       *object,
   switch (prop_id)
     {
     case PROP_CONNECTION:
-      g_dbus_object_manager_server_set_connection (manager, xvalue_get_object (value));
+      xdbus_object_manager_server_set_connection (manager, xvalue_get_object (value));
       break;
 
     case PROP_OBJECT_PATH:
@@ -190,14 +190,14 @@ g_dbus_object_manager_server_set_property (xobject_t       *object,
 }
 
 static void
-g_dbus_object_manager_server_class_init (GDBusObjectManagerServerClass *klass)
+xdbus_object_manager_server_class_init (GDBusObjectManagerServerClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->finalize     = g_dbus_object_manager_server_finalize;
-  gobject_class->constructed  = g_dbus_object_manager_server_constructed;
-  gobject_class->set_property = g_dbus_object_manager_server_set_property;
-  gobject_class->get_property = g_dbus_object_manager_server_get_property;
+  gobject_class->finalize     = xdbus_object_manager_server_finalize;
+  gobject_class->constructed  = xdbus_object_manager_server_constructed;
+  gobject_class->set_property = xdbus_object_manager_server_set_property;
+  gobject_class->get_property = xdbus_object_manager_server_get_property;
 
   /**
    * xdbus_object_manager_server_t:connection:
@@ -236,9 +236,9 @@ g_dbus_object_manager_server_class_init (GDBusObjectManagerServerClass *klass)
 }
 
 static void
-g_dbus_object_manager_server_init (xdbus_object_manager_server_t *manager)
+xdbus_object_manager_server_init (xdbus_object_manager_server_t *manager)
 {
-  manager->priv = g_dbus_object_manager_server_get_instance_private (manager);
+  manager->priv = xdbus_object_manager_server_get_instance_private (manager);
   g_mutex_init (&manager->priv->lock);
   manager->priv->map_object_path_to_data = xhash_table_new_full (xstr_hash,
                                                                   xstr_equal,
@@ -247,13 +247,13 @@ g_dbus_object_manager_server_init (xdbus_object_manager_server_t *manager)
 }
 
 /**
- * g_dbus_object_manager_server_new:
+ * xdbus_object_manager_server_new:
  * @object_path: The object path to export the manager object at.
  *
  * Creates a new #xdbus_object_manager_server_t object.
  *
  * The returned server isn't yet exported on any connection. To do so,
- * use g_dbus_object_manager_server_set_connection(). Normally you
+ * use xdbus_object_manager_server_set_connection(). Normally you
  * want to export all of your objects before doing so to avoid
  * [InterfacesAdded](http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-objectmanager)
  * signals being emitted.
@@ -263,7 +263,7 @@ g_dbus_object_manager_server_init (xdbus_object_manager_server_t *manager)
  * Since: 2.30
  */
 xdbus_object_manager_server_t *
-g_dbus_object_manager_server_new (const xchar_t     *object_path)
+xdbus_object_manager_server_new (const xchar_t     *object_path)
 {
   g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
   return G_DBUS_OBJECT_MANAGER_SERVER (xobject_new (XTYPE_DBUS_OBJECT_MANAGER_SERVER,
@@ -272,7 +272,7 @@ g_dbus_object_manager_server_new (const xchar_t     *object_path)
 }
 
 /**
- * g_dbus_object_manager_server_set_connection:
+ * xdbus_object_manager_server_set_connection:
  * @manager: A #xdbus_object_manager_server_t.
  * @connection: (nullable): A #xdbus_connection_t or %NULL.
  *
@@ -280,7 +280,7 @@ g_dbus_object_manager_server_new (const xchar_t     *object_path)
  * @connection is %NULL, stops exporting objects.
  */
 void
-g_dbus_object_manager_server_set_connection (xdbus_object_manager_server_t  *manager,
+xdbus_object_manager_server_set_connection (xdbus_object_manager_server_t  *manager,
                                              xdbus_connection_t           *connection)
 {
   g_return_if_fail (X_IS_DBUS_OBJECT_MANAGER_SERVER (manager));
@@ -313,7 +313,7 @@ g_dbus_object_manager_server_set_connection (xdbus_object_manager_server_t  *man
 }
 
 /**
- * g_dbus_object_manager_server_get_connection:
+ * xdbus_object_manager_server_get_connection:
  * @manager: A #xdbus_object_manager_server_t
  *
  * Gets the #xdbus_connection_t used by @manager.
@@ -325,7 +325,7 @@ g_dbus_object_manager_server_set_connection (xdbus_object_manager_server_t  *man
  * Since: 2.30
  */
 xdbus_connection_t *
-g_dbus_object_manager_server_get_connection (xdbus_object_manager_server_t *manager)
+xdbus_object_manager_server_get_connection (xdbus_object_manager_server_t *manager)
 {
   xdbus_connection_t *ret;
   g_return_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_SERVER (manager), NULL);
@@ -338,7 +338,7 @@ g_dbus_object_manager_server_get_connection (xdbus_object_manager_server_t *mana
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-registration_data_export_interface (RegistrationData        *data,
+registration_data_export_interface (registration_data_t        *data,
                                     xdbus_interface_skeleton_t  *interface_skeleton,
                                     const xchar_t             *object_path)
 {
@@ -375,12 +375,12 @@ registration_data_export_interface (RegistrationData        *data,
       /* emit InterfacesAdded on the ObjectManager object */
       interfaces[0] = info->name;
       interfaces[1] = NULL;
-      g_dbus_object_manager_server_emit_interfaces_added (data->manager, data, interfaces, object_path);
+      xdbus_object_manager_server_emit_interfaces_added (data->manager, data, interfaces, object_path);
     }
 }
 
 static void
-registration_data_unexport_interface (RegistrationData       *data,
+registration_data_unexport_interface (registration_data_t       *data,
                                       xdbus_interface_skeleton_t *interface_skeleton)
 {
   xdbus_interface_info_t *info;
@@ -402,7 +402,7 @@ registration_data_unexport_interface (RegistrationData       *data,
       /* emit InterfacesRemoved on the ObjectManager object */
       interfaces[0] = info->name;
       interfaces[1] = NULL;
-      g_dbus_object_manager_server_emit_interfaces_removed (data->manager, data, interfaces);
+      xdbus_object_manager_server_emit_interfaces_removed (data->manager, data, interfaces);
     }
 }
 
@@ -413,7 +413,7 @@ on_interface_added (xdbus_object_t    *object,
                     xdbus_interface_t *interface,
                     xpointer_t        user_data)
 {
-  RegistrationData *data = user_data;
+  registration_data_t *data = user_data;
   const xchar_t *object_path;
   g_mutex_lock (&data->manager->priv->lock);
   object_path = g_dbus_object_get_object_path (G_DBUS_OBJECT (data->object));
@@ -426,7 +426,7 @@ on_interface_removed (xdbus_object_t    *object,
                       xdbus_interface_t *interface,
                       xpointer_t        user_data)
 {
-  RegistrationData *data = user_data;
+  registration_data_t *data = user_data;
   g_mutex_lock (&data->manager->priv->lock);
   registration_data_unexport_interface (data, G_DBUS_INTERFACE_SKELETON (interface));
   g_mutex_unlock (&data->manager->priv->lock);
@@ -436,7 +436,7 @@ on_interface_removed (xdbus_object_t    *object,
 
 
 static void
-registration_data_free (RegistrationData *data)
+registration_data_free (registration_data_t *data)
 {
   xhash_table_iter_t iter;
   xdbus_interface_skeleton_t *iface;
@@ -450,8 +450,8 @@ registration_data_free (RegistrationData *data)
         g_dbus_interface_skeleton_unexport (iface);
     }
 
-  g_signal_handlers_disconnect_by_func (data->object, G_CALLBACK (on_interface_added), data);
-  g_signal_handlers_disconnect_by_func (data->object, G_CALLBACK (on_interface_removed), data);
+  xsignal_handlers_disconnect_by_func (data->object, G_CALLBACK (on_interface_added), data);
+  xsignal_handlers_disconnect_by_func (data->object, G_CALLBACK (on_interface_removed), data);
   xobject_unref (data->object);
   xhash_table_destroy (data->map_iface_name_to_iface);
   g_free (data);
@@ -488,11 +488,11 @@ is_valid_child_object_path (xdbus_object_manager_server_t *manager,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-g_dbus_object_manager_server_export_unlocked (xdbus_object_manager_server_t  *manager,
+xdbus_object_manager_server_export_unlocked (xdbus_object_manager_server_t  *manager,
                                               xdbus_object_skeleton_t       *object,
                                               const xchar_t               *object_path)
 {
-  RegistrationData *data;
+  registration_data_t *data;
   xlist_t *existing_interfaces;
   xlist_t *l;
   xptr_array_t *interface_names;
@@ -505,9 +505,9 @@ g_dbus_object_manager_server_export_unlocked (xdbus_object_manager_server_t  *ma
 
   data = xhash_table_lookup (manager->priv->map_object_path_to_data, object_path);
   if (data != NULL)
-    g_dbus_object_manager_server_unexport_unlocked (manager, object_path);
+    xdbus_object_manager_server_unexport_unlocked (manager, object_path);
 
-  data = g_new0 (RegistrationData, 1);
+  data = g_new0 (registration_data_t, 1);
   data->object = xobject_ref (object);
   data->manager = manager;
   data->map_iface_name_to_iface = xhash_table_new_full (xstr_hash,
@@ -515,11 +515,11 @@ g_dbus_object_manager_server_export_unlocked (xdbus_object_manager_server_t  *ma
                                                          NULL,
                                                          (xdestroy_notify_t) xobject_unref);
 
-  g_signal_connect (object,
+  xsignal_connect (object,
                     "interface-added",
                     G_CALLBACK (on_interface_added),
                     data);
-  g_signal_connect (object,
+  xsignal_connect (object,
                     "interface-removed",
                     G_CALLBACK (on_interface_removed),
                     data);
@@ -540,7 +540,7 @@ g_dbus_object_manager_server_export_unlocked (xdbus_object_manager_server_t  *ma
   data->exported = TRUE;
 
   /* now emit InterfacesAdded() for all the interfaces */
-  g_dbus_object_manager_server_emit_interfaces_added (manager, data, (const xchar_t *const *) interface_names->pdata, object_path);
+  xdbus_object_manager_server_emit_interfaces_added (manager, data, (const xchar_t *const *) interface_names->pdata, object_path);
   xptr_array_unref (interface_names);
 
   xhash_table_insert (manager->priv->map_object_path_to_data,
@@ -549,7 +549,7 @@ g_dbus_object_manager_server_export_unlocked (xdbus_object_manager_server_t  *ma
 }
 
 /**
- * g_dbus_object_manager_server_export:
+ * xdbus_object_manager_server_export:
  * @manager: A #xdbus_object_manager_server_t.
  * @object: A #xdbus_object_skeleton_t.
  *
@@ -567,22 +567,22 @@ g_dbus_object_manager_server_export_unlocked (xdbus_object_manager_server_t  *ma
  * Since: 2.30
  */
 void
-g_dbus_object_manager_server_export (xdbus_object_manager_server_t  *manager,
+xdbus_object_manager_server_export (xdbus_object_manager_server_t  *manager,
                                      xdbus_object_skeleton_t       *object)
 {
   g_return_if_fail (X_IS_DBUS_OBJECT_MANAGER_SERVER (manager));
   g_mutex_lock (&manager->priv->lock);
-  g_dbus_object_manager_server_export_unlocked (manager, object,
+  xdbus_object_manager_server_export_unlocked (manager, object,
                                                 g_dbus_object_get_object_path (G_DBUS_OBJECT (object)));
   g_mutex_unlock (&manager->priv->lock);
 }
 
 /**
- * g_dbus_object_manager_server_export_uniquely:
+ * xdbus_object_manager_server_export_uniquely:
  * @manager: A #xdbus_object_manager_server_t.
  * @object: An object.
  *
- * Like g_dbus_object_manager_server_export() but appends a string of
+ * Like xdbus_object_manager_server_export() but appends a string of
  * the form _N (with N being a natural number) to @object's object path
  * if an object with the given path already exists. As such, the
  * #xdbus_object_proxy_t:g-object-path property of @object may be modified.
@@ -590,7 +590,7 @@ g_dbus_object_manager_server_export (xdbus_object_manager_server_t  *manager,
  * Since: 2.30
  */
 void
-g_dbus_object_manager_server_export_uniquely (xdbus_object_manager_server_t *manager,
+xdbus_object_manager_server_export_uniquely (xdbus_object_manager_server_t *manager,
                                               xdbus_object_skeleton_t      *object)
 {
   const xchar_t *orixobject_path;
@@ -611,7 +611,7 @@ g_dbus_object_manager_server_export_uniquely (xdbus_object_manager_server_t *man
   modified = FALSE;
   while (TRUE)
     {
-      RegistrationData *data;
+      registration_data_t *data;
       data = xhash_table_lookup (manager->priv->map_object_path_to_data, object_path);
       if (data == NULL)
         {
@@ -622,19 +622,19 @@ g_dbus_object_manager_server_export_uniquely (xdbus_object_manager_server_t *man
       modified = TRUE;
     }
 
-  g_dbus_object_manager_server_export_unlocked (manager, object, object_path);
+  xdbus_object_manager_server_export_unlocked (manager, object, object_path);
 
   g_mutex_unlock (&manager->priv->lock);
 
   if (modified)
-    g_dbus_object_skeleton_set_object_path (G_DBUS_OBJECT_SKELETON (object), object_path);
+    xdbus_object_skeleton_set_object_path (G_DBUS_OBJECT_SKELETON (object), object_path);
 
   g_free (object_path);
 
 }
 
 /**
- * g_dbus_object_manager_server_is_exported:
+ * xdbus_object_manager_server_is_exported:
  * @manager: A #xdbus_object_manager_server_t.
  * @object: An object.
  *
@@ -645,10 +645,10 @@ g_dbus_object_manager_server_export_uniquely (xdbus_object_manager_server_t *man
  * Since: 2.34
  **/
 xboolean_t
-g_dbus_object_manager_server_is_exported (xdbus_object_manager_server_t *manager,
+xdbus_object_manager_server_is_exported (xdbus_object_manager_server_t *manager,
                                           xdbus_object_skeleton_t      *object)
 {
-  RegistrationData *data = NULL;
+  registration_data_t *data = NULL;
   const xchar_t *object_path;
   xboolean_t object_is_exported;
 
@@ -670,10 +670,10 @@ g_dbus_object_manager_server_is_exported (xdbus_object_manager_server_t *manager
 /* ---------------------------------------------------------------------------------------------------- */
 
 static xboolean_t
-g_dbus_object_manager_server_unexport_unlocked (xdbus_object_manager_server_t  *manager,
+xdbus_object_manager_server_unexport_unlocked (xdbus_object_manager_server_t  *manager,
                                                 const xchar_t               *object_path)
 {
-  RegistrationData *data;
+  registration_data_t *data;
   xboolean_t ret;
 
   g_return_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_SERVER (manager), FALSE);
@@ -695,7 +695,7 @@ g_dbus_object_manager_server_unexport_unlocked (xdbus_object_manager_server_t  *
         xptr_array_add (interface_names, (xpointer_t) iface_name);
       xptr_array_add (interface_names, NULL);
       /* now emit InterfacesRemoved() for all the interfaces */
-      g_dbus_object_manager_server_emit_interfaces_removed (manager, data, (const xchar_t *const *) interface_names->pdata);
+      xdbus_object_manager_server_emit_interfaces_removed (manager, data, (const xchar_t *const *) interface_names->pdata);
       xptr_array_unref (interface_names);
 
       xhash_table_remove (manager->priv->map_object_path_to_data, object_path);
@@ -706,7 +706,7 @@ g_dbus_object_manager_server_unexport_unlocked (xdbus_object_manager_server_t  *
 }
 
 /**
- * g_dbus_object_manager_server_unexport:
+ * xdbus_object_manager_server_unexport:
  * @manager: A #xdbus_object_manager_server_t.
  * @object_path: An object path.
  *
@@ -721,13 +721,13 @@ g_dbus_object_manager_server_unexport_unlocked (xdbus_object_manager_server_t  *
  * Since: 2.30
  */
 xboolean_t
-g_dbus_object_manager_server_unexport (xdbus_object_manager_server_t  *manager,
+xdbus_object_manager_server_unexport (xdbus_object_manager_server_t  *manager,
                                        const xchar_t         *object_path)
 {
   xboolean_t ret;
   g_return_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_SERVER (manager), FALSE);
   g_mutex_lock (&manager->priv->lock);
-  ret = g_dbus_object_manager_server_unexport_unlocked (manager, object_path);
+  ret = xdbus_object_manager_server_unexport_unlocked (manager, object_path);
   g_mutex_unlock (&manager->priv->lock);
   return ret;
 }
@@ -864,7 +864,7 @@ manager_method_call (xdbus_connection_t       *connection,
   xdbus_object_manager_server_t *manager = G_DBUS_OBJECT_MANAGER_SERVER (user_data);
   xvariant_builder_t array_builder;
   xhash_table_iter_t object_iter;
-  RegistrationData *data;
+  registration_data_t *data;
 
   g_mutex_lock (&manager->priv->lock);
 
@@ -922,20 +922,20 @@ static const xdbus_interface_vtable_t manager_interface_vtable =
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-g_dbus_object_manager_server_constructed (xobject_t *object)
+xdbus_object_manager_server_constructed (xobject_t *object)
 {
   xdbus_object_manager_server_t *manager = G_DBUS_OBJECT_MANAGER_SERVER (object);
 
   if (manager->priv->connection != NULL)
     export_all (manager);
 
-  if (G_OBJECT_CLASS (g_dbus_object_manager_server_parent_class)->constructed != NULL)
-    G_OBJECT_CLASS (g_dbus_object_manager_server_parent_class)->constructed (object);
+  if (G_OBJECT_CLASS (xdbus_object_manager_server_parent_class)->constructed != NULL)
+    G_OBJECT_CLASS (xdbus_object_manager_server_parent_class)->constructed (object);
 }
 
 static void
-g_dbus_object_manager_server_emit_interfaces_added (xdbus_object_manager_server_t *manager,
-                                                    RegistrationData   *data,
+xdbus_object_manager_server_emit_interfaces_added (xdbus_object_manager_server_t *manager,
+                                                    registration_data_t   *data,
                                                     const xchar_t *const *interfaces,
                                                     const xchar_t *object_path)
 {
@@ -960,7 +960,7 @@ g_dbus_object_manager_server_emit_interfaces_added (xdbus_object_manager_server_
     }
 
   error = NULL;
-  g_dbus_connection_emit_signal (data->manager->priv->connection,
+  xdbus_connection_emit_signal (data->manager->priv->connection,
                                  NULL, /* destination_bus_name */
                                  manager->priv->object_path,
                                  manager_interface_info.name,
@@ -980,8 +980,8 @@ g_dbus_object_manager_server_emit_interfaces_added (xdbus_object_manager_server_
 }
 
 static void
-g_dbus_object_manager_server_emit_interfaces_removed (xdbus_object_manager_server_t *manager,
-                                                      RegistrationData   *data,
+xdbus_object_manager_server_emit_interfaces_removed (xdbus_object_manager_server_t *manager,
+                                                      registration_data_t   *data,
                                                       const xchar_t *const *interfaces)
 {
   xvariant_builder_t array_builder;
@@ -998,7 +998,7 @@ g_dbus_object_manager_server_emit_interfaces_removed (xdbus_object_manager_serve
 
   error = NULL;
   object_path = g_dbus_object_get_object_path (G_DBUS_OBJECT (data->object));
-  g_dbus_connection_emit_signal (data->manager->priv->connection,
+  xdbus_connection_emit_signal (data->manager->priv->connection,
                                  NULL, /* destination_bus_name */
                                  manager->priv->object_path,
                                  manager_interface_info.name,
@@ -1020,12 +1020,12 @@ g_dbus_object_manager_server_emit_interfaces_removed (xdbus_object_manager_serve
 /* ---------------------------------------------------------------------------------------------------- */
 
 static xlist_t *
-g_dbus_object_manager_server_get_objects (xdbus_object_manager_t  *_manager)
+xdbus_object_manager_server_get_objects (xdbus_object_manager_t  *_manager)
 {
   xdbus_object_manager_server_t *manager = G_DBUS_OBJECT_MANAGER_SERVER (_manager);
   xlist_t *ret;
   xhash_table_iter_t iter;
-  RegistrationData *data;
+  registration_data_t *data;
 
   g_mutex_lock (&manager->priv->lock);
 
@@ -1042,19 +1042,19 @@ g_dbus_object_manager_server_get_objects (xdbus_object_manager_t  *_manager)
 }
 
 static const xchar_t *
-g_dbus_object_manager_server_get_object_path (xdbus_object_manager_t *_manager)
+xdbus_object_manager_server_get_object_path (xdbus_object_manager_t *_manager)
 {
   xdbus_object_manager_server_t *manager = G_DBUS_OBJECT_MANAGER_SERVER (_manager);
   return manager->priv->object_path;
 }
 
 static xdbus_object_t *
-g_dbus_object_manager_server_get_object (xdbus_object_manager_t *_manager,
+xdbus_object_manager_server_get_object (xdbus_object_manager_t *_manager,
                                          const xchar_t        *object_path)
 {
   xdbus_object_manager_server_t *manager = G_DBUS_OBJECT_MANAGER_SERVER (_manager);
   xdbus_object_t *ret;
-  RegistrationData *data;
+  registration_data_t *data;
 
   ret = NULL;
 
@@ -1068,7 +1068,7 @@ g_dbus_object_manager_server_get_object (xdbus_object_manager_t *_manager,
 }
 
 static xdbus_interface_t *
-g_dbus_object_manager_server_get_interface  (xdbus_object_manager_t  *_manager,
+xdbus_object_manager_server_get_interface  (xdbus_object_manager_t  *_manager,
                                              const xchar_t         *object_path,
                                              const xchar_t         *interface_name)
 {
@@ -1089,12 +1089,12 @@ g_dbus_object_manager_server_get_interface  (xdbus_object_manager_t  *_manager,
 }
 
 static void
-dbus_object_manager_interface_init (GDBusObjectManagerIface *iface)
+dbus_object_manager_interface_init (xdbus_object_manager_iface_t *iface)
 {
-  iface->get_object_path = g_dbus_object_manager_server_get_object_path;
-  iface->get_objects     = g_dbus_object_manager_server_get_objects;
-  iface->get_object      = g_dbus_object_manager_server_get_object;
-  iface->get_interface   = g_dbus_object_manager_server_get_interface;
+  iface->get_object_path = xdbus_object_manager_server_get_object_path;
+  iface->get_objects     = xdbus_object_manager_server_get_objects;
+  iface->get_object      = xdbus_object_manager_server_get_object;
+  iface->get_interface   = xdbus_object_manager_server_get_interface;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1104,7 +1104,7 @@ export_all (xdbus_object_manager_server_t *manager)
 {
   xhash_table_iter_t iter;
   const xchar_t *object_path;
-  RegistrationData *data;
+  registration_data_t *data;
   xhash_table_iter_t iface_iter;
   xdbus_interface_skeleton_t *iface;
   xerror_t *error;
@@ -1113,7 +1113,7 @@ export_all (xdbus_object_manager_server_t *manager)
 
   error = NULL;
   g_warn_if_fail (manager->priv->manager_reg_id == 0);
-  manager->priv->manager_reg_id = g_dbus_connection_register_object (manager->priv->connection,
+  manager->priv->manager_reg_id = xdbus_connection_register_object (manager->priv->connection,
                                                                      manager->priv->object_path,
                                                                      (xdbus_interface_info_t *) &manager_interface_info,
                                                                      &manager_interface_vtable,
@@ -1157,7 +1157,7 @@ static void
 unexport_all (xdbus_object_manager_server_t *manager, xboolean_t only_manager)
 {
   xhash_table_iter_t iter;
-  RegistrationData *data;
+  registration_data_t *data;
   xhash_table_iter_t iface_iter;
   xdbus_interface_skeleton_t *iface;
 
@@ -1166,7 +1166,7 @@ unexport_all (xdbus_object_manager_server_t *manager, xboolean_t only_manager)
   g_warn_if_fail (manager->priv->manager_reg_id > 0);
   if (manager->priv->manager_reg_id > 0)
     {
-      g_warn_if_fail (g_dbus_connection_unregister_object (manager->priv->connection,
+      g_warn_if_fail (xdbus_connection_unregister_object (manager->priv->connection,
                                                            manager->priv->manager_reg_id));
       manager->priv->manager_reg_id = 0;
     }

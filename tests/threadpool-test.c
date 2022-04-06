@@ -23,9 +23,9 @@
 
 G_LOCK_DEFINE_STATIC (thread_counter_pools);
 
-static gulong abs_thread_counter = 0;
-static gulong runninxthread_counter = 0;
-static gulong leftover_task_counter = 0;
+static xulong_t abs_thread_counter = 0;
+static xulong_t runninxthread_counter = 0;
+static xulong_t leftover_task_counter = 0;
 
 G_LOCK_DEFINE_STATIC (last_thread);
 
@@ -33,7 +33,7 @@ static xuint_t last_thread_id = 0;
 
 G_LOCK_DEFINE_STATIC (thread_counter_sort);
 
-static gulong sort_thread_counter = 0;
+static xulong_t sort_thread_counter = 0;
 
 static GThreadPool *idle_pool = NULL;
 

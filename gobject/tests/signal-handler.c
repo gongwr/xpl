@@ -29,12 +29,12 @@ static void
 xobj_class_init (xobj_class_t *class)
 {
   signals[SIGNAL1] =
-    g_signal_new ("signal1",
+    xsignal_new ("signal1",
                   XTYPE_FROM_CLASS (class),
                   G_SIGNAL_RUN_LAST,
                   0, NULL, NULL, NULL, XTYPE_NONE, 0);
   signals[SIGNAL2] =
-    g_signal_new ("signal2",
+    xsignal_new ("signal2",
                   XTYPE_FROM_CLASS (class),
                   G_SIGNAL_RUN_LAST,
                   0, NULL, NULL, NULL, XTYPE_NONE, 0);
@@ -59,7 +59,7 @@ test_connect_many (void)
   g_test_timer_start ();
 
   for (i = 0; i < HANDLERS; i++)
-    g_signal_connect (o, "signal1", G_CALLBACK (nop), NULL);
+    xsignal_connect (o, "signal1", G_CALLBACK (nop), NULL);
 
   time_elapsed = g_test_timer_elapsed ();
 
@@ -72,19 +72,19 @@ static void
 test_disconnect_many_ordered (void)
 {
   xobj_t *o;
-  gulong handlers[HANDLERS];
+  xulong_t handlers[HANDLERS];
   xdouble_t time_elapsed;
   xint_t i;
 
   o = xobject_new (xobj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
-    handlers[i] = g_signal_connect (o, "signal1", G_CALLBACK (nop), NULL);
+    handlers[i] = xsignal_connect (o, "signal1", G_CALLBACK (nop), NULL);
 
   g_test_timer_start ();
 
   for (i = 0; i < HANDLERS; i++)
-    g_signal_handler_disconnect (o, handlers[i]);
+    xsignal_handler_disconnect (o, handlers[i]);
 
   time_elapsed = g_test_timer_elapsed ();
 
@@ -97,19 +97,19 @@ static void
 test_disconnect_many_inverse (void)
 {
   xobj_t *o;
-  gulong handlers[HANDLERS];
+  xulong_t handlers[HANDLERS];
   xdouble_t time_elapsed;
   xint_t i;
 
   o = xobject_new (xobj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
-    handlers[i] = g_signal_connect (o, "signal1", G_CALLBACK (nop), NULL);
+    handlers[i] = xsignal_connect (o, "signal1", G_CALLBACK (nop), NULL);
 
   g_test_timer_start ();
 
   for (i = HANDLERS - 1; i >= 0; i--)
-    g_signal_handler_disconnect (o, handlers[i]);
+    xsignal_handler_disconnect (o, handlers[i]);
 
   time_elapsed = g_test_timer_elapsed ();
 
@@ -122,15 +122,15 @@ static void
 test_disconnect_many_random (void)
 {
   xobj_t *o;
-  gulong handlers[HANDLERS];
-  gulong id;
+  xulong_t handlers[HANDLERS];
+  xulong_t id;
   xdouble_t time_elapsed;
   xint_t i, j;
 
   o = xobject_new (xobj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
-    handlers[i] = g_signal_connect (o, "signal1", G_CALLBACK (nop), NULL);
+    handlers[i] = xsignal_connect (o, "signal1", G_CALLBACK (nop), NULL);
 
   for (i = 0; i < HANDLERS; i++)
     {
@@ -143,7 +143,7 @@ test_disconnect_many_random (void)
   g_test_timer_start ();
 
   for (i = 0; i < HANDLERS; i++)
-    g_signal_handler_disconnect (o, handlers[i]);
+    xsignal_handler_disconnect (o, handlers[i]);
 
   time_elapsed = g_test_timer_elapsed ();
 
@@ -156,8 +156,8 @@ static void
 test_disconnect_2_signals (void)
 {
   xobj_t *o;
-  gulong handlers[HANDLERS];
-  gulong id;
+  xulong_t handlers[HANDLERS];
+  xulong_t id;
   xdouble_t time_elapsed;
   xint_t i, j;
 
@@ -166,9 +166,9 @@ test_disconnect_2_signals (void)
   for (i = 0; i < HANDLERS; i++)
     {
       if (i % 2 == 0)
-        handlers[i] = g_signal_connect (o, "signal1", G_CALLBACK (nop), NULL);
+        handlers[i] = xsignal_connect (o, "signal1", G_CALLBACK (nop), NULL);
       else
-        handlers[i] = g_signal_connect (o, "signal2", G_CALLBACK (nop), NULL);
+        handlers[i] = xsignal_connect (o, "signal2", G_CALLBACK (nop), NULL);
     }
 
   for (i = 0; i < HANDLERS; i++)
@@ -182,7 +182,7 @@ test_disconnect_2_signals (void)
   g_test_timer_start ();
 
   for (i = 0; i < HANDLERS; i++)
-    g_signal_handler_disconnect (o, handlers[i]);
+    xsignal_handler_disconnect (o, handlers[i]);
 
   time_elapsed = g_test_timer_elapsed ();
 
@@ -195,9 +195,9 @@ static void
 test_disconnect_2_objects (void)
 {
   xobj_t *o1, *o2, *o;
-  gulong handlers[HANDLERS];
+  xulong_t handlers[HANDLERS];
   xobj_t *objects[HANDLERS];
-  gulong id;
+  xulong_t id;
   xdouble_t time_elapsed;
   xint_t i, j;
 
@@ -208,12 +208,12 @@ test_disconnect_2_objects (void)
     {
       if (i % 2 == 0)
         {
-          handlers[i] = g_signal_connect (o1, "signal1", G_CALLBACK (nop), NULL);
+          handlers[i] = xsignal_connect (o1, "signal1", G_CALLBACK (nop), NULL);
           objects[i] = o1;
         }
       else
         {
-          handlers[i] = g_signal_connect (o2, "signal1", G_CALLBACK (nop), NULL);
+          handlers[i] = xsignal_connect (o2, "signal1", G_CALLBACK (nop), NULL);
           objects[i] = o2;
         }
     }
@@ -232,7 +232,7 @@ test_disconnect_2_objects (void)
   g_test_timer_start ();
 
   for (i = 0; i < HANDLERS; i++)
-    g_signal_handler_disconnect (objects[i], handlers[i]);
+    xsignal_handler_disconnect (objects[i], handlers[i]);
 
   time_elapsed = g_test_timer_elapsed ();
 
@@ -246,15 +246,15 @@ static void
 test_block_many (void)
 {
   xobj_t *o;
-  gulong handlers[HANDLERS];
-  gulong id;
+  xulong_t handlers[HANDLERS];
+  xulong_t id;
   xdouble_t time_elapsed;
   xint_t i, j;
 
   o = xobject_new (xobj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
-    handlers[i] = g_signal_connect (o, "signal1", G_CALLBACK (nop), NULL);
+    handlers[i] = xsignal_connect (o, "signal1", G_CALLBACK (nop), NULL);
 
   for (i = 0; i < HANDLERS; i++)
     {
@@ -267,10 +267,10 @@ test_block_many (void)
   g_test_timer_start ();
 
   for (i = 0; i < HANDLERS; i++)
-    g_signal_handler_block (o, handlers[i]);
+    xsignal_handler_block (o, handlers[i]);
 
   for (i = HANDLERS - 1; i >= 0; i--)
-    g_signal_handler_unblock (o, handlers[i]);
+    xsignal_handler_unblock (o, handlers[i]);
 
   time_elapsed = g_test_timer_elapsed ();
 

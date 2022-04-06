@@ -118,8 +118,8 @@ struct _GValue
     xint_t	v_int;
     xuint_t	v_uint;
     xlong_t	v_long;
-    gulong	v_ulong;
-    gint64      v_int64;
+    xulong_t	v_ulong;
+    sint64_t      v_int64;
     xuint64_t     v_uint64;
     gfloat	v_float;
     xdouble_t	v_double;

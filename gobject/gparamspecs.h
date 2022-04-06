@@ -718,9 +718,9 @@ struct _GParamSpecULong
 {
   xparam_spec_t    parent_instance;
 
-  gulong        minimum;
-  gulong        maximum;
-  gulong        default_value;
+  xulong_t        minimum;
+  xulong_t        maximum;
+  xulong_t        default_value;
 };
 /**
  * GParamSpecInt64:
@@ -735,9 +735,9 @@ struct _GParamSpecInt64
 {
   xparam_spec_t    parent_instance;
 
-  gint64        minimum;
-  gint64        maximum;
-  gint64        default_value;
+  sint64_t        minimum;
+  sint64_t        maximum;
+  sint64_t        default_value;
 };
 /**
  * GParamSpecUInt64:
@@ -1034,17 +1034,17 @@ XPL_AVAILABLE_IN_ALL
 xparam_spec_t*	g_param_spec_ulong	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
-					  gulong	  minimum,
-					  gulong	  maximum,
-					  gulong	  default_value,
+					  xulong_t	  minimum,
+					  xulong_t	  maximum,
+					  xulong_t	  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
 xparam_spec_t*	g_param_spec_int64	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
-					  gint64       	  minimum,
-					  gint64       	  maximum,
-					  gint64       	  default_value,
+					  sint64_t       	  minimum,
+					  sint64_t       	  maximum,
+					  sint64_t       	  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
 xparam_spec_t*	g_param_spec_uint64	 (const xchar_t	 *name,

@@ -7,7 +7,7 @@ xboolean_t
 xpointer_t
 xconstpointer
 xchar_t
-guchar
+xuchar_t
 
 <SUBSECTION>
 xint_t
@@ -23,7 +23,7 @@ G_MAXUSHORT
 xlong_t
 G_MINLONG
 G_MAXLONG
-gulong
+xulong_t
 G_MAXULONG
 
 <SUBSECTION>
@@ -48,7 +48,7 @@ G_GINT32_FORMAT
 xuint32_t
 G_MAXUINT32
 G_GUINT32_FORMAT
-gint64
+sint64_t
 G_MININT64
 G_MAXINT64
 G_GINT64_MODIFIER
@@ -1300,7 +1300,7 @@ g_io_channel_write_chars
 g_io_channel_write_unichar
 g_io_channel_flush
 g_io_channel_seek_position
-GSeekType
+xseek_type_t
 g_io_channel_shutdown
 
 <SUBSECTION>

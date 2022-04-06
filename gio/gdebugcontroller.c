@@ -28,37 +28,37 @@
 
 /**
  * SECTION:gdebugcontroller
- * @title: GDebugController
+ * @title: xdebug_controller_t
  * @short_description: Debugging controller
  * @include: gio/gio.h
  *
- * #GDebugController is an interface to expose control of debugging features and
+ * #xdebug_controller_t is an interface to expose control of debugging features and
  * debug output.
  *
- * It is implemented on Linux using #GDebugControllerDBus, which exposes a D-Bus
+ * It is implemented on Linux using #xdebug_controller_dbus_t, which exposes a D-Bus
  * interface to allow authenticated peers to control debug features in this
  * process.
  *
  * Whether debug output is enabled is exposed as
- * #GDebugController:debug-enabled. This controls g_log_set_debug_enabled() by
+ * #xdebug_controller_t:debug-enabled. This controls g_log_set_debug_enabled() by
  * default. Application code may connect to the #xobject_t::notify signal for it
  * to control other parts of its debug infrastructure as necessary.
  *
  * If your application or service is using the default GLib log writer function,
- * creating one of the built-in implementations of #GDebugController should be
+ * creating one of the built-in implementations of #xdebug_controller_t should be
  * all that’s needed to dynamically enable or disable debug output.
  *
  * Since: 2.72
  */
 
-G_DEFINE_INTERFACE_WITH_CODE (GDebugController, g_debug_controller, XTYPE_OBJECT,
+G_DEFINE_INTERFACE_WITH_CODE (xdebug_controller, xdebug_controller, XTYPE_OBJECT,
                               xtype_interface_add_prerequisite (g_define_type_id, XTYPE_INITABLE))
 
 static void
-g_debug_controller_default_init (GDebugControllerInterface *iface)
+xdebug_controller_default_init (xdebug_controller_tInterface *iface)
 {
   /**
-   * GDebugController:debug-enabled:
+   * xdebug_controller_t:debug-enabled:
    *
    * %TRUE if debug output should be exposed (for example by forwarding it to
    * the journal), %FALSE otherwise.
@@ -76,16 +76,16 @@ g_debug_controller_default_init (GDebugControllerInterface *iface)
 }
 
 /**
- * g_debug_controller_get_debug_enabled:
- * @self: a #GDebugController
+ * xdebug_controller_get_debug_enabled:
+ * @self: a #xdebug_controller_t
  *
- * Get the value of #GDebugController:debug-enabled.
+ * Get the value of #xdebug_controller_t:debug-enabled.
  *
  * Returns: %TRUE if debug output should be exposed, %FALSE otherwise
  * Since: 2.72
  */
 xboolean_t
-g_debug_controller_get_debug_enabled (GDebugController *self)
+xdebug_controller_get_debug_enabled (xdebug_controller_t *self)
 {
   xboolean_t enabled;
 
@@ -99,16 +99,16 @@ g_debug_controller_get_debug_enabled (GDebugController *self)
 }
 
 /**
- * g_debug_controller_set_debug_enabled:
- * @self: a #GDebugController
+ * xdebug_controller_set_debug_enabled:
+ * @self: a #xdebug_controller_t
  * @debug_enabled: %TRUE if debug output should be exposed, %FALSE otherwise
  *
- * Set the value of #GDebugController:debug-enabled.
+ * Set the value of #xdebug_controller_t:debug-enabled.
  *
  * Since: 2.72
  */
 void
-g_debug_controller_set_debug_enabled (GDebugController *self,
+xdebug_controller_set_debug_enabled (xdebug_controller_t *self,
                                       xboolean_t          debug_enabled)
 {
   g_return_if_fail (X_IS_DEBUG_CONTROLLER (self));

@@ -32,7 +32,7 @@ main (int argc, char **argv)
 
   app = xapplication_new ("org.gtk.TestApplication",
                            G_APPLICATION_HANDLES_COMMAND_LINE);
-  g_signal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
+  xsignal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
   xapplication_set_inactivity_timeout (app, 10000);
 
   status = xapplication_run (app, argc, argv);

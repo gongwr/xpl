@@ -68,7 +68,7 @@ test_connection_flush (void)
   g_assert_no_error (error);
   g_assert (connection != NULL);
 
-  signal_handler_id = g_dbus_connection_signal_subscribe (connection,
+  signal_handler_id = xdbus_connection_signal_subscribe (connection,
                                                           NULL, /* sender */
                                                           "org.gtk.GDBus.FlushInterface",
                                                           "SomeSignal",
@@ -111,7 +111,7 @@ test_connection_flush (void)
       xsource_remove (timeout_mainloop_id);
     }
 
-  g_dbus_connection_signal_unsubscribe (connection, signal_handler_id);
+  xdbus_connection_signal_unsubscribe (connection, signal_handler_id);
   xobject_unref (connection);
 
   session_bus_down ();
@@ -156,7 +156,7 @@ large_message_on_name_appeared (xdbus_connection_t *connection,
   request[n] = '\0';
 
   error = NULL;
-  result = g_dbus_connection_call_sync (connection,
+  result = xdbus_connection_call_sync (connection,
                                         "com.example.TestService",      /* bus name */
                                         "/com/example/test_object_t",      /* object path */
                                         "com.example.Frob",             /* interface name */

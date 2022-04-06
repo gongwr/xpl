@@ -7,16 +7,16 @@ LLVMFuzzerTestOneInput (const unsigned char *data, size_t size)
 {
   xssize_t bytes;
   xdbus_message_t *msg = NULL;
-  guchar *blob = NULL;
+  xuchar_t *blob = NULL;
   xsize_t msg_size;
 
   fuzz_set_logging_func ();
 
-  bytes = xdbus_message_bytes_needed ((guchar*) data, size, NULL);
+  bytes = xdbus_message_bytes_needed ((xuchar_t*) data, size, NULL);
   if (bytes <= 0)
     return 0;
 
-  msg = xdbus_message_new_from_blob ((guchar*) data, size, flags, NULL);
+  msg = xdbus_message_new_from_blob ((xuchar_t*) data, size, flags, NULL);
   if (msg == NULL)
     return 0;
 

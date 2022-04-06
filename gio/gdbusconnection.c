@@ -140,7 +140,7 @@
  *
  * This class is rarely used directly in D-Bus clients. If you are writing
  * a D-Bus client, it is often easier to use the g_bus_own_name(),
- * g_bus_watch_name() or g_dbus_proxy_new_for_bus() APIs.
+ * g_bus_watch_name() or xdbus_proxy_new_for_bus() APIs.
  *
  * As an exception to the usual GLib rule that a particular object must not
  * be used by two threads at the same time, #xdbus_connection_t's methods may be
@@ -148,7 +148,7 @@
  * can safely return the same #xdbus_connection_t when called from any thread.
  *
  * Most of the ways to obtain a #xdbus_connection_t automatically initialize it
- * (i.e. connect to D-Bus): for instance, g_dbus_connection_new() and
+ * (i.e. connect to D-Bus): for instance, xdbus_connection_new() and
  * g_bus_get(), and the synchronous versions of those methods, give you an
  * initialized connection. Language bindings for GIO should use
  * xinitable_new() or xasync_initable_new_async(), which also initialize the
@@ -527,7 +527,7 @@ static xuint_t signals[LAST_SIGNAL] = { 0 };
 static void initable_iface_init       (xinitable_iface_t      *initable_iface);
 static void async_initable_iface_init (xasync_initable_iface_t *async_initable_iface);
 
-G_DEFINE_TYPE_WITH_CODE (xdbus_connection, g_dbus_connection, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (xdbus_connection, xdbus_connection, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (XTYPE_INITABLE, initable_iface_init)
                          G_IMPLEMENT_INTERFACE (XTYPE_ASYNC_INITABLE, async_initable_iface_init)
                          );
@@ -568,7 +568,7 @@ check_initialized (xdbus_connection_t *connection)
 
 typedef enum {
     MAY_BE_UNINITIALIZED = (1<<1)
-} CheckUnclosedFlags;
+} check_unclosed_flags_t;
 
 /*
  * Check the same thing as check_initialized(), and also that the
@@ -582,7 +582,7 @@ typedef enum {
  */
 static xboolean_t
 check_unclosed (xdbus_connection_t     *connection,
-                CheckUnclosedFlags   check,
+                check_unclosed_flags_t   check,
                 xerror_t             **error)
 {
   /* check_initialized() is effectively inlined, so we don't waste time
@@ -611,7 +611,7 @@ check_unclosed (xdbus_connection_t     *connection,
 static xhashtable_t *alive_connections = NULL;
 
 static void
-g_dbus_connection_dispose (xobject_t *object)
+xdbus_connection_dispose (xobject_t *object)
 {
   xdbus_connection_t *connection = G_DBUS_CONNECTION (object);
 
@@ -632,12 +632,12 @@ g_dbus_connection_dispose (xobject_t *object)
   CONNECTION_UNLOCK (connection);
   G_UNLOCK (message_bus_lock);
 
-  if (G_OBJECT_CLASS (g_dbus_connection_parent_class)->dispose != NULL)
-    G_OBJECT_CLASS (g_dbus_connection_parent_class)->dispose (object);
+  if (G_OBJECT_CLASS (xdbus_connection_parent_class)->dispose != NULL)
+    G_OBJECT_CLASS (xdbus_connection_parent_class)->dispose (object);
 }
 
 static void
-g_dbus_connection_finalize (xobject_t *object)
+xdbus_connection_finalize (xobject_t *object)
 {
   xdbus_connection_t *connection = G_DBUS_CONNECTION (object);
 
@@ -691,12 +691,12 @@ g_dbus_connection_finalize (xobject_t *object)
   g_mutex_clear (&connection->init_lock);
   g_mutex_clear (&connection->lock);
 
-  G_OBJECT_CLASS (g_dbus_connection_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xdbus_connection_parent_class)->finalize (object);
 }
 
 /* called in any user thread, with the connection's lock not held */
 static void
-g_dbus_connection_get_property (xobject_t    *object,
+xdbus_connection_get_property (xobject_t    *object,
                                 xuint_t       prop_id,
                                 xvalue_t     *value,
                                 xparam_spec_t *pspec)
@@ -706,31 +706,31 @@ g_dbus_connection_get_property (xobject_t    *object,
   switch (prop_id)
     {
     case PROP_STREAM:
-      xvalue_set_object (value, g_dbus_connection_get_stream (connection));
+      xvalue_set_object (value, xdbus_connection_get_stream (connection));
       break;
 
     case PROP_GUID:
-      xvalue_set_string (value, g_dbus_connection_get_guid (connection));
+      xvalue_set_string (value, xdbus_connection_get_guid (connection));
       break;
 
     case PROP_UNIQUE_NAME:
-      xvalue_set_string (value, g_dbus_connection_get_unique_name (connection));
+      xvalue_set_string (value, xdbus_connection_get_unique_name (connection));
       break;
 
     case PROP_CLOSED:
-      xvalue_set_boolean (value, g_dbus_connection_is_closed (connection));
+      xvalue_set_boolean (value, xdbus_connection_is_closed (connection));
       break;
 
     case PROP_EXIT_ON_CLOSE:
-      xvalue_set_boolean (value, g_dbus_connection_get_exit_on_close (connection));
+      xvalue_set_boolean (value, xdbus_connection_get_exit_on_close (connection));
       break;
 
     case PROP_CAPABILITY_FLAGS:
-      xvalue_set_flags (value, g_dbus_connection_get_capabilities (connection));
+      xvalue_set_flags (value, xdbus_connection_get_capabilities (connection));
       break;
 
     case PROP_FLAGS:
-      xvalue_set_flags (value, g_dbus_connection_get_flags (connection));
+      xvalue_set_flags (value, xdbus_connection_get_flags (connection));
       break;
 
     default:
@@ -741,7 +741,7 @@ g_dbus_connection_get_property (xobject_t    *object,
 
 /* called in any user thread, with the connection's lock not held */
 static void
-g_dbus_connection_set_property (xobject_t      *object,
+xdbus_connection_set_property (xobject_t      *object,
                                 xuint_t         prop_id,
                                 const xvalue_t *value,
                                 xparam_spec_t   *pspec)
@@ -767,7 +767,7 @@ g_dbus_connection_set_property (xobject_t      *object,
       break;
 
     case PROP_EXIT_ON_CLOSE:
-      g_dbus_connection_set_exit_on_close (connection, xvalue_get_boolean (value));
+      xdbus_connection_set_exit_on_close (connection, xvalue_get_boolean (value));
       break;
 
     case PROP_AUTHENTICATION_OBSERVER:
@@ -786,7 +786,7 @@ g_dbus_connection_set_property (xobject_t      *object,
  * the object was constructed.
  */
 static void
-g_dbus_connection_real_closed (xdbus_connection_t *connection,
+xdbus_connection_real_closed (xdbus_connection_t *connection,
                                xboolean_t         remote_peer_vanished,
                                xerror_t          *error)
 {
@@ -805,18 +805,18 @@ g_dbus_connection_real_closed (xdbus_connection_t *connection,
 }
 
 static void
-g_dbus_connection_class_init (GDBusConnectionClass *klass)
+xdbus_connection_class_init (GDBusConnectionClass *klass)
 {
   xobject_class_t *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->finalize     = g_dbus_connection_finalize;
-  gobject_class->dispose      = g_dbus_connection_dispose;
-  gobject_class->set_property = g_dbus_connection_set_property;
-  gobject_class->get_property = g_dbus_connection_get_property;
+  gobject_class->finalize     = xdbus_connection_finalize;
+  gobject_class->dispose      = xdbus_connection_dispose;
+  gobject_class->set_property = xdbus_connection_set_property;
+  gobject_class->get_property = xdbus_connection_get_property;
 
-  klass->closed = g_dbus_connection_real_closed;
+  klass->closed = xdbus_connection_real_closed;
 
   /**
    * xdbus_connection_t:stream:
@@ -1038,7 +1038,7 @@ g_dbus_connection_class_init (GDBusConnectionClass *klass)
    *
    * The cause of this event can be
    *
-   * - If g_dbus_connection_close() is called. In this case
+   * - If xdbus_connection_close() is called. In this case
    *   @remote_peer_vanished is set to %FALSE and @error is %NULL.
    *
    * - If the remote peer closes the connection. In this case
@@ -1053,7 +1053,7 @@ g_dbus_connection_class_init (GDBusConnectionClass *klass)
    *
    * Since: 2.26
    */
-  signals[CLOSED_SIGNAL] = g_signal_new (I_("closed"),
+  signals[CLOSED_SIGNAL] = xsignal_new (I_("closed"),
                                          XTYPE_DBUS_CONNECTION,
                                          G_SIGNAL_RUN_LAST,
                                          G_STRUCT_OFFSET (GDBusConnectionClass, closed),
@@ -1064,13 +1064,13 @@ g_dbus_connection_class_init (GDBusConnectionClass *klass)
                                          2,
                                          XTYPE_BOOLEAN,
                                          XTYPE_ERROR);
-  g_signal_set_va_marshaller (signals[CLOSED_SIGNAL],
+  xsignal_set_va_marshaller (signals[CLOSED_SIGNAL],
                               XTYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_VOID__BOOLEAN_BOXEDv);
 }
 
 static void
-g_dbus_connection_init (xdbus_connection_t *connection)
+xdbus_connection_init (xdbus_connection_t *connection)
 {
   g_mutex_init (&connection->lock);
   g_mutex_init (&connection->init_lock);
@@ -1111,7 +1111,7 @@ g_dbus_connection_init (xdbus_connection_t *connection)
 }
 
 /**
- * g_dbus_connection_get_stream:
+ * xdbus_connection_get_stream:
  * @connection: a #xdbus_connection_t
  *
  * Gets the underlying stream used for IO.
@@ -1125,7 +1125,7 @@ g_dbus_connection_init (xdbus_connection_t *connection)
  * Since: 2.26
  */
 xio_stream_t *
-g_dbus_connection_get_stream (xdbus_connection_t *connection)
+xdbus_connection_get_stream (xdbus_connection_t *connection)
 {
   g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
 
@@ -1137,7 +1137,7 @@ g_dbus_connection_get_stream (xdbus_connection_t *connection)
 }
 
 /**
- * g_dbus_connection_start_message_processing:
+ * xdbus_connection_start_message_processing:
  * @connection: a #xdbus_connection_t
  *
  * If @connection was created with
@@ -1148,7 +1148,7 @@ g_dbus_connection_get_stream (xdbus_connection_t *connection)
  * Since: 2.26
  */
 void
-g_dbus_connection_start_message_processing (xdbus_connection_t *connection)
+xdbus_connection_start_message_processing (xdbus_connection_t *connection)
 {
   g_return_if_fail (X_IS_DBUS_CONNECTION (connection));
 
@@ -1161,7 +1161,7 @@ g_dbus_connection_start_message_processing (xdbus_connection_t *connection)
 }
 
 /**
- * g_dbus_connection_is_closed:
+ * xdbus_connection_is_closed:
  * @connection: a #xdbus_connection_t
  *
  * Gets whether @connection is closed.
@@ -1171,7 +1171,7 @@ g_dbus_connection_start_message_processing (xdbus_connection_t *connection)
  * Since: 2.26
  */
 xboolean_t
-g_dbus_connection_is_closed (xdbus_connection_t *connection)
+xdbus_connection_is_closed (xdbus_connection_t *connection)
 {
   xint_t flags;
 
@@ -1183,7 +1183,7 @@ g_dbus_connection_is_closed (xdbus_connection_t *connection)
 }
 
 /**
- * g_dbus_connection_get_capabilities:
+ * xdbus_connection_get_capabilities:
  * @connection: a #xdbus_connection_t
  *
  * Gets the capabilities negotiated with the remote peer
@@ -1193,7 +1193,7 @@ g_dbus_connection_is_closed (xdbus_connection_t *connection)
  * Since: 2.26
  */
 GDBusCapabilityFlags
-g_dbus_connection_get_capabilities (xdbus_connection_t *connection)
+xdbus_connection_get_capabilities (xdbus_connection_t *connection)
 {
   g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), G_DBUS_CAPABILITY_FLAGS_NONE);
 
@@ -1205,7 +1205,7 @@ g_dbus_connection_get_capabilities (xdbus_connection_t *connection)
 }
 
 /**
- * g_dbus_connection_get_flags:
+ * xdbus_connection_get_flags:
  * @connection: a #xdbus_connection_t
  *
  * Gets the flags used to construct this connection
@@ -1215,7 +1215,7 @@ g_dbus_connection_get_capabilities (xdbus_connection_t *connection)
  * Since: 2.60
  */
 GDBusConnectionFlags
-g_dbus_connection_get_flags (xdbus_connection_t *connection)
+xdbus_connection_get_flags (xdbus_connection_t *connection)
 {
   g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), G_DBUS_CONNECTION_FLAGS_NONE);
 
@@ -1237,7 +1237,7 @@ flush_in_thread_func (xtask_t         *task,
 {
   xerror_t *error = NULL;
 
-  if (g_dbus_connection_flush_sync (source_object,
+  if (xdbus_connection_flush_sync (source_object,
                                     cancellable,
                                     &error))
     xtask_return_boolean (task, TRUE);
@@ -1246,7 +1246,7 @@ flush_in_thread_func (xtask_t         *task,
 }
 
 /**
- * g_dbus_connection_flush:
+ * xdbus_connection_flush:
  * @connection: a #xdbus_connection_t
  * @cancellable: (nullable): a #xcancellable_t or %NULL
  * @callback: (nullable): a #xasync_ready_callback_t to call when the
@@ -1264,14 +1264,14 @@ flush_in_thread_func (xtask_t         *task,
  * @callback will be invoked in the
  * [thread-default main context][g-main-context-push-thread-default]
  * of the thread you are calling this method from. You can
- * then call g_dbus_connection_flush_finish() to get the result of the
- * operation. See g_dbus_connection_flush_sync() for the synchronous
+ * then call xdbus_connection_flush_finish() to get the result of the
+ * operation. See xdbus_connection_flush_sync() for the synchronous
  * version.
  *
  * Since: 2.26
  */
 void
-g_dbus_connection_flush (xdbus_connection_t     *connection,
+xdbus_connection_flush (xdbus_connection_t     *connection,
                          xcancellable_t        *cancellable,
                          xasync_ready_callback_t  callback,
                          xpointer_t             user_data)
@@ -1281,26 +1281,26 @@ g_dbus_connection_flush (xdbus_connection_t     *connection,
   g_return_if_fail (X_IS_DBUS_CONNECTION (connection));
 
   task = xtask_new (connection, cancellable, callback, user_data);
-  xtask_set_source_tag (task, g_dbus_connection_flush);
+  xtask_set_source_tag (task, xdbus_connection_flush);
   xtask_run_in_thread (task, flush_in_thread_func);
   xobject_unref (task);
 }
 
 /**
- * g_dbus_connection_flush_finish:
+ * xdbus_connection_flush_finish:
  * @connection: a #xdbus_connection_t
  * @res: a #xasync_result_t obtained from the #xasync_ready_callback_t passed
- *     to g_dbus_connection_flush()
+ *     to xdbus_connection_flush()
  * @error: return location for error or %NULL
  *
- * Finishes an operation started with g_dbus_connection_flush().
+ * Finishes an operation started with xdbus_connection_flush().
  *
  * Returns: %TRUE if the operation succeeded, %FALSE if @error is set
  *
  * Since: 2.26
  */
 xboolean_t
-g_dbus_connection_flush_finish (xdbus_connection_t  *connection,
+xdbus_connection_flush_finish (xdbus_connection_t  *connection,
                                 xasync_result_t     *res,
                                 xerror_t          **error)
 {
@@ -1312,13 +1312,13 @@ g_dbus_connection_flush_finish (xdbus_connection_t  *connection,
 }
 
 /**
- * g_dbus_connection_flush_sync:
+ * xdbus_connection_flush_sync:
  * @connection: a #xdbus_connection_t
  * @cancellable: (nullable): a #xcancellable_t or %NULL
  * @error: return location for error or %NULL
  *
  * Synchronously flushes @connection. The calling thread is blocked
- * until this is done. See g_dbus_connection_flush() for the
+ * until this is done. See xdbus_connection_flush() for the
  * asynchronous version of this method and more details about what it
  * does.
  *
@@ -1327,7 +1327,7 @@ g_dbus_connection_flush_finish (xdbus_connection_t  *connection,
  * Since: 2.26
  */
 xboolean_t
-g_dbus_connection_flush_sync (xdbus_connection_t  *connection,
+xdbus_connection_flush_sync (xdbus_connection_t  *connection,
                               xcancellable_t     *cancellable,
                               xerror_t          **error)
 {
@@ -1386,7 +1386,7 @@ emit_closed_in_idle (xpointer_t user_data)
   xboolean_t result;
 
   xobject_notify (G_OBJECT (data->connection), "closed");
-  g_signal_emit (data->connection,
+  xsignal_emit (data->connection,
                  signals[CLOSED_SIGNAL],
                  0,
                  data->remote_peer_vanished,
@@ -1427,7 +1427,7 @@ schedule_closed_unlocked (xdbus_connection_t *connection,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_connection_close:
+ * xdbus_connection_close:
  * @connection: a #xdbus_connection_t
  * @cancellable: (nullable): a #xcancellable_t or %NULL
  * @callback: (nullable): a #xasync_ready_callback_t to call when the request is
@@ -1441,7 +1441,7 @@ schedule_closed_unlocked (xdbus_connection_t *connection,
  * Once the connection is closed, operations such as sending a message
  * will return with the error %G_IO_ERROR_CLOSED. Closing a connection
  * will not automatically flush the connection so queued messages may
- * be lost. Use g_dbus_connection_flush() if you need such guarantees.
+ * be lost. Use xdbus_connection_flush() if you need such guarantees.
  *
  * If @connection is already closed, this method fails with
  * %G_IO_ERROR_CLOSED.
@@ -1455,14 +1455,14 @@ schedule_closed_unlocked (xdbus_connection_t *connection,
  * @callback will be invoked in the
  * [thread-default main context][g-main-context-push-thread-default]
  * of the thread you are calling this method from. You can
- * then call g_dbus_connection_close_finish() to get the result of the
- * operation. See g_dbus_connection_close_sync() for the synchronous
+ * then call xdbus_connection_close_finish() to get the result of the
+ * operation. See xdbus_connection_close_sync() for the synchronous
  * version.
  *
  * Since: 2.26
  */
 void
-g_dbus_connection_close (xdbus_connection_t     *connection,
+xdbus_connection_close (xdbus_connection_t     *connection,
                          xcancellable_t        *cancellable,
                          xasync_ready_callback_t  callback,
                          xpointer_t             user_data)
@@ -1478,26 +1478,26 @@ g_dbus_connection_close (xdbus_connection_t     *connection,
   g_assert (connection->worker != NULL);
 
   task = xtask_new (connection, cancellable, callback, user_data);
-  xtask_set_source_tag (task, g_dbus_connection_close);
+  xtask_set_source_tag (task, xdbus_connection_close);
   _g_dbus_worker_close (connection->worker, task);
   xobject_unref (task);
 }
 
 /**
- * g_dbus_connection_close_finish:
+ * xdbus_connection_close_finish:
  * @connection: a #xdbus_connection_t
  * @res: a #xasync_result_t obtained from the #xasync_ready_callback_t passed
- *     to g_dbus_connection_close()
+ *     to xdbus_connection_close()
  * @error: return location for error or %NULL
  *
- * Finishes an operation started with g_dbus_connection_close().
+ * Finishes an operation started with xdbus_connection_close().
  *
  * Returns: %TRUE if the operation succeeded, %FALSE if @error is set
  *
  * Since: 2.26
  */
 xboolean_t
-g_dbus_connection_close_finish (xdbus_connection_t  *connection,
+xdbus_connection_close_finish (xdbus_connection_t  *connection,
                                 xasync_result_t     *res,
                                 xerror_t          **error)
 {
@@ -1526,13 +1526,13 @@ sync_close_cb (xobject_t *source_object,
 }
 
 /**
- * g_dbus_connection_close_sync:
+ * xdbus_connection_close_sync:
  * @connection: a #xdbus_connection_t
  * @cancellable: (nullable): a #xcancellable_t or %NULL
  * @error: return location for error or %NULL
  *
  * Synchronously closes @connection. The calling thread is blocked
- * until this is done. See g_dbus_connection_close() for the
+ * until this is done. See xdbus_connection_close() for the
  * asynchronous version of this method and more details about what it
  * does.
  *
@@ -1541,7 +1541,7 @@ sync_close_cb (xobject_t *source_object,
  * Since: 2.26
  */
 xboolean_t
-g_dbus_connection_close_sync (xdbus_connection_t  *connection,
+xdbus_connection_close_sync (xdbus_connection_t  *connection,
                               xcancellable_t     *cancellable,
                               xerror_t          **error)
 {
@@ -1562,9 +1562,9 @@ g_dbus_connection_close_sync (xdbus_connection_t  *connection,
       data.loop = xmain_loop_new (context, TRUE);
       data.result = NULL;
 
-      g_dbus_connection_close (connection, cancellable, sync_close_cb, &data);
+      xdbus_connection_close (connection, cancellable, sync_close_cb, &data);
       xmain_loop_run (data.loop);
-      ret = g_dbus_connection_close_finish (connection, data.result, error);
+      ret = xdbus_connection_close_finish (connection, data.result, error);
 
       xobject_unref (data.result);
       xmain_loop_unref (data.loop);
@@ -1578,14 +1578,14 @@ g_dbus_connection_close_sync (xdbus_connection_t  *connection,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_connection_get_last_serial:
+ * xdbus_connection_get_last_serial:
  * @connection: a #xdbus_connection_t
  *
  * Retrieves the last serial number assigned to a #xdbus_message_t on
  * the current thread. This includes messages sent via both low-level
- * API such as g_dbus_connection_send_message() as well as
- * high-level API such as g_dbus_connection_emit_signal(),
- * g_dbus_connection_call() or g_dbus_proxy_call().
+ * API such as xdbus_connection_send_message() as well as
+ * high-level API such as xdbus_connection_emit_signal(),
+ * xdbus_connection_call() or xdbus_proxy_call().
  *
  * Returns: the last used serial or zero when no message has been sent
  *     within the current thread
@@ -1593,7 +1593,7 @@ g_dbus_connection_close_sync (xdbus_connection_t  *connection,
  * Since: 2.34
  */
 xuint32_t
-g_dbus_connection_get_last_serial (xdbus_connection_t *connection)
+xdbus_connection_get_last_serial (xdbus_connection_t *connection)
 {
   xuint32_t ret;
 
@@ -1611,13 +1611,13 @@ g_dbus_connection_get_last_serial (xdbus_connection_t *connection)
 
 /* Can be called by any thread, with the connection lock held */
 static xboolean_t
-g_dbus_connection_send_message_unlocked (xdbus_connection_t   *connection,
+xdbus_connection_send_message_unlocked (xdbus_connection_t   *connection,
                                          xdbus_message_t      *message,
                                          GDBusSendMessageFlags flags,
                                          xuint32_t           *out_serial,
                                          xerror_t           **error)
 {
-  guchar *blob;
+  xuchar_t *blob;
   xsize_t blob_size;
   xuint32_t serial_to_use;
 
@@ -1702,7 +1702,7 @@ g_dbus_connection_send_message_unlocked (xdbus_connection_t   *connection,
 }
 
 /**
- * g_dbus_connection_send_message:
+ * xdbus_connection_send_message:
  * @connection: a #xdbus_connection_t
  * @message: a #xdbus_message_t
  * @flags: flags affecting how the message is sent
@@ -1738,7 +1738,7 @@ g_dbus_connection_send_message_unlocked (xdbus_connection_t   *connection,
  * Since: 2.26
  */
 xboolean_t
-g_dbus_connection_send_message (xdbus_connection_t        *connection,
+xdbus_connection_send_message (xdbus_connection_t        *connection,
                                 xdbus_message_t           *message,
                                 GDBusSendMessageFlags   flags,
                                 volatile xuint32_t       *out_serial,
@@ -1752,7 +1752,7 @@ g_dbus_connection_send_message (xdbus_connection_t        *connection,
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   CONNECTION_LOCK (connection);
-  ret = g_dbus_connection_send_message_unlocked (connection, message, flags, (xuint32_t *) out_serial, error);
+  ret = xdbus_connection_send_message_unlocked (connection, message, flags, (xuint32_t *) out_serial, error);
   CONNECTION_UNLOCK (connection);
   return ret;
 }
@@ -1763,7 +1763,7 @@ typedef struct
 {
   xuint32_t serial;
 
-  gulong cancellable_handler_id;
+  xulong_t cancellable_handler_id;
 
   xsource_t *timeout_source;
 
@@ -1802,7 +1802,7 @@ send_message_with_reply_cleanup (xtask_t *task, xboolean_t remove)
     }
   if (data->cancellable_handler_id > 0)
     {
-      g_cancellable_disconnect (xtask_get_cancellable (task), data->cancellable_handler_id);
+      xcancellable_disconnect (xtask_get_cancellable (task), data->cancellable_handler_id);
       data->cancellable_handler_id = 0;
     }
 
@@ -1883,7 +1883,7 @@ send_message_with_reply_cancelled_cb (xcancellable_t *cancellable,
   xsource_t *idle_source;
 
   /* postpone cancellation to idle handler since we may be called directly
-   * via g_cancellable_connect() (e.g. holding lock)
+   * via xcancellable_connect() (e.g. holding lock)
    */
   idle_source = g_idle_source_new ();
   xsource_set_static_name (idle_source, "[gio] send_message_with_reply_cancelled_idle_cb");
@@ -1908,7 +1908,7 @@ send_message_with_reply_timeout_cb (xpointer_t user_data)
 
 /* Called from a user thread, connection's lock is held */
 static void
-g_dbus_connection_send_message_with_reply_unlocked (xdbus_connection_t     *connection,
+xdbus_connection_send_message_with_reply_unlocked (xdbus_connection_t     *connection,
                                                     xdbus_message_t        *message,
                                                     GDBusSendMessageFlags flags,
                                                     xint_t                 timeout_msec,
@@ -1931,7 +1931,7 @@ g_dbus_connection_send_message_with_reply_unlocked (xdbus_connection_t     *conn
   data = g_slice_new0 (SendMessageData);
   task = xtask_new (connection, cancellable, callback, user_data);
   xtask_set_source_tag (task,
-                         g_dbus_connection_send_message_with_reply_unlocked);
+                         xdbus_connection_send_message_with_reply_unlocked);
   xtask_set_task_data (task, data, (xdestroy_notify_t) send_message_data_free);
 
   if (xtask_return_error_if_cancelled (task))
@@ -1940,7 +1940,7 @@ g_dbus_connection_send_message_with_reply_unlocked (xdbus_connection_t     *conn
       return;
     }
 
-  if (!g_dbus_connection_send_message_unlocked (connection, message, flags, out_serial, &error))
+  if (!xdbus_connection_send_message_unlocked (connection, message, flags, out_serial, &error))
     {
       xtask_return_error (task, error);
       xobject_unref (task);
@@ -1950,7 +1950,7 @@ g_dbus_connection_send_message_with_reply_unlocked (xdbus_connection_t     *conn
 
   if (cancellable != NULL)
     {
-      data->cancellable_handler_id = g_cancellable_connect (cancellable,
+      data->cancellable_handler_id = xcancellable_connect (cancellable,
                                                             G_CALLBACK (send_message_with_reply_cancelled_cb),
                                                             xobject_ref (task),
                                                             xobject_unref);
@@ -1970,7 +1970,7 @@ g_dbus_connection_send_message_with_reply_unlocked (xdbus_connection_t     *conn
 }
 
 /**
- * g_dbus_connection_send_message_with_reply:
+ * xdbus_connection_send_message_with_reply:
  * @connection: a #xdbus_connection_t
  * @message: a #xdbus_message_t
  * @flags: flags affecting how the message is sent
@@ -2003,8 +2003,8 @@ g_dbus_connection_send_message_with_reply_unlocked (xdbus_connection_t     *conn
  * will be invoked in the
  * [thread-default main context][g-main-context-push-thread-default]
  * of the thread you are calling this method from. You can then call
- * g_dbus_connection_send_message_with_reply_finish() to get the result of the operation.
- * See g_dbus_connection_send_message_with_reply_sync() for the synchronous version.
+ * xdbus_connection_send_message_with_reply_finish() to get the result of the operation.
+ * See xdbus_connection_send_message_with_reply_sync() for the synchronous version.
  *
  * Note that @message must be unlocked, unless @flags contain the
  * %G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL flag.
@@ -2016,7 +2016,7 @@ g_dbus_connection_send_message_with_reply_unlocked (xdbus_connection_t     *conn
  * Since: 2.26
  */
 void
-g_dbus_connection_send_message_with_reply (xdbus_connection_t       *connection,
+xdbus_connection_send_message_with_reply (xdbus_connection_t       *connection,
                                            xdbus_message_t          *message,
                                            GDBusSendMessageFlags  flags,
                                            xint_t                   timeout_msec,
@@ -2031,7 +2031,7 @@ g_dbus_connection_send_message_with_reply (xdbus_connection_t       *connection,
   g_return_if_fail (timeout_msec >= 0 || timeout_msec == -1);
 
   CONNECTION_LOCK (connection);
-  g_dbus_connection_send_message_with_reply_unlocked (connection,
+  xdbus_connection_send_message_with_reply_unlocked (connection,
                                                       message,
                                                       flags,
                                                       timeout_msec,
@@ -2043,13 +2043,13 @@ g_dbus_connection_send_message_with_reply (xdbus_connection_t       *connection,
 }
 
 /**
- * g_dbus_connection_send_message_with_reply_finish:
+ * xdbus_connection_send_message_with_reply_finish:
  * @connection: a #xdbus_connection_t
  * @res: a #xasync_result_t obtained from the #xasync_ready_callback_t passed to
- *     g_dbus_connection_send_message_with_reply()
+ *     xdbus_connection_send_message_with_reply()
  * @error: teturn location for error or %NULL
  *
- * Finishes an operation started with g_dbus_connection_send_message_with_reply().
+ * Finishes an operation started with xdbus_connection_send_message_with_reply().
  *
  * Note that @error is only set if a local in-process error
  * occurred. That is to say that the returned #xdbus_message_t object may
@@ -2065,7 +2065,7 @@ g_dbus_connection_send_message_with_reply (xdbus_connection_t       *connection,
  * Since: 2.26
  */
 xdbus_message_t *
-g_dbus_connection_send_message_with_reply_finish (xdbus_connection_t  *connection,
+xdbus_connection_send_message_with_reply_finish (xdbus_connection_t  *connection,
                                                   xasync_result_t     *res,
                                                   xerror_t          **error)
 {
@@ -2097,7 +2097,7 @@ send_message_with_reply_sync_cb (xdbus_connection_t *connection,
 }
 
 /**
- * g_dbus_connection_send_message_with_reply_sync:
+ * xdbus_connection_send_message_with_reply_sync:
  * @connection: a #xdbus_connection_t
  * @message: a #xdbus_message_t
  * @flags: flags affecting how the message is sent.
@@ -2110,7 +2110,7 @@ send_message_with_reply_sync_cb (xdbus_connection_t *connection,
  *
  * Synchronously sends @message to the peer represented by @connection
  * and blocks the calling thread until a reply is received or the
- * timeout is reached. See g_dbus_connection_send_message_with_reply()
+ * timeout is reached. See xdbus_connection_send_message_with_reply()
  * for the asynchronous version of this method.
  *
  * Unless @flags contain the
@@ -2145,7 +2145,7 @@ send_message_with_reply_sync_cb (xdbus_connection_t *connection,
  * Since: 2.26
  */
 xdbus_message_t *
-g_dbus_connection_send_message_with_reply_sync (xdbus_connection_t        *connection,
+xdbus_connection_send_message_with_reply_sync (xdbus_connection_t        *connection,
                                                 xdbus_message_t           *message,
                                                 GDBusSendMessageFlags   flags,
                                                 xint_t                    timeout_msec,
@@ -2168,7 +2168,7 @@ g_dbus_connection_send_message_with_reply_sync (xdbus_connection_t        *conne
 
   xmain_context_push_thread_default (data.context);
 
-  g_dbus_connection_send_message_with_reply (connection,
+  xdbus_connection_send_message_with_reply (connection,
                                              message,
                                              flags,
                                              timeout_msec,
@@ -2177,7 +2177,7 @@ g_dbus_connection_send_message_with_reply_sync (xdbus_connection_t        *conne
                                              (xasync_ready_callback_t) send_message_with_reply_sync_cb,
                                              &data);
   xmain_loop_run (data.loop);
-  reply = g_dbus_connection_send_message_with_reply_finish (connection,
+  reply = xdbus_connection_send_message_with_reply_finish (connection,
                                                             data.res,
                                                             error);
 
@@ -2640,7 +2640,7 @@ initable_init (xinitable_t     *initable,
           goto out;
         }
 
-      hello_result = g_dbus_connection_call_sync (connection,
+      hello_result = xdbus_connection_call_sync (connection,
                                                   "org.freedesktop.DBus", /* name */
                                                   "/org/freedesktop/DBus", /* path */
                                                   "org.freedesktop.DBus", /* interface */
@@ -2690,7 +2690,7 @@ async_initable_iface_init (xasync_initable_iface_t *async_initable_iface)
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_connection_new:
+ * xdbus_connection_new:
  * @stream: a #xio_stream_t
  * @guid: (nullable): the GUID to use if authenticating as a server or %NULL
  * @flags: flags describing how to make the connection
@@ -2713,17 +2713,17 @@ async_initable_iface_init (xasync_initable_iface_t *async_initable_iface)
  * authentication process.
  *
  * When the operation is finished, @callback will be invoked. You can
- * then call g_dbus_connection_new_finish() to get the result of the
+ * then call xdbus_connection_new_finish() to get the result of the
  * operation.
  *
  * This is an asynchronous failable constructor. See
- * g_dbus_connection_new_sync() for the synchronous
+ * xdbus_connection_new_sync() for the synchronous
  * version.
  *
  * Since: 2.26
  */
 void
-g_dbus_connection_new (xio_stream_t            *stream,
+xdbus_connection_new (xio_stream_t            *stream,
                        const xchar_t          *guid,
                        GDBusConnectionFlags  flags,
                        xdbus_auth_observer_t    *observer,
@@ -2749,12 +2749,12 @@ g_dbus_connection_new (xio_stream_t            *stream,
 }
 
 /**
- * g_dbus_connection_new_finish:
+ * xdbus_connection_new_finish:
  * @res: a #xasync_result_t obtained from the #xasync_ready_callback_t
- *     passed to g_dbus_connection_new().
+ *     passed to xdbus_connection_new().
  * @error: return location for error or %NULL
  *
- * Finishes an operation started with g_dbus_connection_new().
+ * Finishes an operation started with xdbus_connection_new().
  *
  * Returns: (transfer full): a #xdbus_connection_t or %NULL if @error is set. Free
  *     with xobject_unref().
@@ -2762,7 +2762,7 @@ g_dbus_connection_new (xio_stream_t            *stream,
  * Since: 2.26
  */
 xdbus_connection_t *
-g_dbus_connection_new_finish (xasync_result_t  *res,
+xdbus_connection_new_finish (xasync_result_t  *res,
                               xerror_t       **error)
 {
   xobject_t *object;
@@ -2784,7 +2784,7 @@ g_dbus_connection_new_finish (xasync_result_t  *res,
 }
 
 /**
- * g_dbus_connection_new_sync:
+ * xdbus_connection_new_sync:
  * @stream: a #xio_stream_t
  * @guid: (nullable): the GUID to use if authenticating as a server or %NULL
  * @flags: flags describing how to make the connection
@@ -2806,7 +2806,7 @@ g_dbus_connection_new_finish (xasync_result_t  *res,
  * authentication process.
  *
  * This is a synchronous failable constructor. See
- * g_dbus_connection_new() for the asynchronous version.
+ * xdbus_connection_new() for the asynchronous version.
  *
  * Returns: (transfer full): a #xdbus_connection_t or %NULL if @error is set.
  *     Free with xobject_unref().
@@ -2814,7 +2814,7 @@ g_dbus_connection_new_finish (xasync_result_t  *res,
  * Since: 2.26
  */
 xdbus_connection_t *
-g_dbus_connection_new_sync (xio_stream_t             *stream,
+xdbus_connection_new_sync (xio_stream_t             *stream,
                             const xchar_t           *guid,
                             GDBusConnectionFlags   flags,
                             xdbus_auth_observer_t     *observer,
@@ -2838,7 +2838,7 @@ g_dbus_connection_new_sync (xio_stream_t             *stream,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_connection_new_for_address:
+ * xdbus_connection_new_for_address:
  * @address: a D-Bus address
  * @flags: flags describing how to make the connection
  * @observer: (nullable): a #xdbus_auth_observer_t or %NULL
@@ -2852,27 +2852,27 @@ g_dbus_connection_new_sync (xio_stream_t             *stream,
  * [D-Bus address format](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses).
  *
  * This constructor can only be used to initiate client-side
- * connections - use g_dbus_connection_new() if you need to act as the
+ * connections - use xdbus_connection_new() if you need to act as the
  * server. In particular, @flags cannot contain the
  * %G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER,
  * %G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS or
  * %G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER flags.
  *
  * When the operation is finished, @callback will be invoked. You can
- * then call g_dbus_connection_new_for_address_finish() to get the result of
+ * then call xdbus_connection_new_for_address_finish() to get the result of
  * the operation.
  *
  * If @observer is not %NULL it may be used to control the
  * authentication process.
  *
  * This is an asynchronous failable constructor. See
- * g_dbus_connection_new_for_address_sync() for the synchronous
+ * xdbus_connection_new_for_address_sync() for the synchronous
  * version.
  *
  * Since: 2.26
  */
 void
-g_dbus_connection_new_for_address (const xchar_t          *address,
+xdbus_connection_new_for_address (const xchar_t          *address,
                                    GDBusConnectionFlags  flags,
                                    xdbus_auth_observer_t    *observer,
                                    xcancellable_t         *cancellable,
@@ -2896,12 +2896,12 @@ g_dbus_connection_new_for_address (const xchar_t          *address,
 }
 
 /**
- * g_dbus_connection_new_for_address_finish:
+ * xdbus_connection_new_for_address_finish:
  * @res: a #xasync_result_t obtained from the #xasync_ready_callback_t passed
- *     to g_dbus_connection_new()
+ *     to xdbus_connection_new()
  * @error: return location for error or %NULL
  *
- * Finishes an operation started with g_dbus_connection_new_for_address().
+ * Finishes an operation started with xdbus_connection_new_for_address().
  *
  * Returns: (transfer full): a #xdbus_connection_t or %NULL if @error is set.
  *     Free with xobject_unref().
@@ -2909,7 +2909,7 @@ g_dbus_connection_new_for_address (const xchar_t          *address,
  * Since: 2.26
  */
 xdbus_connection_t *
-g_dbus_connection_new_for_address_finish (xasync_result_t  *res,
+xdbus_connection_new_for_address_finish (xasync_result_t  *res,
                                           xerror_t       **error)
 {
   xobject_t *object;
@@ -2931,7 +2931,7 @@ g_dbus_connection_new_for_address_finish (xasync_result_t  *res,
 }
 
 /**
- * g_dbus_connection_new_for_address_sync:
+ * xdbus_connection_new_for_address_sync:
  * @address: a D-Bus address
  * @flags: flags describing how to make the connection
  * @observer: (nullable): a #xdbus_auth_observer_t or %NULL
@@ -2944,14 +2944,14 @@ g_dbus_connection_new_for_address_finish (xasync_result_t  *res,
  * [D-Bus address format](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses).
  *
  * This constructor can only be used to initiate client-side
- * connections - use g_dbus_connection_new_sync() if you need to act
+ * connections - use xdbus_connection_new_sync() if you need to act
  * as the server. In particular, @flags cannot contain the
  * %G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER,
  * %G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS or
  * %G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER flags.
  *
  * This is a synchronous failable constructor. See
- * g_dbus_connection_new_for_address() for the asynchronous version.
+ * xdbus_connection_new_for_address() for the asynchronous version.
  *
  * If @observer is not %NULL it may be used to control the
  * authentication process.
@@ -2962,7 +2962,7 @@ g_dbus_connection_new_for_address_finish (xasync_result_t  *res,
  * Since: 2.26
  */
 xdbus_connection_t *
-g_dbus_connection_new_for_address_sync (const xchar_t           *address,
+xdbus_connection_new_for_address_sync (const xchar_t           *address,
                                         GDBusConnectionFlags   flags,
                                         xdbus_auth_observer_t     *observer,
                                         xcancellable_t          *cancellable,
@@ -2985,7 +2985,7 @@ g_dbus_connection_new_for_address_sync (const xchar_t           *address,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_connection_set_exit_on_close:
+ * xdbus_connection_set_exit_on_close:
  * @connection: a #xdbus_connection_t
  * @exit_on_close: whether the process should be terminated
  *     when @connection is closed by the remote peer
@@ -3004,7 +3004,7 @@ g_dbus_connection_new_for_address_sync (const xchar_t           *address,
  * Since: 2.26
  */
 void
-g_dbus_connection_set_exit_on_close (xdbus_connection_t *connection,
+xdbus_connection_set_exit_on_close (xdbus_connection_t *connection,
                                      xboolean_t         exit_on_close)
 {
   g_return_if_fail (X_IS_DBUS_CONNECTION (connection));
@@ -3017,7 +3017,7 @@ g_dbus_connection_set_exit_on_close (xdbus_connection_t *connection,
 }
 
 /**
- * g_dbus_connection_get_exit_on_close:
+ * xdbus_connection_get_exit_on_close:
  * @connection: a #xdbus_connection_t
  *
  * Gets whether the process is terminated when @connection is
@@ -3030,7 +3030,7 @@ g_dbus_connection_set_exit_on_close (xdbus_connection_t *connection,
  * Since: 2.26
  */
 xboolean_t
-g_dbus_connection_get_exit_on_close (xdbus_connection_t *connection)
+xdbus_connection_get_exit_on_close (xdbus_connection_t *connection)
 {
   g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
 
@@ -3041,7 +3041,7 @@ g_dbus_connection_get_exit_on_close (xdbus_connection_t *connection)
 }
 
 /**
- * g_dbus_connection_get_guid:
+ * xdbus_connection_get_guid:
  * @connection: a #xdbus_connection_t
  *
  * The GUID of the peer performing the role of server when
@@ -3053,14 +3053,14 @@ g_dbus_connection_get_exit_on_close (xdbus_connection_t *connection)
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_connection_get_guid (xdbus_connection_t *connection)
+xdbus_connection_get_guid (xdbus_connection_t *connection)
 {
   g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
   return connection->guid;
 }
 
 /**
- * g_dbus_connection_get_unique_name:
+ * xdbus_connection_get_unique_name:
  * @connection: a #xdbus_connection_t
  *
  * Gets the unique name of @connection as assigned by the message
@@ -3074,7 +3074,7 @@ g_dbus_connection_get_guid (xdbus_connection_t *connection)
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_connection_get_unique_name (xdbus_connection_t *connection)
+xdbus_connection_get_unique_name (xdbus_connection_t *connection)
 {
   g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
 
@@ -3086,7 +3086,7 @@ g_dbus_connection_get_unique_name (xdbus_connection_t *connection)
 }
 
 /**
- * g_dbus_connection_get_peer_credentials:
+ * xdbus_connection_get_peer_credentials:
  * @connection: a #xdbus_connection_t
  *
  * Gets the credentials of the authenticated peer. This will always
@@ -3105,7 +3105,7 @@ g_dbus_connection_get_unique_name (xdbus_connection_t *connection)
  * Since: 2.26
  */
 xcredentials_t *
-g_dbus_connection_get_peer_credentials (xdbus_connection_t *connection)
+xdbus_connection_get_peer_credentials (xdbus_connection_t *connection)
 {
   g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
 
@@ -3121,7 +3121,7 @@ g_dbus_connection_get_peer_credentials (xdbus_connection_t *connection)
 static xuint_t _global_filter_id = 1;  /* (atomic) */
 
 /**
- * g_dbus_connection_add_filter:
+ * xdbus_connection_add_filter:
  * @connection: a #xdbus_connection_t
  * @filter_function: a filter function
  * @user_data: user data to pass to @filter_function
@@ -3139,13 +3139,13 @@ static xuint_t _global_filter_id = 1;  /* (atomic) */
  * Note that filters are run in a dedicated message handling thread so
  * they can't block and, generally, can't do anything but signal a
  * worker thread. Also note that filters are rarely needed - use API
- * such as g_dbus_connection_send_message_with_reply(),
- * g_dbus_connection_signal_subscribe() or g_dbus_connection_call() instead.
+ * such as xdbus_connection_send_message_with_reply(),
+ * xdbus_connection_signal_subscribe() or xdbus_connection_call() instead.
  *
  * If a filter consumes an incoming message the message is not
  * dispatched anywhere else - not even the standard dispatch machinery
- * (that API such as g_dbus_connection_signal_subscribe() and
- * g_dbus_connection_send_message_with_reply() relies on) will see the
+ * (that API such as xdbus_connection_signal_subscribe() and
+ * xdbus_connection_send_message_with_reply() relies on) will see the
  * message. Similarly, if a filter consumes an outgoing message, the
  * message will not be sent to the other peer.
  *
@@ -3157,12 +3157,12 @@ static xuint_t _global_filter_id = 1;  /* (atomic) */
  * destroyed.)
  *
  * Returns: a filter identifier that can be used with
- *     g_dbus_connection_remove_filter()
+ *     xdbus_connection_remove_filter()
  *
  * Since: 2.26
  */
 xuint_t
-g_dbus_connection_add_filter (xdbus_connection_t            *connection,
+xdbus_connection_add_filter (xdbus_connection_t            *connection,
                               GDBusMessageFilterFunction  filter_function,
                               xpointer_t                    user_data,
                               xdestroy_notify_t              user_data_free_func)
@@ -3198,23 +3198,23 @@ purge_all_filters (xdbus_connection_t *connection)
 }
 
 /**
- * g_dbus_connection_remove_filter:
+ * xdbus_connection_remove_filter:
  * @connection: a #xdbus_connection_t
- * @filter_id: an identifier obtained from g_dbus_connection_add_filter()
+ * @filter_id: an identifier obtained from xdbus_connection_add_filter()
  *
  * Removes a filter.
  *
  * Note that since filters run in a different thread, there is a race
  * condition where it is possible that the filter will be running even
- * after calling g_dbus_connection_remove_filter(), so you cannot just
+ * after calling xdbus_connection_remove_filter(), so you cannot just
  * free data that the filter might be using. Instead, you should pass
- * a #xdestroy_notify_t to g_dbus_connection_add_filter(), which will be
+ * a #xdestroy_notify_t to xdbus_connection_add_filter(), which will be
  * called when it is guaranteed that the data is no longer needed.
  *
  * Since: 2.26
  */
 void
-g_dbus_connection_remove_filter (xdbus_connection_t *connection,
+xdbus_connection_remove_filter (xdbus_connection_t *connection,
                                  xuint_t            filter_id)
 {
   xuint_t n;
@@ -3247,7 +3247,7 @@ g_dbus_connection_remove_filter (xdbus_connection_t *connection,
     filter_data_destroy (to_destroy, TRUE);
   else if (!found)
     {
-      g_warning ("g_dbus_connection_remove_filter: No filter found for filter_id %d", filter_id);
+      g_warning ("xdbus_connection_remove_filter: No filter found for filter_id %d", filter_id);
     }
 }
 
@@ -3374,7 +3374,7 @@ add_match_rule (xdbus_connection_t *connection,
                                             "AddMatch");
   xdbus_message_set_body (message, xvariant_new ("(s)", match_rule));
   error = NULL;
-  if (!g_dbus_connection_send_message_unlocked (connection,
+  if (!xdbus_connection_send_message_unlocked (connection,
                                                 message,
                                                 G_DBUS_SEND_MESSAGE_FLAGS_NONE,
                                                 NULL,
@@ -3406,7 +3406,7 @@ remove_match_rule (xdbus_connection_t *connection,
   xdbus_message_set_body (message, xvariant_new ("(s)", match_rule));
 
   error = NULL;
-  if (!g_dbus_connection_send_message_unlocked (connection,
+  if (!xdbus_connection_send_message_unlocked (connection,
                                                 message,
                                                 G_DBUS_SEND_MESSAGE_FLAGS_NONE,
                                                 NULL,
@@ -3437,7 +3437,7 @@ is_signal_data_for_name_lost_or_acquired (SignalData *signal_data)
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_connection_signal_subscribe:
+ * xdbus_connection_signal_subscribe:
  * @connection: a #xdbus_connection_t
  * @sender: (nullable): sender name to match on (unique or well-known name)
  *     or %NULL to listen from all senders
@@ -3485,11 +3485,11 @@ is_signal_data_for_name_lost_or_acquired (SignalData *signal_data)
  *
  * As @callback is potentially invoked in a different thread from where it’s
  * emitted, it’s possible for this to happen after
- * g_dbus_connection_signal_unsubscribe() has been called in another thread.
+ * xdbus_connection_signal_unsubscribe() has been called in another thread.
  * Due to this, @user_data should have a strong reference which is freed with
  * @user_data_free_func, rather than pointing to data whose lifecycle is tied
  * to the signal subscription. For example, if a #xobject_t is used to store the
- * subscription ID from g_dbus_connection_signal_subscribe(), a strong reference
+ * subscription ID from xdbus_connection_signal_subscribe(), a strong reference
  * to that #xobject_t must be passed to @user_data, and xobject_unref() passed to
  * @user_data_free_func. You are responsible for breaking the resulting
  * reference count cycle by explicitly unsubscribing from the signal when
@@ -3497,21 +3497,21 @@ is_signal_data_for_name_lost_or_acquired (SignalData *signal_data)
  * reference may be used.
  *
  * It is guaranteed that if you unsubscribe from a signal using
- * g_dbus_connection_signal_unsubscribe() from the same thread which made the
- * corresponding g_dbus_connection_signal_subscribe() call, @callback will not
- * be invoked after g_dbus_connection_signal_unsubscribe() returns.
+ * xdbus_connection_signal_unsubscribe() from the same thread which made the
+ * corresponding xdbus_connection_signal_subscribe() call, @callback will not
+ * be invoked after xdbus_connection_signal_unsubscribe() returns.
  *
  * The returned subscription identifier is an opaque value which is guaranteed
  * to never be zero.
  *
  * This function can never fail.
  *
- * Returns: a subscription identifier that can be used with g_dbus_connection_signal_unsubscribe()
+ * Returns: a subscription identifier that can be used with xdbus_connection_signal_unsubscribe()
  *
  * Since: 2.26
  */
 xuint_t
-g_dbus_connection_signal_subscribe (xdbus_connection_t     *connection,
+xdbus_connection_signal_subscribe (xdbus_connection_t     *connection,
                                     const xchar_t         *sender,
                                     const xchar_t         *interface_name,
                                     const xchar_t         *member,
@@ -3530,7 +3530,7 @@ g_dbus_connection_signal_subscribe (xdbus_connection_t     *connection,
 
   /* Right now we abort if AddMatch() fails since it can only fail with the bus being in
    * an OOM condition. We might want to change that but that would involve making
-   * g_dbus_connection_signal_subscribe() asynchronous and having the call sites
+   * xdbus_connection_signal_subscribe() asynchronous and having the call sites
    * handle that. And there's really no sensible way of handling this short of retrying
    * to add the match rule... and then there's the little thing that, hey, maybe there's
    * a reason the bus in an OOM condition.
@@ -3686,10 +3686,10 @@ unsubscribe_id_internal (xdbus_connection_t *connection,
           /* remove the match rule from the bus unless NameLost or NameAcquired (see subscribe()) */
           if ((connection->flags & G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION) &&
               !is_signal_data_for_name_lost_or_acquired (signal_data) &&
-              !g_dbus_connection_is_closed (connection) &&
+              !xdbus_connection_is_closed (connection) &&
               !connection->finalizing)
             {
-              /* The check for g_dbus_connection_is_closed() means that
+              /* The check for xdbus_connection_is_closed() means that
                * sending the RemoveMatch message can't fail with
                * G_IO_ERROR_CLOSED, because we're holding the lock,
                * so on_worker_closed() can't happen between the check we just
@@ -3711,10 +3711,10 @@ unsubscribe_id_internal (xdbus_connection_t *connection,
 }
 
 /**
- * g_dbus_connection_signal_unsubscribe:
+ * xdbus_connection_signal_unsubscribe:
  * @connection: a #xdbus_connection_t
  * @subscription_id: a subscription id obtained from
- *     g_dbus_connection_signal_subscribe()
+ *     xdbus_connection_signal_subscribe()
  *
  * Unsubscribes from signals.
  *
@@ -3722,7 +3722,7 @@ unsubscribe_id_internal (xdbus_connection_t *connection,
  * signal subscription) in the current thread-default #xmain_context_t after this
  * function has returned. You should continue to iterate the #xmain_context_t
  * until the #xdestroy_notify_t function passed to
- * g_dbus_connection_signal_subscribe() is called, in order to avoid memory
+ * xdbus_connection_signal_subscribe() is called, in order to avoid memory
  * leaks through callbacks queued on the #xmain_context_t after it’s stopped being
  * iterated.
  * Alternatively, any idle source with a priority lower than %G_PRIORITY_DEFAULT
@@ -3732,7 +3732,7 @@ unsubscribe_id_internal (xdbus_connection_t *connection,
  * Since: 2.26
  */
 void
-g_dbus_connection_signal_unsubscribe (xdbus_connection_t *connection,
+xdbus_connection_signal_unsubscribe (xdbus_connection_t *connection,
                                       xuint_t            subscription_id)
 {
   xuint_t n_subscribers_removed G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
@@ -3761,7 +3761,7 @@ typedef struct
   const xchar_t         *member;
 } SignalInstance;
 
-/* called on delivery thread (e.g. where g_dbus_connection_signal_subscribe() was called) with
+/* called on delivery thread (e.g. where xdbus_connection_signal_subscribe() was called) with
  * no locks held
  */
 static xboolean_t
@@ -4268,7 +4268,7 @@ invoke_get_property_in_idle_cb (xpointer_t _data)
                                                "org.freedesktop.DBus.Error.UnknownMethod",
                                                _("No such interface “org.freedesktop.DBus.Properties” on object at path %s"),
                                                xdbus_message_get_path (data->message));
-      g_dbus_connection_send_message (data->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+      xdbus_connection_send_message (data->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
       xobject_unref (reply);
       goto out;
     }
@@ -4290,7 +4290,7 @@ invoke_get_property_in_idle_cb (xpointer_t _data)
       xvariant_take_ref (value);
       reply = xdbus_message_new_method_reply (data->message);
       xdbus_message_set_body (reply, xvariant_new ("(v)", value));
-      g_dbus_connection_send_message (data->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+      xdbus_connection_send_message (data->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
       xvariant_unref (value);
       xobject_unref (reply);
     }
@@ -4302,7 +4302,7 @@ invoke_get_property_in_idle_cb (xpointer_t _data)
       reply = xdbus_message_new_method_error_literal (data->message,
                                                        dbus_error_name,
                                                        error->message);
-      g_dbus_connection_send_message (data->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+      xdbus_connection_send_message (data->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
       g_free (dbus_error_name);
       xerror_free (error);
       xobject_unref (reply);
@@ -4357,7 +4357,7 @@ invoke_set_property_in_idle_cb (xpointer_t _data)
     }
 
   g_assert (reply != NULL);
-  g_dbus_connection_send_message (data->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+  xdbus_connection_send_message (data->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
   xobject_unref (reply);
   xvariant_unref (value);
 
@@ -4413,7 +4413,7 @@ validate_and_maybe_schedule_property_getset (xdbus_connection_t            *conn
                                                "org.freedesktop.DBus.Error.InvalidArgs",
                                                _("No such property “%s”"),
                                                property_name);
-      g_dbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+      xdbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
       xobject_unref (reply);
       handled = TRUE;
       goto out;
@@ -4425,7 +4425,7 @@ validate_and_maybe_schedule_property_getset (xdbus_connection_t            *conn
                                                "org.freedesktop.DBus.Error.InvalidArgs",
                                                _("Property “%s” is not readable"),
                                                property_name);
-      g_dbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+      xdbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
       xobject_unref (reply);
       handled = TRUE;
       goto out;
@@ -4436,7 +4436,7 @@ validate_and_maybe_schedule_property_getset (xdbus_connection_t            *conn
                                                "org.freedesktop.DBus.Error.InvalidArgs",
                                                _("Property “%s” is not writable"),
                                                property_name);
-      g_dbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+      xdbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
       xobject_unref (reply);
       handled = TRUE;
       goto out;
@@ -4457,7 +4457,7 @@ validate_and_maybe_schedule_property_getset (xdbus_connection_t            *conn
                                                    _("Error setting property “%s”: Expected type “%s” but got “%s”"),
                                                    property_name, property_info->signature,
                                                    xvariant_get_type_string (value));
-          g_dbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+          xdbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
           xvariant_unref (value);
           xobject_unref (reply);
           handled = TRUE;
@@ -4561,7 +4561,7 @@ handle_getset_property (xdbus_connection_t *connection,
                                                "org.freedesktop.DBus.Error.InvalidArgs",
                                                _("No such interface “%s”"),
                                                interface_name);
-      g_dbus_connection_send_message_unlocked (eo->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+      xdbus_connection_send_message_unlocked (eo->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
       xobject_unref (reply);
       handled = TRUE;
       goto out;
@@ -4622,7 +4622,7 @@ invoke_get_all_properties_in_idle_cb (xpointer_t _data)
                                                "org.freedesktop.DBus.Error.UnknownMethod",
                                                _("No such interface “org.freedesktop.DBus.Properties” on object at path %s"),
                                                xdbus_message_get_path (data->message));
-      g_dbus_connection_send_message (data->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+      xdbus_connection_send_message (data->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
       xobject_unref (reply);
       goto out;
     }
@@ -4665,7 +4665,7 @@ invoke_get_all_properties_in_idle_cb (xpointer_t _data)
 
   reply = xdbus_message_new_method_reply (data->message);
   xdbus_message_set_body (reply, xvariant_builder_end (&builder));
-  g_dbus_connection_send_message (data->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+  xdbus_connection_send_message (data->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
   xobject_unref (reply);
 
  out:
@@ -4776,7 +4776,7 @@ handle_get_all_properties (xdbus_connection_t *connection,
                                                "org.freedesktop.DBus.Error.InvalidArgs",
                                                _("No such interface “%s”"),
                                                interface_name);
-      g_dbus_connection_send_message_unlocked (eo->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+      xdbus_connection_send_message_unlocked (eo->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
       xobject_unref (reply);
       handled = TRUE;
       goto out;
@@ -4873,7 +4873,7 @@ maybe_add_path (const xchar_t *path, xsize_t path_len, const xchar_t *object_pat
 /* TODO: we want a nicer public interface for this */
 /* called in any thread with connection's lock held */
 static xchar_t **
-g_dbus_connection_list_registered_unlocked (xdbus_connection_t *connection,
+xdbus_connection_list_registered_unlocked (xdbus_connection_t *connection,
                                             const xchar_t     *path)
 {
   xptr_array_t *p;
@@ -4915,12 +4915,12 @@ g_dbus_connection_list_registered_unlocked (xdbus_connection_t *connection,
 
 /* called in any thread with connection's lock not held */
 static xchar_t **
-g_dbus_connection_list_registered (xdbus_connection_t *connection,
+xdbus_connection_list_registered (xdbus_connection_t *connection,
                                    const xchar_t     *path)
 {
   xchar_t **ret;
   CONNECTION_LOCK (connection);
-  ret = g_dbus_connection_list_registered_unlocked (connection, path);
+  ret = xdbus_connection_list_registered_unlocked (connection, path);
   CONNECTION_UNLOCK (connection);
   return ret;
 }
@@ -4958,7 +4958,7 @@ handle_introspect (xdbus_connection_t *connection,
     g_dbus_interface_info_generate_xml (ei->interface_info, 2, s);
 
   /* finally include nodes registered below us */
-  registered = g_dbus_connection_list_registered_unlocked (connection, eo->object_path);
+  registered = xdbus_connection_list_registered_unlocked (connection, eo->object_path);
   for (n = 0; registered != NULL && registered[n] != NULL; n++)
     xstring_append_printf (s, "  <node name=\"%s\"/>\n", registered[n]);
   xstrfreev (registered);
@@ -4966,7 +4966,7 @@ handle_introspect (xdbus_connection_t *connection,
 
   reply = xdbus_message_new_method_reply (message);
   xdbus_message_set_body (reply, xvariant_new ("(s)", s->str));
-  g_dbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+  xdbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
   xobject_unref (reply);
   xstring_free (s, TRUE);
 
@@ -4999,7 +4999,7 @@ call_in_idle_cb (xpointer_t user_data)
                                                _("No such interface “%s” on object at path %s"),
                                                xdbus_method_invocation_get_interface_name (invocation),
                                                xdbus_method_invocation_get_object_path (invocation));
-      g_dbus_connection_send_message (xdbus_method_invocation_get_connection (invocation), reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+      xdbus_connection_send_message (xdbus_method_invocation_get_connection (invocation), reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
       xobject_unref (reply);
       goto out;
     }
@@ -5099,7 +5099,7 @@ validate_and_maybe_schedule_method_call (xdbus_connection_t            *connecti
                                                "org.freedesktop.DBus.Error.UnknownMethod",
                                                _("No such method “%s”"),
                                                xdbus_message_get_member (message));
-      g_dbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+      xdbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
       xobject_unref (reply);
       handled = TRUE;
       goto out;
@@ -5131,7 +5131,7 @@ validate_and_maybe_schedule_method_call (xdbus_connection_t            *connecti
                                                _("Type of message, “%s”, does not match expected type “%s”"),
                                                xvariant_get_type_string (parameters),
                                                type_string);
-      g_dbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+      xdbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
       xvariant_type_free (in_type);
       xvariant_unref (parameters);
       xobject_unref (reply);
@@ -5235,7 +5235,7 @@ obj_message_func (xdbus_connection_t *connection,
 }
 
 /**
- * g_dbus_connection_register_object:
+ * xdbus_connection_register_object:
  * @connection: a #xdbus_connection_t
  * @object_path: the object path to register at
  * @interface_info: introspection data for the interface
@@ -5284,12 +5284,12 @@ obj_message_func (xdbus_connection_t *connection,
  * See this [server][gdbus-server] for an example of how to use this method.
  *
  * Returns: 0 if @error is set, otherwise a registration id (never 0)
- *     that can be used with g_dbus_connection_unregister_object()
+ *     that can be used with xdbus_connection_unregister_object()
  *
  * Since: 2.26
  */
 xuint_t
-g_dbus_connection_register_object (xdbus_connection_t             *connection,
+xdbus_connection_register_object (xdbus_connection_t             *connection,
                                    const xchar_t                 *object_path,
                                    xdbus_interface_info_t          *interface_info,
                                    const xdbus_interface_vtable_t  *vtable,
@@ -5365,10 +5365,10 @@ g_dbus_connection_register_object (xdbus_connection_t             *connection,
 }
 
 /**
- * g_dbus_connection_unregister_object:
+ * xdbus_connection_unregister_object:
  * @connection: a #xdbus_connection_t
  * @registration_id: a registration id obtained from
- *     g_dbus_connection_register_object()
+ *     xdbus_connection_register_object()
  *
  * Unregisters an object.
  *
@@ -5377,7 +5377,7 @@ g_dbus_connection_register_object (xdbus_connection_t             *connection,
  * Since: 2.26
  */
 xboolean_t
-g_dbus_connection_unregister_object (xdbus_connection_t *connection,
+xdbus_connection_unregister_object (xdbus_connection_t *connection,
                                      xuint_t            registration_id)
 {
   ExportedInterface *ei;
@@ -5621,7 +5621,7 @@ register_with_closures_on_set_property (xdbus_connection_t *connection,
 }
 
 /**
- * g_dbus_connection_register_object_with_closures: (rename-to g_dbus_connection_register_object)
+ * xdbus_connection_register_object_with_closures: (rename-to xdbus_connection_register_object)
  * @connection: A #xdbus_connection_t.
  * @object_path: The object path to register at.
  * @interface_info: Introspection data for the interface.
@@ -5630,16 +5630,16 @@ register_with_closures_on_set_property (xdbus_connection_t *connection,
  * @set_property_closure: (nullable): #xclosure_t for setting a property.
  * @error: Return location for error or %NULL.
  *
- * Version of g_dbus_connection_register_object() using closures instead of a
+ * Version of xdbus_connection_register_object() using closures instead of a
  * #xdbus_interface_vtable_t for easier binding in other languages.
  *
  * Returns: 0 if @error is set, otherwise a registration ID (never 0)
- * that can be used with g_dbus_connection_unregister_object() .
+ * that can be used with xdbus_connection_unregister_object() .
  *
  * Since: 2.46
  */
 xuint_t
-g_dbus_connection_register_object_with_closures (xdbus_connection_t     *connection,
+xdbus_connection_register_object_with_closures (xdbus_connection_t     *connection,
                                                  const xchar_t         *object_path,
                                                  xdbus_interface_info_t  *interface_info,
                                                  xclosure_t            *method_call_closure,
@@ -5658,7 +5658,7 @@ g_dbus_connection_register_object_with_closures (xdbus_connection_t     *connect
 
   data = register_object_data_new (method_call_closure, get_property_closure, set_property_closure);
 
-  return g_dbus_connection_register_object (connection,
+  return xdbus_connection_register_object (connection,
                                             object_path,
                                             interface_info,
                                             &vtable,
@@ -5670,7 +5670,7 @@ g_dbus_connection_register_object_with_closures (xdbus_connection_t     *connect
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_connection_emit_signal:
+ * xdbus_connection_emit_signal:
  * @connection: a #xdbus_connection_t
  * @destination_bus_name: (nullable): the unique bus name for the destination
  *     for the signal or %NULL to emit to all listeners
@@ -5694,7 +5694,7 @@ g_dbus_connection_register_object_with_closures (xdbus_connection_t     *connect
  * Since: 2.26
  */
 xboolean_t
-g_dbus_connection_emit_signal (xdbus_connection_t  *connection,
+xdbus_connection_emit_signal (xdbus_connection_t  *connection,
                                const xchar_t      *destination_bus_name,
                                const xchar_t      *object_path,
                                const xchar_t      *interface_name,
@@ -5742,7 +5742,7 @@ g_dbus_connection_emit_signal (xdbus_connection_t  *connection,
   if (parameters != NULL)
     xdbus_message_set_body (message, parameters);
 
-  ret = g_dbus_connection_send_message (connection, message, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, error);
+  ret = xdbus_connection_send_message (connection, message, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, error);
   xobject_unref (message);
 
   return ret;
@@ -5848,7 +5848,7 @@ call_state_free (CallState *state)
 
 /* called in any thread, with the connection's lock not held */
 static void
-g_dbus_connection_call_done (xobject_t      *source,
+xdbus_connection_call_done (xobject_t      *source,
                              xasync_result_t *result,
                              xpointer_t      user_data)
 {
@@ -5859,7 +5859,7 @@ g_dbus_connection_call_done (xobject_t      *source,
   xdbus_message_t *reply;
   xvariant_t *value = NULL;
 
-  reply = g_dbus_connection_send_message_with_reply_finish (connection,
+  reply = xdbus_connection_send_message_with_reply_finish (connection,
                                                             result,
                                                             &error);
 
@@ -5900,7 +5900,7 @@ g_dbus_connection_call_done (xobject_t      *source,
 
 /* called in any thread, with the connection's lock not held */
 static void
-g_dbus_connection_call_internal (xdbus_connection_t        *connection,
+xdbus_connection_call_internal (xdbus_connection_t        *connection,
                                  const xchar_t            *bus_name,
                                  const xchar_t            *object_path,
                                  const xchar_t            *interface_name,
@@ -5963,16 +5963,16 @@ g_dbus_connection_call_internal (xdbus_connection_t        *connection,
       state->reply_type = xvariant_type_copy (reply_type);
 
       task = xtask_new (connection, cancellable, callback, user_data);
-      xtask_set_source_tag (task, g_dbus_connection_call_internal);
+      xtask_set_source_tag (task, xdbus_connection_call_internal);
       xtask_set_task_data (task, state, (xdestroy_notify_t) call_state_free);
 
-      g_dbus_connection_send_message_with_reply (connection,
+      xdbus_connection_send_message_with_reply (connection,
                                                  message,
                                                  G_DBUS_SEND_MESSAGE_FLAGS_NONE,
                                                  timeout_msec,
                                                  &serial,
                                                  cancellable,
-                                                 g_dbus_connection_call_done,
+                                                 xdbus_connection_call_done,
                                                  task);
     }
   else
@@ -5983,7 +5983,7 @@ g_dbus_connection_call_internal (xdbus_connection_t        *connection,
       flags |= G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED;
       xdbus_message_set_flags (message, flags);
 
-      g_dbus_connection_send_message (connection,
+      xdbus_connection_send_message (connection,
                                       message,
                                       G_DBUS_SEND_MESSAGE_FLAGS_NONE,
                                       &serial, NULL);
@@ -6011,7 +6011,7 @@ g_dbus_connection_call_internal (xdbus_connection_t        *connection,
 
 /* called in any thread, with the connection's lock not held */
 static xvariant_t *
-g_dbus_connection_call_finish_internal (xdbus_connection_t  *connection,
+xdbus_connection_call_finish_internal (xdbus_connection_t  *connection,
                                         xunix_fd_list_t     **out_fd_list,
                                         xasync_result_t     *res,
                                         xerror_t          **error)
@@ -6038,7 +6038,7 @@ g_dbus_connection_call_finish_internal (xdbus_connection_t  *connection,
 
 /* called in any user thread, with the connection's lock not held */
 static xvariant_t *
-g_dbus_connection_call_sync_internal (xdbus_connection_t         *connection,
+xdbus_connection_call_sync_internal (xdbus_connection_t         *connection,
                                       const xchar_t             *bus_name,
                                       const xchar_t             *object_path,
                                       const xchar_t             *interface_name,
@@ -6118,7 +6118,7 @@ g_dbus_connection_call_sync_internal (xdbus_connection_t         *connection,
   if (flags & CALL_FLAGS_INITIALIZING)
     send_flags |= SEND_MESSAGE_FLAGS_INITIALIZING;
 
-  reply = g_dbus_connection_send_message_with_reply_sync (connection,
+  reply = xdbus_connection_send_message_with_reply_sync (connection,
                                                           message,
                                                           send_flags,
                                                           timeout_msec,
@@ -6170,7 +6170,7 @@ g_dbus_connection_call_sync_internal (xdbus_connection_t         *connection,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_connection_call:
+ * xdbus_connection_call:
  * @connection: a #xdbus_connection_t
  * @bus_name: (nullable): a unique or well-known bus name or %NULL if
  *     @connection is not a message bus connection
@@ -6209,7 +6209,7 @@ g_dbus_connection_call_sync_internal (xdbus_connection_t         *connection,
  * If the @parameters #xvariant_t is floating, it is consumed. This allows
  * convenient 'inline' use of xvariant_new(), e.g.:
  * |[<!-- language="C" -->
- *  g_dbus_connection_call (connection,
+ *  xdbus_connection_call (connection,
  *                          "org.freedesktop.StringThings",
  *                          "/org/freedesktop/StringThings",
  *                          "org.freedesktop.StringThings",
@@ -6229,8 +6229,8 @@ g_dbus_connection_call_sync_internal (xdbus_connection_t         *connection,
  * @callback will be invoked in the
  * [thread-default main context][g-main-context-push-thread-default]
  * of the thread you are calling this method from. You can then call
- * g_dbus_connection_call_finish() to get the result of the operation.
- * See g_dbus_connection_call_sync() for the synchronous version of this
+ * xdbus_connection_call_finish() to get the result of the operation.
+ * See xdbus_connection_call_sync() for the synchronous version of this
  * function.
  *
  * If @callback is %NULL then the D-Bus method call message will be sent with
@@ -6239,7 +6239,7 @@ g_dbus_connection_call_sync_internal (xdbus_connection_t         *connection,
  * Since: 2.26
  */
 void
-g_dbus_connection_call (xdbus_connection_t     *connection,
+xdbus_connection_call (xdbus_connection_t     *connection,
                         const xchar_t         *bus_name,
                         const xchar_t         *object_path,
                         const xchar_t         *interface_name,
@@ -6252,16 +6252,16 @@ g_dbus_connection_call (xdbus_connection_t     *connection,
                         xasync_ready_callback_t  callback,
                         xpointer_t             user_data)
 {
-  g_dbus_connection_call_internal (connection, bus_name, object_path, interface_name, method_name, parameters, reply_type, flags, timeout_msec, NULL, cancellable, callback, user_data);
+  xdbus_connection_call_internal (connection, bus_name, object_path, interface_name, method_name, parameters, reply_type, flags, timeout_msec, NULL, cancellable, callback, user_data);
 }
 
 /**
- * g_dbus_connection_call_finish:
+ * xdbus_connection_call_finish:
  * @connection: a #xdbus_connection_t
- * @res: a #xasync_result_t obtained from the #xasync_ready_callback_t passed to g_dbus_connection_call()
+ * @res: a #xasync_result_t obtained from the #xasync_ready_callback_t passed to xdbus_connection_call()
  * @error: return location for error or %NULL
  *
- * Finishes an operation started with g_dbus_connection_call().
+ * Finishes an operation started with xdbus_connection_call().
  *
  * Returns: (transfer full): %NULL if @error is set. Otherwise a non-floating
  *     #xvariant_t tuple with return values. Free with xvariant_unref().
@@ -6269,15 +6269,15 @@ g_dbus_connection_call (xdbus_connection_t     *connection,
  * Since: 2.26
  */
 xvariant_t *
-g_dbus_connection_call_finish (xdbus_connection_t  *connection,
+xdbus_connection_call_finish (xdbus_connection_t  *connection,
                                xasync_result_t     *res,
                                xerror_t          **error)
 {
-  return g_dbus_connection_call_finish_internal (connection, NULL, res, error);
+  return xdbus_connection_call_finish_internal (connection, NULL, res, error);
 }
 
 /**
- * g_dbus_connection_call_sync:
+ * xdbus_connection_call_sync:
  * @connection: a #xdbus_connection_t
  * @bus_name: (nullable): a unique or well-known bus name or %NULL if
  *     @connection is not a message bus connection
@@ -6311,7 +6311,7 @@ g_dbus_connection_call_finish (xdbus_connection_t  *connection,
  * If the @parameters #xvariant_t is floating, it is consumed.
  * This allows convenient 'inline' use of xvariant_new(), e.g.:
  * |[<!-- language="C" -->
- *  g_dbus_connection_call_sync (connection,
+ *  xdbus_connection_call_sync (connection,
  *                               "org.freedesktop.StringThings",
  *                               "/org/freedesktop/StringThings",
  *                               "org.freedesktop.StringThings",
@@ -6327,7 +6327,7 @@ g_dbus_connection_call_finish (xdbus_connection_t  *connection,
  * ]|
  *
  * The calling thread is blocked until a reply is received. See
- * g_dbus_connection_call() for the asynchronous version of
+ * xdbus_connection_call() for the asynchronous version of
  * this method.
  *
  * Returns: (transfer full): %NULL if @error is set. Otherwise a non-floating
@@ -6336,7 +6336,7 @@ g_dbus_connection_call_finish (xdbus_connection_t  *connection,
  * Since: 2.26
  */
 xvariant_t *
-g_dbus_connection_call_sync (xdbus_connection_t     *connection,
+xdbus_connection_call_sync (xdbus_connection_t     *connection,
                              const xchar_t         *bus_name,
                              const xchar_t         *object_path,
                              const xchar_t         *interface_name,
@@ -6348,7 +6348,7 @@ g_dbus_connection_call_sync (xdbus_connection_t     *connection,
                              xcancellable_t        *cancellable,
                              xerror_t             **error)
 {
-  return g_dbus_connection_call_sync_internal (connection, bus_name, object_path, interface_name, method_name, parameters, reply_type, flags, timeout_msec, NULL, NULL, cancellable, error);
+  return xdbus_connection_call_sync_internal (connection, bus_name, object_path, interface_name, method_name, parameters, reply_type, flags, timeout_msec, NULL, NULL, cancellable, error);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -6356,7 +6356,7 @@ g_dbus_connection_call_sync (xdbus_connection_t     *connection,
 #ifdef G_OS_UNIX
 
 /**
- * g_dbus_connection_call_with_unix_fd_list:
+ * xdbus_connection_call_with_unix_fd_list:
  * @connection: a #xdbus_connection_t
  * @bus_name: (nullable): a unique or well-known bus name or %NULL if
  *     @connection is not a message bus connection
@@ -6376,7 +6376,7 @@ g_dbus_connection_call_sync (xdbus_connection_t     *connection,
  *     method invocation
  * @user_data: The data to pass to @callback.
  *
- * Like g_dbus_connection_call() but also takes a #xunix_fd_list_t object.
+ * Like xdbus_connection_call() but also takes a #xunix_fd_list_t object.
  *
  * The file descriptors normally correspond to %G_VARIANT_TYPE_HANDLE
  * values in the body of the message. For example, if a message contains
@@ -6395,7 +6395,7 @@ g_dbus_connection_call_sync (xdbus_connection_t     *connection,
  * Since: 2.30
  */
 void
-g_dbus_connection_call_with_unix_fd_list (xdbus_connection_t     *connection,
+xdbus_connection_call_with_unix_fd_list (xdbus_connection_t     *connection,
                                           const xchar_t         *bus_name,
                                           const xchar_t         *object_path,
                                           const xchar_t         *interface_name,
@@ -6409,18 +6409,18 @@ g_dbus_connection_call_with_unix_fd_list (xdbus_connection_t     *connection,
                                           xasync_ready_callback_t  callback,
                                           xpointer_t             user_data)
 {
-  g_dbus_connection_call_internal (connection, bus_name, object_path, interface_name, method_name, parameters, reply_type, flags, timeout_msec, fd_list, cancellable, callback, user_data);
+  xdbus_connection_call_internal (connection, bus_name, object_path, interface_name, method_name, parameters, reply_type, flags, timeout_msec, fd_list, cancellable, callback, user_data);
 }
 
 /**
- * g_dbus_connection_call_with_unix_fd_list_finish:
+ * xdbus_connection_call_with_unix_fd_list_finish:
  * @connection: a #xdbus_connection_t
  * @out_fd_list: (out) (optional): return location for a #xunix_fd_list_t or %NULL
  * @res: a #xasync_result_t obtained from the #xasync_ready_callback_t passed to
- *     g_dbus_connection_call_with_unix_fd_list()
+ *     xdbus_connection_call_with_unix_fd_list()
  * @error: return location for error or %NULL
  *
- * Finishes an operation started with g_dbus_connection_call_with_unix_fd_list().
+ * Finishes an operation started with xdbus_connection_call_with_unix_fd_list().
  *
  * The file descriptors normally correspond to %G_VARIANT_TYPE_HANDLE
  * values in the body of the message. For example,
@@ -6439,16 +6439,16 @@ g_dbus_connection_call_with_unix_fd_list (xdbus_connection_t     *connection,
  * Since: 2.30
  */
 xvariant_t *
-g_dbus_connection_call_with_unix_fd_list_finish (xdbus_connection_t  *connection,
+xdbus_connection_call_with_unix_fd_list_finish (xdbus_connection_t  *connection,
                                                  xunix_fd_list_t     **out_fd_list,
                                                  xasync_result_t     *res,
                                                  xerror_t          **error)
 {
-  return g_dbus_connection_call_finish_internal (connection, out_fd_list, res, error);
+  return xdbus_connection_call_finish_internal (connection, out_fd_list, res, error);
 }
 
 /**
- * g_dbus_connection_call_with_unix_fd_list_sync:
+ * xdbus_connection_call_with_unix_fd_list_sync:
  * @connection: a #xdbus_connection_t
  * @bus_name: (nullable): a unique or well-known bus name or %NULL
  *     if @connection is not a message bus connection
@@ -6466,9 +6466,9 @@ g_dbus_connection_call_with_unix_fd_list_finish (xdbus_connection_t  *connection
  * @cancellable: (nullable): a #xcancellable_t or %NULL
  * @error: return location for error or %NULL
  *
- * Like g_dbus_connection_call_sync() but also takes and returns #xunix_fd_list_t objects.
- * See g_dbus_connection_call_with_unix_fd_list() and
- * g_dbus_connection_call_with_unix_fd_list_finish() for more details.
+ * Like xdbus_connection_call_sync() but also takes and returns #xunix_fd_list_t objects.
+ * See xdbus_connection_call_with_unix_fd_list() and
+ * xdbus_connection_call_with_unix_fd_list_finish() for more details.
  *
  * This method is only available on UNIX.
  *
@@ -6478,7 +6478,7 @@ g_dbus_connection_call_with_unix_fd_list_finish (xdbus_connection_t  *connection
  * Since: 2.30
  */
 xvariant_t *
-g_dbus_connection_call_with_unix_fd_list_sync (xdbus_connection_t     *connection,
+xdbus_connection_call_with_unix_fd_list_sync (xdbus_connection_t     *connection,
                                                const xchar_t         *bus_name,
                                                const xchar_t         *object_path,
                                                const xchar_t         *interface_name,
@@ -6492,7 +6492,7 @@ g_dbus_connection_call_with_unix_fd_list_sync (xdbus_connection_t     *connectio
                                                xcancellable_t        *cancellable,
                                                xerror_t             **error)
 {
-  return g_dbus_connection_call_sync_internal (connection, bus_name, object_path, interface_name, method_name, parameters, reply_type, flags, timeout_msec, fd_list, out_fd_list, cancellable, error);
+  return xdbus_connection_call_sync_internal (connection, bus_name, object_path, interface_name, method_name, parameters, reply_type, flags, timeout_msec, fd_list, out_fd_list, cancellable, error);
 }
 
 #endif /* G_OS_UNIX */
@@ -6590,7 +6590,7 @@ handle_subtree_introspect (xdbus_connection_t *connection,
     }
 
   /* finally include nodes registered below us */
-  subnode_paths = g_dbus_connection_list_registered (es->connection, requested_object_path);
+  subnode_paths = xdbus_connection_list_registered (es->connection, requested_object_path);
   for (n = 0; subnode_paths != NULL && subnode_paths[n] != NULL; n++)
     xstring_append_printf (s, "  <node name=\"%s\"/>\n", subnode_paths[n]);
   xstrfreev (subnode_paths);
@@ -6599,7 +6599,7 @@ handle_subtree_introspect (xdbus_connection_t *connection,
 
   reply = xdbus_message_new_method_reply (message);
   xdbus_message_set_body (reply, xvariant_new ("(s)", s->str));
-  g_dbus_connection_send_message (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+  xdbus_connection_send_message (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
   xobject_unref (reply);
 
   handled = TRUE;
@@ -6759,7 +6759,7 @@ handle_subtree_method_invocation (xdbus_connection_t *connection,
                                                    "org.freedesktop.DBus.Error.InvalidArgs",
                                                    _("No such interface “%s”"),
                                                    interface_name);
-          g_dbus_connection_send_message (es->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+          xdbus_connection_send_message (es->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
           xobject_unref (reply);
           handled = TRUE;
           goto out;
@@ -6873,7 +6873,7 @@ process_subtree_vtable_message_in_idle_cb (xpointer_t _data)
                                                xdbus_message_get_member (data->message),
                                                xdbus_message_get_interface (data->message),
                                                xdbus_message_get_signature (data->message));
-      g_dbus_connection_send_message (data->es->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+      xdbus_connection_send_message (data->es->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
       xobject_unref (reply);
     }
 
@@ -6912,7 +6912,7 @@ subtree_message_func (xdbus_connection_t *connection,
 }
 
 /**
- * g_dbus_connection_register_subtree:
+ * xdbus_connection_register_subtree:
  * @connection: a #xdbus_connection_t
  * @object_path: the object path to register the subtree at
  * @vtable: a #xdbus_subtree_vtable_t to enumerate, introspect and
@@ -6945,11 +6945,11 @@ subtree_message_func (xdbus_connection_t *connection,
  * then @error is set to %G_IO_ERROR_EXISTS.
  *
  * Note that it is valid to register regular objects (using
- * g_dbus_connection_register_object()) in a subtree registered with
- * g_dbus_connection_register_subtree() - if so, the subtree handler
+ * xdbus_connection_register_object()) in a subtree registered with
+ * xdbus_connection_register_subtree() - if so, the subtree handler
  * is tried as the last resort. One way to think about a subtree
  * handler is to consider it a fallback handler for object paths not
- * registered via g_dbus_connection_register_object() or other bindings.
+ * registered via xdbus_connection_register_object() or other bindings.
  *
  * Note that @vtable will be copied so you cannot change it after
  * registration.
@@ -6958,12 +6958,12 @@ subtree_message_func (xdbus_connection_t *connection,
  * this method.
  *
  * Returns: 0 if @error is set, otherwise a subtree registration ID (never 0)
- * that can be used with g_dbus_connection_unregister_subtree()
+ * that can be used with xdbus_connection_unregister_subtree()
  *
  * Since: 2.26
  */
 xuint_t
-g_dbus_connection_register_subtree (xdbus_connection_t           *connection,
+xdbus_connection_register_subtree (xdbus_connection_t           *connection,
                                     const xchar_t               *object_path,
                                     const xdbus_subtree_vtable_t  *vtable,
                                     GDBusSubtreeFlags          flags,
@@ -7023,10 +7023,10 @@ g_dbus_connection_register_subtree (xdbus_connection_t           *connection,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_connection_unregister_subtree:
+ * xdbus_connection_unregister_subtree:
  * @connection: a #xdbus_connection_t
  * @registration_id: a subtree registration id obtained from
- *     g_dbus_connection_register_subtree()
+ *     xdbus_connection_register_subtree()
  *
  * Unregisters a subtree.
  *
@@ -7035,7 +7035,7 @@ g_dbus_connection_register_subtree (xdbus_connection_t           *connection,
  * Since: 2.26
  */
 xboolean_t
-g_dbus_connection_unregister_subtree (xdbus_connection_t *connection,
+xdbus_connection_unregister_subtree (xdbus_connection_t *connection,
                                       xuint_t            registration_id)
 {
   ExportedSubtree *es;
@@ -7074,7 +7074,7 @@ handle_generic_ping_unlocked (xdbus_connection_t *connection,
 {
   xdbus_message_t *reply;
   reply = xdbus_message_new_method_reply (message);
-  g_dbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+  xdbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
   xobject_unref (reply);
 }
 
@@ -7107,7 +7107,7 @@ handle_generic_get_machine_id_unlocked (xdbus_connection_t *connection,
       reply = xdbus_message_new_method_reply (message);
       xdbus_message_set_body (reply, xvariant_new ("(s)", connection->machine_id));
     }
-  g_dbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+  xdbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
   xobject_unref (reply);
 }
 
@@ -7126,7 +7126,7 @@ handle_generic_introspect_unlocked (xdbus_connection_t *connection,
   s = xstring_new (NULL);
   introspect_append_header (s);
 
-  registered = g_dbus_connection_list_registered_unlocked (connection, object_path);
+  registered = xdbus_connection_list_registered_unlocked (connection, object_path);
   for (n = 0; registered != NULL && registered[n] != NULL; n++)
       xstring_append_printf (s, "  <node name=\"%s\"/>\n", registered[n]);
   xstrfreev (registered);
@@ -7134,7 +7134,7 @@ handle_generic_introspect_unlocked (xdbus_connection_t *connection,
 
   reply = xdbus_message_new_method_reply (message);
   xdbus_message_set_body (reply, xvariant_new ("(s)", s->str));
-  g_dbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+  xdbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
   xobject_unref (reply);
   xstring_free (s, TRUE);
 }
@@ -7283,7 +7283,7 @@ distribute_method_call (xdbus_connection_t *connection,
                                            object_path);
     }
 
-  g_dbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+  xdbus_connection_send_message_unlocked (connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
   xobject_unref (reply);
 
  out:
@@ -7294,7 +7294,7 @@ distribute_method_call (xdbus_connection_t *connection,
 
 /* Called in any user thread, with the message_bus_lock held. */
 static GWeakRef *
-message_bus_get_singleton (GBusType   bus_type,
+message_bus_get_singleton (xbus_type_t   bus_type,
                            xerror_t   **error)
 {
   GWeakRef *ret;
@@ -7357,7 +7357,7 @@ message_bus_get_singleton (GBusType   bus_type,
 
 /* Called in any user thread, without holding locks. */
 static xdbus_connection_t *
-get_uninitialized_connection (GBusType       bus_type,
+get_uninitialized_connection (xbus_type_t       bus_type,
                               xcancellable_t  *cancellable,
                               xerror_t       **error)
 {
@@ -7399,7 +7399,7 @@ get_uninitialized_connection (GBusType       bus_type,
 
 /* May be called from any thread. Must not hold message_bus_lock. */
 xdbus_connection_t *
-_g_bus_get_singleton_if_exists (GBusType bus_type)
+_g_bus_get_singleton_if_exists (xbus_type_t bus_type)
 {
   GWeakRef *singleton;
   xdbus_connection_t *ret = NULL;
@@ -7418,7 +7418,7 @@ _g_bus_get_singleton_if_exists (GBusType bus_type)
 
 /* May be called from any thread. Must not hold message_bus_lock. */
 void
-_g_bus_forget_singleton (GBusType bus_type)
+_g_bus_forget_singleton (xbus_type_t bus_type)
 {
   GWeakRef *singleton;
 
@@ -7434,7 +7434,7 @@ _g_bus_forget_singleton (GBusType bus_type)
 
 /**
  * g_bus_get_sync:
- * @bus_type: a #GBusType
+ * @bus_type: a #xbus_type_t
  * @cancellable: (nullable): a #xcancellable_t or %NULL
  * @error: return location for error or %NULL
  *
@@ -7450,7 +7450,7 @@ _g_bus_forget_singleton (GBusType bus_type)
  * callers of g_bus_get() and g_bus_get_sync() for @bus_type. In the
  * event that you need a private message bus connection, use
  * g_dbus_address_get_for_bus_sync() and
- * g_dbus_connection_new_for_address() with
+ * xdbus_connection_new_for_address() with
  * G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT and
  * G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION flags.
  *
@@ -7463,7 +7463,7 @@ _g_bus_forget_singleton (GBusType bus_type)
  * Since: 2.26
  */
 xdbus_connection_t *
-g_bus_get_sync (GBusType       bus_type,
+g_bus_get_sync (xbus_type_t       bus_type,
                 xcancellable_t  *cancellable,
                 xerror_t       **error)
 {
@@ -7512,7 +7512,7 @@ bus_get_async_initable_cb (xobject_t      *source_object,
 
 /**
  * g_bus_get:
- * @bus_type: a #GBusType
+ * @bus_type: a #xbus_type_t
  * @cancellable: (nullable): a #xcancellable_t or %NULL
  * @callback: a #xasync_ready_callback_t to call when the request is satisfied
  * @user_data: the data to pass to @callback
@@ -7528,7 +7528,7 @@ bus_get_async_initable_cb (xobject_t      *source_object,
  * Since: 2.26
  */
 void
-g_bus_get (GBusType             bus_type,
+g_bus_get (xbus_type_t             bus_type,
            xcancellable_t        *cancellable,
            xasync_ready_callback_t  callback,
            xpointer_t             user_data)
@@ -7571,7 +7571,7 @@ g_bus_get (GBusType             bus_type,
  * callers of g_bus_get() and g_bus_get_sync() for @bus_type. In the
  * event that you need a private message bus connection, use
  * g_dbus_address_get_for_bus_sync() and
- * g_dbus_connection_new_for_address() with
+ * xdbus_connection_new_for_address() with
  * G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT and
  * G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION flags.
  *

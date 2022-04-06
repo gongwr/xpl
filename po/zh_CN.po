@@ -287,8 +287,8 @@ msgid "Seek not supported on base stream"
 msgstr "基流不支持定位"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream"
-msgstr "无法截断 xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
+msgstr "无法截断 xbuffered_input_stream_t"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -3252,8 +3252,8 @@ msgid "Error removing old file: %s"
 msgstr "移除旧文件出错：%s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:762
-msgid "Invalid GSeekType supplied"
-msgstr "提供的 GSeekType 无效"
+msgid "Invalid xseek_type_t supplied"
+msgstr "提供的 xseek_type_t 无效"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"

@@ -54,7 +54,7 @@ struct _GMemoryInputStream
 
 struct _GMemoryInputStreamClass
 {
-  GInputStreamClass parent_class;
+  xinput_stream_class_t parent_class;
 
   /* Padding for future expansion */
   void (*_g_reserved1) (void);

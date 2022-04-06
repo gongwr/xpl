@@ -20,8 +20,8 @@ typedef struct {
 
 xtype_t test_object_get_type (void);
 
-G_DEFINE_TYPE_WITH_CODE (test_object_t, test_object, XTYPE_OBJECT,
-                         G_ADD_PRIVATE (test_object_t))
+G_DEFINE_TYPE_WITH_CODE (test_object, test_object, XTYPE_OBJECT,
+                         G_ADD_PRIVATE (test_object))
 
 static void
 test_object_class_init (test_object_class_t *klass)
@@ -165,7 +165,7 @@ typedef struct {
 } test_mixed_derived_t;
 
 typedef struct {
-  gint64 dummy_4;
+  sint64_t dummy_4;
 } test_mixed_derived_private_t;
 
 typedef struct {
@@ -174,8 +174,8 @@ typedef struct {
 
 xtype_t test_mixed_derived_get_type (void);
 
-G_DEFINE_TYPE_WITH_CODE (test_mixed_derived_t, test_mixed_derived, test_mixed_get_type (),
-                         G_ADD_PRIVATE (test_mixed_derived_t))
+G_DEFINE_TYPE_WITH_CODE (test_mixed_derived, test_mixed_derived, test_mixed_get_type (),
+                         G_ADD_PRIVATE (test_mixed_derived))
 
 static void
 test_mixed_derived_class_init (test_mixed_derived_class_t *klass)
@@ -196,7 +196,7 @@ test_mixed_derived_init (test_mixed_derived_t *self)
   priv->dummy_4 = g_get_monotonic_time ();
 }
 
-static gint64
+static sint64_t
 test_mixed_derived_get_dummy_4 (test_mixed_derived_t *self)
 {
   test_mixed_derived_private_t *priv = test_mixed_derived_get_instance_private (self);

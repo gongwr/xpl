@@ -83,7 +83,7 @@ _g_dbus_hexdump (const xchar_t *data, xsize_t len, xuint_t indent)
          if (m > n && (m%4) == 0)
            xstring_append_c (ret, ' ');
          if (m < len)
-           xstring_append_printf (ret, "%02x ", (guchar) data[m]);
+           xstring_append_printf (ret, "%02x ", (xuchar_t) data[m]);
          else
            xstring_append (ret, "   ");
        }
@@ -728,7 +728,7 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
           xssize_t message_len;
           /* OK, got the header - determine how many more bytes are needed */
           error = NULL;
-          message_len = xdbus_message_bytes_needed ((guchar *) worker->read_buffer,
+          message_len = xdbus_message_bytes_needed ((xuchar_t *) worker->read_buffer,
                                                      16,
                                                      &error);
           if (message_len == -1)
@@ -749,7 +749,7 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
 
           /* TODO: use connection->priv->auth to decode the message */
 
-          message = xdbus_message_new_from_blob ((guchar *) worker->read_buffer,
+          message = xdbus_message_new_from_blob ((xuchar_t *) worker->read_buffer,
                                                   worker->read_buffer_cur_size,
                                                   worker->capabilities,
                                                   &error);
@@ -1490,7 +1490,7 @@ continue_writing (GDBusWorker *worker)
   else if (data != NULL)
     {
       xdbus_message_t *old_message;
-      guchar *new_blob;
+      xuchar_t *new_blob;
       xsize_t new_blob_size;
       xerror_t *error;
 
@@ -1677,7 +1677,7 @@ _g_dbus_worker_new (xio_stream_t                              *stream,
   worker->user_data = user_data;
   worker->stream = xobject_ref (stream);
   worker->capabilities = capabilities;
-  worker->cancellable = g_cancellable_new ();
+  worker->cancellable = xcancellable_new ();
   worker->output_pending = PENDING_NONE;
 
   worker->frozen = initially_frozen;
@@ -1725,7 +1725,7 @@ _g_dbus_worker_close (GDBusWorker         *worker,
   /* Don't set worker->close_expected here - we're in the wrong thread.
    * It'll be set before the actual close happens.
    */
-  g_cancellable_cancel (worker->cancellable);
+  xcancellable_cancel (worker->cancellable);
   g_mutex_lock (&worker->write_lock);
   schedule_writing_unlocked (worker, NULL, NULL, close_data);
   g_mutex_unlock (&worker->write_lock);
@@ -2206,7 +2206,7 @@ open_console_window (void)
 }
 
 static void
-idle_timeout_cb (GDBusDaemon *daemon, xpointer_t user_data)
+idle_timeout_cb (xdbus_daemon_t *daemon, xpointer_t user_data)
 {
   xmain_loop_t *loop = user_data;
   xmain_loop_quit (loop);
@@ -2234,7 +2234,7 @@ turn_off_the_starting_cursor (void)
 void __stdcall
 g_win32_run_session_bus (void* hwnd, void* hinst, const char* cmdline, int cmdshow)
 {
-  GDBusDaemon *daemon;
+  xdbus_daemon_t *daemon;
   xmain_loop_t *loop;
   const char *address;
   xerror_t *error = NULL;
@@ -2245,7 +2245,7 @@ g_win32_run_session_bus (void* hwnd, void* hinst, const char* cmdline, int cmdsh
     open_console_window ();
 
   address = "nonce-tcp:";
-  daemon = _g_dbus_daemon_new (address, NULL, &error);
+  daemon = _xdbus_daemon_new (address, NULL, &error);
   if (daemon == NULL)
     {
       g_printerr ("Can't init bus: %s\n", error->message);
@@ -2261,9 +2261,9 @@ g_win32_run_session_bus (void* hwnd, void* hinst, const char* cmdline, int cmdsh
    * if no clients connect to daemon at all.
    * This may lead to infinite run of this daemon process.
    */
-  g_signal_connect (daemon, "idle-timeout", G_CALLBACK (idle_timeout_cb), loop);
+  xsignal_connect (daemon, "idle-timeout", G_CALLBACK (idle_timeout_cb), loop);
 
-  if (publish_session_bus (_g_dbus_daemon_get_address (daemon)))
+  if (publish_session_bus (_xdbus_daemon_get_address (daemon)))
     {
       xmain_loop_run (loop);
 
@@ -2541,7 +2541,7 @@ read_message_print_transport_debug (xssize_t bytes_read,
   serial = 0;
   message_length = 0;
   if (size >= 16)
-    message_length = xdbus_message_bytes_needed ((guchar *) worker->read_buffer, size, NULL);
+    message_length = xdbus_message_bytes_needed ((xuchar_t *) worker->read_buffer, size, NULL);
   if (size >= 1)
     {
       switch (worker->read_buffer[0])
@@ -2578,7 +2578,7 @@ read_message_print_transport_debug (xssize_t bytes_read,
 /* ---------------------------------------------------------------------------------------------------- */
 
 xboolean_t
-_g_signal_accumulator_false_handled (xsignal_invocation_hint_t *ihint,
+_xsignal_accumulator_false_handled (xsignal_invocation_hint_t *ihint,
                                      xvalue_t                *return_accu,
                                      const xvalue_t          *handler_return,
                                      xpointer_t               dummy)
@@ -2617,7 +2617,7 @@ _g_dbus_hexencode (const xchar_t *str,
       xint_t upper_nibble;
       xint_t lower_nibble;
 
-      val = ((const guchar *) str)[n];
+      val = ((const xuchar_t *) str)[n];
       upper_nibble = val >> 4;
       lower_nibble = val & 0x0f;
 

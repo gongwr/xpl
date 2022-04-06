@@ -148,8 +148,8 @@ struct _GIOWin32Channel {
    * Full:     (wrp + 1) % BUFFER_SIZE == rdp
    * Partial:  otherwise
    */
-  guchar *buffer;		/* (Circular) buffer */
-  xint_t wrp, rdp;		/* Buffer indices for writing and reading */
+  xuchar_t *buffer;		/* (Circular) buffer */
+  xint_t wrp, rdp;		/* buffer_t indices for writing and reading */
   HANDLE space_avail_event;
 
   /* Fields used by G_IO_WIN32_SOCKET channels */
@@ -313,7 +313,7 @@ static unsigned __stdcall
 read_thread (void *parameter)
 {
   GIOWin32Channel *channel = parameter;
-  guchar *buffer;
+  xuchar_t *buffer;
   xint_t nbytes;
 
   g_io_channel_ref ((xio_channel_t *)channel);
@@ -340,7 +340,7 @@ read_thread (void *parameter)
 		 channel->thread_id, channel->rdp, channel->wrp);
       if ((channel->wrp + 1) % BUFFER_SIZE == channel->rdp)
 	{
-	  /* Buffer is full */
+	  /* buffer_t is full */
 	  if (channel->debug)
 	    g_print ("read_thread %#x: resetting space_avail\n",
 		     channel->thread_id);
@@ -424,7 +424,7 @@ static unsigned __stdcall
 write_thread (void *parameter)
 {
   GIOWin32Channel *channel = parameter;
-  guchar *buffer;
+  xuchar_t *buffer;
   xint_t nbytes;
 
   g_io_channel_ref ((xio_channel_t *)channel);
@@ -457,7 +457,7 @@ write_thread (void *parameter)
 		 channel->thread_id, channel->rdp, channel->wrp);
       if (channel->wrp == channel->rdp)
 	{
-	  /* Buffer is empty. */
+	  /* buffer_t is empty. */
 	  if (channel->debug)
 	    g_print ("write_thread %#x: resetting space_avail\n",
 		     channel->thread_id);
@@ -644,7 +644,7 @@ buffer_write (GIOWin32Channel *channel,
 
   if ((channel->wrp + 1) % BUFFER_SIZE == channel->rdp)
     {
-      /* Buffer is full */
+      /* buffer_t is full */
       if (channel->debug)
 	g_print ("buffer_write: tid %#x: resetting data_avail\n",
 		 channel->thread_id);
@@ -681,7 +681,7 @@ buffer_write (GIOWin32Channel *channel,
 
   if ((channel->wrp + 1) % BUFFER_SIZE == channel->rdp)
     {
-      /* Buffer is full */
+      /* buffer_t is full */
       if (channel->debug)
 	g_print ("buffer_write: tid %#x: resetting data_avail\n",
 		 channel->thread_id);
@@ -1285,13 +1285,13 @@ g_io_win32_fd_and_console_write (xio_channel_t  *channel,
 
 static GIOStatus
 g_io_win32_fd_seek (xio_channel_t *channel,
-		    gint64      offset,
-		    GSeekType   type,
+		    sint64_t      offset,
+		    xseek_type_t   type,
 		    xerror_t    **err)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
   int whence, errsv;
-  gint64 result;
+  sint64_t result;
 
   switch (type)
     {

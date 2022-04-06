@@ -83,7 +83,7 @@ static xoffset_t  g_memory_input_stream_tell                (xseekable__t       
 static xboolean_t g_memory_input_stream_can_seek            (xseekable__t       *seekable);
 static xboolean_t g_memory_input_stream_seek                (xseekable__t       *seekable,
                                                            xoffset_t          offset,
-                                                           GSeekType        type,
+                                                           xseek_type_t        type,
                                                            xcancellable_t    *cancellable,
                                                            xerror_t         **error);
 static xboolean_t g_memory_input_stream_can_truncate        (xseekable__t       *seekable);
@@ -92,7 +92,7 @@ static xboolean_t g_memory_input_stream_truncate            (xseekable__t       
                                                            xcancellable_t    *cancellable,
                                                            xerror_t         **error);
 
-static void     g_memory_input_stream_pollable_iface_init (GPollableInputStreamInterface *iface);
+static void     g_memory_input_stream_pollable_iface_init (xpollable_input_stream_interface_t *iface);
 static xboolean_t g_memory_input_stream_is_readable         (xpollable_input_stream_t *stream);
 static xsource_t *g_memory_input_stream_create_source       (xpollable_input_stream_t *stream,
 							   xcancellable_t          *cancellable);
@@ -112,7 +112,7 @@ static void
 g_memory_input_stream_class_init (GMemoryInputStreamClass *klass)
 {
   xobject_class_t *object_class;
-  GInputStreamClass *istream_class;
+  xinput_stream_class_t *istream_class;
 
   object_class = G_OBJECT_CLASS (klass);
   object_class->finalize     = g_memory_input_stream_finalize;
@@ -153,7 +153,7 @@ g_memory_input_stream_seekable_iface_init (xseekable_iface_t *iface)
 }
 
 static void
-g_memory_input_stream_pollable_iface_init (GPollableInputStreamInterface *iface)
+g_memory_input_stream_pollable_iface_init (xpollable_input_stream_interface_t *iface)
 {
   iface->is_readable   = g_memory_input_stream_is_readable;
   iface->create_source = g_memory_input_stream_create_source;
@@ -442,7 +442,7 @@ xboolean_t g_memory_input_stream_can_seek (xseekable__t *seekable)
 static xboolean_t
 g_memory_input_stream_seek (xseekable__t     *seekable,
                             xoffset_t        offset,
-                            GSeekType      type,
+                            xseek_type_t      type,
                             xcancellable_t  *cancellable,
                             xerror_t       **error)
 {
@@ -471,7 +471,7 @@ g_memory_input_stream_seek (xseekable__t     *seekable,
       g_set_error_literal (error,
                            G_IO_ERROR,
                            G_IO_ERROR_INVALID_ARGUMENT,
-                           _("Invalid GSeekType supplied"));
+                           _("Invalid xseek_type_t supplied"));
 
       return FALSE;
     }

@@ -384,8 +384,8 @@ g_io_channel_write (xio_channel_t  *channel,
  **/
 GIOError
 g_io_channel_seek (xio_channel_t *channel,
-		   gint64      offset,
-		   GSeekType   type)
+		   sint64_t      offset,
+		   xseek_type_t   type)
 {
   xerror_t *err = NULL;
   GIOError error;
@@ -766,7 +766,7 @@ g_io_channel_error_from_errno (xint_t en)
 
 #ifdef EFAULT
     case EFAULT:
-      g_warning ("Buffer outside valid address space.");
+      g_warning ("buffer_t outside valid address space.");
       return G_IO_CHANNEL_ERROR_FAILED;
 #endif
 
@@ -1065,7 +1065,7 @@ g_io_channel_get_close_on_unref	(xio_channel_t *channel)
  * g_io_channel_seek_position:
  * @channel: a #xio_channel_t
  * @offset: The offset in bytes from the position specified by @type
- * @type: a #GSeekType. The type %G_SEEK_CUR is only allowed in those
+ * @type: a #xseek_type_t. The type %G_SEEK_CUR is only allowed in those
  *                      cases where a call to g_io_channel_set_encoding ()
  *                      is allowed. See the documentation for
  *                      g_io_channel_set_encoding () for details.
@@ -1076,7 +1076,7 @@ g_io_channel_get_close_on_unref	(xio_channel_t *channel)
  * Returns: the status of the operation.
  **/
 /**
- * GSeekType:
+ * xseek_type_t:
  * @G_SEEK_CUR: the current position in the file.
  * @G_SEEK_SET: the start of the file.
  * @G_SEEK_END: the end of the file.
@@ -1086,8 +1086,8 @@ g_io_channel_get_close_on_unref	(xio_channel_t *channel)
  **/
 GIOStatus
 g_io_channel_seek_position (xio_channel_t  *channel,
-                            gint64       offset,
-                            GSeekType    type,
+                            sint64_t       offset,
+                            xseek_type_t    type,
                             xerror_t     **error)
 {
   GIOStatus status;
@@ -1560,7 +1560,7 @@ reencode:
                   status = G_IO_STATUS_NORMAL;
                 break;
               case E2BIG:
-                /* Buffer size at least 6, wrote at least on character */
+                /* buffer_t size at least 6, wrote at least on character */
                 g_assert (inbuf != channel->read_buf->str);
                 goto reencode;
               case EILSEQ:

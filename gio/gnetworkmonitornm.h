@@ -23,7 +23,7 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_NETWORK_MONITOR_NM         (_g_network_monitor_nm_get_type ())
+#define XTYPE_NETWORK_MONITOR_NM         (_xnetwork_monitor_nm_get_type ())
 #define G_NETWORK_MONITOR_NM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NETWORK_MONITOR_NM, GNetworkMonitorNM))
 #define G_NETWORK_MONITOR_NM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NETWORK_MONITOR_NM, GNetworkMonitorNMClass))
 #define X_IS_NETWORK_MONITOR_NM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NETWORK_MONITOR_NM))
@@ -46,7 +46,7 @@ struct _GNetworkMonitorNMClass {
   xnetwork_monitor_netlink_class_t parent_class;
 };
 
-xtype_t _g_network_monitor_nm_get_type (void);
+xtype_t _xnetwork_monitor_nm_get_type (void);
 
 G_END_DECLS
 

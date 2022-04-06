@@ -1263,7 +1263,7 @@ get_session_address_platform_specific (xerror_t **error)
 
 /**
  * g_dbus_address_get_for_bus_sync:
- * @bus_type: a #GBusType
+ * @bus_type: a #xbus_type_t
  * @cancellable: (nullable): a #xcancellable_t or %NULL
  * @error: return location for error or %NULL
  *
@@ -1280,7 +1280,7 @@ get_session_address_platform_specific (xerror_t **error)
  * Since: 2.26
  */
 xchar_t *
-g_dbus_address_get_for_bus_sync (GBusType       bus_type,
+g_dbus_address_get_for_bus_sync (xbus_type_t       bus_type,
                                  xcancellable_t  *cancellable,
                                  xerror_t       **error)
 {

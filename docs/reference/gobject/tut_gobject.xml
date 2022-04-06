@@ -55,10 +55,10 @@
     <para>
       Objects which inherit from xobject_t are allowed to override this
       constructed class method.
-      The example below shows how <type>ViewerFile</type> overrides the parent's construction process:
+      The example below shows how <type>viewer_file_t</type> overrides the parent's construction process:
 <informalexample><programlisting>
 #define VIEWER_TYPE_FILE viewer_file_get_type ()
-G_DECLARE_FINAL_TYPE (ViewerFile, viewer_file, VIEWER, FILE, xobject_t)
+G_DECLARE_FINAL_TYPE (viewer_file_t, viewer_file, VIEWER, FILE, xobject_t)
 
 struct _ViewerFile
 {
@@ -70,7 +70,7 @@ struct _ViewerFile
 };
 
 /* will create viewer_file_get_type and set viewer_file_parent_class */
-G_DEFINE_TYPE (ViewerFile, viewer_file, XTYPE_OBJECT)
+G_DEFINE_TYPE (viewer_file_t, viewer_file, XTYPE_OBJECT)
 
 static void
 viewer_file_constructed (xobject_t *obj)
@@ -85,7 +85,7 @@ viewer_file_constructed (xobject_t *obj)
 static void
 viewer_file_finalize (xobject_t *obj)
 {
-  ViewerFile *self = VIEWER_FILE (obj);
+  viewer_file_t *self = VIEWER_FILE (obj);
 
   g_free (self->filename);
 
@@ -104,15 +104,15 @@ viewer_file_class_init (ViewerFileClass *klass)
 }
 
 static void
-viewer_file_init (ViewerFile *self)
+viewer_file_init (viewer_file_t *self)
 {
   /* initialize the object */
 }
 
 </programlisting></informalexample>
-      If the user instantiates an object <type>ViewerFile</type> with:
+      If the user instantiates an object <type>viewer_file_t</type> with:
 <informalexample><programlisting>
-ViewerFile *file = xobject_new (VIEWER_TYPE_FILE, NULL);
+viewer_file_t *file = xobject_new (VIEWER_TYPE_FILE, NULL);
 </programlisting></informalexample>
       If this is the first instantiation of such an object, the
       <function>viewer_file_class_init</function> function will be invoked
@@ -495,7 +495,7 @@ viewer_file_set_property (xobject_t      *object,
                           const xvalue_t *value,
                           xparam_spec_t   *pspec)
 {
-  ViewerFile *self = VIEWER_FILE (object);
+  viewer_file_t *self = VIEWER_FILE (object);
 
   switch ((ViewerFileProperty) property_id)
     {
@@ -523,7 +523,7 @@ viewer_file_get_property (xobject_t    *object,
                           xvalue_t     *value,
                           xparam_spec_t *pspec)
 {
-  ViewerFile *self = VIEWER_FILE (object);
+  viewer_file_t *self = VIEWER_FILE (object);
 
   switch ((ViewerFileProperty) property_id)
     {
@@ -575,7 +575,7 @@ viewer_file_class_init (ViewerFileClass *klass)
 /* Use                                          */
 /************************************************/
 
-ViewerFile *file;
+viewer_file_t *file;
 xvalue_t val = G_VALUE_INIT;
 
 file = xobject_new (VIEWER_TYPE_FILE, NULL);
@@ -630,7 +630,7 @@ xvalue_unset (&amp;val);
       If the user's xvalue_t had been set to a valid value, <function><link linkend="g-object-set-property">xobject_set_property</link></function>
       would have proceeded with calling the object's
       <function>set_property</function> class method. Here, since our
-      implementation of <type>ViewerFile</type> did override this method, execution would jump to
+      implementation of <type>viewer_file_t</type> did override this method, execution would jump to
       <function>viewer_file_set_property</function> after having retrieved from the
       <link linkend="xparam_spec_t"><type>xparam_spec_t</type></link> the <emphasis>param_id</emphasis>
       <footnote>
@@ -682,7 +682,7 @@ xvalue_unset (&amp;val);
         <function><link linkend="g-object-set-valist">xobject_set_valist</link></function> (variadic version) functions can be used to set
         multiple properties at once. The client code shown above can then be re-written as:
 <informalexample><programlisting>
-ViewerFile *file;
+viewer_file_t *file;
 file = /* */;
 xobject_set (G_OBJECT (file),
               "zoom-level", 6,

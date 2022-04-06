@@ -3353,8 +3353,8 @@ msgstr "Gabim gjatë fshirjes së file: %s"
 
 # (pofilter) untranslated: checks whether a string has been translated at all
 #: ../gio/gmemoryinputstream.c:486 ../gio/gmemoryoutputstream.c:746
-msgid "Invalid GSeekType supplied"
-msgstr "Dhënë GSeekType i pavlefshëm"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Dhënë xseek_type_t i pavlefshëm"
 
 # (pofilter) variables: translation contains variables not in original: %s
 # (pofilter) isfuzzy: Check if the unit has been marked fuzzy.

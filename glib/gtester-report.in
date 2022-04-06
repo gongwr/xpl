@@ -286,7 +286,7 @@ class HTMLReportWriter(ReportWriter):
       presults.sort()
       ptxt = ''.join ([e[1] for e in presults])
       self.oprint ('<script language="javascript" type="text/javascript">message_array["b%u_t%u_"] = "%s";</script>\n' % (self.bcounter, self.tcounter, ptxt))
-      self.oprint ('<td align="center"><a href="javascript:view_testlog (\'%s\', \'%s\', \'%s\', \'%s\', \'Test Results:\', \'b%u_t%u_\')">Details</a></td>\n' %
+      self.oprint ('<td align="center"><a href="javascript:view_testlog (\'%s\', \'%s\', \'%s\', \'%s\', \'test_t Results:\', \'b%u_t%u_\')">Details</a></td>\n' %
                    ('TestResultWindow', binary.file, binary.random_seed, path, self.bcounter, self.tcounter))
     else:
       self.oprint ('<td align="center">-</td>\n')
@@ -341,11 +341,11 @@ class HTMLReportWriter(ReportWriter):
     self.oprint ('</tr>\n')
   def printout (self):
     self.oprint ('<html><head>\n')
-    self.oprint ('<title>GTester Unit Test Report</title>\n')
+    self.oprint ('<title>GTester Unit test_t Report</title>\n')
     self.oprint (self.cssjs)
     self.oprint ('</head>\n')
     self.oprint ('<body>\n')
-    self.oprint ('<h2>GTester Unit Test Report</h2>\n')
+    self.oprint ('<h2>GTester Unit test_t Report</h2>\n')
     self.handle_info ()
     self.oprint ('<p style="color:red;font-weight:bold"><blink>'
                  'Deprecated: Since GLib 2.62, gtester and gtester-report are '

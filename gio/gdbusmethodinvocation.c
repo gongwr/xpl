@@ -48,7 +48,7 @@
  *
  * The normal way to obtain a #xdbus_method_invocation_t object is to receive
  * it as an argument to the handle_method_call() function in a
- * #xdbus_interface_vtable_t that was passed to g_dbus_connection_register_object().
+ * #xdbus_interface_vtable_t that was passed to xdbus_connection_register_object().
  */
 
 typedef struct _GDBusMethodInvocationClass GDBusMethodInvocationClass;
@@ -312,7 +312,7 @@ xdbus_method_invocation_get_parameters (xdbus_method_invocation_t *invocation)
  * xdbus_method_invocation_get_user_data: (skip)
  * @invocation: A #xdbus_method_invocation_t.
  *
- * Gets the @user_data #xpointer_t passed to g_dbus_connection_register_object().
+ * Gets the @user_data #xpointer_t passed to xdbus_connection_register_object().
  *
  * Returns: A #xpointer_t.
  *
@@ -336,7 +336,7 @@ xdbus_method_invocation_get_user_data (xdbus_method_invocation_t *invocation)
  * @connection: The #xdbus_connection_t the method was invoked on.
  * @message: The D-Bus message as a #xdbus_message_t.
  * @parameters: The parameters as a #xvariant_t tuple.
- * @user_data: The @user_data #xpointer_t passed to g_dbus_connection_register_object().
+ * @user_data: The @user_data #xpointer_t passed to xdbus_connection_register_object().
  *
  * Creates a new #xdbus_method_invocation_t object.
  *
@@ -516,7 +516,7 @@ xdbus_method_invocation_return_value_internal (xdbus_method_invocation_t *invoca
 #endif
 
   error = NULL;
-  if (!g_dbus_connection_send_message (xdbus_method_invocation_get_connection (invocation), reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, &error))
+  if (!xdbus_connection_send_message (xdbus_method_invocation_get_connection (invocation), reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, &error))
     {
       if (!xerror_matches (error, G_IO_ERROR, G_IO_ERROR_CLOSED))
         g_warning ("Error sending message: %s", error->message);
@@ -829,7 +829,7 @@ xdbus_method_invocation_return_dbus_error (xdbus_method_invocation_t *invocation
   reply = xdbus_message_new_method_error_literal (invocation->message,
                                                    error_name,
                                                    error_message);
-  g_dbus_connection_send_message (xdbus_method_invocation_get_connection (invocation), reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
+  xdbus_connection_send_message (xdbus_method_invocation_get_connection (invocation), reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
   xobject_unref (reply);
 
 out:

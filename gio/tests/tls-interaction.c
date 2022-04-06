@@ -51,11 +51,11 @@ typedef struct {
   xthread_t *test_thread;
   xthread_t *loop_thread;
   const Fixture *fixture;
-} Test;
+} test_t;
 
 typedef struct {
   xtls_interaction_t parent;
-  Test *test;
+  test_t *test;
 } TestInteraction;
 
 typedef struct {
@@ -102,7 +102,7 @@ test_interaction_ask_password_async_success (xtls_interaction_t    *interaction,
   task = xtask_new (self, cancellable, callback, user_data);
 
   /* Don't do this in real life. Include a null terminator for testing */
-  xtls_password_set_value (password, (const guchar *)"the password", 13);
+  xtls_password_set_value (password, (const xuchar_t *)"the password", 13);
   xtask_return_int (task, G_TLS_INTERACTION_HANDLED);
   xobject_unref (task);
 }
@@ -177,17 +177,17 @@ test_interaction_ask_password_finish_failure (xtls_interaction_t    *interaction
 /* Return a copy of @str that is allocated in a silly way, to exercise
  * custom free-functions. The returned pointer points to a copy of @str
  * in a buffer of the form "BEFORE \0 str \0 AFTER". */
-static guchar *
+static xuchar_t *
 special_dup (const char *str)
 {
   xstring_t *buf = xstring_new ("BEFORE");
-  guchar *ret;
+  xuchar_t *ret;
 
   xstring_append_c (buf, '\0');
   xstring_append (buf, str);
   xstring_append_c (buf, '\0');
   xstring_append (buf, "AFTER");
-  ret = (guchar *) xstring_free (buf, FALSE);
+  ret = (xuchar_t *) xstring_free (buf, FALSE);
   return ret + strlen ("BEFORE") + 1;
 }
 
@@ -213,7 +213,7 @@ test_interaction_ask_password_sync_success (xtls_interaction_t    *interaction,
                                             xerror_t            **error)
 {
   TestInteraction *self;
-  const guchar *value;
+  const xuchar_t *value;
   xsize_t len;
 
   g_assert (TEST_IS_INTERACTION (interaction));
@@ -227,12 +227,12 @@ test_interaction_ask_password_sync_success (xtls_interaction_t    *interaction,
   g_assert (*error == NULL);
 
   /* Exercise different ways to set the value */
-  xtls_password_set_value (password, (const guchar *) "foo", 4);
+  xtls_password_set_value (password, (const xuchar_t *) "foo", 4);
   len = 0;
   value = xtls_password_get_value (password, &len);
   g_assert_cmpmem (value, len, "foo", 4);
 
-  xtls_password_set_value (password, (const guchar *) "bar", -1);
+  xtls_password_set_value (password, (const xuchar_t *) "bar", -1);
   len = 0;
   value = xtls_password_get_value (password, &len);
   g_assert_cmpmem (value, len, "bar", 3);
@@ -248,7 +248,7 @@ test_interaction_ask_password_sync_success (xtls_interaction_t    *interaction,
   g_assert_cmpmem (value, len, "baz", 3);
 
   /* Don't do this in real life. Include a null terminator for testing */
-  xtls_password_set_value (password, (const guchar *)"the password", 13);
+  xtls_password_set_value (password, (const xuchar_t *)"the password", 13);
   return G_TLS_INTERACTION_HANDLED;
 }
 
@@ -432,7 +432,7 @@ on_ask_password_async_call (xobject_t      *source,
                             xasync_result_t *result,
                             xpointer_t      user_data)
 {
-  Test *test = user_data;
+  test_t *test = user_data;
   GTlsInteractionResult res;
   xerror_t *error = NULL;
 
@@ -470,7 +470,7 @@ on_ask_password_async_call (xobject_t      *source,
 }
 
 static void
-test_ask_password_async (Test            *test,
+test_ask_password_async (test_t            *test,
                          xconstpointer    unused)
 {
   /* This test only works with a main loop */
@@ -485,7 +485,7 @@ test_ask_password_async (Test            *test,
 }
 
 static void
-test_invoke_ask_password (Test         *test,
+test_invoke_ask_password (test_t         *test,
                           xconstpointer unused)
 {
   GTlsInteractionResult res;
@@ -520,7 +520,7 @@ test_invoke_ask_password (Test         *test,
 }
 
 static void
-test_ask_password (Test         *test,
+test_ask_password (test_t         *test,
                    xconstpointer unused)
 {
   GTlsInteractionResult res;
@@ -559,7 +559,7 @@ on_request_certificate_async_call (xobject_t      *source,
                                    xasync_result_t *result,
                                    xpointer_t      user_data)
 {
-  Test *test = user_data;
+  test_t *test = user_data;
   GTlsInteractionResult res;
   xerror_t *error = NULL;
 
@@ -596,7 +596,7 @@ on_request_certificate_async_call (xobject_t      *source,
 }
 
 static void
-test_request_certificate_async (Test            *test,
+test_request_certificate_async (test_t            *test,
                                 xconstpointer    unused)
 {
   /* This test only works with a main loop */
@@ -611,7 +611,7 @@ test_request_certificate_async (Test            *test,
 }
 
 static void
-test_invoke_request_certificate (Test         *test,
+test_invoke_request_certificate (test_t         *test,
                                  xconstpointer unused)
 {
   GTlsInteractionResult res;
@@ -647,7 +647,7 @@ test_invoke_request_certificate (Test         *test,
 }
 
 static void
-test_request_certificate (Test         *test,
+test_request_certificate (test_t         *test,
                           xconstpointer unused)
 {
   GTlsInteractionResult res;
@@ -686,7 +686,7 @@ test_request_certificate (Test         *test,
  */
 
 static void
-setup_without_loop (Test           *test,
+setup_without_loop (test_t           *test,
                     xconstpointer   user_data)
 {
   const Fixture *fixture = user_data;
@@ -725,7 +725,7 @@ setup_without_loop (Test           *test,
 }
 
 static void
-teardown_without_loop (Test            *test,
+teardown_without_loop (test_t            *test,
                        xconstpointer    unused)
 {
   xobject_unref (test->connection);
@@ -738,7 +738,7 @@ typedef struct {
   xmutex_t loop_mutex;
   xcond_t loop_started;
   xboolean_t started;
-  Test *test;
+  test_t *test;
 } ThreadLoop;
 
 static xpointer_t
@@ -746,7 +746,7 @@ thread_loop (xpointer_t user_data)
 {
   xmain_context_t *context = xmain_context_default ();
   ThreadLoop *closure = user_data;
-  Test *test = closure->test;
+  test_t *test = closure->test;
 
   g_mutex_lock (&closure->loop_mutex);
 
@@ -767,7 +767,7 @@ thread_loop (xpointer_t user_data)
 }
 
 static void
-setup_with_thread_loop (Test            *test,
+setup_with_thread_loop (test_t            *test,
                         xconstpointer    user_data)
 {
   ThreadLoop closure;
@@ -796,7 +796,7 @@ setup_with_thread_loop (Test            *test,
 }
 
 static void
-teardown_with_thread_loop (Test            *test,
+teardown_with_thread_loop (test_t            *test,
                            xconstpointer    unused)
 {
   xpointer_t check;
@@ -812,7 +812,7 @@ teardown_with_thread_loop (Test            *test,
 }
 
 static void
-setup_with_normal_loop (Test            *test,
+setup_with_normal_loop (test_t            *test,
                         xconstpointer    user_data)
 {
   xmain_context_t *context;
@@ -828,7 +828,7 @@ setup_with_normal_loop (Test            *test,
 }
 
 static void
-teardown_with_normal_loop (Test            *test,
+teardown_with_normal_loop (test_t            *test,
                            xconstpointer    unused)
 {
   xmain_context_t *context;
@@ -846,7 +846,7 @@ teardown_with_normal_loop (Test            *test,
   teardown_without_loop (test, unused);
 }
 
-typedef void (*TestFunc) (Test *test, xconstpointer data);
+typedef void (*TestFunc) (test_t *test, xconstpointer data);
 
 static void
 test_with_async_ask_password (const xchar_t *name,
@@ -864,7 +864,7 @@ test_with_async_ask_password (const xchar_t *name,
   fixture->ask_password_func = NULL;
   fixture->result = G_TLS_INTERACTION_HANDLED;
   test_name = xstrdup_printf ("%s/async-implementation-success", name);
-  g_test_add (test_name, Test, fixture, setup, func, teardown);
+  g_test_add (test_name, test_t, fixture, setup, func, teardown);
   g_free (test_name);
   xptr_array_add (fixtures, fixture);
 
@@ -878,7 +878,7 @@ test_with_async_ask_password (const xchar_t *name,
   fixture->error_code = XFILE_ERROR_ACCES;
   fixture->error_message = "The message";
   test_name = xstrdup_printf ("%s/async-implementation-failure", name);
-  g_test_add (test_name, Test, fixture, setup, func, teardown);
+  g_test_add (test_name, test_t, fixture, setup, func, teardown);
   g_free (test_name);
   xptr_array_add (fixtures, fixture);
 }
@@ -899,7 +899,7 @@ test_with_unhandled_ask_password (const xchar_t *name,
   fixture->ask_password_func = NULL;
   fixture->result = G_TLS_INTERACTION_UNHANDLED;
   test_name = xstrdup_printf ("%s/unhandled-implementation", name);
-  g_test_add (test_name, Test, fixture, setup, func, teardown);
+  g_test_add (test_name, test_t, fixture, setup, func, teardown);
   g_free (test_name);
   xptr_array_add (fixtures, fixture);
 }
@@ -920,7 +920,7 @@ test_with_sync_ask_password (const xchar_t *name,
   fixture->ask_password_func = test_interaction_ask_password_sync_success;
   fixture->result = G_TLS_INTERACTION_HANDLED;
   test_name = xstrdup_printf ("%s/sync-implementation-success", name);
-  g_test_add (test_name, Test, fixture, setup, func, teardown);
+  g_test_add (test_name, test_t, fixture, setup, func, teardown);
   g_free (test_name);
   xptr_array_add (fixtures, fixture);
 
@@ -934,7 +934,7 @@ test_with_sync_ask_password (const xchar_t *name,
   fixture->error_code = XFILE_ERROR_ACCES;
   fixture->error_message = "The message";
   test_name = xstrdup_printf ("%s/sync-implementation-failure", name);
-  g_test_add (test_name, Test, fixture, setup, func, teardown);
+  g_test_add (test_name, test_t, fixture, setup, func, teardown);
   g_free (test_name);
   xptr_array_add (fixtures, fixture);
 }
@@ -966,7 +966,7 @@ test_with_async_request_certificate (const xchar_t *name,
   fixture->request_certificate_func = NULL;
   fixture->result = G_TLS_INTERACTION_HANDLED;
   test_name = xstrdup_printf ("%s/async-implementation-success", name);
-  g_test_add (test_name, Test, fixture, setup, func, teardown);
+  g_test_add (test_name, test_t, fixture, setup, func, teardown);
   g_free (test_name);
   xptr_array_add (fixtures, fixture);
 
@@ -980,7 +980,7 @@ test_with_async_request_certificate (const xchar_t *name,
   fixture->error_code = XFILE_ERROR_NOENT;
   fixture->error_message = "Another message";
   test_name = xstrdup_printf ("%s/async-implementation-failure", name);
-  g_test_add (test_name, Test, fixture, setup, func, teardown);
+  g_test_add (test_name, test_t, fixture, setup, func, teardown);
   g_free (test_name);
   xptr_array_add (fixtures, fixture);
 }
@@ -1001,7 +1001,7 @@ test_with_unhandled_request_certificate (const xchar_t *name,
   fixture->request_certificate_func = NULL;
   fixture->result = G_TLS_INTERACTION_UNHANDLED;
   test_name = xstrdup_printf ("%s/unhandled-implementation", name);
-  g_test_add (test_name, Test, fixture, setup, func, teardown);
+  g_test_add (test_name, test_t, fixture, setup, func, teardown);
   g_free (test_name);
   xptr_array_add (fixtures, fixture);
 }
@@ -1022,7 +1022,7 @@ test_with_sync_request_certificate (const xchar_t *name,
   fixture->request_certificate_func = test_interaction_request_certificate_sync_success;
   fixture->result = G_TLS_INTERACTION_HANDLED;
   test_name = xstrdup_printf ("%s/sync-implementation-success", name);
-  g_test_add (test_name, Test, fixture, setup, func, teardown);
+  g_test_add (test_name, test_t, fixture, setup, func, teardown);
   g_free (test_name);
   xptr_array_add (fixtures, fixture);
 
@@ -1036,7 +1036,7 @@ test_with_sync_request_certificate (const xchar_t *name,
   fixture->error_code = XFILE_ERROR_NOENT;
   fixture->error_message = "Another message";
   test_name = xstrdup_printf ("%s/sync-implementation-failure", name);
-  g_test_add (test_name, Test, fixture, setup, func, teardown);
+  g_test_add (test_name, test_t, fixture, setup, func, teardown);
   g_free (test_name);
   xptr_array_add (fixtures, fixture);
 }

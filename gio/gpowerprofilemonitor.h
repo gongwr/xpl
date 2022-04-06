@@ -38,9 +38,9 @@ G_BEGIN_DECLS
  */
 #define G_POWER_PROFILE_MONITOR_EXTENSION_POINT_NAME "gio-power-profile-monitor"
 
-#define XTYPE_POWER_PROFILE_MONITOR             (g_power_profile_monitor_get_type ())
+#define XTYPE_POWER_PROFILE_MONITOR             (xpower_profile_monitor_get_type ())
 XPL_AVAILABLE_IN_2_70
-G_DECLARE_INTERFACE (xpower_profile_monitor_t, g_power_profile_monitor, g, power_profile_monitor, xobject_t)
+G_DECLARE_INTERFACE (xpower_profile_monitor_t, xpower_profile_monitor, g, power_profile_monitor, xobject_t)
 
 #define G_POWER_PROFILE_MONITOR(o)               (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_POWER_PROFILE_MONITOR, xpower_profile_monitor))
 #define X_IS_POWER_PROFILE_MONITOR(o)            (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_POWER_PROFILE_MONITOR))
@@ -53,10 +53,10 @@ struct _xpower_profile_monitor_tInterface
 };
 
 XPL_AVAILABLE_IN_2_70
-xpower_profile_monitor_t      *g_power_profile_monitor_dup_default              (void);
+xpower_profile_monitor_t      *xpower_profile_monitor_dup_default              (void);
 
 XPL_AVAILABLE_IN_2_70
-xboolean_t                   g_power_profile_monitor_get_power_saver_enabled  (xpower_profile_monitor_t *monitor);
+xboolean_t                   xpower_profile_monitor_get_power_saver_enabled  (xpower_profile_monitor_t *monitor);
 
 G_END_DECLS
 

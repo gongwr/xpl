@@ -67,7 +67,7 @@
  *
  * Application Options:
  *   -r, --repeats=N          Average over N repetitions
- *   -m, --max-size=M         Test up to 2^M items
+ *   -m, --max-size=M         test_t up to 2^M items
  *   --display=DISPLAY        X display to use
  *   -v, --verbose            Be verbose
  *   -b, --beep               Beep when done
@@ -98,7 +98,7 @@
  * static GOptionEntry entries[] =
  * {
  *   { "repeats", 'r', 0, G_OPTION_ARG_INT, &repeats, "Average over N repetitions", "N" },
- *   { "max-size", 'm', 0, G_OPTION_ARG_INT, &max_size, "Test up to 2^M items", "M" },
+ *   { "max-size", 'm', 0, G_OPTION_ARG_INT, &max_size, "test_t up to 2^M items", "M" },
  *   { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, "Be verbose", NULL },
  *   { "beep", 'b', 0, G_OPTION_ARG_NONE, &beep, "Beep when done", NULL },
  *   { "rand", 0, 0, G_OPTION_ARG_NONE, &randomize, "Randomize the data", NULL },
@@ -218,7 +218,7 @@ typedef struct
     xchar_t *str;
     xchar_t **array;
     xdouble_t dbl;
-    gint64 int64;
+    sint64_t int64;
   } prev;
   union
   {
@@ -845,7 +845,7 @@ g_option_context_get_help (xoption_context_t *context,
   xboolean_t seen[256];
   const xchar_t *rest_description;
   xstring_t *string;
-  guchar token;
+  xuchar_t token;
 
   g_return_val_if_fail (context != NULL, NULL);
 
@@ -905,10 +905,10 @@ g_option_context_get_help (xoption_context_t *context,
                                (xpointer_t)entry->long_name,
                                entry);
 
-          if (seen[(guchar)entry->short_name])
+          if (seen[(xuchar_t)entry->short_name])
             entry->short_name = 0;
           else
-            seen[(guchar)entry->short_name] = TRUE;
+            seen[(xuchar_t)entry->short_name] = TRUE;
         }
     }
 
@@ -928,11 +928,11 @@ g_option_context_get_help (xoption_context_t *context,
           else
             xhash_table_insert (shadow_map, (xpointer_t)entry->long_name, entry);
 
-          if (seen[(guchar)entry->short_name] &&
+          if (seen[(xuchar_t)entry->short_name] &&
               !(entry->flags & G_OPTION_FLAG_NOALIAS))
             entry->short_name = 0;
           else
-            seen[(guchar)entry->short_name] = TRUE;
+            seen[(xuchar_t)entry->short_name] = TRUE;
         }
       list = list->next;
     }
@@ -1179,11 +1179,11 @@ parse_double (const xchar_t *arg_name,
 static xboolean_t
 parse_int64 (const xchar_t *arg_name,
              const xchar_t *arg,
-             gint64      *result,
+             sint64_t      *result,
              xerror_t     **error)
 {
   xchar_t *end;
-  gint64 tmp;
+  sint64_t tmp;
 
   errno = 0;
   tmp = g_ascii_strtoll (arg, &end, 0);
@@ -1484,7 +1484,7 @@ parse_arg (xoption_context_t *context,
       }
     case G_OPTION_ARG_INT64:
       {
-        gint64 data;
+        sint64_t data;
 
         if (!parse_int64 (option_name, value,
                          &data,
@@ -1495,8 +1495,8 @@ parse_arg (xoption_context_t *context,
 
         change = get_change (context, G_OPTION_ARG_INT64,
                              entry->arg_data);
-        change->prev.int64 = *(gint64 *)entry->arg_data;
-        *(gint64 *)entry->arg_data = data;
+        change->prev.int64 = *(sint64_t *)entry->arg_data;
+        *(sint64_t *)entry->arg_data = data;
         break;
       }
     default:
@@ -1761,7 +1761,7 @@ free_changes_list (xoption_context_t *context,
               *(xdouble_t *)change->arg_data = change->prev.dbl;
               break;
             case G_OPTION_ARG_INT64:
-              *(gint64 *)change->arg_data = change->prev.int64;
+              *(sint64_t *)change->arg_data = change->prev.int64;
               break;
             default:
               g_assert_not_reached ();

@@ -76,7 +76,7 @@ static void
 g_filter_output_stream_class_init (GFilterOutputStreamClass *klass)
 {
   xobject_class_t *object_class;
-  GOutputStreamClass *ostream_class;
+  xoutput_stream_class_t *ostream_class;
 
   object_class = G_OBJECT_CLASS (klass);
   object_class->get_property = g_filter_output_stream_get_property;

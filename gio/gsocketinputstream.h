@@ -41,7 +41,7 @@ typedef struct _GSocketInputStream                          GSocketInputStream;
 
 struct _GSocketInputStreamClass
 {
-  GInputStreamClass parent_class;
+  xinput_stream_class_t parent_class;
 };
 
 struct _GSocketInputStream

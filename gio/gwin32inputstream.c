@@ -126,7 +126,7 @@ g_win32_input_stream_read (xinput_stream_t  *stream,
 
   win32_stream = G_WIN32_INPUT_STREAM (stream);
 
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+  if (xcancellable_set_error_if_cancelled (cancellable, error))
     return -1;
 
   if (count > G_MAXINT)
@@ -152,7 +152,7 @@ g_win32_input_stream_read (xinput_stream_t  *stream,
           goto end;
         }
 
-      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+      if (xcancellable_set_error_if_cancelled (cancellable, error))
         goto end;
 
       errsv = GetLastError ();
@@ -243,7 +243,7 @@ static void
 g_win32_input_stream_class_init (GWin32InputStreamClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
-  GInputStreamClass *stream_class = G_INPUT_STREAM_CLASS (klass);
+  xinput_stream_class_t *stream_class = G_INPUT_STREAM_CLASS (klass);
 
   gobject_class->get_property = g_win32_input_stream_get_property;
   gobject_class->set_property = g_win32_input_stream_set_property;

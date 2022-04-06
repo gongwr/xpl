@@ -216,7 +216,7 @@ test_resource (xresource_t *resource)
   g_assert_cmpint (xstrv_length (children), ==, 2);
   xstrfreev (children);
 
-  /* Test the preferred lookup where we have a trailing slash. */
+  /* test_t the preferred lookup where we have a trailing slash. */
   children = g_resource_enumerate_children  (resource,
 					     "/a_prefix/",
 					     G_RESOURCE_LOOKUP_FLAGS_NONE,
@@ -360,7 +360,7 @@ test_resource_data_unaligned (void)
   g_resource_unref (resource);
 }
 
-/* Test error handling for corrupt xresource_t files (specifically, a corrupt
+/* test_t error handling for corrupt xresource_t files (specifically, a corrupt
  * GVDB header). */
 static void
 test_resource_data_corrupt (void)
@@ -381,7 +381,7 @@ test_resource_data_corrupt (void)
   g_clear_error (&local_error);
 }
 
-/* Test handling for empty xresource_t files. They should also be treated as
+/* test_t handling for empty xresource_t files. They should also be treated as
  * corrupt. */
 static void
 test_resource_data_empty (void)
@@ -633,7 +633,7 @@ test_resource_manual2 (void)
   g_resource_unref (resource);
 }
 
-/* Test building resources with external data option,
+/* test_t building resources with external data option,
  * where data is linked in as binary instead of compiled in.
  * Checks if resources are automatically registered and
  * data can be found and read. */
@@ -670,7 +670,7 @@ test_resource_binary_linked (void)
   #endif /* if __linux__ */
 }
 
-/* Test resource whose xml file starts with more than one digit
+/* test_t resource whose xml file starts with more than one digit
  * and where no explicit c-name is given
  * Checks if resources are successfully registered and
  * data can be found and read. */

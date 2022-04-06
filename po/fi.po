@@ -285,7 +285,7 @@ msgstr "Virta ei tue siirtymistä"
 #: gio/gbufferedinputstream.c:938
 #, fuzzy
 #| msgid "Cannot truncate xmemory_input_stream_t"
-msgid "Cannot truncate xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
 msgstr "xmemory_input_stream_t-kohdetta ei voi kutistaa"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1237 gio/giostream.c:300
@@ -3574,8 +3574,8 @@ msgid "Error removing old file: %s"
 msgstr "Virhe poistettaessa vanhaa tiedostoa: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:772
-msgid "Invalid GSeekType supplied"
-msgstr "Saatiin virheellinen GSeekType"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Saatiin virheellinen xseek_type_t"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"

@@ -46,11 +46,11 @@ static xinput_stream_t *g_loadable_icon_real_load_finish (xloadable_icon_t      
 						       char                **type,
 						       xerror_t              **error);
 
-typedef GLoadableIconIface GLoadableIconInterface;
+typedef xloadable_icon_iface_t GLoadableIconInterface;
 G_DEFINE_INTERFACE(xloadable_icon_t, g_loadable_icon, XTYPE_ICON)
 
 static void
-g_loadable_icon_default_init (GLoadableIconIface *iface)
+g_loadable_icon_default_init (xloadable_icon_iface_t *iface)
 {
   iface->load_async = g_loadable_icon_real_load_async;
   iface->load_finish = g_loadable_icon_real_load_finish;
@@ -79,7 +79,7 @@ g_loadable_icon_load (xloadable_icon_t  *icon,
 		      xcancellable_t   *cancellable,
 		      xerror_t        **error)
 {
-  GLoadableIconIface *iface;
+  xloadable_icon_iface_t *iface;
 
   g_return_val_if_fail (X_IS_LOADABLE_ICON (icon), NULL);
 
@@ -108,7 +108,7 @@ g_loadable_icon_load_async (xloadable_icon_t       *icon,
                             xasync_ready_callback_t  callback,
                             xpointer_t             user_data)
 {
-  GLoadableIconIface *iface;
+  xloadable_icon_iface_t *iface;
 
   g_return_if_fail (X_IS_LOADABLE_ICON (icon));
 
@@ -136,7 +136,7 @@ g_loadable_icon_load_finish (xloadable_icon_t  *icon,
 			     char          **type,
 			     xerror_t        **error)
 {
-  GLoadableIconIface *iface;
+  xloadable_icon_iface_t *iface;
 
   g_return_val_if_fail (X_IS_LOADABLE_ICON (icon), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
@@ -173,7 +173,7 @@ load_async_thread (xtask_t        *task,
 {
   xloadable_icon_t *icon = source_object;
   LoadData *data = task_data;
-  GLoadableIconIface *iface;
+  xloadable_icon_iface_t *iface;
   xinput_stream_t *stream;
   xerror_t *error = NULL;
 

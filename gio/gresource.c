@@ -759,7 +759,7 @@ g_resource_open_stream (xresource_t             *resource,
       xzlib_decompressor_t *decompressor =
         g_zlib_decompressor_new (G_ZLIB_COMPRESSOR_FORMAT_ZLIB);
 
-      stream2 = g_converter_input_stream_new (stream, G_CONVERTER (decompressor));
+      stream2 = xconverter_input_stream_new (stream, G_CONVERTER (decompressor));
       xobject_unref (decompressor);
       xobject_unref (stream);
       stream = stream2;

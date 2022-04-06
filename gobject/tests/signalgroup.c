@@ -44,7 +44,7 @@ static void
 signal_target_class_init (signal_target_class_t *klass)
 {
   signals[THE_SIGNAL] =
-      g_signal_new ("the-signal",
+      xsignal_new ("the-signal",
                     XTYPE_FROM_CLASS (klass),
                     G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED,
                     0,
@@ -54,7 +54,7 @@ signal_target_class_init (signal_target_class_t *klass)
                     XTYPE_OBJECT);
 
   signals[NEVER_EMITTED] =
-      g_signal_new ("never-emitted",
+      xsignal_new ("never-emitted",
                     XTYPE_FROM_CLASS (klass),
                     G_SIGNAL_RUN_LAST,
                     0,
@@ -256,7 +256,7 @@ assert_signals (signal_target_t *target,
   g_assert (group == NULL || X_IS_SIGNAL_GROUP (group));
 
   global_signal_calls = 0;
-  g_signal_emit (target, signals[THE_SIGNAL],
+  xsignal_emit (target, signals[THE_SIGNAL],
                  signal_detail_quark (), group);
   g_assert_cmpint (global_signal_calls, ==, success ? 5 : 0);
 }
@@ -288,7 +288,7 @@ test_signal_group_invalid (void)
 
   /* Invalid Signal Name */
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                         "*g_signal_parse_name*");
+                         "*xsignal_parse_name*");
   group = xsignal_group_new (signal_target_get_type ());
   xsignal_group_connect (group,
                           "does-not-exist",
@@ -433,7 +433,7 @@ test_signal_group_blocking (void)
   signal_target_t *target1, *target2, *readback;
   xsignal_group_t *group = xsignal_group_new (signal_target_get_type ());
 
-  /* Test blocking and unblocking null target */
+  /* test_t blocking and unblocking null target */
   xsignal_group_block (group);
   xsignal_group_unblock (group);
 
@@ -547,7 +547,7 @@ test_signal_group_signal_parsing_subprocess (void)
   xsignal_group_t *group;
 
   /* Check that the class has not been created and with it the
-   * signals registered. This will cause g_signal_parse_name()
+   * signals registered. This will cause xsignal_parse_name()
    * to fail unless xsignal_group_t calls xtype_class_ref().
    */
   g_assert_null (xtype_class_peek (signal_target_get_type ()));
@@ -603,7 +603,7 @@ static void
 signal_thing_default_init (signal_thing_interface_t *iface)
 {
   signal_thing_changed =
-      g_signal_new ("changed",
+      xsignal_new ("changed",
                     XTYPE_FROM_INTERFACE (iface),
                     G_SIGNAL_RUN_LAST,
                     G_STRUCT_OFFSET (signal_thing_interface_t, changed),

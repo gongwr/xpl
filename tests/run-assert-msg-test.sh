@@ -2,7 +2,7 @@
 
 fail ()
 {
-  echo "Test failed: $*"
+  echo "test_t failed: $*"
   exit 1
 }
 
@@ -17,7 +17,7 @@ error_out=/dev/null
 if [ "$1" = "-v" ]; then
   verbose=1
   error_out=/dev/stderr
-fi  
+fi
 
 if [ -z "$LIBTOOL" ]; then
   if [ -f ../libtool ]; then

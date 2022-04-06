@@ -17,7 +17,7 @@
 
 /* xfilter_input_stream_t and xfilter_output_stream_t are abstract, so define
  * minimal subclasses for testing. (This used to use
- * xbuffered_input_stream and xbuffered_output_stream_t, but those have
+ * xbuffered_input_stream_t and xbuffered_output_stream_t, but those have
  * their own test program, and they override some methods, meaning the
  * core filter stream functionality wasn't getting fully tested.)
  */

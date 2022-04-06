@@ -230,14 +230,14 @@ xfile_enumerator_next_file (xfile_enumerator_t *enumerator,
   class = XFILE_ENUMERATOR_GET_CLASS (enumerator);
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   enumerator->priv->pending = TRUE;
   info = (* class->next_file) (enumerator, cancellable, error);
   enumerator->priv->pending = FALSE;
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   return info;
 }
@@ -280,7 +280,7 @@ xfile_enumerator_close (xfile_enumerator_t  *enumerator,
     }
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   enumerator->priv->pending = TRUE;
   (* class->close_fn) (enumerator, cancellable, error);
@@ -288,7 +288,7 @@ xfile_enumerator_close (xfile_enumerator_t  *enumerator,
   enumerator->priv->closed = TRUE;
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   return TRUE;
 }
@@ -779,7 +779,7 @@ next_files_thread (xtask_t        *task,
 
   for (i = 0; i < num_files; i++)
     {
-      if (g_cancellable_set_error_if_cancelled (cancellable, &error))
+      if (xcancellable_set_error_if_cancelled (cancellable, &error))
 	info = NULL;
       else
 	info = class->next_file (enumerator, cancellable, &error);

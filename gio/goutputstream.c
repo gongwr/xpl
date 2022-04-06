@@ -48,7 +48,7 @@
  * All of these functions have async variants too.
  **/
 
-struct _GOutputStreamPrivate {
+struct _xoutput_stream_private {
   xuint_t closed : 1;
   xuint_t pending : 1;
   xuint_t closing : 1;
@@ -141,7 +141,7 @@ xoutput_stream_dispose (xobject_t *object)
 }
 
 static void
-xoutput_stream_class_init (GOutputStreamClass *klass)
+xoutput_stream_class_init (xoutput_stream_class_t *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
@@ -208,7 +208,7 @@ xoutput_stream_write (xoutput_stream_t  *stream,
 		       xcancellable_t   *cancellable,
 		       xerror_t        **error)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xssize_t res;
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), -1);
@@ -237,12 +237,12 @@ xoutput_stream_write (xoutput_stream_t  *stream,
     return -1;
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   res = class->write_fn (stream, buffer, count, cancellable, error);
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   xoutput_stream_clear_pending (stream);
 
@@ -365,7 +365,7 @@ xoutput_stream_writev (xoutput_stream_t        *stream,
 		        xcancellable_t         *cancellable,
 		        xerror_t              **error)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xboolean_t res;
   xsize_t _bytes_written = 0;
 
@@ -388,7 +388,7 @@ xoutput_stream_writev (xoutput_stream_t        *stream,
     return FALSE;
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   res = class->writev_fn (stream, vectors, n_vectors, &_bytes_written, cancellable, error);
 
@@ -396,7 +396,7 @@ xoutput_stream_writev (xoutput_stream_t        *stream,
   g_warn_if_fail (res || (error == NULL || *error != NULL));
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   xoutput_stream_clear_pending (stream);
 
@@ -673,7 +673,7 @@ xoutput_stream_flush (xoutput_stream_t  *stream,
                        xcancellable_t   *cancellable,
                        xerror_t        **error)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xboolean_t res;
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
@@ -687,12 +687,12 @@ xoutput_stream_flush (xoutput_stream_t  *stream,
   if (class->flush)
     {
       if (cancellable)
-	g_cancellable_push_current (cancellable);
+	xcancellable_push_current (cancellable);
 
       res = class->flush (stream, cancellable, error);
 
       if (cancellable)
-	g_cancellable_pop_current (cancellable);
+	xcancellable_pop_current (cancellable);
     }
 
   xoutput_stream_clear_pending (stream);
@@ -724,7 +724,7 @@ xoutput_stream_splice (xoutput_stream_t             *stream,
 			xcancellable_t              *cancellable,
 			xerror_t                   **error)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xssize_t bytes_copied;
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), -1);
@@ -743,12 +743,12 @@ xoutput_stream_splice (xoutput_stream_t             *stream,
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   bytes_copied = class->splice (stream, source, flags, cancellable, error);
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   xoutput_stream_clear_pending (stream);
 
@@ -762,7 +762,7 @@ xoutput_stream_real_splice (xoutput_stream_t             *stream,
                              xcancellable_t              *cancellable,
                              xerror_t                   **error)
 {
-  GOutputStreamClass *class = G_OUTPUT_STREAM_GET_CLASS (stream);
+  xoutput_stream_class_t *class = G_OUTPUT_STREAM_GET_CLASS (stream);
   xssize_t n_read, n_written;
   xsize_t bytes_copied;
   char buffer[8192], *p;
@@ -840,7 +840,7 @@ xoutput_stream_internal_close (xoutput_stream_t  *stream,
                                 xcancellable_t   *cancellable,
                                 xerror_t        **error)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xboolean_t res;
 
   if (stream->priv->closed)
@@ -851,7 +851,7 @@ xoutput_stream_internal_close (xoutput_stream_t  *stream,
   stream->priv->closing = TRUE;
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   if (class->flush)
     res = class->flush (stream, cancellable, error);
@@ -874,7 +874,7 @@ xoutput_stream_internal_close (xoutput_stream_t  *stream,
     }
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   stream->priv->closing = FALSE;
   stream->priv->closed = TRUE;
@@ -948,7 +948,7 @@ async_ready_write_callback_wrapper (xobject_t      *source_object,
                                     xpointer_t      user_data)
 {
   xoutput_stream_t *stream = G_OUTPUT_STREAM (source_object);
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xtask_t *task = user_data;
   xssize_t nwrote;
   xerror_t *error = NULL;
@@ -1025,7 +1025,7 @@ xoutput_stream_write_async (xoutput_stream_t       *stream,
 			     xasync_ready_callback_t  callback,
 			     xpointer_t             user_data)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xerror_t *error = NULL;
   xtask_t *task;
 
@@ -1326,7 +1326,7 @@ xoutput_stream_writev_async (xoutput_stream_t             *stream,
 			      xasync_ready_callback_t        callback,
 			      xpointer_t                   user_data)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
 
   g_return_if_fail (X_IS_OUTPUT_STREAM (stream));
   g_return_if_fail (vectors != NULL || n_vectors == 0);
@@ -1359,7 +1359,7 @@ xoutput_stream_writev_finish (xoutput_stream_t  *stream,
                                xsize_t          *bytes_written,
                                xerror_t        **error)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xboolean_t res;
   xsize_t _bytes_written = 0;
 
@@ -1693,7 +1693,7 @@ async_ready_splice_callback_wrapper (xobject_t      *source_object,
                                      xpointer_t     _data)
 {
   xoutput_stream_t *stream = G_OUTPUT_STREAM (source_object);
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xtask_t *task = _data;
   xssize_t nspliced;
   xerror_t *error = NULL;
@@ -1742,7 +1742,7 @@ xoutput_stream_splice_async (xoutput_stream_t            *stream,
 			      xasync_ready_callback_t       callback,
 			      xpointer_t                  user_data)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xtask_t *task;
   xerror_t *error = NULL;
 
@@ -1811,7 +1811,7 @@ async_ready_flush_callback_wrapper (xobject_t      *source_object,
                                     xpointer_t      user_data)
 {
   xoutput_stream_t *stream = G_OUTPUT_STREAM (source_object);
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xtask_t *task = user_data;
   xboolean_t flushed;
   xerror_t *error = NULL;
@@ -1856,7 +1856,7 @@ xoutput_stream_flush_async (xoutput_stream_t       *stream,
                              xasync_ready_callback_t  callback,
                              xpointer_t             user_data)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xtask_t *task;
   xerror_t *error = NULL;
 
@@ -1920,7 +1920,7 @@ async_ready_close_callback_wrapper (xobject_t      *source_object,
                                     xpointer_t      user_data)
 {
   xoutput_stream_t *stream = G_OUTPUT_STREAM (source_object);
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xtask_t *task = user_data;
   xerror_t *error = xtask_get_task_data (task);
 
@@ -1948,7 +1948,7 @@ async_ready_close_flushed_callback_wrapper (xobject_t      *source_object,
                                             xpointer_t      user_data)
 {
   xoutput_stream_t *stream = G_OUTPUT_STREAM (source_object);
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xtask_t *task = user_data;
   xerror_t *error = NULL;
 
@@ -2048,7 +2048,7 @@ xoutput_stream_internal_close_async (xoutput_stream_t       *stream,
                                       xasync_ready_callback_t  callback,
                                       xpointer_t             user_data)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xtask_t *task;
 
   task = xtask_new (stream, cancellable, callback, user_data);
@@ -2238,7 +2238,7 @@ xoutput_stream_clear_pending (xoutput_stream_t *stream)
 xboolean_t
 xoutput_stream_async_write_is_via_threads (xoutput_stream_t *stream)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
 
@@ -2260,7 +2260,7 @@ xoutput_stream_async_write_is_via_threads (xoutput_stream_t *stream)
 xboolean_t
 xoutput_stream_async_writev_is_via_threads (xoutput_stream_t *stream)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
 
@@ -2282,7 +2282,7 @@ xoutput_stream_async_writev_is_via_threads (xoutput_stream_t *stream)
 xboolean_t
 xoutput_stream_async_close_is_via_threads (xoutput_stream_t *stream)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
 
@@ -2302,7 +2302,7 @@ xoutput_stream_real_writev (xoutput_stream_t         *stream,
                              xcancellable_t          *cancellable,
                              xerror_t               **error)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xsize_t _bytes_written = 0;
   xsize_t i;
   xerror_t *err = NULL;
@@ -2378,7 +2378,7 @@ write_async_thread (xtask_t        *task,
 {
   xoutput_stream_t *stream = source_object;
   WriteData *op = task_data;
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xerror_t *error = NULL;
   xssize_t count_written;
 
@@ -2494,7 +2494,7 @@ writev_async_thread (xtask_t        *task,
 {
   xoutput_stream_t *stream = source_object;
   WritevData *op = task_data;
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xerror_t *error = NULL;
   xboolean_t res;
 
@@ -2753,7 +2753,7 @@ real_splice_async_write_cb (xobject_t      *source,
                             xasync_result_t *res,
                             xpointer_t      user_data)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xtask_t *task = XTASK (user_data);
   SpliceData *op = xtask_get_task_data (task);
   xssize_t ret;
@@ -2795,7 +2795,7 @@ real_splice_async_read_cb (xobject_t      *source,
                            xasync_result_t *res,
                            xpointer_t      user_data)
 {
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xtask_t *task = XTASK (user_data);
   SpliceData *op = xtask_get_task_data (task);
   xssize_t ret;
@@ -2826,7 +2826,7 @@ splice_async_thread (xtask_t        *task,
 {
   xoutput_stream_t *stream = source_object;
   SpliceData *op = task_data;
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xerror_t *error = NULL;
   xssize_t bytes_copied;
 
@@ -2895,7 +2895,7 @@ flush_async_thread (xtask_t        *task,
                     xcancellable_t *cancellable)
 {
   xoutput_stream_t *stream = source_object;
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xboolean_t result;
   xerror_t *error = NULL;
 
@@ -2942,7 +2942,7 @@ close_async_thread (xtask_t        *task,
                     xcancellable_t *cancellable)
 {
   xoutput_stream_t *stream = source_object;
-  GOutputStreamClass *class;
+  xoutput_stream_class_t *class;
   xerror_t *error = NULL;
   xboolean_t result = TRUE;
 

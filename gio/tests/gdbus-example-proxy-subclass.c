@@ -123,7 +123,7 @@ static void
 accounts_user_init (AccountsUser *user)
 {
   /* Sets the expected interface */
-  g_dbus_proxy_set_interface_info (G_DBUS_PROXY (user), accounts_user_get_interface_info ());
+  xdbus_proxy_set_interface_info (G_DBUS_PROXY (user), accounts_user_get_interface_info ());
 }
 
 static void
@@ -160,7 +160,7 @@ accounts_user_get_user_name (AccountsUser *user)
   xvariant_t *value;
   const xchar_t *ret;
   g_return_val_if_fail (ACCOUNTS_IS_USER (user), NULL);
-  value = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (user), "UserName");
+  value = xdbus_proxy_get_cached_property (G_DBUS_PROXY (user), "UserName");
   ret = xvariant_get_string (value, NULL);
   xvariant_unref (value);
   return ret;
@@ -172,7 +172,7 @@ accounts_user_get_real_name (AccountsUser *user)
   xvariant_t *value;
   const xchar_t *ret;
   g_return_val_if_fail (ACCOUNTS_IS_USER (user), NULL);
-  value = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (user), "RealName");
+  value = xdbus_proxy_get_cached_property (G_DBUS_PROXY (user), "RealName");
   ret = xvariant_get_string (value, NULL);
   xvariant_unref (value);
   return ret;
@@ -184,7 +184,7 @@ accounts_user_get_automatic_login (AccountsUser *user)
   xvariant_t *value;
   xboolean_t ret;
   g_return_val_if_fail (ACCOUNTS_IS_USER (user), FALSE);
-  value = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (user), "AutomaticLogin");
+  value = xdbus_proxy_get_cached_property (G_DBUS_PROXY (user), "AutomaticLogin");
   ret = xvariant_get_boolean (value);
   xvariant_unref (value);
   return ret;
@@ -198,7 +198,7 @@ accounts_user_g_signal (xdbus_proxy_t   *proxy,
 {
   AccountsUser *user = ACCOUNTS_USER (proxy);
   if (xstrcmp0 (signal_name, "Changed") == 0)
-    g_signal_emit (user, signals[CHANGED_SIGNAL], 0);
+    xsignal_emit (user, signals[CHANGED_SIGNAL], 0);
 }
 
 static void
@@ -267,7 +267,7 @@ accounts_user_class_init (AccountsUserClass *klass)
                                                          G_PARAM_READABLE |
                                                          G_PARAM_STATIC_STRINGS));
 
-  signals[CHANGED_SIGNAL] = g_signal_new ("changed",
+  signals[CHANGED_SIGNAL] = xsignal_new ("changed",
                                           ACCOUNTS_TYPE_USER,
                                           G_SIGNAL_RUN_LAST,
                                           G_STRUCT_OFFSET (AccountsUserClass, changed),
@@ -292,7 +292,7 @@ accounts_user_frobnicate_sync (AccountsUser        *user,
 
   ret = NULL;
 
-  value = g_dbus_proxy_call_sync (G_DBUS_PROXY (user),
+  value = xdbus_proxy_call_sync (G_DBUS_PROXY (user),
                                   "Frobnicate",
                                   xvariant_new ("(si)",
                                                  flux,
@@ -318,7 +318,7 @@ accounts_user_frobnicate (AccountsUser        *user,
                           xpointer_t             user_data)
 {
   g_return_if_fail (ACCOUNTS_IS_USER (user));
-  g_dbus_proxy_call (G_DBUS_PROXY (user),
+  xdbus_proxy_call (G_DBUS_PROXY (user),
                      "Frobnicate",
                      xvariant_new ("(si)",
                                     flux,
@@ -340,7 +340,7 @@ accounts_user_frobnicate_finish (AccountsUser        *user,
   xvariant_t *value;
 
   ret = NULL;
-  value = g_dbus_proxy_call_finish (G_DBUS_PROXY (user), res, error);
+  value = xdbus_proxy_call_finish (G_DBUS_PROXY (user), res, error);
   if (value != NULL)
     {
       xvariant_get (value, "(s)", &ret);

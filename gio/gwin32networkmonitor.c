@@ -160,7 +160,7 @@ win_network_monitor_process_table (GWin32NetworkMonitor  *win,
       xptr_array_add (networks, network);
     }
 
-  g_network_monitor_base_set_networks (G_NETWORK_MONITOR_BASE (win),
+  xnetwork_monitor_base_set_networks (G_NETWORK_MONITOR_BASE (win),
                                        (xinet_address_mask_t **) networks->pdata,
                                        networks->len);
 
@@ -178,7 +178,7 @@ add_network (GWin32NetworkMonitor *win,
   network = get_network_mask (family, dest, dest_len);
   if (network != NULL)
     {
-      g_network_monitor_base_add_network (G_NETWORK_MONITOR_BASE (win), network);
+      xnetwork_monitor_base_add_network (G_NETWORK_MONITOR_BASE (win), network);
       xobject_unref (network);
     }
 }
@@ -194,7 +194,7 @@ remove_network (GWin32NetworkMonitor *win,
   network = get_network_mask (family, dest, dest_len);
   if (network != NULL)
     {
-      g_network_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (win), network);
+      xnetwork_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (win), network);
       xobject_unref (network);
     }
 }

@@ -288,7 +288,7 @@ msgstr "Serĉo ne estas subtenata en fluo"
 #: ../gio/gbufferedinputstream.c:937
 #, fuzzy
 #| msgid "Cannot truncate xmemory_input_stream_t"
-msgid "Cannot truncate xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
 msgstr "Ne eblas trunki xmemory_input_stream_t-on"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1208
@@ -3127,8 +3127,8 @@ msgid "Error removing old file: %s"
 msgstr "Eraro dum forigo de la malnova dosiero: %s"
 
 #: ../gio/gmemoryinputstream.c:474 ../gio/gmemoryoutputstream.c:772
-msgid "Invalid GSeekType supplied"
-msgstr "Nevalida GSeekType liverita"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Nevalida xseek_type_t liverita"
 
 #: ../gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"

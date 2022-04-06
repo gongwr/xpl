@@ -28,7 +28,7 @@ G_BEGIN_DECLS
 #define XTYPE_DBUS_INTERFACE         (g_dbus_interface_get_type())
 #define G_DBUS_INTERFACE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_INTERFACE, xdbus_interface))
 #define X_IS_DBUS_INTERFACE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_INTERFACE))
-#define G_DBUS_INTERFACE_GET_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE((o), XTYPE_DBUS_INTERFACE, GDBusInterfaceIface))
+#define G_DBUS_INTERFACE_GET_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE((o), XTYPE_DBUS_INTERFACE, xdbus_interface_iface_t))
 
 /**
  * xdbus_interface_t:
@@ -38,10 +38,10 @@ G_BEGIN_DECLS
  * Since: 2.30
  */
 
-typedef struct _GDBusInterfaceIface GDBusInterfaceIface;
+typedef struct _GDBusInterfaceIface xdbus_interface_iface_t;
 
 /**
- * GDBusInterfaceIface:
+ * xdbus_interface_iface_t:
  * @parent_iface: The parent interface.
  * @get_info: Returns a #xdbus_interface_info_t. See g_dbus_interface_get_info().
  * @get_object: Gets the enclosing #xdbus_object_t. See g_dbus_interface_get_object().

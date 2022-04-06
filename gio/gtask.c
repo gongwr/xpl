@@ -556,7 +556,7 @@ struct _GTask {
   xdestroy_notify_t task_data_destroy;
 
   xmain_context_t *context;
-  gint64 creation_time;
+  sint64_t creation_time;
   xint_t priority;
   xcancellable_t *cancellable;
 
@@ -1295,7 +1295,7 @@ xtask_return (xtask_t           *task,
            * another iteration of the main loop than tracking how the
            * cancellation was handled.
            */
-          if (!g_cancellable_is_cancelled (task->cancellable))
+          if (!xcancellable_is_cancelled (task->cancellable))
             {
               xtask_return_now (task);
               xobject_unref (task);
@@ -1363,7 +1363,7 @@ xtask_thread_complete (xtask_t *task)
   g_mutex_unlock (&task->lock);
 
   if (task->cancellable)
-    g_signal_handlers_disconnect_by_func (task->cancellable, task_thread_cancelled, task);
+    xsignal_handlers_disconnect_by_func (task->cancellable, task_thread_cancelled, task);
 
   if (task->synchronous)
     g_cond_signal (&task->cond);
@@ -1468,7 +1468,7 @@ task_thread_cancelled (xcancellable_t *cancellable,
 
   /* We don't actually set task->error; xtask_return_error() doesn't
    * use a lock, and xtask_propagate_error() will call
-   * g_cancellable_set_error_if_cancelled() anyway.
+   * xcancellable_set_error_if_cancelled() anyway.
    */
   g_mutex_unlock (&task->lock);
   xtask_thread_complete (task);
@@ -1497,7 +1497,7 @@ xtask_start_task_thread (xtask_t           *task,
   if (task->cancellable)
     {
       if (task->return_on_cancel &&
-          g_cancellable_set_error_if_cancelled (task->cancellable,
+          xcancellable_set_error_if_cancelled (task->cancellable,
                                                 &task->error))
         {
           task->thread_cancelled = task->thread_complete = TRUE;
@@ -1514,7 +1514,7 @@ xtask_start_task_thread (xtask_t           *task,
        * Accordingly, the signal handler *must* be removed once the task has
        * completed.
        */
-      g_signal_connect_data (task->cancellable, "cancelled",
+      xsignal_connect_data (task->cancellable, "cancelled",
                              G_CALLBACK (task_thread_cancelled),
                              xobject_ref (task),
                              task_thread_cancelled_disconnect_notify, 0);
@@ -1661,7 +1661,7 @@ xtask_propagate_error (xtask_t   *task,
   xboolean_t error_set;
 
   if (task->check_cancellable &&
-      g_cancellable_set_error_if_cancelled (task->cancellable, error))
+      xcancellable_set_error_if_cancelled (task->cancellable, error))
     error_set = TRUE;
   else if (task->error)
     {
@@ -1951,7 +1951,7 @@ xtask_return_error_if_cancelled (xtask_t *task)
   g_return_val_if_fail (X_IS_TASK (task), FALSE);
   g_return_val_if_fail (!task->ever_returned, FALSE);
 
-  if (g_cancellable_set_error_if_cancelled (task->cancellable, &error))
+  if (xcancellable_set_error_if_cancelled (task->cancellable, &error))
     {
       /* We explicitly set task->error so this works even when
        * check-cancellable is not set.
@@ -1984,7 +1984,7 @@ xtask_had_error (xtask_t *task)
   if (task->error != NULL || task->had_error)
     return TRUE;
 
-  if (task->check_cancellable && g_cancellable_is_cancelled (task->cancellable))
+  if (task->check_cancellable && xcancellable_is_cancelled (task->cancellable))
     return TRUE;
 
   return FALSE;
@@ -2149,9 +2149,9 @@ xtask_compare_priority (xconstpointer a,
 
   /* Let already-cancelled tasks finish right away */
   a_cancelled = (ta->check_cancellable &&
-                 g_cancellable_is_cancelled (ta->cancellable));
+                 xcancellable_is_cancelled (ta->cancellable));
   b_cancelled = (tb->check_cancellable &&
-                 g_cancellable_is_cancelled (tb->cancellable));
+                 xcancellable_is_cancelled (tb->cancellable));
   if (a_cancelled && !b_cancelled)
     return -1;
   else if (b_cancelled && !a_cancelled)

@@ -257,7 +257,7 @@ static xquark	            quark_toggle_refs = 0;
 static xquark               quark_notify_queue;
 static xquark               quark_in_construction;
 static GParamSpecPool      *pspec_pool = NULL;
-static gulong	            gobject_signals[LAST_SIGNAL] = { 0, };
+static xulong_t	            gobject_signals[LAST_SIGNAL] = { 0, };
 static xuint_t (*floating_flag_handler) (xobject_t*, xint_t) = object_floating_flag_handler;
 /* qdata pointing to xslist_t<GWeakRef *>, protected by weak_locations_lock */
 static xquark	            quark_weak_locations = 0;
@@ -544,10 +544,10 @@ xobject_do_class_init (xobject_class_t *class)
    *
    * This signal is typically used to obtain change notification for a
    * single property, by specifying the property name as a detail in the
-   * g_signal_connect() call, like this:
+   * xsignal_connect() call, like this:
    *
    * |[<!-- language="C" -->
-   * g_signal_connect (text_view->buffer, "notify::paste-target-list",
+   * xsignal_connect (text_view->buffer, "notify::paste-target-list",
    *                   G_CALLBACK (gtk_text_view_target_list_notify),
    *                   text_view)
    * ]|
@@ -557,7 +557,7 @@ xobject_do_class_init (xobject_class_t *class)
    * detail strings for the notify signal.
    */
   gobject_signals[NOTIFY] =
-    g_signal_new (g_intern_static_string ("notify"),
+    xsignal_new (g_intern_static_string ("notify"),
 		  XTYPE_FROM_CLASS (class),
 		  G_SIGNAL_RUN_FIRST | G_SIGNAL_NO_RECURSE | G_SIGNAL_DETAILED | G_SIGNAL_NO_HOOKS | G_SIGNAL_ACTION,
 		  G_STRUCT_OFFSET (xobject_class_t, notify),
@@ -1179,7 +1179,7 @@ xobject_do_get_property (xobject_t     *object,
 static void
 xobject_real_dispose (xobject_t *object)
 {
-  g_signal_handlers_destroy (object);
+  xsignal_handlers_destroy (object);
   g_datalist_id_set_data (&object->qdata, quark_closure_array, NULL);
   g_datalist_id_set_data (&object->qdata, quark_weak_refs, NULL);
   g_datalist_id_set_data (&object->qdata, quark_weak_locations, NULL);
@@ -1245,7 +1245,7 @@ xobject_dispatch_properties_changed (xobject_t     *object,
   xuint_t i;
 
   for (i = 0; i < n_pspecs; i++)
-    g_signal_emit (object, gobject_signals[NOTIFY], g_param_spec_get_name_quark (pspecs[i]), pspecs[i]);
+    xsignal_emit (object, gobject_signals[NOTIFY], g_param_spec_get_name_quark (pspecs[i]), pspecs[i]);
 }
 
 /**
@@ -1792,7 +1792,7 @@ xobject_get_type (void)
  * type #xint_t or #xuint_t or smaller. Specifically, you can use integer literals
  * with these property types.
  *
- * When using property types of #gint64 or #xuint64_t, you must ensure that the
+ * When using property types of #sint64_t or #xuint64_t, you must ensure that the
  * value that you provide is 64 bit. This means that you should use a cast or
  * make use of the %G_GINT64_CONSTANT or %G_GUINT64_CONSTANT macros.
  *
@@ -2684,7 +2684,7 @@ xobject_get_valist (xobject_t	 *object,
  *
  * The same caveats about passing integer literals as varargs apply as with
  * xobject_new(). In particular, any integer literals set as the values for
- * properties of type #gint64 or #xuint64_t must be 64 bits wide, using the
+ * properties of type #sint64_t or #xuint64_t must be 64 bits wide, using the
  * %G_GINT64_CONSTANT or %G_GUINT64_CONSTANT macros.
  *
  * Note that the "notify" signals are queued and only emitted (in
@@ -2865,14 +2865,14 @@ xobject_get_property (xobject_t	   *object,
  *
  * The signal specs expected by this function have the form
  * "modifier::signal_name", where modifier can be one of the following:
- * - signal: equivalent to g_signal_connect_data (..., NULL, 0)
- * - object-signal, object_signal: equivalent to g_signal_connect_object (..., 0)
- * - swapped-signal, swapped_signal: equivalent to g_signal_connect_data (..., NULL, G_CONNECT_SWAPPED)
- * - swapped_object_signal, swapped-object-signal: equivalent to g_signal_connect_object (..., G_CONNECT_SWAPPED)
- * - signal_after, signal-after: equivalent to g_signal_connect_data (..., NULL, G_CONNECT_AFTER)
- * - object_signal_after, object-signal-after: equivalent to g_signal_connect_object (..., G_CONNECT_AFTER)
- * - swapped_signal_after, swapped-signal-after: equivalent to g_signal_connect_data (..., NULL, G_CONNECT_SWAPPED | G_CONNECT_AFTER)
- * - swapped_object_signal_after, swapped-object-signal-after: equivalent to g_signal_connect_object (..., G_CONNECT_SWAPPED | G_CONNECT_AFTER)
+ * - signal: equivalent to xsignal_connect_data (..., NULL, 0)
+ * - object-signal, object_signal: equivalent to xsignal_connect_object (..., 0)
+ * - swapped-signal, swapped_signal: equivalent to xsignal_connect_data (..., NULL, G_CONNECT_SWAPPED)
+ * - swapped_object_signal, swapped-object-signal: equivalent to xsignal_connect_object (..., G_CONNECT_SWAPPED)
+ * - signal_after, signal-after: equivalent to xsignal_connect_data (..., NULL, G_CONNECT_AFTER)
+ * - object_signal_after, object-signal-after: equivalent to xsignal_connect_object (..., G_CONNECT_AFTER)
+ * - swapped_signal_after, swapped-signal-after: equivalent to xsignal_connect_data (..., NULL, G_CONNECT_SWAPPED | G_CONNECT_AFTER)
+ * - swapped_object_signal_after, swapped-object-signal-after: equivalent to xsignal_connect_object (..., G_CONNECT_SWAPPED | G_CONNECT_AFTER)
  *
  * |[<!-- language="C" -->
  *   menu->toplevel = xobject_connect (xobject_new (GTK_TYPE_WINDOW,
@@ -2905,42 +2905,42 @@ xobject_connect (xpointer_t     _object,
       xpointer_t data = va_arg (var_args, xpointer_t);
 
       if (strncmp (signal_spec, "signal::", 8) == 0)
-	g_signal_connect_data (object, signal_spec + 8,
+	xsignal_connect_data (object, signal_spec + 8,
 			       callback, data, NULL,
 			       0);
       else if (strncmp (signal_spec, "object_signal::", 15) == 0 ||
                strncmp (signal_spec, "object-signal::", 15) == 0)
-	g_signal_connect_object (object, signal_spec + 15,
+	xsignal_connect_object (object, signal_spec + 15,
 				 callback, data,
 				 0);
       else if (strncmp (signal_spec, "swapped_signal::", 16) == 0 ||
                strncmp (signal_spec, "swapped-signal::", 16) == 0)
-	g_signal_connect_data (object, signal_spec + 16,
+	xsignal_connect_data (object, signal_spec + 16,
 			       callback, data, NULL,
 			       G_CONNECT_SWAPPED);
       else if (strncmp (signal_spec, "swapped_object_signal::", 23) == 0 ||
                strncmp (signal_spec, "swapped-object-signal::", 23) == 0)
-	g_signal_connect_object (object, signal_spec + 23,
+	xsignal_connect_object (object, signal_spec + 23,
 				 callback, data,
 				 G_CONNECT_SWAPPED);
       else if (strncmp (signal_spec, "signal_after::", 14) == 0 ||
                strncmp (signal_spec, "signal-after::", 14) == 0)
-	g_signal_connect_data (object, signal_spec + 14,
+	xsignal_connect_data (object, signal_spec + 14,
 			       callback, data, NULL,
 			       G_CONNECT_AFTER);
       else if (strncmp (signal_spec, "object_signal_after::", 21) == 0 ||
                strncmp (signal_spec, "object-signal-after::", 21) == 0)
-	g_signal_connect_object (object, signal_spec + 21,
+	xsignal_connect_object (object, signal_spec + 21,
 				 callback, data,
 				 G_CONNECT_AFTER);
       else if (strncmp (signal_spec, "swapped_signal_after::", 22) == 0 ||
                strncmp (signal_spec, "swapped-signal-after::", 22) == 0)
-	g_signal_connect_data (object, signal_spec + 22,
+	xsignal_connect_data (object, signal_spec + 22,
 			       callback, data, NULL,
 			       G_CONNECT_SWAPPED | G_CONNECT_AFTER);
       else if (strncmp (signal_spec, "swapped_object_signal_after::", 29) == 0 ||
                strncmp (signal_spec, "swapped-object-signal-after::", 29) == 0)
-	g_signal_connect_object (object, signal_spec + 29,
+	xsignal_connect_object (object, signal_spec + 29,
 				 callback, data,
 				 G_CONNECT_SWAPPED | G_CONNECT_AFTER);
       else
@@ -3007,9 +3007,9 @@ xobject_disconnect (xpointer_t     _object,
 	}
 
       if ((mask & G_SIGNAL_MATCH_ID) &&
-	  !g_signal_parse_name (signal_spec, G_OBJECT_TYPE (object), &sid, &detail, FALSE))
+	  !xsignal_parse_name (signal_spec, G_OBJECT_TYPE (object), &sid, &detail, FALSE))
 	g_warning ("%s: invalid signal name \"%s\"", G_STRFUNC, signal_spec);
-      else if (!g_signal_handlers_disconnect_matched (object, mask | (detail ? G_SIGNAL_MATCH_DETAIL : 0),
+      else if (!xsignal_handlers_disconnect_matched (object, mask | (detail ? G_SIGNAL_MATCH_DETAIL : 0),
 						      sid, detail,
 						      NULL, (xpointer_t)callback, data))
 	g_warning ("%s: signal handler %p(%p) is not connected", G_STRFUNC, callback, data);
@@ -3661,7 +3661,7 @@ xobject_unref (xpointer_t _object)
 
       /* we are still in the process of taking away the last ref */
       g_datalist_id_set_data (&object->qdata, quark_closure_array, NULL);
-      g_signal_handlers_destroy (object);
+      xsignal_handlers_destroy (object);
       g_datalist_id_set_data (&object->qdata, quark_weak_refs, NULL);
       g_datalist_id_set_data (&object->qdata, quark_weak_locations, NULL);
 
@@ -4347,7 +4347,7 @@ xvalue_dup_object (const xvalue_t *value)
 }
 
 /**
- * g_signal_connect_object: (skip)
+ * xsignal_connect_object: (skip)
  * @instance: (type xobject_t.TypeInstance): the instance to connect to.
  * @detailed_signal: a string of the form "signal-name::detail".
  * @c_handler: the #xcallback_t to connect.
@@ -4355,7 +4355,7 @@ xvalue_dup_object (const xvalue_t *value)
  *    to @c_handler.
  * @connect_flags: a combination of #GConnectFlags.
  *
- * This is similar to g_signal_connect_data(), but uses a closure which
+ * This is similar to xsignal_connect_data(), but uses a closure which
  * ensures that the @gobject stays alive during the call to @c_handler
  * by temporarily adding a reference count to @gobject.
  *
@@ -4366,8 +4366,8 @@ xvalue_dup_object (const xvalue_t *value)
  *
  * Returns: the handler id.
  */
-gulong
-g_signal_connect_object (xpointer_t      instance,
+xulong_t
+xsignal_connect_object (xpointer_t      instance,
 			 const xchar_t  *detailed_signal,
 			 xcallback_t     c_handler,
 			 xpointer_t      gobject,
@@ -4385,10 +4385,10 @@ g_signal_connect_object (xpointer_t      instance,
 
       closure = ((connect_flags & G_CONNECT_SWAPPED) ? g_cclosure_new_object_swap : g_cclosure_new_object) (c_handler, gobject);
 
-      return g_signal_connect_closure (instance, detailed_signal, closure, connect_flags & G_CONNECT_AFTER);
+      return xsignal_connect_closure (instance, detailed_signal, closure, connect_flags & G_CONNECT_AFTER);
     }
   else
-    return g_signal_connect_data (instance, detailed_signal, c_handler, NULL, NULL, connect_flags);
+    return xsignal_connect_data (instance, detailed_signal, c_handler, NULL, NULL, connect_flags);
 }
 
 typedef struct {

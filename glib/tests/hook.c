@@ -38,7 +38,7 @@ test_hook1 (void)
 {
   GHookList *hl;
   GHook *hook;
-  gulong id;
+  xulong_t id;
   GHook *h;
 
   hl = g_new (GHookList, 1);

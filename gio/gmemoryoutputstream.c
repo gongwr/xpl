@@ -102,7 +102,7 @@ static xoffset_t  g_memory_output_stream_tell                (xseekable__t      
 static xboolean_t g_memory_output_stream_can_seek            (xseekable__t       *seekable);
 static xboolean_t g_memory_output_stream_seek                (xseekable__t       *seekable,
                                                            xoffset_t          offset,
-                                                           GSeekType        type,
+                                                           xseek_type_t        type,
                                                            xcancellable_t    *cancellable,
                                                            xerror_t         **error);
 static xboolean_t g_memory_output_stream_can_truncate        (xseekable__t       *seekable);
@@ -128,7 +128,7 @@ G_DEFINE_TYPE_WITH_CODE (xmemory_output_stream_t, g_memory_output_stream, XTYPE_
 static void
 g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
 {
-  GOutputStreamClass *ostream_class;
+  xoutput_stream_class_t *ostream_class;
   xobject_class_t *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
@@ -153,7 +153,7 @@ g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
   xobject_class_install_property (gobject_class,
                                    PROP_DATA,
                                    g_param_spec_pointer ("data",
-                                                         P_("Data Buffer"),
+                                                         P_("Data buffer_t"),
                                                          P_("Pointer to buffer where data will be written."),
                                                          G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
                                                          G_PARAM_STATIC_STRINGS));
@@ -168,7 +168,7 @@ g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
   xobject_class_install_property (gobject_class,
                                    PROP_SIZE,
                                    g_param_spec_ulong ("size",
-                                                       P_("Data Buffer Size"),
+                                                       P_("Data buffer_t Size"),
                                                        P_("Current size of the data buffer."),
                                                        0, G_MAXULONG, 0,
                                                        G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
@@ -723,7 +723,7 @@ g_memory_output_stream_can_seek (xseekable__t *seekable)
 static xboolean_t
 g_memory_output_stream_seek (xseekable__t    *seekable,
                              xoffset_t        offset,
-                             GSeekType      type,
+                             xseek_type_t      type,
                              xcancellable_t  *cancellable,
                              xerror_t       **error)
 {
@@ -759,7 +759,7 @@ g_memory_output_stream_seek (xseekable__t    *seekable,
       g_set_error_literal (error,
                            G_IO_ERROR,
                            G_IO_ERROR_INVALID_ARGUMENT,
-                           _("Invalid GSeekType supplied"));
+                           _("Invalid xseek_type_t supplied"));
 
       return FALSE;
     }

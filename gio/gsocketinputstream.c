@@ -39,7 +39,7 @@ struct _GSocketInputStreamPrivate
   xsize_t count;
 };
 
-static void xsocket_input_stream_pollable_iface_init (GPollableInputStreamInterface *iface);
+static void xsocket_input_stream_pollable_iface_init (xpollable_input_stream_interface_t *iface);
 #ifdef G_OS_UNIX
 static void xsocket_input_stream_file_descriptor_based_iface_init (GFileDescriptorBasedIface *iface);
 #endif
@@ -180,7 +180,7 @@ static void
 xsocket_input_stream_class_init (GSocketInputStreamClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
-  GInputStreamClass *ginputstream_class = G_INPUT_STREAM_CLASS (klass);
+  xinput_stream_class_t *ginputstream_class = G_INPUT_STREAM_CLASS (klass);
 
   gobject_class->finalize = xsocket_input_stream_finalize;
   gobject_class->get_property = xsocket_input_stream_get_property;
@@ -205,7 +205,7 @@ xsocket_input_stream_file_descriptor_based_iface_init (GFileDescriptorBasedIface
 #endif
 
 static void
-xsocket_input_stream_pollable_iface_init (GPollableInputStreamInterface *iface)
+xsocket_input_stream_pollable_iface_init (xpollable_input_stream_interface_t *iface)
 {
   iface->is_readable = xsocket_input_stream_pollable_is_readable;
   iface->create_source = xsocket_input_stream_pollable_create_source;

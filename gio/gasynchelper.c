@@ -45,14 +45,14 @@ _g_win32_overlap_wait_result (HANDLE           hfile,
   xint_t num, npoll;
 
 #if XPL_SIZEOF_VOID_P == 8
-  pollfd[0].fd = (gint64)overlap->hEvent;
+  pollfd[0].fd = (sint64_t)overlap->hEvent;
 #else
   pollfd[0].fd = (xint_t)overlap->hEvent;
 #endif
   pollfd[0].events = G_IO_IN;
   num = 1;
 
-  if (g_cancellable_make_pollfd (cancellable, &pollfd[1]))
+  if (xcancellable_make_pollfd (cancellable, &pollfd[1]))
     num++;
 
 loop:
@@ -61,7 +61,7 @@ loop:
     /* error out, should never happen */
     goto end;
 
-  if (g_cancellable_is_cancelled (cancellable))
+  if (xcancellable_is_cancelled (cancellable))
     {
       /* CancelIO only cancels pending operations issued by the
        * current thread and since we're doing only sync operations,
@@ -75,12 +75,12 @@ loop:
   result = GetOverlappedResult (overlap->hEvent, overlap, transferred, FALSE);
   if (result == FALSE &&
       GetLastError () == ERROR_IO_INCOMPLETE &&
-      !g_cancellable_is_cancelled (cancellable))
+      !xcancellable_is_cancelled (cancellable))
     goto loop;
 
 end:
   if (num > 1)
-    g_cancellable_release_fd (cancellable);
+    xcancellable_release_fd (cancellable);
 
   return result;
 }

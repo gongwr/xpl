@@ -136,8 +136,8 @@ g_simple_action_change_state (xaction_t  *action,
   /* If the user connected a signal handler then they are responsible
    * for handling state changes.
    */
-  if (g_signal_has_handler_pending (action, g_simple_action_signals[SIGNAL_CHANGE_STATE], 0, TRUE))
-    g_signal_emit (action, g_simple_action_signals[SIGNAL_CHANGE_STATE], 0, value);
+  if (xsignal_has_handler_pending (action, g_simple_action_signals[SIGNAL_CHANGE_STATE], 0, TRUE))
+    xsignal_emit (action, g_simple_action_signals[SIGNAL_CHANGE_STATE], 0, value);
 
   /* If not, then the default behaviour is to just set the state. */
   else
@@ -221,8 +221,8 @@ g_simple_action_activate (xaction_t  *action,
       /* If the user connected a signal handler then they are responsible
        * for handling activation.
        */
-      if (g_signal_has_handler_pending (action, g_simple_action_signals[SIGNAL_ACTIVATE], 0, TRUE))
-        g_signal_emit (action, g_simple_action_signals[SIGNAL_ACTIVATE], 0, parameter);
+      if (xsignal_has_handler_pending (action, g_simple_action_signals[SIGNAL_ACTIVATE], 0, TRUE))
+        xsignal_emit (action, g_simple_action_signals[SIGNAL_ACTIVATE], 0, parameter);
 
       /* If not, do some reasonable defaults for stateful actions. */
       else if (simple->state)
@@ -391,7 +391,7 @@ g_simple_action_class_init (GSimpleActionClass *class)
    * Since: 2.28
    */
   g_simple_action_signals[SIGNAL_ACTIVATE] =
-    g_signal_new (I_("activate"),
+    xsignal_new (I_("activate"),
                   XTYPE_SIMPLE_ACTION,
                   G_SIGNAL_RUN_LAST | G_SIGNAL_MUST_COLLECT,
                   0, NULL, NULL,
@@ -441,7 +441,7 @@ g_simple_action_class_init (GSimpleActionClass *class)
    * Since: 2.30
    */
   g_simple_action_signals[SIGNAL_CHANGE_STATE] =
-    g_signal_new (I_("change-state"),
+    xsignal_new (I_("change-state"),
                   XTYPE_SIMPLE_ACTION,
                   G_SIGNAL_RUN_LAST | G_SIGNAL_MUST_COLLECT,
                   0, NULL, NULL,

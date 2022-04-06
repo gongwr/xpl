@@ -853,7 +853,7 @@ xsocket_client_class_init (GSocketClientClass *class)
    * Since: 2.32
    */
   signals[EVENT] =
-    g_signal_new (I_("event"),
+    xsignal_new (I_("event"),
 		  XTYPE_FROM_CLASS (gobject_class),
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GSocketClientClass, event),
@@ -863,7 +863,7 @@ xsocket_client_class_init (GSocketClientClass *class)
 		  XTYPE_SOCKET_CLIENT_EVENT,
 		  XTYPE_SOCKET_CONNECTABLE,
 		  XTYPE_IO_STREAM);
-  g_signal_set_va_marshaller (signals[EVENT],
+  xsignal_set_va_marshaller (signals[EVENT],
                               XTYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_VOID__ENUM_OBJECT_OBJECTv);
 
@@ -989,7 +989,7 @@ xsocket_client_emit_event (xsocket_client_t       *client,
 			    xsocket_connectable_t  *connectable,
 			    xio_stream_t           *connection)
 {
-  g_signal_emit (client, signals[EVENT], 0,
+  xsignal_emit (client, signals[EVENT], 0,
 		 event, connectable, connection);
 }
 
@@ -1123,10 +1123,10 @@ xsocket_client_connect (xsocket_client_t       *client,
       xsocket_t *socket;
       xboolean_t using_proxy;
 
-      if (g_cancellable_is_cancelled (cancellable))
+      if (xcancellable_is_cancelled (cancellable))
 	{
 	  g_clear_error (&error_info->best_error);
-	  g_cancellable_set_error_if_cancelled (cancellable, &error_info->best_error);
+	  xcancellable_set_error_if_cancelled (cancellable, &error_info->best_error);
 	  break;
 	}
 
@@ -1554,7 +1554,7 @@ cancel_all_attempts (GSocketClientAsyncConnectData *data)
   for (l = data->connection_attempts; l; l = xslist_next (l))
     {
       ConnectionAttempt *attempt_entry = l->data;
-      g_cancellable_cancel (attempt_entry->cancellable);
+      xcancellable_cancel (attempt_entry->cancellable);
       connection_attempt_unref (attempt_entry);
     }
   xslist_free (data->connection_attempts);
@@ -1563,7 +1563,7 @@ cancel_all_attempts (GSocketClientAsyncConnectData *data)
   xslist_free_full (data->successful_connections, connection_attempt_unref);
   data->successful_connections = NULL;
 
-  g_cancellable_cancel (data->enumeration_cancellable);
+  xcancellable_cancel (data->enumeration_cancellable);
 }
 
 static void
@@ -1586,7 +1586,7 @@ xsocket_client_async_connect_complete (ConnectionAttempt *attempt)
   data->completed = TRUE;
   cancel_all_attempts (data);
 
-  if (g_cancellable_set_error_if_cancelled (xtask_get_cancellable (data->task), &error))
+  if (xcancellable_set_error_if_cancelled (xtask_get_cancellable (data->task), &error))
     {
       g_debug ("xsocket_client_t: Connection cancelled!");
       xsocket_client_emit_event (data->client, XSOCKET_CLIENT_COMPLETE, data->connectable, NULL);
@@ -1745,7 +1745,7 @@ task_completed_or_cancelled (GSocketClientAsyncConnectData *data)
 
   if (data->completed)
     return TRUE;
-  else if (g_cancellable_set_error_if_cancelled (cancellable, &error))
+  else if (xcancellable_set_error_if_cancelled (cancellable, &error))
     {
       complete_connection_with_error (data, g_steal_pointer (&error));
       return TRUE;
@@ -1863,7 +1863,7 @@ xsocket_client_connected_callback (xobject_t      *source,
   ConnectionAttempt *attempt = user_data;
   GSocketClientAsyncConnectData *data = attempt->data;
 
-  if (task_completed_or_cancelled (data) || g_cancellable_is_cancelled (attempt->cancellable))
+  if (task_completed_or_cancelled (data) || xcancellable_is_cancelled (attempt->cancellable))
     {
       xobject_unref (data->task);
       connection_attempt_unref (attempt);
@@ -1879,7 +1879,7 @@ xsocket_client_connected_callback (xobject_t      *source,
   if (!xsocket_connection_connect_finish (XSOCKET_CONNECTION (source),
 					   result, &data->error_info->tmp_error))
     {
-      if (!g_cancellable_is_cancelled (attempt->cancellable))
+      if (!xcancellable_is_cancelled (attempt->cancellable))
         {
           g_debug ("xsocket_client_t: Connection attempt failed: %s", data->error_info->tmp_error->message);
           clarify_connect_error (data->error_info->tmp_error, data->connectable, attempt->address);
@@ -1936,7 +1936,7 @@ on_connection_cancelled (xcancellable_t *cancellable,
 {
   xcancellable_t *linked_cancellable = G_CANCELLABLE (data);
 
-  g_cancellable_cancel (linked_cancellable);
+  xcancellable_cancel (linked_cancellable);
 }
 
 static void
@@ -2009,7 +2009,7 @@ xsocket_client_enumerator_callback (xobject_t      *object,
   attempt->data = data;
   attempt->socket = socket;
   attempt->address = address;
-  attempt->cancellable = g_cancellable_new ();
+  attempt->cancellable = xcancellable_new ();
   attempt->connection = (xio_stream_t *)xsocket_connection_factory_create_connection (socket);
   attempt->timeout_source = g_timeout_source_new (HAPPY_EYEBALLS_CONNECTION_ATTEMPT_TIMEOUT_MS);
 
@@ -2021,7 +2021,7 @@ xsocket_client_enumerator_callback (xobject_t      *object,
   data->connection_attempts = xslist_append (data->connection_attempts, attempt);
 
   if (xtask_get_cancellable (data->task))
-    g_cancellable_connect (xtask_get_cancellable (data->task), G_CALLBACK (on_connection_cancelled),
+    xcancellable_connect (xtask_get_cancellable (data->task), G_CALLBACK (on_connection_cancelled),
                            xobject_ref (attempt->cancellable), xobject_unref);
 
   xsocket_connection_set_cached_remote_address ((xsocket_connection_t *)attempt->connection, address);
@@ -2125,9 +2125,9 @@ xsocket_client_connect_async (xsocket_client_t       *client,
   xtask_set_source_tag (data->task, xsocket_client_connect_async);
   xtask_set_task_data (data->task, data, (xdestroy_notify_t)xsocket_client_async_connect_data_free);
 
-  data->enumeration_cancellable = g_cancellable_new ();
+  data->enumeration_cancellable = xcancellable_new ();
   if (cancellable)
-    g_cancellable_connect (cancellable, G_CALLBACK (on_connection_cancelled),
+    xcancellable_connect (cancellable, G_CALLBACK (on_connection_cancelled),
                            xobject_ref (data->enumeration_cancellable), xobject_unref);
 
   enumerator_next_async (data, FALSE);

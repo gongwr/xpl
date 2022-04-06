@@ -78,7 +78,7 @@ return_type function_callback (… , xpointer_t user_data);
       <para>
         If you are using C or C++
         to connect a callback to a given event, you will either use simple <link linkend="GCClosure"><type>GCClosure</type></link>s
-        which have a pretty minimal API or the even simpler <function><link linkend="g-signal-connect">g_signal_connect</link></function>
+        which have a pretty minimal API or the even simpler <function><link linkend="g-signal-connect">xsignal_connect</link></function>
         functions (which will be presented a bit later).
       </para>
 
@@ -206,10 +206,10 @@ return_type function_callback (xpointer_t instance, …, xpointer_t user_data);
       <title>Signal registration</title>
 
 	  <para>
-		To register a new signal on an existing type, we can use any of <function><link linkend="g-signal-newv">g_signal_newv</link></function>,
-		<function><link linkend="g-signal-new-valist">g_signal_new_valist</link></function> or <function><link linkend="g-signal-new">g_signal_new</link></function> functions:
+		To register a new signal on an existing type, we can use any of <function><link linkend="g-signal-newv">xsignal_newv</link></function>,
+		<function><link linkend="g-signal-new-valist">xsignal_new_valist</link></function> or <function><link linkend="g-signal-new">xsignal_new</link></function> functions:
 <informalexample><programlisting>
-xuint_t g_signal_newv (const xchar_t        *signal_name,
+xuint_t xsignal_newv (const xchar_t        *signal_name,
                      xtype_t               itype,
                      GSignalFlags        signal_flags,
                      xclosure_t           *class_closure,
@@ -290,13 +290,13 @@ xuint_t g_signal_newv (const xchar_t        *signal_name,
 		  of a given signal on <emphasis>any</emphasis> of the instances of the type which supports that signal.
 			</para></listitem>
 		  <listitem><para>
-		  You can use <function><link linkend="g-signal-override-class-closure">g_signal_override_class_closure</link></function> which
+		  You can use <function><link linkend="g-signal-override-class-closure">xsignal_override_class_closure</link></function> which
 		  overrides the class closure of a given type. It is possible to call this function
 		  only on a derived type of the type on which the signal was registered.
 		  This function is of use only to language bindings.
 			</para></listitem>
 		  <listitem><para>
-		  You can register a closure with the <function><link linkend="g-signal-connect">g_signal_connect</link></function>
+		  You can register a closure with the <function><link linkend="g-signal-connect">xsignal_connect</link></function>
 		  family of functions. This is an instance-specific operation: the closure
 		  will be invoked only during emission of a given signal on a given instance.
 			</para></listitem>
@@ -305,8 +305,8 @@ xuint_t g_signal_newv (const xchar_t        *signal_name,
 		emission hooks are invoked whenever a given signal is emitted whatever the instance on
 		which it is emitted. Emission hooks are used for example to get all mouse_clicked
 		emissions in an application to be able to emit the small mouse click sound.
-		Emission hooks are connected with <function><link linkend="g-signal-add-emission-hook">g_signal_add_emission_hook</link></function>
-		and removed with <function><link linkend="g-signal-remove-emission-hook">g_signal_remove_emission_hook</link></function>.
+		Emission hooks are connected with <function><link linkend="g-signal-add-emission-hook">xsignal_add_emission_hook</link></function>
+		and removed with <function><link linkend="g-signal-remove-emission-hook">xsignal_remove_emission_hook</link></function>.
 	  </para>
 
 	</sect2>
@@ -315,10 +315,10 @@ xuint_t g_signal_newv (const xchar_t        *signal_name,
 	  <title>Signal emission</title>
 
 	  <para>
-		Signal emission is done through the use of the <function><link linkend="g-signal-emit">g_signal_emit</link></function> family
+		Signal emission is done through the use of the <function><link linkend="g-signal-emit">xsignal_emit</link></function> family
 		of functions.
 <informalexample><programlisting>
-void g_signal_emitv (const xvalue_t *instance_and_params,
+void xsignal_emitv (const xvalue_t *instance_and_params,
                      xuint_t         signal_id,
                      xquark        detail,
                      xvalue_t       *return_value);
@@ -366,8 +366,8 @@ void g_signal_emitv (const xvalue_t *instance_and_params,
 			</para></listitem>
 		  <listitem><para>
 			<literal>HANDLER_RUN_FIRST</literal>: if any closure were connected
-			with the <function><link linkend="g-signal-connect">g_signal_connect</link></function> family of
-			functions, and if they are not blocked (with the <function><link linkend="g-signal-handler-block">g_signal_handler_block</link></function>
+			with the <function><link linkend="g-signal-connect">xsignal_connect</link></function> family of
+			functions, and if they are not blocked (with the <function><link linkend="g-signal-handler-block">xsignal_handler_block</link></function>
 			family of functions) they are run here, from first to last connected.
 			</para></listitem>
 		  <listitem><para>
@@ -377,7 +377,7 @@ void g_signal_emitv (const xvalue_t *instance_and_params,
 			</para></listitem>
 		  <listitem><para>
 			<literal>HANDLER_RUN_LAST</literal>: if any closure were connected
-			with the <function>g_signal_connect_after</function> family of
+			with the <function>xsignal_connect_after</function> family of
 			functions, if they were not invoked during <literal>HANDLER_RUN_FIRST</literal> and if they
 			are not blocked, they are run here, from first to last connected.
 			</para></listitem>
@@ -392,7 +392,7 @@ void g_signal_emitv (const xvalue_t *instance_and_params,
 	  <para>
 		If, at any point during emission (except in <literal>RUN_CLEANUP</literal> or
 		<literal>EMISSION_HOOK</literal> state), one of the closures stops the signal emission with
-		<function><link linkend="g-signal-stop-emission">g_signal_stop_emission</link></function>,
+		<function><link linkend="g-signal-stop-emission">xsignal_stop_emission</link></function>,
 		emission jumps to <literal>RUN_CLEANUP</literal> state.
 	  </para>
 
@@ -413,7 +413,7 @@ void g_signal_emitv (const xvalue_t *instance_and_params,
 
 	  <para>
 		If no accumulator function was provided, the value returned by the last handler
-		run will be returned by <function><link linkend="g-signal-emit">g_signal_emit</link></function>.
+		run will be returned by <function><link linkend="g-signal-emit">xsignal_emit</link></function>.
 	  </para>
 
 	</sect2>
@@ -430,7 +430,7 @@ void g_signal_emitv (const xvalue_t *instance_and_params,
 	  <para>
 	    Of the three main connection functions,
 		only one has an explicit detail parameter as a <link linkend="xquark"><type>xquark</type></link>:
-		<link linkend="g-signal-connect-closure-by-id"><function>g_signal_connect_closure_by_id</function></link>.
+		<link linkend="g-signal-connect-closure-by-id"><function>xsignal_connect_closure_by_id</function></link>.
 		<footnote>
 		  <para>A xquark is an integer which uniquely represents a string. It is possible to transform
 		   back and forth between the integer and string representations with the functions
@@ -440,8 +440,8 @@ void g_signal_emitv (const xvalue_t *instance_and_params,
 	  </para>
 	  <para>
 	    The two other functions,
-	    <link linkend="g-signal-connect-closure"><function>g_signal_connect_closure</function></link> and
-	    <link linkend="g-signal-connect-data"><function>g_signal_connect_data</function></link>
+	    <link linkend="g-signal-connect-closure"><function>xsignal_connect_closure</function></link> and
+	    <link linkend="g-signal-connect-data"><function>xsignal_connect_data</function></link>
 	    hide the detail parameter in the signal name identification.
 		Their <parameter>detailed_signal</parameter> parameter is a
 		string which identifies the name of the signal to connect to.
@@ -457,12 +457,12 @@ void g_signal_emitv (const xvalue_t *instance_and_params,
 	  <para>
 	    Of the four main signal emission functions, one hides it in its
 	    signal name parameter:
-	    <link linkend="g-signal-connect"><function>g_signal_connect</function></link>.
+	    <link linkend="g-signal-connect"><function>xsignal_connect</function></link>.
 	    The other three have an explicit detail parameter as a
 	    <link linkend="xquark"><type>xquark</type></link> again:
-	    <link linkend="g-signal-emit"><function>g_signal_emit</function></link>,
-	    <link linkend="g-signal-emitv"><function>g_signal_emitv</function></link> and
-	    <link linkend="g-signal-emit-valist"><function>g_signal_emit_valist</function></link>.
+	    <link linkend="g-signal-emit"><function>xsignal_emit</function></link>,
+	    <link linkend="g-signal-emitv"><function>xsignal_emitv</function></link> and
+	    <link linkend="g-signal-emit-valist"><function>xsignal_emit_valist</function></link>.
 	  </para>
 
 	  <para>

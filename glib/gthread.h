@@ -213,7 +213,7 @@ void            g_cond_broadcast                (xcond_t          *cond);
 XPL_AVAILABLE_IN_2_32
 xboolean_t        g_cond_wait_until               (xcond_t          *cond,
                                                  xmutex_t         *mutex,
-                                                 gint64          end_time);
+                                                 sint64_t          end_time);
 
 XPL_AVAILABLE_IN_ALL
 xpointer_t        g_private_get                   (GPrivate       *key);

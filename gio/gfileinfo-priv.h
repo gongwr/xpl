@@ -132,7 +132,7 @@ void               _xfile_info_set_attribute_uint64_by_id      (xfile_info_t    
 							         xuint64_t                attr_value);
 void               _xfile_info_set_attribute_int64_by_id       (xfile_info_t             *info,
                                                                  xuint32_t                attribute,
-							         gint64                 attr_value);
+							         sint64_t                 attr_value);
 void               _xfile_info_set_attribute_object_by_id      (xfile_info_t             *info,
                                                                  xuint32_t                attribute,
 							         xobject_t               *attr_value);

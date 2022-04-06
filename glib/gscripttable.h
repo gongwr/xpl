@@ -6,7 +6,7 @@
 
 #define G_EASY_SCRIPTS_RANGE 8192
 
-static const guchar g_script_easy_table[8192] = {
+static const xuchar_t g_script_easy_table[8192] = {
 
   XUNICODE_SCRIPT_COMMON, XUNICODE_SCRIPT_COMMON, XUNICODE_SCRIPT_COMMON,
   XUNICODE_SCRIPT_COMMON, XUNICODE_SCRIPT_COMMON, XUNICODE_SCRIPT_COMMON,

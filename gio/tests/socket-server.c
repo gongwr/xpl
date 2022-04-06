@@ -63,7 +63,7 @@ main (int argc,
   xinput_stream_t *istream;
   xoutput_stream_t *ostream;
 
-  context = g_option_context_new (" - Test xsocket_t server stuff");
+  context = g_option_context_new (" - test_t xsocket_t server stuff");
   g_option_context_add_main_entries (context, cmd_entries, NULL);
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
@@ -80,7 +80,7 @@ main (int argc,
   if (cancel_timeout)
     {
       xthread_t *thread;
-      cancellable = g_cancellable_new ();
+      cancellable = xcancellable_new ();
       thread = xthread_new ("cancel", cancel_thread, cancellable);
       xthread_unref (thread);
     }

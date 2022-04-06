@@ -531,7 +531,7 @@ xsimple_async_result_propagate_error (xsimple_async_result_t  *simple,
 {
   g_return_val_if_fail (X_IS_SIMPLE_ASYNC_RESULT (simple), FALSE);
 
-  if (g_cancellable_set_error_if_cancelled (simple->check_cancellable, dest))
+  if (xcancellable_set_error_if_cancelled (simple->check_cancellable, dest))
     return TRUE;
 
   if (simple->failed)
@@ -864,7 +864,7 @@ complete_in_idle_cb_for_thread (xpointer_t _data)
   simple = data->simple;
 
   if (simple->handle_cancellation &&
-      g_cancellable_is_cancelled (data->cancellable))
+      xcancellable_is_cancelled (data->cancellable))
     xsimple_async_result_set_error (simple,
                                      G_IO_ERROR,
                                      G_IO_ERROR_CANCELLED,
@@ -890,7 +890,7 @@ run_in_thread (xio_scheduler_job_t *job,
   xsource_t *source;
 
   if (simple->handle_cancellation &&
-      g_cancellable_is_cancelled (c))
+      xcancellable_is_cancelled (c))
     xsimple_async_result_set_error (simple,
                                      G_IO_ERROR,
                                      G_IO_ERROR_CANCELLED,

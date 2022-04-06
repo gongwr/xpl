@@ -101,7 +101,7 @@ handle_launch (int argc, char *argv[], xboolean_t do_help)
     }
   else
     {
-      app = (xapp_info_t*)g_desktop_app_info_new_from_keyfile (keyfile);
+      app = (xapp_info_t*)xdesktop_app_info_new_from_keyfile (keyfile);
       if (!app)
         {
           print_error (_("Unable to load application information for ‘%s‘"), desktop_file);

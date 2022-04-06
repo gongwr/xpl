@@ -59,7 +59,7 @@ G_LOCK_EXTERN (inotify_lock);
 
 static ik_event_t *
 ik_event_new (struct inotify_event *kevent,
-              gint64                now)
+              sint64_t                now)
 {
   ik_event_t *event = g_new0 (ik_event_t, 1);
 
@@ -103,7 +103,7 @@ typedef struct
 
 static InotifyKernelSource *inotify_source;
 
-static gint64
+static sint64_t
 ik_source_get_dispatch_time (InotifyKernelSource *iks)
 {
   ik_event_t *head;
@@ -128,9 +128,9 @@ ik_source_get_dispatch_time (InotifyKernelSource *iks)
 
 static xboolean_t
 ik_source_can_dispatch_now (InotifyKernelSource *iks,
-                            gint64               now)
+                            sint64_t               now)
 {
-  gint64 dispatch_time;
+  sint64_t dispatch_time;
 
   dispatch_time = ik_source_get_dispatch_time (iks);
 
@@ -222,7 +222,7 @@ ik_source_dispatch (xsource_t     *source,
   InotifyKernelSource *iks = (InotifyKernelSource *) source;
   xboolean_t (*user_callback) (ik_event_t *event) = (void *) func;
   xboolean_t interesting = FALSE;
-  gint64 now;
+  sint64_t now;
 
   now = xsource_get_time (source);
 

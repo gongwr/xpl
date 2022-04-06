@@ -182,7 +182,7 @@ test_prgname_thread_safety (void)
   xthread_t *threads[4];
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/847");
-  g_test_summary ("Test that threads racing to get and set the program name "
+  g_test_summary ("test_t that threads racing to get and set the program name "
                   "always receive a valid program name.");
 
   g_set_prgname ("prgname");
@@ -219,7 +219,7 @@ test_tmpdir (void)
 
 #if TEST_BUILTINS
 static xint_t
-builtin_bit_nth_lsf1 (gulong mask, xint_t nth_bit)
+builtin_bit_nth_lsf1 (xulong_t mask, xint_t nth_bit)
 {
   if (nth_bit >= 0)
     {
@@ -232,7 +232,7 @@ builtin_bit_nth_lsf1 (gulong mask, xint_t nth_bit)
 }
 
 static xint_t
-builtin_bit_nth_lsf2 (gulong mask, xint_t nth_bit)
+builtin_bit_nth_lsf2 (xulong_t mask, xint_t nth_bit)
 {
   if (nth_bit >= 0)
     {
@@ -245,7 +245,7 @@ builtin_bit_nth_lsf2 (gulong mask, xint_t nth_bit)
 }
 
 static xint_t
-builtin_bit_nth_msf (gulong mask, xint_t nth_bit)
+builtin_bit_nth_msf (xulong_t mask, xint_t nth_bit)
 {
   if (nth_bit >= 0 && nth_bit < XPL_SIZEOF_LONG * 8)
     mask &= (1UL << nth_bit) - 1;
@@ -253,14 +253,14 @@ builtin_bit_nth_msf (gulong mask, xint_t nth_bit)
 }
 
 static xuint_t
-builtin_bit_storage (gulong number)
+builtin_bit_storage (xulong_t number)
 {
   return number ? XPL_SIZEOF_LONG * 8 - __builtin_clzl (number) : 1;
 }
 #endif
 
 static xint_t
-naive_bit_nth_lsf (gulong mask, xint_t nth_bit)
+naive_bit_nth_lsf (xulong_t mask, xint_t nth_bit)
 {
   if (G_UNLIKELY (nth_bit < -1))
     nth_bit = -1;
@@ -274,7 +274,7 @@ naive_bit_nth_lsf (gulong mask, xint_t nth_bit)
 }
 
 static xint_t
-naive_bit_nth_msf (gulong mask, xint_t nth_bit)
+naive_bit_nth_msf (xulong_t mask, xint_t nth_bit)
 {
   if (nth_bit < 0 || G_UNLIKELY (nth_bit > XPL_SIZEOF_LONG * 8))
     nth_bit = XPL_SIZEOF_LONG * 8;
@@ -288,7 +288,7 @@ naive_bit_nth_msf (gulong mask, xint_t nth_bit)
 }
 
 static xuint_t
-naive_bit_storage (gulong number)
+naive_bit_storage (xulong_t number)
 {
   xuint_t n_bits = 0;
 
@@ -304,7 +304,7 @@ naive_bit_storage (gulong number)
 static void
 test_basic_bits (void)
 {
-  gulong i;
+  xulong_t i;
   xint_t nth_bit;
 
   /* we loop like this: 0, -1, 1, -2, 2, -3, 3, ... */
@@ -312,7 +312,7 @@ test_basic_bits (void)
     {
       xuint_t naive_bit_storage_i = naive_bit_storage (i);
 
-      /* Test the g_bit_*() implementations against the compiler builtins (if
+      /* test_t the g_bit_*() implementations against the compiler builtins (if
        * available), and against a slow-but-correct ‘naive’ implementation.
        * They should all agree.
        *
@@ -356,14 +356,14 @@ test_basic_bits (void)
 static void
 test_bits (void)
 {
-  gulong mask;
+  xulong_t mask;
   xint_t max_bit;
   xint_t i, pos;
 
   pos = g_bit_nth_lsf (0, -1);
   g_assert_cmpint (pos, ==, -1);
 
-  max_bit = sizeof (gulong) * 8;
+  max_bit = sizeof (xulong_t) * 8;
   for (i = 0; i < max_bit; i++)
     {
       mask = 1UL << i;
@@ -817,7 +817,7 @@ test_clear_pointer (void)
   g_assert (a == NULL);
 }
 
-/* Test that g_clear_pointer() works with a xdestroy_notify_t which contains a cast.
+/* test_t that g_clear_pointer() works with a xdestroy_notify_t which contains a cast.
  * See https://gitlab.gnome.org/GNOME/glib/issues/1425 */
 static void
 test_clear_pointer_cast (void)
@@ -833,7 +833,7 @@ test_clear_pointer_cast (void)
   g_assert_null (hash_table);
 }
 
-/* Test that the macro version of g_clear_pointer() only evaluates its argument
+/* test_t that the macro version of g_clear_pointer() only evaluates its argument
  * once, just like the function version would. */
 static void
 test_clear_pointer_side_effects (void)
@@ -920,7 +920,7 @@ aligned_alloc_nz (void)
 {
   xpointer_t a;
 
-  /* Test an alignment that’s zero */
+  /* test_t an alignment that’s zero */
   a = g_aligned_alloc (16, sizeof(char), 0);
   g_aligned_free (a);
   exit (0);
@@ -931,7 +931,7 @@ aligned_alloc_npot (void)
 {
   xpointer_t a;
 
-  /* Test an alignment that’s not a power of two */
+  /* test_t an alignment that’s not a power of two */
   a = g_aligned_alloc (16, sizeof(char), 15);
   g_aligned_free (a);
   exit (0);
@@ -942,7 +942,7 @@ aligned_alloc_nmov (void)
 {
   xpointer_t a;
 
-  /* Test an alignment that’s not a multiple of sizeof(void*) */
+  /* test_t an alignment that’s not a multiple of sizeof(void*) */
   a = g_aligned_alloc (16, sizeof(char), sizeof(void *) / 2);
   g_aligned_free (a);
   exit (0);
@@ -1050,7 +1050,7 @@ test_check_setuid (void)
   g_assert (!res);
 }
 
-/* Test the defined integer limits are correct, as some compilers have had
+/* test_t the defined integer limits are correct, as some compilers have had
  * problems with signed/unsigned conversion in the past. These limits should not
  * vary between platforms, compilers or architectures.
  *

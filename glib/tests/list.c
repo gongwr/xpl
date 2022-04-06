@@ -69,7 +69,7 @@ test_list_sort_with_data (void)
   xlist_free (list);
 }
 
-/* Test that the sort is stable. */
+/* test_t that the sort is stable. */
 static void
 test_list_sort_stable (void)
 {

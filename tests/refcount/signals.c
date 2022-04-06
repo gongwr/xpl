@@ -105,20 +105,20 @@ xtest_class_init (xtest_class_t * klass)
   gobject_class->get_property = xtest_get_property;
 
   xtest_signals[TEST_SIGNAL1] =
-      g_signal_new ("test-signal1", XTYPE_FROM_CLASS (klass),
+      xsignal_new ("test-signal1", XTYPE_FROM_CLASS (klass),
       G_SIGNAL_RUN_LAST, G_STRUCT_OFFSET (xtest_class_t, test_signal1), NULL,
       NULL, g_cclosure_marshal_VOID__INT, XTYPE_NONE, 1, XTYPE_INT);
   xtest_signals[TEST_SIGNAL2] =
-      g_signal_new ("test-signal2", XTYPE_FROM_CLASS (klass),
+      xsignal_new ("test-signal2", XTYPE_FROM_CLASS (klass),
       G_SIGNAL_RUN_LAST, G_STRUCT_OFFSET (xtest_class_t, test_signal2), NULL,
       NULL, g_cclosure_marshal_VOID__INT, XTYPE_NONE, 1, XTYPE_INT);
   xtest_signals[TEST_SIGNAL3] =
-      g_signal_new ("test-signal3", XTYPE_FROM_CLASS (klass),
+      xsignal_new ("test-signal3", XTYPE_FROM_CLASS (klass),
       G_SIGNAL_RUN_LAST, G_STRUCT_OFFSET (xtest_class_t, test_signal3), NULL,
       NULL, g_cclosure_marshal_generic, XTYPE_STRING, 1, XTYPE_INT);
 
   xobject_class_install_property (G_OBJECT_CLASS (klass), ARG_TEST_PROP,
-      g_param_spec_int ("test-prop", "Test Prop", "Test property",
+      g_param_spec_int ("test-prop", "test_t Prop", "test_t property",
           0, 1, 0, G_PARAM_READWRITE));
 
   klass->test_signal2 = signal2_handler;
@@ -184,7 +184,7 @@ xtest_get_property (xobject_t * object, xuint_t prop_id,
 static void
 xtest_do_signal1 (xtest_t * test)
 {
-  g_signal_emit (G_OBJECT (test), xtest_signals[TEST_SIGNAL1], 0, 0);
+  xsignal_emit (G_OBJECT (test), xtest_signals[TEST_SIGNAL1], 0, 0);
 }
 
 static void
@@ -195,7 +195,7 @@ signal2_handler (xtest_t * test, xint_t anint)
 static void
 xtest_do_signal2 (xtest_t * test)
 {
-  g_signal_emit (G_OBJECT (test), xtest_signals[TEST_SIGNAL2], 0, 0);
+  xsignal_emit (G_OBJECT (test), xtest_signals[TEST_SIGNAL2], 0, 0);
 }
 
 static xchar_t *
@@ -209,7 +209,7 @@ xtest_do_signal3 (xtest_t * test)
 {
   xchar_t *res;
 
-  g_signal_emit (G_OBJECT (test), xtest_signals[TEST_SIGNAL3], 0, 0, &res);
+  xsignal_emit (G_OBJECT (test), xtest_signals[TEST_SIGNAL3], 0, 0, &res);
   g_assert (res);
   g_free (res);
 }
@@ -267,9 +267,9 @@ main (int argc, char **argv)
   test1 = xobject_new (XTYPE_TEST, NULL);
   test2 = xobject_new (XTYPE_TEST, NULL);
 
-  g_signal_connect (test1, "notify::test-prop", G_CALLBACK (notify), NULL);
-  g_signal_connect (test1, "test-signal1", G_CALLBACK (notify), NULL);
-  g_signal_connect (test1, "test-signal2", G_CALLBACK (notify), NULL);
+  xsignal_connect (test1, "notify::test-prop", G_CALLBACK (notify), NULL);
+  xsignal_connect (test1, "test-signal1", G_CALLBACK (notify), NULL);
+  xsignal_connect (test1, "test-signal2", G_CALLBACK (notify), NULL);
 
   test_threads = g_array_new (FALSE, FALSE, sizeof (xthread_t *));
 

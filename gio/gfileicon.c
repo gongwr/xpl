@@ -42,7 +42,7 @@
  **/
 
 static void xfile_icon_icon_iface_init          (xicon_iface_t          *iface);
-static void xfile_icon_loadable_icon_iface_init (GLoadableIconIface  *iface);
+static void xfile_icon_loadable_icon_iface_init (xloadable_icon_iface_t  *iface);
 static void xfile_icon_load_async               (xloadable_icon_t       *icon,
 						  int                  size,
 						  xcancellable_t        *cancellable,
@@ -358,7 +358,7 @@ xfile_icon_load_finish (xloadable_icon_t  *icon,
 }
 
 static void
-xfile_icon_loadable_icon_iface_init (GLoadableIconIface *iface)
+xfile_icon_loadable_icon_iface_init (xloadable_icon_iface_t *iface)
 {
   iface->load = xfile_icon_load;
   iface->load_async = xfile_icon_load_async;

@@ -136,21 +136,21 @@ whoami_filter_cb (xdbus_connection_t *connection,
       xstrcmp0 (xdbus_message_get_member (message), "WhoAmI") == 0)
     {
       xdbus_message_t *reply = xdbus_message_new_method_reply (message);
-      gint64 uid = -1;
-      gint64 pid = -1;
+      sint64_t uid = -1;
+      sint64_t pid = -1;
 #ifdef G_OS_UNIX
-      xcredentials_t *credentials = g_dbus_connection_get_peer_credentials (connection);
+      xcredentials_t *credentials = xdbus_connection_get_peer_credentials (connection);
 
       if (credentials != NULL)
         {
-          uid = (gint64) xcredentials_get_unix_user (credentials, NULL);
-          pid = (gint64) xcredentials_get_unix_pid (credentials, NULL);
+          uid = (sint64_t) xcredentials_get_unix_user (credentials, NULL);
+          pid = (sint64_t) xcredentials_get_unix_pid (credentials, NULL);
         }
 #endif
 
       xdbus_message_set_body (reply,
                                xvariant_new ("(xx)", uid, pid));
-      g_dbus_connection_send_message (connection, reply,
+      xdbus_connection_send_message (connection, reply,
                                       G_DBUS_SEND_MESSAGE_FLAGS_NONE,
                                       NULL, NULL);
       xobject_unref (reply);
@@ -168,7 +168,7 @@ new_connection_cb (G_GNUC_UNUSED xdbus_server_t *server,
                    xdbus_connection_t *connection,
                    G_GNUC_UNUSED xpointer_t user_data)
 {
-  xcredentials_t *credentials = g_dbus_connection_get_peer_credentials (connection);
+  xcredentials_t *credentials = xdbus_connection_get_peer_credentials (connection);
 
   if (credentials == NULL)
     {
@@ -183,7 +183,7 @@ new_connection_cb (G_GNUC_UNUSED xdbus_server_t *server,
     }
 
   xobject_ref (connection);
-  g_dbus_connection_add_filter (connection, whoami_filter_cb, NULL, NULL);
+  xdbus_connection_add_filter (connection, whoami_filter_cb, NULL, NULL);
   return TRUE;
 }
 
@@ -225,8 +225,8 @@ store_result_cb (G_GNUC_UNUSED xobject_t *source_object,
 
 static void
 assert_expected_uid_pid (InteropFlags flags,
-                         gint64 uid,
-                         gint64 pid)
+                         sint64_t uid,
+                         sint64_t pid)
 {
 #ifdef G_OS_UNIX
   if (flags & (INTEROP_FLAGS_ANONYMOUS | INTEROP_FLAGS_SHA1 | INTEROP_FLAGS_TCP))
@@ -234,7 +234,7 @@ assert_expected_uid_pid (InteropFlags flags,
       /* No assertion. There is no guarantee whether credentials will be
        * passed even though we didn't send them. Conversely, if
        * credentials were not passed,
-       * g_dbus_connection_get_peer_credentials() always returns the
+       * xdbus_connection_get_peer_credentials() always returns the
        * credentials of the socket, and not the uid that a
        * client might have proved it has by using DBUS_COOKIE_SHA1. */
     }
@@ -266,13 +266,13 @@ do_test_server_auth (InteropFlags flags)
   xchar_t *listenable_address = NULL;
   xdbus_server_t *server = NULL;
   xdbus_auth_observer_t *observer = NULL;
-  GDBusServerFlags server_flags = G_DBUS_SERVER_FLAGS_RUN_IN_THREAD;
+  xdbus_server_flags_t server_flags = G_DBUS_SERVER_FLAGS_RUN_IN_THREAD;
   xchar_t *guid = NULL;
   const char *connectable_address;
   xdbus_connection_t *client = NULL;
   xasync_result_t *result = NULL;
   xvariant_t *tuple = NULL;
-  gint64 uid, pid;
+  sint64_t uid, pid;
 #ifdef HAVE_DBUS1
   /* GNOME/glib#1831 seems to involve a race condition, so try a few times
    * to see if we can trigger it. */
@@ -332,24 +332,24 @@ do_test_server_auth (InteropFlags flags)
   observer = xdbus_auth_observer_new ();
 
   if (flags & INTEROP_FLAGS_EXTERNAL)
-    g_signal_connect (observer, "allow-mechanism",
+    xsignal_connect (observer, "allow-mechanism",
                       G_CALLBACK (allow_external_cb), NULL);
   else if (flags & INTEROP_FLAGS_ANONYMOUS)
-    g_signal_connect (observer, "allow-mechanism",
+    xsignal_connect (observer, "allow-mechanism",
                       G_CALLBACK (allow_anonymous_cb), NULL);
   else if (flags & INTEROP_FLAGS_SHA1)
-    g_signal_connect (observer, "allow-mechanism",
+    xsignal_connect (observer, "allow-mechanism",
                       G_CALLBACK (allow_sha1_cb), NULL);
   else
-    g_signal_connect (observer, "allow-mechanism",
+    xsignal_connect (observer, "allow-mechanism",
                       G_CALLBACK (allow_any_mechanism_cb), NULL);
 
-  g_signal_connect (observer, "authorize-authenticated-peer",
+  xsignal_connect (observer, "authorize-authenticated-peer",
                     G_CALLBACK (authorize_any_authenticated_peer_cb),
                     NULL);
 
   guid = g_dbus_generate_guid ();
-  server = g_dbus_server_new_sync (listenable_address,
+  server = xdbus_server_new_sync (listenable_address,
                                    server_flags,
                                    guid,
                                    observer,
@@ -357,25 +357,25 @@ do_test_server_auth (InteropFlags flags)
                                    &error);
   g_assert_no_error (error);
   g_assert_nonnull (server);
-  g_signal_connect (server, "new-connection", G_CALLBACK (new_connection_cb), NULL);
-  g_dbus_server_start (server);
-  connectable_address = g_dbus_server_get_client_address (server);
+  xsignal_connect (server, "new-connection", G_CALLBACK (new_connection_cb), NULL);
+  xdbus_server_start (server);
+  connectable_address = xdbus_server_get_client_address (server);
   g_test_message ("Connectable address: %s", connectable_address);
 
   result = NULL;
-  g_dbus_connection_new_for_address (connectable_address,
+  xdbus_connection_new_for_address (connectable_address,
                                      G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
                                      NULL, NULL, store_result_cb, &result);
 
   while (result == NULL)
     xmain_context_iteration (NULL, TRUE);
 
-  client = g_dbus_connection_new_for_address_finish (result, &error);
+  client = xdbus_connection_new_for_address_finish (result, &error);
   g_assert_no_error (error);
   g_assert_nonnull (client);
   g_clear_object (&result);
 
-  g_dbus_connection_call (client, NULL, "/", "com.example.Test", "WhoAmI",
+  xdbus_connection_call (client, NULL, "/", "com.example.test_t", "WhoAmI",
                           NULL, G_VARIANT_TYPE ("(xx)"),
                           G_DBUS_CALL_FLAGS_NONE, -1, NULL, store_result_cb,
                           &result);
@@ -383,7 +383,7 @@ do_test_server_auth (InteropFlags flags)
   while (result == NULL)
     xmain_context_iteration (NULL, TRUE);
 
-  tuple = g_dbus_connection_call_finish (client, result, &error);
+  tuple = xdbus_connection_call_finish (client, result, &error);
   g_assert_no_error (error);
   g_assert_nonnull (tuple);
   g_clear_object (&result);
@@ -420,7 +420,7 @@ do_test_server_auth (InteropFlags flags)
       g_assert_nonnull (libdbus_call.conn);
 
       libdbus_call.call = dbus_message_new_method_call (NULL, "/",
-                                                        "com.example.Test",
+                                                        "com.example.test_t",
                                                         "WhoAmI");
 
       if (libdbus_call.call == NULL)
@@ -467,7 +467,7 @@ do_test_server_auth (InteropFlags flags)
 
 out:
   if (server != NULL)
-    g_dbus_server_stop (server);
+    xdbus_server_stop (server);
 
   if (tmpdir != NULL)
     g_assert_cmpstr (g_rmdir (tmpdir) == 0 ? "OK" : xstrerror (errno),

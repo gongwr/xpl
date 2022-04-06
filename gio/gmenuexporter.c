@@ -114,7 +114,7 @@ struct _GMenuExporterMenu
   xuint_t               id;
 
   xmenu_model_t *model;
-  gulong      handler_id;
+  xulong_t      handler_id;
   xsequence_t  *item_links;
 };
 
@@ -131,7 +131,7 @@ xmenu_exporter_menu_free (GMenuExporterMenu *menu)
   xmenu_exporter_group_remove_menu (menu->group, menu->id);
 
   if (menu->handler_id != 0)
-    g_signal_handler_disconnect (menu->model, menu->handler_id);
+    xsignal_handler_disconnect (menu->model, menu->handler_id);
 
   if (menu->item_links != NULL)
     g_sequence_free (menu->item_links);
@@ -288,7 +288,7 @@ xmenu_exporter_menu_prepare (GMenuExporterMenu *menu)
   g_assert (menu->item_links == NULL);
 
   if (xmenu_model_is_mutable (menu->model))
-    menu->handler_id = g_signal_connect (menu->model, "items-changed",
+    menu->handler_id = xsignal_connect (menu->model, "items-changed",
                                          G_CALLBACK (xmenu_exporter_menu_items_changed), menu);
 
   menu->item_links = g_sequence_new (xmenu_exporter_link_free);
@@ -660,7 +660,7 @@ xmenu_exporter_report (GMenuExporter *exporter,
   xvariant_builder_add_value (&builder, report);
   xvariant_builder_close (&builder);
 
-  g_dbus_connection_emit_signal (exporter->connection,
+  xdbus_connection_emit_signal (exporter->connection,
                                  NULL,
                                  exporter->object_path,
                                  "org.gtk.Menus", "Changed",
@@ -753,7 +753,7 @@ xmenu_exporter_method_call (xdbus_connection_t       *connection,
 /* {{{1 Public API */
 
 /**
- * g_dbus_connection_export_menu_model:
+ * xdbus_connection_export_menu_model:
  * @connection: a #xdbus_connection_t
  * @object_path: a D-Bus object path
  * @menu: a #xmenu_model_t
@@ -769,7 +769,7 @@ xmenu_exporter_method_call (xdbus_connection_t       *connection,
  * returned (with @error set accordingly).
  *
  * You can unexport the menu model using
- * g_dbus_connection_unexport_menu_model() with the return value of
+ * xdbus_connection_unexport_menu_model() with the return value of
  * this function.
  *
  * Returns: the ID of the export (never zero), or 0 in case of failure
@@ -777,7 +777,7 @@ xmenu_exporter_method_call (xdbus_connection_t       *connection,
  * Since: 2.32
  */
 xuint_t
-g_dbus_connection_export_menu_model (xdbus_connection_t  *connection,
+xdbus_connection_export_menu_model (xdbus_connection_t  *connection,
                                      const xchar_t      *object_path,
                                      xmenu_model_t       *menu,
                                      xerror_t          **error)
@@ -790,7 +790,7 @@ g_dbus_connection_export_menu_model (xdbus_connection_t  *connection,
 
   exporter = g_slice_new0 (GMenuExporter);
 
-  id = g_dbus_connection_register_object (connection, object_path, org_gtk_Menus_get_interface (),
+  id = xdbus_connection_register_object (connection, object_path, org_gtk_Menus_get_interface (),
                                           &vtable, exporter, xmenu_exporter_free, error);
 
   if (id == 0)
@@ -809,24 +809,24 @@ g_dbus_connection_export_menu_model (xdbus_connection_t  *connection,
 }
 
 /**
- * g_dbus_connection_unexport_menu_model:
+ * xdbus_connection_unexport_menu_model:
  * @connection: a #xdbus_connection_t
- * @export_id: the ID from g_dbus_connection_export_menu_model()
+ * @export_id: the ID from xdbus_connection_export_menu_model()
  *
  * Reverses the effect of a previous call to
- * g_dbus_connection_export_menu_model().
+ * xdbus_connection_export_menu_model().
  *
  * It is an error to call this function with an ID that wasn't returned
- * from g_dbus_connection_export_menu_model() or to call it with the
+ * from xdbus_connection_export_menu_model() or to call it with the
  * same ID more than once.
  *
  * Since: 2.32
  */
 void
-g_dbus_connection_unexport_menu_model (xdbus_connection_t *connection,
+xdbus_connection_unexport_menu_model (xdbus_connection_t *connection,
                                        xuint_t            export_id)
 {
-  g_dbus_connection_unregister_object (connection, export_id);
+  xdbus_connection_unregister_object (connection, export_id);
 }
 
 /* {{{1 Epilogue */

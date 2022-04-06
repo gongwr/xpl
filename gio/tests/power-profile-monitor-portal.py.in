@@ -36,7 +36,7 @@ try:
     XDG_DESKTOP_PORTAL_PATH = "@libexecdir@/xdg-desktop-portal"
 
     class TestPowerProfileMonitorPortal(dbusmock.DBusTestCase):
-        '''Test xpower_profile_monitor_portal_t'''
+        '''test_t xpower_profile_monitor_portal_t'''
 
         @classmethod
         def setUpClass(klass):

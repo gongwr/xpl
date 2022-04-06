@@ -66,7 +66,7 @@ watch_handler (xpointer_t user_data)
 {
   GMemoryMonitorWin32 *win32 = user_data;
 
-  g_signal_emit_by_name (win32, "low-memory-warning",
+  xsignal_emit_by_name (win32, "low-memory-warning",
                          G_MEMORY_MONITOR_WARNING_LEVEL_LOW);
 
   return G_SOURCE_REMOVE;

@@ -1,4 +1,4 @@
-/* Test module for xio_module_t tests
+/* test_t module for xio_module_t tests
  * Copyright (C) 2013 Red Hat, Inc
  * Author: Matthias Clasen
  *

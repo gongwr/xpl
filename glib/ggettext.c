@@ -452,7 +452,7 @@ const xchar_t *
 g_dngettext (const xchar_t *domain,
              const xchar_t *msgid,
              const xchar_t *msgid_plural,
-             gulong       n)
+             xulong_t       n)
 {
   if (domain && G_UNLIKELY (!_g_dgettext_should_translate ()))
     return n == 1 ? msgid : msgid_plural;

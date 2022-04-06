@@ -161,7 +161,7 @@ test_delivery_in_thread_func (xpointer_t _data)
   /*
    * Check that we get a reply to the GetId() method call.
    */
-  g_dbus_connection_call (c,
+  xdbus_connection_call (c,
                           "org.freedesktop.DBus",  /* bus_name */
                           "/org/freedesktop/DBus", /* object path */
                           "org.freedesktop.DBus",  /* interface name */
@@ -175,7 +175,7 @@ test_delivery_in_thread_func (xpointer_t _data)
   while (data.async_result == NULL)
     xmain_context_iteration (thread_context, TRUE);
 
-  result_variant = g_dbus_connection_call_finish (c, data.async_result, &error);
+  result_variant = xdbus_connection_call_finish (c, data.async_result, &error);
   g_assert_no_error (error);
   g_assert_nonnull (result_variant);
   g_clear_pointer (&result_variant, xvariant_unref);
@@ -186,9 +186,9 @@ test_delivery_in_thread_func (xpointer_t _data)
    * is already cancelled - i.e.  we should get G_IO_ERROR_CANCELLED
    * when the actual connection is not up.
    */
-  ca = g_cancellable_new ();
-  g_cancellable_cancel (ca);
-  g_dbus_connection_call (c,
+  ca = xcancellable_new ();
+  xcancellable_cancel (ca);
+  xdbus_connection_call (c,
                           "org.freedesktop.DBus",  /* bus_name */
                           "/org/freedesktop/DBus", /* object path */
                           "org.freedesktop.DBus",  /* interface name */
@@ -202,7 +202,7 @@ test_delivery_in_thread_func (xpointer_t _data)
   while (data.async_result == NULL)
     xmain_context_iteration (thread_context, TRUE);
 
-  result_variant = g_dbus_connection_call_finish (c, data.async_result, &error);
+  result_variant = xdbus_connection_call_finish (c, data.async_result, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
   g_assert_false (g_dbus_error_is_remote_error (error));
   g_clear_error (&error);
@@ -214,8 +214,8 @@ test_delivery_in_thread_func (xpointer_t _data)
   /*
    * Check that cancellation works when the message is already in flight.
    */
-  ca = g_cancellable_new ();
-  g_dbus_connection_call (c,
+  ca = xcancellable_new ();
+  xdbus_connection_call (c,
                           "org.freedesktop.DBus",  /* bus_name */
                           "/org/freedesktop/DBus", /* object path */
                           "org.freedesktop.DBus",  /* interface name */
@@ -226,12 +226,12 @@ test_delivery_in_thread_func (xpointer_t _data)
                           ca,
                           (xasync_ready_callback_t) async_result_cb,
                           &data);
-  g_cancellable_cancel (ca);
+  xcancellable_cancel (ca);
 
   while (data.async_result == NULL)
     xmain_context_iteration (thread_context, TRUE);
 
-  result_variant = g_dbus_connection_call_finish (c, data.async_result, &error);
+  result_variant = xdbus_connection_call_finish (c, data.async_result, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
   g_assert_false (g_dbus_error_is_remote_error (error));
   g_clear_error (&error);
@@ -246,7 +246,7 @@ test_delivery_in_thread_func (xpointer_t _data)
    * First we subscribe to the signal, then we call EmitSignal(). This should
    * cause a TestSignal emission from the testserver.
    */
-  subscription_id = g_dbus_connection_signal_subscribe (c,
+  subscription_id = xdbus_connection_signal_subscribe (c,
                                                         "com.example.TestService", /* sender */
                                                         "com.example.Frob",        /* interface */
                                                         "TestSignal",              /* member */
@@ -259,7 +259,7 @@ test_delivery_in_thread_func (xpointer_t _data)
   g_assert_cmpuint (subscription_id, !=, 0);
   g_assert_cmpuint (data.signal_count, ==, 0);
 
-  g_dbus_connection_call (c,
+  xdbus_connection_call (c,
                           "com.example.TestService", /* bus_name */
                           "/com/example/test_object_t", /* object path */
                           "com.example.Frob",        /* interface name */
@@ -274,7 +274,7 @@ test_delivery_in_thread_func (xpointer_t _data)
   while (data.async_result == NULL || data.signal_count < 1)
     xmain_context_iteration (thread_context, TRUE);
 
-  result_variant = g_dbus_connection_call_finish (c, data.async_result, &error);
+  result_variant = xdbus_connection_call_finish (c, data.async_result, &error);
   g_assert_no_error (error);
   g_assert_nonnull (result_variant);
   g_clear_pointer (&result_variant, xvariant_unref);
@@ -282,7 +282,7 @@ test_delivery_in_thread_func (xpointer_t _data)
 
   g_assert_cmpuint (data.signal_count, ==, 1);
 
-  g_dbus_connection_signal_unsubscribe (c, subscription_id);
+  xdbus_connection_signal_unsubscribe (c, subscription_id);
   subscription_id = 0;
 
   while (!data.unsubscribe_complete)
@@ -333,7 +333,7 @@ sleep_cb (xdbus_proxy_t   *proxy,
   xvariant_t *result;
 
   error = NULL;
-  result = g_dbus_proxy_call_finish (proxy,
+  result = xdbus_proxy_call_finish (proxy,
                                      res,
                                      &error);
   g_assert_no_error (error);
@@ -366,7 +366,7 @@ test_sleep_in_thread_func (xpointer_t _data)
       if (data->async)
         {
           //g_debug ("invoking async (%p)", xthread_self ());
-          g_dbus_proxy_call (data->proxy,
+          xdbus_proxy_call (data->proxy,
                              "Sleep",
                              xvariant_new ("(i)", data->msec),
                              G_DBUS_CALL_FLAGS_NONE,
@@ -386,7 +386,7 @@ test_sleep_in_thread_func (xpointer_t _data)
 
           error = NULL;
           //g_debug ("invoking sync (%p)", xthread_self ());
-          result = g_dbus_proxy_call_sync (data->proxy,
+          result = xdbus_proxy_call_sync (data->proxy,
                                            "Sleep",
                                            xvariant_new ("(i)", data->msec),
                                            G_DBUS_CALL_FLAGS_NONE,
@@ -446,7 +446,7 @@ test_method_calls_on_proxy (xdbus_proxy_t *proxy)
       SyncThreadData data1;
       SyncThreadData data2;
       SyncThreadData data3;
-      gint64 start_time, end_time;
+      sint64_t start_time, end_time;
       xuint_t elapsed_msec;
 
       do_async = (n == 0);
@@ -509,7 +509,7 @@ test_method_calls_in_thread (void)
                                &error);
   g_assert_no_error (error);
   error = NULL;
-  proxy = g_dbus_proxy_new_sync (connection,
+  proxy = xdbus_proxy_new_sync (connection,
                                  G_DBUS_PROXY_FLAGS_NONE,
                                  NULL,                      /* xdbus_interface_info_t */
                                  "com.example.TestService", /* name */
@@ -540,7 +540,7 @@ ensure_connection_works (xdbus_connection_t *conn)
   xvariant_t *v;
   xerror_t *error = NULL;
 
-  v = g_dbus_connection_call_sync (conn, "org.freedesktop.DBus",
+  v = xdbus_connection_call_sync (conn, "org.freedesktop.DBus",
       "/org/freedesktop/DBus", "org.freedesktop.DBus", "GetId", NULL, NULL, 0, -1,
       NULL, &error);
   g_assert_no_error (error);

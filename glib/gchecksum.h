@@ -77,7 +77,7 @@ XPL_AVAILABLE_IN_ALL
 void                  xchecksum_free               (xchecksum_t       *checksum);
 XPL_AVAILABLE_IN_ALL
 void                  xchecksum_update             (xchecksum_t       *checksum,
-                                                     const guchar    *data,
+                                                     const xuchar_t    *data,
                                                      xssize_t           length);
 XPL_AVAILABLE_IN_ALL
 const xchar_t *         xchecksum_get_string         (xchecksum_t       *checksum);
@@ -88,7 +88,7 @@ void                  xchecksum_get_digest         (xchecksum_t       *checksum,
 
 XPL_AVAILABLE_IN_ALL
 xchar_t                *g_compute_checksum_for_data   (GChecksumType    checksum_type,
-                                                     const guchar    *data,
+                                                     const xuchar_t    *data,
                                                      xsize_t            length);
 XPL_AVAILABLE_IN_ALL
 xchar_t                *g_compute_checksum_for_string (GChecksumType    checksum_type,

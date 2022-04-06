@@ -47,7 +47,7 @@ typedef void (*GTestFixtureFunc) (xpointer_t      fixture,
                                                  #s1 " " #cmp " " #s2, __s1, #cmp, __s2); \
                                         } G_STMT_END
 #define g_assert_cmpint(n1, cmp, n2)    G_STMT_START { \
-                                             gint64 __n1 = (n1), __n2 = (n2); \
+                                             sint64_t __n1 = (n1), __n2 = (n2); \
                                              if (__n1 cmp __n2) ; else \
                                                g_assertion_message_cmpnum (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, \
                                                  #n1 " " #cmp " " #n2, (long double) __n1, #cmp, (long double) __n2, 'i'); \
@@ -435,7 +435,7 @@ void    g_test_queue_destroy            (xdestroy_notify_t destroy_func,
  *     child process is shared with stdin of its parent process.
  *     It is redirected to `/dev/null` otherwise.
  *
- * Test traps are guards around forked tests.
+ * test_t traps are guards around forked tests.
  * These flags determine what traps to set.
  *
  * Deprecated: 2.38: #GTestTrapFlags is used only with g_test_trap_fork(),

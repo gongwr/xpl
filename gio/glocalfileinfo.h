@@ -158,9 +158,9 @@ inline static xuint32_t _g_stat_blksize     (const GLocalFileStat *buf) { return
 
 inline static xuint64_t _g_stat_blocks      (const GLocalFileStat *buf) { return buf->stx_blocks; }
 
-inline static gint64  _g_stat_atime       (const GLocalFileStat *buf) { return buf->stx_atime.tv_sec; }
-inline static gint64  _g_stat_ctime       (const GLocalFileStat *buf) { return buf->stx_ctime.tv_sec; }
-inline static gint64  _g_stat_mtime       (const GLocalFileStat *buf) { return buf->stx_mtime.tv_sec; }
+inline static sint64_t  _g_stat_atime       (const GLocalFileStat *buf) { return buf->stx_atime.tv_sec; }
+inline static sint64_t  _g_stat_ctime       (const GLocalFileStat *buf) { return buf->stx_ctime.tv_sec; }
+inline static sint64_t  _g_stat_mtime       (const GLocalFileStat *buf) { return buf->stx_mtime.tv_sec; }
 inline static xuint32_t _g_stat_atim_nsec   (const GLocalFileStat *buf) { return buf->stx_atime.tv_nsec; }
 inline static xuint32_t _g_stat_ctim_nsec   (const GLocalFileStat *buf) { return buf->stx_ctime.tv_nsec; }
 inline static xuint32_t _g_stat_mtim_nsec   (const GLocalFileStat *buf) { return buf->stx_mtime.tv_nsec; }

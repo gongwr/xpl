@@ -116,7 +116,7 @@ typedef xboolean_t (*GSignalAccumulator)	(xsignal_invocation_hint_t *ihint,
  * @G_SIGNAL_DETAILED: This signal supports "::detail" appendices to the signal name
  *  upon handler connections and emissions.
  * @G_SIGNAL_ACTION: Action signals are signals that may freely be emitted on alive
- *  objects from user code via g_signal_emit() and friends, without
+ *  objects from user code via xsignal_emit() and friends, without
  *  the need of being embedded into extra code that performs pre or
  *  post emission adjustments on the object. They can also be thought
  *  of as object methods which can be called generically by
@@ -158,7 +158,7 @@ typedef enum
  * @G_CONNECT_AFTER: whether the handler should be called before or after the
  *  default handler of the signal.
  * @G_CONNECT_SWAPPED: whether the instance and data should be swapped when
- *  calling the handler; see g_signal_connect_swapped() for an example.
+ *  calling the handler; see xsignal_connect_swapped() for an example.
  *
  * The connection flags are used to specify the behaviour of a signal's
  * connection.
@@ -177,8 +177,8 @@ typedef enum
  * @G_SIGNAL_MATCH_DATA: The closure data must be the same.
  * @G_SIGNAL_MATCH_UNBLOCKED: Only unblocked signals may be matched.
  *
- * The match types specify what g_signal_handlers_block_matched(),
- * g_signal_handlers_unblock_matched() and g_signal_handlers_disconnect_matched()
+ * The match types specify what xsignal_handlers_block_matched(),
+ * xsignal_handlers_unblock_matched() and xsignal_handlers_disconnect_matched()
  * match signals by.
  */
 typedef enum
@@ -204,9 +204,9 @@ typedef enum
  * they are used in. This is only useful for non ref-counted, value-copy types.
  *
  * To flag a signal argument in this way, add `| G_SIGNAL_TYPE_STATIC_SCOPE`
- * to the corresponding argument of g_signal_new().
+ * to the corresponding argument of xsignal_new().
  * |[
- * g_signal_new ("size_request",
+ * xsignal_new ("size_request",
  *   XTYPE_FROM_CLASS (gobject_class),
  * 	 G_SIGNAL_RUN_FIRST,
  * 	 G_STRUCT_OFFSET (GtkWidgetClass, size_request),
@@ -245,7 +245,7 @@ struct _GSignalInvocationHint
  *  signal to be queried was unknown.
  * @signal_name: The signal name.
  * @itype: The interface/instance type that this signal can be emitted for.
- * @signal_flags: The signal flags as passed in to g_signal_new().
+ * @signal_flags: The signal flags as passed in to xsignal_new().
  * @return_type: The return type for user callbacks.
  * @n_params: The number of parameters that user callbacks take.
  * @param_types: (array length=n_params): The individual parameter types for
@@ -258,7 +258,7 @@ struct _GSignalInvocationHint
  *
  * A structure holding in-depth information for a specific signal.
  *
- * See also: g_signal_query()
+ * See also: xsignal_query()
  */
 struct _GSignalQuery
 {
@@ -274,7 +274,7 @@ struct _GSignalQuery
 
 /* --- signals --- */
 XPL_AVAILABLE_IN_ALL
-xuint_t                 g_signal_newv         (const xchar_t        *signal_name,
+xuint_t                 xsignal_newv         (const xchar_t        *signal_name,
 					     xtype_t               itype,
 					     GSignalFlags        signal_flags,
 					     xclosure_t           *class_closure,
@@ -285,7 +285,7 @@ xuint_t                 g_signal_newv         (const xchar_t        *signal_name
 					     xuint_t               n_params,
 					     xtype_t              *param_types);
 XPL_AVAILABLE_IN_ALL
-xuint_t                 g_signal_new_valist   (const xchar_t        *signal_name,
+xuint_t                 xsignal_new_valist   (const xchar_t        *signal_name,
 					     xtype_t               itype,
 					     GSignalFlags        signal_flags,
 					     xclosure_t           *class_closure,
@@ -296,7 +296,7 @@ xuint_t                 g_signal_new_valist   (const xchar_t        *signal_name
 					     xuint_t               n_params,
 					     va_list             args);
 XPL_AVAILABLE_IN_ALL
-xuint_t                 g_signal_new          (const xchar_t        *signal_name,
+xuint_t                 xsignal_new          (const xchar_t        *signal_name,
 					     xtype_t               itype,
 					     GSignalFlags        signal_flags,
 					     xuint_t               class_offset,
@@ -307,7 +307,7 @@ xuint_t                 g_signal_new          (const xchar_t        *signal_name
 					     xuint_t               n_params,
 					     ...);
 XPL_AVAILABLE_IN_ALL
-xuint_t            g_signal_new_class_handler (const xchar_t        *signal_name,
+xuint_t            xsignal_new_class_handler (const xchar_t        *signal_name,
                                              xtype_t               itype,
                                              GSignalFlags        signal_flags,
                                              xcallback_t           class_handler,
@@ -318,109 +318,109 @@ xuint_t            g_signal_new_class_handler (const xchar_t        *signal_name
                                              xuint_t               n_params,
                                              ...);
 XPL_AVAILABLE_IN_ALL
-void             g_signal_set_va_marshaller (xuint_t              signal_id,
+void             xsignal_set_va_marshaller (xuint_t              signal_id,
 					     xtype_t              instance_type,
 					     GSignalCVaMarshaller va_marshaller);
 
 XPL_AVAILABLE_IN_ALL
-void                  g_signal_emitv        (const xvalue_t       *instance_and_params,
+void                  xsignal_emitv        (const xvalue_t       *instance_and_params,
 					     xuint_t               signal_id,
 					     xquark              detail,
 					     xvalue_t             *return_value);
 XPL_AVAILABLE_IN_ALL
-void                  g_signal_emit_valist  (xpointer_t            instance,
+void                  xsignal_emit_valist  (xpointer_t            instance,
 					     xuint_t               signal_id,
 					     xquark              detail,
 					     va_list             var_args);
 XPL_AVAILABLE_IN_ALL
-void                  g_signal_emit         (xpointer_t            instance,
+void                  xsignal_emit         (xpointer_t            instance,
 					     xuint_t               signal_id,
 					     xquark              detail,
 					     ...);
 XPL_AVAILABLE_IN_ALL
-void                  g_signal_emit_by_name (xpointer_t            instance,
+void                  xsignal_emit_by_name (xpointer_t            instance,
 					     const xchar_t        *detailed_signal,
 					     ...);
 XPL_AVAILABLE_IN_ALL
-xuint_t                 g_signal_lookup       (const xchar_t        *name,
+xuint_t                 xsignal_lookup       (const xchar_t        *name,
 					     xtype_t               itype);
 XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_signal_name         (xuint_t               signal_id);
+const xchar_t *         xsignal_name         (xuint_t               signal_id);
 XPL_AVAILABLE_IN_ALL
-void                  g_signal_query        (xuint_t               signal_id,
+void                  xsignal_query        (xuint_t               signal_id,
 					     GSignalQuery       *query);
 XPL_AVAILABLE_IN_ALL
-xuint_t*                g_signal_list_ids     (xtype_t               itype,
+xuint_t*                xsignal_list_ids     (xtype_t               itype,
 					     xuint_t              *n_ids);
 XPL_AVAILABLE_IN_2_66
-xboolean_t              g_signal_is_valid_name (const xchar_t      *name);
+xboolean_t              xsignal_is_valid_name (const xchar_t      *name);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	      g_signal_parse_name   (const xchar_t	*detailed_signal,
+xboolean_t	      xsignal_parse_name   (const xchar_t	*detailed_signal,
 					     xtype_t		 itype,
 					     xuint_t		*signal_id_p,
 					     xquark		*detail_p,
 					     xboolean_t		 force_detail_quark);
 XPL_AVAILABLE_IN_ALL
-xsignal_invocation_hint_t* g_signal_get_invocation_hint (xpointer_t    instance);
+xsignal_invocation_hint_t* xsignal_get_invocation_hint (xpointer_t    instance);
 
 
 /* --- signal emissions --- */
 XPL_AVAILABLE_IN_ALL
-void	g_signal_stop_emission		    (xpointer_t		  instance,
+void	xsignal_stop_emission		    (xpointer_t		  instance,
 					     xuint_t		  signal_id,
 					     xquark		  detail);
 XPL_AVAILABLE_IN_ALL
-void	g_signal_stop_emission_by_name	    (xpointer_t		  instance,
+void	xsignal_stop_emission_by_name	    (xpointer_t		  instance,
 					     const xchar_t	 *detailed_signal);
 XPL_AVAILABLE_IN_ALL
-gulong	g_signal_add_emission_hook	    (xuint_t		  signal_id,
+xulong_t	xsignal_add_emission_hook	    (xuint_t		  signal_id,
 					     xquark		  detail,
 					     GSignalEmissionHook  hook_func,
 					     xpointer_t	       	  hook_data,
 					     xdestroy_notify_t	  data_destroy);
 XPL_AVAILABLE_IN_ALL
-void	g_signal_remove_emission_hook	    (xuint_t		  signal_id,
-					     gulong		  hook_id);
+void	xsignal_remove_emission_hook	    (xuint_t		  signal_id,
+					     xulong_t		  hook_id);
 
 
 /* --- signal handlers --- */
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_signal_has_handler_pending	      (xpointer_t		  instance,
+xboolean_t xsignal_has_handler_pending	      (xpointer_t		  instance,
 					       xuint_t		  signal_id,
 					       xquark		  detail,
 					       xboolean_t		  may_be_blocked);
 XPL_AVAILABLE_IN_ALL
-gulong	 g_signal_connect_closure_by_id	      (xpointer_t		  instance,
+xulong_t	 xsignal_connect_closure_by_id	      (xpointer_t		  instance,
 					       xuint_t		  signal_id,
 					       xquark		  detail,
 					       xclosure_t		 *closure,
 					       xboolean_t		  after);
 XPL_AVAILABLE_IN_ALL
-gulong	 g_signal_connect_closure	      (xpointer_t		  instance,
+xulong_t	 xsignal_connect_closure	      (xpointer_t		  instance,
 					       const xchar_t       *detailed_signal,
 					       xclosure_t		 *closure,
 					       xboolean_t		  after);
 XPL_AVAILABLE_IN_ALL
-gulong	 g_signal_connect_data		      (xpointer_t		  instance,
+xulong_t	 xsignal_connect_data		      (xpointer_t		  instance,
 					       const xchar_t	 *detailed_signal,
 					       xcallback_t	  c_handler,
 					       xpointer_t		  data,
 					       xclosure_notify_t	  destroy_data,
 					       GConnectFlags	  connect_flags);
 XPL_AVAILABLE_IN_ALL
-void	 g_signal_handler_block		      (xpointer_t		  instance,
-					       gulong		  handler_id);
+void	 xsignal_handler_block		      (xpointer_t		  instance,
+					       xulong_t		  handler_id);
 XPL_AVAILABLE_IN_ALL
-void	 g_signal_handler_unblock	      (xpointer_t		  instance,
-					       gulong		  handler_id);
+void	 xsignal_handler_unblock	      (xpointer_t		  instance,
+					       xulong_t		  handler_id);
 XPL_AVAILABLE_IN_ALL
-void	 g_signal_handler_disconnect	      (xpointer_t		  instance,
-					       gulong		  handler_id);
+void	 xsignal_handler_disconnect	      (xpointer_t		  instance,
+					       xulong_t		  handler_id);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_signal_handler_is_connected	      (xpointer_t		  instance,
-					       gulong		  handler_id);
+xboolean_t xsignal_handler_is_connected	      (xpointer_t		  instance,
+					       xulong_t		  handler_id);
 XPL_AVAILABLE_IN_ALL
-gulong	 g_signal_handler_find		      (xpointer_t		  instance,
+xulong_t	 xsignal_handler_find		      (xpointer_t		  instance,
 					       GSignalMatchType	  mask,
 					       xuint_t		  signal_id,
 					       xquark		  detail,
@@ -428,7 +428,7 @@ gulong	 g_signal_handler_find		      (xpointer_t		  instance,
 					       xpointer_t		  func,
 					       xpointer_t		  data);
 XPL_AVAILABLE_IN_ALL
-xuint_t	 g_signal_handlers_block_matched      (xpointer_t		  instance,
+xuint_t	 xsignal_handlers_block_matched      (xpointer_t		  instance,
 					       GSignalMatchType	  mask,
 					       xuint_t		  signal_id,
 					       xquark		  detail,
@@ -436,7 +436,7 @@ xuint_t	 g_signal_handlers_block_matched      (xpointer_t		  instance,
 					       xpointer_t		  func,
 					       xpointer_t		  data);
 XPL_AVAILABLE_IN_ALL
-xuint_t	 g_signal_handlers_unblock_matched    (xpointer_t		  instance,
+xuint_t	 xsignal_handlers_unblock_matched    (xpointer_t		  instance,
 					       GSignalMatchType	  mask,
 					       xuint_t		  signal_id,
 					       xquark		  detail,
@@ -444,7 +444,7 @@ xuint_t	 g_signal_handlers_unblock_matched    (xpointer_t		  instance,
 					       xpointer_t		  func,
 					       xpointer_t		  data);
 XPL_AVAILABLE_IN_ALL
-xuint_t	 g_signal_handlers_disconnect_matched (xpointer_t		  instance,
+xuint_t	 xsignal_handlers_disconnect_matched (xpointer_t		  instance,
 					       GSignalMatchType	  mask,
 					       xuint_t		  signal_id,
 					       xquark		  detail,
@@ -453,43 +453,43 @@ xuint_t	 g_signal_handlers_disconnect_matched (xpointer_t		  instance,
 					       xpointer_t		  data);
 
 XPL_AVAILABLE_IN_2_62
-void	 g_clear_signal_handler		      (gulong            *handler_id_ptr,
+void	 g_clear_signal_handler		      (xulong_t            *handler_id_ptr,
 					       xpointer_t           instance);
 
 #define  g_clear_signal_handler(handler_id_ptr, instance)           \
   G_STMT_START {                                                    \
     xpointer_t const _instance      = (instance);                     \
-    gulong *const _handler_id_ptr = (handler_id_ptr);               \
-    const gulong _handler_id      = *_handler_id_ptr;               \
+    xulong_t *const _handler_id_ptr = (handler_id_ptr);               \
+    const xulong_t _handler_id      = *_handler_id_ptr;               \
                                                                     \
     if (_handler_id > 0)                                            \
       {                                                             \
         *_handler_id_ptr = 0;                                       \
-        g_signal_handler_disconnect (_instance, _handler_id);       \
+        xsignal_handler_disconnect (_instance, _handler_id);       \
       }                                                             \
   } G_STMT_END                                                      \
   XPL_AVAILABLE_MACRO_IN_2_62
 
 /* --- overriding and chaining --- */
 XPL_AVAILABLE_IN_ALL
-void    g_signal_override_class_closure       (xuint_t              signal_id,
+void    xsignal_override_class_closure       (xuint_t              signal_id,
                                                xtype_t              instance_type,
                                                xclosure_t          *class_closure);
 XPL_AVAILABLE_IN_ALL
-void    g_signal_override_class_handler       (const xchar_t       *signal_name,
+void    xsignal_override_class_handler       (const xchar_t       *signal_name,
                                                xtype_t              instance_type,
                                                xcallback_t          class_handler);
 XPL_AVAILABLE_IN_ALL
-void    g_signal_chain_from_overridden        (const xvalue_t      *instance_and_params,
+void    xsignal_chain_from_overridden        (const xvalue_t      *instance_and_params,
                                                xvalue_t            *return_value);
 XPL_AVAILABLE_IN_ALL
-void   g_signal_chain_from_overridden_handler (xpointer_t           instance,
+void   xsignal_chain_from_overridden_handler (xpointer_t           instance,
                                                ...);
 
 
 /* --- convenience --- */
 /**
- * g_signal_connect:
+ * xsignal_connect:
  * @instance: the instance to connect to.
  * @detailed_signal: a string of the form "signal-name::detail".
  * @c_handler: the #xcallback_t to connect.
@@ -497,17 +497,17 @@ void   g_signal_chain_from_overridden_handler (xpointer_t           instance,
  *
  * Connects a #xcallback_t function to a signal for a particular object.
  *
- * The handler will be called synchronously, before the default handler of the signal. g_signal_emit() will not return control until all handlers are called.
+ * The handler will be called synchronously, before the default handler of the signal. xsignal_emit() will not return control until all handlers are called.
  *
  * See [memory management of signal handlers][signal-memory-management] for
  * details on how to handle the return value and memory management of @data.
  *
- * Returns: the handler ID, of type #gulong (always greater than 0 for successful connections)
+ * Returns: the handler ID, of type #xulong_t (always greater than 0 for successful connections)
  */
-#define g_signal_connect(instance, detailed_signal, c_handler, data) \
-    g_signal_connect_data ((instance), (detailed_signal), (c_handler), (data), NULL, (GConnectFlags) 0)
+#define xsignal_connect(instance, detailed_signal, c_handler, data) \
+    xsignal_connect_data ((instance), (detailed_signal), (c_handler), (data), NULL, (GConnectFlags) 0)
 /**
- * g_signal_connect_after:
+ * xsignal_connect_after:
  * @instance: the instance to connect to.
  * @detailed_signal: a string of the form "signal-name::detail".
  * @c_handler: the #xcallback_t to connect.
@@ -517,12 +517,12 @@ void   g_signal_chain_from_overridden_handler (xpointer_t           instance,
  *
  * The handler will be called synchronously, after the default handler of the signal.
  *
- * Returns: the handler ID, of type #gulong (always greater than 0 for successful connections)
+ * Returns: the handler ID, of type #xulong_t (always greater than 0 for successful connections)
  */
-#define g_signal_connect_after(instance, detailed_signal, c_handler, data) \
-    g_signal_connect_data ((instance), (detailed_signal), (c_handler), (data), NULL, G_CONNECT_AFTER)
+#define xsignal_connect_after(instance, detailed_signal, c_handler, data) \
+    xsignal_connect_data ((instance), (detailed_signal), (c_handler), (data), NULL, G_CONNECT_AFTER)
 /**
- * g_signal_connect_swapped:
+ * xsignal_connect_swapped:
  * @instance: the instance to connect to.
  * @detailed_signal: a string of the form "signal-name::detail".
  * @c_handler: the #xcallback_t to connect.
@@ -537,7 +537,7 @@ void   g_signal_chain_from_overridden_handler (xpointer_t           instance,
  *
  * For example, this allows the shorter code:
  * |[<!-- language="C" -->
- * g_signal_connect_swapped (button, "clicked",
+ * xsignal_connect_swapped (button, "clicked",
  *                           (xcallback_t) gtk_widget_hide, other_widget);
  * ]|
  *
@@ -551,16 +551,16 @@ void   g_signal_chain_from_overridden_handler (xpointer_t           instance,
  *
  * ...
  *
- * g_signal_connect (button, "clicked",
+ * xsignal_connect (button, "clicked",
  *                   (xcallback_t) button_clicked_cb, other_widget);
  * ]|
  *
- * Returns: the handler ID, of type #gulong (always greater than 0 for successful connections)
+ * Returns: the handler ID, of type #xulong_t (always greater than 0 for successful connections)
  */
-#define g_signal_connect_swapped(instance, detailed_signal, c_handler, data) \
-    g_signal_connect_data ((instance), (detailed_signal), (c_handler), (data), NULL, G_CONNECT_SWAPPED)
+#define xsignal_connect_swapped(instance, detailed_signal, c_handler, data) \
+    xsignal_connect_data ((instance), (detailed_signal), (c_handler), (data), NULL, G_CONNECT_SWAPPED)
 /**
- * g_signal_handlers_disconnect_by_func:
+ * xsignal_handlers_disconnect_by_func:
  * @instance: The instance to remove handlers from.
  * @func: The C closure callback of the handlers (useless for non-C closures).
  * @data: The closure data of the handlers' closures.
@@ -569,13 +569,13 @@ void   g_signal_chain_from_overridden_handler (xpointer_t           instance,
  *
  * Returns: The number of handlers that matched.
  */
-#define	g_signal_handlers_disconnect_by_func(instance, func, data)						\
-    g_signal_handlers_disconnect_matched ((instance),								\
+#define	xsignal_handlers_disconnect_by_func(instance, func, data)						\
+    xsignal_handlers_disconnect_matched ((instance),								\
 					  (GSignalMatchType) (G_SIGNAL_MATCH_FUNC | G_SIGNAL_MATCH_DATA),	\
 					  0, 0, NULL, (func), (data))
 
 /**
- * g_signal_handlers_disconnect_by_data:
+ * xsignal_handlers_disconnect_by_data:
  * @instance: The instance to remove handlers from
  * @data: the closure data of the handlers' closures
  *
@@ -585,11 +585,11 @@ void   g_signal_chain_from_overridden_handler (xpointer_t           instance,
  *
  * Since: 2.32
  */
-#define g_signal_handlers_disconnect_by_data(instance, data) \
-  g_signal_handlers_disconnect_matched ((instance), G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, (data))
+#define xsignal_handlers_disconnect_by_data(instance, data) \
+  xsignal_handlers_disconnect_matched ((instance), G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, (data))
 
 /**
- * g_signal_handlers_block_by_func:
+ * xsignal_handlers_block_by_func:
  * @instance: The instance to block handlers from.
  * @func: The C closure callback of the handlers (useless for non-C closures).
  * @data: The closure data of the handlers' closures.
@@ -598,12 +598,12 @@ void   g_signal_chain_from_overridden_handler (xpointer_t           instance,
  *
  * Returns: The number of handlers that matched.
  */
-#define	g_signal_handlers_block_by_func(instance, func, data)							\
-    g_signal_handlers_block_matched      ((instance),								\
+#define	xsignal_handlers_block_by_func(instance, func, data)							\
+    xsignal_handlers_block_matched      ((instance),								\
 				          (GSignalMatchType) (G_SIGNAL_MATCH_FUNC | G_SIGNAL_MATCH_DATA),	\
 				          0, 0, NULL, (func), (data))
 /**
- * g_signal_handlers_unblock_by_func:
+ * xsignal_handlers_unblock_by_func:
  * @instance: The instance to unblock handlers from.
  * @func: The C closure callback of the handlers (useless for non-C closures).
  * @data: The closure data of the handlers' closures.
@@ -612,27 +612,27 @@ void   g_signal_chain_from_overridden_handler (xpointer_t           instance,
  *
  * Returns: The number of handlers that matched.
  */
-#define	g_signal_handlers_unblock_by_func(instance, func, data)							\
-    g_signal_handlers_unblock_matched    ((instance),								\
+#define	xsignal_handlers_unblock_by_func(instance, func, data)							\
+    xsignal_handlers_unblock_matched    ((instance),								\
 				          (GSignalMatchType) (G_SIGNAL_MATCH_FUNC | G_SIGNAL_MATCH_DATA),	\
 				          0, 0, NULL, (func), (data))
 
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_signal_accumulator_true_handled (xsignal_invocation_hint_t *ihint,
+xboolean_t xsignal_accumulator_true_handled (xsignal_invocation_hint_t *ihint,
 					    xvalue_t                *return_accu,
 					    const xvalue_t          *handler_return,
 					    xpointer_t               dummy);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_signal_accumulator_first_wins   (xsignal_invocation_hint_t *ihint,
+xboolean_t xsignal_accumulator_first_wins   (xsignal_invocation_hint_t *ihint,
                                             xvalue_t                *return_accu,
                                             const xvalue_t          *handler_return,
                                             xpointer_t               dummy);
 
 /*< private >*/
 XPL_AVAILABLE_IN_ALL
-void	 g_signal_handlers_destroy	      (xpointer_t		  instance);
+void	 xsignal_handlers_destroy	      (xpointer_t		  instance);
 void	 _g_signals_destroy		      (xtype_t		  itype);
 
 G_END_DECLS

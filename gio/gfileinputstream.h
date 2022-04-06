@@ -57,13 +57,13 @@ struct _GFileInputStream
 
 struct _GFileInputStreamClass
 {
-  GInputStreamClass parent_class;
+  xinput_stream_class_t parent_class;
 
   xoffset_t     (* tell)              (xfile_input_stream_t     *stream);
   xboolean_t    (* can_seek)          (xfile_input_stream_t     *stream);
   xboolean_t    (* seek)	            (xfile_input_stream_t     *stream,
                                      xoffset_t               offset,
-                                     GSeekType             type,
+                                     xseek_type_t             type,
                                      xcancellable_t         *cancellable,
                                      xerror_t              **error);
   xfile_info_t * (* query_info)        (xfile_input_stream_t     *stream,

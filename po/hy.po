@@ -3141,8 +3141,8 @@ msgid "Error removing old file: %s"
 msgstr "Հին ֆայլը ջնջելու սխալ․ %s"
 
 #: ../gio/gmemoryinputstream.c:486 ../gio/gmemoryoutputstream.c:746
-msgid "Invalid GSeekType supplied"
-msgstr "Փոխանցված է անվավեր GSeekType"
+msgid "Invalid xseek_type_t supplied"
+msgstr "Փոխանցված է անվավեր xseek_type_t"
 
 #: ../gio/gmemoryinputstream.c:496
 msgid "Invalid seek request"

@@ -253,7 +253,7 @@ msgid "Seek not supported on base stream"
 msgstr "Tákntengi eru ekki studd"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream"
+msgid "Cannot truncate xbuffered_input_stream_t"
 msgstr ""
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1202
@@ -2084,7 +2084,7 @@ msgid "Error removing old file: %s"
 msgstr "Villa við lestur skráarinnar '%s': %s"
 
 #: ../gio/gmemoryinputstream.c:471 ../gio/gmemoryoutputstream.c:769
-msgid "Invalid GSeekType supplied"
+msgid "Invalid xseek_type_t supplied"
 msgstr ""
 
 #: ../gio/gmemoryinputstream.c:481

@@ -55,7 +55,7 @@ test_basic (void)
   g_assert_null (state);
   g_free (name);
 
-  g_signal_connect (action, "activate", G_CALLBACK (activate), &a);
+  xsignal_connect (action, "activate", G_CALLBACK (activate), &a);
   g_assert_false (a.did_run);
   g_action_activate (G_ACTION (action), NULL);
   g_assert_true (a.did_run);
@@ -83,7 +83,7 @@ test_basic (void)
   g_assert_null (g_action_get_state_hint (G_ACTION (action)));
   g_assert_null (g_action_get_state (G_ACTION (action)));
 
-  g_signal_connect (action, "activate", G_CALLBACK (activate), &a);
+  xsignal_connect (action, "activate", G_CALLBACK (activate), &a);
   g_assert_false (a.did_run);
   g_action_activate (G_ACTION (action), xvariant_new_string ("Hello world"));
   g_assert_true (a.did_run);
@@ -192,7 +192,7 @@ test_simple_group (void)
   xvariant_t *state;
 
   simple = g_simple_action_new ("foo", NULL);
-  g_signal_connect (simple, "activate", G_CALLBACK (activate), &a);
+  xsignal_connect (simple, "activate", G_CALLBACK (activate), &a);
   g_assert_false (a.did_run);
   g_action_activate (G_ACTION (simple), NULL);
   g_assert_true (a.did_run);
@@ -311,7 +311,7 @@ test_default_activate (void)
   xsimple_action_t *action;
   xvariant_t *state;
 
-  /* Test changing state via activation with parameter */
+  /* test_t changing state via activation with parameter */
   action = g_simple_action_new_stateful ("foo", G_VARIANT_TYPE_STRING, xvariant_new_string ("hihi"));
   g_action_activate (G_ACTION (action), xvariant_new_string ("bye"));
   state = g_action_get_state (G_ACTION (action));
@@ -319,7 +319,7 @@ test_default_activate (void)
   xvariant_unref (state);
   xobject_unref (action);
 
-  /* Test toggling a boolean action via activation with no parameter */
+  /* test_t toggling a boolean action via activation with no parameter */
   action = g_simple_action_new_stateful ("foo", NULL, xvariant_new_boolean (FALSE));
   g_action_activate (G_ACTION (action), NULL);
   state = g_action_get_state (G_ACTION (action));
@@ -664,7 +664,7 @@ list_cb (xobject_t      *source,
   xvariant_t *v;
   xchar_t **actions;
 
-  v = g_dbus_connection_call_finish (bus, res, &error);
+  v = xdbus_connection_call_finish (bus, res, &error);
   g_assert_nonnull (v);
   xvariant_get (v, "(^a&s)", &actions);
   g_assert_cmpint (xstrv_length (actions), ==, G_N_ELEMENTS (exported_entries));
@@ -679,8 +679,8 @@ call_list (xpointer_t user_data)
   xdbus_connection_t *bus;
 
   bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
-  g_dbus_connection_call (bus,
-                          g_dbus_connection_get_unique_name (bus),
+  xdbus_connection_call (bus,
+                          xdbus_connection_get_unique_name (bus),
                           "/",
                           "org.gtk.Actions",
                           "List",
@@ -709,7 +709,7 @@ describe_cb (xobject_t      *source,
   xchar_t *param;
   xvariant_iter_t *iter;
 
-  v = g_dbus_connection_call_finish (bus, res, &error);
+  v = xdbus_connection_call_finish (bus, res, &error);
   g_assert_nonnull (v);
   /* FIXME: there's an extra level of tuplelization in here */
   xvariant_get (v, "((bgav))", &enabled, &param, &iter);
@@ -729,8 +729,8 @@ call_describe (xpointer_t user_data)
   xdbus_connection_t *bus;
 
   bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
-  g_dbus_connection_call (bus,
-                          g_dbus_connection_get_unique_name (bus),
+  xdbus_connection_call (bus,
+                          xdbus_connection_get_unique_name (bus),
                           "/",
                           "org.gtk.Actions",
                           "Describe",
@@ -796,7 +796,7 @@ test_dbus_export (void)
   xuint_t id;
   xchar_t **actions;
   xuint_t n_actions_added = 0, n_actions_enabled_changed = 0, n_actions_removed = 0, n_actions_state_changed = 0;
-  gulong added_signal_id, enabled_changed_signal_id, removed_signal_id, state_changed_signal_id;
+  xulong_t added_signal_id, enabled_changed_signal_id, removed_signal_id, state_changed_signal_id;
 
   loop = xmain_loop_new (NULL, FALSE);
 
@@ -809,14 +809,14 @@ test_dbus_export (void)
                                      G_N_ELEMENTS (exported_entries),
                                      NULL);
 
-  id = g_dbus_connection_export_action_group (bus, "/", XACTION_GROUP (group), &error);
+  id = xdbus_connection_export_action_group (bus, "/", XACTION_GROUP (group), &error);
   g_assert_no_error (error);
 
-  proxy = g_dbus_action_group_get (bus, g_dbus_connection_get_unique_name (bus), "/");
-  added_signal_id = g_signal_connect (proxy, "action-added", G_CALLBACK (action_added_removed_cb), &n_actions_added);
-  enabled_changed_signal_id = g_signal_connect (proxy, "action-enabled-changed", G_CALLBACK (action_enabled_changed_cb), &n_actions_enabled_changed);
-  removed_signal_id = g_signal_connect (proxy, "action-removed", G_CALLBACK (action_added_removed_cb), &n_actions_removed);
-  state_changed_signal_id = g_signal_connect (proxy, "action-state-changed", G_CALLBACK (action_state_changed_cb), &n_actions_state_changed);
+  proxy = xdbus_action_group_get (bus, xdbus_connection_get_unique_name (bus), "/");
+  added_signal_id = xsignal_connect (proxy, "action-added", G_CALLBACK (action_added_removed_cb), &n_actions_added);
+  enabled_changed_signal_id = xsignal_connect (proxy, "action-enabled-changed", G_CALLBACK (action_enabled_changed_cb), &n_actions_enabled_changed);
+  removed_signal_id = xsignal_connect (proxy, "action-removed", G_CALLBACK (action_added_removed_cb), &n_actions_removed);
+  state_changed_signal_id = xsignal_connect (proxy, "action-state-changed", G_CALLBACK (action_state_changed_cb), &n_actions_state_changed);
 
   actions = xaction_group_list_actions (XACTION_GROUP (proxy));
   g_assert_cmpint (xstrv_length (actions), ==, 0);
@@ -913,12 +913,12 @@ test_dbus_export (void)
   g_assert_false (xvariant_get_boolean (v));
   xvariant_unref (v);
 
-  g_dbus_connection_unexport_action_group (bus, id);
+  xdbus_connection_unexport_action_group (bus, id);
 
-  g_signal_handler_disconnect (proxy, added_signal_id);
-  g_signal_handler_disconnect (proxy, enabled_changed_signal_id);
-  g_signal_handler_disconnect (proxy, removed_signal_id);
-  g_signal_handler_disconnect (proxy, state_changed_signal_id);
+  xsignal_handler_disconnect (proxy, added_signal_id);
+  xsignal_handler_disconnect (proxy, enabled_changed_signal_id);
+  xsignal_handler_disconnect (proxy, removed_signal_id);
+  xsignal_handler_disconnect (proxy, state_changed_signal_id);
   xobject_unref (proxy);
   xobject_unref (group);
   xmain_loop_unref (loop);
@@ -948,14 +948,14 @@ do_export (xpointer_t data)
 
   for (i = 0; i < 10000; i++)
     {
-      id = g_dbus_connection_export_action_group (bus, path, XACTION_GROUP (group), &error);
+      id = xdbus_connection_export_action_group (bus, path, XACTION_GROUP (group), &error);
       g_assert_no_error (error);
 
       action = g_simple_action_group_lookup (G_SIMPLE_ACTION_GROUP (group), "a");
       g_simple_action_set_enabled (G_SIMPLE_ACTION (action),
                                    !g_action_get_enabled (action));
 
-      g_dbus_connection_unexport_action_group (bus, id);
+      xdbus_connection_unexport_action_group (bus, id);
 
       while (xmain_context_iteration (ctx, FALSE));
     }
@@ -1013,7 +1013,7 @@ test_bug679509 (void)
   session_bus_up ();
   bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
 
-  proxy = g_dbus_action_group_get (bus, g_dbus_connection_get_unique_name (bus), "/");
+  proxy = xdbus_action_group_get (bus, xdbus_connection_get_unique_name (bus), "/");
   xstrfreev (xaction_group_list_actions (XACTION_GROUP (proxy)));
   xobject_unref (proxy);
 
@@ -1080,7 +1080,7 @@ test_property_actions (void)
   xvariant_t *state;
 
   group = g_simple_action_group_new ();
-  g_signal_connect (group, "action-state-changed", G_CALLBACK (state_changed), NULL);
+  xsignal_connect (group, "action-state-changed", G_CALLBACK (state_changed), NULL);
 
   client = xsocket_client_new ();
   app = xapplication_new ("org.gtk.test", 0);

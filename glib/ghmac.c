@@ -91,13 +91,13 @@ struct _GHmac
  */
 xhmac_t *
 g_hmac_new (GChecksumType  digest_type,
-            const guchar  *key,
+            const xuchar_t  *key,
             xsize_t          key_len)
 {
   xchecksum_t *checksum;
   xhmac_t *hmac;
-  guchar *buffer;
-  guchar *pad;
+  xuchar_t *buffer;
+  xuchar_t *pad;
   xsize_t i, len;
   xsize_t block_size;
 
@@ -250,7 +250,7 @@ g_hmac_unref (xhmac_t *hmac)
  */
 void
 g_hmac_update (xhmac_t        *hmac,
-               const guchar *data,
+               const xuchar_t *data,
                xssize_t        length)
 {
   g_return_if_fail (hmac != NULL);
@@ -349,9 +349,9 @@ g_hmac_get_digest (xhmac_t  *hmac,
  */
 xchar_t *
 g_compute_hmac_for_data (GChecksumType  digest_type,
-                         const guchar  *key,
+                         const xuchar_t  *key,
                          xsize_t          key_len,
-                         const guchar  *data,
+                         const xuchar_t  *data,
                          xsize_t          length)
 {
   xhmac_t *hmac;
@@ -426,7 +426,7 @@ g_compute_hmac_for_bytes (GChecksumType  digest_type,
  */
 xchar_t *
 g_compute_hmac_for_string (GChecksumType  digest_type,
-                           const guchar  *key,
+                           const xuchar_t  *key,
                            xsize_t          key_len,
                            const xchar_t   *str,
                            xssize_t         length)
@@ -437,5 +437,5 @@ g_compute_hmac_for_string (GChecksumType  digest_type,
     length = strlen (str);
 
   return g_compute_hmac_for_data (digest_type, key, key_len,
-                                  (const guchar *) str, length);
+                                  (const xuchar_t *) str, length);
 }

@@ -80,7 +80,7 @@ typedef struct {
   xint_t int2;
   xchar_t byte;
   xpointer_t next;
-  gint64 more;
+  sint64_t more;
 } TestStruct;
 
 static void

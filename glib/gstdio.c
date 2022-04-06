@@ -170,19 +170,19 @@ _g_win32_fix_mode (wchar_t *mode)
  * The function that does the reverse can be found in
  * gio/glocalfileinfo.c.
  */
-static gint64
+static sint64_t
 _g_win32_filetime_to_unix_time (const FILETIME *ft,
                                 gint32         *nsec)
 {
-  gint64 result;
+  sint64_t result;
   /* 1 unit of FILETIME is 100ns */
-  const gint64 hundreds_of_usec_per_sec = 10000000;
+  const sint64_t hundreds_of_usec_per_sec = 10000000;
   /* The difference between January 1, 1601 UTC (FILETIME epoch) and UNIX epoch
    * in hundreds of nanoseconds.
    */
-  const gint64 filetime_unix_epoch_offset = 116444736000000000;
+  const sint64_t filetime_unix_epoch_offset = 116444736000000000;
 
-  result = ((gint64) ft->dwLowDateTime) | (((gint64) ft->dwHighDateTime) << 32);
+  result = ((sint64_t) ft->dwLowDateTime) | (((sint64_t) ft->dwHighDateTime) << 32);
   result -= filetime_unix_epoch_offset;
 
   if (nsec)

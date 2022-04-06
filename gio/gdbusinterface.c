@@ -35,11 +35,11 @@
  * (see #xdbus_proxy_t).
  */
 
-typedef GDBusInterfaceIface GDBusInterfaceInterface;
+typedef xdbus_interface_iface_t GDBusInterfaceInterface;
 G_DEFINE_INTERFACE (xdbus_interface, g_dbus_interface, XTYPE_OBJECT)
 
 static void
-g_dbus_interface_default_init (GDBusInterfaceIface *iface)
+g_dbus_interface_default_init (xdbus_interface_iface_t *iface)
 {
 }
 

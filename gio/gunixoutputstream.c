@@ -115,7 +115,7 @@ static void
 g_unix_output_stream_class_init (GUnixOutputStreamClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
-  GOutputStreamClass *stream_class = G_OUTPUT_STREAM_CLASS (klass);
+  xoutput_stream_class_t *stream_class = G_OUTPUT_STREAM_CLASS (klass);
 
   gobject_class->get_property = g_unix_output_stream_get_property;
   gobject_class->set_property = g_unix_output_stream_set_property;
@@ -335,7 +335,7 @@ g_unix_output_stream_write (xoutput_stream_t  *stream,
   nfds++;
 
   if (unix_stream->priv->can_poll &&
-      g_cancellable_make_pollfd (cancellable, &poll_fds[1]))
+      xcancellable_make_pollfd (cancellable, &poll_fds[1]))
     nfds++;
 
   while (1)
@@ -359,7 +359,7 @@ g_unix_output_stream_write (xoutput_stream_t  *stream,
 	  break;
 	}
 
-      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+      if (xcancellable_set_error_if_cancelled (cancellable, error))
 	break;
 
       if (!poll_fds[0].revents)
@@ -382,7 +382,7 @@ g_unix_output_stream_write (xoutput_stream_t  *stream,
     }
 
   if (nfds == 2)
-    g_cancellable_release_fd (cancellable);
+    xcancellable_release_fd (cancellable);
   return res;
 }
 
@@ -442,7 +442,7 @@ g_unix_output_stream_writev (xoutput_stream_t        *stream,
   nfds++;
 
   if (unix_stream->priv->can_poll &&
-      g_cancellable_make_pollfd (cancellable, &poll_fds[1]))
+      xcancellable_make_pollfd (cancellable, &poll_fds[1]))
     nfds++;
 
   while (1)
@@ -466,7 +466,7 @@ g_unix_output_stream_writev (xoutput_stream_t        *stream,
 	  break;
 	}
 
-      if (g_cancellable_set_error_if_cancelled (cancellable, error))
+      if (xcancellable_set_error_if_cancelled (cancellable, error))
 	break;
 
       if (!poll_fds[0].revents)
@@ -492,7 +492,7 @@ g_unix_output_stream_writev (xoutput_stream_t        *stream,
     }
 
   if (nfds == 2)
-    g_cancellable_release_fd (cancellable);
+    xcancellable_release_fd (cancellable);
   return res != -1;
 }
 
@@ -564,7 +564,7 @@ g_unix_output_stream_pollable_create_source (xpollable_output_stream_t *stream,
 
   if (cancellable)
     {
-      cancellable_source = g_cancellable_source_new (cancellable);
+      cancellable_source = xcancellable_source_new (cancellable);
       xsource_set_dummy_callback (cancellable_source);
       xsource_add_child_source (pollable_source, cancellable_source);
       xsource_unref (cancellable_source);

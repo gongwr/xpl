@@ -329,7 +329,7 @@ main (int ignored_argc, char **ignored_argv)
         {
           char *endptr = NULL;
           int sourcefd, targetfd;
-          gint64 val;
+          sint64_t val;
 
           val = g_ascii_strtoll (fdsv[i], &endptr, 10);
           g_assert (val <= G_MAXINT32);

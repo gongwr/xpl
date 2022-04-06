@@ -88,7 +88,7 @@ _km_add_missing (kqueue_sub *sub)
 static void
 _kh_file_appeared_cb (kqueue_sub *sub)
 {
-  gint64 now = g_get_monotonic_time ();
+  sint64_t now = g_get_monotonic_time ();
 
   g_assert (sub != NULL);
   g_assert (sub->filename);

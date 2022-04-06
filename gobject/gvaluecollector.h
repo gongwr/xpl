@@ -65,7 +65,7 @@ union _xtype_c_value
 {
   xint_t     v_int;
   xlong_t    v_long;
-  gint64   v_int64;
+  sint64_t   v_int64;
   xdouble_t  v_double;
   xpointer_t v_pointer;
 };
@@ -110,7 +110,7 @@ G_STMT_START {										\
 	  g_vci_cvalue->v_long = va_arg ((var_args), xlong_t);					\
 	  break;									\
 	case G_VALUE_COLLECT_INT64:							\
-	  g_vci_cvalue->v_int64 = va_arg ((var_args), gint64);				\
+	  g_vci_cvalue->v_int64 = va_arg ((var_args), sint64_t);				\
 	  break;									\
 	case G_VALUE_COLLECT_DOUBLE:							\
 	  g_vci_cvalue->v_double = va_arg ((var_args), xdouble_t);				\
@@ -182,7 +182,7 @@ G_STMT_START {										\
 	  va_arg ((var_args), xlong_t);							\
 	  break;									\
 	case G_VALUE_COLLECT_INT64:							\
-	  va_arg ((var_args), gint64);							\
+	  va_arg ((var_args), sint64_t);							\
 	  break;									\
 	case G_VALUE_COLLECT_DOUBLE:							\
 	  va_arg ((var_args), xdouble_t);							\
@@ -233,7 +233,7 @@ G_STMT_START {										\
 	  g_vl_cvalue->v_long = va_arg ((var_args), xlong_t);					\
 	  break;									\
 	case G_VALUE_COLLECT_INT64:							\
-	  g_vl_cvalue->v_int64 = va_arg ((var_args), gint64);				\
+	  g_vl_cvalue->v_int64 = va_arg ((var_args), sint64_t);				\
 	  break;									\
 	case G_VALUE_COLLECT_DOUBLE:							\
 	  g_vl_cvalue->v_double = va_arg ((var_args), xdouble_t);				\

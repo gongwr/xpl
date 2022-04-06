@@ -73,7 +73,7 @@ g_mount_default_init (GMountInterface *iface)
    *
    * Emitted when the mount has been changed.
    **/
-  g_signal_new (I_("changed"),
+  xsignal_new (I_("changed"),
                 XTYPE_MOUNT,
                 G_SIGNAL_RUN_LAST,
                 G_STRUCT_OFFSET (GMountIface, changed),
@@ -90,7 +90,7 @@ g_mount_default_init (GMountInterface *iface)
    * object they should release them so the object can be
    * finalized.
    **/
-  g_signal_new (I_("unmounted"),
+  xsignal_new (I_("unmounted"),
                 XTYPE_MOUNT,
                 G_SIGNAL_RUN_LAST,
                 G_STRUCT_OFFSET (GMountIface, unmounted),
@@ -109,7 +109,7 @@ g_mount_default_init (GMountInterface *iface)
    *
    * Since: 2.22
    **/
-  g_signal_new (I_("pre-unmount"),
+  xsignal_new (I_("pre-unmount"),
                 XTYPE_MOUNT,
                 G_SIGNAL_RUN_LAST,
                 G_STRUCT_OFFSET (GMountIface, pre_unmount),

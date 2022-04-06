@@ -470,7 +470,7 @@ class HeaderCodeGenerator:
             self.outfile.write(
                 "void %s_proxy_new (\n"
                 "    xdbus_connection_t     *connection,\n"
-                "    GDBusProxyFlags      flags,\n"
+                "    xdbus_proxy_flags_t      flags,\n"
                 "    const xchar_t         *name,\n"
                 "    const xchar_t         *object_path,\n"
                 "    xcancellable_t        *cancellable,\n"
@@ -493,7 +493,7 @@ class HeaderCodeGenerator:
             self.outfile.write(
                 "%s *%s_proxy_new_sync (\n"
                 "    xdbus_connection_t     *connection,\n"
-                "    GDBusProxyFlags      flags,\n"
+                "    xdbus_proxy_flags_t      flags,\n"
                 "    const xchar_t         *name,\n"
                 "    const xchar_t         *object_path,\n"
                 "    xcancellable_t        *cancellable,\n"
@@ -506,8 +506,8 @@ class HeaderCodeGenerator:
                 self.outfile.write("G_GNUC_DEPRECATED ")
             self.outfile.write(
                 "void %s_proxy_new_for_bus (\n"
-                "    GBusType             bus_type,\n"
-                "    GDBusProxyFlags      flags,\n"
+                "    xbus_type_t             bus_type,\n"
+                "    xdbus_proxy_flags_t      flags,\n"
                 "    const xchar_t         *name,\n"
                 "    const xchar_t         *object_path,\n"
                 "    xcancellable_t        *cancellable,\n"
@@ -529,8 +529,8 @@ class HeaderCodeGenerator:
                 self.outfile.write("G_GNUC_DEPRECATED ")
             self.outfile.write(
                 "%s *%s_proxy_new_for_bus_sync (\n"
-                "    GBusType             bus_type,\n"
-                "    GDBusProxyFlags      flags,\n"
+                "    xbus_type_t             bus_type,\n"
+                "    xdbus_proxy_flags_t      flags,\n"
                 "    const xchar_t         *name,\n"
                 "    const xchar_t         *object_path,\n"
                 "    xcancellable_t        *cancellable,\n"
@@ -739,7 +739,7 @@ class HeaderCodeGenerator:
             self.outfile.write("\n")
             self.outfile.write("struct _%sObjectProxyClass\n" % (self.namespace))
             self.outfile.write("{\n")
-            self.outfile.write("  GDBusObjectProxyClass parent_class;\n")
+            self.outfile.write("  xdbus_object_proxy_class_t parent_class;\n")
             self.outfile.write("};\n")
             self.outfile.write("\n")
             if self.symbol_decorator is not None:
@@ -963,7 +963,7 @@ class HeaderCodeGenerator:
                 self.outfile.write("%s\n" % self.symbol_decorator)
             self.outfile.write(
                 "void %sobject_manager_client_new_for_bus (\n"
-                "    GBusType                bus_type,\n"
+                "    xbus_type_t                bus_type,\n"
                 "    GDBusObjectManagerClientFlags  flags,\n"
                 "    const xchar_t            *name,\n"
                 "    const xchar_t            *object_path,\n"
@@ -982,7 +982,7 @@ class HeaderCodeGenerator:
                 self.outfile.write("%s\n" % self.symbol_decorator)
             self.outfile.write(
                 "xdbus_object_manager_t *%sobject_manager_client_new_for_bus_sync (\n"
-                "    GBusType                bus_type,\n"
+                "    xbus_type_t                bus_type,\n"
                 "    GDBusObjectManagerClientFlags  flags,\n"
                 "    const xchar_t            *name,\n"
                 "    const xchar_t            *object_path,\n"
@@ -2114,11 +2114,11 @@ class CodeGenerator:
                 else:
                     extra_args = 1
                 self.outfile.write(
-                    '  g_signal_new ("handle-%s",\n'
+                    '  xsignal_new ("handle-%s",\n'
                     "    XTYPE_FROM_INTERFACE (iface),\n"
                     "    G_SIGNAL_RUN_LAST,\n"
                     "    G_STRUCT_OFFSET (%sIface, handle_%s),\n"
-                    "    g_signal_accumulator_true_handled,\n"
+                    "    xsignal_accumulator_true_handled,\n"
                     "    NULL,\n"  # accu_data
                     "    g_cclosure_marshal_generic,\n"
                     "    XTYPE_BOOLEAN,\n"
@@ -2157,14 +2157,14 @@ class CodeGenerator:
                         "   *\n"
                         "   * On the client-side, this signal is emitted whenever the D-Bus signal #%s::%s is received.\n"
                         "   *\n"
-                        "   * On the service-side, this signal can be used with e.g. g_signal_emit_by_name() to make the object emit the D-Bus signal.\n"
+                        "   * On the service-side, this signal can be used with e.g. xsignal_emit_by_name() to make the object emit the D-Bus signal.\n"
                         % (i.name, s.name),
                         False,
                     )
                 )
                 self.write_gtkdoc_deprecated_and_since_and_close(s, self.outfile, 2)
                 self.outfile.write(
-                    '  g_signal_new ("%s",\n'
+                    '  xsignal_new ("%s",\n'
                     "    XTYPE_FROM_INTERFACE (iface),\n"
                     "    G_SIGNAL_RUN_LAST,\n"
                     "    G_STRUCT_OFFSET (%sIface, %s),\n"
@@ -2487,7 +2487,7 @@ class CodeGenerator:
             for a in s.args:
                 self.outfile.write(",\n    %sarg_%s" % (a.ctype_in, a.name))
             self.outfile.write(
-                ")\n" "{\n" '  g_signal_emit_by_name (object, "%s"' % (s.name_hyphen)
+                ")\n" "{\n" '  xsignal_emit_by_name (object, "%s"' % (s.name_hyphen)
             )
             for a in s.args:
                 self.outfile.write(", arg_%s" % a.name)
@@ -2565,10 +2565,10 @@ class CodeGenerator:
             )
             if m.unix_fd:
                 self.outfile.write(
-                    "  g_dbus_proxy_call_with_unix_fd_list (G_DBUS_PROXY (proxy),\n"
+                    "  xdbus_proxy_call_with_unix_fd_list (G_DBUS_PROXY (proxy),\n"
                 )
             else:
-                self.outfile.write("  g_dbus_proxy_call (G_DBUS_PROXY (proxy),\n")
+                self.outfile.write("  xdbus_proxy_call (G_DBUS_PROXY (proxy),\n")
             self.outfile.write('    "%s",\n' '    xvariant_new ("(' % (m.name))
             for a in m.in_args:
                 self.outfile.write("%s" % (a.format_in))
@@ -2632,11 +2632,11 @@ class CodeGenerator:
             )
             if m.unix_fd:
                 self.outfile.write(
-                    "  _ret = g_dbus_proxy_call_with_unix_fd_list_finish (G_DBUS_PROXY (proxy), out_fd_list, res, error);\n"
+                    "  _ret = xdbus_proxy_call_with_unix_fd_list_finish (G_DBUS_PROXY (proxy), out_fd_list, res, error);\n"
                 )
             else:
                 self.outfile.write(
-                    "  _ret = g_dbus_proxy_call_finish (G_DBUS_PROXY (proxy), res, error);\n"
+                    "  _ret = xdbus_proxy_call_finish (G_DBUS_PROXY (proxy), res, error);\n"
                 )
             self.outfile.write("  if (_ret == NULL)\n" "    goto _out;\n")
             self.outfile.write("  xvariant_get (_ret,\n" '                 "(')
@@ -2720,11 +2720,11 @@ class CodeGenerator:
             )
             if m.unix_fd:
                 self.outfile.write(
-                    "  _ret = g_dbus_proxy_call_with_unix_fd_list_sync (G_DBUS_PROXY (proxy),\n"
+                    "  _ret = xdbus_proxy_call_with_unix_fd_list_sync (G_DBUS_PROXY (proxy),\n"
                 )
             else:
                 self.outfile.write(
-                    "  _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),\n"
+                    "  _ret = xdbus_proxy_call_sync (G_DBUS_PROXY (proxy),\n"
                 )
             self.outfile.write('    "%s",\n' '    xvariant_new ("(' % (m.name))
             for a in m.in_args:
@@ -2929,7 +2929,7 @@ class CodeGenerator:
                 "  xvariant_t *variant;\n"
                 "  g_assert (prop_id != 0 && prop_id - 1 < %d);\n"
                 "  info = (const _ExtendedGDBusPropertyInfo *) _%s_property_info_pointers[prop_id - 1];\n"
-                "  variant = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (object), info->parent_struct.name);\n"
+                "  variant = xdbus_proxy_get_cached_property (G_DBUS_PROXY (object), info->parent_struct.name);\n"
                 "  if (info->use_gvariant)\n"
                 "    {\n"
                 "      xvalue_set_variant (value, variant);\n"
@@ -2958,7 +2958,7 @@ class CodeGenerator:
                 "  xerror_t *error;\n"
                 "  xvariant_t *_ret;\n"
                 "  error = NULL;\n"
-                "  _ret = g_dbus_proxy_call_finish (proxy, res, &error);\n"
+                "  _ret = xdbus_proxy_call_finish (proxy, res, &error);\n"
                 "  if (!_ret)\n"
                 "    {\n"
                 "      g_warning (\"Error setting property '%%s' on interface %s: %%s (%%s, %%d)\",\n"
@@ -2993,7 +2993,7 @@ class CodeGenerator:
                 "  g_assert (prop_id != 0 && prop_id - 1 < %d);\n"
                 "  info = (const _ExtendedGDBusPropertyInfo *) _%s_property_info_pointers[prop_id - 1];\n"
                 "  variant = g_dbus_gvalue_to_gvariant (value, G_VARIANT_TYPE (info->parent_struct.signature));\n"
-                "  g_dbus_proxy_call (G_DBUS_PROXY (object),\n"
+                "  xdbus_proxy_call (G_DBUS_PROXY (object),\n"
                 '    "org.freedesktop.DBus.Properties.Set",\n'
                 '    xvariant_new ("(ssv)", "%s", info->parent_struct.name, variant),\n'
                 "    G_DBUS_CALL_FLAGS_NONE,\n"
@@ -3052,10 +3052,10 @@ class CodeGenerator:
             "    }\n"
         )
         self.outfile.write(
-            "  signal_id = g_signal_lookup (info->signal_name, %sTYPE_%s);\n"
+            "  signal_id = xsignal_lookup (info->signal_name, %sTYPE_%s);\n"
             % (i.ns_upper, i.name_upper)
         )
-        self.outfile.write("  g_signal_emitv (paramv, signal_id, 0, NULL);\n")
+        self.outfile.write("  xsignal_emitv (paramv, signal_id, 0, NULL);\n")
         self.outfile.write(
             "  for (n = 0; n < num_params + 1; n++)\n"
             "    xvalue_unset (&paramv[n]);\n"
@@ -3145,7 +3145,7 @@ class CodeGenerator:
                     "    return value;\n" % (p.name)
                 )
             self.outfile.write(
-                '  variant = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "%s");\n'
+                '  variant = xdbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "%s");\n'
                 % (p.name)
             )
             if p.arg.gtype == "XTYPE_VARIANT":
@@ -3186,7 +3186,7 @@ class CodeGenerator:
             "#else\n"
             "  proxy->priv = XTYPE_INSTANCE_GET_PRIVATE (proxy, %sTYPE_%s_PROXY, %sProxyPrivate);\n"
             "#endif\n\n"
-            "  g_dbus_proxy_set_interface_info (G_DBUS_PROXY (proxy), %s_interface_info ());\n"
+            "  xdbus_proxy_set_interface_info (G_DBUS_PROXY (proxy), %s_interface_info ());\n"
             "}\n"
             "\n"
             % (
@@ -3258,14 +3258,14 @@ class CodeGenerator:
                 "/**\n"
                 " * %s_proxy_new:\n"
                 " * @connection: A #xdbus_connection_t.\n"
-                " * @flags: Flags from the #GDBusProxyFlags enumeration.\n"
+                " * @flags: Flags from the #xdbus_proxy_flags_t enumeration.\n"
                 " * @name: (nullable): A bus name (well-known or unique) or %%NULL if @connection is not a message bus connection.\n"
                 " * @object_path: An object path.\n"
                 " * @cancellable: (nullable): A #xcancellable_t or %%NULL.\n"
                 " * @callback: A #xasync_ready_callback_t to call when the request is satisfied.\n"
                 " * @user_data: User data to pass to @callback.\n"
                 " *\n"
-                " * Asynchronously creates a proxy for the D-Bus interface #%s. See g_dbus_proxy_new() for more details.\n"
+                " * Asynchronously creates a proxy for the D-Bus interface #%s. See xdbus_proxy_new() for more details.\n"
                 " *\n"
                 " * When the operation is finished, @callback will be invoked in the thread-default main loop of the thread you are calling this method from (see xmain_context_push_thread_default()).\n"
                 " * You can then call %s_proxy_new_finish() to get the result of the operation.\n"
@@ -3280,7 +3280,7 @@ class CodeGenerator:
             "void\n"
             "%s_proxy_new (\n"
             "    xdbus_connection_t     *connection,\n"
-            "    GDBusProxyFlags      flags,\n"
+            "    xdbus_proxy_flags_t      flags,\n"
             "    const xchar_t         *name,\n"
             "    const xchar_t         *object_path,\n"
             "    xcancellable_t        *cancellable,\n"
@@ -3326,13 +3326,13 @@ class CodeGenerator:
                 "/**\n"
                 " * %s_proxy_new_sync:\n"
                 " * @connection: A #xdbus_connection_t.\n"
-                " * @flags: Flags from the #GDBusProxyFlags enumeration.\n"
+                " * @flags: Flags from the #xdbus_proxy_flags_t enumeration.\n"
                 " * @name: (nullable): A bus name (well-known or unique) or %%NULL if @connection is not a message bus connection.\n"
                 " * @object_path: An object path.\n"
                 " * @cancellable: (nullable): A #xcancellable_t or %%NULL.\n"
                 " * @error: Return location for error or %%NULL\n"
                 " *\n"
-                " * Synchronously creates a proxy for the D-Bus interface #%s. See g_dbus_proxy_new_sync() for more details.\n"
+                " * Synchronously creates a proxy for the D-Bus interface #%s. See xdbus_proxy_new_sync() for more details.\n"
                 " *\n"
                 " * The calling thread is blocked until a reply is received.\n"
                 " *\n"
@@ -3348,7 +3348,7 @@ class CodeGenerator:
             "%s *\n"
             "%s_proxy_new_sync (\n"
             "    xdbus_connection_t     *connection,\n"
-            "    GDBusProxyFlags      flags,\n"
+            "    xdbus_proxy_flags_t      flags,\n"
             "    const xchar_t         *name,\n"
             "    const xchar_t         *object_path,\n"
             "    xcancellable_t        *cancellable,\n"
@@ -3377,15 +3377,15 @@ class CodeGenerator:
             self.docbook_gen.expand(
                 "/**\n"
                 " * %s_proxy_new_for_bus:\n"
-                " * @bus_type: A #GBusType.\n"
-                " * @flags: Flags from the #GDBusProxyFlags enumeration.\n"
+                " * @bus_type: A #xbus_type_t.\n"
+                " * @flags: Flags from the #xdbus_proxy_flags_t enumeration.\n"
                 " * @name: A bus name (well-known or unique).\n"
                 " * @object_path: An object path.\n"
                 " * @cancellable: (nullable): A #xcancellable_t or %%NULL.\n"
                 " * @callback: A #xasync_ready_callback_t to call when the request is satisfied.\n"
                 " * @user_data: User data to pass to @callback.\n"
                 " *\n"
-                " * Like %s_proxy_new() but takes a #GBusType instead of a #xdbus_connection_t.\n"
+                " * Like %s_proxy_new() but takes a #xbus_type_t instead of a #xdbus_connection_t.\n"
                 " *\n"
                 " * When the operation is finished, @callback will be invoked in the thread-default main loop of the thread you are calling this method from (see xmain_context_push_thread_default()).\n"
                 " * You can then call %s_proxy_new_for_bus_finish() to get the result of the operation.\n"
@@ -3399,8 +3399,8 @@ class CodeGenerator:
         self.outfile.write(
             "void\n"
             "%s_proxy_new_for_bus (\n"
-            "    GBusType             bus_type,\n"
-            "    GDBusProxyFlags      flags,\n"
+            "    xbus_type_t             bus_type,\n"
+            "    xdbus_proxy_flags_t      flags,\n"
             "    const xchar_t         *name,\n"
             "    const xchar_t         *object_path,\n"
             "    xcancellable_t        *cancellable,\n"
@@ -3445,14 +3445,14 @@ class CodeGenerator:
             self.docbook_gen.expand(
                 "/**\n"
                 " * %s_proxy_new_for_bus_sync:\n"
-                " * @bus_type: A #GBusType.\n"
-                " * @flags: Flags from the #GDBusProxyFlags enumeration.\n"
+                " * @bus_type: A #xbus_type_t.\n"
+                " * @flags: Flags from the #xdbus_proxy_flags_t enumeration.\n"
                 " * @name: A bus name (well-known or unique).\n"
                 " * @object_path: An object path.\n"
                 " * @cancellable: (nullable): A #xcancellable_t or %%NULL.\n"
                 " * @error: Return location for error or %%NULL\n"
                 " *\n"
-                " * Like %s_proxy_new_sync() but takes a #GBusType instead of a #xdbus_connection_t.\n"
+                " * Like %s_proxy_new_sync() but takes a #xbus_type_t instead of a #xdbus_connection_t.\n"
                 " *\n"
                 " * The calling thread is blocked until a reply is received.\n"
                 " *\n"
@@ -3467,8 +3467,8 @@ class CodeGenerator:
         self.outfile.write(
             "%s *\n"
             "%s_proxy_new_for_bus_sync (\n"
-            "    GBusType             bus_type,\n"
-            "    GDBusProxyFlags      flags,\n"
+            "    xbus_type_t             bus_type,\n"
+            "    xdbus_proxy_flags_t      flags,\n"
             "    const xchar_t         *name,\n"
             "    const xchar_t         *object_path,\n"
             "    xcancellable_t        *cancellable,\n"
@@ -3605,12 +3605,12 @@ class CodeGenerator:
             "    }\n"
         )
         self.outfile.write(
-            "  signal_id = g_signal_lookup (info->signal_name, %sTYPE_%s);\n"
+            "  signal_id = xsignal_lookup (info->signal_name, %sTYPE_%s);\n"
             % (i.ns_upper, i.name_upper)
         )
         self.outfile.write(
             "  xvalue_init (&return_value, XTYPE_BOOLEAN);\n"
-            "  g_signal_emitv (paramv, signal_id, 0, &return_value);\n"
+            "  xsignal_emitv (paramv, signal_id, 0, &return_value);\n"
             "  if (!xvalue_get_boolean (&return_value))\n"
             '    xdbus_method_invocation_return_error (invocation, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD, "Method %s is not implemented on interface %s", method_name, interface_name);\n'
             "  xvalue_unset (&return_value);\n"
@@ -3833,7 +3833,7 @@ class CodeGenerator:
                 "  for (l = connections; l != NULL; l = l->next)\n"
                 "    {\n"
                 "      xdbus_connection_t *connection = l->data;\n"
-                "      g_dbus_connection_emit_signal (connection,\n"
+                "      xdbus_connection_emit_signal (connection,\n"
                 '        NULL, g_dbus_interface_skeleton_get_object_path (G_DBUS_INTERFACE_SKELETON (skeleton)), "%s", "%s",\n'
                 "        signal_variant, NULL);\n"
                 "    }\n" % (i.name, s.name)
@@ -3980,7 +3980,7 @@ class CodeGenerator:
                 "        {\n"
                 "          xdbus_connection_t *connection = ll->data;\n"
                 "\n"
-                "          g_dbus_connection_emit_signal (connection,\n"
+                "          xdbus_connection_emit_signal (connection,\n"
                 "                                         NULL, g_dbus_interface_skeleton_get_object_path (G_DBUS_INTERFACE_SKELETON (skeleton)),\n"
                 '                                         "org.freedesktop.DBus.Properties",\n'
                 '                                         "PropertiesChanged",\n'
@@ -4331,7 +4331,7 @@ class CodeGenerator:
             % (self.namespace, self.namespace)
         )
         self.outfile.write(
-            "G_DEFINE_INTERFACE_WITH_CODE (%sObject, %sobject, XTYPE_OBJECT, xtype_interface_add_prerequisite (g_define_type_id, XTYPE_DBUS_OBJECT);)\n"
+            "G_DEFINE_INTERFACE_WITH_CODE (%sobject, %sobject, XTYPE_OBJECT, xtype_interface_add_prerequisite (g_define_type_id, XTYPE_DBUS_OBJECT);)\n"
             % (self.namespace, self.ns_lower)
         )
         self.outfile.write("\n")
@@ -4498,7 +4498,7 @@ class CodeGenerator:
         )
         self.outfile.write(
             "static void\n"
-            "%sobject_proxy__g_dbus_object_iface_init (GDBusObjectIface *iface)\n"
+            "%sobject_proxy__g_dbus_object_iface_init (xdbus_object_iface_t *iface)\n"
             "{\n"
             "  iface->interface_added = %sobject_notify;\n"
             "  iface->interface_removed = %sobject_notify;\n"
@@ -4651,7 +4651,7 @@ class CodeGenerator:
         self.outfile.write("\n")
         self.outfile.write(
             "static void\n"
-            "%sobject_skeleton__g_dbus_object_iface_init (GDBusObjectIface *iface)\n"
+            "%sobject_skeleton__g_dbus_object_iface_init (xdbus_object_iface_t *iface)\n"
             "{\n"
             "  iface->interface_added = %sobject_notify;\n"
             "  iface->interface_removed = %sobject_notify;\n"
@@ -4701,11 +4701,11 @@ class CodeGenerator:
                 "      if (interface != NULL)\n"
                 "        {\n"
                 "          g_warn_if_fail (%sIS_%s (interface));\n"
-                "          g_dbus_object_skeleton_add_interface (G_DBUS_OBJECT_SKELETON (object), interface);\n"
+                "          xdbus_object_skeleton_add_interface (G_DBUS_OBJECT_SKELETON (object), interface);\n"
                 "        }\n"
                 "      else\n"
                 "        {\n"
-                '          g_dbus_object_skeleton_remove_interface_by_name (G_DBUS_OBJECT_SKELETON (object), "%s");\n'
+                '          xdbus_object_skeleton_remove_interface_by_name (G_DBUS_OBJECT_SKELETON (object), "%s");\n'
                 "        }\n"
                 "      break;\n"
                 "\n" % (n, self.ns_upper, i.name_upper, i.name)
@@ -4955,7 +4955,7 @@ class CodeGenerator:
                 " * @callback: A #xasync_ready_callback_t to call when the request is satisfied.\n"
                 " * @user_data: User data to pass to @callback.\n"
                 " *\n"
-                " * Asynchronously creates #xdbus_object_manager_client_t using %sobject_manager_client_get_proxy_type() as the #xdbus_proxy_type_func_t. See g_dbus_object_manager_client_new() for more details.\n"
+                " * Asynchronously creates #xdbus_object_manager_client_t using %sobject_manager_client_get_proxy_type() as the #xdbus_proxy_type_func_t. See xdbus_object_manager_client_new() for more details.\n"
                 " *\n"
                 " * When the operation is finished, @callback will be invoked in the thread-default main loop of the thread you are calling this method from (see xmain_context_push_thread_default()).\n"
                 " * You can then call %sobject_manager_client_new_finish() to get the result of the operation.\n"
@@ -5022,7 +5022,7 @@ class CodeGenerator:
                 " * @cancellable: (nullable): A #xcancellable_t or %%NULL.\n"
                 " * @error: Return location for error or %%NULL\n"
                 " *\n"
-                " * Synchronously creates #xdbus_object_manager_client_t using %sobject_manager_client_get_proxy_type() as the #xdbus_proxy_type_func_t. See g_dbus_object_manager_client_new_sync() for more details.\n"
+                " * Synchronously creates #xdbus_object_manager_client_t using %sobject_manager_client_get_proxy_type() as the #xdbus_proxy_type_func_t. See xdbus_object_manager_client_new_sync() for more details.\n"
                 " *\n"
                 " * The calling thread is blocked until a reply is received.\n"
                 " *\n"
@@ -5058,7 +5058,7 @@ class CodeGenerator:
             self.docbook_gen.expand(
                 "/**\n"
                 " * %sobject_manager_client_new_for_bus:\n"
-                " * @bus_type: A #GBusType.\n"
+                " * @bus_type: A #xbus_type_t.\n"
                 " * @flags: Flags from the #GDBusObjectManagerClientFlags enumeration.\n"
                 " * @name: A bus name (well-known or unique).\n"
                 " * @object_path: An object path.\n"
@@ -5066,7 +5066,7 @@ class CodeGenerator:
                 " * @callback: A #xasync_ready_callback_t to call when the request is satisfied.\n"
                 " * @user_data: User data to pass to @callback.\n"
                 " *\n"
-                " * Like %sobject_manager_client_new() but takes a #GBusType instead of a #xdbus_connection_t.\n"
+                " * Like %sobject_manager_client_new() but takes a #xbus_type_t instead of a #xdbus_connection_t.\n"
                 " *\n"
                 " * When the operation is finished, @callback will be invoked in the thread-default main loop of the thread you are calling this method from (see xmain_context_push_thread_default()).\n"
                 " * You can then call %sobject_manager_client_new_for_bus_finish() to get the result of the operation.\n"
@@ -5080,7 +5080,7 @@ class CodeGenerator:
         self.outfile.write(
             "void\n"
             "%sobject_manager_client_new_for_bus (\n"
-            "    GBusType                bus_type,\n"
+            "    xbus_type_t                bus_type,\n"
             "    GDBusObjectManagerClientFlags  flags,\n"
             "    const xchar_t            *name,\n"
             "    const xchar_t            *object_path,\n"
@@ -5126,14 +5126,14 @@ class CodeGenerator:
             self.docbook_gen.expand(
                 "/**\n"
                 " * %sobject_manager_client_new_for_bus_sync:\n"
-                " * @bus_type: A #GBusType.\n"
+                " * @bus_type: A #xbus_type_t.\n"
                 " * @flags: Flags from the #GDBusObjectManagerClientFlags enumeration.\n"
                 " * @name: A bus name (well-known or unique).\n"
                 " * @object_path: An object path.\n"
                 " * @cancellable: (nullable): A #xcancellable_t or %%NULL.\n"
                 " * @error: Return location for error or %%NULL\n"
                 " *\n"
-                " * Like %sobject_manager_client_new_sync() but takes a #GBusType instead of a #xdbus_connection_t.\n"
+                " * Like %sobject_manager_client_new_sync() but takes a #xbus_type_t instead of a #xdbus_connection_t.\n"
                 " *\n"
                 " * The calling thread is blocked until a reply is received.\n"
                 " *\n"
@@ -5148,7 +5148,7 @@ class CodeGenerator:
         self.outfile.write(
             "xdbus_object_manager_t *\n"
             "%sobject_manager_client_new_for_bus_sync (\n"
-            "    GBusType                bus_type,\n"
+            "    xbus_type_t                bus_type,\n"
             "    GDBusObjectManagerClientFlags  flags,\n"
             "    const xchar_t            *name,\n"
             "    const xchar_t            *object_path,\n"

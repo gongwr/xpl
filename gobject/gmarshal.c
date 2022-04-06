@@ -409,7 +409,7 @@ g_cclosure_marshal_VOID__UCHAR (xclosure_t     *closure,
                                 xpointer_t      marshal_data)
 {
   typedef void (*GMarshalFunc_VOID__UCHAR) (xpointer_t     data1,
-                                            guchar       arg_1,
+                                            xuchar_t       arg_1,
                                             xpointer_t     data2);
   GMarshalFunc_VOID__UCHAR callback;
   GCClosure *cc = (GCClosure*) closure;
@@ -461,16 +461,16 @@ g_cclosure_marshal_VOID__UCHARv (xclosure_t     *closure,
                                  xtype_t        *param_types)
 {
   typedef void (*GMarshalFunc_VOID__UCHAR) (xpointer_t     instance,
-                                            guchar       arg_0,
+                                            xuchar_t       arg_0,
                                             xpointer_t     data);
   GCClosure *cc = (GCClosure*) closure;
   xpointer_t data1, data2;
   GMarshalFunc_VOID__UCHAR callback;
-  guchar arg0;
+  xuchar_t arg0;
   va_list args_copy;
 
   G_VA_COPY (args_copy, args);
-  arg0 = (guchar) va_arg (args_copy, xuint_t);
+  arg0 = (xuchar_t) va_arg (args_copy, xuint_t);
   va_end (args_copy);
 
   if (G_CCLOSURE_SWAP_DATA (closure))
@@ -841,7 +841,7 @@ g_cclosure_marshal_VOID__ULONG (xclosure_t     *closure,
                                 xpointer_t      marshal_data)
 {
   typedef void (*GMarshalFunc_VOID__ULONG) (xpointer_t     data1,
-                                            gulong       arg_1,
+                                            xulong_t       arg_1,
                                             xpointer_t     data2);
   GMarshalFunc_VOID__ULONG callback;
   GCClosure *cc = (GCClosure*) closure;
@@ -893,16 +893,16 @@ g_cclosure_marshal_VOID__ULONGv (xclosure_t     *closure,
                                  xtype_t        *param_types)
 {
   typedef void (*GMarshalFunc_VOID__ULONG) (xpointer_t     instance,
-                                            gulong       arg_0,
+                                            xulong_t       arg_0,
                                             xpointer_t     data);
   GCClosure *cc = (GCClosure*) closure;
   xpointer_t data1, data2;
   GMarshalFunc_VOID__ULONG callback;
-  gulong arg0;
+  xulong_t arg0;
   va_list args_copy;
 
   G_VA_COPY (args_copy, args);
-  arg0 = (gulong) va_arg (args_copy, gulong);
+  arg0 = (xulong_t) va_arg (args_copy, xulong_t);
   va_end (args_copy);
 
   if (G_CCLOSURE_SWAP_DATA (closure))
@@ -2157,7 +2157,7 @@ g_cclosure_marshal_VOID__UINT_POINTERv (xclosure_t     *closure,
  * A #GClosureMarshal function for use with signals with handlers that
  * take a flags type as an argument and return a boolean.  If you have
  * such a signal, you will probably also need to use an accumulator,
- * such as g_signal_accumulator_true_handled().
+ * such as xsignal_accumulator_true_handled().
  */
 /* BOOL:FLAGS */
 void
@@ -2404,7 +2404,7 @@ g_cclosure_marshal_STRING__OBJECT_POINTERv (xclosure_t     *closure,
  * A #GClosureMarshal function for use with signals with handlers that
  * take two boxed pointers as arguments and return a boolean.  If you
  * have such a signal, you will probably also need to use an
- * accumulator, such as g_signal_accumulator_true_handled().
+ * accumulator, such as xsignal_accumulator_true_handled().
  */
 /* BOOL:BOXED,BOXED */
 void

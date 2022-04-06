@@ -3023,8 +3023,8 @@ msgid "Error removing old file: %s"
 msgstr "पुरान फाइल केँ पढ़बामे त्रुटि: %s"
 
 #: ../gio/gmemoryinputstream.c:486 ../gio/gmemoryoutputstream.c:746
-msgid "Invalid GSeekType supplied"
-msgstr "अमान्य GSeekType कए आपूर्ति"
+msgid "Invalid xseek_type_t supplied"
+msgstr "अमान्य xseek_type_t कए आपूर्ति"
 
 #: ../gio/gmemoryinputstream.c:496
 msgid "Invalid seek request"

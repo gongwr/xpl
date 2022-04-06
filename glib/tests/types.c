@@ -32,7 +32,7 @@ test_basic_types (void)
   xchar_t *string;
   gushort gus;
   xuint_t gui;
-  gulong gul;
+  xulong_t gul;
   xsize_t gsz;
   gshort gs;
   xint_t gi;
@@ -45,8 +45,8 @@ test_basic_types (void)
   xuint32_t gu32t1 = 0x02a7f109U, gu32t2 = 0x09f1a702U;
   xuint64_t gu64t1 = G_GINT64_CONSTANT(0x1d636b02300a7aa7U),
           gu64t2 = G_GINT64_CONSTANT(0xa77a0a30026b631dU);
-  gint64 gi64t1;
-  gint64 gi64t2;
+  sint64_t gi64t1;
+  sint64_t gi64t2;
   xssize_t gsst1;
   xssize_t gsst2;
   xsize_t  gst1;
@@ -56,13 +56,13 @@ test_basic_types (void)
   g_assert_cmpint (sizeof (gint8), ==, 1);
   g_assert_cmpint (sizeof (gint16), ==, 2);
   g_assert_cmpint (sizeof (gint32), ==, 4);
-  g_assert_cmpint (sizeof (gint64), ==, 8);
+  g_assert_cmpint (sizeof (sint64_t), ==, 8);
 
   g_assert_cmpuint (GUINT16_SWAP_LE_BE (gu16t1), ==, gu16t2);
   g_assert_cmpuint (GUINT32_SWAP_LE_BE (gu32t1), ==, gu32t2);
   g_assert_cmpuint (GUINT64_SWAP_LE_BE (gu64t1), ==, gu64t2);
 
-  /* Test the G_(MIN|MAX|MAXU)(SHORT|INT|LONG) macros */
+  /* test_t the G_(MIN|MAX|MAXU)(SHORT|INT|LONG) macros */
 
   gus = G_MAXUSHORT;
   gus++;
@@ -90,10 +90,10 @@ test_basic_types (void)
   g_assert_cmpint (gi, ==, G_MININT);
 
   gl = G_MAXLONG;
-  gl = (xlong_t) (1 + (gulong) gl);
+  gl = (xlong_t) (1 + (xulong_t) gl);
   g_assert_cmpint (gl, ==, G_MINLONG);
 
-  /* Test the G_G(U)?INT(16|32|64)_FORMAT macros */
+  /* test_t the G_G(U)?INT(16|32|64)_FORMAT macros */
 
   gi16t1 = -0x3AFA;
   gu16t1 = 0xFAFA;

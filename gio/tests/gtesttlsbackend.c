@@ -83,7 +83,7 @@ _g_test_tls_backend_get_default_database (xtls_backend_t * backend)
   return default_db;
 }
 
-/* Test certificate type */
+/* test_t certificate type */
 
 typedef struct _GTestTlsCertificate      GTestTlsCertificate;
 typedef struct _GTestTlsCertificateClass GTestTlsCertificateClass;
@@ -407,7 +407,7 @@ g_test_tls_connection_initable_iface_init (xinitable_iface_t  *iface)
   iface->init = g_test_tls_connection_initable_init;
 }
 
-/* Test database type */
+/* test_t database type */
 
 typedef struct _GTestTlsDatabase      GTestTlsDatabase;
 typedef struct _GTestTlsDatabaseClass GTestTlsDatabaseClass;

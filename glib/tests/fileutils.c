@@ -30,7 +30,7 @@
 
 #include <glib.h>
 
-/* Test our stdio wrappers here; this disables redefining (e.g.) g_open() to open() */
+/* test_t our stdio wrappers here; this disables redefining (e.g.) g_open() to open() */
 #define G_STDIO_WRAP_ON_UNIX
 #include <glib/gstdio.h>
 
@@ -501,7 +501,7 @@ test_build_filename (void)
 
 #ifdef G_OS_WIN32
 
-  /* Test also using the slash as file name separator */
+  /* test_t also using the slash as file name separator */
 #define Z "/"
   /* check_string (g_build_filename (NULL), ""); */
   check_string (g_build_filename (Z, NULL), Z);
@@ -591,7 +591,7 @@ test_build_filenamev (void)
 
 #ifdef G_OS_WIN32
 
-  /* Test also using the slash as file name separator */
+  /* test_t also using the slash as file name separator */
 #define Z "/"
   args[0] = NULL;
   check_string (g_build_filenamev (args), "");
@@ -1284,7 +1284,7 @@ test_mkstemp (void)
   g_assert_cmpint (g_mkstemp (name), ==, -1);
   g_free (name);
 
-  /* Test normal case */
+  /* test_t normal case */
   name = xstrdup ("testXXXXXXtest"),
   fd = g_mkstemp (name);
   g_assert_cmpint (fd, !=, -1);
@@ -1529,7 +1529,7 @@ test_set_contents_full (void)
     };
   xsize_t i;
 
-  g_test_summary ("Test xfile_set_contents_full() with various flags");
+  g_test_summary ("test_t xfile_set_contents_full() with various flags");
 
   for (flags = 0; flags < (xint_t) flags_mask; flags++)
     {
@@ -1682,7 +1682,7 @@ test_set_contents_full_read_only_file (void)
   xboolean_t ret;
   xboolean_t can_override_dac = check_cap_dac_override (NULL);
 
-  g_test_summary ("Test xfile_set_contents_full() on a read-only file");
+  g_test_summary ("test_t xfile_set_contents_full() on a read-only file");
 
   /* Can’t test this with different #GFileSetContentsFlags as they all have
    * different behaviours wrt replacing the file while noticing/ignoring the
@@ -1743,7 +1743,7 @@ test_set_contents_full_read_only_directory (void)
       XFILE_SET_CONTENTS_CONSISTENT;
   xint_t flags;
 
-  g_test_summary ("Test xfile_set_contents_full() on a file in a read-only directory");
+  g_test_summary ("test_t xfile_set_contents_full() on a file in a read-only directory");
 
   for (flags = 0; flags < (xint_t) flags_mask; flags++)
     {
@@ -2192,7 +2192,7 @@ G_STMT_START { \
 } G_STMT_END
 
 static xchar_t *
-to_hex (const guchar *buf,
+to_hex (const xuchar_t *buf,
         xsize_t        len)
 {
   xsize_t i;
@@ -2209,17 +2209,17 @@ test_win32_zero_terminate_symlink (void)
 {
   xsize_t i;
 #define TESTCASE(data, len_mod, use_buf, buf_size, terminate, reported_len, returned_string) \
- { (const guchar *) data, wcslen (data) * 2 + len_mod, use_buf, buf_size, terminate, reported_len, (guchar *) returned_string},
+ { (const xuchar_t *) data, wcslen (data) * 2 + len_mod, use_buf, buf_size, terminate, reported_len, (xuchar_t *) returned_string},
 
   struct
   {
-    const guchar *data;
+    const xuchar_t *data;
     xsize_t         data_size;
     xboolean_t      use_buf;
     xsize_t         buf_size;
     xboolean_t      terminate;
     int           reported_len;
-    const guchar *returned_string;
+    const xuchar_t *returned_string;
   } testcases[] = {
     TESTCASE (L"foobar", +2, TRUE, 12 + 4, FALSE, 12 + 2, "f\0o\0o\0b\0a\0r\0\0\0")
     TESTCASE (L"foobar", +2, TRUE, 12 + 3, FALSE, 12 + 2, "f\0o\0o\0b\0a\0r\0\0\0")
@@ -2391,18 +2391,18 @@ test_win32_zero_terminate_symlink (void)
                                                   testcases[i].use_buf ? NULL : &buf,
                                                   testcases[i].terminate);
       if (testcases[i].reported_len != result)
-        xerror ("Test %" G_GSIZE_FORMAT " failed, result %d != %d", i, result, testcases[i].reported_len);
+        xerror ("test_t %" G_GSIZE_FORMAT " failed, result %d != %d", i, result, testcases[i].reported_len);
       if (buf == NULL && testcases[i].buf_size != 0)
-        xerror ("Test %" G_GSIZE_FORMAT " failed, buf == NULL", i);
+        xerror ("test_t %" G_GSIZE_FORMAT " failed, buf == NULL", i);
       g_assert_cmpint (testcases[i].reported_len, ==, result);
       if ((testcases[i].use_buf && testcases[i].buf_size != 0) ||
           (!testcases[i].use_buf && testcases[i].reported_len != 0))
         {
           g_assert_nonnull (buf);
-          buf_hex = to_hex ((const guchar *) buf, result);
+          buf_hex = to_hex ((const xuchar_t *) buf, result);
           expected_hex = to_hex (testcases[i].returned_string, testcases[i].reported_len);
           if (memcmp (buf, testcases[i].returned_string, result) != 0)
-            xerror ("Test %" G_GSIZE_FORMAT " failed:\n%s !=\n%s", i, buf_hex, expected_hex);
+            xerror ("test_t %" G_GSIZE_FORMAT " failed:\n%s !=\n%s", i, buf_hex, expected_hex);
           g_assert_memcmp (buf, ==, testcases[i].returned_string, testcases[i].reported_len, buf_hex, expected_hex, testcases[i].line);
           g_free (buf_hex);
           g_free (expected_hex);

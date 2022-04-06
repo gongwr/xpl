@@ -22,7 +22,7 @@
 
   <para>
     Throughout the chapter, a running example of a file viewer program is used,
-    which has a <type>ViewerFile</type> class to represent a single file being
+    which has a <type>viewer_file_t</type> class to represent a single file being
     viewed, and various derived classes for different types of files with
     special functionality, such as audio files. The example application also
     supports editing files (for example, to tweak a photo being viewed), using
@@ -68,7 +68,7 @@
 
     <para>
       If you want to declare a type named ‘file’ in namespace ‘viewer’, name the
-      type instance <function>ViewerFile</function> and its class
+      type instance <function>viewer_file_t</function> and its class
       <function>ViewerFileClass</function> (names are case sensitive). The
       recommended method of declaring a type differs based on whether the type
       is final or derivable.
@@ -103,12 +103,12 @@ G_BEGIN_DECLS
  * Type declaration.
  */
 #define VIEWER_TYPE_FILE viewer_file_get_type ()
-G_DECLARE_FINAL_TYPE (ViewerFile, viewer_file, VIEWER, FILE, xobject_t)
+G_DECLARE_FINAL_TYPE (viewer_file_t, viewer_file, VIEWER, FILE, xobject_t)
 
 /*
  * Method definitions.
  */
-ViewerFile *viewer_file_new (void);
+viewer_file_t *viewer_file_new (void);
 
 G_END_DECLS
 
@@ -141,14 +141,14 @@ G_BEGIN_DECLS
  * Type declaration.
  */
 #define VIEWER_TYPE_FILE viewer_file_get_type ()
-G_DECLARE_DERIVABLE_TYPE (ViewerFile, viewer_file, VIEWER, FILE, xobject_t)
+G_DECLARE_DERIVABLE_TYPE (viewer_file_t, viewer_file, VIEWER, FILE, xobject_t)
 
 struct _ViewerFileClass
 {
   xobject_class_t parent_class;
 
   /* Class virtual function fields. */
-  void (* open) (ViewerFile  *file,
+  void (* open) (viewer_file_t  *file,
                  xerror_t     **error);
 
   /* Padding to allow adding up to 12 new virtual functions without
@@ -159,7 +159,7 @@ struct _ViewerFileClass
 /*
  * Method definitions.
  */
-ViewerFile *viewer_file_new (void);
+viewer_file_t *viewer_file_new (void);
 
 G_END_DECLS
 
@@ -238,7 +238,7 @@ struct _ViewerFile
       If the class has been declared as final using
       <function>G_DECLARE_FINAL_TYPE</function> (see
       <xref linkend="howto-gobject-header"/>), private data should be placed in
-      the instance structure, <type>ViewerFile</type>, and
+      the instance structure, <type>viewer_file_t</type>, and
       <function>G_DEFINE_TYPE</function> should be used instead of
       <function>G_DEFINE_TYPE_WITH_PRIVATE</function>. The instance structure
       for a final class is not exposed publicly, and is not embedded in the
@@ -249,11 +249,11 @@ struct _ViewerFile
       <function>G_DEFINE_TYPE_WITH_PRIVATE</function> must be used.
 
 <informalexample><programlisting>
-G_DEFINE_TYPE (ViewerFile, viewer_file, XTYPE_OBJECT)
+G_DEFINE_TYPE (viewer_file_t, viewer_file, XTYPE_OBJECT)
 </programlisting></informalexample>
 or
 <informalexample><programlisting>
-G_DEFINE_TYPE_WITH_PRIVATE (ViewerFile, viewer_file, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (viewer_file_t, viewer_file, XTYPE_OBJECT)
 </programlisting></informalexample>
     </para>
 
@@ -304,7 +304,7 @@ G_DEFINE_TYPE_WITH_PRIVATE (ViewerFile, viewer_file, XTYPE_OBJECT)
     <para>
       You should write the following code first:
 <informalexample><programlisting>
-G_DEFINE_TYPE_WITH_PRIVATE (ViewerFile, viewer_file, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (viewer_file_t, viewer_file, XTYPE_OBJECT)
 
 static void
 viewer_file_class_init (ViewerFileClass *klass)
@@ -312,7 +312,7 @@ viewer_file_class_init (ViewerFileClass *klass)
 }
 
 static void
-viewer_file_init (ViewerFile *self)
+viewer_file_init (viewer_file_t *self)
 {
   ViewerFilePrivate *priv = viewer_file_get_instance_private (self);
 
@@ -420,7 +420,7 @@ struct _ViewerFilePrivate
   xinput_stream_t *input_stream;
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (ViewerFile, viewer_file, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (viewer_file_t, viewer_file, XTYPE_OBJECT)
 
 static void
 viewer_file_dispose (xobject_t *gobject)
@@ -469,7 +469,7 @@ viewer_file_class_init (ViewerFileClass *klass)
 }
 
 static void
-viewer_file_init (ViewerFile *self);
+viewer_file_init (viewer_file_t *self);
 {
   ViewerFilePrivate *priv = viewer_file_get_instance_private (self);
 
@@ -520,12 +520,12 @@ viewer_file_init (ViewerFile *self);
         in the source file.
 <informalexample><programlisting>
 /* declaration in the header. */
-void viewer_file_open (ViewerFile  *self,
+void viewer_file_open (viewer_file_t  *self,
                        xerror_t     **error);
 
 /* implementation in the source file */
 void
-viewer_file_open (ViewerFile  *self,
+viewer_file_open (viewer_file_t  *self,
                   xerror_t     **error)
 {
   g_return_if_fail (VIEWER_IS_FILE (self));
@@ -572,14 +572,14 @@ viewer_file_open (ViewerFile  *self,
 <informalexample><programlisting>
 /* declaration in viewer-file.h. */
 #define VIEWER_TYPE_FILE viewer_file_get_type ()
-G_DECLARE_DERIVABLE_TYPE (ViewerFile, viewer_file, VIEWER, FILE, xobject_t)
+G_DECLARE_DERIVABLE_TYPE (viewer_file_t, viewer_file, VIEWER, FILE, xobject_t)
 
 struct _ViewerFileClass
 {
   xobject_class_t parent_class;
 
   /* stuff */
-  void (*open) (ViewerFile  *self,
+  void (*open) (viewer_file_t  *self,
                 xerror_t     **error);
 
   /* Padding to allow adding up to 12 new virtual functions without
@@ -587,12 +587,12 @@ struct _ViewerFileClass
   xpointer_t padding[12];
 };
 
-void viewer_file_open (ViewerFile  *self,
+void viewer_file_open (viewer_file_t  *self,
                        xerror_t     **error);
 
 /* implementation in viewer-file.c */
 void
-viewer_file_open (ViewerFile  *self,
+viewer_file_open (viewer_file_t  *self,
                   xerror_t     **error)
 {
   ViewerFileClass *klass;
@@ -620,7 +620,7 @@ viewer_file_open (ViewerFile  *self,
         <function>NULL</function>, and thus are to be considered "pure virtual".
 <informalexample><programlisting>
 static void
-viewer_file_real_close (ViewerFile  *self,
+viewer_file_real_close (viewer_file_t  *self,
                         xerror_t     **error)
 {
   /* Default implementation for the virtual method. */
@@ -640,7 +640,7 @@ viewer_file_class_init (ViewerFileClass *klass)
 }
 
 void
-viewer_file_open (ViewerFile  *self,
+viewer_file_open (viewer_file_t  *self,
                   xerror_t     **error)
 {
   ViewerFileClass *klass;
@@ -660,7 +660,7 @@ viewer_file_open (ViewerFile  *self,
 }
 
 void
-viewer_file_close (ViewerFile  *self,
+viewer_file_close (viewer_file_t  *self,
                    xerror_t     **error)
 {
   ViewerFileClass *klass;
@@ -691,32 +691,32 @@ struct _ViewerFileClass
   xobject_class_t parent;
 
   /* Public virtual method as before. */
-  void     (*open)           (ViewerFile  *self,
+  void     (*open)           (viewer_file_t  *self,
                               xerror_t     **error);
 
   /* Private helper function to work out whether the file can be loaded via
    * memory mapped I/O, or whether it has to be read as a stream. */
-  xboolean_t (*can_memory_map) (ViewerFile *self);
+  xboolean_t (*can_memory_map) (viewer_file_t *self);
 
   /* Padding to allow adding up to 12 new virtual functions without
    * breaking ABI. */
   xpointer_t padding[12];
 };
 
-void viewer_file_open (ViewerFile *self, xerror_t **error);
+void viewer_file_open (viewer_file_t *self, xerror_t **error);
 </programlisting></informalexample>
         These virtual functions are often used to delegate part of the job
         to child classes:
 <informalexample><programlisting>
 /* this accessor function is static: it is not exported outside of this file. */
 static xboolean_t
-viewer_file_can_memory_map (ViewerFile *self)
+viewer_file_can_memory_map (viewer_file_t *self)
 {
   return VIEWER_FILE_GET_CLASS (self)->can_memory_map (self);
 }
 
 void
-viewer_file_open (ViewerFile  *self,
+viewer_file_open (viewer_file_t  *self,
                   xerror_t     **error)
 {
   g_return_if_fail (VIEWER_IS_FILE (self));
@@ -743,7 +743,7 @@ viewer_file_open (ViewerFile  *self,
         private virtual function:
 <informalexample><programlisting>
 static xboolean_t
-viewer_file_real_can_memory_map (ViewerFile *self)
+viewer_file_real_can_memory_map (viewer_file_t *self)
 {
   /* As an example, always return false. Or, potentially return true if the
    * file is local. */
@@ -763,7 +763,7 @@ viewer_file_class_init (ViewerFileClass *klass)
         Derived classes can then override the method with code such as:
 <informalexample><programlisting>
 static void
-viewer_audio_file_class_init (ViewerAudioFileClass *klass)
+viewer_audio_file_class_init (viewer_audio_file_class_t *klass)
 {
   ViewerFileClass *file_class = VIEWER_FILE_CLASS (klass);
 
@@ -1002,7 +1002,7 @@ viewer_editable_redo (ViewerEditable *self,
     </para>
 
     <para>
-      The second step is to implement <type>ViewerFile</type> by defining
+      The second step is to implement <type>viewer_file_t</type> by defining
       it using
       <function><link linkend="G-DEFINE-TYPE-WITH-CODE:CAPS">G_DEFINE_TYPE_WITH_CODE</link></function>
       and
@@ -1012,7 +1012,7 @@ viewer_editable_redo (ViewerEditable *self,
 <informalexample><programlisting>
 static void viewer_file_editable_interface_init (ViewerEditableInterface *iface);
 
-G_DEFINE_TYPE_WITH_CODE (ViewerFile, viewer_file, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (viewer_file_t, viewer_file, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (VIEWER_TYPE_EDITABLE,
                                                 viewer_file_editable_interface_init))
 </programlisting></informalexample>
@@ -1033,7 +1033,7 @@ G_DEFINE_TYPE_WITH_CODE (ViewerFile, viewer_file, XTYPE_OBJECT,
       must be assigned to its implementation:
 <informalexample><programlisting>
 static void
-viewer_file_editable_save (ViewerFile  *self,
+viewer_file_editable_save (viewer_file_t  *self,
                            xerror_t     **error)
 {
   g_print ("File implementation of editable interface save method: %s.\n",
@@ -1041,7 +1041,7 @@ viewer_file_editable_save (ViewerFile  *self,
 }
 
 static void
-viewer_file_editable_undo (ViewerFile *self,
+viewer_file_editable_undo (viewer_file_t *self,
                            xuint_t       n_steps)
 {
   g_print ("File implementation of editable interface undo method: %s.\n",
@@ -1049,7 +1049,7 @@ viewer_file_editable_undo (ViewerFile *self,
 }
 
 static void
-viewer_file_editable_redo (ViewerFile *self,
+viewer_file_editable_redo (viewer_file_t *self,
                            xuint_t       n_steps)
 {
   g_print ("File implementation of editable interface redo method: %s.\n",
@@ -1065,7 +1065,7 @@ viewer_file_editable_interface_init (ViewerEditableInterface *iface)
 }
 
 static void
-viewer_file_init (ViewerFile *self)
+viewer_file_init (viewer_file_t *self)
 {
   /* Instance variable initialisation code. */
 }
@@ -1079,8 +1079,8 @@ viewer_file_init (ViewerFile *self)
       macro should be added. The private structure should be declared exactly
       as for a normal derivable object, see <xref linkend="howto-gobject-code"/>.
 <informalexample><programlisting>
-G_DEFINE_TYPE_WITH_CODE (ViewerFile, viewer_file, XTYPE_OBJECT,
-                         G_ADD_PRIVATE (ViewerFile)
+G_DEFINE_TYPE_WITH_CODE (viewer_file_t, viewer_file, XTYPE_OBJECT,
+                         G_ADD_PRIVATE (viewer_file_t)
                          G_IMPLEMENT_INTERFACE (VIEWER_TYPE_EDITABLE,
                                                 viewer_file_editable_interface_init))
 </programlisting></informalexample>
@@ -1118,7 +1118,7 @@ G_DEFINE_INTERFACE (ViewerEditableLossy, viewer_editable_lossy, VIEWER_TYPE_EDIT
 static void
 viewer_file_editable_lossy_compress (ViewerEditableLossy *editable)
 {
-  ViewerFile *self = VIEWER_FILE (editable);
+  viewer_file_t *self = VIEWER_FILE (editable);
 
   g_print ("File implementation of lossy editable interface compress method: %s.\n",
            self->filename);
@@ -1134,7 +1134,7 @@ static void
 viewer_file_editable_save (ViewerEditable  *editable,
                            xerror_t         **error)
 {
-  ViewerFile *self = VIEWER_FILE (editable);
+  viewer_file_t *self = VIEWER_FILE (editable);
 
   g_print ("File implementation of editable interface save method: %s.\n",
            self->filename);
@@ -1144,7 +1144,7 @@ static void
 viewer_file_editable_undo (ViewerEditable *editable,
                            xuint_t           n_steps)
 {
-  ViewerFile *self = VIEWER_FILE (editable);
+  viewer_file_t *self = VIEWER_FILE (editable);
 
   g_print ("File implementation of editable interface undo method: %s.\n",
            self->filename);
@@ -1154,7 +1154,7 @@ static void
 viewer_file_editable_redo (ViewerEditable *editable,
                            xuint_t           n_steps)
 {
-  ViewerFile *self = VIEWER_FILE (editable);
+  viewer_file_t *self = VIEWER_FILE (editable);
 
   g_print ("File implementation of editable interface redo method: %s.\n",
            self->filename);
@@ -1175,12 +1175,12 @@ viewer_file_class_init (ViewerFileClass *klass)
 }
 
 static void
-viewer_file_init (ViewerFile *self)
+viewer_file_init (viewer_file_t *self)
 {
   /* Instance variable initialisation code. */
 }
 
-G_DEFINE_TYPE_WITH_CODE (ViewerFile, viewer_file, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (viewer_file_t, viewer_file, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (VIEWER_TYPE_EDITABLE,
                                                 viewer_file_editable_interface_init)
                          G_IMPLEMENT_INTERFACE (VIEWER_TYPE_EDITABLE_LOSSY,
@@ -1247,7 +1247,7 @@ viewer_editable_default_init (ViewerEditableInterface *iface)
       implements using <function><link linkend="g-object-class-override-property">xobject_class_override_property</link></function>
       instead of <function><link linkend="g-object-class-install-property">xobject_class_install_property</link></function>.
       The following code snippet shows the modifications needed in the
-      <type>ViewerFile</type> declaration and implementation above:
+      <type>viewer_file_t</type> declaration and implementation above:
 <informalexample><programlisting>
 struct _ViewerFile
 {
@@ -1268,7 +1268,7 @@ viewer_file_set_property (xobject_t      *object,
                           const xvalue_t *value,
                           xparam_spec_t   *pspec)
 {
-  ViewerFile *file = VIEWER_FILE (object);
+  viewer_file_t *file = VIEWER_FILE (object);
 
   switch (prop_id)
     {
@@ -1288,7 +1288,7 @@ viewer_file_get_property (xobject_t    *object,
                           xvalue_t     *value,
                           xparam_spec_t *pspec)
 {
-  ViewerFile *file = VIEWER_FILE (object);
+  viewer_file_t *file = VIEWER_FILE (object);
 
   switch (prop_id)
     {
@@ -1328,9 +1328,9 @@ viewer_file_class_init (ViewerFileClass *klass)
     </para>
 
     <para>
-      In this example, <type>ViewerAudioFile</type> is derived from
-      <type>ViewerFile</type>. Both implement the <type>ViewerEditable</type>
-      interface. <type>ViewerAudioFile</type> only implements one method of the
+      In this example, <type>viewer_audio_file_t</type> is derived from
+      <type>viewer_file_t</type>. Both implement the <type>ViewerEditable</type>
+      interface. <type>viewer_audio_file_t</type> only implements one method of the
       <type>ViewerEditable</type> interface and uses the base class implementation of
       the other.
 <informalexample><programlisting>
@@ -1338,7 +1338,7 @@ static void
 viewer_audio_file_editable_save (ViewerEditable  *editable,
                                  xerror_t         **error)
 {
-  ViewerAudioFile *self = VIEWER_AUDIO_FILE (editable);
+  viewer_audio_file_t *self = VIEWER_AUDIO_FILE (editable);
 
   g_print ("Audio file implementation of editable interface save method.\n");
 }
@@ -1355,18 +1355,18 @@ viewer_audio_file_editable_interface_init (ViewerEditableInterface *iface)
    */
 }
 
-G_DEFINE_TYPE_WITH_CODE (ViewerAudioFile, viewer_audio_file, VIEWER_TYPE_FILE,
+G_DEFINE_TYPE_WITH_CODE (viewer_audio_file, viewer_audio_file, VIEWER_TYPE_FILE,
                          G_IMPLEMENT_INTERFACE (VIEWER_TYPE_EDITABLE,
                                                 viewer_audio_file_editable_interface_init))
 
 static void
-viewer_audio_file_class_init (ViewerAudioFileClass *klass)
+viewer_audio_file_class_init (viewer_audio_file_class_t *klass)
 {
   /* Nothing here. */
 }
 
 static void
-viewer_audio_file_init (ViewerAudioFile *self)
+viewer_audio_file_init (viewer_audio_file_t *self)
 {
   /* Nothing here. */
 }
@@ -1388,7 +1388,7 @@ viewer_audio_file_init (ViewerAudioFile *self)
     </para>
 
     <para>
-      In this example <type>ViewerAudioFile</type> overrides the
+      In this example <type>viewer_audio_file_t</type> overrides the
       <function>save</function> interface method. In its overridden method
       it calls the base class implementation of the same interface method.
 <informalexample><programlisting>
@@ -1398,7 +1398,7 @@ static void
 viewer_audio_file_editable_save (ViewerEditable  *editable,
                                  xerror_t         **error)
 {
-  ViewerAudioFile *self = VIEWER_AUDIO_FILE (editable);
+  viewer_audio_file_t *self = VIEWER_AUDIO_FILE (editable);
 
   g_print ("Audio file implementation of editable interface save method.\n");
 
@@ -1414,18 +1414,18 @@ viewer_audio_file_editable_interface_init (ViewerEditableInterface *iface)
   iface->save = viewer_audio_file_editable_save;
 }
 
-G_DEFINE_TYPE_WITH_CODE (ViewerAudioFile, viewer_audio_file, VIEWER_TYPE_FILE,
+G_DEFINE_TYPE_WITH_CODE (viewer_audio_file, viewer_audio_file, VIEWER_TYPE_FILE,
                          G_IMPLEMENT_INTERFACE (VIEWER_TYPE_EDITABLE,
                                                 viewer_audio_file_editable_interface_init))
 
 static void
-viewer_audio_file_class_init (ViewerAudioFileClass *klass)
+viewer_audio_file_class_init (viewer_audio_file_class_t *klass)
 {
   /* Nothing here. */
 }
 
 static void
-viewer_audio_file_init (ViewerAudioFile *self)
+viewer_audio_file_init (viewer_audio_file_t *self)
 {
   /* Nothing here. */
 }
@@ -1461,7 +1461,7 @@ viewer_audio_file_init (ViewerAudioFile *self)
 
     <para>
       The most basic use of signals is to implement event
-      notification. For example, given a <type>ViewerFile</type> object with
+      notification. For example, given a <type>viewer_file_t</type> object with
       a <function>write</function> method, a signal could be emitted whenever
       the file is changed using that method.
       The code below shows how the user can connect a callback to the
@@ -1469,18 +1469,18 @@ viewer_audio_file_init (ViewerAudioFile *self)
 <informalexample><programlisting>
 file = xobject_new (VIEWER_FILE_TYPE, NULL);
 
-g_signal_connect (file, "changed", (xcallback_t) changed_event, NULL);
+xsignal_connect (file, "changed", (xcallback_t) changed_event, NULL);
 
 viewer_file_write (file, buffer, strlen (buffer));
 </programlisting></informalexample>
     </para>
 
     <para>
-      The <type>ViewerFile</type> signal is registered in the
+      The <type>viewer_file_t</type> signal is registered in the
       <function>class_init</function> function:
 <informalexample><programlisting>
 file_signals[CHANGED] =
-  g_signal_newv ("changed",
+  xsignal_newv ("changed",
                  XTYPE_FROM_CLASS (object_class),
                  G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
                  NULL /* closure */,
@@ -1494,7 +1494,7 @@ file_signals[CHANGED] =
       and the signal is emitted in <function>viewer_file_write</function>:
 <informalexample><programlisting>
 void
-viewer_file_write (ViewerFile   *self,
+viewer_file_write (viewer_file_t   *self,
                    const xuint8_t *buffer,
                    xsize_t         size)
 {
@@ -1504,7 +1504,7 @@ viewer_file_write (ViewerFile   *self,
   /* First write data. */
 
   /* Then, notify user of data written. */
-  g_signal_emit (self, file_signals[CHANGED], 0 /* details */);
+  xsignal_emit (self, file_signals[CHANGED], 0 /* details */);
 }
 </programlisting></informalexample>
       As shown above, the details parameter can safely be set to zero if no

@@ -51,7 +51,7 @@ g_fam_file_monitor_callback (xint_t         fd,
                              xio_condition_t condition,
                              xpointer_t     user_data)
 {
-  gint64 now = xsource_get_time (fam_source);
+  sint64_t now = xsource_get_time (fam_source);
 
   g_mutex_lock (&fam_lock);
 

@@ -23,7 +23,7 @@ test_dup_default (void)
 {
   xpower_profile_monitor_t *monitor;
 
-  monitor = g_power_profile_monitor_dup_default ();
+  monitor = xpower_profile_monitor_dup_default ();
   g_assert_nonnull (monitor);
   xobject_unref (monitor);
 }
@@ -35,7 +35,7 @@ power_saver_enabled_cb (xpower_profile_monitor_t *monitor,
 {
   xboolean_t enabled;
 
-  enabled = g_power_profile_monitor_get_power_saver_enabled (monitor);
+  enabled = xpower_profile_monitor_get_power_saver_enabled (monitor);
   g_debug ("Power Saver %s (%d)", enabled ? "enabled" : "disabled", enabled);
 }
 
@@ -44,16 +44,16 @@ do_watch_power_profile (void)
 {
   xpower_profile_monitor_t *monitor;
   xmain_loop_t *loop;
-  gulong signal_id;
+  xulong_t signal_id;
 
-  monitor = g_power_profile_monitor_dup_default ();
-  signal_id = g_signal_connect (G_OBJECT (monitor), "notify::power-saver-enabled",
+  monitor = xpower_profile_monitor_dup_default ();
+  signal_id = xsignal_connect (G_OBJECT (monitor), "notify::power-saver-enabled",
 		                G_CALLBACK (power_saver_enabled_cb), NULL);
 
   loop = xmain_loop_new (NULL, TRUE);
   xmain_loop_run (loop);
 
-  g_signal_handler_disconnect (monitor, signal_id);
+  xsignal_handler_disconnect (monitor, signal_id);
   xobject_unref (monitor);
   xmain_loop_unref (loop);
 }

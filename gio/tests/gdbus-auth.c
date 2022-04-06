@@ -56,7 +56,7 @@ server_new_for_mechanism (const xchar_t *allowed_mechanism)
   xdbus_server_t *server;
   xdbus_auth_observer_t *auth_observer;
   xerror_t *error;
-  GDBusServerFlags flags;
+  xdbus_server_flags_t flags;
 
   guid = g_dbus_generate_guid ();
 
@@ -83,7 +83,7 @@ server_new_for_mechanism (const xchar_t *allowed_mechanism)
     flags |= G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS;
 
   error = NULL;
-  server = g_dbus_server_new_sync (addr,
+  server = xdbus_server_new_sync (addr,
                                    flags,
                                    guid,
                                    auth_observer,
@@ -92,7 +92,7 @@ server_new_for_mechanism (const xchar_t *allowed_mechanism)
   g_assert_no_error (error);
   g_assert (server != NULL);
 
-  g_signal_connect (auth_observer,
+  xsignal_connect (auth_observer,
                     "allow-mechanism",
                     G_CALLBACK (server_on_allow_mechanism),
                     (xpointer_t) allowed_mechanism);
@@ -142,12 +142,12 @@ test_auth_client_thread_func (xpointer_t user_data)
 
   auth_observer = xdbus_auth_observer_new ();
 
-  g_signal_connect (auth_observer,
+  xsignal_connect (auth_observer,
                     "allow-mechanism",
                     G_CALLBACK (server_on_allow_mechanism),
                     (xpointer_t) data->allowed_client_mechanism);
 
-  c = g_dbus_connection_new_for_address_sync (data->address,
+  c = xdbus_connection_new_for_address_sync (data->address,
                                               G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
                                               auth_observer,
                                               NULL, /* xcancellable_t */
@@ -173,7 +173,7 @@ test_auth_mechanism (const xchar_t *allowed_client_mechanism,
 
   loop = xmain_loop_new (NULL, FALSE);
 
-  g_signal_connect (server,
+  xsignal_connect (server,
                     "new-connection",
                     G_CALLBACK (test_auth_on_new_connection),
                     loop);
@@ -182,18 +182,18 @@ test_auth_mechanism (const xchar_t *allowed_client_mechanism,
 
   data.allowed_client_mechanism = allowed_client_mechanism;
   data.allowed_server_mechanism = allowed_server_mechanism;
-  data.address = g_dbus_server_get_client_address (server);
+  data.address = xdbus_server_get_client_address (server);
 
   /* run the D-Bus client in a thread */
   client_thread = xthread_new ("gdbus-client-thread",
                                 test_auth_client_thread_func,
                                 &data);
 
-  g_dbus_server_start (server);
+  xdbus_server_start (server);
 
   xmain_loop_run (loop);
 
-  g_dbus_server_stop (server);
+  xdbus_server_stop (server);
 
   xthread_join (client_thread);
   xsource_remove (timeout_id);

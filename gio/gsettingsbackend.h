@@ -167,7 +167,7 @@ XPL_AVAILABLE_IN_ALL
 xsettings_backend_t *      g_null_settings_backend_new                     (void);
 
 XPL_AVAILABLE_IN_ALL
-xsettings_backend_t *      g_memory_settings_backend_new                   (void);
+xsettings_backend_t *      xmemory_settings_backend_new                   (void);
 
 G_END_DECLS
 

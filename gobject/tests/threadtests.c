@@ -403,7 +403,7 @@ test_threaded_weak_ref_finalization (void)
   };
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2390");
-  g_test_summary ("Test that a weak ref added by another thread during dispose "
+  g_test_summary ("test_t that a weak ref added by another thread during dispose "
                   "of a xobject_t is cleared during finalisation. "
                   "Use on_weak_ref_disposed() to synchronize the other thread "
                   "with the dispose vfunc.");
@@ -480,7 +480,7 @@ test_threaded_toggle_notify (void)
   xsize_t i;
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/issues/2394");
-  g_test_summary ("Test that toggle reference notifications can be changed "
+  g_test_summary ("test_t that toggle reference notifications can be changed "
                   "safely from another (the main) thread without causing the "
                   "notifying thread to abort");
 

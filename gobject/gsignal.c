@@ -92,7 +92,7 @@
  * get unblocked exactly the same amount of times it has been blocked before.
  *
  * Second, upon emission of a %G_SIGNAL_DETAILED signal, an additional
- * @detail argument passed in to g_signal_emit() has to match the detail
+ * @detail argument passed in to xsignal_emit() has to match the detail
  * argument of the signal handler currently subject to invocation.
  * Specification of no detail argument for signal handlers (omission of the
  * detail part of the signal specification upon connection) serves as a
@@ -106,23 +106,23 @@
  *
  * If you are connecting handlers to signals and using a #xobject_t instance as
  * your signal handler user data, you should remember to pair calls to
- * g_signal_connect() with calls to g_signal_handler_disconnect() or
- * g_signal_handlers_disconnect_by_func(). While signal handlers are
+ * xsignal_connect() with calls to xsignal_handler_disconnect() or
+ * xsignal_handlers_disconnect_by_func(). While signal handlers are
  * automatically disconnected when the object emitting the signal is finalised,
  * they are not automatically disconnected when the signal handler user data is
  * destroyed. If this user data is a #xobject_t instance, using it from a
  * signal handler after it has been finalised is an error.
  *
  * There are two strategies for managing such user data. The first is to
- * disconnect the signal handler (using g_signal_handler_disconnect() or
- * g_signal_handlers_disconnect_by_func()) when the user data (object) is
+ * disconnect the signal handler (using xsignal_handler_disconnect() or
+ * xsignal_handlers_disconnect_by_func()) when the user data (object) is
  * finalised; this has to be implemented manually. For non-threaded programs,
- * g_signal_connect_object() can be used to implement this automatically.
+ * xsignal_connect_object() can be used to implement this automatically.
  * Currently, however, it is unsafe to use in threaded programs.
  *
  * The second is to hold a strong reference on the user data until after the
  * signal is disconnected for other reasons. This can be implemented
- * automatically using g_signal_connect_data().
+ * automatically using xsignal_connect_data().
  *
  * The first approach is recommended, as the second approach can result in
  * effective memory leaks of the user data if the signal handler is never
@@ -163,7 +163,7 @@ static	      void		handler_insert		(xuint_t		  signal_id,
 							 xpointer_t	  instance,
 							 Handler	 *handler);
 static	      Handler*		handler_lookup		(xpointer_t	  instance,
-							 gulong		  handler_id,
+							 xulong_t		  handler_id,
 							 xclosure_t        *closure,
 							 xuint_t		 *signal_id_p);
 static inline HandlerMatch*	handler_match_prepend	(HandlerMatch	 *list,
@@ -275,7 +275,7 @@ struct _HandlerList
 
 struct _Handler
 {
-  gulong        sequential_number;
+  xulong_t        sequential_number;
   Handler      *next;
   Handler      *prev;
   xquark	detail;
@@ -303,13 +303,13 @@ typedef struct
 
 
 /* --- variables --- */
-static GBSearchArray *g_signal_key_bsa = NULL;
-static const GBSearchConfig g_signal_key_bconfig = {
+static GBSearchArray *xsignal_key_bsa = NULL;
+static const GBSearchConfig xsignal_key_bconfig = {
   sizeof (SignalKey),
   signal_key_cmp,
   G_BSEARCH_ARRAY_ALIGN_POWER2,
 };
-static GBSearchConfig g_signal_hlbsa_bconfig = {
+static GBSearchConfig xsignal_hlbsa_bconfig = {
   sizeof (HandlerList),
   handler_lists_cmp,
   0,
@@ -321,23 +321,23 @@ static GBSearchConfig g_class_closure_bconfig = {
 };
 static xhashtable_t    *g_handler_list_bsa_ht = NULL;
 static Emission      *g_emissions = NULL;
-static gulong         g_handler_sequential_number = 1;
+static xulong_t         g_handler_sequential_number = 1;
 static xhashtable_t    *g_handlers = NULL;
 
-G_LOCK_DEFINE_STATIC (g_signal_mutex);
-#define	SIGNAL_LOCK()		G_LOCK (g_signal_mutex)
-#define	SIGNAL_UNLOCK()		G_UNLOCK (g_signal_mutex)
+G_LOCK_DEFINE_STATIC (xsignal_mutex);
+#define	SIGNAL_LOCK()		G_LOCK (xsignal_mutex)
+#define	SIGNAL_UNLOCK()		G_UNLOCK (xsignal_mutex)
 
 
 /* --- signal nodes --- */
 static xuint_t          g_n_signal_nodes = 0;
-static SignalNode   **g_signal_nodes = NULL;
+static SignalNode   **xsignal_nodes = NULL;
 
 static inline SignalNode*
 LOOKUP_SIGNAL_NODE (xuint_t signal_id)
 {
   if (signal_id < g_n_signal_nodes)
-    return g_signal_nodes[signal_id];
+    return xsignal_nodes[signal_id];
   else
     return NULL;
 }
@@ -368,7 +368,7 @@ is_canonical (const xchar_t *key)
 }
 
 /**
- * g_signal_is_valid_name:
+ * xsignal_is_valid_name:
  * @name: the canonical name of the signal
  *
  * Validate a signal name. This can be useful for dynamically-generated signals
@@ -382,7 +382,7 @@ is_canonical (const xchar_t *key)
  * Since: 2.66
  */
 xboolean_t
-g_signal_is_valid_name (const xchar_t *name)
+xsignal_is_valid_name (const xchar_t *name)
 {
   /* FIXME: We allow this, against our own documentation (the leading `-` is
    * invalid), because GTK has historically used this. */
@@ -410,7 +410,7 @@ signal_id_lookup (const xchar_t *name,
       SignalKey *signal_key;
 
       key.itype = type;
-      signal_key = g_bsearch_array_lookup (g_signal_key_bsa, &g_signal_key_bconfig, &key);
+      signal_key = g_bsearch_array_lookup (xsignal_key_bsa, &xsignal_key_bconfig, &key);
 
       if (signal_key)
 	return signal_key->signal_id;
@@ -426,7 +426,7 @@ signal_id_lookup (const xchar_t *name,
       SignalKey *signal_key;
 
       key.itype = ifaces[n_ifaces];
-      signal_key = g_bsearch_array_lookup (g_signal_key_bsa, &g_signal_key_bconfig, &key);
+      signal_key = g_bsearch_array_lookup (xsignal_key_bsa, &xsignal_key_bconfig, &key);
 
       if (signal_key)
 	{
@@ -485,19 +485,19 @@ handler_list_ensure (xuint_t    signal_id,
   key.tail_after  = NULL;
   if (!hlbsa)
     {
-      hlbsa = g_bsearch_array_create (&g_signal_hlbsa_bconfig);
-      hlbsa = g_bsearch_array_insert (hlbsa, &g_signal_hlbsa_bconfig, &key);
+      hlbsa = g_bsearch_array_create (&xsignal_hlbsa_bconfig);
+      hlbsa = g_bsearch_array_insert (hlbsa, &xsignal_hlbsa_bconfig, &key);
       xhash_table_insert (g_handler_list_bsa_ht, instance, hlbsa);
     }
   else
     {
       GBSearchArray *o = hlbsa;
 
-      hlbsa = g_bsearch_array_insert (o, &g_signal_hlbsa_bconfig, &key);
+      hlbsa = g_bsearch_array_insert (o, &xsignal_hlbsa_bconfig, &key);
       if (hlbsa != o)
 	xhash_table_insert (g_handler_list_bsa_ht, instance, hlbsa);
     }
-  return g_bsearch_array_lookup (hlbsa, &g_signal_hlbsa_bconfig, &key);
+  return g_bsearch_array_lookup (hlbsa, &xsignal_hlbsa_bconfig, &key);
 }
 
 static inline HandlerList*
@@ -509,7 +509,7 @@ handler_list_lookup (xuint_t    signal_id,
 
   key.signal_id = signal_id;
 
-  return hlbsa ? g_bsearch_array_lookup (hlbsa, &g_signal_hlbsa_bconfig, &key) : NULL;
+  return hlbsa ? g_bsearch_array_lookup (hlbsa, &xsignal_hlbsa_bconfig, &key) : NULL;
 }
 
 static xuint_t
@@ -529,7 +529,7 @@ handler_equal (xconstpointer a, xconstpointer b)
 
 static Handler*
 handler_lookup (xpointer_t  instance,
-		gulong    handler_id,
+		xulong_t    handler_id,
 		xclosure_t *closure,
 		xuint_t    *signal_id_p)
 {
@@ -552,7 +552,7 @@ handler_lookup (xpointer_t  instance,
 
       for (i = 0; i < hlbsa->n_nodes; i++)
         {
-          HandlerList *hlist = g_bsearch_array_get_nth (hlbsa, &g_signal_hlbsa_bconfig, i);
+          HandlerList *hlist = g_bsearch_array_get_nth (hlbsa, &xsignal_hlbsa_bconfig, i);
           Handler *handler;
 
           for (handler = hlist->handlers; handler; handler = handler->next)
@@ -648,7 +648,7 @@ handlers_find (xpointer_t         instance,
 
           for (i = 0; i < hlbsa->n_nodes; i++)
             {
-              HandlerList *hlist = g_bsearch_array_get_nth (hlbsa, &g_signal_hlbsa_bconfig, i);
+              HandlerList *hlist = g_bsearch_array_get_nth (hlbsa, &xsignal_hlbsa_bconfig, i);
 	      SignalNode *node = NULL;
               Handler *handler;
 
@@ -729,7 +729,7 @@ handler_unref_R (xuint_t    signal_id,
 
       if (handler->next)
         handler->next->prev = handler->prev;
-      if (handler->prev)    /* watch out for g_signal_handlers_destroy()! */
+      if (handler->prev)    /* watch out for xsignal_handlers_destroy()! */
         handler->prev->next = handler->next;
       else
         {
@@ -922,19 +922,19 @@ signal_key_cmp (xconstpointer node1,
 }
 
 void
-_g_signal_init (void)
+_xsignal_init (void)
 {
   SIGNAL_LOCK ();
   if (!g_n_signal_nodes)
     {
       /* setup handler list binary searchable array hash table (in german, that'd be one word ;) */
       g_handler_list_bsa_ht = xhash_table_new (g_direct_hash, NULL);
-      g_signal_key_bsa = g_bsearch_array_create (&g_signal_key_bconfig);
+      xsignal_key_bsa = g_bsearch_array_create (&xsignal_key_bconfig);
 
       /* invalid (0) signal_id */
       g_n_signal_nodes = 1;
-      g_signal_nodes = g_renew (SignalNode*, g_signal_nodes, g_n_signal_nodes);
-      g_signal_nodes[0] = NULL;
+      xsignal_nodes = g_renew (SignalNode*, xsignal_nodes, g_n_signal_nodes);
+      xsignal_nodes[0] = NULL;
       g_handlers = xhash_table_new (handler_hash, handler_equal);
     }
   SIGNAL_UNLOCK ();
@@ -948,7 +948,7 @@ _g_signals_destroy (xtype_t itype)
   SIGNAL_LOCK ();
   for (i = 1; i < g_n_signal_nodes; i++)
     {
-      SignalNode *node = g_signal_nodes[i];
+      SignalNode *node = xsignal_nodes[i];
 
       if (node->itype == itype)
         {
@@ -964,9 +964,9 @@ _g_signals_destroy (xtype_t itype)
 }
 
 /**
- * g_signal_stop_emission:
+ * xsignal_stop_emission:
  * @instance: (type xobject_t.Object): the object whose signal handlers you wish to stop.
- * @signal_id: the signal identifier, as returned by g_signal_lookup().
+ * @signal_id: the signal identifier, as returned by xsignal_lookup().
  * @detail: the detail which the signal was emitted with.
  *
  * Stops a signal's current emission.
@@ -978,7 +978,7 @@ _g_signals_destroy (xtype_t itype)
  * Prints a warning if used on a signal which isn't being emitted.
  */
 void
-g_signal_stop_emission (xpointer_t instance,
+xsignal_stop_emission (xpointer_t instance,
                         xuint_t    signal_id,
 			xquark   detail)
 {
@@ -1032,8 +1032,8 @@ signal_finalize_hook (GHookList *hook_list,
 }
 
 /**
- * g_signal_add_emission_hook:
- * @signal_id: the signal identifier, as returned by g_signal_lookup().
+ * xsignal_add_emission_hook:
+ * @signal_id: the signal identifier, as returned by xsignal_lookup().
  * @detail: the detail on which to call the hook.
  * @hook_func: (not nullable): a #GSignalEmissionHook function.
  * @hook_data: (nullable) (closure hook_func): user data for @hook_func.
@@ -1043,16 +1043,16 @@ signal_finalize_hook (GHookList *hook_list,
  * of that signal, independent of the instance. This is possible only
  * for signals which don't have %G_SIGNAL_NO_HOOKS flag set.
  *
- * Returns: the hook id, for later use with g_signal_remove_emission_hook().
+ * Returns: the hook id, for later use with xsignal_remove_emission_hook().
  */
-gulong
-g_signal_add_emission_hook (xuint_t               signal_id,
+xulong_t
+xsignal_add_emission_hook (xuint_t               signal_id,
 			    xquark              detail,
 			    GSignalEmissionHook hook_func,
 			    xpointer_t            hook_data,
 			    xdestroy_notify_t      data_destroy)
 {
-  static gulong seq_hook_id = 1;
+  static xulong_t seq_hook_id = 1;
   SignalNode *node;
   GHook *hook;
   SignalHook *signal_hook;
@@ -1106,16 +1106,16 @@ g_signal_add_emission_hook (xuint_t               signal_id,
 }
 
 /**
- * g_signal_remove_emission_hook:
+ * xsignal_remove_emission_hook:
  * @signal_id: the id of the signal
  * @hook_id: the id of the emission hook, as returned by
- *  g_signal_add_emission_hook()
+ *  xsignal_add_emission_hook()
  *
  * Deletes an emission hook.
  */
 void
-g_signal_remove_emission_hook (xuint_t  signal_id,
-			       gulong hook_id)
+xsignal_remove_emission_hook (xuint_t  signal_id,
+			       xulong_t hook_id)
 {
   SignalNode *node;
 
@@ -1186,7 +1186,7 @@ signal_parse_name (const xchar_t *name,
 }
 
 /**
- * g_signal_parse_name:
+ * xsignal_parse_name:
  * @detailed_signal: a string of the form "signal-name::detail".
  * @itype: The interface/instance type that introduced "signal-name".
  * @signal_id_p: (out): Location to store the signal id.
@@ -1199,7 +1199,7 @@ signal_parse_name (const xchar_t *name,
  * Returns: Whether the signal name could successfully be parsed and @signal_id_p and @detail_p contain valid return values.
  */
 xboolean_t
-g_signal_parse_name (const xchar_t *detailed_signal,
+xsignal_parse_name (const xchar_t *detailed_signal,
 		     xtype_t        itype,
 		     xuint_t       *signal_id_p,
 		     xquark      *detail_p,
@@ -1230,17 +1230,17 @@ g_signal_parse_name (const xchar_t *detailed_signal,
 }
 
 /**
- * g_signal_stop_emission_by_name:
+ * xsignal_stop_emission_by_name:
  * @instance: (type xobject_t.Object): the object whose signal handlers you wish to stop.
  * @detailed_signal: a string of the form "signal-name::detail".
  *
  * Stops a signal's current emission.
  *
- * This is just like g_signal_stop_emission() except it will look up the
+ * This is just like xsignal_stop_emission() except it will look up the
  * signal id for you.
  */
 void
-g_signal_stop_emission_by_name (xpointer_t     instance,
+xsignal_stop_emission_by_name (xpointer_t     instance,
 				const xchar_t *detailed_signal)
 {
   xuint_t signal_id;
@@ -1286,7 +1286,7 @@ g_signal_stop_emission_by_name (xpointer_t     instance,
 }
 
 /**
- * g_signal_lookup:
+ * xsignal_lookup:
  * @name: the signal's name.
  * @itype: the type that the signal operates on.
  *
@@ -1300,12 +1300,12 @@ g_signal_stop_emission_by_name (xpointer_t     instance,
  * example, using xtype_class_ref()) for this function to work, as signals are
  * always installed during class initialization.
  *
- * See g_signal_new() for details on allowed signal names.
+ * See xsignal_new() for details on allowed signal names.
  *
  * Returns: the signal's identifying number, or 0 if no signal was found.
  */
 xuint_t
-g_signal_lookup (const xchar_t *name,
+xsignal_lookup (const xchar_t *name,
                  xtype_t        itype)
 {
   xuint_t signal_id;
@@ -1321,7 +1321,7 @@ g_signal_lookup (const xchar_t *name,
       if (!xtype_name (itype))
 	g_warning (G_STRLOC ": unable to look up signal \"%s\" for invalid type id '%"G_GSIZE_FORMAT"'",
 		   name, itype);
-      else if (!g_signal_is_valid_name (name))
+      else if (!xsignal_is_valid_name (name))
         g_warning (G_STRLOC ": unable to look up invalid signal name \"%s\" on type '%s'",
                    name, xtype_name (itype));
     }
@@ -1330,18 +1330,18 @@ g_signal_lookup (const xchar_t *name,
 }
 
 /**
- * g_signal_list_ids:
+ * xsignal_list_ids:
  * @itype: Instance or interface type.
  * @n_ids: Location to store the number of signal ids for @itype.
  *
  * Lists the signals by id that a certain instance or interface type
  * created. Further information about the signals can be acquired through
- * g_signal_query().
+ * xsignal_query().
  *
  * Returns: (array length=n_ids) (transfer full): Newly allocated array of signal IDs.
  */
 xuint_t*
-g_signal_list_ids (xtype_t  itype,
+xsignal_list_ids (xtype_t  itype,
 		   xuint_t *n_ids)
 {
   SignalKey *keys;
@@ -1353,8 +1353,8 @@ g_signal_list_ids (xtype_t  itype,
   g_return_val_if_fail (n_ids != NULL, NULL);
 
   SIGNAL_LOCK ();
-  keys = g_bsearch_array_get_nth (g_signal_key_bsa, &g_signal_key_bconfig, 0);
-  n_nodes = g_bsearch_array_get_n_nodes (g_signal_key_bsa);
+  keys = g_bsearch_array_get_nth (xsignal_key_bsa, &xsignal_key_bconfig, 0);
+  n_nodes = g_bsearch_array_get_n_nodes (xsignal_key_bsa);
   result = g_array_new (FALSE, FALSE, sizeof (xuint_t));
 
   for (i = 0; i < n_nodes; i++)
@@ -1382,7 +1382,7 @@ g_signal_list_ids (xtype_t  itype,
 }
 
 /**
- * g_signal_name:
+ * xsignal_name:
  * @signal_id: the signal's identifying number.
  *
  * Given the signal's identifier, finds its name.
@@ -1392,7 +1392,7 @@ g_signal_list_ids (xtype_t  itype,
  * Returns: (nullable): the signal name, or %NULL if the signal number was invalid.
  */
 const xchar_t *
-g_signal_name (xuint_t signal_id)
+xsignal_name (xuint_t signal_id)
 {
   SignalNode *node;
   const xchar_t *name;
@@ -1406,7 +1406,7 @@ g_signal_name (xuint_t signal_id)
 }
 
 /**
- * g_signal_query:
+ * xsignal_query:
  * @signal_id: The signal id of the signal to query information for.
  * @query: (out caller-allocates) (not optional): A user provided structure that is
  *  filled in with constant values upon success.
@@ -1419,7 +1419,7 @@ g_signal_name (xuint_t signal_id)
  * be considered constant and have to be left untouched.
  */
 void
-g_signal_query (xuint_t         signal_id,
+xsignal_query (xuint_t         signal_id,
 		GSignalQuery *query)
 {
   SignalNode *node;
@@ -1444,7 +1444,7 @@ g_signal_query (xuint_t         signal_id,
 }
 
 /**
- * g_signal_new:
+ * xsignal_new:
  * @signal_name: the name for the signal
  * @itype: the type this signal pertains to. It will also pertain to
  *  types which are derived from this type.
@@ -1477,21 +1477,21 @@ g_signal_query (xuint_t         signal_id,
  *
  * If 0 is used for @class_offset subclasses cannot override the class handler
  * in their class_init method by doing super_class->signal_handler = my_signal_handler.
- * Instead they will have to use g_signal_override_class_handler().
+ * Instead they will have to use xsignal_override_class_handler().
  *
  * If @c_marshaller is %NULL, g_cclosure_marshal_generic() will be used as
- * the marshaller for this signal. In some simple cases, g_signal_new()
+ * the marshaller for this signal. In some simple cases, xsignal_new()
  * will use a more optimized c_marshaller and va_marshaller for the signal
  * instead of g_cclosure_marshal_generic().
  *
  * If @c_marshaller is non-%NULL, you need to also specify a va_marshaller
- * using g_signal_set_va_marshaller() or the generic va_marshaller will
+ * using xsignal_set_va_marshaller() or the generic va_marshaller will
  * be used.
  *
  * Returns: the signal id
  */
 xuint_t
-g_signal_new (const xchar_t	 *signal_name,
+xsignal_new (const xchar_t	 *signal_name,
 	      xtype_t		  itype,
 	      GSignalFlags	  signal_flags,
 	      xuint_t               class_offset,
@@ -1509,8 +1509,8 @@ g_signal_new (const xchar_t	 *signal_name,
 
   va_start (args, n_params);
 
-  signal_id = g_signal_new_valist (signal_name, itype, signal_flags,
-                                   class_offset ? g_signal_type_cclosure_new (itype, class_offset) : NULL,
+  signal_id = xsignal_new_valist (signal_name, itype, signal_flags,
+                                   class_offset ? xsignal_type_cclosure_new (itype, class_offset) : NULL,
 				   accumulator, accu_data, c_marshaller,
                                    return_type, n_params, args);
 
@@ -1520,7 +1520,7 @@ g_signal_new (const xchar_t	 *signal_name,
 }
 
 /**
- * g_signal_new_class_handler:
+ * xsignal_new_class_handler:
  * @signal_name: the name for the signal
  * @itype: the type this signal pertains to. It will also pertain to
  *  types which are derived from this type.
@@ -1541,17 +1541,17 @@ g_signal_new (const xchar_t	 *signal_name,
  *
  * Creates a new signal. (This is usually done in the class initializer.)
  *
- * This is a variant of g_signal_new() that takes a C callback instead
+ * This is a variant of xsignal_new() that takes a C callback instead
  * of a class offset for the signal's class handler. This function
  * doesn't need a function pointer exposed in the class structure of
  * an object definition, instead the function pointer is passed
  * directly and can be overridden by derived classes with
- * g_signal_override_class_closure() or
- * g_signal_override_class_handler()and chained to with
- * g_signal_chain_from_overridden() or
- * g_signal_chain_from_overridden_handler().
+ * xsignal_override_class_closure() or
+ * xsignal_override_class_handler()and chained to with
+ * xsignal_chain_from_overridden() or
+ * xsignal_chain_from_overridden_handler().
  *
- * See g_signal_new() for information about signal names.
+ * See xsignal_new() for information about signal names.
  *
  * If c_marshaller is %NULL, g_cclosure_marshal_generic() will be used as
  * the marshaller for this signal.
@@ -1561,7 +1561,7 @@ g_signal_new (const xchar_t	 *signal_name,
  * Since: 2.18
  */
 xuint_t
-g_signal_new_class_handler (const xchar_t        *signal_name,
+xsignal_new_class_handler (const xchar_t        *signal_name,
                             xtype_t               itype,
                             GSignalFlags        signal_flags,
                             xcallback_t           class_handler,
@@ -1579,7 +1579,7 @@ g_signal_new_class_handler (const xchar_t        *signal_name,
 
   va_start (args, n_params);
 
-  signal_id = g_signal_new_valist (signal_name, itype, signal_flags,
+  signal_id = xsignal_new_valist (signal_name, itype, signal_flags,
                                    class_handler ? g_cclosure_new (class_handler, NULL, NULL) : NULL,
                                    accumulator, accu_data, c_marshaller,
                                    return_type, n_params, args);
@@ -1658,7 +1658,7 @@ signal_add_class_closure (SignalNode *node,
 }
 
 /**
- * g_signal_newv:
+ * xsignal_newv:
  * @signal_name: the name for the signal
  * @itype: the type this signal pertains to. It will also pertain to
  *     types which are derived from this type
@@ -1680,7 +1680,7 @@ signal_add_class_closure (SignalNode *node,
  *
  * Creates a new signal. (This is usually done in the class initializer.)
  *
- * See g_signal_new() for details on allowed signal names.
+ * See xsignal_new() for details on allowed signal names.
  *
  * If c_marshaller is %NULL, g_cclosure_marshal_generic() will be used as
  * the marshaller for this signal.
@@ -1688,7 +1688,7 @@ signal_add_class_closure (SignalNode *node,
  * Returns: the signal id
  */
 xuint_t
-g_signal_newv (const xchar_t       *signal_name,
+xsignal_newv (const xchar_t       *signal_name,
                xtype_t              itype,
                GSignalFlags       signal_flags,
                xclosure_t          *class_closure,
@@ -1708,7 +1708,7 @@ g_signal_newv (const xchar_t       *signal_name,
   GSignalCVaMarshaller va_marshaller;
 
   g_return_val_if_fail (signal_name != NULL, 0);
-  g_return_val_if_fail (g_signal_is_valid_name (signal_name), 0);
+  g_return_val_if_fail (xsignal_is_valid_name (signal_name), 0);
   g_return_val_if_fail (XTYPE_IS_INSTANTIATABLE (itype) || XTYPE_IS_INTERFACE (itype), 0);
   if (n_params)
     g_return_val_if_fail (param_types != NULL, 0);
@@ -1780,14 +1780,14 @@ g_signal_newv (const xchar_t       *signal_name,
       signal_id = g_n_signal_nodes++;
       node = g_new (SignalNode, 1);
       node->signal_id = signal_id;
-      g_signal_nodes = g_renew (SignalNode*, g_signal_nodes, g_n_signal_nodes);
-      g_signal_nodes[signal_id] = node;
+      xsignal_nodes = g_renew (SignalNode*, xsignal_nodes, g_n_signal_nodes);
+      xsignal_nodes[signal_id] = node;
       node->itype = itype;
       key.itype = itype;
       key.signal_id = signal_id;
       node->name = g_intern_string (name);
       key.quark = g_quark_from_string (name);
-      g_signal_key_bsa = g_bsearch_array_insert (g_signal_key_bsa, &g_signal_key_bconfig, &key);
+      xsignal_key_bsa = g_bsearch_array_insert (xsignal_key_bsa, &xsignal_key_bconfig, &key);
 
       TRACE(GOBJECT_SIGNAL_NEW(signal_id, name, itype));
     }
@@ -1878,7 +1878,7 @@ g_signal_newv (const xchar_t       *signal_name,
 }
 
 /**
- * g_signal_set_va_marshaller:
+ * xsignal_set_va_marshaller:
  * @signal_id: the signal id
  * @instance_type: the instance type on which to set the marshaller.
  * @va_marshaller: the marshaller to set.
@@ -1891,7 +1891,7 @@ g_signal_newv (const xchar_t       *signal_name,
  * Since: 2.32
  */
 void
-g_signal_set_va_marshaller (xuint_t              signal_id,
+xsignal_set_va_marshaller (xuint_t              signal_id,
 			    xtype_t              instance_type,
 			    GSignalCVaMarshaller va_marshaller)
 {
@@ -1920,7 +1920,7 @@ g_signal_set_va_marshaller (xuint_t              signal_id,
 
 
 /**
- * g_signal_new_valist:
+ * xsignal_new_valist:
  * @signal_name: the name for the signal
  * @itype: the type this signal pertains to. It will also pertain to
  *  types which are derived from this type.
@@ -1939,7 +1939,7 @@ g_signal_set_va_marshaller (xuint_t              signal_id,
  *
  * Creates a new signal. (This is usually done in the class initializer.)
  *
- * See g_signal_new() for details on allowed signal names.
+ * See xsignal_new() for details on allowed signal names.
  *
  * If c_marshaller is %NULL, g_cclosure_marshal_generic() will be used as
  * the marshaller for this signal.
@@ -1947,7 +1947,7 @@ g_signal_set_va_marshaller (xuint_t              signal_id,
  * Returns: the signal id
  */
 xuint_t
-g_signal_new_valist (const xchar_t       *signal_name,
+xsignal_new_valist (const xchar_t       *signal_name,
                      xtype_t              itype,
                      GSignalFlags       signal_flags,
                      xclosure_t          *class_closure,
@@ -1980,7 +1980,7 @@ g_signal_new_valist (const xchar_t       *signal_name,
         param_types[i] = va_arg (args, xtype_t);
     }
 
-  signal_id = g_signal_newv (signal_name, itype, signal_flags,
+  signal_id = xsignal_newv (signal_name, itype, signal_flags,
                              class_closure, accumulator, accu_data, c_marshaller,
                              return_type, n_params, param_types);
   g_free (param_types_heap);
@@ -2044,7 +2044,7 @@ signal_destroy_R (SignalNode *signal_node)
 }
 
 /**
- * g_signal_override_class_closure:
+ * xsignal_override_class_closure:
  * @signal_id: the signal id
  * @instance_type: the instance type on which to override the class closure
  *  for the signal.
@@ -2054,12 +2054,12 @@ signal_destroy_R (SignalNode *signal_node)
  * for emissions on instances of @instance_type. @instance_type must be derived
  * from the type to which the signal belongs.
  *
- * See g_signal_chain_from_overridden() and
- * g_signal_chain_from_overridden_handler() for how to chain up to the
+ * See xsignal_chain_from_overridden() and
+ * xsignal_chain_from_overridden_handler() for how to chain up to the
  * parent class closure from inside the overridden one.
  */
 void
-g_signal_override_class_closure (xuint_t     signal_id,
+xsignal_override_class_closure (xuint_t     signal_id,
 				 xtype_t     instance_type,
 				 xclosure_t *class_closure)
 {
@@ -2086,7 +2086,7 @@ g_signal_override_class_closure (xuint_t     signal_id,
 }
 
 /**
- * g_signal_override_class_handler:
+ * xsignal_override_class_handler:
  * @signal_name: the name for the signal
  * @instance_type: the instance type on which to override the class handler
  *  for the signal.
@@ -2097,14 +2097,14 @@ g_signal_override_class_closure (xuint_t     signal_id,
  * callback @class_handler. @instance_type must be derived from the
  * type to which the signal belongs.
  *
- * See g_signal_chain_from_overridden() and
- * g_signal_chain_from_overridden_handler() for how to chain up to the
+ * See xsignal_chain_from_overridden() and
+ * xsignal_chain_from_overridden_handler() for how to chain up to the
  * parent class closure from inside the overridden one.
  *
  * Since: 2.18
  */
 void
-g_signal_override_class_handler (const xchar_t *signal_name,
+xsignal_override_class_handler (const xchar_t *signal_name,
 				 xtype_t        instance_type,
 				 xcallback_t    class_handler)
 {
@@ -2114,10 +2114,10 @@ g_signal_override_class_handler (const xchar_t *signal_name,
   g_return_if_fail (instance_type != XTYPE_NONE);
   g_return_if_fail (class_handler != NULL);
 
-  signal_id = g_signal_lookup (signal_name, instance_type);
+  signal_id = xsignal_lookup (signal_name, instance_type);
 
   if (signal_id)
-    g_signal_override_class_closure (signal_id, instance_type,
+    xsignal_override_class_closure (signal_id, instance_type,
                                      g_cclosure_new (class_handler, NULL, NULL));
   else
     g_warning ("%s: signal name '%s' is invalid for type id '%"G_GSIZE_FORMAT"'",
@@ -2126,7 +2126,7 @@ g_signal_override_class_handler (const xchar_t *signal_name,
 }
 
 /**
- * g_signal_chain_from_overridden:
+ * xsignal_chain_from_overridden:
  * @instance_and_params: (array) the argument list of the signal emission.
  *  The first element in the array is a #xvalue_t for the instance the signal
  *  is being emitted on. The rest are any arguments to be passed to the signal.
@@ -2134,11 +2134,11 @@ g_signal_override_class_handler (const xchar_t *signal_name,
  *
  * Calls the original class closure of a signal. This function should only
  * be called from an overridden class closure; see
- * g_signal_override_class_closure() and
- * g_signal_override_class_handler().
+ * xsignal_override_class_closure() and
+ * xsignal_override_class_handler().
  */
 void
-g_signal_chain_from_overridden (const xvalue_t *instance_and_params,
+xsignal_chain_from_overridden (const xvalue_t *instance_and_params,
 				xvalue_t       *return_value)
 {
   xtype_t chain_type = 0, restore_type = 0;
@@ -2159,7 +2159,7 @@ g_signal_chain_from_overridden (const xvalue_t *instance_and_params,
 
       g_assert (node != NULL);	/* paranoid */
 
-      /* we should probably do the same parameter checks as g_signal_emit() here.
+      /* we should probably do the same parameter checks as xsignal_emit() here.
        */
       if (emission->chain_type != XTYPE_NONE)
 	{
@@ -2198,7 +2198,7 @@ g_signal_chain_from_overridden (const xvalue_t *instance_and_params,
 }
 
 /**
- * g_signal_chain_from_overridden_handler: (skip)
+ * xsignal_chain_from_overridden_handler: (skip)
  * @instance: (type xobject_t.TypeInstance): the instance the signal is being
  *    emitted on.
  * @...: parameters to be passed to the parent class closure, followed by a
@@ -2207,13 +2207,13 @@ g_signal_chain_from_overridden (const xvalue_t *instance_and_params,
  *
  * Calls the original class closure of a signal. This function should
  * only be called from an overridden class closure; see
- * g_signal_override_class_closure() and
- * g_signal_override_class_handler().
+ * xsignal_override_class_closure() and
+ * xsignal_override_class_handler().
  *
  * Since: 2.18
  */
 void
-g_signal_chain_from_overridden_handler (xpointer_t instance,
+xsignal_chain_from_overridden_handler (xpointer_t instance,
                                         ...)
 {
   xtype_t chain_type = 0, restore_type = 0;
@@ -2232,7 +2232,7 @@ g_signal_chain_from_overridden_handler (xpointer_t instance,
 
       g_assert (node != NULL);	/* paranoid */
 
-      /* we should probably do the same parameter checks as g_signal_emit() here.
+      /* we should probably do the same parameter checks as xsignal_emit() here.
        */
       if (emission->chain_type != XTYPE_NONE)
 	{
@@ -2360,7 +2360,7 @@ g_signal_chain_from_overridden_handler (xpointer_t instance,
 }
 
 /**
- * g_signal_get_invocation_hint:
+ * xsignal_get_invocation_hint:
  * @instance: (type xobject_t.Object): the instance to query
  *
  * Returns the invocation hint of the innermost signal emission of instance.
@@ -2369,7 +2369,7 @@ g_signal_chain_from_overridden_handler (xpointer_t instance,
  *     signal emission, or %NULL if not found.
  */
 xsignal_invocation_hint_t*
-g_signal_get_invocation_hint (xpointer_t instance)
+xsignal_get_invocation_hint (xpointer_t instance)
 {
   Emission *emission = NULL;
 
@@ -2383,7 +2383,7 @@ g_signal_get_invocation_hint (xpointer_t instance)
 }
 
 /**
- * g_signal_connect_closure_by_id:
+ * xsignal_connect_closure_by_id:
  * @instance: (type xobject_t.Object): the instance to connect to.
  * @signal_id: the id of the signal.
  * @detail: the detail.
@@ -2395,15 +2395,15 @@ g_signal_get_invocation_hint (xpointer_t instance)
  *
  * Returns: the handler ID (always greater than 0 for successful connections)
  */
-gulong
-g_signal_connect_closure_by_id (xpointer_t  instance,
+xulong_t
+xsignal_connect_closure_by_id (xpointer_t  instance,
 				xuint_t     signal_id,
 				xquark    detail,
 				xclosure_t *closure,
 				xboolean_t  after)
 {
   SignalNode *node;
-  gulong handler_seq_no = 0;
+  xulong_t handler_seq_no = 0;
 
   g_return_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
   g_return_val_if_fail (signal_id > 0, 0);
@@ -2446,7 +2446,7 @@ g_signal_connect_closure_by_id (xpointer_t  instance,
 }
 
 /**
- * g_signal_connect_closure:
+ * xsignal_connect_closure:
  * @instance: (type xobject_t.Object): the instance to connect to.
  * @detailed_signal: a string of the form "signal-name::detail".
  * @closure: (not nullable): the closure to connect.
@@ -2457,14 +2457,14 @@ g_signal_connect_closure_by_id (xpointer_t  instance,
  *
  * Returns: the handler ID (always greater than 0 for successful connections)
  */
-gulong
-g_signal_connect_closure (xpointer_t     instance,
+xulong_t
+xsignal_connect_closure (xpointer_t     instance,
 			  const xchar_t *detailed_signal,
 			  xclosure_t    *closure,
 			  xboolean_t     after)
 {
   xuint_t signal_id;
-  gulong handler_seq_no = 0;
+  xulong_t handler_seq_no = 0;
   xquark detail = 0;
   xtype_t itype;
 
@@ -2537,7 +2537,7 @@ node_check_deprecated (const SignalNode *node)
 }
 
 /**
- * g_signal_connect_data:
+ * xsignal_connect_data:
  * @instance: (type xobject_t.Object): the instance to connect to.
  * @detailed_signal: a string of the form "signal-name::detail".
  * @c_handler: (not nullable): the #xcallback_t to connect.
@@ -2546,15 +2546,15 @@ node_check_deprecated (const SignalNode *node)
  * @connect_flags: a combination of #GConnectFlags.
  *
  * Connects a #xcallback_t function to a signal for a particular object. Similar
- * to g_signal_connect(), but allows to provide a #xclosure_notify_t for the data
+ * to xsignal_connect(), but allows to provide a #xclosure_notify_t for the data
  * which will be called when the signal handler is disconnected and no longer
  * used. Specify @connect_flags if you need `..._after()` or
  * `..._swapped()` variants of this function.
  *
  * Returns: the handler ID (always greater than 0 for successful connections)
  */
-gulong
-g_signal_connect_data (xpointer_t       instance,
+xulong_t
+xsignal_connect_data (xpointer_t       instance,
 		       const xchar_t   *detailed_signal,
 		       xcallback_t      c_handler,
 		       xpointer_t       data,
@@ -2562,7 +2562,7 @@ g_signal_connect_data (xpointer_t       instance,
 		       GConnectFlags  connect_flags)
 {
   xuint_t signal_id;
-  gulong handler_seq_no = 0;
+  xulong_t handler_seq_no = 0;
   xquark detail = 0;
   xtype_t itype;
   xboolean_t swapped, after;
@@ -2617,7 +2617,7 @@ g_signal_connect_data (xpointer_t       instance,
 }
 
 /**
- * g_signal_handler_block:
+ * xsignal_handler_block:
  * @instance: (type xobject_t.Object): The instance to block the signal handler of.
  * @handler_id: Handler id of the handler to be blocked.
  *
@@ -2631,8 +2631,8 @@ g_signal_connect_data (xpointer_t       instance,
  * signal of @instance.
  */
 void
-g_signal_handler_block (xpointer_t instance,
-                        gulong   handler_id)
+xsignal_handler_block (xpointer_t instance,
+                        xulong_t   handler_id)
 {
   Handler *handler;
 
@@ -2655,11 +2655,11 @@ g_signal_handler_block (xpointer_t instance,
 }
 
 /**
- * g_signal_handler_unblock:
+ * xsignal_handler_unblock:
  * @instance: (type xobject_t.Object): The instance to unblock the signal handler of.
  * @handler_id: Handler id of the handler to be unblocked.
  *
- * Undoes the effect of a previous g_signal_handler_block() call.  A
+ * Undoes the effect of a previous xsignal_handler_block() call.  A
  * blocked handler is skipped during signal emissions and will not be
  * invoked, unblocking it (for exactly the amount of times it has been
  * blocked before) reverts its "blocked" state, so the handler will be
@@ -2674,8 +2674,8 @@ g_signal_handler_block (xpointer_t instance,
  * connected to a signal of @instance and is currently blocked.
  */
 void
-g_signal_handler_unblock (xpointer_t instance,
-                          gulong   handler_id)
+xsignal_handler_unblock (xpointer_t instance,
+                          xulong_t   handler_id)
 {
   Handler *handler;
 
@@ -2697,7 +2697,7 @@ g_signal_handler_unblock (xpointer_t instance,
 }
 
 /**
- * g_signal_handler_disconnect:
+ * xsignal_handler_disconnect:
  * @instance: (type xobject_t.Object): The instance to remove the signal handler from.
  * @handler_id: Handler id of the handler to be disconnected.
  *
@@ -2709,8 +2709,8 @@ g_signal_handler_unblock (xpointer_t instance,
  * signal of @instance.
  */
 void
-g_signal_handler_disconnect (xpointer_t instance,
-                             gulong   handler_id)
+xsignal_handler_disconnect (xpointer_t instance,
+                             xulong_t   handler_id)
 {
   Handler *handler;
 
@@ -2733,7 +2733,7 @@ g_signal_handler_disconnect (xpointer_t instance,
 }
 
 /**
- * g_signal_handler_is_connected:
+ * xsignal_handler_is_connected:
  * @instance: (type xobject_t.Object): The instance where a signal handler is sought.
  * @handler_id: the handler ID.
  *
@@ -2742,8 +2742,8 @@ g_signal_handler_disconnect (xpointer_t instance,
  * Returns: whether @handler_id identifies a handler connected to @instance.
  */
 xboolean_t
-g_signal_handler_is_connected (xpointer_t instance,
-			       gulong   handler_id)
+xsignal_handler_is_connected (xpointer_t instance,
+			       xulong_t   handler_id)
 {
   Handler *handler;
   xboolean_t connected;
@@ -2759,7 +2759,7 @@ g_signal_handler_is_connected (xpointer_t instance,
 }
 
 /**
- * g_signal_handlers_destroy:
+ * xsignal_handlers_destroy:
  * @instance: (type xobject_t.Object): The instance whose signal handlers are destroyed
  *
  * Destroy all signal handlers of a type instance. This function is
@@ -2767,7 +2767,7 @@ g_signal_handler_is_connected (xpointer_t instance,
  * and should not be used outside of the type system.
  */
 void
-g_signal_handlers_destroy (xpointer_t instance)
+xsignal_handlers_destroy (xpointer_t instance)
 {
   GBSearchArray *hlbsa;
 
@@ -2784,7 +2784,7 @@ g_signal_handlers_destroy (xpointer_t instance)
 
       for (i = 0; i < hlbsa->n_nodes; i++)
         {
-          HandlerList *hlist = g_bsearch_array_get_nth (hlbsa, &g_signal_hlbsa_bconfig, i);
+          HandlerList *hlist = g_bsearch_array_get_nth (hlbsa, &xsignal_hlbsa_bconfig, i);
           Handler *handler = hlist->handlers;
 
           while (handler)
@@ -2805,13 +2805,13 @@ g_signal_handlers_destroy (xpointer_t instance)
 		}
             }
         }
-      g_bsearch_array_free (hlbsa, &g_signal_hlbsa_bconfig);
+      g_bsearch_array_free (hlbsa, &xsignal_hlbsa_bconfig);
     }
   SIGNAL_UNLOCK ();
 }
 
 /**
- * g_signal_handler_find:
+ * xsignal_handler_find:
  * @instance: (type xobject_t.Object): The instance owning the signal handler to be found.
  * @mask: Mask indicating which of @signal_id, @detail, @closure, @func
  *  and/or @data the handler has to match.
@@ -2829,8 +2829,8 @@ g_signal_handlers_destroy (xpointer_t instance)
  *
  * Returns: A valid non-0 signal handler id for a successful match.
  */
-gulong
-g_signal_handler_find (xpointer_t         instance,
+xulong_t
+xsignal_handler_find (xpointer_t         instance,
                        GSignalMatchType mask,
                        xuint_t            signal_id,
 		       xquark		detail,
@@ -2838,7 +2838,7 @@ g_signal_handler_find (xpointer_t         instance,
                        xpointer_t         func,
                        xpointer_t         data)
 {
-  gulong handler_seq_no = 0;
+  xulong_t handler_seq_no = 0;
 
   g_return_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
   g_return_val_if_fail ((mask & ~G_SIGNAL_MATCH_MASK) == 0, 0);
@@ -2869,7 +2869,7 @@ signal_handlers_foreach_matched_R (xpointer_t         instance,
 				   xpointer_t         func,
 				   xpointer_t         data,
 				   void		  (*callback) (xpointer_t instance,
-							       gulong   handler_seq_no))
+							       xulong_t   handler_seq_no))
 {
   HandlerMatch *mlist;
   xuint_t n_handlers = 0;
@@ -2891,7 +2891,7 @@ signal_handlers_foreach_matched_R (xpointer_t         instance,
 }
 
 /**
- * g_signal_handlers_block_matched:
+ * xsignal_handlers_block_matched:
  * @instance: (type xobject_t.Object): The instance to block handlers from.
  * @mask: Mask indicating which of @signal_id, @detail, @closure, @func
  *  and/or @data the handlers have to match.
@@ -2912,7 +2912,7 @@ signal_handlers_foreach_matched_R (xpointer_t         instance,
  * Returns: The number of handlers that matched.
  */
 xuint_t
-g_signal_handlers_block_matched (xpointer_t         instance,
+xsignal_handlers_block_matched (xpointer_t         instance,
 				 GSignalMatchType mask,
 				 xuint_t            signal_id,
 				 xquark           detail,
@@ -2930,7 +2930,7 @@ g_signal_handlers_block_matched (xpointer_t         instance,
       SIGNAL_LOCK ();
       n_handlers = signal_handlers_foreach_matched_R (instance, mask, signal_id, detail,
 						      closure, func, data,
-						      g_signal_handler_block);
+						      xsignal_handler_block);
       SIGNAL_UNLOCK ();
     }
 
@@ -2938,7 +2938,7 @@ g_signal_handlers_block_matched (xpointer_t         instance,
 }
 
 /**
- * g_signal_handlers_unblock_matched:
+ * xsignal_handlers_unblock_matched:
  * @instance: (type xobject_t.Object): The instance to unblock handlers from.
  * @mask: Mask indicating which of @signal_id, @detail, @closure, @func
  *  and/or @data the handlers have to match.
@@ -2960,7 +2960,7 @@ g_signal_handlers_block_matched (xpointer_t         instance,
  * Returns: The number of handlers that matched.
  */
 xuint_t
-g_signal_handlers_unblock_matched (xpointer_t         instance,
+xsignal_handlers_unblock_matched (xpointer_t         instance,
 				   GSignalMatchType mask,
 				   xuint_t            signal_id,
 				   xquark           detail,
@@ -2978,7 +2978,7 @@ g_signal_handlers_unblock_matched (xpointer_t         instance,
       SIGNAL_LOCK ();
       n_handlers = signal_handlers_foreach_matched_R (instance, mask, signal_id, detail,
 						      closure, func, data,
-						      g_signal_handler_unblock);
+						      xsignal_handler_unblock);
       SIGNAL_UNLOCK ();
     }
 
@@ -2986,7 +2986,7 @@ g_signal_handlers_unblock_matched (xpointer_t         instance,
 }
 
 /**
- * g_signal_handlers_disconnect_matched:
+ * xsignal_handlers_disconnect_matched:
  * @instance: (type xobject_t.Object): The instance to remove handlers from.
  * @mask: Mask indicating which of @signal_id, @detail, @closure, @func
  *  and/or @data the handlers have to match.
@@ -3008,7 +3008,7 @@ g_signal_handlers_unblock_matched (xpointer_t         instance,
  * Returns: The number of handlers that matched.
  */
 xuint_t
-g_signal_handlers_disconnect_matched (xpointer_t         instance,
+xsignal_handlers_disconnect_matched (xpointer_t         instance,
 				      GSignalMatchType mask,
 				      xuint_t            signal_id,
 				      xquark           detail,
@@ -3026,7 +3026,7 @@ g_signal_handlers_disconnect_matched (xpointer_t         instance,
       SIGNAL_LOCK ();
       n_handlers = signal_handlers_foreach_matched_R (instance, mask, signal_id, detail,
 						      closure, func, data,
-						      g_signal_handler_disconnect);
+						      xsignal_handler_disconnect);
       SIGNAL_UNLOCK ();
     }
 
@@ -3034,7 +3034,7 @@ g_signal_handlers_disconnect_matched (xpointer_t         instance,
 }
 
 /**
- * g_signal_has_handler_pending:
+ * xsignal_has_handler_pending:
  * @instance: (type xobject_t.Object): the object whose signal handlers are sought.
  * @signal_id: the signal id.
  * @detail: the detail.
@@ -3061,7 +3061,7 @@ g_signal_handlers_disconnect_matched (xpointer_t         instance,
  *          otherwise.
  */
 xboolean_t
-g_signal_has_handler_pending (xpointer_t instance,
+xsignal_has_handler_pending (xpointer_t instance,
 			      xuint_t    signal_id,
 			      xquark   detail,
 			      xboolean_t may_be_blocked)
@@ -3107,7 +3107,7 @@ g_signal_has_handler_pending (xpointer_t instance,
 }
 
 /**
- * g_signal_emitv:
+ * xsignal_emitv:
  * @instance_and_params: (array): argument list for the signal emission.
  *  The first element in the array is a #xvalue_t for the instance the signal
  *  is being emitted on. The rest are any arguments to be passed to the signal.
@@ -3120,11 +3120,11 @@ g_signal_has_handler_pending (xpointer_t instance,
  * Emits a signal. Signal emission is done synchronously.
  * The method will only return control after all handlers are called or signal emission was stopped.
  *
- * Note that g_signal_emitv() doesn't change @return_value if no handlers are
- * connected, in contrast to g_signal_emit() and g_signal_emit_valist().
+ * Note that xsignal_emitv() doesn't change @return_value if no handlers are
+ * connected, in contrast to xsignal_emit() and xsignal_emit_valist().
  */
 void
-g_signal_emitv (const xvalue_t *instance_and_params,
+xsignal_emitv (const xvalue_t *instance_and_params,
 		xuint_t         signal_id,
 		xquark	      detail,
 		xvalue_t       *return_value)
@@ -3247,7 +3247,7 @@ accumulate (xsignal_invocation_hint_t *ihint,
 }
 
 /**
- * g_signal_emit_valist: (skip)
+ * xsignal_emit_valist: (skip)
  * @instance: (type xobject_t.TypeInstance): the instance the signal is being
  *    emitted on.
  * @signal_id: the signal id
@@ -3259,11 +3259,11 @@ accumulate (xsignal_invocation_hint_t *ihint,
  * Emits a signal. Signal emission is done synchronously.
  * The method will only return control after all handlers are called or signal emission was stopped.
  *
- * Note that g_signal_emit_valist() resets the return value to the default
- * if no handlers are connected, in contrast to g_signal_emitv().
+ * Note that xsignal_emit_valist() resets the return value to the default
+ * if no handlers are connected, in contrast to xsignal_emitv().
  */
 void
-g_signal_emit_valist (xpointer_t instance,
+xsignal_emit_valist (xpointer_t instance,
 		      xuint_t    signal_id,
 		      xquark   detail,
 		      va_list  var_args)
@@ -3527,7 +3527,7 @@ g_signal_emit_valist (xpointer_t instance,
 }
 
 /**
- * g_signal_emit:
+ * xsignal_emit:
  * @instance: (type xobject_t.Object): the instance the signal is being emitted on.
  * @signal_id: the signal id
  * @detail: the detail
@@ -3538,11 +3538,11 @@ g_signal_emit_valist (xpointer_t instance,
  * Emits a signal. Signal emission is done synchronously.
  * The method will only return control after all handlers are called or signal emission was stopped.
  *
- * Note that g_signal_emit() resets the return value to the default
- * if no handlers are connected, in contrast to g_signal_emitv().
+ * Note that xsignal_emit() resets the return value to the default
+ * if no handlers are connected, in contrast to xsignal_emitv().
  */
 void
-g_signal_emit (xpointer_t instance,
+xsignal_emit (xpointer_t instance,
 	       xuint_t    signal_id,
 	       xquark   detail,
 	       ...)
@@ -3550,12 +3550,12 @@ g_signal_emit (xpointer_t instance,
   va_list var_args;
 
   va_start (var_args, detail);
-  g_signal_emit_valist (instance, signal_id, detail, var_args);
+  xsignal_emit_valist (instance, signal_id, detail, var_args);
   va_end (var_args);
 }
 
 /**
- * g_signal_emit_by_name:
+ * xsignal_emit_by_name:
  * @instance: (type xobject_t.Object): the instance the signal is being emitted on.
  * @detailed_signal: a string of the form "signal-name::detail".
  * @...: parameters to be passed to the signal, followed by a
@@ -3566,11 +3566,11 @@ g_signal_emit (xpointer_t instance,
  * Emits a signal. Signal emission is done synchronously.
  * The method will only return control after all handlers are called or signal emission was stopped.
  *
- * Note that g_signal_emit_by_name() resets the return value to the default
- * if no handlers are connected, in contrast to g_signal_emitv().
+ * Note that xsignal_emit_by_name() resets the return value to the default
+ * if no handlers are connected, in contrast to xsignal_emitv().
  */
 void
-g_signal_emit_by_name (xpointer_t     instance,
+xsignal_emit_by_name (xpointer_t     instance,
 		       const xchar_t *detailed_signal,
 		       ...)
 {
@@ -3592,7 +3592,7 @@ g_signal_emit_by_name (xpointer_t     instance,
       va_list var_args;
 
       va_start (var_args, detailed_signal);
-      g_signal_emit_valist (instance, signal_id, detail, var_args);
+      xsignal_emit_valist (instance, signal_id, detail, var_args);
       va_end (var_args);
     }
   else
@@ -3614,7 +3614,7 @@ signal_emit_unlocked_R (SignalNode   *node,
   Handler *handler_list = NULL;
   xvalue_t *return_accu, accu = G_VALUE_INIT;
   xuint_t signal_id;
-  gulong max_sequential_handler_number;
+  xulong_t max_sequential_handler_number;
   xboolean_t return_value_altered = FALSE;
 
   TRACE(GOBJECT_SIGNAL_EMIT(node->signal_id, detail, instance, XTYPE_FROM_INSTANCE (instance)));
@@ -3944,7 +3944,7 @@ type_debug_name (xtype_t type)
 }
 
 /**
- * g_signal_accumulator_true_handled:
+ * xsignal_accumulator_true_handled:
  * @ihint: standard #GSignalAccumulator parameter
  * @return_accu: standard #GSignalAccumulator parameter
  * @handler_return: standard #GSignalAccumulator parameter
@@ -3963,7 +3963,7 @@ type_debug_name (xtype_t type)
  * Returns: standard #GSignalAccumulator result
  */
 xboolean_t
-g_signal_accumulator_true_handled (xsignal_invocation_hint_t *ihint,
+xsignal_accumulator_true_handled (xsignal_invocation_hint_t *ihint,
 				   xvalue_t                *return_accu,
 				   const xvalue_t          *handler_return,
 				   xpointer_t               dummy)
@@ -3979,7 +3979,7 @@ g_signal_accumulator_true_handled (xsignal_invocation_hint_t *ihint,
 }
 
 /**
- * g_signal_accumulator_first_wins:
+ * xsignal_accumulator_first_wins:
  * @ihint: standard #GSignalAccumulator parameter
  * @return_accu: standard #GSignalAccumulator parameter
  * @handler_return: standard #GSignalAccumulator parameter
@@ -4001,7 +4001,7 @@ g_signal_accumulator_true_handled (xsignal_invocation_hint_t *ihint,
  * Since: 2.28
  **/
 xboolean_t
-g_signal_accumulator_first_wins (xsignal_invocation_hint_t *ihint,
+xsignal_accumulator_first_wins (xsignal_invocation_hint_t *ihint,
                                  xvalue_t                *return_accu,
                                  const xvalue_t          *handler_return,
                                  xpointer_t               dummy)
@@ -4012,13 +4012,13 @@ g_signal_accumulator_first_wins (xsignal_invocation_hint_t *ihint,
 
 /**
  * g_clear_signal_handler:
- * @handler_id_ptr: A pointer to a handler ID (of type #gulong) of the handler to be disconnected.
+ * @handler_id_ptr: A pointer to a handler ID (of type #xulong_t) of the handler to be disconnected.
  * @instance: (type xobject_t.Object): The instance to remove the signal handler from.
  *   This pointer may be %NULL or invalid, if the handler ID is zero.
  *
  * Disconnects a handler from @instance so it will not be called during
  * any future or currently ongoing emissions of the signal it has been
- * connected to. The @handler_id_ptr is then set to zero, which is never a valid handler ID value (see g_signal_connect()).
+ * connected to. The @handler_id_ptr is then set to zero, which is never a valid handler ID value (see xsignal_connect()).
  *
  * If the handler ID is 0 then this function does nothing.
  *
@@ -4028,7 +4028,7 @@ g_signal_accumulator_first_wins (xsignal_invocation_hint_t *ihint,
  * Since: 2.62
  */
 void
-(g_clear_signal_handler) (gulong   *handler_id_ptr,
+(g_clear_signal_handler) (xulong_t   *handler_id_ptr,
                           xpointer_t  instance)
 {
   g_return_if_fail (handler_id_ptr != NULL);

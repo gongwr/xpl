@@ -3025,8 +3025,8 @@ msgid "Error removing old file: %s"
 msgstr "𐑻𐑼 𐑮𐑦𐑥𐑵𐑝𐑦𐑙 𐑴𐑤𐑛 𐑓𐑲𐑤: %s"
 
 #: ../gio/gmemoryinputstream.c:486 ../gio/gmemoryoutputstream.c:746
-msgid "Invalid GSeekType supplied"
-msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 GSeekType 𐑕𐑩𐑐𐑤𐑲𐑛"
+msgid "Invalid xseek_type_t supplied"
+msgstr "𐑦𐑯𐑝𐑨𐑤𐑦𐑛 xseek_type_t 𐑕𐑩𐑐𐑤𐑲𐑛"
 
 #: ../gio/gmemoryinputstream.c:496
 msgid "Invalid seek request"

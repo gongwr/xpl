@@ -235,7 +235,7 @@
  * different types of values in it and that only one type information
  * structure is required for many different values of the same type.
  *
- * ## Buffer Management Memory
+ * ## buffer_t Management Memory
  *
  * #xvariant_t uses an internal buffer management structure to deal
  * with the various different possible sources of serialized data
@@ -342,7 +342,7 @@ xvariant_new_from_trusted (const xvariant_type_t *type,
 xvariant_t *
 xvariant_new_boolean (xboolean_t value)
 {
-  guchar v = value;
+  xuchar_t v = value;
 
   return xvariant_new_from_trusted (G_VARIANT_TYPE_BOOLEAN, &v, 1);
 }
@@ -363,7 +363,7 @@ xvariant_new_boolean (xboolean_t value)
 xboolean_t
 xvariant_get_boolean (xvariant_t *value)
 {
-  const guchar *data;
+  const xuchar_t *data;
 
   TYPE_CHECK (value, G_VARIANT_TYPE_BOOLEAN, FALSE);
 
@@ -516,7 +516,7 @@ NUMERIC_TYPE (UINT32, uint32, xuint32_t)
 
 /**
  * xvariant_new_int64:
- * @value: a #gint64 value
+ * @value: a #sint64_t value
  *
  * Creates a new int64 #xvariant_t instance.
  *
@@ -533,11 +533,11 @@ NUMERIC_TYPE (UINT32, uint32, xuint32_t)
  * It is an error to call this function with a @value of any type
  * other than %G_VARIANT_TYPE_INT64.
  *
- * Returns: a #gint64
+ * Returns: a #sint64_t
  *
  * Since: 2.24
  **/
-NUMERIC_TYPE (INT64, int64, gint64)
+NUMERIC_TYPE (INT64, int64, sint64_t)
 
 /**
  * xvariant_new_uint64:
@@ -1115,7 +1115,7 @@ xvariant_lookup_value (xvariant_t           *dictionary,
  * as an array of the given C type, with @element_size set to the size
  * the appropriate type:
  * - %G_VARIANT_TYPE_INT16 (etc.): #gint16 (etc.)
- * - %G_VARIANT_TYPE_BOOLEAN: #guchar (not #xboolean_t!)
+ * - %G_VARIANT_TYPE_BOOLEAN: #xuchar_t (not #xboolean_t!)
  * - %G_VARIANT_TYPE_BYTE: #xuint8_t
  * - %G_VARIANT_TYPE_HANDLE: #xuint32_t
  * - %G_VARIANT_TYPE_DOUBLE: #xdouble_t
@@ -2870,8 +2870,8 @@ xvariant_compare (xconstpointer one,
 
     case XVARIANT_CLASS_INT64:
       {
-        gint64 a_val = xvariant_get_int64 (a);
-        gint64 b_val = xvariant_get_int64 (b);
+        sint64_t a_val = xvariant_get_int64 (a);
+        sint64_t b_val = xvariant_get_int64 (b);
 
         return (a_val == b_val) ? 0 : (a_val > b_val) ? 1 : -1;
       }
@@ -5055,7 +5055,7 @@ xvariant_valist_new_leaf (const xchar_t **str,
       return xvariant_new_uint32 (va_arg (*app, xuint_t));
 
     case 'x':
-      return xvariant_new_int64 (va_arg (*app, gint64));
+      return xvariant_new_int64 (va_arg (*app, sint64_t));
 
     case 't':
       return xvariant_new_uint64 (va_arg (*app, xuint64_t));
@@ -5135,7 +5135,7 @@ xvariant_valist_get_leaf (const xchar_t **str,
           return;
 
         case 'x':
-          *(gint64 *) ptr = xvariant_get_int64 (value);
+          *(sint64_t *) ptr = xvariant_get_int64 (value);
           return;
 
         case 't':
@@ -5350,7 +5350,7 @@ xvariant_valist_get (const xchar_t **str,
  * the [xvariant_t varargs documentation][gvariant-varargs].
  *
  * |[<!-- language="C" -->
- * MyFlags some_flags = FLAG_ONE | FLAG_TWO;
+ * my_flags_t some_flags = FLAG_ONE | FLAG_TWO;
  * const xchar_t *some_strings[] = { "a", "b", "c", NULL };
  * xvariant_t *new_variant;
  *

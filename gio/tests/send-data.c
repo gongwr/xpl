@@ -30,7 +30,7 @@ cancel_thread (xpointer_t data)
 
   g_usleep (1000*1000*cancel_timeout);
   g_print ("Cancelling\n");
-  g_cancellable_cancel (cancellable);
+  xcancellable_cancel (cancellable);
   return NULL;
 }
 
@@ -66,7 +66,7 @@ socket_client_event (xsocket_client_t *client,
 		     xsocket_connection_t *connection)
 {
   static xenum_class_t *event_class;
-  gint64 now_us;
+  sint64_t now_us;
 
   if (!event_class)
     event_class = xtype_class_ref (XTYPE_SOCKET_CLIENT_EVENT);
@@ -110,7 +110,7 @@ main (int argc, char *argv[])
   if (cancel_timeout)
     {
       xthread_t *thread;
-      cancellable = g_cancellable_new ();
+      cancellable = xcancellable_new ();
       thread = xthread_new ("cancel", cancel_thread, cancellable);
       xthread_unref (thread);
     }
@@ -123,7 +123,7 @@ main (int argc, char *argv[])
   if (io_timeout)
     xsocket_client_set_timeout (client, io_timeout);
   if (verbose)
-    g_signal_connect (client, "event", G_CALLBACK (socket_client_event), NULL);
+    xsignal_connect (client, "event", G_CALLBACK (socket_client_event), NULL);
 
   if (async)
     {

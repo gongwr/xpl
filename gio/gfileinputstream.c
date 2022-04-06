@@ -52,7 +52,7 @@ static xoffset_t    xfile_input_stream_seekable_tell          (xseekable__t     
 static xboolean_t   xfile_input_stream_seekable_can_seek      (xseekable__t            *seekable);
 static xboolean_t   xfile_input_stream_seekable_seek          (xseekable__t            *seekable,
 							      xoffset_t               offset,
-							      GSeekType             type,
+							      xseek_type_t             type,
 							      xcancellable_t         *cancellable,
 							      xerror_t              **error);
 static xboolean_t   xfile_input_stream_seekable_can_truncate  (xseekable__t            *seekable);
@@ -139,7 +139,7 @@ xfile_input_stream_query_info (xfile_input_stream_t  *stream,
   info = NULL;
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   class = XFILE_INPUT_STREAM_GET_CLASS (stream);
   if (class->query_info)
@@ -149,7 +149,7 @@ xfile_input_stream_query_info (xfile_input_stream_t  *stream,
                          _("Stream doesn’t support query_info"));
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   xinput_stream_clear_pending (input_stream);
 
@@ -306,7 +306,7 @@ xfile_input_stream_seekable_can_seek (xseekable__t *seekable)
 static xboolean_t
 xfile_input_stream_seek (xfile_input_stream_t  *stream,
 			  xoffset_t            offset,
-			  GSeekType          type,
+			  xseek_type_t          type,
 			  xcancellable_t      *cancellable,
 			  xerror_t           **error)
 {
@@ -330,12 +330,12 @@ xfile_input_stream_seek (xfile_input_stream_t  *stream,
     return FALSE;
 
   if (cancellable)
-    g_cancellable_push_current (cancellable);
+    xcancellable_push_current (cancellable);
 
   res = class->seek (stream, offset, type, cancellable, error);
 
   if (cancellable)
-    g_cancellable_pop_current (cancellable);
+    xcancellable_pop_current (cancellable);
 
   xinput_stream_clear_pending (input_stream);
 
@@ -345,7 +345,7 @@ xfile_input_stream_seek (xfile_input_stream_t  *stream,
 static xboolean_t
 xfile_input_stream_seekable_seek (xseekable__t     *seekable,
 				   xoffset_t        offset,
-				   GSeekType      type,
+				   xseek_type_t      type,
 				   xcancellable_t  *cancellable,
 				   xerror_t       **error)
 {

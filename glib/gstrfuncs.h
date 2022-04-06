@@ -54,37 +54,37 @@ typedef enum {
 XPL_VAR const xuint16_t * const g_ascii_table;
 
 #define g_ascii_isalnum(c) \
-  ((g_ascii_table[(guchar) (c)] & G_ASCII_ALNUM) != 0)
+  ((g_ascii_table[(xuchar_t) (c)] & G_ASCII_ALNUM) != 0)
 
 #define g_ascii_isalpha(c) \
-  ((g_ascii_table[(guchar) (c)] & G_ASCII_ALPHA) != 0)
+  ((g_ascii_table[(xuchar_t) (c)] & G_ASCII_ALPHA) != 0)
 
 #define g_ascii_iscntrl(c) \
-  ((g_ascii_table[(guchar) (c)] & G_ASCII_CNTRL) != 0)
+  ((g_ascii_table[(xuchar_t) (c)] & G_ASCII_CNTRL) != 0)
 
 #define g_ascii_isdigit(c) \
-  ((g_ascii_table[(guchar) (c)] & G_ASCII_DIGIT) != 0)
+  ((g_ascii_table[(xuchar_t) (c)] & G_ASCII_DIGIT) != 0)
 
 #define g_ascii_isgraph(c) \
-  ((g_ascii_table[(guchar) (c)] & G_ASCII_GRAPH) != 0)
+  ((g_ascii_table[(xuchar_t) (c)] & G_ASCII_GRAPH) != 0)
 
 #define g_ascii_islower(c) \
-  ((g_ascii_table[(guchar) (c)] & G_ASCII_LOWER) != 0)
+  ((g_ascii_table[(xuchar_t) (c)] & G_ASCII_LOWER) != 0)
 
 #define g_ascii_isprint(c) \
-  ((g_ascii_table[(guchar) (c)] & G_ASCII_PRINT) != 0)
+  ((g_ascii_table[(xuchar_t) (c)] & G_ASCII_PRINT) != 0)
 
 #define g_ascii_ispunct(c) \
-  ((g_ascii_table[(guchar) (c)] & G_ASCII_PUNCT) != 0)
+  ((g_ascii_table[(xuchar_t) (c)] & G_ASCII_PUNCT) != 0)
 
 #define g_ascii_isspace(c) \
-  ((g_ascii_table[(guchar) (c)] & G_ASCII_SPACE) != 0)
+  ((g_ascii_table[(xuchar_t) (c)] & G_ASCII_SPACE) != 0)
 
 #define g_ascii_isupper(c) \
-  ((g_ascii_table[(guchar) (c)] & G_ASCII_UPPER) != 0)
+  ((g_ascii_table[(xuchar_t) (c)] & G_ASCII_UPPER) != 0)
 
 #define g_ascii_isxdigit(c) \
-  ((g_ascii_table[(guchar) (c)] & G_ASCII_XDIGIT) != 0)
+  ((g_ascii_table[(xuchar_t) (c)] & G_ASCII_XDIGIT) != 0)
 
 XPL_AVAILABLE_IN_ALL
 xchar_t                 g_ascii_tolower  (xchar_t        c) G_GNUC_CONST;
@@ -154,7 +154,7 @@ xuint64_t		      g_ascii_strtoull (const xchar_t *nptr,
 					xchar_t      **endptr,
 					xuint_t        base);
 XPL_AVAILABLE_IN_ALL
-gint64		      g_ascii_strtoll  (const xchar_t *nptr,
+sint64_t		      g_ascii_strtoll  (const xchar_t *nptr,
 					xchar_t      **endptr,
 					xuint_t        base);
 /* 29 bytes should enough for all possible values that
@@ -348,9 +348,9 @@ xquark                g_number_parser_error_quark  (void);
 XPL_AVAILABLE_IN_2_54
 xboolean_t              g_ascii_string_to_signed     (const xchar_t  *str,
                                                     xuint_t         base,
-                                                    gint64        min,
-                                                    gint64        max,
-                                                    gint64       *out_num,
+                                                    sint64_t        min,
+                                                    sint64_t        max,
+                                                    sint64_t       *out_num,
                                                     xerror_t      **error);
 
 XPL_AVAILABLE_IN_2_54

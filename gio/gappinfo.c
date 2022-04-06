@@ -1164,7 +1164,7 @@ xapp_launch_context_class_init (xapp_launch_context_class_t *klass)
    *
    * Since: 2.36
    */
-  signals[LAUNCH_FAILED] = g_signal_new (I_("launch-failed"),
+  signals[LAUNCH_FAILED] = xsignal_new (I_("launch-failed"),
                                          G_OBJECT_CLASS_TYPE (object_class),
                                          G_SIGNAL_RUN_LAST,
                                          G_STRUCT_OFFSET (xapp_launch_context_class_t, launch_failed),
@@ -1194,7 +1194,7 @@ xapp_launch_context_class_init (xapp_launch_context_class_t *klass)
    *
    * Since: 2.72
    */
-  signals[LAUNCH_STARTED] = g_signal_new (I_("launch-started"),
+  signals[LAUNCH_STARTED] = xsignal_new (I_("launch-started"),
                                           G_OBJECT_CLASS_TYPE (object_class),
                                           G_SIGNAL_RUN_LAST,
                                           G_STRUCT_OFFSET (xapp_launch_context_class_t, launch_started),
@@ -1202,7 +1202,7 @@ xapp_launch_context_class_init (xapp_launch_context_class_t *klass)
                                           _g_cclosure_marshal_VOID__OBJECT_VARIANT,
                                           XTYPE_NONE, 2,
                                           XTYPE_APP_INFO, XTYPE_VARIANT);
-  g_signal_set_va_marshaller (signals[LAUNCH_STARTED],
+  xsignal_set_va_marshaller (signals[LAUNCH_STARTED],
                               XTYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_VOID__OBJECT_VARIANTv);
 
@@ -1224,7 +1224,7 @@ xapp_launch_context_class_init (xapp_launch_context_class_t *klass)
    *
    * Since: 2.36
    */
-  signals[LAUNCHED] = g_signal_new (I_("launched"),
+  signals[LAUNCHED] = xsignal_new (I_("launched"),
                                     G_OBJECT_CLASS_TYPE (object_class),
                                     G_SIGNAL_RUN_LAST,
                                     G_STRUCT_OFFSET (xapp_launch_context_class_t, launched),
@@ -1232,7 +1232,7 @@ xapp_launch_context_class_init (xapp_launch_context_class_t *klass)
                                     _g_cclosure_marshal_VOID__OBJECT_VARIANT,
                                     XTYPE_NONE, 2,
                                     XTYPE_APP_INFO, XTYPE_VARIANT);
-  g_signal_set_va_marshaller (signals[LAUNCHED],
+  xsignal_set_va_marshaller (signals[LAUNCHED],
                               XTYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_VOID__OBJECT_VARIANTv);
 }
@@ -1399,7 +1399,7 @@ xapp_launch_context_launch_failed (xapp_launch_context_t *context,
   g_return_if_fail (X_IS_APP_LAUNCH_CONTEXT (context));
   g_return_if_fail (startup_notify_id != NULL);
 
-  g_signal_emit (context, signals[LAUNCH_FAILED], 0, startup_notify_id);
+  xsignal_emit (context, signals[LAUNCH_FAILED], 0, startup_notify_id);
 }
 
 
@@ -1481,7 +1481,7 @@ xapp_info_monitor_class_init (GAppInfoMonitorClass *class)
    * Signal emitted when the app info database for changes (ie: newly installed
    * or removed applications).
    **/
-  xapp_info_monitor_changed_signal = g_signal_new (I_("changed"), XTYPE_APP_INFO_MONITOR, G_SIGNAL_RUN_FIRST,
+  xapp_info_monitor_changed_signal = xsignal_new (I_("changed"), XTYPE_APP_INFO_MONITOR, G_SIGNAL_RUN_FIRST,
                                                     0, NULL, NULL, g_cclosure_marshal_VOID__VOID, XTYPE_NONE, 0);
 
   object_class->finalize = xapp_info_monitor_finalize;

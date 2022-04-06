@@ -13,7 +13,7 @@
 
 #define XUNICODE_NOT_PRESENT_OFFSET 65535
 
-static const guchar cclass_data[][256] = {
+static const xuchar_t cclass_data[][256] = {
   { /* page 3, index 0 */
     230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230, 230,
     230, 230, 230, 230, 230, 230, 230, 232, 220, 220, 220, 220, 232, 216,

@@ -49,7 +49,7 @@ main (int argc, char **argv)
       xchar_t ***results;
       xint_t i, j;
 
-      results = g_desktop_app_info_search (argv[2]);
+      results = xdesktop_app_info_search (argv[2]);
       for (i = 0; results[i]; i++)
         {
           for (j = 0; results[i][j]; j++)
@@ -63,14 +63,14 @@ main (int argc, char **argv)
     {
       xlist_t *results;
 
-      results = g_desktop_app_info_get_implementations (argv[2]);
+      results = xdesktop_app_info_get_implementations (argv[2]);
       print_app_list (results);
     }
   else if (xstr_equal (argv[1], "show-info"))
     {
       xapp_info_t *info;
 
-      info = (xapp_info_t *) g_desktop_app_info_new (argv[2]);
+      info = (xapp_info_t *) xdesktop_app_info_new (argv[2]);
       if (info)
         {
           print (xapp_info_get_id (info));
@@ -119,7 +119,7 @@ main (int argc, char **argv)
     {
       xapp_info_t *info;
 
-      info = (xapp_info_t *) g_desktop_app_info_new (argv[2]);
+      info = (xapp_info_t *) xdesktop_app_info_new (argv[2]);
       if (info)
         {
           g_print ("%s\n", xapp_info_should_show (info) ? "true" : "false");
@@ -134,10 +134,10 @@ main (int argc, char **argv)
 
       monitor = xapp_info_monitor_get ();
 
-      info = (xapp_info_t *) g_desktop_app_info_new ("this-desktop-file-does-not-exist");
+      info = (xapp_info_t *) xdesktop_app_info_new ("this-desktop-file-does-not-exist");
       g_assert (!info);
 
-      g_signal_connect (monitor, "changed", G_CALLBACK (quit), NULL);
+      xsignal_connect (monitor, "changed", G_CALLBACK (quit), NULL);
 
       while (1)
         xmain_context_iteration (NULL, TRUE);

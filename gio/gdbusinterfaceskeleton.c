@@ -73,7 +73,7 @@ enum
 
 static xuint_t signals[LAST_SIGNAL] = {0};
 
-static void     dbus_interface_interface_init                      (GDBusInterfaceIface    *iface);
+static void     dbus_interface_interface_init                      (xdbus_interface_iface_t    *iface);
 
 static void     set_object_path_locked                             (xdbus_interface_skeleton_t *interface_,
                                                                     const xchar_t            *object_path);
@@ -243,17 +243,17 @@ g_dbus_interface_skeleton_class_init (GDBusInterfaceSkeletonClass *klass)
    * Since: 2.30
    */
   signals[G_AUTHORIZE_METHOD_SIGNAL] =
-    g_signal_new (I_("g-authorize-method"),
+    xsignal_new (I_("g-authorize-method"),
                   XTYPE_DBUS_INTERFACE_SKELETON,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GDBusInterfaceSkeletonClass, g_authorize_method),
-                  _g_signal_accumulator_false_handled,
+                  _xsignal_accumulator_false_handled,
                   NULL,
                   _g_cclosure_marshal_BOOLEAN__OBJECT,
                   XTYPE_BOOLEAN,
                   1,
                   XTYPE_DBUS_METHOD_INVOCATION);
-  g_signal_set_va_marshaller (signals[G_AUTHORIZE_METHOD_SIGNAL],
+  xsignal_set_va_marshaller (signals[G_AUTHORIZE_METHOD_SIGNAL],
                               XTYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_BOOLEAN__OBJECTv);
 }
@@ -446,7 +446,7 @@ g_dbus_interface_skeleton_set_object (xdbus_interface_t *interface_,
 }
 
 static void
-dbus_interface_interface_init (GDBusInterfaceIface *iface)
+dbus_interface_interface_init (xdbus_interface_iface_t *iface)
 {
   iface->get_info    = _g_dbus_interface_skeleton_get_info;
   iface->get_object  = g_dbus_interface_skeleton_get_object;
@@ -515,7 +515,7 @@ dispatch_in_thread_func (xtask_t        *task,
   authorized = TRUE;
   if (object != NULL)
     {
-      g_signal_emit_by_name (object,
+      xsignal_emit_by_name (object,
                              "authorize-method",
                              data->interface,
                              data->invocation,
@@ -523,7 +523,7 @@ dispatch_in_thread_func (xtask_t        *task,
     }
   if (authorized)
     {
-      g_signal_emit (data->interface,
+      xsignal_emit (data->interface,
                      signals[G_AUTHORIZE_METHOD_SIGNAL],
                      0,
                      data->invocation,
@@ -593,7 +593,7 @@ g_dbus_interface_method_dispatch_helper (xdbus_interface_skeleton_t       *inter
    *  a) no handler is connected and class handler is not overridden (both interface and object); and
    *  b) method calls are not dispatched in a thread
    */
-  has_handlers = g_signal_has_handler_pending (interface,
+  has_handlers = xsignal_has_handler_pending (interface,
                                                signals[G_AUTHORIZE_METHOD_SIGNAL],
                                                0,
                                                TRUE);
@@ -604,7 +604,7 @@ g_dbus_interface_method_dispatch_helper (xdbus_interface_skeleton_t       *inter
   if (!emit_authorized_signal)
     {
       if (object != NULL)
-        emit_authorized_signal = _g_dbus_object_skeleton_has_authorize_method_handlers (G_DBUS_OBJECT_SKELETON (object));
+        emit_authorized_signal = _xdbus_object_skeleton_has_authorize_method_handlers (G_DBUS_OBJECT_SKELETON (object));
     }
 
   run_in_thread = (flags & G_DBUS_INTERFACE_SKELETON_FLAGS_HANDLE_METHOD_INVOCATIONS_IN_THREAD);
@@ -706,7 +706,7 @@ add_connection_locked (xdbus_interface_skeleton_t *interface_,
       interface_->priv->hooked_vtable->method_call = skeleton_intercept_handle_method_call;
     }
 
-  registration_id = g_dbus_connection_register_object (connection,
+  registration_id = xdbus_connection_register_object (connection,
                                                        interface_->priv->object_path,
                                                        g_dbus_interface_skeleton_get_info (interface_),
                                                        interface_->priv->hooked_vtable,
@@ -737,7 +737,7 @@ remove_connection_locked (xdbus_interface_skeleton_t *interface_,
       data = l->data;
       if (data->connection == connection)
         {
-          g_warn_if_fail (g_dbus_connection_unregister_object (data->connection, data->registration_id));
+          g_warn_if_fail (xdbus_connection_unregister_object (data->connection, data->registration_id));
           free_connection (data);
           interface_->priv->connections = xslist_delete_link (interface_->priv->connections, l);
           /* we are guaranteed that the connection is only added once, so bail out early */

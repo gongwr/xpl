@@ -75,14 +75,14 @@ struct _GDatagramBasedInterface
                                          xinput_message_t        *messages,
                                          xuint_t                 num_messages,
                                          xint_t                  flags,
-                                         gint64                timeout,
+                                         sint64_t                timeout,
                                          xcancellable_t         *cancellable,
                                          xerror_t              **error);
   xint_t          (*send_messages)        (xdatagram_based_t       *datagram_based,
                                          xoutput_message_t       *messages,
                                          xuint_t                 num_messages,
                                          xint_t                  flags,
-                                         gint64                timeout,
+                                         sint64_t                timeout,
                                          xcancellable_t         *cancellable,
                                          xerror_t              **error);
 
@@ -93,7 +93,7 @@ struct _GDatagramBasedInterface
                                          xio_condition_t          condition);
   xboolean_t      (*condition_wait)       (xdatagram_based_t       *datagram_based,
                                          xio_condition_t          condition,
-                                         gint64                timeout,
+                                         sint64_t                timeout,
                                          xcancellable_t         *cancellable,
                                          xerror_t              **error);
 };
@@ -108,7 +108,7 @@ g_datagram_based_receive_messages     (xdatagram_based_t       *datagram_based,
                                        xinput_message_t        *messages,
                                        xuint_t                 num_messages,
                                        xint_t                  flags,
-                                       gint64                timeout,
+                                       sint64_t                timeout,
                                        xcancellable_t         *cancellable,
                                        xerror_t              **error);
 
@@ -118,7 +118,7 @@ g_datagram_based_send_messages        (xdatagram_based_t       *datagram_based,
                                        xoutput_message_t       *messages,
                                        xuint_t                 num_messages,
                                        xint_t                  flags,
-                                       gint64                timeout,
+                                       sint64_t                timeout,
                                        xcancellable_t         *cancellable,
                                        xerror_t              **error);
 
@@ -135,7 +135,7 @@ XPL_AVAILABLE_IN_2_48
 xboolean_t
 g_datagram_based_condition_wait       (xdatagram_based_t       *datagram_based,
                                        xio_condition_t          condition,
-                                       gint64                timeout,
+                                       sint64_t                timeout,
                                        xcancellable_t         *cancellable,
                                        xerror_t              **error);
 

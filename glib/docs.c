@@ -37,9 +37,9 @@
  *   various C standard library header files) — #xboolean_t, #xssize_t.
  * - Integer types which are guaranteed to be the same size across
  *   all platforms — #gint8, #xuint8_t, #gint16, #xuint16_t, #gint32,
- *   #xuint32_t, #gint64, #xuint64_t.
+ *   #xuint32_t, #sint64_t, #xuint64_t.
  * - Types which are easier to use than their standard C counterparts -
- *   #xpointer_t, #xconstpointer, #guchar, #xuint_t, #gushort, #gulong.
+ *   #xpointer_t, #xconstpointer, #xuchar_t, #xuint_t, #gushort, #xulong_t.
  * - Types which correspond exactly to standard C types, but are
  *   included for completeness — #xchar_t, #xint_t, #gshort, #xlong_t,
  *   #gfloat, #xdouble_t.
@@ -99,7 +99,7 @@
  */
 
 /**
- * guchar:
+ * xuchar_t:
  *
  * Corresponds to the standard C unsigned char type.
  */
@@ -188,7 +188,7 @@
  */
 
 /**
- * gulong:
+ * xulong_t:
  *
  * Corresponds to the standard C unsigned long type.
  * Values of this type can range from 0 to %G_MAXULONG.
@@ -197,7 +197,7 @@
 /**
  * G_MAXULONG:
  *
- * The maximum value which can be held in a #gulong.
+ * The maximum value which can be held in a #xulong_t.
  */
 
 /**
@@ -372,7 +372,7 @@
  */
 
 /**
- * gint64:
+ * sint64_t:
  *
  * A signed integer guaranteed to be 64 bits on all platforms.
  * Values of this type can range from %G_MININT64
@@ -386,14 +386,14 @@
 /**
  * G_MAXINT64:
  *
- * The maximum value which can be held in a #gint64.
+ * The maximum value which can be held in a #sint64_t.
  */
 
 /**
  * G_GINT64_MODIFIER:
  *
  * The platform dependent length modifier for conversion specifiers
- * for scanning and printing values of type #gint64 or #xuint64_t.
+ * for scanning and printing values of type #sint64_t or #xuint64_t.
  * It is a string literal.
  *
  * Some platforms do not support printing 64-bit integers, even
@@ -407,7 +407,7 @@
  * G_GINT64_FORMAT:
  *
  * This is the platform dependent conversion specifier for scanning
- * and printing values of type #gint64. See also %G_GINT16_FORMAT.
+ * and printing values of type #sint64_t. See also %G_GINT16_FORMAT.
  *
  * Some platforms do not support scanning and printing 64-bit integers,
  * even though the types are supported. On such platforms %G_GINT64_FORMAT
@@ -1020,36 +1020,36 @@
 
 /**
  * GULONG_FROM_BE:
- * @val: a #gulong value in big-endian byte order
+ * @val: a #xulong_t value in big-endian byte order
  *
- * Converts a #gulong value from big-endian to host byte order.
+ * Converts a #xulong_t value from big-endian to host byte order.
  *
  * Returns: @val converted to host byte order
  */
 
 /**
  * GULONG_FROM_LE:
- * @val: a #gulong value in little-endian byte order
+ * @val: a #xulong_t value in little-endian byte order
  *
- * Converts a #gulong value from little-endian to host byte order.
+ * Converts a #xulong_t value from little-endian to host byte order.
  *
  * Returns: @val converted to host byte order
  */
 
 /**
  * GULONG_TO_BE:
- * @val: a #gulong value in host byte order
+ * @val: a #xulong_t value in host byte order
  *
- * Converts a #gulong value from host byte order to big-endian.
+ * Converts a #xulong_t value from host byte order to big-endian.
  *
  * Returns: @val converted to big-endian
  */
 
 /**
  * GULONG_TO_LE:
- * @val: a #gulong value in host byte order
+ * @val: a #xulong_t value in host byte order
  *
- * Converts a #gulong value from host byte order to little-endian.
+ * Converts a #xulong_t value from host byte order to little-endian.
  *
  * Returns: @val converted to little-endian
  */
@@ -1272,36 +1272,36 @@
 
 /**
  * GINT64_FROM_BE:
- * @val: a #gint64 value in big-endian byte order
+ * @val: a #sint64_t value in big-endian byte order
  *
- * Converts a #gint64 value from big-endian to host byte order.
+ * Converts a #sint64_t value from big-endian to host byte order.
  *
  * Returns: @val converted to host byte order
  */
 
 /**
  * GINT64_FROM_LE:
- * @val: a #gint64 value in little-endian byte order
+ * @val: a #sint64_t value in little-endian byte order
  *
- * Converts a #gint64 value from little-endian to host byte order.
+ * Converts a #sint64_t value from little-endian to host byte order.
  *
  * Returns: @val converted to host byte order
  */
 
 /**
  * GINT64_TO_BE:
- * @val: a #gint64 value in host byte order
+ * @val: a #sint64_t value in host byte order
  *
- * Converts a #gint64 value from host byte order to big-endian.
+ * Converts a #sint64_t value from host byte order to big-endian.
  *
  * Returns: @val converted to big-endian
  */
 
 /**
  * GINT64_TO_LE:
- * @val: a #gint64 value in host byte order
+ * @val: a #sint64_t value in host byte order
  *
- * Converts a #gint64 value from host byte order to little-endian.
+ * Converts a #sint64_t value from host byte order to little-endian.
  *
  * Returns: @val converted to little-endian
  */

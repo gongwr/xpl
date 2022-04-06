@@ -288,11 +288,11 @@ static xuint_t xapplication_signals[NR_SIGNALS];
 static void xapplication_action_group_iface_init (xaction_group_interface_t *);
 static void xapplication_action_map_iface_init (xaction_map_interface_t *);
 G_DEFINE_TYPE_WITH_CODE (xapplication, xapplication, XTYPE_OBJECT,
- G_ADD_PRIVATE (xapplication_t)
+ G_ADD_PRIVATE (xapplication)
  G_IMPLEMENT_INTERFACE (XTYPE_ACTION_GROUP, xapplication_action_group_iface_init)
  G_IMPLEMENT_INTERFACE (XTYPE_ACTION_MAP, xapplication_action_map_iface_init))
 
-/* GApplicationExportedActions {{{1 */
+/* xapplication_exported_actions_t {{{1 */
 
 /* We create a subclass of xsimple_action_group_t that implements
  * xremote_action_group_t and deals with the platform data using
@@ -309,11 +309,11 @@ typedef struct
 {
   xsimple_action_group_t parent_instance;
   xapplication_t *application;
-} GApplicationExportedActions;
+} xapplication_exported_actions_t;
 
 static xtype_t xapplication_exported_actions_get_type   (void);
 static void  xapplication_exported_actions_iface_init (xremote_action_group_interface_t *iface);
-G_DEFINE_TYPE_WITH_CODE (GApplicationExportedActions, xapplication_exported_actions, XTYPE_SIMPLE_ACTION_GROUP,
+G_DEFINE_TYPE_WITH_CODE (xapplication_exported_actions, xapplication_exported_actions, XTYPE_SIMPLE_ACTION_GROUP,
                          G_IMPLEMENT_INTERFACE (XTYPE_REMOTE_ACTION_GROUP, xapplication_exported_actions_iface_init))
 
 static void
@@ -322,7 +322,7 @@ xapplication_exported_actions_activate_action_full (xremote_action_group_t *remo
                                                      xvariant_t           *parameter,
                                                      xvariant_t           *platform_data)
 {
-  GApplicationExportedActions *exported = (GApplicationExportedActions *) remote;
+  xapplication_exported_actions_t *exported = (xapplication_exported_actions_t *) remote;
 
   G_APPLICATION_GET_CLASS (exported->application)
     ->before_emit (exported->application, platform_data);
@@ -339,7 +339,7 @@ xapplication_exported_actions_change_action_state_full (xremote_action_group_t *
                                                          xvariant_t           *value,
                                                          xvariant_t           *platform_data)
 {
-  GApplicationExportedActions *exported = (GApplicationExportedActions *) remote;
+  xapplication_exported_actions_t *exported = (xapplication_exported_actions_t *) remote;
 
   G_APPLICATION_GET_CLASS (exported->application)
     ->before_emit (exported->application, platform_data);
@@ -351,7 +351,7 @@ xapplication_exported_actions_change_action_state_full (xremote_action_group_t *
 }
 
 static void
-xapplication_exported_actions_init (GApplicationExportedActions *actions)
+xapplication_exported_actions_init (xapplication_exported_actions_t *actions)
 {
 }
 
@@ -370,7 +370,7 @@ xapplication_exported_actions_class_init (GApplicationExportedActionsClass *clas
 static xaction_group_t *
 xapplication_exported_actions_new (xapplication_t *application)
 {
-  GApplicationExportedActions *actions;
+  xapplication_exported_actions_t *actions;
 
   actions = xobject_new (xapplication_exported_actions_get_type (), NULL);
   actions->application = application;
@@ -459,8 +459,8 @@ xapplication_pack_option_entries (xapplication_t *application,
           break;
 
         case G_OPTION_ARG_INT64:
-          if (*(gint64 *) entry->arg_data)
-            value = xvariant_new_int64 (*(gint64 *) entry->arg_data);
+          if (*(sint64_t *) entry->arg_data)
+            value = xvariant_new_int64 (*(sint64_t *) entry->arg_data);
           break;
 
         default:
@@ -630,7 +630,7 @@ add_packed_option (xapplication_t *application,
       break;
 
     case G_OPTION_ARG_INT64:
-      entry->arg_data = g_new0 (gint64, 1);
+      entry->arg_data = g_new0 (sint64_t, 1);
       break;
 
     case G_OPTION_ARG_DOUBLE:
@@ -943,7 +943,7 @@ xapplication_real_shutdown (xapplication_t *application)
 static void
 xapplication_real_activate (xapplication_t *application)
 {
-  if (!g_signal_has_handler_pending (application,
+  if (!xsignal_has_handler_pending (application,
                                      xapplication_signals[SIGNAL_ACTIVATE],
                                      0, TRUE) &&
       G_APPLICATION_GET_CLASS (application)->activate == xapplication_real_activate)
@@ -966,7 +966,7 @@ xapplication_real_open (xapplication_t  *application,
                          xint_t           n_files,
                          const xchar_t   *hint)
 {
-  if (!g_signal_has_handler_pending (application,
+  if (!xsignal_has_handler_pending (application,
                                      xapplication_signals[SIGNAL_OPEN],
                                      0, TRUE) &&
       G_APPLICATION_GET_CLASS (application)->open == xapplication_real_open)
@@ -987,7 +987,7 @@ static int
 xapplication_real_command_line (xapplication_t            *application,
                                  xapplication_command_line_t *cmdline)
 {
-  if (!g_signal_has_handler_pending (application,
+  if (!xsignal_has_handler_pending (application,
                                      xapplication_signals[SIGNAL_COMMAND_LINE],
                                      0, TRUE) &&
       G_APPLICATION_GET_CLASS (application)->command_line == xapplication_real_command_line)
@@ -1077,7 +1077,7 @@ xapplication_call_command_line (xapplication_t        *application,
                               "arguments", v,
                               "options", options,
                               NULL);
-      g_signal_emit (application, xapplication_signals[SIGNAL_COMMAND_LINE], 0, cmdline, exit_status);
+      xsignal_emit (application, xapplication_signals[SIGNAL_COMMAND_LINE], 0, cmdline, exit_status);
       xobject_unref (cmdline);
     }
 }
@@ -1100,7 +1100,7 @@ xapplication_real_local_command_line (xapplication_t   *application,
       return TRUE;
     }
 
-  g_signal_emit (application, xapplication_signals[SIGNAL_HANDLE_LOCAL_OPTIONS], 0, options, exit_status);
+  xsignal_emit (application, xapplication_signals[SIGNAL_HANDLE_LOCAL_OPTIONS], 0, options, exit_status);
 
   if (*exit_status >= 0)
     {
@@ -1424,13 +1424,13 @@ xapplication_init (xapplication_t *application)
   /* application->priv->actions is the one and only ref on the group, so when
    * we dispose, the action group will die, disconnecting all signals.
    */
-  g_signal_connect_swapped (application->priv->actions, "action-added",
+  xsignal_connect_swapped (application->priv->actions, "action-added",
                             G_CALLBACK (xaction_group_action_added), application);
-  g_signal_connect_swapped (application->priv->actions, "action-enabled-changed",
+  xsignal_connect_swapped (application->priv->actions, "action-enabled-changed",
                             G_CALLBACK (xaction_group_action_enabled_changed), application);
-  g_signal_connect_swapped (application->priv->actions, "action-state-changed",
+  xsignal_connect_swapped (application->priv->actions, "action-state-changed",
                             G_CALLBACK (xaction_group_action_state_changed), application);
-  g_signal_connect_swapped (application->priv->actions, "action-removed",
+  xsignal_connect_swapped (application->priv->actions, "action-removed",
                             G_CALLBACK (xaction_group_action_removed), application);
 }
 
@@ -1541,7 +1541,7 @@ xapplication_class_init (xapplication_class_t *class)
    * after registration. See xapplication_register().
    */
   xapplication_signals[SIGNAL_STARTUP] =
-    g_signal_new (I_("startup"), XTYPE_APPLICATION, G_SIGNAL_RUN_FIRST,
+    xsignal_new (I_("startup"), XTYPE_APPLICATION, G_SIGNAL_RUN_FIRST,
                   G_STRUCT_OFFSET (xapplication_class_t, startup),
                   NULL, NULL, NULL, XTYPE_NONE, 0);
 
@@ -1553,7 +1553,7 @@ xapplication_class_init (xapplication_class_t *class)
    * immediately after the main loop terminates.
    */
   xapplication_signals[SIGNAL_SHUTDOWN] =
-    g_signal_new (I_("shutdown"), XTYPE_APPLICATION, G_SIGNAL_RUN_LAST,
+    xsignal_new (I_("shutdown"), XTYPE_APPLICATION, G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (xapplication_class_t, shutdown),
                   NULL, NULL, NULL, XTYPE_NONE, 0);
 
@@ -1565,7 +1565,7 @@ xapplication_class_init (xapplication_class_t *class)
    * activation occurs. See xapplication_activate().
    */
   xapplication_signals[SIGNAL_ACTIVATE] =
-    g_signal_new (I_("activate"), XTYPE_APPLICATION, G_SIGNAL_RUN_LAST,
+    xsignal_new (I_("activate"), XTYPE_APPLICATION, G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (xapplication_class_t, activate),
                   NULL, NULL, NULL, XTYPE_NONE, 0);
 
@@ -1581,12 +1581,12 @@ xapplication_class_init (xapplication_class_t *class)
    * files to open. See xapplication_open() for more information.
    */
   xapplication_signals[SIGNAL_OPEN] =
-    g_signal_new (I_("open"), XTYPE_APPLICATION, G_SIGNAL_RUN_LAST,
+    xsignal_new (I_("open"), XTYPE_APPLICATION, G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (xapplication_class_t, open),
                   NULL, NULL,
                   _g_cclosure_marshal_VOID__POINTER_INT_STRING,
                   XTYPE_NONE, 3, XTYPE_POINTER, XTYPE_INT, XTYPE_STRING);
-  g_signal_set_va_marshaller (xapplication_signals[SIGNAL_OPEN],
+  xsignal_set_va_marshaller (xapplication_signals[SIGNAL_OPEN],
                               XTYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_VOID__POINTER_INT_STRINGv);
 
@@ -1604,12 +1604,12 @@ xapplication_class_init (xapplication_class_t *class)
    *   process. See xapplication_command_line_set_exit_status().
    */
   xapplication_signals[SIGNAL_COMMAND_LINE] =
-    g_signal_new (I_("command-line"), XTYPE_APPLICATION, G_SIGNAL_RUN_LAST,
+    xsignal_new (I_("command-line"), XTYPE_APPLICATION, G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (xapplication_class_t, command_line),
-                  g_signal_accumulator_first_wins, NULL,
+                  xsignal_accumulator_first_wins, NULL,
                   _g_cclosure_marshal_INT__OBJECT,
                   XTYPE_INT, 1, XTYPE_APPLICATION_COMMAND_LINE);
-  g_signal_set_va_marshaller (xapplication_signals[SIGNAL_COMMAND_LINE],
+  xsignal_set_va_marshaller (xapplication_signals[SIGNAL_COMMAND_LINE],
                               XTYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_INT__OBJECTv);
 
@@ -1668,12 +1668,12 @@ xapplication_class_init (xapplication_class_t *class)
    * Since: 2.40
    **/
   xapplication_signals[SIGNAL_HANDLE_LOCAL_OPTIONS] =
-    g_signal_new (I_("handle-local-options"), XTYPE_APPLICATION, G_SIGNAL_RUN_LAST,
+    xsignal_new (I_("handle-local-options"), XTYPE_APPLICATION, G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (xapplication_class_t, handle_local_options),
                   xapplication_handle_local_options_accumulator, NULL,
                   _g_cclosure_marshal_INT__BOXED,
                   XTYPE_INT, 1, XTYPE_VARIANT_DICT);
-  g_signal_set_va_marshaller (xapplication_signals[SIGNAL_HANDLE_LOCAL_OPTIONS],
+  xsignal_set_va_marshaller (xapplication_signals[SIGNAL_HANDLE_LOCAL_OPTIONS],
                               XTYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_INT__BOXEDv);
 
@@ -1692,12 +1692,12 @@ xapplication_class_init (xapplication_class_t *class)
    * Since: 2.60
    */
   xapplication_signals[SIGNAL_NAME_LOST] =
-    g_signal_new (I_("name-lost"), XTYPE_APPLICATION, G_SIGNAL_RUN_LAST,
+    xsignal_new (I_("name-lost"), XTYPE_APPLICATION, G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (xapplication_class_t, name_lost),
-                  g_signal_accumulator_true_handled, NULL,
+                  xsignal_accumulator_true_handled, NULL,
                   _g_cclosure_marshal_BOOLEAN__VOID,
                   XTYPE_BOOLEAN, 0);
-  g_signal_set_va_marshaller (xapplication_signals[SIGNAL_NAME_LOST],
+  xsignal_set_va_marshaller (xapplication_signals[SIGNAL_NAME_LOST],
                               XTYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_BOOLEAN__VOIDv);
 }
@@ -2206,7 +2206,7 @@ xapplication_register (xapplication_t  *application,
 
       if (!application->priv->is_remote)
         {
-          g_signal_emit (application, xapplication_signals[SIGNAL_STARTUP], 0);
+          xsignal_emit (application, xapplication_signals[SIGNAL_STARTUP], 0);
 
           if (!application->priv->did_startup)
             g_critical ("xapplication_t subclass '%s' failed to chain up on"
@@ -2305,7 +2305,7 @@ xapplication_activate (xapplication_t *application)
                                  get_platform_data (application, NULL));
 
   else
-    g_signal_emit (application, xapplication_signals[SIGNAL_ACTIVATE], 0);
+    xsignal_emit (application, xapplication_signals[SIGNAL_ACTIVATE], 0);
 }
 
 /**
@@ -2349,7 +2349,7 @@ xapplication_open (xapplication_t  *application,
                              get_platform_data (application, NULL));
 
   else
-    g_signal_emit (application, xapplication_signals[SIGNAL_OPEN],
+    xsignal_emit (application, xapplication_signals[SIGNAL_OPEN],
                    0, files, n_files, hint);
 }
 
@@ -2572,7 +2572,7 @@ xapplication_run (xapplication_t  *application,
 
   if (application->priv->is_registered && !application->priv->is_remote)
     {
-      g_signal_emit (application, xapplication_signals[SIGNAL_SHUTDOWN], 0);
+      xsignal_emit (application, xapplication_signals[SIGNAL_SHUTDOWN], 0);
 
       if (!application->priv->did_shutdown)
         g_critical ("xapplication_t subclass '%s' failed to chain up on"
@@ -3068,13 +3068,13 @@ xapplication_bind_busy_property (xapplication_t *application,
   g_return_if_fail (X_IS_OBJECT (object));
   g_return_if_fail (property != NULL);
 
-  notify_id = g_signal_lookup ("notify", XTYPE_OBJECT);
+  notify_id = xsignal_lookup ("notify", XTYPE_OBJECT);
   property_quark = g_quark_from_string (property);
   pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (object), property);
 
   g_return_if_fail (pspec != NULL && pspec->value_type == XTYPE_BOOLEAN);
 
-  if (g_signal_handler_find (object, G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_DETAIL | G_SIGNAL_MATCH_FUNC,
+  if (xsignal_handler_find (object, G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_DETAIL | G_SIGNAL_MATCH_FUNC,
                              notify_id, property_quark, NULL, xapplication_notify_busy_binding, NULL) > 0)
     {
       g_critical ("%s: '%s' is already bound to the busy state of the application", G_STRFUNC, property);
@@ -3087,7 +3087,7 @@ xapplication_bind_busy_property (xapplication_t *application,
 
   closure = g_cclosure_new (G_CALLBACK (xapplication_notify_busy_binding), binding,
                             xapplication_busy_binding_destroy);
-  g_signal_connect_closure_by_id (object, notify_id, property_quark, closure, FALSE);
+  xsignal_connect_closure_by_id (object, notify_id, property_quark, closure, FALSE);
 
   /* fetch the initial value */
   xapplication_notify_busy_binding (object, pspec, binding);
@@ -3112,16 +3112,16 @@ xapplication_unbind_busy_property (xapplication_t *application,
 {
   xuint_t notify_id;
   xquark property_quark;
-  gulong handler_id;
+  xulong_t handler_id;
 
   g_return_if_fail (X_IS_APPLICATION (application));
   g_return_if_fail (X_IS_OBJECT (object));
   g_return_if_fail (property != NULL);
 
-  notify_id = g_signal_lookup ("notify", XTYPE_OBJECT);
+  notify_id = xsignal_lookup ("notify", XTYPE_OBJECT);
   property_quark = g_quark_from_string (property);
 
-  handler_id = g_signal_handler_find (object, G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_DETAIL | G_SIGNAL_MATCH_FUNC,
+  handler_id = xsignal_handler_find (object, G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_DETAIL | G_SIGNAL_MATCH_FUNC,
                                       notify_id, property_quark, NULL, xapplication_notify_busy_binding, NULL);
   if (handler_id == 0)
     {
@@ -3129,7 +3129,7 @@ xapplication_unbind_busy_property (xapplication_t *application,
       return;
     }
 
-  g_signal_handler_disconnect (object, handler_id);
+  xsignal_handler_disconnect (object, handler_id);
 }
 
 /* Epilogue {{{1 */

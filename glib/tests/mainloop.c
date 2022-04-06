@@ -428,7 +428,7 @@ test_invoke (void)
  */
 
 static xint_t counter;
-static gint64 last_counter_update;
+static sint64_t last_counter_update;
 
 typedef struct {
   xsource_t source;
@@ -441,7 +441,7 @@ counter_source_prepare (xsource_t *source,
                         xint_t    *timeout)
 {
   CounterSource *csource = (CounterSource *)source;
-  gint64 now;
+  sint64_t now;
 
   now = xsource_get_time (source);
   if (now != last_counter_update)
@@ -763,7 +763,7 @@ typedef struct {
   xmain_loop_t *loop;
 
   xsource_t *timeout1, *timeout2;
-  gint64 time1;
+  sint64_t time1;
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   GTimeVal tv;  /* needed for xsource_get_current_time() */
 G_GNUC_END_IGNORE_DEPRECATIONS
@@ -774,7 +774,7 @@ timeout1_callback (xpointer_t user_data)
 {
   TimeTestData *data = user_data;
   xsource_t *source;
-  gint64 mtime1, mtime2, time2;
+  sint64_t mtime1, mtime2, time2;
 
   source = g_main_current_source ();
   g_assert_true (source == data->timeout1);
@@ -834,7 +834,7 @@ timeout2_callback (xpointer_t user_data)
 {
   TimeTestData *data = user_data;
   xsource_t *source;
-  gint64 time2, time3;
+  sint64_t time2, time3;
 
   source = g_main_current_source ();
   g_assert_true (source == data->timeout2);
@@ -1907,7 +1907,7 @@ test_nsources_same_priority (void)
 {
   xmain_context_t *context;
   xsource_t **sources;
-  gint64 start, end;
+  sint64_t start, end;
   xsize_t n_sources = 50000, i;
 
   context = xmain_context_default ();
@@ -1954,7 +1954,7 @@ test_nsources_different_priority (void)
 {
   xmain_context_t *context;
   xsource_t **sources;
-  gint64 start, end;
+  sint64_t start, end;
   xsize_t n_sources = 50000, i;
 
   context = xmain_context_default ();
@@ -2024,7 +2024,7 @@ test_nsources_threadpool (void)
   xsource_t **sources;
   GThreadPool *pool;
   xerror_t *error = NULL;
-  gint64 start, end;
+  sint64_t start, end;
   xsize_t n_sources = 50000, i;
 
   context = xmain_context_default ();
@@ -2200,7 +2200,7 @@ test_maincontext_source_finalization_from_source (xconstpointer user_data)
       xsource_attach (s1, c);
     }
 
-  /* Test a few different permutations here */
+  /* test_t a few different permutations here */
   if (GPOINTER_TO_INT (user_data) % 5 == 0)
     {
       /* Get rid of our references so that destroying the context
