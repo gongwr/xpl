@@ -21,17 +21,17 @@ msgstr ""
 "X-Project-Style: gnome\n"
 
 #: ../gio/gapplication.c:490
-msgid "GApplication options"
-msgstr "Roghainnean GApplication"
+msgid "xapplication_t options"
+msgstr "Roghainnean xapplication_t"
 
 #: ../gio/gapplication.c:490
-msgid "Show GApplication options"
-msgstr "Seall roghainnean GApplication"
+msgid "Show xapplication_t options"
+msgstr "Seall roghainnean xapplication_t"
 
 #: ../gio/gapplication.c:535
-msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
 msgstr ""
-"Rach a-steach dha mhodh frithealaidh GApplication (cleachd o fhaidhlichean "
+"Rach a-steach dha mhodh frithealaidh xapplication_t (cleachd o fhaidhlichean "
 "seirbheis D-Bus)"
 
 #: ../gio/gapplication.c:547
@@ -292,7 +292,7 @@ msgid "Seek not supported on base stream"
 msgstr "Chan eil taic ri sireadh air bun-shruth"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
 msgstr ""
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1208
@@ -366,15 +366,15 @@ msgid "%s filetype"
 msgstr ""
 
 #: ../gio/gcredentials.c:312 ../gio/gcredentials.c:571
-msgid "GCredentials is not implemented on this OS"
+msgid "xcredentials_t is not implemented on this OS"
 msgstr ""
 
 #: ../gio/gcredentials.c:467
-msgid "There is no GCredentials support for your platform"
+msgid "There is no xcredentials_t support for your platform"
 msgstr ""
 
 #: ../gio/gcredentials.c:513
-msgid "GCredentials does not contain a process ID on this OS"
+msgid "xcredentials_t does not contain a process ID on this OS"
 msgstr ""
 
 #: ../gio/gcredentials.c:565
@@ -553,7 +553,7 @@ msgid ""
 msgstr ""
 
 #: ../gio/gdbusauth.c:1174
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
 msgstr ""
 
 #: ../gio/gdbusauthmechanismsha1.c:262
@@ -1276,26 +1276,26 @@ msgstr ""
 
 #: ../gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of GEmblem encoding"
+msgid "Can’t handle version %d of xemblem_t encoding"
 msgstr ""
 
 #: ../gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of GEmblemedIcon encoding"
+msgid "Can’t handle version %d of xemblemed_icon_t encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
 msgstr ""
 
 #: ../gio/gfile.c:969 ../gio/gfile.c:1207 ../gio/gfile.c:1345
@@ -1395,11 +1395,11 @@ msgstr ""
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can’t handle version %d of GFileIcon encoding"
+msgid "Can’t handle version %d of xfile_icon_t encoding"
 msgstr ""
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for GFileIcon"
+msgid "Malformed input data for xfile_icon_t"
 msgstr ""
 
 #: ../gio/gfileinputstream.c:149 ../gio/gfileinputstream.c:394
@@ -1569,7 +1569,7 @@ msgid "Copy one or more files"
 msgstr ""
 
 #: ../gio/gio-tool.c:231
-#| msgid "Show GApplication options"
+#| msgid "Show xapplication_t options"
 msgid "Show information about locations"
 msgstr "Seall fiosrachadh air na h-ionadan"
 
@@ -1805,7 +1805,7 @@ msgid "Writable attribute namespaces:\n"
 msgstr ""
 
 #: ../gio/gio-tool-info.c:287
-#| msgid "Show GApplication options"
+#| msgid "Show xapplication_t options"
 msgid "Show information about locations."
 msgstr "Seall fiosrachadh air na h-ionadan."
 
@@ -2689,7 +2689,7 @@ msgstr ""
 
 #: ../gio/glib-compile-schemas.c:2099
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
@@ -3024,7 +3024,7 @@ msgid "Invalid seek request"
 msgstr ""
 
 #: ../gio/gmemoryinputstream.c:508
-msgid "Cannot truncate GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
 msgstr ""
 
 #: ../gio/gmemoryoutputstream.c:567
@@ -3590,7 +3590,7 @@ msgid "Error sending message: %s"
 msgstr ""
 
 #: ../gio/gsocket.c:4441
-msgid "GSocketControlMessage not supported on Windows"
+msgid "xsocket_control_message_t not supported on Windows"
 msgstr ""
 
 #: ../gio/gsocket.c:4894 ../gio/gsocket.c:4967 ../gio/gsocket.c:5193
@@ -3730,7 +3730,7 @@ msgstr ""
 
 #: ../gio/gthemedicon.c:518
 #, c-format
-msgid "Can’t handle version %d of GThemedIcon encoding"
+msgid "Can’t handle version %d of xthemed_icon_t encoding"
 msgstr ""
 
 #: ../gio/gthreadedresolver.c:118
@@ -4051,25 +4051,25 @@ msgstr ""
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:202
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %b %e %H:%M:%S %Y"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:205
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%d/%m/%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:208
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:211
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -4265,13 +4265,13 @@ msgstr "DiD"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:354
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "m"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:357
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "f"
 

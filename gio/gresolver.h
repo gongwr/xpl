@@ -29,7 +29,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_RESOLVER         (g_resolver_get_type ())
-#define G_RESOLVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_RESOLVER, GResolver))
+#define G_RESOLVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_RESOLVER, xresolver))
 #define G_RESOLVER_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_RESOLVER, GResolverClass))
 #define X_IS_RESOLVER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_RESOLVER))
 #define X_IS_RESOLVER_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_RESOLVER))
@@ -64,67 +64,67 @@ struct _GResolverClass {
   xobject_class_t parent_class;
 
   /* Signals */
-  void    ( *reload)                           (GResolver               *resolver);
+  void    ( *reload)                           (xresolver_t               *resolver);
 
   /* Virtual methods */
-  xlist_t * ( *lookup_by_name)                   (GResolver               *resolver,
+  xlist_t * ( *lookup_by_name)                   (xresolver_t               *resolver,
                                                 const xchar_t             *hostname,
                                                 xcancellable_t            *cancellable,
                                                 xerror_t                 **error);
-  void    ( *lookup_by_name_async)             (GResolver               *resolver,
+  void    ( *lookup_by_name_async)             (xresolver_t               *resolver,
                                                 const xchar_t             *hostname,
                                                 xcancellable_t            *cancellable,
                                                 xasync_ready_callback_t      callback,
                                                 xpointer_t                 user_data);
-  xlist_t * ( *lookup_by_name_finish)            (GResolver               *resolver,
+  xlist_t * ( *lookup_by_name_finish)            (xresolver_t               *resolver,
                                                 xasync_result_t            *result,
                                                 xerror_t                 **error);
 
-  xchar_t * ( *lookup_by_address)                (GResolver               *resolver,
+  xchar_t * ( *lookup_by_address)                (xresolver_t               *resolver,
                                                 xinet_address_t            *address,
                                                 xcancellable_t            *cancellable,
                                                 xerror_t                 **error);
-  void    ( *lookup_by_address_async)          (GResolver               *resolver,
+  void    ( *lookup_by_address_async)          (xresolver_t               *resolver,
                                                 xinet_address_t            *address,
                                                 xcancellable_t            *cancellable,
                                                 xasync_ready_callback_t      callback,
                                                 xpointer_t                 user_data);
-  xchar_t * ( *lookup_by_address_finish)         (GResolver               *resolver,
+  xchar_t * ( *lookup_by_address_finish)         (xresolver_t               *resolver,
                                                 xasync_result_t            *result,
                                                 xerror_t                 **error);
 
-  xlist_t * ( *lookup_service)                   (GResolver               *resolver,
+  xlist_t * ( *lookup_service)                   (xresolver_t               *resolver,
                                                 const xchar_t              *rrname,
                                                 xcancellable_t             *cancellable,
                                                 xerror_t                  **error);
-  void    ( *lookup_service_async)             (GResolver                *resolver,
+  void    ( *lookup_service_async)             (xresolver_t                *resolver,
                                                 const xchar_t              *rrname,
                                                 xcancellable_t             *cancellable,
                                                 xasync_ready_callback_t       callback,
                                                 xpointer_t                  user_data);
-  xlist_t * ( *lookup_service_finish)            (GResolver                *resolver,
+  xlist_t * ( *lookup_service_finish)            (xresolver_t                *resolver,
                                                 xasync_result_t             *result,
                                                 xerror_t                  **error);
 
-  xlist_t * ( *lookup_records)                   (GResolver                *resolver,
+  xlist_t * ( *lookup_records)                   (xresolver_t                *resolver,
                                                 const xchar_t              *rrname,
                                                 GResolverRecordType       record_type,
                                                 xcancellable_t             *cancellable,
                                                 xerror_t                  **error);
 
-  void    ( *lookup_records_async)             (GResolver                *resolver,
+  void    ( *lookup_records_async)             (xresolver_t                *resolver,
                                                 const xchar_t              *rrname,
                                                 GResolverRecordType       record_type,
                                                 xcancellable_t             *cancellable,
                                                 xasync_ready_callback_t       callback,
                                                 xpointer_t                  user_data);
 
-  xlist_t * ( *lookup_records_finish)            (GResolver                *resolver,
+  xlist_t * ( *lookup_records_finish)            (xresolver_t                *resolver,
                                                 xasync_result_t             *result,
                                                 xerror_t                   **error);
   /**
    * GResolverClass::lookup_by_name_with_flags_async:
-   * @resolver: a #GResolver
+   * @resolver: a #xresolver_t
    * @hostname: the hostname to resolve
    * @flags: extra #GResolverNameLookupFlags to modify the lookup
    * @cancellable: (nullable): a #xcancellable_t
@@ -138,7 +138,7 @@ struct _GResolverClass {
    *
    * Since: 2.60
    */
-  void    ( *lookup_by_name_with_flags_async)  (GResolver                 *resolver,
+  void    ( *lookup_by_name_with_flags_async)  (xresolver_t                 *resolver,
                                                 const xchar_t               *hostname,
                                                 GResolverNameLookupFlags   flags,
                                                 xcancellable_t              *cancellable,
@@ -146,7 +146,7 @@ struct _GResolverClass {
                                                 xpointer_t                   user_data);
   /**
    * GResolverClass::lookup_by_name_with_flags_finish:
-   * @resolver: a #GResolver
+   * @resolver: a #xresolver_t
    * @result: a #xasync_result_t
    * @error: (nullable): a pointer to a %NULL #xerror_t
    *
@@ -155,12 +155,12 @@ struct _GResolverClass {
    * Returns: (element-type xinet_address_t) (transfer full): List of #xinet_address_t.
    * Since: 2.60
    */
-  xlist_t * ( *lookup_by_name_with_flags_finish) (GResolver                 *resolver,
+  xlist_t * ( *lookup_by_name_with_flags_finish) (xresolver_t                 *resolver,
                                                 xasync_result_t              *result,
                                                 xerror_t                   **error);
   /**
    * GResolverClass::lookup_by_name_with_flags:
-   * @resolver: a #GResolver
+   * @resolver: a #xresolver_t
    * @hostname: the hostname to resolve
    * @flags: extra #GResolverNameLookupFlags to modify the lookup
    * @cancellable: (nullable): a #xcancellable_t
@@ -173,7 +173,7 @@ struct _GResolverClass {
    * Returns: (element-type xinet_address_t) (transfer full): List of #xinet_address_t.
    * Since: 2.60
    */
-  xlist_t * ( *lookup_by_name_with_flags)        (GResolver                 *resolver,
+  xlist_t * ( *lookup_by_name_with_flags)        (xresolver_t                 *resolver,
                                                 const xchar_t               *hostname,
                                                 GResolverNameLookupFlags   flags,
                                                 xcancellable_t              *cancellable,
@@ -184,37 +184,37 @@ struct _GResolverClass {
 XPL_AVAILABLE_IN_ALL
 xtype_t      g_resolver_get_type                         (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-GResolver *g_resolver_get_default                      (void);
+xresolver_t *g_resolver_get_default                      (void);
 XPL_AVAILABLE_IN_ALL
-void       g_resolver_set_default                      (GResolver                 *resolver);
+void       g_resolver_set_default                      (xresolver_t                 *resolver);
 XPL_AVAILABLE_IN_ALL
-xlist_t     *g_resolver_lookup_by_name                   (GResolver                 *resolver,
+xlist_t     *g_resolver_lookup_by_name                   (xresolver_t                 *resolver,
                                                         const xchar_t               *hostname,
                                                         xcancellable_t              *cancellable,
                                                         xerror_t                   **error);
 XPL_AVAILABLE_IN_ALL
-void       g_resolver_lookup_by_name_async             (GResolver                 *resolver,
+void       g_resolver_lookup_by_name_async             (xresolver_t                 *resolver,
                                                         const xchar_t               *hostname,
                                                         xcancellable_t              *cancellable,
                                                         xasync_ready_callback_t        callback,
                                                         xpointer_t                   user_data);
 XPL_AVAILABLE_IN_ALL
-xlist_t     *g_resolver_lookup_by_name_finish            (GResolver                 *resolver,
+xlist_t     *g_resolver_lookup_by_name_finish            (xresolver_t                 *resolver,
                                                         xasync_result_t              *result,
                                                         xerror_t                   **error);
 XPL_AVAILABLE_IN_2_60
-void       g_resolver_lookup_by_name_with_flags_async  (GResolver                 *resolver,
+void       g_resolver_lookup_by_name_with_flags_async  (xresolver_t                 *resolver,
                                                         const xchar_t               *hostname,
                                                         GResolverNameLookupFlags   flags,
                                                         xcancellable_t              *cancellable,
                                                         xasync_ready_callback_t        callback,
                                                         xpointer_t                   user_data);
 XPL_AVAILABLE_IN_2_60
-xlist_t     *g_resolver_lookup_by_name_with_flags_finish (GResolver                 *resolver,
+xlist_t     *g_resolver_lookup_by_name_with_flags_finish (xresolver_t                 *resolver,
                                                         xasync_result_t              *result,
                                                         xerror_t                   **error);
 XPL_AVAILABLE_IN_2_60
-xlist_t     *g_resolver_lookup_by_name_with_flags        (GResolver                 *resolver,
+xlist_t     *g_resolver_lookup_by_name_with_flags        (xresolver_t                 *resolver,
                                                         const xchar_t               *hostname,
                                                         GResolverNameLookupFlags   flags,
                                                         xcancellable_t              *cancellable,
@@ -222,29 +222,29 @@ xlist_t     *g_resolver_lookup_by_name_with_flags        (GResolver             
 XPL_AVAILABLE_IN_ALL
 void       g_resolver_free_addresses                   (xlist_t                     *addresses);
 XPL_AVAILABLE_IN_ALL
-xchar_t     *g_resolver_lookup_by_address                (GResolver                 *resolver,
+xchar_t     *g_resolver_lookup_by_address                (xresolver_t                 *resolver,
                                                         xinet_address_t              *address,
                                                         xcancellable_t              *cancellable,
                                                         xerror_t                   **error);
 XPL_AVAILABLE_IN_ALL
-void       g_resolver_lookup_by_address_async          (GResolver                 *resolver,
+void       g_resolver_lookup_by_address_async          (xresolver_t                 *resolver,
                                                         xinet_address_t              *address,
                                                         xcancellable_t              *cancellable,
                                                         xasync_ready_callback_t        callback,
                                                         xpointer_t                   user_data);
 XPL_AVAILABLE_IN_ALL
-xchar_t     *g_resolver_lookup_by_address_finish         (GResolver                 *resolver,
+xchar_t     *g_resolver_lookup_by_address_finish         (xresolver_t                 *resolver,
                                                         xasync_result_t              *result,
                                                         xerror_t                   **error);
 XPL_AVAILABLE_IN_ALL
-xlist_t     *g_resolver_lookup_service                   (GResolver                 *resolver,
+xlist_t     *g_resolver_lookup_service                   (xresolver_t                 *resolver,
                                                         const xchar_t               *service,
                                                         const xchar_t               *protocol,
                                                         const xchar_t               *domain,
                                                         xcancellable_t              *cancellable,
                                                         xerror_t                   **error);
 XPL_AVAILABLE_IN_ALL
-void       g_resolver_lookup_service_async             (GResolver                 *resolver,
+void       g_resolver_lookup_service_async             (xresolver_t                 *resolver,
                                                         const xchar_t               *service,
                                                         const xchar_t               *protocol,
                                                         const xchar_t               *domain,
@@ -252,24 +252,24 @@ void       g_resolver_lookup_service_async             (GResolver               
                                                         xasync_ready_callback_t        callback,
                                                         xpointer_t                   user_data);
 XPL_AVAILABLE_IN_ALL
-xlist_t     *g_resolver_lookup_service_finish            (GResolver                 *resolver,
+xlist_t     *g_resolver_lookup_service_finish            (xresolver_t                 *resolver,
                                                         xasync_result_t              *result,
                                                         xerror_t                   **error);
 XPL_AVAILABLE_IN_2_34
-xlist_t     *g_resolver_lookup_records                   (GResolver                 *resolver,
+xlist_t     *g_resolver_lookup_records                   (xresolver_t                 *resolver,
                                                         const xchar_t               *rrname,
                                                         GResolverRecordType        record_type,
                                                         xcancellable_t              *cancellable,
                                                         xerror_t                   **error);
 XPL_AVAILABLE_IN_2_34
-void       g_resolver_lookup_records_async             (GResolver                 *resolver,
+void       g_resolver_lookup_records_async             (xresolver_t                 *resolver,
                                                         const xchar_t               *rrname,
                                                         GResolverRecordType        record_type,
                                                         xcancellable_t              *cancellable,
                                                         xasync_ready_callback_t        callback,
                                                         xpointer_t                   user_data);
 XPL_AVAILABLE_IN_2_34
-xlist_t     *g_resolver_lookup_records_finish            (GResolver                 *resolver,
+xlist_t     *g_resolver_lookup_records_finish            (xresolver_t                 *resolver,
                                                         xasync_result_t              *result,
                                                         xerror_t                   **error);
 XPL_AVAILABLE_IN_ALL
@@ -279,13 +279,13 @@ void       g_resolver_free_targets                     (xlist_t                 
 /**
  * G_RESOLVER_ERROR:
  *
- * Error domain for #GResolver. Errors in this domain will be from the
+ * Error domain for #xresolver_t. Errors in this domain will be from the
  * #GResolverError enumeration. See #xerror_t for more information on
  * error domains.
  */
 #define G_RESOLVER_ERROR (g_resolver_error_quark ())
 XPL_AVAILABLE_IN_ALL
-GQuark g_resolver_error_quark (void);
+xquark g_resolver_error_quark (void);
 
 G_END_DECLS
 

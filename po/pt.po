@@ -32,17 +32,17 @@ msgid "Setting application as last used for type not supported yet"
 msgstr "Definir aplicação como última utilizada para tipo ainda não suportado"
 
 #: gio/gapplication.c:497
-msgid "GApplication options"
-msgstr "Opções GApplication"
+msgid "xapplication_t options"
+msgstr "Opções xapplication_t"
 
 #: gio/gapplication.c:497
-msgid "Show GApplication options"
-msgstr "Mostrar opções GApplication"
+msgid "Show xapplication_t options"
+msgstr "Mostrar opções xapplication_t"
 
 #: gio/gapplication.c:542
-msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
 msgstr ""
-"Entrar em modo de serviço GApplication (utilizar a partir de ficheiros D-Bus "
+"Entrar em modo de serviço xapplication_t (utilizar a partir de ficheiros D-Bus "
 "de serviço)"
 
 #: gio/gapplication.c:554
@@ -281,8 +281,8 @@ msgid "Seek not supported on base stream"
 msgstr "Procura não é suportada no fluxo base"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "Impossível truncar um GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "Impossível truncar um xbuffered_input_stream"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -353,20 +353,20 @@ msgid "%s filetype"
 msgstr "Tipo de ficheiro %s"
 
 #: gio/gcredentials.c:335
-msgid "GCredentials contains invalid data"
-msgstr "GCredentials contém dados inválidos"
+msgid "xcredentials_t contains invalid data"
+msgstr "xcredentials_t contém dados inválidos"
 
 #: gio/gcredentials.c:395 gio/gcredentials.c:686
-msgid "GCredentials is not implemented on this OS"
-msgstr "GCredentials não está implementado neste SO"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "xcredentials_t não está implementado neste SO"
 
 #: gio/gcredentials.c:550 gio/gcredentials.c:568
-msgid "There is no GCredentials support for your platform"
-msgstr "Não existe suporte para GCredentials na sua plataforma"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "Não existe suporte para xcredentials_t na sua plataforma"
 
 #: gio/gcredentials.c:626
-msgid "GCredentials does not contain a process ID on this OS"
-msgstr "GCredentials não contém um ID de processo neste SO"
+msgid "xcredentials_t does not contain a process ID on this OS"
+msgstr "xcredentials_t não contém um ID de processo neste SO"
 
 #: gio/gcredentials.c:680
 msgid "Credentials spoofing is not possible on this OS"
@@ -565,8 +565,8 @@ msgstr ""
 "As IDs dos utilizadores devem ser as mesmas para os pares e para o servidor"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "Cancelado via GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "Cancelado via xdbus_auth_observer_t::authorize-authenticated-peer"
 
 #: gio/gdbusauthmechanismsha1.c:299
 #, c-format
@@ -1390,27 +1390,27 @@ msgstr "O suporte DTLS não está disponível"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of GEmblem encoding"
-msgstr "Impossível manipular a versão %d da codificação GEmblem"
+msgid "Can’t handle version %d of xemblem_t encoding"
+msgstr "Impossível manipular a versão %d da codificação xemblem_t"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "Número de blocos (%d) mal-formado na codificação GEmblem"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "Número de blocos (%d) mal-formado na codificação xemblem_t"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of GEmblemedIcon encoding"
-msgstr "Impossível manipular a versão %d da codificação GEmblemedIcon"
+msgid "Can’t handle version %d of xemblemed_icon_t encoding"
+msgstr "Impossível manipular a versão %d da codificação xemblemed_icon_t"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "Número de blocos (%d) mal-formado na codificação GEmblemedIcon"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "Número de blocos (%d) mal-formado na codificação xemblemed_icon_t"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "Esperado um GEmblem para o GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "Esperado um xemblem_t para o xemblemed_icon_t"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1501,12 +1501,12 @@ msgstr "Enumerador de ficheiro já está fechado"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of GFileIcon encoding"
-msgstr "Impossível manipular a versão %d da codificação GFileIcon"
+msgid "Can’t handle version %d of xfile_icon_t encoding"
+msgstr "Impossível manipular a versão %d da codificação xfile_icon_t"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for GFileIcon"
-msgstr "Dados de entrada mal-formados para o GFileIcon"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "Dados de entrada mal-formados para o xfile_icon_t"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -2998,11 +2998,11 @@ msgstr "Não forçar restrições de nomes de chaves"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Compilar todos os ficheiros de esquema GSettings numa cache de esquemas.\n"
+"Compilar todos os ficheiros de esquema xsettings_t numa cache de esquemas.\n"
 "Ficheiros de esquema têm de ter a extensão .gschema.xml,\n"
 "e o ficheiro de cache é designado gschemas.compiled."
 
@@ -3369,8 +3369,8 @@ msgid "Invalid seek request"
 msgstr "Pedido de procura inválido"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "Impossível truncar um GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "Impossível truncar um xmemory_input_stream_t"
 
 #: gio/gmemoryoutputstream.c:568
 msgid "Memory output stream not resizable"
@@ -4047,8 +4047,8 @@ msgid "Error sending message: %s"
 msgstr "Erro ao enviar a mensagem: %s"
 
 #: gio/gsocket.c:5032
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "GSocketControlMessage não é suportada em Windows"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "xsocket_control_message_t não é suportada em Windows"
 
 #: gio/gsocket.c:5505 gio/gsocket.c:5581 gio/gsocket.c:5807
 #, c-format
@@ -4196,8 +4196,8 @@ msgstr "Os canais não são suportados nesta plataforma"
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of GThemedIcon encoding"
-msgstr "Impossível manipular a versão %d da codificação GThemedIcon"
+msgid "Can’t handle version %d of xthemed_icon_t encoding"
+msgstr "Impossível manipular a versão %d da codificação xthemed_icon_t"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4250,8 +4250,8 @@ msgid "The current TLS backend does not support PKCS #12"
 msgstr "O backend TLS atual não suporta o PKCS #12"
 
 #: gio/gtlscertificate.c:1013
-msgid "This GTlsBackend does not support creating PKCS #11 certificates"
-msgstr "Este GTlsBackend não suporta a criação de certificados PKCS # 11"
+msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
+msgstr "Este xtls_backend_t não suporta a criação de certificados PKCS # 11"
 
 #: gio/gtlspassword.c:111
 msgid ""
@@ -4561,25 +4561,25 @@ msgstr "O nome de caminho “%s” não é um caminho absoluto"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %d %b %Y %T %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%y/%m/%d"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -4962,13 +4962,13 @@ msgstr "Dez"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "AM"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "PM"
 
@@ -6508,11 +6508,11 @@ msgstr "%.1f EB"
 #~ msgid "Error writing to unix: %s"
 #~ msgstr "Erro ao escrever no unix: %s"
 
-#~ msgctxt "GDateTime"
+#~ msgctxt "xdatetime_t"
 #~ msgid "am"
 #~ msgstr "am"
 
-#~ msgctxt "GDateTime"
+#~ msgctxt "xdatetime_t"
 #~ msgid "pm"
 #~ msgstr "pm"
 
@@ -6647,28 +6647,28 @@ msgstr "%.1f EB"
 #~ msgstr ""
 #~ "Incapaz de ler o ficheiro de área de trabalho que acabou de ser criado"
 
-#~ msgid "Too large count value passed to g_input_stream_read_async"
+#~ msgid "Too large count value passed to xinput_stream_read_async"
 #~ msgstr ""
-#~ "Valor de contagem demasiado elevado passado a g_input_stream_read_async"
+#~ "Valor de contagem demasiado elevado passado a xinput_stream_read_async"
 
-#~ msgid "Too large count value passed to g_input_stream_skip"
-#~ msgstr "Valor de contagem demasiado grande passado para g_input_stream_skip"
+#~ msgid "Too large count value passed to xinput_stream_skip"
+#~ msgstr "Valor de contagem demasiado grande passado para xinput_stream_skip"
 
-#~ msgid "Too large count value passed to g_input_stream_skip_async"
+#~ msgid "Too large count value passed to xinput_stream_skip_async"
 #~ msgstr ""
-#~ "Valor de contagem demasiado grande passado para g_input_stream_skip_async"
+#~ "Valor de contagem demasiado grande passado para xinput_stream_skip_async"
 
 #~ msgid "Target file already exists"
 #~ msgstr "Já existe o ficheiro de destino"
 
-#~ msgid "Too large count value passed to g_output_stream_write"
+#~ msgid "Too large count value passed to xoutput_stream_write"
 #~ msgstr ""
-#~ "Valor de contagem demasiado grande passado para g_output_stream_write"
+#~ "Valor de contagem demasiado grande passado para xoutput_stream_write"
 
-#~ msgid "Too large count value passed to g_output_stream_write_async"
+#~ msgid "Too large count value passed to xoutput_stream_write_async"
 #~ msgstr ""
 #~ "Valor de contagem demasiado grande passado para "
-#~ "g_output_stream_write_async"
+#~ "xoutput_stream_write_async"
 
 #~ msgid "Could not change file mode: fork() failed: %s"
 #~ msgstr "Incapaz de alterar o modo do ficheiro: falha no fork(): %s"

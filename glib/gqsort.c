@@ -92,17 +92,17 @@ msort_with_tmp (const struct msort_param *p, void *b, size_t n)
 	{
 	  if ((*cmp) (b1, b2, arg) <= 0)
 	    {
-	      *(guint32 *) tmp = *(guint32 *) b1;
-	      b1 += sizeof (guint32);
+	      *(xuint32_t *) tmp = *(xuint32_t *) b1;
+	      b1 += sizeof (xuint32_t);
 	      --n1;
 	    }
 	  else
 	    {
-	      *(guint32 *) tmp = *(guint32 *) b2;
-	      b2 += sizeof (guint32);
+	      *(xuint32_t *) tmp = *(xuint32_t *) b2;
+	      b2 += sizeof (xuint32_t);
 	      --n2;
 	    }
-	  tmp += sizeof (guint32);
+	  tmp += sizeof (xuint32_t);
 	}
       break;
     case 1:
@@ -110,17 +110,17 @@ msort_with_tmp (const struct msort_param *p, void *b, size_t n)
 	{
 	  if ((*cmp) (b1, b2, arg) <= 0)
 	    {
-	      *(guint64 *) tmp = *(guint64 *) b1;
-	      b1 += sizeof (guint64);
+	      *(xuint64_t *) tmp = *(xuint64_t *) b1;
+	      b1 += sizeof (xuint64_t);
 	      --n1;
 	    }
 	  else
 	    {
-	      *(guint64 *) tmp = *(guint64 *) b2;
-	      b2 += sizeof (guint64);
+	      *(xuint64_t *) tmp = *(xuint64_t *) b2;
+	      b2 += sizeof (xuint64_t);
 	      --n2;
 	    }
-	  tmp += sizeof (guint64);
+	  tmp += sizeof (xuint64_t);
 	}
       break;
     case 2:
@@ -262,12 +262,12 @@ msort_r (void *b, size_t n, size_t s, GCompareDataFunc cmp, void *arg)
     }
   else
     {
-      if ((s & (sizeof (guint32) - 1)) == 0
+      if ((s & (sizeof (xuint32_t) - 1)) == 0
 	  && ((char *) b - (char *) 0) % ALIGNOF_GUINT32 == 0)
 	{
-	  if (s == sizeof (guint32))
+	  if (s == sizeof (xuint32_t))
 	    p.var = 0;
-	  else if (s == sizeof (guint64)
+	  else if (s == sizeof (xuint64_t)
 		   && ((char *) b - (char *) 0) % ALIGNOF_GUINT64 == 0)
 	    p.var = 1;
 	  else if ((s & (sizeof (unsigned long) - 1)) == 0
@@ -294,7 +294,7 @@ msort_r (void *b, size_t n, size_t s, GCompareDataFunc cmp, void *arg)
  * This is guaranteed to be a stable sort since version 2.32.
  */
 void
-g_qsort_with_data (gconstpointer    pbase,
+g_qsort_with_data (xconstpointer    pbase,
                    xint_t             total_elems,
                    xsize_t            size,
                    GCompareDataFunc compare_func,

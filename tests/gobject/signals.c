@@ -38,48 +38,48 @@
  */
 
 /*
- * TestObject, a parent class for TestObject
+ * test_object_t, a parent class for test_object_t
  */
 #define TEST_TYPE_OBJECT         (test_object_get_type ())
-typedef struct _TestObject        TestObject;
-typedef struct _TestObjectClass   TestObjectClass;
+typedef struct _test_object        test_object_t;
+typedef struct _test_object_class   test_object_class_t;
 static xboolean_t callback1_ran = FALSE, callback2_ran = FALSE, callback3_ran = FALSE, default_handler_ran = FALSE;
 
-struct _TestObject
+struct _test_object
 {
   xobject_t parent_instance;
 };
-struct _TestObjectClass
+struct _test_object_class
 {
   xobject_class_t parent_class;
 
-  void   (*test_signal) (TestObject *object);
+  void   (*test_signal) (test_object_t *object);
 };
 
 static xtype_t test_object_get_type (void);
 
 static void
-test_object_real_signal (TestObject *object)
+test_object_real_signal (test_object_t *object)
 {
   default_handler_ran = TRUE;
 }
 
 static void
-test_object_signal_callback3 (TestObject *object,
+test_object_signal_callback3 (test_object_t *object,
                               xpointer_t    data)
 {
   callback3_ran = TRUE;
 }
 
 static void
-test_object_signal_callback2 (TestObject *object,
+test_object_signal_callback2 (test_object_t *object,
                               xpointer_t    data)
 {
   callback2_ran = TRUE;
 }
 
 static void
-test_object_signal_callback1 (TestObject *object,
+test_object_signal_callback1 (test_object_t *object,
                               xpointer_t    data)
 {
   callback1_ran = TRUE;
@@ -91,18 +91,18 @@ test_object_signal_callback1 (TestObject *object,
 }
 
 static void
-test_object_class_init (TestObjectClass *class)
+test_object_class_init (test_object_class_t *class)
 {
   class->test_signal = test_object_real_signal;
 
   g_signal_new ("test-signal",
                 G_OBJECT_CLASS_TYPE (class),
                 G_SIGNAL_RUN_LAST,
-                G_STRUCT_OFFSET (TestObjectClass, test_signal),
+                G_STRUCT_OFFSET (test_object_class_t, test_signal),
                 NULL, NULL, NULL, XTYPE_NONE, 0);
 }
 
-static DEFINE_TYPE(TestObject, test_object,
+static DEFINE_TYPE(test_object, test_object,
                    test_object_class_init, NULL, NULL,
                    XTYPE_OBJECT)
 
@@ -110,13 +110,13 @@ int
 main (int   argc,
       char *argv[])
 {
-  TestObject *object;
+  test_object_t *object;
 
   g_log_set_always_fatal (g_log_set_always_fatal (G_LOG_FATAL_MASK) |
                           G_LOG_LEVEL_WARNING |
                           G_LOG_LEVEL_CRITICAL);
 
-  object = g_object_new (TEST_TYPE_OBJECT, NULL);
+  object = xobject_new (TEST_TYPE_OBJECT, NULL);
 
   g_signal_connect (object, "test-signal",
                     G_CALLBACK (test_object_signal_callback1), NULL);
@@ -129,6 +129,6 @@ main (int   argc,
   g_assert (!callback3_ran);
   g_assert (default_handler_ran);
 
-  g_object_unref (object);
+  xobject_unref (object);
   return 0;
 }

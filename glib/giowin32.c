@@ -45,7 +45,7 @@
  * Bug 357674 - 2 serious bugs in giowin32.c making glib iochannels useless
  * http://bugzilla.gnome.org/show_bug.cgi?id=357674
  *
- * Bug 425156 - GIOChannel deadlocks on a win32 socket
+ * Bug 425156 - xio_channel_t deadlocks on a win32 socket
  * http://bugzilla.gnome.org/show_bug.cgi?id=425156
  *
  * Bug 468910 - giofunc condition=0
@@ -103,7 +103,7 @@ typedef enum {
 } GIOWin32ChannelType;
 
 struct _GIOWin32Channel {
-  GIOChannel channel;
+  xio_channel_t channel;
   xint_t fd;			/* Either a Unix-like file handle as provided
 				 * by the Microsoft C runtime, or a SOCKET
 				 * as provided by WinSock.
@@ -161,10 +161,10 @@ struct _GIOWin32Channel {
 };
 
 struct _GIOWin32Watch {
-  GSource       source;
-  GPollFD       pollfd;
-  GIOChannel   *channel;
-  GIOCondition  condition;
+  xsource_t       source;
+  xpollfd_t       pollfd;
+  xio_channel_t   *channel;
+  xio_condition_t  condition;
 };
 
 static void
@@ -234,7 +234,7 @@ event_mask_to_string (int mask)
 }
 
 static const char *
-condition_to_string (GIOCondition condition)
+condition_to_string (xio_condition_t condition)
 {
   char buf[100];
   int checked_bits = 0;
@@ -304,7 +304,7 @@ create_events (GIOWin32Channel *channel)
     {
       xchar_t *emsg = g_win32_error_message (GetLastError ());
 
-      g_error ("Error creating event: %s", emsg);
+      xerror ("Error creating event: %s", emsg);
       g_free (emsg);
     }
 }
@@ -316,7 +316,7 @@ read_thread (void *parameter)
   guchar *buffer;
   xint_t nbytes;
 
-  g_io_channel_ref ((GIOChannel *)channel);
+  g_io_channel_ref ((xio_channel_t *)channel);
 
   if (channel->debug)
     g_print ("read_thread %#x: start fd=%d, data_avail=%p space_avail=%p\n",
@@ -410,7 +410,7 @@ read_thread (void *parameter)
   SetEvent (channel->data_avail_event);
   LeaveCriticalSection (&channel->mutex);
 
-  g_io_channel_unref ((GIOChannel *)channel);
+  g_io_channel_unref ((xio_channel_t *)channel);
 
   /* No need to call _endthreadex(), the actual thread starter routine
    * in MSVCRT (see crt/src/threadex.c:_threadstartex) calls
@@ -427,7 +427,7 @@ write_thread (void *parameter)
   guchar *buffer;
   xint_t nbytes;
 
-  g_io_channel_ref ((GIOChannel *)channel);
+  g_io_channel_ref ((xio_channel_t *)channel);
 
   if (channel->debug)
     g_print ("write_thread %#x: start fd=%d, data_avail=%p space_avail=%p\n",
@@ -526,14 +526,14 @@ write_thread (void *parameter)
 
   LeaveCriticalSection (&channel->mutex);
 
-  g_io_channel_unref ((GIOChannel *)channel);
+  g_io_channel_unref ((xio_channel_t *)channel);
 
   return 0;
 }
 
 static void
 create_thread (GIOWin32Channel     *channel,
-	       GIOCondition         condition,
+	       xio_condition_t         condition,
 	       unsigned (__stdcall *thread) (void *parameter))
 {
   HANDLE thread_handle;
@@ -544,7 +544,7 @@ create_thread (GIOWin32Channel     *channel,
   errsv = errno;
   if (thread_handle == 0)
     g_warning ("Error creating thread: %s.",
-	       g_strerror (errsv));
+	       xstrerror (errsv));
   else if (!CloseHandle (thread_handle))
     {
       xchar_t *emsg = g_win32_error_message (GetLastError ());
@@ -699,11 +699,11 @@ buffer_write (GIOWin32Channel *channel,
 
 
 static xboolean_t
-g_io_win32_prepare (GSource *source,
+g_io_win32_prepare (xsource_t *source,
 		    xint_t    *timeout)
 {
   GIOWin32Watch *watch = (GIOWin32Watch *)source;
-  GIOCondition buffer_condition = g_io_channel_get_buffer_condition (watch->channel);
+  xio_condition_t buffer_condition = g_io_channel_get_buffer_condition (watch->channel);
   GIOWin32Channel *channel = (GIOWin32Channel *)watch->channel;
   int event_mask;
 
@@ -809,12 +809,12 @@ g_io_win32_prepare (GSource *source,
 }
 
 static xboolean_t
-g_io_win32_check (GSource *source)
+g_io_win32_check (xsource_t *source)
 {
   MSG msg;
   GIOWin32Watch *watch = (GIOWin32Watch *)source;
   GIOWin32Channel *channel = (GIOWin32Channel *)watch->channel;
-  GIOCondition buffer_condition = g_io_channel_get_buffer_condition (watch->channel);
+  xio_condition_t buffer_condition = g_io_channel_get_buffer_condition (watch->channel);
   WSANETWORKEVENTS events = { 0 };
 
   if (channel->debug)
@@ -952,19 +952,19 @@ g_io_win32_check (GSource *source)
 }
 
 static xboolean_t
-g_io_win32_dispatch (GSource     *source,
-		     GSourceFunc  callback,
+g_io_win32_dispatch (xsource_t     *source,
+		     xsource_func_t  callback,
 		     xpointer_t     user_data)
 {
   GIOFunc func = (GIOFunc)callback;
   GIOWin32Watch *watch = (GIOWin32Watch *)source;
   GIOWin32Channel *channel = (GIOWin32Channel *)watch->channel;
-  GIOCondition buffer_condition = g_io_channel_get_buffer_condition (watch->channel);
+  xio_condition_t buffer_condition = g_io_channel_get_buffer_condition (watch->channel);
 
   if (!func)
     {
       g_warning ("IO Watch dispatched without callback. "
-		 "You must call g_source_connect().");
+		 "You must call xsource_connect().");
       return FALSE;
     }
 
@@ -980,7 +980,7 @@ g_io_win32_dispatch (GSource     *source,
 }
 
 static void
-g_io_win32_finalize (GSource *source)
+g_io_win32_finalize (xsource_t *source)
 {
   GIOWin32Watch *watch = (GIOWin32Watch *)source;
   GIOWin32Channel *channel = (GIOWin32Channel *)watch->channel;
@@ -1019,7 +1019,7 @@ g_io_win32_finalize (GSource *source)
   g_io_channel_unref (watch->channel);
 }
 
-GSourceFuncs g_io_watch_funcs = {
+xsource_funcs_t g_io_watch_funcs = {
   g_io_win32_prepare,
   g_io_win32_check,
   g_io_win32_dispatch,
@@ -1029,7 +1029,7 @@ GSourceFuncs g_io_watch_funcs = {
 };
 
 static GIOStatus
-g_io_win32_msg_read (GIOChannel *channel,
+g_io_win32_msg_read (xio_channel_t *channel,
 		     xchar_t      *buf,
 		     xsize_t       count,
 		     xsize_t      *bytes_read,
@@ -1060,7 +1060,7 @@ g_io_win32_msg_read (GIOChannel *channel,
 }
 
 static GIOStatus
-g_io_win32_msg_write (GIOChannel  *channel,
+g_io_win32_msg_write (xio_channel_t  *channel,
 		      const xchar_t *buf,
 		      xsize_t        count,
 		      xsize_t       *bytes_written,
@@ -1096,7 +1096,7 @@ g_io_win32_msg_write (GIOChannel  *channel,
 }
 
 static GIOStatus
-g_io_win32_msg_close (GIOChannel *channel,
+g_io_win32_msg_close (xio_channel_t *channel,
 		      xerror_t    **err)
 {
   /* Nothing to be done. Or should we set hwnd to some invalid value? */
@@ -1105,7 +1105,7 @@ g_io_win32_msg_close (GIOChannel *channel,
 }
 
 static void
-g_io_win32_free (GIOChannel *channel)
+g_io_win32_free (xio_channel_t *channel)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
 
@@ -1164,15 +1164,15 @@ g_io_win32_free (GIOChannel *channel)
   g_free (win32_channel);
 }
 
-static GSource *
-g_io_win32_msg_create_watch (GIOChannel   *channel,
-			     GIOCondition  condition)
+static xsource_t *
+g_io_win32_msg_create_watch (xio_channel_t   *channel,
+			     xio_condition_t  condition)
 {
   GIOWin32Watch *watch;
-  GSource *source;
+  xsource_t *source;
 
-  source = g_source_new (&g_io_watch_funcs, sizeof (GIOWin32Watch));
-  g_source_set_static_name (source, "GIOChannel (Win32)");
+  source = xsource_new (&g_io_watch_funcs, sizeof (GIOWin32Watch));
+  xsource_set_static_name (source, "xio_channel_t (Win32)");
   watch = (GIOWin32Watch *)source;
 
   watch->channel = channel;
@@ -1183,13 +1183,13 @@ g_io_win32_msg_create_watch (GIOChannel   *channel,
   watch->pollfd.fd = (gintptr) G_WIN32_MSG_HANDLE;
   watch->pollfd.events = condition;
 
-  g_source_add_poll (source, &watch->pollfd);
+  xsource_add_poll (source, &watch->pollfd);
 
   return source;
 }
 
 static GIOStatus
-g_io_win32_fd_and_console_read (GIOChannel *channel,
+g_io_win32_fd_and_console_read (xio_channel_t *channel,
 				xchar_t      *buf,
 				xsize_t       count,
 				xsize_t      *bytes_read,
@@ -1227,7 +1227,7 @@ g_io_win32_fd_and_console_read (GIOChannel *channel,
 	default:
 	  g_set_error_literal (err, G_IO_CHANNEL_ERROR,
                                g_io_channel_error_from_errno (errsv),
-                               g_strerror (errsv));
+                               xstrerror (errsv));
 	  return G_IO_STATUS_ERROR;
         }
     }
@@ -1238,7 +1238,7 @@ g_io_win32_fd_and_console_read (GIOChannel *channel,
 }
 
 static GIOStatus
-g_io_win32_fd_and_console_write (GIOChannel  *channel,
+g_io_win32_fd_and_console_write (xio_channel_t  *channel,
 				 const xchar_t *buf,
 				 xsize_t        count,
 				 xsize_t       *bytes_written,
@@ -1273,7 +1273,7 @@ g_io_win32_fd_and_console_write (GIOChannel  *channel,
 	default:
 	  g_set_error_literal (err, G_IO_CHANNEL_ERROR,
                                g_io_channel_error_from_errno (errsv),
-                               g_strerror (errsv));
+                               xstrerror (errsv));
 	  return G_IO_STATUS_ERROR;
         }
     }
@@ -1284,7 +1284,7 @@ g_io_win32_fd_and_console_write (GIOChannel  *channel,
 }
 
 static GIOStatus
-g_io_win32_fd_seek (GIOChannel *channel,
+g_io_win32_fd_seek (xio_channel_t *channel,
 		    gint64      offset,
 		    GSeekType   type,
 		    xerror_t    **err)
@@ -1317,7 +1317,7 @@ g_io_win32_fd_seek (GIOChannel *channel,
     {
       g_set_error_literal (err, G_IO_CHANNEL_ERROR,
                            g_io_channel_error_from_errno (errsv),
-                           g_strerror (errsv));
+                           xstrerror (errsv));
       return G_IO_STATUS_ERROR;
     }
 
@@ -1325,7 +1325,7 @@ g_io_win32_fd_seek (GIOChannel *channel,
 }
 
 static GIOStatus
-g_io_win32_fd_close (GIOChannel *channel,
+g_io_win32_fd_close (xio_channel_t *channel,
 	             xerror_t    **err)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
@@ -1364,12 +1364,12 @@ g_io_win32_fd_close (GIOChannel *channel,
   return G_IO_STATUS_NORMAL;
 }
 
-static GSource *
-g_io_win32_fd_create_watch (GIOChannel    *channel,
-			    GIOCondition   condition)
+static xsource_t *
+g_io_win32_fd_create_watch (xio_channel_t    *channel,
+			    xio_condition_t   condition)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
-  GSource *source = g_source_new (&g_io_watch_funcs, sizeof (GIOWin32Watch));
+  xsource_t *source = xsource_new (&g_io_watch_funcs, sizeof (GIOWin32Watch));
   GIOWin32Watch *watch = (GIOWin32Watch *)source;
 
   watch->channel = channel;
@@ -1397,14 +1397,14 @@ g_io_win32_fd_create_watch (GIOChannel    *channel,
 	create_thread (win32_channel, condition, write_thread);
     }
 
-  g_source_add_poll (source, &watch->pollfd);
+  xsource_add_poll (source, &watch->pollfd);
   LeaveCriticalSection (&win32_channel->mutex);
 
   return source;
 }
 
 static GIOStatus
-g_io_win32_console_close (GIOChannel *channel,
+g_io_win32_console_close (xio_channel_t *channel,
 		          xerror_t    **err)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
@@ -1414,19 +1414,19 @@ g_io_win32_console_close (GIOChannel *channel,
       int errsv = errno;
       g_set_error_literal (err, G_IO_CHANNEL_ERROR,
                            g_io_channel_error_from_errno (errsv),
-                           g_strerror (errsv));
+                           xstrerror (errsv));
       return G_IO_STATUS_ERROR;
     }
 
   return G_IO_STATUS_NORMAL;
 }
 
-static GSource *
-g_io_win32_console_create_watch (GIOChannel    *channel,
-				 GIOCondition   condition)
+static xsource_t *
+g_io_win32_console_create_watch (xio_channel_t    *channel,
+				 xio_condition_t   condition)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
-  GSource *source = g_source_new (&g_io_watch_funcs, sizeof (GIOWin32Watch));
+  xsource_t *source = xsource_new (&g_io_watch_funcs, sizeof (GIOWin32Watch));
   GIOWin32Watch *watch = (GIOWin32Watch *)source;
 
   watch->channel = channel;
@@ -1437,13 +1437,13 @@ g_io_win32_console_create_watch (GIOChannel    *channel,
   watch->pollfd.fd = _get_osfhandle (win32_channel->fd);
   watch->pollfd.events = condition;
 
-  g_source_add_poll (source, &watch->pollfd);
+  xsource_add_poll (source, &watch->pollfd);
 
   return source;
 }
 
 static GIOStatus
-g_io_win32_sock_read (GIOChannel *channel,
+g_io_win32_sock_read (xio_channel_t *channel,
 		      xchar_t      *buf,
 		      xsize_t       count,
 		      xsize_t      *bytes_read,
@@ -1504,7 +1504,7 @@ g_io_win32_sock_read (GIOChannel *channel,
 }
 
 static GIOStatus
-g_io_win32_sock_write (GIOChannel  *channel,
+g_io_win32_sock_write (xio_channel_t  *channel,
 		       const xchar_t *buf,
 		       xsize_t        count,
 		       xsize_t       *bytes_written,
@@ -1566,7 +1566,7 @@ g_io_win32_sock_write (GIOChannel  *channel,
 }
 
 static GIOStatus
-g_io_win32_sock_close (GIOChannel *channel,
+g_io_win32_sock_close (xio_channel_t *channel,
 		       xerror_t    **err)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
@@ -1586,12 +1586,12 @@ g_io_win32_sock_close (GIOChannel *channel,
   return G_IO_STATUS_NORMAL;
 }
 
-static GSource *
-g_io_win32_sock_create_watch (GIOChannel    *channel,
-			      GIOCondition   condition)
+static xsource_t *
+g_io_win32_sock_create_watch (xio_channel_t    *channel,
+			      xio_condition_t   condition)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
-  GSource *source = g_source_new (&g_io_watch_funcs, sizeof (GIOWin32Watch));
+  xsource_t *source = xsource_new (&g_io_watch_funcs, sizeof (GIOWin32Watch));
   GIOWin32Watch *watch = (GIOWin32Watch *)source;
 
   watch->channel = channel;
@@ -1610,18 +1610,18 @@ g_io_win32_sock_create_watch (GIOChannel    *channel,
 	     channel, win32_channel->fd, (HANDLE) watch->pollfd.fd,
 	     condition_to_string (watch->condition));
 
-  g_source_add_poll (source, &watch->pollfd);
+  xsource_add_poll (source, &watch->pollfd);
 
   return source;
 }
 
-GIOChannel *
+xio_channel_t *
 g_io_channel_new_file (const xchar_t  *filename,
                        const xchar_t  *mode,
                        xerror_t      **error)
 {
   int fid, flags, pmode;
-  GIOChannel *channel;
+  xio_channel_t *channel;
 
   enum { /* Cheesy hack */
     MODE_R = 1 << 0,
@@ -1711,10 +1711,10 @@ g_io_channel_new_file (const xchar_t  *filename,
 
   if (fid < 0)
     {
-      g_set_error_literal (error, G_FILE_ERROR,
-                           g_file_error_from_errno (errsv),
-                           g_strerror (errsv));
-      return (GIOChannel *)NULL;
+      g_set_error_literal (error, XFILE_ERROR,
+                           xfile_error_from_errno (errsv),
+                           xstrerror (errsv));
+      return (xio_channel_t *)NULL;
     }
 
   channel = g_io_channel_win32_new_fd (fid);
@@ -1749,7 +1749,7 @@ g_io_channel_new_file (const xchar_t  *filename,
 }
 
 static GIOStatus
-g_io_win32_unimpl_set_flags (GIOChannel *channel,
+g_io_win32_unimpl_set_flags (xio_channel_t *channel,
 			     GIOFlags    flags,
 			     xerror_t    **err)
 {
@@ -1770,7 +1770,7 @@ g_io_win32_unimpl_set_flags (GIOChannel *channel,
 }
 
 static GIOFlags
-g_io_win32_fd_get_flags_internal (GIOChannel      *channel,
+g_io_win32_fd_get_flags_internal (xio_channel_t      *channel,
 				  struct _stati64 *st)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *) channel;
@@ -1801,7 +1801,7 @@ g_io_win32_fd_get_flags_internal (GIOChannel      *channel,
 }
 
 static GIOFlags
-g_io_win32_fd_get_flags (GIOChannel *channel)
+g_io_win32_fd_get_flags (xio_channel_t *channel)
 {
   struct _stati64 st;
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
@@ -1816,7 +1816,7 @@ g_io_win32_fd_get_flags (GIOChannel *channel)
 }
 
 static GIOFlags
-g_io_win32_console_get_flags_internal (GIOChannel  *channel)
+g_io_win32_console_get_flags_internal (xio_channel_t  *channel)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *) channel;
   HANDLE handle = (HANDLE) _get_osfhandle (win32_channel->fd);
@@ -1832,7 +1832,7 @@ g_io_win32_console_get_flags_internal (GIOChannel  *channel)
 }
 
 static GIOFlags
-g_io_win32_console_get_flags (GIOChannel *channel)
+g_io_win32_console_get_flags (xio_channel_t *channel)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
 
@@ -1843,13 +1843,13 @@ g_io_win32_console_get_flags (GIOChannel *channel)
 }
 
 static GIOFlags
-g_io_win32_msg_get_flags (GIOChannel *channel)
+g_io_win32_msg_get_flags (xio_channel_t *channel)
 {
   return 0;
 }
 
 static GIOStatus
-g_io_win32_sock_set_flags (GIOChannel *channel,
+g_io_win32_sock_set_flags (xio_channel_t *channel,
 			   GIOFlags    flags,
 			   xerror_t    **err)
 {
@@ -1898,7 +1898,7 @@ g_io_win32_sock_set_flags (GIOChannel *channel,
 }
 
 static GIOFlags
-g_io_win32_sock_get_flags (GIOChannel *channel)
+g_io_win32_sock_get_flags (xio_channel_t *channel)
 {
   /* Could we do something here? */
   return 0;
@@ -1952,14 +1952,14 @@ static GIOFuncs win32_channel_sock_funcs = {
  * g_io_channel_win32_new_messages:
  * @hwnd: a window handle.
  *
- * Creates a new #GIOChannel given a window handle on Windows.
+ * Creates a new #xio_channel_t given a window handle on Windows.
  *
- * This function creates a #GIOChannel that can be used to poll for
+ * This function creates a #xio_channel_t that can be used to poll for
  * Windows messages for the window in question.
  *
- * Returns: a new #GIOChannel.
+ * Returns: a new #xio_channel_t.
  **/
-GIOChannel *
+xio_channel_t *
 #if XPL_SIZEOF_VOID_P == 8
 g_io_channel_win32_new_messages (xsize_t hwnd)
 #else
@@ -1967,7 +1967,7 @@ g_io_channel_win32_new_messages (xuint_t hwnd)
 #endif
 {
   GIOWin32Channel *win32_channel = g_new (GIOWin32Channel, 1);
-  GIOChannel *channel = (GIOChannel *)win32_channel;
+  xio_channel_t *channel = (xio_channel_t *)win32_channel;
 
   g_io_channel_init (channel);
   g_io_channel_win32_init (win32_channel);
@@ -1987,15 +1987,15 @@ g_io_channel_win32_new_messages (xuint_t hwnd)
   return channel;
 }
 
-static GIOChannel *
+static xio_channel_t *
 g_io_channel_win32_new_fd_internal (xint_t             fd,
 				    struct _stati64 *st)
 {
   GIOWin32Channel *win32_channel;
-  GIOChannel *channel;
+  xio_channel_t *channel;
 
   win32_channel = g_new (GIOWin32Channel, 1);
-  channel = (GIOChannel *)win32_channel;
+  channel = (xio_channel_t *)win32_channel;
 
   g_io_channel_init (channel);
   g_io_channel_win32_init (win32_channel);
@@ -2026,7 +2026,7 @@ g_io_channel_win32_new_fd_internal (xint_t             fd,
  * g_io_channel_win32_new_fd:
  * @fd: a C library file descriptor.
  *
- * Creates a new #GIOChannel given a file descriptor on Windows. This
+ * Creates a new #xio_channel_t given a file descriptor on Windows. This
  * works for file descriptors from the C runtime.
  *
  * This function works for file descriptors as returned by the open(),
@@ -2039,7 +2039,7 @@ g_io_channel_win32_new_fd_internal (xint_t             fd,
  * The GNU compiler and toolchain for Windows, also known as Mingw,
  * fully supports msvcrt.dll.
  *
- * If you have created a #GIOChannel for a file descriptor and started
+ * If you have created a #xio_channel_t for a file descriptor and started
  * watching (polling) it, you shouldn't call read() on the file
  * descriptor. This is because adding polling for a file descriptor is
  * implemented in GLib on Windows by starting a thread that sits
@@ -2049,9 +2049,9 @@ g_io_channel_win32_new_fd_internal (xint_t             fd,
  *
  * This function is available only in GLib on Windows.
  *
- * Returns: a new #GIOChannel.
+ * Returns: a new #xio_channel_t.
  **/
-GIOChannel *
+xio_channel_t *
 g_io_channel_win32_new_fd (xint_t fd)
 {
   struct _stati64 st;
@@ -2066,7 +2066,7 @@ g_io_channel_win32_new_fd (xint_t fd)
 }
 
 xint_t
-g_io_channel_win32_get_fd (GIOChannel *channel)
+g_io_channel_win32_get_fd (xio_channel_t *channel)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
 
@@ -2077,22 +2077,22 @@ g_io_channel_win32_get_fd (GIOChannel *channel)
  * g_io_channel_win32_new_socket:
  * @socket: a Winsock socket
  *
- * Creates a new #GIOChannel given a socket on Windows.
+ * Creates a new #xio_channel_t given a socket on Windows.
  *
  * This function works for sockets created by Winsock. It's available
  * only in GLib on Windows.
  *
- * Polling a #GSource created to watch a channel for a socket puts the
+ * Polling a #xsource_t created to watch a channel for a socket puts the
  * socket in non-blocking mode. This is a side-effect of the
  * implementation and unavoidable.
  *
- * Returns: a new #GIOChannel
+ * Returns: a new #xio_channel_t
  **/
-GIOChannel *
+xio_channel_t *
 g_io_channel_win32_new_socket (int socket)
 {
   GIOWin32Channel *win32_channel = g_new (GIOWin32Channel, 1);
-  GIOChannel *channel = (GIOChannel *)win32_channel;
+  xio_channel_t *channel = (xio_channel_t *)win32_channel;
 
   g_io_channel_init (channel);
   g_io_channel_win32_init (win32_channel);
@@ -2110,7 +2110,7 @@ g_io_channel_win32_new_socket (int socket)
   return channel;
 }
 
-GIOChannel *
+xio_channel_t *
 g_io_channel_unix_new (xint_t fd)
 {
   xboolean_t is_fd, is_socket;
@@ -2137,13 +2137,13 @@ g_io_channel_unix_new (xint_t fd)
 }
 
 xint_t
-g_io_channel_unix_get_fd (GIOChannel *channel)
+g_io_channel_unix_get_fd (xio_channel_t *channel)
 {
   return g_io_channel_win32_get_fd (channel);
 }
 
 void
-g_io_channel_win32_set_debug (GIOChannel *channel,
+g_io_channel_win32_set_debug (xio_channel_t *channel,
 			      xboolean_t    flag)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
@@ -2152,7 +2152,7 @@ g_io_channel_win32_set_debug (GIOChannel *channel,
 }
 
 xint_t
-g_io_channel_win32_poll (GPollFD *fds,
+g_io_channel_win32_poll (xpollfd_t *fds,
 			 xint_t     n_fds,
 			 xint_t     timeout)
 {
@@ -2162,9 +2162,9 @@ g_io_channel_win32_poll (GPollFD *fds,
 }
 
 void
-g_io_channel_win32_make_pollfd (GIOChannel   *channel,
-				GIOCondition  condition,
-				GPollFD      *fd)
+g_io_channel_win32_make_pollfd (xio_channel_t   *channel,
+				xio_condition_t  condition,
+				xpollfd_t      *fd)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
 
@@ -2214,7 +2214,7 @@ g_io_channel_win32_make_pollfd (GIOChannel   *channel,
 #ifndef _WIN64
 
 /* Binary compatibility */
-GIOChannel *
+xio_channel_t *
 g_io_channel_win32_new_stream_socket (int socket)
 {
   return g_io_channel_win32_new_socket (socket);
@@ -2226,11 +2226,11 @@ g_io_channel_win32_new_stream_socket (int socket)
 
 /* Binary compatibility versions. Not for newly compiled code. */
 
-_XPL_EXTERN GIOChannel *g_io_channel_new_file_utf8 (const xchar_t  *filename,
+_XPL_EXTERN xio_channel_t *g_io_channel_new_file_utf8 (const xchar_t  *filename,
                                                      const xchar_t  *mode,
                                                      xerror_t      **error);
 
-GIOChannel *
+xio_channel_t *
 g_io_channel_new_file_utf8 (const xchar_t  *filename,
                             const xchar_t  *mode,
                             xerror_t      **error)

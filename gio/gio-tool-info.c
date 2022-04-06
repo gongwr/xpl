@@ -44,41 +44,41 @@ static const GOptionEntry entries[] = {
 static char *
 escape_string (const char *in)
 {
-  GString *str;
+  xstring_t *str;
   static char *hex_digits = "0123456789abcdef";
   unsigned char c;
 
 
-  str = g_string_new ("");
+  str = xstring_new ("");
 
   while ((c = *in++) != 0)
     {
       if (c >= 32 && c <= 126 && c != '\\')
-        g_string_append_c (str, c);
+        xstring_append_c (str, c);
       else
         {
-          g_string_append (str, "\\x");
-          g_string_append_c (str, hex_digits[(c >> 4) & 0xf]);
-          g_string_append_c (str, hex_digits[c & 0xf]);
+          xstring_append (str, "\\x");
+          xstring_append_c (str, hex_digits[(c >> 4) & 0xf]);
+          xstring_append_c (str, hex_digits[c & 0xf]);
         }
     }
 
-  return g_string_free (str, FALSE);
+  return xstring_free (str, FALSE);
 }
 
 static void
-show_attributes (GFileInfo *info)
+show_attributes (xfile_info_t *info)
 {
   char **attributes;
   char *s;
   int i;
 
-  attributes = g_file_info_list_attributes (info, NULL);
+  attributes = xfile_info_list_attributes (info, NULL);
 
   g_print (_("attributes:\n"));
   for (i = 0; attributes[i] != NULL; i++)
     {
-      /* list the icons in order rather than displaying "GThemedIcon:0x8df7200" */
+      /* list the icons in order rather than displaying "xthemed_icon_t:0x8df7200" */
       if (strcmp (attributes[i], "standard::icon") == 0 ||
           strcmp (attributes[i], "standard::symbolic-icon") == 0)
         {
@@ -87,11 +87,11 @@ show_attributes (GFileInfo *info)
           const char * const *names = NULL;
 
           if (strcmp (attributes[i], "standard::symbolic-icon") == 0)
-            icon = g_file_info_get_symbolic_icon (info);
+            icon = xfile_info_get_symbolic_icon (info);
           else
-            icon = g_file_info_get_icon (info);
+            icon = xfile_info_get_icon (info);
 
-          /* only look up names if GThemedIcon */
+          /* only look up names if xthemed_icon_t */
           if (X_IS_THEMED_ICON(icon))
             {
               names = g_themed_icon_get_names (G_THEMED_ICON (icon));
@@ -102,43 +102,43 @@ show_attributes (GFileInfo *info)
             }
           else
             {
-              s = g_file_info_get_attribute_as_string (info, attributes[i]);
+              s = xfile_info_get_attribute_as_string (info, attributes[i]);
               g_print ("  %s: %s\n", attributes[i], s);
               g_free (s);
             }
         }
       else
         {
-          s = g_file_info_get_attribute_as_string (info, attributes[i]);
+          s = xfile_info_get_attribute_as_string (info, attributes[i]);
           g_print ("  %s: %s\n", attributes[i], s);
           g_free (s);
         }
     }
-  g_strfreev (attributes);
+  xstrfreev (attributes);
 }
 
 static void
-show_info (xfile_t *file, GFileInfo *info)
+show_info (xfile_t *file, xfile_info_t *info)
 {
   const char *name, *type;
   char *escaped, *uri;
-  goffset size;
+  xoffset_t size;
   const char *path;
 #ifdef G_OS_UNIX
   GUnixMountEntry *entry;
 #endif
 
-  name = g_file_info_get_display_name (info);
+  name = xfile_info_get_display_name (info);
   if (name)
     /* Translators: This is a noun and represents and attribute of a file */
     g_print (_("display name: %s\n"), name);
 
-  name = g_file_info_get_edit_name (info);
+  name = xfile_info_get_edit_name (info);
   if (name)
     /* Translators: This is a noun and represents and attribute of a file */
     g_print (_("edit name: %s\n"), name);
 
-  name = g_file_info_get_name (info);
+  name = xfile_info_get_name (info);
   if (name)
     {
       escaped = escape_string (name);
@@ -146,27 +146,27 @@ show_info (xfile_t *file, GFileInfo *info)
       g_free (escaped);
     }
 
-  if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_TYPE))
+  if (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_TYPE))
     {
-      type = file_type_to_string (g_file_info_get_file_type (info));
+      type = file_type_to_string (xfile_info_get_file_type (info));
       g_print (_("type: %s\n"), type);
     }
 
-  if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_SIZE))
+  if (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_SIZE))
     {
-      size = g_file_info_get_size (info);
+      size = xfile_info_get_size (info);
       g_print (_("size: "));
-      g_print (" %"G_GUINT64_FORMAT"\n", (guint64)size);
+      g_print (" %"G_GUINT64_FORMAT"\n", (xuint64_t)size);
     }
 
-  if (g_file_info_get_is_hidden (info))
+  if (xfile_info_get_is_hidden (info))
     g_print (_("hidden\n"));
 
-  uri = g_file_get_uri (file);
+  uri = xfile_get_uri (file);
   g_print (_("uri: %s\n"), uri);
   g_free (uri);
 
-  path = g_file_peek_path (file);
+  path = xfile_peek_path (file);
   if (path)
     {
       g_print (_("local path: %s\n"), path);
@@ -185,21 +185,21 @@ show_info (xfile_t *file, GFileInfo *info)
           const xchar_t *options;
           xchar_t *options_string = NULL;
 
-          device = g_strescape (g_unix_mount_get_device_path (entry), NULL);
+          device = xstrescape (g_unix_mount_get_device_path (entry), NULL);
           root = g_unix_mount_get_root_path (entry);
-          if (root != NULL && g_strcmp0 (root, "/") != 0)
+          if (root != NULL && xstrcmp0 (root, "/") != 0)
             {
-              escaped = g_strescape (root, NULL);
-              root_string = g_strconcat ("[", escaped, "]", NULL);
+              escaped = xstrescape (root, NULL);
+              root_string = xstrconcat ("[", escaped, "]", NULL);
               g_free (escaped);
             }
-          mount = g_strescape (g_unix_mount_get_mount_path (entry), NULL);
-          fs = g_strescape (g_unix_mount_get_fs_type (entry), NULL);
+          mount = xstrescape (g_unix_mount_get_mount_path (entry), NULL);
+          fs = xstrescape (g_unix_mount_get_fs_type (entry), NULL);
 
           options = g_unix_mount_get_options (entry);
           if (options != NULL)
             {
-              options_string = g_strescape (options, NULL);
+              options_string = xstrescape (options, NULL);
             }
 
           g_print (_("unix mount: %s%s %s %s %s\n"), device,
@@ -223,8 +223,8 @@ show_info (xfile_t *file, GFileInfo *info)
 static xboolean_t
 query_info (xfile_t *file)
 {
-  GFileQueryInfoFlags flags;
-  GFileInfo *info;
+  xfile_query_info_flags_t flags;
+  xfile_info_t *info;
   xerror_t *error;
 
   if (file == NULL)
@@ -235,18 +235,18 @@ query_info (xfile_t *file)
 
   flags = 0;
   if (nofollow_symlinks)
-    flags |= G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS;
+    flags |= XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS;
 
   error = NULL;
   if (filesystem)
-    info = g_file_query_filesystem_info (file, attributes, NULL, &error);
+    info = xfile_query_filesystem_info (file, attributes, NULL, &error);
   else
-    info = g_file_query_info (file, attributes, flags, NULL, &error);
+    info = xfile_query_info (file, attributes, flags, NULL, &error);
 
   if (info == NULL)
     {
       print_file_error (file, error->message);
-      g_error_free (error);
+      xerror_free (error);
       return FALSE;
     }
 
@@ -255,7 +255,7 @@ query_info (xfile_t *file)
   else
     show_info (file, info);
 
-  g_object_unref (info);
+  xobject_unref (info);
 
   return TRUE;
 }
@@ -263,7 +263,7 @@ query_info (xfile_t *file)
 static xboolean_t
 get_writable_info (xfile_t *file)
 {
-  GFileAttributeInfoList *list;
+  xfile_attribute_info_list_t *list;
   xerror_t *error;
   int i;
   char *flags;
@@ -273,11 +273,11 @@ get_writable_info (xfile_t *file)
 
   error = NULL;
 
-  list = g_file_query_settable_attributes (file, NULL, &error);
+  list = xfile_query_settable_attributes (file, NULL, &error);
   if (list == NULL)
     {
       print_file_error (file, error->message);
-      g_error_free (error);
+      xerror_free (error);
       return FALSE;
     }
 
@@ -295,13 +295,13 @@ get_writable_info (xfile_t *file)
         }
     }
 
-  g_file_attribute_info_list_unref (list);
+  xfile_attribute_info_list_unref (list);
 
-  list = g_file_query_writable_namespaces (file, NULL, &error);
+  list = xfile_query_writable_namespaces (file, NULL, &error);
   if (list == NULL)
     {
       print_file_error (file, error->message);
-      g_error_free (error);
+      xerror_free (error);
       return FALSE;
     }
 
@@ -319,7 +319,7 @@ get_writable_info (xfile_t *file)
         }
     }
 
-  g_file_attribute_info_list_unref (list);
+  xfile_attribute_info_list_unref (list);
 
   return TRUE;
 }
@@ -327,7 +327,7 @@ get_writable_info (xfile_t *file)
 int
 handle_info (int argc, char *argv[], xboolean_t do_help)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xchar_t *param;
   xerror_t *error = NULL;
   xboolean_t res;
@@ -337,7 +337,7 @@ handle_info (int argc, char *argv[], xboolean_t do_help)
   g_set_prgname ("gio info");
 
   /* Translators: commandline placeholder */
-  param = g_strdup_printf ("%s…", _("LOCATION"));
+  param = xstrdup_printf ("%s…", _("LOCATION"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -361,7 +361,7 @@ handle_info (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      g_error_free (error);
+      xerror_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -378,12 +378,12 @@ handle_info (int argc, char *argv[], xboolean_t do_help)
   res = TRUE;
   for (i = 1; i < argc; i++)
     {
-      file = g_file_new_for_commandline_arg (argv[i]);
+      file = xfile_new_for_commandline_arg (argv[i]);
       if (writable)
         res &= get_writable_info (file);
       else
         res &= query_info (file);
-      g_object_unref (file);
+      xobject_unref (file);
     }
 
   return res ? 0 : 2;

@@ -3,19 +3,19 @@
 #include <string.h>
 
 static void
-activate (GApplication *application)
+activate (xapplication_t *application)
 {
   g_print ("activated\n");
 
   /* Note: when doing a longer-lasting action here that returns
-   * to the mainloop, you should use g_application_hold() and
-   * g_application_release() to keep the application alive until
+   * to the mainloop, you should use xapplication_hold() and
+   * xapplication_release() to keep the application alive until
    * the action is completed.
    */
 }
 
 static void
-open (GApplication  *application,
+open (xapplication_t  *application,
       xfile_t        **files,
       xint_t           n_files,
       const xchar_t   *hint)
@@ -24,14 +24,14 @@ open (GApplication  *application,
 
   for (i = 0; i < n_files; i++)
     {
-      xchar_t *uri = g_file_get_uri (files[i]);
+      xchar_t *uri = xfile_get_uri (files[i]);
       g_print ("open %s\n", uri);
       g_free (uri);
     }
 
   /* Note: when doing a longer-lasting action here that returns
-   * to the mainloop, you should use g_application_hold() and
-   * g_application_release() to keep the application alive until
+   * to the mainloop, you should use xapplication_hold() and
+   * xapplication_release() to keep the application alive until
    * the action is completed.
    */
 }
@@ -39,18 +39,18 @@ open (GApplication  *application,
 int
 main (int argc, char **argv)
 {
-  GApplication *app;
+  xapplication_t *app;
   int status;
 
-  app = g_application_new ("org.gtk.TestApplication",
+  app = xapplication_new ("org.gtk.TestApplication",
                            G_APPLICATION_HANDLES_OPEN);
   g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
   g_signal_connect (app, "open", G_CALLBACK (open), NULL);
-  g_application_set_inactivity_timeout (app, 10000);
+  xapplication_set_inactivity_timeout (app, 10000);
 
-  status = g_application_run (app, argc, argv);
+  status = xapplication_run (app, argc, argv);
 
-  g_object_unref (app);
+  xobject_unref (app);
 
   return status;
 }

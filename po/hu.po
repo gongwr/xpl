@@ -34,17 +34,17 @@ msgstr ""
 "támogatott"
 
 #: gio/gapplication.c:497
-msgid "GApplication options"
-msgstr "GApplication kapcsolói"
+msgid "xapplication_t options"
+msgstr "xapplication_t kapcsolói"
 
 #: gio/gapplication.c:497
-msgid "Show GApplication options"
-msgstr "A GApplication kapcsolóinak megjelenítése"
+msgid "Show xapplication_t options"
+msgstr "A xapplication_t kapcsolóinak megjelenítése"
 
 #: gio/gapplication.c:542
-msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
 msgstr ""
-"Belépés GApplication szolgáltatásmódba (használja D-Bus "
+"Belépés xapplication_t szolgáltatásmódba (használja D-Bus "
 "szolgáltatásfájlokból)"
 
 #: gio/gapplication.c:554
@@ -283,8 +283,8 @@ msgid "Seek not supported on base stream"
 msgstr "Az alap adatfolyam nem támogatja a pozicionálást"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "A GBufferedInputStream nem csonkítható"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "A xbuffered_input_stream nem csonkítható"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -357,20 +357,20 @@ msgid "%s filetype"
 msgstr "%s fájltípus"
 
 #: gio/gcredentials.c:335
-msgid "GCredentials contains invalid data"
-msgstr "A GCredentials érvénytelen adatot tartalmaz"
+msgid "xcredentials_t contains invalid data"
+msgstr "A xcredentials_t érvénytelen adatot tartalmaz"
 
 #: gio/gcredentials.c:395 gio/gcredentials.c:686
-msgid "GCredentials is not implemented on this OS"
-msgstr "A GCredentials nincs megvalósítva ezen a rendszeren"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "A xcredentials_t nincs megvalósítva ezen a rendszeren"
 
 #: gio/gcredentials.c:550 gio/gcredentials.c:568
-msgid "There is no GCredentials support for your platform"
-msgstr "A platformhoz nincs GCredentials támogatás"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "A platformhoz nincs xcredentials_t támogatás"
 
 #: gio/gcredentials.c:626
-msgid "GCredentials does not contain a process ID on this OS"
-msgstr "A GCredentials nem tartalmaz folyamatazonosítót ezen a rendszeren"
+msgid "xcredentials_t does not contain a process ID on this OS"
+msgstr "A xcredentials_t nem tartalmaz folyamatazonosítót ezen a rendszeren"
 
 #: gio/gcredentials.c:680
 msgid "Credentials spoofing is not possible on this OS"
@@ -573,9 +573,9 @@ msgstr ""
 "kiszolgálónál"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
 msgstr ""
-"Megszakítva a GDBusAuthObserver::authorize-authenticated-peer használatával"
+"Megszakítva a xdbus_auth_observer_t::authorize-authenticated-peer használatával"
 
 #: gio/gdbusauthmechanismsha1.c:299
 #, c-format
@@ -1386,27 +1386,27 @@ msgstr "A DTLS-támogatás nem érhető el"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of GEmblem encoding"
-msgstr "A GEmblem kódolás %d. verziója nem kezelhető"
+msgid "Can’t handle version %d of xemblem_t encoding"
+msgstr "A xemblem_t kódolás %d. verziója nem kezelhető"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "A GEmblem kódolásban a jelsorok száma (%d) hibásan formált"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "A xemblem_t kódolásban a jelsorok száma (%d) hibásan formált"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of GEmblemedIcon encoding"
-msgstr "A GEmblemedIcon kódolás %d. verziója nem kezelhető"
+msgid "Can’t handle version %d of xemblemed_icon_t encoding"
+msgstr "A xemblemed_icon_t kódolás %d. verziója nem kezelhető"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "A GEmblemedIcon kódolásban a jelsorok száma (%d) hibásan formált"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "A xemblemed_icon_t kódolásban a jelsorok száma (%d) hibásan formált"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "Egy GEmblem kellene a GEmblemedIconhoz"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "Egy xemblem_t kellene a xemblemed_icon_thoz"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1497,12 +1497,12 @@ msgstr "A fájlenumerátor már le van zárva"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of GFileIcon encoding"
-msgstr "A GFileIcon kódolás %d. verziója nem kezelhető"
+msgid "Can’t handle version %d of xfile_icon_t encoding"
+msgstr "A xfile_icon_t kódolás %d. verziója nem kezelhető"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for GFileIcon"
-msgstr "A GFileIcon bemeneti adatai rosszul formáltak"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "A xfile_icon_t bemeneti adatai rosszul formáltak"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -2996,11 +2996,11 @@ msgstr "Ne kényszerítse ki a kulcsnévmegszorításokat"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Minden GSettings sémafájl sémagyorsítótárba fordítása.\n"
+"Minden xsettings_t sémafájl sémagyorsítótárba fordítása.\n"
 "A sémafájloknak .gschema.xml kiterjesztéssel kell rendelkezniük,\n"
 "és a gyorsítótárfájl neve gschemas.compiled."
 
@@ -3368,8 +3368,8 @@ msgid "Invalid seek request"
 msgstr "Érvénytelen keresési kérés"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "A GMemoryInputStream nem csonkítható"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "A xmemory_input_stream_t nem csonkítható"
 
 #: gio/gmemoryoutputstream.c:568
 msgid "Memory output stream not resizable"
@@ -4051,8 +4051,8 @@ msgid "Error sending message: %s"
 msgstr "Hiba az üzenet küldésekor: %s"
 
 #: gio/gsocket.c:5032
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "A GSocketControlMessage nem támogatott Windowson"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "A xsocket_control_message_t nem támogatott Windowson"
 
 #: gio/gsocket.c:5505 gio/gsocket.c:5581 gio/gsocket.c:5807
 #, c-format
@@ -4200,8 +4200,8 @@ msgstr "A csővezetékek nem támogatottak ezen a platformon"
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of GThemedIcon encoding"
-msgstr "A GThemedIcon kódolás %d. verziója nem kezelhető"
+msgid "Can’t handle version %d of xthemed_icon_t encoding"
+msgstr "A xthemed_icon_t kódolás %d. verziója nem kezelhető"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4250,13 +4250,13 @@ msgid "Could not parse PEM-encoded certificate"
 msgstr "Nem dolgozható fel a PEM-kódolású tanúsítvány"
 
 #: gio/gtlscertificate.c:796
-#| msgid "This GTlsBackend does not support creating PKCS #11 certificates"
+#| msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
 msgid "The current TLS backend does not support PKCS #12"
 msgstr "A jelenlegi TLS háttérprogram nem támogatja a PKCS #12 tanúsítványokat"
 
 #: gio/gtlscertificate.c:1013
-msgid "This GTlsBackend does not support creating PKCS #11 certificates"
-msgstr "Ez a GTlsBackend nem támogatja a PKCS #11 tanúsítványok létrehozását"
+msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
+msgstr "Ez a xtls_backend_t nem támogatja a PKCS #11 tanúsítványok létrehozását"
 
 #: gio/gtlspassword.c:111
 msgid ""
@@ -4572,25 +4572,25 @@ msgstr "A(z) „%s” elérési út neve nem abszolút útvonal"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%Y. %b. %-e. %a. %H:%M:%S"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%Y. %m. %d."
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%H:%M:%S"
 
@@ -4973,13 +4973,13 @@ msgstr "dec"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "DE"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "DU"
 

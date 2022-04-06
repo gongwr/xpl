@@ -51,13 +51,13 @@ struct _GDebugControllerDBusClass
   xobject_class_t parent_class;
 
   xboolean_t (*authorize)  (GDebugControllerDBus  *controller,
-                          GDBusMethodInvocation *invocation);
+                          xdbus_method_invocation_t *invocation);
 
   xpointer_t padding[12];
 };
 
 XPL_AVAILABLE_IN_2_72
-GDebugControllerDBus *g_debug_controller_dbus_new (GDBusConnection  *connection,
+GDebugControllerDBus *g_debug_controller_dbus_new (xdbus_connection_t  *connection,
                                                    xcancellable_t     *cancellable,
                                                    xerror_t          **error);
 

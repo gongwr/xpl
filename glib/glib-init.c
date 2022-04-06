@@ -75,13 +75,13 @@ G_STATIC_ASSERT (G_ALIGNOF (TestInt) == G_ALIGNOF (int));
 G_STATIC_ASSERT (sizeof (xchar_t) == 1);
 G_STATIC_ASSERT (sizeof (guchar) == 1);
 G_STATIC_ASSERT (sizeof (gint8) * CHAR_BIT == 8);
-G_STATIC_ASSERT (sizeof (guint8) * CHAR_BIT == 8);
+G_STATIC_ASSERT (sizeof (xuint8_t) * CHAR_BIT == 8);
 G_STATIC_ASSERT (sizeof (gint16) * CHAR_BIT == 16);
-G_STATIC_ASSERT (sizeof (guint16) * CHAR_BIT == 16);
+G_STATIC_ASSERT (sizeof (xuint16_t) * CHAR_BIT == 16);
 G_STATIC_ASSERT (sizeof (gint32) * CHAR_BIT == 32);
-G_STATIC_ASSERT (sizeof (guint32) * CHAR_BIT == 32);
+G_STATIC_ASSERT (sizeof (xuint32_t) * CHAR_BIT == 32);
 G_STATIC_ASSERT (sizeof (gint64) * CHAR_BIT == 64);
-G_STATIC_ASSERT (sizeof (guint64) * CHAR_BIT == 64);
+G_STATIC_ASSERT (sizeof (xuint64_t) * CHAR_BIT == 64);
 
 G_STATIC_ASSERT (sizeof (void *) == XPL_SIZEOF_VOID_P);
 G_STATIC_ASSERT (sizeof (gintptr) == sizeof (void *));
@@ -98,14 +98,14 @@ G_STATIC_ASSERT (sizeof (size_t) == XPL_SIZEOF_SSIZE_T);
 G_STATIC_ASSERT (sizeof (xsize_t) == XPL_SIZEOF_SSIZE_T);
 G_STATIC_ASSERT (sizeof (xsize_t) == sizeof (size_t));
 /* Again this is size_t not ssize_t, because ssize_t is POSIX, not C99 */
-G_STATIC_ASSERT (sizeof (gssize) == sizeof (size_t));
+G_STATIC_ASSERT (sizeof (xssize_t) == sizeof (size_t));
 G_STATIC_ASSERT (G_ALIGNOF (xsize_t) == G_ALIGNOF (size_t));
-G_STATIC_ASSERT (G_ALIGNOF (gssize) == G_ALIGNOF (size_t));
+G_STATIC_ASSERT (G_ALIGNOF (xssize_t) == G_ALIGNOF (size_t));
 
-/* goffset is always 64-bit, even if off_t is only 32-bit
+/* xoffset_t is always 64-bit, even if off_t is only 32-bit
  * (compiling without large-file-support on 32-bit) */
-G_STATIC_ASSERT (sizeof (goffset) == sizeof (gint64));
-G_STATIC_ASSERT (G_ALIGNOF (goffset) == G_ALIGNOF (gint64));
+G_STATIC_ASSERT (sizeof (xoffset_t) == sizeof (gint64));
+G_STATIC_ASSERT (G_ALIGNOF (xoffset_t) == G_ALIGNOF (gint64));
 
 G_STATIC_ASSERT (sizeof (gfloat) == sizeof (float));
 G_STATIC_ASSERT (G_ALIGNOF (gfloat) == G_ALIGNOF (float));
@@ -118,24 +118,24 @@ G_STATIC_ASSERT (G_ALIGNOF (gintptr) == G_ALIGNOF (intptr_t));
 G_STATIC_ASSERT (G_ALIGNOF (guintptr) == G_ALIGNOF (uintptr_t));
 
 G_STATIC_ASSERT (sizeof (gint8) == sizeof (int8_t));
-G_STATIC_ASSERT (sizeof (guint8) == sizeof (uint8_t));
+G_STATIC_ASSERT (sizeof (xuint8_t) == sizeof (uint8_t));
 G_STATIC_ASSERT (G_ALIGNOF (gint8) == G_ALIGNOF (int8_t));
-G_STATIC_ASSERT (G_ALIGNOF (guint8) == G_ALIGNOF (uint8_t));
+G_STATIC_ASSERT (G_ALIGNOF (xuint8_t) == G_ALIGNOF (uint8_t));
 
 G_STATIC_ASSERT (sizeof (gint16) == sizeof (int16_t));
-G_STATIC_ASSERT (sizeof (guint16) == sizeof (uint16_t));
+G_STATIC_ASSERT (sizeof (xuint16_t) == sizeof (uint16_t));
 G_STATIC_ASSERT (G_ALIGNOF (gint16) == G_ALIGNOF (int16_t));
-G_STATIC_ASSERT (G_ALIGNOF (guint16) == G_ALIGNOF (uint16_t));
+G_STATIC_ASSERT (G_ALIGNOF (xuint16_t) == G_ALIGNOF (uint16_t));
 
 G_STATIC_ASSERT (sizeof (gint32) == sizeof (int32_t));
-G_STATIC_ASSERT (sizeof (guint32) == sizeof (uint32_t));
+G_STATIC_ASSERT (sizeof (xuint32_t) == sizeof (uint32_t));
 G_STATIC_ASSERT (G_ALIGNOF (gint32) == G_ALIGNOF (int32_t));
-G_STATIC_ASSERT (G_ALIGNOF (guint32) == G_ALIGNOF (uint32_t));
+G_STATIC_ASSERT (G_ALIGNOF (xuint32_t) == G_ALIGNOF (uint32_t));
 
 G_STATIC_ASSERT (sizeof (gint64) == sizeof (int64_t));
-G_STATIC_ASSERT (sizeof (guint64) == sizeof (uint64_t));
+G_STATIC_ASSERT (sizeof (xuint64_t) == sizeof (uint64_t));
 G_STATIC_ASSERT (G_ALIGNOF (gint64) == G_ALIGNOF (int64_t));
-G_STATIC_ASSERT (G_ALIGNOF (guint64) == G_ALIGNOF (uint64_t));
+G_STATIC_ASSERT (G_ALIGNOF (xuint64_t) == G_ALIGNOF (uint64_t));
 
 /**
  * g_mem_gc_friendly:
@@ -154,7 +154,7 @@ debug_key_matches (const xchar_t *key,
                    const xchar_t *token,
                    xuint_t        length)
 {
-  /* may not call GLib functions: see note in g_parse_debug_string() */
+  /* may not call GLib functions: see note in g_parse_debuxstring() */
   for (; length; length--, key++, token++)
     {
       char k = (*key   == '_') ? '-' : tolower (*key  );
@@ -175,7 +175,7 @@ debug_key_matches (const xchar_t *key,
 G_STATIC_ASSERT (sizeof (int) == sizeof (gint32));
 
 /**
- * g_parse_debug_string:
+ * g_parse_debuxstring:
  * @string: (nullable): a list of debug options separated by colons, spaces, or
  * commas, or %NULL.
  * @keys: (array length=nkeys): pointer to an array of #GDebugKey which associate
@@ -198,7 +198,7 @@ G_STATIC_ASSERT (sizeof (int) == sizeof (gint32));
  * Returns: the combined set of bit flags.
  */
 xuint_t
-g_parse_debug_string  (const xchar_t     *string,
+g_parse_debuxstring  (const xchar_t     *string,
                        const GDebugKey *keys,
                        xuint_t            nkeys)
 {
@@ -289,7 +289,7 @@ g_parse_debug_envvar (const xchar_t     *envvar,
   if (value == NULL)
     return default_value;
 
-  return g_parse_debug_string (value, keys, n_keys);
+  return g_parse_debuxstring (value, keys, n_keys);
 }
 
 static void
@@ -337,7 +337,7 @@ glib_init (void)
   g_messages_prefixed_init ();
   g_debug_init ();
   g_quark_init ();
-  g_error_init ();
+  xerror_init ();
 }
 
 #ifdef XPLATFORM_WIN32
@@ -356,7 +356,7 @@ glib_win32_init (void)
 
       g_crash_handler_win32_init ();
 #ifdef THREADS_WIN32
-      g_thread_win32_init ();
+      xthread_win32_init ();
 #endif
 
       g_clock_win32_init ();
@@ -371,7 +371,7 @@ glib_win32_deinit (xboolean_t detach_thread)
 {
 #ifdef THREADS_WIN32
   if (detach_thread)
-    g_thread_win32_process_detach ();
+    xthread_win32_process_detach ();
 #endif
   g_crash_handler_win32_deinit ();
 }
@@ -396,7 +396,7 @@ DllMain (HINSTANCE hinstDLL,
 
     case DLL_THREAD_DETACH:
 #ifdef THREADS_WIN32
-      g_thread_win32_thread_detach ();
+      xthread_win32_thread_detach ();
 #endif
       break;
 

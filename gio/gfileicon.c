@@ -34,16 +34,16 @@
  * SECTION:gfileicon
  * @short_description: Icons pointing to an image file
  * @include: gio/gio.h
- * @see_also: #xicon_t, #GLoadableIcon
+ * @see_also: #xicon_t, #xloadable_icon_t
  *
- * #GFileIcon specifies an icon by pointing to an image file
+ * #xfile_icon_t specifies an icon by pointing to an image file
  * to be used as icon.
  *
  **/
 
-static void g_file_icon_icon_iface_init          (GIconIface          *iface);
-static void g_file_icon_loadable_icon_iface_init (GLoadableIconIface  *iface);
-static void g_file_icon_load_async               (GLoadableIcon       *icon,
+static void xfile_icon_icon_iface_init          (xicon_iface_t          *iface);
+static void xfile_icon_loadable_icon_iface_init (GLoadableIconIface  *iface);
+static void xfile_icon_load_async               (xloadable_icon_t       *icon,
 						  int                  size,
 						  xcancellable_t        *cancellable,
 						  xasync_ready_callback_t  callback,
@@ -67,24 +67,24 @@ enum
   PROP_FILE
 };
 
-G_DEFINE_TYPE_WITH_CODE (GFileIcon, g_file_icon, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (xfile_icon, xfile_icon, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (XTYPE_ICON,
-                                                g_file_icon_icon_iface_init)
+                                                xfile_icon_icon_iface_init)
                          G_IMPLEMENT_INTERFACE (XTYPE_LOADABLE_ICON,
-                                                g_file_icon_loadable_icon_iface_init))
+                                                xfile_icon_loadable_icon_iface_init))
 
 static void
-g_file_icon_get_property (xobject_t    *object,
+xfile_icon_get_property (xobject_t    *object,
                           xuint_t       prop_id,
-                          GValue     *value,
-                          GParamSpec *pspec)
+                          xvalue_t     *value,
+                          xparam_spec_t *pspec)
 {
-  GFileIcon *icon = G_FILE_ICON (object);
+  xfile_icon_t *icon = XFILE_ICON (object);
 
   switch (prop_id)
     {
       case PROP_FILE:
-        g_value_set_object (value, icon->file);
+        xvalue_set_object (value, icon->file);
         break;
 
       default:
@@ -93,17 +93,17 @@ g_file_icon_get_property (xobject_t    *object,
 }
 
 static void
-g_file_icon_set_property (xobject_t      *object,
+xfile_icon_set_property (xobject_t      *object,
                           xuint_t         prop_id,
-                          const GValue *value,
-                          GParamSpec   *pspec)
+                          const xvalue_t *value,
+                          xparam_spec_t   *pspec)
 {
-  GFileIcon *icon = G_FILE_ICON (object);
+  xfile_icon_t *icon = XFILE_ICON (object);
 
   switch (prop_id)
     {
       case PROP_FILE:
-        icon->file = G_FILE (g_value_dup_object (value));
+        icon->file = XFILE (xvalue_dup_object (value));
         break;
 
       default:
@@ -112,47 +112,47 @@ g_file_icon_set_property (xobject_t      *object,
 }
 
 static void
-g_file_icon_constructed (xobject_t *object)
+xfile_icon_constructed (xobject_t *object)
 {
 #ifndef G_DISABLE_ASSERT
-  GFileIcon *icon = G_FILE_ICON (object);
+  xfile_icon_t *icon = XFILE_ICON (object);
 #endif
 
-  G_OBJECT_CLASS (g_file_icon_parent_class)->constructed (object);
+  G_OBJECT_CLASS (xfile_icon_parent_class)->constructed (object);
 
   /* Must have be set during construction */
   g_assert (icon->file != NULL);
 }
 
 static void
-g_file_icon_finalize (xobject_t *object)
+xfile_icon_finalize (xobject_t *object)
 {
-  GFileIcon *icon;
+  xfile_icon_t *icon;
 
-  icon = G_FILE_ICON (object);
+  icon = XFILE_ICON (object);
 
   if (icon->file)
-    g_object_unref (icon->file);
+    xobject_unref (icon->file);
 
-  G_OBJECT_CLASS (g_file_icon_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xfile_icon_parent_class)->finalize (object);
 }
 
 static void
-g_file_icon_class_init (GFileIconClass *klass)
+xfile_icon_class_init (GFileIconClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->get_property = g_file_icon_get_property;
-  gobject_class->set_property = g_file_icon_set_property;
-  gobject_class->finalize = g_file_icon_finalize;
-  gobject_class->constructed = g_file_icon_constructed;
+  gobject_class->get_property = xfile_icon_get_property;
+  gobject_class->set_property = xfile_icon_set_property;
+  gobject_class->finalize = xfile_icon_finalize;
+  gobject_class->constructed = xfile_icon_constructed;
 
   /**
-   * GFileIcon:file:
+   * xfile_icon_t:file:
    *
    * The file containing the icon.
    */
-  g_object_class_install_property (gobject_class, PROP_FILE,
+  xobject_class_install_property (gobject_class, PROP_FILE,
                                    g_param_spec_object ("file",
                                                         P_("file"),
                                                         P_("The file containing the icon"),
@@ -161,29 +161,29 @@ g_file_icon_class_init (GFileIconClass *klass)
 }
 
 static void
-g_file_icon_init (GFileIcon *file)
+xfile_icon_init (xfile_icon_t *file)
 {
 }
 
 /**
- * g_file_icon_new:
+ * xfile_icon_new:
  * @file: a #xfile_t.
  *
  * Creates a new icon for a file.
  *
- * Returns: (transfer full) (type GFileIcon): a #xicon_t for the given
+ * Returns: (transfer full) (type xfile_icon_t): a #xicon_t for the given
  *   @file, or %NULL on error.
  **/
 xicon_t *
-g_file_icon_new (xfile_t *file)
+xfile_icon_new (xfile_t *file)
 {
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  return G_ICON (g_object_new (XTYPE_FILE_ICON, "file", file, NULL));
+  return XICON (xobject_new (XTYPE_FILE_ICON, "file", file, NULL));
 }
 
 /**
- * g_file_icon_get_file:
+ * xfile_icon_get_file:
  * @icon: a #xicon_t.
  *
  * Gets the #xfile_t associated with the given @icon.
@@ -191,7 +191,7 @@ g_file_icon_new (xfile_t *file)
  * Returns: (transfer none): a #xfile_t.
  **/
 xfile_t *
-g_file_icon_get_file (GFileIcon *icon)
+xfile_icon_get_file (xfile_icon_t *icon)
 {
   g_return_val_if_fail (X_IS_FILE_ICON (icon), NULL);
 
@@ -199,40 +199,40 @@ g_file_icon_get_file (GFileIcon *icon)
 }
 
 static xuint_t
-g_file_icon_hash (xicon_t *icon)
+xfile_icon_hash (xicon_t *icon)
 {
-  GFileIcon *file_icon = G_FILE_ICON (icon);
+  xfile_icon_t *file_icon = XFILE_ICON (icon);
 
-  return g_file_hash (file_icon->file);
+  return xfile_hash (file_icon->file);
 }
 
 static xboolean_t
-g_file_icon_equal (xicon_t *icon1,
+xfile_icon_equal (xicon_t *icon1,
 		   xicon_t *icon2)
 {
-  GFileIcon *file1 = G_FILE_ICON (icon1);
-  GFileIcon *file2 = G_FILE_ICON (icon2);
+  xfile_icon_t *file1 = XFILE_ICON (icon1);
+  xfile_icon_t *file2 = XFILE_ICON (icon2);
 
-  return g_file_equal (file1->file, file2->file);
+  return xfile_equal (file1->file, file2->file);
 }
 
 static xboolean_t
-g_file_icon_to_tokens (xicon_t *icon,
-		       GPtrArray *tokens,
+xfile_icon_to_tokens (xicon_t *icon,
+		       xptr_array_t *tokens,
                        xint_t  *out_version)
 {
-  GFileIcon *file_icon = G_FILE_ICON (icon);
+  xfile_icon_t *file_icon = XFILE_ICON (icon);
 
   g_return_val_if_fail (out_version != NULL, FALSE);
 
   *out_version = 0;
 
-  g_ptr_array_add (tokens, g_file_get_uri (file_icon->file));
+  xptr_array_add (tokens, xfile_get_uri (file_icon->file));
   return TRUE;
 }
 
 static xicon_t *
-g_file_icon_from_tokens (xchar_t  **tokens,
+xfile_icon_from_tokens (xchar_t  **tokens,
                          xint_t     num_tokens,
                          xint_t     version,
                          xerror_t **error)
@@ -247,7 +247,7 @@ g_file_icon_from_tokens (xchar_t  **tokens,
       g_set_error (error,
                    G_IO_ERROR,
                    G_IO_ERROR_INVALID_ARGUMENT,
-                   _("Can’t handle version %d of GFileIcon encoding"),
+                   _("Can’t handle version %d of xfile_icon_t encoding"),
                    version);
       goto out;
     }
@@ -257,48 +257,48 @@ g_file_icon_from_tokens (xchar_t  **tokens,
       g_set_error_literal (error,
                            G_IO_ERROR,
                            G_IO_ERROR_INVALID_ARGUMENT,
-                           _("Malformed input data for GFileIcon"));
+                           _("Malformed input data for xfile_icon_t"));
       goto out;
     }
 
-  file = g_file_new_for_uri (tokens[0]);
-  icon = g_file_icon_new (file);
-  g_object_unref (file);
+  file = xfile_new_for_uri (tokens[0]);
+  icon = xfile_icon_new (file);
+  xobject_unref (file);
 
  out:
   return icon;
 }
 
 static xvariant_t *
-g_file_icon_serialize (xicon_t *icon)
+xfile_icon_serialize (xicon_t *icon)
 {
-  GFileIcon *file_icon = G_FILE_ICON (icon);
+  xfile_icon_t *file_icon = XFILE_ICON (icon);
 
-  return g_variant_new ("(sv)", "file", g_variant_new_take_string (g_file_get_uri (file_icon->file)));
+  return xvariant_new ("(sv)", "file", xvariant_new_take_string (xfile_get_uri (file_icon->file)));
 }
 
 static void
-g_file_icon_icon_iface_init (GIconIface *iface)
+xfile_icon_icon_iface_init (xicon_iface_t *iface)
 {
-  iface->hash = g_file_icon_hash;
-  iface->equal = g_file_icon_equal;
-  iface->to_tokens = g_file_icon_to_tokens;
-  iface->from_tokens = g_file_icon_from_tokens;
-  iface->serialize = g_file_icon_serialize;
+  iface->hash = xfile_icon_hash;
+  iface->equal = xfile_icon_equal;
+  iface->to_tokens = xfile_icon_to_tokens;
+  iface->from_tokens = xfile_icon_from_tokens;
+  iface->serialize = xfile_icon_serialize;
 }
 
 
 static xinput_stream_t *
-g_file_icon_load (GLoadableIcon  *icon,
+xfile_icon_load (xloadable_icon_t  *icon,
 		  int            size,
 		  char          **type,
 		  xcancellable_t   *cancellable,
 		  xerror_t        **error)
 {
-  GFileInputStream *stream;
-  GFileIcon *file_icon = G_FILE_ICON (icon);
+  xfile_input_stream_t *stream;
+  xfile_icon_t *file_icon = XFILE_ICON (icon);
 
-  stream = g_file_read (file_icon->file,
+  stream = xfile_read (file_icon->file,
 			cancellable,
 			error);
 
@@ -313,54 +313,54 @@ load_async_callback (xobject_t      *source_object,
 		     xasync_result_t *res,
 		     xpointer_t      user_data)
 {
-  GFileInputStream *stream;
+  xfile_input_stream_t *stream;
   xerror_t *error = NULL;
-  GTask *task = user_data;
+  xtask_t *task = user_data;
 
-  stream = g_file_read_finish (G_FILE (source_object), res, &error);
+  stream = xfile_read_finish (XFILE (source_object), res, &error);
   if (stream == NULL)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_pointer (task, stream, g_object_unref);
-  g_object_unref (task);
+    xtask_return_pointer (task, stream, xobject_unref);
+  xobject_unref (task);
 }
 
 static void
-g_file_icon_load_async (GLoadableIcon       *icon,
+xfile_icon_load_async (xloadable_icon_t       *icon,
                         int                  size,
                         xcancellable_t        *cancellable,
                         xasync_ready_callback_t  callback,
                         xpointer_t             user_data)
 {
-  GFileIcon *file_icon = G_FILE_ICON (icon);
-  GTask *task;
+  xfile_icon_t *file_icon = XFILE_ICON (icon);
+  xtask_t *task;
 
-  task = g_task_new (icon, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_icon_load_async);
+  task = xtask_new (icon, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_icon_load_async);
 
-  g_file_read_async (file_icon->file, 0,
+  xfile_read_async (file_icon->file, 0,
                      cancellable,
                      load_async_callback, task);
 }
 
 static xinput_stream_t *
-g_file_icon_load_finish (GLoadableIcon  *icon,
+xfile_icon_load_finish (xloadable_icon_t  *icon,
 			 xasync_result_t   *res,
 			 char          **type,
 			 xerror_t        **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, icon), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, icon), NULL);
 
   if (type)
     *type = NULL;
 
-  return g_task_propagate_pointer (G_TASK (res), error);
+  return xtask_propagate_pointer (XTASK (res), error);
 }
 
 static void
-g_file_icon_loadable_icon_iface_init (GLoadableIconIface *iface)
+xfile_icon_loadable_icon_iface_init (GLoadableIconIface *iface)
 {
-  iface->load = g_file_icon_load;
-  iface->load_async = g_file_icon_load_async;
-  iface->load_finish = g_file_icon_load_finish;
+  iface->load = xfile_icon_load;
+  iface->load_async = xfile_icon_load_async;
+  iface->load_finish = xfile_icon_load_finish;
 }

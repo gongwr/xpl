@@ -32,12 +32,12 @@ init_networking (void)
   WSADATA wsadata;
 
   if (WSAStartup (MAKEWORD (2, 0), &wsadata) != 0)
-    g_error ("Windows Sockets could not be initialized");
+    xerror ("Windows Sockets could not be initialized");
 }
 
 static void
 prepare_fds (SOCKET  sockets[],
-             GPollFD fds[],
+             xpollfd_t fds[],
              int     num_pollees)
 {
   xint_t i;
@@ -50,7 +50,7 @@ prepare_fds (SOCKET  sockets[],
 }
 
 static void
-reset_fds (GPollFD fds[],
+reset_fds (xpollfd_t fds[],
            int     num_pollees)
 {
   xint_t i;
@@ -64,7 +64,7 @@ reset_fds (GPollFD fds[],
 }
 
 static void
-reset_fds_msg (GPollFD fds[],
+reset_fds_msg (xpollfd_t fds[],
                int     num_pollfds)
 {
   fds[num_pollfds - 1].fd = G_WIN32_MSG_HANDLE;
@@ -74,7 +74,7 @@ reset_fds_msg (GPollFD fds[],
 
 static void
 check_fds (SOCKET  sockets[],
-           GPollFD fds[],
+           xpollfd_t fds[],
            int     num_pollees)
 {
   xint_t i;
@@ -114,7 +114,7 @@ check_fds (SOCKET  sockets[],
 static void
 prepare_sockets (SOCKET  sockets[],
                  SOCKET  opp_sockets[],
-                 GPollFD fds[],
+                 xpollfd_t fds[],
                  int     num_pollees)
 {
   xint_t i;
@@ -240,7 +240,7 @@ static void
 test_gpoll (void)
 {
   SOCKET sockets[NUM_POLLEES];
-  GPollFD fds[NUM_POLLFDS];
+  xpollfd_t fds[NUM_POLLFDS];
   SOCKET opp_sockets[NUM_POLLEES];
   xint_t i;
   xint_t activatable;
@@ -608,17 +608,17 @@ main (int   argc,
       char *argv[])
 {
   int result;
-  GMainContext *ctx;
+  xmain_context_t *ctx;
 
   g_test_init (&argc, &argv, NULL);
   init_networking ();
-  ctx = g_main_context_new ();
+  ctx = xmain_context_new ();
 
   g_test_add_func ("/gpoll/gpoll", test_gpoll);
 
   result = g_test_run ();
 
-  g_main_context_unref (ctx);
+  xmain_context_unref (ctx);
 
   return result;
 }

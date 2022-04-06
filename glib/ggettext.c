@@ -84,7 +84,7 @@ _glib_get_locale_dir (void)
   if (retval)
     return retval;
   else
-    return g_strdup ("");
+    return xstrdup ("");
 }
 
 #undef XPL_LOCALE_DIR
@@ -156,7 +156,7 @@ glib_pgettext (const xchar_t *msgctxtid,
 }
 
 /**
- * g_strip_context:
+ * xstrip_context:
  * @msgid: a string
  * @msgval: another string
  *
@@ -169,7 +169,7 @@ glib_pgettext (const xchar_t *msgctxtid,
  * Since: 2.4
  */
 const xchar_t *
-g_strip_context (const xchar_t *msgid,
+xstrip_context (const xchar_t *msgid,
                  const xchar_t *msgval)
 {
   if (msgval == msgid)

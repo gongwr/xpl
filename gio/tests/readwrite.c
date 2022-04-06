@@ -14,25 +14,25 @@ static const char *original_data = "This is some test data that we can put in a 
 static const char *new_data = "new data..";
 
 static void
-verify_pos (xio_stream_t *iostream, goffset expected_pos)
+verify_pos (xio_stream_t *iostream, xoffset_t expected_pos)
 {
-  goffset pos;
+  xoffset_t pos;
 
-  pos = g_seekable_tell (G_SEEKABLE (iostream));
+  pos = xseekable_tell (G_SEEKABLE (iostream));
   g_assert_cmpint (pos, ==, expected_pos);
 
-  pos = g_seekable_tell (G_SEEKABLE (g_io_stream_get_input_stream (iostream)));
+  pos = xseekable_tell (G_SEEKABLE (g_io_stream_get_input_stream (iostream)));
   g_assert_cmpint (pos, ==, expected_pos);
 
-  pos = g_seekable_tell (G_SEEKABLE (g_io_stream_get_output_stream (iostream)));
+  pos = xseekable_tell (G_SEEKABLE (g_io_stream_get_output_stream (iostream)));
   g_assert_cmpint (pos, ==, expected_pos);
 }
 
 static void
-verify_iostream (GFileIOStream *file_iostream)
+verify_iostream (xfile_io_stream_t *file_iostream)
 {
   xboolean_t res;
-  gssize skipped;
+  xssize_t skipped;
   xio_stream_t *iostream;
   xerror_t *error;
   xinput_stream_t *in;
@@ -48,86 +48,86 @@ verify_iostream (GFileIOStream *file_iostream)
   in = g_io_stream_get_input_stream (iostream);
   out = g_io_stream_get_output_stream (iostream);
 
-  res = g_input_stream_read_all (in, buffer, 20, &n_bytes, NULL, NULL);
+  res = xinput_stream_read_all (in, buffer, 20, &n_bytes, NULL, NULL);
   g_assert (res);
   g_assert_cmpmem (buffer, n_bytes, original_data, 20);
 
   verify_pos (iostream, 20);
 
-  res = g_seekable_seek (G_SEEKABLE (iostream),
+  res = xseekable_seek (G_SEEKABLE (iostream),
 			 -10, G_SEEK_END,
 			 NULL, NULL);
   g_assert (res);
   verify_pos (iostream, strlen (original_data) - 10);
 
-  res = g_input_stream_read_all (in, buffer, 20, &n_bytes, NULL, NULL);
+  res = xinput_stream_read_all (in, buffer, 20, &n_bytes, NULL, NULL);
   g_assert (res);
   g_assert_cmpmem (buffer, n_bytes, original_data + strlen (original_data) - 10, 10);
 
   verify_pos (iostream, strlen (original_data));
 
-  res = g_seekable_seek (G_SEEKABLE (iostream),
+  res = xseekable_seek (G_SEEKABLE (iostream),
 			 10, G_SEEK_SET,
 			 NULL, NULL);
 
-  res = g_input_stream_skip (in, 5, NULL, NULL);
+  res = xinput_stream_skip (in, 5, NULL, NULL);
   g_assert (res == 5);
   verify_pos (iostream, 15);
 
-  skipped = g_input_stream_skip (in, 10000, NULL, NULL);
+  skipped = xinput_stream_skip (in, 10000, NULL, NULL);
   g_assert_cmpint (skipped, >=, 0);
   g_assert ((xsize_t) skipped == strlen (original_data) - 15);
   verify_pos (iostream, strlen (original_data));
 
-  res = g_seekable_seek (G_SEEKABLE (iostream),
+  res = xseekable_seek (G_SEEKABLE (iostream),
 			 10, G_SEEK_SET,
 			 NULL, NULL);
 
   verify_pos (iostream, 10);
 
-  res = g_output_stream_write_all (out, new_data, strlen (new_data),
+  res = xoutput_stream_write_all (out, new_data, strlen (new_data),
 				   &n_bytes, NULL, NULL);
   g_assert (res);
   g_assert_cmpint (n_bytes, ==, strlen (new_data));
 
   verify_pos (iostream, 10 + strlen (new_data));
 
-  res = g_seekable_seek (G_SEEKABLE (iostream),
+  res = xseekable_seek (G_SEEKABLE (iostream),
 			 0, G_SEEK_SET,
 			 NULL, NULL);
   g_assert (res);
   verify_pos (iostream, 0);
 
-  res = g_input_stream_read_all (in, buffer, strlen (original_data), &n_bytes, NULL, NULL);
+  res = xinput_stream_read_all (in, buffer, strlen (original_data), &n_bytes, NULL, NULL);
   g_assert (res);
   g_assert_cmpint ((int)n_bytes, ==, strlen (original_data));
   buffer[n_bytes] = 0;
 
-  modified_data = g_strdup (original_data);
+  modified_data = xstrdup (original_data);
   memcpy (modified_data + 10, new_data, strlen (new_data));
   g_assert_cmpstr (buffer, ==, modified_data);
 
   verify_pos (iostream, strlen (original_data));
 
-  res = g_seekable_seek (G_SEEKABLE (iostream),
+  res = xseekable_seek (G_SEEKABLE (iostream),
 			 0, G_SEEK_SET,
 			 NULL, NULL);
   g_assert (res);
   verify_pos (iostream, 0);
 
-  res = g_output_stream_close (out, NULL, NULL);
+  res = xoutput_stream_close (out, NULL, NULL);
   g_assert (res);
 
-  res = g_input_stream_read_all (in, buffer, 15, &n_bytes, NULL, NULL);
+  res = xinput_stream_read_all (in, buffer, 15, &n_bytes, NULL, NULL);
   g_assert (res);
   g_assert_cmpmem (buffer, n_bytes, modified_data, 15);
 
   error = NULL;
-  res = g_output_stream_write_all (out, new_data, strlen (new_data),
+  res = xoutput_stream_write_all (out, new_data, strlen (new_data),
 				   &n_bytes, NULL, &error);
   g_assert (!res);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED);
-  g_error_free (error);
+  xerror_free (error);
 
   error = NULL;
   res = g_io_stream_close (iostream, NULL, &error);
@@ -138,104 +138,104 @@ verify_iostream (GFileIOStream *file_iostream)
 }
 
 static void
-test_g_file_open_readwrite (void)
+test_xfile_open_readwrite (void)
 {
   char *tmp_file;
   int fd;
   xboolean_t res;
-  GFileIOStream *file_iostream;
+  xfile_io_stream_t *file_iostream;
   char *path;
   xfile_t *file;
   xerror_t *error;
 
-  fd = g_file_open_tmp ("readwrite_XXXXXX",
+  fd = xfile_open_tmp ("readwrite_XXXXXX",
 			&tmp_file, NULL);
   g_assert (fd != -1);
   close (fd);
 
-  res = g_file_set_contents (tmp_file,
+  res = xfile_set_contents (tmp_file,
 			     original_data, -1, NULL);
   g_assert (res);
 
   path = g_build_filename (g_get_tmp_dir (), "g-a-nonexisting-file", NULL);
-  file = g_file_new_for_path (path);
+  file = xfile_new_for_path (path);
   g_free (path);
   error = NULL;
-  file_iostream = g_file_open_readwrite (file, NULL, &error);
+  file_iostream = xfile_open_readwrite (file, NULL, &error);
   g_assert (file_iostream == NULL);
-  g_assert (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND));
-  g_error_free (error);
-  g_object_unref (file);
+  g_assert (xerror_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND));
+  xerror_free (error);
+  xobject_unref (file);
 
-  file = g_file_new_for_path (tmp_file);
+  file = xfile_new_for_path (tmp_file);
   error = NULL;
-  file_iostream = g_file_open_readwrite (file, NULL, &error);
+  file_iostream = xfile_open_readwrite (file, NULL, &error);
   g_assert (file_iostream != NULL);
-  g_object_unref (file);
+  xobject_unref (file);
 
   verify_iostream (file_iostream);
 
-  g_object_unref (file_iostream);
+  xobject_unref (file_iostream);
 
   g_unlink (tmp_file);
   g_free (tmp_file);
 }
 
 static void
-test_g_file_create_readwrite (void)
+test_xfile_create_readwrite (void)
 {
   char *tmp_file;
   int fd;
   xboolean_t res;
-  GFileIOStream *file_iostream;
+  xfile_io_stream_t *file_iostream;
   xoutput_stream_t *out;
   xfile_t *file;
   xerror_t *error;
   xsize_t n_bytes;
 
-  fd = g_file_open_tmp ("readwrite_XXXXXX",
+  fd = xfile_open_tmp ("readwrite_XXXXXX",
 			&tmp_file, NULL);
   g_assert (fd != -1);
   close (fd);
 
-  file = g_file_new_for_path (tmp_file);
+  file = xfile_new_for_path (tmp_file);
   error = NULL;
-  file_iostream = g_file_create_readwrite (file, 0, NULL, &error);
+  file_iostream = xfile_create_readwrite (file, 0, NULL, &error);
   g_assert (file_iostream == NULL);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_EXISTS);
-  g_error_free (error);
+  xerror_free (error);
 
   g_unlink (tmp_file);
-  file_iostream = g_file_create_readwrite (file, 0, NULL, &error);
+  file_iostream = xfile_create_readwrite (file, 0, NULL, &error);
   g_assert (file_iostream != NULL);
 
   out = g_io_stream_get_output_stream (XIO_STREAM (file_iostream));
-  res = g_output_stream_write_all (out, original_data, strlen (original_data),
+  res = xoutput_stream_write_all (out, original_data, strlen (original_data),
 				   &n_bytes, NULL, NULL);
   g_assert (res);
   g_assert_cmpint (n_bytes, ==, strlen (original_data));
 
-  res = g_seekable_seek (G_SEEKABLE (file_iostream),
+  res = xseekable_seek (G_SEEKABLE (file_iostream),
 			 0, G_SEEK_SET,
 			 NULL, NULL);
   g_assert (res);
 
   verify_iostream (file_iostream);
 
-  g_object_unref (file_iostream);
-  g_object_unref (file);
+  xobject_unref (file_iostream);
+  xobject_unref (file);
 
   g_unlink (tmp_file);
   g_free (tmp_file);
 }
 
 static void
-test_g_file_replace_readwrite (void)
+test_xfile_replace_readwrite (void)
 {
   char *tmp_file, *backup, *data;
   int fd;
   xboolean_t res;
-  GFileIOStream *file_iostream;
+  xfile_io_stream_t *file_iostream;
   xinput_stream_t *in;
   xoutput_stream_t *out;
   xfile_t *file;
@@ -243,46 +243,46 @@ test_g_file_replace_readwrite (void)
   char buffer[1024];
   xsize_t n_bytes;
 
-  fd = g_file_open_tmp ("readwrite_XXXXXX",
+  fd = xfile_open_tmp ("readwrite_XXXXXX",
 			&tmp_file, NULL);
   g_assert (fd != -1);
   close (fd);
 
-  res = g_file_set_contents (tmp_file,
+  res = xfile_set_contents (tmp_file,
 			     new_data, -1, NULL);
   g_assert (res);
 
-  file = g_file_new_for_path (tmp_file);
+  file = xfile_new_for_path (tmp_file);
   error = NULL;
-  file_iostream = g_file_replace_readwrite (file, NULL,
+  file_iostream = xfile_replace_readwrite (file, NULL,
 					    TRUE, 0, NULL, &error);
   g_assert (file_iostream != NULL);
 
   in = g_io_stream_get_input_stream (XIO_STREAM (file_iostream));
 
   /* Ensure its empty */
-  res = g_input_stream_read_all (in, buffer, sizeof buffer, &n_bytes, NULL, NULL);
+  res = xinput_stream_read_all (in, buffer, sizeof buffer, &n_bytes, NULL, NULL);
   g_assert (res);
   g_assert_cmpint ((int)n_bytes, ==, 0);
 
   out = g_io_stream_get_output_stream (XIO_STREAM (file_iostream));
-  res = g_output_stream_write_all (out, original_data, strlen (original_data),
+  res = xoutput_stream_write_all (out, original_data, strlen (original_data),
 				   &n_bytes, NULL, NULL);
   g_assert (res);
   g_assert_cmpint (n_bytes, ==, strlen (original_data));
 
-  res = g_seekable_seek (G_SEEKABLE (file_iostream),
+  res = xseekable_seek (G_SEEKABLE (file_iostream),
 			 0, G_SEEK_SET,
 			 NULL, NULL);
   g_assert (res);
 
   verify_iostream (file_iostream);
 
-  g_object_unref (file_iostream);
-  g_object_unref (file);
+  xobject_unref (file_iostream);
+  xobject_unref (file);
 
-  backup = g_strconcat (tmp_file, "~", NULL);
-  res = g_file_get_contents (backup,
+  backup = xstrconcat (tmp_file, "~", NULL);
+  res = xfile_get_contents (backup,
 			     &data,
 			     NULL, NULL);
   g_assert (res);
@@ -302,12 +302,12 @@ main (int   argc,
 {
   g_test_init (&argc, &argv, NULL);
 
-  g_test_add_func ("/readwrite/test_g_file_open_readwrite",
-		   test_g_file_open_readwrite);
-  g_test_add_func ("/readwrite/test_g_file_create_readwrite",
-		   test_g_file_create_readwrite);
-  g_test_add_func ("/readwrite/test_g_file_replace_readwrite",
-		   test_g_file_replace_readwrite);
+  g_test_add_func ("/readwrite/test_xfile_open_readwrite",
+		   test_xfile_open_readwrite);
+  g_test_add_func ("/readwrite/test_xfile_create_readwrite",
+		   test_xfile_create_readwrite);
+  g_test_add_func ("/readwrite/test_xfile_replace_readwrite",
+		   test_xfile_replace_readwrite);
 
   return g_test_run();
 }

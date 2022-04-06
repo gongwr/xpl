@@ -44,21 +44,21 @@ test_fds (void)
   xerror_t *err = NULL;
   GUnixFDMessage *message;
   GUnixFDMessage **mv;
-  GUnixFDList *list, *l2;
+  xunix_fd_list_t *list, *l2;
   xsocket_t *sockets[2];
   xsocket_address_t *addr;
   const xint_t *peek;
   char buffer[1024];
   xint_t fd_list[40];
-  GOutputVector ov;
-  GInputVector iv;
+  xoutput_vector_t ov;
+  xinput_vector_t iv;
   xint_t *stolen;
   xint_t sv[3];
   xint_t flags;
   xint_t nm;
   xint_t s;
   xchar_t *path;
-  GByteArray *array;
+  xbyte_array_t *array;
   xboolean_t abstract;
   GUnixSocketAddressType type;
 
@@ -70,10 +70,10 @@ test_fds (void)
 
   list = g_unix_fd_list_new_from_array (sv, -1);
   message = G_UNIX_FD_MESSAGE (g_unix_fd_message_new_with_fd_list (list));
-  g_object_unref (list);
+  xobject_unref (list);
 
   g_assert (g_unix_fd_message_get_fd_list (message) == list);
-  g_object_get (message, "fd-list", &l2, NULL);
+  xobject_get (message, "fd-list", &l2, NULL);
   g_assert (l2 == list);
   g_assert_cmpint (g_unix_fd_list_get_length (list), ==, 2);
 
@@ -116,8 +116,8 @@ test_fds (void)
   g_assert_no_error (err);
   g_assert_cmpint (s, ==, 0);
 
-  g_object_unref (message);
-  g_object_unref (list);
+  xobject_unref (message);
+  xobject_unref (list);
 
   message = G_UNIX_FD_MESSAGE (g_unix_fd_message_new ());
   list = g_unix_fd_message_get_fd_list (message);
@@ -162,7 +162,7 @@ G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   g_assert (!g_unix_socket_address_get_is_abstract (G_UNIX_SOCKET_ADDRESS (addr)));
 G_GNUC_END_IGNORE_DEPRECATIONS
 
-  g_object_get (addr,
+  xobject_get (addr,
                 "path", &path,
                 "path-as-array", &array,
                 "abstract", &abstract,
@@ -173,19 +173,19 @@ G_GNUC_END_IGNORE_DEPRECATIONS
   g_assert (!abstract);
   g_assert (type == G_UNIX_SOCKET_ADDRESS_ANONYMOUS);
   g_free (path);
-  g_byte_array_free (array, TRUE);
+  xbyte_array_free (array, TRUE);
 
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   buffer[0] = 0xff;
   ov.buffer = buffer;
   ov.size = 1;
   s = xsocket_send_message (sockets[0], NULL, &ov, 1,
-                             (GSocketControlMessage **) &message,
+                             (xsocket_control_message_t **) &message,
                              1, 0, NULL, &err);
   g_assert_no_error (err);
   g_assert_cmpint (s, ==, 1);
-  g_object_unref (message);
+  xobject_unref (message);
 
   message = NULL;
 
@@ -193,20 +193,20 @@ G_GNUC_END_IGNORE_DEPRECATIONS
   iv.buffer = buffer;
   iv.size = 1;
   s = xsocket_receive_message (sockets[1], NULL, &iv, 1,
-                                (GSocketControlMessage ***) &mv,
+                                (xsocket_control_message_t ***) &mv,
                                 &nm, &flags, NULL, &err);
   g_assert_no_error (err);
   g_assert_cmpint (s, ==, 1);
-  g_object_unref (sockets[0]);
-  g_object_unref (sockets[1]);
+  xobject_unref (sockets[0]);
+  xobject_unref (sockets[1]);
 
   g_assert_cmpint (nm, ==, 1);
   message = mv[0];
   g_free (mv);
 
   g_assert (X_IS_UNIX_FD_MESSAGE (message));
-  list = g_object_ref (g_unix_fd_message_get_fd_list (message));
-  g_object_unref (message);
+  list = xobject_ref (g_unix_fd_message_get_fd_list (message));
+  xobject_unref (message);
 
   peek = g_unix_fd_list_peek_fds (list, &s);
   g_assert_cmpint (s, ==, 2);
@@ -225,7 +225,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
   g_assert_cmpstr (buffer, ==,
                    "failure to say failure to say 'i love gnome-panel!'.");
 
-  g_object_unref (list);
+  xobject_unref (list);
 
   check_fd_list (fd_list);
 }

@@ -43,37 +43,37 @@ static const GOptionEntry entries[] = {
 };
 
 static void
-show_file_listing (GFileInfo *info, xfile_t *parent)
+show_file_listing (xfile_info_t *info, xfile_t *parent)
 {
   const char *name, *type;
   char *uri = NULL;
-  goffset size;
+  xoffset_t size;
   char **attributes;
   int i;
   xboolean_t first_attr;
   xfile_t *child;
 
-  if ((g_file_info_get_is_hidden (info)) && !show_hidden)
+  if ((xfile_info_get_is_hidden (info)) && !show_hidden)
     return;
 
   if (print_display_names)
-    name = g_file_info_get_display_name (info);
+    name = xfile_info_get_display_name (info);
   else
-    name = g_file_info_get_name (info);
+    name = xfile_info_get_name (info);
 
   if (name == NULL)
     name = "";
 
   if (print_uris) {
-    child = g_file_get_child (parent, name);
-    uri = g_file_get_uri (child);
-    g_object_unref (child);
+    child = xfile_get_child (parent, name);
+    uri = xfile_get_uri (child);
+    xobject_unref (child);
   }
 
-  size = g_file_info_get_size (info);
-  type = file_type_to_string (g_file_info_get_file_type (info));
+  size = xfile_info_get_size (info);
+  type = file_type_to_string (xfile_info_get_file_type (info));
   if (show_long)
-    g_print ("%s\t%"G_GUINT64_FORMAT"\t(%s)", print_uris? uri: name, (guint64)size, type);
+    g_print ("%s\t%"G_GUINT64_FORMAT"\t(%s)", print_uris? uri: name, (xuint64_t)size, type);
   else
     g_print ("%s", print_uris? uri: name);
 
@@ -81,17 +81,17 @@ show_file_listing (GFileInfo *info, xfile_t *parent)
     g_free (uri);
 
   first_attr = TRUE;
-  attributes = g_file_info_list_attributes (info, NULL);
+  attributes = xfile_info_list_attributes (info, NULL);
   for (i = 0 ; attributes[i] != NULL; i++)
     {
       char *val_as_string;
 
       if (!show_long ||
-          (!print_display_names && strcmp (attributes[i], G_FILE_ATTRIBUTE_STANDARD_NAME) == 0) ||
-          (print_display_names && strcmp (attributes[i], G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME) == 0) ||
-          strcmp (attributes[i], G_FILE_ATTRIBUTE_STANDARD_SIZE) == 0 ||
-          strcmp (attributes[i], G_FILE_ATTRIBUTE_STANDARD_TYPE) == 0 ||
-          strcmp (attributes[i], G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN) == 0)
+          (!print_display_names && strcmp (attributes[i], XFILE_ATTRIBUTE_STANDARD_NAME) == 0) ||
+          (print_display_names && strcmp (attributes[i], XFILE_ATTRIBUTE_STANDARD_DISPLAY_NAME) == 0) ||
+          strcmp (attributes[i], XFILE_ATTRIBUTE_STANDARD_SIZE) == 0 ||
+          strcmp (attributes[i], XFILE_ATTRIBUTE_STANDARD_TYPE) == 0 ||
+          strcmp (attributes[i], XFILE_ATTRIBUTE_STANDARD_IS_HIDDEN) == 0)
         continue;
 
       if (first_attr)
@@ -101,12 +101,12 @@ show_file_listing (GFileInfo *info, xfile_t *parent)
         }
       else
         g_print (" ");
-      val_as_string = g_file_info_get_attribute_as_string (info, attributes[i]);
+      val_as_string = xfile_info_get_attribute_as_string (info, attributes[i]);
       g_print ("%s=%s", attributes[i], val_as_string);
       g_free (val_as_string);
     }
 
-  g_strfreev (attributes);
+  xstrfreev (attributes);
 
   g_print ("\n");
 }
@@ -114,29 +114,29 @@ show_file_listing (GFileInfo *info, xfile_t *parent)
 static xboolean_t
 list (xfile_t *file)
 {
-  GFileEnumerator *enumerator;
-  GFileInfo *info;
+  xfile_enumerator_t *enumerator;
+  xfile_info_t *info;
   xerror_t *error;
   xboolean_t res;
 
   error = NULL;
-  enumerator = g_file_enumerate_children (file,
+  enumerator = xfile_enumerate_children (file,
                                           attributes,
-                                          nofollow_symlinks ? G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS : 0,
+                                          nofollow_symlinks ? XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS : 0,
                                           NULL,
                                           &error);
   if (enumerator == NULL)
     {
       print_file_error (file, error->message);
-      g_error_free (error);
+      xerror_free (error);
       return FALSE;
     }
 
   res = TRUE;
-  while ((info = g_file_enumerator_next_file (enumerator, NULL, &error)) != NULL)
+  while ((info = xfile_enumerator_next_file (enumerator, NULL, &error)) != NULL)
     {
       show_file_listing (info, file);
-      g_object_unref (info);
+      xobject_unref (info);
     }
 
   if (error)
@@ -146,7 +146,7 @@ list (xfile_t *file)
       res = FALSE;
     }
 
-  if (!g_file_enumerator_close (enumerator, NULL, &error))
+  if (!xfile_enumerator_close (enumerator, NULL, &error))
     {
       print_file_error (file, error->message);
       g_clear_error (&error);
@@ -159,7 +159,7 @@ list (xfile_t *file)
 int
 handle_list (int argc, char *argv[], xboolean_t do_help)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xchar_t *param;
   xerror_t *error = NULL;
   xboolean_t res;
@@ -169,7 +169,7 @@ handle_list (int argc, char *argv[], xboolean_t do_help)
   g_set_prgname ("gio list");
 
   /* Translators: commandline placeholder */
-  param = g_strdup_printf ("[%s…]", _("LOCATION"));
+  param = xstrdup_printf ("[%s…]", _("LOCATION"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -192,7 +192,7 @@ handle_list (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      g_error_free (error);
+      xerror_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -202,11 +202,11 @@ handle_list (int argc, char *argv[], xboolean_t do_help)
   if (attributes != NULL)
     show_long = TRUE;
 
-  attributes = g_strconcat (!print_display_names ? G_FILE_ATTRIBUTE_STANDARD_NAME "," : "",
-                            print_display_names ? G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME "," : "",
-                            G_FILE_ATTRIBUTE_STANDARD_TYPE ","
-                            G_FILE_ATTRIBUTE_STANDARD_SIZE ","
-                            G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN,
+  attributes = xstrconcat (!print_display_names ? XFILE_ATTRIBUTE_STANDARD_NAME "," : "",
+                            print_display_names ? XFILE_ATTRIBUTE_STANDARD_DISPLAY_NAME "," : "",
+                            XFILE_ATTRIBUTE_STANDARD_TYPE ","
+                            XFILE_ATTRIBUTE_STANDARD_SIZE ","
+                            XFILE_ATTRIBUTE_STANDARD_IS_HIDDEN,
                             attributes != NULL ? "," : "",
                             attributes,
                             NULL);
@@ -216,9 +216,9 @@ handle_list (int argc, char *argv[], xboolean_t do_help)
     {
       for (i = 1; i < argc; i++)
         {
-          file = g_file_new_for_commandline_arg (argv[i]);
+          file = xfile_new_for_commandline_arg (argv[i]);
           res &= list (file);
-          g_object_unref (file);
+          xobject_unref (file);
         }
     }
   else
@@ -226,9 +226,9 @@ handle_list (int argc, char *argv[], xboolean_t do_help)
       char *cwd;
 
       cwd = g_get_current_dir ();
-      file = g_file_new_for_path (cwd);
+      file = xfile_new_for_path (cwd);
       res = list (file);
-      g_object_unref (file);
+      xobject_unref (file);
       g_free (cwd);
     }
 

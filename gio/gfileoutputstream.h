@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __G_FILE_OUTPUT_STREAM_H__
-#define __G_FILE_OUTPUT_STREAM_H__
+#ifndef __XFILE_OUTPUT_STREAM_H__
+#define __XFILE_OUTPUT_STREAM_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,20 +29,20 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_FILE_OUTPUT_STREAM         (g_file_output_stream_get_type ())
-#define G_FILE_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FILE_OUTPUT_STREAM, GFileOutputStream))
-#define G_FILE_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILE_OUTPUT_STREAM, GFileOutputStreamClass))
+#define XTYPE_FILE_OUTPUT_STREAM         (xfile_output_stream_get_type ())
+#define XFILE_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FILE_OUTPUT_STREAM, xfile_output_stream))
+#define XFILE_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILE_OUTPUT_STREAM, GFileOutputStreamClass))
 #define X_IS_FILE_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_FILE_OUTPUT_STREAM))
 #define X_IS_FILE_OUTPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_FILE_OUTPUT_STREAM))
-#define G_FILE_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILE_OUTPUT_STREAM, GFileOutputStreamClass))
+#define XFILE_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILE_OUTPUT_STREAM, GFileOutputStreamClass))
 
 /**
- * GFileOutputStream:
+ * xfile_output_stream_t:
  *
  * A subclass of xoutput_stream_t for opened files. This adds
  * a few file-specific operations and seeking and truncating.
  *
- * #GFileOutputStream implements GSeekable.
+ * #xfile_output_stream_t implements xseekable__t.
  **/
 typedef struct _GFileOutputStreamClass    GFileOutputStreamClass;
 typedef struct _GFileOutputStreamPrivate  GFileOutputStreamPrivate;
@@ -59,32 +59,32 @@ struct _GFileOutputStreamClass
 {
   GOutputStreamClass parent_class;
 
-  goffset     (* tell)              (GFileOutputStream    *stream);
-  xboolean_t    (* can_seek)          (GFileOutputStream    *stream);
-  xboolean_t    (* seek)	            (GFileOutputStream    *stream,
-                                     goffset               offset,
+  xoffset_t     (* tell)              (xfile_output_stream_t    *stream);
+  xboolean_t    (* can_seek)          (xfile_output_stream_t    *stream);
+  xboolean_t    (* seek)	            (xfile_output_stream_t    *stream,
+                                     xoffset_t               offset,
                                      GSeekType             type,
                                      xcancellable_t         *cancellable,
                                      xerror_t              **error);
-  xboolean_t    (* can_truncate)      (GFileOutputStream    *stream);
-  xboolean_t    (* truncate_fn)       (GFileOutputStream    *stream,
-                                     goffset               size,
+  xboolean_t    (* can_truncate)      (xfile_output_stream_t    *stream);
+  xboolean_t    (* truncate_fn)       (xfile_output_stream_t    *stream,
+                                     xoffset_t               size,
                                      xcancellable_t         *cancellable,
                                      xerror_t              **error);
-  GFileInfo * (* query_info)        (GFileOutputStream    *stream,
+  xfile_info_t * (* query_info)        (xfile_output_stream_t    *stream,
                                      const char           *attributes,
                                      xcancellable_t         *cancellable,
                                      xerror_t              **error);
-  void        (* query_info_async)  (GFileOutputStream     *stream,
+  void        (* query_info_async)  (xfile_output_stream_t     *stream,
                                      const char            *attributes,
                                      int                   io_priority,
                                      xcancellable_t         *cancellable,
                                      xasync_ready_callback_t   callback,
                                      xpointer_t              user_data);
-  GFileInfo * (* query_info_finish) (GFileOutputStream     *stream,
+  xfile_info_t * (* query_info_finish) (xfile_output_stream_t     *stream,
                                      xasync_result_t         *result,
                                      xerror_t              **error);
-  char      * (* get_etag)          (GFileOutputStream    *stream);
+  char      * (* get_etag)          (xfile_output_stream_t    *stream);
 
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
@@ -95,28 +95,28 @@ struct _GFileOutputStreamClass
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t      g_file_output_stream_get_type          (void) G_GNUC_CONST;
+xtype_t      xfile_output_stream_get_type          (void) G_GNUC_CONST;
 
 
 XPL_AVAILABLE_IN_ALL
-GFileInfo *g_file_output_stream_query_info        (GFileOutputStream    *stream,
+xfile_info_t *xfile_output_stream_query_info        (xfile_output_stream_t    *stream,
                                                    const char           *attributes,
                                                    xcancellable_t         *cancellable,
                                                    xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-void       g_file_output_stream_query_info_async  (GFileOutputStream    *stream,
+void       xfile_output_stream_query_info_async  (xfile_output_stream_t    *stream,
 						   const char           *attributes,
 						   int                   io_priority,
 						   xcancellable_t         *cancellable,
 						   xasync_ready_callback_t   callback,
 						   xpointer_t              user_data);
 XPL_AVAILABLE_IN_ALL
-GFileInfo *g_file_output_stream_query_info_finish (GFileOutputStream    *stream,
+xfile_info_t *xfile_output_stream_query_info_finish (xfile_output_stream_t    *stream,
 						   xasync_result_t         *result,
 						   xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-char *     g_file_output_stream_get_etag          (GFileOutputStream    *stream);
+char *     xfile_output_stream_get_etag          (xfile_output_stream_t    *stream);
 
 G_END_DECLS
 
-#endif /* __G_FILE_FILE_OUTPUT_STREAM_H__ */
+#endif /* __XFILE_FILE_OUTPUT_STREAM_H__ */

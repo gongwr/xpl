@@ -27,24 +27,24 @@
 
 /**
  * SECTION:gsimpleactiongroup
- * @title: GSimpleActionGroup
+ * @title: xsimple_action_group_t
  * @short_description: A simple xaction_group_t implementation
  * @include: gio/gio.h
  *
- * #GSimpleActionGroup is a hash table filled with #GAction objects,
- * implementing the #xaction_group_t and #GActionMap interfaces.
+ * #xsimple_action_group_t is a hash table filled with #xaction_t objects,
+ * implementing the #xaction_group_t and #xaction_map_t interfaces.
  **/
 
 struct _GSimpleActionGroupPrivate
 {
-  GHashTable *table;  /* string -> GAction */
+  xhashtable_t *table;  /* string -> xaction_t */
 };
 
 static void g_simple_action_group_iface_init (xaction_group_interface_t *);
-static void g_simple_action_group_map_iface_init (GActionMapInterface *);
-G_DEFINE_TYPE_WITH_CODE (GSimpleActionGroup,
+static void g_simple_action_group_map_iface_init (xaction_map_interface_t *);
+G_DEFINE_TYPE_WITH_CODE (xsimple_action_group_t,
   g_simple_action_group, XTYPE_OBJECT,
-  G_ADD_PRIVATE (GSimpleActionGroup)
+  G_ADD_PRIVATE (xsimple_action_group_t)
   G_IMPLEMENT_INTERFACE (XTYPE_ACTION_GROUP,
                          g_simple_action_group_iface_init);
   G_IMPLEMENT_INTERFACE (XTYPE_ACTION_MAP,
@@ -53,18 +53,18 @@ G_DEFINE_TYPE_WITH_CODE (GSimpleActionGroup,
 static xchar_t **
 g_simple_action_group_list_actions (xaction_group_t *group)
 {
-  GSimpleActionGroup *simple = G_SIMPLE_ACTION_GROUP (group);
-  GHashTableIter iter;
+  xsimple_action_group_t *simple = G_SIMPLE_ACTION_GROUP (group);
+  xhash_table_iter_t iter;
   xint_t n, i = 0;
   xchar_t **keys;
   xpointer_t key;
 
-  n = g_hash_table_size (simple->priv->table);
+  n = xhash_table_size (simple->priv->table);
   keys = g_new (xchar_t *, n + 1);
 
-  g_hash_table_iter_init (&iter, simple->priv->table);
-  while (g_hash_table_iter_next (&iter, &key, NULL))
-    keys[i++] = g_strdup (key);
+  xhash_table_iter_init (&iter, simple->priv->table);
+  while (xhash_table_iter_next (&iter, &key, NULL))
+    keys[i++] = xstrdup (key);
   g_assert_cmpint (i, ==, n);
   keys[n] = NULL;
 
@@ -80,10 +80,10 @@ g_simple_action_group_query_action (xaction_group_t        *group,
                                     xvariant_t           **state_hint,
                                     xvariant_t           **state)
 {
-  GSimpleActionGroup *simple = G_SIMPLE_ACTION_GROUP (group);
-  GAction *action;
+  xsimple_action_group_t *simple = G_SIMPLE_ACTION_GROUP (group);
+  xaction_t *action;
 
-  action = g_hash_table_lookup (simple->priv->table, action_name);
+  action = xhash_table_lookup (simple->priv->table, action_name);
 
   if (action == NULL)
     return FALSE;
@@ -111,10 +111,10 @@ g_simple_action_group_change_state (xaction_group_t *group,
                                     const xchar_t  *action_name,
                                     xvariant_t     *value)
 {
-  GSimpleActionGroup *simple = G_SIMPLE_ACTION_GROUP (group);
-  GAction *action;
+  xsimple_action_group_t *simple = G_SIMPLE_ACTION_GROUP (group);
+  xaction_t *action;
 
-  action = g_hash_table_lookup (simple->priv->table, action_name);
+  action = xhash_table_lookup (simple->priv->table, action_name);
 
   if (action == NULL)
     return;
@@ -127,10 +127,10 @@ g_simple_action_group_activate (xaction_group_t *group,
                                 const xchar_t  *action_name,
                                 xvariant_t     *parameter)
 {
-  GSimpleActionGroup *simple = G_SIMPLE_ACTION_GROUP (group);
-  GAction *action;
+  xsimple_action_group_t *simple = G_SIMPLE_ACTION_GROUP (group);
+  xaction_t *action;
 
-  action = g_hash_table_lookup (simple->priv->table, action_name);
+  action = xhash_table_lookup (simple->priv->table, action_name);
 
   if (action == NULL)
     return;
@@ -139,8 +139,8 @@ g_simple_action_group_activate (xaction_group_t *group,
 }
 
 static void
-action_enabled_notify (GAction     *action,
-                       GParamSpec  *pspec,
+action_enabled_notify (xaction_t     *action,
+                       xparam_spec_t  *pspec,
                        xpointer_t     user_data)
 {
   xaction_group_action_enabled_changed (user_data,
@@ -149,8 +149,8 @@ action_enabled_notify (GAction     *action,
 }
 
 static void
-action_state_notify (GAction    *action,
-                     GParamSpec *pspec,
+action_state_notify (xaction_t    *action,
+                     xparam_spec_t *pspec,
                      xpointer_t    user_data)
 {
   xvariant_t *value;
@@ -159,7 +159,7 @@ action_state_notify (GAction    *action,
   xaction_group_action_state_changed (user_data,
                                        g_action_get_name (action),
                                        value);
-  g_variant_unref (value);
+  xvariant_unref (value);
 }
 
 static void
@@ -173,32 +173,32 @@ g_simple_action_group_disconnect (xpointer_t key,
                                         user_data);
 }
 
-static GAction *
-g_simple_action_group_lookup_action (GActionMap *action_map,
+static xaction_t *
+g_simple_action_group_lookup_action (xaction_map_t *action_map,
                                      const xchar_t        *action_name)
 {
-  GSimpleActionGroup *simple = G_SIMPLE_ACTION_GROUP (action_map);
+  xsimple_action_group_t *simple = G_SIMPLE_ACTION_GROUP (action_map);
 
-  return g_hash_table_lookup (simple->priv->table, action_name);
+  return xhash_table_lookup (simple->priv->table, action_name);
 }
 
 static void
-g_simple_action_group_add_action (GActionMap *action_map,
-                                  GAction    *action)
+g_simple_action_group_add_action (xaction_map_t *action_map,
+                                  xaction_t    *action)
 {
-  GSimpleActionGroup *simple = G_SIMPLE_ACTION_GROUP (action_map);
+  xsimple_action_group_t *simple = G_SIMPLE_ACTION_GROUP (action_map);
   const xchar_t *action_name;
-  GAction *old_action;
+  xaction_t *old_action;
 
   action_name = g_action_get_name (action);
   if (action_name == NULL)
     {
       g_critical ("The supplied action has no name. You must set the "
-                  "GAction:name property when creating an action.");
+                  "xaction_t:name property when creating an action.");
       return;
     }
 
-  old_action = g_hash_table_lookup (simple->priv->table, action_name);
+  old_action = xhash_table_lookup (simple->priv->table, action_name);
 
   if (old_action != action)
     {
@@ -216,51 +216,51 @@ g_simple_action_group_add_action (GActionMap *action_map,
         g_signal_connect (action, "notify::state",
                           G_CALLBACK (action_state_notify), simple);
 
-      g_hash_table_insert (simple->priv->table,
-                           g_strdup (action_name),
-                           g_object_ref (action));
+      xhash_table_insert (simple->priv->table,
+                           xstrdup (action_name),
+                           xobject_ref (action));
 
       xaction_group_action_added (XACTION_GROUP (simple), action_name);
     }
 }
 
 static void
-g_simple_action_group_remove_action (GActionMap  *action_map,
+g_simple_action_group_remove_action (xaction_map_t  *action_map,
                                      const xchar_t *action_name)
 {
-  GSimpleActionGroup *simple = G_SIMPLE_ACTION_GROUP (action_map);
-  GAction *action;
+  xsimple_action_group_t *simple = G_SIMPLE_ACTION_GROUP (action_map);
+  xaction_t *action;
 
-  action = g_hash_table_lookup (simple->priv->table, action_name);
+  action = xhash_table_lookup (simple->priv->table, action_name);
 
   if (action != NULL)
     {
       xaction_group_action_removed (XACTION_GROUP (simple), action_name);
       g_simple_action_group_disconnect (NULL, action, simple);
-      g_hash_table_remove (simple->priv->table, action_name);
+      xhash_table_remove (simple->priv->table, action_name);
     }
 }
 
 static void
 g_simple_action_group_finalize (xobject_t *object)
 {
-  GSimpleActionGroup *simple = G_SIMPLE_ACTION_GROUP (object);
+  xsimple_action_group_t *simple = G_SIMPLE_ACTION_GROUP (object);
 
-  g_hash_table_foreach (simple->priv->table,
+  xhash_table_foreach (simple->priv->table,
                         g_simple_action_group_disconnect,
                         simple);
-  g_hash_table_unref (simple->priv->table);
+  xhash_table_unref (simple->priv->table);
 
   G_OBJECT_CLASS (g_simple_action_group_parent_class)
     ->finalize (object);
 }
 
 static void
-g_simple_action_group_init (GSimpleActionGroup *simple)
+g_simple_action_group_init (xsimple_action_group_t *simple)
 {
   simple->priv = g_simple_action_group_get_instance_private (simple);
-  simple->priv->table = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                               g_free, g_object_unref);
+  simple->priv->table = xhash_table_new_full (xstr_hash, xstr_equal,
+                                               g_free, xobject_unref);
 }
 
 static void
@@ -281,7 +281,7 @@ g_simple_action_group_iface_init (xaction_group_interface_t *iface)
 }
 
 static void
-g_simple_action_group_map_iface_init (GActionMapInterface *iface)
+g_simple_action_group_map_iface_init (xaction_map_interface_t *iface)
 {
   iface->add_action = g_simple_action_group_add_action;
   iface->remove_action = g_simple_action_group_remove_action;
@@ -291,46 +291,46 @@ g_simple_action_group_map_iface_init (GActionMapInterface *iface)
 /**
  * g_simple_action_group_new:
  *
- * Creates a new, empty, #GSimpleActionGroup.
+ * Creates a new, empty, #xsimple_action_group_t.
  *
- * Returns: a new #GSimpleActionGroup
+ * Returns: a new #xsimple_action_group_t
  *
  * Since: 2.28
  **/
-GSimpleActionGroup *
+xsimple_action_group_t *
 g_simple_action_group_new (void)
 {
-  return g_object_new (XTYPE_SIMPLE_ACTION_GROUP, NULL);
+  return xobject_new (XTYPE_SIMPLE_ACTION_GROUP, NULL);
 }
 
 /**
  * g_simple_action_group_lookup:
- * @simple: a #GSimpleActionGroup
+ * @simple: a #xsimple_action_group_t
  * @action_name: the name of an action
  *
  * Looks up the action with the name @action_name in the group.
  *
  * If no such action exists, returns %NULL.
  *
- * Returns: (transfer none): a #GAction, or %NULL
+ * Returns: (transfer none): a #xaction_t, or %NULL
  *
  * Since: 2.28
  *
- * Deprecated: 2.38: Use g_action_map_lookup_action()
+ * Deprecated: 2.38: Use xaction_map_lookup_action()
  */
-GAction *
-g_simple_action_group_lookup (GSimpleActionGroup *simple,
+xaction_t *
+g_simple_action_group_lookup (xsimple_action_group_t *simple,
                               const xchar_t        *action_name)
 {
   g_return_val_if_fail (X_IS_SIMPLE_ACTION_GROUP (simple), NULL);
 
-  return g_action_map_lookup_action (G_ACTION_MAP (simple), action_name);
+  return xaction_map_lookup_action (G_ACTION_MAP (simple), action_name);
 }
 
 /**
  * g_simple_action_group_insert:
- * @simple: a #GSimpleActionGroup
- * @action: a #GAction
+ * @simple: a #xsimple_action_group_t
+ * @action: a #xaction_t
  *
  * Adds an action to the action group.
  *
@@ -341,20 +341,20 @@ g_simple_action_group_lookup (GSimpleActionGroup *simple,
  *
  * Since: 2.28
  *
- * Deprecated: 2.38: Use g_action_map_add_action()
+ * Deprecated: 2.38: Use xaction_map_add_action()
  **/
 void
-g_simple_action_group_insert (GSimpleActionGroup *simple,
-                              GAction            *action)
+g_simple_action_group_insert (xsimple_action_group_t *simple,
+                              xaction_t            *action)
 {
   g_return_if_fail (X_IS_SIMPLE_ACTION_GROUP (simple));
 
-  g_action_map_add_action (G_ACTION_MAP (simple), action);
+  xaction_map_add_action (G_ACTION_MAP (simple), action);
 }
 
 /**
  * g_simple_action_group_remove:
- * @simple: a #GSimpleActionGroup
+ * @simple: a #xsimple_action_group_t
  * @action_name: the name of the action
  *
  * Removes the named action from the action group.
@@ -363,38 +363,38 @@ g_simple_action_group_insert (GSimpleActionGroup *simple,
  *
  * Since: 2.28
  *
- * Deprecated: 2.38: Use g_action_map_remove_action()
+ * Deprecated: 2.38: Use xaction_map_remove_action()
  **/
 void
-g_simple_action_group_remove (GSimpleActionGroup *simple,
+g_simple_action_group_remove (xsimple_action_group_t *simple,
                               const xchar_t        *action_name)
 {
   g_return_if_fail (X_IS_SIMPLE_ACTION_GROUP (simple));
 
-  g_action_map_remove_action (G_ACTION_MAP (simple), action_name);
+  xaction_map_remove_action (G_ACTION_MAP (simple), action_name);
 }
 
 
 /**
  * g_simple_action_group_add_entries:
- * @simple: a #GSimpleActionGroup
+ * @simple: a #xsimple_action_group_t
  * @entries: (array length=n_entries): a pointer to the first item in
- *           an array of #GActionEntry structs
+ *           an array of #xaction_entry_t structs
  * @n_entries: the length of @entries, or -1
  * @user_data: the user data for signal connections
  *
- * A convenience function for creating multiple #GSimpleAction instances
+ * A convenience function for creating multiple #xsimple_action_t instances
  * and adding them to the action group.
  *
  * Since: 2.30
  *
- * Deprecated: 2.38: Use g_action_map_add_action_entries()
+ * Deprecated: 2.38: Use xaction_map_add_action_entries()
  **/
 void
-g_simple_action_group_add_entries (GSimpleActionGroup *simple,
-                                   const GActionEntry *entries,
+g_simple_action_group_add_entries (xsimple_action_group_t *simple,
+                                   const xaction_entry_t *entries,
                                    xint_t                n_entries,
                                    xpointer_t            user_data)
 {
-  g_action_map_add_action_entries (G_ACTION_MAP (simple), entries, n_entries, user_data);
+  xaction_map_add_action_entries (G_ACTION_MAP (simple), entries, n_entries, user_data);
 }

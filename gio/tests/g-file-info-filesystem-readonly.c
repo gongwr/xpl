@@ -1,4 +1,4 @@
-/* Testcase for bug in GIO function g_file_query_filesystem_info()
+/* Testcase for bug in GIO function xfile_query_filesystem_info()
  * Author: Nelson Benítez León
  *
  * This work is provided "as is"; redistribution and modification
@@ -30,34 +30,34 @@ run (xerror_t **error,
      const xchar_t *argv0,
      ...)
 {
-  GPtrArray *args;
+  xptr_array_t *args;
   const xchar_t *arg;
   va_list ap;
-  GSubprocess *subprocess;
+  xsubprocess_t *subprocess;
   xchar_t *command_line = NULL;
   xboolean_t success;
 
-  args = g_ptr_array_new ();
+  args = xptr_array_new ();
 
   va_start (ap, argv0);
-  g_ptr_array_add (args, (xchar_t *) argv0);
+  xptr_array_add (args, (xchar_t *) argv0);
   while ((arg = va_arg (ap, const xchar_t *)))
-    g_ptr_array_add (args, (xchar_t *) arg);
-  g_ptr_array_add (args, NULL);
+    xptr_array_add (args, (xchar_t *) arg);
+  xptr_array_add (args, NULL);
   va_end (ap);
 
-  command_line = g_strjoinv (" ", (xchar_t **) args->pdata);
+  command_line = xstrjoinv (" ", (xchar_t **) args->pdata);
   g_test_message ("Running command `%s`", command_line);
   g_free (command_line);
 
-  subprocess = g_subprocess_newv ((const xchar_t * const *) args->pdata, G_SUBPROCESS_FLAGS_NONE, error);
-  g_ptr_array_free (args, TRUE);
+  subprocess = xsubprocess_newv ((const xchar_t * const *) args->pdata, G_SUBPROCESS_FLAGS_NONE, error);
+  xptr_array_free (args, TRUE);
 
   if (subprocess == NULL)
     return FALSE;
 
-  success = g_subprocess_wait_check (subprocess, NULL, error);
-  g_object_unref (subprocess);
+  success = xsubprocess_wait_check (subprocess, NULL, error);
+  xobject_unref (subprocess);
 
   return success;
 }
@@ -66,7 +66,7 @@ static void
 assert_remove (const xchar_t *file)
 {
   if (g_remove (file) != 0)
-    g_error ("failed to remove %s: %s", file, g_strerror (errno));
+    xerror ("failed to remove %s: %s", file, xstrerror (errno));
 }
 
 static xboolean_t
@@ -75,7 +75,7 @@ fuse_module_loaded (void)
   char *contents = NULL;
   xboolean_t ret;
 
-  if (!g_file_get_contents ("/proc/modules", &contents, NULL, NULL) ||
+  if (!xfile_get_contents ("/proc/modules", &contents, NULL, NULL) ||
       contents == NULL)
     {
       g_free (contents);
@@ -88,9 +88,9 @@ fuse_module_loaded (void)
 }
 
 static void
-test_filesystem_readonly (gconstpointer with_mount_monitor)
+test_filesystem_readonly (xconstpointer with_mount_monitor)
 {
-  GFileInfo *file_info;
+  xfile_info_t *file_info;
   xfile_t *mounted_file;
   GUnixMountMonitor *mount_monitor = NULL;
   xchar_t *bindfs, *fusermount;
@@ -117,7 +117,7 @@ test_filesystem_readonly (gconstpointer with_mount_monitor)
    * we're probably in a rootless container and won't be able to
    * use bindfs to run our tests */
   if (fuse_module_loaded () &&
-      !g_file_test ("/dev/fuse", G_FILE_TEST_EXISTS))
+      !xfile_test ("/dev/fuse", XFILE_TEST_EXISTS))
     {
       g_test_skip ("fuse support is needed to run this test (rootless container?)");
       g_free (fusermount);
@@ -126,13 +126,13 @@ test_filesystem_readonly (gconstpointer with_mount_monitor)
     }
 
   curdir = g_get_current_dir ();
-  dir_to_mount = g_strdup_printf ("%s/dir_bindfs_to_mount", curdir);
-  file_in_mount = g_strdup_printf ("%s/example.txt", dir_to_mount);
-  dir_mountpoint = g_strdup_printf ("%s/dir_bindfs_mountpoint", curdir);
+  dir_to_mount = xstrdup_printf ("%s/dir_bindfs_to_mount", curdir);
+  file_in_mount = xstrdup_printf ("%s/example.txt", dir_to_mount);
+  dir_mountpoint = xstrdup_printf ("%s/dir_bindfs_mountpoint", curdir);
 
   g_mkdir (dir_to_mount, 0777);
   g_mkdir (dir_mountpoint, 0777);
-  if (! g_file_set_contents (file_in_mount, "Example", -1, NULL))
+  if (! xfile_set_contents (file_in_mount, "Example", -1, NULL))
     {
       g_test_skip ("Failed to create file needed to proceed further with the test");
 
@@ -152,7 +152,7 @@ test_filesystem_readonly (gconstpointer with_mount_monitor)
    * into another dir (and do the mount as readonly as per passed '-o ro' option) */
   if (!run (&error, bindfs, "-n", "-o", "ro", dir_to_mount, dir_mountpoint, NULL))
     {
-      xchar_t *skip_message = g_strdup_printf ("Failed to run bindfs to set up test: %s", error->message);
+      xchar_t *skip_message = xstrdup_printf ("Failed to run bindfs to set up test: %s", error->message);
       g_test_skip (skip_message);
 
       g_free (skip_message);
@@ -170,21 +170,21 @@ test_filesystem_readonly (gconstpointer with_mount_monitor)
     }
 
   /* Let's check now, that the file is in indeed in a readonly filesystem */
-  file_in_mountpoint = g_strdup_printf ("%s/example.txt", dir_mountpoint);
-  mounted_file = g_file_new_for_path (file_in_mountpoint);
+  file_in_mountpoint = xstrdup_printf ("%s/example.txt", dir_mountpoint);
+  mounted_file = xfile_new_for_path (file_in_mountpoint);
 
   if (with_mount_monitor)
     {
      /* Let UnixMountMonitor process its 'mounts-changed'
       * signal triggered by mount operation above */
-      while (g_main_context_iteration (NULL, FALSE));
+      while (xmain_context_iteration (NULL, FALSE));
     }
 
-  file_info = g_file_query_filesystem_info (mounted_file,
-                                            G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, NULL, &error);
+  file_info = xfile_query_filesystem_info (mounted_file,
+                                            XFILE_ATTRIBUTE_FILESYSTEM_READONLY, NULL, &error);
   g_assert_no_error (error);
   g_assert_nonnull (file_info);
-  if (! g_file_info_get_attribute_boolean (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY))
+  if (! xfile_info_get_attribute_boolean (file_info, XFILE_ATTRIBUTE_FILESYSTEM_READONLY))
     {
       g_test_skip ("Failed to create readonly file needed to proceed further with the test");
 
@@ -212,19 +212,19 @@ test_filesystem_readonly (gconstpointer with_mount_monitor)
     {
      /* Let UnixMountMonitor process its 'mounts-changed' signal
       * triggered by mount/umount operations above */
-      while (g_main_context_iteration (NULL, FALSE));
+      while (xmain_context_iteration (NULL, FALSE));
     }
 
   /* Now let's test if GIO will report the new filesystem state */
   g_clear_object (&file_info);
   g_clear_object (&mounted_file);
-  mounted_file = g_file_new_for_path (file_in_mountpoint);
-  file_info = g_file_query_filesystem_info (mounted_file,
-                                            G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, NULL, &error);
+  mounted_file = xfile_new_for_path (file_in_mountpoint);
+  file_info = xfile_query_filesystem_info (mounted_file,
+                                            XFILE_ATTRIBUTE_FILESYSTEM_READONLY, NULL, &error);
   g_assert_no_error (error);
   g_assert_nonnull (file_info);
 
-  g_assert_false (g_file_info_get_attribute_boolean (file_info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY));
+  g_assert_false (xfile_info_get_attribute_boolean (file_info, XFILE_ATTRIBUTE_FILESYSTEM_READONLY));
 
   /* Clean up */
   g_clear_object (&mount_monitor);
@@ -263,7 +263,7 @@ main (int argc, char *argv[])
    *  g_unix_mount_get(&time_read) - To fill the time_read parameter
    *  g_unix_mounts_changed_since()
    *
-   * made from inside g_file_query_filesystem_info() will use the mount_poller_time
+   * made from inside xfile_query_filesystem_info() will use the mount_poller_time
    * from the monitoring of /proc/self/mountinfo , while in the previous test new
    * created timestamps are returned from those g_unix_mount* functions. */
   g_test_add_data_func ("/g-file-info-filesystem-readonly/test-fs-ro-with-mount-monitor",

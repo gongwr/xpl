@@ -50,14 +50,14 @@ struct _GDelayedSettingsBackendClass
 
 struct _GDelayedSettingsBackend
 {
-  GSettingsBackend parent_instance;
+  xsettings_backend_t parent_instance;
   GDelayedSettingsBackendPrivate *priv;
 };
 
 xtype_t                           g_delayed_settings_backend_get_type     (void);
-GDelayedSettingsBackend *       g_delayed_settings_backend_new          (GSettingsBackend        *backend,
+GDelayedSettingsBackend *       g_delayed_settings_backend_new          (xsettings_backend_t        *backend,
                                                                          xpointer_t                 owner,
-                                                                         GMainContext            *owner_context);
+                                                                         xmain_context_t            *owner_context);
 void                            g_delayed_settings_backend_revert       (GDelayedSettingsBackend *delayed);
 void                            g_delayed_settings_backend_apply        (GDelayedSettingsBackend *delayed);
 xboolean_t                        g_delayed_settings_backend_get_has_unapplied (GDelayedSettingsBackend *delayed);

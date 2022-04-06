@@ -48,7 +48,7 @@ ensure_trash_portal (void)
 
   if (g_once_init_enter (&trash))
     {
-      GDBusConnection *connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
+      xdbus_connection_t *connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
       GXdpTrash *proxy = NULL;
 
       if (connection != NULL)
@@ -57,7 +57,7 @@ ensure_trash_portal (void)
                                              "org.freedesktop.portal.Desktop",
                                              "/org/freedesktop/portal/desktop",
                                              NULL, NULL);
-          g_object_unref (connection);
+          xobject_unref (connection);
         }
 
       g_once_init_leave (&trash, proxy);
@@ -71,7 +71,7 @@ g_trash_portal_trash_file (xfile_t   *file,
                            xerror_t **error)
 {
   char *path = NULL;
-  GUnixFDList *fd_list = NULL;
+  xunix_fd_list_t *fd_list = NULL;
   int fd, fd_in, errsv;
   xboolean_t ret = FALSE;
   xuint_t portal_result = 0;
@@ -85,7 +85,7 @@ g_trash_portal_trash_file (xfile_t   *file,
       goto out;
     }
 
-  path = g_file_get_path (file);
+  path = xfile_get_path (file);
 
   fd = g_open (path, O_RDWR | O_CLOEXEC | O_NOFOLLOW);
   if (fd == -1 && errno == EISDIR)
@@ -113,7 +113,7 @@ g_trash_portal_trash_file (xfile_t   *file,
     goto out;
 
   ret = gxdp_trash_call_trash_file_sync (proxy,
-                                         g_variant_new_handle (fd_in),
+                                         xvariant_new_handle (fd_in),
                                          fd_list,
                                          &portal_result,
                                          NULL,

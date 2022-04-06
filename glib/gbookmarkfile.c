@@ -55,7 +55,7 @@
  * @title: Bookmark file parser
  * @short_description: parses files containing bookmarks
  *
- * GBookmarkFile lets you parse, edit or create files containing bookmarks
+ * xbookmark_file_t lets you parse, edit or create files containing bookmarks
  * to URI, along with some meta-data about the resource pointed by the URI
  * like its MIME type, the application that is registering the bookmark and
  * the icon that should be used to represent the bookmark. The data is stored
@@ -92,7 +92,7 @@
  * the on disk representation, using g_bookmark_file_to_data() or
  * g_bookmark_file_to_file().
  *
- * The #GBookmarkFile parser was added in GLib 2.12.
+ * The #xbookmark_file_t parser was added in GLib 2.12.
  */
 
 /* XBEL 1.0 standard entities */
@@ -166,7 +166,7 @@ struct _BookmarkAppInfo
 
   xuint_t count;
 
-  GDateTime *stamp;  /* (owned) */
+  xdatetime_t *stamp;  /* (owned) */
 };
 
 struct _BookmarkMetadata
@@ -176,7 +176,7 @@ struct _BookmarkMetadata
   xlist_t *groups;
 
   xlist_t *applications;
-  GHashTable *apps_by_name;
+  xhashtable_t *apps_by_name;
 
   xchar_t *icon_href;
   xchar_t *icon_mime;
@@ -191,9 +191,9 @@ struct _BookmarkItem
   xchar_t *title;
   xchar_t *description;
 
-  GDateTime *added;  /* (owned) */
-  GDateTime *modified;  /* (owned) */
-  GDateTime *visited;  /* (owned) */
+  xdatetime_t *added;  /* (owned) */
+  xdatetime_t *modified;  /* (owned) */
+  xdatetime_t *visited;  /* (owned) */
 
   BookmarkMetadata *metadata;
 };
@@ -207,7 +207,7 @@ struct _GBookmarkFile
    * a hash table for faster lookup performances
    */
   xlist_t *items;
-  GHashTable *items_by_uri;
+  xhashtable_t *items_by_uri;
 };
 
 /* parser state machine */
@@ -231,23 +231,23 @@ typedef enum
   STATE_FINISHED
 } ParserState;
 
-static void          g_bookmark_file_init        (GBookmarkFile  *bookmark);
-static void          g_bookmark_file_clear       (GBookmarkFile  *bookmark);
-static xboolean_t      g_bookmark_file_parse       (GBookmarkFile  *bookmark,
+static void          g_bookmark_file_init        (xbookmark_file_t  *bookmark);
+static void          g_bookmark_file_clear       (xbookmark_file_t  *bookmark);
+static xboolean_t      g_bookmark_file_parse       (xbookmark_file_t  *bookmark,
 						  const xchar_t    *buffer,
 						  xsize_t           length,
 						  xerror_t        **error);
-static xchar_t *       g_bookmark_file_dump        (GBookmarkFile  *bookmark,
+static xchar_t *       g_bookmark_file_dump        (xbookmark_file_t  *bookmark,
 						  xsize_t          *length,
 						  xerror_t        **error);
-static BookmarkItem *g_bookmark_file_lookup_item (GBookmarkFile  *bookmark,
+static BookmarkItem *g_bookmark_file_lookup_item (xbookmark_file_t  *bookmark,
 						  const xchar_t    *uri);
-static void          g_bookmark_file_add_item    (GBookmarkFile  *bookmark,
+static void          g_bookmark_file_add_item    (xbookmark_file_t  *bookmark,
 						  BookmarkItem   *item,
 						  xerror_t        **error);
 
 static xboolean_t timestamp_from_iso8601 (const xchar_t  *iso_date,
-                                        GDateTime   **out_date_time,
+                                        xdatetime_t   **out_date_time,
                                         xerror_t      **error);
 
 /********************************
@@ -264,7 +264,7 @@ bookmark_app_info_new (const xchar_t *name)
 
   retval = g_slice_new (BookmarkAppInfo);
 
-  retval->name = g_strdup (name);
+  retval->name = xstrdup (name);
   retval->exec = NULL;
   retval->count = 0;
   retval->stamp = NULL;
@@ -280,7 +280,7 @@ bookmark_app_info_free (BookmarkAppInfo *app_info)
 
   g_free (app_info->name);
   g_free (app_info->exec);
-  g_clear_pointer (&app_info->stamp, g_date_time_unref);
+  g_clear_pointer (&app_info->stamp, xdate_time_unref);
 
   g_slice_free (BookmarkAppInfo, app_info);
 }
@@ -298,10 +298,10 @@ bookmark_app_info_dump (BookmarkAppInfo *app_info)
 
   name = g_markup_escape_text (app_info->name, -1);
   exec = g_markup_escape_text (app_info->exec, -1);
-  modified = g_date_time_format_iso8601 (app_info->stamp);
-  count = g_strdup_printf ("%u", app_info->count);
+  modified = xdate_time_format_iso8601 (app_info->stamp);
+  count = xstrdup_printf ("%u", app_info->count);
 
-  retval = g_strconcat ("          "
+  retval = xstrconcat ("          "
                         "<" BOOKMARK_NAMESPACE_NAME ":" BOOKMARK_APPLICATION_ELEMENT
                         " " BOOKMARK_NAME_ATTRIBUTE "=\"", name, "\""
                         " " BOOKMARK_EXEC_ATTRIBUTE "=\"", exec, "\""
@@ -335,8 +335,8 @@ bookmark_metadata_new (void)
   retval->groups = NULL;
 
   retval->applications = NULL;
-  retval->apps_by_name = g_hash_table_new_full (g_str_hash,
-                                                g_str_equal,
+  retval->apps_by_name = xhash_table_new_full (xstr_hash,
+                                                xstr_equal,
                                                 NULL,
                                                 NULL);
 
@@ -356,10 +356,10 @@ bookmark_metadata_free (BookmarkMetadata *metadata)
 
   g_free (metadata->mime_type);
 
-  g_list_free_full (metadata->groups, g_free);
-  g_list_free_full (metadata->applications, (GDestroyNotify) bookmark_app_info_free);
+  xlist_free_full (metadata->groups, g_free);
+  xlist_free_full (metadata->applications, (xdestroy_notify_t) bookmark_app_info_free);
 
-  g_hash_table_destroy (metadata->apps_by_name);
+  xhash_table_destroy (metadata->apps_by_name);
 
   g_free (metadata->icon_href);
   g_free (metadata->icon_mime);
@@ -370,16 +370,16 @@ bookmark_metadata_free (BookmarkMetadata *metadata)
 static xchar_t *
 bookmark_metadata_dump (BookmarkMetadata *metadata)
 {
-  GString *retval;
+  xstring_t *retval;
   xchar_t *buffer;
 
   if (!metadata->applications)
     return NULL;
 
-  retval = g_string_sized_new (1024);
+  retval = xstring_sized_new (1024);
 
   /* metadata container */
-  g_string_append (retval,
+  xstring_append (retval,
 		   "      "
 		   "<" XBEL_METADATA_ELEMENT
 		   " " XBEL_OWNER_ATTRIBUTE "=\"" BOOKMARK_METADATA_OWNER
@@ -387,11 +387,11 @@ bookmark_metadata_dump (BookmarkMetadata *metadata)
 
   /* mime type */
   if (metadata->mime_type) {
-    buffer = g_strconcat ("        "
+    buffer = xstrconcat ("        "
 			  "<" MIME_NAMESPACE_NAME ":" MIME_TYPE_ELEMENT " "
 			  MIME_TYPE_ATTRIBUTE "=\"", metadata->mime_type, "\"/>\n",
 			  NULL);
-    g_string_append (retval, buffer);
+    xstring_append (retval, buffer);
     g_free (buffer);
   }
 
@@ -400,30 +400,30 @@ bookmark_metadata_dump (BookmarkMetadata *metadata)
       xlist_t *l;
 
       /* open groups container */
-      g_string_append (retval,
+      xstring_append (retval,
 		       "        "
 		       "<" BOOKMARK_NAMESPACE_NAME
 		       ":" BOOKMARK_GROUPS_ELEMENT ">\n");
 
-      for (l = g_list_last (metadata->groups); l != NULL; l = l->prev)
+      for (l = xlist_last (metadata->groups); l != NULL; l = l->prev)
         {
           xchar_t *group_name;
 
 	  group_name = g_markup_escape_text ((xchar_t *) l->data, -1);
-	  buffer = g_strconcat ("          "
+	  buffer = xstrconcat ("          "
 				"<" BOOKMARK_NAMESPACE_NAME
 				":" BOOKMARK_GROUP_ELEMENT ">",
 				group_name,
 				"</" BOOKMARK_NAMESPACE_NAME
 				":"  BOOKMARK_GROUP_ELEMENT ">\n", NULL);
-	  g_string_append (retval, buffer);
+	  xstring_append (retval, buffer);
 
 	  g_free (buffer);
 	  g_free (group_name);
         }
 
       /* close groups container */
-      g_string_append (retval,
+      xstring_append (retval,
 		       "        "
 		       "</" BOOKMARK_NAMESPACE_NAME
 		       ":" BOOKMARK_GROUPS_ELEMENT ">\n");
@@ -434,12 +434,12 @@ bookmark_metadata_dump (BookmarkMetadata *metadata)
       xlist_t *l;
 
       /* open applications container */
-      g_string_append (retval,
+      xstring_append (retval,
 		       "        "
 		       "<" BOOKMARK_NAMESPACE_NAME
 		       ":" BOOKMARK_APPLICATIONS_ELEMENT ">\n");
 
-      for (l = g_list_last (metadata->applications); l != NULL; l = l->prev)
+      for (l = xlist_last (metadata->applications); l != NULL; l = l->prev)
         {
           BookmarkAppInfo *app_info = (BookmarkAppInfo *) l->data;
           xchar_t *app_data;
@@ -450,14 +450,14 @@ bookmark_metadata_dump (BookmarkMetadata *metadata)
 
 	  if (app_data)
             {
-              retval = g_string_append (retval, app_data);
+              retval = xstring_append (retval, app_data);
 
 	      g_free (app_data);
 	    }
         }
 
       /* close applications container */
-      g_string_append (retval,
+      xstring_append (retval,
 		       "        "
 		       "</" BOOKMARK_NAMESPACE_NAME
 		       ":" BOOKMARK_APPLICATIONS_ELEMENT ">\n");
@@ -467,31 +467,31 @@ bookmark_metadata_dump (BookmarkMetadata *metadata)
   if (metadata->icon_href)
     {
       if (!metadata->icon_mime)
-        metadata->icon_mime = g_strdup ("application/octet-stream");
+        metadata->icon_mime = xstrdup ("application/octet-stream");
 
-      buffer = g_strconcat ("       "
+      buffer = xstrconcat ("       "
 			    "<" BOOKMARK_NAMESPACE_NAME
 			    ":" BOOKMARK_ICON_ELEMENT
 			    " " BOOKMARK_HREF_ATTRIBUTE "=\"", metadata->icon_href,
 			    "\" " BOOKMARK_TYPE_ATTRIBUTE "=\"", metadata->icon_mime, "\"/>\n", NULL);
-      g_string_append (retval, buffer);
+      xstring_append (retval, buffer);
 
       g_free (buffer);
     }
 
   /* private hint */
   if (metadata->is_private)
-    g_string_append (retval,
+    xstring_append (retval,
 		     "        "
 		     "<" BOOKMARK_NAMESPACE_NAME
 		     ":" BOOKMARK_PRIVATE_ELEMENT "/>\n");
 
   /* close metadata container */
-  g_string_append (retval,
+  xstring_append (retval,
 		   "      "
 		   "</" XBEL_METADATA_ELEMENT ">\n");
 
-  return g_string_free (retval, FALSE);
+  return xstring_free (retval, FALSE);
 }
 
 /******************************************************
@@ -507,7 +507,7 @@ bookmark_item_new (const xchar_t *uri)
   g_warn_if_fail (uri != NULL);
 
   item = g_slice_new (BookmarkItem);
-  item->uri = g_strdup (uri);
+  item->uri = xstrdup (uri);
 
   item->title = NULL;
   item->description = NULL;
@@ -534,9 +534,9 @@ bookmark_item_free (BookmarkItem *item)
   if (item->metadata)
     bookmark_metadata_free (item->metadata);
 
-  g_clear_pointer (&item->added, g_date_time_unref);
-  g_clear_pointer (&item->modified, g_date_time_unref);
-  g_clear_pointer (&item->visited, g_date_time_unref);
+  g_clear_pointer (&item->added, xdate_time_unref);
+  g_clear_pointer (&item->modified, xdate_time_unref);
+  g_clear_pointer (&item->visited, xdate_time_unref);
 
   g_slice_free (BookmarkItem, item);
 }
@@ -544,14 +544,14 @@ bookmark_item_free (BookmarkItem *item)
 static void
 bookmark_item_touch_modified (BookmarkItem *item)
 {
-  g_clear_pointer (&item->modified, g_date_time_unref);
-  item->modified = g_date_time_new_now_utc ();
+  g_clear_pointer (&item->modified, xdate_time_unref);
+  item->modified = xdate_time_new_now_utc ();
 }
 
 static xchar_t *
 bookmark_item_dump (BookmarkItem *item)
 {
-  GString *retval;
+  xstring_t *retval;
   xchar_t *escaped_uri;
 
   /* at this point, we must have at least a registered application; if we don't
@@ -563,15 +563,15 @@ bookmark_item_dump (BookmarkItem *item)
       return NULL;
     }
 
-  retval = g_string_sized_new (4096);
+  retval = xstring_sized_new (4096);
 
-  g_string_append (retval, "  <" XBEL_BOOKMARK_ELEMENT " ");
+  xstring_append (retval, "  <" XBEL_BOOKMARK_ELEMENT " ");
 
   escaped_uri = g_markup_escape_text (item->uri, -1);
 
-  g_string_append (retval, XBEL_HREF_ATTRIBUTE "=\"");
-  g_string_append (retval, escaped_uri);
-  g_string_append (retval , "\" ");
+  xstring_append (retval, XBEL_HREF_ATTRIBUTE "=\"");
+  xstring_append (retval, escaped_uri);
+  xstring_append (retval , "\" ");
 
   g_free (escaped_uri);
 
@@ -579,10 +579,10 @@ bookmark_item_dump (BookmarkItem *item)
     {
       char *added;
 
-      added = g_date_time_format_iso8601 (item->added);
-      g_string_append (retval, XBEL_ADDED_ATTRIBUTE "=\"");
-      g_string_append (retval, added);
-      g_string_append (retval, "\" ");
+      added = xdate_time_format_iso8601 (item->added);
+      xstring_append (retval, XBEL_ADDED_ATTRIBUTE "=\"");
+      xstring_append (retval, added);
+      xstring_append (retval, "\" ");
       g_free (added);
     }
 
@@ -590,10 +590,10 @@ bookmark_item_dump (BookmarkItem *item)
     {
       char *modified;
 
-      modified = g_date_time_format_iso8601 (item->modified);
-      g_string_append (retval, XBEL_MODIFIED_ATTRIBUTE "=\"");
-      g_string_append (retval, modified);
-      g_string_append (retval, "\" ");
+      modified = xdate_time_format_iso8601 (item->modified);
+      xstring_append (retval, XBEL_MODIFIED_ATTRIBUTE "=\"");
+      xstring_append (retval, modified);
+      xstring_append (retval, "\" ");
       g_free (modified);
     }
 
@@ -601,25 +601,25 @@ bookmark_item_dump (BookmarkItem *item)
     {
       char *visited;
 
-      visited = g_date_time_format_iso8601 (item->visited);
-      g_string_append (retval, XBEL_VISITED_ATTRIBUTE "=\"");
-      g_string_append (retval, visited);
-      g_string_append (retval, "\" ");
+      visited = xdate_time_format_iso8601 (item->visited);
+      xstring_append (retval, XBEL_VISITED_ATTRIBUTE "=\"");
+      xstring_append (retval, visited);
+      xstring_append (retval, "\" ");
       g_free (visited);
     }
 
   if (retval->str[retval->len - 1] == ' ')
-    g_string_truncate (retval, retval->len - 1);
-  g_string_append (retval, ">\n");
+    xstring_truncate (retval, retval->len - 1);
+  xstring_append (retval, ">\n");
 
   if (item->title)
     {
       xchar_t *escaped_title;
 
       escaped_title = g_markup_escape_text (item->title, -1);
-      g_string_append (retval, "    " "<" XBEL_TITLE_ELEMENT ">");
-      g_string_append (retval, escaped_title);
-      g_string_append (retval, "</" XBEL_TITLE_ELEMENT ">\n");
+      xstring_append (retval, "    " "<" XBEL_TITLE_ELEMENT ">");
+      xstring_append (retval, escaped_title);
+      xstring_append (retval, "</" XBEL_TITLE_ELEMENT ">\n");
 
       g_free (escaped_title);
     }
@@ -629,9 +629,9 @@ bookmark_item_dump (BookmarkItem *item)
       xchar_t *escaped_desc;
 
       escaped_desc = g_markup_escape_text (item->description, -1);
-      g_string_append (retval, "    " "<" XBEL_DESC_ELEMENT ">");
-      g_string_append (retval, escaped_desc);
-      g_string_append (retval, "</" XBEL_DESC_ELEMENT ">\n");
+      xstring_append (retval, "    " "<" XBEL_DESC_ELEMENT ">");
+      xstring_append (retval, escaped_desc);
+      xstring_append (retval, "</" XBEL_DESC_ELEMENT ">\n");
 
       g_free (escaped_desc);
     }
@@ -643,17 +643,17 @@ bookmark_item_dump (BookmarkItem *item)
       metadata = bookmark_metadata_dump (item->metadata);
       if (metadata)
         {
-          g_string_append (retval, "    " "<" XBEL_INFO_ELEMENT ">\n");
-          g_string_append (retval, metadata);
-          g_string_append (retval, "    " "</" XBEL_INFO_ELEMENT ">\n");
+          xstring_append (retval, "    " "<" XBEL_INFO_ELEMENT ">\n");
+          xstring_append (retval, metadata);
+          xstring_append (retval, "    " "</" XBEL_INFO_ELEMENT ">\n");
 
           g_free (metadata);
         }
     }
 
-  g_string_append (retval, "  </" XBEL_BOOKMARK_ELEMENT ">\n");
+  xstring_append (retval, "  </" XBEL_BOOKMARK_ELEMENT ">\n");
 
-  return g_string_free (retval, FALSE);
+  return xstring_free (retval, FALSE);
 }
 
 static BookmarkAppInfo *
@@ -665,38 +665,38 @@ bookmark_item_lookup_app_info (BookmarkItem *item,
   if (!item->metadata)
     return NULL;
 
-  return g_hash_table_lookup (item->metadata->apps_by_name, app_name);
+  return xhash_table_lookup (item->metadata->apps_by_name, app_name);
 }
 
 /*************************
- *    GBookmarkFile    *
+ *    xbookmark_file_t    *
  *************************/
 
 static void
-g_bookmark_file_init (GBookmarkFile *bookmark)
+g_bookmark_file_init (xbookmark_file_t *bookmark)
 {
   bookmark->title = NULL;
   bookmark->description = NULL;
 
   bookmark->items = NULL;
-  bookmark->items_by_uri = g_hash_table_new_full (g_str_hash,
-                                                  g_str_equal,
+  bookmark->items_by_uri = xhash_table_new_full (xstr_hash,
+                                                  xstr_equal,
                                                   NULL,
                                                   NULL);
 }
 
 static void
-g_bookmark_file_clear (GBookmarkFile *bookmark)
+g_bookmark_file_clear (xbookmark_file_t *bookmark)
 {
   g_free (bookmark->title);
   g_free (bookmark->description);
 
-  g_list_free_full (bookmark->items, (GDestroyNotify) bookmark_item_free);
+  xlist_free_full (bookmark->items, (xdestroy_notify_t) bookmark_item_free);
   bookmark->items = NULL;
 
   if (bookmark->items_by_uri)
     {
-      g_hash_table_destroy (bookmark->items_by_uri);
+      xhash_table_destroy (bookmark->items_by_uri);
 
       bookmark->items_by_uri = NULL;
     }
@@ -706,9 +706,9 @@ struct _ParseData
 {
   ParserState state;
 
-  GHashTable *namespaces;
+  xhashtable_t *namespaces;
 
-  GBookmarkFile *bookmark_file;
+  xbookmark_file_t *bookmark_file;
   BookmarkItem *current_item;
 };
 
@@ -720,9 +720,9 @@ parse_data_new (void)
   retval = g_new (ParseData, 1);
 
   retval->state = STATE_STARTED;
-  retval->namespaces = g_hash_table_new_full (g_str_hash, g_str_equal,
-  					      (GDestroyNotify) g_free,
-  					      (GDestroyNotify) g_free);
+  retval->namespaces = xhash_table_new_full (xstr_hash, xstr_equal,
+  					      (xdestroy_notify_t) g_free,
+  					      (xdestroy_notify_t) g_free);
   retval->bookmark_file = NULL;
   retval->current_item = NULL;
 
@@ -732,7 +732,7 @@ parse_data_new (void)
 static void
 parse_data_free (ParseData *parse_data)
 {
-  g_hash_table_destroy (parse_data->namespaces);
+  xhash_table_destroy (parse_data->namespaces);
 
   g_free (parse_data);
 }
@@ -740,7 +740,7 @@ parse_data_free (ParseData *parse_data)
 #define IS_ATTRIBUTE(s,a)	((0 == strcmp ((s), (a))))
 
 static void
-parse_bookmark_element (GMarkupParseContext  *context,
+parse_bookmark_element (xmarkup_parse_context_t  *context,
 			ParseData            *parse_data,
 			const xchar_t         **attribute_names,
 			const xchar_t         **attribute_values,
@@ -830,7 +830,7 @@ parse_bookmark_element (GMarkupParseContext  *context,
 }
 
 static void
-parse_application_element (GMarkupParseContext  *context,
+parse_application_element (xmarkup_parse_context_t  *context,
 			   ParseData            *parse_data,
 			   const xchar_t         **attribute_names,
 			   const xchar_t         **attribute_values,
@@ -892,19 +892,19 @@ parse_application_element (GMarkupParseContext  *context,
       if (!item->metadata)
 	item->metadata = bookmark_metadata_new ();
 
-      item->metadata->applications = g_list_prepend (item->metadata->applications, ai);
-      g_hash_table_replace (item->metadata->apps_by_name, ai->name, ai);
+      item->metadata->applications = xlist_prepend (item->metadata->applications, ai);
+      xhash_table_replace (item->metadata->apps_by_name, ai->name, ai);
     }
 
   g_free (ai->exec);
-  ai->exec = g_strdup (exec);
+  ai->exec = xstrdup (exec);
 
   if (count)
     ai->count = atoi (count);
   else
     ai->count = 1;
 
-  g_clear_pointer (&ai->stamp, g_date_time_unref);
+  g_clear_pointer (&ai->stamp, xdate_time_unref);
   if (modified != NULL)
     {
       if (!timestamp_from_iso8601 (modified, &ai->stamp, error))
@@ -916,14 +916,14 @@ parse_application_element (GMarkupParseContext  *context,
        * it for backward compatibility
        */
       if (stamp)
-        ai->stamp = g_date_time_new_from_unix_utc (atol (stamp));
+        ai->stamp = xdate_time_new_from_unix_utc (atol (stamp));
       else
-        ai->stamp = g_date_time_new_now_utc ();
+        ai->stamp = xdate_time_new_now_utc ();
     }
 }
 
 static void
-parse_mime_type_element (GMarkupParseContext  *context,
+parse_mime_type_element (xmarkup_parse_context_t  *context,
 			 ParseData            *parse_data,
 			 const xchar_t         **attribute_names,
 			 const xchar_t         **attribute_values,
@@ -954,11 +954,11 @@ parse_mime_type_element (GMarkupParseContext  *context,
     item->metadata = bookmark_metadata_new ();
 
   g_free (item->metadata->mime_type);
-  item->metadata->mime_type = g_strdup (type);
+  item->metadata->mime_type = xstrdup (type);
 }
 
 static void
-parse_icon_element (GMarkupParseContext  *context,
+parse_icon_element (xmarkup_parse_context_t  *context,
 		    ParseData            *parse_data,
 		    const xchar_t         **attribute_names,
 		    const xchar_t         **attribute_values,
@@ -1005,8 +1005,8 @@ parse_icon_element (GMarkupParseContext  *context,
 
   g_free (item->metadata->icon_href);
   g_free (item->metadata->icon_mime);
-  item->metadata->icon_href = g_strdup (href);
-  item->metadata->icon_mime = g_strdup (type);
+  item->metadata->icon_href = xstrdup (href);
+  item->metadata->icon_mime = xstrdup (type);
 }
 
 /* scans through the attributes of an element for the "xmlns" pragma, and
@@ -1038,21 +1038,21 @@ map_namespace_to_name (ParseData    *parse_data,
   i = 0;
   for (attr = attribute_names[i]; attr; attr = attribute_names[++i])
     {
-      if (g_str_has_prefix (attr, "xmlns"))
+      if (xstr_has_prefix (attr, "xmlns"))
         {
           xchar_t *namespace_name, *namespace_uri;
           xchar_t *p;
 
-          p = g_utf8_strchr (attr, -1, ':');
+          p = xutf8_strchr (attr, -1, ':');
           if (p)
-            p = g_utf8_next_char (p);
+            p = xutf8_next_char (p);
           else
             p = "default";
 
-          namespace_name = g_strdup (p);
-          namespace_uri = g_strdup (attribute_values[i]);
+          namespace_name = xstrdup (p);
+          namespace_uri = xstrdup (attribute_values[i]);
 
-          g_hash_table_replace (parse_data->namespaces,
+          xhash_table_replace (parse_data->namespaces,
                                 namespace_name,
                                 namespace_uri);
         }
@@ -1091,19 +1091,19 @@ is_element_full (ParseData   *parse_data,
    * namespace has been set, just do a plain comparison between @full_element
    * and @element.
    */
-  p = g_utf8_strchr (element_full, -1, ':');
+  p = xutf8_strchr (element_full, -1, ':');
   if (p)
     {
-      ns_name = g_strndup (element_full, p - element_full);
-      element_name = g_utf8_next_char (p);
+      ns_name = xstrndup (element_full, p - element_full);
+      element_name = xutf8_next_char (p);
     }
   else
     {
-      ns_name = g_strdup ("default");
+      ns_name = xstrdup ("default");
       element_name = element_full;
     }
 
-  ns_uri = g_hash_table_lookup (parse_data->namespaces, ns_name);
+  ns_uri = xhash_table_lookup (parse_data->namespaces, ns_name);
   if (!ns_uri)
     {
       /* no default namespace found */
@@ -1161,7 +1161,7 @@ parser_state_to_element_name (ParserState state)
 }
 
 static void
-start_element_raw_cb (GMarkupParseContext *context,
+start_element_raw_cb (xmarkup_parse_context_t *context,
                       const xchar_t         *element_name,
                       const xchar_t        **attribute_names,
                       const xchar_t        **attribute_values,
@@ -1362,7 +1362,7 @@ start_element_raw_cb (GMarkupParseContext *context,
 }
 
 static void
-end_element_raw_cb (GMarkupParseContext *context,
+end_element_raw_cb (xmarkup_parse_context_t *context,
                     const xchar_t         *element_name,
                     xpointer_t             user_data,
                     xerror_t             **error)
@@ -1405,7 +1405,7 @@ end_element_raw_cb (GMarkupParseContext *context,
 }
 
 static void
-text_raw_cb (GMarkupParseContext *context,
+text_raw_cb (xmarkup_parse_context_t *context,
              const xchar_t         *text,
              xsize_t                length,
              xpointer_t             user_data,
@@ -1414,7 +1414,7 @@ text_raw_cb (GMarkupParseContext *context,
   ParseData *parse_data = (ParseData *) user_data;
   xchar_t *payload;
 
-  payload = g_strndup (text, length);
+  payload = xstrndup (text, length);
 
   switch (parse_data->state)
     {
@@ -1422,24 +1422,24 @@ text_raw_cb (GMarkupParseContext *context,
       if (parse_data->current_item)
         {
           g_free (parse_data->current_item->title);
-          parse_data->current_item->title = g_strdup (payload);
+          parse_data->current_item->title = xstrdup (payload);
         }
       else
         {
           g_free (parse_data->bookmark_file->title);
-          parse_data->bookmark_file->title = g_strdup (payload);
+          parse_data->bookmark_file->title = xstrdup (payload);
         }
       break;
     case STATE_DESC:
       if (parse_data->current_item)
         {
           g_free (parse_data->current_item->description);
-          parse_data->current_item->description = g_strdup (payload);
+          parse_data->current_item->description = xstrdup (payload);
         }
       else
         {
           g_free (parse_data->bookmark_file->description);
-          parse_data->bookmark_file->description = g_strdup (payload);
+          parse_data->bookmark_file->description = xstrdup (payload);
         }
       break;
     case STATE_GROUP:
@@ -1452,7 +1452,7 @@ text_raw_cb (GMarkupParseContext *context,
         parse_data->current_item->metadata = bookmark_metadata_new ();
 
       groups = parse_data->current_item->metadata->groups;
-      parse_data->current_item->metadata->groups = g_list_prepend (groups, g_strdup (payload));
+      parse_data->current_item->metadata->groups = xlist_prepend (groups, xstrdup (payload));
       }
       break;
     case STATE_ROOT:
@@ -1483,12 +1483,12 @@ static const GMarkupParser markup_parser =
 };
 
 static xboolean_t
-g_bookmark_file_parse (GBookmarkFile  *bookmark,
+g_bookmark_file_parse (xbookmark_file_t  *bookmark,
 			 const xchar_t  *buffer,
 			 xsize_t         length,
 			 xerror_t       **error)
 {
-  GMarkupParseContext *context;
+  xmarkup_parse_context_t *context;
   ParseData *parse_data;
   xerror_t *parse_error, *end_error;
   xboolean_t retval;
@@ -1507,12 +1507,12 @@ g_bookmark_file_parse (GBookmarkFile  *bookmark,
   parse_data = parse_data_new ();
   parse_data->bookmark_file = bookmark;
 
-  context = g_markup_parse_context_new (&markup_parser,
+  context = xmarkup_parse_context_new (&markup_parser,
   					0,
   					parse_data,
-  					(GDestroyNotify) parse_data_free);
+  					(xdestroy_notify_t) parse_data_free);
 
-  retval = g_markup_parse_context_parse (context,
+  retval = xmarkup_parse_context_parse (context,
   					 buffer,
   					 length,
   					 &parse_error);
@@ -1520,28 +1520,28 @@ g_bookmark_file_parse (GBookmarkFile  *bookmark,
     g_propagate_error (error, parse_error);
   else
    {
-     retval = g_markup_parse_context_end_parse (context, &end_error);
+     retval = xmarkup_parse_context_end_parse (context, &end_error);
       if (!retval)
         g_propagate_error (error, end_error);
    }
 
-  g_markup_parse_context_free (context);
+  xmarkup_parse_context_free (context);
 
   return retval;
 }
 
 static xchar_t *
-g_bookmark_file_dump (GBookmarkFile  *bookmark,
+g_bookmark_file_dump (xbookmark_file_t  *bookmark,
 		      xsize_t          *length,
 		      xerror_t        **error)
 {
-  GString *retval;
+  xstring_t *retval;
   xchar_t *buffer;
   xlist_t *l;
 
-  retval = g_string_sized_new (4096);
+  retval = xstring_sized_new (4096);
 
-  g_string_append (retval,
+  xstring_append (retval,
 		   "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 #if 0
 		   /* XXX - do we really need the doctype? */
@@ -1559,12 +1559,12 @@ g_bookmark_file_dump (GBookmarkFile  *bookmark,
 
       escaped_title = g_markup_escape_text (bookmark->title, -1);
 
-      buffer = g_strconcat ("  "
+      buffer = xstrconcat ("  "
 			    "<" XBEL_TITLE_ELEMENT ">",
 			    escaped_title,
 			    "</" XBEL_TITLE_ELEMENT ">\n", NULL);
 
-      g_string_append (retval, buffer);
+      xstring_append (retval, buffer);
 
       g_free (buffer);
       g_free (escaped_title);
@@ -1576,11 +1576,11 @@ g_bookmark_file_dump (GBookmarkFile  *bookmark,
 
       escaped_desc = g_markup_escape_text (bookmark->description, -1);
 
-      buffer = g_strconcat ("  "
+      buffer = xstrconcat ("  "
 			    "<" XBEL_DESC_ELEMENT ">",
 			    escaped_desc,
 			    "</" XBEL_DESC_ELEMENT ">\n", NULL);
-      g_string_append (retval, buffer);
+      xstring_append (retval, buffer);
 
       g_free (buffer);
       g_free (escaped_desc);
@@ -1589,10 +1589,10 @@ g_bookmark_file_dump (GBookmarkFile  *bookmark,
   if (!bookmark->items)
     goto out;
   else
-    retval = g_string_append (retval, "\n");
+    retval = xstring_append (retval, "\n");
 
   /* the items are stored in reverse order */
-  for (l = g_list_last (bookmark->items);
+  for (l = xlist_last (bookmark->items);
        l != NULL;
        l = l->prev)
     {
@@ -1603,18 +1603,18 @@ g_bookmark_file_dump (GBookmarkFile  *bookmark,
       if (!item_dump)
         continue;
 
-      retval = g_string_append (retval, item_dump);
+      retval = xstring_append (retval, item_dump);
 
       g_free (item_dump);
     }
 
 out:
-  g_string_append (retval, "</" XBEL_ROOT_ELEMENT ">");
+  xstring_append (retval, "</" XBEL_ROOT_ELEMENT ">");
 
   if (length)
     *length = retval->len;
 
-  return g_string_free (retval, FALSE);
+  return xstring_free (retval, FALSE);
 }
 
 /**************
@@ -1623,10 +1623,10 @@ out:
 
 static xboolean_t
 timestamp_from_iso8601 (const xchar_t  *iso_date,
-                        GDateTime   **out_date_time,
+                        xdatetime_t   **out_date_time,
                         xerror_t      **error)
 {
-  GDateTime *dt = g_date_time_new_from_iso8601 (iso_date, NULL);
+  xdatetime_t *dt = xdate_time_new_from_iso8601 (iso_date, NULL);
   if (dt == NULL)
     {
       g_set_error (error, G_BOOKMARK_FILE_ERROR, G_BOOKMARK_FILE_ERROR_READ,
@@ -1647,22 +1647,22 @@ G_DEFINE_QUARK (g-bookmark-file-error-quark, g_bookmark_file_error)
 /**
  * g_bookmark_file_new: (constructor)
  *
- * Creates a new empty #GBookmarkFile object.
+ * Creates a new empty #xbookmark_file_t object.
  *
  * Use g_bookmark_file_load_from_file(), g_bookmark_file_load_from_data()
  * or g_bookmark_file_load_from_data_dirs() to read an existing bookmark
  * file.
  *
- * Returns: an empty #GBookmarkFile
+ * Returns: an empty #xbookmark_file_t
  *
  * Since: 2.12
  */
-GBookmarkFile *
+xbookmark_file_t *
 g_bookmark_file_new (void)
 {
-  GBookmarkFile *bookmark;
+  xbookmark_file_t *bookmark;
 
-  bookmark = g_new (GBookmarkFile, 1);
+  bookmark = g_new (xbookmark_file_t, 1);
 
   g_bookmark_file_init (bookmark);
 
@@ -1671,14 +1671,14 @@ g_bookmark_file_new (void)
 
 /**
  * g_bookmark_file_free:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  *
- * Frees a #GBookmarkFile.
+ * Frees a #xbookmark_file_t.
  *
  * Since: 2.12
  */
 void
-g_bookmark_file_free (GBookmarkFile *bookmark)
+g_bookmark_file_free (xbookmark_file_t *bookmark)
 {
   if (!bookmark)
     return;
@@ -1690,13 +1690,13 @@ g_bookmark_file_free (GBookmarkFile *bookmark)
 
 /**
  * g_bookmark_file_load_from_data:
- * @bookmark: an empty #GBookmarkFile struct
- * @data: (array length=length) (element-type guint8): desktop bookmarks
+ * @bookmark: an empty #xbookmark_file_t struct
+ * @data: (array length=length) (element-type xuint8_t): desktop bookmarks
  *    loaded in memory
  * @length: the length of @data in bytes
  * @error: return location for a #xerror_t, or %NULL
  *
- * Loads a bookmark file from memory into an empty #GBookmarkFile
+ * Loads a bookmark file from memory into an empty #xbookmark_file_t
  * structure.  If the object cannot be created then @error is set to a
  * #GBookmarkFileError.
  *
@@ -1705,7 +1705,7 @@ g_bookmark_file_free (GBookmarkFile *bookmark)
  * Since: 2.12
  */
 xboolean_t
-g_bookmark_file_load_from_data (GBookmarkFile  *bookmark,
+g_bookmark_file_load_from_data (xbookmark_file_t  *bookmark,
 				const xchar_t    *data,
 				xsize_t           length,
 				xerror_t        **error)
@@ -1735,12 +1735,12 @@ g_bookmark_file_load_from_data (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_load_from_file:
- * @bookmark: an empty #GBookmarkFile struct
+ * @bookmark: an empty #xbookmark_file_t struct
  * @filename: (type filename): the path of a filename to load, in the
  *     GLib file name encoding
  * @error: return location for a #xerror_t, or %NULL
  *
- * Loads a desktop bookmark file into an empty #GBookmarkFile structure.
+ * Loads a desktop bookmark file into an empty #xbookmark_file_t structure.
  * If the file could not be loaded then @error is set to either a #GFileError
  * or #GBookmarkFileError.
  *
@@ -1749,7 +1749,7 @@ g_bookmark_file_load_from_data (GBookmarkFile  *bookmark,
  * Since: 2.12
  */
 xboolean_t
-g_bookmark_file_load_from_file (GBookmarkFile  *bookmark,
+g_bookmark_file_load_from_file (xbookmark_file_t  *bookmark,
 				const xchar_t    *filename,
 				xerror_t        **error)
 {
@@ -1760,7 +1760,7 @@ g_bookmark_file_load_from_file (GBookmarkFile  *bookmark,
   g_return_val_if_fail (bookmark != NULL, FALSE);
   g_return_val_if_fail (filename != NULL, FALSE);
 
-  if (!g_file_get_contents (filename, &buffer, &len, error))
+  if (!xfile_get_contents (filename, &buffer, &len, error))
     goto out;
 
   if (!g_bookmark_file_load_from_data (bookmark, buffer, len, error))
@@ -1799,7 +1799,7 @@ find_file_in_data_dirs (const xchar_t   *file,
       xchar_t *candidate_file, *sub_dir;
 
       candidate_file = (xchar_t *) file;
-      sub_dir = g_strdup ("");
+      sub_dir = xstrdup ("");
       while (candidate_file != NULL && !path)
         {
           xchar_t *p;
@@ -1815,7 +1815,7 @@ find_file_in_data_dirs (const xchar_t   *file,
           candidate_file++;
 
           g_free (sub_dir);
-          sub_dir = g_strndup (file, candidate_file - file - 1);
+          sub_dir = xstrndup (file, candidate_file - file - 1);
 
           for (p = sub_dir; *p != '\0'; p++)
             {
@@ -1844,7 +1844,7 @@ find_file_in_data_dirs (const xchar_t   *file,
 
 /**
  * g_bookmark_file_load_from_data_dirs:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @file: (type filename): a relative path to a filename to open and parse
  * @full_path: (out) (optional) (type filename): return location for a string
  *    containing the full path of the file, or %NULL
@@ -1861,7 +1861,7 @@ find_file_in_data_dirs (const xchar_t   *file,
  * Since: 2.12
  */
 xboolean_t
-g_bookmark_file_load_from_data_dirs (GBookmarkFile  *bookmark,
+g_bookmark_file_load_from_data_dirs (xbookmark_file_t  *bookmark,
 				     const xchar_t    *file,
 				     xchar_t         **full_path,
 				     xerror_t        **error)
@@ -1879,14 +1879,14 @@ g_bookmark_file_load_from_data_dirs (GBookmarkFile  *bookmark,
 
   user_data_dir = g_get_user_data_dir ();
   system_data_dirs = g_get_system_data_dirs ();
-  all_data_dirs = g_new0 (xchar_t *, g_strv_length ((xchar_t **)system_data_dirs) + 2);
+  all_data_dirs = g_new0 (xchar_t *, xstrv_length ((xchar_t **)system_data_dirs) + 2);
 
   i = 0;
-  all_data_dirs[i++] = g_strdup (user_data_dir);
+  all_data_dirs[i++] = xstrdup (user_data_dir);
 
   j = 0;
   while (system_data_dirs[j] != NULL)
-    all_data_dirs[i++] = g_strdup (system_data_dirs[j++]);
+    all_data_dirs[i++] = xstrdup (system_data_dirs[j++]);
 
   found_file = FALSE;
   data_dirs = all_data_dirs;
@@ -1918,7 +1918,7 @@ g_bookmark_file_load_from_data_dirs (GBookmarkFile  *bookmark,
   else
     g_free (output_path);
 
-  g_strfreev (all_data_dirs);
+  xstrfreev (all_data_dirs);
 
   return found_file;
 }
@@ -1926,19 +1926,19 @@ g_bookmark_file_load_from_data_dirs (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_to_data:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @length: (out) (optional): return location for the length of the returned string, or %NULL
  * @error: return location for a #xerror_t, or %NULL
  *
  * This function outputs @bookmark as a string.
  *
- * Returns: (transfer full) (array length=length) (element-type guint8):
- *   a newly allocated string holding the contents of the #GBookmarkFile
+ * Returns: (transfer full) (array length=length) (element-type xuint8_t):
+ *   a newly allocated string holding the contents of the #xbookmark_file_t
  *
  * Since: 2.12
  */
 xchar_t *
-g_bookmark_file_to_data (GBookmarkFile  *bookmark,
+g_bookmark_file_to_data (xbookmark_file_t  *bookmark,
 			 xsize_t          *length,
 			 xerror_t        **error)
 {
@@ -1960,19 +1960,19 @@ g_bookmark_file_to_data (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_to_file:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @filename: (type filename): path of the output file
  * @error: return location for a #xerror_t, or %NULL
  *
  * This function outputs @bookmark into a file.  The write process is
- * guaranteed to be atomic by using g_file_set_contents() internally.
+ * guaranteed to be atomic by using xfile_set_contents() internally.
  *
  * Returns: %TRUE if the file was successfully written.
  *
  * Since: 2.12
  */
 xboolean_t
-g_bookmark_file_to_file (GBookmarkFile  *bookmark,
+g_bookmark_file_to_file (xbookmark_file_t  *bookmark,
 			 const xchar_t    *filename,
 			 xerror_t        **error)
 {
@@ -1994,7 +1994,7 @@ g_bookmark_file_to_file (GBookmarkFile  *bookmark,
     }
 
   write_error = NULL;
-  g_file_set_contents (filename, data, len, &write_error);
+  xfile_set_contents (filename, data, len, &write_error);
   if (write_error)
     {
       g_propagate_error (error, write_error);
@@ -2010,17 +2010,17 @@ g_bookmark_file_to_file (GBookmarkFile  *bookmark,
 }
 
 static BookmarkItem *
-g_bookmark_file_lookup_item (GBookmarkFile *bookmark,
+g_bookmark_file_lookup_item (xbookmark_file_t *bookmark,
 			     const xchar_t   *uri)
 {
   g_warn_if_fail (bookmark != NULL && uri != NULL);
 
-  return g_hash_table_lookup (bookmark->items_by_uri, uri);
+  return xhash_table_lookup (bookmark->items_by_uri, uri);
 }
 
 /* this function adds a new item to the list */
 static void
-g_bookmark_file_add_item (GBookmarkFile  *bookmark,
+g_bookmark_file_add_item (xbookmark_file_t  *bookmark,
 			  BookmarkItem   *item,
 			  xerror_t        **error)
 {
@@ -2039,25 +2039,25 @@ g_bookmark_file_add_item (GBookmarkFile  *bookmark,
       return;
     }
 
-  bookmark->items = g_list_prepend (bookmark->items, item);
+  bookmark->items = xlist_prepend (bookmark->items, item);
 
-  g_hash_table_replace (bookmark->items_by_uri,
+  xhash_table_replace (bookmark->items_by_uri,
 			item->uri,
 			item);
 
   if (item->added == NULL)
-    item->added = g_date_time_new_now_utc ();
+    item->added = xdate_time_new_now_utc ();
 
   if (item->modified == NULL)
-    item->modified = g_date_time_new_now_utc ();
+    item->modified = xdate_time_new_now_utc ();
 
   if (item->visited == NULL)
-    item->visited = g_date_time_new_now_utc ();
+    item->visited = xdate_time_new_now_utc ();
 }
 
 /**
  * g_bookmark_file_remove_item:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @error: return location for a #xerror_t, or %NULL
  *
@@ -2068,7 +2068,7 @@ g_bookmark_file_add_item (GBookmarkFile  *bookmark,
  * Since: 2.12
  */
 xboolean_t
-g_bookmark_file_remove_item (GBookmarkFile  *bookmark,
+g_bookmark_file_remove_item (xbookmark_file_t  *bookmark,
 			     const xchar_t    *uri,
 			     xerror_t        **error)
 {
@@ -2088,8 +2088,8 @@ g_bookmark_file_remove_item (GBookmarkFile  *bookmark,
       return FALSE;
     }
 
-  bookmark->items = g_list_remove (bookmark->items, item);
-  g_hash_table_remove (bookmark->items_by_uri, item->uri);
+  bookmark->items = xlist_remove (bookmark->items, item);
+  xhash_table_remove (bookmark->items_by_uri, item->uri);
 
   bookmark_item_free (item);
 
@@ -2098,7 +2098,7 @@ g_bookmark_file_remove_item (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_has_item:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  *
  * Looks whether the desktop bookmark has an item with its URI set to @uri.
@@ -2108,18 +2108,18 @@ g_bookmark_file_remove_item (GBookmarkFile  *bookmark,
  * Since: 2.12
  */
 xboolean_t
-g_bookmark_file_has_item (GBookmarkFile *bookmark,
+g_bookmark_file_has_item (xbookmark_file_t *bookmark,
 			  const xchar_t   *uri)
 {
   g_return_val_if_fail (bookmark != NULL, FALSE);
   g_return_val_if_fail (uri != NULL, FALSE);
 
-  return (NULL != g_hash_table_lookup (bookmark->items_by_uri, uri));
+  return (NULL != xhash_table_lookup (bookmark->items_by_uri, uri));
 }
 
 /**
  * g_bookmark_file_get_uris:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @length: (out) (optional): return location for the number of returned URIs, or %NULL
  *
  * Returns all URIs of the bookmarks in the bookmark file @bookmark.
@@ -2127,12 +2127,12 @@ g_bookmark_file_has_item (GBookmarkFile *bookmark,
  * optionally be %NULL.
  *
  * Returns: (array length=length) (transfer full): a newly allocated %NULL-terminated array of strings.
- *   Use g_strfreev() to free it.
+ *   Use xstrfreev() to free it.
  *
  * Since: 2.12
  */
 xchar_t **
-g_bookmark_file_get_uris (GBookmarkFile *bookmark,
+g_bookmark_file_get_uris (xbookmark_file_t *bookmark,
 			  xsize_t         *length)
 {
   xlist_t *l;
@@ -2141,17 +2141,17 @@ g_bookmark_file_get_uris (GBookmarkFile *bookmark,
 
   g_return_val_if_fail (bookmark != NULL, NULL);
 
-  n_items = g_list_length (bookmark->items);
+  n_items = xlist_length (bookmark->items);
   uris = g_new0 (xchar_t *, n_items + 1);
 
   /* the items are stored in reverse order, so we walk the list backward */
-  for (l = g_list_last (bookmark->items), i = 0; l != NULL; l = l->prev)
+  for (l = xlist_last (bookmark->items), i = 0; l != NULL; l = l->prev)
     {
       BookmarkItem *item = (BookmarkItem *) l->data;
 
       g_warn_if_fail (item != NULL);
 
-      uris[i++] = g_strdup (item->uri);
+      uris[i++] = xstrdup (item->uri);
     }
   uris[i] = NULL;
 
@@ -2163,7 +2163,7 @@ g_bookmark_file_get_uris (GBookmarkFile *bookmark,
 
 /**
  * g_bookmark_file_set_title:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: (nullable): a valid URI or %NULL
  * @title: a UTF-8 encoded string
  *
@@ -2177,7 +2177,7 @@ g_bookmark_file_get_uris (GBookmarkFile *bookmark,
  * Since: 2.12
  */
 void
-g_bookmark_file_set_title (GBookmarkFile *bookmark,
+g_bookmark_file_set_title (xbookmark_file_t *bookmark,
 			   const xchar_t   *uri,
 			   const xchar_t   *title)
 {
@@ -2186,7 +2186,7 @@ g_bookmark_file_set_title (GBookmarkFile *bookmark,
   if (!uri)
     {
       g_free (bookmark->title);
-      bookmark->title = g_strdup (title);
+      bookmark->title = xstrdup (title);
     }
   else
     {
@@ -2200,7 +2200,7 @@ g_bookmark_file_set_title (GBookmarkFile *bookmark,
         }
 
       g_free (item->title);
-      item->title = g_strdup (title);
+      item->title = xstrdup (title);
 
       bookmark_item_touch_modified (item);
     }
@@ -2208,7 +2208,7 @@ g_bookmark_file_set_title (GBookmarkFile *bookmark,
 
 /**
  * g_bookmark_file_get_title:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: (nullable): a valid URI or %NULL
  * @error: return location for a #xerror_t, or %NULL
  *
@@ -2225,7 +2225,7 @@ g_bookmark_file_set_title (GBookmarkFile *bookmark,
  * Since: 2.12
  */
 xchar_t *
-g_bookmark_file_get_title (GBookmarkFile  *bookmark,
+g_bookmark_file_get_title (xbookmark_file_t  *bookmark,
 			   const xchar_t    *uri,
 			   xerror_t        **error)
 {
@@ -2234,7 +2234,7 @@ g_bookmark_file_get_title (GBookmarkFile  *bookmark,
   g_return_val_if_fail (bookmark != NULL, NULL);
 
   if (!uri)
-    return g_strdup (bookmark->title);
+    return xstrdup (bookmark->title);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)
@@ -2246,12 +2246,12 @@ g_bookmark_file_get_title (GBookmarkFile  *bookmark,
       return NULL;
     }
 
-  return g_strdup (item->title);
+  return xstrdup (item->title);
 }
 
 /**
  * g_bookmark_file_set_description:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: (nullable): a valid URI or %NULL
  * @description: a string
  *
@@ -2264,7 +2264,7 @@ g_bookmark_file_get_title (GBookmarkFile  *bookmark,
  * Since: 2.12
  */
 void
-g_bookmark_file_set_description (GBookmarkFile *bookmark,
+g_bookmark_file_set_description (xbookmark_file_t *bookmark,
 				 const xchar_t   *uri,
 				 const xchar_t   *description)
 {
@@ -2273,7 +2273,7 @@ g_bookmark_file_set_description (GBookmarkFile *bookmark,
   if (!uri)
     {
       g_free (bookmark->description);
-      bookmark->description = g_strdup (description);
+      bookmark->description = xstrdup (description);
     }
   else
     {
@@ -2287,7 +2287,7 @@ g_bookmark_file_set_description (GBookmarkFile *bookmark,
         }
 
       g_free (item->description);
-      item->description = g_strdup (description);
+      item->description = xstrdup (description);
 
       bookmark_item_touch_modified (item);
     }
@@ -2295,7 +2295,7 @@ g_bookmark_file_set_description (GBookmarkFile *bookmark,
 
 /**
  * g_bookmark_file_get_description:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @error: return location for a #xerror_t, or %NULL
  *
@@ -2310,7 +2310,7 @@ g_bookmark_file_set_description (GBookmarkFile *bookmark,
  * Since: 2.12
  */
 xchar_t *
-g_bookmark_file_get_description (GBookmarkFile  *bookmark,
+g_bookmark_file_get_description (xbookmark_file_t  *bookmark,
 				 const xchar_t    *uri,
 				 xerror_t        **error)
 {
@@ -2319,7 +2319,7 @@ g_bookmark_file_get_description (GBookmarkFile  *bookmark,
   g_return_val_if_fail (bookmark != NULL, NULL);
 
   if (!uri)
-    return g_strdup (bookmark->description);
+    return xstrdup (bookmark->description);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)
@@ -2331,12 +2331,12 @@ g_bookmark_file_get_description (GBookmarkFile  *bookmark,
       return NULL;
     }
 
-  return g_strdup (item->description);
+  return xstrdup (item->description);
 }
 
 /**
  * g_bookmark_file_set_mime_type:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @mime_type: a MIME type
  *
@@ -2347,7 +2347,7 @@ g_bookmark_file_get_description (GBookmarkFile  *bookmark,
  * Since: 2.12
  */
 void
-g_bookmark_file_set_mime_type (GBookmarkFile *bookmark,
+g_bookmark_file_set_mime_type (xbookmark_file_t *bookmark,
 			       const xchar_t   *uri,
 			       const xchar_t   *mime_type)
 {
@@ -2369,13 +2369,13 @@ g_bookmark_file_set_mime_type (GBookmarkFile *bookmark,
 
   g_free (item->metadata->mime_type);
 
-  item->metadata->mime_type = g_strdup (mime_type);
+  item->metadata->mime_type = xstrdup (mime_type);
   bookmark_item_touch_modified (item);
 }
 
 /**
  * g_bookmark_file_get_mime_type:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @error: return location for a #xerror_t, or %NULL
  *
@@ -2392,7 +2392,7 @@ g_bookmark_file_set_mime_type (GBookmarkFile *bookmark,
  * Since: 2.12
  */
 xchar_t *
-g_bookmark_file_get_mime_type (GBookmarkFile  *bookmark,
+g_bookmark_file_get_mime_type (xbookmark_file_t  *bookmark,
 			       const xchar_t    *uri,
 			       xerror_t        **error)
 {
@@ -2420,12 +2420,12 @@ g_bookmark_file_get_mime_type (GBookmarkFile  *bookmark,
       return NULL;
     }
 
-  return g_strdup (item->metadata->mime_type);
+  return xstrdup (item->metadata->mime_type);
 }
 
 /**
  * g_bookmark_file_set_is_private:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @is_private: %TRUE if the bookmark should be marked as private
  *
@@ -2436,7 +2436,7 @@ g_bookmark_file_get_mime_type (GBookmarkFile  *bookmark,
  * Since: 2.12
  */
 void
-g_bookmark_file_set_is_private (GBookmarkFile *bookmark,
+g_bookmark_file_set_is_private (xbookmark_file_t *bookmark,
 				const xchar_t   *uri,
 				xboolean_t       is_private)
 {
@@ -2461,7 +2461,7 @@ g_bookmark_file_set_is_private (GBookmarkFile *bookmark,
 
 /**
  * g_bookmark_file_get_is_private:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @error: return location for a #xerror_t, or %NULL
  *
@@ -2477,7 +2477,7 @@ g_bookmark_file_set_is_private (GBookmarkFile *bookmark,
  * Since: 2.12
  */
 xboolean_t
-g_bookmark_file_get_is_private (GBookmarkFile  *bookmark,
+g_bookmark_file_get_is_private (xbookmark_file_t  *bookmark,
 				const xchar_t    *uri,
 				xerror_t        **error)
 {
@@ -2510,7 +2510,7 @@ g_bookmark_file_get_is_private (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_set_added:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @added: a timestamp or -1 to use the current time
  *
@@ -2523,20 +2523,20 @@ g_bookmark_file_get_is_private (GBookmarkFile  *bookmark,
  *    `time_t` is deprecated due to the year 2038 problem.
  */
 void
-g_bookmark_file_set_added (GBookmarkFile *bookmark,
+g_bookmark_file_set_added (xbookmark_file_t *bookmark,
 			   const xchar_t   *uri,
 			   time_t         added)
 {
-  GDateTime *added_dt = (added != (time_t) -1) ? g_date_time_new_from_unix_utc (added) : g_date_time_new_now_utc ();
+  xdatetime_t *added_dt = (added != (time_t) -1) ? xdate_time_new_from_unix_utc (added) : xdate_time_new_now_utc ();
   g_bookmark_file_set_added_date_time (bookmark, uri, added_dt);
-  g_date_time_unref (added_dt);
+  xdate_time_unref (added_dt);
 }
 
 /**
  * g_bookmark_file_set_added_date_time:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
- * @added: a #GDateTime
+ * @added: a #xdatetime_t
  *
  * Sets the time the bookmark for @uri was added into @bookmark.
  *
@@ -2545,9 +2545,9 @@ g_bookmark_file_set_added (GBookmarkFile *bookmark,
  * Since: 2.66
  */
 void
-g_bookmark_file_set_added_date_time (GBookmarkFile *bookmark,
+g_bookmark_file_set_added_date_time (xbookmark_file_t *bookmark,
                                      const char    *uri,
-                                     GDateTime     *added)
+                                     xdatetime_t     *added)
 {
   BookmarkItem *item;
 
@@ -2562,15 +2562,15 @@ g_bookmark_file_set_added_date_time (GBookmarkFile *bookmark,
       g_bookmark_file_add_item (bookmark, item, NULL);
     }
 
-  g_clear_pointer (&item->added, g_date_time_unref);
-  item->added = g_date_time_ref (added);
-  g_clear_pointer (&item->modified, g_date_time_unref);
-  item->modified = g_date_time_ref (added);
+  g_clear_pointer (&item->added, xdate_time_unref);
+  item->added = xdate_time_ref (added);
+  g_clear_pointer (&item->modified, xdate_time_unref);
+  item->modified = xdate_time_ref (added);
 }
 
 /**
  * g_bookmark_file_get_added:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @error: return location for a #xerror_t, or %NULL
  *
@@ -2586,17 +2586,17 @@ g_bookmark_file_set_added_date_time (GBookmarkFile *bookmark,
  *    `time_t` is deprecated due to the year 2038 problem.
  */
 time_t
-g_bookmark_file_get_added (GBookmarkFile  *bookmark,
+g_bookmark_file_get_added (xbookmark_file_t  *bookmark,
 			   const xchar_t    *uri,
 			   xerror_t        **error)
 {
-  GDateTime *added = g_bookmark_file_get_added_date_time (bookmark, uri, error);
-  return (added != NULL) ? g_date_time_to_unix (added) : (time_t) -1;
+  xdatetime_t *added = g_bookmark_file_get_added_date_time (bookmark, uri, error);
+  return (added != NULL) ? xdate_time_to_unix (added) : (time_t) -1;
 }
 
 /**
  * g_bookmark_file_get_added_date_time:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @error: return location for a #xerror_t, or %NULL
  *
@@ -2605,12 +2605,12 @@ g_bookmark_file_get_added (GBookmarkFile  *bookmark,
  * In the event the URI cannot be found, %NULL is returned and
  * @error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
  *
- * Returns: (transfer none): a #GDateTime
+ * Returns: (transfer none): a #xdatetime_t
  *
  * Since: 2.66
  */
-GDateTime *
-g_bookmark_file_get_added_date_time (GBookmarkFile  *bookmark,
+xdatetime_t *
+g_bookmark_file_get_added_date_time (xbookmark_file_t  *bookmark,
                                      const char     *uri,
                                      xerror_t        **error)
 {
@@ -2635,7 +2635,7 @@ g_bookmark_file_get_added_date_time (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_set_modified:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @modified: a timestamp or -1 to use the current time
  *
@@ -2644,7 +2644,7 @@ g_bookmark_file_get_added_date_time (GBookmarkFile  *bookmark,
  * If no bookmark for @uri is found then it is created.
  *
  * The "modified" time should only be set when the bookmark's meta-data
- * was actually changed.  Every function of #GBookmarkFile that
+ * was actually changed.  Every function of #xbookmark_file_t that
  * modifies a bookmark also changes the modification time, except for
  * g_bookmark_file_set_visited_date_time().
  *
@@ -2653,36 +2653,36 @@ g_bookmark_file_get_added_date_time (GBookmarkFile  *bookmark,
  *    `time_t` is deprecated due to the year 2038 problem.
  */
 void
-g_bookmark_file_set_modified (GBookmarkFile *bookmark,
+g_bookmark_file_set_modified (xbookmark_file_t *bookmark,
 			      const xchar_t   *uri,
 			      time_t         modified)
 {
-  GDateTime *modified_dt = (modified != (time_t) -1) ? g_date_time_new_from_unix_utc (modified) : g_date_time_new_now_utc ();
+  xdatetime_t *modified_dt = (modified != (time_t) -1) ? xdate_time_new_from_unix_utc (modified) : xdate_time_new_now_utc ();
   g_bookmark_file_set_modified_date_time (bookmark, uri, modified_dt);
-  g_date_time_unref (modified_dt);
+  xdate_time_unref (modified_dt);
 }
 
 /**
  * g_bookmark_file_set_modified_date_time:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
- * @modified: a #GDateTime
+ * @modified: a #xdatetime_t
  *
  * Sets the last time the bookmark for @uri was last modified.
  *
  * If no bookmark for @uri is found then it is created.
  *
  * The "modified" time should only be set when the bookmark's meta-data
- * was actually changed.  Every function of #GBookmarkFile that
+ * was actually changed.  Every function of #xbookmark_file_t that
  * modifies a bookmark also changes the modification time, except for
  * g_bookmark_file_set_visited_date_time().
  *
  * Since: 2.66
  */
 void
-g_bookmark_file_set_modified_date_time (GBookmarkFile *bookmark,
+g_bookmark_file_set_modified_date_time (xbookmark_file_t *bookmark,
                                         const char    *uri,
-                                        GDateTime     *modified)
+                                        xdatetime_t     *modified)
 {
   BookmarkItem *item;
 
@@ -2697,13 +2697,13 @@ g_bookmark_file_set_modified_date_time (GBookmarkFile *bookmark,
       g_bookmark_file_add_item (bookmark, item, NULL);
     }
 
-  g_clear_pointer (&item->modified, g_date_time_unref);
-  item->modified = g_date_time_ref (modified);
+  g_clear_pointer (&item->modified, xdate_time_unref);
+  item->modified = xdate_time_ref (modified);
 }
 
 /**
  * g_bookmark_file_get_modified:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @error: return location for a #xerror_t, or %NULL
  *
@@ -2719,17 +2719,17 @@ g_bookmark_file_set_modified_date_time (GBookmarkFile *bookmark,
  *    `time_t` is deprecated due to the year 2038 problem.
  */
 time_t
-g_bookmark_file_get_modified (GBookmarkFile  *bookmark,
+g_bookmark_file_get_modified (xbookmark_file_t  *bookmark,
 			      const xchar_t    *uri,
 			      xerror_t        **error)
 {
-  GDateTime *modified = g_bookmark_file_get_modified_date_time (bookmark, uri, error);
-  return (modified != NULL) ? g_date_time_to_unix (modified) : (time_t) -1;
+  xdatetime_t *modified = g_bookmark_file_get_modified_date_time (bookmark, uri, error);
+  return (modified != NULL) ? xdate_time_to_unix (modified) : (time_t) -1;
 }
 
 /**
  * g_bookmark_file_get_modified_date_time:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @error: return location for a #xerror_t, or %NULL
  *
@@ -2738,12 +2738,12 @@ g_bookmark_file_get_modified (GBookmarkFile  *bookmark,
  * In the event the URI cannot be found, %NULL is returned and
  * @error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
  *
- * Returns: (transfer none): a #GDateTime
+ * Returns: (transfer none): a #xdatetime_t
  *
  * Since: 2.66
  */
-GDateTime *
-g_bookmark_file_get_modified_date_time (GBookmarkFile  *bookmark,
+xdatetime_t *
+g_bookmark_file_get_modified_date_time (xbookmark_file_t  *bookmark,
                                         const char     *uri,
                                         xerror_t        **error)
 {
@@ -2768,7 +2768,7 @@ g_bookmark_file_get_modified_date_time (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_set_visited:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @visited: a timestamp or -1 to use the current time
  *
@@ -2787,20 +2787,20 @@ g_bookmark_file_get_modified_date_time (GBookmarkFile  *bookmark,
  *    `time_t` is deprecated due to the year 2038 problem.
  */
 void
-g_bookmark_file_set_visited (GBookmarkFile *bookmark,
+g_bookmark_file_set_visited (xbookmark_file_t *bookmark,
 			     const xchar_t   *uri,
 			     time_t         visited)
 {
-  GDateTime *visited_dt = (visited != (time_t) -1) ? g_date_time_new_from_unix_utc (visited) : g_date_time_new_now_utc ();
+  xdatetime_t *visited_dt = (visited != (time_t) -1) ? xdate_time_new_from_unix_utc (visited) : xdate_time_new_now_utc ();
   g_bookmark_file_set_visited_date_time (bookmark, uri, visited_dt);
-  g_date_time_unref (visited_dt);
+  xdate_time_unref (visited_dt);
 }
 
 /**
  * g_bookmark_file_set_visited_date_time:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
- * @visited: a #GDateTime
+ * @visited: a #xdatetime_t
  *
  * Sets the time the bookmark for @uri was last visited.
  *
@@ -2815,9 +2815,9 @@ g_bookmark_file_set_visited (GBookmarkFile *bookmark,
  * Since: 2.66
  */
 void
-g_bookmark_file_set_visited_date_time (GBookmarkFile *bookmark,
+g_bookmark_file_set_visited_date_time (xbookmark_file_t *bookmark,
                                        const char    *uri,
-                                       GDateTime     *visited)
+                                       xdatetime_t     *visited)
 {
   BookmarkItem *item;
 
@@ -2832,13 +2832,13 @@ g_bookmark_file_set_visited_date_time (GBookmarkFile *bookmark,
       g_bookmark_file_add_item (bookmark, item, NULL);
     }
 
-  g_clear_pointer (&item->visited, g_date_time_unref);
-  item->visited = g_date_time_ref (visited);
+  g_clear_pointer (&item->visited, xdate_time_unref);
+  item->visited = xdate_time_ref (visited);
 }
 
 /**
  * g_bookmark_file_get_visited:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @error: return location for a #xerror_t, or %NULL
  *
@@ -2854,17 +2854,17 @@ g_bookmark_file_set_visited_date_time (GBookmarkFile *bookmark,
  *    `time_t` is deprecated due to the year 2038 problem.
  */
 time_t
-g_bookmark_file_get_visited (GBookmarkFile  *bookmark,
+g_bookmark_file_get_visited (xbookmark_file_t  *bookmark,
 			     const xchar_t    *uri,
 			     xerror_t        **error)
 {
-  GDateTime *visited = g_bookmark_file_get_visited_date_time (bookmark, uri, error);
-  return (visited != NULL) ? g_date_time_to_unix (visited) : (time_t) -1;
+  xdatetime_t *visited = g_bookmark_file_get_visited_date_time (bookmark, uri, error);
+  return (visited != NULL) ? xdate_time_to_unix (visited) : (time_t) -1;
 }
 
 /**
  * g_bookmark_file_get_visited_date_time:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @error: return location for a #xerror_t, or %NULL
  *
@@ -2873,12 +2873,12 @@ g_bookmark_file_get_visited (GBookmarkFile  *bookmark,
  * In the event the URI cannot be found, %NULL is returned and
  * @error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
  *
- * Returns: (transfer none): a #GDateTime
+ * Returns: (transfer none): a #xdatetime_t
  *
  * Since: 2.66
  */
-GDateTime *
-g_bookmark_file_get_visited_date_time (GBookmarkFile  *bookmark,
+xdatetime_t *
+g_bookmark_file_get_visited_date_time (xbookmark_file_t  *bookmark,
                                        const char     *uri,
                                        xerror_t        **error)
 {
@@ -2903,7 +2903,7 @@ g_bookmark_file_get_visited_date_time (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_has_group:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @group: the group name to be searched
  * @error: return location for a #xerror_t, or %NULL
@@ -2919,7 +2919,7 @@ g_bookmark_file_get_visited_date_time (GBookmarkFile  *bookmark,
  * Since: 2.12
  */
 xboolean_t
-g_bookmark_file_has_group (GBookmarkFile  *bookmark,
+g_bookmark_file_has_group (xbookmark_file_t  *bookmark,
 			   const xchar_t    *uri,
 			   const xchar_t    *group,
 			   xerror_t        **error)
@@ -2955,7 +2955,7 @@ g_bookmark_file_has_group (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_add_group:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @group: the group name to be added
  *
@@ -2967,7 +2967,7 @@ g_bookmark_file_has_group (GBookmarkFile  *bookmark,
  * Since: 2.12
  */
 void
-g_bookmark_file_add_group (GBookmarkFile *bookmark,
+g_bookmark_file_add_group (xbookmark_file_t *bookmark,
 			   const xchar_t   *uri,
 			   const xchar_t   *group)
 {
@@ -2989,8 +2989,8 @@ g_bookmark_file_add_group (GBookmarkFile *bookmark,
 
   if (!g_bookmark_file_has_group (bookmark, uri, group, NULL))
     {
-      item->metadata->groups = g_list_prepend (item->metadata->groups,
-                                               g_strdup (group));
+      item->metadata->groups = xlist_prepend (item->metadata->groups,
+                                               xstrdup (group));
 
       bookmark_item_touch_modified (item);
     }
@@ -2998,7 +2998,7 @@ g_bookmark_file_add_group (GBookmarkFile *bookmark,
 
 /**
  * g_bookmark_file_remove_group:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @group: the group name to be removed
  * @error: return location for a #xerror_t, or %NULL
@@ -3016,7 +3016,7 @@ g_bookmark_file_add_group (GBookmarkFile *bookmark,
  * Since: 2.12
  */
 xboolean_t
-g_bookmark_file_remove_group (GBookmarkFile  *bookmark,
+g_bookmark_file_remove_group (xbookmark_file_t  *bookmark,
 			      const xchar_t    *uri,
 			      const xchar_t    *group,
 			      xerror_t        **error)
@@ -3050,9 +3050,9 @@ g_bookmark_file_remove_group (GBookmarkFile  *bookmark,
     {
       if (strcmp (l->data, group) == 0)
         {
-          item->metadata->groups = g_list_remove_link (item->metadata->groups, l);
+          item->metadata->groups = xlist_remove_link (item->metadata->groups, l);
           g_free (l->data);
-	  g_list_free_1 (l);
+	  xlist_free_1 (l);
 
           bookmark_item_touch_modified (item);
 
@@ -3065,7 +3065,7 @@ g_bookmark_file_remove_group (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_set_groups:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: an item's URI
  * @groups: (nullable) (array length=length) (element-type utf8): an array of
  *    group names, or %NULL to remove all groups
@@ -3079,7 +3079,7 @@ g_bookmark_file_remove_group (GBookmarkFile  *bookmark,
  * Since: 2.12
  */
 void
-g_bookmark_file_set_groups (GBookmarkFile  *bookmark,
+g_bookmark_file_set_groups (xbookmark_file_t  *bookmark,
 			    const xchar_t    *uri,
 			    const xchar_t   **groups,
 			    xsize_t           length)
@@ -3101,14 +3101,14 @@ g_bookmark_file_set_groups (GBookmarkFile  *bookmark,
   if (!item->metadata)
     item->metadata = bookmark_metadata_new ();
 
-  g_list_free_full (item->metadata->groups, g_free);
+  xlist_free_full (item->metadata->groups, g_free);
   item->metadata->groups = NULL;
 
   if (groups)
     {
       for (i = 0; i < length && groups[i] != NULL; i++)
-        item->metadata->groups = g_list_append (item->metadata->groups,
-					        g_strdup (groups[i]));
+        item->metadata->groups = xlist_append (item->metadata->groups,
+					        xstrdup (groups[i]));
     }
 
   bookmark_item_touch_modified (item);
@@ -3116,7 +3116,7 @@ g_bookmark_file_set_groups (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_get_groups:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @length: (out) (optional): return location for the length of the returned string, or %NULL
  * @error: return location for a #xerror_t, or %NULL
@@ -3130,12 +3130,12 @@ g_bookmark_file_set_groups (GBookmarkFile  *bookmark,
  * be %NULL.
  *
  * Returns: (array length=length) (transfer full): a newly allocated %NULL-terminated array of group names.
- *   Use g_strfreev() to free it.
+ *   Use xstrfreev() to free it.
  *
  * Since: 2.12
  */
 xchar_t **
-g_bookmark_file_get_groups (GBookmarkFile  *bookmark,
+g_bookmark_file_get_groups (xbookmark_file_t  *bookmark,
 			    const xchar_t    *uri,
 			    xsize_t          *length,
 			    xerror_t        **error)
@@ -3166,9 +3166,9 @@ g_bookmark_file_get_groups (GBookmarkFile  *bookmark,
       return NULL;
     }
 
-  len = g_list_length (item->metadata->groups);
+  len = xlist_length (item->metadata->groups);
   retval = g_new0 (xchar_t *, len + 1);
-  for (l = g_list_last (item->metadata->groups), i = 0;
+  for (l = xlist_last (item->metadata->groups), i = 0;
        l != NULL;
        l = l->prev)
     {
@@ -3176,7 +3176,7 @@ g_bookmark_file_get_groups (GBookmarkFile  *bookmark,
 
       g_warn_if_fail (group_name != NULL);
 
-      retval[i++] = g_strdup (group_name);
+      retval[i++] = xstrdup (group_name);
     }
   retval[i] = NULL;
 
@@ -3188,7 +3188,7 @@ g_bookmark_file_get_groups (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_add_application:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @name: (nullable): the name of the application registering the bookmark
  *   or %NULL
@@ -3198,7 +3198,7 @@ g_bookmark_file_get_groups (GBookmarkFile  *bookmark,
  * applications that have registered a bookmark for @uri into
  * @bookmark.
  *
- * Every bookmark inside a #GBookmarkFile must have at least an
+ * Every bookmark inside a #xbookmark_file_t must have at least an
  * application registered.  Each application must provide a name, a
  * command line useful for launching the bookmark, the number of times
  * the bookmark has been registered by the application and the last
@@ -3220,14 +3220,14 @@ g_bookmark_file_get_groups (GBookmarkFile  *bookmark,
  * Since: 2.12
  */
 void
-g_bookmark_file_add_application (GBookmarkFile *bookmark,
+g_bookmark_file_add_application (xbookmark_file_t *bookmark,
 				 const xchar_t   *uri,
 				 const xchar_t   *name,
 				 const xchar_t   *exec)
 {
   BookmarkItem *item;
   xchar_t *app_name, *app_exec;
-  GDateTime *stamp;
+  xdatetime_t *stamp;
 
   g_return_if_fail (bookmark != NULL);
   g_return_if_fail (uri != NULL);
@@ -3240,16 +3240,16 @@ g_bookmark_file_add_application (GBookmarkFile *bookmark,
     }
 
   if (name && name[0] != '\0')
-    app_name = g_strdup (name);
+    app_name = xstrdup (name);
   else
-    app_name = g_strdup (g_get_application_name ());
+    app_name = xstrdup (g_get_application_name ());
 
   if (exec && exec[0] != '\0')
-    app_exec = g_strdup (exec);
+    app_exec = xstrdup (exec);
   else
-    app_exec = g_strjoin (" ", g_get_prgname(), "%u", NULL);
+    app_exec = xstrjoin (" ", g_get_prgname(), "%u", NULL);
 
-  stamp = g_date_time_new_now_utc ();
+  stamp = xdate_time_new_now_utc ();
 
   g_bookmark_file_set_application_info (bookmark, uri,
                                         app_name,
@@ -3258,14 +3258,14 @@ g_bookmark_file_add_application (GBookmarkFile *bookmark,
                                         stamp,
                                         NULL);
 
-  g_date_time_unref (stamp);
+  xdate_time_unref (stamp);
   g_free (app_exec);
   g_free (app_name);
 }
 
 /**
  * g_bookmark_file_remove_application:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @name: the name of the application
  * @error: return location for a #xerror_t or %NULL
@@ -3284,7 +3284,7 @@ g_bookmark_file_add_application (GBookmarkFile *bookmark,
  * Since: 2.12
  */
 xboolean_t
-g_bookmark_file_remove_application (GBookmarkFile  *bookmark,
+g_bookmark_file_remove_application (xbookmark_file_t  *bookmark,
 				    const xchar_t    *uri,
 				    const xchar_t    *name,
 				    xerror_t        **error)
@@ -3315,7 +3315,7 @@ g_bookmark_file_remove_application (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_has_application:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @name: the name of the application
  * @error: return location for a #xerror_t or %NULL
@@ -3331,7 +3331,7 @@ g_bookmark_file_remove_application (GBookmarkFile  *bookmark,
  * Since: 2.12
  */
 xboolean_t
-g_bookmark_file_has_application (GBookmarkFile  *bookmark,
+g_bookmark_file_has_application (xbookmark_file_t  *bookmark,
 				 const xchar_t    *uri,
 				 const xchar_t    *name,
 				 xerror_t        **error)
@@ -3357,7 +3357,7 @@ g_bookmark_file_has_application (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_set_app_info:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @name: an application's name
  * @exec: an application's command line
@@ -3402,7 +3402,7 @@ g_bookmark_file_has_application (GBookmarkFile  *bookmark,
  *    `time_t` is deprecated due to the year 2038 problem.
  */
 xboolean_t
-g_bookmark_file_set_app_info (GBookmarkFile  *bookmark,
+g_bookmark_file_set_app_info (xbookmark_file_t  *bookmark,
 			      const xchar_t    *uri,
 			      const xchar_t    *name,
 			      const xchar_t    *exec,
@@ -3410,17 +3410,17 @@ g_bookmark_file_set_app_info (GBookmarkFile  *bookmark,
 			      time_t          stamp,
 			      xerror_t        **error)
 {
-  GDateTime *stamp_dt = (stamp != (time_t) -1) ? g_date_time_new_from_unix_utc (stamp) : g_date_time_new_now_utc ();
+  xdatetime_t *stamp_dt = (stamp != (time_t) -1) ? xdate_time_new_from_unix_utc (stamp) : xdate_time_new_now_utc ();
   xboolean_t retval;
   retval = g_bookmark_file_set_application_info (bookmark, uri, name, exec, count,
                                                  stamp_dt, error);
-  g_date_time_unref (stamp_dt);
+  xdate_time_unref (stamp_dt);
   return retval;
 }
 
 /**
  * g_bookmark_file_set_application_info:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @name: an application's name
  * @exec: an application's command line
@@ -3463,12 +3463,12 @@ g_bookmark_file_set_app_info (GBookmarkFile  *bookmark,
  * Since: 2.66
  */
 xboolean_t
-g_bookmark_file_set_application_info (GBookmarkFile  *bookmark,
+g_bookmark_file_set_application_info (xbookmark_file_t  *bookmark,
                                       const char     *uri,
                                       const char     *name,
                                       const char     *exec,
                                       int             count,
-                                      GDateTime      *stamp,
+                                      xdatetime_t      *stamp,
                                       xerror_t        **error)
 {
   BookmarkItem *item;
@@ -3518,15 +3518,15 @@ g_bookmark_file_set_application_info (GBookmarkFile  *bookmark,
         {
           ai = bookmark_app_info_new (name);
 
-          item->metadata->applications = g_list_prepend (item->metadata->applications, ai);
-          g_hash_table_replace (item->metadata->apps_by_name, ai->name, ai);
+          item->metadata->applications = xlist_prepend (item->metadata->applications, ai);
+          xhash_table_replace (item->metadata->apps_by_name, ai->name, ai);
         }
     }
 
   if (count == 0)
     {
-      item->metadata->applications = g_list_remove (item->metadata->applications, ai);
-      g_hash_table_remove (item->metadata->apps_by_name, ai->name);
+      item->metadata->applications = xlist_remove (item->metadata->applications, ai);
+      xhash_table_remove (item->metadata->apps_by_name, ai->name);
       bookmark_app_info_free (ai);
 
       bookmark_item_touch_modified (item);
@@ -3538,8 +3538,8 @@ g_bookmark_file_set_application_info (GBookmarkFile  *bookmark,
   else
     ai->count += 1;
 
-  g_clear_pointer (&ai->stamp, g_date_time_unref);
-  ai->stamp = g_date_time_ref (stamp);
+  g_clear_pointer (&ai->stamp, xdate_time_unref);
+  ai->stamp = xdate_time_ref (stamp);
 
   if (exec && exec[0] != '\0')
     {
@@ -3557,15 +3557,15 @@ static xchar_t *
 expand_exec_line (const xchar_t *exec_fmt,
 		  const xchar_t *uri)
 {
-  GString *exec;
+  xstring_t *exec;
   xchar_t ch;
 
-  exec = g_string_sized_new (512);
+  exec = xstring_sized_new (512);
   while ((ch = *exec_fmt++) != '\0')
    {
      if (ch != '%')
        {
-         exec = g_string_append_c (exec, ch);
+         exec = xstring_append_c (exec, ch);
          continue;
        }
 
@@ -3576,38 +3576,38 @@ expand_exec_line (const xchar_t *exec_fmt,
 	 goto out;
        case 'U':
        case 'u':
-         g_string_append (exec, uri);
+         xstring_append (exec, uri);
          break;
        case 'F':
        case 'f':
          {
-	   xchar_t *file = g_filename_from_uri (uri, NULL, NULL);
+	   xchar_t *file = xfilename_from_uri (uri, NULL, NULL);
            if (file)
              {
-	       g_string_append (exec, file);
+	       xstring_append (exec, file);
 	       g_free (file);
              }
            else
              {
-               g_string_free (exec, TRUE);
+               xstring_free (exec, TRUE);
                return NULL;
              }
          }
          break;
        case '%':
        default:
-         exec = g_string_append_c (exec, ch);
+         exec = xstring_append_c (exec, ch);
          break;
        }
    }
 
  out:
-  return g_string_free (exec, FALSE);
+  return xstring_free (exec, FALSE);
 }
 
 /**
  * g_bookmark_file_get_app_info:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @name: an application's name
  * @exec: (out) (optional): return location for the command line of the application, or %NULL
@@ -3636,7 +3636,7 @@ expand_exec_line (const xchar_t *exec_fmt,
  *    `time_t` is deprecated due to the year 2038 problem.
  */
 xboolean_t
-g_bookmark_file_get_app_info (GBookmarkFile  *bookmark,
+g_bookmark_file_get_app_info (xbookmark_file_t  *bookmark,
 			      const xchar_t    *uri,
 			      const xchar_t    *name,
 			      xchar_t         **exec,
@@ -3644,7 +3644,7 @@ g_bookmark_file_get_app_info (GBookmarkFile  *bookmark,
 			      time_t         *stamp,
 			      xerror_t        **error)
 {
-  GDateTime *stamp_dt = NULL;
+  xdatetime_t *stamp_dt = NULL;
   xboolean_t retval;
 
   retval = g_bookmark_file_get_application_info (bookmark, uri, name, exec, count, &stamp_dt, error);
@@ -3652,14 +3652,14 @@ g_bookmark_file_get_app_info (GBookmarkFile  *bookmark,
     return FALSE;
 
   if (stamp != NULL)
-    *stamp = g_date_time_to_unix (stamp_dt);
+    *stamp = xdate_time_to_unix (stamp_dt);
 
   return TRUE;
 }
 
 /**
  * g_bookmark_file_get_application_info:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @name: an application's name
  * @exec: (out) (optional): return location for the command line of the application, or %NULL
@@ -3686,12 +3686,12 @@ g_bookmark_file_get_app_info (GBookmarkFile  *bookmark,
  * Since: 2.66
  */
 xboolean_t
-g_bookmark_file_get_application_info (GBookmarkFile  *bookmark,
+g_bookmark_file_get_application_info (xbookmark_file_t  *bookmark,
                                       const char     *uri,
                                       const char     *name,
                                       char          **exec,
                                       unsigned int   *count,
-                                      GDateTime     **stamp,
+                                      xdatetime_t     **stamp,
                                       xerror_t        **error)
 {
   BookmarkItem *item;
@@ -3761,7 +3761,7 @@ g_bookmark_file_get_application_info (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_get_applications:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @length: (out) (optional): return location of the length of the returned list, or %NULL
  * @error: return location for a #xerror_t, or %NULL
@@ -3773,12 +3773,12 @@ g_bookmark_file_get_application_info (GBookmarkFile  *bookmark,
  * @error is set to %G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.
  *
  * Returns: (array length=length) (transfer full): a newly allocated %NULL-terminated array of strings.
- *   Use g_strfreev() to free it.
+ *   Use xstrfreev() to free it.
  *
  * Since: 2.12
  */
 xchar_t **
-g_bookmark_file_get_applications (GBookmarkFile  *bookmark,
+g_bookmark_file_get_applications (xbookmark_file_t  *bookmark,
 				  const xchar_t    *uri,
 				  xsize_t          *length,
 				  xerror_t        **error)
@@ -3809,10 +3809,10 @@ g_bookmark_file_get_applications (GBookmarkFile  *bookmark,
       return NULL;
     }
 
-  n_apps = g_list_length (item->metadata->applications);
+  n_apps = xlist_length (item->metadata->applications);
   apps = g_new0 (xchar_t *, n_apps + 1);
 
-  for (l = g_list_last (item->metadata->applications), i = 0;
+  for (l = xlist_last (item->metadata->applications), i = 0;
        l != NULL;
        l = l->prev)
     {
@@ -3823,7 +3823,7 @@ g_bookmark_file_get_applications (GBookmarkFile  *bookmark,
       g_warn_if_fail (ai != NULL);
       g_warn_if_fail (ai->name != NULL);
 
-      apps[i++] = g_strdup (ai->name);
+      apps[i++] = xstrdup (ai->name);
     }
   apps[i] = NULL;
 
@@ -3835,7 +3835,7 @@ g_bookmark_file_get_applications (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_get_size:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  *
  * Gets the number of bookmarks inside @bookmark.
  *
@@ -3844,16 +3844,16 @@ g_bookmark_file_get_applications (GBookmarkFile  *bookmark,
  * Since: 2.12
  */
 xint_t
-g_bookmark_file_get_size (GBookmarkFile *bookmark)
+g_bookmark_file_get_size (xbookmark_file_t *bookmark)
 {
   g_return_val_if_fail (bookmark != NULL, 0);
 
-  return g_list_length (bookmark->items);
+  return xlist_length (bookmark->items);
 }
 
 /**
  * g_bookmark_file_move_item:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @old_uri: a valid URI
  * @new_uri: (nullable): a valid URI, or %NULL
  * @error: return location for a #xerror_t or %NULL
@@ -3870,7 +3870,7 @@ g_bookmark_file_get_size (GBookmarkFile *bookmark)
  * Since: 2.12
  */
 xboolean_t
-g_bookmark_file_move_item (GBookmarkFile  *bookmark,
+g_bookmark_file_move_item (xbookmark_file_t  *bookmark,
 			   const xchar_t    *old_uri,
 			   const xchar_t    *new_uri,
 			   xerror_t        **error)
@@ -3892,7 +3892,7 @@ g_bookmark_file_move_item (GBookmarkFile  *bookmark,
 
   if (new_uri && new_uri[0] != '\0')
     {
-      if (g_strcmp0 (old_uri, new_uri) == 0)
+      if (xstrcmp0 (old_uri, new_uri) == 0)
         return TRUE;
 
       if (g_bookmark_file_has_item (bookmark, new_uri))
@@ -3901,13 +3901,13 @@ g_bookmark_file_move_item (GBookmarkFile  *bookmark,
             return FALSE;
         }
 
-      g_hash_table_steal (bookmark->items_by_uri, item->uri);
+      xhash_table_steal (bookmark->items_by_uri, item->uri);
 
       g_free (item->uri);
-      item->uri = g_strdup (new_uri);
+      item->uri = xstrdup (new_uri);
       bookmark_item_touch_modified (item);
 
-      g_hash_table_replace (bookmark->items_by_uri, item->uri, item);
+      xhash_table_replace (bookmark->items_by_uri, item->uri, item);
 
       return TRUE;
     }
@@ -3922,7 +3922,7 @@ g_bookmark_file_move_item (GBookmarkFile  *bookmark,
 
 /**
  * g_bookmark_file_set_icon:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @href: (nullable): the URI of the icon for the bookmark, or %NULL
  * @mime_type: the MIME type of the icon for the bookmark
@@ -3936,7 +3936,7 @@ g_bookmark_file_move_item (GBookmarkFile  *bookmark,
  * Since: 2.12
  */
 void
-g_bookmark_file_set_icon (GBookmarkFile *bookmark,
+g_bookmark_file_set_icon (xbookmark_file_t *bookmark,
 			  const xchar_t   *uri,
 			  const xchar_t   *href,
 			  const xchar_t   *mime_type)
@@ -3959,19 +3959,19 @@ g_bookmark_file_set_icon (GBookmarkFile *bookmark,
   g_free (item->metadata->icon_href);
   g_free (item->metadata->icon_mime);
 
-  item->metadata->icon_href = g_strdup (href);
+  item->metadata->icon_href = xstrdup (href);
 
   if (mime_type && mime_type[0] != '\0')
-    item->metadata->icon_mime = g_strdup (mime_type);
+    item->metadata->icon_mime = xstrdup (mime_type);
   else
-    item->metadata->icon_mime = g_strdup ("application/octet-stream");
+    item->metadata->icon_mime = xstrdup ("application/octet-stream");
 
   bookmark_item_touch_modified (item);
 }
 
 /**
  * g_bookmark_file_get_icon:
- * @bookmark: a #GBookmarkFile
+ * @bookmark: a #xbookmark_file_t
  * @uri: a valid URI
  * @href: (out) (optional): return location for the icon's location or %NULL
  * @mime_type: (out) (optional): return location for the icon's MIME type or %NULL
@@ -3988,7 +3988,7 @@ g_bookmark_file_set_icon (GBookmarkFile *bookmark,
  * Since: 2.12
  */
 xboolean_t
-g_bookmark_file_get_icon (GBookmarkFile  *bookmark,
+g_bookmark_file_get_icon (xbookmark_file_t  *bookmark,
 			  const xchar_t    *uri,
 			  xchar_t         **href,
 			  xchar_t         **mime_type,
@@ -4013,10 +4013,10 @@ g_bookmark_file_get_icon (GBookmarkFile  *bookmark,
     return FALSE;
 
   if (href)
-    *href = g_strdup (item->metadata->icon_href);
+    *href = xstrdup (item->metadata->icon_href);
 
   if (mime_type)
-    *mime_type = g_strdup (item->metadata->icon_mime);
+    *mime_type = xstrdup (item->metadata->icon_mime);
 
   return TRUE;
 }

@@ -42,7 +42,7 @@ typedef struct _GWin32InputStream         GWin32InputStream;
 typedef struct _GWin32InputStreamClass    GWin32InputStreamClass;
 typedef struct _GWin32InputStreamPrivate  GWin32InputStreamPrivate;
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GWin32InputStream, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GWin32InputStream, xobject_unref)
 
 struct _GWin32InputStream
 {

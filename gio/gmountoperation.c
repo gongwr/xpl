@@ -39,7 +39,7 @@
  * also be used to ask the user questions or show a list of applications
  * preventing unmount or eject operations from completing.
  *
- * Note that #xmount_operation_t is used for more than just #GMount
+ * Note that #xmount_operation_t is used for more than just #xmount_t
  * objects – for example it is also used in xdrive_start() and
  * xdrive_stop().
  *
@@ -98,8 +98,8 @@ G_DEFINE_TYPE_WITH_PRIVATE (xmount_operation_t, g_mount_operation, XTYPE_OBJECT)
 static void
 g_mount_operation_set_property (xobject_t      *object,
                                 xuint_t         prop_id,
-                                const GValue *value,
-                                GParamSpec   *pspec)
+                                const xvalue_t *value,
+                                xparam_spec_t   *pspec)
 {
   xmount_operation_t *operation;
 
@@ -109,47 +109,47 @@ g_mount_operation_set_property (xobject_t      *object,
     {
     case PROP_USERNAME:
       g_mount_operation_set_username (operation,
-                                      g_value_get_string (value));
+                                      xvalue_get_string (value));
       break;
 
     case PROP_PASSWORD:
       g_mount_operation_set_password (operation,
-                                      g_value_get_string (value));
+                                      xvalue_get_string (value));
       break;
 
     case PROP_ANONYMOUS:
       g_mount_operation_set_anonymous (operation,
-                                       g_value_get_boolean (value));
+                                       xvalue_get_boolean (value));
       break;
 
     case PROP_DOMAIN:
       g_mount_operation_set_domain (operation,
-                                    g_value_get_string (value));
+                                    xvalue_get_string (value));
       break;
 
     case PROP_PASSWORD_SAVE:
       g_mount_operation_set_password_save (operation,
-                                           g_value_get_enum (value));
+                                           xvalue_get_enum (value));
       break;
 
     case PROP_CHOICE:
       g_mount_operation_set_choice (operation,
-                                    g_value_get_int (value));
+                                    xvalue_get_int (value));
       break;
 
     case PROP_IS_TCRYPT_HIDDEN_VOLUME:
       g_mount_operation_set_is_tcrypt_hidden_volume (operation,
-                                                     g_value_get_boolean (value));
+                                                     xvalue_get_boolean (value));
       break;
 
     case PROP_IS_TCRYPT_SYSTEM_VOLUME:
       g_mount_operation_set_is_tcrypt_system_volume (operation,
-                                                     g_value_get_boolean (value));
+                                                     xvalue_get_boolean (value));
       break;
 
     case PROP_PIM:
         g_mount_operation_set_pim (operation,
-                                   g_value_get_uint (value));
+                                   xvalue_get_uint (value));
         break;
 
     default:
@@ -162,8 +162,8 @@ g_mount_operation_set_property (xobject_t      *object,
 static void
 g_mount_operation_get_property (xobject_t    *object,
                                 xuint_t       prop_id,
-                                GValue     *value,
-                                GParamSpec *pspec)
+                                xvalue_t     *value,
+                                xparam_spec_t *pspec)
 {
   xmount_operation_t *operation;
   GMountOperationPrivate *priv;
@@ -174,39 +174,39 @@ g_mount_operation_get_property (xobject_t    *object,
   switch (prop_id)
     {
     case PROP_USERNAME:
-      g_value_set_string (value, priv->user);
+      xvalue_set_string (value, priv->user);
       break;
 
     case PROP_PASSWORD:
-      g_value_set_string (value, priv->password);
+      xvalue_set_string (value, priv->password);
       break;
 
     case PROP_ANONYMOUS:
-      g_value_set_boolean (value, priv->anonymous);
+      xvalue_set_boolean (value, priv->anonymous);
       break;
 
     case PROP_DOMAIN:
-      g_value_set_string (value, priv->domain);
+      xvalue_set_string (value, priv->domain);
       break;
 
     case PROP_PASSWORD_SAVE:
-      g_value_set_enum (value, priv->password_save);
+      xvalue_set_enum (value, priv->password_save);
       break;
 
     case PROP_CHOICE:
-      g_value_set_int (value, priv->choice);
+      xvalue_set_int (value, priv->choice);
       break;
 
     case PROP_IS_TCRYPT_HIDDEN_VOLUME:
-      g_value_set_boolean (value, priv->hidden_volume);
+      xvalue_set_boolean (value, priv->hidden_volume);
       break;
 
     case PROP_IS_TCRYPT_SYSTEM_VOLUME:
-      g_value_set_boolean (value, priv->system_volume);
+      xvalue_set_boolean (value, priv->system_volume);
       break;
 
     case PROP_PIM:
-      g_value_set_uint (value, priv->pim);
+      xvalue_set_uint (value, priv->pim);
       break;
 
     default:
@@ -251,8 +251,8 @@ ask_password (xmount_operation_t *op,
 {
   g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
 		   reply_non_handled_in_idle,
-		   g_object_ref (op),
-		   g_object_unref);
+		   xobject_ref (op),
+		   xobject_unref);
 }
 
 static void
@@ -262,20 +262,20 @@ ask_question (xmount_operation_t *op,
 {
   g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
 		   reply_non_handled_in_idle,
-		   g_object_ref (op),
-		   g_object_unref);
+		   xobject_ref (op),
+		   xobject_unref);
 }
 
 static void
 show_processes (xmount_operation_t      *op,
                 const xchar_t          *message,
-                GArray               *processes,
+                xarray_t               *processes,
                 const xchar_t          *choices[])
 {
   g_idle_add_full (G_PRIORITY_DEFAULT_IDLE,
 		   reply_non_handled_in_idle,
-		   g_object_ref (op),
-		   g_object_unref);
+		   xobject_ref (op),
+		   xobject_unref);
 }
 
 static void
@@ -396,12 +396,12 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    * xmount_operation_t::show-processes:
    * @op: a #xmount_operation_t.
    * @message: string containing a message to display to the user.
-   * @processes: (element-type GPid): an array of #GPid for processes
+   * @processes: (element-type xpid_t): an array of #xpid_t for processes
    *   blocking the operation.
    * @choices: an array of strings for each possible choice.
    *
    * Emitted when one or more processes are blocking an operation
-   * e.g. unmounting/ejecting a #GMount or stopping a #xdrive_t.
+   * e.g. unmounting/ejecting a #xmount_t or stopping a #xdrive_t.
    *
    * Note that this signal may be emitted several times to update the
    * list of blocking processes as processes close files. The
@@ -476,7 +476,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    * The user name that is used for authentication when carrying out
    * the mount operation.
    */
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_USERNAME,
                                    g_param_spec_string ("username",
                                                         P_("Username"),
@@ -491,7 +491,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    * The password that is used for authentication when carrying out
    * the mount operation.
    */
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_PASSWORD,
                                    g_param_spec_string ("password",
                                                         P_("Password"),
@@ -505,7 +505,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    *
    * Whether to use an anonymous user when authenticating.
    */
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_ANONYMOUS,
                                    g_param_spec_boolean ("anonymous",
                                                          P_("Anonymous"),
@@ -519,7 +519,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    *
    * The domain to use for the mount operation.
    */
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_DOMAIN,
                                    g_param_spec_string ("domain",
                                                         P_("Domain"),
@@ -533,7 +533,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    *
    * Determines if and how the password information should be saved.
    */
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_PASSWORD_SAVE,
                                    g_param_spec_enum ("password-save",
                                                       P_("Password save"),
@@ -549,7 +549,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    * The index of the user's choice when a question is asked during the
    * mount operation. See the #xmount_operation_t::ask-question signal.
    */
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_CHOICE,
                                    g_param_spec_int ("choice",
                                                      P_("Choice"),
@@ -566,7 +566,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    *
    * Since: 2.58
    */
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_IS_TCRYPT_HIDDEN_VOLUME,
                                    g_param_spec_boolean ("is-tcrypt-hidden-volume",
                                                          P_("TCRYPT Hidden Volume"),
@@ -586,7 +586,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
   *
   * Since: 2.58
   */
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_IS_TCRYPT_SYSTEM_VOLUME,
                                    g_param_spec_boolean ("is-tcrypt-system-volume",
                                                          P_("TCRYPT System Volume"),
@@ -603,7 +603,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
   *
   * Since: 2.58
   */
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_PIM,
                                    g_param_spec_uint ("pim",
                                                       P_("PIM"),
@@ -629,7 +629,7 @@ g_mount_operation_init (xmount_operation_t *operation)
 xmount_operation_t *
 g_mount_operation_new (void)
 {
-  return g_object_new (XTYPE_MOUNT_OPERATION, NULL);
+  return xobject_new (XTYPE_MOUNT_OPERATION, NULL);
 }
 
 /**
@@ -660,8 +660,8 @@ g_mount_operation_set_username (xmount_operation_t *op,
 {
   g_return_if_fail (X_IS_MOUNT_OPERATION (op));
   g_free (op->priv->user);
-  op->priv->user = g_strdup (username);
-  g_object_notify (G_OBJECT (op), "username");
+  op->priv->user = xstrdup (username);
+  xobject_notify (G_OBJECT (op), "username");
 }
 
 /**
@@ -693,8 +693,8 @@ g_mount_operation_set_password (xmount_operation_t *op,
 {
   g_return_if_fail (X_IS_MOUNT_OPERATION (op));
   g_free (op->priv->password);
-  op->priv->password = g_strdup (password);
-  g_object_notify (G_OBJECT (op), "password");
+  op->priv->password = xstrdup (password);
+  xobject_notify (G_OBJECT (op), "password");
 }
 
 /**
@@ -731,7 +731,7 @@ g_mount_operation_set_anonymous (xmount_operation_t *op,
   if (priv->anonymous != anonymous)
     {
       priv->anonymous = anonymous;
-      g_object_notify (G_OBJECT (op), "anonymous");
+      xobject_notify (G_OBJECT (op), "anonymous");
     }
 }
 
@@ -763,8 +763,8 @@ g_mount_operation_set_domain (xmount_operation_t *op,
 {
   g_return_if_fail (X_IS_MOUNT_OPERATION (op));
   g_free (op->priv->domain);
-  op->priv->domain = g_strdup (domain);
-  g_object_notify (G_OBJECT (op), "domain");
+  op->priv->domain = xstrdup (domain);
+  xobject_notify (G_OBJECT (op), "domain");
 }
 
 /**
@@ -802,7 +802,7 @@ g_mount_operation_set_password_save (xmount_operation_t *op,
   if (priv->password_save != save)
     {
       priv->password_save = save;
-      g_object_notify (G_OBJECT (op), "password-save");
+      xobject_notify (G_OBJECT (op), "password-save");
     }
 }
 
@@ -839,7 +839,7 @@ g_mount_operation_set_choice (xmount_operation_t *op,
   if (priv->choice != choice)
     {
       priv->choice = choice;
-      g_object_notify (G_OBJECT (op), "choice");
+      xobject_notify (G_OBJECT (op), "choice");
     }
 }
 
@@ -881,7 +881,7 @@ g_mount_operation_set_is_tcrypt_hidden_volume (xmount_operation_t *op,
   if (priv->hidden_volume != hidden_volume)
     {
       priv->hidden_volume = hidden_volume;
-      g_object_notify (G_OBJECT (op), "is-tcrypt-hidden-volume");
+      xobject_notify (G_OBJECT (op), "is-tcrypt-hidden-volume");
     }
 }
 
@@ -923,7 +923,7 @@ g_mount_operation_set_is_tcrypt_system_volume (xmount_operation_t *op,
   if (priv->system_volume != system_volume)
     {
       priv->system_volume = system_volume;
-      g_object_notify (G_OBJECT (op), "is-tcrypt-system-volume");
+      xobject_notify (G_OBJECT (op), "is-tcrypt-system-volume");
     }
 }
 
@@ -963,7 +963,7 @@ g_mount_operation_set_pim (xmount_operation_t *op,
   if (priv->pim != pim)
     {
       priv->pim = pim;
-      g_object_notify (G_OBJECT (op), "pim");
+      xobject_notify (G_OBJECT (op), "pim");
     }
 }
 

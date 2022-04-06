@@ -67,63 +67,63 @@
  * @short_description: associations between keys and values so that
  *     given a key the value can be found quickly
  *
- * A #GHashTable provides associations between keys and values which is
+ * A #xhashtable_t provides associations between keys and values which is
  * optimized so that given a key, the associated value can be found,
  * inserted or removed in amortized O(1). All operations going through
  * each element take O(n) time (list all keys/values, table resize, etc.).
  *
  * Note that neither keys nor values are copied when inserted into the
- * #GHashTable, so they must exist for the lifetime of the #GHashTable.
+ * #xhashtable_t, so they must exist for the lifetime of the #xhashtable_t.
  * This means that the use of static strings is OK, but temporary
  * strings (i.e. those created in buffers and those returned by GTK
- * widgets) should be copied with g_strdup() before being inserted.
+ * widgets) should be copied with xstrdup() before being inserted.
  *
  * If keys or values are dynamically allocated, you must be careful to
  * ensure that they are freed when they are removed from the
- * #GHashTable, and also when they are overwritten by new insertions
- * into the #GHashTable. It is also not advisable to mix static strings
- * and dynamically-allocated strings in a #GHashTable, because it then
+ * #xhashtable_t, and also when they are overwritten by new insertions
+ * into the #xhashtable_t. It is also not advisable to mix static strings
+ * and dynamically-allocated strings in a #xhashtable_t, because it then
  * becomes difficult to determine whether the string should be freed.
  *
- * To create a #GHashTable, use g_hash_table_new().
+ * To create a #xhashtable_t, use xhash_table_new().
  *
- * To insert a key and value into a #GHashTable, use
- * g_hash_table_insert().
+ * To insert a key and value into a #xhashtable_t, use
+ * xhash_table_insert().
  *
  * To look up a value corresponding to a given key, use
- * g_hash_table_lookup() and g_hash_table_lookup_extended().
+ * xhash_table_lookup() and xhash_table_lookup_extended().
  *
- * g_hash_table_lookup_extended() can also be used to simply
+ * xhash_table_lookup_extended() can also be used to simply
  * check if a key is present in the hash table.
  *
- * To remove a key and value, use g_hash_table_remove().
+ * To remove a key and value, use xhash_table_remove().
  *
  * To call a function for each key and value pair use
- * g_hash_table_foreach() or use an iterator to iterate over the
- * key/value pairs in the hash table, see #GHashTableIter. The iteration order
+ * xhash_table_foreach() or use an iterator to iterate over the
+ * key/value pairs in the hash table, see #xhash_table_iter_t. The iteration order
  * of a hash table is not defined, and you must not rely on iterating over
  * keys/values in the same order as they were inserted.
  *
- * To destroy a #GHashTable use g_hash_table_destroy().
+ * To destroy a #xhashtable_t use xhash_table_destroy().
  *
  * A common use-case for hash tables is to store information about a
  * set of keys, without associating any particular value with each
- * key. GHashTable optimizes one way of doing so: If you store only
- * key-value pairs where key == value, then GHashTable does not
+ * key. xhashtable_t optimizes one way of doing so: If you store only
+ * key-value pairs where key == value, then xhashtable_t does not
  * allocate memory to store the values, which can be a considerable
  * space saving, if your set is large. The functions
- * g_hash_table_add() and g_hash_table_contains() are designed to be
- * used when using #GHashTable this way.
+ * xhash_table_add() and xhash_table_contains() are designed to be
+ * used when using #xhashtable_t this way.
  *
- * #GHashTable is not designed to be statically initialised with keys and
+ * #xhashtable_t is not designed to be statically initialised with keys and
  * values known at compile time. To build a static hash table, use a tool such
  * as [gperf](https://www.gnu.org/software/gperf/).
  */
 
 /**
- * GHashTable:
+ * xhashtable_t:
  *
- * The #GHashTable struct is an opaque data structure to represent a
+ * The #xhashtable_t struct is an opaque data structure to represent a
  * [Hash Table][glib-Hash-Tables]. It should only be accessed via the
  * following functions.
  */
@@ -133,10 +133,10 @@
  * @key: a key
  *
  * Specifies the type of the hash function which is passed to
- * g_hash_table_new() when a #GHashTable is created.
+ * xhash_table_new() when a #xhashtable_t is created.
  *
  * The function is passed a key and should return a #xuint_t hash value.
- * The functions g_direct_hash(), g_int_hash() and g_str_hash() provide
+ * The functions g_direct_hash(), g_int_hash() and xstr_hash() provide
  * hash functions which can be used when the key is a #xpointer_t, #xint_t*,
  * and #xchar_t* respectively.
  *
@@ -152,9 +152,9 @@
  * Note that the hash functions provided by GLib have these qualities,
  * but are not particularly robust against manufactured keys that
  * cause hash collisions. Therefore, you should consider choosing
- * a more secure hash function when using a GHashTable with keys
+ * a more secure hash function when using a xhashtable_t with keys
  * that originate in untrusted data (such as HTTP requests).
- * Using g_str_hash() in that situation might make your application
+ * Using xstr_hash() in that situation might make your application
  * vulnerable to
  * [Algorithmic Complexity Attacks](https://lwn.net/Articles/474912/).
  *
@@ -170,27 +170,27 @@
  * GHFunc:
  * @key: a key
  * @value: the value corresponding to the key
- * @user_data: user data passed to g_hash_table_foreach()
+ * @user_data: user data passed to xhash_table_foreach()
  *
- * Specifies the type of the function passed to g_hash_table_foreach().
+ * Specifies the type of the function passed to xhash_table_foreach().
  * It is called with each key/value pair, together with the @user_data
- * parameter which is passed to g_hash_table_foreach().
+ * parameter which is passed to xhash_table_foreach().
  */
 
 /**
  * GHRFunc:
  * @key: a key
  * @value: the value associated with the key
- * @user_data: user data passed to g_hash_table_remove()
+ * @user_data: user data passed to xhash_table_remove()
  *
  * Specifies the type of the function passed to
- * g_hash_table_foreach_remove(). It is called with each key/value
+ * xhash_table_foreach_remove(). It is called with each key/value
  * pair, together with the @user_data parameter passed to
- * g_hash_table_foreach_remove(). It should return %TRUE if the
- * key/value pair should be removed from the #GHashTable.
+ * xhash_table_foreach_remove(). It should return %TRUE if the
+ * key/value pair should be removed from the #xhashtable_t.
  *
  * Returns: %TRUE if the key/value pair should be removed from the
- *     #GHashTable
+ *     #xhashtable_t
  */
 
 /**
@@ -206,28 +206,28 @@
  */
 
 /**
- * GHashTableIter:
+ * xhash_table_iter_t:
  *
- * A GHashTableIter structure represents an iterator that can be used
- * to iterate over the elements of a #GHashTable. GHashTableIter
+ * A xhash_table_iter_t structure represents an iterator that can be used
+ * to iterate over the elements of a #xhashtable_t. xhash_table_iter_t
  * structures are typically allocated on the stack and then initialized
- * with g_hash_table_iter_init().
+ * with xhash_table_iter_init().
  *
- * The iteration order of a #GHashTableIter over the keys/values in a hash
+ * The iteration order of a #xhash_table_iter_t over the keys/values in a hash
  * table is not defined.
  */
 
 /**
- * g_hash_table_freeze:
- * @hash_table: a #GHashTable
+ * xhash_table_freeze:
+ * @hash_table: a #xhashtable_t
  *
  * This function is deprecated and will be removed in the next major
  * release of GLib. It does nothing.
  */
 
 /**
- * g_hash_table_thaw:
- * @hash_table: a #GHashTable
+ * xhash_table_thaw:
+ * @hash_table: a #xhashtable_t
  *
  * This function is deprecated and will be removed in the next major
  * release of GLib. It does nothing.
@@ -262,7 +262,7 @@ struct _GHashTable
   xint_t             noccupied;  /* nnodes + tombstones */
 
   xuint_t            have_big_keys : 1;
-  xuint_t            have_big_values : 1;
+  xuint_t            have_bixvalues : 1;
 
   xpointer_t         keys;
   xuint_t           *hashes;
@@ -279,13 +279,13 @@ struct _GHashTable
    */
   int              version;
 #endif
-  GDestroyNotify   key_destroy_func;
-  GDestroyNotify   value_destroy_func;
+  xdestroy_notify_t   key_destroy_func;
+  xdestroy_notify_t   value_destroy_func;
 };
 
 typedef struct
 {
-  GHashTable  *hash_table;
+  xhashtable_t  *hash_table;
   xpointer_t     dummy1;
   xpointer_t     dummy2;
   xint_t         position;
@@ -293,8 +293,8 @@ typedef struct
   xint_t         version;
 } RealIter;
 
-G_STATIC_ASSERT (sizeof (GHashTableIter) == sizeof (RealIter));
-G_STATIC_ASSERT (G_ALIGNOF (GHashTableIter) >= G_ALIGNOF (RealIter));
+G_STATIC_ASSERT (sizeof (xhash_table_iter_t) == sizeof (RealIter));
+G_STATIC_ASSERT (G_ALIGNOF (xhash_table_iter_t) >= G_ALIGNOF (RealIter));
 
 /* Each table size has an associated prime modulo (the first prime
  * lower than the table size) used to find the initial bucket. Probing
@@ -338,7 +338,7 @@ static const xint_t prime_mod [] =
 };
 
 static void
-g_hash_table_set_shift (GHashTable *hash_table, xint_t shift)
+xhash_table_set_shift (xhashtable_t *hash_table, xint_t shift)
 {
   hash_table->size = 1 << shift;
   hash_table->mod  = prime_mod [shift];
@@ -352,7 +352,7 @@ g_hash_table_set_shift (GHashTable *hash_table, xint_t shift)
 }
 
 static xint_t
-g_hash_table_find_closest_shift (xint_t n)
+xhash_table_find_closest_shift (xint_t n)
 {
   xint_t i;
 
@@ -363,18 +363,18 @@ g_hash_table_find_closest_shift (xint_t n)
 }
 
 static void
-g_hash_table_set_shift_from_size (GHashTable *hash_table, xint_t size)
+xhash_table_set_shift_from_size (xhashtable_t *hash_table, xint_t size)
 {
   xint_t shift;
 
-  shift = g_hash_table_find_closest_shift (size);
+  shift = xhash_table_find_closest_shift (size);
   shift = MAX (shift, HASH_TABLE_MIN_SHIFT);
 
-  g_hash_table_set_shift (hash_table, shift);
+  xhash_table_set_shift (hash_table, shift);
 }
 
 static inline xpointer_t
-g_hash_table_realloc_key_or_value_array (xpointer_t a, xuint_t size, G_GNUC_UNUSED xboolean_t is_big)
+xhash_table_realloc_key_or_value_array (xpointer_t a, xuint_t size, G_GNUC_UNUSED xboolean_t is_big)
 {
 #ifdef USE_SMALL_ARRAYS
   return g_realloc (a, size * (is_big ? BIG_ENTRY_SIZE : SMALL_ENTRY_SIZE));
@@ -384,7 +384,7 @@ g_hash_table_realloc_key_or_value_array (xpointer_t a, xuint_t size, G_GNUC_UNUS
 }
 
 static inline xpointer_t
-g_hash_table_fetch_key_or_value (xpointer_t a, xuint_t index, xboolean_t is_big)
+xhash_table_fetch_key_or_value (xpointer_t a, xuint_t index, xboolean_t is_big)
 {
 #ifndef USE_SMALL_ARRAYS
   is_big = TRUE;
@@ -393,7 +393,7 @@ g_hash_table_fetch_key_or_value (xpointer_t a, xuint_t index, xboolean_t is_big)
 }
 
 static inline void
-g_hash_table_assign_key_or_value (xpointer_t a, xuint_t index, xboolean_t is_big, xpointer_t v)
+xhash_table_assign_key_or_value (xpointer_t a, xuint_t index, xboolean_t is_big, xpointer_t v)
 {
 #ifndef USE_SMALL_ARRAYS
   is_big = TRUE;
@@ -405,7 +405,7 @@ g_hash_table_assign_key_or_value (xpointer_t a, xuint_t index, xboolean_t is_big
 }
 
 static inline xpointer_t
-g_hash_table_evict_key_or_value (xpointer_t a, xuint_t index, xboolean_t is_big, xpointer_t v)
+xhash_table_evict_key_or_value (xpointer_t a, xuint_t index, xboolean_t is_big, xpointer_t v)
 {
 #ifndef USE_SMALL_ARRAYS
   is_big = TRUE;
@@ -425,7 +425,7 @@ g_hash_table_evict_key_or_value (xpointer_t a, xuint_t index, xboolean_t is_big,
 }
 
 static inline xuint_t
-g_hash_table_hash_to_index (GHashTable *hash_table, xuint_t hash)
+xhash_table_hash_to_index (xhashtable_t *hash_table, xuint_t hash)
 {
   /* Multiply the hash by a small prime before applying the modulo. This
    * prevents the table from becoming densely packed, even with a poor hash
@@ -435,8 +435,8 @@ g_hash_table_hash_to_index (GHashTable *hash_table, xuint_t hash)
 }
 
 /*
- * g_hash_table_lookup_node:
- * @hash_table: our #GHashTable
+ * xhash_table_lookup_node:
+ * @hash_table: our #xhashtable_t
  * @key: the key to look up against
  * @hash_return: key hash return location
  *
@@ -458,8 +458,8 @@ g_hash_table_hash_to_index (GHashTable *hash_table, xuint_t hash)
  * Returns: index of the described node
  */
 static inline xuint_t
-g_hash_table_lookup_node (GHashTable    *hash_table,
-                          gconstpointer  key,
+xhash_table_lookup_node (xhashtable_t    *hash_table,
+                          xconstpointer  key,
                           xuint_t         *hash_return)
 {
   xuint_t node_index;
@@ -475,7 +475,7 @@ g_hash_table_lookup_node (GHashTable    *hash_table,
 
   *hash_return = hash_value;
 
-  node_index = g_hash_table_hash_to_index (hash_table, hash_value);
+  node_index = xhash_table_hash_to_index (hash_table, hash_value);
   node_hash = hash_table->hashes[node_index];
 
   while (!HASH_IS_UNUSED (node_hash))
@@ -486,7 +486,7 @@ g_hash_table_lookup_node (GHashTable    *hash_table,
        */
       if (node_hash == hash_value)
         {
-          xpointer_t node_key = g_hash_table_fetch_key_or_value (hash_table->keys, node_index, hash_table->have_big_keys);
+          xpointer_t node_key = xhash_table_fetch_key_or_value (hash_table->keys, node_index, hash_table->have_big_keys);
 
           if (hash_table->key_equal_func)
             {
@@ -517,8 +517,8 @@ g_hash_table_lookup_node (GHashTable    *hash_table,
 }
 
 /*
- * g_hash_table_remove_node:
- * @hash_table: our #GHashTable
+ * xhash_table_remove_node:
+ * @hash_table: our #xhashtable_t
  * @node: pointer to node to remove
  * @notify: %TRUE if the destroy notify handlers are to be called
  *
@@ -529,22 +529,22 @@ g_hash_table_lookup_node (GHashTable    *hash_table,
  * for the key and value of the hash node.
  */
 static void
-g_hash_table_remove_node (GHashTable   *hash_table,
+xhash_table_remove_node (xhashtable_t   *hash_table,
                           xint_t          i,
                           xboolean_t      notify)
 {
   xpointer_t key;
   xpointer_t value;
 
-  key = g_hash_table_fetch_key_or_value (hash_table->keys, i, hash_table->have_big_keys);
-  value = g_hash_table_fetch_key_or_value (hash_table->values, i, hash_table->have_big_values);
+  key = xhash_table_fetch_key_or_value (hash_table->keys, i, hash_table->have_big_keys);
+  value = xhash_table_fetch_key_or_value (hash_table->values, i, hash_table->have_bixvalues);
 
   /* Erect tombstone */
   hash_table->hashes[i] = TOMBSTONE_HASH_VALUE;
 
   /* Be GC friendly */
-  g_hash_table_assign_key_or_value (hash_table->keys, i, hash_table->have_big_keys, NULL);
-  g_hash_table_assign_key_or_value (hash_table->values, i, hash_table->have_big_values, NULL);
+  xhash_table_assign_key_or_value (hash_table->keys, i, hash_table->have_big_keys, NULL);
+  xhash_table_assign_key_or_value (hash_table->values, i, hash_table->have_bixvalues, NULL);
 
   hash_table->nnodes--;
 
@@ -557,13 +557,13 @@ g_hash_table_remove_node (GHashTable   *hash_table,
 }
 
 /*
- * g_hash_table_setup_storage:
- * @hash_table: our #GHashTable
+ * xhash_table_setup_storage:
+ * @hash_table: our #xhashtable_t
  *
  * Initialise the hash table size, mask, mod, and arrays.
  */
 static void
-g_hash_table_setup_storage (GHashTable *hash_table)
+xhash_table_setup_storage (xhashtable_t *hash_table)
 {
   xboolean_t small = FALSE;
 
@@ -581,19 +581,19 @@ g_hash_table_setup_storage (GHashTable *hash_table)
 # endif
 #endif
 
-  g_hash_table_set_shift (hash_table, HASH_TABLE_MIN_SHIFT);
+  xhash_table_set_shift (hash_table, HASH_TABLE_MIN_SHIFT);
 
   hash_table->have_big_keys = !small;
-  hash_table->have_big_values = !small;
+  hash_table->have_bixvalues = !small;
 
-  hash_table->keys   = g_hash_table_realloc_key_or_value_array (NULL, hash_table->size, hash_table->have_big_keys);
+  hash_table->keys   = xhash_table_realloc_key_or_value_array (NULL, hash_table->size, hash_table->have_big_keys);
   hash_table->values = hash_table->keys;
   hash_table->hashes = g_new0 (xuint_t, hash_table->size);
 }
 
 /*
- * g_hash_table_remove_all_nodes:
- * @hash_table: our #GHashTable
+ * xhash_table_remove_all_nodes:
+ * @hash_table: our #xhashtable_t
  * @notify: %TRUE if the destroy notify handlers are to be called
  *
  * Removes all nodes from the table.
@@ -610,7 +610,7 @@ g_hash_table_setup_storage (GHashTable *hash_table)
  * table.
  */
 static void
-g_hash_table_remove_all_nodes (GHashTable *hash_table,
+xhash_table_remove_all_nodes (xhashtable_t *hash_table,
                                xboolean_t    notify,
                                xboolean_t    destruction)
 {
@@ -622,7 +622,7 @@ g_hash_table_remove_all_nodes (GHashTable *hash_table,
   xpointer_t *old_values;
   xuint_t    *old_hashes;
   xboolean_t  old_have_big_keys;
-  xboolean_t  old_have_big_values;
+  xboolean_t  old_have_bixvalues;
 
   /* If the hash table is already empty, there is nothing to be done. */
   if (hash_table->nnodes == 0)
@@ -642,7 +642,7 @@ g_hash_table_remove_all_nodes (GHashTable *hash_table,
 
 #ifdef USE_SMALL_ARRAYS
           memset (hash_table->keys, 0, hash_table->size * (hash_table->have_big_keys ? BIG_ENTRY_SIZE : SMALL_ENTRY_SIZE));
-          memset (hash_table->values, 0, hash_table->size * (hash_table->have_big_values ? BIG_ENTRY_SIZE : SMALL_ENTRY_SIZE));
+          memset (hash_table->values, 0, hash_table->size * (hash_table->have_bixvalues ? BIG_ENTRY_SIZE : SMALL_ENTRY_SIZE));
 #else
           memset (hash_table->keys, 0, hash_table->size * sizeof (xpointer_t));
           memset (hash_table->values, 0, hash_table->size * sizeof (xpointer_t));
@@ -674,14 +674,14 @@ g_hash_table_remove_all_nodes (GHashTable *hash_table,
    */
   old_size = hash_table->size;
   old_have_big_keys = hash_table->have_big_keys;
-  old_have_big_values = hash_table->have_big_values;
+  old_have_bixvalues = hash_table->have_bixvalues;
   old_keys   = g_steal_pointer (&hash_table->keys);
   old_values = g_steal_pointer (&hash_table->values);
   old_hashes = g_steal_pointer (&hash_table->hashes);
 
   if (!destruction)
     /* Any accesses will see an empty table */
-    g_hash_table_setup_storage (hash_table);
+    xhash_table_setup_storage (hash_table);
   else
     /* Will cause a quick crash on any attempted access */
     hash_table->size = hash_table->mod = hash_table->mask = 0;
@@ -691,13 +691,13 @@ g_hash_table_remove_all_nodes (GHashTable *hash_table,
     {
       if (HASH_IS_REAL (old_hashes[i]))
         {
-          key = g_hash_table_fetch_key_or_value (old_keys, i, old_have_big_keys);
-          value = g_hash_table_fetch_key_or_value (old_values, i, old_have_big_values);
+          key = xhash_table_fetch_key_or_value (old_keys, i, old_have_big_keys);
+          value = xhash_table_fetch_key_or_value (old_values, i, old_have_bixvalues);
 
           old_hashes[i] = UNUSED_HASH_VALUE;
 
-          g_hash_table_assign_key_or_value (old_keys, i, old_have_big_keys, NULL);
-          g_hash_table_assign_key_or_value (old_values, i, old_have_big_values, NULL);
+          xhash_table_assign_key_or_value (old_keys, i, old_have_big_keys, NULL);
+          xhash_table_assign_key_or_value (old_values, i, old_have_bixvalues, NULL);
 
           if (hash_table->key_destroy_func != NULL)
             hash_table->key_destroy_func (key);
@@ -716,15 +716,15 @@ g_hash_table_remove_all_nodes (GHashTable *hash_table,
 }
 
 static void
-realloc_arrays (GHashTable *hash_table, xboolean_t is_a_set)
+realloc_arrays (xhashtable_t *hash_table, xboolean_t is_a_set)
 {
   hash_table->hashes = g_renew (xuint_t, hash_table->hashes, hash_table->size);
-  hash_table->keys = g_hash_table_realloc_key_or_value_array (hash_table->keys, hash_table->size, hash_table->have_big_keys);
+  hash_table->keys = xhash_table_realloc_key_or_value_array (hash_table->keys, hash_table->size, hash_table->have_big_keys);
 
   if (is_a_set)
     hash_table->values = hash_table->keys;
   else
-    hash_table->values = g_hash_table_realloc_key_or_value_array (hash_table->values, hash_table->size, hash_table->have_big_values);
+    hash_table->values = xhash_table_realloc_key_or_value_array (hash_table->values, hash_table->size, hash_table->have_bixvalues);
 }
 
 /* When resizing the table in place, we use a temporary bit array to keep
@@ -736,13 +736,13 @@ realloc_arrays (GHashTable *hash_table, xboolean_t is_a_set)
  * evicted. The array starts out cleared to zero. */
 
 static inline xboolean_t
-get_status_bit (const guint32 *bitmap, xuint_t index)
+get_status_bit (const xuint32_t *bitmap, xuint_t index)
 {
   return (bitmap[index / 32] >> (index % 32)) & 1;
 }
 
 static inline void
-set_status_bit (guint32 *bitmap, xuint_t index)
+set_status_bit (xuint32_t *bitmap, xuint_t index)
 {
   bitmap[index / 32] |= 1U << (index % 32);
 }
@@ -752,7 +752,7 @@ set_status_bit (guint32 *bitmap, xuint_t index)
  * performance improvement at the cost of a bit of macro gunk. */
 
 #define DEFINE_RESIZE_FUNC(fname) \
-static void fname (GHashTable *hash_table, xuint_t old_size, guint32 *reallocated_buckets_bitmap) \
+static void fname (xhashtable_t *hash_table, xuint_t old_size, xuint32_t *reallocated_buckets_bitmap) \
 {                                                                       \
   xuint_t i;                                                              \
                                                                         \
@@ -781,7 +781,7 @@ static void fname (GHashTable *hash_table, xuint_t old_size, guint32 *reallocate
           xuint_t replaced_hash;                                          \
           xuint_t step = 0;                                               \
                                                                         \
-          hash_val = g_hash_table_hash_to_index (hash_table, node_hash); \
+          hash_val = xhash_table_hash_to_index (hash_table, node_hash); \
                                                                         \
           while (get_status_bit (reallocated_buckets_bitmap, hash_val)) \
             {                                                           \
@@ -807,13 +807,13 @@ static void fname (GHashTable *hash_table, xuint_t old_size, guint32 *reallocate
 }
 
 #define ASSIGN_KEYVAL(ht, index, key, value) G_STMT_START{ \
-    g_hash_table_assign_key_or_value ((ht)->keys, (index), (ht)->have_big_keys, (key)); \
-    g_hash_table_assign_key_or_value ((ht)->values, (index), (ht)->have_big_values, (value)); \
+    xhash_table_assign_key_or_value ((ht)->keys, (index), (ht)->have_big_keys, (key)); \
+    xhash_table_assign_key_or_value ((ht)->values, (index), (ht)->have_bixvalues, (value)); \
   }G_STMT_END
 
 #define EVICT_KEYVAL(ht, index, key, value, outkey, outvalue) G_STMT_START{ \
-    (outkey) = g_hash_table_evict_key_or_value ((ht)->keys, (index), (ht)->have_big_keys, (key)); \
-    (outvalue) = g_hash_table_evict_key_or_value ((ht)->values, (index), (ht)->have_big_values, (value)); \
+    (outkey) = xhash_table_evict_key_or_value ((ht)->keys, (index), (ht)->have_big_keys, (key)); \
+    (outvalue) = xhash_table_evict_key_or_value ((ht)->values, (index), (ht)->have_bixvalues, (value)); \
   }G_STMT_END
 
 DEFINE_RESIZE_FUNC (resize_map)
@@ -822,11 +822,11 @@ DEFINE_RESIZE_FUNC (resize_map)
 #undef EVICT_KEYVAL
 
 #define ASSIGN_KEYVAL(ht, index, key, value) G_STMT_START{ \
-    g_hash_table_assign_key_or_value ((ht)->keys, (index), (ht)->have_big_keys, (key)); \
+    xhash_table_assign_key_or_value ((ht)->keys, (index), (ht)->have_big_keys, (key)); \
   }G_STMT_END
 
 #define EVICT_KEYVAL(ht, index, key, value, outkey, outvalue) G_STMT_START{ \
-    (outkey) = g_hash_table_evict_key_or_value ((ht)->keys, (index), (ht)->have_big_keys, (key)); \
+    (outkey) = xhash_table_evict_key_or_value ((ht)->keys, (index), (ht)->have_big_keys, (key)); \
   }G_STMT_END
 
 DEFINE_RESIZE_FUNC (resize_set)
@@ -835,29 +835,29 @@ DEFINE_RESIZE_FUNC (resize_set)
 #undef EVICT_KEYVAL
 
 /*
- * g_hash_table_resize:
- * @hash_table: our #GHashTable
+ * xhash_table_resize:
+ * @hash_table: our #xhashtable_t
  *
  * Resizes the hash table to the optimal size based on the number of
  * nodes currently held. If you call this function then a resize will
  * occur, even if one does not need to occur.
- * Use g_hash_table_maybe_resize() instead.
+ * Use xhash_table_maybe_resize() instead.
  *
  * This function may "resize" the hash table to its current size, with
  * the side effect of cleaning up tombstones and otherwise optimizing
  * the probe sequences.
  */
 static void
-g_hash_table_resize (GHashTable *hash_table)
+xhash_table_resize (xhashtable_t *hash_table)
 {
-  guint32 *reallocated_buckets_bitmap;
+  xuint32_t *reallocated_buckets_bitmap;
   xsize_t old_size;
   xboolean_t is_a_set;
 
   old_size = hash_table->size;
   is_a_set = hash_table->keys == hash_table->values;
 
-  /* The outer checks in g_hash_table_maybe_resize() will only consider
+  /* The outer checks in xhash_table_maybe_resize() will only consider
    * cleanup/resize when the load factor goes below .25 (1/4, ignoring
    * tombstones) or above .9375 (15/16, including tombstones).
    *
@@ -868,18 +868,18 @@ g_hash_table_resize (GHashTable *hash_table)
    * Immediately after growing, the load factor will be in the range
    * .375 .. .469. After shrinking, it will be exactly .5. */
 
-  g_hash_table_set_shift_from_size (hash_table, hash_table->nnodes * 1.333);
+  xhash_table_set_shift_from_size (hash_table, hash_table->nnodes * 1.333);
 
   if (hash_table->size > old_size)
     {
       realloc_arrays (hash_table, is_a_set);
       memset (&hash_table->hashes[old_size], 0, (hash_table->size - old_size) * sizeof (xuint_t));
 
-      reallocated_buckets_bitmap = g_new0 (guint32, (hash_table->size + 31) / 32);
+      reallocated_buckets_bitmap = g_new0 (xuint32_t, (hash_table->size + 31) / 32);
     }
   else
     {
-      reallocated_buckets_bitmap = g_new0 (guint32, (old_size + 31) / 32);
+      reallocated_buckets_bitmap = g_new0 (xuint32_t, (old_size + 31) / 32);
     }
 
   if (is_a_set)
@@ -896,23 +896,23 @@ g_hash_table_resize (GHashTable *hash_table)
 }
 
 /*
- * g_hash_table_maybe_resize:
- * @hash_table: our #GHashTable
+ * xhash_table_maybe_resize:
+ * @hash_table: our #xhashtable_t
  *
  * Resizes the hash table, if needed.
  *
- * Essentially, calls g_hash_table_resize() if the table has strayed
+ * Essentially, calls xhash_table_resize() if the table has strayed
  * too far from its ideal size for its number of nodes.
  */
 static inline void
-g_hash_table_maybe_resize (GHashTable *hash_table)
+xhash_table_maybe_resize (xhashtable_t *hash_table)
 {
   xint_t noccupied = hash_table->noccupied;
   xint_t size = hash_table->size;
 
   if ((size > hash_table->nnodes * 4 && size > 1 << HASH_TABLE_MIN_SHIFT) ||
       (size <= noccupied + (noccupied / 16)))
-    g_hash_table_resize (hash_table);
+    xhash_table_resize (hash_table);
 }
 
 #ifdef USE_SMALL_ARRAYS
@@ -924,7 +924,7 @@ entry_is_big (xpointer_t v)
 }
 
 static inline xboolean_t
-g_hash_table_maybe_make_big_keys_or_values (xpointer_t *a_p, xpointer_t v, xint_t ht_size)
+xhash_table_maybe_make_big_keys_or_values (xpointer_t *a_p, xpointer_t v, xint_t ht_size)
 {
   if (entry_is_big (v))
     {
@@ -950,7 +950,7 @@ g_hash_table_maybe_make_big_keys_or_values (xpointer_t *a_p, xpointer_t v, xint_
 #endif
 
 static inline void
-g_hash_table_ensure_keyval_fits (GHashTable *hash_table, xpointer_t key, xpointer_t value)
+xhash_table_ensure_keyval_fits (xhashtable_t *hash_table, xpointer_t key, xpointer_t value)
 {
   xboolean_t is_a_set = (hash_table->keys == hash_table->values);
 
@@ -979,19 +979,19 @@ g_hash_table_ensure_keyval_fits (GHashTable *hash_table, xpointer_t key, xpointe
   /* Make keys big? */
   if (!hash_table->have_big_keys)
     {
-      hash_table->have_big_keys = g_hash_table_maybe_make_big_keys_or_values (&hash_table->keys, key, hash_table->size);
+      hash_table->have_big_keys = xhash_table_maybe_make_big_keys_or_values (&hash_table->keys, key, hash_table->size);
 
       if (is_a_set)
         {
           hash_table->values = hash_table->keys;
-          hash_table->have_big_values = hash_table->have_big_keys;
+          hash_table->have_bixvalues = hash_table->have_big_keys;
         }
     }
 
   /* Make values big? */
-  if (!is_a_set && !hash_table->have_big_values)
+  if (!is_a_set && !hash_table->have_bixvalues)
     {
-      hash_table->have_big_values = g_hash_table_maybe_make_big_keys_or_values (&hash_table->values, value, hash_table->size);
+      hash_table->have_bixvalues = xhash_table_maybe_make_big_keys_or_values (&hash_table->values, value, hash_table->size);
     }
 
 #else
@@ -1004,71 +1004,71 @@ g_hash_table_ensure_keyval_fits (GHashTable *hash_table, xpointer_t key, xpointe
 }
 
 /**
- * g_hash_table_new:
+ * xhash_table_new:
  * @hash_func: a function to create a hash value from a key
  * @key_equal_func: a function to check two keys for equality
  *
- * Creates a new #GHashTable with a reference count of 1.
+ * Creates a new #xhashtable_t with a reference count of 1.
  *
  * Hash values returned by @hash_func are used to determine where keys
- * are stored within the #GHashTable data structure. The g_direct_hash(),
- * g_int_hash(), g_int64_hash(), g_double_hash() and g_str_hash()
+ * are stored within the #xhashtable_t data structure. The g_direct_hash(),
+ * g_int_hash(), g_int64_hash(), g_double_hash() and xstr_hash()
  * functions are provided for some common types of keys.
  * If @hash_func is %NULL, g_direct_hash() is used.
  *
- * @key_equal_func is used when looking up keys in the #GHashTable.
+ * @key_equal_func is used when looking up keys in the #xhashtable_t.
  * The g_direct_equal(), g_int_equal(), g_int64_equal(), g_double_equal()
- * and g_str_equal() functions are provided for the most common types
+ * and xstr_equal() functions are provided for the most common types
  * of keys. If @key_equal_func is %NULL, keys are compared directly in
  * a similar fashion to g_direct_equal(), but without the overhead of
  * a function call. @key_equal_func is called with the key from the hash table
  * as its first parameter, and the user-provided key to check against as
  * its second.
  *
- * Returns: a new #GHashTable
+ * Returns: a new #xhashtable_t
  */
-GHashTable *
-g_hash_table_new (GHashFunc  hash_func,
+xhashtable_t *
+xhash_table_new (GHashFunc  hash_func,
                   GEqualFunc key_equal_func)
 {
-  return g_hash_table_new_full (hash_func, key_equal_func, NULL, NULL);
+  return xhash_table_new_full (hash_func, key_equal_func, NULL, NULL);
 }
 
 
 /**
- * g_hash_table_new_full:
+ * xhash_table_new_full:
  * @hash_func: a function to create a hash value from a key
  * @key_equal_func: a function to check two keys for equality
  * @key_destroy_func: (nullable): a function to free the memory allocated for the key
- *     used when removing the entry from the #GHashTable, or %NULL
+ *     used when removing the entry from the #xhashtable_t, or %NULL
  *     if you don't want to supply such a function.
  * @value_destroy_func: (nullable): a function to free the memory allocated for the
- *     value used when removing the entry from the #GHashTable, or %NULL
+ *     value used when removing the entry from the #xhashtable_t, or %NULL
  *     if you don't want to supply such a function.
  *
- * Creates a new #GHashTable like g_hash_table_new() with a reference
+ * Creates a new #xhashtable_t like xhash_table_new() with a reference
  * count of 1 and allows to specify functions to free the memory
  * allocated for the key and value that get called when removing the
- * entry from the #GHashTable.
+ * entry from the #xhashtable_t.
  *
  * Since version 2.42 it is permissible for destroy notify functions to
  * recursively remove further items from the hash table. This is only
  * permissible if the application still holds a reference to the hash table.
  * This means that you may need to ensure that the hash table is empty by
- * calling g_hash_table_remove_all() before releasing the last reference using
- * g_hash_table_unref().
+ * calling xhash_table_remove_all() before releasing the last reference using
+ * xhash_table_unref().
  *
- * Returns: a new #GHashTable
+ * Returns: a new #xhashtable_t
  */
-GHashTable *
-g_hash_table_new_full (GHashFunc      hash_func,
+xhashtable_t *
+xhash_table_new_full (GHashFunc      hash_func,
                        GEqualFunc     key_equal_func,
-                       GDestroyNotify key_destroy_func,
-                       GDestroyNotify value_destroy_func)
+                       xdestroy_notify_t key_destroy_func,
+                       xdestroy_notify_t value_destroy_func)
 {
-  GHashTable *hash_table;
+  xhashtable_t *hash_table;
 
-  hash_table = g_slice_new (GHashTable);
+  hash_table = g_slice_new (xhashtable_t);
   g_atomic_ref_count_init (&hash_table->ref_count);
   hash_table->nnodes             = 0;
   hash_table->noccupied          = 0;
@@ -1080,16 +1080,16 @@ g_hash_table_new_full (GHashFunc      hash_func,
   hash_table->key_destroy_func   = key_destroy_func;
   hash_table->value_destroy_func = value_destroy_func;
 
-  g_hash_table_setup_storage (hash_table);
+  xhash_table_setup_storage (hash_table);
 
   return hash_table;
 }
 
 /**
- * g_hash_table_new_similar:
- * @other_hash_table: (not nullable) (transfer none): Another #GHashTable
+ * xhash_table_new_similar:
+ * @other_hash_table: (not nullable) (transfer none): Another #xhashtable_t
  *
- * Creates a new #GHashTable like g_hash_table_new_full() with a reference
+ * Creates a new #xhashtable_t like xhash_table_new_full() with a reference
  * count of 1.
  *
  * It inherits the hash function, the key equal function, the key destroy function,
@@ -1098,38 +1098,38 @@ g_hash_table_new_full (GHashFunc      hash_func,
  * The returned hash table will be empty; it will not contain the keys
  * or values from @other_hash_table.
  *
- * Returns: (transfer full) (not nullable): a new #GHashTable
+ * Returns: (transfer full) (not nullable): a new #xhashtable_t
  * Since: 2.72
  */
-GHashTable *
-g_hash_table_new_similar (GHashTable *other_hash_table)
+xhashtable_t *
+xhash_table_new_similar (xhashtable_t *other_hash_table)
 {
   g_return_val_if_fail (other_hash_table, NULL);
 
-  return g_hash_table_new_full (other_hash_table->hash_func,
+  return xhash_table_new_full (other_hash_table->hash_func,
                                 other_hash_table->key_equal_func,
                                 other_hash_table->key_destroy_func,
                                 other_hash_table->value_destroy_func);
 }
 
 /**
- * g_hash_table_iter_init:
- * @iter: an uninitialized #GHashTableIter
- * @hash_table: a #GHashTable
+ * xhash_table_iter_init:
+ * @iter: an uninitialized #xhash_table_iter_t
+ * @hash_table: a #xhashtable_t
  *
  * Initializes a key/value pair iterator and associates it with
  * @hash_table. Modifying the hash table after calling this function
  * invalidates the returned iterator.
  *
- * The iteration order of a #GHashTableIter over the keys/values in a hash
+ * The iteration order of a #xhash_table_iter_t over the keys/values in a hash
  * table is not defined.
  *
  * |[<!-- language="C" -->
- * GHashTableIter iter;
+ * xhash_table_iter_t iter;
  * xpointer_t key, value;
  *
- * g_hash_table_iter_init (&iter, hash_table);
- * while (g_hash_table_iter_next (&iter, &key, &value))
+ * xhash_table_iter_init (&iter, hash_table);
+ * while (xhash_table_iter_next (&iter, &key, &value))
  *   {
  *     // do something with key and value
  *   }
@@ -1138,8 +1138,8 @@ g_hash_table_new_similar (GHashTable *other_hash_table)
  * Since: 2.16
  */
 void
-g_hash_table_iter_init (GHashTableIter *iter,
-                        GHashTable     *hash_table)
+xhash_table_iter_init (xhash_table_iter_t *iter,
+                        xhashtable_t     *hash_table)
 {
   RealIter *ri = (RealIter *) iter;
 
@@ -1154,8 +1154,8 @@ g_hash_table_iter_init (GHashTableIter *iter,
 }
 
 /**
- * g_hash_table_iter_next:
- * @iter: an initialized #GHashTableIter
+ * xhash_table_iter_next:
+ * @iter: an initialized #xhash_table_iter_t
  * @key: (out) (optional): a location to store the key
  * @value: (out) (optional) (nullable): a location to store the value
  *
@@ -1163,12 +1163,12 @@ g_hash_table_iter_init (GHashTableIter *iter,
  * pointed to as a result of this advancement. If %FALSE is returned,
  * @key and @value are not set, and the iterator becomes invalid.
  *
- * Returns: %FALSE if the end of the #GHashTable has been reached.
+ * Returns: %FALSE if the end of the #xhashtable_t has been reached.
  *
  * Since: 2.16
  */
 xboolean_t
-g_hash_table_iter_next (GHashTableIter *iter,
+xhash_table_iter_next (xhash_table_iter_t *iter,
                         xpointer_t       *key,
                         xpointer_t       *value)
 {
@@ -1179,14 +1179,14 @@ g_hash_table_iter_next (GHashTableIter *iter,
 #ifndef G_DISABLE_ASSERT
   g_return_val_if_fail (ri->version == ri->hash_table->version, FALSE);
 #endif
-  g_return_val_if_fail (ri->position < (gssize) ri->hash_table->size, FALSE);
+  g_return_val_if_fail (ri->position < (xssize_t) ri->hash_table->size, FALSE);
 
   position = ri->position;
 
   do
     {
       position++;
-      if (position >= (gssize) ri->hash_table->size)
+      if (position >= (xssize_t) ri->hash_table->size)
         {
           ri->position = position;
           return FALSE;
@@ -1195,26 +1195,26 @@ g_hash_table_iter_next (GHashTableIter *iter,
   while (!HASH_IS_REAL (ri->hash_table->hashes[position]));
 
   if (key != NULL)
-    *key = g_hash_table_fetch_key_or_value (ri->hash_table->keys, position, ri->hash_table->have_big_keys);
+    *key = xhash_table_fetch_key_or_value (ri->hash_table->keys, position, ri->hash_table->have_big_keys);
   if (value != NULL)
-    *value = g_hash_table_fetch_key_or_value (ri->hash_table->values, position, ri->hash_table->have_big_values);
+    *value = xhash_table_fetch_key_or_value (ri->hash_table->values, position, ri->hash_table->have_bixvalues);
 
   ri->position = position;
   return TRUE;
 }
 
 /**
- * g_hash_table_iter_get_hash_table:
- * @iter: an initialized #GHashTableIter
+ * xhash_table_iter_get_hash_table:
+ * @iter: an initialized #xhash_table_iter_t
  *
- * Returns the #GHashTable associated with @iter.
+ * Returns the #xhashtable_t associated with @iter.
  *
- * Returns: the #GHashTable associated with @iter.
+ * Returns: the #xhashtable_t associated with @iter.
  *
  * Since: 2.16
  */
-GHashTable *
-g_hash_table_iter_get_hash_table (GHashTableIter *iter)
+xhashtable_t *
+xhash_table_iter_get_hash_table (xhash_table_iter_t *iter)
 {
   g_return_val_if_fail (iter != NULL, NULL);
 
@@ -1231,7 +1231,7 @@ iter_remove_or_steal (RealIter *ri, xboolean_t notify)
   g_return_if_fail (ri->position >= 0);
   g_return_if_fail ((xsize_t) ri->position < ri->hash_table->size);
 
-  g_hash_table_remove_node (ri->hash_table, ri->position, notify);
+  xhash_table_remove_node (ri->hash_table, ri->position, notify);
 
 #ifndef G_DISABLE_ASSERT
   ri->version++;
@@ -1240,39 +1240,39 @@ iter_remove_or_steal (RealIter *ri, xboolean_t notify)
 }
 
 /**
- * g_hash_table_iter_remove:
- * @iter: an initialized #GHashTableIter
+ * xhash_table_iter_remove:
+ * @iter: an initialized #xhash_table_iter_t
  *
  * Removes the key/value pair currently pointed to by the iterator
- * from its associated #GHashTable. Can only be called after
- * g_hash_table_iter_next() returned %TRUE, and cannot be called
+ * from its associated #xhashtable_t. Can only be called after
+ * xhash_table_iter_next() returned %TRUE, and cannot be called
  * more than once for the same key/value pair.
  *
- * If the #GHashTable was created using g_hash_table_new_full(),
+ * If the #xhashtable_t was created using xhash_table_new_full(),
  * the key and value are freed using the supplied destroy functions,
  * otherwise you have to make sure that any dynamically allocated
  * values are freed yourself.
  *
- * It is safe to continue iterating the #GHashTable afterward:
+ * It is safe to continue iterating the #xhashtable_t afterward:
  * |[<!-- language="C" -->
- * while (g_hash_table_iter_next (&iter, &key, &value))
+ * while (xhash_table_iter_next (&iter, &key, &value))
  *   {
  *     if (condition)
- *       g_hash_table_iter_remove (&iter);
+ *       xhash_table_iter_remove (&iter);
  *   }
  * ]|
  *
  * Since: 2.16
  */
 void
-g_hash_table_iter_remove (GHashTableIter *iter)
+xhash_table_iter_remove (xhash_table_iter_t *iter)
 {
   iter_remove_or_steal ((RealIter *) iter, TRUE);
 }
 
 /*
- * g_hash_table_insert_node:
- * @hash_table: our #GHashTable
+ * xhash_table_insert_node:
+ * @hash_table: our #xhashtable_t
  * @node_index: pointer to node to insert/replace
  * @key_hash: key hash
  * @key: (nullable): key to replace with, or %NULL
@@ -1283,13 +1283,13 @@ g_hash_table_iter_remove (GHashTableIter *iter)
  * Inserts a value at @node_index in the hash table and updates it.
  *
  * If @key has been taken out of the existing node (ie it is not
- * passed in via a g_hash_table_insert/replace) call, then @reusing_key
+ * passed in via a xhash_table_insert/replace) call, then @reusing_key
  * should be %TRUE.
  *
  * Returns: %TRUE if the key did not exist yet
  */
 static xboolean_t
-g_hash_table_insert_node (GHashTable *hash_table,
+xhash_table_insert_node (xhashtable_t *hash_table,
                           xuint_t       node_index,
                           xuint_t       key_hash,
                           xpointer_t    new_key,
@@ -1330,17 +1330,17 @@ g_hash_table_insert_node (GHashTable *hash_table,
        * because we might change the value in the event that the two
        * arrays are shared.
        */
-      value_to_free = g_hash_table_fetch_key_or_value (hash_table->values, node_index, hash_table->have_big_values);
+      value_to_free = xhash_table_fetch_key_or_value (hash_table->values, node_index, hash_table->have_bixvalues);
 
       if (keep_new_key)
         {
-          key_to_free = g_hash_table_fetch_key_or_value (hash_table->keys, node_index, hash_table->have_big_keys);
+          key_to_free = xhash_table_fetch_key_or_value (hash_table->keys, node_index, hash_table->have_big_keys);
           key_to_keep = new_key;
         }
       else
         {
           key_to_free = new_key;
-          key_to_keep = g_hash_table_fetch_key_or_value (hash_table->keys, node_index, hash_table->have_big_keys);
+          key_to_keep = xhash_table_fetch_key_or_value (hash_table->keys, node_index, hash_table->have_big_keys);
         }
     }
   else
@@ -1350,11 +1350,11 @@ g_hash_table_insert_node (GHashTable *hash_table,
     }
 
   /* Resize key/value arrays and split table as necessary */
-  g_hash_table_ensure_keyval_fits (hash_table, key_to_keep, new_value);
-  g_hash_table_assign_key_or_value (hash_table->keys, node_index, hash_table->have_big_keys, key_to_keep);
+  xhash_table_ensure_keyval_fits (hash_table, key_to_keep, new_value);
+  xhash_table_assign_key_or_value (hash_table->keys, node_index, hash_table->have_big_keys, key_to_keep);
 
   /* Step 3: Actually do the write */
-  g_hash_table_assign_key_or_value (hash_table->values, node_index, hash_table->have_big_values, new_value);
+  xhash_table_assign_key_or_value (hash_table->values, node_index, hash_table->have_bixvalues, new_value);
 
   /* Now, the bookkeeping... */
   if (!already_exists)
@@ -1365,7 +1365,7 @@ g_hash_table_insert_node (GHashTable *hash_table,
         {
           /* We replaced an empty node, and not a tombstone */
           hash_table->noccupied++;
-          g_hash_table_maybe_resize (hash_table);
+          xhash_table_maybe_resize (hash_table);
         }
 
 #ifndef G_DISABLE_ASSERT
@@ -1385,21 +1385,21 @@ g_hash_table_insert_node (GHashTable *hash_table,
 }
 
 /**
- * g_hash_table_iter_replace:
- * @iter: an initialized #GHashTableIter
+ * xhash_table_iter_replace:
+ * @iter: an initialized #xhash_table_iter_t
  * @value: the value to replace with
  *
  * Replaces the value currently pointed to by the iterator
- * from its associated #GHashTable. Can only be called after
- * g_hash_table_iter_next() returned %TRUE.
+ * from its associated #xhashtable_t. Can only be called after
+ * xhash_table_iter_next() returned %TRUE.
  *
  * If you supplied a @value_destroy_func when creating the
- * #GHashTable, the old value is freed using that function.
+ * #xhashtable_t, the old value is freed using that function.
  *
  * Since: 2.30
  */
 void
-g_hash_table_iter_replace (GHashTableIter *iter,
+xhash_table_iter_replace (xhash_table_iter_t *iter,
                            xpointer_t        value)
 {
   RealIter *ri;
@@ -1417,9 +1417,9 @@ g_hash_table_iter_replace (GHashTableIter *iter,
 
   node_hash = ri->hash_table->hashes[ri->position];
 
-  key = g_hash_table_fetch_key_or_value (ri->hash_table->keys, ri->position, ri->hash_table->have_big_keys);
+  key = xhash_table_fetch_key_or_value (ri->hash_table->keys, ri->position, ri->hash_table->have_big_keys);
 
-  g_hash_table_insert_node (ri->hash_table, ri->position, node_hash, key, value, TRUE, TRUE);
+  xhash_table_insert_node (ri->hash_table, ri->position, node_hash, key, value, TRUE, TRUE);
 
 #ifndef G_DISABLE_ASSERT
   ri->version++;
@@ -1428,37 +1428,37 @@ g_hash_table_iter_replace (GHashTableIter *iter,
 }
 
 /**
- * g_hash_table_iter_steal:
- * @iter: an initialized #GHashTableIter
+ * xhash_table_iter_steal:
+ * @iter: an initialized #xhash_table_iter_t
  *
  * Removes the key/value pair currently pointed to by the
- * iterator from its associated #GHashTable, without calling
+ * iterator from its associated #xhashtable_t, without calling
  * the key and value destroy functions. Can only be called
- * after g_hash_table_iter_next() returned %TRUE, and cannot
+ * after xhash_table_iter_next() returned %TRUE, and cannot
  * be called more than once for the same key/value pair.
  *
  * Since: 2.16
  */
 void
-g_hash_table_iter_steal (GHashTableIter *iter)
+xhash_table_iter_steal (xhash_table_iter_t *iter)
 {
   iter_remove_or_steal ((RealIter *) iter, FALSE);
 }
 
 
 /**
- * g_hash_table_ref:
- * @hash_table: a valid #GHashTable
+ * xhash_table_ref:
+ * @hash_table: a valid #xhashtable_t
  *
  * Atomically increments the reference count of @hash_table by one.
  * This function is MT-safe and may be called from any thread.
  *
- * Returns: the passed in #GHashTable
+ * Returns: the passed in #xhashtable_t
  *
  * Since: 2.10
  */
-GHashTable *
-g_hash_table_ref (GHashTable *hash_table)
+xhashtable_t *
+xhash_table_ref (xhashtable_t *hash_table)
 {
   g_return_val_if_fail (hash_table != NULL, NULL);
 
@@ -1468,8 +1468,8 @@ g_hash_table_ref (GHashTable *hash_table)
 }
 
 /**
- * g_hash_table_unref:
- * @hash_table: a valid #GHashTable
+ * xhash_table_unref:
+ * @hash_table: a valid #xhashtable_t
  *
  * Atomically decrements the reference count of @hash_table by one.
  * If the reference count drops to 0, all keys and values will be
@@ -1479,91 +1479,91 @@ g_hash_table_ref (GHashTable *hash_table)
  * Since: 2.10
  */
 void
-g_hash_table_unref (GHashTable *hash_table)
+xhash_table_unref (xhashtable_t *hash_table)
 {
   g_return_if_fail (hash_table != NULL);
 
   if (g_atomic_ref_count_dec (&hash_table->ref_count))
     {
-      g_hash_table_remove_all_nodes (hash_table, TRUE, TRUE);
+      xhash_table_remove_all_nodes (hash_table, TRUE, TRUE);
       if (hash_table->keys != hash_table->values)
         g_free (hash_table->values);
       g_free (hash_table->keys);
       g_free (hash_table->hashes);
-      g_slice_free (GHashTable, hash_table);
+      g_slice_free (xhashtable_t, hash_table);
     }
 }
 
 /**
- * g_hash_table_destroy:
- * @hash_table: a #GHashTable
+ * xhash_table_destroy:
+ * @hash_table: a #xhashtable_t
  *
- * Destroys all keys and values in the #GHashTable and decrements its
+ * Destroys all keys and values in the #xhashtable_t and decrements its
  * reference count by 1. If keys and/or values are dynamically allocated,
- * you should either free them first or create the #GHashTable with destroy
- * notifiers using g_hash_table_new_full(). In the latter case the destroy
+ * you should either free them first or create the #xhashtable_t with destroy
+ * notifiers using xhash_table_new_full(). In the latter case the destroy
  * functions you supplied will be called on all keys and values during the
  * destruction phase.
  */
 void
-g_hash_table_destroy (GHashTable *hash_table)
+xhash_table_destroy (xhashtable_t *hash_table)
 {
   g_return_if_fail (hash_table != NULL);
 
-  g_hash_table_remove_all (hash_table);
-  g_hash_table_unref (hash_table);
+  xhash_table_remove_all (hash_table);
+  xhash_table_unref (hash_table);
 }
 
 /**
- * g_hash_table_lookup:
- * @hash_table: a #GHashTable
+ * xhash_table_lookup:
+ * @hash_table: a #xhashtable_t
  * @key: the key to look up
  *
- * Looks up a key in a #GHashTable. Note that this function cannot
+ * Looks up a key in a #xhashtable_t. Note that this function cannot
  * distinguish between a key that is not present and one which is present
  * and has the value %NULL. If you need this distinction, use
- * g_hash_table_lookup_extended().
+ * xhash_table_lookup_extended().
  *
  * Returns: (nullable): the associated value, or %NULL if the key is not found
  */
 xpointer_t
-g_hash_table_lookup (GHashTable    *hash_table,
-                     gconstpointer  key)
+xhash_table_lookup (xhashtable_t    *hash_table,
+                     xconstpointer  key)
 {
   xuint_t node_index;
   xuint_t node_hash;
 
   g_return_val_if_fail (hash_table != NULL, NULL);
 
-  node_index = g_hash_table_lookup_node (hash_table, key, &node_hash);
+  node_index = xhash_table_lookup_node (hash_table, key, &node_hash);
 
   return HASH_IS_REAL (hash_table->hashes[node_index])
-    ? g_hash_table_fetch_key_or_value (hash_table->values, node_index, hash_table->have_big_values)
+    ? xhash_table_fetch_key_or_value (hash_table->values, node_index, hash_table->have_bixvalues)
     : NULL;
 }
 
 /**
- * g_hash_table_lookup_extended:
- * @hash_table: a #GHashTable
+ * xhash_table_lookup_extended:
+ * @hash_table: a #xhashtable_t
  * @lookup_key: the key to look up
  * @orig_key: (out) (optional): return location for the original key
  * @value: (out) (optional) (nullable): return location for the value associated
  * with the key
  *
- * Looks up a key in the #GHashTable, returning the original key and the
+ * Looks up a key in the #xhashtable_t, returning the original key and the
  * associated value and a #xboolean_t which is %TRUE if the key was found. This
  * is useful if you need to free the memory allocated for the original key,
- * for example before calling g_hash_table_remove().
+ * for example before calling xhash_table_remove().
  *
  * You can actually pass %NULL for @lookup_key to test
  * whether the %NULL key exists, provided the hash and equal functions
  * of @hash_table are %NULL-safe.
  *
- * Returns: %TRUE if the key was found in the #GHashTable
+ * Returns: %TRUE if the key was found in the #xhashtable_t
  */
 xboolean_t
-g_hash_table_lookup_extended (GHashTable    *hash_table,
-                              gconstpointer  lookup_key,
+xhash_table_lookup_extended (xhashtable_t    *hash_table,
+                              xconstpointer  lookup_key,
                               xpointer_t      *orig_key,
                               xpointer_t      *value)
 {
@@ -1572,7 +1572,7 @@ g_hash_table_lookup_extended (GHashTable    *hash_table,
 
   g_return_val_if_fail (hash_table != NULL, FALSE);
 
-  node_index = g_hash_table_lookup_node (hash_table, lookup_key, &node_hash);
+  node_index = xhash_table_lookup_node (hash_table, lookup_key, &node_hash);
 
   if (!HASH_IS_REAL (hash_table->hashes[node_index]))
     {
@@ -1585,25 +1585,25 @@ g_hash_table_lookup_extended (GHashTable    *hash_table,
     }
 
   if (orig_key)
-    *orig_key = g_hash_table_fetch_key_or_value (hash_table->keys, node_index, hash_table->have_big_keys);
+    *orig_key = xhash_table_fetch_key_or_value (hash_table->keys, node_index, hash_table->have_big_keys);
 
   if (value)
-    *value = g_hash_table_fetch_key_or_value (hash_table->values, node_index, hash_table->have_big_values);
+    *value = xhash_table_fetch_key_or_value (hash_table->values, node_index, hash_table->have_bixvalues);
 
   return TRUE;
 }
 
 /*
- * g_hash_table_insert_internal:
- * @hash_table: our #GHashTable
+ * xhash_table_insert_internal:
+ * @hash_table: our #xhashtable_t
  * @key: the key to insert
  * @value: the value to insert
  * @keep_new_key: if %TRUE and this key already exists in the table
  *   then call the destroy notify function on the old key.  If %FALSE
  *   then call the destroy notify function on the new key.
  *
- * Implements the common logic for the g_hash_table_insert() and
- * g_hash_table_replace() functions.
+ * Implements the common logic for the xhash_table_insert() and
+ * xhash_table_replace() functions.
  *
  * Do a lookup of @key. If it is found, replace it with the new
  * @value (and perhaps the new @key). If it is not found, create
@@ -1612,7 +1612,7 @@ g_hash_table_lookup_extended (GHashTable    *hash_table,
  * Returns: %TRUE if the key did not exist yet
  */
 static xboolean_t
-g_hash_table_insert_internal (GHashTable *hash_table,
+xhash_table_insert_internal (xhashtable_t *hash_table,
                               xpointer_t    key,
                               xpointer_t    value,
                               xboolean_t    keep_new_key)
@@ -1622,24 +1622,24 @@ g_hash_table_insert_internal (GHashTable *hash_table,
 
   g_return_val_if_fail (hash_table != NULL, FALSE);
 
-  node_index = g_hash_table_lookup_node (hash_table, key, &key_hash);
+  node_index = xhash_table_lookup_node (hash_table, key, &key_hash);
 
-  return g_hash_table_insert_node (hash_table, node_index, key_hash, key, value, keep_new_key, FALSE);
+  return xhash_table_insert_node (hash_table, node_index, key_hash, key, value, keep_new_key, FALSE);
 }
 
 /**
- * g_hash_table_insert:
- * @hash_table: a #GHashTable
+ * xhash_table_insert:
+ * @hash_table: a #xhashtable_t
  * @key: a key to insert
  * @value: the value to associate with the key
  *
- * Inserts a new key and value into a #GHashTable.
+ * Inserts a new key and value into a #xhashtable_t.
  *
- * If the key already exists in the #GHashTable its current
+ * If the key already exists in the #xhashtable_t its current
  * value is replaced with the new value. If you supplied a
- * @value_destroy_func when creating the #GHashTable, the old
+ * @value_destroy_func when creating the #xhashtable_t, the old
  * value is freed using that function. If you supplied a
- * @key_destroy_func when creating the #GHashTable, the passed
+ * @key_destroy_func when creating the #xhashtable_t, the passed
  * key is freed using that function.
  *
  * Starting from GLib 2.40, this function returns a boolean value to
@@ -1649,26 +1649,26 @@ g_hash_table_insert_internal (GHashTable *hash_table,
  * Returns: %TRUE if the key did not exist yet
  */
 xboolean_t
-g_hash_table_insert (GHashTable *hash_table,
+xhash_table_insert (xhashtable_t *hash_table,
                      xpointer_t    key,
                      xpointer_t    value)
 {
-  return g_hash_table_insert_internal (hash_table, key, value, FALSE);
+  return xhash_table_insert_internal (hash_table, key, value, FALSE);
 }
 
 /**
- * g_hash_table_replace:
- * @hash_table: a #GHashTable
+ * xhash_table_replace:
+ * @hash_table: a #xhashtable_t
  * @key: a key to insert
  * @value: the value to associate with the key
  *
- * Inserts a new key and value into a #GHashTable similar to
- * g_hash_table_insert(). The difference is that if the key
- * already exists in the #GHashTable, it gets replaced by the
+ * Inserts a new key and value into a #xhashtable_t similar to
+ * xhash_table_insert(). The difference is that if the key
+ * already exists in the #xhashtable_t, it gets replaced by the
  * new key. If you supplied a @value_destroy_func when creating
- * the #GHashTable, the old value is freed using that function.
+ * the #xhashtable_t, the old value is freed using that function.
  * If you supplied a @key_destroy_func when creating the
- * #GHashTable, the old key is freed using that function.
+ * #xhashtable_t, the old key is freed using that function.
  *
  * Starting from GLib 2.40, this function returns a boolean value to
  * indicate whether the newly added value was already in the hash table
@@ -1677,20 +1677,20 @@ g_hash_table_insert (GHashTable *hash_table,
  * Returns: %TRUE if the key did not exist yet
  */
 xboolean_t
-g_hash_table_replace (GHashTable *hash_table,
+xhash_table_replace (xhashtable_t *hash_table,
                       xpointer_t    key,
                       xpointer_t    value)
 {
-  return g_hash_table_insert_internal (hash_table, key, value, TRUE);
+  return xhash_table_insert_internal (hash_table, key, value, TRUE);
 }
 
 /**
- * g_hash_table_add:
- * @hash_table: a #GHashTable
+ * xhash_table_add:
+ * @hash_table: a #xhashtable_t
  * @key: (transfer full): a key to insert
  *
- * This is a convenience function for using a #GHashTable as a set.  It
- * is equivalent to calling g_hash_table_replace() with @key as both the
+ * This is a convenience function for using a #xhashtable_t as a set.  It
+ * is equivalent to calling xhash_table_replace() with @key as both the
  * key and the value.
  *
  * In particular, this means that if @key already exists in the hash table, then
@@ -1710,15 +1710,15 @@ g_hash_table_replace (GHashTable *hash_table,
  * Since: 2.32
  */
 xboolean_t
-g_hash_table_add (GHashTable *hash_table,
+xhash_table_add (xhashtable_t *hash_table,
                   xpointer_t    key)
 {
-  return g_hash_table_insert_internal (hash_table, key, key, TRUE);
+  return xhash_table_insert_internal (hash_table, key, key, TRUE);
 }
 
 /**
- * g_hash_table_contains:
- * @hash_table: a #GHashTable
+ * xhash_table_contains:
+ * @hash_table: a #xhashtable_t
  * @key: a key to check
  *
  * Checks if @key is in @hash_table.
@@ -1728,35 +1728,35 @@ g_hash_table_add (GHashTable *hash_table,
  * Since: 2.32
  **/
 xboolean_t
-g_hash_table_contains (GHashTable    *hash_table,
-                       gconstpointer  key)
+xhash_table_contains (xhashtable_t    *hash_table,
+                       xconstpointer  key)
 {
   xuint_t node_index;
   xuint_t node_hash;
 
   g_return_val_if_fail (hash_table != NULL, FALSE);
 
-  node_index = g_hash_table_lookup_node (hash_table, key, &node_hash);
+  node_index = xhash_table_lookup_node (hash_table, key, &node_hash);
 
   return HASH_IS_REAL (hash_table->hashes[node_index]);
 }
 
 /*
- * g_hash_table_remove_internal:
- * @hash_table: our #GHashTable
+ * xhash_table_remove_internal:
+ * @hash_table: our #xhashtable_t
  * @key: the key to remove
  * @notify: %TRUE if the destroy notify handlers are to be called
  * Returns: %TRUE if a node was found and removed, else %FALSE
  *
- * Implements the common logic for the g_hash_table_remove() and
- * g_hash_table_steal() functions.
+ * Implements the common logic for the xhash_table_remove() and
+ * xhash_table_steal() functions.
  *
  * Do a lookup of @key and remove it if it is found, calling the
  * destroy notify handlers only if @notify is %TRUE.
  */
 static xboolean_t
-g_hash_table_remove_internal (GHashTable    *hash_table,
-                              gconstpointer  key,
+xhash_table_remove_internal (xhashtable_t    *hash_table,
+                              xconstpointer  key,
                               xboolean_t       notify)
 {
   xuint_t node_index;
@@ -1764,13 +1764,13 @@ g_hash_table_remove_internal (GHashTable    *hash_table,
 
   g_return_val_if_fail (hash_table != NULL, FALSE);
 
-  node_index = g_hash_table_lookup_node (hash_table, key, &node_hash);
+  node_index = xhash_table_lookup_node (hash_table, key, &node_hash);
 
   if (!HASH_IS_REAL (hash_table->hashes[node_index]))
     return FALSE;
 
-  g_hash_table_remove_node (hash_table, node_index, notify);
-  g_hash_table_maybe_resize (hash_table);
+  xhash_table_remove_node (hash_table, node_index, notify);
+  xhash_table_maybe_resize (hash_table);
 
 #ifndef G_DISABLE_ASSERT
   hash_table->version++;
@@ -1780,69 +1780,69 @@ g_hash_table_remove_internal (GHashTable    *hash_table,
 }
 
 /**
- * g_hash_table_remove:
- * @hash_table: a #GHashTable
+ * xhash_table_remove:
+ * @hash_table: a #xhashtable_t
  * @key: the key to remove
  *
- * Removes a key and its associated value from a #GHashTable.
+ * Removes a key and its associated value from a #xhashtable_t.
  *
- * If the #GHashTable was created using g_hash_table_new_full(), the
+ * If the #xhashtable_t was created using xhash_table_new_full(), the
  * key and value are freed using the supplied destroy functions, otherwise
  * you have to make sure that any dynamically allocated values are freed
  * yourself.
  *
- * Returns: %TRUE if the key was found and removed from the #GHashTable
+ * Returns: %TRUE if the key was found and removed from the #xhashtable_t
  */
 xboolean_t
-g_hash_table_remove (GHashTable    *hash_table,
-                     gconstpointer  key)
+xhash_table_remove (xhashtable_t    *hash_table,
+                     xconstpointer  key)
 {
-  return g_hash_table_remove_internal (hash_table, key, TRUE);
+  return xhash_table_remove_internal (hash_table, key, TRUE);
 }
 
 /**
- * g_hash_table_steal:
- * @hash_table: a #GHashTable
+ * xhash_table_steal:
+ * @hash_table: a #xhashtable_t
  * @key: the key to remove
  *
- * Removes a key and its associated value from a #GHashTable without
+ * Removes a key and its associated value from a #xhashtable_t without
  * calling the key and value destroy functions.
  *
- * Returns: %TRUE if the key was found and removed from the #GHashTable
+ * Returns: %TRUE if the key was found and removed from the #xhashtable_t
  */
 xboolean_t
-g_hash_table_steal (GHashTable    *hash_table,
-                    gconstpointer  key)
+xhash_table_steal (xhashtable_t    *hash_table,
+                    xconstpointer  key)
 {
-  return g_hash_table_remove_internal (hash_table, key, FALSE);
+  return xhash_table_remove_internal (hash_table, key, FALSE);
 }
 
 /**
- * g_hash_table_steal_extended:
- * @hash_table: a #GHashTable
+ * xhash_table_steal_extended:
+ * @hash_table: a #xhashtable_t
  * @lookup_key: the key to look up
  * @stolen_key: (out) (optional) (transfer full): return location for the
  *    original key
  * @stolen_value: (out) (optional) (nullable) (transfer full): return location
  *    for the value associated with the key
  *
- * Looks up a key in the #GHashTable, stealing the original key and the
+ * Looks up a key in the #xhashtable_t, stealing the original key and the
  * associated value and returning %TRUE if the key was found. If the key was
  * not found, %FALSE is returned.
  *
  * If found, the stolen key and value are removed from the hash table without
  * calling the key and value destroy functions, and ownership is transferred to
- * the caller of this method; as with g_hash_table_steal().
+ * the caller of this method; as with xhash_table_steal().
  *
  * You can pass %NULL for @lookup_key, provided the hash and equal functions
  * of @hash_table are %NULL-safe.
  *
- * Returns: %TRUE if the key was found in the #GHashTable
+ * Returns: %TRUE if the key was found in the #xhashtable_t
  * Since: 2.58
  */
 xboolean_t
-g_hash_table_steal_extended (GHashTable    *hash_table,
-                             gconstpointer  lookup_key,
+xhash_table_steal_extended (xhashtable_t    *hash_table,
+                             xconstpointer  lookup_key,
                              xpointer_t      *stolen_key,
                              xpointer_t      *stolen_value)
 {
@@ -1851,7 +1851,7 @@ g_hash_table_steal_extended (GHashTable    *hash_table,
 
   g_return_val_if_fail (hash_table != NULL, FALSE);
 
-  node_index = g_hash_table_lookup_node (hash_table, lookup_key, &node_hash);
+  node_index = xhash_table_lookup_node (hash_table, lookup_key, &node_hash);
 
   if (!HASH_IS_REAL (hash_table->hashes[node_index]))
     {
@@ -1864,18 +1864,18 @@ g_hash_table_steal_extended (GHashTable    *hash_table,
 
   if (stolen_key != NULL)
   {
-    *stolen_key = g_hash_table_fetch_key_or_value (hash_table->keys, node_index, hash_table->have_big_keys);
-    g_hash_table_assign_key_or_value (hash_table->keys, node_index, hash_table->have_big_keys, NULL);
+    *stolen_key = xhash_table_fetch_key_or_value (hash_table->keys, node_index, hash_table->have_big_keys);
+    xhash_table_assign_key_or_value (hash_table->keys, node_index, hash_table->have_big_keys, NULL);
   }
 
   if (stolen_value != NULL)
   {
-    *stolen_value = g_hash_table_fetch_key_or_value (hash_table->values, node_index, hash_table->have_big_values);
-    g_hash_table_assign_key_or_value (hash_table->values, node_index, hash_table->have_big_values, NULL);
+    *stolen_value = xhash_table_fetch_key_or_value (hash_table->values, node_index, hash_table->have_bixvalues);
+    xhash_table_assign_key_or_value (hash_table->values, node_index, hash_table->have_bixvalues, NULL);
   }
 
-  g_hash_table_remove_node (hash_table, node_index, FALSE);
-  g_hash_table_maybe_resize (hash_table);
+  xhash_table_remove_node (hash_table, node_index, FALSE);
+  xhash_table_maybe_resize (hash_table);
 
 #ifndef G_DISABLE_ASSERT
   hash_table->version++;
@@ -1885,12 +1885,12 @@ g_hash_table_steal_extended (GHashTable    *hash_table,
 }
 
 /**
- * g_hash_table_remove_all:
- * @hash_table: a #GHashTable
+ * xhash_table_remove_all:
+ * @hash_table: a #xhashtable_t
  *
- * Removes all keys and their associated values from a #GHashTable.
+ * Removes all keys and their associated values from a #xhashtable_t.
  *
- * If the #GHashTable was created using g_hash_table_new_full(),
+ * If the #xhashtable_t was created using xhash_table_new_full(),
  * the keys and values are freed using the supplied destroy functions,
  * otherwise you have to make sure that any dynamically allocated
  * values are freed yourself.
@@ -1898,7 +1898,7 @@ g_hash_table_steal_extended (GHashTable    *hash_table,
  * Since: 2.12
  */
 void
-g_hash_table_remove_all (GHashTable *hash_table)
+xhash_table_remove_all (xhashtable_t *hash_table)
 {
   g_return_if_fail (hash_table != NULL);
 
@@ -1907,21 +1907,21 @@ g_hash_table_remove_all (GHashTable *hash_table)
     hash_table->version++;
 #endif
 
-  g_hash_table_remove_all_nodes (hash_table, TRUE, FALSE);
-  g_hash_table_maybe_resize (hash_table);
+  xhash_table_remove_all_nodes (hash_table, TRUE, FALSE);
+  xhash_table_maybe_resize (hash_table);
 }
 
 /**
- * g_hash_table_steal_all:
- * @hash_table: a #GHashTable
+ * xhash_table_steal_all:
+ * @hash_table: a #xhashtable_t
  *
- * Removes all keys and their associated values from a #GHashTable
+ * Removes all keys and their associated values from a #xhashtable_t
  * without calling the key and value destroy functions.
  *
  * Since: 2.12
  */
 void
-g_hash_table_steal_all (GHashTable *hash_table)
+xhash_table_steal_all (xhashtable_t *hash_table)
 {
   g_return_if_fail (hash_table != NULL);
 
@@ -1930,19 +1930,19 @@ g_hash_table_steal_all (GHashTable *hash_table)
     hash_table->version++;
 #endif
 
-  g_hash_table_remove_all_nodes (hash_table, FALSE, FALSE);
-  g_hash_table_maybe_resize (hash_table);
+  xhash_table_remove_all_nodes (hash_table, FALSE, FALSE);
+  xhash_table_maybe_resize (hash_table);
 }
 
 /*
- * g_hash_table_foreach_remove_or_steal:
- * @hash_table: a #GHashTable
+ * xhash_table_foreach_remove_or_steal:
+ * @hash_table: a #xhashtable_t
  * @func: the user's callback function
  * @user_data: data for @func
  * @notify: %TRUE if the destroy notify handlers are to be called
  *
- * Implements the common logic for g_hash_table_foreach_remove()
- * and g_hash_table_foreach_steal().
+ * Implements the common logic for xhash_table_foreach_remove()
+ * and xhash_table_foreach_steal().
  *
  * Iterates over every node in the table, calling @func with the key
  * and value of the node (and @user_data). If @func returns %TRUE the
@@ -1952,7 +1952,7 @@ g_hash_table_steal_all (GHashTable *hash_table)
  * for each removed node.
  */
 static xuint_t
-g_hash_table_foreach_remove_or_steal (GHashTable *hash_table,
+xhash_table_foreach_remove_or_steal (xhashtable_t *hash_table,
                                       GHRFunc     func,
                                       xpointer_t    user_data,
                                       xboolean_t    notify)
@@ -1966,13 +1966,13 @@ g_hash_table_foreach_remove_or_steal (GHashTable *hash_table,
   for (i = 0; i < hash_table->size; i++)
     {
       xuint_t node_hash = hash_table->hashes[i];
-      xpointer_t node_key = g_hash_table_fetch_key_or_value (hash_table->keys, i, hash_table->have_big_keys);
-      xpointer_t node_value = g_hash_table_fetch_key_or_value (hash_table->values, i, hash_table->have_big_values);
+      xpointer_t node_key = xhash_table_fetch_key_or_value (hash_table->keys, i, hash_table->have_big_keys);
+      xpointer_t node_value = xhash_table_fetch_key_or_value (hash_table->values, i, hash_table->have_bixvalues);
 
       if (HASH_IS_REAL (node_hash) &&
           (* func) (node_key, node_value, user_data))
         {
-          g_hash_table_remove_node (hash_table, i, notify);
+          xhash_table_remove_node (hash_table, i, notify);
           deleted++;
         }
 
@@ -1981,7 +1981,7 @@ g_hash_table_foreach_remove_or_steal (GHashTable *hash_table,
 #endif
     }
 
-  g_hash_table_maybe_resize (hash_table);
+  xhash_table_maybe_resize (hash_table);
 
 #ifndef G_DISABLE_ASSERT
   if (deleted > 0)
@@ -1992,81 +1992,81 @@ g_hash_table_foreach_remove_or_steal (GHashTable *hash_table,
 }
 
 /**
- * g_hash_table_foreach_remove:
- * @hash_table: a #GHashTable
+ * xhash_table_foreach_remove:
+ * @hash_table: a #xhashtable_t
  * @func: the function to call for each key/value pair
  * @user_data: user data to pass to the function
  *
  * Calls the given function for each key/value pair in the
- * #GHashTable. If the function returns %TRUE, then the key/value
- * pair is removed from the #GHashTable. If you supplied key or
- * value destroy functions when creating the #GHashTable, they are
+ * #xhashtable_t. If the function returns %TRUE, then the key/value
+ * pair is removed from the #xhashtable_t. If you supplied key or
+ * value destroy functions when creating the #xhashtable_t, they are
  * used to free the memory allocated for the removed keys and values.
  *
- * See #GHashTableIter for an alternative way to loop over the
+ * See #xhash_table_iter_t for an alternative way to loop over the
  * key/value pairs in the hash table.
  *
  * Returns: the number of key/value pairs removed
  */
 xuint_t
-g_hash_table_foreach_remove (GHashTable *hash_table,
+xhash_table_foreach_remove (xhashtable_t *hash_table,
                              GHRFunc     func,
                              xpointer_t    user_data)
 {
   g_return_val_if_fail (hash_table != NULL, 0);
   g_return_val_if_fail (func != NULL, 0);
 
-  return g_hash_table_foreach_remove_or_steal (hash_table, func, user_data, TRUE);
+  return xhash_table_foreach_remove_or_steal (hash_table, func, user_data, TRUE);
 }
 
 /**
- * g_hash_table_foreach_steal:
- * @hash_table: a #GHashTable
+ * xhash_table_foreach_steal:
+ * @hash_table: a #xhashtable_t
  * @func: the function to call for each key/value pair
  * @user_data: user data to pass to the function
  *
  * Calls the given function for each key/value pair in the
- * #GHashTable. If the function returns %TRUE, then the key/value
- * pair is removed from the #GHashTable, but no key or value
+ * #xhashtable_t. If the function returns %TRUE, then the key/value
+ * pair is removed from the #xhashtable_t, but no key or value
  * destroy functions are called.
  *
- * See #GHashTableIter for an alternative way to loop over the
+ * See #xhash_table_iter_t for an alternative way to loop over the
  * key/value pairs in the hash table.
  *
  * Returns: the number of key/value pairs removed.
  */
 xuint_t
-g_hash_table_foreach_steal (GHashTable *hash_table,
+xhash_table_foreach_steal (xhashtable_t *hash_table,
                             GHRFunc     func,
                             xpointer_t    user_data)
 {
   g_return_val_if_fail (hash_table != NULL, 0);
   g_return_val_if_fail (func != NULL, 0);
 
-  return g_hash_table_foreach_remove_or_steal (hash_table, func, user_data, FALSE);
+  return xhash_table_foreach_remove_or_steal (hash_table, func, user_data, FALSE);
 }
 
 /**
- * g_hash_table_foreach:
- * @hash_table: a #GHashTable
+ * xhash_table_foreach:
+ * @hash_table: a #xhashtable_t
  * @func: the function to call for each key/value pair
  * @user_data: user data to pass to the function
  *
  * Calls the given function for each of the key/value pairs in the
- * #GHashTable.  The function is passed the key and value of each
+ * #xhashtable_t.  The function is passed the key and value of each
  * pair, and the given @user_data parameter.  The hash table may not
  * be modified while iterating over it (you can't add/remove
  * items). To remove all items matching a predicate, use
- * g_hash_table_foreach_remove().
+ * xhash_table_foreach_remove().
  *
- * The order in which g_hash_table_foreach() iterates over the keys/values in
+ * The order in which xhash_table_foreach() iterates over the keys/values in
  * the hash table is not defined.
  *
- * See g_hash_table_find() for performance caveats for linear
- * order searches in contrast to g_hash_table_lookup().
+ * See xhash_table_find() for performance caveats for linear
+ * order searches in contrast to xhash_table_lookup().
  */
 void
-g_hash_table_foreach (GHashTable *hash_table,
+xhash_table_foreach (xhashtable_t *hash_table,
                       GHFunc      func,
                       xpointer_t    user_data)
 {
@@ -2085,8 +2085,8 @@ g_hash_table_foreach (GHashTable *hash_table,
   for (i = 0; i < hash_table->size; i++)
     {
       xuint_t node_hash = hash_table->hashes[i];
-      xpointer_t node_key = g_hash_table_fetch_key_or_value (hash_table->keys, i, hash_table->have_big_keys);
-      xpointer_t node_value = g_hash_table_fetch_key_or_value (hash_table->values, i, hash_table->have_big_values);
+      xpointer_t node_key = xhash_table_fetch_key_or_value (hash_table->keys, i, hash_table->have_big_keys);
+      xpointer_t node_value = xhash_table_fetch_key_or_value (hash_table->values, i, hash_table->have_bixvalues);
 
       if (HASH_IS_REAL (node_hash))
         (* func) (node_key, node_value, user_data);
@@ -2098,20 +2098,20 @@ g_hash_table_foreach (GHashTable *hash_table,
 }
 
 /**
- * g_hash_table_find:
- * @hash_table: a #GHashTable
+ * xhash_table_find:
+ * @hash_table: a #xhashtable_t
  * @predicate: function to test the key/value pairs for a certain property
  * @user_data: user data to pass to the function
  *
- * Calls the given function for key/value pairs in the #GHashTable
+ * Calls the given function for key/value pairs in the #xhashtable_t
  * until @predicate returns %TRUE. The function is passed the key
  * and value of each pair, and the given @user_data parameter. The
  * hash table may not be modified while iterating over it (you can't
  * add/remove items).
  *
  * Note, that hash tables are really only optimized for forward
- * lookups, i.e. g_hash_table_lookup(). So code that frequently issues
- * g_hash_table_find() or g_hash_table_foreach() (e.g. in the order of
+ * lookups, i.e. xhash_table_lookup(). So code that frequently issues
+ * xhash_table_find() or xhash_table_foreach() (e.g. in the order of
  * once per every entry in a hash table) should probably be reworked
  * to use additional or different data structures for reverse lookups
  * (keep in mind that an O(n) find/foreach operation issued for all n
@@ -2124,7 +2124,7 @@ g_hash_table_foreach (GHashTable *hash_table,
  * Since: 2.4
  */
 xpointer_t
-g_hash_table_find (GHashTable *hash_table,
+xhash_table_find (xhashtable_t *hash_table,
                    GHRFunc     predicate,
                    xpointer_t    user_data)
 {
@@ -2146,8 +2146,8 @@ g_hash_table_find (GHashTable *hash_table,
   for (i = 0; i < hash_table->size; i++)
     {
       xuint_t node_hash = hash_table->hashes[i];
-      xpointer_t node_key = g_hash_table_fetch_key_or_value (hash_table->keys, i, hash_table->have_big_keys);
-      xpointer_t node_value = g_hash_table_fetch_key_or_value (hash_table->values, i, hash_table->have_big_values);
+      xpointer_t node_key = xhash_table_fetch_key_or_value (hash_table->keys, i, hash_table->have_big_keys);
+      xpointer_t node_value = xhash_table_fetch_key_or_value (hash_table->values, i, hash_table->have_bixvalues);
 
       if (HASH_IS_REAL (node_hash))
         match = predicate (node_key, node_value, user_data);
@@ -2164,15 +2164,15 @@ g_hash_table_find (GHashTable *hash_table,
 }
 
 /**
- * g_hash_table_size:
- * @hash_table: a #GHashTable
+ * xhash_table_size:
+ * @hash_table: a #xhashtable_t
  *
- * Returns the number of elements contained in the #GHashTable.
+ * Returns the number of elements contained in the #xhashtable_t.
  *
- * Returns: the number of key/value pairs in the #GHashTable.
+ * Returns: the number of key/value pairs in the #xhashtable_t.
  */
 xuint_t
-g_hash_table_size (GHashTable *hash_table)
+xhash_table_size (xhashtable_t *hash_table)
 {
   g_return_val_if_fail (hash_table != NULL, 0);
 
@@ -2180,25 +2180,25 @@ g_hash_table_size (GHashTable *hash_table)
 }
 
 /**
- * g_hash_table_get_keys:
- * @hash_table: a #GHashTable
+ * xhash_table_get_keys:
+ * @hash_table: a #xhashtable_t
  *
  * Retrieves every key inside @hash_table. The returned data is valid
  * until changes to the hash release those keys.
  *
  * This iterates over every entry in the hash table to build its return value.
- * To iterate over the entries in a #GHashTable more efficiently, use a
- * #GHashTableIter.
+ * To iterate over the entries in a #xhashtable_t more efficiently, use a
+ * #xhash_table_iter_t.
  *
  * Returns: (transfer container): a #xlist_t containing all the keys
  *     inside the hash table. The content of the list is owned by the
- *     hash table and should not be modified or freed. Use g_list_free()
+ *     hash table and should not be modified or freed. Use xlist_free()
  *     when done using the list.
  *
  * Since: 2.14
  */
 xlist_t *
-g_hash_table_get_keys (GHashTable *hash_table)
+xhash_table_get_keys (xhashtable_t *hash_table)
 {
   xsize_t i;
   xlist_t *retval;
@@ -2209,15 +2209,15 @@ g_hash_table_get_keys (GHashTable *hash_table)
   for (i = 0; i < hash_table->size; i++)
     {
       if (HASH_IS_REAL (hash_table->hashes[i]))
-        retval = g_list_prepend (retval, g_hash_table_fetch_key_or_value (hash_table->keys, i, hash_table->have_big_keys));
+        retval = xlist_prepend (retval, xhash_table_fetch_key_or_value (hash_table->keys, i, hash_table->have_big_keys));
     }
 
   return retval;
 }
 
 /**
- * g_hash_table_get_keys_as_array:
- * @hash_table: a #GHashTable
+ * xhash_table_get_keys_as_array:
+ * @hash_table: a #xhashtable_t
  * @length: (out) (optional): the length of the returned array
  *
  * Retrieves every key inside @hash_table, as an array.
@@ -2226,16 +2226,16 @@ g_hash_table_get_keys (GHashTable *hash_table)
  * key.  Use @length to determine the true length if it's possible that
  * %NULL was used as the value for a key.
  *
- * Note: in the common case of a string-keyed #GHashTable, the return
+ * Note: in the common case of a string-keyed #xhashtable_t, the return
  * value of this function can be conveniently cast to (const xchar_t **).
  *
  * This iterates over every entry in the hash table to build its return value.
- * To iterate over the entries in a #GHashTable more efficiently, use a
- * #GHashTableIter.
+ * To iterate over the entries in a #xhashtable_t more efficiently, use a
+ * #xhash_table_iter_t.
  *
  * You should always free the return result with g_free().  In the
  * above-mentioned case of a string-keyed hash table, it may be
- * appropriate to use g_strfreev() if you call g_hash_table_steal_all()
+ * appropriate to use xstrfreev() if you call xhash_table_steal_all()
  * first to transfer ownership of the keys.
  *
  * Returns: (array length=length) (transfer container): a
@@ -2244,7 +2244,7 @@ g_hash_table_get_keys (GHashTable *hash_table)
  * Since: 2.40
  **/
 xpointer_t *
-g_hash_table_get_keys_as_array (GHashTable *hash_table,
+xhash_table_get_keys_as_array (xhashtable_t *hash_table,
                                 xuint_t      *length)
 {
   xpointer_t *result;
@@ -2254,7 +2254,7 @@ g_hash_table_get_keys_as_array (GHashTable *hash_table,
   for (i = 0; i < hash_table->size; i++)
     {
       if (HASH_IS_REAL (hash_table->hashes[i]))
-        result[j++] = g_hash_table_fetch_key_or_value (hash_table->keys, i, hash_table->have_big_keys);
+        result[j++] = xhash_table_fetch_key_or_value (hash_table->keys, i, hash_table->have_big_keys);
     }
   g_assert_cmpint (j, ==, hash_table->nnodes);
   result[j] = NULL;
@@ -2266,25 +2266,25 @@ g_hash_table_get_keys_as_array (GHashTable *hash_table,
 }
 
 /**
- * g_hash_table_get_values:
- * @hash_table: a #GHashTable
+ * xhash_table_get_values:
+ * @hash_table: a #xhashtable_t
  *
  * Retrieves every value inside @hash_table. The returned data
  * is valid until @hash_table is modified.
  *
  * This iterates over every entry in the hash table to build its return value.
- * To iterate over the entries in a #GHashTable more efficiently, use a
- * #GHashTableIter.
+ * To iterate over the entries in a #xhashtable_t more efficiently, use a
+ * #xhash_table_iter_t.
  *
  * Returns: (transfer container): a #xlist_t containing all the values
  *     inside the hash table. The content of the list is owned by the
- *     hash table and should not be modified or freed. Use g_list_free()
+ *     hash table and should not be modified or freed. Use xlist_free()
  *     when done using the list.
  *
  * Since: 2.14
  */
 xlist_t *
-g_hash_table_get_values (GHashTable *hash_table)
+xhash_table_get_values (xhashtable_t *hash_table)
 {
   xsize_t i;
   xlist_t *retval;
@@ -2295,7 +2295,7 @@ g_hash_table_get_values (GHashTable *hash_table)
   for (i = 0; i < hash_table->size; i++)
     {
       if (HASH_IS_REAL (hash_table->hashes[i]))
-        retval = g_list_prepend (retval, g_hash_table_fetch_key_or_value (hash_table->values, i, hash_table->have_big_values));
+        retval = xlist_prepend (retval, xhash_table_fetch_key_or_value (hash_table->values, i, hash_table->have_bixvalues));
     }
 
   return retval;
@@ -2305,24 +2305,24 @@ g_hash_table_get_values (GHashTable *hash_table)
  */
 
 /**
- * g_str_equal:
+ * xstr_equal:
  * @v1: (not nullable): a key
  * @v2: (not nullable): a key to compare with @v1
  *
  * Compares two strings for byte-by-byte equality and returns %TRUE
- * if they are equal. It can be passed to g_hash_table_new() as the
+ * if they are equal. It can be passed to xhash_table_new() as the
  * @key_equal_func parameter, when using non-%NULL strings as keys in a
- * #GHashTable.
+ * #xhashtable_t.
  *
  * This function is typically used for hash table comparisons, but can be used
  * for general purpose comparisons of non-%NULL strings. For a %NULL-safe string
- * comparison function, see g_strcmp0().
+ * comparison function, see xstrcmp0().
  *
  * Returns: %TRUE if the two keys match
  */
 xboolean_t
-g_str_equal (gconstpointer v1,
-             gconstpointer v2)
+xstr_equal (xconstpointer v1,
+             xconstpointer v2)
 {
   const xchar_t *string1 = v1;
   const xchar_t *string2 = v2;
@@ -2331,7 +2331,7 @@ g_str_equal (gconstpointer v1,
 }
 
 /**
- * g_str_hash:
+ * xstr_hash:
  * @v: (not nullable): a string key
  *
  * Converts a string to a hash value.
@@ -2342,8 +2342,8 @@ g_str_equal (gconstpointer v1,
  * the string, is updated: `hash = hash * 33 + c`. This function
  * uses the signed value of each byte.
  *
- * It can be passed to g_hash_table_new() as the @hash_func parameter,
- * when using non-%NULL strings as keys in a #GHashTable.
+ * It can be passed to xhash_table_new() as the @hash_func parameter,
+ * when using non-%NULL strings as keys in a #xhashtable_t.
  *
  * Note that this function may not be a perfect fit for all use cases.
  * For example, it produces some hash collisions with strings as short
@@ -2352,10 +2352,10 @@ g_str_equal (gconstpointer v1,
  * Returns: a hash value corresponding to the key
  */
 xuint_t
-g_str_hash (gconstpointer v)
+xstr_hash (xconstpointer v)
 {
   const signed char *p;
-  guint32 h = 5381;
+  xuint32_t h = 5381;
 
   for (p = v; *p != '\0'; p++)
     h = (h << 5) + h + *p;
@@ -2368,9 +2368,9 @@ g_str_hash (gconstpointer v)
  * @v: (nullable): a #xpointer_t key
  *
  * Converts a xpointer_t to a hash value.
- * It can be passed to g_hash_table_new() as the @hash_func parameter,
+ * It can be passed to xhash_table_new() as the @hash_func parameter,
  * when using opaque pointers compared by pointer value as keys in a
- * #GHashTable.
+ * #xhashtable_t.
  *
  * This hash function is also appropriate for keys that are integers
  * stored in pointers, such as `GINT_TO_POINTER (n)`.
@@ -2378,7 +2378,7 @@ g_str_hash (gconstpointer v)
  * Returns: a hash value corresponding to the key.
  */
 xuint_t
-g_direct_hash (gconstpointer v)
+g_direct_hash (xconstpointer v)
 {
   return GPOINTER_TO_UINT (v);
 }
@@ -2389,9 +2389,9 @@ g_direct_hash (gconstpointer v)
  * @v2: (nullable): a key to compare with @v1
  *
  * Compares two #xpointer_t arguments and returns %TRUE if they are equal.
- * It can be passed to g_hash_table_new() as the @key_equal_func
+ * It can be passed to xhash_table_new() as the @key_equal_func
  * parameter, when using opaque pointers compared by pointer value as
- * keys in a #GHashTable.
+ * keys in a #xhashtable_t.
  *
  * This equality function is also appropriate for keys that are integers
  * stored in pointers, such as `GINT_TO_POINTER (n)`.
@@ -2399,8 +2399,8 @@ g_direct_hash (gconstpointer v)
  * Returns: %TRUE if the two keys match.
  */
 xboolean_t
-g_direct_equal (gconstpointer v1,
-                gconstpointer v2)
+g_direct_equal (xconstpointer v1,
+                xconstpointer v2)
 {
   return v1 == v2;
 }
@@ -2412,9 +2412,9 @@ g_direct_equal (gconstpointer v1,
  *
  * Compares the two #xint_t values being pointed to and returns
  * %TRUE if they are equal.
- * It can be passed to g_hash_table_new() as the @key_equal_func
+ * It can be passed to xhash_table_new() as the @key_equal_func
  * parameter, when using non-%NULL pointers to integers as keys in a
- * #GHashTable.
+ * #xhashtable_t.
  *
  * Note that this function acts on pointers to #xint_t, not on #xint_t
  * directly: if your hash table's keys are of the form
@@ -2423,8 +2423,8 @@ g_direct_equal (gconstpointer v1,
  * Returns: %TRUE if the two keys match.
  */
 xboolean_t
-g_int_equal (gconstpointer v1,
-             gconstpointer v2)
+g_int_equal (xconstpointer v1,
+             xconstpointer v2)
 {
   return *((const xint_t*) v1) == *((const xint_t*) v2);
 }
@@ -2434,8 +2434,8 @@ g_int_equal (gconstpointer v1,
  * @v: (not nullable): a pointer to a #xint_t key
  *
  * Converts a pointer to a #xint_t to a hash value.
- * It can be passed to g_hash_table_new() as the @hash_func parameter,
- * when using non-%NULL pointers to integer values as keys in a #GHashTable.
+ * It can be passed to xhash_table_new() as the @hash_func parameter,
+ * when using non-%NULL pointers to integer values as keys in a #xhashtable_t.
  *
  * Note that this function acts on pointers to #xint_t, not on #xint_t
  * directly: if your hash table's keys are of the form
@@ -2444,7 +2444,7 @@ g_int_equal (gconstpointer v1,
  * Returns: a hash value corresponding to the key.
  */
 xuint_t
-g_int_hash (gconstpointer v)
+g_int_hash (xconstpointer v)
 {
   return *(const xint_t*) v;
 }
@@ -2456,17 +2456,17 @@ g_int_hash (gconstpointer v)
  *
  * Compares the two #gint64 values being pointed to and returns
  * %TRUE if they are equal.
- * It can be passed to g_hash_table_new() as the @key_equal_func
+ * It can be passed to xhash_table_new() as the @key_equal_func
  * parameter, when using non-%NULL pointers to 64-bit integers as keys in a
- * #GHashTable.
+ * #xhashtable_t.
  *
  * Returns: %TRUE if the two keys match.
  *
  * Since: 2.22
  */
 xboolean_t
-g_int64_equal (gconstpointer v1,
-               gconstpointer v2)
+g_int64_equal (xconstpointer v1,
+               xconstpointer v2)
 {
   return *((const gint64*) v1) == *((const gint64*) v2);
 }
@@ -2477,16 +2477,16 @@ g_int64_equal (gconstpointer v1,
  *
  * Converts a pointer to a #gint64 to a hash value.
  *
- * It can be passed to g_hash_table_new() as the @hash_func parameter,
+ * It can be passed to xhash_table_new() as the @hash_func parameter,
  * when using non-%NULL pointers to 64-bit integer values as keys in a
- * #GHashTable.
+ * #xhashtable_t.
  *
  * Returns: a hash value corresponding to the key.
  *
  * Since: 2.22
  */
 xuint_t
-g_int64_hash (gconstpointer v)
+g_int64_hash (xconstpointer v)
 {
   return (xuint_t) *(const gint64*) v;
 }
@@ -2498,17 +2498,17 @@ g_int64_hash (gconstpointer v)
  *
  * Compares the two #xdouble_t values being pointed to and returns
  * %TRUE if they are equal.
- * It can be passed to g_hash_table_new() as the @key_equal_func
+ * It can be passed to xhash_table_new() as the @key_equal_func
  * parameter, when using non-%NULL pointers to doubles as keys in a
- * #GHashTable.
+ * #xhashtable_t.
  *
  * Returns: %TRUE if the two keys match.
  *
  * Since: 2.22
  */
 xboolean_t
-g_double_equal (gconstpointer v1,
-                gconstpointer v2)
+g_double_equal (xconstpointer v1,
+                xconstpointer v2)
 {
   return *((const xdouble_t*) v1) == *((const xdouble_t*) v2);
 }
@@ -2518,16 +2518,16 @@ g_double_equal (gconstpointer v1,
  * @v: (not nullable): a pointer to a #xdouble_t key
  *
  * Converts a pointer to a #xdouble_t to a hash value.
- * It can be passed to g_hash_table_new() as the @hash_func parameter,
- * It can be passed to g_hash_table_new() as the @hash_func parameter,
- * when using non-%NULL pointers to doubles as keys in a #GHashTable.
+ * It can be passed to xhash_table_new() as the @hash_func parameter,
+ * It can be passed to xhash_table_new() as the @hash_func parameter,
+ * when using non-%NULL pointers to doubles as keys in a #xhashtable_t.
  *
  * Returns: a hash value corresponding to the key.
  *
  * Since: 2.22
  */
 xuint_t
-g_double_hash (gconstpointer v)
+g_double_hash (xconstpointer v)
 {
   return (xuint_t) *(const xdouble_t*) v;
 }

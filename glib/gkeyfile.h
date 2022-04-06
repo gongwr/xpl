@@ -40,12 +40,12 @@ typedef enum
   G_KEY_FILE_ERROR_INVALID_VALUE
 } GKeyFileError;
 
-#define G_KEY_FILE_ERROR g_key_file_error_quark()
+#define G_KEY_FILE_ERROR xkey_file_error_quark()
 
 XPL_AVAILABLE_IN_ALL
-GQuark g_key_file_error_quark (void);
+xquark xkey_file_error_quark (void);
 
-typedef struct _GKeyFile GKeyFile;
+typedef struct _GKeyFile xkey_file_t;
 
 typedef enum
 {
@@ -55,244 +55,244 @@ typedef enum
 } GKeyFileFlags;
 
 XPL_AVAILABLE_IN_ALL
-GKeyFile *g_key_file_new                    (void);
+xkey_file_t *xkey_file_new                    (void);
 XPL_AVAILABLE_IN_ALL
-GKeyFile *g_key_file_ref                    (GKeyFile             *key_file);
+xkey_file_t *xkey_file_ref                    (xkey_file_t             *key_file);
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_unref                  (GKeyFile             *key_file);
+void      xkey_file_unref                  (xkey_file_t             *key_file);
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_free                   (GKeyFile             *key_file);
+void      xkey_file_free                   (xkey_file_t             *key_file);
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_set_list_separator     (GKeyFile             *key_file,
+void      xkey_file_set_list_separator     (xkey_file_t             *key_file,
 					     xchar_t                 separator);
 XPL_AVAILABLE_IN_ALL
-xboolean_t  g_key_file_load_from_file         (GKeyFile             *key_file,
+xboolean_t  xkey_file_load_from_file         (xkey_file_t             *key_file,
 					     const xchar_t          *file,
 					     GKeyFileFlags         flags,
 					     xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t  g_key_file_load_from_data         (GKeyFile             *key_file,
+xboolean_t  xkey_file_load_from_data         (xkey_file_t             *key_file,
 					     const xchar_t          *data,
 					     xsize_t                 length,
 					     GKeyFileFlags         flags,
 					     xerror_t              **error);
 XPL_AVAILABLE_IN_2_50
-xboolean_t  g_key_file_load_from_bytes        (GKeyFile             *key_file,
-                                             GBytes               *bytes,
+xboolean_t  xkey_file_load_from_bytes        (xkey_file_t             *key_file,
+                                             xbytes_t               *bytes,
                                              GKeyFileFlags         flags,
                                              xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_key_file_load_from_dirs          (GKeyFile             *key_file,
+xboolean_t xkey_file_load_from_dirs          (xkey_file_t             *key_file,
 					     const xchar_t	  *file,
 					     const xchar_t	 **search_dirs,
 					     xchar_t		 **full_path,
 					     GKeyFileFlags         flags,
 					     xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_key_file_load_from_data_dirs     (GKeyFile             *key_file,
+xboolean_t xkey_file_load_from_data_dirs     (xkey_file_t             *key_file,
 					     const xchar_t          *file,
 					     xchar_t               **full_path,
 					     GKeyFileFlags         flags,
 					     xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-xchar_t    *g_key_file_to_data                (GKeyFile             *key_file,
+xchar_t    *xkey_file_to_data                (xkey_file_t             *key_file,
 					     xsize_t                *length,
 					     xerror_t              **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_2_40
-xboolean_t  g_key_file_save_to_file           (GKeyFile             *key_file,
+xboolean_t  xkey_file_save_to_file           (xkey_file_t             *key_file,
                                              const xchar_t          *filename,
                                              xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-xchar_t    *g_key_file_get_start_group        (GKeyFile             *key_file) G_GNUC_MALLOC;
+xchar_t    *xkey_file_get_start_group        (xkey_file_t             *key_file) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-xchar_t   **g_key_file_get_groups             (GKeyFile             *key_file,
+xchar_t   **xkey_file_get_groups             (xkey_file_t             *key_file,
 					     xsize_t                *length);
 XPL_AVAILABLE_IN_ALL
-xchar_t   **g_key_file_get_keys               (GKeyFile             *key_file,
+xchar_t   **xkey_file_get_keys               (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     xsize_t                *length,
 					     xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t  g_key_file_has_group              (GKeyFile             *key_file,
+xboolean_t  xkey_file_has_group              (xkey_file_t             *key_file,
 					     const xchar_t          *group_name);
 XPL_AVAILABLE_IN_ALL
-xboolean_t  g_key_file_has_key                (GKeyFile             *key_file,
+xboolean_t  xkey_file_has_key                (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-xchar_t    *g_key_file_get_value              (GKeyFile             *key_file,
+xchar_t    *xkey_file_get_value              (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xerror_t              **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_set_value              (GKeyFile             *key_file,
+void      xkey_file_set_value              (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     const xchar_t          *value);
 XPL_AVAILABLE_IN_ALL
-xchar_t    *g_key_file_get_string             (GKeyFile             *key_file,
+xchar_t    *xkey_file_get_string             (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xerror_t              **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_set_string             (GKeyFile             *key_file,
+void      xkey_file_set_string             (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     const xchar_t          *string);
 XPL_AVAILABLE_IN_ALL
-xchar_t    *g_key_file_get_locale_string      (GKeyFile             *key_file,
+xchar_t    *xkey_file_get_locale_string      (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     const xchar_t          *locale,
 					     xerror_t              **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_2_56
-xchar_t    *g_key_file_get_locale_for_key     (GKeyFile             *key_file,
+xchar_t    *xkey_file_get_locale_for_key     (xkey_file_t             *key_file,
                                              const xchar_t          *group_name,
                                              const xchar_t          *key,
                                              const xchar_t          *locale) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_set_locale_string      (GKeyFile             *key_file,
+void      xkey_file_set_locale_string      (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     const xchar_t          *locale,
 					     const xchar_t          *string);
 XPL_AVAILABLE_IN_ALL
-xboolean_t  g_key_file_get_boolean            (GKeyFile             *key_file,
+xboolean_t  xkey_file_get_boolean            (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_set_boolean            (GKeyFile             *key_file,
+void      xkey_file_set_boolean            (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xboolean_t              value);
 XPL_AVAILABLE_IN_ALL
-xint_t      g_key_file_get_integer            (GKeyFile             *key_file,
+xint_t      xkey_file_get_integer            (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_set_integer            (GKeyFile             *key_file,
+void      xkey_file_set_integer            (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xint_t                  value);
 XPL_AVAILABLE_IN_ALL
-gint64    g_key_file_get_int64              (GKeyFile             *key_file,
+gint64    xkey_file_get_int64              (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_set_int64              (GKeyFile             *key_file,
+void      xkey_file_set_int64              (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     gint64                value);
 XPL_AVAILABLE_IN_ALL
-guint64   g_key_file_get_uint64             (GKeyFile             *key_file,
+xuint64_t   xkey_file_get_uint64             (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_set_uint64             (GKeyFile             *key_file,
+void      xkey_file_set_uint64             (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
-					     guint64               value);
+					     xuint64_t               value);
 XPL_AVAILABLE_IN_ALL
-xdouble_t   g_key_file_get_double             (GKeyFile             *key_file,
+xdouble_t   xkey_file_get_double             (xkey_file_t             *key_file,
                                              const xchar_t          *group_name,
                                              const xchar_t          *key,
                                              xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_set_double             (GKeyFile             *key_file,
+void      xkey_file_set_double             (xkey_file_t             *key_file,
                                              const xchar_t          *group_name,
                                              const xchar_t          *key,
                                              xdouble_t               value);
 XPL_AVAILABLE_IN_ALL
-xchar_t   **g_key_file_get_string_list        (GKeyFile             *key_file,
+xchar_t   **xkey_file_get_string_list        (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xsize_t                *length,
 					     xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_set_string_list        (GKeyFile             *key_file,
+void      xkey_file_set_string_list        (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     const xchar_t * const   list[],
 					     xsize_t                 length);
 XPL_AVAILABLE_IN_ALL
-xchar_t   **g_key_file_get_locale_string_list (GKeyFile             *key_file,
+xchar_t   **xkey_file_get_locale_string_list (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     const xchar_t          *locale,
 					     xsize_t                *length,
 					     xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_set_locale_string_list (GKeyFile             *key_file,
+void      xkey_file_set_locale_string_list (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     const xchar_t          *locale,
 					     const xchar_t * const   list[],
 					     xsize_t                 length);
 XPL_AVAILABLE_IN_ALL
-xboolean_t *g_key_file_get_boolean_list       (GKeyFile             *key_file,
+xboolean_t *xkey_file_get_boolean_list       (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xsize_t                *length,
 					     xerror_t              **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_set_boolean_list       (GKeyFile             *key_file,
+void      xkey_file_set_boolean_list       (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xboolean_t              list[],
 					     xsize_t                 length);
 XPL_AVAILABLE_IN_ALL
-xint_t     *g_key_file_get_integer_list       (GKeyFile             *key_file,
+xint_t     *xkey_file_get_integer_list       (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xsize_t                *length,
 					     xerror_t              **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_set_double_list        (GKeyFile             *key_file,
+void      xkey_file_set_double_list        (xkey_file_t             *key_file,
                                              const xchar_t          *group_name,
                                              const xchar_t          *key,
                                              xdouble_t               list[],
                                              xsize_t                 length);
 XPL_AVAILABLE_IN_ALL
-xdouble_t  *g_key_file_get_double_list        (GKeyFile             *key_file,
+xdouble_t  *xkey_file_get_double_list        (xkey_file_t             *key_file,
                                              const xchar_t          *group_name,
                                              const xchar_t          *key,
                                              xsize_t                *length,
                                              xerror_t              **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-void      g_key_file_set_integer_list       (GKeyFile             *key_file,
+void      xkey_file_set_integer_list       (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xint_t                  list[],
 					     xsize_t                 length);
 XPL_AVAILABLE_IN_ALL
-xboolean_t  g_key_file_set_comment            (GKeyFile             *key_file,
+xboolean_t  xkey_file_set_comment            (xkey_file_t             *key_file,
                                              const xchar_t          *group_name,
                                              const xchar_t          *key,
                                              const xchar_t          *comment,
                                              xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-xchar_t    *g_key_file_get_comment            (GKeyFile             *key_file,
+xchar_t    *xkey_file_get_comment            (xkey_file_t             *key_file,
                                              const xchar_t          *group_name,
                                              const xchar_t          *key,
                                              xerror_t              **error) G_GNUC_MALLOC;
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t  g_key_file_remove_comment         (GKeyFile             *key_file,
+xboolean_t  xkey_file_remove_comment         (xkey_file_t             *key_file,
                                              const xchar_t          *group_name,
                                              const xchar_t          *key,
 					     xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t  g_key_file_remove_key             (GKeyFile             *key_file,
+xboolean_t  xkey_file_remove_key             (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     const xchar_t          *key,
 					     xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t  g_key_file_remove_group           (GKeyFile             *key_file,
+xboolean_t  xkey_file_remove_group           (xkey_file_t             *key_file,
 					     const xchar_t          *group_name,
 					     xerror_t              **error);
 

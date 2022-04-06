@@ -36,7 +36,7 @@
  * functions like getpass() and does lazy things with threads.
  */
 
-G_DEFINE_TYPE (GTlsConsoleInteraction, g_tls_console_interaction, XTYPE_TLS_INTERACTION)
+G_DEFINE_TYPE (GTlsConsoleInteraction, xtls_console_interaction, XTYPE_TLS_INTERACTION)
 
 #if defined(G_OS_WIN32) || defined(__BIONIC__)
 /* win32 doesn't have getpass() */
@@ -72,68 +72,68 @@ getpass (const xchar_t *prompt)
 #endif
 
 static GTlsInteractionResult
-g_tls_console_interaction_ask_password (GTlsInteraction    *interaction,
-                                        GTlsPassword       *password,
+xtls_console_interaction_ask_password (xtls_interaction_t    *interaction,
+                                        xtls_password_t       *password,
                                         xcancellable_t       *cancellable,
                                         xerror_t            **error)
 {
   const xchar_t *value;
   xchar_t *prompt;
 
-  prompt = g_strdup_printf ("Password \"%s\"': ", g_tls_password_get_description (password));
+  prompt = xstrdup_printf ("Password \"%s\"': ", xtls_password_get_description (password));
   value = getpass (prompt);
   g_free (prompt);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return G_TLS_INTERACTION_FAILED;
 
-  g_tls_password_set_value (password, (guchar *)value, -1);
+  xtls_password_set_value (password, (guchar *)value, -1);
   return G_TLS_INTERACTION_HANDLED;
 }
 
 static void
-ask_password_with_getpass (GTask        *task,
+ask_password_with_getpass (xtask_t        *task,
                            xpointer_t      object,
                            xpointer_t      task_data,
                            xcancellable_t *cancellable)
 {
-  GTlsPassword *password = task_data;
+  xtls_password_t *password = task_data;
   xerror_t *error = NULL;
 
-  g_tls_console_interaction_ask_password (G_TLS_INTERACTION (object), password,
+  xtls_console_interaction_ask_password (G_TLS_INTERACTION (object), password,
                                           cancellable, &error);
   if (error != NULL)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_int (task, G_TLS_INTERACTION_HANDLED);
+    xtask_return_int (task, G_TLS_INTERACTION_HANDLED);
 }
 
 static void
-g_tls_console_interaction_ask_password_async (GTlsInteraction    *interaction,
-                                              GTlsPassword       *password,
+xtls_console_interaction_ask_password_async (xtls_interaction_t    *interaction,
+                                              xtls_password_t       *password,
                                               xcancellable_t       *cancellable,
                                               xasync_ready_callback_t callback,
                                               xpointer_t            user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (interaction, cancellable, callback, user_data);
-  g_task_set_task_data (task, g_object_ref (password), g_object_unref);
-  g_task_run_in_thread (task, ask_password_with_getpass);
-  g_object_unref (task);
+  task = xtask_new (interaction, cancellable, callback, user_data);
+  xtask_set_task_data (task, xobject_ref (password), xobject_unref);
+  xtask_run_in_thread (task, ask_password_with_getpass);
+  xobject_unref (task);
 }
 
 static GTlsInteractionResult
-g_tls_console_interaction_ask_password_finish (GTlsInteraction    *interaction,
+xtls_console_interaction_ask_password_finish (xtls_interaction_t    *interaction,
                                                xasync_result_t       *result,
                                                xerror_t            **error)
 {
   GTlsInteractionResult ret;
 
-  g_return_val_if_fail (g_task_is_valid (result, interaction),
+  g_return_val_if_fail (xtask_is_valid (result, interaction),
                         G_TLS_INTERACTION_FAILED);
 
-  ret = g_task_propagate_int (G_TASK (result), error);
+  ret = xtask_propagate_int (XTASK (result), error);
   if (ret == (GTlsInteractionResult)-1)
     return G_TLS_INTERACTION_FAILED;
   else
@@ -141,22 +141,22 @@ g_tls_console_interaction_ask_password_finish (GTlsInteraction    *interaction,
 }
 
 static void
-g_tls_console_interaction_init (GTlsConsoleInteraction *interaction)
+xtls_console_interaction_init (GTlsConsoleInteraction *interaction)
 {
 
 }
 
 static void
-g_tls_console_interaction_class_init (GTlsConsoleInteractionClass *klass)
+xtls_console_interaction_class_init (GTlsConsoleInteractionClass *klass)
 {
   GTlsInteractionClass *interaction_class = G_TLS_INTERACTION_CLASS (klass);
-  interaction_class->ask_password = g_tls_console_interaction_ask_password;
-  interaction_class->ask_password_async = g_tls_console_interaction_ask_password_async;
-  interaction_class->ask_password_finish = g_tls_console_interaction_ask_password_finish;
+  interaction_class->ask_password = xtls_console_interaction_ask_password;
+  interaction_class->ask_password_async = xtls_console_interaction_ask_password_async;
+  interaction_class->ask_password_finish = xtls_console_interaction_ask_password_finish;
 }
 
-GTlsInteraction *
-g_tls_console_interaction_new (void)
+xtls_interaction_t *
+xtls_console_interaction_new (void)
 {
-  return g_object_new (XTYPE_TLS_CONSOLE_INTERACTION, NULL);
+  return xobject_new (XTYPE_TLS_CONSOLE_INTERACTION, NULL);
 }

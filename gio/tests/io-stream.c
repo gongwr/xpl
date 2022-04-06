@@ -27,7 +27,7 @@
 
 typedef struct
 {
-  GMainLoop *main_loop;
+  xmain_loop_t *main_loop;
   const xchar_t *data1;
   const xchar_t *data2;
   xio_stream_t *iostream1;
@@ -40,7 +40,7 @@ test_copy_chunks_splice_cb (xobject_t *source_object,
     xpointer_t user_data)
 {
   TestCopyChunksData *data = user_data;
-  GMemoryOutputStream *ostream;
+  xmemory_output_stream_t *ostream;
   xchar_t *received_data;
   xerror_t *error = NULL;
 
@@ -58,7 +58,7 @@ test_copy_chunks_splice_cb (xobject_t *source_object,
   g_assert (g_io_stream_is_closed (data->iostream1));
   g_assert (g_io_stream_is_closed (data->iostream2));
 
-  g_main_loop_quit (data->main_loop);
+  xmain_loop_quit (data->main_loop);
 }
 
 static void
@@ -68,21 +68,21 @@ test_copy_chunks (void)
   xinput_stream_t *istream;
   xoutput_stream_t *ostream;
 
-  data.main_loop = g_main_loop_new (NULL, FALSE);
+  data.main_loop = xmain_loop_new (NULL, FALSE);
   data.data1 = "abcdefghijklmnopqrstuvwxyz";
   data.data2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   istream = g_memory_input_stream_new_from_data (data.data1, -1, NULL);
   ostream = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
   data.iostream1 = g_simple_io_stream_new (istream, ostream);
-  g_object_unref (istream);
-  g_object_unref (ostream);
+  xobject_unref (istream);
+  xobject_unref (ostream);
 
   istream = g_memory_input_stream_new_from_data (data.data2, -1, NULL);
   ostream = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
   data.iostream2 = g_simple_io_stream_new (istream, ostream);
-  g_object_unref (istream);
-  g_object_unref (ostream);
+  xobject_unref (istream);
+  xobject_unref (ostream);
 
   g_io_stream_splice_async (data.iostream1, data.iostream2,
       G_IO_STREAM_SPLICE_CLOSE_STREAM1 | G_IO_STREAM_SPLICE_CLOSE_STREAM2 |
@@ -91,11 +91,11 @@ test_copy_chunks (void)
 
   /* We do not hold a ref in data struct, this is to make sure the operation
    * keeps the iostream objects alive until it finishes */
-  g_object_unref (data.iostream1);
-  g_object_unref (data.iostream2);
+  xobject_unref (data.iostream1);
+  xobject_unref (data.iostream2);
 
-  g_main_loop_run (data.main_loop);
-  g_main_loop_unref (data.main_loop);
+  xmain_loop_run (data.main_loop);
+  xmain_loop_unref (data.main_loop);
 }
 
 static void
@@ -112,26 +112,26 @@ static void
 test_close_file (void)
 {
 #ifdef G_OS_UNIX
-  GFileIOStream *fios;
+  xfile_io_stream_t *fios;
   xboolean_t done;
   xio_stream_t *io;
   xfile_t *file;
 
-  file = g_file_new_for_path ("/dev/null");
-  fios = g_file_open_readwrite (file, NULL, NULL);
-  g_object_unref (file);
+  file = xfile_new_for_path ("/dev/null");
+  fios = xfile_open_readwrite (file, NULL, NULL);
+  xobject_unref (file);
   g_assert (fios);
 
   io = g_simple_io_stream_new (g_io_stream_get_input_stream (XIO_STREAM (fios)),
                                g_io_stream_get_output_stream (XIO_STREAM (fios)));
-  g_object_unref (fios);
+  xobject_unref (fios);
 
   g_io_stream_close_async (io, 0, NULL, close_async_done, &done);
-  g_object_unref (io);
+  xobject_unref (io);
 
   done = FALSE;
   while (!done)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 #endif
 }
 
@@ -146,15 +146,15 @@ test_close_memory (void)
   in = g_memory_input_stream_new ();
   out = g_memory_output_stream_new_resizable ();
   io = g_simple_io_stream_new (in, out);
-  g_object_unref (out);
-  g_object_unref (in);
+  xobject_unref (out);
+  xobject_unref (in);
 
   g_io_stream_close_async (io, 0, NULL, close_async_done, &done);
-  g_object_unref (io);
+  xobject_unref (io);
 
   done = FALSE;
   while (!done)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 }
 
 int

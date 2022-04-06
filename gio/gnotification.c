@@ -30,20 +30,20 @@
  * @short_description: User Notifications (pop up messages)
  * @include: gio/gio.h
  *
- * #GNotification is a mechanism for creating a notification to be shown
+ * #xnotification_t is a mechanism for creating a notification to be shown
  * to the user -- typically as a pop-up notification presented by the
  * desktop environment shell.
  *
- * The key difference between #GNotification and other similar APIs is
+ * The key difference between #xnotification_t and other similar APIs is
  * that, if supported by the desktop environment, notifications sent
- * with #GNotification will persist after the application has exited,
+ * with #xnotification_t will persist after the application has exited,
  * and even across system reboots.
  *
  * Since the user may click on a notification while the application is
- * not running, applications using #GNotification should be able to be
- * started as a D-Bus service, using #GApplication.
+ * not running, applications using #xnotification_t should be able to be
+ * started as a D-Bus service, using #xapplication_t.
  *
- * In order for #GNotification to work, the application must have installed
+ * In order for #xnotification_t to work, the application must have installed
  * a `.desktop` file. For example:
  * |[
  *  [Desktop Entry]
@@ -64,7 +64,7 @@
  * Control Center’s ‘Notifications’ panel.
  *
  * The `.desktop` file must be named as `org.gnome.TestApplication.desktop`,
- * where `org.gnome.TestApplication` is the ID passed to g_application_new().
+ * where `org.gnome.TestApplication` is the ID passed to xapplication_new().
  *
  * User interaction with a notification (either the default action, or
  * buttons) must be associated with actions on the application (ie:
@@ -73,13 +73,13 @@
  * the application is autostarted as a result of a notification being
  * clicked.
  *
- * A notification can be sent with g_application_send_notification().
+ * A notification can be sent with xapplication_send_notification().
  *
  * Since: 2.40
  **/
 
 /**
- * GNotification:
+ * xnotification_t:
  *
  * This structure type is private and should only be accessed using the
  * public APIs.
@@ -98,7 +98,7 @@ struct _GNotification
   xicon_t *icon;
   GNotificationPriority priority;
   xchar_t *category;
-  GPtrArray *buttons;
+  xptr_array_t *buttons;
   xchar_t *default_action;
   xvariant_t *default_action_target;
 };
@@ -110,7 +110,7 @@ typedef struct
   xvariant_t *target;
 } Button;
 
-G_DEFINE_TYPE (GNotification, g_notification, XTYPE_OBJECT)
+G_DEFINE_TYPE (xnotification, xnotification, XTYPE_OBJECT)
 
 static void
 button_free (xpointer_t data)
@@ -120,83 +120,83 @@ button_free (xpointer_t data)
   g_free (button->label);
   g_free (button->action_name);
   if (button->target)
-    g_variant_unref (button->target);
+    xvariant_unref (button->target);
 
   g_slice_free (Button, button);
 }
 
 static void
-g_notification_dispose (xobject_t *object)
+xnotification_dispose (xobject_t *object)
 {
-  GNotification *notification = G_NOTIFICATION (object);
+  xnotification_t *notification = G_NOTIFICATION (object);
 
   g_clear_object (&notification->icon);
 
-  G_OBJECT_CLASS (g_notification_parent_class)->dispose (object);
+  G_OBJECT_CLASS (xnotification_parent_class)->dispose (object);
 }
 
 static void
-g_notification_finalize (xobject_t *object)
+xnotification_finalize (xobject_t *object)
 {
-  GNotification *notification = G_NOTIFICATION (object);
+  xnotification_t *notification = G_NOTIFICATION (object);
 
   g_free (notification->title);
   g_free (notification->body);
   g_free (notification->category);
   g_free (notification->default_action);
   if (notification->default_action_target)
-    g_variant_unref (notification->default_action_target);
-  g_ptr_array_free (notification->buttons, TRUE);
+    xvariant_unref (notification->default_action_target);
+  xptr_array_free (notification->buttons, TRUE);
 
-  G_OBJECT_CLASS (g_notification_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xnotification_parent_class)->finalize (object);
 }
 
 static void
-g_notification_class_init (GNotificationClass *klass)
+xnotification_class_init (GNotificationClass *klass)
 {
   xobject_class_t *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->dispose = g_notification_dispose;
-  object_class->finalize = g_notification_finalize;
+  object_class->dispose = xnotification_dispose;
+  object_class->finalize = xnotification_finalize;
 }
 
 static void
-g_notification_init (GNotification *notification)
+xnotification_init (xnotification_t *notification)
 {
-  notification->buttons = g_ptr_array_new_full (2, button_free);
+  notification->buttons = xptr_array_new_full (2, button_free);
 }
 
 /**
- * g_notification_new:
+ * xnotification_new:
  * @title: the title of the notification
  *
- * Creates a new #GNotification with @title as its title.
+ * Creates a new #xnotification_t with @title as its title.
  *
  * After populating @notification with more details, it can be sent to
- * the desktop shell with g_application_send_notification(). Changing
+ * the desktop shell with xapplication_send_notification(). Changing
  * any properties after this call will not have any effect until
  * resending @notification.
  *
- * Returns: a new #GNotification instance
+ * Returns: a new #xnotification_t instance
  *
  * Since: 2.40
  */
-GNotification *
-g_notification_new (const xchar_t *title)
+xnotification_t *
+xnotification_new (const xchar_t *title)
 {
-  GNotification *notification;
+  xnotification_t *notification;
 
   g_return_val_if_fail (title != NULL, NULL);
 
-  notification = g_object_new (XTYPE_NOTIFICATION, NULL);
-  notification->title = g_strdup (title);
+  notification = xobject_new (XTYPE_NOTIFICATION, NULL);
+  notification->title = xstrdup (title);
 
   return notification;
 }
 
 /*< private >
- * g_notification_get_title:
- * @notification: a #GNotification
+ * xnotification_get_title:
+ * @notification: a #xnotification_t
  *
  * Gets the title of @notification.
  *
@@ -205,7 +205,7 @@ g_notification_new (const xchar_t *title)
  * Since: 2.40
  */
 const xchar_t *
-g_notification_get_title (GNotification *notification)
+xnotification_get_title (xnotification_t *notification)
 {
   g_return_val_if_fail (X_IS_NOTIFICATION (notification), NULL);
 
@@ -213,8 +213,8 @@ g_notification_get_title (GNotification *notification)
 }
 
 /**
- * g_notification_set_title:
- * @notification: a #GNotification
+ * xnotification_set_title:
+ * @notification: a #xnotification_t
  * @title: the new title for @notification
  *
  * Sets the title of @notification to @title.
@@ -222,7 +222,7 @@ g_notification_get_title (GNotification *notification)
  * Since: 2.40
  */
 void
-g_notification_set_title (GNotification *notification,
+xnotification_set_title (xnotification_t *notification,
                           const xchar_t   *title)
 {
   g_return_if_fail (X_IS_NOTIFICATION (notification));
@@ -230,12 +230,12 @@ g_notification_set_title (GNotification *notification,
 
   g_free (notification->title);
 
-  notification->title = g_strdup (title);
+  notification->title = xstrdup (title);
 }
 
 /*< private >
- * g_notification_get_body:
- * @notification: a #GNotification
+ * xnotification_get_body:
+ * @notification: a #xnotification_t
  *
  * Gets the current body of @notification.
  *
@@ -244,7 +244,7 @@ g_notification_set_title (GNotification *notification,
  * Since: 2.40
  */
 const xchar_t *
-g_notification_get_body (GNotification *notification)
+xnotification_get_body (xnotification_t *notification)
 {
   g_return_val_if_fail (X_IS_NOTIFICATION (notification), NULL);
 
@@ -252,8 +252,8 @@ g_notification_get_body (GNotification *notification)
 }
 
 /**
- * g_notification_set_body:
- * @notification: a #GNotification
+ * xnotification_set_body:
+ * @notification: a #xnotification_t
  * @body: (nullable): the new body for @notification, or %NULL
  *
  * Sets the body of @notification to @body.
@@ -261,7 +261,7 @@ g_notification_get_body (GNotification *notification)
  * Since: 2.40
  */
 void
-g_notification_set_body (GNotification *notification,
+xnotification_set_body (xnotification_t *notification,
                          const xchar_t   *body)
 {
   g_return_if_fail (X_IS_NOTIFICATION (notification));
@@ -269,12 +269,12 @@ g_notification_set_body (GNotification *notification,
 
   g_free (notification->body);
 
-  notification->body = g_strdup (body);
+  notification->body = xstrdup (body);
 }
 
 /*< private >
- * g_notification_get_icon:
- * @notification: a #GNotification
+ * xnotification_get_icon:
+ * @notification: a #xnotification_t
  *
  * Gets the icon currently set on @notification.
  *
@@ -283,7 +283,7 @@ g_notification_set_body (GNotification *notification,
  * Since: 2.40
  */
 xicon_t *
-g_notification_get_icon (GNotification *notification)
+xnotification_get_icon (xnotification_t *notification)
 {
   g_return_val_if_fail (X_IS_NOTIFICATION (notification), NULL);
 
@@ -291,8 +291,8 @@ g_notification_get_icon (GNotification *notification)
 }
 
 /**
- * g_notification_set_icon:
- * @notification: a #GNotification
+ * xnotification_set_icon:
+ * @notification: a #xnotification_t
  * @icon: the icon to be shown in @notification, as a #xicon_t
  *
  * Sets the icon of @notification to @icon.
@@ -300,27 +300,27 @@ g_notification_get_icon (GNotification *notification)
  * Since: 2.40
  */
 void
-g_notification_set_icon (GNotification *notification,
+xnotification_set_icon (xnotification_t *notification,
                          xicon_t         *icon)
 {
   g_return_if_fail (X_IS_NOTIFICATION (notification));
 
   if (notification->icon)
-    g_object_unref (notification->icon);
+    xobject_unref (notification->icon);
 
-  notification->icon = g_object_ref (icon);
+  notification->icon = xobject_ref (icon);
 }
 
 /*< private >
- * g_notification_get_priority:
- * @notification: a #GNotification
+ * xnotification_get_priority:
+ * @notification: a #xnotification_t
  *
  * Returns the priority of @notification
  *
  * Since: 2.42
  */
 GNotificationPriority
-g_notification_get_priority (GNotification *notification)
+xnotification_get_priority (xnotification_t *notification)
 {
   g_return_val_if_fail (X_IS_NOTIFICATION (notification), G_NOTIFICATION_PRIORITY_NORMAL);
 
@@ -328,18 +328,18 @@ g_notification_get_priority (GNotification *notification)
 }
 
 /**
- * g_notification_set_urgent:
- * @notification: a #GNotification
+ * xnotification_set_urgent:
+ * @notification: a #xnotification_t
  * @urgent: %TRUE if @notification is urgent
  *
- * Deprecated in favor of g_notification_set_priority().
+ * Deprecated in favor of xnotification_set_priority().
  *
  * Since: 2.40
  * Deprecated: 2.42: Since 2.42, this has been deprecated in favour of
- *    g_notification_set_priority().
+ *    xnotification_set_priority().
  */
 void
-g_notification_set_urgent (GNotification *notification,
+xnotification_set_urgent (xnotification_t *notification,
                            xboolean_t       urgent)
 {
   g_return_if_fail (X_IS_NOTIFICATION (notification));
@@ -350,8 +350,8 @@ g_notification_set_urgent (GNotification *notification,
 }
 
 /*< private >
- * g_notification_get_category:
- * @notification: a #GNotification
+ * xnotification_get_category:
+ * @notification: a #xnotification_t
  *
  * Gets the cateogry of @notification.
  *
@@ -362,7 +362,7 @@ g_notification_set_urgent (GNotification *notification,
  * Since: 2.70
  */
 const xchar_t *
-g_notification_get_category (GNotification *notification)
+xnotification_get_category (xnotification_t *notification)
 {
   g_return_val_if_fail (X_IS_NOTIFICATION (notification), NULL);
 
@@ -370,8 +370,8 @@ g_notification_get_category (GNotification *notification)
 }
 
 /**
- * g_notification_set_category:
- * @notification: a #GNotification
+ * xnotification_set_category:
+ * @notification: a #xnotification_t
  * @category: (nullable): the category for @notification, or %NULL for no category
  *
  * Sets the type of @notification to @category. Categories have a main
@@ -384,7 +384,7 @@ g_notification_get_category (GNotification *notification)
  * Since: 2.70
  */
 void
-g_notification_set_category (GNotification *notification,
+xnotification_set_category (xnotification_t *notification,
                              const xchar_t   *category)
 {
   g_return_if_fail (X_IS_NOTIFICATION (notification));
@@ -392,19 +392,19 @@ g_notification_set_category (GNotification *notification,
 
   g_free (notification->category);
 
-  notification->category = g_strdup (category);
+  notification->category = xstrdup (category);
 }
 
 /**
- * g_notification_set_priority:
- * @notification: a #GNotification
+ * xnotification_set_priority:
+ * @notification: a #xnotification_t
  * @priority: a #GNotificationPriority
  *
  * Sets the priority of @notification to @priority. See
  * #GNotificationPriority for possible values.
  */
 void
-g_notification_set_priority (GNotification         *notification,
+xnotification_set_priority (xnotification_t         *notification,
                              GNotificationPriority  priority)
 {
   g_return_if_fail (X_IS_NOTIFICATION (notification));
@@ -413,8 +413,8 @@ g_notification_set_priority (GNotification         *notification,
 }
 
 /**
- * g_notification_add_button:
- * @notification: a #GNotification
+ * xnotification_add_button:
+ * @notification: a #xnotification_t
  * @label: label of the button
  * @detailed_action: a detailed action name
  *
@@ -430,7 +430,7 @@ g_notification_set_priority (GNotification         *notification,
  * Since: 2.40
  */
 void
-g_notification_add_button (GNotification *notification,
+xnotification_add_button (xnotification_t *notification,
                            const xchar_t   *label,
                            const xchar_t   *detailed_action)
 {
@@ -443,20 +443,20 @@ g_notification_add_button (GNotification *notification,
   if (!g_action_parse_detailed_name (detailed_action, &action, &target, &error))
     {
       g_warning ("%s: %s", G_STRFUNC, error->message);
-      g_error_free (error);
+      xerror_free (error);
       return;
     }
 
-  g_notification_add_button_with_target_value (notification, label, action, target);
+  xnotification_add_button_with_target_value (notification, label, action, target);
 
   g_free (action);
   if (target)
-    g_variant_unref (target);
+    xvariant_unref (target);
 }
 
 /**
- * g_notification_add_button_with_target: (skip)
- * @notification: a #GNotification
+ * xnotification_add_button_with_target: (skip)
+ * @notification: a #xnotification_t
  * @label: label of the button
  * @action: an action name
  * @target_format: (nullable): a #xvariant_t format string, or %NULL
@@ -467,13 +467,13 @@ g_notification_add_button (GNotification *notification,
  *
  * If @target_format is given, it is used to collect remaining
  * positional parameters into a #xvariant_t instance, similar to
- * g_variant_new(). @action will be activated with that #xvariant_t as its
+ * xvariant_new(). @action will be activated with that #xvariant_t as its
  * parameter.
  *
  * Since: 2.40
  */
 void
-g_notification_add_button_with_target (GNotification *notification,
+xnotification_add_button_with_target (xnotification_t *notification,
                                        const xchar_t   *label,
                                        const xchar_t   *action,
                                        const xchar_t   *target_format,
@@ -485,16 +485,16 @@ g_notification_add_button_with_target (GNotification *notification,
   if (target_format)
     {
       va_start (args, target_format);
-      target = g_variant_new_va (target_format, NULL, &args);
+      target = xvariant_new_va (target_format, NULL, &args);
       va_end (args);
     }
 
-  g_notification_add_button_with_target_value (notification, label, action, target);
+  xnotification_add_button_with_target_value (notification, label, action, target);
 }
 
 /**
- * g_notification_add_button_with_target_value: (rename-to g_notification_add_button_with_target)
- * @notification: a #GNotification
+ * xnotification_add_button_with_target_value: (rename-to xnotification_add_button_with_target)
+ * @notification: a #xnotification_t
  * @label: label of the button
  * @action: an action name
  * @target: (nullable): a #xvariant_t to use as @action's parameter, or %NULL
@@ -508,7 +508,7 @@ g_notification_add_button_with_target (GNotification *notification,
  * Since: 2.40
  */
 void
-g_notification_add_button_with_target_value (GNotification *notification,
+xnotification_add_button_with_target_value (xnotification_t *notification,
                                              const xchar_t   *label,
                                              const xchar_t   *action,
                                              xvariant_t      *target)
@@ -519,37 +519,37 @@ g_notification_add_button_with_target_value (GNotification *notification,
   g_return_if_fail (label != NULL);
   g_return_if_fail (action != NULL && g_action_name_is_valid (action));
 
-  if (!g_str_has_prefix (action, "app."))
+  if (!xstr_has_prefix (action, "app."))
     {
       g_warning ("%s: action '%s' does not start with 'app.'."
                  "This is unlikely to work properly.", G_STRFUNC, action);
     }
 
   button =  g_slice_new0 (Button);
-  button->label = g_strdup (label);
-  button->action_name = g_strdup (action);
+  button->label = xstrdup (label);
+  button->action_name = xstrdup (action);
 
   if (target)
-    button->target = g_variant_ref_sink (target);
+    button->target = xvariant_ref_sink (target);
 
-  g_ptr_array_add (notification->buttons, button);
+  xptr_array_add (notification->buttons, button);
 }
 
 /*< private >
- * g_notification_get_n_buttons:
- * @notification: a #GNotification
+ * xnotification_get_n_buttons:
+ * @notification: a #xnotification_t
  *
  * Returns: the amount of buttons added to @notification.
  */
 xuint_t
-g_notification_get_n_buttons (GNotification *notification)
+xnotification_get_n_buttons (xnotification_t *notification)
 {
   return notification->buttons->len;
 }
 
 /*< private >
- * g_notification_get_button:
- * @notification: a #GNotification
+ * xnotification_get_button:
+ * @notification: a #xnotification_t
  * @index: index of the button
  * @label: (): return location for the button's label
  * @action: (): return location for the button's associated action
@@ -557,13 +557,13 @@ g_notification_get_n_buttons (GNotification *notification)
  * activated with
  *
  * Returns a description of a button that was added to @notification
- * with g_notification_add_button().
+ * with xnotification_add_button().
  *
  * @index must be smaller than the value returned by
- * g_notification_get_n_buttons().
+ * xnotification_get_n_buttons().
  */
 void
-g_notification_get_button (GNotification  *notification,
+xnotification_get_button (xnotification_t  *notification,
                            xint_t            index,
                            xchar_t         **label,
                            xchar_t         **action,
@@ -571,28 +571,28 @@ g_notification_get_button (GNotification  *notification,
 {
   Button *button;
 
-  button = g_ptr_array_index (notification->buttons, index);
+  button = xptr_array_index (notification->buttons, index);
 
   if (label)
-    *label = g_strdup (button->label);
+    *label = xstrdup (button->label);
 
   if (action)
-    *action = g_strdup (button->action_name);
+    *action = xstrdup (button->action_name);
 
   if (target)
-    *target = button->target ? g_variant_ref (button->target) : NULL;
+    *target = button->target ? xvariant_ref (button->target) : NULL;
 }
 
 /*< private >
- * g_notification_get_button_with_action:
- * @notification: a #GNotification
+ * xnotification_get_button_with_action:
+ * @notification: a #xnotification_t
  * @action: an action name
  *
  * Returns the index of the button in @notification that is associated
  * with @action, or -1 if no such button exists.
  */
 xint_t
-g_notification_get_button_with_action (GNotification *notification,
+xnotification_get_button_with_action (xnotification_t *notification,
                                        const xchar_t   *action)
 {
   xuint_t i;
@@ -601,8 +601,8 @@ g_notification_get_button_with_action (GNotification *notification,
     {
       Button *button;
 
-      button = g_ptr_array_index (notification->buttons, i);
-      if (g_str_equal (action, button->action_name))
+      button = xptr_array_index (notification->buttons, i);
+      if (xstr_equal (action, button->action_name))
         return i;
     }
 
@@ -611,8 +611,8 @@ g_notification_get_button_with_action (GNotification *notification,
 
 
 /*< private >
- * g_notification_get_default_action:
- * @notification: a #GNotification
+ * xnotification_get_default_action:
+ * @notification: a #xnotification_t
  * @action: (nullable): return location for the default action
  * @target: (nullable): return location for the target of the default action
  *
@@ -621,7 +621,7 @@ g_notification_get_button_with_action (GNotification *notification,
  * Returns: %TRUE if @notification has a default action
  */
 xboolean_t
-g_notification_get_default_action (GNotification  *notification,
+xnotification_get_default_action (xnotification_t  *notification,
                                    xchar_t         **action,
                                    xvariant_t      **target)
 {
@@ -629,12 +629,12 @@ g_notification_get_default_action (GNotification  *notification,
     return FALSE;
 
   if (action)
-    *action = g_strdup (notification->default_action);
+    *action = xstrdup (notification->default_action);
 
   if (target)
     {
       if (notification->default_action_target)
-        *target = g_variant_ref (notification->default_action_target);
+        *target = xvariant_ref (notification->default_action_target);
       else
         *target = NULL;
     }
@@ -643,8 +643,8 @@ g_notification_get_default_action (GNotification  *notification,
 }
 
 /**
- * g_notification_set_default_action:
- * @notification: a #GNotification
+ * xnotification_set_default_action:
+ * @notification: a #xnotification_t
  * @detailed_action: a detailed action name
  *
  * Sets the default action of @notification to @detailed_action. This
@@ -662,7 +662,7 @@ g_notification_get_default_action (GNotification  *notification,
  * Since: 2.40
  */
 void
-g_notification_set_default_action (GNotification *notification,
+xnotification_set_default_action (xnotification_t *notification,
                                    const xchar_t   *detailed_action)
 {
   xchar_t *action;
@@ -672,20 +672,20 @@ g_notification_set_default_action (GNotification *notification,
   if (!g_action_parse_detailed_name (detailed_action, &action, &target, &error))
     {
       g_warning ("%s: %s", G_STRFUNC, error->message);
-      g_error_free (error);
+      xerror_free (error);
       return;
     }
 
-  g_notification_set_default_action_and_target_value (notification, action, target);
+  xnotification_set_default_action_and_target_value (notification, action, target);
 
   g_free (action);
   if (target)
-    g_variant_unref (target);
+    xvariant_unref (target);
 }
 
 /**
- * g_notification_set_default_action_and_target: (skip)
- * @notification: a #GNotification
+ * xnotification_set_default_action_and_target: (skip)
+ * @notification: a #xnotification_t
  * @action: an action name
  * @target_format: (nullable): a #xvariant_t format string, or %NULL
  * @...: positional parameters, as determined by @target_format
@@ -696,7 +696,7 @@ g_notification_set_default_action (GNotification *notification,
  *
  * If @target_format is given, it is used to collect remaining
  * positional parameters into a #xvariant_t instance, similar to
- * g_variant_new(). @action will be activated with that #xvariant_t as its
+ * xvariant_new(). @action will be activated with that #xvariant_t as its
  * parameter.
  *
  * When no default action is set, the application that the notification
@@ -705,7 +705,7 @@ g_notification_set_default_action (GNotification *notification,
  * Since: 2.40
  */
 void
-g_notification_set_default_action_and_target (GNotification *notification,
+xnotification_set_default_action_and_target (xnotification_t *notification,
                                               const xchar_t   *action,
                                               const xchar_t   *target_format,
                                               ...)
@@ -716,16 +716,16 @@ g_notification_set_default_action_and_target (GNotification *notification,
   if (target_format)
     {
       va_start (args, target_format);
-      target = g_variant_new_va (target_format, NULL, &args);
+      target = xvariant_new_va (target_format, NULL, &args);
       va_end (args);
     }
 
-  g_notification_set_default_action_and_target_value (notification, action, target);
+  xnotification_set_default_action_and_target_value (notification, action, target);
 }
 
 /**
- * g_notification_set_default_action_and_target_value: (rename-to g_notification_set_default_action_and_target)
- * @notification: a #GNotification
+ * xnotification_set_default_action_and_target_value: (rename-to xnotification_set_default_action_and_target)
+ * @notification: a #xnotification_t
  * @action: an action name
  * @target: (nullable): a #xvariant_t to use as @action's parameter, or %NULL
  *
@@ -742,118 +742,118 @@ g_notification_set_default_action_and_target (GNotification *notification,
  * Since: 2.40
  */
 void
-g_notification_set_default_action_and_target_value (GNotification *notification,
+xnotification_set_default_action_and_target_value (xnotification_t *notification,
                                                     const xchar_t   *action,
                                                     xvariant_t      *target)
 {
   g_return_if_fail (X_IS_NOTIFICATION (notification));
   g_return_if_fail (action != NULL && g_action_name_is_valid (action));
 
-  if (!g_str_has_prefix (action, "app."))
+  if (!xstr_has_prefix (action, "app."))
     {
       g_warning ("%s: action '%s' does not start with 'app.'."
                  "This is unlikely to work properly.", G_STRFUNC, action);
     }
 
   g_free (notification->default_action);
-  g_clear_pointer (&notification->default_action_target, g_variant_unref);
+  g_clear_pointer (&notification->default_action_target, xvariant_unref);
 
-  notification->default_action = g_strdup (action);
+  notification->default_action = xstrdup (action);
 
   if (target)
-    notification->default_action_target = g_variant_ref_sink (target);
+    notification->default_action_target = xvariant_ref_sink (target);
 }
 
 static xvariant_t *
-g_notification_serialize_button (Button *button)
+xnotification_serialize_button (Button *button)
 {
-  GVariantBuilder builder;
+  xvariant_builder_t builder;
 
-  g_variant_builder_init (&builder, G_VARIANT_TYPE ("a{sv}"));
+  xvariant_builder_init (&builder, G_VARIANT_TYPE ("a{sv}"));
 
-  g_variant_builder_add (&builder, "{sv}", "label", g_variant_new_string (button->label));
-  g_variant_builder_add (&builder, "{sv}", "action", g_variant_new_string (button->action_name));
+  xvariant_builder_add (&builder, "{sv}", "label", xvariant_new_string (button->label));
+  xvariant_builder_add (&builder, "{sv}", "action", xvariant_new_string (button->action_name));
 
   if (button->target)
-    g_variant_builder_add (&builder, "{sv}", "target", button->target);
+    xvariant_builder_add (&builder, "{sv}", "target", button->target);
 
-  return g_variant_builder_end (&builder);
+  return xvariant_builder_end (&builder);
 }
 
 static xvariant_t *
-g_notification_get_priority_nick (GNotification *notification)
+xnotification_get_priority_nick (xnotification_t *notification)
 {
-  GEnumClass *enum_class;
-  GEnumValue *value;
+  xenum_class_t *enum_class;
+  xenum_value_t *value;
   xvariant_t *nick;
 
-  enum_class = g_type_class_ref (XTYPE_NOTIFICATION_PRIORITY);
-  value = g_enum_get_value (enum_class, g_notification_get_priority (notification));
+  enum_class = xtype_class_ref (XTYPE_NOTIFICATION_PRIORITY);
+  value = xenum_get_value (enum_class, xnotification_get_priority (notification));
   g_assert (value != NULL);
-  nick = g_variant_new_string (value->value_nick);
-  g_type_class_unref (enum_class);
+  nick = xvariant_new_string (value->value_nick);
+  xtype_class_unref (enum_class);
 
   return nick;
 }
 
 /*< private >
- * g_notification_serialize:
+ * xnotification_serialize:
  *
  * Serializes @notification into a floating variant of type a{sv}.
  *
  * Returns: the serialized @notification as a floating variant.
  */
 xvariant_t *
-g_notification_serialize (GNotification *notification)
+xnotification_serialize (xnotification_t *notification)
 {
-  GVariantBuilder builder;
+  xvariant_builder_t builder;
 
-  g_variant_builder_init (&builder, G_VARIANT_TYPE ("a{sv}"));
+  xvariant_builder_init (&builder, G_VARIANT_TYPE ("a{sv}"));
 
   if (notification->title)
-    g_variant_builder_add (&builder, "{sv}", "title", g_variant_new_string (notification->title));
+    xvariant_builder_add (&builder, "{sv}", "title", xvariant_new_string (notification->title));
 
   if (notification->body)
-    g_variant_builder_add (&builder, "{sv}", "body", g_variant_new_string (notification->body));
+    xvariant_builder_add (&builder, "{sv}", "body", xvariant_new_string (notification->body));
 
   if (notification->icon)
     {
       xvariant_t *serialized_icon;
 
-      if ((serialized_icon = g_icon_serialize (notification->icon)))
+      if ((serialized_icon = xicon_serialize (notification->icon)))
         {
-          g_variant_builder_add (&builder, "{sv}", "icon", serialized_icon);
-          g_variant_unref (serialized_icon);
+          xvariant_builder_add (&builder, "{sv}", "icon", serialized_icon);
+          xvariant_unref (serialized_icon);
         }
     }
 
-  g_variant_builder_add (&builder, "{sv}", "priority", g_notification_get_priority_nick (notification));
+  xvariant_builder_add (&builder, "{sv}", "priority", xnotification_get_priority_nick (notification));
 
   if (notification->default_action)
     {
-      g_variant_builder_add (&builder, "{sv}", "default-action",
-                                               g_variant_new_string (notification->default_action));
+      xvariant_builder_add (&builder, "{sv}", "default-action",
+                                               xvariant_new_string (notification->default_action));
 
       if (notification->default_action_target)
-        g_variant_builder_add (&builder, "{sv}", "default-action-target",
+        xvariant_builder_add (&builder, "{sv}", "default-action-target",
                                                   notification->default_action_target);
     }
 
   if (notification->buttons->len > 0)
     {
-      GVariantBuilder actions_builder;
+      xvariant_builder_t actions_builder;
       xuint_t i;
 
-      g_variant_builder_init (&actions_builder, G_VARIANT_TYPE ("aa{sv}"));
+      xvariant_builder_init (&actions_builder, G_VARIANT_TYPE ("aa{sv}"));
 
       for (i = 0; i < notification->buttons->len; i++)
         {
-          Button *button = g_ptr_array_index (notification->buttons, i);
-          g_variant_builder_add (&actions_builder, "@a{sv}", g_notification_serialize_button (button));
+          Button *button = xptr_array_index (notification->buttons, i);
+          xvariant_builder_add (&actions_builder, "@a{sv}", xnotification_serialize_button (button));
         }
 
-      g_variant_builder_add (&builder, "{sv}", "buttons", g_variant_builder_end (&actions_builder));
+      xvariant_builder_add (&builder, "{sv}", "buttons", xvariant_builder_end (&actions_builder));
     }
 
-  return g_variant_builder_end (&builder);
+  return xvariant_builder_end (&builder);
 }

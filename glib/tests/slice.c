@@ -22,7 +22,7 @@ test_slice_nodebug (void)
       g_slice_free1 (237, p);
       g_slice_free1 (259, q);
 
-      g_slice_debug_tree_statistics ();
+      g_slice_debuxtree_statistics ();
       return;
     }
   g_test_trap_subprocess (NULL, 1000000, 0);
@@ -50,7 +50,7 @@ test_slice_debug (void)
       g_slice_free1 (237, p);
       g_slice_free1 (259, q);
 
-      g_slice_debug_tree_statistics ();
+      g_slice_debuxtree_statistics ();
       return;
     }
   g_test_trap_subprocess (NULL, 1000000, 0);
@@ -135,7 +135,7 @@ thread_allocate (xpointer_t data)
 static void
 test_allocate (void)
 {
-  GThread *threads[30];
+  xthread_t *threads[30];
   xint_t size;
   xsize_t i;
 
@@ -144,10 +144,10 @@ test_allocate (void)
       chunks[size - 1][i] = NULL;
 
   for (i = 0; i < G_N_ELEMENTS(threads); i++)
-    threads[i] = g_thread_create (thread_allocate, NULL, TRUE, NULL);
+    threads[i] = xthread_create (thread_allocate, NULL, TRUE, NULL);
 
   for (i = 0; i < G_N_ELEMENTS(threads); i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 }
 
 int

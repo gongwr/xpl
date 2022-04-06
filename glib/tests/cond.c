@@ -1,4 +1,4 @@
-/* Unit tests for GCond
+/* Unit tests for xcond_t
  * Copyright (C) 2011 Red Hat, Inc
  * Author: Matthias Clasen
  *
@@ -27,8 +27,8 @@
 
 #include <glib.h>
 
-static GCond cond;
-static GMutex mutex;
+static xcond_t cond;
+static xmutex_t mutex;
 static xint_t next;  /* locked by @mutex */
 
 static void
@@ -39,7 +39,7 @@ push_value (xint_t value)
     g_cond_wait (&cond, &mutex);
   next = value;
   if (g_test_verbose ())
-    g_printerr ("Thread %p producing next value: %d\n", g_thread_self (), value);
+    g_printerr ("Thread %p producing next value: %d\n", xthread_self (), value);
   if (value % 10 == 0)
     g_cond_broadcast (&cond);
   else
@@ -56,14 +56,14 @@ pop_value (void)
   while (next == 0)
     {
       if (g_test_verbose ())
-        g_printerr ("Thread %p waiting for cond\n", g_thread_self ());
+        g_printerr ("Thread %p waiting for cond\n", xthread_self ());
       g_cond_wait (&cond, &mutex);
     }
   value = next;
   next = 0;
   g_cond_broadcast (&cond);
   if (g_test_verbose ())
-    g_printerr ("Thread %p consuming value %d\n", g_thread_self (), value);
+    g_printerr ("Thread %p consuming value %d\n", xthread_self (), value);
   g_mutex_unlock (&mutex);
 
   return value;
@@ -87,7 +87,7 @@ produce_values (xpointer_t data)
   push_value (-1);
 
   if (g_test_verbose ())
-    g_printerr ("Thread %p produced %d altogether\n", g_thread_self (), total);
+    g_printerr ("Thread %p produced %d altogether\n", xthread_self (), total);
 
   return GINT_TO_POINTER (total);
 }
@@ -108,33 +108,33 @@ consume_values (xpointer_t data)
     }
 
   if (g_test_verbose ())
-    g_printerr ("Thread %p accumulated %d\n", g_thread_self (), accum);
+    g_printerr ("Thread %p accumulated %d\n", xthread_self (), accum);
 
   return GINT_TO_POINTER (accum);
 }
 
-static GThread *producer, *consumer1, *consumer2;
+static xthread_t *producer, *consumer1, *consumer2;
 
 static void
 test_cond1 (void)
 {
   xint_t total, acc1, acc2;
 
-  producer = g_thread_create (produce_values, NULL, TRUE, NULL);
-  consumer1 = g_thread_create (consume_values, NULL, TRUE, NULL);
-  consumer2 = g_thread_create (consume_values, NULL, TRUE, NULL);
+  producer = xthread_create (produce_values, NULL, TRUE, NULL);
+  consumer1 = xthread_create (consume_values, NULL, TRUE, NULL);
+  consumer2 = xthread_create (consume_values, NULL, TRUE, NULL);
 
-  total = GPOINTER_TO_INT (g_thread_join (producer));
-  acc1 = GPOINTER_TO_INT (g_thread_join (consumer1));
-  acc2 = GPOINTER_TO_INT (g_thread_join (consumer2));
+  total = GPOINTER_TO_INT (xthread_join (producer));
+  acc1 = GPOINTER_TO_INT (xthread_join (consumer1));
+  acc2 = GPOINTER_TO_INT (xthread_join (consumer2));
 
   g_assert_cmpint (total, ==, acc1 + acc2);
 }
 
 typedef struct
 {
-  GMutex mutex;
-  GCond  cond;
+  xmutex_t mutex;
+  xcond_t  cond;
   xint_t   limit;
   xint_t   count;
 } Barrier;
@@ -218,16 +218,16 @@ static void
 test_cond2 (void)
 {
   xint_t i;
-  GThread *threads[5];
+  xthread_t *threads[5];
 
   g_atomic_int_set (&check, 0);
 
   barrier_init (&b, 5);
   for (i = 0; i < 5; i++)
-    threads[i] = g_thread_create (cond2_func, GINT_TO_POINTER (i), TRUE, NULL);
+    threads[i] = xthread_create (cond2_func, GINT_TO_POINTER (i), TRUE, NULL);
 
   for (i = 0; i < 5; i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 
   g_assert_cmpint (g_atomic_int_get (&check), ==, 10);
 
@@ -238,8 +238,8 @@ static void
 test_wait_until (void)
 {
   gint64 until;
-  GMutex lock;
-  GCond cond;
+  xmutex_t lock;
+  xcond_t cond;
 
   /* This test will make sure we don't wait too much or too little.
    *
@@ -283,7 +283,7 @@ static pthread_t main_thread;
 static void *
 mutex_holder (void *data)
 {
-  GMutex *lock = data;
+  xmutex_t *lock = data;
 
   g_mutex_lock (lock);
 
@@ -316,8 +316,8 @@ static void
 test_wait_until_errno (void)
 {
   xboolean_t result;
-  GMutex lock;
-  GCond cond;
+  xmutex_t lock;
+  xcond_t cond;
   struct sigaction act = { };
 
   /* important: no SA_RESTART (we want EINTR) */
@@ -343,7 +343,7 @@ test_wait_until_errno (void)
    *      return EINTR, clobbering the errno return from the condition
    *      variable
    */
-  g_thread_unref (g_thread_new ("mutex-holder", mutex_holder, &lock));
+  xthread_unref (xthread_new ("mutex-holder", mutex_holder, &lock));
 
   result = g_cond_wait_until (&cond, &lock,
                               g_get_monotonic_time () + G_TIME_SPAN_SECOND / 50);

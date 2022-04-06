@@ -320,7 +320,7 @@ test_is_ip_addr (void)
     {
       if (g_hostname_is_ip_address (ip_addr_tests[i].addr) != ip_addr_tests[i].is_addr)
 	{
-	  char *msg = g_strdup_printf ("g_hostname_is_ip_address (\"%s\") == %s",
+	  char *msg = xstrdup_printf ("g_hostname_is_ip_address (\"%s\") == %s",
 				       ip_addr_tests[i].addr,
 				       ip_addr_tests[i].is_addr ? "TRUE" : "FALSE");
 	  g_assertion_message (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);

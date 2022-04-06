@@ -7,7 +7,7 @@
 #include <gio/gdesktopappinfo.h>
 
 static void
-test_launch_for_app_info (GAppInfo *appinfo)
+test_launch_for_app_info (xapp_info_t *appinfo)
 {
   xerror_t *error = NULL;
   xboolean_t success;
@@ -22,46 +22,46 @@ test_launch_for_app_info (GAppInfo *appinfo)
       return;
     }
 
-  success = g_app_info_launch (appinfo, NULL, NULL, &error);
+  success = xapp_info_launch (appinfo, NULL, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (success);
 
-  success = g_app_info_launch_uris (appinfo, NULL, NULL, &error);
+  success = xapp_info_launch_uris (appinfo, NULL, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (success);
 
   path = g_test_get_filename (G_TEST_BUILT, "appinfo-test.desktop", NULL);
-  file = g_file_new_for_path (path);
+  file = xfile_new_for_path (path);
   l = NULL;
-  l = g_list_append (l, file);
+  l = xlist_append (l, file);
 
-  success = g_app_info_launch (appinfo, l, NULL, &error);
+  success = xapp_info_launch (appinfo, l, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (success);
-  g_list_free (l);
-  g_object_unref (file);
+  xlist_free (l);
+  xobject_unref (file);
 
   l = NULL;
-  uri = g_strconcat ("file://", g_test_get_dir (G_TEST_BUILT), "/appinfo-test.desktop", NULL);
-  l = g_list_append (l, uri);
-  l = g_list_append (l, "file:///etc/group#adm");
+  uri = xstrconcat ("file://", g_test_get_dir (G_TEST_BUILT), "/appinfo-test.desktop", NULL);
+  l = xlist_append (l, uri);
+  l = xlist_append (l, "file:///etc/group#adm");
 
-  success = g_app_info_launch_uris (appinfo, l, NULL, &error);
+  success = xapp_info_launch_uris (appinfo, l, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (success);
 
-  g_list_free (l);
+  xlist_free (l);
   g_free (uri);
 }
 
 static void
 test_launch (void)
 {
-  GAppInfo *appinfo;
+  xapp_info_t *appinfo;
   const xchar_t *path;
 
   path = g_test_get_filename (G_TEST_BUILT, "appinfo-test.desktop", NULL);
-  appinfo = (GAppInfo*)g_desktop_app_info_new_from_filename (path);
+  appinfo = (xapp_info_t*)g_desktop_app_info_new_from_filename (path);
 
   if (appinfo == NULL)
     {
@@ -70,7 +70,7 @@ test_launch (void)
     }
 
   test_launch_for_app_info (appinfo);
-  g_object_unref (appinfo);
+  xobject_unref (appinfo);
 }
 
 static void
@@ -84,8 +84,8 @@ test_launch_no_app_id (void)
     "Name[de]=appinfo-test-de\n"
     "X-GNOME-FullName=example\n"
     "X-GNOME-FullName[de]=Beispiel\n"
-    "Comment=GAppInfo example\n"
-    "Comment[de]=GAppInfo Beispiel\n"
+    "Comment=xapp_info_t example\n"
+    "Comment[de]=xapp_info_t Beispiel\n"
     "Icon=testicon.svg\n"
     "Terminal=false\n"
     "StartupNotify=true\n"
@@ -97,10 +97,10 @@ test_launch_no_app_id (void)
   xchar_t *exec_line_variants[2];
   xsize_t i;
 
-  exec_line_variants[0] = g_strdup_printf (
+  exec_line_variants[0] = xstrdup_printf (
       "Exec=%s/appinfo-test --option %%U %%i --name %%c --filename %%k %%m %%%%",
       g_test_get_dir (G_TEST_BUILT));
-  exec_line_variants[1] = g_strdup_printf (
+  exec_line_variants[1] = xstrdup_printf (
       "Exec=%s/appinfo-test --option %%u %%i --name %%c --filename %%k %%m %%%%",
       g_test_get_dir (G_TEST_BUILT));
 
@@ -109,31 +109,31 @@ test_launch_no_app_id (void)
   for (i = 0; i < G_N_ELEMENTS (exec_line_variants); i++)
     {
       xchar_t *desktop_file_contents;
-      GKeyFile *fake_desktop_file;
-      GAppInfo *appinfo;
+      xkey_file_t *fake_desktop_file;
+      xapp_info_t *appinfo;
       xboolean_t loaded;
 
       g_test_message ("Exec line variant #%" G_GSIZE_FORMAT, i);
 
-      desktop_file_contents = g_strdup_printf ("%s\n%s",
+      desktop_file_contents = xstrdup_printf ("%s\n%s",
                                                desktop_file_base_contents,
                                                exec_line_variants[i]);
 
       /* We load a desktop file from memory to force the app not
        * to have an app ID, which would check different codepaths.
        */
-      fake_desktop_file = g_key_file_new ();
-      loaded = g_key_file_load_from_data (fake_desktop_file, desktop_file_contents, -1, G_KEY_FILE_NONE, NULL);
+      fake_desktop_file = xkey_file_new ();
+      loaded = xkey_file_load_from_data (fake_desktop_file, desktop_file_contents, -1, G_KEY_FILE_NONE, NULL);
       g_assert_true (loaded);
 
-      appinfo = (GAppInfo*)g_desktop_app_info_new_from_keyfile (fake_desktop_file);
+      appinfo = (xapp_info_t*)g_desktop_app_info_new_from_keyfile (fake_desktop_file);
       g_assert_nonnull (appinfo);
 
       test_launch_for_app_info (appinfo);
 
       g_free (desktop_file_contents);
-      g_object_unref (appinfo);
-      g_key_file_unref (fake_desktop_file);
+      xobject_unref (appinfo);
+      xkey_file_unref (fake_desktop_file);
     }
 
   g_free (exec_line_variants[1]);
@@ -143,37 +143,37 @@ test_launch_no_app_id (void)
 static void
 test_locale (const char *locale)
 {
-  GAppInfo *appinfo;
+  xapp_info_t *appinfo;
   xchar_t *orig = NULL;
   const xchar_t *path;
 
-  orig = g_strdup (setlocale (LC_ALL, NULL));
+  orig = xstrdup (setlocale (LC_ALL, NULL));
   g_setenv ("LANGUAGE", locale, TRUE);
   setlocale (LC_ALL, "");
 
   path = g_test_get_filename (G_TEST_DIST, "appinfo-test-static.desktop", NULL);
-  appinfo = (GAppInfo*)g_desktop_app_info_new_from_filename (path);
+  appinfo = (xapp_info_t*)g_desktop_app_info_new_from_filename (path);
 
-  if (g_strcmp0 (locale, "C") == 0)
+  if (xstrcmp0 (locale, "C") == 0)
     {
-      g_assert_cmpstr (g_app_info_get_name (appinfo), ==, "appinfo-test");
-      g_assert_cmpstr (g_app_info_get_description (appinfo), ==, "GAppInfo example");
-      g_assert_cmpstr (g_app_info_get_display_name (appinfo), ==, "example");
+      g_assert_cmpstr (xapp_info_get_name (appinfo), ==, "appinfo-test");
+      g_assert_cmpstr (xapp_info_get_description (appinfo), ==, "xapp_info_t example");
+      g_assert_cmpstr (xapp_info_get_display_name (appinfo), ==, "example");
     }
-  else if (g_str_has_prefix (locale, "en"))
+  else if (xstr_has_prefix (locale, "en"))
     {
-      g_assert_cmpstr (g_app_info_get_name (appinfo), ==, "appinfo-test");
-      g_assert_cmpstr (g_app_info_get_description (appinfo), ==, "GAppInfo example");
-      g_assert_cmpstr (g_app_info_get_display_name (appinfo), ==, "example");
+      g_assert_cmpstr (xapp_info_get_name (appinfo), ==, "appinfo-test");
+      g_assert_cmpstr (xapp_info_get_description (appinfo), ==, "xapp_info_t example");
+      g_assert_cmpstr (xapp_info_get_display_name (appinfo), ==, "example");
     }
-  else if (g_str_has_prefix (locale, "de"))
+  else if (xstr_has_prefix (locale, "de"))
     {
-      g_assert_cmpstr (g_app_info_get_name (appinfo), ==, "appinfo-test-de");
-      g_assert_cmpstr (g_app_info_get_description (appinfo), ==, "GAppInfo Beispiel");
-      g_assert_cmpstr (g_app_info_get_display_name (appinfo), ==, "Beispiel");
+      g_assert_cmpstr (xapp_info_get_name (appinfo), ==, "appinfo-test-de");
+      g_assert_cmpstr (xapp_info_get_description (appinfo), ==, "xapp_info_t Beispiel");
+      g_assert_cmpstr (xapp_info_get_display_name (appinfo), ==, "Beispiel");
     }
 
-  g_object_unref (appinfo);
+  xobject_unref (appinfo);
 
   g_setenv ("LANGUAGE", orig, TRUE);
   setlocale (LC_ALL, "");
@@ -192,40 +192,40 @@ test_text (void)
 static void
 test_basic (void)
 {
-  GAppInfo *appinfo;
-  GAppInfo *appinfo2;
+  xapp_info_t *appinfo;
+  xapp_info_t *appinfo2;
   xicon_t *icon, *icon2;
   const xchar_t *path;
 
   path = g_test_get_filename (G_TEST_DIST, "appinfo-test-static.desktop", NULL);
-  appinfo = (GAppInfo*)g_desktop_app_info_new_from_filename (path);
+  appinfo = (xapp_info_t*)g_desktop_app_info_new_from_filename (path);
   g_assert_nonnull (appinfo);
 
-  g_assert_cmpstr (g_app_info_get_id (appinfo), ==, "appinfo-test-static.desktop");
-  g_assert_nonnull (strstr (g_app_info_get_executable (appinfo), "true"));
+  g_assert_cmpstr (xapp_info_get_id (appinfo), ==, "appinfo-test-static.desktop");
+  g_assert_nonnull (strstr (xapp_info_get_executable (appinfo), "true"));
 
-  icon = g_app_info_get_icon (appinfo);
+  icon = xapp_info_get_icon (appinfo);
   g_assert_true (X_IS_THEMED_ICON (icon));
   icon2 = g_themed_icon_new ("testicon");
-  g_assert_true (g_icon_equal (icon, icon2));
-  g_object_unref (icon2);
+  g_assert_true (xicon_equal (icon, icon2));
+  xobject_unref (icon2);
 
-  appinfo2 = g_app_info_dup (appinfo);
-  g_assert_cmpstr (g_app_info_get_id (appinfo), ==, g_app_info_get_id (appinfo2));
-  g_assert_cmpstr (g_app_info_get_commandline (appinfo), ==, g_app_info_get_commandline (appinfo2));
+  appinfo2 = xapp_info_dup (appinfo);
+  g_assert_cmpstr (xapp_info_get_id (appinfo), ==, xapp_info_get_id (appinfo2));
+  g_assert_cmpstr (xapp_info_get_commandline (appinfo), ==, xapp_info_get_commandline (appinfo2));
 
-  g_object_unref (appinfo);
-  g_object_unref (appinfo2);
+  xobject_unref (appinfo);
+  xobject_unref (appinfo2);
 }
 
 static void
 test_show_in (void)
 {
-  GAppInfo *appinfo;
+  xapp_info_t *appinfo;
   const xchar_t *path;
 
   path = g_test_get_filename (G_TEST_BUILT, "appinfo-test.desktop", NULL);
-  appinfo = (GAppInfo*)g_desktop_app_info_new_from_filename (path);
+  appinfo = (xapp_info_t*)g_desktop_app_info_new_from_filename (path);
 
   if (appinfo == NULL)
     {
@@ -233,61 +233,61 @@ test_show_in (void)
       return;
     }
 
-  g_assert_true (g_app_info_should_show (appinfo));
-  g_object_unref (appinfo);
+  g_assert_true (xapp_info_should_show (appinfo));
+  xobject_unref (appinfo);
 
   path = g_test_get_filename (G_TEST_BUILT, "appinfo-test-gnome.desktop", NULL);
-  appinfo = (GAppInfo*)g_desktop_app_info_new_from_filename (path);
-  g_assert_true (g_app_info_should_show (appinfo));
-  g_object_unref (appinfo);
+  appinfo = (xapp_info_t*)g_desktop_app_info_new_from_filename (path);
+  g_assert_true (xapp_info_should_show (appinfo));
+  xobject_unref (appinfo);
 
   path = g_test_get_filename (G_TEST_BUILT, "appinfo-test-notgnome.desktop", NULL);
-  appinfo = (GAppInfo*)g_desktop_app_info_new_from_filename (path);
-  g_assert_false (g_app_info_should_show (appinfo));
-  g_object_unref (appinfo);
+  appinfo = (xapp_info_t*)g_desktop_app_info_new_from_filename (path);
+  g_assert_false (xapp_info_should_show (appinfo));
+  xobject_unref (appinfo);
 }
 
 static void
 test_commandline (void)
 {
-  GAppInfo *appinfo;
+  xapp_info_t *appinfo;
   xerror_t *error;
   xchar_t *cmdline;
   xchar_t *cmdline_out;
 
-  cmdline = g_strconcat (g_test_get_dir (G_TEST_BUILT), "/appinfo-test --option", NULL);
-  cmdline_out = g_strconcat (cmdline, " %u", NULL);
+  cmdline = xstrconcat (g_test_get_dir (G_TEST_BUILT), "/appinfo-test --option", NULL);
+  cmdline_out = xstrconcat (cmdline, " %u", NULL);
 
   error = NULL;
-  appinfo = g_app_info_create_from_commandline (cmdline,
+  appinfo = xapp_info_create_from_commandline (cmdline,
                                                 "cmdline-app-test",
                                                 G_APP_INFO_CREATE_SUPPORTS_URIS,
                                                 &error);
   g_assert_no_error (error);
   g_assert_nonnull (appinfo);
-  g_assert_cmpstr (g_app_info_get_name (appinfo), ==, "cmdline-app-test");
-  g_assert_cmpstr (g_app_info_get_commandline (appinfo), ==, cmdline_out);
-  g_assert_true (g_app_info_supports_uris (appinfo));
-  g_assert_false (g_app_info_supports_files (appinfo));
+  g_assert_cmpstr (xapp_info_get_name (appinfo), ==, "cmdline-app-test");
+  g_assert_cmpstr (xapp_info_get_commandline (appinfo), ==, cmdline_out);
+  g_assert_true (xapp_info_supports_uris (appinfo));
+  g_assert_false (xapp_info_supports_files (appinfo));
 
-  g_object_unref (appinfo);
+  xobject_unref (appinfo);
 
   g_free (cmdline_out);
-  cmdline_out = g_strconcat (cmdline, " %f", NULL);
+  cmdline_out = xstrconcat (cmdline, " %f", NULL);
 
   error = NULL;
-  appinfo = g_app_info_create_from_commandline (cmdline,
+  appinfo = xapp_info_create_from_commandline (cmdline,
                                                 "cmdline-app-test",
                                                 G_APP_INFO_CREATE_NONE,
                                                 &error);
   g_assert_no_error (error);
   g_assert_nonnull (appinfo);
-  g_assert_cmpstr (g_app_info_get_name (appinfo), ==, "cmdline-app-test");
-  g_assert_cmpstr (g_app_info_get_commandline (appinfo), ==, cmdline_out);
-  g_assert_false (g_app_info_supports_uris (appinfo));
-  g_assert_true (g_app_info_supports_files (appinfo));
+  g_assert_cmpstr (xapp_info_get_name (appinfo), ==, "cmdline-app-test");
+  g_assert_cmpstr (xapp_info_get_commandline (appinfo), ==, cmdline_out);
+  g_assert_false (xapp_info_supports_uris (appinfo));
+  g_assert_true (xapp_info_supports_files (appinfo));
 
-  g_object_unref (appinfo);
+  xobject_unref (appinfo);
 
   g_free (cmdline);
   g_free (cmdline_out);
@@ -296,27 +296,27 @@ test_commandline (void)
 static void
 test_launch_context (void)
 {
-  GAppLaunchContext *context;
-  GAppInfo *appinfo;
+  xapp_launch_context_t *context;
+  xapp_info_t *appinfo;
   xchar_t *str;
   xchar_t *cmdline;
 
-  cmdline = g_strconcat (g_test_get_dir (G_TEST_BUILT), "/appinfo-test --option", NULL);
+  cmdline = xstrconcat (g_test_get_dir (G_TEST_BUILT), "/appinfo-test --option", NULL);
 
-  context = g_app_launch_context_new ();
-  appinfo = g_app_info_create_from_commandline (cmdline,
+  context = xapp_launch_context_new ();
+  appinfo = xapp_info_create_from_commandline (cmdline,
                                                 "cmdline-app-test",
                                                 G_APP_INFO_CREATE_SUPPORTS_URIS,
                                                 NULL);
 
-  str = g_app_launch_context_get_display (context, appinfo, NULL);
+  str = xapp_launch_context_get_display (context, appinfo, NULL);
   g_assert_null (str);
 
-  str = g_app_launch_context_get_startup_notify_id (context, appinfo, NULL);
+  str = xapp_launch_context_get_startup_notify_id (context, appinfo, NULL);
   g_assert_null (str);
 
-  g_object_unref (appinfo);
-  g_object_unref (context);
+  xobject_unref (appinfo);
+  xobject_unref (context);
 
   g_free (cmdline);
 }
@@ -324,22 +324,22 @@ test_launch_context (void)
 static xboolean_t launched_reached;
 
 static void
-launched (GAppLaunchContext *context,
-          GAppInfo          *info,
+launched (xapp_launch_context_t *context,
+          xapp_info_t          *info,
           xvariant_t          *platform_data,
           xpointer_t           user_data)
 {
   xint_t pid;
 
   pid = 0;
-  g_assert_true (g_variant_lookup (platform_data, "pid", "i", &pid));
+  g_assert_true (xvariant_lookup (platform_data, "pid", "i", &pid));
   g_assert_cmpint (pid, !=, 0);
 
   launched_reached = TRUE;
 }
 
 static void
-launch_failed (GAppLaunchContext *context,
+launch_failed (xapp_launch_context_t *context,
                const xchar_t       *startup_notify_id)
 {
   g_assert_not_reached ();
@@ -348,30 +348,30 @@ launch_failed (GAppLaunchContext *context,
 static void
 test_launch_context_signals (void)
 {
-  GAppLaunchContext *context;
-  GAppInfo *appinfo;
+  xapp_launch_context_t *context;
+  xapp_info_t *appinfo;
   xerror_t *error = NULL;
   xboolean_t success;
   xchar_t *cmdline;
 
-  cmdline = g_strconcat (g_test_get_dir (G_TEST_BUILT), "/appinfo-test --option", NULL);
+  cmdline = xstrconcat (g_test_get_dir (G_TEST_BUILT), "/appinfo-test --option", NULL);
 
-  context = g_app_launch_context_new ();
+  context = xapp_launch_context_new ();
   g_signal_connect (context, "launched", G_CALLBACK (launched), NULL);
   g_signal_connect (context, "launch_failed", G_CALLBACK (launch_failed), NULL);
-  appinfo = g_app_info_create_from_commandline (cmdline,
+  appinfo = xapp_info_create_from_commandline (cmdline,
                                                 "cmdline-app-test",
                                                 G_APP_INFO_CREATE_SUPPORTS_URIS,
                                                 NULL);
 
-  success = g_app_info_launch (appinfo, NULL, context, &error);
+  success = xapp_info_launch (appinfo, NULL, context, &error);
   g_assert_no_error (error);
   g_assert_true (success);
 
   g_assert_true (launched_reached);
 
-  g_object_unref (appinfo);
-  g_object_unref (context);
+  xobject_unref (appinfo);
+  xobject_unref (context);
 
   g_free (cmdline);
 }
@@ -379,11 +379,11 @@ test_launch_context_signals (void)
 static void
 test_tryexec (void)
 {
-  GAppInfo *appinfo;
+  xapp_info_t *appinfo;
   const xchar_t *path;
 
   path = g_test_get_filename (G_TEST_BUILT, "appinfo-test2.desktop", NULL);
-  appinfo = (GAppInfo*)g_desktop_app_info_new_from_filename (path);
+  appinfo = (xapp_info_t*)g_desktop_app_info_new_from_filename (path);
 
   g_assert_null (appinfo);
 }
@@ -394,67 +394,67 @@ test_tryexec (void)
 static void
 test_associations (void)
 {
-  GAppInfo *appinfo;
-  GAppInfo *appinfo2;
+  xapp_info_t *appinfo;
+  xapp_info_t *appinfo2;
   xerror_t *error = NULL;
   xboolean_t result;
   xlist_t *list;
   xchar_t *cmdline;
 
-  cmdline = g_strconcat (g_test_get_dir (G_TEST_BUILT), "/appinfo-test --option", NULL);
-  appinfo = g_app_info_create_from_commandline (cmdline,
+  cmdline = xstrconcat (g_test_get_dir (G_TEST_BUILT), "/appinfo-test --option", NULL);
+  appinfo = xapp_info_create_from_commandline (cmdline,
                                                 "cmdline-app-test",
                                                 G_APP_INFO_CREATE_SUPPORTS_URIS,
                                                 NULL);
   g_free (cmdline);
 
-  result = g_app_info_set_as_default_for_type (appinfo, "application/x-glib-test", &error);
+  result = xapp_info_set_as_default_for_type (appinfo, "application/x-glib-test", &error);
   g_assert_no_error (error);
   g_assert_true (result);
 
-  appinfo2 = g_app_info_get_default_for_type ("application/x-glib-test", FALSE);
+  appinfo2 = xapp_info_get_default_for_type ("application/x-glib-test", FALSE);
 
   g_assert_nonnull (appinfo2);
-  g_assert_cmpstr (g_app_info_get_commandline (appinfo), ==, g_app_info_get_commandline (appinfo2));
+  g_assert_cmpstr (xapp_info_get_commandline (appinfo), ==, xapp_info_get_commandline (appinfo2));
 
-  g_object_unref (appinfo2);
+  xobject_unref (appinfo2);
 
-  result = g_app_info_set_as_default_for_extension (appinfo, "gio-tests", &error);
+  result = xapp_info_set_as_default_for_extension (appinfo, "gio-tests", &error);
   g_assert_no_error (error);
   g_assert_true (result);
 
-  appinfo2 = g_app_info_get_default_for_type ("application/x-extension-gio-tests", FALSE);
+  appinfo2 = xapp_info_get_default_for_type ("application/x-extension-gio-tests", FALSE);
 
   g_assert_nonnull (appinfo2);
-  g_assert_cmpstr (g_app_info_get_commandline (appinfo), ==, g_app_info_get_commandline (appinfo2));
+  g_assert_cmpstr (xapp_info_get_commandline (appinfo), ==, xapp_info_get_commandline (appinfo2));
 
-  g_object_unref (appinfo2);
+  xobject_unref (appinfo2);
 
-  result = g_app_info_add_supports_type (appinfo, "application/x-gio-test", &error);
+  result = xapp_info_add_supports_type (appinfo, "application/x-gio-test", &error);
   g_assert_no_error (error);
   g_assert_true (result);
 
-  list = g_app_info_get_all_for_type ("application/x-gio-test");
-  g_assert_cmpint (g_list_length (list), ==, 1);
+  list = xapp_info_get_all_for_type ("application/x-gio-test");
+  g_assert_cmpint (xlist_length (list), ==, 1);
   appinfo2 = list->data;
-  g_assert_cmpstr (g_app_info_get_commandline (appinfo), ==, g_app_info_get_commandline (appinfo2));
-  g_object_unref (appinfo2);
-  g_list_free (list);
+  g_assert_cmpstr (xapp_info_get_commandline (appinfo), ==, xapp_info_get_commandline (appinfo2));
+  xobject_unref (appinfo2);
+  xlist_free (list);
 
-  g_assert_true (g_app_info_can_remove_supports_type (appinfo));
-  result = g_app_info_remove_supports_type (appinfo, "application/x-gio-test", &error);
+  g_assert_true (xapp_info_can_remove_supports_type (appinfo));
+  result = xapp_info_remove_supports_type (appinfo, "application/x-gio-test", &error);
   g_assert_no_error (error);
   g_assert_true (result);
 
-  g_assert_true (g_app_info_can_delete (appinfo));
-  g_assert_true (g_app_info_delete (appinfo));
-  g_object_unref (appinfo);
+  g_assert_true (xapp_info_can_delete (appinfo));
+  g_assert_true (xapp_info_delete (appinfo));
+  xobject_unref (appinfo);
 }
 
 static void
 test_environment (void)
 {
-  GAppLaunchContext *ctx;
+  xapp_launch_context_t *ctx;
   xchar_t **env;
   const xchar_t *path;
 
@@ -462,38 +462,38 @@ test_environment (void)
   g_unsetenv ("BLA");
   path = g_getenv ("PATH");
 
-  ctx = g_app_launch_context_new ();
+  ctx = xapp_launch_context_new ();
 
-  env = g_app_launch_context_get_environment (ctx);
+  env = xapp_launch_context_get_environment (ctx);
 
   g_assert_null (g_environ_getenv (env, "FOO"));
   g_assert_null (g_environ_getenv (env, "BLA"));
   g_assert_cmpstr (g_environ_getenv (env, "PATH"), ==, path);
 
-  g_strfreev (env);
+  xstrfreev (env);
 
-  g_app_launch_context_setenv (ctx, "FOO", "bar");
-  g_app_launch_context_setenv (ctx, "BLA", "bla");
+  xapp_launch_context_setenv (ctx, "FOO", "bar");
+  xapp_launch_context_setenv (ctx, "BLA", "bla");
 
-  env = g_app_launch_context_get_environment (ctx);
+  env = xapp_launch_context_get_environment (ctx);
 
   g_assert_cmpstr (g_environ_getenv (env, "FOO"), ==, "bar");
   g_assert_cmpstr (g_environ_getenv (env, "BLA"), ==, "bla");
   g_assert_cmpstr (g_environ_getenv (env, "PATH"), ==, path);
 
-  g_strfreev (env);
+  xstrfreev (env);
 
-  g_app_launch_context_setenv (ctx, "FOO", "baz");
-  g_app_launch_context_unsetenv (ctx, "BLA");
+  xapp_launch_context_setenv (ctx, "FOO", "baz");
+  xapp_launch_context_unsetenv (ctx, "BLA");
 
-  env = g_app_launch_context_get_environment (ctx);
+  env = xapp_launch_context_get_environment (ctx);
 
   g_assert_cmpstr (g_environ_getenv (env, "FOO"), ==, "baz");
   g_assert_null (g_environ_getenv (env, "BLA"));
 
-  g_strfreev (env);
+  xstrfreev (env);
 
-  g_object_unref (ctx);
+  xobject_unref (ctx);
 }
 
 static void
@@ -509,31 +509,31 @@ test_startup_wm_class (void)
 
   g_assert_cmpstr (wm_class, ==, "appinfo-class");
 
-  g_object_unref (appinfo);
+  xobject_unref (appinfo);
 }
 
 static void
 test_supported_types (void)
 {
-  GAppInfo *appinfo;
+  xapp_info_t *appinfo;
   const char * const *content_types;
   const xchar_t *path;
 
   path = g_test_get_filename (G_TEST_DIST, "appinfo-test-static.desktop", NULL);
   appinfo = G_APP_INFO (g_desktop_app_info_new_from_filename (path));
-  content_types = g_app_info_get_supported_types (appinfo);
+  content_types = xapp_info_get_supported_types (appinfo);
 
-  g_assert_cmpint (g_strv_length ((char**)content_types), ==, 2);
+  g_assert_cmpint (xstrv_length ((char**)content_types), ==, 2);
   g_assert_cmpstr (content_types[0], ==, "image/png");
 
-  g_object_unref (appinfo);
+  xobject_unref (appinfo);
 }
 
 static void
 test_from_keyfile (void)
 {
   GDesktopAppInfo *info;
-  GKeyFile *kf;
+  xkey_file_t *kf;
   xerror_t *error = NULL;
   const xchar_t *categories;
   xchar_t **categories_list;
@@ -544,14 +544,14 @@ test_from_keyfile (void)
   const xchar_t *path;
 
   path = g_test_get_filename (G_TEST_DIST, "appinfo-test-static.desktop", NULL);
-  kf = g_key_file_new ();
-  g_key_file_load_from_file (kf, path, G_KEY_FILE_NONE, &error);
+  kf = xkey_file_new ();
+  xkey_file_load_from_file (kf, path, G_KEY_FILE_NONE, &error);
   g_assert_no_error (error);
   info = g_desktop_app_info_new_from_keyfile (kf);
-  g_key_file_unref (kf);
+  xkey_file_unref (kf);
   g_assert_nonnull (info);
 
-  g_object_get (info, "filename", &file, NULL);
+  xobject_get (info, "filename", &file, NULL);
   g_assert_null (file);
 
   file = g_desktop_app_info_get_filename (info);
@@ -560,19 +560,19 @@ test_from_keyfile (void)
   g_assert_cmpstr (categories, ==, "GNOME;GTK;");
   categories_list = g_desktop_app_info_get_string_list (info, "Categories", &categories_count);
   g_assert_cmpint (categories_count, ==, 2);
-  g_assert_cmpint (g_strv_length (categories_list), ==, 2);
+  g_assert_cmpint (xstrv_length (categories_list), ==, 2);
   g_assert_cmpstr (categories_list[0], ==, "GNOME");
   g_assert_cmpstr (categories_list[1], ==, "GTK");
   keywords = (xchar_t **)g_desktop_app_info_get_keywords (info);
-  g_assert_cmpint (g_strv_length (keywords), ==, 2);
+  g_assert_cmpint (xstrv_length (keywords), ==, 2);
   g_assert_cmpstr (keywords[0], ==, "keyword1");
   g_assert_cmpstr (keywords[1], ==, "test keyword");
   name = g_desktop_app_info_get_generic_name (info);
   g_assert_cmpstr (name, ==, "generic-appinfo-test");
   g_assert_false (g_desktop_app_info_get_nodisplay (info));
 
-  g_strfreev (categories_list);
-  g_object_unref (info);
+  xstrfreev (categories_list);
+  xobject_unref (info);
 }
 
 int

@@ -27,7 +27,7 @@
 #include "glib-unix.h"
 #endif
 
-G_DEFINE_BOXED_TYPE (GIOChannel, g_io_channel, g_io_channel_ref, g_io_channel_unref)
+G_DEFINE_BOXED_TYPE (xio_channel_t, g_io_channel, g_io_channel_ref, g_io_channel_unref)
 
 xtype_t
 g_io_condition_get_type (void)
@@ -36,7 +36,7 @@ g_io_condition_get_type (void)
 
   if (g_once_init_enter (&etype))
     {
-      static const GFlagsValue values[] = {
+      static const xflags_value_t values[] = {
 	{ G_IO_IN,   "G_IO_IN",   "in" },
 	{ G_IO_OUT,  "G_IO_OUT",  "out" },
 	{ G_IO_PRI,  "G_IO_PRI",  "pri" },
@@ -45,7 +45,7 @@ g_io_condition_get_type (void)
 	{ G_IO_NVAL, "G_IO_NVAL", "nval" },
 	{ 0, NULL, NULL }
       };
-      xtype_t type_id = g_flags_register_static ("GIOCondition", values);
+      xtype_t type_id = xflags_register_static ("xio_condition_t", values);
       g_once_init_leave (&etype, type_id);
     }
   return etype;
@@ -55,86 +55,86 @@ g_io_condition_get_type (void)
  * instance object.
  */
 static void
-source_closure_marshal_BOOLEAN__VOID (GClosure     *closure,
-				      GValue       *return_value,
+source_closure_marshal_BOOLEAN__VOID (xclosure_t     *closure,
+				      xvalue_t       *return_value,
 				      xuint_t         n_param_values,
-				      const GValue *param_values,
+				      const xvalue_t *param_values,
 				      xpointer_t      invocation_hint,
 				      xpointer_t      marshal_data)
 {
-  GSourceFunc callback;
+  xsource_func_t callback;
   GCClosure *cc = (GCClosure*) closure;
   xboolean_t v_return;
 
   g_return_if_fail (return_value != NULL);
   g_return_if_fail (n_param_values == 0);
 
-  callback = (GSourceFunc) (marshal_data ? marshal_data : cc->callback);
+  callback = (xsource_func_t) (marshal_data ? marshal_data : cc->callback);
 
   v_return = callback (closure->data);
 
-  g_value_set_boolean (return_value, v_return);
+  xvalue_set_boolean (return_value, v_return);
 }
 
 static xboolean_t
-io_watch_closure_callback (GIOChannel   *channel,
-			   GIOCondition  condition,
+io_watch_closure_callback (xio_channel_t   *channel,
+			   xio_condition_t  condition,
 			   xpointer_t      data)
 {
-  GClosure *closure = data;
+  xclosure_t *closure = data;
 
-  GValue params[2] = { G_VALUE_INIT, G_VALUE_INIT };
-  GValue result_value = G_VALUE_INIT;
+  xvalue_t params[2] = { G_VALUE_INIT, G_VALUE_INIT };
+  xvalue_t result_value = G_VALUE_INIT;
   xboolean_t result;
 
-  g_value_init (&result_value, XTYPE_BOOLEAN);
-  g_value_init (&params[0], XTYPE_IO_CHANNEL);
-  g_value_set_boxed (&params[0], channel);
+  xvalue_init (&result_value, XTYPE_BOOLEAN);
+  xvalue_init (&params[0], XTYPE_IO_CHANNEL);
+  xvalue_set_boxed (&params[0], channel);
 
-  g_value_init (&params[1], XTYPE_IO_CONDITION);
-  g_value_set_flags (&params[1], condition);
+  xvalue_init (&params[1], XTYPE_IO_CONDITION);
+  xvalue_set_flags (&params[1], condition);
 
-  g_closure_invoke (closure, &result_value, 2, params, NULL);
+  xclosure_invoke (closure, &result_value, 2, params, NULL);
 
-  result = g_value_get_boolean (&result_value);
-  g_value_unset (&result_value);
-  g_value_unset (&params[0]);
-  g_value_unset (&params[1]);
+  result = xvalue_get_boolean (&result_value);
+  xvalue_unset (&result_value);
+  xvalue_unset (&params[0]);
+  xvalue_unset (&params[1]);
 
   return result;
 }
 
 static xboolean_t
-g_child_watch_closure_callback (GPid     pid,
+g_child_watch_closure_callback (xpid_t     pid,
                                 xint_t     status,
                                 xpointer_t data)
 {
-  GClosure *closure = data;
+  xclosure_t *closure = data;
 
-  GValue params[2] = { G_VALUE_INIT, G_VALUE_INIT };
-  GValue result_value = G_VALUE_INIT;
+  xvalue_t params[2] = { G_VALUE_INIT, G_VALUE_INIT };
+  xvalue_t result_value = G_VALUE_INIT;
   xboolean_t result;
 
-  g_value_init (&result_value, XTYPE_BOOLEAN);
+  xvalue_init (&result_value, XTYPE_BOOLEAN);
 
 #ifdef G_OS_UNIX
-  g_value_init (&params[0], XTYPE_ULONG);
-  g_value_set_ulong (&params[0], pid);
+  xvalue_init (&params[0], XTYPE_ULONG);
+  xvalue_set_ulong (&params[0], pid);
 #endif
 #ifdef G_OS_WIN32
-  g_value_init (&params[0], XTYPE_POINTER);
-  g_value_set_pointer (&params[0], pid);
+  xvalue_init (&params[0], XTYPE_POINTER);
+  xvalue_set_pointer (&params[0], pid);
 #endif
 
-  g_value_init (&params[1], XTYPE_INT);
-  g_value_set_int (&params[1], status);
+  xvalue_init (&params[1], XTYPE_INT);
+  xvalue_set_int (&params[1], status);
 
-  g_closure_invoke (closure, &result_value, 2, params, NULL);
+  xclosure_invoke (closure, &result_value, 2, params, NULL);
 
-  result = g_value_get_boolean (&result_value);
-  g_value_unset (&result_value);
-  g_value_unset (&params[0]);
-  g_value_unset (&params[1]);
+  result = xvalue_get_boolean (&result_value);
+  xvalue_unset (&result_value);
+  xvalue_unset (&params[0]);
+  xvalue_unset (&params[1]);
 
   return result;
 }
@@ -142,29 +142,29 @@ g_child_watch_closure_callback (GPid     pid,
 #ifdef G_OS_UNIX
 static xboolean_t
 g_unix_fd_source_closure_callback (int           fd,
-                                   GIOCondition  condition,
+                                   xio_condition_t  condition,
                                    xpointer_t      data)
 {
-  GClosure *closure = data;
+  xclosure_t *closure = data;
 
-  GValue params[2] = { G_VALUE_INIT, G_VALUE_INIT };
-  GValue result_value = G_VALUE_INIT;
+  xvalue_t params[2] = { G_VALUE_INIT, G_VALUE_INIT };
+  xvalue_t result_value = G_VALUE_INIT;
   xboolean_t result;
 
-  g_value_init (&result_value, XTYPE_BOOLEAN);
+  xvalue_init (&result_value, XTYPE_BOOLEAN);
 
-  g_value_init (&params[0], XTYPE_INT);
-  g_value_set_int (&params[0], fd);
+  xvalue_init (&params[0], XTYPE_INT);
+  xvalue_set_int (&params[0], fd);
 
-  g_value_init (&params[1], XTYPE_IO_CONDITION);
-  g_value_set_flags (&params[1], condition);
+  xvalue_init (&params[1], XTYPE_IO_CONDITION);
+  xvalue_set_flags (&params[1], condition);
 
-  g_closure_invoke (closure, &result_value, 2, params, NULL);
+  xclosure_invoke (closure, &result_value, 2, params, NULL);
 
-  result = g_value_get_boolean (&result_value);
-  g_value_unset (&result_value);
-  g_value_unset (&params[0]);
-  g_value_unset (&params[1]);
+  result = xvalue_get_boolean (&result_value);
+  xvalue_unset (&result_value);
+  xvalue_unset (&params[0]);
+  xvalue_unset (&params[1]);
 
   return result;
 }
@@ -173,37 +173,37 @@ g_unix_fd_source_closure_callback (int           fd,
 static xboolean_t
 source_closure_callback (xpointer_t data)
 {
-  GClosure *closure = data;
-  GValue result_value = G_VALUE_INIT;
+  xclosure_t *closure = data;
+  xvalue_t result_value = G_VALUE_INIT;
   xboolean_t result;
 
-  g_value_init (&result_value, XTYPE_BOOLEAN);
+  xvalue_init (&result_value, XTYPE_BOOLEAN);
 
-  g_closure_invoke (closure, &result_value, 0, NULL, NULL);
+  xclosure_invoke (closure, &result_value, 0, NULL, NULL);
 
-  result = g_value_get_boolean (&result_value);
-  g_value_unset (&result_value);
+  result = xvalue_get_boolean (&result_value);
+  xvalue_unset (&result_value);
 
   return result;
 }
 
 static void
 closure_callback_get (xpointer_t     cb_data,
-		      GSource     *source,
-		      GSourceFunc *func,
+		      xsource_t     *source,
+		      xsource_func_t *func,
 		      xpointer_t    *data)
 {
-  GSourceFunc closure_callback = source->source_funcs->closure_callback;
+  xsource_func_t closure_callback = source->source_funcs->closure_callback;
 
   if (!closure_callback)
     {
       if (source->source_funcs == &g_io_watch_funcs)
-        closure_callback = (GSourceFunc)io_watch_closure_callback;
+        closure_callback = (xsource_func_t)io_watch_closure_callback;
       else if (source->source_funcs == &g_child_watch_funcs)
-        closure_callback = (GSourceFunc)g_child_watch_closure_callback;
+        closure_callback = (xsource_func_t)g_child_watch_closure_callback;
 #ifdef G_OS_UNIX
       else if (source->source_funcs == &g_unix_fd_source_funcs)
-        closure_callback = (GSourceFunc)g_unix_fd_source_closure_callback;
+        closure_callback = (xsource_func_t)g_unix_fd_source_closure_callback;
 #endif
       else if (source->source_funcs == &g_timeout_funcs ||
 #ifdef G_OS_UNIX
@@ -217,33 +217,33 @@ closure_callback_get (xpointer_t     cb_data,
   *data = cb_data;
 }
 
-static GSourceCallbackFuncs closure_callback_funcs = {
-  (void (*) (xpointer_t)) g_closure_ref,
-  (void (*) (xpointer_t)) g_closure_unref,
+static xsource_callback_funcs_t closure_callback_funcs = {
+  (void (*) (xpointer_t)) xclosure_ref,
+  (void (*) (xpointer_t)) xclosure_unref,
   closure_callback_get
 };
 
 static void
 closure_invalidated (xpointer_t  user_data,
-                     GClosure *closure)
+                     xclosure_t *closure)
 {
-  g_source_destroy (user_data);
+  xsource_destroy (user_data);
 }
 
 /**
- * g_source_set_closure:
+ * xsource_set_closure:
  * @source: the source
- * @closure: a #GClosure
+ * @closure: a #xclosure_t
  *
- * Set the callback for a source as a #GClosure.
+ * Set the callback for a source as a #xclosure_t.
  *
  * If the source is not one of the standard GLib types, the @closure_callback
- * and @closure_marshal fields of the #GSourceFuncs structure must have been
+ * and @closure_marshal fields of the #xsource_funcs_t structure must have been
  * filled in with pointers to appropriate functions.
  */
 void
-g_source_set_closure (GSource  *source,
-		      GClosure *closure)
+xsource_set_closure (xsource_t  *source,
+		      xclosure_t *closure)
 {
   g_return_if_fail (source != NULL);
   g_return_if_fail (closure != NULL);
@@ -258,65 +258,65 @@ g_source_set_closure (GSource  *source,
       source->source_funcs != &g_timeout_funcs &&
       source->source_funcs != &g_idle_funcs)
     {
-      g_critical (G_STRLOC ": closure cannot be set on GSource without GSourceFuncs::closure_callback");
+      g_critical (G_STRLOC ": closure cannot be set on xsource_t without xsource_funcs_t::closure_callback");
       return;
     }
 
-  g_closure_ref (closure);
-  g_closure_sink (closure);
-  g_source_set_callback_indirect (source, closure, &closure_callback_funcs);
+  xclosure_ref (closure);
+  xclosure_sink (closure);
+  xsource_set_callback_indirect (source, closure, &closure_callback_funcs);
 
-  g_closure_add_invalidate_notifier (closure, source, closure_invalidated);
+  xclosure_add_invalidate_notifier (closure, source, closure_invalidated);
 
   if (G_CLOSURE_NEEDS_MARSHAL (closure))
     {
       GClosureMarshal marshal = (GClosureMarshal)source->source_funcs->closure_marshal;
       if (marshal)
-	g_closure_set_marshal (closure, marshal);
+	xclosure_set_marshal (closure, marshal);
       else if (source->source_funcs == &g_idle_funcs ||
 #ifdef G_OS_UNIX
                source->source_funcs == &g_unix_signal_funcs ||
 #endif
                source->source_funcs == &g_timeout_funcs)
-	g_closure_set_marshal (closure, source_closure_marshal_BOOLEAN__VOID);
+	xclosure_set_marshal (closure, source_closure_marshal_BOOLEAN__VOID);
       else
-        g_closure_set_marshal (closure, g_cclosure_marshal_generic);
+        xclosure_set_marshal (closure, g_cclosure_marshal_generic);
     }
 }
 
 static void
-dummy_closure_marshal (GClosure     *closure,
-		       GValue       *return_value,
+dummy_closure_marshal (xclosure_t     *closure,
+		       xvalue_t       *return_value,
 		       xuint_t         n_param_values,
-		       const GValue *param_values,
+		       const xvalue_t *param_values,
 		       xpointer_t      invocation_hint,
 		       xpointer_t      marshal_data)
 {
   if (G_VALUE_HOLDS_BOOLEAN (return_value))
-    g_value_set_boolean (return_value, TRUE);
+    xvalue_set_boolean (return_value, TRUE);
 }
 
 /**
- * g_source_set_dummy_callback:
+ * xsource_set_dummy_callback:
  * @source: the source
  *
  * Sets a dummy callback for @source. The callback will do nothing, and
  * if the source expects a #xboolean_t return value, it will return %TRUE.
  * (If the source expects any other type of return value, it will return
- * a 0/%NULL value; whatever g_value_init() initializes a #GValue to for
+ * a 0/%NULL value; whatever xvalue_init() initializes a #xvalue_t to for
  * that type.)
  *
  * If the source is not one of the standard GLib types, the
- * @closure_callback and @closure_marshal fields of the #GSourceFuncs
+ * @closure_callback and @closure_marshal fields of the #xsource_funcs_t
  * structure must have been filled in with pointers to appropriate
  * functions.
  */
 void
-g_source_set_dummy_callback (GSource *source)
+xsource_set_dummy_callback (xsource_t *source)
 {
-  GClosure *closure;
+  xclosure_t *closure;
 
-  closure = g_closure_new_simple (sizeof (GClosure), NULL);
-  g_closure_set_meta_marshal (closure, NULL, dummy_closure_marshal);
-  g_source_set_closure (source, closure);
+  closure = xclosure_new_simple (sizeof (xclosure_t), NULL);
+  xclosure_set_meta_marshal (closure, NULL, dummy_closure_marshal);
+  xsource_set_closure (source, closure);
 }

@@ -32,23 +32,23 @@ xtype_t g_srv_target_get_type (void) G_GNUC_CONST;
 #define XTYPE_SRV_TARGET (g_srv_target_get_type ())
 
 XPL_AVAILABLE_IN_ALL
-GSrvTarget  *g_srv_target_new          (const xchar_t *hostname,
-				        guint16      port,
-				        guint16      priority,
-				        guint16      weight);
+xsrv_target_t  *g_srv_target_new          (const xchar_t *hostname,
+				        xuint16_t      port,
+				        xuint16_t      priority,
+				        xuint16_t      weight);
 XPL_AVAILABLE_IN_ALL
-GSrvTarget  *g_srv_target_copy         (GSrvTarget  *target);
+xsrv_target_t  *g_srv_target_copy         (xsrv_target_t  *target);
 XPL_AVAILABLE_IN_ALL
-void         g_srv_target_free         (GSrvTarget  *target);
+void         g_srv_target_free         (xsrv_target_t  *target);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t *g_srv_target_get_hostname (GSrvTarget  *target);
+const xchar_t *g_srv_target_get_hostname (xsrv_target_t  *target);
 XPL_AVAILABLE_IN_ALL
-guint16      g_srv_target_get_port     (GSrvTarget  *target);
+xuint16_t      g_srv_target_get_port     (xsrv_target_t  *target);
 XPL_AVAILABLE_IN_ALL
-guint16      g_srv_target_get_priority (GSrvTarget  *target);
+xuint16_t      g_srv_target_get_priority (xsrv_target_t  *target);
 XPL_AVAILABLE_IN_ALL
-guint16      g_srv_target_get_weight   (GSrvTarget  *target);
+xuint16_t      g_srv_target_get_weight   (xsrv_target_t  *target);
 
 XPL_AVAILABLE_IN_ALL
 xlist_t       *g_srv_target_list_sort    (xlist_t       *targets);

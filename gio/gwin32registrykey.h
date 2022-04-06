@@ -100,7 +100,7 @@ struct _GWin32RegistrySubkeyIter {
   xint_t               counter;
   xint_t               subkey_count;
 
-  gunichar2         *subkey_name;
+  xunichar2_t         *subkey_name;
   xsize_t              subkey_name_size;
   xsize_t              subkey_name_len;
 
@@ -115,15 +115,15 @@ struct _GWin32RegistryValueIter {
   xint_t                     counter;
   xint_t                     value_count;
 
-  gunichar2               *value_name;
+  xunichar2_t               *value_name;
   xsize_t                    value_name_size;
   xsize_t                    value_name_len;
   GWin32RegistryValueType  value_type;
-  guint8                  *value_data;
+  xuint8_t                  *value_data;
   xsize_t                    value_data_size;
   xsize_t                    value_actual_data_size;
   GWin32RegistryValueType  value_expanded_type;
-  gunichar2               *value_data_expanded;
+  xunichar2_t               *value_data_expanded;
   xsize_t                    value_data_expanded_charsize;
 
   xchar_t                   *value_name_u8;
@@ -164,7 +164,7 @@ GWin32RegistryKey *g_win32_registry_key_new                  (const xchar_t     
                                                               xerror_t                        **error);
 
 XPL_AVAILABLE_IN_2_46
-GWin32RegistryKey *g_win32_registry_key_new_w                (const gunichar2                *path,
+GWin32RegistryKey *g_win32_registry_key_new_w                (const xunichar2_t                *path,
                                                               xerror_t                        **error);
 
 XPL_AVAILABLE_IN_2_46
@@ -174,7 +174,7 @@ GWin32RegistryKey *g_win32_registry_key_get_child            (GWin32RegistryKey 
 
 XPL_AVAILABLE_IN_2_46
 GWin32RegistryKey *g_win32_registry_key_get_child_w          (GWin32RegistryKey              *key,
-                                                              const gunichar2                *subkey,
+                                                              const xunichar2_t                *subkey,
                                                               xerror_t                        **error);
 
 XPL_AVAILABLE_IN_2_46
@@ -196,7 +196,7 @@ xboolean_t         g_win32_registry_subkey_iter_get_name       (GWin32RegistrySu
                                                               xerror_t                         **error);
 XPL_AVAILABLE_IN_2_46
 xboolean_t         g_win32_registry_subkey_iter_get_name_w     (GWin32RegistrySubkeyIter        *iter,
-                                                              const gunichar2                **subkey_name,
+                                                              const xunichar2_t                **subkey_name,
                                                               xsize_t                           *subkey_name_len,
                                                               xerror_t                         **error);
 
@@ -223,7 +223,7 @@ xboolean_t         g_win32_registry_value_iter_get_name        (GWin32RegistryVa
                                                               xerror_t                         **error);
 XPL_AVAILABLE_IN_2_46
 xboolean_t         g_win32_registry_value_iter_get_name_w      (GWin32RegistryValueIter         *iter,
-                                                              gunichar2                      **value_name,
+                                                              xunichar2_t                      **value_name,
                                                               xsize_t                           *value_name_len,
                                                               xerror_t                         **error);
 XPL_AVAILABLE_IN_2_46
@@ -251,9 +251,9 @@ xboolean_t         g_win32_registry_key_get_value              (GWin32RegistryKe
 
 XPL_AVAILABLE_IN_2_66
 xboolean_t         g_win32_registry_key_get_value_w            (GWin32RegistryKey               *key,
-                                                              const gunichar2 * const         *mui_dll_dirs,
+                                                              const xunichar2_t * const         *mui_dll_dirs,
                                                               xboolean_t                         auto_expand,
-                                                              const gunichar2                 *value_name,
+                                                              const xunichar2_t                 *value_name,
                                                               GWin32RegistryValueType         *value_type,
                                                               xpointer_t                        *value_data,
                                                               xsize_t                           *value_data_size,
@@ -263,7 +263,7 @@ XPL_AVAILABLE_IN_2_46
 const xchar_t     *g_win32_registry_key_get_path               (GWin32RegistryKey               *key);
 
 XPL_AVAILABLE_IN_2_46
-const gunichar2 *g_win32_registry_key_get_path_w             (GWin32RegistryKey               *key);
+const xunichar2_t *g_win32_registry_key_get_path_w             (GWin32RegistryKey               *key);
 
 XPL_AVAILABLE_IN_2_46
 xboolean_t         g_win32_registry_key_watch                  (GWin32RegistryKey               *key,
@@ -279,7 +279,7 @@ XPL_AVAILABLE_IN_2_46
 void             g_win32_registry_key_erase_change_indicator (GWin32RegistryKey               *key);
 
 XPL_AVAILABLE_IN_2_66
-const gunichar2 * const *g_win32_registry_get_os_dirs_w (void);
+const xunichar2_t * const *g_win32_registry_get_os_dirs_w (void);
 
 XPL_AVAILABLE_IN_2_66
 const xchar_t * const     *g_win32_registry_get_os_dirs   (void);

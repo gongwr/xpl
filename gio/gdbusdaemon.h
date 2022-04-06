@@ -10,7 +10,7 @@
 typedef struct _GDBusDaemon GDBusDaemon;
 typedef struct _GDBusDaemonClass GDBusDaemonClass;
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GDBusDaemon, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GDBusDaemon, xobject_unref)
 
 xtype_t _g_dbus_daemon_get_type (void) G_GNUC_CONST;
 

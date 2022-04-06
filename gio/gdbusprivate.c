@@ -70,33 +70,33 @@ xchar_t *
 _g_dbus_hexdump (const xchar_t *data, xsize_t len, xuint_t indent)
 {
  xuint_t n, m;
- GString *ret;
+ xstring_t *ret;
 
- ret = g_string_new (NULL);
+ ret = xstring_new (NULL);
 
  for (n = 0; n < len; n += 16)
    {
-     g_string_append_printf (ret, "%*s%04x: ", indent, "", n);
+     xstring_append_printf (ret, "%*s%04x: ", indent, "", n);
 
      for (m = n; m < n + 16; m++)
        {
          if (m > n && (m%4) == 0)
-           g_string_append_c (ret, ' ');
+           xstring_append_c (ret, ' ');
          if (m < len)
-           g_string_append_printf (ret, "%02x ", (guchar) data[m]);
+           xstring_append_printf (ret, "%02x ", (guchar) data[m]);
          else
-           g_string_append (ret, "   ");
+           xstring_append (ret, "   ");
        }
 
-     g_string_append (ret, "   ");
+     xstring_append (ret, "   ");
 
      for (m = n; m < len && m < n + 16; m++)
-       g_string_append_c (ret, g_ascii_isprint (data[m]) ? data[m] : '.');
+       xstring_append_c (ret, g_ascii_isprint (data[m]) ? data[m] : '.');
 
-     g_string_append_c (ret, '\n');
+     xstring_append_c (ret, '\n');
    }
 
- return g_string_free (ret, FALSE);
+ return xstring_free (ret, FALSE);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -112,7 +112,7 @@ typedef struct
   void *buffer;
   xsize_t count;
 
-  GSocketControlMessage ***messages;
+  xsocket_control_message_t ***messages;
   xint_t *num_messages;
 } ReadWithControlData;
 
@@ -124,14 +124,14 @@ read_with_control_data_free (ReadWithControlData *data)
 
 static xboolean_t
 _xsocket_read_with_control_messages_ready (xsocket_t      *socket,
-                                            GIOCondition  condition,
+                                            xio_condition_t  condition,
                                             xpointer_t      user_data)
 {
-  GTask *task = user_data;
-  ReadWithControlData *data = g_task_get_task_data (task);
+  xtask_t *task = user_data;
+  ReadWithControlData *data = xtask_get_task_data (task);
   xerror_t *error;
-  gssize result;
-  GInputVector vector;
+  xssize_t result;
+  xinput_vector_t vector;
 
   error = NULL;
   vector.buffer = data->buffer;
@@ -143,21 +143,21 @@ _xsocket_read_with_control_messages_ready (xsocket_t      *socket,
                                      data->messages,
                                      data->num_messages,
                                      NULL,
-                                     g_task_get_cancellable (task),
+                                     xtask_get_cancellable (task),
                                      &error);
 
-  if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
+  if (xerror_matches (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
     {
-      g_error_free (error);
+      xerror_free (error);
       return TRUE;
     }
 
   g_assert (result >= 0 || error != NULL);
   if (result >= 0)
-    g_task_return_int (task, result);
+    xtask_return_int (task, result);
   else
-    g_task_return_error (task, error);
-  g_object_unref (task);
+    xtask_return_error (task, error);
+  xobject_unref (task);
 
   return FALSE;
 }
@@ -166,16 +166,16 @@ static void
 _xsocket_read_with_control_messages (xsocket_t                 *socket,
                                       void                    *buffer,
                                       xsize_t                    count,
-                                      GSocketControlMessage ***messages,
+                                      xsocket_control_message_t ***messages,
                                       xint_t                    *num_messages,
                                       xint_t                     io_priority,
                                       xcancellable_t            *cancellable,
                                       xasync_ready_callback_t      callback,
                                       xpointer_t                 user_data)
 {
-  GTask *task;
+  xtask_t *task;
   ReadWithControlData *data;
-  GSource *source;
+  xsource_t *source;
 
   data = g_slice_new0 (ReadWithControlData);
   data->buffer = buffer;
@@ -183,10 +183,10 @@ _xsocket_read_with_control_messages (xsocket_t                 *socket,
   data->messages = messages;
   data->num_messages = num_messages;
 
-  task = g_task_new (socket, cancellable, callback, user_data);
-  g_task_set_source_tag (task, _xsocket_read_with_control_messages);
-  g_task_set_name (task, "[gio] D-Bus read");
-  g_task_set_task_data (task, data, (GDestroyNotify) read_with_control_data_free);
+  task = xtask_new (socket, cancellable, callback, user_data);
+  xtask_set_source_tag (task, _xsocket_read_with_control_messages);
+  xtask_set_name (task, "[gio] D-Bus read");
+  xtask_set_task_data (task, data, (xdestroy_notify_t) read_with_control_data_free);
 
   if (xsocket_condition_check (socket, G_IO_IN))
     {
@@ -197,19 +197,19 @@ _xsocket_read_with_control_messages (xsocket_t                 *socket,
   source = xsocket_create_source (socket,
                                    G_IO_IN | G_IO_HUP | G_IO_ERR,
                                    cancellable);
-  g_task_attach_source (task, source, (GSourceFunc) _xsocket_read_with_control_messages_ready);
-  g_source_unref (source);
+  xtask_attach_source (task, source, (xsource_func_t) _xsocket_read_with_control_messages_ready);
+  xsource_unref (source);
 }
 
-static gssize
+static xssize_t
 _xsocket_read_with_control_messages_finish (xsocket_t       *socket,
                                              xasync_result_t  *result,
                                              xerror_t       **error)
 {
   g_return_val_if_fail (X_IS_SOCKET (socket), -1);
-  g_return_val_if_fail (g_task_is_valid (result, socket), -1);
+  g_return_val_if_fail (xtask_is_valid (result, socket), -1);
 
-  return g_task_propagate_int (G_TASK (result), error);
+  return xtask_propagate_int (XTASK (result), error);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -217,19 +217,19 @@ _xsocket_read_with_control_messages_finish (xsocket_t       *socket,
 /* Work-around for https://bugzilla.gnome.org/show_bug.cgi?id=674885
    and see also the original https://bugzilla.gnome.org/show_bug.cgi?id=627724  */
 
-static GPtrArray *ensured_classes = NULL;
+static xptr_array_t *ensured_classes = NULL;
 
 static void
 ensure_type (xtype_t gtype)
 {
-  g_ptr_array_add (ensured_classes, g_type_class_ref (gtype));
+  xptr_array_add (ensured_classes, xtype_class_ref (gtype));
 }
 
 static void
 release_required_types (void)
 {
-  g_ptr_array_foreach (ensured_classes, (GFunc) g_type_class_unref, NULL);
-  g_ptr_array_unref (ensured_classes);
+  xptr_array_foreach (ensured_classes, (GFunc) xtype_class_unref, NULL);
+  xptr_array_unref (ensured_classes);
   ensured_classes = NULL;
 }
 
@@ -237,11 +237,11 @@ static void
 ensure_required_types (void)
 {
   g_assert (ensured_classes == NULL);
-  ensured_classes = g_ptr_array_new ();
+  ensured_classes = xptr_array_new ();
   /* Generally in this list, you should initialize types which are used as
-   * properties first, then the class which has them. For example, GDBusProxy
-   * has a type of GDBusConnection, so we initialize GDBusConnection first.
-   * And because GDBusConnection has a property of type GDBusConnectionFlags,
+   * properties first, then the class which has them. For example, xdbus_proxy_t
+   * has a type of xdbus_connection_t, so we initialize xdbus_connection_t first.
+   * And because xdbus_connection_t has a property of type GDBusConnectionFlags,
    * we initialize that first.
    *
    * Similarly, xsocket_t has a type of xsocket_address_t.
@@ -268,9 +268,9 @@ ensure_required_types (void)
 typedef struct
 {
   xint_t refcount;  /* (atomic) */
-  GThread *thread;
-  GMainContext *context;
-  GMainLoop *loop;
+  xthread_t *thread;
+  xmain_context_t *context;
+  xmain_loop_t *loop;
 } SharedThreadData;
 
 static xpointer_t
@@ -278,9 +278,9 @@ gdbus_shared_thread_func (xpointer_t user_data)
 {
   SharedThreadData *data = user_data;
 
-  g_main_context_push_thread_default (data->context);
-  g_main_loop_run (data->loop);
-  g_main_context_pop_thread_default (data->context);
+  xmain_context_push_thread_default (data->context);
+  xmain_loop_run (data->loop);
+  xmain_context_pop_thread_default (data->context);
 
   release_required_types ();
 
@@ -302,9 +302,9 @@ _g_dbus_shared_thread_ref (void)
       data = g_new0 (SharedThreadData, 1);
       data->refcount = 0;
 
-      data->context = g_main_context_new ();
-      data->loop = g_main_loop_new (data->context, FALSE);
-      data->thread = g_thread_new ("gdbus",
+      data->context = xmain_context_new ();
+      data->loop = xmain_loop_new (data->context, FALSE);
+      data->thread = xthread_new ("gdbus",
                                    gdbus_shared_thread_func,
                                    data);
       /* We can cast between xsize_t and xpointer_t safely */
@@ -324,10 +324,10 @@ _g_dbus_shared_thread_unref (SharedThreadData *data)
   g_assert (data != NULL);
   if (g_atomic_int_dec_and_test (&data->refcount))
     {
-      g_main_loop_quit (data->loop);
-      //g_thread_join (data->thread);
-      g_main_loop_unref (data->loop);
-      g_main_context_unref (data->context);
+      xmain_loop_quit (data->loop);
+      //xthread_join (data->thread);
+      xmain_loop_unref (data->loop);
+      xmain_context_unref (data->context);
     }
 #endif
 }
@@ -351,12 +351,12 @@ struct GDBusWorker
   xint_t                                stopped;  /* (atomic) */
 
   /* TODO: frozen (e.g. G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING) currently
-   * only affects messages received from the other peer (since GDBusServer is the
+   * only affects messages received from the other peer (since xdbus_server_t is the
    * only user) - we might want it to affect messages sent to the other peer too?
    */
   xboolean_t                            frozen;
   GDBusCapabilityFlags                capabilities;
-  GQueue                             *received_messages_while_frozen;
+  xqueue_t                             *received_messages_while_frozen;
 
   xio_stream_t                          *stream;
   xcancellable_t                       *cancellable;
@@ -369,13 +369,13 @@ struct GDBusWorker
   xsocket_t *socket;
 
   /* used for reading */
-  GMutex                              read_lock;
+  xmutex_t                              read_lock;
   xchar_t                              *read_buffer;
   xsize_t                               read_buffer_allocated_size;
   xsize_t                               read_buffer_cur_size;
   xsize_t                               read_buffer_bytes_wanted;
-  GUnixFDList                        *read_fd_list;
-  GSocketControlMessage             **read_ancillary_messages;
+  xunix_fd_list_t                        *read_fd_list;
+  xsocket_control_message_t             **read_ancillary_messages;
   xint_t                                read_num_ancillary_messages;
 
   /* Whether an async write, flush or close, or none of those, is pending.
@@ -385,15 +385,15 @@ struct GDBusWorker
    */
   OutputPending                       output_pending;
   /* used for writing */
-  GMutex                              write_lock;
+  xmutex_t                              write_lock;
   /* queue of MessageToWriteData, protected by write_lock */
-  GQueue                             *write_queue;
+  xqueue_t                             *write_queue;
   /* protected by write_lock */
-  guint64                             write_num_messages_written;
+  xuint64_t                             write_num_messages_written;
   /* number of messages we'd written out last time we flushed;
    * protected by write_lock
    */
-  guint64                             write_num_messages_flushed;
+  xuint64_t                             write_num_messages_flushed;
   /* list of FlushData, protected by write_lock */
   xlist_t                              *write_pending_flushes;
   /* list of CloseData, protected by write_lock */
@@ -408,9 +408,9 @@ static void _g_dbus_worker_unref (GDBusWorker *worker);
 
 typedef struct
 {
-  GMutex  mutex;
-  GCond   cond;
-  guint64 number_to_wait_for;
+  xmutex_t  mutex;
+  xcond_t   cond;
+  xuint64_t number_to_wait_for;
   xboolean_t finished;
   xerror_t *error;
 } FlushData;
@@ -420,15 +420,15 @@ typedef struct _MessageToWriteData MessageToWriteData;
 
 static void message_to_write_data_free (MessageToWriteData *data);
 
-static void read_message_print_transport_debug (gssize bytes_read,
+static void read_message_print_transport_debug (xssize_t bytes_read,
                                                 GDBusWorker *worker);
 
-static void write_message_print_transport_debug (gssize bytes_written,
+static void write_message_print_transport_debug (xssize_t bytes_written,
                                                  MessageToWriteData *data);
 
 typedef struct {
     GDBusWorker *worker;
-    GTask *task;
+    xtask_t *task;
 } CloseData;
 
 static void close_data_free (CloseData *close_data)
@@ -457,16 +457,16 @@ _g_dbus_worker_unref (GDBusWorker *worker)
 
       _g_dbus_shared_thread_unref (worker->shared_thread_data);
 
-      g_object_unref (worker->stream);
+      xobject_unref (worker->stream);
 
       g_mutex_clear (&worker->read_lock);
-      g_object_unref (worker->cancellable);
+      xobject_unref (worker->cancellable);
       if (worker->read_fd_list != NULL)
-        g_object_unref (worker->read_fd_list);
+        xobject_unref (worker->read_fd_list);
 
-      g_queue_free_full (worker->received_messages_while_frozen, (GDestroyNotify) g_object_unref);
+      g_queue_free_full (worker->received_messages_while_frozen, (xdestroy_notify_t) xobject_unref);
       g_mutex_clear (&worker->write_lock);
-      g_queue_free_full (worker->write_queue, (GDestroyNotify) message_to_write_data_free);
+      g_queue_free_full (worker->write_queue, (xdestroy_notify_t) message_to_write_data_free);
       g_free (worker->read_buffer);
 
       g_free (worker);
@@ -484,17 +484,17 @@ _g_dbus_worker_emit_disconnected (GDBusWorker  *worker,
 
 static void
 _g_dbus_worker_emit_message_received (GDBusWorker  *worker,
-                                      GDBusMessage *message)
+                                      xdbus_message_t *message)
 {
   if (!g_atomic_int_get (&worker->stopped))
     worker->message_received_callback (worker, message, worker->user_data);
 }
 
-static GDBusMessage *
+static xdbus_message_t *
 _g_dbus_worker_emit_message_about_to_be_sent (GDBusWorker  *worker,
-                                              GDBusMessage *message)
+                                              xdbus_message_t *message)
 {
-  GDBusMessage *ret;
+  xdbus_message_t *ret;
   if (!g_atomic_int_get (&worker->stopped))
     ret = worker->message_about_to_be_sent_callback (worker, g_steal_pointer (&message), worker->user_data);
   else
@@ -505,7 +505,7 @@ _g_dbus_worker_emit_message_about_to_be_sent (GDBusWorker  *worker,
 /* can only be called from private thread with read-lock held - takes ownership of @message */
 static void
 _g_dbus_worker_queue_or_deliver_received_message (GDBusWorker  *worker,
-                                                  GDBusMessage *message)
+                                                  xdbus_message_t *message)
 {
   if (worker->frozen || g_queue_get_length (worker->received_messages_while_frozen) > 0)
     {
@@ -520,12 +520,12 @@ _g_dbus_worker_queue_or_deliver_received_message (GDBusWorker  *worker,
     }
 }
 
-/* called in private thread shared by all GDBusConnection instances (without read-lock held) */
+/* called in private thread shared by all xdbus_connection_t instances (without read-lock held) */
 static xboolean_t
 unfreeze_in_idle_cb (xpointer_t user_data)
 {
   GDBusWorker *worker = user_data;
-  GDBusMessage *message;
+  xdbus_message_t *message;
 
   g_mutex_lock (&worker->read_lock);
   if (worker->frozen)
@@ -549,23 +549,23 @@ unfreeze_in_idle_cb (xpointer_t user_data)
 void
 _g_dbus_worker_unfreeze (GDBusWorker *worker)
 {
-  GSource *idle_source;
+  xsource_t *idle_source;
   idle_source = g_idle_source_new ();
-  g_source_set_priority (idle_source, G_PRIORITY_DEFAULT);
-  g_source_set_callback (idle_source,
+  xsource_set_priority (idle_source, G_PRIORITY_DEFAULT);
+  xsource_set_callback (idle_source,
                          unfreeze_in_idle_cb,
                          _g_dbus_worker_ref (worker),
-                         (GDestroyNotify) _g_dbus_worker_unref);
-  g_source_set_static_name (idle_source, "[gio] unfreeze_in_idle_cb");
-  g_source_attach (idle_source, worker->shared_thread_data->context);
-  g_source_unref (idle_source);
+                         (xdestroy_notify_t) _g_dbus_worker_unref);
+  xsource_set_static_name (idle_source, "[gio] unfreeze_in_idle_cb");
+  xsource_attach (idle_source, worker->shared_thread_data->context);
+  xsource_unref (idle_source);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void _g_dbus_worker_do_read_unlocked (GDBusWorker *worker);
 
-/* called in private thread shared by all GDBusConnection instances (without read-lock held) */
+/* called in private thread shared by all xdbus_connection_t instances (without read-lock held) */
 static void
 _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
                            xasync_result_t  *res,
@@ -573,7 +573,7 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
 {
   GDBusWorker *worker = user_data;
   xerror_t *error;
-  gssize bytes_read;
+  xssize_t bytes_read;
 
   g_mutex_lock (&worker->read_lock);
 
@@ -583,7 +583,7 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
 
   error = NULL;
   if (worker->socket == NULL)
-    bytes_read = g_input_stream_read_finish (g_io_stream_get_input_stream (worker->stream),
+    bytes_read = xinput_stream_read_finish (g_io_stream_get_input_stream (worker->stream),
                                              res,
                                              &error);
   else
@@ -595,7 +595,7 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
       xint_t n;
       for (n = 0; n < worker->read_num_ancillary_messages; n++)
         {
-          GSocketControlMessage *control_message = XSOCKET_CONTROL_MESSAGE (worker->read_ancillary_messages[n]);
+          xsocket_control_message_t *control_message = XSOCKET_CONTROL_MESSAGE (worker->read_ancillary_messages[n]);
 
           if (FALSE)
             {
@@ -638,18 +638,18 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
                                G_IO_ERROR,
                                G_IO_ERROR_FAILED,
                                "Unexpected ancillary message of type %s received from peer",
-                               g_type_name (XTYPE_FROM_INSTANCE (control_message)));
+                               xtype_name (XTYPE_FROM_INSTANCE (control_message)));
                   _g_dbus_worker_emit_disconnected (worker, TRUE, error);
-                  g_error_free (error);
-                  g_object_unref (control_message);
+                  xerror_free (error);
+                  xobject_unref (control_message);
                   n++;
                   while (n < worker->read_num_ancillary_messages)
-                    g_object_unref (worker->read_ancillary_messages[n++]);
+                    xobject_unref (worker->read_ancillary_messages[n++]);
                   g_free (worker->read_ancillary_messages);
                   goto out;
                 }
             }
-          g_object_unref (control_message);
+          xobject_unref (control_message);
         }
       g_free (worker->read_ancillary_messages);
     }
@@ -663,7 +663,7 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
                    "GDBus-debug:Transport:\n"
                    "  ---- READ ERROR on stream of type %s:\n"
                    "  ---- %s %d: %s\n",
-                   g_type_name (XTYPE_FROM_INSTANCE (g_io_stream_get_input_stream (worker->stream))),
+                   xtype_name (XTYPE_FROM_INSTANCE (g_io_stream_get_input_stream (worker->stream))),
                    g_quark_to_string (error->domain), error->code,
                    error->message);
           _g_dbus_debug_print_unlock ();
@@ -671,7 +671,7 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
 
       /* Every async read that uses this callback uses worker->cancellable
        * as its xcancellable_t. worker->cancellable gets cancelled if and only
-       * if the GDBusConnection tells us to close (either via
+       * if the xdbus_connection_t tells us to close (either via
        * _g_dbus_worker_stop, which is called on last-unref, or directly),
        * so a cancelled read must mean our connection was closed locally.
        *
@@ -685,12 +685,12 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
        * thread), we do still need to check the error.
        */
       if (worker->close_expected ||
-          g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+          xerror_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         _g_dbus_worker_emit_disconnected (worker, FALSE, NULL);
       else
         _g_dbus_worker_emit_disconnected (worker, TRUE, error);
 
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
 
@@ -713,7 +713,7 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
                    G_IO_ERROR_FAILED,
                    "Underlying xio_stream_t returned 0 bytes on an async read");
       _g_dbus_worker_emit_disconnected (worker, TRUE, error);
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
 
@@ -725,17 +725,17 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
       /* OK, got what we asked for! */
       if (worker->read_buffer_bytes_wanted == 16)
         {
-          gssize message_len;
+          xssize_t message_len;
           /* OK, got the header - determine how many more bytes are needed */
           error = NULL;
-          message_len = g_dbus_message_bytes_needed ((guchar *) worker->read_buffer,
+          message_len = xdbus_message_bytes_needed ((guchar *) worker->read_buffer,
                                                      16,
                                                      &error);
           if (message_len == -1)
             {
               g_warning ("_g_dbus_worker_do_read_cb: error determining bytes needed: %s", error->message);
               _g_dbus_worker_emit_disconnected (worker, FALSE, error);
-              g_error_free (error);
+              xerror_free (error);
               goto out;
             }
 
@@ -744,12 +744,12 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
         }
       else
         {
-          GDBusMessage *message;
+          xdbus_message_t *message;
           error = NULL;
 
           /* TODO: use connection->priv->auth to decode the message */
 
-          message = g_dbus_message_new_from_blob ((guchar *) worker->read_buffer,
+          message = xdbus_message_new_from_blob ((guchar *) worker->read_buffer,
                                                   worker->read_buffer_cur_size,
                                                   worker->capabilities,
                                                   &error);
@@ -766,15 +766,15 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
                          s);
               g_free (s);
               _g_dbus_worker_emit_disconnected (worker, FALSE, error);
-              g_error_free (error);
+              xerror_free (error);
               goto out;
             }
 
 #ifdef G_OS_UNIX
           if (worker->read_fd_list != NULL)
             {
-              g_dbus_message_set_unix_fd_list (message, worker->read_fd_list);
-              g_object_unref (worker->read_fd_list);
+              xdbus_message_set_unix_fd_list (message, worker->read_fd_list);
+              xobject_unref (worker->read_fd_list);
               worker->read_fd_list = NULL;
             }
 #endif
@@ -787,7 +787,7 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
                        "GDBus-debug:Message:\n"
                        "  <<<< RECEIVED D-Bus message (%" G_GSIZE_FORMAT " bytes)\n",
                        worker->read_buffer_cur_size);
-              s = g_dbus_message_print (message, 2);
+              s = xdbus_message_print (message, 2);
               g_print ("%s", s);
               g_free (s);
               if (G_UNLIKELY (_g_dbus_debug_payload ()))
@@ -820,11 +820,11 @@ _g_dbus_worker_do_read_cb (xinput_stream_t  *input_stream,
   /* check if there is any pending close */
   schedule_pending_close (worker);
 
-  /* gives up the reference acquired when calling g_input_stream_read_async() */
+  /* gives up the reference acquired when calling xinput_stream_read_async() */
   _g_dbus_worker_unref (worker);
 }
 
-/* called in private thread shared by all GDBusConnection instances (with read-lock held) */
+/* called in private thread shared by all xdbus_connection_t instances (with read-lock held) */
 static void
 _g_dbus_worker_do_read_unlocked (GDBusWorker *worker)
 {
@@ -848,7 +848,7 @@ _g_dbus_worker_do_read_unlocked (GDBusWorker *worker)
     }
 
   if (worker->socket == NULL)
-    g_input_stream_read_async (g_io_stream_get_input_stream (worker->stream),
+    xinput_stream_read_async (g_io_stream_get_input_stream (worker->stream),
                                worker->read_buffer + worker->read_buffer_cur_size,
                                worker->read_buffer_bytes_wanted - worker->read_buffer_cur_size,
                                G_PRIORITY_DEFAULT,
@@ -871,7 +871,7 @@ _g_dbus_worker_do_read_unlocked (GDBusWorker *worker)
     }
 }
 
-/* called in private thread shared by all GDBusConnection instances (without read-lock held) */
+/* called in private thread shared by all xdbus_connection_t instances (without read-lock held) */
 static xboolean_t
 _g_dbus_worker_do_initial_read (xpointer_t data)
 {
@@ -887,12 +887,12 @@ _g_dbus_worker_do_initial_read (xpointer_t data)
 struct _MessageToWriteData
 {
   GDBusWorker  *worker;
-  GDBusMessage *message;
+  xdbus_message_t *message;
   xchar_t        *blob;
   xsize_t         blob_size;
 
   xsize_t         total_written;
-  GTask        *task;
+  xtask_t        *task;
 };
 
 static void
@@ -900,7 +900,7 @@ message_to_write_data_free (MessageToWriteData *data)
 {
   _g_dbus_worker_unref (data->worker);
   if (data->message)
-    g_object_unref (data->message);
+    xobject_unref (data->message);
   g_free (data->blob);
   g_slice_free (MessageToWriteData, data);
 }
@@ -909,7 +909,7 @@ message_to_write_data_free (MessageToWriteData *data)
 
 static void write_message_continue_writing (MessageToWriteData *data);
 
-/* called in private thread shared by all GDBusConnection instances
+/* called in private thread shared by all xdbus_connection_t instances
  *
  * write-lock is not held on entry
  * output_pending is PENDING_WRITE on entry
@@ -920,23 +920,23 @@ write_message_async_cb (xobject_t      *source_object,
                         xpointer_t      user_data)
 {
   MessageToWriteData *data = user_data;
-  GTask *task;
-  gssize bytes_written;
+  xtask_t *task;
+  xssize_t bytes_written;
   xerror_t *error;
 
-  /* Note: we can't access data->task after calling g_task_return_* () because the
+  /* Note: we can't access data->task after calling xtask_return_* () because the
    * callback can free @data and we're not completing in idle. So use a copy of the pointer.
    */
   task = data->task;
 
   error = NULL;
-  bytes_written = g_output_stream_write_finish (G_OUTPUT_STREAM (source_object),
+  bytes_written = xoutput_stream_write_finish (G_OUTPUT_STREAM (source_object),
                                                 res,
                                                 &error);
   if (bytes_written == -1)
     {
-      g_task_return_error (task, error);
-      g_object_unref (task);
+      xtask_return_error (task, error);
+      xobject_unref (task);
       goto out;
     }
   g_assert (bytes_written > 0); /* zero is never returned */
@@ -947,8 +947,8 @@ write_message_async_cb (xobject_t      *source_object,
   g_assert (data->total_written <= data->blob_size);
   if (data->total_written == data->blob_size)
     {
-      g_task_return_boolean (task, TRUE);
-      g_object_unref (task);
+      xtask_return_boolean (task, TRUE);
+      xobject_unref (task);
       goto out;
     }
 
@@ -958,7 +958,7 @@ write_message_async_cb (xobject_t      *source_object,
   ;
 }
 
-/* called in private thread shared by all GDBusConnection instances
+/* called in private thread shared by all xdbus_connection_t instances
  *
  * write-lock is not held on entry
  * output_pending is PENDING_WRITE on entry
@@ -966,7 +966,7 @@ write_message_async_cb (xobject_t      *source_object,
 #ifdef G_OS_UNIX
 static xboolean_t
 on_socket_ready (xsocket_t      *socket,
-                 GIOCondition  condition,
+                 xio_condition_t  condition,
                  xpointer_t      user_data)
 {
   MessageToWriteData *data = user_data;
@@ -975,7 +975,7 @@ on_socket_ready (xsocket_t      *socket,
 }
 #endif
 
-/* called in private thread shared by all GDBusConnection instances
+/* called in private thread shared by all xdbus_connection_t instances
  *
  * write-lock is not held on entry
  * output_pending is PENDING_WRITE on entry
@@ -985,12 +985,12 @@ write_message_continue_writing (MessageToWriteData *data)
 {
   xoutput_stream_t *ostream;
 #ifdef G_OS_UNIX
-  GTask *task;
-  GUnixFDList *fd_list;
+  xtask_t *task;
+  xunix_fd_list_t *fd_list;
 #endif
 
 #ifdef G_OS_UNIX
-  /* Note: we can't access data->task after calling g_task_return_* () because the
+  /* Note: we can't access data->task after calling xtask_return_* () because the
    * callback can free @data and we're not completing in idle. So use a copy of the pointer.
    */
   task = data->task;
@@ -998,10 +998,10 @@ write_message_continue_writing (MessageToWriteData *data)
 
   ostream = g_io_stream_get_output_stream (data->worker->stream);
 #ifdef G_OS_UNIX
-  fd_list = g_dbus_message_get_unix_fd_list (data->message);
+  fd_list = xdbus_message_get_unix_fd_list (data->message);
 #endif
 
-  g_assert (!g_output_stream_has_pending (ostream));
+  g_assert (!xoutput_stream_has_pending (ostream));
   g_assert_cmpint (data->total_written, <, data->blob_size);
 
   if (FALSE)
@@ -1010,9 +1010,9 @@ write_message_continue_writing (MessageToWriteData *data)
 #ifdef G_OS_UNIX
   else if (X_IS_SOCKET_OUTPUT_STREAM (ostream) && data->total_written == 0)
     {
-      GOutputVector vector;
-      GSocketControlMessage *control_message;
-      gssize bytes_written;
+      xoutput_vector_t vector;
+      xsocket_control_message_t *control_message;
+      xssize_t bytes_written;
       xerror_t *error;
 
       vector.buffer = data->blob;
@@ -1023,11 +1023,11 @@ write_message_continue_writing (MessageToWriteData *data)
         {
           if (!(data->worker->capabilities & G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING))
             {
-              g_task_return_new_error (task,
+              xtask_return_new_error (task,
                                        G_IO_ERROR,
                                        G_IO_ERROR_FAILED,
                                        "Tried sending a file descriptor but remote peer does not support this capability");
-              g_object_unref (task);
+              xobject_unref (task);
               goto out;
             }
           control_message = g_unix_fd_message_new_with_fd_list (fd_list);
@@ -1044,28 +1044,28 @@ write_message_continue_writing (MessageToWriteData *data)
                                              data->worker->cancellable,
                                              &error);
       if (control_message != NULL)
-        g_object_unref (control_message);
+        xobject_unref (control_message);
 
       if (bytes_written == -1)
         {
           /* Handle WOULD_BLOCK by waiting until there's room in the buffer */
-          if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
+          if (xerror_matches (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
             {
-              GSource *source;
+              xsource_t *source;
               source = xsocket_create_source (data->worker->socket,
                                                G_IO_OUT | G_IO_HUP | G_IO_ERR,
                                                data->worker->cancellable);
-              g_source_set_callback (source,
-                                     (GSourceFunc) on_socket_ready,
+              xsource_set_callback (source,
+                                     (xsource_func_t) on_socket_ready,
                                      data,
-                                     NULL); /* GDestroyNotify */
-              g_source_attach (source, g_main_context_get_thread_default ());
-              g_source_unref (source);
-              g_error_free (error);
+                                     NULL); /* xdestroy_notify_t */
+              xsource_attach (source, xmain_context_get_thread_default ());
+              xsource_unref (source);
+              xerror_free (error);
               goto out;
             }
-          g_task_return_error (task, error);
-          g_object_unref (task);
+          xtask_return_error (task, error);
+          xobject_unref (task);
           goto out;
         }
       g_assert (bytes_written > 0); /* zero is never returned */
@@ -1076,8 +1076,8 @@ write_message_continue_writing (MessageToWriteData *data)
       g_assert (data->total_written <= data->blob_size);
       if (data->total_written == data->blob_size)
         {
-          g_task_return_boolean (task, TRUE);
-          g_object_unref (task);
+          xtask_return_boolean (task, TRUE);
+          xobject_unref (task);
           goto out;
         }
 
@@ -1092,17 +1092,17 @@ write_message_continue_writing (MessageToWriteData *data)
           /* We were trying to write byte 0 of the message, which needs
            * the fd list to be attached to it, but this connection doesn't
            * support doing that. */
-          g_task_return_new_error (task,
+          xtask_return_new_error (task,
                                    G_IO_ERROR,
                                    G_IO_ERROR_FAILED,
                                    "Tried sending a file descriptor on unsupported stream of type %s",
-                                   g_type_name (XTYPE_FROM_INSTANCE (ostream)));
-          g_object_unref (task);
+                                   xtype_name (XTYPE_FROM_INSTANCE (ostream)));
+          xobject_unref (task);
           goto out;
         }
 #endif
 
-      g_output_stream_write_async (ostream,
+      xoutput_stream_write_async (ostream,
                                    (const xchar_t *) data->blob + data->total_written,
                                    data->blob_size - data->total_written,
                                    G_PRIORITY_DEFAULT,
@@ -1116,7 +1116,7 @@ write_message_continue_writing (MessageToWriteData *data)
   ;
 }
 
-/* called in private thread shared by all GDBusConnection instances
+/* called in private thread shared by all xdbus_connection_t instances
  *
  * write-lock is not held on entry
  * output_pending is PENDING_WRITE on entry
@@ -1127,21 +1127,21 @@ write_message_async (GDBusWorker         *worker,
                      xasync_ready_callback_t  callback,
                      xpointer_t             user_data)
 {
-  data->task = g_task_new (NULL, NULL, callback, user_data);
-  g_task_set_source_tag (data->task, write_message_async);
-  g_task_set_name (data->task, "[gio] D-Bus write message");
+  data->task = xtask_new (NULL, NULL, callback, user_data);
+  xtask_set_source_tag (data->task, write_message_async);
+  xtask_set_name (data->task, "[gio] D-Bus write message");
   data->total_written = 0;
   write_message_continue_writing (data);
 }
 
-/* called in private thread shared by all GDBusConnection instances (with write-lock held) */
+/* called in private thread shared by all xdbus_connection_t instances (with write-lock held) */
 static xboolean_t
 write_message_finish (xasync_result_t   *res,
                       xerror_t        **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, NULL), FALSE);
+  g_return_val_if_fail (xtask_is_valid (res, NULL), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (res), error);
+  return xtask_propagate_boolean (XTASK (res), error);
 }
 /* ---------------------------------------------------------------------------------------------------- */
 
@@ -1163,7 +1163,7 @@ flush_data_list_complete (const xlist_t  *flushers,
     {
       FlushData *f = l->data;
 
-      f->error = error != NULL ? g_error_copy (error) : NULL;
+      f->error = error != NULL ? xerror_copy (error) : NULL;
 
       g_mutex_lock (&f->mutex);
       f->finished = TRUE;
@@ -1172,7 +1172,7 @@ flush_data_list_complete (const xlist_t  *flushers,
     }
 }
 
-/* called in private thread shared by all GDBusConnection instances
+/* called in private thread shared by all xdbus_connection_t instances
  *
  * write-lock is not held on entry
  * output_pending is PENDING_FLUSH on entry
@@ -1186,7 +1186,7 @@ ostream_flush_cb (xobject_t      *source_object,
   xerror_t *error;
 
   error = NULL;
-  g_output_stream_flush_finish (G_OUTPUT_STREAM (source_object),
+  xoutput_stream_flush_finish (G_OUTPUT_STREAM (source_object),
                                 res,
                                 &error);
 
@@ -1198,7 +1198,7 @@ ostream_flush_cb (xobject_t      *source_object,
           g_print ("========================================================================\n"
                    "GDBus-debug:Transport:\n"
                    "  ---- FLUSHED stream of type %s\n",
-                   g_type_name (XTYPE_FROM_INSTANCE (g_io_stream_get_output_stream (data->worker->stream))));
+                   xtype_name (XTYPE_FROM_INSTANCE (g_io_stream_get_output_stream (data->worker->stream))));
           _g_dbus_debug_print_unlock ();
         }
     }
@@ -1213,9 +1213,9 @@ ostream_flush_cb (xobject_t      *source_object,
 
   g_assert (data->flushers != NULL);
   flush_data_list_complete (data->flushers, error);
-  g_list_free (data->flushers);
+  xlist_free (data->flushers);
   if (error != NULL)
-    g_error_free (error);
+    xerror_free (error);
 
   /* OK, cool, finally kick off the next write */
   continue_writing (data->worker);
@@ -1224,7 +1224,7 @@ ostream_flush_cb (xobject_t      *source_object,
   g_free (data);
 }
 
-/* called in private thread shared by all GDBusConnection instances
+/* called in private thread shared by all xdbus_connection_t instances
  *
  * write-lock is not held on entry
  * output_pending is PENDING_FLUSH on entry
@@ -1232,14 +1232,14 @@ ostream_flush_cb (xobject_t      *source_object,
 static void
 start_flush (FlushAsyncData *data)
 {
-  g_output_stream_flush_async (g_io_stream_get_output_stream (data->worker->stream),
+  xoutput_stream_flush_async (g_io_stream_get_output_stream (data->worker->stream),
                                G_PRIORITY_DEFAULT,
                                data->worker->cancellable,
                                ostream_flush_cb,
                                data);
 }
 
-/* called in private thread shared by all GDBusConnection instances
+/* called in private thread shared by all xdbus_connection_t instances
  *
  * write-lock is held on entry
  * output_pending is PENDING_NONE on entry
@@ -1256,7 +1256,7 @@ message_written_unlocked (GDBusWorker *worker,
                "GDBus-debug:Message:\n"
                "  >>>> SENT D-Bus message (%" G_GSIZE_FORMAT " bytes)\n",
                message_data->blob_size);
-      s = g_dbus_message_print (message_data->message, 2);
+      s = xdbus_message_print (message_data->message, 2);
       g_print ("%s", s);
       g_free (s);
       if (G_UNLIKELY (_g_dbus_debug_payload ()))
@@ -1271,7 +1271,7 @@ message_written_unlocked (GDBusWorker *worker,
   worker->write_num_messages_written += 1;
 }
 
-/* called in private thread shared by all GDBusConnection instances
+/* called in private thread shared by all xdbus_connection_t instances
  *
  * write-lock is held on entry
  * output_pending is PENDING_NONE on entry
@@ -1293,8 +1293,8 @@ prepare_flush_unlocked (GDBusWorker *worker)
 
       if (f->number_to_wait_for == worker->write_num_messages_written)
         {
-          flushers = g_list_append (flushers, f);
-          worker->write_pending_flushes = g_list_delete_link (worker->write_pending_flushes, l);
+          flushers = xlist_append (flushers, f);
+          worker->write_pending_flushes = xlist_delete_link (worker->write_pending_flushes, l);
         }
     }
   if (flushers != NULL)
@@ -1316,7 +1316,7 @@ prepare_flush_unlocked (GDBusWorker *worker)
   return NULL;
 }
 
-/* called in private thread shared by all GDBusConnection instances
+/* called in private thread shared by all xdbus_connection_t instances
  *
  * write-lock is not held on entry
  * output_pending is PENDING_WRITE on entry
@@ -1340,7 +1340,7 @@ write_message_cb (xobject_t       *source_object,
 
       /* TODO: handle */
       _g_dbus_worker_emit_disconnected (data->worker, TRUE, error);
-      g_error_free (error);
+      xerror_free (error);
 
       g_mutex_lock (&data->worker->write_lock);
     }
@@ -1354,7 +1354,7 @@ write_message_cb (xobject_t       *source_object,
   message_to_write_data_free (data);
 }
 
-/* called in private thread shared by all GDBusConnection instances
+/* called in private thread shared by all xdbus_connection_t instances
  *
  * write-lock is not held on entry
  * output_pending is PENDING_CLOSE on entry
@@ -1367,7 +1367,7 @@ iostream_close_cb (xobject_t      *source_object,
   GDBusWorker *worker = user_data;
   xerror_t *error = NULL;
   xlist_t *pending_close_attempts, *pending_flush_attempts;
-  GQueue *send_queue;
+  xqueue_t *send_queue;
 
   g_io_stream_close_finish (worker->stream, res, &error);
 
@@ -1387,7 +1387,7 @@ iostream_close_cb (xobject_t      *source_object,
 
   /* Ensure threads waiting for pending flushes to finish will be unblocked. */
   worker->write_num_messages_flushed =
-    worker->write_num_messages_written + g_list_length(pending_flush_attempts);
+    worker->write_num_messages_written + xlist_length(pending_flush_attempts);
 
   g_mutex_unlock (&worker->write_lock);
 
@@ -1395,15 +1395,15 @@ iostream_close_cb (xobject_t      *source_object,
     {
       CloseData *close_data = pending_close_attempts->data;
 
-      pending_close_attempts = g_list_delete_link (pending_close_attempts,
+      pending_close_attempts = xlist_delete_link (pending_close_attempts,
                                                    pending_close_attempts);
 
       if (close_data->task != NULL)
         {
           if (error != NULL)
-            g_task_return_error (close_data->task, g_error_copy (error));
+            xtask_return_error (close_data->task, xerror_copy (error));
           else
-            g_task_return_boolean (close_data->task, TRUE);
+            xtask_return_boolean (close_data->task, TRUE);
         }
 
       close_data_free (close_data);
@@ -1412,18 +1412,18 @@ iostream_close_cb (xobject_t      *source_object,
   g_clear_error (&error);
 
   /* all messages queued for sending are discarded */
-  g_queue_free_full (send_queue, (GDestroyNotify) message_to_write_data_free);
+  g_queue_free_full (send_queue, (xdestroy_notify_t) message_to_write_data_free);
   /* all queued flushes fail */
-  error = g_error_new (G_IO_ERROR, G_IO_ERROR_CANCELLED,
+  error = xerror_new (G_IO_ERROR, G_IO_ERROR_CANCELLED,
                        _("Operation was cancelled"));
   flush_data_list_complete (pending_flush_attempts, error);
-  g_list_free (pending_flush_attempts);
+  xlist_free (pending_flush_attempts);
   g_clear_error (&error);
 
   _g_dbus_worker_unref (worker);
 }
 
-/* called in private thread shared by all GDBusConnection instances
+/* called in private thread shared by all xdbus_connection_t instances
  *
  * write-lock is not held on entry
  * output_pending must be PENDING_NONE on entry
@@ -1448,7 +1448,7 @@ continue_writing (GDBusWorker *worker)
     {
       xinput_stream_t *input = g_io_stream_get_input_stream (worker->stream);
 
-      if (!g_input_stream_has_pending (input))
+      if (!xinput_stream_has_pending (input))
         {
           worker->close_expected = TRUE;
           worker->output_pending = PENDING_CLOSE;
@@ -1489,7 +1489,7 @@ continue_writing (GDBusWorker *worker)
     }
   else if (data != NULL)
     {
-      GDBusMessage *old_message;
+      xdbus_message_t *old_message;
       guchar *new_blob;
       xsize_t new_blob_size;
       xerror_t *error;
@@ -1513,19 +1513,19 @@ continue_writing (GDBusWorker *worker)
         {
           /* filters altered the message -> re-encode */
           error = NULL;
-          new_blob = g_dbus_message_to_blob (data->message,
+          new_blob = xdbus_message_to_blob (data->message,
                                              &new_blob_size,
                                              worker->capabilities,
                                              &error);
           if (new_blob == NULL)
             {
-              /* if filter make the GDBusMessage unencodeable, just complain on stderr and send
+              /* if filter make the xdbus_message_t unencodeable, just complain on stderr and send
                * the old message instead
                */
-              g_warning ("Error encoding GDBusMessage with serial %d altered by filter function: %s",
-                         g_dbus_message_get_serial (data->message),
+              g_warning ("Error encoding xdbus_message_t with serial %d altered by filter function: %s",
+                         xdbus_message_get_serial (data->message),
                          error->message);
-              g_error_free (error);
+              xerror_free (error);
             }
           else
             {
@@ -1542,7 +1542,7 @@ continue_writing (GDBusWorker *worker)
     }
 }
 
-/* called in private thread shared by all GDBusConnection instances
+/* called in private thread shared by all xdbus_connection_t instances
  *
  * write-lock is not held on entry
  * output_pending may be anything
@@ -1581,10 +1581,10 @@ schedule_writing_unlocked (GDBusWorker        *worker,
     g_queue_push_tail (worker->write_queue, write_data);
 
   if (flush_data != NULL)
-    worker->write_pending_flushes = g_list_prepend (worker->write_pending_flushes, flush_data);
+    worker->write_pending_flushes = xlist_prepend (worker->write_pending_flushes, flush_data);
 
   if (close_data != NULL)
-    worker->pending_close_attempts = g_list_prepend (worker->pending_close_attempts,
+    worker->pending_close_attempts = xlist_prepend (worker->pending_close_attempts,
                                                      close_data);
 
   /* If we had output pending, the next bit of output will happen
@@ -1596,16 +1596,16 @@ schedule_writing_unlocked (GDBusWorker        *worker,
    */
   if (worker->output_pending == PENDING_NONE)
     {
-      GSource *idle_source;
+      xsource_t *idle_source;
       idle_source = g_idle_source_new ();
-      g_source_set_priority (idle_source, G_PRIORITY_DEFAULT);
-      g_source_set_callback (idle_source,
+      xsource_set_priority (idle_source, G_PRIORITY_DEFAULT);
+      xsource_set_callback (idle_source,
                              continue_writing_in_idle_cb,
                              _g_dbus_worker_ref (worker),
-                             (GDestroyNotify) _g_dbus_worker_unref);
-      g_source_set_static_name (idle_source, "[gio] continue_writing_in_idle_cb");
-      g_source_attach (idle_source, worker->shared_thread_data->context);
-      g_source_unref (idle_source);
+                             (xdestroy_notify_t) _g_dbus_worker_unref);
+      xsource_set_static_name (idle_source, "[gio] continue_writing_in_idle_cb");
+      xsource_attach (idle_source, worker->shared_thread_data->context);
+      xsource_unref (idle_source);
     }
 }
 
@@ -1627,7 +1627,7 @@ schedule_pending_close (GDBusWorker *worker)
  */
 void
 _g_dbus_worker_send_message (GDBusWorker    *worker,
-                             GDBusMessage   *message,
+                             xdbus_message_t   *message,
                              xchar_t          *blob,
                              xsize_t           blob_len)
 {
@@ -1639,7 +1639,7 @@ _g_dbus_worker_send_message (GDBusWorker    *worker,
 
   data = g_slice_new0 (MessageToWriteData);
   data->worker = _g_dbus_worker_ref (worker);
-  data->message = g_object_ref (message);
+  data->message = xobject_ref (message);
   data->blob = blob; /* steal! */
   data->blob_size = blob_len;
 
@@ -1660,7 +1660,7 @@ _g_dbus_worker_new (xio_stream_t                              *stream,
                     xpointer_t                                user_data)
 {
   GDBusWorker *worker;
-  GSource *idle_source;
+  xsource_t *idle_source;
 
   g_return_val_if_fail (X_IS_IO_STREAM (stream), NULL);
   g_return_val_if_fail (message_received_callback != NULL, NULL);
@@ -1675,7 +1675,7 @@ _g_dbus_worker_new (xio_stream_t                              *stream,
   worker->message_about_to_be_sent_callback = message_about_to_be_sent_callback;
   worker->disconnected_callback = disconnected_callback;
   worker->user_data = user_data;
-  worker->stream = g_object_ref (stream);
+  worker->stream = xobject_ref (stream);
   worker->capabilities = capabilities;
   worker->cancellable = g_cancellable_new ();
   worker->output_pending = PENDING_NONE;
@@ -1693,14 +1693,14 @@ _g_dbus_worker_new (xio_stream_t                              *stream,
 
   /* begin reading */
   idle_source = g_idle_source_new ();
-  g_source_set_priority (idle_source, G_PRIORITY_DEFAULT);
-  g_source_set_callback (idle_source,
+  xsource_set_priority (idle_source, G_PRIORITY_DEFAULT);
+  xsource_set_callback (idle_source,
                          _g_dbus_worker_do_initial_read,
                          _g_dbus_worker_ref (worker),
-                         (GDestroyNotify) _g_dbus_worker_unref);
-  g_source_set_static_name (idle_source, "[gio] _g_dbus_worker_do_initial_read");
-  g_source_attach (idle_source, worker->shared_thread_data->context);
-  g_source_unref (idle_source);
+                         (xdestroy_notify_t) _g_dbus_worker_unref);
+  xsource_set_static_name (idle_source, "[gio] _g_dbus_worker_do_initial_read");
+  xsource_attach (idle_source, worker->shared_thread_data->context);
+  xsource_unref (idle_source);
 
   return worker;
 }
@@ -1714,13 +1714,13 @@ _g_dbus_worker_new (xio_stream_t                              *stream,
  */
 void
 _g_dbus_worker_close (GDBusWorker         *worker,
-                      GTask               *task)
+                      xtask_t               *task)
 {
   CloseData *close_data;
 
   close_data = g_slice_new0 (CloseData);
   close_data->worker = _g_dbus_worker_ref (worker);
-  close_data->task = (task == NULL ? NULL : g_object_ref (task));
+  close_data->task = (task == NULL ? NULL : xobject_ref (task));
 
   /* Don't set worker->close_expected here - we're in the wrong thread.
    * It'll be set before the actual close happens.
@@ -1771,7 +1771,7 @@ _g_dbus_worker_flush_sync (GDBusWorker    *worker,
 {
   xboolean_t ret;
   FlushData *data;
-  guint64 pending_writes;
+  xuint64_t pending_writes;
 
   data = NULL;
   ret = TRUE;
@@ -1969,7 +1969,7 @@ _g_dbus_initialize (void)
             { "proxy",          G_DBUS_DEBUG_PROXY          }
           };
 
-          _gdbus_debug_flags = g_parse_debug_string (debug, keys, G_N_ELEMENTS (keys));
+          _gdbus_debug_flags = g_parse_debuxstring (debug, keys, G_N_ELEMENTS (keys));
           if (_gdbus_debug_flags & G_DBUS_DEBUG_PAYLOAD)
             _gdbus_debug_flags |= G_DBUS_DEBUG_MESSAGE;
         }
@@ -1984,7 +1984,7 @@ _g_dbus_initialize (void)
 /* ---------------------------------------------------------------------------------------------------- */
 
 xvariant_type_t *
-_g_dbus_compute_complete_signature (GDBusArgInfo **args)
+_g_dbus_compute_complete_signature (xdbus_arg_info_t **args)
 {
   const xvariant_type_t *arg_types[256];
   xuint_t n;
@@ -2005,7 +2005,7 @@ _g_dbus_compute_complete_signature (GDBusArgInfo **args)
   else
     n = 0;
 
-  return g_variant_type_new_tuple (arg_types, n);
+  return xvariant_type_new_tuple (arg_types, n);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -2096,7 +2096,7 @@ read_shm (const char *shm_name)
        */
       if (shared_data != NULL)
 	{
-	  res = g_strdup (shared_data);
+	  res = xstrdup (shared_data);
 	  UnmapViewOfFile (shared_data);
 	}
       CloseHandle (shared_mem);
@@ -2208,8 +2208,8 @@ open_console_window (void)
 static void
 idle_timeout_cb (GDBusDaemon *daemon, xpointer_t user_data)
 {
-  GMainLoop *loop = user_data;
-  g_main_loop_quit (loop);
+  xmain_loop_t *loop = user_data;
+  xmain_loop_quit (loop);
 }
 
 /* Satisfies STARTF_FORCEONFEEDBACK */
@@ -2235,7 +2235,7 @@ void __stdcall
 g_win32_run_session_bus (void* hwnd, void* hinst, const char* cmdline, int cmdshow)
 {
   GDBusDaemon *daemon;
-  GMainLoop *loop;
+  xmain_loop_t *loop;
   const char *address;
   xerror_t *error = NULL;
 
@@ -2249,11 +2249,11 @@ g_win32_run_session_bus (void* hwnd, void* hinst, const char* cmdline, int cmdsh
   if (daemon == NULL)
     {
       g_printerr ("Can't init bus: %s\n", error->message);
-      g_error_free (error);
+      xerror_free (error);
       return;
     }
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   /* There is a subtle detail with "idle-timeout" signal of dbus daemon:
    * It is fired on idle after last client disconnection,
@@ -2265,13 +2265,13 @@ g_win32_run_session_bus (void* hwnd, void* hinst, const char* cmdline, int cmdsh
 
   if (publish_session_bus (_g_dbus_daemon_get_address (daemon)))
     {
-      g_main_loop_run (loop);
+      xmain_loop_run (loop);
 
       unpublish_session_bus ();
     }
 
-  g_main_loop_unref (loop);
-  g_object_unref (daemon);
+  xmain_loop_unref (loop);
+  xobject_unref (daemon);
 }
 
 static xboolean_t autolaunch_binary_absent = FALSE;
@@ -2281,7 +2281,7 @@ find_dbus_process_path (void)
 {
   wchar_t *dbus_path;
   xchar_t *exe_path = XPL_PRIVATE_CALL (g_win32_find_helper_executable_path) ("gdbus.exe", _xio_win32_get_module ());
-  dbus_path = g_utf8_to_utf16 (exe_path, -1, NULL, NULL, NULL);
+  dbus_path = xutf8_to_utf16 (exe_path, -1, NULL, NULL, NULL);
   g_free (exe_path);
 
   if (dbus_path == NULL)
@@ -2431,11 +2431,11 @@ _g_dbus_get_machine_id (xerror_t **error)
   const xchar_t *var_lib_path = LOCALSTATEDIR "/lib/dbus/machine-id";
   const xchar_t *etc_path = "/etc/machine-id";
 
-  if (!g_file_get_contents (var_lib_path,
+  if (!xfile_get_contents (var_lib_path,
                             &ret,
                             NULL,
                             &first_error) &&
-      !g_file_get_contents (etc_path,
+      !xfile_get_contents (etc_path,
                             &ret,
                             NULL,
                             NULL))
@@ -2487,23 +2487,23 @@ xchar_t *
 _g_dbus_enum_to_string (xtype_t enum_type, xint_t value)
 {
   xchar_t *ret;
-  GEnumClass *klass;
-  GEnumValue *enum_value;
+  xenum_class_t *klass;
+  xenum_value_t *enum_value;
 
-  klass = g_type_class_ref (enum_type);
-  enum_value = g_enum_get_value (klass, value);
+  klass = xtype_class_ref (enum_type);
+  enum_value = xenum_get_value (klass, value);
   if (enum_value != NULL)
-    ret = g_strdup (enum_value->value_nick);
+    ret = xstrdup (enum_value->value_nick);
   else
-    ret = g_strdup_printf ("unknown (value %d)", value);
-  g_type_class_unref (klass);
+    ret = xstrdup_printf ("unknown (value %d)", value);
+  xtype_class_unref (klass);
   return ret;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-write_message_print_transport_debug (gssize bytes_written,
+write_message_print_transport_debug (xssize_t bytes_written,
                                      MessageToWriteData *data)
 {
   if (G_LIKELY (!_g_dbus_debug_transport ()))
@@ -2515,10 +2515,10 @@ write_message_print_transport_debug (gssize bytes_written,
            "  >>>> WROTE %" G_GSSIZE_FORMAT " bytes of message with serial %d and\n"
            "       size %" G_GSIZE_FORMAT " from offset %" G_GSIZE_FORMAT " on a %s\n",
            bytes_written,
-           g_dbus_message_get_serial (data->message),
+           xdbus_message_get_serial (data->message),
            data->blob_size,
            data->total_written,
-           g_type_name (XTYPE_FROM_INSTANCE (g_io_stream_get_output_stream (data->worker->stream))));
+           xtype_name (XTYPE_FROM_INSTANCE (g_io_stream_get_output_stream (data->worker->stream))));
   _g_dbus_debug_print_unlock ();
  out:
   ;
@@ -2527,7 +2527,7 @@ write_message_print_transport_debug (gssize bytes_written,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-read_message_print_transport_debug (gssize bytes_read,
+read_message_print_transport_debug (xssize_t bytes_read,
                                     GDBusWorker *worker)
 {
   xsize_t size;
@@ -2541,18 +2541,18 @@ read_message_print_transport_debug (gssize bytes_read,
   serial = 0;
   message_length = 0;
   if (size >= 16)
-    message_length = g_dbus_message_bytes_needed ((guchar *) worker->read_buffer, size, NULL);
+    message_length = xdbus_message_bytes_needed ((guchar *) worker->read_buffer, size, NULL);
   if (size >= 1)
     {
       switch (worker->read_buffer[0])
         {
         case 'l':
           if (size >= 12)
-            serial = GUINT32_FROM_LE (((guint32 *) worker->read_buffer)[2]);
+            serial = GUINT32_FROM_LE (((xuint32_t *) worker->read_buffer)[2]);
           break;
         case 'B':
           if (size >= 12)
-            serial = GUINT32_FROM_BE (((guint32 *) worker->read_buffer)[2]);
+            serial = GUINT32_FROM_BE (((xuint32_t *) worker->read_buffer)[2]);
           break;
         default:
           /* an error will be set elsewhere if this happens */
@@ -2569,7 +2569,7 @@ read_message_print_transport_debug (gssize bytes_read,
            serial,
            message_length,
            worker->read_buffer_cur_size,
-           g_type_name (XTYPE_FROM_INSTANCE (g_io_stream_get_input_stream (worker->stream))));
+           xtype_name (XTYPE_FROM_INSTANCE (g_io_stream_get_input_stream (worker->stream))));
   _g_dbus_debug_print_unlock ();
  out:
   ;
@@ -2578,16 +2578,16 @@ read_message_print_transport_debug (gssize bytes_read,
 /* ---------------------------------------------------------------------------------------------------- */
 
 xboolean_t
-_g_signal_accumulator_false_handled (GSignalInvocationHint *ihint,
-                                     GValue                *return_accu,
-                                     const GValue          *handler_return,
+_g_signal_accumulator_false_handled (xsignal_invocation_hint_t *ihint,
+                                     xvalue_t                *return_accu,
+                                     const xvalue_t          *handler_return,
                                      xpointer_t               dummy)
 {
   xboolean_t continue_emission;
   xboolean_t signal_return;
 
-  signal_return = g_value_get_boolean (handler_return);
-  g_value_set_boolean (return_accu, signal_return);
+  signal_return = xvalue_get_boolean (handler_return);
+  xvalue_set_boolean (return_accu, signal_return);
   continue_emission = signal_return;
 
   return continue_emission;
@@ -2596,9 +2596,9 @@ _g_signal_accumulator_false_handled (GSignalInvocationHint *ihint,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-append_nibble (GString *s, xint_t val)
+append_nibble (xstring_t *s, xint_t val)
 {
-  g_string_append_c (s, val >= 10 ? ('a' + val - 10) : ('0' + val));
+  xstring_append_c (s, val >= 10 ? ('a' + val - 10) : ('0' + val));
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -2608,9 +2608,9 @@ _g_dbus_hexencode (const xchar_t *str,
                    xsize_t        str_len)
 {
   xsize_t n;
-  GString *s;
+  xstring_t *s;
 
-  s = g_string_new (NULL);
+  s = xstring_new (NULL);
   for (n = 0; n < str_len; n++)
     {
       xint_t val;
@@ -2625,5 +2625,5 @@ _g_dbus_hexencode (const xchar_t *str,
       append_nibble (s, lower_nibble);
     }
 
-  return g_string_free (s, FALSE);
+  return xstring_free (s, FALSE);
 }

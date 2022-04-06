@@ -26,39 +26,39 @@
 # threads supported?
 
 <FUNCTION>
-<NAME>g_thread_supported</NAME>
+<NAME>xthread_supported</NAME>
 <RETURNS>xboolean_t</RETURNS>
 </FUNCTION>
 
-# GMutex
+# xmutex_t
 
 <FUNCTION>
 <NAME>g_mutex_new</NAME>
-<RETURNS>GMutex *</RETURNS>
+<RETURNS>xmutex_t *</RETURNS>
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_mutex_lock</NAME>
 <RETURNS>void</RETURNS>
-GMutex *mutex
+xmutex_t *mutex
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_mutex_trylock</NAME>
 <RETURNS>xboolean_t</RETURNS>
-GMutex *mutex
+xmutex_t *mutex
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_mutex_unlock</NAME>
 <RETURNS>void</RETURNS>
-GMutex *mutex
+xmutex_t *mutex
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_mutex_free</NAME>
 <RETURNS>void</RETURNS>
-GMutex *mutex
+xmutex_t *mutex
 </FUNCTION>
 
 # GStaticMutex
@@ -92,20 +92,20 @@ GStaticMutex* mutex
 
 <FUNCTION>
 <NAME>g_static_mutex_get_mutex</NAME>
-<RETURNS>GMutex *</RETURNS>
+<RETURNS>xmutex_t *</RETURNS>
 GStaticMutex* mutex
 </FUNCTION>
 
-# GThread
+# xthread_t
 
 <FUNCTION>
-<NAME>g_thread_yield</NAME>
+<NAME>xthread_yield</NAME>
 <RETURNS>void</RETURNS>
 </FUNCTION>
 
 <FUNCTION>
-<NAME>g_thread_create</NAME>
-<RETURNS>GThread *</RETURNS>
+<NAME>xthread_create</NAME>
+<RETURNS>xthread_t *</RETURNS>
 GThreadFunc func
 xpointer_t data,
 xboolean_t joinable,
@@ -144,41 +144,41 @@ xerror_t **error
 #define G_TRYLOCK(name)
 </MACRO>
 
-# GCond
+# xcond_t
 
 <FUNCTION>
 <NAME>g_cond_new</NAME>
-<RETURNS>GCond*</RETURNS>
+<RETURNS>xcond_t*</RETURNS>
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_cond_signal</NAME>
 <RETURNS>void</RETURNS>
-GCond *cond
+xcond_t *cond
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_cond_broadcast</NAME>
 <RETURNS>void</RETURNS>
-GCond *cond
+xcond_t *cond
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_cond_wait</NAME>
 <RETURNS>void</RETURNS>
-GCond *cond, GMutex *mutex
+xcond_t *cond, xmutex_t *mutex
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_cond_timed_wait</NAME>
 <RETURNS>xboolean_t</RETURNS>
-GCond *cond, GMutex *mutex, GTimeVal *abs_time
+xcond_t *cond, xmutex_t *mutex, GTimeVal *abs_time
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_cond_free</NAME>
 <RETURNS>void</RETURNS>
-GCond *cond
+xcond_t *cond
 </FUNCTION>
 
 # GPrivate

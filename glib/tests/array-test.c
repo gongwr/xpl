@@ -30,7 +30,7 @@
 #include "glib.h"
 
 /* Test data to be passed to any function which calls g_array_new(), providing
- * the parameters for that call. Most #GArray tests should be repeated for all
+ * the parameters for that call. Most #xarray_t tests should be repeated for all
  * possible values of #ArrayTestData. */
 typedef struct
 {
@@ -41,7 +41,7 @@ typedef struct
 /* Assert that @garray contains @n_expected_elements as given in @expected_data.
  * @garray must contain #xint_t elements. */
 static void
-assert_int_array_equal (GArray     *garray,
+assert_int_array_equal (xarray_t     *garray,
                         const xint_t *expected_data,
                         xsize_t       n_expected_elements)
 {
@@ -56,7 +56,7 @@ assert_int_array_equal (GArray     *garray,
  * @garray is zero. @garray must contain #xint_t elements. */
 static void
 assert_int_array_zero_terminated (const ArrayTestData *config,
-                                  GArray              *garray)
+                                  xarray_t              *garray)
 {
   if (config->zero_terminated)
     {
@@ -77,10 +77,10 @@ sum_up (xpointer_t data,
 /* Check that expanding an array with g_array_set_size() clears the new elements
  * if @clear_ was specified during construction. */
 static void
-array_set_size (gconstpointer test_data)
+array_set_size (xconstpointer test_data)
 {
   const ArrayTestData *config = test_data;
-  GArray *garray;
+  xarray_t *garray;
   xsize_t i;
 
   garray = g_array_new (config->zero_terminated, config->clear_, sizeof (xint_t));
@@ -100,10 +100,10 @@ array_set_size (gconstpointer test_data)
 
 /* As with array_set_size(), but with a sized array. */
 static void
-array_set_size_sized (gconstpointer test_data)
+array_set_size_sized (xconstpointer test_data)
 {
   const ArrayTestData *config = test_data;
-  GArray *garray;
+  xarray_t *garray;
   xsize_t i;
 
   garray = g_array_sized_new (config->zero_terminated, config->clear_, sizeof (xint_t), 10);
@@ -125,7 +125,7 @@ array_set_size_sized (gconstpointer test_data)
 static void
 array_new_zero_terminated (void)
 {
-  GArray *garray;
+  xarray_t *garray;
   xchar_t *out_str = NULL;
 
   garray = g_array_new (TRUE, FALSE, sizeof (xchar_t));
@@ -145,7 +145,7 @@ static void
 array_steal (void)
 {
   const xuint_t array_size = 10000;
-  GArray *garray;
+  xarray_t *garray;
   xint_t *adata;
   xuint_t i;
   xsize_t len, past_len;
@@ -191,13 +191,13 @@ array_steal (void)
   g_array_free (garray, TRUE);
 }
 
-/* Check that g_array_append_val() works correctly for various #GArray
+/* Check that g_array_append_val() works correctly for various #xarray_t
  * configurations. */
 static void
-array_append_val (gconstpointer test_data)
+array_append_val (xconstpointer test_data)
 {
   const ArrayTestData *config = test_data;
-  GArray *garray;
+  xarray_t *garray;
   xint_t i;
   xint_t *segment;
 
@@ -218,13 +218,13 @@ array_append_val (gconstpointer test_data)
   g_free (segment);
 }
 
-/* Check that g_array_prepend_val() works correctly for various #GArray
+/* Check that g_array_prepend_val() works correctly for various #xarray_t
  * configurations. */
 static void
-array_prepend_val (gconstpointer test_data)
+array_prepend_val (xconstpointer test_data)
 {
   const ArrayTestData *config = test_data;
-  GArray *garray;
+  xarray_t *garray;
   xint_t i;
 
   garray = g_array_new (config->zero_terminated, config->clear_, sizeof (xint_t));
@@ -241,10 +241,10 @@ array_prepend_val (gconstpointer test_data)
 /* Test that g_array_prepend_vals() works correctly with various array
  * configurations. */
 static void
-array_prepend_vals (gconstpointer test_data)
+array_prepend_vals (xconstpointer test_data)
 {
   const ArrayTestData *config = test_data;
-  GArray *garray, *garray_out;
+  xarray_t *garray, *garray_out;
   const xint_t vals[] = { 0, 1, 2, 3, 4 };
   const xint_t expected_vals1[] = { 0, 1 };
   const xint_t expected_vals2[] = { 2, 0, 1 };
@@ -290,10 +290,10 @@ array_prepend_vals (gconstpointer test_data)
 /* Test that g_array_insert_vals() works correctly with various array
  * configurations. */
 static void
-array_insert_vals (gconstpointer test_data)
+array_insert_vals (xconstpointer test_data)
 {
   const ArrayTestData *config = test_data;
-  GArray *garray, *garray_out;
+  xarray_t *garray, *garray_out;
   xsize_t i;
   const xint_t vals[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
   const xint_t expected_vals1[] = { 0, 1 };
@@ -359,13 +359,13 @@ array_insert_vals (gconstpointer test_data)
   g_array_free (garray, TRUE);
 }
 
-/* Check that g_array_remove_index() works correctly for various #GArray
+/* Check that g_array_remove_index() works correctly for various #xarray_t
  * configurations. */
 static void
-array_remove_index (gconstpointer test_data)
+array_remove_index (xconstpointer test_data)
 {
   const ArrayTestData *config = test_data;
-  GArray *garray;
+  xarray_t *garray;
   xuint_t i;
   xint_t prev, cur;
 
@@ -396,13 +396,13 @@ array_remove_index (gconstpointer test_data)
   g_array_free (garray, TRUE);
 }
 
-/* Check that g_array_remove_index_fast() works correctly for various #GArray
+/* Check that g_array_remove_index_fast() works correctly for various #xarray_t
  * configurations. */
 static void
-array_remove_index_fast (gconstpointer test_data)
+array_remove_index_fast (xconstpointer test_data)
 {
   const ArrayTestData *config = test_data;
-  GArray *garray;
+  xarray_t *garray;
   xuint_t i;
   xint_t prev, cur;
 
@@ -436,13 +436,13 @@ array_remove_index_fast (gconstpointer test_data)
   g_array_free (garray, TRUE);
 }
 
-/* Check that g_array_remove_range() works correctly for various #GArray
+/* Check that g_array_remove_range() works correctly for various #xarray_t
  * configurations. */
 static void
-array_remove_range (gconstpointer test_data)
+array_remove_range (xconstpointer test_data)
 {
   const ArrayTestData *config = test_data;
-  GArray *garray;
+  xarray_t *garray;
   xuint_t i;
   xint_t prev, cur;
 
@@ -484,8 +484,8 @@ array_remove_range (gconstpointer test_data)
 static void
 array_ref_count (void)
 {
-  GArray *garray;
-  GArray *garray2;
+  xarray_t *garray;
+  xarray_t *garray2;
   xint_t i;
 
   garray = g_array_new (FALSE, FALSE, sizeof (xint_t));
@@ -500,7 +500,7 @@ array_ref_count (void)
   for (i = 0; i < 100; i++)
     g_assert_cmpint (g_array_index (garray, xint_t, i), ==, (100 - i - 1));
 
-  /* garray2 should be an empty valid GArray wrapper */
+  /* garray2 should be an empty valid xarray_t wrapper */
   garray2 = g_array_ref (garray);
   g_array_free (garray, TRUE);
 
@@ -509,7 +509,7 @@ array_ref_count (void)
 }
 
 static int
-int_compare (gconstpointer p1, gconstpointer p2)
+int_compare (xconstpointer p1, xconstpointer p2)
 {
   const xint_t *i1 = p1;
   const xint_t *i2 = p2;
@@ -518,9 +518,9 @@ int_compare (gconstpointer p1, gconstpointer p2)
 }
 
 static void
-array_copy (gconstpointer test_data)
+array_copy (xconstpointer test_data)
 {
-  GArray *array, *array_copy;
+  xarray_t *array, *array_copy;
   xsize_t i;
   const ArrayTestData *config = test_data;
   const xsize_t array_size = 100;
@@ -571,7 +571,7 @@ array_copy (gconstpointer test_data)
 }
 
 static int
-int_compare_data (gconstpointer p1, gconstpointer p2, xpointer_t data)
+int_compare_data (xconstpointer p1, xconstpointer p2, xpointer_t data)
 {
   const xint_t *i1 = p1;
   const xint_t *i2 = p2;
@@ -579,13 +579,13 @@ int_compare_data (gconstpointer p1, gconstpointer p2, xpointer_t data)
   return *i1 - *i2;
 }
 
-/* Check that g_array_sort() works correctly for various #GArray
+/* Check that g_array_sort() works correctly for various #xarray_t
  * configurations. */
 static void
-array_sort (gconstpointer test_data)
+array_sort (xconstpointer test_data)
 {
   const ArrayTestData *config = test_data;
-  GArray *garray;
+  xarray_t *garray;
   xuint_t i;
   xint_t prev, cur;
 
@@ -615,13 +615,13 @@ array_sort (gconstpointer test_data)
   g_array_free (garray, TRUE);
 }
 
-/* Check that g_array_sort_with_data() works correctly for various #GArray
+/* Check that g_array_sort_with_data() works correctly for various #xarray_t
  * configurations. */
 static void
-array_sort_with_data (gconstpointer test_data)
+array_sort_with_data (xconstpointer test_data)
 {
   const ArrayTestData *config = test_data;
-  GArray *garray;
+  xarray_t *garray;
   xuint_t i;
   xint_t prev, cur;
 
@@ -662,7 +662,7 @@ my_clear_func (xpointer_t data)
 static void
 array_clear_func (void)
 {
-  GArray *garray;
+  xarray_t *garray;
   xint_t i;
   xint_t cur;
 
@@ -690,7 +690,7 @@ array_clear_func (void)
 
 /* Defining a comparison function for testing g_array_binary_search() */
 static xint_t
-cmpint (gconstpointer a, gconstpointer b)
+cmpint (xconstpointer a, xconstpointer b)
 {
   const xint_t *_a = a;
   const xint_t *_b = b;
@@ -702,7 +702,7 @@ cmpint (gconstpointer a, gconstpointer b)
 static void
 test_array_binary_search (void)
 {
-  GArray *garray;
+  xarray_t *garray;
   xuint_t i, matched_index;
 
   if (g_test_undefined ())
@@ -822,7 +822,7 @@ test_array_binary_search (void)
 static void
 test_array_copy_sized (void)
 {
-  GArray *array1 = NULL, *array2 = NULL, *array3 = NULL;
+  xarray_t *array1 = NULL, *array2 = NULL, *array3 = NULL;
   int val = 5;
 
   g_test_summary ("Test that copying a newly-allocated sized array works.");
@@ -853,7 +853,7 @@ array_overflow_append_vals (void)
 
   if (g_test_subprocess ())
     {
-      GArray *array = g_array_new (TRUE, FALSE, 1);
+      xarray_t *array = g_array_new (TRUE, FALSE, 1);
       /* Check for overflow should happen before data is accessed. */
       g_array_append_vals (array, NULL, G_MAXUINT);
     }
@@ -873,7 +873,7 @@ array_overflow_set_size (void)
 
   if (g_test_subprocess ())
     {
-      GArray *array = g_array_new (TRUE, FALSE, 1);
+      xarray_t *array = g_array_new (TRUE, FALSE, 1);
       g_array_set_size (array, G_MAXUINT);
     }
   else
@@ -884,69 +884,69 @@ array_overflow_set_size (void)
     }
 }
 
-/* Check g_ptr_array_steal() function */
+/* Check xptr_array_steal() function */
 static void
 pointer_array_steal (void)
 {
   const xuint_t array_size = 10000;
-  GPtrArray *gparray;
+  xptr_array_t *gparray;
   xpointer_t *pdata;
   xuint_t i;
   xsize_t len, past_len;
 
-  gparray = g_ptr_array_new ();
-  pdata = g_ptr_array_steal (gparray, NULL);
+  gparray = xptr_array_new ();
+  pdata = xptr_array_steal (gparray, NULL);
   g_assert_null (pdata);
 
-  pdata = g_ptr_array_steal (gparray, &len);
+  pdata = xptr_array_steal (gparray, &len);
   g_assert_null (pdata);
   g_assert_cmpint (len, ==, 0);
 
   for (i = 0; i < array_size; i++)
-    g_ptr_array_add (gparray, GINT_TO_POINTER (i));
+    xptr_array_add (gparray, GINT_TO_POINTER (i));
 
   past_len = gparray->len;
-  pdata = g_ptr_array_steal (gparray, &len);
+  pdata = xptr_array_steal (gparray, &len);
   g_assert_cmpint (gparray->len, ==, 0);
   g_assert_cmpint (past_len, ==, len);
-  g_ptr_array_add (gparray, GINT_TO_POINTER (10));
+  xptr_array_add (gparray, GINT_TO_POINTER (10));
 
   g_assert_cmpint ((xsize_t) pdata[0], ==, (xsize_t) GINT_TO_POINTER (0));
-  g_assert_cmpint ((xsize_t) g_ptr_array_index (gparray, 0), ==,
+  g_assert_cmpint ((xsize_t) xptr_array_index (gparray, 0), ==,
                    (xsize_t) GINT_TO_POINTER (10));
   g_assert_cmpint (gparray->len, ==, 1);
 
-  g_ptr_array_remove_index (gparray, 0);
+  xptr_array_remove_index (gparray, 0);
 
   for (i = 0; i < array_size; i++)
-    g_ptr_array_add (gparray, GINT_TO_POINTER (i));
+    xptr_array_add (gparray, GINT_TO_POINTER (i));
   g_assert_cmpmem (pdata, array_size * sizeof (xpointer_t),
                    gparray->pdata, array_size * sizeof (xpointer_t));
   g_free (pdata);
 
-  g_ptr_array_free (gparray, TRUE);
+  xptr_array_free (gparray, TRUE);
 }
 
 static void
 pointer_array_add (void)
 {
-  GPtrArray *gparray;
+  xptr_array_t *gparray;
   xint_t i;
   xint_t sum = 0;
   xpointer_t *segment;
 
-  gparray = g_ptr_array_sized_new (1000);
+  gparray = xptr_array_sized_new (1000);
 
   for (i = 0; i < 10000; i++)
-    g_ptr_array_add (gparray, GINT_TO_POINTER (i));
+    xptr_array_add (gparray, GINT_TO_POINTER (i));
 
   for (i = 0; i < 10000; i++)
-    g_assert (g_ptr_array_index (gparray, i) == GINT_TO_POINTER (i));
+    g_assert (xptr_array_index (gparray, i) == GINT_TO_POINTER (i));
 
-  g_ptr_array_foreach (gparray, sum_up, &sum);
+  xptr_array_foreach (gparray, sum_up, &sum);
   g_assert (sum == 49995000);
 
-  segment = g_ptr_array_free (gparray, FALSE);
+  segment = xptr_array_free (gparray, FALSE);
   for (i = 0; i < 10000; i++)
     g_assert (segment[i] == GINT_TO_POINTER (i));
   g_free (segment);
@@ -955,53 +955,53 @@ pointer_array_add (void)
 static void
 pointer_array_insert (void)
 {
-  GPtrArray *gparray;
+  xptr_array_t *gparray;
   xint_t i;
   xint_t sum = 0;
   xint_t index;
 
-  gparray = g_ptr_array_sized_new (1000);
+  gparray = xptr_array_sized_new (1000);
 
   for (i = 0; i < 10000; i++)
     {
       index = g_random_int_range (-1, i + 1);
-      g_ptr_array_insert (gparray, index, GINT_TO_POINTER (i));
+      xptr_array_insert (gparray, index, GINT_TO_POINTER (i));
     }
 
-  g_ptr_array_foreach (gparray, sum_up, &sum);
+  xptr_array_foreach (gparray, sum_up, &sum);
   g_assert (sum == 49995000);
 
-  g_ptr_array_free (gparray, TRUE);
+  xptr_array_free (gparray, TRUE);
 }
 
 static void
 pointer_array_ref_count (void)
 {
-  GPtrArray *gparray;
-  GPtrArray *gparray2;
+  xptr_array_t *gparray;
+  xptr_array_t *gparray2;
   xint_t i;
   xint_t sum = 0;
 
-  gparray = g_ptr_array_new ();
+  gparray = xptr_array_new ();
   for (i = 0; i < 10000; i++)
-    g_ptr_array_add (gparray, GINT_TO_POINTER (i));
+    xptr_array_add (gparray, GINT_TO_POINTER (i));
 
   /* check we can ref, unref and still access the array */
-  gparray2 = g_ptr_array_ref (gparray);
+  gparray2 = xptr_array_ref (gparray);
   g_assert (gparray == gparray2);
-  g_ptr_array_unref (gparray2);
+  xptr_array_unref (gparray2);
   for (i = 0; i < 10000; i++)
-    g_assert (g_ptr_array_index (gparray, i) == GINT_TO_POINTER (i));
+    g_assert (xptr_array_index (gparray, i) == GINT_TO_POINTER (i));
 
-  g_ptr_array_foreach (gparray, sum_up, &sum);
+  xptr_array_foreach (gparray, sum_up, &sum);
   g_assert (sum == 49995000);
 
-  /* gparray2 should be an empty valid GPtrArray wrapper */
-  gparray2 = g_ptr_array_ref (gparray);
-  g_ptr_array_free (gparray, TRUE);
+  /* gparray2 should be an empty valid xptr_array_t wrapper */
+  gparray2 = xptr_array_ref (gparray);
+  xptr_array_free (gparray, TRUE);
 
   g_assert_cmpint (gparray2->len, ==, 0);
-  g_ptr_array_unref (gparray2);
+  xptr_array_unref (gparray2);
 }
 
 static xint_t num_free_func_invocations = 0;
@@ -1016,99 +1016,99 @@ my_free_func (xpointer_t data)
 static void
 pointer_array_free_func (void)
 {
-  GPtrArray *gparray;
-  GPtrArray *gparray2;
+  xptr_array_t *gparray;
+  xptr_array_t *gparray2;
   xchar_t **strv;
   xchar_t *s;
 
   num_free_func_invocations = 0;
-  gparray = g_ptr_array_new_with_free_func (my_free_func);
-  g_ptr_array_unref (gparray);
+  gparray = xptr_array_new_with_free_func (my_free_func);
+  xptr_array_unref (gparray);
   g_assert_cmpint (num_free_func_invocations, ==, 0);
 
-  gparray = g_ptr_array_new_with_free_func (my_free_func);
-  g_ptr_array_free (gparray, TRUE);
+  gparray = xptr_array_new_with_free_func (my_free_func);
+  xptr_array_free (gparray, TRUE);
   g_assert_cmpint (num_free_func_invocations, ==, 0);
 
   num_free_func_invocations = 0;
-  gparray = g_ptr_array_new_with_free_func (my_free_func);
-  g_ptr_array_add (gparray, g_strdup ("foo"));
-  g_ptr_array_add (gparray, g_strdup ("bar"));
-  g_ptr_array_add (gparray, g_strdup ("baz"));
-  g_ptr_array_remove_index (gparray, 0);
+  gparray = xptr_array_new_with_free_func (my_free_func);
+  xptr_array_add (gparray, xstrdup ("foo"));
+  xptr_array_add (gparray, xstrdup ("bar"));
+  xptr_array_add (gparray, xstrdup ("baz"));
+  xptr_array_remove_index (gparray, 0);
   g_assert_cmpint (num_free_func_invocations, ==, 1);
-  g_ptr_array_remove_index_fast (gparray, 1);
+  xptr_array_remove_index_fast (gparray, 1);
   g_assert_cmpint (num_free_func_invocations, ==, 2);
-  s = g_strdup ("frob");
-  g_ptr_array_add (gparray, s);
-  g_assert (g_ptr_array_remove (gparray, s));
-  g_assert (!g_ptr_array_remove (gparray, "nuun"));
-  g_assert (!g_ptr_array_remove_fast (gparray, "mlo"));
+  s = xstrdup ("frob");
+  xptr_array_add (gparray, s);
+  g_assert (xptr_array_remove (gparray, s));
+  g_assert (!xptr_array_remove (gparray, "nuun"));
+  g_assert (!xptr_array_remove_fast (gparray, "mlo"));
   g_assert_cmpint (num_free_func_invocations, ==, 3);
-  s = g_strdup ("frob");
-  g_ptr_array_add (gparray, s);
-  g_ptr_array_set_size (gparray, 1);
+  s = xstrdup ("frob");
+  xptr_array_add (gparray, s);
+  xptr_array_set_size (gparray, 1);
   g_assert_cmpint (num_free_func_invocations, ==, 4);
-  g_ptr_array_ref (gparray);
-  g_ptr_array_unref (gparray);
+  xptr_array_ref (gparray);
+  xptr_array_unref (gparray);
   g_assert_cmpint (num_free_func_invocations, ==, 4);
-  g_ptr_array_unref (gparray);
+  xptr_array_unref (gparray);
   g_assert_cmpint (num_free_func_invocations, ==, 5);
 
   num_free_func_invocations = 0;
-  gparray = g_ptr_array_new_full (10, my_free_func);
-  g_ptr_array_add (gparray, g_strdup ("foo"));
-  g_ptr_array_add (gparray, g_strdup ("bar"));
-  g_ptr_array_add (gparray, g_strdup ("baz"));
-  g_ptr_array_set_size (gparray, 20);
-  g_ptr_array_add (gparray, NULL);
-  gparray2 = g_ptr_array_ref (gparray);
-  strv = (xchar_t **) g_ptr_array_free (gparray, FALSE);
+  gparray = xptr_array_new_full (10, my_free_func);
+  xptr_array_add (gparray, xstrdup ("foo"));
+  xptr_array_add (gparray, xstrdup ("bar"));
+  xptr_array_add (gparray, xstrdup ("baz"));
+  xptr_array_set_size (gparray, 20);
+  xptr_array_add (gparray, NULL);
+  gparray2 = xptr_array_ref (gparray);
+  strv = (xchar_t **) xptr_array_free (gparray, FALSE);
   g_assert_cmpint (num_free_func_invocations, ==, 0);
-  g_strfreev (strv);
-  g_ptr_array_unref (gparray2);
+  xstrfreev (strv);
+  xptr_array_unref (gparray2);
   g_assert_cmpint (num_free_func_invocations, ==, 0);
 
   num_free_func_invocations = 0;
-  gparray = g_ptr_array_new_with_free_func (my_free_func);
-  g_ptr_array_add (gparray, g_strdup ("foo"));
-  g_ptr_array_add (gparray, g_strdup ("bar"));
-  g_ptr_array_add (gparray, g_strdup ("baz"));
-  g_ptr_array_remove_range (gparray, 1, 1);
-  g_ptr_array_unref (gparray);
+  gparray = xptr_array_new_with_free_func (my_free_func);
+  xptr_array_add (gparray, xstrdup ("foo"));
+  xptr_array_add (gparray, xstrdup ("bar"));
+  xptr_array_add (gparray, xstrdup ("baz"));
+  xptr_array_remove_range (gparray, 1, 1);
+  xptr_array_unref (gparray);
   g_assert_cmpint (num_free_func_invocations, ==, 3);
 
   num_free_func_invocations = 0;
-  gparray = g_ptr_array_new_with_free_func (my_free_func);
-  g_ptr_array_add (gparray, g_strdup ("foo"));
-  g_ptr_array_add (gparray, g_strdup ("bar"));
-  g_ptr_array_add (gparray, g_strdup ("baz"));
-  g_ptr_array_free (gparray, TRUE);
+  gparray = xptr_array_new_with_free_func (my_free_func);
+  xptr_array_add (gparray, xstrdup ("foo"));
+  xptr_array_add (gparray, xstrdup ("bar"));
+  xptr_array_add (gparray, xstrdup ("baz"));
+  xptr_array_free (gparray, TRUE);
   g_assert_cmpint (num_free_func_invocations, ==, 3);
 
   num_free_func_invocations = 0;
-  gparray = g_ptr_array_new_with_free_func (my_free_func);
-  g_ptr_array_add (gparray, "foo");
-  g_ptr_array_add (gparray, "bar");
-  g_ptr_array_add (gparray, "baz");
-  g_ptr_array_set_free_func (gparray, NULL);
-  g_ptr_array_free (gparray, TRUE);
+  gparray = xptr_array_new_with_free_func (my_free_func);
+  xptr_array_add (gparray, "foo");
+  xptr_array_add (gparray, "bar");
+  xptr_array_add (gparray, "baz");
+  xptr_array_set_free_func (gparray, NULL);
+  xptr_array_free (gparray, TRUE);
   g_assert_cmpint (num_free_func_invocations, ==, 0);
 }
 
 static xpointer_t
-ptr_array_copy_func (gconstpointer src, xpointer_t userdata)
+ptr_array_copy_func (xconstpointer src, xpointer_t userdata)
 {
   xsize_t *dst = g_malloc (sizeof (xsize_t));
   *dst = *((xsize_t *) src);
   return dst;
 }
 
-/* Test the g_ptr_array_copy() function */
+/* Test the xptr_array_copy() function */
 static void
 pointer_array_copy (void)
 {
-  GPtrArray *ptr_array, *ptr_array2;
+  xptr_array_t *ptr_array, *ptr_array2;
   xsize_t i;
   const xsize_t array_size = 100;
   xsize_t *array_test = g_malloc (array_size * sizeof (xsize_t));
@@ -1122,7 +1122,7 @@ pointer_array_copy (void)
       /* Testing degenerated cases */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      ptr_array = g_ptr_array_copy (NULL, NULL, NULL);
+      ptr_array = xptr_array_copy (NULL, NULL, NULL);
       g_test_assert_expected_messages ();
       g_assert_cmpuint ((xsize_t) ptr_array, ==, (xsize_t) NULL);
     }
@@ -1132,56 +1132,56 @@ pointer_array_copy (void)
     array_test[i] = i;
 
   /* Test copy an empty array */
-  ptr_array = g_ptr_array_sized_new (0);
-  ptr_array2 = g_ptr_array_copy (ptr_array, NULL, NULL);
+  ptr_array = xptr_array_sized_new (0);
+  ptr_array2 = xptr_array_copy (ptr_array, NULL, NULL);
 
   g_assert_cmpuint (ptr_array2->len, ==, ptr_array->len);
 
-  g_ptr_array_unref (ptr_array);
-  g_ptr_array_unref (ptr_array2);
+  xptr_array_unref (ptr_array);
+  xptr_array_unref (ptr_array2);
 
   /* Test simple copy */
-  ptr_array = g_ptr_array_sized_new (array_size);
+  ptr_array = xptr_array_sized_new (array_size);
 
   for (i = 0; i < array_size; i++)
-    g_ptr_array_add (ptr_array, &array_test[i]);
+    xptr_array_add (ptr_array, &array_test[i]);
 
-  ptr_array2 = g_ptr_array_copy (ptr_array, NULL, NULL);
+  ptr_array2 = xptr_array_copy (ptr_array, NULL, NULL);
 
   g_assert_cmpuint (ptr_array2->len, ==, ptr_array->len);
   for (i = 0; i < array_size; i++)
-    g_assert_cmpuint (*((xsize_t *) g_ptr_array_index (ptr_array2, i)), ==, i);
+    g_assert_cmpuint (*((xsize_t *) xptr_array_index (ptr_array2, i)), ==, i);
 
   for (i = 0; i < array_size; i++)
-    g_assert_cmpuint ((xsize_t) g_ptr_array_index (ptr_array, i), ==,
-                      (xsize_t) g_ptr_array_index (ptr_array2, i));
+    g_assert_cmpuint ((xsize_t) xptr_array_index (ptr_array, i), ==,
+                      (xsize_t) xptr_array_index (ptr_array2, i));
 
-  g_ptr_array_free (ptr_array2, TRUE);
+  xptr_array_free (ptr_array2, TRUE);
 
   /* Test copy through GCopyFunc */
-  ptr_array2 = g_ptr_array_copy (ptr_array, ptr_array_copy_func, NULL);
-  g_ptr_array_set_free_func (ptr_array2, g_free);
+  ptr_array2 = xptr_array_copy (ptr_array, ptr_array_copy_func, NULL);
+  xptr_array_set_free_func (ptr_array2, g_free);
 
   g_assert_cmpuint (ptr_array2->len, ==, ptr_array->len);
   for (i = 0; i < array_size; i++)
-    g_assert_cmpuint (*((xsize_t *) g_ptr_array_index (ptr_array2, i)), ==, i);
+    g_assert_cmpuint (*((xsize_t *) xptr_array_index (ptr_array2, i)), ==, i);
 
   for (i = 0; i < array_size; i++)
-    g_assert_cmpuint ((xsize_t) g_ptr_array_index (ptr_array, i), !=,
-                      (xsize_t) g_ptr_array_index (ptr_array2, i));
+    g_assert_cmpuint ((xsize_t) xptr_array_index (ptr_array, i), !=,
+                      (xsize_t) xptr_array_index (ptr_array2, i));
 
-  g_ptr_array_free (ptr_array2, TRUE);
+  xptr_array_free (ptr_array2, TRUE);
 
   /* Final cleanup */
-  g_ptr_array_free (ptr_array, TRUE);
+  xptr_array_free (ptr_array, TRUE);
   g_free (array_test);
 }
 
-/* Test the g_ptr_array_extend() function */
+/* Test the xptr_array_extend() function */
 static void
 pointer_array_extend (void)
 {
-  GPtrArray *ptr_array, *ptr_array2;
+  xptr_array_t *ptr_array, *ptr_array2;
   xsize_t i;
   const xsize_t array_size = 100;
   xsize_t *array_test = g_malloc (array_size * sizeof (xsize_t));
@@ -1189,18 +1189,18 @@ pointer_array_extend (void)
   if (g_test_undefined ())
     {
       /* Testing degenerated cases */
-      ptr_array = g_ptr_array_sized_new (0);
+      ptr_array = xptr_array_sized_new (0);
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      g_ptr_array_extend (NULL, ptr_array, NULL, NULL);
+      xptr_array_extend (NULL, ptr_array, NULL, NULL);
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      g_ptr_array_extend (ptr_array, NULL, NULL, NULL);
+      xptr_array_extend (ptr_array, NULL, NULL, NULL);
       g_test_assert_expected_messages ();
 
-      g_ptr_array_unref (ptr_array);
+      xptr_array_unref (ptr_array);
     }
 
   /* Initializing array_test */
@@ -1208,98 +1208,98 @@ pointer_array_extend (void)
     array_test[i] = i;
 
   /* Testing extend with array of size zero */
-  ptr_array = g_ptr_array_sized_new (0);
-  ptr_array2 = g_ptr_array_sized_new (0);
+  ptr_array = xptr_array_sized_new (0);
+  ptr_array2 = xptr_array_sized_new (0);
 
-  g_ptr_array_extend (ptr_array, ptr_array2, NULL, NULL);
+  xptr_array_extend (ptr_array, ptr_array2, NULL, NULL);
 
   g_assert_cmpuint (ptr_array->len, ==, 0);
   g_assert_cmpuint (ptr_array2->len, ==, 0);
 
-  g_ptr_array_unref (ptr_array);
-  g_ptr_array_unref (ptr_array2);
+  xptr_array_unref (ptr_array);
+  xptr_array_unref (ptr_array2);
 
   /* Testing extend an array of size zero */
-  ptr_array = g_ptr_array_sized_new (array_size);
-  ptr_array2 = g_ptr_array_sized_new (0);
+  ptr_array = xptr_array_sized_new (array_size);
+  ptr_array2 = xptr_array_sized_new (0);
 
   for (i = 0; i < array_size; i++)
     {
-      g_ptr_array_add (ptr_array, &array_test[i]);
+      xptr_array_add (ptr_array, &array_test[i]);
     }
 
-  g_ptr_array_extend (ptr_array, ptr_array2, NULL, NULL);
+  xptr_array_extend (ptr_array, ptr_array2, NULL, NULL);
 
   for (i = 0; i < array_size; i++)
-    g_assert_cmpuint (*((xsize_t *) g_ptr_array_index (ptr_array, i)), ==, i);
+    g_assert_cmpuint (*((xsize_t *) xptr_array_index (ptr_array, i)), ==, i);
 
-  g_ptr_array_unref (ptr_array);
-  g_ptr_array_unref (ptr_array2);
+  xptr_array_unref (ptr_array);
+  xptr_array_unref (ptr_array2);
 
   /* Testing extend an array of size zero */
-  ptr_array = g_ptr_array_sized_new (0);
-  ptr_array2 = g_ptr_array_sized_new (array_size);
+  ptr_array = xptr_array_sized_new (0);
+  ptr_array2 = xptr_array_sized_new (array_size);
 
   for (i = 0; i < array_size; i++)
     {
-      g_ptr_array_add (ptr_array2, &array_test[i]);
+      xptr_array_add (ptr_array2, &array_test[i]);
     }
 
-  g_ptr_array_extend (ptr_array, ptr_array2, NULL, NULL);
+  xptr_array_extend (ptr_array, ptr_array2, NULL, NULL);
 
   for (i = 0; i < array_size; i++)
-    g_assert_cmpuint (*((xsize_t *) g_ptr_array_index (ptr_array, i)), ==, i);
+    g_assert_cmpuint (*((xsize_t *) xptr_array_index (ptr_array, i)), ==, i);
 
-  g_ptr_array_unref (ptr_array);
-  g_ptr_array_unref (ptr_array2);
+  xptr_array_unref (ptr_array);
+  xptr_array_unref (ptr_array2);
 
   /* Testing simple extend */
-  ptr_array = g_ptr_array_sized_new (array_size / 2);
-  ptr_array2 = g_ptr_array_sized_new (array_size / 2);
+  ptr_array = xptr_array_sized_new (array_size / 2);
+  ptr_array2 = xptr_array_sized_new (array_size / 2);
 
   for (i = 0; i < array_size / 2; i++)
     {
-      g_ptr_array_add (ptr_array, &array_test[i]);
-      g_ptr_array_add (ptr_array2, &array_test[i + (array_size / 2)]);
+      xptr_array_add (ptr_array, &array_test[i]);
+      xptr_array_add (ptr_array2, &array_test[i + (array_size / 2)]);
     }
 
-  g_ptr_array_extend (ptr_array, ptr_array2, NULL, NULL);
+  xptr_array_extend (ptr_array, ptr_array2, NULL, NULL);
 
   for (i = 0; i < array_size; i++)
-    g_assert_cmpuint (*((xsize_t *) g_ptr_array_index (ptr_array, i)), ==, i);
+    g_assert_cmpuint (*((xsize_t *) xptr_array_index (ptr_array, i)), ==, i);
 
-  g_ptr_array_unref (ptr_array);
-  g_ptr_array_unref (ptr_array2);
+  xptr_array_unref (ptr_array);
+  xptr_array_unref (ptr_array2);
 
   /* Testing extend with GCopyFunc */
-  ptr_array = g_ptr_array_sized_new (array_size / 2);
-  ptr_array2 = g_ptr_array_sized_new (array_size / 2);
+  ptr_array = xptr_array_sized_new (array_size / 2);
+  ptr_array2 = xptr_array_sized_new (array_size / 2);
 
   for (i = 0; i < array_size / 2; i++)
     {
-      g_ptr_array_add (ptr_array, &array_test[i]);
-      g_ptr_array_add (ptr_array2, &array_test[i + (array_size / 2)]);
+      xptr_array_add (ptr_array, &array_test[i]);
+      xptr_array_add (ptr_array2, &array_test[i + (array_size / 2)]);
     }
 
-  g_ptr_array_extend (ptr_array, ptr_array2, ptr_array_copy_func, NULL);
+  xptr_array_extend (ptr_array, ptr_array2, ptr_array_copy_func, NULL);
 
   for (i = 0; i < array_size; i++)
-    g_assert_cmpuint (*((xsize_t *) g_ptr_array_index (ptr_array, i)), ==, i);
+    g_assert_cmpuint (*((xsize_t *) xptr_array_index (ptr_array, i)), ==, i);
 
   /* Clean-up memory */
   for (i = array_size / 2; i < array_size; i++)
-    g_free (g_ptr_array_index (ptr_array, i));
+    g_free (xptr_array_index (ptr_array, i));
 
-  g_ptr_array_unref (ptr_array);
-  g_ptr_array_unref (ptr_array2);
+  xptr_array_unref (ptr_array);
+  xptr_array_unref (ptr_array2);
   g_free (array_test);
 }
 
-/* Test the g_ptr_array_extend_and_steal() function */
+/* Test the xptr_array_extend_and_steal() function */
 static void
 pointer_array_extend_and_steal (void)
 {
-  GPtrArray *ptr_array, *ptr_array2, *ptr_array3;
+  xptr_array_t *ptr_array, *ptr_array2, *ptr_array3;
   xsize_t i;
   const xsize_t array_size = 100;
   xsize_t *array_test = g_malloc (array_size * sizeof (xsize_t));
@@ -1309,53 +1309,53 @@ pointer_array_extend_and_steal (void)
     array_test[i] = i;
 
   /* Testing simple extend_and_steal() */
-  ptr_array = g_ptr_array_sized_new (array_size / 2);
-  ptr_array2 = g_ptr_array_sized_new (array_size / 2);
+  ptr_array = xptr_array_sized_new (array_size / 2);
+  ptr_array2 = xptr_array_sized_new (array_size / 2);
 
   for (i = 0; i < array_size / 2; i++)
     {
-      g_ptr_array_add (ptr_array, &array_test[i]);
-      g_ptr_array_add (ptr_array2, &array_test[i + (array_size / 2)]);
+      xptr_array_add (ptr_array, &array_test[i]);
+      xptr_array_add (ptr_array2, &array_test[i + (array_size / 2)]);
     }
 
-  g_ptr_array_extend_and_steal (ptr_array, ptr_array2);
+  xptr_array_extend_and_steal (ptr_array, ptr_array2);
 
   for (i = 0; i < array_size; i++)
-    g_assert_cmpuint (*((xsize_t *) g_ptr_array_index (ptr_array, i)), ==, i);
+    g_assert_cmpuint (*((xsize_t *) xptr_array_index (ptr_array, i)), ==, i);
 
-  g_ptr_array_free (ptr_array, TRUE);
+  xptr_array_free (ptr_array, TRUE);
 
   /* Testing extend_and_steal() with a pending reference to stolen array */
-  ptr_array = g_ptr_array_sized_new (array_size / 2);
-  ptr_array2 = g_ptr_array_sized_new (array_size / 2);
+  ptr_array = xptr_array_sized_new (array_size / 2);
+  ptr_array2 = xptr_array_sized_new (array_size / 2);
 
   for (i = 0; i < array_size / 2; i++)
     {
-      g_ptr_array_add (ptr_array, &array_test[i]);
-      g_ptr_array_add (ptr_array2, &array_test[i + (array_size / 2)]);
+      xptr_array_add (ptr_array, &array_test[i]);
+      xptr_array_add (ptr_array2, &array_test[i + (array_size / 2)]);
     }
 
-  ptr_array3 = g_ptr_array_ref (ptr_array2);
+  ptr_array3 = xptr_array_ref (ptr_array2);
 
-  g_ptr_array_extend_and_steal (ptr_array, ptr_array2);
+  xptr_array_extend_and_steal (ptr_array, ptr_array2);
 
   for (i = 0; i < array_size; i++)
-    g_assert_cmpuint (*((xsize_t *) g_ptr_array_index (ptr_array, i)), ==, i);
+    g_assert_cmpuint (*((xsize_t *) xptr_array_index (ptr_array, i)), ==, i);
 
   g_assert_cmpuint (ptr_array3->len, ==, 0);
   g_assert_null (ptr_array3->pdata);
 
-  g_ptr_array_add (ptr_array2, NULL);
+  xptr_array_add (ptr_array2, NULL);
 
-  g_ptr_array_free (ptr_array, TRUE);
-  g_ptr_array_free (ptr_array3, TRUE);
+  xptr_array_free (ptr_array, TRUE);
+  xptr_array_free (ptr_array3, TRUE);
 
   /* Final memory clean-up */
   g_free (array_test);
 }
 
 static xint_t
-ptr_compare (gconstpointer p1, gconstpointer p2)
+ptr_compare (xconstpointer p1, xconstpointer p2)
 {
   xpointer_t i1 = *(xpointer_t*)p1;
   xpointer_t i2 = *(xpointer_t*)p2;
@@ -1364,7 +1364,7 @@ ptr_compare (gconstpointer p1, gconstpointer p2)
 }
 
 static xint_t
-ptr_compare_data (gconstpointer p1, gconstpointer p2, xpointer_t data)
+ptr_compare_data (xconstpointer p1, xconstpointer p2, xpointer_t data)
 {
   xpointer_t i1 = *(xpointer_t*)p1;
   xpointer_t i2 = *(xpointer_t*)p2;
@@ -1375,37 +1375,37 @@ ptr_compare_data (gconstpointer p1, gconstpointer p2, xpointer_t data)
 static void
 pointer_array_sort (void)
 {
-  GPtrArray *gparray;
+  xptr_array_t *gparray;
   xint_t i;
   xint_t val;
   xint_t prev, cur;
 
-  gparray = g_ptr_array_new ();
+  gparray = xptr_array_new ();
 
   /* Sort empty array */
-  g_ptr_array_sort (gparray, ptr_compare);
+  xptr_array_sort (gparray, ptr_compare);
 
   for (i = 0; i < 10000; i++)
     {
       val = g_random_int_range (0, 10000);
-      g_ptr_array_add (gparray, GINT_TO_POINTER (val));
+      xptr_array_add (gparray, GINT_TO_POINTER (val));
     }
 
-  g_ptr_array_sort (gparray, ptr_compare);
+  xptr_array_sort (gparray, ptr_compare);
 
   prev = -1;
   for (i = 0; i < 10000; i++)
     {
-      cur = GPOINTER_TO_INT (g_ptr_array_index (gparray, i));
+      cur = GPOINTER_TO_INT (xptr_array_index (gparray, i));
       g_assert_cmpint (prev, <=, cur);
       prev = cur;
     }
 
-  g_ptr_array_free (gparray, TRUE);
+  xptr_array_free (gparray, TRUE);
 }
 
 /* Please keep pointer_array_sort_example() in sync with the doc-comment
- * of g_ptr_array_sort() */
+ * of xptr_array_sort() */
 
 typedef struct
 {
@@ -1423,7 +1423,7 @@ file_list_entry_free (xpointer_t p)
 }
 
 static xint_t
-sort_filelist (gconstpointer a, gconstpointer b)
+sort_filelist (xconstpointer a, xconstpointer b)
 {
    const FileListEntry *entry1 = *((FileListEntry **) a);
    const FileListEntry *entry2 = *((FileListEntry **) b);
@@ -1434,48 +1434,48 @@ sort_filelist (gconstpointer a, gconstpointer b)
 static void
 pointer_array_sort_example (void)
 {
-  GPtrArray *file_list = NULL;
+  xptr_array_t *file_list = NULL;
   FileListEntry *entry;
 
-  g_test_summary ("Check that the doc-comment for g_ptr_array_sort() is correct");
+  g_test_summary ("Check that the doc-comment for xptr_array_sort() is correct");
 
-  file_list = g_ptr_array_new_with_free_func (file_list_entry_free);
+  file_list = xptr_array_new_with_free_func (file_list_entry_free);
 
   entry = g_new0 (FileListEntry, 1);
-  entry->name = g_strdup ("README");
+  entry->name = xstrdup ("README");
   entry->size = 42;
-  g_ptr_array_add (file_list, g_steal_pointer (&entry));
+  xptr_array_add (file_list, g_steal_pointer (&entry));
 
   entry = g_new0 (FileListEntry, 1);
-  entry->name = g_strdup ("empty");
+  entry->name = xstrdup ("empty");
   entry->size = 0;
-  g_ptr_array_add (file_list, g_steal_pointer (&entry));
+  xptr_array_add (file_list, g_steal_pointer (&entry));
 
   entry = g_new0 (FileListEntry, 1);
-  entry->name = g_strdup ("aardvark");
+  entry->name = xstrdup ("aardvark");
   entry->size = 23;
-  g_ptr_array_add (file_list, g_steal_pointer (&entry));
+  xptr_array_add (file_list, g_steal_pointer (&entry));
 
-  g_ptr_array_sort (file_list, sort_filelist);
+  xptr_array_sort (file_list, sort_filelist);
 
   g_assert_cmpuint (file_list->len, ==, 3);
-  entry = g_ptr_array_index (file_list, 0);
+  entry = xptr_array_index (file_list, 0);
   g_assert_cmpstr (entry->name, ==, "aardvark");
-  entry = g_ptr_array_index (file_list, 1);
+  entry = xptr_array_index (file_list, 1);
   g_assert_cmpstr (entry->name, ==, "empty");
-  entry = g_ptr_array_index (file_list, 2);
+  entry = xptr_array_index (file_list, 2);
   g_assert_cmpstr (entry->name, ==, "README");
 
-  g_ptr_array_unref (file_list);
+  xptr_array_unref (file_list);
 }
 
 /* Please keep pointer_array_sort_with_data_example() in sync with the
- * doc-comment of g_ptr_array_sort_with_data() */
+ * doc-comment of xptr_array_sort_with_data() */
 
 typedef enum { SORT_NAME, SORT_SIZE } SortMode;
 
 static xint_t
-sort_filelist_how (gconstpointer a, gconstpointer b, xpointer_t user_data)
+sort_filelist_how (xconstpointer a, xconstpointer b, xpointer_t user_data)
 {
   xint_t order;
   const SortMode sort_mode = GPOINTER_TO_INT (user_data);
@@ -1500,133 +1500,133 @@ sort_filelist_how (gconstpointer a, gconstpointer b, xpointer_t user_data)
 static void
 pointer_array_sort_with_data_example (void)
 {
-  GPtrArray *file_list = NULL;
+  xptr_array_t *file_list = NULL;
   FileListEntry *entry;
   SortMode sort_mode;
 
-  g_test_summary ("Check that the doc-comment for g_ptr_array_sort_with_data() is correct");
+  g_test_summary ("Check that the doc-comment for xptr_array_sort_with_data() is correct");
 
-  file_list = g_ptr_array_new_with_free_func (file_list_entry_free);
+  file_list = xptr_array_new_with_free_func (file_list_entry_free);
 
   entry = g_new0 (FileListEntry, 1);
-  entry->name = g_strdup ("README");
+  entry->name = xstrdup ("README");
   entry->size = 42;
-  g_ptr_array_add (file_list, g_steal_pointer (&entry));
+  xptr_array_add (file_list, g_steal_pointer (&entry));
 
   entry = g_new0 (FileListEntry, 1);
-  entry->name = g_strdup ("empty");
+  entry->name = xstrdup ("empty");
   entry->size = 0;
-  g_ptr_array_add (file_list, g_steal_pointer (&entry));
+  xptr_array_add (file_list, g_steal_pointer (&entry));
 
   entry = g_new0 (FileListEntry, 1);
-  entry->name = g_strdup ("aardvark");
+  entry->name = xstrdup ("aardvark");
   entry->size = 23;
-  g_ptr_array_add (file_list, g_steal_pointer (&entry));
+  xptr_array_add (file_list, g_steal_pointer (&entry));
 
   sort_mode = SORT_NAME;
-  g_ptr_array_sort_with_data (file_list, sort_filelist_how, GINT_TO_POINTER (sort_mode));
+  xptr_array_sort_with_data (file_list, sort_filelist_how, GINT_TO_POINTER (sort_mode));
 
   g_assert_cmpuint (file_list->len, ==, 3);
-  entry = g_ptr_array_index (file_list, 0);
+  entry = xptr_array_index (file_list, 0);
   g_assert_cmpstr (entry->name, ==, "aardvark");
-  entry = g_ptr_array_index (file_list, 1);
+  entry = xptr_array_index (file_list, 1);
   g_assert_cmpstr (entry->name, ==, "empty");
-  entry = g_ptr_array_index (file_list, 2);
+  entry = xptr_array_index (file_list, 2);
   g_assert_cmpstr (entry->name, ==, "README");
 
   sort_mode = SORT_SIZE;
-  g_ptr_array_sort_with_data (file_list, sort_filelist_how, GINT_TO_POINTER (sort_mode));
+  xptr_array_sort_with_data (file_list, sort_filelist_how, GINT_TO_POINTER (sort_mode));
 
   g_assert_cmpuint (file_list->len, ==, 3);
-  entry = g_ptr_array_index (file_list, 0);
+  entry = xptr_array_index (file_list, 0);
   g_assert_cmpstr (entry->name, ==, "empty");
-  entry = g_ptr_array_index (file_list, 1);
+  entry = xptr_array_index (file_list, 1);
   g_assert_cmpstr (entry->name, ==, "aardvark");
-  entry = g_ptr_array_index (file_list, 2);
+  entry = xptr_array_index (file_list, 2);
   g_assert_cmpstr (entry->name, ==, "README");
 
-  g_ptr_array_unref (file_list);
+  xptr_array_unref (file_list);
 }
 
 static void
 pointer_array_sort_with_data (void)
 {
-  GPtrArray *gparray;
+  xptr_array_t *gparray;
   xint_t i;
   xint_t prev, cur;
 
-  gparray = g_ptr_array_new ();
+  gparray = xptr_array_new ();
 
   /* Sort empty array */
-  g_ptr_array_sort_with_data (gparray, ptr_compare_data, NULL);
+  xptr_array_sort_with_data (gparray, ptr_compare_data, NULL);
 
   for (i = 0; i < 10000; i++)
-    g_ptr_array_add (gparray, GINT_TO_POINTER (g_random_int_range (0, 10000)));
+    xptr_array_add (gparray, GINT_TO_POINTER (g_random_int_range (0, 10000)));
 
-  g_ptr_array_sort_with_data (gparray, ptr_compare_data, NULL);
+  xptr_array_sort_with_data (gparray, ptr_compare_data, NULL);
 
   prev = -1;
   for (i = 0; i < 10000; i++)
     {
-      cur = GPOINTER_TO_INT (g_ptr_array_index (gparray, i));
+      cur = GPOINTER_TO_INT (xptr_array_index (gparray, i));
       g_assert_cmpint (prev, <=, cur);
       prev = cur;
     }
 
-  g_ptr_array_free (gparray, TRUE);
+  xptr_array_free (gparray, TRUE);
 }
 
 static void
 pointer_array_find_empty (void)
 {
-  GPtrArray *array;
+  xptr_array_t *array;
   xuint_t idx;
 
-  array = g_ptr_array_new ();
+  array = xptr_array_new ();
 
-  g_assert_false (g_ptr_array_find (array, "some-value", NULL));  /* NULL index */
-  g_assert_false (g_ptr_array_find (array, "some-value", &idx));  /* non-NULL index */
-  g_assert_false (g_ptr_array_find_with_equal_func (array, "some-value", g_str_equal, NULL));  /* NULL index */
-  g_assert_false (g_ptr_array_find_with_equal_func (array, "some-value", g_str_equal, &idx));  /* non-NULL index */
+  g_assert_false (xptr_array_find (array, "some-value", NULL));  /* NULL index */
+  g_assert_false (xptr_array_find (array, "some-value", &idx));  /* non-NULL index */
+  g_assert_false (xptr_array_find_with_equal_func (array, "some-value", xstr_equal, NULL));  /* NULL index */
+  g_assert_false (xptr_array_find_with_equal_func (array, "some-value", xstr_equal, &idx));  /* non-NULL index */
 
-  g_ptr_array_free (array, TRUE);
+  xptr_array_free (array, TRUE);
 }
 
 static void
 pointer_array_find_non_empty (void)
 {
-  GPtrArray *array;
+  xptr_array_t *array;
   xuint_t idx;
   const xchar_t *str_pointer = "static-string";
 
-  array = g_ptr_array_new ();
+  array = xptr_array_new ();
 
-  g_ptr_array_add (array, "some");
-  g_ptr_array_add (array, "random");
-  g_ptr_array_add (array, "values");
-  g_ptr_array_add (array, "some");
-  g_ptr_array_add (array, "duplicated");
-  g_ptr_array_add (array, (xpointer_t) str_pointer);
+  xptr_array_add (array, "some");
+  xptr_array_add (array, "random");
+  xptr_array_add (array, "values");
+  xptr_array_add (array, "some");
+  xptr_array_add (array, "duplicated");
+  xptr_array_add (array, (xpointer_t) str_pointer);
 
-  g_assert_true (g_ptr_array_find_with_equal_func (array, "random", g_str_equal, NULL));  /* NULL index */
-  g_assert_true (g_ptr_array_find_with_equal_func (array, "random", g_str_equal, &idx));  /* non-NULL index */
+  g_assert_true (xptr_array_find_with_equal_func (array, "random", xstr_equal, NULL));  /* NULL index */
+  g_assert_true (xptr_array_find_with_equal_func (array, "random", xstr_equal, &idx));  /* non-NULL index */
   g_assert_cmpuint (idx, ==, 1);
 
-  g_assert_true (g_ptr_array_find_with_equal_func (array, "some", g_str_equal, &idx));  /* duplicate element */
+  g_assert_true (xptr_array_find_with_equal_func (array, "some", xstr_equal, &idx));  /* duplicate element */
   g_assert_cmpuint (idx, ==, 0);
 
-  g_assert_false (g_ptr_array_find_with_equal_func (array, "nope", g_str_equal, NULL));
+  g_assert_false (xptr_array_find_with_equal_func (array, "nope", xstr_equal, NULL));
 
-  g_assert_true (g_ptr_array_find_with_equal_func (array, str_pointer, g_str_equal, &idx));
+  g_assert_true (xptr_array_find_with_equal_func (array, str_pointer, xstr_equal, &idx));
   g_assert_cmpuint (idx, ==, 5);
   idx = G_MAXUINT;
-  g_assert_true (g_ptr_array_find_with_equal_func (array, str_pointer, NULL, &idx));  /* NULL equal func */
+  g_assert_true (xptr_array_find_with_equal_func (array, str_pointer, NULL, &idx));  /* NULL equal func */
   g_assert_cmpuint (idx, ==, 5);
   idx = G_MAXUINT;
-  g_assert_true (g_ptr_array_find (array, str_pointer, &idx));  /* NULL equal func */
+  g_assert_true (xptr_array_find (array, str_pointer, &idx));  /* NULL equal func */
   g_assert_cmpuint (idx, ==, 5);
 
-  g_ptr_array_free (array, TRUE);
+  xptr_array_free (array, TRUE);
 }
 
 static void
@@ -1636,45 +1636,45 @@ steal_destroy_notify (xpointer_t data)
   *counter = *counter + 1;
 }
 
-/* Test that g_ptr_array_steal_index() and g_ptr_array_steal_index_fast() can
- * remove elements from a pointer array without the #GDestroyNotify being called. */
+/* Test that xptr_array_steal_index() and xptr_array_steal_index_fast() can
+ * remove elements from a pointer array without the #xdestroy_notify_t being called. */
 static void
 pointer_array_steal_index (void)
 {
   xuint_t i1 = 0, i2 = 0, i3 = 0, i4 = 0;
   xpointer_t out1, out2;
-  GPtrArray *array = g_ptr_array_new_with_free_func (steal_destroy_notify);
+  xptr_array_t *array = xptr_array_new_with_free_func (steal_destroy_notify);
 
-  g_ptr_array_add (array, &i1);
-  g_ptr_array_add (array, &i2);
-  g_ptr_array_add (array, &i3);
-  g_ptr_array_add (array, &i4);
+  xptr_array_add (array, &i1);
+  xptr_array_add (array, &i2);
+  xptr_array_add (array, &i3);
+  xptr_array_add (array, &i4);
 
   g_assert_cmpuint (array->len, ==, 4);
 
   /* Remove a single element. */
-  out1 = g_ptr_array_steal_index (array, 0);
+  out1 = xptr_array_steal_index (array, 0);
   g_assert_true (out1 == &i1);
   g_assert_cmpuint (i1, ==, 0);  /* should not have been destroyed */
 
   /* Following elements should have been moved down. */
   g_assert_cmpuint (array->len, ==, 3);
-  g_assert_true (g_ptr_array_index (array, 0) == &i2);
-  g_assert_true (g_ptr_array_index (array, 1) == &i3);
-  g_assert_true (g_ptr_array_index (array, 2) == &i4);
+  g_assert_true (xptr_array_index (array, 0) == &i2);
+  g_assert_true (xptr_array_index (array, 1) == &i3);
+  g_assert_true (xptr_array_index (array, 2) == &i4);
 
   /* Remove another element, quickly. */
-  out2 = g_ptr_array_steal_index_fast (array, 0);
+  out2 = xptr_array_steal_index_fast (array, 0);
   g_assert_true (out2 == &i2);
   g_assert_cmpuint (i2, ==, 0);  /* should not have been destroyed */
 
   /* Last element should have been swapped in place. */
   g_assert_cmpuint (array->len, ==, 2);
-  g_assert_true (g_ptr_array_index (array, 0) == &i4);
-  g_assert_true (g_ptr_array_index (array, 1) == &i3);
+  g_assert_true (xptr_array_index (array, 0) == &i4);
+  g_assert_true (xptr_array_index (array, 1) == &i3);
 
   /* Check that destroying the pointer array doesn’t affect the stolen elements. */
-  g_ptr_array_unref (array);
+  xptr_array_unref (array);
 
   g_assert_cmpuint (i1, ==, 0);
   g_assert_cmpuint (i2, ==, 0);
@@ -1688,7 +1688,7 @@ byte_array_new_take_overflow (void)
 #if SIZE_WIDTH <= UINT_WIDTH
   g_test_skip ("Overflow test requires G_MAXSIZE > G_MAXUINT.");
 #else
-  GByteArray* arr;
+  xbyte_array_t* arr;
 
   if (!g_test_undefined ())
       return;
@@ -1696,7 +1696,7 @@ byte_array_new_take_overflow (void)
   /* Check for overflow should happen before data is accessed. */
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                           "*assertion 'len <= G_MAXUINT' failed");
-  arr = g_byte_array_new_take (NULL, (xsize_t)G_MAXUINT + 1);
+  arr = xbyte_array_new_take (NULL, (xsize_t)G_MAXUINT + 1);
   g_assert_null (arr);
   g_test_assert_expected_messages ();
 #endif
@@ -1706,47 +1706,47 @@ static void
 byte_array_steal (void)
 {
   const xuint_t array_size = 10000;
-  GByteArray *gbarray;
-  guint8 *bdata;
+  xbyte_array_t *gbarray;
+  xuint8_t *bdata;
   xuint_t i;
   xsize_t len, past_len;
 
-  gbarray = g_byte_array_new ();
-  bdata = g_byte_array_steal (gbarray, NULL);
+  gbarray = xbyte_array_new ();
+  bdata = xbyte_array_steal (gbarray, NULL);
   g_assert_cmpint ((xsize_t) bdata, ==, (xsize_t) gbarray->data);
   g_free (bdata);
 
   for (i = 0; i < array_size; i++)
-    g_byte_array_append (gbarray, (guint8 *) "abcd", 4);
+    xbyte_array_append (gbarray, (xuint8_t *) "abcd", 4);
 
   past_len = gbarray->len;
-  bdata = g_byte_array_steal (gbarray, &len);
+  bdata = xbyte_array_steal (gbarray, &len);
 
   g_assert_cmpint (len, ==, past_len);
   g_assert_cmpint (gbarray->len, ==, 0);
 
-  g_byte_array_append (gbarray, (guint8 *) "@", 1);
+  xbyte_array_append (gbarray, (xuint8_t *) "@", 1);
 
   g_assert_cmpint (bdata[0], ==, 'a');
   g_assert_cmpint (gbarray->data[0], ==, '@');
   g_assert_cmpint (gbarray->len, ==, 1);
 
-  g_byte_array_remove_index (gbarray, 0);
+  xbyte_array_remove_index (gbarray, 0);
 
   g_free (bdata);
-  g_byte_array_free (gbarray, TRUE);
+  xbyte_array_free (gbarray, TRUE);
 }
 
 static void
 byte_array_append (void)
 {
-  GByteArray *gbarray;
+  xbyte_array_t *gbarray;
   xint_t i;
-  guint8 *segment;
+  xuint8_t *segment;
 
-  gbarray = g_byte_array_sized_new (1000);
+  gbarray = xbyte_array_sized_new (1000);
   for (i = 0; i < 10000; i++)
-    g_byte_array_append (gbarray, (guint8*) "abcd", 4);
+    xbyte_array_append (gbarray, (xuint8_t*) "abcd", 4);
 
   for (i = 0; i < 10000; i++)
     {
@@ -1756,7 +1756,7 @@ byte_array_append (void)
       g_assert (gbarray->data[4*i+3] == 'd');
     }
 
-  segment = g_byte_array_free (gbarray, FALSE);
+  segment = xbyte_array_free (gbarray, FALSE);
 
   for (i = 0; i < 10000; i++)
     {
@@ -1772,14 +1772,14 @@ byte_array_append (void)
 static void
 byte_array_prepend (void)
 {
-  GByteArray *gbarray;
+  xbyte_array_t *gbarray;
   xint_t i;
 
-  gbarray = g_byte_array_new ();
-  g_byte_array_set_size (gbarray, 1000);
+  gbarray = xbyte_array_new ();
+  xbyte_array_set_size (gbarray, 1000);
 
   for (i = 0; i < 10000; i++)
-    g_byte_array_prepend (gbarray, (guint8*) "abcd", 4);
+    xbyte_array_prepend (gbarray, (xuint8_t*) "abcd", 4);
 
   for (i = 0; i < 10000; i++)
     {
@@ -1789,23 +1789,23 @@ byte_array_prepend (void)
       g_assert (gbarray->data[4*i+3] == 'd');
     }
 
-  g_byte_array_free (gbarray, TRUE);
+  xbyte_array_free (gbarray, TRUE);
 }
 
 static void
 byte_array_ref_count (void)
 {
-  GByteArray *gbarray;
-  GByteArray *gbarray2;
+  xbyte_array_t *gbarray;
+  xbyte_array_t *gbarray2;
   xint_t i;
 
-  gbarray = g_byte_array_new ();
+  gbarray = xbyte_array_new ();
   for (i = 0; i < 10000; i++)
-    g_byte_array_append (gbarray, (guint8*) "abcd", 4);
+    xbyte_array_append (gbarray, (xuint8_t*) "abcd", 4);
 
-  gbarray2 = g_byte_array_ref (gbarray);
+  gbarray2 = xbyte_array_ref (gbarray);
   g_assert (gbarray2 == gbarray);
-  g_byte_array_unref (gbarray2);
+  xbyte_array_unref (gbarray2);
   for (i = 0; i < 10000; i++)
     {
       g_assert (gbarray->data[4*i] == 'a');
@@ -1814,29 +1814,29 @@ byte_array_ref_count (void)
       g_assert (gbarray->data[4*i+3] == 'd');
     }
 
-  gbarray2 = g_byte_array_ref (gbarray);
+  gbarray2 = xbyte_array_ref (gbarray);
   g_assert (gbarray2 == gbarray);
-  g_byte_array_free (gbarray, TRUE);
+  xbyte_array_free (gbarray, TRUE);
   g_assert_cmpint (gbarray2->len, ==, 0);
-  g_byte_array_unref (gbarray2);
+  xbyte_array_unref (gbarray2);
 }
 
 static void
 byte_array_remove (void)
 {
-  GByteArray *gbarray;
+  xbyte_array_t *gbarray;
   xint_t i;
 
-  gbarray = g_byte_array_new ();
+  gbarray = xbyte_array_new ();
   for (i = 0; i < 100; i++)
-    g_byte_array_append (gbarray, (guint8*) "abcd", 4);
+    xbyte_array_append (gbarray, (xuint8_t*) "abcd", 4);
 
   g_assert_cmpint (gbarray->len, ==, 400);
 
-  g_byte_array_remove_index (gbarray, 4);
-  g_byte_array_remove_index (gbarray, 4);
-  g_byte_array_remove_index (gbarray, 4);
-  g_byte_array_remove_index (gbarray, 4);
+  xbyte_array_remove_index (gbarray, 4);
+  xbyte_array_remove_index (gbarray, 4);
+  xbyte_array_remove_index (gbarray, 4);
+  xbyte_array_remove_index (gbarray, 4);
 
   g_assert_cmpint (gbarray->len, ==, 396);
 
@@ -1848,25 +1848,25 @@ byte_array_remove (void)
       g_assert (gbarray->data[4*i+3] == 'd');
     }
 
-  g_byte_array_free (gbarray, TRUE);
+  xbyte_array_free (gbarray, TRUE);
 }
 
 static void
 byte_array_remove_fast (void)
 {
-  GByteArray *gbarray;
+  xbyte_array_t *gbarray;
   xint_t i;
 
-  gbarray = g_byte_array_new ();
+  gbarray = xbyte_array_new ();
   for (i = 0; i < 100; i++)
-    g_byte_array_append (gbarray, (guint8*) "abcd", 4);
+    xbyte_array_append (gbarray, (xuint8_t*) "abcd", 4);
 
   g_assert_cmpint (gbarray->len, ==, 400);
 
-  g_byte_array_remove_index_fast (gbarray, 4);
-  g_byte_array_remove_index_fast (gbarray, 4);
-  g_byte_array_remove_index_fast (gbarray, 4);
-  g_byte_array_remove_index_fast (gbarray, 4);
+  xbyte_array_remove_index_fast (gbarray, 4);
+  xbyte_array_remove_index_fast (gbarray, 4);
+  xbyte_array_remove_index_fast (gbarray, 4);
+  xbyte_array_remove_index_fast (gbarray, 4);
 
   g_assert_cmpint (gbarray->len, ==, 396);
 
@@ -1878,22 +1878,22 @@ byte_array_remove_fast (void)
       g_assert (gbarray->data[4*i+3] == 'd');
     }
 
-  g_byte_array_free (gbarray, TRUE);
+  xbyte_array_free (gbarray, TRUE);
 }
 
 static void
 byte_array_remove_range (void)
 {
-  GByteArray *gbarray;
+  xbyte_array_t *gbarray;
   xint_t i;
 
-  gbarray = g_byte_array_new ();
+  gbarray = xbyte_array_new ();
   for (i = 0; i < 100; i++)
-    g_byte_array_append (gbarray, (guint8*) "abcd", 4);
+    xbyte_array_append (gbarray, (xuint8_t*) "abcd", 4);
 
   g_assert_cmpint (gbarray->len, ==, 400);
 
-  g_byte_array_remove_range (gbarray, 12, 4);
+  xbyte_array_remove_range (gbarray, 12, 4);
 
   g_assert_cmpint (gbarray->len, ==, 396);
 
@@ -1906,26 +1906,26 @@ byte_array_remove_range (void)
     }
 
   /* Ensure the entire array can be cleared, even when empty. */
-  g_byte_array_remove_range (gbarray, 0, gbarray->len);
-  g_byte_array_remove_range (gbarray, 0, gbarray->len);
+  xbyte_array_remove_range (gbarray, 0, gbarray->len);
+  xbyte_array_remove_range (gbarray, 0, gbarray->len);
 
-  g_byte_array_free (gbarray, TRUE);
+  xbyte_array_free (gbarray, TRUE);
 }
 
 static int
-byte_compare (gconstpointer p1, gconstpointer p2)
+byte_compare (xconstpointer p1, xconstpointer p2)
 {
-  const guint8 *i1 = p1;
-  const guint8 *i2 = p2;
+  const xuint8_t *i1 = p1;
+  const xuint8_t *i2 = p2;
 
   return *i1 - *i2;
 }
 
 static int
-byte_compare_data (gconstpointer p1, gconstpointer p2, xpointer_t data)
+byte_compare_data (xconstpointer p1, xconstpointer p2, xpointer_t data)
 {
-  const guint8 *i1 = p1;
-  const guint8 *i2 = p2;
+  const xuint8_t *i1 = p1;
+  const xuint8_t *i2 = p2;
 
   return *i1 - *i2;
 }
@@ -1933,19 +1933,19 @@ byte_compare_data (gconstpointer p1, gconstpointer p2, xpointer_t data)
 static void
 byte_array_sort (void)
 {
-  GByteArray *gbarray;
+  xbyte_array_t *gbarray;
   xuint_t i;
-  guint8 val;
-  guint8 prev, cur;
+  xuint8_t val;
+  xuint8_t prev, cur;
 
-  gbarray = g_byte_array_new ();
+  gbarray = xbyte_array_new ();
   for (i = 0; i < 100; i++)
     {
       val = 'a' + g_random_int_range (0, 26);
-      g_byte_array_append (gbarray, (guint8*) &val, 1);
+      xbyte_array_append (gbarray, (xuint8_t*) &val, 1);
     }
 
-  g_byte_array_sort (gbarray, byte_compare);
+  xbyte_array_sort (gbarray, byte_compare);
 
   prev = 'a';
   for (i = 0; i < gbarray->len; i++)
@@ -1955,25 +1955,25 @@ byte_array_sort (void)
       prev = cur;
     }
 
-  g_byte_array_free (gbarray, TRUE);
+  xbyte_array_free (gbarray, TRUE);
 }
 
 static void
 byte_array_sort_with_data (void)
 {
-  GByteArray *gbarray;
+  xbyte_array_t *gbarray;
   xuint_t i;
-  guint8 val;
-  guint8 prev, cur;
+  xuint8_t val;
+  xuint8_t prev, cur;
 
-  gbarray = g_byte_array_new ();
+  gbarray = xbyte_array_new ();
   for (i = 0; i < 100; i++)
     {
       val = 'a' + g_random_int_range (0, 26);
-      g_byte_array_append (gbarray, (guint8*) &val, 1);
+      xbyte_array_append (gbarray, (xuint8_t*) &val, 1);
     }
 
-  g_byte_array_sort_with_data (gbarray, byte_compare_data, NULL);
+  xbyte_array_sort_with_data (gbarray, byte_compare_data, NULL);
 
   prev = 'a';
   for (i = 0; i < gbarray->len; i++)
@@ -1983,41 +1983,41 @@ byte_array_sort_with_data (void)
       prev = cur;
     }
 
-  g_byte_array_free (gbarray, TRUE);
+  xbyte_array_free (gbarray, TRUE);
 }
 
 static void
 byte_array_new_take (void)
 {
-  GByteArray *gbarray;
-  guint8 *data;
+  xbyte_array_t *gbarray;
+  xuint8_t *data;
 
   data = g_memdup2 ("woooweeewow", 11);
-  gbarray = g_byte_array_new_take (data, 11);
+  gbarray = xbyte_array_new_take (data, 11);
   g_assert (gbarray->data == data);
   g_assert_cmpuint (gbarray->len, ==, 11);
-  g_byte_array_free (gbarray, TRUE);
+  xbyte_array_free (gbarray, TRUE);
 }
 
 static void
 byte_array_free_to_bytes (void)
 {
-  GByteArray *gbarray;
+  xbyte_array_t *gbarray;
   xpointer_t memory;
-  GBytes *bytes;
+  xbytes_t *bytes;
   xsize_t size;
 
-  gbarray = g_byte_array_new ();
-  g_byte_array_append (gbarray, (guint8 *)"woooweeewow", 11);
+  gbarray = xbyte_array_new ();
+  xbyte_array_append (gbarray, (xuint8_t *)"woooweeewow", 11);
   memory = gbarray->data;
 
-  bytes = g_byte_array_free_to_bytes (gbarray);
+  bytes = xbyte_array_free_to_bytes (gbarray);
   g_assert (bytes != NULL);
-  g_assert_cmpuint (g_bytes_get_size (bytes), ==, 11);
-  g_assert (g_bytes_get_data (bytes, &size) == memory);
+  g_assert_cmpuint (xbytes_get_size (bytes), ==, 11);
+  g_assert (xbytes_get_data (bytes, &size) == memory);
   g_assert_cmpuint (size, ==, 11);
 
-  g_bytes_unref (bytes);
+  xbytes_unref (bytes);
 }
 
 static void
@@ -2027,7 +2027,7 @@ add_array_test (const xchar_t         *test_path,
 {
   xchar_t *test_name = NULL;
 
-  test_name = g_strdup_printf ("%s/%s-%s",
+  test_name = xstrdup_printf ("%s/%s-%s",
                                test_path,
                                config->zero_terminated ? "zero-terminated" : "non-zero-terminated",
                                config->clear_ ? "clear" : "no-clear");

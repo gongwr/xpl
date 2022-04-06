@@ -74,15 +74,15 @@ test_rec_mutex3 (void)
 #define THREADS    100
 
 
-GThread   *owners[LOCKS];
+xthread_t   *owners[LOCKS];
 GRecMutex  locks[LOCKS];
 
 static void
 acquire (xint_t nr)
 {
-  GThread *self;
+  xthread_t *self;
 
-  self = g_thread_self ();
+  self = xthread_self ();
 
   if (!g_rec_mutex_trylock (&locks[nr]))
     {
@@ -96,8 +96,8 @@ acquire (xint_t nr)
   owners[nr] = self;
 
   /* let some other threads try to ruin our day */
-  g_thread_yield ();
-  g_thread_yield ();
+  xthread_yield ();
+  xthread_yield ();
 
   g_assert (owners[nr] == self);   /* hopefully this is still us... */
 
@@ -110,8 +110,8 @@ acquire (xint_t nr)
 
   g_rec_mutex_unlock (&locks[nr]);
 
-  g_thread_yield ();
-  g_thread_yield ();
+  xthread_yield ();
+  xthread_yield ();
 
   g_assert (owners[nr] == self);   /* hopefully this is still us... */
   owners[nr] = NULL;               /* make way for the next guy */
@@ -123,7 +123,7 @@ static xpointer_t
 thread_func (xpointer_t data)
 {
   xint_t i;
-  GRand *rand;
+  xrand_t *rand;
 
   rand = g_rand_new ();
 
@@ -139,16 +139,16 @@ static void
 test_rec_mutex4 (void)
 {
   xint_t i;
-  GThread *threads[THREADS];
+  xthread_t *threads[THREADS];
 
   for (i = 0; i < LOCKS; i++)
     g_rec_mutex_init (&locks[i]);
 
   for (i = 0; i < THREADS; i++)
-    threads[i] = g_thread_new ("test", thread_func, NULL);
+    threads[i] = xthread_new ("test", thread_func, NULL);
 
   for (i = 0; i < THREADS; i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 
   for (i = 0; i < LOCKS; i++)
     g_rec_mutex_clear (&locks[i]);
@@ -191,10 +191,10 @@ addition_thread (xpointer_t value)
 }
 
 static void
-test_mutex_perf (gconstpointer data)
+test_mutex_perf (xconstpointer data)
 {
   xint_t c = GPOINTER_TO_INT (data);
-  GThread *threads[THREADS];
+  xthread_t *threads[THREADS];
   gint64 start_time;
   xint_t n_threads;
   xdouble_t rate;
@@ -205,7 +205,7 @@ test_mutex_perf (gconstpointer data)
   depth = c % 256;
 
   for (i = 0; i < n_threads - 1; i++)
-    threads[i] = g_thread_new ("test", addition_thread, &x);
+    threads[i] = xthread_new ("test", addition_thread, &x);
 
   /* avoid measuring thread setup/teardown time */
   start_time = g_get_monotonic_time ();
@@ -216,7 +216,7 @@ test_mutex_perf (gconstpointer data)
   rate = x / rate;
 
   for (i = 0; i < n_threads - 1; i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 
   g_test_maximized_result (rate, "%f mips", rate);
 }

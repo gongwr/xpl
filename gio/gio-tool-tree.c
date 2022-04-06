@@ -35,13 +35,13 @@ static const GOptionEntry entries[] = {
 };
 
 static xint_t
-sort_info_by_name (GFileInfo *a, GFileInfo *b)
+sort_info_by_name (xfile_info_t *a, xfile_info_t *b)
 {
   const char *na;
   const char *nb;
 
-  na = g_file_info_get_name (a);
-  nb = g_file_info_get_name (b);
+  na = xfile_info_get_name (a);
+  nb = xfile_info_get_name (b);
 
   if (na == NULL)
     na = "";
@@ -52,36 +52,36 @@ sort_info_by_name (GFileInfo *a, GFileInfo *b)
 }
 
 static void
-do_tree (xfile_t *f, unsigned int level, guint64 pattern)
+do_tree (xfile_t *f, unsigned int level, xuint64_t pattern)
 {
-  GFileEnumerator *enumerator;
+  xfile_enumerator_t *enumerator;
   xerror_t *error = NULL;
   unsigned int n;
-  GFileInfo *info;
+  xfile_info_t *info;
 
-  info = g_file_query_info (f,
-			    G_FILE_ATTRIBUTE_STANDARD_TYPE ","
-			    G_FILE_ATTRIBUTE_STANDARD_TARGET_URI,
+  info = xfile_query_info (f,
+			    XFILE_ATTRIBUTE_STANDARD_TYPE ","
+			    XFILE_ATTRIBUTE_STANDARD_TARGET_URI,
 			    0,
 			    NULL, NULL);
   if (info != NULL)
     {
-      if (g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_STANDARD_TYPE) == G_FILE_TYPE_MOUNTABLE)
+      if (xfile_info_get_attribute_uint32 (info, XFILE_ATTRIBUTE_STANDARD_TYPE) == XFILE_TYPE_MOUNTABLE)
 	{
 	  /* don't process mountables; we avoid these by getting the target_uri below */
-	  g_object_unref (info);
+	  xobject_unref (info);
 	  return;
 	}
-      g_object_unref (info);
+      xobject_unref (info);
     }
 
-  enumerator = g_file_enumerate_children (f,
-					  G_FILE_ATTRIBUTE_STANDARD_NAME ","
-					  G_FILE_ATTRIBUTE_STANDARD_TYPE ","
-					  G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN ","
-					  G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK ","
-					  G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET ","
-					  G_FILE_ATTRIBUTE_STANDARD_TARGET_URI,
+  enumerator = xfile_enumerate_children (f,
+					  XFILE_ATTRIBUTE_STANDARD_NAME ","
+					  XFILE_ATTRIBUTE_STANDARD_TYPE ","
+					  XFILE_ATTRIBUTE_STANDARD_IS_HIDDEN ","
+					  XFILE_ATTRIBUTE_STANDARD_IS_SYMLINK ","
+					  XFILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET ","
+					  XFILE_ATTRIBUTE_STANDARD_TARGET_URI,
 					  0,
 					  NULL,
 					  &error);
@@ -91,33 +91,33 @@ do_tree (xfile_t *f, unsigned int level, guint64 pattern)
       xlist_t *info_list;
 
       info_list = NULL;
-      while ((info = g_file_enumerator_next_file (enumerator, NULL, NULL)) != NULL)
+      while ((info = xfile_enumerator_next_file (enumerator, NULL, NULL)) != NULL)
 	{
-	  if (g_file_info_get_is_hidden (info) && !show_hidden)
+	  if (xfile_info_get_is_hidden (info) && !show_hidden)
 	    {
-	      g_object_unref (info);
+	      xobject_unref (info);
 	    }
 	  else
 	    {
-	      info_list = g_list_prepend (info_list, info);
+	      info_list = xlist_prepend (info_list, info);
 	    }
 	}
-      g_file_enumerator_close (enumerator, NULL, NULL);
+      xfile_enumerator_close (enumerator, NULL, NULL);
 
-      info_list = g_list_sort (info_list, (GCompareFunc) sort_info_by_name);
+      info_list = xlist_sort (info_list, (GCompareFunc) sort_info_by_name);
 
       for (l = info_list; l != NULL; l = l->next)
 	{
 	  const char *name;
 	  const char *target_uri;
-	  GFileType type;
+	  xfile_type_t type;
 	  xboolean_t is_last_item;
 
 	  info = l->data;
 	  is_last_item = (l->next == NULL);
 
-	  name = g_file_info_get_name (info);
-	  type = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_STANDARD_TYPE);
+	  name = xfile_info_get_name (info);
+	  type = xfile_info_get_attribute_uint32 (info, XFILE_ATTRIBUTE_STANDARD_TYPE);
 	  if (name != NULL)
 	    {
 
@@ -142,27 +142,27 @@ do_tree (xfile_t *f, unsigned int level, guint64 pattern)
 		  g_print ("|-- %s", name);
 		}
 
-	      target_uri = g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_TARGET_URI);
+	      target_uri = xfile_info_get_attribute_string (info, XFILE_ATTRIBUTE_STANDARD_TARGET_URI);
 	      if (target_uri != NULL)
 		{
 		  g_print (" -> %s", target_uri);
 		}
 	      else
 		{
-		  if (g_file_info_get_is_symlink (info))
+		  if (xfile_info_get_is_symlink (info))
 		    {
 		      const char *target;
-		      target = g_file_info_get_symlink_target (info);
+		      target = xfile_info_get_symlink_target (info);
 		      g_print (" -> %s", target);
 		    }
 		}
 
 	      g_print ("\n");
 
-	      if ((type & G_FILE_TYPE_DIRECTORY) &&
-		  (follow_symlinks || !g_file_info_get_is_symlink (info)))
+	      if ((type & XFILE_TYPE_DIRECTORY) &&
+		  (follow_symlinks || !xfile_info_get_is_symlink (info)))
 		{
-		  guint64 new_pattern;
+		  xuint64_t new_pattern;
 		  xfile_t *child;
 
 		  if (is_last_item)
@@ -174,23 +174,23 @@ do_tree (xfile_t *f, unsigned int level, guint64 pattern)
 		  if (target_uri != NULL)
 		    {
 		      if (follow_symlinks)
-			child = g_file_new_for_uri (target_uri);
+			child = xfile_new_for_uri (target_uri);
 		    }
 		  else
 		    {
-		      child = g_file_get_child (f, name);
+		      child = xfile_get_child (f, name);
 		    }
 
 		  if (child != NULL)
 		    {
 		      do_tree (child, level + 1, new_pattern);
-		      g_object_unref (child);
+		      xobject_unref (child);
 		    }
 		}
 	    }
-	  g_object_unref (info);
+	  xobject_unref (info);
 	}
-      g_list_free (info_list);
+      xlist_free (info_list);
     }
   else
     {
@@ -208,7 +208,7 @@ do_tree (xfile_t *f, unsigned int level, guint64 pattern)
 
       g_print ("    [%s]\n", error->message);
 
-      g_error_free (error);
+      xerror_free (error);
     }
 }
 
@@ -217,7 +217,7 @@ tree (xfile_t *f)
 {
   char *uri;
 
-  uri = g_file_get_uri (f);
+  uri = xfile_get_uri (f);
   g_print ("%s\n", uri);
   g_free (uri);
 
@@ -227,7 +227,7 @@ tree (xfile_t *f)
 int
 handle_tree (int argc, char *argv[], xboolean_t do_help)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xerror_t *error = NULL;
   xfile_t *file;
   xchar_t *param;
@@ -236,7 +236,7 @@ handle_tree (int argc, char *argv[], xboolean_t do_help)
   g_set_prgname ("gio tree");
 
   /* Translators: commandline placeholder */
-  param = g_strdup_printf ("[%s…]", _("LOCATION"));
+  param = xstrdup_printf ("[%s…]", _("LOCATION"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -256,7 +256,7 @@ handle_tree (int argc, char *argv[], xboolean_t do_help)
   if (error != NULL)
     {
       show_help (context, error->message);
-      g_error_free (error);
+      xerror_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -267,9 +267,9 @@ handle_tree (int argc, char *argv[], xboolean_t do_help)
     {
       for (i = 1; i < argc; i++)
         {
-          file = g_file_new_for_commandline_arg (argv[i]);
+          file = xfile_new_for_commandline_arg (argv[i]);
           tree (file);
-          g_object_unref (file);
+          xobject_unref (file);
         }
     }
   else
@@ -277,10 +277,10 @@ handle_tree (int argc, char *argv[], xboolean_t do_help)
       char *cwd;
 
       cwd = g_get_current_dir ();
-      file = g_file_new_for_path (cwd);
+      file = xfile_new_for_path (cwd);
       g_free (cwd);
       tree (file);
-      g_object_unref (file);
+      xobject_unref (file);
     }
 
   return 0;

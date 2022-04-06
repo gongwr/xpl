@@ -20,10 +20,10 @@
 
 static void
 check_property (const char *output,
-	        GParamSpec *pspec,
-		GValue *value)
+	        xparam_spec_t *pspec,
+		xvalue_t *value)
 {
-  GValue default_value = G_VALUE_INIT;
+  xvalue_t default_value = G_VALUE_INIT;
   char *v, *dv, *msg;
 
   if (g_param_value_defaults (pspec, value))
@@ -31,12 +31,12 @@ check_property (const char *output,
 
   g_param_value_set_default (pspec, &default_value);
 
-  v = g_strdup_value_contents (value);
-  dv = g_strdup_value_contents (&default_value);
+  v = xstrdup_value_contents (value);
+  dv = xstrdup_value_contents (&default_value);
 
-  msg = g_strdup_printf ("%s %s.%s: %s != %s\n",
+  msg = xstrdup_printf ("%s %s.%s: %s != %s\n",
 			 output,
-			 g_type_name (pspec->owner_type),
+			 xtype_name (pspec->owner_type),
 			 pspec->name,
 			 dv, v);
   g_assertion_message (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
@@ -44,85 +44,85 @@ check_property (const char *output,
 
   g_free (v);
   g_free (dv);
-  g_value_unset (&default_value);
+  xvalue_unset (&default_value);
 }
 
 static void
-test_type (gconstpointer data)
+test_type (xconstpointer data)
 {
   xobject_class_t *klass;
   xobject_t *instance;
-  GParamSpec **pspecs;
+  xparam_spec_t **pspecs;
   xuint_t n_pspecs, i;
   xtype_t type;
 
   type = * (xtype_t *) data;
 
-  if (g_type_is_a (type, XTYPE_APP_INFO_MONITOR))
+  if (xtype_is_a (type, XTYPE_APP_INFO_MONITOR))
     {
       g_test_skip ("singleton");
       return;
     }
 
-  if (g_type_is_a (type, XTYPE_BINDING) ||
-      g_type_is_a (type, XTYPE_BUFFERED_INPUT_STREAM) ||
-      g_type_is_a (type, XTYPE_BUFFERED_OUTPUT_STREAM) ||
-      g_type_is_a (type, XTYPE_CHARSET_CONVERTER) ||
-      g_type_is_a (type, XTYPE_DBUS_ACTION_GROUP) ||
-      g_type_is_a (type, XTYPE_DBUS_CONNECTION) ||
-      g_type_is_a (type, XTYPE_DBUS_OBJECT_MANAGER_CLIENT) ||
-      g_type_is_a (type, XTYPE_DBUS_OBJECT_MANAGER_SERVER) ||
-      g_type_is_a (type, XTYPE_DBUS_PROXY) ||
-      g_type_is_a (type, XTYPE_DBUS_SERVER) ||
-      g_type_is_a (type, XTYPE_FILTER_OUTPUT_STREAM) ||
-      g_type_is_a (type, XTYPE_FILTER_INPUT_STREAM) ||
-      g_type_is_a (type, XTYPE_INET_ADDRESS) ||
-      g_type_is_a (type, XTYPE_INET_SOCKET_ADDRESS) ||
-      g_type_is_a (type, XTYPE_PROPERTY_ACTION) ||
-      g_type_is_a (type, XTYPE_SETTINGS) ||
-      g_type_is_a (type, XTYPE_SOCKET_CONNECTION) ||
-      g_type_is_a (type, XTYPE_SIMPLE_IO_STREAM) ||
-      g_type_is_a (type, XTYPE_THEMED_ICON) ||
+  if (xtype_is_a (type, XTYPE_BINDING) ||
+      xtype_is_a (type, XTYPE_BUFFERED_INPUT_STREAM) ||
+      xtype_is_a (type, XTYPE_BUFFERED_OUTPUT_STREAM) ||
+      xtype_is_a (type, XTYPE_CHARSET_CONVERTER) ||
+      xtype_is_a (type, XTYPE_DBUS_ACTION_GROUP) ||
+      xtype_is_a (type, XTYPE_DBUS_CONNECTION) ||
+      xtype_is_a (type, XTYPE_DBUS_OBJECT_MANAGER_CLIENT) ||
+      xtype_is_a (type, XTYPE_DBUS_OBJECT_MANAGER_SERVER) ||
+      xtype_is_a (type, XTYPE_DBUS_PROXY) ||
+      xtype_is_a (type, XTYPE_DBUS_SERVER) ||
+      xtype_is_a (type, XTYPE_FILTER_OUTPUT_STREAM) ||
+      xtype_is_a (type, XTYPE_FILTER_INPUT_STREAM) ||
+      xtype_is_a (type, XTYPE_INET_ADDRESS) ||
+      xtype_is_a (type, XTYPE_INET_SOCKET_ADDRESS) ||
+      xtype_is_a (type, XTYPE_PROPERTY_ACTION) ||
+      xtype_is_a (type, XTYPE_SETTINGS) ||
+      xtype_is_a (type, XTYPE_SOCKET_CONNECTION) ||
+      xtype_is_a (type, XTYPE_SIMPLE_IO_STREAM) ||
+      xtype_is_a (type, XTYPE_THEMED_ICON) ||
       FALSE)
     {
       g_test_skip ("mandatory construct params");
       return;
     }
 
-  if (g_type_is_a (type, XTYPE_DBUS_MENU_MODEL) ||
-      g_type_is_a (type, XTYPE_DBUS_METHOD_INVOCATION))
+  if (xtype_is_a (type, XTYPE_DBUS_MENU_MODEL) ||
+      xtype_is_a (type, XTYPE_DBUS_METHOD_INVOCATION))
     {
       g_test_skip ("crash in finalize");
       return;
     }
 
-  if (g_type_is_a (type, XTYPE_FILE_ENUMERATOR) ||
-      g_type_is_a (type, XTYPE_FILE_IO_STREAM))
+  if (xtype_is_a (type, XTYPE_FILE_ENUMERATOR) ||
+      xtype_is_a (type, XTYPE_FILE_IO_STREAM))
     {
       g_test_skip ("should be abstract");
       return;
     }
 
-  klass = g_type_class_ref (type);
-  instance = g_object_new (type, NULL);
+  klass = xtype_class_ref (type);
+  instance = xobject_new (type, NULL);
 
   if (X_IS_INITABLE (instance) &&
-      !g_initable_init (G_INITABLE (instance), NULL, NULL))
+      !xinitable_init (XINITABLE (instance), NULL, NULL))
     {
       g_test_skip ("initialization failed");
-      g_object_unref (instance);
-      g_type_class_unref (klass);
+      xobject_unref (instance);
+      xtype_class_unref (klass);
       return;
     }
 
-  if (g_type_is_a (type, XTYPE_INITIALLY_UNOWNED))
-    g_object_ref_sink (instance);
+  if (xtype_is_a (type, XTYPE_INITIALLY_UNOWNED))
+    xobject_ref_sink (instance);
 
-  pspecs = g_object_class_list_properties (klass, &n_pspecs);
+  pspecs = xobject_class_list_properties (klass, &n_pspecs);
   for (i = 0; i < n_pspecs; ++i)
     {
-      GParamSpec *pspec = pspecs[i];
-      GValue value = G_VALUE_INIT;
+      xparam_spec_t *pspec = pspecs[i];
+      xvalue_t value = G_VALUE_INIT;
 
       if (pspec->owner_type != type)
 	continue;
@@ -130,37 +130,37 @@ test_type (gconstpointer data)
       if ((pspec->flags & G_PARAM_READABLE) == 0)
 	continue;
 
-      if (g_type_is_a (type, XTYPE_APPLICATION) &&
+      if (xtype_is_a (type, XTYPE_APPLICATION) &&
           (strcmp (pspec->name, "is-remote") == 0))
         {
-          g_test_message ("skipping GApplication:is-remote");
+          g_test_message ("skipping xapplication_t:is-remote");
           continue;
         }
 
-      if (g_type_is_a (type, XTYPE_PROXY_ADDRESS_ENUMERATOR) &&
+      if (xtype_is_a (type, XTYPE_PROXY_ADDRESS_ENUMERATOR) &&
           (strcmp (pspec->name, "proxy-resolver") == 0))
         {
-          g_test_message ("skipping GProxyAddressEnumerator:proxy-resolver");
+          g_test_message ("skipping xproxy_address_enumerator_t:proxy-resolver");
           continue;
         }
 
-      if (g_type_is_a (type, XTYPE_SOCKET_CLIENT) &&
+      if (xtype_is_a (type, XTYPE_SOCKET_CLIENT) &&
           (strcmp (pspec->name, "proxy-resolver") == 0))
         {
-          g_test_message ("skipping GSocketClient:proxy-resolver");
+          g_test_message ("skipping xsocket_client_t:proxy-resolver");
           continue;
         }
 
       if (g_test_verbose ())
-        g_printerr ("Property %s.%s\n", g_type_name (pspec->owner_type), pspec->name);
-      g_value_init (&value, G_PARAM_SPEC_VALUE_TYPE (pspec));
-      g_object_get_property (instance, pspec->name, &value);
+        g_printerr ("Property %s.%s\n", xtype_name (pspec->owner_type), pspec->name);
+      xvalue_init (&value, G_PARAM_SPEC_VALUE_TYPE (pspec));
+      xobject_get_property (instance, pspec->name, &value);
       check_property ("Property", pspec, &value);
-      g_value_unset (&value);
+      xvalue_unset (&value);
     }
   g_free (pspecs);
-  g_object_unref (instance);
-  g_type_class_unref (klass);
+  xobject_unref (instance);
+  xtype_class_unref (klass);
 }
 
 static xtype_t *all_registered_types;
@@ -185,7 +185,7 @@ main (int argc, char **argv)
 {
   const xtype_t *otypes;
   xuint_t i;
-  GTestDBus *bus;
+  xtest_dbus_t *bus;
   xint_t result;
 
   g_setenv ("GIO_USE_VFS", "local", TRUE);
@@ -210,11 +210,11 @@ main (int argc, char **argv)
       if (XTYPE_IS_ABSTRACT (otypes[i]))
         continue;
 
-      if (!g_type_is_a (otypes[i], XTYPE_OBJECT))
+      if (!xtype_is_a (otypes[i], XTYPE_OBJECT))
         continue;
 
-      testname = g_strdup_printf ("/Default Values/%s",
-				  g_type_name (otypes[i]));
+      testname = xstrdup_printf ("/Default Values/%s",
+				  xtype_name (otypes[i]));
       g_test_add_data_func (testname, &otypes[i], test_type);
       g_free (testname);
     }
@@ -222,7 +222,7 @@ main (int argc, char **argv)
   result = g_test_run ();
 
   g_test_dbus_down (bus);
-  g_object_unref (bus);
+  xobject_unref (bus);
 
   return result;
 }

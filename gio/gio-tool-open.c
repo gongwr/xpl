@@ -44,7 +44,7 @@ launch_default_for_uri_cb (xobject_t *source_object,
   xerror_t *error = NULL;
   xchar_t *uri = user_data;
 
-  if (!g_app_info_launch_default_for_uri_finish (res, &error))
+  if (!xapp_info_launch_default_for_uri_finish (res, &error))
     {
        print_error ("%s: %s", uri, error->message);
        g_clear_error (&error);
@@ -59,7 +59,7 @@ launch_default_for_uri_cb (xobject_t *source_object,
 int
 handle_open (int argc, char *argv[], xboolean_t do_help)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xchar_t *param;
   xerror_t *error = NULL;
   int i;
@@ -67,7 +67,7 @@ handle_open (int argc, char *argv[], xboolean_t do_help)
   g_set_prgname ("gio open");
 
   /* Translators: commandline placeholder */
-  param = g_strdup_printf ("%s…", _("LOCATION"));
+  param = xstrdup_printf ("%s…", _("LOCATION"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -86,7 +86,7 @@ handle_open (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      g_error_free (error);
+      xerror_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -109,24 +109,24 @@ handle_open (int argc, char *argv[], xboolean_t do_help)
        * location for other cases, because xfile_t might modify the URI in ways
        * we don't want. See:
        * https://bugzilla.gnome.org/show_bug.cgi?id=779182 */
-      uri_scheme = g_uri_parse_scheme (argv[i]);
+      uri_scheme = xuri_parse_scheme (argv[i]);
       if (!uri_scheme || uri_scheme[0] == '\0')
         {
           xfile_t *file;
 
-          file = g_file_new_for_commandline_arg (argv[i]);
-          uri = g_file_get_uri (file);
-          g_object_unref (file);
+          file = xfile_new_for_commandline_arg (argv[i]);
+          uri = xfile_get_uri (file);
+          xobject_unref (file);
         }
       else
-        uri = g_strdup (argv[i]);
+        uri = xstrdup (argv[i]);
       g_free (uri_scheme);
 
-      g_app_info_launch_default_for_uri_async (uri,
+      xapp_info_launch_default_for_uri_async (uri,
                                                NULL,
                                                NULL,
                                                launch_default_for_uri_cb,
-                                               g_strdup (uri));
+                                               xstrdup (uri));
 
       n_outstanding++;
 
@@ -134,7 +134,7 @@ handle_open (int argc, char *argv[], xboolean_t do_help)
     }
 
   while (n_outstanding > 0)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   return success ? 0 : 2;
 }

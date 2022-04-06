@@ -95,8 +95,8 @@ test_io_stream_new (xinput_stream_t  *input_stream,
 
   g_return_val_if_fail (X_IS_INPUT_STREAM (input_stream), NULL);
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (output_stream), NULL);
-  stream = TEST_IO_STREAM (g_object_new (TEST_TYPE_IO_STREAM, NULL));
-  stream->input_stream = g_object_ref (input_stream);
-  stream->output_stream = g_object_ref (output_stream);
+  stream = TEST_IO_STREAM (xobject_new (TEST_TYPE_IO_STREAM, NULL));
+  stream->input_stream = xobject_ref (input_stream);
+  stream->output_stream = xobject_ref (output_stream);
   return XIO_STREAM (stream);
 }

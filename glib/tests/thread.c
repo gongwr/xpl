@@ -1,4 +1,4 @@
-/* Unit tests for GThread
+/* Unit tests for xthread_t
  * Copyright (C) 2011 Red Hat, Inc
  * Author: Matthias Clasen
  *
@@ -47,25 +47,25 @@
 static xpointer_t
 thread1_func (xpointer_t data)
 {
-  g_thread_exit (GINT_TO_POINTER (1));
+  xthread_exit (GINT_TO_POINTER (1));
 
   g_assert_not_reached ();
 
   return NULL;
 }
 
-/* test that g_thread_exit() works */
+/* test that xthread_exit() works */
 static void
 test_thread1 (void)
 {
   xpointer_t result;
-  GThread *thread;
+  xthread_t *thread;
   xerror_t *error = NULL;
 
-  thread = g_thread_try_new ("test", thread1_func, NULL, &error);
+  thread = xthread_try_new ("test", thread1_func, NULL, &error);
   g_assert_no_error (error);
 
-  result = g_thread_join (thread);
+  result = xthread_join (thread);
 
   g_assert_cmpint (GPOINTER_TO_INT (result), ==, 1);
 }
@@ -73,21 +73,21 @@ test_thread1 (void)
 static xpointer_t
 thread2_func (xpointer_t data)
 {
-  return g_thread_self ();
+  return xthread_self ();
 }
 
-/* test that g_thread_self() works */
+/* test that xthread_self() works */
 static void
 test_thread2 (void)
 {
   xpointer_t result;
-  GThread *thread;
+  xthread_t *thread;
 
-  thread = g_thread_new ("test", thread2_func, NULL);
+  thread = xthread_new ("test", thread2_func, NULL);
 
-  g_assert (g_thread_self () != thread);
+  g_assert (xthread_self () != thread);
 
-  result = g_thread_join (thread);
+  result = xthread_join (thread);
 
   g_assert (result == thread);
 }
@@ -95,7 +95,7 @@ test_thread2 (void)
 static xpointer_t
 thread3_func (xpointer_t data)
 {
-  GThread *peer = data;
+  xthread_t *peer = data;
   xint_t retval;
 
   retval = 3;
@@ -104,7 +104,7 @@ thread3_func (xpointer_t data)
     {
       xpointer_t result;
 
-      result = g_thread_join (peer);
+      result = xthread_join (peer);
 
       retval += GPOINTER_TO_INT (result);
     }
@@ -112,18 +112,18 @@ thread3_func (xpointer_t data)
   return GINT_TO_POINTER (retval);
 }
 
-/* test that g_thread_join() works across peers */
+/* test that xthread_join() works across peers */
 static void
 test_thread3 (void)
 {
   xpointer_t result;
-  GThread *thread1, *thread2, *thread3;
+  xthread_t *thread1, *thread2, *thread3;
 
-  thread1 = g_thread_new ("a", thread3_func, NULL);
-  thread2 = g_thread_new ("b", thread3_func, thread1);
-  thread3 = g_thread_new ("c", thread3_func, thread2);
+  thread1 = xthread_new ("a", thread3_func, NULL);
+  thread2 = xthread_new ("b", thread3_func, thread1);
+  thread3 = xthread_new ("c", thread3_func, thread2);
 
-  result = g_thread_join (thread3);
+  result = xthread_join (thread3);
 
   g_assert_cmpint (GPOINTER_TO_INT(result), ==, 9);
 }
@@ -138,7 +138,7 @@ test_thread4 (void)
   g_test_incomplete ("FIXME: Leaks a GSystemThread's name, see glib#2308");
 #elif defined(HAVE_PRLIMIT)
   struct rlimit ol, nl;
-  GThread *thread;
+  xthread_t *thread;
   xerror_t *error;
   xint_t ret;
 
@@ -146,10 +146,10 @@ test_thread4 (void)
   nl.rlim_cur = 1;
 
   if ((ret = prlimit (getpid (), RLIMIT_NPROC, &nl, &ol)) != 0)
-    g_error ("prlimit failed: %s", g_strerror (errno));
+    xerror ("prlimit failed: %s", xstrerror (errno));
 
   error = NULL;
-  thread = g_thread_try_new ("a", thread1_func, NULL, &error);
+  thread = xthread_try_new ("a", thread1_func, NULL, &error);
 
   if (thread != NULL)
     {
@@ -158,33 +158,33 @@ test_thread4 (void)
       /* Privileged processes might be able to create new threads even
        * though the rlimit is too low. There isn't much we can do about
        * this; we just can't test this failure mode in this situation. */
-      g_test_skip ("Unable to test g_thread_try_new() failing with EAGAIN "
+      g_test_skip ("Unable to test xthread_try_new() failing with EAGAIN "
                    "while privileged (CAP_SYS_RESOURCE, CAP_SYS_ADMIN or "
                    "euid 0?)");
-      result = g_thread_join (thread);
+      result = xthread_join (thread);
       g_assert_cmpint (GPOINTER_TO_INT (result), ==, 1);
     }
   else
     {
       g_assert (thread == NULL);
       g_assert_error (error, G_THREAD_ERROR, G_THREAD_ERROR_AGAIN);
-      g_error_free (error);
+      xerror_free (error);
     }
 
   if ((ret = prlimit (getpid (), RLIMIT_NPROC, &ol, NULL)) != 0)
-    g_error ("resetting RLIMIT_NPROC failed: %s", g_strerror (errno));
+    xerror ("resetting RLIMIT_NPROC failed: %s", xstrerror (errno));
 #endif
 }
 
 static void
 test_thread5 (void)
 {
-  GThread *thread;
+  xthread_t *thread;
 
-  thread = g_thread_new ("a", thread3_func, NULL);
-  g_thread_ref (thread);
-  g_thread_join (thread);
-  g_thread_unref (thread);
+  thread = xthread_new ("a", thread3_func, NULL);
+  xthread_ref (thread);
+  xthread_join (thread);
+  xthread_unref (thread);
 }
 
 static xpointer_t
@@ -204,10 +204,10 @@ thread6_func (xpointer_t data)
 static void
 test_thread6 (void)
 {
-  GThread *thread;
+  xthread_t *thread;
 
-  thread = g_thread_new ("abc", thread6_func, "abc");
-  g_thread_join (thread);
+  thread = xthread_new ("abc", thread6_func, "abc");
+  xthread_join (thread);
 }
 
 int

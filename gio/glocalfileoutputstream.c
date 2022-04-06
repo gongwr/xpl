@@ -80,7 +80,7 @@ struct _GLocalFileOutputStreamPrivate {
 };
 
 #ifdef G_OS_UNIX
-static void       g_file_descriptor_based_iface_init   (GFileDescriptorBasedIface *iface);
+static void       xfile_descriptor_based_iface_init   (GFileDescriptorBasedIface *iface);
 #endif
 
 #define g_local_file_output_stream_get_type _g_local_file_output_stream_get_type
@@ -88,7 +88,7 @@ static void       g_file_descriptor_based_iface_init   (GFileDescriptorBasedIfac
 G_DEFINE_TYPE_WITH_CODE (GLocalFileOutputStream, g_local_file_output_stream, XTYPE_FILE_OUTPUT_STREAM,
                          G_ADD_PRIVATE (GLocalFileOutputStream)
 			 G_IMPLEMENT_INTERFACE (XTYPE_FILE_DESCRIPTOR_BASED,
-						g_file_descriptor_based_iface_init))
+						xfile_descriptor_based_iface_init))
 #else
 G_DEFINE_TYPE_WITH_CODE (GLocalFileOutputStream, g_local_file_output_stream, XTYPE_FILE_OUTPUT_STREAM,
                          G_ADD_PRIVATE (GLocalFileOutputStream))
@@ -101,14 +101,14 @@ G_DEFINE_TYPE_WITH_CODE (GLocalFileOutputStream, g_local_file_output_stream, XTY
 
 #define BACKUP_EXTENSION "~"
 
-static gssize     g_local_file_output_stream_write        (xoutput_stream_t      *stream,
+static xssize_t     g_local_file_output_stream_write        (xoutput_stream_t      *stream,
 							   const void         *buffer,
 							   xsize_t               count,
 							   xcancellable_t       *cancellable,
 							   xerror_t            **error);
 #ifdef G_OS_UNIX
 static xboolean_t   g_local_file_output_stream_writev       (xoutput_stream_t       *stream,
-							   const GOutputVector *vectors,
+							   const xoutput_vector_t *vectors,
 							   xsize_t                n_vectors,
 							   xsize_t               *bytes_written,
 							   xcancellable_t        *cancellable,
@@ -117,25 +117,25 @@ static xboolean_t   g_local_file_output_stream_writev       (xoutput_stream_t   
 static xboolean_t   g_local_file_output_stream_close        (xoutput_stream_t      *stream,
 							   xcancellable_t       *cancellable,
 							   xerror_t            **error);
-static GFileInfo *g_local_file_output_stream_query_info   (GFileOutputStream  *stream,
+static xfile_info_t *g_local_file_output_stream_query_info   (xfile_output_stream_t  *stream,
 							   const char         *attributes,
 							   xcancellable_t       *cancellable,
 							   xerror_t            **error);
-static char *     g_local_file_output_stream_get_etag     (GFileOutputStream  *stream);
-static goffset    g_local_file_output_stream_tell         (GFileOutputStream  *stream);
-static xboolean_t   g_local_file_output_stream_can_seek     (GFileOutputStream  *stream);
-static xboolean_t   g_local_file_output_stream_seek         (GFileOutputStream  *stream,
-							   goffset             offset,
+static char *     g_local_file_output_stream_get_etag     (xfile_output_stream_t  *stream);
+static xoffset_t    g_local_file_output_stream_tell         (xfile_output_stream_t  *stream);
+static xboolean_t   g_local_file_output_stream_can_seek     (xfile_output_stream_t  *stream);
+static xboolean_t   g_local_file_output_stream_seek         (xfile_output_stream_t  *stream,
+							   xoffset_t             offset,
 							   GSeekType           type,
 							   xcancellable_t       *cancellable,
 							   xerror_t            **error);
-static xboolean_t   g_local_file_output_stream_can_truncate (GFileOutputStream  *stream);
-static xboolean_t   g_local_file_output_stream_truncate     (GFileOutputStream  *stream,
-							   goffset             size,
+static xboolean_t   g_local_file_output_stream_can_truncate (xfile_output_stream_t  *stream);
+static xboolean_t   g_local_file_output_stream_truncate     (xfile_output_stream_t  *stream,
+							   xoffset_t             size,
 							   xcancellable_t       *cancellable,
 							   xerror_t            **error);
 #ifdef G_OS_UNIX
-static int        g_local_file_output_stream_get_fd       (GFileDescriptorBased *stream);
+static int        g_local_file_output_stream_get_fd       (xfile_descriptor_based_t *stream);
 #endif
 
 static void
@@ -158,7 +158,7 @@ g_local_file_output_stream_class_init (GLocalFileOutputStreamClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
   GOutputStreamClass *stream_class = G_OUTPUT_STREAM_CLASS (klass);
-  GFileOutputStreamClass *file_stream_class = G_FILE_OUTPUT_STREAM_CLASS (klass);
+  GFileOutputStreamClass *file_stream_class = XFILE_OUTPUT_STREAM_CLASS (klass);
 
   gobject_class->finalize = g_local_file_output_stream_finalize;
 
@@ -178,7 +178,7 @@ g_local_file_output_stream_class_init (GLocalFileOutputStreamClass *klass)
 
 #ifdef G_OS_UNIX
 static void
-g_file_descriptor_based_iface_init (GFileDescriptorBasedIface *iface)
+xfile_descriptor_based_iface_init (GFileDescriptorBasedIface *iface)
 {
   iface->get_fd = g_local_file_output_stream_get_fd;
 }
@@ -191,7 +191,7 @@ g_local_file_output_stream_init (GLocalFileOutputStream *stream)
   stream->priv->do_close = TRUE;
 }
 
-static gssize
+static xssize_t
 g_local_file_output_stream_write (xoutput_stream_t  *stream,
 				  const void     *buffer,
 				  xsize_t           count,
@@ -199,7 +199,7 @@ g_local_file_output_stream_write (xoutput_stream_t  *stream,
 				  xerror_t        **error)
 {
   GLocalFileOutputStream *file;
-  gssize res;
+  xssize_t res;
 
   file = G_LOCAL_FILE_OUTPUT_STREAM (stream);
 
@@ -218,7 +218,7 @@ g_local_file_output_stream_write (xoutput_stream_t  *stream,
 	  g_set_error (error, G_IO_ERROR,
 		       g_io_error_from_errno (errsv),
 		       _("Error writing to file: %s"),
-		       g_strerror (errsv));
+		       xstrerror (errsv));
 	}
 
       break;
@@ -233,23 +233,23 @@ g_local_file_output_stream_write (xoutput_stream_t  *stream,
  * to a page. We can't possibly guarantee that in GLib.
  */
 #ifdef G_OS_UNIX
-/* Macro to check if struct iovec and GOutputVector have the same ABI */
-#define G_OUTPUT_VECTOR_IS_IOVEC (sizeof (struct iovec) == sizeof (GOutputVector) && \
-      G_SIZEOF_MEMBER (struct iovec, iov_base) == G_SIZEOF_MEMBER (GOutputVector, buffer) && \
-      G_STRUCT_OFFSET (struct iovec, iov_base) == G_STRUCT_OFFSET (GOutputVector, buffer) && \
-      G_SIZEOF_MEMBER (struct iovec, iov_len) == G_SIZEOF_MEMBER (GOutputVector, size) && \
-      G_STRUCT_OFFSET (struct iovec, iov_len) == G_STRUCT_OFFSET (GOutputVector, size))
+/* Macro to check if struct iovec and xoutput_vector_t have the same ABI */
+#define G_OUTPUT_VECTOR_IS_IOVEC (sizeof (struct iovec) == sizeof (xoutput_vector_t) && \
+      G_SIZEOF_MEMBER (struct iovec, iov_base) == G_SIZEOF_MEMBER (xoutput_vector_t, buffer) && \
+      G_STRUCT_OFFSET (struct iovec, iov_base) == G_STRUCT_OFFSET (xoutput_vector_t, buffer) && \
+      G_SIZEOF_MEMBER (struct iovec, iov_len) == G_SIZEOF_MEMBER (xoutput_vector_t, size) && \
+      G_STRUCT_OFFSET (struct iovec, iov_len) == G_STRUCT_OFFSET (xoutput_vector_t, size))
 
 static xboolean_t
 g_local_file_output_stream_writev (xoutput_stream_t        *stream,
-				   const GOutputVector  *vectors,
+				   const xoutput_vector_t  *vectors,
 				   xsize_t                 n_vectors,
 				   xsize_t                *bytes_written,
 				   xcancellable_t         *cancellable,
 				   xerror_t              **error)
 {
   GLocalFileOutputStream *file;
-  gssize res;
+  xssize_t res;
   struct iovec *iov;
 
   if (bytes_written)
@@ -296,7 +296,7 @@ g_local_file_output_stream_writev (xoutput_stream_t        *stream,
           g_set_error (error, G_IO_ERROR,
                        g_io_error_from_errno (errsv),
                        _("Error writing to file: %s"),
-                       g_strerror (errsv));
+                       xstrerror (errsv));
         }
       else if (bytes_written)
         {
@@ -332,7 +332,7 @@ _g_local_file_output_stream_really_close (GLocalFileOutputStream *file,
       g_set_error (error, G_IO_ERROR,
 		   g_io_error_from_errno (errsv),
 		   _("Error writing to file: %s"),
-		   g_strerror (errsv));
+		   xstrerror (errsv));
       goto err_out;
     }
 
@@ -351,7 +351,7 @@ _g_local_file_output_stream_really_close (GLocalFileOutputStream *file,
       g_set_error (error, G_IO_ERROR,
 		   g_io_error_from_errno (errsv),
 		   _("Error closing file: %s"),
-		   g_strerror (errsv));
+		   xstrerror (errsv));
       return FALSE;
     }
 
@@ -378,7 +378,7 @@ _g_local_file_output_stream_really_close (GLocalFileOutputStream *file,
 	      g_set_error (error, G_IO_ERROR,
 			   G_IO_ERROR_CANT_CREATE_BACKUP,
 			   _("Error removing old backup link: %s"),
-			   g_strerror (errsv));
+			   xstrerror (errsv));
 	      goto err_out;
 	    }
 
@@ -392,7 +392,7 @@ _g_local_file_output_stream_really_close (GLocalFileOutputStream *file,
 	    	  g_set_error (error, G_IO_ERROR,
 		    	       G_IO_ERROR_CANT_CREATE_BACKUP,
 			       _("Error creating backup copy: %s"),
-			       g_strerror (errsv));
+			       xstrerror (errsv));
 	          goto err_out;
 		}
 	    }
@@ -405,7 +405,7 @@ _g_local_file_output_stream_really_close (GLocalFileOutputStream *file,
 	      g_set_error (error, G_IO_ERROR,
 			   G_IO_ERROR_CANT_CREATE_BACKUP,
 			   _("Error creating backup copy: %s"),
-			   g_strerror (errsv));
+			   xstrerror (errsv));
 	      goto err_out;
 	    }
 #endif
@@ -423,7 +423,7 @@ _g_local_file_output_stream_really_close (GLocalFileOutputStream *file,
 	  g_set_error (error, G_IO_ERROR,
 		       g_io_error_from_errno (errsv),
 		       _("Error renaming temporary file: %s"),
-		       g_strerror (errsv));
+		       xstrerror (errsv));
 	  goto err_out;
 	}
 
@@ -445,7 +445,7 @@ _g_local_file_output_stream_really_close (GLocalFileOutputStream *file,
       g_set_error (error, G_IO_ERROR,
                    g_io_error_from_errno (errsv),
                    _("Error closing file: %s"),
-                   g_strerror (errsv));
+                   xstrerror (errsv));
       goto err_out;
     }
 
@@ -482,17 +482,17 @@ g_local_file_output_stream_close (xoutput_stream_t  *stream,
 }
 
 static char *
-g_local_file_output_stream_get_etag (GFileOutputStream *stream)
+g_local_file_output_stream_get_etag (xfile_output_stream_t *stream)
 {
   GLocalFileOutputStream *file;
 
   file = G_LOCAL_FILE_OUTPUT_STREAM (stream);
 
-  return g_strdup (file->priv->etag);
+  return xstrdup (file->priv->etag);
 }
 
-static goffset
-g_local_file_output_stream_tell (GFileOutputStream *stream)
+static xoffset_t
+g_local_file_output_stream_tell (xfile_output_stream_t *stream)
 {
   GLocalFileOutputStream *file;
   off_t pos;
@@ -508,7 +508,7 @@ g_local_file_output_stream_tell (GFileOutputStream *stream)
 }
 
 static xboolean_t
-g_local_file_output_stream_can_seek (GFileOutputStream *stream)
+g_local_file_output_stream_can_seek (xfile_output_stream_t *stream)
 {
   GLocalFileOutputStream *file;
   off_t pos;
@@ -541,8 +541,8 @@ seek_type_to_lseek (GSeekType type)
 }
 
 static xboolean_t
-g_local_file_output_stream_seek (GFileOutputStream  *stream,
-				 goffset             offset,
+g_local_file_output_stream_seek (xfile_output_stream_t  *stream,
+				 xoffset_t             offset,
 				 GSeekType           type,
 				 xcancellable_t       *cancellable,
 				 xerror_t            **error)
@@ -561,7 +561,7 @@ g_local_file_output_stream_seek (GFileOutputStream  *stream,
       g_set_error (error, G_IO_ERROR,
 		   g_io_error_from_errno (errsv),
 		   _("Error seeking in file: %s"),
-		   g_strerror (errsv));
+		   xstrerror (errsv));
       return FALSE;
     }
 
@@ -569,15 +569,15 @@ g_local_file_output_stream_seek (GFileOutputStream  *stream,
 }
 
 static xboolean_t
-g_local_file_output_stream_can_truncate (GFileOutputStream *stream)
+g_local_file_output_stream_can_truncate (xfile_output_stream_t *stream)
 {
   /* We can't truncate pipes and stuff where we can't seek */
   return g_local_file_output_stream_can_seek (stream);
 }
 
 static xboolean_t
-g_local_file_output_stream_truncate (GFileOutputStream  *stream,
-				     goffset             size,
+g_local_file_output_stream_truncate (xfile_output_stream_t  *stream,
+				     xoffset_t             size,
 				     xcancellable_t       *cancellable,
 				     xerror_t            **error)
 {
@@ -607,7 +607,7 @@ g_local_file_output_stream_truncate (GFileOutputStream  *stream,
       g_set_error (error, G_IO_ERROR,
 		   g_io_error_from_errno (errsv),
 		   _("Error truncating file: %s"),
-		   g_strerror (errsv));
+		   xstrerror (errsv));
       return FALSE;
     }
 
@@ -615,8 +615,8 @@ g_local_file_output_stream_truncate (GFileOutputStream  *stream,
 }
 
 
-static GFileInfo *
-g_local_file_output_stream_query_info (GFileOutputStream  *stream,
+static xfile_info_t *
+g_local_file_output_stream_query_info (xfile_output_stream_t  *stream,
 				       const char         *attributes,
 				       xcancellable_t       *cancellable,
 				       xerror_t            **error)
@@ -633,14 +633,14 @@ g_local_file_output_stream_query_info (GFileOutputStream  *stream,
 					 error);
 }
 
-GFileOutputStream *
+xfile_output_stream_t *
 _g_local_file_output_stream_new (int fd)
 {
   GLocalFileOutputStream *stream;
 
-  stream = g_object_new (XTYPE_LOCAL_FILE_OUTPUT_STREAM, NULL);
+  stream = xobject_new (XTYPE_LOCAL_FILE_OUTPUT_STREAM, NULL);
   stream->priv->fd = fd;
-  return G_FILE_OUTPUT_STREAM (stream);
+  return XFILE_OUTPUT_STREAM (stream);
 }
 
 static void
@@ -656,16 +656,16 @@ set_error_from_open_errno (const char *filename,
                          _("Invalid filename"));
   else
     {
-      char *display_name = g_filename_display_name (filename);
+      char *display_name = xfilename_display_name (filename);
       g_set_error (error, G_IO_ERROR,
                    g_io_error_from_errno (errsv),
                    _("Error opening file “%s”: %s"),
-		       display_name, g_strerror (errsv));
+		       display_name, xstrerror (errsv));
       g_free (display_name);
     }
 }
 
-static GFileOutputStream *
+static xfile_output_stream_t *
 output_stream_open (const char    *filename,
                     xint_t           open_flags,
                     xuint_t          mode,
@@ -682,12 +682,12 @@ output_stream_open (const char    *filename,
       return NULL;
     }
 
-  stream = g_object_new (XTYPE_LOCAL_FILE_OUTPUT_STREAM, NULL);
+  stream = xobject_new (XTYPE_LOCAL_FILE_OUTPUT_STREAM, NULL);
   stream->priv->fd = fd;
-  return G_FILE_OUTPUT_STREAM (stream);
+  return XFILE_OUTPUT_STREAM (stream);
 }
 
-GFileOutputStream *
+xfile_output_stream_t *
 _g_local_file_output_stream_open  (const char        *filename,
 				   xboolean_t          readable,
 				   xcancellable_t      *cancellable,
@@ -708,22 +708,22 @@ _g_local_file_output_stream_open  (const char        *filename,
 }
 
 static xint_t
-mode_from_flags_or_info (GFileCreateFlags   flags,
-                         GFileInfo         *reference_info)
+mode_from_flags_or_info (xfile_create_flags_t   flags,
+                         xfile_info_t         *reference_info)
 {
-  if (flags & G_FILE_CREATE_PRIVATE)
+  if (flags & XFILE_CREATE_PRIVATE)
     return 0600;
-  else if (reference_info && g_file_info_has_attribute (reference_info, "unix::mode"))
-    return g_file_info_get_attribute_uint32 (reference_info, "unix::mode") & (~S_IFMT);
+  else if (reference_info && xfile_info_has_attribute (reference_info, "unix::mode"))
+    return xfile_info_get_attribute_uint32 (reference_info, "unix::mode") & (~S_IFMT);
   else
     return 0666;
 }
 
-GFileOutputStream *
+xfile_output_stream_t *
 _g_local_file_output_stream_create  (const char        *filename,
 				     xboolean_t          readable,
-				     GFileCreateFlags   flags,
-                                     GFileInfo         *reference_info,
+				     xfile_create_flags_t   flags,
+                                     xfile_info_t         *reference_info,
 				     xcancellable_t      *cancellable,
 				     xerror_t           **error)
 {
@@ -744,9 +744,9 @@ _g_local_file_output_stream_create  (const char        *filename,
   return output_stream_open (filename, open_flags, mode, cancellable, error);
 }
 
-GFileOutputStream *
+xfile_output_stream_t *
 _g_local_file_output_stream_append  (const char        *filename,
-				     GFileCreateFlags   flags,
+				     xfile_create_flags_t   flags,
 				     xcancellable_t      *cancellable,
 				     xerror_t           **error)
 {
@@ -755,7 +755,7 @@ _g_local_file_output_stream_append  (const char        *filename,
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  if (flags & G_FILE_CREATE_PRIVATE)
+  if (flags & XFILE_CREATE_PRIVATE)
     mode = 0600;
   else
     mode = 0666;
@@ -767,7 +767,7 @@ _g_local_file_output_stream_append  (const char        *filename,
 static char *
 create_backup_filename (const char *filename)
 {
-  return g_strconcat (filename, BACKUP_EXTENSION, NULL);
+  return xstrconcat (filename, BACKUP_EXTENSION, NULL);
 }
 
 #define BUFSIZE	8192 /* size of normal write buffer */
@@ -780,9 +780,9 @@ copy_file_data (xint_t     sfd,
   xboolean_t ret = TRUE;
   xpointer_t buffer;
   const xchar_t *write_buffer;
-  gssize bytes_read;
-  gssize bytes_to_write;
-  gssize bytes_written;
+  xssize_t bytes_read;
+  xssize_t bytes_to_write;
+  xssize_t bytes_written;
 
   buffer = g_malloc (BUFSIZE);
 
@@ -799,7 +799,7 @@ copy_file_data (xint_t     sfd,
 	  g_set_error (error, G_IO_ERROR,
 		       g_io_error_from_errno (errsv),
 		       _("Error reading from file: %s"),
-		       g_strerror (errsv));
+		       xstrerror (errsv));
 	  ret = FALSE;
 	  break;
 	}
@@ -820,7 +820,7 @@ copy_file_data (xint_t     sfd,
 	      g_set_error (error, G_IO_ERROR,
 			   g_io_error_from_errno (errsv),
 			   _("Error writing to file: %s"),
-			   g_strerror (errsv));
+			   xstrerror (errsv));
 	      ret = FALSE;
 	      break;
 	    }
@@ -843,8 +843,8 @@ handle_overwrite_open (const char    *filename,
 		       const char    *etag,
 		       xboolean_t       create_backup,
 		       char         **temp_filename,
-		       GFileCreateFlags flags,
-                       GFileInfo       *reference_info,
+		       xfile_create_flags_t flags,
+                       xfile_info_t       *reference_info,
 		       xcancellable_t  *cancellable,
 		       xerror_t       **error)
 {
@@ -856,7 +856,7 @@ handle_overwrite_open (const char    *filename,
   int res;
   int mode;
   int errsv;
-  xboolean_t replace_destination_set = (flags & G_FILE_CREATE_REPLACE_DESTINATION);
+  xboolean_t replace_destination_set = (flags & XFILE_CREATE_REPLACE_DESTINATION);
 
   mode = mode_from_flags_or_info (flags, reference_info);
 
@@ -889,7 +889,7 @@ handle_overwrite_open (const char    *filename,
     }
 #else  /* if !O_NOFOLLOW */
   /* This is racy, but we do it as soon as possible to minimize the race */
-  is_symlink = g_file_test (filename, G_FILE_TEST_IS_SYMLINK);
+  is_symlink = xfile_test (filename, XFILE_TEST_IS_SYMLINK);
 
   if (!is_symlink || !replace_destination_set)
     {
@@ -901,11 +901,11 @@ handle_overwrite_open (const char    *filename,
   if (fd == -1 &&
       (!is_symlink || !replace_destination_set))
     {
-      char *display_name = g_filename_display_name (filename);
+      char *display_name = xfilename_display_name (filename);
       g_set_error (error, G_IO_ERROR,
 		   g_io_error_from_errno (errsv),
 		   _("Error opening file “%s”: %s"),
-		   display_name, g_strerror (errsv));
+		   display_name, xstrerror (errsv));
       g_free (display_name);
       return -1;
     }
@@ -937,11 +937,11 @@ handle_overwrite_open (const char    *filename,
 
   if (res != 0)
     {
-      char *display_name = g_filename_display_name (filename);
+      char *display_name = xfilename_display_name (filename);
       g_set_error (error, G_IO_ERROR,
 		   g_io_error_from_errno (errsv),
 		   _("Error when getting information for file “%s”: %s"),
-		   display_name, g_strerror (errsv));
+		   display_name, xstrerror (errsv));
       g_free (display_name);
       goto error;
     }
@@ -989,11 +989,11 @@ handle_overwrite_open (const char    *filename,
 
           if (res != 0)
             {
-              char *display_name = g_filename_display_name (filename);
+              char *display_name = xfilename_display_name (filename);
               g_set_error (error, G_IO_ERROR,
                            g_io_error_from_errno (errsv),
                            _("Error when getting information for file “%s”: %s"),
-                           display_name, g_strerror (errsv));
+                           display_name, xstrerror (errsv));
               g_free (display_name);
               goto error;
             }
@@ -1184,7 +1184,7 @@ handle_overwrite_open (const char    *filename,
 	  g_set_error (error, G_IO_ERROR,
 		       g_io_error_from_errno (errsv),
 		       _("Error seeking in file: %s"),
-		       g_strerror (errsv));
+		       xstrerror (errsv));
           goto error;
 	}
     }
@@ -1200,7 +1200,7 @@ handle_overwrite_open (const char    *filename,
 	  g_set_error (error, G_IO_ERROR,
 		       g_io_error_from_errno (errsv),
 		       _("Error removing old file: %s"),
-		       g_strerror (errsv));
+		       xstrerror (errsv));
           goto error;
 	}
 
@@ -1212,11 +1212,11 @@ handle_overwrite_open (const char    *filename,
       if (fd == -1)
 	{
 	  int errsv = errno;
-	  char *display_name = g_filename_display_name (filename);
+	  char *display_name = xfilename_display_name (filename);
 	  g_set_error (error, G_IO_ERROR,
 		       g_io_error_from_errno (errsv),
 		       _("Error opening file “%s”: %s"),
-		       display_name, g_strerror (errsv));
+		       display_name, xstrerror (errsv));
 	  g_free (display_name);
           goto error;
 	}
@@ -1235,7 +1235,7 @@ handle_overwrite_open (const char    *filename,
 	    g_set_error (error, G_IO_ERROR,
 			 g_io_error_from_errno (errsv),
 			 _("Error truncating file: %s"),
-			 g_strerror (errsv));
+			 xstrerror (errsv));
             goto error;
 	  }
     }
@@ -1249,13 +1249,13 @@ error:
   return -1;
 }
 
-GFileOutputStream *
+xfile_output_stream_t *
 _g_local_file_output_stream_replace (const char        *filename,
 				     xboolean_t          readable,
 				     const char        *etag,
 				     xboolean_t           create_backup,
-				     GFileCreateFlags   flags,
-                                     GFileInfo         *reference_info,
+				     xfile_create_flags_t   flags,
+                                     xfile_info_t         *reference_info,
 				     xcancellable_t      *cancellable,
 				     xerror_t           **error)
 {
@@ -1310,15 +1310,15 @@ _g_local_file_output_stream_replace (const char        *filename,
     fcntl (fd, F_SETFD, FD_CLOEXEC);
 #endif
 
-  stream = g_object_new (XTYPE_LOCAL_FILE_OUTPUT_STREAM, NULL);
+  stream = xobject_new (XTYPE_LOCAL_FILE_OUTPUT_STREAM, NULL);
   stream->priv->fd = fd;
   stream->priv->sync_on_close = sync_on_close;
   stream->priv->tmp_filename = temp_file;
   if (create_backup)
     stream->priv->backup_filename = create_backup_filename (filename);
-  stream->priv->original_filename =  g_strdup (filename);
+  stream->priv->original_filename =  xstrdup (filename);
 
-  return G_FILE_OUTPUT_STREAM (stream);
+  return XFILE_OUTPUT_STREAM (stream);
 }
 
 xint_t
@@ -1330,7 +1330,7 @@ _g_local_file_output_stream_get_fd (GLocalFileOutputStream *stream)
 
 #ifdef G_OS_UNIX
 static int
-g_local_file_output_stream_get_fd (GFileDescriptorBased *fd_based)
+g_local_file_output_stream_get_fd (xfile_descriptor_based_t *fd_based)
 {
   GLocalFileOutputStream *stream = G_LOCAL_FILE_OUTPUT_STREAM (fd_based);
   return _g_local_file_output_stream_get_fd (stream);

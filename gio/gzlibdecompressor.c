@@ -44,7 +44,7 @@ enum {
  * @short_description: Zlib decompressor
  * @include: gio/gio.h
  *
- * #GZlibDecompressor is an implementation of #GConverter that
+ * #xzlib_decompressor_t is an implementation of #xconverter_t that
  * decompresses data compressed with zlib.
  */
 
@@ -53,11 +53,11 @@ static void g_zlib_decompressor_iface_init          (GConverterIface *iface);
 typedef struct {
   gz_header gzheader;
   char filename[257];
-  GFileInfo *file_info;
+  xfile_info_t *file_info;
 } HeaderData;
 
 /**
- * GZlibDecompressor:
+ * xzlib_decompressor_t:
  *
  * Zlib decompression
  */
@@ -71,7 +71,7 @@ struct _GZlibDecompressor
 };
 
 static void
-g_zlib_decompressor_set_gzheader (GZlibDecompressor *decompressor)
+g_zlib_decompressor_set_gzheader (xzlib_decompressor_t *decompressor)
 {
   /* On win32, these functions were not exported before 1.2.4 */
 #if !defined (G_OS_WIN32) || ZLIB_VERNUM >= 0x1240
@@ -81,7 +81,7 @@ g_zlib_decompressor_set_gzheader (GZlibDecompressor *decompressor)
   if (decompressor->header_data != NULL)
     {
       if (decompressor->header_data->file_info)
-        g_object_unref (decompressor->header_data->file_info);
+        xobject_unref (decompressor->header_data->file_info);
 
       memset (decompressor->header_data, 0, sizeof (HeaderData));
     }
@@ -99,14 +99,14 @@ g_zlib_decompressor_set_gzheader (GZlibDecompressor *decompressor)
 #endif /* !G_OS_WIN32 || ZLIB >= 1.2.4 */
 }
 
-G_DEFINE_TYPE_WITH_CODE (GZlibDecompressor, g_zlib_decompressor, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (xzlib_decompressor_t, g_zlib_decompressor, XTYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (XTYPE_CONVERTER,
 						g_zlib_decompressor_iface_init))
 
 static void
 g_zlib_decompressor_finalize (xobject_t *object)
 {
-  GZlibDecompressor *decompressor;
+  xzlib_decompressor_t *decompressor;
 
   decompressor = G_ZLIB_DECOMPRESSOR (object);
 
@@ -115,7 +115,7 @@ g_zlib_decompressor_finalize (xobject_t *object)
   if (decompressor->header_data != NULL)
     {
       if (decompressor->header_data->file_info)
-        g_object_unref (decompressor->header_data->file_info);
+        xobject_unref (decompressor->header_data->file_info);
       g_free (decompressor->header_data);
     }
 
@@ -126,17 +126,17 @@ g_zlib_decompressor_finalize (xobject_t *object)
 static void
 g_zlib_decompressor_set_property (xobject_t      *object,
 				  xuint_t         prop_id,
-				  const GValue *value,
-				  GParamSpec   *pspec)
+				  const xvalue_t *value,
+				  xparam_spec_t   *pspec)
 {
-  GZlibDecompressor *decompressor;
+  xzlib_decompressor_t *decompressor;
 
   decompressor = G_ZLIB_DECOMPRESSOR (object);
 
   switch (prop_id)
     {
     case PROP_FORMAT:
-      decompressor->format = g_value_get_enum (value);
+      decompressor->format = xvalue_get_enum (value);
       break;
 
     default:
@@ -149,24 +149,24 @@ g_zlib_decompressor_set_property (xobject_t      *object,
 static void
 g_zlib_decompressor_get_property (xobject_t    *object,
 				  xuint_t       prop_id,
-				  GValue     *value,
-				  GParamSpec *pspec)
+				  xvalue_t     *value,
+				  xparam_spec_t *pspec)
 {
-  GZlibDecompressor *decompressor;
+  xzlib_decompressor_t *decompressor;
 
   decompressor = G_ZLIB_DECOMPRESSOR (object);
 
   switch (prop_id)
     {
     case PROP_FORMAT:
-      g_value_set_enum (value, decompressor->format);
+      xvalue_set_enum (value, decompressor->format);
       break;
 
     case PROP_FILE_INFO:
       if (decompressor->header_data)
-        g_value_set_object (value, decompressor->header_data->file_info);
+        xvalue_set_object (value, decompressor->header_data->file_info);
       else
-        g_value_set_object (value, NULL);
+        xvalue_set_object (value, NULL);
       break;
 
     default:
@@ -176,14 +176,14 @@ g_zlib_decompressor_get_property (xobject_t    *object,
 }
 
 static void
-g_zlib_decompressor_init (GZlibDecompressor *decompressor)
+g_zlib_decompressor_init (xzlib_decompressor_t *decompressor)
 {
 }
 
 static void
 g_zlib_decompressor_constructed (xobject_t *object)
 {
-  GZlibDecompressor *decompressor;
+  xzlib_decompressor_t *decompressor;
   int res;
 
   decompressor = G_ZLIB_DECOMPRESSOR (object);
@@ -202,7 +202,7 @@ g_zlib_decompressor_constructed (xobject_t *object)
     res = inflateInit (&decompressor->zstream);
 
   if (res == Z_MEM_ERROR )
-    g_error ("GZlibDecompressor: Not enough memory for zlib use");
+    xerror ("xzlib_decompressor_t: Not enough memory for zlib use");
 
   if (res != Z_OK)
     g_warning ("unexpected zlib error: %s", decompressor->zstream.msg);
@@ -220,7 +220,7 @@ g_zlib_decompressor_class_init (GZlibDecompressorClass *klass)
   gobject_class->get_property = g_zlib_decompressor_get_property;
   gobject_class->set_property = g_zlib_decompressor_set_property;
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
 				   PROP_FORMAT,
 				   g_param_spec_enum ("format",
 						      P_("compression format"),
@@ -231,16 +231,16 @@ g_zlib_decompressor_class_init (GZlibDecompressorClass *klass)
 						      G_PARAM_STATIC_STRINGS));
 
   /**
-   * GZlibDecompressor:file-info:
+   * xzlib_decompressor_t:file-info:
    *
-   * A #GFileInfo containing the information found in the GZIP header
+   * A #xfile_info_t containing the information found in the GZIP header
    * of the data stream processed, or %NULL if the header was not yet
    * fully processed, is not present at all, or the compressor's
-   * #GZlibDecompressor:format property is not %G_ZLIB_COMPRESSOR_FORMAT_GZIP.
+   * #xzlib_decompressor_t:format property is not %G_ZLIB_COMPRESSOR_FORMAT_GZIP.
    *
    * Since: 2.26
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_FILE_INFO,
                                    g_param_spec_object ("file-info",
                                                        P_("file info"),
@@ -254,18 +254,18 @@ g_zlib_decompressor_class_init (GZlibDecompressorClass *klass)
  * g_zlib_decompressor_new:
  * @format: The format to use for the compressed data
  *
- * Creates a new #GZlibDecompressor.
+ * Creates a new #xzlib_decompressor_t.
  *
- * Returns: a new #GZlibDecompressor
+ * Returns: a new #xzlib_decompressor_t
  *
  * Since: 2.24
  **/
-GZlibDecompressor *
+xzlib_decompressor_t *
 g_zlib_decompressor_new (GZlibCompressorFormat format)
 {
-  GZlibDecompressor *decompressor;
+  xzlib_decompressor_t *decompressor;
 
-  decompressor = g_object_new (XTYPE_ZLIB_DECOMPRESSOR,
+  decompressor = xobject_new (XTYPE_ZLIB_DECOMPRESSOR,
 			       "format", format,
 			       NULL);
 
@@ -274,20 +274,20 @@ g_zlib_decompressor_new (GZlibCompressorFormat format)
 
 /**
  * g_zlib_decompressor_get_file_info:
- * @decompressor: a #GZlibDecompressor
+ * @decompressor: a #xzlib_decompressor_t
  *
- * Retrieves the #GFileInfo constructed from the GZIP header data
+ * Retrieves the #xfile_info_t constructed from the GZIP header data
  * of compressed data processed by @compressor, or %NULL if @decompressor's
- * #GZlibDecompressor:format property is not %G_ZLIB_COMPRESSOR_FORMAT_GZIP,
+ * #xzlib_decompressor_t:format property is not %G_ZLIB_COMPRESSOR_FORMAT_GZIP,
  * or the header data was not fully processed yet, or it not present in the
  * data stream at all.
  *
- * Returns: (nullable) (transfer none): a #GFileInfo, or %NULL
+ * Returns: (nullable) (transfer none): a #xfile_info_t, or %NULL
  *
  * Since: 2.26
  */
-GFileInfo *
-g_zlib_decompressor_get_file_info (GZlibDecompressor *decompressor)
+xfile_info_t *
+g_zlib_decompressor_get_file_info (xzlib_decompressor_t *decompressor)
 {
   g_return_val_if_fail (X_IS_ZLIB_DECOMPRESSOR (decompressor), NULL);
 
@@ -298,9 +298,9 @@ g_zlib_decompressor_get_file_info (GZlibDecompressor *decompressor)
 }
 
 static void
-g_zlib_decompressor_reset (GConverter *converter)
+g_zlib_decompressor_reset (xconverter_t *converter)
 {
-  GZlibDecompressor *decompressor = G_ZLIB_DECOMPRESSOR (converter);
+  xzlib_decompressor_t *decompressor = G_ZLIB_DECOMPRESSOR (converter);
   int res;
 
   res = inflateReset (&decompressor->zstream);
@@ -311,7 +311,7 @@ g_zlib_decompressor_reset (GConverter *converter)
 }
 
 static GConverterResult
-g_zlib_decompressor_convert (GConverter *converter,
+g_zlib_decompressor_convert (xconverter_t *converter,
 			     const void *inbuf,
 			     xsize_t       inbuf_size,
 			     void       *outbuf,
@@ -321,7 +321,7 @@ g_zlib_decompressor_convert (GConverter *converter,
 			     xsize_t      *bytes_written,
 			     xerror_t    **error)
 {
-  GZlibDecompressor *decompressor;
+  xzlib_decompressor_t *decompressor;
   int res;
 
   decompressor = G_ZLIB_DECOMPRESSOR (converter);
@@ -383,20 +383,20 @@ g_zlib_decompressor_convert (GConverter *converter,
       /* So we don't notify again */
       data->gzheader.done = 2;
 
-      data->file_info = g_file_info_new ();
-      g_file_info_set_attribute_uint64 (data->file_info,
-                                        G_FILE_ATTRIBUTE_TIME_MODIFIED,
+      data->file_info = xfile_info_new ();
+      xfile_info_set_attribute_uint64 (data->file_info,
+                                        XFILE_ATTRIBUTE_TIME_MODIFIED,
                                         data->gzheader.time);
-      g_file_info_set_attribute_uint32 (data->file_info,
-                                        G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC,
+      xfile_info_set_attribute_uint32 (data->file_info,
+                                        XFILE_ATTRIBUTE_TIME_MODIFIED_USEC,
                                         0);
 
       if (data->filename[0] != '\0')
-        g_file_info_set_attribute_byte_string (data->file_info,
-                                               G_FILE_ATTRIBUTE_STANDARD_NAME,
+        xfile_info_set_attribute_byte_string (data->file_info,
+                                               XFILE_ATTRIBUTE_STANDARD_NAME,
                                                data->filename);
 
-      g_object_notify (G_OBJECT (decompressor), "file-info");
+      xobject_notify (G_OBJECT (decompressor), "file-info");
     }
 #endif /* !G_OS_WIN32 || ZLIB >= 1.2.4 */
 

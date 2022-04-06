@@ -27,16 +27,16 @@ msgstr ""
 
 #: ../gio/gapplication.c:490
 #| msgid "Application Options:"
-msgid "GApplication options"
+msgid "xapplication_t options"
 msgstr "Aplikaĵaj opcioj"
 
 #: ../gio/gapplication.c:490
 #| msgid "Application Options:"
-msgid "Show GApplication options"
+msgid "Show xapplication_t options"
 msgstr "Montri aplikaĵajn opciojn"
 
 #: ../gio/gapplication.c:535
-msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
 msgstr ""
 
 #: ../gio/gapplication.c:547
@@ -287,9 +287,9 @@ msgstr "Serĉo ne estas subtenata en fluo"
 
 #: ../gio/gbufferedinputstream.c:937
 #, fuzzy
-#| msgid "Cannot truncate GMemoryInputStream"
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "Ne eblas trunki GMemoryInputStream-on"
+#| msgid "Cannot truncate xmemory_input_stream_t"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "Ne eblas trunki xmemory_input_stream_t-on"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1208
 #: ../gio/giostream.c:300 ../gio/goutputstream.c:1660
@@ -366,22 +366,22 @@ msgid "%s filetype"
 msgstr "%s dosierotipo"
 
 #: ../gio/gcredentials.c:312 ../gio/gcredentials.c:571
-msgid "GCredentials is not implemented on this OS"
-msgstr "GCredentials ne estas realigita sur ĉi tiu operaciumo"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "xcredentials_t ne estas realigita sur ĉi tiu operaciumo"
 
 #: ../gio/gcredentials.c:467
-msgid "There is no GCredentials support for your platform"
-msgstr "Estas neniu subteno por GCredentials por via platformo"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "Estas neniu subteno por xcredentials_t por via platformo"
 
 #: ../gio/gcredentials.c:513
 #, fuzzy
-#| msgid "GCredentials is not implemented on this OS"
-msgid "GCredentials does not contain a process ID on this OS"
-msgstr "GCredentials ne estas realigita sur ĉi tiu operaciumo"
+#| msgid "xcredentials_t is not implemented on this OS"
+msgid "xcredentials_t does not contain a process ID on this OS"
+msgstr "xcredentials_t ne estas realigita sur ĉi tiu operaciumo"
 
 #: ../gio/gcredentials.c:565
 #, fuzzy
-#| msgid "GCredentials is not implemented on this OS"
+#| msgid "xcredentials_t is not implemented on this OS"
 msgid "Credentials spoofing is not possible on this OS"
 msgstr "Credentials ne estas realigita sur ĉi tiu operaciumo"
 
@@ -604,8 +604,8 @@ msgstr ""
 "Eluzis ĉiujn haveblajn aŭtentigajn metodojn (provinta: %s) (havebla: %s)"
 
 #: ../gio/gdbusauth.c:1174
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "Resignita per GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "Resignita per xdbus_auth_observer_t::authorize-authenticated-peer"
 
 #: ../gio/gdbusauthmechanismsha1.c:261
 #, fuzzy, c-format
@@ -1457,29 +1457,29 @@ msgstr "TLS subteno ne estas havebla"
 
 #: ../gio/gemblem.c:323
 #, fuzzy, c-format
-#| msgid "Can't handle version %d of GEmblem encoding"
-msgid "Can’t handle version %d of GEmblem encoding"
-msgstr "Ne eblas trakti version %d de GEmblem kodoprezento"
+#| msgid "Can't handle version %d of xemblem_t encoding"
+msgid "Can’t handle version %d of xemblem_t encoding"
+msgstr "Ne eblas trakti version %d de xemblem_t kodoprezento"
 
 #: ../gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "Misformita nombro da ĵetonoj (%d) en GEmblem kodoprezento"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "Misformita nombro da ĵetonoj (%d) en xemblem_t kodoprezento"
 
 #: ../gio/gemblemedicon.c:362
 #, fuzzy, c-format
-#| msgid "Can't handle version %d of GEmblemedIcon encoding"
-msgid "Can’t handle version %d of GEmblemedIcon encoding"
-msgstr "Ne eblas trakti version %d de GEmblemedIcon kodoprezento"
+#| msgid "Can't handle version %d of xemblemed_icon_t encoding"
+msgid "Can’t handle version %d of xemblemed_icon_t encoding"
+msgstr "Ne eblas trakti version %d de xemblemed_icon_t kodoprezento"
 
 #: ../gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "Misformita nombro da ĵetonoj (%d) en GEmblemedIcon kodoprezento"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "Misformita nombro da ĵetonoj (%d) en xemblemed_icon_t kodoprezento"
 
 #: ../gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "Atendis GEmblem por GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "Atendis xemblem_t por xemblemed_icon_t"
 
 #: ../gio/gfile.c:969 ../gio/gfile.c:1207 ../gio/gfile.c:1345
 #: ../gio/gfile.c:1583 ../gio/gfile.c:1638 ../gio/gfile.c:1696
@@ -1590,13 +1590,13 @@ msgstr "Dosierenumeraciilo jam estas fermita"
 
 #: ../gio/gfileicon.c:236
 #, fuzzy, c-format
-#| msgid "Can't handle version %d of GFileIcon encoding"
-msgid "Can’t handle version %d of GFileIcon encoding"
-msgstr "Ne eblas trakti version %d de GFileIcon-kodoprezento"
+#| msgid "Can't handle version %d of xfile_icon_t encoding"
+msgid "Can’t handle version %d of xfile_icon_t encoding"
+msgstr "Ne eblas trakti version %d de xfile_icon_t-kodoprezento"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for GFileIcon"
-msgstr "Esti misformita eniga datumaro por GFileIcon"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "Esti misformita eniga datumaro por xfile_icon_t"
 
 #: ../gio/gfileinputstream.c:149 ../gio/gfileinputstream.c:394
 #: ../gio/gfileiostream.c:167 ../gio/gfileoutputstream.c:164
@@ -2773,11 +2773,11 @@ msgstr "Ne devigi ŝlosilonomajn limigojn"
 
 #: ../gio/glib-compile-schemas.c:2085
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Kompili ciujn GSettings skemajn dosierojn en skema kaŝmemoro.\n"
+"Kompili ciujn xsettings_t skemajn dosierojn en skema kaŝmemoro.\n"
 "Skemaj dosieroj estas bezonas havi la sufikson .gschema.xml,\n"
 "kaj la kaŝmemora dosiero estas nomita gschemas.compiled."
 
@@ -3135,8 +3135,8 @@ msgid "Invalid seek request"
 msgstr "Nevalida serĉpeto"
 
 #: ../gio/gmemoryinputstream.c:508
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "Ne eblas trunki GMemoryInputStream-on"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "Ne eblas trunki xmemory_input_stream_t-on"
 
 #: ../gio/gmemoryoutputstream.c:567
 msgid "Memory output stream not resizable"
@@ -3825,9 +3825,9 @@ msgstr "Eraro dum sendado de la mesaĝo: %s"
 
 #: ../gio/gsocket.c:4428
 #, fuzzy
-#| msgid "GSocketControlMessage not supported on windows"
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "GSocketControlMessage ne estas subternata sur Vindozo"
+#| msgid "xsocket_control_message_t not supported on windows"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "xsocket_control_message_t ne estas subternata sur Vindozo"
 
 #: ../gio/gsocket.c:4881 ../gio/gsocket.c:4954 ../gio/gsocket.c:5180
 #, c-format
@@ -3977,9 +3977,9 @@ msgstr "Nekonata SOCKv5 prokurilo eraro."
 
 #: ../gio/gthemedicon.c:518
 #, fuzzy, c-format
-#| msgid "Can't handle version %d of GThemedIcon encoding"
-msgid "Can’t handle version %d of GThemedIcon encoding"
-msgstr "Ne eblas trakti version %d de GThemedIcon kodoprezento"
+#| msgid "Can't handle version %d of xthemed_icon_t encoding"
+msgid "Can’t handle version %d of xthemed_icon_t encoding"
+msgstr "Ne eblas trakti version %d de xthemed_icon_t kodoprezento"
 
 #: ../gio/gthreadedresolver.c:118
 msgid "No valid addresses were found"
@@ -4343,25 +4343,25 @@ msgstr "La vojnomo '%s' ne estas absoluta vojo"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:202
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %b %e %H:%M:%S %Y"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:205
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%F"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:208
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:211
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -4557,13 +4557,13 @@ msgstr "dim"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:354
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "ATM"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:357
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "PTM"
 

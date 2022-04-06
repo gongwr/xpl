@@ -71,7 +71,7 @@ struct _GCacheNode
  * information about a #GCache. It should only be accessed via the
  * following functions.
  *
- * Deprecated:2.32: Use a #GHashTable instead
+ * Deprecated:2.32: Use a #xhashtable_t instead
  */
 struct _GCache
 {
@@ -88,10 +88,10 @@ struct _GCache
   GCacheDestroyFunc key_destroy_func;
 
   /* Associates keys with nodes */
-  GHashTable *key_table;
+  xhashtable_t *key_table;
 
   /* Associates nodes with keys */
-  GHashTable *value_table;
+  xhashtable_t *value_table;
 };
 
 static inline GCacheNode*
@@ -133,7 +133,7 @@ g_cache_node_destroy (GCacheNode *node)
  *
  * Returns: a new #GCache
  *
- * Deprecated:2.32: Use a #GHashTable instead
+ * Deprecated:2.32: Use a #xhashtable_t instead
  */
 
 /**
@@ -193,8 +193,8 @@ g_cache_new (GCacheNewFunc      value_new_func,
   cache->value_destroy_func = value_destroy_func;
   cache->key_dup_func = key_dup_func;
   cache->key_destroy_func = key_destroy_func;
-  cache->key_table = g_hash_table_new (hash_key_func, key_equal_func);
-  cache->value_table = g_hash_table_new (hash_value_func, NULL);
+  cache->key_table = xhash_table_new (hash_key_func, key_equal_func);
+  cache->value_table = xhash_table_new (hash_value_func, NULL);
 
   return cache;
 }
@@ -208,15 +208,15 @@ g_cache_new (GCacheNewFunc      value_new_func,
  * Note that it does not destroy the keys and values which were
  * contained in the #GCache.
  *
- * Deprecated:2.32: Use a #GHashTable instead
+ * Deprecated:2.32: Use a #xhashtable_t instead
  */
 void
 g_cache_destroy (GCache *cache)
 {
   g_return_if_fail (cache != NULL);
 
-  g_hash_table_destroy (cache->key_table);
-  g_hash_table_destroy (cache->value_table);
+  xhash_table_destroy (cache->key_table);
+  xhash_table_destroy (cache->value_table);
   g_slice_free (GCache, cache);
 }
 
@@ -236,7 +236,7 @@ g_cache_destroy (GCache *cache)
  *
  * Returns: a pointer to a #GCache value
  *
- * Deprecated:2.32: Use a #GHashTable instead
+ * Deprecated:2.32: Use a #xhashtable_t instead
  */
 xpointer_t
 g_cache_insert (GCache   *cache,
@@ -247,7 +247,7 @@ g_cache_insert (GCache   *cache,
 
   g_return_val_if_fail (cache != NULL, NULL);
 
-  node = g_hash_table_lookup (cache->key_table, key);
+  node = xhash_table_lookup (cache->key_table, key);
   if (node)
     {
       node->ref_count += 1;
@@ -258,8 +258,8 @@ g_cache_insert (GCache   *cache,
   value = (* cache->value_new_func) (key);
   node = g_cache_node_new (value);
 
-  g_hash_table_insert (cache->key_table, key, node);
-  g_hash_table_insert (cache->value_table, value, key);
+  xhash_table_insert (cache->key_table, key, node);
+  xhash_table_insert (cache->value_table, value, key);
 
   return node->value;
 }
@@ -273,27 +273,27 @@ g_cache_insert (GCache   *cache,
  * then the value and its corresponding key are destroyed, using the
  * @value_destroy_func and @key_destroy_func passed to g_cache_new().
  *
- * Deprecated:2.32: Use a #GHashTable instead
+ * Deprecated:2.32: Use a #xhashtable_t instead
  */
 void
 g_cache_remove (GCache        *cache,
-                gconstpointer  value)
+                xconstpointer  value)
 {
   GCacheNode *node;
   xpointer_t key;
 
   g_return_if_fail (cache != NULL);
 
-  key = g_hash_table_lookup (cache->value_table, value);
-  node = g_hash_table_lookup (cache->key_table, key);
+  key = xhash_table_lookup (cache->value_table, value);
+  node = xhash_table_lookup (cache->key_table, key);
 
   g_return_if_fail (node != NULL);
 
   node->ref_count -= 1;
   if (node->ref_count == 0)
     {
-      g_hash_table_remove (cache->value_table, value);
-      g_hash_table_remove (cache->key_table, key);
+      xhash_table_remove (cache->value_table, value);
+      xhash_table_remove (cache->key_table, key);
 
       (* cache->key_destroy_func) (key);
       (* cache->value_destroy_func) (node->value);
@@ -311,10 +311,10 @@ g_cache_remove (GCache        *cache,
  *
  * NOTE @func is passed three parameters, the value and key of a cache
  * entry and the @user_data. The order of value and key is different
- * from the order in which g_hash_table_foreach() passes key-value
+ * from the order in which xhash_table_foreach() passes key-value
  * pairs to its callback function !
  *
- * Deprecated:2.32: Use a #GHashTable instead
+ * Deprecated:2.32: Use a #xhashtable_t instead
  */
 void
 g_cache_key_foreach (GCache   *cache,
@@ -324,7 +324,7 @@ g_cache_key_foreach (GCache   *cache,
   g_return_if_fail (cache != NULL);
   g_return_if_fail (func != NULL);
 
-  g_hash_table_foreach (cache->value_table, func, user_data);
+  xhash_table_foreach (cache->value_table, func, user_data);
 }
 
 /**
@@ -346,5 +346,5 @@ g_cache_value_foreach (GCache   *cache,
   g_return_if_fail (cache != NULL);
   g_return_if_fail (func != NULL);
 
-  g_hash_table_foreach (cache->key_table, func, user_data);
+  xhash_table_foreach (cache->key_table, func, user_data);
 }

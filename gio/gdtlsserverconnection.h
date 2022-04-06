@@ -29,15 +29,15 @@
 G_BEGIN_DECLS
 
 #define XTYPE_DTLS_SERVER_CONNECTION                (g_dtls_server_connection_get_type ())
-#define G_DTLS_SERVER_CONNECTION(inst)               (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_DTLS_SERVER_CONNECTION, GDtlsServerConnection))
+#define G_DTLS_SERVER_CONNECTION(inst)               (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_DTLS_SERVER_CONNECTION, xdtls_server_connection))
 #define X_IS_DTLS_SERVER_CONNECTION(inst)            (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_DTLS_SERVER_CONNECTION))
 #define G_DTLS_SERVER_CONNECTION_GET_INTERFACE(inst) (XTYPE_INSTANCE_GET_INTERFACE ((inst), XTYPE_DTLS_SERVER_CONNECTION, GDtlsServerConnectionInterface))
 
 /**
- * GDtlsServerConnection:
+ * xdtls_server_connection_t:
  *
  * DTLS server-side connection. This is the server-side implementation
- * of a #GDtlsConnection.
+ * of a #xdtls_connection_t.
  *
  * Since: 2.48
  */
@@ -47,7 +47,7 @@ typedef struct _GDtlsServerConnectionInterface GDtlsServerConnectionInterface;
  * GDtlsServerConnectionInterface:
  * @x_iface: The parent interface.
  *
- * vtable for a #GDtlsServerConnection implementation.
+ * vtable for a #xdtls_server_connection_t implementation.
  *
  * Since: 2.48
  */
@@ -60,8 +60,8 @@ XPL_AVAILABLE_IN_2_48
 xtype_t           g_dtls_server_connection_get_type (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_2_48
-GDatagramBased *g_dtls_server_connection_new      (GDatagramBased   *base_socket,
-                                                   GTlsCertificate  *certificate,
+xdatagram_based_t *g_dtls_server_connection_new      (xdatagram_based_t   *base_socket,
+                                                   xtls_certificate_t  *certificate,
                                                    xerror_t          **error);
 
 G_END_DECLS

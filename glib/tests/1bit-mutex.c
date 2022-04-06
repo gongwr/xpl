@@ -56,7 +56,7 @@
 #pragma GCC diagnostic pop
 #endif
 
-volatile GThread *owners[LOCKS];
+volatile xthread_t *owners[LOCKS];
 volatile xint_t     locks[LOCKS];
 volatile xpointer_t ptrs[LOCKS];
 volatile xint_t     bits[LOCKS];
@@ -65,9 +65,9 @@ static void
 acquire (int      nr,
          xboolean_t use_pointers)
 {
-  GThread *self;
+  xthread_t *self;
 
-  self = g_thread_self ();
+  self = xthread_self ();
 
   g_assert_cmpint (((xsize_t) ptrs) % sizeof(xint_t), ==, 0);
 
@@ -88,9 +88,9 @@ acquire (int      nr,
   owners[nr] = self;
 
   /* let some other threads try to ruin our day */
-  g_thread_yield ();
-  g_thread_yield ();
-  g_thread_yield ();
+  xthread_yield ();
+  xthread_yield ();
+  xthread_yield ();
 
   g_assert (owners[nr] == self);   /* hopefully this is still us... */
   owners[nr] = NULL;               /* make way for the next guy */
@@ -106,7 +106,7 @@ thread_func (xpointer_t data)
 {
   xboolean_t use_pointers = GPOINTER_TO_INT (data);
   xint_t i;
-  GRand *rand;
+  xrand_t *rand;
 
   rand = g_rand_new ();
 
@@ -119,10 +119,10 @@ thread_func (xpointer_t data)
 }
 
 static void
-testcase (gconstpointer data)
+testcase (xconstpointer data)
 {
   xboolean_t use_pointers = GPOINTER_TO_INT (data);
-  GThread *threads[THREADS];
+  xthread_t *threads[THREADS];
   int i;
 
 #ifdef TEST_EMULATED_FUTEX
@@ -140,11 +140,11 @@ testcase (gconstpointer data)
     bits[i] = g_random_int () % 32;
 
   for (i = 0; i < THREADS; i++)
-    threads[i] = g_thread_new ("foo", thread_func,
+    threads[i] = xthread_new ("foo", thread_func,
                                GINT_TO_POINTER (use_pointers));
 
   for (i = 0; i < THREADS; i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 
   for (i = 0; i < LOCKS; i++)
     {

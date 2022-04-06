@@ -31,12 +31,12 @@
 /**
  * SECTION:gparamspec
  * @short_description: Metadata for parameter specifications
- * @see_also: g_object_class_install_property(), g_object_set(),
- *     g_object_get(), g_object_set_property(), g_object_get_property(),
- *     g_value_register_transform_func()
- * @title: GParamSpec
+ * @see_also: xobject_class_install_property(), xobject_set(),
+ *     xobject_get(), xobject_set_property(), xobject_get_property(),
+ *     xvalue_register_transform_func()
+ * @title: xparam_spec_t
  *
- * #GParamSpec is an object structure that encapsulates the metadata
+ * #xparam_spec_t is an object structure that encapsulates the metadata
  * required to specify parameters, such as e.g. #xobject_t properties.
  *
  * ## Parameter names # {#canonical-parameter-names}
@@ -46,7 +46,7 @@
  * character of a property name must be a letter. These are the same rules as
  * for signal naming (see g_signal_new()).
  *
- * When creating and looking up a #GParamSpec, either separator can be
+ * When creating and looking up a #xparam_spec_t, either separator can be
  * used, but they cannot be mixed. Using `-` is considerably more
  * efficient, and is the ‘canonical form’. Using `_` is discouraged.
  */
@@ -62,36 +62,36 @@ static void	g_param_spec_class_base_init	 (GParamSpecClass	*class);
 static void	g_param_spec_class_base_finalize (GParamSpecClass	*class);
 static void	g_param_spec_class_init		 (GParamSpecClass	*class,
 						  xpointer_t               class_data);
-static void	g_param_spec_init		 (GParamSpec		*pspec,
+static void	g_param_spec_init		 (xparam_spec_t		*pspec,
 						  GParamSpecClass	*class);
-static void	g_param_spec_finalize		 (GParamSpec		*pspec);
-static void	value_param_init		(GValue		*value);
-static void	value_param_free_value		(GValue		*value);
-static void	value_param_copy_value		(const GValue	*src_value,
-						 GValue		*dest_value);
-static void	value_param_transform_value	(const GValue	*src_value,
-						 GValue		*dest_value);
-static xpointer_t	value_param_peek_pointer	(const GValue	*value);
-static xchar_t*	value_param_collect_value	(GValue		*value,
+static void	g_param_spec_finalize		 (xparam_spec_t		*pspec);
+static void	value_param_init		(xvalue_t		*value);
+static void	value_param_free_value		(xvalue_t		*value);
+static void	value_param_copy_value		(const xvalue_t	*src_value,
+						 xvalue_t		*dest_value);
+static void	value_param_transform_value	(const xvalue_t	*src_value,
+						 xvalue_t		*dest_value);
+static xpointer_t	value_param_peek_pointer	(const xvalue_t	*value);
+static xchar_t*	value_param_collect_value	(xvalue_t		*value,
 						 xuint_t           n_collect_values,
-						 GTypeCValue    *collect_values,
+						 xtype_c_value_t    *collect_values,
 						 xuint_t           collect_flags);
-static xchar_t*	value_param_lcopy_value		(const GValue	*value,
+static xchar_t*	value_param_lcopy_value		(const xvalue_t	*value,
 						 xuint_t           n_collect_values,
-						 GTypeCValue    *collect_values,
+						 xtype_c_value_t    *collect_values,
 						 xuint_t           collect_flags);
 
 typedef struct
 {
-  GValue default_value;
-  GQuark name_quark;
+  xvalue_t default_value;
+  xquark name_quark;
 } GParamSpecPrivate;
 
 static xint_t g_param_private_offset;
 
 /* --- functions --- */
 static inline GParamSpecPrivate *
-g_param_spec_get_private (GParamSpec *pspec)
+g_param_spec_get_private (xparam_spec_t *pspec)
 {
   return &G_STRUCT_MEMBER (GParamSpecPrivate, pspec, g_param_private_offset);
 }
@@ -105,7 +105,7 @@ _g_param_type_init (void)
      XTYPE_FLAG_DERIVABLE |
      XTYPE_FLAG_DEEP_DERIVABLE),
   };
-  static const GTypeValueTable param_value_table = {
+  static const xtype_value_table_t param_value_table = {
     value_param_init,           /* value_init */
     value_param_free_value,     /* value_free */
     value_param_copy_value,     /* value_copy */
@@ -115,32 +115,32 @@ _g_param_type_init (void)
     "p",			/* lcopy_format */
     value_param_lcopy_value,    /* lcopy_value */
   };
-  const GTypeInfo param_spec_info = {
+  const xtype_info_t param_spec_info = {
     sizeof (GParamSpecClass),
 
-    (GBaseInitFunc) g_param_spec_class_base_init,
-    (GBaseFinalizeFunc) g_param_spec_class_base_finalize,
-    (GClassInitFunc) g_param_spec_class_init,
-    (GClassFinalizeFunc) NULL,
+    (xbase_init_func_t) g_param_spec_class_base_init,
+    (xbase_finalize_func_t) g_param_spec_class_base_finalize,
+    (xclass_init_func_t) g_param_spec_class_init,
+    (xclass_finalize_func_t) NULL,
     NULL,	/* class_data */
 
-    sizeof (GParamSpec),
+    sizeof (xparam_spec_t),
     0,		/* n_preallocs */
-    (GInstanceInitFunc) g_param_spec_init,
+    (xinstance_init_func_t) g_param_spec_init,
 
     &param_value_table,
   };
   xtype_t type;
 
-  /* This should be registered as GParamSpec instead of GParam, for
+  /* This should be registered as xparam_spec_t instead of GParam, for
    * consistency sake, so that type name can be mapped to struct name,
    * However, some language bindings, most noticeable the python ones
    * depends on the "GParam" identifier, see #548689
    */
-  type = g_type_register_fundamental (XTYPE_PARAM, g_intern_static_string ("GParam"), &param_spec_info, &finfo, XTYPE_FLAG_ABSTRACT);
+  type = xtype_register_fundamental (XTYPE_PARAM, g_intern_static_string ("GParam"), &param_spec_info, &finfo, XTYPE_FLAG_ABSTRACT);
   g_assert (type == XTYPE_PARAM);
-  g_param_private_offset = g_type_add_instance_private (type, sizeof (GParamSpecPrivate));
-  g_value_register_transform_func (XTYPE_PARAM, XTYPE_PARAM, value_param_transform_value);
+  g_param_private_offset = xtype_add_instance_private (type, sizeof (GParamSpecPrivate));
+  xvalue_register_transform_func (XTYPE_PARAM, XTYPE_PARAM, value_param_transform_value);
 }
 
 static void
@@ -163,11 +163,11 @@ g_param_spec_class_init (GParamSpecClass *class,
   class->value_validate = NULL;
   class->values_cmp = NULL;
 
-  g_type_class_adjust_private_offset (class, &g_param_private_offset);
+  xtype_class_adjust_private_offset (class, &g_param_private_offset);
 }
 
 static void
-g_param_spec_init (GParamSpec      *pspec,
+g_param_spec_init (xparam_spec_t      *pspec,
 		   GParamSpecClass *class)
 {
   pspec->name = NULL;
@@ -183,12 +183,12 @@ g_param_spec_init (GParamSpec      *pspec,
 }
 
 static void
-g_param_spec_finalize (GParamSpec *pspec)
+g_param_spec_finalize (xparam_spec_t *pspec)
 {
   GParamSpecPrivate *priv = g_param_spec_get_private (pspec);
 
   if (priv->default_value.g_type)
-    g_value_reset (&priv->default_value);
+    xvalue_reset (&priv->default_value);
 
   g_datalist_clear (&pspec->qdata);
 
@@ -198,19 +198,19 @@ g_param_spec_finalize (GParamSpec *pspec)
   if (!(pspec->flags & G_PARAM_STATIC_BLURB))
     g_free (pspec->_blurb);
 
-  g_type_free_instance ((GTypeInstance*) pspec);
+  xtype_free_instance ((GTypeInstance*) pspec);
 }
 
 /**
  * g_param_spec_ref: (skip)
- * @pspec: (transfer none) (not nullable): a valid #GParamSpec
+ * @pspec: (transfer none) (not nullable): a valid #xparam_spec_t
  *
  * Increments the reference count of @pspec.
  *
- * Returns: (transfer full) (not nullable): the #GParamSpec that was passed into this function
+ * Returns: (transfer full) (not nullable): the #xparam_spec_t that was passed into this function
  */
-GParamSpec*
-g_param_spec_ref (GParamSpec *pspec)
+xparam_spec_t*
+g_param_spec_ref (xparam_spec_t *pspec)
 {
   g_return_val_if_fail (X_IS_PARAM_SPEC (pspec), NULL);
 
@@ -221,12 +221,12 @@ g_param_spec_ref (GParamSpec *pspec)
 
 /**
  * g_param_spec_unref: (skip)
- * @pspec: a valid #GParamSpec
+ * @pspec: a valid #xparam_spec_t
  *
  * Decrements the reference count of a @pspec.
  */
 void
-g_param_spec_unref (GParamSpec *pspec)
+g_param_spec_unref (xparam_spec_t *pspec)
 {
   xboolean_t is_zero;
 
@@ -242,9 +242,9 @@ g_param_spec_unref (GParamSpec *pspec)
 
 /**
  * g_param_spec_sink:
- * @pspec: a valid #GParamSpec
+ * @pspec: a valid #xparam_spec_t
  *
- * The initial reference count of a newly created #GParamSpec is 1,
+ * The initial reference count of a newly created #xparam_spec_t is 1,
  * even though no one has explicitly called g_param_spec_ref() on it
  * yet. So the initial reference count is flagged as "floating", until
  * someone calls `g_param_spec_ref (pspec); g_param_spec_sink
@@ -253,7 +253,7 @@ g_param_spec_unref (GParamSpec *pspec)
  * count of 1 still, but is not flagged "floating" anymore).
  */
 void
-g_param_spec_sink (GParamSpec *pspec)
+g_param_spec_sink (xparam_spec_t *pspec)
 {
   xsize_t oldvalue;
   g_return_if_fail (X_IS_PARAM_SPEC (pspec));
@@ -265,15 +265,15 @@ g_param_spec_sink (GParamSpec *pspec)
 
 /**
  * g_param_spec_ref_sink: (skip)
- * @pspec: a valid #GParamSpec
+ * @pspec: a valid #xparam_spec_t
  *
- * Convenience function to ref and sink a #GParamSpec.
+ * Convenience function to ref and sink a #xparam_spec_t.
  *
  * Since: 2.10
- * Returns: (transfer full) (not nullable): the #GParamSpec that was passed into this function
+ * Returns: (transfer full) (not nullable): the #xparam_spec_t that was passed into this function
  */
-GParamSpec*
-g_param_spec_ref_sink (GParamSpec *pspec)
+xparam_spec_t*
+g_param_spec_ref_sink (xparam_spec_t *pspec)
 {
   xsize_t oldvalue;
   g_return_val_if_fail (X_IS_PARAM_SPEC (pspec), NULL);
@@ -287,9 +287,9 @@ g_param_spec_ref_sink (GParamSpec *pspec)
 
 /**
  * g_param_spec_get_name:
- * @pspec: a valid #GParamSpec
+ * @pspec: a valid #xparam_spec_t
  *
- * Get the name of a #GParamSpec.
+ * Get the name of a #xparam_spec_t.
  *
  * The name is always an "interned" string (as per g_intern_string()).
  * This allows for pointer-value comparisons.
@@ -297,7 +297,7 @@ g_param_spec_ref_sink (GParamSpec *pspec)
  * Returns: the name of @pspec.
  */
 const xchar_t *
-g_param_spec_get_name (GParamSpec *pspec)
+g_param_spec_get_name (xparam_spec_t *pspec)
 {
   g_return_val_if_fail (X_IS_PARAM_SPEC (pspec), NULL);
 
@@ -306,14 +306,14 @@ g_param_spec_get_name (GParamSpec *pspec)
 
 /**
  * g_param_spec_get_nick:
- * @pspec: a valid #GParamSpec
+ * @pspec: a valid #xparam_spec_t
  *
- * Get the nickname of a #GParamSpec.
+ * Get the nickname of a #xparam_spec_t.
  *
  * Returns: the nickname of @pspec.
  */
 const xchar_t *
-g_param_spec_get_nick (GParamSpec *pspec)
+g_param_spec_get_nick (xparam_spec_t *pspec)
 {
   g_return_val_if_fail (X_IS_PARAM_SPEC (pspec), NULL);
 
@@ -321,7 +321,7 @@ g_param_spec_get_nick (GParamSpec *pspec)
     return pspec->_nick;
   else
     {
-      GParamSpec *redirect_target;
+      xparam_spec_t *redirect_target;
 
       redirect_target = g_param_spec_get_redirect_target (pspec);
       if (redirect_target && redirect_target->_nick)
@@ -333,14 +333,14 @@ g_param_spec_get_nick (GParamSpec *pspec)
 
 /**
  * g_param_spec_get_blurb:
- * @pspec: a valid #GParamSpec
+ * @pspec: a valid #xparam_spec_t
  *
- * Get the short description of a #GParamSpec.
+ * Get the short description of a #xparam_spec_t.
  *
  * Returns: (nullable): the short description of @pspec.
  */
 const xchar_t *
-g_param_spec_get_blurb (GParamSpec *pspec)
+g_param_spec_get_blurb (xparam_spec_t *pspec)
 {
   g_return_val_if_fail (X_IS_PARAM_SPEC (pspec), NULL);
 
@@ -348,7 +348,7 @@ g_param_spec_get_blurb (GParamSpec *pspec)
     return pspec->_blurb;
   else
     {
-      GParamSpec *redirect_target;
+      xparam_spec_t *redirect_target;
 
       redirect_target = g_param_spec_get_redirect_target (pspec);
       if (redirect_target && redirect_target->_blurb)
@@ -385,7 +385,7 @@ is_canonical (const xchar_t *key)
  * g_param_spec_is_valid_name:
  * @name: the canonical name of the property
  *
- * Validate a property name for a #GParamSpec. This can be useful for
+ * Validate a property name for a #xparam_spec_t. This can be useful for
  * dynamically-generated properties which need to be validated at run-time
  * before actually trying to create them.
  *
@@ -427,7 +427,7 @@ g_param_spec_is_valid_name (const xchar_t *name)
  * @blurb: a short description of the property
  * @flags: a combination of #GParamFlags
  *
- * Creates a new #GParamSpec instance.
+ * Creates a new #xparam_spec_t instance.
  *
  * See [canonical parameter names][canonical-parameter-names] for details of
  * the rules for @name. Names which violate these rules lead to undefined
@@ -440,7 +440,7 @@ g_param_spec_is_valid_name (const xchar_t *name)
  * e.g. a tooltip. The @nick and @blurb should ideally be localized.
  *
  * Returns: (type xobject_t.ParamSpec): (transfer floating): a newly allocated
- *     #GParamSpec instance, which is initially floating
+ *     #xparam_spec_t instance, which is initially floating
  */
 xpointer_t
 g_param_spec_internal (xtype_t        param_type,
@@ -449,7 +449,7 @@ g_param_spec_internal (xtype_t        param_type,
 		       const xchar_t *blurb,
 		       GParamFlags  flags)
 {
-  GParamSpec *pspec;
+  xparam_spec_t *pspec;
   GParamSpecPrivate *priv;
 
   g_return_val_if_fail (XTYPE_IS_PARAM (param_type) && param_type != XTYPE_PARAM, NULL);
@@ -457,7 +457,7 @@ g_param_spec_internal (xtype_t        param_type,
   g_return_val_if_fail (g_param_spec_is_valid_name (name), NULL);
   g_return_val_if_fail (!(flags & G_PARAM_STATIC_NAME) || is_canonical (name), NULL);
 
-  pspec = (xpointer_t) g_type_create_instance (param_type);
+  pspec = (xpointer_t) xtype_create_instance (param_type);
 
   if (flags & G_PARAM_STATIC_NAME)
     {
@@ -472,7 +472,7 @@ g_param_spec_internal (xtype_t        param_type,
         pspec->name = (xchar_t *) g_intern_string (name);
       else
         {
-          xchar_t *tmp = g_strdup (name);
+          xchar_t *tmp = xstrdup (name);
           canonicalize_key (tmp);
           pspec->name = (xchar_t *) g_intern_string (tmp);
           g_free (tmp);
@@ -485,12 +485,12 @@ g_param_spec_internal (xtype_t        param_type,
   if (flags & G_PARAM_STATIC_NICK)
     pspec->_nick = (xchar_t*) nick;
   else
-    pspec->_nick = g_strdup (nick);
+    pspec->_nick = xstrdup (nick);
 
   if (flags & G_PARAM_STATIC_BLURB)
     pspec->_blurb = (xchar_t*) blurb;
   else
-    pspec->_blurb = g_strdup (blurb);
+    pspec->_blurb = xstrdup (blurb);
 
   pspec->flags = (flags & G_PARAM_USER_MASK) | (flags & G_PARAM_MASK);
 
@@ -499,16 +499,16 @@ g_param_spec_internal (xtype_t        param_type,
 
 /**
  * g_param_spec_get_qdata:
- * @pspec: a valid #GParamSpec
- * @quark: a #GQuark, naming the user data pointer
+ * @pspec: a valid #xparam_spec_t
+ * @quark: a #xquark, naming the user data pointer
  *
  * Gets back user data pointers stored via g_param_spec_set_qdata().
  *
  * Returns: (transfer none) (nullable): the user data pointer set, or %NULL
  */
 xpointer_t
-g_param_spec_get_qdata (GParamSpec *pspec,
-			GQuark      quark)
+g_param_spec_get_qdata (xparam_spec_t *pspec,
+			xquark      quark)
 {
   g_return_val_if_fail (X_IS_PARAM_SPEC (pspec), NULL);
 
@@ -517,20 +517,20 @@ g_param_spec_get_qdata (GParamSpec *pspec,
 
 /**
  * g_param_spec_set_qdata:
- * @pspec: the #GParamSpec to set store a user data pointer
- * @quark: a #GQuark, naming the user data pointer
+ * @pspec: the #xparam_spec_t to set store a user data pointer
+ * @quark: a #xquark, naming the user data pointer
  * @data: (nullable): an opaque user data pointer
  *
- * Sets an opaque, named pointer on a #GParamSpec. The name is
- * specified through a #GQuark (retrieved e.g. via
+ * Sets an opaque, named pointer on a #xparam_spec_t. The name is
+ * specified through a #xquark (retrieved e.g. via
  * g_quark_from_static_string()), and the pointer can be gotten back
  * from the @pspec with g_param_spec_get_qdata().  Setting a
  * previously set user data pointer, overrides (frees) the old pointer
  * set, using %NULL as pointer essentially removes the data stored.
  */
 void
-g_param_spec_set_qdata (GParamSpec *pspec,
-			GQuark      quark,
+g_param_spec_set_qdata (xparam_spec_t *pspec,
+			xquark      quark,
 			xpointer_t    data)
 {
   g_return_if_fail (X_IS_PARAM_SPEC (pspec));
@@ -541,8 +541,8 @@ g_param_spec_set_qdata (GParamSpec *pspec,
 
 /**
  * g_param_spec_set_qdata_full: (skip)
- * @pspec: the #GParamSpec to set store a user data pointer
- * @quark: a #GQuark, naming the user data pointer
+ * @pspec: the #xparam_spec_t to set store a user data pointer
+ * @quark: a #xquark, naming the user data pointer
  * @data: (nullable): an opaque user data pointer
  * @destroy: (nullable): function to invoke with @data as argument, when @data needs to
  *  be freed
@@ -554,21 +554,21 @@ g_param_spec_set_qdata (GParamSpec *pspec,
  * g_param_spec_set_qdata() with the same @quark.
  */
 void
-g_param_spec_set_qdata_full (GParamSpec    *pspec,
-			     GQuark         quark,
+g_param_spec_set_qdata_full (xparam_spec_t    *pspec,
+			     xquark         quark,
 			     xpointer_t       data,
-			     GDestroyNotify destroy)
+			     xdestroy_notify_t destroy)
 {
   g_return_if_fail (X_IS_PARAM_SPEC (pspec));
   g_return_if_fail (quark > 0);
 
-  g_datalist_id_set_data_full (&pspec->qdata, quark, data, data ? destroy : (GDestroyNotify) NULL);
+  g_datalist_id_set_data_full (&pspec->qdata, quark, data, data ? destroy : (xdestroy_notify_t) NULL);
 }
 
 /**
  * g_param_spec_steal_qdata:
- * @pspec: the #GParamSpec to get a stored user data pointer from
- * @quark: a #GQuark, naming the user data pointer
+ * @pspec: the #xparam_spec_t to get a stored user data pointer from
+ * @quark: a #xquark, naming the user data pointer
  *
  * Gets back user data pointers stored via g_param_spec_set_qdata()
  * and removes the @data from @pspec without invoking its destroy()
@@ -578,8 +578,8 @@ g_param_spec_set_qdata_full (GParamSpec    *pspec,
  * Returns: (transfer none) (nullable): the user data pointer set, or %NULL
  */
 xpointer_t
-g_param_spec_steal_qdata (GParamSpec *pspec,
-			  GQuark      quark)
+g_param_spec_steal_qdata (xparam_spec_t *pspec,
+			  xquark      quark)
 {
   g_return_val_if_fail (X_IS_PARAM_SPEC (pspec), NULL);
   g_return_val_if_fail (quark > 0, NULL);
@@ -589,14 +589,14 @@ g_param_spec_steal_qdata (GParamSpec *pspec,
 
 /**
  * g_param_spec_get_redirect_target:
- * @pspec: a #GParamSpec
+ * @pspec: a #xparam_spec_t
  *
  * If the paramspec redirects operations to another paramspec,
  * returns that paramspec. Redirect is used typically for
  * providing a new implementation of a property in a derived
  * type while preserving all the properties from the parent
  * type. Redirection is established by creating a property
- * of type #GParamSpecOverride. See g_object_class_override_property()
+ * of type #GParamSpecOverride. See xobject_class_override_property()
  * for an example of the use of this capability.
  *
  * Since: 2.4
@@ -604,8 +604,8 @@ g_param_spec_steal_qdata (GParamSpec *pspec,
  * Returns: (transfer none) (nullable): paramspec to which requests on this
  *          paramspec should be redirected, or %NULL if none.
  */
-GParamSpec*
-g_param_spec_get_redirect_target (GParamSpec *pspec)
+xparam_spec_t*
+g_param_spec_get_redirect_target (xparam_spec_t *pspec)
 {
   GTypeInstance *inst = (GTypeInstance *)pspec;
 
@@ -617,27 +617,27 @@ g_param_spec_get_redirect_target (GParamSpec *pspec)
 
 /**
  * g_param_value_set_default:
- * @pspec: a valid #GParamSpec
- * @value: a #GValue of correct type for @pspec; since 2.64, you
- *   can also pass an empty #GValue, initialized with %G_VALUE_INIT
+ * @pspec: a valid #xparam_spec_t
+ * @value: a #xvalue_t of correct type for @pspec; since 2.64, you
+ *   can also pass an empty #xvalue_t, initialized with %G_VALUE_INIT
  *
  * Sets @value to its default value as specified in @pspec.
  */
 void
-g_param_value_set_default (GParamSpec *pspec,
-			   GValue     *value)
+g_param_value_set_default (xparam_spec_t *pspec,
+			   xvalue_t     *value)
 {
   g_return_if_fail (X_IS_PARAM_SPEC (pspec));
 
   if (G_VALUE_TYPE (value) == XTYPE_INVALID)
     {
-      g_value_init (value, G_PARAM_SPEC_VALUE_TYPE (pspec));
+      xvalue_init (value, G_PARAM_SPEC_VALUE_TYPE (pspec));
     }
   else
     {
       g_return_if_fail (X_IS_VALUE (value));
       g_return_if_fail (PSPEC_APPLIES_TO_VALUE (pspec, value));
-      g_value_reset (value);
+      xvalue_reset (value);
     }
 
   G_PARAM_SPEC_GET_CLASS (pspec)->value_set_default (pspec, value);
@@ -645,36 +645,36 @@ g_param_value_set_default (GParamSpec *pspec,
 
 /**
  * g_param_value_defaults:
- * @pspec: a valid #GParamSpec
- * @value: a #GValue of correct type for @pspec
+ * @pspec: a valid #xparam_spec_t
+ * @value: a #xvalue_t of correct type for @pspec
  *
  * Checks whether @value contains the default value as specified in @pspec.
  *
  * Returns: whether @value contains the canonical default for this @pspec
  */
 xboolean_t
-g_param_value_defaults (GParamSpec   *pspec,
-			const GValue *value)
+g_param_value_defaults (xparam_spec_t   *pspec,
+			const xvalue_t *value)
 {
-  GValue dflt_value = G_VALUE_INIT;
+  xvalue_t dflt_value = G_VALUE_INIT;
   xboolean_t defaults;
 
   g_return_val_if_fail (X_IS_PARAM_SPEC (pspec), FALSE);
   g_return_val_if_fail (X_IS_VALUE (value), FALSE);
   g_return_val_if_fail (PSPEC_APPLIES_TO_VALUE (pspec, value), FALSE);
 
-  g_value_init (&dflt_value, G_PARAM_SPEC_VALUE_TYPE (pspec));
+  xvalue_init (&dflt_value, G_PARAM_SPEC_VALUE_TYPE (pspec));
   G_PARAM_SPEC_GET_CLASS (pspec)->value_set_default (pspec, &dflt_value);
   defaults = G_PARAM_SPEC_GET_CLASS (pspec)->values_cmp (pspec, value, &dflt_value) == 0;
-  g_value_unset (&dflt_value);
+  xvalue_unset (&dflt_value);
 
   return defaults;
 }
 
 /**
  * g_param_value_validate:
- * @pspec: a valid #GParamSpec
- * @value: a #GValue of correct type for @pspec
+ * @pspec: a valid #xparam_spec_t
+ * @value: a #xvalue_t of correct type for @pspec
  *
  * Ensures that the contents of @value comply with the specifications
  * set out by @pspec. For example, a #GParamSpecInt might require
@@ -686,8 +686,8 @@ g_param_value_defaults (GParamSpec   *pspec,
  * Returns: whether modifying @value was necessary to ensure validity
  */
 xboolean_t
-g_param_value_validate (GParamSpec *pspec,
-			GValue     *value)
+g_param_value_validate (xparam_spec_t *pspec,
+			xvalue_t     *value)
 {
   g_return_val_if_fail (X_IS_PARAM_SPEC (pspec), FALSE);
   g_return_val_if_fail (X_IS_VALUE (value), FALSE);
@@ -695,7 +695,7 @@ g_param_value_validate (GParamSpec *pspec,
 
   if (G_PARAM_SPEC_GET_CLASS (pspec)->value_validate)
     {
-      GValue oval = *value;
+      xvalue_t oval = *value;
 
       if (G_PARAM_SPEC_GET_CLASS (pspec)->value_validate (pspec, value) ||
 	  memcmp (&oval.data, &value->data, sizeof (oval.data)))
@@ -707,9 +707,9 @@ g_param_value_validate (GParamSpec *pspec,
 
 /**
  * g_param_value_convert:
- * @pspec: a valid #GParamSpec
- * @src_value: source #GValue
- * @dest_value: destination #GValue of correct type for @pspec
+ * @pspec: a valid #xparam_spec_t
+ * @src_value: source #xvalue_t
+ * @dest_value: destination #xvalue_t of correct type for @pspec
  * @strict_validation: %TRUE requires @dest_value to conform to @pspec
  * without modifications
  *
@@ -718,19 +718,19 @@ g_param_value_validate (GParamSpec *pspec,
  * @strict_validation is %TRUE this function will only succeed if the
  * transformed @dest_value complied to @pspec without modifications.
  *
- * See also g_value_type_transformable(), g_value_transform() and
+ * See also xvalue_type_transformable(), xvalue_transform() and
  * g_param_value_validate().
  *
  * Returns: %TRUE if transformation and validation were successful,
  *  %FALSE otherwise and @dest_value is left untouched.
  */
 xboolean_t
-g_param_value_convert (GParamSpec   *pspec,
-		       const GValue *src_value,
-		       GValue       *dest_value,
+g_param_value_convert (xparam_spec_t   *pspec,
+		       const xvalue_t *src_value,
+		       xvalue_t       *dest_value,
 		       xboolean_t	     strict_validation)
 {
-  GValue tmp_value = G_VALUE_INIT;
+  xvalue_t tmp_value = G_VALUE_INIT;
 
   g_return_val_if_fail (X_IS_PARAM_SPEC (pspec), FALSE);
   g_return_val_if_fail (X_IS_VALUE (src_value), FALSE);
@@ -739,11 +739,11 @@ g_param_value_convert (GParamSpec   *pspec,
 
   /* better leave dest_value untouched when returning FALSE */
 
-  g_value_init (&tmp_value, G_VALUE_TYPE (dest_value));
-  if (g_value_transform (src_value, &tmp_value) &&
+  xvalue_init (&tmp_value, G_VALUE_TYPE (dest_value));
+  if (xvalue_transform (src_value, &tmp_value) &&
       (!g_param_value_validate (pspec, &tmp_value) || !strict_validation))
     {
-      g_value_unset (dest_value);
+      xvalue_unset (dest_value);
 
       /* values are relocatable */
       memcpy (dest_value, &tmp_value, sizeof (tmp_value));
@@ -752,7 +752,7 @@ g_param_value_convert (GParamSpec   *pspec,
     }
   else
     {
-      g_value_unset (&tmp_value);
+      xvalue_unset (&tmp_value);
 
       return FALSE;
     }
@@ -760,9 +760,9 @@ g_param_value_convert (GParamSpec   *pspec,
 
 /**
  * g_param_values_cmp:
- * @pspec: a valid #GParamSpec
- * @value1: a #GValue of correct type for @pspec
- * @value2: a #GValue of correct type for @pspec
+ * @pspec: a valid #xparam_spec_t
+ * @value1: a #xvalue_t of correct type for @pspec
+ * @value2: a #xvalue_t of correct type for @pspec
  *
  * Compares @value1 with @value2 according to @pspec, and return -1, 0 or +1,
  * if @value1 is found to be less than, equal to or greater than @value2,
@@ -771,9 +771,9 @@ g_param_value_convert (GParamSpec   *pspec,
  * Returns: -1, 0 or +1, for a less than, equal to or greater than result
  */
 xint_t
-g_param_values_cmp (GParamSpec   *pspec,
-		    const GValue *value1,
-		    const GValue *value2)
+g_param_values_cmp (xparam_spec_t   *pspec,
+		    const xvalue_t *value1,
+		    const xvalue_t *value2)
 {
   xint_t cmp;
 
@@ -795,21 +795,21 @@ g_param_values_cmp (GParamSpec   *pspec,
 }
 
 static void
-value_param_init (GValue *value)
+value_param_init (xvalue_t *value)
 {
   value->data[0].v_pointer = NULL;
 }
 
 static void
-value_param_free_value (GValue *value)
+value_param_free_value (xvalue_t *value)
 {
   if (value->data[0].v_pointer)
     g_param_spec_unref (value->data[0].v_pointer);
 }
 
 static void
-value_param_copy_value (const GValue *src_value,
-			GValue       *dest_value)
+value_param_copy_value (const xvalue_t *src_value,
+			xvalue_t       *dest_value)
 {
   if (src_value->data[0].v_pointer)
     dest_value->data[0].v_pointer = g_param_spec_ref (src_value->data[0].v_pointer);
@@ -818,39 +818,39 @@ value_param_copy_value (const GValue *src_value,
 }
 
 static void
-value_param_transform_value (const GValue *src_value,
-			     GValue       *dest_value)
+value_param_transform_value (const xvalue_t *src_value,
+			     xvalue_t       *dest_value)
 {
   if (src_value->data[0].v_pointer &&
-      g_type_is_a (G_PARAM_SPEC_TYPE (dest_value->data[0].v_pointer), G_VALUE_TYPE (dest_value)))
+      xtype_is_a (G_PARAM_SPEC_TYPE (dest_value->data[0].v_pointer), G_VALUE_TYPE (dest_value)))
     dest_value->data[0].v_pointer = g_param_spec_ref (src_value->data[0].v_pointer);
   else
     dest_value->data[0].v_pointer = NULL;
 }
 
 static xpointer_t
-value_param_peek_pointer (const GValue *value)
+value_param_peek_pointer (const xvalue_t *value)
 {
   return value->data[0].v_pointer;
 }
 
 static xchar_t*
-value_param_collect_value (GValue      *value,
+value_param_collect_value (xvalue_t      *value,
 			   xuint_t        n_collect_values,
-			   GTypeCValue *collect_values,
+			   xtype_c_value_t *collect_values,
 			   xuint_t        collect_flags)
 {
   if (collect_values[0].v_pointer)
     {
-      GParamSpec *param = collect_values[0].v_pointer;
+      xparam_spec_t *param = collect_values[0].v_pointer;
 
-      if (param->g_type_instance.g_class == NULL)
-	return g_strconcat ("invalid unclassed param spec pointer for value type '",
+      if (param->xtype_instance.g_class == NULL)
+	return xstrconcat ("invalid unclassed param spec pointer for value type '",
 			    G_VALUE_TYPE_NAME (value),
 			    "'",
 			    NULL);
-      else if (!g_value_type_compatible (G_PARAM_SPEC_TYPE (param), G_VALUE_TYPE (value)))
-	return g_strconcat ("invalid param spec type '",
+      else if (!xvalue_type_compatible (G_PARAM_SPEC_TYPE (param), G_VALUE_TYPE (value)))
+	return xstrconcat ("invalid param spec type '",
 			    G_PARAM_SPEC_TYPE_NAME (param),
 			    "' for value type '",
 			    G_VALUE_TYPE_NAME (value),
@@ -865,14 +865,14 @@ value_param_collect_value (GValue      *value,
 }
 
 static xchar_t*
-value_param_lcopy_value (const GValue *value,
+value_param_lcopy_value (const xvalue_t *value,
 			 xuint_t         n_collect_values,
-			 GTypeCValue  *collect_values,
+			 xtype_c_value_t  *collect_values,
 			 xuint_t         collect_flags)
 {
-  GParamSpec **param_p = collect_values[0].v_pointer;
+  xparam_spec_t **param_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (param_p != NULL, g_strdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  g_return_val_if_fail (param_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   if (!value->data[0].v_pointer)
     *param_p = NULL;
@@ -897,15 +897,15 @@ value_param_lcopy_value (const GValue *value,
  */
 struct _GParamSpecPool
 {
-  GMutex       mutex;
+  xmutex_t       mutex;
   xboolean_t     type_prefixing;
-  GHashTable  *hash_table;
+  xhashtable_t  *hash_table;
 };
 
 static xuint_t
-param_spec_pool_hash (gconstpointer key_spec)
+param_spec_pool_hash (xconstpointer key_spec)
 {
-  const GParamSpec *key = key_spec;
+  const xparam_spec_t *key = key_spec;
   const xchar_t *p;
   xuint_t h = key->owner_type;
 
@@ -916,11 +916,11 @@ param_spec_pool_hash (gconstpointer key_spec)
 }
 
 static xboolean_t
-param_spec_pool_equals (gconstpointer key_spec_1,
-			gconstpointer key_spec_2)
+param_spec_pool_equals (xconstpointer key_spec_1,
+			xconstpointer key_spec_2)
 {
-  const GParamSpec *key1 = key_spec_1;
-  const GParamSpec *key2 = key_spec_2;
+  const xparam_spec_t *key1 = key_spec_1;
+  const xparam_spec_t *key2 = key_spec_2;
 
   return (key1->owner_type == key2->owner_type &&
 	  strcmp (key1->name, key2->name) == 0);
@@ -942,12 +942,12 @@ param_spec_pool_equals (gconstpointer key_spec_1,
 GParamSpecPool*
 g_param_spec_pool_new (xboolean_t type_prefixing)
 {
-  static GMutex init_mutex;
+  static xmutex_t init_mutex;
   GParamSpecPool *pool = g_new (GParamSpecPool, 1);
 
   memcpy (&pool->mutex, &init_mutex, sizeof (init_mutex));
   pool->type_prefixing = type_prefixing != FALSE;
-  pool->hash_table = g_hash_table_new (param_spec_pool_hash, param_spec_pool_equals);
+  pool->hash_table = xhash_table_new (param_spec_pool_hash, param_spec_pool_equals);
 
   return pool;
 }
@@ -955,14 +955,14 @@ g_param_spec_pool_new (xboolean_t type_prefixing)
 /**
  * g_param_spec_pool_insert:
  * @pool: a #GParamSpecPool.
- * @pspec: (transfer none) (not nullable): the #GParamSpec to insert
+ * @pspec: (transfer none) (not nullable): the #xparam_spec_t to insert
  * @owner_type: a #xtype_t identifying the owner of @pspec
  *
- * Inserts a #GParamSpec in the pool.
+ * Inserts a #xparam_spec_t in the pool.
  */
 void
 g_param_spec_pool_insert (GParamSpecPool *pool,
-			  GParamSpec     *pspec,
+			  xparam_spec_t     *pspec,
 			  xtype_t           owner_type)
 {
   const xchar_t *p;
@@ -980,7 +980,7 @@ g_param_spec_pool_insert (GParamSpecPool *pool,
       g_mutex_lock (&pool->mutex);
       pspec->owner_type = owner_type;
       g_param_spec_ref (pspec);
-      g_hash_table_add (pool->hash_table, pspec);
+      xhash_table_add (pool->hash_table, pspec);
       g_mutex_unlock (&pool->mutex);
     }
   else
@@ -995,18 +995,18 @@ g_param_spec_pool_insert (GParamSpecPool *pool,
 /**
  * g_param_spec_pool_remove:
  * @pool: a #GParamSpecPool
- * @pspec: (transfer none) (not nullable): the #GParamSpec to remove
+ * @pspec: (transfer none) (not nullable): the #xparam_spec_t to remove
  *
- * Removes a #GParamSpec from the pool.
+ * Removes a #xparam_spec_t from the pool.
  */
 void
 g_param_spec_pool_remove (GParamSpecPool *pool,
-			  GParamSpec     *pspec)
+			  xparam_spec_t     *pspec)
 {
   if (pool && pspec)
     {
       g_mutex_lock (&pool->mutex);
-      if (g_hash_table_remove (pool->hash_table, pspec))
+      if (xhash_table_remove (pool->hash_table, pspec))
 	g_param_spec_unref (pspec);
       else
 	g_warning (G_STRLOC ": attempt to remove unknown pspec '%s' from pool", pspec->name);
@@ -1019,33 +1019,33 @@ g_param_spec_pool_remove (GParamSpecPool *pool,
     }
 }
 
-static inline GParamSpec*
-param_spec_ht_lookup (GHashTable  *hash_table,
+static inline xparam_spec_t*
+param_spec_ht_lookup (xhashtable_t  *hash_table,
 		      const xchar_t *param_name,
 		      xtype_t        owner_type,
 		      xboolean_t     walk_ancestors)
 {
-  GParamSpec key, *pspec;
+  xparam_spec_t key, *pspec;
 
   key.owner_type = owner_type;
   key.name = (xchar_t*) param_name;
   if (walk_ancestors)
     do
       {
-	pspec = g_hash_table_lookup (hash_table, &key);
+	pspec = xhash_table_lookup (hash_table, &key);
 	if (pspec)
 	  return pspec;
-	key.owner_type = g_type_parent (key.owner_type);
+	key.owner_type = xtype_parent (key.owner_type);
       }
     while (key.owner_type);
   else
-    pspec = g_hash_table_lookup (hash_table, &key);
+    pspec = xhash_table_lookup (hash_table, &key);
 
   if (!pspec && !is_canonical (param_name))
     {
       xchar_t *canonical;
 
-      canonical = g_strdup (key.name);
+      canonical = xstrdup (key.name);
       canonicalize_key (canonical);
 
       /* try canonicalized form */
@@ -1055,17 +1055,17 @@ param_spec_ht_lookup (GHashTable  *hash_table,
       if (walk_ancestors)
         do
           {
-            pspec = g_hash_table_lookup (hash_table, &key);
+            pspec = xhash_table_lookup (hash_table, &key);
             if (pspec)
               {
                 g_free (canonical);
                 return pspec;
               }
-            key.owner_type = g_type_parent (key.owner_type);
+            key.owner_type = xtype_parent (key.owner_type);
           }
         while (key.owner_type);
       else
-        pspec = g_hash_table_lookup (hash_table, &key);
+        pspec = xhash_table_lookup (hash_table, &key);
 
       g_free (canonical);
     }
@@ -1078,21 +1078,21 @@ param_spec_ht_lookup (GHashTable  *hash_table,
  * @pool: a #GParamSpecPool
  * @param_name: the name to look for
  * @owner_type: the owner to look for
- * @walk_ancestors: If %TRUE, also try to find a #GParamSpec with @param_name
+ * @walk_ancestors: If %TRUE, also try to find a #xparam_spec_t with @param_name
  *  owned by an ancestor of @owner_type.
  *
- * Looks up a #GParamSpec in the pool.
+ * Looks up a #xparam_spec_t in the pool.
  *
- * Returns: (transfer none) (nullable): The found #GParamSpec, or %NULL if no
- * matching #GParamSpec was found.
+ * Returns: (transfer none) (nullable): The found #xparam_spec_t, or %NULL if no
+ * matching #xparam_spec_t was found.
  */
-GParamSpec*
+xparam_spec_t*
 g_param_spec_pool_lookup (GParamSpecPool *pool,
 			  const xchar_t    *param_name,
 			  xtype_t           owner_type,
 			  xboolean_t        walk_ancestors)
 {
-  GParamSpec *pspec;
+  xparam_spec_t *pspec;
   xchar_t *delim;
 
   g_return_val_if_fail (pool != NULL, NULL);
@@ -1120,13 +1120,13 @@ g_param_spec_pool_lookup (GParamSpecPool *pool,
 
       strncpy (buffer, param_name, delim - param_name);
       buffer[l] = 0;
-      type = g_type_from_name (buffer);
+      type = xtype_from_name (buffer);
       if (l >= 32)
 	g_free (buffer);
       if (type)		/* type==0 isn't a valid type pefix */
 	{
 	  /* sanity check, these cases don't make a whole lot of sense */
-	  if ((!walk_ancestors && type != owner_type) || !g_type_is_a (owner_type, type))
+	  if ((!walk_ancestors && type != owner_type) || !xtype_is_a (owner_type, type))
 	    {
 	      g_mutex_unlock (&pool->mutex);
 
@@ -1152,12 +1152,12 @@ pool_list (xpointer_t key,
 	   xpointer_t value,
 	   xpointer_t user_data)
 {
-  GParamSpec *pspec = value;
+  xparam_spec_t *pspec = value;
   xpointer_t *data = user_data;
   xtype_t owner_type = (xtype_t) data[1];
 
   if (owner_type == pspec->owner_type)
-    data[0] = g_list_prepend (data[0], pspec);
+    data[0] = xlist_prepend (data[0], pspec);
 }
 
 /**
@@ -1184,17 +1184,17 @@ g_param_spec_pool_list_owned (GParamSpecPool *pool,
   g_mutex_lock (&pool->mutex);
   data[0] = NULL;
   data[1] = (xpointer_t) owner_type;
-  g_hash_table_foreach (pool->hash_table, pool_list, &data);
+  xhash_table_foreach (pool->hash_table, pool_list, &data);
   g_mutex_unlock (&pool->mutex);
 
   return data[0];
 }
 
 static xint_t
-pspec_compare_id (gconstpointer a,
-		  gconstpointer b)
+pspec_compare_id (xconstpointer a,
+		  xconstpointer b)
 {
-  const GParamSpec *pspec1 = a, *pspec2 = b;
+  const xparam_spec_t *pspec1 = a, *pspec2 = b;
 
   if (pspec1->param_id < pspec2->param_id)
     return -1;
@@ -1206,11 +1206,11 @@ pspec_compare_id (gconstpointer a,
 }
 
 static inline xboolean_t
-should_list_pspec (GParamSpec *pspec,
+should_list_pspec (xparam_spec_t *pspec,
                    xtype_t      owner_type,
-                   GHashTable *ht)
+                   xhashtable_t *ht)
 {
-  GParamSpec *found;
+  xparam_spec_t *found;
 
   /* Remove paramspecs that are redirected, and also paramspecs
    * that have are overridden by non-redirected properties.
@@ -1223,7 +1223,7 @@ should_list_pspec (GParamSpec *pspec,
   found = param_spec_ht_lookup (ht, pspec->name, owner_type, TRUE);
   if (found != pspec)
     {
-      GParamSpec *redirect = g_param_spec_get_redirect_target (found);
+      xparam_spec_t *redirect = g_param_spec_get_redirect_target (found);
       if (redirect != pspec)
         return FALSE;
     }
@@ -1236,26 +1236,26 @@ pool_depth_list (xpointer_t key,
 		 xpointer_t value,
 		 xpointer_t user_data)
 {
-  GParamSpec *pspec = value;
+  xparam_spec_t *pspec = value;
   xpointer_t *data = user_data;
-  GSList **slists = data[0];
+  xslist_t **slists = data[0];
   xtype_t owner_type = (xtype_t) data[1];
-  GHashTable *ht = data[2];
+  xhashtable_t *ht = data[2];
   int *count = data[3];
 
-  if (g_type_is_a (owner_type, pspec->owner_type) &&
+  if (xtype_is_a (owner_type, pspec->owner_type) &&
       should_list_pspec (pspec, owner_type, ht))
     {
       if (XTYPE_IS_INTERFACE (pspec->owner_type))
 	{
-	  slists[0] = g_slist_prepend (slists[0], pspec);
+	  slists[0] = xslist_prepend (slists[0], pspec);
           *count = *count + 1;
 	}
       else
 	{
-          xuint_t d = g_type_depth (pspec->owner_type);
+          xuint_t d = xtype_depth (pspec->owner_type);
 
-          slists[d - 1] = g_slist_prepend (slists[d - 1], pspec);
+          slists[d - 1] = xslist_prepend (slists[d - 1], pspec);
           *count = *count + 1;
 	}
     }
@@ -1275,17 +1275,17 @@ pool_depth_list_for_interface (xpointer_t key,
 			       xpointer_t value,
 			       xpointer_t user_data)
 {
-  GParamSpec *pspec = value;
+  xparam_spec_t *pspec = value;
   xpointer_t *data = user_data;
-  GSList **slists = data[0];
+  xslist_t **slists = data[0];
   xtype_t owner_type = (xtype_t) data[1];
-  GHashTable *ht = data[2];
+  xhashtable_t *ht = data[2];
   int *count = data[3];
 
   if (pspec->owner_type == owner_type &&
       should_list_pspec (pspec, owner_type, ht))
     {
-      slists[0] = g_slist_prepend (slists[0], pspec);
+      slists[0] = xslist_prepend (slists[0], pspec);
       *count = *count + 1;
     }
 }
@@ -1303,13 +1303,13 @@ pool_depth_list_for_interface (xpointer_t key,
  *          allocated array containing pointers to all #GParamSpecs
  *          owned by @owner_type in the pool
  */
-GParamSpec**
+xparam_spec_t**
 g_param_spec_pool_list (GParamSpecPool *pool,
 			xtype_t           owner_type,
 			xuint_t          *n_pspecs_p)
 {
-  GParamSpec **pspecs, **p;
-  GSList **slists, *node;
+  xparam_spec_t **pspecs, **p;
+  xslist_t **slists, *node;
   xpointer_t data[4];
   xuint_t d, i;
   int n_pspecs = 0;
@@ -1319,27 +1319,27 @@ g_param_spec_pool_list (GParamSpecPool *pool,
   g_return_val_if_fail (n_pspecs_p != NULL, NULL);
 
   g_mutex_lock (&pool->mutex);
-  d = g_type_depth (owner_type);
-  slists = g_new0 (GSList*, d);
+  d = xtype_depth (owner_type);
+  slists = g_new0 (xslist_t*, d);
   data[0] = slists;
   data[1] = (xpointer_t) owner_type;
   data[2] = pool->hash_table;
   data[3] = &n_pspecs;
 
-  g_hash_table_foreach (pool->hash_table,
+  xhash_table_foreach (pool->hash_table,
                         XTYPE_IS_INTERFACE (owner_type) ?
                           pool_depth_list_for_interface :
                           pool_depth_list,
                         &data);
 
-  pspecs = g_new (GParamSpec*, n_pspecs + 1);
+  pspecs = g_new (xparam_spec_t*, n_pspecs + 1);
   p = pspecs;
   for (i = 0; i < d; i++)
     {
-      slists[i] = g_slist_sort (slists[i], pspec_compare_id);
+      slists[i] = xslist_sort (slists[i], pspec_compare_id);
       for (node = slists[i]; node; node = node->next)
 	*p++ = node->data;
-      g_slist_free (slists[i]);
+      xslist_free (slists[i]);
     }
   *p++ = NULL;
   g_free (slists);
@@ -1355,14 +1355,14 @@ typedef struct
 {
   /* class portion */
   xtype_t           value_type;
-  void          (*finalize)             (GParamSpec   *pspec);
-  void          (*value_set_default)    (GParamSpec   *pspec,
-					 GValue       *value);
-  xboolean_t      (*value_validate)       (GParamSpec   *pspec,
-					 GValue       *value);
-  xint_t          (*values_cmp)           (GParamSpec   *pspec,
-					 const GValue *value1,
-					 const GValue *value2);
+  void          (*finalize)             (xparam_spec_t   *pspec);
+  void          (*value_set_default)    (xparam_spec_t   *pspec,
+					 xvalue_t       *value);
+  xboolean_t      (*value_validate)       (xparam_spec_t   *pspec,
+					 xvalue_t       *value);
+  xint_t          (*values_cmp)           (xparam_spec_t   *pspec,
+					 const xvalue_t *value1,
+					 const xvalue_t *value2);
 } ParamSpecClassInfo;
 
 static void
@@ -1383,30 +1383,30 @@ param_spec_generic_class_init (xpointer_t g_class,
 }
 
 static void
-default_value_set_default (GParamSpec *pspec,
-			   GValue     *value)
+default_value_set_default (xparam_spec_t *pspec,
+			   xvalue_t     *value)
 {
   /* value is already zero initialized */
 }
 
 static xint_t
-default_values_cmp (GParamSpec   *pspec,
-		    const GValue *value1,
-		    const GValue *value2)
+default_values_cmp (xparam_spec_t   *pspec,
+		    const xvalue_t *value1,
+		    const xvalue_t *value2)
 {
   return memcmp (&value1->data, &value2->data, sizeof (value1->data));
 }
 
 /**
  * g_param_type_register_static:
- * @name: 0-terminated string used as the name of the new #GParamSpec type.
- * @pspec_info: The #GParamSpecTypeInfo for this #GParamSpec type.
+ * @name: 0-terminated string used as the name of the new #xparam_spec_t type.
+ * @pspec_info: The #GParamSpecTypeInfo for this #xparam_spec_t type.
  *
  * Registers @name as the name of a new static type derived
  * from %XTYPE_PARAM.
  *
  * The type system uses the information contained in the #GParamSpecTypeInfo
- * structure pointed to by @info to manage the #GParamSpec type and its
+ * structure pointed to by @info to manage the #xparam_spec_t type and its
  * instances.
  *
  * Returns: The new type identifier.
@@ -1415,7 +1415,7 @@ xtype_t
 g_param_type_register_static (const xchar_t              *name,
 			      const GParamSpecTypeInfo *pspec_info)
 {
-  GTypeInfo info = {
+  xtype_info_t info = {
     sizeof (GParamSpecClass),      /* class_size */
     NULL,                          /* base_init */
     NULL,                          /* base_destroy */
@@ -1431,16 +1431,16 @@ g_param_type_register_static (const xchar_t              *name,
 
   g_return_val_if_fail (name != NULL, 0);
   g_return_val_if_fail (pspec_info != NULL, 0);
-  g_return_val_if_fail (g_type_from_name (name) == 0, 0);
-  g_return_val_if_fail (pspec_info->instance_size >= sizeof (GParamSpec), 0);
-  g_return_val_if_fail (g_type_name (pspec_info->value_type) != NULL, 0);
+  g_return_val_if_fail (xtype_from_name (name) == 0, 0);
+  g_return_val_if_fail (pspec_info->instance_size >= sizeof (xparam_spec_t), 0);
+  g_return_val_if_fail (xtype_name (pspec_info->value_type) != NULL, 0);
   /* default: g_return_val_if_fail (pspec_info->value_set_default != NULL, 0); */
   /* optional: g_return_val_if_fail (pspec_info->value_validate != NULL, 0); */
   /* default: g_return_val_if_fail (pspec_info->values_cmp != NULL, 0); */
 
   info.instance_size = pspec_info->instance_size;
   info.n_preallocs = pspec_info->n_preallocs;
-  info.instance_init = (GInstanceInitFunc) pspec_info->instance_init;
+  info.instance_init = (xinstance_init_func_t) pspec_info->instance_init;
   cinfo = g_new (ParamSpecClassInfo, 1);
   cinfo->value_type = pspec_info->value_type;
   cinfo->finalize = pspec_info->finalize;
@@ -1449,19 +1449,19 @@ g_param_type_register_static (const xchar_t              *name,
   cinfo->values_cmp = pspec_info->values_cmp ? pspec_info->values_cmp : default_values_cmp;
   info.class_data = cinfo;
 
-  return g_type_register_static (XTYPE_PARAM, name, &info, 0);
+  return xtype_register_static (XTYPE_PARAM, name, &info, 0);
 }
 
 /**
- * g_value_set_param:
- * @value: a valid #GValue of type %XTYPE_PARAM
- * @param: (nullable): the #GParamSpec to be set
+ * xvalue_set_param:
+ * @value: a valid #xvalue_t of type %XTYPE_PARAM
+ * @param: (nullable): the #xparam_spec_t to be set
  *
- * Set the contents of a %XTYPE_PARAM #GValue to @param.
+ * Set the contents of a %XTYPE_PARAM #xvalue_t to @param.
  */
 void
-g_value_set_param (GValue     *value,
-		   GParamSpec *param)
+xvalue_set_param (xvalue_t     *value,
+		   xparam_spec_t *param)
 {
   g_return_if_fail (G_VALUE_HOLDS_PARAM (value));
   if (param)
@@ -1475,35 +1475,35 @@ g_value_set_param (GValue     *value,
 }
 
 /**
- * g_value_set_param_take_ownership: (skip)
- * @value: a valid #GValue of type %XTYPE_PARAM
- * @param: (nullable): the #GParamSpec to be set
+ * xvalue_set_param_take_ownership: (skip)
+ * @value: a valid #xvalue_t of type %XTYPE_PARAM
+ * @param: (nullable): the #xparam_spec_t to be set
  *
  * This is an internal function introduced mainly for C marshallers.
  *
- * Deprecated: 2.4: Use g_value_take_param() instead.
+ * Deprecated: 2.4: Use xvalue_take_param() instead.
  */
 void
-g_value_set_param_take_ownership (GValue     *value,
-				  GParamSpec *param)
+xvalue_set_param_take_ownership (xvalue_t     *value,
+				  xparam_spec_t *param)
 {
-  g_value_take_param (value, param);
+  xvalue_take_param (value, param);
 }
 
 /**
- * g_value_take_param: (skip)
- * @value: a valid #GValue of type %XTYPE_PARAM
- * @param: (nullable): the #GParamSpec to be set
+ * xvalue_take_param: (skip)
+ * @value: a valid #xvalue_t of type %XTYPE_PARAM
+ * @param: (nullable): the #xparam_spec_t to be set
  *
- * Sets the contents of a %XTYPE_PARAM #GValue to @param and takes
+ * Sets the contents of a %XTYPE_PARAM #xvalue_t to @param and takes
  * over the ownership of the caller’s reference to @param; the caller
  * doesn’t have to unref it any more.
  *
  * Since: 2.4
  */
 void
-g_value_take_param (GValue     *value,
-		    GParamSpec *param)
+xvalue_take_param (xvalue_t     *value,
+		    xparam_spec_t *param)
 {
   g_return_if_fail (G_VALUE_HOLDS_PARAM (value));
   if (param)
@@ -1515,15 +1515,15 @@ g_value_take_param (GValue     *value,
 }
 
 /**
- * g_value_get_param:
- * @value: a valid #GValue whose type is derived from %XTYPE_PARAM
+ * xvalue_get_param:
+ * @value: a valid #xvalue_t whose type is derived from %XTYPE_PARAM
  *
- * Get the contents of a %XTYPE_PARAM #GValue.
+ * Get the contents of a %XTYPE_PARAM #xvalue_t.
  *
- * Returns: (transfer none): #GParamSpec content of @value
+ * Returns: (transfer none): #xparam_spec_t content of @value
  */
-GParamSpec*
-g_value_get_param (const GValue *value)
+xparam_spec_t*
+xvalue_get_param (const xvalue_t *value)
 {
   g_return_val_if_fail (G_VALUE_HOLDS_PARAM (value), NULL);
 
@@ -1531,17 +1531,17 @@ g_value_get_param (const GValue *value)
 }
 
 /**
- * g_value_dup_param: (skip)
- * @value: a valid #GValue whose type is derived from %XTYPE_PARAM
+ * xvalue_dup_param: (skip)
+ * @value: a valid #xvalue_t whose type is derived from %XTYPE_PARAM
  *
- * Get the contents of a %XTYPE_PARAM #GValue, increasing its
+ * Get the contents of a %XTYPE_PARAM #xvalue_t, increasing its
  * reference count.
  *
- * Returns: (transfer full): #GParamSpec content of @value, should be
+ * Returns: (transfer full): #xparam_spec_t content of @value, should be
  *     unreferenced when no longer needed.
  */
-GParamSpec*
-g_value_dup_param (const GValue *value)
+xparam_spec_t*
+xvalue_dup_param (const xvalue_t *value)
 {
   g_return_val_if_fail (G_VALUE_HOLDS_PARAM (value), NULL);
 
@@ -1550,29 +1550,29 @@ g_value_dup_param (const GValue *value)
 
 /**
  * g_param_spec_get_default_value:
- * @pspec: a #GParamSpec
+ * @pspec: a #xparam_spec_t
  *
- * Gets the default value of @pspec as a pointer to a #GValue.
+ * Gets the default value of @pspec as a pointer to a #xvalue_t.
  *
- * The #GValue will remain valid for the life of @pspec.
+ * The #xvalue_t will remain valid for the life of @pspec.
  *
- * Returns: a pointer to a #GValue which must not be modified
+ * Returns: a pointer to a #xvalue_t which must not be modified
  *
  * Since: 2.38
  **/
-const GValue *
-g_param_spec_get_default_value (GParamSpec *pspec)
+const xvalue_t *
+g_param_spec_get_default_value (xparam_spec_t *pspec)
 {
   GParamSpecPrivate *priv = g_param_spec_get_private (pspec);
 
-  /* We use the type field of the GValue as the key for the once because
+  /* We use the type field of the xvalue_t as the key for the once because
    * it will be zero before it is initialised and non-zero after.  We
    * have to take care that we don't write a non-zero value to the type
    * field before we are completely done, however, because then another
    * thread could come along and find the value partially-initialised.
    *
    * In order to accomplish this we store the default value in a
-   * stack-allocated GValue.  We then set the type field in that value
+   * stack-allocated xvalue_t.  We then set the type field in that value
    * to zero and copy the contents into place.  We then end by storing
    * the type as the last step in order to ensure that we're completely
    * done before a g_once_init_enter() could take the fast path in
@@ -1580,9 +1580,9 @@ g_param_spec_get_default_value (GParamSpec *pspec)
    */
   if (g_once_init_enter (&priv->default_value.g_type))
     {
-      GValue default_value = G_VALUE_INIT;
+      xvalue_t default_value = G_VALUE_INIT;
 
-      g_value_init (&default_value, pspec->value_type);
+      xvalue_init (&default_value, pspec->value_type);
       g_param_value_set_default (pspec, &default_value);
 
       /* store all but the type */
@@ -1596,16 +1596,16 @@ g_param_spec_get_default_value (GParamSpec *pspec)
 
 /**
  * g_param_spec_get_name_quark:
- * @pspec: a #GParamSpec
+ * @pspec: a #xparam_spec_t
  *
- * Gets the GQuark for the name.
+ * Gets the xquark for the name.
  *
- * Returns: the GQuark for @pspec->name.
+ * Returns: the xquark for @pspec->name.
  *
  * Since: 2.46
  */
-GQuark
-g_param_spec_get_name_quark (GParamSpec *pspec)
+xquark
+g_param_spec_get_name_quark (xparam_spec_t *pspec)
 {
   GParamSpecPrivate *priv = g_param_spec_get_private (pspec);
 

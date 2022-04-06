@@ -45,9 +45,9 @@ typedef struct _GWinHttpVfsClass  GWinHttpVfsClass;
 
 struct _GWinHttpVfs
 {
-  GVfs parent;
+  xvfs_t parent;
 
-  GVfs *wrapped_vfs;
+  xvfs_t *wrapped_vfs;
   HINTERNET session;
 };
 
@@ -69,7 +69,7 @@ struct _GWinHttpDllFuncs
 
 struct _GWinHttpVfsClass
 {
-  GVfsClass parent_class;
+  xvfs_class_t parent_class;
 
   /* As there is no import library for winhttp.dll in mingw, and
    * winhttp.dll isn't present on Windows 2000 anyway, we must look up
@@ -81,7 +81,7 @@ struct _GWinHttpVfsClass
 
 xtype_t   _g_winhttp_vfs_get_type  (void) G_GNUC_CONST;
 
-GVfs *_g_winhttp_vfs_new (void);
+xvfs_t *_g_winhttp_vfs_new (void);
 
 char *_g_winhttp_error_message (DWORD error_code);
 

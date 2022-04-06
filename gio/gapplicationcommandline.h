@@ -29,30 +29,30 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_APPLICATION_COMMAND_LINE                     (g_application_command_line_get_type ())
+#define XTYPE_APPLICATION_COMMAND_LINE                     (xapplication_command_line_get_type ())
 #define G_APPLICATION_COMMAND_LINE(inst)                    (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
                                                              XTYPE_APPLICATION_COMMAND_LINE,                        \
-                                                             GApplicationCommandLine))
+                                                             xapplication_command_line_t))
 #define G_APPLICATION_COMMAND_LINE_CLASS(class)             (XTYPE_CHECK_CLASS_CAST ((class),                       \
                                                              XTYPE_APPLICATION_COMMAND_LINE,                        \
-                                                             GApplicationCommandLineClass))
+                                                             xapplication_command_line_class_t))
 #define X_IS_APPLICATION_COMMAND_LINE(inst)                 (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
                                                              XTYPE_APPLICATION_COMMAND_LINE))
 #define X_IS_APPLICATION_COMMAND_LINE_CLASS(class)          (XTYPE_CHECK_CLASS_TYPE ((class),                       \
                                                              XTYPE_APPLICATION_COMMAND_LINE))
 #define G_APPLICATION_COMMAND_LINE_GET_CLASS(inst)          (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
                                                              XTYPE_APPLICATION_COMMAND_LINE,                        \
-                                                             GApplicationCommandLineClass))
+                                                             xapplication_command_line_class_t))
 
-typedef struct _GApplicationCommandLinePrivate               GApplicationCommandLinePrivate;
-typedef struct _GApplicationCommandLineClass                 GApplicationCommandLineClass;
+typedef struct _GApplicationCommandLinePrivate               xapplication_command_line_private_t;
+typedef struct _GApplicationCommandLineClass                 xapplication_command_line_class_t;
 
 struct _GApplicationCommandLine
 {
   /*< private >*/
   xobject_t parent_instance;
 
-  GApplicationCommandLinePrivate *priv;
+  xapplication_command_line_private_t *priv;
 };
 
 struct _GApplicationCommandLineClass
@@ -60,61 +60,61 @@ struct _GApplicationCommandLineClass
   /*< private >*/
   xobject_class_t parent_class;
 
-  void                  (* print_literal)       (GApplicationCommandLine *cmdline,
+  void                  (* print_literal)       (xapplication_command_line_t *cmdline,
                                                  const xchar_t             *message);
-  void                  (* printerr_literal)    (GApplicationCommandLine *cmdline,
+  void                  (* printerr_literal)    (xapplication_command_line_t *cmdline,
                                                  const xchar_t             *message);
-  xinput_stream_t *        (* get_stdin)           (GApplicationCommandLine *cmdline);
+  xinput_stream_t *        (* get_stdin)           (xapplication_command_line_t *cmdline);
 
   xpointer_t padding[11];
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t                   g_application_command_line_get_type             (void) G_GNUC_CONST;
+xtype_t                   xapplication_command_line_get_type             (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-xchar_t **                g_application_command_line_get_arguments        (GApplicationCommandLine   *cmdline,
+xchar_t **                xapplication_command_line_get_arguments        (xapplication_command_line_t   *cmdline,
                                                                          int                       *argc);
 
 XPL_AVAILABLE_IN_2_40
-GVariantDict *          g_application_command_line_get_options_dict     (GApplicationCommandLine   *cmdline);
+xvariant_dict_t *          xapplication_command_line_get_options_dict     (xapplication_command_line_t   *cmdline);
 
 XPL_AVAILABLE_IN_2_36
-xinput_stream_t *          g_application_command_line_get_stdin            (GApplicationCommandLine   *cmdline);
+xinput_stream_t *          xapplication_command_line_get_stdin            (xapplication_command_line_t   *cmdline);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t * const *   g_application_command_line_get_environ          (GApplicationCommandLine   *cmdline);
+const xchar_t * const *   xapplication_command_line_get_environ          (xapplication_command_line_t   *cmdline);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t *           g_application_command_line_getenv               (GApplicationCommandLine   *cmdline,
+const xchar_t *           xapplication_command_line_getenv               (xapplication_command_line_t   *cmdline,
                                                                          const xchar_t               *name);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t *           g_application_command_line_get_cwd              (GApplicationCommandLine   *cmdline);
+const xchar_t *           xapplication_command_line_get_cwd              (xapplication_command_line_t   *cmdline);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_application_command_line_get_is_remote        (GApplicationCommandLine   *cmdline);
+xboolean_t                xapplication_command_line_get_is_remote        (xapplication_command_line_t   *cmdline);
 
 XPL_AVAILABLE_IN_ALL
-void                    g_application_command_line_print                (GApplicationCommandLine   *cmdline,
+void                    xapplication_command_line_print                (xapplication_command_line_t   *cmdline,
                                                                          const xchar_t               *format,
                                                                          ...) G_GNUC_PRINTF(2, 3);
 XPL_AVAILABLE_IN_ALL
-void                    g_application_command_line_printerr             (GApplicationCommandLine   *cmdline,
+void                    xapplication_command_line_printerr             (xapplication_command_line_t   *cmdline,
                                                                          const xchar_t               *format,
                                                                          ...) G_GNUC_PRINTF(2, 3);
 
 XPL_AVAILABLE_IN_ALL
-int                     g_application_command_line_get_exit_status      (GApplicationCommandLine   *cmdline);
+int                     xapplication_command_line_get_exit_status      (xapplication_command_line_t   *cmdline);
 XPL_AVAILABLE_IN_ALL
-void                    g_application_command_line_set_exit_status      (GApplicationCommandLine   *cmdline,
+void                    xapplication_command_line_set_exit_status      (xapplication_command_line_t   *cmdline,
                                                                          int                        exit_status);
 
 XPL_AVAILABLE_IN_ALL
-xvariant_t *              g_application_command_line_get_platform_data    (GApplicationCommandLine   *cmdline);
+xvariant_t *              xapplication_command_line_get_platform_data    (xapplication_command_line_t   *cmdline);
 
 XPL_AVAILABLE_IN_2_36
-xfile_t *                 g_application_command_line_create_file_for_arg  (GApplicationCommandLine   *cmdline,
+xfile_t *                 xapplication_command_line_create_file_for_arg  (xapplication_command_line_t   *cmdline,
                                                                          const xchar_t               *arg);
 
 G_END_DECLS

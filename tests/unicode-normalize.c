@@ -13,7 +13,7 @@ decode (const xchar_t *input)
 {
   unsigned ch;
   int offset = 0;
-  GString *result = g_string_new (NULL);
+  xstring_t *result = xstring_new (NULL);
 
   do
     {
@@ -23,7 +23,7 @@ decode (const xchar_t *input)
 	  exit (1);
 	}
 
-      g_string_append_unichar (result, ch);
+      xstring_append_unichar (result, ch);
 
       while (input[offset] && input[offset] != ' ')
 	offset++;
@@ -32,7 +32,7 @@ decode (const xchar_t *input)
     }
   while (input[offset]);
 
-  return g_string_free (result, FALSE);
+  return xstring_free (result, FALSE);
 }
 
 const char *names[4] = {
@@ -45,22 +45,22 @@ const char *names[4] = {
 static char *
 encode (const xchar_t *input)
 {
-  GString *result = g_string_new(NULL);
+  xstring_t *result = xstring_new(NULL);
 
   const xchar_t *p = input;
   while (*p)
     {
-      gunichar c = g_utf8_get_char (p);
-      g_string_append_printf (result, "%04X ", c);
-      p = g_utf8_next_char(p);
+      xunichar_t c = xutf8_get_char (p);
+      xstring_append_printf (result, "%04X ", c);
+      p = xutf8_next_char(p);
     }
 
-  return g_string_free (result, FALSE);
+  return xstring_free (result, FALSE);
 }
 
 static void
 test_form (int            line,
-	   GNormalizeMode mode,
+	   xnormalize_mode_t mode,
 	   xboolean_t       do_compat,
 	   int            expected,
 	   char         **c,
@@ -68,19 +68,19 @@ test_form (int            line,
 {
   int i;
 
-  xboolean_t mode_is_compat = (mode == G_NORMALIZE_NFKC ||
-			     mode == G_NORMALIZE_NFKD);
+  xboolean_t mode_is_compat = (mode == XNORMALIZE_NFKC ||
+			     mode == XNORMALIZE_NFKD);
 
   if (mode_is_compat || !do_compat)
     {
       for (i = 0; i < 3; i++)
 	{
-	  char *result = g_utf8_normalize (c[i], -1, mode);
+	  char *result = xutf8_normalize (c[i], -1, mode);
 	  if (strcmp (result, c[expected]) != 0)
 	    {
 	      char *result_raw = encode(result);
 	      fprintf (stderr, "\nFailure: %d/%d: %s\n", line, i + 1, raw[5]);
-	      fprintf (stderr, "  g_utf8_normalize (%s, %s) != %s but %s\n",
+	      fprintf (stderr, "  xutf8_normalize (%s, %s) != %s but %s\n",
 		   raw[i], names[mode], raw[expected], result_raw);
 	      g_free (result_raw);
 	      success = FALSE;
@@ -93,12 +93,12 @@ test_form (int            line,
     {
       for (i = 3; i < 5; i++)
 	{
-	  char *result = g_utf8_normalize (c[i], -1, mode);
+	  char *result = xutf8_normalize (c[i], -1, mode);
 	  if (strcmp (result, c[expected]) != 0)
 	    {
 	      char *result_raw = encode(result);
 	      fprintf (stderr, "\nFailure: %d/%d: %s\n", line, i, raw[5]);
-	      fprintf (stderr, "  g_utf8_normalize (%s, %s) != %s but %s\n",
+	      fprintf (stderr, "  xutf8_normalize (%s, %s) != %s but %s\n",
 		   raw[i], names[mode], raw[expected], result_raw);
 	      g_free (result_raw);
 	      success = FALSE;
@@ -125,12 +125,12 @@ process_one (int line, xchar_t **columns)
 
   if (!skip)
     {
-      test_form (line, G_NORMALIZE_NFD, FALSE, 2, c, columns);
-      test_form (line, G_NORMALIZE_NFD, TRUE, 4, c, columns);
-      test_form (line, G_NORMALIZE_NFC, FALSE, 1, c, columns);
-      test_form (line, G_NORMALIZE_NFC, TRUE, 3, c, columns);
-      test_form (line, G_NORMALIZE_NFKD, TRUE, 4, c, columns);
-      test_form (line, G_NORMALIZE_NFKC, TRUE, 3, c, columns);
+      test_form (line, XNORMALIZE_NFD, FALSE, 2, c, columns);
+      test_form (line, XNORMALIZE_NFD, TRUE, 4, c, columns);
+      test_form (line, XNORMALIZE_NFC, FALSE, 1, c, columns);
+      test_form (line, XNORMALIZE_NFC, TRUE, 3, c, columns);
+      test_form (line, XNORMALIZE_NFKD, TRUE, 4, c, columns);
+      test_form (line, XNORMALIZE_NFKC, TRUE, 3, c, columns);
     }
 
   for (i=0; i < 5; i++)
@@ -141,9 +141,9 @@ process_one (int line, xchar_t **columns)
 
 int main (int argc, char **argv)
 {
-  GIOChannel *in;
+  xio_channel_t *in;
   xerror_t *error = NULL;
-  GString *buffer = g_string_new (NULL);
+  xstring_t *buffer = xstring_new (NULL);
   int line_to_do = 0;
   int line = 1;
 
@@ -184,16 +184,16 @@ int main (int argc, char **argv)
 	  goto next;
 	}
 
-      columns = g_strsplit (buffer->str, ";", -1);
+      columns = xstrsplit (buffer->str, ";", -1);
       if (!columns[0])
 	goto next;
 
       if (!process_one (line, columns))
 	return 1;
-      g_strfreev (columns);
+      xstrfreev (columns);
 
     next:
-      g_string_truncate (buffer, 0);
+      xstring_truncate (buffer, 0);
       line++;
     }
 
@@ -204,7 +204,7 @@ int main (int argc, char **argv)
     }
 
   g_io_channel_unref (in);
-  g_string_free (buffer, TRUE);
+  xstring_free (buffer, TRUE);
 
   return !success;
 }

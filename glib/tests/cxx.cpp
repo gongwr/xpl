@@ -20,30 +20,30 @@
 typedef struct
 {
   int dummy;
-} MyObject;
+} xobject_t;
 
 static void
 test_typeof (void)
 {
 #if __cplusplus >= 201103L
   // Test that with C++11 we don't get those kind of errors:
-  // error: invalid conversion from ‘xpointer_t’ {aka ‘void*’} to ‘MyObject*’ [-fpermissive]
-  MyObject *obj = g_rc_box_new0 (MyObject);
-  MyObject *obj2 = g_rc_box_acquire (obj);
+  // error: invalid conversion from ‘xpointer_t’ {aka ‘void*’} to ‘xobject_t*’ [-fpermissive]
+  xobject_t *obj = g_rc_box_new0 (xobject_t);
+  xobject_t *obj2 = g_rc_box_acquire (obj);
   g_assert_true (obj2 == obj);
 
-  MyObject *obj3 = g_atomic_pointer_get (&obj2);
+  xobject_t *obj3 = g_atomic_pointer_get (&obj2);
   g_assert_true (obj3 == obj);
 
-  MyObject *obj4 = nullptr;
+  xobject_t *obj4 = nullptr;
   g_atomic_pointer_set (&obj4, obj3);
   g_assert_true (obj4 == obj);
 
-  MyObject *obj5 = nullptr;
+  xobject_t *obj5 = nullptr;
   g_atomic_pointer_compare_and_exchange (&obj5, nullptr, obj4);
   g_assert_true (obj5 == obj);
 
-  MyObject *obj6 = g_steal_pointer (&obj5);
+  xobject_t *obj6 = g_steal_pointer (&obj5);
   g_assert_true (obj6 == obj);
 
   g_clear_pointer (&obj6, g_rc_box_release);

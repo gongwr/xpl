@@ -16,17 +16,17 @@
  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __G_UNICODE_PRIVATE_H__
-#define __G_UNICODE_PRIVATE_H__
+#ifndef __XUNICODE_PRIVATE_H__
+#define __XUNICODE_PRIVATE_H__
 
 #include "gtypes.h"
 
 G_BEGIN_DECLS
 
-gunichar *_g_utf8_normalize_wc (const xchar_t    *str,
-                                gssize          max_len,
-				GNormalizeMode  mode);
+xunichar_t *_xutf8_normalize_wc (const xchar_t    *str,
+                                xssize_t          max_len,
+				xnormalize_mode_t  mode);
 
 G_END_DECLS
 
-#endif /* __G_UNICODE_PRIVATE_H__ */
+#endif /* __XUNICODE_PRIVATE_H__ */

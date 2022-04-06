@@ -33,25 +33,25 @@ static const GOptionEntry entries[] = {
   G_OPTION_ENTRY_NULL
 };
 
-static GAppInfo *
+static xapp_info_t *
 get_app_info_for_id (const char *id)
 {
   xlist_t *list, *l;
-  GAppInfo *ret_info;
+  xapp_info_t *ret_info;
 
-  list = g_app_info_get_all ();
+  list = xapp_info_get_all ();
   ret_info = NULL;
   for (l = list; l != NULL; l = l->next)
     {
-      GAppInfo *info;
+      xapp_info_t *info;
 
       info = l->data;
-      if (ret_info == NULL && g_strcmp0 (g_app_info_get_id (info), id) == 0)
+      if (ret_info == NULL && xstrcmp0 (xapp_info_get_id (info), id) == 0)
         ret_info = info;
       else
-        g_object_unref (info);
+        xobject_unref (info);
     }
-  g_list_free (list);
+  xlist_free (list);
 
   return ret_info;
 }
@@ -59,7 +59,7 @@ get_app_info_for_id (const char *id)
 int
 handle_mime (int argc, char *argv[], xboolean_t do_help)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xerror_t *error = NULL;
   xchar_t *param;
   const xchar_t *mimetype;
@@ -68,7 +68,7 @@ handle_mime (int argc, char *argv[], xboolean_t do_help)
   g_set_prgname ("gio mime");
 
   /* Translators: commandline placeholder */
-  param = g_strdup_printf ("%s [%s]", _("MIMETYPE"), _("HANDLER"));
+  param = xstrdup_printf ("%s [%s]", _("MIMETYPE"), _("HANDLER"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -90,7 +90,7 @@ handle_mime (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      g_error_free (error);
+      xerror_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -106,11 +106,11 @@ handle_mime (int argc, char *argv[], xboolean_t do_help)
 
   if (argc == 2)
     {
-      GAppInfo *info;
+      xapp_info_t *info;
 
       mimetype = argv[1];
 
-      info = g_app_info_get_default_for_type (mimetype, FALSE);
+      info = xapp_info_get_default_for_type (mimetype, FALSE);
       if (!info)
         {
           g_print (_("No default applications for “%s”\n"), mimetype);
@@ -119,10 +119,10 @@ handle_mime (int argc, char *argv[], xboolean_t do_help)
         {
           xlist_t *list, *l;
 
-          g_print (_("Default application for “%s”: %s\n"), mimetype, g_app_info_get_id (info));
-          g_object_unref (info);
+          g_print (_("Default application for “%s”: %s\n"), mimetype, xapp_info_get_id (info));
+          xobject_unref (info);
 
-          list = g_app_info_get_all_for_type (mimetype);
+          list = xapp_info_get_all_for_type (mimetype);
           if (list != NULL)
             g_print (_("Registered applications:\n"));
           else
@@ -130,12 +130,12 @@ handle_mime (int argc, char *argv[], xboolean_t do_help)
           for (l = list; l != NULL; l = l->next)
             {
               info = l->data;
-              g_print ("\t%s\n", g_app_info_get_id (info));
-              g_object_unref (info);
+              g_print ("\t%s\n", xapp_info_get_id (info));
+              xobject_unref (info);
             }
-          g_list_free (list);
+          xlist_free (list);
 
-          list = g_app_info_get_recommended_for_type (mimetype);
+          list = xapp_info_get_recommended_for_type (mimetype);
           if (list != NULL)
             g_print (_("Recommended applications:\n"));
           else
@@ -143,15 +143,15 @@ handle_mime (int argc, char *argv[], xboolean_t do_help)
           for (l = list; l != NULL; l = l->next)
             {
               info = l->data;
-              g_print ("\t%s\n", g_app_info_get_id (info));
-              g_object_unref (info);
+              g_print ("\t%s\n", xapp_info_get_id (info));
+              xobject_unref (info);
             }
-          g_list_free (list);
+          xlist_free (list);
         }
     }
   else
     {
-      GAppInfo *info;
+      xapp_info_t *info;
 
       mimetype = argv[1];
       handler = argv[2];
@@ -163,16 +163,16 @@ handle_mime (int argc, char *argv[], xboolean_t do_help)
           return 1;
         }
 
-      if (g_app_info_set_as_default_for_type (info, mimetype, &error) == FALSE)
+      if (xapp_info_set_as_default_for_type (info, mimetype, &error) == FALSE)
         {
           print_error (_("Failed to set “%s” as the default handler for “%s”: %s\n"),
                        handler, mimetype, error->message);
-          g_error_free (error);
-          g_object_unref (info);
+          xerror_free (error);
+          xobject_unref (info);
           return 1;
         }
-      g_print ("Set %s as the default for %s\n", g_app_info_get_id (info), mimetype);
-      g_object_unref (info);
+      g_print ("Set %s as the default for %s\n", xapp_info_get_id (info), mimetype);
+      xobject_unref (info);
     }
 
   return 0;

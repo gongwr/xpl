@@ -32,14 +32,14 @@ fill_memory (xuint_t **mem,
     mem[j][o] = val;
 }
 
-static guint64
+static xuint64_t
 access_memory3 (xuint_t  **mema,
                 xuint_t  **memb,
                 xuint_t  **memd,
                 xuint_t    n,
-                guint64  repeats)
+                xuint64_t  repeats)
 {
-  guint64 accu = 0, i, j;
+  xuint64_t accu = 0, i, j;
   const xuint_t o = 0;
   for (i = 0; i < repeats; i++)
     {
@@ -53,12 +53,12 @@ access_memory3 (xuint_t  **mema,
 }
 
 static void
-touch_mem (guint64 block_size,
-           guint64 n_blocks,
-           guint64 repeats)
+touch_mem (xuint64_t block_size,
+           xuint64_t n_blocks,
+           xuint64_t repeats)
 {
-  guint64 j, accu, n = n_blocks;
-  GTimer *timer;
+  xuint64_t j, accu, n = n_blocks;
+  xtimer_t *timer;
   xuint_t **memc;
   xuint_t **memb;
   xuint_t **mema = g_new (xuint_t*, n);
@@ -105,7 +105,7 @@ int
 main (int   argc,
       char *argv[])
 {
-  guint64 block_size = 512, area_size = 1024 * 1024, n_blocks, repeats = 1000000;
+  xuint64_t block_size = 512, area_size = 1024 * 1024, n_blocks, repeats = 1000000;
 
   if (argc > 1)
     block_size = parse_memsize (argv[1]);
@@ -136,7 +136,7 @@ main (int   argc,
 
   g_printerr ("Will allocate and touch %" G_GUINT64_FORMAT " blocks of %" G_GUINT64_FORMAT " bytes (= %" G_GUINT64_FORMAT " bytes) %" G_GUINT64_FORMAT " times with color increment: 0x%08" G_GINT64_MODIFIER "x\n",
               n_blocks, block_size, n_blocks * block_size, repeats,
-	      (guint64)g_slice_get_config (G_SLICE_CONFIG_COLOR_INCREMENT));
+	      (xuint64_t)g_slice_get_config (G_SLICE_CONFIG_COLOR_INCREMENT));
 
   touch_mem (block_size, n_blocks, repeats);
 
@@ -146,8 +146,8 @@ main (int   argc,
 static xdouble_t
 parse_memsize (const xchar_t *cstring)
 {
-  xchar_t *mem = g_strdup (cstring);
-  xchar_t *string = g_strstrip (mem);
+  xchar_t *mem = xstrdup (cstring);
+  xchar_t *string = xstrstrip (mem);
   xuint_t l = strlen (string);
   xdouble_t f = 0;
   xchar_t *derr = NULL;

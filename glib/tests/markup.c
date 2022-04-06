@@ -24,11 +24,11 @@
 #include "glib.h"
 
 typedef struct {
-  GSList *stack;
+  xslist_t *stack;
 } ParseData;
 
 static void
-start (GMarkupParseContext  *context,
+start (xmarkup_parse_context_t  *context,
        const xchar_t          *element_name,
        const xchar_t         **attribute_names,
        const xchar_t         **attribute_values,
@@ -37,21 +37,21 @@ start (GMarkupParseContext  *context,
 {
   ParseData *data = user_data;
 
-  data->stack = g_slist_prepend (data->stack, g_strdup (element_name));
+  data->stack = xslist_prepend (data->stack, xstrdup (element_name));
 }
 
 static void
-end (GMarkupParseContext  *context,
+end (xmarkup_parse_context_t  *context,
      const xchar_t          *element_name,
      xpointer_t              user_data,
      xerror_t              **error)
 {
   ParseData *data = user_data;
-  const GSList *stack;
-  const GSList *s1, *s2;
-  GSList *s;
+  const xslist_t *stack;
+  const xslist_t *s1, *s2;
+  xslist_t *s;
 
-  stack = g_markup_parse_context_get_element_stack (context);
+  stack = xmarkup_parse_context_get_element_stack (context);
   for (s1 = stack, s2 = data->stack; s1 && s2; s1 = s1->next, s2 = s2->next)
     g_assert_cmpstr (s1->data, ==, s2->data);
   g_assert (s1 == NULL && s2 == NULL);
@@ -59,7 +59,7 @@ end (GMarkupParseContext  *context,
   s = data->stack;
   data->stack = data->stack->next;
   s->next = NULL;
-  g_slist_free_full (s, g_free);
+  xslist_free_full (s, g_free);
 }
 
 const xchar_t content[] =
@@ -75,16 +75,16 @@ test_markup_stack (void)
     NULL,
     NULL
   };
-  GMarkupParseContext *context;
+  xmarkup_parse_context_t *context;
   ParseData data = { NULL };
   xboolean_t res;
   xerror_t *error = NULL;
 
-  context = g_markup_parse_context_new (&parser, 0, &data, NULL);
-  res = g_markup_parse_context_parse (context, content, -1, &error);
+  context = xmarkup_parse_context_new (&parser, 0, &data, NULL);
+  res = xmarkup_parse_context_parse (context, content, -1, &error);
   g_assert (res);
   g_assert_no_error (error);
-  g_markup_parse_context_free (context);
+  xmarkup_parse_context_free (context);
 }
 
 int

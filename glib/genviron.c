@@ -113,7 +113,7 @@ g_environ_getenv (xchar_t       **envp,
 /**
  * g_environ_setenv:
  * @envp: (nullable) (array zero-terminated=1) (element-type filename) (transfer full):
- *     an environment list that can be freed using g_strfreev() (e.g., as
+ *     an environment list that can be freed using xstrfreev() (e.g., as
  *     returned from g_get_environ()), or %NULL for an empty
  *     environment list
  * @variable: (type filename): the environment variable to set, must not
@@ -125,7 +125,7 @@ g_environ_getenv (xchar_t       **envp,
  * @envp to @value.
  *
  * Returns: (array zero-terminated=1) (element-type filename) (transfer full):
- *     the updated environment list. Free it using g_strfreev().
+ *     the updated environment list. Free it using xstrfreev().
  *
  * Since: 2.32
  */
@@ -147,16 +147,16 @@ g_environ_setenv (xchar_t       **envp,
       if (overwrite)
         {
           g_free (envp[index]);
-          envp[index] = g_strdup_printf ("%s=%s", variable, value);
+          envp[index] = xstrdup_printf ("%s=%s", variable, value);
         }
     }
   else
     {
       xint_t length;
 
-      length = envp ? g_strv_length (envp) : 0;
+      length = envp ? xstrv_length (envp) : 0;
       envp = g_renew (xchar_t *, envp, length + 2);
-      envp[length] = g_strdup_printf ("%s=%s", variable, value);
+      envp[length] = xstrdup_printf ("%s=%s", variable, value);
       envp[length + 1] = NULL;
     }
 
@@ -201,7 +201,7 @@ g_environ_unsetenv_internal (xchar_t        **envp,
 /**
  * g_environ_unsetenv:
  * @envp: (nullable) (array zero-terminated=1) (element-type filename) (transfer full):
- *     an environment list that can be freed using g_strfreev() (e.g., as
+ *     an environment list that can be freed using xstrfreev() (e.g., as
  *     returned from g_get_environ()), or %NULL for an empty environment list
  * @variable: (type filename): the environment variable to remove, must not
  *     contain '='
@@ -210,7 +210,7 @@ g_environ_unsetenv_internal (xchar_t        **envp,
  * environment @envp.
  *
  * Returns: (array zero-terminated=1) (element-type filename) (transfer full):
- *     the updated environment list. Free it using g_strfreev().
+ *     the updated environment list. Free it using xstrfreev().
  *
  * Since: 2.32
  */
@@ -303,7 +303,7 @@ g_setenv (const xchar_t *variable,
 #ifndef G_DISABLE_CHECKS
   /* FIXME: This will be upgraded to a g_warning() in a future release of GLib.
    * See https://gitlab.gnome.org/GNOME/glib/issues/715 */
-  if (g_thread_n_created () > 0)
+  if (xthread_n_created () > 0)
     g_debug ("setenv()/putenv() are not thread-safe and should not be used after threads are created");
 #endif
 
@@ -317,7 +317,7 @@ g_setenv (const xchar_t *variable,
    * settings. It would be fairly easy to fix this by keeping
    * our own parallel array or hash table.
    */
-  string = g_strconcat (variable, "=", value, NULL);
+  string = xstrconcat (variable, "=", value, NULL);
   result = putenv (string);
 #endif
   return result == 0;
@@ -366,7 +366,7 @@ g_unsetenv (const xchar_t *variable)
 #ifndef G_DISABLE_CHECKS
   /* FIXME: This will be upgraded to a g_warning() in a future release of GLib.
    * See https://gitlab.gnome.org/GNOME/glib/issues/715 */
-  if (g_thread_n_created () > 0)
+  if (xthread_n_created () > 0)
     g_debug ("unsetenv() is not thread-safe and should not be used after threads are created");
 #endif
 
@@ -394,7 +394,7 @@ g_unsetenv (const xchar_t *variable)
  *
  * Returns: (array zero-terminated=1) (element-type filename) (transfer full):
  *     a %NULL-terminated list of strings which must be freed with
- *     g_strfreev().
+ *     xstrfreev().
  *
  * Since: 2.8
  */
@@ -404,7 +404,7 @@ g_listenv (void)
   xchar_t **result, *eq;
   xint_t len, i, j;
 
-  len = g_strv_length (environ);
+  len = xstrv_length (environ);
   result = g_new0 (xchar_t *, len + 1);
 
   j = 0;
@@ -412,7 +412,7 @@ g_listenv (void)
     {
       eq = strchr (environ[i], '=');
       if (eq)
-        result[j++] = g_strndup (environ[i], eq - environ[i]);
+        result[j++] = xstrndup (environ[i], eq - environ[i]);
     }
 
   result[j] = NULL;
@@ -432,7 +432,7 @@ g_listenv (void)
  * except portable.
  *
  * The return value is freshly allocated and it should be freed with
- * g_strfreev() when it is no longer needed.
+ * xstrfreev() when it is no longer needed.
  *
  * Returns: (array zero-terminated=1) (element-type filename) (transfer full):
  *     the list of environment variables
@@ -442,7 +442,7 @@ g_listenv (void)
 xchar_t **
 g_get_environ (void)
 {
-  return g_strdupv (environ);
+  return xstrdupv (environ);
 }
 
 /* Win32 implementation {{{1 */
@@ -451,13 +451,13 @@ g_get_environ (void)
 const xchar_t *
 g_getenv (const xchar_t *variable)
 {
-  GQuark quark;
+  xquark quark;
   xchar_t *value;
   wchar_t dummy[2], *wname, *wvalue;
   DWORD len;
 
   g_return_val_if_fail (variable != NULL, NULL);
-  g_return_val_if_fail (g_utf8_validate (variable, -1, NULL), NULL);
+  g_return_val_if_fail (xutf8_validate (variable, -1, NULL), NULL);
 
   /* On Windows NT, it is relatively typical that environment
    * variables contain references to other environment variables. If
@@ -469,7 +469,7 @@ g_getenv (const xchar_t *variable)
    * contain references to other environment variables.)
    */
 
-  wname = g_utf8_to_utf16 (variable, -1, NULL, NULL, NULL);
+  wname = xutf8_to_utf16 (variable, -1, NULL, NULL, NULL);
 
   len = GetEnvironmentVariableW (wname, dummy, 2);
 
@@ -514,7 +514,7 @@ g_getenv (const xchar_t *variable)
         }
     }
 
-  value = g_utf16_to_utf8 (wvalue, -1, NULL, NULL, NULL);
+  value = xutf16_to_utf8 (wvalue, -1, NULL, NULL, NULL);
 
   g_free (wname);
   g_free (wvalue);
@@ -537,8 +537,8 @@ g_setenv (const xchar_t *variable,
   g_return_val_if_fail (variable != NULL, FALSE);
   g_return_val_if_fail (strchr (variable, '=') == NULL, FALSE);
   g_return_val_if_fail (value != NULL, FALSE);
-  g_return_val_if_fail (g_utf8_validate (variable, -1, NULL), FALSE);
-  g_return_val_if_fail (g_utf8_validate (value, -1, NULL), FALSE);
+  g_return_val_if_fail (xutf8_validate (variable, -1, NULL), FALSE);
+  g_return_val_if_fail (xutf8_validate (value, -1, NULL), FALSE);
 
   if (!overwrite && g_getenv (variable) != NULL)
     return TRUE;
@@ -557,10 +557,10 @@ g_setenv (const xchar_t *variable,
    * the putenv() first, then call SetEnvironmentValueW ourselves.
    */
 
-  wname = g_utf8_to_utf16 (variable, -1, NULL, NULL, NULL);
-  wvalue = g_utf8_to_utf16 (value, -1, NULL, NULL, NULL);
-  tem = g_strconcat (variable, "=", value, NULL);
-  wassignment = g_utf8_to_utf16 (tem, -1, NULL, NULL, NULL);
+  wname = xutf8_to_utf16 (variable, -1, NULL, NULL, NULL);
+  wvalue = xutf8_to_utf16 (value, -1, NULL, NULL, NULL);
+  tem = xstrconcat (variable, "=", value, NULL);
+  wassignment = xutf8_to_utf16 (tem, -1, NULL, NULL, NULL);
 
   g_free (tem);
   _wputenv (wassignment);
@@ -582,11 +582,11 @@ g_unsetenv (const xchar_t *variable)
 
   g_return_if_fail (variable != NULL);
   g_return_if_fail (strchr (variable, '=') == NULL);
-  g_return_if_fail (g_utf8_validate (variable, -1, NULL));
+  g_return_if_fail (xutf8_validate (variable, -1, NULL));
 
-  wname = g_utf8_to_utf16 (variable, -1, NULL, NULL, NULL);
-  tem = g_strconcat (variable, "=", NULL);
-  wassignment = g_utf8_to_utf16 (tem, -1, NULL, NULL, NULL);
+  wname = xutf8_to_utf16 (variable, -1, NULL, NULL, NULL);
+  tem = xstrconcat (variable, "=", NULL);
+  wassignment = xutf8_to_utf16 (tem, -1, NULL, NULL, NULL);
 
   g_free (tem);
   _wputenv (wassignment);
@@ -620,7 +620,7 @@ g_listenv (void)
   q = p;
   while (*q)
     {
-      result[j] = g_utf16_to_utf8 (q, -1, NULL, NULL, NULL);
+      result[j] = xutf16_to_utf8 (q, -1, NULL, NULL, NULL);
       if (result[j] != NULL)
         {
           eq = strchr (result[j], '=');
@@ -643,7 +643,7 @@ g_listenv (void)
 xchar_t **
 g_get_environ (void)
 {
-  gunichar2 *strings;
+  xunichar2_t *strings;
   xchar_t **result;
   xint_t i, n;
 
@@ -654,7 +654,7 @@ g_get_environ (void)
   result = g_new (char *, i + 1);
   for (n = 0, i = 0; strings[n]; i++)
     {
-      result[i] = g_utf16_to_utf8 (strings + n, -1, NULL, NULL, NULL);
+      result[i] = xutf16_to_utf8 (strings + n, -1, NULL, NULL, NULL);
       n += wcslen (strings + n) + 1;
     }
   FreeEnvironmentStringsW (strings);

@@ -17,8 +17,8 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __G_UNICODE_H__
-#define __G_UNICODE_H__
+#ifndef __XUNICODE_H__
+#define __XUNICODE_H__
 
 #if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
 #error "Only <glib.h> can be included directly."
@@ -30,13 +30,13 @@
 G_BEGIN_DECLS
 
 /**
- * gunichar:
+ * xunichar_t:
  *
  * A type which can hold any UTF-32 or UCS-4 character code,
  * also known as a Unicode code point.
  *
- * If you want to produce the UTF-8 representation of a #gunichar,
- * use g_ucs4_to_utf8(). See also g_utf8_to_ucs4() for the reverse
+ * If you want to produce the UTF-8 representation of a #xunichar_t,
+ * use g_ucs4_to_utf8(). See also xutf8_to_ucs4() for the reverse
  * process.
  *
  * To print/scan values of this type as integer, use
@@ -51,63 +51,63 @@ G_BEGIN_DECLS
  * To scan, use the format string "U+\%06"G_GINT32_FORMAT"X".
  *
  * |[
- * gunichar c;
+ * xunichar_t c;
  * sscanf ("U+0041", "U+%06"G_GINT32_FORMAT"X", &amp;c)
  * g_print ("Read U+%04"G_GINT32_FORMAT"X", c);
  * ]|
  */
-typedef guint32 gunichar;
+typedef xuint32_t xunichar_t;
 
 /**
- * gunichar2:
+ * xunichar2_t:
  *
  * A type which can hold any UTF-16 code
  * point<footnote id="utf16_surrogate_pairs">UTF-16 also has so called
  * <firstterm>surrogate pairs</firstterm> to encode characters beyond
  * the BMP as pairs of 16bit numbers. Surrogate pairs cannot be stored
- * in a single gunichar2 field, but all GLib functions accepting gunichar2
+ * in a single xunichar2_t field, but all GLib functions accepting xunichar2_t
  * arrays will correctly interpret surrogate pairs.</footnote>.
  *
  * To print/scan values of this type to/from text you need to convert
- * to/from UTF-8, using g_utf16_to_utf8()/g_utf8_to_utf16().
+ * to/from UTF-8, using xutf16_to_utf8()/xutf8_to_utf16().
  *
  * To print/scan values of this type as integer, use
  * %G_GINT16_MODIFIER and/or %G_GUINT16_FORMAT.
  */
-typedef guint16 gunichar2;
+typedef xuint16_t xunichar2_t;
 
 /**
- * GUnicodeType:
- * @G_UNICODE_CONTROL: General category "Other, Control" (Cc)
- * @G_UNICODE_FORMAT: General category "Other, Format" (Cf)
- * @G_UNICODE_UNASSIGNED: General category "Other, Not Assigned" (Cn)
- * @G_UNICODE_PRIVATE_USE: General category "Other, Private Use" (Co)
- * @G_UNICODE_SURROGATE: General category "Other, Surrogate" (Cs)
- * @G_UNICODE_LOWERCASE_LETTER: General category "Letter, Lowercase" (Ll)
- * @G_UNICODE_MODIFIER_LETTER: General category "Letter, Modifier" (Lm)
- * @G_UNICODE_OTHER_LETTER: General category "Letter, Other" (Lo)
- * @G_UNICODE_TITLECASE_LETTER: General category "Letter, Titlecase" (Lt)
- * @G_UNICODE_UPPERCASE_LETTER: General category "Letter, Uppercase" (Lu)
- * @G_UNICODE_SPACING_MARK: General category "Mark, Spacing" (Mc)
- * @G_UNICODE_ENCLOSING_MARK: General category "Mark, Enclosing" (Me)
- * @G_UNICODE_NON_SPACING_MARK: General category "Mark, Nonspacing" (Mn)
- * @G_UNICODE_DECIMAL_NUMBER: General category "Number, Decimal Digit" (Nd)
- * @G_UNICODE_LETTER_NUMBER: General category "Number, Letter" (Nl)
- * @G_UNICODE_OTHER_NUMBER: General category "Number, Other" (No)
- * @G_UNICODE_CONNECT_PUNCTUATION: General category "Punctuation, Connector" (Pc)
- * @G_UNICODE_DASH_PUNCTUATION: General category "Punctuation, Dash" (Pd)
- * @G_UNICODE_CLOSE_PUNCTUATION: General category "Punctuation, Close" (Pe)
- * @G_UNICODE_FINAL_PUNCTUATION: General category "Punctuation, Final quote" (Pf)
- * @G_UNICODE_INITIAL_PUNCTUATION: General category "Punctuation, Initial quote" (Pi)
- * @G_UNICODE_OTHER_PUNCTUATION: General category "Punctuation, Other" (Po)
- * @G_UNICODE_OPEN_PUNCTUATION: General category "Punctuation, Open" (Ps)
- * @G_UNICODE_CURRENCY_SYMBOL: General category "Symbol, Currency" (Sc)
- * @G_UNICODE_MODIFIER_SYMBOL: General category "Symbol, Modifier" (Sk)
- * @G_UNICODE_MATH_SYMBOL: General category "Symbol, Math" (Sm)
- * @G_UNICODE_OTHER_SYMBOL: General category "Symbol, Other" (So)
- * @G_UNICODE_LINE_SEPARATOR: General category "Separator, Line" (Zl)
- * @G_UNICODE_PARAGRAPH_SEPARATOR: General category "Separator, Paragraph" (Zp)
- * @G_UNICODE_SPACE_SEPARATOR: General category "Separator, Space" (Zs)
+ * xunicode_type_t:
+ * @XUNICODE_CONTROL: General category "Other, Control" (Cc)
+ * @XUNICODE_FORMAT: General category "Other, Format" (Cf)
+ * @XUNICODE_UNASSIGNED: General category "Other, Not Assigned" (Cn)
+ * @XUNICODE_PRIVATE_USE: General category "Other, Private Use" (Co)
+ * @XUNICODE_SURROGATE: General category "Other, Surrogate" (Cs)
+ * @XUNICODE_LOWERCASE_LETTER: General category "Letter, Lowercase" (Ll)
+ * @XUNICODE_MODIFIER_LETTER: General category "Letter, Modifier" (Lm)
+ * @XUNICODE_OTHER_LETTER: General category "Letter, Other" (Lo)
+ * @XUNICODE_TITLECASE_LETTER: General category "Letter, Titlecase" (Lt)
+ * @XUNICODE_UPPERCASE_LETTER: General category "Letter, Uppercase" (Lu)
+ * @XUNICODE_SPACING_MARK: General category "Mark, Spacing" (Mc)
+ * @XUNICODE_ENCLOSING_MARK: General category "Mark, Enclosing" (Me)
+ * @XUNICODE_NON_SPACING_MARK: General category "Mark, Nonspacing" (Mn)
+ * @XUNICODE_DECIMAL_NUMBER: General category "Number, Decimal Digit" (Nd)
+ * @XUNICODE_LETTER_NUMBER: General category "Number, Letter" (Nl)
+ * @XUNICODE_OTHER_NUMBER: General category "Number, Other" (No)
+ * @XUNICODE_CONNECT_PUNCTUATION: General category "Punctuation, Connector" (Pc)
+ * @XUNICODE_DASH_PUNCTUATION: General category "Punctuation, Dash" (Pd)
+ * @XUNICODE_CLOSE_PUNCTUATION: General category "Punctuation, Close" (Pe)
+ * @XUNICODE_FINAL_PUNCTUATION: General category "Punctuation, Final quote" (Pf)
+ * @XUNICODE_INITIAL_PUNCTUATION: General category "Punctuation, Initial quote" (Pi)
+ * @XUNICODE_OTHER_PUNCTUATION: General category "Punctuation, Other" (Po)
+ * @XUNICODE_OPEN_PUNCTUATION: General category "Punctuation, Open" (Ps)
+ * @XUNICODE_CURRENCY_SYMBOL: General category "Symbol, Currency" (Sc)
+ * @XUNICODE_MODIFIER_SYMBOL: General category "Symbol, Modifier" (Sk)
+ * @XUNICODE_MATH_SYMBOL: General category "Symbol, Math" (Sm)
+ * @XUNICODE_OTHER_SYMBOL: General category "Symbol, Other" (So)
+ * @XUNICODE_LINE_SEPARATOR: General category "Separator, Line" (Zl)
+ * @XUNICODE_PARAGRAPH_SEPARATOR: General category "Separator, Paragraph" (Zp)
+ * @XUNICODE_SPACE_SEPARATOR: General category "Separator, Space" (Zs)
  *
  * These are the possible character classifications from the
  * Unicode specification.
@@ -115,329 +115,329 @@ typedef guint16 gunichar2;
  */
 typedef enum
 {
-  G_UNICODE_CONTROL,
-  G_UNICODE_FORMAT,
-  G_UNICODE_UNASSIGNED,
-  G_UNICODE_PRIVATE_USE,
-  G_UNICODE_SURROGATE,
-  G_UNICODE_LOWERCASE_LETTER,
-  G_UNICODE_MODIFIER_LETTER,
-  G_UNICODE_OTHER_LETTER,
-  G_UNICODE_TITLECASE_LETTER,
-  G_UNICODE_UPPERCASE_LETTER,
-  G_UNICODE_SPACING_MARK,
-  G_UNICODE_ENCLOSING_MARK,
-  G_UNICODE_NON_SPACING_MARK,
-  G_UNICODE_DECIMAL_NUMBER,
-  G_UNICODE_LETTER_NUMBER,
-  G_UNICODE_OTHER_NUMBER,
-  G_UNICODE_CONNECT_PUNCTUATION,
-  G_UNICODE_DASH_PUNCTUATION,
-  G_UNICODE_CLOSE_PUNCTUATION,
-  G_UNICODE_FINAL_PUNCTUATION,
-  G_UNICODE_INITIAL_PUNCTUATION,
-  G_UNICODE_OTHER_PUNCTUATION,
-  G_UNICODE_OPEN_PUNCTUATION,
-  G_UNICODE_CURRENCY_SYMBOL,
-  G_UNICODE_MODIFIER_SYMBOL,
-  G_UNICODE_MATH_SYMBOL,
-  G_UNICODE_OTHER_SYMBOL,
-  G_UNICODE_LINE_SEPARATOR,
-  G_UNICODE_PARAGRAPH_SEPARATOR,
-  G_UNICODE_SPACE_SEPARATOR
-} GUnicodeType;
+  XUNICODE_CONTROL,
+  XUNICODE_FORMAT,
+  XUNICODE_UNASSIGNED,
+  XUNICODE_PRIVATE_USE,
+  XUNICODE_SURROGATE,
+  XUNICODE_LOWERCASE_LETTER,
+  XUNICODE_MODIFIER_LETTER,
+  XUNICODE_OTHER_LETTER,
+  XUNICODE_TITLECASE_LETTER,
+  XUNICODE_UPPERCASE_LETTER,
+  XUNICODE_SPACING_MARK,
+  XUNICODE_ENCLOSING_MARK,
+  XUNICODE_NON_SPACING_MARK,
+  XUNICODE_DECIMAL_NUMBER,
+  XUNICODE_LETTER_NUMBER,
+  XUNICODE_OTHER_NUMBER,
+  XUNICODE_CONNECT_PUNCTUATION,
+  XUNICODE_DASH_PUNCTUATION,
+  XUNICODE_CLOSE_PUNCTUATION,
+  XUNICODE_FINAL_PUNCTUATION,
+  XUNICODE_INITIAL_PUNCTUATION,
+  XUNICODE_OTHER_PUNCTUATION,
+  XUNICODE_OPEN_PUNCTUATION,
+  XUNICODE_CURRENCY_SYMBOL,
+  XUNICODE_MODIFIER_SYMBOL,
+  XUNICODE_MATH_SYMBOL,
+  XUNICODE_OTHER_SYMBOL,
+  XUNICODE_LINE_SEPARATOR,
+  XUNICODE_PARAGRAPH_SEPARATOR,
+  XUNICODE_SPACE_SEPARATOR
+} xunicode_type_t;
 
 /**
- * G_UNICODE_COMBINING_MARK:
+ * XUNICODE_COMBINING_MARK:
  *
- * Older name for %G_UNICODE_SPACING_MARK.
+ * Older name for %XUNICODE_SPACING_MARK.
  *
- * Deprecated: 2.30: Use %G_UNICODE_SPACING_MARK.
+ * Deprecated: 2.30: Use %XUNICODE_SPACING_MARK.
  */
-#define G_UNICODE_COMBINING_MARK G_UNICODE_SPACING_MARK XPL_DEPRECATED_MACRO_IN_2_30_FOR(G_UNICODE_SPACING_MARK)
+#define XUNICODE_COMBINING_MARK XUNICODE_SPACING_MARK XPL_DEPRECATED_MACRO_IN_2_30_FOR(XUNICODE_SPACING_MARK)
 
 /**
  * GUnicodeBreakType:
- * @G_UNICODE_BREAK_MANDATORY: Mandatory Break (BK)
- * @G_UNICODE_BREAK_CARRIAGE_RETURN: Carriage Return (CR)
- * @G_UNICODE_BREAK_LINE_FEED: Line Feed (LF)
- * @G_UNICODE_BREAK_COMBINING_MARK: Attached Characters and Combining Marks (CM)
- * @G_UNICODE_BREAK_SURROGATE: Surrogates (SG)
- * @G_UNICODE_BREAK_ZERO_WIDTH_SPACE: Zero Width Space (ZW)
- * @G_UNICODE_BREAK_INSEPARABLE: Inseparable (IN)
- * @G_UNICODE_BREAK_NON_BREAKING_GLUE: Non-breaking ("Glue") (GL)
- * @G_UNICODE_BREAK_CONTINGENT: Contingent Break Opportunity (CB)
- * @G_UNICODE_BREAK_SPACE: Space (SP)
- * @G_UNICODE_BREAK_AFTER: Break Opportunity After (BA)
- * @G_UNICODE_BREAK_BEFORE: Break Opportunity Before (BB)
- * @G_UNICODE_BREAK_BEFORE_AND_AFTER: Break Opportunity Before and After (B2)
- * @G_UNICODE_BREAK_HYPHEN: Hyphen (HY)
- * @G_UNICODE_BREAK_NON_STARTER: Nonstarter (NS)
- * @G_UNICODE_BREAK_OPEN_PUNCTUATION: Opening Punctuation (OP)
- * @G_UNICODE_BREAK_CLOSE_PUNCTUATION: Closing Punctuation (CL)
- * @G_UNICODE_BREAK_QUOTATION: Ambiguous Quotation (QU)
- * @G_UNICODE_BREAK_EXCLAMATION: Exclamation/Interrogation (EX)
- * @G_UNICODE_BREAK_IDEOGRAPHIC: Ideographic (ID)
- * @G_UNICODE_BREAK_NUMERIC: Numeric (NU)
- * @G_UNICODE_BREAK_INFIX_SEPARATOR: Infix Separator (Numeric) (IS)
- * @G_UNICODE_BREAK_SYMBOL: Symbols Allowing Break After (SY)
- * @G_UNICODE_BREAK_ALPHABETIC: Ordinary Alphabetic and Symbol Characters (AL)
- * @G_UNICODE_BREAK_PREFIX: Prefix (Numeric) (PR)
- * @G_UNICODE_BREAK_POSTFIX: Postfix (Numeric) (PO)
- * @G_UNICODE_BREAK_COMPLEX_CONTEXT: Complex Content Dependent (South East Asian) (SA)
- * @G_UNICODE_BREAK_AMBIGUOUS: Ambiguous (Alphabetic or Ideographic) (AI)
- * @G_UNICODE_BREAK_UNKNOWN: Unknown (XX)
- * @G_UNICODE_BREAK_NEXT_LINE: Next Line (NL)
- * @G_UNICODE_BREAK_WORD_JOINER: Word Joiner (WJ)
- * @G_UNICODE_BREAK_HANGUL_L_JAMO: Hangul L Jamo (JL)
- * @G_UNICODE_BREAK_HANGUL_V_JAMO: Hangul V Jamo (JV)
- * @G_UNICODE_BREAK_HANGUL_T_JAMO: Hangul T Jamo (JT)
- * @G_UNICODE_BREAK_HANGUL_LV_SYLLABLE: Hangul LV Syllable (H2)
- * @G_UNICODE_BREAK_HANGUL_LVT_SYLLABLE: Hangul LVT Syllable (H3)
- * @G_UNICODE_BREAK_CLOSE_PARANTHESIS: Closing Parenthesis (CP). Since 2.28. Deprecated: 2.70: Use %G_UNICODE_BREAK_CLOSE_PARENTHESIS instead.
- * @G_UNICODE_BREAK_CLOSE_PARENTHESIS: Closing Parenthesis (CP). Since 2.70
- * @G_UNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER: Conditional Japanese Starter (CJ). Since: 2.32
- * @G_UNICODE_BREAK_HEBREW_LETTER: Hebrew Letter (HL). Since: 2.32
- * @G_UNICODE_BREAK_REGIONAL_INDICATOR: Regional Indicator (RI). Since: 2.36
- * @G_UNICODE_BREAK_EMOJI_BASE: Emoji Base (EB). Since: 2.50
- * @G_UNICODE_BREAK_EMOJI_MODIFIER: Emoji Modifier (EM). Since: 2.50
- * @G_UNICODE_BREAK_ZERO_WIDTH_JOINER: Zero Width Joiner (ZWJ). Since: 2.50
+ * @XUNICODE_BREAK_MANDATORY: Mandatory Break (BK)
+ * @XUNICODE_BREAK_CARRIAGE_RETURN: Carriage Return (CR)
+ * @XUNICODE_BREAK_LINE_FEED: Line Feed (LF)
+ * @XUNICODE_BREAK_COMBINING_MARK: Attached Characters and Combining Marks (CM)
+ * @XUNICODE_BREAK_SURROGATE: Surrogates (SG)
+ * @XUNICODE_BREAK_ZERO_WIDTH_SPACE: Zero Width Space (ZW)
+ * @XUNICODE_BREAK_INSEPARABLE: Inseparable (IN)
+ * @XUNICODE_BREAK_NON_BREAKING_GLUE: Non-breaking ("Glue") (GL)
+ * @XUNICODE_BREAK_CONTINGENT: Contingent Break Opportunity (CB)
+ * @XUNICODE_BREAK_SPACE: Space (SP)
+ * @XUNICODE_BREAK_AFTER: Break Opportunity After (BA)
+ * @XUNICODE_BREAK_BEFORE: Break Opportunity Before (BB)
+ * @XUNICODE_BREAK_BEFORE_AND_AFTER: Break Opportunity Before and After (B2)
+ * @XUNICODE_BREAK_HYPHEN: Hyphen (HY)
+ * @XUNICODE_BREAK_NON_STARTER: Nonstarter (NS)
+ * @XUNICODE_BREAK_OPEN_PUNCTUATION: Opening Punctuation (OP)
+ * @XUNICODE_BREAK_CLOSE_PUNCTUATION: Closing Punctuation (CL)
+ * @XUNICODE_BREAK_QUOTATION: Ambiguous Quotation (QU)
+ * @XUNICODE_BREAK_EXCLAMATION: Exclamation/Interrogation (EX)
+ * @XUNICODE_BREAK_IDEOGRAPHIC: Ideographic (ID)
+ * @XUNICODE_BREAK_NUMERIC: Numeric (NU)
+ * @XUNICODE_BREAK_INFIX_SEPARATOR: Infix Separator (Numeric) (IS)
+ * @XUNICODE_BREAK_SYMBOL: Symbols Allowing Break After (SY)
+ * @XUNICODE_BREAK_ALPHABETIC: Ordinary Alphabetic and Symbol Characters (AL)
+ * @XUNICODE_BREAK_PREFIX: Prefix (Numeric) (PR)
+ * @XUNICODE_BREAK_POSTFIX: Postfix (Numeric) (PO)
+ * @XUNICODE_BREAK_COMPLEX_CONTEXT: Complex Content Dependent (South East Asian) (SA)
+ * @XUNICODE_BREAK_AMBIGUOUS: Ambiguous (Alphabetic or Ideographic) (AI)
+ * @XUNICODE_BREAK_UNKNOWN: Unknown (XX)
+ * @XUNICODE_BREAK_NEXT_LINE: Next Line (NL)
+ * @XUNICODE_BREAK_WORD_JOINER: Word Joiner (WJ)
+ * @XUNICODE_BREAK_HANGUL_L_JAMO: Hangul L Jamo (JL)
+ * @XUNICODE_BREAK_HANGUL_V_JAMO: Hangul V Jamo (JV)
+ * @XUNICODE_BREAK_HANGUL_T_JAMO: Hangul T Jamo (JT)
+ * @XUNICODE_BREAK_HANGUL_LV_SYLLABLE: Hangul LV Syllable (H2)
+ * @XUNICODE_BREAK_HANGUL_LVT_SYLLABLE: Hangul LVT Syllable (H3)
+ * @XUNICODE_BREAK_CLOSE_PARANTHESIS: Closing Parenthesis (CP). Since 2.28. Deprecated: 2.70: Use %XUNICODE_BREAK_CLOSE_PARENTHESIS instead.
+ * @XUNICODE_BREAK_CLOSE_PARENTHESIS: Closing Parenthesis (CP). Since 2.70
+ * @XUNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER: Conditional Japanese Starter (CJ). Since: 2.32
+ * @XUNICODE_BREAK_HEBREW_LETTER: Hebrew Letter (HL). Since: 2.32
+ * @XUNICODE_BREAK_REGIONAL_INDICATOR: Regional Indicator (RI). Since: 2.36
+ * @XUNICODE_BREAK_EMOJI_BASE: Emoji Base (EB). Since: 2.50
+ * @XUNICODE_BREAK_EMOJI_MODIFIER: Emoji Modifier (EM). Since: 2.50
+ * @XUNICODE_BREAK_ZERO_WIDTH_JOINER: Zero Width Joiner (ZWJ). Since: 2.50
  *
  * These are the possible line break classifications.
  *
  * Since new unicode versions may add new types here, applications should be ready
- * to handle unknown values. They may be regarded as %G_UNICODE_BREAK_UNKNOWN.
+ * to handle unknown values. They may be regarded as %XUNICODE_BREAK_UNKNOWN.
  *
  * See [Unicode Line Breaking Algorithm](http://www.unicode.org/unicode/reports/tr14/).
  */
 typedef enum
 {
-  G_UNICODE_BREAK_MANDATORY,
-  G_UNICODE_BREAK_CARRIAGE_RETURN,
-  G_UNICODE_BREAK_LINE_FEED,
-  G_UNICODE_BREAK_COMBINING_MARK,
-  G_UNICODE_BREAK_SURROGATE,
-  G_UNICODE_BREAK_ZERO_WIDTH_SPACE,
-  G_UNICODE_BREAK_INSEPARABLE,
-  G_UNICODE_BREAK_NON_BREAKING_GLUE,
-  G_UNICODE_BREAK_CONTINGENT,
-  G_UNICODE_BREAK_SPACE,
-  G_UNICODE_BREAK_AFTER,
-  G_UNICODE_BREAK_BEFORE,
-  G_UNICODE_BREAK_BEFORE_AND_AFTER,
-  G_UNICODE_BREAK_HYPHEN,
-  G_UNICODE_BREAK_NON_STARTER,
-  G_UNICODE_BREAK_OPEN_PUNCTUATION,
-  G_UNICODE_BREAK_CLOSE_PUNCTUATION,
-  G_UNICODE_BREAK_QUOTATION,
-  G_UNICODE_BREAK_EXCLAMATION,
-  G_UNICODE_BREAK_IDEOGRAPHIC,
-  G_UNICODE_BREAK_NUMERIC,
-  G_UNICODE_BREAK_INFIX_SEPARATOR,
-  G_UNICODE_BREAK_SYMBOL,
-  G_UNICODE_BREAK_ALPHABETIC,
-  G_UNICODE_BREAK_PREFIX,
-  G_UNICODE_BREAK_POSTFIX,
-  G_UNICODE_BREAK_COMPLEX_CONTEXT,
-  G_UNICODE_BREAK_AMBIGUOUS,
-  G_UNICODE_BREAK_UNKNOWN,
-  G_UNICODE_BREAK_NEXT_LINE,
-  G_UNICODE_BREAK_WORD_JOINER,
-  G_UNICODE_BREAK_HANGUL_L_JAMO,
-  G_UNICODE_BREAK_HANGUL_V_JAMO,
-  G_UNICODE_BREAK_HANGUL_T_JAMO,
-  G_UNICODE_BREAK_HANGUL_LV_SYLLABLE,
-  G_UNICODE_BREAK_HANGUL_LVT_SYLLABLE,
-  G_UNICODE_BREAK_CLOSE_PARANTHESIS,
-  G_UNICODE_BREAK_CLOSE_PARENTHESIS XPL_AVAILABLE_ENUMERATOR_IN_2_70 = G_UNICODE_BREAK_CLOSE_PARANTHESIS,
-  G_UNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER,
-  G_UNICODE_BREAK_HEBREW_LETTER,
-  G_UNICODE_BREAK_REGIONAL_INDICATOR,
-  G_UNICODE_BREAK_EMOJI_BASE,
-  G_UNICODE_BREAK_EMOJI_MODIFIER,
-  G_UNICODE_BREAK_ZERO_WIDTH_JOINER
+  XUNICODE_BREAK_MANDATORY,
+  XUNICODE_BREAK_CARRIAGE_RETURN,
+  XUNICODE_BREAK_LINE_FEED,
+  XUNICODE_BREAK_COMBINING_MARK,
+  XUNICODE_BREAK_SURROGATE,
+  XUNICODE_BREAK_ZERO_WIDTH_SPACE,
+  XUNICODE_BREAK_INSEPARABLE,
+  XUNICODE_BREAK_NON_BREAKING_GLUE,
+  XUNICODE_BREAK_CONTINGENT,
+  XUNICODE_BREAK_SPACE,
+  XUNICODE_BREAK_AFTER,
+  XUNICODE_BREAK_BEFORE,
+  XUNICODE_BREAK_BEFORE_AND_AFTER,
+  XUNICODE_BREAK_HYPHEN,
+  XUNICODE_BREAK_NON_STARTER,
+  XUNICODE_BREAK_OPEN_PUNCTUATION,
+  XUNICODE_BREAK_CLOSE_PUNCTUATION,
+  XUNICODE_BREAK_QUOTATION,
+  XUNICODE_BREAK_EXCLAMATION,
+  XUNICODE_BREAK_IDEOGRAPHIC,
+  XUNICODE_BREAK_NUMERIC,
+  XUNICODE_BREAK_INFIX_SEPARATOR,
+  XUNICODE_BREAK_SYMBOL,
+  XUNICODE_BREAK_ALPHABETIC,
+  XUNICODE_BREAK_PREFIX,
+  XUNICODE_BREAK_POSTFIX,
+  XUNICODE_BREAK_COMPLEX_CONTEXT,
+  XUNICODE_BREAK_AMBIGUOUS,
+  XUNICODE_BREAK_UNKNOWN,
+  XUNICODE_BREAK_NEXT_LINE,
+  XUNICODE_BREAK_WORD_JOINER,
+  XUNICODE_BREAK_HANGUL_L_JAMO,
+  XUNICODE_BREAK_HANGUL_V_JAMO,
+  XUNICODE_BREAK_HANGUL_T_JAMO,
+  XUNICODE_BREAK_HANGUL_LV_SYLLABLE,
+  XUNICODE_BREAK_HANGUL_LVT_SYLLABLE,
+  XUNICODE_BREAK_CLOSE_PARANTHESIS,
+  XUNICODE_BREAK_CLOSE_PARENTHESIS XPL_AVAILABLE_ENUMERATOR_IN_2_70 = XUNICODE_BREAK_CLOSE_PARANTHESIS,
+  XUNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER,
+  XUNICODE_BREAK_HEBREW_LETTER,
+  XUNICODE_BREAK_REGIONAL_INDICATOR,
+  XUNICODE_BREAK_EMOJI_BASE,
+  XUNICODE_BREAK_EMOJI_MODIFIER,
+  XUNICODE_BREAK_ZERO_WIDTH_JOINER
 } GUnicodeBreakType;
 
 /**
- * GUnicodeScript:
- * @G_UNICODE_SCRIPT_INVALID_CODE:
- *                               a value never returned from g_unichar_get_script()
- * @G_UNICODE_SCRIPT_COMMON:     a character used by multiple different scripts
- * @G_UNICODE_SCRIPT_INHERITED:  a mark glyph that takes its script from the
+ * xunicode_script_t:
+ * @XUNICODE_SCRIPT_INVALID_CODE:
+ *                               a value never returned from xunichar_get_script()
+ * @XUNICODE_SCRIPT_COMMON:     a character used by multiple different scripts
+ * @XUNICODE_SCRIPT_INHERITED:  a mark glyph that takes its script from the
  *                               base glyph to which it is attached
- * @G_UNICODE_SCRIPT_ARABIC:     Arabic
- * @G_UNICODE_SCRIPT_ARMENIAN:   Armenian
- * @G_UNICODE_SCRIPT_BENGALI:    Bengali
- * @G_UNICODE_SCRIPT_BOPOMOFO:   Bopomofo
- * @G_UNICODE_SCRIPT_CHEROKEE:   Cherokee
- * @G_UNICODE_SCRIPT_COPTIC:     Coptic
- * @G_UNICODE_SCRIPT_CYRILLIC:   Cyrillic
- * @G_UNICODE_SCRIPT_DESERET:    Deseret
- * @G_UNICODE_SCRIPT_DEVANAGARI: Devanagari
- * @G_UNICODE_SCRIPT_ETHIOPIC:   Ethiopic
- * @G_UNICODE_SCRIPT_GEORGIAN:   Georgian
- * @G_UNICODE_SCRIPT_GOTHIC:     Gothic
- * @G_UNICODE_SCRIPT_GREEK:      Greek
- * @G_UNICODE_SCRIPT_GUJARATI:   Gujarati
- * @G_UNICODE_SCRIPT_GURMUKHI:   Gurmukhi
- * @G_UNICODE_SCRIPT_HAN:        Han
- * @G_UNICODE_SCRIPT_HANGUL:     Hangul
- * @G_UNICODE_SCRIPT_HEBREW:     Hebrew
- * @G_UNICODE_SCRIPT_HIRAGANA:   Hiragana
- * @G_UNICODE_SCRIPT_KANNADA:    Kannada
- * @G_UNICODE_SCRIPT_KATAKANA:   Katakana
- * @G_UNICODE_SCRIPT_KHMER:      Khmer
- * @G_UNICODE_SCRIPT_LAO:        Lao
- * @G_UNICODE_SCRIPT_LATIN:      Latin
- * @G_UNICODE_SCRIPT_MALAYALAM:  Malayalam
- * @G_UNICODE_SCRIPT_MONGOLIAN:  Mongolian
- * @G_UNICODE_SCRIPT_MYANMAR:    Myanmar
- * @G_UNICODE_SCRIPT_OGHAM:      Ogham
- * @G_UNICODE_SCRIPT_OLD_ITALIC: Old Italic
- * @G_UNICODE_SCRIPT_ORIYA:      Oriya
- * @G_UNICODE_SCRIPT_RUNIC:      Runic
- * @G_UNICODE_SCRIPT_SINHALA:    Sinhala
- * @G_UNICODE_SCRIPT_SYRIAC:     Syriac
- * @G_UNICODE_SCRIPT_TAMIL:      Tamil
- * @G_UNICODE_SCRIPT_TELUGU:     Telugu
- * @G_UNICODE_SCRIPT_THAANA:     Thaana
- * @G_UNICODE_SCRIPT_THAI:       Thai
- * @G_UNICODE_SCRIPT_TIBETAN:    Tibetan
- * @G_UNICODE_SCRIPT_CANADIAN_ABORIGINAL:
+ * @XUNICODE_SCRIPT_ARABIC:     Arabic
+ * @XUNICODE_SCRIPT_ARMENIAN:   Armenian
+ * @XUNICODE_SCRIPT_BENGALI:    Bengali
+ * @XUNICODE_SCRIPT_BOPOMOFO:   Bopomofo
+ * @XUNICODE_SCRIPT_CHEROKEE:   Cherokee
+ * @XUNICODE_SCRIPT_COPTIC:     Coptic
+ * @XUNICODE_SCRIPT_CYRILLIC:   Cyrillic
+ * @XUNICODE_SCRIPT_DESERET:    Deseret
+ * @XUNICODE_SCRIPT_DEVANAGARI: Devanagari
+ * @XUNICODE_SCRIPT_ETHIOPIC:   Ethiopic
+ * @XUNICODE_SCRIPT_GEORGIAN:   Georgian
+ * @XUNICODE_SCRIPT_GOTHIC:     Gothic
+ * @XUNICODE_SCRIPT_GREEK:      Greek
+ * @XUNICODE_SCRIPT_GUJARATI:   Gujarati
+ * @XUNICODE_SCRIPT_GURMUKHI:   Gurmukhi
+ * @XUNICODE_SCRIPT_HAN:        Han
+ * @XUNICODE_SCRIPT_HANGUL:     Hangul
+ * @XUNICODE_SCRIPT_HEBREW:     Hebrew
+ * @XUNICODE_SCRIPT_HIRAGANA:   Hiragana
+ * @XUNICODE_SCRIPT_KANNADA:    Kannada
+ * @XUNICODE_SCRIPT_KATAKANA:   Katakana
+ * @XUNICODE_SCRIPT_KHMER:      Khmer
+ * @XUNICODE_SCRIPT_LAO:        Lao
+ * @XUNICODE_SCRIPT_LATIN:      Latin
+ * @XUNICODE_SCRIPT_MALAYALAM:  Malayalam
+ * @XUNICODE_SCRIPT_MONGOLIAN:  Mongolian
+ * @XUNICODE_SCRIPT_MYANMAR:    Myanmar
+ * @XUNICODE_SCRIPT_OGHAM:      Ogham
+ * @XUNICODE_SCRIPT_OLD_ITALIC: Old Italic
+ * @XUNICODE_SCRIPT_ORIYA:      Oriya
+ * @XUNICODE_SCRIPT_RUNIC:      Runic
+ * @XUNICODE_SCRIPT_SINHALA:    Sinhala
+ * @XUNICODE_SCRIPT_SYRIAC:     Syriac
+ * @XUNICODE_SCRIPT_TAMIL:      Tamil
+ * @XUNICODE_SCRIPT_TELUGU:     Telugu
+ * @XUNICODE_SCRIPT_THAANA:     Thaana
+ * @XUNICODE_SCRIPT_THAI:       Thai
+ * @XUNICODE_SCRIPT_TIBETAN:    Tibetan
+ * @XUNICODE_SCRIPT_CANADIAN_ABORIGINAL:
  *                               Canadian Aboriginal
- * @G_UNICODE_SCRIPT_YI:         Yi
- * @G_UNICODE_SCRIPT_TAGALOG:    Tagalog
- * @G_UNICODE_SCRIPT_HANUNOO:    Hanunoo
- * @G_UNICODE_SCRIPT_BUHID:      Buhid
- * @G_UNICODE_SCRIPT_TAGBANWA:   Tagbanwa
- * @G_UNICODE_SCRIPT_BRAILLE:    Braille
- * @G_UNICODE_SCRIPT_CYPRIOT:    Cypriot
- * @G_UNICODE_SCRIPT_LIMBU:      Limbu
- * @G_UNICODE_SCRIPT_OSMANYA:    Osmanya
- * @G_UNICODE_SCRIPT_SHAVIAN:    Shavian
- * @G_UNICODE_SCRIPT_LINEAR_B:   Linear B
- * @G_UNICODE_SCRIPT_TAI_LE:     Tai Le
- * @G_UNICODE_SCRIPT_UGARITIC:   Ugaritic
- * @G_UNICODE_SCRIPT_NEW_TAI_LUE:
+ * @XUNICODE_SCRIPT_YI:         Yi
+ * @XUNICODE_SCRIPT_TAGALOG:    Tagalog
+ * @XUNICODE_SCRIPT_HANUNOO:    Hanunoo
+ * @XUNICODE_SCRIPT_BUHID:      Buhid
+ * @XUNICODE_SCRIPT_TAGBANWA:   Tagbanwa
+ * @XUNICODE_SCRIPT_BRAILLE:    Braille
+ * @XUNICODE_SCRIPT_CYPRIOT:    Cypriot
+ * @XUNICODE_SCRIPT_LIMBU:      Limbu
+ * @XUNICODE_SCRIPT_OSMANYA:    Osmanya
+ * @XUNICODE_SCRIPT_SHAVIAN:    Shavian
+ * @XUNICODE_SCRIPT_LINEAR_B:   Linear B
+ * @XUNICODE_SCRIPT_TAI_LE:     Tai Le
+ * @XUNICODE_SCRIPT_UGARITIC:   Ugaritic
+ * @XUNICODE_SCRIPT_NEW_TAI_LUE:
  *                               New Tai Lue
- * @G_UNICODE_SCRIPT_BUGINESE:   Buginese
- * @G_UNICODE_SCRIPT_GLAGOLITIC: Glagolitic
- * @G_UNICODE_SCRIPT_TIFINAGH:   Tifinagh
- * @G_UNICODE_SCRIPT_SYLOTI_NAGRI:
+ * @XUNICODE_SCRIPT_BUGINESE:   Buginese
+ * @XUNICODE_SCRIPT_GLAGOLITIC: Glagolitic
+ * @XUNICODE_SCRIPT_TIFINAGH:   Tifinagh
+ * @XUNICODE_SCRIPT_SYLOTI_NAGRI:
  *                               Syloti Nagri
- * @G_UNICODE_SCRIPT_OLD_PERSIAN:
+ * @XUNICODE_SCRIPT_OLD_PERSIAN:
  *                               Old Persian
- * @G_UNICODE_SCRIPT_KHAROSHTHI: Kharoshthi
- * @G_UNICODE_SCRIPT_UNKNOWN:    an unassigned code point
- * @G_UNICODE_SCRIPT_BALINESE:   Balinese
- * @G_UNICODE_SCRIPT_CUNEIFORM:  Cuneiform
- * @G_UNICODE_SCRIPT_PHOENICIAN: Phoenician
- * @G_UNICODE_SCRIPT_PHAGS_PA:   Phags-pa
- * @G_UNICODE_SCRIPT_NKO:        N'Ko
- * @G_UNICODE_SCRIPT_KAYAH_LI:   Kayah Li. Since 2.16.3
- * @G_UNICODE_SCRIPT_LEPCHA:     Lepcha. Since 2.16.3
- * @G_UNICODE_SCRIPT_REJANG:     Rejang. Since 2.16.3
- * @G_UNICODE_SCRIPT_SUNDANESE:  Sundanese. Since 2.16.3
- * @G_UNICODE_SCRIPT_SAURASHTRA: Saurashtra. Since 2.16.3
- * @G_UNICODE_SCRIPT_CHAM:       Cham. Since 2.16.3
- * @G_UNICODE_SCRIPT_OL_CHIKI:   Ol Chiki. Since 2.16.3
- * @G_UNICODE_SCRIPT_VAI:        Vai. Since 2.16.3
- * @G_UNICODE_SCRIPT_CARIAN:     Carian. Since 2.16.3
- * @G_UNICODE_SCRIPT_LYCIAN:     Lycian. Since 2.16.3
- * @G_UNICODE_SCRIPT_LYDIAN:     Lydian. Since 2.16.3
- * @G_UNICODE_SCRIPT_AVESTAN:    Avestan. Since 2.26
- * @G_UNICODE_SCRIPT_BAMUM:      Bamum. Since 2.26
- * @G_UNICODE_SCRIPT_EGYPTIAN_HIEROGLYPHS:
+ * @XUNICODE_SCRIPT_KHAROSHTHI: Kharoshthi
+ * @XUNICODE_SCRIPT_UNKNOWN:    an unassigned code point
+ * @XUNICODE_SCRIPT_BALINESE:   Balinese
+ * @XUNICODE_SCRIPT_CUNEIFORM:  Cuneiform
+ * @XUNICODE_SCRIPT_PHOENICIAN: Phoenician
+ * @XUNICODE_SCRIPT_PHAGS_PA:   Phags-pa
+ * @XUNICODE_SCRIPT_NKO:        N'Ko
+ * @XUNICODE_SCRIPT_KAYAH_LI:   Kayah Li. Since 2.16.3
+ * @XUNICODE_SCRIPT_LEPCHA:     Lepcha. Since 2.16.3
+ * @XUNICODE_SCRIPT_REJANG:     Rejang. Since 2.16.3
+ * @XUNICODE_SCRIPT_SUNDANESE:  Sundanese. Since 2.16.3
+ * @XUNICODE_SCRIPT_SAURASHTRA: Saurashtra. Since 2.16.3
+ * @XUNICODE_SCRIPT_CHAM:       Cham. Since 2.16.3
+ * @XUNICODE_SCRIPT_OL_CHIKI:   Ol Chiki. Since 2.16.3
+ * @XUNICODE_SCRIPT_VAI:        Vai. Since 2.16.3
+ * @XUNICODE_SCRIPT_CARIAN:     Carian. Since 2.16.3
+ * @XUNICODE_SCRIPT_LYCIAN:     Lycian. Since 2.16.3
+ * @XUNICODE_SCRIPT_LYDIAN:     Lydian. Since 2.16.3
+ * @XUNICODE_SCRIPT_AVESTAN:    Avestan. Since 2.26
+ * @XUNICODE_SCRIPT_BAMUM:      Bamum. Since 2.26
+ * @XUNICODE_SCRIPT_EGYPTIAN_HIEROGLYPHS:
  *                               Egyptian Hieroglpyhs. Since 2.26
- * @G_UNICODE_SCRIPT_IMPERIAL_ARAMAIC:
+ * @XUNICODE_SCRIPT_IMPERIAL_ARAMAIC:
  *                               Imperial Aramaic. Since 2.26
- * @G_UNICODE_SCRIPT_INSCRIPTIONAL_PAHLAVI:
+ * @XUNICODE_SCRIPT_INSCRIPTIONAL_PAHLAVI:
  *                               Inscriptional Pahlavi. Since 2.26
- * @G_UNICODE_SCRIPT_INSCRIPTIONAL_PARTHIAN:
+ * @XUNICODE_SCRIPT_INSCRIPTIONAL_PARTHIAN:
  *                               Inscriptional Parthian. Since 2.26
- * @G_UNICODE_SCRIPT_JAVANESE:   Javanese. Since 2.26
- * @G_UNICODE_SCRIPT_KAITHI:     Kaithi. Since 2.26
- * @G_UNICODE_SCRIPT_LISU:       Lisu. Since 2.26
- * @G_UNICODE_SCRIPT_MEETEI_MAYEK:
+ * @XUNICODE_SCRIPT_JAVANESE:   Javanese. Since 2.26
+ * @XUNICODE_SCRIPT_KAITHI:     Kaithi. Since 2.26
+ * @XUNICODE_SCRIPT_LISU:       Lisu. Since 2.26
+ * @XUNICODE_SCRIPT_MEETEI_MAYEK:
  *                               Meetei Mayek. Since 2.26
- * @G_UNICODE_SCRIPT_OLD_SOUTH_ARABIAN:
+ * @XUNICODE_SCRIPT_OLD_SOUTH_ARABIAN:
  *                               Old South Arabian. Since 2.26
- * @G_UNICODE_SCRIPT_OLD_TURKIC: Old Turkic. Since 2.28
- * @G_UNICODE_SCRIPT_SAMARITAN:  Samaritan. Since 2.26
- * @G_UNICODE_SCRIPT_TAI_THAM:   Tai Tham. Since 2.26
- * @G_UNICODE_SCRIPT_TAI_VIET:   Tai Viet. Since 2.26
- * @G_UNICODE_SCRIPT_BATAK:      Batak. Since 2.28
- * @G_UNICODE_SCRIPT_BRAHMI:     Brahmi. Since 2.28
- * @G_UNICODE_SCRIPT_MANDAIC:    Mandaic. Since 2.28
- * @G_UNICODE_SCRIPT_CHAKMA:               Chakma. Since: 2.32
- * @G_UNICODE_SCRIPT_MEROITIC_CURSIVE:     Meroitic Cursive. Since: 2.32
- * @G_UNICODE_SCRIPT_MEROITIC_HIEROGLYPHS: Meroitic Hieroglyphs. Since: 2.32
- * @G_UNICODE_SCRIPT_MIAO:                 Miao. Since: 2.32
- * @G_UNICODE_SCRIPT_SHARADA:              Sharada. Since: 2.32
- * @G_UNICODE_SCRIPT_SORA_SOMPENG:         Sora Sompeng. Since: 2.32
- * @G_UNICODE_SCRIPT_TAKRI:                Takri. Since: 2.32
- * @G_UNICODE_SCRIPT_BASSA_VAH:            Bassa. Since: 2.42
- * @G_UNICODE_SCRIPT_CAUCASIAN_ALBANIAN:   Caucasian Albanian. Since: 2.42
- * @G_UNICODE_SCRIPT_DUPLOYAN:             Duployan. Since: 2.42
- * @G_UNICODE_SCRIPT_ELBASAN:              Elbasan. Since: 2.42
- * @G_UNICODE_SCRIPT_GRANTHA:              Grantha. Since: 2.42
- * @G_UNICODE_SCRIPT_KHOJKI:               Kjohki. Since: 2.42
- * @G_UNICODE_SCRIPT_KHUDAWADI:            Khudawadi, Sindhi. Since: 2.42
- * @G_UNICODE_SCRIPT_LINEAR_A:             Linear A. Since: 2.42
- * @G_UNICODE_SCRIPT_MAHAJANI:             Mahajani. Since: 2.42
- * @G_UNICODE_SCRIPT_MANICHAEAN:           Manichaean. Since: 2.42
- * @G_UNICODE_SCRIPT_MENDE_KIKAKUI:        Mende Kikakui. Since: 2.42
- * @G_UNICODE_SCRIPT_MODI:                 Modi. Since: 2.42
- * @G_UNICODE_SCRIPT_MRO:                  Mro. Since: 2.42
- * @G_UNICODE_SCRIPT_NABATAEAN:            Nabataean. Since: 2.42
- * @G_UNICODE_SCRIPT_OLD_NORTH_ARABIAN:    Old North Arabian. Since: 2.42
- * @G_UNICODE_SCRIPT_OLD_PERMIC:           Old Permic. Since: 2.42
- * @G_UNICODE_SCRIPT_PAHAWH_HMONG:         Pahawh Hmong. Since: 2.42
- * @G_UNICODE_SCRIPT_PALMYRENE:            Palmyrene. Since: 2.42
- * @G_UNICODE_SCRIPT_PAU_CIN_HAU:          Pau Cin Hau. Since: 2.42
- * @G_UNICODE_SCRIPT_PSALTER_PAHLAVI:      Psalter Pahlavi. Since: 2.42
- * @G_UNICODE_SCRIPT_SIDDHAM:              Siddham. Since: 2.42
- * @G_UNICODE_SCRIPT_TIRHUTA:              Tirhuta. Since: 2.42
- * @G_UNICODE_SCRIPT_WARANG_CITI:          Warang Citi. Since: 2.42
- * @G_UNICODE_SCRIPT_AHOM:                 Ahom. Since: 2.48
- * @G_UNICODE_SCRIPT_ANATOLIAN_HIEROGLYPHS: Anatolian Hieroglyphs. Since: 2.48
- * @G_UNICODE_SCRIPT_HATRAN:               Hatran. Since: 2.48
- * @G_UNICODE_SCRIPT_MULTANI:              Multani. Since: 2.48
- * @G_UNICODE_SCRIPT_OLD_HUNGARIAN:        Old Hungarian. Since: 2.48
- * @G_UNICODE_SCRIPT_SIGNWRITING:          Signwriting. Since: 2.48
- * @G_UNICODE_SCRIPT_ADLAM:                Adlam. Since: 2.50
- * @G_UNICODE_SCRIPT_BHAIKSUKI:            Bhaiksuki. Since: 2.50
- * @G_UNICODE_SCRIPT_MARCHEN:              Marchen. Since: 2.50
- * @G_UNICODE_SCRIPT_NEWA:                 Newa. Since: 2.50
- * @G_UNICODE_SCRIPT_OSAGE:                Osage. Since: 2.50
- * @G_UNICODE_SCRIPT_TANGUT:               Tangut. Since: 2.50
- * @G_UNICODE_SCRIPT_MASARAM_GONDI:        Masaram Gondi. Since: 2.54
- * @G_UNICODE_SCRIPT_NUSHU:                Nushu. Since: 2.54
- * @G_UNICODE_SCRIPT_SOYOMBO:              Soyombo. Since: 2.54
- * @G_UNICODE_SCRIPT_ZANABAZAR_SQUARE:     Zanabazar Square. Since: 2.54
- * @G_UNICODE_SCRIPT_DOGRA:                Dogra. Since: 2.58
- * @G_UNICODE_SCRIPT_GUNJALA_GONDI:        Gunjala Gondi. Since: 2.58
- * @G_UNICODE_SCRIPT_HANIFI_ROHINGYA:      Hanifi Rohingya. Since: 2.58
- * @G_UNICODE_SCRIPT_MAKASAR:              Makasar. Since: 2.58
- * @G_UNICODE_SCRIPT_MEDEFAIDRIN:          Medefaidrin. Since: 2.58
- * @G_UNICODE_SCRIPT_OLD_SOGDIAN:          Old Sogdian. Since: 2.58
- * @G_UNICODE_SCRIPT_SOGDIAN:              Sogdian. Since: 2.58
- * @G_UNICODE_SCRIPT_ELYMAIC:              Elym. Since: 2.62
- * @G_UNICODE_SCRIPT_NANDINAGARI:          Nand. Since: 2.62
- * @G_UNICODE_SCRIPT_NYIAKENG_PUACHUE_HMONG: Rohg. Since: 2.62
- * @G_UNICODE_SCRIPT_WANCHO:               Wcho. Since: 2.62
- * @G_UNICODE_SCRIPT_CHORASMIAN:           Chorasmian. Since: 2.66
- * @G_UNICODE_SCRIPT_DIVES_AKURU:          Dives Akuru. Since: 2.66
- * @G_UNICODE_SCRIPT_KHITAN_SMALL_SCRIPT:  Khitan small script. Since: 2.66
- * @G_UNICODE_SCRIPT_YEZIDI:               Yezidi. Since: 2.66
- * @G_UNICODE_SCRIPT_CYPRO_MINOAN:         Cypro-Minoan. Since: 2.72
- * @G_UNICODE_SCRIPT_OLD_UYGHUR:           Old Uyghur. Since: 2.72
- * @G_UNICODE_SCRIPT_TANGSA:               Tangsa. Since: 2.72
- * @G_UNICODE_SCRIPT_TOTO:                 Toto. Since: 2.72
- * @G_UNICODE_SCRIPT_VITHKUQI:             Vithkuqi. Since: 2.72
- * @G_UNICODE_SCRIPT_MATH:                 Mathematical notation. Since: 2.72
+ * @XUNICODE_SCRIPT_OLD_TURKIC: Old Turkic. Since 2.28
+ * @XUNICODE_SCRIPT_SAMARITAN:  Samaritan. Since 2.26
+ * @XUNICODE_SCRIPT_TAI_THAM:   Tai Tham. Since 2.26
+ * @XUNICODE_SCRIPT_TAI_VIET:   Tai Viet. Since 2.26
+ * @XUNICODE_SCRIPT_BATAK:      Batak. Since 2.28
+ * @XUNICODE_SCRIPT_BRAHMI:     Brahmi. Since 2.28
+ * @XUNICODE_SCRIPT_MANDAIC:    Mandaic. Since 2.28
+ * @XUNICODE_SCRIPT_CHAKMA:               Chakma. Since: 2.32
+ * @XUNICODE_SCRIPT_MEROITIC_CURSIVE:     Meroitic Cursive. Since: 2.32
+ * @XUNICODE_SCRIPT_MEROITIC_HIEROGLYPHS: Meroitic Hieroglyphs. Since: 2.32
+ * @XUNICODE_SCRIPT_MIAO:                 Miao. Since: 2.32
+ * @XUNICODE_SCRIPT_SHARADA:              Sharada. Since: 2.32
+ * @XUNICODE_SCRIPT_SORA_SOMPENG:         Sora Sompeng. Since: 2.32
+ * @XUNICODE_SCRIPT_TAKRI:                Takri. Since: 2.32
+ * @XUNICODE_SCRIPT_BASSA_VAH:            Bassa. Since: 2.42
+ * @XUNICODE_SCRIPT_CAUCASIAN_ALBANIAN:   Caucasian Albanian. Since: 2.42
+ * @XUNICODE_SCRIPT_DUPLOYAN:             Duployan. Since: 2.42
+ * @XUNICODE_SCRIPT_ELBASAN:              Elbasan. Since: 2.42
+ * @XUNICODE_SCRIPT_GRANTHA:              Grantha. Since: 2.42
+ * @XUNICODE_SCRIPT_KHOJKI:               Kjohki. Since: 2.42
+ * @XUNICODE_SCRIPT_KHUDAWADI:            Khudawadi, Sindhi. Since: 2.42
+ * @XUNICODE_SCRIPT_LINEAR_A:             Linear A. Since: 2.42
+ * @XUNICODE_SCRIPT_MAHAJANI:             Mahajani. Since: 2.42
+ * @XUNICODE_SCRIPT_MANICHAEAN:           Manichaean. Since: 2.42
+ * @XUNICODE_SCRIPT_MENDE_KIKAKUI:        Mende Kikakui. Since: 2.42
+ * @XUNICODE_SCRIPT_MODI:                 Modi. Since: 2.42
+ * @XUNICODE_SCRIPT_MRO:                  Mro. Since: 2.42
+ * @XUNICODE_SCRIPT_NABATAEAN:            Nabataean. Since: 2.42
+ * @XUNICODE_SCRIPT_OLD_NORTH_ARABIAN:    Old North Arabian. Since: 2.42
+ * @XUNICODE_SCRIPT_OLD_PERMIC:           Old Permic. Since: 2.42
+ * @XUNICODE_SCRIPT_PAHAWH_HMONG:         Pahawh Hmong. Since: 2.42
+ * @XUNICODE_SCRIPT_PALMYRENE:            Palmyrene. Since: 2.42
+ * @XUNICODE_SCRIPT_PAU_CIN_HAU:          Pau Cin Hau. Since: 2.42
+ * @XUNICODE_SCRIPT_PSALTER_PAHLAVI:      Psalter Pahlavi. Since: 2.42
+ * @XUNICODE_SCRIPT_SIDDHAM:              Siddham. Since: 2.42
+ * @XUNICODE_SCRIPT_TIRHUTA:              Tirhuta. Since: 2.42
+ * @XUNICODE_SCRIPT_WARANG_CITI:          Warang Citi. Since: 2.42
+ * @XUNICODE_SCRIPT_AHOM:                 Ahom. Since: 2.48
+ * @XUNICODE_SCRIPT_ANATOLIAN_HIEROGLYPHS: Anatolian Hieroglyphs. Since: 2.48
+ * @XUNICODE_SCRIPT_HATRAN:               Hatran. Since: 2.48
+ * @XUNICODE_SCRIPT_MULTANI:              Multani. Since: 2.48
+ * @XUNICODE_SCRIPT_OLD_HUNGARIAN:        Old Hungarian. Since: 2.48
+ * @XUNICODE_SCRIPT_SIGNWRITING:          Signwriting. Since: 2.48
+ * @XUNICODE_SCRIPT_ADLAM:                Adlam. Since: 2.50
+ * @XUNICODE_SCRIPT_BHAIKSUKI:            Bhaiksuki. Since: 2.50
+ * @XUNICODE_SCRIPT_MARCHEN:              Marchen. Since: 2.50
+ * @XUNICODE_SCRIPT_NEWA:                 Newa. Since: 2.50
+ * @XUNICODE_SCRIPT_OSAGE:                Osage. Since: 2.50
+ * @XUNICODE_SCRIPT_TANGUT:               Tangut. Since: 2.50
+ * @XUNICODE_SCRIPT_MASARAM_GONDI:        Masaram Gondi. Since: 2.54
+ * @XUNICODE_SCRIPT_NUSHU:                Nushu. Since: 2.54
+ * @XUNICODE_SCRIPT_SOYOMBO:              Soyombo. Since: 2.54
+ * @XUNICODE_SCRIPT_ZANABAZAR_SQUARE:     Zanabazar Square. Since: 2.54
+ * @XUNICODE_SCRIPT_DOGRA:                Dogra. Since: 2.58
+ * @XUNICODE_SCRIPT_GUNJALA_GONDI:        Gunjala Gondi. Since: 2.58
+ * @XUNICODE_SCRIPT_HANIFI_ROHINGYA:      Hanifi Rohingya. Since: 2.58
+ * @XUNICODE_SCRIPT_MAKASAR:              Makasar. Since: 2.58
+ * @XUNICODE_SCRIPT_MEDEFAIDRIN:          Medefaidrin. Since: 2.58
+ * @XUNICODE_SCRIPT_OLD_SOGDIAN:          Old Sogdian. Since: 2.58
+ * @XUNICODE_SCRIPT_SOGDIAN:              Sogdian. Since: 2.58
+ * @XUNICODE_SCRIPT_ELYMAIC:              Elym. Since: 2.62
+ * @XUNICODE_SCRIPT_NANDINAGARI:          Nand. Since: 2.62
+ * @XUNICODE_SCRIPT_NYIAKENG_PUACHUE_HMONG: Rohg. Since: 2.62
+ * @XUNICODE_SCRIPT_WANCHO:               Wcho. Since: 2.62
+ * @XUNICODE_SCRIPT_CHORASMIAN:           Chorasmian. Since: 2.66
+ * @XUNICODE_SCRIPT_DIVES_AKURU:          Dives Akuru. Since: 2.66
+ * @XUNICODE_SCRIPT_KHITAN_SMALL_SCRIPT:  Khitan small script. Since: 2.66
+ * @XUNICODE_SCRIPT_YEZIDI:               Yezidi. Since: 2.66
+ * @XUNICODE_SCRIPT_CYPRO_MINOAN:         Cypro-Minoan. Since: 2.72
+ * @XUNICODE_SCRIPT_OLD_UYGHUR:           Old Uyghur. Since: 2.72
+ * @XUNICODE_SCRIPT_TANGSA:               Tangsa. Since: 2.72
+ * @XUNICODE_SCRIPT_TOTO:                 Toto. Since: 2.72
+ * @XUNICODE_SCRIPT_VITHKUQI:             Vithkuqi. Since: 2.72
+ * @XUNICODE_SCRIPT_MATH:                 Mathematical notation. Since: 2.72
  *
- * The #GUnicodeScript enumeration identifies different writing
+ * The #xunicode_script_t enumeration identifies different writing
  * systems. The values correspond to the names as defined in the
  * Unicode standard. The enumeration has been added in GLib 2.14,
  * and is interchangeable with #PangoScript.
@@ -448,300 +448,300 @@ typedef enum
  */
 typedef enum
 {                         /* ISO 15924 code */
-  G_UNICODE_SCRIPT_INVALID_CODE = -1,
-  G_UNICODE_SCRIPT_COMMON       = 0,   /* Zyyy */
-  G_UNICODE_SCRIPT_INHERITED,          /* Zinh (Qaai) */
-  G_UNICODE_SCRIPT_ARABIC,             /* Arab */
-  G_UNICODE_SCRIPT_ARMENIAN,           /* Armn */
-  G_UNICODE_SCRIPT_BENGALI,            /* Beng */
-  G_UNICODE_SCRIPT_BOPOMOFO,           /* Bopo */
-  G_UNICODE_SCRIPT_CHEROKEE,           /* Cher */
-  G_UNICODE_SCRIPT_COPTIC,             /* Copt (Qaac) */
-  G_UNICODE_SCRIPT_CYRILLIC,           /* Cyrl (Cyrs) */
-  G_UNICODE_SCRIPT_DESERET,            /* Dsrt */
-  G_UNICODE_SCRIPT_DEVANAGARI,         /* Deva */
-  G_UNICODE_SCRIPT_ETHIOPIC,           /* Ethi */
-  G_UNICODE_SCRIPT_GEORGIAN,           /* Geor (Geon, Geoa) */
-  G_UNICODE_SCRIPT_GOTHIC,             /* Goth */
-  G_UNICODE_SCRIPT_GREEK,              /* Grek */
-  G_UNICODE_SCRIPT_GUJARATI,           /* Gujr */
-  G_UNICODE_SCRIPT_GURMUKHI,           /* Guru */
-  G_UNICODE_SCRIPT_HAN,                /* Hani */
-  G_UNICODE_SCRIPT_HANGUL,             /* Hang */
-  G_UNICODE_SCRIPT_HEBREW,             /* Hebr */
-  G_UNICODE_SCRIPT_HIRAGANA,           /* Hira */
-  G_UNICODE_SCRIPT_KANNADA,            /* Knda */
-  G_UNICODE_SCRIPT_KATAKANA,           /* Kana */
-  G_UNICODE_SCRIPT_KHMER,              /* Khmr */
-  G_UNICODE_SCRIPT_LAO,                /* Laoo */
-  G_UNICODE_SCRIPT_LATIN,              /* Latn (Latf, Latg) */
-  G_UNICODE_SCRIPT_MALAYALAM,          /* Mlym */
-  G_UNICODE_SCRIPT_MONGOLIAN,          /* Mong */
-  G_UNICODE_SCRIPT_MYANMAR,            /* Mymr */
-  G_UNICODE_SCRIPT_OGHAM,              /* Ogam */
-  G_UNICODE_SCRIPT_OLD_ITALIC,         /* Ital */
-  G_UNICODE_SCRIPT_ORIYA,              /* Orya */
-  G_UNICODE_SCRIPT_RUNIC,              /* Runr */
-  G_UNICODE_SCRIPT_SINHALA,            /* Sinh */
-  G_UNICODE_SCRIPT_SYRIAC,             /* Syrc (Syrj, Syrn, Syre) */
-  G_UNICODE_SCRIPT_TAMIL,              /* Taml */
-  G_UNICODE_SCRIPT_TELUGU,             /* Telu */
-  G_UNICODE_SCRIPT_THAANA,             /* Thaa */
-  G_UNICODE_SCRIPT_THAI,               /* Thai */
-  G_UNICODE_SCRIPT_TIBETAN,            /* Tibt */
-  G_UNICODE_SCRIPT_CANADIAN_ABORIGINAL, /* Cans */
-  G_UNICODE_SCRIPT_YI,                 /* Yiii */
-  G_UNICODE_SCRIPT_TAGALOG,            /* Tglg */
-  G_UNICODE_SCRIPT_HANUNOO,            /* Hano */
-  G_UNICODE_SCRIPT_BUHID,              /* Buhd */
-  G_UNICODE_SCRIPT_TAGBANWA,           /* Tagb */
+  XUNICODE_SCRIPT_INVALID_CODE = -1,
+  XUNICODE_SCRIPT_COMMON       = 0,   /* Zyyy */
+  XUNICODE_SCRIPT_INHERITED,          /* Zinh (Qaai) */
+  XUNICODE_SCRIPT_ARABIC,             /* Arab */
+  XUNICODE_SCRIPT_ARMENIAN,           /* Armn */
+  XUNICODE_SCRIPT_BENGALI,            /* Beng */
+  XUNICODE_SCRIPT_BOPOMOFO,           /* Bopo */
+  XUNICODE_SCRIPT_CHEROKEE,           /* Cher */
+  XUNICODE_SCRIPT_COPTIC,             /* Copt (Qaac) */
+  XUNICODE_SCRIPT_CYRILLIC,           /* Cyrl (Cyrs) */
+  XUNICODE_SCRIPT_DESERET,            /* Dsrt */
+  XUNICODE_SCRIPT_DEVANAGARI,         /* Deva */
+  XUNICODE_SCRIPT_ETHIOPIC,           /* Ethi */
+  XUNICODE_SCRIPT_GEORGIAN,           /* Geor (Geon, Geoa) */
+  XUNICODE_SCRIPT_GOTHIC,             /* Goth */
+  XUNICODE_SCRIPT_GREEK,              /* Grek */
+  XUNICODE_SCRIPT_GUJARATI,           /* Gujr */
+  XUNICODE_SCRIPT_GURMUKHI,           /* Guru */
+  XUNICODE_SCRIPT_HAN,                /* Hani */
+  XUNICODE_SCRIPT_HANGUL,             /* Hang */
+  XUNICODE_SCRIPT_HEBREW,             /* Hebr */
+  XUNICODE_SCRIPT_HIRAGANA,           /* Hira */
+  XUNICODE_SCRIPT_KANNADA,            /* Knda */
+  XUNICODE_SCRIPT_KATAKANA,           /* Kana */
+  XUNICODE_SCRIPT_KHMER,              /* Khmr */
+  XUNICODE_SCRIPT_LAO,                /* Laoo */
+  XUNICODE_SCRIPT_LATIN,              /* Latn (Latf, Latg) */
+  XUNICODE_SCRIPT_MALAYALAM,          /* Mlym */
+  XUNICODE_SCRIPT_MONGOLIAN,          /* Mong */
+  XUNICODE_SCRIPT_MYANMAR,            /* Mymr */
+  XUNICODE_SCRIPT_OGHAM,              /* Ogam */
+  XUNICODE_SCRIPT_OLD_ITALIC,         /* Ital */
+  XUNICODE_SCRIPT_ORIYA,              /* Orya */
+  XUNICODE_SCRIPT_RUNIC,              /* Runr */
+  XUNICODE_SCRIPT_SINHALA,            /* Sinh */
+  XUNICODE_SCRIPT_SYRIAC,             /* Syrc (Syrj, Syrn, Syre) */
+  XUNICODE_SCRIPT_TAMIL,              /* Taml */
+  XUNICODE_SCRIPT_TELUGU,             /* Telu */
+  XUNICODE_SCRIPT_THAANA,             /* Thaa */
+  XUNICODE_SCRIPT_THAI,               /* Thai */
+  XUNICODE_SCRIPT_TIBETAN,            /* Tibt */
+  XUNICODE_SCRIPT_CANADIAN_ABORIGINAL, /* Cans */
+  XUNICODE_SCRIPT_YI,                 /* Yiii */
+  XUNICODE_SCRIPT_TAGALOG,            /* Tglg */
+  XUNICODE_SCRIPT_HANUNOO,            /* Hano */
+  XUNICODE_SCRIPT_BUHID,              /* Buhd */
+  XUNICODE_SCRIPT_TAGBANWA,           /* Tagb */
 
   /* Unicode-4.0 additions */
-  G_UNICODE_SCRIPT_BRAILLE,            /* Brai */
-  G_UNICODE_SCRIPT_CYPRIOT,            /* Cprt */
-  G_UNICODE_SCRIPT_LIMBU,              /* Limb */
-  G_UNICODE_SCRIPT_OSMANYA,            /* Osma */
-  G_UNICODE_SCRIPT_SHAVIAN,            /* Shaw */
-  G_UNICODE_SCRIPT_LINEAR_B,           /* Linb */
-  G_UNICODE_SCRIPT_TAI_LE,             /* Tale */
-  G_UNICODE_SCRIPT_UGARITIC,           /* Ugar */
+  XUNICODE_SCRIPT_BRAILLE,            /* Brai */
+  XUNICODE_SCRIPT_CYPRIOT,            /* Cprt */
+  XUNICODE_SCRIPT_LIMBU,              /* Limb */
+  XUNICODE_SCRIPT_OSMANYA,            /* Osma */
+  XUNICODE_SCRIPT_SHAVIAN,            /* Shaw */
+  XUNICODE_SCRIPT_LINEAR_B,           /* Linb */
+  XUNICODE_SCRIPT_TAI_LE,             /* Tale */
+  XUNICODE_SCRIPT_UGARITIC,           /* Ugar */
 
   /* Unicode-4.1 additions */
-  G_UNICODE_SCRIPT_NEW_TAI_LUE,        /* Talu */
-  G_UNICODE_SCRIPT_BUGINESE,           /* Bugi */
-  G_UNICODE_SCRIPT_GLAGOLITIC,         /* Glag */
-  G_UNICODE_SCRIPT_TIFINAGH,           /* Tfng */
-  G_UNICODE_SCRIPT_SYLOTI_NAGRI,       /* Sylo */
-  G_UNICODE_SCRIPT_OLD_PERSIAN,        /* Xpeo */
-  G_UNICODE_SCRIPT_KHAROSHTHI,         /* Khar */
+  XUNICODE_SCRIPT_NEW_TAI_LUE,        /* Talu */
+  XUNICODE_SCRIPT_BUGINESE,           /* Bugi */
+  XUNICODE_SCRIPT_GLAGOLITIC,         /* Glag */
+  XUNICODE_SCRIPT_TIFINAGH,           /* Tfng */
+  XUNICODE_SCRIPT_SYLOTI_NAGRI,       /* Sylo */
+  XUNICODE_SCRIPT_OLD_PERSIAN,        /* Xpeo */
+  XUNICODE_SCRIPT_KHAROSHTHI,         /* Khar */
 
   /* Unicode-5.0 additions */
-  G_UNICODE_SCRIPT_UNKNOWN,            /* Zzzz */
-  G_UNICODE_SCRIPT_BALINESE,           /* Bali */
-  G_UNICODE_SCRIPT_CUNEIFORM,          /* Xsux */
-  G_UNICODE_SCRIPT_PHOENICIAN,         /* Phnx */
-  G_UNICODE_SCRIPT_PHAGS_PA,           /* Phag */
-  G_UNICODE_SCRIPT_NKO,                /* Nkoo */
+  XUNICODE_SCRIPT_UNKNOWN,            /* Zzzz */
+  XUNICODE_SCRIPT_BALINESE,           /* Bali */
+  XUNICODE_SCRIPT_CUNEIFORM,          /* Xsux */
+  XUNICODE_SCRIPT_PHOENICIAN,         /* Phnx */
+  XUNICODE_SCRIPT_PHAGS_PA,           /* Phag */
+  XUNICODE_SCRIPT_NKO,                /* Nkoo */
 
   /* Unicode-5.1 additions */
-  G_UNICODE_SCRIPT_KAYAH_LI,           /* Kali */
-  G_UNICODE_SCRIPT_LEPCHA,             /* Lepc */
-  G_UNICODE_SCRIPT_REJANG,             /* Rjng */
-  G_UNICODE_SCRIPT_SUNDANESE,          /* Sund */
-  G_UNICODE_SCRIPT_SAURASHTRA,         /* Saur */
-  G_UNICODE_SCRIPT_CHAM,               /* Cham */
-  G_UNICODE_SCRIPT_OL_CHIKI,           /* Olck */
-  G_UNICODE_SCRIPT_VAI,                /* Vaii */
-  G_UNICODE_SCRIPT_CARIAN,             /* Cari */
-  G_UNICODE_SCRIPT_LYCIAN,             /* Lyci */
-  G_UNICODE_SCRIPT_LYDIAN,             /* Lydi */
+  XUNICODE_SCRIPT_KAYAH_LI,           /* Kali */
+  XUNICODE_SCRIPT_LEPCHA,             /* Lepc */
+  XUNICODE_SCRIPT_REJANG,             /* Rjng */
+  XUNICODE_SCRIPT_SUNDANESE,          /* Sund */
+  XUNICODE_SCRIPT_SAURASHTRA,         /* Saur */
+  XUNICODE_SCRIPT_CHAM,               /* Cham */
+  XUNICODE_SCRIPT_OL_CHIKI,           /* Olck */
+  XUNICODE_SCRIPT_VAI,                /* Vaii */
+  XUNICODE_SCRIPT_CARIAN,             /* Cari */
+  XUNICODE_SCRIPT_LYCIAN,             /* Lyci */
+  XUNICODE_SCRIPT_LYDIAN,             /* Lydi */
 
   /* Unicode-5.2 additions */
-  G_UNICODE_SCRIPT_AVESTAN,                /* Avst */
-  G_UNICODE_SCRIPT_BAMUM,                  /* Bamu */
-  G_UNICODE_SCRIPT_EGYPTIAN_HIEROGLYPHS,   /* Egyp */
-  G_UNICODE_SCRIPT_IMPERIAL_ARAMAIC,       /* Armi */
-  G_UNICODE_SCRIPT_INSCRIPTIONAL_PAHLAVI,  /* Phli */
-  G_UNICODE_SCRIPT_INSCRIPTIONAL_PARTHIAN, /* Prti */
-  G_UNICODE_SCRIPT_JAVANESE,               /* Java */
-  G_UNICODE_SCRIPT_KAITHI,                 /* Kthi */
-  G_UNICODE_SCRIPT_LISU,                   /* Lisu */
-  G_UNICODE_SCRIPT_MEETEI_MAYEK,           /* Mtei */
-  G_UNICODE_SCRIPT_OLD_SOUTH_ARABIAN,      /* Sarb */
-  G_UNICODE_SCRIPT_OLD_TURKIC,             /* Orkh */
-  G_UNICODE_SCRIPT_SAMARITAN,              /* Samr */
-  G_UNICODE_SCRIPT_TAI_THAM,               /* Lana */
-  G_UNICODE_SCRIPT_TAI_VIET,               /* Tavt */
+  XUNICODE_SCRIPT_AVESTAN,                /* Avst */
+  XUNICODE_SCRIPT_BAMUM,                  /* Bamu */
+  XUNICODE_SCRIPT_EGYPTIAN_HIEROGLYPHS,   /* Egyp */
+  XUNICODE_SCRIPT_IMPERIAL_ARAMAIC,       /* Armi */
+  XUNICODE_SCRIPT_INSCRIPTIONAL_PAHLAVI,  /* Phli */
+  XUNICODE_SCRIPT_INSCRIPTIONAL_PARTHIAN, /* Prti */
+  XUNICODE_SCRIPT_JAVANESE,               /* Java */
+  XUNICODE_SCRIPT_KAITHI,                 /* Kthi */
+  XUNICODE_SCRIPT_LISU,                   /* Lisu */
+  XUNICODE_SCRIPT_MEETEI_MAYEK,           /* Mtei */
+  XUNICODE_SCRIPT_OLD_SOUTH_ARABIAN,      /* Sarb */
+  XUNICODE_SCRIPT_OLD_TURKIC,             /* Orkh */
+  XUNICODE_SCRIPT_SAMARITAN,              /* Samr */
+  XUNICODE_SCRIPT_TAI_THAM,               /* Lana */
+  XUNICODE_SCRIPT_TAI_VIET,               /* Tavt */
 
   /* Unicode-6.0 additions */
-  G_UNICODE_SCRIPT_BATAK,                  /* Batk */
-  G_UNICODE_SCRIPT_BRAHMI,                 /* Brah */
-  G_UNICODE_SCRIPT_MANDAIC,                /* Mand */
+  XUNICODE_SCRIPT_BATAK,                  /* Batk */
+  XUNICODE_SCRIPT_BRAHMI,                 /* Brah */
+  XUNICODE_SCRIPT_MANDAIC,                /* Mand */
 
   /* Unicode-6.1 additions */
-  G_UNICODE_SCRIPT_CHAKMA,                 /* Cakm */
-  G_UNICODE_SCRIPT_MEROITIC_CURSIVE,       /* Merc */
-  G_UNICODE_SCRIPT_MEROITIC_HIEROGLYPHS,   /* Mero */
-  G_UNICODE_SCRIPT_MIAO,                   /* Plrd */
-  G_UNICODE_SCRIPT_SHARADA,                /* Shrd */
-  G_UNICODE_SCRIPT_SORA_SOMPENG,           /* Sora */
-  G_UNICODE_SCRIPT_TAKRI,                  /* Takr */
+  XUNICODE_SCRIPT_CHAKMA,                 /* Cakm */
+  XUNICODE_SCRIPT_MEROITIC_CURSIVE,       /* Merc */
+  XUNICODE_SCRIPT_MEROITIC_HIEROGLYPHS,   /* Mero */
+  XUNICODE_SCRIPT_MIAO,                   /* Plrd */
+  XUNICODE_SCRIPT_SHARADA,                /* Shrd */
+  XUNICODE_SCRIPT_SORA_SOMPENG,           /* Sora */
+  XUNICODE_SCRIPT_TAKRI,                  /* Takr */
 
   /* Unicode 7.0 additions */
-  G_UNICODE_SCRIPT_BASSA_VAH,              /* Bass */
-  G_UNICODE_SCRIPT_CAUCASIAN_ALBANIAN,     /* Aghb */
-  G_UNICODE_SCRIPT_DUPLOYAN,               /* Dupl */
-  G_UNICODE_SCRIPT_ELBASAN,                /* Elba */
-  G_UNICODE_SCRIPT_GRANTHA,                /* Gran */
-  G_UNICODE_SCRIPT_KHOJKI,                 /* Khoj */
-  G_UNICODE_SCRIPT_KHUDAWADI,              /* Sind */
-  G_UNICODE_SCRIPT_LINEAR_A,               /* Lina */
-  G_UNICODE_SCRIPT_MAHAJANI,               /* Mahj */
-  G_UNICODE_SCRIPT_MANICHAEAN,             /* Mani */
-  G_UNICODE_SCRIPT_MENDE_KIKAKUI,          /* Mend */
-  G_UNICODE_SCRIPT_MODI,                   /* Modi */
-  G_UNICODE_SCRIPT_MRO,                    /* Mroo */
-  G_UNICODE_SCRIPT_NABATAEAN,              /* Nbat */
-  G_UNICODE_SCRIPT_OLD_NORTH_ARABIAN,      /* Narb */
-  G_UNICODE_SCRIPT_OLD_PERMIC,             /* Perm */
-  G_UNICODE_SCRIPT_PAHAWH_HMONG,           /* Hmng */
-  G_UNICODE_SCRIPT_PALMYRENE,              /* Palm */
-  G_UNICODE_SCRIPT_PAU_CIN_HAU,            /* Pauc */
-  G_UNICODE_SCRIPT_PSALTER_PAHLAVI,        /* Phlp */
-  G_UNICODE_SCRIPT_SIDDHAM,                /* Sidd */
-  G_UNICODE_SCRIPT_TIRHUTA,                /* Tirh */
-  G_UNICODE_SCRIPT_WARANG_CITI,            /* Wara */
+  XUNICODE_SCRIPT_BASSA_VAH,              /* Bass */
+  XUNICODE_SCRIPT_CAUCASIAN_ALBANIAN,     /* Aghb */
+  XUNICODE_SCRIPT_DUPLOYAN,               /* Dupl */
+  XUNICODE_SCRIPT_ELBASAN,                /* Elba */
+  XUNICODE_SCRIPT_GRANTHA,                /* Gran */
+  XUNICODE_SCRIPT_KHOJKI,                 /* Khoj */
+  XUNICODE_SCRIPT_KHUDAWADI,              /* Sind */
+  XUNICODE_SCRIPT_LINEAR_A,               /* Lina */
+  XUNICODE_SCRIPT_MAHAJANI,               /* Mahj */
+  XUNICODE_SCRIPT_MANICHAEAN,             /* Mani */
+  XUNICODE_SCRIPT_MENDE_KIKAKUI,          /* Mend */
+  XUNICODE_SCRIPT_MODI,                   /* Modi */
+  XUNICODE_SCRIPT_MRO,                    /* Mroo */
+  XUNICODE_SCRIPT_NABATAEAN,              /* Nbat */
+  XUNICODE_SCRIPT_OLD_NORTH_ARABIAN,      /* Narb */
+  XUNICODE_SCRIPT_OLD_PERMIC,             /* Perm */
+  XUNICODE_SCRIPT_PAHAWH_HMONG,           /* Hmng */
+  XUNICODE_SCRIPT_PALMYRENE,              /* Palm */
+  XUNICODE_SCRIPT_PAU_CIN_HAU,            /* Pauc */
+  XUNICODE_SCRIPT_PSALTER_PAHLAVI,        /* Phlp */
+  XUNICODE_SCRIPT_SIDDHAM,                /* Sidd */
+  XUNICODE_SCRIPT_TIRHUTA,                /* Tirh */
+  XUNICODE_SCRIPT_WARANG_CITI,            /* Wara */
 
   /* Unicode 8.0 additions */
-  G_UNICODE_SCRIPT_AHOM,                   /* Ahom */
-  G_UNICODE_SCRIPT_ANATOLIAN_HIEROGLYPHS,  /* Hluw */
-  G_UNICODE_SCRIPT_HATRAN,                 /* Hatr */
-  G_UNICODE_SCRIPT_MULTANI,                /* Mult */
-  G_UNICODE_SCRIPT_OLD_HUNGARIAN,          /* Hung */
-  G_UNICODE_SCRIPT_SIGNWRITING,            /* Sgnw */
+  XUNICODE_SCRIPT_AHOM,                   /* Ahom */
+  XUNICODE_SCRIPT_ANATOLIAN_HIEROGLYPHS,  /* Hluw */
+  XUNICODE_SCRIPT_HATRAN,                 /* Hatr */
+  XUNICODE_SCRIPT_MULTANI,                /* Mult */
+  XUNICODE_SCRIPT_OLD_HUNGARIAN,          /* Hung */
+  XUNICODE_SCRIPT_SIGNWRITING,            /* Sgnw */
 
   /* Unicode 9.0 additions */
-  G_UNICODE_SCRIPT_ADLAM,                  /* Adlm */
-  G_UNICODE_SCRIPT_BHAIKSUKI,              /* Bhks */
-  G_UNICODE_SCRIPT_MARCHEN,                /* Marc */
-  G_UNICODE_SCRIPT_NEWA,                   /* Newa */
-  G_UNICODE_SCRIPT_OSAGE,                  /* Osge */
-  G_UNICODE_SCRIPT_TANGUT,                 /* Tang */
+  XUNICODE_SCRIPT_ADLAM,                  /* Adlm */
+  XUNICODE_SCRIPT_BHAIKSUKI,              /* Bhks */
+  XUNICODE_SCRIPT_MARCHEN,                /* Marc */
+  XUNICODE_SCRIPT_NEWA,                   /* Newa */
+  XUNICODE_SCRIPT_OSAGE,                  /* Osge */
+  XUNICODE_SCRIPT_TANGUT,                 /* Tang */
 
   /* Unicode 10.0 additions */
-  G_UNICODE_SCRIPT_MASARAM_GONDI,          /* Gonm */
-  G_UNICODE_SCRIPT_NUSHU,                  /* Nshu */
-  G_UNICODE_SCRIPT_SOYOMBO,                /* Soyo */
-  G_UNICODE_SCRIPT_ZANABAZAR_SQUARE,       /* Zanb */
+  XUNICODE_SCRIPT_MASARAM_GONDI,          /* Gonm */
+  XUNICODE_SCRIPT_NUSHU,                  /* Nshu */
+  XUNICODE_SCRIPT_SOYOMBO,                /* Soyo */
+  XUNICODE_SCRIPT_ZANABAZAR_SQUARE,       /* Zanb */
 
   /* Unicode 11.0 additions */
-  G_UNICODE_SCRIPT_DOGRA,                  /* Dogr */
-  G_UNICODE_SCRIPT_GUNJALA_GONDI,          /* Gong */
-  G_UNICODE_SCRIPT_HANIFI_ROHINGYA,        /* Rohg */
-  G_UNICODE_SCRIPT_MAKASAR,                /* Maka */
-  G_UNICODE_SCRIPT_MEDEFAIDRIN,            /* Medf */
-  G_UNICODE_SCRIPT_OLD_SOGDIAN,            /* Sogo */
-  G_UNICODE_SCRIPT_SOGDIAN,                /* Sogd */
+  XUNICODE_SCRIPT_DOGRA,                  /* Dogr */
+  XUNICODE_SCRIPT_GUNJALA_GONDI,          /* Gong */
+  XUNICODE_SCRIPT_HANIFI_ROHINGYA,        /* Rohg */
+  XUNICODE_SCRIPT_MAKASAR,                /* Maka */
+  XUNICODE_SCRIPT_MEDEFAIDRIN,            /* Medf */
+  XUNICODE_SCRIPT_OLD_SOGDIAN,            /* Sogo */
+  XUNICODE_SCRIPT_SOGDIAN,                /* Sogd */
 
   /* Unicode 12.0 additions */
-  G_UNICODE_SCRIPT_ELYMAIC,                /* Elym */
-  G_UNICODE_SCRIPT_NANDINAGARI,            /* Nand */
-  G_UNICODE_SCRIPT_NYIAKENG_PUACHUE_HMONG, /* Rohg */
-  G_UNICODE_SCRIPT_WANCHO,                 /* Wcho */
+  XUNICODE_SCRIPT_ELYMAIC,                /* Elym */
+  XUNICODE_SCRIPT_NANDINAGARI,            /* Nand */
+  XUNICODE_SCRIPT_NYIAKENG_PUACHUE_HMONG, /* Rohg */
+  XUNICODE_SCRIPT_WANCHO,                 /* Wcho */
 
   /* Unicode 13.0 additions */
-  G_UNICODE_SCRIPT_CHORASMIAN,             /* Chrs */
-  G_UNICODE_SCRIPT_DIVES_AKURU,            /* Diak */
-  G_UNICODE_SCRIPT_KHITAN_SMALL_SCRIPT,    /* Kits */
-  G_UNICODE_SCRIPT_YEZIDI,                 /* Yezi */
+  XUNICODE_SCRIPT_CHORASMIAN,             /* Chrs */
+  XUNICODE_SCRIPT_DIVES_AKURU,            /* Diak */
+  XUNICODE_SCRIPT_KHITAN_SMALL_SCRIPT,    /* Kits */
+  XUNICODE_SCRIPT_YEZIDI,                 /* Yezi */
 
   /* Unicode 14.0 additions */
-  G_UNICODE_SCRIPT_CYPRO_MINOAN,           /* Cpmn */
-  G_UNICODE_SCRIPT_OLD_UYGHUR,             /* Ougr */
-  G_UNICODE_SCRIPT_TANGSA,                 /* Tnsa */
-  G_UNICODE_SCRIPT_TOTO,                   /* Toto */
-  G_UNICODE_SCRIPT_VITHKUQI,               /* Vith */
+  XUNICODE_SCRIPT_CYPRO_MINOAN,           /* Cpmn */
+  XUNICODE_SCRIPT_OLD_UYGHUR,             /* Ougr */
+  XUNICODE_SCRIPT_TANGSA,                 /* Tnsa */
+  XUNICODE_SCRIPT_TOTO,                   /* Toto */
+  XUNICODE_SCRIPT_VITHKUQI,               /* Vith */
 
   /* not really a Unicode script, but part of ISO 15924 */
-  G_UNICODE_SCRIPT_MATH,                   /* Zmth */
-} GUnicodeScript;
+  XUNICODE_SCRIPT_MATH,                   /* Zmth */
+} xunicode_script_t;
 
 XPL_AVAILABLE_IN_ALL
-guint32        g_unicode_script_to_iso15924   (GUnicodeScript script);
+xuint32_t        xunicode_script_to_iso15924   (xunicode_script_t script);
 XPL_AVAILABLE_IN_ALL
-GUnicodeScript g_unicode_script_from_iso15924 (guint32        iso15924);
+xunicode_script_t xunicode_script_from_iso15924 (xuint32_t        iso15924);
 
 /* These are all analogs of the <ctype.h> functions.
  */
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_isalnum   (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_isalnum   (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_isalpha   (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_isalpha   (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_iscntrl   (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_iscntrl   (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_isdigit   (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_isdigit   (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_isgraph   (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_isgraph   (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_islower   (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_islower   (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_isprint   (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_isprint   (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_ispunct   (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_ispunct   (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_isspace   (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_isspace   (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_isupper   (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_isupper   (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_isxdigit  (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_isxdigit  (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_istitle   (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_istitle   (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_isdefined (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_isdefined (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_iswide    (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_iswide    (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_iswide_cjk(gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_iswide_cjk(xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_iszerowidth(gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_iszerowidth(xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_ismark    (gunichar c) G_GNUC_CONST;
+xboolean_t xunichar_ismark    (xunichar_t c) G_GNUC_CONST;
 
 /* More <ctype.h> functions.  These convert between the three cases.
  * See the Unicode book to understand title case.  */
 XPL_AVAILABLE_IN_ALL
-gunichar g_unichar_toupper (gunichar c) G_GNUC_CONST;
+xunichar_t xunichar_toupper (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-gunichar g_unichar_tolower (gunichar c) G_GNUC_CONST;
+xunichar_t xunichar_tolower (xunichar_t c) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-gunichar g_unichar_totitle (gunichar c) G_GNUC_CONST;
+xunichar_t xunichar_totitle (xunichar_t c) G_GNUC_CONST;
 
-/* If C is a digit (according to 'g_unichar_isdigit'), then return its
+/* If C is a digit (according to 'xunichar_isdigit'), then return its
    numeric value.  Otherwise return -1.  */
 XPL_AVAILABLE_IN_ALL
-xint_t g_unichar_digit_value (gunichar c) G_GNUC_CONST;
+xint_t xunichar_digit_value (xunichar_t c) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-xint_t g_unichar_xdigit_value (gunichar c) G_GNUC_CONST;
+xint_t xunichar_xdigit_value (xunichar_t c) G_GNUC_CONST;
 
 /* Return the Unicode character type of a given character.  */
 XPL_AVAILABLE_IN_ALL
-GUnicodeType g_unichar_type (gunichar c) G_GNUC_CONST;
+xunicode_type_t xunichar_type (xunichar_t c) G_GNUC_CONST;
 
 /* Return the line break property for a given character */
 XPL_AVAILABLE_IN_ALL
-GUnicodeBreakType g_unichar_break_type (gunichar c) G_GNUC_CONST;
+GUnicodeBreakType xunichar_break_type (xunichar_t c) G_GNUC_CONST;
 
 /* Returns the combining class for a given character */
 XPL_AVAILABLE_IN_ALL
-xint_t g_unichar_combining_class (gunichar uc) G_GNUC_CONST;
+xint_t xunichar_combining_class (xunichar_t uc) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_get_mirror_char (gunichar ch,
-                                    gunichar *mirrored_ch);
+xboolean_t xunichar_get_mirror_char (xunichar_t ch,
+                                    xunichar_t *mirrored_ch);
 
 XPL_AVAILABLE_IN_ALL
-GUnicodeScript g_unichar_get_script (gunichar ch) G_GNUC_CONST;
+xunicode_script_t xunichar_get_script (xunichar_t ch) G_GNUC_CONST;
 
 /* Validate a Unicode character */
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_validate (gunichar ch) G_GNUC_CONST;
+xboolean_t xunichar_validate (xunichar_t ch) G_GNUC_CONST;
 
 /* Pairwise canonical compose/decompose */
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_compose (gunichar  a,
-                            gunichar  b,
-                            gunichar *ch);
+xboolean_t xunichar_compose (xunichar_t  a,
+                            xunichar_t  b,
+                            xunichar_t *ch);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_unichar_decompose (gunichar  ch,
-                              gunichar *a,
-                              gunichar *b);
+xboolean_t xunichar_decompose (xunichar_t  ch,
+                              xunichar_t *a,
+                              xunichar_t *b);
 
 XPL_AVAILABLE_IN_ALL
-xsize_t g_unichar_fully_decompose (gunichar  ch,
+xsize_t xunichar_fully_decompose (xunichar_t  ch,
                                  xboolean_t  compat,
-                                 gunichar *result,
+                                 xunichar_t *result,
                                  xsize_t     result_len);
 
 /**
@@ -760,20 +760,20 @@ xsize_t g_unichar_fully_decompose (gunichar  ch,
    decomposed characters in the string according to their combining
    classes.  See the Unicode manual for more information.  */
 XPL_AVAILABLE_IN_ALL
-void g_unicode_canonical_ordering (gunichar *string,
+void xunicode_canonical_ordering (xunichar_t *string,
                                    xsize_t     len);
 
 
 XPL_DEPRECATED_IN_2_30
-gunichar *g_unicode_canonical_decomposition (gunichar  ch,
+xunichar_t *xunicode_canonical_decomposition (xunichar_t  ch,
                                              xsize_t    *result_len) G_GNUC_MALLOC;
 
 /* Array of skip-bytes-per-initial character.
  */
-XPL_VAR const xchar_t * const g_utf8_skip;
+XPL_VAR const xchar_t * const xutf8_skip;
 
 /**
- * g_utf8_next_char:
+ * xutf8_next_char:
  * @p: Pointer to the start of a valid UTF-8 character
  *
  * Skips to the next character in a UTF-8 string.
@@ -785,141 +785,141 @@ XPL_VAR const xchar_t * const g_utf8_skip;
  *
  * The macro returns the start of the next UTF-8 character.
  *
- * Before using this macro, use g_utf8_validate() to validate strings
+ * Before using this macro, use xutf8_validate() to validate strings
  * that may contain invalid UTF-8.
  */
-#define g_utf8_next_char(p) (char *)((p) + g_utf8_skip[*(const guchar *)(p)])
+#define xutf8_next_char(p) (char *)((p) + xutf8_skip[*(const guchar *)(p)])
 
 XPL_AVAILABLE_IN_ALL
-gunichar g_utf8_get_char           (const xchar_t  *p) G_GNUC_PURE;
+xunichar_t xutf8_get_char           (const xchar_t  *p) G_GNUC_PURE;
 XPL_AVAILABLE_IN_ALL
-gunichar g_utf8_get_char_validated (const  xchar_t *p,
-                                    gssize        max_len) G_GNUC_PURE;
+xunichar_t xutf8_get_char_validated (const  xchar_t *p,
+                                    xssize_t        max_len) G_GNUC_PURE;
 
 XPL_AVAILABLE_IN_ALL
-xchar_t*   g_utf8_offset_to_pointer (const xchar_t *str,
-                                   glong        offset) G_GNUC_PURE;
+xchar_t*   xutf8_offset_to_pointer (const xchar_t *str,
+                                   xlong_t        offset) G_GNUC_PURE;
 XPL_AVAILABLE_IN_ALL
-glong    g_utf8_pointer_to_offset (const xchar_t *str,
+xlong_t    xutf8_pointer_to_offset (const xchar_t *str,
                                    const xchar_t *pos) G_GNUC_PURE;
 XPL_AVAILABLE_IN_ALL
-xchar_t*   g_utf8_prev_char         (const xchar_t *p) G_GNUC_PURE;
+xchar_t*   xutf8_prev_char         (const xchar_t *p) G_GNUC_PURE;
 XPL_AVAILABLE_IN_ALL
-xchar_t*   g_utf8_find_next_char    (const xchar_t *p,
+xchar_t*   xutf8_find_next_char    (const xchar_t *p,
                                    const xchar_t *end) G_GNUC_PURE;
 XPL_AVAILABLE_IN_ALL
-xchar_t*   g_utf8_find_prev_char    (const xchar_t *str,
+xchar_t*   xutf8_find_prev_char    (const xchar_t *str,
                                    const xchar_t *p) G_GNUC_PURE;
 
 XPL_AVAILABLE_IN_ALL
-glong    g_utf8_strlen            (const xchar_t *p,
-                                   gssize       max) G_GNUC_PURE;
+xlong_t    xutf8_strlen            (const xchar_t *p,
+                                   xssize_t       max) G_GNUC_PURE;
 
 XPL_AVAILABLE_IN_2_30
-xchar_t   *g_utf8_substring         (const xchar_t *str,
-                                   glong        start_pos,
-                                   glong        end_pos) G_GNUC_MALLOC;
+xchar_t   *xutf8_substring         (const xchar_t *str,
+                                   xlong_t        start_pos,
+                                   xlong_t        end_pos) G_GNUC_MALLOC;
 
 XPL_AVAILABLE_IN_ALL
-xchar_t   *g_utf8_strncpy           (xchar_t       *dest,
+xchar_t   *xutf8_strncpy           (xchar_t       *dest,
                                    const xchar_t *src,
                                    xsize_t        n);
 
 /* Find the UTF-8 character corresponding to ch, in string p. These
    functions are equivalants to strchr and strrchr */
 XPL_AVAILABLE_IN_ALL
-xchar_t* g_utf8_strchr  (const xchar_t *p,
-                       gssize       len,
-                       gunichar     c);
+xchar_t* xutf8_strchr  (const xchar_t *p,
+                       xssize_t       len,
+                       xunichar_t     c);
 XPL_AVAILABLE_IN_ALL
-xchar_t* g_utf8_strrchr (const xchar_t *p,
-                       gssize       len,
-                       gunichar     c);
+xchar_t* xutf8_strrchr (const xchar_t *p,
+                       xssize_t       len,
+                       xunichar_t     c);
 XPL_AVAILABLE_IN_ALL
-xchar_t* g_utf8_strreverse (const xchar_t *str,
-                          gssize len);
+xchar_t* xutf8_strreverse (const xchar_t *str,
+                          xssize_t len);
 
 XPL_AVAILABLE_IN_ALL
-gunichar2 *g_utf8_to_utf16     (const xchar_t      *str,
-                                glong             len,
-                                glong            *items_read,
-                                glong            *items_written,
+xunichar2_t *xutf8_to_utf16     (const xchar_t      *str,
+                                xlong_t             len,
+                                xlong_t            *items_read,
+                                xlong_t            *items_written,
                                 xerror_t          **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-gunichar * g_utf8_to_ucs4      (const xchar_t      *str,
-                                glong             len,
-                                glong            *items_read,
-                                glong            *items_written,
+xunichar_t * xutf8_to_ucs4      (const xchar_t      *str,
+                                xlong_t             len,
+                                xlong_t            *items_read,
+                                xlong_t            *items_written,
                                 xerror_t          **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-gunichar * g_utf8_to_ucs4_fast (const xchar_t      *str,
-                                glong             len,
-                                glong            *items_written) G_GNUC_MALLOC;
+xunichar_t * xutf8_to_ucs4_fast (const xchar_t      *str,
+                                xlong_t             len,
+                                xlong_t            *items_written) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-gunichar * g_utf16_to_ucs4     (const gunichar2  *str,
-                                glong             len,
-                                glong            *items_read,
-                                glong            *items_written,
+xunichar_t * xutf16_to_ucs4     (const xunichar2_t  *str,
+                                xlong_t             len,
+                                xlong_t            *items_read,
+                                xlong_t            *items_written,
                                 xerror_t          **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-xchar_t*     g_utf16_to_utf8     (const gunichar2  *str,
-                                glong             len,
-                                glong            *items_read,
-                                glong            *items_written,
+xchar_t*     xutf16_to_utf8     (const xunichar2_t  *str,
+                                xlong_t             len,
+                                xlong_t            *items_read,
+                                xlong_t            *items_written,
                                 xerror_t          **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-gunichar2 *g_ucs4_to_utf16     (const gunichar   *str,
-                                glong             len,
-                                glong            *items_read,
-                                glong            *items_written,
+xunichar2_t *g_ucs4_to_utf16     (const xunichar_t   *str,
+                                xlong_t             len,
+                                xlong_t            *items_read,
+                                xlong_t            *items_written,
                                 xerror_t          **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-xchar_t*     g_ucs4_to_utf8      (const gunichar   *str,
-                                glong             len,
-                                glong            *items_read,
-                                glong            *items_written,
+xchar_t*     g_ucs4_to_utf8      (const xunichar_t   *str,
+                                xlong_t             len,
+                                xlong_t            *items_read,
+                                xlong_t            *items_written,
                                 xerror_t          **error) G_GNUC_MALLOC;
 
 XPL_AVAILABLE_IN_ALL
-xint_t      g_unichar_to_utf8 (gunichar    c,
+xint_t      xunichar_to_utf8 (xunichar_t    c,
                              xchar_t      *outbuf);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_utf8_validate (const xchar_t  *str,
-                          gssize        max_len,
+xboolean_t xutf8_validate (const xchar_t  *str,
+                          xssize_t        max_len,
                           const xchar_t **end);
 XPL_AVAILABLE_IN_2_60
-xboolean_t g_utf8_validate_len (const xchar_t  *str,
+xboolean_t xutf8_validate_len (const xchar_t  *str,
                               xsize_t         max_len,
                               const xchar_t **end);
 
 XPL_AVAILABLE_IN_ALL
-xchar_t *g_utf8_strup   (const xchar_t *str,
-                       gssize       len) G_GNUC_MALLOC;
+xchar_t *xutf8_strup   (const xchar_t *str,
+                       xssize_t       len) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-xchar_t *g_utf8_strdown (const xchar_t *str,
-                       gssize       len) G_GNUC_MALLOC;
+xchar_t *xutf8_strdown (const xchar_t *str,
+                       xssize_t       len) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-xchar_t *g_utf8_casefold (const xchar_t *str,
-                        gssize       len) G_GNUC_MALLOC;
+xchar_t *xutf8_casefold (const xchar_t *str,
+                        xssize_t       len) G_GNUC_MALLOC;
 
 /**
- * GNormalizeMode:
- * @G_NORMALIZE_DEFAULT: standardize differences that do not affect the
+ * xnormalize_mode:
+ * @XNORMALIZE_DEFAULT: standardize differences that do not affect the
  *     text content, such as the above-mentioned accent representation
- * @G_NORMALIZE_NFD: another name for %G_NORMALIZE_DEFAULT
- * @G_NORMALIZE_DEFAULT_COMPOSE: like %G_NORMALIZE_DEFAULT, but with
+ * @XNORMALIZE_NFD: another name for %XNORMALIZE_DEFAULT
+ * @XNORMALIZE_DEFAULT_COMPOSE: like %XNORMALIZE_DEFAULT, but with
  *     composed forms rather than a maximally decomposed form
- * @G_NORMALIZE_NFC: another name for %G_NORMALIZE_DEFAULT_COMPOSE
- * @G_NORMALIZE_ALL: beyond %G_NORMALIZE_DEFAULT also standardize the
+ * @XNORMALIZE_NFC: another name for %XNORMALIZE_DEFAULT_COMPOSE
+ * @XNORMALIZE_ALL: beyond %XNORMALIZE_DEFAULT also standardize the
  *     "compatibility" characters in Unicode, such as SUPERSCRIPT THREE
  *     to the standard forms (in this case DIGIT THREE). Formatting
  *     information may be lost but for most text operations such
  *     characters should be considered the same
- * @G_NORMALIZE_NFKD: another name for %G_NORMALIZE_ALL
- * @G_NORMALIZE_ALL_COMPOSE: like %G_NORMALIZE_ALL, but with composed
+ * @XNORMALIZE_NFKD: another name for %XNORMALIZE_ALL
+ * @XNORMALIZE_ALL_COMPOSE: like %XNORMALIZE_ALL, but with composed
  *     forms rather than a maximally decomposed form
- * @G_NORMALIZE_NFKC: another name for %G_NORMALIZE_ALL_COMPOSE
+ * @XNORMALIZE_NFKC: another name for %XNORMALIZE_ALL_COMPOSE
  *
  * Defines how a Unicode string is transformed in a canonical
  * form, standardizing such issues as whether a character with
@@ -928,35 +928,35 @@ xchar_t *g_utf8_casefold (const xchar_t *str,
  * should generally be normalized before comparing them.
  */
 typedef enum {
-  G_NORMALIZE_DEFAULT,
-  G_NORMALIZE_NFD = G_NORMALIZE_DEFAULT,
-  G_NORMALIZE_DEFAULT_COMPOSE,
-  G_NORMALIZE_NFC = G_NORMALIZE_DEFAULT_COMPOSE,
-  G_NORMALIZE_ALL,
-  G_NORMALIZE_NFKD = G_NORMALIZE_ALL,
-  G_NORMALIZE_ALL_COMPOSE,
-  G_NORMALIZE_NFKC = G_NORMALIZE_ALL_COMPOSE
-} GNormalizeMode;
+  XNORMALIZE_DEFAULT,
+  XNORMALIZE_NFD = XNORMALIZE_DEFAULT,
+  XNORMALIZE_DEFAULT_COMPOSE,
+  XNORMALIZE_NFC = XNORMALIZE_DEFAULT_COMPOSE,
+  XNORMALIZE_ALL,
+  XNORMALIZE_NFKD = XNORMALIZE_ALL,
+  XNORMALIZE_ALL_COMPOSE,
+  XNORMALIZE_NFKC = XNORMALIZE_ALL_COMPOSE
+} xnormalize_mode_t;
 
 XPL_AVAILABLE_IN_ALL
-xchar_t *g_utf8_normalize (const xchar_t   *str,
-                         gssize         len,
-                         GNormalizeMode mode) G_GNUC_MALLOC;
+xchar_t *xutf8_normalize (const xchar_t   *str,
+                         xssize_t         len,
+                         xnormalize_mode_t mode) G_GNUC_MALLOC;
 
 XPL_AVAILABLE_IN_ALL
-xint_t   g_utf8_collate     (const xchar_t *str1,
+xint_t   xutf8_collate     (const xchar_t *str1,
                            const xchar_t *str2) G_GNUC_PURE;
 XPL_AVAILABLE_IN_ALL
-xchar_t *g_utf8_collate_key (const xchar_t *str,
-                           gssize       len) G_GNUC_MALLOC;
+xchar_t *xutf8_collate_key (const xchar_t *str,
+                           xssize_t       len) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-xchar_t *g_utf8_collate_key_for_filename (const xchar_t *str,
-                                        gssize       len) G_GNUC_MALLOC;
+xchar_t *xutf8_collate_key_for_filename (const xchar_t *str,
+                                        xssize_t       len) G_GNUC_MALLOC;
 
 XPL_AVAILABLE_IN_2_52
-xchar_t *g_utf8_make_valid (const xchar_t *str,
-                          gssize       len) G_GNUC_MALLOC;
+xchar_t *xutf8_make_valid (const xchar_t *str,
+                          xssize_t       len) G_GNUC_MALLOC;
 
 G_END_DECLS
 
-#endif /* __G_UNICODE_H__ */
+#endif /* __XUNICODE_H__ */

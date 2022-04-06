@@ -39,7 +39,7 @@ typedef enum
 } GShellError;
 
 XPL_AVAILABLE_IN_ALL
-GQuark g_shell_error_quark (void);
+xquark g_shell_error_quark (void);
 
 XPL_AVAILABLE_IN_ALL
 xchar_t*   g_shell_quote      (const xchar_t   *unquoted_string);

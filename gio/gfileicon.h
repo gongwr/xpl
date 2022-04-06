@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __G_FILE_ICON_H__
-#define __G_FILE_ICON_H__
+#ifndef __XFILE_ICON_H__
+#define __XFILE_ICON_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,29 +29,29 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_FILE_ICON         (g_file_icon_get_type ())
-#define G_FILE_ICON(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FILE_ICON, GFileIcon))
-#define G_FILE_ICON_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILE_ICON, GFileIconClass))
+#define XTYPE_FILE_ICON         (xfile_icon_get_type ())
+#define XFILE_ICON(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FILE_ICON, xfile_icon))
+#define XFILE_ICON_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILE_ICON, GFileIconClass))
 #define X_IS_FILE_ICON(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_FILE_ICON))
 #define X_IS_FILE_ICON_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_FILE_ICON))
-#define G_FILE_ICON_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILE_ICON, GFileIconClass))
+#define XFILE_ICON_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILE_ICON, GFileIconClass))
 
 /**
- * GFileIcon:
+ * xfile_icon_t:
  *
- * Gets an icon for a #xfile_t. Implements #GLoadableIcon.
+ * Gets an icon for a #xfile_t. Implements #xloadable_icon_t.
  **/
 typedef struct _GFileIconClass   GFileIconClass;
 
 XPL_AVAILABLE_IN_ALL
-xtype_t   g_file_icon_get_type (void) G_GNUC_CONST;
+xtype_t   xfile_icon_get_type (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-xicon_t * g_file_icon_new      (xfile_t     *file);
+xicon_t * xfile_icon_new      (xfile_t     *file);
 
 XPL_AVAILABLE_IN_ALL
-xfile_t * g_file_icon_get_file (GFileIcon *icon);
+xfile_t * xfile_icon_get_file (xfile_icon_t *icon);
 
 G_END_DECLS
 
-#endif /* __G_FILE_ICON_H__ */
+#endif /* __XFILE_ICON_H__ */

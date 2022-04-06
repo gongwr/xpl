@@ -26,7 +26,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_DBUS_INTERFACE_SKELETON         (g_dbus_interface_skeleton_get_type ())
-#define G_DBUS_INTERFACE_SKELETON(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_INTERFACE_SKELETON, GDBusInterfaceSkeleton))
+#define G_DBUS_INTERFACE_SKELETON(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_INTERFACE_SKELETON, xdbus_interface_skeleton))
 #define G_DBUS_INTERFACE_SKELETON_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DBUS_INTERFACE_SKELETON, GDBusInterfaceSkeletonClass))
 #define G_DBUS_INTERFACE_SKELETON_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DBUS_INTERFACE_SKELETON, GDBusInterfaceSkeletonClass))
 #define X_IS_DBUS_INTERFACE_SKELETON(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_INTERFACE_SKELETON))
@@ -36,9 +36,9 @@ typedef struct _GDBusInterfaceSkeletonClass   GDBusInterfaceSkeletonClass;
 typedef struct _GDBusInterfaceSkeletonPrivate GDBusInterfaceSkeletonPrivate;
 
 /**
- * GDBusInterfaceSkeleton:
+ * xdbus_interface_skeleton_t:
  *
- * The #GDBusInterfaceSkeleton structure contains private data and should
+ * The #xdbus_interface_skeleton_t structure contains private data and should
  * only be accessed using the provided API.
  *
  * Since: 2.30
@@ -53,13 +53,13 @@ struct _GDBusInterfaceSkeleton
 /**
  * GDBusInterfaceSkeletonClass:
  * @parent_class: The parent class.
- * @get_info: Returns a #GDBusInterfaceInfo. See g_dbus_interface_skeleton_get_info() for details.
- * @get_vtable: Returns a #GDBusInterfaceVTable. See g_dbus_interface_skeleton_get_vtable() for details.
+ * @get_info: Returns a #xdbus_interface_info_t. See g_dbus_interface_skeleton_get_info() for details.
+ * @get_vtable: Returns a #xdbus_interface_vtable_t. See g_dbus_interface_skeleton_get_vtable() for details.
  * @get_properties: Returns a #xvariant_t with all properties. See g_dbus_interface_skeleton_get_properties().
  * @flush: Emits outstanding changes, if any. See g_dbus_interface_skeleton_flush().
- * @g_authorize_method: Signal class handler for the #GDBusInterfaceSkeleton::g-authorize-method signal.
+ * @g_authorize_method: Signal class handler for the #xdbus_interface_skeleton_t::g-authorize-method signal.
  *
- * Class structure for #GDBusInterfaceSkeleton.
+ * Class structure for #xdbus_interface_skeleton_t.
  *
  * Since: 2.30
  */
@@ -68,18 +68,18 @@ struct _GDBusInterfaceSkeletonClass
   xobject_class_t parent_class;
 
   /* Virtual Functions */
-  GDBusInterfaceInfo   *(*get_info)       (GDBusInterfaceSkeleton  *interface_);
-  GDBusInterfaceVTable *(*get_vtable)     (GDBusInterfaceSkeleton  *interface_);
-  xvariant_t             *(*get_properties) (GDBusInterfaceSkeleton  *interface_);
-  void                  (*flush)          (GDBusInterfaceSkeleton  *interface_);
+  xdbus_interface_info_t   *(*get_info)       (xdbus_interface_skeleton_t  *interface_);
+  xdbus_interface_vtable_t *(*get_vtable)     (xdbus_interface_skeleton_t  *interface_);
+  xvariant_t             *(*get_properties) (xdbus_interface_skeleton_t  *interface_);
+  void                  (*flush)          (xdbus_interface_skeleton_t  *interface_);
 
   /*< private >*/
   xpointer_t vfunc_padding[8];
   /*< public >*/
 
   /* Signals */
-  xboolean_t (*g_authorize_method) (GDBusInterfaceSkeleton  *interface_,
-                                  GDBusMethodInvocation   *invocation);
+  xboolean_t (*g_authorize_method) (xdbus_interface_skeleton_t  *interface_,
+                                  xdbus_method_invocation_t   *invocation);
 
   /*< private >*/
   xpointer_t signal_padding[8];
@@ -88,39 +88,39 @@ struct _GDBusInterfaceSkeletonClass
 XPL_AVAILABLE_IN_ALL
 xtype_t                        g_dbus_interface_skeleton_get_type        (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-GDBusInterfaceSkeletonFlags  g_dbus_interface_skeleton_get_flags       (GDBusInterfaceSkeleton      *interface_);
+GDBusInterfaceSkeletonFlags  g_dbus_interface_skeleton_get_flags       (xdbus_interface_skeleton_t      *interface_);
 XPL_AVAILABLE_IN_ALL
-void                         g_dbus_interface_skeleton_set_flags       (GDBusInterfaceSkeleton      *interface_,
+void                         g_dbus_interface_skeleton_set_flags       (xdbus_interface_skeleton_t      *interface_,
                                                                         GDBusInterfaceSkeletonFlags  flags);
 XPL_AVAILABLE_IN_ALL
-GDBusInterfaceInfo          *g_dbus_interface_skeleton_get_info        (GDBusInterfaceSkeleton      *interface_);
+xdbus_interface_info_t          *g_dbus_interface_skeleton_get_info        (xdbus_interface_skeleton_t      *interface_);
 XPL_AVAILABLE_IN_ALL
-GDBusInterfaceVTable        *g_dbus_interface_skeleton_get_vtable      (GDBusInterfaceSkeleton      *interface_);
+xdbus_interface_vtable_t        *g_dbus_interface_skeleton_get_vtable      (xdbus_interface_skeleton_t      *interface_);
 XPL_AVAILABLE_IN_ALL
-xvariant_t                    *g_dbus_interface_skeleton_get_properties  (GDBusInterfaceSkeleton      *interface_);
+xvariant_t                    *g_dbus_interface_skeleton_get_properties  (xdbus_interface_skeleton_t      *interface_);
 XPL_AVAILABLE_IN_ALL
-void                         g_dbus_interface_skeleton_flush           (GDBusInterfaceSkeleton      *interface_);
+void                         g_dbus_interface_skeleton_flush           (xdbus_interface_skeleton_t      *interface_);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t                     g_dbus_interface_skeleton_export          (GDBusInterfaceSkeleton      *interface_,
-                                                                        GDBusConnection             *connection,
+xboolean_t                     g_dbus_interface_skeleton_export          (xdbus_interface_skeleton_t      *interface_,
+                                                                        xdbus_connection_t             *connection,
                                                                         const xchar_t                 *object_path,
                                                                         xerror_t                     **error);
 XPL_AVAILABLE_IN_ALL
-void                         g_dbus_interface_skeleton_unexport        (GDBusInterfaceSkeleton      *interface_);
+void                         g_dbus_interface_skeleton_unexport        (xdbus_interface_skeleton_t      *interface_);
 XPL_AVAILABLE_IN_ALL
-void                g_dbus_interface_skeleton_unexport_from_connection (GDBusInterfaceSkeleton      *interface_,
-                                                                        GDBusConnection             *connection);
+void                g_dbus_interface_skeleton_unexport_from_connection (xdbus_interface_skeleton_t      *interface_,
+                                                                        xdbus_connection_t             *connection);
 
 XPL_AVAILABLE_IN_ALL
-GDBusConnection             *g_dbus_interface_skeleton_get_connection  (GDBusInterfaceSkeleton      *interface_);
+xdbus_connection_t             *g_dbus_interface_skeleton_get_connection  (xdbus_interface_skeleton_t      *interface_);
 XPL_AVAILABLE_IN_ALL
-xlist_t                       *g_dbus_interface_skeleton_get_connections (GDBusInterfaceSkeleton      *interface_);
+xlist_t                       *g_dbus_interface_skeleton_get_connections (xdbus_interface_skeleton_t      *interface_);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                     g_dbus_interface_skeleton_has_connection  (GDBusInterfaceSkeleton      *interface_,
-                                                                        GDBusConnection             *connection);
+xboolean_t                     g_dbus_interface_skeleton_has_connection  (xdbus_interface_skeleton_t      *interface_,
+                                                                        xdbus_connection_t             *connection);
 XPL_AVAILABLE_IN_ALL
-const xchar_t                 *g_dbus_interface_skeleton_get_object_path (GDBusInterfaceSkeleton      *interface_);
+const xchar_t                 *g_dbus_interface_skeleton_get_object_path (xdbus_interface_skeleton_t      *interface_);
 
 G_END_DECLS
 

@@ -34,8 +34,8 @@ msgid "Seek not supported on base stream"
 msgstr "ئاساسىي ئېقىم يۆتكىلىش(Seek) نى قوللىمايدۇ"
 
 #: ../gio/gbufferedinputstream.c:945
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "ئېقىم GBufferedInputStream نى قىسقارتقىلى بولمىدى"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "ئېقىم xbuffered_input_stream نى قىسقارتقىلى بولمىدى"
 
 #: ../gio/gbufferedinputstream.c:990 ../gio/ginputstream.c:1023
 #: ../gio/giostream.c:291 ../gio/goutputstream.c:1334
@@ -110,16 +110,16 @@ msgid "%s filetype"
 msgstr "%s ھۆججەت تىپى"
 
 #: ../gio/gcredentials.c:264 ../gio/gcredentials.c:528
-msgid "GCredentials is not implemented on this OS"
-msgstr "GCredentials نى بۇ مەشغۇلات سىستېمىسىدا ئىشلەتكىلى بولمايدۇ"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "xcredentials_t نى بۇ مەشغۇلات سىستېمىسىدا ئىشلەتكىلى بولمايدۇ"
 
 #: ../gio/gcredentials.c:438
-msgid "There is no GCredentials support for your platform"
-msgstr "سىستېمىڭىز GCredentials نى قوللىمايدۇ"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "سىستېمىڭىز xcredentials_t نى قوللىمايدۇ"
 
 #: ../gio/gcredentials.c:480
-msgid "GCredentials does not contain a process ID on this OS"
-msgstr "مەزكۇر مەشغۇلات سىستېمىسىدا GCredentials نىڭ ئىجرا كىملىكى يوق"
+msgid "xcredentials_t does not contain a process ID on this OS"
+msgstr "مەزكۇر مەشغۇلات سىستېمىسىدا xcredentials_t نىڭ ئىجرا كىملىكى يوق"
 
 #: ../gio/gdatainputstream.c:311
 msgid "Unexpected early end-of-stream"
@@ -288,8 +288,8 @@ msgid ""
 msgstr "ئىشلەتكىلى بولىدىغان ھەممە دەلىللەش مېخانىزمىنى ئىشلىتىپ بولدى(سىنالغان قېتىم سانى: %s) (ئىشلىتىلىشچان: %s)"
 
 #: ../gio/gdbusauth.c:1175
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "GDBusAuthObserver::authorize-authenticated-peer ئارقىلىق بىكار قىلىندى"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "xdbus_auth_observer_t::authorize-authenticated-peer ئارقىلىق بىكار قىلىندى"
 
 #: ../gio/gdbusauthmechanismsha1.c:266
 #, c-format
@@ -943,27 +943,27 @@ msgstr "TLS نى قوللاشنى ئىشلەتكىلى بولمايدۇ."
 
 #: ../gio/gemblem.c:324
 #, c-format
-msgid "Can't handle version %d of GEmblem encoding"
-msgstr "GEmblem كودلاشنىڭ %d نەشرىنى بىر تەرەپ قىلالمىدى"
+msgid "Can't handle version %d of xemblem_t encoding"
+msgstr "xemblem_t كودلاشنىڭ %d نەشرىنى بىر تەرەپ قىلالمىدى"
 
 #: ../gio/gemblem.c:334
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "GEmblem كودلاشتا ناتوغرا بەلگە سانى مەۋجۇت (%d)"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "xemblem_t كودلاشتا ناتوغرا بەلگە سانى مەۋجۇت (%d)"
 
 #: ../gio/gemblemedicon.c:367
 #, c-format
-msgid "Can't handle version %d of GEmblemedIcon encoding"
-msgstr "GEmblemedIcon كودلاشنىڭ %d نەشرىنى بىر تەرەپ قىلالمايدۇ"
+msgid "Can't handle version %d of xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t كودلاشنىڭ %d نەشرىنى بىر تەرەپ قىلالمايدۇ"
 
 #: ../gio/gemblemedicon.c:377
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "GEmblemedIcon كودلاشتا ناتوغرا بەلگە سانى (%d)"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t كودلاشتا ناتوغرا بەلگە سانى (%d)"
 
 #: ../gio/gemblemedicon.c:400
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "GEmblemedIcon ئۈچۈن بىر GEmblem ئۈمىد قىلىندى"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "xemblemed_icon_t ئۈچۈن بىر xemblem_t ئۈمىد قىلىندى"
 
 #: ../gio/gfile.c:917 ../gio/gfile.c:1156 ../gio/gfile.c:1295
 #: ../gio/gfile.c:1535 ../gio/gfile.c:1590 ../gio/gfile.c:1648
@@ -1070,12 +1070,12 @@ msgstr "ھۆججەت سانىغۇچ تاقالغان"
 
 #: ../gio/gfileicon.c:237
 #, c-format
-msgid "Can't handle version %d of GFileIcon encoding"
-msgstr "GFileIcon كودلاشنىڭ نەشرى %d نى بىر تەرەپ قىلالمىدى"
+msgid "Can't handle version %d of xfile_icon_t encoding"
+msgstr "xfile_icon_t كودلاشنىڭ نەشرى %d نى بىر تەرەپ قىلالمىدى"
 
 #: ../gio/gfileicon.c:247
-msgid "Malformed input data for GFileIcon"
-msgstr "GFileIcon غا كىرگۈزگەن سانلىق-مەلۇمات فورماتى خاتا"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "xfile_icon_t غا كىرگۈزگەن سانلىق-مەلۇمات فورماتى خاتا"
 
 #: ../gio/gfileinputstream.c:154 ../gio/gfileinputstream.c:400
 #: ../gio/gfileiostream.c:170 ../gio/gfileoutputstream.c:169
@@ -1519,10 +1519,10 @@ msgstr "كۇنۇپكا ئاتىنىڭ چەكلىمىسىنى مەجبۇرلىم�
 
 #: ../gio/glib-compile-schemas.c:2031
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
-msgstr "بارلىق GSettings لايىھە ھۆججەتنى لايىھە غەملەككە تەرجىمە-تەھرىرلەيدۇ.\n"
+msgstr "بارلىق xsettings_t لايىھە ھۆججەتنى لايىھە غەملەككە تەرجىمە-تەھرىرلەيدۇ.\n"
 "كېڭەيتىلگەن .gschema.xml نى ئىشلىتىشتە، لايىھە ھۆججىتى بولۇشى لازىم، غەملەك ھۆججىتى gschemas.compiled دەپ ئاتىلىدۇ."
 
 #: ../gio/glib-compile-schemas.c:2047
@@ -1840,8 +1840,8 @@ msgid "Invalid seek request"
 msgstr "ئىناۋەتسىز ئىزدەش ئىلتىماسى"
 
 #: ../gio/gmemoryinputstream.c:510
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "GMemoryInputStream ئۈزەلمەيدۇ"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "xmemory_input_stream_t ئۈزەلمەيدۇ"
 
 #: ../gio/gmemoryoutputstream.c:544
 msgid "Memory output stream not resizable"
@@ -2434,8 +2434,8 @@ msgid "Error sending message: %s"
 msgstr "ئۇچۇر يوللاۋاتقاندا خاتالىق كۆرۈلدى: %s"
 
 #: ../gio/gsocket.c:3821
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "windows تا GSocketControlMessage نى ئىشلەتكىلى بولمايدۇ"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "windows تا xsocket_control_message_t نى ئىشلەتكىلى بولمايدۇ"
 
 #: ../gio/gsocket.c:4155 ../gio/gsocket.c:4290
 #, c-format
@@ -2574,8 +2574,8 @@ msgstr "نامەلۇم SOCKSv5 ۋاكالەتچى خاتالىقى."
 
 #: ../gio/gthemedicon.c:498
 #, c-format
-msgid "Can't handle version %d of GThemedIcon encoding"
-msgstr "GThemedIcon كودلاشنىڭ %d نەشرىنى بىر تەرەپ قىلالمايدۇ"
+msgid "Can't handle version %d of xthemed_icon_t encoding"
+msgstr "xthemed_icon_t كودلاشنىڭ %d نەشرىنى بىر تەرەپ قىلالمايدۇ"
 
 #: ../gio/gthreadedresolver.c:110
 #, c-format
@@ -2913,37 +2913,37 @@ msgstr "باش ماشىنا ئاتى ئىناۋەتسىز"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:205
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "چ ب"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:207
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "چ ك"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:210
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%Y-%m-%dT%T %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:213
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%d-%m-%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:216
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:219
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%-I:%M:%S %p"
 
@@ -4370,11 +4370,11 @@ msgstr "كۆنەك"
 #~ msgid "Error writing to unix: %s"
 #~ msgstr "unix قا يېزىۋاتقاندا خاتالىق كۆرۈلدى: %s"
 
-#~ msgctxt "GDateTime"
+#~ msgctxt "xdatetime_t"
 #~ msgid "am"
 #~ msgstr "چ ب"
 
-#~ msgctxt "GDateTime"
+#~ msgctxt "xdatetime_t"
 #~ msgid "pm"
 #~ msgstr "چ ك"
 

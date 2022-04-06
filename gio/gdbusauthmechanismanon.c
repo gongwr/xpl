@@ -271,7 +271,7 @@ mechanism_client_initiate (GDBusAuthMechanism   *mechanism,
   m->priv->state = G_DBUS_AUTH_MECHANISM_STATE_ACCEPTED;
 
   /* just return our library name and version */
-  result = g_strdup ("GDBus 0.1");
+  result = xstrdup ("GDBus 0.1");
   *out_initial_response_len = strlen (result);
 
   return result;

@@ -33,27 +33,27 @@
  * SECTION:gmemoryinputstream
  * @short_description: Streaming input operations on memory chunks
  * @include: gio/gio.h
- * @see_also: #GMemoryOutputStream
+ * @see_also: #xmemory_output_stream_t
  *
- * #GMemoryInputStream is a class for using arbitrary
+ * #xmemory_input_stream_t is a class for using arbitrary
  * memory chunks as input for GIO streaming input operations.
  *
- * As of GLib 2.34, #GMemoryInputStream implements
- * #GPollableInputStream.
+ * As of GLib 2.34, #xmemory_input_stream_t implements
+ * #xpollable_input_stream_t.
  */
 
 struct _GMemoryInputStreamPrivate {
-  GSList *chunks;
+  xslist_t *chunks;
   xsize_t   len;
   xsize_t   pos;
 };
 
-static gssize   g_memory_input_stream_read         (xinput_stream_t         *stream,
+static xssize_t   g_memory_input_stream_read         (xinput_stream_t         *stream,
 						    void                 *buffer,
 						    xsize_t                 count,
 						    xcancellable_t         *cancellable,
 						    xerror_t              **error);
-static gssize   g_memory_input_stream_skip         (xinput_stream_t         *stream,
+static xssize_t   g_memory_input_stream_skip         (xinput_stream_t         *stream,
 						    xsize_t                 count,
 						    xcancellable_t         *cancellable,
 						    xerror_t              **error);
@@ -66,7 +66,7 @@ static void     g_memory_input_stream_skip_async   (xinput_stream_t         *str
 						    xcancellable_t         *cancellabl,
 						    xasync_ready_callback_t   callback,
 						    xpointer_t              datae);
-static gssize   g_memory_input_stream_skip_finish  (xinput_stream_t         *stream,
+static xssize_t   g_memory_input_stream_skip_finish  (xinput_stream_t         *stream,
 						    xasync_result_t         *result,
 						    xerror_t              **error);
 static void     g_memory_input_stream_close_async  (xinput_stream_t         *stream,
@@ -78,29 +78,29 @@ static xboolean_t g_memory_input_stream_close_finish (xinput_stream_t         *s
 						    xasync_result_t         *result,
 						    xerror_t              **error);
 
-static void     g_memory_input_stream_seekable_iface_init (GSeekableIface  *iface);
-static goffset  g_memory_input_stream_tell                (GSeekable       *seekable);
-static xboolean_t g_memory_input_stream_can_seek            (GSeekable       *seekable);
-static xboolean_t g_memory_input_stream_seek                (GSeekable       *seekable,
-                                                           goffset          offset,
+static void     g_memory_input_stream_seekable_iface_init (xseekable_iface_t  *iface);
+static xoffset_t  g_memory_input_stream_tell                (xseekable__t       *seekable);
+static xboolean_t g_memory_input_stream_can_seek            (xseekable__t       *seekable);
+static xboolean_t g_memory_input_stream_seek                (xseekable__t       *seekable,
+                                                           xoffset_t          offset,
                                                            GSeekType        type,
                                                            xcancellable_t    *cancellable,
                                                            xerror_t         **error);
-static xboolean_t g_memory_input_stream_can_truncate        (GSeekable       *seekable);
-static xboolean_t g_memory_input_stream_truncate            (GSeekable       *seekable,
-                                                           goffset          offset,
+static xboolean_t g_memory_input_stream_can_truncate        (xseekable__t       *seekable);
+static xboolean_t g_memory_input_stream_truncate            (xseekable__t       *seekable,
+                                                           xoffset_t          offset,
                                                            xcancellable_t    *cancellable,
                                                            xerror_t         **error);
 
 static void     g_memory_input_stream_pollable_iface_init (GPollableInputStreamInterface *iface);
-static xboolean_t g_memory_input_stream_is_readable         (GPollableInputStream *stream);
-static GSource *g_memory_input_stream_create_source       (GPollableInputStream *stream,
+static xboolean_t g_memory_input_stream_is_readable         (xpollable_input_stream_t *stream);
+static xsource_t *g_memory_input_stream_create_source       (xpollable_input_stream_t *stream,
 							   xcancellable_t          *cancellable);
 
 static void     g_memory_input_stream_finalize            (xobject_t         *object);
 
-G_DEFINE_TYPE_WITH_CODE (GMemoryInputStream, g_memory_input_stream, XTYPE_INPUT_STREAM,
-                         G_ADD_PRIVATE (GMemoryInputStream)
+G_DEFINE_TYPE_WITH_CODE (xmemory_input_stream, g_memory_input_stream, XTYPE_INPUT_STREAM,
+                         G_ADD_PRIVATE (xmemory_input_stream_t)
                          G_IMPLEMENT_INTERFACE (XTYPE_SEEKABLE,
                                                 g_memory_input_stream_seekable_iface_init);
                          G_IMPLEMENT_INTERFACE (XTYPE_POLLABLE_INPUT_STREAM,
@@ -131,19 +131,19 @@ g_memory_input_stream_class_init (GMemoryInputStreamClass *klass)
 static void
 g_memory_input_stream_finalize (xobject_t *object)
 {
-  GMemoryInputStream        *stream;
+  xmemory_input_stream_t        *stream;
   GMemoryInputStreamPrivate *priv;
 
   stream = G_MEMORY_INPUT_STREAM (object);
   priv = stream->priv;
 
-  g_slist_free_full (priv->chunks, (GDestroyNotify)g_bytes_unref);
+  xslist_free_full (priv->chunks, (xdestroy_notify_t)xbytes_unref);
 
   G_OBJECT_CLASS (g_memory_input_stream_parent_class)->finalize (object);
 }
 
 static void
-g_memory_input_stream_seekable_iface_init (GSeekableIface *iface)
+g_memory_input_stream_seekable_iface_init (xseekable_iface_t *iface)
 {
   iface->tell         = g_memory_input_stream_tell;
   iface->can_seek     = g_memory_input_stream_can_seek;
@@ -160,7 +160,7 @@ g_memory_input_stream_pollable_iface_init (GPollableInputStreamInterface *iface)
 }
 
 static void
-g_memory_input_stream_init (GMemoryInputStream *stream)
+g_memory_input_stream_init (xmemory_input_stream_t *stream)
 {
   stream->priv = g_memory_input_stream_get_instance_private (stream);
 }
@@ -168,7 +168,7 @@ g_memory_input_stream_init (GMemoryInputStream *stream)
 /**
  * g_memory_input_stream_new:
  *
- * Creates a new empty #GMemoryInputStream.
+ * Creates a new empty #xmemory_input_stream_t.
  *
  * Returns: a new #xinput_stream_t
  */
@@ -177,25 +177,25 @@ g_memory_input_stream_new (void)
 {
   xinput_stream_t *stream;
 
-  stream = g_object_new (XTYPE_MEMORY_INPUT_STREAM, NULL);
+  stream = xobject_new (XTYPE_MEMORY_INPUT_STREAM, NULL);
 
   return stream;
 }
 
 /**
  * g_memory_input_stream_new_from_data:
- * @data: (array length=len) (element-type guint8) (transfer full): input data
+ * @data: (array length=len) (element-type xuint8_t) (transfer full): input data
  * @len: length of the data, may be -1 if @data is a nul-terminated string
  * @destroy: (nullable): function that is called to free @data, or %NULL
  *
- * Creates a new #GMemoryInputStream with data in memory of a given size.
+ * Creates a new #xmemory_input_stream_t with data in memory of a given size.
  *
  * Returns: new #xinput_stream_t read from @data of @len bytes.
  **/
 xinput_stream_t *
 g_memory_input_stream_new_from_data (const void     *data,
-                                     gssize          len,
-                                     GDestroyNotify  destroy)
+                                     xssize_t          len,
+                                     xdestroy_notify_t  destroy)
 {
   xinput_stream_t *stream;
 
@@ -209,16 +209,16 @@ g_memory_input_stream_new_from_data (const void     *data,
 
 /**
  * g_memory_input_stream_new_from_bytes:
- * @bytes: a #GBytes
+ * @bytes: a #xbytes_t
  *
- * Creates a new #GMemoryInputStream with data from the given @bytes.
+ * Creates a new #xmemory_input_stream_t with data from the given @bytes.
  *
  * Returns: new #xinput_stream_t read from @bytes
  *
  * Since: 2.34
  **/
 xinput_stream_t *
-g_memory_input_stream_new_from_bytes (GBytes  *bytes)
+g_memory_input_stream_new_from_bytes (xbytes_t  *bytes)
 {
 
   xinput_stream_t *stream;
@@ -233,20 +233,20 @@ g_memory_input_stream_new_from_bytes (GBytes  *bytes)
 
 /**
  * g_memory_input_stream_add_data:
- * @stream: a #GMemoryInputStream
- * @data: (array length=len) (element-type guint8) (transfer full): input data
+ * @stream: a #xmemory_input_stream_t
+ * @data: (array length=len) (element-type xuint8_t) (transfer full): input data
  * @len: length of the data, may be -1 if @data is a nul-terminated string
  * @destroy: (nullable): function that is called to free @data, or %NULL
  *
  * Appends @data to data that can be read from the input stream
  */
 void
-g_memory_input_stream_add_data (GMemoryInputStream *stream,
+g_memory_input_stream_add_data (xmemory_input_stream_t *stream,
                                 const void         *data,
-                                gssize              len,
-                                GDestroyNotify      destroy)
+                                xssize_t              len,
+                                xdestroy_notify_t      destroy)
 {
-  GBytes *bytes;
+  xbytes_t *bytes;
 
   if (len == -1)
     len = strlen (data);
@@ -254,16 +254,16 @@ g_memory_input_stream_add_data (GMemoryInputStream *stream,
   /* It's safe to discard the const here because we're chaining the
    * destroy callback.
    */
-  bytes = g_bytes_new_with_free_func (data, len, destroy, (void*)data);
+  bytes = xbytes_new_with_free_func (data, len, destroy, (void*)data);
 
   g_memory_input_stream_add_bytes (stream, bytes);
 
-  g_bytes_unref (bytes);
+  xbytes_unref (bytes);
 }
 
 /**
  * g_memory_input_stream_add_bytes:
- * @stream: a #GMemoryInputStream
+ * @stream: a #xmemory_input_stream_t
  * @bytes: input data
  *
  * Appends @bytes to data that can be read from the input stream.
@@ -271,8 +271,8 @@ g_memory_input_stream_add_data (GMemoryInputStream *stream,
  * Since: 2.34
  */
 void
-g_memory_input_stream_add_bytes (GMemoryInputStream *stream,
-				 GBytes             *bytes)
+g_memory_input_stream_add_bytes (xmemory_input_stream_t *stream,
+				 xbytes_t             *bytes)
 {
   GMemoryInputStreamPrivate *priv;
 
@@ -281,21 +281,21 @@ g_memory_input_stream_add_bytes (GMemoryInputStream *stream,
 
   priv = stream->priv;
 
-  priv->chunks = g_slist_append (priv->chunks, g_bytes_ref (bytes));
-  priv->len += g_bytes_get_size (bytes);
+  priv->chunks = xslist_append (priv->chunks, xbytes_ref (bytes));
+  priv->len += xbytes_get_size (bytes);
 }
 
-static gssize
+static xssize_t
 g_memory_input_stream_read (xinput_stream_t  *stream,
                             void          *buffer,
                             xsize_t          count,
                             xcancellable_t  *cancellable,
                             xerror_t       **error)
 {
-  GMemoryInputStream *memory_stream;
+  xmemory_input_stream_t *memory_stream;
   GMemoryInputStreamPrivate *priv;
-  GSList *l;
-  GBytes *chunk;
+  xslist_t *l;
+  xbytes_t *chunk;
   xsize_t len;
   xsize_t offset, start, rest, size;
 
@@ -307,8 +307,8 @@ g_memory_input_stream_read (xinput_stream_t  *stream,
   offset = 0;
   for (l = priv->chunks; l; l = l->next)
     {
-      chunk = (GBytes *)l->data;
-      len = g_bytes_get_size (chunk);
+      chunk = (xbytes_t *)l->data;
+      len = xbytes_get_size (chunk);
 
       if (offset + len > priv->pos)
         break;
@@ -321,14 +321,14 @@ g_memory_input_stream_read (xinput_stream_t  *stream,
 
   for (; l && rest > 0; l = l->next)
     {
-      const guint8* chunk_data;
-      chunk = (GBytes *)l->data;
+      const xuint8_t* chunk_data;
+      chunk = (xbytes_t *)l->data;
 
-      chunk_data = g_bytes_get_data (chunk, &len);
+      chunk_data = xbytes_get_data (chunk, &len);
 
       size = MIN (rest, len - start);
 
-      memcpy ((guint8 *)buffer + (count - rest), chunk_data + start, size);
+      memcpy ((xuint8_t *)buffer + (count - rest), chunk_data + start, size);
       rest -= size;
 
       start = 0;
@@ -339,13 +339,13 @@ g_memory_input_stream_read (xinput_stream_t  *stream,
   return count;
 }
 
-static gssize
+static xssize_t
 g_memory_input_stream_skip (xinput_stream_t  *stream,
                             xsize_t          count,
                             xcancellable_t  *cancellable,
                             xerror_t       **error)
 {
-  GMemoryInputStream *memory_stream;
+  xmemory_input_stream_t *memory_stream;
   GMemoryInputStreamPrivate *priv;
 
   memory_stream = G_MEMORY_INPUT_STREAM (stream);
@@ -373,29 +373,29 @@ g_memory_input_stream_skip_async (xinput_stream_t        *stream,
                                   xasync_ready_callback_t  callback,
                                   xpointer_t             user_data)
 {
-  GTask *task;
-  gssize nskipped;
+  xtask_t *task;
+  xssize_t nskipped;
   xerror_t *error = NULL;
 
   nskipped = G_INPUT_STREAM_GET_CLASS (stream)->skip (stream, count, cancellable, &error);
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_memory_input_stream_skip_async);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, g_memory_input_stream_skip_async);
 
   if (error)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_int (task, nskipped);
-  g_object_unref (task);
+    xtask_return_int (task, nskipped);
+  xobject_unref (task);
 }
 
-static gssize
+static xssize_t
 g_memory_input_stream_skip_finish (xinput_stream_t  *stream,
                                    xasync_result_t  *result,
                                    xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, stream), -1);
+  g_return_val_if_fail (xtask_is_valid (result, stream), -1);
 
-  return g_task_propagate_int (G_TASK (result), error);
+  return xtask_propagate_int (XTASK (result), error);
 }
 
 static void
@@ -405,12 +405,12 @@ g_memory_input_stream_close_async (xinput_stream_t        *stream,
                                    xasync_ready_callback_t  callback,
                                    xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_memory_input_stream_close_async);
-  g_task_return_boolean (task, TRUE);
-  g_object_unref (task);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, g_memory_input_stream_close_async);
+  xtask_return_boolean (task, TRUE);
+  xobject_unref (task);
 }
 
 static xboolean_t
@@ -421,10 +421,10 @@ g_memory_input_stream_close_finish (xinput_stream_t  *stream,
   return TRUE;
 }
 
-static goffset
-g_memory_input_stream_tell (GSeekable *seekable)
+static xoffset_t
+g_memory_input_stream_tell (xseekable__t *seekable)
 {
-  GMemoryInputStream *memory_stream;
+  xmemory_input_stream_t *memory_stream;
   GMemoryInputStreamPrivate *priv;
 
   memory_stream = G_MEMORY_INPUT_STREAM (seekable);
@@ -434,21 +434,21 @@ g_memory_input_stream_tell (GSeekable *seekable)
 }
 
 static
-xboolean_t g_memory_input_stream_can_seek (GSeekable *seekable)
+xboolean_t g_memory_input_stream_can_seek (xseekable__t *seekable)
 {
   return TRUE;
 }
 
 static xboolean_t
-g_memory_input_stream_seek (GSeekable     *seekable,
-                            goffset        offset,
+g_memory_input_stream_seek (xseekable__t     *seekable,
+                            xoffset_t        offset,
                             GSeekType      type,
                             xcancellable_t  *cancellable,
                             xerror_t       **error)
 {
-  GMemoryInputStream *memory_stream;
+  xmemory_input_stream_t *memory_stream;
   GMemoryInputStreamPrivate *priv;
-  goffset absolute;
+  xoffset_t absolute;
 
   memory_stream = G_MEMORY_INPUT_STREAM (seekable);
   priv = memory_stream->priv;
@@ -491,40 +491,40 @@ g_memory_input_stream_seek (GSeekable     *seekable,
 }
 
 static xboolean_t
-g_memory_input_stream_can_truncate (GSeekable *seekable)
+g_memory_input_stream_can_truncate (xseekable__t *seekable)
 {
   return FALSE;
 }
 
 static xboolean_t
-g_memory_input_stream_truncate (GSeekable     *seekable,
-                                goffset        offset,
+g_memory_input_stream_truncate (xseekable__t     *seekable,
+                                xoffset_t        offset,
                                 xcancellable_t  *cancellable,
                                 xerror_t       **error)
 {
   g_set_error_literal (error,
                        G_IO_ERROR,
                        G_IO_ERROR_NOT_SUPPORTED,
-                       _("Cannot truncate GMemoryInputStream"));
+                       _("Cannot truncate xmemory_input_stream_t"));
   return FALSE;
 }
 
 static xboolean_t
-g_memory_input_stream_is_readable (GPollableInputStream *stream)
+g_memory_input_stream_is_readable (xpollable_input_stream_t *stream)
 {
   return TRUE;
 }
 
-static GSource *
-g_memory_input_stream_create_source (GPollableInputStream *stream,
+static xsource_t *
+g_memory_input_stream_create_source (xpollable_input_stream_t *stream,
 				     xcancellable_t         *cancellable)
 {
-  GSource *base_source, *pollable_source;
+  xsource_t *base_source, *pollable_source;
 
   base_source = g_timeout_source_new (0);
   pollable_source = g_pollable_source_new_full (stream, base_source,
 						cancellable);
-  g_source_unref (base_source);
+  xsource_unref (base_source);
 
   return pollable_source;
 }

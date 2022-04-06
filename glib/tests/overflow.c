@@ -16,7 +16,7 @@
 typedef struct
 {
   xboolean_t success;
-  guint64 c, a, b;
+  xuint64_t c, a, b;
 } Case;
 
 static void
@@ -93,7 +93,7 @@ test_checked_guint64_add (void)
 
   for (i = 0; i < G_N_ELEMENTS (cases); i++)
     {
-      guint64 result;
+      xuint64_t result;
 
       g_assert_cmpuint (cases[i].success, ==, g_uint64_checked_add (&result, cases[i].a, cases[i].b));
       if (cases[i].success)
@@ -111,8 +111,8 @@ test_checked_guint64_mul (void)
       { TRUE,                 G_MAXINT64,       G_MAXINT64,              1 },
       { TRUE,                          0,      G_MAXUINT64,              0 },
       { TRUE,                G_MAXUINT64,      G_MAXUINT64,              1 },
-      { TRUE,   2 * (guint64) G_MAXINT64,                2,     G_MAXINT64 },
-      { TRUE,   2 * (guint64) G_MAXINT64,       G_MAXINT64,              2 },
+      { TRUE,   2 * (xuint64_t) G_MAXINT64,                2,     G_MAXINT64 },
+      { TRUE,   2 * (xuint64_t) G_MAXINT64,       G_MAXINT64,              2 },
       { FALSE,                         0,                3,     G_MAXINT64 },
       { FALSE,                         0,       G_MAXINT64,              3 }
   };
@@ -120,7 +120,7 @@ test_checked_guint64_mul (void)
 
   for (i = 0; i < G_N_ELEMENTS (cases); i++)
     {
-      guint64 result;
+      xuint64_t result;
 
       g_assert_cmpuint (cases[i].success, ==, g_uint64_checked_mul (&result, cases[i].a, cases[i].b));
       if (cases[i].success)
@@ -190,8 +190,8 @@ main (int argc, char **argv)
 
   g_test_add_func ("/glib/checked-math/xuint_t-add", test_checked_guint_add);
   g_test_add_func ("/glib/checked-math/xuint_t-mul", test_checked_guint_mul);
-  g_test_add_func ("/glib/checked-math/guint64-add", test_checked_guint64_add);
-  g_test_add_func ("/glib/checked-math/guint64-mul", test_checked_guint64_mul);
+  g_test_add_func ("/glib/checked-math/xuint64_t-add", test_checked_guint64_add);
+  g_test_add_func ("/glib/checked-math/xuint64_t-mul", test_checked_guint64_mul);
   g_test_add_func ("/glib/checked-math/xsize_t-add", test_checked_gsize_add);
   g_test_add_func ("/glib/checked-math/xsize_t-mul", test_checked_gsize_mul);
 

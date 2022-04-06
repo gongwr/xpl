@@ -42,8 +42,8 @@ typedef struct {
   xsocket_t *server;
   xsocket_t *client;
   xsocket_family_t family;
-  GThread *thread;
-  GMainLoop *loop;
+  xthread_t *thread;
+  xmain_loop_t *loop;
   xcancellable_t *cancellable; /* to shut down dgram echo server thread */
 } IPTestData;
 
@@ -55,7 +55,7 @@ echo_server_dgram_thread (xpointer_t user_data)
   xcancellable_t *cancellable = data->cancellable;
   xsocket_t *sock;
   xerror_t *error = NULL;
-  gssize nread, nwrote;
+  xssize_t nread, nwrote;
   xchar_t buf[128];
 
   sock = data->server;
@@ -63,18 +63,18 @@ echo_server_dgram_thread (xpointer_t user_data)
   while (TRUE)
     {
       nread = xsocket_receive_from (sock, &sa, buf, sizeof (buf), cancellable, &error);
-      if (error && g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+      if (error && xerror_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         break;
       g_assert_no_error (error);
       g_assert_cmpint (nread, >=, 0);
 
       nwrote = xsocket_send_to (sock, sa, buf, nread, cancellable, &error);
-      if (error && g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+      if (error && xerror_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
         break;
       g_assert_no_error (error);
       g_assert_cmpint (nwrote, ==, nread);
 
-      g_object_unref (sa);
+      xobject_unref (sa);
     }
 
   g_clear_error (&error);
@@ -88,7 +88,7 @@ echo_server_thread (xpointer_t user_data)
   IPTestData *data = user_data;
   xsocket_t *sock;
   xerror_t *error = NULL;
-  gssize nread, nwrote;
+  xssize_t nread, nwrote;
   xchar_t buf[128];
 
   sock = xsocket_accept (data->server, NULL, &error);
@@ -110,7 +110,7 @@ echo_server_thread (xpointer_t user_data)
 
   xsocket_close (sock, &error);
   g_assert_no_error (error);
-  g_object_unref (sock);
+  xobject_unref (sock);
   return NULL;
 }
 
@@ -160,21 +160,21 @@ create_server_full (xsocket_family_t   family,
   else
     iaddr = xinet_address_new_loopback (family);
   addr = g_inet_socket_address_new (iaddr, 0);
-  g_object_unref (iaddr);
+  xobject_unref (iaddr);
 
   g_assert_cmpint (g_inet_socket_address_get_port (G_INET_SOCKET_ADDRESS (addr)), ==, 0);
   if (!xsocket_bind (server, addr, TRUE, error))
     {
-      g_object_unref (addr);
+      xobject_unref (addr);
       goto error;
     }
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   addr = xsocket_get_local_address (server, error);
   if (addr == NULL)
     goto error;
   g_assert_cmpint (g_inet_socket_address_get_port (G_INET_SOCKET_ADDRESS (addr)), !=, 0);
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   if (socket_type == XSOCKET_TYPE_STREAM)
     {
@@ -186,7 +186,7 @@ create_server_full (xsocket_family_t   family,
       data->cancellable = g_cancellable_new ();
     }
 
-  data->thread = g_thread_new ("server", server_thread, data);
+  data->thread = xthread_new ("server", server_thread, data);
 
   return data;
 
@@ -210,12 +210,12 @@ static const xchar_t *testbuf = "0123456789abcdef";
 
 static xboolean_t
 test_ip_async_read_ready (xsocket_t      *client,
-			  GIOCondition  cond,
+			  xio_condition_t  cond,
 			  xpointer_t      user_data)
 {
   IPTestData *data = user_data;
   xerror_t *error = NULL;
-  gssize len;
+  xssize_t len;
   xchar_t buf[128];
 
   g_assert_cmpint (cond, ==, G_IO_IN);
@@ -226,20 +226,20 @@ test_ip_async_read_ready (xsocket_t      *client,
 
   g_assert_cmpstr (testbuf, ==, buf);
 
-  g_main_loop_quit (data->loop);
+  xmain_loop_quit (data->loop);
 
   return FALSE;
 }
 
 static xboolean_t
 test_ip_async_write_ready (xsocket_t      *client,
-			   GIOCondition  cond,
+			   xio_condition_t  cond,
 			   xpointer_t      user_data)
 {
   IPTestData *data = user_data;
   xerror_t *error = NULL;
-  GSource *source;
-  gssize len;
+  xsource_t *source;
+  xssize_t len;
 
   g_assert_cmpint (cond, ==, G_IO_OUT);
 
@@ -248,23 +248,23 @@ test_ip_async_write_ready (xsocket_t      *client,
   g_assert_cmpint (len, ==, strlen (testbuf) + 1);
 
   source = xsocket_create_source (client, G_IO_IN, NULL);
-  g_source_set_callback (source, (GSourceFunc)test_ip_async_read_ready,
+  xsource_set_callback (source, (xsource_func_t)test_ip_async_read_ready,
 			 data, NULL);
-  g_source_attach (source, NULL);
-  g_source_unref (source);
+  xsource_attach (source, NULL);
+  xsource_unref (source);
 
   return FALSE;
 }
 
 static xboolean_t
 test_ip_async_timed_out (xsocket_t      *client,
-			 GIOCondition  cond,
+			 xio_condition_t  cond,
 			 xpointer_t      user_data)
 {
   IPTestData *data = user_data;
   xerror_t *error = NULL;
-  GSource *source;
-  gssize len;
+  xsource_t *source;
+  xssize_t len;
   xchar_t buf[128];
 
   if (data->family == XSOCKET_FAMILY_IPV4)
@@ -277,23 +277,23 @@ test_ip_async_timed_out (xsocket_t      *client,
     }
 
   source = xsocket_create_source (client, G_IO_OUT, NULL);
-  g_source_set_callback (source, (GSourceFunc)test_ip_async_write_ready,
+  xsource_set_callback (source, (xsource_func_t)test_ip_async_write_ready,
 			 data, NULL);
-  g_source_attach (source, NULL);
-  g_source_unref (source);
+  xsource_attach (source, NULL);
+  xsource_unref (source);
 
   return FALSE;
 }
 
 static xboolean_t
 test_ip_async_connected (xsocket_t      *client,
-			 GIOCondition  cond,
+			 xio_condition_t  cond,
 			 xpointer_t      user_data)
 {
   IPTestData *data = user_data;
   xerror_t *error = NULL;
-  GSource *source;
-  gssize len;
+  xsource_t *source;
+  xssize_t len;
   xchar_t buf[128];
 
   xsocket_check_connect_result (client, &error);
@@ -314,10 +314,10 @@ test_ip_async_connected (xsocket_t      *client,
       g_clear_error (&error);
 
       source = xsocket_create_source (client, G_IO_IN, NULL);
-      g_source_set_callback (source, (GSourceFunc)test_ip_async_timed_out,
+      xsource_set_callback (source, (xsource_func_t)test_ip_async_timed_out,
 			     data, NULL);
-      g_source_attach (source, NULL);
-      g_source_unref (source);
+      xsource_attach (source, NULL);
+      xsource_unref (source);
     }
   else
     test_ip_async_timed_out (client, 0, data);
@@ -340,8 +340,8 @@ test_ip_async (xsocket_family_t family)
   xerror_t *error = NULL;
   xsocket_t *client;
   xsocket_address_t *addr;
-  GSource *source;
-  gssize len;
+  xsource_t *source;
+  xssize_t len;
   xchar_t buf[128];
 
   data = create_server (family, echo_server_thread, FALSE, &error);
@@ -380,21 +380,21 @@ test_ip_async (xsocket_family_t family)
       g_assert_error (error, G_IO_ERROR, G_IO_ERROR_PENDING);
       g_clear_error (&error);
       source = xsocket_create_source (client, G_IO_OUT, NULL);
-      g_source_set_callback (source, (GSourceFunc)test_ip_async_connected,
+      xsource_set_callback (source, (xsource_func_t)test_ip_async_connected,
 			     data, NULL);
-      g_source_attach (source, NULL);
-      g_source_unref (source);
+      xsource_attach (source, NULL);
+      xsource_unref (source);
     }
-  g_object_unref (addr);
+  xobject_unref (addr);
 
-  data->loop = g_main_loop_new (NULL, TRUE);
-  g_main_loop_run (data->loop);
-  g_main_loop_unref (data->loop);
+  data->loop = xmain_loop_new (NULL, TRUE);
+  xmain_loop_run (data->loop);
+  xmain_loop_unref (data->loop);
 
   xsocket_shutdown (client, FALSE, TRUE, &error);
   g_assert_no_error (error);
 
-  g_thread_join (data->thread);
+  xthread_join (data->thread);
 
   if (family == XSOCKET_FAMILY_IPV4)
     {
@@ -419,8 +419,8 @@ test_ip_async (xsocket_family_t family)
   xsocket_close (data->server, &error);
   g_assert_no_error (error);
 
-  g_object_unref (data->server);
-  g_object_unref (client);
+  xobject_unref (data->server);
+  xobject_unref (client);
 
   g_slice_free (IPTestData, data);
 }
@@ -452,7 +452,7 @@ test_ip_sync (xsocket_family_t family)
   xerror_t *error = NULL;
   xsocket_t *client;
   xsocket_address_t *addr;
-  gssize len;
+  xssize_t len;
   xchar_t buf[128];
 
   data = create_server (family, echo_server_thread, FALSE, &error);
@@ -482,7 +482,7 @@ test_ip_sync (xsocket_family_t family)
   xsocket_connect (client, addr, NULL, &error);
   g_assert_no_error (error);
   g_assert (xsocket_is_connected (client));
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   /* This adds 1 second to "make check", so let's just only do it once. */
   if (family == XSOCKET_FAMILY_IPV4)
@@ -504,7 +504,7 @@ test_ip_sync (xsocket_family_t family)
   g_assert_cmpstr (testbuf, ==, buf);
 
   {
-    GOutputVector v[7] = { { NULL, 0 }, };
+    xoutput_vector_t v[7] = { { NULL, 0 }, };
 
     v[0].buffer = testbuf2 + 0;
     v[0].size = 3;
@@ -535,7 +535,7 @@ test_ip_sync (xsocket_family_t family)
   xsocket_shutdown (client, FALSE, TRUE, &error);
   g_assert_no_error (error);
 
-  g_thread_join (data->thread);
+  xthread_join (data->thread);
 
   if (family == XSOCKET_FAMILY_IPV4)
     {
@@ -558,8 +558,8 @@ test_ip_sync (xsocket_family_t family)
   xsocket_close (data->server, &error);
   g_assert_no_error (error);
 
-  g_object_unref (data->server);
-  g_object_unref (client);
+  xobject_unref (data->server);
+  xobject_unref (client);
 
   g_slice_free (IPTestData, data);
 }
@@ -589,7 +589,7 @@ test_ip_sync_dgram (xsocket_family_t family)
   xerror_t *error = NULL;
   xsocket_t *client;
   xsocket_address_t *dest_addr;
-  gssize len;
+  xssize_t len;
   xchar_t buf[128];
 
   data = create_server_full (family, XSOCKET_TYPE_DATAGRAM,
@@ -627,10 +627,10 @@ test_ip_sync_dgram (xsocket_family_t family)
   g_assert_cmpstr (testbuf, ==, buf);
 
   {
-    GOutputMessage m[3] = { { NULL, NULL, 0, 0, NULL, 0 }, };
-    GInputMessage im[3] = { { NULL, NULL, 0, 0, 0, NULL, 0 }, };
-    GOutputVector v[7] = { { NULL, 0 }, };
-    GInputVector iv[7] = { { NULL, 0 }, };
+    xoutput_message_t m[3] = { { NULL, NULL, 0, 0, NULL, 0 }, };
+    xinput_message_t im[3] = { { NULL, NULL, 0, 0, 0, NULL, 0 }, };
+    xoutput_vector_t v[7] = { { NULL, 0 }, };
+    xinput_vector_t iv[7] = { { NULL, 0 }, };
 
     v[0].buffer = testbuf2 + 0;
     v[0].size = 3;
@@ -782,17 +782,17 @@ test_ip_sync_dgram (xsocket_family_t family)
 
   g_cancellable_cancel (data->cancellable);
 
-  g_thread_join (data->thread);
+  xthread_join (data->thread);
 
   xsocket_close (client, &error);
   g_assert_no_error (error);
   xsocket_close (data->server, &error);
   g_assert_no_error (error);
 
-  g_object_unref (data->server);
-  g_object_unref (data->cancellable);
-  g_object_unref (client);
-  g_object_unref (dest_addr);
+  xobject_unref (data->server);
+  xobject_unref (data->cancellable);
+  xobject_unref (client);
+  xobject_unref (dest_addr);
 
   g_slice_free (IPTestData, data);
 }
@@ -822,7 +822,7 @@ cancellable_thread_cb (xpointer_t data)
 
   g_usleep (0.1 * G_USEC_PER_SEC);
   g_cancellable_cancel (cancellable);
-  g_object_unref (cancellable);
+  xobject_unref (cancellable);
 
   return NULL;
 }
@@ -833,8 +833,8 @@ test_ip_sync_dgram_timeouts (xsocket_family_t family)
   xerror_t *error = NULL;
   xsocket_t *client = NULL;
   xcancellable_t *cancellable = NULL;
-  GThread *cancellable_thread = NULL;
-  gssize len;
+  xthread_t *cancellable_thread = NULL;
+  xssize_t len;
 #ifdef G_OS_WIN32
   xinet_address_t *iaddr;
   xsocket_address_t *addr;
@@ -854,9 +854,9 @@ test_ip_sync_dgram_timeouts (xsocket_family_t family)
   /* Winsock can't recv() on unbound udp socket */
   iaddr = xinet_address_new_loopback (family);
   addr = g_inet_socket_address_new (iaddr, 0);
-  g_object_unref (iaddr);
+  xobject_unref (iaddr);
   xsocket_bind (client, addr, TRUE, &error);
-  g_object_unref (addr);
+  xobject_unref (addr);
   g_assert_no_error (error);
 #endif
 
@@ -868,9 +868,9 @@ test_ip_sync_dgram_timeouts (xsocket_family_t family)
   /* Check for timeouts when no server is running. */
   {
     gint64 start_time;
-    GInputMessage im = { NULL, NULL, 0, 0, 0, NULL, 0 };
-    GInputVector iv = { NULL, 0 };
-    guint8 buf[128];
+    xinput_message_t im = { NULL, NULL, 0, 0, 0, NULL, 0 };
+    xinput_vector_t iv = { NULL, 0 };
+    xuint8_t buf[128];
 
     iv.buffer = buf;
     iv.size = sizeof (buf);
@@ -902,9 +902,9 @@ test_ip_sync_dgram_timeouts (xsocket_family_t family)
 
     /* Try a blocking read, cancelled from another thread. */
     xsocket_set_timeout (client, 0);
-    cancellable_thread = g_thread_new ("cancellable",
+    cancellable_thread = xthread_new ("cancellable",
                                        cancellable_thread_cb,
-                                       g_object_ref (cancellable));
+                                       xobject_ref (cancellable));
 
     start_time = g_get_monotonic_time ();
     len = xsocket_receive_messages (client, &im, 1, 0  /* flags */,
@@ -914,14 +914,14 @@ test_ip_sync_dgram_timeouts (xsocket_family_t family)
     g_assert_cmpint (g_get_monotonic_time () - start_time, >, 0);
     g_clear_error (&error);
 
-    g_thread_join (cancellable_thread);
+    xthread_join (cancellable_thread);
   }
 
   xsocket_close (client, &error);
   g_assert_no_error (error);
 
-  g_object_unref (client);
-  g_object_unref (cancellable);
+  xobject_unref (client);
+  xobject_unref (cancellable);
 }
 
 static void
@@ -948,7 +948,7 @@ graceful_server_thread (xpointer_t user_data)
   IPTestData *data = user_data;
   xsocket_t *sock;
   xerror_t *error = NULL;
-  gssize len;
+  xssize_t len;
 
   sock = xsocket_accept (data->server, NULL, &error);
   g_assert_no_error (error);
@@ -968,7 +968,7 @@ test_close_graceful (void)
   xerror_t *error = NULL;
   xsocket_t *client, *server;
   xsocket_address_t *addr;
-  gssize len;
+  xssize_t len;
   xchar_t buf[128];
 
   data = create_server (family, graceful_server_thread, FALSE, &error);
@@ -998,9 +998,9 @@ test_close_graceful (void)
   xsocket_connect (client, addr, NULL, &error);
   g_assert_no_error (error);
   g_assert (xsocket_is_connected (client));
-  g_object_unref (addr);
+  xobject_unref (addr);
 
-  server = g_thread_join (data->thread);
+  server = xthread_join (data->thread);
 
   /* similar to g_tcp_connection_set_graceful_disconnect(), but explicit */
   xsocket_shutdown (server, FALSE, TRUE, &error);
@@ -1027,9 +1027,9 @@ test_close_graceful (void)
   xsocket_close (client, &error);
   g_assert_no_error (error);
 
-  g_object_unref (server);
-  g_object_unref (data->server);
-  g_object_unref (client);
+  xobject_unref (server);
+  xobject_unref (data->server);
+  xobject_unref (client);
 
   g_slice_free (IPTestData, data);
 }
@@ -1051,16 +1051,16 @@ v4mapped_server_thread (xpointer_t user_data)
   addr = xsocket_get_local_address (sock, &error);
   g_assert_no_error (error);
   g_assert_cmpint (xsocket_address_get_family (addr), ==, XSOCKET_FAMILY_IPV4);
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   addr = xsocket_get_remote_address (sock, &error);
   g_assert_no_error (error);
   g_assert_cmpint (xsocket_address_get_family (addr), ==, XSOCKET_FAMILY_IPV4);
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   xsocket_close (sock, &error);
   g_assert_no_error (error);
-  g_object_unref (sock);
+  xobject_unref (sock);
   return NULL;
 }
 
@@ -1100,23 +1100,23 @@ test_ipv6_v4mapped (void)
   g_assert_no_error (error);
   iaddr = xinet_address_new_loopback (XSOCKET_FAMILY_IPV4);
   v4addr = g_inet_socket_address_new (iaddr, g_inet_socket_address_get_port (G_INET_SOCKET_ADDRESS (addr)));
-  g_object_unref (iaddr);
-  g_object_unref (addr);
+  xobject_unref (iaddr);
+  xobject_unref (addr);
 
   xsocket_connect (client, v4addr, NULL, &error);
   g_assert_no_error (error);
   g_assert (xsocket_is_connected (client));
 
-  g_thread_join (data->thread);
+  xthread_join (data->thread);
 
   xsocket_close (client, &error);
   g_assert_no_error (error);
   xsocket_close (data->server, &error);
   g_assert_no_error (error);
 
-  g_object_unref (data->server);
-  g_object_unref (client);
-  g_object_unref (v4addr);
+  xobject_unref (data->server);
+  xobject_unref (client);
+  xobject_unref (v4addr);
 
   g_slice_free (IPTestData, data);
 }
@@ -1160,7 +1160,7 @@ test_timed_wait (void)
 
   xsocket_connect (client, addr, NULL, &error);
   g_assert_no_error (error);
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   start_time = g_get_monotonic_time ();
   xsocket_condition_timed_wait (client, G_IO_IN, 100000 /* 100 ms */,
@@ -1175,13 +1175,13 @@ test_timed_wait (void)
   xsocket_close (client, &error);
   g_assert_no_error (error);
 
-  g_thread_join (data->thread);
+  xthread_join (data->thread);
 
   xsocket_close (data->server, &error);
   g_assert_no_error (error);
 
-  g_object_unref (data->server);
-  g_object_unref (client);
+  xobject_unref (data->server);
+  xobject_unref (client);
 
   g_slice_free (IPTestData, data);
 }
@@ -1218,7 +1218,7 @@ test_fd_reuse (void)
   xsocket_t *client2;
   xsocket_address_t *addr;
   int fd;
-  gssize len;
+  xssize_t len;
   xchar_t buf[128];
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=741707");
@@ -1246,7 +1246,7 @@ test_fd_reuse (void)
   xsocket_connect (client, addr, NULL, &error);
   g_assert_no_error (error);
   g_assert (xsocket_is_connected (client));
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   /* we have to dup otherwise the fd gets closed twice on unref */
   fd = duplicate_fd (xsocket_get_fd (client));
@@ -1274,7 +1274,7 @@ test_fd_reuse (void)
    */
   xsocket_shutdown (client2, FALSE, TRUE, NULL);
 
-  g_thread_join (data->thread);
+  xthread_join (data->thread);
 
   xsocket_close (client, &error);
   g_assert_no_error (error);
@@ -1287,9 +1287,9 @@ test_fd_reuse (void)
   g_assert_cmpint (xsocket_get_fd (client2), ==, -1);
   g_assert_cmpint (xsocket_get_fd (data->server), ==, -1);
 
-  g_object_unref (data->server);
-  g_object_unref (client);
-  g_object_unref (client2);
+  xobject_unref (data->server);
+  xobject_unref (client);
+  xobject_unref (client2);
 
   g_slice_free (IPTestData, data);
 }
@@ -1299,7 +1299,7 @@ test_sockaddr (void)
 {
   struct sockaddr_in6 sin6, gsin6;
   xsocket_address_t *saddr;
-  GInetSocketAddress *isaddr;
+  xinet_socket_address_t *isaddr;
   xinet_address_t *iaddr;
   xerror_t *error = NULL;
 
@@ -1330,7 +1330,7 @@ test_sockaddr (void)
   g_assert_cmpint (sin6.sin6_scope_id, ==, gsin6.sin6_scope_id);
   g_assert_cmpint (sin6.sin6_flowinfo, ==, gsin6.sin6_flowinfo);
 
-  g_object_unref (saddr);
+  xobject_unref (saddr);
 }
 
 static void
@@ -1368,7 +1368,7 @@ test_unix_from_fd (void)
   g_assert_cmpint (xsocket_get_family (s), ==, XSOCKET_FAMILY_UNIX);
   g_assert_cmpint (xsocket_get_socket_type (s), ==, XSOCKET_TYPE_STREAM);
   g_assert_cmpint (xsocket_get_protocol (s), ==, XSOCKET_PROTOCOL_DEFAULT);
-  g_object_unref (s);
+  xobject_unref (s);
 }
 
 static void
@@ -1389,8 +1389,8 @@ test_unix_connection (void)
   g_assert_no_error (error);
   c = xsocket_connection_factory_create_connection (s);
   g_assert (X_IS_UNIX_CONNECTION (c));
-  g_object_unref (c);
-  g_object_unref (s);
+  xobject_unref (c);
+  xobject_unref (s);
 }
 
 #ifdef G_OS_UNIX
@@ -1406,7 +1406,7 @@ create_connection_for_fd (int fd)
   g_assert (X_IS_SOCKET (socket));
   connection = xsocket_connection_factory_create_connection (socket);
   g_assert (X_IS_UNIX_CONNECTION (connection));
-  g_object_unref (socket);
+  xobject_unref (socket);
   return connection;
 }
 
@@ -1452,7 +1452,7 @@ test_unix_connection_ancillary_data (void)
 					 &err);
       g_assert_no_error (err);
       g_assert_cmpint (fd, >, -1);
-      g_object_unref (connection);
+      xobject_unref (connection);
 
       do
 	len = write (fd, TEST_DATA, sizeof (TEST_DATA));
@@ -1471,7 +1471,7 @@ test_unix_connection_ancillary_data (void)
       g_unix_connection_send_fd (G_UNIX_CONNECTION (connection), pv[1], NULL,
 				 &err);
       g_assert_no_error (err);
-      g_object_unref (connection);
+      xobject_unref (connection);
 
       status = close (pv[1]);
       g_assert_cmpint (status, ==, 0);
@@ -1497,7 +1497,7 @@ test_unix_connection_ancillary_data (void)
 
 static xboolean_t
 postmortem_source_cb (xsocket_t      *socket,
-                      GIOCondition  condition,
+                      xio_condition_t  condition,
                       xpointer_t      user_data)
 {
   xboolean_t *been_here = user_data;
@@ -1511,34 +1511,34 @@ postmortem_source_cb (xsocket_t      *socket,
 static void
 test_source_postmortem (void)
 {
-  GMainContext *context;
+  xmain_context_t *context;
   xsocket_t *socket;
-  GSource *source;
+  xsource_t *source;
   xerror_t *error = NULL;
   xboolean_t callback_visited = FALSE;
 
   socket = xsocket_new (XSOCKET_FAMILY_UNIX, XSOCKET_TYPE_STREAM, XSOCKET_PROTOCOL_DEFAULT, &error);
   g_assert_no_error (error);
 
-  context = g_main_context_new ();
+  context = xmain_context_new ();
 
   source = xsocket_create_source (socket, G_IO_IN, NULL);
-  g_source_set_callback (source, (GSourceFunc) postmortem_source_cb,
+  xsource_set_callback (source, (xsource_func_t) postmortem_source_cb,
                          &callback_visited, NULL);
-  g_source_attach (source, context);
-  g_source_unref (source);
+  xsource_attach (source, context);
+  xsource_unref (source);
 
   xsocket_close (socket, &error);
   g_assert_no_error (error);
-  g_object_unref (socket);
+  xobject_unref (socket);
 
   /* Test that, after a socket is closed, its source callback should be called
    * exactly once. */
-  g_main_context_iteration (context, FALSE);
+  xmain_context_iteration (context, FALSE);
   g_assert (callback_visited);
-  g_assert (!g_main_context_pending (context));
+  g_assert (!xmain_context_pending (context));
 
-  g_main_context_unref (context);
+  xmain_context_unref (context);
 }
 
 static void
@@ -1557,9 +1557,9 @@ test_reuse_tcp (void)
 
   iaddr = xinet_address_new_loopback (XSOCKET_FAMILY_IPV4);
   addr = g_inet_socket_address_new (iaddr, 0);
-  g_object_unref (iaddr);
+  xobject_unref (iaddr);
   xsocket_bind (sock1, addr, TRUE, &error);
-  g_object_unref (addr);
+  xobject_unref (addr);
   g_assert_no_error (error);
 
   xsocket_listen (sock1, &error);
@@ -1576,10 +1576,10 @@ test_reuse_tcp (void)
   xsocket_bind (sock2, addr, TRUE, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_ADDRESS_IN_USE);
   g_clear_error (&error);
-  g_object_unref (addr);
+  xobject_unref (addr);
 
-  g_object_unref (sock1);
-  g_object_unref (sock2);
+  xobject_unref (sock1);
+  xobject_unref (sock2);
 }
 
 static void
@@ -1598,9 +1598,9 @@ test_reuse_udp (void)
 
   iaddr = xinet_address_new_loopback (XSOCKET_FAMILY_IPV4);
   addr = g_inet_socket_address_new (iaddr, 0);
-  g_object_unref (iaddr);
+  xobject_unref (iaddr);
   xsocket_bind (sock1, addr, TRUE, &error);
-  g_object_unref (addr);
+  xobject_unref (addr);
   g_assert_no_error (error);
 
   sock2 = xsocket_new (XSOCKET_FAMILY_IPV4,
@@ -1612,15 +1612,15 @@ test_reuse_udp (void)
   addr = xsocket_get_local_address (sock1, &error);
   g_assert_no_error (error);
   xsocket_bind (sock2, addr, TRUE, &error);
-  g_object_unref (addr);
+  xobject_unref (addr);
   g_assert_no_error (error);
 
-  g_object_unref (sock1);
-  g_object_unref (sock2);
+  xobject_unref (sock1);
+  xobject_unref (sock2);
 }
 
 static void
-test_get_available (gconstpointer user_data)
+test_get_available (xconstpointer user_data)
 {
   xsocket_type_t socket_type = GPOINTER_TO_UINT (user_data);
   xerror_t *err = NULL;
@@ -1629,7 +1629,7 @@ test_get_available (gconstpointer user_data)
   xsocket_address_t *saddr, *boundaddr;
   xchar_t data[] = "0123456789abcdef";
   xchar_t buf[34];
-  gssize nread;
+  xssize_t nread;
 
   listener = xsocket_new (XSOCKET_FAMILY_IPV4,
                            socket_type,
@@ -1656,16 +1656,16 @@ test_get_available (gconstpointer user_data)
 
   xsocket_bind (listener, saddr, TRUE, &err);
   g_assert_no_error (err);
-  g_object_unref (saddr);
-  g_object_unref (addr);
+  xobject_unref (saddr);
+  xobject_unref (addr);
 
   boundaddr = xsocket_get_local_address (listener, &err);
   g_assert_no_error (err);
 
   addr = xinet_address_new_loopback (XSOCKET_FAMILY_IPV4);
   saddr = g_inet_socket_address_new (addr, g_inet_socket_address_get_port (G_INET_SOCKET_ADDRESS (boundaddr)));
-  g_object_unref (addr);
-  g_object_unref (boundaddr);
+  xobject_unref (addr);
+  xobject_unref (boundaddr);
 
   if (socket_type == XSOCKET_TYPE_STREAM)
     {
@@ -1677,7 +1677,7 @@ test_get_available (gconstpointer user_data)
       server = xsocket_accept (listener, NULL, &err);
       g_assert_no_error (err);
       xsocket_set_blocking (server, FALSE);
-      g_object_unref (listener);
+      xobject_unref (listener);
     }
   else
     server = listener;
@@ -1706,7 +1706,7 @@ test_get_available (gconstpointer user_data)
 
       for (tries = 0; tries < 100; tries++)
         {
-          gssize res = xsocket_get_available_bytes (server);
+          xssize_t res = xsocket_get_available_bytes (server);
           if ((res == -1) || ((xsize_t) res > sizeof (data)))
             break;
           g_usleep (100000);
@@ -1753,16 +1753,16 @@ test_get_available (gconstpointer user_data)
   xsocket_close (server, &err);
   g_assert_no_error (err);
 
-  g_object_unref (saddr);
-  g_object_unref (server);
-  g_object_unref (client);
+  xobject_unref (saddr);
+  xobject_unref (server);
+  xobject_unref (client);
 }
 
 typedef struct {
   xinput_stream_t *is;
   xoutput_stream_t *os;
-  const guint8 *write_data;
-  guint8 *read_data;
+  const xuint8_t *write_data;
+  xuint8_t *read_data;
 } TestReadWriteData;
 
 static xpointer_t
@@ -1773,7 +1773,7 @@ test_read_write_write_thread (xpointer_t user_data)
   xerror_t *error = NULL;
   xboolean_t res;
 
-  res = g_output_stream_write_all (data->os, data->write_data, 1024, &bytes_written, NULL, &error);
+  res = xoutput_stream_write_all (data->os, data->write_data, 1024, &bytes_written, NULL, &error);
   g_assert_true (res);
   g_assert_no_error (error);
   g_assert_cmpint (bytes_written, ==, 1024);
@@ -1789,7 +1789,7 @@ test_read_write_read_thread (xpointer_t user_data)
   xerror_t *error = NULL;
   xboolean_t res;
 
-  res = g_input_stream_read_all (data->is, data->read_data, 1024, &bytes_read, NULL, &error);
+  res = xinput_stream_read_all (data->is, data->read_data, 1024, &bytes_read, NULL, &error);
   g_assert_true (res);
   g_assert_no_error (error);
   g_assert_cmpint (bytes_read, ==, 1024);
@@ -1804,7 +1804,7 @@ test_read_write_writev_thread (xpointer_t user_data)
   xsize_t bytes_written;
   xerror_t *error = NULL;
   xboolean_t res;
-  GOutputVector vectors[3];
+  xoutput_vector_t vectors[3];
 
   vectors[0].buffer = data->write_data;
   vectors[0].size = 256;
@@ -1813,7 +1813,7 @@ test_read_write_writev_thread (xpointer_t user_data)
   vectors[2].buffer = data->write_data + 512;
   vectors[2].size = 512;
 
-  res = g_output_stream_writev_all (data->os, vectors, G_N_ELEMENTS (vectors), &bytes_written, NULL, &error);
+  res = xoutput_stream_writev_all (data->os, vectors, G_N_ELEMENTS (vectors), &bytes_written, NULL, &error);
   g_assert_true (res);
   g_assert_no_error (error);
   g_assert_cmpint (bytes_written, ==, 1024);
@@ -1823,7 +1823,7 @@ test_read_write_writev_thread (xpointer_t user_data)
 
 /* test if normal read/write/writev via the xsocket_t*Streams works on TCP sockets */
 static void
-test_read_write (gconstpointer user_data)
+test_read_write (xconstpointer user_data)
 {
   xboolean_t writev = GPOINTER_TO_INT (user_data);
   xerror_t *err = NULL;
@@ -1831,9 +1831,9 @@ test_read_write (gconstpointer user_data)
   xinet_address_t *addr;
   xsocket_address_t *saddr, *boundaddr;
   TestReadWriteData data;
-  guint8 data_write[1024], data_read[1024];
+  xuint8_t data_write[1024], data_read[1024];
   xsocket_connection_t *server_stream, *client_stream;
-  GThread *write_thread, *read_thread;
+  xthread_t *write_thread, *read_thread;
   xuint_t i;
 
   listener = xsocket_new (XSOCKET_FAMILY_IPV4,
@@ -1855,8 +1855,8 @@ test_read_write (gconstpointer user_data)
 
   xsocket_bind (listener, saddr, TRUE, &err);
   g_assert_no_error (err);
-  g_object_unref (saddr);
-  g_object_unref (addr);
+  xobject_unref (saddr);
+  xobject_unref (addr);
 
   boundaddr = xsocket_get_local_address (listener, &err);
   g_assert_no_error (err);
@@ -1866,8 +1866,8 @@ test_read_write (gconstpointer user_data)
 
   addr = xinet_address_new_loopback (XSOCKET_FAMILY_IPV4);
   saddr = g_inet_socket_address_new (addr, g_inet_socket_address_get_port (G_INET_SOCKET_ADDRESS (boundaddr)));
-  g_object_unref (addr);
-  g_object_unref (boundaddr);
+  xobject_unref (addr);
+  xobject_unref (boundaddr);
 
   xsocket_connect (client, saddr, NULL, &err);
   g_assert_no_error (err);
@@ -1875,7 +1875,7 @@ test_read_write (gconstpointer user_data)
   server = xsocket_accept (listener, NULL, &err);
   g_assert_no_error (err);
   xsocket_set_blocking (server, FALSE);
-  g_object_unref (listener);
+  xobject_unref (listener);
 
   server_stream = xsocket_connection_factory_create_connection (server);
   g_assert_nonnull (server_stream);
@@ -1891,25 +1891,25 @@ test_read_write (gconstpointer user_data)
   data.write_data = data_write;
 
   if (writev)
-    write_thread = g_thread_new ("writer", test_read_write_writev_thread, &data);
+    write_thread = xthread_new ("writer", test_read_write_writev_thread, &data);
   else
-    write_thread = g_thread_new ("writer", test_read_write_write_thread, &data);
-  read_thread = g_thread_new ("reader", test_read_write_read_thread, &data);
+    write_thread = xthread_new ("writer", test_read_write_write_thread, &data);
+  read_thread = xthread_new ("reader", test_read_write_read_thread, &data);
 
-  g_thread_join (write_thread);
-  g_thread_join (read_thread);
+  xthread_join (write_thread);
+  xthread_join (read_thread);
 
   g_assert_cmpmem (data_write, sizeof data_write, data_read, sizeof data_read);
 
   xsocket_close (server, &err);
   g_assert_no_error (err);
 
-  g_object_unref (server_stream);
-  g_object_unref (client_stream);
+  xobject_unref (server_stream);
+  xobject_unref (client_stream);
 
-  g_object_unref (saddr);
-  g_object_unref (server);
-  g_object_unref (client);
+  xobject_unref (saddr);
+  xobject_unref (server);
+  xobject_unref (client);
 }
 
 #ifdef SO_NOSIGPIPE
@@ -1930,7 +1930,7 @@ test_nosigpipe (void)
   g_assert_no_error (error);
   g_assert_true (value);
 
-  g_object_unref (sock);
+  xobject_unref (sock);
 }
 #endif
 
@@ -1945,7 +1945,7 @@ test_credentials_tcp_client (void)
   xerror_t *error = NULL;
   xsocket_t *client;
   xsocket_address_t *addr;
-  GCredentials *creds;
+  xcredentials_t *creds;
 
   data = create_server (family, echo_server_thread, FALSE, &error);
   if (error != NULL)
@@ -1969,12 +1969,12 @@ test_credentials_tcp_client (void)
 
   xsocket_connect (client, addr, NULL, &error);
   g_assert_no_error (error);
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   creds = xsocket_get_credentials (client, &error);
   if (creds != NULL)
     {
-      xchar_t *str = g_credentials_to_string (creds);
+      xchar_t *str = xcredentials_to_string (creds);
       g_print ("Supported on this OS: %s\n", str);
       g_free (str);
       g_clear_object (&creds);
@@ -1989,13 +1989,13 @@ test_credentials_tcp_client (void)
   xsocket_close (client, &error);
   g_assert_no_error (error);
 
-  g_thread_join (data->thread);
+  xthread_join (data->thread);
 
   xsocket_close (data->server, &error);
   g_assert_no_error (error);
 
-  g_object_unref (data->server);
-  g_object_unref (client);
+  xobject_unref (data->server);
+  xobject_unref (client);
 
   g_slice_free (IPTestData, data);
 }
@@ -2010,7 +2010,7 @@ test_credentials_tcp_server (void)
   xsocket_address_t *addr = NULL;
   xinet_address_t *iaddr = NULL;
   xsocket_t *sock = NULL;
-  GCredentials *creds;
+  xcredentials_t *creds;
 
   data = g_slice_new0 (IPTestData);
   data->family = family;
@@ -2032,7 +2032,7 @@ test_credentials_tcp_server (void)
   if (!xsocket_listen (server, &error))
     goto skip;
 
-  data->thread = g_thread_new ("client", client_setup_thread, data);
+  data->thread = xthread_new ("client", client_setup_thread, data);
 
   sock = xsocket_accept (server, NULL, &error);
   g_assert_no_error (error);
@@ -2040,7 +2040,7 @@ test_credentials_tcp_server (void)
   creds = xsocket_get_credentials (sock, &error);
   if (creds != NULL)
     {
-      xchar_t *str = g_credentials_to_string (creds);
+      xchar_t *str = xcredentials_to_string (creds);
       g_print ("Supported on this OS: %s\n", str);
       g_free (str);
       g_clear_object (&creds);
@@ -2066,7 +2066,7 @@ beach:
     g_clear_object (&addr);
     g_clear_object (&iaddr);
 
-    g_clear_pointer (&data->thread, g_thread_join);
+    g_clear_pointer (&data->thread, xthread_join);
     g_clear_object (&data->server);
     g_clear_object (&data->client);
 
@@ -2097,7 +2097,7 @@ client_setup_thread (xpointer_t user_data)
   xsocket_connect (client, addr, NULL, &error);
   g_assert_no_error (error);
 
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   return NULL;
 }
@@ -2132,7 +2132,7 @@ _g_win32_socketpair (xint_t            domain,
   addr.sun_family = AF_UNIX;
   socklen = sizeof (addr);
 
-  tmpfd = g_file_open_tmp (NULL, &path, NULL);
+  tmpfd = xfile_open_tmp (NULL, &path, NULL);
   if (tmpfd == -1)
     {
       WSASetLastError (WSAEACCES);
@@ -2221,7 +2221,7 @@ test_credentials_unix_socketpair (void)
   xint_t status;
   xsocket_t *sock;
   xerror_t *error = NULL;
-  GCredentials *creds;
+  xcredentials_t *creds;
 
 #ifdef G_OS_WIN32
   status = _g_win32_socketpair (PF_UNIX, SOCK_STREAM, 0, fds);
@@ -2235,7 +2235,7 @@ test_credentials_unix_socketpair (void)
   creds = xsocket_get_credentials (sock, &error);
   if (creds != NULL)
     {
-      xchar_t *str = g_credentials_to_string (creds);
+      xchar_t *str = xcredentials_to_string (creds);
       g_print ("Supported on this OS: %s\n", str);
       g_free (str);
       g_clear_object (&creds);
@@ -2247,7 +2247,7 @@ test_credentials_unix_socketpair (void)
       g_clear_error (&error);
     }
 
-  g_object_unref (sock);
+  xobject_unref (sock);
   g_close (fds[1], NULL);
 }
 #endif
@@ -2268,7 +2268,7 @@ main (int   argc,
   if (sock != NULL)
     {
       ipv6_supported = TRUE;
-      g_object_unref (sock);
+      xobject_unref (sock);
     }
   else
     {

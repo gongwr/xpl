@@ -15,9 +15,9 @@
 #include <glib/glib.h>
 #include <gio/gio.h>
 
-/* GFilterInputStream and GFilterOutputStream are abstract, so define
+/* xfilter_input_stream_t and xfilter_output_stream_t are abstract, so define
  * minimal subclasses for testing. (This used to use
- * GBufferedInputStream and GBufferedOutputStream, but those have
+ * xbuffered_input_stream and xbuffered_output_stream_t, but those have
  * their own test program, and they override some methods, meaning the
  * core filter stream functionality wasn't getting fully tested.)
  */
@@ -30,9 +30,9 @@ xtype_t test_filter_output_stream_get_type (void);
 #define TEST_TYPE_FILTER_OUTPUT_STREAM (test_filter_output_stream_get_type ())
 #define TEST_FILTER_OUTPUT_STREAM(o)   (XTYPE_CHECK_INSTANCE_CAST ((o), TEST_TYPE_FILTER_OUTPUT_STREAM, TestFilterOutputStream))
 
-typedef GFilterInputStream       TestFilterInputStream;
+typedef xfilter_input_stream_t       TestFilterInputStream;
 typedef GFilterInputStreamClass  TestFilterInputStreamClass;
-typedef GFilterOutputStream      TestFilterOutputStream;
+typedef xfilter_output_stream_t      TestFilterOutputStream;
 typedef GFilterOutputStreamClass TestFilterOutputStreamClass;
 
 G_DEFINE_TYPE (TestFilterInputStream, test_filter_input_stream, XTYPE_FILTER_INPUT_STREAM)
@@ -70,47 +70,47 @@ test_input_filter (void)
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=568394");
   base = g_memory_input_stream_new_from_data ("abcdefghijk", -1, NULL);
-  f1 = g_object_new (TEST_TYPE_FILTER_INPUT_STREAM,
+  f1 = xobject_new (TEST_TYPE_FILTER_INPUT_STREAM,
                      "base-stream", base,
                      "close-base-stream", FALSE,
                      NULL);
-  f2 = g_object_new (TEST_TYPE_FILTER_INPUT_STREAM,
+  f2 = xobject_new (TEST_TYPE_FILTER_INPUT_STREAM,
                      "base-stream", base,
                      NULL);
 
   g_assert (g_filter_input_stream_get_base_stream (G_FILTER_INPUT_STREAM (f1)) == base);
   g_assert (g_filter_input_stream_get_base_stream (G_FILTER_INPUT_STREAM (f2)) == base);
 
-  g_assert (!g_input_stream_is_closed (base));
-  g_assert (!g_input_stream_is_closed (f1));
-  g_assert (!g_input_stream_is_closed (f2));
+  g_assert (!xinput_stream_is_closed (base));
+  g_assert (!xinput_stream_is_closed (f1));
+  g_assert (!xinput_stream_is_closed (f2));
 
-  g_object_get (f1,
+  xobject_get (f1,
                 "close-base-stream", &close_base,
                 "base-stream", &s,
                 NULL);
   g_assert (!close_base);
   g_assert (s == base);
-  g_object_unref (s);
+  xobject_unref (s);
 
-  g_object_unref (f1);
+  xobject_unref (f1);
 
-  g_assert (!g_input_stream_is_closed (base));
-  g_assert (!g_input_stream_is_closed (f2));
+  g_assert (!xinput_stream_is_closed (base));
+  g_assert (!xinput_stream_is_closed (f2));
 
-  g_input_stream_skip (f2, 3, NULL, &error);
+  xinput_stream_skip (f2, 3, NULL, &error);
   g_assert_no_error (error);
 
   memset (buf, 0, 1024);
-  g_input_stream_read_all (f2, buf, 1024, NULL, NULL, &error);
+  xinput_stream_read_all (f2, buf, 1024, NULL, NULL, &error);
   g_assert_no_error (error);
   g_assert_cmpstr (buf, ==, "defghijk");
 
-  g_object_unref (f2);
+  xobject_unref (f2);
 
-  g_assert (g_input_stream_is_closed (base));
+  g_assert (xinput_stream_is_closed (base));
 
-  g_object_unref (base);
+  xobject_unref (base);
 }
 
 static void
@@ -119,37 +119,37 @@ test_output_filter (void)
   xoutput_stream_t *base, *f1, *f2;
 
   base = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
-  f1 = g_object_new (TEST_TYPE_FILTER_OUTPUT_STREAM,
+  f1 = xobject_new (TEST_TYPE_FILTER_OUTPUT_STREAM,
                      "base-stream", base,
                      "close-base-stream", FALSE,
                      NULL);
-  f2 = g_object_new (TEST_TYPE_FILTER_OUTPUT_STREAM,
+  f2 = xobject_new (TEST_TYPE_FILTER_OUTPUT_STREAM,
                      "base-stream", base,
                      NULL);
 
   g_assert (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (f1)) == base);
   g_assert (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (f2)) == base);
 
-  g_assert (!g_output_stream_is_closed (base));
-  g_assert (!g_output_stream_is_closed (f1));
-  g_assert (!g_output_stream_is_closed (f2));
+  g_assert (!xoutput_stream_is_closed (base));
+  g_assert (!xoutput_stream_is_closed (f1));
+  g_assert (!xoutput_stream_is_closed (f2));
 
-  g_object_unref (f1);
+  xobject_unref (f1);
 
-  g_assert (!g_output_stream_is_closed (base));
-  g_assert (!g_output_stream_is_closed (f2));
+  g_assert (!xoutput_stream_is_closed (base));
+  g_assert (!xoutput_stream_is_closed (f2));
 
-  g_object_unref (f2);
+  xobject_unref (f2);
 
-  g_assert (g_output_stream_is_closed (base));
+  g_assert (xoutput_stream_is_closed (base));
 
-  g_object_unref (base);
+  xobject_unref (base);
 }
 
 xpointer_t expected_obj;
 xpointer_t expected_data;
 xboolean_t callback_happened;
-GMainLoop *loop;
+xmain_loop_t *loop;
 
 static void
 return_result_cb (xobject_t      *object,
@@ -158,8 +158,8 @@ return_result_cb (xobject_t      *object,
 {
   xasync_result_t **ret = user_data;
 
-  *ret = g_object_ref (result);
-  g_main_loop_quit (loop);
+  *ret = xobject_ref (result);
+  xmain_loop_quit (loop);
 }
 
 static void
@@ -173,11 +173,11 @@ in_cb (xobject_t      *object,
   g_assert (user_data == expected_data);
   g_assert (callback_happened == FALSE);
 
-  g_input_stream_close_finish (expected_obj, result, &error);
+  xinput_stream_close_finish (expected_obj, result, &error);
   g_assert (error == NULL);
 
   callback_happened = TRUE;
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
@@ -188,14 +188,14 @@ test_input_async (void)
   xasync_result_t *result = NULL;
   xerror_t *error = NULL;
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   base = g_memory_input_stream_new_from_data ("abcdefghijklmnopqrstuvwxyz", -1, NULL);
-  f1 = g_object_new (TEST_TYPE_FILTER_INPUT_STREAM,
+  f1 = xobject_new (TEST_TYPE_FILTER_INPUT_STREAM,
                      "base-stream", base,
                      "close-base-stream", FALSE,
                      NULL);
-  f2 = g_object_new (TEST_TYPE_FILTER_INPUT_STREAM,
+  f2 = xobject_new (TEST_TYPE_FILTER_INPUT_STREAM,
                      "base-stream", base,
                      NULL);
 
@@ -204,74 +204,74 @@ test_input_async (void)
 
 
   memset (buf, 0, sizeof (buf));
-  g_input_stream_read_async (f1, buf, 10, G_PRIORITY_DEFAULT,
+  xinput_stream_read_async (f1, buf, 10, G_PRIORITY_DEFAULT,
                              NULL, return_result_cb, &result);
-  g_main_loop_run (loop);
-  g_assert_cmpint (g_input_stream_read_finish (f1, result, &error), ==, 10);
+  xmain_loop_run (loop);
+  g_assert_cmpint (xinput_stream_read_finish (f1, result, &error), ==, 10);
   g_assert_cmpstr (buf, ==, "abcdefghij");
   g_assert_no_error (error);
   g_clear_object (&result);
 
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (base)), ==, 10);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (base)), ==, 10);
 
-  g_input_stream_skip_async (f2, 10, G_PRIORITY_DEFAULT,
+  xinput_stream_skip_async (f2, 10, G_PRIORITY_DEFAULT,
                              NULL, return_result_cb, &result);
-  g_main_loop_run (loop);
-  g_assert_cmpint (g_input_stream_skip_finish (f2, result, &error), ==, 10);
+  xmain_loop_run (loop);
+  g_assert_cmpint (xinput_stream_skip_finish (f2, result, &error), ==, 10);
   g_assert_no_error (error);
   g_clear_object (&result);
 
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (base)), ==, 20);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (base)), ==, 20);
 
   memset (buf, 0, sizeof (buf));
-  g_input_stream_read_async (f1, buf, 10, G_PRIORITY_DEFAULT,
+  xinput_stream_read_async (f1, buf, 10, G_PRIORITY_DEFAULT,
                              NULL, return_result_cb, &result);
-  g_main_loop_run (loop);
-  g_assert_cmpint (g_input_stream_read_finish (f1, result, &error), ==, 6);
+  xmain_loop_run (loop);
+  g_assert_cmpint (xinput_stream_read_finish (f1, result, &error), ==, 6);
   g_assert_cmpstr (buf, ==, "uvwxyz");
   g_assert_no_error (error);
   g_clear_object (&result);
 
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (base)), ==, 26);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (base)), ==, 26);
 
 
-  g_assert (!g_input_stream_is_closed (base));
-  g_assert (!g_input_stream_is_closed (f1));
-  g_assert (!g_input_stream_is_closed (f2));
+  g_assert (!xinput_stream_is_closed (base));
+  g_assert (!xinput_stream_is_closed (f1));
+  g_assert (!xinput_stream_is_closed (f2));
 
   expected_obj = f1;
   expected_data = g_malloc (20);
   callback_happened = FALSE;
-  g_input_stream_close_async (f1, 0, NULL, in_cb, expected_data);
+  xinput_stream_close_async (f1, 0, NULL, in_cb, expected_data);
 
   g_assert (callback_happened == FALSE);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
   g_assert (callback_happened == TRUE);
 
-  g_assert (!g_input_stream_is_closed (base));
-  g_assert (!g_input_stream_is_closed (f2));
+  g_assert (!xinput_stream_is_closed (base));
+  g_assert (!xinput_stream_is_closed (f2));
   g_free (expected_data);
-  g_object_unref (f1);
-  g_assert (!g_input_stream_is_closed (base));
-  g_assert (!g_input_stream_is_closed (f2));
+  xobject_unref (f1);
+  g_assert (!xinput_stream_is_closed (base));
+  g_assert (!xinput_stream_is_closed (f2));
 
   expected_obj = f2;
   expected_data = g_malloc (20);
   callback_happened = FALSE;
-  g_input_stream_close_async (f2, 0, NULL, in_cb, expected_data);
+  xinput_stream_close_async (f2, 0, NULL, in_cb, expected_data);
 
   g_assert (callback_happened == FALSE);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
   g_assert (callback_happened == TRUE);
 
-  g_assert (g_input_stream_is_closed (base));
-  g_assert (g_input_stream_is_closed (f2));
+  g_assert (xinput_stream_is_closed (base));
+  g_assert (xinput_stream_is_closed (f2));
   g_free (expected_data);
-  g_object_unref (f2);
+  xobject_unref (f2);
 
-  g_assert (g_input_stream_is_closed (base));
-  g_object_unref (base);
-  g_main_loop_unref (loop);
+  g_assert (xinput_stream_is_closed (base));
+  xobject_unref (base);
+  xmain_loop_unref (loop);
 }
 
 static void
@@ -285,11 +285,11 @@ out_cb (xobject_t      *object,
   g_assert (user_data == expected_data);
   g_assert (callback_happened == FALSE);
 
-  g_output_stream_close_finish (expected_obj, result, &error);
+  xoutput_stream_close_finish (expected_obj, result, &error);
   g_assert (error == NULL);
 
   callback_happened = TRUE;
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
@@ -299,14 +299,14 @@ test_output_async (void)
   xasync_result_t *result = NULL;
   xerror_t *error = NULL;
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   base = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
-  f1 = g_object_new (TEST_TYPE_FILTER_OUTPUT_STREAM,
+  f1 = xobject_new (TEST_TYPE_FILTER_OUTPUT_STREAM,
                      "base-stream", base,
                      "close-base-stream", FALSE,
                      NULL);
-  f2 = g_object_new (TEST_TYPE_FILTER_OUTPUT_STREAM,
+  f2 = xobject_new (TEST_TYPE_FILTER_OUTPUT_STREAM,
                      "base-stream", base,
                      NULL);
 
@@ -314,67 +314,67 @@ test_output_async (void)
   g_assert (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (f2)) == base);
 
 
-  g_output_stream_write_async (f1, "abcdefghijklm", 13, G_PRIORITY_DEFAULT,
+  xoutput_stream_write_async (f1, "abcdefghijklm", 13, G_PRIORITY_DEFAULT,
                                NULL, return_result_cb, &result);
-  g_main_loop_run (loop);
-  g_assert_cmpint (g_output_stream_write_finish (f1, result, &error), ==, 13);
+  xmain_loop_run (loop);
+  g_assert_cmpint (xoutput_stream_write_finish (f1, result, &error), ==, 13);
   g_assert_no_error (error);
   g_clear_object (&result);
 
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (base)), ==, 13);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (base)), ==, 13);
 
-  g_output_stream_write_async (f2, "nopqrstuvwxyz", 13, G_PRIORITY_DEFAULT,
+  xoutput_stream_write_async (f2, "nopqrstuvwxyz", 13, G_PRIORITY_DEFAULT,
                                NULL, return_result_cb, &result);
-  g_main_loop_run (loop);
-  g_assert_cmpint (g_output_stream_write_finish (f2, result, &error), ==, 13);
+  xmain_loop_run (loop);
+  g_assert_cmpint (xoutput_stream_write_finish (f2, result, &error), ==, 13);
   g_assert_no_error (error);
   g_clear_object (&result);
 
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (base)), ==, 26);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (base)), ==, 26);
 
   g_assert_cmpint (g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (base)), ==, 26);
-  g_output_stream_write (base, "\0", 1, NULL, &error);
+  xoutput_stream_write (base, "\0", 1, NULL, &error);
   g_assert_no_error (error);
   g_assert_cmpstr (g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (base)), ==, "abcdefghijklmnopqrstuvwxyz");
 
 
-  g_assert (!g_output_stream_is_closed (base));
-  g_assert (!g_output_stream_is_closed (f1));
-  g_assert (!g_output_stream_is_closed (f2));
+  g_assert (!xoutput_stream_is_closed (base));
+  g_assert (!xoutput_stream_is_closed (f1));
+  g_assert (!xoutput_stream_is_closed (f2));
 
   expected_obj = f1;
   expected_data = g_malloc (20);
   callback_happened = FALSE;
-  g_output_stream_close_async (f1, 0, NULL, out_cb, expected_data);
+  xoutput_stream_close_async (f1, 0, NULL, out_cb, expected_data);
 
   g_assert (callback_happened == FALSE);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
   g_assert (callback_happened == TRUE);
 
-  g_assert (!g_output_stream_is_closed (base));
-  g_assert (!g_output_stream_is_closed (f2));
+  g_assert (!xoutput_stream_is_closed (base));
+  g_assert (!xoutput_stream_is_closed (f2));
   g_free (expected_data);
-  g_object_unref (f1);
-  g_assert (!g_output_stream_is_closed (base));
-  g_assert (!g_output_stream_is_closed (f2));
+  xobject_unref (f1);
+  g_assert (!xoutput_stream_is_closed (base));
+  g_assert (!xoutput_stream_is_closed (f2));
 
   expected_obj = f2;
   expected_data = g_malloc (20);
   callback_happened = FALSE;
-  g_output_stream_close_async (f2, 0, NULL, out_cb, expected_data);
+  xoutput_stream_close_async (f2, 0, NULL, out_cb, expected_data);
 
   g_assert (callback_happened == FALSE);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
   g_assert (callback_happened == TRUE);
 
-  g_assert (g_output_stream_is_closed (base));
-  g_assert (g_output_stream_is_closed (f2));
+  g_assert (xoutput_stream_is_closed (base));
+  g_assert (xoutput_stream_is_closed (f2));
   g_free (expected_data);
-  g_object_unref (f2);
+  xobject_unref (f2);
 
-  g_assert (g_output_stream_is_closed (base));
-  g_object_unref (base);
-  g_main_loop_unref (loop);
+  g_assert (xoutput_stream_is_closed (base));
+  xobject_unref (base);
+  xmain_loop_unref (loop);
 }
 
 int

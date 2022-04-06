@@ -72,7 +72,7 @@
  * @title: Key-value file parser
  * @short_description: parses .ini-like config files
  *
- * #GKeyFile lets you parse, edit or create files containing groups of
+ * #xkey_file_t lets you parse, edit or create files containing groups of
  * key-value pairs, which we call "key files" for lack of a better name.
  * Several freedesktop.org specifications use key files now, e.g the
  * [Desktop Entry Specification](http://freedesktop.org/Standards/desktop-entry-spec)
@@ -155,19 +155,19 @@
  *
  * Here is an example of loading a key file and reading a value:
  * |[<!-- language="C" -->
- * g_autoptr(xerror_t) error = NULL;
- * g_autoptr(GKeyFile) key_file = g_key_file_new ();
+ * x_autoptr(xerror) error = NULL;
+ * x_autoptr(xkey_file) key_file = xkey_file_new ();
  *
- * if (!g_key_file_load_from_file (key_file, "key-file.ini", flags, &error))
+ * if (!xkey_file_load_from_file (key_file, "key-file.ini", flags, &error))
  *   {
- *     if (!g_error_matches (error, G_FILE_ERROR, G_FILE_ERROR_NOENT))
+ *     if (!xerror_matches (error, XFILE_ERROR, XFILE_ERROR_NOENT))
  *       g_warning ("Error loading key file: %s", error->message);
  *     return;
  *   }
  *
- * g_autofree xchar_t *val = g_key_file_get_string (key_file, "Group Name", "SomeKey", &error);
+ * g_autofree xchar_t *val = xkey_file_get_string (key_file, "Group Name", "SomeKey", &error);
  * if (val == NULL &&
- *     !g_error_matches (error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND))
+ *     !xerror_matches (error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND))
  *   {
  *     g_warning ("Error finding key in key file: %s", error->message);
  *     return;
@@ -175,34 +175,34 @@
  * else if (val == NULL)
  *   {
  *     // Fall back to a default value.
- *     val = g_strdup ("default-value");
+ *     val = xstrdup ("default-value");
  *   }
  * ]|
  *
  * Here is an example of creating and saving a key file:
  * |[<!-- language="C" -->
- * g_autoptr(GKeyFile) key_file = g_key_file_new ();
+ * x_autoptr(xkey_file) key_file = xkey_file_new ();
  * const xchar_t *val = …;
- * g_autoptr(xerror_t) error = NULL;
+ * x_autoptr(xerror) error = NULL;
  *
- * g_key_file_set_string (key_file, "Group Name", "SomeKey", val);
+ * xkey_file_set_string (key_file, "Group Name", "SomeKey", val);
  *
  * // Save as a file.
- * if (!g_key_file_save_to_file (key_file, "key-file.ini", &error))
+ * if (!xkey_file_save_to_file (key_file, "key-file.ini", &error))
  *   {
  *     g_warning ("Error saving key file: %s", error->message);
  *     return;
  *   }
  *
- * // Or store to a GBytes for use elsewhere.
+ * // Or store to a xbytes_t for use elsewhere.
  * xsize_t data_len;
- * g_autofree guint8 *data = (guint8 *) g_key_file_to_data (key_file, &data_len, &error);
+ * g_autofree xuint8_t *data = (xuint8_t *) xkey_file_to_data (key_file, &data_len, &error);
  * if (data == NULL)
  *   {
  *     g_warning ("Error saving key file: %s", error->message);
  *     return;
  *   }
- * g_autoptr(GBytes) bytes = g_bytes_new_take (g_steal_pointer (&data), data_len);
+ * x_autoptr(xbytes) bytes = xbytes_new_take (g_steal_pointer (&data), data_len);
  * ]|
  */
 
@@ -492,20 +492,20 @@
 typedef struct _GKeyFileGroup GKeyFileGroup;
 
 /**
- * GKeyFile:
+ * xkey_file_t:
  *
- * The GKeyFile struct contains only private data
+ * The xkey_file_t struct contains only private data
  * and should not be accessed directly.
  */
 struct _GKeyFile
 {
   xlist_t *groups;
-  GHashTable *group_hash;
+  xhashtable_t *group_hash;
 
   GKeyFileGroup *start_group;
   GKeyFileGroup *current_group;
 
-  GString *parse_buffer; /* Holds up to one line of not-yet-parsed data */
+  xstring_t *parse_buffer; /* Holds up to one line of not-yet-parsed data */
 
   xchar_t list_separator;
 
@@ -530,7 +530,7 @@ struct _GKeyFileGroup
   /* Used in parallel with key_value_pairs for
    * increased lookup performance
    */
-  GHashTable *lookup_map;
+  xhashtable_t *lookup_map;
 };
 
 struct _GKeyFileKeyValuePair
@@ -543,97 +543,97 @@ static xint_t                  find_file_in_data_dirs            (const xchar_t 
 								const xchar_t           **data_dirs,
 								xchar_t                 **output_file,
 								xerror_t                **error);
-static xboolean_t              g_key_file_load_from_fd           (GKeyFile               *key_file,
+static xboolean_t              xkey_file_load_from_fd           (xkey_file_t               *key_file,
 								xint_t                    fd,
 								GKeyFileFlags           flags,
 								xerror_t                **error);
-static xlist_t                *g_key_file_lookup_group_node      (GKeyFile               *key_file,
+static xlist_t                *xkey_file_lookup_group_node      (xkey_file_t               *key_file,
 			                                        const xchar_t            *group_name);
-static GKeyFileGroup        *g_key_file_lookup_group           (GKeyFile               *key_file,
+static GKeyFileGroup        *xkey_file_lookup_group           (xkey_file_t               *key_file,
 								const xchar_t            *group_name);
 
-static xlist_t                *g_key_file_lookup_key_value_pair_node  (GKeyFile       *key_file,
+static xlist_t                *xkey_file_lookup_key_value_pair_node  (xkey_file_t       *key_file,
 			                                             GKeyFileGroup  *group,
                                                                      const xchar_t    *key);
-static GKeyFileKeyValuePair *g_key_file_lookup_key_value_pair       (GKeyFile       *key_file,
+static GKeyFileKeyValuePair *xkey_file_lookup_key_value_pair       (xkey_file_t       *key_file,
                                                                      GKeyFileGroup  *group,
                                                                      const xchar_t    *key);
 
-static void                  g_key_file_remove_group_node          (GKeyFile      *key_file,
+static void                  xkey_file_remove_group_node          (xkey_file_t      *key_file,
 							  	    xlist_t         *group_node);
-static void                  g_key_file_remove_key_value_pair_node (GKeyFile      *key_file,
+static void                  xkey_file_remove_key_value_pair_node (xkey_file_t      *key_file,
                                                                     GKeyFileGroup *group,
                                                                     xlist_t         *pair_node);
 
-static void                  g_key_file_add_key_value_pair     (GKeyFile               *key_file,
+static void                  xkey_file_add_key_value_pair     (xkey_file_t               *key_file,
                                                                 GKeyFileGroup          *group,
                                                                 GKeyFileKeyValuePair   *pair);
-static void                  g_key_file_add_key                (GKeyFile               *key_file,
+static void                  xkey_file_add_key                (xkey_file_t               *key_file,
 								GKeyFileGroup          *group,
 								const xchar_t            *key,
 								const xchar_t            *value);
-static void                  g_key_file_add_group              (GKeyFile               *key_file,
+static void                  xkey_file_add_group              (xkey_file_t               *key_file,
 								const xchar_t            *group_name);
-static xboolean_t              g_key_file_is_group_name          (const xchar_t *name);
-static xboolean_t              g_key_file_is_key_name            (const xchar_t *name,
+static xboolean_t              xkey_file_is_group_name          (const xchar_t *name);
+static xboolean_t              xkey_file_is_key_name            (const xchar_t *name,
                                                                 xsize_t        len);
-static void                  g_key_file_key_value_pair_free    (GKeyFileKeyValuePair   *pair);
-static xboolean_t              g_key_file_line_is_comment        (const xchar_t            *line);
-static xboolean_t              g_key_file_line_is_group          (const xchar_t            *line);
-static xboolean_t              g_key_file_line_is_key_value_pair (const xchar_t            *line);
-static xchar_t                *g_key_file_parse_value_as_string  (GKeyFile               *key_file,
+static void                  xkey_file_key_value_pair_free    (GKeyFileKeyValuePair   *pair);
+static xboolean_t              xkey_file_line_is_comment        (const xchar_t            *line);
+static xboolean_t              xkey_file_line_is_group          (const xchar_t            *line);
+static xboolean_t              xkey_file_line_is_key_value_pair (const xchar_t            *line);
+static xchar_t                *xkey_file_parse_value_as_string  (xkey_file_t               *key_file,
 								const xchar_t            *value,
-								GSList                **separators,
+								xslist_t                **separators,
 								xerror_t                **error);
-static xchar_t                *g_key_file_parse_string_as_value  (GKeyFile               *key_file,
+static xchar_t                *xkey_file_parse_string_as_value  (xkey_file_t               *key_file,
 								const xchar_t            *string,
 								xboolean_t                escape_separator);
-static xint_t                  g_key_file_parse_value_as_integer (GKeyFile               *key_file,
+static xint_t                  xkey_file_parse_value_as_integer (xkey_file_t               *key_file,
 								const xchar_t            *value,
 								xerror_t                **error);
-static xchar_t                *g_key_file_parse_integer_as_value (GKeyFile               *key_file,
+static xchar_t                *xkey_file_parse_integer_as_value (xkey_file_t               *key_file,
 								xint_t                    value);
-static xdouble_t               g_key_file_parse_value_as_double  (GKeyFile               *key_file,
+static xdouble_t               xkey_file_parse_value_as_double  (xkey_file_t               *key_file,
                                                                 const xchar_t            *value,
                                                                 xerror_t                **error);
-static xboolean_t              g_key_file_parse_value_as_boolean (GKeyFile               *key_file,
+static xboolean_t              xkey_file_parse_value_as_boolean (xkey_file_t               *key_file,
 								const xchar_t            *value,
 								xerror_t                **error);
-static const xchar_t          *g_key_file_parse_boolean_as_value (GKeyFile               *key_file,
+static const xchar_t          *xkey_file_parse_boolean_as_value (xkey_file_t               *key_file,
 								xboolean_t                value);
-static xchar_t                *g_key_file_parse_value_as_comment (GKeyFile               *key_file,
+static xchar_t                *xkey_file_parse_value_as_comment (xkey_file_t               *key_file,
                                                                 const xchar_t            *value,
                                                                 xboolean_t                is_final_line);
-static xchar_t                *g_key_file_parse_comment_as_value (GKeyFile               *key_file,
+static xchar_t                *xkey_file_parse_comment_as_value (xkey_file_t               *key_file,
                                                                 const xchar_t            *comment);
-static void                  g_key_file_parse_key_value_pair   (GKeyFile               *key_file,
+static void                  xkey_file_parse_key_value_pair   (xkey_file_t               *key_file,
 								const xchar_t            *line,
 								xsize_t                   length,
 								xerror_t                **error);
-static void                  g_key_file_parse_comment          (GKeyFile               *key_file,
+static void                  xkey_file_parse_comment          (xkey_file_t               *key_file,
 								const xchar_t            *line,
 								xsize_t                   length,
 								xerror_t                **error);
-static void                  g_key_file_parse_group            (GKeyFile               *key_file,
+static void                  xkey_file_parse_group            (xkey_file_t               *key_file,
 								const xchar_t            *line,
 								xsize_t                   length,
 								xerror_t                **error);
 static const xchar_t          *key_get_locale                    (const xchar_t            *key,
                                                                 xsize_t                  *len_out);
-static void                  g_key_file_parse_data             (GKeyFile               *key_file,
+static void                  xkey_file_parse_data             (xkey_file_t               *key_file,
 								const xchar_t            *data,
 								xsize_t                   length,
 								xerror_t                **error);
-static void                  g_key_file_flush_parse_buffer     (GKeyFile               *key_file,
+static void                  xkey_file_flush_parse_buffer     (xkey_file_t               *key_file,
 								xerror_t                **error);
 
-G_DEFINE_QUARK (g-key-file-error-quark, g_key_file_error)
+G_DEFINE_QUARK (g-key-file-error-quark, xkey_file_error)
 
 static void
-g_key_file_init (GKeyFile *key_file)
+xkey_file_init (xkey_file_t *key_file)
 {
   key_file->current_group = g_slice_new0 (GKeyFileGroup);
-  key_file->groups = g_list_prepend (NULL, key_file->current_group);
+  key_file->groups = xlist_prepend (NULL, key_file->current_group);
   key_file->group_hash = NULL;
   key_file->start_group = NULL;
   key_file->parse_buffer = NULL;
@@ -642,20 +642,20 @@ g_key_file_init (GKeyFile *key_file)
 }
 
 static void
-g_key_file_clear (GKeyFile *key_file)
+xkey_file_clear (xkey_file_t *key_file)
 {
   xlist_t *tmp, *group_node;
 
   if (key_file->locales)
     {
-      g_strfreev (key_file->locales);
+      xstrfreev (key_file->locales);
       key_file->locales = NULL;
     }
   key_file->checked_locales = FALSE;
 
   if (key_file->parse_buffer)
     {
-      g_string_free (key_file->parse_buffer, TRUE);
+      xstring_free (key_file->parse_buffer, TRUE);
       key_file->parse_buffer = NULL;
     }
 
@@ -664,12 +664,12 @@ g_key_file_clear (GKeyFile *key_file)
     {
       group_node = tmp;
       tmp = tmp->next;
-      g_key_file_remove_group_node (key_file, group_node);
+      xkey_file_remove_group_node (key_file, group_node);
     }
 
   if (key_file->group_hash != NULL)
     {
-      g_hash_table_destroy (key_file->group_hash);
+      xhash_table_destroy (key_file->group_hash);
       key_file->group_hash = NULL;
     }
 
@@ -678,32 +678,32 @@ g_key_file_clear (GKeyFile *key_file)
 
 
 /**
- * g_key_file_new:
+ * xkey_file_new:
  *
- * Creates a new empty #GKeyFile object. Use
- * g_key_file_load_from_file(), g_key_file_load_from_data(),
- * g_key_file_load_from_dirs() or g_key_file_load_from_data_dirs() to
+ * Creates a new empty #xkey_file_t object. Use
+ * xkey_file_load_from_file(), xkey_file_load_from_data(),
+ * xkey_file_load_from_dirs() or xkey_file_load_from_data_dirs() to
  * read an existing key file.
  *
- * Returns: (transfer full): an empty #GKeyFile.
+ * Returns: (transfer full): an empty #xkey_file_t.
  *
  * Since: 2.6
  **/
-GKeyFile *
-g_key_file_new (void)
+xkey_file_t *
+xkey_file_new (void)
 {
-  GKeyFile *key_file;
+  xkey_file_t *key_file;
 
-  key_file = g_slice_new0 (GKeyFile);
+  key_file = g_slice_new0 (xkey_file_t);
   key_file->ref_count = 1;
-  g_key_file_init (key_file);
+  xkey_file_init (key_file);
 
   return key_file;
 }
 
 /**
- * g_key_file_set_list_separator:
- * @key_file: a #GKeyFile
+ * xkey_file_set_list_separator:
+ * @key_file: a #xkey_file_t
  * @separator: the separator
  *
  * Sets the character which is used to separate
@@ -713,7 +713,7 @@ g_key_file_new (void)
  * Since: 2.6
  */
 void
-g_key_file_set_list_separator (GKeyFile *key_file,
+xkey_file_set_list_separator (xkey_file_t *key_file,
 			       xchar_t     separator)
 {
   g_return_if_fail (key_file != NULL);
@@ -751,7 +751,7 @@ find_file_in_data_dirs (const xchar_t   *file,
       xchar_t *sub_dir;
 
       candidate_file = file;
-      sub_dir = g_strdup ("");
+      sub_dir = xstrdup ("");
       while (candidate_file != NULL && fd == -1)
         {
           xchar_t *p;
@@ -775,7 +775,7 @@ find_file_in_data_dirs (const xchar_t   *file,
           candidate_file++;
 
           g_free (sub_dir);
-          sub_dir = g_strndup (file, candidate_file - file - 1);
+          sub_dir = xstrndup (file, candidate_file - file - 1);
 
           for (p = sub_dir; *p != '\0'; p++)
             {
@@ -796,7 +796,7 @@ find_file_in_data_dirs (const xchar_t   *file,
     }
 
   if (output_file != NULL && fd != -1)
-    *output_file = g_strdup (path);
+    *output_file = xstrdup (path);
 
   g_free (path);
 
@@ -804,13 +804,13 @@ find_file_in_data_dirs (const xchar_t   *file,
 }
 
 static xboolean_t
-g_key_file_load_from_fd (GKeyFile       *key_file,
+xkey_file_load_from_fd (xkey_file_t       *key_file,
 			 xint_t            fd,
 			 GKeyFileFlags   flags,
 			 xerror_t        **error)
 {
   xerror_t *key_file_error = NULL;
-  gssize bytes_read;
+  xssize_t bytes_read;
   struct stat stat_buf;
   xchar_t read_buf[4096];
   xchar_t list_separator;
@@ -818,9 +818,9 @@ g_key_file_load_from_fd (GKeyFile       *key_file,
   if (fstat (fd, &stat_buf) < 0)
     {
       int errsv = errno;
-      g_set_error_literal (error, G_FILE_ERROR,
-                           g_file_error_from_errno (errsv),
-                           g_strerror (errsv));
+      g_set_error_literal (error, XFILE_ERROR,
+                           xfile_error_from_errno (errsv),
+                           xstrerror (errsv));
       return FALSE;
     }
 
@@ -833,8 +833,8 @@ g_key_file_load_from_fd (GKeyFile       *key_file,
     }
 
   list_separator = key_file->list_separator;
-  g_key_file_clear (key_file);
-  g_key_file_init (key_file);
+  xkey_file_clear (key_file);
+  xkey_file_init (key_file);
   key_file->list_separator = list_separator;
   key_file->flags = flags;
 
@@ -853,13 +853,13 @@ g_key_file_load_from_fd (GKeyFile       *key_file,
           if (errsv == EINTR || errsv == EAGAIN)
             continue;
 
-          g_set_error_literal (error, G_FILE_ERROR,
-                               g_file_error_from_errno (errsv),
-                               g_strerror (errsv));
+          g_set_error_literal (error, XFILE_ERROR,
+                               xfile_error_from_errno (errsv),
+                               xstrerror (errsv));
           return FALSE;
         }
 
-      g_key_file_parse_data (key_file,
+      xkey_file_parse_data (key_file,
 			     read_buf, bytes_read,
 			     &key_file_error);
     }
@@ -871,7 +871,7 @@ g_key_file_load_from_fd (GKeyFile       *key_file,
       return FALSE;
     }
 
-  g_key_file_flush_parse_buffer (key_file, &key_file_error);
+  xkey_file_flush_parse_buffer (key_file, &key_file_error);
 
   if (key_file_error)
     {
@@ -883,27 +883,27 @@ g_key_file_load_from_fd (GKeyFile       *key_file,
 }
 
 /**
- * g_key_file_load_from_file:
- * @key_file: an empty #GKeyFile struct
+ * xkey_file_load_from_file:
+ * @key_file: an empty #xkey_file_t struct
  * @file: (type filename): the path of a filename to load, in the GLib filename encoding
  * @flags: flags from #GKeyFileFlags
  * @error: return location for a #xerror_t, or %NULL
  *
- * Loads a key file into an empty #GKeyFile structure.
+ * Loads a key file into an empty #xkey_file_t structure.
  *
  * If the OS returns an error when opening or reading the file, a
- * %G_FILE_ERROR is returned. If there is a problem parsing the file, a
+ * %XFILE_ERROR is returned. If there is a problem parsing the file, a
  * %G_KEY_FILE_ERROR is returned.
  *
  * This function will never return a %G_KEY_FILE_ERROR_NOT_FOUND error. If the
- * @file is not found, %G_FILE_ERROR_NOENT is returned.
+ * @file is not found, %XFILE_ERROR_NOENT is returned.
  *
  * Returns: %TRUE if a key file could be loaded, %FALSE otherwise
  *
  * Since: 2.6
  **/
 xboolean_t
-g_key_file_load_from_file (GKeyFile       *key_file,
+xkey_file_load_from_file (xkey_file_t       *key_file,
 			   const xchar_t    *file,
 			   GKeyFileFlags   flags,
 			   xerror_t        **error)
@@ -920,13 +920,13 @@ g_key_file_load_from_file (GKeyFile       *key_file,
 
   if (fd == -1)
     {
-      g_set_error_literal (error, G_FILE_ERROR,
-                           g_file_error_from_errno (errsv),
-                           g_strerror (errsv));
+      g_set_error_literal (error, XFILE_ERROR,
+                           xfile_error_from_errno (errsv),
+                           xstrerror (errsv));
       return FALSE;
     }
 
-  g_key_file_load_from_fd (key_file, fd, flags, &key_file_error);
+  xkey_file_load_from_fd (key_file, fd, flags, &key_file_error);
   close (fd);
 
   if (key_file_error)
@@ -939,14 +939,14 @@ g_key_file_load_from_file (GKeyFile       *key_file,
 }
 
 /**
- * g_key_file_load_from_data:
- * @key_file: an empty #GKeyFile struct
+ * xkey_file_load_from_data:
+ * @key_file: an empty #xkey_file_t struct
  * @data: key file loaded in memory
  * @length: the length of @data in bytes (or (xsize_t)-1 if data is nul-terminated)
  * @flags: flags from #GKeyFileFlags
  * @error: return location for a #xerror_t, or %NULL
  *
- * Loads a key file from memory into an empty #GKeyFile structure.
+ * Loads a key file from memory into an empty #xkey_file_t structure.
  * If the object cannot be created then %error is set to a #GKeyFileError.
  *
  * Returns: %TRUE if a key file could be loaded, %FALSE otherwise
@@ -954,7 +954,7 @@ g_key_file_load_from_file (GKeyFile       *key_file,
  * Since: 2.6
  **/
 xboolean_t
-g_key_file_load_from_data (GKeyFile       *key_file,
+xkey_file_load_from_data (xkey_file_t       *key_file,
 			   const xchar_t    *data,
 			   xsize_t           length,
 			   GKeyFileFlags   flags,
@@ -970,12 +970,12 @@ g_key_file_load_from_data (GKeyFile       *key_file,
     length = strlen (data);
 
   list_separator = key_file->list_separator;
-  g_key_file_clear (key_file);
-  g_key_file_init (key_file);
+  xkey_file_clear (key_file);
+  xkey_file_init (key_file);
   key_file->list_separator = list_separator;
   key_file->flags = flags;
 
-  g_key_file_parse_data (key_file, data, length, &key_file_error);
+  xkey_file_parse_data (key_file, data, length, &key_file_error);
 
   if (key_file_error)
     {
@@ -983,7 +983,7 @@ g_key_file_load_from_data (GKeyFile       *key_file,
       return FALSE;
     }
 
-  g_key_file_flush_parse_buffer (key_file, &key_file_error);
+  xkey_file_flush_parse_buffer (key_file, &key_file_error);
 
   if (key_file_error)
     {
@@ -995,13 +995,13 @@ g_key_file_load_from_data (GKeyFile       *key_file,
 }
 
 /**
- * g_key_file_load_from_bytes:
- * @key_file: an empty #GKeyFile struct
- * @bytes: a #GBytes
+ * xkey_file_load_from_bytes:
+ * @key_file: an empty #xkey_file_t struct
+ * @bytes: a #xbytes_t
  * @flags: flags from #GKeyFileFlags
  * @error: return location for a #xerror_t, or %NULL
  *
- * Loads a key file from the data in @bytes into an empty #GKeyFile structure.
+ * Loads a key file from the data in @bytes into an empty #xkey_file_t structure.
  * If the object cannot be created then %error is set to a #GKeyFileError.
  *
  * Returns: %TRUE if a key file could be loaded, %FALSE otherwise
@@ -1009,8 +1009,8 @@ g_key_file_load_from_data (GKeyFile       *key_file,
  * Since: 2.50
  **/
 xboolean_t
-g_key_file_load_from_bytes (GKeyFile       *key_file,
-                            GBytes         *bytes,
+xkey_file_load_from_bytes (xkey_file_t       *key_file,
+                            xbytes_t         *bytes,
                             GKeyFileFlags   flags,
                             xerror_t        **error)
 {
@@ -1020,13 +1020,13 @@ g_key_file_load_from_bytes (GKeyFile       *key_file,
   g_return_val_if_fail (key_file != NULL, FALSE);
   g_return_val_if_fail (bytes != NULL, FALSE);
 
-  data = g_bytes_get_data (bytes, &size);
-  return g_key_file_load_from_data (key_file, (const xchar_t *) data, size, flags, error);
+  data = xbytes_get_data (bytes, &size);
+  return xkey_file_load_from_data (key_file, (const xchar_t *) data, size, flags, error);
 }
 
 /**
- * g_key_file_load_from_dirs:
- * @key_file: an empty #GKeyFile struct
+ * xkey_file_load_from_dirs:
+ * @key_file: an empty #xkey_file_t struct
  * @file: (type filename): a relative path to a filename to open and parse
  * @search_dirs: (array zero-terminated=1) (element-type filename): %NULL-terminated array of directories to search
  * @full_path: (out) (type filename) (optional): return location for a string containing the full path
@@ -1041,7 +1041,7 @@ g_key_file_load_from_bytes (GKeyFile       *key_file,
  * If the file could not be found in any of the @search_dirs,
  * %G_KEY_FILE_ERROR_NOT_FOUND is returned. If
  * the file is found but the OS returns an error when opening or reading the
- * file, a %G_FILE_ERROR is returned. If there is a problem parsing the file, a
+ * file, a %XFILE_ERROR is returned. If there is a problem parsing the file, a
  * %G_KEY_FILE_ERROR is returned.
  *
  * Returns: %TRUE if a key file could be loaded, %FALSE otherwise
@@ -1049,7 +1049,7 @@ g_key_file_load_from_bytes (GKeyFile       *key_file,
  * Since: 2.14
  **/
 xboolean_t
-g_key_file_load_from_dirs (GKeyFile       *key_file,
+xkey_file_load_from_dirs (xkey_file_t       *key_file,
                            const xchar_t    *file,
                            const xchar_t   **search_dirs,
                            xchar_t         **full_path,
@@ -1084,7 +1084,7 @@ g_key_file_load_from_dirs (GKeyFile       *key_file,
  	  break;
         }
 
-      found_file = g_key_file_load_from_fd (key_file, fd, flags,
+      found_file = xkey_file_load_from_fd (key_file, fd, flags,
 	                                    &key_file_error);
       close (fd);
 
@@ -1104,8 +1104,8 @@ g_key_file_load_from_dirs (GKeyFile       *key_file,
 }
 
 /**
- * g_key_file_load_from_data_dirs:
- * @key_file: an empty #GKeyFile struct
+ * xkey_file_load_from_data_dirs:
+ * @key_file: an empty #xkey_file_t struct
  * @file: (type filename): a relative path to a filename to open and parse
  * @full_path: (out) (type filename) (optional): return location for a string containing the full path
  *   of the file, or %NULL
@@ -1122,7 +1122,7 @@ g_key_file_load_from_dirs (GKeyFile       *key_file,
  * Since: 2.6
  **/
 xboolean_t
-g_key_file_load_from_data_dirs (GKeyFile       *key_file,
+xkey_file_load_from_data_dirs (xkey_file_t       *key_file,
 				const xchar_t    *file,
 				xchar_t         **full_path,
 				GKeyFileFlags   flags,
@@ -1139,31 +1139,31 @@ g_key_file_load_from_data_dirs (GKeyFile       *key_file,
 
   user_data_dir = g_get_user_data_dir ();
   system_data_dirs = g_get_system_data_dirs ();
-  all_data_dirs = g_new (xchar_t *, g_strv_length ((xchar_t **)system_data_dirs) + 2);
+  all_data_dirs = g_new (xchar_t *, xstrv_length ((xchar_t **)system_data_dirs) + 2);
 
   i = 0;
-  all_data_dirs[i++] = g_strdup (user_data_dir);
+  all_data_dirs[i++] = xstrdup (user_data_dir);
 
   j = 0;
   while (system_data_dirs[j] != NULL)
-    all_data_dirs[i++] = g_strdup (system_data_dirs[j++]);
+    all_data_dirs[i++] = xstrdup (system_data_dirs[j++]);
   all_data_dirs[i] = NULL;
 
-  found_file = g_key_file_load_from_dirs (key_file,
+  found_file = xkey_file_load_from_dirs (key_file,
                                           file,
                                           (const xchar_t **)all_data_dirs,
                                           full_path,
                                           flags,
                                           error);
 
-  g_strfreev (all_data_dirs);
+  xstrfreev (all_data_dirs);
 
   return found_file;
 }
 
 /**
- * g_key_file_ref: (skip)
- * @key_file: a #GKeyFile
+ * xkey_file_ref: (skip)
+ * @key_file: a #xkey_file_t
  *
  * Increases the reference count of @key_file.
  *
@@ -1171,8 +1171,8 @@ g_key_file_load_from_data_dirs (GKeyFile       *key_file,
  *
  * Since: 2.32
  **/
-GKeyFile *
-g_key_file_ref (GKeyFile *key_file)
+xkey_file_t *
+xkey_file_ref (xkey_file_t *key_file)
 {
   g_return_val_if_fail (key_file != NULL, NULL);
 
@@ -1182,8 +1182,8 @@ g_key_file_ref (GKeyFile *key_file)
 }
 
 /**
- * g_key_file_free: (skip)
- * @key_file: a #GKeyFile
+ * xkey_file_free: (skip)
+ * @key_file: a #xkey_file_t
  *
  * Clears all keys and groups from @key_file, and decreases the
  * reference count by 1. If the reference count reaches zero,
@@ -1192,21 +1192,21 @@ g_key_file_ref (GKeyFile *key_file)
  * Since: 2.6
  **/
 void
-g_key_file_free (GKeyFile *key_file)
+xkey_file_free (xkey_file_t *key_file)
 {
   g_return_if_fail (key_file != NULL);
 
-  g_key_file_clear (key_file);
+  xkey_file_clear (key_file);
 
   if (g_atomic_int_dec_and_test (&key_file->ref_count))
-    g_slice_free (GKeyFile, key_file);
+    g_slice_free (xkey_file_t, key_file);
   else
-    g_key_file_init (key_file);
+    xkey_file_init (key_file);
 }
 
 /**
- * g_key_file_unref:
- * @key_file: a #GKeyFile
+ * xkey_file_unref:
+ * @key_file: a #xkey_file_t
  *
  * Decreases the reference count of @key_file by 1. If the reference count
  * reaches zero, frees the key file and all its allocated memory.
@@ -1214,14 +1214,14 @@ g_key_file_free (GKeyFile *key_file)
  * Since: 2.32
  **/
 void
-g_key_file_unref (GKeyFile *key_file)
+xkey_file_unref (xkey_file_t *key_file)
 {
   g_return_if_fail (key_file != NULL);
 
   if (g_atomic_int_dec_and_test (&key_file->ref_count))
     {
-      g_key_file_clear (key_file);
-      g_slice_free (GKeyFile, key_file);
+      xkey_file_clear (key_file);
+      g_slice_free (xkey_file_t, key_file);
     }
 }
 
@@ -1229,7 +1229,7 @@ g_key_file_unref (GKeyFile *key_file)
  * true for locales that match those in g_get_language_names().
  */
 static xboolean_t
-g_key_file_locale_is_interesting (GKeyFile    *key_file,
+xkey_file_locale_is_interesting (xkey_file_t    *key_file,
                                   const xchar_t *locale,
                                   xsize_t        locale_len)
 {
@@ -1241,7 +1241,7 @@ g_key_file_locale_is_interesting (GKeyFile    *key_file,
   if (!key_file->checked_locales)
     {
       g_assert (key_file->locales == NULL);
-      key_file->locales = g_strdupv ((xchar_t **)g_get_language_names ());
+      key_file->locales = xstrdupv ((xchar_t **)g_get_language_names ());
       key_file->checked_locales = TRUE;
     }
 
@@ -1256,7 +1256,7 @@ g_key_file_locale_is_interesting (GKeyFile    *key_file,
 }
 
 static void
-g_key_file_parse_line (GKeyFile     *key_file,
+xkey_file_parse_line (xkey_file_t     *key_file,
 		       const xchar_t  *line,
 		       xsize_t         length,
 		       xerror_t      **error)
@@ -1271,19 +1271,19 @@ g_key_file_parse_line (GKeyFile     *key_file,
   while (g_ascii_isspace (*line_start))
     line_start++;
 
-  if (g_key_file_line_is_comment (line_start))
-    g_key_file_parse_comment (key_file, line, length, &parse_error);
-  else if (g_key_file_line_is_group (line_start))
-    g_key_file_parse_group (key_file, line_start,
+  if (xkey_file_line_is_comment (line_start))
+    xkey_file_parse_comment (key_file, line, length, &parse_error);
+  else if (xkey_file_line_is_group (line_start))
+    xkey_file_parse_group (key_file, line_start,
 			    length - (line_start - line),
 			    &parse_error);
-  else if (g_key_file_line_is_key_value_pair (line_start))
-    g_key_file_parse_key_value_pair (key_file, line_start,
+  else if (xkey_file_line_is_key_value_pair (line_start))
+    xkey_file_parse_key_value_pair (key_file, line_start,
 				     length - (line_start - line),
 				     &parse_error);
   else
     {
-      xchar_t *line_utf8 = g_utf8_make_valid (line, length);
+      xchar_t *line_utf8 = xutf8_make_valid (line, length);
       g_set_error (error, G_KEY_FILE_ERROR,
                    G_KEY_FILE_ERROR_PARSE,
                    _("Key file contains line “%s” which is not "
@@ -1299,7 +1299,7 @@ g_key_file_parse_line (GKeyFile     *key_file,
 }
 
 static void
-g_key_file_parse_comment (GKeyFile     *key_file,
+xkey_file_parse_comment (xkey_file_t     *key_file,
 			  const xchar_t  *line,
 			  xsize_t         length,
 			  xerror_t      **error)
@@ -1313,14 +1313,14 @@ g_key_file_parse_comment (GKeyFile     *key_file,
 
   pair = g_slice_new (GKeyFileKeyValuePair);
   pair->key = NULL;
-  pair->value = g_strndup (line, length);
+  pair->value = xstrndup (line, length);
 
   key_file->current_group->key_value_pairs =
-    g_list_prepend (key_file->current_group->key_value_pairs, pair);
+    xlist_prepend (key_file->current_group->key_value_pairs, pair);
 }
 
 static void
-g_key_file_parse_group (GKeyFile     *key_file,
+xkey_file_parse_group (xkey_file_t     *key_file,
 			const xchar_t  *line,
 			xsize_t         length,
 			xerror_t      **error)
@@ -1336,10 +1336,10 @@ g_key_file_parse_group (GKeyFile     *key_file,
   while (*group_name_end != ']')
     group_name_end--;
 
-  group_name = g_strndup (group_name_start,
+  group_name = xstrndup (group_name_start,
                           group_name_end - group_name_start);
 
-  if (!g_key_file_is_group_name (group_name))
+  if (!xkey_file_is_group_name (group_name))
     {
       g_set_error (error, G_KEY_FILE_ERROR,
 		   G_KEY_FILE_ERROR_PARSE,
@@ -1348,12 +1348,12 @@ g_key_file_parse_group (GKeyFile     *key_file,
       return;
     }
 
-  g_key_file_add_group (key_file, group_name);
+  xkey_file_add_group (key_file, group_name);
   g_free (group_name);
 }
 
 static void
-g_key_file_parse_key_value_pair (GKeyFile     *key_file,
+xkey_file_parse_key_value_pair (xkey_file_t     *key_file,
 				 const xchar_t  *line,
 				 xsize_t         length,
 				 xerror_t      **error)
@@ -1387,7 +1387,7 @@ g_key_file_parse_key_value_pair (GKeyFile     *key_file,
 
   g_warn_if_fail (key_len <= length);
 
-  if (!g_key_file_is_key_name (line, key_len - 1))
+  if (!xkey_file_is_key_name (line, key_len - 1))
     {
       g_set_error (error, G_KEY_FILE_ERROR,
                    G_KEY_FILE_ERROR_PARSE,
@@ -1395,7 +1395,7 @@ g_key_file_parse_key_value_pair (GKeyFile     *key_file,
       return;
     }
 
-  key = g_strndup (line, key_len - 1);
+  key = xstrndup (line, key_len - 1);
 
   /* Pull the value from the line (chugging leading whitespace)
    */
@@ -1416,7 +1416,7 @@ g_key_file_parse_key_value_pair (GKeyFile     *key_file,
       if (value_len != strlen ("UTF-8") ||
           g_ascii_strncasecmp (value_start, "UTF-8", value_len) != 0)
         {
-          xchar_t *value_utf8 = g_utf8_make_valid (value_start, value_len);
+          xchar_t *value_utf8 = xutf8_make_valid (value_start, value_len);
           g_set_error (error, G_KEY_FILE_ERROR,
                        G_KEY_FILE_ERROR_UNKNOWN_ENCODING,
                        _("Key file contains unsupported "
@@ -1432,15 +1432,15 @@ g_key_file_parse_key_value_pair (GKeyFile     *key_file,
    */
   locale = key_get_locale (key, &locale_len);
 
-  if (locale == NULL || g_key_file_locale_is_interesting (key_file, locale, locale_len))
+  if (locale == NULL || xkey_file_locale_is_interesting (key_file, locale, locale_len))
     {
       GKeyFileKeyValuePair *pair;
 
       pair = g_slice_new (GKeyFileKeyValuePair);
       pair->key = g_steal_pointer (&key);
-      pair->value = g_strndup (value_start, value_len);
+      pair->value = xstrndup (value_start, value_len);
 
-      g_key_file_add_key_value_pair (key_file, key_file->current_group, pair);
+      xkey_file_add_key_value_pair (key_file, key_file->current_group, pair);
     }
 
   g_free (key);
@@ -1453,7 +1453,7 @@ key_get_locale (const xchar_t *key,
   const xchar_t *locale;
   xsize_t locale_len;
 
-  locale = g_strrstr (key, "[");
+  locale = xstrrstr (key, "[");
   if (locale != NULL)
     locale_len = strlen (locale);
   else
@@ -1475,7 +1475,7 @@ key_get_locale (const xchar_t *key,
 }
 
 static void
-g_key_file_parse_data (GKeyFile     *key_file,
+xkey_file_parse_data (xkey_file_t     *key_file,
 		       const xchar_t  *data,
 		       xsize_t         length,
 		       xerror_t      **error)
@@ -1489,7 +1489,7 @@ g_key_file_parse_data (GKeyFile     *key_file,
   parse_error = NULL;
 
   if (!key_file->parse_buffer)
-    key_file->parse_buffer = g_string_sized_new (128);
+    key_file->parse_buffer = xstring_sized_new (128);
 
   i = 0;
   while (i < length)
@@ -1499,7 +1499,7 @@ g_key_file_parse_data (GKeyFile     *key_file,
 	  if (key_file->parse_buffer->len > 0
 	      && (key_file->parse_buffer->str[key_file->parse_buffer->len - 1]
 		  == '\r'))
-	    g_string_erase (key_file->parse_buffer,
+	    xstring_erase (key_file->parse_buffer,
 			    key_file->parse_buffer->len - 1,
 			    1);
 
@@ -1508,9 +1508,9 @@ g_key_file_parse_data (GKeyFile     *key_file,
            * up in the parse buffer, so they get parsed directly.
            */
           if (key_file->parse_buffer->len > 0)
-            g_key_file_flush_parse_buffer (key_file, &parse_error);
+            xkey_file_flush_parse_buffer (key_file, &parse_error);
           else
-            g_key_file_parse_comment (key_file, "", 1, &parse_error);
+            xkey_file_parse_comment (key_file, "", 1, &parse_error);
 
           if (parse_error)
             {
@@ -1533,14 +1533,14 @@ g_key_file_parse_data (GKeyFile     *key_file,
 
           line_length = end_of_line - start_of_line;
 
-          g_string_append_len (key_file->parse_buffer, start_of_line, line_length);
+          xstring_append_len (key_file->parse_buffer, start_of_line, line_length);
           i += line_length;
         }
     }
 }
 
 static void
-g_key_file_flush_parse_buffer (GKeyFile  *key_file,
+xkey_file_flush_parse_buffer (xkey_file_t  *key_file,
 			       xerror_t   **error)
 {
   xerror_t *file_error = NULL;
@@ -1554,10 +1554,10 @@ g_key_file_flush_parse_buffer (GKeyFile  *key_file,
 
   if (key_file->parse_buffer->len > 0)
     {
-      g_key_file_parse_line (key_file, key_file->parse_buffer->str,
+      xkey_file_parse_line (key_file, key_file->parse_buffer->str,
 			     key_file->parse_buffer->len,
 			     &file_error);
-      g_string_erase (key_file->parse_buffer, 0, -1);
+      xstring_erase (key_file->parse_buffer, 0, -1);
 
       if (file_error)
         {
@@ -1568,8 +1568,8 @@ g_key_file_flush_parse_buffer (GKeyFile  *key_file,
 }
 
 /**
- * g_key_file_to_data:
- * @key_file: a #GKeyFile
+ * xkey_file_to_data:
+ * @key_file: a #xkey_file_t
  * @length: (out) (optional): return location for the length of the
  *   returned string, or %NULL
  * @error: return location for a #xerror_t, or %NULL
@@ -1580,23 +1580,23 @@ g_key_file_flush_parse_buffer (GKeyFile  *key_file,
  * so it is safe to pass %NULL as @error.
  *
  * Returns: a newly allocated string holding
- *   the contents of the #GKeyFile
+ *   the contents of the #xkey_file_t
  *
  * Since: 2.6
  **/
 xchar_t *
-g_key_file_to_data (GKeyFile  *key_file,
+xkey_file_to_data (xkey_file_t  *key_file,
 		    xsize_t     *length,
 		    xerror_t   **error)
 {
-  GString *data_string;
+  xstring_t *data_string;
   xlist_t *group_node, *key_file_node;
 
   g_return_val_if_fail (key_file != NULL, NULL);
 
-  data_string = g_string_new (NULL);
+  data_string = xstring_new (NULL);
 
-  for (group_node = g_list_last (key_file->groups);
+  for (group_node = xlist_last (key_file->groups);
        group_node != NULL;
        group_node = group_node->prev)
     {
@@ -1607,15 +1607,15 @@ g_key_file_to_data (GKeyFile  *key_file,
       /* separate groups by at least an empty line */
       if (data_string->len >= 2 &&
           data_string->str[data_string->len - 2] != '\n')
-        g_string_append_c (data_string, '\n');
+        xstring_append_c (data_string, '\n');
 
       if (group->comment != NULL)
-        g_string_append_printf (data_string, "%s\n", group->comment->value);
+        xstring_append_printf (data_string, "%s\n", group->comment->value);
 
       if (group->name != NULL)
-        g_string_append_printf (data_string, "[%s]\n", group->name);
+        xstring_append_printf (data_string, "[%s]\n", group->name);
 
-      for (key_file_node = g_list_last (group->key_value_pairs);
+      for (key_file_node = xlist_last (group->key_value_pairs);
            key_file_node != NULL;
            key_file_node = key_file_node->prev)
         {
@@ -1624,21 +1624,21 @@ g_key_file_to_data (GKeyFile  *key_file,
           pair = (GKeyFileKeyValuePair *) key_file_node->data;
 
           if (pair->key != NULL)
-            g_string_append_printf (data_string, "%s=%s\n", pair->key, pair->value);
+            xstring_append_printf (data_string, "%s=%s\n", pair->key, pair->value);
           else
-            g_string_append_printf (data_string, "%s\n", pair->value);
+            xstring_append_printf (data_string, "%s\n", pair->value);
         }
     }
 
   if (length)
     *length = data_string->len;
 
-  return g_string_free (data_string, FALSE);
+  return xstring_free (data_string, FALSE);
 }
 
 /**
- * g_key_file_get_keys:
- * @key_file: a #GKeyFile
+ * xkey_file_get_keys:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @length: (out) (optional): return location for the number of keys returned, or %NULL
  * @error: return location for a #xerror_t, or %NULL
@@ -1650,12 +1650,12 @@ g_key_file_to_data (GKeyFile  *key_file,
  * %G_KEY_FILE_ERROR_GROUP_NOT_FOUND.
  *
  * Returns: (array zero-terminated=1) (transfer full): a newly-allocated %NULL-terminated array of strings.
- *     Use g_strfreev() to free it.
+ *     Use xstrfreev() to free it.
  *
  * Since: 2.6
  **/
 xchar_t **
-g_key_file_get_keys (GKeyFile     *key_file,
+xkey_file_get_keys (xkey_file_t     *key_file,
 		     const xchar_t  *group_name,
 		     xsize_t        *length,
 		     xerror_t      **error)
@@ -1668,7 +1668,7 @@ g_key_file_get_keys (GKeyFile     *key_file,
   g_return_val_if_fail (key_file != NULL, NULL);
   g_return_val_if_fail (group_name != NULL, NULL);
 
-  group = g_key_file_lookup_group (key_file, group_name);
+  group = xkey_file_lookup_group (key_file, group_name);
 
   if (!group)
     {
@@ -1701,7 +1701,7 @@ g_key_file_get_keys (GKeyFile     *key_file,
 
       if (pair->key)
 	{
-	  keys[i] = g_strdup (pair->key);
+	  keys[i] = xstrdup (pair->key);
 	  i--;
 	}
     }
@@ -1715,8 +1715,8 @@ g_key_file_get_keys (GKeyFile     *key_file,
 }
 
 /**
- * g_key_file_get_start_group:
- * @key_file: a #GKeyFile
+ * xkey_file_get_start_group:
+ * @key_file: a #xkey_file_t
  *
  * Returns the name of the start group of the file.
  *
@@ -1725,19 +1725,19 @@ g_key_file_get_keys (GKeyFile     *key_file,
  * Since: 2.6
  **/
 xchar_t *
-g_key_file_get_start_group (GKeyFile *key_file)
+xkey_file_get_start_group (xkey_file_t *key_file)
 {
   g_return_val_if_fail (key_file != NULL, NULL);
 
   if (key_file->start_group)
-    return g_strdup (key_file->start_group->name);
+    return xstrdup (key_file->start_group->name);
 
   return NULL;
 }
 
 /**
- * g_key_file_get_groups:
- * @key_file: a #GKeyFile
+ * xkey_file_get_groups:
+ * @key_file: a #xkey_file_t
  * @length: (out) (optional): return location for the number of returned groups, or %NULL
  *
  * Returns all groups in the key file loaded with @key_file.
@@ -1745,11 +1745,11 @@ g_key_file_get_start_group (GKeyFile *key_file)
  * @length may optionally be %NULL.
  *
  * Returns: (array zero-terminated=1) (transfer full): a newly-allocated %NULL-terminated array of strings.
- *   Use g_strfreev() to free it.
+ *   Use xstrfreev() to free it.
  * Since: 2.6
  **/
 xchar_t **
-g_key_file_get_groups (GKeyFile *key_file,
+xkey_file_get_groups (xkey_file_t *key_file,
 		       xsize_t    *length)
 {
   xlist_t *group_node;
@@ -1758,11 +1758,11 @@ g_key_file_get_groups (GKeyFile *key_file,
 
   g_return_val_if_fail (key_file != NULL, NULL);
 
-  num_groups = g_list_length (key_file->groups);
+  num_groups = xlist_length (key_file->groups);
 
   g_return_val_if_fail (num_groups > 0, NULL);
 
-  group_node = g_list_last (key_file->groups);
+  group_node = xlist_last (key_file->groups);
 
   g_return_val_if_fail (((GKeyFileGroup *) group_node->data)->name == NULL, NULL);
 
@@ -1785,7 +1785,7 @@ g_key_file_get_groups (GKeyFile *key_file,
 
       g_warn_if_fail (group->name != NULL);
 
-      groups[i++] = g_strdup (group->name);
+      groups[i++] = xstrdup (group->name);
     }
   groups[i] = NULL;
 
@@ -1807,14 +1807,14 @@ set_not_found_key_error (const char *group_name,
 }
 
 /**
- * g_key_file_get_value:
- * @key_file: a #GKeyFile
+ * xkey_file_get_value:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @error: return location for a #xerror_t, or %NULL
  *
  * Returns the raw value associated with @key under @group_name.
- * Use g_key_file_get_string() to retrieve an unescaped UTF-8 string.
+ * Use xkey_file_get_string() to retrieve an unescaped UTF-8 string.
  *
  * In the event the key cannot be found, %NULL is returned and
  * @error is set to %G_KEY_FILE_ERROR_KEY_NOT_FOUND.  In the
@@ -1828,7 +1828,7 @@ set_not_found_key_error (const char *group_name,
  * Since: 2.6
  **/
 xchar_t *
-g_key_file_get_value (GKeyFile     *key_file,
+xkey_file_get_value (xkey_file_t     *key_file,
 		      const xchar_t  *group_name,
 		      const xchar_t  *key,
 		      xerror_t      **error)
@@ -1841,7 +1841,7 @@ g_key_file_get_value (GKeyFile     *key_file,
   g_return_val_if_fail (group_name != NULL, NULL);
   g_return_val_if_fail (key != NULL, NULL);
 
-  group = g_key_file_lookup_group (key_file, group_name);
+  group = xkey_file_lookup_group (key_file, group_name);
 
   if (!group)
     {
@@ -1852,10 +1852,10 @@ g_key_file_get_value (GKeyFile     *key_file,
       return NULL;
     }
 
-  pair = g_key_file_lookup_key_value_pair (key_file, group, key);
+  pair = xkey_file_lookup_key_value_pair (key_file, group, key);
 
   if (pair)
-    value = g_strdup (pair->value);
+    value = xstrdup (pair->value);
   else
     set_not_found_key_error (group_name, key, error);
 
@@ -1863,8 +1863,8 @@ g_key_file_get_value (GKeyFile     *key_file,
 }
 
 /**
- * g_key_file_set_value:
- * @key_file: a #GKeyFile
+ * xkey_file_set_value:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @value: a string
@@ -1874,12 +1874,12 @@ g_key_file_get_value (GKeyFile     *key_file,
  * If @key cannot be found then it is created. If @group_name cannot
  * be found then it is created. To set an UTF-8 string which may contain
  * characters that need escaping (such as newlines or spaces), use
- * g_key_file_set_string().
+ * xkey_file_set_string().
  *
  * Since: 2.6
  **/
 void
-g_key_file_set_value (GKeyFile    *key_file,
+xkey_file_set_value (xkey_file_t    *key_file,
 		      const xchar_t *group_name,
 		      const xchar_t *key,
 		      const xchar_t *value)
@@ -1888,42 +1888,42 @@ g_key_file_set_value (GKeyFile    *key_file,
   GKeyFileKeyValuePair *pair;
 
   g_return_if_fail (key_file != NULL);
-  g_return_if_fail (group_name != NULL && g_key_file_is_group_name (group_name));
-  g_return_if_fail (key != NULL && g_key_file_is_key_name (key, strlen (key)));
+  g_return_if_fail (group_name != NULL && xkey_file_is_group_name (group_name));
+  g_return_if_fail (key != NULL && xkey_file_is_key_name (key, strlen (key)));
   g_return_if_fail (value != NULL);
 
-  group = g_key_file_lookup_group (key_file, group_name);
+  group = xkey_file_lookup_group (key_file, group_name);
 
   if (!group)
     {
-      g_key_file_add_group (key_file, group_name);
+      xkey_file_add_group (key_file, group_name);
       group = (GKeyFileGroup *) key_file->groups->data;
 
-      g_key_file_add_key (key_file, group, key, value);
+      xkey_file_add_key (key_file, group, key, value);
     }
   else
     {
-      pair = g_key_file_lookup_key_value_pair (key_file, group, key);
+      pair = xkey_file_lookup_key_value_pair (key_file, group, key);
 
       if (!pair)
-        g_key_file_add_key (key_file, group, key, value);
+        xkey_file_add_key (key_file, group, key, value);
       else
         {
           g_free (pair->value);
-          pair->value = g_strdup (value);
+          pair->value = xstrdup (value);
         }
     }
 }
 
 /**
- * g_key_file_get_string:
- * @key_file: a #GKeyFile
+ * xkey_file_get_string:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @error: return location for a #xerror_t, or %NULL
  *
  * Returns the string value associated with @key under @group_name.
- * Unlike g_key_file_get_value(), this function handles escape sequences
+ * Unlike xkey_file_get_value(), this function handles escape sequences
  * like \s.
  *
  * In the event the key cannot be found, %NULL is returned and
@@ -1937,12 +1937,12 @@ g_key_file_set_value (GKeyFile    *key_file,
  * Since: 2.6
  **/
 xchar_t *
-g_key_file_get_string (GKeyFile     *key_file,
+xkey_file_get_string (xkey_file_t     *key_file,
 		       const xchar_t  *group_name,
 		       const xchar_t  *key,
 		       xerror_t      **error)
 {
-  xchar_t *value, *string_value;
+  xchar_t *value, *strinxvalue;
   xerror_t *key_file_error;
 
   g_return_val_if_fail (key_file != NULL, NULL);
@@ -1951,7 +1951,7 @@ g_key_file_get_string (GKeyFile     *key_file,
 
   key_file_error = NULL;
 
-  value = g_key_file_get_value (key_file, group_name, key, &key_file_error);
+  value = xkey_file_get_value (key_file, group_name, key, &key_file_error);
 
   if (key_file_error)
     {
@@ -1959,9 +1959,9 @@ g_key_file_get_string (GKeyFile     *key_file,
       return NULL;
     }
 
-  if (!g_utf8_validate (value, -1, NULL))
+  if (!xutf8_validate (value, -1, NULL))
     {
-      xchar_t *value_utf8 = g_utf8_make_valid (value, -1);
+      xchar_t *value_utf8 = xutf8_make_valid (value, -1);
       g_set_error (error, G_KEY_FILE_ERROR,
                    G_KEY_FILE_ERROR_UNKNOWN_ENCODING,
                    _("Key file contains key “%s” with value “%s” "
@@ -1972,13 +1972,13 @@ g_key_file_get_string (GKeyFile     *key_file,
       return NULL;
     }
 
-  string_value = g_key_file_parse_value_as_string (key_file, value, NULL,
+  strinxvalue = xkey_file_parse_value_as_string (key_file, value, NULL,
 						   &key_file_error);
   g_free (value);
 
   if (key_file_error)
     {
-      if (g_error_matches (key_file_error,
+      if (xerror_matches (key_file_error,
                            G_KEY_FILE_ERROR,
                            G_KEY_FILE_ERROR_INVALID_VALUE))
         {
@@ -1987,18 +1987,18 @@ g_key_file_get_string (GKeyFile     *key_file,
                        _("Key file contains key “%s” "
                          "which has a value that cannot be interpreted."),
                        key);
-          g_error_free (key_file_error);
+          xerror_free (key_file_error);
         }
       else
         g_propagate_error (error, key_file_error);
     }
 
-  return string_value;
+  return strinxvalue;
 }
 
 /**
- * g_key_file_set_string:
- * @key_file: a #GKeyFile
+ * xkey_file_set_string:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @string: a string
@@ -2006,13 +2006,13 @@ g_key_file_get_string (GKeyFile     *key_file,
  * Associates a new string value with @key under @group_name.
  * If @key cannot be found then it is created.
  * If @group_name cannot be found then it is created.
- * Unlike g_key_file_set_value(), this function handles characters
+ * Unlike xkey_file_set_value(), this function handles characters
  * that need escaping, such as newlines.
  *
  * Since: 2.6
  **/
 void
-g_key_file_set_string (GKeyFile    *key_file,
+xkey_file_set_string (xkey_file_t    *key_file,
 		       const xchar_t *group_name,
 		       const xchar_t *key,
 		       const xchar_t *string)
@@ -2022,14 +2022,14 @@ g_key_file_set_string (GKeyFile    *key_file,
   g_return_if_fail (key_file != NULL);
   g_return_if_fail (string != NULL);
 
-  value = g_key_file_parse_string_as_value (key_file, string, FALSE);
-  g_key_file_set_value (key_file, group_name, key, value);
+  value = xkey_file_parse_string_as_value (key_file, string, FALSE);
+  xkey_file_set_value (key_file, group_name, key, value);
   g_free (value);
 }
 
 /**
- * g_key_file_get_string_list:
- * @key_file: a #GKeyFile
+ * xkey_file_get_string_list:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @length: (out) (optional): return location for the number of returned strings, or %NULL
@@ -2044,21 +2044,21 @@ g_key_file_set_string (GKeyFile    *key_file,
  *
  * Returns: (array zero-terminated=1 length=length) (element-type utf8) (transfer full):
  *  a %NULL-terminated string array or %NULL if the specified
- *  key cannot be found. The array should be freed with g_strfreev().
+ *  key cannot be found. The array should be freed with xstrfreev().
  *
  * Since: 2.6
  **/
 xchar_t **
-g_key_file_get_string_list (GKeyFile     *key_file,
+xkey_file_get_string_list (xkey_file_t     *key_file,
 			    const xchar_t  *group_name,
 			    const xchar_t  *key,
 			    xsize_t        *length,
 			    xerror_t      **error)
 {
   xerror_t *key_file_error = NULL;
-  xchar_t *value, *string_value, **values;
+  xchar_t *value, *strinxvalue, **values;
   xint_t i, len;
-  GSList *p, *pieces = NULL;
+  xslist_t *p, *pieces = NULL;
 
   g_return_val_if_fail (key_file != NULL, NULL);
   g_return_val_if_fail (group_name != NULL, NULL);
@@ -2067,7 +2067,7 @@ g_key_file_get_string_list (GKeyFile     *key_file,
   if (length)
     *length = 0;
 
-  value = g_key_file_get_value (key_file, group_name, key, &key_file_error);
+  value = xkey_file_get_value (key_file, group_name, key, &key_file_error);
 
   if (key_file_error)
     {
@@ -2075,9 +2075,9 @@ g_key_file_get_string_list (GKeyFile     *key_file,
       return NULL;
     }
 
-  if (!g_utf8_validate (value, -1, NULL))
+  if (!xutf8_validate (value, -1, NULL))
     {
-      xchar_t *value_utf8 = g_utf8_make_valid (value, -1);
+      xchar_t *value_utf8 = xutf8_make_valid (value, -1);
       g_set_error (error, G_KEY_FILE_ERROR,
                    G_KEY_FILE_ERROR_UNKNOWN_ENCODING,
                    _("Key file contains key “%s” with value “%s” "
@@ -2088,13 +2088,13 @@ g_key_file_get_string_list (GKeyFile     *key_file,
       return NULL;
     }
 
-  string_value = g_key_file_parse_value_as_string (key_file, value, &pieces, &key_file_error);
+  strinxvalue = xkey_file_parse_value_as_string (key_file, value, &pieces, &key_file_error);
   g_free (value);
-  g_free (string_value);
+  g_free (strinxvalue);
 
   if (key_file_error)
     {
-      if (g_error_matches (key_file_error,
+      if (xerror_matches (key_file_error,
                            G_KEY_FILE_ERROR,
                            G_KEY_FILE_ERROR_INVALID_VALUE))
         {
@@ -2103,22 +2103,22 @@ g_key_file_get_string_list (GKeyFile     *key_file,
                        _("Key file contains key “%s” "
                          "which has a value that cannot be interpreted."),
                        key);
-          g_error_free (key_file_error);
+          xerror_free (key_file_error);
         }
       else
         g_propagate_error (error, key_file_error);
 
-      g_slist_free_full (pieces, g_free);
+      xslist_free_full (pieces, g_free);
       return NULL;
     }
 
-  len = g_slist_length (pieces);
+  len = xslist_length (pieces);
   values = g_new (xchar_t *, len + 1);
   for (p = pieces, i = 0; p; p = p->next)
     values[i++] = p->data;
   values[len] = NULL;
 
-  g_slist_free (pieces);
+  xslist_free (pieces);
 
   if (length)
     *length = len;
@@ -2127,8 +2127,8 @@ g_key_file_get_string_list (GKeyFile     *key_file,
 }
 
 /**
- * g_key_file_set_string_list:
- * @key_file: a #GKeyFile
+ * xkey_file_set_string_list:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @list: (array zero-terminated=1 length=length) (element-type utf8): an array of string values
@@ -2141,37 +2141,37 @@ g_key_file_get_string_list (GKeyFile     *key_file,
  * Since: 2.6
  **/
 void
-g_key_file_set_string_list (GKeyFile            *key_file,
+xkey_file_set_string_list (xkey_file_t            *key_file,
 			    const xchar_t         *group_name,
 			    const xchar_t         *key,
 			    const xchar_t * const  list[],
 			    xsize_t                length)
 {
-  GString *value_list;
+  xstring_t *value_list;
   xsize_t i;
 
   g_return_if_fail (key_file != NULL);
   g_return_if_fail (list != NULL || length == 0);
 
-  value_list = g_string_sized_new (length * 128);
+  value_list = xstring_sized_new (length * 128);
   for (i = 0; i < length && list[i] != NULL; i++)
     {
       xchar_t *value;
 
-      value = g_key_file_parse_string_as_value (key_file, list[i], TRUE);
-      g_string_append (value_list, value);
-      g_string_append_c (value_list, key_file->list_separator);
+      value = xkey_file_parse_string_as_value (key_file, list[i], TRUE);
+      xstring_append (value_list, value);
+      xstring_append_c (value_list, key_file->list_separator);
 
       g_free (value);
     }
 
-  g_key_file_set_value (key_file, group_name, key, value_list->str);
-  g_string_free (value_list, TRUE);
+  xkey_file_set_value (key_file, group_name, key, value_list->str);
+  xstring_free (value_list, TRUE);
 }
 
 /**
- * g_key_file_set_locale_string:
- * @key_file: a #GKeyFile
+ * xkey_file_set_locale_string:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @locale: a locale identifier
@@ -2183,7 +2183,7 @@ g_key_file_set_string_list (GKeyFile            *key_file,
  * Since: 2.6
  **/
 void
-g_key_file_set_locale_string (GKeyFile     *key_file,
+xkey_file_set_locale_string (xkey_file_t     *key_file,
 			      const xchar_t  *group_name,
 			      const xchar_t  *key,
 			      const xchar_t  *locale,
@@ -2196,16 +2196,16 @@ g_key_file_set_locale_string (GKeyFile     *key_file,
   g_return_if_fail (locale != NULL);
   g_return_if_fail (string != NULL);
 
-  value = g_key_file_parse_string_as_value (key_file, string, FALSE);
-  full_key = g_strdup_printf ("%s[%s]", key, locale);
-  g_key_file_set_value (key_file, group_name, full_key, value);
+  value = xkey_file_parse_string_as_value (key_file, string, FALSE);
+  full_key = xstrdup_printf ("%s[%s]", key, locale);
+  xkey_file_set_value (key_file, group_name, full_key, value);
   g_free (full_key);
   g_free (value);
 }
 
 /**
- * g_key_file_get_locale_string:
- * @key_file: a #GKeyFile
+ * xkey_file_get_locale_string:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @locale: (nullable): a locale identifier or %NULL
@@ -2216,7 +2216,7 @@ g_key_file_set_locale_string (GKeyFile     *key_file,
  * %NULL then the current locale is assumed.
  *
  * If @locale is to be non-%NULL, or if the current locale will change over
- * the lifetime of the #GKeyFile, it must be loaded with
+ * the lifetime of the #xkey_file_t, it must be loaded with
  * %G_KEY_FILE_KEEP_TRANSLATIONS in order to load strings for all locales.
  *
  * If @key cannot be found then %NULL is returned and @error is set
@@ -2230,7 +2230,7 @@ g_key_file_set_locale_string (GKeyFile     *key_file,
  * Since: 2.6
  **/
 xchar_t *
-g_key_file_get_locale_string (GKeyFile     *key_file,
+xkey_file_get_locale_string (xkey_file_t     *key_file,
 			      const xchar_t  *group_name,
 			      const xchar_t  *key,
 			      const xchar_t  *locale,
@@ -2263,9 +2263,9 @@ g_key_file_get_locale_string (GKeyFile     *key_file,
 
   for (i = 0; languages[i]; i++)
     {
-      candidate_key = g_strdup_printf ("%s[%s]", key, languages[i]);
+      candidate_key = xstrdup_printf ("%s[%s]", key, languages[i]);
 
-      translated_value = g_key_file_get_string (key_file,
+      translated_value = xkey_file_get_string (key_file,
 						group_name,
 						candidate_key, NULL);
       g_free (candidate_key);
@@ -2278,7 +2278,7 @@ g_key_file_get_locale_string (GKeyFile     *key_file,
    */
   if (!translated_value)
     {
-      translated_value = g_key_file_get_string (key_file, group_name, key,
+      translated_value = xkey_file_get_string (key_file, group_name, key,
 						&key_file_error);
 
       if (!translated_value)
@@ -2286,24 +2286,24 @@ g_key_file_get_locale_string (GKeyFile     *key_file,
     }
 
   if (free_languages)
-    g_strfreev (languages);
+    xstrfreev (languages);
 
   return translated_value;
 }
 
 /**
- * g_key_file_get_locale_for_key:
- * @key_file: a #GKeyFile
+ * xkey_file_get_locale_for_key:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @locale: (nullable): a locale identifier or %NULL
  *
  * Returns the actual locale which the result of
- * g_key_file_get_locale_string() or g_key_file_get_locale_string_list()
+ * xkey_file_get_locale_string() or xkey_file_get_locale_string_list()
  * came from.
  *
- * If calling g_key_file_get_locale_string() or
- * g_key_file_get_locale_string_list() with exactly the same @key_file,
+ * If calling xkey_file_get_locale_string() or
+ * xkey_file_get_locale_string_list() with exactly the same @key_file,
  * @group_name, @key and @locale, the result of those functions will
  * have originally been tagged with the locale that is the result of
  * this function.
@@ -2314,7 +2314,7 @@ g_key_file_get_locale_string (GKeyFile     *key_file,
  * Since: 2.56
  */
 xchar_t *
-g_key_file_get_locale_for_key (GKeyFile    *key_file,
+xkey_file_get_locale_for_key (xkey_file_t    *key_file,
                                const xchar_t *group_name,
                                const xchar_t *key,
                                const xchar_t *locale)
@@ -2340,8 +2340,8 @@ g_key_file_get_locale_for_key (GKeyFile    *key_file,
     {
       xchar_t *candidate_key, *translated_value;
 
-      candidate_key = g_strdup_printf ("%s[%s]", key, languages[i]);
-      translated_value = g_key_file_get_string (key_file, group_name, candidate_key, NULL);
+      candidate_key = xstrdup_printf ("%s[%s]", key, languages[i]);
+      translated_value = xkey_file_get_string (key_file, group_name, candidate_key, NULL);
       g_free (translated_value);
       g_free (candidate_key);
 
@@ -2349,16 +2349,16 @@ g_key_file_get_locale_for_key (GKeyFile    *key_file,
         break;
    }
 
-  result = g_strdup (languages[i]);
+  result = xstrdup (languages[i]);
 
-  g_strfreev (languages_allocated);
+  xstrfreev (languages_allocated);
 
   return result;
 }
 
 /**
- * g_key_file_get_locale_string_list:
- * @key_file: a #GKeyFile
+ * xkey_file_get_locale_string_list:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @locale: (nullable): a locale identifier or %NULL
@@ -2370,7 +2370,7 @@ g_key_file_get_locale_for_key (GKeyFile    *key_file,
  * %NULL then the current locale is assumed.
  *
  * If @locale is to be non-%NULL, or if the current locale will change over
- * the lifetime of the #GKeyFile, it must be loaded with
+ * the lifetime of the #xkey_file_t, it must be loaded with
  * %G_KEY_FILE_KEEP_TRANSLATIONS in order to load strings for all locales.
  *
  * If @key cannot be found then %NULL is returned and @error is set
@@ -2382,12 +2382,12 @@ g_key_file_get_locale_for_key (GKeyFile    *key_file,
  *
  * Returns: (array zero-terminated=1 length=length) (element-type utf8) (transfer full): a newly allocated %NULL-terminated string array
  *   or %NULL if the key isn't found. The string array should be freed
- *   with g_strfreev().
+ *   with xstrfreev().
  *
  * Since: 2.6
  **/
 xchar_t **
-g_key_file_get_locale_string_list (GKeyFile     *key_file,
+xkey_file_get_locale_string_list (xkey_file_t     *key_file,
 				   const xchar_t  *group_name,
 				   const xchar_t  *key,
 				   const xchar_t  *locale,
@@ -2405,7 +2405,7 @@ g_key_file_get_locale_string_list (GKeyFile     *key_file,
 
   key_file_error = NULL;
 
-  value = g_key_file_get_locale_string (key_file, group_name,
+  value = xkey_file_get_locale_string (key_file, group_name,
 					key, locale,
 					&key_file_error);
 
@@ -2425,19 +2425,19 @@ g_key_file_get_locale_string_list (GKeyFile     *key_file,
 
   list_separator[0] = key_file->list_separator;
   list_separator[1] = '\0';
-  values = g_strsplit (value, list_separator, 0);
+  values = xstrsplit (value, list_separator, 0);
 
   g_free (value);
 
   if (length)
-    *length = g_strv_length (values);
+    *length = xstrv_length (values);
 
   return values;
 }
 
 /**
- * g_key_file_set_locale_string_list:
- * @key_file: a #GKeyFile
+ * xkey_file_set_locale_string_list:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @locale: a locale identifier
@@ -2451,14 +2451,14 @@ g_key_file_get_locale_string_list (GKeyFile     *key_file,
  * Since: 2.6
  **/
 void
-g_key_file_set_locale_string_list (GKeyFile            *key_file,
+xkey_file_set_locale_string_list (xkey_file_t            *key_file,
 				   const xchar_t         *group_name,
 				   const xchar_t         *key,
 				   const xchar_t         *locale,
 				   const xchar_t * const  list[],
 				   xsize_t                length)
 {
-  GString *value_list;
+  xstring_t *value_list;
   xchar_t *full_key;
   xsize_t i;
 
@@ -2467,27 +2467,27 @@ g_key_file_set_locale_string_list (GKeyFile            *key_file,
   g_return_if_fail (locale != NULL);
   g_return_if_fail (length != 0);
 
-  value_list = g_string_sized_new (length * 128);
+  value_list = xstring_sized_new (length * 128);
   for (i = 0; i < length && list[i] != NULL; i++)
     {
       xchar_t *value;
 
-      value = g_key_file_parse_string_as_value (key_file, list[i], TRUE);
-      g_string_append (value_list, value);
-      g_string_append_c (value_list, key_file->list_separator);
+      value = xkey_file_parse_string_as_value (key_file, list[i], TRUE);
+      xstring_append (value_list, value);
+      xstring_append_c (value_list, key_file->list_separator);
 
       g_free (value);
     }
 
-  full_key = g_strdup_printf ("%s[%s]", key, locale);
-  g_key_file_set_value (key_file, group_name, full_key, value_list->str);
+  full_key = xstrdup_printf ("%s[%s]", key, locale);
+  xkey_file_set_value (key_file, group_name, full_key, value_list->str);
   g_free (full_key);
-  g_string_free (value_list, TRUE);
+  xstring_free (value_list, TRUE);
 }
 
 /**
- * g_key_file_get_boolean:
- * @key_file: a #GKeyFile
+ * xkey_file_get_boolean:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @error: return location for a #xerror_t
@@ -2506,7 +2506,7 @@ g_key_file_set_locale_string_list (GKeyFile            *key_file,
  * Since: 2.6
  **/
 xboolean_t
-g_key_file_get_boolean (GKeyFile     *key_file,
+xkey_file_get_boolean (xkey_file_t     *key_file,
 			const xchar_t  *group_name,
 			const xchar_t  *key,
 			xerror_t      **error)
@@ -2519,7 +2519,7 @@ g_key_file_get_boolean (GKeyFile     *key_file,
   g_return_val_if_fail (group_name != NULL, FALSE);
   g_return_val_if_fail (key != NULL, FALSE);
 
-  value = g_key_file_get_value (key_file, group_name, key, &key_file_error);
+  value = xkey_file_get_value (key_file, group_name, key, &key_file_error);
 
   if (!value)
     {
@@ -2527,13 +2527,13 @@ g_key_file_get_boolean (GKeyFile     *key_file,
       return FALSE;
     }
 
-  bool_value = g_key_file_parse_value_as_boolean (key_file, value,
+  bool_value = xkey_file_parse_value_as_boolean (key_file, value,
 						  &key_file_error);
   g_free (value);
 
   if (key_file_error)
     {
-      if (g_error_matches (key_file_error,
+      if (xerror_matches (key_file_error,
                            G_KEY_FILE_ERROR,
                            G_KEY_FILE_ERROR_INVALID_VALUE))
         {
@@ -2542,7 +2542,7 @@ g_key_file_get_boolean (GKeyFile     *key_file,
                        _("Key file contains key “%s” "
                          "which has a value that cannot be interpreted."),
                        key);
-          g_error_free (key_file_error);
+          xerror_free (key_file_error);
         }
       else
         g_propagate_error (error, key_file_error);
@@ -2552,8 +2552,8 @@ g_key_file_get_boolean (GKeyFile     *key_file,
 }
 
 /**
- * g_key_file_set_boolean:
- * @key_file: a #GKeyFile
+ * xkey_file_set_boolean:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @value: %TRUE or %FALSE
@@ -2564,7 +2564,7 @@ g_key_file_get_boolean (GKeyFile     *key_file,
  * Since: 2.6
  **/
 void
-g_key_file_set_boolean (GKeyFile    *key_file,
+xkey_file_set_boolean (xkey_file_t    *key_file,
 			const xchar_t *group_name,
 			const xchar_t *key,
 			xboolean_t     value)
@@ -2573,13 +2573,13 @@ g_key_file_set_boolean (GKeyFile    *key_file,
 
   g_return_if_fail (key_file != NULL);
 
-  result = g_key_file_parse_boolean_as_value (key_file, value);
-  g_key_file_set_value (key_file, group_name, key, result);
+  result = xkey_file_parse_boolean_as_value (key_file, value);
+  xkey_file_set_value (key_file, group_name, key, result);
 }
 
 /**
- * g_key_file_get_boolean_list:
- * @key_file: a #GKeyFile
+ * xkey_file_get_boolean_list:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @length: (out): the number of booleans returned
@@ -2601,7 +2601,7 @@ g_key_file_set_boolean (GKeyFile    *key_file,
  * Since: 2.6
  **/
 xboolean_t *
-g_key_file_get_boolean_list (GKeyFile     *key_file,
+xkey_file_get_boolean_list (xkey_file_t     *key_file,
 			     const xchar_t  *group_name,
 			     const xchar_t  *key,
 			     xsize_t        *length,
@@ -2621,7 +2621,7 @@ g_key_file_get_boolean_list (GKeyFile     *key_file,
 
   key_file_error = NULL;
 
-  values = g_key_file_get_string_list (key_file, group_name, key,
+  values = xkey_file_get_string_list (key_file, group_name, key,
 				       &num_bools, &key_file_error);
 
   if (key_file_error)
@@ -2634,20 +2634,20 @@ g_key_file_get_boolean_list (GKeyFile     *key_file,
 
   for (i = 0; i < num_bools; i++)
     {
-      bool_values[i] = g_key_file_parse_value_as_boolean (key_file,
+      bool_values[i] = xkey_file_parse_value_as_boolean (key_file,
 							  values[i],
 							  &key_file_error);
 
       if (key_file_error)
         {
           g_propagate_error (error, key_file_error);
-          g_strfreev (values);
+          xstrfreev (values);
           g_free (bool_values);
 
           return NULL;
         }
     }
-  g_strfreev (values);
+  xstrfreev (values);
 
   if (length)
     *length = num_bools;
@@ -2656,8 +2656,8 @@ g_key_file_get_boolean_list (GKeyFile     *key_file,
 }
 
 /**
- * g_key_file_set_boolean_list:
- * @key_file: a #GKeyFile
+ * xkey_file_set_boolean_list:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @list: (array length=length): an array of boolean values
@@ -2670,36 +2670,36 @@ g_key_file_get_boolean_list (GKeyFile     *key_file,
  * Since: 2.6
  **/
 void
-g_key_file_set_boolean_list (GKeyFile    *key_file,
+xkey_file_set_boolean_list (xkey_file_t    *key_file,
 			     const xchar_t *group_name,
 			     const xchar_t *key,
 			     xboolean_t     list[],
 			     xsize_t        length)
 {
-  GString *value_list;
+  xstring_t *value_list;
   xsize_t i;
 
   g_return_if_fail (key_file != NULL);
   g_return_if_fail (list != NULL);
 
-  value_list = g_string_sized_new (length * 8);
+  value_list = xstring_sized_new (length * 8);
   for (i = 0; i < length; i++)
     {
       const xchar_t *value;
 
-      value = g_key_file_parse_boolean_as_value (key_file, list[i]);
+      value = xkey_file_parse_boolean_as_value (key_file, list[i]);
 
-      g_string_append (value_list, value);
-      g_string_append_c (value_list, key_file->list_separator);
+      xstring_append (value_list, value);
+      xstring_append_c (value_list, key_file->list_separator);
     }
 
-  g_key_file_set_value (key_file, group_name, key, value_list->str);
-  g_string_free (value_list, TRUE);
+  xkey_file_set_value (key_file, group_name, key, value_list->str);
+  xstring_free (value_list, TRUE);
 }
 
 /**
- * g_key_file_get_integer:
- * @key_file: a #GKeyFile
+ * xkey_file_get_integer:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @error: return location for a #xerror_t
@@ -2719,7 +2719,7 @@ g_key_file_set_boolean_list (GKeyFile    *key_file,
  * Since: 2.6
  **/
 xint_t
-g_key_file_get_integer (GKeyFile     *key_file,
+xkey_file_get_integer (xkey_file_t     *key_file,
 			const xchar_t  *group_name,
 			const xchar_t  *key,
 			xerror_t      **error)
@@ -2734,7 +2734,7 @@ g_key_file_get_integer (GKeyFile     *key_file,
 
   key_file_error = NULL;
 
-  value = g_key_file_get_value (key_file, group_name, key, &key_file_error);
+  value = xkey_file_get_value (key_file, group_name, key, &key_file_error);
 
   if (key_file_error)
     {
@@ -2742,13 +2742,13 @@ g_key_file_get_integer (GKeyFile     *key_file,
       return 0;
     }
 
-  int_value = g_key_file_parse_value_as_integer (key_file, value,
+  int_value = xkey_file_parse_value_as_integer (key_file, value,
 						 &key_file_error);
   g_free (value);
 
   if (key_file_error)
     {
-      if (g_error_matches (key_file_error,
+      if (xerror_matches (key_file_error,
                            G_KEY_FILE_ERROR,
                            G_KEY_FILE_ERROR_INVALID_VALUE))
         {
@@ -2757,7 +2757,7 @@ g_key_file_get_integer (GKeyFile     *key_file,
                        _("Key file contains key “%s” in group “%s” "
                          "which has a value that cannot be interpreted."),
                          key, group_name);
-          g_error_free (key_file_error);
+          xerror_free (key_file_error);
         }
       else
         g_propagate_error (error, key_file_error);
@@ -2767,8 +2767,8 @@ g_key_file_get_integer (GKeyFile     *key_file,
 }
 
 /**
- * g_key_file_set_integer:
- * @key_file: a #GKeyFile
+ * xkey_file_set_integer:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @value: an integer value
@@ -2779,7 +2779,7 @@ g_key_file_get_integer (GKeyFile     *key_file,
  * Since: 2.6
  **/
 void
-g_key_file_set_integer (GKeyFile    *key_file,
+xkey_file_set_integer (xkey_file_t    *key_file,
 			const xchar_t *group_name,
 			const xchar_t *key,
 			xint_t         value)
@@ -2788,20 +2788,20 @@ g_key_file_set_integer (GKeyFile    *key_file,
 
   g_return_if_fail (key_file != NULL);
 
-  result = g_key_file_parse_integer_as_value (key_file, value);
-  g_key_file_set_value (key_file, group_name, key, result);
+  result = xkey_file_parse_integer_as_value (key_file, value);
+  xkey_file_set_value (key_file, group_name, key, result);
   g_free (result);
 }
 
 /**
- * g_key_file_get_int64:
- * @key_file: a non-%NULL #GKeyFile
+ * xkey_file_get_int64:
+ * @key_file: a non-%NULL #xkey_file_t
  * @group_name: a non-%NULL group name
  * @key: a non-%NULL key
  * @error: return location for a #xerror_t
  *
  * Returns the value associated with @key under @group_name as a signed
- * 64-bit integer. This is similar to g_key_file_get_integer() but can return
+ * 64-bit integer. This is similar to xkey_file_get_integer() but can return
  * 64-bit results without truncation.
  *
  * Returns: the value associated with the key as a signed 64-bit integer, or
@@ -2810,7 +2810,7 @@ g_key_file_set_integer (GKeyFile    *key_file,
  * Since: 2.26
  */
 gint64
-g_key_file_get_int64 (GKeyFile     *key_file,
+xkey_file_get_int64 (xkey_file_t     *key_file,
                       const xchar_t  *group_name,
                       const xchar_t  *key,
                       xerror_t      **error)
@@ -2822,7 +2822,7 @@ g_key_file_get_int64 (GKeyFile     *key_file,
   g_return_val_if_fail (group_name != NULL, -1);
   g_return_val_if_fail (key != NULL, -1);
 
-  s = g_key_file_get_value (key_file, group_name, key, error);
+  s = xkey_file_get_value (key_file, group_name, key, error);
 
   if (s == NULL)
     return 0;
@@ -2844,8 +2844,8 @@ g_key_file_get_int64 (GKeyFile     *key_file,
 }
 
 /**
- * g_key_file_set_int64:
- * @key_file: a #GKeyFile
+ * xkey_file_set_int64:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @value: an integer value
@@ -2856,7 +2856,7 @@ g_key_file_get_int64 (GKeyFile     *key_file,
  * Since: 2.26
  **/
 void
-g_key_file_set_int64 (GKeyFile    *key_file,
+xkey_file_set_int64 (xkey_file_t    *key_file,
                       const xchar_t *group_name,
                       const xchar_t *key,
                       gint64       value)
@@ -2865,20 +2865,20 @@ g_key_file_set_int64 (GKeyFile    *key_file,
 
   g_return_if_fail (key_file != NULL);
 
-  result = g_strdup_printf ("%" G_GINT64_FORMAT, value);
-  g_key_file_set_value (key_file, group_name, key, result);
+  result = xstrdup_printf ("%" G_GINT64_FORMAT, value);
+  xkey_file_set_value (key_file, group_name, key, result);
   g_free (result);
 }
 
 /**
- * g_key_file_get_uint64:
- * @key_file: a non-%NULL #GKeyFile
+ * xkey_file_get_uint64:
+ * @key_file: a non-%NULL #xkey_file_t
  * @group_name: a non-%NULL group name
  * @key: a non-%NULL key
  * @error: return location for a #xerror_t
  *
  * Returns the value associated with @key under @group_name as an unsigned
- * 64-bit integer. This is similar to g_key_file_get_integer() but can return
+ * 64-bit integer. This is similar to xkey_file_get_integer() but can return
  * large positive results without truncation.
  *
  * Returns: the value associated with the key as an unsigned 64-bit integer,
@@ -2886,20 +2886,20 @@ g_key_file_set_int64 (GKeyFile    *key_file,
  *
  * Since: 2.26
  */
-guint64
-g_key_file_get_uint64 (GKeyFile     *key_file,
+xuint64_t
+xkey_file_get_uint64 (xkey_file_t     *key_file,
                        const xchar_t  *group_name,
                        const xchar_t  *key,
                        xerror_t      **error)
 {
   xchar_t *s, *end;
-  guint64 v;
+  xuint64_t v;
 
   g_return_val_if_fail (key_file != NULL, -1);
   g_return_val_if_fail (group_name != NULL, -1);
   g_return_val_if_fail (key != NULL, -1);
 
-  s = g_key_file_get_value (key_file, group_name, key, error);
+  s = xkey_file_get_value (key_file, group_name, key, error);
 
   if (s == NULL)
     return 0;
@@ -2921,8 +2921,8 @@ g_key_file_get_uint64 (GKeyFile     *key_file,
 }
 
 /**
- * g_key_file_set_uint64:
- * @key_file: a #GKeyFile
+ * xkey_file_set_uint64:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @value: an integer value
@@ -2933,23 +2933,23 @@ g_key_file_get_uint64 (GKeyFile     *key_file,
  * Since: 2.26
  **/
 void
-g_key_file_set_uint64 (GKeyFile    *key_file,
+xkey_file_set_uint64 (xkey_file_t    *key_file,
                        const xchar_t *group_name,
                        const xchar_t *key,
-                       guint64      value)
+                       xuint64_t      value)
 {
   xchar_t *result;
 
   g_return_if_fail (key_file != NULL);
 
-  result = g_strdup_printf ("%" G_GUINT64_FORMAT, value);
-  g_key_file_set_value (key_file, group_name, key, result);
+  result = xstrdup_printf ("%" G_GUINT64_FORMAT, value);
+  xkey_file_set_value (key_file, group_name, key, result);
   g_free (result);
 }
 
 /**
- * g_key_file_get_integer_list:
- * @key_file: a #GKeyFile
+ * xkey_file_get_integer_list:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @length: (out): the number of integers returned
@@ -2972,7 +2972,7 @@ g_key_file_set_uint64 (GKeyFile    *key_file,
  * Since: 2.6
  **/
 xint_t *
-g_key_file_get_integer_list (GKeyFile     *key_file,
+xkey_file_get_integer_list (xkey_file_t     *key_file,
 			     const xchar_t  *group_name,
 			     const xchar_t  *key,
 			     xsize_t        *length,
@@ -2990,7 +2990,7 @@ g_key_file_get_integer_list (GKeyFile     *key_file,
   if (length)
     *length = 0;
 
-  values = g_key_file_get_string_list (key_file, group_name, key,
+  values = xkey_file_get_string_list (key_file, group_name, key,
 				       &num_ints, &key_file_error);
 
   if (key_file_error)
@@ -3003,20 +3003,20 @@ g_key_file_get_integer_list (GKeyFile     *key_file,
 
   for (i = 0; i < num_ints; i++)
     {
-      int_values[i] = g_key_file_parse_value_as_integer (key_file,
+      int_values[i] = xkey_file_parse_value_as_integer (key_file,
 							 values[i],
 							 &key_file_error);
 
       if (key_file_error)
         {
           g_propagate_error (error, key_file_error);
-          g_strfreev (values);
+          xstrfreev (values);
           g_free (int_values);
 
           return NULL;
         }
     }
-  g_strfreev (values);
+  xstrfreev (values);
 
   if (length)
     *length = num_ints;
@@ -3025,8 +3025,8 @@ g_key_file_get_integer_list (GKeyFile     *key_file,
 }
 
 /**
- * g_key_file_set_integer_list:
- * @key_file: a #GKeyFile
+ * xkey_file_set_integer_list:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @list: (array length=length): an array of integer values
@@ -3038,38 +3038,38 @@ g_key_file_get_integer_list (GKeyFile     *key_file,
  * Since: 2.6
  **/
 void
-g_key_file_set_integer_list (GKeyFile    *key_file,
+xkey_file_set_integer_list (xkey_file_t    *key_file,
 			     const xchar_t *group_name,
 			     const xchar_t *key,
 			     xint_t         list[],
 			     xsize_t        length)
 {
-  GString *values;
+  xstring_t *values;
   xsize_t i;
 
   g_return_if_fail (key_file != NULL);
   g_return_if_fail (list != NULL);
 
-  values = g_string_sized_new (length * 16);
+  values = xstring_sized_new (length * 16);
   for (i = 0; i < length; i++)
     {
       xchar_t *value;
 
-      value = g_key_file_parse_integer_as_value (key_file, list[i]);
+      value = xkey_file_parse_integer_as_value (key_file, list[i]);
 
-      g_string_append (values, value);
-      g_string_append_c (values, key_file->list_separator);
+      xstring_append (values, value);
+      xstring_append_c (values, key_file->list_separator);
 
       g_free (value);
     }
 
-  g_key_file_set_value (key_file, group_name, key, values->str);
-  g_string_free (values, TRUE);
+  xkey_file_set_value (key_file, group_name, key, values->str);
+  xstring_free (values, TRUE);
 }
 
 /**
- * g_key_file_get_double:
- * @key_file: a #GKeyFile
+ * xkey_file_get_double:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @error: return location for a #xerror_t
@@ -3088,7 +3088,7 @@ g_key_file_set_integer_list (GKeyFile    *key_file,
  * Since: 2.12
  **/
 xdouble_t
-g_key_file_get_double  (GKeyFile     *key_file,
+xkey_file_get_double  (xkey_file_t     *key_file,
                         const xchar_t  *group_name,
                         const xchar_t  *key,
                         xerror_t      **error)
@@ -3103,7 +3103,7 @@ g_key_file_get_double  (GKeyFile     *key_file,
 
   key_file_error = NULL;
 
-  value = g_key_file_get_value (key_file, group_name, key, &key_file_error);
+  value = xkey_file_get_value (key_file, group_name, key, &key_file_error);
 
   if (key_file_error)
     {
@@ -3111,13 +3111,13 @@ g_key_file_get_double  (GKeyFile     *key_file,
       return 0;
     }
 
-  double_value = g_key_file_parse_value_as_double (key_file, value,
+  double_value = xkey_file_parse_value_as_double (key_file, value,
                                                   &key_file_error);
   g_free (value);
 
   if (key_file_error)
     {
-      if (g_error_matches (key_file_error,
+      if (xerror_matches (key_file_error,
                            G_KEY_FILE_ERROR,
                            G_KEY_FILE_ERROR_INVALID_VALUE))
         {
@@ -3126,7 +3126,7 @@ g_key_file_get_double  (GKeyFile     *key_file,
                        _("Key file contains key “%s” in group “%s” "
                          "which has a value that cannot be interpreted."),
                        key, group_name);
-          g_error_free (key_file_error);
+          xerror_free (key_file_error);
         }
       else
         g_propagate_error (error, key_file_error);
@@ -3136,8 +3136,8 @@ g_key_file_get_double  (GKeyFile     *key_file,
 }
 
 /**
- * g_key_file_set_double:
- * @key_file: a #GKeyFile
+ * xkey_file_set_double:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @value: a double value
@@ -3148,7 +3148,7 @@ g_key_file_get_double  (GKeyFile     *key_file,
  * Since: 2.12
  **/
 void
-g_key_file_set_double  (GKeyFile    *key_file,
+xkey_file_set_double  (xkey_file_t    *key_file,
                         const xchar_t *group_name,
                         const xchar_t *key,
                         xdouble_t      value)
@@ -3158,12 +3158,12 @@ g_key_file_set_double  (GKeyFile    *key_file,
   g_return_if_fail (key_file != NULL);
 
   g_ascii_dtostr (result, sizeof (result), value);
-  g_key_file_set_value (key_file, group_name, key, result);
+  xkey_file_set_value (key_file, group_name, key, result);
 }
 
 /**
- * g_key_file_get_double_list:
- * @key_file: a #GKeyFile
+ * xkey_file_get_double_list:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @length: (out): the number of doubles returned
@@ -3185,7 +3185,7 @@ g_key_file_set_double  (GKeyFile    *key_file,
  * Since: 2.12
  **/
 xdouble_t *
-g_key_file_get_double_list  (GKeyFile     *key_file,
+xkey_file_get_double_list  (xkey_file_t     *key_file,
                              const xchar_t  *group_name,
                              const xchar_t  *key,
                              xsize_t        *length,
@@ -3203,7 +3203,7 @@ g_key_file_get_double_list  (GKeyFile     *key_file,
   if (length)
     *length = 0;
 
-  values = g_key_file_get_string_list (key_file, group_name, key,
+  values = xkey_file_get_string_list (key_file, group_name, key,
                                        &num_doubles, &key_file_error);
 
   if (key_file_error)
@@ -3216,20 +3216,20 @@ g_key_file_get_double_list  (GKeyFile     *key_file,
 
   for (i = 0; i < num_doubles; i++)
     {
-      double_values[i] = g_key_file_parse_value_as_double (key_file,
+      double_values[i] = xkey_file_parse_value_as_double (key_file,
 							   values[i],
 							   &key_file_error);
 
       if (key_file_error)
         {
           g_propagate_error (error, key_file_error);
-          g_strfreev (values);
+          xstrfreev (values);
           g_free (double_values);
 
           return NULL;
         }
     }
-  g_strfreev (values);
+  xstrfreev (values);
 
   if (length)
     *length = num_doubles;
@@ -3238,8 +3238,8 @@ g_key_file_get_double_list  (GKeyFile     *key_file,
 }
 
 /**
- * g_key_file_set_double_list:
- * @key_file: a #GKeyFile
+ * xkey_file_set_double_list:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key
  * @list: (array length=length): an array of double values
@@ -3251,35 +3251,35 @@ g_key_file_get_double_list  (GKeyFile     *key_file,
  * Since: 2.12
  **/
 void
-g_key_file_set_double_list (GKeyFile    *key_file,
+xkey_file_set_double_list (xkey_file_t    *key_file,
 			    const xchar_t *group_name,
 			    const xchar_t *key,
 			    xdouble_t      list[],
 			    xsize_t        length)
 {
-  GString *values;
+  xstring_t *values;
   xsize_t i;
 
   g_return_if_fail (key_file != NULL);
   g_return_if_fail (list != NULL);
 
-  values = g_string_sized_new (length * 16);
+  values = xstring_sized_new (length * 16);
   for (i = 0; i < length; i++)
     {
       xchar_t result[G_ASCII_DTOSTR_BUF_SIZE];
 
       g_ascii_dtostr( result, sizeof (result), list[i] );
 
-      g_string_append (values, result);
-      g_string_append_c (values, key_file->list_separator);
+      xstring_append (values, result);
+      xstring_append_c (values, key_file->list_separator);
     }
 
-  g_key_file_set_value (key_file, group_name, key, values->str);
-  g_string_free (values, TRUE);
+  xkey_file_set_value (key_file, group_name, key, values->str);
+  xstring_free (values, TRUE);
 }
 
 static xboolean_t
-g_key_file_set_key_comment (GKeyFile     *key_file,
+xkey_file_set_key_comment (xkey_file_t     *key_file,
                             const xchar_t  *group_name,
                             const xchar_t  *key,
                             const xchar_t  *comment,
@@ -3289,7 +3289,7 @@ g_key_file_set_key_comment (GKeyFile     *key_file,
   GKeyFileKeyValuePair *pair;
   xlist_t *key_node, *comment_node, *tmp;
 
-  group = g_key_file_lookup_group (key_file, group_name);
+  group = xkey_file_lookup_group (key_file, group_name);
   if (!group)
     {
       g_set_error (error, G_KEY_FILE_ERROR,
@@ -3303,7 +3303,7 @@ g_key_file_set_key_comment (GKeyFile     *key_file,
   /* First find the key the comments are supposed to be
    * associated with
    */
-  key_node = g_key_file_lookup_key_value_pair_node (key_file, group, key);
+  key_node = xkey_file_lookup_key_value_pair_node (key_file, group, key);
 
   if (key_node == NULL)
     {
@@ -3324,7 +3324,7 @@ g_key_file_set_key_comment (GKeyFile     *key_file,
 
       comment_node = tmp;
       tmp = tmp->next;
-      g_key_file_remove_key_value_pair_node (key_file, group,
+      xkey_file_remove_key_value_pair_node (key_file, group,
                                              comment_node);
     }
 
@@ -3335,25 +3335,25 @@ g_key_file_set_key_comment (GKeyFile     *key_file,
    */
   pair = g_slice_new (GKeyFileKeyValuePair);
   pair->key = NULL;
-  pair->value = g_key_file_parse_comment_as_value (key_file, comment);
+  pair->value = xkey_file_parse_comment_as_value (key_file, comment);
 
-  key_node = g_list_insert (key_node, pair, 1);
+  key_node = xlist_insert (key_node, pair, 1);
   (void) key_node;
 
   return TRUE;
 }
 
 static xboolean_t
-g_key_file_set_group_comment (GKeyFile     *key_file,
+xkey_file_set_group_comment (xkey_file_t     *key_file,
                               const xchar_t  *group_name,
                               const xchar_t  *comment,
                               xerror_t      **error)
 {
   GKeyFileGroup *group;
 
-  g_return_val_if_fail (group_name != NULL && g_key_file_is_group_name (group_name), FALSE);
+  g_return_val_if_fail (group_name != NULL && xkey_file_is_group_name (group_name), FALSE);
 
-  group = g_key_file_lookup_group (key_file, group_name);
+  group = xkey_file_lookup_group (key_file, group_name);
   if (!group)
     {
       g_set_error (error, G_KEY_FILE_ERROR,
@@ -3368,7 +3368,7 @@ g_key_file_set_group_comment (GKeyFile     *key_file,
    */
   if (group->comment)
     {
-      g_key_file_key_value_pair_free (group->comment);
+      xkey_file_key_value_pair_free (group->comment);
       group->comment = NULL;
     }
 
@@ -3379,13 +3379,13 @@ g_key_file_set_group_comment (GKeyFile     *key_file,
    */
   group->comment = g_slice_new (GKeyFileKeyValuePair);
   group->comment->key = NULL;
-  group->comment->value = g_key_file_parse_comment_as_value (key_file, comment);
+  group->comment->value = xkey_file_parse_comment_as_value (key_file, comment);
 
   return TRUE;
 }
 
 static xboolean_t
-g_key_file_set_top_comment (GKeyFile     *key_file,
+xkey_file_set_top_comment (xkey_file_t     *key_file,
                             const xchar_t  *comment,
                             xerror_t      **error)
 {
@@ -3397,14 +3397,14 @@ g_key_file_set_top_comment (GKeyFile     *key_file,
    * group in the file
    */
   g_warn_if_fail (key_file->groups != NULL);
-  group_node = g_list_last (key_file->groups);
+  group_node = xlist_last (key_file->groups);
   group = (GKeyFileGroup *) group_node->data;
   g_warn_if_fail (group->name == NULL);
 
   /* Note all keys must be comments at the top of
    * the file, so we can just free it all.
    */
-  g_list_free_full (group->key_value_pairs, (GDestroyNotify) g_key_file_key_value_pair_free);
+  xlist_free_full (group->key_value_pairs, (xdestroy_notify_t) xkey_file_key_value_pair_free);
   group->key_value_pairs = NULL;
 
   if (comment == NULL)
@@ -3412,17 +3412,17 @@ g_key_file_set_top_comment (GKeyFile     *key_file,
 
   pair = g_slice_new (GKeyFileKeyValuePair);
   pair->key = NULL;
-  pair->value = g_key_file_parse_comment_as_value (key_file, comment);
+  pair->value = xkey_file_parse_comment_as_value (key_file, comment);
 
   group->key_value_pairs =
-    g_list_prepend (group->key_value_pairs, pair);
+    xlist_prepend (group->key_value_pairs, pair);
 
   return TRUE;
 }
 
 /**
- * g_key_file_set_comment:
- * @key_file: a #GKeyFile
+ * xkey_file_set_comment:
+ * @key_file: a #xkey_file_t
  * @group_name: (nullable): a group name, or %NULL
  * @key: (nullable): a key
  * @comment: a comment
@@ -3442,7 +3442,7 @@ g_key_file_set_top_comment (GKeyFile     *key_file,
  * Since: 2.6
  **/
 xboolean_t
-g_key_file_set_comment (GKeyFile     *key_file,
+xkey_file_set_comment (xkey_file_t     *key_file,
                         const xchar_t  *group_name,
                         const xchar_t  *key,
                         const xchar_t  *comment,
@@ -3452,17 +3452,17 @@ g_key_file_set_comment (GKeyFile     *key_file,
 
   if (group_name != NULL && key != NULL)
     {
-      if (!g_key_file_set_key_comment (key_file, group_name, key, comment, error))
+      if (!xkey_file_set_key_comment (key_file, group_name, key, comment, error))
         return FALSE;
     }
   else if (group_name != NULL)
     {
-      if (!g_key_file_set_group_comment (key_file, group_name, comment, error))
+      if (!xkey_file_set_group_comment (key_file, group_name, comment, error))
         return FALSE;
     }
   else
     {
-      if (!g_key_file_set_top_comment (key_file, comment, error))
+      if (!xkey_file_set_top_comment (key_file, comment, error))
         return FALSE;
     }
 
@@ -3470,7 +3470,7 @@ g_key_file_set_comment (GKeyFile     *key_file,
 }
 
 static xchar_t *
-g_key_file_get_key_comment (GKeyFile     *key_file,
+xkey_file_get_key_comment (xkey_file_t     *key_file,
                             const xchar_t  *group_name,
                             const xchar_t  *key,
                             xerror_t      **error)
@@ -3478,12 +3478,12 @@ g_key_file_get_key_comment (GKeyFile     *key_file,
   GKeyFileGroup *group;
   GKeyFileKeyValuePair *pair;
   xlist_t *key_node, *tmp;
-  GString *string;
+  xstring_t *string;
   xchar_t *comment;
 
-  g_return_val_if_fail (group_name != NULL && g_key_file_is_group_name (group_name), NULL);
+  g_return_val_if_fail (group_name != NULL && xkey_file_is_group_name (group_name), NULL);
 
-  group = g_key_file_lookup_group (key_file, group_name);
+  group = xkey_file_lookup_group (key_file, group_name);
   if (!group)
     {
       g_set_error (error, G_KEY_FILE_ERROR,
@@ -3497,7 +3497,7 @@ g_key_file_get_key_comment (GKeyFile     *key_file,
   /* First find the key the comments are supposed to be
    * associated with
    */
-  key_node = g_key_file_lookup_key_value_pair_node (key_file, group, key);
+  key_node = xkey_file_lookup_key_value_pair_node (key_file, group, key);
 
   if (key_node == NULL)
     {
@@ -3533,11 +3533,11 @@ g_key_file_get_key_comment (GKeyFile     *key_file,
       pair = (GKeyFileKeyValuePair *) tmp->data;
 
       if (string == NULL)
-	string = g_string_sized_new (512);
+	string = xstring_sized_new (512);
 
-      comment = g_key_file_parse_value_as_comment (key_file, pair->value,
+      comment = xkey_file_parse_value_as_comment (key_file, pair->value,
                                                    (tmp->prev == key_node));
-      g_string_append (string, comment);
+      xstring_append (string, comment);
       g_free (comment);
 
       tmp = tmp->prev;
@@ -3546,7 +3546,7 @@ g_key_file_get_key_comment (GKeyFile     *key_file,
   if (string != NULL)
     {
       comment = string->str;
-      g_string_free (string, FALSE);
+      xstring_free (string, FALSE);
     }
   else
     comment = NULL;
@@ -3555,11 +3555,11 @@ g_key_file_get_key_comment (GKeyFile     *key_file,
 }
 
 static xchar_t *
-get_group_comment (GKeyFile       *key_file,
+get_group_comment (xkey_file_t       *key_file,
 		   GKeyFileGroup  *group,
 		   xerror_t        **error)
 {
-  GString *string;
+  xstring_t *string;
   xlist_t *tmp;
   xchar_t *comment;
 
@@ -3591,31 +3591,31 @@ get_group_comment (GKeyFile       *key_file,
       pair = (GKeyFileKeyValuePair *) tmp->data;
 
       if (string == NULL)
-        string = g_string_sized_new (512);
+        string = xstring_sized_new (512);
 
-      comment = g_key_file_parse_value_as_comment (key_file, pair->value,
+      comment = xkey_file_parse_value_as_comment (key_file, pair->value,
                                                    (tmp->prev == NULL));
-      g_string_append (string, comment);
+      xstring_append (string, comment);
       g_free (comment);
 
       tmp = tmp->prev;
     }
 
   if (string != NULL)
-    return g_string_free (string, FALSE);
+    return xstring_free (string, FALSE);
 
   return NULL;
 }
 
 static xchar_t *
-g_key_file_get_group_comment (GKeyFile     *key_file,
+xkey_file_get_group_comment (xkey_file_t     *key_file,
                               const xchar_t  *group_name,
                               xerror_t      **error)
 {
   xlist_t *group_node;
   GKeyFileGroup *group;
 
-  group = g_key_file_lookup_group (key_file, group_name);
+  group = xkey_file_lookup_group (key_file, group_name);
   if (!group)
     {
       g_set_error (error, G_KEY_FILE_ERROR,
@@ -3627,16 +3627,16 @@ g_key_file_get_group_comment (GKeyFile     *key_file,
     }
 
   if (group->comment)
-    return g_strdup (group->comment->value);
+    return xstrdup (group->comment->value);
 
-  group_node = g_key_file_lookup_group_node (key_file, group_name);
+  group_node = xkey_file_lookup_group_node (key_file, group_name);
   group_node = group_node->next;
   group = (GKeyFileGroup *)group_node->data;
   return get_group_comment (key_file, group, error);
 }
 
 static xchar_t *
-g_key_file_get_top_comment (GKeyFile  *key_file,
+xkey_file_get_top_comment (xkey_file_t  *key_file,
                             xerror_t   **error)
 {
   xlist_t *group_node;
@@ -3646,7 +3646,7 @@ g_key_file_get_top_comment (GKeyFile  *key_file,
    * group in the file
    */
   g_warn_if_fail (key_file->groups != NULL);
-  group_node = g_list_last (key_file->groups);
+  group_node = xlist_last (key_file->groups);
   group = (GKeyFileGroup *) group_node->data;
   g_warn_if_fail (group->name == NULL);
 
@@ -3654,8 +3654,8 @@ g_key_file_get_top_comment (GKeyFile  *key_file,
 }
 
 /**
- * g_key_file_get_comment:
- * @key_file: a #GKeyFile
+ * xkey_file_get_comment:
+ * @key_file: a #xkey_file_t
  * @group_name: (nullable): a group name, or %NULL
  * @key: (nullable): a key
  * @error: return location for a #xerror_t
@@ -3674,7 +3674,7 @@ g_key_file_get_top_comment (GKeyFile  *key_file,
  * Since: 2.6
  **/
 xchar_t *
-g_key_file_get_comment (GKeyFile     *key_file,
+xkey_file_get_comment (xkey_file_t     *key_file,
                         const xchar_t  *group_name,
                         const xchar_t  *key,
                         xerror_t      **error)
@@ -3682,16 +3682,16 @@ g_key_file_get_comment (GKeyFile     *key_file,
   g_return_val_if_fail (key_file != NULL, NULL);
 
   if (group_name != NULL && key != NULL)
-    return g_key_file_get_key_comment (key_file, group_name, key, error);
+    return xkey_file_get_key_comment (key_file, group_name, key, error);
   else if (group_name != NULL)
-    return g_key_file_get_group_comment (key_file, group_name, error);
+    return xkey_file_get_group_comment (key_file, group_name, error);
   else
-    return g_key_file_get_top_comment (key_file, error);
+    return xkey_file_get_top_comment (key_file, error);
 }
 
 /**
- * g_key_file_remove_comment:
- * @key_file: a #GKeyFile
+ * xkey_file_remove_comment:
+ * @key_file: a #xkey_file_t
  * @group_name: (nullable): a group name, or %NULL
  * @key: (nullable): a key
  * @error: return location for a #xerror_t
@@ -3707,7 +3707,7 @@ g_key_file_get_comment (GKeyFile     *key_file,
  **/
 
 xboolean_t
-g_key_file_remove_comment (GKeyFile     *key_file,
+xkey_file_remove_comment (xkey_file_t     *key_file,
                            const xchar_t  *group_name,
                            const xchar_t  *key,
                            xerror_t      **error)
@@ -3715,16 +3715,16 @@ g_key_file_remove_comment (GKeyFile     *key_file,
   g_return_val_if_fail (key_file != NULL, FALSE);
 
   if (group_name != NULL && key != NULL)
-    return g_key_file_set_key_comment (key_file, group_name, key, NULL, error);
+    return xkey_file_set_key_comment (key_file, group_name, key, NULL, error);
   else if (group_name != NULL)
-    return g_key_file_set_group_comment (key_file, group_name, NULL, error);
+    return xkey_file_set_group_comment (key_file, group_name, NULL, error);
   else
-    return g_key_file_set_top_comment (key_file, NULL, error);
+    return xkey_file_set_top_comment (key_file, NULL, error);
 }
 
 /**
- * g_key_file_has_group:
- * @key_file: a #GKeyFile
+ * xkey_file_has_group:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  *
  * Looks whether the key file has the group @group_name.
@@ -3734,20 +3734,20 @@ g_key_file_remove_comment (GKeyFile     *key_file,
  * Since: 2.6
  **/
 xboolean_t
-g_key_file_has_group (GKeyFile    *key_file,
+xkey_file_has_group (xkey_file_t    *key_file,
 		      const xchar_t *group_name)
 {
   g_return_val_if_fail (key_file != NULL, FALSE);
   g_return_val_if_fail (group_name != NULL, FALSE);
 
-  return g_key_file_lookup_group (key_file, group_name) != NULL;
+  return xkey_file_lookup_group (key_file, group_name) != NULL;
 }
 
 /* This code remains from a historical attempt to add a new public API
  * which respects the xerror_t rules.
  */
 static xboolean_t
-g_key_file_has_key_full (GKeyFile     *key_file,
+xkey_file_has_key_full (xkey_file_t     *key_file,
 			 const xchar_t  *group_name,
 			 const xchar_t  *key,
 			 xboolean_t     *has_key,
@@ -3760,7 +3760,7 @@ g_key_file_has_key_full (GKeyFile     *key_file,
   g_return_val_if_fail (group_name != NULL, FALSE);
   g_return_val_if_fail (key != NULL, FALSE);
 
-  group = g_key_file_lookup_group (key_file, group_name);
+  group = xkey_file_lookup_group (key_file, group_name);
 
   if (!group)
     {
@@ -3772,7 +3772,7 @@ g_key_file_has_key_full (GKeyFile     *key_file,
       return FALSE;
     }
 
-  pair = g_key_file_lookup_key_value_pair (key_file, group, key);
+  pair = xkey_file_lookup_key_value_pair (key_file, group, key);
 
   if (has_key)
     *has_key = pair != NULL;
@@ -3780,8 +3780,8 @@ g_key_file_has_key_full (GKeyFile     *key_file,
 }
 
 /**
- * g_key_file_has_key: (skip)
- * @key_file: a #GKeyFile
+ * xkey_file_has_key: (skip)
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key name
  * @error: return location for a #xerror_t
@@ -3794,7 +3794,7 @@ g_key_file_has_key_full (GKeyFile     *key_file,
  * this function, you must pass a #xerror_t pointer in @error, and check
  * whether it is not %NULL to see if an error occurred.
  *
- * Language bindings should use g_key_file_get_value() to test whether
+ * Language bindings should use xkey_file_get_value() to test whether
  * or not a key exists.
  *
  * Returns: %TRUE if @key is a part of @group_name, %FALSE otherwise
@@ -3802,7 +3802,7 @@ g_key_file_has_key_full (GKeyFile     *key_file,
  * Since: 2.6
  **/
 xboolean_t
-g_key_file_has_key (GKeyFile     *key_file,
+xkey_file_has_key (xkey_file_t     *key_file,
 		    const xchar_t  *group_name,
 		    const xchar_t  *key,
 		    xerror_t      **error)
@@ -3810,7 +3810,7 @@ g_key_file_has_key (GKeyFile     *key_file,
   xerror_t *temp_error = NULL;
   xboolean_t has_key;
 
-  if (g_key_file_has_key_full (key_file, group_name, key, &has_key, &temp_error))
+  if (xkey_file_has_key_full (key_file, group_name, key, &has_key, &temp_error))
     {
       return has_key;
     }
@@ -3822,15 +3822,15 @@ g_key_file_has_key (GKeyFile     *key_file,
 }
 
 static void
-g_key_file_add_group (GKeyFile    *key_file,
+xkey_file_add_group (xkey_file_t    *key_file,
 		      const xchar_t *group_name)
 {
   GKeyFileGroup *group;
 
   g_return_if_fail (key_file != NULL);
-  g_return_if_fail (group_name != NULL && g_key_file_is_group_name (group_name));
+  g_return_if_fail (group_name != NULL && xkey_file_is_group_name (group_name));
 
-  group = g_key_file_lookup_group (key_file, group_name);
+  group = xkey_file_lookup_group (key_file, group_name);
   if (group != NULL)
     {
       key_file->current_group = group;
@@ -3838,22 +3838,22 @@ g_key_file_add_group (GKeyFile    *key_file,
     }
 
   group = g_slice_new0 (GKeyFileGroup);
-  group->name = g_strdup (group_name);
-  group->lookup_map = g_hash_table_new (g_str_hash, g_str_equal);
-  key_file->groups = g_list_prepend (key_file->groups, group);
+  group->name = xstrdup (group_name);
+  group->lookup_map = xhash_table_new (xstr_hash, xstr_equal);
+  key_file->groups = xlist_prepend (key_file->groups, group);
   key_file->current_group = group;
 
   if (key_file->start_group == NULL)
     key_file->start_group = group;
 
   if (!key_file->group_hash)
-    key_file->group_hash = g_hash_table_new (g_str_hash, g_str_equal);
+    key_file->group_hash = xhash_table_new (xstr_hash, xstr_equal);
 
-  g_hash_table_insert (key_file->group_hash, (xpointer_t)group->name, group);
+  xhash_table_insert (key_file->group_hash, (xpointer_t)group->name, group);
 }
 
 static void
-g_key_file_key_value_pair_free (GKeyFileKeyValuePair *pair)
+xkey_file_key_value_pair_free (GKeyFileKeyValuePair *pair)
 {
   if (pair != NULL)
     {
@@ -3873,7 +3873,7 @@ g_key_file_key_value_pair_free (GKeyFileKeyValuePair *pair)
  *     anyway.
  */
 static void
-g_key_file_remove_key_value_pair_node (GKeyFile      *key_file,
+xkey_file_remove_key_value_pair_node (xkey_file_t      *key_file,
                                        GKeyFileGroup *group,
 			               xlist_t         *pair_node)
 {
@@ -3882,17 +3882,17 @@ g_key_file_remove_key_value_pair_node (GKeyFile      *key_file,
 
   pair = (GKeyFileKeyValuePair *) pair_node->data;
 
-  group->key_value_pairs = g_list_remove_link (group->key_value_pairs, pair_node);
+  group->key_value_pairs = xlist_remove_link (group->key_value_pairs, pair_node);
 
   g_warn_if_fail (pair->value != NULL);
 
-  g_key_file_key_value_pair_free (pair);
+  xkey_file_key_value_pair_free (pair);
 
-  g_list_free_1 (pair_node);
+  xlist_free_1 (pair_node);
 }
 
 static void
-g_key_file_remove_group_node (GKeyFile *key_file,
+xkey_file_remove_group_node (xkey_file_t *key_file,
 			      xlist_t    *group_node)
 {
   GKeyFileGroup *group;
@@ -3903,7 +3903,7 @@ g_key_file_remove_group_node (GKeyFile *key_file,
   if (group->name)
     {
       g_assert (key_file->group_hash);
-      g_hash_table_remove (key_file->group_hash, group->name);
+      xhash_table_remove (key_file->group_hash, group->name);
     }
 
   /* If the current group gets deleted make the current group the last
@@ -3912,7 +3912,7 @@ g_key_file_remove_group_node (GKeyFile *key_file,
   if (key_file->current_group == group)
     {
       /* groups should always contain at least the top comment group,
-       * unless g_key_file_clear has been called
+       * unless xkey_file_clear has been called
        */
       if (key_file->groups)
         key_file->current_group = (GKeyFileGroup *) key_file->groups->data;
@@ -3925,7 +3925,7 @@ g_key_file_remove_group_node (GKeyFile *key_file,
    */
   if (key_file->start_group == group)
     {
-      tmp = g_list_last (key_file->groups);
+      tmp = xlist_last (key_file->groups);
       while (tmp != NULL)
 	{
 	  if (tmp != group_node &&
@@ -3941,7 +3941,7 @@ g_key_file_remove_group_node (GKeyFile *key_file,
         key_file->start_group = NULL;
     }
 
-  key_file->groups = g_list_remove_link (key_file->groups, group_node);
+  key_file->groups = xlist_remove_link (key_file->groups, group_node);
 
   tmp = group->key_value_pairs;
   while (tmp != NULL)
@@ -3950,31 +3950,31 @@ g_key_file_remove_group_node (GKeyFile *key_file,
 
       pair_node = tmp;
       tmp = tmp->next;
-      g_key_file_remove_key_value_pair_node (key_file, group, pair_node);
+      xkey_file_remove_key_value_pair_node (key_file, group, pair_node);
     }
 
   g_warn_if_fail (group->key_value_pairs == NULL);
 
   if (group->comment)
     {
-      g_key_file_key_value_pair_free (group->comment);
+      xkey_file_key_value_pair_free (group->comment);
       group->comment = NULL;
     }
 
   if (group->lookup_map)
     {
-      g_hash_table_destroy (group->lookup_map);
+      xhash_table_destroy (group->lookup_map);
       group->lookup_map = NULL;
     }
 
   g_free ((xchar_t *) group->name);
   g_slice_free (GKeyFileGroup, group);
-  g_list_free_1 (group_node);
+  xlist_free_1 (group_node);
 }
 
 /**
- * g_key_file_remove_group:
- * @key_file: a #GKeyFile
+ * xkey_file_remove_group:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @error: return location for a #xerror_t or %NULL
  *
@@ -3986,7 +3986,7 @@ g_key_file_remove_group_node (GKeyFile *key_file,
  * Since: 2.6
  **/
 xboolean_t
-g_key_file_remove_group (GKeyFile     *key_file,
+xkey_file_remove_group (xkey_file_t     *key_file,
 			 const xchar_t  *group_name,
 			 xerror_t      **error)
 {
@@ -3995,7 +3995,7 @@ g_key_file_remove_group (GKeyFile     *key_file,
   g_return_val_if_fail (key_file != NULL, FALSE);
   g_return_val_if_fail (group_name != NULL, FALSE);
 
-  group_node = g_key_file_lookup_group_node (key_file, group_name);
+  group_node = xkey_file_lookup_group_node (key_file, group_name);
 
   if (!group_node)
     {
@@ -4006,22 +4006,22 @@ g_key_file_remove_group (GKeyFile     *key_file,
       return FALSE;
     }
 
-  g_key_file_remove_group_node (key_file, group_node);
+  xkey_file_remove_group_node (key_file, group_node);
 
   return TRUE;
 }
 
 static void
-g_key_file_add_key_value_pair (GKeyFile             *key_file,
+xkey_file_add_key_value_pair (xkey_file_t             *key_file,
                                GKeyFileGroup        *group,
                                GKeyFileKeyValuePair *pair)
 {
-  g_hash_table_replace (group->lookup_map, pair->key, pair);
-  group->key_value_pairs = g_list_prepend (group->key_value_pairs, pair);
+  xhash_table_replace (group->lookup_map, pair->key, pair);
+  group->key_value_pairs = xlist_prepend (group->key_value_pairs, pair);
 }
 
 static void
-g_key_file_add_key (GKeyFile      *key_file,
+xkey_file_add_key (xkey_file_t      *key_file,
 		    GKeyFileGroup *group,
 		    const xchar_t   *key,
 		    const xchar_t   *value)
@@ -4029,15 +4029,15 @@ g_key_file_add_key (GKeyFile      *key_file,
   GKeyFileKeyValuePair *pair;
 
   pair = g_slice_new (GKeyFileKeyValuePair);
-  pair->key = g_strdup (key);
-  pair->value = g_strdup (value);
+  pair->key = xstrdup (key);
+  pair->value = xstrdup (value);
 
-  g_key_file_add_key_value_pair (key_file, group, pair);
+  xkey_file_add_key_value_pair (key_file, group, pair);
 }
 
 /**
- * g_key_file_remove_key:
- * @key_file: a #GKeyFile
+ * xkey_file_remove_key:
+ * @key_file: a #xkey_file_t
  * @group_name: a group name
  * @key: a key name to remove
  * @error: return location for a #xerror_t or %NULL
@@ -4049,7 +4049,7 @@ g_key_file_add_key (GKeyFile      *key_file,
  * Since: 2.6
  **/
 xboolean_t
-g_key_file_remove_key (GKeyFile     *key_file,
+xkey_file_remove_key (xkey_file_t     *key_file,
 		       const xchar_t  *group_name,
 		       const xchar_t  *key,
 		       xerror_t      **error)
@@ -4063,7 +4063,7 @@ g_key_file_remove_key (GKeyFile     *key_file,
 
   pair = NULL;
 
-  group = g_key_file_lookup_group (key_file, group_name);
+  group = xkey_file_lookup_group (key_file, group_name);
   if (!group)
     {
       g_set_error (error, G_KEY_FILE_ERROR,
@@ -4073,7 +4073,7 @@ g_key_file_remove_key (GKeyFile     *key_file,
       return FALSE;
     }
 
-  pair = g_key_file_lookup_key_value_pair (key_file, group, key);
+  pair = xkey_file_lookup_key_value_pair (key_file, group, key);
 
   if (!pair)
     {
@@ -4081,38 +4081,38 @@ g_key_file_remove_key (GKeyFile     *key_file,
       return FALSE;
     }
 
-  group->key_value_pairs = g_list_remove (group->key_value_pairs, pair);
-  g_hash_table_remove (group->lookup_map, pair->key);
-  g_key_file_key_value_pair_free (pair);
+  group->key_value_pairs = xlist_remove (group->key_value_pairs, pair);
+  xhash_table_remove (group->lookup_map, pair->key);
+  xkey_file_key_value_pair_free (pair);
 
   return TRUE;
 }
 
 static xlist_t *
-g_key_file_lookup_group_node (GKeyFile    *key_file,
+xkey_file_lookup_group_node (xkey_file_t    *key_file,
 			      const xchar_t *group_name)
 {
   GKeyFileGroup *group;
 
-  group = g_key_file_lookup_group (key_file, group_name);
+  group = xkey_file_lookup_group (key_file, group_name);
   if (group == NULL)
     return NULL;
 
-  return g_list_find (key_file->groups, group);
+  return xlist_find (key_file->groups, group);
 }
 
 static GKeyFileGroup *
-g_key_file_lookup_group (GKeyFile    *key_file,
+xkey_file_lookup_group (xkey_file_t    *key_file,
 			 const xchar_t *group_name)
 {
   if (!key_file->group_hash)
     return NULL;
 
-  return (GKeyFileGroup *)g_hash_table_lookup (key_file->group_hash, group_name);
+  return (GKeyFileGroup *)xhash_table_lookup (key_file->group_hash, group_name);
 }
 
 static xlist_t *
-g_key_file_lookup_key_value_pair_node (GKeyFile       *key_file,
+xkey_file_lookup_key_value_pair_node (xkey_file_t       *key_file,
 			               GKeyFileGroup  *group,
                                        const xchar_t    *key)
 {
@@ -4134,11 +4134,11 @@ g_key_file_lookup_key_value_pair_node (GKeyFile       *key_file,
 }
 
 static GKeyFileKeyValuePair *
-g_key_file_lookup_key_value_pair (GKeyFile      *key_file,
+xkey_file_lookup_key_value_pair (xkey_file_t      *key_file,
 				  GKeyFileGroup *group,
 				  const xchar_t   *key)
 {
-  return (GKeyFileKeyValuePair *) g_hash_table_lookup (group->lookup_map, key);
+  return (GKeyFileKeyValuePair *) xhash_table_lookup (group->lookup_map, key);
 }
 
 /* Lines starting with # or consisting entirely of whitespace are merely
@@ -4146,13 +4146,13 @@ g_key_file_lookup_key_value_pair (GKeyFile      *key_file,
  * has been stripped.
  */
 static xboolean_t
-g_key_file_line_is_comment (const xchar_t *line)
+xkey_file_line_is_comment (const xchar_t *line)
 {
   return (*line == '#' || *line == '\0' || *line == '\n');
 }
 
 static xboolean_t
-g_key_file_is_group_name (const xchar_t *name)
+xkey_file_is_group_name (const xchar_t *name)
 {
   const xchar_t *p, *q;
 
@@ -4160,7 +4160,7 @@ g_key_file_is_group_name (const xchar_t *name)
 
   p = q = name;
   while (*q && *q != ']' && *q != '[' && !g_ascii_iscntrl (*q))
-    q = g_utf8_find_next_char (q, NULL);
+    q = xutf8_find_next_char (q, NULL);
 
   if (*q != '\0' || q == p)
     return FALSE;
@@ -4169,7 +4169,7 @@ g_key_file_is_group_name (const xchar_t *name)
 }
 
 static xboolean_t
-g_key_file_is_key_name (const xchar_t *name,
+xkey_file_is_key_name (const xchar_t *name,
                         xsize_t        len)
 {
   const xchar_t *p, *q, *end;
@@ -4184,7 +4184,7 @@ g_key_file_is_key_name (const xchar_t *name,
    */
   while (q < end && *q && *q != '=' && *q != '[' && *q != ']')
     {
-      q = g_utf8_find_next_char (q, end);
+      q = xutf8_find_next_char (q, end);
       if (q == NULL)
         q = end;
     }
@@ -4206,9 +4206,9 @@ g_key_file_is_key_name (const xchar_t *name,
       q++;
       while (q < end &&
              *q != '\0' &&
-             (g_unichar_isalnum (g_utf8_get_char_validated (q, end - q)) || *q == '-' || *q == '_' || *q == '.' || *q == '@'))
+             (xunichar_isalnum (xutf8_get_char_validated (q, end - q)) || *q == '-' || *q == '_' || *q == '.' || *q == '@'))
         {
-          q = g_utf8_find_next_char (q, end);
+          q = xutf8_find_next_char (q, end);
           if (q == NULL)
             {
               q = end;
@@ -4232,7 +4232,7 @@ g_key_file_is_key_name (const xchar_t *name,
  * or more letters making up the group name followed by ']'.
  */
 static xboolean_t
-g_key_file_line_is_group (const xchar_t *line)
+xkey_file_line_is_group (const xchar_t *line)
 {
   const xchar_t *p;
 
@@ -4243,15 +4243,15 @@ g_key_file_line_is_group (const xchar_t *line)
   p++;
 
   while (*p && *p != ']')
-    p = g_utf8_find_next_char (p, NULL);
+    p = xutf8_find_next_char (p, NULL);
 
   if (*p != ']')
     return FALSE;
 
   /* silently accept whitespace after the ] */
-  p = g_utf8_find_next_char (p, NULL);
+  p = xutf8_find_next_char (p, NULL);
   while (*p == ' ' || *p == '\t')
-    p = g_utf8_find_next_char (p, NULL);
+    p = xutf8_find_next_char (p, NULL);
 
   if (*p)
     return FALSE;
@@ -4260,11 +4260,11 @@ g_key_file_line_is_group (const xchar_t *line)
 }
 
 static xboolean_t
-g_key_file_line_is_key_value_pair (const xchar_t *line)
+xkey_file_line_is_key_value_pair (const xchar_t *line)
 {
   const xchar_t *p;
 
-  p = g_utf8_strchr (line, -1, '=');
+  p = xutf8_strchr (line, -1, '=');
 
   if (!p)
     return FALSE;
@@ -4278,18 +4278,18 @@ g_key_file_line_is_key_value_pair (const xchar_t *line)
 }
 
 static xchar_t *
-g_key_file_parse_value_as_string (GKeyFile     *key_file,
+xkey_file_parse_value_as_string (xkey_file_t     *key_file,
 				  const xchar_t  *value,
-				  GSList      **pieces,
+				  xslist_t      **pieces,
 				  xerror_t      **error)
 {
-  xchar_t *string_value, *q0, *q;
+  xchar_t *strinxvalue, *q0, *q;
   const xchar_t *p;
 
-  string_value = g_new (xchar_t, strlen (value) + 1);
+  strinxvalue = g_new (xchar_t, strlen (value) + 1);
 
   p = value;
-  q0 = q = string_value;
+  q0 = q = strinxvalue;
   while (*p)
     {
       if (*p == '\\')
@@ -4355,7 +4355,7 @@ g_key_file_parse_value_as_string (GKeyFile     *key_file,
 	  *q = *p;
 	  if (pieces && (*p == key_file->list_separator))
 	    {
-	      *pieces = g_slist_prepend (*pieces, g_strndup (q0, q - q0));
+	      *pieces = xslist_prepend (*pieces, xstrndup (q0, q - q0));
 	      q0 = q + 1;
 	    }
 	}
@@ -4371,15 +4371,15 @@ g_key_file_parse_value_as_string (GKeyFile     *key_file,
   if (pieces)
   {
     if (q0 < q)
-      *pieces = g_slist_prepend (*pieces, g_strndup (q0, q - q0));
-    *pieces = g_slist_reverse (*pieces);
+      *pieces = xslist_prepend (*pieces, xstrndup (q0, q - q0));
+    *pieces = xslist_reverse (*pieces);
   }
 
-  return string_value;
+  return strinxvalue;
 }
 
 static xchar_t *
-g_key_file_parse_string_as_value (GKeyFile    *key_file,
+xkey_file_parse_string_as_value (xkey_file_t    *key_file,
 				  const xchar_t *string,
 				  xboolean_t     escape_separator)
 {
@@ -4470,22 +4470,22 @@ g_key_file_parse_string_as_value (GKeyFile    *key_file,
 }
 
 static xint_t
-g_key_file_parse_value_as_integer (GKeyFile     *key_file,
+xkey_file_parse_value_as_integer (xkey_file_t     *key_file,
 				   const xchar_t  *value,
 				   xerror_t      **error)
 {
   xchar_t *eof_int;
-  glong long_value;
+  xlong_t lonxvalue;
   xint_t int_value;
   int errsv;
 
   errno = 0;
-  long_value = strtol (value, &eof_int, 10);
+  lonxvalue = strtol (value, &eof_int, 10);
   errsv = errno;
 
   if (*value == '\0' || (*eof_int != '\0' && !g_ascii_isspace(*eof_int)))
     {
-      xchar_t *value_utf8 = g_utf8_make_valid (value, -1);
+      xchar_t *value_utf8 = xutf8_make_valid (value, -1);
       g_set_error (error, G_KEY_FILE_ERROR,
 		   G_KEY_FILE_ERROR_INVALID_VALUE,
 		   _("Value “%s” cannot be interpreted "
@@ -4495,10 +4495,10 @@ g_key_file_parse_value_as_integer (GKeyFile     *key_file,
       return 0;
     }
 
-  int_value = long_value;
-  if (int_value != long_value || errsv == ERANGE)
+  int_value = lonxvalue;
+  if (int_value != lonxvalue || errsv == ERANGE)
     {
-      xchar_t *value_utf8 = g_utf8_make_valid (value, -1);
+      xchar_t *value_utf8 = xutf8_make_valid (value, -1);
       g_set_error (error,
 		   G_KEY_FILE_ERROR,
 		   G_KEY_FILE_ERROR_INVALID_VALUE,
@@ -4513,15 +4513,15 @@ g_key_file_parse_value_as_integer (GKeyFile     *key_file,
 }
 
 static xchar_t *
-g_key_file_parse_integer_as_value (GKeyFile *key_file,
+xkey_file_parse_integer_as_value (xkey_file_t *key_file,
 				   xint_t      value)
 
 {
-  return g_strdup_printf ("%d", value);
+  return xstrdup_printf ("%d", value);
 }
 
 static xdouble_t
-g_key_file_parse_value_as_double  (GKeyFile     *key_file,
+xkey_file_parse_value_as_double  (xkey_file_t     *key_file,
                                    const xchar_t  *value,
                                    xerror_t      **error)
 {
@@ -4532,7 +4532,7 @@ g_key_file_parse_value_as_double  (GKeyFile     *key_file,
 
   if (*end_of_valid_d != '\0' || end_of_valid_d == value)
     {
-      xchar_t *value_utf8 = g_utf8_make_valid (value, -1);
+      xchar_t *value_utf8 = xutf8_make_valid (value, -1);
       g_set_error (error, G_KEY_FILE_ERROR,
 		   G_KEY_FILE_ERROR_INVALID_VALUE,
 		   _("Value “%s” cannot be interpreted "
@@ -4554,7 +4554,7 @@ strcmp_sized (const xchar_t *s1, size_t len1, const xchar_t *s2)
 }
 
 static xboolean_t
-g_key_file_parse_value_as_boolean (GKeyFile     *key_file,
+xkey_file_parse_value_as_boolean (xkey_file_t     *key_file,
 				   const xchar_t  *value,
 				   xerror_t      **error)
 {
@@ -4571,7 +4571,7 @@ g_key_file_parse_value_as_boolean (GKeyFile     *key_file,
   else if (strcmp_sized (value, length, "false") == 0 || strcmp_sized (value, length, "0") == 0)
     return FALSE;
 
-  value_utf8 = g_utf8_make_valid (value, -1);
+  value_utf8 = xutf8_make_valid (value, -1);
   g_set_error (error, G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_INVALID_VALUE,
                _("Value “%s” cannot be interpreted "
@@ -4582,7 +4582,7 @@ g_key_file_parse_value_as_boolean (GKeyFile     *key_file,
 }
 
 static const xchar_t *
-g_key_file_parse_boolean_as_value (GKeyFile *key_file,
+xkey_file_parse_boolean_as_value (xkey_file_t *key_file,
 				   xboolean_t  value)
 {
   if (value)
@@ -4592,79 +4592,79 @@ g_key_file_parse_boolean_as_value (GKeyFile *key_file,
 }
 
 static xchar_t *
-g_key_file_parse_value_as_comment (GKeyFile    *key_file,
+xkey_file_parse_value_as_comment (xkey_file_t    *key_file,
                                    const xchar_t *value,
                                    xboolean_t     is_final_line)
 {
-  GString *string;
+  xstring_t *string;
   xchar_t **lines;
   xsize_t i;
 
-  string = g_string_sized_new (512);
+  string = xstring_sized_new (512);
 
-  lines = g_strsplit (value, "\n", 0);
+  lines = xstrsplit (value, "\n", 0);
 
   for (i = 0; lines[i] != NULL; i++)
     {
       const xchar_t *line = lines[i];
 
       if (i != 0)
-        g_string_append_c (string, '\n');
+        xstring_append_c (string, '\n');
 
       if (line[0] == '#')
         line++;
-      g_string_append (string, line);
+      xstring_append (string, line);
     }
-  g_strfreev (lines);
+  xstrfreev (lines);
 
   /* This function gets called once per line of a comment, but we don’t want
    * to add a trailing newline. */
   if (!is_final_line)
-    g_string_append_c (string, '\n');
+    xstring_append_c (string, '\n');
 
-  return g_string_free (string, FALSE);
+  return xstring_free (string, FALSE);
 }
 
 static xchar_t *
-g_key_file_parse_comment_as_value (GKeyFile      *key_file,
+xkey_file_parse_comment_as_value (xkey_file_t      *key_file,
                                    const xchar_t   *comment)
 {
-  GString *string;
+  xstring_t *string;
   xchar_t **lines;
   xsize_t i;
 
-  string = g_string_sized_new (512);
+  string = xstring_sized_new (512);
 
-  lines = g_strsplit (comment, "\n", 0);
+  lines = xstrsplit (comment, "\n", 0);
 
   for (i = 0; lines[i] != NULL; i++)
-    g_string_append_printf (string, "#%s%s", lines[i],
+    xstring_append_printf (string, "#%s%s", lines[i],
                             lines[i + 1] == NULL? "" : "\n");
-  g_strfreev (lines);
+  xstrfreev (lines);
 
-  return g_string_free (string, FALSE);
+  return xstring_free (string, FALSE);
 }
 
 /**
- * g_key_file_save_to_file:
- * @key_file: a #GKeyFile
+ * xkey_file_save_to_file:
+ * @key_file: a #xkey_file_t
  * @filename: the name of the file to write to
  * @error: a pointer to a %NULL #xerror_t, or %NULL
  *
  * Writes the contents of @key_file to @filename using
- * g_file_set_contents(). If you need stricter guarantees about durability of
- * the written file than are provided by g_file_set_contents(), use
- * g_file_set_contents_full() with the return value of g_key_file_to_data().
+ * xfile_set_contents(). If you need stricter guarantees about durability of
+ * the written file than are provided by xfile_set_contents(), use
+ * xfile_set_contents_full() with the return value of xkey_file_to_data().
  *
  * This function can fail for any of the reasons that
- * g_file_set_contents() may fail.
+ * xfile_set_contents() may fail.
  *
  * Returns: %TRUE if successful, else %FALSE with @error set
  *
  * Since: 2.40
  */
 xboolean_t
-g_key_file_save_to_file (GKeyFile     *key_file,
+xkey_file_save_to_file (xkey_file_t     *key_file,
                          const xchar_t  *filename,
                          xerror_t      **error)
 {
@@ -4676,10 +4676,10 @@ g_key_file_save_to_file (GKeyFile     *key_file,
   g_return_val_if_fail (filename != NULL, FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  contents = g_key_file_to_data (key_file, &length, NULL);
+  contents = xkey_file_to_data (key_file, &length, NULL);
   g_assert (contents != NULL);
 
-  success = g_file_set_contents (filename, contents, length, error);
+  success = xfile_set_contents (filename, contents, length, error);
   g_free (contents);
 
   return success;

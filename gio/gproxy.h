@@ -31,10 +31,10 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_PROXY		(g_proxy_get_type ())
-#define G_PROXY(o)		(XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_PROXY, GProxy))
+#define XTYPE_PROXY		(xproxy_get_type ())
+#define G_PROXY(o)		(XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_PROXY, xproxy))
 #define X_IS_PROXY(o)		(XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_PROXY))
-#define G_PROXY_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_PROXY, GProxyInterface))
+#define G_PROXY_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_PROXY, xproxy_interface_t))
 
 /**
  * G_PROXY_EXTENSION_POINT_NAME:
@@ -47,16 +47,16 @@ G_BEGIN_DECLS
 #define G_PROXY_EXTENSION_POINT_NAME "gio-proxy"
 
 /**
- * GProxy:
+ * xproxy_t:
  *
  * Interface that handles proxy connection and payload.
  *
  * Since: 2.26
  */
-typedef struct _GProxyInterface GProxyInterface;
+typedef struct _xproxy_interface xproxy_interface_t;
 
 /**
- * GProxyInterface:
+ * xproxy_interface_t:
  * @x_iface: The parent interface.
  * @connect: Connect to proxy server and wrap (if required) the #connection
  *           to handle payload.
@@ -68,60 +68,60 @@ typedef struct _GProxyInterface GProxyInterface;
  *
  * Since: 2.26
  */
-struct _GProxyInterface
+struct _xproxy_interface
 {
   xtype_interface_t x_iface;
 
   /* Virtual Table */
 
-  xio_stream_t * (* connect)           (GProxy               *proxy,
+  xio_stream_t * (* connect)           (xproxy_t               *proxy,
 				     xio_stream_t            *connection,
-				     GProxyAddress        *proxy_address,
+				     xproxy_address_t        *proxy_address,
 				     xcancellable_t         *cancellable,
 				     xerror_t              **error);
 
-  void        (* connect_async)     (GProxy               *proxy,
+  void        (* connect_async)     (xproxy_t               *proxy,
 				     xio_stream_t            *connection,
-				     GProxyAddress	  *proxy_address,
+				     xproxy_address_t	  *proxy_address,
 				     xcancellable_t         *cancellable,
 				     xasync_ready_callback_t   callback,
 				     xpointer_t              user_data);
 
-  xio_stream_t * (* connect_finish)    (GProxy               *proxy,
+  xio_stream_t * (* connect_finish)    (xproxy_t               *proxy,
 				     xasync_result_t         *result,
 				     xerror_t              **error);
 
-  xboolean_t    (* supports_hostname) (GProxy             *proxy);
+  xboolean_t    (* supports_hostname) (xproxy_t             *proxy);
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t      g_proxy_get_type                 (void) G_GNUC_CONST;
+xtype_t      xproxy_get_type                 (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GProxy    *g_proxy_get_default_for_protocol (const xchar_t *protocol);
+xproxy_t    *xproxy_get_default_for_protocol (const xchar_t *protocol);
 
 XPL_AVAILABLE_IN_ALL
-xio_stream_t *g_proxy_connect           (GProxy               *proxy,
+xio_stream_t *xproxy_connect           (xproxy_t               *proxy,
 				      xio_stream_t            *connection,
-				      GProxyAddress        *proxy_address,
+				      xproxy_address_t        *proxy_address,
 				      xcancellable_t         *cancellable,
 				      xerror_t              **error);
 
 XPL_AVAILABLE_IN_ALL
-void       g_proxy_connect_async     (GProxy               *proxy,
+void       xproxy_connect_async     (xproxy_t               *proxy,
 				      xio_stream_t            *connection,
-				      GProxyAddress        *proxy_address,
+				      xproxy_address_t        *proxy_address,
 				      xcancellable_t         *cancellable,
 				      xasync_ready_callback_t   callback,
 				      xpointer_t              user_data);
 
 XPL_AVAILABLE_IN_ALL
-xio_stream_t *g_proxy_connect_finish    (GProxy               *proxy,
+xio_stream_t *xproxy_connect_finish    (xproxy_t               *proxy,
 				      xasync_result_t         *result,
 				      xerror_t              **error);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t   g_proxy_supports_hostname (GProxy               *proxy);
+xboolean_t   xproxy_supports_hostname (xproxy_t               *proxy);
 
 G_END_DECLS
 

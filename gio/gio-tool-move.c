@@ -47,8 +47,8 @@ static gint64 start_time;
 static gint64 previous_time;
 
 static void
-show_progress (goffset current_num_bytes,
-               goffset total_num_bytes,
+show_progress (xoffset_t current_num_bytes,
+               xoffset_t total_num_bytes,
                xpointer_t user_data)
 {
   gint64 tv;
@@ -77,7 +77,7 @@ show_progress (goffset current_num_bytes,
 int
 handle_move (int argc, char *argv[], xboolean_t do_help)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xchar_t *param;
   xerror_t *error = NULL;
   xfile_t *source, *dest, *target;
@@ -85,13 +85,13 @@ handle_move (int argc, char *argv[], xboolean_t do_help)
   char *basename;
   char *uri;
   int i;
-  GFileCopyFlags flags;
+  xfile_copy_flags_t flags;
   int retval = 0;
 
   g_set_prgname ("gio move");
 
   /* Translators: commandline placeholder */
-  param = g_strdup_printf ("%s… %s", _("SOURCE"), _("DESTINATION"));
+  param = xstrdup_printf ("%s… %s", _("SOURCE"), _("DESTINATION"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -113,7 +113,7 @@ handle_move (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      g_error_free (error);
+      xerror_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -125,12 +125,12 @@ handle_move (int argc, char *argv[], xboolean_t do_help)
       return 1;
     }
 
-  dest = g_file_new_for_commandline_arg (argv[argc - 1]);
+  dest = xfile_new_for_commandline_arg (argv[argc - 1]);
 
   if (no_target_directory && argc > 3)
     {
       show_help (context, NULL);
-      g_object_unref (dest);
+      xobject_unref (dest);
       g_option_context_free (context);
       return 1;
     }
@@ -140,10 +140,10 @@ handle_move (int argc, char *argv[], xboolean_t do_help)
   if (!dest_is_dir && argc > 3)
     {
       char *message;
-      message = g_strdup_printf (_("Target %s is not a directory"), argv[argc - 1]);
+      message = xstrdup_printf (_("Target %s is not a directory"), argv[argc - 1]);
       show_help (context, message);
       g_free (message);
-      g_object_unref (dest);
+      xobject_unref (dest);
       g_option_context_free (context);
       return 1;
     }
@@ -152,45 +152,45 @@ handle_move (int argc, char *argv[], xboolean_t do_help)
 
   for (i = 1; i < argc - 1; i++)
     {
-      source = g_file_new_for_commandline_arg (argv[i]);
+      source = xfile_new_for_commandline_arg (argv[i]);
 
       if (dest_is_dir && !no_target_directory)
         {
-          basename = g_file_get_basename (source);
-          target = g_file_get_child (dest, basename);
+          basename = xfile_get_basename (source);
+          target = xfile_get_child (dest, basename);
           g_free (basename);
         }
       else
-        target = g_object_ref (dest);
+        target = xobject_ref (dest);
 
       flags = 0;
       if (backup)
-        flags |= G_FILE_COPY_BACKUP;
+        flags |= XFILE_COPY_BACKUP;
       if (!interactive)
-        flags |= G_FILE_COPY_OVERWRITE;
+        flags |= XFILE_COPY_OVERWRITE;
       if (no_copy_fallback)
-        flags |= G_FILE_COPY_NO_FALLBACK_FOR_MOVE;
+        flags |= XFILE_COPY_NO_FALLBACK_FOR_MOVE;
 
       error = NULL;
       start_time = g_get_monotonic_time ();
-      if (!g_file_move (source, target, flags, NULL, progress ? show_progress : NULL, NULL, &error))
+      if (!xfile_move (source, target, flags, NULL, progress ? show_progress : NULL, NULL, &error))
         {
-          if (interactive && g_error_matches (error, G_IO_ERROR, G_IO_ERROR_EXISTS))
+          if (interactive && xerror_matches (error, G_IO_ERROR, G_IO_ERROR_EXISTS))
             {
               char line[16];
 
-              g_error_free (error);
+              xerror_free (error);
               error = NULL;
 
-              uri = g_file_get_uri (target);
+              uri = xfile_get_uri (target);
               g_print (_("%s: overwrite “%s”? "), argv[0], uri);
               g_free (uri);
               if (fgets (line, sizeof (line), stdin) &&
                   (line[0] == 'y' || line[0] == 'Y'))
                 {
-                  flags |= G_FILE_COPY_OVERWRITE;
+                  flags |= XFILE_COPY_OVERWRITE;
                   start_time = g_get_monotonic_time ();
-                  if (!g_file_move (source, target, flags, NULL, progress ? show_progress : NULL, NULL, &error))
+                  if (!xfile_move (source, target, flags, NULL, progress ? show_progress : NULL, NULL, &error))
                     goto move_failed;
                 }
             }
@@ -198,7 +198,7 @@ handle_move (int argc, char *argv[], xboolean_t do_help)
             {
             move_failed:
               print_file_error (source, error->message);
-              g_error_free (error);
+              xerror_free (error);
               retval = 1;
             }
         }
@@ -206,11 +206,11 @@ handle_move (int argc, char *argv[], xboolean_t do_help)
       if (progress && retval == 0)
         g_print("\n");
 
-      g_object_unref (source);
-      g_object_unref (target);
+      xobject_unref (source);
+      xobject_unref (target);
     }
 
-  g_object_unref (dest);
+  xobject_unref (dest);
 
   return retval;
 }

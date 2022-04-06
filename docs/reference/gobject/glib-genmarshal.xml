@@ -38,7 +38,7 @@
 
 <refsect1><title>Description</title>
 <para><command>glib-genmarshal</command> is a small utility that generates C code
-marshallers for callback functions of the GClosure mechanism in the xobject_t
+marshallers for callback functions of the xclosure_t mechanism in the xobject_t
 sublibrary of GLib. The marshaller functions have a standard signature,
 they get passed in the invoking closure, an array of value structures holding
 the callback function parameters and a value structure for the return value
@@ -125,7 +125,7 @@ for unsigned integer types (xuint_t)
 <varlistentry>
 <term><replaceable>LONG</replaceable></term>
 <listitem><para>
-for signed long integer types (glong)
+for signed long integer types (xlong_t)
 </para></listitem>
 </varlistentry>
 
@@ -146,7 +146,7 @@ for signed 64bit integer types (gint64)
 <varlistentry>
 <term><replaceable>UINT64</replaceable></term>
 <listitem><para>
-for unsigned 64bit integer types (guint64)
+for unsigned 64bit integer types (xuint64_t)
 </para></listitem>
 </varlistentry>
 
@@ -195,7 +195,7 @@ for boxed (anonymous but reference counted) types (GBoxed*)
 <varlistentry>
 <term><replaceable>PARAM</replaceable></term>
 <listitem><para>
-for GParamSpec or derived types (GParamSpec*)
+for xparam_spec_t or derived types (xparam_spec_t*)
 </para></listitem>
 </varlistentry>
 
@@ -558,14 +558,14 @@ They can be used directly for GClosures or be passed in as the
 GSignalCMarshaller c_marshaller; argument upon creation of signals:
 </para>
 <informalexample><programlisting>
-GClosure *cc_foo, *cc_bar, *cc_baz;
+xclosure_t *cc_foo, *cc_bar, *cc_baz;
 
 cc_foo = g_cclosure_new (NULL, foo, NULL);
-g_closure_set_marshal (cc_foo, g_cclosure_user_marshal_VOID__VOID);
+xclosure_set_marshal (cc_foo, g_cclosure_user_marshal_VOID__VOID);
 cc_bar = g_cclosure_new (NULL, bar, NULL);
-g_closure_set_marshal (cc_bar, g_cclosure_user_marshal_VOID__INT);
+xclosure_set_marshal (cc_bar, g_cclosure_user_marshal_VOID__INT);
 cc_baz = g_cclosure_new (NULL, baz, NULL);
-g_closure_set_marshal (cc_baz, g_cclosure_user_marshal_FLOAT__BOOLEAN_UCHAR);
+xclosure_set_marshal (cc_baz, g_cclosure_user_marshal_FLOAT__BOOLEAN_UCHAR);
 </programlisting></informalexample>
 </refsect1>
 <refsect1><title>See also</title>

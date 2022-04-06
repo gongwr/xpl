@@ -173,37 +173,37 @@ msgstr "হোস্ট-নেম অকার্যকর"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:202
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "পূর্বাহ্ণ"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:204
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "অপরাহ্ণ"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:207
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%A %d %b %Y %I:%M:%S %p %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:210
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%A %d %b %Y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:213
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%I:%M:%S  %Z"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:216
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p %Z"
 
@@ -1484,11 +1484,11 @@ msgid "%s type"
 msgstr "%s ধরণ"
 
 #: ../gio/gcredentials.c:273 ../gio/gcredentials.c:495
-msgid "GCredentials is not implemented on this OS"
+msgid "xcredentials_t is not implemented on this OS"
 msgstr ""
 
 #: ../gio/gcredentials.c:447
-msgid "There is no GCredentials support for your platform"
+msgid "There is no xcredentials_t support for your platform"
 msgstr ""
 
 #: ../gio/gdatainputstream.c:311
@@ -1654,7 +1654,7 @@ msgid ""
 msgstr ""
 
 #: ../gio/gdbusauth.c:1159
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
 msgstr ""
 
 #: ../gio/gdbusauthmechanismsha1.c:266
@@ -2302,27 +2302,27 @@ msgstr ""
 
 #: ../gio/gemblem.c:324
 #, c-format
-msgid "Can't handle version %d of GEmblem encoding"
-msgstr "GEmblem এনকোডিং-এর %d সংস্করণ ব্যবস্থাপনা করা সম্ভব নয়"
+msgid "Can't handle version %d of xemblem_t encoding"
+msgstr "xemblem_t এনকোডিং-এর %d সংস্করণ ব্যবস্থাপনা করা সম্ভব নয়"
 
 #: ../gio/gemblem.c:334
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "GEmblem এনকোডিং-এর মধ্যে উপস্থিত ক্ষতিগ্রস্ত টোকেনের সংখ্যা (%d)"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "xemblem_t এনকোডিং-এর মধ্যে উপস্থিত ক্ষতিগ্রস্ত টোকেনের সংখ্যা (%d)"
 
 #: ../gio/gemblemedicon.c:368
 #, c-format
-msgid "Can't handle version %d of GEmblemedIcon encoding"
-msgstr "GEmblemedIcon এনকোডিং-এর %d সংস্করণ ব্যবস্থাপনা করা সম্ভব নয়"
+msgid "Can't handle version %d of xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t এনকোডিং-এর %d সংস্করণ ব্যবস্থাপনা করা সম্ভব নয়"
 
 #: ../gio/gemblemedicon.c:378
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "GEmblemedIcon এনকোডিং-এর মধ্যে উপস্থিত ক্ষতিগ্রস্ত টোকেনের সংখ্যা (%d)"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t এনকোডিং-এর মধ্যে উপস্থিত ক্ষতিগ্রস্ত টোকেনের সংখ্যা (%d)"
 
 #: ../gio/gemblemedicon.c:401
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "GEmblemedIcon-এর জন্য একটি GEmblem প্রত্যাশিত"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "xemblemed_icon_t-এর জন্য একটি xemblem_t প্রত্যাশিত"
 
 #: ../gio/gfile.c:871 ../gio/gfile.c:1102 ../gio/gfile.c:1237
 #: ../gio/gfile.c:1474 ../gio/gfile.c:1528 ../gio/gfile.c:1585
@@ -2415,12 +2415,12 @@ msgstr "ফাইল enumerator বন্ধ আছে"
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can't handle version %d of GFileIcon encoding"
-msgstr "GFileIcon এনকোডিং-এর %d সংস্করণ ব্যবস্থাপনা করা সম্ভব নয়"
+msgid "Can't handle version %d of xfile_icon_t encoding"
+msgstr "xfile_icon_t এনকোডিং-এর %d সংস্করণ ব্যবস্থাপনা করা সম্ভব নয়"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for GFileIcon"
-msgstr "GFileIcon-এর জন্য ক্ষতিগ্রস্ত ইনপুট তথ্য উপস্থিত"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "xfile_icon_t-এর জন্য ক্ষতিগ্রস্ত ইনপুট তথ্য উপস্থিত"
 
 #: ../gio/gfileinputstream.c:154 ../gio/gfileinputstream.c:420
 #: ../gio/gfileiostream.c:170 ../gio/gfileoutputstream.c:169
@@ -2737,7 +2737,7 @@ msgstr ""
 
 #: ../gio/glib-compile-schemas.c:1973
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
@@ -3055,8 +3055,8 @@ msgid "Invalid seek request"
 msgstr "অবৈধ seek-এর অনুরোধ"
 
 #: ../gio/gmemoryinputstream.c:520
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "GMemoryInputStream ট্রানকেট করতে ব্যর্থ"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "xmemory_input_stream_t ট্রানকেট করতে ব্যর্থ"
 
 #: ../gio/gmemoryoutputstream.c:496
 msgid "Memory output stream not resizable"
@@ -3474,8 +3474,8 @@ msgid "Error sending message: %s"
 msgstr "বার্তা পাঠাতে সমস্যা: %s"
 
 #: ../gio/gsocket.c:3081
-msgid "GSocketControlMessage not supported on windows"
-msgstr "উইন্ডোতে GSocketControlMessage সমর্থিত নয়"
+msgid "xsocket_control_message_t not supported on windows"
+msgstr "উইন্ডোতে xsocket_control_message_t সমর্থিত নয়"
 
 #: ../gio/gsocket.c:3358 ../gio/gsocket.c:3494
 #, c-format
@@ -3597,8 +3597,8 @@ msgstr ""
 
 #: ../gio/gthemedicon.c:498
 #, c-format
-msgid "Can't handle version %d of GThemedIcon encoding"
-msgstr "GEmblemedIcon এনকোডিং-এর %d সংস্করণ ব্যবস্থাপনা করা সম্ভব নয়"
+msgid "Can't handle version %d of xthemed_icon_t encoding"
+msgstr "xemblemed_icon_t এনকোডিং-এর %d সংস্করণ ব্যবস্থাপনা করা সম্ভব নয়"
 
 #: ../gio/gtlscertificate.c:226
 msgid "No PEM-encoded private key found"

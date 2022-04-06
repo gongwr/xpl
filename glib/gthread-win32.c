@@ -26,7 +26,7 @@
  * GLib at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-/* The GMutex and GCond implementations in this file are some of the
+/* The xmutex_t and xcond_t implementations in this file are some of the
  * lowest-level code in GLib.  All other parts of GLib (messages,
  * memory, slices, etc) assume that they can freely use these facilities
  * without risking recursion.
@@ -53,7 +53,7 @@
 #include <stdio.h>
 
 static void
-g_thread_abort (xint_t         status,
+xthread_abort (xint_t         status,
                 const xchar_t *function)
 {
   fprintf (stderr, "GLib (gthread-win32.c): Unexpected error from C library during '%s': %s.  Aborting.\n",
@@ -72,35 +72,35 @@ g_thread_abort (xint_t         status,
  * to how futex()-based mutexes work on Linux).  The biggest advantage
  * of these new types is that they can be statically initialised to
  * zero.  That means that they are completely ABI compatible with our
- * GMutex and GCond APIs.
+ * xmutex_t and xcond_t APIs.
  */
 
-/* {{{1 GMutex */
+/* {{{1 xmutex_t */
 void
-g_mutex_init (GMutex *mutex)
+g_mutex_init (xmutex_t *mutex)
 {
   InitializeSRWLock ((xpointer_t) mutex);
 }
 
 void
-g_mutex_clear (GMutex *mutex)
+g_mutex_clear (xmutex_t *mutex)
 {
 }
 
 void
-g_mutex_lock (GMutex *mutex)
+g_mutex_lock (xmutex_t *mutex)
 {
   AcquireSRWLockExclusive ((xpointer_t) mutex);
 }
 
 xboolean_t
-g_mutex_trylock (GMutex *mutex)
+g_mutex_trylock (xmutex_t *mutex)
 {
   return TryAcquireSRWLockExclusive ((xpointer_t) mutex);
 }
 
 void
-g_mutex_unlock (GMutex *mutex)
+g_mutex_unlock (xmutex_t *mutex)
 {
   ReleaseSRWLockExclusive ((xpointer_t) mutex);
 }
@@ -220,40 +220,40 @@ g_rw_lock_reader_unlock (GRWLock *lock)
   ReleaseSRWLockShared ((xpointer_t) lock);
 }
 
-/* {{{1 GCond */
+/* {{{1 xcond_t */
 void
-g_cond_init (GCond *cond)
+g_cond_init (xcond_t *cond)
 {
   InitializeConditionVariable ((xpointer_t) cond);
 }
 
 void
-g_cond_clear (GCond *cond)
+g_cond_clear (xcond_t *cond)
 {
 }
 
 void
-g_cond_signal (GCond *cond)
+g_cond_signal (xcond_t *cond)
 {
   WakeConditionVariable ((xpointer_t) cond);
 }
 
 void
-g_cond_broadcast (GCond *cond)
+g_cond_broadcast (xcond_t *cond)
 {
   WakeAllConditionVariable ((xpointer_t) cond);
 }
 
 void
-g_cond_wait (GCond  *cond,
-             GMutex *entered_mutex)
+g_cond_wait (xcond_t  *cond,
+             xmutex_t *entered_mutex)
 {
   SleepConditionVariableSRW ((xpointer_t) cond, (xpointer_t) entered_mutex, INFINITE, 0);
 }
 
 xboolean_t
-g_cond_wait_until (GCond  *cond,
-                   GMutex *entered_mutex,
+g_cond_wait_until (xcond_t  *cond,
+                   xmutex_t *entered_mutex,
                    gint64  end_time)
 {
   gint64 span, start_time;
@@ -297,7 +297,7 @@ typedef struct _GPrivateDestructor GPrivateDestructor;
 struct _GPrivateDestructor
 {
   DWORD               index;
-  GDestroyNotify      notify;
+  xdestroy_notify_t      notify;
   GPrivateDestructor *next;
 };
 
@@ -330,13 +330,13 @@ g_private_get_impl (GPrivate *key)
             }
 
           if (impl == TLS_OUT_OF_INDEXES || impl == 0)
-            g_thread_abort (0, "TlsAlloc");
+            xthread_abort (0, "TlsAlloc");
 
           if (key->notify != NULL)
             {
               destructor = malloc (sizeof (GPrivateDestructor));
               if G_UNLIKELY (destructor == NULL)
-                g_thread_abort (errno, "malloc");
+                xthread_abort (errno, "malloc");
               destructor->index = impl;
               destructor->notify = key->notify;
               destructor->next = g_atomic_pointer_get (&g_private_destructors);
@@ -350,12 +350,12 @@ g_private_get_impl (GPrivate *key)
               if (!g_atomic_pointer_compare_and_exchange (&g_private_destructors,
                                                           destructor->next,
                                                           destructor))
-                g_thread_abort (0, "g_private_get_impl(1)");
+                xthread_abort (0, "g_private_get_impl(1)");
             }
 
           /* Ditto, due to the unlocked access on the fast path */
           if (!g_atomic_pointer_compare_and_exchange (&key->p, NULL, impl))
-            g_thread_abort (0, "g_private_get_impl(2)");
+            xthread_abort (0, "g_private_get_impl(2)");
         }
       LeaveCriticalSection (&g_private_lock);
     }
@@ -389,11 +389,11 @@ g_private_replace (GPrivate *key,
     key->notify (old);
 }
 
-/* {{{1 GThread */
+/* {{{1 xthread_t */
 
 #define win32_check_for_error(what) G_STMT_START{			\
   if (!(what))								\
-    g_error ("file %s: line %d (%s): error %s during %s",		\
+    xerror ("file %s: line %d (%s): error %s during %s",		\
 	     __FILE__, __LINE__, G_STRFUNC,				\
 	     g_win32_error_message (GetLastError ()), #what);		\
   }G_STMT_END
@@ -428,7 +428,7 @@ g_system_thread_exit (void)
    * compilation mode, we call directly the "detach" function here right
    * before terminating the thread.
    * As all win32 threads initialized through the glib API are run through
-   * the same proxy function g_thread_win32_proxy() which calls systematically
+   * the same proxy function xthread_win32_proxy() which calls systematically
    * g_system_thread_exit() when finishing, we obtain the same behavior as
    * with dynamic compilation.
    *
@@ -441,14 +441,14 @@ g_system_thread_exit (void)
    * memory leaks when the thread finishes.
    */
 #ifdef XPL_STATIC_COMPILATION
-  g_thread_win32_thread_detach ();
+  xthread_win32_thread_detach ();
 #endif
 
   _endthreadex (0);
 }
 
 static xuint_t __stdcall
-g_thread_win32_proxy (xpointer_t data)
+xthread_win32_proxy (xpointer_t data)
 {
   GThreadWin32 *self = data;
 
@@ -494,9 +494,9 @@ g_system_thread_new (GThreadFunc proxy,
   base_thread->thread.joinable = TRUE;
   base_thread->thread.func = func;
   base_thread->thread.data = data;
-  base_thread->name = g_strdup (name);
+  base_thread->name = xstrdup (name);
 
-  thread->handle = (HANDLE) _beginthreadex (NULL, stack_size, g_thread_win32_proxy, thread,
+  thread->handle = (HANDLE) _beginthreadex (NULL, stack_size, xthread_win32_proxy, thread,
                                             CREATE_SUSPENDED, &ignore);
 
   if (thread->handle == NULL)
@@ -558,7 +558,7 @@ error:
 }
 
 void
-g_thread_yield (void)
+xthread_yield (void)
 {
   Sleep(0);
 }
@@ -635,7 +635,7 @@ static pSetThreadDescription SetThreadDescriptionFunc = NULL;
 static HMODULE kernel32_module = NULL;
 
 static xboolean_t
-g_thread_win32_load_library (void)
+xthread_win32_load_library (void)
 {
   /* FIXME: Add support for UWP app */
 #if !defined(G_WINAPI_ONLY_APP)
@@ -659,15 +659,15 @@ g_thread_win32_load_library (void)
 }
 
 static xboolean_t
-g_thread_win32_set_thread_desc (const xchar_t *name)
+xthread_win32_set_thread_desc (const xchar_t *name)
 {
   HRESULT hr;
   wchar_t *namew;
 
-  if (!g_thread_win32_load_library () || !name)
+  if (!xthread_win32_load_library () || !name)
     return FALSE;
 
-  namew = g_utf8_to_utf16 (name, -1, NULL, NULL, NULL);
+  namew = xutf8_to_utf16 (name, -1, NULL, NULL, NULL);
   if (!namew)
     return FALSE;
 
@@ -683,14 +683,14 @@ g_system_thread_set_name (const xchar_t *name)
   /* Prefer SetThreadDescription over exception based way if available,
    * since thread description set by SetThreadDescription will be preserved
    * in dump file */
-  if (!g_thread_win32_set_thread_desc (name))
+  if (!xthread_win32_set_thread_desc (name))
     SetThreadName ((DWORD) -1, name);
 }
 
 /* {{{1 Epilogue */
 
 void
-g_thread_win32_init (void)
+xthread_win32_init (void)
 {
   InitializeCriticalSection (&g_private_lock);
 
@@ -704,7 +704,7 @@ g_thread_win32_init (void)
 }
 
 void
-g_thread_win32_thread_detach (void)
+xthread_win32_thread_detach (void)
 {
   xboolean_t dtors_called;
 
@@ -739,7 +739,7 @@ g_thread_win32_thread_detach (void)
 }
 
 void
-g_thread_win32_process_detach (void)
+xthread_win32_process_detach (void)
 {
 #ifndef _MSC_VER
   if (SetThreadName_VEH_handle != NULL)

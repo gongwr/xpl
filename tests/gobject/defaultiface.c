@@ -38,9 +38,9 @@
  * Static interface tests
  **********************************************************************/
 
-typedef struct _TestStaticIfaceClass TestStaticIfaceClass;
+typedef struct _test_static_iface_class test_static_iface_class_t;
 
-struct _TestStaticIfaceClass
+struct _test_static_iface_class
 {
   xtype_interface_t base_iface;
   xuint_t val;
@@ -50,36 +50,36 @@ xtype_t test_static_iface_get_type (void);
 #define TEST_TYPE_STATIC_IFACE (test_static_iface_get_type ())
 
 static void
-test_static_iface_default_init (TestStaticIfaceClass *iface)
+test_static_iface_default_init (test_static_iface_class_t *iface)
 {
   iface->val = 42;
 }
 
-DEFINE_IFACE (TestStaticIface, test_static_iface,
+DEFINE_IFACE (test_static_iface, test_static_iface,
 	      NULL, test_static_iface_default_init)
 
 static void
 test_static_iface (void)
 {
-  TestStaticIfaceClass *static_iface;
+  test_static_iface_class_t *static_iface;
 
   /* Not loaded until we call ref for the first time */
-  static_iface = g_type_default_interface_peek (TEST_TYPE_STATIC_IFACE);
+  static_iface = xtype_default_interface_peek (TEST_TYPE_STATIC_IFACE);
   g_assert (static_iface == NULL);
 
   /* Ref loads */
-  static_iface = g_type_default_interface_ref (TEST_TYPE_STATIC_IFACE);
+  static_iface = xtype_default_interface_ref (TEST_TYPE_STATIC_IFACE);
   g_assert (static_iface && static_iface->val == 42);
 
   /* Peek then works */
-  static_iface = g_type_default_interface_peek (TEST_TYPE_STATIC_IFACE);
+  static_iface = xtype_default_interface_peek (TEST_TYPE_STATIC_IFACE);
   g_assert (static_iface && static_iface->val == 42);
 
   /* Unref does nothing */
-  g_type_default_interface_unref (static_iface);
+  xtype_default_interface_unref (static_iface);
 
   /* And peek still works */
-  static_iface = g_type_default_interface_peek (TEST_TYPE_STATIC_IFACE);
+  static_iface = xtype_default_interface_peek (TEST_TYPE_STATIC_IFACE);
   g_assert (static_iface && static_iface->val == 42);
 }
 
@@ -101,28 +101,28 @@ static xboolean_t dynamic_iface_init = FALSE;
 #define TEST_TYPE_DYNAMIC_IFACE (test_dynamic_iface_type)
 
 static void
-test_dynamic_iface_default_init (TestStaticIfaceClass *iface)
+test_dynamic_iface_default_init (test_static_iface_class_t *iface)
 {
   dynamic_iface_init = TRUE;
   iface->val = 42;
 }
 
 static void
-test_dynamic_iface_default_finalize (TestStaticIfaceClass *iface)
+test_dynamic_iface_default_finalize (test_static_iface_class_t *iface)
 {
   dynamic_iface_init = FALSE;
 }
 
 static void
-test_dynamic_iface_register (GTypeModule *module)
+test_dynamic_iface_register (xtype_module_t *module)
 {
-  const GTypeInfo iface_info =
+  const xtype_info_t iface_info =
     {
       sizeof (TestDynamicIfaceClass),
-      (GBaseInitFunc)	   NULL,
-      (GBaseFinalizeFunc)  NULL,
-      (GClassInitFunc)     test_dynamic_iface_default_init,
-      (GClassFinalizeFunc) test_dynamic_iface_default_finalize,
+      (xbase_init_func_t)	   NULL,
+      (xbase_finalize_func_t)  NULL,
+      (xclass_init_func_t)     test_dynamic_iface_default_init,
+      (xclass_finalize_func_t) test_dynamic_iface_default_finalize,
       NULL,
       0,
       0,
@@ -130,12 +130,12 @@ test_dynamic_iface_register (GTypeModule *module)
       NULL
     };
 
-  test_dynamic_iface_type = g_type_module_register_type (module, XTYPE_INTERFACE,
+  test_dynamic_iface_type = xtype_module_register_type (module, XTYPE_INTERFACE,
 							 "TestDynamicIface", &iface_info, 0);
 }
 
 static void
-module_register (GTypeModule *module)
+module_register (xtype_module_t *module)
 {
   test_dynamic_iface_register (module);
 }
@@ -148,37 +148,37 @@ test_dynamic_iface (void)
   test_module_new (module_register);
 
   /* Not loaded until we call ref for the first time */
-  dynamic_iface = g_type_default_interface_peek (TEST_TYPE_DYNAMIC_IFACE);
+  dynamic_iface = xtype_default_interface_peek (TEST_TYPE_DYNAMIC_IFACE);
   g_assert (dynamic_iface == NULL);
 
   /* Ref loads */
-  dynamic_iface = g_type_default_interface_ref (TEST_TYPE_DYNAMIC_IFACE);
+  dynamic_iface = xtype_default_interface_ref (TEST_TYPE_DYNAMIC_IFACE);
   g_assert (dynamic_iface_init);
   g_assert (dynamic_iface && dynamic_iface->val == 42);
 
   /* Peek then works */
-  dynamic_iface = g_type_default_interface_peek (TEST_TYPE_DYNAMIC_IFACE);
+  dynamic_iface = xtype_default_interface_peek (TEST_TYPE_DYNAMIC_IFACE);
   g_assert (dynamic_iface && dynamic_iface->val == 42);
 
   /* Unref causes finalize */
-  g_type_default_interface_unref (dynamic_iface);
+  xtype_default_interface_unref (dynamic_iface);
 #if 0
   g_assert (!dynamic_iface_init);
 #endif
 
   /* Peek returns NULL */
-  dynamic_iface = g_type_default_interface_peek (TEST_TYPE_DYNAMIC_IFACE);
+  dynamic_iface = xtype_default_interface_peek (TEST_TYPE_DYNAMIC_IFACE);
 #if 0
   g_assert (dynamic_iface == NULL);
 #endif
 
   /* Ref reloads */
-  dynamic_iface = g_type_default_interface_ref (TEST_TYPE_DYNAMIC_IFACE);
+  dynamic_iface = xtype_default_interface_ref (TEST_TYPE_DYNAMIC_IFACE);
   g_assert (dynamic_iface_init);
   g_assert (dynamic_iface && dynamic_iface->val == 42);
 
   /* And Unref causes finalize once more*/
-  g_type_default_interface_unref (dynamic_iface);
+  xtype_default_interface_unref (dynamic_iface);
 #if 0
   g_assert (!dynamic_iface_init);
 #endif

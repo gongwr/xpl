@@ -32,7 +32,7 @@
 
 static xboolean_t loaded = FALSE;
 
-struct _TestIfaceClass
+struct _test_iface_class
 {
   xtype_interface_t base_iface;
   xuint_t val;
@@ -40,69 +40,69 @@ struct _TestIfaceClass
 
 static xtype_t test_iface_get_type (void);
 #define TEST_TYPE_IFACE           (test_iface_get_type ())
-#define TEST_IFACE_GET_CLASS(obj) (XTYPE_INSTANCE_GET_INTERFACE ((obj), TEST_TYPE_IFACE, TestIfaceClass))
-typedef struct _TestIface      TestIface;
-typedef struct _TestIfaceClass TestIfaceClass;
+#define TEST_IFACE_GET_CLASS(obj) (XTYPE_INSTANCE_GET_INTERFACE ((obj), TEST_TYPE_IFACE, test_iface_class_t))
+typedef struct _test_iface      test_iface_t;
+typedef struct _test_iface_class test_iface_class_t;
 
-static void test_iface_base_init    (TestIfaceClass *iface);
-static void test_iface_default_init (TestIfaceClass *iface, xpointer_t class_data);
+static void test_iface_base_init    (test_iface_class_t *iface);
+static void test_iface_default_init (test_iface_class_t *iface, xpointer_t class_data);
 
-static DEFINE_IFACE(TestIface, test_iface, test_iface_base_init, test_iface_default_init)
+static DEFINE_IFACE(test_iface_t, test_iface, test_iface_base_init, test_iface_default_init)
 
 static void
-test_iface_default_init (TestIfaceClass *iface,
+test_iface_default_init (test_iface_class_t *iface,
 			 xpointer_t        class_data)
 {
 }
 
 static void
-test_iface_base_init (TestIfaceClass *iface)
+test_iface_base_init (test_iface_class_t *iface)
 {
 }
 
 xtype_t dynamic_object_get_type (void);
 #define DYNAMIC_OBJECT_TYPE (dynamic_object_get_type ())
 
-typedef xobject_t DynamicObject;
-typedef struct _DynamicObjectClass DynamicObjectClass;
+typedef xobject_t dynamic_object_t;
+typedef struct _dynamic_object_class dynamic_object_class_t;
 
-struct _DynamicObjectClass
+struct _dynamic_object_class
 {
   xobject_class_t parent_class;
   xuint_t val;
 };
 
-static void dynamic_object_iface_init (TestIface *iface);
+static void dynamic_object_iface_init (test_iface_t *iface);
 
-G_DEFINE_DYNAMIC_TYPE_EXTENDED(DynamicObject, dynamic_object, XTYPE_OBJECT, 0,
+G_DEFINE_DYNAMIC_TYPE_EXTENDED(dynamic_object_t, dynamic_object, XTYPE_OBJECT, 0,
 			       G_IMPLEMENT_INTERFACE_DYNAMIC (TEST_TYPE_IFACE,
 							      dynamic_object_iface_init));
 
 static void
-dynamic_object_class_init (DynamicObjectClass *class)
+dynamic_object_class_init (dynamic_object_class_t *class)
 {
   class->val = 42;
   loaded = TRUE;
 }
 
 static void
-dynamic_object_class_finalize (DynamicObjectClass *class)
+dynamic_object_class_finalize (dynamic_object_class_t *class)
 {
   loaded = FALSE;
 }
 
 static void
-dynamic_object_iface_init (TestIface *iface)
+dynamic_object_iface_init (test_iface_t *iface)
 {
 }
 
 static void
-dynamic_object_init (DynamicObject *dynamic_object)
+dynamic_object_init (dynamic_object_t *dynamic_object)
 {
 }
 
 static void
-module_register (GTypeModule *module)
+module_register (xtype_module_t *module)
 {
   dynamic_object_register_type (module);
 }
@@ -110,51 +110,51 @@ module_register (GTypeModule *module)
 static void
 test_dynamic_type (void)
 {
-  DynamicObjectClass *class;
+  dynamic_object_class_t *class;
 
   test_module_new (module_register);
 
   /* Not loaded until we call ref for the first time */
-  class = g_type_class_peek (DYNAMIC_OBJECT_TYPE);
+  class = xtype_class_peek (DYNAMIC_OBJECT_TYPE);
   g_assert (class == NULL);
   g_assert (!loaded);
 
   /* Make sure interfaces work */
-  g_assert (g_type_is_a (DYNAMIC_OBJECT_TYPE,
+  g_assert (xtype_is_a (DYNAMIC_OBJECT_TYPE,
 			 TEST_TYPE_IFACE));
 
   /* Ref loads */
-  class = g_type_class_ref (DYNAMIC_OBJECT_TYPE);
+  class = xtype_class_ref (DYNAMIC_OBJECT_TYPE);
   g_assert (class && class->val == 42);
   g_assert (loaded);
 
   /* Peek then works */
-  class = g_type_class_peek (DYNAMIC_OBJECT_TYPE);
+  class = xtype_class_peek (DYNAMIC_OBJECT_TYPE);
   g_assert (class && class->val == 42);
   g_assert (loaded);
 
   /* Make sure interfaces still work */
-  g_assert (g_type_is_a (DYNAMIC_OBJECT_TYPE,
+  g_assert (xtype_is_a (DYNAMIC_OBJECT_TYPE,
 			 TEST_TYPE_IFACE));
 
   /* Unref causes finalize */
-  g_type_class_unref (class);
+  xtype_class_unref (class);
 
   /* Peek returns NULL */
-  class = g_type_class_peek (DYNAMIC_OBJECT_TYPE);
+  class = xtype_class_peek (DYNAMIC_OBJECT_TYPE);
 #if 0
   g_assert (!class);
   g_assert (!loaded);
 #endif
 
   /* Ref reloads */
-  class = g_type_class_ref (DYNAMIC_OBJECT_TYPE);
+  class = xtype_class_ref (DYNAMIC_OBJECT_TYPE);
   g_assert (class && class->val == 42);
   g_assert (loaded);
 
   /* And Unref causes finalize once more*/
-  g_type_class_unref (class);
-  class = g_type_class_peek (DYNAMIC_OBJECT_TYPE);
+  xtype_class_unref (class);
+  class = xtype_class_peek (DYNAMIC_OBJECT_TYPE);
 #if 0
   g_assert (!class);
   g_assert (!loaded);

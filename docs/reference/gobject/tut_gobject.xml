@@ -28,7 +28,7 @@
     <title>Object instantiation</title>
 
     <para>
-      The <function><link linkend="g-object-new">g_object_new</link></function>
+      The <function><link linkend="g-object-new">xobject_new</link></function>
       family of functions can be used to instantiate any xtype_t which inherits
       from the xobject_t base type. All these functions make sure the class and
       instance structures have been correctly initialized by GLib's type system
@@ -36,7 +36,7 @@
       which is used to:
       <itemizedlist>
         <listitem><para>
-            Allocate and clear memory through <function><link linkend="g-type-create-instance">g_type_create_instance</link></function>,
+            Allocate and clear memory through <function><link linkend="g-type-create-instance">xtype_create_instance</link></function>,
           </para></listitem>
         <listitem><para>
             Initialize the object's instance with the construction properties.
@@ -112,7 +112,7 @@ viewer_file_init (ViewerFile *self)
 </programlisting></informalexample>
       If the user instantiates an object <type>ViewerFile</type> with:
 <informalexample><programlisting>
-ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
+ViewerFile *file = xobject_new (VIEWER_TYPE_FILE, NULL);
 </programlisting></informalexample>
       If this is the first instantiation of such an object, the
       <function>viewer_file_class_init</function> function will be invoked
@@ -126,7 +126,7 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
     </para>
 
     <para>
-      Once <function><link linkend="g-object-new">g_object_new</link></function> has obtained a reference to an initialized
+      Once <function><link linkend="g-object-new">xobject_new</link></function> has obtained a reference to an initialized
       class structure, it invokes its constructor method to create an instance of the new
       object, if the constructor has been overridden in <function>viewer_file_class_init</function>.
       Overridden constructors must chain up to their parent’s constructor. In
@@ -138,28 +138,28 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
     </para>
 
     <para>
-      Finally, at one point or another, <function>g_object_constructor</function> is invoked
+      Finally, at one point or another, <function>xobject_constructor</function> is invoked
       by the last constructor in the chain. This function allocates the object's instance buffer
-      through <function><link linkend="g-type-create-instance">g_type_create_instance</link></function>
+      through <function><link linkend="g-type-create-instance">xtype_create_instance</link></function>
       which means that the <function>instance_init</function> function is invoked at this point if one
       was registered. After <function>instance_init</function> returns, the object is fully initialized and should be
       ready to have its methods called by the user. When
-      <function><link linkend="g-type-create-instance">g_type_create_instance</link></function>
-      returns, <function>g_object_constructor</function> sets the construction properties
-      (i.e. the properties which were given to <function><link linkend="g-object-new">g_object_new</link></function>) and returns
+      <function><link linkend="g-type-create-instance">xtype_create_instance</link></function>
+      returns, <function>xobject_constructor</function> sets the construction properties
+      (i.e. the properties which were given to <function><link linkend="g-object-new">xobject_new</link></function>) and returns
       to the user's constructor.
     </para>
 
     <para>
       The process described above might seem a bit complicated, but it can be
       summarized easily by the table below which lists the functions invoked
-      by <function><link linkend="g-object-new">g_object_new</link></function>
+      by <function><link linkend="g-object-new">xobject_new</link></function>
       and their order of invocation:
     </para>
 
     <para>
       <table id="gobject-construction-table">
-        <title><function><link linkend="g-object-new">g_object_new</link></function></title>
+        <title><function><link linkend="g-object-new">xobject_new</link></function></title>
         <tgroup cols="3">
           <colspec colwidth="*" colnum="1" align="left"/>
           <colspec colwidth="*" colnum="2" align="left"/>
@@ -175,14 +175,14 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
           </thead>
           <tbody>
             <row>
-              <entry morerows="3">First call to <function><link linkend="g-object-new">g_object_new</link></function> for target type</entry>
+              <entry morerows="3">First call to <function><link linkend="g-object-new">xobject_new</link></function> for target type</entry>
               <entry>target type's <function>base_init</function> function</entry>
               <entry>On the inheritance tree of classes from fundamental type to target type.
                 <function>base_init</function> is invoked once for each class structure.</entry>
               <entry>Never used in practice. Unlikely you will need it.</entry>
             </row>
             <row>
-              <!--entry>First call to <function><link linkend="g-object-new">g_object_new</link></function> for target type</entry-->
+              <!--entry>First call to <function><link linkend="g-object-new">xobject_new</link></function> for target type</entry-->
               <entry>target type's <function>class_init</function> function</entry>
               <entry>On target type's class structure</entry>
               <entry>
@@ -192,19 +192,19 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
               </entry>
             </row>
             <row>
-              <!--entry>First call to <function><link linkend="g-object-new">g_object_new</link></function> for target type</entry-->
+              <!--entry>First call to <function><link linkend="g-object-new">xobject_new</link></function> for target type</entry-->
               <entry>interface's <function>base_init</function> function</entry>
               <entry>On interface's vtable</entry>
               <entry></entry>
             </row>
             <row>
-              <!--entry>First call to <function><link linkend="g-object-new">g_object_new</link></function> for target type</entry-->
+              <!--entry>First call to <function><link linkend="g-object-new">xobject_new</link></function> for target type</entry-->
               <entry>interface's <function>interface_init</function> function</entry>
               <entry>On interface's vtable</entry>
               <entry></entry>
             </row>
             <row>
-              <entry morerows="2">Each call to <function><link linkend="g-object-new">g_object_new</link></function> for target type</entry>
+              <entry morerows="2">Each call to <function><link linkend="g-object-new">xobject_new</link></function> for target type</entry>
               <entry>target type's class <function>constructor</function> method: <function>xobject_class_t->constructor</function></entry>
               <entry>On object's instance</entry>
               <entry>
@@ -215,7 +215,7 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
               </entry>
             </row>
             <row>
-              <!--entry>Each call to <function><link linkend="g-object-new">g_object_new</link></function> for target type</entry-->
+              <!--entry>Each call to <function><link linkend="g-object-new">xobject_new</link></function> for target type</entry-->
               <entry>type's <function>instance_init</function> function</entry>
               <entry>On the inheritance tree of classes from fundamental type to target type.
               the <function>instance_init</function> provided for each type is invoked once for each instance
@@ -227,7 +227,7 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
               </entry>
             </row>
             <row>
-              <!--entry>Each call to <function><link linkend="g-object-new">g_object_new</link></function> for target type</entry-->
+              <!--entry>Each call to <function><link linkend="g-object-new">xobject_new</link></function> for target type</entry-->
               <entry>target type's class <function>constructed</function> method: <function>xobject_class_t->constructed</function></entry>
               <entry>On object's instance</entry>
               <entry>
@@ -245,8 +245,8 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
       Readers should feel concerned about one little twist in the order in
       which functions are invoked: while, technically, the class' constructor
       method is called <emphasis>before</emphasis> the xtype_t's <function>instance_init</function>
-      function (since <function><link linkend="g-type-create-instance">g_type_create_instance</link></function> which calls <function>instance_init</function> is called by
-      <function>g_object_constructor</function> which is the top-level class
+      function (since <function><link linkend="g-type-create-instance">xtype_create_instance</link></function> which calls <function>instance_init</function> is called by
+      <function>xobject_constructor</function> which is the top-level class
       constructor method and to which users are expected to chain to), the
       user's code which runs in a user-provided constructor will always
       run <emphasis>after</emphasis> xtype_t's <function>instance_init</function> function since the
@@ -270,27 +270,27 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
       <title>Reference count</title>
 
       <para>
-        The functions <function><link linkend="g-object-ref">g_object_ref</link></function>/<function><link linkend="g-object-unref">g_object_unref</link></function> respectively
+        The functions <function><link linkend="g-object-ref">xobject_ref</link></function>/<function><link linkend="g-object-unref">xobject_unref</link></function> respectively
         increase and decrease the reference count. These functions are
         thread-safe.
         <function><link linkend="g-clear-object">g_clear_object</link></function>
-        is a convenience wrapper around <function>g_object_unref</function>
+        is a convenience wrapper around <function>xobject_unref</function>
         which also clears the pointer passed to it.
       </para>
       <para>
         The reference count is initialized to one by
-        <function><link linkend="g-object-new">g_object_new</link></function> which means that the caller
-        is currently the sole owner of the newly-created reference. (If the object is derived from <link linkend="GInitiallyUnowned"><type>GInitiallyUnowned</type></link>, this reference count is <link linkend="floating-ref">floating</link>.)
+        <function><link linkend="g-object-new">xobject_new</link></function> which means that the caller
+        is currently the sole owner of the newly-created reference. (If the object is derived from <link linkend="xinitially_unowned_t"><type>xinitially_unowned_t</type></link>, this reference count is <link linkend="floating-ref">floating</link>.)
         When the reference count reaches zero, that is,
-        when <function><link linkend="g-object-unref">g_object_unref</link></function> is called by the last client holding
+        when <function><link linkend="g-object-unref">xobject_unref</link></function> is called by the last client holding
         a reference to the object, the <emphasis>dispose</emphasis> and the
         <emphasis>finalize</emphasis> class methods are invoked.
       </para>
       <para>
         Finally, after <emphasis>finalize</emphasis> is invoked,
-        <function><link linkend="g-type-free-instance">g_type_free_instance</link></function> is called to free the object instance.
+        <function><link linkend="g-type-free-instance">xtype_free_instance</link></function> is called to free the object instance.
         Depending on the memory allocation policy decided when the type was registered (through
-        one of the <function>g_type_register_*</function> functions), the object's instance
+        one of the <function>xtype_register_*</function> functions), the object's instance
         memory will be freed or returned to the object pool for this type.
         Once the object has been freed, if it was the last instance of the type, the type's class
         will be destroyed as described in <xref linkend="gtype-instantiatable-classed"/> and
@@ -300,7 +300,7 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
       <para>
         The table below summarizes the destruction process of a xobject_t:
         <table id="gobject-destruction-table">
-          <title><function><link linkend="g-object-unref">g_object_unref</link></function></title>
+          <title><function><link linkend="g-object-unref">xobject_unref</link></function></title>
           <tgroup cols="3">
             <colspec colwidth="*" colnum="1" align="left"/>
             <colspec colwidth="*" colnum="2" align="left"/>
@@ -316,7 +316,7 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
             </thead>
             <tbody>
               <row>
-                <entry morerows="1">Last call to <function><link linkend="g-object-unref">g_object_unref</link></function> for an instance
+                <entry morerows="1">Last call to <function><link linkend="g-object-unref">xobject_unref</link></function> for an instance
                   of target type
                  </entry>
                 <entry>target type's dispose class function</entry>
@@ -331,7 +331,7 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
                 </entry>
               </row>
               <row>
-                <!--entry>Last call to <function><link linkend="g-object-unref">g_object_unref</link></function> for an instance
+                <!--entry>Last call to <function><link linkend="g-object-unref">xobject_unref</link></function> for an instance
                   of target type
                 </entry-->
                 <entry>target type's finalize class function</entry>
@@ -347,7 +347,7 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
                 </entry>
               </row>
               <row>
-                <entry morerows="3">Last call to <function><link linkend="g-object-unref">g_object_unref</link></function> for the last
+                <entry morerows="3">Last call to <function><link linkend="g-object-unref">xobject_unref</link></function> for the last
                   instance of target type
                  </entry>
                 <entry>interface's <function>interface_finalize</function> function</entry>
@@ -355,7 +355,7 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
                 <entry>Never used in practice. Unlikely you will need it.</entry>
               </row>
               <row>
-                <!--entry>Last call to <function><link linkend="g-object-unref">g_object_unref</link></function>for the last
+                <!--entry>Last call to <function><link linkend="g-object-unref">xobject_unref</link></function>for the last
                   instance of target type
                  </entry-->
                 <entry>interface's <function>base_finalize</function> function</entry>
@@ -363,7 +363,7 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
                 <entry>Never used in practice. Unlikely you will need it.</entry>
               </row>
               <row>
-                <!--entry>Last call to <function><link linkend="g-object-unref">g_object_unref</link></function> for the last
+                <!--entry>Last call to <function><link linkend="g-object-unref">xobject_unref</link></function> for the last
                   instance of target type
                  </entry-->
                 <entry>target type's <function>class_finalize</function> function</entry>
@@ -371,7 +371,7 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
                 <entry>Never used in practice. Unlikely you will need it.</entry>
               </row>
               <row>
-                <!--entry>Last call to <function><link linkend="g-object-unref">g_object_unref</link></function> for the last
+                <!--entry>Last call to <function><link linkend="g-object-unref">xobject_unref</link></function> for the last
                   instance of target type
                  </entry-->
                 <entry>type's <function>base_finalize</function> function</entry>
@@ -391,7 +391,7 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
 
       <para>
       Weak references are used to monitor object finalization:
-      <function><link linkend="g-object-weak-ref">g_object_weak_ref</link></function> adds a monitoring callback which does
+      <function><link linkend="g-object-weak-ref">xobject_weak_ref</link></function> adds a monitoring callback which does
       not hold a reference to the object but which is invoked when the object runs
       its dispose method. As such, each weak ref can be invoked more than once upon
       object finalization (since dispose can run more than once during object
@@ -399,13 +399,13 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
       </para>
 
       <para>
-        <function><link linkend="g-object-weak-unref">g_object_weak_unref</link></function> can be used to remove a monitoring
+        <function><link linkend="g-object-weak-unref">xobject_weak_unref</link></function> can be used to remove a monitoring
         callback from the object.
       </para>
 
       <para>
-        Weak references are also used to implement <function><link linkend="g-object-add-weak-pointer">g_object_add_weak_pointer</link></function>
-        and <function><link linkend="g-object-remove-weak-pointer">g_object_remove_weak_pointer</link></function>. These functions add a weak reference
+        Weak references are also used to implement <function><link linkend="g-object-add-weak-pointer">xobject_add_weak_pointer</link></function>
+        and <function><link linkend="g-object-remove-weak-pointer">xobject_remove_weak_pointer</link></function>. These functions add a weak reference
         to the object they are applied to which makes sure to nullify the pointer given by the user
         when object is finalized.
       </para>
@@ -431,7 +431,7 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
       <para>
         This two-step destruction process is very useful to break reference counting cycles.
         While the detection of the cycles is up to the external code, once the cycles have been
-        detected, the external code can invoke <function><link linkend="g-object-run-dispose">g_object_run_dispose</link></function> which
+        detected, the external code can invoke <function><link linkend="g-object-run-dispose">xobject_run_dispose</link></function> which
         will indeed break any existing cycles since it will run the dispose handler associated
         to the object and thus release all references to other objects.
       </para>
@@ -441,7 +441,7 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
         the dispose handler can be invoked multiple times. Let's say we
         have a reference count cycle: object A references B which itself references object A.
         Let's say we have detected the cycle and we want to destroy the two objects. One way to
-        do this would be to invoke <function><link linkend="g-object-run-dispose">g_object_run_dispose</link></function> on one of the
+        do this would be to invoke <function><link linkend="g-object-run-dispose">xobject_run_dispose</link></function> on one of the
         objects.
       </para>
 
@@ -469,7 +469,7 @@ ViewerFile *file = g_object_new (VIEWER_TYPE_FILE, NULL);
       One of xobject_t's nice features is its generic get/set mechanism for object
       properties. When an object
       is instantiated, the object's <function>class_init</function> handler should be used to register
-      the object's properties with <function><link linkend="g-object-class-install-properties">g_object_class_install_properties</link></function>.
+      the object's properties with <function><link linkend="g-object-class-install-properties">xobject_class_install_properties</link></function>.
     </para>
 
     <para>
@@ -487,13 +487,13 @@ typedef enum
   N_PROPERTIES
 } ViewerFileProperty;
 
-static GParamSpec *obj_properties[N_PROPERTIES] = { NULL, };
+static xparam_spec_t *obj_properties[N_PROPERTIES] = { NULL, };
 
 static void
 viewer_file_set_property (xobject_t      *object,
                           xuint_t         property_id,
-                          const GValue *value,
-                          GParamSpec   *pspec)
+                          const xvalue_t *value,
+                          xparam_spec_t   *pspec)
 {
   ViewerFile *self = VIEWER_FILE (object);
 
@@ -501,12 +501,12 @@ viewer_file_set_property (xobject_t      *object,
     {
     case PROP_FILENAME:
       g_free (self-&gt;filename);
-      self-&gt;filename = g_value_dup_string (value);
+      self-&gt;filename = xvalue_dup_string (value);
       g_print ("filename: %s\n", self-&gt;filename);
       break;
 
     case PROP_ZOOM_LEVEL:
-      self-&gt;zoom_level = g_value_get_uint (value);
+      self-&gt;zoom_level = xvalue_get_uint (value);
       g_print ("zoom level: &percnt;u\n", self-&gt;zoom_level);
       break;
 
@@ -520,19 +520,19 @@ viewer_file_set_property (xobject_t      *object,
 static void
 viewer_file_get_property (xobject_t    *object,
                           xuint_t       property_id,
-                          GValue     *value,
-                          GParamSpec *pspec)
+                          xvalue_t     *value,
+                          xparam_spec_t *pspec)
 {
   ViewerFile *self = VIEWER_FILE (object);
 
   switch ((ViewerFileProperty) property_id)
     {
     case PROP_FILENAME:
-      g_value_set_string (value, self-&gt;filename);
+      xvalue_set_string (value, self-&gt;filename);
       break;
 
     case PROP_ZOOM_LEVEL:
-      g_value_set_uint (value, self-&gt;zoom_level);
+      xvalue_set_uint (value, self-&gt;zoom_level);
       break;
 
     default:
@@ -566,7 +566,7 @@ viewer_file_class_init (ViewerFileClass *klass)
                        2  /* default value */,
                        G_PARAM_READWRITE);
 
-  g_object_class_install_properties (object_class,
+  xobject_class_install_properties (object_class,
                                      N_PROPERTIES,
                                      obj_properties);
 }
@@ -576,33 +576,33 @@ viewer_file_class_init (ViewerFileClass *klass)
 /************************************************/
 
 ViewerFile *file;
-GValue val = G_VALUE_INIT;
+xvalue_t val = G_VALUE_INIT;
 
-file = g_object_new (VIEWER_TYPE_FILE, NULL);
+file = xobject_new (VIEWER_TYPE_FILE, NULL);
 
-g_value_init (&amp;val, XTYPE_UINT);
-g_value_set_char (&amp;val, 11);
+xvalue_init (&amp;val, XTYPE_UINT);
+xvalue_set_char (&amp;val, 11);
 
-g_object_set_property (G_OBJECT (file), "zoom-level", &amp;val);
+xobject_set_property (G_OBJECT (file), "zoom-level", &amp;val);
 
-g_value_unset (&amp;val);
+xvalue_unset (&amp;val);
 </programlisting></informalexample>
       The client code above looks simple but a lot of things happen under the hood:
     </para>
 
     <para>
-      <function><link linkend="g-object-set-property">g_object_set_property</link></function> first ensures a property
+      <function><link linkend="g-object-set-property">xobject_set_property</link></function> first ensures a property
       with this name was registered in <emphasis>file</emphasis>'s <function>class_init</function> handler. If so it walks the class hierarchy,
       from bottom-most most-derived type, to top-most fundamental type to find the class
       which registered that property. It then tries to convert the user-provided
-      <link linkend="GValue"><type>GValue</type></link>
-      into a <type>GValue</type> whose type is that of the associated property.
+      <link linkend="xvalue_t"><type>xvalue_t</type></link>
+      into a <type>xvalue_t</type> whose type is that of the associated property.
     </para>
 
     <para>
-      If the user provides a <type>signed char</type> <type>GValue</type>, as is shown
+      If the user provides a <type>signed char</type> <type>xvalue_t</type>, as is shown
       here, and if the object's property was registered as an <type>unsigned int</type>,
-      <function><link linkend="g-value-transform">g_value_transform</link></function> will try to transform the input signed char into
+      <function><link linkend="g-value-transform">xvalue_transform</link></function> will try to transform the input signed char into
       an unsigned int. Of course, the success of the transformation depends on the availability
       of the required transform function. In practice, there will almost always be a transformation
       <footnote>
@@ -614,50 +614,50 @@ g_value_unset (&amp;val);
     </para>
 
     <para>
-      After transformation, the <link linkend="GValue"><type>GValue</type></link> is validated by
+      After transformation, the <link linkend="xvalue_t"><type>xvalue_t</type></link> is validated by
       <function><link linkend="g-param-value-validate">g_param_value_validate</link></function> which makes sure the user's
-      data stored in the <link linkend="GValue"><type>GValue</type></link> matches the characteristics specified by
-      the property's <link linkend="GParamSpec"><type>GParamSpec</type></link>.
-      Here, the <link linkend="GParamSpec"><type>GParamSpec</type></link> we
-      provided in <function>class_init</function> has a validation function which makes sure that the GValue
+      data stored in the <link linkend="xvalue_t"><type>xvalue_t</type></link> matches the characteristics specified by
+      the property's <link linkend="xparam_spec_t"><type>xparam_spec_t</type></link>.
+      Here, the <link linkend="xparam_spec_t"><type>xparam_spec_t</type></link> we
+      provided in <function>class_init</function> has a validation function which makes sure that the xvalue_t
       contains a value which respects the minimum and maximum bounds of the
-      <link linkend="GParamSpec"><type>GParamSpec</type></link>. In the example above, the client's GValue does not
+      <link linkend="xparam_spec_t"><type>xparam_spec_t</type></link>. In the example above, the client's xvalue_t does not
       respect these constraints (it is set to 11, while the maximum is 10). As such, the
-      <function><link linkend="g-object-set-property">g_object_set_property</link></function> function will return with an error.
+      <function><link linkend="g-object-set-property">xobject_set_property</link></function> function will return with an error.
     </para>
 
     <para>
-      If the user's GValue had been set to a valid value, <function><link linkend="g-object-set-property">g_object_set_property</link></function>
+      If the user's xvalue_t had been set to a valid value, <function><link linkend="g-object-set-property">xobject_set_property</link></function>
       would have proceeded with calling the object's
       <function>set_property</function> class method. Here, since our
       implementation of <type>ViewerFile</type> did override this method, execution would jump to
       <function>viewer_file_set_property</function> after having retrieved from the
-      <link linkend="GParamSpec"><type>GParamSpec</type></link> the <emphasis>param_id</emphasis>
+      <link linkend="xparam_spec_t"><type>xparam_spec_t</type></link> the <emphasis>param_id</emphasis>
       <footnote>
         <para>
           It should be noted that the param_id used here need only to uniquely identify each
-          <link linkend="GParamSpec"><type>GParamSpec</type></link> within the <type>ViewerFileClass</type> such that the switch
+          <link linkend="xparam_spec_t"><type>xparam_spec_t</type></link> within the <type>ViewerFileClass</type> such that the switch
           used in the set and get methods actually works. Of course, this locally-unique
           integer is purely an optimization: it would have been possible to use a set of
           <emphasis>if (strcmp (a, b) == 0) {} else if (strcmp (a, b) == 0) {}</emphasis> statements.
         </para>
       </footnote>
       which had been stored by
-      <function><link linkend="g-object-class-install-property">g_object_class_install_property</link></function>.
+      <function><link linkend="g-object-class-install-property">xobject_class_install_property</link></function>.
     </para>
 
     <para>
       Once the property has been set by the object's
       <function>set_property</function> class method, execution
-      returns to <function><link linkend="g-object-set-property">g_object_set_property</link></function> which makes sure that
+      returns to <function><link linkend="g-object-set-property">xobject_set_property</link></function> which makes sure that
       the "notify" signal is emitted on the object's instance with the changed property as
-      parameter unless notifications were frozen by <function><link linkend="g-object-freeze-notify">g_object_freeze_notify</link></function>.
+      parameter unless notifications were frozen by <function><link linkend="g-object-freeze-notify">xobject_freeze_notify</link></function>.
     </para>
 
     <para>
-      <function><link linkend="g-object-thaw-notify">g_object_thaw_notify</link></function> can be used to re-enable notification of
+      <function><link linkend="g-object-thaw-notify">xobject_thaw_notify</link></function> can be used to re-enable notification of
       property modifications through the
-      <link linkend="xobject_t-notify"><type>“notify”</type></link> signal. It is important to remember that
+      <link linkend="xobject-notify"><type>“notify”</type></link> signal. It is important to remember that
       even if properties are changed while property change notification is frozen, the "notify"
       signal will be emitted once for each of these changed properties as soon as the property
       change notification is thawed: no property change is lost for the "notify"
@@ -668,8 +668,8 @@ g_value_unset (&amp;val);
 
     <para>
       It sounds like a tedious task to set up GValues every time when one wants to modify a property.
-      In practice one will rarely do this. The functions <function><link linkend="g-object-set-property">g_object_set_property</link></function>
-      and <function><link linkend="g-object-get-property">g_object_get_property</link></function>
+      In practice one will rarely do this. The functions <function><link linkend="g-object-set-property">xobject_set_property</link></function>
+      and <function><link linkend="g-object-get-property">xobject_get_property</link></function>
       are meant to be used by language bindings. For application there is an easier way and
       that is described next.
     </para>
@@ -678,26 +678,26 @@ g_value_unset (&amp;val);
       <title>Accessing multiple properties at once</title>
 
       <para>
-        It is interesting to note that the <function><link linkend="g-object-set">g_object_set</link></function> and
-        <function><link linkend="g-object-set-valist">g_object_set_valist</link></function> (variadic version) functions can be used to set
+        It is interesting to note that the <function><link linkend="g-object-set">xobject_set</link></function> and
+        <function><link linkend="g-object-set-valist">xobject_set_valist</link></function> (variadic version) functions can be used to set
         multiple properties at once. The client code shown above can then be re-written as:
 <informalexample><programlisting>
 ViewerFile *file;
 file = /* */;
-g_object_set (G_OBJECT (file),
+xobject_set (G_OBJECT (file),
               "zoom-level", 6,
               "filename", "~/some-file.txt",
               NULL);
 </programlisting></informalexample>
         This saves us from managing the GValues that we were needing to handle when using
-        <function><link linkend="g-object-set-property">g_object_set_property</link></function>.
+        <function><link linkend="g-object-set-property">xobject_set_property</link></function>.
         The code above will trigger one notify signal emission for each property modified.
       </para>
 
       <para>
         Equivalent <function>_get</function> versions are also available:
-        <function><link linkend="g-object-get">g_object_get</link></function>
-        and <function><link linkend="g-object-get-valist">g_object_get_valist</link></function> (variadic version) can be used to get numerous
+        <function><link linkend="g-object-get">xobject_get</link></function>
+        and <function><link linkend="g-object-get-valist">xobject_get_valist</link></function> (variadic version) can be used to get numerous
         properties at once.
       </para>
 
@@ -712,10 +712,10 @@ g_object_set (G_OBJECT (file),
       </para>
 
       <para>
-        This explains how <function><link linkend="g-object-new">g_object_new</link></function>,
-        <function><link linkend="g-object-newv">g_object_newv</link></function> and <function><link linkend="g-object-new-valist">g_object_new_valist</link></function>
+        This explains how <function><link linkend="g-object-new">xobject_new</link></function>,
+        <function><link linkend="g-object-newv">xobject_newv</link></function> and <function><link linkend="g-object-new-valist">xobject_new_valist</link></function>
         work: they parse the user-provided variable number of parameters and invoke
-        <function><link linkend="g-object-set">g_object_set</link></function> on the parameters only after the object has been successfully constructed.
+        <function><link linkend="g-object-set">xobject_set</link></function> on the parameters only after the object has been successfully constructed.
         The "notify" signal will be emitted for each property set.
       </para>
 

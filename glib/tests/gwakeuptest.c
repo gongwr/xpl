@@ -11,7 +11,7 @@ static void alarm (int sec) { }
 static xboolean_t
 check_signaled (GWakeup *wakeup)
 {
-  GPollFD fd;
+  xpollfd_t fd;
 
   g_wakeup_get_pollfd (wakeup, &fd);
   return g_poll (&fd, 1, 0);
@@ -20,7 +20,7 @@ check_signaled (GWakeup *wakeup)
 static void
 wait_for_signaled (GWakeup *wakeup)
 {
-  GPollFD fd;
+  xpollfd_t fd;
 
   g_wakeup_get_pollfd (wakeup, &fd);
   g_poll (&fd, 1, -1);
@@ -79,8 +79,8 @@ struct token
 
 struct context
 {
-  GSList *pending_tokens;
-  GMutex lock;
+  xslist_t *pending_tokens;
+  xmutex_t lock;
   GWakeup *wakeup;
   xboolean_t quit;
 };
@@ -90,7 +90,7 @@ struct context
 #define TOKEN_TTL   100000
 
 static struct context contexts[NUM_THREADS];
-static GThread *threads[NUM_THREADS];
+static xthread_t *threads[NUM_THREADS];
 static GWakeup *last_token_wakeup;
 static xint_t tokens_alive;  /* (atomic) */
 
@@ -129,7 +129,7 @@ context_try_pop_token (struct context *ctx)
   if (ctx->pending_tokens != NULL)
     {
       token = ctx->pending_tokens->data;
-      ctx->pending_tokens = g_slist_delete_link (ctx->pending_tokens,
+      ctx->pending_tokens = xslist_delete_link (ctx->pending_tokens,
                                                  ctx->pending_tokens);
     }
   g_mutex_unlock (&ctx->lock);
@@ -144,7 +144,7 @@ context_push_token (struct context *ctx,
   g_assert (token->owner == ctx);
 
   g_mutex_lock (&ctx->lock);
-  ctx->pending_tokens = g_slist_prepend (ctx->pending_tokens, token);
+  ctx->pending_tokens = xslist_prepend (ctx->pending_tokens, token);
   g_mutex_unlock (&ctx->lock);
 
   g_wakeup_signal (ctx->wakeup);
@@ -233,7 +233,7 @@ test_threaded (void)
   for (i = 0; i < NUM_THREADS; i++)
     {
       context_init (&contexts[i]);
-      threads[i] = g_thread_new ("test", thread_func, &contexts[i]);
+      threads[i] = xthread_new ("test", thread_func, &contexts[i]);
     }
 
   /* dispatch tokens */
@@ -247,7 +247,7 @@ test_threaded (void)
   for (i = 0; i < NUM_THREADS; i++)
     {
       context_quit (&contexts[i]);
-      g_thread_join (threads[i]);
+      xthread_join (threads[i]);
       context_clear (&contexts[i]);
     }
 

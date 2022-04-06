@@ -35,7 +35,7 @@ XPL_AVAILABLE_IN_ALL
 xpointer_t g_slice_alloc0         	(xsize_t         block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
 XPL_AVAILABLE_IN_ALL
 xpointer_t g_slice_copy                   (xsize_t         block_size,
-                                         gconstpointer mem_block) G_GNUC_ALLOC_SIZE(1);
+                                         xconstpointer mem_block) G_GNUC_ALLOC_SIZE(1);
 XPL_AVAILABLE_IN_ALL
 void     g_slice_free1          	(xsize_t         block_size,
 					 xpointer_t      mem_block);
@@ -107,7 +107,7 @@ gint64*  g_slice_get_config_state  (GSliceConfig ckey, gint64 address, xuint_t *
 
 #ifdef G_ENABLE_DEBUG
 XPL_AVAILABLE_IN_ALL
-void     g_slice_debug_tree_statistics (void);
+void     g_slice_debuxtree_statistics (void);
 #endif
 
 G_END_DECLS

@@ -37,7 +37,7 @@ G_BEGIN_DECLS
  * @G_APP_INFO_CREATE_SUPPORTS_URIS: Application supports URI arguments.
  * @G_APP_INFO_CREATE_SUPPORTS_STARTUP_NOTIFICATION: Application supports startup notification. Since 2.26
  *
- * Flags used when creating a #GAppInfo.
+ * Flags used when creating a #xapp_info_t.
  */
 typedef enum {
   G_APP_INFO_CREATE_NONE                           = 0,         /*< nick=none >*/
@@ -116,83 +116,83 @@ typedef enum {
 
 
 /**
- * GFileAttributeType:
- * @G_FILE_ATTRIBUTE_TYPE_INVALID: indicates an invalid or uninitialized type.
- * @G_FILE_ATTRIBUTE_TYPE_STRING: a null terminated UTF8 string.
- * @G_FILE_ATTRIBUTE_TYPE_BYTE_STRING: a zero terminated string of non-zero bytes.
- * @G_FILE_ATTRIBUTE_TYPE_BOOLEAN: a boolean value.
- * @G_FILE_ATTRIBUTE_TYPE_UINT32: an unsigned 4-byte/32-bit integer.
- * @G_FILE_ATTRIBUTE_TYPE_INT32: a signed 4-byte/32-bit integer.
- * @G_FILE_ATTRIBUTE_TYPE_UINT64: an unsigned 8-byte/64-bit integer.
- * @G_FILE_ATTRIBUTE_TYPE_INT64: a signed 8-byte/64-bit integer.
- * @G_FILE_ATTRIBUTE_TYPE_OBJECT: a #xobject_t.
- * @G_FILE_ATTRIBUTE_TYPE_STRINGV: a %NULL terminated char **. Since 2.22
+ * xfile_attribute_type_t:
+ * @XFILE_ATTRIBUTE_TYPE_INVALID: indicates an invalid or uninitialized type.
+ * @XFILE_ATTRIBUTE_TYPE_STRING: a null terminated UTF8 string.
+ * @XFILE_ATTRIBUTE_TYPE_BYTE_STRING: a zero terminated string of non-zero bytes.
+ * @XFILE_ATTRIBUTE_TYPE_BOOLEAN: a boolean value.
+ * @XFILE_ATTRIBUTE_TYPE_UINT32: an unsigned 4-byte/32-bit integer.
+ * @XFILE_ATTRIBUTE_TYPE_INT32: a signed 4-byte/32-bit integer.
+ * @XFILE_ATTRIBUTE_TYPE_UINT64: an unsigned 8-byte/64-bit integer.
+ * @XFILE_ATTRIBUTE_TYPE_INT64: a signed 8-byte/64-bit integer.
+ * @XFILE_ATTRIBUTE_TYPE_OBJECT: a #xobject_t.
+ * @XFILE_ATTRIBUTE_TYPE_STRINGV: a %NULL terminated char **. Since 2.22
  *
  * The data types for file attributes.
  **/
 typedef enum {
-  G_FILE_ATTRIBUTE_TYPE_INVALID = 0,
-  G_FILE_ATTRIBUTE_TYPE_STRING,
-  G_FILE_ATTRIBUTE_TYPE_BYTE_STRING, /* zero terminated string of non-zero bytes */
-  G_FILE_ATTRIBUTE_TYPE_BOOLEAN,
-  G_FILE_ATTRIBUTE_TYPE_UINT32,
-  G_FILE_ATTRIBUTE_TYPE_INT32,
-  G_FILE_ATTRIBUTE_TYPE_UINT64,
-  G_FILE_ATTRIBUTE_TYPE_INT64,
-  G_FILE_ATTRIBUTE_TYPE_OBJECT,
-  G_FILE_ATTRIBUTE_TYPE_STRINGV
-} GFileAttributeType;
+  XFILE_ATTRIBUTE_TYPE_INVALID = 0,
+  XFILE_ATTRIBUTE_TYPE_STRING,
+  XFILE_ATTRIBUTE_TYPE_BYTE_STRING, /* zero terminated string of non-zero bytes */
+  XFILE_ATTRIBUTE_TYPE_BOOLEAN,
+  XFILE_ATTRIBUTE_TYPE_UINT32,
+  XFILE_ATTRIBUTE_TYPE_INT32,
+  XFILE_ATTRIBUTE_TYPE_UINT64,
+  XFILE_ATTRIBUTE_TYPE_INT64,
+  XFILE_ATTRIBUTE_TYPE_OBJECT,
+  XFILE_ATTRIBUTE_TYPE_STRINGV
+} xfile_attribute_type_t;
 
 
 /**
- * GFileAttributeInfoFlags:
- * @G_FILE_ATTRIBUTE_INFO_NONE: no flags set.
- * @G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE: copy the attribute values when the file is copied.
- * @G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED: copy the attribute values when the file is moved.
+ * xfile_attribute_info_flags_t:
+ * @XFILE_ATTRIBUTE_INFO_NONE: no flags set.
+ * @XFILE_ATTRIBUTE_INFO_COPY_WITH_FILE: copy the attribute values when the file is copied.
+ * @XFILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED: copy the attribute values when the file is moved.
  *
  * Flags specifying the behaviour of an attribute.
  **/
 typedef enum {
-  G_FILE_ATTRIBUTE_INFO_NONE            = 0,
-  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE  = (1 << 0),
-  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED = (1 << 1)
-} GFileAttributeInfoFlags;
+  XFILE_ATTRIBUTE_INFO_NONE            = 0,
+  XFILE_ATTRIBUTE_INFO_COPY_WITH_FILE  = (1 << 0),
+  XFILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED = (1 << 1)
+} xfile_attribute_info_flags_t;
 
 
 /**
- * GFileAttributeStatus:
- * @G_FILE_ATTRIBUTE_STATUS_UNSET: Attribute value is unset (empty).
- * @G_FILE_ATTRIBUTE_STATUS_SET: Attribute value is set.
- * @G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING: Indicates an error in setting the value.
+ * xfile_attribute_status_t:
+ * @XFILE_ATTRIBUTE_STATUS_UNSET: Attribute value is unset (empty).
+ * @XFILE_ATTRIBUTE_STATUS_SET: Attribute value is set.
+ * @XFILE_ATTRIBUTE_STATUS_ERROR_SETTING: Indicates an error in setting the value.
  *
- * Used by g_file_set_attributes_from_info() when setting file attributes.
+ * Used by xfile_set_attributes_from_info() when setting file attributes.
  **/
 typedef enum {
-  G_FILE_ATTRIBUTE_STATUS_UNSET = 0,
-  G_FILE_ATTRIBUTE_STATUS_SET,
-  G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING
-} GFileAttributeStatus;
+  XFILE_ATTRIBUTE_STATUS_UNSET = 0,
+  XFILE_ATTRIBUTE_STATUS_SET,
+  XFILE_ATTRIBUTE_STATUS_ERROR_SETTING
+} xfile_attribute_status_t;
 
 
 /**
- * GFileQueryInfoFlags:
- * @G_FILE_QUERY_INFO_NONE: No flags set.
- * @G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS: Don't follow symlinks.
+ * xfile_query_info_flags_t:
+ * @XFILE_QUERY_INFO_NONE: No flags set.
+ * @XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS: Don't follow symlinks.
  *
- * Flags used when querying a #GFileInfo.
+ * Flags used when querying a #xfile_info_t.
  */
 typedef enum {
-  G_FILE_QUERY_INFO_NONE              = 0,
-  G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS = (1 << 0)   /*< nick=nofollow-symlinks >*/
-} GFileQueryInfoFlags;
+  XFILE_QUERY_INFO_NONE              = 0,
+  XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS = (1 << 0)   /*< nick=nofollow-symlinks >*/
+} xfile_query_info_flags_t;
 
 
 /**
- * GFileCreateFlags:
- * @G_FILE_CREATE_NONE: No flags set.
- * @G_FILE_CREATE_PRIVATE: Create a file that can only be
+ * xfile_create_flags_t:
+ * @XFILE_CREATE_NONE: No flags set.
+ * @XFILE_CREATE_PRIVATE: Create a file that can only be
  *    accessed by the current user.
- * @G_FILE_CREATE_REPLACE_DESTINATION: Replace the destination
+ * @XFILE_CREATE_REPLACE_DESTINATION: Replace the destination
  *    as if it didn't exist before. Don't try to keep any old
  *    permissions, replace instead of following links. This
  *    is generally useful if you're doing a "copy over"
@@ -200,40 +200,40 @@ typedef enum {
  *    You can think of it as "unlink destination" before
  *    writing to it, although the implementation may not
  *    be exactly like that. This flag can only be used with
- *    g_file_replace() and its variants, including g_file_replace_contents().
+ *    xfile_replace() and its variants, including xfile_replace_contents().
  *    Since 2.20
  *
  * Flags used when an operation may create a file.
  */
 typedef enum {
-  G_FILE_CREATE_NONE    = 0,
-  G_FILE_CREATE_PRIVATE = (1 << 0),
-  G_FILE_CREATE_REPLACE_DESTINATION = (1 << 1)
-} GFileCreateFlags;
+  XFILE_CREATE_NONE    = 0,
+  XFILE_CREATE_PRIVATE = (1 << 0),
+  XFILE_CREATE_REPLACE_DESTINATION = (1 << 1)
+} xfile_create_flags_t;
 
 /**
- * GFileMeasureFlags:
- * @G_FILE_MEASURE_NONE: No flags set.
- * @G_FILE_MEASURE_REPORT_ANY_ERROR: Report any error encountered
+ * xfile_measure_flags_t:
+ * @XFILE_MEASURE_NONE: No flags set.
+ * @XFILE_MEASURE_REPORT_ANY_ERROR: Report any error encountered
  *   while traversing the directory tree.  Normally errors are only
  *   reported for the toplevel file.
- * @G_FILE_MEASURE_APPARENT_SIZE: Tally usage based on apparent file
+ * @XFILE_MEASURE_APPARENT_SIZE: Tally usage based on apparent file
  *   sizes.  Normally, the block-size is used, if available, as this is a
  *   more accurate representation of disk space used.
  *   Compare with `du --apparent-size`.
- * @G_FILE_MEASURE_NO_XDEV: Do not cross mount point boundaries.
+ * @XFILE_MEASURE_NO_XDEV: Do not cross mount point boundaries.
  *   Compare with `du -x`.
  *
- * Flags that can be used with g_file_measure_disk_usage().
+ * Flags that can be used with xfile_measure_disk_usage().
  *
  * Since: 2.38
  **/
 typedef enum {
-  G_FILE_MEASURE_NONE                 = 0,
-  G_FILE_MEASURE_REPORT_ANY_ERROR     = (1 << 1),
-  G_FILE_MEASURE_APPARENT_SIZE        = (1 << 2),
-  G_FILE_MEASURE_NO_XDEV              = (1 << 3)
-} GFileMeasureFlags;
+  XFILE_MEASURE_NONE                 = 0,
+  XFILE_MEASURE_REPORT_ANY_ERROR     = (1 << 1),
+  XFILE_MEASURE_APPARENT_SIZE        = (1 << 2),
+  XFILE_MEASURE_NO_XDEV              = (1 << 3)
+} xfile_measure_flags_t;
 
 /**
  * GMountMountFlags:
@@ -300,143 +300,143 @@ typedef enum {
 } GDriveStartStopType;
 
 /**
- * GFileCopyFlags:
- * @G_FILE_COPY_NONE: No flags set.
- * @G_FILE_COPY_OVERWRITE: Overwrite any existing files
- * @G_FILE_COPY_BACKUP: Make a backup of any existing files.
- * @G_FILE_COPY_NOFOLLOW_SYMLINKS: Don't follow symlinks.
- * @G_FILE_COPY_ALL_METADATA: Copy all file metadata instead of just default set used for copy (see #GFileInfo).
- * @G_FILE_COPY_NO_FALLBACK_FOR_MOVE: Don't use copy and delete fallback if native move not supported.
- * @G_FILE_COPY_TARGET_DEFAULT_PERMS: Leaves target file with default perms, instead of setting the source file perms.
+ * xfile_copy_flags_t:
+ * @XFILE_COPY_NONE: No flags set.
+ * @XFILE_COPY_OVERWRITE: Overwrite any existing files
+ * @XFILE_COPY_BACKUP: Make a backup of any existing files.
+ * @XFILE_COPY_NOFOLLOW_SYMLINKS: Don't follow symlinks.
+ * @XFILE_COPY_ALL_METADATA: Copy all file metadata instead of just default set used for copy (see #xfile_info_t).
+ * @XFILE_COPY_NO_FALLBACK_FOR_MOVE: Don't use copy and delete fallback if native move not supported.
+ * @XFILE_COPY_TARGET_DEFAULT_PERMS: Leaves target file with default perms, instead of setting the source file perms.
  *
  * Flags used when copying or moving files.
  */
 typedef enum {
-  G_FILE_COPY_NONE                 = 0,          /*< nick=none >*/
-  G_FILE_COPY_OVERWRITE            = (1 << 0),
-  G_FILE_COPY_BACKUP               = (1 << 1),
-  G_FILE_COPY_NOFOLLOW_SYMLINKS    = (1 << 2),
-  G_FILE_COPY_ALL_METADATA         = (1 << 3),
-  G_FILE_COPY_NO_FALLBACK_FOR_MOVE = (1 << 4),
-  G_FILE_COPY_TARGET_DEFAULT_PERMS = (1 << 5)
-} GFileCopyFlags;
+  XFILE_COPY_NONE                 = 0,          /*< nick=none >*/
+  XFILE_COPY_OVERWRITE            = (1 << 0),
+  XFILE_COPY_BACKUP               = (1 << 1),
+  XFILE_COPY_NOFOLLOW_SYMLINKS    = (1 << 2),
+  XFILE_COPY_ALL_METADATA         = (1 << 3),
+  XFILE_COPY_NO_FALLBACK_FOR_MOVE = (1 << 4),
+  XFILE_COPY_TARGET_DEFAULT_PERMS = (1 << 5)
+} xfile_copy_flags_t;
 
 
 /**
- * GFileMonitorFlags:
- * @G_FILE_MONITOR_NONE: No flags set.
- * @G_FILE_MONITOR_WATCH_MOUNTS: Watch for mount events.
- * @G_FILE_MONITOR_SEND_MOVED: Pair DELETED and CREATED events caused
- *   by file renames (moves) and send a single G_FILE_MONITOR_EVENT_MOVED
+ * xfile_monitor_flags_t:
+ * @XFILE_MONITOR_NONE: No flags set.
+ * @XFILE_MONITOR_WATCH_MOUNTS: Watch for mount events.
+ * @XFILE_MONITOR_SEND_MOVED: Pair DELETED and CREATED events caused
+ *   by file renames (moves) and send a single XFILE_MONITOR_EVENT_MOVED
  *   event instead (NB: not supported on all backends; the default
  *   behaviour -without specifying this flag- is to send single DELETED
  *   and CREATED events).  Deprecated since 2.46: use
- *   %G_FILE_MONITOR_WATCH_MOVES instead.
- * @G_FILE_MONITOR_WATCH_HARD_LINKS: Watch for changes to the file made
+ *   %XFILE_MONITOR_WATCH_MOVES instead.
+ * @XFILE_MONITOR_WATCH_HARD_LINKS: Watch for changes to the file made
  *   via another hard link. Since 2.36.
- * @G_FILE_MONITOR_WATCH_MOVES: Watch for rename operations on a
- *   monitored directory.  This causes %G_FILE_MONITOR_EVENT_RENAMED,
- *   %G_FILE_MONITOR_EVENT_MOVED_IN and %G_FILE_MONITOR_EVENT_MOVED_OUT
+ * @XFILE_MONITOR_WATCH_MOVES: Watch for rename operations on a
+ *   monitored directory.  This causes %XFILE_MONITOR_EVENT_RENAMED,
+ *   %XFILE_MONITOR_EVENT_MOVED_IN and %XFILE_MONITOR_EVENT_MOVED_OUT
  *   events to be emitted when possible.  Since: 2.46.
  *
- * Flags used to set what a #GFileMonitor will watch for.
+ * Flags used to set what a #xfile_monitor_t will watch for.
  */
 typedef enum {
-  G_FILE_MONITOR_NONE             = 0,
-  G_FILE_MONITOR_WATCH_MOUNTS     = (1 << 0),
-  G_FILE_MONITOR_SEND_MOVED       = (1 << 1),
-  G_FILE_MONITOR_WATCH_HARD_LINKS = (1 << 2),
-  G_FILE_MONITOR_WATCH_MOVES      = (1 << 3)
-} GFileMonitorFlags;
+  XFILE_MONITOR_NONE             = 0,
+  XFILE_MONITOR_WATCH_MOUNTS     = (1 << 0),
+  XFILE_MONITOR_SEND_MOVED       = (1 << 1),
+  XFILE_MONITOR_WATCH_HARD_LINKS = (1 << 2),
+  XFILE_MONITOR_WATCH_MOVES      = (1 << 3)
+} xfile_monitor_flags_t;
 
 
 /**
- * GFileType:
- * @G_FILE_TYPE_UNKNOWN: File's type is unknown.
- * @G_FILE_TYPE_REGULAR: File handle represents a regular file.
- * @G_FILE_TYPE_DIRECTORY: File handle represents a directory.
- * @G_FILE_TYPE_SYMBOLIC_LINK: File handle represents a symbolic link
+ * xfile_type_t:
+ * @XFILE_TYPE_UNKNOWN: File's type is unknown.
+ * @XFILE_TYPE_REGULAR: File handle represents a regular file.
+ * @XFILE_TYPE_DIRECTORY: File handle represents a directory.
+ * @XFILE_TYPE_SYMBOLIC_LINK: File handle represents a symbolic link
  *    (Unix systems).
- * @G_FILE_TYPE_SPECIAL: File is a "special" file, such as a socket, fifo,
+ * @XFILE_TYPE_SPECIAL: File is a "special" file, such as a socket, fifo,
  *    block device, or character device.
- * @G_FILE_TYPE_SHORTCUT: File is a shortcut (Windows systems).
- * @G_FILE_TYPE_MOUNTABLE: File is a mountable location.
+ * @XFILE_TYPE_SHORTCUT: File is a shortcut (Windows systems).
+ * @XFILE_TYPE_MOUNTABLE: File is a mountable location.
  *
  * Indicates the file's on-disk type.
  *
- * On Windows systems a file will never have %G_FILE_TYPE_SYMBOLIC_LINK type;
- * use #GFileInfo and %G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK to determine
+ * On Windows systems a file will never have %XFILE_TYPE_SYMBOLIC_LINK type;
+ * use #xfile_info_t and %XFILE_ATTRIBUTE_STANDARD_IS_SYMLINK to determine
  * whether a file is a symlink or not. This is due to the fact that NTFS does
  * not have a single filesystem object type for symbolic links - it has
  * files that symlink to files, and directories that symlink to directories.
- * #GFileType enumeration cannot precisely represent this important distinction,
+ * #xfile_type_t enumeration cannot precisely represent this important distinction,
  * which is why all Windows symlinks will continue to be reported as
- * %G_FILE_TYPE_REGULAR or %G_FILE_TYPE_DIRECTORY.
+ * %XFILE_TYPE_REGULAR or %XFILE_TYPE_DIRECTORY.
  **/
 typedef enum {
-  G_FILE_TYPE_UNKNOWN = 0,
-  G_FILE_TYPE_REGULAR,
-  G_FILE_TYPE_DIRECTORY,
-  G_FILE_TYPE_SYMBOLIC_LINK,
-  G_FILE_TYPE_SPECIAL, /* socket, fifo, blockdev, chardev */
-  G_FILE_TYPE_SHORTCUT,
-  G_FILE_TYPE_MOUNTABLE
-} GFileType;
+  XFILE_TYPE_UNKNOWN = 0,
+  XFILE_TYPE_REGULAR,
+  XFILE_TYPE_DIRECTORY,
+  XFILE_TYPE_SYMBOLIC_LINK,
+  XFILE_TYPE_SPECIAL, /* socket, fifo, blockdev, chardev */
+  XFILE_TYPE_SHORTCUT,
+  XFILE_TYPE_MOUNTABLE
+} xfile_type_t;
 
 
 /**
- * GFilesystemPreviewType:
- * @G_FILESYSTEM_PREVIEW_TYPE_IF_ALWAYS: Only preview files if user has explicitly requested it.
- * @G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL: Preview files if user has requested preview of "local" files.
- * @G_FILESYSTEM_PREVIEW_TYPE_NEVER: Never preview files.
+ * xfilesystem_preview_type_t:
+ * @XFILESYSTEM_PREVIEW_TYPE_IF_ALWAYS: Only preview files if user has explicitly requested it.
+ * @XFILESYSTEM_PREVIEW_TYPE_IF_LOCAL: Preview files if user has requested preview of "local" files.
+ * @XFILESYSTEM_PREVIEW_TYPE_NEVER: Never preview files.
  *
  * Indicates a hint from the file system whether files should be
  * previewed in a file manager. Returned as the value of the key
- * %G_FILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW.
+ * %XFILE_ATTRIBUTE_FILESYSTEM_USE_PREVIEW.
  **/
 typedef enum {
-  G_FILESYSTEM_PREVIEW_TYPE_IF_ALWAYS = 0,
-  G_FILESYSTEM_PREVIEW_TYPE_IF_LOCAL,
-  G_FILESYSTEM_PREVIEW_TYPE_NEVER
-} GFilesystemPreviewType;
+  XFILESYSTEM_PREVIEW_TYPE_IF_ALWAYS = 0,
+  XFILESYSTEM_PREVIEW_TYPE_IF_LOCAL,
+  XFILESYSTEM_PREVIEW_TYPE_NEVER
+} xfilesystem_preview_type_t;
 
 
 /**
- * GFileMonitorEvent:
- * @G_FILE_MONITOR_EVENT_CHANGED: a file changed.
- * @G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT: a hint that this was probably the last change in a set of changes.
- * @G_FILE_MONITOR_EVENT_DELETED: a file was deleted.
- * @G_FILE_MONITOR_EVENT_CREATED: a file was created.
- * @G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED: a file attribute was changed.
- * @G_FILE_MONITOR_EVENT_PRE_UNMOUNT: the file location will soon be unmounted.
- * @G_FILE_MONITOR_EVENT_UNMOUNTED: the file location was unmounted.
- * @G_FILE_MONITOR_EVENT_MOVED: the file was moved -- only sent if the
- *   (deprecated) %G_FILE_MONITOR_SEND_MOVED flag is set
- * @G_FILE_MONITOR_EVENT_RENAMED: the file was renamed within the
- *   current directory -- only sent if the %G_FILE_MONITOR_WATCH_MOVES
+ * xfile_monitor_event_t:
+ * @XFILE_MONITOR_EVENT_CHANGED: a file changed.
+ * @XFILE_MONITOR_EVENT_CHANGES_DONE_HINT: a hint that this was probably the last change in a set of changes.
+ * @XFILE_MONITOR_EVENT_DELETED: a file was deleted.
+ * @XFILE_MONITOR_EVENT_CREATED: a file was created.
+ * @XFILE_MONITOR_EVENT_ATTRIBUTE_CHANGED: a file attribute was changed.
+ * @XFILE_MONITOR_EVENT_PRE_UNMOUNT: the file location will soon be unmounted.
+ * @XFILE_MONITOR_EVENT_UNMOUNTED: the file location was unmounted.
+ * @XFILE_MONITOR_EVENT_MOVED: the file was moved -- only sent if the
+ *   (deprecated) %XFILE_MONITOR_SEND_MOVED flag is set
+ * @XFILE_MONITOR_EVENT_RENAMED: the file was renamed within the
+ *   current directory -- only sent if the %XFILE_MONITOR_WATCH_MOVES
  *   flag is set.  Since: 2.46.
- * @G_FILE_MONITOR_EVENT_MOVED_IN: the file was moved into the
+ * @XFILE_MONITOR_EVENT_MOVED_IN: the file was moved into the
  *   monitored directory from another location -- only sent if the
- *   %G_FILE_MONITOR_WATCH_MOVES flag is set.  Since: 2.46.
- * @G_FILE_MONITOR_EVENT_MOVED_OUT: the file was moved out of the
+ *   %XFILE_MONITOR_WATCH_MOVES flag is set.  Since: 2.46.
+ * @XFILE_MONITOR_EVENT_MOVED_OUT: the file was moved out of the
  *   monitored directory to another location -- only sent if the
- *   %G_FILE_MONITOR_WATCH_MOVES flag is set.  Since: 2.46
+ *   %XFILE_MONITOR_WATCH_MOVES flag is set.  Since: 2.46
  *
  * Specifies what type of event a monitor event is.
  **/
 typedef enum {
-  G_FILE_MONITOR_EVENT_CHANGED,
-  G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT,
-  G_FILE_MONITOR_EVENT_DELETED,
-  G_FILE_MONITOR_EVENT_CREATED,
-  G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
-  G_FILE_MONITOR_EVENT_PRE_UNMOUNT,
-  G_FILE_MONITOR_EVENT_UNMOUNTED,
-  G_FILE_MONITOR_EVENT_MOVED,
-  G_FILE_MONITOR_EVENT_RENAMED,
-  G_FILE_MONITOR_EVENT_MOVED_IN,
-  G_FILE_MONITOR_EVENT_MOVED_OUT
-} GFileMonitorEvent;
+  XFILE_MONITOR_EVENT_CHANGED,
+  XFILE_MONITOR_EVENT_CHANGES_DONE_HINT,
+  XFILE_MONITOR_EVENT_DELETED,
+  XFILE_MONITOR_EVENT_CREATED,
+  XFILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
+  XFILE_MONITOR_EVENT_PRE_UNMOUNT,
+  XFILE_MONITOR_EVENT_UNMOUNTED,
+  XFILE_MONITOR_EVENT_MOVED,
+  XFILE_MONITOR_EVENT_RENAMED,
+  XFILE_MONITOR_EVENT_MOVED_IN,
+  XFILE_MONITOR_EVENT_MOVED_OUT
+} xfile_monitor_event_t;
 
 
 /* This enumeration conflicts with GIOError in giochannel.h. However,
@@ -515,7 +515,7 @@ typedef enum {
  * replace %G_IO_ERROR_FAILED in cases that were not explicitly
  * distinguished before. You should therefore avoid writing code like
  * |[<!-- language="C" -->
- * if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_FAILED))
+ * if (xerror_matches (error, G_IO_ERROR, G_IO_ERROR_FAILED))
  *   {
  *     // Assume that this is EPRINTERONFIRE
  *     ...
@@ -685,7 +685,7 @@ typedef enum {
  * @G_EMBLEM_ORIGIN_TAG: Emblem comes from a user-defined tag, e.g. set by nautilus (in the future)
  *
  * GEmblemOrigin is used to add information about the origin of the emblem
- * to #GEmblem.
+ * to #xemblem_t.
  *
  * Since: 2.18
  */
@@ -705,7 +705,7 @@ typedef enum  {
  * @G_RESOLVER_ERROR_INTERNAL: unknown error
  *
  * An error code used with %G_RESOLVER_ERROR in a #xerror_t returned
- * from a #GResolver routine.
+ * from a #xresolver_t routine.
  *
  * Since: 2.22
  */
@@ -729,11 +729,11 @@ typedef enum {
  * the variant tuples returned.
  *
  * %G_RESOLVER_RECORD_SRV records are returned as variants with the signature
- * `(qqqs)`, containing a `guint16` with the priority, a `guint16` with the
- * weight, a `guint16` with the port, and a string of the hostname.
+ * `(qqqs)`, containing a `xuint16_t` with the priority, a `xuint16_t` with the
+ * weight, a `xuint16_t` with the port, and a string of the hostname.
  *
  * %G_RESOLVER_RECORD_MX records are returned as variants with the signature
- * `(qs)`, representing a `guint16` with the preference, and a string containing
+ * `(qs)`, representing a `xuint16_t` with the preference, and a string containing
  * the mail exchanger hostname.
  *
  * %G_RESOLVER_RECORD_TXT records are returned as variants with the signature
@@ -747,9 +747,9 @@ typedef enum {
  *
  * %G_RESOLVER_RECORD_SOA records are returned as variants with the signature
  * `(ssuuuuu)`, representing a string containing the primary name server, a
- * string containing the administrator, the serial as a `guint32`, the refresh
- * interval as a `guint32`, the retry interval as a `guint32`, the expire timeout
- * as a `guint32`, and the TTL as a `guint32`.
+ * string containing the administrator, the serial as a `xuint32_t`, the refresh
+ * interval as a `xuint32_t`, the retry interval as a `xuint32_t`, the expire timeout
+ * as a `xuint32_t`, and the TTL as a `xuint32_t`.
  *
  * %G_RESOLVER_RECORD_NS records are returned as variants with the signature
  * `(s)`, representing a string of the hostname of the name server.
@@ -905,8 +905,8 @@ typedef enum {
  * @G_ZLIB_COMPRESSOR_FORMAT_GZIP: gzip file format
  * @G_ZLIB_COMPRESSOR_FORMAT_RAW: deflate compression with no header
  *
- * Used to select the type of data format to use for #GZlibDecompressor
- * and #GZlibCompressor.
+ * Used to select the type of data format to use for #xzlib_decompressor_t
+ * and #xzlib_compressor_t.
  *
  * Since: 2.24
  */
@@ -1016,7 +1016,7 @@ typedef enum
  * @G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START: If the proxy is for a well-known name,
  * do not ask the bus to launch an owner during proxy initialization or a method call.
  * This flag is only meaningful in proxies for well-known names.
- * @G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES: If set, the property value for any __invalidated property__ will be (asynchronously) retrieved upon receiving the [`PropertiesChanged`](http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-properties) D-Bus signal and the property will not cause emission of the #GDBusProxy::g-properties-changed signal. When the value is received the #GDBusProxy::g-properties-changed signal is emitted for the property along with the retrieved value. Since 2.32.
+ * @G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES: If set, the property value for any __invalidated property__ will be (asynchronously) retrieved upon receiving the [`PropertiesChanged`](http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-properties) D-Bus signal and the property will not cause emission of the #xdbus_proxy_t::g-properties-changed signal. When the value is received the #xdbus_proxy_t::g-properties-changed signal is emitted for the property along with the retrieved value. Since 2.32.
  * @G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START_AT_CONSTRUCTION: If the proxy is for a well-known name,
  * do not ask the bus to launch an owner during proxy initialization, but allow it to be
  * autostarted by a method call. This flag is only meaningful in proxies for well-known names,
@@ -1025,7 +1025,7 @@ typedef enum
  *    call for this signal subscription. This gives you more control
  *    over which match rules you add (but you must add them manually). (Since: 2.72)
  *
- * Flags used when constructing an instance of a #GDBusProxy derived class.
+ * Flags used when constructing an instance of a #xdbus_proxy_t derived class.
  *
  * Since: 2.26
  */
@@ -1213,7 +1213,7 @@ typedef enum
  * @G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER: When authenticating
  * as a server, require the UID of the peer to be the same as the UID of the server. (Since: 2.68)
  *
- * Flags used when creating a new #GDBusConnection.
+ * Flags used when creating a new #xdbus_connection_t.
  *
  * Since: 2.26
  */
@@ -1260,7 +1260,7 @@ typedef enum {
   G_DBUS_CALL_FLAGS_NO_AUTO_START = (1<<0),
   G_DBUS_CALL_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION = (1<<1)
 } GDBusCallFlags;
-/* (1<<31) is reserved for internal use by GDBusConnection, do not use it. */
+/* (1<<31) is reserved for internal use by xdbus_connection_t, do not use it. */
 
 /**
  * GDBusMessageType:
@@ -1270,7 +1270,7 @@ typedef enum {
  * @G_DBUS_MESSAGE_TYPE_ERROR: Error reply.
  * @G_DBUS_MESSAGE_TYPE_SIGNAL: Signal emission.
  *
- * Message types used in #GDBusMessage.
+ * Message types used in #xdbus_message_t.
  *
  * Since: 2.26
  */
@@ -1292,7 +1292,7 @@ typedef enum {
  * call, this flag means that the caller is prepared to wait for interactive
  * authorization. Since 2.46.
  *
- * Message flags used in #GDBusMessage.
+ * Message flags used in #xdbus_message_t.
  *
  * Since: 2.26
  */
@@ -1316,7 +1316,7 @@ typedef enum {
  * @G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE: The signature of the message body.
  * @G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS: The number of UNIX file descriptors that accompany the message.
  *
- * Header fields used in #GDBusMessage.
+ * Header fields used in #xdbus_message_t.
  *
  * Since: 2.26
  */
@@ -1370,7 +1370,7 @@ typedef enum
 /**
  * GDBusServerFlags:
  * @G_DBUS_SERVER_FLAGS_NONE: No flags set.
- * @G_DBUS_SERVER_FLAGS_RUN_IN_THREAD: All #GDBusServer::new-connection
+ * @G_DBUS_SERVER_FLAGS_RUN_IN_THREAD: All #xdbus_server_t::new-connection
  * signals will run in separated dedicated threads (see signal for
  * details).
  * @G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS: Allow the anonymous
@@ -1378,7 +1378,7 @@ typedef enum
  * @G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER: Require the UID of the
  * peer to be the same as the UID of the server when authenticating. (Since: 2.68)
  *
- * Flags used when creating a #GDBusServer.
+ * Flags used when creating a #xdbus_server_t.
  *
  * Since: 2.26
  */
@@ -1418,10 +1418,10 @@ typedef enum /*< flags >*/
  * GDBusSendMessageFlags:
  * @G_DBUS_SEND_MESSAGE_FLAGS_NONE: No flags set.
  * @G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL: Do not automatically
- * assign a serial number from the #GDBusConnection object when
+ * assign a serial number from the #xdbus_connection_t object when
  * sending a message.
  *
- * Flags used when sending #GDBusMessages on a #GDBusConnection.
+ * Flags used when sending #GDBusMessages on a #xdbus_connection_t.
  *
  * Since: 2.26
  */
@@ -1430,7 +1430,7 @@ typedef enum
   G_DBUS_SEND_MESSAGE_FLAGS_NONE = 0,
   G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL = (1<<0)
 } GDBusSendMessageFlags;
-/* (1<<31) is reserved for internal use by GDBusConnection, do not use it. */
+/* (1<<31) is reserved for internal use by xdbus_connection_t, do not use it. */
 
 /**
  * GCredentialsType:
@@ -1486,19 +1486,19 @@ typedef enum
  *     the primary instance). Note that this flag only affects the default
  *     implementation of local_command_line(), and has no effect if
  *     %G_APPLICATION_HANDLES_COMMAND_LINE is given.
- *     See g_application_run() for details.
+ *     See xapplication_run() for details.
  * @G_APPLICATION_HANDLES_COMMAND_LINE: This application handles command line
  *     arguments (in the primary instance). Note that this flag only affect
  *     the default implementation of local_command_line().
- *     See g_application_run() for details.
+ *     See xapplication_run() for details.
  * @G_APPLICATION_SEND_ENVIRONMENT: Send the environment of the
  *     launching process to the primary instance. Set this flag if your
  *     application is expected to behave differently depending on certain
  *     environment variables. For instance, an editor might be expected
  *     to use the `GIT_COMMITTER_NAME` environment variable
  *     when editing a git commit message. The environment is available
- *     to the #GApplication::command-line signal handler, via
- *     g_application_command_line_getenv().
+ *     to the #xapplication_t::command-line signal handler, via
+ *     xapplication_command_line_getenv().
  * @G_APPLICATION_NON_UNIQUE: Make no attempts to do any of the typical
  *     single-instance application negotiation, even if the application
  *     ID is given.  The application neither attempts to become the
@@ -1514,7 +1514,7 @@ typedef enum
  *     usually set by passing `--gapplication-replace` on the commandline.
  *     Since: 2.60
  *
- * Flags used to define the behaviour of a #GApplication.
+ * Flags used to define the behaviour of a #xapplication_t.
  *
  * Since: 2.28
  **/
@@ -1547,10 +1547,10 @@ typedef enum
  *   peer's certificate was not acceptable.
  * @G_TLS_ERROR_CERTIFICATE_REQUIRED: The TLS handshake failed because
  *   the server requested a client-side certificate, but none was
- *   provided. See g_tls_connection_set_certificate().
+ *   provided. See xtls_connection_set_certificate().
  * @G_TLS_ERROR_EOF: The TLS connection was closed without proper
  *   notice, which may indicate an attack. See
- *   g_tls_connection_set_require_close_notify().
+ *   xtls_connection_set_require_close_notify().
  * @G_TLS_ERROR_INAPPROPRIATE_FALLBACK: The TLS handshake failed
  *   because the client sent the fallback SCSV, indicating a protocol
  *   downgrade attack. Since: 2.60
@@ -1584,7 +1584,7 @@ typedef enum {
  *   is still in the future
  * @G_TLS_CERTIFICATE_EXPIRED: The certificate has expired
  * @G_TLS_CERTIFICATE_REVOKED: The certificate has been revoked
- *   according to the #GTlsConnection's certificate revocation list.
+ *   according to the #xtls_connection_t's certificate revocation list.
  * @G_TLS_CERTIFICATE_INSECURE: The certificate's algorithm is
  *   considered insecure.
  * @G_TLS_CERTIFICATE_GENERIC_ERROR: Some other error occurred validating
@@ -1594,7 +1594,7 @@ typedef enum {
  *
  * A set of flags describing TLS certification validation. This can be
  * used to describe why a particular certificate was rejected (for
- * example, in #GTlsConnection::accept-certificate).
+ * example, in #xtls_connection_t::accept-certificate).
  *
  * GLib guarantees that if certificate verification fails, at least one
  * flag will be set, but it does not guarantee that all possible flags
@@ -1624,7 +1624,7 @@ typedef enum {
  * @G_TLS_AUTHENTICATION_REQUESTED: client authentication is requested
  * @G_TLS_AUTHENTICATION_REQUIRED: client authentication is required
  *
- * The client authentication mode for a #GTlsServerConnection.
+ * The client authentication mode for a #xtls_server_connection_t.
  *
  * Since: 2.28
  */
@@ -1643,8 +1643,8 @@ typedef enum {
  *    [`tls-server-end-point`](https://tools.ietf.org/html/rfc5929#section-4)
  *    binding type
  *
- * The type of TLS channel binding data to retrieve from #GTlsConnection
- * or #GDtlsConnection, as documented by RFC 5929. The
+ * The type of TLS channel binding data to retrieve from #xtls_connection_t
+ * or #xdtls_connection_t, as documented by RFC 5929. The
  * [`tls-unique-for-telnet`](https://tools.ietf.org/html/rfc5929#section-5)
  * binding type is not currently implemented.
  *
@@ -1696,7 +1696,7 @@ typedef enum {
  * @G_TLS_REHANDSHAKE_UNSAFELY: Allow unsafe rehandshaking
  *
  * When to allow rehandshaking. See
- * g_tls_connection_set_rehandshake_mode().
+ * xtls_connection_set_rehandshake_mode().
  *
  * Since: 2.28
  *
@@ -1750,7 +1750,7 @@ typedef enum _GTlsPasswordFlags
  * @G_TLS_INTERACTION_FAILED: The interaction has failed, or was cancelled.
  *     and the operation should be aborted.
  *
- * #GTlsInteractionResult is returned by various functions in #GTlsInteraction
+ * #GTlsInteractionResult is returned by various functions in #xtls_interaction_t
  * when finishing an interaction request.
  *
  * Since: 2.30
@@ -1769,7 +1769,7 @@ typedef enum {
  *   without blocking any other part of the process. It also means that the method implementation must
  *   use locking to access data structures used by other threads.
  *
- * Flags describing the behavior of a #GDBusInterfaceSkeleton instance.
+ * Flags describing the behavior of a #xdbus_interface_skeleton_t instance.
  *
  * Since: 2.30
  */
@@ -1787,7 +1787,7 @@ typedef enum
  *   an owner for the name if no-one owns the name. This flag can only
  *   be used in managers for well-known names.
  *
- * Flags used when constructing a #GDBusObjectManagerClient.
+ * Flags used when constructing a #xdbus_object_manager_client_t.
  *
  * Since: 2.30
  */
@@ -1801,7 +1801,7 @@ typedef enum
  * GTlsDatabaseVerifyFlags:
  * @G_TLS_DATABASE_VERIFY_NONE: No verification flags
  *
- * Flags for g_tls_database_verify_chain().
+ * Flags for xtls_database_verify_chain().
  *
  * Since: 2.30
  */
@@ -1815,9 +1815,9 @@ typedef enum /*< flags >*/ {
  * @G_TLS_DATABASE_LOOKUP_KEYPAIR: Restrict lookup to certificates that have
  *     a private key.
  *
- * Flags for g_tls_database_lookup_certificate_for_handle(),
- * g_tls_database_lookup_certificate_issuer(),
- * and g_tls_database_lookup_certificates_issued_by().
+ * Flags for xtls_database_lookup_certificate_for_handle(),
+ * xtls_database_lookup_certificate_issuer(),
+ * and xtls_database_lookup_certificates_issued_by().
  *
  * Since: 2.30
  */
@@ -1830,9 +1830,9 @@ typedef enum {
  * GTlsCertificateRequestFlags:
  * @G_TLS_CERTIFICATE_REQUEST_NONE: No flags
  *
- * Flags for g_tls_interaction_request_certificate(),
- * g_tls_interaction_request_certificate_async(), and
- * g_tls_interaction_invoke_request_certificate().
+ * Flags for xtls_interaction_request_certificate(),
+ * xtls_interaction_request_certificate_async(), and
+ * xtls_interaction_invoke_request_certificate().
  *
  * Since: 2.40
  */
@@ -1851,8 +1851,8 @@ typedef enum {
  * @G_TLS_PROTOCOL_VERSION_DTLS_1_0: DTLS 1.0, which is insecure and should not be used
  * @G_TLS_PROTOCOL_VERSION_DTLS_1_2: DTLS 1.2, defined by [RFC 6347](https://datatracker.ietf.org/doc/html/rfc6347)
  *
- * The TLS or DTLS protocol version used by a #GTlsConnection or
- * #GDtlsConnection. The integer values of these versions are sequential
+ * The TLS or DTLS protocol version used by a #xtls_connection_t or
+ * #xdtls_connection_t. The integer values of these versions are sequential
  * to ensure newer known protocol versions compare greater than older
  * known versions. Any known DTLS protocol version will compare greater
  * than any SSL or TLS protocol version. The protocol version may be
@@ -1881,7 +1881,7 @@ typedef enum {
  *     scan modules, automatically block a modules which has the same base
  *     basename as previously loaded module.
  *
- * Flags for use with g_io_module_scope_new().
+ * Flags for use with xio_module_scope_new().
  *
  * Since: 2.30
  */
@@ -1907,10 +1907,10 @@ typedef enum {
  * @XSOCKET_CLIENT_TLS_HANDSHAKED: The client has performed a
  *   TLS handshake.
  * @XSOCKET_CLIENT_COMPLETE: The client is done with a particular
- *   #GSocketConnectable.
+ *   #xsocket_connectable_t.
  *
- * Describes an event occurring on a #GSocketClient. See the
- * #GSocketClient::event signal for more details.
+ * Describes an event occurring on a #xsocket_client_t. See the
+ * #xsocket_client_t::event signal for more details.
  *
  * Additional values may be added to this type in the future.
  *
@@ -1937,8 +1937,8 @@ typedef enum {
  * @XSOCKET_LISTENER_LISTENED: The listener is now listening on
  *   this socket.
  *
- * Describes an event occurring on a #GSocketListener. See the
- * #GSocketListener::event signal for more details.
+ * Describes an event occurring on a #xsocket_listener_t. See the
+ * #xsocket_listener_t::event signal for more details.
  *
  * Additional values may be added to this type in the future.
  *
@@ -1955,7 +1955,7 @@ typedef enum {
  * GTestDBusFlags:
  * @G_TEST_DBUS_NONE: No flags.
  *
- * Flags to define future #GTestDBus behaviour.
+ * Flags to define future #xtest_dbus_t behaviour.
  *
  * Since: 2.34
  */
@@ -1964,21 +1964,21 @@ typedef enum /*< flags >*/ {
 } GTestDBusFlags;
 
 /**
- * GSubprocessFlags:
+ * xsubprocess_flags_t:
  * @G_SUBPROCESS_FLAGS_NONE: No flags.
  * @G_SUBPROCESS_FLAGS_STDIN_PIPE: create a pipe for the stdin of the
  *   spawned process that can be accessed with
- *   g_subprocess_get_stdin_pipe().
+ *   xsubprocess_get_stdin_pipe().
  * @G_SUBPROCESS_FLAGS_STDIN_INHERIT: stdin is inherited from the
  *   calling process.
  * @G_SUBPROCESS_FLAGS_STDOUT_PIPE: create a pipe for the stdout of the
  *   spawned process that can be accessed with
- *   g_subprocess_get_stdout_pipe().
+ *   xsubprocess_get_stdout_pipe().
  * @G_SUBPROCESS_FLAGS_STDOUT_SILENCE: silence the stdout of the spawned
  *   process (ie: redirect to `/dev/null`).
  * @G_SUBPROCESS_FLAGS_STDERR_PIPE: create a pipe for the stderr of the
  *   spawned process that can be accessed with
- *   g_subprocess_get_stderr_pipe().
+ *   xsubprocess_get_stderr_pipe().
  * @G_SUBPROCESS_FLAGS_STDERR_SILENCE: silence the stderr of the spawned
  *   process (ie: redirect to `/dev/null`).
  * @G_SUBPROCESS_FLAGS_STDERR_MERGE: merge the stderr of the spawned
@@ -1992,7 +1992,7 @@ typedef enum /*< flags >*/ {
  *   needed when spawning the subprocess, use the `PATH` in the launcher
  *   environment. (Since: 2.72)
  *
- * Flags to define the behaviour of a #GSubprocess.
+ * Flags to define the behaviour of a #xsubprocess_t.
  *
  * Note that the default for stdin is to redirect from `/dev/null`.  For
  * stdout and stderr the default are for them to inherit the
@@ -2015,7 +2015,7 @@ typedef enum {
   G_SUBPROCESS_FLAGS_STDERR_MERGE          = (1u << 6),
   G_SUBPROCESS_FLAGS_INHERIT_FDS           = (1u << 7),
   G_SUBPROCESS_FLAGS_SEARCH_PATH_FROM_ENVP = (1u << 8)
-} GSubprocessFlags;
+} xsubprocess_flags_t;
 
 /**
  * GNotificationPriority:
@@ -2056,7 +2056,7 @@ typedef enum {
  * @G_NETWORK_CONNECTIVITY_FULL: The host is connected to a network, and
  *   appears to be able to reach the full Internet.
  *
- * The host's network connectivity state, as reported by #GNetworkMonitor.
+ * The host's network connectivity state, as reported by #xnetwork_monitor_t.
  *
  * Since: 2.44
  */

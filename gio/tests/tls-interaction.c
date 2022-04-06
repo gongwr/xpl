@@ -24,7 +24,7 @@
 
 #include "gtesttlsbackend.h"
 
-static GPtrArray *fixtures = NULL;
+static xptr_array_t *fixtures = NULL;
 
 typedef struct {
   /* Class virtual interaction methods */
@@ -37,24 +37,24 @@ typedef struct {
 
   /* Expected results */
   GTlsInteractionResult result;
-  GQuark error_domain;
+  xquark error_domain;
   xint_t error_code;
   const xchar_t *error_message;
 } Fixture;
 
 typedef struct {
-  GTlsInteraction *interaction;
-  GTlsPassword *password;
-  GTlsConnection *connection;
-  GMainLoop *loop;
-  GThread *interaction_thread;
-  GThread *test_thread;
-  GThread *loop_thread;
+  xtls_interaction_t *interaction;
+  xtls_password_t *password;
+  xtls_connection_t *connection;
+  xmain_loop_t *loop;
+  xthread_t *interaction_thread;
+  xthread_t *test_thread;
+  xthread_t *loop_thread;
   const Fixture *fixture;
 } Test;
 
 typedef struct {
-  GTlsInteraction parent;
+  xtls_interaction_t parent;
   Test *test;
 } TestInteraction;
 
@@ -82,34 +82,34 @@ test_interaction_class_init (TestInteractionClass *klass)
 }
 
 static void
-test_interaction_ask_password_async_success (GTlsInteraction    *interaction,
-                                             GTlsPassword       *password,
+test_interaction_ask_password_async_success (xtls_interaction_t    *interaction,
+                                             xtls_password_t       *password,
                                              xcancellable_t       *cancellable,
                                              xasync_ready_callback_t callback,
                                              xpointer_t            user_data)
 {
-  GTask *task;
+  xtask_t *task;
   TestInteraction *self;
 
   g_assert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (g_thread_self () == self->test->interaction_thread);
+  g_assert (xthread_self () == self->test->interaction_thread);
 
   g_assert (X_IS_TLS_PASSWORD (password));
   g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
 
-  task = g_task_new (self, cancellable, callback, user_data);
+  task = xtask_new (self, cancellable, callback, user_data);
 
   /* Don't do this in real life. Include a null terminator for testing */
-  g_tls_password_set_value (password, (const guchar *)"the password", 13);
-  g_task_return_int (task, G_TLS_INTERACTION_HANDLED);
-  g_object_unref (task);
+  xtls_password_set_value (password, (const guchar *)"the password", 13);
+  xtask_return_int (task, G_TLS_INTERACTION_HANDLED);
+  xobject_unref (task);
 }
 
 
 static GTlsInteractionResult
-test_interaction_ask_password_finish_success (GTlsInteraction    *interaction,
+test_interaction_ask_password_finish_success (xtls_interaction_t    *interaction,
                                               xasync_result_t       *result,
                                               xerror_t            **error)
 {
@@ -118,41 +118,41 @@ test_interaction_ask_password_finish_success (GTlsInteraction    *interaction,
   g_assert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (g_thread_self () == self->test->interaction_thread);
+  g_assert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (g_task_is_valid (result, interaction));
+  g_assert (xtask_is_valid (result, interaction));
   g_assert (error != NULL);
   g_assert (*error == NULL);
 
-  return g_task_propagate_int (G_TASK (result), error);
+  return xtask_propagate_int (XTASK (result), error);
 }
 
 static void
-test_interaction_ask_password_async_failure (GTlsInteraction    *interaction,
-                                             GTlsPassword       *password,
+test_interaction_ask_password_async_failure (xtls_interaction_t    *interaction,
+                                             xtls_password_t       *password,
                                              xcancellable_t       *cancellable,
                                              xasync_ready_callback_t callback,
                                              xpointer_t            user_data)
 {
-  GTask *task;
+  xtask_t *task;
   TestInteraction *self;
 
   g_assert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (g_thread_self () == self->test->interaction_thread);
+  g_assert (xthread_self () == self->test->interaction_thread);
 
   g_assert (X_IS_TLS_PASSWORD (password));
   g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
 
-  task = g_task_new (self, cancellable, callback, user_data);
+  task = xtask_new (self, cancellable, callback, user_data);
 
-  g_task_return_new_error (task, G_FILE_ERROR, G_FILE_ERROR_ACCES, "The message");
-  g_object_unref (task);
+  xtask_return_new_error (task, XFILE_ERROR, XFILE_ERROR_ACCES, "The message");
+  xobject_unref (task);
 }
 
 static GTlsInteractionResult
-test_interaction_ask_password_finish_failure (GTlsInteraction    *interaction,
+test_interaction_ask_password_finish_failure (xtls_interaction_t    *interaction,
                                               xasync_result_t       *result,
                                               xerror_t            **error)
 {
@@ -161,13 +161,13 @@ test_interaction_ask_password_finish_failure (GTlsInteraction    *interaction,
   g_assert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (g_thread_self () == self->test->interaction_thread);
+  g_assert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (g_task_is_valid (result, interaction));
+  g_assert (xtask_is_valid (result, interaction));
   g_assert (error != NULL);
   g_assert (*error == NULL);
 
-  if (g_task_propagate_int (G_TASK (result), error) != -1)
+  if (xtask_propagate_int (XTASK (result), error) != -1)
     g_assert_not_reached ();
 
   return G_TLS_INTERACTION_FAILED;
@@ -180,14 +180,14 @@ test_interaction_ask_password_finish_failure (GTlsInteraction    *interaction,
 static guchar *
 special_dup (const char *str)
 {
-  GString *buf = g_string_new ("BEFORE");
+  xstring_t *buf = xstring_new ("BEFORE");
   guchar *ret;
 
-  g_string_append_c (buf, '\0');
-  g_string_append (buf, str);
-  g_string_append_c (buf, '\0');
-  g_string_append (buf, "AFTER");
-  ret = (guchar *) g_string_free (buf, FALSE);
+  xstring_append_c (buf, '\0');
+  xstring_append (buf, str);
+  xstring_append_c (buf, '\0');
+  xstring_append (buf, "AFTER");
+  ret = (guchar *) xstring_free (buf, FALSE);
   return ret + strlen ("BEFORE") + 1;
 }
 
@@ -207,8 +207,8 @@ special_free (xpointer_t p)
 
 
 static GTlsInteractionResult
-test_interaction_ask_password_sync_success (GTlsInteraction    *interaction,
-                                            GTlsPassword       *password,
+test_interaction_ask_password_sync_success (xtls_interaction_t    *interaction,
+                                            xtls_password_t       *password,
                                             xcancellable_t       *cancellable,
                                             xerror_t            **error)
 {
@@ -219,7 +219,7 @@ test_interaction_ask_password_sync_success (GTlsInteraction    *interaction,
   g_assert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (g_thread_self () == self->test->interaction_thread);
+  g_assert (xthread_self () == self->test->interaction_thread);
 
   g_assert (X_IS_TLS_PASSWORD (password));
   g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
@@ -227,34 +227,34 @@ test_interaction_ask_password_sync_success (GTlsInteraction    *interaction,
   g_assert (*error == NULL);
 
   /* Exercise different ways to set the value */
-  g_tls_password_set_value (password, (const guchar *) "foo", 4);
+  xtls_password_set_value (password, (const guchar *) "foo", 4);
   len = 0;
-  value = g_tls_password_get_value (password, &len);
+  value = xtls_password_get_value (password, &len);
   g_assert_cmpmem (value, len, "foo", 4);
 
-  g_tls_password_set_value (password, (const guchar *) "bar", -1);
+  xtls_password_set_value (password, (const guchar *) "bar", -1);
   len = 0;
-  value = g_tls_password_get_value (password, &len);
+  value = xtls_password_get_value (password, &len);
   g_assert_cmpmem (value, len, "bar", 3);
 
-  g_tls_password_set_value_full (password, special_dup ("baa"), 4, special_free);
+  xtls_password_set_value_full (password, special_dup ("baa"), 4, special_free);
   len = 0;
-  value = g_tls_password_get_value (password, &len);
+  value = xtls_password_get_value (password, &len);
   g_assert_cmpmem (value, len, "baa", 4);
 
-  g_tls_password_set_value_full (password, special_dup ("baz"), -1, special_free);
+  xtls_password_set_value_full (password, special_dup ("baz"), -1, special_free);
   len = 0;
-  value = g_tls_password_get_value (password, &len);
+  value = xtls_password_get_value (password, &len);
   g_assert_cmpmem (value, len, "baz", 3);
 
   /* Don't do this in real life. Include a null terminator for testing */
-  g_tls_password_set_value (password, (const guchar *)"the password", 13);
+  xtls_password_set_value (password, (const guchar *)"the password", 13);
   return G_TLS_INTERACTION_HANDLED;
 }
 
 static GTlsInteractionResult
-test_interaction_ask_password_sync_failure (GTlsInteraction    *interaction,
-                                            GTlsPassword       *password,
+test_interaction_ask_password_sync_failure (xtls_interaction_t    *interaction,
+                                            xtls_password_t       *password,
                                             xcancellable_t       *cancellable,
                                             xerror_t            **error)
 {
@@ -263,50 +263,50 @@ test_interaction_ask_password_sync_failure (GTlsInteraction    *interaction,
   g_assert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (g_thread_self () == self->test->interaction_thread);
+  g_assert (xthread_self () == self->test->interaction_thread);
 
   g_assert (X_IS_TLS_PASSWORD (password));
   g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
   g_assert (error != NULL);
   g_assert (*error == NULL);
 
-  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_ACCES, "The message");
+  g_set_error (error, XFILE_ERROR, XFILE_ERROR_ACCES, "The message");
   return G_TLS_INTERACTION_FAILED;
 }
 
 static void
-test_interaction_request_certificate_async_success (GTlsInteraction    *interaction,
-                                                    GTlsConnection     *connection,
+test_interaction_request_certificate_async_success (xtls_interaction_t    *interaction,
+                                                    xtls_connection_t     *connection,
                                                     xint_t                unused_flags,
                                                     xcancellable_t       *cancellable,
                                                     xasync_ready_callback_t callback,
                                                     xpointer_t            user_data)
 {
-  GTask *task;
+  xtask_t *task;
   TestInteraction *self;
 
   g_assert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (g_thread_self () == self->test->interaction_thread);
+  g_assert (xthread_self () == self->test->interaction_thread);
 
   g_assert (X_IS_TLS_CONNECTION (connection));
   g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
   g_assert (unused_flags == 0);
 
-  task = g_task_new (self, cancellable, callback, user_data);
+  task = xtask_new (self, cancellable, callback, user_data);
 
   /*
-   * IRL would call g_tls_connection_set_certificate(). But here just touch
+   * IRL would call xtls_connection_set_certificate(). But here just touch
    * the connection in a detectable way.
    */
-  g_object_set_data (G_OBJECT (connection), "chosen-certificate", "my-certificate");
-  g_task_return_int (task, G_TLS_INTERACTION_HANDLED);
-  g_object_unref (task);
+  xobject_set_data (G_OBJECT (connection), "chosen-certificate", "my-certificate");
+  xtask_return_int (task, G_TLS_INTERACTION_HANDLED);
+  xobject_unref (task);
 }
 
 static GTlsInteractionResult
-test_interaction_request_certificate_finish_success (GTlsInteraction    *interaction,
+test_interaction_request_certificate_finish_success (xtls_interaction_t    *interaction,
                                                      xasync_result_t       *result,
                                                      xerror_t            **error)
 {
@@ -315,43 +315,43 @@ test_interaction_request_certificate_finish_success (GTlsInteraction    *interac
   g_assert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (g_thread_self () == self->test->interaction_thread);
+  g_assert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (g_task_is_valid (result, interaction));
+  g_assert (xtask_is_valid (result, interaction));
   g_assert (error != NULL);
   g_assert (*error == NULL);
 
-  return g_task_propagate_int (G_TASK (result), error);
+  return xtask_propagate_int (XTASK (result), error);
 }
 
 static void
-test_interaction_request_certificate_async_failure (GTlsInteraction    *interaction,
-                                                    GTlsConnection     *connection,
+test_interaction_request_certificate_async_failure (xtls_interaction_t    *interaction,
+                                                    xtls_connection_t     *connection,
                                                     xint_t                unused_flags,
                                                     xcancellable_t       *cancellable,
                                                     xasync_ready_callback_t callback,
                                                     xpointer_t            user_data)
 {
-  GTask *task;
+  xtask_t *task;
   TestInteraction *self;
 
   g_assert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (g_thread_self () == self->test->interaction_thread);
+  g_assert (xthread_self () == self->test->interaction_thread);
 
   g_assert (X_IS_TLS_CONNECTION (connection));
   g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
   g_assert (unused_flags == 0);
 
-  task = g_task_new (self, cancellable, callback, user_data);
+  task = xtask_new (self, cancellable, callback, user_data);
 
-  g_task_return_new_error (task, G_FILE_ERROR, G_FILE_ERROR_NOENT, "Another message");
-  g_object_unref (task);
+  xtask_return_new_error (task, XFILE_ERROR, XFILE_ERROR_NOENT, "Another message");
+  xobject_unref (task);
 }
 
 static GTlsInteractionResult
-test_interaction_request_certificate_finish_failure (GTlsInteraction    *interaction,
+test_interaction_request_certificate_finish_failure (xtls_interaction_t    *interaction,
                                                      xasync_result_t       *result,
                                                      xerror_t            **error)
 {
@@ -360,21 +360,21 @@ test_interaction_request_certificate_finish_failure (GTlsInteraction    *interac
   g_assert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (g_thread_self () == self->test->interaction_thread);
+  g_assert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (g_task_is_valid (result, interaction));
+  g_assert (xtask_is_valid (result, interaction));
   g_assert (error != NULL);
   g_assert (*error == NULL);
 
-  if (g_task_propagate_int (G_TASK (result), error) != -1)
+  if (xtask_propagate_int (XTASK (result), error) != -1)
     g_assert_not_reached ();
 
   return G_TLS_INTERACTION_FAILED;
 }
 
 static GTlsInteractionResult
-test_interaction_request_certificate_sync_success (GTlsInteraction    *interaction,
-                                                   GTlsConnection      *connection,
+test_interaction_request_certificate_sync_success (xtls_interaction_t    *interaction,
+                                                   xtls_connection_t      *connection,
                                                    xint_t                 unused_flags,
                                                    xcancellable_t        *cancellable,
                                                    xerror_t             **error)
@@ -384,7 +384,7 @@ test_interaction_request_certificate_sync_success (GTlsInteraction    *interacti
   g_assert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (g_thread_self () == self->test->interaction_thread);
+  g_assert (xthread_self () == self->test->interaction_thread);
 
   g_assert (X_IS_TLS_CONNECTION (connection));
   g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
@@ -392,16 +392,16 @@ test_interaction_request_certificate_sync_success (GTlsInteraction    *interacti
   g_assert (*error == NULL);
 
   /*
-   * IRL would call g_tls_connection_set_certificate(). But here just touch
+   * IRL would call xtls_connection_set_certificate(). But here just touch
    * the connection in a detectable way.
    */
-  g_object_set_data (G_OBJECT (connection), "chosen-certificate", "my-certificate");
+  xobject_set_data (G_OBJECT (connection), "chosen-certificate", "my-certificate");
   return G_TLS_INTERACTION_HANDLED;
 }
 
 static GTlsInteractionResult
-test_interaction_request_certificate_sync_failure (GTlsInteraction    *interaction,
-                                                   GTlsConnection     *connection,
+test_interaction_request_certificate_sync_failure (xtls_interaction_t    *interaction,
+                                                   xtls_connection_t     *connection,
                                                    xint_t                unused_flags,
                                                    xcancellable_t       *cancellable,
                                                    xerror_t            **error)
@@ -411,7 +411,7 @@ test_interaction_request_certificate_sync_failure (GTlsInteraction    *interacti
   g_assert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (g_thread_self () == self->test->interaction_thread);
+  g_assert (xthread_self () == self->test->interaction_thread);
 
   g_assert (X_IS_TLS_CONNECTION (connection));
   g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
@@ -419,7 +419,7 @@ test_interaction_request_certificate_sync_failure (GTlsInteraction    *interacti
   g_assert (error != NULL);
   g_assert (*error == NULL);
 
-  g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_NOENT, "Another message");
+  g_set_error (error, XFILE_ERROR, XFILE_ERROR_NOENT, "Another message");
   return G_TLS_INTERACTION_FAILED;
 }
 
@@ -440,9 +440,9 @@ on_ask_password_async_call (xobject_t      *source,
   g_assert (G_TLS_INTERACTION (source) == test->interaction);
 
   /* Check that this callback is being run in the right place */
-  g_assert (g_thread_self () == test->interaction_thread);
+  g_assert (xthread_self () == test->interaction_thread);
 
-  res = g_tls_interaction_ask_password_finish (test->interaction, result,
+  res = xtls_interaction_ask_password_finish (test->interaction, result,
                                                &error);
 
   /* Check that the results match the fixture */
@@ -451,7 +451,7 @@ on_ask_password_async_call (xobject_t      *source,
     {
       case G_TLS_INTERACTION_HANDLED:
         g_assert_no_error (error);
-        g_assert_cmpstr ((const xchar_t *)g_tls_password_get_value (test->password, NULL), ==, "the password");
+        g_assert_cmpstr ((const xchar_t *)xtls_password_get_value (test->password, NULL), ==, "the password");
         break;
       case G_TLS_INTERACTION_FAILED:
         g_assert_error (error, test->fixture->error_domain, test->fixture->error_code);
@@ -466,32 +466,32 @@ on_ask_password_async_call (xobject_t      *source,
     }
 
   /* Signal the end of the test */
-  g_main_loop_quit (test->loop);
+  xmain_loop_quit (test->loop);
 }
 
 static void
 test_ask_password_async (Test            *test,
-                         gconstpointer    unused)
+                         xconstpointer    unused)
 {
   /* This test only works with a main loop */
   g_assert (test->loop);
 
-  g_tls_interaction_ask_password_async (test->interaction,
+  xtls_interaction_ask_password_async (test->interaction,
                                         test->password, NULL,
                                         on_ask_password_async_call,
                                         test);
 
-  /* teardown waits until g_main_loop_quit(). called from callback */
+  /* teardown waits until xmain_loop_quit(). called from callback */
 }
 
 static void
 test_invoke_ask_password (Test         *test,
-                          gconstpointer unused)
+                          xconstpointer unused)
 {
   GTlsInteractionResult res;
   xerror_t *error = NULL;
 
-  res = g_tls_interaction_invoke_ask_password (test->interaction, test->password,
+  res = xtls_interaction_invoke_ask_password (test->interaction, test->password,
                                                NULL, &error);
 
   /* Check that the results match the fixture */
@@ -500,7 +500,7 @@ test_invoke_ask_password (Test         *test,
     {
       case G_TLS_INTERACTION_HANDLED:
         g_assert_no_error (error);
-        g_assert_cmpstr ((const xchar_t *)g_tls_password_get_value (test->password, NULL), ==, "the password");
+        g_assert_cmpstr ((const xchar_t *)xtls_password_get_value (test->password, NULL), ==, "the password");
         break;
       case G_TLS_INTERACTION_FAILED:
         g_assert_error (error, test->fixture->error_domain, test->fixture->error_code);
@@ -516,17 +516,17 @@ test_invoke_ask_password (Test         *test,
 
   /* This allows teardown to stop if running with loop */
   if (test->loop)
-    g_main_loop_quit (test->loop);
+    xmain_loop_quit (test->loop);
 }
 
 static void
 test_ask_password (Test         *test,
-                   gconstpointer unused)
+                   xconstpointer unused)
 {
   GTlsInteractionResult res;
   xerror_t *error = NULL;
 
-  res = g_tls_interaction_ask_password (test->interaction, test->password,
+  res = xtls_interaction_ask_password (test->interaction, test->password,
                                         NULL, &error);
 
   /* Check that the results match the fixture */
@@ -535,7 +535,7 @@ test_ask_password (Test         *test,
     {
       case G_TLS_INTERACTION_HANDLED:
         g_assert_no_error (error);
-        g_assert_cmpstr ((const xchar_t *)g_tls_password_get_value (test->password, NULL), ==, "the password");
+        g_assert_cmpstr ((const xchar_t *)xtls_password_get_value (test->password, NULL), ==, "the password");
         break;
       case G_TLS_INTERACTION_FAILED:
         g_assert_error (error, test->fixture->error_domain, test->fixture->error_code);
@@ -551,7 +551,7 @@ test_ask_password (Test         *test,
 
   /* This allows teardown to stop if running with loop */
   if (test->loop)
-    g_main_loop_quit (test->loop);
+    xmain_loop_quit (test->loop);
 }
 
 static void
@@ -567,9 +567,9 @@ on_request_certificate_async_call (xobject_t      *source,
   g_assert (G_TLS_INTERACTION (source) == test->interaction);
 
   /* Check that this callback is being run in the right place */
-  g_assert (g_thread_self () == test->interaction_thread);
+  g_assert (xthread_self () == test->interaction_thread);
 
-  res = g_tls_interaction_request_certificate_finish (test->interaction, result, &error);
+  res = xtls_interaction_request_certificate_finish (test->interaction, result, &error);
 
   /* Check that the results match the fixture */
   g_assert_cmpuint (test->fixture->result, ==, res);
@@ -577,7 +577,7 @@ on_request_certificate_async_call (xobject_t      *source,
     {
       case G_TLS_INTERACTION_HANDLED:
         g_assert_no_error (error);
-        g_assert_cmpstr (g_object_get_data (G_OBJECT (test->connection), "chosen-certificate"), ==, "my-certificate");
+        g_assert_cmpstr (xobject_get_data (G_OBJECT (test->connection), "chosen-certificate"), ==, "my-certificate");
         break;
       case G_TLS_INTERACTION_FAILED:
         g_assert_error (error, test->fixture->error_domain, test->fixture->error_code);
@@ -592,32 +592,32 @@ on_request_certificate_async_call (xobject_t      *source,
     }
 
   /* Signal the end of the test */
-  g_main_loop_quit (test->loop);
+  xmain_loop_quit (test->loop);
 }
 
 static void
 test_request_certificate_async (Test            *test,
-                                gconstpointer    unused)
+                                xconstpointer    unused)
 {
   /* This test only works with a main loop */
   g_assert (test->loop);
 
-  g_tls_interaction_request_certificate_async (test->interaction,
+  xtls_interaction_request_certificate_async (test->interaction,
                                                test->connection, 0, NULL,
                                                on_request_certificate_async_call,
                                                test);
 
-  /* teardown waits until g_main_loop_quit(). called from callback */
+  /* teardown waits until xmain_loop_quit(). called from callback */
 }
 
 static void
 test_invoke_request_certificate (Test         *test,
-                                 gconstpointer unused)
+                                 xconstpointer unused)
 {
   GTlsInteractionResult res;
   xerror_t *error = NULL;
 
-  res = g_tls_interaction_invoke_request_certificate (test->interaction,
+  res = xtls_interaction_invoke_request_certificate (test->interaction,
                                                       test->connection,
                                                       0, NULL, &error);
 
@@ -627,7 +627,7 @@ test_invoke_request_certificate (Test         *test,
     {
       case G_TLS_INTERACTION_HANDLED:
         g_assert_no_error (error);
-        g_assert_cmpstr (g_object_get_data (G_OBJECT (test->connection), "chosen-certificate"), ==, "my-certificate");
+        g_assert_cmpstr (xobject_get_data (G_OBJECT (test->connection), "chosen-certificate"), ==, "my-certificate");
         break;
       case G_TLS_INTERACTION_FAILED:
         g_assert_error (error, test->fixture->error_domain, test->fixture->error_code);
@@ -643,17 +643,17 @@ test_invoke_request_certificate (Test         *test,
 
   /* This allows teardown to stop if running with loop */
   if (test->loop)
-    g_main_loop_quit (test->loop);
+    xmain_loop_quit (test->loop);
 }
 
 static void
 test_request_certificate (Test         *test,
-                          gconstpointer unused)
+                          xconstpointer unused)
 {
   GTlsInteractionResult res;
   xerror_t *error = NULL;
 
-  res = g_tls_interaction_request_certificate (test->interaction, test->connection,
+  res = xtls_interaction_request_certificate (test->interaction, test->connection,
                                                0, NULL, &error);
 
   /* Check that the results match the fixture */
@@ -662,7 +662,7 @@ test_request_certificate (Test         *test,
     {
       case G_TLS_INTERACTION_HANDLED:
         g_assert_no_error (error);
-        g_assert_cmpstr (g_object_get_data (G_OBJECT (test->connection), "chosen-certificate"), ==, "my-certificate");
+        g_assert_cmpstr (xobject_get_data (G_OBJECT (test->connection), "chosen-certificate"), ==, "my-certificate");
         break;
       case G_TLS_INTERACTION_FAILED:
         g_assert_error (error, test->fixture->error_domain, test->fixture->error_code);
@@ -678,7 +678,7 @@ test_request_certificate (Test         *test,
 
   /* This allows teardown to stop if running with loop */
   if (test->loop)
-    g_main_loop_quit (test->loop);
+    xmain_loop_quit (test->loop);
 }
 
 /* ----------------------------------------------------------------------------
@@ -687,16 +687,16 @@ test_request_certificate (Test         *test,
 
 static void
 setup_without_loop (Test           *test,
-                    gconstpointer   user_data)
+                    xconstpointer   user_data)
 {
   const Fixture *fixture = user_data;
   GTlsInteractionClass *klass;
-  GTlsBackend *backend;
+  xtls_backend_t *backend;
   xerror_t *error = NULL;
 
   test->fixture = fixture;
 
-  test->interaction = g_object_new (TEST_TYPE_INTERACTION, NULL);
+  test->interaction = xobject_new (TEST_TYPE_INTERACTION, NULL);
   g_assert (TEST_IS_INTERACTION (test->interaction));
 
   TEST_INTERACTION (test->interaction)->test = test;
@@ -709,13 +709,13 @@ setup_without_loop (Test           *test,
   klass->request_certificate_async = fixture->request_certificate_async_func;
   klass->request_certificate_finish = fixture->request_certificate_finish_func;
 
-  backend = g_object_new (XTYPE_TEST_TLS_BACKEND, NULL);
-  test->connection = g_object_new (g_tls_backend_get_server_connection_type (backend), NULL);
+  backend = xobject_new (XTYPE_TEST_TLS_BACKEND, NULL);
+  test->connection = xobject_new (xtls_backend_get_server_connection_type (backend), NULL);
   g_assert_no_error (error);
-  g_object_unref (backend);
+  xobject_unref (backend);
 
-  test->password = g_tls_password_new (0, "Description");
-  test->test_thread = g_thread_self ();
+  test->password = xtls_password_new (0, "Description");
+  test->test_thread = xthread_self ();
 
   /*
    * If no loop is running then interaction should happen in the same
@@ -726,17 +726,17 @@ setup_without_loop (Test           *test,
 
 static void
 teardown_without_loop (Test            *test,
-                       gconstpointer    unused)
+                       xconstpointer    unused)
 {
-  g_object_unref (test->connection);
-  g_object_unref (test->password);
+  xobject_unref (test->connection);
+  xobject_unref (test->password);
 
   g_assert_finalize_object (test->interaction);
 }
 
 typedef struct {
-  GMutex loop_mutex;
-  GCond loop_started;
+  xmutex_t loop_mutex;
+  xcond_t loop_started;
   xboolean_t started;
   Test *test;
 } ThreadLoop;
@@ -744,31 +744,31 @@ typedef struct {
 static xpointer_t
 thread_loop (xpointer_t user_data)
 {
-  GMainContext *context = g_main_context_default ();
+  xmain_context_t *context = xmain_context_default ();
   ThreadLoop *closure = user_data;
   Test *test = closure->test;
 
   g_mutex_lock (&closure->loop_mutex);
 
-  g_assert (test->loop_thread == g_thread_self ());
+  g_assert (test->loop_thread == xthread_self ());
   g_assert (test->loop == NULL);
-  test->loop = g_main_loop_new (context, TRUE);
+  test->loop = xmain_loop_new (context, TRUE);
 
-  g_main_context_acquire (context);
+  xmain_context_acquire (context);
   closure->started = TRUE;
   g_cond_signal (&closure->loop_started);
   g_mutex_unlock (&closure->loop_mutex);
 
-  while (g_main_loop_is_running (test->loop))
-    g_main_context_iteration (context, TRUE);
+  while (xmain_loop_is_running (test->loop))
+    xmain_context_iteration (context, TRUE);
 
-  g_main_context_release (context);
+  xmain_context_release (context);
   return test;
 }
 
 static void
 setup_with_thread_loop (Test            *test,
-                        gconstpointer    user_data)
+                        xconstpointer    user_data)
 {
   ThreadLoop closure;
 
@@ -780,7 +780,7 @@ setup_with_thread_loop (Test            *test,
   closure.test = test;
 
   g_mutex_lock (&closure.loop_mutex);
-  test->loop_thread = g_thread_new ("loop", thread_loop, &closure);
+  test->loop_thread = xthread_new ("loop", thread_loop, &closure);
   while (!closure.started)
     g_cond_wait (&closure.loop_started, &closure.loop_mutex);
   g_mutex_unlock (&closure.loop_mutex);
@@ -797,56 +797,56 @@ setup_with_thread_loop (Test            *test,
 
 static void
 teardown_with_thread_loop (Test            *test,
-                           gconstpointer    unused)
+                           xconstpointer    unused)
 {
   xpointer_t check;
 
   g_assert (test->loop_thread);
-  check = g_thread_join (test->loop_thread);
+  check = xthread_join (test->loop_thread);
   g_assert (check == test);
   test->loop_thread = NULL;
 
-  g_main_loop_unref (test->loop);
+  xmain_loop_unref (test->loop);
 
   teardown_without_loop (test, unused);
 }
 
 static void
 setup_with_normal_loop (Test            *test,
-                        gconstpointer    user_data)
+                        xconstpointer    user_data)
 {
-  GMainContext *context;
+  xmain_context_t *context;
 
   setup_without_loop (test, user_data);
 
-  context = g_main_context_default ();
-  if (!g_main_context_acquire (context))
+  context = xmain_context_default ();
+  if (!xmain_context_acquire (context))
     g_assert_not_reached ();
 
-  test->loop = g_main_loop_new (context, TRUE);
-  g_assert (g_main_loop_is_running (test->loop));
+  test->loop = xmain_loop_new (context, TRUE);
+  g_assert (xmain_loop_is_running (test->loop));
 }
 
 static void
 teardown_with_normal_loop (Test            *test,
-                           gconstpointer    unused)
+                           xconstpointer    unused)
 {
-  GMainContext *context;
+  xmain_context_t *context;
 
-  context = g_main_context_default ();
-  while (g_main_loop_is_running (test->loop))
-    g_main_context_iteration (context, TRUE);
+  context = xmain_context_default ();
+  while (xmain_loop_is_running (test->loop))
+    xmain_context_iteration (context, TRUE);
 
-  g_main_context_release (context);
+  xmain_context_release (context);
 
   /* Run test until complete */
-  g_main_loop_unref (test->loop);
+  xmain_loop_unref (test->loop);
   test->loop = NULL;
 
   teardown_without_loop (test, unused);
 }
 
-typedef void (*TestFunc) (Test *test, gconstpointer data);
+typedef void (*TestFunc) (Test *test, xconstpointer data);
 
 static void
 test_with_async_ask_password (const xchar_t *name,
@@ -863,10 +863,10 @@ test_with_async_ask_password (const xchar_t *name,
   fixture->ask_password_finish_func = test_interaction_ask_password_finish_success;
   fixture->ask_password_func = NULL;
   fixture->result = G_TLS_INTERACTION_HANDLED;
-  test_name = g_strdup_printf ("%s/async-implementation-success", name);
+  test_name = xstrdup_printf ("%s/async-implementation-success", name);
   g_test_add (test_name, Test, fixture, setup, func, teardown);
   g_free (test_name);
-  g_ptr_array_add (fixtures, fixture);
+  xptr_array_add (fixtures, fixture);
 
   /* Async implementation that fails */
   fixture = g_new0 (Fixture, 1);
@@ -874,13 +874,13 @@ test_with_async_ask_password (const xchar_t *name,
   fixture->ask_password_finish_func = test_interaction_ask_password_finish_failure;
   fixture->ask_password_func = NULL;
   fixture->result = G_TLS_INTERACTION_FAILED;
-  fixture->error_domain = G_FILE_ERROR;
-  fixture->error_code = G_FILE_ERROR_ACCES;
+  fixture->error_domain = XFILE_ERROR;
+  fixture->error_code = XFILE_ERROR_ACCES;
   fixture->error_message = "The message";
-  test_name = g_strdup_printf ("%s/async-implementation-failure", name);
+  test_name = xstrdup_printf ("%s/async-implementation-failure", name);
   g_test_add (test_name, Test, fixture, setup, func, teardown);
   g_free (test_name);
-  g_ptr_array_add (fixtures, fixture);
+  xptr_array_add (fixtures, fixture);
 }
 
 static void
@@ -898,10 +898,10 @@ test_with_unhandled_ask_password (const xchar_t *name,
   fixture->ask_password_finish_func = NULL;
   fixture->ask_password_func = NULL;
   fixture->result = G_TLS_INTERACTION_UNHANDLED;
-  test_name = g_strdup_printf ("%s/unhandled-implementation", name);
+  test_name = xstrdup_printf ("%s/unhandled-implementation", name);
   g_test_add (test_name, Test, fixture, setup, func, teardown);
   g_free (test_name);
-  g_ptr_array_add (fixtures, fixture);
+  xptr_array_add (fixtures, fixture);
 }
 
 static void
@@ -919,10 +919,10 @@ test_with_sync_ask_password (const xchar_t *name,
   fixture->ask_password_finish_func = NULL;
   fixture->ask_password_func = test_interaction_ask_password_sync_success;
   fixture->result = G_TLS_INTERACTION_HANDLED;
-  test_name = g_strdup_printf ("%s/sync-implementation-success", name);
+  test_name = xstrdup_printf ("%s/sync-implementation-success", name);
   g_test_add (test_name, Test, fixture, setup, func, teardown);
   g_free (test_name);
-  g_ptr_array_add (fixtures, fixture);
+  xptr_array_add (fixtures, fixture);
 
   /* Async implementation that fails */
   fixture = g_new0 (Fixture, 1);
@@ -930,13 +930,13 @@ test_with_sync_ask_password (const xchar_t *name,
   fixture->ask_password_finish_func = NULL;
   fixture->ask_password_func = test_interaction_ask_password_sync_failure;
   fixture->result = G_TLS_INTERACTION_FAILED;
-  fixture->error_domain = G_FILE_ERROR;
-  fixture->error_code = G_FILE_ERROR_ACCES;
+  fixture->error_domain = XFILE_ERROR;
+  fixture->error_code = XFILE_ERROR_ACCES;
   fixture->error_message = "The message";
-  test_name = g_strdup_printf ("%s/sync-implementation-failure", name);
+  test_name = xstrdup_printf ("%s/sync-implementation-failure", name);
   g_test_add (test_name, Test, fixture, setup, func, teardown);
   g_free (test_name);
-  g_ptr_array_add (fixtures, fixture);
+  xptr_array_add (fixtures, fixture);
 }
 
 static void
@@ -965,10 +965,10 @@ test_with_async_request_certificate (const xchar_t *name,
   fixture->request_certificate_finish_func = test_interaction_request_certificate_finish_success;
   fixture->request_certificate_func = NULL;
   fixture->result = G_TLS_INTERACTION_HANDLED;
-  test_name = g_strdup_printf ("%s/async-implementation-success", name);
+  test_name = xstrdup_printf ("%s/async-implementation-success", name);
   g_test_add (test_name, Test, fixture, setup, func, teardown);
   g_free (test_name);
-  g_ptr_array_add (fixtures, fixture);
+  xptr_array_add (fixtures, fixture);
 
   /* Async implementation that fails */
   fixture = g_new0 (Fixture, 1);
@@ -976,13 +976,13 @@ test_with_async_request_certificate (const xchar_t *name,
   fixture->request_certificate_finish_func = test_interaction_request_certificate_finish_failure;
   fixture->request_certificate_func = NULL;
   fixture->result = G_TLS_INTERACTION_FAILED;
-  fixture->error_domain = G_FILE_ERROR;
-  fixture->error_code = G_FILE_ERROR_NOENT;
+  fixture->error_domain = XFILE_ERROR;
+  fixture->error_code = XFILE_ERROR_NOENT;
   fixture->error_message = "Another message";
-  test_name = g_strdup_printf ("%s/async-implementation-failure", name);
+  test_name = xstrdup_printf ("%s/async-implementation-failure", name);
   g_test_add (test_name, Test, fixture, setup, func, teardown);
   g_free (test_name);
-  g_ptr_array_add (fixtures, fixture);
+  xptr_array_add (fixtures, fixture);
 }
 
 static void
@@ -1000,10 +1000,10 @@ test_with_unhandled_request_certificate (const xchar_t *name,
   fixture->request_certificate_finish_func = NULL;
   fixture->request_certificate_func = NULL;
   fixture->result = G_TLS_INTERACTION_UNHANDLED;
-  test_name = g_strdup_printf ("%s/unhandled-implementation", name);
+  test_name = xstrdup_printf ("%s/unhandled-implementation", name);
   g_test_add (test_name, Test, fixture, setup, func, teardown);
   g_free (test_name);
-  g_ptr_array_add (fixtures, fixture);
+  xptr_array_add (fixtures, fixture);
 }
 
 static void
@@ -1021,10 +1021,10 @@ test_with_sync_request_certificate (const xchar_t *name,
   fixture->request_certificate_finish_func = NULL;
   fixture->request_certificate_func = test_interaction_request_certificate_sync_success;
   fixture->result = G_TLS_INTERACTION_HANDLED;
-  test_name = g_strdup_printf ("%s/sync-implementation-success", name);
+  test_name = xstrdup_printf ("%s/sync-implementation-success", name);
   g_test_add (test_name, Test, fixture, setup, func, teardown);
   g_free (test_name);
-  g_ptr_array_add (fixtures, fixture);
+  xptr_array_add (fixtures, fixture);
 
   /* Async implementation that fails */
   fixture = g_new0 (Fixture, 1);
@@ -1032,13 +1032,13 @@ test_with_sync_request_certificate (const xchar_t *name,
   fixture->request_certificate_finish_func = NULL;
   fixture->request_certificate_func = test_interaction_request_certificate_sync_failure;
   fixture->result = G_TLS_INTERACTION_FAILED;
-  fixture->error_domain = G_FILE_ERROR;
-  fixture->error_code = G_FILE_ERROR_NOENT;
+  fixture->error_domain = XFILE_ERROR;
+  fixture->error_code = XFILE_ERROR_NOENT;
   fixture->error_message = "Another message";
-  test_name = g_strdup_printf ("%s/sync-implementation-failure", name);
+  test_name = xstrdup_printf ("%s/sync-implementation-failure", name);
   g_test_add (test_name, Test, fixture, setup, func, teardown);
   g_free (test_name);
-  g_ptr_array_add (fixtures, fixture);
+  xptr_array_add (fixtures, fixture);
 }
 
 static void
@@ -1059,9 +1059,9 @@ main (int   argc,
 
   g_test_init (&argc, &argv, NULL);
 
-  fixtures = g_ptr_array_new_with_free_func (g_free);
+  fixtures = xptr_array_new_with_free_func (g_free);
 
-  /* Tests for g_tls_interaction_invoke_ask_password */
+  /* Tests for xtls_interaction_invoke_ask_password */
   test_with_all_ask_password ("/tls-interaction/ask-password/invoke-with-loop",
                               setup_with_thread_loop, test_invoke_ask_password, teardown_with_thread_loop);
   test_with_all_ask_password ("/tls-interaction/ask-password/invoke-without-loop",
@@ -1069,19 +1069,19 @@ main (int   argc,
   test_with_all_ask_password ("/tls-interaction/ask-password/invoke-in-loop",
                                               setup_with_normal_loop, test_invoke_ask_password, teardown_with_normal_loop);
 
-  /* Tests for g_tls_interaction_ask_password */
+  /* Tests for xtls_interaction_ask_password */
   test_with_unhandled_ask_password ("/tls-interaction/ask-password/sync",
                                     setup_without_loop, test_ask_password, teardown_without_loop);
   test_with_sync_ask_password ("/tls-interaction/ask-password/sync",
                                setup_without_loop, test_ask_password, teardown_without_loop);
 
-  /* Tests for g_tls_interaction_ask_password_async */
+  /* Tests for xtls_interaction_ask_password_async */
   test_with_unhandled_ask_password ("/tls-interaction/ask-password/async",
                                     setup_with_normal_loop, test_ask_password_async, teardown_with_normal_loop);
   test_with_async_ask_password ("/tls-interaction/ask-password/async",
                                 setup_with_normal_loop, test_ask_password_async, teardown_with_normal_loop);
 
-  /* Tests for g_tls_interaction_invoke_request_certificate */
+  /* Tests for xtls_interaction_invoke_request_certificate */
   test_with_all_request_certificate ("/tls-interaction/request-certificate/invoke-with-loop",
                                      setup_with_thread_loop, test_invoke_request_certificate, teardown_with_thread_loop);
   test_with_all_request_certificate ("/tls-interaction/request-certificate/invoke-without-loop",
@@ -1089,19 +1089,19 @@ main (int   argc,
   test_with_all_request_certificate ("/tls-interaction/request-certificate/invoke-in-loop",
                               setup_with_normal_loop, test_invoke_request_certificate, teardown_with_normal_loop);
 
-  /* Tests for g_tls_interaction_ask_password */
+  /* Tests for xtls_interaction_ask_password */
   test_with_unhandled_request_certificate ("/tls-interaction/request-certificate/sync",
                                            setup_without_loop, test_request_certificate, teardown_without_loop);
   test_with_sync_request_certificate ("/tls-interaction/request-certificate/sync",
                                       setup_without_loop, test_request_certificate, teardown_without_loop);
 
-  /* Tests for g_tls_interaction_ask_password_async */
+  /* Tests for xtls_interaction_ask_password_async */
   test_with_unhandled_request_certificate ("/tls-interaction/request-certificate/async",
                                            setup_with_normal_loop, test_request_certificate_async, teardown_with_normal_loop);
   test_with_async_request_certificate ("/tls-interaction/request-certificate/async",
                                        setup_with_normal_loop, test_request_certificate_async, teardown_with_normal_loop);
 
   ret = g_test_run();
-  g_ptr_array_free (fixtures, TRUE);
+  xptr_array_free (fixtures, TRUE);
   return ret;
 }

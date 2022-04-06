@@ -30,12 +30,12 @@
 
 /**
  * SECTION:gpermission
- * @title: GPermission
+ * @title: xpermission_t
  * @short_description: An object representing the permission
  *     to perform a certain action
  * @include: gio/gio.h
  *
- * A #GPermission represents the status of the caller's permission to
+ * A #xpermission_t represents the status of the caller's permission to
  * perform a certain action.
  *
  * You can query if the action is currently allowed and if it is
@@ -45,17 +45,17 @@
  * There is also an API to actually acquire the permission and one to
  * release it.
  *
- * As an example, a #GPermission might represent the ability for the
- * user to write to a #GSettings object.  This #GPermission object could
+ * As an example, a #xpermission_t might represent the ability for the
+ * user to write to a #xsettings_t object.  This #xpermission_t object could
  * then be used to decide if it is appropriate to show a "Click here to
  * unlock" button in a dialog and to provide the mechanism to invoke
  * when that button is clicked.
  **/
 
 /**
- * GPermission:
+ * xpermission_t:
  *
- * #GPermission is an opaque data structure and can only be accessed
+ * #xpermission_t is an opaque data structure and can only be accessed
  * using the following functions.
  **/
 
@@ -73,11 +73,11 @@ enum  {
   PROP_CAN_RELEASE
 };
 
-G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (GPermission, g_permission, XTYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (xpermission_t, g_permission, XTYPE_OBJECT)
 
 /**
  * g_permission_acquire:
- * @permission: a #GPermission instance
+ * @permission: a #xpermission_t instance
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
  * @error: a pointer to a %NULL #xerror_t, or %NULL
  *
@@ -102,7 +102,7 @@ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (GPermission, g_permission, XTYPE_OBJECT)
  * Since: 2.26
  */
 xboolean_t
-g_permission_acquire (GPermission   *permission,
+g_permission_acquire (xpermission_t   *permission,
                       xcancellable_t  *cancellable,
                       xerror_t       **error)
 {
@@ -113,7 +113,7 @@ g_permission_acquire (GPermission   *permission,
 
 /**
  * g_permission_acquire_async:
- * @permission: a #GPermission instance
+ * @permission: a #xpermission_t instance
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
  * @callback: the #xasync_ready_callback_t to call when done
  * @user_data: the user data to pass to @callback
@@ -126,7 +126,7 @@ g_permission_acquire (GPermission   *permission,
  * Since: 2.26
  **/
 void
-g_permission_acquire_async (GPermission         *permission,
+g_permission_acquire_async (xpermission_t         *permission,
                             xcancellable_t        *cancellable,
                             xasync_ready_callback_t  callback,
                             xpointer_t             user_data)
@@ -138,7 +138,7 @@ g_permission_acquire_async (GPermission         *permission,
 
 /**
  * g_permission_acquire_finish:
- * @permission: a #GPermission instance
+ * @permission: a #xpermission_t instance
  * @result: the #xasync_result_t given to the #xasync_ready_callback_t
  * @error: a pointer to a %NULL #xerror_t, or %NULL
  *
@@ -153,7 +153,7 @@ g_permission_acquire_async (GPermission         *permission,
  * Since: 2.26
  **/
 xboolean_t
-g_permission_acquire_finish (GPermission   *permission,
+g_permission_acquire_finish (xpermission_t   *permission,
                              xasync_result_t  *result,
                              xerror_t       **error)
 {
@@ -164,7 +164,7 @@ g_permission_acquire_finish (GPermission   *permission,
 
 /**
  * g_permission_release:
- * @permission: a #GPermission instance
+ * @permission: a #xpermission_t instance
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
  * @error: a pointer to a %NULL #xerror_t, or %NULL
  *
@@ -189,7 +189,7 @@ g_permission_acquire_finish (GPermission   *permission,
  * Since: 2.26
  **/
 xboolean_t
-g_permission_release (GPermission   *permission,
+g_permission_release (xpermission_t   *permission,
                       xcancellable_t  *cancellable,
                       xerror_t       **error)
 {
@@ -200,7 +200,7 @@ g_permission_release (GPermission   *permission,
 
 /**
  * g_permission_release_async:
- * @permission: a #GPermission instance
+ * @permission: a #xpermission_t instance
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
  * @callback: the #xasync_ready_callback_t to call when done
  * @user_data: the user data to pass to @callback
@@ -213,7 +213,7 @@ g_permission_release (GPermission   *permission,
  * Since: 2.26
  **/
 void
-g_permission_release_async (GPermission         *permission,
+g_permission_release_async (xpermission_t         *permission,
                             xcancellable_t        *cancellable,
                             xasync_ready_callback_t  callback,
                             xpointer_t             user_data)
@@ -225,7 +225,7 @@ g_permission_release_async (GPermission         *permission,
 
 /**
  * g_permission_release_finish:
- * @permission: a #GPermission instance
+ * @permission: a #xpermission_t instance
  * @result: the #xasync_result_t given to the #xasync_ready_callback_t
  * @error: a pointer to a %NULL #xerror_t, or %NULL
  *
@@ -240,7 +240,7 @@ g_permission_release_async (GPermission         *permission,
  * Since: 2.26
  **/
 xboolean_t
-g_permission_release_finish (GPermission   *permission,
+g_permission_release_finish (xpermission_t   *permission,
                              xasync_result_t  *result,
                              xerror_t       **error)
 {
@@ -251,7 +251,7 @@ g_permission_release_finish (GPermission   *permission,
 
 /**
  * g_permission_get_allowed:
- * @permission: a #GPermission instance
+ * @permission: a #xpermission_t instance
  *
  * Gets the value of the 'allowed' property.  This property is %TRUE if
  * the caller currently has permission to perform the action that
@@ -262,7 +262,7 @@ g_permission_release_finish (GPermission   *permission,
  * Since: 2.26
  **/
 xboolean_t
-g_permission_get_allowed (GPermission *permission)
+g_permission_get_allowed (xpermission_t *permission)
 {
   g_return_val_if_fail (X_IS_PERMISSION (permission), FALSE);
   return permission->priv->allowed;
@@ -270,7 +270,7 @@ g_permission_get_allowed (GPermission *permission)
 
 /**
  * g_permission_get_can_acquire:
- * @permission: a #GPermission instance
+ * @permission: a #xpermission_t instance
  *
  * Gets the value of the 'can-acquire' property.  This property is %TRUE
  * if it is generally possible to acquire the permission by calling
@@ -281,7 +281,7 @@ g_permission_get_allowed (GPermission *permission)
  * Since: 2.26
  **/
 xboolean_t
-g_permission_get_can_acquire (GPermission *permission)
+g_permission_get_can_acquire (xpermission_t *permission)
 {
   g_return_val_if_fail (X_IS_PERMISSION (permission), FALSE);
   return permission->priv->can_acquire;
@@ -289,7 +289,7 @@ g_permission_get_can_acquire (GPermission *permission)
 
 /**
  * g_permission_get_can_release:
- * @permission: a #GPermission instance
+ * @permission: a #xpermission_t instance
  *
  * Gets the value of the 'can-release' property.  This property is %TRUE
  * if it is generally possible to release the permission by calling
@@ -300,7 +300,7 @@ g_permission_get_can_acquire (GPermission *permission)
  * Since: 2.26
  **/
 xboolean_t
-g_permission_get_can_release (GPermission *permission)
+g_permission_get_can_release (xpermission_t *permission)
 {
   g_return_val_if_fail (X_IS_PERMISSION (permission), FALSE);
   return permission->priv->can_release;
@@ -308,21 +308,21 @@ g_permission_get_can_release (GPermission *permission)
 
 /**
  * g_permission_impl_update:
- * @permission: a #GPermission instance
+ * @permission: a #xpermission_t instance
  * @allowed: the new value for the 'allowed' property
  * @can_acquire: the new value for the 'can-acquire' property
  * @can_release: the new value for the 'can-release' property
  *
- * This function is called by the #GPermission implementation to update
+ * This function is called by the #xpermission_t implementation to update
  * the properties of the permission.  You should never call this
- * function except from a #GPermission implementation.
+ * function except from a #xpermission_t implementation.
  *
  * xobject_t notify signals are generated, as appropriate.
  *
  * Since: 2.26
  **/
 void
-g_permission_impl_update (GPermission *permission,
+g_permission_impl_update (xpermission_t *permission,
                           xboolean_t     allowed,
                           xboolean_t     can_acquire,
                           xboolean_t     can_release)
@@ -332,50 +332,50 @@ g_permission_impl_update (GPermission *permission,
   g_return_if_fail (X_IS_PERMISSION (permission));
 
   object = G_OBJECT (permission);
-  g_object_freeze_notify (object);
+  xobject_freeze_notify (object);
 
   allowed = allowed != FALSE;
   if (allowed != permission->priv->allowed)
     {
       permission->priv->allowed = allowed;
-      g_object_notify (object, "allowed");
+      xobject_notify (object, "allowed");
     }
 
   can_acquire = can_acquire != FALSE;
   if (can_acquire != permission->priv->can_acquire)
     {
       permission->priv->can_acquire = can_acquire;
-      g_object_notify (object, "can-acquire");
+      xobject_notify (object, "can-acquire");
     }
 
   can_release = can_release != FALSE;
   if (can_release != permission->priv->can_release)
     {
       permission->priv->can_release = can_release;
-      g_object_notify (object, "can-release");
+      xobject_notify (object, "can-release");
     }
 
-  g_object_thaw_notify (object);
+  xobject_thaw_notify (object);
 }
 
 static void
 g_permission_get_property (xobject_t *object, xuint_t prop_id,
-                           GValue *value, GParamSpec *pspec)
+                           xvalue_t *value, xparam_spec_t *pspec)
 {
-  GPermission *permission = G_PERMISSION (object);
+  xpermission_t *permission = G_PERMISSION (object);
 
   switch (prop_id)
     {
     case PROP_ALLOWED:
-      g_value_set_boolean (value, permission->priv->allowed);
+      xvalue_set_boolean (value, permission->priv->allowed);
       break;
 
     case PROP_CAN_ACQUIRE:
-      g_value_set_boolean (value, permission->priv->can_acquire);
+      xvalue_set_boolean (value, permission->priv->can_acquire);
       break;
 
     case PROP_CAN_RELEASE:
-      g_value_set_boolean (value, permission->priv->can_release);
+      xvalue_set_boolean (value, permission->priv->can_release);
       break;
 
     default:
@@ -384,13 +384,13 @@ g_permission_get_property (xobject_t *object, xuint_t prop_id,
 }
 
 static void
-g_permission_init (GPermission *permission)
+g_permission_init (xpermission_t *permission)
 {
   permission->priv = g_permission_get_instance_private (permission);
 }
 
 static xboolean_t
-acquire_or_release (GPermission   *permission,
+acquire_or_release (xpermission_t   *permission,
                     xcancellable_t  *cancellable,
                     xerror_t       **error)
 {
@@ -401,12 +401,12 @@ acquire_or_release (GPermission   *permission,
 }
 
 static void
-acquire_or_release_async (GPermission         *permission,
+acquire_or_release_async (xpermission_t         *permission,
                           xcancellable_t        *cancellable,
                           xasync_ready_callback_t  callback,
                           xpointer_t             user_data)
 {
-  g_task_report_new_error (permission,
+  xtask_report_new_error (permission,
                            callback, user_data,
                            NULL,
                            G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
@@ -414,11 +414,11 @@ acquire_or_release_async (GPermission         *permission,
 }
 
 static xboolean_t
-acquire_or_release_finish (GPermission   *permission,
+acquire_or_release_finish (xpermission_t   *permission,
                            xasync_result_t  *result,
                            xerror_t       **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 static void
@@ -436,12 +436,12 @@ g_permission_class_init (GPermissionClass *class)
   class->release_finish = acquire_or_release_finish;
 
   /**
-   * GPermission:allowed:
+   * xpermission_t:allowed:
    *
    * %TRUE if the caller currently has permission to perform the action that
    * @permission represents the permission to perform.
    */
-   g_object_class_install_property (object_class, PROP_ALLOWED,
+   xobject_class_install_property (object_class, PROP_ALLOWED,
      g_param_spec_boolean ("allowed",
                            P_("Is allowed"),
                            P_("If the caller is allowed to perform the action"),
@@ -449,12 +449,12 @@ g_permission_class_init (GPermissionClass *class)
                            G_PARAM_STATIC_STRINGS | G_PARAM_READABLE));
 
   /**
-   * GPermission:can-acquire:
+   * xpermission_t:can-acquire:
    *
    * %TRUE if it is generally possible to acquire the permission by calling
    * g_permission_acquire().
    */
-   g_object_class_install_property (object_class, PROP_CAN_ACQUIRE,
+   xobject_class_install_property (object_class, PROP_CAN_ACQUIRE,
      g_param_spec_boolean ("can-acquire",
                            P_("Can acquire"),
                            P_("If calling g_permission_acquire() makes sense"),
@@ -462,12 +462,12 @@ g_permission_class_init (GPermissionClass *class)
                            G_PARAM_STATIC_STRINGS | G_PARAM_READABLE));
 
   /**
-   * GPermission:can-release:
+   * xpermission_t:can-release:
    *
    * %TRUE if it is generally possible to release the permission by calling
    * g_permission_release().
    */
-   g_object_class_install_property (object_class, PROP_CAN_RELEASE,
+   xobject_class_install_property (object_class, PROP_CAN_RELEASE,
      g_param_spec_boolean ("can-release",
                            P_("Can release"),
                            P_("If calling g_permission_release() makes sense"),

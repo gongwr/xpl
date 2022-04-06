@@ -68,7 +68,7 @@ typedef void	     (*GModuleUnload)	 (GModule	*module);
 
 #define G_MODULE_ERROR g_module_error_quark () XPL_AVAILABLE_MACRO_IN_2_70
 XPL_AVAILABLE_IN_2_70
-GQuark g_module_error_quark (void);
+xquark g_module_error_quark (void);
 
 /**
  * GModuleError:

@@ -33,9 +33,9 @@ typedef struct
 
 /* deserialization */
 XPL_AVAILABLE_IN_ALL
-xsize_t                           g_variant_serialised_n_children         (GVariantSerialised        container);
+xsize_t                           xvariant_serialised_n_children         (GVariantSerialised        container);
 XPL_AVAILABLE_IN_ALL
-GVariantSerialised              g_variant_serialised_get_child          (GVariantSerialised        container,
+GVariantSerialised              xvariant_serialised_get_child          (GVariantSerialised        container,
                                                                          xsize_t                     index);
 
 /* serialization */
@@ -43,34 +43,34 @@ typedef void                  (*GVariantSerialisedFiller)               (GVarian
                                                                          xpointer_t                  data);
 
 XPL_AVAILABLE_IN_ALL
-xsize_t                           g_variant_serialiser_needed_size        (GVariantTypeInfo         *info,
+xsize_t                           xvariant_serialiser_needed_size        (GVariantTypeInfo         *info,
                                                                          GVariantSerialisedFiller  gsv_filler,
                                                                          const xpointer_t           *children,
                                                                          xsize_t                     n_children);
 
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_serialiser_serialise          (GVariantSerialised        container,
+void                            xvariant_serialiser_serialise          (GVariantSerialised        container,
                                                                          GVariantSerialisedFiller  gsv_filler,
                                                                          const xpointer_t           *children,
                                                                          xsize_t                     n_children);
 
 /* misc */
 XPL_AVAILABLE_IN_2_60
-xboolean_t                        g_variant_serialised_check              (GVariantSerialised        serialised);
+xboolean_t                        xvariant_serialised_check              (GVariantSerialised        serialised);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_serialised_is_normal          (GVariantSerialised        value);
+xboolean_t                        xvariant_serialised_is_normal          (GVariantSerialised        value);
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_serialised_byteswap           (GVariantSerialised        value);
+void                            xvariant_serialised_byteswap           (GVariantSerialised        value);
 
 /* validation of strings */
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_serialiser_is_string          (gconstpointer             data,
+xboolean_t                        xvariant_serialiser_is_string          (xconstpointer             data,
                                                                          xsize_t                     size);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_serialiser_is_object_path     (gconstpointer             data,
+xboolean_t                        xvariant_serialiser_is_object_path     (xconstpointer             data,
                                                                          xsize_t                     size);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_serialiser_is_signature       (gconstpointer             data,
+xboolean_t                        xvariant_serialiser_is_signature       (xconstpointer             data,
                                                                          xsize_t                     size);
 
 #endif /* __G_VARIANT_SERIALISER_H__ */

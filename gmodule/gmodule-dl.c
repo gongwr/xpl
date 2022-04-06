@@ -37,7 +37,7 @@
  */
 #ifndef	G_MODULE_HAVE_DLERROR
 #  ifdef __NetBSD__
-#    define dlerror()	g_strerror (errno)
+#    define dlerror()	xstrerror (errno)
 #  else /* !__NetBSD__ */
 /* could we rely on errno's state here? */
 #    define dlerror()	"unknown dl-error"
@@ -215,11 +215,11 @@ _g_module_build_path (const xchar_t *directory,
 {
   if (directory && *directory) {
     if (strncmp (module_name, "lib", 3) == 0)
-      return g_strconcat (directory, "/", module_name, NULL);
+      return xstrconcat (directory, "/", module_name, NULL);
     else
-      return g_strconcat (directory, "/lib", module_name, "." G_MODULE_SUFFIX, NULL);
+      return xstrconcat (directory, "/lib", module_name, "." G_MODULE_SUFFIX, NULL);
   } else if (strncmp (module_name, "lib", 3) == 0)
-    return g_strdup (module_name);
+    return xstrdup (module_name);
   else
-    return g_strconcat ("lib", module_name, "." G_MODULE_SUFFIX, NULL);
+    return xstrconcat ("lib", module_name, "." G_MODULE_SUFFIX, NULL);
 }

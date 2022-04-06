@@ -75,7 +75,7 @@ G_BEGIN_DECLS
  * Known volume classes include `device`, `network`, and `loop`. Other
  * classes may be added in the future.
  *
- * This is intended to be used by applications to classify #GVolume
+ * This is intended to be used by applications to classify #xvolume_t
  * instances into different sections - for example a file manager or
  * file chooser can use this information to show `network` volumes under
  * a "Network" heading and `device` volumes under a "Devices" heading.
@@ -84,7 +84,7 @@ G_BEGIN_DECLS
 
 
 #define XTYPE_VOLUME            (g_volume_get_type ())
-#define G_VOLUME(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_VOLUME, GVolume))
+#define G_VOLUME(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_VOLUME, xvolume))
 #define X_IS_VOLUME(obj)         (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_VOLUME))
 #define G_VOLUME_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_VOLUME, GVolumeIface))
 
@@ -92,32 +92,32 @@ G_BEGIN_DECLS
  * GVolumeIface:
  * @x_iface: The parent interface.
  * @changed: Changed signal that is emitted when the volume's state has changed.
- * @removed: The removed signal that is emitted when the #GVolume have been removed. If the recipient is holding references to the object they should release them so the object can be finalized.
- * @get_name: Gets a string containing the name of the #GVolume.
- * @get_icon: Gets a #xicon_t for the #GVolume.
- * @get_uuid: Gets the UUID for the #GVolume. The reference is typically based on the file system UUID for the mount in question and should be considered an opaque string. Returns %NULL if there is no UUID available.
- * @get_drive: Gets a #xdrive_t the volume is located on. Returns %NULL if the #GVolume is not associated with a #xdrive_t.
- * @get_mount: Gets a #GMount representing the mounted volume. Returns %NULL if the #GVolume is not mounted.
- * @can_mount: Returns %TRUE if the #GVolume can be mounted.
- * @can_eject: Checks if a #GVolume can be ejected.
- * @mount_fn: Mounts a given #GVolume.
- *     #GVolume implementations must emit the #xmount_operation_t::aborted
+ * @removed: The removed signal that is emitted when the #xvolume_t have been removed. If the recipient is holding references to the object they should release them so the object can be finalized.
+ * @get_name: Gets a string containing the name of the #xvolume_t.
+ * @get_icon: Gets a #xicon_t for the #xvolume_t.
+ * @get_uuid: Gets the UUID for the #xvolume_t. The reference is typically based on the file system UUID for the mount in question and should be considered an opaque string. Returns %NULL if there is no UUID available.
+ * @get_drive: Gets a #xdrive_t the volume is located on. Returns %NULL if the #xvolume_t is not associated with a #xdrive_t.
+ * @get_mount: Gets a #xmount_t representing the mounted volume. Returns %NULL if the #xvolume_t is not mounted.
+ * @can_mount: Returns %TRUE if the #xvolume_t can be mounted.
+ * @can_eject: Checks if a #xvolume_t can be ejected.
+ * @mount_fn: Mounts a given #xvolume_t.
+ *     #xvolume_t implementations must emit the #xmount_operation_t::aborted
  *     signal before completing a mount operation that is aborted while
  *     awaiting input from the user through a #xmount_operation_t instance.
  * @mount_finish: Finishes a mount operation.
- * @eject: Ejects a given #GVolume.
+ * @eject: Ejects a given #xvolume_t.
  * @eject_finish: Finishes an eject operation.
  * @get_identifier: Returns the [identifier][volume-identifier] of the given kind, or %NULL if
- *    the #GVolume doesn't have one.
+ *    the #xvolume_t doesn't have one.
  * @enumerate_identifiers: Returns an array strings listing the kinds
- *    of [identifiers][volume-identifier] which the #GVolume has.
- * @should_automount: Returns %TRUE if the #GVolume should be automatically mounted.
- * @get_activation_root: Returns the activation root for the #GVolume if it is known in advance or %NULL if
+ *    of [identifiers][volume-identifier] which the #xvolume_t has.
+ * @should_automount: Returns %TRUE if the #xvolume_t should be automatically mounted.
+ * @get_activation_root: Returns the activation root for the #xvolume_t if it is known in advance or %NULL if
  *   it is not known.
- * @eject_with_operation: Starts ejecting a #GVolume using a #xmount_operation_t. Since 2.22.
+ * @eject_with_operation: Starts ejecting a #xvolume_t using a #xmount_operation_t. Since 2.22.
  * @eject_with_operation_finish: Finishes an eject operation using a #xmount_operation_t. Since 2.22.
- * @get_sort_key: Gets a key used for sorting #GVolume instance or %NULL if no such key exists. Since 2.32.
- * @get_symbolic_icon: Gets a symbolic #xicon_t for the #GVolume. Since 2.34.
+ * @get_sort_key: Gets a key used for sorting #xvolume_t instance or %NULL if no such key exists. Since 2.32.
+ * @get_symbolic_icon: Gets a symbolic #xicon_t for the #xvolume_t. Since 2.34.
  *
  * Interface for implementing operations for mountable volumes.
  **/
@@ -129,124 +129,124 @@ struct _GVolumeIface
 
   /* signals */
 
-  void        (* changed)               (GVolume             *volume);
-  void        (* removed)               (GVolume             *volume);
+  void        (* changed)               (xvolume_t             *volume);
+  void        (* removed)               (xvolume_t             *volume);
 
   /* Virtual Table */
 
-  char      * (* get_name)              (GVolume             *volume);
-  xicon_t     * (* get_icon)              (GVolume             *volume);
-  char      * (* get_uuid)              (GVolume             *volume);
-  xdrive_t    * (* get_drive)             (GVolume             *volume);
-  GMount    * (* get_mount)             (GVolume             *volume);
-  xboolean_t    (* can_mount)             (GVolume             *volume);
-  xboolean_t    (* can_eject)             (GVolume             *volume);
-  void        (* mount_fn)              (GVolume             *volume,
+  char      * (* get_name)              (xvolume_t             *volume);
+  xicon_t     * (* get_icon)              (xvolume_t             *volume);
+  char      * (* get_uuid)              (xvolume_t             *volume);
+  xdrive_t    * (* get_drive)             (xvolume_t             *volume);
+  xmount_t    * (* get_mount)             (xvolume_t             *volume);
+  xboolean_t    (* can_mount)             (xvolume_t             *volume);
+  xboolean_t    (* can_eject)             (xvolume_t             *volume);
+  void        (* mount_fn)              (xvolume_t             *volume,
                                          GMountMountFlags     flags,
                                          xmount_operation_t     *mount_operation,
                                          xcancellable_t        *cancellable,
                                          xasync_ready_callback_t  callback,
                                          xpointer_t             user_data);
-  xboolean_t    (* mount_finish)          (GVolume             *volume,
+  xboolean_t    (* mount_finish)          (xvolume_t             *volume,
                                          xasync_result_t        *result,
                                          xerror_t             **error);
-  void        (* eject)                 (GVolume             *volume,
+  void        (* eject)                 (xvolume_t             *volume,
                                          xmount_unmount_flags_t   flags,
                                          xcancellable_t        *cancellable,
                                          xasync_ready_callback_t  callback,
                                          xpointer_t             user_data);
-  xboolean_t    (* eject_finish)          (GVolume             *volume,
+  xboolean_t    (* eject_finish)          (xvolume_t             *volume,
                                          xasync_result_t        *result,
                                          xerror_t             **error);
 
-  char      * (* get_identifier)        (GVolume             *volume,
+  char      * (* get_identifier)        (xvolume_t             *volume,
                                          const char          *kind);
-  char     ** (* enumerate_identifiers) (GVolume             *volume);
+  char     ** (* enumerate_identifiers) (xvolume_t             *volume);
 
-  xboolean_t    (* should_automount)      (GVolume             *volume);
+  xboolean_t    (* should_automount)      (xvolume_t             *volume);
 
-  xfile_t     * (* get_activation_root)   (GVolume             *volume);
+  xfile_t     * (* get_activation_root)   (xvolume_t             *volume);
 
-  void        (* eject_with_operation)      (GVolume             *volume,
+  void        (* eject_with_operation)      (xvolume_t             *volume,
                                              xmount_unmount_flags_t   flags,
                                              xmount_operation_t     *mount_operation,
                                              xcancellable_t        *cancellable,
                                              xasync_ready_callback_t  callback,
                                              xpointer_t             user_data);
-  xboolean_t    (* eject_with_operation_finish) (GVolume           *volume,
+  xboolean_t    (* eject_with_operation_finish) (xvolume_t           *volume,
                                              xasync_result_t        *result,
                                              xerror_t             **error);
 
-  const xchar_t * (* get_sort_key)        (GVolume             *volume);
-  xicon_t       * (* get_symbolic_icon)   (GVolume             *volume);
+  const xchar_t * (* get_sort_key)        (xvolume_t             *volume);
+  xicon_t       * (* get_symbolic_icon)   (xvolume_t             *volume);
 };
 
 XPL_AVAILABLE_IN_ALL
 xtype_t    g_volume_get_type              (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-char *   g_volume_get_name              (GVolume              *volume);
+char *   g_volume_get_name              (xvolume_t              *volume);
 XPL_AVAILABLE_IN_ALL
-xicon_t *  g_volume_get_icon              (GVolume              *volume);
+xicon_t *  g_volume_get_icon              (xvolume_t              *volume);
 XPL_AVAILABLE_IN_ALL
-xicon_t *  g_volume_get_symbolic_icon     (GVolume              *volume);
+xicon_t *  g_volume_get_symbolic_icon     (xvolume_t              *volume);
 XPL_AVAILABLE_IN_ALL
-char *   g_volume_get_uuid              (GVolume              *volume);
+char *   g_volume_get_uuid              (xvolume_t              *volume);
 XPL_AVAILABLE_IN_ALL
-xdrive_t * g_volume_get_drive             (GVolume              *volume);
+xdrive_t * g_volume_get_drive             (xvolume_t              *volume);
 XPL_AVAILABLE_IN_ALL
-GMount * g_volume_get_mount             (GVolume              *volume);
+xmount_t * g_volume_get_mount             (xvolume_t              *volume);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_volume_can_mount             (GVolume              *volume);
+xboolean_t g_volume_can_mount             (xvolume_t              *volume);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_volume_can_eject             (GVolume              *volume);
+xboolean_t g_volume_can_eject             (xvolume_t              *volume);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_volume_should_automount      (GVolume              *volume);
+xboolean_t g_volume_should_automount      (xvolume_t              *volume);
 XPL_AVAILABLE_IN_ALL
-void     g_volume_mount                 (GVolume              *volume,
+void     g_volume_mount                 (xvolume_t              *volume,
 					 GMountMountFlags      flags,
 					 xmount_operation_t      *mount_operation,
 					 xcancellable_t         *cancellable,
 					 xasync_ready_callback_t   callback,
 					 xpointer_t              user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_volume_mount_finish          (GVolume              *volume,
+xboolean_t g_volume_mount_finish          (xvolume_t              *volume,
 					 xasync_result_t         *result,
 					 xerror_t              **error);
 XPL_DEPRECATED_FOR(g_volume_eject_with_operation)
-void     g_volume_eject                 (GVolume              *volume,
+void     g_volume_eject                 (xvolume_t              *volume,
                                          xmount_unmount_flags_t    flags,
                                          xcancellable_t         *cancellable,
                                          xasync_ready_callback_t   callback,
                                          xpointer_t              user_data);
 
 XPL_DEPRECATED_FOR(g_volume_eject_with_operation_finish)
-xboolean_t g_volume_eject_finish          (GVolume              *volume,
+xboolean_t g_volume_eject_finish          (xvolume_t              *volume,
                                          xasync_result_t         *result,
                                          xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-char *   g_volume_get_identifier        (GVolume              *volume,
+char *   g_volume_get_identifier        (xvolume_t              *volume,
 					 const char           *kind);
 XPL_AVAILABLE_IN_ALL
-char **  g_volume_enumerate_identifiers (GVolume              *volume);
+char **  g_volume_enumerate_identifiers (xvolume_t              *volume);
 
 XPL_AVAILABLE_IN_ALL
-xfile_t *  g_volume_get_activation_root   (GVolume              *volume);
+xfile_t *  g_volume_get_activation_root   (xvolume_t              *volume);
 
 XPL_AVAILABLE_IN_ALL
-void        g_volume_eject_with_operation     (GVolume             *volume,
+void        g_volume_eject_with_operation     (xvolume_t             *volume,
                                                xmount_unmount_flags_t   flags,
                                                xmount_operation_t     *mount_operation,
                                                xcancellable_t        *cancellable,
                                                xasync_ready_callback_t  callback,
                                                xpointer_t             user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t    g_volume_eject_with_operation_finish (GVolume          *volume,
+xboolean_t    g_volume_eject_with_operation_finish (xvolume_t          *volume,
                                                xasync_result_t        *result,
                                                xerror_t             **error);
 
 XPL_AVAILABLE_IN_2_32
-const xchar_t *g_volume_get_sort_key            (GVolume              *volume);
+const xchar_t *g_volume_get_sort_key            (xvolume_t              *volume);
 
 G_END_DECLS
 

@@ -363,7 +363,7 @@ The name org.freedesktop.NetworkManager is owned by :1.5
   Emitting a signal:
 </para>
 <programlisting>
-$ gdbus emit --session --object-path /foo --signal org.bar.Foo "['foo', 'bar', 'baz']"
+$ gdbus emit --session --object-path /foo --signal org.bar.foo_t "['foo', 'bar', 'baz']"
 </programlisting>
 
 <para>

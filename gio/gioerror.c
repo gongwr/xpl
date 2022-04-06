@@ -39,7 +39,7 @@
  *
  * Gets the GIO Error Quark.
  *
- * Returns: a #GQuark.
+ * Returns: a #xquark.
  **/
 G_DEFINE_QUARK (g-io-error-quark, g_io_error)
 
@@ -303,7 +303,7 @@ g_io_error_from_errno (xint_t err_no)
  * specific value instead).
  *
  * You can use g_win32_error_message() to get a localized string
- * corresponding to @error_code. (But note that unlike g_strerror(),
+ * corresponding to @error_code. (But note that unlike xstrerror(),
  * g_win32_error_message() returns a string that must be freed.)
  *
  * Returns: #GIOErrorEnum value for the given error number.

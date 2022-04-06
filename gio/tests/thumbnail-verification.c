@@ -31,8 +31,8 @@ test_validity (void)
   struct
     {
       const xchar_t *filename;  /* name of a file in the tests/thumbnails dir */
-      guint64 mtime;  /* asserted mtime of @filename */
-      guint64 size;  /* asserted size of @filename */
+      xuint64_t mtime;  /* asserted mtime of @filename */
+      xuint64_t size;  /* asserted size of @filename */
       xboolean_t expected_validity;  /* should thumbnail_verify() succeed? */
     }
   tests[] =
@@ -98,7 +98,7 @@ test_validity (void)
 
       thumbnail_path = g_test_get_filename (G_TEST_DIST, "thumbnails",
                                             tests[i].filename, NULL);
-      file_uri = g_strconcat ("file:///tmp/", tests[i].filename, NULL);
+      file_uri = xstrconcat ("file:///tmp/", tests[i].filename, NULL);
 #ifdef HAVE_STATX
       stat_buf.stx_mtime.tv_sec = tests[i].mtime;
       stat_buf.stx_size = tests[i].size;

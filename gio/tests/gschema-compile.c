@@ -15,7 +15,7 @@ static void
 test_schema_do_compile (xpointer_t data)
 {
   SchemaTest *test = (SchemaTest *) data;
-  xchar_t *filename = g_strconcat (test->name, ".gschema.xml", NULL);
+  xchar_t *filename = xstrconcat (test->name, ".gschema.xml", NULL);
   xchar_t *path = g_test_build_filename (G_TEST_DIST, "schema-tests", filename, NULL);
   const xchar_t *argv[] = {
     XPL_COMPILE_SCHEMAS,  /* defined in meson.build */
@@ -37,7 +37,7 @@ test_schema (xpointer_t data)
   SchemaTest *test = (SchemaTest *) data;
   xchar_t *child_name;
 
-  child_name = g_strdup_printf ("/gschema/%s%s/subprocess/do_compile", test->name, test->opt ? "/opt" : "");
+  child_name = xstrdup_printf ("/gschema/%s%s/subprocess/do_compile", test->name, test->opt ? "/opt" : "");
   g_test_trap_subprocess (child_name, 0, 0);
   g_free (child_name);
 
@@ -151,11 +151,11 @@ main (int argc, char *argv[])
     {
       xchar_t *name;
 
-      name = g_strdup_printf ("/gschema/%s%s", tests[i].name, tests[i].opt ? "/opt" : "");
+      name = xstrdup_printf ("/gschema/%s%s", tests[i].name, tests[i].opt ? "/opt" : "");
       g_test_add_data_func (name, &tests[i], (xpointer_t) test_schema);
       g_free (name);
 
-      name = g_strdup_printf ("/gschema/%s%s/subprocess/do_compile", tests[i].name, tests[i].opt ? "/opt" : "");
+      name = xstrdup_printf ("/gschema/%s%s/subprocess/do_compile", tests[i].name, tests[i].opt ? "/opt" : "");
       g_test_add_data_func (name, &tests[i], (xpointer_t) test_schema_do_compile);
       g_free (name);
     }

@@ -66,24 +66,24 @@
 
 
 #define CC_PART1(Page, Char) \
-  ((combining_class_table_part1[Page] >= G_UNICODE_MAX_TABLE_INDEX) \
-   ? (combining_class_table_part1[Page] - G_UNICODE_MAX_TABLE_INDEX) \
+  ((combining_class_table_part1[Page] >= XUNICODE_MAX_TABLE_INDEX) \
+   ? (combining_class_table_part1[Page] - XUNICODE_MAX_TABLE_INDEX) \
    : (cclass_data[combining_class_table_part1[Page]][Char]))
 
 #define CC_PART2(Page, Char) \
-  ((combining_class_table_part2[Page] >= G_UNICODE_MAX_TABLE_INDEX) \
-   ? (combining_class_table_part2[Page] - G_UNICODE_MAX_TABLE_INDEX) \
+  ((combining_class_table_part2[Page] >= XUNICODE_MAX_TABLE_INDEX) \
+   ? (combining_class_table_part2[Page] - XUNICODE_MAX_TABLE_INDEX) \
    : (cclass_data[combining_class_table_part2[Page]][Char]))
 
 #define COMBINING_CLASS(Char) \
-  (((Char) <= G_UNICODE_LAST_CHAR_PART1) \
+  (((Char) <= XUNICODE_LAST_CHAR_PART1) \
    ? CC_PART1 ((Char) >> 8, (Char) & 0xff) \
-   : (((Char) >= 0xe0000 && (Char) <= G_UNICODE_LAST_CHAR) \
+   : (((Char) >= 0xe0000 && (Char) <= XUNICODE_LAST_CHAR) \
       ? CC_PART2 (((Char) - 0xe0000) >> 8, (Char) & 0xff) \
       : 0))
 
 /**
- * g_unichar_combining_class:
+ * xunichar_combining_class:
  * @uc: a Unicode character
  *
  * Determines the canonical combining class of a Unicode character.
@@ -93,7 +93,7 @@
  * Since: 2.14
  **/
 xint_t
-g_unichar_combining_class (gunichar uc)
+xunichar_combining_class (xunichar_t uc)
 {
   return COMBINING_CLASS (uc);
 }
@@ -110,7 +110,7 @@ g_unichar_combining_class (gunichar uc)
 #define SCount (LCount * NCount)
 
 /**
- * g_unicode_canonical_ordering:
+ * xunicode_canonical_ordering:
  * @string: a UCS-4 encoded string.
  * @len: the maximum length of @string to use.
  *
@@ -120,7 +120,7 @@ g_unichar_combining_class (gunichar uc)
  * manual for more information.
  **/
 void
-g_unicode_canonical_ordering (gunichar *string,
+xunicode_canonical_ordering (xunichar_t *string,
 			      xsize_t     len)
 {
   xsize_t i;
@@ -140,7 +140,7 @@ g_unicode_canonical_ordering (gunichar *string,
 	      /* Percolate item leftward through string.  */
 	      for (j = i + 1; j > 0; --j)
 		{
-		  gunichar t;
+		  xunichar_t t;
 		  if (COMBINING_CLASS (string[j - 1]) <= next)
 		    break;
 		  t = string[j];
@@ -162,8 +162,8 @@ g_unicode_canonical_ordering (gunichar *string,
  * only calculate the result_len; however, a buffer with space for three
  * characters will always be big enough. */
 static void
-decompose_hangul (gunichar s,
-                  gunichar *r,
+decompose_hangul (xunichar_t s,
+                  xunichar_t *r,
                   xsize_t *result_len)
 {
   xint_t SIndex = s - SBase;
@@ -187,7 +187,7 @@ decompose_hangul (gunichar s,
 
 /* returns a pointer to a null-terminated UTF-8 string */
 static const xchar_t *
-find_decomposition (gunichar ch,
+find_decomposition (xunichar_t ch,
 		    xboolean_t compat)
 {
   int start = 0;
@@ -206,13 +206,13 @@ find_decomposition (gunichar ch,
 	      if (compat)
 		{
 		  offset = decomp_table[half].compat_offset;
-		  if (offset == G_UNICODE_NOT_PRESENT_OFFSET)
+		  if (offset == XUNICODE_NOT_PRESENT_OFFSET)
 		    offset = decomp_table[half].canon_offset;
 		}
 	      else
 		{
 		  offset = decomp_table[half].canon_offset;
-		  if (offset == G_UNICODE_NOT_PRESENT_OFFSET)
+		  if (offset == XUNICODE_NOT_PRESENT_OFFSET)
 		    return NULL;
 		}
 
@@ -231,7 +231,7 @@ find_decomposition (gunichar ch,
 }
 
 /**
- * g_unicode_canonical_decomposition:
+ * xunicode_canonical_decomposition:
  * @ch: a Unicode character.
  * @result_len: location to store the length of the return value.
  *
@@ -240,22 +240,22 @@ find_decomposition (gunichar ch,
  * Returns: a newly allocated string of Unicode characters.
  *   @result_len is set to the resulting length of the string.
  *
- * Deprecated: 2.30: Use the more flexible g_unichar_fully_decompose()
+ * Deprecated: 2.30: Use the more flexible xunichar_fully_decompose()
  *   instead.
  **/
-gunichar *
-g_unicode_canonical_decomposition (gunichar ch,
+xunichar_t *
+xunicode_canonical_decomposition (xunichar_t ch,
 				   xsize_t   *result_len)
 {
   const xchar_t *decomp;
   const xchar_t *p;
-  gunichar *r;
+  xunichar_t *r;
 
   /* Hangul syllable */
   if (ch >= SBase && ch < SBase + SCount)
     {
       decompose_hangul (ch, NULL, result_len);
-      r = g_malloc (*result_len * sizeof (gunichar));
+      r = g_malloc (*result_len * sizeof (xunichar_t));
       decompose_hangul (ch, r, result_len);
     }
   else if ((decomp = find_decomposition (ch, FALSE)) != NULL)
@@ -263,16 +263,16 @@ g_unicode_canonical_decomposition (gunichar ch,
       /* Found it.  */
       int i;
 
-      *result_len = g_utf8_strlen (decomp, -1);
-      r = g_malloc (*result_len * sizeof (gunichar));
+      *result_len = xutf8_strlen (decomp, -1);
+      r = g_malloc (*result_len * sizeof (xunichar_t));
 
-      for (p = decomp, i = 0; *p != '\0'; p = g_utf8_next_char (p), i++)
-        r[i] = g_utf8_get_char (p);
+      for (p = decomp, i = 0; *p != '\0'; p = xutf8_next_char (p), i++)
+        r[i] = xutf8_get_char (p);
     }
   else
     {
       /* Not in our table.  */
-      r = g_malloc (sizeof (gunichar));
+      r = g_malloc (sizeof (xunichar_t));
       *r = ch;
       *result_len = 1;
     }
@@ -282,9 +282,9 @@ g_unicode_canonical_decomposition (gunichar ch,
 
 /* L,V => LV and LV,T => LVT  */
 static xboolean_t
-combine_hangul (gunichar a,
-                gunichar b,
-                gunichar *result)
+combine_hangul (xunichar_t a,
+                xunichar_t b,
+                xunichar_t *result)
 {
   xint_t LIndex = a - LBase;
   xint_t SIndex = a - SBase;
@@ -309,17 +309,17 @@ combine_hangul (gunichar a,
 }
 
 #define CI(Page, Char) \
-  ((compose_table[Page] >= G_UNICODE_MAX_TABLE_INDEX) \
-   ? (compose_table[Page] - G_UNICODE_MAX_TABLE_INDEX) \
+  ((compose_table[Page] >= XUNICODE_MAX_TABLE_INDEX) \
+   ? (compose_table[Page] - XUNICODE_MAX_TABLE_INDEX) \
    : (compose_data[compose_table[Page]][Char]))
 
 #define COMPOSE_INDEX(Char) \
      (((Char >> 8) > (COMPOSE_TABLE_LAST)) ? 0 : CI((Char) >> 8, (Char) & 0xff))
 
 static xboolean_t
-combine (gunichar  a,
-	 gunichar  b,
-	 gunichar *result)
+combine (xunichar_t  a,
+	 xunichar_t  b,
+	 xunichar_t *result)
 {
   gushort index_a, index_b;
 
@@ -355,7 +355,7 @@ combine (gunichar  a,
   if (index_a >= COMPOSE_FIRST_START && index_a < COMPOSE_FIRST_SINGLE_START &&
       index_b >= COMPOSE_SECOND_START && index_b < COMPOSE_SECOND_SINGLE_START)
     {
-      gunichar res = compose_array[index_a - COMPOSE_FIRST_START][index_b - COMPOSE_SECOND_START];
+      xunichar_t res = compose_array[index_a - COMPOSE_FIRST_START][index_b - COMPOSE_SECOND_START];
 
       if (res)
 	{
@@ -367,26 +367,26 @@ combine (gunichar  a,
   return FALSE;
 }
 
-gunichar *
-_g_utf8_normalize_wc (const xchar_t    *str,
-		      gssize          max_len,
-		      GNormalizeMode  mode)
+xunichar_t *
+_xutf8_normalize_wc (const xchar_t    *str,
+		      xssize_t          max_len,
+		      xnormalize_mode_t  mode)
 {
   xsize_t n_wc;
-  gunichar *wc_buffer;
+  xunichar_t *wc_buffer;
   const char *p;
   xsize_t last_start;
-  xboolean_t do_compat = (mode == G_NORMALIZE_NFKC ||
-			mode == G_NORMALIZE_NFKD);
-  xboolean_t do_compose = (mode == G_NORMALIZE_NFC ||
-			 mode == G_NORMALIZE_NFKC);
+  xboolean_t do_compat = (mode == XNORMALIZE_NFKC ||
+			mode == XNORMALIZE_NFKD);
+  xboolean_t do_compose = (mode == XNORMALIZE_NFC ||
+			 mode == XNORMALIZE_NFKC);
 
   n_wc = 0;
   p = str;
   while ((max_len < 0 || p < str + max_len) && *p)
     {
       const xchar_t *decomp;
-      gunichar wc = g_utf8_get_char (p);
+      xunichar_t wc = xutf8_get_char (p);
 
       if (wc >= SBase && wc < SBase + SCount)
         {
@@ -399,22 +399,22 @@ _g_utf8_normalize_wc (const xchar_t    *str,
           decomp = find_decomposition (wc, do_compat);
 
           if (decomp)
-            n_wc += g_utf8_strlen (decomp, -1);
+            n_wc += xutf8_strlen (decomp, -1);
           else
             n_wc++;
         }
 
-      p = g_utf8_next_char (p);
+      p = xutf8_next_char (p);
     }
 
-  wc_buffer = g_new (gunichar, n_wc + 1);
+  wc_buffer = g_new (xunichar_t, n_wc + 1);
 
   last_start = 0;
   n_wc = 0;
   p = str;
   while ((max_len < 0 || p < str + max_len) && *p)
     {
-      gunichar wc = g_utf8_get_char (p);
+      xunichar_t wc = xutf8_get_char (p);
       const xchar_t *decomp;
       int cc;
       xsize_t old_n_wc = n_wc;
@@ -432,8 +432,8 @@ _g_utf8_normalize_wc (const xchar_t    *str,
           if (decomp)
             {
               const char *pd;
-              for (pd = decomp; *pd != '\0'; pd = g_utf8_next_char (pd))
-                wc_buffer[n_wc++] = g_utf8_get_char (pd);
+              for (pd = decomp; *pd != '\0'; pd = xutf8_next_char (pd))
+                wc_buffer[n_wc++] = xutf8_get_char (pd);
             }
           else
             wc_buffer[n_wc++] = wc;
@@ -445,17 +445,17 @@ _g_utf8_normalize_wc (const xchar_t    *str,
 
 	  if (cc == 0)
 	    {
-	      g_unicode_canonical_ordering (wc_buffer + last_start, n_wc - last_start);
+	      xunicode_canonical_ordering (wc_buffer + last_start, n_wc - last_start);
 	      last_start = old_n_wc;
 	    }
 	}
 
-      p = g_utf8_next_char (p);
+      p = xutf8_next_char (p);
     }
 
   if (n_wc > 0)
     {
-      g_unicode_canonical_ordering (wc_buffer + last_start, n_wc - last_start);
+      xunicode_canonical_ordering (wc_buffer + last_start, n_wc - last_start);
       last_start = n_wc;
       (void) last_start;
     }
@@ -505,7 +505,7 @@ _g_utf8_normalize_wc (const xchar_t    *str,
 }
 
 /**
- * g_utf8_normalize:
+ * xutf8_normalize:
  * @str: a UTF-8 encoded string.
  * @len: length of @str, in bytes, or -1 if @str is nul-terminated.
  * @mode: the type of normalization to perform.
@@ -515,21 +515,21 @@ _g_utf8_normalize_wc (const xchar_t    *str,
  * is represented as a base character and combining
  * accent or as a single precomposed character. The
  * string has to be valid UTF-8, otherwise %NULL is
- * returned. You should generally call g_utf8_normalize()
+ * returned. You should generally call xutf8_normalize()
  * before comparing two Unicode strings.
  *
- * The normalization mode %G_NORMALIZE_DEFAULT only
+ * The normalization mode %XNORMALIZE_DEFAULT only
  * standardizes differences that do not affect the
  * text content, such as the above-mentioned accent
- * representation. %G_NORMALIZE_ALL also standardizes
+ * representation. %XNORMALIZE_ALL also standardizes
  * the "compatibility" characters in Unicode, such
  * as SUPERSCRIPT THREE to the standard forms
  * (in this case DIGIT THREE). Formatting information
  * may be lost but for most text operations such
  * characters should be considered the same.
  *
- * %G_NORMALIZE_DEFAULT_COMPOSE and %G_NORMALIZE_ALL_COMPOSE
- * are like %G_NORMALIZE_DEFAULT and %G_NORMALIZE_ALL,
+ * %XNORMALIZE_DEFAULT_COMPOSE and %XNORMALIZE_ALL_COMPOSE
+ * are like %XNORMALIZE_DEFAULT and %XNORMALIZE_ALL,
  * but returned a result with composed forms rather
  * than a maximally decomposed form. This is often
  * useful if you intend to convert the string to
@@ -541,11 +541,11 @@ _g_utf8_normalize_wc (const xchar_t    *str,
  *   is not valid UTF-8.
  **/
 xchar_t *
-g_utf8_normalize (const xchar_t    *str,
-		  gssize          len,
-		  GNormalizeMode  mode)
+xutf8_normalize (const xchar_t    *str,
+		  xssize_t          len,
+		  xnormalize_mode_t  mode)
 {
-  gunichar *result_wc = _g_utf8_normalize_wc (str, len, mode);
+  xunichar_t *result_wc = _xutf8_normalize_wc (str, len, mode);
   xchar_t *result;
 
   result = g_ucs4_to_utf8 (result_wc, -1, NULL, NULL, NULL);
@@ -555,9 +555,9 @@ g_utf8_normalize (const xchar_t    *str,
 }
 
 static xboolean_t
-decompose_hangul_step (gunichar  ch,
-                       gunichar *a,
-                       gunichar *b)
+decompose_hangul_step (xunichar_t  ch,
+                       xunichar_t *a,
+                       xunichar_t *b)
 {
   xint_t SIndex, TIndex;
 
@@ -584,7 +584,7 @@ decompose_hangul_step (gunichar  ch,
 }
 
 /**
- * g_unichar_decompose:
+ * xunichar_decompose:
  * @ch: a Unicode character
  * @a: (out) (not optional): return location for the first component of @ch
  * @b: (out) (not optional): return location for the second component of @ch
@@ -607,7 +607,7 @@ decompose_hangul_step (gunichar  ch,
  * further, but @a may itself decompose.  To get the full
  * canonical decomposition for @ch, one would need to
  * recursively call this function on @a.  Or use
- * g_unichar_fully_decompose().
+ * xunichar_fully_decompose().
  *
  * See
  * [UAX#15](http://unicode.org/reports/tr15/)
@@ -618,9 +618,9 @@ decompose_hangul_step (gunichar  ch,
  * Since: 2.30
  */
 xboolean_t
-g_unichar_decompose (gunichar  ch,
-                     gunichar *a,
-                     gunichar *b)
+xunichar_decompose (xunichar_t  ch,
+                     xunichar_t *a,
+                     xunichar_t *b)
 {
   xint_t start = 0;
   xint_t end = G_N_ELEMENTS (decomp_step_table);
@@ -658,7 +658,7 @@ g_unichar_decompose (gunichar  ch,
 }
 
 /**
- * g_unichar_compose:
+ * xunichar_compose:
  * @a: a Unicode character
  * @b: a Unicode character
  * @ch: (out) (not optional): return location for the composed character
@@ -667,7 +667,7 @@ g_unichar_decompose (gunichar  ch,
  * Unicode canonical composition algorithm.
  *
  * This function includes algorithmic Hangul Jamo composition,
- * but it is not exactly the inverse of g_unichar_decompose().
+ * but it is not exactly the inverse of xunichar_decompose().
  * No composition can have either of @a or @b equal to zero.
  * To be precise, this function composes if and only if
  * there exists a Primary Composite P which is canonically
@@ -685,9 +685,9 @@ g_unichar_decompose (gunichar  ch,
  * Since: 2.30
  */
 xboolean_t
-g_unichar_compose (gunichar  a,
-                   gunichar  b,
-                   gunichar *ch)
+xunichar_compose (xunichar_t  a,
+                   xunichar_t  b,
+                   xunichar_t *ch)
 {
   if (combine (a, b, ch))
     return TRUE;
@@ -697,7 +697,7 @@ g_unichar_compose (gunichar  a,
 }
 
 /**
- * g_unichar_fully_decompose:
+ * xunichar_fully_decompose:
  * @ch: a Unicode character.
  * @compat: whether perform canonical or compatibility decomposition
  * @result: (optional) (out caller-allocates): location to store decomposed result, or %NULL
@@ -728,9 +728,9 @@ g_unichar_compose (gunichar  a,
  * Since: 2.30
  **/
 xsize_t
-g_unichar_fully_decompose (gunichar  ch,
+xunichar_fully_decompose (xunichar_t  ch,
 			   xboolean_t  compat,
-			   gunichar *result,
+			   xunichar_t *result,
 			   xsize_t     result_len)
 {
   const xchar_t *decomp;
@@ -740,7 +740,7 @@ g_unichar_fully_decompose (gunichar  ch,
   if (ch >= SBase && ch < SBase + SCount)
     {
       xsize_t len, i;
-      gunichar buffer[3];
+      xunichar_t buffer[3];
       decompose_hangul (ch, result ? buffer : NULL, &len);
       if (result)
         for (i = 0; i < len && i < result_len; i++)
@@ -752,10 +752,10 @@ g_unichar_fully_decompose (gunichar  ch,
       /* Found it.  */
       xsize_t len, i;
 
-      len = g_utf8_strlen (decomp, -1);
+      len = xutf8_strlen (decomp, -1);
 
-      for (p = decomp, i = 0; i < len && i < result_len; p = g_utf8_next_char (p), i++)
-        result[i] = g_utf8_get_char (p);
+      for (p = decomp, i = 0; i < len && i < result_len; p = xutf8_next_char (p), i++)
+        result[i] = xutf8_get_char (p);
 
       return len;
     }

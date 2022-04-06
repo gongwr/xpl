@@ -65,20 +65,20 @@
  * SECTION:gsocketclient
  * @short_description: Helper for connecting to a network service
  * @include: gio/gio.h
- * @see_also: #xsocket_connection_t, #GSocketListener
+ * @see_also: #xsocket_connection_t, #xsocket_listener_t
  *
- * #GSocketClient is a lightweight high-level utility class for connecting to
+ * #xsocket_client_t is a lightweight high-level utility class for connecting to
  * a network host using a connection oriented socket type.
  *
- * You create a #GSocketClient object, set any options you want, and then
+ * You create a #xsocket_client_t object, set any options you want, and then
  * call a sync or async connect operation, which returns a #xsocket_connection_t
  * subclass on success.
  *
  * The type of the #xsocket_connection_t object returned depends on the type of
  * the underlying socket that is in use. For instance, for a TCP/IP connection
- * it will be a #GTcpConnection.
+ * it will be a #xtcp_connection_t.
  *
- * As #GSocketClient is a lightweight object, you don't need to cache it. You
+ * As #xsocket_client_t is a lightweight object, you don't need to cache it. You
  * can just create a new one any time you need one.
  *
  * Since: 2.22
@@ -115,16 +115,16 @@ struct _GSocketClientPrivate
   xsocket_address_t *local_address;
   xuint_t timeout;
   xboolean_t enable_proxy;
-  GHashTable *app_proxies;
+  xhashtable_t *app_proxies;
   xboolean_t tls;
   GTlsCertificateFlags tls_validation_flags;
-  GProxyResolver *proxy_resolver;
+  xproxy_resolver_t *proxy_resolver;
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (GSocketClient, xsocket_client, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (xsocket_client_t, xsocket_client, XTYPE_OBJECT)
 
 static xsocket_t *
-create_socket (GSocketClient  *client,
+create_socket (xsocket_client_t  *client,
 	       xsocket_address_t *dest_address,
 	       xerror_t        **error)
 {
@@ -156,7 +156,7 @@ create_socket (GSocketClient  *client,
 			  FALSE,
 			  error))
 	{
-	  g_object_unref (socket);
+	  xobject_unref (socket);
 	  return NULL;
 	}
     }
@@ -168,7 +168,7 @@ create_socket (GSocketClient  *client,
 }
 
 static xboolean_t
-can_use_proxy (GSocketClient *client)
+can_use_proxy (xsocket_client_t *client)
 {
   GSocketClientPrivate *priv = client->priv;
 
@@ -178,7 +178,7 @@ can_use_proxy (GSocketClient *client)
 
 static void
 clarify_connect_error (xerror_t             *error,
-		       GSocketConnectable *connectable,
+		       xsocket_connectable_t *connectable,
 		       xsocket_address_t     *address)
 {
   const char *name;
@@ -211,12 +211,12 @@ clarify_connect_error (xerror_t             *error,
 }
 
 static void
-xsocket_client_init (GSocketClient *client)
+xsocket_client_init (xsocket_client_t *client)
 {
   client->priv = xsocket_client_get_instance_private (client);
   client->priv->type = XSOCKET_TYPE_STREAM;
-  client->priv->app_proxies = g_hash_table_new_full (g_str_hash,
-						     g_str_equal,
+  client->priv->app_proxies = xhash_table_new_full (xstr_hash,
+						     xstr_equal,
 						     g_free,
 						     NULL);
 }
@@ -224,78 +224,78 @@ xsocket_client_init (GSocketClient *client)
 /**
  * xsocket_client_new:
  *
- * Creates a new #GSocketClient with the default options.
+ * Creates a new #xsocket_client_t with the default options.
  *
- * Returns: a #GSocketClient.
- *     Free the returned object with g_object_unref().
+ * Returns: a #xsocket_client_t.
+ *     Free the returned object with xobject_unref().
  *
  * Since: 2.22
  */
-GSocketClient *
+xsocket_client_t *
 xsocket_client_new (void)
 {
-  return g_object_new (XTYPE_SOCKET_CLIENT, NULL);
+  return xobject_new (XTYPE_SOCKET_CLIENT, NULL);
 }
 
 static void
 xsocket_client_finalize (xobject_t *object)
 {
-  GSocketClient *client = XSOCKET_CLIENT (object);
+  xsocket_client_t *client = XSOCKET_CLIENT (object);
 
   g_clear_object (&client->priv->local_address);
   g_clear_object (&client->priv->proxy_resolver);
 
   G_OBJECT_CLASS (xsocket_client_parent_class)->finalize (object);
 
-  g_hash_table_unref (client->priv->app_proxies);
+  xhash_table_unref (client->priv->app_proxies);
 }
 
 static void
 xsocket_client_get_property (xobject_t    *object,
 			      xuint_t       prop_id,
-			      GValue     *value,
-			      GParamSpec *pspec)
+			      xvalue_t     *value,
+			      xparam_spec_t *pspec)
 {
-  GSocketClient *client = XSOCKET_CLIENT (object);
+  xsocket_client_t *client = XSOCKET_CLIENT (object);
 
   switch (prop_id)
     {
       case PROP_FAMILY:
-	g_value_set_enum (value, client->priv->family);
+	xvalue_set_enum (value, client->priv->family);
 	break;
 
       case PROP_TYPE:
-	g_value_set_enum (value, client->priv->type);
+	xvalue_set_enum (value, client->priv->type);
 	break;
 
       case PROP_PROTOCOL:
-	g_value_set_enum (value, client->priv->protocol);
+	xvalue_set_enum (value, client->priv->protocol);
 	break;
 
       case PROP_LOCAL_ADDRESS:
-	g_value_set_object (value, client->priv->local_address);
+	xvalue_set_object (value, client->priv->local_address);
 	break;
 
       case PROP_TIMEOUT:
-	g_value_set_uint (value, client->priv->timeout);
+	xvalue_set_uint (value, client->priv->timeout);
 	break;
 
       case PROP_ENABLE_PROXY:
-	g_value_set_boolean (value, client->priv->enable_proxy);
+	xvalue_set_boolean (value, client->priv->enable_proxy);
 	break;
 
       case PROP_TLS:
-	g_value_set_boolean (value, xsocket_client_get_tls (client));
+	xvalue_set_boolean (value, xsocket_client_get_tls (client));
 	break;
 
       case PROP_TLS_VALIDATION_FLAGS:
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-	g_value_set_flags (value, xsocket_client_get_tls_validation_flags (client));
+	xvalue_set_flags (value, xsocket_client_get_tls_validation_flags (client));
 G_GNUC_END_IGNORE_DEPRECATIONS
 	break;
 
       case PROP_PROXY_RESOLVER:
-	g_value_set_object (value, xsocket_client_get_proxy_resolver (client));
+	xvalue_set_object (value, xsocket_client_get_proxy_resolver (client));
 	break;
 
       default:
@@ -306,49 +306,49 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 static void
 xsocket_client_set_property (xobject_t      *object,
 			      xuint_t         prop_id,
-			      const GValue *value,
-			      GParamSpec   *pspec)
+			      const xvalue_t *value,
+			      xparam_spec_t   *pspec)
 {
-  GSocketClient *client = XSOCKET_CLIENT (object);
+  xsocket_client_t *client = XSOCKET_CLIENT (object);
 
   switch (prop_id)
     {
     case PROP_FAMILY:
-      xsocket_client_set_family (client, g_value_get_enum (value));
+      xsocket_client_set_family (client, xvalue_get_enum (value));
       break;
 
     case PROP_TYPE:
-      xsocket_client_set_socket_type (client, g_value_get_enum (value));
+      xsocket_client_set_socket_type (client, xvalue_get_enum (value));
       break;
 
     case PROP_PROTOCOL:
-      xsocket_client_set_protocol (client, g_value_get_enum (value));
+      xsocket_client_set_protocol (client, xvalue_get_enum (value));
       break;
 
     case PROP_LOCAL_ADDRESS:
-      xsocket_client_set_local_address (client, g_value_get_object (value));
+      xsocket_client_set_local_address (client, xvalue_get_object (value));
       break;
 
     case PROP_TIMEOUT:
-      xsocket_client_set_timeout (client, g_value_get_uint (value));
+      xsocket_client_set_timeout (client, xvalue_get_uint (value));
       break;
 
     case PROP_ENABLE_PROXY:
-      xsocket_client_set_enable_proxy (client, g_value_get_boolean (value));
+      xsocket_client_set_enable_proxy (client, xvalue_get_boolean (value));
       break;
 
     case PROP_TLS:
-      xsocket_client_set_tls (client, g_value_get_boolean (value));
+      xsocket_client_set_tls (client, xvalue_get_boolean (value));
       break;
 
     case PROP_TLS_VALIDATION_FLAGS:
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-      xsocket_client_set_tls_validation_flags (client, g_value_get_flags (value));
+      xsocket_client_set_tls_validation_flags (client, xvalue_get_flags (value));
 G_GNUC_END_IGNORE_DEPRECATIONS
       break;
 
     case PROP_PROXY_RESOLVER:
-      xsocket_client_set_proxy_resolver (client, g_value_get_object (value));
+      xsocket_client_set_proxy_resolver (client, xvalue_get_object (value));
       break;
 
     default:
@@ -358,7 +358,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
  * xsocket_client_get_family:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  *
  * Gets the socket family of the socket client.
  *
@@ -369,14 +369,14 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * Since: 2.22
  */
 xsocket_family_t
-xsocket_client_get_family (GSocketClient *client)
+xsocket_client_get_family (xsocket_client_t *client)
 {
   return client->priv->family;
 }
 
 /**
  * xsocket_client_set_family:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  * @family: a #xsocket_family_t
  *
  * Sets the socket family of the socket client.
@@ -391,19 +391,19 @@ xsocket_client_get_family (GSocketClient *client)
  * Since: 2.22
  */
 void
-xsocket_client_set_family (GSocketClient *client,
+xsocket_client_set_family (xsocket_client_t *client,
 			    xsocket_family_t  family)
 {
   if (client->priv->family == family)
     return;
 
   client->priv->family = family;
-  g_object_notify (G_OBJECT (client), "family");
+  xobject_notify (G_OBJECT (client), "family");
 }
 
 /**
  * xsocket_client_get_socket_type:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  *
  * Gets the socket type of the socket client.
  *
@@ -414,14 +414,14 @@ xsocket_client_set_family (GSocketClient *client,
  * Since: 2.22
  */
 xsocket_type_t
-xsocket_client_get_socket_type (GSocketClient *client)
+xsocket_client_get_socket_type (xsocket_client_t *client)
 {
   return client->priv->type;
 }
 
 /**
  * xsocket_client_set_socket_type:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  * @type: a #xsocket_type_t
  *
  * Sets the socket type of the socket client.
@@ -429,24 +429,24 @@ xsocket_client_get_socket_type (GSocketClient *client)
  * type.
  *
  * It doesn't make sense to specify a type of %XSOCKET_TYPE_DATAGRAM,
- * as GSocketClient is used for connection oriented services.
+ * as xsocket_client_t is used for connection oriented services.
  *
  * Since: 2.22
  */
 void
-xsocket_client_set_socket_type (GSocketClient *client,
+xsocket_client_set_socket_type (xsocket_client_t *client,
 				 xsocket_type_t    type)
 {
   if (client->priv->type == type)
     return;
 
   client->priv->type = type;
-  g_object_notify (G_OBJECT (client), "type");
+  xobject_notify (G_OBJECT (client), "type");
 }
 
 /**
  * xsocket_client_get_protocol:
- * @client: a #GSocketClient
+ * @client: a #xsocket_client_t
  *
  * Gets the protocol name type of the socket client.
  *
@@ -457,14 +457,14 @@ xsocket_client_set_socket_type (GSocketClient *client,
  * Since: 2.22
  */
 GSocketProtocol
-xsocket_client_get_protocol (GSocketClient *client)
+xsocket_client_get_protocol (xsocket_client_t *client)
 {
   return client->priv->protocol;
 }
 
 /**
  * xsocket_client_set_protocol:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  * @protocol: a #GSocketProtocol
  *
  * Sets the protocol of the socket client.
@@ -477,19 +477,19 @@ xsocket_client_get_protocol (GSocketClient *client)
  * Since: 2.22
  */
 void
-xsocket_client_set_protocol (GSocketClient   *client,
+xsocket_client_set_protocol (xsocket_client_t   *client,
 			      GSocketProtocol  protocol)
 {
   if (client->priv->protocol == protocol)
     return;
 
   client->priv->protocol = protocol;
-  g_object_notify (G_OBJECT (client), "protocol");
+  xobject_notify (G_OBJECT (client), "protocol");
 }
 
 /**
  * xsocket_client_get_local_address:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  *
  * Gets the local address of the socket client.
  *
@@ -500,14 +500,14 @@ xsocket_client_set_protocol (GSocketClient   *client,
  * Since: 2.22
  */
 xsocket_address_t *
-xsocket_client_get_local_address (GSocketClient *client)
+xsocket_client_get_local_address (xsocket_client_t *client)
 {
   return client->priv->local_address;
 }
 
 /**
  * xsocket_client_set_local_address:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  * @address: (nullable): a #xsocket_address_t, or %NULL
  *
  * Sets the local address of the socket client.
@@ -521,23 +521,23 @@ xsocket_client_get_local_address (GSocketClient *client)
  * Since: 2.22
  */
 void
-xsocket_client_set_local_address (GSocketClient  *client,
+xsocket_client_set_local_address (xsocket_client_t  *client,
 				   xsocket_address_t *address)
 {
   if (address)
-    g_object_ref (address);
+    xobject_ref (address);
 
   if (client->priv->local_address)
     {
-      g_object_unref (client->priv->local_address);
+      xobject_unref (client->priv->local_address);
     }
   client->priv->local_address = address;
-  g_object_notify (G_OBJECT (client), "local-address");
+  xobject_notify (G_OBJECT (client), "local-address");
 }
 
 /**
  * xsocket_client_get_timeout:
- * @client: a #GSocketClient
+ * @client: a #xsocket_client_t
  *
  * Gets the I/O timeout time for sockets created by @client.
  *
@@ -548,7 +548,7 @@ xsocket_client_set_local_address (GSocketClient  *client,
  * Since: 2.26
  */
 xuint_t
-xsocket_client_get_timeout (GSocketClient *client)
+xsocket_client_get_timeout (xsocket_client_t *client)
 {
   return client->priv->timeout;
 }
@@ -556,7 +556,7 @@ xsocket_client_get_timeout (GSocketClient *client)
 
 /**
  * xsocket_client_set_timeout:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  * @timeout: the timeout
  *
  * Sets the I/O timeout for sockets created by @client. @timeout is a
@@ -569,19 +569,19 @@ xsocket_client_get_timeout (GSocketClient *client)
  * Since: 2.26
  */
 void
-xsocket_client_set_timeout (GSocketClient *client,
+xsocket_client_set_timeout (xsocket_client_t *client,
 			     xuint_t          timeout)
 {
   if (client->priv->timeout == timeout)
     return;
 
   client->priv->timeout = timeout;
-  g_object_notify (G_OBJECT (client), "timeout");
+  xobject_notify (G_OBJECT (client), "timeout");
 }
 
 /**
  * xsocket_client_get_enable_proxy:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  *
  * Gets the proxy enable state; see xsocket_client_set_enable_proxy()
  *
@@ -590,19 +590,19 @@ xsocket_client_set_timeout (GSocketClient *client,
  * Since: 2.26
  */
 xboolean_t
-xsocket_client_get_enable_proxy (GSocketClient *client)
+xsocket_client_get_enable_proxy (xsocket_client_t *client)
 {
   return client->priv->enable_proxy;
 }
 
 /**
  * xsocket_client_set_enable_proxy:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  * @enable: whether to enable proxies
  *
  * Sets whether or not @client attempts to make connections via a
- * proxy server. When enabled (the default), #GSocketClient will use a
- * #GProxyResolver to determine if a proxy protocol such as SOCKS is
+ * proxy server. When enabled (the default), #xsocket_client_t will use a
+ * #xproxy_resolver_t to determine if a proxy protocol such as SOCKS is
  * needed, and automatically do the necessary proxy negotiation.
  *
  * See also xsocket_client_set_proxy_resolver().
@@ -610,7 +610,7 @@ xsocket_client_get_enable_proxy (GSocketClient *client)
  * Since: 2.26
  */
 void
-xsocket_client_set_enable_proxy (GSocketClient *client,
+xsocket_client_set_enable_proxy (xsocket_client_t *client,
 				  xboolean_t       enable)
 {
   enable = !!enable;
@@ -618,12 +618,12 @@ xsocket_client_set_enable_proxy (GSocketClient *client,
     return;
 
   client->priv->enable_proxy = enable;
-  g_object_notify (G_OBJECT (client), "enable-proxy");
+  xobject_notify (G_OBJECT (client), "enable-proxy");
 }
 
 /**
  * xsocket_client_get_tls:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  *
  * Gets whether @client creates TLS connections. See
  * xsocket_client_set_tls() for details.
@@ -633,39 +633,39 @@ xsocket_client_set_enable_proxy (GSocketClient *client,
  * Since: 2.28
  */
 xboolean_t
-xsocket_client_get_tls (GSocketClient *client)
+xsocket_client_get_tls (xsocket_client_t *client)
 {
   return client->priv->tls;
 }
 
 /**
  * xsocket_client_set_tls:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  * @tls: whether to use TLS
  *
  * Sets whether @client creates TLS (aka SSL) connections. If @tls is
- * %TRUE, @client will wrap its connections in a #GTlsClientConnection
+ * %TRUE, @client will wrap its connections in a #xtls_client_connection_t
  * and perform a TLS handshake when connecting.
  *
- * Note that since #GSocketClient must return a #xsocket_connection_t,
- * but #GTlsClientConnection is not a #xsocket_connection_t, this
- * actually wraps the resulting #GTlsClientConnection in a
- * #GTcpWrapperConnection when returning it. You can use
+ * Note that since #xsocket_client_t must return a #xsocket_connection_t,
+ * but #xtls_client_connection_t is not a #xsocket_connection_t, this
+ * actually wraps the resulting #xtls_client_connection_t in a
+ * #xtcp_wrapper_connection_t when returning it. You can use
  * g_tcp_wrapper_connection_get_base_io_stream() on the return value
- * to extract the #GTlsClientConnection.
+ * to extract the #xtls_client_connection_t.
  *
  * If you need to modify the behavior of the TLS handshake (eg, by
  * setting a client-side certificate to use, or connecting to the
- * #GTlsConnection::accept-certificate signal), you can connect to
- * @client's #GSocketClient::event signal and wait for it to be
+ * #xtls_connection_t::accept-certificate signal), you can connect to
+ * @client's #xsocket_client_t::event signal and wait for it to be
  * emitted with %XSOCKET_CLIENT_TLS_HANDSHAKING, which will give you
- * a chance to see the #GTlsClientConnection before the handshake
+ * a chance to see the #xtls_client_connection_t before the handshake
  * starts.
  *
  * Since: 2.28
  */
 void
-xsocket_client_set_tls (GSocketClient *client,
+xsocket_client_set_tls (xsocket_client_t *client,
 			 xboolean_t       tls)
 {
   tls = !!tls;
@@ -673,18 +673,18 @@ xsocket_client_set_tls (GSocketClient *client,
     return;
 
   client->priv->tls = tls;
-  g_object_notify (G_OBJECT (client), "tls");
+  xobject_notify (G_OBJECT (client), "tls");
 }
 
 /**
  * xsocket_client_get_tls_validation_flags:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  *
  * Gets the TLS validation flags used creating TLS connections via
  * @client.
  *
  * This function does not work as originally designed and is impossible
- * to use correctly. See #GSocketClient:tls-validation-flags for more
+ * to use correctly. See #xsocket_client_t:tls-validation-flags for more
  * information.
  *
  * Returns: the TLS validation flags
@@ -694,21 +694,21 @@ xsocket_client_set_tls (GSocketClient *client,
  * Deprecated: 2.72: Do not attempt to ignore validation errors.
  */
 GTlsCertificateFlags
-xsocket_client_get_tls_validation_flags (GSocketClient *client)
+xsocket_client_get_tls_validation_flags (xsocket_client_t *client)
 {
   return client->priv->tls_validation_flags;
 }
 
 /**
  * xsocket_client_set_tls_validation_flags:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  * @flags: the validation flags
  *
  * Sets the TLS validation flags used when creating TLS connections
  * via @client. The default value is %G_TLS_CERTIFICATE_VALIDATE_ALL.
  *
  * This function does not work as originally designed and is impossible
- * to use correctly. See #GSocketClient:tls-validation-flags for more
+ * to use correctly. See #xsocket_client_t:tls-validation-flags for more
  * information.
  *
  * Since: 2.28
@@ -716,72 +716,72 @@ xsocket_client_get_tls_validation_flags (GSocketClient *client)
  * Deprecated: 2.72: Do not attempt to ignore validation errors.
  */
 void
-xsocket_client_set_tls_validation_flags (GSocketClient        *client,
+xsocket_client_set_tls_validation_flags (xsocket_client_t        *client,
 					  GTlsCertificateFlags  flags)
 {
   if (client->priv->tls_validation_flags != flags)
     {
       client->priv->tls_validation_flags = flags;
-      g_object_notify (G_OBJECT (client), "tls-validation-flags");
+      xobject_notify (G_OBJECT (client), "tls-validation-flags");
     }
 }
 
 /**
  * xsocket_client_get_proxy_resolver:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  *
- * Gets the #GProxyResolver being used by @client. Normally, this will
- * be the resolver returned by g_proxy_resolver_get_default(), but you
+ * Gets the #xproxy_resolver_t being used by @client. Normally, this will
+ * be the resolver returned by xproxy_resolver_get_default(), but you
  * can override it with xsocket_client_set_proxy_resolver().
  *
- * Returns: (transfer none): The #GProxyResolver being used by
+ * Returns: (transfer none): The #xproxy_resolver_t being used by
  *   @client.
  *
  * Since: 2.36
  */
-GProxyResolver *
-xsocket_client_get_proxy_resolver (GSocketClient *client)
+xproxy_resolver_t *
+xsocket_client_get_proxy_resolver (xsocket_client_t *client)
 {
   if (client->priv->proxy_resolver)
     return client->priv->proxy_resolver;
   else
-    return g_proxy_resolver_get_default ();
+    return xproxy_resolver_get_default ();
 }
 
 /**
  * xsocket_client_set_proxy_resolver:
- * @client: a #GSocketClient.
- * @proxy_resolver: (nullable): a #GProxyResolver, or %NULL for the
+ * @client: a #xsocket_client_t.
+ * @proxy_resolver: (nullable): a #xproxy_resolver_t, or %NULL for the
  *   default.
  *
- * Overrides the #GProxyResolver used by @client. You can call this if
+ * Overrides the #xproxy_resolver_t used by @client. You can call this if
  * you want to use specific proxies, rather than using the system
  * default proxy settings.
  *
  * Note that whether or not the proxy resolver is actually used
- * depends on the setting of #GSocketClient:enable-proxy, which is not
+ * depends on the setting of #xsocket_client_t:enable-proxy, which is not
  * changed by this function (but which is %TRUE by default)
  *
  * Since: 2.36
  */
 void
-xsocket_client_set_proxy_resolver (GSocketClient  *client,
-                                    GProxyResolver *proxy_resolver)
+xsocket_client_set_proxy_resolver (xsocket_client_t  *client,
+                                    xproxy_resolver_t *proxy_resolver)
 {
   /* We have to be careful to avoid calling
-   * g_proxy_resolver_get_default() until we're sure we need it,
+   * xproxy_resolver_get_default() until we're sure we need it,
    * because trying to load the default proxy resolver module will
    * break some test programs that aren't expecting it (eg,
    * tests/gsettings).
    */
 
   if (client->priv->proxy_resolver)
-    g_object_unref (client->priv->proxy_resolver);
+    xobject_unref (client->priv->proxy_resolver);
 
   client->priv->proxy_resolver = proxy_resolver;
 
   if (client->priv->proxy_resolver)
-    g_object_ref (client->priv->proxy_resolver);
+    xobject_ref (client->priv->proxy_resolver);
 }
 
 static void
@@ -794,10 +794,10 @@ xsocket_client_class_init (GSocketClientClass *class)
   gobject_class->get_property = xsocket_client_get_property;
 
   /**
-   * GSocketClient::event:
-   * @client: the #GSocketClient
+   * xsocket_client_t::event:
+   * @client: the #xsocket_client_t
    * @event: the event that is occurring
-   * @connectable: the #GSocketConnectable that @event is occurring on
+   * @connectable: the #xsocket_connectable_t that @event is occurring on
    * @connection: (nullable): the current representation of the connection
    *
    * Emitted when @client's activity on @connectable changes state.
@@ -826,14 +826,14 @@ xsocket_client_class_init (GSocketClientClass *class)
    *
    * - %XSOCKET_CLIENT_PROXY_NEGOTIATED: @client has negotiated a
    *   connection to @connectable through a proxy server. @connection is
-   *   the stream returned from g_proxy_connect(), which may or may not
+   *   the stream returned from xproxy_connect(), which may or may not
    *   be a #xsocket_connection_t.
    *
    * - %XSOCKET_CLIENT_TLS_HANDSHAKING: @client is about to begin a TLS
-   *   handshake. @connection is a #GTlsClientConnection.
+   *   handshake. @connection is a #xtls_client_connection_t.
    *
    * - %XSOCKET_CLIENT_TLS_HANDSHAKED: @client has successfully completed
-   *   the TLS handshake. @connection is a #GTlsClientConnection.
+   *   the TLS handshake. @connection is a #xtls_client_connection_t.
    *
    * - %XSOCKET_CLIENT_COMPLETE: @client has either successfully connected
    *   to @connectable (in which case @connection is the #xsocket_connection_t
@@ -843,7 +843,7 @@ xsocket_client_class_init (GSocketClientClass *class)
    * Each event except %XSOCKET_CLIENT_COMPLETE may be emitted
    * multiple times (or not at all) for a given connectable (in
    * particular, if @client ends up attempting to connect to more than
-   * one address). However, if @client emits the #GSocketClient::event
+   * one address). However, if @client emits the #xsocket_client_t::event
    * signal at all for a given connectable, then it will always emit
    * it with %XSOCKET_CLIENT_COMPLETE when it is done.
    *
@@ -867,7 +867,7 @@ xsocket_client_class_init (GSocketClientClass *class)
                               XTYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_VOID__ENUM_OBJECT_OBJECTv);
 
-  g_object_class_install_property (gobject_class, PROP_FAMILY,
+  xobject_class_install_property (gobject_class, PROP_FAMILY,
 				   g_param_spec_enum ("family",
 						      P_("Socket family"),
 						      P_("The sockets address family to use for socket construction"),
@@ -877,7 +877,7 @@ xsocket_client_class_init (GSocketClientClass *class)
                                                       G_PARAM_READWRITE |
                                                       G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class, PROP_TYPE,
+  xobject_class_install_property (gobject_class, PROP_TYPE,
 				   g_param_spec_enum ("type",
 						      P_("Socket type"),
 						      P_("The sockets type to use for socket construction"),
@@ -887,7 +887,7 @@ xsocket_client_class_init (GSocketClientClass *class)
                                                       G_PARAM_READWRITE |
                                                       G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class, PROP_PROTOCOL,
+  xobject_class_install_property (gobject_class, PROP_PROTOCOL,
 				   g_param_spec_enum ("protocol",
 						      P_("Socket protocol"),
 						      P_("The protocol to use for socket construction, or 0 for default"),
@@ -897,7 +897,7 @@ xsocket_client_class_init (GSocketClientClass *class)
                                                       G_PARAM_READWRITE |
                                                       G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class, PROP_LOCAL_ADDRESS,
+  xobject_class_install_property (gobject_class, PROP_LOCAL_ADDRESS,
 				   g_param_spec_object ("local-address",
 							P_("Local address"),
 							P_("The local address constructed sockets will be bound to"),
@@ -906,7 +906,7 @@ xsocket_client_class_init (GSocketClientClass *class)
                                                         G_PARAM_READWRITE |
                                                         G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class, PROP_TIMEOUT,
+  xobject_class_install_property (gobject_class, PROP_TIMEOUT,
 				   g_param_spec_uint ("timeout",
 						      P_("Socket timeout"),
 						      P_("The I/O timeout for sockets, or 0 for none"),
@@ -915,7 +915,7 @@ xsocket_client_class_init (GSocketClientClass *class)
                                                       G_PARAM_READWRITE |
                                                       G_PARAM_STATIC_STRINGS));
 
-   g_object_class_install_property (gobject_class, PROP_ENABLE_PROXY,
+   xobject_class_install_property (gobject_class, PROP_ENABLE_PROXY,
 				    g_param_spec_boolean ("enable-proxy",
 							  P_("Enable proxy"),
 							  P_("Enable proxy support"),
@@ -924,7 +924,7 @@ xsocket_client_class_init (GSocketClientClass *class)
 							  G_PARAM_READWRITE |
 							  G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class, PROP_TLS,
+  xobject_class_install_property (gobject_class, PROP_TLS,
 				   g_param_spec_boolean ("tls",
 							 P_("TLS"),
 							 P_("Whether to create TLS connections"),
@@ -934,7 +934,7 @@ xsocket_client_class_init (GSocketClientClass *class)
 							 G_PARAM_STATIC_STRINGS));
 
   /**
-   * GSocketClient:tls-validation-flags:
+   * xsocket_client_t:tls-validation-flags:
    *
    * The TLS validation flags used when creating TLS connections. The
    * default value is %G_TLS_CERTIFICATE_VALIDATE_ALL.
@@ -949,13 +949,13 @@ xsocket_client_class_init (GSocketClientClass *class)
    * safe way to use this property. This is not a horrible problem,
    * though, because you should not be attempting to ignore validation
    * errors anyway. If you really must ignore TLS certificate errors,
-   * connect to the #GSocketClient::event signal, wait for it to be
+   * connect to the #xsocket_client_t::event signal, wait for it to be
    * emitted with %XSOCKET_CLIENT_TLS_HANDSHAKING, and use that to
-   * connect to #GTlsConnection::accept-certificate.
+   * connect to #xtls_connection_t::accept-certificate.
    *
    * Deprecated: 2.72: Do not attempt to ignore validation errors.
    */
-  g_object_class_install_property (gobject_class, PROP_TLS_VALIDATION_FLAGS,
+  xobject_class_install_property (gobject_class, PROP_TLS_VALIDATION_FLAGS,
 				   g_param_spec_flags ("tls-validation-flags",
 						       P_("TLS validation flags"),
 						       P_("TLS validation flags to use"),
@@ -967,13 +967,13 @@ xsocket_client_class_init (GSocketClientClass *class)
 						       G_PARAM_DEPRECATED));
 
   /**
-   * GSocketClient:proxy-resolver:
+   * xsocket_client_t:proxy-resolver:
    *
    * The proxy resolver to use
    *
    * Since: 2.36
    */
-  g_object_class_install_property (gobject_class, PROP_PROXY_RESOLVER,
+  xobject_class_install_property (gobject_class, PROP_PROXY_RESOLVER,
                                    g_param_spec_object ("proxy-resolver",
                                                         P_("Proxy resolver"),
                                                         P_("The proxy resolver to use"),
@@ -984,16 +984,16 @@ xsocket_client_class_init (GSocketClientClass *class)
 }
 
 static void
-xsocket_client_emit_event (GSocketClient       *client,
+xsocket_client_emit_event (xsocket_client_t       *client,
 			    GSocketClientEvent   event,
-			    GSocketConnectable  *connectable,
+			    xsocket_connectable_t  *connectable,
 			    xio_stream_t           *connection)
 {
   g_signal_emit (client, signals[EVENT], 0,
 		 event, connectable, connection);
 }
 
-/* Originally, GSocketClient returned whatever error occured last. Turns
+/* Originally, xsocket_client_t returned whatever error occured last. Turns
  * out this doesn't work well in practice. Consider the following case:
  * DNS returns an IPv4 and IPv6 address. First we'll connect() to the
  * IPv4 address, and say that succeeds, but TLS is enabled and the TLS
@@ -1061,8 +1061,8 @@ consider_tmp_error (SocketClientErrorInfo *info,
 
 /**
  * xsocket_client_connect:
- * @client: a #GSocketClient.
- * @connectable: a #GSocketConnectable specifying the remote address.
+ * @client: a #xsocket_client_t.
+ * @connectable: a #xsocket_connectable_t specifying the remote address.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: #xerror_t for error reporting, or %NULL to ignore.
  *
@@ -1074,7 +1074,7 @@ consider_tmp_error (SocketClientErrorInfo *info,
  *
  * The type of the #xsocket_connection_t object returned depends on the type of
  * the underlying socket that is used. For instance, for a TCP/IP connection
- * it will be a #GTcpConnection.
+ * it will be a #xtcp_connection_t.
  *
  * The socket created will be the same family as the address that the
  * @connectable resolves to, unless family is set with xsocket_client_set_family()
@@ -1090,13 +1090,13 @@ consider_tmp_error (SocketClientErrorInfo *info,
  * Since: 2.22
  */
 xsocket_connection_t *
-xsocket_client_connect (GSocketClient       *client,
-			 GSocketConnectable  *connectable,
+xsocket_client_connect (xsocket_client_t       *client,
+			 xsocket_connectable_t  *connectable,
 			 xcancellable_t        *cancellable,
 			 xerror_t             **error)
 {
   xio_stream_t *connection = NULL;
-  GSocketAddressEnumerator *enumerator = NULL;
+  xsocket_address_enumerator_t *enumerator = NULL;
   SocketClientErrorInfo *error_info;
   xboolean_t ever_resolved = FALSE;
 
@@ -1108,7 +1108,7 @@ xsocket_client_connect (GSocketClient       *client,
       if (client->priv->proxy_resolver &&
           X_IS_PROXY_ADDRESS_ENUMERATOR (enumerator))
         {
-          g_object_set (G_OBJECT (enumerator),
+          xobject_set (G_OBJECT (enumerator),
                         "proxy-resolver", client->priv->proxy_resolver,
                         NULL);
         }
@@ -1159,7 +1159,7 @@ xsocket_client_connect (GSocketClient       *client,
       consider_tmp_error (error_info, XSOCKET_CLIENT_CONNECTING);
       if (socket == NULL)
 	{
-	  g_object_unref (address);
+	  xobject_unref (address);
 	  continue;
 	}
 
@@ -1177,17 +1177,17 @@ xsocket_client_connect (GSocketClient       *client,
 	{
 	  clarify_connect_error (error_info->tmp_error, connectable, address);
           consider_tmp_error (error_info, XSOCKET_CLIENT_CONNECTING);
-	  g_object_unref (connection);
+	  xobject_unref (connection);
 	  connection = NULL;
 	}
 
       if (connection && using_proxy)
 	{
-	  GProxyAddress *proxy_addr = G_PROXY_ADDRESS (address);
+	  xproxy_address_t *proxy_addr = G_PROXY_ADDRESS (address);
 	  const xchar_t *protocol;
-	  GProxy *proxy;
+	  xproxy_t *proxy;
 
-	  protocol = g_proxy_address_get_protocol (proxy_addr);
+	  protocol = xproxy_address_get_protocol (proxy_addr);
 
           /* The connection should not be anything else then TCP Connection,
            * but let's put a safety guard in case
@@ -1202,28 +1202,28 @@ xsocket_client_connect (GSocketClient       *client,
                   _("Proxying over a non-TCP connection is not supported."));
               consider_tmp_error (error_info, XSOCKET_CLIENT_PROXY_NEGOTIATING);
 
-	      g_object_unref (connection);
+	      xobject_unref (connection);
 	      connection = NULL;
             }
-	  else if (g_hash_table_contains (client->priv->app_proxies, protocol))
+	  else if (xhash_table_contains (client->priv->app_proxies, protocol))
 	    {
 	      application_proxy = TRUE;
 	    }
-          else if ((proxy = g_proxy_get_default_for_protocol (protocol)))
+          else if ((proxy = xproxy_get_default_for_protocol (protocol)))
 	    {
 	      xio_stream_t *proxy_connection;
 
 	      xsocket_client_emit_event (client, XSOCKET_CLIENT_PROXY_NEGOTIATING, connectable, connection);
-	      proxy_connection = g_proxy_connect (proxy,
+	      proxy_connection = xproxy_connect (proxy,
 						  connection,
 						  proxy_addr,
 						  cancellable,
 						  &error_info->tmp_error);
 	      consider_tmp_error (error_info, XSOCKET_CLIENT_PROXY_NEGOTIATING);
 
-	      g_object_unref (connection);
+	      xobject_unref (connection);
 	      connection = proxy_connection;
-	      g_object_unref (proxy);
+	      xobject_unref (proxy);
 
 	      if (connection)
 		xsocket_client_emit_event (client, XSOCKET_CLIENT_PROXY_NEGOTIATED, connectable, connection);
@@ -1234,7 +1234,7 @@ xsocket_client_connect (GSocketClient       *client,
 			   _("Proxy protocol “%s” is not supported."),
 			   protocol);
 	      consider_tmp_error (error_info, XSOCKET_CLIENT_PROXY_NEGOTIATING);
-	      g_object_unref (connection);
+	      xobject_unref (connection);
 	      connection = NULL;
 	    }
 	}
@@ -1243,18 +1243,18 @@ xsocket_client_connect (GSocketClient       *client,
 	{
 	  xio_stream_t *tlsconn;
 
-	  tlsconn = g_tls_client_connection_new (connection, connectable, &error_info->tmp_error);
-	  g_object_unref (connection);
+	  tlsconn = xtls_client_connection_new (connection, connectable, &error_info->tmp_error);
+	  xobject_unref (connection);
 	  connection = tlsconn;
 
 	  if (tlsconn)
 	    {
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-	      g_tls_client_connection_set_validation_flags (G_TLS_CLIENT_CONNECTION (tlsconn),
+	      xtls_client_connection_set_validation_flags (G_TLS_CLIENT_CONNECTION (tlsconn),
                                                             client->priv->tls_validation_flags);
 G_GNUC_END_IGNORE_DEPRECATIONS
 	      xsocket_client_emit_event (client, XSOCKET_CLIENT_TLS_HANDSHAKING, connectable, connection);
-	      if (g_tls_connection_handshake (G_TLS_CONNECTION (tlsconn),
+	      if (xtls_connection_handshake (G_TLS_CONNECTION (tlsconn),
 					      cancellable, &error_info->tmp_error))
 		{
 		  xsocket_client_emit_event (client, XSOCKET_CLIENT_TLS_HANDSHAKED, connectable, connection);
@@ -1262,7 +1262,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 	      else
 		{
 		  consider_tmp_error (error_info, XSOCKET_CLIENT_TLS_HANDSHAKING);
-		  g_object_unref (tlsconn);
+		  xobject_unref (tlsconn);
 		  connection = NULL;
 		}
 	    }
@@ -1277,14 +1277,14 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 	  xsocket_connection_t *wrapper_connection;
 
 	  wrapper_connection = g_tcp_wrapper_connection_new (connection, socket);
-	  g_object_unref (connection);
+	  xobject_unref (connection);
 	  connection = (xio_stream_t *)wrapper_connection;
 	}
 
-      g_object_unref (socket);
-      g_object_unref (address);
+      xobject_unref (socket);
+      xobject_unref (address);
     }
-  g_object_unref (enumerator);
+  xobject_unref (enumerator);
 
   if (!connection)
     g_propagate_error (error, g_steal_pointer (&error_info->best_error));
@@ -1296,7 +1296,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
  * xsocket_client_connect_to_host:
- * @client: a #GSocketClient
+ * @client: a #xsocket_client_t
  * @host_and_port: the name and optionally port of the host to connect to
  * @default_port: the default port to connect to
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
@@ -1338,13 +1338,13 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * Since: 2.22
  */
 xsocket_connection_t *
-xsocket_client_connect_to_host (GSocketClient  *client,
+xsocket_client_connect_to_host (xsocket_client_t  *client,
 				 const xchar_t    *host_and_port,
-				 guint16         default_port,
+				 xuint16_t         default_port,
 				 xcancellable_t   *cancellable,
 				 xerror_t        **error)
 {
-  GSocketConnectable *connectable;
+  xsocket_connectable_t *connectable;
   xsocket_connection_t *connection;
 
   connectable = g_network_address_parse (host_and_port, default_port, error);
@@ -1353,7 +1353,7 @@ xsocket_client_connect_to_host (GSocketClient  *client,
 
   connection = xsocket_client_connect (client, connectable,
 					cancellable, error);
-  g_object_unref (connectable);
+  xobject_unref (connectable);
 
   return connection;
 }
@@ -1384,26 +1384,26 @@ xsocket_client_connect_to_host (GSocketClient  *client,
  * Returns: (transfer full): a #xsocket_connection_t if successful, or %NULL on error
  */
 xsocket_connection_t *
-xsocket_client_connect_to_service (GSocketClient  *client,
+xsocket_client_connect_to_service (xsocket_client_t  *client,
 				    const xchar_t    *domain,
 				    const xchar_t    *service,
 				    xcancellable_t   *cancellable,
 				    xerror_t        **error)
 {
-  GSocketConnectable *connectable;
+  xsocket_connectable_t *connectable;
   xsocket_connection_t *connection;
 
   connectable = g_network_service_new (service, "tcp", domain);
   connection = xsocket_client_connect (client, connectable,
 					cancellable, error);
-  g_object_unref (connectable);
+  xobject_unref (connectable);
 
   return connection;
 }
 
 /**
  * xsocket_client_connect_to_uri:
- * @client: a #GSocketClient
+ * @client: a #xsocket_client_t
  * @uri: A network URI
  * @default_port: the default port to connect to
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
@@ -1415,12 +1415,12 @@ xsocket_client_connect_to_service (GSocketClient  *client,
  *
  * @uri may be any valid URI containing an "authority" (hostname/port)
  * component. If a port is not specified in the URI, @default_port
- * will be used. TLS will be negotiated if #GSocketClient:tls is %TRUE.
- * (#GSocketClient does not know to automatically assume TLS for
+ * will be used. TLS will be negotiated if #xsocket_client_t:tls is %TRUE.
+ * (#xsocket_client_t does not know to automatically assume TLS for
  * certain URI schemes.)
  *
  * Using this rather than xsocket_client_connect() or
- * xsocket_client_connect_to_host() allows #GSocketClient to
+ * xsocket_client_connect_to_host() allows #xsocket_client_t to
  * determine when to use application-specific proxy protocols.
  *
  * Upon a successful connection, a new #xsocket_connection_t is constructed
@@ -1436,13 +1436,13 @@ xsocket_client_connect_to_service (GSocketClient  *client,
  * Since: 2.26
  */
 xsocket_connection_t *
-xsocket_client_connect_to_uri (GSocketClient  *client,
+xsocket_client_connect_to_uri (xsocket_client_t  *client,
 				const xchar_t    *uri,
-				guint16         default_port,
+				xuint16_t         default_port,
 				xcancellable_t   *cancellable,
 				xerror_t        **error)
 {
-  GSocketConnectable *connectable;
+  xsocket_connectable_t *connectable;
   xsocket_connection_t *connection;
 
   connectable = g_network_address_parse_uri (uri, default_port, error);
@@ -1451,22 +1451,22 @@ xsocket_client_connect_to_uri (GSocketClient  *client,
 
   connection = xsocket_client_connect (client, connectable,
 					cancellable, error);
-  g_object_unref (connectable);
+  xobject_unref (connectable);
 
   return connection;
 }
 
 typedef struct
 {
-  GTask *task; /* unowned */
-  GSocketClient *client;
+  xtask_t *task; /* unowned */
+  xsocket_client_t *client;
 
-  GSocketConnectable *connectable;
-  GSocketAddressEnumerator *enumerator;
+  xsocket_connectable_t *connectable;
+  xsocket_address_enumerator_t *enumerator;
   xcancellable_t *enumeration_cancellable;
 
-  GSList *connection_attempts;
-  GSList *successful_connections;
+  xslist_t *connection_attempts;
+  xslist_t *successful_connections;
   SocketClientErrorInfo *error_info;
 
   xboolean_t enumerated_at_least_once;
@@ -1484,8 +1484,8 @@ xsocket_client_async_connect_data_free (GSocketClientAsyncConnectData *data)
   g_clear_object (&data->connectable);
   g_clear_object (&data->enumerator);
   g_clear_object (&data->enumeration_cancellable);
-  g_slist_free_full (data->connection_attempts, connection_attempt_unref);
-  g_slist_free_full (data->successful_connections, connection_attempt_unref);
+  xslist_free_full (data->connection_attempts, connection_attempt_unref);
+  xslist_free_full (data->successful_connections, connection_attempt_unref);
 
   g_clear_pointer (&data->error_info, socket_client_error_info_free);
 
@@ -1497,9 +1497,9 @@ typedef struct
   xsocket_address_t *address;
   xsocket_t *socket;
   xio_stream_t *connection;
-  GProxyAddress *proxy_addr;
+  xproxy_address_t *proxy_addr;
   GSocketClientAsyncConnectData *data; /* unowned */
-  GSource *timeout_source;
+  xsource_t *timeout_source;
   xcancellable_t *cancellable;
   grefcount ref;
 } ConnectionAttempt;
@@ -1532,8 +1532,8 @@ connection_attempt_unref (xpointer_t pointer)
       g_clear_object (&attempt->proxy_addr);
       if (attempt->timeout_source)
         {
-          g_source_destroy (attempt->timeout_source);
-          g_source_unref (attempt->timeout_source);
+          xsource_destroy (attempt->timeout_source);
+          xsource_unref (attempt->timeout_source);
         }
       g_free (attempt);
     }
@@ -1542,25 +1542,25 @@ connection_attempt_unref (xpointer_t pointer)
 static void
 connection_attempt_remove (ConnectionAttempt *attempt)
 {
-  attempt->data->connection_attempts = g_slist_remove (attempt->data->connection_attempts, attempt);
+  attempt->data->connection_attempts = xslist_remove (attempt->data->connection_attempts, attempt);
   connection_attempt_unref (attempt);
 }
 
 static void
 cancel_all_attempts (GSocketClientAsyncConnectData *data)
 {
-  GSList *l;
+  xslist_t *l;
 
-  for (l = data->connection_attempts; l; l = g_slist_next (l))
+  for (l = data->connection_attempts; l; l = xslist_next (l))
     {
       ConnectionAttempt *attempt_entry = l->data;
       g_cancellable_cancel (attempt_entry->cancellable);
       connection_attempt_unref (attempt_entry);
     }
-  g_slist_free (data->connection_attempts);
+  xslist_free (data->connection_attempts);
   data->connection_attempts = NULL;
 
-  g_slist_free_full (data->successful_connections, connection_attempt_unref);
+  xslist_free_full (data->successful_connections, connection_attempt_unref);
   data->successful_connections = NULL;
 
   g_cancellable_cancel (data->enumeration_cancellable);
@@ -1579,28 +1579,28 @@ xsocket_client_async_connect_complete (ConnectionAttempt *attempt)
       xsocket_connection_t *wrapper_connection;
 
       wrapper_connection = g_tcp_wrapper_connection_new (attempt->connection, attempt->socket);
-      g_object_unref (attempt->connection);
+      xobject_unref (attempt->connection);
       attempt->connection = (xio_stream_t *)wrapper_connection;
     }
 
   data->completed = TRUE;
   cancel_all_attempts (data);
 
-  if (g_cancellable_set_error_if_cancelled (g_task_get_cancellable (data->task), &error))
+  if (g_cancellable_set_error_if_cancelled (xtask_get_cancellable (data->task), &error))
     {
-      g_debug ("GSocketClient: Connection cancelled!");
+      g_debug ("xsocket_client_t: Connection cancelled!");
       xsocket_client_emit_event (data->client, XSOCKET_CLIENT_COMPLETE, data->connectable, NULL);
-      g_task_return_error (data->task, g_steal_pointer (&error));
+      xtask_return_error (data->task, g_steal_pointer (&error));
     }
   else
     {
-      g_debug ("GSocketClient: Connection successful!");
+      g_debug ("xsocket_client_t: Connection successful!");
       xsocket_client_emit_event (data->client, XSOCKET_CLIENT_COMPLETE, data->connectable, attempt->connection);
-      g_task_return_pointer (data->task, g_steal_pointer (&attempt->connection), g_object_unref);
+      xtask_return_pointer (data->task, g_steal_pointer (&attempt->connection), xobject_unref);
     }
 
   connection_attempt_unref (attempt);
-  g_object_unref (data->task);
+  xobject_unref (data->task);
 }
 
 
@@ -1616,11 +1616,11 @@ enumerator_next_async (GSocketClientAsyncConnectData *data,
   /* Each enumeration takes a ref. This arg just avoids repeated unrefs when
      an enumeration starts another enumeration */
   if (add_task_ref)
-    g_object_ref (data->task);
+    xobject_ref (data->task);
 
   if (!data->enumerated_at_least_once)
     xsocket_client_emit_event (data->client, XSOCKET_CLIENT_RESOLVING, data->connectable, NULL);
-  g_debug ("GSocketClient: Starting new address enumeration");
+  g_debug ("xsocket_client_t: Starting new address enumeration");
   xsocket_address_enumerator_next_async (data->enumerator,
 					  data->enumeration_cancellable,
 					  xsocket_client_enumerator_callback,
@@ -1637,23 +1637,23 @@ xsocket_client_tls_handshake_callback (xobject_t      *object,
   ConnectionAttempt *attempt = user_data;
   GSocketClientAsyncConnectData *data = attempt->data;
 
-  if (g_tls_connection_handshake_finish (G_TLS_CONNECTION (object),
+  if (xtls_connection_handshake_finish (G_TLS_CONNECTION (object),
 					 result,
 					 &data->error_info->tmp_error))
     {
-      g_object_unref (attempt->connection);
+      xobject_unref (attempt->connection);
       attempt->connection = XIO_STREAM (object);
 
-      g_debug ("GSocketClient: TLS handshake succeeded");
+      g_debug ("xsocket_client_t: TLS handshake succeeded");
       xsocket_client_emit_event (data->client, XSOCKET_CLIENT_TLS_HANDSHAKED, data->connectable, attempt->connection);
       xsocket_client_async_connect_complete (attempt);
     }
   else
     {
-      g_object_unref (object);
+      xobject_unref (object);
       connection_attempt_unref (attempt);
 
-      g_debug ("GSocketClient: TLS handshake failed: %s", data->error_info->tmp_error->message);
+      g_debug ("xsocket_client_t: TLS handshake failed: %s", data->error_info->tmp_error->message);
       consider_tmp_error (data->error_info, XSOCKET_CLIENT_TLS_HANDSHAKING);
       try_next_connection_or_finish (data, TRUE);
     }
@@ -1671,20 +1671,20 @@ xsocket_client_tls_handshake (ConnectionAttempt *attempt)
       return;
     }
 
-  g_debug ("GSocketClient: Starting TLS handshake");
-  tlsconn = g_tls_client_connection_new (attempt->connection,
+  g_debug ("xsocket_client_t: Starting TLS handshake");
+  tlsconn = xtls_client_connection_new (attempt->connection,
 					 data->connectable,
 					 &data->error_info->tmp_error);
   if (tlsconn)
     {
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-      g_tls_client_connection_set_validation_flags (G_TLS_CLIENT_CONNECTION (tlsconn),
+      xtls_client_connection_set_validation_flags (G_TLS_CLIENT_CONNECTION (tlsconn),
                                                     data->client->priv->tls_validation_flags);
 G_GNUC_END_IGNORE_DEPRECATIONS
       xsocket_client_emit_event (data->client, XSOCKET_CLIENT_TLS_HANDSHAKING, data->connectable, XIO_STREAM (tlsconn));
-      g_tls_connection_handshake_async (G_TLS_CONNECTION (tlsconn),
+      xtls_connection_handshake_async (G_TLS_CONNECTION (tlsconn),
 					G_PRIORITY_DEFAULT,
-					g_task_get_cancellable (data->task),
+					xtask_get_cancellable (data->task),
 					xsocket_client_tls_handshake_callback,
 					attempt);
     }
@@ -1705,8 +1705,8 @@ xsocket_client_proxy_connect_callback (xobject_t      *object,
   ConnectionAttempt *attempt = user_data;
   GSocketClientAsyncConnectData *data = attempt->data;
 
-  g_object_unref (attempt->connection);
-  attempt->connection = g_proxy_connect_finish (G_PROXY (object),
+  xobject_unref (attempt->connection);
+  attempt->connection = xproxy_connect_finish (G_PROXY (object),
                                                 result,
                                                 &data->error_info->tmp_error);
   if (attempt->connection)
@@ -1727,20 +1727,20 @@ static void
 complete_connection_with_error (GSocketClientAsyncConnectData *data,
                                 xerror_t                        *error)
 {
-  g_debug ("GSocketClient: Connection failed: %s", error->message);
+  g_debug ("xsocket_client_t: Connection failed: %s", error->message);
   g_assert (!data->completed);
 
   xsocket_client_emit_event (data->client, XSOCKET_CLIENT_COMPLETE, data->connectable, NULL);
   data->completed = TRUE;
   cancel_all_attempts (data);
-  g_task_return_error (data->task, error);
+  xtask_return_error (data->task, error);
 }
 
 static xboolean_t
 task_completed_or_cancelled (GSocketClientAsyncConnectData *data)
 {
-  GTask *task = data->task;
-  xcancellable_t *cancellable = g_task_get_cancellable (task);
+  xtask_t *task = data->task;
+  xcancellable_t *cancellable = xtask_get_cancellable (task);
   xerror_t *error = NULL;
 
   if (data->completed)
@@ -1759,7 +1759,7 @@ try_next_successful_connection (GSocketClientAsyncConnectData *data)
 {
   ConnectionAttempt *attempt;
   const xchar_t *protocol;
-  GProxy *proxy;
+  xproxy_t *proxy;
 
   if (data->connection_in_progress)
     return FALSE;
@@ -1767,10 +1767,10 @@ try_next_successful_connection (GSocketClientAsyncConnectData *data)
   g_assert (data->successful_connections != NULL);
   attempt = data->successful_connections->data;
   g_assert (attempt != NULL);
-  data->successful_connections = g_slist_remove (data->successful_connections, attempt);
+  data->successful_connections = xslist_remove (data->successful_connections, attempt);
   data->connection_in_progress = TRUE;
 
-  g_debug ("GSocketClient: Starting application layer connection");
+  g_debug ("xsocket_client_t: Starting application layer connection");
 
   if (!attempt->proxy_addr)
     {
@@ -1778,7 +1778,7 @@ try_next_successful_connection (GSocketClientAsyncConnectData *data)
       return TRUE;
     }
 
-  protocol = g_proxy_address_get_protocol (attempt->proxy_addr);
+  protocol = xproxy_address_get_protocol (attempt->proxy_addr);
 
   /* The connection should not be anything other than TCP,
    * but let's put a safety guard in case
@@ -1793,27 +1793,27 @@ try_next_successful_connection (GSocketClientAsyncConnectData *data)
           _("Proxying over a non-TCP connection is not supported."));
       consider_tmp_error (data->error_info, XSOCKET_CLIENT_PROXY_NEGOTIATING);
     }
-  else if (g_hash_table_contains (data->client->priv->app_proxies, protocol))
+  else if (xhash_table_contains (data->client->priv->app_proxies, protocol))
     {
       /* Simply complete the connection, we don't want to do TLS handshake
        * as the application proxy handling may need proxy handshake first */
       xsocket_client_async_connect_complete (g_steal_pointer (&attempt));
       return TRUE;
     }
-  else if ((proxy = g_proxy_get_default_for_protocol (protocol)))
+  else if ((proxy = xproxy_get_default_for_protocol (protocol)))
     {
       xio_stream_t *connection = attempt->connection;
-      GProxyAddress *proxy_addr = attempt->proxy_addr;
+      xproxy_address_t *proxy_addr = attempt->proxy_addr;
 
       xsocket_client_emit_event (data->client, XSOCKET_CLIENT_PROXY_NEGOTIATING, data->connectable, attempt->connection);
-      g_debug ("GSocketClient: Starting proxy connection");
-      g_proxy_connect_async (proxy,
+      g_debug ("xsocket_client_t: Starting proxy connection");
+      xproxy_connect_async (proxy,
                              connection,
                              proxy_addr,
-                             g_task_get_cancellable (data->task),
+                             xtask_get_cancellable (data->task),
                              xsocket_client_proxy_connect_callback,
                              g_steal_pointer (&attempt));
-      g_object_unref (proxy);
+      xobject_unref (proxy);
       return TRUE;
     }
   else
@@ -1865,15 +1865,15 @@ xsocket_client_connected_callback (xobject_t      *source,
 
   if (task_completed_or_cancelled (data) || g_cancellable_is_cancelled (attempt->cancellable))
     {
-      g_object_unref (data->task);
+      xobject_unref (data->task);
       connection_attempt_unref (attempt);
       return;
     }
 
   if (attempt->timeout_source)
     {
-      g_source_destroy (attempt->timeout_source);
-      g_clear_pointer (&attempt->timeout_source, g_source_unref);
+      xsource_destroy (attempt->timeout_source);
+      g_clear_pointer (&attempt->timeout_source, xsource_unref);
     }
 
   if (!xsocket_connection_connect_finish (XSOCKET_CONNECTION (source),
@@ -1881,7 +1881,7 @@ xsocket_client_connected_callback (xobject_t      *source,
     {
       if (!g_cancellable_is_cancelled (attempt->cancellable))
         {
-          g_debug ("GSocketClient: Connection attempt failed: %s", data->error_info->tmp_error->message);
+          g_debug ("xsocket_client_t: Connection attempt failed: %s", data->error_info->tmp_error->message);
           clarify_connect_error (data->error_info->tmp_error, data->connectable, attempt->address);
           consider_tmp_error (data->error_info, XSOCKET_CLIENT_CONNECTING);
           connection_attempt_remove (attempt);
@@ -1891,7 +1891,7 @@ xsocket_client_connected_callback (xobject_t      *source,
       else /* Silently ignore cancelled attempts */
         {
           g_clear_error (&data->error_info->tmp_error);
-          g_object_unref (data->task);
+          xobject_unref (data->task);
           connection_attempt_unref (attempt);
         }
 
@@ -1899,7 +1899,7 @@ xsocket_client_connected_callback (xobject_t      *source,
     }
 
   xsocket_connection_set_cached_remote_address ((xsocket_connection_t*)attempt->connection, NULL);
-  g_debug ("GSocketClient: TCP connection successful");
+  g_debug ("xsocket_client_t: TCP connection successful");
   xsocket_client_emit_event (data->client, XSOCKET_CLIENT_CONNECTED, data->connectable, attempt->connection);
 
   /* wrong, but backward compatible */
@@ -1911,7 +1911,7 @@ xsocket_client_connected_callback (xobject_t      *source,
      connection.
    */
   connection_attempt_remove (attempt);
-  data->successful_connections = g_slist_append (data->successful_connections, g_steal_pointer (&attempt));
+  data->successful_connections = xslist_append (data->successful_connections, g_steal_pointer (&attempt));
   try_next_connection_or_finish (data, FALSE);
 }
 
@@ -1922,11 +1922,11 @@ on_connection_attempt_timeout (xpointer_t data)
 
   if (!attempt->data->enumeration_completed)
     {
-      g_debug ("GSocketClient: Timeout reached, trying another enumeration");
+      g_debug ("xsocket_client_t: Timeout reached, trying another enumeration");
       enumerator_next_async (attempt->data, TRUE);
     }
 
-  g_clear_pointer (&attempt->timeout_source, g_source_unref);
+  g_clear_pointer (&attempt->timeout_source, xsource_unref);
   return G_SOURCE_REMOVE;
 }
 
@@ -1951,7 +1951,7 @@ xsocket_client_enumerator_callback (xobject_t      *object,
 
   if (task_completed_or_cancelled (data))
     {
-      g_object_unref (data->task);
+      xobject_unref (data->task);
       return;
     }
 
@@ -1963,7 +1963,7 @@ xsocket_client_enumerator_callback (xobject_t      *object,
         return;
 
       data->enumeration_completed = TRUE;
-      g_debug ("GSocketClient: Address enumeration completed (out of addresses)");
+      g_debug ("xsocket_client_t: Address enumeration completed (out of addresses)");
 
       /* As per API docs: We only care about error if it's the first call,
          after that the enumerator is done.
@@ -1976,7 +1976,7 @@ xsocket_client_enumerator_callback (xobject_t      *object,
       if ((data->enumerated_at_least_once && !data->connection_attempts && !data->connection_in_progress) ||
           !data->enumerated_at_least_once)
         {
-          g_debug ("GSocketClient: Address enumeration failed: %s",
+          g_debug ("xsocket_client_t: Address enumeration failed: %s",
                    data->error_info->tmp_error ? data->error_info->tmp_error->message : NULL);
           consider_tmp_error (data->error_info, XSOCKET_CLIENT_RESOLVING);
           g_assert (data->error_info->best_error);
@@ -1984,11 +1984,11 @@ xsocket_client_enumerator_callback (xobject_t      *object,
         }
 
       /* Enumeration should never trigger again, drop our ref */
-      g_object_unref (data->task);
+      xobject_unref (data->task);
       return;
     }
 
-  g_debug ("GSocketClient: Address enumeration succeeded");
+  g_debug ("xsocket_client_t: Address enumeration succeeded");
   if (!data->enumerated_at_least_once)
     {
       xsocket_client_emit_event (data->client, XSOCKET_CLIENT_RESOLVED,
@@ -1999,7 +1999,7 @@ xsocket_client_enumerator_callback (xobject_t      *object,
   socket = create_socket (data->client, address, &data->error_info->tmp_error);
   if (socket == NULL)
     {
-      g_object_unref (address);
+      xobject_unref (address);
       consider_tmp_error (data->error_info, XSOCKET_CLIENT_CONNECTING);
       enumerator_next_async (data, FALSE);
       return;
@@ -2014,18 +2014,18 @@ xsocket_client_enumerator_callback (xobject_t      *object,
   attempt->timeout_source = g_timeout_source_new (HAPPY_EYEBALLS_CONNECTION_ATTEMPT_TIMEOUT_MS);
 
   if (X_IS_PROXY_ADDRESS (address) && data->client->priv->enable_proxy)
-    attempt->proxy_addr = g_object_ref (G_PROXY_ADDRESS (address));
+    attempt->proxy_addr = xobject_ref (G_PROXY_ADDRESS (address));
 
-  g_source_set_callback (attempt->timeout_source, on_connection_attempt_timeout, attempt, NULL);
-  g_source_attach (attempt->timeout_source, g_task_get_context (data->task));
-  data->connection_attempts = g_slist_append (data->connection_attempts, attempt);
+  xsource_set_callback (attempt->timeout_source, on_connection_attempt_timeout, attempt, NULL);
+  xsource_attach (attempt->timeout_source, xtask_get_context (data->task));
+  data->connection_attempts = xslist_append (data->connection_attempts, attempt);
 
-  if (g_task_get_cancellable (data->task))
-    g_cancellable_connect (g_task_get_cancellable (data->task), G_CALLBACK (on_connection_cancelled),
-                           g_object_ref (attempt->cancellable), g_object_unref);
+  if (xtask_get_cancellable (data->task))
+    g_cancellable_connect (xtask_get_cancellable (data->task), G_CALLBACK (on_connection_cancelled),
+                           xobject_ref (attempt->cancellable), xobject_unref);
 
   xsocket_connection_set_cached_remote_address ((xsocket_connection_t *)attempt->connection, address);
-  g_debug ("GSocketClient: Starting TCP connection attempt");
+  g_debug ("xsocket_client_t: Starting TCP connection attempt");
   xsocket_client_emit_event (data->client, XSOCKET_CLIENT_CONNECTING, data->connectable, attempt->connection);
   xsocket_connection_connect_async (XSOCKET_CONNECTION (attempt->connection),
 				     address,
@@ -2035,8 +2035,8 @@ xsocket_client_enumerator_callback (xobject_t      *object,
 
 /**
  * xsocket_client_connect_async:
- * @client: a #GSocketClient
- * @connectable: a #GSocketConnectable specifying the remote address.
+ * @client: a #xsocket_client_t
+ * @connectable: a #xsocket_connectable_t specifying the remote address.
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
  * @callback: (scope async): a #xasync_ready_callback_t
  * @user_data: (closure): user data for the callback
@@ -2059,8 +2059,8 @@ xsocket_client_enumerator_callback (xobject_t      *object,
  * Since: 2.22
  */
 void
-xsocket_client_connect_async (GSocketClient       *client,
-			       GSocketConnectable  *connectable,
+xsocket_client_connect_async (xsocket_client_t       *client,
+			       xsocket_connectable_t  *connectable,
 			       xcancellable_t        *cancellable,
 			       xasync_ready_callback_t  callback,
 			       xpointer_t             user_data)
@@ -2071,7 +2071,7 @@ xsocket_client_connect_async (GSocketClient       *client,
 
   data = g_slice_new0 (GSocketClientAsyncConnectData);
   data->client = client;
-  data->connectable = g_object_ref (connectable);
+  data->connectable = xobject_ref (connectable);
   data->error_info = socket_client_error_info_new ();
 
   if (can_use_proxy (client))
@@ -2080,7 +2080,7 @@ xsocket_client_connect_async (GSocketClient       *client,
       if (client->priv->proxy_resolver &&
           X_IS_PROXY_ADDRESS_ENUMERATOR (data->enumerator))
         {
-          g_object_set (G_OBJECT (data->enumerator),
+          xobject_set (G_OBJECT (data->enumerator),
                         "proxy-resolver", client->priv->proxy_resolver,
                         NULL);
         }
@@ -2096,7 +2096,7 @@ xsocket_client_connect_async (GSocketClient       *client,
      Firstly we have address enumeration (DNS):
        - This may be triggered multiple times by enumerator_next_async().
        - It also has its own cancellable (data->enumeration_cancellable).
-       - Enumeration is done lazily because GNetworkAddressAddressEnumerator
+       - Enumeration is done lazily because xnetwork_address_address_enumerator_t
          also does work in parallel and may lazily add new addresses.
        - If the first enumeration errors then the task errors. Otherwise all enumerations
          will potentially be used (until task or enumeration is cancelled).
@@ -2120,22 +2120,22 @@ xsocket_client_connect_async (GSocketClient       *client,
           and returns the connection.
   */
 
-  data->task = g_task_new (client, cancellable, callback, user_data);
-  g_task_set_check_cancellable (data->task, FALSE); /* We handle this manually */
-  g_task_set_source_tag (data->task, xsocket_client_connect_async);
-  g_task_set_task_data (data->task, data, (GDestroyNotify)xsocket_client_async_connect_data_free);
+  data->task = xtask_new (client, cancellable, callback, user_data);
+  xtask_set_check_cancellable (data->task, FALSE); /* We handle this manually */
+  xtask_set_source_tag (data->task, xsocket_client_connect_async);
+  xtask_set_task_data (data->task, data, (xdestroy_notify_t)xsocket_client_async_connect_data_free);
 
   data->enumeration_cancellable = g_cancellable_new ();
   if (cancellable)
     g_cancellable_connect (cancellable, G_CALLBACK (on_connection_cancelled),
-                           g_object_ref (data->enumeration_cancellable), g_object_unref);
+                           xobject_ref (data->enumeration_cancellable), xobject_unref);
 
   enumerator_next_async (data, FALSE);
 }
 
 /**
  * xsocket_client_connect_to_host_async:
- * @client: a #GSocketClient
+ * @client: a #xsocket_client_t
  * @host_and_port: the name and optionally the port of the host to connect to
  * @default_port: the default port to connect to
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
@@ -2151,14 +2151,14 @@ xsocket_client_connect_async (GSocketClient       *client,
  * Since: 2.22
  */
 void
-xsocket_client_connect_to_host_async (GSocketClient        *client,
+xsocket_client_connect_to_host_async (xsocket_client_t        *client,
 				       const xchar_t          *host_and_port,
-				       guint16               default_port,
+				       xuint16_t               default_port,
 				       xcancellable_t         *cancellable,
 				       xasync_ready_callback_t   callback,
 				       xpointer_t              user_data)
 {
-  GSocketConnectable *connectable;
+  xsocket_connectable_t *connectable;
   xerror_t *error;
 
   error = NULL;
@@ -2166,7 +2166,7 @@ xsocket_client_connect_to_host_async (GSocketClient        *client,
 					 &error);
   if (connectable == NULL)
     {
-      g_task_report_error (client, callback, user_data,
+      xtask_report_error (client, callback, user_data,
                            xsocket_client_connect_to_host_async,
                            error);
     }
@@ -2175,13 +2175,13 @@ xsocket_client_connect_to_host_async (GSocketClient        *client,
       xsocket_client_connect_async (client,
 				     connectable, cancellable,
 				     callback, user_data);
-      g_object_unref (connectable);
+      xobject_unref (connectable);
     }
 }
 
 /**
  * xsocket_client_connect_to_service_async:
- * @client: a #GSocketClient
+ * @client: a #xsocket_client_t
  * @domain: a domain name
  * @service: the name of the service to connect to
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
@@ -2194,25 +2194,25 @@ xsocket_client_connect_to_host_async (GSocketClient        *client,
  * Since: 2.22
  */
 void
-xsocket_client_connect_to_service_async (GSocketClient       *client,
+xsocket_client_connect_to_service_async (xsocket_client_t       *client,
 					  const xchar_t         *domain,
 					  const xchar_t         *service,
 					  xcancellable_t        *cancellable,
 					  xasync_ready_callback_t  callback,
 					  xpointer_t             user_data)
 {
-  GSocketConnectable *connectable;
+  xsocket_connectable_t *connectable;
 
   connectable = g_network_service_new (service, "tcp", domain);
   xsocket_client_connect_async (client,
 				 connectable, cancellable,
 				 callback, user_data);
-  g_object_unref (connectable);
+  xobject_unref (connectable);
 }
 
 /**
  * xsocket_client_connect_to_uri_async:
- * @client: a #GSocketClient
+ * @client: a #xsocket_client_t
  * @uri: a network uri
  * @default_port: the default port to connect to
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
@@ -2228,21 +2228,21 @@ xsocket_client_connect_to_service_async (GSocketClient       *client,
  * Since: 2.26
  */
 void
-xsocket_client_connect_to_uri_async (GSocketClient        *client,
+xsocket_client_connect_to_uri_async (xsocket_client_t        *client,
 				      const xchar_t          *uri,
-				      guint16               default_port,
+				      xuint16_t               default_port,
 				      xcancellable_t         *cancellable,
 				      xasync_ready_callback_t   callback,
 				      xpointer_t              user_data)
 {
-  GSocketConnectable *connectable;
+  xsocket_connectable_t *connectable;
   xerror_t *error;
 
   error = NULL;
   connectable = g_network_address_parse_uri (uri, default_port, &error);
   if (connectable == NULL)
     {
-      g_task_report_error (client, callback, user_data,
+      xtask_report_error (client, callback, user_data,
                            xsocket_client_connect_to_uri_async,
                            error);
     }
@@ -2252,14 +2252,14 @@ xsocket_client_connect_to_uri_async (GSocketClient        *client,
       xsocket_client_connect_async (client,
 				     connectable, cancellable,
 				     callback, user_data);
-      g_object_unref (connectable);
+      xobject_unref (connectable);
     }
 }
 
 
 /**
  * xsocket_client_connect_finish:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  * ignore.
@@ -2271,18 +2271,18 @@ xsocket_client_connect_to_uri_async (GSocketClient        *client,
  * Since: 2.22
  */
 xsocket_connection_t *
-xsocket_client_connect_finish (GSocketClient  *client,
+xsocket_client_connect_finish (xsocket_client_t  *client,
 				xasync_result_t   *result,
 				xerror_t        **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, client), NULL);
+  g_return_val_if_fail (xtask_is_valid (result, client), NULL);
 
-  return g_task_propagate_pointer (G_TASK (result), error);
+  return xtask_propagate_pointer (XTASK (result), error);
 }
 
 /**
  * xsocket_client_connect_to_host_finish:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  * ignore.
@@ -2294,7 +2294,7 @@ xsocket_client_connect_finish (GSocketClient  *client,
  * Since: 2.22
  */
 xsocket_connection_t *
-xsocket_client_connect_to_host_finish (GSocketClient  *client,
+xsocket_client_connect_to_host_finish (xsocket_client_t  *client,
 					xasync_result_t   *result,
 					xerror_t        **error)
 {
@@ -2303,7 +2303,7 @@ xsocket_client_connect_to_host_finish (GSocketClient  *client,
 
 /**
  * xsocket_client_connect_to_service_finish:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  * ignore.
@@ -2315,7 +2315,7 @@ xsocket_client_connect_to_host_finish (GSocketClient  *client,
  * Since: 2.22
  */
 xsocket_connection_t *
-xsocket_client_connect_to_service_finish (GSocketClient  *client,
+xsocket_client_connect_to_service_finish (xsocket_client_t  *client,
 					   xasync_result_t   *result,
 					   xerror_t        **error)
 {
@@ -2324,7 +2324,7 @@ xsocket_client_connect_to_service_finish (GSocketClient  *client,
 
 /**
  * xsocket_client_connect_to_uri_finish:
- * @client: a #GSocketClient.
+ * @client: a #xsocket_client_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  * ignore.
@@ -2336,7 +2336,7 @@ xsocket_client_connect_to_service_finish (GSocketClient  *client,
  * Since: 2.26
  */
 xsocket_connection_t *
-xsocket_client_connect_to_uri_finish (GSocketClient  *client,
+xsocket_client_connect_to_uri_finish (xsocket_client_t  *client,
 				       xasync_result_t   *result,
 				       xerror_t        **error)
 {
@@ -2345,16 +2345,16 @@ xsocket_client_connect_to_uri_finish (GSocketClient  *client,
 
 /**
  * xsocket_client_add_application_proxy:
- * @client: a #GSocketClient
+ * @client: a #xsocket_client_t
  * @protocol: The proxy protocol
  *
  * Enable proxy protocols to be handled by the application. When the
- * indicated proxy protocol is returned by the #GProxyResolver,
- * #GSocketClient will consider this protocol as supported but will
- * not try to find a #GProxy instance to handle handshaking. The
+ * indicated proxy protocol is returned by the #xproxy_resolver_t,
+ * #xsocket_client_t will consider this protocol as supported but will
+ * not try to find a #xproxy_t instance to handle handshaking. The
  * application must check for this case by calling
  * xsocket_connection_get_remote_address() on the returned
- * #xsocket_connection_t, and seeing if it's a #GProxyAddress of the
+ * #xsocket_connection_t, and seeing if it's a #xproxy_address_t of the
  * appropriate type, to determine whether or not it needs to handle
  * the proxy handshaking itself.
  *
@@ -2369,8 +2369,8 @@ xsocket_client_connect_to_uri_finish (GSocketClient  *client,
  * specific handshake.
  */
 void
-xsocket_client_add_application_proxy (GSocketClient *client,
+xsocket_client_add_application_proxy (xsocket_client_t *client,
 			               const xchar_t   *protocol)
 {
-  g_hash_table_add (client->priv->app_proxies, g_strdup (protocol));
+  xhash_table_add (client->priv->app_proxies, xstrdup (protocol));
 }

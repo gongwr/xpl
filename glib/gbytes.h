@@ -32,61 +32,61 @@
 G_BEGIN_DECLS
 
 XPL_AVAILABLE_IN_ALL
-GBytes *        g_bytes_new                     (gconstpointer   data,
+xbytes_t *        xbytes_new                     (xconstpointer   data,
                                                  xsize_t           size);
 
 XPL_AVAILABLE_IN_ALL
-GBytes *        g_bytes_new_take                (xpointer_t        data,
+xbytes_t *        xbytes_new_take                (xpointer_t        data,
                                                  xsize_t           size);
 
 XPL_AVAILABLE_IN_ALL
-GBytes *        g_bytes_new_static              (gconstpointer   data,
+xbytes_t *        xbytes_new_static              (xconstpointer   data,
                                                  xsize_t           size);
 
 XPL_AVAILABLE_IN_ALL
-GBytes *        g_bytes_new_with_free_func      (gconstpointer   data,
+xbytes_t *        xbytes_new_with_free_func      (xconstpointer   data,
                                                  xsize_t           size,
-                                                 GDestroyNotify  free_func,
+                                                 xdestroy_notify_t  free_func,
                                                  xpointer_t        user_data);
 
 XPL_AVAILABLE_IN_ALL
-GBytes *        g_bytes_new_from_bytes          (GBytes         *bytes,
+xbytes_t *        xbytes_new_from_bytes          (xbytes_t         *bytes,
                                                  xsize_t           offset,
                                                  xsize_t           length);
 
 XPL_AVAILABLE_IN_ALL
-gconstpointer   g_bytes_get_data                (GBytes         *bytes,
+xconstpointer   xbytes_get_data                (xbytes_t         *bytes,
                                                  xsize_t          *size);
 
 XPL_AVAILABLE_IN_ALL
-xsize_t           g_bytes_get_size                (GBytes         *bytes);
+xsize_t           xbytes_get_size                (xbytes_t         *bytes);
 
 XPL_AVAILABLE_IN_ALL
-GBytes *        g_bytes_ref                     (GBytes         *bytes);
+xbytes_t *        xbytes_ref                     (xbytes_t         *bytes);
 
 XPL_AVAILABLE_IN_ALL
-void            g_bytes_unref                   (GBytes         *bytes);
+void            xbytes_unref                   (xbytes_t         *bytes);
 
 XPL_AVAILABLE_IN_ALL
-xpointer_t        g_bytes_unref_to_data           (GBytes         *bytes,
+xpointer_t        xbytes_unref_to_data           (xbytes_t         *bytes,
                                                  xsize_t          *size);
 
 XPL_AVAILABLE_IN_ALL
-GByteArray *    g_bytes_unref_to_array          (GBytes         *bytes);
+xbyte_array_t *    xbytes_unref_to_array          (xbytes_t         *bytes);
 
 XPL_AVAILABLE_IN_ALL
-xuint_t           g_bytes_hash                    (gconstpointer   bytes);
+xuint_t           xbytes_hash                    (xconstpointer   bytes);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t        g_bytes_equal                   (gconstpointer   bytes1,
-                                                 gconstpointer   bytes2);
+xboolean_t        xbytes_equal                   (xconstpointer   bytes1,
+                                                 xconstpointer   bytes2);
 
 XPL_AVAILABLE_IN_ALL
-xint_t            g_bytes_compare                 (gconstpointer   bytes1,
-                                                 gconstpointer   bytes2);
+xint_t            xbytes_compare                 (xconstpointer   bytes1,
+                                                 xconstpointer   bytes2);
 
 XPL_AVAILABLE_IN_2_70
-gconstpointer   g_bytes_get_region              (GBytes         *bytes,
+xconstpointer   xbytes_get_region              (xbytes_t         *bytes,
                                                  xsize_t           element_size,
                                                  xsize_t           offset,
                                                  xsize_t           n_elements);

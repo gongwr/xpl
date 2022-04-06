@@ -33,7 +33,7 @@ static xboolean_t is_debug_enabled = FALSE;
 static xchar_t*
 dup_dirname (const xchar_t *dirname)
 {
-  xchar_t *d_dirname = g_strdup (dirname);
+  xchar_t *d_dirname = xstrdup (dirname);
   size_t len = strlen (d_dirname);
 
   if (d_dirname[len - 1] == '/')
@@ -61,7 +61,7 @@ _ih_sub_new (const xchar_t *dirname,
   else
     {
       sub->dirname = dup_dirname (dirname);
-      sub->filename = g_strdup (basename);
+      sub->filename = xstrdup (basename);
       sub->hardlinks = FALSE;
     }
 

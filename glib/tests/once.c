@@ -60,8 +60,8 @@ test_once_single_threaded (void)
 
 static GOnce once_multi_threaded = G_ONCE_INIT;
 static xint_t once_multi_threaded_counter = 0;
-static GCond once_multi_threaded_cond;
-static GMutex once_multi_threaded_mutex;
+static xcond_t once_multi_threaded_cond;
+static xmutex_t once_multi_threaded_mutex;
 static xuint_t once_multi_threaded_n_threads_waiting = 0;
 
 static xpointer_t
@@ -107,12 +107,12 @@ static void
 test_once_multi_threaded (void)
 {
   xuint_t i;
-  GThread *threads[THREADS];
+  xthread_t *threads[THREADS];
 
   g_test_summary ("Test g_once() usage from multiple threads");
 
   for (i = 0; i < G_N_ELEMENTS (threads); i++)
-    threads[i] = g_thread_new ("once-multi-threaded",
+    threads[i] = xthread_new ("once-multi-threaded",
                                once_thread_func,
                                GUINT_TO_POINTER (G_N_ELEMENTS (threads)));
 
@@ -120,7 +120,7 @@ test_once_multi_threaded (void)
   g_cond_broadcast (&once_multi_threaded_cond);
 
   for (i = 0; i < G_N_ELEMENTS (threads); i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 
   g_assert_cmpint (g_atomic_int_get (&once_multi_threaded_counter), ==, 1);
 }
@@ -174,17 +174,17 @@ static void
 test_once_init_multi_threaded (void)
 {
   xsize_t i;
-  GThread *threads[THREADS];
+  xthread_t *threads[THREADS];
 
   g_test_summary ("Test g_once_init_{enter,leave}() usage from multiple threads");
 
   shared = 0;
 
   for (i = 0; i < G_N_ELEMENTS (threads); i++)
-    threads[i] = g_thread_new ("once-init-multi-threaded", thread_func, NULL);
+    threads[i] = xthread_new ("once-init-multi-threaded", thread_func, NULL);
 
   for (i = 0; i < G_N_ELEMENTS (threads); i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 
   g_assert_cmpint (shared, ==, 42);
 }

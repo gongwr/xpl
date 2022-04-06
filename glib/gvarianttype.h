@@ -34,9 +34,9 @@ G_BEGIN_DECLS
  *
  * A type in the xvariant_t type system.
  *
- * Two types may not be compared by value; use g_variant_type_equal() or
- * g_variant_type_is_subtype_of().  May be copied using
- * g_variant_type_copy() and freed using g_variant_type_free().
+ * Two types may not be compared by value; use xvariant_type_equal() or
+ * xvariant_type_is_subtype_of().  May be copied using
+ * xvariant_type_copy() and freed using xvariant_type_free().
  **/
 typedef struct _GVariantType xvariant_type_t;
 
@@ -280,102 +280,102 @@ typedef struct _GVariantType xvariant_type_t;
  * to ensure that @string is a valid xvariant_t type string.
  *
  * It is always a programmer error to use this macro with an invalid
- * type string. If in doubt, use g_variant_type_string_is_valid() to
+ * type string. If in doubt, use xvariant_type_string_is_valid() to
  * check if the string is valid.
  *
  * Since 2.24
  **/
 #ifndef G_DISABLE_CHECKS
-# define G_VARIANT_TYPE(type_string)            (g_variant_type_checked_ ((type_string)))
+# define G_VARIANT_TYPE(type_string)            (xvariant_type_checked_ ((type_string)))
 #else
 # define G_VARIANT_TYPE(type_string)            ((const xvariant_type_t *) (type_string))
 #endif
 
 /* type string checking */
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_type_string_is_valid          (const xchar_t         *type_string);
+xboolean_t                        xvariant_type_string_is_valid          (const xchar_t         *type_string);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_type_string_scan              (const xchar_t         *string,
+xboolean_t                        xvariant_type_string_scan              (const xchar_t         *string,
                                                                          const xchar_t         *limit,
                                                                          const xchar_t        **endptr);
 
 /* create/destroy */
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_type_free                     (xvariant_type_t        *type);
+void                            xvariant_type_free                     (xvariant_type_t        *type);
 XPL_AVAILABLE_IN_ALL
-xvariant_type_t *                  g_variant_type_copy                     (const xvariant_type_t  *type);
+xvariant_type_t *                  xvariant_type_copy                     (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-xvariant_type_t *                  g_variant_type_new                      (const xchar_t         *type_string);
+xvariant_type_t *                  xvariant_type_new                      (const xchar_t         *type_string);
 
 /* getters */
 XPL_AVAILABLE_IN_ALL
-xsize_t                           g_variant_type_get_string_length        (const xvariant_type_t  *type);
+xsize_t                           xvariant_type_get_string_length        (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-const xchar_t *                   g_variant_type_peek_string              (const xvariant_type_t  *type);
+const xchar_t *                   xvariant_type_peek_string              (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-xchar_t *                         g_variant_type_dup_string               (const xvariant_type_t  *type);
+xchar_t *                         xvariant_type_dup_string               (const xvariant_type_t  *type);
 
 /* classification */
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_type_is_definite              (const xvariant_type_t  *type);
+xboolean_t                        xvariant_type_is_definite              (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_type_is_container             (const xvariant_type_t  *type);
+xboolean_t                        xvariant_type_is_container             (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_type_is_basic                 (const xvariant_type_t  *type);
+xboolean_t                        xvariant_type_is_basic                 (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_type_is_maybe                 (const xvariant_type_t  *type);
+xboolean_t                        xvariant_type_is_maybe                 (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_type_is_array                 (const xvariant_type_t  *type);
+xboolean_t                        xvariant_type_is_array                 (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_type_is_tuple                 (const xvariant_type_t  *type);
+xboolean_t                        xvariant_type_is_tuple                 (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_type_is_dict_entry            (const xvariant_type_t  *type);
+xboolean_t                        xvariant_type_is_dict_entry            (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_type_is_variant               (const xvariant_type_t  *type);
+xboolean_t                        xvariant_type_is_variant               (const xvariant_type_t  *type);
 
 /* for hash tables */
 XPL_AVAILABLE_IN_ALL
-xuint_t                           g_variant_type_hash                     (gconstpointer        type);
+xuint_t                           xvariant_type_hash                     (xconstpointer        type);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_type_equal                    (gconstpointer        type1,
-                                                                         gconstpointer        type2);
+xboolean_t                        xvariant_type_equal                    (xconstpointer        type1,
+                                                                         xconstpointer        type2);
 
 /* subtypes */
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_type_is_subtype_of            (const xvariant_type_t  *type,
+xboolean_t                        xvariant_type_is_subtype_of            (const xvariant_type_t  *type,
                                                                          const xvariant_type_t  *supertype);
 
 /* type iterator interface */
 XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *            g_variant_type_element                  (const xvariant_type_t  *type);
+const xvariant_type_t *            xvariant_type_element                  (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *            g_variant_type_first                    (const xvariant_type_t  *type);
+const xvariant_type_t *            xvariant_type_first                    (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *            g_variant_type_next                     (const xvariant_type_t  *type);
+const xvariant_type_t *            xvariant_type_next                     (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-xsize_t                           g_variant_type_n_items                  (const xvariant_type_t  *type);
+xsize_t                           xvariant_type_n_items                  (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *            g_variant_type_key                      (const xvariant_type_t  *type);
+const xvariant_type_t *            xvariant_type_key                      (const xvariant_type_t  *type);
 XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *            g_variant_type_value                    (const xvariant_type_t  *type);
+const xvariant_type_t *            xvariant_type_value                    (const xvariant_type_t  *type);
 
 /* constructors */
 XPL_AVAILABLE_IN_ALL
-xvariant_type_t *                  g_variant_type_new_array                (const xvariant_type_t  *element);
+xvariant_type_t *                  xvariant_type_new_array                (const xvariant_type_t  *element);
 XPL_AVAILABLE_IN_ALL
-xvariant_type_t *                  g_variant_type_new_maybe                (const xvariant_type_t  *element);
+xvariant_type_t *                  xvariant_type_new_maybe                (const xvariant_type_t  *element);
 XPL_AVAILABLE_IN_ALL
-xvariant_type_t *                  g_variant_type_new_tuple                (const xvariant_type_t * const *items,
+xvariant_type_t *                  xvariant_type_new_tuple                (const xvariant_type_t * const *items,
                                                                          xint_t                 length);
 XPL_AVAILABLE_IN_ALL
-xvariant_type_t *                  g_variant_type_new_dict_entry           (const xvariant_type_t  *key,
+xvariant_type_t *                  xvariant_type_new_dict_entry           (const xvariant_type_t  *key,
                                                                          const xvariant_type_t  *value);
 
 /*< private >*/
 XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *            g_variant_type_checked_                 (const xchar_t *);
+const xvariant_type_t *            xvariant_type_checked_                 (const xchar_t *);
 XPL_AVAILABLE_IN_2_60
-xsize_t                           g_variant_type_string_get_depth_        (const xchar_t *type_string);
+xsize_t                           xvariant_type_string_get_depth_        (const xchar_t *type_string);
 
 G_END_DECLS
 

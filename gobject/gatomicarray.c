@@ -124,7 +124,7 @@ _g_atomic_array_copy (GAtomicArray *array,
 		      xsize_t header_size,
 		      xsize_t additional_element_size)
 {
-  guint8 *new, *old;
+  xuint8_t *new, *old;
   xsize_t old_size, new_size;
 
   G_LOCK (array);
@@ -158,7 +158,7 @@ void
 _g_atomic_array_update (GAtomicArray *array,
 			xpointer_t new_data)
 {
-  guint8 *old;
+  xuint8_t *old;
 
   G_LOCK (array);
   old = g_atomic_pointer_get (&array->data);

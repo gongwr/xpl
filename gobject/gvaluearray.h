@@ -30,71 +30,71 @@ G_BEGIN_DECLS
 /**
  * XTYPE_VALUE_ARRAY:
  *
- * The type ID of the "GValueArray" type which is a boxed type,
- * used to pass around pointers to GValueArrays.
+ * The type ID of the "xvalue_array_t" type which is a boxed type,
+ * used to pass around pointers to xvalue_array_ts.
  *
- * Deprecated: 2.32: Use #GArray instead of #GValueArray
+ * Deprecated: 2.32: Use #xarray_t instead of #xvalue_array_t
  */
-#define XTYPE_VALUE_ARRAY (g_value_array_get_type ()) XPL_DEPRECATED_MACRO_IN_2_32_FOR(XTYPE_ARRAY)
+#define XTYPE_VALUE_ARRAY (xvalue_array_get_type ()) XPL_DEPRECATED_MACRO_IN_2_32_FOR(XTYPE_ARRAY)
 
 /* --- typedefs & structs --- */
-typedef struct _GValueArray GValueArray;
+typedef struct _xvalue_array_t xvalue_array_t;
 /**
- * GValueArray:
+ * xvalue_array_t:
  * @n_values: number of values contained in the array
  * @values: array of values
  *
- * A #GValueArray contains an array of #GValue elements.
+ * A #xvalue_array_t contains an array of #xvalue_t elements.
  */
-struct _GValueArray
+struct _xvalue_array_t
 {
   xuint_t   n_values;
-  GValue *values;
+  xvalue_t *values;
 
   /*< private >*/
   xuint_t   n_prealloced;
 };
 
 /* --- prototypes --- */
-XPL_DEPRECATED_IN_2_32_FOR(GArray)
-xtype_t           g_value_array_get_type       (void) G_GNUC_CONST;
+XPL_DEPRECATED_IN_2_32_FOR(xarray_t)
+xtype_t           xvalue_array_get_type       (void) G_GNUC_CONST;
 
-XPL_DEPRECATED_IN_2_32_FOR(GArray)
-GValue*		g_value_array_get_nth	     (GValueArray	*value_array,
+XPL_DEPRECATED_IN_2_32_FOR(xarray_t)
+xvalue_t*		xvalue_array_get_nth	     (xvalue_array_t	*value_array,
 					      xuint_t		 index_);
 
-XPL_DEPRECATED_IN_2_32_FOR(GArray)
-GValueArray*	g_value_array_new	     (xuint_t		 n_prealloced);
+XPL_DEPRECATED_IN_2_32_FOR(xarray_t)
+xvalue_array_t*	xvalue_array_new	     (xuint_t		 n_prealloced);
 
-XPL_DEPRECATED_IN_2_32_FOR(GArray)
-void		g_value_array_free	     (GValueArray	*value_array);
+XPL_DEPRECATED_IN_2_32_FOR(xarray_t)
+void		xvalue_array_free	     (xvalue_array_t	*value_array);
 
-XPL_DEPRECATED_IN_2_32_FOR(GArray)
-GValueArray*	g_value_array_copy	     (const GValueArray *value_array);
+XPL_DEPRECATED_IN_2_32_FOR(xarray_t)
+xvalue_array_t*	xvalue_array_copy	     (const xvalue_array_t *value_array);
 
-XPL_DEPRECATED_IN_2_32_FOR(GArray)
-GValueArray*	g_value_array_prepend	     (GValueArray	*value_array,
-					      const GValue	*value);
+XPL_DEPRECATED_IN_2_32_FOR(xarray_t)
+xvalue_array_t*	xvalue_array_prepend	     (xvalue_array_t	*value_array,
+					      const xvalue_t	*value);
 
-XPL_DEPRECATED_IN_2_32_FOR(GArray)
-GValueArray*	g_value_array_append	     (GValueArray	*value_array,
-					      const GValue	*value);
+XPL_DEPRECATED_IN_2_32_FOR(xarray_t)
+xvalue_array_t*	xvalue_array_append	     (xvalue_array_t	*value_array,
+					      const xvalue_t	*value);
 
-XPL_DEPRECATED_IN_2_32_FOR(GArray)
-GValueArray*	g_value_array_insert	     (GValueArray	*value_array,
+XPL_DEPRECATED_IN_2_32_FOR(xarray_t)
+xvalue_array_t*	xvalue_array_insert	     (xvalue_array_t	*value_array,
 					      xuint_t		 index_,
-					      const GValue	*value);
+					      const xvalue_t	*value);
 
-XPL_DEPRECATED_IN_2_32_FOR(GArray)
-GValueArray*	g_value_array_remove	     (GValueArray	*value_array,
+XPL_DEPRECATED_IN_2_32_FOR(xarray_t)
+xvalue_array_t*	xvalue_array_remove	     (xvalue_array_t	*value_array,
 					      xuint_t		 index_);
 
-XPL_DEPRECATED_IN_2_32_FOR(GArray)
-GValueArray*	g_value_array_sort	     (GValueArray	*value_array,
+XPL_DEPRECATED_IN_2_32_FOR(xarray_t)
+xvalue_array_t*	xvalue_array_sort	     (xvalue_array_t	*value_array,
 					      GCompareFunc	 compare_func);
 
-XPL_DEPRECATED_IN_2_32_FOR(GArray)
-GValueArray*	g_value_array_sort_with_data (GValueArray	*value_array,
+XPL_DEPRECATED_IN_2_32_FOR(xarray_t)
+xvalue_array_t*	xvalue_array_sort_with_data (xvalue_array_t	*value_array,
 					      GCompareDataFunc	 compare_func,
 					      xpointer_t		 user_data);
 

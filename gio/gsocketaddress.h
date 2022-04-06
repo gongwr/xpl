@@ -31,7 +31,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_SOCKET_ADDRESS         (xsocket_address_get_type ())
-#define XSOCKET_ADDRESS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_SOCKET_ADDRESS, xsocket_address_t))
+#define XSOCKET_ADDRESS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_SOCKET_ADDRESS, xsocket_address))
 #define XSOCKET_ADDRESS_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_SOCKET_ADDRESS, GSocketAddressClass))
 #define X_IS_SOCKET_ADDRESS(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_SOCKET_ADDRESS))
 #define X_IS_SOCKET_ADDRESS_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_SOCKET_ADDRESS))
@@ -50,7 +50,7 @@ struct _GSocketAddressClass
 
   xsocket_family_t  (*get_family)      (xsocket_address_t *address);
 
-  gssize         (*get_native_size) (xsocket_address_t *address);
+  xssize_t         (*get_native_size) (xsocket_address_t *address);
 
   xboolean_t       (*to_native)       (xsocket_address_t *address,
                                      xpointer_t        dest,
@@ -75,7 +75,7 @@ xboolean_t              xsocket_address_to_native       (xsocket_address_t *addr
 							xerror_t        **error);
 
 XPL_AVAILABLE_IN_ALL
-gssize                xsocket_address_get_native_size (xsocket_address_t *address);
+xssize_t                xsocket_address_get_native_size (xsocket_address_t *address);
 
 G_END_DECLS
 

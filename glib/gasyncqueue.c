@@ -1,7 +1,7 @@
 /* XPL - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
- * GAsyncQueue: asynchronous queue implementation, based on GQueue.
+ * xasync_queue_t: asynchronous queue implementation, based on xqueue_t.
  * Copyright (C) 2000 Sebastian Wilhelmi; University of Karlsruhe
  *
  * This library is free software; you can redistribute it and/or
@@ -55,7 +55,7 @@
  * it will always be used by at least 2 concurrent threads.
  *
  * For using an asynchronous queue you first have to create one with
- * g_async_queue_new(). #GAsyncQueue structs are reference counted,
+ * g_async_queue_new(). #xasync_queue_t structs are reference counted,
  * use g_async_queue_ref() and g_async_queue_unref() to manage your
  * references.
  *
@@ -81,12 +81,12 @@
  *
  * In many cases, it may be more convenient to use #GThreadPool when
  * you need to distribute work to a set of worker threads instead of
- * using #GAsyncQueue manually. #GThreadPool uses a GAsyncQueue
+ * using #xasync_queue_t manually. #GThreadPool uses a xasync_queue_t
  * internally.
  */
 
 /**
- * GAsyncQueue:
+ * xasync_queue_t:
  *
  * An opaque data structure which represents an asynchronous queue.
  *
@@ -94,11 +94,11 @@
  */
 struct _GAsyncQueue
 {
-  GMutex mutex;
-  GCond cond;
-  GQueue queue;
-  GDestroyNotify item_free_func;
-  xuint_t waiting_threads;
+  xmutex_t mutex;
+  xcond_t cond;
+  xqueue_t queue;
+  xdestroy_notify_t item_free_func;
+  xuint_t waitinxthreads;
   xint_t ref_count;
 };
 
@@ -113,9 +113,9 @@ typedef struct
  *
  * Creates a new asynchronous queue.
  *
- * Returns: a new #GAsyncQueue. Free with g_async_queue_unref()
+ * Returns: a new #xasync_queue_t. Free with g_async_queue_unref()
  */
-GAsyncQueue *
+xasync_queue_t *
 g_async_queue_new (void)
 {
   return g_async_queue_new_full (NULL);
@@ -129,20 +129,20 @@ g_async_queue_new (void)
  * function that is used to free any remaining queue items when
  * the queue is destroyed after the final unref.
  *
- * Returns: a new #GAsyncQueue. Free with g_async_queue_unref()
+ * Returns: a new #xasync_queue_t. Free with g_async_queue_unref()
  *
  * Since: 2.16
  */
-GAsyncQueue *
-g_async_queue_new_full (GDestroyNotify item_free_func)
+xasync_queue_t *
+g_async_queue_new_full (xdestroy_notify_t item_free_func)
 {
-  GAsyncQueue *queue;
+  xasync_queue_t *queue;
 
-  queue = g_new (GAsyncQueue, 1);
+  queue = g_new (xasync_queue_t, 1);
   g_mutex_init (&queue->mutex);
   g_cond_init (&queue->cond);
   g_queue_init (&queue->queue);
-  queue->waiting_threads = 0;
+  queue->waitinxthreads = 0;
   queue->ref_count = 1;
   queue->item_free_func = item_free_func;
 
@@ -151,15 +151,15 @@ g_async_queue_new_full (GDestroyNotify item_free_func)
 
 /**
  * g_async_queue_ref:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  *
  * Increases the reference count of the asynchronous @queue by 1.
  * You do not need to hold the lock to call this function.
  *
  * Returns: the @queue that was passed in (since 2.6)
  */
-GAsyncQueue *
-g_async_queue_ref (GAsyncQueue *queue)
+xasync_queue_t *
+g_async_queue_ref (xasync_queue_t *queue)
 {
   g_return_val_if_fail (queue, NULL);
 
@@ -170,7 +170,7 @@ g_async_queue_ref (GAsyncQueue *queue)
 
 /**
  * g_async_queue_ref_unlocked:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  *
  * Increases the reference count of the asynchronous @queue by 1.
  *
@@ -179,7 +179,7 @@ g_async_queue_ref (GAsyncQueue *queue)
  * lock.
  */
 void
-g_async_queue_ref_unlocked (GAsyncQueue *queue)
+g_async_queue_ref_unlocked (xasync_queue_t *queue)
 {
   g_return_if_fail (queue);
 
@@ -188,7 +188,7 @@ g_async_queue_ref_unlocked (GAsyncQueue *queue)
 
 /**
  * g_async_queue_unref_and_unlock:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  *
  * Decreases the reference count of the asynchronous @queue by 1
  * and releases the lock. This function must be called while holding
@@ -200,7 +200,7 @@ g_async_queue_ref_unlocked (GAsyncQueue *queue)
  * lock.
  */
 void
-g_async_queue_unref_and_unlock (GAsyncQueue *queue)
+g_async_queue_unref_and_unlock (xasync_queue_t *queue)
 {
   g_return_if_fail (queue);
 
@@ -210,7 +210,7 @@ g_async_queue_unref_and_unlock (GAsyncQueue *queue)
 
 /**
  * g_async_queue_unref:
- * @queue: a #GAsyncQueue.
+ * @queue: a #xasync_queue_t.
  *
  * Decreases the reference count of the asynchronous @queue by 1.
  *
@@ -220,13 +220,13 @@ g_async_queue_unref_and_unlock (GAsyncQueue *queue)
  * You do not need to hold the lock to call this function.
  */
 void
-g_async_queue_unref (GAsyncQueue *queue)
+g_async_queue_unref (xasync_queue_t *queue)
 {
   g_return_if_fail (queue);
 
   if (g_atomic_int_dec_and_test (&queue->ref_count))
     {
-      g_return_if_fail (queue->waiting_threads == 0);
+      g_return_if_fail (queue->waitinxthreads == 0);
       g_mutex_clear (&queue->mutex);
       g_cond_clear (&queue->cond);
       if (queue->item_free_func)
@@ -238,7 +238,7 @@ g_async_queue_unref (GAsyncQueue *queue)
 
 /**
  * g_async_queue_lock:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  *
  * Acquires the @queue's lock. If another thread is already
  * holding the lock, this call will block until the lock
@@ -251,7 +251,7 @@ g_async_queue_unref (GAsyncQueue *queue)
  * deadlock may occur.
  */
 void
-g_async_queue_lock (GAsyncQueue *queue)
+g_async_queue_lock (xasync_queue_t *queue)
 {
   g_return_if_fail (queue);
 
@@ -260,7 +260,7 @@ g_async_queue_lock (GAsyncQueue *queue)
 
 /**
  * g_async_queue_unlock:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  *
  * Releases the queue's lock.
  *
@@ -269,7 +269,7 @@ g_async_queue_lock (GAsyncQueue *queue)
  * behaviour.
  */
 void
-g_async_queue_unlock (GAsyncQueue *queue)
+g_async_queue_unlock (xasync_queue_t *queue)
 {
   g_return_if_fail (queue);
 
@@ -278,13 +278,13 @@ g_async_queue_unlock (GAsyncQueue *queue)
 
 /**
  * g_async_queue_push:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  * @data: @data to push into the @queue
  *
  * Pushes the @data into the @queue. @data must not be %NULL.
  */
 void
-g_async_queue_push (GAsyncQueue *queue,
+g_async_queue_push (xasync_queue_t *queue,
                     xpointer_t     data)
 {
   g_return_if_fail (queue);
@@ -297,7 +297,7 @@ g_async_queue_push (GAsyncQueue *queue,
 
 /**
  * g_async_queue_push_unlocked:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  * @data: @data to push into the @queue
  *
  * Pushes the @data into the @queue. @data must not be %NULL.
@@ -305,20 +305,20 @@ g_async_queue_push (GAsyncQueue *queue,
  * This function must be called while holding the @queue's lock.
  */
 void
-g_async_queue_push_unlocked (GAsyncQueue *queue,
+g_async_queue_push_unlocked (xasync_queue_t *queue,
                              xpointer_t     data)
 {
   g_return_if_fail (queue);
   g_return_if_fail (data);
 
   g_queue_push_head (&queue->queue, data);
-  if (queue->waiting_threads > 0)
+  if (queue->waitinxthreads > 0)
     g_cond_signal (&queue->cond);
 }
 
 /**
  * g_async_queue_push_sorted:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  * @data: the @data to push into the @queue
  * @func: the #GCompareDataFunc is used to sort @queue
  * @user_data: user data passed to @func.
@@ -337,7 +337,7 @@ g_async_queue_push_unlocked (GAsyncQueue *queue,
  * Since: 2.10
  */
 void
-g_async_queue_push_sorted (GAsyncQueue      *queue,
+g_async_queue_push_sorted (xasync_queue_t      *queue,
                            xpointer_t          data,
                            GCompareDataFunc  func,
                            xpointer_t          user_data)
@@ -359,7 +359,7 @@ g_async_queue_invert_compare (xpointer_t  v1,
 
 /**
  * g_async_queue_push_sorted_unlocked:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  * @data: the @data to push into the @queue
  * @func: the #GCompareDataFunc is used to sort @queue
  * @user_data: user data passed to @func.
@@ -383,7 +383,7 @@ g_async_queue_invert_compare (xpointer_t  v1,
  * Since: 2.10
  */
 void
-g_async_queue_push_sorted_unlocked (GAsyncQueue      *queue,
+g_async_queue_push_sorted_unlocked (xasync_queue_t      *queue,
                                     xpointer_t          data,
                                     GCompareDataFunc  func,
                                     xpointer_t          user_data)
@@ -399,12 +399,12 @@ g_async_queue_push_sorted_unlocked (GAsyncQueue      *queue,
                          data,
                          (GCompareDataFunc)g_async_queue_invert_compare,
                          &sd);
-  if (queue->waiting_threads > 0)
+  if (queue->waitinxthreads > 0)
     g_cond_signal (&queue->cond);
 }
 
 static xpointer_t
-g_async_queue_pop_intern_unlocked (GAsyncQueue *queue,
+g_async_queue_pop_intern_unlocked (xasync_queue_t *queue,
                                    xboolean_t     wait,
                                    gint64       end_time)
 {
@@ -412,7 +412,7 @@ g_async_queue_pop_intern_unlocked (GAsyncQueue *queue,
 
   if (!g_queue_peek_tail_link (&queue->queue) && wait)
     {
-      queue->waiting_threads++;
+      queue->waitinxthreads++;
       while (!g_queue_peek_tail_link (&queue->queue))
         {
 	  if (end_time == -1)
@@ -423,7 +423,7 @@ g_async_queue_pop_intern_unlocked (GAsyncQueue *queue,
 		break;
 	    }
         }
-      queue->waiting_threads--;
+      queue->waitinxthreads--;
     }
 
   retval = g_queue_pop_tail (&queue->queue);
@@ -435,7 +435,7 @@ g_async_queue_pop_intern_unlocked (GAsyncQueue *queue,
 
 /**
  * g_async_queue_pop:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  *
  * Pops data from the @queue. If @queue is empty, this function
  * blocks until data becomes available.
@@ -443,7 +443,7 @@ g_async_queue_pop_intern_unlocked (GAsyncQueue *queue,
  * Returns: data from the queue
  */
 xpointer_t
-g_async_queue_pop (GAsyncQueue *queue)
+g_async_queue_pop (xasync_queue_t *queue)
 {
   xpointer_t retval;
 
@@ -458,7 +458,7 @@ g_async_queue_pop (GAsyncQueue *queue)
 
 /**
  * g_async_queue_pop_unlocked:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  *
  * Pops data from the @queue. If @queue is empty, this function
  * blocks until data becomes available.
@@ -468,7 +468,7 @@ g_async_queue_pop (GAsyncQueue *queue)
  * Returns: data from the queue.
  */
 xpointer_t
-g_async_queue_pop_unlocked (GAsyncQueue *queue)
+g_async_queue_pop_unlocked (xasync_queue_t *queue)
 {
   g_return_val_if_fail (queue, NULL);
 
@@ -477,7 +477,7 @@ g_async_queue_pop_unlocked (GAsyncQueue *queue)
 
 /**
  * g_async_queue_try_pop:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  *
  * Tries to pop data from the @queue. If no data is available,
  * %NULL is returned.
@@ -486,7 +486,7 @@ g_async_queue_pop_unlocked (GAsyncQueue *queue)
  *     available immediately.
  */
 xpointer_t
-g_async_queue_try_pop (GAsyncQueue *queue)
+g_async_queue_try_pop (xasync_queue_t *queue)
 {
   xpointer_t retval;
 
@@ -501,7 +501,7 @@ g_async_queue_try_pop (GAsyncQueue *queue)
 
 /**
  * g_async_queue_try_pop_unlocked:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  *
  * Tries to pop data from the @queue. If no data is available,
  * %NULL is returned.
@@ -512,7 +512,7 @@ g_async_queue_try_pop (GAsyncQueue *queue)
  *     available immediately.
  */
 xpointer_t
-g_async_queue_try_pop_unlocked (GAsyncQueue *queue)
+g_async_queue_try_pop_unlocked (xasync_queue_t *queue)
 {
   g_return_val_if_fail (queue, NULL);
 
@@ -521,7 +521,7 @@ g_async_queue_try_pop_unlocked (GAsyncQueue *queue)
 
 /**
  * g_async_queue_timeout_pop:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  * @timeout: the number of microseconds to wait
  *
  * Pops data from the @queue. If the queue is empty, blocks for
@@ -533,8 +533,8 @@ g_async_queue_try_pop_unlocked (GAsyncQueue *queue)
  *     received before the timeout.
  */
 xpointer_t
-g_async_queue_timeout_pop (GAsyncQueue *queue,
-			   guint64      timeout)
+g_async_queue_timeout_pop (xasync_queue_t *queue,
+			   xuint64_t      timeout)
 {
   gint64 end_time = g_get_monotonic_time () + timeout;
   xpointer_t retval;
@@ -550,7 +550,7 @@ g_async_queue_timeout_pop (GAsyncQueue *queue,
 
 /**
  * g_async_queue_timeout_pop_unlocked:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  * @timeout: the number of microseconds to wait
  *
  * Pops data from the @queue. If the queue is empty, blocks for
@@ -564,8 +564,8 @@ g_async_queue_timeout_pop (GAsyncQueue *queue,
  *     received before the timeout.
  */
 xpointer_t
-g_async_queue_timeout_pop_unlocked (GAsyncQueue *queue,
-				    guint64      timeout)
+g_async_queue_timeout_pop_unlocked (xasync_queue_t *queue,
+				    xuint64_t      timeout)
 {
   gint64 end_time = g_get_monotonic_time () + timeout;
 
@@ -576,7 +576,7 @@ g_async_queue_timeout_pop_unlocked (GAsyncQueue *queue,
 
 /**
  * g_async_queue_timed_pop:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  * @end_time: a #GTimeVal, determining the final time
  *
  * Pops data from the @queue. If the queue is empty, blocks until
@@ -594,7 +594,7 @@ g_async_queue_timeout_pop_unlocked (GAsyncQueue *queue,
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 xpointer_t
-g_async_queue_timed_pop (GAsyncQueue *queue,
+g_async_queue_timed_pop (xasync_queue_t *queue,
                          GTimeVal    *end_time)
 {
   gint64 m_end_time;
@@ -620,7 +620,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
  * g_async_queue_timed_pop_unlocked:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  * @end_time: a #GTimeVal, determining the final time
  *
  * Pops data from the @queue. If the queue is empty, blocks until
@@ -640,7 +640,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 xpointer_t
-g_async_queue_timed_pop_unlocked (GAsyncQueue *queue,
+g_async_queue_timed_pop_unlocked (xasync_queue_t *queue,
                                   GTimeVal    *end_time)
 {
   gint64 m_end_time;
@@ -661,7 +661,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
  * g_async_queue_length:
- * @queue: a #GAsyncQueue.
+ * @queue: a #xasync_queue_t.
  *
  * Returns the length of the queue.
  *
@@ -675,14 +675,14 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * Returns: the length of the @queue
  */
 xint_t
-g_async_queue_length (GAsyncQueue *queue)
+g_async_queue_length (xasync_queue_t *queue)
 {
   xint_t retval;
 
   g_return_val_if_fail (queue, 0);
 
   g_mutex_lock (&queue->mutex);
-  retval = queue->queue.length - queue->waiting_threads;
+  retval = queue->queue.length - queue->waitinxthreads;
   g_mutex_unlock (&queue->mutex);
 
   return retval;
@@ -690,7 +690,7 @@ g_async_queue_length (GAsyncQueue *queue)
 
 /**
  * g_async_queue_length_unlocked:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  *
  * Returns the length of the queue.
  *
@@ -706,16 +706,16 @@ g_async_queue_length (GAsyncQueue *queue)
  * Returns: the length of the @queue.
  */
 xint_t
-g_async_queue_length_unlocked (GAsyncQueue *queue)
+g_async_queue_length_unlocked (xasync_queue_t *queue)
 {
   g_return_val_if_fail (queue, 0);
 
-  return queue->queue.length - queue->waiting_threads;
+  return queue->queue.length - queue->waitinxthreads;
 }
 
 /**
  * g_async_queue_sort:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  * @func: the #GCompareDataFunc is used to sort @queue
  * @user_data: user data passed to @func
  *
@@ -745,7 +745,7 @@ g_async_queue_length_unlocked (GAsyncQueue *queue)
  * Since: 2.10
  */
 void
-g_async_queue_sort (GAsyncQueue      *queue,
+g_async_queue_sort (xasync_queue_t      *queue,
                     GCompareDataFunc  func,
                     xpointer_t          user_data)
 {
@@ -759,7 +759,7 @@ g_async_queue_sort (GAsyncQueue      *queue,
 
 /**
  * g_async_queue_sort_unlocked:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  * @func: the #GCompareDataFunc is used to sort @queue
  * @user_data: user data passed to @func
  *
@@ -776,7 +776,7 @@ g_async_queue_sort (GAsyncQueue      *queue,
  * Since: 2.10
  */
 void
-g_async_queue_sort_unlocked (GAsyncQueue      *queue,
+g_async_queue_sort_unlocked (xasync_queue_t      *queue,
                              GCompareDataFunc  func,
                              xpointer_t          user_data)
 {
@@ -795,7 +795,7 @@ g_async_queue_sort_unlocked (GAsyncQueue      *queue,
 
 /**
  * g_async_queue_remove:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  * @item: the data to remove from the @queue
  *
  * Remove an item from the queue.
@@ -805,7 +805,7 @@ g_async_queue_sort_unlocked (GAsyncQueue      *queue,
  * Since: 2.46
  */
 xboolean_t
-g_async_queue_remove (GAsyncQueue *queue,
+g_async_queue_remove (xasync_queue_t *queue,
                       xpointer_t     item)
 {
   xboolean_t ret;
@@ -822,7 +822,7 @@ g_async_queue_remove (GAsyncQueue *queue,
 
 /**
  * g_async_queue_remove_unlocked:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  * @item: the data to remove from the @queue
  *
  * Remove an item from the queue.
@@ -834,7 +834,7 @@ g_async_queue_remove (GAsyncQueue *queue,
  * Since: 2.46
  */
 xboolean_t
-g_async_queue_remove_unlocked (GAsyncQueue *queue,
+g_async_queue_remove_unlocked (xasync_queue_t *queue,
                                xpointer_t     item)
 {
   g_return_val_if_fail (queue != NULL, FALSE);
@@ -845,7 +845,7 @@ g_async_queue_remove_unlocked (GAsyncQueue *queue,
 
 /**
  * g_async_queue_push_front:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  * @item: data to push into the @queue
  *
  * Pushes the @item into the @queue. @item must not be %NULL.
@@ -856,7 +856,7 @@ g_async_queue_remove_unlocked (GAsyncQueue *queue,
  * Since: 2.46
  */
 void
-g_async_queue_push_front (GAsyncQueue *queue,
+g_async_queue_push_front (xasync_queue_t *queue,
                           xpointer_t     item)
 {
   g_return_if_fail (queue != NULL);
@@ -869,7 +869,7 @@ g_async_queue_push_front (GAsyncQueue *queue,
 
 /**
  * g_async_queue_push_front_unlocked:
- * @queue: a #GAsyncQueue
+ * @queue: a #xasync_queue_t
  * @item: data to push into the @queue
  *
  * Pushes the @item into the @queue. @item must not be %NULL.
@@ -882,14 +882,14 @@ g_async_queue_push_front (GAsyncQueue *queue,
  * Since: 2.46
  */
 void
-g_async_queue_push_front_unlocked (GAsyncQueue *queue,
+g_async_queue_push_front_unlocked (xasync_queue_t *queue,
                                    xpointer_t     item)
 {
   g_return_if_fail (queue != NULL);
   g_return_if_fail (item != NULL);
 
   g_queue_push_tail (&queue->queue, item);
-  if (queue->waiting_threads > 0)
+  if (queue->waitinxthreads > 0)
     g_cond_signal (&queue->cond);
 }
 
@@ -897,8 +897,8 @@ g_async_queue_push_front_unlocked (GAsyncQueue *queue,
  * Private API
  */
 
-GMutex *
-_g_async_queue_get_mutex (GAsyncQueue *queue)
+xmutex_t *
+_g_async_queue_get_mutex (xasync_queue_t *queue)
 {
   g_return_val_if_fail (queue, NULL);
 

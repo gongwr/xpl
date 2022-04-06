@@ -17,15 +17,15 @@
  * Author: Marc-André Lureau <marcandre.lureau@redhat.com>
  */
 
-#ifndef __G_URI_PRIVATE_H__
-#define __G_URI_PRIVATE_H__
+#ifndef __XURI_PRIVATE_H__
+#define __XURI_PRIVATE_H__
 
 #include "gtypes.h"
 
 G_BEGIN_DECLS
 
 void
-_uri_encoder (GString      *out,
+_uri_encoder (xstring_t      *out,
               const guchar *start,
               xsize_t         length,
               const xchar_t  *reserved_chars_allowed,
@@ -33,4 +33,4 @@ _uri_encoder (GString      *out,
 
 G_END_DECLS
 
-#endif /* __G_URI_PRIVATE_H__ */
+#endif /* __XURI_PRIVATE_H__ */

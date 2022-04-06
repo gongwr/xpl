@@ -55,21 +55,21 @@ struct  _GThread
 typedef struct _GThreadFunctions GThreadFunctions XPL_DEPRECATED_TYPE_IN_2_32;
 struct _GThreadFunctions
 {
-  GMutex*  (*mutex_new)           (void);
-  void     (*mutex_lock)          (GMutex               *mutex);
-  xboolean_t (*mutex_trylock)       (GMutex               *mutex);
-  void     (*mutex_unlock)        (GMutex               *mutex);
-  void     (*mutex_free)          (GMutex               *mutex);
-  GCond*   (*cond_new)            (void);
-  void     (*cond_signal)         (GCond                *cond);
-  void     (*cond_broadcast)      (GCond                *cond);
-  void     (*cond_wait)           (GCond                *cond,
-                                   GMutex               *mutex);
-  xboolean_t (*cond_timed_wait)     (GCond                *cond,
-                                   GMutex               *mutex,
+  xmutex_t*  (*mutex_new)           (void);
+  void     (*mutex_lock)          (xmutex_t               *mutex);
+  xboolean_t (*mutex_trylock)       (xmutex_t               *mutex);
+  void     (*mutex_unlock)        (xmutex_t               *mutex);
+  void     (*mutex_free)          (xmutex_t               *mutex);
+  xcond_t*   (*cond_new)            (void);
+  void     (*cond_signal)         (xcond_t                *cond);
+  void     (*cond_broadcast)      (xcond_t                *cond);
+  void     (*cond_wait)           (xcond_t                *cond,
+                                   xmutex_t               *mutex);
+  xboolean_t (*cond_timed_wait)     (xcond_t                *cond,
+                                   xmutex_t               *mutex,
                                    GTimeVal             *end_time);
-  void      (*cond_free)          (GCond                *cond);
-  GPrivate* (*private_new)        (GDestroyNotify        destructor);
+  void      (*cond_free)          (xcond_t                *cond);
+  GPrivate* (*private_new)        (xdestroy_notify_t        destructor);
   xpointer_t  (*private_get)        (GPrivate             *private_key);
   void      (*private_set)        (GPrivate             *private_key,
                                    xpointer_t              data);
@@ -91,19 +91,19 @@ struct _GThreadFunctions
                                    xpointer_t              thread2);
 } XPL_DEPRECATED_TYPE_IN_2_32;
 
-XPL_VAR GThreadFunctions       g_thread_functions_for_glib_use;
-XPL_VAR xboolean_t               g_thread_use_default_impl;
+XPL_VAR GThreadFunctions       xthread_functions_for_glib_use;
+XPL_VAR xboolean_t               xthread_use_default_impl;
 
-XPL_VAR guint64   (*g_thread_gettime) (void);
+XPL_VAR xuint64_t   (*xthread_gettime) (void);
 
-XPL_DEPRECATED_IN_2_32_FOR(g_thread_new)
-GThread *g_thread_create       (GThreadFunc       func,
+XPL_DEPRECATED_IN_2_32_FOR(xthread_new)
+xthread_t *xthread_create       (GThreadFunc       func,
                                 xpointer_t          data,
                                 xboolean_t          joinable,
                                 xerror_t          **error);
 
-XPL_DEPRECATED_IN_2_32_FOR(g_thread_new)
-GThread *g_thread_create_full  (GThreadFunc       func,
+XPL_DEPRECATED_IN_2_32_FOR(xthread_new)
+xthread_t *xthread_create_full  (GThreadFunc       func,
                                 xpointer_t          data,
                                 gulong            stack_size,
                                 xboolean_t          joinable,
@@ -112,11 +112,11 @@ GThread *g_thread_create_full  (GThreadFunc       func,
                                 xerror_t          **error);
 
 XPL_DEPRECATED_IN_2_32
-void     g_thread_set_priority (GThread          *thread,
+void     xthread_set_priority (xthread_t          *thread,
                                 GThreadPriority   priority);
 
 XPL_DEPRECATED_IN_2_32
-void     g_thread_foreach      (GFunc             thread_func,
+void     xthread_foreach      (GFunc             thread_func,
                                 xpointer_t          user_data);
 
 #ifndef G_OS_WIN32
@@ -132,12 +132,12 @@ void     g_thread_foreach      (GFunc             thread_func,
 #endif
 typedef struct
 {
-  GMutex *mutex;
+  xmutex_t *mutex;
 #ifndef G_OS_WIN32
   /* only for ABI compatibility reasons */
   pthread_mutex_t unused;
 #endif
-} GStaticMutex XPL_DEPRECATED_TYPE_IN_2_32_FOR(GMutex);
+} GStaticMutex XPL_DEPRECATED_TYPE_IN_2_32_FOR(xmutex_t);
 
 #define g_static_mutex_lock(mutex) \
     g_mutex_lock (g_static_mutex_get_mutex (mutex)) XPL_DEPRECATED_MACRO_IN_2_32_FOR(g_mutex_lock)
@@ -150,8 +150,8 @@ XPL_DEPRECATED_IN_2_32_FOR(g_mutex_init)
 void    g_static_mutex_init           (GStaticMutex *mutex);
 XPL_DEPRECATED_IN_2_32_FOR(g_mutex_clear)
 void    g_static_mutex_free           (GStaticMutex *mutex);
-XPL_DEPRECATED_IN_2_32_FOR(GMutex)
-GMutex *g_static_mutex_get_mutex_impl (GStaticMutex *mutex);
+XPL_DEPRECATED_IN_2_32_FOR(xmutex_t)
+xmutex_t *g_static_mutex_get_mutex_impl (GStaticMutex *mutex);
 
 typedef struct _GStaticRecMutex GStaticRecMutex XPL_DEPRECATED_TYPE_IN_2_32_FOR(GRecMutex);
 struct _GStaticRecMutex
@@ -199,8 +199,8 @@ struct _GStaticRWLock
 {
   /*< private >*/
   GStaticMutex mutex;
-  GCond *read_cond;
-  GCond *write_cond;
+  xcond_t *read_cond;
+  xcond_t *write_cond;
   xuint_t read_counter;
   xboolean_t have_writer;
   xuint_t want_to_read;
@@ -234,7 +234,7 @@ XPL_DEPRECATED_IN_2_32_FOR(g_rw_lock_free)
 void      g_static_rw_lock_free           (GStaticRWLock *lock);
 
 XPL_DEPRECATED_IN_2_32
-GPrivate *      g_private_new             (GDestroyNotify notify);
+GPrivate *      g_private_new             (xdestroy_notify_t notify);
 
 typedef struct _GStaticPrivate  GStaticPrivate XPL_DEPRECATED_TYPE_IN_2_32_FOR(GPrivate);
 struct _GStaticPrivate
@@ -253,7 +253,7 @@ xpointer_t g_static_private_get            (GStaticPrivate *private_key);
 XPL_DEPRECATED_IN_2_32_FOR(g_private_set)
 void     g_static_private_set            (GStaticPrivate *private_key,
                                           xpointer_t        data,
-                                          GDestroyNotify  notify);
+                                          xdestroy_notify_t  notify);
 
 XPL_DEPRECATED_IN_2_32
 void     g_static_private_free           (GStaticPrivate *private_key);
@@ -262,28 +262,28 @@ XPL_DEPRECATED_IN_2_32
 xboolean_t g_once_init_enter_impl          (volatile xsize_t *location);
 
 XPL_DEPRECATED_IN_2_32
-void     g_thread_init                   (xpointer_t vtable);
+void     xthread_init                   (xpointer_t vtable);
 XPL_DEPRECATED_IN_2_32
-void    g_thread_init_with_errorcheck_mutexes (xpointer_t vtable);
+void    xthread_init_with_errorcheck_mutexes (xpointer_t vtable);
 
 XPL_DEPRECATED_IN_2_32
-xboolean_t g_thread_get_initialized        (void);
+xboolean_t xthread_get_initialized        (void);
 
-XPL_VAR xboolean_t g_threads_got_initialized;
+XPL_VAR xboolean_t xthreads_got_initialized;
 
-#define g_thread_supported()     (1) XPL_DEPRECATED_MACRO_IN_2_32
+#define xthread_supported()     (1) XPL_DEPRECATED_MACRO_IN_2_32
 
 XPL_DEPRECATED_IN_2_32
-GMutex *        g_mutex_new             (void);
+xmutex_t *        g_mutex_new             (void);
 XPL_DEPRECATED_IN_2_32
-void            g_mutex_free            (GMutex *mutex);
+void            g_mutex_free            (xmutex_t *mutex);
 XPL_DEPRECATED_IN_2_32
-GCond *         g_cond_new              (void);
+xcond_t *         g_cond_new              (void);
 XPL_DEPRECATED_IN_2_32
-void            g_cond_free             (GCond  *cond);
+void            g_cond_free             (xcond_t  *cond);
 XPL_DEPRECATED_IN_2_32
-xboolean_t        g_cond_timed_wait       (GCond          *cond,
-                                         GMutex         *mutex,
+xboolean_t        g_cond_timed_wait       (xcond_t          *cond,
+                                         xmutex_t         *mutex,
                                          GTimeVal       *timeval);
 
 G_GNUC_END_IGNORE_DEPRECATIONS

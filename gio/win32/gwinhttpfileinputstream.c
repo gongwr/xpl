@@ -31,7 +31,7 @@
 
 struct _GWinHttpFileInputStream
 {
-  GFileInputStream parent_instance;
+  xfile_input_stream_t parent_instance;
 
   GWinHttpFile *file;
   xboolean_t request_sent;
@@ -47,7 +47,7 @@ struct _GWinHttpFileInputStreamClass
 #define g_winhttp_file_input_stream_get_type _g_winhttp_file_input_stream_get_type
 G_DEFINE_TYPE (GWinHttpFileInputStream, g_winhttp_file_input_stream, XTYPE_FILE_INPUT_STREAM)
 
-static gssize g_winhttp_file_input_stream_read (xinput_stream_t    *stream,
+static xssize_t g_winhttp_file_input_stream_read (xinput_stream_t    *stream,
                                                 void            *buffer,
                                                 xsize_t            count,
                                                 xcancellable_t    *cancellable,
@@ -69,7 +69,7 @@ g_winhttp_file_input_stream_finalize (xobject_t *object)
   if (winhttp_stream->connection != NULL)
     G_WINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpCloseHandle (winhttp_stream->connection);
 
-  g_object_unref (winhttp_stream->file);
+  xobject_unref (winhttp_stream->file);
   winhttp_stream->file = NULL;
 
   G_OBJECT_CLASS (g_winhttp_file_input_stream_parent_class)->finalize (object);
@@ -98,26 +98,26 @@ g_winhttp_file_input_stream_init (GWinHttpFileInputStream *info)
  * @connection: handle to the HTTP connection, as from WinHttpConnect()
  * @request: handle to the HTTP request, as from WinHttpOpenRequest
  *
- * Returns: #GFileInputStream for the given request
+ * Returns: #xfile_input_stream_t for the given request
  */
-GFileInputStream *
+xfile_input_stream_t *
 _g_winhttp_file_input_stream_new (GWinHttpFile *file,
                                   HINTERNET     connection,
                                   HINTERNET     request)
 {
   GWinHttpFileInputStream *stream;
 
-  stream = g_object_new (XTYPE_WINHTTP_FILE_INPUT_STREAM, NULL);
+  stream = xobject_new (XTYPE_WINHTTP_FILE_INPUT_STREAM, NULL);
 
-  stream->file = g_object_ref (file);
+  stream->file = xobject_ref (file);
   stream->request_sent = FALSE;
   stream->connection = connection;
   stream->request = request;
 
-  return G_FILE_INPUT_STREAM (stream);
+  return XFILE_INPUT_STREAM (stream);
 }
 
-static gssize
+static xssize_t
 g_winhttp_file_input_stream_read (xinput_stream_t  *stream,
                                   void          *buffer,
                                   xsize_t          count,

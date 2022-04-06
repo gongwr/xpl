@@ -41,43 +41,43 @@ static const GOptionEntry entries[] = {
 static void
 delete_trash_file (xfile_t *file, xboolean_t del_file, xboolean_t del_children)
 {
-  GFileInfo *info;
+  xfile_info_t *info;
   xfile_t *child;
-  GFileEnumerator *enumerator;
+  xfile_enumerator_t *enumerator;
 
-  g_return_if_fail (g_file_has_uri_scheme (file, "trash"));
+  g_return_if_fail (xfile_has_uri_scheme (file, "trash"));
 
   if (del_children)
     {
-      enumerator = g_file_enumerate_children (file,
-                                              G_FILE_ATTRIBUTE_STANDARD_NAME ","
-                                              G_FILE_ATTRIBUTE_STANDARD_TYPE,
-                                              G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+      enumerator = xfile_enumerate_children (file,
+                                              XFILE_ATTRIBUTE_STANDARD_NAME ","
+                                              XFILE_ATTRIBUTE_STANDARD_TYPE,
+                                              XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                               NULL,
                                               NULL);
       if (enumerator)
         {
-          while ((info = g_file_enumerator_next_file (enumerator, NULL, NULL)) != NULL)
+          while ((info = xfile_enumerator_next_file (enumerator, NULL, NULL)) != NULL)
             {
-              child = g_file_get_child (file, g_file_info_get_name (info));
+              child = xfile_get_child (file, xfile_info_get_name (info));
 
-              /* The g_file_delete operation works differently for locations
+              /* The xfile_delete operation works differently for locations
                * provided by the trash backend as it prevents modifications of
                * trashed items. For that reason, it is enough to call
-               * g_file_delete on top-level items only.
+               * xfile_delete on top-level items only.
                */
               delete_trash_file (child, TRUE, FALSE);
 
-              g_object_unref (child);
-              g_object_unref (info);
+              xobject_unref (child);
+              xobject_unref (info);
             }
-          g_file_enumerator_close (enumerator, NULL, NULL);
-          g_object_unref (enumerator);
+          xfile_enumerator_close (enumerator, NULL, NULL);
+          xobject_unref (enumerator);
         }
     }
 
   if (del_file)
-    g_file_delete (file, NULL, NULL);
+    xfile_delete (file, NULL, NULL);
 }
 
 static xboolean_t
@@ -86,35 +86,35 @@ restore_trash (xfile_t         *file,
                xcancellable_t  *cancellable,
                xerror_t       **error)
 {
-  GFileInfo *info = NULL;
+  xfile_info_t *info = NULL;
   xfile_t *target = NULL;
   xfile_t *dir_target = NULL;
   xboolean_t ret = FALSE;
   xchar_t *orig_path = NULL;
   xerror_t *local_error = NULL;
 
-  info = g_file_query_info (file, G_FILE_ATTRIBUTE_TRASH_ORIG_PATH, G_FILE_QUERY_INFO_NONE, cancellable, &local_error);
+  info = xfile_query_info (file, XFILE_ATTRIBUTE_TRASH_ORIG_PATH, XFILE_QUERY_INFO_NONE, cancellable, &local_error);
   if (local_error)
     {
       g_propagate_error (error, local_error);
       goto exit_func;
     }
 
-  orig_path = g_file_info_get_attribute_as_string (info, G_FILE_ATTRIBUTE_TRASH_ORIG_PATH);
+  orig_path = xfile_info_get_attribute_as_string (info, XFILE_ATTRIBUTE_TRASH_ORIG_PATH);
   if (!orig_path)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("Unable to find original path"));
       goto exit_func;
     }
 
-  target = g_file_new_for_commandline_arg (orig_path);
+  target = xfile_new_for_commandline_arg (orig_path);
   g_free (orig_path);
 
-  dir_target = g_file_get_parent (target);
+  dir_target = xfile_get_parent (target);
   if (dir_target)
     {
-      g_file_make_directory_with_parents (dir_target, cancellable, &local_error);
-      if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_EXISTS))
+      xfile_make_directory_with_parents (dir_target, cancellable, &local_error);
+      if (xerror_matches (local_error, G_IO_ERROR, G_IO_ERROR_EXISTS))
         {
           g_clear_error (&local_error);
         }
@@ -125,9 +125,9 @@ restore_trash (xfile_t         *file,
         }
     }
 
-  if (!g_file_move (file,
+  if (!xfile_move (file,
                     target,
-                    force ? G_FILE_COPY_OVERWRITE : G_FILE_COPY_NONE,
+                    force ? XFILE_COPY_OVERWRITE : XFILE_COPY_NONE,
                     cancellable,
                     NULL,
                     NULL,
@@ -150,15 +150,15 @@ trash_list (xfile_t         *file,
             xcancellable_t  *cancellable,
             xerror_t       **error)
 {
-  GFileEnumerator *enumerator;
-  GFileInfo *info;
+  xfile_enumerator_t *enumerator;
+  xfile_info_t *info;
   xerror_t *local_error = NULL;
   xboolean_t res;
 
-  enumerator = g_file_enumerate_children (file,
-                                          G_FILE_ATTRIBUTE_STANDARD_NAME ","
-                                          G_FILE_ATTRIBUTE_TRASH_ORIG_PATH,
-                                          G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+  enumerator = xfile_enumerate_children (file,
+                                          XFILE_ATTRIBUTE_STANDARD_NAME ","
+                                          XFILE_ATTRIBUTE_TRASH_ORIG_PATH,
+                                          XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                           cancellable,
                                           &local_error);
   if (!enumerator)
@@ -168,22 +168,22 @@ trash_list (xfile_t         *file,
     }
 
   res = TRUE;
-  while ((info = g_file_enumerator_next_file (enumerator, cancellable, &local_error)) != NULL)
+  while ((info = xfile_enumerator_next_file (enumerator, cancellable, &local_error)) != NULL)
     {
       const char *name;
       char *orig_path;
       char *uri;
       xfile_t* child;
 
-      name = g_file_info_get_name (info);
-      child = g_file_get_child (file, name);
-      uri = g_file_get_uri (child);
-      g_object_unref (child);
-      orig_path = g_file_info_get_attribute_as_string (info, G_FILE_ATTRIBUTE_TRASH_ORIG_PATH);
+      name = xfile_info_get_name (info);
+      child = xfile_get_child (file, name);
+      uri = xfile_get_uri (child);
+      xobject_unref (child);
+      orig_path = xfile_info_get_attribute_as_string (info, XFILE_ATTRIBUTE_TRASH_ORIG_PATH);
 
       g_print ("%s\t%s\n", uri, orig_path);
 
-      g_object_unref (info);
+      xobject_unref (info);
       g_free (orig_path);
       g_free (uri);
     }
@@ -195,7 +195,7 @@ trash_list (xfile_t         *file,
       res = FALSE;
     }
 
-  if (!g_file_enumerator_close (enumerator, cancellable, &local_error))
+  if (!xfile_enumerator_close (enumerator, cancellable, &local_error))
     {
       print_file_error (file, local_error->message);
       g_clear_error (&local_error);
@@ -208,7 +208,7 @@ trash_list (xfile_t         *file,
 int
 handle_trash (int argc, char *argv[], xboolean_t do_help)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xchar_t *param;
   xerror_t *error = NULL;
   int retval = 0;
@@ -217,7 +217,7 @@ handle_trash (int argc, char *argv[], xboolean_t do_help)
   g_set_prgname ("gio trash");
 
   /* Translators: commandline placeholder */
-  param = g_strdup_printf ("[%s…]", _("LOCATION"));
+  param = xstrdup_printf ("[%s…]", _("LOCATION"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -238,7 +238,7 @@ handle_trash (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      g_error_free (error);
+      xerror_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -249,11 +249,11 @@ handle_trash (int argc, char *argv[], xboolean_t do_help)
 
       for (i = 1; i < argc; i++)
         {
-          file = g_file_new_for_commandline_arg (argv[i]);
+          file = xfile_new_for_commandline_arg (argv[i]);
           error = NULL;
           if (restore)
             {
-              if (!g_file_has_uri_scheme (file, "trash"))
+              if (!xfile_has_uri_scheme (file, "trash"))
                 {
                   print_file_error (file, _("Location given doesn't start with trash:///"));
                   retval = 1;
@@ -264,23 +264,23 @@ handle_trash (int argc, char *argv[], xboolean_t do_help)
                   retval = 1;
                 }
             }
-          else if (!g_file_trash (file, NULL, &error))
+          else if (!xfile_trash (file, NULL, &error))
             {
               if (!force ||
-                  !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+                  !xerror_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
                 {
                   print_file_error (file, error->message);
                   retval = 1;
                 }
             }
           g_clear_error (&error);
-          g_object_unref (file);
+          xobject_unref (file);
         }
     }
   else if (list)
     {
       xfile_t *file;
-      file = g_file_new_for_uri ("trash:");
+      file = xfile_new_for_uri ("trash:");
       trash_list (file, NULL, &error);
       if (error)
         {
@@ -288,14 +288,14 @@ handle_trash (int argc, char *argv[], xboolean_t do_help)
           g_clear_error (&error);
           retval = 1;
         }
-      g_object_unref (file);
+      xobject_unref (file);
     }
   else if (empty)
     {
       xfile_t *file;
-      file = g_file_new_for_uri ("trash:");
+      file = xfile_new_for_uri ("trash:");
       delete_trash_file (file, FALSE, TRUE);
-      g_object_unref (file);
+      xobject_unref (file);
     }
 
   if (argc == 1 && !empty && !list)

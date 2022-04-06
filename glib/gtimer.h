@@ -37,27 +37,27 @@ G_BEGIN_DECLS
  */
 
 /* microseconds per second */
-typedef struct _GTimer		GTimer;
+typedef struct _GTimer		xtimer_t;
 
 #define G_USEC_PER_SEC 1000000
 
 XPL_AVAILABLE_IN_ALL
-GTimer*  g_timer_new	         (void);
+xtimer_t*  g_timer_new	         (void);
 XPL_AVAILABLE_IN_ALL
-void	 g_timer_destroy         (GTimer      *timer);
+void	 g_timer_destroy         (xtimer_t      *timer);
 XPL_AVAILABLE_IN_ALL
-void	 g_timer_start	         (GTimer      *timer);
+void	 g_timer_start	         (xtimer_t      *timer);
 XPL_AVAILABLE_IN_ALL
-void	 g_timer_stop	         (GTimer      *timer);
+void	 g_timer_stop	         (xtimer_t      *timer);
 XPL_AVAILABLE_IN_ALL
-void	 g_timer_reset	         (GTimer      *timer);
+void	 g_timer_reset	         (xtimer_t      *timer);
 XPL_AVAILABLE_IN_ALL
-void	 g_timer_continue        (GTimer      *timer);
+void	 g_timer_continue        (xtimer_t      *timer);
 XPL_AVAILABLE_IN_ALL
-xdouble_t  g_timer_elapsed         (GTimer      *timer,
+xdouble_t  g_timer_elapsed         (xtimer_t      *timer,
 				  gulong      *microseconds);
 XPL_AVAILABLE_IN_2_62
-xboolean_t g_timer_is_active       (GTimer      *timer);
+xboolean_t g_timer_is_active       (xtimer_t      *timer);
 
 XPL_AVAILABLE_IN_ALL
 void     g_usleep                (gulong       microseconds);
@@ -65,11 +65,11 @@ void     g_usleep                (gulong       microseconds);
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 XPL_DEPRECATED_IN_2_62
 void     g_time_val_add          (GTimeVal    *time_,
-                                  glong        microseconds);
-XPL_DEPRECATED_IN_2_62_FOR(g_date_time_new_from_iso8601)
+                                  xlong_t        microseconds);
+XPL_DEPRECATED_IN_2_62_FOR(xdate_time_new_from_iso8601)
 xboolean_t g_time_val_from_iso8601 (const xchar_t *iso_date,
 				  GTimeVal    *time_);
-XPL_DEPRECATED_IN_2_62_FOR(g_date_time_format)
+XPL_DEPRECATED_IN_2_62_FOR(xdate_time_format)
 xchar_t*   g_time_val_to_iso8601   (GTimeVal    *time_) G_GNUC_MALLOC;
 G_GNUC_END_IGNORE_DEPRECATIONS
 

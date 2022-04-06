@@ -55,7 +55,7 @@
 
 typedef struct
 {
-  GMainLoop *loop;
+  xmain_loop_t *loop;
   xboolean_t   timed_out;
 } WeakNotifyData;
 
@@ -64,27 +64,27 @@ on_weak_notify_timeout (xpointer_t user_data)
 {
   WeakNotifyData *data = user_data;
   data->timed_out = TRUE;
-  g_main_loop_quit (data->loop);
+  xmain_loop_quit (data->loop);
   return FALSE;
 }
 
 static xboolean_t
 unref_on_idle (xpointer_t object)
 {
-  g_object_unref (object);
+  xobject_unref (object);
   return FALSE;
 }
 
 static xboolean_t
-_g_object_unref_and_wait_weak_notify (xpointer_t object)
+_xobject_unref_and_wait_weak_notify (xpointer_t object)
 {
   WeakNotifyData data;
   xuint_t timeout_id;
 
-  data.loop = g_main_loop_new (NULL, FALSE);
+  data.loop = xmain_loop_new (NULL, FALSE);
   data.timed_out = FALSE;
 
-  g_object_weak_ref (object, (GWeakNotify) g_main_loop_quit, data.loop);
+  xobject_weak_ref (object, (GWeakNotify) xmain_loop_quit, data.loop);
 
   /* Drop the strong ref held by the caller in an idle callback. This is to
    * make sure the mainloop is already running when weak notify happens (when
@@ -94,7 +94,7 @@ _g_object_unref_and_wait_weak_notify (xpointer_t object)
   /* Make sure we don't block forever */
   timeout_id = g_timeout_add (30 * 1000, on_weak_notify_timeout, &data);
 
-  g_main_loop_run (data.loop);
+  xmain_loop_run (data.loop);
 
   if (data.timed_out)
     {
@@ -103,10 +103,10 @@ _g_object_unref_and_wait_weak_notify (xpointer_t object)
     }
   else
     {
-      g_source_remove (timeout_id);
+      xsource_remove (timeout_id);
     }
 
-  g_main_loop_unref (data.loop);
+  xmain_loop_unref (data.loop);
   return data.timed_out;
 }
 
@@ -117,7 +117,7 @@ _g_object_unref_and_wait_weak_notify (xpointer_t object)
 
 /* This could be interesting to expose in public API */
 static void
-_g_test_watcher_add_pid (GPid pid)
+_g_test_watcher_add_pid (xpid_t pid)
 {
   static xsize_t started = 0;
   HANDLE job;
@@ -143,7 +143,7 @@ _g_test_watcher_add_pid (GPid pid)
 }
 
 static void
-_g_test_watcher_remove_pid (GPid pid)
+_g_test_watcher_remove_pid (xpid_t pid)
 {
   /* No need to unassign the process from the job object as the process
      will be killed anyway */
@@ -157,9 +157,9 @@ _g_test_watcher_remove_pid (GPid pid)
 static void
 watch_parent (xint_t fd)
 {
-  GIOChannel *channel;
-  GPollFD fds[1];
-  GArray *pids_to_kill;
+  xio_channel_t *channel;
+  xpollfd_t fds[1];
+  xarray_t *pids_to_kill;
 
   channel = g_io_channel_unix_new (fd);
 
@@ -234,11 +234,11 @@ watch_parent (xint_t fd)
   while (TRUE);
 }
 
-static GIOChannel *
+static xio_channel_t *
 watcher_init (void)
 {
   static xsize_t started = 0;
-  static GIOChannel *channel = NULL;
+  static xio_channel_t *channel = NULL;
   int errsv;
 
   if (g_once_init_enter (&started))
@@ -249,7 +249,7 @@ watcher_init (void)
       if (pipe (pipe_fds) != 0)
         {
           errsv = errno;
-          g_warning ("pipe() failed: %s", g_strerror (errsv));
+          g_warning ("pipe() failed: %s", xstrerror (errsv));
           g_assert_not_reached ();
         }
 
@@ -267,7 +267,7 @@ watcher_init (void)
         {
         case -1:
           errsv = errno;
-          g_warning ("fork() failed: %s", g_strerror (errsv));
+          g_warning ("fork() failed: %s", xstrerror (errsv));
           g_assert_not_reached ();
           break;
 
@@ -292,7 +292,7 @@ watcher_init (void)
 static void
 watcher_send_command (const xchar_t *command)
 {
-  GIOChannel *channel;
+  xio_channel_t *channel;
   xerror_t *error = NULL;
   GIOStatus status;
 
@@ -309,21 +309,21 @@ watcher_send_command (const xchar_t *command)
 
 /* This could be interesting to expose in public API */
 static void
-_g_test_watcher_add_pid (GPid pid)
+_g_test_watcher_add_pid (xpid_t pid)
 {
   xchar_t *command;
 
-  command = g_strdup_printf (ADD_PID_FORMAT, (xuint_t) pid);
+  command = xstrdup_printf (ADD_PID_FORMAT, (xuint_t) pid);
   watcher_send_command (command);
   g_free (command);
 }
 
 static void
-_g_test_watcher_remove_pid (GPid pid)
+_g_test_watcher_remove_pid (xpid_t pid)
 {
   xchar_t *command;
 
-  command = g_strdup_printf (REMOVE_PID_FORMAT, (xuint_t) pid);
+  command = xstrdup_printf (REMOVE_PID_FORMAT, (xuint_t) pid);
   watcher_send_command (command);
   g_free (command);
 }
@@ -331,7 +331,7 @@ _g_test_watcher_remove_pid (GPid pid)
 #endif
 
 /* -------------------------------------------------------------------------- */
-/* GTestDBus object implementation */
+/* xtest_dbus_t object implementation */
 
 /**
  * SECTION:gtestdbus
@@ -341,18 +341,18 @@ _g_test_watcher_remove_pid (GPid pid)
  * A helper class for testing code which uses D-Bus without touching the user's
  * session bus.
  *
- * Note that #GTestDBus modifies the user’s environment, calling setenv().
- * This is not thread-safe, so all #GTestDBus calls should be completed before
+ * Note that #xtest_dbus_t modifies the user’s environment, calling setenv().
+ * This is not thread-safe, so all #xtest_dbus_t calls should be completed before
  * threads are spawned, or should have appropriate locking to ensure no access
- * conflicts to environment variables shared between #GTestDBus and other
+ * conflicts to environment variables shared between #xtest_dbus_t and other
  * threads.
  *
- * ## Creating unit tests using GTestDBus
+ * ## Creating unit tests using xtest_dbus_t
  *
  * Testing of D-Bus services can be tricky because normally we only ever run
  * D-Bus services over an existing instance of the D-Bus daemon thus we
  * usually don't activate D-Bus services that are not yet installed into the
- * target system. The #GTestDBus object makes this easier for us by taking care
+ * target system. The #xtest_dbus_t object makes this easier for us by taking care
  * of the lower level tasks such as running a private D-Bus daemon and looking
  * up uninstalled services in customizable locations, typically in your source
  * code tree.
@@ -378,7 +378,7 @@ _g_test_watcher_remove_pid (GPid pid)
  *     -DTEST_SERVICES=\""$(abs_top_builddir)/tests/services"\"
  * ]|
  *     Once you have a service definition file which is local to your source tree,
- * you can proceed to set up a GTest fixture using the #GTestDBus scaffolding.
+ * you can proceed to set up a xtest_t fixture using the #xtest_dbus_t scaffolding.
  *
  * An example of a test fixture for D-Bus services can be found
  * here:
@@ -387,21 +387,21 @@ _g_test_watcher_remove_pid (GPid pid)
  * Note that these examples only deal with isolating the D-Bus aspect of your
  * service. To successfully run isolated unit tests on your service you may need
  * some additional modifications to your test case fixture. For example; if your
- * service uses GSettings and installs a schema then it is important that your test service
+ * service uses xsettings_t and installs a schema then it is important that your test service
  * not load the schema in the ordinary installed location (chances are that your service
  * and schema files are not yet installed, or worse; there is an older version of the
  * schema file sitting in the install location).
  *
  * Most of the time we can work around these obstacles using the
  * environment. Since the environment is inherited by the D-Bus daemon
- * created by #GTestDBus and then in turn inherited by any services the
+ * created by #xtest_dbus_t and then in turn inherited by any services the
  * D-Bus daemon activates, using the setup routine for your fixture is
  * a practical place to help sandbox your runtime environment. For the
- * rather typical GSettings case we can work around this by setting
+ * rather typical xsettings_t case we can work around this by setting
  * `GSETTINGS_SCHEMA_DIR` to the in tree directory holding your schemas
  * in the above fixture_setup() routine.
  *
- * The GSettings schemas need to be locally pre-compiled for this to work. This can be achieved
+ * The xsettings_t schemas need to be locally pre-compiled for this to work. This can be achieved
  * by compiling the schemas locally as a step before running test cases, an autotools setup might
  * do the following in the directory holding schemas:
  * |[
@@ -416,9 +416,9 @@ typedef struct _GTestDBusClass   GTestDBusClass;
 typedef struct _GTestDBusPrivate GTestDBusPrivate;
 
 /**
- * GTestDBus:
+ * xtest_dbus_t:
  *
- * The #GTestDBus structure contains only private data and
+ * The #xtest_dbus_t structure contains only private data and
  * should only be accessed using the provided API.
  *
  * Since: 2.34
@@ -436,8 +436,8 @@ struct _GTestDBusClass {
 struct _GTestDBusPrivate
 {
   GTestDBusFlags flags;
-  GPtrArray *service_dirs;
-  GPid bus_pid;
+  xptr_array_t *service_dirs;
+  xpid_t bus_pid;
   xchar_t *bus_address;
   xboolean_t up;
 };
@@ -448,19 +448,19 @@ enum
   PROP_FLAGS,
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (GTestDBus, g_test_dbus, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (xtest_dbus_t, g_test_dbus, XTYPE_OBJECT)
 
 static void
-g_test_dbus_init (GTestDBus *self)
+g_test_dbus_init (xtest_dbus_t *self)
 {
   self->priv = g_test_dbus_get_instance_private (self);
-  self->priv->service_dirs = g_ptr_array_new_with_free_func (g_free);
+  self->priv->service_dirs = xptr_array_new_with_free_func (g_free);
 }
 
 static void
 g_test_dbus_dispose (xobject_t *object)
 {
-  GTestDBus *self = (GTestDBus *) object;
+  xtest_dbus_t *self = (xtest_dbus_t *) object;
 
   if (self->priv->up)
     g_test_dbus_down (self);
@@ -471,9 +471,9 @@ g_test_dbus_dispose (xobject_t *object)
 static void
 g_test_dbus_finalize (xobject_t *object)
 {
-  GTestDBus *self = (GTestDBus *) object;
+  xtest_dbus_t *self = (xtest_dbus_t *) object;
 
-  g_ptr_array_unref (self->priv->service_dirs);
+  xptr_array_unref (self->priv->service_dirs);
   g_free (self->priv->bus_address);
 
   G_OBJECT_CLASS (g_test_dbus_parent_class)->finalize (object);
@@ -482,15 +482,15 @@ g_test_dbus_finalize (xobject_t *object)
 static void
 g_test_dbus_get_property (xobject_t *object,
     xuint_t property_id,
-    GValue *value,
-    GParamSpec *pspec)
+    xvalue_t *value,
+    xparam_spec_t *pspec)
 {
-  GTestDBus *self = (GTestDBus *) object;
+  xtest_dbus_t *self = (xtest_dbus_t *) object;
 
   switch (property_id)
     {
       case PROP_FLAGS:
-        g_value_set_flags (value, g_test_dbus_get_flags (self));
+        xvalue_set_flags (value, g_test_dbus_get_flags (self));
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -501,15 +501,15 @@ g_test_dbus_get_property (xobject_t *object,
 static void
 g_test_dbus_set_property (xobject_t *object,
     xuint_t property_id,
-    const GValue *value,
-    GParamSpec *pspec)
+    const xvalue_t *value,
+    xparam_spec_t *pspec)
 {
-  GTestDBus *self = (GTestDBus *) object;
+  xtest_dbus_t *self = (xtest_dbus_t *) object;
 
   switch (property_id)
     {
       case PROP_FLAGS:
-        self->priv->flags = g_value_get_flags (value);
+        self->priv->flags = xvalue_get_flags (value);
         break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -528,13 +528,13 @@ g_test_dbus_class_init (GTestDBusClass *klass)
   object_class->set_property = g_test_dbus_set_property;
 
   /**
-   * GTestDBus:flags:
+   * xtest_dbus_t:flags:
    *
    * #GTestDBusFlags specifying the behaviour of the D-Bus session.
    *
    * Since: 2.34
    */
-  g_object_class_install_property (object_class, PROP_FLAGS,
+  xobject_class_install_property (object_class, PROP_FLAGS,
     g_param_spec_flags ("flags",
                         P_("D-Bus session flags"),
                         P_("Flags specifying the behaviour of the D-Bus session"),
@@ -545,19 +545,19 @@ g_test_dbus_class_init (GTestDBusClass *klass)
 }
 
 static xchar_t *
-write_config_file (GTestDBus *self)
+write_config_file (xtest_dbus_t *self)
 {
-  GString *contents;
+  xstring_t *contents;
   xint_t fd;
   xuint_t i;
   xerror_t *error = NULL;
   xchar_t *path = NULL;
 
-  fd = g_file_open_tmp ("g-test-dbus-XXXXXX", &path, &error);
+  fd = xfile_open_tmp ("g-test-dbus-XXXXXX", &path, &error);
   g_assert_no_error (error);
 
-  contents = g_string_new (NULL);
-  g_string_append (contents,
+  contents = xstring_new (NULL);
+  xstring_append (contents,
       "<busconfig>\n"
       "  <type>session</type>\n"
 #ifdef G_OS_WIN32
@@ -569,13 +569,13 @@ write_config_file (GTestDBus *self)
 
   for (i = 0; i < self->priv->service_dirs->len; i++)
     {
-      const xchar_t *dir_path = g_ptr_array_index (self->priv->service_dirs, i);
+      const xchar_t *dir_path = xptr_array_index (self->priv->service_dirs, i);
 
-      g_string_append_printf (contents,
+      xstring_append_printf (contents,
           "  <servicedir>%s</servicedir>\n", dir_path);
     }
 
-  g_string_append (contents,
+  xstring_append (contents,
       "  <policy context=\"default\">\n"
       "    <!-- Allow everything to be sent -->\n"
       "    <allow send_destination=\"*\" eavesdrop=\"true\"/>\n"
@@ -587,12 +587,12 @@ write_config_file (GTestDBus *self)
       "</busconfig>\n");
 
   close (fd);
-  g_file_set_contents_full (path, contents->str, contents->len,
-                            G_FILE_SET_CONTENTS_NONE,
+  xfile_set_contents_full (path, contents->str, contents->len,
+                            XFILE_SET_CONTENTS_NONE,
                             0600, &error);
   g_assert_no_error (error);
 
-  g_string_free (contents, TRUE);
+  xstring_free (contents, TRUE);
 
   return path;
 }
@@ -610,7 +610,7 @@ make_pipe (xint_t     pipe_fds[2],
 
       g_set_error (error, G_SPAWN_ERROR, G_SPAWN_ERROR_FAILED,
                    _("Failed to create pipe for communicating with child process (%s)"),
-                   g_strerror (errsv));
+                   xstrerror (errsv));
       return FALSE;
     }
   return TRUE;
@@ -622,14 +622,14 @@ make_pipe (xint_t     pipe_fds[2],
 }
 
 static void
-start_daemon (GTestDBus *self)
+start_daemon (xtest_dbus_t *self)
 {
   const xchar_t *argv[] = {"dbus-daemon", "--print-address", "--config-file=foo", NULL};
   xint_t pipe_fds[2] = {-1, -1};
   xchar_t *config_path;
   xchar_t *config_arg;
   xchar_t *print_address;
-  GIOChannel *channel;
+  xio_channel_t *channel;
   xsize_t termpos;
   xerror_t *error = NULL;
 
@@ -639,13 +639,13 @@ start_daemon (GTestDBus *self)
   make_pipe (pipe_fds, &error);
   g_assert_no_error (error);
 
-  print_address = g_strdup_printf ("--print-address=%d", pipe_fds[1]);
+  print_address = xstrdup_printf ("--print-address=%d", pipe_fds[1]);
   argv[1] = print_address;
   g_assert_no_error (error);
 
   /* Write config file and set its path in argv */
   config_path = write_config_file (self);
-  config_arg = g_strdup_printf ("--config-file=%s", config_path);
+  config_arg = xstrdup_printf ("--config-file=%s", config_path);
   argv[2] = config_arg;
 
   /* Spawn dbus-daemon */
@@ -684,7 +684,7 @@ start_daemon (GTestDBus *self)
     {
       xchar_t *command;
 
-      command = g_strdup_printf ("dbus-monitor --address %s",
+      command = xstrdup_printf ("dbus-monitor --address %s",
           self->priv->bus_address);
       g_spawn_command_line_async (command, NULL);
       g_free (command);
@@ -697,7 +697,7 @@ start_daemon (GTestDBus *self)
   g_assert_no_error (error);
   g_io_channel_unref (channel);
 
-  /* Don't use g_file_delete since it calls into gvfs */
+  /* Don't use xfile_delete since it calls into gvfs */
   if (g_unlink (config_path) != 0)
     g_assert_not_reached ();
 
@@ -707,7 +707,7 @@ start_daemon (GTestDBus *self)
 }
 
 static void
-stop_daemon (GTestDBus *self)
+stop_daemon (xtest_dbus_t *self)
 {
 #ifdef G_OS_WIN32
   if (!TerminateProcess (self->priv->bus_pid, 0))
@@ -727,28 +727,28 @@ stop_daemon (GTestDBus *self)
  * g_test_dbus_new:
  * @flags: a #GTestDBusFlags
  *
- * Create a new #GTestDBus object.
+ * Create a new #xtest_dbus_t object.
  *
- * Returns: (transfer full): a new #GTestDBus.
+ * Returns: (transfer full): a new #xtest_dbus_t.
  */
-GTestDBus *
+xtest_dbus_t *
 g_test_dbus_new (GTestDBusFlags flags)
 {
-  return g_object_new (XTYPE_TEST_DBUS,
+  return xobject_new (XTYPE_TEST_DBUS,
       "flags", flags,
       NULL);
 }
 
 /**
  * g_test_dbus_get_flags:
- * @self: a #GTestDBus
+ * @self: a #xtest_dbus_t
  *
- * Get the flags of the #GTestDBus object.
+ * Get the flags of the #xtest_dbus_t object.
  *
- * Returns: the value of #GTestDBus:flags property
+ * Returns: the value of #xtest_dbus_t:flags property
  */
 GTestDBusFlags
-g_test_dbus_get_flags (GTestDBus *self)
+g_test_dbus_get_flags (xtest_dbus_t *self)
 {
   g_return_val_if_fail (X_IS_TEST_DBUS (self), G_TEST_DBUS_NONE);
 
@@ -757,7 +757,7 @@ g_test_dbus_get_flags (GTestDBus *self)
 
 /**
  * g_test_dbus_get_bus_address:
- * @self: a #GTestDBus
+ * @self: a #xtest_dbus_t
  *
  * Get the address on which dbus-daemon is running. If g_test_dbus_up() has not
  * been called yet, %NULL is returned. This can be used with
@@ -766,7 +766,7 @@ g_test_dbus_get_flags (GTestDBus *self)
  * Returns: (nullable): the address of the bus, or %NULL.
  */
 const xchar_t *
-g_test_dbus_get_bus_address (GTestDBus *self)
+g_test_dbus_get_bus_address (xtest_dbus_t *self)
 {
   g_return_val_if_fail (X_IS_TEST_DBUS (self), NULL);
 
@@ -775,25 +775,25 @@ g_test_dbus_get_bus_address (GTestDBus *self)
 
 /**
  * g_test_dbus_add_service_dir:
- * @self: a #GTestDBus
+ * @self: a #xtest_dbus_t
  * @path: path to a directory containing .service files
  *
  * Add a path where dbus-daemon will look up .service files. This can't be
  * called after g_test_dbus_up().
  */
 void
-g_test_dbus_add_service_dir (GTestDBus *self,
+g_test_dbus_add_service_dir (xtest_dbus_t *self,
     const xchar_t *path)
 {
   g_return_if_fail (X_IS_TEST_DBUS (self));
   g_return_if_fail (self->priv->bus_address == NULL);
 
-  g_ptr_array_add (self->priv->service_dirs, g_strdup (path));
+  xptr_array_add (self->priv->service_dirs, xstrdup (path));
 }
 
 /**
  * g_test_dbus_up:
- * @self: a #GTestDBus
+ * @self: a #xtest_dbus_t
  *
  * Start a dbus-daemon instance and set DBUS_SESSION_BUS_ADDRESS. After this
  * call, it is safe for unit tests to start sending messages on the session bus.
@@ -805,7 +805,7 @@ g_test_dbus_add_service_dir (GTestDBus *self,
  * must be called after g_test_run().
  */
 void
-g_test_dbus_up (GTestDBus *self)
+g_test_dbus_up (xtest_dbus_t *self)
 {
   g_return_if_fail (X_IS_TEST_DBUS (self));
   g_return_if_fail (self->priv->bus_address == NULL);
@@ -821,17 +821,17 @@ g_test_dbus_up (GTestDBus *self)
 
 /**
  * g_test_dbus_stop:
- * @self: a #GTestDBus
+ * @self: a #xtest_dbus_t
  *
  * Stop the session bus started by g_test_dbus_up().
  *
- * Unlike g_test_dbus_down(), this won't verify the #GDBusConnection
+ * Unlike g_test_dbus_down(), this won't verify the #xdbus_connection_t
  * singleton returned by g_bus_get() or g_bus_get_sync() is destroyed. Unit
  * tests wanting to verify behaviour after the session bus has been stopped
  * can use this function but should still call g_test_dbus_down() when done.
  */
 void
-g_test_dbus_stop (GTestDBus *self)
+g_test_dbus_stop (xtest_dbus_t *self)
 {
   g_return_if_fail (X_IS_TEST_DBUS (self));
   g_return_if_fail (self->priv->bus_address != NULL);
@@ -841,7 +841,7 @@ g_test_dbus_stop (GTestDBus *self)
 
 /**
  * g_test_dbus_down:
- * @self: a #GTestDBus
+ * @self: a #xtest_dbus_t
  *
  * Stop the session bus started by g_test_dbus_up().
  *
@@ -850,9 +850,9 @@ g_test_dbus_stop (GTestDBus *self)
  * leaked singleton from this test.
  */
 void
-g_test_dbus_down (GTestDBus *self)
+g_test_dbus_down (xtest_dbus_t *self)
 {
-  GDBusConnection *connection;
+  xdbus_connection_t *connection;
 
   g_return_if_fail (X_IS_TEST_DBUS (self));
   g_return_if_fail (self->priv->up);
@@ -865,7 +865,7 @@ g_test_dbus_down (GTestDBus *self)
     stop_daemon (self);
 
   if (connection != NULL)
-    _g_object_unref_and_wait_weak_notify (connection);
+    _xobject_unref_and_wait_weak_notify (connection);
 
   g_test_dbus_unset ();
   _g_bus_forget_singleton (G_BUS_TYPE_SESSION);

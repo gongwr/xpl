@@ -43,7 +43,7 @@
 /* ---------------------------------------------------------------------------------------------------- */
 
 static xuint_t
-count_annotations (GDBusAnnotationInfo **annotations)
+count_annotations (xdbus_annotation_info_t **annotations)
 {
   xuint_t ret;
   ret = 0;
@@ -60,10 +60,10 @@ count_annotations (GDBusAnnotationInfo **annotations)
 static void
 test_annotations (void)
 {
-  GDBusInterfaceInfo *iface;
-  GDBusMethodInfo *method;
-  GDBusSignalInfo *signal;
-  GDBusPropertyInfo *property;
+  xdbus_interface_info_t *iface;
+  xdbus_method_info_t *method;
+  xdbus_signalInfo_t *signal;
+  xdbus_property_info_t *property;
 
   iface = foo_igen_bar_interface_info ();
   g_assert (iface != NULL);
@@ -99,12 +99,12 @@ test_annotations (void)
 
 static xboolean_t
 on_handle_hello_world (FooiGenBar             *object,
-                       GDBusMethodInvocation  *invocation,
+                       xdbus_method_invocation_t  *invocation,
                        const xchar_t            *greeting,
                        xpointer_t                user_data)
 {
   xchar_t *response;
-  response = g_strdup_printf ("Word! You said '%s'. I'm Skeleton, btw!", greeting);
+  response = xstrdup_printf ("Word! You said '%s'. I'm Skeleton, btw!", greeting);
   foo_igen_bar_complete_hello_world (object, invocation, response);
   g_free (response);
   return G_DBUS_METHOD_INVOCATION_HANDLED;
@@ -112,15 +112,15 @@ on_handle_hello_world (FooiGenBar             *object,
 
 static xboolean_t
 on_handle_test_primitive_types (FooiGenBar            *object,
-                                GDBusMethodInvocation *invocation,
+                                xdbus_method_invocation_t *invocation,
                                 guchar                 val_byte,
                                 xboolean_t               val_boolean,
                                 gint16                 val_int16,
-                                guint16                val_uint16,
+                                xuint16_t                val_uint16,
                                 xint_t                   val_int32,
                                 xuint_t                  val_uint32,
                                 gint64                 val_int64,
-                                guint64                val_uint64,
+                                xuint64_t                val_uint64,
                                 xdouble_t                val_double,
                                 const xchar_t           *val_string,
                                 const xchar_t           *val_objpath,
@@ -131,9 +131,9 @@ on_handle_test_primitive_types (FooiGenBar            *object,
   xchar_t *s1;
   xchar_t *s2;
   xchar_t *s3;
-  s1 = g_strdup_printf ("Word! You said '%s'. Rock'n'roll!", val_string);
-  s2 = g_strdup_printf ("/modified%s", val_objpath);
-  s3 = g_strdup_printf ("assgit%s", val_signature);
+  s1 = xstrdup_printf ("Word! You said '%s'. Rock'n'roll!", val_string);
+  s2 = xstrdup_printf ("/modified%s", val_objpath);
+  s3 = xstrdup_printf ("assgit%s", val_signature);
   foo_igen_bar_complete_test_primitive_types (object,
                                               invocation,
                                               10 + val_byte,
@@ -157,7 +157,7 @@ on_handle_test_primitive_types (FooiGenBar            *object,
 
 static xboolean_t
 on_handle_test_non_primitive_types (FooiGenBar            *object,
-                                    GDBusMethodInvocation *invocation,
+                                    xdbus_method_invocation_t *invocation,
                                     xvariant_t              *dict_s_to_s,
                                     xvariant_t              *dict_s_to_pairs,
                                     xvariant_t              *a_struct,
@@ -168,22 +168,22 @@ on_handle_test_non_primitive_types (FooiGenBar            *object,
                                     xpointer_t               user_data)
 {
   xchar_t *s;
-  GString *str;
-  str = g_string_new (NULL);
-  s = g_variant_print (dict_s_to_s, TRUE); g_string_append (str, s); g_free (s);
-  s = g_variant_print (dict_s_to_pairs, TRUE); g_string_append (str, s); g_free (s);
-  s = g_variant_print (a_struct, TRUE); g_string_append (str, s); g_free (s);
-  s = g_strjoinv (", ", (xchar_t **) array_of_strings);
-  g_string_append_printf (str, "array_of_strings: [%s] ", s);
+  xstring_t *str;
+  str = xstring_new (NULL);
+  s = xvariant_print (dict_s_to_s, TRUE); xstring_append (str, s); g_free (s);
+  s = xvariant_print (dict_s_to_pairs, TRUE); xstring_append (str, s); g_free (s);
+  s = xvariant_print (a_struct, TRUE); xstring_append (str, s); g_free (s);
+  s = xstrjoinv (", ", (xchar_t **) array_of_strings);
+  xstring_append_printf (str, "array_of_strings: [%s] ", s);
   g_free (s);
-  s = g_strjoinv (", ", (xchar_t **) array_of_objpaths);
-  g_string_append_printf (str, "array_of_objpaths: [%s] ", s);
+  s = xstrjoinv (", ", (xchar_t **) array_of_objpaths);
+  xstring_append_printf (str, "array_of_objpaths: [%s] ", s);
   g_free (s);
-  s = g_variant_print (array_of_signatures, TRUE);
-  g_string_append_printf (str, "array_of_signatures: %s ", s);
+  s = xvariant_print (array_of_signatures, TRUE);
+  xstring_append_printf (str, "array_of_signatures: %s ", s);
   g_free (s);
-  s = g_strjoinv (", ", (xchar_t **) array_of_bytestrings);
-  g_string_append_printf (str, "array_of_bytestrings: [%s] ", s);
+  s = xstrjoinv (", ", (xchar_t **) array_of_bytestrings);
+  xstring_append_printf (str, "array_of_bytestrings: [%s] ", s);
   g_free (s);
   foo_igen_bar_complete_test_non_primitive_types (object, invocation,
                                                   array_of_strings,
@@ -191,13 +191,13 @@ on_handle_test_non_primitive_types (FooiGenBar            *object,
                                                   array_of_signatures,
                                                   array_of_bytestrings,
                                                   str->str);
-  g_string_free (str, TRUE);
+  xstring_free (str, TRUE);
   return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
 static xboolean_t
 on_handle_request_signal_emission (FooiGenBar             *object,
-                                   GDBusMethodInvocation  *invocation,
+                                   xdbus_method_invocation_t  *invocation,
                                    xint_t                    which_one,
                                    xpointer_t                user_data)
 {
@@ -205,7 +205,7 @@ on_handle_request_signal_emission (FooiGenBar             *object,
     {
       const xchar_t *a_strv[] = {"foo", "bar", NULL};
       const xchar_t *a_bytestring_array[] = {"foo\xff", "bar\xff", NULL};
-      xvariant_t *a_variant = g_variant_new_parsed ("{'first': (42, 42), 'second': (43, 43)}");
+      xvariant_t *a_variant = xvariant_new_parsed ("{'first': (42, 42), 'second': (43, 43)}");
       foo_igen_bar_emit_test_signal (object, 43, a_strv, a_bytestring_array, a_variant); /* consumes a_variant */
       foo_igen_bar_complete_request_signal_emission (object, invocation);
     }
@@ -214,7 +214,7 @@ on_handle_request_signal_emission (FooiGenBar             *object,
 
 static xboolean_t
 on_handle_request_multi_property_mods (FooiGenBar             *object,
-                                       GDBusMethodInvocation  *invocation,
+                                       xdbus_method_invocation_t  *invocation,
                                        xpointer_t                user_data)
 {
   foo_igen_bar_set_y (object, foo_igen_bar_get_y (object) + 1);
@@ -230,7 +230,7 @@ on_handle_request_multi_property_mods (FooiGenBar             *object,
 
 static xboolean_t
 on_handle_property_cancellation (FooiGenBar             *object,
-                                 GDBusMethodInvocation  *invocation,
+                                 xdbus_method_invocation_t  *invocation,
                                  xpointer_t                user_data)
 {
   xuint_t n;
@@ -252,7 +252,7 @@ on_handle_property_cancellation (FooiGenBar             *object,
 
 static xboolean_t
 on_handle_force_method (FooiGenBat             *object,
-                        GDBusMethodInvocation  *invocation,
+                        xdbus_method_invocation_t  *invocation,
                         xvariant_t               *force_in_i,
                         xvariant_t               *force_in_s,
                         xvariant_t               *force_in_ay,
@@ -266,21 +266,21 @@ on_handle_force_method (FooiGenBat             *object,
   gint32 val;
   xchar_t *s;
 
-  ret_i = g_variant_new_int32 (g_variant_get_int32 (force_in_i) + 10);
-  s = g_strdup_printf ("%s_foo", g_variant_get_string (force_in_s, NULL));
-  ret_s = g_variant_new_string (s);
+  ret_i = xvariant_new_int32 (xvariant_get_int32 (force_in_i) + 10);
+  s = xstrdup_printf ("%s_foo", xvariant_get_string (force_in_s, NULL));
+  ret_s = xvariant_new_string (s);
   g_free (s);
-  s = g_strdup_printf ("%s_foo\xff", g_variant_get_bytestring (force_in_ay));
-  ret_ay = g_variant_new_bytestring (s);
+  s = xstrdup_printf ("%s_foo\xff", xvariant_get_bytestring (force_in_ay));
+  ret_ay = xvariant_new_bytestring (s);
   g_free (s);
 
-  g_variant_get (force_in_struct, "(i)", &val);
-  ret_struct = g_variant_new ("(i)", val + 10);
+  xvariant_get (force_in_struct, "(i)", &val);
+  ret_struct = xvariant_new ("(i)", val + 10);
 
-  g_variant_ref_sink (ret_i);
-  g_variant_ref_sink (ret_s);
-  g_variant_ref_sink (ret_ay);
-  g_variant_ref_sink (ret_struct);
+  xvariant_ref_sink (ret_i);
+  xvariant_ref_sink (ret_s);
+  xvariant_ref_sink (ret_ay);
+  xvariant_ref_sink (ret_struct);
 
   foo_igen_bat_emit_force_signal (object,
                                   ret_i,
@@ -295,10 +295,10 @@ on_handle_force_method (FooiGenBat             *object,
                                       ret_ay,
                                       ret_struct);
 
-  g_variant_unref (ret_i);
-  g_variant_unref (ret_s);
-  g_variant_unref (ret_ay);
-  g_variant_unref (ret_struct);
+  xvariant_unref (ret_i);
+  xvariant_unref (ret_s);
+  xvariant_unref (ret_ay);
+  xvariant_unref (ret_struct);
 
   return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
@@ -307,8 +307,8 @@ on_handle_force_method (FooiGenBat             *object,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static xboolean_t
-my_g_authorize_method_handler (GDBusInterfaceSkeleton *interface,
-                               GDBusMethodInvocation  *invocation,
+my_g_authorize_method_handler (xdbus_interface_skeleton_t *interface,
+                               xdbus_method_invocation_t  *invocation,
                                xpointer_t                user_data)
 {
   const xchar_t *method_name;
@@ -316,16 +316,16 @@ my_g_authorize_method_handler (GDBusInterfaceSkeleton *interface,
 
   authorized = FALSE;
 
-  method_name = g_dbus_method_invocation_get_method_name (invocation);
-  if (g_strcmp0 (method_name, "CheckNotAuthorized") == 0)
+  method_name = xdbus_method_invocation_get_method_name (invocation);
+  if (xstrcmp0 (method_name, "CheckNotAuthorized") == 0)
     {
       authorized = FALSE;
     }
-  else if (g_strcmp0 (method_name, "CheckAuthorized") == 0)
+  else if (xstrcmp0 (method_name, "CheckAuthorized") == 0)
     {
       authorized = TRUE;
     }
-  else if (g_strcmp0 (method_name, "CheckNotAuthorizedFromObject") == 0)
+  else if (xstrcmp0 (method_name, "CheckNotAuthorizedFromObject") == 0)
     {
       authorized = TRUE;
     }
@@ -336,7 +336,7 @@ my_g_authorize_method_handler (GDBusInterfaceSkeleton *interface,
 
   if (!authorized)
     {
-      g_dbus_method_invocation_return_error (invocation,
+      xdbus_method_invocation_return_error (invocation,
                                              G_IO_ERROR,
                                              G_IO_ERROR_PERMISSION_DENIED,
                                              "not authorized...");
@@ -345,9 +345,9 @@ my_g_authorize_method_handler (GDBusInterfaceSkeleton *interface,
 }
 
 static xboolean_t
-my_object_authorize_method_handler (GDBusObjectSkeleton     *object,
-                                    GDBusInterfaceSkeleton  *interface,
-                                    GDBusMethodInvocation   *invocation,
+my_object_authorize_method_handler (xdbus_object_skeleton_t     *object,
+                                    xdbus_interface_skeleton_t  *interface,
+                                    xdbus_method_invocation_t   *invocation,
                                     xpointer_t                 user_data)
 {
   const xchar_t *method_name;
@@ -355,16 +355,16 @@ my_object_authorize_method_handler (GDBusObjectSkeleton     *object,
 
   authorized = FALSE;
 
-  method_name = g_dbus_method_invocation_get_method_name (invocation);
-  if (g_strcmp0 (method_name, "CheckNotAuthorized") == 0)
+  method_name = xdbus_method_invocation_get_method_name (invocation);
+  if (xstrcmp0 (method_name, "CheckNotAuthorized") == 0)
     {
       authorized = TRUE;
     }
-  else if (g_strcmp0 (method_name, "CheckAuthorized") == 0)
+  else if (xstrcmp0 (method_name, "CheckAuthorized") == 0)
     {
       authorized = TRUE;
     }
-  else if (g_strcmp0 (method_name, "CheckNotAuthorizedFromObject") == 0)
+  else if (xstrcmp0 (method_name, "CheckNotAuthorizedFromObject") == 0)
     {
       authorized = FALSE;
     }
@@ -375,7 +375,7 @@ my_object_authorize_method_handler (GDBusObjectSkeleton     *object,
 
   if (!authorized)
     {
-      g_dbus_method_invocation_return_error (invocation,
+      xdbus_method_invocation_return_error (invocation,
                                              G_IO_ERROR,
                                              G_IO_ERROR_PENDING,
                                              "not authorized (from object)...");
@@ -385,7 +385,7 @@ my_object_authorize_method_handler (GDBusObjectSkeleton     *object,
 
 static xboolean_t
 on_handle_check_not_authorized (FooiGenAuthorize       *object,
-                                GDBusMethodInvocation  *invocation,
+                                xdbus_method_invocation_t  *invocation,
                                 xpointer_t                user_data)
 {
   foo_igen_authorize_complete_check_not_authorized (object, invocation);
@@ -394,7 +394,7 @@ on_handle_check_not_authorized (FooiGenAuthorize       *object,
 
 static xboolean_t
 on_handle_check_authorized (FooiGenAuthorize       *object,
-                            GDBusMethodInvocation  *invocation,
+                            xdbus_method_invocation_t  *invocation,
                             xpointer_t                user_data)
 {
   foo_igen_authorize_complete_check_authorized (object, invocation);
@@ -403,7 +403,7 @@ on_handle_check_authorized (FooiGenAuthorize       *object,
 
 static xboolean_t
 on_handle_check_not_authorized_from_object (FooiGenAuthorize       *object,
-                                            GDBusMethodInvocation  *invocation,
+                                            xdbus_method_invocation_t  *invocation,
                                             xpointer_t                user_data)
 {
   foo_igen_authorize_complete_check_not_authorized_from_object (object, invocation);
@@ -414,11 +414,11 @@ on_handle_check_not_authorized_from_object (FooiGenAuthorize       *object,
 
 static xboolean_t
 on_handle_get_self (FooiGenMethodThreads   *object,
-                    GDBusMethodInvocation  *invocation,
+                    xdbus_method_invocation_t  *invocation,
                     xpointer_t                user_data)
 {
   xchar_t *s;
-  s = g_strdup_printf ("%p", (void *)g_thread_self ());
+  s = xstrdup_printf ("%p", (void *)xthread_self ());
   foo_igen_method_threads_complete_get_self (object, invocation, s);
   g_free (s);
   return G_DBUS_METHOD_INVOCATION_HANDLED;
@@ -426,12 +426,12 @@ on_handle_get_self (FooiGenMethodThreads   *object,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static GThread *method_handler_thread = NULL;
+static xthread_t *method_handler_thread = NULL;
 
 static FooiGenBar *exported_bar_object = NULL;
 static FooiGenBat *exported_bat_object = NULL;
 static FooiGenAuthorize *exported_authorize_object = NULL;
-static GDBusObjectSkeleton *authorize_enclosing_object = NULL;
+static xdbus_object_skeleton_t *authorize_enclosing_object = NULL;
 static FooiGenMethodThreads *exported_thread_object_1 = NULL;
 static FooiGenMethodThreads *exported_thread_object_2 = NULL;
 
@@ -446,7 +446,7 @@ unexport_objects (void)
 }
 
 static void
-on_bus_acquired (GDBusConnection *connection,
+on_bus_acquired (xdbus_connection_t *connection,
                  const xchar_t     *name,
                  xpointer_t         user_data)
 {
@@ -459,7 +459,7 @@ on_bus_acquired (GDBusConnection *connection,
    * xobject_t signal.
    *
    * 2. Property storage is taken care of by the class; we can
-   *    use g_object_get()/g_object_set() (and the generated
+   *    use xobject_get()/xobject_set() (and the generated
    *    C bindings at will)
    */
   error = NULL;
@@ -516,11 +516,11 @@ on_bus_acquired (GDBusConnection *connection,
                     "handle-force-method",
                     G_CALLBACK (on_handle_force_method),
                     NULL);
-  g_object_set (exported_bat_object,
-                "force-i", g_variant_new_int32 (43),
-                "force-s", g_variant_new_string ("prop string"),
-                "force-ay", g_variant_new_bytestring ("prop bytestring\xff"),
-                "force-struct", g_variant_new ("(i)", 4300),
+  xobject_set (exported_bat_object,
+                "force-i", xvariant_new_int32 (43),
+                "force-s", xvariant_new_string ("prop string"),
+                "force-ay", xvariant_new_bytestring ("prop bytestring\xff"),
+                "force-struct", xvariant_new ("(i)", 4300),
                 NULL);
 
   authorize_enclosing_object = g_dbus_object_skeleton_new ("/authorize");
@@ -584,23 +584,23 @@ on_bus_acquired (GDBusConnection *connection,
 
   g_assert_cmpint (g_dbus_interface_skeleton_get_flags (G_DBUS_INTERFACE_SKELETON (exported_thread_object_2)), ==, G_DBUS_INTERFACE_SKELETON_FLAGS_NONE);
 
-  method_handler_thread = g_thread_self ();
+  method_handler_thread = xthread_self ();
 }
 
 static xpointer_t check_proxies_in_thread (xpointer_t user_data);
 
 static void
-on_name_acquired (GDBusConnection *connection,
+on_name_acquired (xdbus_connection_t *connection,
                   const xchar_t     *name,
                   xpointer_t         user_data)
 {
-  GMainLoop *loop = user_data;
-  GThread *thread = g_thread_new ("check-proxies", check_proxies_in_thread, loop);
-  g_thread_unref (thread);
+  xmain_loop_t *loop = user_data;
+  xthread_t *thread = xthread_new ("check-proxies", check_proxies_in_thread, loop);
+  xthread_unref (thread);
 }
 
 static void
-on_name_lost (GDBusConnection *connection,
+on_name_lost (xdbus_connection_t *connection,
               const xchar_t     *name,
               xpointer_t         user_data)
 {
@@ -611,7 +611,7 @@ on_name_lost (GDBusConnection *connection,
 
 typedef struct
 {
-  GMainLoop *thread_loop;
+  xmain_loop_t *thread_loop;
   xint_t initial_y;
   xint_t initial_i;
   xuint_t num_g_properties_changed;
@@ -622,7 +622,7 @@ typedef struct
 
 static void
 on_notify_u (xobject_t    *object,
-           GParamSpec *pspec,
+           xparam_spec_t *pspec,
            xpointer_t    user_data)
 {
   ClientData *data = user_data;
@@ -632,7 +632,7 @@ on_notify_u (xobject_t    *object,
 
 static void
 on_notify_n (xobject_t    *object,
-             GParamSpec *pspec,
+             xparam_spec_t *pspec,
              xpointer_t    user_data)
 {
   ClientData *data = user_data;
@@ -641,7 +641,7 @@ on_notify_n (xobject_t    *object,
 }
 
 static void
-on_g_properties_changed (GDBusProxy          *_proxy,
+on_g_properties_changed (xdbus_proxy_t          *_proxy,
                          xvariant_t            *changed_properties,
                          const xchar_t* const  *invalidated_properties,
                          xpointer_t             user_data)
@@ -649,7 +649,7 @@ on_g_properties_changed (GDBusProxy          *_proxy,
   ClientData *data = user_data;
   FooiGenBar *proxy = FOO_IGEN_BAR (_proxy);
 
-  g_assert_cmpint (g_variant_n_children (changed_properties), ==, 2);
+  g_assert_cmpint (xvariant_n_children (changed_properties), ==, 2);
 
   if (data->num_g_properties_changed == 0)
     {
@@ -667,7 +667,7 @@ on_g_properties_changed (GDBusProxy          *_proxy,
   data->num_g_properties_changed++;
 
   if (data->num_g_properties_changed == 2)
-    g_main_loop_quit (data->thread_loop);
+    xmain_loop_quit (data->thread_loop);
 }
 
 static void
@@ -689,7 +689,7 @@ on_test_signal (FooiGenBar          *proxy,
   g_assert (array_of_bytestrings[2] == NULL);
 
   data->received_test_signal = TRUE;
-  g_main_loop_quit (data->thread_loop);
+  xmain_loop_quit (data->thread_loop);
 }
 
 static void
@@ -706,12 +706,12 @@ on_property_cancellation_cb (FooiGenBar    *proxy,
   g_assert_no_error (error);
   g_assert (ret);
 
-  g_main_loop_quit (data->thread_loop);
+  xmain_loop_quit (data->thread_loop);
 }
 
 static void
 check_bar_proxy (FooiGenBar *proxy,
-                 GMainLoop  *thread_loop)
+                 xmain_loop_t  *thread_loop)
 {
   const xchar_t *array_of_strings[3] = {"one", "two", NULL};
   const xchar_t *array_of_strings_2[3] = {"one2", "two2", NULL};
@@ -725,11 +725,11 @@ check_bar_proxy (FooiGenBar *proxy,
   guchar ret_val_byte;
   xboolean_t ret_val_boolean;
   gint16 ret_val_int16;
-  guint16 ret_val_uint16;
+  xuint16_t ret_val_uint16;
   xint_t ret_val_int32;
   xuint_t ret_val_uint32;
   gint64 ret_val_int64;
-  guint64 ret_val_uint64;
+  xuint64_t ret_val_uint64;
   xdouble_t ret_val_double;
   xchar_t *ret_val_string;
   xchar_t *ret_val_objpath;
@@ -745,7 +745,7 @@ check_bar_proxy (FooiGenBar *proxy,
   xint_t val_i;
   xuint_t val_u;
   gint64 val_x;
-  guint64 val_t;
+  xuint64_t val_t;
   xdouble_t val_d;
   xchar_t *val_s;
   xchar_t *val_o;
@@ -776,7 +776,7 @@ check_bar_proxy (FooiGenBar *proxy,
 
   v = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "y");
   g_assert (v != NULL);
-  g_variant_unref (v);
+  xvariant_unref (v);
 
   /* set empty values to non-empty */
   val_unset_i = 42;
@@ -790,7 +790,7 @@ check_bar_proxy (FooiGenBar *proxy,
   val_unset_ag = NULL;
   val_unset_struct = NULL;
   /* check properties */
-  g_object_get (proxy,
+  xobject_get (proxy,
                 "y", &val_y,
                 "b", &val_b,
                 "n", &val_n,
@@ -826,9 +826,9 @@ check_bar_proxy (FooiGenBar *proxy,
   g_free (val_g);
   g_assert_cmpstr (val_ay, ==, "ABCabc");
   g_free (val_ay);
-  g_strfreev (val_as);
-  g_strfreev (val_ao);
-  g_variant_unref (val_ag);
+  xstrfreev (val_as);
+  xstrfreev (val_ao);
+  xvariant_unref (val_ag);
   g_free (val_finally_normal_name);
   /* check empty values */
   g_assert_cmpint (val_unset_i, ==, 0);
@@ -842,16 +842,16 @@ check_bar_proxy (FooiGenBar *proxy,
   g_assert_cmpstr (val_unset_ay, ==, "");
   g_assert (val_unset_as[0] == NULL);
   g_assert (val_unset_ao[0] == NULL);
-  g_assert (g_variant_is_of_type (val_unset_ag, G_VARIANT_TYPE ("ag")));
-  g_assert (g_variant_is_of_type (val_unset_struct, G_VARIANT_TYPE ("(idsogayasaoag)")));
-  s = g_variant_print (val_unset_struct, TRUE);
+  g_assert (xvariant_is_of_type (val_unset_ag, G_VARIANT_TYPE ("ag")));
+  g_assert (xvariant_is_of_type (val_unset_struct, G_VARIANT_TYPE ("(idsogayasaoag)")));
+  s = xvariant_print (val_unset_struct, TRUE);
   g_assert_cmpstr (s, ==, "(0, 0.0, '', objectpath '/', signature '', @ay [], @as [], @ao [], @ag [])");
   g_free (s);
   g_free (val_unset_ay);
-  g_strfreev (val_unset_as);
-  g_strfreev (val_unset_ao);
-  g_variant_unref (val_unset_ag);
-  g_variant_unref (val_unset_struct);
+  xstrfreev (val_unset_as);
+  xstrfreev (val_unset_ao);
+  xvariant_unref (val_unset_ag);
+  xvariant_unref (val_unset_struct);
 
   /* Try setting a property. This causes the generated glue to invoke
    * the org.fd.DBus.Properties.Set() method asynchronously. So we
@@ -865,14 +865,14 @@ check_bar_proxy (FooiGenBar *proxy,
    * is to exercise the paths that frees the references.
    */
 
-  g_object_set (proxy,
+  xobject_set (proxy,
                 "s", "a string",
                 "o", "/a/path",
                 "g", "asig",
-                "ay", g_variant_new_parsed ("[byte 0x65, 0x67]"),
+                "ay", xvariant_new_parsed ("[byte 0x65, 0x67]"),
                 "as", array_of_strings,
                 "ao", array_of_objpaths,
-                "ag", g_variant_new_parsed ("[@g 'ass', 'git']"),
+                "ag", xvariant_new_parsed ("[@g 'ass', 'git']"),
                 NULL);
 
   error = NULL;
@@ -918,13 +918,13 @@ check_bar_proxy (FooiGenBar *proxy,
   g_clear_pointer (&ret_val_bytestring, g_free);
 
   error = NULL;
-  array_of_signatures = g_variant_ref_sink (g_variant_new_parsed ("[@g 'ass', 'git']"));
+  array_of_signatures = xvariant_ref_sink (xvariant_new_parsed ("[@g 'ass', 'git']"));
   ret = foo_igen_bar_call_test_non_primitive_types_sync (proxy,
-                                                         g_variant_new_parsed ("{'one': 'red',"
+                                                         xvariant_new_parsed ("{'one': 'red',"
                                                                                " 'two': 'blue'}"),
-                                                         g_variant_new_parsed ("{'first': (42, 42), "
+                                                         xvariant_new_parsed ("{'first': (42, 42), "
                                                                                "'second': (43, 43)}"),
-                                                         g_variant_new_parsed ("(42, 'foo', 'bar')"),
+                                                         xvariant_new_parsed ("(42, 'foo', 'bar')"),
                                                          array_of_strings,
                                                          array_of_objpaths,
                                                          array_of_signatures,
@@ -945,21 +945,21 @@ check_bar_proxy (FooiGenBar *proxy,
   g_assert (ret);
 
   g_assert_nonnull (ret_array_of_strings);
-  g_assert_cmpuint (g_strv_length ((xchar_t **) ret_array_of_strings), ==,
-                    g_strv_length ((xchar_t **) array_of_strings));
+  g_assert_cmpuint (xstrv_length ((xchar_t **) ret_array_of_strings), ==,
+                    xstrv_length ((xchar_t **) array_of_strings));
   g_assert_nonnull (ret_array_of_objpaths);
-  g_assert_cmpuint (g_strv_length ((xchar_t **) ret_array_of_objpaths), ==,
-                    g_strv_length ((xchar_t **) array_of_objpaths));
+  g_assert_cmpuint (xstrv_length ((xchar_t **) ret_array_of_objpaths), ==,
+                    xstrv_length ((xchar_t **) array_of_objpaths));
   g_assert_nonnull (ret_array_of_signatures);
   g_assert_cmpvariant (ret_array_of_signatures, array_of_signatures);
   g_assert_nonnull (ret_array_of_bytestrings);
-  g_assert_cmpuint (g_strv_length ((xchar_t **) ret_array_of_bytestrings), ==,
-                    g_strv_length ((xchar_t **) array_of_bytestrings));
+  g_assert_cmpuint (xstrv_length ((xchar_t **) ret_array_of_bytestrings), ==,
+                    xstrv_length ((xchar_t **) array_of_bytestrings));
 
-  g_clear_pointer (&ret_array_of_strings, g_strfreev);
-  g_clear_pointer (&ret_array_of_objpaths, g_strfreev);
-  g_clear_pointer (&ret_array_of_signatures, g_variant_unref);
-  g_clear_pointer (&ret_array_of_bytestrings, g_strfreev);
+  g_clear_pointer (&ret_array_of_strings, xstrfreev);
+  g_clear_pointer (&ret_array_of_objpaths, xstrfreev);
+  g_clear_pointer (&ret_array_of_signatures, xvariant_unref);
+  g_clear_pointer (&ret_array_of_bytestrings, xstrfreev);
   g_clear_pointer (&s, g_free);
 
   /* Check that org.freedesktop.DBus.Error.UnknownMethod is returned on
@@ -972,7 +972,7 @@ check_bar_proxy (FooiGenBar *proxy,
   ret = foo_igen_bar_call_unimplemented_method_sync (proxy, NULL /* xcancellable_t */, &error);
 #endif
   g_assert_error (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD);
-  g_error_free (error);
+  xerror_free (error);
   error = NULL;
   g_assert (!ret);
 
@@ -990,7 +990,7 @@ check_bar_proxy (FooiGenBar *proxy,
   g_assert (ret);
 
   g_assert (!data->received_test_signal);
-  g_main_loop_run (thread_loop);
+  xmain_loop_run (thread_loop);
   g_assert (data->received_test_signal);
 
   /* Try setting a property. This causes the generated glue to invoke
@@ -1007,16 +1007,16 @@ check_bar_proxy (FooiGenBar *proxy,
    */
   read_as = foo_igen_bar_get_as (proxy);
   read_as2 = foo_igen_bar_get_as (proxy);
-  g_assert_cmpint (g_strv_length ((xchar_t **) read_as), ==, 2);
+  g_assert_cmpint (xstrv_length ((xchar_t **) read_as), ==, 2);
   g_assert_cmpstr (read_as[0], ==, "one");
   g_assert_cmpstr (read_as[1], ==, "two");
   g_assert (read_as == read_as2); /* this is more testing an implementation detail */
-  g_object_set (proxy,
+  xobject_set (proxy,
                 "as", array_of_strings_2,
                 NULL);
   _g_assert_property_notify (proxy, "as");
   read_as3 = foo_igen_bar_get_as (proxy);
-  g_assert_cmpint (g_strv_length ((xchar_t **) read_as3), ==, 2);
+  g_assert_cmpint (xstrv_length ((xchar_t **) read_as3), ==, 2);
   g_assert_cmpstr (read_as3[0], ==, "one2");
   g_assert_cmpstr (read_as3[1], ==, "two2");
 
@@ -1046,7 +1046,7 @@ check_bar_proxy (FooiGenBar *proxy,
 #endif
   g_assert_no_error (error);
   g_assert (ret);
-  g_main_loop_run (thread_loop);
+  xmain_loop_run (thread_loop);
   g_assert_cmpint (data->num_g_properties_changed, ==, 2);
   g_signal_handlers_disconnect_by_func (proxy,
                                         G_CALLBACK (on_g_properties_changed),
@@ -1116,13 +1116,13 @@ check_bar_proxy (FooiGenBar *proxy,
                                            NULL, /* xcancellable_t */
                                            (xasync_ready_callback_t) on_property_cancellation_cb,
                                            data);
-  g_main_loop_run (thread_loop);
+  xmain_loop_run (thread_loop);
   /* Checks that n didn't change at all */
   g_assert_cmpint (data->num_notify_n, ==, 2);
 
   /* cleanup */
   g_free (data);
-  g_variant_unref (array_of_signatures);
+  xvariant_unref (array_of_signatures);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1140,10 +1140,10 @@ on_force_signal (FooiGenBat *proxy,
 
   g_assert (!(*signal_received));
 
-  g_assert_cmpint (g_variant_get_int32 (force_i), ==, 42 + 10);
-  g_assert_cmpstr (g_variant_get_string (force_s, NULL), ==, "a string_foo");
-  g_assert_cmpstr (g_variant_get_bytestring (force_ay), ==, "a bytestring\xff_foo\xff");
-  g_variant_get (force_struct, "(i)", &val);
+  g_assert_cmpint (xvariant_get_int32 (force_i), ==, 42 + 10);
+  g_assert_cmpstr (xvariant_get_string (force_s, NULL), ==, "a string_foo");
+  g_assert_cmpstr (xvariant_get_bytestring (force_ay), ==, "a bytestring\xff_foo\xff");
+  xvariant_get (force_struct, "(i)", &val);
   g_assert_cmpint (val, ==, 4200 + 10);
 
   *signal_received = TRUE;
@@ -1151,7 +1151,7 @@ on_force_signal (FooiGenBat *proxy,
 
 static void
 check_bat_proxy (FooiGenBat *proxy,
-                 GMainLoop  *thread_loop)
+                 xmain_loop_t  *thread_loop)
 {
   xerror_t *error;
   xvariant_t *ret_i;
@@ -1166,21 +1166,21 @@ check_bat_proxy (FooiGenBat *proxy,
   /* --------------------------------------------------- */
 
   /* check properties */
-  g_object_get (proxy,
+  xobject_get (proxy,
                 "force-i", &ret_i,
                 "force-s", &ret_s,
                 "force-ay", &ret_ay,
                 "force-struct", &ret_struct,
                 NULL);
-  g_assert_cmpint (g_variant_get_int32 (ret_i), ==, 43);
-  g_assert_cmpstr (g_variant_get_string (ret_s, NULL), ==, "prop string");
-  g_assert_cmpstr (g_variant_get_bytestring (ret_ay), ==, "prop bytestring\xff");
-  g_variant_get (ret_struct, "(i)", &val);
+  g_assert_cmpint (xvariant_get_int32 (ret_i), ==, 43);
+  g_assert_cmpstr (xvariant_get_string (ret_s, NULL), ==, "prop string");
+  g_assert_cmpstr (xvariant_get_bytestring (ret_ay), ==, "prop bytestring\xff");
+  xvariant_get (ret_struct, "(i)", &val);
   g_assert_cmpint (val, ==, 4300);
-  g_variant_unref (ret_i);
-  g_variant_unref (ret_s);
-  g_variant_unref (ret_ay);
-  g_variant_unref (ret_struct);
+  xvariant_unref (ret_i);
+  xvariant_unref (ret_s);
+  xvariant_unref (ret_ay);
+  xvariant_unref (ret_struct);
 
   /* check method and signal */
   force_signal_received = FALSE;
@@ -1191,10 +1191,10 @@ check_bat_proxy (FooiGenBat *proxy,
 
   error = NULL;
   foo_igen_bat_call_force_method_sync (proxy,
-                                       g_variant_new_int32 (42),
-                                       g_variant_new_string ("a string"),
-                                       g_variant_new_bytestring ("a bytestring\xff"),
-                                       g_variant_new ("(i)", 4200),
+                                       xvariant_new_int32 (42),
+                                       xvariant_new_string ("a string"),
+                                       xvariant_new_bytestring ("a bytestring\xff"),
+                                       xvariant_new ("(i)", 4200),
 #if XPL_VERSION_MIN_REQUIRED >= XPL_VERSION_2_64
                                        G_DBUS_CALL_FLAGS_NONE,
                                        -1,
@@ -1206,15 +1206,15 @@ check_bat_proxy (FooiGenBat *proxy,
                                        NULL, /* xcancellable_t* */
                                        &error);
   g_assert_no_error (error);
-  g_assert_cmpint (g_variant_get_int32 (ret_i), ==, 42 + 10);
-  g_assert_cmpstr (g_variant_get_string (ret_s, NULL), ==, "a string_foo");
-  g_assert_cmpstr (g_variant_get_bytestring (ret_ay), ==, "a bytestring\xff_foo\xff");
-  g_variant_get (ret_struct, "(i)", &val);
+  g_assert_cmpint (xvariant_get_int32 (ret_i), ==, 42 + 10);
+  g_assert_cmpstr (xvariant_get_string (ret_s, NULL), ==, "a string_foo");
+  g_assert_cmpstr (xvariant_get_bytestring (ret_ay), ==, "a bytestring\xff_foo\xff");
+  xvariant_get (ret_struct, "(i)", &val);
   g_assert_cmpint (val, ==, 4200 + 10);
-  g_variant_unref (ret_i);
-  g_variant_unref (ret_s);
-  g_variant_unref (ret_ay);
-  g_variant_unref (ret_struct);
+  xvariant_unref (ret_i);
+  xvariant_unref (ret_s);
+  xvariant_unref (ret_ay);
+  xvariant_unref (ret_struct);
   _g_assert_signal_received (proxy, "force-signal");
   g_assert (force_signal_received);
 }
@@ -1223,7 +1223,7 @@ check_bat_proxy (FooiGenBat *proxy,
 
 static void
 check_authorize_proxy (FooiGenAuthorize *proxy,
-                       GMainLoop        *thread_loop)
+                       xmain_loop_t        *thread_loop)
 {
   xerror_t *error;
   xboolean_t ret;
@@ -1237,7 +1237,7 @@ check_authorize_proxy (FooiGenAuthorize *proxy,
   ret = foo_igen_authorize_call_check_not_authorized_sync (proxy, NULL, &error);
 #endif
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED);
-  g_error_free (error);
+  xerror_free (error);
   g_assert (!ret);
 
   error = NULL;
@@ -1256,13 +1256,13 @@ check_authorize_proxy (FooiGenAuthorize *proxy,
   ret = foo_igen_authorize_call_check_not_authorized_from_object_sync (proxy, NULL, &error);
 #endif
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_PENDING);
-  g_error_free (error);
+  xerror_free (error);
   g_assert (!ret);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static GThread *
+static xthread_t *
 get_self_via_proxy (FooiGenMethodThreads *proxy_1)
 {
   xerror_t *error;
@@ -1289,7 +1289,7 @@ get_self_via_proxy (FooiGenMethodThreads *proxy_1)
 static void
 check_thread_proxies (FooiGenMethodThreads *proxy_1,
                       FooiGenMethodThreads *proxy_2,
-                      GMainLoop            *thread_loop)
+                      xmain_loop_t            *thread_loop)
 {
   /* proxy_1 is indeed using threads so should never get the handler thread */
   g_assert (get_self_via_proxy (proxy_1) != method_handler_thread);
@@ -1303,7 +1303,7 @@ check_thread_proxies (FooiGenMethodThreads *proxy_1,
 static xpointer_t
 check_proxies_in_thread (xpointer_t user_data)
 {
-  GMainLoop *loop = user_data;
+  xmain_loop_t *loop = user_data;
 #ifdef _XPL_ADDRESS_SANITIZER
 
   /* Silence "Not available before 2.38" when using old API */
@@ -1316,8 +1316,8 @@ check_proxies_in_thread (xpointer_t user_data)
   (void) check_bat_proxy;
   (void) check_bar_proxy;
 #else
-  GMainContext *thread_context;
-  GMainLoop *thread_loop;
+  xmain_context_t *thread_context;
+  xmain_loop_t *thread_loop;
   xerror_t *error;
   FooiGenBar *bar_proxy;
   FooiGenBat *bat_proxy;
@@ -1325,9 +1325,9 @@ check_proxies_in_thread (xpointer_t user_data)
   FooiGenMethodThreads *thread_proxy_1;
   FooiGenMethodThreads *thread_proxy_2;
 
-  thread_context = g_main_context_new ();
-  thread_loop = g_main_loop_new (thread_context, FALSE);
-  g_main_context_push_thread_default (thread_context);
+  thread_context = xmain_context_new ();
+  thread_loop = xmain_loop_new (thread_context, FALSE);
+  xmain_context_push_thread_default (thread_context);
 
   /* Check the object */
   error = NULL;
@@ -1339,7 +1339,7 @@ check_proxies_in_thread (xpointer_t user_data)
                                                    &error);
   check_bar_proxy (bar_proxy, thread_loop);
   g_assert_no_error (error);
-  g_object_unref (bar_proxy);
+  xobject_unref (bar_proxy);
 
   error = NULL;
   bat_proxy = foo_igen_bat_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
@@ -1350,7 +1350,7 @@ check_proxies_in_thread (xpointer_t user_data)
                                                    &error);
   check_bat_proxy (bat_proxy, thread_loop);
   g_assert_no_error (error);
-  g_object_unref (bat_proxy);
+  xobject_unref (bat_proxy);
 
   error = NULL;
   authorize_proxy = foo_igen_authorize_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
@@ -1361,7 +1361,7 @@ check_proxies_in_thread (xpointer_t user_data)
                                                                &error);
   check_authorize_proxy (authorize_proxy, thread_loop);
   g_assert_no_error (error);
-  g_object_unref (authorize_proxy);
+  xobject_unref (authorize_proxy);
 
   error = NULL;
   thread_proxy_1 = foo_igen_method_threads_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
@@ -1379,15 +1379,15 @@ check_proxies_in_thread (xpointer_t user_data)
                                                                    &error);
   g_assert_no_error (error);
   check_thread_proxies (thread_proxy_1, thread_proxy_2, thread_loop);
-  g_object_unref (thread_proxy_1);
-  g_object_unref (thread_proxy_2);
+  xobject_unref (thread_proxy_1);
+  xobject_unref (thread_proxy_2);
 
-  g_main_loop_unref (thread_loop);
-  g_main_context_unref (thread_context);
+  xmain_loop_unref (thread_loop);
+  xmain_context_unref (thread_context);
 #endif
 
   /* this breaks out of the loop in main() (below) */
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
   return NULL;
 }
 
@@ -1396,11 +1396,11 @@ check_proxies_in_thread (xpointer_t user_data)
 typedef struct
 {
   xchar_t *xml;
-  GMainLoop *loop;
+  xmain_loop_t *loop;
 } IntrospectData;
 
 static void
-introspect_cb (GDBusConnection   *connection,
+introspect_cb (xdbus_connection_t   *connection,
                xasync_result_t      *res,
                xpointer_t           user_data)
 {
@@ -1414,20 +1414,20 @@ introspect_cb (GDBusConnection   *connection,
                                           &error);
   g_assert_no_error (error);
   g_assert (result != NULL);
-  g_variant_get (result, "(s)", &data->xml);
-  g_variant_unref (result);
+  xvariant_get (result, "(s)", &data->xml);
+  xvariant_unref (result);
 
-  g_main_loop_quit (data->loop);
+  xmain_loop_quit (data->loop);
 }
 
-static GDBusNodeInfo *
-introspect (GDBusConnection  *connection,
+static xdbus_node_info_t *
+introspect (xdbus_connection_t  *connection,
             const xchar_t      *name,
             const xchar_t      *object_path,
-            GMainLoop        *loop)
+            xmain_loop_t        *loop)
 {
   xerror_t *error;
-  GDBusNodeInfo *node_info;
+  xdbus_node_info_t *node_info;
   IntrospectData *data;
 
   data = g_new0 (IntrospectData, 1);
@@ -1447,7 +1447,7 @@ introspect (GDBusConnection  *connection,
                           NULL,
                           (xasync_ready_callback_t) introspect_cb,
                           data);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
   g_assert (data->xml != NULL);
 
   error = NULL;
@@ -1461,7 +1461,7 @@ introspect (GDBusConnection  *connection,
 }
 
 static xuint_t
-count_interfaces (GDBusNodeInfo *info)
+count_interfaces (xdbus_node_info_t *info)
 {
   xuint_t n;
   for (n = 0; info->interfaces != NULL && info->interfaces[n] != NULL; n++)
@@ -1470,7 +1470,7 @@ count_interfaces (GDBusNodeInfo *info)
 }
 
 static xuint_t
-count_nodes (GDBusNodeInfo *info)
+count_nodes (xdbus_node_info_t *info)
 {
   xuint_t n;
   for (n = 0; info->nodes != NULL && info->nodes[n] != NULL; n++)
@@ -1479,13 +1479,13 @@ count_nodes (GDBusNodeInfo *info)
 }
 
 static xuint_t
-has_interface (GDBusNodeInfo *info,
+has_interface (xdbus_node_info_t *info,
                const xchar_t   *name)
 {
   xuint_t n;
   for (n = 0; info->interfaces != NULL && info->interfaces[n] != NULL; n++)
     {
-      if (g_strcmp0 (info->interfaces[n]->name, name) == 0)
+      if (xstrcmp0 (info->interfaces[n]->name, name) == 0)
         return TRUE;
     }
   return FALSE;
@@ -1494,12 +1494,12 @@ has_interface (GDBusNodeInfo *info,
 /* ---------------------------------------------------------------------------------------------------- */
 
 typedef struct {
-  GMainLoop *loop;
+  xmain_loop_t *loop;
   xvariant_t *result;
 } OMGetManagedObjectsData;
 
 static void
-om_get_all_cb (GDBusConnection *connection,
+om_get_all_cb (xdbus_connection_t *connection,
                xasync_result_t    *res,
                xpointer_t         user_data)
 {
@@ -1512,12 +1512,12 @@ om_get_all_cb (GDBusConnection *connection,
                                                 &error);
   g_assert_no_error (error);
   g_assert (data->result != NULL);
-  g_main_loop_quit (data->loop);
+  xmain_loop_quit (data->loop);
 }
 
 static void
-om_check_get_all (GDBusConnection *c,
-                  GMainLoop       *loop,
+om_check_get_all (xdbus_connection_t *c,
+                  xmain_loop_t       *loop,
                   const xchar_t     *str)
 {
   OMGetManagedObjectsData data;
@@ -1539,17 +1539,17 @@ om_check_get_all (GDBusConnection *c,
                           NULL,
                           (xasync_ready_callback_t) om_get_all_cb,
                           &data);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
   g_assert (data.result != NULL);
-  s = g_variant_print (data.result, TRUE);
+  s = xvariant_print (data.result, TRUE);
   g_assert_cmpstr (s, ==, str);
   g_free (s);
-  g_variant_unref (data.result);
+  xvariant_unref (data.result);
 }
 
 typedef struct
 {
-  GMainLoop *loop;
+  xmain_loop_t *loop;
   xuint_t state;
 
   xuint_t num_object_proxy_added_signals;
@@ -1561,7 +1561,7 @@ typedef struct
 static xint_t
 my_pstrcmp (const xchar_t **a, const xchar_t **b)
 {
-  return g_strcmp0 (*a, *b);
+  return xstrcmp0 (*a, *b);
 }
 
 static void
@@ -1574,43 +1574,43 @@ om_check_interfaces_added (const xchar_t *signal_name,
   const xchar_t *path;
   xvariant_t *array;
   xuint_t n;
-  GPtrArray *interfaces;
-  GPtrArray *interfaces_in_message;
+  xptr_array_t *interfaces;
+  xptr_array_t *interfaces_in_message;
   va_list var_args;
   const xchar_t *str;
 
-  interfaces = g_ptr_array_new ();
-  g_ptr_array_add (interfaces, (xpointer_t) first_interface_name);
+  interfaces = xptr_array_new ();
+  xptr_array_add (interfaces, (xpointer_t) first_interface_name);
   va_start (var_args, first_interface_name);
   do
     {
       str = va_arg (var_args, const xchar_t *);
       if (str == NULL)
         break;
-      g_ptr_array_add (interfaces, (xpointer_t) str);
+      xptr_array_add (interfaces, (xpointer_t) str);
     }
   while (TRUE);
   va_end (var_args);
 
-  g_variant_get (parameters, "(&o*)", &path, &array);
+  xvariant_get (parameters, "(&o*)", &path, &array);
   g_assert_cmpstr (signal_name, ==, "InterfacesAdded");
   g_assert_cmpstr (path, ==, object_path);
-  g_assert_cmpint (g_variant_n_children (array), ==, interfaces->len);
-  interfaces_in_message = g_ptr_array_new ();
+  g_assert_cmpint (xvariant_n_children (array), ==, interfaces->len);
+  interfaces_in_message = xptr_array_new ();
   for (n = 0; n < interfaces->len; n++)
     {
       const xchar_t *iface_name;
-      g_variant_get_child (array, n, "{&sa{sv}}", &iface_name, NULL);
-      g_ptr_array_add (interfaces_in_message, (xpointer_t) iface_name);
+      xvariant_get_child (array, n, "{&sa{sv}}", &iface_name, NULL);
+      xptr_array_add (interfaces_in_message, (xpointer_t) iface_name);
     }
   g_assert_cmpint (interfaces_in_message->len, ==, interfaces->len);
-  g_ptr_array_sort (interfaces, (GCompareFunc) my_pstrcmp);
-  g_ptr_array_sort (interfaces_in_message, (GCompareFunc) my_pstrcmp);
+  xptr_array_sort (interfaces, (GCompareFunc) my_pstrcmp);
+  xptr_array_sort (interfaces_in_message, (GCompareFunc) my_pstrcmp);
   for (n = 0; n < interfaces->len; n++)
     g_assert_cmpstr (interfaces->pdata[n], ==, interfaces_in_message->pdata[n]);
-  g_ptr_array_unref (interfaces_in_message);
-  g_ptr_array_unref (interfaces);
-  g_variant_unref (array);
+  xptr_array_unref (interfaces_in_message);
+  xptr_array_unref (interfaces);
+  xvariant_unref (array);
 }
 
 static void
@@ -1623,47 +1623,47 @@ om_check_interfaces_removed (const xchar_t *signal_name,
   const xchar_t *path;
   xvariant_t *array;
   xuint_t n;
-  GPtrArray *interfaces;
-  GPtrArray *interfaces_in_message;
+  xptr_array_t *interfaces;
+  xptr_array_t *interfaces_in_message;
   va_list var_args;
   const xchar_t *str;
 
-  interfaces = g_ptr_array_new ();
-  g_ptr_array_add (interfaces, (xpointer_t) first_interface_name);
+  interfaces = xptr_array_new ();
+  xptr_array_add (interfaces, (xpointer_t) first_interface_name);
   va_start (var_args, first_interface_name);
   do
     {
       str = va_arg (var_args, const xchar_t *);
       if (str == NULL)
         break;
-      g_ptr_array_add (interfaces, (xpointer_t) str);
+      xptr_array_add (interfaces, (xpointer_t) str);
     }
   while (TRUE);
   va_end (var_args);
 
-  g_variant_get (parameters, "(&o*)", &path, &array);
+  xvariant_get (parameters, "(&o*)", &path, &array);
   g_assert_cmpstr (signal_name, ==, "InterfacesRemoved");
   g_assert_cmpstr (path, ==, object_path);
-  g_assert_cmpint (g_variant_n_children (array), ==, interfaces->len);
-  interfaces_in_message = g_ptr_array_new ();
+  g_assert_cmpint (xvariant_n_children (array), ==, interfaces->len);
+  interfaces_in_message = xptr_array_new ();
   for (n = 0; n < interfaces->len; n++)
     {
       const xchar_t *iface_name;
-      g_variant_get_child (array, n, "&s", &iface_name, NULL);
-      g_ptr_array_add (interfaces_in_message, (xpointer_t) iface_name);
+      xvariant_get_child (array, n, "&s", &iface_name, NULL);
+      xptr_array_add (interfaces_in_message, (xpointer_t) iface_name);
     }
   g_assert_cmpint (interfaces_in_message->len, ==, interfaces->len);
-  g_ptr_array_sort (interfaces, (GCompareFunc) my_pstrcmp);
-  g_ptr_array_sort (interfaces_in_message, (GCompareFunc) my_pstrcmp);
+  xptr_array_sort (interfaces, (GCompareFunc) my_pstrcmp);
+  xptr_array_sort (interfaces_in_message, (GCompareFunc) my_pstrcmp);
   for (n = 0; n < interfaces->len; n++)
     g_assert_cmpstr (interfaces->pdata[n], ==, interfaces_in_message->pdata[n]);
-  g_ptr_array_unref (interfaces_in_message);
-  g_ptr_array_unref (interfaces);
-  g_variant_unref (array);
+  xptr_array_unref (interfaces_in_message);
+  xptr_array_unref (interfaces);
+  xvariant_unref (array);
 }
 
 static void
-om_on_signal (GDBusConnection *connection,
+om_on_signal (xdbus_connection_t *connection,
               const xchar_t     *sender_name,
               const xchar_t     *object_path,
               const xchar_t     *interface_name,
@@ -1673,7 +1673,7 @@ om_on_signal (GDBusConnection *connection,
 {
   OMData *om_data = user_data;
 
-  //g_debug ("foo: %s", g_variant_print (parameters, TRUE));
+  //g_debug ("foo: %s", xvariant_print (parameters, TRUE));
 
   switch (om_data->state)
     {
@@ -1682,7 +1682,7 @@ om_on_signal (GDBusConnection *connection,
       g_printerr ("failing and om_data->state=%d on signal %s, params=%s\n",
                om_data->state,
                signal_name,
-               g_variant_print (parameters, TRUE));
+               xvariant_print (parameters, TRUE));
       g_assert_not_reached ();
       break;
 
@@ -1690,7 +1690,7 @@ om_on_signal (GDBusConnection *connection,
       om_check_interfaces_added (signal_name, parameters, "/managed/first",
                                  "org.project.Bar", NULL);
       om_data->state = 2;
-      g_main_loop_quit (om_data->loop);
+      xmain_loop_quit (om_data->loop);
       break;
 
     case 3:
@@ -1704,7 +1704,7 @@ om_on_signal (GDBusConnection *connection,
       om_check_interfaces_added (signal_name, parameters, "/managed/first",
                                  "org.project.Bar", NULL);
       om_data->state = 6;
-      g_main_loop_quit (om_data->loop);
+      xmain_loop_quit (om_data->loop);
       break;
 
     case 7:
@@ -1718,56 +1718,56 @@ om_on_signal (GDBusConnection *connection,
       om_check_interfaces_added (signal_name, parameters, "/managed/first",
                                  "org.project.Bar", NULL);
       om_data->state = 10;
-      g_main_loop_quit (om_data->loop);
+      xmain_loop_quit (om_data->loop);
       break;
 
     case 11:
       om_check_interfaces_added (signal_name, parameters, "/managed/first",
                                  "org.project.Bat", NULL);
       om_data->state = 12;
-      g_main_loop_quit (om_data->loop);
+      xmain_loop_quit (om_data->loop);
       break;
 
     case 13:
       om_check_interfaces_removed (signal_name, parameters, "/managed/first",
                                    "org.project.Bar", NULL);
       om_data->state = 14;
-      g_main_loop_quit (om_data->loop);
+      xmain_loop_quit (om_data->loop);
       break;
 
     case 15:
       om_check_interfaces_removed (signal_name, parameters, "/managed/first",
                                    "org.project.Bat", NULL);
       om_data->state = 16;
-      g_main_loop_quit (om_data->loop);
+      xmain_loop_quit (om_data->loop);
       break;
 
     case 17:
       om_check_interfaces_added (signal_name, parameters, "/managed/first",
                                  "com.acme.Coyote", NULL);
       om_data->state = 18;
-      g_main_loop_quit (om_data->loop);
+      xmain_loop_quit (om_data->loop);
       break;
 
     case 101:
       om_check_interfaces_added (signal_name, parameters, "/managed/second",
                                  "org.project.Bat", "org.project.Bar", NULL);
       om_data->state = 102;
-      g_main_loop_quit (om_data->loop);
+      xmain_loop_quit (om_data->loop);
       break;
 
     case 103:
       om_check_interfaces_removed (signal_name, parameters, "/managed/second",
                                    "org.project.Bat", "org.project.Bar", NULL);
       om_data->state = 104;
-      g_main_loop_quit (om_data->loop);
+      xmain_loop_quit (om_data->loop);
       break;
 
     case 200:
       om_check_interfaces_added (signal_name, parameters, "/managed/first_1",
                                  "com.acme.Coyote", NULL);
       om_data->state = 201;
-      g_main_loop_quit (om_data->loop);
+      xmain_loop_quit (om_data->loop);
       break;
     }
 }
@@ -1779,14 +1779,14 @@ om_pm_start_cb (FooiGenObjectManagerClient *manager,
                 xasync_result_t               *res,
                 xpointer_t                    user_data)
 {
-  GMainLoop *loop = user_data;
-  om_res = g_object_ref (res);
-  g_main_loop_quit (loop);
+  xmain_loop_t *loop = user_data;
+  om_res = xobject_ref (res);
+  xmain_loop_quit (loop);
 }
 
 static void
-on_interface_added (GDBusObject    *object,
-                    GDBusInterface *interface,
+on_interface_added (xdbus_object_t    *object,
+                    xdbus_interface_t *interface,
                     xpointer_t        user_data)
 {
   OMData *om_data = user_data;
@@ -1794,8 +1794,8 @@ on_interface_added (GDBusObject    *object,
 }
 
 static void
-on_interface_removed (GDBusObject    *object,
-                      GDBusInterface *interface,
+on_interface_removed (xdbus_object_t    *object,
+                      xdbus_interface_t *interface,
                       xpointer_t        user_data)
 {
   OMData *om_data = user_data;
@@ -1803,8 +1803,8 @@ on_interface_removed (GDBusObject    *object,
 }
 
 static void
-on_object_proxy_added (GDBusObjectManagerClient  *manager,
-                       GDBusObjectProxy   *object_proxy,
+on_object_proxy_added (xdbus_object_manager_client_t  *manager,
+                       xdbus_object_proxy_t   *object_proxy,
                        xpointer_t            user_data)
 {
   OMData *om_data = user_data;
@@ -1820,8 +1820,8 @@ on_object_proxy_added (GDBusObjectManagerClient  *manager,
 }
 
 static void
-on_object_proxy_removed (GDBusObjectManagerClient  *manager,
-                         GDBusObjectProxy   *object_proxy,
+on_object_proxy_removed (xdbus_object_manager_client_t  *manager,
+                         xdbus_object_proxy_t   *object_proxy,
                          xpointer_t            user_data)
 {
   OMData *om_data = user_data;
@@ -1836,7 +1836,7 @@ on_object_proxy_removed (GDBusObjectManagerClient  *manager,
 
 static void
 property_changed (xobject_t    *object,
-		  GParamSpec *pspec,
+		  xparam_spec_t *pspec,
 		  xpointer_t    user_data)
 {
   xboolean_t *changed = user_data;
@@ -1845,7 +1845,7 @@ property_changed (xobject_t    *object,
 }
 
 static void
-om_check_property_and_signal_emission (GMainLoop  *loop,
+om_check_property_and_signal_emission (xmain_loop_t  *loop,
                                        FooiGenBar *skeleton,
                                        FooiGenBar *proxy)
 {
@@ -1913,26 +1913,26 @@ check_object_manager (void)
   FooiGenObjectSkeleton *o = NULL;
   FooiGenObjectSkeleton *o2 = NULL;
   FooiGenObjectSkeleton *o3 = NULL;
-  GDBusInterfaceSkeleton *i;
-  GDBusConnection *c;
-  GDBusObjectManagerServer *manager = NULL;
-  GDBusNodeInfo *info;
+  xdbus_interface_skeleton_t *i;
+  xdbus_connection_t *c;
+  xdbus_object_manager_server_t *manager = NULL;
+  xdbus_node_info_t *info;
   xerror_t *error;
-  GMainLoop *loop;
+  xmain_loop_t *loop;
   OMData *om_data = NULL;
   xuint_t om_signal_id = 0;
-  GDBusObjectManager *pm = NULL;
+  xdbus_object_manager_t *pm = NULL;
   xlist_t *object_proxies;
   xlist_t *proxies;
-  GDBusObject *op;
-  GDBusProxy *p;
+  xdbus_object_t *op;
+  xdbus_proxy_t *p;
   FooiGenBar *bar_skeleton;
-  GDBusInterface *iface;
+  xdbus_interface_t *iface;
   xchar_t *path, *name, *name_owner;
-  GDBusConnection *c2;
+  xdbus_connection_t *c2;
   GDBusObjectManagerClientFlags flags;
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   om_data = g_new0 (OMData, 1);
   om_data->loop = loop;
@@ -1954,13 +1954,13 @@ check_object_manager (void)
                                                      om_data,
                                                      NULL); /* user_data_free_func */
 
-  /* Our GDBusObjectManagerClient tests are simple - we basically just count the
+  /* Our xdbus_object_manager_client_t tests are simple - we basically just count the
    * number of times the various signals have been emitted (we don't check
    * that the right objects/interfaces are passed though - that's checked
    * in the lower-level tests in om_on_signal()...)
    *
    * Note that these tests rely on the D-Bus signal handlers used by
-   * GDBusObjectManagerClient firing before om_on_signal().
+   * xdbus_object_manager_client_t firing before om_on_signal().
    */
   error = NULL;
   pm = foo_igen_object_manager_client_new_sync (c,
@@ -1970,7 +1970,7 @@ check_object_manager (void)
                                                 NULL, /* xcancellable_t */
                                                 &error);
   g_assert_error (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD);
-  g_error_free (error);
+  xerror_free (error);
   g_assert (pm == NULL);
 
   manager = g_dbus_object_manager_server_new ("/managed");
@@ -1980,7 +1980,7 @@ check_object_manager (void)
   g_dbus_object_manager_server_set_connection (manager, c);
 
   g_assert_cmpstr (g_dbus_object_manager_get_object_path (G_DBUS_OBJECT_MANAGER (manager)), ==, "/managed");
-  g_object_get (manager, "object-path", &path, "connection", &c2, NULL);
+  xobject_get (manager, "object-path", &path, "connection", &c2, NULL);
   g_assert_cmpstr (path, ==, "/managed");
   g_assert (c2 == c);
   g_free (path);
@@ -2006,7 +2006,7 @@ check_object_manager (void)
                                       NULL, /* xcancellable_t */
                                       (xasync_ready_callback_t) om_pm_start_cb,
                                       loop);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
   error = NULL;
   pm = foo_igen_object_manager_client_new_finish (om_res, &error);
   g_clear_object (&om_res);
@@ -2022,7 +2022,7 @@ check_object_manager (void)
                     om_data);
 
   g_assert_cmpstr (g_dbus_object_manager_get_object_path (G_DBUS_OBJECT_MANAGER (pm)), ==, "/managed");
-  g_object_get (pm,
+  xobject_get (pm,
                 "object-path", &path,
                 "connection", &c2,
                 "name", &name,
@@ -2071,7 +2071,7 @@ check_object_manager (void)
   /* ... check we get the InterfacesAdded signal */
   om_data->state = 1;
 
-  g_main_loop_run (om_data->loop);
+  xmain_loop_run (om_data->loop);
 
   g_assert_cmpint (om_data->state, ==, 2);
   g_assert_cmpint (om_data->num_object_proxy_added_signals, ==, 1);
@@ -2100,7 +2100,7 @@ check_object_manager (void)
   foo_igen_object_skeleton_set_bar (o, FOO_IGEN_BAR (i));
   /* ... check we get the InterfacesRemoved */
   om_data->state = 3;
-  g_main_loop_run (om_data->loop);
+  xmain_loop_run (om_data->loop);
   /* ... and then check we get the InterfacesAdded */
   g_assert_cmpint (om_data->state, ==, 6);
   g_assert_cmpint (om_data->num_object_proxy_added_signals, ==, 2);
@@ -2119,7 +2119,7 @@ check_object_manager (void)
   foo_igen_object_skeleton_set_bar (o, FOO_IGEN_BAR (i));
   /* ... check we get the InterfacesRemoved and then InterfacesAdded */
   om_data->state = 7;
-  g_main_loop_run (om_data->loop);
+  xmain_loop_run (om_data->loop);
   g_assert_cmpint (om_data->state, ==, 10);
   g_assert_cmpint (om_data->num_object_proxy_added_signals, ==, 3);
   g_assert_cmpint (om_data->num_object_proxy_removed_signals, ==, 2);
@@ -2138,7 +2138,7 @@ check_object_manager (void)
   g_clear_object (&i);
   /* ... check we get the InterfacesAdded */
   om_data->state = 11;
-  g_main_loop_run (om_data->loop);
+  xmain_loop_run (om_data->loop);
   g_assert_cmpint (om_data->state, ==, 12);
   g_assert_cmpint (om_data->num_object_proxy_added_signals, ==, 3);
   g_assert_cmpint (om_data->num_object_proxy_removed_signals, ==, 2);
@@ -2155,7 +2155,7 @@ check_object_manager (void)
   foo_igen_object_skeleton_set_bar (o, NULL);
   /* ... check we get the InterfacesRemoved */
   om_data->state = 13;
-  g_main_loop_run (om_data->loop);
+  xmain_loop_run (om_data->loop);
   g_assert_cmpint (om_data->state, ==, 14);
   g_assert_cmpint (om_data->num_object_proxy_added_signals, ==, 3);
   g_assert_cmpint (om_data->num_object_proxy_removed_signals, ==, 2);
@@ -2182,7 +2182,7 @@ check_object_manager (void)
   foo_igen_object_skeleton_set_bat (o, NULL);
   /* ... check we get the InterfacesRemoved */
   om_data->state = 15;
-  g_main_loop_run (om_data->loop);
+  xmain_loop_run (om_data->loop);
   g_assert_cmpint (om_data->state, ==, 16);
   g_assert_cmpint (om_data->num_object_proxy_added_signals, ==, 3);
   g_assert_cmpint (om_data->num_object_proxy_removed_signals, ==, 3);
@@ -2199,7 +2199,7 @@ check_object_manager (void)
   g_clear_object (&i);
   /* ... check we get the InterfacesAdded */
   om_data->state = 17;
-  g_main_loop_run (om_data->loop);
+  xmain_loop_run (om_data->loop);
   g_assert_cmpint (om_data->state, ==, 18);
   g_assert_cmpint (om_data->num_object_proxy_added_signals, ==, 4);
   g_assert_cmpint (om_data->num_object_proxy_removed_signals, ==, 3);
@@ -2230,7 +2230,7 @@ check_object_manager (void)
   g_dbus_object_manager_server_export (manager, G_DBUS_OBJECT_SKELETON (o2));
   /* ... check we get the InterfacesAdded with _two_ interfaces */
   om_data->state = 101;
-  g_main_loop_run (om_data->loop);
+  xmain_loop_run (om_data->loop);
   g_assert_cmpint (om_data->state, ==, 102);
   g_assert_cmpint (om_data->num_object_proxy_added_signals, ==, 5);
   g_assert_cmpint (om_data->num_object_proxy_removed_signals, ==, 3);
@@ -2262,21 +2262,21 @@ check_object_manager (void)
    * the generated ::get-proxy-type signal handler
    */
   object_proxies = g_dbus_object_manager_get_objects (pm);
-  g_assert (g_list_length (object_proxies) == 2);
-  g_list_free_full (object_proxies, g_object_unref);
+  g_assert (xlist_length (object_proxies) == 2);
+  xlist_free_full (object_proxies, xobject_unref);
   op = g_dbus_object_manager_get_object (pm, "/managed/first");
   g_assert (op != NULL);
   g_assert (FOO_IGEN_IS_OBJECT_PROXY (op));
   g_assert_cmpstr (g_dbus_object_get_object_path (op), ==, "/managed/first");
   proxies = g_dbus_object_get_interfaces (op);
-  g_assert (g_list_length (proxies) == 1);
-  g_list_free_full (proxies, g_object_unref);
+  g_assert (xlist_length (proxies) == 1);
+  xlist_free_full (proxies, xobject_unref);
   p = G_DBUS_PROXY (foo_igen_object_get_com_acme_coyote (FOO_IGEN_OBJECT (op)));
   g_assert (p != NULL);
   g_assert_cmpint (XTYPE_FROM_INSTANCE (p), ==, FOO_IGEN_TYPE_COM_ACME_COYOTE_PROXY);
-  g_assert (g_type_is_a (XTYPE_FROM_INSTANCE (p), FOO_IGEN_TYPE_COM_ACME_COYOTE));
+  g_assert (xtype_is_a (XTYPE_FROM_INSTANCE (p), FOO_IGEN_TYPE_COM_ACME_COYOTE));
   g_clear_object (&p);
-  p = (GDBusProxy *) g_dbus_object_get_interface (op, "org.project.NonExisting");
+  p = (xdbus_proxy_t *) g_dbus_object_get_interface (op, "org.project.NonExisting");
   g_assert (p == NULL);
   g_clear_object (&op);
 
@@ -2286,23 +2286,23 @@ check_object_manager (void)
   g_assert (FOO_IGEN_IS_OBJECT_PROXY (op));
   g_assert_cmpstr (g_dbus_object_get_object_path (op), ==, "/managed/second");
   proxies = g_dbus_object_get_interfaces (op);
-  g_assert (g_list_length (proxies) == 2);
-  g_list_free_full (proxies, g_object_unref);
+  g_assert (xlist_length (proxies) == 2);
+  xlist_free_full (proxies, xobject_unref);
   p = G_DBUS_PROXY (foo_igen_object_get_bat (FOO_IGEN_OBJECT (op)));
   g_assert (p != NULL);
   g_assert_cmpint (XTYPE_FROM_INSTANCE (p), ==, FOO_IGEN_TYPE_BAT_PROXY);
-  g_assert (g_type_is_a (XTYPE_FROM_INSTANCE (p), FOO_IGEN_TYPE_BAT));
+  g_assert (xtype_is_a (XTYPE_FROM_INSTANCE (p), FOO_IGEN_TYPE_BAT));
   g_clear_object (&p);
   p = G_DBUS_PROXY (foo_igen_object_get_bar (FOO_IGEN_OBJECT (op)));
   g_assert (p != NULL);
   g_assert_cmpint (XTYPE_FROM_INSTANCE (p), ==, FOO_IGEN_TYPE_BAR_PROXY);
-  g_assert (g_type_is_a (XTYPE_FROM_INSTANCE (p), FOO_IGEN_TYPE_BAR));
+  g_assert (xtype_is_a (XTYPE_FROM_INSTANCE (p), FOO_IGEN_TYPE_BAR));
   /* ... now that we have a Bar instance around, also check that we get signals
    *     and property changes...
    */
   om_check_property_and_signal_emission (loop, bar_skeleton, FOO_IGEN_BAR (p));
   g_clear_object (&p);
-  p = (GDBusProxy *) g_dbus_object_get_interface (op, "org.project.NonExisting");
+  p = (xdbus_proxy_t *) g_dbus_object_get_interface (op, "org.project.NonExisting");
   g_assert (p == NULL);
   g_clear_object (&op);
 
@@ -2312,7 +2312,7 @@ check_object_manager (void)
   g_dbus_object_manager_server_unexport (manager, "/managed/second");
   /* ... check we get InterfacesRemoved with both interfaces */
   om_data->state = 103;
-  g_main_loop_run (om_data->loop);
+  xmain_loop_run (om_data->loop);
   g_assert_cmpint (om_data->state, ==, 104);
   g_assert_cmpint (om_data->num_object_proxy_added_signals, ==, 5);
   g_assert_cmpint (om_data->num_object_proxy_removed_signals, ==, 4);
@@ -2339,22 +2339,22 @@ check_object_manager (void)
   g_dbus_object_manager_server_export_uniquely (manager, G_DBUS_OBJECT_SKELETON (o3));
   /* ... check we get the InterfacesAdded signal */
   om_data->state = 200;
-  g_main_loop_run (om_data->loop);
+  xmain_loop_run (om_data->loop);
   g_assert_cmpint (om_data->state, ==, 201);
 
   om_check_get_all (c, loop,
                     "({objectpath '/managed/first': {'com.acme.Coyote': {'Mood': <''>}}, '/managed/first_1': {'com.acme.Coyote': {'Mood': <'indifferent'>}}},)");
 
-  //g_main_loop_run (loop); /* TODO: tmp */
+  //xmain_loop_run (loop); /* TODO: tmp */
 
   /* Clean up objects */
   g_assert (g_dbus_object_manager_server_unexport (manager, "/managed/first_1"));
   //g_assert (g_dbus_object_manager_server_unexport (manager, "/managed/second"));
   g_assert (g_dbus_object_manager_server_unexport (manager, "/managed/first"));
-  g_assert_cmpint (g_list_length (g_dbus_object_manager_get_objects (G_DBUS_OBJECT_MANAGER (manager))), ==, 0);
+  g_assert_cmpint (xlist_length (g_dbus_object_manager_get_objects (G_DBUS_OBJECT_MANAGER (manager))), ==, 0);
 
   if (loop != NULL)
-    g_main_loop_unref (loop);
+    xmain_loop_unref (loop);
 
   if (om_signal_id != 0)
     g_dbus_connection_signal_unsubscribe (c, om_signal_id);
@@ -2382,10 +2382,10 @@ check_object_manager (void)
 static void
 test_object_manager (void)
 {
-  GMainLoop *loop;
+  xmain_loop_t *loop;
   xuint_t id;
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   id = g_bus_own_name (G_BUS_TYPE_SESSION,
                        "org.gtk.GDBus.BindingsTool.Test",
@@ -2396,17 +2396,17 @@ test_object_manager (void)
                        loop,
                        NULL);
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   check_object_manager ();
 
   /* uncomment to keep the service around (to e.g. introspect it) */
-  /* g_main_loop_run (loop); */
+  /* xmain_loop_run (loop); */
 
   unexport_objects ();
 
   g_bus_unown_name (id);
-  g_main_loop_unref (loop);
+  xmain_loop_unref (loop);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -2471,29 +2471,29 @@ test_property_naming (void)
   (void) c_setter_name;
 
   skel = foo_igen_naming_skeleton_new ();
-  g_assert (g_object_class_find_property (G_OBJECT_GET_CLASS (skel), "type") != NULL);
-  g_object_unref (skel);
+  g_assert (xobject_class_find_property (G_OBJECT_GET_CLASS (skel), "type") != NULL);
+  xobject_unref (skel);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 /* autocleanups
  *
- * - check that g_autoptr() works for all generated types, if supported by the
+ * - check that x_autoptr() works for all generated types, if supported by the
  *   current compiler
  */
 
 static void
 test_autocleanups (void)
 {
-#ifdef g_autoptr
-  g_autoptr(FooiGenBar) bar = NULL;
-  g_autoptr(FooiGenBarProxy) bar_proxy = NULL;
-  g_autoptr(FooiGenBarSkeleton) bar_skeleton = NULL;
-  g_autoptr(FooiGenObject) object = NULL;
-  g_autoptr(FooiGenObjectProxy) object_proxy = NULL;
-  g_autoptr(FooiGenObjectSkeleton) object_skeleton = NULL;
-  g_autoptr(FooiGenObjectManagerClient) object_manager_client = NULL;
+#ifdef x_autoptr
+  x_autoptr(FooiGenBar) bar = NULL;
+  x_autoptr(FooiGenBarProxy) bar_proxy = NULL;
+  x_autoptr(FooiGenBarSkeleton) bar_skeleton = NULL;
+  x_autoptr(FooiGenObject) object = NULL;
+  x_autoptr(FooiGenObjectProxy) object_proxy = NULL;
+  x_autoptr(FooiGenObjectSkeleton) object_skeleton = NULL;
+  x_autoptr(FooiGenObjectManagerClient) object_manager_client = NULL;
 
   (void) bar;
   (void) bar_proxy;
@@ -2511,7 +2511,7 @@ test_autocleanups (void)
    *
    * g_test_skip() was added in 2.38.
    */
-  g_test_skip ("g_autoptr() not supported on this compiler");
+  g_test_skip ("x_autoptr() not supported on this compiler");
 #else
   /* Let's just say it passed. */
 #endif
@@ -2527,37 +2527,37 @@ test_deprecations (void)
 {
   {
     FooiGenOldieInterface *iskel;
-    GParamSpec *pspec;
+    xparam_spec_t *pspec;
 
     G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     iskel = foo_igen_oldie_interface_skeleton_new ();
     G_GNUC_END_IGNORE_DEPRECATIONS;
 
-    pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (iskel), "bat");
+    pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (iskel), "bat");
     g_assert_nonnull (pspec);
     g_assert_cmpint (pspec->flags & G_PARAM_DEPRECATED, ==, G_PARAM_DEPRECATED);
 
-    g_object_unref (iskel);
+    xobject_unref (iskel);
   }
 
   {
     FooiGenObjectSkeleton *oskel;
-    GParamSpec *pspec;
+    xparam_spec_t *pspec;
 
     oskel = foo_igen_object_skeleton_new ("/objects/first");
-    pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (oskel), "oldie-interface");
+    pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (oskel), "oldie-interface");
     g_assert_nonnull (pspec);
     g_assert_cmpint (pspec->flags & G_PARAM_DEPRECATED, ==, G_PARAM_DEPRECATED);
 
-    g_object_unref (oskel);
+    xobject_unref (oskel);
   }
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-assert_arg_infos_equal (GDBusArgInfo **a,
-                        GDBusArgInfo **b)
+assert_arg_infos_equal (xdbus_arg_info_t **a,
+                        xdbus_arg_info_t **b)
 {
   if (a == NULL)
     {
@@ -2578,8 +2578,8 @@ assert_arg_infos_equal (GDBusArgInfo **a,
 }
 
 static void
-assert_annotations_equal (GDBusAnnotationInfo **a,
-                          GDBusAnnotationInfo **b)
+assert_annotations_equal (xdbus_annotation_info_t **a,
+                          xdbus_annotation_info_t **b)
 {
   xuint_t a_len = count_annotations (a);
   xuint_t b_len = count_annotations (b);
@@ -2600,23 +2600,23 @@ assert_annotations_equal (GDBusAnnotationInfo **a,
   g_assert_null (*b);
 }
 
-/* Test that the GDBusInterfaceInfo structure generated by gdbus-codegen
+/* Test that the xdbus_interface_info_t structure generated by gdbus-codegen
  * --interface-info-body matches that generated by the other mode.
  */
 static void
 test_standalone_interface_info (void)
 {
-  GDBusInterfaceSkeleton *skel = G_DBUS_INTERFACE_SKELETON (foo_igen_bar_skeleton_new ());
-  GDBusInterfaceInfo *skel_info = g_dbus_interface_skeleton_get_info (skel);
-  const GDBusInterfaceInfo *slim_info = &org_project_bar_interface;
+  xdbus_interface_skeleton_t *skel = G_DBUS_INTERFACE_SKELETON (foo_igen_bar_skeleton_new ());
+  xdbus_interface_info_t *skel_info = g_dbus_interface_skeleton_get_info (skel);
+  const xdbus_interface_info_t *slim_info = &org_project_bar_interface;
   xsize_t i;
 
   g_assert_cmpstr (skel_info->name, ==, slim_info->name);
 
   for (i = 0; skel_info->methods[i] != NULL; i++)
     {
-      GDBusMethodInfo *skel_method = skel_info->methods[i];
-      GDBusMethodInfo *slim_method = slim_info->methods[i];
+      xdbus_method_info_t *skel_method = skel_info->methods[i];
+      xdbus_method_info_t *slim_method = slim_info->methods[i];
 
       g_assert_nonnull (slim_method);
       g_assert_cmpstr (skel_method->name, ==, slim_method->name);
@@ -2628,8 +2628,8 @@ test_standalone_interface_info (void)
 
   for (i = 0; skel_info->signals[i] != NULL; i++)
     {
-      GDBusSignalInfo *skel_signal = skel_info->signals[i];
-      GDBusSignalInfo *slim_signal = slim_info->signals[i];
+      xdbus_signalInfo_t *skel_signal = skel_info->signals[i];
+      xdbus_signalInfo_t *slim_signal = slim_info->signals[i];
 
       g_assert_nonnull (slim_signal);
       g_assert_cmpstr (skel_signal->name, ==, slim_signal->name);
@@ -2640,8 +2640,8 @@ test_standalone_interface_info (void)
 
   for (i = 0; skel_info->properties[i] != NULL; i++)
     {
-      GDBusPropertyInfo *skel_prop = skel_info->properties[i];
-      GDBusPropertyInfo *slim_prop = slim_info->properties[i];
+      xdbus_property_info_t *skel_prop = skel_info->properties[i];
+      xdbus_property_info_t *slim_prop = slim_info->properties[i];
 
       g_assert_nonnull (slim_prop);
 
@@ -2660,8 +2660,8 @@ test_standalone_interface_info (void)
 /* ---------------------------------------------------------------------------------------------------- */
 static xboolean_t
 handle_hello_fd (FooiGenFDPassing *object,
-                 GDBusMethodInvocation *invocation,
-                 GUnixFDList *fd_list,
+                 xdbus_method_invocation_t *invocation,
+                 xunix_fd_list_t *fd_list,
                  const xchar_t *arg_greeting)
 {
   foo_igen_fdpassing_complete_hello_fd (object, invocation, fd_list, arg_greeting);
@@ -2671,8 +2671,8 @@ handle_hello_fd (FooiGenFDPassing *object,
 #if XPL_VERSION_MIN_REQUIRED >= XPL_VERSION_2_64
 static xboolean_t
 handle_no_annotation (FooiGenFDPassing *object,
-                      GDBusMethodInvocation *invocation,
-                      GUnixFDList *fd_list,
+                      xdbus_method_invocation_t *invocation,
+                      xunix_fd_list_t *fd_list,
                       xvariant_t *arg_greeting,
                       const xchar_t *arg_greeting_locale)
 {
@@ -2682,8 +2682,8 @@ handle_no_annotation (FooiGenFDPassing *object,
 
 static xboolean_t
 handle_no_annotation_nested (FooiGenFDPassing *object,
-                             GDBusMethodInvocation *invocation,
-                             GUnixFDList *fd_list,
+                             xdbus_method_invocation_t *invocation,
+                             xunix_fd_list_t *fd_list,
                              xvariant_t *arg_files)
 {
   foo_igen_fdpassing_complete_no_annotation_nested (object, invocation, fd_list);
@@ -2692,7 +2692,7 @@ handle_no_annotation_nested (FooiGenFDPassing *object,
 #else
 static xboolean_t
 handle_no_annotation (FooiGenFDPassing *object,
-                      GDBusMethodInvocation *invocation,
+                      xdbus_method_invocation_t *invocation,
                       xvariant_t *arg_greeting,
                       const xchar_t *arg_greeting_locale)
 {
@@ -2702,7 +2702,7 @@ handle_no_annotation (FooiGenFDPassing *object,
 
 static xboolean_t
 handle_no_annotation_nested (FooiGenFDPassing *object,
-                             GDBusMethodInvocation *invocation,
+                             xdbus_method_invocation_t *invocation,
                              xvariant_t *arg_files)
 {
   foo_igen_fdpassing_complete_no_annotation_nested (object, invocation);
@@ -2710,9 +2710,9 @@ handle_no_annotation_nested (FooiGenFDPassing *object,
 }
 #endif
 
-/* Test that generated code for methods includes GUnixFDList arguments
+/* Test that generated code for methods includes xunix_fd_list_t arguments
  * unconditionally if the method is explicitly annotated as C.UnixFD, and only
- * emits GUnixFDList arguments when there's merely an 'h' parameter if
+ * emits xunix_fd_list_t arguments when there's merely an 'h' parameter if
  * --glib-min-required=2.64 or greater.
  */
 static void
@@ -2726,7 +2726,7 @@ test_unix_fd_list (void)
   iface.handle_hello_fd = handle_hello_fd;
 
   /* This one is not annotated; even though it's got an in and out 'h'
-   * parameter, for backwards compatibility we cannot emit GUnixFDList
+   * parameter, for backwards compatibility we cannot emit xunix_fd_list_t
    * arguments unless --glib-min-required >= 2.64 was used.
    */
   iface.handle_no_annotation = handle_no_annotation;

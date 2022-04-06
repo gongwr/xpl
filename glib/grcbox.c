@@ -76,7 +76,7 @@
  * void
  * add_person_to_database (Database *db, Person *p)
  * {
- *   db->persons = g_list_prepend (db->persons, g_rc_box_acquire (p));
+ *   db->persons = xlist_prepend (db->persons, g_rc_box_acquire (p));
  * }
  *
  * // Removes a Person from the Database; the reference acquired by
@@ -84,7 +84,7 @@
  * void
  * remove_person_from_database (Database *db, Person *p)
  * {
- *   db->persons = g_list_remove (db->persons, p);
+ *   db->persons = xlist_remove (db->persons, p);
  *   g_rc_box_release (p);
  * }
  * ]|
@@ -106,8 +106,8 @@
  * void
  * remove_person_from_database (Database *db, Person *p)
  * {
- *   db->persons = g_list_remove (db->persons, p);
- *   g_rc_box_release_full (p, (GDestroyNotify) person_clear);
+ *   db->persons = xlist_remove (db->persons, p);
+ *   g_rc_box_release_full (p, (xdestroy_notify_t) person_clear);
  * }
  * ]|
  *
@@ -137,7 +137,7 @@
  *
  * ## Automatic pointer clean up
  *
- * If you want to add g_autoptr() support to your plain old data type through
+ * If you want to add x_autoptr() support to your plain old data type through
  * reference counting, you can use the G_DEFINE_AUTOPTR_CLEANUP_FUNC() and
  * g_rc_box_release():
  *
@@ -153,7 +153,7 @@
  * my_data_struct_release (MyDataStruct *data)
  * {
  *   // my_data_struct_clear() is defined elsewhere
- *   g_rc_box_release_full (data, (GDestroyNotify) my_data_struct_clear);
+ *   g_rc_box_release_full (data, (xdestroy_notify_t) my_data_struct_clear);
  * }
  *
  * G_DEFINE_AUTOPTR_CLEANUP_FUNC (MyDataStruct, my_data_struct_release)
@@ -382,7 +382,7 @@ g_rc_box_alloc0 (xsize_t block_size)
  */
 xpointer_t
 (g_rc_box_dup) (xsize_t         block_size,
-                gconstpointer mem_block)
+                xconstpointer mem_block)
 {
   xpointer_t res;
 
@@ -455,7 +455,7 @@ g_rc_box_release (xpointer_t mem_block)
  */
 void
 g_rc_box_release_full (xpointer_t       mem_block,
-                       GDestroyNotify clear_func)
+                       xdestroy_notify_t clear_func)
 {
   GRcBox *real_box = G_RC_BOX (mem_block);
 

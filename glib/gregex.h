@@ -1,4 +1,4 @@
-/* GRegex -- regular expression API wrapper around PCRE.
+/* xregex_t -- regular expression API wrapper around PCRE.
  *
  * Copyright (C) 1999, 2000 Scott Wimer
  * Copyright (C) 2004, Matthias Clasen <mclasen@redhat.com>
@@ -18,8 +18,8 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __G_REGEX_H__
-#define __G_REGEX_H__
+#ifndef __XREGEX_H__
+#define __XREGEX_H__
 
 #if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
 #error "Only <glib.h> can be included directly."
@@ -32,105 +32,105 @@ G_BEGIN_DECLS
 
 /**
  * GRegexError:
- * @G_REGEX_ERROR_COMPILE: Compilation of the regular expression failed.
- * @G_REGEX_ERROR_OPTIMIZE: Optimization of the regular expression failed.
- * @G_REGEX_ERROR_REPLACE: Replacement failed due to an ill-formed replacement
+ * @XREGEX_ERROR_COMPILE: Compilation of the regular expression failed.
+ * @XREGEX_ERROR_OPTIMIZE: Optimization of the regular expression failed.
+ * @XREGEX_ERROR_REPLACE: Replacement failed due to an ill-formed replacement
  *     string.
- * @G_REGEX_ERROR_MATCH: The match process failed.
- * @G_REGEX_ERROR_INTERNAL: Internal error of the regular expression engine.
+ * @XREGEX_ERROR_MATCH: The match process failed.
+ * @XREGEX_ERROR_INTERNAL: Internal error of the regular expression engine.
  *     Since 2.16
- * @G_REGEX_ERROR_STRAY_BACKSLASH: "\\" at end of pattern. Since 2.16
- * @G_REGEX_ERROR_MISSING_CONTROL_CHAR: "\\c" at end of pattern. Since 2.16
- * @G_REGEX_ERROR_UNRECOGNIZED_ESCAPE: Unrecognized character follows "\\".
+ * @XREGEX_ERROR_STRAY_BACKSLASH: "\\" at end of pattern. Since 2.16
+ * @XREGEX_ERROR_MISSING_CONTROL_CHAR: "\\c" at end of pattern. Since 2.16
+ * @XREGEX_ERROR_UNRECOGNIZED_ESCAPE: Unrecognized character follows "\\".
  *     Since 2.16
- * @G_REGEX_ERROR_QUANTIFIERS_OUT_OF_ORDER: Numbers out of order in "{}"
+ * @XREGEX_ERROR_QUANTIFIERS_OUT_OF_ORDER: Numbers out of order in "{}"
  *     quantifier. Since 2.16
- * @G_REGEX_ERROR_QUANTIFIER_TOO_BIG: Number too big in "{}" quantifier.
+ * @XREGEX_ERROR_QUANTIFIER_TOO_BIG: Number too big in "{}" quantifier.
  *     Since 2.16
- * @G_REGEX_ERROR_UNTERMINATED_CHARACTER_CLASS: Missing terminating "]" for
+ * @XREGEX_ERROR_UNTERMINATED_CHARACTER_CLASS: Missing terminating "]" for
  *     character class. Since 2.16
- * @G_REGEX_ERROR_INVALID_ESCAPE_IN_CHARACTER_CLASS: Invalid escape sequence
+ * @XREGEX_ERROR_INVALID_ESCAPE_IN_CHARACTER_CLASS: Invalid escape sequence
  *     in character class. Since 2.16
- * @G_REGEX_ERROR_RANGE_OUT_OF_ORDER: Range out of order in character class.
+ * @XREGEX_ERROR_RANGE_OUT_OF_ORDER: Range out of order in character class.
  *     Since 2.16
- * @G_REGEX_ERROR_NOTHING_TO_REPEAT: Nothing to repeat. Since 2.16
- * @G_REGEX_ERROR_UNRECOGNIZED_CHARACTER: Unrecognized character after "(?",
+ * @XREGEX_ERROR_NOTHING_TO_REPEAT: Nothing to repeat. Since 2.16
+ * @XREGEX_ERROR_UNRECOGNIZED_CHARACTER: Unrecognized character after "(?",
  *     "(?<" or "(?P". Since 2.16
- * @G_REGEX_ERROR_POSIX_NAMED_CLASS_OUTSIDE_CLASS: POSIX named classes are
+ * @XREGEX_ERROR_POSIX_NAMED_CLASS_OUTSIDE_CLASS: POSIX named classes are
  *     supported only within a class. Since 2.16
- * @G_REGEX_ERROR_UNMATCHED_PARENTHESIS: Missing terminating ")" or ")"
+ * @XREGEX_ERROR_UNMATCHED_PARENTHESIS: Missing terminating ")" or ")"
  *     without opening "(". Since 2.16
- * @G_REGEX_ERROR_INEXISTENT_SUBPATTERN_REFERENCE: Reference to non-existent
+ * @XREGEX_ERROR_INEXISTENT_SUBPATTERN_REFERENCE: Reference to non-existent
  *     subpattern. Since 2.16
- * @G_REGEX_ERROR_UNTERMINATED_COMMENT: Missing terminating ")" after comment.
+ * @XREGEX_ERROR_UNTERMINATED_COMMENT: Missing terminating ")" after comment.
  *     Since 2.16
- * @G_REGEX_ERROR_EXPRESSION_TOO_LARGE: Regular expression too large.
+ * @XREGEX_ERROR_EXPRESSION_TOO_LARGE: Regular expression too large.
  *     Since 2.16
- * @G_REGEX_ERROR_MEMORY_ERROR: Failed to get memory. Since 2.16
- * @G_REGEX_ERROR_VARIABLE_LENGTH_LOOKBEHIND: Lookbehind assertion is not
+ * @XREGEX_ERROR_MEMORY_ERROR: Failed to get memory. Since 2.16
+ * @XREGEX_ERROR_VARIABLE_LENGTH_LOOKBEHIND: Lookbehind assertion is not
  *     fixed length. Since 2.16
- * @G_REGEX_ERROR_MALFORMED_CONDITION: Malformed number or name after "(?(".
+ * @XREGEX_ERROR_MALFORMED_CONDITION: Malformed number or name after "(?(".
  *     Since 2.16
- * @G_REGEX_ERROR_TOO_MANY_CONDITIONAL_BRANCHES: Conditional group contains
+ * @XREGEX_ERROR_TOO_MANY_CONDITIONAL_BRANCHES: Conditional group contains
  *     more than two branches. Since 2.16
- * @G_REGEX_ERROR_ASSERTION_EXPECTED: Assertion expected after "(?(".
+ * @XREGEX_ERROR_ASSERTION_EXPECTED: Assertion expected after "(?(".
  *     Since 2.16
- * @G_REGEX_ERROR_UNKNOWN_POSIX_CLASS_NAME: Unknown POSIX class name.
+ * @XREGEX_ERROR_UNKNOWN_POSIX_CLASS_NAME: Unknown POSIX class name.
  *     Since 2.16
- * @G_REGEX_ERROR_POSIX_COLLATING_ELEMENTS_NOT_SUPPORTED: POSIX collating
+ * @XREGEX_ERROR_POSIX_COLLATING_ELEMENTS_NOT_SUPPORTED: POSIX collating
  *     elements are not supported. Since 2.16
- * @G_REGEX_ERROR_HEX_CODE_TOO_LARGE: Character value in "\\x{...}" sequence
+ * @XREGEX_ERROR_HEX_CODE_TOO_LARGE: Character value in "\\x{...}" sequence
  *     is too large. Since 2.16
- * @G_REGEX_ERROR_INVALID_CONDITION: Invalid condition "(?(0)". Since 2.16
- * @G_REGEX_ERROR_SINGLE_BYTE_MATCH_IN_LOOKBEHIND: \\C not allowed in
+ * @XREGEX_ERROR_INVALID_CONDITION: Invalid condition "(?(0)". Since 2.16
+ * @XREGEX_ERROR_SINGLE_BYTE_MATCH_IN_LOOKBEHIND: \\C not allowed in
  *     lookbehind assertion. Since 2.16
- * @G_REGEX_ERROR_INFINITE_LOOP: Recursive call could loop indefinitely.
+ * @XREGEX_ERROR_INFINITE_LOOP: Recursive call could loop indefinitely.
  *     Since 2.16
- * @G_REGEX_ERROR_MISSING_SUBPATTERN_NAME_TERMINATOR: Missing terminator
+ * @XREGEX_ERROR_MISSING_SUBPATTERN_NAME_TERMINATOR: Missing terminator
  *     in subpattern name. Since 2.16
- * @G_REGEX_ERROR_DUPLICATE_SUBPATTERN_NAME: Two named subpatterns have
+ * @XREGEX_ERROR_DUPLICATE_SUBPATTERN_NAME: Two named subpatterns have
  *     the same name. Since 2.16
- * @G_REGEX_ERROR_MALFORMED_PROPERTY: Malformed "\\P" or "\\p" sequence.
+ * @XREGEX_ERROR_MALFORMED_PROPERTY: Malformed "\\P" or "\\p" sequence.
  *     Since 2.16
- * @G_REGEX_ERROR_UNKNOWN_PROPERTY: Unknown property name after "\\P" or
+ * @XREGEX_ERROR_UNKNOWN_PROPERTY: Unknown property name after "\\P" or
  *     "\\p". Since 2.16
- * @G_REGEX_ERROR_SUBPATTERN_NAME_TOO_LONG: Subpattern name is too long
+ * @XREGEX_ERROR_SUBPATTERN_NAME_TOO_LONG: Subpattern name is too long
  *     (maximum 32 characters). Since 2.16
- * @G_REGEX_ERROR_TOO_MANY_SUBPATTERNS: Too many named subpatterns (maximum
+ * @XREGEX_ERROR_TOO_MANY_SUBPATTERNS: Too many named subpatterns (maximum
  *     10,000). Since 2.16
- * @G_REGEX_ERROR_INVALID_OCTAL_VALUE: Octal value is greater than "\\377".
+ * @XREGEX_ERROR_INVALID_OCTAL_VALUE: Octal value is greater than "\\377".
  *     Since 2.16
- * @G_REGEX_ERROR_TOO_MANY_BRANCHES_IN_DEFINE: "DEFINE" group contains more
+ * @XREGEX_ERROR_TOO_MANY_BRANCHES_IN_DEFINE: "DEFINE" group contains more
  *     than one branch. Since 2.16
- * @G_REGEX_ERROR_DEFINE_REPETION: Repeating a "DEFINE" group is not allowed.
+ * @XREGEX_ERROR_DEFINE_REPETION: Repeating a "DEFINE" group is not allowed.
  *     This error is never raised. Since: 2.16 Deprecated: 2.34
- * @G_REGEX_ERROR_INCONSISTENT_NEWLINE_OPTIONS: Inconsistent newline options.
+ * @XREGEX_ERROR_INCONSISTENT_NEWLINE_OPTIONS: Inconsistent newline options.
  *     Since 2.16
- * @G_REGEX_ERROR_MISSING_BACK_REFERENCE: "\\g" is not followed by a braced,
+ * @XREGEX_ERROR_MISSING_BACK_REFERENCE: "\\g" is not followed by a braced,
  *      angle-bracketed, or quoted name or number, or by a plain number. Since: 2.16
- * @G_REGEX_ERROR_INVALID_RELATIVE_REFERENCE: relative reference must not be zero. Since: 2.34
- * @G_REGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_FORBIDDEN: the backtracing
+ * @XREGEX_ERROR_INVALID_RELATIVE_REFERENCE: relative reference must not be zero. Since: 2.34
+ * @XREGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_FORBIDDEN: the backtracing
  *     control verb used does not allow an argument. Since: 2.34
- * @G_REGEX_ERROR_UNKNOWN_BACKTRACKING_CONTROL_VERB: unknown backtracing
+ * @XREGEX_ERROR_UNKNOWN_BACKTRACKING_CONTROL_VERB: unknown backtracing
  *     control verb. Since: 2.34
- * @G_REGEX_ERROR_NUMBER_TOO_BIG: number is too big in escape sequence. Since: 2.34
- * @G_REGEX_ERROR_MISSING_SUBPATTERN_NAME: Missing subpattern name. Since: 2.34
- * @G_REGEX_ERROR_MISSING_DIGIT: Missing digit. Since 2.34
- * @G_REGEX_ERROR_INVALID_DATA_CHARACTER: In JavaScript compatibility mode,
+ * @XREGEX_ERROR_NUMBER_TOO_BIG: number is too big in escape sequence. Since: 2.34
+ * @XREGEX_ERROR_MISSING_SUBPATTERN_NAME: Missing subpattern name. Since: 2.34
+ * @XREGEX_ERROR_MISSING_DIGIT: Missing digit. Since 2.34
+ * @XREGEX_ERROR_INVALID_DATA_CHARACTER: In JavaScript compatibility mode,
  *     "[" is an invalid data character. Since: 2.34
- * @G_REGEX_ERROR_EXTRA_SUBPATTERN_NAME: different names for subpatterns of the
+ * @XREGEX_ERROR_EXTRA_SUBPATTERN_NAME: different names for subpatterns of the
  *     same number are not allowed. Since: 2.34
- * @G_REGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_REQUIRED: the backtracing control
+ * @XREGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_REQUIRED: the backtracing control
  *     verb requires an argument. Since: 2.34
- * @G_REGEX_ERROR_INVALID_CONTROL_CHAR: "\\c" must be followed by an ASCII
+ * @XREGEX_ERROR_INVALID_CONTROL_CHAR: "\\c" must be followed by an ASCII
  *     character. Since: 2.34
- * @G_REGEX_ERROR_MISSING_NAME: "\\k" is not followed by a braced, angle-bracketed, or
+ * @XREGEX_ERROR_MISSING_NAME: "\\k" is not followed by a braced, angle-bracketed, or
  *     quoted name. Since: 2.34
- * @G_REGEX_ERROR_NOT_SUPPORTED_IN_CLASS: "\\N" is not supported in a class. Since: 2.34
- * @G_REGEX_ERROR_TOO_MANY_FORWARD_REFERENCES: too many forward references. Since: 2.34
- * @G_REGEX_ERROR_NAME_TOO_LONG: the name is too long in "(*MARK)", "(*PRUNE)",
+ * @XREGEX_ERROR_NOT_SUPPORTED_IN_CLASS: "\\N" is not supported in a class. Since: 2.34
+ * @XREGEX_ERROR_TOO_MANY_FORWARD_REFERENCES: too many forward references. Since: 2.34
+ * @XREGEX_ERROR_NAME_TOO_LONG: the name is too long in "(*MARK)", "(*PRUNE)",
  *     "(*SKIP)", or "(*THEN)". Since: 2.34
- * @G_REGEX_ERROR_CHARACTER_VALUE_TOO_LARGE: the character value in the \\u sequence is
+ * @XREGEX_ERROR_CHARACTER_VALUE_TOO_LARGE: the character value in the \\u sequence is
  *     too large. Since: 2.34
  *
  * Error codes returned by regular expressions functions.
@@ -139,69 +139,69 @@ G_BEGIN_DECLS
  */
 typedef enum
 {
-  G_REGEX_ERROR_COMPILE,
-  G_REGEX_ERROR_OPTIMIZE,
-  G_REGEX_ERROR_REPLACE,
-  G_REGEX_ERROR_MATCH,
-  G_REGEX_ERROR_INTERNAL,
+  XREGEX_ERROR_COMPILE,
+  XREGEX_ERROR_OPTIMIZE,
+  XREGEX_ERROR_REPLACE,
+  XREGEX_ERROR_MATCH,
+  XREGEX_ERROR_INTERNAL,
 
   /* These are the error codes from PCRE + 100 */
-  G_REGEX_ERROR_STRAY_BACKSLASH = 101,
-  G_REGEX_ERROR_MISSING_CONTROL_CHAR = 102,
-  G_REGEX_ERROR_UNRECOGNIZED_ESCAPE = 103,
-  G_REGEX_ERROR_QUANTIFIERS_OUT_OF_ORDER = 104,
-  G_REGEX_ERROR_QUANTIFIER_TOO_BIG = 105,
-  G_REGEX_ERROR_UNTERMINATED_CHARACTER_CLASS = 106,
-  G_REGEX_ERROR_INVALID_ESCAPE_IN_CHARACTER_CLASS = 107,
-  G_REGEX_ERROR_RANGE_OUT_OF_ORDER = 108,
-  G_REGEX_ERROR_NOTHING_TO_REPEAT = 109,
-  G_REGEX_ERROR_UNRECOGNIZED_CHARACTER = 112,
-  G_REGEX_ERROR_POSIX_NAMED_CLASS_OUTSIDE_CLASS = 113,
-  G_REGEX_ERROR_UNMATCHED_PARENTHESIS = 114,
-  G_REGEX_ERROR_INEXISTENT_SUBPATTERN_REFERENCE = 115,
-  G_REGEX_ERROR_UNTERMINATED_COMMENT = 118,
-  G_REGEX_ERROR_EXPRESSION_TOO_LARGE = 120,
-  G_REGEX_ERROR_MEMORY_ERROR = 121,
-  G_REGEX_ERROR_VARIABLE_LENGTH_LOOKBEHIND = 125,
-  G_REGEX_ERROR_MALFORMED_CONDITION = 126,
-  G_REGEX_ERROR_TOO_MANY_CONDITIONAL_BRANCHES = 127,
-  G_REGEX_ERROR_ASSERTION_EXPECTED = 128,
-  G_REGEX_ERROR_UNKNOWN_POSIX_CLASS_NAME = 130,
-  G_REGEX_ERROR_POSIX_COLLATING_ELEMENTS_NOT_SUPPORTED = 131,
-  G_REGEX_ERROR_HEX_CODE_TOO_LARGE = 134,
-  G_REGEX_ERROR_INVALID_CONDITION = 135,
-  G_REGEX_ERROR_SINGLE_BYTE_MATCH_IN_LOOKBEHIND = 136,
-  G_REGEX_ERROR_INFINITE_LOOP = 140,
-  G_REGEX_ERROR_MISSING_SUBPATTERN_NAME_TERMINATOR = 142,
-  G_REGEX_ERROR_DUPLICATE_SUBPATTERN_NAME = 143,
-  G_REGEX_ERROR_MALFORMED_PROPERTY = 146,
-  G_REGEX_ERROR_UNKNOWN_PROPERTY = 147,
-  G_REGEX_ERROR_SUBPATTERN_NAME_TOO_LONG = 148,
-  G_REGEX_ERROR_TOO_MANY_SUBPATTERNS = 149,
-  G_REGEX_ERROR_INVALID_OCTAL_VALUE = 151,
-  G_REGEX_ERROR_TOO_MANY_BRANCHES_IN_DEFINE = 154,
-  G_REGEX_ERROR_DEFINE_REPETION = 155,
-  G_REGEX_ERROR_INCONSISTENT_NEWLINE_OPTIONS = 156,
-  G_REGEX_ERROR_MISSING_BACK_REFERENCE = 157,
-  G_REGEX_ERROR_INVALID_RELATIVE_REFERENCE = 158,
-  G_REGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_FORBIDDEN = 159,
-  G_REGEX_ERROR_UNKNOWN_BACKTRACKING_CONTROL_VERB  = 160,
-  G_REGEX_ERROR_NUMBER_TOO_BIG = 161,
-  G_REGEX_ERROR_MISSING_SUBPATTERN_NAME = 162,
-  G_REGEX_ERROR_MISSING_DIGIT = 163,
-  G_REGEX_ERROR_INVALID_DATA_CHARACTER = 164,
-  G_REGEX_ERROR_EXTRA_SUBPATTERN_NAME = 165,
-  G_REGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_REQUIRED = 166,
-  G_REGEX_ERROR_INVALID_CONTROL_CHAR = 168,
-  G_REGEX_ERROR_MISSING_NAME = 169,
-  G_REGEX_ERROR_NOT_SUPPORTED_IN_CLASS = 171,
-  G_REGEX_ERROR_TOO_MANY_FORWARD_REFERENCES = 172,
-  G_REGEX_ERROR_NAME_TOO_LONG = 175,
-  G_REGEX_ERROR_CHARACTER_VALUE_TOO_LARGE = 176
+  XREGEX_ERROR_STRAY_BACKSLASH = 101,
+  XREGEX_ERROR_MISSING_CONTROL_CHAR = 102,
+  XREGEX_ERROR_UNRECOGNIZED_ESCAPE = 103,
+  XREGEX_ERROR_QUANTIFIERS_OUT_OF_ORDER = 104,
+  XREGEX_ERROR_QUANTIFIER_TOO_BIG = 105,
+  XREGEX_ERROR_UNTERMINATED_CHARACTER_CLASS = 106,
+  XREGEX_ERROR_INVALID_ESCAPE_IN_CHARACTER_CLASS = 107,
+  XREGEX_ERROR_RANGE_OUT_OF_ORDER = 108,
+  XREGEX_ERROR_NOTHING_TO_REPEAT = 109,
+  XREGEX_ERROR_UNRECOGNIZED_CHARACTER = 112,
+  XREGEX_ERROR_POSIX_NAMED_CLASS_OUTSIDE_CLASS = 113,
+  XREGEX_ERROR_UNMATCHED_PARENTHESIS = 114,
+  XREGEX_ERROR_INEXISTENT_SUBPATTERN_REFERENCE = 115,
+  XREGEX_ERROR_UNTERMINATED_COMMENT = 118,
+  XREGEX_ERROR_EXPRESSION_TOO_LARGE = 120,
+  XREGEX_ERROR_MEMORY_ERROR = 121,
+  XREGEX_ERROR_VARIABLE_LENGTH_LOOKBEHIND = 125,
+  XREGEX_ERROR_MALFORMED_CONDITION = 126,
+  XREGEX_ERROR_TOO_MANY_CONDITIONAL_BRANCHES = 127,
+  XREGEX_ERROR_ASSERTION_EXPECTED = 128,
+  XREGEX_ERROR_UNKNOWN_POSIX_CLASS_NAME = 130,
+  XREGEX_ERROR_POSIX_COLLATING_ELEMENTS_NOT_SUPPORTED = 131,
+  XREGEX_ERROR_HEX_CODE_TOO_LARGE = 134,
+  XREGEX_ERROR_INVALID_CONDITION = 135,
+  XREGEX_ERROR_SINGLE_BYTE_MATCH_IN_LOOKBEHIND = 136,
+  XREGEX_ERROR_INFINITE_LOOP = 140,
+  XREGEX_ERROR_MISSING_SUBPATTERN_NAME_TERMINATOR = 142,
+  XREGEX_ERROR_DUPLICATE_SUBPATTERN_NAME = 143,
+  XREGEX_ERROR_MALFORMED_PROPERTY = 146,
+  XREGEX_ERROR_UNKNOWN_PROPERTY = 147,
+  XREGEX_ERROR_SUBPATTERN_NAME_TOO_LONG = 148,
+  XREGEX_ERROR_TOO_MANY_SUBPATTERNS = 149,
+  XREGEX_ERROR_INVALID_OCTAL_VALUE = 151,
+  XREGEX_ERROR_TOO_MANY_BRANCHES_IN_DEFINE = 154,
+  XREGEX_ERROR_DEFINE_REPETION = 155,
+  XREGEX_ERROR_INCONSISTENT_NEWLINE_OPTIONS = 156,
+  XREGEX_ERROR_MISSING_BACK_REFERENCE = 157,
+  XREGEX_ERROR_INVALID_RELATIVE_REFERENCE = 158,
+  XREGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_FORBIDDEN = 159,
+  XREGEX_ERROR_UNKNOWN_BACKTRACKING_CONTROL_VERB  = 160,
+  XREGEX_ERROR_NUMBER_TOO_BIG = 161,
+  XREGEX_ERROR_MISSING_SUBPATTERN_NAME = 162,
+  XREGEX_ERROR_MISSING_DIGIT = 163,
+  XREGEX_ERROR_INVALID_DATA_CHARACTER = 164,
+  XREGEX_ERROR_EXTRA_SUBPATTERN_NAME = 165,
+  XREGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_REQUIRED = 166,
+  XREGEX_ERROR_INVALID_CONTROL_CHAR = 168,
+  XREGEX_ERROR_MISSING_NAME = 169,
+  XREGEX_ERROR_NOT_SUPPORTED_IN_CLASS = 171,
+  XREGEX_ERROR_TOO_MANY_FORWARD_REFERENCES = 172,
+  XREGEX_ERROR_NAME_TOO_LONG = 175,
+  XREGEX_ERROR_CHARACTER_VALUE_TOO_LARGE = 176
 } GRegexError;
 
 /**
- * G_REGEX_ERROR:
+ * XREGEX_ERROR:
  *
  * Error domain for regular expressions. Errors in this domain will be
  * from the #GRegexError enumeration. See #xerror_t for information on
@@ -209,171 +209,171 @@ typedef enum
  *
  * Since: 2.14
  */
-#define G_REGEX_ERROR g_regex_error_quark ()
+#define XREGEX_ERROR xregex_error_quark ()
 
 XPL_AVAILABLE_IN_ALL
-GQuark g_regex_error_quark (void);
+xquark xregex_error_quark (void);
 
 /**
- * GRegexCompileFlags:
- * @G_REGEX_CASELESS: Letters in the pattern match both upper- and
+ * xregex_compile_flags_t:
+ * @XREGEX_CASELESS: Letters in the pattern match both upper- and
  *     lowercase letters. This option can be changed within a pattern
  *     by a "(?i)" option setting.
- * @G_REGEX_MULTILINE: By default, GRegex treats the strings as consisting
+ * @XREGEX_MULTILINE: By default, xregex_t treats the strings as consisting
  *     of a single line of characters (even if it actually contains
  *     newlines). The "start of line" metacharacter ("^") matches only
  *     at the start of the string, while the "end of line" metacharacter
  *     ("$") matches only at the end of the string, or before a terminating
- *     newline (unless %G_REGEX_DOLLAR_ENDONLY is set). When
- *     %G_REGEX_MULTILINE is set, the "start of line" and "end of line"
+ *     newline (unless %XREGEX_DOLLAR_ENDONLY is set). When
+ *     %XREGEX_MULTILINE is set, the "start of line" and "end of line"
  *     constructs match immediately following or immediately before any
  *     newline in the string, respectively, as well as at the very start
  *     and end. This can be changed within a pattern by a "(?m)" option
  *     setting.
- * @G_REGEX_DOTALL: A dot metacharacter (".") in the pattern matches all
+ * @XREGEX_DOTALL: A dot metacharacter (".") in the pattern matches all
  *     characters, including newlines. Without it, newlines are excluded.
  *     This option can be changed within a pattern by a ("?s") option setting.
- * @G_REGEX_EXTENDED: Whitespace data characters in the pattern are
+ * @XREGEX_EXTENDED: Whitespace data characters in the pattern are
  *     totally ignored except when escaped or inside a character class.
  *     Whitespace does not include the VT character (code 11). In addition,
  *     characters between an unescaped "#" outside a character class and
  *     the next newline character, inclusive, are also ignored. This can
  *     be changed within a pattern by a "(?x)" option setting.
- * @G_REGEX_ANCHORED: The pattern is forced to be "anchored", that is,
+ * @XREGEX_ANCHORED: The pattern is forced to be "anchored", that is,
  *     it is constrained to match only at the first matching point in the
  *     string that is being searched. This effect can also be achieved by
  *     appropriate constructs in the pattern itself such as the "^"
  *     metacharacter.
- * @G_REGEX_DOLLAR_ENDONLY: A dollar metacharacter ("$") in the pattern
+ * @XREGEX_DOLLAR_ENDONLY: A dollar metacharacter ("$") in the pattern
  *     matches only at the end of the string. Without this option, a
  *     dollar also matches immediately before the final character if
  *     it is a newline (but not before any other newlines). This option
- *     is ignored if %G_REGEX_MULTILINE is set.
- * @G_REGEX_UNGREEDY: Inverts the "greediness" of the quantifiers so that
+ *     is ignored if %XREGEX_MULTILINE is set.
+ * @XREGEX_UNGREEDY: Inverts the "greediness" of the quantifiers so that
  *     they are not greedy by default, but become greedy if followed by "?".
  *     It can also be set by a "(?U)" option setting within the pattern.
- * @G_REGEX_RAW: Usually strings must be valid UTF-8 strings, using this
+ * @XREGEX_RAW: Usually strings must be valid UTF-8 strings, using this
  *     flag they are considered as a raw sequence of bytes.
- * @G_REGEX_NO_AUTO_CAPTURE: Disables the use of numbered capturing
+ * @XREGEX_NO_AUTO_CAPTURE: Disables the use of numbered capturing
  *     parentheses in the pattern. Any opening parenthesis that is not
  *     followed by "?" behaves as if it were followed by "?:" but named
  *     parentheses can still be used for capturing (and they acquire numbers
  *     in the usual way).
- * @G_REGEX_OPTIMIZE: Optimize the regular expression. If the pattern will
+ * @XREGEX_OPTIMIZE: Optimize the regular expression. If the pattern will
  *     be used many times, then it may be worth the effort to optimize it
  *     to improve the speed of matches.
- * @G_REGEX_FIRSTLINE: Limits an unanchored pattern to match before (or at) the
+ * @XREGEX_FIRSTLINE: Limits an unanchored pattern to match before (or at) the
  *     first newline. Since: 2.34
- * @G_REGEX_DUPNAMES: Names used to identify capturing subpatterns need not
+ * @XREGEX_DUPNAMES: Names used to identify capturing subpatterns need not
  *     be unique. This can be helpful for certain types of pattern when it
  *     is known that only one instance of the named subpattern can ever be
  *     matched.
- * @G_REGEX_NEWLINE_CR: Usually any newline character or character sequence is
+ * @XREGEX_NEWLINE_CR: Usually any newline character or character sequence is
  *     recognized. If this option is set, the only recognized newline character
  *     is '\r'.
- * @G_REGEX_NEWLINE_LF: Usually any newline character or character sequence is
+ * @XREGEX_NEWLINE_LF: Usually any newline character or character sequence is
  *     recognized. If this option is set, the only recognized newline character
  *     is '\n'.
- * @G_REGEX_NEWLINE_CRLF: Usually any newline character or character sequence is
+ * @XREGEX_NEWLINE_CRLF: Usually any newline character or character sequence is
  *     recognized. If this option is set, the only recognized newline character
  *     sequence is '\r\n'.
- * @G_REGEX_NEWLINE_ANYCRLF: Usually any newline character or character sequence
+ * @XREGEX_NEWLINE_ANYCRLF: Usually any newline character or character sequence
  *     is recognized. If this option is set, the only recognized newline character
  *     sequences are '\r', '\n', and '\r\n'. Since: 2.34
- * @G_REGEX_BSR_ANYCRLF: Usually any newline character or character sequence
+ * @XREGEX_BSR_ANYCRLF: Usually any newline character or character sequence
  *     is recognised. If this option is set, then "\R" only recognizes the newline
  *    characters '\r', '\n' and '\r\n'. Since: 2.34
- * @G_REGEX_JAVASCRIPT_COMPAT: Changes behaviour so that it is compatible with
+ * @XREGEX_JAVASCRIPT_COMPAT: Changes behaviour so that it is compatible with
  *     JavaScript rather than PCRE. Since: 2.34
  *
  * Flags specifying compile-time options.
  *
  * Since: 2.14
  */
-/* Remember to update G_REGEX_COMPILE_MASK in gregex.c after
+/* Remember to update XREGEX_COMPILE_MASK in gregex.c after
  * adding a new flag.
  */
 typedef enum
 {
-  G_REGEX_CASELESS          = 1 << 0,
-  G_REGEX_MULTILINE         = 1 << 1,
-  G_REGEX_DOTALL            = 1 << 2,
-  G_REGEX_EXTENDED          = 1 << 3,
-  G_REGEX_ANCHORED          = 1 << 4,
-  G_REGEX_DOLLAR_ENDONLY    = 1 << 5,
-  G_REGEX_UNGREEDY          = 1 << 9,
-  G_REGEX_RAW               = 1 << 11,
-  G_REGEX_NO_AUTO_CAPTURE   = 1 << 12,
-  G_REGEX_OPTIMIZE          = 1 << 13,
-  G_REGEX_FIRSTLINE         = 1 << 18,
-  G_REGEX_DUPNAMES          = 1 << 19,
-  G_REGEX_NEWLINE_CR        = 1 << 20,
-  G_REGEX_NEWLINE_LF        = 1 << 21,
-  G_REGEX_NEWLINE_CRLF      = G_REGEX_NEWLINE_CR | G_REGEX_NEWLINE_LF,
-  G_REGEX_NEWLINE_ANYCRLF   = G_REGEX_NEWLINE_CR | 1 << 22,
-  G_REGEX_BSR_ANYCRLF       = 1 << 23,
-  G_REGEX_JAVASCRIPT_COMPAT = 1 << 25
-} GRegexCompileFlags;
+  XREGEX_CASELESS          = 1 << 0,
+  XREGEX_MULTILINE         = 1 << 1,
+  XREGEX_DOTALL            = 1 << 2,
+  XREGEX_EXTENDED          = 1 << 3,
+  XREGEX_ANCHORED          = 1 << 4,
+  XREGEX_DOLLAR_ENDONLY    = 1 << 5,
+  XREGEX_UNGREEDY          = 1 << 9,
+  XREGEX_RAW               = 1 << 11,
+  XREGEX_NO_AUTO_CAPTURE   = 1 << 12,
+  XREGEX_OPTIMIZE          = 1 << 13,
+  XREGEX_FIRSTLINE         = 1 << 18,
+  XREGEX_DUPNAMES          = 1 << 19,
+  XREGEX_NEWLINE_CR        = 1 << 20,
+  XREGEX_NEWLINE_LF        = 1 << 21,
+  XREGEX_NEWLINE_CRLF      = XREGEX_NEWLINE_CR | XREGEX_NEWLINE_LF,
+  XREGEX_NEWLINE_ANYCRLF   = XREGEX_NEWLINE_CR | 1 << 22,
+  XREGEX_BSR_ANYCRLF       = 1 << 23,
+  XREGEX_JAVASCRIPT_COMPAT = 1 << 25
+} xregex_compile_flags_t;
 
 /**
- * GRegexMatchFlags:
- * @G_REGEX_MATCH_ANCHORED: The pattern is forced to be "anchored", that is,
+ * xregex_match_flags_t:
+ * @XREGEX_MATCH_ANCHORED: The pattern is forced to be "anchored", that is,
  *     it is constrained to match only at the first matching point in the
  *     string that is being searched. This effect can also be achieved by
  *     appropriate constructs in the pattern itself such as the "^"
  *     metacharacter.
- * @G_REGEX_MATCH_NOTBOL: Specifies that first character of the string is
+ * @XREGEX_MATCH_NOTBOL: Specifies that first character of the string is
  *     not the beginning of a line, so the circumflex metacharacter should
- *     not match before it. Setting this without %G_REGEX_MULTILINE (at
+ *     not match before it. Setting this without %XREGEX_MULTILINE (at
  *     compile time) causes circumflex never to match. This option affects
  *     only the behaviour of the circumflex metacharacter, it does not
  *     affect "\A".
- * @G_REGEX_MATCH_NOTEOL: Specifies that the end of the subject string is
+ * @XREGEX_MATCH_NOTEOL: Specifies that the end of the subject string is
  *     not the end of a line, so the dollar metacharacter should not match
  *     it nor (except in multiline mode) a newline immediately before it.
- *     Setting this without %G_REGEX_MULTILINE (at compile time) causes
+ *     Setting this without %XREGEX_MULTILINE (at compile time) causes
  *     dollar never to match. This option affects only the behaviour of
  *     the dollar metacharacter, it does not affect "\Z" or "\z".
- * @G_REGEX_MATCH_NOTEMPTY: An empty string is not considered to be a valid
+ * @XREGEX_MATCH_NOTEMPTY: An empty string is not considered to be a valid
  *     match if this option is set. If there are alternatives in the pattern,
  *     they are tried. If all the alternatives match the empty string, the
  *     entire match fails. For example, if the pattern "a?b?" is applied to
  *     a string not beginning with "a" or "b", it matches the empty string
  *     at the start of the string. With this flag set, this match is not
- *     valid, so GRegex searches further into the string for occurrences
+ *     valid, so xregex_t searches further into the string for occurrences
  *     of "a" or "b".
- * @G_REGEX_MATCH_PARTIAL: Turns on the partial matching feature, for more
- *     documentation on partial matching see g_match_info_is_partial_match().
- * @G_REGEX_MATCH_NEWLINE_CR: Overrides the newline definition set when
- *     creating a new #GRegex, setting the '\r' character as line terminator.
- * @G_REGEX_MATCH_NEWLINE_LF: Overrides the newline definition set when
- *     creating a new #GRegex, setting the '\n' character as line terminator.
- * @G_REGEX_MATCH_NEWLINE_CRLF: Overrides the newline definition set when
- *     creating a new #GRegex, setting the '\r\n' characters sequence as line terminator.
- * @G_REGEX_MATCH_NEWLINE_ANY: Overrides the newline definition set when
- *     creating a new #GRegex, any Unicode newline sequence
+ * @XREGEX_MATCH_PARTIAL: Turns on the partial matching feature, for more
+ *     documentation on partial matching see xmatch_info_is_partial_match().
+ * @XREGEX_MATCH_NEWLINE_CR: Overrides the newline definition set when
+ *     creating a new #xregex_t, setting the '\r' character as line terminator.
+ * @XREGEX_MATCH_NEWLINE_LF: Overrides the newline definition set when
+ *     creating a new #xregex_t, setting the '\n' character as line terminator.
+ * @XREGEX_MATCH_NEWLINE_CRLF: Overrides the newline definition set when
+ *     creating a new #xregex_t, setting the '\r\n' characters sequence as line terminator.
+ * @XREGEX_MATCH_NEWLINE_ANY: Overrides the newline definition set when
+ *     creating a new #xregex_t, any Unicode newline sequence
  *     is recognised as a newline. These are '\r', '\n' and '\rn', and the
  *     single characters U+000B LINE TABULATION, U+000C FORM FEED (FF),
  *     U+0085 NEXT LINE (NEL), U+2028 LINE SEPARATOR and
  *     U+2029 PARAGRAPH SEPARATOR.
- * @G_REGEX_MATCH_NEWLINE_ANYCRLF: Overrides the newline definition set when
- *     creating a new #GRegex; any '\r', '\n', or '\r\n' character sequence
+ * @XREGEX_MATCH_NEWLINE_ANYCRLF: Overrides the newline definition set when
+ *     creating a new #xregex_t; any '\r', '\n', or '\r\n' character sequence
  *     is recognized as a newline. Since: 2.34
- * @G_REGEX_MATCH_BSR_ANYCRLF: Overrides the newline definition for "\R" set when
- *     creating a new #GRegex; only '\r', '\n', or '\r\n' character sequences
+ * @XREGEX_MATCH_BSR_ANYCRLF: Overrides the newline definition for "\R" set when
+ *     creating a new #xregex_t; only '\r', '\n', or '\r\n' character sequences
  *     are recognized as a newline by "\R". Since: 2.34
- * @G_REGEX_MATCH_BSR_ANY: Overrides the newline definition for "\R" set when
- *     creating a new #GRegex; any Unicode newline character or character sequence
+ * @XREGEX_MATCH_BSR_ANY: Overrides the newline definition for "\R" set when
+ *     creating a new #xregex_t; any Unicode newline character or character sequence
  *     are recognized as a newline by "\R". These are '\r', '\n' and '\rn', and the
  *     single characters U+000B LINE TABULATION, U+000C FORM FEED (FF),
  *     U+0085 NEXT LINE (NEL), U+2028 LINE SEPARATOR and
  *     U+2029 PARAGRAPH SEPARATOR. Since: 2.34
- * @G_REGEX_MATCH_PARTIAL_SOFT: An alias for %G_REGEX_MATCH_PARTIAL. Since: 2.34
- * @G_REGEX_MATCH_PARTIAL_HARD: Turns on the partial matching feature. In contrast to
- *     to %G_REGEX_MATCH_PARTIAL_SOFT, this stops matching as soon as a partial match
+ * @XREGEX_MATCH_PARTIAL_SOFT: An alias for %XREGEX_MATCH_PARTIAL. Since: 2.34
+ * @XREGEX_MATCH_PARTIAL_HARD: Turns on the partial matching feature. In contrast to
+ *     to %XREGEX_MATCH_PARTIAL_SOFT, this stops matching as soon as a partial match
  *     is found, without continuing to search for a possible complete match. See
- *     g_match_info_is_partial_match() for more information. Since: 2.34
- * @G_REGEX_MATCH_NOTEMPTY_ATSTART: Like %G_REGEX_MATCH_NOTEMPTY, but only applied to
+ *     xmatch_info_is_partial_match() for more information. Since: 2.34
+ * @XREGEX_MATCH_NOTEMPTY_ATSTART: Like %XREGEX_MATCH_NOTEMPTY, but only applied to
  *     the start of the matched string. For anchored
  *     patterns this can only happen for pattern containing "\K". Since: 2.34
  *
@@ -381,229 +381,229 @@ typedef enum
  *
  * Since: 2.14
  */
-/* Remember to update G_REGEX_MATCH_MASK in gregex.c after
+/* Remember to update XREGEX_MATCH_MASK in gregex.c after
  * adding a new flag. */
 typedef enum
 {
-  G_REGEX_MATCH_ANCHORED         = 1 << 4,
-  G_REGEX_MATCH_NOTBOL           = 1 << 7,
-  G_REGEX_MATCH_NOTEOL           = 1 << 8,
-  G_REGEX_MATCH_NOTEMPTY         = 1 << 10,
-  G_REGEX_MATCH_PARTIAL          = 1 << 15,
-  G_REGEX_MATCH_NEWLINE_CR       = 1 << 20,
-  G_REGEX_MATCH_NEWLINE_LF       = 1 << 21,
-  G_REGEX_MATCH_NEWLINE_CRLF     = G_REGEX_MATCH_NEWLINE_CR | G_REGEX_MATCH_NEWLINE_LF,
-  G_REGEX_MATCH_NEWLINE_ANY      = 1 << 22,
-  G_REGEX_MATCH_NEWLINE_ANYCRLF  = G_REGEX_MATCH_NEWLINE_CR | G_REGEX_MATCH_NEWLINE_ANY,
-  G_REGEX_MATCH_BSR_ANYCRLF      = 1 << 23,
-  G_REGEX_MATCH_BSR_ANY          = 1 << 24,
-  G_REGEX_MATCH_PARTIAL_SOFT     = G_REGEX_MATCH_PARTIAL,
-  G_REGEX_MATCH_PARTIAL_HARD     = 1 << 27,
-  G_REGEX_MATCH_NOTEMPTY_ATSTART = 1 << 28
-} GRegexMatchFlags;
+  XREGEX_MATCH_ANCHORED         = 1 << 4,
+  XREGEX_MATCH_NOTBOL           = 1 << 7,
+  XREGEX_MATCH_NOTEOL           = 1 << 8,
+  XREGEX_MATCH_NOTEMPTY         = 1 << 10,
+  XREGEX_MATCH_PARTIAL          = 1 << 15,
+  XREGEX_MATCH_NEWLINE_CR       = 1 << 20,
+  XREGEX_MATCH_NEWLINE_LF       = 1 << 21,
+  XREGEX_MATCH_NEWLINE_CRLF     = XREGEX_MATCH_NEWLINE_CR | XREGEX_MATCH_NEWLINE_LF,
+  XREGEX_MATCH_NEWLINE_ANY      = 1 << 22,
+  XREGEX_MATCH_NEWLINE_ANYCRLF  = XREGEX_MATCH_NEWLINE_CR | XREGEX_MATCH_NEWLINE_ANY,
+  XREGEX_MATCH_BSR_ANYCRLF      = 1 << 23,
+  XREGEX_MATCH_BSR_ANY          = 1 << 24,
+  XREGEX_MATCH_PARTIAL_SOFT     = XREGEX_MATCH_PARTIAL,
+  XREGEX_MATCH_PARTIAL_HARD     = 1 << 27,
+  XREGEX_MATCH_NOTEMPTY_ATSTART = 1 << 28
+} xregex_match_flags_t;
 
 /**
- * GRegex:
+ * xregex_t:
  *
- * A GRegex is the "compiled" form of a regular expression pattern.
+ * A xregex_t is the "compiled" form of a regular expression pattern.
  * This structure is opaque and its fields cannot be accessed directly.
  *
  * Since: 2.14
  */
-typedef struct _GRegex		GRegex;
+typedef struct _xregex		xregex_t;
 
 
 /**
- * GMatchInfo:
+ * xmatch_info_t:
  *
- * A GMatchInfo is an opaque struct used to return information about
+ * A xmatch_info_t is an opaque struct used to return information about
  * matches.
  */
-typedef struct _GMatchInfo	GMatchInfo;
+typedef struct _xmatch_info	xmatch_info_t;
 
 /**
- * GRegexEvalCallback:
- * @match_info: the #GMatchInfo generated by the match.
- *     Use g_match_info_get_regex() and g_match_info_get_string() if you
- *     need the #GRegex or the matched string.
- * @result: a #GString containing the new string
- * @user_data: user data passed to g_regex_replace_eval()
+ * xregex_eval_callback_t:
+ * @match_info: the #xmatch_info_t generated by the match.
+ *     Use xmatch_info_get_regex() and xmatch_info_get_string() if you
+ *     need the #xregex_t or the matched string.
+ * @result: a #xstring_t containing the new string
+ * @user_data: user data passed to xregex_replace_eval()
  *
- * Specifies the type of the function passed to g_regex_replace_eval().
+ * Specifies the type of the function passed to xregex_replace_eval().
  * It is called for each occurrence of the pattern in the string passed
- * to g_regex_replace_eval(), and it should append the replacement to
+ * to xregex_replace_eval(), and it should append the replacement to
  * @result.
  *
  * Returns: %FALSE to continue the replacement process, %TRUE to stop it
  *
  * Since: 2.14
  */
-typedef xboolean_t (*GRegexEvalCallback)		(const GMatchInfo *match_info,
-						 GString          *result,
+typedef xboolean_t (*xregex_eval_callback_t)		(const xmatch_info_t *match_info,
+						 xstring_t          *result,
 						 xpointer_t          user_data);
 
 
 XPL_AVAILABLE_IN_ALL
-GRegex		 *g_regex_new			(const xchar_t         *pattern,
-						 GRegexCompileFlags   compile_options,
-						 GRegexMatchFlags     match_options,
+xregex_t		 *xregex_new			(const xchar_t         *pattern,
+						 xregex_compile_flags_t   compile_options,
+						 xregex_match_flags_t     match_options,
 						 xerror_t             **error);
 XPL_AVAILABLE_IN_ALL
-GRegex           *g_regex_ref			(GRegex              *regex);
+xregex_t           *xregex_ref			(xregex_t              *regex);
 XPL_AVAILABLE_IN_ALL
-void		  g_regex_unref			(GRegex              *regex);
+void		  xregex_unref			(xregex_t              *regex);
 XPL_AVAILABLE_IN_ALL
-const xchar_t	 *g_regex_get_pattern		(const GRegex        *regex);
+const xchar_t	 *xregex_get_pattern		(const xregex_t        *regex);
 XPL_AVAILABLE_IN_ALL
-xint_t		  g_regex_get_max_backref	(const GRegex        *regex);
+xint_t		  xregex_get_max_backref	(const xregex_t        *regex);
 XPL_AVAILABLE_IN_ALL
-xint_t		  g_regex_get_capture_count	(const GRegex        *regex);
+xint_t		  xregex_get_capture_count	(const xregex_t        *regex);
 XPL_AVAILABLE_IN_ALL
-xboolean_t          g_regex_get_has_cr_or_lf      (const GRegex        *regex);
+xboolean_t          xregex_get_has_cr_or_lf      (const xregex_t        *regex);
 XPL_AVAILABLE_IN_2_38
-xint_t              g_regex_get_max_lookbehind    (const GRegex        *regex);
+xint_t              xregex_get_max_lookbehind    (const xregex_t        *regex);
 XPL_AVAILABLE_IN_ALL
-xint_t		  g_regex_get_string_number	(const GRegex        *regex,
+xint_t		  xregex_get_string_number	(const xregex_t        *regex,
 						 const xchar_t         *name);
 XPL_AVAILABLE_IN_ALL
-xchar_t		 *g_regex_escape_string		(const xchar_t         *string,
+xchar_t		 *xregex_escape_string		(const xchar_t         *string,
 						 xint_t                 length);
 XPL_AVAILABLE_IN_ALL
-xchar_t		 *g_regex_escape_nul		(const xchar_t         *string,
+xchar_t		 *xregex_escape_nul		(const xchar_t         *string,
 						 xint_t                 length);
 
 XPL_AVAILABLE_IN_ALL
-GRegexCompileFlags g_regex_get_compile_flags    (const GRegex        *regex);
+xregex_compile_flags_t xregex_get_compile_flags    (const xregex_t        *regex);
 XPL_AVAILABLE_IN_ALL
-GRegexMatchFlags   g_regex_get_match_flags      (const GRegex        *regex);
+xregex_match_flags_t   xregex_get_match_flags      (const xregex_t        *regex);
 
 /* Matching. */
 XPL_AVAILABLE_IN_ALL
-xboolean_t	  g_regex_match_simple		(const xchar_t         *pattern,
+xboolean_t	  xregex_match_simple		(const xchar_t         *pattern,
 						 const xchar_t         *string,
-						 GRegexCompileFlags   compile_options,
-						 GRegexMatchFlags     match_options);
+						 xregex_compile_flags_t   compile_options,
+						 xregex_match_flags_t     match_options);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	  g_regex_match			(const GRegex        *regex,
+xboolean_t	  xregex_match			(const xregex_t        *regex,
 						 const xchar_t         *string,
-						 GRegexMatchFlags     match_options,
-						 GMatchInfo         **match_info);
+						 xregex_match_flags_t     match_options,
+						 xmatch_info_t         **match_info);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	  g_regex_match_full		(const GRegex        *regex,
+xboolean_t	  xregex_match_full		(const xregex_t        *regex,
 						 const xchar_t         *string,
-						 gssize               string_len,
+						 xssize_t               string_len,
 						 xint_t                 start_position,
-						 GRegexMatchFlags     match_options,
-						 GMatchInfo         **match_info,
+						 xregex_match_flags_t     match_options,
+						 xmatch_info_t         **match_info,
 						 xerror_t             **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	  g_regex_match_all		(const GRegex        *regex,
+xboolean_t	  xregex_match_all		(const xregex_t        *regex,
 						 const xchar_t         *string,
-						 GRegexMatchFlags     match_options,
-						 GMatchInfo         **match_info);
+						 xregex_match_flags_t     match_options,
+						 xmatch_info_t         **match_info);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	  g_regex_match_all_full	(const GRegex        *regex,
+xboolean_t	  xregex_match_all_full	(const xregex_t        *regex,
 						 const xchar_t         *string,
-						 gssize               string_len,
+						 xssize_t               string_len,
 						 xint_t                 start_position,
-						 GRegexMatchFlags     match_options,
-						 GMatchInfo         **match_info,
+						 xregex_match_flags_t     match_options,
+						 xmatch_info_t         **match_info,
 						 xerror_t             **error);
 
 /* String splitting. */
 XPL_AVAILABLE_IN_ALL
-xchar_t		**g_regex_split_simple		(const xchar_t         *pattern,
+xchar_t		**xregex_split_simple		(const xchar_t         *pattern,
 						 const xchar_t         *string,
-						 GRegexCompileFlags   compile_options,
-						 GRegexMatchFlags     match_options);
+						 xregex_compile_flags_t   compile_options,
+						 xregex_match_flags_t     match_options);
 XPL_AVAILABLE_IN_ALL
-xchar_t		**g_regex_split			(const GRegex        *regex,
+xchar_t		**xregex_split			(const xregex_t        *regex,
 						 const xchar_t         *string,
-						 GRegexMatchFlags     match_options);
+						 xregex_match_flags_t     match_options);
 XPL_AVAILABLE_IN_ALL
-xchar_t		**g_regex_split_full		(const GRegex        *regex,
+xchar_t		**xregex_split_full		(const xregex_t        *regex,
 						 const xchar_t         *string,
-						 gssize               string_len,
+						 xssize_t               string_len,
 						 xint_t                 start_position,
-						 GRegexMatchFlags     match_options,
+						 xregex_match_flags_t     match_options,
 						 xint_t                 max_tokens,
 						 xerror_t             **error);
 
 /* String replacement. */
 XPL_AVAILABLE_IN_ALL
-xchar_t		 *g_regex_replace		(const GRegex        *regex,
+xchar_t		 *xregex_replace		(const xregex_t        *regex,
 						 const xchar_t         *string,
-						 gssize               string_len,
+						 xssize_t               string_len,
 						 xint_t                 start_position,
 						 const xchar_t         *replacement,
-						 GRegexMatchFlags     match_options,
+						 xregex_match_flags_t     match_options,
 						 xerror_t             **error);
 XPL_AVAILABLE_IN_ALL
-xchar_t		 *g_regex_replace_literal	(const GRegex        *regex,
+xchar_t		 *xregex_replace_literal	(const xregex_t        *regex,
 						 const xchar_t         *string,
-						 gssize               string_len,
+						 xssize_t               string_len,
 						 xint_t                 start_position,
 						 const xchar_t         *replacement,
-						 GRegexMatchFlags     match_options,
+						 xregex_match_flags_t     match_options,
 						 xerror_t             **error);
 XPL_AVAILABLE_IN_ALL
-xchar_t		 *g_regex_replace_eval		(const GRegex        *regex,
+xchar_t		 *xregex_replace_eval		(const xregex_t        *regex,
 						 const xchar_t         *string,
-						 gssize               string_len,
+						 xssize_t               string_len,
 						 xint_t                 start_position,
-						 GRegexMatchFlags     match_options,
-						 GRegexEvalCallback   eval,
+						 xregex_match_flags_t     match_options,
+						 xregex_eval_callback_t   eval,
 						 xpointer_t             user_data,
 						 xerror_t             **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	  g_regex_check_replacement	(const xchar_t         *replacement,
+xboolean_t	  xregex_check_replacement	(const xchar_t         *replacement,
 						 xboolean_t            *has_references,
 						 xerror_t             **error);
 
 /* Match info */
 XPL_AVAILABLE_IN_ALL
-GRegex		 *g_match_info_get_regex	(const GMatchInfo    *match_info);
+xregex_t		 *xmatch_info_get_regex	(const xmatch_info_t    *match_info);
 XPL_AVAILABLE_IN_ALL
-const xchar_t      *g_match_info_get_string       (const GMatchInfo    *match_info);
+const xchar_t      *xmatch_info_get_string       (const xmatch_info_t    *match_info);
 
 XPL_AVAILABLE_IN_ALL
-GMatchInfo       *g_match_info_ref              (GMatchInfo          *match_info);
+xmatch_info_t       *xmatch_info_ref              (xmatch_info_t          *match_info);
 XPL_AVAILABLE_IN_ALL
-void              g_match_info_unref            (GMatchInfo          *match_info);
+void              xmatch_info_unref            (xmatch_info_t          *match_info);
 XPL_AVAILABLE_IN_ALL
-void		  g_match_info_free		(GMatchInfo          *match_info);
+void		  xmatch_info_free		(xmatch_info_t          *match_info);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	  g_match_info_next		(GMatchInfo          *match_info,
+xboolean_t	  xmatch_info_next		(xmatch_info_t          *match_info,
 						 xerror_t             **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	  g_match_info_matches		(const GMatchInfo    *match_info);
+xboolean_t	  xmatch_info_matches		(const xmatch_info_t    *match_info);
 XPL_AVAILABLE_IN_ALL
-xint_t		  g_match_info_get_match_count	(const GMatchInfo    *match_info);
+xint_t		  xmatch_info_get_match_count	(const xmatch_info_t    *match_info);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	  g_match_info_is_partial_match	(const GMatchInfo    *match_info);
+xboolean_t	  xmatch_info_is_partial_match	(const xmatch_info_t    *match_info);
 XPL_AVAILABLE_IN_ALL
-xchar_t		 *g_match_info_expand_references(const GMatchInfo    *match_info,
+xchar_t		 *xmatch_info_expand_references(const xmatch_info_t    *match_info,
 						 const xchar_t         *string_to_expand,
 						 xerror_t             **error);
 XPL_AVAILABLE_IN_ALL
-xchar_t		 *g_match_info_fetch		(const GMatchInfo    *match_info,
+xchar_t		 *xmatch_info_fetch		(const xmatch_info_t    *match_info,
 						 xint_t                 match_num);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	  g_match_info_fetch_pos	(const GMatchInfo    *match_info,
+xboolean_t	  xmatch_info_fetch_pos	(const xmatch_info_t    *match_info,
 						 xint_t                 match_num,
 						 xint_t                *start_pos,
 						 xint_t                *end_pos);
 XPL_AVAILABLE_IN_ALL
-xchar_t		 *g_match_info_fetch_named	(const GMatchInfo    *match_info,
+xchar_t		 *xmatch_info_fetch_named	(const xmatch_info_t    *match_info,
 						 const xchar_t         *name);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	  g_match_info_fetch_named_pos	(const GMatchInfo    *match_info,
+xboolean_t	  xmatch_info_fetch_named_pos	(const xmatch_info_t    *match_info,
 						 const xchar_t         *name,
 						 xint_t                *start_pos,
 						 xint_t                *end_pos);
 XPL_AVAILABLE_IN_ALL
-xchar_t		**g_match_info_fetch_all	(const GMatchInfo    *match_info);
+xchar_t		**xmatch_info_fetch_all	(const xmatch_info_t    *match_info);
 
 G_END_DECLS
 
-#endif  /*  __G_REGEX_H__ */
+#endif  /*  __XREGEX_H__ */

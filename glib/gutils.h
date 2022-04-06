@@ -82,7 +82,7 @@ xchar_t *               g_get_os_info          (const xchar_t *key_name);
 /**
  * G_OS_INFO_KEY_PRETTY_NAME:
  *
- * A key to get the name of the operating system in a format suitable for presentation to the user, e.g. "YoYoOS Foo"
+ * A key to get the name of the operating system in a format suitable for presentation to the user, e.g. "YoYoOS foo_t"
  *
  * Since: 2.64
  */
@@ -93,7 +93,7 @@ xchar_t *               g_get_os_info          (const xchar_t *key_name);
 /**
  * G_OS_INFO_KEY_VERSION:
  *
- * A key to get the operating system version suitable for presentation to the user, e.g. "42 (Foo)"
+ * A key to get the operating system version suitable for presentation to the user, e.g. "42 (foo_t)"
  *
  * Since: 2.64
  */
@@ -271,7 +271,7 @@ const xchar_t * g_get_user_special_dir (GUserDirectory directory);
  * @value: the flag
  *
  * Associates a string with a bit flag.
- * Used in g_parse_debug_string().
+ * Used in g_parse_debuxstring().
  */
 typedef struct _GDebugKey GDebugKey;
 struct _GDebugKey
@@ -283,7 +283,7 @@ struct _GDebugKey
 /* Miscellaneous utility functions
  */
 XPL_AVAILABLE_IN_ALL
-xuint_t                 g_parse_debug_string (const xchar_t     *string,
+xuint_t                 g_parse_debuxstring (const xchar_t     *string,
 					    const GDebugKey *keys,
 					    xuint_t            nkeys);
 
@@ -311,13 +311,13 @@ typedef enum
 } GFormatSizeFlags;
 
 XPL_AVAILABLE_IN_2_30
-xchar_t *g_format_size_full   (guint64          size,
+xchar_t *g_format_size_full   (xuint64_t          size,
                              GFormatSizeFlags flags);
 XPL_AVAILABLE_IN_2_30
-xchar_t *g_format_size        (guint64          size);
+xchar_t *g_format_size        (xuint64_t          size);
 
 XPL_DEPRECATED_IN_2_30_FOR(g_format_size)
-xchar_t *g_format_size_for_display (goffset size);
+xchar_t *g_format_size_for_display (xoffset_t size);
 
 #define g_ATEXIT(proc)	(atexit (proc)) XPL_DEPRECATED_MACRO_IN_2_32
 #define g_memmove(dest,src,len) \
@@ -474,7 +474,7 @@ DllMain (HINSTANCE hinstDLL,						\
     {									\
     case DLL_PROCESS_ATTACH:						\
       GetModuleFileNameW ((HMODULE) hinstDLL, wcbfr, G_N_ELEMENTS (wcbfr)); \
-      tem = g_utf16_to_utf8 (wcbfr, -1, NULL, NULL, NULL);		\
+      tem = xutf16_to_utf8 (wcbfr, -1, NULL, NULL, NULL);		\
       dll_name = g_path_get_basename (tem);				\
       g_free (tem);							\
       break;								\

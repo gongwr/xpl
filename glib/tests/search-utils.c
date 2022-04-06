@@ -59,13 +59,13 @@ SearchTest c_locale_unicode[] = {
 SearchTest multi_words[] = {
   { "Xavier Claessens", "Xav Cla", "C", TRUE },
   { "Xavier Claessens", "Cla Xav", "C", TRUE },
-  { "Foo Bar Baz", "   b  ", "C", TRUE },
-  { "Foo Bar Baz", "bar bazz", "C", FALSE },
+  { "foo_t Bar baz_t", "   b  ", "C", TRUE },
+  { "foo_t Bar baz_t", "bar bazz", "C", FALSE },
   { NULL, NULL, NULL, FALSE }
 };
 
 static void
-test_search (gconstpointer d)
+test_search (xconstpointer d)
 {
   const SearchTest *tests = d;
   xuint_t i;
@@ -83,7 +83,7 @@ test_search (gconstpointer d)
         {
           skipped = FALSE;
           all_skipped = FALSE;
-          match = g_str_match_string (tests[i].prefix, tests[i].string, TRUE);
+          match = xstr_match_string (tests[i].prefix, tests[i].string, TRUE);
           ok = (match == tests[i].should_match);
         }
       else

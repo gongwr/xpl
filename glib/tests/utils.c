@@ -49,7 +49,7 @@ strv_check (const xchar_t * const *strv, ...)
   for (i = 0; strv[i]; i++)
     {
       s = va_arg (args, xchar_t*);
-      if (g_strcmp0 (strv[i], s) != 0)
+      if (xstrcmp0 (strv[i], s) != 0)
         {
           va_end (args);
           return FALSE;
@@ -92,11 +92,11 @@ test_locale_variants (void)
 
   v = g_get_locale_variants ("fr_BE");
   g_assert (strv_check ((const xchar_t * const *) v, "fr_BE", "fr", NULL));
-  g_strfreev (v);
+  xstrfreev (v);
 
   v = g_get_locale_variants ("sr_SR@latin");
   g_assert (strv_check ((const xchar_t * const *) v, "sr_SR@latin", "sr@latin", "sr_SR", "sr", NULL));
-  g_strfreev (v);
+  xstrfreev (v);
 }
 
 static void
@@ -169,7 +169,7 @@ thread_prgname_check (xpointer_t data)
 
   g_atomic_int_inc (n_threads_got_prgname);
 
-  while (g_strcmp0 (g_get_prgname (), "prgname2") != 0);
+  while (xstrcmp0 (g_get_prgname (), "prgname2") != 0);
 
   return NULL;
 }
@@ -179,7 +179,7 @@ test_prgname_thread_safety (void)
 {
   xsize_t i;
   xint_t n_threads_got_prgname;
-  GThread *threads[4];
+  xthread_t *threads[4];
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/847");
   g_test_summary ("Test that threads racing to get and set the program name "
@@ -189,7 +189,7 @@ test_prgname_thread_safety (void)
   g_atomic_int_set (&n_threads_got_prgname, 0);
 
   for (i = 0; i < G_N_ELEMENTS (threads); i++)
-    threads[i] = g_thread_new (NULL, thread_prgname_check, &n_threads_got_prgname);
+    threads[i] = xthread_new (NULL, thread_prgname_check, &n_threads_got_prgname);
 
   while (g_atomic_int_get (&n_threads_got_prgname) != G_N_ELEMENTS (threads))
     g_usleep (50);
@@ -198,7 +198,7 @@ test_prgname_thread_safety (void)
 
   /* Wait for all the workers to exit. */
   for (i = 0; i < G_N_ELEMENTS (threads); i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 
   /* reset prgname */
   g_set_prgname ("prgname");
@@ -308,7 +308,7 @@ test_basic_bits (void)
   xint_t nth_bit;
 
   /* we loop like this: 0, -1, 1, -2, 2, -3, 3, ... */
-  for (i = 0; (glong) i < 1500; i = -(i + ((glong) i >= 0)))
+  for (i = 0; (xlong_t) i < 1500; i = -(i + ((xlong_t) i >= 0)))
     {
       xuint_t naive_bit_storage_i = naive_bit_storage (i);
 
@@ -408,9 +408,9 @@ test_bits (void)
 static void
 test_swap (void)
 {
-  guint16 a16, b16;
-  guint32 a32, b32;
-  guint64 a64, b64;
+  xuint16_t a16, b16;
+  xuint32_t a32, b32;
+  xuint64_t a64, b64;
 
   a16 = 0xaabb;
   b16 = 0xbbaa;
@@ -449,12 +449,12 @@ test_find_program (void)
 
   cwd = g_get_current_dir ();
   absolute_path = g_find_program_in_path ("sh");
-  relative_path = g_strdup (absolute_path);
+  relative_path = xstrdup (absolute_path);
   for (i = 0; cwd[i] != '\0'; i++)
     {
       if (cwd[i] == '/' && cwd[i + 1] != '\0')
         {
-          xchar_t *relative_path_2 = g_strconcat ("../", relative_path, NULL);
+          xchar_t *relative_path_2 = xstrconcat ("../", relative_path, NULL);
           g_free (relative_path);
           relative_path = relative_path_2;
         }
@@ -493,33 +493,33 @@ test_debug (void)
   };
   xuint_t res;
 
-  res = g_parse_debug_string (NULL, keys, G_N_ELEMENTS (keys));
+  res = g_parse_debuxstring (NULL, keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 0);
 
-  res = g_parse_debug_string ("foobabla;#!%!$%112 223", keys, G_N_ELEMENTS (keys));
+  res = g_parse_debuxstring ("foobabla;#!%!$%112 223", keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 0);
 
-  res = g_parse_debug_string ("key1:key2", keys, G_N_ELEMENTS (keys));
+  res = g_parse_debuxstring ("key1:key2", keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 3);
 
-  res = g_parse_debug_string ("key1;key2", keys, G_N_ELEMENTS (keys));
+  res = g_parse_debuxstring ("key1;key2", keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 3);
 
-  res = g_parse_debug_string ("key1,key2", keys, G_N_ELEMENTS (keys));
+  res = g_parse_debuxstring ("key1,key2", keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 3);
 
-  res = g_parse_debug_string ("key1   key2", keys, G_N_ELEMENTS (keys));
+  res = g_parse_debuxstring ("key1   key2", keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 3);
 
-  res = g_parse_debug_string ("key1\tkey2", keys, G_N_ELEMENTS (keys));
+  res = g_parse_debuxstring ("key1\tkey2", keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 3);
 
-  res = g_parse_debug_string ("all", keys, G_N_ELEMENTS (keys));
+  res = g_parse_debuxstring ("all", keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 7);
 
   if (g_test_subprocess ())
     {
-      res = g_parse_debug_string ("help", keys, G_N_ELEMENTS (keys));
+      res = g_parse_debuxstring ("help", keys, G_N_ELEMENTS (keys));
       g_assert_cmpint (res, ==, 0);
       return;
     }
@@ -566,7 +566,7 @@ test_console_charset (void)
 #ifdef G_OS_WIN32
   /* store current environment and unset $LANG to make sure it does not interfere */
   const unsigned int initial_cp = GetConsoleOutputCP ();
-  xchar_t *initial_lang = g_strdup (g_getenv ("LANG"));
+  xchar_t *initial_lang = xstrdup (g_getenv ("LANG"));
   g_unsetenv ("LANG");
 
   /* set console output codepage to something specific (ISO-8859-1 aka CP28591) and query it */
@@ -611,10 +611,10 @@ test_gettext (void)
 {
   const xchar_t *am0, *am1, *am2, *am3;
 
-  am0 = glib_pgettext ("GDateTime\004AM", strlen ("GDateTime") + 1);
-  am1 = g_dpgettext ("glib20", "GDateTime\004AM", strlen ("GDateTime") + 1);
-  am2 = g_dpgettext ("glib20", "GDateTime|AM", 0);
-  am3 = g_dpgettext2 ("glib20", "GDateTime", "AM");
+  am0 = glib_pgettext ("xdatetime_t\004AM", strlen ("xdatetime_t") + 1);
+  am1 = g_dpgettext ("glib20", "xdatetime_t\004AM", strlen ("xdatetime_t") + 1);
+  am2 = g_dpgettext ("glib20", "xdatetime_t|AM", 0);
+  am3 = g_dpgettext2 ("glib20", "xdatetime_t", "AM");
 
   g_assert_cmpstr (am0, ==, am1);
   g_assert_cmpstr (am1, ==, am2);
@@ -649,7 +649,7 @@ test_hostname (void)
   name = g_get_host_name ();
 
   g_assert (name != NULL);
-  g_assert_true (g_utf8_validate (name, -1, NULL));
+  g_assert_true (xutf8_validate (name, -1, NULL));
 }
 
 #ifdef G_OS_UNIX
@@ -661,7 +661,7 @@ test_xdg_dirs (void)
   const xchar_t * const *dirs;
   xchar_t *s;
 
-  xdg = g_strdup (g_getenv ("XDG_CONFIG_HOME"));
+  xdg = xstrdup (g_getenv ("XDG_CONFIG_HOME"));
   if (!xdg)
     xdg = g_build_filename (g_get_home_dir (), ".config", NULL);
 
@@ -670,7 +670,7 @@ test_xdg_dirs (void)
   g_assert_cmpstr (dir, ==, xdg);
   g_free (xdg);
 
-  xdg = g_strdup (g_getenv ("XDG_DATA_HOME"));
+  xdg = xstrdup (g_getenv ("XDG_DATA_HOME"));
   if (!xdg)
     xdg = g_build_filename (g_get_home_dir (), ".local", "share", NULL);
 
@@ -679,7 +679,7 @@ test_xdg_dirs (void)
   g_assert_cmpstr (dir, ==, xdg);
   g_free (xdg);
 
-  xdg = g_strdup (g_getenv ("XDG_CACHE_HOME"));
+  xdg = xstrdup (g_getenv ("XDG_CACHE_HOME"));
   if (!xdg)
     xdg = g_build_filename (g_get_home_dir (), ".cache", NULL);
 
@@ -688,7 +688,7 @@ test_xdg_dirs (void)
   g_assert_cmpstr (dir, ==, xdg);
   g_free (xdg);
 
-  xdg = g_strdup (g_getenv ("XDG_STATE_HOME"));
+  xdg = xstrdup (g_getenv ("XDG_STATE_HOME"));
   if (!xdg)
     xdg = g_build_filename (g_get_home_dir (), ".local/state", NULL);
 
@@ -697,9 +697,9 @@ test_xdg_dirs (void)
   g_assert_cmpstr (dir, ==, xdg);
   g_free (xdg);
 
-  xdg = g_strdup (g_getenv ("XDG_RUNTIME_DIR"));
+  xdg = xstrdup (g_getenv ("XDG_RUNTIME_DIR"));
   if (!xdg)
-    xdg = g_strdup (g_get_user_cache_dir ());
+    xdg = xstrdup (g_get_user_cache_dir ());
 
   dir = g_get_user_runtime_dir ();
 
@@ -712,7 +712,7 @@ test_xdg_dirs (void)
 
   dirs = g_get_system_config_dirs ();
 
-  s = g_strjoinv (":", (xchar_t **)dirs);
+  s = xstrjoinv (":", (xchar_t **)dirs);
 
   g_assert_cmpstr (s, ==, xdg);
 
@@ -764,8 +764,8 @@ test_os_info (void)
   /* These OSs have a special case so NAME should always succeed */
   g_assert_nonnull (name);
 #elif defined (G_OS_UNIX)
-  if (g_file_get_contents ("/etc/os-release", &contents, NULL, NULL) ||
-      g_file_get_contents ("/usr/lib/os-release", &contents, NULL, NULL) ||
+  if (xfile_get_contents ("/etc/os-release", &contents, NULL, NULL) ||
+      xfile_get_contents ("/usr/lib/os-release", &contents, NULL, NULL) ||
       uname (&info) == 0)
     g_assert_nonnull (name);
   else
@@ -793,13 +793,13 @@ test_clear_source (void)
   id = g_idle_add (source_test, NULL);
   g_assert_cmpuint (id, >, 0);
 
-  g_clear_handle_id (&id, g_source_remove);
+  g_clear_handle_id (&id, xsource_remove);
   g_assert_cmpuint (id, ==, 0);
 
   id = g_timeout_add (100, source_test, NULL);
   g_assert_cmpuint (id, >, 0);
 
-  g_clear_handle_id (&id, g_source_remove);
+  g_clear_handle_id (&id, xsource_remove);
   g_assert_cmpuint (id, ==, 0);
 }
 
@@ -817,18 +817,18 @@ test_clear_pointer (void)
   g_assert (a == NULL);
 }
 
-/* Test that g_clear_pointer() works with a GDestroyNotify which contains a cast.
+/* Test that g_clear_pointer() works with a xdestroy_notify_t which contains a cast.
  * See https://gitlab.gnome.org/GNOME/glib/issues/1425 */
 static void
 test_clear_pointer_cast (void)
 {
-  GHashTable *hash_table = NULL;
+  xhashtable_t *hash_table = NULL;
 
-  hash_table = g_hash_table_new (g_str_hash, g_str_equal);
+  hash_table = xhash_table_new (xstr_hash, xstr_equal);
 
   g_assert_nonnull (hash_table);
 
-  g_clear_pointer (&hash_table, (void (*) (GHashTable *)) g_hash_table_destroy);
+  g_clear_pointer (&hash_table, (void (*) (xhashtable_t *)) xhash_table_destroy);
 
   g_assert_null (hash_table);
 }
@@ -841,8 +841,8 @@ test_clear_pointer_side_effects (void)
   xchar_t **my_string_array, **i;
 
   my_string_array = g_new0 (xchar_t*, 3);
-  my_string_array[0] = g_strdup ("hello");
-  my_string_array[1] = g_strdup ("there");
+  my_string_array[0] = xstrdup ("hello");
+  my_string_array[1] = xstrdup ("there");
   my_string_array[2] = NULL;
 
   i = my_string_array;
@@ -1063,7 +1063,7 @@ test_int_limits (void)
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/issues/1663");
 
-  str = g_strdup_printf ("%d %d %u\n"
+  str = xstrdup_printf ("%d %d %u\n"
                          "%" G_GINT16_FORMAT " %" G_GINT16_FORMAT " %" G_GUINT16_FORMAT "\n"
                          "%" G_GINT32_FORMAT " %" G_GINT32_FORMAT " %" G_GUINT32_FORMAT "\n"
                          "%" G_GINT64_FORMAT " %" G_GINT64_FORMAT " %" G_GUINT64_FORMAT "\n",
@@ -1088,7 +1088,7 @@ test_clear_list (void)
     g_clear_list (&list, NULL);
     g_assert_null (list);
 
-    list = g_list_prepend (list, "test");
+    list = xlist_prepend (list, "test");
     g_assert_nonnull (list);
 
     g_clear_list (&list, NULL);
@@ -1097,7 +1097,7 @@ test_clear_list (void)
     g_clear_list (&list, g_free);
     g_assert_null (list);
 
-    list = g_list_prepend (list, g_malloc (16));
+    list = xlist_prepend (list, g_malloc (16));
     g_assert_nonnull (list);
 
     g_clear_list (&list, g_free);
@@ -1107,12 +1107,12 @@ test_clear_list (void)
 static void
 test_clear_slist (void)
 {
-    GSList *slist = NULL;
+    xslist_t *slist = NULL;
 
     g_clear_slist (&slist, NULL);
     g_assert_null (slist);
 
-    slist = g_slist_prepend (slist, "test");
+    slist = xslist_prepend (slist, "test");
     g_assert_nonnull (slist);
 
     g_clear_slist (&slist, NULL);
@@ -1121,7 +1121,7 @@ test_clear_slist (void)
     g_clear_slist (&slist, g_free);
     g_assert_null (slist);
 
-    slist = g_slist_prepend (slist, g_malloc (16));
+    slist = xslist_prepend (slist, g_malloc (16));
     g_assert_nonnull (slist);
 
     g_clear_slist (&slist, g_free);

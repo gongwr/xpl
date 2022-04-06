@@ -43,13 +43,13 @@ test_basic (void)
   base_stream = g_memory_output_stream_new (data, MAX_LINES_BUFF, NULL, NULL);
   stream = G_OUTPUT_STREAM (g_data_output_stream_new (base_stream));
 
-  g_object_get (stream, "byte-order", &val, NULL);
+  xobject_get (stream, "byte-order", &val, NULL);
   g_assert_cmpint (val, ==, G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN);
-  g_object_set (stream, "byte-order", G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN, NULL);
+  xobject_set (stream, "byte-order", G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN, NULL);
   g_assert_cmpint (g_data_output_stream_get_byte_order (G_DATA_OUTPUT_STREAM (stream)), ==, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
 
-  g_object_unref (stream);
-  g_object_unref (base_stream);
+  xobject_unref (stream);
+  xobject_unref (base_stream);
   g_free (data);
 }
 
@@ -81,7 +81,7 @@ test_read_lines (GDataStreamNewlineType newline_type)
   for (i = 0; i < MAX_LINES; i++)
     {
       xboolean_t res;
-      char *s = g_strconcat (TEST_STRING, endl[newline_type], NULL);
+      char *s = xstrconcat (TEST_STRING, endl[newline_type], NULL);
       res = g_data_output_stream_put_string (G_DATA_OUTPUT_STREAM (stream), s, NULL, &error);
       g_stpcpy ((char*)(lines + i*strlen(s)), s);
       g_assert_no_error (error);
@@ -100,8 +100,8 @@ test_read_lines (GDataStreamNewlineType newline_type)
   g_assert_cmpint (size, <, MAX_LINES_BUFF);
   g_assert_cmpstr ((char*)data, ==, lines);
 
-  g_object_unref (base_stream);
-  g_object_unref (stream);
+  xobject_unref (base_stream);
+  xobject_unref (stream);
   g_free (data);
   g_free (lines);
 }
@@ -193,19 +193,19 @@ test_data_array (guchar *buffer, xsize_t len,
 	  res = g_data_output_stream_put_int16 (G_DATA_OUTPUT_STREAM (stream), ((gint16 *) buffer)[pos], NULL, &error);
 	  break;
 	case TEST_DATA_UINT16:
-	  res = g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (stream), ((guint16 *) buffer)[pos], NULL, &error);
+	  res = g_data_output_stream_put_uint16 (G_DATA_OUTPUT_STREAM (stream), ((xuint16_t *) buffer)[pos], NULL, &error);
 	  break;
 	case TEST_DATA_INT32:
 	  res = g_data_output_stream_put_int32 (G_DATA_OUTPUT_STREAM (stream), ((gint32 *) buffer)[pos], NULL, &error);
 	  break;
 	case TEST_DATA_UINT32:
-	  res = g_data_output_stream_put_uint32 (G_DATA_OUTPUT_STREAM (stream), ((guint32 *) buffer)[pos], NULL, &error);
+	  res = g_data_output_stream_put_uint32 (G_DATA_OUTPUT_STREAM (stream), ((xuint32_t *) buffer)[pos], NULL, &error);
 	  break;
 	case TEST_DATA_INT64:
 	  res = g_data_output_stream_put_int64 (G_DATA_OUTPUT_STREAM (stream), ((gint64 *) buffer)[pos], NULL, &error);
 	  break;
 	case TEST_DATA_UINT64:
-	  res = g_data_output_stream_put_uint64 (G_DATA_OUTPUT_STREAM (stream), ((guint64 *) buffer)[pos], NULL, &error);
+	  res = g_data_output_stream_put_uint64 (G_DATA_OUTPUT_STREAM (stream), ((xuint64_t *) buffer)[pos], NULL, &error);
 	  break;
         default:
           g_assert_not_reached ();
@@ -226,9 +226,9 @@ test_data_array (guchar *buffer, xsize_t len,
           break;
         case TEST_DATA_UINT16:
           if (swap)
-            g_assert_cmpint (GUINT16_SWAP_LE_BE (((guint16 *) buffer)[pos]), ==, ((guint16 *) stream_data)[pos]);
+            g_assert_cmpint (GUINT16_SWAP_LE_BE (((xuint16_t *) buffer)[pos]), ==, ((xuint16_t *) stream_data)[pos]);
           else
-            g_assert_cmpint (((guint16 *) buffer)[pos], ==, ((guint16 *) stream_data)[pos]);
+            g_assert_cmpint (((xuint16_t *) buffer)[pos], ==, ((xuint16_t *) stream_data)[pos]);
           break;
         case TEST_DATA_INT16:
           if (swap)
@@ -238,9 +238,9 @@ test_data_array (guchar *buffer, xsize_t len,
           break;
         case TEST_DATA_UINT32:
           if (swap)
-            g_assert_cmpint (GUINT32_SWAP_LE_BE (((guint32 *) buffer)[pos]), ==, ((guint32 *) stream_data)[pos]);
+            g_assert_cmpint (GUINT32_SWAP_LE_BE (((xuint32_t *) buffer)[pos]), ==, ((xuint32_t *) stream_data)[pos]);
           else
-            g_assert_cmpint (((guint32 *) buffer)[pos], ==, ((guint32 *) stream_data)[pos]);
+            g_assert_cmpint (((xuint32_t *) buffer)[pos], ==, ((xuint32_t *) stream_data)[pos]);
           break;
         case TEST_DATA_INT32:
           if (swap)
@@ -250,9 +250,9 @@ test_data_array (guchar *buffer, xsize_t len,
           break;
         case TEST_DATA_UINT64:
           if (swap)
-            g_assert_cmpint (GUINT64_SWAP_LE_BE (((guint64 *) buffer)[pos]), ==, ((guint64 *) stream_data)[pos]);
+            g_assert_cmpint (GUINT64_SWAP_LE_BE (((xuint64_t *) buffer)[pos]), ==, ((xuint64_t *) stream_data)[pos]);
           else
-            g_assert_cmpint (((guint64 *) buffer)[pos], ==, ((guint64 *) stream_data)[pos]);
+            g_assert_cmpint (((xuint64_t *) buffer)[pos], ==, ((xuint64_t *) stream_data)[pos]);
           break;
         case TEST_DATA_INT64:
           if (swap)
@@ -266,15 +266,15 @@ test_data_array (guchar *buffer, xsize_t len,
         }
     }
 
-  g_object_unref (base_stream);
-  g_object_unref (stream);
+  xobject_unref (base_stream);
+  xobject_unref (stream);
   g_free (stream_data);
 }
 
 static void
 test_read_int (void)
 {
-  GRand *randomizer;
+  xrand_t *randomizer;
   xpointer_t buffer;
   int i;
 
@@ -303,9 +303,9 @@ test_read_int (void)
 static void
 test_seek (void)
 {
-  GDataOutputStream *stream;
-  GMemoryOutputStream *base_stream;
-  GSeekable *seekable;
+  xdata_output_stream_t *stream;
+  xmemory_output_stream_t *base_stream;
+  xseekable__t *seekable;
   xerror_t *error;
   guchar *stream_data;
   xsize_t len;
@@ -319,16 +319,16 @@ test_seek (void)
   stream = g_data_output_stream_new (G_OUTPUT_STREAM (base_stream));
   g_data_output_stream_set_byte_order (stream, G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN);
   seekable = G_SEEKABLE (stream);
-  g_assert (!g_seekable_can_truncate (seekable));
+  g_assert (!xseekable_can_truncate (seekable));
   error = NULL;
 
   /* Write */
-  g_assert_cmpint (g_seekable_tell (seekable), ==, 0);
+  g_assert_cmpint (xseekable_tell (seekable), ==, 0);
   res = g_data_output_stream_put_uint16 (stream, 0x0123, NULL, &error);
   g_assert_no_error (error);
   g_assert (res);
   g_data_output_stream_put_uint16 (stream, 0x4567, NULL, NULL);
-  g_assert_cmpint (g_seekable_tell (seekable), ==, 4);
+  g_assert_cmpint (xseekable_tell (seekable), ==, 4);
   g_assert_cmpint (stream_data[0], ==, 0x01);
   g_assert_cmpint (stream_data[1], ==, 0x23);
   g_assert_cmpint (stream_data[2], ==, 0x45);
@@ -336,14 +336,14 @@ test_seek (void)
   g_assert_cmpint (g_memory_output_stream_get_data_size (base_stream), ==, 4);
 
   /* Forward relative seek */
-  res = g_seekable_seek (seekable, 2, G_SEEK_CUR, NULL, &error);
+  res = xseekable_seek (seekable, 2, G_SEEK_CUR, NULL, &error);
   g_assert_no_error (error);
   g_assert (res);
-  g_assert_cmpint (g_seekable_tell (seekable), ==, 6);
+  g_assert_cmpint (xseekable_tell (seekable), ==, 6);
   g_assert_cmpint (g_memory_output_stream_get_data_size (base_stream), ==, 4);
   res = g_data_output_stream_put_uint16 (stream, 0x89AB, NULL, &error);
   g_assert (res);
-  g_assert_cmpint (g_seekable_tell (seekable), ==, 8);
+  g_assert_cmpint (xseekable_tell (seekable), ==, 8);
   g_assert_cmpint (g_memory_output_stream_get_data_size (base_stream), ==, 8);
   g_assert_cmpint (stream_data[0], ==, 0x01);
   g_assert_cmpint (stream_data[1], ==, 0x23);
@@ -355,15 +355,15 @@ test_seek (void)
   g_assert_cmpint (stream_data[7], ==, 0xAB);
 
   /* Backward relative seek */
-  res = g_seekable_seek (seekable, -3, G_SEEK_CUR, NULL, &error);
+  res = xseekable_seek (seekable, -3, G_SEEK_CUR, NULL, &error);
   g_assert_no_error (error);
   g_assert (res);
-  g_assert_cmpint (g_seekable_tell (seekable), ==, 5);
+  g_assert_cmpint (xseekable_tell (seekable), ==, 5);
   g_assert_cmpint (g_memory_output_stream_get_data_size (base_stream), ==, 8);
   res = g_data_output_stream_put_uint16 (stream, 0xCDEF, NULL, &error);
   g_assert_no_error (error);
   g_assert (res);
-  g_assert_cmpint (g_seekable_tell (seekable), ==, 7);
+  g_assert_cmpint (xseekable_tell (seekable), ==, 7);
   g_assert_cmpint (g_memory_output_stream_get_data_size (base_stream), ==, 8);
   g_assert_cmpint (stream_data[0], ==, 0x01);
   g_assert_cmpint (stream_data[1], ==, 0x23);
@@ -375,15 +375,15 @@ test_seek (void)
   g_assert_cmpint (stream_data[7], ==, 0xAB);
 
   /* From start */
-  res = g_seekable_seek (seekable, 4, G_SEEK_SET, NULL, &error);
+  res = xseekable_seek (seekable, 4, G_SEEK_SET, NULL, &error);
   g_assert_no_error (error);
   g_assert (res);
-  g_assert_cmpint (g_seekable_tell (seekable), ==, 4);
+  g_assert_cmpint (xseekable_tell (seekable), ==, 4);
   g_assert_cmpint (g_memory_output_stream_get_data_size (base_stream), ==, 8);
   res = g_data_output_stream_put_uint16 (stream, 0xFEDC, NULL, &error);
   g_assert_no_error (error);
   g_assert (res);
-  g_assert_cmpint (g_seekable_tell (seekable), ==, 6);
+  g_assert_cmpint (xseekable_tell (seekable), ==, 6);
   g_assert_cmpint (g_memory_output_stream_get_data_size (base_stream), ==, 8);
   g_assert_cmpint (stream_data[0], ==, 0x01);
   g_assert_cmpint (stream_data[1], ==, 0x23);
@@ -395,15 +395,15 @@ test_seek (void)
   g_assert_cmpint (stream_data[7], ==, 0xAB);
 
   /* From end */
-  res = g_seekable_seek (seekable, -4, G_SEEK_END, NULL, &error);
+  res = xseekable_seek (seekable, -4, G_SEEK_END, NULL, &error);
   g_assert_no_error (error);
   g_assert (res);
-  g_assert_cmpint (g_seekable_tell (seekable), ==, 4);
+  g_assert_cmpint (xseekable_tell (seekable), ==, 4);
   g_assert_cmpint (g_memory_output_stream_get_data_size (base_stream), ==, 8);
   res = g_data_output_stream_put_uint16 (stream, 0xBA87, NULL, &error);
   g_assert_no_error (error);
   g_assert (res);
-  g_assert_cmpint (g_seekable_tell (seekable), ==, 6);
+  g_assert_cmpint (xseekable_tell (seekable), ==, 6);
   g_assert_cmpint (g_memory_output_stream_get_data_size (base_stream), ==, 8);
   g_assert_cmpint (stream_data[0], ==, 0x01);
   g_assert_cmpint (stream_data[1], ==, 0x23);
@@ -414,17 +414,17 @@ test_seek (void)
   g_assert_cmpint (stream_data[6], ==, 0xEF);
   g_assert_cmpint (stream_data[7], ==, 0xAB);
 
-  g_object_unref (stream);
-  g_object_unref (base_stream);
+  xobject_unref (stream);
+  xobject_unref (base_stream);
   g_free (stream_data);
 }
 
 static void
 test_truncate (void)
 {
-  GDataOutputStream *stream;
-  GMemoryOutputStream *base_stream;
-  GSeekable *seekable;
+  xdata_output_stream_t *stream;
+  xmemory_output_stream_t *base_stream;
+  xseekable__t *seekable;
   xerror_t *error;
   guchar *stream_data;
   xsize_t len;
@@ -439,7 +439,7 @@ test_truncate (void)
   g_data_output_stream_set_byte_order (stream, G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN);
   seekable = G_SEEKABLE (stream);
   error = NULL;
-  g_assert (g_seekable_can_truncate (seekable));
+  g_assert (xseekable_can_truncate (seekable));
 
   /* Write */
   g_assert_cmpint (g_memory_output_stream_get_size (base_stream), ==, len);
@@ -459,7 +459,7 @@ test_truncate (void)
   g_assert_cmpint (stream_data[3], ==, 0x67);
 
   /* Truncate at position */
-  res = g_seekable_truncate (seekable, 4, NULL, &error);
+  res = xseekable_truncate (seekable, 4, NULL, &error);
   g_assert_no_error (error);
   g_assert (res);
   g_assert_cmpint (g_memory_output_stream_get_size (base_stream), ==, 4);
@@ -471,7 +471,7 @@ test_truncate (void)
   g_assert_cmpint (stream_data[3], ==, 0x67);
 
   /* Truncate beyond position */
-  res = g_seekable_truncate (seekable, 6, NULL, &error);
+  res = xseekable_truncate (seekable, 6, NULL, &error);
   g_assert_no_error (error);
   g_assert (res);
   g_assert_cmpint (g_memory_output_stream_get_size (base_stream), ==, 6);
@@ -483,7 +483,7 @@ test_truncate (void)
   g_assert_cmpint (stream_data[3], ==, 0x67);
 
   /* Truncate before position */
-  res = g_seekable_truncate (seekable, 2, NULL, &error);
+  res = xseekable_truncate (seekable, 2, NULL, &error);
   g_assert_no_error (error);
   g_assert (res);
   g_assert_cmpint (g_memory_output_stream_get_size (base_stream), ==, 2);
@@ -492,8 +492,8 @@ test_truncate (void)
   g_assert_cmpint (stream_data[0], ==, 0x01);
   g_assert_cmpint (stream_data[1], ==, 0x23);
 
-  g_object_unref (stream);
-  g_object_unref (base_stream);
+  xobject_unref (stream);
+  xobject_unref (base_stream);
 }
 
 int

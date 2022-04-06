@@ -23,15 +23,15 @@
 
 #include <string.h>
 
-G_DEFINE_INTERFACE (GAction, g_action, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (xaction, g_action, XTYPE_OBJECT)
 
 /**
  * SECTION:gaction
- * @title: GAction
+ * @title: xaction_t
  * @short_description: An action interface
  * @include: gio/gio.h
  *
- * #GAction represents a single named action.
+ * #xaction_t represents a single named action.
  *
  * The main interface to an action is that it can be activated with
  * g_action_activate().  This results in the 'activate' signal being
@@ -47,9 +47,9 @@ G_DEFINE_INTERFACE (GAction, g_action, XTYPE_OBJECT)
  * The state may have a hint associated with it, specifying its valid
  * range.
  *
- * #GAction is merely the interface to the concept of an action, as
+ * #xaction_t is merely the interface to the concept of an action, as
  * described above.  Various implementations of actions exist, including
- * #GSimpleAction.
+ * #xsimple_action_t.
  *
  * In all cases, the implementing class is responsible for storing the
  * name of the action, the parameter type, the enabled state, the
@@ -58,19 +58,19 @@ G_DEFINE_INTERFACE (GAction, g_action, XTYPE_OBJECT)
  * calls to g_action_activate() and g_action_change_state() for type
  * safety and for the state being enabled.
  *
- * Probably the only useful thing to do with a #GAction is to put it
- * inside of a #GSimpleActionGroup.
+ * Probably the only useful thing to do with a #xaction_t is to put it
+ * inside of a #xsimple_action_group_t.
  **/
 
 /**
- * GAction:
+ * xaction_t:
  *
- * #GAction is an opaque data structure and can only be accessed
+ * #xaction_t is an opaque data structure and can only be accessed
  * using the following functions.
  **/
 
 /**
- * GActionInterface:
+ * xaction_interface_t:
  * @get_name: the virtual function pointer for g_action_get_name()
  * @get_parameter_type: the virtual function pointer for g_action_get_parameter_type()
  * @get_state_type: the virtual function pointer for g_action_get_state_type()
@@ -78,26 +78,26 @@ G_DEFINE_INTERFACE (GAction, g_action, XTYPE_OBJECT)
  * @get_enabled: the virtual function pointer for g_action_get_enabled()
  * @get_state: the virtual function pointer for g_action_get_state()
  * @change_state: the virtual function pointer for g_action_change_state()
- * @activate: the virtual function pointer for g_action_activate().  Note that #GAction does not have an
+ * @activate: the virtual function pointer for g_action_activate().  Note that #xaction_t does not have an
  *            'activate' signal but that implementations of it may have one.
  *
- * The virtual function table for #GAction.
+ * The virtual function table for #xaction_t.
  *
  * Since: 2.28
  */
 
 void
-g_action_default_init (GActionInterface *iface)
+g_action_default_init (xaction_interface_t *iface)
 {
   /**
-   * GAction:name:
+   * xaction_t:name:
    *
    * The name of the action.  This is mostly meaningful for identifying
    * the action once it has been added to a #xaction_group_t. It is immutable.
    *
    * Since: 2.28
    **/
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
                                        g_param_spec_string ("name",
                                                             P_("Action Name"),
                                                             P_("The name used to invoke the action"),
@@ -106,7 +106,7 @@ g_action_default_init (GActionInterface *iface)
                                                             G_PARAM_STATIC_STRINGS));
 
   /**
-   * GAction:parameter-type:
+   * xaction_t:parameter-type:
    *
    * The type of the parameter that must be given when activating the
    * action. This is immutable, and may be %NULL if no parameter is needed when
@@ -114,7 +114,7 @@ g_action_default_init (GActionInterface *iface)
    *
    * Since: 2.28
    **/
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
                                        g_param_spec_boxed ("parameter-type",
                                                            P_("Parameter Type"),
                                                            P_("The type of xvariant_t passed to activate()"),
@@ -123,7 +123,7 @@ g_action_default_init (GActionInterface *iface)
                                                            G_PARAM_STATIC_STRINGS));
 
   /**
-   * GAction:enabled:
+   * xaction_t:enabled:
    *
    * If @action is currently enabled.
    *
@@ -132,7 +132,7 @@ g_action_default_init (GActionInterface *iface)
    *
    * Since: 2.28
    **/
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
                                        g_param_spec_boolean ("enabled",
                                                              P_("Enabled"),
                                                              P_("If the action can be activated"),
@@ -141,14 +141,14 @@ g_action_default_init (GActionInterface *iface)
                                                              G_PARAM_STATIC_STRINGS));
 
   /**
-   * GAction:state-type:
+   * xaction_t:state-type:
    *
    * The #xvariant_type_t of the state that the action has, or %NULL if the
    * action is stateless. This is immutable.
    *
    * Since: 2.28
    **/
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
                                        g_param_spec_boxed ("state-type",
                                                            P_("State Type"),
                                                            P_("The type of the state kept by the action"),
@@ -157,13 +157,13 @@ g_action_default_init (GActionInterface *iface)
                                                            G_PARAM_STATIC_STRINGS));
 
   /**
-   * GAction:state:
+   * xaction_t:state:
    *
    * The state of the action, or %NULL if the action is stateless.
    *
    * Since: 2.28
    **/
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
                                        g_param_spec_variant ("state",
                                                              P_("State"),
                                                              P_("The state the action is in"),
@@ -175,7 +175,7 @@ g_action_default_init (GActionInterface *iface)
 
 /**
  * g_action_change_state:
- * @action: a #GAction
+ * @action: a #xaction_t
  * @value: the new state
  *
  * Request for the state of @action to be changed to @value.
@@ -192,7 +192,7 @@ g_action_default_init (GActionInterface *iface)
  * Since: 2.30
  **/
 void
-g_action_change_state (GAction  *action,
+g_action_change_state (xaction_t  *action,
                        xvariant_t *value)
 {
   const xvariant_type_t *state_type;
@@ -201,19 +201,19 @@ g_action_change_state (GAction  *action,
   g_return_if_fail (value != NULL);
   state_type = g_action_get_state_type (action);
   g_return_if_fail (state_type != NULL);
-  g_return_if_fail (g_variant_is_of_type (value, state_type));
+  g_return_if_fail (xvariant_is_of_type (value, state_type));
 
-  g_variant_ref_sink (value);
+  xvariant_ref_sink (value);
 
   G_ACTION_GET_IFACE (action)
     ->change_state (action, value);
 
-  g_variant_unref (value);
+  xvariant_unref (value);
 }
 
 /**
  * g_action_get_state:
- * @action: a #GAction
+ * @action: a #xaction_t
  *
  * Queries the current state of @action.
  *
@@ -222,14 +222,14 @@ g_action_change_state (GAction  *action,
  * given by g_action_get_state_type().
  *
  * The return value (if non-%NULL) should be freed with
- * g_variant_unref() when it is no longer required.
+ * xvariant_unref() when it is no longer required.
  *
  * Returns: (nullable) (transfer full): the current state of the action
  *
  * Since: 2.28
  **/
 xvariant_t *
-g_action_get_state (GAction *action)
+g_action_get_state (xaction_t *action)
 {
   g_return_val_if_fail (X_IS_ACTION (action), NULL);
 
@@ -239,7 +239,7 @@ g_action_get_state (GAction *action)
 
 /**
  * g_action_get_name:
- * @action: a #GAction
+ * @action: a #xaction_t
  *
  * Queries the name of @action.
  *
@@ -248,7 +248,7 @@ g_action_get_state (GAction *action)
  * Since: 2.28
  **/
 const xchar_t *
-g_action_get_name (GAction *action)
+g_action_get_name (xaction_t *action)
 {
   g_return_val_if_fail (X_IS_ACTION (action), NULL);
 
@@ -258,7 +258,7 @@ g_action_get_name (GAction *action)
 
 /**
  * g_action_get_parameter_type:
- * @action: a #GAction
+ * @action: a #xaction_t
  *
  * Queries the type of the parameter that must be given when activating
  * @action.
@@ -274,7 +274,7 @@ g_action_get_name (GAction *action)
  * Since: 2.28
  **/
 const xvariant_type_t *
-g_action_get_parameter_type (GAction *action)
+g_action_get_parameter_type (xaction_t *action)
 {
   g_return_val_if_fail (X_IS_ACTION (action), NULL);
 
@@ -284,7 +284,7 @@ g_action_get_parameter_type (GAction *action)
 
 /**
  * g_action_get_state_type:
- * @action: a #GAction
+ * @action: a #xaction_t
  *
  * Queries the type of the state of @action.
  *
@@ -304,7 +304,7 @@ g_action_get_parameter_type (GAction *action)
  * Since: 2.28
  **/
 const xvariant_type_t *
-g_action_get_state_type (GAction *action)
+g_action_get_state_type (xaction_t *action)
 {
   g_return_val_if_fail (X_IS_ACTION (action), NULL);
 
@@ -314,7 +314,7 @@ g_action_get_state_type (GAction *action)
 
 /**
  * g_action_get_state_hint:
- * @action: a #GAction
+ * @action: a #xaction_t
  *
  * Requests a hint about the valid range of values for the state of
  * @action.
@@ -333,14 +333,14 @@ g_action_get_state_type (GAction *action)
  * within the range may fail.
  *
  * The return value (if non-%NULL) should be freed with
- * g_variant_unref() when it is no longer required.
+ * xvariant_unref() when it is no longer required.
  *
  * Returns: (nullable) (transfer full): the state range hint
  *
  * Since: 2.28
  **/
 xvariant_t *
-g_action_get_state_hint (GAction *action)
+g_action_get_state_hint (xaction_t *action)
 {
   g_return_val_if_fail (X_IS_ACTION (action), NULL);
 
@@ -350,7 +350,7 @@ g_action_get_state_hint (GAction *action)
 
 /**
  * g_action_get_enabled:
- * @action: a #GAction
+ * @action: a #xaction_t
  *
  * Checks if @action is currently enabled.
  *
@@ -362,7 +362,7 @@ g_action_get_state_hint (GAction *action)
  * Since: 2.28
  **/
 xboolean_t
-g_action_get_enabled (GAction *action)
+g_action_get_enabled (xaction_t *action)
 {
   g_return_val_if_fail (X_IS_ACTION (action), FALSE);
 
@@ -372,7 +372,7 @@ g_action_get_enabled (GAction *action)
 
 /**
  * g_action_activate:
- * @action: a #GAction
+ * @action: a #xaction_t
  * @parameter: (nullable): the parameter to the activation
  *
  * Activates the action.
@@ -386,19 +386,19 @@ g_action_get_enabled (GAction *action)
  * Since: 2.28
  **/
 void
-g_action_activate (GAction  *action,
+g_action_activate (xaction_t  *action,
                    xvariant_t *parameter)
 {
   g_return_if_fail (X_IS_ACTION (action));
 
   if (parameter != NULL)
-    g_variant_ref_sink (parameter);
+    xvariant_ref_sink (parameter);
 
   G_ACTION_GET_IFACE (action)
     ->activate (action, parameter);
 
   if (parameter != NULL)
-    g_variant_unref (parameter);
+    xvariant_unref (parameter);
 }
 
 /**
@@ -457,7 +457,7 @@ g_action_name_is_valid (const xchar_t *action_name)
  * The third format is used to represent an action with any type of
  * target value, including strings.  The target value follows the action
  * name, surrounded in parens.  For example: "app.action(42)".  The
- * target value is parsed using g_variant_parse().  If a tuple-typed
+ * target value is parsed using xvariant_parse().  If a tuple-typed
  * value is desired, it must be specified in the same way, resulting in
  * two sets of parens, for example: "app.action((1,2,3))".  A string
  * target can be specified this way as well: "app.action('target')".
@@ -503,7 +503,7 @@ g_action_parse_detailed_name (const xchar_t  *detailed_name,
       if (target[1] != ':')
         goto bad_fmt;
 
-      *target_value = g_variant_ref_sink (g_variant_new_string (target + 2));
+      *target_value = xvariant_ref_sink (xvariant_new_string (target + 2));
       break;
 
     case '(':
@@ -511,7 +511,7 @@ g_action_parse_detailed_name (const xchar_t  *detailed_name,
         if (target[target_len - 1] != ')')
           goto bad_fmt;
 
-        *target_value = g_variant_parse (NULL, target + 1, target + target_len - 1, NULL, error);
+        *target_value = xvariant_parse (NULL, target + 1, target + target_len - 1, NULL, error);
         if (*target_value == NULL)
           goto bad_fmt;
       }
@@ -522,7 +522,7 @@ g_action_parse_detailed_name (const xchar_t  *detailed_name,
       break;
     }
 
-  *action_name = g_strndup (detailed_name, base_len);
+  *action_name = xstrndup (detailed_name, base_len);
 
   return TRUE;
 
@@ -566,22 +566,22 @@ g_action_print_detailed_name (const xchar_t *action_name,
   g_return_val_if_fail (g_action_name_is_valid (action_name), NULL);
 
   if (target_value == NULL)
-    return g_strdup (action_name);
+    return xstrdup (action_name);
 
-  if (g_variant_is_of_type (target_value, G_VARIANT_TYPE_STRING))
+  if (xvariant_is_of_type (target_value, G_VARIANT_TYPE_STRING))
     {
-      const xchar_t *str = g_variant_get_string (target_value, NULL);
+      const xchar_t *str = xvariant_get_string (target_value, NULL);
 
       if (g_action_name_is_valid (str))
-        return g_strconcat (action_name, "::", str, NULL);
+        return xstrconcat (action_name, "::", str, NULL);
     }
 
   {
-    GString *result = g_string_new (action_name);
-    g_string_append_c (result, '(');
-    g_variant_print_string (target_value, result, TRUE);
-    g_string_append_c (result, ')');
+    xstring_t *result = xstring_new (action_name);
+    xstring_append_c (result, '(');
+    xvariant_print_string (target_value, result, TRUE);
+    xstring_append_c (result, ')');
 
-    return g_string_free (result, FALSE);
+    return xstring_free (result, FALSE);
   }
 }

@@ -272,7 +272,7 @@ thread_func (xpointer_t data)
       d = g_random_int_range (-10, 100);
       bucket[idx] += d;
       g_atomic_int_add (&atomic, d);
-      g_thread_yield ();
+      xthread_yield ();
     }
 
   return NULL;
@@ -283,17 +283,17 @@ test_threaded (void)
 {
   xint_t sum;
   xint_t i;
-  GThread *threads[THREADS];
+  xthread_t *threads[THREADS];
 
   atomic = 0;
   for (i = 0; i < THREADS; i++)
     bucket[i] = 0;
 
   for (i = 0; i < THREADS; i++)
-    threads[i] = g_thread_new ("atomic", thread_func, GINT_TO_POINTER (i));
+    threads[i] = xthread_new ("atomic", thread_func, GINT_TO_POINTER (i));
 
   for (i = 0; i < THREADS; i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 
   sum = 0;
   for (i = 0; i < THREADS; i++)

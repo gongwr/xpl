@@ -28,27 +28,27 @@
 G_BEGIN_DECLS
 
 #define XTYPE_SOCKET_CONNECTABLE            (xsocket_connectable_get_type ())
-#define XSOCKET_CONNECTABLE(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SOCKET_CONNECTABLE, GSocketConnectable))
+#define XSOCKET_CONNECTABLE(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SOCKET_CONNECTABLE, xsocket_connectable))
 #define X_IS_SOCKET_CONNECTABLE(obj)         (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_SOCKET_CONNECTABLE))
-#define XSOCKET_CONNECTABLE_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_SOCKET_CONNECTABLE, GSocketConnectableIface))
+#define XSOCKET_CONNECTABLE_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_SOCKET_CONNECTABLE, xsocket_connectable_iface_t))
 
 /**
- * GSocketConnectable:
+ * xsocket_connectable_t:
  *
  * Interface for objects that contain or generate a #xsocket_address_t.
  */
-typedef struct _GSocketConnectableIface GSocketConnectableIface;
+typedef struct _GSocketConnectableIface xsocket_connectable_iface_t;
 
 /**
- * GSocketConnectableIface:
+ * xsocket_connectable_iface_t:
  * @x_iface: The parent interface.
- * @enumerate: Creates a #GSocketAddressEnumerator
- * @proxy_enumerate: Creates a #GProxyAddressEnumerator
+ * @enumerate: Creates a #xsocket_address_enumerator_t
+ * @proxy_enumerate: Creates a #xproxy_address_enumerator_t
  * @to_string: Format the connectable’s address as a string for debugging.
  *    Implementing this is optional. (Since: 2.48)
  *
- * Provides an interface for returning a #GSocketAddressEnumerator
- * and #GProxyAddressEnumerator
+ * Provides an interface for returning a #xsocket_address_enumerator_t
+ * and #xproxy_address_enumerator_t
  */
 struct _GSocketConnectableIface
 {
@@ -56,24 +56,24 @@ struct _GSocketConnectableIface
 
   /* Virtual Table */
 
-  GSocketAddressEnumerator * (* enumerate)       (GSocketConnectable *connectable);
+  xsocket_address_enumerator_t * (* enumerate)       (xsocket_connectable_t *connectable);
 
-  GSocketAddressEnumerator * (* proxy_enumerate) (GSocketConnectable *connectable);
+  xsocket_address_enumerator_t * (* proxy_enumerate) (xsocket_connectable_t *connectable);
 
-  xchar_t                    * (* to_string)       (GSocketConnectable *connectable);
+  xchar_t                    * (* to_string)       (xsocket_connectable_t *connectable);
 };
 
 XPL_AVAILABLE_IN_ALL
 xtype_t                     xsocket_connectable_get_type  (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GSocketAddressEnumerator *xsocket_connectable_enumerate (GSocketConnectable *connectable);
+xsocket_address_enumerator_t *xsocket_connectable_enumerate (xsocket_connectable_t *connectable);
 
 XPL_AVAILABLE_IN_ALL
-GSocketAddressEnumerator *xsocket_connectable_proxy_enumerate (GSocketConnectable *connectable);
+xsocket_address_enumerator_t *xsocket_connectable_proxy_enumerate (xsocket_connectable_t *connectable);
 
 XPL_AVAILABLE_IN_2_48
-xchar_t                    *xsocket_connectable_to_string (GSocketConnectable *connectable);
+xchar_t                    *xsocket_connectable_to_string (xsocket_connectable_t *connectable);
 
 G_END_DECLS
 

@@ -33,8 +33,8 @@ msgid "Seek not supported on base stream"
 msgstr "Базавы струмень не падтрымлівае пракрутку"
 
 #: ../gio/gbufferedinputstream.c:942
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "Немагчыма абрэзаць GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "Немагчыма абрэзаць xbuffered_input_stream"
 
 #: ../gio/gbufferedinputstream.c:987 ../gio/ginputstream.c:1012
 #: ../gio/giostream.c:280 ../gio/goutputstream.c:1323
@@ -108,17 +108,17 @@ msgid "%s filetype"
 msgstr "Тып файлаў %s"
 
 #: ../gio/gcredentials.c:264 ../gio/gcredentials.c:528
-msgid "GCredentials is not implemented on this OS"
-msgstr "Механізм GCredentials адсутнічае для гэтай аперацыйнай сістэмы"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "Механізм xcredentials_t адсутнічае для гэтай аперацыйнай сістэмы"
 
 #: ../gio/gcredentials.c:438
-msgid "There is no GCredentials support for your platform"
-msgstr "Ваша праграмная платформа не падтрымлівае механізму GCredentials"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "Ваша праграмная платформа не падтрымлівае механізму xcredentials_t"
 
 #: ../gio/gcredentials.c:480
-msgid "GCredentials does not contain a process ID on this OS"
+msgid "xcredentials_t does not contain a process ID on this OS"
 msgstr ""
-"GCredentials не змяшчаюць ідэнтыфікатара працэсу для гэтай аперацыйнай "
+"xcredentials_t не змяшчаюць ідэнтыфікатара працэсу для гэтай аперацыйнай "
 "сістэмы"
 
 #: ../gio/gdatainputstream.c:306
@@ -313,8 +313,8 @@ msgstr ""
 "(наяўна: %s)"
 
 #: ../gio/gdbusauth.c:1172
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "Скасавана праз GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "Скасавана праз xdbus_auth_observer_t::authorize-authenticated-peer"
 
 #: ../gio/gdbusauthmechanismsha1.c:262
 #, c-format
@@ -1022,27 +1022,27 @@ msgstr "Адсутнічае падтрымка TLS"
 
 #: ../gio/gemblem.c:324
 #, c-format
-msgid "Can't handle version %d of GEmblem encoding"
-msgstr "Не ўдалося апрацаваць версію %d кадавання GEmblem"
+msgid "Can't handle version %d of xemblem_t encoding"
+msgstr "Не ўдалося апрацаваць версію %d кадавання xemblem_t"
 
 #: ../gio/gemblem.c:334
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "Хібная колькасць складнікаў (%d) у кадаванні GEmblem"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "Хібная колькасць складнікаў (%d) у кадаванні xemblem_t"
 
 #: ../gio/gemblemedicon.c:364
 #, c-format
-msgid "Can't handle version %d of GEmblemedIcon encoding"
-msgstr "Не ўдалося апрацаваць версію %d кадавання GEmblemedIcon"
+msgid "Can't handle version %d of xemblemed_icon_t encoding"
+msgstr "Не ўдалося апрацаваць версію %d кадавання xemblemed_icon_t"
 
 #: ../gio/gemblemedicon.c:374
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "Хібная колькасць складнікаў (%d) у кадаванні GEmblemedIcon"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "Хібная колькасць складнікаў (%d) у кадаванні xemblemed_icon_t"
 
 #: ../gio/gemblemedicon.c:397
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "Чакалі GEmblem для GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "Чакалі xemblem_t для xemblemed_icon_t"
 
 #: ../gio/gfile.c:965 ../gio/gfile.c:1204 ../gio/gfile.c:1343
 #: ../gio/gfile.c:1583 ../gio/gfile.c:1638 ../gio/gfile.c:1696
@@ -1150,12 +1150,12 @@ msgstr "Аб'ект пераліку файлаў ужо закрыты"
 
 #: ../gio/gfileicon.c:237
 #, c-format
-msgid "Can't handle version %d of GFileIcon encoding"
-msgstr "Не ўдалося апрацаваць версію %d кадавання GFileIcon"
+msgid "Can't handle version %d of xfile_icon_t encoding"
+msgstr "Не ўдалося апрацаваць версію %d кадавання xfile_icon_t"
 
 #: ../gio/gfileicon.c:247
-msgid "Malformed input data for GFileIcon"
-msgstr "Хібныя ўводныя даныя для GFileIcon"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "Хібныя ўводныя даныя для xfile_icon_t"
 
 #: ../gio/gfileinputstream.c:151 ../gio/gfileinputstream.c:397
 #: ../gio/gfileiostream.c:169 ../gio/gfileoutputstream.c:166
@@ -1619,11 +1619,11 @@ msgstr "Не пільнавацца абмежаванняў на назвы к�
 
 #: ../gio/glib-compile-schemas.c:2031
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Скампіляваць файлы схем GSettings у кэш.\n"
+"Скампіляваць файлы схем xsettings_t у кэш.\n"
 "Файлы схем мусяць мець пашырэнне .gschema.xml,\n"
 "а файл кэшу называецца gschemas.compiled."
 
@@ -1945,8 +1945,8 @@ msgid "Invalid seek request"
 msgstr "Хібны запыт пракруткі"
 
 #: ../gio/gmemoryinputstream.c:507
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "Немагчыма абрэзаць струмень GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "Немагчыма абрэзаць струмень xmemory_input_stream_t"
 
 #: ../gio/gmemoryoutputstream.c:541
 msgid "Memory output stream not resizable"
@@ -2565,8 +2565,8 @@ msgid "Error sending message: %s"
 msgstr "Памылка пасылання паведамлення: %s"
 
 #: ../gio/gsocket.c:3919
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "GSocketControlMessage не падтрымліваецца ў сістэме Windows"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "xsocket_control_message_t не падтрымліваецца ў сістэме Windows"
 
 #: ../gio/gsocket.c:4253 ../gio/gsocket.c:4388
 #, c-format
@@ -2709,8 +2709,8 @@ msgstr "Невядомая памылка проксі-сервера SOCKSv5."
 
 #: ../gio/gthemedicon.c:521
 #, c-format
-msgid "Can't handle version %d of GThemedIcon encoding"
-msgstr "Не ўдалося апрацаваць версію %d кадавання GThemedIcon"
+msgid "Can't handle version %d of xthemed_icon_t encoding"
+msgstr "Не ўдалося апрацаваць версію %d кадавання xthemed_icon_t"
 
 #: ../gio/gthreadedresolver.c:110
 #, c-format
@@ -3061,37 +3061,37 @@ msgstr "Хібная назва машыны"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:205
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "да поўдня"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:207
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "пасля поўдня"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:210
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %d %b %Y %T"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:213
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%2$d.%1$m.%3$y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:216
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:219
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%H:%M:%S"
 

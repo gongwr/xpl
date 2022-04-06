@@ -30,29 +30,29 @@ G_BEGIN_DECLS
 
 #define XTYPE_ACTION                                       (g_action_get_type ())
 #define G_ACTION(inst)                                      (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_ACTION, GAction))
+                                                             XTYPE_ACTION, xaction_t))
 #define X_IS_ACTION(inst)                                   (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_ACTION))
 #define G_ACTION_GET_IFACE(inst)                            (XTYPE_INSTANCE_GET_INTERFACE ((inst),                  \
-                                                             XTYPE_ACTION, GActionInterface))
+                                                             XTYPE_ACTION, xaction_interface_t))
 
-typedef struct _GActionInterface                            GActionInterface;
+typedef struct _xaction_interface                            xaction_interface_t;
 
-struct _GActionInterface
+struct _xaction_interface
 {
   xtype_interface_t x_iface;
 
   /* virtual functions */
-  const xchar_t *        (* get_name)             (GAction  *action);
-  const xvariant_type_t * (* get_parameter_type)   (GAction  *action);
-  const xvariant_type_t * (* get_state_type)       (GAction  *action);
-  xvariant_t *           (* get_state_hint)       (GAction  *action);
+  const xchar_t *        (* get_name)             (xaction_t  *action);
+  const xvariant_type_t * (* get_parameter_type)   (xaction_t  *action);
+  const xvariant_type_t * (* get_state_type)       (xaction_t  *action);
+  xvariant_t *           (* get_state_hint)       (xaction_t  *action);
 
-  xboolean_t             (* get_enabled)          (GAction  *action);
-  xvariant_t *           (* get_state)            (GAction  *action);
+  xboolean_t             (* get_enabled)          (xaction_t  *action);
+  xvariant_t *           (* get_state)            (xaction_t  *action);
 
-  void                 (* change_state)         (GAction  *action,
+  void                 (* change_state)         (xaction_t  *action,
                                                  xvariant_t *value);
-  void                 (* activate)             (GAction  *action,
+  void                 (* activate)             (xaction_t  *action,
                                                  xvariant_t *parameter);
 };
 
@@ -60,24 +60,24 @@ XPL_AVAILABLE_IN_2_30
 xtype_t                   g_action_get_type                               (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t *           g_action_get_name                               (GAction            *action);
+const xchar_t *           g_action_get_name                               (xaction_t            *action);
 XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *    g_action_get_parameter_type                     (GAction            *action);
+const xvariant_type_t *    g_action_get_parameter_type                     (xaction_t            *action);
 XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *    g_action_get_state_type                         (GAction            *action);
+const xvariant_type_t *    g_action_get_state_type                         (xaction_t            *action);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *              g_action_get_state_hint                         (GAction            *action);
+xvariant_t *              g_action_get_state_hint                         (xaction_t            *action);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_action_get_enabled                            (GAction            *action);
+xboolean_t                g_action_get_enabled                            (xaction_t            *action);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *              g_action_get_state                              (GAction            *action);
+xvariant_t *              g_action_get_state                              (xaction_t            *action);
 
 XPL_AVAILABLE_IN_ALL
-void                    g_action_change_state                           (GAction            *action,
+void                    g_action_change_state                           (xaction_t            *action,
                                                                          xvariant_t           *value);
 XPL_AVAILABLE_IN_ALL
-void                    g_action_activate                               (GAction            *action,
+void                    g_action_activate                               (xaction_t            *action,
                                                                          xvariant_t           *parameter);
 
 XPL_AVAILABLE_IN_2_28

@@ -29,8 +29,8 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_PROXY_ADDRESS         (g_proxy_address_get_type ())
-#define G_PROXY_ADDRESS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_PROXY_ADDRESS, GProxyAddress))
+#define XTYPE_PROXY_ADDRESS         (xproxy_address_get_type ())
+#define G_PROXY_ADDRESS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_PROXY_ADDRESS, xproxy_address))
 #define G_PROXY_ADDRESS_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_PROXY_ADDRESS, GProxyAddressClass))
 #define X_IS_PROXY_ADDRESS(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_PROXY_ADDRESS))
 #define X_IS_PROXY_ADDRESS_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_PROXY_ADDRESS))
@@ -41,7 +41,7 @@ typedef struct _GProxyAddressPrivate GProxyAddressPrivate;
 
 struct _GProxyAddress
 {
-  GInetSocketAddress parent_instance;
+  xinet_socket_address_t parent_instance;
 
   /*< private >*/
   GProxyAddressPrivate *priv;
@@ -54,32 +54,32 @@ struct _GProxyAddressClass
 
 
 XPL_AVAILABLE_IN_ALL
-xtype_t           g_proxy_address_get_type    (void) G_GNUC_CONST;
+xtype_t           xproxy_address_get_type    (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-xsocket_address_t *g_proxy_address_new         (xinet_address_t *inetaddr,
-					     guint16       port,
+xsocket_address_t *xproxy_address_new         (xinet_address_t *inetaddr,
+					     xuint16_t       port,
 					     const xchar_t  *protocol,
 					     const xchar_t  *dest_hostname,
-		                             guint16       dest_port,
+		                             xuint16_t       dest_port,
 					     const xchar_t  *username,
 					     const xchar_t  *password);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t    *g_proxy_address_get_protocol                (GProxyAddress *proxy);
+const xchar_t    *xproxy_address_get_protocol                (xproxy_address_t *proxy);
 XPL_AVAILABLE_IN_2_34
-const xchar_t    *g_proxy_address_get_destination_protocol    (GProxyAddress *proxy);
+const xchar_t    *xproxy_address_get_destination_protocol    (xproxy_address_t *proxy);
 XPL_AVAILABLE_IN_ALL
-const xchar_t    *g_proxy_address_get_destination_hostname    (GProxyAddress *proxy);
+const xchar_t    *xproxy_address_get_destination_hostname    (xproxy_address_t *proxy);
 XPL_AVAILABLE_IN_ALL
-guint16         g_proxy_address_get_destination_port        (GProxyAddress *proxy);
+xuint16_t         xproxy_address_get_destination_port        (xproxy_address_t *proxy);
 XPL_AVAILABLE_IN_ALL
-const xchar_t    *g_proxy_address_get_username                (GProxyAddress *proxy);
+const xchar_t    *xproxy_address_get_username                (xproxy_address_t *proxy);
 XPL_AVAILABLE_IN_ALL
-const xchar_t    *g_proxy_address_get_password                (GProxyAddress *proxy);
+const xchar_t    *xproxy_address_get_password                (xproxy_address_t *proxy);
 
 XPL_AVAILABLE_IN_2_34
-const xchar_t    *g_proxy_address_get_uri                     (GProxyAddress *proxy);
+const xchar_t    *xproxy_address_get_uri                     (xproxy_address_t *proxy);
 
 G_END_DECLS
 

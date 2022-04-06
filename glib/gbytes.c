@@ -35,32 +35,32 @@
 #include <string.h>
 
 /**
- * GBytes:
+ * xbytes_t:
  *
  * A simple refcounted data type representing an immutable sequence of zero or
  * more bytes from an unspecified origin.
  *
- * The purpose of a #GBytes is to keep the memory region that it holds
+ * The purpose of a #xbytes_t is to keep the memory region that it holds
  * alive for as long as anyone holds a reference to the bytes.  When
  * the last reference count is dropped, the memory is released. Multiple
- * unrelated callers can use byte data in the #GBytes without coordinating
+ * unrelated callers can use byte data in the #xbytes_t without coordinating
  * their activities, resting assured that the byte data will not change or
  * move while they hold a reference.
  *
- * A #GBytes can come from many different origins that may have
+ * A #xbytes_t can come from many different origins that may have
  * different procedures for freeing the memory region.  Examples are
- * memory from g_malloc(), from memory slices, from a #GMappedFile or
+ * memory from g_malloc(), from memory slices, from a #xmapped_file_t or
  * memory from other allocators.
  *
- * #GBytes work well as keys in #GHashTable. Use g_bytes_equal() and
- * g_bytes_hash() as parameters to g_hash_table_new() or g_hash_table_new_full().
- * #GBytes can also be used as keys in a #GTree by passing the g_bytes_compare()
- * function to g_tree_new().
+ * #xbytes_t work well as keys in #xhashtable_t. Use xbytes_equal() and
+ * xbytes_hash() as parameters to xhash_table_new() or xhash_table_new_full().
+ * #xbytes_t can also be used as keys in a #xtree_t by passing the xbytes_compare()
+ * function to xtree_new().
  *
  * The data pointed to by this bytes must not be modified. For a mutable
- * array of bytes see #GByteArray. Use g_bytes_unref_to_array() to create a
- * mutable array for a #GBytes sequence. To create an immutable #GBytes from
- * a mutable #GByteArray, use the g_byte_array_free_to_bytes() function.
+ * array of bytes see #xbyte_array_t. Use xbytes_unref_to_array() to create a
+ * mutable array for a #xbytes_t sequence. To create an immutable #xbytes_t from
+ * a mutable #xbyte_array_t, use the xbyte_array_free_to_bytes() function.
  *
  * Since: 2.32
  **/
@@ -68,98 +68,98 @@
 /* Keep in sync with glib/tests/bytes.c */
 struct _GBytes
 {
-  gconstpointer data;  /* may be NULL iff (size == 0) */
+  xconstpointer data;  /* may be NULL iff (size == 0) */
   xsize_t size;  /* may be 0 */
   gatomicrefcount ref_count;
-  GDestroyNotify free_func;
+  xdestroy_notify_t free_func;
   xpointer_t user_data;
 };
 
 /**
- * g_bytes_new:
- * @data: (transfer none) (array length=size) (element-type guint8) (nullable):
+ * xbytes_new:
+ * @data: (transfer none) (array length=size) (element-type xuint8_t) (nullable):
  *        the data to be used for the bytes
  * @size: the size of @data
  *
- * Creates a new #GBytes from @data.
+ * Creates a new #xbytes_t from @data.
  *
  * @data is copied. If @size is 0, @data may be %NULL.
  *
- * Returns: (transfer full): a new #GBytes
+ * Returns: (transfer full): a new #xbytes_t
  *
  * Since: 2.32
  */
-GBytes *
-g_bytes_new (gconstpointer data,
+xbytes_t *
+xbytes_new (xconstpointer data,
              xsize_t         size)
 {
   g_return_val_if_fail (data != NULL || size == 0, NULL);
 
-  return g_bytes_new_take (g_memdup2 (data, size), size);
+  return xbytes_new_take (g_memdup2 (data, size), size);
 }
 
 /**
- * g_bytes_new_take:
- * @data: (transfer full) (array length=size) (element-type guint8) (nullable):
+ * xbytes_new_take:
+ * @data: (transfer full) (array length=size) (element-type xuint8_t) (nullable):
  *        the data to be used for the bytes
  * @size: the size of @data
  *
- * Creates a new #GBytes from @data.
+ * Creates a new #xbytes_t from @data.
  *
  * After this call, @data belongs to the bytes and may no longer be
  * modified by the caller.  g_free() will be called on @data when the
  * bytes is no longer in use. Because of this @data must have been created by
  * a call to g_malloc(), g_malloc0() or g_realloc() or by one of the many
- * functions that wrap these calls (such as g_new(), g_strdup(), etc).
+ * functions that wrap these calls (such as g_new(), xstrdup(), etc).
  *
- * For creating #GBytes with memory from other allocators, see
- * g_bytes_new_with_free_func().
+ * For creating #xbytes_t with memory from other allocators, see
+ * xbytes_new_with_free_func().
  *
  * @data may be %NULL if @size is 0.
  *
- * Returns: (transfer full): a new #GBytes
+ * Returns: (transfer full): a new #xbytes_t
  *
  * Since: 2.32
  */
-GBytes *
-g_bytes_new_take (xpointer_t data,
+xbytes_t *
+xbytes_new_take (xpointer_t data,
                   xsize_t    size)
 {
-  return g_bytes_new_with_free_func (data, size, g_free, data);
+  return xbytes_new_with_free_func (data, size, g_free, data);
 }
 
 
 /**
- * g_bytes_new_static: (skip)
- * @data: (transfer full) (array length=size) (element-type guint8) (nullable):
+ * xbytes_new_static: (skip)
+ * @data: (transfer full) (array length=size) (element-type xuint8_t) (nullable):
  *        the data to be used for the bytes
  * @size: the size of @data
  *
- * Creates a new #GBytes from static data.
+ * Creates a new #xbytes_t from static data.
  *
  * @data must be static (ie: never modified or freed). It may be %NULL if @size
  * is 0.
  *
- * Returns: (transfer full): a new #GBytes
+ * Returns: (transfer full): a new #xbytes_t
  *
  * Since: 2.32
  */
-GBytes *
-g_bytes_new_static (gconstpointer data,
+xbytes_t *
+xbytes_new_static (xconstpointer data,
                     xsize_t         size)
 {
-  return g_bytes_new_with_free_func (data, size, NULL, NULL);
+  return xbytes_new_with_free_func (data, size, NULL, NULL);
 }
 
 /**
- * g_bytes_new_with_free_func: (skip)
- * @data: (array length=size) (element-type guint8) (nullable):
+ * xbytes_new_with_free_func: (skip)
+ * @data: (array length=size) (element-type xuint8_t) (nullable):
  *        the data to be used for the bytes
  * @size: the size of @data
  * @free_func: the function to call to release the data
  * @user_data: data to pass to @free_func
  *
- * Creates a #GBytes from @data.
+ * Creates a #xbytes_t from @data.
  *
  * When the last reference is dropped, @free_func will be called with the
  * @user_data argument.
@@ -169,54 +169,54 @@ g_bytes_new_static (gconstpointer data,
  *
  * @data may be %NULL if @size is 0.
  *
- * Returns: (transfer full): a new #GBytes
+ * Returns: (transfer full): a new #xbytes_t
  *
  * Since: 2.32
  */
-GBytes *
-g_bytes_new_with_free_func (gconstpointer  data,
+xbytes_t *
+xbytes_new_with_free_func (xconstpointer  data,
                             xsize_t          size,
-                            GDestroyNotify free_func,
+                            xdestroy_notify_t free_func,
                             xpointer_t       user_data)
 {
-  GBytes *bytes;
+  xbytes_t *bytes;
 
   g_return_val_if_fail (data != NULL || size == 0, NULL);
 
-  bytes = g_slice_new (GBytes);
+  bytes = g_slice_new (xbytes_t);
   bytes->data = data;
   bytes->size = size;
   bytes->free_func = free_func;
   bytes->user_data = user_data;
   g_atomic_ref_count_init (&bytes->ref_count);
 
-  return (GBytes *)bytes;
+  return (xbytes_t *)bytes;
 }
 
 /**
- * g_bytes_new_from_bytes:
- * @bytes: a #GBytes
+ * xbytes_new_from_bytes:
+ * @bytes: a #xbytes_t
  * @offset: offset which subsection starts at
  * @length: length of subsection
  *
- * Creates a #GBytes which is a subsection of another #GBytes. The @offset +
+ * Creates a #xbytes_t which is a subsection of another #xbytes_t. The @offset +
  * @length may not be longer than the size of @bytes.
  *
- * A reference to @bytes will be held by the newly created #GBytes until
+ * A reference to @bytes will be held by the newly created #xbytes_t until
  * the byte data is no longer needed.
  *
  * Since 2.56, if @offset is 0 and @length matches the size of @bytes, then
  * @bytes will be returned with the reference count incremented by 1. If @bytes
- * is a slice of another #GBytes, then the resulting #GBytes will reference
- * the same #GBytes instead of @bytes. This allows consumers to simplify the
- * usage of #GBytes when asynchronously writing to streams.
+ * is a slice of another #xbytes_t, then the resulting #xbytes_t will reference
+ * the same #xbytes_t instead of @bytes. This allows consumers to simplify the
+ * usage of #xbytes_t when asynchronously writing to streams.
  *
- * Returns: (transfer full): a new #GBytes
+ * Returns: (transfer full): a new #xbytes_t
  *
  * Since: 2.32
  */
-GBytes *
-g_bytes_new_from_bytes (GBytes  *bytes,
+xbytes_t *
+xbytes_new_from_bytes (xbytes_t  *bytes,
                         xsize_t    offset,
                         xsize_t    length)
 {
@@ -227,16 +227,16 @@ g_bytes_new_from_bytes (GBytes  *bytes,
   g_return_val_if_fail (offset <= bytes->size, NULL);
   g_return_val_if_fail (offset + length <= bytes->size, NULL);
 
-  /* Avoid an extra GBytes if all bytes were requested */
+  /* Avoid an extra xbytes_t if all bytes were requested */
   if (offset == 0 && length == bytes->size)
-    return g_bytes_ref (bytes);
+    return xbytes_ref (bytes);
 
   base = (xchar_t *)bytes->data + offset;
 
-  /* Avoid referencing intermediate GBytes. In practice, this should
+  /* Avoid referencing intermediate xbytes_t. In practice, this should
    * only loop once.
    */
-  while (bytes->free_func == (xpointer_t)g_bytes_unref)
+  while (bytes->free_func == (xpointer_t)xbytes_unref)
     bytes = bytes->user_data;
 
   g_return_val_if_fail (bytes != NULL, NULL);
@@ -244,30 +244,30 @@ g_bytes_new_from_bytes (GBytes  *bytes,
   g_return_val_if_fail (base <= (xchar_t *)bytes->data + bytes->size, NULL);
   g_return_val_if_fail (base + length <= (xchar_t *)bytes->data + bytes->size, NULL);
 
-  return g_bytes_new_with_free_func (base, length,
-                                     (GDestroyNotify)g_bytes_unref, g_bytes_ref (bytes));
+  return xbytes_new_with_free_func (base, length,
+                                     (xdestroy_notify_t)xbytes_unref, xbytes_ref (bytes));
 }
 
 /**
- * g_bytes_get_data:
- * @bytes: a #GBytes
+ * xbytes_get_data:
+ * @bytes: a #xbytes_t
  * @size: (out) (optional): location to return size of byte data
  *
- * Get the byte data in the #GBytes. This data should not be modified.
+ * Get the byte data in the #xbytes_t. This data should not be modified.
  *
- * This function will always return the same pointer for a given #GBytes.
+ * This function will always return the same pointer for a given #xbytes_t.
  *
- * %NULL may be returned if @size is 0. This is not guaranteed, as the #GBytes
+ * %NULL may be returned if @size is 0. This is not guaranteed, as the #xbytes_t
  * may represent an empty string with @data non-%NULL and @size as 0. %NULL will
  * not be returned if @size is non-zero.
  *
- * Returns: (transfer none) (array length=size) (element-type guint8) (nullable):
+ * Returns: (transfer none) (array length=size) (element-type xuint8_t) (nullable):
  *          a pointer to the byte data, or %NULL
  *
  * Since: 2.32
  */
-gconstpointer
-g_bytes_get_data (GBytes *bytes,
+xconstpointer
+xbytes_get_data (xbytes_t *bytes,
                   xsize_t *size)
 {
   g_return_val_if_fail (bytes != NULL, NULL);
@@ -277,19 +277,19 @@ g_bytes_get_data (GBytes *bytes,
 }
 
 /**
- * g_bytes_get_size:
- * @bytes: a #GBytes
+ * xbytes_get_size:
+ * @bytes: a #xbytes_t
  *
- * Get the size of the byte data in the #GBytes.
+ * Get the size of the byte data in the #xbytes_t.
  *
- * This function will always return the same value for a given #GBytes.
+ * This function will always return the same value for a given #xbytes_t.
  *
  * Returns: the size
  *
  * Since: 2.32
  */
 xsize_t
-g_bytes_get_size (GBytes *bytes)
+xbytes_get_size (xbytes_t *bytes)
 {
   g_return_val_if_fail (bytes != NULL, 0);
   return bytes->size;
@@ -297,17 +297,17 @@ g_bytes_get_size (GBytes *bytes)
 
 
 /**
- * g_bytes_ref:
- * @bytes: a #GBytes
+ * xbytes_ref:
+ * @bytes: a #xbytes_t
  *
  * Increase the reference count on @bytes.
  *
- * Returns: the #GBytes
+ * Returns: the #xbytes_t
  *
  * Since: 2.32
  */
-GBytes *
-g_bytes_ref (GBytes *bytes)
+xbytes_t *
+xbytes_ref (xbytes_t *bytes)
 {
   g_return_val_if_fail (bytes != NULL, NULL);
 
@@ -317,8 +317,8 @@ g_bytes_ref (GBytes *bytes)
 }
 
 /**
- * g_bytes_unref:
- * @bytes: (nullable): a #GBytes
+ * xbytes_unref:
+ * @bytes: (nullable): a #xbytes_t
  *
  * Releases a reference on @bytes.  This may result in the bytes being
  * freed. If @bytes is %NULL, it will return immediately.
@@ -326,7 +326,7 @@ g_bytes_ref (GBytes *bytes)
  * Since: 2.32
  */
 void
-g_bytes_unref (GBytes *bytes)
+xbytes_unref (xbytes_t *bytes)
 {
   if (bytes == NULL)
     return;
@@ -335,31 +335,31 @@ g_bytes_unref (GBytes *bytes)
     {
       if (bytes->free_func != NULL)
         bytes->free_func (bytes->user_data);
-      g_slice_free (GBytes, bytes);
+      g_slice_free (xbytes_t, bytes);
     }
 }
 
 /**
- * g_bytes_equal:
- * @bytes1: (type GLib.Bytes): a pointer to a #GBytes
- * @bytes2: (type GLib.Bytes): a pointer to a #GBytes to compare with @bytes1
+ * xbytes_equal:
+ * @bytes1: (type GLib.Bytes): a pointer to a #xbytes_t
+ * @bytes2: (type GLib.Bytes): a pointer to a #xbytes_t to compare with @bytes1
  *
- * Compares the two #GBytes values being pointed to and returns
+ * Compares the two #xbytes_t values being pointed to and returns
  * %TRUE if they are equal.
  *
- * This function can be passed to g_hash_table_new() as the @key_equal_func
- * parameter, when using non-%NULL #GBytes pointers as keys in a #GHashTable.
+ * This function can be passed to xhash_table_new() as the @key_equal_func
+ * parameter, when using non-%NULL #xbytes_t pointers as keys in a #xhashtable_t.
  *
  * Returns: %TRUE if the two keys match.
  *
  * Since: 2.32
  */
 xboolean_t
-g_bytes_equal (gconstpointer bytes1,
-               gconstpointer bytes2)
+xbytes_equal (xconstpointer bytes1,
+               xconstpointer bytes2)
 {
-  const GBytes *b1 = bytes1;
-  const GBytes *b2 = bytes2;
+  const xbytes_t *b1 = bytes1;
+  const xbytes_t *b2 = bytes2;
 
   g_return_val_if_fail (bytes1 != NULL, FALSE);
   g_return_val_if_fail (bytes2 != NULL, FALSE);
@@ -369,24 +369,24 @@ g_bytes_equal (gconstpointer bytes1,
 }
 
 /**
- * g_bytes_hash:
- * @bytes: (type GLib.Bytes): a pointer to a #GBytes key
+ * xbytes_hash:
+ * @bytes: (type GLib.Bytes): a pointer to a #xbytes_t key
  *
- * Creates an integer hash code for the byte data in the #GBytes.
+ * Creates an integer hash code for the byte data in the #xbytes_t.
  *
- * This function can be passed to g_hash_table_new() as the @key_hash_func
- * parameter, when using non-%NULL #GBytes pointers as keys in a #GHashTable.
+ * This function can be passed to xhash_table_new() as the @key_hash_func
+ * parameter, when using non-%NULL #xbytes_t pointers as keys in a #xhashtable_t.
  *
  * Returns: a hash value corresponding to the key.
  *
  * Since: 2.32
  */
 xuint_t
-g_bytes_hash (gconstpointer bytes)
+xbytes_hash (xconstpointer bytes)
 {
-  const GBytes *a = bytes;
+  const xbytes_t *a = bytes;
   const signed char *p, *e;
-  guint32 h = 5381;
+  xuint32_t h = 5381;
 
   g_return_val_if_fail (bytes != NULL, 0);
 
@@ -397,13 +397,13 @@ g_bytes_hash (gconstpointer bytes)
 }
 
 /**
- * g_bytes_compare:
- * @bytes1: (type GLib.Bytes): a pointer to a #GBytes
- * @bytes2: (type GLib.Bytes): a pointer to a #GBytes to compare with @bytes1
+ * xbytes_compare:
+ * @bytes1: (type GLib.Bytes): a pointer to a #xbytes_t
+ * @bytes2: (type GLib.Bytes): a pointer to a #xbytes_t to compare with @bytes1
  *
- * Compares the two #GBytes values.
+ * Compares the two #xbytes_t values.
  *
- * This function can be used to sort GBytes instances in lexicographical order.
+ * This function can be used to sort xbytes_t instances in lexicographical order.
  *
  * If @bytes1 and @bytes2 have different length but the shorter one is a
  * prefix of the longer one then the shorter one is considered to be less than
@@ -419,11 +419,11 @@ g_bytes_hash (gconstpointer bytes)
  * Since: 2.32
  */
 xint_t
-g_bytes_compare (gconstpointer bytes1,
-                 gconstpointer bytes2)
+xbytes_compare (xconstpointer bytes1,
+                 xconstpointer bytes2)
 {
-  const GBytes *b1 = bytes1;
-  const GBytes *b2 = bytes2;
+  const xbytes_t *b1 = bytes1;
+  const xbytes_t *b2 = bytes2;
   xint_t ret;
 
   g_return_val_if_fail (bytes1 != NULL, 0);
@@ -436,8 +436,8 @@ g_bytes_compare (gconstpointer bytes1,
 }
 
 static xpointer_t
-try_steal_and_unref (GBytes         *bytes,
-                     GDestroyNotify  free_func,
+try_steal_and_unref (xbytes_t         *bytes,
+                     xdestroy_notify_t  free_func,
                      xsize_t          *size)
 {
   xpointer_t result;
@@ -451,7 +451,7 @@ try_steal_and_unref (GBytes         *bytes,
     {
       *size = bytes->size;
       result = (xpointer_t)bytes->data;
-      g_slice_free (GBytes, bytes);
+      g_slice_free (xbytes_t, bytes);
       return result;
     }
 
@@ -460,26 +460,26 @@ try_steal_and_unref (GBytes         *bytes,
 
 
 /**
- * g_bytes_unref_to_data:
- * @bytes: (transfer full): a #GBytes
+ * xbytes_unref_to_data:
+ * @bytes: (transfer full): a #xbytes_t
  * @size: (out): location to place the length of the returned data
  *
  * Unreferences the bytes, and returns a pointer the same byte data
  * contents.
  *
  * As an optimization, the byte data is returned without copying if this was
- * the last reference to bytes and bytes was created with g_bytes_new(),
- * g_bytes_new_take() or g_byte_array_free_to_bytes(). In all other cases the
+ * the last reference to bytes and bytes was created with xbytes_new(),
+ * xbytes_new_take() or xbyte_array_free_to_bytes(). In all other cases the
  * data is copied.
  *
- * Returns: (transfer full) (array length=size) (element-type guint8)
+ * Returns: (transfer full) (array length=size) (element-type xuint8_t)
  *          (not nullable): a pointer to the same byte data, which should be
  *          freed with g_free()
  *
  * Since: 2.32
  */
 xpointer_t
-g_bytes_unref_to_data (GBytes *bytes,
+xbytes_unref_to_data (xbytes_t *bytes,
                        xsize_t  *size)
 {
   xpointer_t result;
@@ -489,7 +489,7 @@ g_bytes_unref_to_data (GBytes *bytes,
 
   /*
    * Optimal path: if this is was the last reference, then we can return
-   * the data from this GBytes without copying.
+   * the data from this xbytes_t without copying.
    */
 
   result = try_steal_and_unref (bytes, g_free, size);
@@ -501,47 +501,47 @@ g_bytes_unref_to_data (GBytes *bytes,
        */
       result = g_memdup2 (bytes->data, bytes->size);
       *size = bytes->size;
-      g_bytes_unref (bytes);
+      xbytes_unref (bytes);
     }
 
   return result;
 }
 
 /**
- * g_bytes_unref_to_array:
- * @bytes: (transfer full): a #GBytes
+ * xbytes_unref_to_array:
+ * @bytes: (transfer full): a #xbytes_t
  *
- * Unreferences the bytes, and returns a new mutable #GByteArray containing
+ * Unreferences the bytes, and returns a new mutable #xbyte_array_t containing
  * the same byte data.
  *
  * As an optimization, the byte data is transferred to the array without copying
  * if this was the last reference to bytes and bytes was created with
- * g_bytes_new(), g_bytes_new_take() or g_byte_array_free_to_bytes(). In all
+ * xbytes_new(), xbytes_new_take() or xbyte_array_free_to_bytes(). In all
  * other cases the data is copied.
  *
  * Do not use it if @bytes contains more than %G_MAXUINT
- * bytes. #GByteArray stores the length of its data in #xuint_t, which
+ * bytes. #xbyte_array_t stores the length of its data in #xuint_t, which
  * may be shorter than #xsize_t, that @bytes is using.
  *
- * Returns: (transfer full): a new mutable #GByteArray containing the same byte data
+ * Returns: (transfer full): a new mutable #xbyte_array_t containing the same byte data
  *
  * Since: 2.32
  */
-GByteArray *
-g_bytes_unref_to_array (GBytes *bytes)
+xbyte_array_t *
+xbytes_unref_to_array (xbytes_t *bytes)
 {
   xpointer_t data;
   xsize_t size;
 
   g_return_val_if_fail (bytes != NULL, NULL);
 
-  data = g_bytes_unref_to_data (bytes, &size);
-  return g_byte_array_new_take (data, size);
+  data = xbytes_unref_to_data (bytes, &size);
+  return xbyte_array_new_take (data, size);
 }
 
 /**
- * g_bytes_get_region:
- * @bytes: a #GBytes
+ * xbytes_get_region:
+ * @bytes: a #xbytes_t
  * @element_size: a non-zero element size
  * @offset: an offset to the start of the region within the @bytes
  * @n_elements: the number of elements in the region
@@ -571,8 +571,8 @@ g_bytes_unref_to_array (GBytes *bytes)
  *
  * Since: 2.70
  */
-gconstpointer
-g_bytes_get_region (GBytes *bytes,
+xconstpointer
+xbytes_get_region (xbytes_t *bytes,
                     xsize_t   element_size,
                     xsize_t   offset,
                     xsize_t   n_elements)

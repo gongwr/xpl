@@ -68,15 +68,15 @@ enum
 static void
 xsocket_input_stream_get_property (xobject_t    *object,
                                     xuint_t       prop_id,
-                                    GValue     *value,
-                                    GParamSpec *pspec)
+                                    xvalue_t     *value,
+                                    xparam_spec_t *pspec)
 {
   GSocketInputStream *stream = XSOCKET_INPUT_STREAM (object);
 
   switch (prop_id)
     {
       case PROP_SOCKET:
-        g_value_set_object (value, stream->priv->socket);
+        xvalue_set_object (value, stream->priv->socket);
         break;
 
       default:
@@ -87,15 +87,15 @@ xsocket_input_stream_get_property (xobject_t    *object,
 static void
 xsocket_input_stream_set_property (xobject_t      *object,
                                     xuint_t         prop_id,
-                                    const GValue *value,
-                                    GParamSpec   *pspec)
+                                    const xvalue_t *value,
+                                    xparam_spec_t   *pspec)
 {
   GSocketInputStream *stream = XSOCKET_INPUT_STREAM (object);
 
   switch (prop_id)
     {
       case PROP_SOCKET:
-        stream->priv->socket = g_value_dup_object (value);
+        stream->priv->socket = xvalue_dup_object (value);
         break;
 
       default:
@@ -109,12 +109,12 @@ xsocket_input_stream_finalize (xobject_t *object)
   GSocketInputStream *stream = XSOCKET_INPUT_STREAM (object);
 
   if (stream->priv->socket)
-    g_object_unref (stream->priv->socket);
+    xobject_unref (stream->priv->socket);
 
   G_OBJECT_CLASS (xsocket_input_stream_parent_class)->finalize (object);
 }
 
-static gssize
+static xssize_t
 xsocket_input_stream_read (xinput_stream_t  *stream,
                             void          *buffer,
                             xsize_t          count,
@@ -129,32 +129,32 @@ xsocket_input_stream_read (xinput_stream_t  *stream,
 }
 
 static xboolean_t
-xsocket_input_stream_pollable_is_readable (GPollableInputStream *pollable)
+xsocket_input_stream_pollable_is_readable (xpollable_input_stream_t *pollable)
 {
   GSocketInputStream *input_stream = XSOCKET_INPUT_STREAM (pollable);
 
   return xsocket_condition_check (input_stream->priv->socket, G_IO_IN);
 }
 
-static GSource *
-xsocket_input_stream_pollable_create_source (GPollableInputStream *pollable,
+static xsource_t *
+xsocket_input_stream_pollable_create_source (xpollable_input_stream_t *pollable,
 					      xcancellable_t         *cancellable)
 {
   GSocketInputStream *input_stream = XSOCKET_INPUT_STREAM (pollable);
-  GSource *socket_source, *pollable_source;
+  xsource_t *socket_source, *pollable_source;
 
   pollable_source = g_pollable_source_new (G_OBJECT (input_stream));
   socket_source = xsocket_create_source (input_stream->priv->socket,
 					  G_IO_IN, cancellable);
-  g_source_set_dummy_callback (socket_source);
-  g_source_add_child_source (pollable_source, socket_source);
-  g_source_unref (socket_source);
+  xsource_set_dummy_callback (socket_source);
+  xsource_add_child_source (pollable_source, socket_source);
+  xsource_unref (socket_source);
 
   return pollable_source;
 }
 
-static gssize
-xsocket_input_stream_pollable_read_nonblocking (GPollableInputStream  *pollable,
+static xssize_t
+xsocket_input_stream_pollable_read_nonblocking (xpollable_input_stream_t  *pollable,
 						 void                  *buffer,
 						 xsize_t                  size,
 						 xerror_t               **error)
@@ -168,7 +168,7 @@ xsocket_input_stream_pollable_read_nonblocking (GPollableInputStream  *pollable,
 
 #ifdef G_OS_UNIX
 static int
-xsocket_input_stream_get_fd (GFileDescriptorBased *fd_based)
+xsocket_input_stream_get_fd (xfile_descriptor_based_t *fd_based)
 {
   GSocketInputStream *input_stream = XSOCKET_INPUT_STREAM (fd_based);
 
@@ -188,7 +188,7 @@ xsocket_input_stream_class_init (GSocketInputStreamClass *klass)
 
   ginputstream_class->read_fn = xsocket_input_stream_read;
 
-  g_object_class_install_property (gobject_class, PROP_SOCKET,
+  xobject_class_install_property (gobject_class, PROP_SOCKET,
 				   g_param_spec_object ("socket",
 							P_("socket"),
 							P_("The socket that this stream wraps"),
@@ -221,5 +221,5 @@ xsocket_input_stream_init (GSocketInputStream *stream)
 GSocketInputStream *
 _xsocket_input_stream_new (xsocket_t *socket)
 {
-  return g_object_new (XTYPE_SOCKET_INPUT_STREAM, "socket", socket, NULL);
+  return xobject_new (XTYPE_SOCKET_INPUT_STREAM, "socket", socket, NULL);
 }

@@ -3,17 +3,17 @@
 /* --------------------------------- */
 /* test_object_constructor_singleton */
 
-typedef xobject_t MySingletonObject;
-typedef xobject_class_t MySingletonObjectClass;
+typedef xobject_t my_singleton_object_t;
+typedef xobject_class_t my_singleton_object_class_t;
 
 xtype_t my_singleton_object_get_type (void);
 
-G_DEFINE_TYPE (MySingletonObject, my_singleton_object, XTYPE_OBJECT)
+G_DEFINE_TYPE (my_singleton_object, my_singleton_object, XTYPE_OBJECT)
 
-static MySingletonObject *singleton;
+static my_singleton_object_t *singleton;
 
 static void
-my_singleton_object_init (MySingletonObject *obj)
+my_singleton_object_init (my_singleton_object_t *obj)
 {
 }
 
@@ -25,17 +25,17 @@ my_singleton_object_constructor (xtype_t                  type,
   xobject_t *object;
 
   if (singleton)
-    return g_object_ref (singleton);
+    return xobject_ref (singleton);
 
   object = G_OBJECT_CLASS (my_singleton_object_parent_class)->
     constructor (type, n_construct_properties, construct_params);
-  singleton = (MySingletonObject *)object;
+  singleton = (my_singleton_object_t *)object;
 
   return object;
 }
 
 static void
-my_singleton_object_finalize (MySingletonObject *obj)
+my_singleton_object_finalize (my_singleton_object_t *obj)
 {
   singleton = NULL;
 
@@ -43,7 +43,7 @@ my_singleton_object_finalize (MySingletonObject *obj)
 }
 
 static void
-my_singleton_object_class_init (MySingletonObjectClass *klass)
+my_singleton_object_class_init (my_singleton_object_class_t *klass)
 {
   xobject_class_t *object_class = G_OBJECT_CLASS (klass);
 
@@ -54,26 +54,26 @@ my_singleton_object_class_init (MySingletonObjectClass *klass)
 static void
 test_object_constructor_singleton (void)
 {
-  MySingletonObject *one, *two, *three;
+  my_singleton_object_t *one, *two, *three;
 
-  one = g_object_new (my_singleton_object_get_type (), NULL);
+  one = xobject_new (my_singleton_object_get_type (), NULL);
   g_assert_cmpint (G_OBJECT (one)->ref_count, ==, 1);
 
-  two = g_object_new (my_singleton_object_get_type (), NULL);
+  two = xobject_new (my_singleton_object_get_type (), NULL);
   g_assert (one == two);
   g_assert_cmpint (G_OBJECT (two)->ref_count, ==, 2);
 
-  three = g_object_new (my_singleton_object_get_type (), NULL);
+  three = xobject_new (my_singleton_object_get_type (), NULL);
   g_assert (one == three);
   g_assert_cmpint (G_OBJECT (three)->ref_count, ==, 3);
 
-  g_object_add_weak_pointer (G_OBJECT (one), (xpointer_t *)&one);
+  xobject_add_weak_pointer (G_OBJECT (one), (xpointer_t *)&one);
 
-  g_object_unref (one);
+  xobject_unref (one);
   g_assert (one != NULL);
 
-  g_object_unref (three);
-  g_object_unref (two);
+  xobject_unref (three);
+  xobject_unref (two);
 
   g_assert (one == NULL);
 }
@@ -81,15 +81,15 @@ test_object_constructor_singleton (void)
 /* ----------------------------------- */
 /* test_object_constructor_infanticide */
 
-typedef xobject_t MyInfanticideObject;
-typedef xobject_class_t MyInfanticideObjectClass;
+typedef xobject_t my_infanticide_object_t;
+typedef xobject_class_t my_infanticide_object_class_t;
 
 xtype_t my_infanticide_object_get_type (void);
 
-G_DEFINE_TYPE (MyInfanticideObject, my_infanticide_object, XTYPE_OBJECT)
+G_DEFINE_TYPE (my_infanticide_object, my_infanticide_object, XTYPE_OBJECT)
 
 static void
-my_infanticide_object_init (MyInfanticideObject *obj)
+my_infanticide_object_init (my_infanticide_object_t *obj)
 {
 }
 
@@ -103,13 +103,13 @@ my_infanticide_object_constructor (xtype_t                  type,
   object = G_OBJECT_CLASS (my_infanticide_object_parent_class)->
     constructor (type, n_construct_properties, construct_params);
 
-  g_object_unref (object);
+  xobject_unref (object);
 
   return NULL;
 }
 
 static void
-my_infanticide_object_class_init (MyInfanticideObjectClass *klass)
+my_infanticide_object_class_init (my_infanticide_object_class_t *klass)
 {
   xobject_class_t *object_class = G_OBJECT_CLASS (klass);
 
@@ -130,7 +130,7 @@ test_object_constructor_infanticide (void)
                              "*finalized while still in-construction*");
       g_test_expect_message ("GLib-xobject_t", G_LOG_LEVEL_CRITICAL,
                              "*Custom constructor*returned NULL*");
-      obj = g_object_new (my_infanticide_object_get_type (), NULL);
+      obj = xobject_new (my_infanticide_object_get_type (), NULL);
       g_assert_null (obj);
       g_test_assert_expected_messages ();
     }

@@ -33,28 +33,28 @@ static xboolean_t no_moves;
 static xboolean_t mounts;
 
 static const GOptionEntry entries[] = {
-  { "dir", 'd', 0, G_OPTION_ARG_FILENAME_ARRAY, &watch_dirs,
+  { "dir", 'd', 0, G_OPTION_ARXFILENAME_ARRAY, &watch_dirs,
       N_("Monitor a directory (default: depends on type)"), N_("LOCATION") },
-  { "file", 'f', 0, G_OPTION_ARG_FILENAME_ARRAY, &watch_files,
+  { "file", 'f', 0, G_OPTION_ARXFILENAME_ARRAY, &watch_files,
       N_("Monitor a file (default: depends on type)"), N_("LOCATION") },
-  { "direct", 'D', 0, G_OPTION_ARG_FILENAME_ARRAY, &watch_direct,
+  { "direct", 'D', 0, G_OPTION_ARXFILENAME_ARRAY, &watch_direct,
       N_("Monitor a file directly (notices changes made via hardlinks)"), N_("LOCATION") },
-  { "silent", 's', 0, G_OPTION_ARG_FILENAME_ARRAY, &watch_silent,
+  { "silent", 's', 0, G_OPTION_ARXFILENAME_ARRAY, &watch_silent,
       N_("Monitors a file directly, but doesn’t report changes"), N_("LOCATION") },
   { "no-moves", 'n', 0, G_OPTION_ARG_NONE, &no_moves,
       N_("Report moves and renames as simple deleted/created events"), NULL },
   { "mounts", 'm', 0, G_OPTION_ARG_NONE, &mounts,
       N_("Watch for mount events"), NULL },
-  { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &watch_default,
+  { G_OPTION_REMAINING, 0, 0, G_OPTION_ARXFILENAME_ARRAY, &watch_default,
       NULL, NULL },
   G_OPTION_ENTRY_NULL
 };
 
 static void
-watch_callback (GFileMonitor      *monitor,
+watch_callback (xfile_monitor_t      *monitor,
                 xfile_t             *child,
                 xfile_t             *other,
-                GFileMonitorEvent  event_type,
+                xfile_monitor_event_t  event_type,
                 xpointer_t           user_data)
 {
   xchar_t *child_str;
@@ -62,68 +62,68 @@ watch_callback (GFileMonitor      *monitor,
 
   g_assert (child);
 
-  if (g_file_is_native (child))
-    child_str = g_file_get_path (child);
+  if (xfile_is_native (child))
+    child_str = xfile_get_path (child);
   else
-    child_str = g_file_get_uri (child);
+    child_str = xfile_get_uri (child);
 
   if (other)
     {
-      if (g_file_is_native (other))
-        other_str = g_file_get_path (other);
+      if (xfile_is_native (other))
+        other_str = xfile_get_path (other);
       else
-        other_str = g_file_get_uri (other);
+        other_str = xfile_get_uri (other);
     }
   else
-    other_str = g_strdup ("(none)");
+    other_str = xstrdup ("(none)");
 
   g_print ("%s: ", (xchar_t *) user_data);
   switch (event_type)
     {
-    case G_FILE_MONITOR_EVENT_CHANGED:
+    case XFILE_MONITOR_EVENT_CHANGED:
       g_assert (!other);
       g_print ("%s: changed", child_str);
       break;
-    case G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
+    case XFILE_MONITOR_EVENT_CHANGES_DONE_HINT:
       g_assert (!other);
       g_print ("%s: changes done", child_str);
       break;
-    case G_FILE_MONITOR_EVENT_DELETED:
+    case XFILE_MONITOR_EVENT_DELETED:
       g_assert (!other);
       g_print ("%s: deleted", child_str);
       break;
-    case G_FILE_MONITOR_EVENT_CREATED:
+    case XFILE_MONITOR_EVENT_CREATED:
       g_assert (!other);
       g_print ("%s: created", child_str);
       break;
-    case G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
+    case XFILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
       g_assert (!other);
       g_print ("%s: attributes changed", child_str);
       break;
-    case G_FILE_MONITOR_EVENT_PRE_UNMOUNT:
+    case XFILE_MONITOR_EVENT_PRE_UNMOUNT:
       g_assert (!other);
       g_print ("%s: pre-unmount", child_str);
       break;
-    case G_FILE_MONITOR_EVENT_UNMOUNTED:
+    case XFILE_MONITOR_EVENT_UNMOUNTED:
       g_assert (!other);
       g_print ("%s: unmounted", child_str);
       break;
-    case G_FILE_MONITOR_EVENT_MOVED_IN:
+    case XFILE_MONITOR_EVENT_MOVED_IN:
       g_print ("%s: moved in", child_str);
       if (other)
         g_print (" (from %s)", other_str);
       break;
-    case G_FILE_MONITOR_EVENT_MOVED_OUT:
+    case XFILE_MONITOR_EVENT_MOVED_OUT:
       g_print ("%s: moved out", child_str);
       if (other)
         g_print (" (to %s)", other_str);
       break;
-    case G_FILE_MONITOR_EVENT_RENAMED:
+    case XFILE_MONITOR_EVENT_RENAMED:
       g_assert (other);
       g_print ("%s: renamed to %s\n", child_str, other_str);
       break;
 
-    case G_FILE_MONITOR_EVENT_MOVED:
+    case XFILE_MONITOR_EVENT_MOVED:
     default:
       g_assert_not_reached ();
     }
@@ -143,48 +143,48 @@ typedef enum
 static xboolean_t
 add_watch (const xchar_t       *cmdline,
            WatchType          watch_type,
-           GFileMonitorFlags  flags,
+           xfile_monitor_flags_t  flags,
            xboolean_t           connect_handler)
 {
-  GFileMonitor *monitor = NULL;
+  xfile_monitor_t *monitor = NULL;
   xerror_t *error = NULL;
   xfile_t *file;
 
-  file = g_file_new_for_commandline_arg (cmdline);
+  file = xfile_new_for_commandline_arg (cmdline);
 
   if (watch_type == WATCH_AUTO)
     {
-      GFileInfo *info;
-      guint32 type;
+      xfile_info_t *info;
+      xuint32_t type;
 
-      info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_TYPE, G_FILE_QUERY_INFO_NONE, NULL, &error);
+      info = xfile_query_info (file, XFILE_ATTRIBUTE_STANDARD_TYPE, XFILE_QUERY_INFO_NONE, NULL, &error);
       if (!info)
         goto err;
 
-      type = g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_STANDARD_TYPE);
-      watch_type = (type == G_FILE_TYPE_DIRECTORY) ? WATCH_DIR : WATCH_FILE;
+      type = xfile_info_get_attribute_uint32 (info, XFILE_ATTRIBUTE_STANDARD_TYPE);
+      watch_type = (type == XFILE_TYPE_DIRECTORY) ? WATCH_DIR : WATCH_FILE;
     }
 
   if (watch_type == WATCH_DIR)
-    monitor = g_file_monitor_directory (file, flags, NULL, &error);
+    monitor = xfile_monitor_directory (file, flags, NULL, &error);
   else
-    monitor = g_file_monitor (file, flags, NULL, &error);
+    monitor = xfile_monitor (file, flags, NULL, &error);
 
   if (!monitor)
     goto err;
 
   if (connect_handler)
-    g_signal_connect (monitor, "changed", G_CALLBACK (watch_callback), g_strdup (cmdline));
+    g_signal_connect (monitor, "changed", G_CALLBACK (watch_callback), xstrdup (cmdline));
 
   monitor = NULL; /* leak */
-  g_object_unref (file);
+  xobject_unref (file);
 
   return TRUE;
 
 err:
   print_file_error (file, error->message);
-  g_error_free (error);
-  g_object_unref (file);
+  xerror_free (error);
+  xobject_unref (file);
 
   return FALSE;
 }
@@ -192,16 +192,16 @@ err:
 int
 handle_monitor (int argc, xchar_t *argv[], xboolean_t do_help)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xchar_t *param;
   xerror_t *error = NULL;
-  GFileMonitorFlags flags;
+  xfile_monitor_flags_t flags;
   xuint_t i;
 
   g_set_prgname ("gio monitor");
 
   /* Translators: commandline placeholder */
-  param = g_strdup_printf ("%s…", _("LOCATION"));
+  param = xstrdup_printf ("%s…", _("LOCATION"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -219,7 +219,7 @@ handle_monitor (int argc, xchar_t *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      g_error_free (error);
+      xerror_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -233,8 +233,8 @@ handle_monitor (int argc, xchar_t *argv[], xboolean_t do_help)
 
   g_option_context_free (context);
 
-  flags = (no_moves ? 0 : G_FILE_MONITOR_WATCH_MOVES) |
-          (mounts ? G_FILE_MONITOR_WATCH_MOUNTS : 0);
+  flags = (no_moves ? 0 : XFILE_MONITOR_WATCH_MOVES) |
+          (mounts ? XFILE_MONITOR_WATCH_MOUNTS : 0);
 
   if (watch_dirs)
     {
@@ -253,14 +253,14 @@ handle_monitor (int argc, xchar_t *argv[], xboolean_t do_help)
   if (watch_direct)
     {
       for (i = 0; watch_direct[i]; i++)
-        if (!add_watch (watch_direct[i], WATCH_FILE, flags | G_FILE_MONITOR_WATCH_HARD_LINKS, TRUE))
+        if (!add_watch (watch_direct[i], WATCH_FILE, flags | XFILE_MONITOR_WATCH_HARD_LINKS, TRUE))
           return 1;
     }
 
   if (watch_silent)
     {
       for (i = 0; watch_silent[i]; i++)
-        if (!add_watch (watch_silent[i], WATCH_FILE, flags | G_FILE_MONITOR_WATCH_HARD_LINKS, FALSE))
+        if (!add_watch (watch_silent[i], WATCH_FILE, flags | XFILE_MONITOR_WATCH_HARD_LINKS, FALSE))
           return 1;
     }
 
@@ -272,7 +272,7 @@ handle_monitor (int argc, xchar_t *argv[], xboolean_t do_help)
     }
 
   while (TRUE)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   return 0;
 }

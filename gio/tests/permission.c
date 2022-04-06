@@ -1,4 +1,4 @@
-/* Unit tests for GPermission
+/* Unit tests for xpermission_t
  * Copyright (C) 2012 Red Hat, Inc
  * Author: Matthias Clasen
  *
@@ -27,8 +27,8 @@ acquired (xobject_t      *source,
           xasync_result_t *res,
           xpointer_t      user_data)
 {
-  GPermission *p = G_PERMISSION (source);
-  GMainLoop *loop = user_data;
+  xpermission_t *p = G_PERMISSION (source);
+  xmain_loop_t *loop = user_data;
   xerror_t *error = NULL;
   xboolean_t ret;
 
@@ -37,7 +37,7 @@ acquired (xobject_t      *source,
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED);
   g_clear_error (&error);
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
@@ -45,8 +45,8 @@ released (xobject_t      *source,
           xasync_result_t *res,
           xpointer_t      user_data)
 {
-  GPermission *p = G_PERMISSION (source);
-  GMainLoop *loop = user_data;
+  xpermission_t *p = G_PERMISSION (source);
+  xmain_loop_t *loop = user_data;
   xerror_t *error = NULL;
   xboolean_t ret;
 
@@ -55,19 +55,19 @@ released (xobject_t      *source,
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED);
   g_clear_error (&error);
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
 test_simple (void)
 {
-  GPermission *p;
+  xpermission_t *p;
   xboolean_t allowed;
   xboolean_t can_acquire;
   xboolean_t can_release;
   xboolean_t ret;
   xerror_t *error = NULL;
-  GMainLoop *loop;
+  xmain_loop_t *loop;
 
   p = g_simple_permission_new (TRUE);
 
@@ -75,7 +75,7 @@ test_simple (void)
   g_assert (!g_permission_get_can_acquire (p));
   g_assert (!g_permission_get_can_release (p));
 
-  g_object_get (p,
+  xobject_get (p,
                 "allowed", &allowed,
                 "can-acquire", &can_acquire,
                 "can-release", &can_release,
@@ -95,15 +95,15 @@ test_simple (void)
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED);
   g_clear_error (&error);
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
   g_permission_acquire_async (p, NULL, acquired, loop);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
   g_permission_release_async (p, NULL, released, loop);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
-  g_main_loop_unref (loop);
+  xmain_loop_unref (loop);
 
-  g_object_unref (p);
+  xobject_unref (p);
 }
 
 int

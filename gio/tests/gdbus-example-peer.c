@@ -8,7 +8,7 @@ UNIX domain socket transport:
    $ ./gdbus-example-peer --server --address unix:abstract=myaddr
    Server is listening at: unix:abstract=myaddr
    Client connected.
-   Peer credentials: GCredentials:unix-user=500,unix-group=500,unix-process=13378
+   Peer credentials: xcredentials_t:unix-user=500,unix-group=500,unix-process=13378
    Negotiated capabilities: unix-fd-passing=1
    Client said: Hey, it's 1273093080 already!
 
@@ -73,7 +73,7 @@ TCP transport on two different hosts without authentication:
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static GDBusNodeInfo *introspection_data = NULL;
+static xdbus_node_info_t *introspection_data = NULL;
 
 /* Introspection data for the service we are exporting */
 static const xchar_t introspection_xml[] =
@@ -89,30 +89,30 @@ static const xchar_t introspection_xml[] =
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-handle_method_call (GDBusConnection       *connection,
+handle_method_call (xdbus_connection_t       *connection,
                     const xchar_t           *sender,
                     const xchar_t           *object_path,
                     const xchar_t           *interface_name,
                     const xchar_t           *method_name,
                     xvariant_t              *parameters,
-                    GDBusMethodInvocation *invocation,
+                    xdbus_method_invocation_t *invocation,
                     xpointer_t               user_data)
 {
-  if (g_strcmp0 (method_name, "HelloWorld") == 0)
+  if (xstrcmp0 (method_name, "HelloWorld") == 0)
     {
       const xchar_t *greeting;
       xchar_t *response;
 
-      g_variant_get (parameters, "(&s)", &greeting);
-      response = g_strdup_printf ("You said '%s'. KTHXBYE!", greeting);
-      g_dbus_method_invocation_return_value (invocation,
-                                             g_variant_new ("(s)", response));
+      xvariant_get (parameters, "(&s)", &greeting);
+      response = xstrdup_printf ("You said '%s'. KTHXBYE!", greeting);
+      xdbus_method_invocation_return_value (invocation,
+                                             xvariant_new ("(s)", response));
       g_free (response);
       g_print ("Client said: %s\n", greeting);
     }
 }
 
-static const GDBusInterfaceVTable interface_vtable =
+static const xdbus_interface_vtable_t interface_vtable =
 {
   handle_method_call,
   NULL,
@@ -123,29 +123,29 @@ static const GDBusInterfaceVTable interface_vtable =
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-connection_closed (GDBusConnection *connection,
+connection_closed (xdbus_connection_t *connection,
                    xboolean_t remote_peer_vanished,
                    xerror_t *Error,
                    xpointer_t user_data)
 {
   g_print ("Client disconnected.\n");
-  g_object_unref (connection);
+  xobject_unref (connection);
 }
 
 static xboolean_t
-on_new_connection (GDBusServer *server,
-                   GDBusConnection *connection,
+on_new_connection (xdbus_server_t *server,
+                   xdbus_connection_t *connection,
                    xpointer_t user_data)
 {
   xuint_t registration_id;
-  GCredentials *credentials;
+  xcredentials_t *credentials;
   xchar_t *s;
 
   credentials = g_dbus_connection_get_peer_credentials (connection);
   if (credentials == NULL)
-    s = g_strdup ("(no credentials received)");
+    s = xstrdup ("(no credentials received)");
   else
-    s = g_credentials_to_string (credentials);
+    s = xcredentials_to_string (credentials);
 
 
   g_print ("Client connected.\n"
@@ -154,10 +154,10 @@ on_new_connection (GDBusServer *server,
            s,
            g_dbus_connection_get_capabilities (connection) & G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING);
 
-  g_object_ref (connection);
+  xobject_ref (connection);
   g_signal_connect (connection, "closed", G_CALLBACK (connection_closed), NULL);
   registration_id = g_dbus_connection_register_object (connection,
-                                                       "/org/gtk/GDBus/TestObject",
+                                                       "/org/gtk/GDBus/test_object_t",
                                                        introspection_data->interfaces[0],
                                                        &interface_vtable,
                                                        NULL,  /* user_data */
@@ -171,17 +171,17 @@ on_new_connection (GDBusServer *server,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static xboolean_t
-allow_mechanism_cb (GDBusAuthObserver *observer,
+allow_mechanism_cb (xdbus_auth_observer_t *observer,
                     const xchar_t *mechanism,
                     G_GNUC_UNUSED xpointer_t user_data)
 {
   /*
-   * In a production GDBusServer that only needs to work on modern Unix
+   * In a production xdbus_server_t that only needs to work on modern Unix
    * platforms, consider requiring EXTERNAL (credentials-passing),
    * which is the recommended authentication mechanism for AF_UNIX
    * sockets:
    *
-   * if (g_strcmp0 (mechanism, "EXTERNAL") == 0)
+   * if (xstrcmp0 (mechanism, "EXTERNAL") == 0)
    *   return TRUE;
    *
    * return FALSE;
@@ -194,9 +194,9 @@ allow_mechanism_cb (GDBusAuthObserver *observer,
 }
 
 static xboolean_t
-authorize_authenticated_peer_cb (GDBusAuthObserver *observer,
+authorize_authenticated_peer_cb (xdbus_auth_observer_t *observer,
                                  G_GNUC_UNUSED xio_stream_t *stream,
-                                 GCredentials *credentials,
+                                 xcredentials_t *credentials,
                                  G_GNUC_UNUSED xpointer_t user_data)
 {
   xboolean_t authorized = FALSE;
@@ -205,23 +205,23 @@ authorize_authenticated_peer_cb (GDBusAuthObserver *observer,
 
   if (credentials != NULL)
     {
-      GCredentials *own_credentials;
+      xcredentials_t *own_credentials;
       xchar_t *credentials_string = NULL;
 
-      credentials_string = g_credentials_to_string (credentials);
+      credentials_string = xcredentials_to_string (credentials);
       g_print ("Peer's credentials: %s\n", credentials_string);
       g_free (credentials_string);
 
-      own_credentials = g_credentials_new ();
+      own_credentials = xcredentials_new ();
 
-      credentials_string = g_credentials_to_string (own_credentials);
+      credentials_string = xcredentials_to_string (own_credentials);
       g_print ("Server's credentials: %s\n", credentials_string);
       g_free (credentials_string);
 
-      if (g_credentials_is_same_user (credentials, own_credentials, NULL))
+      if (xcredentials_is_same_user (credentials, own_credentials, NULL))
         authorized = TRUE;
 
-      g_object_unref (own_credentials);
+      xobject_unref (own_credentials);
     }
 
   if (!authorized)
@@ -244,7 +244,7 @@ main (int argc, char *argv[])
   xint_t ret;
   xboolean_t opt_server;
   xchar_t *opt_address;
-  GOptionContext *opt_context;
+  xoption_context_t *opt_context;
   xboolean_t opt_allow_anonymous;
   xerror_t *error;
   GOptionEntry opt_entries[] =
@@ -267,7 +267,7 @@ main (int argc, char *argv[])
   if (!g_option_context_parse (opt_context, &argc, &argv, &error))
     {
       g_printerr ("Error parsing options: %s\n", error->message);
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
   if (opt_address == NULL)
@@ -290,10 +290,10 @@ main (int argc, char *argv[])
 
   if (opt_server)
     {
-      GDBusAuthObserver *observer;
-      GDBusServer *server;
+      xdbus_auth_observer_t *observer;
+      xdbus_server_t *server;
       xchar_t *guid;
-      GMainLoop *loop;
+      xmain_loop_t *loop;
       GDBusServerFlags server_flags;
 
       guid = g_dbus_generate_guid ();
@@ -302,7 +302,7 @@ main (int argc, char *argv[])
       if (opt_allow_anonymous)
         server_flags |= G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS;
 
-      observer = g_dbus_auth_observer_new ();
+      observer = xdbus_auth_observer_new ();
       g_signal_connect (observer, "allow-mechanism", G_CALLBACK (allow_mechanism_cb), NULL);
       g_signal_connect (observer, "authorize-authenticated-peer", G_CALLBACK (authorize_authenticated_peer_cb), NULL);
 
@@ -315,13 +315,13 @@ main (int argc, char *argv[])
                                        &error);
       g_dbus_server_start (server);
 
-      g_object_unref (observer);
+      xobject_unref (observer);
       g_free (guid);
 
       if (server == NULL)
         {
           g_printerr ("Error creating server at address %s: %s\n", opt_address, error->message);
-          g_error_free (error);
+          xerror_free (error);
           goto out;
         }
       g_print ("Server is listening at: %s\n", g_dbus_server_get_client_address (server));
@@ -330,15 +330,15 @@ main (int argc, char *argv[])
                         G_CALLBACK (on_new_connection),
                         NULL);
 
-      loop = g_main_loop_new (NULL, FALSE);
-      g_main_loop_run (loop);
+      loop = xmain_loop_new (NULL, FALSE);
+      xmain_loop_run (loop);
 
-      g_object_unref (server);
-      g_main_loop_unref (loop);
+      xobject_unref (server);
+      xmain_loop_unref (loop);
     }
   else
     {
-      GDBusConnection *connection;
+      xdbus_connection_t *connection;
       const xchar_t *greeting_response;
       xvariant_t *value;
       xchar_t *greeting;
@@ -346,13 +346,13 @@ main (int argc, char *argv[])
       error = NULL;
       connection = g_dbus_connection_new_for_address_sync (opt_address,
                                                            G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
-                                                           NULL, /* GDBusAuthObserver */
+                                                           NULL, /* xdbus_auth_observer_t */
                                                            NULL, /* xcancellable_t */
                                                            &error);
       if (connection == NULL)
         {
           g_printerr ("Error connecting to D-Bus address %s: %s\n", opt_address, error->message);
-          g_error_free (error);
+          xerror_free (error);
           goto out;
         }
 
@@ -360,14 +360,14 @@ main (int argc, char *argv[])
                "Negotiated capabilities: unix-fd-passing=%d\n",
                g_dbus_connection_get_capabilities (connection) & G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING);
 
-      greeting = g_strdup_printf ("Hey, it's %" G_GINT64_FORMAT " already!",
+      greeting = xstrdup_printf ("Hey, it's %" G_GINT64_FORMAT " already!",
                                   g_get_real_time () / G_USEC_PER_SEC);
       value = g_dbus_connection_call_sync (connection,
                                            NULL, /* bus_name */
-                                           "/org/gtk/GDBus/TestObject",
+                                           "/org/gtk/GDBus/test_object_t",
                                            "org.gtk.GDBus.TestPeerInterface",
                                            "HelloWorld",
-                                           g_variant_new ("(s)", greeting),
+                                           xvariant_new ("(s)", greeting),
                                            G_VARIANT_TYPE ("(s)"),
                                            G_DBUS_CALL_FLAGS_NONE,
                                            -1,
@@ -376,14 +376,14 @@ main (int argc, char *argv[])
       if (value == NULL)
         {
           g_printerr ("Error invoking HelloWorld(): %s\n", error->message);
-          g_error_free (error);
+          xerror_free (error);
           goto out;
         }
-      g_variant_get (value, "(&s)", &greeting_response);
+      xvariant_get (value, "(&s)", &greeting_response);
       g_print ("Server said: %s\n", greeting_response);
-      g_variant_unref (value);
+      xvariant_unref (value);
 
-      g_object_unref (connection);
+      xobject_unref (connection);
     }
   g_dbus_node_info_unref (introspection_data);
 

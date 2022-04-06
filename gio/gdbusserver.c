@@ -67,7 +67,7 @@
  * @short_description: Helper for accepting connections
  * @include: gio/gio.h
  *
- * #GDBusServer is a helper for listening to and accepting D-Bus
+ * #xdbus_server_t is a helper for listening to and accepting D-Bus
  * connections. This can be used to create a new D-Bus server, allowing two
  * peers to use the D-Bus protocol for their own specialized communication.
  * A server instance provided in this way will not perform message routing or
@@ -79,18 +79,18 @@
  * An example of peer-to-peer communication with GDBus can be found
  * in [gdbus-example-peer.c](https://gitlab.gnome.org/GNOME/glib/-/blob/HEAD/gio/tests/gdbus-example-peer.c).
  *
- * Note that a minimal #GDBusServer will accept connections from any
- * peer. In many use-cases it will be necessary to add a #GDBusAuthObserver
+ * Note that a minimal #xdbus_server_t will accept connections from any
+ * peer. In many use-cases it will be necessary to add a #xdbus_auth_observer_t
  * that only accepts connections that have successfully authenticated
- * as the same user that is running the #GDBusServer. Since GLib 2.68 this can
+ * as the same user that is running the #xdbus_server_t. Since GLib 2.68 this can
  * be achieved more simply by passing the
  * %G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER flag to the server.
  */
 
 /**
- * GDBusServer:
+ * xdbus_server_t:
  *
- * The #GDBusServer structure contains only private data and
+ * The #xdbus_server_t structure contains only private data and
  * should only be accessed using the provided API.
  *
  * Since: 2.26
@@ -110,28 +110,28 @@ struct _GDBusServer
   xchar_t *client_address;
 
   xchar_t *unix_socket_path;
-  GSocketListener *listener;
+  xsocket_listener_t *listener;
   xboolean_t is_using_listener;
   gulong run_signal_handler_id;
 
-  /* The result of g_main_context_ref_thread_default() when the object
+  /* The result of xmain_context_ref_thread_default() when the object
    * was created (the xobject_t _init() function) - this is used for delivery
    * of the :new-connection xobject_t signal.
    */
-  GMainContext *main_context_at_construction;
+  xmain_context_t *main_context_at_construction;
 
   xboolean_t active;
 
-  GDBusAuthObserver *authentication_observer;
+  xdbus_auth_observer_t *authentication_observer;
 };
 
 typedef struct _GDBusServerClass GDBusServerClass;
 
 /**
  * GDBusServerClass:
- * @new_connection: Signal class handler for the #GDBusServer::new-connection signal.
+ * @new_connection: Signal class handler for the #xdbus_server_t::new-connection signal.
  *
- * Class structure for #GDBusServer.
+ * Class structure for #xdbus_server_t.
  *
  * Since: 2.26
  */
@@ -142,8 +142,8 @@ struct _GDBusServerClass
 
   /*< public >*/
   /* Signals */
-  xboolean_t (*new_connection) (GDBusServer      *server,
-                              GDBusConnection  *connection);
+  xboolean_t (*new_connection) (xdbus_server_t      *server,
+                              xdbus_connection_t  *connection);
 };
 
 enum
@@ -165,15 +165,15 @@ enum
 
 static xuint_t _signals[LAST_SIGNAL] = {0};
 
-static void initable_iface_init       (GInitableIface *initable_iface);
+static void initable_iface_init       (xinitable_iface_t *initable_iface);
 
-G_DEFINE_TYPE_WITH_CODE (GDBusServer, g_dbus_server, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (xdbus_server, g_dbus_server, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (XTYPE_INITABLE, initable_iface_init))
 
 static void
 g_dbus_server_dispose (xobject_t *object)
 {
-  GDBusServer *server = G_DBUS_SERVER (object);
+  xdbus_server_t *server = G_DBUS_SERVER (object);
 
   if (server->active)
     g_dbus_server_stop (server);
@@ -184,18 +184,18 @@ g_dbus_server_dispose (xobject_t *object)
 static void
 g_dbus_server_finalize (xobject_t *object)
 {
-  GDBusServer *server = G_DBUS_SERVER (object);
+  xdbus_server_t *server = G_DBUS_SERVER (object);
 
   g_assert (!server->active);
 
   if (server->authentication_observer != NULL)
-    g_object_unref (server->authentication_observer);
+    xobject_unref (server->authentication_observer);
 
   if (server->run_signal_handler_id > 0)
     g_signal_handler_disconnect (server->listener, server->run_signal_handler_id);
 
   if (server->listener != NULL)
-    g_object_unref (server->listener);
+    xobject_unref (server->listener);
 
   g_free (server->address);
   g_free (server->guid);
@@ -209,7 +209,7 @@ g_dbus_server_finalize (xobject_t *object)
   g_free (server->unix_socket_path);
   g_free (server->nonce_file);
 
-  g_main_context_unref (server->main_context_at_construction);
+  xmain_context_unref (server->main_context_at_construction);
 
   G_OBJECT_CLASS (g_dbus_server_parent_class)->finalize (object);
 }
@@ -217,35 +217,35 @@ g_dbus_server_finalize (xobject_t *object)
 static void
 g_dbus_server_get_property (xobject_t    *object,
                             xuint_t       prop_id,
-                            GValue     *value,
-                            GParamSpec *pspec)
+                            xvalue_t     *value,
+                            xparam_spec_t *pspec)
 {
-  GDBusServer *server = G_DBUS_SERVER (object);
+  xdbus_server_t *server = G_DBUS_SERVER (object);
 
   switch (prop_id)
     {
     case PROP_FLAGS:
-      g_value_set_flags (value, server->flags);
+      xvalue_set_flags (value, server->flags);
       break;
 
     case PROP_GUID:
-      g_value_set_string (value, server->guid);
+      xvalue_set_string (value, server->guid);
       break;
 
     case PROP_ADDRESS:
-      g_value_set_string (value, server->address);
+      xvalue_set_string (value, server->address);
       break;
 
     case PROP_CLIENT_ADDRESS:
-      g_value_set_string (value, server->client_address);
+      xvalue_set_string (value, server->client_address);
       break;
 
     case PROP_ACTIVE:
-      g_value_set_boolean (value, server->active);
+      xvalue_set_boolean (value, server->active);
       break;
 
     case PROP_AUTHENTICATION_OBSERVER:
-      g_value_set_object (value, server->authentication_observer);
+      xvalue_set_object (value, server->authentication_observer);
       break;
 
     default:
@@ -257,27 +257,27 @@ g_dbus_server_get_property (xobject_t    *object,
 static void
 g_dbus_server_set_property (xobject_t      *object,
                             xuint_t         prop_id,
-                            const GValue *value,
-                            GParamSpec   *pspec)
+                            const xvalue_t *value,
+                            xparam_spec_t   *pspec)
 {
-  GDBusServer *server = G_DBUS_SERVER (object);
+  xdbus_server_t *server = G_DBUS_SERVER (object);
 
   switch (prop_id)
     {
     case PROP_FLAGS:
-      server->flags = g_value_get_flags (value);
+      server->flags = xvalue_get_flags (value);
       break;
 
     case PROP_GUID:
-      server->guid = g_value_dup_string (value);
+      server->guid = xvalue_dup_string (value);
       break;
 
     case PROP_ADDRESS:
-      server->address = g_value_dup_string (value);
+      server->address = xvalue_dup_string (value);
       break;
 
     case PROP_AUTHENTICATION_OBSERVER:
-      server->authentication_observer = g_value_dup_object (value);
+      server->authentication_observer = xvalue_dup_object (value);
       break;
 
     default:
@@ -297,13 +297,13 @@ g_dbus_server_class_init (GDBusServerClass *klass)
   gobject_class->get_property = g_dbus_server_get_property;
 
   /**
-   * GDBusServer:flags:
+   * xdbus_server_t:flags:
    *
    * Flags from the #GDBusServerFlags enumeration.
    *
    * Since: 2.26
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_FLAGS,
                                    g_param_spec_flags ("flags",
                                                        P_("Flags"),
@@ -318,15 +318,15 @@ g_dbus_server_class_init (GDBusServerClass *klass)
                                                        G_PARAM_STATIC_NICK));
 
   /**
-   * GDBusServer:guid:
+   * xdbus_server_t:guid:
    *
    * The GUID of the server.
    *
-   * See #GDBusConnection:guid for more details.
+   * See #xdbus_connection_t:guid for more details.
    *
    * Since: 2.26
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_GUID,
                                    g_param_spec_string ("guid",
                                                         P_("GUID"),
@@ -340,13 +340,13 @@ g_dbus_server_class_init (GDBusServerClass *klass)
                                                         G_PARAM_STATIC_NICK));
 
   /**
-   * GDBusServer:address:
+   * xdbus_server_t:address:
    *
    * The D-Bus address to listen on.
    *
    * Since: 2.26
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_ADDRESS,
                                    g_param_spec_string ("address",
                                                         P_("Address"),
@@ -360,13 +360,13 @@ g_dbus_server_class_init (GDBusServerClass *klass)
                                                         G_PARAM_STATIC_NICK));
 
   /**
-   * GDBusServer:client-address:
+   * xdbus_server_t:client-address:
    *
    * The D-Bus address that clients can use.
    *
    * Since: 2.26
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_CLIENT_ADDRESS,
                                    g_param_spec_string ("client-address",
                                                         P_("Client Address"),
@@ -378,13 +378,13 @@ g_dbus_server_class_init (GDBusServerClass *klass)
                                                         G_PARAM_STATIC_NICK));
 
   /**
-   * GDBusServer:active:
+   * xdbus_server_t:active:
    *
    * Whether the server is currently active.
    *
    * Since: 2.26
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_ACTIVE,
                                    g_param_spec_boolean ("active",
                                                          P_("Active"),
@@ -396,13 +396,13 @@ g_dbus_server_class_init (GDBusServerClass *klass)
                                                          G_PARAM_STATIC_NICK));
 
   /**
-   * GDBusServer:authentication-observer:
+   * xdbus_server_t:authentication-observer:
    *
-   * A #GDBusAuthObserver object to assist in the authentication process or %NULL.
+   * A #xdbus_auth_observer_t object to assist in the authentication process or %NULL.
    *
    * Since: 2.26
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_AUTHENTICATION_OBSERVER,
                                    g_param_spec_object ("authentication-observer",
                                                         P_("Authentication Observer"),
@@ -416,9 +416,9 @@ g_dbus_server_class_init (GDBusServerClass *klass)
                                                         G_PARAM_STATIC_NICK));
 
   /**
-   * GDBusServer::new-connection:
-   * @server: The #GDBusServer emitting the signal.
-   * @connection: A #GDBusConnection for the new connection.
+   * xdbus_server_t::new-connection:
+   * @server: The #xdbus_server_t emitting the signal.
+   * @connection: A #xdbus_connection_t for the new connection.
    *
    * Emitted when a new authenticated connection has been made. Use
    * g_dbus_connection_get_peer_credentials() to figure out what
@@ -429,9 +429,9 @@ g_dbus_server_class_init (GDBusServerClass *klass)
    * connection call g_dbus_connection_close() and give up your
    * reference. Note that the other peer may disconnect at any time -
    * a typical thing to do when accepting a connection is to listen to
-   * the #GDBusConnection::closed signal.
+   * the #xdbus_connection_t::closed signal.
    *
-   * If #GDBusServer:flags contains %G_DBUS_SERVER_FLAGS_RUN_IN_THREAD
+   * If #xdbus_server_t:flags contains %G_DBUS_SERVER_FLAGS_RUN_IN_THREAD
    * then the signal is emitted in a new thread dedicated to the
    * connection. Otherwise the signal is emitted in the
    * [thread-default main context][g-main-context-push-thread-default]
@@ -463,13 +463,13 @@ g_dbus_server_class_init (GDBusServerClass *klass)
 }
 
 static void
-g_dbus_server_init (GDBusServer *server)
+g_dbus_server_init (xdbus_server_t *server)
 {
-  server->main_context_at_construction = g_main_context_ref_thread_default ();
+  server->main_context_at_construction = xmain_context_ref_thread_default ();
 }
 
 static xboolean_t
-on_run (GSocketService    *service,
+on_run (xsocket_service_t    *service,
         xsocket_connection_t *socket_connection,
         xobject_t           *source_object,
         xpointer_t           user_data);
@@ -479,7 +479,7 @@ on_run (GSocketService    *service,
  * @address: A D-Bus address.
  * @flags: Flags from the #GDBusServerFlags enumeration.
  * @guid: A D-Bus GUID.
- * @observer: (nullable): A #GDBusAuthObserver or %NULL.
+ * @observer: (nullable): A #xdbus_auth_observer_t or %NULL.
  * @cancellable: (nullable): A #xcancellable_t or %NULL.
  * @error: Return location for server or %NULL.
  *
@@ -491,40 +491,40 @@ on_run (GSocketService    *service,
  *
  * To have control over the available authentication mechanisms and
  * the users that are authorized to connect, it is strongly recommended
- * to provide a non-%NULL #GDBusAuthObserver.
+ * to provide a non-%NULL #xdbus_auth_observer_t.
  *
- * Connect to the #GDBusServer::new-connection signal to handle
+ * Connect to the #xdbus_server_t::new-connection signal to handle
  * incoming connections.
  *
- * The returned #GDBusServer isn't active - you have to start it with
+ * The returned #xdbus_server_t isn't active - you have to start it with
  * g_dbus_server_start().
  *
- * #GDBusServer is used in this [example][gdbus-peer-to-peer].
+ * #xdbus_server_t is used in this [example][gdbus-peer-to-peer].
  *
  * This is a synchronous failable constructor. There is currently no
  * asynchronous version.
  *
- * Returns: A #GDBusServer or %NULL if @error is set. Free with
- * g_object_unref().
+ * Returns: A #xdbus_server_t or %NULL if @error is set. Free with
+ * xobject_unref().
  *
  * Since: 2.26
  */
-GDBusServer *
+xdbus_server_t *
 g_dbus_server_new_sync (const xchar_t        *address,
                         GDBusServerFlags    flags,
                         const xchar_t        *guid,
-                        GDBusAuthObserver  *observer,
+                        xdbus_auth_observer_t  *observer,
                         xcancellable_t       *cancellable,
                         xerror_t            **error)
 {
-  GDBusServer *server;
+  xdbus_server_t *server;
 
   g_return_val_if_fail (address != NULL, NULL);
   g_return_val_if_fail (g_dbus_is_guid (guid), NULL);
   g_return_val_if_fail ((flags & ~G_DBUS_SERVER_FLAGS_ALL) == 0, NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  server = g_initable_new (XTYPE_DBUS_SERVER,
+  server = xinitable_new (XTYPE_DBUS_SERVER,
                            cancellable,
                            error,
                            "address", address,
@@ -538,13 +538,13 @@ g_dbus_server_new_sync (const xchar_t        *address,
 
 /**
  * g_dbus_server_get_client_address:
- * @server: A #GDBusServer.
+ * @server: A #xdbus_server_t.
  *
  * Gets a
  * [D-Bus address](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses)
  * string that can be used by clients to connect to @server.
  *
- * This is valid and non-empty if initializing the #GDBusServer succeeded.
+ * This is valid and non-empty if initializing the #xdbus_server_t succeeded.
  *
  * Returns: (not nullable): A D-Bus address string. Do not free, the string is owned
  * by @server.
@@ -552,7 +552,7 @@ g_dbus_server_new_sync (const xchar_t        *address,
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_server_get_client_address (GDBusServer *server)
+g_dbus_server_get_client_address (xdbus_server_t *server)
 {
   g_return_val_if_fail (X_IS_DBUS_SERVER (server), NULL);
   return server->client_address;
@@ -560,7 +560,7 @@ g_dbus_server_get_client_address (GDBusServer *server)
 
 /**
  * g_dbus_server_get_guid:
- * @server: A #GDBusServer.
+ * @server: A #xdbus_server_t.
  *
  * Gets the GUID for @server, as provided to g_dbus_server_new_sync().
  *
@@ -569,7 +569,7 @@ g_dbus_server_get_client_address (GDBusServer *server)
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_server_get_guid (GDBusServer *server)
+g_dbus_server_get_guid (xdbus_server_t *server)
 {
   g_return_val_if_fail (X_IS_DBUS_SERVER (server), NULL);
   return server->guid;
@@ -577,7 +577,7 @@ g_dbus_server_get_guid (GDBusServer *server)
 
 /**
  * g_dbus_server_get_flags:
- * @server: A #GDBusServer.
+ * @server: A #xdbus_server_t.
  *
  * Gets the flags for @server.
  *
@@ -586,7 +586,7 @@ g_dbus_server_get_guid (GDBusServer *server)
  * Since: 2.26
  */
 GDBusServerFlags
-g_dbus_server_get_flags (GDBusServer *server)
+g_dbus_server_get_flags (xdbus_server_t *server)
 {
   g_return_val_if_fail (X_IS_DBUS_SERVER (server), G_DBUS_SERVER_FLAGS_NONE);
   return server->flags;
@@ -594,7 +594,7 @@ g_dbus_server_get_flags (GDBusServer *server)
 
 /**
  * g_dbus_server_is_active:
- * @server: A #GDBusServer.
+ * @server: A #xdbus_server_t.
  *
  * Gets whether @server is active.
  *
@@ -603,7 +603,7 @@ g_dbus_server_get_flags (GDBusServer *server)
  * Since: 2.26
  */
 xboolean_t
-g_dbus_server_is_active (GDBusServer *server)
+g_dbus_server_is_active (xdbus_server_t *server)
 {
   g_return_val_if_fail (X_IS_DBUS_SERVER (server), G_DBUS_SERVER_FLAGS_NONE);
   return server->active;
@@ -611,14 +611,14 @@ g_dbus_server_is_active (GDBusServer *server)
 
 /**
  * g_dbus_server_start:
- * @server: A #GDBusServer.
+ * @server: A #xdbus_server_t.
  *
  * Starts @server.
  *
  * Since: 2.26
  */
 void
-g_dbus_server_start (GDBusServer *server)
+g_dbus_server_start (xdbus_server_t *server)
 {
   g_return_if_fail (X_IS_DBUS_SERVER (server));
   if (server->active)
@@ -628,24 +628,24 @@ g_dbus_server_start (GDBusServer *server)
   server->run_signal_handler_id = g_signal_connect_data (XSOCKET_SERVICE (server->listener),
                                                          "run",
                                                          G_CALLBACK (on_run),
-                                                         g_object_ref (server),
-                                                         (GClosureNotify) g_object_unref,
+                                                         xobject_ref (server),
+                                                         (xclosure_notify_t) xobject_unref,
                                                          0  /* flags */);
   xsocket_service_start (XSOCKET_SERVICE (server->listener));
   server->active = TRUE;
-  g_object_notify (G_OBJECT (server), "active");
+  xobject_notify (G_OBJECT (server), "active");
 }
 
 /**
  * g_dbus_server_stop:
- * @server: A #GDBusServer.
+ * @server: A #xdbus_server_t.
  *
  * Stops @server.
  *
  * Since: 2.26
  */
 void
-g_dbus_server_stop (GDBusServer *server)
+g_dbus_server_stop (xdbus_server_t *server)
 {
   g_return_if_fail (X_IS_DBUS_SERVER (server));
   if (!server->active)
@@ -656,18 +656,18 @@ g_dbus_server_stop (GDBusServer *server)
   g_clear_signal_handler (&server->run_signal_handler_id, server->listener);
   xsocket_service_stop (XSOCKET_SERVICE (server->listener));
   server->active = FALSE;
-  g_object_notify (G_OBJECT (server), "active");
+  xobject_notify (G_OBJECT (server), "active");
 
   if (server->unix_socket_path)
     {
       if (g_unlink (server->unix_socket_path) != 0)
-        g_warning ("Failed to delete %s: %s", server->unix_socket_path, g_strerror (errno));
+        g_warning ("Failed to delete %s: %s", server->unix_socket_path, xstrerror (errno));
     }
 
   if (server->nonce_file)
     {
       if (g_unlink (server->nonce_file) != 0)
-        g_warning ("Failed to delete %s: %s", server->nonce_file, g_strerror (errno));
+        g_warning ("Failed to delete %s: %s", server->nonce_file, xstrerror (errno));
     }
 }
 
@@ -691,9 +691,9 @@ random_ascii (void)
 
 /* note that address_entry has already been validated => exactly one of path, dir, tmpdir, or abstract keys are set */
 static xboolean_t
-try_unix (GDBusServer  *server,
+try_unix (xdbus_server_t  *server,
           const xchar_t  *address_entry,
-          GHashTable   *key_value_pairs,
+          xhashtable_t   *key_value_pairs,
           xerror_t      **error)
 {
   xboolean_t ret;
@@ -706,10 +706,10 @@ try_unix (GDBusServer  *server,
   ret = FALSE;
   address = NULL;
 
-  path = g_hash_table_lookup (key_value_pairs, "path");
-  dir = g_hash_table_lookup (key_value_pairs, "dir");
-  tmpdir = g_hash_table_lookup (key_value_pairs, "tmpdir");
-  abstract = g_hash_table_lookup (key_value_pairs, "abstract");
+  path = xhash_table_lookup (key_value_pairs, "path");
+  dir = xhash_table_lookup (key_value_pairs, "dir");
+  tmpdir = xhash_table_lookup (key_value_pairs, "tmpdir");
+  abstract = xhash_table_lookup (key_value_pairs, "abstract");
 
   if (path != NULL)
     {
@@ -718,14 +718,14 @@ try_unix (GDBusServer  *server,
   else if (dir != NULL || tmpdir != NULL)
     {
       xint_t n;
-      GString *s;
+      xstring_t *s;
       xerror_t *local_error;
 
     retry:
-      s = g_string_new (tmpdir != NULL ? tmpdir : dir);
-      g_string_append (s, "/dbus-");
+      s = xstring_new (tmpdir != NULL ? tmpdir : dir);
+      xstring_append (s, "/dbus-");
       for (n = 0; n < 8; n++)
-        g_string_append_c (s, random_ascii ());
+        xstring_append_c (s, random_ascii ());
 
       /* prefer abstract namespace if available for tmpdir: addresses
        * abstract namespace is disallowed for dir: addresses */
@@ -735,7 +735,7 @@ try_unix (GDBusServer  *server,
                                                        G_UNIX_SOCKET_ADDRESS_ABSTRACT);
       else
         address = g_unix_socket_address_new (s->str);
-      g_string_free (s, TRUE);
+      xstring_free (s, TRUE);
 
       local_error = NULL;
       if (!xsocket_listener_add_address (server->listener,
@@ -748,7 +748,7 @@ try_unix (GDBusServer  *server,
         {
           if (local_error->domain == G_IO_ERROR && local_error->code == G_IO_ERROR_ADDRESS_IN_USE)
             {
-              g_error_free (local_error);
+              xerror_free (local_error);
               goto retry;
             }
           g_propagate_error (error, local_error);
@@ -804,12 +804,12 @@ try_unix (GDBusServer  *server,
           switch (g_unix_socket_address_get_address_type (G_UNIX_SOCKET_ADDRESS (address)))
             {
             case G_UNIX_SOCKET_ADDRESS_ABSTRACT:
-              server->client_address = g_strdup_printf ("unix:abstract=%s", escaped_path);
+              server->client_address = xstrdup_printf ("unix:abstract=%s", escaped_path);
               break;
 
             case G_UNIX_SOCKET_ADDRESS_PATH:
-              server->client_address = g_strdup_printf ("unix:path=%s", escaped_path);
-              server->unix_socket_path = g_strdup (address_path);
+              server->client_address = xstrdup_printf ("unix:path=%s", escaped_path);
+              server->unix_socket_path = xstrdup (address_path);
               break;
 
             default:
@@ -819,7 +819,7 @@ try_unix (GDBusServer  *server,
 
           g_free (escaped_path);
         }
-      g_object_unref (address);
+      xobject_unref (address);
     }
   return ret;
 }
@@ -831,9 +831,9 @@ try_unix (GDBusServer  *server,
  *  both host and port (guaranteed to be a number in [0, 65535]) are set (family is optional)
  */
 static xboolean_t
-try_tcp (GDBusServer  *server,
+try_tcp (xdbus_server_t  *server,
          const xchar_t  *address_entry,
-         GHashTable   *key_value_pairs,
+         xhashtable_t   *key_value_pairs,
          xboolean_t      do_nonce,
          xerror_t      **error)
 {
@@ -841,7 +841,7 @@ try_tcp (GDBusServer  *server,
   const xchar_t *host;
   const xchar_t *port;
   xint_t port_num;
-  GResolver *resolver;
+  xresolver_t *resolver;
   xlist_t *resolved_addresses;
   xlist_t *l;
 
@@ -849,10 +849,10 @@ try_tcp (GDBusServer  *server,
   resolver = NULL;
   resolved_addresses = NULL;
 
-  host = g_hash_table_lookup (key_value_pairs, "host");
-  port = g_hash_table_lookup (key_value_pairs, "port");
-  /* family = g_hash_table_lookup (key_value_pairs, "family"); */
-  if (g_hash_table_lookup (key_value_pairs, "noncefile") != NULL)
+  host = xhash_table_lookup (key_value_pairs, "host");
+  port = xhash_table_lookup (key_value_pairs, "port");
+  /* family = xhash_table_lookup (key_value_pairs, "family"); */
+  if (xhash_table_lookup (key_value_pairs, "noncefile") != NULL)
     {
       g_set_error_literal (error,
                            G_IO_ERROR,
@@ -891,15 +891,15 @@ try_tcp (GDBusServer  *server,
                                           &effective_address,
                                           error))
         {
-          g_object_unref (socket_address);
+          xobject_unref (socket_address);
           goto out;
         }
       if (port_num == 0)
         /* make sure we allocate the same port number for other listeners */
         port_num = g_inet_socket_address_get_port (G_INET_SOCKET_ADDRESS (effective_address));
 
-      g_object_unref (effective_address);
-      g_object_unref (socket_address);
+      xobject_unref (effective_address);
+      xobject_unref (socket_address);
     }
 
   if (do_nonce)
@@ -914,7 +914,7 @@ try_tcp (GDBusServer  *server,
       server->nonce = g_new0 (guchar, 16);
       for (n = 0; n < 16; n++)
         server->nonce[n] = g_random_int_range (0, 256);
-      fd = g_file_open_tmp ("gdbus-nonce-file-XXXXXX",
+      fd = xfile_open_tmp ("gdbus-nonce-file-XXXXXX",
                             &server->nonce_file,
                             error);
       if (fd == -1)
@@ -927,7 +927,7 @@ try_tcp (GDBusServer  *server,
       bytes_remaining = 16;
       while (bytes_remaining > 0)
         {
-          gssize ret;
+          xssize_t ret;
           int errsv;
 
           ret = write (fd, server->nonce + bytes_written, bytes_remaining);
@@ -941,7 +941,7 @@ try_tcp (GDBusServer  *server,
                            g_io_error_from_errno (errsv),
                            _("Error writing nonce file at “%s”: %s"),
                            server->nonce_file,
-                           g_strerror (errsv));
+                           xstrerror (errsv));
               goto out;
             }
           bytes_written += ret;
@@ -951,7 +951,7 @@ try_tcp (GDBusServer  *server,
         goto out;
       host_escaped = g_dbus_address_escape_value (host);
       file_escaped = g_dbus_address_escape_value (server->nonce_file);
-      server->client_address = g_strdup_printf ("nonce-tcp:host=%s,port=%d,noncefile=%s",
+      server->client_address = xstrdup_printf ("nonce-tcp:host=%s,port=%d,noncefile=%s",
                                                 host_escaped,
                                                 port_num,
                                                 file_escaped);
@@ -960,15 +960,15 @@ try_tcp (GDBusServer  *server,
     }
   else
     {
-      server->client_address = g_strdup_printf ("tcp:host=%s,port=%d", host, port_num);
+      server->client_address = xstrdup_printf ("tcp:host=%s,port=%d", host, port_num);
     }
   server->is_using_listener = TRUE;
   ret = TRUE;
 
  out:
-  g_list_free_full (resolved_addresses, g_object_unref);
+  xlist_free_full (resolved_addresses, xobject_unref);
   if (resolver)
-    g_object_unref (resolver);
+    xobject_unref (resolver);
   return ret;
 }
 
@@ -976,15 +976,15 @@ try_tcp (GDBusServer  *server,
 
 typedef struct
 {
-  GDBusServer *server;
-  GDBusConnection *connection;
+  xdbus_server_t *server;
+  xdbus_connection_t *connection;
 } EmitIdleData;
 
 static void
 emit_idle_data_free (EmitIdleData *data)
 {
-  g_object_unref (data->server);
-  g_object_unref (data->connection);
+  xobject_unref (data->server);
+  xobject_unref (data->connection);
   g_free (data);
 }
 
@@ -1003,20 +1003,20 @@ emit_new_connection_in_idle (xpointer_t user_data)
 
   if (claimed)
     g_dbus_connection_start_message_processing (data->connection);
-  g_object_unref (data->connection);
+  xobject_unref (data->connection);
 
   return FALSE;
 }
 
 /* Called in new thread */
 static xboolean_t
-on_run (GSocketService    *service,
+on_run (xsocket_service_t    *service,
         xsocket_connection_t *socket_connection,
         xobject_t           *source_object,
         xpointer_t           user_data)
 {
-  GDBusServer *server = G_DBUS_SERVER (user_data);
-  GDBusConnection *connection;
+  xdbus_server_t *server = G_DBUS_SERVER (user_data);
+  xdbus_connection_t *connection;
   GDBusConnectionFlags connection_flags;
 
   if (server->nonce != NULL)
@@ -1024,7 +1024,7 @@ on_run (GSocketService    *service,
       xchar_t buf[16];
       xsize_t bytes_read;
 
-      if (!g_input_stream_read_all (g_io_stream_get_input_stream (XIO_STREAM (socket_connection)),
+      if (!xinput_stream_read_all (g_io_stream_get_input_stream (XIO_STREAM (socket_connection)),
                                     buf,
                                     16,
                                     &bytes_read,
@@ -1068,26 +1068,26 @@ on_run (GSocketService    *service,
                      &claimed);
       if (claimed)
         g_dbus_connection_start_message_processing (connection);
-      g_object_unref (connection);
+      xobject_unref (connection);
     }
   else
     {
-      GSource *idle_source;
+      xsource_t *idle_source;
       EmitIdleData *data;
 
       data = g_new0 (EmitIdleData, 1);
-      data->server = g_object_ref (server);
-      data->connection = g_object_ref (connection);
+      data->server = xobject_ref (server);
+      data->connection = xobject_ref (connection);
 
       idle_source = g_idle_source_new ();
-      g_source_set_priority (idle_source, G_PRIORITY_DEFAULT);
-      g_source_set_callback (idle_source,
+      xsource_set_priority (idle_source, G_PRIORITY_DEFAULT);
+      xsource_set_callback (idle_source,
                              emit_new_connection_in_idle,
                              data,
-                             (GDestroyNotify) emit_idle_data_free);
-      g_source_set_static_name (idle_source, "[gio] emit_new_connection_in_idle");
-      g_source_attach (idle_source, server->main_context_at_construction);
-      g_source_unref (idle_source);
+                             (xdestroy_notify_t) emit_idle_data_free);
+      xsource_set_static_name (idle_source, "[gio] emit_new_connection_in_idle");
+      xsource_attach (idle_source, server->main_context_at_construction);
+      xsource_unref (idle_source);
     }
 
  out:
@@ -1095,11 +1095,11 @@ on_run (GSocketService    *service,
 }
 
 static xboolean_t
-initable_init (GInitable     *initable,
+initable_init (xinitable_t     *initable,
                xcancellable_t  *cancellable,
                xerror_t       **error)
 {
-  GDBusServer *server = G_DBUS_SERVER (initable);
+  xdbus_server_t *server = G_DBUS_SERVER (initable);
   xboolean_t ret;
   xuint_t n;
   xchar_t **addr_array;
@@ -1119,14 +1119,14 @@ initable_init (GInitable     *initable,
       goto out;
     }
 
-  server->listener = XSOCKET_LISTENER (g_threaded_socket_service_new (-1));
+  server->listener = XSOCKET_LISTENER (xthreaded_socket_service_new (-1));
 
-  addr_array = g_strsplit (server->address, ";", 0);
+  addr_array = xstrsplit (server->address, ";", 0);
   last_error = NULL;
   for (n = 0; addr_array != NULL && addr_array[n] != NULL; n++)
     {
       const xchar_t *address_entry = addr_array[n];
-      GHashTable *key_value_pairs;
+      xhashtable_t *key_value_pairs;
       xchar_t *transport_name;
       xerror_t *this_error;
 
@@ -1143,12 +1143,12 @@ initable_init (GInitable     *initable,
             {
             }
 #ifdef G_OS_UNIX
-          else if (g_strcmp0 (transport_name, "unix") == 0)
+          else if (xstrcmp0 (transport_name, "unix") == 0)
             ret = try_unix (server, address_entry, key_value_pairs, &this_error);
 #endif
-          else if (g_strcmp0 (transport_name, "tcp") == 0)
+          else if (xstrcmp0 (transport_name, "tcp") == 0)
             ret = try_tcp (server, address_entry, key_value_pairs, FALSE, &this_error);
-          else if (g_strcmp0 (transport_name, "nonce-tcp") == 0)
+          else if (xstrcmp0 (transport_name, "nonce-tcp") == 0)
             ret = try_tcp (server, address_entry, key_value_pairs, TRUE, &this_error);
           else
             g_set_error (&this_error,
@@ -1159,7 +1159,7 @@ initable_init (GInitable     *initable,
 
           g_free (transport_name);
           if (key_value_pairs != NULL)
-            g_hash_table_unref (key_value_pairs);
+            xhash_table_unref (key_value_pairs);
 
           if (ret)
             {
@@ -1171,14 +1171,14 @@ initable_init (GInitable     *initable,
       if (this_error != NULL)
         {
           if (last_error != NULL)
-            g_error_free (last_error);
+            xerror_free (last_error);
           last_error = this_error;
         }
     }
 
  out:
 
-  g_strfreev (addr_array);
+  xstrfreev (addr_array);
 
   if (ret)
     {
@@ -1194,7 +1194,7 @@ initable_init (GInitable     *initable,
 
 
 static void
-initable_iface_init (GInitableIface *initable_iface)
+initable_iface_init (xinitable_iface_t *initable_iface)
 {
   initable_iface->init = initable_init;
 }

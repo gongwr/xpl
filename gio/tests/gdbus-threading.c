@@ -25,11 +25,11 @@
 #include "gdbus-tests.h"
 
 /* all tests rely on a global connection */
-static GDBusConnection *c = NULL;
+static xdbus_connection_t *c = NULL;
 
 typedef struct
 {
-  GMainContext *context;
+  xmain_context_t *context;
   xboolean_t timed_out;
 } TimeoutData;
 
@@ -39,7 +39,7 @@ timeout_cb (xpointer_t user_data)
   TimeoutData *data = user_data;
 
   data->timed_out = TRUE;
-  g_main_context_wakeup (data->context);
+  xmain_context_wakeup (data->context);
 
   return G_SOURCE_REMOVE;
 }
@@ -48,32 +48,32 @@ timeout_cb (xpointer_t user_data)
  * unrefs complete first. This is typically used on the shared connection, to
  * ensure it’s in a correct state before beginning the next test. */
 static void
-(assert_connection_has_one_ref) (GDBusConnection *connection,
-                                 GMainContext    *context,
+(assert_connection_has_one_ref) (xdbus_connection_t *connection,
+                                 xmain_context_t    *context,
                                  const xchar_t     *calling_function)
 {
-  GSource *timeout_source = NULL;
+  xsource_t *timeout_source = NULL;
   TimeoutData data = { context, FALSE };
 
   if (g_atomic_int_get (&G_OBJECT (connection)->ref_count) == 1)
     return;
 
   timeout_source = g_timeout_source_new_seconds (3);
-  g_source_set_callback (timeout_source, timeout_cb, &data, NULL);
-  g_source_attach (timeout_source, context);
+  xsource_set_callback (timeout_source, timeout_cb, &data, NULL);
+  xsource_attach (timeout_source, context);
 
   while (g_atomic_int_get (&G_OBJECT (connection)->ref_count) != 1 && !data.timed_out)
     {
       g_debug ("refcount of %p is not right (%u rather than 1) in %s(), sleeping",
                connection, g_atomic_int_get (&G_OBJECT (connection)->ref_count), calling_function);
-      g_main_context_iteration (NULL, TRUE);
+      xmain_context_iteration (NULL, TRUE);
     }
 
-  g_source_destroy (timeout_source);
-  g_source_unref (timeout_source);
+  xsource_destroy (timeout_source);
+  xsource_unref (timeout_source);
 
   if (g_atomic_int_get (&G_OBJECT (connection)->ref_count) != 1)
-    g_error ("connection %p had too many refs (%u rather than 1) in %s()",
+    xerror ("connection %p had too many refs (%u rather than 1) in %s()",
              connection, g_atomic_int_get (&G_OBJECT (connection)->ref_count), calling_function);
 }
 
@@ -86,29 +86,29 @@ static void
 /* ---------------------------------------------------------------------------------------------------- */
 
 typedef struct {
-  GThread *thread;
-  GMainContext *context;
+  xthread_t *thread;
+  xmain_context_t *context;
   xuint_t signal_count;
   xboolean_t unsubscribe_complete;
   xasync_result_t *async_result;
 } DeliveryData;
 
 static void
-async_result_cb (GDBusConnection *connection,
+async_result_cb (xdbus_connection_t *connection,
                  xasync_result_t    *res,
                  xpointer_t         user_data)
 {
   DeliveryData *data = user_data;
 
-  data->async_result = g_object_ref (res);
+  data->async_result = xobject_ref (res);
 
-  g_assert_true (g_thread_self () == data->thread);
+  g_assert_true (xthread_self () == data->thread);
 
-  g_main_context_wakeup (data->context);
+  xmain_context_wakeup (data->context);
 }
 
 static void
-signal_handler (GDBusConnection *connection,
+signal_handler (xdbus_connection_t *connection,
                 const xchar_t      *sender_name,
                 const xchar_t      *object_path,
                 const xchar_t      *interface_name,
@@ -118,11 +118,11 @@ signal_handler (GDBusConnection *connection,
 {
   DeliveryData *data = user_data;
 
-  g_assert_true (g_thread_self () == data->thread);
+  g_assert_true (xthread_self () == data->thread);
 
   data->signal_count++;
 
-  g_main_context_wakeup (data->context);
+  xmain_context_wakeup (data->context);
 }
 
 static void
@@ -130,27 +130,27 @@ signal_data_free_cb (xpointer_t user_data)
 {
   DeliveryData *data = user_data;
 
-  g_assert_true (g_thread_self () == data->thread);
+  g_assert_true (xthread_self () == data->thread);
 
   data->unsubscribe_complete = TRUE;
 
-  g_main_context_wakeup (data->context);
+  xmain_context_wakeup (data->context);
 }
 
 static xpointer_t
 test_delivery_in_thread_func (xpointer_t _data)
 {
-  GMainContext *thread_context;
+  xmain_context_t *thread_context;
   DeliveryData data;
   xcancellable_t *ca;
   xuint_t subscription_id;
   xerror_t *error = NULL;
   xvariant_t *result_variant = NULL;
 
-  thread_context = g_main_context_new ();
-  g_main_context_push_thread_default (thread_context);
+  thread_context = xmain_context_new ();
+  xmain_context_push_thread_default (thread_context);
 
-  data.thread = g_thread_self ();
+  data.thread = xthread_self ();
   data.context = thread_context;
   data.signal_count = 0;
   data.unsubscribe_complete = FALSE;
@@ -173,12 +173,12 @@ test_delivery_in_thread_func (xpointer_t _data)
                           (xasync_ready_callback_t) async_result_cb,
                           &data);
   while (data.async_result == NULL)
-    g_main_context_iteration (thread_context, TRUE);
+    xmain_context_iteration (thread_context, TRUE);
 
   result_variant = g_dbus_connection_call_finish (c, data.async_result, &error);
   g_assert_no_error (error);
   g_assert_nonnull (result_variant);
-  g_clear_pointer (&result_variant, g_variant_unref);
+  g_clear_pointer (&result_variant, xvariant_unref);
   g_clear_object (&data.async_result);
 
   /*
@@ -200,7 +200,7 @@ test_delivery_in_thread_func (xpointer_t _data)
                           (xasync_ready_callback_t) async_result_cb,
                           &data);
   while (data.async_result == NULL)
-    g_main_context_iteration (thread_context, TRUE);
+    xmain_context_iteration (thread_context, TRUE);
 
   result_variant = g_dbus_connection_call_finish (c, data.async_result, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
@@ -209,7 +209,7 @@ test_delivery_in_thread_func (xpointer_t _data)
   g_assert_null (result_variant);
   g_clear_object (&data.async_result);
 
-  g_object_unref (ca);
+  xobject_unref (ca);
 
   /*
    * Check that cancellation works when the message is already in flight.
@@ -229,7 +229,7 @@ test_delivery_in_thread_func (xpointer_t _data)
   g_cancellable_cancel (ca);
 
   while (data.async_result == NULL)
-    g_main_context_iteration (thread_context, TRUE);
+    xmain_context_iteration (thread_context, TRUE);
 
   result_variant = g_dbus_connection_call_finish (c, data.async_result, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
@@ -238,7 +238,7 @@ test_delivery_in_thread_func (xpointer_t _data)
   g_assert_null (result_variant);
   g_clear_object (&data.async_result);
 
-  g_object_unref (ca);
+  xobject_unref (ca);
 
   /*
    * Check that signals are delivered to the correct thread.
@@ -250,7 +250,7 @@ test_delivery_in_thread_func (xpointer_t _data)
                                                         "com.example.TestService", /* sender */
                                                         "com.example.Frob",        /* interface */
                                                         "TestSignal",              /* member */
-                                                        "/com/example/TestObject", /* path */
+                                                        "/com/example/test_object_t", /* path */
                                                         NULL,
                                                         G_DBUS_SIGNAL_FLAGS_NONE,
                                                         signal_handler,
@@ -261,10 +261,10 @@ test_delivery_in_thread_func (xpointer_t _data)
 
   g_dbus_connection_call (c,
                           "com.example.TestService", /* bus_name */
-                          "/com/example/TestObject", /* object path */
+                          "/com/example/test_object_t", /* object path */
                           "com.example.Frob",        /* interface name */
                           "EmitSignal",              /* method name */
-                          g_variant_new_parsed ("('hello', @o '/com/example/TestObject')"),
+                          xvariant_new_parsed ("('hello', @o '/com/example/test_object_t')"),
                           NULL,
                           G_DBUS_CALL_FLAGS_NONE,
                           -1,
@@ -272,12 +272,12 @@ test_delivery_in_thread_func (xpointer_t _data)
                           (xasync_ready_callback_t) async_result_cb,
                           &data);
   while (data.async_result == NULL || data.signal_count < 1)
-    g_main_context_iteration (thread_context, TRUE);
+    xmain_context_iteration (thread_context, TRUE);
 
   result_variant = g_dbus_connection_call_finish (c, data.async_result, &error);
   g_assert_no_error (error);
   g_assert_nonnull (result_variant);
-  g_clear_pointer (&result_variant, g_variant_unref);
+  g_clear_pointer (&result_variant, xvariant_unref);
   g_clear_object (&data.async_result);
 
   g_assert_cmpuint (data.signal_count, ==, 1);
@@ -286,13 +286,13 @@ test_delivery_in_thread_func (xpointer_t _data)
   subscription_id = 0;
 
   while (!data.unsubscribe_complete)
-    g_main_context_iteration (thread_context, TRUE);
+    xmain_context_iteration (thread_context, TRUE);
   g_assert_true (data.unsubscribe_complete);
 
   /* ---------------------------------------------------------------------------------------------------- */
 
-  g_main_context_pop_thread_default (thread_context);
-  g_main_context_unref (thread_context);
+  xmain_context_pop_thread_default (thread_context);
+  xmain_context_unref (thread_context);
 
   return NULL;
 }
@@ -300,13 +300,13 @@ test_delivery_in_thread_func (xpointer_t _data)
 static void
 test_delivery_in_thread (void)
 {
-  GThread *thread;
+  xthread_t *thread;
 
-  thread = g_thread_new ("deliver",
+  thread = xthread_new ("deliver",
                          test_delivery_in_thread_func,
                          NULL);
 
-  g_thread_join (thread);
+  xthread_join (thread);
 
   assert_connection_has_one_ref (c, NULL);
 }
@@ -314,17 +314,17 @@ test_delivery_in_thread (void)
 /* ---------------------------------------------------------------------------------------------------- */
 
 typedef struct {
-  GDBusProxy *proxy;
+  xdbus_proxy_t *proxy;
   xint_t msec;
   xuint_t num;
   xboolean_t async;
 
-  GMainLoop *thread_loop;
-  GThread *thread;
+  xmain_loop_t *thread_loop;
+  xthread_t *thread;
 } SyncThreadData;
 
 static void
-sleep_cb (GDBusProxy   *proxy,
+sleep_cb (xdbus_proxy_t   *proxy,
           xasync_result_t *res,
           xpointer_t      user_data)
 {
@@ -338,46 +338,46 @@ sleep_cb (GDBusProxy   *proxy,
                                      &error);
   g_assert_no_error (error);
   g_assert_nonnull (result);
-  g_assert_cmpstr (g_variant_get_type_string (result), ==, "()");
-  g_variant_unref (result);
+  g_assert_cmpstr (xvariant_get_type_string (result), ==, "()");
+  xvariant_unref (result);
 
-  g_assert_true (data->thread == g_thread_self ());
+  g_assert_true (data->thread == xthread_self ());
 
-  g_main_loop_quit (data->thread_loop);
+  xmain_loop_quit (data->thread_loop);
 
-  //g_debug ("async cb (%p)", g_thread_self ());
+  //g_debug ("async cb (%p)", xthread_self ());
 }
 
 static xpointer_t
 test_sleep_in_thread_func (xpointer_t _data)
 {
   SyncThreadData *data = _data;
-  GMainContext *thread_context;
+  xmain_context_t *thread_context;
   xuint_t n;
 
-  thread_context = g_main_context_new ();
-  data->thread_loop = g_main_loop_new (thread_context, FALSE);
-  g_main_context_push_thread_default (thread_context);
+  thread_context = xmain_context_new ();
+  data->thread_loop = xmain_loop_new (thread_context, FALSE);
+  xmain_context_push_thread_default (thread_context);
 
-  data->thread = g_thread_self ();
+  data->thread = xthread_self ();
 
   for (n = 0; n < data->num; n++)
     {
       if (data->async)
         {
-          //g_debug ("invoking async (%p)", g_thread_self ());
+          //g_debug ("invoking async (%p)", xthread_self ());
           g_dbus_proxy_call (data->proxy,
                              "Sleep",
-                             g_variant_new ("(i)", data->msec),
+                             xvariant_new ("(i)", data->msec),
                              G_DBUS_CALL_FLAGS_NONE,
                              -1,
                              NULL,
                              (xasync_ready_callback_t) sleep_cb,
                              data);
-          g_main_loop_run (data->thread_loop);
+          xmain_loop_run (data->thread_loop);
           if (g_test_verbose ())
             g_printerr ("A");
-          //g_debug ("done invoking async (%p)", g_thread_self ());
+          //g_debug ("done invoking async (%p)", xthread_self ());
         }
       else
         {
@@ -385,33 +385,33 @@ test_sleep_in_thread_func (xpointer_t _data)
           xvariant_t *result;
 
           error = NULL;
-          //g_debug ("invoking sync (%p)", g_thread_self ());
+          //g_debug ("invoking sync (%p)", xthread_self ());
           result = g_dbus_proxy_call_sync (data->proxy,
                                            "Sleep",
-                                           g_variant_new ("(i)", data->msec),
+                                           xvariant_new ("(i)", data->msec),
                                            G_DBUS_CALL_FLAGS_NONE,
                                            -1,
                                            NULL,
                                            &error);
           if (g_test_verbose ())
             g_printerr ("S");
-          //g_debug ("done invoking sync (%p)", g_thread_self ());
+          //g_debug ("done invoking sync (%p)", xthread_self ());
           g_assert_no_error (error);
           g_assert_nonnull (result);
-          g_assert_cmpstr (g_variant_get_type_string (result), ==, "()");
-          g_variant_unref (result);
+          g_assert_cmpstr (xvariant_get_type_string (result), ==, "()");
+          xvariant_unref (result);
         }
     }
 
-  g_main_context_pop_thread_default (thread_context);
-  g_main_loop_unref (data->thread_loop);
-  g_main_context_unref (thread_context);
+  xmain_context_pop_thread_default (thread_context);
+  xmain_loop_unref (data->thread_loop);
+  xmain_context_unref (thread_context);
 
   return NULL;
 }
 
 static void
-test_method_calls_on_proxy (GDBusProxy *proxy)
+test_method_calls_on_proxy (xdbus_proxy_t *proxy)
 {
   xuint_t n, divisor;
 
@@ -440,9 +440,9 @@ test_method_calls_on_proxy (GDBusProxy *proxy)
   for (n = 0; n < 2; n++)
     {
       xboolean_t do_async;
-      GThread *thread1;
-      GThread *thread2;
-      GThread *thread3;
+      xthread_t *thread1;
+      xthread_t *thread2;
+      xthread_t *thread3;
       SyncThreadData data1;
       SyncThreadData data2;
       SyncThreadData data3;
@@ -457,7 +457,7 @@ test_method_calls_on_proxy (GDBusProxy *proxy)
       data1.msec = 40;
       data1.num = 100 / divisor;
       data1.async = do_async;
-      thread1 = g_thread_new ("sleep",
+      thread1 = xthread_new ("sleep",
                               test_sleep_in_thread_func,
                               &data1);
 
@@ -465,7 +465,7 @@ test_method_calls_on_proxy (GDBusProxy *proxy)
       data2.msec = 20;
       data2.num = 200 / divisor;
       data2.async = do_async;
-      thread2 = g_thread_new ("sleep2",
+      thread2 = xthread_new ("sleep2",
                               test_sleep_in_thread_func,
                               &data2);
 
@@ -473,13 +473,13 @@ test_method_calls_on_proxy (GDBusProxy *proxy)
       data3.msec = 100;
       data3.num = 40 / divisor;
       data3.async = do_async;
-      thread3 = g_thread_new ("sleep3",
+      thread3 = xthread_new ("sleep3",
                               test_sleep_in_thread_func,
                               &data3);
 
-      g_thread_join (thread1);
-      g_thread_join (thread2);
-      g_thread_join (thread3);
+      xthread_join (thread1);
+      xthread_join (thread2);
+      xthread_join (thread3);
 
       end_time = g_get_real_time ();
 
@@ -499,8 +499,8 @@ test_method_calls_on_proxy (GDBusProxy *proxy)
 static void
 test_method_calls_in_thread (void)
 {
-  GDBusProxy *proxy;
-  GDBusConnection *connection;
+  xdbus_proxy_t *proxy;
+  xdbus_connection_t *connection;
   xerror_t *error;
 
   error = NULL;
@@ -511,9 +511,9 @@ test_method_calls_in_thread (void)
   error = NULL;
   proxy = g_dbus_proxy_new_sync (connection,
                                  G_DBUS_PROXY_FLAGS_NONE,
-                                 NULL,                      /* GDBusInterfaceInfo */
+                                 NULL,                      /* xdbus_interface_info_t */
                                  "com.example.TestService", /* name */
-                                 "/com/example/TestObject", /* object path */
+                                 "/com/example/test_object_t", /* object path */
                                  "com.example.Frob",        /* interface */
                                  NULL, /* xcancellable_t */
                                  &error);
@@ -521,8 +521,8 @@ test_method_calls_in_thread (void)
 
   test_method_calls_on_proxy (proxy);
 
-  g_object_unref (proxy);
-  g_object_unref (connection);
+  xobject_unref (proxy);
+  xobject_unref (connection);
 
   if (g_test_verbose ())
     g_printerr ("\n");
@@ -535,7 +535,7 @@ test_method_calls_in_thread (void)
 
 /* Can run in any thread */
 static void
-ensure_connection_works (GDBusConnection *conn)
+ensure_connection_works (xdbus_connection_t *conn)
 {
   xvariant_t *v;
   xerror_t *error = NULL;
@@ -545,8 +545,8 @@ ensure_connection_works (GDBusConnection *conn)
       NULL, &error);
   g_assert_no_error (error);
   g_assert_nonnull (v);
-  g_assert_true (g_variant_is_of_type (v, G_VARIANT_TYPE ("(s)")));
-  g_variant_unref (v);
+  g_assert_true (xvariant_is_of_type (v, G_VARIANT_TYPE ("(s)")));
+  xvariant_unref (v);
 }
 
 /**
@@ -565,7 +565,7 @@ get_sync_in_thread (xpointer_t data)
 {
   xuint_t delay = GPOINTER_TO_UINT (data);
   xerror_t *error = NULL;
-  GDBusConnection *conn;
+  xdbus_connection_t *conn;
 
   g_usleep (delay);
 
@@ -591,9 +591,9 @@ test_threaded_singleton (void)
 
   for (i = 0; i < n; i++)
     {
-      GThread *thread;
+      xthread_t *thread;
       xuint_t unref_delay, get_delay;
-      GDBusConnection *new_conn;
+      xdbus_connection_t *new_conn;
 
       /* We want to be the last ref, so let it finish setting up */
       assert_connection_has_one_ref (c, NULL);
@@ -609,17 +609,17 @@ test_threaded_singleton (void)
       get_delay = g_random_int_range (SLEEP_MIN_USEC / 2, SLEEP_MAX_USEC / 2);
 
       /* One half of the race is to call g_bus_get_sync... */
-      thread = g_thread_new ("get_sync_in_thread", get_sync_in_thread,
+      thread = xthread_new ("get_sync_in_thread", get_sync_in_thread,
           GUINT_TO_POINTER (get_delay));
 
       /* ... and the other half is to unref the shared connection, which must
        * have exactly one ref at this point
        */
       g_usleep (unref_delay);
-      g_object_unref (c);
+      xobject_unref (c);
 
       /* Wait for the thread to run; see what it got */
-      new_conn = g_thread_join (thread);
+      new_conn = xthread_join (thread);
 
       /* If the thread won the race, it will have kept the same connection,
        * and it'll have one ref
@@ -677,7 +677,7 @@ main (int   argc,
 
   ret = g_test_run();
 
-  g_object_unref (c);
+  xobject_unref (c);
 
   /* tear down bus */
   session_bus_down ();

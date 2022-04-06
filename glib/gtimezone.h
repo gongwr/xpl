@@ -29,7 +29,7 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GTimeZone GTimeZone;
+typedef struct _GTimeZone xtimezone_t;
 
 /**
  * GTimeType:
@@ -53,43 +53,43 @@ typedef enum
   G_TIME_TYPE_UNIVERSAL
 } GTimeType;
 
-XPL_DEPRECATED_IN_2_68_FOR (g_time_zone_new_identifier)
-GTimeZone *             g_time_zone_new                                 (const xchar_t *identifier);
+XPL_DEPRECATED_IN_2_68_FOR (xtime_zone_new_identifier)
+xtimezone_t *             xtime_zone_new                                 (const xchar_t *identifier);
 XPL_AVAILABLE_IN_2_68
-GTimeZone *             g_time_zone_new_identifier                      (const xchar_t *identifier);
+xtimezone_t *             xtime_zone_new_identifier                      (const xchar_t *identifier);
 XPL_AVAILABLE_IN_ALL
-GTimeZone *             g_time_zone_new_utc                             (void);
+xtimezone_t *             xtime_zone_new_utc                             (void);
 XPL_AVAILABLE_IN_ALL
-GTimeZone *             g_time_zone_new_local                           (void);
+xtimezone_t *             xtime_zone_new_local                           (void);
 XPL_AVAILABLE_IN_2_58
-GTimeZone *             g_time_zone_new_offset                          (gint32       seconds);
+xtimezone_t *             xtime_zone_new_offset                          (gint32       seconds);
 
 XPL_AVAILABLE_IN_ALL
-GTimeZone *             g_time_zone_ref                                 (GTimeZone   *tz);
+xtimezone_t *             xtime_zone_ref                                 (xtimezone_t   *tz);
 XPL_AVAILABLE_IN_ALL
-void                    g_time_zone_unref                               (GTimeZone   *tz);
+void                    xtime_zone_unref                               (xtimezone_t   *tz);
 
 XPL_AVAILABLE_IN_ALL
-xint_t                    g_time_zone_find_interval                       (GTimeZone   *tz,
+xint_t                    xtime_zone_find_interval                       (xtimezone_t   *tz,
                                                                          GTimeType    type,
                                                                          gint64       time_);
 
 XPL_AVAILABLE_IN_ALL
-xint_t                    g_time_zone_adjust_time                         (GTimeZone   *tz,
+xint_t                    xtime_zone_adjust_time                         (xtimezone_t   *tz,
                                                                          GTimeType    type,
                                                                          gint64      *time_);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t *           g_time_zone_get_abbreviation                    (GTimeZone   *tz,
+const xchar_t *           xtime_zone_get_abbreviation                    (xtimezone_t   *tz,
                                                                          xint_t         interval);
 XPL_AVAILABLE_IN_ALL
-gint32                  g_time_zone_get_offset                          (GTimeZone   *tz,
+gint32                  xtime_zone_get_offset                          (xtimezone_t   *tz,
                                                                          xint_t         interval);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_time_zone_is_dst                              (GTimeZone   *tz,
+xboolean_t                xtime_zone_is_dst                              (xtimezone_t   *tz,
                                                                          xint_t         interval);
 XPL_AVAILABLE_IN_2_58
-const xchar_t *           g_time_zone_get_identifier                      (GTimeZone   *tz);
+const xchar_t *           xtime_zone_get_identifier                      (xtimezone_t   *tz);
 
 G_END_DECLS
 

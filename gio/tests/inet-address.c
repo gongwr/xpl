@@ -32,25 +32,25 @@ test_parse (void)
 
   addr = xinet_address_new_from_string ("0:0:0:0:0:0:0:0");
   g_assert (addr != NULL);
-  g_object_unref (addr);
+  xobject_unref (addr);
   addr = xinet_address_new_from_string ("1:0:0:0:0:0:0:8");
   g_assert (addr != NULL);
-  g_object_unref (addr);
+  xobject_unref (addr);
   addr = xinet_address_new_from_string ("0:0:0:0:0:FFFF:204.152.189.116");
   g_assert (addr != NULL);
-  g_object_unref (addr);
+  xobject_unref (addr);
   addr = xinet_address_new_from_string ("::1");
   g_assert (addr != NULL);
-  g_object_unref (addr);
+  xobject_unref (addr);
   addr = xinet_address_new_from_string ("::");
   g_assert (addr != NULL);
-  g_object_unref (addr);
+  xobject_unref (addr);
   addr = xinet_address_new_from_string ("::FFFF:204.152.189.116");
   g_assert (addr != NULL);
-  g_object_unref (addr);
+  xobject_unref (addr);
   addr = xinet_address_new_from_string ("204.152.189.116");
   g_assert (addr != NULL);
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   addr = xinet_address_new_from_string ("::1::2");
   g_assert (addr == NULL);
@@ -95,7 +95,7 @@ test_any (void)
       g_assert (!xinet_address_get_is_mc_org_local (addr));
       g_assert (!xinet_address_get_is_mc_site_local (addr));
 
-      g_object_unref (addr);
+      xobject_unref (addr);
    }
 }
 
@@ -107,19 +107,19 @@ test_loopback (void)
   addr = xinet_address_new_from_string ("::1");
   g_assert (xinet_address_get_family (addr) == XSOCKET_FAMILY_IPV6);
   g_assert (xinet_address_get_is_loopback (addr));
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   addr = xinet_address_new_from_string ("127.0.0.0");
   g_assert (xinet_address_get_family (addr) == XSOCKET_FAMILY_IPV4);
   g_assert (xinet_address_get_is_loopback (addr));
-  g_object_unref (addr);
+  xobject_unref (addr);
 }
 
 static void
 test_bytes (void)
 {
   xinet_address_t *addr1, *addr2, *addr3;
-  const guint8 *bytes;
+  const xuint8_t *bytes;
 
   addr1 = xinet_address_new_from_string ("192.168.0.100");
   addr2 = xinet_address_new_from_string ("192.168.0.101");
@@ -129,9 +129,9 @@ test_bytes (void)
   g_assert (!xinet_address_equal (addr1, addr2));
   g_assert (xinet_address_equal (addr1, addr3));
 
-  g_object_unref (addr1);
-  g_object_unref (addr2);
-  g_object_unref (addr3);
+  xobject_unref (addr1);
+  xobject_unref (addr2);
+  xobject_unref (addr3);
 }
 
 static void
@@ -139,7 +139,7 @@ test_property (void)
 {
   xinet_address_t *addr;
   xsocket_family_t family;
-  const guint8 *bytes;
+  const xuint8_t *bytes;
   xboolean_t any;
   xboolean_t loopback;
   xboolean_t link_local;
@@ -152,7 +152,7 @@ test_property (void)
   xboolean_t mc_site_local;
 
   addr = xinet_address_new_from_string ("ff85::");
-  g_object_get (addr,
+  xobject_get (addr,
                 "family", &family,
                 "bytes", &bytes,
                 "is-any", &any,
@@ -179,45 +179,45 @@ test_property (void)
   g_assert (!mc_org_local);
   g_assert (mc_site_local);
 
-  g_object_unref (addr);
+  xobject_unref (addr);
 }
 
 static void
 test_socket_address (void)
 {
   xinet_address_t *addr;
-  GInetSocketAddress *saddr;
+  xinet_socket_address_t *saddr;
   xuint_t port;
-  guint32 flowinfo;
-  guint32 scope_id;
+  xuint32_t flowinfo;
+  xuint32_t scope_id;
   xsocket_family_t family;
 
   addr = xinet_address_new_from_string ("::ffff:125.1.15.5");
   saddr = G_INET_SOCKET_ADDRESS (g_inet_socket_address_new (addr, 308));
 
   g_assert (xinet_address_equal (addr, g_inet_socket_address_get_address (saddr)));
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   g_assert (g_inet_socket_address_get_port (saddr) == 308);
   g_assert (g_inet_socket_address_get_flowinfo (saddr) == 0);
   g_assert (g_inet_socket_address_get_scope_id (saddr) == 0);
 
-  g_object_unref (saddr);
+  xobject_unref (saddr);
 
   addr = xinet_address_new_from_string ("::1");
-  saddr = G_INET_SOCKET_ADDRESS (g_object_new (XTYPE_INET_SOCKET_ADDRESS,
+  saddr = G_INET_SOCKET_ADDRESS (xobject_new (XTYPE_INET_SOCKET_ADDRESS,
                                                "address", addr,
                                                "port", 308,
                                                "flowinfo", 10,
                                                "scope-id", 25,
                                                NULL));
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   g_assert (g_inet_socket_address_get_port (saddr) == 308);
   g_assert (g_inet_socket_address_get_flowinfo (saddr) == 10);
   g_assert (g_inet_socket_address_get_scope_id (saddr) == 25);
 
-  g_object_get (saddr,
+  xobject_get (saddr,
                 "family", &family,
                 "address", &addr,
                 "port", &port,
@@ -231,8 +231,8 @@ test_socket_address (void)
   g_assert (flowinfo == 10);
   g_assert (scope_id == 25);
 
-  g_object_unref (addr);
-  g_object_unref (saddr);
+  xobject_unref (addr);
+  xobject_unref (saddr);
 }
 
 static void
@@ -248,8 +248,8 @@ test_socket_address_to_string (void)
   str = xsocket_connectable_to_string (XSOCKET_CONNECTABLE (sa));
   g_assert_cmpstr (str, ==, "123.1.123.1:80");
   g_free (str);
-  g_object_unref (sa);
-  g_object_unref (ia);
+  xobject_unref (sa);
+  xobject_unref (ia);
 
   /* IPv6. */
   ia = xinet_address_new_from_string ("fe80::80");
@@ -257,8 +257,8 @@ test_socket_address_to_string (void)
   str = xsocket_connectable_to_string (XSOCKET_CONNECTABLE (sa));
   g_assert_cmpstr (str, ==, "[fe80::80]:80");
   g_free (str);
-  g_object_unref (sa);
-  g_object_unref (ia);
+  xobject_unref (sa);
+  xobject_unref (ia);
 
   /* IPv6 without port. */
   ia = xinet_address_new_from_string ("fe80::80");
@@ -266,12 +266,12 @@ test_socket_address_to_string (void)
   str = xsocket_connectable_to_string (XSOCKET_CONNECTABLE (sa));
   g_assert_cmpstr (str, ==, "fe80::80");
   g_free (str);
-  g_object_unref (sa);
-  g_object_unref (ia);
+  xobject_unref (sa);
+  xobject_unref (ia);
 
   /* IPv6 with scope. */
   ia = xinet_address_new_from_string ("::1");
-  sa = XSOCKET_ADDRESS (g_object_new (XTYPE_INET_SOCKET_ADDRESS,
+  sa = XSOCKET_ADDRESS (xobject_new (XTYPE_INET_SOCKET_ADDRESS,
                                        "address", ia,
                                        "port", 123,
                                        "flowinfo", 10,
@@ -280,8 +280,8 @@ test_socket_address_to_string (void)
   str = xsocket_connectable_to_string (XSOCKET_CONNECTABLE (sa));
   g_assert_cmpstr (str, ==, "[::1%25]:123");
   g_free (str);
-  g_object_unref (sa);
-  g_object_unref (ia);
+  xobject_unref (sa);
+  xobject_unref (ia);
 }
 
 static void
@@ -293,17 +293,17 @@ test_mask_parse (void)
   mask = xinet_address_mask_new_from_string ("10.0.0.0/8", &error);
   g_assert_no_error (error);
   g_assert (mask != NULL);
-  g_object_unref (mask);
+  xobject_unref (mask);
 
   mask = xinet_address_mask_new_from_string ("fe80::/10", &error);
   g_assert_no_error (error);
   g_assert (mask != NULL);
-  g_object_unref (mask);
+  xobject_unref (mask);
 
   mask = xinet_address_mask_new_from_string ("::", &error);
   g_assert_no_error (error);
   g_assert (mask != NULL);
-  g_object_unref (mask);
+  xobject_unref (mask);
 
   mask = xinet_address_mask_new_from_string ("::/abc", &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -329,9 +329,9 @@ test_mask_property (void)
   g_assert (xinet_address_mask_get_family (mask) == XSOCKET_FAMILY_IPV6);
   g_assert (xinet_address_equal (addr, xinet_address_mask_get_address (mask)));
   g_assert (xinet_address_mask_get_length (mask) == 10);
-  g_object_unref (addr);
+  xobject_unref (addr);
 
-  g_object_get (mask,
+  xobject_get (mask,
                 "family", &family,
                 "address", &addr,
                 "length", &len,
@@ -339,9 +339,9 @@ test_mask_property (void)
   g_assert (family == XSOCKET_FAMILY_IPV6);
   g_assert (addr != NULL);
   g_assert (len == 10);
-  g_object_unref (addr);
+  xobject_unref (addr);
 
-  g_object_unref (mask);
+  xobject_unref (mask);
 }
 
 static void
@@ -356,18 +356,18 @@ test_mask_equal (void)
   g_assert_cmpstr (str, ==, "fe80::/10");
   mask2 = xinet_address_mask_new_from_string (str, NULL);
   g_assert (xinet_address_mask_equal (mask, mask2));
-  g_object_unref (mask2);
+  xobject_unref (mask2);
   g_free (str);
 
   mask2 = xinet_address_mask_new_from_string ("fe80::/12", NULL);
   g_assert (!xinet_address_mask_equal (mask, mask2));
-  g_object_unref (mask2);
+  xobject_unref (mask2);
 
   mask2 = xinet_address_mask_new_from_string ("ff80::/10", NULL);
   g_assert (!xinet_address_mask_equal (mask, mask2));
-  g_object_unref (mask2);
+  xobject_unref (mask2);
 
-  g_object_unref (mask);
+  xobject_unref (mask);
 }
 
 static void
@@ -380,29 +380,29 @@ test_mask_match (void)
 
   addr = xinet_address_new_from_string ("1.2.0.0");
   g_assert (xinet_address_mask_matches (mask, addr));
-  g_object_unref (addr);
+  xobject_unref (addr);
   addr = xinet_address_new_from_string ("1.2.3.4");
   g_assert (xinet_address_mask_matches (mask, addr));
-  g_object_unref (addr);
+  xobject_unref (addr);
   addr = xinet_address_new_from_string ("1.3.1.1");
   g_assert (!xinet_address_mask_matches (mask, addr));
-  g_object_unref (addr);
+  xobject_unref (addr);
 
-  g_object_unref (mask);
+  xobject_unref (mask);
 
   mask = xinet_address_mask_new_from_string ("1.2.0.0/24", NULL);
 
   addr = xinet_address_new_from_string ("1.2.0.0");
   g_assert (xinet_address_mask_matches (mask, addr));
-  g_object_unref (addr);
+  xobject_unref (addr);
   addr = xinet_address_new_from_string ("1.2.3.4");
   g_assert (!xinet_address_mask_matches (mask, addr));
-  g_object_unref (addr);
+  xobject_unref (addr);
   addr = xinet_address_new_from_string ("1.2.0.24");
   g_assert (xinet_address_mask_matches (mask, addr));
-  g_object_unref (addr);
+  xobject_unref (addr);
 
-  g_object_unref (mask);
+  xobject_unref (mask);
 
 }
 

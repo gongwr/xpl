@@ -158,7 +158,7 @@ g_completion_add_items (GCompletion* cmp,
   /* optimize adding to cache? */
   if (cmp->cache)
     {
-      g_list_free (cmp->cache);
+      xlist_free (cmp->cache);
       cmp->cache = NULL;
     }
 
@@ -171,7 +171,7 @@ g_completion_add_items (GCompletion* cmp,
   it = items;
   while (it)
     {
-      cmp->items = g_list_prepend (cmp->items, it->data);
+      cmp->items = xlist_prepend (cmp->items, it->data);
       it = it->next;
     }
 }
@@ -182,7 +182,7 @@ g_completion_add_items (GCompletion* cmp,
  * @items: (transfer none): the items to remove.
  *
  * Removes items from a #GCompletion. The items are not freed, so if the memory
- * was dynamically allocated, free @items with g_list_free_full() after calling
+ * was dynamically allocated, free @items with xlist_free_full() after calling
  * this function.
  *
  * Deprecated: 2.26: Rarely used API
@@ -198,14 +198,14 @@ g_completion_remove_items (GCompletion* cmp,
   it = items;
   while (cmp->items && it)
     {
-      cmp->items = g_list_remove (cmp->items, it->data);
+      cmp->items = xlist_remove (cmp->items, it->data);
       it = it->next;
     }
 
   it = items;
   while (cmp->cache && it)
     {
-      cmp->cache = g_list_remove(cmp->cache, it->data);
+      cmp->cache = xlist_remove(cmp->cache, it->data);
       it = it->next;
     }
 }
@@ -225,9 +225,9 @@ g_completion_clear_items (GCompletion* cmp)
 {
   g_return_if_fail (cmp != NULL);
 
-  g_list_free (cmp->items);
+  xlist_free (cmp->items);
   cmp->items = NULL;
-  g_list_free (cmp->cache);
+  xlist_free (cmp->cache);
   cmp->cache = NULL;
   g_free (cmp->prefix);
   cmp->prefix = NULL;
@@ -314,12 +314,12 @@ g_completion_complete_utf8 (GCompletion  *cmp,
   if (new_prefix && *new_prefix)
     {
       p = *new_prefix + strlen (*new_prefix);
-      q = g_utf8_find_prev_char (*new_prefix, p);
+      q = xutf8_find_prev_char (*new_prefix, p);
 
-      switch (g_utf8_get_char_validated (q, p - q))
+      switch (xutf8_get_char_validated (q, p - q))
 	{
-	case (gunichar)-2:
-	case (gunichar)-1:
+	case (xunichar_t)-2:
+	case (xunichar_t)-1:
 	  *q = 0;
 	  break;
 	default: ;
@@ -375,7 +375,7 @@ g_completion_complete (GCompletion* cmp,
 	      if (cmp->strncmp_func (prefix,
 				     cmp->func ? cmp->func (list->data) : (xchar_t*) list->data,
 				     len))
-		cmp->cache = g_list_delete_link (cmp->cache, list);
+		cmp->cache = xlist_delete_link (cmp->cache, list);
 
 	      list = next;
 	    }
@@ -386,7 +386,7 @@ g_completion_complete (GCompletion* cmp,
   if (!done)
     {
       /* normal code */
-      g_list_free (cmp->cache);
+      xlist_free (cmp->cache);
       cmp->cache = NULL;
       list = cmp->items;
       while (*prefix && list)
@@ -394,7 +394,7 @@ g_completion_complete (GCompletion* cmp,
 	  if (!cmp->strncmp_func (prefix,
 			cmp->func ? cmp->func (list->data) : (xchar_t*) list->data,
 			len))
-	    cmp->cache = g_list_prepend (cmp->cache, list->data);
+	    cmp->cache = xlist_prepend (cmp->cache, list->data);
 	  list = list->next;
 	}
     }
@@ -404,7 +404,7 @@ g_completion_complete (GCompletion* cmp,
       cmp->prefix = NULL;
     }
   if (cmp->cache)
-    cmp->prefix = g_strdup (prefix);
+    cmp->prefix = xstrdup (prefix);
   completion_check_cache (cmp, new_prefix);
 
   return *prefix ? cmp->cache : cmp->items;
@@ -476,10 +476,10 @@ main (int   argc,
     }
 
   cmp = g_completion_new (NULL);
-  list = g_list_alloc ();
+  list = xlist_alloc ();
   while (fgets (buf, 1024, file))
     {
-      list->data = g_strdup (buf);
+      list->data = xstrdup (buf);
       g_completion_add_items (cmp, list);
     }
   fclose (file);
@@ -488,15 +488,15 @@ main (int   argc,
     {
       printf ("COMPLETING: %s\n", argv[i]);
       result = g_completion_complete (cmp, argv[i], &longp);
-      g_list_foreach (result, (GFunc) printf, NULL);
+      xlist_foreach (result, (GFunc) printf, NULL);
       printf ("LONG MATCH: %s\n", longp);
       g_free (longp);
       longp = NULL;
     }
 
-  g_list_foreach (cmp->items, (GFunc) g_free, NULL);
+  xlist_foreach (cmp->items, (GFunc) g_free, NULL);
   g_completion_free (cmp);
-  g_list_free (list);
+  xlist_free (list);
 
   return 0;
 }

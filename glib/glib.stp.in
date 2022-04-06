@@ -7,7 +7,7 @@ probe process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISI
 }
 
 /**
- * probe glib.quark_new - Called when a #GQuark is initially created
+ * probe glib.quark_new - Called when a #xquark is initially created
  * @quark: integer value for the quark
  * @str: string form of the quark
  */
@@ -84,7 +84,7 @@ probe glib.slice_free = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_C
 }
 
 /**
- * probe glib.main_after_prepare - Called after preparing a GSource
+ * probe glib.main_after_prepare - Called after preparing a xsource_t
  * @source: source pointer
  * @prepare: prepare function pointer
  * @source_timeout: callback function pointer
@@ -98,7 +98,7 @@ probe glib.main_after_prepare = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so
 }
 
 /**
- * probe glib.main_after_check - Called after checking a GSource
+ * probe glib.main_after_check - Called after checking a xsource_t
  * @source: source pointer
  * @check: check function pointer
  * @result: result of the check call
@@ -112,7 +112,7 @@ probe glib.main_after_check = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0
 }
 
 /**
- * probe glib.main_before_dispatch - Called before dispatching a GSource
+ * probe glib.main_before_dispatch - Called before dispatching a xsource_t
  * @source: name of the source
  * @source_ptr: source pointer
  * @dispatch: dispatch function pointer
@@ -130,7 +130,7 @@ probe glib.main_before_dispatch = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.
 }
 
 /**
- * probe glib.main_after_dispatch - Called after dispatching a GSource
+ * probe glib.main_after_dispatch - Called after dispatching a xsource_t
  * @source: name of the source
  * @source_ptr: source pointer
  * @dispatch: dispatch function pointer
@@ -146,11 +146,11 @@ probe glib.main_after_dispatch = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.s
 }
 
 /**
- * probe glib.main_source_attach - Called when a #GSource is attached to a #GMainContext
+ * probe glib.main_source_attach - Called when a #xsource_t is attached to a #xmain_context_t
  * @source: name of the source
- * @source_ptr: the #GSource
- * @context: the #GMainContext the source is being attached to
- * @id: the ID of the #GSource in the context
+ * @source_ptr: the #xsource_t
+ * @context: the #xmain_context_t the source is being attached to
+ * @id: the ID of the #xsource_t in the context
  */
 probe glib.main_source_attach = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__source_attach")
 {
@@ -162,10 +162,10 @@ probe glib.main_source_attach = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so
 }
 
 /**
- * probe glib.main_source_destroy - Called when a #GSource is destroyed from a #GMainContext
+ * probe glib.main_source_destroy - Called when a #xsource_t is destroyed from a #xmain_context_t
  * @source: name of the source
- * @source_ptr: the #GSource
- * @context: the #GMainContext the source is being destroyed from
+ * @source_ptr: the #xsource_t
+ * @context: the #xmain_context_t the source is being destroyed from
  */
 probe glib.main_source_destroy = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__source_destroy")
 {
@@ -176,8 +176,8 @@ probe glib.main_source_destroy = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.s
 }
 
 /*
- * probe glib.main_context_default - Called when the default #GMainContext is created
- * @context: pointer to the new default #GMainContext
+ * probe glib.main_context_default - Called when the default #xmain_context_t is created
+ * @context: pointer to the new default #xmain_context_t
  */
 probe glib.main_context_default = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_default")
 {
@@ -186,8 +186,8 @@ probe glib.main_context_default = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.
 }
 
 /**
- * probe glib.main_context_new - Called when a #GMainContext is initially created
- * @context: pointer to the new #GMainContext
+ * probe glib.main_context_new - Called when a #xmain_context_t is initially created
+ * @context: pointer to the new #xmain_context_t
  */
 probe glib.main_context_new = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_new")
 {
@@ -196,8 +196,8 @@ probe glib.main_context_new = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0
 }
 
 /**
- * probe glib.main_context_acquire - Called when a thread tries to acquire a #GMainContext
- * @context: the #GMainContext
+ * probe glib.main_context_acquire - Called when a thread tries to acquire a #xmain_context_t
+ * @context: the #xmain_context_t
  * @success: TRUE if acquisition was successful; FALSE if there was contention
  */
 probe glib.main_context_acquire = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_acquire")
@@ -208,8 +208,8 @@ probe glib.main_context_acquire = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.
 }
 
 /**
- * probe glib.main_context_release - Called when a thread releases a #GMainContext
- * @context: the #GMainContext
+ * probe glib.main_context_release - Called when a thread releases a #xmain_context_t
+ * @context: the #xmain_context_t
  */
 probe glib.main_context_release = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_release")
 {
@@ -218,8 +218,8 @@ probe glib.main_context_release = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.
 }
 
 /**
- * probe glib.main_context_free - Called when a #GMainContext is freed
- * @context: pointer to the #GMainContext to be freed
+ * probe glib.main_context_free - Called when a #xmain_context_t is freed
+ * @context: pointer to the #xmain_context_t to be freed
  */
 probe glib.main_context_free = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_free")
 {
@@ -228,8 +228,8 @@ probe glib.main_context_free = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.
 }
 
 /**
- * probe glib.main_context_push_thread_default - Called when a #GMainContext is pushed onto the thread default stack
- * @context: a #GMainContext
+ * probe glib.main_context_push_thread_default - Called when a #xmain_context_t is pushed onto the thread default stack
+ * @context: a #xmain_context_t
  */
 probe glib.main_context_push_thread_default = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_push_thread_default")
 {
@@ -238,8 +238,8 @@ probe glib.main_context_push_thread_default = process("@ABS_XPL_RUNTIME_LIBDIR@/
 }
 
 /**
- * probe glib.main_context_pop_thread_default - Called when a #GMainContext is popped off the thread default stack
- * @context: a #GMainContext
+ * probe glib.main_context_pop_thread_default - Called when a #xmain_context_t is popped off the thread default stack
+ * @context: a #xmain_context_t
  */
 probe glib.main_context_pop_thread_default = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_pop_thread_default")
 {
@@ -248,8 +248,8 @@ probe glib.main_context_pop_thread_default = process("@ABS_XPL_RUNTIME_LIBDIR@/l
 }
 
 /**
- * probe glib.main_context_before_prepare - Called before a #GMainContext calls prepare on all its #GSources
- * @context: a #GMainContext
+ * probe glib.main_context_before_prepare - Called before a #xmain_context_t calls prepare on all its #GSources
+ * @context: a #xmain_context_t
  */
 probe glib.main_context_before_prepare = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_before_prepare")
 {
@@ -258,9 +258,9 @@ probe glib.main_context_before_prepare = process("@ABS_XPL_RUNTIME_LIBDIR@/libgl
 }
 
 /**
- * probe glib.main_context_after_prepare - Called after a #GMainContext calls prepare on all its #GSources
- * @context: a #GMainContext
- * @priority: priority of the highest priority ready #GSource
+ * probe glib.main_context_after_prepare - Called after a #xmain_context_t calls prepare on all its #GSources
+ * @context: a #xmain_context_t
+ * @priority: priority of the highest priority ready #xsource_t
  * @n_ready: number of #GSources ready
  */
 probe glib.main_context_after_prepare = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_after_prepare")
@@ -272,9 +272,9 @@ probe glib.main_context_after_prepare = process("@ABS_XPL_RUNTIME_LIBDIR@/libgli
 }
 
 /**
- * probe glib.main_context_before_query - Called before a #GMainContext calls query on all its #GSources
- * @context: a #GMainContext
- * @max_priority: maximum priority #GSource to check
+ * probe glib.main_context_before_query - Called before a #xmain_context_t calls query on all its #GSources
+ * @context: a #xmain_context_t
+ * @max_priority: maximum priority #xsource_t to check
  */
 probe glib.main_context_before_query = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_before_query")
 {
@@ -284,8 +284,8 @@ probe glib.main_context_before_query = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib
 }
 
 /**
- * probe glib.main_context_after_query - Called after a #GMainContext calls query on all its #GSources
- * @context: a #GMainContext
+ * probe glib.main_context_after_query - Called after a #xmain_context_t calls query on all its #GSources
+ * @context: a #xmain_context_t
  * @timeout: poll timeout to use
  * @fds: array of FDs ready to be polled, of length @n_fds
  * @n_fds: number of FDs ready to be polled
@@ -300,9 +300,9 @@ probe glib.main_context_after_query = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-
 }
 
 /**
- * probe glib.main_context_before_check - Called before a #GMainContext calls check on all its #GSources
- * @context: a #GMainContext
- * @max_priority: maximum priority #GSource to check
+ * probe glib.main_context_before_check - Called before a #xmain_context_t calls check on all its #GSources
+ * @context: a #xmain_context_t
+ * @max_priority: maximum priority #xsource_t to check
  * @fds: array of FDs to check, of length @n_fds
  * @n_fds: number of FDs to check
  */
@@ -316,8 +316,8 @@ probe glib.main_context_before_check = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib
 }
 
 /**
- * probe glib.main_context_after_check - Called after a #GMainContext calls check on all its #GSources
- * @context: a #GMainContext
+ * probe glib.main_context_after_check - Called after a #xmain_context_t calls check on all its #GSources
+ * @context: a #xmain_context_t
  * @n_ready: number of sources ready to be dispatched
  */
 probe glib.main_context_after_check = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_after_check")
@@ -328,8 +328,8 @@ probe glib.main_context_after_check = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-
 }
 
 /**
- * probe glib.main_context_before_dispatch - Called before a #GMainContext calls dispatch on all its #GSources
- * @context: a #GMainContext
+ * probe glib.main_context_before_dispatch - Called before a #xmain_context_t calls dispatch on all its #GSources
+ * @context: a #xmain_context_t
  */
 probe glib.main_context_before_dispatch = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_before_dispatch")
 {
@@ -338,8 +338,8 @@ probe glib.main_context_before_dispatch = process("@ABS_XPL_RUNTIME_LIBDIR@/libg
 }
 
 /**
- * probe glib.main_context_after_dispatch - Called after a #GMainContext calls dispatch on all its #GSources
- * @context: a #GMainContext
+ * probe glib.main_context_after_dispatch - Called after a #xmain_context_t calls dispatch on all its #GSources
+ * @context: a #xmain_context_t
  */
 probe glib.main_context_after_dispatch = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_after_dispatch")
 {
@@ -348,8 +348,8 @@ probe glib.main_context_after_dispatch = process("@ABS_XPL_RUNTIME_LIBDIR@/libgl
 }
 
 /**
- * probe glib.main_context_wakeup - Called when a wakeup call is made for a #GMainContext
- * @context: a #GMainContext
+ * probe glib.main_context_wakeup - Called when a wakeup call is made for a #xmain_context_t
+ * @context: a #xmain_context_t
  */
 probe glib.main_context_wakeup = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_wakeup")
 {
@@ -358,8 +358,8 @@ probe glib.main_context_wakeup = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.s
 }
 
 /**
- * probe glib.main_context_wakeup_acknowledge - Called when a wakeup call is acknowledged by a #GMainContext
- * @context: a #GMainContext
+ * probe glib.main_context_wakeup_acknowledge - Called when a wakeup call is acknowledged by a #xmain_context_t
+ * @context: a #xmain_context_t
  */
 probe glib.main_context_wakeup_acknowledge = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__context_wakeup_acknowledge")
 {
@@ -368,9 +368,9 @@ probe glib.main_context_wakeup_acknowledge = process("@ABS_XPL_RUNTIME_LIBDIR@/l
 }
 
 /**
- * probe glib.main_loop_new - Called when a #GMainLoop is initially created
- * @loop: pointer to the new #GMainLoop
- * @context: pointer to the parent #GMainContext
+ * probe glib.main_loop_new - Called when a #xmain_loop_t is initially created
+ * @loop: pointer to the new #xmain_loop_t
+ * @context: pointer to the parent #xmain_context_t
  */
 probe glib.main_loop_new = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__loop_new")
 {
@@ -380,8 +380,8 @@ probe glib.main_loop_new = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@L
 }
 
 /**
- * probe glib.main_context_quit - Called when a #GMainLoop is quit
- * @loop: pointer to the #GMainLoop to be quit
+ * probe glib.main_context_quit - Called when a #xmain_loop_t is quit
+ * @loop: pointer to the #xmain_loop_t to be quit
  */
 probe glib.main_loop_quit = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("main__loop_quit")
 {
@@ -391,9 +391,9 @@ probe glib.main_loop_quit = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@
 
 /**
  * probe glib.idle_add - Called when g_idle_add() or g_idle_add_full() is called
- * @source: the newly created idle #GSource
- * @context: the #GMainContext the idle source was added to
- * @id: the ID of the #GSource in the main context
+ * @source: the newly created idle #xsource_t
+ * @context: the #xmain_context_t the idle source was added to
+ * @id: the ID of the #xsource_t in the main context
  * @priority: the priority of the idle source
  * @func: the idle callback function
  * @data: data to pass to the callback function
@@ -410,9 +410,9 @@ probe glib.idle_add = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CUR
 }
 
 /**
- * probe glib.idle_dispatch - Called when an idle #GSource is dispatched
- * @source: the idle #GSource
- * @context: the #GMainContext the idle source was in
+ * probe glib.idle_dispatch - Called when an idle #xsource_t is dispatched
+ * @source: the idle #xsource_t
+ * @context: the #xmain_context_t the idle source was in
  * @func: the idle callback function
  * @data: data passed to the callback function
  * @again: 1 if the idle function is to be scheduled again, 0 otherwise
@@ -429,9 +429,9 @@ probe glib.idle_dispatch = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@L
 
 /**
  * probe glib.timeout_add - Called when g_timeout_add() or g_timeout_add_full() is called
- * @source: the newly created timeout #GSource
- * @context: the #GMainContext the timeout source was added to
- * @id: the ID of the #GSource in the main context
+ * @source: the newly created timeout #xsource_t
+ * @context: the #xmain_context_t the timeout source was added to
+ * @id: the ID of the #xsource_t in the main context
  * @priority: the priority of the timeout source
  * @interval: the time between dispatches of the source, in milliseconds
  * @func: the timeout callback function
@@ -450,9 +450,9 @@ probe glib.timeout_add = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_
 }
 
 /**
- * probe glib.timeout_dispatch - Called when a timeout #GSource is dispatched
- * @source: the timeout #GSource
- * @context: the #GMainContext the timeout source was in
+ * probe glib.timeout_dispatch - Called when a timeout #xsource_t is dispatched
+ * @source: the timeout #xsource_t
+ * @context: the #xmain_context_t the timeout source was in
  * @func: the timeout callback function
  * @data: data passed to the callback function
  * @again: 1 if the timeout is to be scheduled again, 0 otherwise
@@ -468,13 +468,13 @@ probe glib.timeout_dispatch = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0
 }
 
 /**
- * probe glib.source_new - Called when a new #GSource is created
- * @source: the new #GSource
- * @prepare: the prepare function for the #GSource
- * @check: the check function for the #GSource
- * @dispatch: the dispatch function for the #GSource
- * @finalize: the finalize function for the #GSource
- * @struct_size: the size of #GSource structure to allocate
+ * probe glib.source_new - Called when a new #xsource_t is created
+ * @source: the new #xsource_t
+ * @prepare: the prepare function for the #xsource_t
+ * @check: the check function for the #xsource_t
+ * @dispatch: the dispatch function for the #xsource_t
+ * @finalize: the finalize function for the #xsource_t
+ * @struct_size: the size of #xsource_t structure to allocate
  */
 probe glib.source_new = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("source__new")
 {
@@ -488,8 +488,8 @@ probe glib.source_new = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_C
 }
 
 /**
- * probe glib.source_set_callback - Called when the callback on a #GSource is set
- * @source: the #GSource
+ * probe glib.source_set_callback - Called when the callback on a #xsource_t is set
+ * @source: the #xsource_t
  * @func: the new callback function for the source
  * @data: data to pass to @func
  * @notify: notify handler for @data
@@ -504,8 +504,8 @@ probe glib.source_set_callback = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.s
 }
 
 /**
- * probe glib.source_set_callback_indirect - Called when an indirect callback on a #GSource is set
- * @source: the #GSource
+ * probe glib.source_set_callback_indirect - Called when an indirect callback on a #xsource_t is set
+ * @source: the #xsource_t
  * @callback_data: data for @callback_funcs
  * @ref: the indirect callback ref function
  * @unref: the indirect callback unref function
@@ -522,8 +522,8 @@ probe glib.source_set_callback_indirect = process("@ABS_XPL_RUNTIME_LIBDIR@/libg
 }
 
 /**
- * probe glib.source_set_ready_time - Called when the ready time is set on a #GSource
- * @source: the #GSource
+ * probe glib.source_set_ready_time - Called when the ready time is set on a #xsource_t
+ * @source: the #xsource_t
  * @ready_time: the new ready time
  */
 probe glib.source_set_ready_time = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("source__set_ready_time")
@@ -534,8 +534,8 @@ probe glib.source_set_ready_time = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0
 }
 
 /**
- * probe glib.source_set_priority - Called when the priority is set on a #GSource
- * @source: the #GSource
+ * probe glib.source_set_priority - Called when the priority is set on a #xsource_t
+ * @source: the #xsource_t
  * @context: the context the source is attached to
  * @priority: the new priority
  */
@@ -548,9 +548,9 @@ probe glib.source_set_priority = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.s
 }
 
 /**
- * probe glib.source_add_child_source - Called when a child #GSource is added to another
- * @source: the parent #GSource
- * @child_source: the child #GSource
+ * probe glib.source_add_child_source - Called when a child #xsource_t is added to another
+ * @source: the parent #xsource_t
+ * @child_source: the child #xsource_t
  */
 probe glib.source_add_child_source = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("source__add_child_source")
 {
@@ -560,8 +560,8 @@ probe glib.source_add_child_source = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2
 }
 
 /**
- * probe glib.source_set_name - Called when the name is set for a #GSource
- * @source: the #GSource
+ * probe glib.source_set_name - Called when the name is set for a #xsource_t
+ * @source: the #xsource_t
  * @name: the new name
  */
 probe glib.source_set_name = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("source__set_name")
@@ -572,9 +572,9 @@ probe glib.source_set_name = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.
 }
 
 /**
- * probe glib.source_before_free - Called before a #GSource is finalised
- * @source: the #GSource
- * @context: the context the #GSource is attached to, if any
+ * probe glib.source_before_free - Called before a #xsource_t is finalised
+ * @source: the #xsource_t
+ * @context: the context the #xsource_t is attached to, if any
  * @finalize: the finalize function about to be called
  */
 probe glib.source_before_free = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so.0.@LT_CURRENT@.@LT_REVISION@").mark("source__before_free")
@@ -586,7 +586,7 @@ probe glib.source_before_free = process("@ABS_XPL_RUNTIME_LIBDIR@/libglib-2.0.so
 }
 
 /**
- * probe glib.thread_spawned - Called from a newly spawned GThread, before the thread function is called
+ * probe glib.thread_spawned - Called from a newly spawned xthread_t, before the thread function is called
  * @func: the #GThreadFunc about to be executed
  * @data: data to be passed to @func
  * @name: (nullable): the thread name

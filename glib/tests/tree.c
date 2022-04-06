@@ -36,8 +36,8 @@
 
 
 static xint_t
-my_compare (gconstpointer a,
-            gconstpointer b)
+my_compare (xconstpointer a,
+            xconstpointer b)
 {
   const char *cha = a;
   const char *chb = b;
@@ -46,8 +46,8 @@ my_compare (gconstpointer a,
 }
 
 static xint_t
-my_compare_with_data (gconstpointer a,
-                      gconstpointer b,
+my_compare_with_data (xconstpointer a,
+                      xconstpointer b,
                       xpointer_t      user_data)
 {
   const char *cha = a;
@@ -60,8 +60,8 @@ my_compare_with_data (gconstpointer a,
 }
 
 static xint_t
-my_search (gconstpointer a,
-           gconstpointer b)
+my_search (xconstpointer a,
+           xconstpointer b)
 {
   return my_compare (b, a);
 }
@@ -128,141 +128,141 @@ static void
 test_tree_search (void)
 {
   xint_t i;
-  GTree *tree;
+  xtree_t *tree;
   xboolean_t removed;
   xchar_t c;
   xchar_t *p, *d;
 
-  tree = g_tree_new_with_data (my_compare_with_data, GINT_TO_POINTER(123));
+  tree = xtree_new_with_data (my_compare_with_data, GINT_TO_POINTER(123));
 
   for (i = 0; chars[i]; i++)
-    g_tree_insert (tree, &chars[i], &chars[i]);
+    xtree_insert (tree, &chars[i], &chars[i]);
 
-  g_tree_foreach (tree, my_traverse, NULL);
+  xtree_foreach (tree, my_traverse, NULL);
 
-  g_assert_cmpint (g_tree_nnodes (tree), ==, strlen (chars));
-  g_assert_cmpint (g_tree_height (tree), ==, 6);
+  g_assert_cmpint (xtree_nnodes (tree), ==, strlen (chars));
+  g_assert_cmpint (xtree_height (tree), ==, 6);
 
   p = chars;
-  g_tree_foreach (tree, check_order, &p);
+  xtree_foreach (tree, check_order, &p);
 
   for (i = 0; i < 26; i++)
     {
-      removed = g_tree_remove (tree, &chars[i + 10]);
+      removed = xtree_remove (tree, &chars[i + 10]);
       g_assert (removed);
     }
 
   c = '\0';
-  removed = g_tree_remove (tree, &c);
+  removed = xtree_remove (tree, &c);
   g_assert (!removed);
 
-  g_tree_foreach (tree, my_traverse, NULL);
+  xtree_foreach (tree, my_traverse, NULL);
 
-  g_assert_cmpint (g_tree_nnodes (tree), ==, strlen (chars2));
-  g_assert_cmpint (g_tree_height (tree), ==, 6);
+  g_assert_cmpint (xtree_nnodes (tree), ==, strlen (chars2));
+  g_assert_cmpint (xtree_height (tree), ==, 6);
 
   p = chars2;
-  g_tree_foreach (tree, check_order, &p);
+  xtree_foreach (tree, check_order, &p);
 
   for (i = 25; i >= 0; i--)
-    g_tree_insert (tree, &chars[i + 10], &chars[i + 10]);
+    xtree_insert (tree, &chars[i + 10], &chars[i + 10]);
 
   p = chars;
-  g_tree_foreach (tree, check_order, &p);
+  xtree_foreach (tree, check_order, &p);
 
   c = '0';
-  p = g_tree_lookup (tree, &c);
+  p = xtree_lookup (tree, &c);
   g_assert (p && *p == c);
-  g_assert (g_tree_lookup_extended (tree, &c, (xpointer_t *)&d, (xpointer_t *)&p));
+  g_assert (xtree_lookup_extended (tree, &c, (xpointer_t *)&d, (xpointer_t *)&p));
   g_assert (c == *d && c == *p);
 
   c = 'A';
-  p = g_tree_lookup (tree, &c);
+  p = xtree_lookup (tree, &c);
   g_assert (p && *p == c);
 
   c = 'a';
-  p = g_tree_lookup (tree, &c);
+  p = xtree_lookup (tree, &c);
   g_assert (p && *p == c);
 
   c = 'z';
-  p = g_tree_lookup (tree, &c);
+  p = xtree_lookup (tree, &c);
   g_assert (p && *p == c);
 
   c = '!';
-  p = g_tree_lookup (tree, &c);
+  p = xtree_lookup (tree, &c);
   g_assert (p == NULL);
 
   c = '=';
-  p = g_tree_lookup (tree, &c);
+  p = xtree_lookup (tree, &c);
   g_assert (p == NULL);
 
   c = '|';
-  p = g_tree_lookup (tree, &c);
+  p = xtree_lookup (tree, &c);
   g_assert (p == NULL);
 
   c = '0';
-  p = g_tree_search (tree, my_search, &c);
+  p = xtree_search (tree, my_search, &c);
   g_assert (p && *p == c);
 
   c = 'A';
-  p = g_tree_search (tree, my_search, &c);
+  p = xtree_search (tree, my_search, &c);
   g_assert (p && *p == c);
 
   c = 'a';
-  p = g_tree_search (tree, my_search, &c);
+  p = xtree_search (tree, my_search, &c);
   g_assert (p &&*p == c);
 
   c = 'z';
-  p = g_tree_search (tree, my_search, &c);
+  p = xtree_search (tree, my_search, &c);
   g_assert (p && *p == c);
 
   c = '!';
-  p = g_tree_search (tree, my_search, &c);
+  p = xtree_search (tree, my_search, &c);
   g_assert (p == NULL);
 
   c = '=';
-  p = g_tree_search (tree, my_search, &c);
+  p = xtree_search (tree, my_search, &c);
   g_assert (p == NULL);
 
   c = '|';
-  p = g_tree_search (tree, my_search, &c);
+  p = xtree_search (tree, my_search, &c);
   g_assert (p == NULL);
 
-  g_tree_destroy (tree);
+  xtree_destroy (tree);
 }
 
 static void
 test_tree_remove (void)
 {
-  GTree *tree;
+  xtree_t *tree;
   char c, d;
   xint_t i;
   xboolean_t removed;
   xchar_t *remove;
 
-  tree = g_tree_new_full ((GCompareDataFunc)my_compare, NULL,
+  tree = xtree_new_full ((GCompareDataFunc)my_compare, NULL,
                           my_key_destroy,
                           my_value_destroy);
 
   for (i = 0; chars[i]; i++)
-    g_tree_insert (tree, &chars[i], &chars[i]);
+    xtree_insert (tree, &chars[i], &chars[i]);
 
   c = '0';
-  g_tree_insert (tree, &c, &c);
+  xtree_insert (tree, &c, &c);
   g_assert (destroyed_key == &c);
   g_assert (destroyed_value == &chars[0]);
   destroyed_key = NULL;
   destroyed_value = NULL;
 
   d = '1';
-  g_tree_replace (tree, &d, &d);
+  xtree_replace (tree, &d, &d);
   g_assert (destroyed_key == &chars[1]);
   g_assert (destroyed_value == &chars[1]);
   destroyed_key = NULL;
   destroyed_value = NULL;
 
   c = '2';
-  removed = g_tree_remove (tree, &c);
+  removed = xtree_remove (tree, &c);
   g_assert (removed);
   g_assert (destroyed_key == &chars[2]);
   g_assert (destroyed_value == &chars[2]);
@@ -270,7 +270,7 @@ test_tree_remove (void)
   destroyed_value = NULL;
 
   c = '3';
-  removed = g_tree_steal (tree, &c);
+  removed = xtree_steal (tree, &c);
   g_assert (removed);
   g_assert (destroyed_key == NULL);
   g_assert (destroyed_value == NULL);
@@ -278,62 +278,62 @@ test_tree_remove (void)
   remove = "omkjigfedba";
   for (i = 0; remove[i]; i++)
     {
-      removed = g_tree_remove (tree, &remove[i]);
+      removed = xtree_remove (tree, &remove[i]);
       g_assert (removed);
     }
 
-  g_tree_destroy (tree);
+  xtree_destroy (tree);
 }
 
 static void
 test_tree_remove_all (void)
 {
-  GTree *tree;
+  xtree_t *tree;
   xsize_t i;
 
-  tree = g_tree_new_full ((GCompareDataFunc)my_compare, NULL,
+  tree = xtree_new_full ((GCompareDataFunc)my_compare, NULL,
                           my_key_destroy,
                           my_value_destroy);
 
   for (i = 0; chars[i]; i++)
-    g_tree_insert (tree, &chars[i], &chars[i]);
+    xtree_insert (tree, &chars[i], &chars[i]);
 
   destroyed_key_count = 0;
   destroyed_value_count = 0;
 
-  g_tree_remove_all (tree);
+  xtree_remove_all (tree);
 
   g_assert_cmpuint (destroyed_key_count, ==, strlen (chars));
   g_assert_cmpuint (destroyed_value_count, ==, strlen (chars));
-  g_assert_cmpint (g_tree_height (tree), ==, 0);
-  g_assert_cmpint (g_tree_nnodes (tree), ==, 0);
+  g_assert_cmpint (xtree_height (tree), ==, 0);
+  g_assert_cmpint (xtree_nnodes (tree), ==, 0);
 
-  g_tree_unref (tree);
+  xtree_unref (tree);
 }
 
 static void
 test_tree_destroy (void)
 {
-  GTree *tree;
+  xtree_t *tree;
   xint_t i;
 
-  tree = g_tree_new (my_compare);
+  tree = xtree_new (my_compare);
 
   for (i = 0; chars[i]; i++)
-    g_tree_insert (tree, &chars[i], &chars[i]);
+    xtree_insert (tree, &chars[i], &chars[i]);
 
-  g_assert_cmpint (g_tree_nnodes (tree), ==, strlen (chars));
+  g_assert_cmpint (xtree_nnodes (tree), ==, strlen (chars));
 
-  g_tree_ref (tree);
-  g_tree_destroy (tree);
+  xtree_ref (tree);
+  xtree_destroy (tree);
 
-  g_assert_cmpint (g_tree_nnodes (tree), ==, 0);
+  g_assert_cmpint (xtree_nnodes (tree), ==, 0);
 
-  g_tree_unref (tree);
+  xtree_unref (tree);
 }
 
 typedef struct {
-  GString *s;
+  xstring_t *s;
   xint_t count;
 } CallbackData;
 
@@ -343,7 +343,7 @@ traverse_func (xpointer_t key, xpointer_t value, xpointer_t data)
   CallbackData *d = data;
 
   xchar_t *c = value;
-  g_string_append_c (d->s, *c);
+  xstring_append_c (d->s, *c);
 
   d->count--;
 
@@ -362,7 +362,7 @@ typedef struct {
 static void
 test_tree_traverse (void)
 {
-  GTree *tree;
+  xtree_t *tree;
   xsize_t i;
   TraverseData orders[] = {
     { G_IN_ORDER,   -1, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" },
@@ -415,51 +415,51 @@ test_tree_traverse (void)
   };
   CallbackData data;
 
-  tree = g_tree_new (my_compare);
+  tree = xtree_new (my_compare);
 
   for (i = 0; chars[i]; i++)
-    g_tree_insert (tree, &chars[i], &chars[i]);
+    xtree_insert (tree, &chars[i], &chars[i]);
 
-  data.s = g_string_new ("");
+  data.s = xstring_new ("");
   for (i = 0; i < G_N_ELEMENTS (orders); i++)
     {
-      g_string_set_size (data.s, 0);
+      xstring_set_size (data.s, 0);
       data.count = orders[i].limit;
-      g_tree_traverse (tree, traverse_func, orders[i].traverse, &data);
+      xtree_traverse (tree, traverse_func, orders[i].traverse, &data);
       g_assert_cmpstr (data.s->str, ==, orders[i].expected);
     }
 
-  g_tree_unref (tree);
-  g_string_free (data.s, TRUE);
+  xtree_unref (tree);
+  xstring_free (data.s, TRUE);
 }
 
 static void
 test_tree_insert (void)
 {
-  GTree *tree;
+  xtree_t *tree;
   xchar_t *p;
   xint_t i;
   xchar_t *scrambled;
 
-  tree = g_tree_new (my_compare);
+  tree = xtree_new (my_compare);
 
   for (i = 0; chars[i]; i++)
-    g_tree_insert (tree, &chars[i], &chars[i]);
+    xtree_insert (tree, &chars[i], &chars[i]);
   p = chars;
-  g_tree_foreach (tree, check_order, &p);
+  xtree_foreach (tree, check_order, &p);
 
-  g_tree_unref (tree);
-  tree = g_tree_new (my_compare);
+  xtree_unref (tree);
+  tree = xtree_new (my_compare);
 
   for (i = strlen (chars) - 1; i >= 0; i--)
-    g_tree_insert (tree, &chars[i], &chars[i]);
+    xtree_insert (tree, &chars[i], &chars[i]);
   p = chars;
-  g_tree_foreach (tree, check_order, &p);
+  xtree_foreach (tree, check_order, &p);
 
-  g_tree_unref (tree);
-  tree = g_tree_new (my_compare);
+  xtree_unref (tree);
+  tree = xtree_new (my_compare);
 
-  scrambled = g_strdup (chars);
+  scrambled = xstrdup (chars);
 
   for (i = 0; i < 30; i++)
     {
@@ -474,16 +474,16 @@ test_tree_insert (void)
     }
 
   for (i = 0; scrambled[i]; i++)
-    g_tree_insert (tree, &scrambled[i], &scrambled[i]);
+    xtree_insert (tree, &scrambled[i], &scrambled[i]);
   p = chars;
-  g_tree_foreach (tree, check_order, &p);
+  xtree_foreach (tree, check_order, &p);
 
   g_free (scrambled);
-  g_tree_unref (tree);
+  xtree_unref (tree);
 }
 
 static void
-binary_tree_bound (GTree *tree,
+binary_tree_bound (xtree_t *tree,
                    char   c,
                    char   expected,
                    int    lower)
@@ -491,49 +491,49 @@ binary_tree_bound (GTree *tree,
   GTreeNode *node;
 
   if (lower)
-    node = g_tree_lower_bound (tree, &c);
+    node = xtree_lower_bound (tree, &c);
   else
-    node = g_tree_upper_bound (tree, &c);
+    node = xtree_upper_bound (tree, &c);
 
   if (g_test_verbose ())
     g_test_message ("%c %s: ", c, lower ? "lower" : "upper");
 
   if (!node)
     {
-      if (!g_tree_nnodes (tree))
+      if (!xtree_nnodes (tree))
         {
           if (g_test_verbose ())
             g_test_message ("empty tree");
         }
       else
         {
-          GTreeNode *last = g_tree_node_last (tree);
+          GTreeNode *last = xtree_node_last (tree);
 
           g_assert (last);
           if (g_test_verbose ())
             g_test_message ("past end last %c",
-                            *(char *) g_tree_node_key (last));
+                            *(char *) xtree_node_key (last));
         }
       g_assert (expected == '\x00');
     }
   else
     {
-      GTreeNode *begin = g_tree_node_first (tree);
-      GTreeNode *last = g_tree_node_last (tree);
-      GTreeNode *prev = g_tree_node_previous (node);
-      GTreeNode *next = g_tree_node_next (node);
+      GTreeNode *begin = xtree_node_first (tree);
+      GTreeNode *last = xtree_node_last (tree);
+      GTreeNode *prev = xtree_node_previous (node);
+      GTreeNode *next = xtree_node_next (node);
 
       g_assert (expected != '\x00');
-      g_assert (expected == *(char *) g_tree_node_key (node));
+      g_assert (expected == *(char *) xtree_node_key (node));
 
       if (g_test_verbose ())
-        g_test_message ("%c", *(char *) g_tree_node_key (node));
+        g_test_message ("%c", *(char *) xtree_node_key (node));
 
       if (node != begin)
         {
           g_assert (prev);
           if (g_test_verbose ())
-            g_test_message (" prev %c", *(char *) g_tree_node_key (prev));
+            g_test_message (" prev %c", *(char *) xtree_node_key (prev));
         }
       else
         {
@@ -546,7 +546,7 @@ binary_tree_bound (GTree *tree,
         {
           g_assert (next);
           if (g_test_verbose ())
-            g_test_message (" next %c", *(char *) g_tree_node_key (next));
+            g_test_message (" next %c", *(char *) xtree_node_key (next));
         }
       else
         {
@@ -561,7 +561,7 @@ binary_tree_bound (GTree *tree,
 }
 
 static void
-binary_tree_bounds (GTree *tree,
+binary_tree_bounds (xtree_t *tree,
                     char   c,
                     int    mode)
 {
@@ -595,7 +595,7 @@ binary_tree_bounds (GTree *tree,
 }
 
 static void
-binary_tree_bounds_test (GTree *tree,
+binary_tree_bounds_test (xtree_t *tree,
                          int    mode)
 {
   binary_tree_bounds (tree, 'a', mode);
@@ -614,12 +614,12 @@ binary_tree_bounds_test (GTree *tree,
 static void
 test_tree_bounds (void)
 {
-  GQueue queue = G_QUEUE_INIT;
-  GTree *tree;
+  xqueue_t queue = G_QUEUE_INIT;
+  xtree_t *tree;
   char chars[62];
   xuint_t i, j;
 
-  tree = g_tree_new (my_compare);
+  tree = xtree_new (my_compare);
 
   i = 0;
   for (j = 0; j < 10; j++, i++)
@@ -652,63 +652,63 @@ test_tree_bounds (void)
       if (g_test_verbose ())
         g_test_message ("%c ", *(char *) elem);
 
-      node = g_tree_insert_node (tree, elem, elem);
-      g_assert (g_tree_node_key (node) == elem);
-      g_assert (g_tree_node_value (node) == elem);
+      node = xtree_insert_node (tree, elem, elem);
+      g_assert (xtree_node_key (node) == elem);
+      g_assert (xtree_node_value (node) == elem);
     }
 
   if (g_test_verbose ())
     g_test_message ("\n");
 
-  g_assert_cmpint (g_tree_nnodes (tree), ==, 10 + 26 + 26);
-  g_assert_cmpint (g_tree_height (tree), >=, 6);
-  g_assert_cmpint (g_tree_height (tree), <=, 8);
+  g_assert_cmpint (xtree_nnodes (tree), ==, 10 + 26 + 26);
+  g_assert_cmpint (xtree_height (tree), >=, 6);
+  g_assert_cmpint (xtree_height (tree), <=, 8);
 
   if (g_test_verbose ())
     {
       g_test_message ("tree: ");
-      g_tree_foreach (tree, my_traverse, NULL);
+      xtree_foreach (tree, my_traverse, NULL);
       g_test_message ("\n");
     }
 
   binary_tree_bounds_test (tree, 0);
 
   for (i = 0; i < 10; i++)
-    g_tree_remove (tree, &chars[i]);
+    xtree_remove (tree, &chars[i]);
 
-  g_assert_cmpint (g_tree_nnodes (tree), ==, 26 + 26);
-  g_assert_cmpint (g_tree_height (tree), >=, 6);
-  g_assert_cmpint (g_tree_height (tree), <=, 8);
+  g_assert_cmpint (xtree_nnodes (tree), ==, 26 + 26);
+  g_assert_cmpint (xtree_height (tree), >=, 6);
+  g_assert_cmpint (xtree_height (tree), <=, 8);
 
   if (g_test_verbose ())
     {
       g_test_message ("tree: ");
-      g_tree_foreach (tree, my_traverse, NULL);
+      xtree_foreach (tree, my_traverse, NULL);
       g_test_message ("\n");
     }
 
   binary_tree_bounds_test (tree, 1);
 
   for (i = 10; i < 10 + 26 + 26 - 1; i++)
-    g_tree_remove (tree, &chars[i]);
+    xtree_remove (tree, &chars[i]);
 
   if (g_test_verbose ())
     {
       g_test_message ("tree: ");
-      g_tree_foreach (tree, my_traverse, NULL);
+      xtree_foreach (tree, my_traverse, NULL);
       g_test_message ("\n");
     }
 
   binary_tree_bounds_test (tree, 2);
 
-  g_tree_remove (tree, &chars[10 + 26 + 26 - 1]);
+  xtree_remove (tree, &chars[10 + 26 + 26 - 1]);
 
   if (g_test_verbose ())
     g_test_message ("empty tree\n");
 
   binary_tree_bounds_test (tree, 3);
 
-  g_tree_unref (tree);
+  xtree_unref (tree);
 }
 
 int

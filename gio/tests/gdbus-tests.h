@@ -48,7 +48,7 @@ G_BEGIN_DECLS
                                G_STRFUNC,                               \
                                "Not a xobject_t instance");               \
         }                                                               \
-      if (g_object_class_find_property (G_OBJECT_GET_CLASS (object),    \
+      if (xobject_class_find_property (G_OBJECT_GET_CLASS (object),    \
                                         property_name) == NULL)         \
         {                                                               \
           g_assertion_message (G_LOG_DOMAIN,                            \
@@ -110,12 +110,12 @@ xboolean_t _g_assert_property_notify_run (xpointer_t     object,
 xboolean_t _g_assert_signal_received_run (xpointer_t     object,
                                         const xchar_t *signal_name);
 
-GDBusConnection *_g_bus_get_priv (GBusType            bus_type,
+xdbus_connection_t *_g_bus_get_priv (GBusType            bus_type,
                                   xcancellable_t       *cancellable,
                                   xerror_t            **error);
 
-void ensure_gdbus_testserver_up (GDBusConnection *connection,
-                                 GMainContext    *context);
+void ensure_gdbus_testserver_up (xdbus_connection_t *connection,
+                                 xmain_context_t    *context);
 
 G_END_DECLS
 

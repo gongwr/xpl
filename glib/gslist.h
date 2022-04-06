@@ -34,115 +34,115 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GSList GSList;
+typedef struct _GSList xslist_t;
 
 struct _GSList
 {
   xpointer_t data;
-  GSList *next;
+  xslist_t *next;
 };
 
 /* Singly linked lists
  */
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_alloc                   (void) G_GNUC_WARN_UNUSED_RESULT;
+xslist_t*  xslist_alloc                   (void) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-void     g_slist_free                    (GSList           *list);
+void     xslist_free                    (xslist_t           *list);
 XPL_AVAILABLE_IN_ALL
-void     g_slist_free_1                  (GSList           *list);
-#define	 g_slist_free1		         g_slist_free_1
+void     xslist_free_1                  (xslist_t           *list);
+#define	 xslist_free1		         xslist_free_1
 XPL_AVAILABLE_IN_ALL
-void     g_slist_free_full               (GSList           *list,
-					  GDestroyNotify    free_func);
+void     xslist_free_full               (xslist_t           *list,
+					  xdestroy_notify_t    free_func);
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_append                  (GSList           *list,
+xslist_t*  xslist_append                  (xslist_t           *list,
 					  xpointer_t          data) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_prepend                 (GSList           *list,
+xslist_t*  xslist_prepend                 (xslist_t           *list,
 					  xpointer_t          data) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_insert                  (GSList           *list,
+xslist_t*  xslist_insert                  (xslist_t           *list,
 					  xpointer_t          data,
 					  xint_t              position) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_insert_sorted           (GSList           *list,
+xslist_t*  xslist_insert_sorted           (xslist_t           *list,
 					  xpointer_t          data,
 					  GCompareFunc      func) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_insert_sorted_with_data (GSList           *list,
+xslist_t*  xslist_insert_sorted_with_data (xslist_t           *list,
 					  xpointer_t          data,
 					  GCompareDataFunc  func,
 					  xpointer_t          user_data) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_insert_before           (GSList           *slist,
-					  GSList           *sibling,
+xslist_t*  xslist_insert_before           (xslist_t           *slist,
+					  xslist_t           *sibling,
 					  xpointer_t          data) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_concat                  (GSList           *list1,
-					  GSList           *list2) G_GNUC_WARN_UNUSED_RESULT;
+xslist_t*  xslist_concat                  (xslist_t           *list1,
+					  xslist_t           *list2) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_remove                  (GSList           *list,
-					  gconstpointer     data) G_GNUC_WARN_UNUSED_RESULT;
+xslist_t*  xslist_remove                  (xslist_t           *list,
+					  xconstpointer     data) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_remove_all              (GSList           *list,
-					  gconstpointer     data) G_GNUC_WARN_UNUSED_RESULT;
+xslist_t*  xslist_remove_all              (xslist_t           *list,
+					  xconstpointer     data) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_remove_link             (GSList           *list,
-					  GSList           *link_) G_GNUC_WARN_UNUSED_RESULT;
+xslist_t*  xslist_remove_link             (xslist_t           *list,
+					  xslist_t           *link_) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_delete_link             (GSList           *list,
-					  GSList           *link_) G_GNUC_WARN_UNUSED_RESULT;
+xslist_t*  xslist_delete_link             (xslist_t           *list,
+					  xslist_t           *link_) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_reverse                 (GSList           *list) G_GNUC_WARN_UNUSED_RESULT;
+xslist_t*  xslist_reverse                 (xslist_t           *list) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_copy                    (GSList           *list) G_GNUC_WARN_UNUSED_RESULT;
+xslist_t*  xslist_copy                    (xslist_t           *list) G_GNUC_WARN_UNUSED_RESULT;
 
 XPL_AVAILABLE_IN_2_34
-GSList*  g_slist_copy_deep               (GSList            *list,
+xslist_t*  xslist_copy_deep               (xslist_t            *list,
 					  GCopyFunc         func,
 					  xpointer_t          user_data) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_nth                     (GSList           *list,
+xslist_t*  xslist_nth                     (xslist_t           *list,
 					  xuint_t             n);
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_find                    (GSList           *list,
-					  gconstpointer     data);
+xslist_t*  xslist_find                    (xslist_t           *list,
+					  xconstpointer     data);
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_find_custom             (GSList           *list,
-					  gconstpointer     data,
+xslist_t*  xslist_find_custom             (xslist_t           *list,
+					  xconstpointer     data,
 					  GCompareFunc      func);
 XPL_AVAILABLE_IN_ALL
-xint_t     g_slist_position                (GSList           *list,
-					  GSList           *llink);
+xint_t     xslist_position                (xslist_t           *list,
+					  xslist_t           *llink);
 XPL_AVAILABLE_IN_ALL
-xint_t     g_slist_index                   (GSList           *list,
-					  gconstpointer     data);
+xint_t     xslist_index                   (xslist_t           *list,
+					  xconstpointer     data);
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_last                    (GSList           *list);
+xslist_t*  xslist_last                    (xslist_t           *list);
 XPL_AVAILABLE_IN_ALL
-xuint_t    g_slist_length                  (GSList           *list);
+xuint_t    xslist_length                  (xslist_t           *list);
 XPL_AVAILABLE_IN_ALL
-void     g_slist_foreach                 (GSList           *list,
+void     xslist_foreach                 (xslist_t           *list,
 					  GFunc             func,
 					  xpointer_t          user_data);
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_sort                    (GSList           *list,
+xslist_t*  xslist_sort                    (xslist_t           *list,
 					  GCompareFunc      compare_func) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-GSList*  g_slist_sort_with_data          (GSList           *list,
+xslist_t*  xslist_sort_with_data          (xslist_t           *list,
 					  GCompareDataFunc  compare_func,
 					  xpointer_t          user_data) G_GNUC_WARN_UNUSED_RESULT;
 XPL_AVAILABLE_IN_ALL
-xpointer_t g_slist_nth_data                (GSList           *list,
+xpointer_t xslist_nth_data                (xslist_t           *list,
 					  xuint_t             n);
 
 XPL_AVAILABLE_IN_2_64
-void     g_clear_slist                   (GSList          **slist_ptr,
-                                          GDestroyNotify    destroy);
+void     g_clear_slist                   (xslist_t          **slist_ptr,
+                                          xdestroy_notify_t    destroy);
 
 #define  g_clear_slist(slist_ptr, destroy)       \
   G_STMT_START {                                 \
-    GSList *_slist;                              \
+    xslist_t *_slist;                              \
                                                  \
     _slist = *(slist_ptr);                       \
     if (_slist)                                  \
@@ -150,14 +150,14 @@ void     g_clear_slist                   (GSList          **slist_ptr,
         *slist_ptr = NULL;                       \
                                                  \
         if ((destroy) != NULL)                   \
-          g_slist_free_full (_slist, (destroy)); \
+          xslist_free_full (_slist, (destroy)); \
         else                                     \
-          g_slist_free (_slist);                 \
+          xslist_free (_slist);                 \
       }                                          \
   } G_STMT_END                                   \
   XPL_AVAILABLE_MACRO_IN_2_64
 
-#define  g_slist_next(slist)	         ((slist) ? (((GSList *)(slist))->next) : NULL)
+#define  xslist_next(slist)	         ((slist) ? (((xslist_t *)(slist))->next) : NULL)
 
 G_END_DECLS
 

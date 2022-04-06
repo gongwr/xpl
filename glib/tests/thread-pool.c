@@ -24,8 +24,8 @@
 #include <glib.h>
 
 typedef struct {
-  GMutex mutex;
-  GCond cond;
+  xmutex_t mutex;
+  xcond_t cond;
   xboolean_t signalled;
 } MutexCond;
 
@@ -43,7 +43,7 @@ pool_func (xpointer_t data, xpointer_t user_data)
 }
 
 static void
-test_simple (gconstpointer shared)
+test_simple (xconstpointer shared)
 {
   GThreadPool *pool;
   xerror_t *err = NULL;
@@ -57,12 +57,12 @@ test_simple (gconstpointer shared)
     {
       g_test_summary ("Tests that a shared, non-exclusive thread pool "
                       "generally works.");
-      pool = g_thread_pool_new (pool_func, &m, -1, FALSE, &err);
+      pool = xthread_pool_new (pool_func, &m, -1, FALSE, &err);
     }
   else
     {
       g_test_summary ("Tests that an exclusive thread pool generally works.");
-      pool = g_thread_pool_new (pool_func, &m, 2, TRUE, &err);
+      pool = xthread_pool_new (pool_func, &m, 2, TRUE, &err);
     }
   g_assert_no_error (err);
   g_assert_nonnull (pool);
@@ -70,7 +70,7 @@ test_simple (gconstpointer shared)
   g_mutex_lock (&m.mutex);
   m.signalled = FALSE;
 
-  success = g_thread_pool_push (pool, GUINT_TO_POINTER (123), &err);
+  success = xthread_pool_push (pool, GUINT_TO_POINTER (123), &err);
   g_assert_no_error (err);
   g_assert_true (success);
 
@@ -78,7 +78,7 @@ test_simple (gconstpointer shared)
     g_cond_wait (&m.cond, &m.mutex);
   g_mutex_unlock (&m.mutex);
 
-  g_thread_pool_free (pool, TRUE, TRUE);
+  xthread_pool_free (pool, TRUE, TRUE);
 }
 
 static void
@@ -88,7 +88,7 @@ dummy_pool_func (xpointer_t data, xpointer_t user_data)
 }
 
 static void
-test_create_first_pool (gconstpointer shared_first)
+test_create_first_pool (xconstpointer shared_first)
 {
   GThreadPool *pool;
   xerror_t *err = NULL;
@@ -113,39 +113,39 @@ test_create_first_pool (gconstpointer shared_first)
       return;
     }
 
-  g_thread_pool_set_max_unused_threads (0);
+  xthread_pool_set_max_unused_threads (0);
 
   if (GPOINTER_TO_INT (shared_first))
-    pool = g_thread_pool_new (dummy_pool_func, NULL, -1, FALSE, &err);
+    pool = xthread_pool_new (dummy_pool_func, NULL, -1, FALSE, &err);
   else
-    pool = g_thread_pool_new (dummy_pool_func, NULL, 2, TRUE, &err);
+    pool = xthread_pool_new (dummy_pool_func, NULL, 2, TRUE, &err);
   g_assert_no_error (err);
   g_assert_nonnull (pool);
 
-  success = g_thread_pool_push (pool, GUINT_TO_POINTER (123), &err);
+  success = xthread_pool_push (pool, GUINT_TO_POINTER (123), &err);
   g_assert_no_error (err);
   g_assert_true (success);
 
-  g_thread_pool_free (pool, TRUE, TRUE);
+  xthread_pool_free (pool, TRUE, TRUE);
 
   if (GPOINTER_TO_INT (shared_first))
-    pool = g_thread_pool_new (dummy_pool_func, NULL, 2, TRUE, &err);
+    pool = xthread_pool_new (dummy_pool_func, NULL, 2, TRUE, &err);
   else
-    pool = g_thread_pool_new (dummy_pool_func, NULL, -1, FALSE, &err);
+    pool = xthread_pool_new (dummy_pool_func, NULL, -1, FALSE, &err);
   g_assert_no_error (err);
   g_assert_nonnull (pool);
 
-  success = g_thread_pool_push (pool, GUINT_TO_POINTER (123), &err);
+  success = xthread_pool_push (pool, GUINT_TO_POINTER (123), &err);
   g_assert_no_error (err);
   g_assert_true (success);
 
-  g_thread_pool_free (pool, TRUE, TRUE);
+  xthread_pool_free (pool, TRUE, TRUE);
 }
 
 typedef struct
 {
-  GMutex mutex;  /* (owned) */
-  GCond cond;  /* (owned) */
+  xmutex_t mutex;  /* (owned) */
+  xcond_t cond;  /* (owned) */
   xboolean_t threads_should_block;  /* protected by mutex, cond */
 
   xuint_t n_jobs_started;  /* (atomic) */
@@ -179,13 +179,13 @@ free_func (xpointer_t user_data)
 }
 
 static void
-test_thread_pool_full (gconstpointer shared_first)
+test_thread_pool_full (xconstpointer shared_first)
 {
   xuint_t i;
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/121");
 
-  g_thread_pool_set_max_unused_threads (0);
+  xthread_pool_set_max_unused_threads (0);
 
   /* Run the test twice, once with a shared pool and once with an exclusive one. */
   for (i = 0; i < 2; i++)
@@ -205,7 +205,7 @@ test_thread_pool_full (gconstpointer shared_first)
 
       /* Create a thread pool with only one worker thread. The pool can be
        * created in shared or exclusive mode. */
-      pool = g_thread_pool_new_full (full_thread_func, &test_data, free_func,
+      pool = xthread_pool_new_full (full_thread_func, &test_data, free_func,
                                      1, (i == 0),
                                      &local_error);
       g_assert_no_error (local_error);
@@ -216,7 +216,7 @@ test_thread_pool_full (gconstpointer shared_first)
        * worker thread. */
       for (j = 0; j < 2; j++)
         {
-          success = g_thread_pool_push (pool, &test_data, &local_error);
+          success = xthread_pool_push (pool, &test_data, &local_error);
           g_assert_no_error (local_error);
           g_assert_true (success);
         }
@@ -228,7 +228,7 @@ test_thread_pool_full (gconstpointer shared_first)
        * the thread pool hangs around until the executing first job has
        * completed. The first job will complete only once @threads_should_block
        * is unset. */
-      g_thread_pool_free (pool, TRUE, FALSE);
+      xthread_pool_free (pool, TRUE, FALSE);
 
       g_assert_cmpuint (g_atomic_int_get (&test_data.n_jobs_started), ==, 1);
       g_assert_cmpuint (g_atomic_int_get (&test_data.n_jobs_completed), ==, 0);

@@ -42,7 +42,7 @@
  * SECTION:threads-deprecated
  * @title: Deprecated thread API
  * @short_description: old thread APIs (for reference only)
- * @see_also: #GThread
+ * @see_also: #xthread_t
  *
  * These APIs are deprecated.  You should not use them in new code.
  * This section remains only to assist with understanding code that was
@@ -77,17 +77,17 @@
  * @private_new: virtual function pointer for g_private_new()
  * @private_get: virtual function pointer for g_private_get()
  * @private_set: virtual function pointer for g_private_set()
- * @thread_create: virtual function pointer for g_thread_create()
- * @thread_yield: virtual function pointer for g_thread_yield()
- * @thread_join: virtual function pointer for g_thread_join()
- * @thread_exit: virtual function pointer for g_thread_exit()
+ * @thread_create: virtual function pointer for xthread_create()
+ * @thread_yield: virtual function pointer for xthread_yield()
+ * @thread_join: virtual function pointer for xthread_join()
+ * @thread_exit: virtual function pointer for xthread_exit()
  * @thread_set_priority: virtual function pointer for
- *                       g_thread_set_priority()
- * @thread_self: virtual function pointer for g_thread_self()
+ *                       xthread_set_priority()
+ * @thread_self: virtual function pointer for xthread_self()
  * @thread_equal: used internally by recursive mutex locks and by some
  *                assertion checks
  *
- * This function table is no longer used by g_thread_init()
+ * This function table is no longer used by xthread_init()
  * to initialize the thread system.
  */
 
@@ -114,9 +114,9 @@
 /* Set this FALSE to have previously-compiled GStaticMutex code use the
  * slow path (ie: call into us) to avoid compatibility problems.
  */
-xboolean_t g_thread_use_default_impl = FALSE;
+xboolean_t xthread_use_default_impl = FALSE;
 
-GThreadFunctions g_thread_functions_for_glib_use =
+GThreadFunctions xthread_functions_for_glib_use =
 {
   g_mutex_new,
   g_mutex_lock,
@@ -133,7 +133,7 @@ GThreadFunctions g_thread_functions_for_glib_use =
   g_private_get,
   g_private_set,
   NULL,
-  g_thread_yield,
+  xthread_yield,
   NULL,
   NULL,
   NULL,
@@ -141,37 +141,37 @@ GThreadFunctions g_thread_functions_for_glib_use =
   NULL,
 };
 
-static guint64
+static xuint64_t
 gettime (void)
 {
   return g_get_monotonic_time () * 1000;
 }
 
-guint64 (*g_thread_gettime) (void) = gettime;
+xuint64_t (*xthread_gettime) (void) = gettime;
 
 /* Initialisation {{{1 ---------------------------------------------------- */
-xboolean_t         g_threads_got_initialized = TRUE;
+xboolean_t         xthreads_got_initialized = TRUE;
 
 /**
- * g_thread_init:
+ * xthread_init:
  * @vtable: a function table of type #GThreadFunctions, that provides
  *     the entry points to the thread system to be used. Since 2.32,
  *     this parameter is ignored and should always be %NULL
  *
  * If you use GLib from more than one thread, you must initialize the
- * thread system by calling g_thread_init().
+ * thread system by calling xthread_init().
  *
- * Since version 2.24, calling g_thread_init() multiple times is allowed,
+ * Since version 2.24, calling xthread_init() multiple times is allowed,
  * but nothing happens except for the first call.
  *
  * Since version 2.32, GLib does not support custom thread implementations
  * anymore and the @vtable parameter is ignored and you should pass %NULL.
  *
- * <note><para>g_thread_init() must not be called directly or indirectly
+ * <note><para>xthread_init() must not be called directly or indirectly
  * in a callback from GLib. Also no mutexes may be currently locked while
- * calling g_thread_init().</para></note>
+ * calling xthread_init().</para></note>
  *
- * <note><para>To use g_thread_init() in your program, you have to link
+ * <note><para>To use xthread_init() in your program, you have to link
  * with the libraries that the command <command>pkg-config --libs
  * gthread-2.0</command> outputs. This is not the case for all the
  * other thread-related functions of GLib. Those can be used without
@@ -183,39 +183,39 @@ xboolean_t         g_threads_got_initialized = TRUE;
  */
 
 /**
- * g_thread_get_initialized:
+ * xthread_get_initialized:
  *
- * Indicates if g_thread_init() has been called.
+ * Indicates if xthread_init() has been called.
  *
  * Returns: %TRUE if threads have been initialized.
  *
  * Since: 2.20
  */
 xboolean_t
-g_thread_get_initialized (void)
+xthread_get_initialized (void)
 {
-  return g_thread_supported ();
+  return xthread_supported ();
 }
 
 /* We need this for ABI compatibility */
 XPL_AVAILABLE_IN_ALL
-void g_thread_init_glib (void);
-void g_thread_init_glib (void) { }
+void xthread_init_glib (void);
+void xthread_init_glib (void) { }
 
 /* Internal variables {{{1 */
 
-static GSList      *g_thread_all_threads = NULL;
-static GSList      *g_thread_free_indices = NULL;
+static xslist_t      *xthread_all_threads = NULL;
+static xslist_t      *xthread_free_indices = NULL;
 
-/* Protects g_thread_all_threads and g_thread_free_indices */
+/* Protects xthread_all_threads and xthread_free_indices */
 G_LOCK_DEFINE_STATIC (g_static_mutex);
-G_LOCK_DEFINE_STATIC (g_thread);
+G_LOCK_DEFINE_STATIC (xthread);
 
-/* Misc. GThread functions {{{1 */
+/* Misc. xthread_t functions {{{1 */
 
 /**
- * g_thread_set_priority:
- * @thread: a #GThread.
+ * xthread_set_priority:
+ * @thread: a #xthread_t.
  * @priority: ignored
  *
  * This function does nothing.
@@ -223,22 +223,22 @@ G_LOCK_DEFINE_STATIC (g_thread);
  * Deprecated:2.32: Thread priorities no longer have any effect.
  */
 void
-g_thread_set_priority (GThread         *thread,
+xthread_set_priority (xthread_t         *thread,
                        GThreadPriority  priority)
 {
 }
 
 /**
- * g_thread_foreach:
- * @thread_func: function to call for all #GThread structures
+ * xthread_foreach:
+ * @thread_func: function to call for all #xthread_t structures
  * @user_data: second argument to @thread_func
  *
  * Call @thread_func on all #GThreads that have been
- * created with g_thread_create().
+ * created with xthread_create().
  *
  * Note that threads may decide to exit while @thread_func is
  * running, so without intimate knowledge about the lifetime of
- * foreign threads, @thread_func shouldn't access the GThread*
+ * foreign threads, @thread_func shouldn't access the xthread_t*
  * pointer passed in as first argument. However, @thread_func will
  * not be called for threads which are known to have exited already.
  *
@@ -247,36 +247,36 @@ g_thread_set_priority (GThread         *thread,
  *
  * Since: 2.10
  *
- * Deprecated:2.32: There aren't many things you can do with a #GThread,
- *     except comparing it with one that was returned from g_thread_create().
+ * Deprecated:2.32: There aren't many things you can do with a #xthread_t,
+ *     except comparing it with one that was returned from xthread_create().
  *     There are better ways to find out if your thread is still alive.
  */
 void
-g_thread_foreach (GFunc    thread_func,
+xthread_foreach (GFunc    thread_func,
                   xpointer_t user_data)
 {
-  GSList *slist = NULL;
+  xslist_t *slist = NULL;
   GRealThread *thread;
   g_return_if_fail (thread_func != NULL);
   /* snapshot the list of threads for iteration */
-  G_LOCK (g_thread);
-  slist = g_slist_copy (g_thread_all_threads);
-  G_UNLOCK (g_thread);
+  G_LOCK (xthread);
+  slist = xslist_copy (xthread_all_threads);
+  G_UNLOCK (xthread);
   /* walk the list, skipping non-existent threads */
   while (slist)
     {
-      GSList *node = slist;
+      xslist_t *node = slist;
       slist = node->next;
       /* check whether the current thread still exists */
-      G_LOCK (g_thread);
-      if (g_slist_find (g_thread_all_threads, node->data))
+      G_LOCK (xthread);
+      if (xslist_find (xthread_all_threads, node->data))
         thread = node->data;
       else
         thread = NULL;
-      G_UNLOCK (g_thread);
+      G_UNLOCK (xthread);
       if (thread)
         thread_func (thread, user_data);
-      g_slist_free_1 (node);
+      xslist_free_1 (node);
     }
 }
 
@@ -285,9 +285,9 @@ g_enumerable_thread_remove (xpointer_t data)
 {
   GRealThread *thread = data;
 
-  G_LOCK (g_thread);
-  g_thread_all_threads = g_slist_remove (g_thread_all_threads, thread);
-  G_UNLOCK (g_thread);
+  G_LOCK (xthread);
+  xthread_all_threads = xslist_remove (xthread_all_threads, thread);
+  G_UNLOCK (xthread);
 }
 
 GPrivate enumerable_thread_private = G_PRIVATE_INIT (g_enumerable_thread_remove);
@@ -295,9 +295,9 @@ GPrivate enumerable_thread_private = G_PRIVATE_INIT (g_enumerable_thread_remove)
 static void
 g_enumerable_thread_add (GRealThread *thread)
 {
-  G_LOCK (g_thread);
-  g_thread_all_threads = g_slist_prepend (g_thread_all_threads, thread);
-  G_UNLOCK (g_thread);
+  G_LOCK (xthread);
+  xthread_all_threads = xslist_prepend (xthread_all_threads, thread);
+  G_UNLOCK (xthread);
 
   g_private_set (&enumerable_thread_private, thread);
 }
@@ -309,11 +309,11 @@ g_deprecated_thread_proxy (xpointer_t data)
 
   g_enumerable_thread_add (real);
 
-  return g_thread_proxy (data);
+  return xthread_proxy (data);
 }
 
 /**
- * g_thread_create:
+ * xthread_create:
  * @func: a function to execute in the new thread
  * @data: an argument to supply to the new thread
  * @joinable: should this thread be joinable?
@@ -329,24 +329,24 @@ g_deprecated_thread_proxy (xpointer_t data)
  *
  * This function returns a reference to the created thread only if
  * @joinable is %TRUE.  In that case, you must free this reference by
- * calling g_thread_unref() or g_thread_join().  If @joinable is %FALSE
+ * calling xthread_unref() or xthread_join().  If @joinable is %FALSE
  * then you should probably not touch the return value.
  *
- * Returns: the new #GThread on success
+ * Returns: the new #xthread_t on success
  *
- * Deprecated:2.32: Use g_thread_new() instead
+ * Deprecated:2.32: Use xthread_new() instead
  */
-GThread *
-g_thread_create (GThreadFunc   func,
+xthread_t *
+xthread_create (GThreadFunc   func,
                  xpointer_t      data,
                  xboolean_t      joinable,
                  xerror_t      **error)
 {
-  return g_thread_create_full (func, data, 0, joinable, 0, 0, error);
+  return xthread_create_full (func, data, 0, joinable, 0, 0, error);
 }
 
 /**
- * g_thread_create_full:
+ * xthread_create_full:
  * @func: a function to execute in the new thread.
  * @data: an argument to supply to the new thread.
  * @stack_size: a stack size for the new thread.
@@ -357,13 +357,13 @@ g_thread_create (GThreadFunc   func,
  *
  * This function creates a new thread.
  *
- * Returns: the new #GThread on success.
+ * Returns: the new #xthread_t on success.
  *
  * Deprecated:2.32: The @bound and @priority arguments are now ignored.
- * Use g_thread_new().
+ * Use xthread_new().
  */
-GThread *
-g_thread_create_full (GThreadFunc       func,
+xthread_t *
+xthread_create_full (GThreadFunc       func,
                       xpointer_t          data,
                       gulong            stack_size,
                       xboolean_t          joinable,
@@ -371,15 +371,15 @@ g_thread_create_full (GThreadFunc       func,
                       GThreadPriority   priority,
                       xerror_t          **error)
 {
-  GThread *thread;
+  xthread_t *thread;
 
-  thread = g_thread_new_internal (NULL, g_deprecated_thread_proxy,
+  thread = xthread_new_internal (NULL, g_deprecated_thread_proxy,
                                   func, data, stack_size, NULL, error);
 
   if (thread && !joinable)
     {
       thread->joinable = FALSE;
-      g_thread_unref (thread);
+      xthread_unref (thread);
     }
 
   return thread;
@@ -397,11 +397,11 @@ g_once_init_enter_impl (volatile xsize_t *location)
 /**
  * GStaticMutex:
  *
- * A #GStaticMutex works like a #GMutex.
+ * A #GStaticMutex works like a #xmutex_t.
  *
  * Prior to GLib 2.32, GStaticMutex had the significant advantage
  * that it doesn't need to be created at run-time, but can be defined
- * at compile-time. Since 2.32, #GMutex can be statically allocated
+ * at compile-time. Since 2.32, #xmutex_t can be statically allocated
  * as well, and GStaticMutex has been deprecated.
  *
  * Here is a version of our give_me_next_number() example using
@@ -423,10 +423,10 @@ g_once_init_enter_impl (volatile xsize_t *location)
  * ]|
  *
  * Sometimes you would like to dynamically create a mutex. If you don't
- * want to require prior calling to g_thread_init(), because your code
+ * want to require prior calling to xthread_init(), because your code
  * should also be usable in non-threaded programs, you are not able to
- * use g_mutex_new() and thus #GMutex, as that requires a prior call to
- * g_thread_init(). In these cases you can also use a #GStaticMutex.
+ * use g_mutex_new() and thus #xmutex_t, as that requires a prior call to
+ * xthread_init(). In these cases you can also use a #GStaticMutex.
  * It must be initialized with g_static_mutex_init() before using it
  * and freed with with g_static_mutex_free() when not needed anymore to
  * free up any allocated resources.
@@ -436,7 +436,7 @@ g_once_init_enter_impl (volatile xsize_t *location)
  * platforms.
  *
  * All of the g_static_mutex_* functions apart from
- * g_static_mutex_get_mutex() can also be used even if g_thread_init()
+ * g_static_mutex_get_mutex() can also be used even if xthread_init()
  * has not yet been called. Then they do nothing, apart from
  * g_static_mutex_trylock() which does nothing but returning %TRUE.
  *
@@ -479,39 +479,39 @@ g_static_mutex_init (GStaticMutex *mutex)
 
 /* IMPLEMENTATION NOTE:
  *
- * On some platforms a GStaticMutex is actually a normal GMutex stored
+ * On some platforms a GStaticMutex is actually a normal xmutex_t stored
  * inside of a structure instead of being allocated dynamically.  We can
  * only do this for platforms on which we know, in advance, how to
  * allocate (size) and initialise (value) that memory.
  *
  * On other platforms, a GStaticMutex is nothing more than a pointer to
- * a GMutex.  In that case, the first access we make to the static mutex
- * must first allocate the normal GMutex and store it into the pointer.
+ * a xmutex_t.  In that case, the first access we make to the static mutex
+ * must first allocate the normal xmutex_t and store it into the pointer.
  *
  * configure.ac writes macros into glibconfig.h to determine if
  * g_static_mutex_get_mutex() accesses the structure in memory directly
  * (on platforms where we are able to do that) or if it ends up here,
- * where we may have to allocate the GMutex before returning it.
+ * where we may have to allocate the xmutex_t before returning it.
  */
 
 /**
  * g_static_mutex_get_mutex:
  * @mutex: a #GStaticMutex.
  *
- * For some operations (like g_cond_wait()) you must have a #GMutex
+ * For some operations (like g_cond_wait()) you must have a #xmutex_t
  * instead of a #GStaticMutex. This function will return the
- * corresponding #GMutex for @mutex.
+ * corresponding #xmutex_t for @mutex.
  *
- * Returns: the #GMutex corresponding to @mutex.
+ * Returns: the #xmutex_t corresponding to @mutex.
  *
- * Deprecated: 2.32: Just use a #GMutex
+ * Deprecated: 2.32: Just use a #xmutex_t
  */
-GMutex *
+xmutex_t *
 g_static_mutex_get_mutex_impl (GStaticMutex* mutex)
 {
-  GMutex *result;
+  xmutex_t *result;
 
-  if (!g_thread_supported ())
+  if (!xthread_supported ())
     return NULL;
 
   result = g_atomic_pointer_get (&mutex->mutex);
@@ -589,16 +589,16 @@ g_static_mutex_get_mutex_impl (GStaticMutex* mutex)
 void
 g_static_mutex_free (GStaticMutex* mutex)
 {
-  GMutex **runtime_mutex;
+  xmutex_t **runtime_mutex;
 
   g_return_if_fail (mutex);
 
   /* The runtime_mutex is the first (or only) member of GStaticMutex,
    * see both versions (of glibconfig.h) in configure.ac. Note, that
-   * this variable is NULL, if g_thread_init() hasn't been called or
+   * this variable is NULL, if xthread_init() hasn't been called or
    * if we're using the default thread implementation and it provides
    * static mutexes. */
-  runtime_mutex = ((GMutex**)mutex);
+  runtime_mutex = ((xmutex_t**)mutex);
 
   if (*runtime_mutex)
     g_mutex_free (*runtime_mutex);
@@ -625,7 +625,7 @@ g_static_mutex_free (GStaticMutex* mutex)
  * with the following functions.
  *
  * All of the g_static_rec_mutex_* functions can be used even if
- * g_thread_init() has not been called. Then they do nothing, apart
+ * xthread_init() has not been called. Then they do nothing, apart
  * from g_static_rec_mutex_trylock(), which does nothing but returning
  * %TRUE.
  */
@@ -668,7 +668,7 @@ g_static_rec_mutex_get_rec_mutex_impl (GStaticRecMutex* mutex)
 {
   GRecMutex *result;
 
-  if (!g_thread_supported ())
+  if (!xthread_supported ())
     return NULL;
 
   result = (GRecMutex *) g_atomic_pointer_get (&mutex->mutex.mutex);
@@ -682,7 +682,7 @@ g_static_rec_mutex_get_rec_mutex_impl (GStaticRecMutex* mutex)
         {
           result = g_slice_new (GRecMutex);
           g_rec_mutex_init (result);
-          g_atomic_pointer_set (&mutex->mutex.mutex, (GMutex *) result);
+          g_atomic_pointer_set (&mutex->mutex.mutex, (xmutex_t *) result);
         }
 
       G_UNLOCK (g_static_mutex);
@@ -863,7 +863,7 @@ g_static_rec_mutex_free (GStaticRecMutex *mutex)
  * Take a look at the following example:
  * |[
  *   GStaticRWLock rwlock = G_STATIC_RW_LOCK_INIT;
- *   GPtrArray *array;
+ *   xptr_array_t *array;
  *
  *   xpointer_t
  *   my_array_get (xuint_t index)
@@ -875,7 +875,7 @@ g_static_rec_mutex_free (GStaticRecMutex *mutex)
  *
  *     g_static_rw_lock_reader_lock (&rwlock);
  *     if (index < array->len)
- *       retval = g_ptr_array_index (array, index);
+ *       retval = xptr_array_index (array, index);
  *     g_static_rw_lock_reader_unlock (&rwlock);
  *
  *     return retval;
@@ -887,11 +887,11 @@ g_static_rec_mutex_free (GStaticRecMutex *mutex)
  *     g_static_rw_lock_writer_lock (&rwlock);
  *
  *     if (!array)
- *       array = g_ptr_array_new ();
+ *       array = xptr_array_new ();
  *
  *     if (index >= array->len)
- *       g_ptr_array_set_size (array, index + 1);
- *     g_ptr_array_index (array, index) = data;
+ *       xptr_array_set_size (array, index + 1);
+ *     xptr_array_index (array, index) = data;
  *
  *     g_static_rw_lock_writer_unlock (&rwlock);
  *   }
@@ -915,7 +915,7 @@ g_static_rec_mutex_free (GStaticRecMutex *mutex)
  * with the following functions.
  *
  * All of the g_static_rw_lock_* functions can be used even if
- * g_thread_init() has not been called. Then they do nothing, apart
+ * xthread_init() has not been called. Then they do nothing, apart
  * from g_static_rw_lock_*_trylock, which does nothing but returning %TRUE.
  *
  * A read-write lock has a higher overhead than a mutex. For example, both
@@ -964,7 +964,7 @@ g_static_rw_lock_init (GStaticRWLock* lock)
 }
 
 inline static void
-g_static_rw_lock_wait (GCond** cond, GStaticMutex* mutex)
+g_static_rw_lock_wait (xcond_t** cond, GStaticMutex* mutex)
 {
   if (!*cond)
       *cond = g_cond_new ();
@@ -1003,7 +1003,7 @@ g_static_rw_lock_reader_lock (GStaticRWLock* lock)
 {
   g_return_if_fail (lock);
 
-  if (!g_threads_got_initialized)
+  if (!xthreads_got_initialized)
     return;
 
   g_static_mutex_lock (&lock->mutex);
@@ -1036,7 +1036,7 @@ g_static_rw_lock_reader_trylock (GStaticRWLock* lock)
 
   g_return_val_if_fail (lock, FALSE);
 
-  if (!g_threads_got_initialized)
+  if (!xthreads_got_initialized)
     return TRUE;
 
   g_static_mutex_lock (&lock->mutex);
@@ -1064,7 +1064,7 @@ g_static_rw_lock_reader_unlock  (GStaticRWLock* lock)
 {
   g_return_if_fail (lock);
 
-  if (!g_threads_got_initialized)
+  if (!xthreads_got_initialized)
     return;
 
   g_static_mutex_lock (&lock->mutex);
@@ -1093,7 +1093,7 @@ g_static_rw_lock_writer_lock (GStaticRWLock* lock)
 {
   g_return_if_fail (lock);
 
-  if (!g_threads_got_initialized)
+  if (!xthreads_got_initialized)
     return;
 
   g_static_mutex_lock (&lock->mutex);
@@ -1125,7 +1125,7 @@ g_static_rw_lock_writer_trylock (GStaticRWLock* lock)
 
   g_return_val_if_fail (lock, FALSE);
 
-  if (!g_threads_got_initialized)
+  if (!xthreads_got_initialized)
     return TRUE;
 
   g_static_mutex_lock (&lock->mutex);
@@ -1156,7 +1156,7 @@ g_static_rw_lock_writer_unlock (GStaticRWLock* lock)
 {
   g_return_if_fail (lock);
 
-  if (!g_threads_got_initialized)
+  if (!xthreads_got_initialized)
     return;
 
   g_static_mutex_lock (&lock->mutex);
@@ -1200,7 +1200,7 @@ g_static_rw_lock_free (GStaticRWLock* lock)
 
 /**
  * g_private_new:
- * @notify: a #GDestroyNotify
+ * @notify: a #xdestroy_notify_t
  *
  * Creates a new #GPrivate.
  *
@@ -1210,7 +1210,7 @@ g_static_rw_lock_free (GStaticRWLock* lock)
  * Returns: a newly allocated #GPrivate (which can never be destroyed)
  */
 GPrivate *
-g_private_new (GDestroyNotify notify)
+g_private_new (xdestroy_notify_t notify)
 {
   GPrivate tmp = G_PRIVATE_INIT (notify);
   GPrivate *key;
@@ -1227,14 +1227,14 @@ typedef struct _GStaticPrivateNode GStaticPrivateNode;
 struct _GStaticPrivateNode
 {
   xpointer_t        data;
-  GDestroyNotify  destroy;
+  xdestroy_notify_t  destroy;
   GStaticPrivate *owner;
 };
 
 static void
 g_static_private_cleanup (xpointer_t data)
 {
-  GArray *array = data;
+  xarray_t *array = data;
   xuint_t i;
 
   for (i = 0; i < array->len; i++ )
@@ -1255,7 +1255,7 @@ GPrivate static_private_private = G_PRIVATE_INIT (g_static_private_cleanup);
  * A #GStaticPrivate works almost like a #GPrivate, but it has one
  * significant advantage. It doesn't need to be created at run-time
  * like a #GPrivate, but can be defined at compile-time. This is
- * similar to the difference between #GMutex and #GStaticMutex.
+ * similar to the difference between #xmutex_t and #GStaticMutex.
  *
  * Now look at our give_me_next_number() example with #GStaticPrivate:
  * |[
@@ -1309,14 +1309,14 @@ g_static_private_init (GStaticPrivate *private_key)
  *
  * Works like g_private_get() only for a #GStaticPrivate.
  *
- * This function works even if g_thread_init() has not yet been called.
+ * This function works even if xthread_init() has not yet been called.
  *
  * Returns: the corresponding pointer
  */
 xpointer_t
 g_static_private_get (GStaticPrivate *private_key)
 {
-  GArray *array;
+  xarray_t *array;
   xpointer_t ret = NULL;
 
   array = g_private_get (&static_private_private);
@@ -1358,39 +1358,39 @@ g_static_private_get (GStaticPrivate *private_key)
  * non-%NULL), whenever the pointer is set again or whenever the
  * current thread ends.
  *
- * This function works even if g_thread_init() has not yet been called.
- * If g_thread_init() is called later, the @data keyed to @private_key
+ * This function works even if xthread_init() has not yet been called.
+ * If xthread_init() is called later, the @data keyed to @private_key
  * will be inherited only by the main thread, i.e. the one that called
- * g_thread_init().
+ * xthread_init().
  *
  * @notify is used quite differently from @destructor in g_private_new().
  */
 void
 g_static_private_set (GStaticPrivate *private_key,
                       xpointer_t        data,
-                      GDestroyNotify  notify)
+                      xdestroy_notify_t  notify)
 {
-  GArray *array;
+  xarray_t *array;
   static xuint_t next_index = 0;
   GStaticPrivateNode *node;
 
   if (!private_key->index)
     {
-      G_LOCK (g_thread);
+      G_LOCK (xthread);
 
       if (!private_key->index)
         {
-          if (g_thread_free_indices)
+          if (xthread_free_indices)
             {
-              private_key->index = GPOINTER_TO_UINT (g_thread_free_indices->data);
-              g_thread_free_indices = g_slist_delete_link (g_thread_free_indices,
-                                                           g_thread_free_indices);
+              private_key->index = GPOINTER_TO_UINT (xthread_free_indices->data);
+              xthread_free_indices = xslist_delete_link (xthread_free_indices,
+                                                           xthread_free_indices);
             }
           else
             private_key->index = ++next_index;
         }
 
-      G_UNLOCK (g_thread);
+      G_UNLOCK (xthread);
     }
 
   array = g_private_get (&static_private_private);
@@ -1437,30 +1437,30 @@ g_static_private_free (GStaticPrivate *private_key)
    * thread end or the next g_static_private_get() call for
    * the same index.
    */
-  G_LOCK (g_thread);
-  g_thread_free_indices = g_slist_prepend (g_thread_free_indices,
+  G_LOCK (xthread);
+  xthread_free_indices = xslist_prepend (xthread_free_indices,
                                            GUINT_TO_POINTER (idx));
-  G_UNLOCK (g_thread);
+  G_UNLOCK (xthread);
 }
 
-/* GMutex {{{1 ------------------------------------------------------ */
+/* xmutex_t {{{1 ------------------------------------------------------ */
 
 /**
  * g_mutex_new:
  *
- * Allocates and initializes a new #GMutex.
+ * Allocates and initializes a new #xmutex_t.
  *
- * Returns: a newly allocated #GMutex. Use g_mutex_free() to free
+ * Returns: a newly allocated #xmutex_t. Use g_mutex_free() to free
  *
- * Deprecated: 2.32: GMutex can now be statically allocated, or embedded
+ * Deprecated: 2.32: xmutex_t can now be statically allocated, or embedded
  * in structures and initialised with g_mutex_init().
  */
-GMutex *
+xmutex_t *
 g_mutex_new (void)
 {
-  GMutex *mutex;
+  xmutex_t *mutex;
 
-  mutex = g_slice_new (GMutex);
+  mutex = g_slice_new (xmutex_t);
   g_mutex_init (mutex);
 
   return mutex;
@@ -1468,41 +1468,41 @@ g_mutex_new (void)
 
 /**
  * g_mutex_free:
- * @mutex: a #GMutex
+ * @mutex: a #xmutex_t
  *
  * Destroys a @mutex that has been created with g_mutex_new().
  *
  * Calling g_mutex_free() on a locked mutex may result
  * in undefined behaviour.
  *
- * Deprecated: 2.32: GMutex can now be statically allocated, or embedded
+ * Deprecated: 2.32: xmutex_t can now be statically allocated, or embedded
  * in structures and initialised with g_mutex_init().
  */
 void
-g_mutex_free (GMutex *mutex)
+g_mutex_free (xmutex_t *mutex)
 {
   g_mutex_clear (mutex);
-  g_slice_free (GMutex, mutex);
+  g_slice_free (xmutex_t, mutex);
 }
 
-/* GCond {{{1 ------------------------------------------------------ */
+/* xcond_t {{{1 ------------------------------------------------------ */
 
 /**
  * g_cond_new:
  *
- * Allocates and initializes a new #GCond.
+ * Allocates and initializes a new #xcond_t.
  *
- * Returns: a newly allocated #GCond. Free with g_cond_free()
+ * Returns: a newly allocated #xcond_t. Free with g_cond_free()
  *
- * Deprecated: 2.32: GCond can now be statically allocated, or embedded
+ * Deprecated: 2.32: xcond_t can now be statically allocated, or embedded
  * in structures and initialised with g_cond_init().
  */
-GCond *
+xcond_t *
 g_cond_new (void)
 {
-  GCond *cond;
+  xcond_t *cond;
 
-  cond = g_slice_new (GCond);
+  cond = g_slice_new (xcond_t);
   g_cond_init (cond);
 
   return cond;
@@ -1510,27 +1510,27 @@ g_cond_new (void)
 
 /**
  * g_cond_free:
- * @cond: a #GCond
+ * @cond: a #xcond_t
  *
- * Destroys a #GCond that has been created with g_cond_new().
+ * Destroys a #xcond_t that has been created with g_cond_new().
  *
- * Calling g_cond_free() for a #GCond on which threads are
+ * Calling g_cond_free() for a #xcond_t on which threads are
  * blocking leads to undefined behaviour.
  *
- * Deprecated: 2.32: GCond can now be statically allocated, or embedded
+ * Deprecated: 2.32: xcond_t can now be statically allocated, or embedded
  * in structures and initialised with g_cond_init().
  */
 void
-g_cond_free (GCond *cond)
+g_cond_free (xcond_t *cond)
 {
   g_cond_clear (cond);
-  g_slice_free (GCond, cond);
+  g_slice_free (xcond_t, cond);
 }
 
 /**
  * g_cond_timed_wait:
- * @cond: a #GCond
- * @mutex: a #GMutex that is currently locked
+ * @cond: a #xcond_t
+ * @mutex: a #xmutex_t that is currently locked
  * @abs_time: a #GTimeVal, determining the final time
  *
  * Waits until this thread is woken up on @cond, but not longer than
@@ -1539,7 +1539,7 @@ g_cond_free (GCond *cond)
  *
  * If @abs_time is %NULL, g_cond_timed_wait() acts like g_cond_wait().
  *
- * This function can be used even if g_thread_init() has not yet been
+ * This function can be used even if xthread_init() has not yet been
  * called, and, in that case, will immediately return %TRUE.
  *
  * To easily calculate @abs_time a combination of g_get_real_time()
@@ -1550,8 +1550,8 @@ g_cond_free (GCond *cond)
  * Deprecated:2.32: Use g_cond_wait_until() instead.
  */
 xboolean_t
-g_cond_timed_wait (GCond    *cond,
-                   GMutex   *mutex,
+g_cond_timed_wait (xcond_t    *cond,
+                   xmutex_t   *mutex,
                    GTimeVal *abs_time)
 {
   gint64 end_time;

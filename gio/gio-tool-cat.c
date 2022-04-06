@@ -51,17 +51,17 @@ cat (xfile_t *file)
   xinput_stream_t *in;
   char *buffer;
   char *p;
-  gssize res;
+  xssize_t res;
   xboolean_t close_res;
   xerror_t *error;
   xboolean_t success;
 
   error = NULL;
-  in = (xinput_stream_t *) g_file_read (file, NULL, &error);
+  in = (xinput_stream_t *) xfile_read (file, NULL, &error);
   if (in == NULL)
     {
       print_file_error (file, error->message);
-      g_error_free (error);
+      xerror_free (error);
       return FALSE;
     }
 
@@ -69,10 +69,10 @@ cat (xfile_t *file)
   success = TRUE;
   while (1)
     {
-      res = g_input_stream_read (in, buffer, STREAM_BUFFER_SIZE, NULL, &error);
+      res = xinput_stream_read (in, buffer, STREAM_BUFFER_SIZE, NULL, &error);
       if (res > 0)
         {
-          gssize written;
+          xssize_t written;
 
           p = buffer;
           while (res > 0)
@@ -95,7 +95,7 @@ cat (xfile_t *file)
       else if (res < 0)
         {
           print_file_error (file, error->message);
-          g_error_free (error);
+          xerror_free (error);
           error = NULL;
           success = FALSE;
           break;
@@ -105,11 +105,11 @@ cat (xfile_t *file)
     }
 
  out:
- close_res = g_input_stream_close (in, NULL, &error);
+ close_res = xinput_stream_close (in, NULL, &error);
   if (!close_res)
     {
       print_file_error (file, error->message);
-      g_error_free (error);
+      xerror_free (error);
       success = FALSE;
     }
 
@@ -121,7 +121,7 @@ cat (xfile_t *file)
 int
 handle_cat (int argc, char *argv[], xboolean_t do_help)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xchar_t *param;
   xerror_t *error = NULL;
   int i;
@@ -130,7 +130,7 @@ handle_cat (int argc, char *argv[], xboolean_t do_help)
 
   g_set_prgname ("gio cat");
   /* Translators: commandline placeholder */
-  param = g_strdup_printf ("%s…", _("LOCATION"));
+  param = xstrdup_printf ("%s…", _("LOCATION"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -152,7 +152,7 @@ handle_cat (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      g_error_free (error);
+      xerror_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -169,9 +169,9 @@ handle_cat (int argc, char *argv[], xboolean_t do_help)
   res = TRUE;
   for (i = 1; i < argc; i++)
     {
-      file = g_file_new_for_commandline_arg (argv[i]);
+      file = xfile_new_for_commandline_arg (argv[i]);
       res &= cat (file);
-      g_object_unref (file);
+      xobject_unref (file);
     }
 
   return res ? 0 : 2;

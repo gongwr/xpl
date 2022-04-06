@@ -12,7 +12,7 @@
 
 /**
  * SECTION:gtcpconnection
- * @title: GTcpConnection
+ * @title: xtcp_connection_t
  * @short_description: A TCP xsocket_connection_t
  * @include: gio/gio.h
  * @see_also: #xsocket_connection_t.
@@ -35,9 +35,9 @@ struct _GTcpConnectionPrivate
   xuint_t graceful_disconnect : 1;
 };
 
-G_DEFINE_TYPE_WITH_CODE (GTcpConnection, g_tcp_connection,
+G_DEFINE_TYPE_WITH_CODE (xtcp_connection, g_tcp_connection,
 			 XTYPE_SOCKET_CONNECTION,
-                         G_ADD_PRIVATE (GTcpConnection)
+                         G_ADD_PRIVATE (xtcp_connection_t)
   xsocket_connection_factory_register_type (g_define_type_id,
 					     XSOCKET_FAMILY_IPV4,
 					     XSOCKET_TYPE_STREAM,
@@ -73,7 +73,7 @@ enum
 };
 
 static void
-g_tcp_connection_init (GTcpConnection *connection)
+g_tcp_connection_init (xtcp_connection_t *connection)
 {
   connection->priv = g_tcp_connection_get_instance_private (connection);
   connection->priv->graceful_disconnect = FALSE;
@@ -82,15 +82,15 @@ g_tcp_connection_init (GTcpConnection *connection)
 static void
 g_tcp_connection_get_property (xobject_t    *object,
 			       xuint_t       prop_id,
-			       GValue     *value,
-			       GParamSpec *pspec)
+			       xvalue_t     *value,
+			       xparam_spec_t *pspec)
 {
-  GTcpConnection *connection = G_TCP_CONNECTION (object);
+  xtcp_connection_t *connection = G_TCP_CONNECTION (object);
 
   switch (prop_id)
     {
       case PROP_GRACEFUL_DISCONNECT:
-	g_value_set_boolean (value, connection->priv->graceful_disconnect);
+	xvalue_set_boolean (value, connection->priv->graceful_disconnect);
 	break;
 
       default:
@@ -101,16 +101,16 @@ g_tcp_connection_get_property (xobject_t    *object,
 static void
 g_tcp_connection_set_property (xobject_t      *object,
 			       xuint_t         prop_id,
-			       const GValue *value,
-			       GParamSpec   *pspec)
+			       const xvalue_t *value,
+			       xparam_spec_t   *pspec)
 {
-  GTcpConnection *connection = G_TCP_CONNECTION (object);
+  xtcp_connection_t *connection = G_TCP_CONNECTION (object);
 
   switch (prop_id)
     {
       case PROP_GRACEFUL_DISCONNECT:
 	g_tcp_connection_set_graceful_disconnect (connection,
-						  g_value_get_boolean (value));
+						  xvalue_get_boolean (value));
 	break;
 
       default:
@@ -130,7 +130,7 @@ g_tcp_connection_class_init (GTcpConnectionClass *class)
   stream_class->close_fn = g_tcp_connection_close;
   stream_class->close_async = g_tcp_connection_close_async;
 
-  g_object_class_install_property (gobject_class, PROP_GRACEFUL_DISCONNECT,
+  xobject_class_install_property (gobject_class, PROP_GRACEFUL_DISCONNECT,
 				   g_param_spec_boolean ("graceful-disconnect",
 							 P_("Graceful Disconnect"),
 							 P_("Whether or not close does a graceful disconnect"),
@@ -144,10 +144,10 @@ g_tcp_connection_close (xio_stream_t     *stream,
 			xcancellable_t  *cancellable,
 			xerror_t       **error)
 {
-  GTcpConnection *connection = G_TCP_CONNECTION (stream);
+  xtcp_connection_t *connection = G_TCP_CONNECTION (stream);
   xsocket_t *socket;
   char buffer[1024];
-  gssize ret;
+  xssize_t ret;
   xboolean_t had_error;
 
   socket = xsocket_connection_get_socket (XSOCKET_CONNECTION (stream));
@@ -185,12 +185,12 @@ g_tcp_connection_close (xio_stream_t     *stream,
 
 /* consumes @error */
 static void
-async_close_finish (GTask    *task,
+async_close_finish (xtask_t    *task,
                     xerror_t   *error)
 {
   xio_stream_class_t *parent = XIO_STREAM_CLASS (g_tcp_connection_parent_class);
-  xio_stream_t *stream = g_task_get_source_object (task);
-  xcancellable_t *cancellable = g_task_get_cancellable (task);
+  xio_stream_t *stream = xtask_get_source_object (task);
+  xcancellable_t *cancellable = xtask_get_cancellable (task);
 
   /* Close underlying stream, ignoring further errors if we already
    * have one.
@@ -201,35 +201,35 @@ async_close_finish (GTask    *task,
     parent->close_fn (stream, cancellable, &error);
 
   if (error)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_boolean (task, TRUE);
+    xtask_return_boolean (task, TRUE);
 }
 
 
 static xboolean_t
 close_read_ready (xsocket_t        *socket,
-		  GIOCondition    condition,
-		  GTask          *task)
+		  xio_condition_t    condition,
+		  xtask_t          *task)
 {
   xerror_t *error = NULL;
   char buffer[1024];
-  gssize ret;
+  xssize_t ret;
 
   ret = xsocket_receive_with_blocking (socket,  buffer, sizeof (buffer),
-                                        FALSE, g_task_get_cancellable (task),
+                                        FALSE, xtask_get_cancellable (task),
                                         &error);
   if (ret < 0)
     {
-      if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
+      if (xerror_matches (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
 	{
-	  g_error_free (error);
+	  xerror_free (error);
 	  return TRUE;
 	}
       else
 	{
 	  async_close_finish (task, error);
-	  g_object_unref (task);
+	  xobject_unref (task);
 	  return FALSE;
 	}
     }
@@ -251,32 +251,32 @@ g_tcp_connection_close_async (xio_stream_t           *stream,
 			      xasync_ready_callback_t  callback,
 			      xpointer_t             user_data)
 {
-  GTcpConnection *connection = G_TCP_CONNECTION (stream);
+  xtcp_connection_t *connection = G_TCP_CONNECTION (stream);
   xsocket_t *socket;
-  GSource *source;
+  xsource_t *source;
   xerror_t *error;
-  GTask *task;
+  xtask_t *task;
 
   if (connection->priv->graceful_disconnect &&
       !g_cancellable_is_cancelled (cancellable) /* Cancelled -> close fast */)
     {
-      task = g_task_new (stream, cancellable, callback, user_data);
-      g_task_set_source_tag (task, g_tcp_connection_close_async);
-      g_task_set_priority (task, io_priority);
+      task = xtask_new (stream, cancellable, callback, user_data);
+      xtask_set_source_tag (task, g_tcp_connection_close_async);
+      xtask_set_priority (task, io_priority);
 
       socket = xsocket_connection_get_socket (XSOCKET_CONNECTION (stream));
 
       error = NULL;
       if (!xsocket_shutdown (socket, FALSE, TRUE, &error))
 	{
-	  g_task_return_error (task, error);
-	  g_object_unref (task);
+	  xtask_return_error (task, error);
+	  xobject_unref (task);
 	  return;
 	}
 
       source = xsocket_create_source (socket, G_IO_IN, cancellable);
-      g_task_attach_source (task, source, (GSourceFunc) close_read_ready);
-      g_source_unref (source);
+      xtask_attach_source (task, source, (xsource_func_t) close_read_ready);
+      xsource_unref (source);
 
       return;
     }
@@ -287,7 +287,7 @@ g_tcp_connection_close_async (xio_stream_t           *stream,
 
 /**
  * g_tcp_connection_set_graceful_disconnect:
- * @connection: a #GTcpConnection
+ * @connection: a #xtcp_connection_t
  * @graceful_disconnect: Whether to do graceful disconnects or not
  *
  * This enables graceful disconnects on close. A graceful disconnect
@@ -303,20 +303,20 @@ g_tcp_connection_close_async (xio_stream_t           *stream,
  * Since: 2.22
  */
 void
-g_tcp_connection_set_graceful_disconnect (GTcpConnection *connection,
+g_tcp_connection_set_graceful_disconnect (xtcp_connection_t *connection,
 					  xboolean_t        graceful_disconnect)
 {
   graceful_disconnect = !!graceful_disconnect;
   if (graceful_disconnect != connection->priv->graceful_disconnect)
     {
       connection->priv->graceful_disconnect = graceful_disconnect;
-      g_object_notify (G_OBJECT (connection), "graceful-disconnect");
+      xobject_notify (G_OBJECT (connection), "graceful-disconnect");
     }
 }
 
 /**
  * g_tcp_connection_get_graceful_disconnect:
- * @connection: a #GTcpConnection
+ * @connection: a #xtcp_connection_t
  *
  * Checks if graceful disconnects are used. See
  * g_tcp_connection_set_graceful_disconnect().
@@ -326,7 +326,7 @@ g_tcp_connection_set_graceful_disconnect (GTcpConnection *connection,
  * Since: 2.22
  */
 xboolean_t
-g_tcp_connection_get_graceful_disconnect (GTcpConnection *connection)
+g_tcp_connection_get_graceful_disconnect (xtcp_connection_t *connection)
 {
   return connection->priv->graceful_disconnect;
 }

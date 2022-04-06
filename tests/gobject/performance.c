@@ -64,9 +64,9 @@ static void
 run_test (PerformanceTest *test)
 {
   xpointer_t data = NULL;
-  guint64 i, num_rounds;
+  xuint64_t i, num_rounds;
   double elapsed, min_elapsed, max_elapsed, avg_elapsed, factor;
-  GTimer *timer;
+  xtimer_t *timer;
 
   g_print ("Running test %s\n", test->name);
 
@@ -208,18 +208,18 @@ simple_object_init (SimpleObject *simple_object)
   simple_object->val = 42;
 }
 
-typedef struct _TestIfaceClass TestIfaceClass;
-typedef struct _TestIfaceClass TestIface1Class;
-typedef struct _TestIfaceClass TestIface2Class;
-typedef struct _TestIfaceClass TestIface3Class;
-typedef struct _TestIfaceClass TestIface4Class;
-typedef struct _TestIfaceClass TestIface5Class;
-typedef struct _TestIface TestIface;
+typedef struct _test_iface_class test_iface_class_t;
+typedef struct _test_iface_class TestIface1Class;
+typedef struct _test_iface_class TestIface2Class;
+typedef struct _test_iface_class TestIface3Class;
+typedef struct _test_iface_class TestIface4Class;
+typedef struct _test_iface_class TestIface5Class;
+typedef struct _test_iface test_iface_t;
 
-struct _TestIfaceClass
+struct _test_iface_class
 {
   xtype_interface_t base_iface;
-  void (*method) (TestIface *obj);
+  void (*method) (test_iface_t *obj);
 };
 
 static xtype_t test_iface1_get_type (void);
@@ -304,18 +304,18 @@ complex_object_finalize (xobject_t *object)
 static void
 complex_object_set_property (xobject_t         *object,
 			     xuint_t            prop_id,
-			     const GValue    *value,
-			     GParamSpec      *pspec)
+			     const xvalue_t    *value,
+			     xparam_spec_t      *pspec)
 {
   ComplexObject *complex = COMPLEX_OBJECT (object);
 
   switch (prop_id)
     {
     case PROP_VAL1:
-      complex->val1 = g_value_get_int (value);
+      complex->val1 = xvalue_get_int (value);
       break;
     case PROP_VAL2:
-      complex->val2 = g_value_get_int (value);
+      complex->val2 = xvalue_get_int (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -326,18 +326,18 @@ complex_object_set_property (xobject_t         *object,
 static void
 complex_object_get_property (xobject_t         *object,
 			     xuint_t            prop_id,
-			     GValue          *value,
-			     GParamSpec      *pspec)
+			     xvalue_t          *value,
+			     xparam_spec_t      *pspec)
 {
   ComplexObject *complex = COMPLEX_OBJECT (object);
 
   switch (prop_id)
     {
     case PROP_VAL1:
-      g_value_set_int (value, complex->val1);
+      xvalue_set_int (value, complex->val1);
       break;
     case PROP_VAL2:
-      g_value_set_int (value, complex->val2);
+      xvalue_set_int (value, complex->val2);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -405,7 +405,7 @@ complex_object_class_init (ComplexObjectClass *class)
                   g_cclosure_marshal_VOID__UINT_POINTER,
                   XTYPE_NONE, 2, XTYPE_UINT, XTYPE_POINTER);
 
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
 				   PROP_VAL1,
 				   g_param_spec_int ("val1",
  						     "val1",
@@ -414,7 +414,7 @@ complex_object_class_init (ComplexObjectClass *class)
  						     G_MAXINT,
  						     42,
  						     G_PARAM_CONSTRUCT | G_PARAM_READWRITE));
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
 				   PROP_VAL2,
 				   g_param_spec_int ("val2",
  						     "val2",
@@ -428,7 +428,7 @@ complex_object_class_init (ComplexObjectClass *class)
 }
 
 static void
-complex_object_iface_method (TestIface *obj)
+complex_object_iface_method (test_iface_t *obj)
 {
   ComplexObject *complex = COMPLEX_OBJECT (obj);
   complex->val1++;
@@ -438,7 +438,7 @@ static void
 complex_test_iface_init (xpointer_t         x_iface,
 			 xpointer_t         iface_data)
 {
-  TestIfaceClass *iface = x_iface;
+  test_iface_class_t *iface = x_iface;
   iface->method = complex_object_iface_method;
 }
 
@@ -498,7 +498,7 @@ test_construction_run (PerformanceTest *test,
 
   n_objects = data->n_objects;
   for (i = 0; i < n_objects; i++)
-    objects[i] = g_object_new (type, NULL);
+    objects[i] = xobject_new (type, NULL);
 }
 
 static void
@@ -509,7 +509,7 @@ test_construction_finish (PerformanceTest *test,
   int i;
 
   for (i = 0; i < data->n_objects; i++)
-    g_object_unref (data->objects[i]);
+    xobject_unref (data->objects[i]);
 }
 
 static void
@@ -549,7 +549,7 @@ test_type_check_setup (PerformanceTest *test)
   struct TypeCheckTest *data;
 
   data = g_new0 (struct TypeCheckTest, 1);
-  data->object = g_object_new (COMPLEX_TYPE_OBJECT, NULL);
+  data->object = xobject_new (COMPLEX_TYPE_OBJECT, NULL);
 
   return data;
 }
@@ -565,10 +565,10 @@ test_type_check_init (PerformanceTest *test,
 }
 
 
-/* Work around g_type_check_instance_is_a being marked "pure",
+/* Work around xtype_check_instance_is_a being marked "pure",
    and thus only called once for the loop. */
 xboolean_t (*my_type_check_instance_is_a) (GTypeInstance *type_instance,
-					 xtype_t          iface_type) = &g_type_check_instance_is_a;
+					 xtype_t          iface_type) = &xtype_check_instance_is_a;
 
 static void
 test_type_check_run (PerformanceTest *test,
@@ -618,7 +618,7 @@ test_type_check_teardown (PerformanceTest *test,
 {
   struct TypeCheckTest *data = _data;
 
-  g_object_unref (data->object);
+  xobject_unref (data->object);
   g_free (data);
 }
 
@@ -668,7 +668,7 @@ test_emission_unhandled_setup (PerformanceTest *test)
   struct EmissionTest *data;
 
   data = g_new0 (struct EmissionTest, 1);
-  data->object = g_object_new (COMPLEX_TYPE_OBJECT, NULL);
+  data->object = xobject_new (COMPLEX_TYPE_OBJECT, NULL);
   data->signal_id = complex_signals[GPOINTER_TO_INT (test->extra_data)];
   return data;
 }
@@ -706,7 +706,7 @@ test_emission_unhandled_teardown (PerformanceTest *test,
 {
   struct EmissionTest *data = _data;
 
-  g_object_unref (data->object);
+  xobject_unref (data->object);
   g_free (data);
 }
 
@@ -725,7 +725,7 @@ test_emission_handled_setup (PerformanceTest *test)
   struct EmissionTest *data;
 
   data = g_new0 (struct EmissionTest, 1);
-  data->object = g_object_new (COMPLEX_TYPE_OBJECT, NULL);
+  data->object = xobject_new (COMPLEX_TYPE_OBJECT, NULL);
   data->signal_id = complex_signals[GPOINTER_TO_INT (test->extra_data)];
   g_signal_connect (data->object, "signal",
                     G_CALLBACK (test_emission_handled_handler),
@@ -779,7 +779,7 @@ test_emission_handled_teardown (PerformanceTest *test,
 {
   struct EmissionTest *data = _data;
 
-  g_object_unref (data->object);
+  xobject_unref (data->object);
   g_free (data);
 }
 
@@ -800,7 +800,7 @@ test_refcount_setup (PerformanceTest *test)
   struct RefcountTest *data;
 
   data = g_new0 (struct RefcountTest, 1);
-  data->object = g_object_new (COMPLEX_TYPE_OBJECT, NULL);
+  data->object = xobject_new (COMPLEX_TYPE_OBJECT, NULL);
 
   return data;
 }
@@ -825,17 +825,17 @@ test_refcount_run (PerformanceTest *test,
 
   for (i = 0; i < data->n_checks; i++)
     {
-      g_object_ref (object);
-      g_object_ref (object);
-      g_object_ref (object);
-      g_object_unref (object);
-      g_object_unref (object);
+      xobject_ref (object);
+      xobject_ref (object);
+      xobject_ref (object);
+      xobject_unref (object);
+      xobject_unref (object);
 
-      g_object_ref (object);
-      g_object_ref (object);
-      g_object_unref (object);
-      g_object_unref (object);
-      g_object_unref (object);
+      xobject_ref (object);
+      xobject_ref (object);
+      xobject_unref (object);
+      xobject_unref (object);
+      xobject_unref (object);
     }
 }
 
@@ -861,7 +861,7 @@ test_refcount_teardown (PerformanceTest *test,
 {
   struct RefcountTest *data = _data;
 
-  g_object_unref (data->object);
+  xobject_unref (data->object);
   g_free (data);
 }
 
@@ -1028,7 +1028,7 @@ main (int   argc,
       char *argv[])
 {
   PerformanceTest *test;
-  GOptionContext *context;
+  xoption_context_t *context;
   xerror_t *error = NULL;
   int i;
 

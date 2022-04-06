@@ -27,12 +27,12 @@
 #include "gdbus-tests.h"
 
 /* all tests rely on a shared mainloop */
-static GMainLoop *loop = NULL;
+static xmain_loop_t *loop = NULL;
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-test_connection_flush_signal_handler (GDBusConnection  *connection,
+test_connection_flush_signal_handler (xdbus_connection_t  *connection,
                                       const xchar_t      *sender_name,
                                       const xchar_t      *object_path,
                                       const xchar_t      *interface_name,
@@ -40,7 +40,7 @@ test_connection_flush_signal_handler (GDBusConnection  *connection,
                                       xvariant_t         *parameters,
                                       xpointer_t         user_data)
 {
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static xboolean_t
@@ -55,7 +55,7 @@ test_connection_flush_on_timeout (xpointer_t user_data)
 static void
 test_connection_flush (void)
 {
-  GDBusConnection *connection;
+  xdbus_connection_t *connection;
   xerror_t *error;
   xuint_t n;
   xuint_t signal_handler_id;
@@ -107,12 +107,12 @@ test_connection_flush (void)
       g_assert_true (ret);
 
       timeout_mainloop_id = g_timeout_add (1000, test_connection_flush_on_timeout, GUINT_TO_POINTER (n));
-      g_main_loop_run (loop);
-      g_source_remove (timeout_mainloop_id);
+      xmain_loop_run (loop);
+      xsource_remove (timeout_mainloop_id);
     }
 
   g_dbus_connection_signal_unsubscribe (connection, signal_handler_id);
-  g_object_unref (connection);
+  xobject_unref (connection);
 
   session_bus_down ();
 }
@@ -131,13 +131,13 @@ large_message_timeout_cb (xpointer_t data)
 {
   (void)data;
 
-  g_error ("Error: timeout waiting for dbus name to appear");
+  xerror ("Error: timeout waiting for dbus name to appear");
 
   return G_SOURCE_REMOVE;
 }
 
 static void
-large_message_on_name_appeared (GDBusConnection *connection,
+large_message_on_name_appeared (xdbus_connection_t *connection,
                                 const xchar_t *name,
                                 const xchar_t *name_owner,
                                 xpointer_t user_data)
@@ -148,7 +148,7 @@ large_message_on_name_appeared (GDBusConnection *connection,
   xvariant_t *result;
   xuint_t n;
 
-  g_assert (g_source_remove (GPOINTER_TO_UINT (user_data)));
+  g_assert (xsource_remove (GPOINTER_TO_UINT (user_data)));
 
   request = g_new (xchar_t, LARGE_MESSAGE_STRING_LENGTH + 1);
   for (n = 0; n < LARGE_MESSAGE_STRING_LENGTH; n++)
@@ -158,10 +158,10 @@ large_message_on_name_appeared (GDBusConnection *connection,
   error = NULL;
   result = g_dbus_connection_call_sync (connection,
                                         "com.example.TestService",      /* bus name */
-                                        "/com/example/TestObject",      /* object path */
+                                        "/com/example/test_object_t",      /* object path */
                                         "com.example.Frob",             /* interface name */
                                         "HelloWorld",                   /* method name */
-                                        g_variant_new ("(s)", request), /* parameters */
+                                        xvariant_new ("(s)", request), /* parameters */
                                         G_VARIANT_TYPE ("(s)"),         /* return type */
                                         G_DBUS_CALL_FLAGS_NONE,
                                         G_MAXINT,
@@ -169,19 +169,19 @@ large_message_on_name_appeared (GDBusConnection *connection,
                                         &error);
   g_assert_no_error (error);
   g_assert (result != NULL);
-  g_variant_get (result, "(&s)", &reply);
+  xvariant_get (result, "(&s)", &reply);
   g_assert_cmpint (strlen (reply), >, LARGE_MESSAGE_STRING_LENGTH);
-  g_assert (g_str_has_prefix (reply, "You greeted me with '01234567890123456789012"));
-  g_assert (g_str_has_suffix (reply, "6789'. Thanks!"));
-  g_variant_unref (result);
+  g_assert (xstr_has_prefix (reply, "You greeted me with '01234567890123456789012"));
+  g_assert (xstr_has_suffix (reply, "6789'. Thanks!"));
+  xvariant_unref (result);
 
   g_free (request);
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
-large_message_on_name_vanished (GDBusConnection *connection,
+large_message_on_name_vanished (xdbus_connection_t *connection,
                                 const xchar_t *name,
                                 xpointer_t user_data)
 {
@@ -208,8 +208,8 @@ test_connection_large_message (void)
                                  large_message_on_name_appeared,
                                  large_message_on_name_vanished,
                                  GUINT_TO_POINTER (timeout_id),  /* user_data */
-                                 NULL); /* GDestroyNotify */
-  g_main_loop_run (loop);
+                                 NULL); /* xdestroy_notify_t */
+  xmain_loop_run (loop);
   g_bus_unwatch_name (watcher_id);
 
   session_bus_down ();
@@ -226,7 +226,7 @@ main (int   argc,
   g_test_init (&argc, &argv, NULL);
 
   /* all the tests rely on a shared main loop */
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   g_test_dbus_unset ();
 
@@ -234,6 +234,6 @@ main (int   argc,
   g_test_add_func ("/gdbus/connection/large_message", test_connection_large_message);
 
   ret = g_test_run();
-  g_main_loop_unref (loop);
+  xmain_loop_unref (loop);
   return ret;
 }

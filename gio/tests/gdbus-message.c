@@ -25,7 +25,7 @@
 
 static void
 on_notify_locked (xobject_t    *object,
-                  GParamSpec *pspec,
+                  xparam_spec_t *pspec,
                   xpointer_t    user_data)
 {
   xint_t *count = user_data;
@@ -35,54 +35,54 @@ on_notify_locked (xobject_t    *object,
 static void
 message_lock (void)
 {
-  GDBusMessage *m;
+  xdbus_message_t *m;
   xint_t count;
 
   count = 0;
-  m = g_dbus_message_new ();
+  m = xdbus_message_new ();
   g_signal_connect (m,
                     "notify::locked",
                     G_CALLBACK (on_notify_locked),
                     &count);
-  g_assert (!g_dbus_message_get_locked (m));
-  g_dbus_message_lock (m);
-  g_assert (g_dbus_message_get_locked (m));
+  g_assert (!xdbus_message_get_locked (m));
+  xdbus_message_lock (m);
+  g_assert (xdbus_message_get_locked (m));
   g_assert_cmpint (count, ==, 1);
-  g_dbus_message_lock (m);
-  g_assert (g_dbus_message_get_locked (m));
+  xdbus_message_lock (m);
+  g_assert (xdbus_message_get_locked (m));
   g_assert_cmpint (count, ==, 1);
 
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
                          "*Attempted to modify a locked message*");
-  g_dbus_message_set_serial (m, 42);
+  xdbus_message_set_serial (m, 42);
   g_test_assert_expected_messages ();
 
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
                          "*Attempted to modify a locked message*");
-  g_dbus_message_set_byte_order (m, G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN);
+  xdbus_message_set_byte_order (m, G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN);
   g_test_assert_expected_messages ();
 
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
                          "*Attempted to modify a locked message*");
-  g_dbus_message_set_message_type (m, G_DBUS_MESSAGE_TYPE_METHOD_CALL);
+  xdbus_message_set_message_type (m, G_DBUS_MESSAGE_TYPE_METHOD_CALL);
   g_test_assert_expected_messages ();
 
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
                          "*Attempted to modify a locked message*");
-  g_dbus_message_set_flags (m, G_DBUS_MESSAGE_FLAGS_NONE);
+  xdbus_message_set_flags (m, G_DBUS_MESSAGE_FLAGS_NONE);
   g_test_assert_expected_messages ();
 
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
                          "*Attempted to modify a locked message*");
-  g_dbus_message_set_body (m, NULL);
+  xdbus_message_set_body (m, NULL);
   g_test_assert_expected_messages ();
 
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
                          "*Attempted to modify a locked message*");
-  g_dbus_message_set_header (m, 0, NULL);
+  xdbus_message_set_header (m, 0, NULL);
   g_test_assert_expected_messages ();
 
-  g_object_unref (m);
+  xobject_unref (m);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -90,42 +90,42 @@ message_lock (void)
 static void
 message_copy (void)
 {
-  GDBusMessage *m;
-  GDBusMessage *copy;
+  xdbus_message_t *m;
+  xdbus_message_t *copy;
   xerror_t *error;
   guchar *m_headers;
   guchar *copy_headers;
   xuint_t n;
 
-  m = g_dbus_message_new_method_call ("org.example.Name",
+  m = xdbus_message_new_method_call ("org.example.Name",
                                       "/org/example/Object",
                                       "org.example.Interface",
                                       "Method");
-  g_dbus_message_set_serial (m, 42);
-  g_dbus_message_set_byte_order (m, G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN);
+  xdbus_message_set_serial (m, 42);
+  xdbus_message_set_byte_order (m, G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN);
 
   error = NULL;
-  copy = g_dbus_message_copy (m, &error);
+  copy = xdbus_message_copy (m, &error);
   g_assert_no_error (error);
   g_assert (X_IS_DBUS_MESSAGE (copy));
   g_assert (m != copy);
   g_assert_cmpint (G_OBJECT (m)->ref_count, ==, 1);
   g_assert_cmpint (G_OBJECT (copy)->ref_count, ==, 1);
 
-  g_assert_cmpint (g_dbus_message_get_serial (copy), ==, g_dbus_message_get_serial (m));
-  g_assert_cmpint (g_dbus_message_get_byte_order (copy), ==, g_dbus_message_get_byte_order (m));
-  g_assert_cmpint (g_dbus_message_get_flags (copy), ==, g_dbus_message_get_flags (m));
-  g_assert_cmpint (g_dbus_message_get_message_type (copy), ==, g_dbus_message_get_message_type (m));
-  m_headers = g_dbus_message_get_header_fields (m);
-  copy_headers = g_dbus_message_get_header_fields (copy);
+  g_assert_cmpint (xdbus_message_get_serial (copy), ==, xdbus_message_get_serial (m));
+  g_assert_cmpint (xdbus_message_get_byte_order (copy), ==, xdbus_message_get_byte_order (m));
+  g_assert_cmpint (xdbus_message_get_flags (copy), ==, xdbus_message_get_flags (m));
+  g_assert_cmpint (xdbus_message_get_message_type (copy), ==, xdbus_message_get_message_type (m));
+  m_headers = xdbus_message_get_header_fields (m);
+  copy_headers = xdbus_message_get_header_fields (copy);
   g_assert (m_headers != NULL);
   g_assert (copy_headers != NULL);
   for (n = 0; m_headers[n] != 0; n++)
     {
       xvariant_t *m_val;
       xvariant_t *copy_val;
-      m_val = g_dbus_message_get_header (m, m_headers[n]);
-      copy_val = g_dbus_message_get_header (m, m_headers[n]);
+      m_val = xdbus_message_get_header (m, m_headers[n]);
+      copy_val = xdbus_message_get_header (m, m_headers[n]);
       g_assert (m_val != NULL);
       g_assert (copy_val != NULL);
       g_assert_cmpvariant (m_val, copy_val);
@@ -135,21 +135,21 @@ message_copy (void)
   g_free (m_headers);
   g_free (copy_headers);
 
-  g_object_unref (copy);
-  g_object_unref (m);
+  xobject_unref (copy);
+  xobject_unref (m);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* Test g_dbus_message_bytes_needed() returns correct results for a variety of
+/* Test xdbus_message_bytes_needed() returns correct results for a variety of
  * arbitrary binary inputs.*/
 static void
 message_bytes_needed (void)
 {
   const struct
     {
-      const guint8 blob[16];
-      gssize expected_bytes_needed;
+      const xuint8_t blob[16];
+      xssize_t expected_bytes_needed;
     }
   vectors[] =
     {
@@ -188,12 +188,12 @@ message_bytes_needed (void)
 
   for (i = 0; i < G_N_ELEMENTS (vectors); i++)
     {
-      gssize bytes_needed;
+      xssize_t bytes_needed;
       xerror_t *local_error = NULL;
 
       g_test_message ("Vector: %" G_GSIZE_FORMAT, i);
 
-      bytes_needed = g_dbus_message_bytes_needed ((guchar *) vectors[i].blob,
+      bytes_needed = xdbus_message_bytes_needed ((guchar *) vectors[i].blob,
                                                   G_N_ELEMENTS (vectors[i].blob),
                                                   &local_error);
 

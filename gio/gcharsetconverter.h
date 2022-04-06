@@ -30,7 +30,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_CHARSET_CONVERTER         (g_charset_converter_get_type ())
-#define G_CHARSET_CONVERTER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CHARSET_CONVERTER, GCharsetConverter))
+#define G_CHARSET_CONVERTER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CHARSET_CONVERTER, xcharset_converter))
 #define G_CHARSET_CONVERTER_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CHARSET_CONVERTER, GCharsetConverterClass))
 #define X_IS_CHARSET_CONVERTER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_CHARSET_CONVERTER))
 #define X_IS_CHARSET_CONVERTER_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_CHARSET_CONVERTER))
@@ -47,16 +47,16 @@ XPL_AVAILABLE_IN_ALL
 xtype_t              g_charset_converter_get_type      (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GCharsetConverter *g_charset_converter_new            (const xchar_t  *to_charset,
+xcharset_converter_t *g_charset_converter_new            (const xchar_t  *to_charset,
 						       const xchar_t  *from_charset,
 						       xerror_t **error);
 XPL_AVAILABLE_IN_ALL
-void               g_charset_converter_set_use_fallback (GCharsetConverter *converter,
+void               g_charset_converter_set_use_fallback (xcharset_converter_t *converter,
 							 xboolean_t use_fallback);
 XPL_AVAILABLE_IN_ALL
-xboolean_t           g_charset_converter_get_use_fallback (GCharsetConverter *converter);
+xboolean_t           g_charset_converter_get_use_fallback (xcharset_converter_t *converter);
 XPL_AVAILABLE_IN_ALL
-xuint_t              g_charset_converter_get_num_fallbacks (GCharsetConverter *converter);
+xuint_t              g_charset_converter_get_num_fallbacks (xcharset_converter_t *converter);
 
 G_END_DECLS
 

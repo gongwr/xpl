@@ -1,7 +1,7 @@
 #include <gio/gio.h>
 
 static void
-on_bus_acquired (GDBusConnection *connection,
+on_bus_acquired (xdbus_connection_t *connection,
                  const xchar_t     *name,
                  xpointer_t         user_data)
 {
@@ -9,7 +9,7 @@ on_bus_acquired (GDBusConnection *connection,
 }
 
 static void
-on_name_acquired (GDBusConnection *connection,
+on_name_acquired (xdbus_connection_t *connection,
                   const xchar_t     *name,
                   xpointer_t         user_data)
 {
@@ -17,7 +17,7 @@ on_name_acquired (GDBusConnection *connection,
 }
 
 static void
-on_name_lost (GDBusConnection *connection,
+on_name_lost (xdbus_connection_t *connection,
               const xchar_t     *name,
               xpointer_t         user_data)
 {
@@ -28,12 +28,12 @@ int
 main (int argc, char *argv[])
 {
   xuint_t owner_id;
-  GMainLoop *loop;
+  xmain_loop_t *loop;
   GBusNameOwnerFlags flags;
   xboolean_t opt_replace;
   xboolean_t opt_allow_replacement;
   xchar_t *opt_name;
-  GOptionContext *opt_context;
+  xoption_context_t *opt_context;
   xerror_t *error;
   GOptionEntry opt_entries[] =
     {
@@ -75,8 +75,8 @@ main (int argc, char *argv[])
                              NULL,
                              NULL);
 
-  loop = g_main_loop_new (NULL, FALSE);
-  g_main_loop_run (loop);
+  loop = xmain_loop_new (NULL, FALSE);
+  xmain_loop_run (loop);
 
   g_bus_unown_name (owner_id);
 

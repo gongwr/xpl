@@ -33,7 +33,7 @@ test_pipe (void)
   xerror_t *error = NULL;
   int pipefd[2];
   char buf[1024];
-  gssize bytes_read;
+  xssize_t bytes_read;
   xboolean_t res;
 
   res = g_unix_open_pipe (pipefd, FD_CLOEXEC, &error);
@@ -49,7 +49,7 @@ test_pipe (void)
   close (pipefd[0]);
   close (pipefd[1]);
 
-  g_assert (g_str_has_prefix (buf, "hello"));
+  g_assert (xstr_has_prefix (buf, "hello"));
 }
 
 static void
@@ -104,8 +104,8 @@ static int sig_counter = 0;
 static xboolean_t
 on_sig_received (xpointer_t user_data)
 {
-  GMainLoop *loop = user_data;
-  g_main_loop_quit (loop);
+  xmain_loop_t *loop = user_data;
+  xmain_loop_quit (loop);
   sig_received = TRUE;
   sig_counter ++;
   return G_SOURCE_REMOVE;
@@ -114,8 +114,8 @@ on_sig_received (xpointer_t user_data)
 static xboolean_t
 on_sig_timeout (xpointer_t data)
 {
-  GMainLoop *loop = data;
-  g_main_loop_quit (loop);
+  xmain_loop_t *loop = data;
+  xmain_loop_quit (loop);
   sig_timeout = TRUE;
   return G_SOURCE_REMOVE;
 }
@@ -123,29 +123,29 @@ on_sig_timeout (xpointer_t data)
 static xboolean_t
 exit_mainloop (xpointer_t data)
 {
-  GMainLoop *loop = data;
-  g_main_loop_quit (loop);
+  xmain_loop_t *loop = data;
+  xmain_loop_quit (loop);
   return G_SOURCE_REMOVE;
 }
 
 static xboolean_t
 on_sig_received_2 (xpointer_t data)
 {
-  GMainLoop *loop = data;
+  xmain_loop_t *loop = data;
 
   sig_counter ++;
   if (sig_counter == 2)
-    g_main_loop_quit (loop);
+    xmain_loop_quit (loop);
   return G_SOURCE_REMOVE;
 }
 
 static void
 test_signal (int signum)
 {
-  GMainLoop *mainloop;
+  xmain_loop_t *mainloop;
   int id;
 
-  mainloop = g_main_loop_new (NULL, FALSE);
+  mainloop = xmain_loop_new (NULL, FALSE);
 
   sig_received = FALSE;
   sig_counter = 0;
@@ -153,14 +153,14 @@ test_signal (int signum)
   kill (getpid (), signum);
   g_assert (!sig_received);
   id = g_timeout_add (5000, on_sig_timeout, mainloop);
-  g_main_loop_run (mainloop);
+  xmain_loop_run (mainloop);
   g_assert (sig_received);
   sig_received = FALSE;
-  g_source_remove (id);
+  xsource_remove (id);
 
   /* Ensure we don't get double delivery */
   g_timeout_add (500, exit_mainloop, mainloop);
-  g_main_loop_run (mainloop);
+  xmain_loop_run (mainloop);
   g_assert (!sig_received);
 
   /* Ensure that two sources for the same signal get it */
@@ -170,11 +170,11 @@ test_signal (int signum)
   id = g_timeout_add (5000, on_sig_timeout, mainloop);
 
   kill (getpid (), signum);
-  g_main_loop_run (mainloop);
+  xmain_loop_run (mainloop);
   g_assert_cmpint (sig_counter, ==, 2);
-  g_source_remove (id);
+  xsource_remove (id);
 
-  g_main_loop_unref (mainloop);
+  xmain_loop_unref (mainloop);
 }
 
 static void
@@ -197,7 +197,7 @@ test_sighup_add_remove (void)
 
   sig_received = FALSE;
   id = g_unix_signal_add (SIGHUP, on_sig_received, NULL);
-  g_source_remove (id);
+  xsource_remove (id);
 
   sigaction (SIGHUP, NULL, &action);
   g_assert (action.sa_handler == SIG_DFL);
@@ -206,24 +206,24 @@ test_sighup_add_remove (void)
 static xboolean_t
 nested_idle (xpointer_t data)
 {
-  GMainLoop *nested;
-  GMainContext *context;
-  GSource *source;
+  xmain_loop_t *nested;
+  xmain_context_t *context;
+  xsource_t *source;
 
-  context = g_main_context_new ();
-  nested = g_main_loop_new (context, FALSE);
+  context = xmain_context_new ();
+  nested = xmain_loop_new (context, FALSE);
 
   source = g_unix_signal_source_new (SIGHUP);
-  g_source_set_callback (source, on_sig_received, nested, NULL);
-  g_source_attach (source, context);
-  g_source_unref (source);
+  xsource_set_callback (source, on_sig_received, nested, NULL);
+  xsource_attach (source, context);
+  xsource_unref (source);
 
   kill (getpid (), SIGHUP);
-  g_main_loop_run (nested);
+  xmain_loop_run (nested);
   g_assert_cmpint (sig_counter, ==, 1);
 
-  g_main_loop_unref (nested);
-  g_main_context_unref (context);
+  xmain_loop_unref (nested);
+  xmain_context_unref (context);
 
   return G_SOURCE_REMOVE;
 }
@@ -231,32 +231,32 @@ nested_idle (xpointer_t data)
 static void
 test_sighup_nested (void)
 {
-  GMainLoop *mainloop;
+  xmain_loop_t *mainloop;
 
-  mainloop = g_main_loop_new (NULL, FALSE);
+  mainloop = xmain_loop_new (NULL, FALSE);
 
   sig_counter = 0;
   sig_received = FALSE;
   g_unix_signal_add (SIGHUP, on_sig_received, mainloop);
   g_idle_add (nested_idle, mainloop);
 
-  g_main_loop_run (mainloop);
+  xmain_loop_run (mainloop);
   g_assert_cmpint (sig_counter, ==, 2);
 
-  g_main_loop_unref (mainloop);
+  xmain_loop_unref (mainloop);
 }
 
 static xboolean_t
 on_sigwinch_received (xpointer_t data)
 {
-  GMainLoop *loop = (GMainLoop *) data;
+  xmain_loop_t *loop = (xmain_loop_t *) data;
 
   sig_counter ++;
 
   if (sig_counter == 1)
     kill (getpid (), SIGWINCH);
   else if (sig_counter == 2)
-    g_main_loop_quit (loop);
+    xmain_loop_quit (loop);
   else if (sig_counter > 2)
     g_assert_not_reached ();
 
@@ -273,27 +273,27 @@ test_callback_after_signal (void)
    * In other words a new signal is never merged with the one being currently
    * dispatched or whose dispatch had already finished. */
 
-  GMainLoop *mainloop;
-  GMainContext *context;
-  GSource *source;
+  xmain_loop_t *mainloop;
+  xmain_context_t *context;
+  xsource_t *source;
 
   sig_counter = 0;
 
-  context = g_main_context_new ();
-  mainloop = g_main_loop_new (context, FALSE);
+  context = xmain_context_new ();
+  mainloop = xmain_loop_new (context, FALSE);
 
   source = g_unix_signal_source_new (SIGWINCH);
-  g_source_set_callback (source, on_sigwinch_received, mainloop, NULL);
-  g_source_attach (source, context);
-  g_source_unref (source);
+  xsource_set_callback (source, on_sigwinch_received, mainloop, NULL);
+  xsource_attach (source, context);
+  xsource_unref (source);
 
   g_assert_cmpint (sig_counter, ==, 0);
   kill (getpid (), SIGWINCH);
-  g_main_loop_run (mainloop);
+  xmain_loop_run (mainloop);
   g_assert_cmpint (sig_counter, ==, 2);
 
-  g_main_loop_unref (mainloop);
-  g_main_context_unref (context);
+  xmain_loop_unref (mainloop);
+  xmain_context_unref (context);
 }
 
 static void

@@ -30,9 +30,9 @@ test_guess (void)
   existing_directory = (xchar_t *) g_getenv ("SYSTEMROOT");
 
   if (existing_directory)
-    existing_directory = g_strdup_printf ("%s/", existing_directory);
+    existing_directory = xstrdup_printf ("%s/", existing_directory);
 #else
-  existing_directory = g_strdup ("/etc/");
+  existing_directory = xstrdup ("/etc/");
 #endif
 
   res = g_content_type_guess (existing_directory, NULL, 0, &uncertain);
@@ -159,7 +159,7 @@ test_subtype (void)
 }
 
 static xint_t
-find_mime (gconstpointer a, gconstpointer b)
+find_mime (xconstpointer a, xconstpointer b)
 {
   if (g_content_type_equals (a, b))
     return 0;
@@ -183,13 +183,13 @@ test_list (void)
 
   types = g_content_types_get_registered ();
 
-  g_assert_cmpuint (g_list_length (types), >, 1);
+  g_assert_cmpuint (xlist_length (types), >, 1);
 
   /* just check that some types are in the list */
-  g_assert_nonnull (g_list_find_custom (types, plain, find_mime));
-  g_assert_nonnull (g_list_find_custom (types, xml, find_mime));
+  g_assert_nonnull (xlist_find_custom (types, plain, find_mime));
+  g_assert_nonnull (xlist_find_custom (types, xml, find_mime));
 
-  g_list_free_full (types, g_free);
+  xlist_free_full (types, g_free);
 
   g_free (plain);
   g_free (xml);
@@ -242,13 +242,13 @@ test_icon (void)
 
       names = g_themed_icon_get_names (G_THEMED_ICON (icon));
 #ifdef __APPLE__
-      g_assert_true (g_strv_contains (names, "text-*"));
+      g_assert_true (xstrv_contains (names, "text-*"));
 #else
-      g_assert_true (g_strv_contains (names, "text-plain"));
-      g_assert_true (g_strv_contains (names, "text-x-generic"));
+      g_assert_true (xstrv_contains (names, "text-plain"));
+      g_assert_true (xstrv_contains (names, "text-x-generic"));
 #endif
     }
-  g_object_unref (icon);
+  xobject_unref (icon);
   g_free (type);
 
   type = g_content_type_from_mime_type ("application/rtf");
@@ -259,12 +259,12 @@ test_icon (void)
       const xchar_t *const *names;
 
       names = g_themed_icon_get_names (G_THEMED_ICON (icon));
-      g_assert_true (g_strv_contains (names, "application-rtf"));
+      g_assert_true (xstrv_contains (names, "application-rtf"));
 #ifndef __APPLE__
-      g_assert_true (g_strv_contains (names, "x-office-document"));
+      g_assert_true (xstrv_contains (names, "x-office-document"));
 #endif
     }
-  g_object_unref (icon);
+  xobject_unref (icon);
   g_free (type);
 }
 
@@ -284,16 +284,16 @@ test_symbolic_icon (void)
 
       names = g_themed_icon_get_names (G_THEMED_ICON (icon));
 #ifdef __APPLE__
-      g_assert_true (g_strv_contains (names, "text-*-symbolic"));
-      g_assert_true (g_strv_contains (names, "text-*"));
+      g_assert_true (xstrv_contains (names, "text-*-symbolic"));
+      g_assert_true (xstrv_contains (names, "text-*"));
 #else
-      g_assert_true (g_strv_contains (names, "text-plain-symbolic"));
-      g_assert_true (g_strv_contains (names, "text-x-generic-symbolic"));
-      g_assert_true (g_strv_contains (names, "text-plain"));
-      g_assert_true (g_strv_contains (names, "text-x-generic"));
+      g_assert_true (xstrv_contains (names, "text-plain-symbolic"));
+      g_assert_true (xstrv_contains (names, "text-x-generic-symbolic"));
+      g_assert_true (xstrv_contains (names, "text-plain"));
+      g_assert_true (xstrv_contains (names, "text-x-generic"));
 #endif
     }
-  g_object_unref (icon);
+  xobject_unref (icon);
   g_free (type);
 
   type = g_content_type_from_mime_type ("application/rtf");
@@ -304,14 +304,14 @@ test_symbolic_icon (void)
       const xchar_t *const *names;
 
       names = g_themed_icon_get_names (G_THEMED_ICON (icon));
-      g_assert_true (g_strv_contains (names, "application-rtf-symbolic"));
-      g_assert_true (g_strv_contains (names, "application-rtf"));
+      g_assert_true (xstrv_contains (names, "application-rtf-symbolic"));
+      g_assert_true (xstrv_contains (names, "application-rtf"));
 #ifndef __APPLE__
-      g_assert_true (g_strv_contains (names, "x-office-document-symbolic"));
-      g_assert_true (g_strv_contains (names, "x-office-document"));
+      g_assert_true (xstrv_contains (names, "x-office-document-symbolic"));
+      g_assert_true (xstrv_contains (names, "x-office-document"));
 #endif
     }
-  g_object_unref (icon);
+  xobject_unref (icon);
   g_free (type);
 #endif
 }
@@ -337,11 +337,11 @@ test_tree (void)
   for (i = 0; i < G_N_ELEMENTS (tests); i++)
     {
       path = g_test_get_filename (G_TEST_DIST, tests[i], NULL);
-      file = g_file_new_for_path (path);
+      file = xfile_new_for_path (path);
       types = g_content_type_guess_for_tree (file);
       g_assert_content_type_equals (types[0], tests[i]);
-      g_strfreev (types);
-      g_object_unref (file);
+      xstrfreev (types);
+      xobject_unref (file);
    }
 }
 

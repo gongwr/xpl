@@ -57,25 +57,25 @@ _im_startup (void (*callback)(inotify_sub *sub))
 void
 _im_add (inotify_sub *sub)
 {
-  if (g_list_find (missing_sub_list, sub))
+  if (xlist_find (missing_sub_list, sub))
     {
       IM_W ("asked to add %s to missing list but it's already on the list!\n", sub->dirname);
       return;
     }
 
   IM_W ("adding %s to missing list\n", sub->dirname);
-  missing_sub_list = g_list_prepend (missing_sub_list, sub);
+  missing_sub_list = xlist_prepend (missing_sub_list, sub);
 
   /* If the timeout is turned off, we turn it back on */
   if (!scan_missing_running)
     {
-      GSource *source;
+      xsource_t *source;
 
       scan_missing_running = TRUE;
       source = g_timeout_source_new_seconds (SCAN_MISSING_TIME);
-      g_source_set_callback (source, im_scan_missing, NULL, NULL);
-      g_source_attach (source, XPL_PRIVATE_CALL (g_get_worker_context) ());
-      g_source_unref (source);
+      xsource_set_callback (source, im_scan_missing, NULL, NULL);
+      xsource_attach (source, XPL_PRIVATE_CALL (g_get_worker_context) ());
+      xsource_unref (source);
     }
 }
 
@@ -85,7 +85,7 @@ _im_rm (inotify_sub *sub)
 {
   xlist_t *link;
 
-  link = g_list_find (missing_sub_list, sub);
+  link = xlist_find (missing_sub_list, sub);
 
   if (!link)
     {
@@ -95,8 +95,8 @@ _im_rm (inotify_sub *sub)
 
   IM_W ("removing %s from missing list\n", sub->dirname);
 
-  missing_sub_list = g_list_remove_link (missing_sub_list, link);
-  g_list_free_1 (link);
+  missing_sub_list = xlist_remove_link (missing_sub_list, link);
+  xlist_free_1 (link);
 }
 
 /* Scans the list of missing subscriptions checking if they
@@ -110,7 +110,7 @@ im_scan_missing (xpointer_t user_data)
 
   G_LOCK (inotify_lock);
 
-  IM_W ("scanning missing list with %d items\n", g_list_length (missing_sub_list));
+  IM_W ("scanning missing list with %d items\n", xlist_length (missing_sub_list));
   for (l = missing_sub_list; l; l = l->next)
     {
       inotify_sub *sub = l->data;
@@ -128,18 +128,18 @@ im_scan_missing (xpointer_t user_data)
 	  /* We have to build a list of list nodes to remove from the
 	   * missing_sub_list. We do the removal outside of this loop.
 	   */
-	  nolonger_missing = g_list_prepend (nolonger_missing, l);
+	  nolonger_missing = xlist_prepend (nolonger_missing, l);
 	}
     }
 
   for (l = nolonger_missing; l ; l = l->next)
     {
       xlist_t *llink = l->data;
-      missing_sub_list = g_list_remove_link (missing_sub_list, llink);
-      g_list_free_1 (llink);
+      missing_sub_list = xlist_remove_link (missing_sub_list, llink);
+      xlist_free_1 (llink);
     }
 
-  g_list_free (nolonger_missing);
+  xlist_free (nolonger_missing);
 
   /* If the missing list is now empty, we disable the timeout */
   if (missing_sub_list == NULL)

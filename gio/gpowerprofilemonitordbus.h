@@ -25,7 +25,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_POWER_PROFILE_MONITOR_DBUS         (g_power_profile_monitor_dbus_get_type ())
-G_DECLARE_FINAL_TYPE (GPowerProfileMonitorDBus, g_power_profile_monitor_dbus, G, POWER_PROFILE_MONITOR_DBUS, xobject_t)
+G_DECLARE_FINAL_TYPE (xpower_profile_monitor_dbus_t, g_power_profile_monitor_dbus, G, POWER_PROFILE_MONITOR_DBUS, xobject_t)
 
 G_END_DECLS
 

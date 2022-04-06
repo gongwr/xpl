@@ -30,13 +30,13 @@
  * @short_description: Base type for D-Bus interfaces
  * @include: gio/gio.h
  *
- * The #GDBusInterface type is the base type for D-Bus interfaces both
- * on the service side (see #GDBusInterfaceSkeleton) and client side
- * (see #GDBusProxy).
+ * The #xdbus_interface_t type is the base type for D-Bus interfaces both
+ * on the service side (see #xdbus_interface_skeleton_t) and client side
+ * (see #xdbus_proxy_t).
  */
 
 typedef GDBusInterfaceIface GDBusInterfaceInterface;
-G_DEFINE_INTERFACE (GDBusInterface, g_dbus_interface, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (xdbus_interface, g_dbus_interface, XTYPE_OBJECT)
 
 static void
 g_dbus_interface_default_init (GDBusInterfaceIface *iface)
@@ -52,12 +52,12 @@ g_dbus_interface_default_init (GDBusInterfaceIface *iface)
  * Gets D-Bus introspection information for the D-Bus interface
  * implemented by @interface_.
  *
- * Returns: (transfer none): A #GDBusInterfaceInfo. Do not free.
+ * Returns: (transfer none): A #xdbus_interface_info_t. Do not free.
  *
  * Since: 2.30
  */
-GDBusInterfaceInfo *
-g_dbus_interface_get_info (GDBusInterface *interface_)
+xdbus_interface_info_t *
+g_dbus_interface_get_info (xdbus_interface_t *interface_)
 {
   g_return_val_if_fail (X_IS_DBUS_INTERFACE (interface_), NULL);
   return G_DBUS_INTERFACE_GET_IFACE (interface_)->get_info (interface_);
@@ -67,19 +67,19 @@ g_dbus_interface_get_info (GDBusInterface *interface_)
  * g_dbus_interface_get_object: (skip)
  * @interface_: An exported D-Bus interface
  *
- * Gets the #GDBusObject that @interface_ belongs to, if any.
+ * Gets the #xdbus_object_t that @interface_ belongs to, if any.
  *
  * It is not safe to use the returned object if @interface_ or
  * the returned object is being used from other threads. See
  * g_dbus_interface_dup_object() for a thread-safe alternative.
  *
- * Returns: (nullable) (transfer none): A #GDBusObject or %NULL. The returned
+ * Returns: (nullable) (transfer none): A #xdbus_object_t or %NULL. The returned
  *     reference belongs to @interface_ and should not be freed.
  *
  * Since: 2.30
  */
-GDBusObject *
-g_dbus_interface_get_object (GDBusInterface *interface_)
+xdbus_object_t *
+g_dbus_interface_get_object (xdbus_interface_t *interface_)
 {
   g_return_val_if_fail (X_IS_DBUS_INTERFACE (interface_), NULL);
   return G_DBUS_INTERFACE_GET_IFACE (interface_)->get_object (interface_);
@@ -89,17 +89,17 @@ g_dbus_interface_get_object (GDBusInterface *interface_)
  * g_dbus_interface_dup_object: (rename-to g_dbus_interface_get_object)
  * @interface_: An exported D-Bus interface.
  *
- * Gets the #GDBusObject that @interface_ belongs to, if any.
+ * Gets the #xdbus_object_t that @interface_ belongs to, if any.
  *
- * Returns: (nullable) (transfer full): A #GDBusObject or %NULL. The returned
- * reference should be freed with g_object_unref().
+ * Returns: (nullable) (transfer full): A #xdbus_object_t or %NULL. The returned
+ * reference should be freed with xobject_unref().
  *
  * Since: 2.32
  */
-GDBusObject *
-g_dbus_interface_dup_object (GDBusInterface *interface_)
+xdbus_object_t *
+g_dbus_interface_dup_object (xdbus_interface_t *interface_)
 {
-  GDBusObject *ret;
+  xdbus_object_t *ret;
   g_return_val_if_fail (X_IS_DBUS_INTERFACE (interface_), NULL);
   if (G_LIKELY (G_DBUS_INTERFACE_GET_IFACE (interface_)->dup_object != NULL))
     {
@@ -108,10 +108,10 @@ g_dbus_interface_dup_object (GDBusInterface *interface_)
   else
     {
       g_warning ("No dup_object() vfunc on type %s - using get_object() in a way that is not thread-safe.",
-                 g_type_name_from_instance ((GTypeInstance *) interface_));
+                 xtype_name_from_instance ((GTypeInstance *) interface_));
       ret = G_DBUS_INTERFACE_GET_IFACE (interface_)->get_object (interface_);
       if (ret != NULL)
-        g_object_ref (ret);
+        xobject_ref (ret);
     }
   return ret;
 }
@@ -119,17 +119,17 @@ g_dbus_interface_dup_object (GDBusInterface *interface_)
 /**
  * g_dbus_interface_set_object:
  * @interface_: An exported D-Bus interface.
- * @object: (nullable): A #GDBusObject or %NULL.
+ * @object: (nullable): A #xdbus_object_t or %NULL.
  *
- * Sets the #GDBusObject for @interface_ to @object.
+ * Sets the #xdbus_object_t for @interface_ to @object.
  *
  * Note that @interface_ will hold a weak reference to @object.
  *
  * Since: 2.30
  */
 void
-g_dbus_interface_set_object (GDBusInterface    *interface_,
-                             GDBusObject       *object)
+g_dbus_interface_set_object (xdbus_interface_t    *interface_,
+                             xdbus_object_t       *object)
 {
   g_return_if_fail (X_IS_DBUS_INTERFACE (interface_));
   g_return_if_fail (object == NULL || X_IS_DBUS_OBJECT (object));

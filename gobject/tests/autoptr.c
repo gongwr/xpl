@@ -23,60 +23,60 @@
 #include <glib-object.h>
 #include <string.h>
 
-G_DECLARE_DERIVABLE_TYPE (TestAutoCleanupBase, test_base_auto_cleanup, TEST, BASE_AUTO_CLEANUP, xobject_t)
+G_DECLARE_DERIVABLE_TYPE (test_auto_cleanup_base, test_base_auto_cleanup, TEST, BASE_AUTO_CLEANUP, xobject)
 
-struct _TestAutoCleanupBaseClass {
+struct _test_auto_cleanup_base_class {
   xobject_class_t parent_class;
 };
 
-G_DEFINE_TYPE (TestAutoCleanupBase, test_base_auto_cleanup, XTYPE_OBJECT)
+G_DEFINE_TYPE (test_auto_cleanup_base, test_base_auto_cleanup, XTYPE_OBJECT)
 
 static void
-test_base_auto_cleanup_class_init (TestAutoCleanupBaseClass *class)
+test_base_auto_cleanup_class_init (test_auto_cleanup_base_class_t *class)
 {
 }
 
 static void
-test_base_auto_cleanup_init (TestAutoCleanupBase *tac)
+test_base_auto_cleanup_init (test_auto_cleanup_base_t *tac)
 {
 }
 
-G_DECLARE_FINAL_TYPE (TestAutoCleanup, test_auto_cleanup, TEST, AUTO_CLEANUP, TestAutoCleanupBase)
+G_DECLARE_FINAL_TYPE (test_auto_cleanup, test_auto_cleanup, TEST, AUTO_CLEANUP, test_auto_cleanup_base)
 
-struct _TestAutoCleanup
+struct _test_auto_cleanup
 {
-  TestAutoCleanupBase parent_instance;
+  test_auto_cleanup_base_t parent_instance;
 };
 
-G_DEFINE_TYPE (TestAutoCleanup, test_auto_cleanup, XTYPE_OBJECT)
+G_DEFINE_TYPE (test_auto_cleanup, test_auto_cleanup, XTYPE_OBJECT)
 
 static void
-test_auto_cleanup_class_init (TestAutoCleanupClass *class)
+test_auto_cleanup_class_init (test_auto_cleanup_class_t *class)
 {
 }
 
 static void
-test_auto_cleanup_init (TestAutoCleanup *tac)
+test_auto_cleanup_init (test_auto_cleanup_t *tac)
 {
 }
 
-static TestAutoCleanup *
+static test_auto_cleanup_t *
 test_auto_cleanup_new (void)
 {
-  return g_object_new (test_auto_cleanup_get_type (), NULL);
+  return xobject_new (test_auto_cleanup_get_type (), NULL);
 }
 
 /* Verify that an object declared with G_DECLARE_FINAL_TYPE provides by default
  * autocleanup functions, defined using the ones of the base type (defined with
- * G_DECLARE_DERIVABLE_TYPE) and so that it can be used with g_autoptr */
+ * G_DECLARE_DERIVABLE_TYPE) and so that it can be used with x_autoptr */
 static void
 test_autoptr (void)
 {
-  TestAutoCleanup *tac_ptr = test_auto_cleanup_new ();
-  g_object_add_weak_pointer (G_OBJECT (tac_ptr), (xpointer_t *) &tac_ptr);
+  test_auto_cleanup_t *tac_ptr = test_auto_cleanup_new ();
+  xobject_add_weak_pointer (G_OBJECT (tac_ptr), (xpointer_t *) &tac_ptr);
 
   {
-    g_autoptr (TestAutoCleanup) tac = tac_ptr;
+    x_autoptr (test_auto_cleanup) tac = tac_ptr;
     g_assert_nonnull (tac);
   }
 #ifdef __GNUC__
@@ -90,13 +90,13 @@ test_autoptr (void)
 static void
 test_autoptr_steal (void)
 {
-  g_autoptr (TestAutoCleanup) tac1 = test_auto_cleanup_new ();
-  TestAutoCleanup *tac_ptr = tac1;
+  x_autoptr (test_auto_cleanup) tac1 = test_auto_cleanup_new ();
+  test_auto_cleanup_t *tac_ptr = tac1;
 
-  g_object_add_weak_pointer (G_OBJECT (tac_ptr), (xpointer_t *) &tac_ptr);
+  xobject_add_weak_pointer (G_OBJECT (tac_ptr), (xpointer_t *) &tac_ptr);
 
   {
-    g_autoptr (TestAutoCleanup) tac2 = g_steal_pointer (&tac1);
+    x_autoptr (test_auto_cleanup) tac2 = g_steal_pointer (&tac1);
     g_assert_nonnull (tac_ptr);
     g_assert_null (tac1);
     g_assert_true (tac2 == tac_ptr);
@@ -113,19 +113,19 @@ test_autoptr_steal (void)
 static void
 test_autolist (void)
 {
-  TestAutoCleanup *tac1 = test_auto_cleanup_new ();
-  TestAutoCleanup *tac2 = test_auto_cleanup_new ();
-  g_autoptr (TestAutoCleanup) tac3 = test_auto_cleanup_new ();
+  test_auto_cleanup_t *tac1 = test_auto_cleanup_new ();
+  test_auto_cleanup_t *tac2 = test_auto_cleanup_new ();
+  x_autoptr (test_auto_cleanup) tac3 = test_auto_cleanup_new ();
 
-  g_object_add_weak_pointer (G_OBJECT (tac1), (xpointer_t *) &tac1);
-  g_object_add_weak_pointer (G_OBJECT (tac2), (xpointer_t *) &tac2);
-  g_object_add_weak_pointer (G_OBJECT (tac3), (xpointer_t *) &tac3);
+  xobject_add_weak_pointer (G_OBJECT (tac1), (xpointer_t *) &tac1);
+  xobject_add_weak_pointer (G_OBJECT (tac2), (xpointer_t *) &tac2);
+  xobject_add_weak_pointer (G_OBJECT (tac3), (xpointer_t *) &tac3);
 
   {
-    g_autolist (TestAutoCleanup) l = NULL;
+    g_autolist (test_auto_cleanup) l = NULL;
 
-    l = g_list_prepend (l, tac1);
-    l = g_list_prepend (l, tac2);
+    l = xlist_prepend (l, tac1);
+    l = xlist_prepend (l, tac2);
 
     /* Squash warnings about dead stores */
     (void) l;
@@ -149,19 +149,19 @@ test_autolist (void)
 static void
 test_autoslist (void)
 {
-  TestAutoCleanup *tac1 = test_auto_cleanup_new ();
-  TestAutoCleanup *tac2 = test_auto_cleanup_new ();
-  g_autoptr (TestAutoCleanup) tac3 = test_auto_cleanup_new ();
+  test_auto_cleanup_t *tac1 = test_auto_cleanup_new ();
+  test_auto_cleanup_t *tac2 = test_auto_cleanup_new ();
+  x_autoptr (test_auto_cleanup) tac3 = test_auto_cleanup_new ();
 
-  g_object_add_weak_pointer (G_OBJECT (tac1), (xpointer_t *) &tac1);
-  g_object_add_weak_pointer (G_OBJECT (tac2), (xpointer_t *) &tac2);
-  g_object_add_weak_pointer (G_OBJECT (tac3), (xpointer_t *) &tac3);
+  xobject_add_weak_pointer (G_OBJECT (tac1), (xpointer_t *) &tac1);
+  xobject_add_weak_pointer (G_OBJECT (tac2), (xpointer_t *) &tac2);
+  xobject_add_weak_pointer (G_OBJECT (tac3), (xpointer_t *) &tac3);
 
   {
-    g_autoslist (TestAutoCleanup) l = NULL;
+    g_autoslist (test_auto_cleanup) l = NULL;
 
-    l = g_slist_prepend (l, tac1);
-    l = g_slist_prepend (l, tac2);
+    l = xslist_prepend (l, tac1);
+    l = xslist_prepend (l, tac2);
   }
 
   /* Only assert if autoptr works */
@@ -182,16 +182,16 @@ test_autoslist (void)
 static void
 test_autoqueue (void)
 {
-  TestAutoCleanup *tac1 = test_auto_cleanup_new ();
-  TestAutoCleanup *tac2 = test_auto_cleanup_new ();
-  g_autoptr (TestAutoCleanup) tac3 = test_auto_cleanup_new ();
+  test_auto_cleanup_t *tac1 = test_auto_cleanup_new ();
+  test_auto_cleanup_t *tac2 = test_auto_cleanup_new ();
+  x_autoptr (test_auto_cleanup) tac3 = test_auto_cleanup_new ();
 
-  g_object_add_weak_pointer (G_OBJECT (tac1), (xpointer_t *) &tac1);
-  g_object_add_weak_pointer (G_OBJECT (tac2), (xpointer_t *) &tac2);
-  g_object_add_weak_pointer (G_OBJECT (tac3), (xpointer_t *) &tac3);
+  xobject_add_weak_pointer (G_OBJECT (tac1), (xpointer_t *) &tac1);
+  xobject_add_weak_pointer (G_OBJECT (tac2), (xpointer_t *) &tac2);
+  xobject_add_weak_pointer (G_OBJECT (tac3), (xpointer_t *) &tac3);
 
   {
-    g_autoqueue (TestAutoCleanup) q = g_queue_new ();
+    g_autoqueue (test_auto_cleanup) q = g_queue_new ();
 
     g_queue_push_head (q, tac1);
     g_queue_push_tail (q, tac2);
@@ -211,11 +211,11 @@ test_autoqueue (void)
 static void
 test_autoclass (void)
 {
-  g_autoptr (TestAutoCleanupBaseClass) base_class_ptr = NULL;
-  g_autoptr (TestAutoCleanupClass) class_ptr = NULL;
+  x_autoptr (test_auto_cleanup_base) base_class_ptr = NULL;
+  x_autoptr (test_auto_cleanup) class_ptr = NULL;
 
-  base_class_ptr = g_type_class_ref (test_base_auto_cleanup_get_type ());
-  class_ptr = g_type_class_ref (test_auto_cleanup_get_type ());
+  base_class_ptr = xtype_class_ref (test_base_auto_cleanup_get_type ());
+  class_ptr = xtype_class_ref (test_auto_cleanup_get_type ());
 
   g_assert_nonnull (base_class_ptr);
   g_assert_nonnull (class_ptr);

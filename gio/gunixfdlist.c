@@ -14,12 +14,12 @@
 
 /**
  * SECTION:gunixfdlist
- * @title: GUnixFDList
+ * @title: xunix_fd_list_t
  * @short_description: An object containing a set of UNIX file descriptors
  * @include: gio/gunixfdlist.h
  * @see_also: #GUnixFDMessage
  *
- * A #GUnixFDList contains a list of file descriptors.  It owns the file
+ * A #xunix_fd_list_t contains a list of file descriptors.  It owns the file
  * descriptors that it contains, closing them when finalized.
  *
  * It may be wrapped in a #GUnixFDMessage and sent over a #xsocket_t in
@@ -32,9 +32,9 @@
  */
 
 /**
- * GUnixFDList:
+ * xunix_fd_list_t:
  *
- * #GUnixFDList is an opaque data structure and can only be accessed
+ * #xunix_fd_list_t is an opaque data structure and can only be accessed
  * using the following functions.
  **/
 
@@ -55,10 +55,10 @@ struct _GUnixFDListPrivate
   xint_t nfd;
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (GUnixFDList, g_unix_fd_list, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (xunix_fd_list_t, g_unix_fd_list, XTYPE_OBJECT)
 
 static void
-g_unix_fd_list_init (GUnixFDList *list)
+g_unix_fd_list_init (xunix_fd_list_t *list)
 {
   list->priv = g_unix_fd_list_get_instance_private (list);
 }
@@ -66,7 +66,7 @@ g_unix_fd_list_init (GUnixFDList *list)
 static void
 g_unix_fd_list_finalize (xobject_t *object)
 {
-  GUnixFDList *list = G_UNIX_FD_LIST (object);
+  xunix_fd_list_t *list = G_UNIX_FD_LIST (object);
   xint_t i;
 
   for (i = 0; i < list->priv->nfd; i++)
@@ -113,7 +113,7 @@ dup_close_on_exec_fd (xint_t     fd,
 
       g_set_error (error, G_IO_ERROR,
                    g_io_error_from_errno (saved_errno),
-                   "dup: %s", g_strerror (saved_errno));
+                   "dup: %s", xstrerror (saved_errno));
 
       return -1;
     }
@@ -133,7 +133,7 @@ dup_close_on_exec_fd (xint_t     fd,
 
       g_set_error (error, G_IO_ERROR,
                    g_io_error_from_errno (saved_errno),
-                   "fcntl: %s", g_strerror (saved_errno));
+                   "fcntl: %s", xstrerror (saved_errno));
       close (new_fd);
 
       return -1;
@@ -145,16 +145,16 @@ dup_close_on_exec_fd (xint_t     fd,
 /**
  * g_unix_fd_list_new:
  *
- * Creates a new #GUnixFDList containing no file descriptors.
+ * Creates a new #xunix_fd_list_t containing no file descriptors.
  *
- * Returns: a new #GUnixFDList
+ * Returns: a new #xunix_fd_list_t
  *
  * Since: 2.24
  **/
-GUnixFDList *
+xunix_fd_list_t *
 g_unix_fd_list_new (void)
 {
-  return g_object_new (XTYPE_UNIX_FD_LIST, NULL);
+  return xobject_new (XTYPE_UNIX_FD_LIST, NULL);
 }
 
 /**
@@ -162,7 +162,7 @@ g_unix_fd_list_new (void)
  * @fds: (array length=n_fds): the initial list of file descriptors
  * @n_fds: the length of #fds, or -1
  *
- * Creates a new #GUnixFDList containing the file descriptors given in
+ * Creates a new #xunix_fd_list_t containing the file descriptors given in
  * @fds.  The file descriptors become the property of the new list and
  * may no longer be used by the caller.  The array itself is owned by
  * the caller.
@@ -171,22 +171,22 @@ g_unix_fd_list_new (void)
  *
  * If @n_fds is -1 then @fds must be terminated with -1.
  *
- * Returns: a new #GUnixFDList
+ * Returns: a new #xunix_fd_list_t
  *
  * Since: 2.24
  **/
-GUnixFDList *
+xunix_fd_list_t *
 g_unix_fd_list_new_from_array (const xint_t *fds,
                                xint_t        n_fds)
 {
-  GUnixFDList *list;
+  xunix_fd_list_t *list;
 
   g_return_val_if_fail (fds != NULL || n_fds == 0, NULL);
 
   if (n_fds == -1)
     for (n_fds = 0; fds[n_fds] != -1; n_fds++);
 
-  list = g_object_new (XTYPE_UNIX_FD_LIST, NULL);
+  list = xobject_new (XTYPE_UNIX_FD_LIST, NULL);
   list->priv->fds = g_new (xint_t, n_fds + 1);
   list->priv->nfd = n_fds;
 
@@ -199,7 +199,7 @@ g_unix_fd_list_new_from_array (const xint_t *fds,
 
 /**
  * g_unix_fd_list_steal_fds:
- * @list: a #GUnixFDList
+ * @list: a #xunix_fd_list_t
  * @length: (out) (optional): pointer to the length of the returned
  *     array, or %NULL
  *
@@ -228,7 +228,7 @@ g_unix_fd_list_new_from_array (const xint_t *fds,
  * Since: 2.24
  */
 xint_t *
-g_unix_fd_list_steal_fds (GUnixFDList *list,
+g_unix_fd_list_steal_fds (xunix_fd_list_t *list,
                           xint_t        *length)
 {
   xint_t *result;
@@ -255,7 +255,7 @@ g_unix_fd_list_steal_fds (GUnixFDList *list,
 
 /**
  * g_unix_fd_list_peek_fds:
- * @list: a #GUnixFDList
+ * @list: a #xunix_fd_list_t
  * @length: (out) (optional): pointer to the length of the returned
  *     array, or %NULL
  *
@@ -279,7 +279,7 @@ g_unix_fd_list_steal_fds (GUnixFDList *list,
  * Since: 2.24
  */
 const xint_t *
-g_unix_fd_list_peek_fds (GUnixFDList *list,
+g_unix_fd_list_peek_fds (xunix_fd_list_t *list,
                          xint_t        *length)
 {
   g_return_val_if_fail (X_IS_UNIX_FD_LIST (list), NULL);
@@ -300,7 +300,7 @@ g_unix_fd_list_peek_fds (GUnixFDList *list,
 
 /**
  * g_unix_fd_list_append:
- * @list: a #GUnixFDList
+ * @list: a #xunix_fd_list_t
  * @fd: a valid open file descriptor
  * @error: a #xerror_t pointer
  *
@@ -323,7 +323,7 @@ g_unix_fd_list_peek_fds (GUnixFDList *list,
  * Since: 2.24
  */
 xint_t
-g_unix_fd_list_append (GUnixFDList  *list,
+g_unix_fd_list_append (xunix_fd_list_t  *list,
                        xint_t          fd,
                        xerror_t      **error)
 {
@@ -347,7 +347,7 @@ g_unix_fd_list_append (GUnixFDList  *list,
 
 /**
  * g_unix_fd_list_get:
- * @list: a #GUnixFDList
+ * @list: a #xunix_fd_list_t
  * @index_: the index into the list
  * @error: a #xerror_t pointer
  *
@@ -369,7 +369,7 @@ g_unix_fd_list_append (GUnixFDList  *list,
  * Since: 2.24
  **/
 xint_t
-g_unix_fd_list_get (GUnixFDList  *list,
+g_unix_fd_list_get (xunix_fd_list_t  *list,
                     xint_t          index_,
                     xerror_t      **error)
 {
@@ -382,7 +382,7 @@ g_unix_fd_list_get (GUnixFDList  *list,
 
 /**
  * g_unix_fd_list_get_length:
- * @list: a #GUnixFDList
+ * @list: a #xunix_fd_list_t
  *
  * Gets the length of @list (ie: the number of file descriptors
  * contained within).
@@ -392,7 +392,7 @@ g_unix_fd_list_get (GUnixFDList  *list,
  * Since: 2.24
  **/
 xint_t
-g_unix_fd_list_get_length (GUnixFDList *list)
+g_unix_fd_list_get_length (xunix_fd_list_t *list)
 {
   g_return_val_if_fail (X_IS_UNIX_FD_LIST (list), 0);
 

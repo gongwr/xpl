@@ -10,7 +10,7 @@ LLVMFuzzerTestOneInput (const unsigned char *data, size_t size)
   fuzz_set_logging_func ();
 
   /* ignore @size (none of the functions support it); ensure @data is nul-terminated */
-  nul_terminated_data = (unsigned char *) g_strndup ((const xchar_t *) data, size);
+  nul_terminated_data = (unsigned char *) xstrndup ((const xchar_t *) data, size);
 
   g_path_is_absolute ((const xchar_t *) nul_terminated_data);
 

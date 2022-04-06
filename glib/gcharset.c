@@ -49,17 +49,17 @@
 
 G_LOCK_DEFINE_STATIC (aliases);
 
-static GHashTable *
+static xhashtable_t *
 get_alias_hash (void)
 {
-  static GHashTable *alias_hash = NULL;
+  static xhashtable_t *alias_hash = NULL;
   const char *aliases;
 
   G_LOCK (aliases);
 
   if (!alias_hash)
     {
-      alias_hash = g_hash_table_new (g_str_hash, g_str_equal);
+      alias_hash = xhash_table_new (xstr_hash, xstr_equal);
 
       aliases = _g_locale_get_charset_aliases ();
       while (*aliases != '\0')
@@ -74,7 +74,7 @@ get_alias_hash (void)
           canonical = aliases;
           aliases += strlen (aliases) + 1;
 
-          alias_array = g_hash_table_lookup (alias_hash, canonical);
+          alias_array = xhash_table_lookup (alias_hash, canonical);
           if (alias_array)
             {
               while (alias_array[count])
@@ -85,7 +85,7 @@ get_alias_hash (void)
           alias_array[count] = alias;
           alias_array[count + 1] = NULL;
 
-          g_hash_table_insert (alias_hash, (char *)canonical, alias_array);
+          xhash_table_insert (alias_hash, (char *)canonical, alias_array);
         }
     }
 
@@ -100,13 +100,13 @@ get_alias_hash (void)
 const char **
 _g_charset_get_aliases (const char *canonical_name)
 {
-  GHashTable *alias_hash = get_alias_hash ();
+  xhashtable_t *alias_hash = get_alias_hash ();
 
-  return g_hash_table_lookup (alias_hash, canonical_name);
+  return xhash_table_lookup (alias_hash, canonical_name);
 }
 
 static xboolean_t
-g_utf8_get_charset_internal (const char  *raw_data,
+xutf8_get_charset_internal (const char  *raw_data,
                              const char **a)
 {
   /* Allow CHARSET to override the charset of any locale category. Users should
@@ -216,9 +216,9 @@ g_get_charset (const char **charset)
 
       g_free (cache->raw);
       g_free (cache->charset);
-      cache->raw = g_strdup (raw);
-      cache->is_utf8 = g_utf8_get_charset_internal (raw, &new_charset);
-      cache->charset = g_strdup (new_charset);
+      cache->raw = xstrdup (raw);
+      cache->is_utf8 = xutf8_get_charset_internal (raw, &new_charset);
+      cache->charset = xstrdup (new_charset);
     }
 
   if (charset)
@@ -257,9 +257,9 @@ _g_get_time_charset (const char **charset)
 
       g_free (cache->raw);
       g_free (cache->charset);
-      cache->raw = g_strdup (raw);
-      cache->is_utf8 = g_utf8_get_charset_internal (raw, &new_charset);
-      cache->charset = g_strdup (new_charset);
+      cache->raw = xstrdup (raw);
+      cache->is_utf8 = xutf8_get_charset_internal (raw, &new_charset);
+      cache->charset = xstrdup (new_charset);
     }
 
   if (charset)
@@ -297,9 +297,9 @@ _g_get_ctype_charset (const char **charset)
 
       g_free (cache->raw);
       g_free (cache->charset);
-      cache->raw = g_strdup (raw);
-      cache->is_utf8 = g_utf8_get_charset_internal (raw, &new_charset);
-      cache->charset = g_strdup (new_charset);
+      cache->raw = xstrdup (raw);
+      cache->is_utf8 = xutf8_get_charset_internal (raw, &new_charset);
+      cache->charset = xstrdup (new_charset);
     }
 
   if (charset)
@@ -323,7 +323,7 @@ g_get_codeset (void)
 
   g_get_charset (&charset);
 
-  return g_strdup (charset);
+  return xstrdup (charset);
 }
 
 /**
@@ -418,9 +418,9 @@ g_get_console_charset (const char **charset)
 
       g_free (cache->raw);
       g_free (cache->charset);
-      cache->raw = g_strdup (raw);
-      cache->is_utf8 = g_utf8_get_charset_internal (raw, &new_charset);
-      cache->charset = g_strdup (new_charset);
+      cache->raw = xstrdup (raw);
+      cache->is_utf8 = xutf8_get_charset_internal (raw, &new_charset);
+      cache->charset = xstrdup (new_charset);
     }
 
   if (charset)
@@ -438,7 +438,7 @@ g_get_console_charset (const char **charset)
 /* read an alias file for the locales */
 static void
 read_aliases (const xchar_t *file,
-              GHashTable  *alias_table)
+              xhashtable_t  *alias_table)
 {
   FILE *fp;
   char buf[256];
@@ -450,7 +450,7 @@ read_aliases (const xchar_t *file,
     {
       char *p, *q;
 
-      g_strstrip (buf);
+      xstrstrip (buf);
 
       /* Line is a comment */
       if ((buf[0] == '#') || (buf[0] == '\0'))
@@ -480,8 +480,8 @@ read_aliases (const xchar_t *file,
       }
 
       /* Add to alias table if necessary */
-      if (!g_hash_table_lookup (alias_table, buf)) {
-        g_hash_table_insert (alias_table, g_strdup (buf), g_strdup (q));
+      if (!xhash_table_lookup (alias_table, buf)) {
+        xhash_table_insert (alias_table, xstrdup (buf), xstrdup (q));
       }
     }
   fclose (fp);
@@ -493,19 +493,19 @@ static char *
 unalias_lang (char *lang)
 {
 #ifndef G_OS_WIN32
-  static GHashTable *alias_table = NULL;
+  static xhashtable_t *alias_table = NULL;
   char *p;
   int i;
 
   if (g_once_init_enter (&alias_table))
     {
-      GHashTable *table = g_hash_table_new (g_str_hash, g_str_equal);
+      xhashtable_t *table = xhash_table_new (xstr_hash, xstr_equal);
       read_aliases ("/usr/share/locale/locale.alias", table);
       g_once_init_leave (&alias_table, table);
     }
 
   i = 0;
-  while ((p = g_hash_table_lookup (alias_table, lang)) && (strcmp (p, lang) != 0))
+  while ((p = xhash_table_lookup (alias_table, lang)) && (strcmp (p, lang) != 0))
     {
       lang = p;
       if (i++ == 30)
@@ -554,7 +554,7 @@ explode_locale (const xchar_t *locale,
   if (at_pos)
     {
       mask |= COMPONENT_MODIFIER;
-      *modifier = g_strdup (at_pos);
+      *modifier = xstrdup (at_pos);
     }
   else
     at_pos = locale + strlen (locale);
@@ -562,7 +562,7 @@ explode_locale (const xchar_t *locale,
   if (dot_pos)
     {
       mask |= COMPONENT_CODESET;
-      *codeset = g_strndup (dot_pos, at_pos - dot_pos);
+      *codeset = xstrndup (dot_pos, at_pos - dot_pos);
     }
   else
     dot_pos = at_pos;
@@ -570,12 +570,12 @@ explode_locale (const xchar_t *locale,
   if (uscore_pos)
     {
       mask |= COMPONENT_TERRITORY;
-      *territory = g_strndup (uscore_pos, dot_pos - uscore_pos);
+      *territory = xstrndup (uscore_pos, dot_pos - uscore_pos);
     }
   else
     uscore_pos = dot_pos;
 
-  *language = g_strndup (locale, uscore_pos - locale);
+  *language = xstrndup (locale, uscore_pos - locale);
 
   return mask;
 }
@@ -593,7 +593,7 @@ explode_locale (const xchar_t *locale,
  *       to do so when this should handle 99% of the time...
  */
 static void
-append_locale_variants (GPtrArray *array,
+append_locale_variants (xptr_array_t *array,
                         const xchar_t *locale)
 {
   xchar_t *language = NULL;
@@ -617,12 +617,12 @@ append_locale_variants (GPtrArray *array,
 
       if ((i & ~mask) == 0)
         {
-          xchar_t *val = g_strconcat (language,
+          xchar_t *val = xstrconcat (language,
                                     (i & COMPONENT_TERRITORY) ? territory : "",
                                     (i & COMPONENT_CODESET) ? codeset : "",
                                     (i & COMPONENT_MODIFIER) ? modifier : "",
                                     NULL);
-          g_ptr_array_add (array, val);
+          xptr_array_add (array, val);
         }
     }
 
@@ -657,22 +657,22 @@ append_locale_variants (GPtrArray *array,
  *
  * Returns: (transfer full) (array zero-terminated=1) (element-type utf8): a newly
  *   allocated array of newly allocated strings with the locale variants. Free with
- *   g_strfreev().
+ *   xstrfreev().
  *
  * Since: 2.28
  */
 xchar_t **
 g_get_locale_variants (const xchar_t *locale)
 {
-  GPtrArray *array;
+  xptr_array_t *array;
 
   g_return_val_if_fail (locale != NULL, NULL);
 
-  array = g_ptr_array_sized_new (8);
+  array = xptr_array_sized_new (8);
   append_locale_variants (array, locale);
-  g_ptr_array_add (array, NULL);
+  xptr_array_add (array, NULL);
 
-  return (xchar_t **) g_ptr_array_free (array, FALSE);
+  return (xchar_t **) xptr_array_free (array, FALSE);
 }
 
 /* The following is (partly) taken from the gettext package.
@@ -738,7 +738,7 @@ language_names_cache_free (xpointer_t data)
 {
   GLanguageNamesCache *cache = data;
   g_free (cache->languages);
-  g_strfreev (cache->language_names);
+  xstrfreev (cache->language_names);
   g_free (cache);
 }
 
@@ -792,8 +792,8 @@ g_get_language_names (void)
 const xchar_t * const *
 g_get_language_names_with_category (const xchar_t *category_name)
 {
-  static GPrivate cache_private = G_PRIVATE_INIT ((void (*)(xpointer_t)) g_hash_table_unref);
-  GHashTable *cache = g_private_get (&cache_private);
+  static GPrivate cache_private = G_PRIVATE_INIT ((void (*)(xpointer_t)) xhash_table_unref);
+  xhashtable_t *cache = g_private_get (&cache_private);
   const xchar_t *languages;
   GLanguageNamesCache *name_cache;
 
@@ -801,7 +801,7 @@ g_get_language_names_with_category (const xchar_t *category_name)
 
   if (!cache)
     {
-      cache = g_hash_table_new_full (g_str_hash, g_str_equal,
+      cache = xhash_table_new_full (xstr_hash, xstr_equal,
                                      g_free, language_names_cache_free);
       g_private_set (&cache_private, cache);
     }
@@ -810,28 +810,28 @@ g_get_language_names_with_category (const xchar_t *category_name)
   if (!languages)
     languages = "C";
 
-  name_cache = (GLanguageNamesCache *) g_hash_table_lookup (cache, category_name);
+  name_cache = (GLanguageNamesCache *) xhash_table_lookup (cache, category_name);
   if (!(name_cache && name_cache->languages &&
         strcmp (name_cache->languages, languages) == 0))
     {
-      GPtrArray *array;
+      xptr_array_t *array;
       xchar_t **alist, **a;
 
-      g_hash_table_remove (cache, category_name);
+      xhash_table_remove (cache, category_name);
 
-      array = g_ptr_array_sized_new (8);
+      array = xptr_array_sized_new (8);
 
-      alist = g_strsplit (languages, ":", 0);
+      alist = xstrsplit (languages, ":", 0);
       for (a = alist; *a; a++)
         append_locale_variants (array, unalias_lang (*a));
-      g_strfreev (alist);
-      g_ptr_array_add (array, g_strdup ("C"));
-      g_ptr_array_add (array, NULL);
+      xstrfreev (alist);
+      xptr_array_add (array, xstrdup ("C"));
+      xptr_array_add (array, NULL);
 
       name_cache = g_new0 (GLanguageNamesCache, 1);
-      name_cache->languages = g_strdup (languages);
-      name_cache->language_names = (xchar_t **) g_ptr_array_free (array, FALSE);
-      g_hash_table_insert (cache, g_strdup (category_name), name_cache);
+      name_cache->languages = xstrdup (languages);
+      name_cache->language_names = (xchar_t **) xptr_array_free (array, FALSE);
+      xhash_table_insert (cache, xstrdup (category_name), name_cache);
     }
 
   return (const xchar_t * const *) name_cache->language_names;

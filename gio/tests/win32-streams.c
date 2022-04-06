@@ -34,13 +34,13 @@
 
 int writer_pipe[2], reader_pipe[2];
 xcancellable_t *writer_cancel, *reader_cancel, *main_cancel;
-GMainLoop *loop;
+xmain_loop_t *loop;
 
 static xpointer_t
 writer_thread (xpointer_t user_data)
 {
   xoutput_stream_t *out;
-  gssize nwrote, offset;
+  xssize_t nwrote, offset;
   xerror_t *err = NULL;
   HANDLE out_handle;
 
@@ -58,9 +58,9 @@ writer_thread (xpointer_t user_data)
       g_usleep (10);
 
       offset = 0;
-      while (offset < (gssize) sizeof (DATA))
+      while (offset < (xssize_t) sizeof (DATA))
 	{
-	  nwrote = g_output_stream_write (out, DATA + offset,
+	  nwrote = xoutput_stream_write (out, DATA + offset,
 					  sizeof (DATA) - offset,
 					  writer_cancel, &err);
 	  if (nwrote <= 0 || err != NULL)
@@ -75,7 +75,7 @@ writer_thread (xpointer_t user_data)
   if (g_cancellable_is_cancelled (writer_cancel))
     {
       g_cancellable_cancel (main_cancel);
-      g_object_unref (out);
+      xobject_unref (out);
       return NULL;
     }
 
@@ -87,7 +87,7 @@ static xpointer_t
 reader_thread (xpointer_t user_data)
 {
   xinput_stream_t *in;
-  gssize nread = 0, total;
+  xssize_t nread = 0, total;
   xerror_t *err = NULL;
   char buf[sizeof (DATA)];
   HANDLE in_handle;
@@ -105,9 +105,9 @@ reader_thread (xpointer_t user_data)
   do
     {
       total = 0;
-      while (total < (gssize) sizeof (DATA))
+      while (total < (xssize_t) sizeof (DATA))
 	{
-	  nread = g_input_stream_read (in, buf + total, sizeof (buf) - total,
+	  nread = xinput_stream_read (in, buf + total, sizeof (buf) - total,
 				       reader_cancel, &err);
 	  if (nread <= 0 || err != NULL)
 	    break;
@@ -121,7 +121,7 @@ reader_thread (xpointer_t user_data)
 	{
 	  g_assert (err == NULL);
 	  /* pipe closed */
-	  g_object_unref (in);
+	  xobject_unref (in);
 	  return NULL;
 	}
 
@@ -135,7 +135,7 @@ reader_thread (xpointer_t user_data)
 }
 
 char main_buf[sizeof (DATA)];
-gssize main_len, main_offset;
+xssize_t main_len, main_offset;
 
 static void readable (xobject_t *source, xasync_result_t *res, xpointer_t user_data);
 static void writable (xobject_t *source, xasync_result_t *res, xpointer_t user_data);
@@ -143,8 +143,8 @@ static void writable (xobject_t *source, xasync_result_t *res, xpointer_t user_d
 static void
 do_main_cancel (xoutput_stream_t *out)
 {
-  g_output_stream_close (out, NULL, NULL);
-  g_main_loop_quit (loop);
+  xoutput_stream_close (out, NULL, NULL);
+  xmain_loop_quit (loop);
 }
 
 static void
@@ -154,7 +154,7 @@ readable (xobject_t *source, xasync_result_t *res, xpointer_t user_data)
   xoutput_stream_t *out = user_data;
   xerror_t *err = NULL;
 
-  main_len = g_input_stream_read_finish (in, res, &err);
+  main_len = xinput_stream_read_finish (in, res, &err);
 
   if (g_cancellable_is_cancelled (main_cancel))
     {
@@ -165,7 +165,7 @@ readable (xobject_t *source, xasync_result_t *res, xpointer_t user_data)
   g_assert (err == NULL);
 
   main_offset = 0;
-  g_output_stream_write_async (out, main_buf, main_len,
+  xoutput_stream_write_async (out, main_buf, main_len,
 			       G_PRIORITY_DEFAULT, main_cancel,
 			       writable, in);
 }
@@ -176,9 +176,9 @@ writable (xobject_t *source, xasync_result_t *res, xpointer_t user_data)
   xoutput_stream_t *out = G_OUTPUT_STREAM (source);
   xinput_stream_t *in = user_data;
   xerror_t *err = NULL;
-  gssize nwrote;
+  xssize_t nwrote;
 
-  nwrote = g_output_stream_write_finish (out, res, &err);
+  nwrote = xoutput_stream_write_finish (out, res, &err);
 
   if (g_cancellable_is_cancelled (main_cancel))
     {
@@ -192,13 +192,13 @@ writable (xobject_t *source, xasync_result_t *res, xpointer_t user_data)
   main_offset += nwrote;
   if (main_offset == main_len)
     {
-      g_input_stream_read_async (in, main_buf, sizeof (main_buf),
+      xinput_stream_read_async (in, main_buf, sizeof (main_buf),
 				 G_PRIORITY_DEFAULT, main_cancel,
 				 readable, out);
     }
   else
     {
-      g_output_stream_write_async (out, main_buf + main_offset,
+      xoutput_stream_write_async (out, main_buf + main_offset,
 				   main_len - main_offset,
 				   G_PRIORITY_DEFAULT, main_cancel,
 				   writable, in);
@@ -215,7 +215,7 @@ timeout (xpointer_t cancellable)
 static void
 test_pipe_io (void)
 {
-  GThread *writer, *reader;
+  xthread_t *writer, *reader;
   xinput_stream_t *in;
   xoutput_stream_t *out;
   HANDLE in_handle, out_handle;
@@ -236,8 +236,8 @@ test_pipe_io (void)
   reader_cancel = g_cancellable_new ();
   main_cancel = g_cancellable_new ();
 
-  writer = g_thread_new ("writer", writer_thread, NULL);
-  reader = g_thread_new ("reader", reader_thread, NULL);
+  writer = xthread_new ("writer", writer_thread, NULL);
+  reader = xthread_new ("reader", reader_thread, NULL);
 
   g_assert (DuplicateHandle (GetCurrentProcess (),
 			     (HANDLE) (gintptr) _get_osfhandle (writer_pipe[0]),
@@ -258,31 +258,31 @@ test_pipe_io (void)
   in = g_win32_input_stream_new (in_handle, TRUE);
   out = g_win32_output_stream_new (out_handle, TRUE);
 
-  g_input_stream_read_async (in, main_buf, sizeof (main_buf),
+  xinput_stream_read_async (in, main_buf, sizeof (main_buf),
 			     G_PRIORITY_DEFAULT, main_cancel,
 			     readable, out);
 
   g_timeout_add (500, timeout, writer_cancel);
 
-  loop = g_main_loop_new (NULL, TRUE);
-  g_main_loop_run (loop);
-  g_main_loop_unref (loop);
+  loop = xmain_loop_new (NULL, TRUE);
+  xmain_loop_run (loop);
+  xmain_loop_unref (loop);
 
-  g_thread_join (reader);
-  g_thread_join (writer);
+  xthread_join (reader);
+  xthread_join (writer);
 
-  g_object_unref (main_cancel);
-  g_object_unref (reader_cancel);
-  g_object_unref (writer_cancel);
-  g_object_unref (in);
-  g_object_unref (out);
+  xobject_unref (main_cancel);
+  xobject_unref (reader_cancel);
+  xobject_unref (writer_cancel);
+  xobject_unref (in);
+  xobject_unref (out);
 }
 
 typedef struct _PipeIOOverlapReader
 {
   char buf[sizeof (DATA)];
   xinput_stream_t *in;
-  GThread *thread;
+  xthread_t *thread;
   xcancellable_t *cancellable;
   xboolean_t success;
 } PipeIOOverlapReader;
@@ -299,7 +299,7 @@ pipe_io_overlap_reader_thread (xpointer_t user_data)
 
   for (i = 0; i < TEST_PIPE_IO_OVERLAP; ++i) {
     memset (p->buf, 0, sizeof (p->buf));
-    g_input_stream_read_all (p->in, p->buf, sizeof (p->buf),
+    xinput_stream_read_all (p->in, p->buf, sizeof (p->buf),
                              &read, NULL, &err);
 
     g_assert_cmpuint (read, ==, sizeof (p->buf));
@@ -319,7 +319,7 @@ pipe_io_overlap_writer_thread (xpointer_t user_data)
   xuint_t i;
 
   for (i = 0; i < TEST_PIPE_IO_OVERLAP; ++i) {
-    g_output_stream_write_all (out, DATA, sizeof (DATA),
+    xoutput_stream_write_all (out, DATA, sizeof (DATA),
                                &bytes_written, NULL, &err);
 
     g_assert_cmpuint (bytes_written, ==, sizeof (DATA));
@@ -333,7 +333,7 @@ static void
 test_pipe_io_overlap (void)
 {
   xoutput_stream_t *out_server, *out_client;
-  GThread *writer_server, *writer_client;
+  xthread_t *writer_server, *writer_client;
   PipeIOOverlapReader rs, rc;
   HANDLE server, client;
   xchar_t name[256];
@@ -351,24 +351,24 @@ test_pipe_io_overlap (void)
   g_assert (client != INVALID_HANDLE_VALUE);
 
   out_server = g_win32_output_stream_new (server, TRUE);
-  writer_server = g_thread_new ("writer_server", pipe_io_overlap_writer_thread, out_server);
+  writer_server = xthread_new ("writer_server", pipe_io_overlap_writer_thread, out_server);
   rs.in = g_win32_input_stream_new (server, TRUE);
-  rs.thread = g_thread_new ("reader_server", pipe_io_overlap_reader_thread, &rs);
+  rs.thread = xthread_new ("reader_server", pipe_io_overlap_reader_thread, &rs);
 
   out_client = g_win32_output_stream_new (client, TRUE);
-  writer_client = g_thread_new ("writer_client", pipe_io_overlap_writer_thread, out_client);
+  writer_client = xthread_new ("writer_client", pipe_io_overlap_writer_thread, out_client);
   rc.in = g_win32_input_stream_new (client, TRUE);
-  rc.thread = g_thread_new ("reader_client", pipe_io_overlap_reader_thread, &rc);
+  rc.thread = xthread_new ("reader_client", pipe_io_overlap_reader_thread, &rc);
 
-  g_thread_join (writer_client);
-  g_thread_join (writer_server);
-  g_thread_join (rc.thread);
-  g_thread_join (rs.thread);
+  xthread_join (writer_client);
+  xthread_join (writer_server);
+  xthread_join (rc.thread);
+  xthread_join (rs.thread);
 
-  g_object_unref (rs.in);
-  g_object_unref (rc.in);
-  g_object_unref (out_server);
-  g_object_unref (out_client);
+  xobject_unref (rs.in);
+  xobject_unref (rc.in);
+  xobject_unref (out_server);
+  xobject_unref (out_client);
 }
 
 static xpointer_t
@@ -378,7 +378,7 @@ pipe_io_concurrent_writer_thread (xpointer_t user_data)
   xerror_t *err = NULL;
   xsize_t bytes_written;
 
-  g_output_stream_write_all (out, DATA, 1, &bytes_written, NULL, &err);
+  xoutput_stream_write_all (out, DATA, 1, &bytes_written, NULL, &err);
 
   g_assert_cmpuint (bytes_written, ==, 1);
   g_assert_no_error (err);
@@ -394,7 +394,7 @@ pipe_io_concurrent_reader_thread (xpointer_t user_data)
   xsize_t read;
 
   memset (p->buf, 0, sizeof (p->buf));
-  p->success = g_input_stream_read_all (p->in, p->buf, 1, &read, p->cancellable, &err);
+  p->success = xinput_stream_read_all (p->in, p->buf, 1, &read, p->cancellable, &err);
 
   /* only one thread will succeed, the other will be cancelled */
   if (p->success)
@@ -412,7 +412,7 @@ static void
 test_pipe_io_concurrent (void)
 {
   xoutput_stream_t *out_server;
-  GThread *writer_server;
+  xthread_t *writer_server;
   PipeIOOverlapReader rc1, rc2;
   HANDLE server, client;
   xchar_t name[256], c;
@@ -433,19 +433,19 @@ test_pipe_io_concurrent (void)
   rc1.in = g_win32_input_stream_new (client, TRUE);
   rc1.success = FALSE;
   rc1.cancellable = g_cancellable_new ();
-  rc1.thread = g_thread_new ("reader_client", pipe_io_concurrent_reader_thread, &rc1);
+  rc1.thread = xthread_new ("reader_client", pipe_io_concurrent_reader_thread, &rc1);
 
   rc2.in = g_win32_input_stream_new (client, TRUE);
   rc2.success = FALSE;
   rc2.cancellable = g_cancellable_new ();
-  rc2.thread = g_thread_new ("reader_client", pipe_io_concurrent_reader_thread, &rc2);
+  rc2.thread = xthread_new ("reader_client", pipe_io_concurrent_reader_thread, &rc2);
 
   /* FIXME: how to synchronize on both reader thread waiting in read,
      before starting the writer thread? */
   g_usleep (G_USEC_PER_SEC / 10);
 
   out_server = g_win32_output_stream_new (server, TRUE);
-  writer_server = g_thread_new ("writer_server", pipe_io_concurrent_writer_thread, out_server);
+  writer_server = xthread_new ("writer_server", pipe_io_concurrent_writer_thread, out_server);
 
   read (writer_pipe[0], &c, 1);
 
@@ -454,13 +454,13 @@ test_pipe_io_concurrent (void)
   g_cancellable_cancel (rc1.cancellable);
   g_cancellable_cancel (rc2.cancellable);
 
-  g_thread_join (writer_server);
-  g_thread_join (rc1.thread);
-  g_thread_join (rc2.thread);
+  xthread_join (writer_server);
+  xthread_join (rc1.thread);
+  xthread_join (rc2.thread);
 
-  g_object_unref (rc1.in);
-  g_object_unref (rc2.in);
-  g_object_unref (out_server);
+  xobject_unref (rc1.in);
+  xobject_unref (rc2.in);
+  xobject_unref (out_server);
 
   close (writer_pipe[0]);
   close (writer_pipe[1]);
@@ -471,14 +471,14 @@ readable_cancel (xobject_t *source, xasync_result_t *res, xpointer_t user_data)
 {
   xinput_stream_t *in = G_INPUT_STREAM (source);
   xerror_t *err = NULL;
-  gssize len;
+  xssize_t len;
 
-  len = g_input_stream_read_finish (in, res, &err);
+  len = xinput_stream_read_finish (in, res, &err);
   g_assert_cmpint (len, ==, -1);
   g_assert_error (err, G_IO_ERROR, G_IO_ERROR_CANCELLED);
-  g_error_free (err);
+  xerror_free (err);
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
@@ -505,19 +505,19 @@ test_pipe_io_cancel (void)
   out = g_win32_output_stream_new (out_handle, TRUE);
 
   reader_cancel = g_cancellable_new ();
-  g_input_stream_read_async (in, main_buf, sizeof (main_buf),
+  xinput_stream_read_async (in, main_buf, sizeof (main_buf),
                              G_PRIORITY_DEFAULT, reader_cancel,
                              readable_cancel, out);
 
   g_timeout_add (500, timeout, reader_cancel);
 
-  loop = g_main_loop_new (NULL, TRUE);
-  g_main_loop_run (loop);
-  g_main_loop_unref (loop);
+  loop = xmain_loop_new (NULL, TRUE);
+  xmain_loop_run (loop);
+  xmain_loop_unref (loop);
 
-  g_object_unref (reader_cancel);
-  g_object_unref (in);
-  g_object_unref (out);
+  xobject_unref (reader_cancel);
+  xobject_unref (in);
+  xobject_unref (out);
 }
 
 int

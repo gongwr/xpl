@@ -31,7 +31,7 @@ test_construction (void)
   op = g_mount_operation_new ();
   g_assert_nonnull (op);
   g_assert_true (X_IS_MOUNT_OPERATION (op));
-  g_object_unref (op);
+  xobject_unref (op);
 }
 
 /* Test the property getters and setters on #xmount_operation_t work correctly. */
@@ -51,7 +51,7 @@ test_properties (void)
 
   op = g_mount_operation_new ();
 
-  g_object_get (op,
+  xobject_get (op,
                 "username", &username,
                 "password", &password,
                 "anonymous", &anonymous,
@@ -100,7 +100,7 @@ test_properties (void)
   g_mount_operation_set_pim (op, 5);
   g_assert_cmpuint (g_mount_operation_get_pim (op), ==, 5);
 
-  g_object_set (op,
+  xobject_set (op,
                 "username", "other-username",
                 "password", "other-password",
                 "anonymous", FALSE,
@@ -115,7 +115,7 @@ test_properties (void)
   g_free (domain);
   g_free (password);
   g_free (username);
-  g_object_unref (op);
+  xobject_unref (op);
 }
 
 int

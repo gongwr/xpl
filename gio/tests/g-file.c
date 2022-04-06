@@ -41,7 +41,7 @@ struct TestPathsWithOper {
  **/
 
 static void
-test_g_file_new_null (void)
+test_xfile_new_null (void)
 {
   const char *paths[] = {"/",
 			 "/tmp///",
@@ -61,17 +61,17 @@ test_g_file_new_null (void)
   int i = 0;
   while (paths[i])
     {
-      file = g_file_new_for_path (paths[i++]);
+      file = xfile_new_for_path (paths[i++]);
       g_assert (file != NULL);
-      g_object_unref (file);
+      xobject_unref (file);
     }
 
   i = 0;
   while (uris[i])
     {
-      file = g_file_new_for_uri (uris[i++]);
+      file = xfile_new_for_uri (uris[i++]);
       g_assert (file != NULL);
-      g_object_unref(file);
+      xobject_unref(file);
     }
 }
 
@@ -86,28 +86,28 @@ compare_two_files (const xboolean_t use_uri, const char *path1, const char *path
 
   if (use_uri)
     {
-      file1 = g_file_new_for_uri (path1);
-      file2 = g_file_new_for_uri (path2);
+      file1 = xfile_new_for_uri (path1);
+      file2 = xfile_new_for_uri (path2);
     }
   else
     {
-      file1 = g_file_new_for_path (path1);
-      file2 = g_file_new_for_path (path2);
+      file1 = xfile_new_for_path (path1);
+      file2 = xfile_new_for_path (path2);
     }
 
   g_assert (file1 != NULL);
   g_assert (file2 != NULL);
 
-  equal = g_file_equal (file1, file2);
+  equal = xfile_equal (file1, file2);
 
-  g_object_unref (file1);
-  g_object_unref (file2);
+  xobject_unref (file1);
+  xobject_unref (file2);
 
   return equal;
 }
 
 static void
-test_g_file_new_for_path (void)
+test_xfile_new_for_path (void)
 {
   const struct TestPathsWithOper cmp_paths[] =
     {
@@ -139,7 +139,7 @@ test_g_file_new_for_path (void)
 
 
 static void
-test_g_file_new_for_uri (void)
+test_xfile_new_for_uri (void)
 {
   const struct TestPathsWithOper cmp_uris[] = {
     {"file:///", TRUE, 0, "file:///./", NULL },
@@ -175,26 +175,26 @@ dup_equals (const xboolean_t use_uri, const char *path)
   xboolean_t equal;
 
   if (use_uri)
-    file1 = g_file_new_for_uri (path);
+    file1 = xfile_new_for_uri (path);
   else
-    file1 = g_file_new_for_path (path);
+    file1 = xfile_new_for_path (path);
 
   g_assert (file1 != NULL);
 
-  file2 = g_file_dup (file1);
+  file2 = xfile_dup (file1);
 
   g_assert (file2 != NULL);
 
-  equal = g_file_equal (file1, file2);
+  equal = xfile_equal (file1, file2);
 
-  g_object_unref (file1);
-  g_object_unref (file2);
+  xobject_unref (file1);
+  xobject_unref (file2);
 
   return equal;
 }
 
 static void
-test_g_file_dup (void)
+test_xfile_dup (void)
 {
   const struct TestPathsWithOper dup_paths[] =
     {
@@ -225,31 +225,31 @@ parse_check_utf8 (const xboolean_t use_uri, const char *path, const char *result
   xboolean_t equal;
 
   if (use_uri)
-    file1 = g_file_new_for_uri (path);
+    file1 = xfile_new_for_uri (path);
   else
-    file1 = g_file_new_for_path (path);
+    file1 = xfile_new_for_path (path);
 
   g_assert (file1 != NULL);
 
-  parsed_name = g_file_get_parse_name (file1);
+  parsed_name = xfile_get_parse_name (file1);
 
   g_assert (parsed_name != NULL);
 
   /* UTF-8 validation */
-  is_utf8_valid = g_utf8_validate (parsed_name, -1, NULL);
+  is_utf8_valid = xutf8_validate (parsed_name, -1, NULL);
   g_assert (is_utf8_valid == TRUE);
 
   if (result_parse_name)
     g_assert_cmpstr (parsed_name, ==, result_parse_name);
 
-  file2 = g_file_parse_name (parsed_name);
+  file2 = xfile_parse_name (parsed_name);
 
   g_assert (file2 != NULL);
 
-  equal = g_file_equal (file1, file2);
+  equal = xfile_equal (file1, file2);
 
-  g_object_unref (file1);
-  g_object_unref (file2);
+  xobject_unref (file1);
+  xobject_unref (file2);
 
   g_free (parsed_name);
 
@@ -257,7 +257,7 @@ parse_check_utf8 (const xboolean_t use_uri, const char *path, const char *result
 }
 
 static void
-test_g_file_get_parse_name_utf8 (void)
+test_xfile_get_parse_name_utf8 (void)
 {
   const struct TestPathsWithOper strings[] =
     {
@@ -284,25 +284,25 @@ resolve_arg (const xboolean_t is_uri_only, const char *arg)
   char *path = NULL;
   char *s = NULL;
 
-  file1 = g_file_new_for_commandline_arg (arg);
+  file1 = xfile_new_for_commandline_arg (arg);
   g_assert (file1 != NULL);
 
   /*  Test if we get URI string */
-  uri = g_file_get_uri (file1);
+  uri = xfile_get_uri (file1);
   g_assert_cmpstr (uri, !=, NULL);
   g_printerr ("%s\n",uri);
 
   /*  Test if we get correct value of the local path */
-  path = g_file_get_path (file1);
+  path = xfile_get_path (file1);
   if (is_uri_only)
     g_assert_cmpstr (path, ==, NULL);
   else
     g_assert (g_path_is_absolute (path) == TRUE);
 
   /*  Get the URI scheme and compare it with expected one */
-  s = g_file_get_uri_scheme (file1);
+  s = xfile_get_uri_scheme (file1);
 
-  g_object_unref (file1);
+  xobject_unref (file1);
   g_free (uri);
   g_free (path);
 
@@ -310,7 +310,7 @@ resolve_arg (const xboolean_t is_uri_only, const char *arg)
 }
 
 static void
-test_g_file_new_for_commandline_arg (void)
+test_xfile_new_for_commandline_arg (void)
 {
   /*  TestPathsWithOper.use_uri represents IsURIOnly here */
   const struct TestPathsWithOper arg_data[] =
@@ -338,11 +338,11 @@ test_g_file_new_for_commandline_arg (void)
     }
 
   /* Manual test for getting correct cwd */
-  file = g_file_new_for_commandline_arg ("./");
-  resolved = g_file_get_path (file);
+  file = xfile_new_for_commandline_arg ("./");
+  resolved = xfile_get_path (file);
   cwd = g_get_current_dir ();
   g_assert_cmpstr (resolved, ==, cwd);
-  g_object_unref (file);
+  xobject_unref (file);
   g_free (resolved);
   g_free (cwd);
 }
@@ -358,43 +358,43 @@ get_relative_path (const xboolean_t use_uri, const xboolean_t should_have_prefix
 
   if (use_uri)
     {
-      file1 = g_file_new_for_uri (dir1);
-      file2 = g_file_new_for_uri (dir2);
+      file1 = xfile_new_for_uri (dir1);
+      file2 = xfile_new_for_uri (dir2);
     }
   else
     {
-      file1 = g_file_new_for_path (dir1);
-      file2 = g_file_new_for_path (dir2);
+      file1 = xfile_new_for_path (dir1);
+      file2 = xfile_new_for_path (dir2);
     }
 
   g_assert (file1 != NULL);
   g_assert (file2 != NULL);
 
-  has_prefix = g_file_has_prefix (file2, file1);
+  has_prefix = xfile_has_prefix (file2, file1);
   g_printerr ("%s %s\n", dir1, dir2);
   g_assert (has_prefix == should_have_prefix);
 
-  relative_path = g_file_get_relative_path (file1, file2);
+  relative_path = xfile_get_relative_path (file1, file2);
   if (should_have_prefix)
     {
       g_assert (relative_path != NULL);
 
-      file3 = g_file_resolve_relative_path (file1, relative_path);
-      g_assert (g_file_equal (file2, file3) == TRUE);
+      file3 = xfile_resolve_relative_path (file1, relative_path);
+      g_assert (xfile_equal (file2, file3) == TRUE);
     }
 
   if (file1)
-    g_object_unref (file1);
+    xobject_unref (file1);
   if (file2)
-    g_object_unref (file2);
+    xobject_unref (file2);
   if (file3)
-    g_object_unref (file3);
+    xobject_unref (file3);
 
   return relative_path;
 }
 
 static void
-test_g_file_has_prefix (void)
+test_xfile_has_prefix (void)
 {
   /*  TestPathsWithOper.equal represents here if the dir belongs to the directory structure  */
   const struct TestPathsWithOper dirs[] =
@@ -441,26 +441,26 @@ roundtrip_parent_child (const xboolean_t use_uri, const xboolean_t under_root_de
 
   if (use_uri)
     {
-      files[0] = g_file_new_for_uri (path);
-      files[1] = g_file_new_for_uri (path);
+      files[0] = xfile_new_for_uri (path);
+      files[1] = xfile_new_for_uri (path);
     }
   else
     {
-      files[0] = g_file_new_for_path (path);
-      files[1] = g_file_new_for_path (path);
+      files[0] = xfile_new_for_path (path);
+      files[1] = xfile_new_for_path (path);
     }
 
   g_assert (files[0] != NULL);
   g_assert (files[1] != NULL);
 
-  files[2] = g_file_get_child (files[1], dir_holder);
+  files[2] = xfile_get_child (files[1], dir_holder);
   g_assert (files[2] != NULL);
 
-  files[3] = g_file_get_parent (files[2]);
+  files[3] = xfile_get_parent (files[2]);
   g_assert (files[3] != NULL);
-  g_assert (g_file_equal (files[3], files[0]) == TRUE);
+  g_assert (xfile_equal (files[3], files[0]) == TRUE);
 
-  files[4] = g_file_get_parent (files[3]);
+  files[4] = xfile_get_parent (files[3]);
   /*  Don't go lower beyond the root */
   if (under_root_descending)
     g_assert (files[4] == NULL);
@@ -468,20 +468,20 @@ roundtrip_parent_child (const xboolean_t use_uri, const xboolean_t under_root_de
     {
       g_assert (files[4] != NULL);
 
-      files[5] = g_file_get_child (files[4], dir_holder);
+      files[5] = xfile_get_child (files[4], dir_holder);
       g_assert (files[5] != NULL);
-      g_assert (g_file_equal (files[5], files[0]) == TRUE);
+      g_assert (xfile_equal (files[5], files[0]) == TRUE);
     }
 
   for (i = 0; i < G_N_ELEMENTS (files); i++)
     {
       if (files[i])
-	g_object_unref (files[i]);
+	xobject_unref (files[i]);
     }
 }
 
 static void
-test_g_file_get_parent_child (void)
+test_xfile_get_parent_child (void)
 {
   const struct TestPathsWithOper paths[] =
     {
@@ -509,29 +509,29 @@ main (int   argc,
   g_test_init (&argc, &argv, NULL);
 
 
-  /*  Testing whether g_file_new_for_path() or g_file_new_for_uri() always returns non-NULL result  */
-  g_test_add_func ("/g-file/test_g_file_new_null", test_g_file_new_null);
+  /*  Testing whether xfile_new_for_path() or xfile_new_for_uri() always returns non-NULL result  */
+  g_test_add_func ("/g-file/test_xfile_new_null", test_xfile_new_null);
 
-  /*  Testing whether the g_file_new_for_path() correctly canonicalizes strings and two files equals (g_file_equal()) */
-  g_test_add_func ("/g-file/test_g_file_new_for_path", test_g_file_new_for_path);
+  /*  Testing whether the xfile_new_for_path() correctly canonicalizes strings and two files equals (xfile_equal()) */
+  g_test_add_func ("/g-file/test_xfile_new_for_path", test_xfile_new_for_path);
 
-  /*  Testing whether the g_file_new_for_uri() correctly canonicalizes strings and two files equals (g_file_equal()) */
-  g_test_add_func ("/g-file/test_g_file_new_for_uri", test_g_file_new_for_uri);
+  /*  Testing whether the xfile_new_for_uri() correctly canonicalizes strings and two files equals (xfile_equal()) */
+  g_test_add_func ("/g-file/test_xfile_new_for_uri", test_xfile_new_for_uri);
 
-  /*  Testing g_file_dup() equals original file via g_file_equal()  */
-  g_test_add_func ("/g-file/test_g_file_dup", test_g_file_dup);
+  /*  Testing xfile_dup() equals original file via xfile_equal()  */
+  g_test_add_func ("/g-file/test_xfile_dup", test_xfile_dup);
 
-  /*  Testing g_file_get_parse_name() to return correct UTF-8 string    */
-  g_test_add_func ("/g-file/test_g_file_get_parse_name_utf8", test_g_file_get_parse_name_utf8);
+  /*  Testing xfile_get_parse_name() to return correct UTF-8 string    */
+  g_test_add_func ("/g-file/test_xfile_get_parse_name_utf8", test_xfile_get_parse_name_utf8);
 
-  /*  Testing g_file_new_for_commandline_arg() for correct relavive path resolution and correct path/URI guess   */
-  g_test_add_func ("/g-file/test_g_file_new_for_commandline_arg", test_g_file_new_for_commandline_arg);
+  /*  Testing xfile_new_for_commandline_arg() for correct relavive path resolution and correct path/URI guess   */
+  g_test_add_func ("/g-file/test_xfile_new_for_commandline_arg", test_xfile_new_for_commandline_arg);
 
-  /*  Testing g_file_has_prefix(), g_file_get_relative_path() and g_file_resolve_relative_path() to return and process correct relative paths         */
-  g_test_add_func ("/g-file/test_g_file_has_prefix", test_g_file_has_prefix);
+  /*  Testing xfile_has_prefix(), xfile_get_relative_path() and xfile_resolve_relative_path() to return and process correct relative paths         */
+  g_test_add_func ("/g-file/test_xfile_has_prefix", test_xfile_has_prefix);
 
-  /*  Testing g_file_get_parent() and g_file_get_child()            */
-  g_test_add_func ("/g-file/test_g_file_get_parent_child", test_g_file_get_parent_child);
+  /*  Testing xfile_get_parent() and xfile_get_child()            */
+  g_test_add_func ("/g-file/test_xfile_get_parent_child", test_xfile_get_parent_child);
 
   return g_test_run();
 }

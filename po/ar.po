@@ -37,8 +37,8 @@ msgid "Seek not supported on base stream"
 msgstr "عملية السعي غير مُدعمة على الدَفق الأساسي"
 
 #: ../gio/gbufferedinputstream.c:955
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "تعذر بَتْرُ GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "تعذر بَتْرُ xbuffered_input_stream"
 
 #: ../gio/gbufferedinputstream.c:1000 ../gio/ginputstream.c:1062
 #: ../gio/giostream.c:292 ../gio/goutputstream.c:1385
@@ -113,12 +113,12 @@ msgid "%s type"
 msgstr "نوع %s"
 
 #: ../gio/gcredentials.c:273 ../gio/gcredentials.c:495
-msgid "GCredentials is not implemented on this OS"
-msgstr "لم تُطبق GCredentials لهذا النظام"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "لم تُطبق xcredentials_t لهذا النظام"
 
 #: ../gio/gcredentials.c:447
-msgid "There is no GCredentials support for your platform"
-msgstr "لم تدعم GCredentials على هذه المنصة"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "لم تدعم xcredentials_t على هذه المنصة"
 
 #: ../gio/gdatainputstream.c:311
 msgid "Unexpected early end-of-stream"
@@ -292,7 +292,7 @@ msgid ""
 msgstr ""
 
 #: ../gio/gdbusauth.c:1174
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
 msgstr ""
 
 #: ../gio/gdbusauthmechanismsha1.c:266
@@ -950,26 +950,26 @@ msgstr ""
 
 #: ../gio/gemblem.c:324
 #, c-format
-msgid "Can't handle version %d of GEmblem encoding"
+msgid "Can't handle version %d of xemblem_t encoding"
 msgstr ""
 
 #: ../gio/gemblem.c:334
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:367
 #, c-format
-msgid "Can't handle version %d of GEmblemedIcon encoding"
+msgid "Can't handle version %d of xemblemed_icon_t encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:377
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:400
-msgid "Expected a GEmblem for GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
 msgstr ""
 
 #: ../gio/gfile.c:874 ../gio/gfile.c:1105 ../gio/gfile.c:1240
@@ -1063,11 +1063,11 @@ msgstr "مُعدد الملف سبق إغلاقه"
 
 #: ../gio/gfileicon.c:237
 #, c-format
-msgid "Can't handle version %d of GFileIcon encoding"
+msgid "Can't handle version %d of xfile_icon_t encoding"
 msgstr ""
 
 #: ../gio/gfileicon.c:247
-msgid "Malformed input data for GFileIcon"
+msgid "Malformed input data for xfile_icon_t"
 msgstr ""
 
 #: ../gio/gfileinputstream.c:154 ../gio/gfileinputstream.c:420
@@ -1500,7 +1500,7 @@ msgstr ""
 
 #: ../gio/glib-compile-schemas.c:2028
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
@@ -1820,8 +1820,8 @@ msgid "Invalid seek request"
 msgstr "طلب بحث غير سليم"
 
 #: ../gio/gmemoryinputstream.c:517
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "تعذر بَتْرُ GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "تعذر بَتْرُ xmemory_input_stream_t"
 
 #: ../gio/gmemoryoutputstream.c:530
 msgid "Memory output stream not resizable"
@@ -2388,7 +2388,7 @@ msgid "Error sending message: %s"
 msgstr ""
 
 #: ../gio/gsocket.c:3821
-msgid "GSocketControlMessage not supported on windows"
+msgid "xsocket_control_message_t not supported on windows"
 msgstr ""
 
 #: ../gio/gsocket.c:4101 ../gio/gsocket.c:4237
@@ -2523,7 +2523,7 @@ msgstr ""
 
 #: ../gio/gthemedicon.c:498
 #, c-format
-msgid "Can't handle version %d of GThemedIcon encoding"
+msgid "Can't handle version %d of xthemed_icon_t encoding"
 msgstr ""
 
 #: ../gio/gtlscertificate.c:249
@@ -2845,37 +2845,37 @@ msgstr "اسم المستضيف غير سليم"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:205
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "ص"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:207
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "م"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:210
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%A %e %B %l:%M:%S %Y"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:213
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%d‏/%m‏/%Y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:216
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:219
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%OI:%OM:%OS %p"
 
@@ -4197,11 +4197,11 @@ msgstr "ديسمبر"
 #~ msgid "Error writing to unix: %s"
 #~ msgstr "خطأ أثناء الكتابة إلى يونكس: %s"
 
-#~ msgctxt "GDateTime"
+#~ msgctxt "xdatetime_t"
 #~ msgid "am"
 #~ msgstr "ص"
 
-#~ msgctxt "GDateTime"
+#~ msgctxt "xdatetime_t"
 #~ msgid "pm"
 #~ msgstr "م"
 

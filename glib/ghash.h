@@ -34,13 +34,13 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GHashTable  GHashTable;
+typedef struct _GHashTable  xhashtable_t;
 
 typedef xboolean_t  (*GHRFunc)  (xpointer_t  key,
                                xpointer_t  value,
                                xpointer_t  user_data);
 
-typedef struct _GHashTableIter GHashTableIter;
+typedef struct _GHashTableIter xhash_table_iter_t;
 
 struct _GHashTableIter
 {
@@ -54,136 +54,136 @@ struct _GHashTableIter
 };
 
 XPL_AVAILABLE_IN_ALL
-GHashTable* g_hash_table_new               (GHashFunc       hash_func,
+xhashtable_t* xhash_table_new               (GHashFunc       hash_func,
                                             GEqualFunc      key_equal_func);
 XPL_AVAILABLE_IN_ALL
-GHashTable* g_hash_table_new_full          (GHashFunc       hash_func,
+xhashtable_t* xhash_table_new_full          (GHashFunc       hash_func,
                                             GEqualFunc      key_equal_func,
-                                            GDestroyNotify  key_destroy_func,
-                                            GDestroyNotify  value_destroy_func);
+                                            xdestroy_notify_t  key_destroy_func,
+                                            xdestroy_notify_t  value_destroy_func);
 XPL_AVAILABLE_IN_2_72
-GHashTable *g_hash_table_new_similar       (GHashTable     *other_hash_table);
+xhashtable_t *xhash_table_new_similar       (xhashtable_t     *other_hash_table);
 XPL_AVAILABLE_IN_ALL
-void        g_hash_table_destroy           (GHashTable     *hash_table);
+void        xhash_table_destroy           (xhashtable_t     *hash_table);
 XPL_AVAILABLE_IN_ALL
-xboolean_t    g_hash_table_insert            (GHashTable     *hash_table,
+xboolean_t    xhash_table_insert            (xhashtable_t     *hash_table,
                                             xpointer_t        key,
                                             xpointer_t        value);
 XPL_AVAILABLE_IN_ALL
-xboolean_t    g_hash_table_replace           (GHashTable     *hash_table,
+xboolean_t    xhash_table_replace           (xhashtable_t     *hash_table,
                                             xpointer_t        key,
                                             xpointer_t        value);
 XPL_AVAILABLE_IN_ALL
-xboolean_t    g_hash_table_add               (GHashTable     *hash_table,
+xboolean_t    xhash_table_add               (xhashtable_t     *hash_table,
                                             xpointer_t        key);
 XPL_AVAILABLE_IN_ALL
-xboolean_t    g_hash_table_remove            (GHashTable     *hash_table,
-                                            gconstpointer   key);
+xboolean_t    xhash_table_remove            (xhashtable_t     *hash_table,
+                                            xconstpointer   key);
 XPL_AVAILABLE_IN_ALL
-void        g_hash_table_remove_all        (GHashTable     *hash_table);
+void        xhash_table_remove_all        (xhashtable_t     *hash_table);
 XPL_AVAILABLE_IN_ALL
-xboolean_t    g_hash_table_steal             (GHashTable     *hash_table,
-                                            gconstpointer   key);
+xboolean_t    xhash_table_steal             (xhashtable_t     *hash_table,
+                                            xconstpointer   key);
 XPL_AVAILABLE_IN_2_58
-xboolean_t    g_hash_table_steal_extended    (GHashTable     *hash_table,
-                                            gconstpointer   lookup_key,
+xboolean_t    xhash_table_steal_extended    (xhashtable_t     *hash_table,
+                                            xconstpointer   lookup_key,
                                             xpointer_t       *stolen_key,
                                             xpointer_t       *stolen_value);
 XPL_AVAILABLE_IN_ALL
-void        g_hash_table_steal_all         (GHashTable     *hash_table);
+void        xhash_table_steal_all         (xhashtable_t     *hash_table);
 XPL_AVAILABLE_IN_ALL
-xpointer_t    g_hash_table_lookup            (GHashTable     *hash_table,
-                                            gconstpointer   key);
+xpointer_t    xhash_table_lookup            (xhashtable_t     *hash_table,
+                                            xconstpointer   key);
 XPL_AVAILABLE_IN_ALL
-xboolean_t    g_hash_table_contains          (GHashTable     *hash_table,
-                                            gconstpointer   key);
+xboolean_t    xhash_table_contains          (xhashtable_t     *hash_table,
+                                            xconstpointer   key);
 XPL_AVAILABLE_IN_ALL
-xboolean_t    g_hash_table_lookup_extended   (GHashTable     *hash_table,
-                                            gconstpointer   lookup_key,
+xboolean_t    xhash_table_lookup_extended   (xhashtable_t     *hash_table,
+                                            xconstpointer   lookup_key,
                                             xpointer_t       *orig_key,
                                             xpointer_t       *value);
 XPL_AVAILABLE_IN_ALL
-void        g_hash_table_foreach           (GHashTable     *hash_table,
+void        xhash_table_foreach           (xhashtable_t     *hash_table,
                                             GHFunc          func,
                                             xpointer_t        user_data);
 XPL_AVAILABLE_IN_ALL
-xpointer_t    g_hash_table_find              (GHashTable     *hash_table,
+xpointer_t    xhash_table_find              (xhashtable_t     *hash_table,
                                             GHRFunc         predicate,
                                             xpointer_t        user_data);
 XPL_AVAILABLE_IN_ALL
-xuint_t       g_hash_table_foreach_remove    (GHashTable     *hash_table,
+xuint_t       xhash_table_foreach_remove    (xhashtable_t     *hash_table,
                                             GHRFunc         func,
                                             xpointer_t        user_data);
 XPL_AVAILABLE_IN_ALL
-xuint_t       g_hash_table_foreach_steal     (GHashTable     *hash_table,
+xuint_t       xhash_table_foreach_steal     (xhashtable_t     *hash_table,
                                             GHRFunc         func,
                                             xpointer_t        user_data);
 XPL_AVAILABLE_IN_ALL
-xuint_t       g_hash_table_size              (GHashTable     *hash_table);
+xuint_t       xhash_table_size              (xhashtable_t     *hash_table);
 XPL_AVAILABLE_IN_ALL
-xlist_t *     g_hash_table_get_keys          (GHashTable     *hash_table);
+xlist_t *     xhash_table_get_keys          (xhashtable_t     *hash_table);
 XPL_AVAILABLE_IN_ALL
-xlist_t *     g_hash_table_get_values        (GHashTable     *hash_table);
+xlist_t *     xhash_table_get_values        (xhashtable_t     *hash_table);
 XPL_AVAILABLE_IN_2_40
-xpointer_t *  g_hash_table_get_keys_as_array (GHashTable     *hash_table,
+xpointer_t *  xhash_table_get_keys_as_array (xhashtable_t     *hash_table,
                                             xuint_t          *length);
 
 XPL_AVAILABLE_IN_ALL
-void        g_hash_table_iter_init         (GHashTableIter *iter,
-                                            GHashTable     *hash_table);
+void        xhash_table_iter_init         (xhash_table_iter_t *iter,
+                                            xhashtable_t     *hash_table);
 XPL_AVAILABLE_IN_ALL
-xboolean_t    g_hash_table_iter_next         (GHashTableIter *iter,
+xboolean_t    xhash_table_iter_next         (xhash_table_iter_t *iter,
                                             xpointer_t       *key,
                                             xpointer_t       *value);
 XPL_AVAILABLE_IN_ALL
-GHashTable* g_hash_table_iter_get_hash_table (GHashTableIter *iter);
+xhashtable_t* xhash_table_iter_get_hash_table (xhash_table_iter_t *iter);
 XPL_AVAILABLE_IN_ALL
-void        g_hash_table_iter_remove       (GHashTableIter *iter);
+void        xhash_table_iter_remove       (xhash_table_iter_t *iter);
 XPL_AVAILABLE_IN_2_30
-void        g_hash_table_iter_replace      (GHashTableIter *iter,
+void        xhash_table_iter_replace      (xhash_table_iter_t *iter,
                                             xpointer_t        value);
 XPL_AVAILABLE_IN_ALL
-void        g_hash_table_iter_steal        (GHashTableIter *iter);
+void        xhash_table_iter_steal        (xhash_table_iter_t *iter);
 
 XPL_AVAILABLE_IN_ALL
-GHashTable* g_hash_table_ref               (GHashTable     *hash_table);
+xhashtable_t* xhash_table_ref               (xhashtable_t     *hash_table);
 XPL_AVAILABLE_IN_ALL
-void        g_hash_table_unref             (GHashTable     *hash_table);
+void        xhash_table_unref             (xhashtable_t     *hash_table);
 
-#define g_hash_table_freeze(hash_table) ((void)0) XPL_DEPRECATED_MACRO_IN_2_26
-#define g_hash_table_thaw(hash_table) ((void)0) XPL_DEPRECATED_MACRO_IN_2_26
+#define xhash_table_freeze(hash_table) ((void)0) XPL_DEPRECATED_MACRO_IN_2_26
+#define xhash_table_thaw(hash_table) ((void)0) XPL_DEPRECATED_MACRO_IN_2_26
 
 /* Hash Functions
  */
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_str_equal    (gconstpointer  v1,
-                         gconstpointer  v2);
+xboolean_t xstr_equal    (xconstpointer  v1,
+                         xconstpointer  v2);
 XPL_AVAILABLE_IN_ALL
-xuint_t    g_str_hash     (gconstpointer  v);
+xuint_t    xstr_hash     (xconstpointer  v);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_int_equal    (gconstpointer  v1,
-                         gconstpointer  v2);
+xboolean_t g_int_equal    (xconstpointer  v1,
+                         xconstpointer  v2);
 XPL_AVAILABLE_IN_ALL
-xuint_t    g_int_hash     (gconstpointer  v);
+xuint_t    g_int_hash     (xconstpointer  v);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_int64_equal  (gconstpointer  v1,
-                         gconstpointer  v2);
+xboolean_t g_int64_equal  (xconstpointer  v1,
+                         xconstpointer  v2);
 XPL_AVAILABLE_IN_ALL
-xuint_t    g_int64_hash   (gconstpointer  v);
+xuint_t    g_int64_hash   (xconstpointer  v);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_double_equal (gconstpointer  v1,
-                         gconstpointer  v2);
+xboolean_t g_double_equal (xconstpointer  v1,
+                         xconstpointer  v2);
 XPL_AVAILABLE_IN_ALL
-xuint_t    g_double_hash  (gconstpointer  v);
+xuint_t    g_double_hash  (xconstpointer  v);
 
 XPL_AVAILABLE_IN_ALL
-xuint_t    g_direct_hash  (gconstpointer  v) G_GNUC_CONST;
+xuint_t    g_direct_hash  (xconstpointer  v) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_direct_equal (gconstpointer  v1,
-                         gconstpointer  v2) G_GNUC_CONST;
+xboolean_t g_direct_equal (xconstpointer  v1,
+                         xconstpointer  v2) G_GNUC_CONST;
 
 G_END_DECLS
 

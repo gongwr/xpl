@@ -24,13 +24,13 @@ void print_error      (const xchar_t    *format,
                        ...) G_GNUC_PRINTF (1, 2);
 void print_file_error (xfile_t          *file,
                        const xchar_t    *message);
-void show_help        (GOptionContext *context,
+void show_help        (xoption_context_t *context,
                        const char     *message);
 
-const char         *file_type_to_string        (GFileType                type);
-const char         *attribute_type_to_string   (GFileAttributeType       type);
-GFileAttributeType  attribute_type_from_string (const char              *str);
-char               *attribute_flags_to_string  (GFileAttributeInfoFlags  flags);
+const char         *file_type_to_string        (xfile_type_t                type);
+const char         *attribute_type_to_string   (xfile_attribute_type_t       type);
+xfile_attribute_type_t  attribute_type_from_string (const char              *str);
+char               *attribute_flags_to_string  (xfile_attribute_info_flags_t  flags);
 
 xboolean_t file_is_dir (xfile_t *file);
 

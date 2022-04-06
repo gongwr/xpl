@@ -26,7 +26,7 @@
  */
 
 /* Tests for a simple seed, first number is the seed */
-const guint32 first_numbers[] =
+const xuint32_t first_numbers[] =
 {
   0x7a7a7a7a,
   0xfdcc2d54,
@@ -52,7 +52,7 @@ const guint32 first_numbers[] =
 };
 
 /* array seed */
-const guint32 seed_array[] =
+const xuint32_t seed_array[] =
 {
   0x6553375f,
   0xd6b8d43b,
@@ -61,7 +61,7 @@ const guint32 seed_array[] =
 };
 
 /* tests for the array seed */
-const guint32 array_outputs[] =
+const xuint32_t array_outputs[] =
 {
   0xc22b7dc3,
   0xfdecb8ae,
@@ -81,8 +81,8 @@ test_rand (void)
   xuint_t n;
   xuint_t ones;
   double proportion;
-  GRand *rand;
-  GRand *copy;
+  xrand_t *rand;
+  xrand_t *copy;
 
   rand = g_rand_new_with_seed (first_numbers[0]);
 

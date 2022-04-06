@@ -5,26 +5,26 @@
 #include <string.h>
 #include <stdlib.h>
 
-static GKeyFile *
+static xkey_file_t *
 load_data (const xchar_t   *data,
            GKeyFileFlags  flags)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   xerror_t *error = NULL;
 
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, flags, &error);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, flags, &error);
   g_assert_no_error (error);
   return keyfile;
 }
 
 static void
 check_error (xerror_t **error,
-             GQuark   domain,
+             xquark   domain,
              xint_t     code)
 {
   g_assert_error (*error, domain, code);
-  g_error_free (*error);
+  xerror_free (*error);
   *error = NULL;
 }
 
@@ -35,7 +35,7 @@ check_no_error (xerror_t **error)
 }
 
 static void
-check_string_value (GKeyFile    *keyfile,
+check_strinxvalue (xkey_file_t    *keyfile,
                     const xchar_t *group,
                     const xchar_t *key,
                     const xchar_t *expected)
@@ -43,7 +43,7 @@ check_string_value (GKeyFile    *keyfile,
   xerror_t *error = NULL;
   xchar_t *value;
 
-  value = g_key_file_get_string (keyfile, group, key, &error);
+  value = xkey_file_get_string (keyfile, group, key, &error);
   check_no_error (&error);
   g_assert_nonnull (value);
   g_assert_cmpstr (value, ==, expected);
@@ -51,7 +51,7 @@ check_string_value (GKeyFile    *keyfile,
 }
 
 static void
-check_locale_string_value (GKeyFile    *keyfile,
+check_locale_strinxvalue (xkey_file_t    *keyfile,
                            const xchar_t *group,
                            const xchar_t *key,
                            const xchar_t *locale,
@@ -60,7 +60,7 @@ check_locale_string_value (GKeyFile    *keyfile,
   xerror_t *error = NULL;
   xchar_t *value;
 
-  value = g_key_file_get_locale_string (keyfile, group, key, locale, &error);
+  value = xkey_file_get_locale_string (keyfile, group, key, locale, &error);
   check_no_error (&error);
   g_assert_nonnull (value);
   g_assert_cmpstr (value, ==, expected);
@@ -68,7 +68,7 @@ check_locale_string_value (GKeyFile    *keyfile,
 }
 
 static void
-check_string_locale_value (GKeyFile    *keyfile,
+check_string_locale_value (xkey_file_t    *keyfile,
                            const xchar_t *group,
                            const xchar_t *key,
                            const xchar_t *locale,
@@ -76,13 +76,13 @@ check_string_locale_value (GKeyFile    *keyfile,
 {
   xchar_t *value;
 
-  value = g_key_file_get_locale_for_key (keyfile, group, key, locale);
+  value = xkey_file_get_locale_for_key (keyfile, group, key, locale);
   g_assert_cmpstr (value, ==, expected);
   g_free (value);
 }
 
 static void
-check_string_list_value (GKeyFile    *keyfile,
+check_strinxlist_value (xkey_file_t    *keyfile,
                          const xchar_t *group,
                          const xchar_t *key,
                          ...)
@@ -93,7 +93,7 @@ check_string_list_value (GKeyFile    *keyfile,
   xsize_t len;
   xerror_t *error = NULL;
 
-  value = g_key_file_get_string_list (keyfile, group, key, &len, &error);
+  value = xkey_file_get_string_list (keyfile, group, key, &len, &error);
   check_no_error (&error);
   g_assert_nonnull (value);
 
@@ -110,11 +110,11 @@ check_string_list_value (GKeyFile    *keyfile,
 
   va_end (args);
 
-  g_strfreev (value);
+  xstrfreev (value);
 }
 
 static void
-check_locale_string_list_value (GKeyFile    *keyfile,
+check_locale_strinxlist_value (xkey_file_t    *keyfile,
                                 const xchar_t *group,
                                 const xchar_t *key,
                                 const xchar_t *locale,
@@ -126,7 +126,7 @@ check_locale_string_list_value (GKeyFile    *keyfile,
   xsize_t len;
   xerror_t *error = NULL;
 
-  value = g_key_file_get_locale_string_list (keyfile, group, key, locale, &len, &error);
+  value = xkey_file_get_locale_string_list (keyfile, group, key, locale, &len, &error);
   check_no_error (&error);
   g_assert_nonnull (value);
 
@@ -143,11 +143,11 @@ check_locale_string_list_value (GKeyFile    *keyfile,
 
   va_end (args);
 
-  g_strfreev (value);
+  xstrfreev (value);
 }
 
 static void
-check_integer_list_value (GKeyFile    *keyfile,
+check_integer_list_value (xkey_file_t    *keyfile,
                           const xchar_t *group,
                           const xchar_t *key,
                           ...)
@@ -158,7 +158,7 @@ check_integer_list_value (GKeyFile    *keyfile,
   xsize_t len;
   xerror_t *error = NULL;
 
-  value = g_key_file_get_integer_list (keyfile, group, key, &len, &error);
+  value = xkey_file_get_integer_list (keyfile, group, key, &len, &error);
   check_no_error (&error);
   g_assert_nonnull (value);
 
@@ -179,7 +179,7 @@ check_integer_list_value (GKeyFile    *keyfile,
 }
 
 static void
-check_double_list_value (GKeyFile    *keyfile,
+check_double_list_value (xkey_file_t    *keyfile,
                           const xchar_t *group,
                           const xchar_t *key,
                           ...)
@@ -190,7 +190,7 @@ check_double_list_value (GKeyFile    *keyfile,
   xsize_t len;
   xerror_t *error = NULL;
 
-  value = g_key_file_get_double_list (keyfile, group, key, &len, &error);
+  value = xkey_file_get_double_list (keyfile, group, key, &len, &error);
   check_no_error (&error);
   g_assert_nonnull (value);
 
@@ -211,7 +211,7 @@ check_double_list_value (GKeyFile    *keyfile,
 }
 
 static void
-check_boolean_list_value (GKeyFile    *keyfile,
+check_boolean_list_value (xkey_file_t    *keyfile,
                           const xchar_t *group,
                           const xchar_t *key,
                           ...)
@@ -222,7 +222,7 @@ check_boolean_list_value (GKeyFile    *keyfile,
   xsize_t len;
   xerror_t *error = NULL;
 
-  value = g_key_file_get_boolean_list (keyfile, group, key, &len, &error);
+  value = xkey_file_get_boolean_list (keyfile, group, key, &len, &error);
   check_no_error (&error);
   g_assert_nonnull (value);
 
@@ -243,7 +243,7 @@ check_boolean_list_value (GKeyFile    *keyfile,
 }
 
 static void
-check_boolean_value (GKeyFile    *keyfile,
+check_boolean_value (xkey_file_t    *keyfile,
                      const xchar_t *group,
                      const xchar_t *key,
                      xboolean_t     expected)
@@ -251,13 +251,13 @@ check_boolean_value (GKeyFile    *keyfile,
   xerror_t *error = NULL;
   xboolean_t value;
 
-  value = g_key_file_get_boolean (keyfile, group, key, &error);
+  value = xkey_file_get_boolean (keyfile, group, key, &error);
   check_no_error (&error);
   g_assert_cmpint (value, ==, expected);
 }
 
 static void
-check_integer_value (GKeyFile    *keyfile,
+check_integer_value (xkey_file_t    *keyfile,
                      const xchar_t *group,
                      const xchar_t *key,
                      xint_t         expected)
@@ -265,13 +265,13 @@ check_integer_value (GKeyFile    *keyfile,
   xerror_t *error = NULL;
   xint_t value;
 
-  value = g_key_file_get_integer (keyfile, group, key, &error);
+  value = xkey_file_get_integer (keyfile, group, key, &error);
   check_no_error (&error);
   g_assert_cmpint (value, ==, expected);
 }
 
 static void
-check_double_value (GKeyFile    *keyfile,
+check_double_value (xkey_file_t    *keyfile,
                      const xchar_t *group,
                      const xchar_t *key,
                      xdouble_t      expected)
@@ -279,7 +279,7 @@ check_double_value (GKeyFile    *keyfile,
   xerror_t *error = NULL;
   xdouble_t value;
 
-  value = g_key_file_get_double (keyfile, group, key, &error);
+  value = xkey_file_get_double (keyfile, group, key, &error);
   check_no_error (&error);
   g_assert_cmpfloat (value, ==, expected);
 }
@@ -310,7 +310,7 @@ check_length (const xchar_t *what,
 static void
 test_line_ends (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
 
   const xchar_t *data =
     "[group1]\n"
@@ -322,12 +322,12 @@ test_line_ends (void)
 
   keyfile = load_data (data, 0);
 
-  check_string_value (keyfile, "group1", "key1", "value1");
-  check_string_value (keyfile, "group1", "key2", "value2");
-  check_string_value (keyfile, "group2", "key3", "value3\r");
-  check_string_value (keyfile, "group2", "key4", "value4");
+  check_strinxvalue (keyfile, "group1", "key1", "value1");
+  check_strinxvalue (keyfile, "group1", "key2", "value2");
+  check_strinxvalue (keyfile, "group2", "key3", "value3\r");
+  check_strinxvalue (keyfile, "group2", "key4", "value4");
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 /* check handling of whitespace
@@ -335,7 +335,7 @@ test_line_ends (void)
 static void
 test_whitespace (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
 
   const xchar_t *data =
     "[group1]\n"
@@ -348,13 +348,13 @@ test_whitespace (void)
 
   keyfile = load_data (data, 0);
 
-  check_string_value (keyfile, "group1", "key1", "value1");
-  check_string_value (keyfile, "group1", "key2", "value2");
-  check_string_value (keyfile, " group2 ", "key3", "value3  ");
-  check_string_value (keyfile, " group2 ", "key4", "value \t4");
-  check_string_value (keyfile, " group2 ", "key5", "value5");
+  check_strinxvalue (keyfile, "group1", "key1", "value1");
+  check_strinxvalue (keyfile, "group1", "key2", "value2");
+  check_strinxvalue (keyfile, " group2 ", "key3", "value3  ");
+  check_strinxvalue (keyfile, " group2 ", "key4", "value \t4");
+  check_strinxvalue (keyfile, " group2 ", "key5", "value5");
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 /* check handling of comments
@@ -362,7 +362,7 @@ test_whitespace (void)
 static void
 test_comments (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   xchar_t **names;
   xsize_t len;
   xerror_t *error = NULL;
@@ -391,70 +391,70 @@ test_comments (void)
 
   keyfile = load_data (data, 0);
 
-  check_string_value (keyfile, "group1", "key1", "value1");
-  check_string_value (keyfile, "group1", "key2", "value2");
-  check_string_value (keyfile, "group1", "key3", "value3");
-  check_string_value (keyfile, "group1", "key4", "value4");
+  check_strinxvalue (keyfile, "group1", "key1", "value1");
+  check_strinxvalue (keyfile, "group1", "key2", "value2");
+  check_strinxvalue (keyfile, "group1", "key3", "value3");
+  check_strinxvalue (keyfile, "group1", "key4", "value4");
 
-  names = g_key_file_get_keys (keyfile, "group1", &len, &error);
+  names = xkey_file_get_keys (keyfile, "group1", &len, &error);
   check_no_error (&error);
 
-  check_length ("keys", g_strv_length (names), len, 4);
+  check_length ("keys", xstrv_length (names), len, 4);
   check_name ("key", names[0], "key1", 0);
   check_name ("key", names[1], "key2", 1);
   check_name ("key", names[2], "key3", 2);
   check_name ("key", names[3], "key4", 3);
 
-  g_strfreev (names);
+  xstrfreev (names);
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
   keyfile = load_data (data, G_KEY_FILE_KEEP_COMMENTS);
 
-  names = g_key_file_get_keys (keyfile, "group1", &len, &error);
+  names = xkey_file_get_keys (keyfile, "group1", &len, &error);
   check_no_error (&error);
 
-  check_length ("keys", g_strv_length (names), len, 4);
+  check_length ("keys", xstrv_length (names), len, 4);
   check_name ("key", names[0], "key1", 0);
   check_name ("key", names[1], "key2", 1);
   check_name ("key", names[2], "key3", 2);
   check_name ("key", names[3], "key4", 3);
 
-  g_strfreev (names);
+  xstrfreev (names);
 
-  comment = g_key_file_get_comment (keyfile, NULL, NULL, &error);
+  comment = xkey_file_get_comment (keyfile, NULL, NULL, &error);
   check_no_error (&error);
   check_name ("top comment", comment, top_comment, 0);
   g_free (comment);
 
-  comment = g_key_file_get_comment (keyfile, "group1", "key2", &error);
+  comment = xkey_file_get_comment (keyfile, "group1", "key2", &error);
   check_no_error (&error);
   check_name ("key comment", comment, key_comment, 0);
   g_free (comment);
 
-  g_key_file_remove_comment (keyfile, "group1", "key2", &error);
+  xkey_file_remove_comment (keyfile, "group1", "key2", &error);
   check_no_error (&error);
-  comment = g_key_file_get_comment (keyfile, "group1", "key2", &error);
+  comment = xkey_file_get_comment (keyfile, "group1", "key2", &error);
   check_no_error (&error);
   g_assert_null (comment);
 
-  comment = g_key_file_get_comment (keyfile, "group1", "key4", &error);
+  comment = xkey_file_get_comment (keyfile, "group1", "key4", &error);
   check_no_error (&error);
   check_name ("key comment", comment, key4_comment, 0);
   g_free (comment);
 
-  comment = g_key_file_get_comment (keyfile, "group2", NULL, &error);
+  comment = xkey_file_get_comment (keyfile, "group2", NULL, &error);
   check_no_error (&error);
   check_name ("group comment", comment, group_comment, 0);
   g_free (comment);
 
-  comment = g_key_file_get_comment (keyfile, "group3", NULL, &error);
+  comment = xkey_file_get_comment (keyfile, "group3", NULL, &error);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_GROUP_NOT_FOUND);
   g_assert_null (comment);
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 
@@ -462,7 +462,7 @@ test_comments (void)
 static void
 test_listing (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   xchar_t **names;
   xsize_t len;
   xchar_t *start;
@@ -478,55 +478,55 @@ test_listing (void)
 
   keyfile = load_data (data, 0);
 
-  names = g_key_file_get_groups (keyfile, &len);
+  names = xkey_file_get_groups (keyfile, &len);
   g_assert_nonnull (names);
 
-  check_length ("groups", g_strv_length (names), len, 2);
+  check_length ("groups", xstrv_length (names), len, 2);
   check_name ("group name", names[0], "group1", 0);
   check_name ("group name", names[1], "group2", 1);
 
-  g_strfreev (names);
+  xstrfreev (names);
 
-  names = g_key_file_get_keys (keyfile, "group1", &len, &error);
+  names = xkey_file_get_keys (keyfile, "group1", &len, &error);
   check_no_error (&error);
 
-  check_length ("keys", g_strv_length (names), len, 2);
+  check_length ("keys", xstrv_length (names), len, 2);
   check_name ("key", names[0], "key1", 0);
   check_name ("key", names[1], "key2", 1);
 
-  g_strfreev (names);
+  xstrfreev (names);
 
-  names = g_key_file_get_keys (keyfile, "no-such-group", &len, &error);
+  names = xkey_file_get_keys (keyfile, "no-such-group", &len, &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_GROUP_NOT_FOUND);
 
-  g_strfreev (names);
+  xstrfreev (names);
 
-  g_assert_true (g_key_file_has_group (keyfile, "group1"));
-  g_assert_true (g_key_file_has_group (keyfile, "group2"));
-  g_assert_false (g_key_file_has_group (keyfile, "group10"));
-  g_assert_false (g_key_file_has_group (keyfile, "group20"));
+  g_assert_true (xkey_file_has_group (keyfile, "group1"));
+  g_assert_true (xkey_file_has_group (keyfile, "group2"));
+  g_assert_false (xkey_file_has_group (keyfile, "group10"));
+  g_assert_false (xkey_file_has_group (keyfile, "group20"));
 
-  start = g_key_file_get_start_group (keyfile);
+  start = xkey_file_get_start_group (keyfile);
   g_assert_cmpstr (start, ==, "group1");
   g_free (start);
 
-  g_assert_true (g_key_file_has_key (keyfile, "group1", "key1", &error));
+  g_assert_true (xkey_file_has_key (keyfile, "group1", "key1", &error));
   check_no_error (&error);
-  g_assert_true (g_key_file_has_key (keyfile, "group2", "key3", &error));
+  g_assert_true (xkey_file_has_key (keyfile, "group2", "key3", &error));
   check_no_error (&error);
-  g_assert_false (g_key_file_has_key (keyfile, "group2", "no-such-key", NULL));
+  g_assert_false (xkey_file_has_key (keyfile, "group2", "no-such-key", NULL));
 
-  g_key_file_has_key (keyfile, "no-such-group", "key", &error);
+  xkey_file_has_key (keyfile, "no-such-group", "key", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_GROUP_NOT_FOUND);
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 /* check parsing of string values */
 static void
 test_string (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   xerror_t *error = NULL;
   xchar_t *value;
   const xchar_t * const list[3] = {
@@ -548,45 +548,45 @@ test_string (void)
 
   keyfile = load_data (data, 0);
 
-  check_string_value (keyfile, "valid", "key1", " \n\t\r\\");
-  check_string_value (keyfile, "valid", "key2", "\"quoted\"");
-  check_string_value (keyfile, "valid", "key3", "'quoted'");
-  check_string_value (keyfile, "valid", "key4", "\xe2\x89\xa0\xe2\x89\xa0");
-  check_string_value (keyfile, "valid", "key5", "leading space");
-  check_string_value (keyfile, "valid", "key6", "trailing space  ");
+  check_strinxvalue (keyfile, "valid", "key1", " \n\t\r\\");
+  check_strinxvalue (keyfile, "valid", "key2", "\"quoted\"");
+  check_strinxvalue (keyfile, "valid", "key3", "'quoted'");
+  check_strinxvalue (keyfile, "valid", "key4", "\xe2\x89\xa0\xe2\x89\xa0");
+  check_strinxvalue (keyfile, "valid", "key5", "leading space");
+  check_strinxvalue (keyfile, "valid", "key6", "trailing space  ");
 
-  value = g_key_file_get_string (keyfile, "invalid", "key1", &error);
+  value = xkey_file_get_string (keyfile, "invalid", "key1", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
   g_free (value);
 
-  value = g_key_file_get_string (keyfile, "invalid", "key2", &error);
+  value = xkey_file_get_string (keyfile, "invalid", "key2", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
   g_free (value);
 
-  g_key_file_set_string (keyfile, "inserted", "key1", "simple");
-  g_key_file_set_string (keyfile, "inserted", "key2", " leading space");
-  g_key_file_set_string (keyfile, "inserted", "key3", "\tleading tab");
-  g_key_file_set_string (keyfile, "inserted", "key4", "new\nline");
-  g_key_file_set_string (keyfile, "inserted", "key5", "carriage\rreturn");
-  g_key_file_set_string (keyfile, "inserted", "key6", "slash\\yay!");
-  g_key_file_set_string_list (keyfile, "inserted", "key7", list, 3);
+  xkey_file_set_string (keyfile, "inserted", "key1", "simple");
+  xkey_file_set_string (keyfile, "inserted", "key2", " leading space");
+  xkey_file_set_string (keyfile, "inserted", "key3", "\tleading tab");
+  xkey_file_set_string (keyfile, "inserted", "key4", "new\nline");
+  xkey_file_set_string (keyfile, "inserted", "key5", "carriage\rreturn");
+  xkey_file_set_string (keyfile, "inserted", "key6", "slash\\yay!");
+  xkey_file_set_string_list (keyfile, "inserted", "key7", list, 3);
 
-  check_string_value (keyfile, "inserted", "key1", "simple");
-  check_string_value (keyfile, "inserted", "key2", " leading space");
-  check_string_value (keyfile, "inserted", "key3", "\tleading tab");
-  check_string_value (keyfile, "inserted", "key4", "new\nline");
-  check_string_value (keyfile, "inserted", "key5", "carriage\rreturn");
-  check_string_value (keyfile, "inserted", "key6", "slash\\yay!");
-  check_string_list_value (keyfile, "inserted", "key7", "one", "two;andahalf", "3", NULL);
+  check_strinxvalue (keyfile, "inserted", "key1", "simple");
+  check_strinxvalue (keyfile, "inserted", "key2", " leading space");
+  check_strinxvalue (keyfile, "inserted", "key3", "\tleading tab");
+  check_strinxvalue (keyfile, "inserted", "key4", "new\nline");
+  check_strinxvalue (keyfile, "inserted", "key5", "carriage\rreturn");
+  check_strinxvalue (keyfile, "inserted", "key6", "slash\\yay!");
+  check_strinxlist_value (keyfile, "inserted", "key7", "one", "two;andahalf", "3", NULL);
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 /* check parsing of boolean values */
 static void
 test_boolean (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   xerror_t *error = NULL;
 
   const xchar_t *data =
@@ -612,29 +612,29 @@ test_boolean (void)
   check_boolean_value (keyfile, "valid", "key5", TRUE);
   check_boolean_value (keyfile, "valid", "key6", TRUE);
 
-  g_key_file_get_boolean (keyfile, "invalid", "key1", &error);
+  xkey_file_get_boolean (keyfile, "invalid", "key1", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
 
-  g_key_file_get_boolean (keyfile, "invalid", "key2", &error);
+  xkey_file_get_boolean (keyfile, "invalid", "key2", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
 
-  g_key_file_get_boolean (keyfile, "invalid", "key3", &error);
+  xkey_file_get_boolean (keyfile, "invalid", "key3", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
 
-  g_key_file_get_boolean (keyfile, "invalid", "key4", &error);
+  xkey_file_get_boolean (keyfile, "invalid", "key4", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
 
-  g_key_file_set_boolean (keyfile, "valid", "key1", FALSE);
+  xkey_file_set_boolean (keyfile, "valid", "key1", FALSE);
   check_boolean_value (keyfile, "valid", "key1", FALSE);
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 /* check parsing of integer and double values */
 static void
 test_number (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   xerror_t *error = NULL;
   xdouble_t dval = 0.0;
 
@@ -675,42 +675,42 @@ test_number (void)
   check_double_value (keyfile, "valid", "dkey2", 145.45);
   check_double_value (keyfile, "valid", "dkey3", -3453.7);
 
-  g_key_file_get_integer (keyfile, "invalid", "key1", &error);
+  xkey_file_get_integer (keyfile, "invalid", "key1", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
 
-  g_key_file_get_integer (keyfile, "invalid", "key2", &error);
+  xkey_file_get_integer (keyfile, "invalid", "key2", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
 
-  g_key_file_get_integer (keyfile, "invalid", "key3", &error);
+  xkey_file_get_integer (keyfile, "invalid", "key3", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
 
-  g_key_file_get_integer (keyfile, "invalid", "key4", &error);
+  xkey_file_get_integer (keyfile, "invalid", "key4", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
 
-  dval = g_key_file_get_double (keyfile, "invalid", "key5", &error);
-  check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
-  g_assert_cmpfloat (dval, ==, 0.0);
-
-  dval = g_key_file_get_double (keyfile, "invalid", "key6", &error);
+  dval = xkey_file_get_double (keyfile, "invalid", "key5", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
   g_assert_cmpfloat (dval, ==, 0.0);
 
-  dval = g_key_file_get_double (keyfile, "invalid", "key7", &error);
+  dval = xkey_file_get_double (keyfile, "invalid", "key6", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
   g_assert_cmpfloat (dval, ==, 0.0);
 
-  dval = g_key_file_get_double (keyfile, "invalid", "key8", &error);
+  dval = xkey_file_get_double (keyfile, "invalid", "key7", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
   g_assert_cmpfloat (dval, ==, 0.0);
 
-  g_key_file_free (keyfile);
+  dval = xkey_file_get_double (keyfile, "invalid", "key8", &error);
+  check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
+  g_assert_cmpfloat (dval, ==, 0.0);
+
+  xkey_file_free (keyfile);
 }
 
 /* check handling of translated strings */
 static void
 test_locale_string (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   xchar_t *old_locale;
 
   const xchar_t *data =
@@ -725,34 +725,34 @@ test_locale_string (void)
 
   keyfile = load_data (data, G_KEY_FILE_KEEP_TRANSLATIONS);
 
-  check_locale_string_value (keyfile, "valid", "key1", "it", "v1");
-  check_locale_string_value (keyfile, "valid", "key1", "de", "v1-de");
-  check_locale_string_value (keyfile, "valid", "key1", "de_DE", "v1-de_DE");
-  check_locale_string_value (keyfile, "valid", "key1", "de_DE.UTF8", "v1-de_DE.UTF8");
-  check_locale_string_value (keyfile, "valid", "key1", "fr", "v1-fr");
-  check_locale_string_value (keyfile, "valid", "key1", "fr_FR", "v1-fr");
-  check_locale_string_value (keyfile, "valid", "key1", "en", "v1-en");
-  check_locale_string_value (keyfile, "valid", "key1", "sr@Latn", "v1-sr");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "it", "v1");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "de", "v1-de");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "de_DE", "v1-de_DE");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "de_DE.UTF8", "v1-de_DE.UTF8");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "fr", "v1-fr");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "fr_FR", "v1-fr");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "en", "v1-en");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "sr@Latn", "v1-sr");
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
   /* now test that translations are thrown away */
 
-  old_locale = g_strdup (setlocale (LC_ALL, NULL));
+  old_locale = xstrdup (setlocale (LC_ALL, NULL));
   g_setenv ("LANGUAGE", "de", TRUE);
   setlocale (LC_ALL, "");
 
   keyfile = load_data (data, 0);
 
-  check_locale_string_value (keyfile, "valid", "key1", "it", "v1");
-  check_locale_string_value (keyfile, "valid", "key1", "de", "v1-de");
-  check_locale_string_value (keyfile, "valid", "key1", "de_DE", "v1-de");
-  check_locale_string_value (keyfile, "valid", "key1", "de_DE.UTF8", "v1-de");
-  check_locale_string_value (keyfile, "valid", "key1", "fr", "v1");
-  check_locale_string_value (keyfile, "valid", "key1", "fr_FR", "v1");
-  check_locale_string_value (keyfile, "valid", "key1", "en", "v1");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "it", "v1");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "de", "v1-de");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "de_DE", "v1-de");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "de_DE.UTF8", "v1-de");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "fr", "v1");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "fr_FR", "v1");
+  check_locale_strinxvalue (keyfile, "valid", "key1", "en", "v1");
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
   setlocale (LC_ALL, old_locale);
   g_free (old_locale);
@@ -761,7 +761,7 @@ test_locale_string (void)
 static void
 test_locale_string_multiple_loads (void)
 {
-  GKeyFile *keyfile = NULL;
+  xkey_file_t *keyfile = NULL;
   xerror_t *local_error = NULL;
   xchar_t *old_locale = NULL;
   xuint_t i;
@@ -778,23 +778,23 @@ test_locale_string_multiple_loads (void)
   g_test_summary ("Check that loading with translations multiple times works");
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2361");
 
-  old_locale = g_strdup (setlocale (LC_ALL, NULL));
+  old_locale = xstrdup (setlocale (LC_ALL, NULL));
   g_setenv ("LANGUAGE", "de", TRUE);
   setlocale (LC_ALL, "");
 
-  keyfile = g_key_file_new ();
+  keyfile = xkey_file_new ();
 
   for (i = 0; i < 3; i++)
     {
-      g_key_file_load_from_data (keyfile, data, -1, G_KEY_FILE_NONE, &local_error);
+      xkey_file_load_from_data (keyfile, data, -1, G_KEY_FILE_NONE, &local_error);
       g_assert_no_error (local_error);
 
-      check_locale_string_value (keyfile, "valid", "key1", "it", "v1");
-      check_locale_string_value (keyfile, "valid", "key1", "de", "v1-de");
-      check_locale_string_value (keyfile, "valid", "key1", "de_DE", "v1-de");
+      check_locale_strinxvalue (keyfile, "valid", "key1", "it", "v1");
+      check_locale_strinxvalue (keyfile, "valid", "key1", "de", "v1-de");
+      check_locale_strinxvalue (keyfile, "valid", "key1", "de_DE", "v1-de");
     }
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
   setlocale (LC_ALL, old_locale);
   g_free (old_locale);
@@ -803,7 +803,7 @@ test_locale_string_multiple_loads (void)
 static void
 test_lists (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
 
   const xchar_t *data =
     "[valid]\n"
@@ -819,71 +819,71 @@ test_lists (void)
 
   keyfile = load_data (data, 0);
 
-  check_string_list_value (keyfile, "valid", "key1", "v1", "v2", NULL);
-  check_string_list_value (keyfile, "valid", "key2", "v1", "v2", NULL);
-  check_string_list_value (keyfile, "valid", "key3", "v1,v2", NULL);
-  check_string_list_value (keyfile, "valid", "key4", "v1;v2", NULL);
+  check_strinxlist_value (keyfile, "valid", "key1", "v1", "v2", NULL);
+  check_strinxlist_value (keyfile, "valid", "key2", "v1", "v2", NULL);
+  check_strinxlist_value (keyfile, "valid", "key3", "v1,v2", NULL);
+  check_strinxlist_value (keyfile, "valid", "key4", "v1;v2", NULL);
   check_boolean_list_value (keyfile, "valid", "key5", TRUE, FALSE, -100);
   check_integer_list_value (keyfile, "valid", "key6", 1, 0, -1, -100);
   check_double_list_value (keyfile, "valid", "key9", 0.0, 1.3456, -76532.456, -100.0);
   /* maybe these should be valid */
   /* check_integer_list_value (keyfile, "valid", "key7", 1, 0, -1, -100);*/
-  /* check_string_list_value (keyfile, "valid", "key8", "v1\\,v2", NULL);*/
+  /* check_strinxlist_value (keyfile, "valid", "key8", "v1\\,v2", NULL);*/
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
   /* Now check an alternate separator */
 
   keyfile = load_data (data, 0);
-  g_key_file_set_list_separator (keyfile, ',');
+  xkey_file_set_list_separator (keyfile, ',');
 
-  check_string_list_value (keyfile, "valid", "key1", "v1;v2", NULL);
-  check_string_list_value (keyfile, "valid", "key2", "v1;v2;", NULL);
-  check_string_list_value (keyfile, "valid", "key3", "v1", "v2", NULL);
+  check_strinxlist_value (keyfile, "valid", "key1", "v1;v2", NULL);
+  check_strinxlist_value (keyfile, "valid", "key2", "v1;v2;", NULL);
+  check_strinxlist_value (keyfile, "valid", "key3", "v1", "v2", NULL);
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 static void
 test_lists_set_get (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   static const char * const strings[] = { "v1", "v2" };
   static const char * const locale_strings[] = { "v1-l", "v2-l" };
   static int integers[] = { 1, -1, 2 };
   static xdouble_t doubles[] = { 3.14, 2.71 };
 
-  keyfile = g_key_file_new ();
-  g_key_file_set_string_list (keyfile, "group0", "key1", strings, G_N_ELEMENTS (strings));
-  g_key_file_set_locale_string_list (keyfile, "group0", "key1", "de", locale_strings, G_N_ELEMENTS (locale_strings));
-  g_key_file_set_integer_list (keyfile, "group0", "key2", integers, G_N_ELEMENTS (integers));
-  g_key_file_set_double_list (keyfile, "group0", "key3", doubles, G_N_ELEMENTS (doubles));
+  keyfile = xkey_file_new ();
+  xkey_file_set_string_list (keyfile, "group0", "key1", strings, G_N_ELEMENTS (strings));
+  xkey_file_set_locale_string_list (keyfile, "group0", "key1", "de", locale_strings, G_N_ELEMENTS (locale_strings));
+  xkey_file_set_integer_list (keyfile, "group0", "key2", integers, G_N_ELEMENTS (integers));
+  xkey_file_set_double_list (keyfile, "group0", "key3", doubles, G_N_ELEMENTS (doubles));
 
-  check_string_list_value (keyfile, "group0", "key1", strings[0], strings[1], NULL);
-  check_locale_string_list_value (keyfile, "group0", "key1", "de", locale_strings[0], locale_strings[1], NULL);
+  check_strinxlist_value (keyfile, "group0", "key1", strings[0], strings[1], NULL);
+  check_locale_strinxlist_value (keyfile, "group0", "key1", "de", locale_strings[0], locale_strings[1], NULL);
   check_integer_list_value (keyfile, "group0", "key2", integers[0], integers[1], -100);
   check_double_list_value (keyfile, "group0", "key3", doubles[0], doubles[1], -100.0);
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
   /* and again with a different list separator */
-  keyfile = g_key_file_new ();
-  g_key_file_set_list_separator (keyfile, ',');
-  g_key_file_set_string_list (keyfile, "group0", "key1", strings, G_N_ELEMENTS (strings));
-  g_key_file_set_locale_string_list (keyfile, "group0", "key1", "de", locale_strings, G_N_ELEMENTS (locale_strings));
-  g_key_file_set_integer_list (keyfile, "group0", "key2", integers, G_N_ELEMENTS (integers));
-  g_key_file_set_double_list (keyfile, "group0", "key3", doubles, G_N_ELEMENTS (doubles));
+  keyfile = xkey_file_new ();
+  xkey_file_set_list_separator (keyfile, ',');
+  xkey_file_set_string_list (keyfile, "group0", "key1", strings, G_N_ELEMENTS (strings));
+  xkey_file_set_locale_string_list (keyfile, "group0", "key1", "de", locale_strings, G_N_ELEMENTS (locale_strings));
+  xkey_file_set_integer_list (keyfile, "group0", "key2", integers, G_N_ELEMENTS (integers));
+  xkey_file_set_double_list (keyfile, "group0", "key3", doubles, G_N_ELEMENTS (doubles));
 
-  check_string_list_value (keyfile, "group0", "key1", strings[0], strings[1], NULL);
-  check_locale_string_list_value (keyfile, "group0", "key1", "de", locale_strings[0], locale_strings[1], NULL);
+  check_strinxlist_value (keyfile, "group0", "key1", strings[0], strings[1], NULL);
+  check_locale_strinxlist_value (keyfile, "group0", "key1", "de", locale_strings[0], locale_strings[1], NULL);
   check_integer_list_value (keyfile, "group0", "key2", integers[0], integers[1], -100);
   check_double_list_value (keyfile, "group0", "key3", doubles[0], doubles[1], -100.0);
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 static void
 test_group_remove (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   xchar_t **names;
   xsize_t len;
   xerror_t *error = NULL;
@@ -901,49 +901,49 @@ test_group_remove (void)
 
   keyfile = load_data (data, 0);
 
-  names = g_key_file_get_groups (keyfile, &len);
+  names = xkey_file_get_groups (keyfile, &len);
   g_assert_nonnull (names);
 
-  check_length ("groups", g_strv_length (names), len, 3);
+  check_length ("groups", xstrv_length (names), len, 3);
   check_name ("group name", names[0], "group1", 0);
   check_name ("group name", names[1], "group2", 1);
   check_name ("group name", names[2], "group3", 2);
 
-  g_key_file_remove_group (keyfile, "group1", &error);
+  xkey_file_remove_group (keyfile, "group1", &error);
   check_no_error (&error);
 
-  g_strfreev (names);
+  xstrfreev (names);
 
-  names = g_key_file_get_groups (keyfile, &len);
+  names = xkey_file_get_groups (keyfile, &len);
   g_assert_nonnull (names);
 
-  check_length ("groups", g_strv_length (names), len, 2);
+  check_length ("groups", xstrv_length (names), len, 2);
   check_name ("group name", names[0], "group2", 0);
   check_name ("group name", names[1], "group3", 1);
 
-  g_key_file_remove_group (keyfile, "group2", &error);
+  xkey_file_remove_group (keyfile, "group2", &error);
   check_no_error (&error);
 
-  g_strfreev (names);
+  xstrfreev (names);
 
-  names = g_key_file_get_groups (keyfile, &len);
+  names = xkey_file_get_groups (keyfile, &len);
   g_assert_nonnull (names);
 
-  check_length ("groups", g_strv_length (names), len, 1);
+  check_length ("groups", xstrv_length (names), len, 1);
   check_name ("group name", names[0], "group3", 0);
 
-  g_key_file_remove_group (keyfile, "no such group", &error);
+  xkey_file_remove_group (keyfile, "no such group", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_GROUP_NOT_FOUND);
 
-  g_strfreev (names);
+  xstrfreev (names);
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 static void
 test_key_remove (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   xchar_t *value;
   xerror_t *error = NULL;
 
@@ -956,29 +956,29 @@ test_key_remove (void)
 
   keyfile = load_data (data, 0);
 
-  check_string_value (keyfile, "group1", "key1", "bla");
+  check_strinxvalue (keyfile, "group1", "key1", "bla");
 
-  g_key_file_remove_key (keyfile, "group1", "key1", &error);
+  xkey_file_remove_key (keyfile, "group1", "key1", &error);
   check_no_error (&error);
 
-  value = g_key_file_get_string (keyfile, "group1", "key1", &error);
+  value = xkey_file_get_string (keyfile, "group1", "key1", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND);
   g_free (value);
 
-  g_key_file_remove_key (keyfile, "group1", "key1", &error);
+  xkey_file_remove_key (keyfile, "group1", "key1", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_KEY_NOT_FOUND);
 
-  g_key_file_remove_key (keyfile, "no such group", "key1", &error);
+  xkey_file_remove_key (keyfile, "no such group", "key1", &error);
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_GROUP_NOT_FOUND);
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 
 static void
 test_groups (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
 
   const xchar_t *data =
     "[1]\n"
@@ -990,16 +990,16 @@ test_groups (void)
 
   keyfile = load_data (data, 0);
 
-  check_string_value (keyfile, "1", "key1", "123");
-  check_string_value (keyfile, "2", "key2", "123");
+  check_strinxvalue (keyfile, "1", "key1", "123");
+  check_strinxvalue (keyfile, "2", "key2", "123");
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 static void
 test_group_names (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   xerror_t *error = NULL;
   const xchar_t *data;
   xchar_t *value;
@@ -1007,9 +1007,9 @@ test_group_names (void)
   /* [ in group name */
   data = "[a[b]\n"
          "key1=123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
-  g_key_file_free (keyfile);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
+  xkey_file_free (keyfile);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_PARSE);
@@ -1017,9 +1017,9 @@ test_group_names (void)
   /* ] in group name */
   data = "[a]b]\n"
          "key1=123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
-  g_key_file_free (keyfile);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
+  xkey_file_free (keyfile);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_PARSE);
@@ -1027,9 +1027,9 @@ test_group_names (void)
   /* control char in group name */
   data = "[a\tb]\n"
          "key1=123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
-  g_key_file_free (keyfile);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
+  xkey_file_free (keyfile);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_PARSE);
@@ -1037,9 +1037,9 @@ test_group_names (void)
   /* empty group name */
   data = "[]\n"
          "key1=123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
-  g_key_file_free (keyfile);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
+  xkey_file_free (keyfile);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_PARSE);
@@ -1047,48 +1047,48 @@ test_group_names (void)
   /* Unicode in group name */
   data = "[\xc2\xbd]\n"
          "key1=123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
-  g_key_file_free (keyfile);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
+  xkey_file_free (keyfile);
   check_no_error (&error);
 
-  keyfile = g_key_file_new ();
-  /*g_key_file_set_string (keyfile, "a[b", "key1", "123");*/
-  value = g_key_file_get_string (keyfile, "a[b", "key1", &error);
+  keyfile = xkey_file_new ();
+  /*xkey_file_set_string (keyfile, "a[b", "key1", "123");*/
+  value = xkey_file_get_string (keyfile, "a[b", "key1", &error);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_GROUP_NOT_FOUND);
   g_assert_null (value);
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
-  keyfile = g_key_file_new ();
-  /*g_key_file_set_string (keyfile, "a]b", "key1", "123");*/
-  value = g_key_file_get_string (keyfile, "a]b", "key1", &error);
+  keyfile = xkey_file_new ();
+  /*xkey_file_set_string (keyfile, "a]b", "key1", "123");*/
+  value = xkey_file_get_string (keyfile, "a]b", "key1", &error);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_GROUP_NOT_FOUND);
   g_assert_null (value);
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
-  keyfile = g_key_file_new ();
-  /*g_key_file_set_string (keyfile, "a\tb", "key1", "123");*/
-  value = g_key_file_get_string (keyfile, "a\tb", "key1", &error);
+  keyfile = xkey_file_new ();
+  /*xkey_file_set_string (keyfile, "a\tb", "key1", "123");*/
+  value = xkey_file_get_string (keyfile, "a\tb", "key1", &error);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_GROUP_NOT_FOUND);
   g_assert_null (value);
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
-  keyfile = g_key_file_new ();
-  g_key_file_set_string (keyfile, "\xc2\xbd", "key1", "123");
-  check_string_value (keyfile, "\xc2\xbd", "key1", "123");
-  g_key_file_free (keyfile);
+  keyfile = xkey_file_new ();
+  xkey_file_set_string (keyfile, "\xc2\xbd", "key1", "123");
+  check_strinxvalue (keyfile, "\xc2\xbd", "key1", "123");
+  xkey_file_free (keyfile);
 }
 
 static void
 test_key_names (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   xerror_t *error = NULL;
   const xchar_t *data;
   xchar_t *value;
@@ -1096,9 +1096,9 @@ test_key_names (void)
   /* [ in key name */
   data = "[a]\n"
          "key[=123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
-  g_key_file_free (keyfile);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
+  xkey_file_free (keyfile);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_PARSE);
@@ -1106,9 +1106,9 @@ test_key_names (void)
   /* empty key name */
   data = "[a]\n"
          " =123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
-  g_key_file_free (keyfile);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
+  xkey_file_free (keyfile);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_PARSE);
@@ -1116,9 +1116,9 @@ test_key_names (void)
   /* empty key name */
   data = "[a]\n"
          " [de] =123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
-  g_key_file_free (keyfile);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
+  xkey_file_free (keyfile);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_PARSE);
@@ -1126,9 +1126,9 @@ test_key_names (void)
   /* bad locale suffix */
   data = "[a]\n"
          "foo[@#!&%]=123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
-  g_key_file_free (keyfile);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
+  xkey_file_free (keyfile);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_PARSE);
@@ -1136,131 +1136,131 @@ test_key_names (void)
   /* initial space */
   data = "[a]\n"
          " foo=123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
   check_no_error (&error);
-  check_string_value (keyfile, "a", "foo", "123");
-  g_key_file_free (keyfile);
+  check_strinxvalue (keyfile, "a", "foo", "123");
+  xkey_file_free (keyfile);
 
   /* final space */
   data = "[a]\n"
          "foo =123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
   check_no_error (&error);
-  check_string_value (keyfile, "a", "foo", "123");
-  g_key_file_free (keyfile);
+  check_strinxvalue (keyfile, "a", "foo", "123");
+  xkey_file_free (keyfile);
 
   /* inner space */
   data = "[a]\n"
          "foo bar=123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
   check_no_error (&error);
-  check_string_value (keyfile, "a", "foo bar", "123");
-  g_key_file_free (keyfile);
+  check_strinxvalue (keyfile, "a", "foo bar", "123");
+  xkey_file_free (keyfile);
 
   /* inner space */
   data = "[a]\n"
          "foo [de] =123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_PARSE);
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
   /* control char in key name */
   data = "[a]\n"
          "key\tfoo=123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
-  g_key_file_free (keyfile);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
+  xkey_file_free (keyfile);
   check_no_error (&error);
 
   /* Unicode in key name */
   data = "[a]\n"
          "\xc2\xbd=123\n";
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
-  g_key_file_free (keyfile);
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
+  xkey_file_free (keyfile);
   check_no_error (&error);
 
-  keyfile = g_key_file_new ();
-  g_key_file_set_string (keyfile, "a", "x", "123");
-  /*g_key_file_set_string (keyfile, "a", "key=", "123");*/
-  value = g_key_file_get_string (keyfile, "a", "key=", &error);
+  keyfile = xkey_file_new ();
+  xkey_file_set_string (keyfile, "a", "x", "123");
+  /*xkey_file_set_string (keyfile, "a", "key=", "123");*/
+  value = xkey_file_get_string (keyfile, "a", "key=", &error);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_KEY_NOT_FOUND);
   g_assert_null (value);
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
-  keyfile = g_key_file_new ();
-  g_key_file_set_string (keyfile, "a", "x", "123");
-  /*g_key_file_set_string (keyfile, "a", "key[", "123");*/
-  value = g_key_file_get_string (keyfile, "a", "key[", &error);
+  keyfile = xkey_file_new ();
+  xkey_file_set_string (keyfile, "a", "x", "123");
+  /*xkey_file_set_string (keyfile, "a", "key[", "123");*/
+  value = xkey_file_get_string (keyfile, "a", "key[", &error);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_KEY_NOT_FOUND);
   g_assert_null (value);
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
-  keyfile = g_key_file_new ();
-  g_key_file_set_string (keyfile, "a", "x", "123");
-  g_key_file_set_string (keyfile, "a", "key\tfoo", "123");
-  value = g_key_file_get_string (keyfile, "a", "key\tfoo", &error);
+  keyfile = xkey_file_new ();
+  xkey_file_set_string (keyfile, "a", "x", "123");
+  xkey_file_set_string (keyfile, "a", "key\tfoo", "123");
+  value = xkey_file_get_string (keyfile, "a", "key\tfoo", &error);
   check_no_error (&error);
   g_free (value);
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
-  keyfile = g_key_file_new ();
-  g_key_file_set_string (keyfile, "a", "x", "123");
-  /*g_key_file_set_string (keyfile, "a", " key", "123");*/
-  value = g_key_file_get_string (keyfile, "a", " key", &error);
+  keyfile = xkey_file_new ();
+  xkey_file_set_string (keyfile, "a", "x", "123");
+  /*xkey_file_set_string (keyfile, "a", " key", "123");*/
+  value = xkey_file_get_string (keyfile, "a", " key", &error);
   check_error (&error,
                G_KEY_FILE_ERROR,
                G_KEY_FILE_ERROR_KEY_NOT_FOUND);
   g_assert_null (value);
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
-  keyfile = g_key_file_new ();
-  g_key_file_set_string (keyfile, "a", "x", "123");
+  keyfile = xkey_file_new ();
+  xkey_file_set_string (keyfile, "a", "x", "123");
 
   /* Unicode key */
-  g_key_file_set_string (keyfile, "a", "\xc2\xbd", "123");
-  check_string_value (keyfile, "a", "\xc2\xbd", "123");
+  xkey_file_set_string (keyfile, "a", "\xc2\xbd", "123");
+  check_strinxvalue (keyfile, "a", "\xc2\xbd", "123");
 
   /* Keys with / + . (as used by the gnome-vfs mime cache) */
-  g_key_file_set_string (keyfile, "a", "foo/bar", "/");
-  check_string_value (keyfile, "a", "foo/bar", "/");
-  g_key_file_set_string (keyfile, "a", "foo+bar", "+");
-  check_string_value (keyfile, "a", "foo+bar", "+");
-  g_key_file_set_string (keyfile, "a", "foo.bar", ".");
-  check_string_value (keyfile, "a", "foo.bar", ".");
+  xkey_file_set_string (keyfile, "a", "foo/bar", "/");
+  check_strinxvalue (keyfile, "a", "foo/bar", "/");
+  xkey_file_set_string (keyfile, "a", "foo+bar", "+");
+  check_strinxvalue (keyfile, "a", "foo+bar", "+");
+  xkey_file_set_string (keyfile, "a", "foo.bar", ".");
+  check_strinxvalue (keyfile, "a", "foo.bar", ".");
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 static void
 test_duplicate_keys (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   const xchar_t *data =
     "[1]\n"
     "key1=123\n"
     "key1=345\n";
 
   keyfile = load_data (data, 0);
-  check_string_value (keyfile, "1", "key1", "345");
+  check_strinxvalue (keyfile, "1", "key1", "345");
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 static void
 test_duplicate_groups (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   const xchar_t *data =
     "[Desktop Entry]\n"
     "key1=123\n"
@@ -1270,16 +1270,16 @@ test_duplicate_groups (void)
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=157877");
 
   keyfile = load_data (data, 0);
-  check_string_value (keyfile, "Desktop Entry", "key1", "123");
-  check_string_value (keyfile, "Desktop Entry", "key2", "123");
+  check_strinxvalue (keyfile, "Desktop Entry", "key1", "123");
+  check_strinxvalue (keyfile, "Desktop Entry", "key2", "123");
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 static void
 test_duplicate_groups2 (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   const xchar_t *data =
     "[A]\n"
     "foo=bar\n"
@@ -1291,10 +1291,10 @@ test_duplicate_groups2 (void)
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=385910");
 
   keyfile = load_data (data, 0);
-  check_string_value (keyfile, "A", "foo", "bang");
-  check_string_value (keyfile, "B", "foo", "baz");
+  check_strinxvalue (keyfile, "A", "foo", "bang");
+  check_strinxvalue (keyfile, "B", "foo", "baz");
 
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 }
 
 static void
@@ -1319,7 +1319,7 @@ test_reload_idempotency (void)
     "\n\n"
     "[fourth]\n"
     "[fifth]\n";
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   xerror_t *error = NULL;
   xchar_t *data1, *data2;
   xsize_t len1, len2;
@@ -1327,27 +1327,27 @@ test_reload_idempotency (void)
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=420686");
 
   /* check that we only insert a single new line between groups */
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile,
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile,
                              original_data, strlen(original_data),
                              G_KEY_FILE_KEEP_COMMENTS,
                              &error);
   check_no_error (&error);
 
-  data1 = g_key_file_to_data (keyfile, &len1, &error);
+  data1 = xkey_file_to_data (keyfile, &len1, &error);
   g_assert_nonnull (data1);
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
-  keyfile = g_key_file_new ();
-  g_key_file_load_from_data (keyfile,
+  keyfile = xkey_file_new ();
+  xkey_file_load_from_data (keyfile,
                              data1, len1,
                              G_KEY_FILE_KEEP_COMMENTS,
                              &error);
   check_no_error (&error);
 
-  data2 = g_key_file_to_data (keyfile, &len2, &error);
+  data2 = xkey_file_to_data (keyfile, &len2, &error);
   g_assert_nonnull (data2);
-  g_key_file_free (keyfile);
+  xkey_file_free (keyfile);
 
   g_assert_cmpstr (data1, ==, data2);
 
@@ -1365,83 +1365,83 @@ static const char int64_data[] =
 static void
 test_int64 (void)
 {
-  GKeyFile *file;
+  xkey_file_t *file;
   xboolean_t ok;
-  guint64 c;
+  xuint64_t c;
   gint64 d;
   xchar_t *value;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=614864");
 
-  file = g_key_file_new ();
+  file = xkey_file_new ();
 
-  ok = g_key_file_load_from_data (file, int64_data, strlen (int64_data),
+  ok = xkey_file_load_from_data (file, int64_data, strlen (int64_data),
       0, NULL);
   g_assert_true (ok);
 
-  c = g_key_file_get_uint64 (file, "bees", "c", NULL);
+  c = xkey_file_get_uint64 (file, "bees", "c", NULL);
   g_assert_cmpuint (c, ==, G_GUINT64_CONSTANT (123456789123456789));
 
-  d = g_key_file_get_int64 (file, "bees", "d", NULL);
+  d = xkey_file_get_int64 (file, "bees", "d", NULL);
   g_assert_cmpint (d, ==, G_GINT64_CONSTANT (-123456789123456789));
 
-  g_key_file_set_uint64 (file, "bees", "c",
+  xkey_file_set_uint64 (file, "bees", "c",
       G_GUINT64_CONSTANT (987654321987654321));
-  value = g_key_file_get_value (file, "bees", "c", NULL);
+  value = xkey_file_get_value (file, "bees", "c", NULL);
   g_assert_cmpstr (value, ==, "987654321987654321");
   g_free (value);
 
-  g_key_file_set_int64 (file, "bees", "d",
+  xkey_file_set_int64 (file, "bees", "d",
       G_GINT64_CONSTANT (-987654321987654321));
-  value = g_key_file_get_value (file, "bees", "d", NULL);
+  value = xkey_file_get_value (file, "bees", "d", NULL);
   g_assert_cmpstr (value, ==, "-987654321987654321");
   g_free (value);
 
-  g_key_file_free (file);
+  xkey_file_free (file);
 }
 
 static void
 test_load (void)
 {
-  GKeyFile *file;
+  xkey_file_t *file;
   xerror_t *error;
   xboolean_t bools[2] = { TRUE, FALSE };
   xboolean_t loaded;
 
-  file = g_key_file_new ();
+  file = xkey_file_new ();
   error = NULL;
 #ifdef G_OS_UNIX
   /* Uses the value of $XDG_DATA_HOME we set in main() */
-  loaded = g_key_file_load_from_data_dirs (file, "keyfiletest.ini", NULL, 0, &error);
+  loaded = xkey_file_load_from_data_dirs (file, "keyfiletest.ini", NULL, 0, &error);
 #else
-  loaded = g_key_file_load_from_file (file, g_test_get_filename (G_TEST_DIST, "keyfiletest.ini", NULL), 0, &error);
+  loaded = xkey_file_load_from_file (file, g_test_get_filename (G_TEST_DIST, "keyfiletest.ini", NULL), 0, &error);
 #endif
   g_assert_no_error (error);
   g_assert_true (loaded);
 
-  g_key_file_set_locale_string (file, "test", "key4", "de", "Vierter Schlüssel");
-  g_key_file_set_boolean_list (file, "test", "key5", bools, 2);
-  g_key_file_set_integer (file, "test", "key6", 22);
-  g_key_file_set_double (file, "test", "key7", 2.5);
-  g_key_file_set_comment (file, "test", "key7", "some float", NULL);
-  g_key_file_set_comment (file, "test", NULL, "the test group", NULL);
-  g_key_file_set_comment (file, NULL, NULL, "top comment", NULL);
+  xkey_file_set_locale_string (file, "test", "key4", "de", "Vierter Schlüssel");
+  xkey_file_set_boolean_list (file, "test", "key5", bools, 2);
+  xkey_file_set_integer (file, "test", "key6", 22);
+  xkey_file_set_double (file, "test", "key7", 2.5);
+  xkey_file_set_comment (file, "test", "key7", "some float", NULL);
+  xkey_file_set_comment (file, "test", NULL, "the test group", NULL);
+  xkey_file_set_comment (file, NULL, NULL, "top comment", NULL);
 
-  g_key_file_free (file);
+  xkey_file_free (file);
 
-  file = g_key_file_new ();
+  file = xkey_file_new ();
   error = NULL;
-  g_assert_false (g_key_file_load_from_data_dirs (file, "keyfile-test.ini", NULL, 0, &error));
+  g_assert_false (xkey_file_load_from_data_dirs (file, "keyfile-test.ini", NULL, 0, &error));
   g_assert_error (error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_NOT_FOUND);
-  g_error_free (error);
-  g_key_file_free (file);
+  xerror_free (error);
+  xkey_file_free (file);
 }
 
 static void
 test_save (void)
 {
-  GKeyFile *kf;
-  GKeyFile *kf2;
+  xkey_file_t *kf;
+  xkey_file_t *kf2;
   static const char data[] =
     "[bees]\n"
     "a=1\n"
@@ -1450,60 +1450,60 @@ test_save (void)
     "d=-123456789123456789\n";
   xboolean_t ok;
   xchar_t *file;
-  guint64 c;
+  xuint64_t c;
   xerror_t *error = NULL;
   int fd;
 
-  kf = g_key_file_new ();
-  ok = g_key_file_load_from_data (kf, data, strlen (data), 0, NULL);
+  kf = xkey_file_new ();
+  ok = xkey_file_load_from_data (kf, data, strlen (data), 0, NULL);
   g_assert_true (ok);
 
-  file = g_strdup ("key_file_XXXXXX");
+  file = xstrdup ("key_file_XXXXXX");
   fd = g_mkstemp (file);
   g_assert_cmpint (fd, !=, -1);
   ok = g_close (fd, &error);
   g_assert_true (ok);
   g_assert_no_error (error);
-  ok = g_key_file_save_to_file (kf, file, &error);
+  ok = xkey_file_save_to_file (kf, file, &error);
   g_assert_true (ok);
   g_assert_no_error (error);
 
-  kf2 = g_key_file_new ();
-  ok = g_key_file_load_from_file (kf2, file, 0, &error);
+  kf2 = xkey_file_new ();
+  ok = xkey_file_load_from_file (kf2, file, 0, &error);
   g_assert_true (ok);
   g_assert_no_error (error);
 
-  c = g_key_file_get_uint64 (kf2, "bees", "c", NULL);
+  c = xkey_file_get_uint64 (kf2, "bees", "c", NULL);
   g_assert_cmpuint (c, ==, G_GUINT64_CONSTANT (123456789123456789));
 
   remove (file);
   g_free (file);
-  g_key_file_free (kf);
-  g_key_file_free (kf2);
+  xkey_file_free (kf);
+  xkey_file_free (kf2);
 }
 
 static void
 test_load_fail (void)
 {
-  GKeyFile *file;
+  xkey_file_t *file;
   xerror_t *error;
 
-  file = g_key_file_new ();
+  file = xkey_file_new ();
   error = NULL;
-  g_assert_false (g_key_file_load_from_file (file, g_test_get_filename (G_TEST_DIST, "keyfile.c", NULL), 0, &error));
+  g_assert_false (xkey_file_load_from_file (file, g_test_get_filename (G_TEST_DIST, "keyfile.c", NULL), 0, &error));
   g_assert_error (error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_PARSE);
   g_clear_error (&error);
-  g_assert_false (g_key_file_load_from_file (file, "/nosuchfile", 0, &error));
-  g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_NOENT);
+  g_assert_false (xkey_file_load_from_file (file, "/nosuchfile", 0, &error));
+  g_assert_error (error, XFILE_ERROR, XFILE_ERROR_NOENT);
   g_clear_error (&error);
 
-  g_key_file_free (file);
+  xkey_file_free (file);
 }
 
 static void
 test_non_utf8 (void)
 {
-  GKeyFile *file;
+  xkey_file_t *file;
   static const char data[] =
 "[group]\n"
 "a=\230\230\230\n"
@@ -1514,35 +1514,35 @@ test_non_utf8 (void)
   xchar_t *s;
   xchar_t **l;
 
-  file = g_key_file_new ();
+  file = xkey_file_new ();
 
-  ok = g_key_file_load_from_data (file, data, strlen (data), 0, NULL);
+  ok = xkey_file_load_from_data (file, data, strlen (data), 0, NULL);
   g_assert_true (ok);
 
   error = NULL;
-  s = g_key_file_get_string (file, "group", "a", &error);
+  s = xkey_file_get_string (file, "group", "a", &error);
   g_assert_error (error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_UNKNOWN_ENCODING);
   g_assert_null (s);
 
   g_clear_error (&error);
-  l = g_key_file_get_string_list (file, "group", "b", NULL, &error);
+  l = xkey_file_get_string_list (file, "group", "b", NULL, &error);
   g_assert_error (error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_UNKNOWN_ENCODING);
   g_assert_null (l);
 
   g_clear_error (&error);
-  l = g_key_file_get_string_list (file, "group", "c", NULL, &error);
+  l = xkey_file_get_string_list (file, "group", "c", NULL, &error);
   g_assert_error (error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_INVALID_VALUE);
   g_assert_null (l);
 
   g_clear_error (&error);
 
-  g_key_file_free (file);
+  xkey_file_free (file);
 }
 
 static void
 test_page_boundary (void)
 {
-  GKeyFile *file;
+  xkey_file_t *file;
   xerror_t *error;
   xint_t i;
 
@@ -1554,10 +1554,10 @@ test_page_boundary (void)
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=640695");
 
-  file = g_key_file_new ();
+  file = xkey_file_new ();
 
   error = NULL;
-  g_key_file_load_from_file (file, g_test_get_filename (G_TEST_DIST, "pages.ini", NULL), G_KEY_FILE_NONE, &error);
+  xkey_file_load_from_file (file, g_test_get_filename (G_TEST_DIST, "pages.ini", NULL), G_KEY_FILE_NONE, &error);
   g_assert_no_error (error);
 
   for (i = FIRST_KEY; i <= LAST_KEY; i++)
@@ -1565,96 +1565,96 @@ test_page_boundary (void)
       xchar_t *key;
       xint_t val;
 
-      key = g_strdup_printf (KEY_PREFIX "%d", i);
-      val = g_key_file_get_integer (file, GROUP, key, &error);
+      key = xstrdup_printf (KEY_PREFIX "%d", i);
+      val = xkey_file_get_integer (file, GROUP, key, &error);
       g_free (key);
       g_assert_no_error (error);
       g_assert_cmpint (val, ==, VALUE);
     }
 
-  g_key_file_free (file);
+  xkey_file_free (file);
 }
 
 static void
 test_ref (void)
 {
-  GKeyFile *file;
+  xkey_file_t *file;
   static const char data[] =
 "[group]\n"
 "a=1\n";
   xboolean_t ok;
 
-  file = g_key_file_new ();
+  file = xkey_file_new ();
 
-  ok = g_key_file_load_from_data (file, data, strlen (data), 0, NULL);
+  ok = xkey_file_load_from_data (file, data, strlen (data), 0, NULL);
   g_assert_true (ok);
-  g_assert_true (g_key_file_has_key (file, "group", "a", NULL));
-  g_key_file_ref (file);
-  g_key_file_free (file);
-  g_key_file_unref (file);
+  g_assert_true (xkey_file_has_key (file, "group", "a", NULL));
+  xkey_file_ref (file);
+  xkey_file_free (file);
+  xkey_file_unref (file);
 }
 
 /* https://bugzilla.gnome.org/show_bug.cgi?id=634232 */
 static void
 test_replace_value (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
 
-  keyfile = g_key_file_new();
-  g_key_file_set_value(keyfile, "grupo1", "chave1", "1234567890");
-  g_key_file_set_value(keyfile, "grupo1", "chave1", "123123423423423432432423423");
-  g_key_file_remove_group(keyfile, "grupo1", NULL);
-  g_free (g_key_file_to_data (keyfile, NULL, NULL));
-  g_key_file_unref (keyfile);
+  keyfile = xkey_file_new();
+  xkey_file_set_value(keyfile, "grupo1", "chave1", "1234567890");
+  xkey_file_set_value(keyfile, "grupo1", "chave1", "123123423423423432432423423");
+  xkey_file_remove_group(keyfile, "grupo1", NULL);
+  g_free (xkey_file_to_data (keyfile, NULL, NULL));
+  xkey_file_unref (keyfile);
 }
 
 static void
 test_list_separator (void)
 {
-  GKeyFile *keyfile;
+  xkey_file_t *keyfile;
   xerror_t *error = NULL;
 
   const xchar_t *data =
     "[test]\n"
     "key1=v1,v2\n";
 
-  keyfile = g_key_file_new ();
-  g_key_file_set_list_separator (keyfile, ',');
-  g_key_file_load_from_data (keyfile, data, -1, 0, &error);
+  keyfile = xkey_file_new ();
+  xkey_file_set_list_separator (keyfile, ',');
+  xkey_file_load_from_data (keyfile, data, -1, 0, &error);
 
-  check_string_list_value (keyfile, "test", "key1", "v1", "v2", NULL);
-  g_key_file_unref (keyfile);
+  check_strinxlist_value (keyfile, "test", "key1", "v1", "v2", NULL);
+  xkey_file_unref (keyfile);
 }
 
 static void
 test_empty_string (void)
 {
   xerror_t *error = NULL;
-  GKeyFile *kf;
+  xkey_file_t *kf;
 
-  kf = g_key_file_new ();
+  kf = xkey_file_new ();
 
-  g_key_file_load_from_data (kf, "", 0, 0, &error);
+  xkey_file_load_from_data (kf, "", 0, 0, &error);
   g_assert_no_error (error);
 
-  g_key_file_load_from_data (kf, "", -1, 0, &error);
+  xkey_file_load_from_data (kf, "", -1, 0, &error);
   g_assert_no_error (error);
 
   /* NULL is a fine pointer to use if length is zero */
-  g_key_file_load_from_data (kf, NULL, 0, 0, &error);
+  xkey_file_load_from_data (kf, NULL, 0, 0, &error);
   g_assert_no_error (error);
 
   /* should not attempt to access non-NULL pointer if length is zero */
-  g_key_file_load_from_data (kf, GINT_TO_POINTER (1), 0, 0, &error);
+  xkey_file_load_from_data (kf, GINT_TO_POINTER (1), 0, 0, &error);
   g_assert_no_error (error);
 
-  g_key_file_unref (kf);
+  xkey_file_unref (kf);
 }
 
 static void
 test_limbo (void)
 {
-  GKeyFile *file;
+  xkey_file_t *file;
   static const char data[] =
 "a=b\n"
 "[group]\n"
@@ -1662,14 +1662,14 @@ test_limbo (void)
   xboolean_t ok;
   xerror_t *error;
 
-  file = g_key_file_new ();
+  file = xkey_file_new ();
 
   error = NULL;
-  ok = g_key_file_load_from_data (file, data, strlen (data), 0, &error);
+  ok = xkey_file_load_from_data (file, data, strlen (data), 0, &error);
   g_assert_false (ok);
   g_assert_error (error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_GROUP_NOT_FOUND);
   g_clear_error (&error);
-  g_key_file_free (file);
+  xkey_file_free (file);
 }
 
 static void
@@ -1685,21 +1685,21 @@ test_utf8 (void)
 
   for (i = 0; i < G_N_ELEMENTS (invalid_encoding_names); i++)
     {
-      GKeyFile *file = NULL;
+      xkey_file_t *file = NULL;
       xchar_t *data = NULL;
       xboolean_t ok;
       xerror_t *error = NULL;
 
       g_test_message ("Testing invalid encoding ‘%s’", invalid_encoding_names[i]);
 
-      file = g_key_file_new ();
-      data = g_strdup_printf ("[group]\n"
+      file = xkey_file_new ();
+      data = xstrdup_printf ("[group]\n"
                               "Encoding=%s\n", invalid_encoding_names[i]);
-      ok = g_key_file_load_from_data (file, data, strlen (data), 0, &error);
+      ok = xkey_file_load_from_data (file, data, strlen (data), 0, &error);
       g_assert_false (ok);
       g_assert_error (error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_UNKNOWN_ENCODING);
       g_clear_error (&error);
-      g_key_file_free (file);
+      xkey_file_free (file);
       g_free (data);
     }
 }
@@ -1707,7 +1707,7 @@ test_utf8 (void)
 static void
 test_roundtrip (void)
 {
-  GKeyFile *kf;
+  xkey_file_t *kf;
   const xchar_t orig[] =
     "[Group1]\n"
     "key1=value1\n"
@@ -1718,14 +1718,14 @@ test_roundtrip (void)
   xchar_t *data;
 
   kf = load_data (orig, G_KEY_FILE_KEEP_COMMENTS);
-  g_key_file_set_integer (kf, "Group1", "key2", 0);
-  g_key_file_remove_key (kf, "Group1", "key2", NULL);
+  xkey_file_set_integer (kf, "Group1", "key2", 0);
+  xkey_file_remove_key (kf, "Group1", "key2", NULL);
 
-  data = g_key_file_to_data (kf, &len, NULL);
+  data = xkey_file_to_data (kf, &len, NULL);
   g_assert_cmpstr (data, ==, orig);
 
   g_free (data);
-  g_key_file_free (kf);
+  xkey_file_free (kf);
 }
 
 static void
@@ -1738,39 +1738,39 @@ test_bytes (void)
     "[Group2]\n"
     "key2=value2\n";
 
-  GKeyFile *kf = g_key_file_new ();
-  GBytes *bytes = g_bytes_new (data, strlen (data));
+  xkey_file_t *kf = xkey_file_new ();
+  xbytes_t *bytes = xbytes_new (data, strlen (data));
   xerror_t *error = NULL;
 
   xchar_t **names;
   xsize_t len;
 
-  g_key_file_load_from_bytes (kf, bytes, 0, &error);
+  xkey_file_load_from_bytes (kf, bytes, 0, &error);
 
   g_assert_no_error (error);
 
-  names = g_key_file_get_groups (kf, &len);
+  names = xkey_file_get_groups (kf, &len);
   g_assert_nonnull (names);
 
-  check_length ("groups", g_strv_length (names), len, 2);
+  check_length ("groups", xstrv_length (names), len, 2);
   check_name ("group name", names[0], "Group1", 0);
   check_name ("group name", names[1], "Group2", 1);
 
-  check_string_value (kf, "Group1", "key1", "value1");
-  check_string_value (kf, "Group2", "key2", "value2");
+  check_strinxvalue (kf, "Group1", "key1", "value1");
+  check_strinxvalue (kf, "Group2", "key2", "value2");
 
-  g_strfreev (names);
-  g_bytes_unref (bytes);
-  g_key_file_free (kf);
+  xstrfreev (names);
+  xbytes_unref (bytes);
+  xkey_file_free (kf);
 }
 
 static void
 test_get_locale (void)
 {
-  GKeyFile *kf;
+  xkey_file_t *kf;
 
-  kf = g_key_file_new ();
-  g_key_file_load_from_data (kf,
+  kf = xkey_file_new ();
+  xkey_file_load_from_data (kf,
                              "[Group]\n"
                              "x[fr_CA]=a\n"
                              "x[fr]=b\n"
@@ -1778,22 +1778,22 @@ test_get_locale (void)
                              -1, G_KEY_FILE_KEEP_TRANSLATIONS,
                              NULL);
 
-  check_locale_string_value (kf, "Group", "x", "fr_CA", "a");
+  check_locale_strinxvalue (kf, "Group", "x", "fr_CA", "a");
   check_string_locale_value (kf, "Group", "x", "fr_CA", "fr_CA");
 
-  check_locale_string_value (kf, "Group", "x", "fr_CH", "b");
+  check_locale_strinxvalue (kf, "Group", "x", "fr_CH", "b");
   check_string_locale_value (kf, "Group", "x", "fr_CH", "fr");
 
-  check_locale_string_value (kf, "Group", "x", "eo", "c");
+  check_locale_strinxvalue (kf, "Group", "x", "eo", "c");
   check_string_locale_value (kf, "Group", "x", "eo", NULL);
 
-  g_key_file_free (kf);
+  xkey_file_free (kf);
 }
 
 static void
 test_free_when_not_last_ref (void)
 {
-  GKeyFile *kf;
+  xkey_file_t *kf;
   xerror_t *error = NULL;
   const xchar_t *data =
     "[Group]\n"
@@ -1801,29 +1801,29 @@ test_free_when_not_last_ref (void)
 
   kf = load_data (data, G_KEY_FILE_NONE);
   /* Add a second ref */
-  g_key_file_ref (kf);
+  xkey_file_ref (kf);
 
   /* Quick coherence check */
-  g_assert_true (g_key_file_has_group (kf, "Group"));
-  g_assert_true (g_key_file_has_key (kf, "Group", "Key", &error));
+  g_assert_true (xkey_file_has_group (kf, "Group"));
+  g_assert_true (xkey_file_has_key (kf, "Group", "Key", &error));
   g_assert_no_error (error);
 
   /* Should clear all keys and groups, and remove one ref */
-  g_key_file_free (kf);
+  xkey_file_free (kf);
 
   /* kf should still work */
-  g_assert_false (g_key_file_has_group (kf, "Group"));
-  g_assert_false (g_key_file_has_key (kf, "Group", "Key", &error));
+  g_assert_false (xkey_file_has_group (kf, "Group"));
+  g_assert_false (xkey_file_has_key (kf, "Group", "Key", &error));
   check_error (&error, G_KEY_FILE_ERROR, G_KEY_FILE_ERROR_GROUP_NOT_FOUND);
   g_clear_error (&error);
 
-  g_key_file_load_from_data (kf, data, -1, G_KEY_FILE_NONE, &error);
+  xkey_file_load_from_data (kf, data, -1, G_KEY_FILE_NONE, &error);
   g_assert_no_error (error);
 
-  g_assert_true (g_key_file_has_group (kf, "Group"));
-  g_assert_true (g_key_file_has_key (kf, "Group", "Key", &error));
+  g_assert_true (xkey_file_has_group (kf, "Group"));
+  g_assert_true (xkey_file_has_key (kf, "Group", "Key", &error));
 
-  g_key_file_unref (kf);
+  xkey_file_unref (kf);
 }
 
 int

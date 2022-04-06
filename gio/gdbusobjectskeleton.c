@@ -36,18 +36,18 @@
  * @short_description: Service-side D-Bus object
  * @include: gio/gio.h
  *
- * A #GDBusObjectSkeleton instance is essentially a group of D-Bus
+ * A #xdbus_object_skeleton_t instance is essentially a group of D-Bus
  * interfaces. The set of exported interfaces on the object may be
  * dynamic and change at runtime.
  *
- * This type is intended to be used with #GDBusObjectManager.
+ * This type is intended to be used with #xdbus_object_manager_t.
  */
 
 struct _GDBusObjectSkeletonPrivate
 {
-  GMutex lock;
+  xmutex_t lock;
   xchar_t *object_path;
-  GHashTable *map_name_to_iface;
+  xhashtable_t *map_name_to_iface;
 };
 
 enum
@@ -66,18 +66,18 @@ static xuint_t signals[LAST_SIGNAL] = {0};
 
 static void dbus_object_interface_init (GDBusObjectIface *iface);
 
-G_DEFINE_TYPE_WITH_CODE (GDBusObjectSkeleton, g_dbus_object_skeleton, XTYPE_OBJECT,
-                         G_ADD_PRIVATE (GDBusObjectSkeleton)
+G_DEFINE_TYPE_WITH_CODE (xdbus_object_skeleton, g_dbus_object_skeleton, XTYPE_OBJECT,
+                         G_ADD_PRIVATE (xdbus_object_skeleton_t)
                          G_IMPLEMENT_INTERFACE (XTYPE_DBUS_OBJECT, dbus_object_interface_init))
 
 
 static void
 g_dbus_object_skeleton_finalize (xobject_t *_object)
 {
-  GDBusObjectSkeleton *object = G_DBUS_OBJECT_SKELETON (_object);
+  xdbus_object_skeleton_t *object = G_DBUS_OBJECT_SKELETON (_object);
 
   g_free (object->priv->object_path);
-  g_hash_table_unref (object->priv->map_name_to_iface);
+  xhash_table_unref (object->priv->map_name_to_iface);
 
   g_mutex_clear (&object->priv->lock);
 
@@ -88,16 +88,16 @@ g_dbus_object_skeleton_finalize (xobject_t *_object)
 static void
 g_dbus_object_skeleton_get_property (xobject_t    *_object,
                                      xuint_t       prop_id,
-                                     GValue     *value,
-                                     GParamSpec *pspec)
+                                     xvalue_t     *value,
+                                     xparam_spec_t *pspec)
 {
-  GDBusObjectSkeleton *object = G_DBUS_OBJECT_SKELETON (_object);
+  xdbus_object_skeleton_t *object = G_DBUS_OBJECT_SKELETON (_object);
 
   switch (prop_id)
     {
     case PROP_G_OBJECT_PATH:
       g_mutex_lock (&object->priv->lock);
-      g_value_set_string (value, object->priv->object_path);
+      xvalue_set_string (value, object->priv->object_path);
       g_mutex_unlock (&object->priv->lock);
       break;
 
@@ -110,15 +110,15 @@ g_dbus_object_skeleton_get_property (xobject_t    *_object,
 static void
 g_dbus_object_skeleton_set_property (xobject_t       *_object,
                                      xuint_t          prop_id,
-                                     const GValue  *value,
-                                     GParamSpec    *pspec)
+                                     const xvalue_t  *value,
+                                     xparam_spec_t    *pspec)
 {
-  GDBusObjectSkeleton *object = G_DBUS_OBJECT_SKELETON (_object);
+  xdbus_object_skeleton_t *object = G_DBUS_OBJECT_SKELETON (_object);
 
   switch (prop_id)
     {
     case PROP_G_OBJECT_PATH:
-      g_dbus_object_skeleton_set_object_path (object, g_value_get_string (value));
+      g_dbus_object_skeleton_set_object_path (object, xvalue_get_string (value));
       break;
 
     default:
@@ -128,9 +128,9 @@ g_dbus_object_skeleton_set_property (xobject_t       *_object,
 }
 
 static xboolean_t
-g_dbus_object_skeleton_authorize_method_default (GDBusObjectSkeleton    *object,
-                                                 GDBusInterfaceSkeleton *interface,
-                                                 GDBusMethodInvocation  *invocation)
+g_dbus_object_skeleton_authorize_method_default (xdbus_object_skeleton_t    *object,
+                                                 xdbus_interface_skeleton_t *interface,
+                                                 xdbus_method_invocation_t  *invocation)
 {
   return TRUE;
 }
@@ -147,13 +147,13 @@ g_dbus_object_skeleton_class_init (GDBusObjectSkeletonClass *klass)
   klass->authorize_method = g_dbus_object_skeleton_authorize_method_default;
 
   /**
-   * GDBusObjectSkeleton:g-object-path:
+   * xdbus_object_skeleton_t:g-object-path:
    *
    * The object path where the object is exported.
    *
    * Since: 2.30
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_G_OBJECT_PATH,
                                    g_param_spec_string ("g-object-path",
                                                         "Object Path",
@@ -165,16 +165,16 @@ g_dbus_object_skeleton_class_init (GDBusObjectSkeletonClass *klass)
                                                         G_PARAM_STATIC_STRINGS));
 
   /**
-   * GDBusObjectSkeleton::authorize-method:
-   * @object: The #GDBusObjectSkeleton emitting the signal.
-   * @interface: The #GDBusInterfaceSkeleton that @invocation is for.
-   * @invocation: A #GDBusMethodInvocation.
+   * xdbus_object_skeleton_t::authorize-method:
+   * @object: The #xdbus_object_skeleton_t emitting the signal.
+   * @interface: The #xdbus_interface_skeleton_t that @invocation is for.
+   * @invocation: A #xdbus_method_invocation_t.
    *
    * Emitted when a method is invoked by a remote caller and used to
    * determine if the method call is authorized.
    *
-   * This signal is like #GDBusInterfaceSkeleton's
-   * #GDBusInterfaceSkeleton::g-authorize-method signal,
+   * This signal is like #xdbus_interface_skeleton_t's
+   * #xdbus_interface_skeleton_t::g-authorize-method signal,
    * except that it is for the enclosing object.
    *
    * The default class handler just returns %TRUE.
@@ -198,38 +198,38 @@ g_dbus_object_skeleton_class_init (GDBusObjectSkeletonClass *klass)
 }
 
 static void
-g_dbus_object_skeleton_init (GDBusObjectSkeleton *object)
+g_dbus_object_skeleton_init (xdbus_object_skeleton_t *object)
 {
   object->priv = g_dbus_object_skeleton_get_instance_private (object);
   g_mutex_init (&object->priv->lock);
-  object->priv->map_name_to_iface = g_hash_table_new_full (g_str_hash,
-                                                           g_str_equal,
+  object->priv->map_name_to_iface = xhash_table_new_full (xstr_hash,
+                                                           xstr_equal,
                                                            g_free,
-                                                           (GDestroyNotify) g_object_unref);
+                                                           (xdestroy_notify_t) xobject_unref);
 }
 
 /**
  * g_dbus_object_skeleton_new:
  * @object_path: An object path.
  *
- * Creates a new #GDBusObjectSkeleton.
+ * Creates a new #xdbus_object_skeleton_t.
  *
- * Returns: A #GDBusObjectSkeleton. Free with g_object_unref().
+ * Returns: A #xdbus_object_skeleton_t. Free with xobject_unref().
  *
  * Since: 2.30
  */
-GDBusObjectSkeleton *
+xdbus_object_skeleton_t *
 g_dbus_object_skeleton_new (const xchar_t *object_path)
 {
-  g_return_val_if_fail (g_variant_is_object_path (object_path), NULL);
-  return G_DBUS_OBJECT_SKELETON (g_object_new (XTYPE_DBUS_OBJECT_SKELETON,
+  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
+  return G_DBUS_OBJECT_SKELETON (xobject_new (XTYPE_DBUS_OBJECT_SKELETON,
                                                "g-object-path", object_path,
                                                NULL));
 }
 
 /**
  * g_dbus_object_skeleton_set_object_path:
- * @object: A #GDBusObjectSkeleton.
+ * @object: A #xdbus_object_skeleton_t.
  * @object_path: A valid D-Bus object path.
  *
  * Sets the object path for @object.
@@ -237,19 +237,19 @@ g_dbus_object_skeleton_new (const xchar_t *object_path)
  * Since: 2.30
  */
 void
-g_dbus_object_skeleton_set_object_path (GDBusObjectSkeleton *object,
+g_dbus_object_skeleton_set_object_path (xdbus_object_skeleton_t *object,
                                         const xchar_t     *object_path)
 {
   g_return_if_fail (X_IS_DBUS_OBJECT_SKELETON (object));
-  g_return_if_fail (object_path == NULL || g_variant_is_object_path (object_path));
+  g_return_if_fail (object_path == NULL || xvariant_is_object_path (object_path));
   g_mutex_lock (&object->priv->lock);
   /* TODO: fail if object is currently exported */
-  if (g_strcmp0 (object->priv->object_path, object_path) != 0)
+  if (xstrcmp0 (object->priv->object_path, object_path) != 0)
     {
       g_free (object->priv->object_path);
-      object->priv->object_path = g_strdup (object_path);
+      object->priv->object_path = xstrdup (object_path);
       g_mutex_unlock (&object->priv->lock);
-      g_object_notify (G_OBJECT (object), "g-object-path");
+      xobject_notify (G_OBJECT (object), "g-object-path");
     }
   else
     {
@@ -258,9 +258,9 @@ g_dbus_object_skeleton_set_object_path (GDBusObjectSkeleton *object,
 }
 
 static const xchar_t *
-g_dbus_object_skeleton_get_object_path (GDBusObject *_object)
+g_dbus_object_skeleton_get_object_path (xdbus_object_t *_object)
 {
-  GDBusObjectSkeleton *object = G_DBUS_OBJECT_SKELETON (_object);
+  xdbus_object_skeleton_t *object = G_DBUS_OBJECT_SKELETON (_object);
   const xchar_t *ret;
   g_mutex_lock (&object->priv->lock);
   ret = object->priv->object_path;
@@ -270,12 +270,12 @@ g_dbus_object_skeleton_get_object_path (GDBusObject *_object)
 
 /**
  * g_dbus_object_skeleton_add_interface:
- * @object: A #GDBusObjectSkeleton.
- * @interface_: A #GDBusInterfaceSkeleton.
+ * @object: A #xdbus_object_skeleton_t.
+ * @interface_: A #xdbus_interface_skeleton_t.
  *
  * Adds @interface_ to @object.
  *
- * If @object already contains a #GDBusInterfaceSkeleton with the same
+ * If @object already contains a #xdbus_interface_skeleton_t with the same
  * interface name, it is removed before @interface_ is added.
  *
  * Note that @object takes its own reference on @interface_ and holds
@@ -284,11 +284,11 @@ g_dbus_object_skeleton_get_object_path (GDBusObject *_object)
  * Since: 2.30
  */
 void
-g_dbus_object_skeleton_add_interface (GDBusObjectSkeleton     *object,
-                                      GDBusInterfaceSkeleton  *interface_)
+g_dbus_object_skeleton_add_interface (xdbus_object_skeleton_t     *object,
+                                      xdbus_interface_skeleton_t  *interface_)
 {
-  GDBusInterfaceInfo *info;
-  GDBusInterface *interface_to_remove;
+  xdbus_interface_info_t *info;
+  xdbus_interface_t *interface_to_remove;
 
   g_return_if_fail (X_IS_DBUS_OBJECT_SKELETON (object));
   g_return_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_));
@@ -296,17 +296,17 @@ g_dbus_object_skeleton_add_interface (GDBusObjectSkeleton     *object,
   g_mutex_lock (&object->priv->lock);
 
   info = g_dbus_interface_skeleton_get_info (interface_);
-  g_object_ref (interface_);
+  xobject_ref (interface_);
 
-  interface_to_remove = g_hash_table_lookup (object->priv->map_name_to_iface, info->name);
+  interface_to_remove = xhash_table_lookup (object->priv->map_name_to_iface, info->name);
   if (interface_to_remove != NULL)
     {
-      g_object_ref (interface_to_remove);
-      g_warn_if_fail (g_hash_table_remove (object->priv->map_name_to_iface, info->name));
+      xobject_ref (interface_to_remove);
+      g_warn_if_fail (xhash_table_remove (object->priv->map_name_to_iface, info->name));
     }
-  g_hash_table_insert (object->priv->map_name_to_iface,
-                       g_strdup (info->name),
-                       g_object_ref (interface_));
+  xhash_table_insert (object->priv->map_name_to_iface,
+                       xstrdup (info->name),
+                       xobject_ref (interface_));
   g_dbus_interface_set_object (G_DBUS_INTERFACE (interface_), G_DBUS_OBJECT (object));
 
   g_mutex_unlock (&object->priv->lock);
@@ -317,30 +317,30 @@ g_dbus_object_skeleton_add_interface (GDBusObjectSkeleton     *object,
       g_signal_emit_by_name (object,
                              "interface-removed",
                              interface_to_remove);
-      g_object_unref (interface_to_remove);
+      xobject_unref (interface_to_remove);
     }
 
   g_signal_emit_by_name (object,
                          "interface-added",
                          interface_);
-  g_object_unref (interface_);
+  xobject_unref (interface_);
 }
 
 /**
  * g_dbus_object_skeleton_remove_interface:
- * @object: A #GDBusObjectSkeleton.
- * @interface_: A #GDBusInterfaceSkeleton.
+ * @object: A #xdbus_object_skeleton_t.
+ * @interface_: A #xdbus_interface_skeleton_t.
  *
  * Removes @interface_ from @object.
  *
  * Since: 2.30
  */
 void
-g_dbus_object_skeleton_remove_interface  (GDBusObjectSkeleton    *object,
-                                          GDBusInterfaceSkeleton *interface_)
+g_dbus_object_skeleton_remove_interface  (xdbus_object_skeleton_t    *object,
+                                          xdbus_interface_skeleton_t *interface_)
 {
-  GDBusInterfaceSkeleton *other_interface;
-  GDBusInterfaceInfo *info;
+  xdbus_interface_skeleton_t *other_interface;
+  xdbus_interface_info_t *info;
 
   g_return_if_fail (X_IS_DBUS_OBJECT_SKELETON (object));
   g_return_if_fail (X_IS_DBUS_INTERFACE (interface_));
@@ -349,7 +349,7 @@ g_dbus_object_skeleton_remove_interface  (GDBusObjectSkeleton    *object,
 
   info = g_dbus_interface_skeleton_get_info (interface_);
 
-  other_interface = g_hash_table_lookup (object->priv->map_name_to_iface, info->name);
+  other_interface = xhash_table_lookup (object->priv->map_name_to_iface, info->name);
   if (other_interface == NULL)
     {
       g_mutex_unlock (&object->priv->lock);
@@ -370,24 +370,24 @@ g_dbus_object_skeleton_remove_interface  (GDBusObjectSkeleton    *object,
     }
   else
     {
-      g_object_ref (interface_);
-      g_warn_if_fail (g_hash_table_remove (object->priv->map_name_to_iface, info->name));
+      xobject_ref (interface_);
+      g_warn_if_fail (xhash_table_remove (object->priv->map_name_to_iface, info->name));
       g_mutex_unlock (&object->priv->lock);
       g_dbus_interface_set_object (G_DBUS_INTERFACE (interface_), NULL);
       g_signal_emit_by_name (object,
                              "interface-removed",
                              interface_);
-      g_object_unref (interface_);
+      xobject_unref (interface_);
     }
 }
 
 
 /**
  * g_dbus_object_skeleton_remove_interface_by_name:
- * @object: A #GDBusObjectSkeleton.
+ * @object: A #xdbus_object_skeleton_t.
  * @interface_name: A D-Bus interface name.
  *
- * Removes the #GDBusInterface with @interface_name from @object.
+ * Removes the #xdbus_interface_t with @interface_name from @object.
  *
  * If no D-Bus interface of the given interface exists, this function
  * does nothing.
@@ -395,26 +395,26 @@ g_dbus_object_skeleton_remove_interface  (GDBusObjectSkeleton    *object,
  * Since: 2.30
  */
 void
-g_dbus_object_skeleton_remove_interface_by_name (GDBusObjectSkeleton *object,
+g_dbus_object_skeleton_remove_interface_by_name (xdbus_object_skeleton_t *object,
                                                  const xchar_t         *interface_name)
 {
-  GDBusInterface *interface;
+  xdbus_interface_t *interface;
 
   g_return_if_fail (X_IS_DBUS_OBJECT_SKELETON (object));
   g_return_if_fail (g_dbus_is_interface_name (interface_name));
 
   g_mutex_lock (&object->priv->lock);
-  interface = g_hash_table_lookup (object->priv->map_name_to_iface, interface_name);
+  interface = xhash_table_lookup (object->priv->map_name_to_iface, interface_name);
   if (interface != NULL)
     {
-      g_object_ref (interface);
-      g_warn_if_fail (g_hash_table_remove (object->priv->map_name_to_iface, interface_name));
+      xobject_ref (interface);
+      g_warn_if_fail (xhash_table_remove (object->priv->map_name_to_iface, interface_name));
       g_mutex_unlock (&object->priv->lock);
       g_dbus_interface_set_object (interface, NULL);
       g_signal_emit_by_name (object,
                              "interface-removed",
                              interface);
-      g_object_unref (interface);
+      xobject_unref (interface);
     }
   else
     {
@@ -422,28 +422,28 @@ g_dbus_object_skeleton_remove_interface_by_name (GDBusObjectSkeleton *object,
     }
 }
 
-static GDBusInterface *
-g_dbus_object_skeleton_get_interface (GDBusObject  *_object,
+static xdbus_interface_t *
+g_dbus_object_skeleton_get_interface (xdbus_object_t  *_object,
                                       const xchar_t  *interface_name)
 {
-  GDBusObjectSkeleton *object = G_DBUS_OBJECT_SKELETON (_object);
-  GDBusInterface *ret;
+  xdbus_object_skeleton_t *object = G_DBUS_OBJECT_SKELETON (_object);
+  xdbus_interface_t *ret;
 
   g_return_val_if_fail (X_IS_DBUS_OBJECT_SKELETON (object), NULL);
   g_return_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
 
   g_mutex_lock (&object->priv->lock);
-  ret = g_hash_table_lookup (object->priv->map_name_to_iface, interface_name);
+  ret = xhash_table_lookup (object->priv->map_name_to_iface, interface_name);
   if (ret != NULL)
-    g_object_ref (ret);
+    xobject_ref (ret);
   g_mutex_unlock (&object->priv->lock);
   return ret;
 }
 
 static xlist_t *
-g_dbus_object_skeleton_get_interfaces (GDBusObject *_object)
+g_dbus_object_skeleton_get_interfaces (xdbus_object_t *_object)
 {
-  GDBusObjectSkeleton *object = G_DBUS_OBJECT_SKELETON (_object);
+  xdbus_object_skeleton_t *object = G_DBUS_OBJECT_SKELETON (_object);
   xlist_t *ret;
 
   g_return_val_if_fail (X_IS_DBUS_OBJECT_SKELETON (object), NULL);
@@ -451,8 +451,8 @@ g_dbus_object_skeleton_get_interfaces (GDBusObject *_object)
   ret = NULL;
 
   g_mutex_lock (&object->priv->lock);
-  ret = g_hash_table_get_values (object->priv->map_name_to_iface);
-  g_list_foreach (ret, (GFunc) g_object_ref, NULL);
+  ret = xhash_table_get_values (object->priv->map_name_to_iface);
+  xlist_foreach (ret, (GFunc) xobject_ref, NULL);
   g_mutex_unlock (&object->priv->lock);
 
   return ret;
@@ -460,7 +460,7 @@ g_dbus_object_skeleton_get_interfaces (GDBusObject *_object)
 
 /**
  * g_dbus_object_skeleton_flush:
- * @object: A #GDBusObjectSkeleton.
+ * @object: A #xdbus_object_skeleton_t.
  *
  * This method simply calls g_dbus_interface_skeleton_flush() on all
  * interfaces belonging to @object. See that method for when flushing
@@ -469,19 +469,19 @@ g_dbus_object_skeleton_get_interfaces (GDBusObject *_object)
  * Since: 2.30
  */
 void
-g_dbus_object_skeleton_flush (GDBusObjectSkeleton *object)
+g_dbus_object_skeleton_flush (xdbus_object_skeleton_t *object)
 {
   xlist_t *to_flush, *l;
 
   g_mutex_lock (&object->priv->lock);
-  to_flush = g_hash_table_get_values (object->priv->map_name_to_iface);
-  g_list_foreach (to_flush, (GFunc) g_object_ref, NULL);
+  to_flush = xhash_table_get_values (object->priv->map_name_to_iface);
+  xlist_foreach (to_flush, (GFunc) xobject_ref, NULL);
   g_mutex_unlock (&object->priv->lock);
 
   for (l = to_flush; l != NULL; l = l->next)
     g_dbus_interface_skeleton_flush (G_DBUS_INTERFACE_SKELETON (l->data));
 
-  g_list_free_full (to_flush, g_object_unref);
+  xlist_free_full (to_flush, xobject_unref);
 }
 
 static void
@@ -493,7 +493,7 @@ dbus_object_interface_init (GDBusObjectIface *iface)
 }
 
 xboolean_t
-_g_dbus_object_skeleton_has_authorize_method_handlers (GDBusObjectSkeleton *object)
+_g_dbus_object_skeleton_has_authorize_method_handlers (xdbus_object_skeleton_t *object)
 {
   xboolean_t has_handlers;
   xboolean_t has_default_class_handler;

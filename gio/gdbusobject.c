@@ -31,29 +31,29 @@
  * @short_description: Base type for D-Bus objects
  * @include: gio/gio.h
  *
- * The #GDBusObject type is the base type for D-Bus objects on both
- * the service side (see #GDBusObjectSkeleton) and the client side
- * (see #GDBusObjectProxy). It is essentially just a container of
+ * The #xdbus_object_t type is the base type for D-Bus objects on both
+ * the service side (see #xdbus_object_skeleton_t) and the client side
+ * (see #xdbus_object_proxy_t). It is essentially just a container of
  * interfaces.
  */
 
 /**
- * GDBusObject:
+ * xdbus_object_t:
  *
- * #GDBusObject is an opaque data structure and can only be accessed
+ * #xdbus_object_t is an opaque data structure and can only be accessed
  * using the following functions.
  */
 
 typedef GDBusObjectIface GDBusObjectInterface;
-G_DEFINE_INTERFACE (GDBusObject, g_dbus_object, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (xdbus_object, g_dbus_object, XTYPE_OBJECT)
 
 static void
 g_dbus_object_default_init (GDBusObjectIface *iface)
 {
   /**
-   * GDBusObject::interface-added:
-   * @object: The #GDBusObject emitting the signal.
-   * @interface: The #GDBusInterface that was added.
+   * xdbus_object_t::interface-added:
+   * @object: The #xdbus_object_t emitting the signal.
+   * @interface: The #xdbus_interface_t that was added.
    *
    * Emitted when @interface is added to @object.
    *
@@ -71,9 +71,9 @@ g_dbus_object_default_init (GDBusObjectIface *iface)
                 XTYPE_DBUS_INTERFACE);
 
   /**
-   * GDBusObject::interface-removed:
-   * @object: The #GDBusObject emitting the signal.
-   * @interface: The #GDBusInterface that was removed.
+   * xdbus_object_t::interface-removed:
+   * @object: The #xdbus_object_t emitting the signal.
+   * @interface: The #xdbus_interface_t that was removed.
    *
    * Emitted when @interface is removed from @object.
    *
@@ -95,7 +95,7 @@ g_dbus_object_default_init (GDBusObjectIface *iface)
 
 /**
  * g_dbus_object_get_object_path:
- * @object: A #GDBusObject.
+ * @object: A #xdbus_object_t.
  *
  * Gets the object path for @object.
  *
@@ -104,7 +104,7 @@ g_dbus_object_default_init (GDBusObjectIface *iface)
  * Since: 2.30
  */
 const xchar_t *
-g_dbus_object_get_object_path (GDBusObject *object)
+g_dbus_object_get_object_path (xdbus_object_t *object)
 {
   GDBusObjectIface *iface = G_DBUS_OBJECT_GET_IFACE (object);
   return iface->get_object_path (object);
@@ -112,18 +112,18 @@ g_dbus_object_get_object_path (GDBusObject *object)
 
 /**
  * g_dbus_object_get_interfaces:
- * @object: A #GDBusObject.
+ * @object: A #xdbus_object_t.
  *
  * Gets the D-Bus interfaces associated with @object.
  *
- * Returns: (element-type GDBusInterface) (transfer full): A list of #GDBusInterface instances.
- *   The returned list must be freed by g_list_free() after each element has been freed
- *   with g_object_unref().
+ * Returns: (element-type xdbus_interface_t) (transfer full): A list of #xdbus_interface_t instances.
+ *   The returned list must be freed by xlist_free() after each element has been freed
+ *   with xobject_unref().
  *
  * Since: 2.30
  */
 xlist_t *
-g_dbus_object_get_interfaces (GDBusObject *object)
+g_dbus_object_get_interfaces (xdbus_object_t *object)
 {
   GDBusObjectIface *iface = G_DBUS_OBJECT_GET_IFACE (object);
   return iface->get_interfaces (object);
@@ -131,19 +131,19 @@ g_dbus_object_get_interfaces (GDBusObject *object)
 
 /**
  * g_dbus_object_get_interface:
- * @object: A #GDBusObject.
+ * @object: A #xdbus_object_t.
  * @interface_name: A D-Bus interface name.
  *
  * Gets the D-Bus interface with name @interface_name associated with
  * @object, if any.
  *
  * Returns: (nullable) (transfer full): %NULL if not found, otherwise a
- *   #GDBusInterface that must be freed with g_object_unref().
+ *   #xdbus_interface_t that must be freed with xobject_unref().
  *
  * Since: 2.30
  */
-GDBusInterface *
-g_dbus_object_get_interface (GDBusObject *object,
+xdbus_interface_t *
+g_dbus_object_get_interface (xdbus_object_t *object,
                              const xchar_t *interface_name)
 {
   GDBusObjectIface *iface = G_DBUS_OBJECT_GET_IFACE (object);

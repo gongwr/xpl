@@ -33,9 +33,9 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GRand           GRand;
+typedef struct _GRand           xrand_t;
 
-/* GRand - a good and fast random number generator: Mersenne Twister
+/* xrand_t - a good and fast random number generator: Mersenne Twister
  * see http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html for more info.
  * The range functions return a value in the interval [begin, end).
  * int          -> [0..2^32-1]
@@ -45,45 +45,45 @@ typedef struct _GRand           GRand;
  */
 
 XPL_AVAILABLE_IN_ALL
-GRand*  g_rand_new_with_seed  (guint32  seed);
+xrand_t*  g_rand_new_with_seed  (xuint32_t  seed);
 XPL_AVAILABLE_IN_ALL
-GRand*  g_rand_new_with_seed_array (const guint32 *seed,
+xrand_t*  g_rand_new_with_seed_array (const xuint32_t *seed,
 				    xuint_t seed_length);
 XPL_AVAILABLE_IN_ALL
-GRand*  g_rand_new            (void);
+xrand_t*  g_rand_new            (void);
 XPL_AVAILABLE_IN_ALL
-void    g_rand_free           (GRand   *rand_);
+void    g_rand_free           (xrand_t   *rand_);
 XPL_AVAILABLE_IN_ALL
-GRand*  g_rand_copy           (GRand   *rand_);
+xrand_t*  g_rand_copy           (xrand_t   *rand_);
 XPL_AVAILABLE_IN_ALL
-void    g_rand_set_seed       (GRand   *rand_,
-			       guint32  seed);
+void    g_rand_set_seed       (xrand_t   *rand_,
+			       xuint32_t  seed);
 XPL_AVAILABLE_IN_ALL
-void	g_rand_set_seed_array (GRand   *rand_,
-			       const guint32 *seed,
+void	g_rand_set_seed_array (xrand_t   *rand_,
+			       const xuint32_t *seed,
 			       xuint_t    seed_length);
 
 #define g_rand_boolean(rand_) ((g_rand_int (rand_) & (1 << 15)) != 0)
 
 XPL_AVAILABLE_IN_ALL
-guint32 g_rand_int            (GRand   *rand_);
+xuint32_t g_rand_int            (xrand_t   *rand_);
 XPL_AVAILABLE_IN_ALL
-gint32  g_rand_int_range      (GRand   *rand_,
+gint32  g_rand_int_range      (xrand_t   *rand_,
 			       gint32   begin,
 			       gint32   end);
 XPL_AVAILABLE_IN_ALL
-xdouble_t g_rand_double         (GRand   *rand_);
+xdouble_t g_rand_double         (xrand_t   *rand_);
 XPL_AVAILABLE_IN_ALL
-xdouble_t g_rand_double_range   (GRand   *rand_,
+xdouble_t g_rand_double_range   (xrand_t   *rand_,
 			       xdouble_t  begin,
 			       xdouble_t  end);
 XPL_AVAILABLE_IN_ALL
-void    g_random_set_seed     (guint32  seed);
+void    g_random_set_seed     (xuint32_t  seed);
 
 #define g_random_boolean() ((g_random_int () & (1 << 15)) != 0)
 
 XPL_AVAILABLE_IN_ALL
-guint32 g_random_int          (void);
+xuint32_t g_random_int          (void);
 XPL_AVAILABLE_IN_ALL
 gint32  g_random_int_range    (gint32   begin,
 			       gint32   end);

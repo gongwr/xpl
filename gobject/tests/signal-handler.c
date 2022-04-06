@@ -2,11 +2,11 @@
 
 typedef struct {
   xobject_t instance;
-} MyObj;
+} xobj_t;
 
 typedef struct {
   xobject_class_t parent_class;
-} MyObjClass;
+} xobj_class_t;
 
 enum {
   SIGNAL1,
@@ -16,17 +16,17 @@ enum {
 
 xuint_t signals[LAST_SIGNAL];
 
-xtype_t my_obj_get_type (void);
+xtype_t xobj_get_type (void);
 
-G_DEFINE_TYPE (MyObj, my_obj, XTYPE_OBJECT)
+G_DEFINE_TYPE (xobj, my_obj, XTYPE_OBJECT)
 
 static void
-my_obj_init (MyObj *o)
+xobj_init (xobj_t *o)
 {
 }
 
 static void
-my_obj_class_init (MyObjClass *class)
+xobj_class_init (xobj_class_t *class)
 {
   signals[SIGNAL1] =
     g_signal_new ("signal1",
@@ -50,11 +50,11 @@ nop (void)
 static void
 test_connect_many (void)
 {
-  MyObj *o;
+  xobj_t *o;
   xdouble_t time_elapsed;
   xint_t i;
 
-  o = g_object_new (my_obj_get_type (), NULL);
+  o = xobject_new (xobj_get_type (), NULL);
 
   g_test_timer_start ();
 
@@ -63,7 +63,7 @@ test_connect_many (void)
 
   time_elapsed = g_test_timer_elapsed ();
 
-  g_object_unref (o);
+  xobject_unref (o);
 
   g_test_minimized_result (time_elapsed, "connected %u handlers in %6.3f seconds", HANDLERS, time_elapsed);
 }
@@ -71,12 +71,12 @@ test_connect_many (void)
 static void
 test_disconnect_many_ordered (void)
 {
-  MyObj *o;
+  xobj_t *o;
   gulong handlers[HANDLERS];
   xdouble_t time_elapsed;
   xint_t i;
 
-  o = g_object_new (my_obj_get_type (), NULL);
+  o = xobject_new (xobj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
     handlers[i] = g_signal_connect (o, "signal1", G_CALLBACK (nop), NULL);
@@ -88,7 +88,7 @@ test_disconnect_many_ordered (void)
 
   time_elapsed = g_test_timer_elapsed ();
 
-  g_object_unref (o);
+  xobject_unref (o);
 
   g_test_minimized_result (time_elapsed, "disconnected %u handlers in %6.3f seconds", HANDLERS, time_elapsed);
 }
@@ -96,12 +96,12 @@ test_disconnect_many_ordered (void)
 static void
 test_disconnect_many_inverse (void)
 {
-  MyObj *o;
+  xobj_t *o;
   gulong handlers[HANDLERS];
   xdouble_t time_elapsed;
   xint_t i;
 
-  o = g_object_new (my_obj_get_type (), NULL);
+  o = xobject_new (xobj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
     handlers[i] = g_signal_connect (o, "signal1", G_CALLBACK (nop), NULL);
@@ -113,7 +113,7 @@ test_disconnect_many_inverse (void)
 
   time_elapsed = g_test_timer_elapsed ();
 
-  g_object_unref (o);
+  xobject_unref (o);
 
   g_test_minimized_result (time_elapsed, "disconnected %u handlers in %6.3f seconds", HANDLERS, time_elapsed);
 }
@@ -121,13 +121,13 @@ test_disconnect_many_inverse (void)
 static void
 test_disconnect_many_random (void)
 {
-  MyObj *o;
+  xobj_t *o;
   gulong handlers[HANDLERS];
   gulong id;
   xdouble_t time_elapsed;
   xint_t i, j;
 
-  o = g_object_new (my_obj_get_type (), NULL);
+  o = xobject_new (xobj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
     handlers[i] = g_signal_connect (o, "signal1", G_CALLBACK (nop), NULL);
@@ -147,7 +147,7 @@ test_disconnect_many_random (void)
 
   time_elapsed = g_test_timer_elapsed ();
 
-  g_object_unref (o);
+  xobject_unref (o);
 
   g_test_minimized_result (time_elapsed, "disconnected %u handlers in %6.3f seconds", HANDLERS, time_elapsed);
 }
@@ -155,13 +155,13 @@ test_disconnect_many_random (void)
 static void
 test_disconnect_2_signals (void)
 {
-  MyObj *o;
+  xobj_t *o;
   gulong handlers[HANDLERS];
   gulong id;
   xdouble_t time_elapsed;
   xint_t i, j;
 
-  o = g_object_new (my_obj_get_type (), NULL);
+  o = xobject_new (xobj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
     {
@@ -186,7 +186,7 @@ test_disconnect_2_signals (void)
 
   time_elapsed = g_test_timer_elapsed ();
 
-  g_object_unref (o);
+  xobject_unref (o);
 
   g_test_minimized_result (time_elapsed, "disconnected %u handlers in %6.3f seconds", HANDLERS, time_elapsed);
 }
@@ -194,15 +194,15 @@ test_disconnect_2_signals (void)
 static void
 test_disconnect_2_objects (void)
 {
-  MyObj *o1, *o2, *o;
+  xobj_t *o1, *o2, *o;
   gulong handlers[HANDLERS];
-  MyObj *objects[HANDLERS];
+  xobj_t *objects[HANDLERS];
   gulong id;
   xdouble_t time_elapsed;
   xint_t i, j;
 
-  o1 = g_object_new (my_obj_get_type (), NULL);
-  o2 = g_object_new (my_obj_get_type (), NULL);
+  o1 = xobject_new (xobj_get_type (), NULL);
+  o2 = xobject_new (xobj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
     {
@@ -236,8 +236,8 @@ test_disconnect_2_objects (void)
 
   time_elapsed = g_test_timer_elapsed ();
 
-  g_object_unref (o1);
-  g_object_unref (o2);
+  xobject_unref (o1);
+  xobject_unref (o2);
 
   g_test_minimized_result (time_elapsed, "disconnected %u handlers in %6.3f seconds", HANDLERS, time_elapsed);
 }
@@ -245,13 +245,13 @@ test_disconnect_2_objects (void)
 static void
 test_block_many (void)
 {
-  MyObj *o;
+  xobj_t *o;
   gulong handlers[HANDLERS];
   gulong id;
   xdouble_t time_elapsed;
   xint_t i, j;
 
-  o = g_object_new (my_obj_get_type (), NULL);
+  o = xobject_new (xobj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
     handlers[i] = g_signal_connect (o, "signal1", G_CALLBACK (nop), NULL);
@@ -274,7 +274,7 @@ test_block_many (void)
 
   time_elapsed = g_test_timer_elapsed ();
 
-  g_object_unref (o);
+  xobject_unref (o);
 
   g_test_minimized_result (time_elapsed, "blocked and unblocked %u handlers in %6.3f seconds", HANDLERS, time_elapsed);
 }

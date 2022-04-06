@@ -106,7 +106,7 @@ test_grefcount_saturation (void)
 #else
   /* Ensure that we got a warning when building with checks or with
    * non-GCC compilers; the test will fail because of the critical
-   * warning being caught by GTest
+   * warning being caught by xtest_t
    */
   g_test_trap_assert_failed ();
   g_test_trap_assert_stderr ("*saturation*");
@@ -199,7 +199,7 @@ test_gatomicrefcount_saturation (void)
 #else
   /* Ensure that we got a warning when building with checks or with
    * non-GCC compilers; the test will fail because of the critical
-   * warning being caught by GTest
+   * warning being caught by xtest_t
    */
   g_test_trap_assert_failed ();
   g_test_trap_assert_stderr ("*saturation*");

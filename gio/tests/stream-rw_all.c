@@ -32,7 +32,7 @@ read_done (xobject_t      *source,
   xboolean_t success;
   xsize_t read;
 
-  success = g_input_stream_read_all_finish (G_INPUT_STREAM (source), result, &read, NULL);
+  success = xinput_stream_read_all_finish (G_INPUT_STREAM (source), result, &read, NULL);
   g_assert_cmpint (expected_read_success, ==, success);
   g_assert_cmpint (expected_read, ==, read);
   got_read_done = TRUE;
@@ -47,7 +47,7 @@ wait_for_read (xboolean_t success,
   expected_read = read;
 
   while (!got_read_done)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   got_read_done = FALSE;
 }
@@ -64,7 +64,7 @@ write_done (xobject_t      *source,
   xboolean_t success;
   xsize_t written;
 
-  success = g_output_stream_write_all_finish (G_OUTPUT_STREAM (source), result, &written, NULL);
+  success = xoutput_stream_write_all_finish (G_OUTPUT_STREAM (source), result, &written, NULL);
   g_assert_cmpint (expected_write_success, ==, success);
   g_assert_cmpint (expected_written, ==, written);
   got_write_done = TRUE;
@@ -79,7 +79,7 @@ wait_for_write (xboolean_t success,
   expected_written = written;
 
   while (!got_write_done)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   got_write_done = FALSE;
 }
@@ -92,25 +92,25 @@ test_write_all_async_memory (void)
 
   ms = g_memory_output_stream_new (b, sizeof b, NULL, NULL);
 
-  g_output_stream_write_all_async (ms, "0123456789", 10, 0, NULL, write_done, NULL);
+  xoutput_stream_write_all_async (ms, "0123456789", 10, 0, NULL, write_done, NULL);
   wait_for_write (TRUE, 10);
 
-  g_output_stream_write_all_async (ms, "0123456789", 10, 0, NULL, write_done, NULL);
+  xoutput_stream_write_all_async (ms, "0123456789", 10, 0, NULL, write_done, NULL);
   wait_for_write (TRUE, 10);
 
   /* this will trigger an out-of-space error, but we will see the
    * partial write...
    */
-  g_output_stream_write_all_async (ms, "0123456789", 10, 0, NULL, write_done, NULL);
+  xoutput_stream_write_all_async (ms, "0123456789", 10, 0, NULL, write_done, NULL);
   wait_for_write (FALSE, 4);
 
   /* and still an error, but no further bytes written */
-  g_output_stream_write_all_async (ms, "0123456789", 10, 0, NULL, write_done, NULL);
+  xoutput_stream_write_all_async (ms, "0123456789", 10, 0, NULL, write_done, NULL);
   wait_for_write (FALSE, 0);
 
   g_assert (!memcmp (b, "012345678901234567890123", 24));
 
-  g_object_unref (ms);
+  xobject_unref (ms);
 }
 
 static void
@@ -122,24 +122,24 @@ test_read_all_async_memory (void)
 
   ms = g_memory_input_stream_new_from_data (b, sizeof b, NULL);
 
-  g_input_stream_read_all_async (ms, buf, 10, 0, NULL, read_done, NULL);
+  xinput_stream_read_all_async (ms, buf, 10, 0, NULL, read_done, NULL);
   wait_for_read (TRUE, 10);
   g_assert (!memcmp (buf, "0123456789", 10));
 
-  g_input_stream_read_all_async (ms, buf, 10, 0, NULL, read_done, NULL);
+  xinput_stream_read_all_async (ms, buf, 10, 0, NULL, read_done, NULL);
   wait_for_read (TRUE, 10);
   g_assert (!memcmp (buf, "ABCDEFGHIJ", 10));
 
   /* partial read... */
-  g_input_stream_read_all_async (ms, buf, 10, 0, NULL, read_done, NULL);
+  xinput_stream_read_all_async (ms, buf, 10, 0, NULL, read_done, NULL);
   wait_for_read (TRUE, 4);
   g_assert (!memcmp (buf, "!@#$", 4));
 
   /* EOF */
-  g_input_stream_read_all_async (ms, buf, 10, 0, NULL, read_done, NULL);
+  xinput_stream_read_all_async (ms, buf, 10, 0, NULL, read_done, NULL);
   wait_for_read (TRUE, 0);
 
-  g_object_unref (ms);
+  xobject_unref (ms);
 }
 
 #ifdef G_OS_UNIX
@@ -174,9 +174,9 @@ test_read_write_all_async_pipe (void)
 
   /* Try to fill up the buffer */
   in_flight = 0;
-  while (g_pollable_output_stream_is_writable (G_POLLABLE_OUTPUT_STREAM (out)))
+  while (xpollable_output_stream_is_writable (G_POLLABLE_OUTPUT_STREAM (out)))
     {
-      s = g_output_stream_write (out, wbuf, sizeof wbuf, NULL, &error);
+      s = xoutput_stream_write (out, wbuf, sizeof wbuf, NULL, &error);
       g_assert_no_error (error);
       g_assert (s > 0);
       in_flight += s;
@@ -184,19 +184,19 @@ test_read_write_all_async_pipe (void)
 
   /* Now start a blocking write_all; nothing should happen. */
   cancellable = g_cancellable_new ();
-  g_output_stream_write_all_async (out, "0123456789", 10, 0, cancellable, write_done, NULL);
-  while (g_main_context_iteration (NULL, FALSE))
+  xoutput_stream_write_all_async (out, "0123456789", 10, 0, cancellable, write_done, NULL);
+  while (xmain_context_iteration (NULL, FALSE))
     ;
   g_assert (!got_write_done);
 
   /* Cancel that to make sure it works */
   g_cancellable_cancel (cancellable);
-  g_object_unref (cancellable);
+  xobject_unref (cancellable);
   wait_for_write (FALSE, 0);
 
   /* Start it again */
-  g_output_stream_write_all_async (out, "0123456789", 10, 0, NULL, write_done, NULL);
-  while (g_main_context_iteration (NULL, FALSE))
+  xoutput_stream_write_all_async (out, "0123456789", 10, 0, NULL, write_done, NULL);
+  while (xmain_context_iteration (NULL, FALSE))
     ;
   g_assert (!got_write_done);
 
@@ -205,7 +205,7 @@ test_read_write_all_async_pipe (void)
    */
   while (in_flight)
     {
-      s = g_input_stream_read (in, rbuf, MIN (sizeof wbuf, in_flight), NULL, &error);
+      s = xinput_stream_read (in, rbuf, MIN (sizeof wbuf, in_flight), NULL, &error);
       g_assert_no_error (error);
       g_assert (s > 0);
       in_flight -= s;
@@ -214,7 +214,7 @@ test_read_write_all_async_pipe (void)
   /* That will have caused some writing to start happening.  Do a
    * read_all as well, for more bytes than was written.
    */
-  g_input_stream_read_all_async (in, rbuf, sizeof rbuf, 0, NULL, read_done, NULL);
+  xinput_stream_read_all_async (in, rbuf, sizeof rbuf, 0, NULL, read_done, NULL);
 
   /* The write is surely finished by now */
   wait_for_write (TRUE, 10);
@@ -224,21 +224,21 @@ test_read_write_all_async_pipe (void)
   /* Feed the read more than it asked for; this really should not block
    * since the buffer is so small...
    */
-  g_output_stream_write_all (out, wbuf, sizeof wbuf, 0, NULL, &error);
+  xoutput_stream_write_all (out, wbuf, sizeof wbuf, 0, NULL, &error);
   g_assert_no_error (error);
 
   /* Read will have finished now */
   wait_for_read (TRUE, sizeof rbuf);
 
   /* Close the writer end to make an EOF condition */
-  g_output_stream_close (out, NULL, NULL);
+  xoutput_stream_close (out, NULL, NULL);
 
   /* ... and we should have exactly 10 extra bytes left in the buffer */
-  g_input_stream_read_all_async (in, rbuf, sizeof rbuf, 0, NULL, read_done, NULL);
+  xinput_stream_read_all_async (in, rbuf, sizeof rbuf, 0, NULL, read_done, NULL);
   wait_for_read (TRUE, 10);
 
-  g_object_unref (out);
-  g_object_unref (in);
+  xobject_unref (out);
+  xobject_unref (in);
 }
 #endif
 

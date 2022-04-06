@@ -47,12 +47,12 @@ struct _xresource_file
 
 struct _GResourceFileEnumerator
 {
-  GFileEnumerator parent;
+  xfile_enumerator_t parent;
 
-  GFileAttributeMatcher *matcher;
+  xfile_attribute_matcher_t *matcher;
   char *path;
   char *attributes;
-  GFileQueryInfoFlags flags;
+  xfile_query_info_flags_t flags;
   int index;
 
   char **children;
@@ -60,16 +60,16 @@ struct _GResourceFileEnumerator
 
 struct _GResourceFileEnumeratorClass
 {
-  GFileEnumeratorClass parent_class;
+  xfile_enumerator_class_t parent_class;
 };
 
 typedef struct _GResourceFileEnumerator        GResourceFileEnumerator;
 typedef struct _GResourceFileEnumeratorClass   GResourceFileEnumeratorClass;
 
-static void g_resource_file_file_iface_init (GFileIface *iface);
+static void g_resource_file_file_iface_init (xfile_iface_t *iface);
 
-static GFileAttributeInfoList *resource_writable_attributes = NULL;
-static GFileAttributeInfoList *resource_writable_namespaces = NULL;
+static xfile_attribute_info_list_t *resource_writable_attributes = NULL;
+static xfile_attribute_info_list_t *resource_writable_namespaces = NULL;
 
 static xtype_t _xresource_file_enumerator_get_type (void);
 
@@ -98,16 +98,16 @@ G_DEFINE_TYPE_WITH_CODE (xresource_file_t, g_resource_file, XTYPE_OBJECT,
 #define g_resource_file_enumerator_get_type _xresource_file_enumerator_get_type
 G_DEFINE_TYPE (GResourceFileEnumerator, g_resource_file_enumerator, XTYPE_FILE_ENUMERATOR)
 
-static GFileEnumerator *_xresource_file_enumerator_new (xresource_file_t *file,
+static xfile_enumerator_t *_xresource_file_enumerator_new (xresource_file_t *file,
 							 const char           *attributes,
-							 GFileQueryInfoFlags   flags,
+							 xfile_query_info_flags_t   flags,
 							 xcancellable_t         *cancellable,
 							 xerror_t              **error);
 
 
 static xtype_t              _xresource_file_input_stream_get_type (void) G_GNUC_CONST;
 
-static GFileInputStream *_xresource_file_input_stream_new (xinput_stream_t *stream, xfile_t *file);
+static xfile_input_stream_t *_xresource_file_input_stream_new (xinput_stream_t *stream, xfile_t *file);
 
 
 static void
@@ -129,8 +129,8 @@ g_resource_file_class_init (xresource_file_class_t *klass)
 
   gobject_class->finalize = g_resource_file_finalize;
 
-  resource_writable_attributes = g_file_attribute_info_list_new ();
-  resource_writable_namespaces = g_file_attribute_info_list_new ();
+  resource_writable_attributes = xfile_attribute_info_list_new ();
+  resource_writable_namespaces = xfile_attribute_info_list_new ();
 }
 
 static void
@@ -229,11 +229,11 @@ canonicalize_filename (const char *in)
 static xfile_t *
 g_resource_file_new_for_path (const char *path)
 {
-  xresource_file_t *resource = g_object_new (XTYPE_RESOURCE_FILE, NULL);
+  xresource_file_t *resource = xobject_new (XTYPE_RESOURCE_FILE, NULL);
 
   resource->path = canonicalize_filename (path);
 
-  return G_FILE (resource);
+  return XFILE (resource);
 }
 
 xfile_t *
@@ -242,11 +242,11 @@ _xresource_file_new (const char *uri)
   xfile_t *resource;
   char *path;
 
-  path = g_uri_unescape_string (uri + strlen ("resource:"), NULL);
+  path = xuri_unescape_string (uri + strlen ("resource:"), NULL);
   resource = g_resource_file_new_for_path (path);
   g_free (path);
 
-  return G_FILE (resource);
+  return XFILE (resource);
 }
 
 static xboolean_t
@@ -265,7 +265,7 @@ g_resource_file_has_uri_scheme (xfile_t      *file,
 static char *
 g_resource_file_get_uri_scheme (xfile_t *file)
 {
-  return g_strdup ("resource");
+  return xstrdup ("resource");
 }
 
 static char *
@@ -274,7 +274,7 @@ g_resource_file_get_basename (xfile_t *file)
   xchar_t *base;
 
   base = strrchr (XRESOURCE_FILE (file)->path, '/');
-  return g_strdup (base + 1);
+  return xstrdup (base + 1);
 }
 
 static char *
@@ -287,8 +287,8 @@ static char *
 g_resource_file_get_uri (xfile_t *file)
 {
   char *escaped, *res;
-  escaped = g_uri_escape_string (XRESOURCE_FILE (file)->path, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH, FALSE);
-  res = g_strconcat ("resource://", escaped, NULL);
+  escaped = xuri_escape_string (XRESOURCE_FILE (file)->path, XURI_RESERVED_CHARS_ALLOWED_IN_PATH, FALSE);
+  res = xstrconcat ("resource://", escaped, NULL);
   g_free (escaped);
   return res;
 }
@@ -311,11 +311,11 @@ g_resource_file_get_parent (xfile_t *file)
   if (end == XRESOURCE_FILE (file)->path)
     return NULL;
 
-  parent = g_object_new (XTYPE_RESOURCE_FILE, NULL);
-  parent->path = g_strndup (resource->path,
+  parent = xobject_new (XTYPE_RESOURCE_FILE, NULL);
+  parent->path = xstrndup (resource->path,
 			    end - resource->path);
 
-  return G_FILE (parent);
+  return XFILE (parent);
 }
 
 static xfile_t *
@@ -331,7 +331,7 @@ g_resource_file_hash (xfile_t *file)
 {
   xresource_file_t *resource = XRESOURCE_FILE (file);
 
-  return g_str_hash (resource->path);
+  return xstr_hash (resource->path);
 }
 
 static xboolean_t
@@ -341,7 +341,7 @@ g_resource_file_equal (xfile_t *file1,
   xresource_file_t *resource1 = XRESOURCE_FILE (file1);
   xresource_file_t *resource2 = XRESOURCE_FILE (file2);
 
-  return g_str_equal (resource1->path, resource2->path);
+  return xstr_equal (resource1->path, resource2->path);
 }
 
 static const char *
@@ -388,7 +388,7 @@ g_resource_file_get_relative_path (xfile_t *parent,
   remainder = match_prefix (descendant_resource->path, parent_resource->path);
 
   if (remainder != NULL && *remainder == '/')
-    return g_strdup (remainder + 1);
+    return xstrdup (remainder + 1);
   return NULL;
 }
 
@@ -410,10 +410,10 @@ g_resource_file_resolve_relative_path (xfile_t      *file,
   return child;
 }
 
-static GFileEnumerator *
+static xfile_enumerator_t *
 g_resource_file_enumerate_children (xfile_t                *file,
 				    const char           *attributes,
-				    GFileQueryInfoFlags   flags,
+				    xfile_query_info_flags_t   flags,
 				    xcancellable_t         *cancellable,
 				    xerror_t              **error)
 {
@@ -430,25 +430,25 @@ g_resource_file_get_child_for_display_name (xfile_t        *file,
 {
   xfile_t *new_file;
 
-  new_file = g_file_get_child (file, display_name);
+  new_file = xfile_get_child (file, display_name);
 
   return new_file;
 }
 
-static GFileInfo *
+static xfile_info_t *
 g_resource_file_query_info (xfile_t                *file,
 			    const char           *attributes,
-			    GFileQueryInfoFlags   flags,
+			    xfile_query_info_flags_t   flags,
 			    xcancellable_t         *cancellable,
 			    xerror_t              **error)
 {
   xresource_file_t *resource = XRESOURCE_FILE (file);
   xerror_t *my_error = NULL;
-  GFileInfo *info;
-  GFileAttributeMatcher *matcher;
+  xfile_info_t *info;
+  xfile_attribute_matcher_t *matcher;
   xboolean_t res;
   xsize_t size;
-  guint32 resource_flags;
+  xuint32_t resource_flags;
   char **children;
   xboolean_t is_dir;
   char *base;
@@ -457,7 +457,7 @@ g_resource_file_query_info (xfile_t                *file,
   children = g_resources_enumerate_children (resource->path, 0, NULL);
   if (children != NULL)
     {
-      g_strfreev (children);
+      xstrfreev (children);
       is_dir = TRUE;
     }
 
@@ -470,7 +470,7 @@ g_resource_file_query_info (xfile_t                *file,
       res = g_resources_get_info (resource->path, 0, &size, &resource_flags, &my_error);
       if (!res)
 	{
-	  if (g_error_matches (my_error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND))
+	  if (xerror_matches (my_error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND))
 	    {
 	      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
 			   _("The resource at “%s” does not exist"),
@@ -484,102 +484,102 @@ g_resource_file_query_info (xfile_t                *file,
 	}
     }
 
-  matcher = g_file_attribute_matcher_new (attributes);
+  matcher = xfile_attribute_matcher_new (attributes);
 
-  info = g_file_info_new ();
+  info = xfile_info_new ();
   base = g_resource_file_get_basename (file);
-  g_file_info_set_name (info, base);
-  g_file_info_set_display_name (info, base);
+  xfile_info_set_name (info, base);
+  xfile_info_set_display_name (info, base);
 
-  _g_file_info_set_attribute_boolean_by_id (info, G_FILE_ATTRIBUTE_ID_ACCESS_CAN_READ, TRUE);
-  _g_file_info_set_attribute_boolean_by_id (info, G_FILE_ATTRIBUTE_ID_ACCESS_CAN_WRITE, FALSE);
-  _g_file_info_set_attribute_boolean_by_id (info, G_FILE_ATTRIBUTE_ID_ACCESS_CAN_EXECUTE, FALSE);
-  _g_file_info_set_attribute_boolean_by_id (info, G_FILE_ATTRIBUTE_ID_ACCESS_CAN_RENAME, FALSE);
-  _g_file_info_set_attribute_boolean_by_id (info, G_FILE_ATTRIBUTE_ID_ACCESS_CAN_DELETE, FALSE);
-  _g_file_info_set_attribute_boolean_by_id (info, G_FILE_ATTRIBUTE_ID_ACCESS_CAN_TRASH, FALSE);
+  _xfile_info_set_attribute_boolean_by_id (info, XFILE_ATTRIBUTE_ID_ACCESS_CAN_READ, TRUE);
+  _xfile_info_set_attribute_boolean_by_id (info, XFILE_ATTRIBUTE_ID_ACCESS_CAN_WRITE, FALSE);
+  _xfile_info_set_attribute_boolean_by_id (info, XFILE_ATTRIBUTE_ID_ACCESS_CAN_EXECUTE, FALSE);
+  _xfile_info_set_attribute_boolean_by_id (info, XFILE_ATTRIBUTE_ID_ACCESS_CAN_RENAME, FALSE);
+  _xfile_info_set_attribute_boolean_by_id (info, XFILE_ATTRIBUTE_ID_ACCESS_CAN_DELETE, FALSE);
+  _xfile_info_set_attribute_boolean_by_id (info, XFILE_ATTRIBUTE_ID_ACCESS_CAN_TRASH, FALSE);
 
   if (is_dir)
     {
-      g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
+      xfile_info_set_file_type (info, XFILE_TYPE_DIRECTORY);
     }
   else
     {
-      GBytes *bytes;
+      xbytes_t *bytes;
       char *content_type;
 
-      g_file_info_set_file_type (info, G_FILE_TYPE_REGULAR);
-      g_file_info_set_size (info, size);
+      xfile_info_set_file_type (info, XFILE_TYPE_REGULAR);
+      xfile_info_set_size (info, size);
 
-      if ((_g_file_attribute_matcher_matches_id (matcher, G_FILE_ATTRIBUTE_ID_STANDARD_CONTENT_TYPE) ||
+      if ((_xfile_attribute_matcher_matches_id (matcher, XFILE_ATTRIBUTE_ID_STANDARD_CONTENT_TYPE) ||
            ((~resource_flags & G_RESOURCE_FLAGS_COMPRESSED) &&
-            _g_file_attribute_matcher_matches_id (matcher, G_FILE_ATTRIBUTE_ID_STANDARD_FAST_CONTENT_TYPE))) &&
+            _xfile_attribute_matcher_matches_id (matcher, XFILE_ATTRIBUTE_ID_STANDARD_FAST_CONTENT_TYPE))) &&
           (bytes = g_resources_lookup_data (resource->path, 0, NULL)))
         {
           const guchar *data;
           xsize_t data_size;
 
-          data = g_bytes_get_data (bytes, &data_size);
+          data = xbytes_get_data (bytes, &data_size);
           content_type = g_content_type_guess (base, data, data_size, NULL);
 
-          g_bytes_unref (bytes);
+          xbytes_unref (bytes);
         }
       else
         content_type = NULL;
 
       if (content_type)
         {
-          _g_file_info_set_attribute_string_by_id (info, G_FILE_ATTRIBUTE_ID_STANDARD_CONTENT_TYPE, content_type);
-          _g_file_info_set_attribute_string_by_id (info, G_FILE_ATTRIBUTE_ID_STANDARD_FAST_CONTENT_TYPE, content_type);
+          _xfile_info_set_attribute_string_by_id (info, XFILE_ATTRIBUTE_ID_STANDARD_CONTENT_TYPE, content_type);
+          _xfile_info_set_attribute_string_by_id (info, XFILE_ATTRIBUTE_ID_STANDARD_FAST_CONTENT_TYPE, content_type);
 
           g_free (content_type);
         }
     }
 
   g_free (base);
-  g_file_attribute_matcher_unref (matcher);
+  xfile_attribute_matcher_unref (matcher);
 
   return info;
 }
 
-static GFileInfo *
+static xfile_info_t *
 g_resource_file_query_filesystem_info (xfile_t         *file,
                                        const char    *attributes,
                                        xcancellable_t  *cancellable,
                                        xerror_t       **error)
 {
-  GFileInfo *info;
-  GFileAttributeMatcher *matcher;
+  xfile_info_t *info;
+  xfile_attribute_matcher_t *matcher;
 
-  info = g_file_info_new ();
+  info = xfile_info_new ();
 
-  matcher = g_file_attribute_matcher_new (attributes);
-  if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE))
-    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, "resource");
+  matcher = xfile_attribute_matcher_new (attributes);
+  if (xfile_attribute_matcher_matches (matcher, XFILE_ATTRIBUTE_FILESYSTEM_TYPE))
+    xfile_info_set_attribute_string (info, XFILE_ATTRIBUTE_FILESYSTEM_TYPE, "resource");
 
-  if (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY))    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, TRUE);
+  if (xfile_attribute_matcher_matches (matcher, XFILE_ATTRIBUTE_FILESYSTEM_READONLY))    xfile_info_set_attribute_boolean (info, XFILE_ATTRIBUTE_FILESYSTEM_READONLY, TRUE);
 
-  g_file_attribute_matcher_unref (matcher);
+  xfile_attribute_matcher_unref (matcher);
 
   return info;
 }
 
-static GFileAttributeInfoList *
+static xfile_attribute_info_list_t *
 g_resource_file_query_settable_attributes (xfile_t         *file,
 					   xcancellable_t  *cancellable,
 					   xerror_t       **error)
 {
-  return g_file_attribute_info_list_ref (resource_writable_attributes);
+  return xfile_attribute_info_list_ref (resource_writable_attributes);
 }
 
-static GFileAttributeInfoList *
+static xfile_attribute_info_list_t *
 g_resource_file_query_writable_namespaces (xfile_t         *file,
 					   xcancellable_t  *cancellable,
 					   xerror_t       **error)
 {
-  return g_file_attribute_info_list_ref (resource_writable_namespaces);
+  return xfile_attribute_info_list_ref (resource_writable_namespaces);
 }
 
-static GFileInputStream *
+static xfile_input_stream_t *
 g_resource_file_read (xfile_t         *file,
 		      xcancellable_t  *cancellable,
 		      xerror_t       **error)
@@ -587,13 +587,13 @@ g_resource_file_read (xfile_t         *file,
   xresource_file_t *resource = XRESOURCE_FILE (file);
   xerror_t *my_error = NULL;
   xinput_stream_t *stream;
-  GFileInputStream *res;
+  xfile_input_stream_t *res;
 
   stream = g_resources_open_stream (resource->path, 0, &my_error);
 
   if (stream == NULL)
     {
-      if (g_error_matches (my_error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND))
+      if (xerror_matches (my_error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND))
 	{
 	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
 		       _("The resource at “%s” does not exist"),
@@ -607,19 +607,19 @@ g_resource_file_read (xfile_t         *file,
     }
 
   res = _xresource_file_input_stream_new (stream, file);
-  g_object_unref (stream);
+  xobject_unref (stream);
   return res;
 }
 
-typedef GFileMonitor GResourceFileMonitor;
-typedef GFileMonitorClass GResourceFileMonitorClass;
+typedef xfile_monitor_t GResourceFileMonitor;
+typedef xfile_monitor_class_t GResourceFileMonitorClass;
 
 xtype_t g_resource_file_monitor_get_type (void);
 
 G_DEFINE_TYPE (GResourceFileMonitor, g_resource_file_monitor, XTYPE_FILE_MONITOR)
 
 static xboolean_t
-g_resource_file_monitor_cancel (GFileMonitor *monitor)
+g_resource_file_monitor_cancel (xfile_monitor_t *monitor)
 {
   return TRUE;
 }
@@ -635,17 +635,17 @@ g_resource_file_monitor_class_init (GResourceFileMonitorClass *class)
   class->cancel = g_resource_file_monitor_cancel;
 }
 
-static GFileMonitor *
+static xfile_monitor_t *
 g_resource_file_monitor_file (xfile_t              *file,
-                              GFileMonitorFlags   flags,
+                              xfile_monitor_flags_t   flags,
                               xcancellable_t       *cancellable,
                               xerror_t            **error)
 {
-  return g_object_new (g_resource_file_monitor_get_type (), NULL);
+  return xobject_new (g_resource_file_monitor_get_type (), NULL);
 }
 
 static void
-g_resource_file_file_iface_init (GFileIface *iface)
+g_resource_file_file_iface_init (xfile_iface_t *iface)
 {
   iface->dup = g_resource_file_dup;
   iface->hash = g_resource_file_hash;
@@ -673,10 +673,10 @@ g_resource_file_file_iface_init (GFileIface *iface)
   iface->supports_thread_contexts = TRUE;
 }
 
-static GFileInfo *g_resource_file_enumerator_next_file (GFileEnumerator  *enumerator,
+static xfile_info_t *g_resource_file_enumerator_next_file (xfile_enumerator_t  *enumerator,
 							xcancellable_t     *cancellable,
 							xerror_t          **error);
-static xboolean_t   g_resource_file_enumerator_close     (GFileEnumerator  *enumerator,
+static xboolean_t   g_resource_file_enumerator_close     (xfile_enumerator_t  *enumerator,
 							xcancellable_t     *cancellable,
 							xerror_t          **error);
 
@@ -687,7 +687,7 @@ g_resource_file_enumerator_finalize (xobject_t *object)
 
   resource = XRESOURCE_FILE_ENUMERATOR (object);
 
-  g_strfreev (resource->children);
+  xstrfreev (resource->children);
   g_free (resource->path);
   g_free (resource->attributes);
 
@@ -698,7 +698,7 @@ static void
 g_resource_file_enumerator_class_init (GResourceFileEnumeratorClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
-  GFileEnumeratorClass *enumerator_class = G_FILE_ENUMERATOR_CLASS (klass);
+  xfile_enumerator_class_t *enumerator_class = XFILE_ENUMERATOR_CLASS (klass);
 
   gobject_class->finalize = g_resource_file_enumerator_finalize;
 
@@ -711,10 +711,10 @@ g_resource_file_enumerator_init (GResourceFileEnumerator *resource)
 {
 }
 
-static GFileEnumerator *
+static xfile_enumerator_t *
 _xresource_file_enumerator_new (xresource_file_t *file,
 				 const char           *attributes,
-				 GFileQueryInfoFlags   flags,
+				 xfile_query_info_flags_t   flags,
 				 xcancellable_t         *cancellable,
 				 xerror_t              **error)
 {
@@ -738,26 +738,26 @@ _xresource_file_enumerator_new (xresource_file_t *file,
       return NULL;
     }
 
-  resource = g_object_new (XTYPE_RESOURCE_FILE_ENUMERATOR,
+  resource = xobject_new (XTYPE_RESOURCE_FILE_ENUMERATOR,
 			   "container", file,
 			   NULL);
 
   resource->children = children;
-  resource->path = g_strdup (file->path);
-  resource->attributes = g_strdup (attributes);
+  resource->path = xstrdup (file->path);
+  resource->attributes = xstrdup (attributes);
   resource->flags = flags;
 
-  return G_FILE_ENUMERATOR (resource);
+  return XFILE_ENUMERATOR (resource);
 }
 
-static GFileInfo *
-g_resource_file_enumerator_next_file (GFileEnumerator  *enumerator,
+static xfile_info_t *
+g_resource_file_enumerator_next_file (xfile_enumerator_t  *enumerator,
 				      xcancellable_t     *cancellable,
 				      xerror_t          **error)
 {
   GResourceFileEnumerator *resource = XRESOURCE_FILE_ENUMERATOR (enumerator);
   char *path;
-  GFileInfo *info;
+  xfile_info_t *info;
   xfile_t *file;
 
   if (resource->children == NULL ||
@@ -768,19 +768,19 @@ g_resource_file_enumerator_next_file (GFileEnumerator  *enumerator,
   file = g_resource_file_new_for_path (path);
   g_free (path);
 
-  info = g_file_query_info (file,
+  info = xfile_query_info (file,
 			    resource->attributes,
 			    resource->flags,
 			    cancellable,
 			    error);
 
-  g_object_unref (file);
+  xobject_unref (file);
 
   return info;
 }
 
 static xboolean_t
-g_resource_file_enumerator_close (GFileEnumerator  *enumerator,
+g_resource_file_enumerator_close (xfile_enumerator_t  *enumerator,
 			       xcancellable_t     *cancellable,
 			       xerror_t          **error)
 {
@@ -790,7 +790,7 @@ g_resource_file_enumerator_close (GFileEnumerator  *enumerator,
 
 struct _GResourceFileInputStream
 {
-  GFileInputStream parent_instance;
+  xfile_input_stream_t parent_instance;
   xinput_stream_t *stream;
   xfile_t *file;
 };
@@ -803,26 +803,26 @@ struct _GResourceFileInputStreamClass
 #define g_resource_file_input_stream_get_type _xresource_file_input_stream_get_type
 G_DEFINE_TYPE (GResourceFileInputStream, g_resource_file_input_stream, XTYPE_FILE_INPUT_STREAM)
 
-static gssize     g_resource_file_input_stream_read       (xinput_stream_t      *stream,
+static xssize_t     g_resource_file_input_stream_read       (xinput_stream_t      *stream,
 							   void              *buffer,
 							   xsize_t              count,
 							   xcancellable_t      *cancellable,
 							   xerror_t           **error);
-static gssize     g_resource_file_input_stream_skip       (xinput_stream_t      *stream,
+static xssize_t     g_resource_file_input_stream_skip       (xinput_stream_t      *stream,
 							   xsize_t              count,
 							   xcancellable_t      *cancellable,
 							   xerror_t           **error);
 static xboolean_t   g_resource_file_input_stream_close      (xinput_stream_t      *stream,
 							   xcancellable_t      *cancellable,
 							   xerror_t           **error);
-static goffset    g_resource_file_input_stream_tell       (GFileInputStream  *stream);
-static xboolean_t   g_resource_file_input_stream_can_seek   (GFileInputStream  *stream);
-static xboolean_t   g_resource_file_input_stream_seek       (GFileInputStream  *stream,
-							   goffset            offset,
+static xoffset_t    g_resource_file_input_stream_tell       (xfile_input_stream_t  *stream);
+static xboolean_t   g_resource_file_input_stream_can_seek   (xfile_input_stream_t  *stream);
+static xboolean_t   g_resource_file_input_stream_seek       (xfile_input_stream_t  *stream,
+							   xoffset_t            offset,
 							   GSeekType          type,
 							   xcancellable_t      *cancellable,
 							   xerror_t           **error);
-static GFileInfo *g_resource_file_input_stream_query_info (GFileInputStream  *stream,
+static xfile_info_t *g_resource_file_input_stream_query_info (xfile_input_stream_t  *stream,
 							   const char        *attributes,
 							   xcancellable_t      *cancellable,
 							   xerror_t           **error);
@@ -832,8 +832,8 @@ g_resource_file_input_stream_finalize (xobject_t *object)
 {
   GResourceFileInputStream *file = XRESOURCE_FILE_INPUT_STREAM (object);
 
-  g_object_unref (file->stream);
-  g_object_unref (file->file);
+  xobject_unref (file->stream);
+  xobject_unref (file->file);
   G_OBJECT_CLASS (g_resource_file_input_stream_parent_class)->finalize (object);
 }
 
@@ -842,7 +842,7 @@ g_resource_file_input_stream_class_init (GResourceFileInputStreamClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
   GInputStreamClass *stream_class = G_INPUT_STREAM_CLASS (klass);
-  GFileInputStreamClass *file_stream_class = G_FILE_INPUT_STREAM_CLASS (klass);
+  GFileInputStreamClass *file_stream_class = XFILE_INPUT_STREAM_CLASS (klass);
 
   gobject_class->finalize = g_resource_file_input_stream_finalize;
 
@@ -860,19 +860,19 @@ g_resource_file_input_stream_init (GResourceFileInputStream *info)
 {
 }
 
-static GFileInputStream *
+static xfile_input_stream_t *
 _xresource_file_input_stream_new (xinput_stream_t *in_stream, xfile_t *file)
 {
   GResourceFileInputStream *stream;
 
-  stream = g_object_new (XTYPE_RESOURCE_FILE_INPUT_STREAM, NULL);
-  stream->stream = g_object_ref (in_stream);
-  stream->file = g_object_ref (file);
+  stream = xobject_new (XTYPE_RESOURCE_FILE_INPUT_STREAM, NULL);
+  stream->stream = xobject_ref (in_stream);
+  stream->file = xobject_ref (file);
 
-  return G_FILE_INPUT_STREAM (stream);
+  return XFILE_INPUT_STREAM (stream);
 }
 
-static gssize
+static xssize_t
 g_resource_file_input_stream_read (xinput_stream_t  *stream,
 				   void          *buffer,
 				   xsize_t          count,
@@ -880,18 +880,18 @@ g_resource_file_input_stream_read (xinput_stream_t  *stream,
 				   xerror_t       **error)
 {
   GResourceFileInputStream *file = XRESOURCE_FILE_INPUT_STREAM (stream);
-  return g_input_stream_read (file->stream,
+  return xinput_stream_read (file->stream,
 			      buffer, count, cancellable, error);
 }
 
-static gssize
+static xssize_t
 g_resource_file_input_stream_skip (xinput_stream_t  *stream,
 				   xsize_t          count,
 				   xcancellable_t  *cancellable,
 				   xerror_t       **error)
 {
   GResourceFileInputStream *file = XRESOURCE_FILE_INPUT_STREAM (stream);
-  return g_input_stream_skip (file->stream,
+  return xinput_stream_skip (file->stream,
 			      count, cancellable, error);
 }
 
@@ -901,33 +901,33 @@ g_resource_file_input_stream_close (xinput_stream_t  *stream,
 				    xerror_t       **error)
 {
   GResourceFileInputStream *file = XRESOURCE_FILE_INPUT_STREAM (stream);
-  return g_input_stream_close (file->stream,
+  return xinput_stream_close (file->stream,
 			       cancellable, error);
 }
 
 
-static goffset
-g_resource_file_input_stream_tell (GFileInputStream *stream)
+static xoffset_t
+g_resource_file_input_stream_tell (xfile_input_stream_t *stream)
 {
   GResourceFileInputStream *file = XRESOURCE_FILE_INPUT_STREAM (stream);
 
   if (!X_IS_SEEKABLE (file->stream))
       return 0;
 
-  return g_seekable_tell (G_SEEKABLE (file->stream));
+  return xseekable_tell (G_SEEKABLE (file->stream));
 }
 
 static xboolean_t
-g_resource_file_input_stream_can_seek (GFileInputStream *stream)
+g_resource_file_input_stream_can_seek (xfile_input_stream_t *stream)
 {
   GResourceFileInputStream *file = XRESOURCE_FILE_INPUT_STREAM (stream);
 
-  return X_IS_SEEKABLE (file->stream) && g_seekable_can_seek (G_SEEKABLE (file->stream));
+  return X_IS_SEEKABLE (file->stream) && xseekable_can_seek (G_SEEKABLE (file->stream));
 }
 
 static xboolean_t
-g_resource_file_input_stream_seek (GFileInputStream  *stream,
-				   goffset            offset,
+g_resource_file_input_stream_seek (xfile_input_stream_t  *stream,
+				   xoffset_t            offset,
 				   GSeekType          type,
 				   xcancellable_t      *cancellable,
 				   xerror_t           **error)
@@ -941,17 +941,17 @@ g_resource_file_input_stream_seek (GFileInputStream  *stream,
       return FALSE;
     }
 
-  return g_seekable_seek (G_SEEKABLE (file->stream),
+  return xseekable_seek (G_SEEKABLE (file->stream),
 			  offset, type, cancellable, error);
 }
 
-static GFileInfo *
-g_resource_file_input_stream_query_info (GFileInputStream  *stream,
+static xfile_info_t *
+g_resource_file_input_stream_query_info (xfile_input_stream_t  *stream,
 					 const char        *attributes,
 					 xcancellable_t      *cancellable,
 					 xerror_t           **error)
 {
   GResourceFileInputStream *file = XRESOURCE_FILE_INPUT_STREAM (stream);
 
-  return g_file_query_info (file->file, attributes, 0, cancellable, error);
+  return xfile_query_info (file->file, attributes, 0, cancellable, error);
 }

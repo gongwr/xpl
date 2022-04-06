@@ -33,31 +33,31 @@ G_BEGIN_DECLS
 typedef struct _GIOModuleScope GIOModuleScope;
 
 XPL_AVAILABLE_IN_2_30
-GIOModuleScope *   g_io_module_scope_new     (GIOModuleScopeFlags  flags);
+GIOModuleScope *   xio_module_scope_new     (GIOModuleScopeFlags  flags);
 XPL_AVAILABLE_IN_2_30
-void               g_io_module_scope_free    (GIOModuleScope      *scope);
+void               xio_module_scope_free    (GIOModuleScope      *scope);
 XPL_AVAILABLE_IN_2_30
-void               g_io_module_scope_block   (GIOModuleScope      *scope,
+void               xio_module_scope_block   (GIOModuleScope      *scope,
                                               const xchar_t         *basename);
 
-#define G_IO_TYPE_MODULE         (g_io_module_get_type ())
-#define G_IO_MODULE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), G_IO_TYPE_MODULE, GIOModule))
-#define G_IO_MODULE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), G_IO_TYPE_MODULE, GIOModuleClass))
+#define G_IO_TYPE_MODULE         (xio_module_get_type ())
+#define G_IO_MODULE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), G_IO_TYPE_MODULE, xio_module))
+#define G_IO_MODULE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), G_IO_TYPE_MODULE, xio_module_class))
 #define G_IO_IS_MODULE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), G_IO_TYPE_MODULE))
 #define G_IO_IS_MODULE_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), G_IO_TYPE_MODULE))
-#define G_IO_MODULE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), G_IO_TYPE_MODULE, GIOModuleClass))
+#define G_IO_MODULE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), G_IO_TYPE_MODULE, xio_module_class))
 
 /**
- * GIOModule:
+ * xio_module_t:
  *
  * Opaque module base class for extending GIO.
  **/
-typedef struct _GIOModuleClass GIOModuleClass;
+typedef struct _xio_module_class xio_module_class_t;
 
 XPL_AVAILABLE_IN_ALL
-xtype_t              g_io_module_get_type                       (void) G_GNUC_CONST;
+xtype_t              xio_module_get_type                       (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-GIOModule         *g_io_module_new                            (const xchar_t       *filename);
+xio_module_t         *xio_module_new                            (const xchar_t       *filename);
 
 XPL_AVAILABLE_IN_ALL
 void               g_io_modules_scan_all_in_directory         (const char        *dirname);
@@ -72,40 +72,40 @@ xlist_t             *g_io_modules_load_all_in_directory_with_scope   (const xcha
                                                                     GIOModuleScope    *scope);
 
 XPL_AVAILABLE_IN_ALL
-GIOExtensionPoint *g_io_extension_point_register              (const char        *name);
+xio_extension_point_t *g_io_extension_point_register              (const char        *name);
 XPL_AVAILABLE_IN_ALL
-GIOExtensionPoint *g_io_extension_point_lookup                (const char        *name);
+xio_extension_point_t *g_io_extension_point_lookup                (const char        *name);
 XPL_AVAILABLE_IN_ALL
-void               g_io_extension_point_set_required_type     (GIOExtensionPoint *extension_point,
+void               g_io_extension_point_set_required_type     (xio_extension_point_t *extension_point,
 							       xtype_t              type);
 XPL_AVAILABLE_IN_ALL
-xtype_t              g_io_extension_point_get_required_type     (GIOExtensionPoint *extension_point);
+xtype_t              g_io_extension_point_get_required_type     (xio_extension_point_t *extension_point);
 XPL_AVAILABLE_IN_ALL
-xlist_t             *g_io_extension_point_get_extensions        (GIOExtensionPoint *extension_point);
+xlist_t             *g_io_extension_point_get_extensions        (xio_extension_point_t *extension_point);
 XPL_AVAILABLE_IN_ALL
-GIOExtension *     g_io_extension_point_get_extension_by_name (GIOExtensionPoint *extension_point,
+xio_extension_t *     g_io_extension_point_get_extension_by_name (xio_extension_point_t *extension_point,
 							       const char        *name);
 XPL_AVAILABLE_IN_ALL
-GIOExtension *     g_io_extension_point_implement             (const char        *extension_point_name,
+xio_extension_t *     g_io_extension_point_implement             (const char        *extension_point_name,
 							       xtype_t              type,
 							       const char        *extension_name,
 							       xint_t               priority);
 
 XPL_AVAILABLE_IN_ALL
-xtype_t              g_io_extension_get_type                    (GIOExtension      *extension);
+xtype_t              g_io_extension_get_type                    (xio_extension_t      *extension);
 XPL_AVAILABLE_IN_ALL
-const char *       g_io_extension_get_name                    (GIOExtension      *extension);
+const char *       g_io_extension_get_name                    (xio_extension_t      *extension);
 XPL_AVAILABLE_IN_ALL
-xint_t               g_io_extension_get_priority                (GIOExtension      *extension);
+xint_t               g_io_extension_get_priority                (xio_extension_t      *extension);
 XPL_AVAILABLE_IN_ALL
-GTypeClass*        g_io_extension_ref_class                   (GIOExtension      *extension);
+xtype_class_t*        g_io_extension_ref_class                   (xio_extension_t      *extension);
 
 
 /* API for the modules to implement */
 
 /**
- * g_io_module_load: (skip)
- * @module: a #GIOModule.
+ * xio_module_load: (skip)
+ * @module: a #xio_module_t.
  *
  * Required API for GIO modules to implement.
  *
@@ -122,11 +122,11 @@ GTypeClass*        g_io_extension_ref_class                   (GIOExtension     
  * for static builds.
  **/
 XPL_AVAILABLE_IN_ALL
-void   g_io_module_load   (GIOModule *module);
+void   xio_module_load   (xio_module_t *module);
 
 /**
- * g_io_module_unload: (skip)
- * @module: a #GIOModule.
+ * xio_module_unload: (skip)
+ * @module: a #xio_module_t.
  *
  * Required API for GIO modules to implement.
  *
@@ -142,10 +142,10 @@ void   g_io_module_load   (GIOModule *module);
  * for static builds.
  **/
 XPL_AVAILABLE_IN_ALL
-void   g_io_module_unload (GIOModule *module);
+void   xio_module_unload (xio_module_t *module);
 
 /**
- * g_io_module_query:
+ * xio_module_query:
  *
  * Optional API for GIO modules to implement.
  *
@@ -162,12 +162,12 @@ void   g_io_module_unload (GIOModule *module);
  * startup so that it can register its extension points during init.
  *
  * Note that a module need not actually implement all the extension
- * points that g_io_module_query() returns, since the exact list of
+ * points that xio_module_query() returns, since the exact list of
  * extension may depend on runtime issues. However all extension
- * points actually implemented must be returned by g_io_module_query()
+ * points actually implemented must be returned by xio_module_query()
  * (if defined).
  *
- * When installing a module that implements g_io_module_query() you must
+ * When installing a module that implements xio_module_query() you must
  * run gio-querymodules in order to build the cache files required for
  * lazy loading.
  *
@@ -181,12 +181,12 @@ void   g_io_module_unload (GIOModule *module);
  *
  * Returns: (transfer full): A %NULL-terminated array of strings,
  *     listing the supported extension points of the module. The array
- *     must be suitable for freeing with g_strfreev().
+ *     must be suitable for freeing with xstrfreev().
  *
  * Since: 2.24
  **/
 XPL_AVAILABLE_IN_ALL
-char **g_io_module_query (void);
+char **xio_module_query (void);
 
 G_END_DECLS
 

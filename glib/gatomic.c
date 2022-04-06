@@ -25,7 +25,7 @@
  * SECTION:atomic_operations
  * @title: Atomic Operations
  * @short_description: basic atomic integer and pointer operations
- * @see_also: #GMutex
+ * @see_also: #xmutex_t
  *
  * The following is a collection of compiler macros to provide atomic
  * access to integer and pointer-sized values.
@@ -40,7 +40,7 @@
  * The get, set and exchange operations for integers and pointers
  * nominally operate on #xint_t and #xpointer_t, respectively.  Of the
  * arithmetic operations, the 'add' operation operates on (and returns)
- * signed integer values (#xint_t and #gssize) and the 'and', 'or', and
+ * signed integer values (#xint_t and #xssize_t) and the 'and', 'or', and
  * 'xor' operations operate on (and return) unsigned integer values
  * (#xuint_t and #xsize_t).
  *
@@ -422,9 +422,9 @@ xboolean_t
  *
  * Since: 2.30
  **/
-gssize
+xssize_t
 (g_atomic_pointer_add) (volatile void *atomic,
-                        gssize         val)
+                        xssize_t         val)
 {
   return g_atomic_pointer_add ((xpointer_t *) atomic, val);
 }
@@ -663,9 +663,9 @@ xboolean_t
   return InterlockedCompareExchangePointer (atomic, newval, oldval) == oldval;
 }
 
-gssize
+xssize_t
 (g_atomic_pointer_add) (volatile void *atomic,
-                        gssize         val)
+                        xssize_t         val)
 {
 #if XPL_SIZEOF_VOID_P == 8
   return InterlockedExchangeAdd64 (atomic, val);
@@ -718,7 +718,7 @@ xsize_t
 #else /* G_ATOMIC_LOCK_FREE */
 
 /* We are not permitted to call into any GLib functions from here, so we
- * can not use GMutex.
+ * can not use xmutex_t.
  *
  * Fortunately, we already take care of the Windows case above, and all
  * non-Windows platforms on which glib runs have pthreads.  Use those.
@@ -884,12 +884,12 @@ xboolean_t
   return success;
 }
 
-gssize
+xssize_t
 (g_atomic_pointer_add) (volatile void *atomic,
-                        gssize         val)
+                        xssize_t         val)
 {
-  gssize *ptr = atomic;
-  gssize oldval;
+  xssize_t *ptr = atomic;
+  xssize_t oldval;
 
   pthread_mutex_lock (&g_atomic_lock);
   oldval = *ptr;

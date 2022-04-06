@@ -36,25 +36,25 @@
 /* ---------------------------------------------------------------------------------------------------- */
 
 static xboolean_t
-server_on_allow_mechanism (GDBusAuthObserver *observer,
+server_on_allow_mechanism (xdbus_auth_observer_t *observer,
                            const xchar_t       *mechanism,
                            xpointer_t           user_data)
 {
   const xchar_t *allowed_mechanism = user_data;
-  if (allowed_mechanism == NULL || g_strcmp0 (mechanism, allowed_mechanism) == 0)
+  if (allowed_mechanism == NULL || xstrcmp0 (mechanism, allowed_mechanism) == 0)
     return TRUE;
   else
     return FALSE;
 }
 
 /* pass NULL to allow any mechanism */
-static GDBusServer *
+static xdbus_server_t *
 server_new_for_mechanism (const xchar_t *allowed_mechanism)
 {
   xchar_t *addr;
   xchar_t *guid;
-  GDBusServer *server;
-  GDBusAuthObserver *auth_observer;
+  xdbus_server_t *server;
+  xdbus_auth_observer_t *auth_observer;
   xerror_t *error;
   GDBusServerFlags flags;
 
@@ -63,23 +63,23 @@ server_new_for_mechanism (const xchar_t *allowed_mechanism)
 #ifdef G_OS_UNIX
   if (g_unix_socket_address_abstract_names_supported ())
     {
-      addr = g_strdup ("unix:tmpdir=/tmp/gdbus-test-");
+      addr = xstrdup ("unix:tmpdir=/tmp/gdbus-test-");
     }
   else
     {
       xchar_t *tmpdir;
       tmpdir = g_dir_make_tmp ("gdbus-test-XXXXXX", NULL);
-      addr = g_strdup_printf ("unix:tmpdir=%s", tmpdir);
+      addr = xstrdup_printf ("unix:tmpdir=%s", tmpdir);
       g_free (tmpdir);
     }
 #else
-  addr = g_strdup ("nonce-tcp:");
+  addr = xstrdup ("nonce-tcp:");
 #endif
 
-  auth_observer = g_dbus_auth_observer_new ();
+  auth_observer = xdbus_auth_observer_new ();
 
   flags = G_DBUS_SERVER_FLAGS_NONE;
-  if (g_strcmp0 (allowed_mechanism, "ANONYMOUS") == 0)
+  if (xstrcmp0 (allowed_mechanism, "ANONYMOUS") == 0)
     flags |= G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS;
 
   error = NULL;
@@ -99,7 +99,7 @@ server_new_for_mechanism (const xchar_t *allowed_mechanism)
 
   g_free (addr);
   g_free (guid);
-  g_object_unref (auth_observer);
+  xobject_unref (auth_observer);
 
   return server;
 }
@@ -107,19 +107,19 @@ server_new_for_mechanism (const xchar_t *allowed_mechanism)
 /* ---------------------------------------------------------------------------------------------------- */
 
 static xboolean_t
-test_auth_on_new_connection (GDBusServer     *server,
-                             GDBusConnection *connection,
+test_auth_on_new_connection (xdbus_server_t     *server,
+                             xdbus_connection_t *connection,
                              xpointer_t         user_data)
 {
-  GMainLoop *loop = user_data;
-  g_main_loop_quit (loop);
+  xmain_loop_t *loop = user_data;
+  xmain_loop_quit (loop);
   return FALSE;
 }
 
 static xboolean_t
 test_auth_on_timeout (xpointer_t user_data)
 {
-  g_error ("Timeout waiting for client");
+  xerror ("Timeout waiting for client");
   g_assert_not_reached ();
   return G_SOURCE_REMOVE;
 }
@@ -136,11 +136,11 @@ static xpointer_t
 test_auth_client_thread_func (xpointer_t user_data)
 {
   TestAuthData *data = user_data;
-  GDBusConnection *c = NULL;
+  xdbus_connection_t *c = NULL;
   xerror_t *error = NULL;
-  GDBusAuthObserver *auth_observer = NULL;
+  xdbus_auth_observer_t *auth_observer = NULL;
 
-  auth_observer = g_dbus_auth_observer_new ();
+  auth_observer = xdbus_auth_observer_new ();
 
   g_signal_connect (auth_observer,
                     "allow-mechanism",
@@ -163,15 +163,15 @@ static void
 test_auth_mechanism (const xchar_t *allowed_client_mechanism,
                      const xchar_t *allowed_server_mechanism)
 {
-  GDBusServer *server;
-  GMainLoop *loop;
-  GThread *client_thread;
+  xdbus_server_t *server;
+  xmain_loop_t *loop;
+  xthread_t *client_thread;
   TestAuthData data;
   xuint_t timeout_id;
 
   server = server_new_for_mechanism (allowed_server_mechanism);
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   g_signal_connect (server,
                     "new-connection",
@@ -185,23 +185,23 @@ test_auth_mechanism (const xchar_t *allowed_client_mechanism,
   data.address = g_dbus_server_get_client_address (server);
 
   /* run the D-Bus client in a thread */
-  client_thread = g_thread_new ("gdbus-client-thread",
+  client_thread = xthread_new ("gdbus-client-thread",
                                 test_auth_client_thread_func,
                                 &data);
 
   g_dbus_server_start (server);
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   g_dbus_server_stop (server);
 
-  g_thread_join (client_thread);
-  g_source_remove (timeout_id);
+  xthread_join (client_thread);
+  xsource_remove (timeout_id);
 
-  while (g_main_context_iteration (NULL, FALSE));
-  g_main_loop_unref (loop);
+  while (xmain_context_iteration (NULL, FALSE));
+  xmain_loop_unref (loop);
 
-  g_object_unref (server);
+  xobject_unref (server);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -256,7 +256,7 @@ temp_dbus_keyrings_setup (void)
 static void
 temp_dbus_keyrings_teardown (void)
 {
-  GDir *dir;
+  xdir_t *dir;
   xerror_t *error = NULL;
   const xchar_t *name;
 

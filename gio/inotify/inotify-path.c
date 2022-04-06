@@ -65,7 +65,7 @@ typedef struct ip_watched_dir_s {
    * Maps basename to a ip_watched_file_t if the file is currently
    * being directly watched for changes (ie: 'hardlinks' mode).
    */
-  GHashTable *files_hash;
+  xhashtable_t *files_hash;
 
   /* Inotify state */
   gint32 wd;
@@ -78,23 +78,23 @@ static xboolean_t     ip_debug_enabled = FALSE;
 #define IP_W if (ip_debug_enabled) g_warning
 
 /* path -> ip_watched_dir */
-static GHashTable * path_dir_hash = NULL;
+static xhashtable_t * path_dir_hash = NULL;
 /* inotify_sub * -> ip_watched_dir *
  *
  * Each subscription is attached to a watched directory or it is on
  * the missing list
  */
-static GHashTable * sub_dir_hash = NULL;
+static xhashtable_t * sub_dir_hash = NULL;
 /* This hash holds GLists of ip_watched_dir_t *'s
  * We need to hold a list because symbolic links can share
  * the same wd
  */
-static GHashTable * wd_dir_hash = NULL;
+static xhashtable_t * wd_dir_hash = NULL;
 /* This hash holds GLists of ip_watched_file_t *'s
  * We need to hold a list because links can share
  * the same wd
  */
-static GHashTable * wd_file_hash = NULL;
+static xhashtable_t * wd_file_hash = NULL;
 
 static ip_watched_dir_t *ip_watched_dir_new  (const char       *path,
 					      int               wd);
@@ -119,10 +119,10 @@ _ip_startup (xboolean_t (*cb)(ik_event_t *event, inotify_sub *sub, xboolean_t fi
   if (!result)
     return FALSE;
 
-  path_dir_hash = g_hash_table_new (g_str_hash, g_str_equal);
-  sub_dir_hash = g_hash_table_new (g_direct_hash, g_direct_equal);
-  wd_dir_hash = g_hash_table_new (g_direct_hash, g_direct_equal);
-  wd_file_hash = g_hash_table_new (g_direct_hash, g_direct_equal);
+  path_dir_hash = xhash_table_new (xstr_hash, xstr_equal);
+  sub_dir_hash = xhash_table_new (g_direct_hash, g_direct_equal);
+  wd_dir_hash = xhash_table_new (g_direct_hash, g_direct_equal);
+  wd_file_hash = xhash_table_new (g_direct_hash, g_direct_equal);
 
   initialized = TRUE;
   return TRUE;
@@ -133,7 +133,7 @@ ip_map_path_dir (const char       *path,
                  ip_watched_dir_t *dir)
 {
   g_assert (path && dir);
-  g_hash_table_insert (path_dir_hash, dir->path, dir);
+  xhash_table_insert (path_dir_hash, dir->path, dir);
 }
 
 static void
@@ -142,8 +142,8 @@ ip_map_sub_dir (inotify_sub      *sub,
 {
   /* Associate subscription and directory */
   g_assert (dir && sub);
-  g_hash_table_insert (sub_dir_hash, sub, dir);
-  dir->subs = g_list_prepend (dir->subs, sub);
+  xhash_table_insert (sub_dir_hash, sub, dir);
+  dir->subs = xlist_prepend (dir->subs, sub);
 }
 
 static void
@@ -153,9 +153,9 @@ ip_map_wd_dir (gint32            wd,
   xlist_t *dir_list;
 
   g_assert (wd >= 0 && dir);
-  dir_list = g_hash_table_lookup (wd_dir_hash, GINT_TO_POINTER (wd));
-  dir_list = g_list_prepend (dir_list, dir);
-  g_hash_table_replace (wd_dir_hash, GINT_TO_POINTER (dir->wd), dir_list);
+  dir_list = xhash_table_lookup (wd_dir_hash, GINT_TO_POINTER (wd));
+  dir_list = xlist_prepend (dir_list, dir);
+  xhash_table_replace (wd_dir_hash, GINT_TO_POINTER (dir->wd), dir_list);
 }
 
 static void
@@ -165,26 +165,26 @@ ip_map_wd_file (gint32             wd,
   xlist_t *file_list;
 
   g_assert (wd >= 0 && file);
-  file_list = g_hash_table_lookup (wd_file_hash, GINT_TO_POINTER (wd));
-  file_list = g_list_prepend (file_list, file);
-  g_hash_table_replace (wd_file_hash, GINT_TO_POINTER (wd), file_list);
+  file_list = xhash_table_lookup (wd_file_hash, GINT_TO_POINTER (wd));
+  file_list = xlist_prepend (file_list, file);
+  xhash_table_replace (wd_file_hash, GINT_TO_POINTER (wd), file_list);
 }
 
 static void
 ip_unmap_wd_file (gint32             wd,
                   ip_watched_file_t *file)
 {
-  xlist_t *file_list = g_hash_table_lookup (wd_file_hash, GINT_TO_POINTER (wd));
+  xlist_t *file_list = xhash_table_lookup (wd_file_hash, GINT_TO_POINTER (wd));
 
   if (!file_list)
     return;
 
   g_assert (wd >= 0 && file);
-  file_list = g_list_remove (file_list, file);
+  file_list = xlist_remove (file_list, file);
   if (file_list == NULL)
-    g_hash_table_remove (wd_file_hash, GINT_TO_POINTER (wd));
+    xhash_table_remove (wd_file_hash, GINT_TO_POINTER (wd));
   else
-    g_hash_table_replace (wd_file_hash, GINT_TO_POINTER (wd), file_list);
+    xhash_table_replace (wd_file_hash, GINT_TO_POINTER (wd), file_list);
 }
 
 
@@ -195,8 +195,8 @@ ip_watched_file_new (const xchar_t *dirname,
   ip_watched_file_t *file;
 
   file = g_new0 (ip_watched_file_t, 1);
-  file->path = g_strjoin ("/", dirname, filename, NULL);
-  file->filename = g_strdup (filename);
+  file->path = xstrjoin ("/", dirname, filename, NULL);
+  file->filename = xstrdup (filename);
   file->wd = -1;
 
   return file;
@@ -215,7 +215,7 @@ static void
 ip_watched_file_add_sub (ip_watched_file_t *file,
                          inotify_sub       *sub)
 {
-  file->subs = g_list_prepend (file->subs, sub);
+  file->subs = xlist_prepend (file->subs, sub);
 }
 
 static void
@@ -257,7 +257,7 @@ _ip_start_watching (inotify_sub *sub)
   g_assert (sub->dirname);
 
   IP_W ("Starting to watch %s\n", sub->dirname);
-  dir = g_hash_table_lookup (path_dir_hash, sub->dirname);
+  dir = xhash_table_lookup (path_dir_hash, sub->dirname);
 
   if (dir == NULL)
     {
@@ -286,12 +286,12 @@ _ip_start_watching (inotify_sub *sub)
     {
       ip_watched_file_t *file;
 
-      file = g_hash_table_lookup (dir->files_hash, sub->filename);
+      file = xhash_table_lookup (dir->files_hash, sub->filename);
 
       if (file == NULL)
         {
           file = ip_watched_file_new (sub->dirname, sub->filename);
-          g_hash_table_insert (dir->files_hash, file->filename, file);
+          xhash_table_insert (dir->files_hash, file->filename, file);
         }
 
       ip_watched_file_add_sub (file, sub);
@@ -308,35 +308,35 @@ ip_unmap_path_dir (const char       *path,
                    ip_watched_dir_t *dir)
 {
   g_assert (path && dir);
-  g_hash_table_remove (path_dir_hash, dir->path);
+  xhash_table_remove (path_dir_hash, dir->path);
 }
 
 static void
 ip_unmap_wd_dir (gint32            wd,
                  ip_watched_dir_t *dir)
 {
-  xlist_t *dir_list = g_hash_table_lookup (wd_dir_hash, GINT_TO_POINTER (wd));
+  xlist_t *dir_list = xhash_table_lookup (wd_dir_hash, GINT_TO_POINTER (wd));
 
   if (!dir_list)
     return;
 
   g_assert (wd >= 0 && dir);
-  dir_list = g_list_remove (dir_list, dir);
+  dir_list = xlist_remove (dir_list, dir);
   if (dir_list == NULL)
-    g_hash_table_remove (wd_dir_hash, GINT_TO_POINTER (dir->wd));
+    xhash_table_remove (wd_dir_hash, GINT_TO_POINTER (dir->wd));
   else
-    g_hash_table_replace (wd_dir_hash, GINT_TO_POINTER (dir->wd), dir_list);
+    xhash_table_replace (wd_dir_hash, GINT_TO_POINTER (dir->wd), dir_list);
 }
 
 static void
 ip_unmap_wd (gint32 wd)
 {
-  xlist_t *dir_list = g_hash_table_lookup (wd_dir_hash, GINT_TO_POINTER (wd));
+  xlist_t *dir_list = xhash_table_lookup (wd_dir_hash, GINT_TO_POINTER (wd));
   if (!dir_list)
     return;
   g_assert (wd >= 0);
-  g_hash_table_remove (wd_dir_hash, GINT_TO_POINTER (wd));
-  g_list_free (dir_list);
+  xhash_table_remove (wd_dir_hash, GINT_TO_POINTER (wd));
+  xlist_free (dir_list);
 }
 
 static void
@@ -344,19 +344,19 @@ ip_unmap_sub_dir (inotify_sub      *sub,
                   ip_watched_dir_t *dir)
 {
   g_assert (sub && dir);
-  g_hash_table_remove (sub_dir_hash, sub);
-  dir->subs = g_list_remove (dir->subs, sub);
+  xhash_table_remove (sub_dir_hash, sub);
+  dir->subs = xlist_remove (dir->subs, sub);
 
   if (sub->hardlinks)
     {
       ip_watched_file_t *file;
 
-      file = g_hash_table_lookup (dir->files_hash, sub->filename);
-      file->subs = g_list_remove (file->subs, sub);
+      file = xhash_table_lookup (dir->files_hash, sub->filename);
+      file->subs = xlist_remove (file->subs, sub);
 
       if (file->subs == NULL)
         {
-          g_hash_table_remove (dir->files_hash, sub->filename);
+          xhash_table_remove (dir->files_hash, sub->filename);
           ip_watched_file_stop (file);
           ip_watched_file_free (file);
         }
@@ -375,7 +375,7 @@ _ip_stop_watching (inotify_sub *sub)
 {
   ip_watched_dir_t *dir = NULL;
 
-  dir = g_hash_table_lookup (sub_dir_hash, sub);
+  dir = xhash_table_lookup (sub_dir_hash, sub);
   if (!dir)
     return TRUE;
 
@@ -400,8 +400,8 @@ ip_watched_dir_new (const char *path,
 {
   ip_watched_dir_t *dir = g_new0 (ip_watched_dir_t, 1);
 
-  dir->path = g_strdup (path);
-  dir->files_hash = g_hash_table_new (g_str_hash, g_str_equal);
+  dir->path = xstrdup (path);
+  dir->files_hash = xhash_table_new (xstr_hash, xstr_equal);
   dir->wd = wd;
 
   return dir;
@@ -410,10 +410,10 @@ ip_watched_dir_new (const char *path,
 static void
 ip_watched_dir_free (ip_watched_dir_t *dir)
 {
-  g_assert_cmpint (g_hash_table_size (dir->files_hash), ==, 0);
+  g_assert_cmpint (xhash_table_size (dir->files_hash), ==, 0);
   g_assert (dir->subs == NULL);
   g_free (dir->path);
-  g_hash_table_unref (dir->files_hash);
+  xhash_table_unref (dir->files_hash);
   g_free (dir);
 }
 
@@ -496,7 +496,7 @@ ip_event_dispatch (xlist_t      *dir_list,
             {
               ip_watched_file_t *file;
 
-              file = g_hash_table_lookup (dir->files_hash, sub->filename);
+              file = xhash_table_lookup (dir->files_hash, sub->filename);
 
               if (file != NULL)
                 {
@@ -541,8 +541,8 @@ ip_event_callback (ik_event_t *event)
       return TRUE;
     }
 
-  dir_list = g_hash_table_lookup (wd_dir_hash, GINT_TO_POINTER (event->wd));
-  file_list = g_hash_table_lookup (wd_file_hash, GINT_TO_POINTER (event->wd));
+  dir_list = xhash_table_lookup (wd_dir_hash, GINT_TO_POINTER (event->wd));
+  file_list = xhash_table_lookup (wd_file_hash, GINT_TO_POINTER (event->wd));
 
   if (event->mask & IP_INOTIFY_DIR_MASK)
     interesting |= ip_event_dispatch (dir_list, file_list, event);
@@ -550,8 +550,8 @@ ip_event_callback (ik_event_t *event)
   /* Only deliver paired events if the wds are separate */
   if (event->pair && event->pair->wd != event->wd)
     {
-      dir_list = g_hash_table_lookup (wd_dir_hash, GINT_TO_POINTER (event->pair->wd));
-      file_list = g_hash_table_lookup (wd_file_hash, GINT_TO_POINTER (event->pair->wd));
+      dir_list = xhash_table_lookup (wd_dir_hash, GINT_TO_POINTER (event->pair->wd));
+      file_list = xhash_table_lookup (wd_file_hash, GINT_TO_POINTER (event->pair->wd));
 
       if (event->pair->mask & IP_INOTIFY_DIR_MASK)
         interesting |= ip_event_dispatch (dir_list, file_list, event->pair);
@@ -566,7 +566,7 @@ ip_event_callback (ik_event_t *event)
       event->mask & IN_UNMOUNT)
     {
       /* Add all subscriptions to missing list */
-      g_list_foreach (dir_list, ip_wd_delete, NULL);
+      xlist_foreach (dir_list, ip_wd_delete, NULL);
       /* Unmap all directories attached to this wd */
       ip_unmap_wd (event->wd);
     }
@@ -583,7 +583,7 @@ _ip_get_path_for_wd (gint32 wd)
   ip_watched_dir_t *dir;
 
   g_assert (wd >= 0);
-  dir_list = g_hash_table_lookup (wd_dir_hash, GINT_TO_POINTER (wd));
+  dir_list = xhash_table_lookup (wd_dir_hash, GINT_TO_POINTER (wd));
   if (dir_list)
     {
       dir = dir_list->data;

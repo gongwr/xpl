@@ -1,4 +1,4 @@
-/* giowin32-private.c - private glib-gio functions for W32 GAppInfo
+/* giowin32-private.c - private glib-gio functions for W32 xapp_info_t
  *
  * Copyright 2019 Руслан Ижбулатов
  *
@@ -18,7 +18,7 @@
 
 
 static xsize_t
-g_utf16_len (const gunichar2 *str)
+xutf16_len (const xunichar2_t *str)
 {
   xsize_t result;
 
@@ -28,8 +28,8 @@ g_utf16_len (const gunichar2 *str)
   return result;
 }
 
-static gunichar2 *
-g_wcsdup (const gunichar2 *str, gssize str_len)
+static xunichar2_t *
+g_wcsdup (const xunichar2_t *str, xssize_t str_len)
 {
   xsize_t str_len_unsigned;
   xsize_t str_size;
@@ -37,18 +37,18 @@ g_wcsdup (const gunichar2 *str, gssize str_len)
   g_return_val_if_fail (str != NULL, NULL);
 
   if (str_len < 0)
-    str_len_unsigned = g_utf16_len (str);
+    str_len_unsigned = xutf16_len (str);
   else
     str_len_unsigned = (xsize_t) str_len;
 
-  g_assert (str_len_unsigned <= G_MAXSIZE / sizeof (gunichar2) - 1);
-  str_size = (str_len_unsigned + 1) * sizeof (gunichar2);
+  g_assert (str_len_unsigned <= G_MAXSIZE / sizeof (xunichar2_t) - 1);
+  str_size = (str_len_unsigned + 1) * sizeof (xunichar2_t);
 
   return g_memdup2 (str, str_size);
 }
 
-static const gunichar2 *
-g_utf16_wchr (const gunichar2 *str, const wchar_t wchr)
+static const xunichar2_t *
+xutf16_wchr (const xunichar2_t *str, const wchar_t wchr)
 {
   for (; str != NULL && str[0] != 0; str++)
     if ((wchar_t) str[0] == wchr)
@@ -58,19 +58,19 @@ g_utf16_wchr (const gunichar2 *str, const wchar_t wchr)
 }
 
 static xboolean_t
-g_utf16_to_utf8_and_fold (const gunichar2  *str,
-                          gssize            length,
+xutf16_to_utf8_and_fold (const xunichar2_t  *str,
+                          xssize_t            length,
                           xchar_t           **str_u8,
                           xchar_t           **str_u8_folded)
 {
   xchar_t *u8;
   xchar_t *folded;
-  u8 = g_utf16_to_utf8 (str, length, NULL, NULL, NULL);
+  u8 = xutf16_to_utf8 (str, length, NULL, NULL, NULL);
 
   if (u8 == NULL)
     return FALSE;
 
-  folded = g_utf8_casefold (u8, -1);
+  folded = xutf8_casefold (u8, -1);
 
   if (str_u8)
     *str_u8 = g_steal_pointer (&u8);
@@ -92,14 +92,14 @@ g_utf16_to_utf8_and_fold (const gunichar2  *str,
  * If the string does not contain separators, returns the
  * string itself.
  */
-static const gunichar2 *
-g_utf16_find_basename (const gunichar2 *filename,
-                       gssize           len)
+static const xunichar2_t *
+xutf16_find_basename (const xunichar2_t *filename,
+                       xssize_t           len)
 {
-  const gunichar2 *result;
+  const xunichar2_t *result;
 
   if (len < 0)
-    len = g_utf16_len (filename);
+    len = xutf16_len (filename);
   if (len == 0)
     return filename;
 
@@ -128,8 +128,8 @@ g_utf16_find_basename (const gunichar2 *filename,
  * string itself.
  */
 static const xchar_t *
-g_utf8_find_basename (const xchar_t *filename,
-                      gssize       len)
+xutf8_find_basename (const xchar_t *filename,
+                      xssize_t       len)
 {
   const xchar_t *result;
 
@@ -165,18 +165,18 @@ g_utf8_find_basename (const xchar_t *filename,
  * the filename and the following argument.
  */
 static void
-_g_win32_parse_filename (const gunichar2  *commandline,
+_g_win32_parse_filename (const xunichar2_t  *commandline,
                          xboolean_t          comma_separator,
-                         const gunichar2 **executable_start,
-                         gssize           *executable_len,
-                         const gunichar2 **executable_basename,
-                         const gunichar2 **after_executable)
+                         const xunichar2_t **executable_start,
+                         xssize_t           *executable_len,
+                         const xunichar2_t **executable_basename,
+                         const xunichar2_t **after_executable)
 {
-  const gunichar2 *p;
-  const gunichar2 *first_argument;
+  const xunichar2_t *p;
+  const xunichar2_t *first_argument;
   xboolean_t quoted;
-  gssize len;
-  gssize execlen;
+  xssize_t len;
+  xssize_t execlen;
   xboolean_t found;
 
   while ((wchar_t) commandline[0] == L' ')
@@ -193,7 +193,7 @@ _g_win32_parse_filename (const gunichar2  *commandline,
       commandline += 1;
     }
 
-  len = g_utf16_len (commandline);
+  len = xutf16_len (commandline);
   p = commandline;
 
   while (p < &commandline[len])
@@ -250,7 +250,7 @@ _g_win32_parse_filename (const gunichar2  *commandline,
     *executable_len = execlen;
 
   if (executable_basename)
-    *executable_basename = g_utf16_find_basename (commandline, execlen);
+    *executable_basename = xutf16_find_basename (commandline, execlen);
 
   if (after_executable)
     *after_executable = first_argument;
@@ -261,7 +261,7 @@ _g_win32_parse_filename (const gunichar2  *commandline,
  * follow_class_chain_to_handler() does perform such validation.
  */
 static void
-_g_win32_extract_executable (const gunichar2  *commandline,
+_g_win32_extract_executable (const xunichar2_t  *commandline,
                              xchar_t           **ex_out,
                              xchar_t           **ex_basename_out,
                              xchar_t           **ex_folded_out,
@@ -270,12 +270,12 @@ _g_win32_extract_executable (const gunichar2  *commandline,
 {
   xchar_t *ex;
   xchar_t *ex_folded;
-  const gunichar2 *first_argument;
-  const gunichar2 *executable;
-  const gunichar2 *executable_basename;
+  const xunichar2_t *first_argument;
+  const xunichar2_t *executable;
+  const xunichar2_t *executable_basename;
   xboolean_t quoted;
   xboolean_t folded;
-  gssize execlen;
+  xssize_t execlen;
 
   _g_win32_parse_filename (commandline, FALSE, &executable, &execlen, &executable_basename, &first_argument);
 
@@ -284,7 +284,7 @@ _g_win32_extract_executable (const gunichar2  *commandline,
   while ((wchar_t) first_argument[0] == L' ')
     first_argument++;
 
-  folded = g_utf16_to_utf8_and_fold (executable, (gssize) execlen, &ex, &ex_folded);
+  folded = xutf16_to_utf8_and_fold (executable, (xssize_t) execlen, &ex, &ex_folded);
   /* This should never fail as @executable has to be valid UTF-16. */
   g_assert (folded);
 
@@ -298,9 +298,9 @@ _g_win32_extract_executable (const gunichar2  *commandline,
    * very exploitable, but MS does that sometimes, so we have
    * to accept that.
    */
-  if ((g_strcmp0 (ex_folded, "rundll32.exe") == 0 ||
-       g_str_has_suffix (ex_folded, "\\rundll32.exe") ||
-       g_str_has_suffix (ex_folded, "/rundll32.exe")) &&
+  if ((xstrcmp0 (ex_folded, "rundll32.exe") == 0 ||
+       xstr_has_suffix (ex_folded, "\\rundll32.exe") ||
+       xstr_has_suffix (ex_folded, "/rundll32.exe")) &&
       first_argument[0] != 0 &&
       dll_function_out != NULL)
     {
@@ -329,10 +329,10 @@ _g_win32_extract_executable (const gunichar2  *commandline,
        * and it also works.
        * Good job, Microsoft!
        */
-      const gunichar2 *filename_end = NULL;
-      gssize filename_len = 0;
-      gssize function_len = 0;
-      const gunichar2 *dllpart;
+      const xunichar2_t *filename_end = NULL;
+      xssize_t filename_len = 0;
+      xssize_t function_len = 0;
+      const xunichar2_t *dllpart;
 
       quoted = FALSE;
 
@@ -343,7 +343,7 @@ _g_win32_extract_executable (const gunichar2  *commandline,
 
       if (filename_end[0] != 0 && filename_len > 0)
         {
-          const gunichar2 *function_begin = filename_end;
+          const xunichar2_t *function_begin = filename_end;
 
           while ((wchar_t) function_begin[0] == L',' || (wchar_t) function_begin[0] == L' ')
             function_begin += 1;
@@ -354,20 +354,20 @@ _g_win32_extract_executable (const gunichar2  *commandline,
               xchar_t *dllpart_utf8_folded;
               xchar_t *function_utf8;
               xboolean_t folded;
-              const gunichar2 *space = g_utf16_wchr (function_begin, L' ');
+              const xunichar2_t *space = xutf16_wchr (function_begin, L' ');
 
               if (space)
                 function_len = space - function_begin;
               else
-                function_len = g_utf16_len (function_begin);
+                function_len = xutf16_len (function_begin);
 
               if (quoted)
                 first_argument += 1;
 
-              folded = g_utf16_to_utf8_and_fold (first_argument, filename_len, &dllpart_utf8, &dllpart_utf8_folded);
+              folded = xutf16_to_utf8_and_fold (first_argument, filename_len, &dllpart_utf8, &dllpart_utf8_folded);
               g_assert (folded);
 
-              function_utf8 = g_utf16_to_utf8 (function_begin, function_len, NULL, NULL, NULL);
+              function_utf8 = xutf16_to_utf8 (function_begin, function_len, NULL, NULL, NULL);
 
               /* We only take this branch when dll_function_out is not NULL */
               *dll_function_out = g_steal_pointer (&function_utf8);
@@ -390,7 +390,7 @@ _g_win32_extract_executable (const gunichar2  *commandline,
   if (ex_out)
     {
       if (ex_basename_out)
-        *ex_basename_out = (xchar_t *) g_utf8_find_basename (ex, -1);
+        *ex_basename_out = (xchar_t *) xutf8_find_basename (ex, -1);
 
       *ex_out = g_steal_pointer (&ex);
     }
@@ -400,7 +400,7 @@ _g_win32_extract_executable (const gunichar2  *commandline,
   if (ex_folded_out)
     {
       if (ex_folded_basename_out)
-        *ex_folded_basename_out = (xchar_t *) g_utf8_find_basename (ex_folded, -1);
+        *ex_folded_basename_out = (xchar_t *) xutf8_find_basename (ex_folded, -1);
 
       *ex_folded_out = g_steal_pointer (&ex_folded);
     }
@@ -430,17 +430,17 @@ _g_win32_extract_executable (const gunichar2  *commandline,
  * it should return a non-null dll_function.
  */
 static void
-_g_win32_fixup_broken_microsoft_rundll_commandline (gunichar2 *commandline)
+_g_win32_fixup_broken_microsoft_rundll_commandline (xunichar2_t *commandline)
 {
-  const gunichar2 *first_argument;
-  gunichar2 *after_first_argument;
+  const xunichar2_t *first_argument;
+  xunichar2_t *after_first_argument;
 
   _g_win32_parse_filename (commandline, FALSE, NULL, NULL, NULL, &first_argument);
 
   while ((wchar_t) first_argument[0] == L' ')
     first_argument++;
 
-  _g_win32_parse_filename (first_argument, TRUE, NULL, NULL, NULL, (const gunichar2 **) &after_first_argument);
+  _g_win32_parse_filename (first_argument, TRUE, NULL, NULL, NULL, (const xunichar2_t **) &after_first_argument);
 
   if ((wchar_t) after_first_argument[0] == L',')
     after_first_argument[0] = 0x0020;

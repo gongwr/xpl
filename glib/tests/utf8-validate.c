@@ -272,58 +272,58 @@ static Test global_test[] = {
 };
 
 static void
-do_test (gconstpointer d)
+do_test (xconstpointer d)
 {
   const Test *test = d;
   const xchar_t *end;
   xboolean_t result;
 
-  result = g_utf8_validate (test->text, test->max_len, &end);
+  result = xutf8_validate (test->text, test->max_len, &end);
 
   g_assert_true (result == test->valid);
   g_assert_cmpint (end - test->text, ==, test->offset);
 
   if (test->max_len < 0)
     {
-      result = g_utf8_validate (test->text, strlen (test->text), &end);
+      result = xutf8_validate (test->text, strlen (test->text), &end);
 
       g_assert_true (result == test->valid);
       g_assert_cmpint (end - test->text, ==, test->offset);
     }
   else
     {
-      result = g_utf8_validate_len (test->text, test->max_len, &end);
+      result = xutf8_validate_len (test->text, test->max_len, &end);
 
       g_assert_true (result == test->valid);
       g_assert_cmpint (end - test->text, ==, test->offset);
     }
 }
 
-/* Test the behaviour of g_utf8_get_char_validated() with various inputs and
+/* Test the behaviour of xutf8_get_char_validated() with various inputs and
  * length restrictions. */
 static void
 test_utf8_get_char_validated (void)
 {
   const struct {
     const xchar_t *buf;
-    gssize max_len;
-    gunichar expected_result;
+    xssize_t max_len;
+    xunichar_t expected_result;
   } test_vectors[] = {
     /* Bug #780095: */
-    { "\xC0\x00_45678", 8, (gunichar) -2 },
-    { "\xC0\x00_45678", -1, (gunichar) -2 },
+    { "\xC0\x00_45678", 8, (xunichar_t) -2 },
+    { "\xC0\x00_45678", -1, (xunichar_t) -2 },
     /* It seems odd that the return value differs with the length input, but
      * that’s how it’s documented: */
-    { "", 0, (gunichar) -2 },
-    { "", -1, (gunichar) 0 },
-    { "\0", 1, (gunichar) -2 },
+    { "", 0, (xunichar_t) -2 },
+    { "", -1, (xunichar_t) 0 },
+    { "\0", 1, (xunichar_t) -2 },
     { "AB\0", 3, 'A' },
     { "A\0B", 3, 'A' },
-    { "\0AB", 3, (gunichar) -2 },
-    { "\xD8\0", 2, (gunichar) -2 },
+    { "\0AB", 3, (xunichar_t) -2 },
+    { "\xD8\0", 2, (xunichar_t) -2 },
     /* Normal inputs: */
-    { "hello", 5, (gunichar) 'h' },
-    { "hello", -1, (gunichar) 'h' },
+    { "hello", 5, (xunichar_t) 'h' },
+    { "hello", -1, (xunichar_t) 'h' },
     { "\xD8\x9F", 2, 0x061F },
     { "\xD8\x9F", -1, 0x061F },
     { "\xD8\x9Fmore", 6, 0x061F },
@@ -338,19 +338,19 @@ test_utf8_get_char_validated (void)
     { "\xF0\x9F\x92\xA9more", 8, 0x1F4A9 },
     { "\xF0\x9F\x92\xA9more", -1, 0x1F4A9 },
     /* Partial unichars: */
-    { "\xD8", -1, (gunichar) -2 },
-    { "\xD8\x9F", 1, (gunichar) -2 },
-    { "\xCE", -1, (gunichar) -2 },
-    { "\xCE", 1, (gunichar) -2 },
+    { "\xD8", -1, (xunichar_t) -2 },
+    { "\xD8\x9F", 1, (xunichar_t) -2 },
+    { "\xCE", -1, (xunichar_t) -2 },
+    { "\xCE", 1, (xunichar_t) -2 },
   };
   xsize_t i;
 
   for (i = 0; i < G_N_ELEMENTS (test_vectors); i++)
     {
-      gunichar actual_result;
+      xunichar_t actual_result;
 
       g_test_message ("Vector %" G_GSIZE_FORMAT, i);
-      actual_result = g_utf8_get_char_validated (test_vectors[i].buf,
+      actual_result = xutf8_get_char_validated (test_vectors[i].buf,
                                                  test_vectors[i].max_len);
       g_assert_cmpint (actual_result, ==, test_vectors[i].expected_result);
     }
@@ -366,7 +366,7 @@ main (int argc, char *argv[])
 
   for (i = 0; global_test[i].text; i++)
     {
-      path = g_strdup_printf ("/utf8/validate/%d", i);
+      path = xstrdup_printf ("/utf8/validate/%d", i);
       g_test_add_data_func (path, &global_test[i], do_test);
       g_free (path);
     }

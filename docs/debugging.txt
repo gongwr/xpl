@@ -33,6 +33,6 @@ Environment variables for debugging
 ===================================
 When G_ENABLE_DEBUG was defined upon compilation, the xobject_t library
 supports an environment variable GOBJECT_DEBUG that can be set to a
-combination of the flags passed in to g_type_init() (currently
+combination of the flags passed in to xtype_init() (currently
 "objects" and "signals") to trigger debugging messages about
 object bookkeeping and signal emissions during runtime.

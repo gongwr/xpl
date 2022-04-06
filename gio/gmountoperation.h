@@ -30,7 +30,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_MOUNT_OPERATION         (g_mount_operation_get_type ())
-#define G_MOUNT_OPERATION(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_MOUNT_OPERATION, xmount_operation_t))
+#define G_MOUNT_OPERATION(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_MOUNT_OPERATION, xmount_operation))
 #define G_MOUNT_OPERATION_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_MOUNT_OPERATION, GMountOperationClass))
 #define X_IS_MOUNT_OPERATION(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_MOUNT_OPERATION))
 #define X_IS_MOUNT_OPERATION_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_MOUNT_OPERATION))
@@ -86,7 +86,7 @@ struct _GMountOperationClass
    * GMountOperationClass::show_processes:
    * @op: a #xmount_operation_t
    * @message: string containing a message to display to the user
-   * @processes: (element-type GPid): an array of #GPid for processes blocking
+   * @processes: (element-type xpid_t): an array of #xpid_t for processes blocking
    *    the operation
    * @choices: (array zero-terminated=1) (element-type utf8): an array of
    *    strings for each possible choice
@@ -97,7 +97,7 @@ struct _GMountOperationClass
    */
   void (* show_processes) (xmount_operation_t      *op,
                            const xchar_t          *message,
-                           GArray               *processes,
+                           xarray_t               *processes,
                            const xchar_t          *choices[]);
 
   void (* show_unmount_progress) (xmount_operation_t *op,

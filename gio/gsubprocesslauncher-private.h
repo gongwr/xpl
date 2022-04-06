@@ -23,11 +23,11 @@
 
 G_BEGIN_DECLS
 
-struct _GSubprocessLauncher
+struct _xsubprocess_launcher
 {
   xobject_t parent;
 
-  GSubprocessFlags flags;
+  xsubprocess_flags_t flags;
   char **envp;
   char *cwd;
 
@@ -41,18 +41,18 @@ struct _GSubprocessLauncher
   xint_t stderr_fd;
   xchar_t *stderr_path;
 
-  GArray *source_fds;  /* GSubprocessLauncher has ownership of the FD elements */
-  GArray *target_fds;  /* always the same length as source_fds; elements are just integers and not FDs in this process */
+  xarray_t *source_fds;  /* xsubprocess_launcher_t has ownership of the FD elements */
+  xarray_t *target_fds;  /* always the same length as source_fds; elements are just integers and not FDs in this process */
   xboolean_t closed_fd;
 
   GSpawnChildSetupFunc child_setup_func;
   xpointer_t child_setup_user_data;
-  GDestroyNotify child_setup_destroy_notify;
+  xdestroy_notify_t child_setup_destroy_notify;
 #endif
 };
 
-void g_subprocess_set_launcher (GSubprocess         *subprocess,
-                                GSubprocessLauncher *launcher);
+void xsubprocess_set_launcher (xsubprocess_t         *subprocess,
+                                xsubprocess_launcher_t *launcher);
 
 G_END_DECLS
 

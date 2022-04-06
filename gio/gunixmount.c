@@ -48,7 +48,7 @@
 struct _GUnixMount {
   xobject_t parent;
 
-  GVolumeMonitor   *volume_monitor;
+  xvolume_monitor_t   *volume_monitor;
 
   GUnixVolume      *volume; /* owned by volume monitor */
 
@@ -77,14 +77,14 @@ g_unix_mount_finalize (xobject_t *object)
   mount = G_UNIX_MOUNT (object);
 
   if (mount->volume_monitor != NULL)
-    g_object_unref (mount->volume_monitor);
+    xobject_unref (mount->volume_monitor);
 
   if (mount->volume)
     _g_unix_volume_unset_mount (mount->volume, mount);
 
   /* TODO: g_warn_if_fail (volume->volume == NULL); */
-  g_object_unref (mount->icon);
-  g_object_unref (mount->symbolic_icon);
+  xobject_unref (mount->icon);
+  xobject_unref (mount->symbolic_icon);
   g_free (mount->name);
   g_free (mount->device_path);
   g_free (mount->mount_path);
@@ -106,7 +106,7 @@ g_unix_mount_init (GUnixMount *unix_mount)
 }
 
 GUnixMount *
-_g_unix_mount_new (GVolumeMonitor  *volume_monitor,
+_g_unix_mount_new (xvolume_monitor_t  *volume_monitor,
                    GUnixMountEntry *mount_entry,
                    GUnixVolume     *volume)
 {
@@ -116,10 +116,10 @@ _g_unix_mount_new (GVolumeMonitor  *volume_monitor,
   if (volume == NULL && !g_unix_mount_guess_should_display (mount_entry))
     return NULL;
 
-  mount = g_object_new (XTYPE_UNIX_MOUNT, NULL);
-  mount->volume_monitor = volume_monitor != NULL ? g_object_ref (volume_monitor) : NULL;
-  mount->device_path = g_strdup (g_unix_mount_get_device_path (mount_entry));
-  mount->mount_path = g_strdup (g_unix_mount_get_mount_path (mount_entry));
+  mount = xobject_new (XTYPE_UNIX_MOUNT, NULL);
+  mount->volume_monitor = volume_monitor != NULL ? xobject_ref (volume_monitor) : NULL;
+  mount->device_path = xstrdup (g_unix_mount_get_device_path (mount_entry));
+  mount->mount_path = xstrdup (g_unix_mount_get_mount_path (mount_entry));
   mount->can_eject = g_unix_mount_guess_can_eject (mount_entry);
 
   mount->name = g_unix_mount_guess_name (mount_entry);
@@ -162,41 +162,41 @@ _g_unix_mount_unset_volume (GUnixMount *mount,
 }
 
 static xfile_t *
-g_unix_mount_get_root (GMount *mount)
+g_unix_mount_get_root (xmount_t *mount)
 {
   GUnixMount *unix_mount = G_UNIX_MOUNT (mount);
 
-  return g_file_new_for_path (unix_mount->mount_path);
+  return xfile_new_for_path (unix_mount->mount_path);
 }
 
 static xicon_t *
-g_unix_mount_get_icon (GMount *mount)
+g_unix_mount_get_icon (xmount_t *mount)
 {
   GUnixMount *unix_mount = G_UNIX_MOUNT (mount);
 
-  return g_object_ref (unix_mount->icon);
+  return xobject_ref (unix_mount->icon);
 }
 
 static xicon_t *
-g_unix_mount_get_symbolic_icon (GMount *mount)
+g_unix_mount_get_symbolic_icon (xmount_t *mount)
 {
   GUnixMount *unix_mount = G_UNIX_MOUNT (mount);
 
-  return g_object_ref (unix_mount->symbolic_icon);
+  return xobject_ref (unix_mount->symbolic_icon);
 }
 
 static char *
-g_unix_mount_get_uuid (GMount *mount)
+g_unix_mount_get_uuid (xmount_t *mount)
 {
   return NULL;
 }
 
 static char *
-g_unix_mount_get_name (GMount *mount)
+g_unix_mount_get_name (xmount_t *mount)
 {
   GUnixMount *unix_mount = G_UNIX_MOUNT (mount);
 
-  return g_strdup (unix_mount->name);
+  return xstrdup (unix_mount->name);
 }
 
 xboolean_t
@@ -207,7 +207,7 @@ _g_unix_mount_has_mount_path (GUnixMount *mount,
 }
 
 static xdrive_t *
-g_unix_mount_get_drive (GMount *mount)
+g_unix_mount_get_drive (xmount_t *mount)
 {
   GUnixMount *unix_mount = G_UNIX_MOUNT (mount);
 
@@ -217,25 +217,25 @@ g_unix_mount_get_drive (GMount *mount)
   return NULL;
 }
 
-static GVolume *
-g_unix_mount_get_volume (GMount *mount)
+static xvolume_t *
+g_unix_mount_get_volume (xmount_t *mount)
 {
   GUnixMount *unix_mount = G_UNIX_MOUNT (mount);
 
   if (unix_mount->volume)
-    return G_VOLUME (g_object_ref (unix_mount->volume));
+    return G_VOLUME (xobject_ref (unix_mount->volume));
 
   return NULL;
 }
 
 static xboolean_t
-g_unix_mount_can_unmount (GMount *mount)
+g_unix_mount_can_unmount (xmount_t *mount)
 {
   return TRUE;
 }
 
 static xboolean_t
-g_unix_mount_can_eject (GMount *mount)
+g_unix_mount_can_eject (xmount_t *mount)
 {
   GUnixMount *unix_mount = G_UNIX_MOUNT (mount);
   return unix_mount->can_eject;
@@ -246,59 +246,59 @@ eject_unmount_done (xobject_t      *source,
                     xasync_result_t *result,
                     xpointer_t      user_data)
 {
-  GSubprocess *subprocess = G_SUBPROCESS (source);
-  GTask *task = user_data;
+  xsubprocess_t *subprocess = G_SUBPROCESS (source);
+  xtask_t *task = user_data;
   xerror_t *error = NULL;
   xchar_t *stderr_str;
 
-  if (!g_subprocess_communicate_utf8_finish (subprocess, result, NULL, &stderr_str, &error))
+  if (!xsubprocess_communicate_utf8_finish (subprocess, result, NULL, &stderr_str, &error))
     {
-      g_task_return_error (task, error);
-      g_error_free (error);
+      xtask_return_error (task, error);
+      xerror_free (error);
     }
   else /* successful communication */
     {
-      if (!g_subprocess_get_successful (subprocess))
+      if (!xsubprocess_get_successful (subprocess))
         /* ...but bad exit code */
-        g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED, "%s", stderr_str);
+        xtask_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED, "%s", stderr_str);
       else
         /* ...and successful exit code */
-        g_task_return_boolean (task, TRUE);
+        xtask_return_boolean (task, TRUE);
 
       g_free (stderr_str);
     }
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 static xboolean_t
 eject_unmount_do_cb (xpointer_t user_data)
 {
-  GTask *task = user_data;
+  xtask_t *task = user_data;
   xerror_t *error = NULL;
-  GSubprocess *subprocess;
+  xsubprocess_t *subprocess;
   const xchar_t **argv;
 
-  argv = g_task_get_task_data (task);
+  argv = xtask_get_task_data (task);
 
-  if (g_task_return_error_if_cancelled (task))
+  if (xtask_return_error_if_cancelled (task))
     {
-      g_object_unref (task);
+      xobject_unref (task);
       return G_SOURCE_REMOVE;
     }
 
-  subprocess = g_subprocess_newv (argv, G_SUBPROCESS_FLAGS_STDOUT_SILENCE | G_SUBPROCESS_FLAGS_STDERR_PIPE, &error);
+  subprocess = xsubprocess_newv (argv, G_SUBPROCESS_FLAGS_STDOUT_SILENCE | G_SUBPROCESS_FLAGS_STDERR_PIPE, &error);
   g_assert_no_error (error);
 
-  g_subprocess_communicate_utf8_async (subprocess, NULL,
-                                       g_task_get_cancellable (task),
+  xsubprocess_communicate_utf8_async (subprocess, NULL,
+                                       xtask_get_cancellable (task),
                                        eject_unmount_done, task);
 
   return G_SOURCE_REMOVE;
 }
 
 static void
-eject_unmount_do (GMount              *mount,
+eject_unmount_do (xmount_t              *mount,
                   xcancellable_t        *cancellable,
                   xasync_ready_callback_t  callback,
                   xpointer_t             user_data,
@@ -306,13 +306,13 @@ eject_unmount_do (GMount              *mount,
                   const xchar_t         *task_name)
 {
   GUnixMount *unix_mount = G_UNIX_MOUNT (mount);
-  GTask *task;
-  GSource *timeout;
+  xtask_t *task;
+  xsource_t *timeout;
 
-  task = g_task_new (mount, cancellable, callback, user_data);
-  g_task_set_source_tag (task, eject_unmount_do);
-  g_task_set_name (task, task_name);
-  g_task_set_task_data (task, g_strdupv (argv), (GDestroyNotify) g_strfreev);
+  task = xtask_new (mount, cancellable, callback, user_data);
+  xtask_set_source_tag (task, eject_unmount_do);
+  xtask_set_name (task, task_name);
+  xtask_set_task_data (task, xstrdupv (argv), (xdestroy_notify_t) xstrfreev);
 
   if (unix_mount->volume_monitor != NULL)
     g_signal_emit_by_name (unix_mount->volume_monitor, "mount-pre-unmount", mount);
@@ -320,12 +320,12 @@ eject_unmount_do (GMount              *mount,
   g_signal_emit_by_name (mount, "pre-unmount", 0);
 
   timeout = g_timeout_source_new (500);
-  g_task_attach_source (task, timeout, (GSourceFunc) eject_unmount_do_cb);
-  g_source_unref (timeout);
+  xtask_attach_source (task, timeout, (xsource_func_t) eject_unmount_do_cb);
+  xsource_unref (timeout);
 }
 
 static void
-g_unix_mount_unmount (GMount             *mount,
+g_unix_mount_unmount (xmount_t             *mount,
                       xmount_unmount_flags_t flags,
                       xcancellable_t        *cancellable,
                       xasync_ready_callback_t  callback,
@@ -343,15 +343,15 @@ g_unix_mount_unmount (GMount             *mount,
 }
 
 static xboolean_t
-g_unix_mount_unmount_finish (GMount       *mount,
+g_unix_mount_unmount_finish (xmount_t       *mount,
                              xasync_result_t  *result,
                              xerror_t       **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 static void
-g_unix_mount_eject (GMount             *mount,
+g_unix_mount_eject (xmount_t             *mount,
                     xmount_unmount_flags_t flags,
                     xcancellable_t        *cancellable,
                     xasync_ready_callback_t  callback,
@@ -369,11 +369,11 @@ g_unix_mount_eject (GMount             *mount,
 }
 
 static xboolean_t
-g_unix_mount_eject_finish (GMount       *mount,
+g_unix_mount_eject_finish (xmount_t       *mount,
                            xasync_result_t  *result,
                            xerror_t       **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 static void

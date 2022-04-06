@@ -23,15 +23,15 @@ msgstr ""
 "Plural-Forms: nplurals=2;plural=(n!=1);\n"
 
 #: gio/gapplication.c:500
-msgid "GApplication options"
+msgid "xapplication_t options"
 msgstr "जि-अनुप्रयोग विकल्पहरू"
 
 #: gio/gapplication.c:500
-msgid "Show GApplication options"
+msgid "Show xapplication_t options"
 msgstr "जि-अनुप्रयोग विकल्पहरू देखाउनुहोस्"
 
 #: gio/gapplication.c:545
-msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
 msgstr ""
 
 #: gio/gapplication.c:557
@@ -270,7 +270,7 @@ msgstr "आधार स्ट्रिममा खोजी समर्थि
 
 #: gio/gbufferedinputstream.c:938
 #, fuzzy
-msgid "Cannot truncate GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
 msgstr "सूपबडीइनपुटस्ट्रीम ट्रंक गर्न सकिँदैन"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1237 gio/giostream.c:300
@@ -343,20 +343,20 @@ msgstr "%s फइल प्रकार"
 
 #: gio/gcredentials.c:323
 #, fuzzy
-msgid "GCredentials contains invalid data"
+msgid "xcredentials_t contains invalid data"
 msgstr "फाइल नाममा अवैध वर्ण"
 
 #: gio/gcredentials.c:383 gio/gcredentials.c:667
 #, fuzzy
-msgid "GCredentials is not implemented on this OS"
+msgid "xcredentials_t is not implemented on this OS"
 msgstr "ओएस्(OS)"
 
 #: gio/gcredentials.c:538 gio/gcredentials.c:556
-msgid "There is no GCredentials support for your platform"
+msgid "There is no xcredentials_t support for your platform"
 msgstr ""
 
 #: gio/gcredentials.c:607
-msgid "GCredentials does not contain a process ID on this OS"
+msgid "xcredentials_t does not contain a process ID on this OS"
 msgstr ""
 
 #: gio/gcredentials.c:661
@@ -522,7 +522,7 @@ msgid "User IDs must be the same for peer and server"
 msgstr ""
 
 #: gio/gdbusauth.c:1182
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
 msgstr ""
 
 #: gio/gdbusauthmechanismsha1.c:298
@@ -1294,27 +1294,27 @@ msgstr "DTLS समर्थन उपलब्ध छैन"
 
 #: gio/gemblem.c:323
 #, fuzzy, c-format
-msgid "Can’t handle version %d of GEmblem encoding"
+msgid "Can’t handle version %d of xemblem_t encoding"
 msgstr "GVfsIcon सङ्केतनको संस्करण %d ह्याण्डल गर्न सकिँदैन"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
 msgstr ""
 
 #: gio/gemblemedicon.c:362
 #, fuzzy, c-format
-msgid "Can’t handle version %d of GEmblemedIcon encoding"
+msgid "Can’t handle version %d of xemblemed_icon_t encoding"
 msgstr "GVfsIcon सङ्केतनको संस्करण %d ह्याण्डल गर्न सकिँदैन"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
 msgstr ""
 
 #: gio/gemblemedicon.c:395
 #, fuzzy
-msgid "Expected a GEmblem for GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
 msgstr "(?( पछि दाबी अपेक्षित"
 
 #. Translators: This is an error message when
@@ -1411,12 +1411,12 @@ msgstr "फाइल गणनाकर्ता पहिले नै बन�
 
 #: gio/gfileicon.c:250
 #, fuzzy, c-format
-msgid "Can’t handle version %d of GFileIcon encoding"
+msgid "Can’t handle version %d of xfile_icon_t encoding"
 msgstr "GVfsIcon सङ्केतनको संस्करण %d ह्याण्डल गर्न सकिँदैन"
 
 #: gio/gfileicon.c:260
 #, fuzzy
-msgid "Malformed input data for GFileIcon"
+msgid "Malformed input data for xfile_icon_t"
 msgstr "क्रमाङ्कन गरिएको डेटा विकृत छ"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
@@ -2085,7 +2085,7 @@ msgstr ""
 
 #: gio/gio-tool-mount.c:75
 #, fuzzy
-#| msgctxt "GDateTime"
+#| msgctxt "xdatetime_t"
 #| msgid "PM"
 msgid "PIM"
 msgstr "_PIM"
@@ -2822,7 +2822,7 @@ msgstr ""
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
@@ -3203,7 +3203,7 @@ msgstr "अवैध खोजी अनुरोध"
 
 #: gio/gmemoryinputstream.c:508
 #, fuzzy
-msgid "Cannot truncate GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
 msgstr "सूपबडीइनपुटस्ट्रीम ट्रंक गर्न सकिँदैन"
 
 #: gio/gmemoryoutputstream.c:567
@@ -3849,7 +3849,7 @@ msgstr "सन्देश पठाउदा त्रुटि: %s"
 
 #: gio/gsocket.c:5026
 #, fuzzy
-msgid "GSocketControlMessage not supported on Windows"
+msgid "xsocket_control_message_t not supported on Windows"
 msgstr "सञ्झ्यालहरू"
 
 #: gio/gsocket.c:5495 gio/gsocket.c:5571 gio/gsocket.c:5797
@@ -3991,7 +3991,7 @@ msgstr "SOCKSv5 प्रोक्सी सँग जडान अस्वी�
 
 #: gio/gthemedicon.c:595
 #, fuzzy, c-format
-msgid "Can’t handle version %d of GThemedIcon encoding"
+msgid "Can’t handle version %d of xthemed_icon_t encoding"
 msgstr "GVfsIcon सङ्केतनको संस्करण %d ह्याण्डल गर्न सकिँदैन"
 
 #: gio/gthreadedresolver.c:152
@@ -4046,7 +4046,7 @@ msgid "Could not parse PEM-encoded certificate"
 msgstr "PEM प्रमाणपत्र पार्स गर्न सकेन:% s"
 
 #: gio/gtlscertificate.c:710
-msgid "This GTlsBackend does not support creating PKCS #11 certificates"
+msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
 msgstr ""
 
 #: gio/gtlspassword.c:111
@@ -4357,25 +4357,25 @@ msgstr "%s भण्डार मूल एउटा सुनिश्चित
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%A %d %b %Y %I:%M:%S %p %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%A %d %b %Y"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%I:%M:%S  %Z"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p %Z"
 
@@ -4758,13 +4758,13 @@ msgstr "डिसेम्बर"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "पूर्वाह्न"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "अपराह्न"
 

@@ -61,15 +61,15 @@ enum {
   LAST_PROP
 };
 
-static GParamSpec *props[LAST_PROP];
+static xparam_spec_t *props[LAST_PROP];
 
 G_DEFINE_TYPE_WITH_PRIVATE (GWin32OutputStream, g_win32_output_stream, XTYPE_OUTPUT_STREAM)
 
 static void
 g_win32_output_stream_set_property (xobject_t         *object,
 				    xuint_t            prop_id,
-				    const GValue    *value,
-				    GParamSpec      *pspec)
+				    const xvalue_t    *value,
+				    xparam_spec_t      *pspec)
 {
   GWin32OutputStream *win32_stream;
 
@@ -78,10 +78,10 @@ g_win32_output_stream_set_property (xobject_t         *object,
   switch (prop_id)
     {
     case PROP_HANDLE:
-      win32_stream->priv->handle = g_value_get_pointer (value);
+      win32_stream->priv->handle = xvalue_get_pointer (value);
       break;
     case PROP_CLOSE_HANDLE:
-      win32_stream->priv->close_handle = g_value_get_boolean (value);
+      win32_stream->priv->close_handle = xvalue_get_boolean (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -92,8 +92,8 @@ g_win32_output_stream_set_property (xobject_t         *object,
 static void
 g_win32_output_stream_get_property (xobject_t    *object,
 				    xuint_t       prop_id,
-				    GValue     *value,
-				    GParamSpec *pspec)
+				    xvalue_t     *value,
+				    xparam_spec_t *pspec)
 {
   GWin32OutputStream *win32_stream;
 
@@ -102,17 +102,17 @@ g_win32_output_stream_get_property (xobject_t    *object,
   switch (prop_id)
     {
     case PROP_HANDLE:
-      g_value_set_pointer (value, win32_stream->priv->handle);
+      xvalue_set_pointer (value, win32_stream->priv->handle);
       break;
     case PROP_CLOSE_HANDLE:
-      g_value_set_boolean (value, win32_stream->priv->close_handle);
+      xvalue_set_boolean (value, win32_stream->priv->close_handle);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
 
-static gssize
+static xssize_t
 g_win32_output_stream_write (xoutput_stream_t  *stream,
 			    const void     *buffer,
 			    xsize_t           count,
@@ -123,7 +123,7 @@ g_win32_output_stream_write (xoutput_stream_t  *stream,
   BOOL res;
   DWORD nbytes, nwritten;
   OVERLAPPED overlap = { 0, };
-  gssize retval = -1;
+  xssize_t retval = -1;
 
   win32_stream = G_WIN32_OUTPUT_STREAM (stream);
 
@@ -202,7 +202,7 @@ g_win32_output_stream_close (xoutput_stream_t  *stream,
 	  g_set_error (error, G_IO_ERROR,
 	               g_io_error_from_errno (errsv),
 	               _("Error closing file descriptor: %s"),
-	               g_strerror (errsv));
+	               xstrerror (errsv));
 	  return FALSE;
 	}
     }
@@ -270,7 +270,7 @@ g_win32_output_stream_class_init (GWin32OutputStreamClass *klass)
                           G_PARAM_WRITABLE |
                           G_PARAM_STATIC_STRINGS);
 
-  g_object_class_install_properties (gobject_class, LAST_PROP, props);
+  xobject_class_install_properties (gobject_class, LAST_PROP, props);
 }
 
 static void
@@ -304,7 +304,7 @@ g_win32_output_stream_new (void    *handle,
 
   g_return_val_if_fail (handle != NULL, NULL);
 
-  stream = g_object_new (XTYPE_WIN32_OUTPUT_STREAM,
+  stream = xobject_new (XTYPE_WIN32_OUTPUT_STREAM,
 			 "handle", handle,
 			 "close-handle", close_handle,
 			 NULL);
@@ -332,7 +332,7 @@ g_win32_output_stream_set_close_handle (GWin32OutputStream *stream,
   if (stream->priv->close_handle != close_handle)
     {
       stream->priv->close_handle = close_handle;
-      g_object_notify (G_OBJECT (stream), "close-handle");
+      xobject_notify (G_OBJECT (stream), "close-handle");
     }
 }
 

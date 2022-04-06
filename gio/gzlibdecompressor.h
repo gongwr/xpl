@@ -31,7 +31,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_ZLIB_DECOMPRESSOR         (g_zlib_decompressor_get_type ())
-#define G_ZLIB_DECOMPRESSOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_ZLIB_DECOMPRESSOR, GZlibDecompressor))
+#define G_ZLIB_DECOMPRESSOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_ZLIB_DECOMPRESSOR, xzlib_decompressor))
 #define G_ZLIB_DECOMPRESSOR_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_ZLIB_DECOMPRESSOR, GZlibDecompressorClass))
 #define X_IS_ZLIB_DECOMPRESSOR(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_ZLIB_DECOMPRESSOR))
 #define X_IS_ZLIB_DECOMPRESSOR_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_ZLIB_DECOMPRESSOR))
@@ -48,10 +48,10 @@ XPL_AVAILABLE_IN_ALL
 xtype_t              g_zlib_decompressor_get_type (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GZlibDecompressor *g_zlib_decompressor_new (GZlibCompressorFormat format);
+xzlib_decompressor_t *g_zlib_decompressor_new (GZlibCompressorFormat format);
 
 XPL_AVAILABLE_IN_ALL
-GFileInfo         *g_zlib_decompressor_get_file_info (GZlibDecompressor *decompressor);
+xfile_info_t         *g_zlib_decompressor_get_file_info (xzlib_decompressor_t *decompressor);
 
 G_END_DECLS
 

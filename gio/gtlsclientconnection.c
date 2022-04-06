@@ -33,12 +33,12 @@
  * @short_description: TLS client-side connection
  * @include: gio/gio.h
  *
- * #GTlsClientConnection is the client-side subclass of
- * #GTlsConnection, representing a client-side TLS connection.
+ * #xtls_client_connection_t is the client-side subclass of
+ * #xtls_connection_t, representing a client-side TLS connection.
  */
 
 /**
- * GTlsClientConnection:
+ * xtls_client_connection_t:
  *
  * Abstract base class for the backend-specific client connection
  * type.
@@ -46,18 +46,18 @@
  * Since: 2.28
  */
 
-G_DEFINE_INTERFACE (GTlsClientConnection, g_tls_client_connection, XTYPE_TLS_CONNECTION)
+G_DEFINE_INTERFACE (xtls_client_connection, xtls_client_connection, XTYPE_TLS_CONNECTION)
 
 static void
-g_tls_client_connection_default_init (GTlsClientConnectionInterface *iface)
+xtls_client_connection_default_init (xtls_client_connection_interface_t *iface)
 {
   /**
-   * GTlsClientConnection:validation-flags:
+   * xtls_client_connection_t:validation-flags:
    *
    * What steps to perform when validating a certificate received from
    * a server. Server certificates that fail to validate in any of the
    * ways indicated here will be rejected unless the application
-   * overrides the default via #GTlsConnection::accept-certificate.
+   * overrides the default via #xtls_connection_t::accept-certificate.
    *
    * GLib guarantees that if certificate verification fails, at least one
    * flag will be set, but it does not guarantee that all possible flags
@@ -69,13 +69,13 @@ g_tls_client_connection_default_init (GTlsClientConnectionInterface *iface)
    * safe way to use this property. This is not a horrible problem,
    * though, because you should not be attempting to ignore validation
    * errors anyway. If you really must ignore TLS certificate errors,
-   * connect to #GTlsConnection::accept-certificate.
+   * connect to #xtls_connection_t::accept-certificate.
    *
    * Since: 2.28
    *
    * Deprecated: 2.72: Do not attempt to ignore validation errors.
    */
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
 				       g_param_spec_flags ("validation-flags",
 							   P_("Validation flags"),
 							   P_("What certificate validation to perform"),
@@ -87,15 +87,15 @@ g_tls_client_connection_default_init (GTlsClientConnectionInterface *iface)
 							   G_PARAM_DEPRECATED));
 
   /**
-   * GTlsClientConnection:server-identity:
+   * xtls_client_connection_t:server-identity:
    *
-   * A #GSocketConnectable describing the identity of the server that
+   * A #xsocket_connectable_t describing the identity of the server that
    * is expected on the other end of the connection.
    *
    * If the %G_TLS_CERTIFICATE_BAD_IDENTITY flag is set in
-   * #GTlsClientConnection:validation-flags, this object will be used
+   * #xtls_client_connection_t:validation-flags, this object will be used
    * to determine the expected identify of the remote end of the
-   * connection; if #GTlsClientConnection:server-identity is not set,
+   * connection; if #xtls_client_connection_t:server-identity is not set,
    * or does not match the identity presented by the server, then the
    * %G_TLS_CERTIFICATE_BAD_IDENTITY validation will fail.
    *
@@ -106,26 +106,26 @@ g_tls_client_connection_default_init (GTlsClientConnectionInterface *iface)
    *
    * Since: 2.28
    */
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
 				       g_param_spec_object ("server-identity",
 							    P_("Server identity"),
-							    P_("GSocketConnectable identifying the server"),
+							    P_("xsocket_connectable_t identifying the server"),
 							    XTYPE_SOCKET_CONNECTABLE,
 							    G_PARAM_READWRITE |
 							    G_PARAM_CONSTRUCT |
 							    G_PARAM_STATIC_STRINGS));
 
   /**
-   * GTlsClientConnection:use-ssl3:
+   * xtls_client_connection_t:use-ssl3:
    *
    * SSL 3.0 is no longer supported. See
-   * g_tls_client_connection_set_use_ssl3() for details.
+   * xtls_client_connection_set_use_ssl3() for details.
    *
    * Since: 2.28
    *
    * Deprecated: 2.56: SSL 3.0 is insecure.
    */
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
 				       g_param_spec_boolean ("use-ssl3",
 							     P_("Use fallback"),
 							     P_("Use fallback version of SSL/TLS rather than most recent version"),
@@ -136,19 +136,19 @@ g_tls_client_connection_default_init (GTlsClientConnectionInterface *iface)
 							     G_PARAM_DEPRECATED));
 
   /**
-   * GTlsClientConnection:accepted-cas: (type GLib.List) (element-type GLib.ByteArray)
+   * xtls_client_connection_t:accepted-cas: (type GLib.List) (element-type GLib.ByteArray)
    *
    * A list of the distinguished names of the Certificate Authorities
    * that the server will accept client certificates signed by. If the
    * server requests a client certificate during the handshake, then
    * this property will be set after the handshake completes.
    *
-   * Each item in the list is a #GByteArray which contains the complete
+   * Each item in the list is a #xbyte_array_t which contains the complete
    * subject DN of the certificate authority.
    *
    * Since: 2.28
    */
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
 				       g_param_spec_pointer ("accepted-cas",
 							     P_("Accepted CAs"),
 							     P_("Distinguished names of the CAs the server accepts certificates from"),
@@ -157,34 +157,34 @@ g_tls_client_connection_default_init (GTlsClientConnectionInterface *iface)
 }
 
 /**
- * g_tls_client_connection_new:
+ * xtls_client_connection_new:
  * @base_io_stream: the #xio_stream_t to wrap
  * @server_identity: (nullable): the expected identity of the server
  * @error: #xerror_t for error reporting, or %NULL to ignore.
  *
- * Creates a new #GTlsClientConnection wrapping @base_io_stream (which
+ * Creates a new #xtls_client_connection_t wrapping @base_io_stream (which
  * must have pollable input and output streams) which is assumed to
  * communicate with the server identified by @server_identity.
  *
- * See the documentation for #GTlsConnection:base-io-stream for restrictions
+ * See the documentation for #xtls_connection_t:base-io-stream for restrictions
  * on when application code can run operations on the @base_io_stream after
  * this function has returned.
  *
- * Returns: (transfer full) (type GTlsClientConnection): the new
- * #GTlsClientConnection, or %NULL on error
+ * Returns: (transfer full) (type xtls_client_connection_t): the new
+ * #xtls_client_connection_t, or %NULL on error
  *
  * Since: 2.28
  */
 xio_stream_t *
-g_tls_client_connection_new (xio_stream_t           *base_io_stream,
-			     GSocketConnectable  *server_identity,
+xtls_client_connection_new (xio_stream_t           *base_io_stream,
+			     xsocket_connectable_t  *server_identity,
 			     xerror_t             **error)
 {
   xobject_t *conn;
-  GTlsBackend *backend;
+  xtls_backend_t *backend;
 
-  backend = g_tls_backend_get_default ();
-  conn = g_initable_new (g_tls_backend_get_client_connection_type (backend),
+  backend = xtls_backend_get_default ();
+  conn = xinitable_new (xtls_backend_get_client_connection_type (backend),
 			 NULL, error,
 			 "base-io-stream", base_io_stream,
 			 "server-identity", server_identity,
@@ -193,13 +193,13 @@ g_tls_client_connection_new (xio_stream_t           *base_io_stream,
 }
 
 /**
- * g_tls_client_connection_get_validation_flags:
- * @conn: the #GTlsClientConnection
+ * xtls_client_connection_get_validation_flags:
+ * @conn: the #xtls_client_connection_t
  *
  * Gets @conn's validation flags
  *
  * This function does not work as originally designed and is impossible
- * to use correctly. See #GTlsClientConnection:validation-flags for more
+ * to use correctly. See #xtls_client_connection_t:validation-flags for more
  * information.
  *
  * Returns: the validation flags
@@ -209,19 +209,19 @@ g_tls_client_connection_new (xio_stream_t           *base_io_stream,
  * Deprecated: 2.72: Do not attempt to ignore validation errors.
  */
 GTlsCertificateFlags
-g_tls_client_connection_get_validation_flags (GTlsClientConnection *conn)
+xtls_client_connection_get_validation_flags (xtls_client_connection_t *conn)
 {
   GTlsCertificateFlags flags = 0;
 
   g_return_val_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn), 0);
 
-  g_object_get (G_OBJECT (conn), "validation-flags", &flags, NULL);
+  xobject_get (G_OBJECT (conn), "validation-flags", &flags, NULL);
   return flags;
 }
 
 /**
- * g_tls_client_connection_set_validation_flags:
- * @conn: the #GTlsClientConnection
+ * xtls_client_connection_set_validation_flags:
+ * @conn: the #xtls_client_connection_t
  * @flags: the #GTlsCertificateFlags to use
  *
  * Sets @conn's validation flags, to override the default set of
@@ -229,7 +229,7 @@ g_tls_client_connection_get_validation_flags (GTlsClientConnection *conn)
  * %G_TLS_CERTIFICATE_VALIDATE_ALL is used.
  *
  * This function does not work as originally designed and is impossible
- * to use correctly. See #GTlsClientConnection:validation-flags for more
+ * to use correctly. See #xtls_client_connection_t:validation-flags for more
  * information.
  *
  * Since: 2.28
@@ -237,43 +237,43 @@ g_tls_client_connection_get_validation_flags (GTlsClientConnection *conn)
  * Deprecated: 2.72: Do not attempt to ignore validation errors.
  */
 void
-g_tls_client_connection_set_validation_flags (GTlsClientConnection  *conn,
+xtls_client_connection_set_validation_flags (xtls_client_connection_t  *conn,
 					      GTlsCertificateFlags   flags)
 {
   g_return_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn));
 
-  g_object_set (G_OBJECT (conn), "validation-flags", flags, NULL);
+  xobject_set (G_OBJECT (conn), "validation-flags", flags, NULL);
 }
 
 /**
- * g_tls_client_connection_get_server_identity:
- * @conn: the #GTlsClientConnection
+ * xtls_client_connection_get_server_identity:
+ * @conn: the #xtls_client_connection_t
  *
  * Gets @conn's expected server identity
  *
- * Returns: (nullable) (transfer none): a #GSocketConnectable describing the
+ * Returns: (nullable) (transfer none): a #xsocket_connectable_t describing the
  * expected server identity, or %NULL if the expected identity is not
  * known.
  *
  * Since: 2.28
  */
-GSocketConnectable *
-g_tls_client_connection_get_server_identity (GTlsClientConnection *conn)
+xsocket_connectable_t *
+xtls_client_connection_get_server_identity (xtls_client_connection_t *conn)
 {
-  GSocketConnectable *identity = NULL;
+  xsocket_connectable_t *identity = NULL;
 
   g_return_val_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn), 0);
 
-  g_object_get (G_OBJECT (conn), "server-identity", &identity, NULL);
+  xobject_get (G_OBJECT (conn), "server-identity", &identity, NULL);
   if (identity)
-    g_object_unref (identity);
+    xobject_unref (identity);
   return identity;
 }
 
 /**
- * g_tls_client_connection_set_server_identity:
- * @conn: the #GTlsClientConnection
- * @identity: a #GSocketConnectable describing the expected server identity
+ * xtls_client_connection_set_server_identity:
+ * @conn: the #xtls_client_connection_t
+ * @identity: a #xsocket_connectable_t describing the expected server identity
  *
  * Sets @conn's expected server identity, which is used both to tell
  * servers on virtual hosts which certificate to present, and also
@@ -283,20 +283,20 @@ g_tls_client_connection_get_server_identity (GTlsClientConnection *conn)
  * Since: 2.28
  */
 void
-g_tls_client_connection_set_server_identity (GTlsClientConnection *conn,
-					     GSocketConnectable   *identity)
+xtls_client_connection_set_server_identity (xtls_client_connection_t *conn,
+					     xsocket_connectable_t   *identity)
 {
   g_return_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn));
 
-  g_object_set (G_OBJECT (conn), "server-identity", identity, NULL);
+  xobject_set (G_OBJECT (conn), "server-identity", identity, NULL);
 }
 
 /**
- * g_tls_client_connection_get_use_ssl3:
- * @conn: the #GTlsClientConnection
+ * xtls_client_connection_get_use_ssl3:
+ * @conn: the #xtls_client_connection_t
  *
  * SSL 3.0 is no longer supported. See
- * g_tls_client_connection_set_use_ssl3() for details.
+ * xtls_client_connection_set_use_ssl3() for details.
  *
  * Returns: %FALSE
  *
@@ -305,19 +305,19 @@ g_tls_client_connection_set_server_identity (GTlsClientConnection *conn,
  * Deprecated: 2.56: SSL 3.0 is insecure.
  */
 xboolean_t
-g_tls_client_connection_get_use_ssl3 (GTlsClientConnection *conn)
+xtls_client_connection_get_use_ssl3 (xtls_client_connection_t *conn)
 {
   xboolean_t use_ssl3 = FALSE;
 
   g_return_val_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn), 0);
 
-  g_object_get (G_OBJECT (conn), "use-ssl3", &use_ssl3, NULL);
+  xobject_get (G_OBJECT (conn), "use-ssl3", &use_ssl3, NULL);
   return FALSE;
 }
 
 /**
- * g_tls_client_connection_set_use_ssl3:
- * @conn: the #GTlsClientConnection
+ * xtls_client_connection_set_use_ssl3:
+ * @conn: the #xtls_client_connection_t
  * @use_ssl3: a #xboolean_t, ignored
  *
  * Since GLib 2.42.1, SSL 3.0 is no longer supported.
@@ -336,47 +336,47 @@ g_tls_client_connection_get_use_ssl3 (GTlsClientConnection *conn)
  * Deprecated: 2.56: SSL 3.0 is insecure.
  */
 void
-g_tls_client_connection_set_use_ssl3 (GTlsClientConnection *conn,
+xtls_client_connection_set_use_ssl3 (xtls_client_connection_t *conn,
 				      xboolean_t              use_ssl3)
 {
   g_return_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn));
 
-  g_object_set (G_OBJECT (conn), "use-ssl3", FALSE, NULL);
+  xobject_set (G_OBJECT (conn), "use-ssl3", FALSE, NULL);
 }
 
 /**
- * g_tls_client_connection_get_accepted_cas:
- * @conn: the #GTlsClientConnection
+ * xtls_client_connection_get_accepted_cas:
+ * @conn: the #xtls_client_connection_t
  *
  * Gets the list of distinguished names of the Certificate Authorities
  * that the server will accept certificates from. This will be set
  * during the TLS handshake if the server requests a certificate.
  * Otherwise, it will be %NULL.
  *
- * Each item in the list is a #GByteArray which contains the complete
+ * Each item in the list is a #xbyte_array_t which contains the complete
  * subject DN of the certificate authority.
  *
- * Returns: (element-type GByteArray) (transfer full): the list of
- * CA DNs. You should unref each element with g_byte_array_unref() and then
- * the free the list with g_list_free().
+ * Returns: (element-type xbyte_array_t) (transfer full): the list of
+ * CA DNs. You should unref each element with xbyte_array_unref() and then
+ * the free the list with xlist_free().
  *
  * Since: 2.28
  */
 xlist_t *
-g_tls_client_connection_get_accepted_cas (GTlsClientConnection *conn)
+xtls_client_connection_get_accepted_cas (xtls_client_connection_t *conn)
 {
   xlist_t *accepted_cas = NULL;
 
   g_return_val_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn), NULL);
 
-  g_object_get (G_OBJECT (conn), "accepted-cas", &accepted_cas, NULL);
+  xobject_get (G_OBJECT (conn), "accepted-cas", &accepted_cas, NULL);
   return accepted_cas;
 }
 
 /**
- * g_tls_client_connection_copy_session_state:
- * @conn: a #GTlsClientConnection
- * @source: a #GTlsClientConnection
+ * xtls_client_connection_copy_session_state:
+ * @conn: a #xtls_client_connection_t
+ * @source: a #xtls_client_connection_t
  *
  * Possibly copies session state from one connection to another, for use
  * in TLS session resumption. This is not normally needed, but may be
@@ -401,7 +401,7 @@ g_tls_client_connection_get_accepted_cas (GTlsClientConnection *conn)
  * without weakening the privacy guarantees normally provided by TLS,
  * without need to call this function. For example, with TLS 1.3,
  * a session ticket will be automatically copied from any
- * #GTlsClientConnection that has previously received session tickets
+ * #xtls_client_connection_t that has previously received session tickets
  * from the server, provided a ticket is available that has not
  * previously been used for session resumption, since session ticket
  * reuse would be a privacy weakness. Using this function causes the
@@ -410,8 +410,8 @@ g_tls_client_connection_get_accepted_cas (GTlsClientConnection *conn)
  * Since: 2.46
  */
 void
-g_tls_client_connection_copy_session_state (GTlsClientConnection *conn,
-                                            GTlsClientConnection *source)
+xtls_client_connection_copy_session_state (xtls_client_connection_t *conn,
+                                            xtls_client_connection_t *source)
 {
   g_return_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn));
   g_return_if_fail (X_IS_TLS_CLIENT_CONNECTION (source));

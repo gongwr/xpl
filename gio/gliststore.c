@@ -27,11 +27,11 @@
 
 /**
  * SECTION:gliststore
- * @title: GListStore
- * @short_description: A simple implementation of #GListModel
+ * @title: xlist_store_t
+ * @short_description: A simple implementation of #xlist_model_t
  * @include: gio/gio.h
  *
- * #GListStore is a simple implementation of #GListModel that stores all
+ * #xlist_store_t is a simple implementation of #xlist_model_t that stores all
  * items in memory.
  *
  * It provides insertions, deletions, and lookups in logarithmic time
@@ -39,9 +39,9 @@
  */
 
 /**
- * GListStore:
+ * xlist_store_t:
  *
- * #GListStore is an opaque data structure and can only be accessed
+ * #xlist_store_t is an opaque data structure and can only be accessed
  * using the following functions.
  **/
 
@@ -50,7 +50,7 @@ struct _GListStore
   xobject_t parent_instance;
 
   xtype_t item_type;
-  GSequence *items;
+  xsequence_t *items;
 
   /* cache */
   xuint_t last_position;
@@ -65,13 +65,13 @@ enum
   N_PROPERTIES
 };
 
-static void g_list_store_iface_init (GListModelInterface *iface);
+static void xlist_store_iface_init (xlist_model_interface_t *iface);
 
-G_DEFINE_TYPE_WITH_CODE (GListStore, g_list_store, XTYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (XTYPE_LIST_MODEL, g_list_store_iface_init));
+G_DEFINE_TYPE_WITH_CODE (xlist_store, xlist_store, XTYPE_OBJECT,
+                         G_IMPLEMENT_INTERFACE (XTYPE_LIST_MODEL, xlist_store_iface_init));
 
 static void
-g_list_store_items_changed (GListStore *store,
+xlist_store_items_changed (xlist_store_t *store,
                             xuint_t       position,
                             xuint_t       removed,
                             xuint_t       added)
@@ -84,31 +84,31 @@ g_list_store_items_changed (GListStore *store,
       store->last_position_valid = FALSE;
     }
 
-  g_list_model_items_changed (G_LIST_MODEL (store), position, removed, added);
+  xlist_model_items_changed (XLIST_MODEL (store), position, removed, added);
 }
 
 static void
-g_list_store_dispose (xobject_t *object)
+xlist_store_dispose (xobject_t *object)
 {
-  GListStore *store = G_LIST_STORE (object);
+  xlist_store_t *store = XLIST_STORE (object);
 
   g_clear_pointer (&store->items, g_sequence_free);
 
-  G_OBJECT_CLASS (g_list_store_parent_class)->dispose (object);
+  G_OBJECT_CLASS (xlist_store_parent_class)->dispose (object);
 }
 
 static void
-g_list_store_get_property (xobject_t    *object,
+xlist_store_get_property (xobject_t    *object,
                            xuint_t       property_id,
-                           GValue     *value,
-                           GParamSpec *pspec)
+                           xvalue_t     *value,
+                           xparam_spec_t *pspec)
 {
-  GListStore *store = G_LIST_STORE (object);
+  xlist_store_t *store = XLIST_STORE (object);
 
   switch (property_id)
     {
     case PROP_ITEM_TYPE:
-      g_value_set_gtype (value, store->item_type);
+      xvalue_set_gtype (value, store->item_type);
       break;
 
     default:
@@ -117,18 +117,18 @@ g_list_store_get_property (xobject_t    *object,
 }
 
 static void
-g_list_store_set_property (xobject_t      *object,
+xlist_store_set_property (xobject_t      *object,
                            xuint_t         property_id,
-                           const GValue *value,
-                           GParamSpec   *pspec)
+                           const xvalue_t *value,
+                           xparam_spec_t   *pspec)
 {
-  GListStore *store = G_LIST_STORE (object);
+  xlist_store_t *store = XLIST_STORE (object);
 
   switch (property_id)
     {
     case PROP_ITEM_TYPE: /* construct-only */
-      g_assert (g_type_is_a (g_value_get_gtype (value), XTYPE_OBJECT));
-      store->item_type = g_value_get_gtype (value);
+      g_assert (xtype_is_a (xvalue_get_gtype (value), XTYPE_OBJECT));
+      store->item_type = xvalue_get_gtype (value);
       break;
 
     default:
@@ -137,48 +137,48 @@ g_list_store_set_property (xobject_t      *object,
 }
 
 static void
-g_list_store_class_init (GListStoreClass *klass)
+xlist_store_class_init (GListStoreClass *klass)
 {
   xobject_class_t *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->dispose = g_list_store_dispose;
-  object_class->get_property = g_list_store_get_property;
-  object_class->set_property = g_list_store_set_property;
+  object_class->dispose = xlist_store_dispose;
+  object_class->get_property = xlist_store_get_property;
+  object_class->set_property = xlist_store_set_property;
 
   /**
-   * GListStore:item-type:
+   * xlist_store_t:item-type:
    *
    * The type of items contained in this list store. Items must be
    * subclasses of #xobject_t.
    *
    * Since: 2.44
    **/
-  g_object_class_install_property (object_class, PROP_ITEM_TYPE,
+  xobject_class_install_property (object_class, PROP_ITEM_TYPE,
     g_param_spec_gtype ("item-type", "", "", XTYPE_OBJECT,
                         G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static xtype_t
-g_list_store_get_item_type (GListModel *list)
+xlist_store_get_item_type (xlist_model_t *list)
 {
-  GListStore *store = G_LIST_STORE (list);
+  xlist_store_t *store = XLIST_STORE (list);
 
   return store->item_type;
 }
 
 static xuint_t
-g_list_store_get_n_items (GListModel *list)
+xlist_store_get_n_items (xlist_model_t *list)
 {
-  GListStore *store = G_LIST_STORE (list);
+  xlist_store_t *store = XLIST_STORE (list);
 
   return g_sequence_get_length (store->items);
 }
 
 static xpointer_t
-g_list_store_get_item (GListModel *list,
+xlist_store_get_item (xlist_model_t *list,
                        xuint_t       position)
 {
-  GListStore *store = G_LIST_STORE (list);
+  xlist_store_t *store = XLIST_STORE (list);
   GSequenceIter *it = NULL;
 
   if (store->last_position_valid)
@@ -201,85 +201,85 @@ g_list_store_get_item (GListModel *list,
   if (g_sequence_iter_is_end (it))
     return NULL;
   else
-    return g_object_ref (g_sequence_get (it));
+    return xobject_ref (g_sequence_get (it));
 }
 
 static void
-g_list_store_iface_init (GListModelInterface *iface)
+xlist_store_iface_init (xlist_model_interface_t *iface)
 {
-  iface->get_item_type = g_list_store_get_item_type;
-  iface->get_n_items = g_list_store_get_n_items;
-  iface->get_item = g_list_store_get_item;
+  iface->get_item_type = xlist_store_get_item_type;
+  iface->get_n_items = xlist_store_get_n_items;
+  iface->get_item = xlist_store_get_item;
 }
 
 static void
-g_list_store_init (GListStore *store)
+xlist_store_init (xlist_store_t *store)
 {
-  store->items = g_sequence_new (g_object_unref);
+  store->items = g_sequence_new (xobject_unref);
   store->last_position = 0;
   store->last_position_valid = FALSE;
 }
 
 /**
- * g_list_store_new:
+ * xlist_store_new:
  * @item_type: the #xtype_t of items in the list
  *
- * Creates a new #GListStore with items of type @item_type. @item_type
+ * Creates a new #xlist_store_t with items of type @item_type. @item_type
  * must be a subclass of #xobject_t.
  *
- * Returns: a new #GListStore
+ * Returns: a new #xlist_store_t
  * Since: 2.44
  */
-GListStore *
-g_list_store_new (xtype_t item_type)
+xlist_store_t *
+xlist_store_new (xtype_t item_type)
 {
   /* We only allow GObjects as item types right now. This might change
    * in the future.
    */
-  g_return_val_if_fail (g_type_is_a (item_type, XTYPE_OBJECT), NULL);
+  g_return_val_if_fail (xtype_is_a (item_type, XTYPE_OBJECT), NULL);
 
-  return g_object_new (XTYPE_LIST_STORE,
+  return xobject_new (XTYPE_LIST_STORE,
                        "item-type", item_type,
                        NULL);
 }
 
 /**
- * g_list_store_insert:
- * @store: a #GListStore
+ * xlist_store_insert:
+ * @store: a #xlist_store_t
  * @position: the position at which to insert the new item
  * @item: (type xobject_t): the new item
  *
  * Inserts @item into @store at @position. @item must be of type
- * #GListStore:item-type or derived from it. @position must be smaller
+ * #xlist_store_t:item-type or derived from it. @position must be smaller
  * than the length of the list, or equal to it to append.
  *
  * This function takes a ref on @item.
  *
- * Use g_list_store_splice() to insert multiple items at the same time
+ * Use xlist_store_splice() to insert multiple items at the same time
  * efficiently.
  *
  * Since: 2.44
  */
 void
-g_list_store_insert (GListStore *store,
+xlist_store_insert (xlist_store_t *store,
                      xuint_t       position,
                      xpointer_t    item)
 {
   GSequenceIter *it;
 
   g_return_if_fail (X_IS_LIST_STORE (store));
-  g_return_if_fail (g_type_is_a (G_OBJECT_TYPE (item), store->item_type));
+  g_return_if_fail (xtype_is_a (G_OBJECT_TYPE (item), store->item_type));
   g_return_if_fail (position <= (xuint_t) g_sequence_get_length (store->items));
 
   it = g_sequence_get_iter_at_pos (store->items, position);
-  g_sequence_insert_before (it, g_object_ref (item));
+  g_sequence_insert_before (it, xobject_ref (item));
 
-  g_list_store_items_changed (store, position, 0, 1);
+  xlist_store_items_changed (store, position, 0, 1);
 }
 
 /**
- * g_list_store_insert_sorted:
- * @store: a #GListStore
+ * xlist_store_insert_sorted:
+ * @store: a #xlist_store_t
  * @item: (type xobject_t): the new item
  * @compare_func: (scope call): pairwise comparison function for sorting
  * @user_data: (closure): user data for @compare_func
@@ -298,7 +298,7 @@ g_list_store_insert (GListStore *store,
  * Since: 2.44
  */
 xuint_t
-g_list_store_insert_sorted (GListStore       *store,
+xlist_store_insert_sorted (xlist_store_t       *store,
                             xpointer_t          item,
                             GCompareDataFunc  compare_func,
                             xpointer_t          user_data)
@@ -307,20 +307,20 @@ g_list_store_insert_sorted (GListStore       *store,
   xuint_t position;
 
   g_return_val_if_fail (X_IS_LIST_STORE (store), 0);
-  g_return_val_if_fail (g_type_is_a (G_OBJECT_TYPE (item), store->item_type), 0);
+  g_return_val_if_fail (xtype_is_a (G_OBJECT_TYPE (item), store->item_type), 0);
   g_return_val_if_fail (compare_func != NULL, 0);
 
-  it = g_sequence_insert_sorted (store->items, g_object_ref (item), compare_func, user_data);
+  it = g_sequence_insert_sorted (store->items, xobject_ref (item), compare_func, user_data);
   position = g_sequence_iter_get_position (it);
 
-  g_list_store_items_changed (store, position, 0, 1);
+  xlist_store_items_changed (store, position, 0, 1);
 
   return position;
 }
 
 /**
- * g_list_store_sort:
- * @store: a #GListStore
+ * xlist_store_sort:
+ * @store: a #xlist_store_t
  * @compare_func: (scope call): pairwise comparison function for sorting
  * @user_data: (closure): user data for @compare_func
  *
@@ -329,7 +329,7 @@ g_list_store_insert_sorted (GListStore       *store,
  * Since: 2.46
  */
 void
-g_list_store_sort (GListStore       *store,
+xlist_store_sort (xlist_store_t       *store,
                    GCompareDataFunc  compare_func,
                    xpointer_t          user_data)
 {
@@ -341,53 +341,53 @@ g_list_store_sort (GListStore       *store,
   g_sequence_sort (store->items, compare_func, user_data);
 
   n_items = g_sequence_get_length (store->items);
-  g_list_store_items_changed (store, 0, n_items, n_items);
+  xlist_store_items_changed (store, 0, n_items, n_items);
 }
 
 /**
- * g_list_store_append:
- * @store: a #GListStore
+ * xlist_store_append:
+ * @store: a #xlist_store_t
  * @item: (type xobject_t): the new item
  *
- * Appends @item to @store. @item must be of type #GListStore:item-type.
+ * Appends @item to @store. @item must be of type #xlist_store_t:item-type.
  *
  * This function takes a ref on @item.
  *
- * Use g_list_store_splice() to append multiple items at the same time
+ * Use xlist_store_splice() to append multiple items at the same time
  * efficiently.
  *
  * Since: 2.44
  */
 void
-g_list_store_append (GListStore *store,
+xlist_store_append (xlist_store_t *store,
                      xpointer_t    item)
 {
   xuint_t n_items;
 
   g_return_if_fail (X_IS_LIST_STORE (store));
-  g_return_if_fail (g_type_is_a (G_OBJECT_TYPE (item), store->item_type));
+  g_return_if_fail (xtype_is_a (G_OBJECT_TYPE (item), store->item_type));
 
   n_items = g_sequence_get_length (store->items);
-  g_sequence_append (store->items, g_object_ref (item));
+  g_sequence_append (store->items, xobject_ref (item));
 
-  g_list_store_items_changed (store, n_items, 0, 1);
+  xlist_store_items_changed (store, n_items, 0, 1);
 }
 
 /**
- * g_list_store_remove:
- * @store: a #GListStore
+ * xlist_store_remove:
+ * @store: a #xlist_store_t
  * @position: the position of the item that is to be removed
  *
  * Removes the item from @store that is at @position. @position must be
  * smaller than the current length of the list.
  *
- * Use g_list_store_splice() to remove multiple items at the same time
+ * Use xlist_store_splice() to remove multiple items at the same time
  * efficiently.
  *
  * Since: 2.44
  */
 void
-g_list_store_remove (GListStore *store,
+xlist_store_remove (xlist_store_t *store,
                      xuint_t       position)
 {
   GSequenceIter *it;
@@ -398,19 +398,19 @@ g_list_store_remove (GListStore *store,
   g_return_if_fail (!g_sequence_iter_is_end (it));
 
   g_sequence_remove (it);
-  g_list_store_items_changed (store, position, 1, 0);
+  xlist_store_items_changed (store, position, 1, 0);
 }
 
 /**
- * g_list_store_remove_all:
- * @store: a #GListStore
+ * xlist_store_remove_all:
+ * @store: a #xlist_store_t
  *
  * Removes all items from @store.
  *
  * Since: 2.44
  */
 void
-g_list_store_remove_all (GListStore *store)
+xlist_store_remove_all (xlist_store_t *store)
 {
   xuint_t n_items;
 
@@ -420,12 +420,12 @@ g_list_store_remove_all (GListStore *store)
   g_sequence_remove_range (g_sequence_get_begin_iter (store->items),
                            g_sequence_get_end_iter (store->items));
 
-  g_list_store_items_changed (store, 0, n_items, 0);
+  xlist_store_items_changed (store, 0, n_items, 0);
 }
 
 /**
- * g_list_store_splice:
- * @store: a #GListStore
+ * xlist_store_splice:
+ * @store: a #xlist_store_t
  * @position: the position at which to make the change
  * @n_removals: the number of items to remove
  * @additions: (array length=n_additions) (element-type xobject_t): the items to add
@@ -433,11 +433,11 @@ g_list_store_remove_all (GListStore *store)
  *
  * Changes @store by removing @n_removals items and adding @n_additions
  * items to it. @additions must contain @n_additions items of type
- * #GListStore:item-type.  %NULL is not permitted.
+ * #xlist_store_t:item-type.  %NULL is not permitted.
  *
- * This function is more efficient than g_list_store_insert() and
- * g_list_store_remove(), because it only emits
- * #GListModel::items-changed once for the change.
+ * This function is more efficient than xlist_store_insert() and
+ * xlist_store_remove(), because it only emits
+ * #xlist_model_t::items-changed once for the change.
  *
  * This function takes a ref on each item in @additions.
  *
@@ -448,7 +448,7 @@ g_list_store_remove_all (GListStore *store)
  * Since: 2.44
  */
 void
-g_list_store_splice (GListStore *store,
+xlist_store_splice (xlist_store_t *store,
                      xuint_t       position,
                      xuint_t       n_removals,
                      xpointer_t   *additions,
@@ -481,23 +481,23 @@ g_list_store_splice (GListStore *store,
 
       for (i = 0; i < n_additions; i++)
         {
-          if G_UNLIKELY (!g_type_is_a (G_OBJECT_TYPE (additions[i]), store->item_type))
+          if G_UNLIKELY (!xtype_is_a (G_OBJECT_TYPE (additions[i]), store->item_type))
             {
-              g_critical ("%s: item %d is a %s instead of a %s.  GListStore is now in an undefined state.",
-                          G_STRFUNC, i, G_OBJECT_TYPE_NAME (additions[i]), g_type_name (store->item_type));
+              g_critical ("%s: item %d is a %s instead of a %s.  xlist_store_t is now in an undefined state.",
+                          G_STRFUNC, i, G_OBJECT_TYPE_NAME (additions[i]), xtype_name (store->item_type));
               return;
             }
 
-          g_sequence_insert_before (it, g_object_ref (additions[i]));
+          g_sequence_insert_before (it, xobject_ref (additions[i]));
         }
     }
 
-  g_list_store_items_changed (store, position, n_removals, n_additions);
+  xlist_store_items_changed (store, position, n_removals, n_additions);
 }
 
 /**
- * g_list_store_find_with_equal_func:
- * @store: a #GListStore
+ * xlist_store_find_with_equal_func:
+ * @store: a #xlist_store_t
  * @item: (type xobject_t): an item
  * @equal_func: (scope call): A custom equality check function
  * @position: (out) (optional): the first position of @item, if it was found.
@@ -513,7 +513,7 @@ g_list_store_splice (GListStore *store,
  * Since: 2.64
  */
 xboolean_t
-g_list_store_find_with_equal_func (GListStore *store,
+xlist_store_find_with_equal_func (xlist_store_t *store,
                                    xpointer_t    item,
                                    GEqualFunc  equal_func,
                                    xuint_t      *position)
@@ -521,7 +521,7 @@ g_list_store_find_with_equal_func (GListStore *store,
   GSequenceIter *iter, *begin, *end;
 
   g_return_val_if_fail (X_IS_LIST_STORE (store), FALSE);
-  g_return_val_if_fail (g_type_is_a (G_OBJECT_TYPE (item), store->item_type),
+  g_return_val_if_fail (xtype_is_a (G_OBJECT_TYPE (item), store->item_type),
                         FALSE);
   g_return_val_if_fail (equal_func != NULL, FALSE);
 
@@ -550,8 +550,8 @@ g_list_store_find_with_equal_func (GListStore *store,
 }
 
 /**
- * g_list_store_find:
- * @store: a #GListStore
+ * xlist_store_find:
+ * @store: a #xlist_store_t
  * @item: (type xobject_t): an item
  * @position: (out) (optional): the first position of @item, if it was found.
  *
@@ -560,7 +560,7 @@ g_list_store_find_with_equal_func (GListStore *store,
  * not be set, and this method will return %FALSE.
  *
  * If you need to compare the two items with a custom comparison function, use
- * g_list_store_find_with_equal_func() with a custom #GEqualFunc instead.
+ * xlist_store_find_with_equal_func() with a custom #GEqualFunc instead.
  *
  * Returns: Whether @store contains @item. If it was found, @position will be
  * set to the position where @item occurred for the first time.
@@ -568,11 +568,11 @@ g_list_store_find_with_equal_func (GListStore *store,
  * Since: 2.64
  */
 xboolean_t
-g_list_store_find (GListStore *store,
+xlist_store_find (xlist_store_t *store,
                    xpointer_t    item,
                    xuint_t      *position)
 {
-  return g_list_store_find_with_equal_func (store,
+  return xlist_store_find_with_equal_func (store,
                                             item,
                                             g_direct_equal,
                                             position);

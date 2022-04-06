@@ -34,11 +34,11 @@ typedef GSettingsBackendClass            GNextstepSettingsBackendClass;
 
 struct _GNextstepSettingsBackend
 {
-  GSettingsBackend  parent_instance;
+  xsettings_backend_t  parent_instance;
 
   /*< private >*/
   NSUserDefaults   *user_defaults;
-  GMutex            mutex;
+  xmutex_t            mutex;
 };
 
 G_DEFINE_TYPE_WITH_CODE (GNextstepSettingsBackend,
@@ -49,36 +49,36 @@ G_DEFINE_TYPE_WITH_CODE (GNextstepSettingsBackend,
 
 static void          g_nextstep_settings_backend_finalize       (xobject_t            *backend);
 
-static xvariant_t *    g_nextstep_settings_backend_read           (GSettingsBackend   *backend,
+static xvariant_t *    g_nextstep_settings_backend_read           (xsettings_backend_t   *backend,
                                                                  const xchar_t        *key,
                                                                  const xvariant_type_t *expected_type,
                                                                  xboolean_t            default_value);
 
-static xboolean_t      g_nextstep_settings_backend_get_writable   (GSettingsBackend   *backend,
+static xboolean_t      g_nextstep_settings_backend_get_writable   (xsettings_backend_t   *backend,
                                                                  const xchar_t        *key);
 
-static xboolean_t      g_nextstep_settings_backend_write          (GSettingsBackend   *backend,
+static xboolean_t      g_nextstep_settings_backend_write          (xsettings_backend_t   *backend,
                                                                  const xchar_t        *key,
                                                                  xvariant_t           *value,
                                                                  xpointer_t            origin_tag);
 
-static xboolean_t      g_nextstep_settings_backend_write_tree     (GSettingsBackend   *backend,
-                                                                 GTree              *tree,
+static xboolean_t      g_nextstep_settings_backend_write_tree     (xsettings_backend_t   *backend,
+                                                                 xtree_t              *tree,
                                                                  xpointer_t            origin_tag);
 
-static void          g_nextstep_settings_backend_reset          (GSettingsBackend   *backend,
+static void          g_nextstep_settings_backend_reset          (xsettings_backend_t   *backend,
                                                                  const xchar_t        *key,
                                                                  xpointer_t            origin_tag);
 
-static void          g_nextstep_settings_backend_subscribe      (GSettingsBackend   *backend,
+static void          g_nextstep_settings_backend_subscribe      (xsettings_backend_t   *backend,
                                                                  const xchar_t        *name);
 
-static void          g_nextstep_settings_backend_unsubscribe    (GSettingsBackend   *backend,
+static void          g_nextstep_settings_backend_unsubscribe    (xsettings_backend_t   *backend,
                                                                  const xchar_t        *name);
 
-static void          g_nextstep_settings_backend_sync           (GSettingsBackend   *backend);
+static void          g_nextstep_settings_backend_sync           (xsettings_backend_t   *backend);
 
-static GPermission * g_nextstep_settings_backend_get_permission (GSettingsBackend   *backend,
+static xpermission_t * g_nextstep_settings_backend_get_permission (xsettings_backend_t   *backend,
                                                                  const xchar_t        *path);
 
 static xboolean_t      g_nextstep_settings_backend_write_pair     (xpointer_t            name,
@@ -137,7 +137,7 @@ g_nextstep_settings_backend_finalize (xobject_t *self)
 }
 
 static xvariant_t *
-g_nextstep_settings_backend_read (GSettingsBackend   *backend,
+g_nextstep_settings_backend_read (xsettings_backend_t   *backend,
                                   const xchar_t        *key,
                                   const xvariant_type_t *expected_type,
                                   xboolean_t            default_value)
@@ -166,14 +166,14 @@ g_nextstep_settings_backend_read (GSettingsBackend   *backend,
 }
 
 static xboolean_t
-g_nextstep_settings_backend_get_writable (GSettingsBackend *backend,
+g_nextstep_settings_backend_get_writable (xsettings_backend_t *backend,
                                           const xchar_t      *key)
 {
   return TRUE;
 }
 
 static xboolean_t
-g_nextstep_settings_backend_write (GSettingsBackend *backend,
+g_nextstep_settings_backend_write (xsettings_backend_t *backend,
                                    const xchar_t      *key,
                                    xvariant_t         *value,
                                    xpointer_t          origin_tag)
@@ -195,8 +195,8 @@ g_nextstep_settings_backend_write (GSettingsBackend *backend,
 }
 
 static xboolean_t
-g_nextstep_settings_backend_write_tree (GSettingsBackend *backend,
-                                        GTree            *tree,
+g_nextstep_settings_backend_write_tree (xsettings_backend_t *backend,
+                                        xtree_t            *tree,
                                         xpointer_t          origin_tag)
 {
   GNextstepSettingsBackend *self = G_NEXTSTEP_SETTINGS_BACKEND (backend);
@@ -205,7 +205,7 @@ g_nextstep_settings_backend_write_tree (GSettingsBackend *backend,
   pool = [[NSAutoreleasePool alloc] init];
 
   g_mutex_lock (&self->mutex);
-  g_tree_foreach (tree, g_nextstep_settings_backend_write_pair, self);
+  xtree_foreach (tree, g_nextstep_settings_backend_write_pair, self);
   g_mutex_unlock (&self->mutex);
   g_settings_backend_changed_tree (backend, tree, origin_tag);
 
@@ -215,7 +215,7 @@ g_nextstep_settings_backend_write_tree (GSettingsBackend *backend,
 }
 
 static void
-g_nextstep_settings_backend_reset (GSettingsBackend *backend,
+g_nextstep_settings_backend_reset (xsettings_backend_t *backend,
                                    const xchar_t      *key,
                                    xpointer_t          origin_tag)
 {
@@ -236,19 +236,19 @@ g_nextstep_settings_backend_reset (GSettingsBackend *backend,
 }
 
 static void
-g_nextstep_settings_backend_subscribe (GSettingsBackend *backend,
+g_nextstep_settings_backend_subscribe (xsettings_backend_t *backend,
                                        const xchar_t      *name)
 {
 }
 
 static void
-g_nextstep_settings_backend_unsubscribe (GSettingsBackend *backend,
+g_nextstep_settings_backend_unsubscribe (xsettings_backend_t *backend,
                                          const xchar_t      *name)
 {
 }
 
 static void
-g_nextstep_settings_backend_sync (GSettingsBackend *backend)
+g_nextstep_settings_backend_sync (xsettings_backend_t *backend)
 {
   GNextstepSettingsBackend *self = G_NEXTSTEP_SETTINGS_BACKEND (backend);
   NSAutoreleasePool *pool;
@@ -262,8 +262,8 @@ g_nextstep_settings_backend_sync (GSettingsBackend *backend)
   [pool drain];
 }
 
-static GPermission *
-g_nextstep_settings_backend_get_permission (GSettingsBackend *backend,
+static xpermission_t *
+g_nextstep_settings_backend_get_permission (xsettings_backend_t *backend,
                                             const xchar_t      *path)
 {
   return g_simple_permission_new (TRUE);
@@ -291,29 +291,29 @@ g_nextstep_settings_backend_get_g_variant (id                  object,
                                            const xvariant_type_t *type)
 {
   if ([object isKindOfClass:[NSData class]])
-    return g_variant_parse (type, [[[[NSString alloc] initWithData:object encoding:NSUTF8StringEncoding] autorelease] UTF8String], NULL, NULL, NULL);
+    return xvariant_parse (type, [[[[NSString alloc] initWithData:object encoding:NSUTF8StringEncoding] autorelease] UTF8String], NULL, NULL, NULL);
   else if ([object isKindOfClass:[NSNumber class]])
     {
-      if (g_variant_type_equal (type, G_VARIANT_TYPE_BOOLEAN))
-        return g_variant_new_boolean ([object boolValue]);
-      else if (g_variant_type_equal (type, G_VARIANT_TYPE_BYTE))
-        return g_variant_new_byte ([object unsignedCharValue]);
-      else if (g_variant_type_equal (type, G_VARIANT_TYPE_INT16))
-        return g_variant_new_int16 ([object shortValue]);
-      else if (g_variant_type_equal (type, G_VARIANT_TYPE_UINT16))
-        return g_variant_new_uint16 ([object unsignedShortValue]);
-      else if (g_variant_type_equal (type, G_VARIANT_TYPE_INT32))
-        return g_variant_new_int32 ([object longValue]);
-      else if (g_variant_type_equal (type, G_VARIANT_TYPE_UINT32))
-        return g_variant_new_uint32 ([object unsignedLongValue]);
-      else if (g_variant_type_equal (type, G_VARIANT_TYPE_INT64))
-        return g_variant_new_int64 ([object longLongValue]);
-      else if (g_variant_type_equal (type, G_VARIANT_TYPE_UINT64))
-        return g_variant_new_uint64 ([object unsignedLongLongValue]);
-      else if (g_variant_type_equal (type, G_VARIANT_TYPE_HANDLE))
-        return g_variant_new_handle ([object longValue]);
-      else if (g_variant_type_equal (type, G_VARIANT_TYPE_DOUBLE))
-        return g_variant_new_double ([object doubleValue]);
+      if (xvariant_type_equal (type, G_VARIANT_TYPE_BOOLEAN))
+        return xvariant_new_boolean ([object boolValue]);
+      else if (xvariant_type_equal (type, G_VARIANT_TYPE_BYTE))
+        return xvariant_new_byte ([object unsignedCharValue]);
+      else if (xvariant_type_equal (type, G_VARIANT_TYPE_INT16))
+        return xvariant_new_int16 ([object shortValue]);
+      else if (xvariant_type_equal (type, G_VARIANT_TYPE_UINT16))
+        return xvariant_new_uint16 ([object unsignedShortValue]);
+      else if (xvariant_type_equal (type, G_VARIANT_TYPE_INT32))
+        return xvariant_new_int32 ([object longValue]);
+      else if (xvariant_type_equal (type, G_VARIANT_TYPE_UINT32))
+        return xvariant_new_uint32 ([object unsignedLongValue]);
+      else if (xvariant_type_equal (type, G_VARIANT_TYPE_INT64))
+        return xvariant_new_int64 ([object longLongValue]);
+      else if (xvariant_type_equal (type, G_VARIANT_TYPE_UINT64))
+        return xvariant_new_uint64 ([object unsignedLongLongValue]);
+      else if (xvariant_type_equal (type, G_VARIANT_TYPE_HANDLE))
+        return xvariant_new_handle ([object longValue]);
+      else if (xvariant_type_equal (type, G_VARIANT_TYPE_DOUBLE))
+        return xvariant_new_double ([object doubleValue]);
     }
   else if ([object isKindOfClass:[NSString class]])
     {
@@ -321,26 +321,26 @@ g_nextstep_settings_backend_get_g_variant (id                  object,
 
       string = [object UTF8String];
 
-      if (g_variant_type_equal (type, G_VARIANT_TYPE_STRING))
-        return g_variant_new_string (string);
-      else if (g_variant_type_equal (type, G_VARIANT_TYPE_OBJECT_PATH))
-        return g_variant_is_object_path (string) ?
-               g_variant_new_object_path (string) : NULL;
-      else if (g_variant_type_equal (type, G_VARIANT_TYPE_SIGNATURE))
-        return g_variant_is_signature (string) ?
-               g_variant_new_signature (string) : NULL;
+      if (xvariant_type_equal (type, G_VARIANT_TYPE_STRING))
+        return xvariant_new_string (string);
+      else if (xvariant_type_equal (type, G_VARIANT_TYPE_OBJECT_PATH))
+        return xvariant_is_object_path (string) ?
+               xvariant_new_object_path (string) : NULL;
+      else if (xvariant_type_equal (type, G_VARIANT_TYPE_SIGNATURE))
+        return xvariant_is_signature (string) ?
+               xvariant_new_signature (string) : NULL;
     }
   else if ([object isKindOfClass:[NSDictionary class]])
     {
-      if (g_variant_type_is_subtype_of (type, G_VARIANT_TYPE ("a{s*}")))
+      if (xvariant_type_is_subtype_of (type, G_VARIANT_TYPE ("a{s*}")))
         {
           const xvariant_type_t *value_type;
-          GVariantBuilder builder;
+          xvariant_builder_t builder;
           NSString *key;
 
-          value_type = g_variant_type_value (g_variant_type_element (type));
+          value_type = xvariant_type_value (xvariant_type_element (type));
 
-          g_variant_builder_init (&builder, type);
+          xvariant_builder_init (&builder, type);
 
 #if MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
           for(key in object)
@@ -354,34 +354,34 @@ g_nextstep_settings_backend_get_g_variant (id                  object,
               xvariant_t *variant;
               xvariant_t *entry;
 
-              name = g_variant_new_string ([key UTF8String]);
+              name = xvariant_new_string ([key UTF8String]);
               value = [object objectForKey:key];
               variant = g_nextstep_settings_backend_get_g_variant (value, value_type);
 
               if (variant == NULL)
                 {
-                  g_variant_builder_clear (&builder);
+                  xvariant_builder_clear (&builder);
 
                   return NULL;
                 }
 
-              entry = g_variant_new_dict_entry (name, variant);
-              g_variant_builder_add_value (&builder, entry);
+              entry = xvariant_new_dict_entry (name, variant);
+              xvariant_builder_add_value (&builder, entry);
             }
 
-          return g_variant_builder_end (&builder);
+          return xvariant_builder_end (&builder);
         }
     }
   else if ([object isKindOfClass:[NSArray class]])
     {
-      if (g_variant_type_is_subtype_of (type, G_VARIANT_TYPE_ARRAY))
+      if (xvariant_type_is_subtype_of (type, G_VARIANT_TYPE_ARRAY))
         {
           const xvariant_type_t *value_type;
-          GVariantBuilder builder;
+          xvariant_builder_t builder;
           id value;
 
-          value_type = g_variant_type_element (type);
-          g_variant_builder_init (&builder, type);
+          value_type = xvariant_type_element (type);
+          xvariant_builder_init (&builder, type);
 
 #if MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
           for(value in object)
@@ -394,15 +394,15 @@ g_nextstep_settings_backend_get_g_variant (id                  object,
 
               if (variant == NULL)
                 {
-                  g_variant_builder_clear (&builder);
+                  xvariant_builder_clear (&builder);
 
                   return NULL;
                 }
 
-              g_variant_builder_add_value (&builder, variant);
+              xvariant_builder_add_value (&builder, variant);
             }
 
-          return g_variant_builder_end (&builder);
+          return xvariant_builder_end (&builder);
         }
     }
 
@@ -414,42 +414,42 @@ g_nextstep_settings_backend_get_ns_object (xvariant_t *variant)
 {
   if (variant == NULL)
     return nil;
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_BOOLEAN))
-    return [NSNumber numberWithBool:g_variant_get_boolean (variant)];
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_BYTE))
-    return [NSNumber numberWithUnsignedChar:g_variant_get_byte (variant)];
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_INT16))
-    return [NSNumber numberWithShort:g_variant_get_int16 (variant)];
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_UINT16))
-    return [NSNumber numberWithUnsignedShort:g_variant_get_uint16 (variant)];
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_INT32))
-    return [NSNumber numberWithLong:g_variant_get_int32 (variant)];
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_UINT32))
-    return [NSNumber numberWithUnsignedLong:g_variant_get_uint32 (variant)];
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_INT64))
-    return [NSNumber numberWithLongLong:g_variant_get_int64 (variant)];
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_UINT64))
-    return [NSNumber numberWithUnsignedLongLong:g_variant_get_uint64 (variant)];
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_HANDLE))
-    return [NSNumber numberWithLong:g_variant_get_handle (variant)];
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_DOUBLE))
-    return [NSNumber numberWithDouble:g_variant_get_double (variant)];
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_STRING))
-    return [NSString stringWithUTF8String:g_variant_get_string (variant, NULL)];
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_OBJECT_PATH))
-    return [NSString stringWithUTF8String:g_variant_get_string (variant, NULL)];
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_SIGNATURE))
-    return [NSString stringWithUTF8String:g_variant_get_string (variant, NULL)];
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE ("a{s*}")))
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_BOOLEAN))
+    return [NSNumber numberWithBool:xvariant_get_boolean (variant)];
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_BYTE))
+    return [NSNumber numberWithUnsignedChar:xvariant_get_byte (variant)];
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_INT16))
+    return [NSNumber numberWithShort:xvariant_get_int16 (variant)];
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_UINT16))
+    return [NSNumber numberWithUnsignedShort:xvariant_get_uint16 (variant)];
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_INT32))
+    return [NSNumber numberWithLong:xvariant_get_int32 (variant)];
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_UINT32))
+    return [NSNumber numberWithUnsignedLong:xvariant_get_uint32 (variant)];
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_INT64))
+    return [NSNumber numberWithLongLong:xvariant_get_int64 (variant)];
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_UINT64))
+    return [NSNumber numberWithUnsignedLongLong:xvariant_get_uint64 (variant)];
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_HANDLE))
+    return [NSNumber numberWithLong:xvariant_get_handle (variant)];
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_DOUBLE))
+    return [NSNumber numberWithDouble:xvariant_get_double (variant)];
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_STRING))
+    return [NSString stringWithUTF8String:xvariant_get_string (variant, NULL)];
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_OBJECT_PATH))
+    return [NSString stringWithUTF8String:xvariant_get_string (variant, NULL)];
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_SIGNATURE))
+    return [NSString stringWithUTF8String:xvariant_get_string (variant, NULL)];
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE ("a{s*}")))
     {
       NSMutableDictionary *dictionary;
-      GVariantIter iter;
+      xvariant_iter_t iter;
       const xchar_t *name;
       xvariant_t *value;
 
-      dictionary = [NSMutableDictionary dictionaryWithCapacity:g_variant_iter_init (&iter, variant)];
+      dictionary = [NSMutableDictionary dictionaryWithCapacity:xvariant_iter_init (&iter, variant)];
 
-      while (g_variant_iter_loop (&iter, "{&s*}", &name, &value))
+      while (xvariant_iter_loop (&iter, "{&s*}", &name, &value))
         {
           NSString *key;
           id object;
@@ -462,19 +462,19 @@ g_nextstep_settings_backend_get_ns_object (xvariant_t *variant)
 
       return dictionary;
     }
-  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_ARRAY))
+  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_ARRAY))
     {
       NSMutableArray *array;
-      GVariantIter iter;
+      xvariant_iter_t iter;
       xvariant_t *value;
 
-      array = [NSMutableArray arrayWithCapacity:g_variant_iter_init (&iter, variant)];
+      array = [NSMutableArray arrayWithCapacity:xvariant_iter_init (&iter, variant)];
 
-      while ((value = g_variant_iter_next_value (&iter)) != NULL)
+      while ((value = xvariant_iter_next_value (&iter)) != NULL)
         [array addObject:g_nextstep_settings_backend_get_ns_object (value)];
 
       return array;
     }
   else
-    return [[NSString stringWithUTF8String:g_variant_print (variant, TRUE)] dataUsingEncoding:NSUTF8StringEncoding];
+    return [[NSString stringWithUTF8String:xvariant_print (variant, TRUE)] dataUsingEncoding:NSUTF8StringEncoding];
 }

@@ -72,7 +72,7 @@ typedef enum
  */
 #define G_CONVERT_ERROR g_convert_error_quark()
 XPL_AVAILABLE_IN_ALL
-GQuark g_convert_error_quark (void);
+xquark g_convert_error_quark (void);
 
 /**
  * GIConv: (skip)
@@ -97,7 +97,7 @@ xint_t   g_iconv_close  (GIConv        converter);
 
 XPL_AVAILABLE_IN_ALL
 xchar_t* g_convert               (const xchar_t  *str,
-				gssize        len,
+				xssize_t        len,
 				const xchar_t  *to_codeset,
 				const xchar_t  *from_codeset,
 				xsize_t        *bytes_read,
@@ -105,14 +105,14 @@ xchar_t* g_convert               (const xchar_t  *str,
 				xerror_t      **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
 xchar_t* g_convert_with_iconv    (const xchar_t  *str,
-				gssize        len,
+				xssize_t        len,
 				GIConv        converter,
 				xsize_t        *bytes_read,
 				xsize_t        *bytes_written,
 				xerror_t      **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
 xchar_t* g_convert_with_fallback (const xchar_t  *str,
-				gssize        len,
+				xssize_t        len,
 				const xchar_t  *to_codeset,
 				const xchar_t  *from_codeset,
 				const xchar_t  *fallback,
@@ -125,13 +125,13 @@ xchar_t* g_convert_with_fallback (const xchar_t  *str,
  */
 XPL_AVAILABLE_IN_ALL
 xchar_t* g_locale_to_utf8   (const xchar_t  *opsysstring,
-			   gssize        len,
+			   xssize_t        len,
 			   xsize_t        *bytes_read,
 			   xsize_t        *bytes_written,
 			   xerror_t      **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
 xchar_t* g_locale_from_utf8 (const xchar_t  *utf8string,
-			   gssize        len,
+			   xssize_t        len,
 			   xsize_t        *bytes_read,
 			   xsize_t        *bytes_written,
 			   xerror_t      **error) G_GNUC_MALLOC;
@@ -140,37 +140,37 @@ xchar_t* g_locale_from_utf8 (const xchar_t  *utf8string,
  * representation of file names and UTF-8.
  */
 XPL_AVAILABLE_IN_ALL
-xchar_t* g_filename_to_utf8   (const xchar_t  *opsysstring,
-			     gssize        len,
+xchar_t* xfilename_to_utf8   (const xchar_t  *opsysstring,
+			     xssize_t        len,
 			     xsize_t        *bytes_read,
 			     xsize_t        *bytes_written,
 			     xerror_t      **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-xchar_t* g_filename_from_utf8 (const xchar_t  *utf8string,
-			     gssize        len,
+xchar_t* xfilename_from_utf8 (const xchar_t  *utf8string,
+			     xssize_t        len,
 			     xsize_t        *bytes_read,
 			     xsize_t        *bytes_written,
 			     xerror_t      **error) G_GNUC_MALLOC;
 
 XPL_AVAILABLE_IN_ALL
-xchar_t *g_filename_from_uri (const xchar_t *uri,
+xchar_t *xfilename_from_uri (const xchar_t *uri,
 			    xchar_t      **hostname,
 			    xerror_t     **error) G_GNUC_MALLOC;
 
 XPL_AVAILABLE_IN_ALL
-xchar_t *g_filename_to_uri   (const xchar_t *filename,
+xchar_t *xfilename_to_uri   (const xchar_t *filename,
 			    const xchar_t *hostname,
 			    xerror_t     **error) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
-xchar_t *g_filename_display_name (const xchar_t *filename) G_GNUC_MALLOC;
+xchar_t *xfilename_display_name (const xchar_t *filename) G_GNUC_MALLOC;
 XPL_AVAILABLE_IN_ALL
 xboolean_t g_get_filename_charsets (const xchar_t ***filename_charsets);
 
 XPL_AVAILABLE_IN_ALL
-xchar_t *g_filename_display_basename (const xchar_t *filename) G_GNUC_MALLOC;
+xchar_t *xfilename_display_basename (const xchar_t *filename) G_GNUC_MALLOC;
 
 XPL_AVAILABLE_IN_ALL
-xchar_t **g_uri_list_extract_uris (const xchar_t *uri_list);
+xchar_t **xuri_list_extract_uris (const xchar_t *uri_list);
 
 G_END_DECLS
 

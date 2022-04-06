@@ -54,15 +54,15 @@ get_resource (const xchar_t *file)
   xchar_t *content;
   xsize_t size;
   xresource_t *resource;
-  GBytes *data;
+  xbytes_t *data;
 
   resource = NULL;
 
-  if (g_file_get_contents (file, &content, &size, NULL))
+  if (xfile_get_contents (file, &content, &size, NULL))
     {
-      data = g_bytes_new_take (content, size);
+      data = xbytes_new_take (content, size);
       resource = g_resource_new_from_data (data, NULL);
-      g_bytes_unref (data);
+      xbytes_unref (data);
     }
 
   return resource;
@@ -77,7 +77,7 @@ list_resource (xresource_t   *resource,
 {
   xchar_t **children;
   xsize_t size;
-  guint32 flags;
+  xuint32_t flags;
   xint_t i;
   xchar_t *child;
   xerror_t *error = NULL;
@@ -87,12 +87,12 @@ list_resource (xresource_t   *resource,
   if (error)
     {
       g_printerr ("%s\n", error->message);
-      g_error_free (error);
+      xerror_free (error);
       return;
     }
   for (i = 0; children[i]; i++)
     {
-      child = g_strconcat (path, children[i], NULL);
+      child = xstrconcat (path, children[i], NULL);
 
       len = MIN (strlen (child), strlen (prefix));
       if (strncmp (child, prefix, len) != 0)
@@ -113,26 +113,26 @@ list_resource (xresource_t   *resource,
 
       g_free (child);
     }
-  g_strfreev (children);
+  xstrfreev (children);
 }
 
 static void
 extract_resource (xresource_t   *resource,
                   const xchar_t *path)
 {
-  GBytes *bytes;
+  xbytes_t *bytes;
 
   bytes = g_resource_lookup_data (resource, path, 0, NULL);
   if (bytes != NULL)
     {
-      gconstpointer data;
+      xconstpointer data;
       xsize_t size, written;
 
-      data = g_bytes_get_data (bytes, &size);
+      data = xbytes_get_data (bytes, &size);
       written = fwrite (data, 1, size, stdout);
       if (written < size)
         g_printerr ("Data truncated\n");
-      g_bytes_unref (bytes);
+      xbytes_unref (bytes);
     }
 }
 
@@ -208,7 +208,7 @@ elf_foreach_resource_section (Elf             *elf,
 
       section_name = elf_strptr (elf, shstrndx, shdr->sh_name);
       if (section_name == NULL ||
-          !g_str_has_prefix (section_name, ".gresource."))
+          !xstr_has_prefix (section_name, ".gresource."))
         continue;
 
       if (!callback (shdr, section_name + strlen (".gresource."), data))
@@ -232,16 +232,16 @@ resource_from_section (GElf_Shdr *shdr,
                    PROT_READ, MAP_PRIVATE, fd, shdr->sh_offset - page_offset);
   if (contents != MAP_FAILED)
     {
-      GBytes *bytes;
+      xbytes_t *bytes;
       xerror_t *error = NULL;
 
-      bytes = g_bytes_new_static (contents + page_offset, shdr->sh_size);
+      bytes = xbytes_new_static (contents + page_offset, shdr->sh_size);
       resource = g_resource_new_from_data (bytes, &error);
-      g_bytes_unref (bytes);
+      xbytes_unref (bytes);
       if (error)
         {
           g_printerr ("%s\n", error->message);
-          g_error_free (error);
+          xerror_free (error);
         }
     }
   else
@@ -480,11 +480,11 @@ cmd_help (xboolean_t     requested,
   const xchar_t *description;
   const xchar_t *synopsis;
   xchar_t *option;
-  GString *string;
+  xstring_t *string;
 
   option = NULL;
 
-  string = g_string_new (NULL);
+  string = xstring_new (NULL);
 
   if (command == NULL)
     ;
@@ -507,7 +507,7 @@ cmd_help (xboolean_t     requested,
                       "If SECTION is given, only list resources in this section\n"
                       "If PATH is given, only list matching resources");
       synopsis = _("FILE [PATH]");
-      option = g_strdup_printf ("[--section %s]", _("SECTION"));
+      option = xstrdup_printf ("[--section %s]", _("SECTION"));
     }
 
   else if (strcmp (command, "details") == 0)
@@ -517,26 +517,26 @@ cmd_help (xboolean_t     requested,
                       "If PATH is given, only list matching resources\n"
                       "Details include the section, size and compression");
       synopsis = _("FILE [PATH]");
-      option = g_strdup_printf ("[--section %s]", _("SECTION"));
+      option = xstrdup_printf ("[--section %s]", _("SECTION"));
     }
 
   else if (strcmp (command, "extract") == 0)
     {
       description = _("Extract a resource file to stdout");
       synopsis = _("FILE PATH");
-      option = g_strdup_printf ("[--section %s]", _("SECTION"));
+      option = xstrdup_printf ("[--section %s]", _("SECTION"));
     }
 
   else
     {
-      g_string_printf (string, _("Unknown command %s\n\n"), command);
+      xstring_printf (string, _("Unknown command %s\n\n"), command);
       requested = FALSE;
       command = NULL;
     }
 
   if (command == NULL)
     {
-      g_string_append (string,
+      xstring_append (string,
       _("Usage:\n"
         "  gresource [--section SECTION] COMMAND [ARGS…]\n"
         "\n"
@@ -551,38 +551,38 @@ cmd_help (xboolean_t     requested,
     }
   else
     {
-      g_string_append_printf (string, _("Usage:\n  gresource %s%s%s %s\n\n%s\n\n"),
+      xstring_append_printf (string, _("Usage:\n  gresource %s%s%s %s\n\n%s\n\n"),
                               option ? option : "", option ? " " : "", command, synopsis[0] ? synopsis : "", description);
 
-      g_string_append (string, _("Arguments:\n"));
+      xstring_append (string, _("Arguments:\n"));
 
       if (option)
-        g_string_append (string,
+        xstring_append (string,
                          _("  SECTION   An (optional) elf section name\n"));
 
       if (strstr (synopsis, _("[COMMAND]")))
-        g_string_append (string,
+        xstring_append (string,
                        _("  COMMAND   The (optional) command to explain\n"));
 
       if (strstr (synopsis, _("FILE")))
         {
           if (strcmp (command, "sections") == 0)
-            g_string_append (string,
+            xstring_append (string,
                              _("  FILE      An elf file (a binary or a shared library)\n"));
           else
-            g_string_append (string,
+            xstring_append (string,
                              _("  FILE      An elf file (a binary or a shared library)\n"
                                "            or a compiled resource file\n"));
         }
 
       if (strstr (synopsis, _("[PATH]")))
-        g_string_append (string,
+        xstring_append (string,
                        _("  PATH      An (optional) resource path (may be partial)\n"));
       else if (strstr (synopsis, _("PATH")))
-        g_string_append (string,
+        xstring_append (string,
                        _("  PATH      A resource path\n"));
 
-      g_string_append (string, "\n");
+      xstring_append (string, "\n");
     }
 
   if (requested)
@@ -591,7 +591,7 @@ cmd_help (xboolean_t     requested,
     g_printerr ("%s\n", string->str);
 
   g_free (option);
-  g_string_free (string, TRUE);
+  xstring_free (string, TRUE);
 
   return requested ? 0 : 1;
 }

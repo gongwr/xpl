@@ -69,7 +69,7 @@ static CmdlineTest cmdline_tests[] =
 };
 
 static void
-do_cmdline_test (gconstpointer d)
+do_cmdline_test (xconstpointer d)
 {
   const CmdlineTest *test = d;
   xint_t argc;
@@ -84,7 +84,7 @@ do_cmdline_test (gconstpointer d)
     {
       g_assert (res);
       g_assert_cmpint (argc, ==, test->argc);
-      g_assert (g_strv_equal ((const xchar_t * const *) argv, (const xchar_t * const *) test->argv));
+      g_assert (xstrv_equal ((const xchar_t * const *) argv, (const xchar_t * const *) test->argv));
       g_assert_no_error (err);
     }
   else
@@ -94,9 +94,9 @@ do_cmdline_test (gconstpointer d)
     }
 
   if (err)
-    g_error_free (err);
+    xerror_free (err);
   if (res)
-    g_strfreev (argv);
+    xstrfreev (argv);
 }
 
 typedef struct _QuoteTest QuoteTest;
@@ -119,7 +119,7 @@ static QuoteTest quote_tests[] =
 };
 
 static void
-do_quote_test (gconstpointer d)
+do_quote_test (xconstpointer d)
 {
   const QuoteTest *test = d;
   xchar_t *out;
@@ -164,7 +164,7 @@ static UnquoteTest unquote_tests[] =
 };
 
 static void
-do_unquote_test (gconstpointer d)
+do_unquote_test (xconstpointer d)
 {
   const UnquoteTest *test = d;
   xchar_t *out;
@@ -180,7 +180,7 @@ do_unquote_test (gconstpointer d)
 
   g_free (out);
   if (error)
-    g_error_free (error);
+    xerror_free (error);
 }
 
 int
@@ -193,21 +193,21 @@ main (int   argc, char *argv[])
 
   for (i = 0; i < G_N_ELEMENTS (cmdline_tests); i++)
     {
-      path = g_strdup_printf ("/shell/cmdline/%" G_GSIZE_FORMAT, i);
+      path = xstrdup_printf ("/shell/cmdline/%" G_GSIZE_FORMAT, i);
       g_test_add_data_func (path, &cmdline_tests[i], do_cmdline_test);
       g_free (path);
     }
 
   for (i = 0; i < G_N_ELEMENTS (quote_tests); i++)
     {
-      path = g_strdup_printf ("/shell/quote/%" G_GSIZE_FORMAT, i);
+      path = xstrdup_printf ("/shell/quote/%" G_GSIZE_FORMAT, i);
       g_test_add_data_func (path, &quote_tests[i], do_quote_test);
       g_free (path);
     }
 
   for (i = 0; i < G_N_ELEMENTS (unquote_tests); i++)
     {
-      path = g_strdup_printf ("/shell/unquote/%" G_GSIZE_FORMAT, i);
+      path = xstrdup_printf ("/shell/unquote/%" G_GSIZE_FORMAT, i);
       g_test_add_data_func (path, &unquote_tests[i], do_unquote_test);
       g_free (path);
     }

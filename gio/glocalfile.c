@@ -93,10 +93,10 @@
 #endif
 
 
-static void g_local_file_file_iface_init (GFileIface *iface);
+static void g_local_file_file_iface_init (xfile_iface_t *iface);
 
-static GFileAttributeInfoList *local_writable_attributes = NULL;
-static /* GFileAttributeInfoList * */ xsize_t local_writable_namespaces = 0;
+static xfile_attribute_info_list_t *local_writable_attributes = NULL;
+static /* xfile_attribute_info_list_t * */ xsize_t local_writable_namespaces = 0;
 
 struct _GLocalFile
 {
@@ -132,7 +132,7 @@ static void
 g_local_file_class_init (GLocalFileClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
-  GFileAttributeInfoList *list;
+  xfile_attribute_info_list_t *list;
 
   gobject_class->finalize = g_local_file_finalize;
 
@@ -140,54 +140,54 @@ g_local_file_class_init (GLocalFileClass *klass)
 
   /* Writable attributes: */
 
-  list = g_file_attribute_info_list_new ();
+  list = xfile_attribute_info_list_new ();
 
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_UNIX_MODE,
-				  G_FILE_ATTRIBUTE_TYPE_UINT32,
-				  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
-				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+  xfile_attribute_info_list_add (list,
+				  XFILE_ATTRIBUTE_UNIX_MODE,
+				  XFILE_ATTRIBUTE_TYPE_UINT32,
+				  XFILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+				  XFILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
 
 #ifdef G_OS_UNIX
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_UNIX_UID,
-				  G_FILE_ATTRIBUTE_TYPE_UINT32,
-				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_UNIX_GID,
-				  G_FILE_ATTRIBUTE_TYPE_UINT32,
-				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+  xfile_attribute_info_list_add (list,
+				  XFILE_ATTRIBUTE_UNIX_UID,
+				  XFILE_ATTRIBUTE_TYPE_UINT32,
+				  XFILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+  xfile_attribute_info_list_add (list,
+				  XFILE_ATTRIBUTE_UNIX_GID,
+				  XFILE_ATTRIBUTE_TYPE_UINT32,
+				  XFILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
 #endif
 
 #ifdef HAVE_SYMLINK
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET,
-				  G_FILE_ATTRIBUTE_TYPE_BYTE_STRING,
+  xfile_attribute_info_list_add (list,
+				  XFILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET,
+				  XFILE_ATTRIBUTE_TYPE_BYTE_STRING,
 				  0);
 #endif
 
 #ifdef HAVE_UTIMES
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_TIME_MODIFIED,
-				  G_FILE_ATTRIBUTE_TYPE_UINT64,
-				  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
-				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC,
-				  G_FILE_ATTRIBUTE_TYPE_UINT32,
-				  G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
-				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+  xfile_attribute_info_list_add (list,
+				  XFILE_ATTRIBUTE_TIME_MODIFIED,
+				  XFILE_ATTRIBUTE_TYPE_UINT64,
+				  XFILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+				  XFILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+  xfile_attribute_info_list_add (list,
+				  XFILE_ATTRIBUTE_TIME_MODIFIED_USEC,
+				  XFILE_ATTRIBUTE_TYPE_UINT32,
+				  XFILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+				  XFILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
   /* When copying, the target file is accessed. Replicating
    * the source access time does not make sense in this case.
    */
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_TIME_ACCESS,
-				  G_FILE_ATTRIBUTE_TYPE_UINT64,
-				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
-  g_file_attribute_info_list_add (list,
-				  G_FILE_ATTRIBUTE_TIME_ACCESS_USEC,
-				  G_FILE_ATTRIBUTE_TYPE_UINT32,
-				  G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+  xfile_attribute_info_list_add (list,
+				  XFILE_ATTRIBUTE_TIME_ACCESS,
+				  XFILE_ATTRIBUTE_TYPE_UINT64,
+				  XFILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+  xfile_attribute_info_list_add (list,
+				  XFILE_ATTRIBUTE_TIME_ACCESS_USEC,
+				  XFILE_ATTRIBUTE_TYPE_UINT32,
+				  XFILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
 #endif
 
   local_writable_attributes = list;
@@ -209,10 +209,10 @@ _g_local_file_new (const char *filename)
 {
   GLocalFile *local;
 
-  local = g_object_new (XTYPE_LOCAL_FILE, NULL);
+  local = xobject_new (XTYPE_LOCAL_FILE, NULL);
   local->filename = g_canonicalize_filename (filename, NULL);
 
-  return G_FILE (local);
+  return XFILE (local);
 }
 
 /*< internal >
@@ -224,7 +224,7 @@ _g_local_file_new (const char *filename)
  *
  * This is more efficient than pasting the fields together for yourself
  * and creating a #xfile_t from the result, and also more efficient than
- * creating a #xfile_t for the dirname and using g_file_get_child().
+ * creating a #xfile_t for the dirname and using xfile_get_child().
  *
  * @dirname must be canonical, as per GLocalFile's opinion of what
  * canonical means.  This means that you should only pass strings that
@@ -241,10 +241,10 @@ g_local_file_new_from_dirname_and_basename (const xchar_t *dirname,
   g_return_val_if_fail (dirname != NULL, NULL);
   g_return_val_if_fail (basename && basename[0] && !strchr (basename, '/'), NULL);
 
-  local = g_object_new (XTYPE_LOCAL_FILE, NULL);
+  local = xobject_new (XTYPE_LOCAL_FILE, NULL);
   local->filename = g_build_filename (dirname, basename, NULL);
 
-  return G_FILE (local);
+  return XFILE (local);
 }
 
 static xboolean_t
@@ -263,7 +263,7 @@ g_local_file_has_uri_scheme (xfile_t      *file,
 static char *
 g_local_file_get_uri_scheme (xfile_t *file)
 {
-  return g_strdup ("file");
+  return xstrdup ("file");
 }
 
 static char *
@@ -275,13 +275,13 @@ g_local_file_get_basename (xfile_t *file)
 static char *
 g_local_file_get_path (xfile_t *file)
 {
-  return g_strdup (G_LOCAL_FILE (file)->filename);
+  return xstrdup (G_LOCAL_FILE (file)->filename);
 }
 
 static char *
 g_local_file_get_uri (xfile_t *file)
 {
-  return g_filename_to_uri (G_LOCAL_FILE (file)->filename, NULL, NULL);
+  return xfilename_to_uri (G_LOCAL_FILE (file)->filename, NULL, NULL);
 }
 
 static xboolean_t
@@ -305,7 +305,7 @@ name_is_valid_for_display (const char *string,
   char c;
 
   if (!is_valid_utf8 &&
-      !g_utf8_validate (string, -1, NULL))
+      !xutf8_validate (string, -1, NULL))
     return FALSE;
 
   while ((c = *string++) != 0)
@@ -366,7 +366,7 @@ g_local_file_get_parse_name (xfile_t *file)
       if (free_utf8_filename)
 	parse_name = utf8_filename;
       else
-	parse_name = g_strdup (utf8_filename);
+	parse_name = xstrdup (utf8_filename);
     }
   else
     {
@@ -374,10 +374,10 @@ g_local_file_get_parse_name (xfile_t *file)
       char *dup_filename, *p, *backslash;
 
       /* Turn backslashes into forward slashes like
-       * g_filename_to_uri() would do (but we can't use that because
+       * xfilename_to_uri() would do (but we can't use that because
        * it doesn't output IRIs).
        */
-      dup_filename = g_strdup (filename);
+      dup_filename = xstrdup (filename);
       filename = p = dup_filename;
 
       while ((backslash = strchr (p, '\\')) != NULL)
@@ -387,10 +387,10 @@ g_local_file_get_parse_name (xfile_t *file)
 	}
 #endif
 
-      escaped_path = g_uri_escape_string (filename,
-					  G_URI_RESERVED_CHARS_ALLOWED_IN_PATH_ELEMENT "/",
+      escaped_path = xuri_escape_string (filename,
+					  XURI_RESERVED_CHARS_ALLOWED_IN_PATH_ELEMENT "/",
 					  TRUE);
-      parse_name = g_strconcat ("file://",
+      parse_name = xstrconcat ("file://",
 				(*escaped_path != '/') ? "/" : "",
 				escaped_path,
 				NULL);
@@ -441,7 +441,7 @@ g_local_file_hash (xfile_t *file)
 {
   GLocalFile *local = G_LOCAL_FILE (file);
 
-  return g_str_hash (local->filename);
+  return xstr_hash (local->filename);
 }
 
 static xboolean_t
@@ -451,7 +451,7 @@ g_local_file_equal (xfile_t *file1,
   GLocalFile *local1 = G_LOCAL_FILE (file1);
   GLocalFile *local2 = G_LOCAL_FILE (file2);
 
-  return g_str_equal (local1->filename, local2->filename);
+  return xstr_equal (local1->filename, local2->filename);
 }
 
 static const char *
@@ -498,7 +498,7 @@ g_local_file_get_relative_path (xfile_t *parent,
   remainder = match_prefix (descendant_local->filename, parent_local->filename);
 
   if (remainder != NULL && X_IS_DIR_SEPARATOR (*remainder))
-    return g_strdup (remainder + 1);
+    return xstrdup (remainder + 1);
   return NULL;
 }
 
@@ -520,15 +520,15 @@ g_local_file_resolve_relative_path (xfile_t      *file,
   return child;
 }
 
-static GFileEnumerator *
+static xfile_enumerator_t *
 g_local_file_enumerate_children (xfile_t                *file,
 				 const char           *attributes,
-				 GFileQueryInfoFlags   flags,
+				 xfile_query_info_flags_t   flags,
 				 xcancellable_t         *cancellable,
 				 xerror_t              **error)
 {
   GLocalFile *local = G_LOCAL_FILE (file);
-  return _g_local_file_enumerator_new (local,
+  return _xlocal_file_enumerator_new (local,
 				       attributes, flags,
 				       cancellable, error);
 }
@@ -541,7 +541,7 @@ g_local_file_get_child_for_display_name (xfile_t        *file,
   xfile_t *new_file;
   char *basename;
 
-  basename = g_filename_from_utf8 (display_name, -1, NULL, NULL, NULL);
+  basename = xfilename_from_utf8 (display_name, -1, NULL, NULL, NULL);
   if (basename == NULL)
     {
       g_set_error (error, G_IO_ERROR,
@@ -550,7 +550,7 @@ g_local_file_get_child_for_display_name (xfile_t        *file,
       return NULL;
     }
 
-  new_file = g_file_get_child (file, basename);
+  new_file = xfile_get_child (file, basename);
   g_free (basename);
 
   return new_file;
@@ -740,30 +740,30 @@ get_fs_type (long f_type)
 #ifndef G_OS_WIN32
 
 G_LOCK_DEFINE_STATIC(mount_info_hash);
-static GHashTable *mount_info_hash = NULL;
-static guint64 mount_info_hash_cache_time = 0;
+static xhashtable_t *mount_info_hash = NULL;
+static xuint64_t mount_info_hash_cache_time = 0;
 
 typedef enum {
   MOUNT_INFO_READONLY = 1<<0
 } MountInfo;
 
 static xboolean_t
-device_equal (gconstpointer v1,
-              gconstpointer v2)
+device_equal (xconstpointer v1,
+              xconstpointer v2)
 {
   return *(dev_t *)v1 == *(dev_t *)v2;
 }
 
 static xuint_t
-device_hash (gconstpointer v)
+device_hash (xconstpointer v)
 {
   return (xuint_t) *(dev_t *)v;
 }
 
 static void
-get_mount_info (GFileInfo             *fs_info,
+get_mount_info (xfile_info_t             *fs_info,
 		const char            *path,
-		GFileAttributeMatcher *matcher)
+		xfile_attribute_matcher_t *matcher)
 {
   GStatBuf buf;
   xboolean_t got_info;
@@ -772,7 +772,7 @@ get_mount_info (GFileInfo             *fs_info,
   char *mountpoint;
   dev_t *dev;
   GUnixMountEntry *mount;
-  guint64 cache_time;
+  xuint64_t cache_time;
 
   if (g_lstat (path, &buf) != 0)
     return;
@@ -780,14 +780,14 @@ get_mount_info (GFileInfo             *fs_info,
   G_LOCK (mount_info_hash);
 
   if (mount_info_hash == NULL)
-    mount_info_hash = g_hash_table_new_full (device_hash, device_equal,
+    mount_info_hash = xhash_table_new_full (device_hash, device_equal,
 					     g_free, NULL);
 
 
   if (g_unix_mounts_changed_since (mount_info_hash_cache_time))
-    g_hash_table_remove_all (mount_info_hash);
+    xhash_table_remove_all (mount_info_hash);
 
-  got_info = g_hash_table_lookup_extended (mount_info_hash,
+  got_info = xhash_table_lookup_extended (mount_info_hash,
 					   &buf.st_dev,
 					   NULL,
 					   &info_as_ptr);
@@ -802,7 +802,7 @@ get_mount_info (GFileInfo             *fs_info,
 
       mountpoint = find_mountpoint_for (path, buf.st_dev, FALSE);
       if (mountpoint == NULL)
-	mountpoint = g_strdup ("/");
+	mountpoint = xstrdup ("/");
 
       mount = g_unix_mount_at (mountpoint, &cache_time);
       if (mount)
@@ -820,12 +820,12 @@ get_mount_info (GFileInfo             *fs_info,
 
       G_LOCK (mount_info_hash);
       mount_info_hash_cache_time = cache_time;
-      g_hash_table_insert (mount_info_hash, dev, GUINT_TO_POINTER (mount_info));
+      xhash_table_insert (mount_info_hash, dev, GUINT_TO_POINTER (mount_info));
       G_UNLOCK (mount_info_hash);
     }
 
   if (mount_info & MOUNT_INFO_READONLY)
-    g_file_info_set_attribute_boolean (fs_info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY, TRUE);
+    xfile_info_set_attribute_boolean (fs_info, XFILE_ATTRIBUTE_FILESYSTEM_READONLY, TRUE);
 }
 
 #endif
@@ -839,7 +839,7 @@ get_volume_for_path (const char *path)
   wchar_t *wpath;
   wchar_t *result;
 
-  wpath = g_utf8_to_utf16 (path, -1, NULL, NULL, NULL);
+  wpath = xutf8_to_utf16 (path, -1, NULL, NULL, NULL);
   result = g_new (wchar_t, MAX_PATH);
 
   if (!GetVolumePathNameW (wpath, result, MAX_PATH))
@@ -874,14 +874,14 @@ find_mountpoint_for (const char *file, dev_t dev, xboolean_t resolve_basename_sy
   if (!wpath)
     return NULL;
 
-  utf8_path = g_utf16_to_utf8 (wpath, -1, NULL, NULL, NULL);
+  utf8_path = xutf16_to_utf8 (wpath, -1, NULL, NULL, NULL);
 
   g_free (wpath);
   return utf8_path;
 }
 
 static void
-get_filesystem_readonly (GFileInfo  *info,
+get_filesystem_readonly (xfile_info_t  *info,
 			 const char *path)
 {
   wchar_t *rootdir;
@@ -892,7 +892,7 @@ get_filesystem_readonly (GFileInfo  *info,
     {
       DWORD flags;
       if (GetVolumeInformationW (rootdir, NULL, 0, NULL, NULL, &flags, NULL, 0))
-        g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY,
+        xfile_info_set_attribute_boolean (info, XFILE_ATTRIBUTE_FILESYSTEM_READONLY,
                                            (flags & FILE_READ_ONLY_VOLUME) != 0);
     }
 
@@ -912,34 +912,34 @@ g_set_io_error (xerror_t      **error,
   GLocalFile *local = G_LOCAL_FILE (file);
   xchar_t *display_name;
 
-  display_name = g_filename_display_name (local->filename);
+  display_name = xfilename_display_name (local->filename);
   g_set_error (error, G_IO_ERROR, g_io_error_from_errno (errsv),
-               msg, display_name, g_strerror (errsv));
+               msg, display_name, xstrerror (errsv));
   g_free (display_name);
 }
 #pragma GCC diagnostic pop
 
-static GFileInfo *
+static xfile_info_t *
 g_local_file_query_filesystem_info (xfile_t         *file,
 				    const char    *attributes,
 				    xcancellable_t  *cancellable,
 				    xerror_t       **error)
 {
   GLocalFile *local = G_LOCAL_FILE (file);
-  GFileInfo *info;
+  xfile_info_t *info;
   int statfs_result = 0;
   xboolean_t no_size;
 #ifndef G_OS_WIN32
   const char *fstype;
 #ifdef USE_STATFS
-  guint64 block_size;
+  xuint64_t block_size;
   struct statfs statfs_buffer;
 #elif defined(USE_STATVFS)
-  guint64 block_size;
+  xuint64_t block_size;
   struct statvfs statfs_buffer;
 #endif /* USE_STATFS */
 #endif /* G_OS_WIN32 */
-  GFileAttributeMatcher *attribute_matcher;
+  xfile_attribute_matcher_t *attribute_matcher;
 
   no_size = FALSE;
 
@@ -984,65 +984,65 @@ g_local_file_query_filesystem_info (xfile_t         *file,
       return NULL;
     }
 
-  info = g_file_info_new ();
+  info = xfile_info_new ();
 
-  attribute_matcher = g_file_attribute_matcher_new (attributes);
+  attribute_matcher = xfile_attribute_matcher_new (attributes);
 
   if (!no_size &&
-      g_file_attribute_matcher_matches (attribute_matcher,
-					G_FILE_ATTRIBUTE_FILESYSTEM_FREE))
+      xfile_attribute_matcher_matches (attribute_matcher,
+					XFILE_ATTRIBUTE_FILESYSTEM_FREE))
     {
 #ifdef G_OS_WIN32
       xchar_t *localdir = g_path_get_dirname (local->filename);
-      wchar_t *wdirname = g_utf8_to_utf16 (localdir, -1, NULL, NULL, NULL);
+      wchar_t *wdirname = xutf8_to_utf16 (localdir, -1, NULL, NULL, NULL);
       ULARGE_INTEGER li;
 
       g_free (localdir);
       if (GetDiskFreeSpaceExW (wdirname, &li, NULL, NULL))
-        g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, (guint64)li.QuadPart);
+        xfile_info_set_attribute_uint64 (info, XFILE_ATTRIBUTE_FILESYSTEM_FREE, (xuint64_t)li.QuadPart);
       g_free (wdirname);
 #else
 #if defined(USE_STATFS) || defined(USE_STATVFS)
-      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, block_size * statfs_buffer.f_bavail);
+      xfile_info_set_attribute_uint64 (info, XFILE_ATTRIBUTE_FILESYSTEM_FREE, block_size * statfs_buffer.f_bavail);
 #endif
 #endif
     }
   if (!no_size &&
-      g_file_attribute_matcher_matches (attribute_matcher,
-					G_FILE_ATTRIBUTE_FILESYSTEM_SIZE))
+      xfile_attribute_matcher_matches (attribute_matcher,
+					XFILE_ATTRIBUTE_FILESYSTEM_SIZE))
     {
 #ifdef G_OS_WIN32
       xchar_t *localdir = g_path_get_dirname (local->filename);
-      wchar_t *wdirname = g_utf8_to_utf16 (localdir, -1, NULL, NULL, NULL);
+      wchar_t *wdirname = xutf8_to_utf16 (localdir, -1, NULL, NULL, NULL);
       ULARGE_INTEGER li;
 
       g_free (localdir);
       if (GetDiskFreeSpaceExW (wdirname, NULL, &li, NULL))
-        g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE,  (guint64)li.QuadPart);
+        xfile_info_set_attribute_uint64 (info, XFILE_ATTRIBUTE_FILESYSTEM_SIZE,  (xuint64_t)li.QuadPart);
       g_free (wdirname);
 #else
 #if defined(USE_STATFS) || defined(USE_STATVFS)
-      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_SIZE, block_size * statfs_buffer.f_blocks);
+      xfile_info_set_attribute_uint64 (info, XFILE_ATTRIBUTE_FILESYSTEM_SIZE, block_size * statfs_buffer.f_blocks);
 #endif
 #endif /* G_OS_WIN32 */
     }
 
   if (!no_size &&
-      g_file_attribute_matcher_matches (attribute_matcher,
-                                        G_FILE_ATTRIBUTE_FILESYSTEM_USED))
+      xfile_attribute_matcher_matches (attribute_matcher,
+                                        XFILE_ATTRIBUTE_FILESYSTEM_USED))
     {
 #ifdef G_OS_WIN32
       xchar_t *localdir = g_path_get_dirname (local->filename);
-      wchar_t *wdirname = g_utf8_to_utf16 (localdir, -1, NULL, NULL, NULL);
+      wchar_t *wdirname = xutf8_to_utf16 (localdir, -1, NULL, NULL, NULL);
       ULARGE_INTEGER li_free;
       ULARGE_INTEGER li_total;
 
       g_free (localdir);
       if (GetDiskFreeSpaceExW (wdirname, &li_free, &li_total, NULL))
-        g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_USED,  (guint64)li_total.QuadPart - (guint64)li_free.QuadPart);
+        xfile_info_set_attribute_uint64 (info, XFILE_ATTRIBUTE_FILESYSTEM_USED,  (xuint64_t)li_total.QuadPart - (xuint64_t)li_free.QuadPart);
       g_free (wdirname);
 #else
-      g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_USED, block_size * (statfs_buffer.f_blocks - statfs_buffer.f_bfree));
+      xfile_info_set_attribute_uint64 (info, XFILE_ATTRIBUTE_FILESYSTEM_USED, block_size * (statfs_buffer.f_blocks - statfs_buffer.f_bfree));
 #endif /* G_OS_WIN32 */
     }
 
@@ -1065,13 +1065,13 @@ g_local_file_query_filesystem_info (xfile_t         *file,
 #endif /* USE_STATFS */
 
   if (fstype &&
-      g_file_attribute_matcher_matches (attribute_matcher,
-					G_FILE_ATTRIBUTE_FILESYSTEM_TYPE))
-    g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, fstype);
+      xfile_attribute_matcher_matches (attribute_matcher,
+					XFILE_ATTRIBUTE_FILESYSTEM_TYPE))
+    xfile_info_set_attribute_string (info, XFILE_ATTRIBUTE_FILESYSTEM_TYPE, fstype);
 #endif /* G_OS_WIN32 */
 
-  if (g_file_attribute_matcher_matches (attribute_matcher,
-					G_FILE_ATTRIBUTE_FILESYSTEM_READONLY))
+  if (xfile_attribute_matcher_matches (attribute_matcher,
+					XFILE_ATTRIBUTE_FILESYSTEM_READONLY))
     {
 #ifdef G_OS_WIN32
       get_filesystem_readonly (info, local->filename);
@@ -1081,18 +1081,18 @@ g_local_file_query_filesystem_info (xfile_t         *file,
     }
 
 #ifndef G_OS_WIN32
-  if (g_file_attribute_matcher_matches (attribute_matcher,
-                                        G_FILE_ATTRIBUTE_FILESYSTEM_REMOTE))
-    g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_REMOTE,
+  if (xfile_attribute_matcher_matches (attribute_matcher,
+                                        XFILE_ATTRIBUTE_FILESYSTEM_REMOTE))
+    xfile_info_set_attribute_boolean (info, XFILE_ATTRIBUTE_FILESYSTEM_REMOTE,
                                        is_remote_fs_type (fstype));
 #endif
 
-  g_file_attribute_matcher_unref (attribute_matcher);
+  xfile_attribute_matcher_unref (attribute_matcher);
 
   return info;
 }
 
-static GMount *
+static xmount_t *
 g_local_file_find_enclosing_mount (xfile_t         *file,
                                    xcancellable_t  *cancellable,
                                    xerror_t       **error)
@@ -1100,7 +1100,7 @@ g_local_file_find_enclosing_mount (xfile_t         *file,
   GLocalFile *local = G_LOCAL_FILE (file);
   GStatBuf buf;
   char *mountpoint;
-  GMount *mount;
+  xmount_t *mount;
 
   if (g_lstat (local->filename, &buf) != 0)
     goto error;
@@ -1135,11 +1135,11 @@ g_local_file_set_display_name (xfile_t         *file,
   GLocalFile *local, *new_local;
   xfile_t *new_file, *parent;
   GStatBuf statbuf;
-  GVfsClass *class;
-  GVfs *vfs;
+  xvfs_class_t *class;
+  xvfs_t *vfs;
   int errsv;
 
-  parent = g_file_get_parent (file);
+  parent = xfile_get_parent (file);
   if (parent == NULL)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
@@ -1147,8 +1147,8 @@ g_local_file_set_display_name (xfile_t         *file,
       return NULL;
     }
 
-  new_file = g_file_get_child_for_display_name (parent, display_name, error);
-  g_object_unref (parent);
+  new_file = xfile_get_child_for_display_name (parent, display_name, error);
+  xobject_unref (parent);
 
   if (new_file == NULL)
     return NULL;
@@ -1186,32 +1186,32 @@ g_local_file_set_display_name (xfile_t         *file,
         g_set_io_error (error,
 		        _("Error renaming file %s: %s"),
                         file, errsv);
-      g_object_unref (new_file);
+      xobject_unref (new_file);
       return NULL;
     }
 
-  vfs = g_vfs_get_default ();
-  class = G_VFS_GET_CLASS (vfs);
+  vfs = xvfs_get_default ();
+  class = XVFS_GET_CLASS (vfs);
   if (class->local_file_moved)
     class->local_file_moved (vfs, local->filename, new_local->filename);
 
   return new_file;
 }
 
-static GFileInfo *
+static xfile_info_t *
 g_local_file_query_info (xfile_t                *file,
 			 const char           *attributes,
-			 GFileQueryInfoFlags   flags,
+			 xfile_query_info_flags_t   flags,
 			 xcancellable_t         *cancellable,
 			 xerror_t              **error)
 {
   GLocalFile *local = G_LOCAL_FILE (file);
-  GFileInfo *info;
-  GFileAttributeMatcher *matcher;
+  xfile_info_t *info;
+  xfile_attribute_matcher_t *matcher;
   char *basename, *dirname;
   GLocalParentFileInfo parent_info;
 
-  matcher = g_file_attribute_matcher_new (attributes);
+  matcher = xfile_attribute_matcher_new (attributes);
 
   basename = g_path_get_basename (local->filename);
 
@@ -1227,64 +1227,64 @@ g_local_file_query_info (xfile_t                *file,
   _g_local_file_info_free_parent_info (&parent_info);
   g_free (basename);
 
-  g_file_attribute_matcher_unref (matcher);
+  xfile_attribute_matcher_unref (matcher);
 
   return info;
 }
 
-static GFileAttributeInfoList *
+static xfile_attribute_info_list_t *
 g_local_file_query_settable_attributes (xfile_t         *file,
 					xcancellable_t  *cancellable,
 					xerror_t       **error)
 {
-  return g_file_attribute_info_list_ref (local_writable_attributes);
+  return xfile_attribute_info_list_ref (local_writable_attributes);
 }
 
-static GFileAttributeInfoList *
+static xfile_attribute_info_list_t *
 g_local_file_query_writable_namespaces (xfile_t         *file,
 					xcancellable_t  *cancellable,
 					xerror_t       **error)
 {
-  GFileAttributeInfoList *list;
-  GVfsClass *class;
-  GVfs *vfs;
+  xfile_attribute_info_list_t *list;
+  xvfs_class_t *class;
+  xvfs_t *vfs;
 
   if (g_once_init_enter (&local_writable_namespaces))
     {
       /* Writable namespaces: */
 
-      list = g_file_attribute_info_list_new ();
+      list = xfile_attribute_info_list_new ();
 
 #ifdef HAVE_XATTR
-      g_file_attribute_info_list_add (list,
+      xfile_attribute_info_list_add (list,
 				      "xattr",
-				      G_FILE_ATTRIBUTE_TYPE_STRING,
-				      G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
-				      G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
-      g_file_attribute_info_list_add (list,
+				      XFILE_ATTRIBUTE_TYPE_STRING,
+				      XFILE_ATTRIBUTE_INFO_COPY_WITH_FILE |
+				      XFILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+      xfile_attribute_info_list_add (list,
 				      "xattr-sys",
-				      G_FILE_ATTRIBUTE_TYPE_STRING,
-				      G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
+				      XFILE_ATTRIBUTE_TYPE_STRING,
+				      XFILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED);
 #endif
 
-      vfs = g_vfs_get_default ();
-      class = G_VFS_GET_CLASS (vfs);
+      vfs = xvfs_get_default ();
+      class = XVFS_GET_CLASS (vfs);
       if (class->add_writable_namespaces)
 	class->add_writable_namespaces (vfs, list);
 
       g_once_init_leave (&local_writable_namespaces, (xsize_t)list);
     }
-  list = (GFileAttributeInfoList *)local_writable_namespaces;
+  list = (xfile_attribute_info_list_t *)local_writable_namespaces;
 
-  return g_file_attribute_info_list_ref (list);
+  return xfile_attribute_info_list_ref (list);
 }
 
 static xboolean_t
 g_local_file_set_attribute (xfile_t                *file,
 			    const char           *attribute,
-			    GFileAttributeType    type,
+			    xfile_attribute_type_t    type,
 			    xpointer_t              value_p,
-			    GFileQueryInfoFlags   flags,
+			    xfile_query_info_flags_t   flags,
 			    xcancellable_t         *cancellable,
 			    xerror_t              **error)
 {
@@ -1301,14 +1301,14 @@ g_local_file_set_attribute (xfile_t                *file,
 
 static xboolean_t
 g_local_file_set_attributes_from_info (xfile_t                *file,
-				       GFileInfo            *info,
-				       GFileQueryInfoFlags   flags,
+				       xfile_info_t            *info,
+				       xfile_query_info_flags_t   flags,
 				       xcancellable_t         *cancellable,
 				       xerror_t              **error)
 {
   GLocalFile *local = G_LOCAL_FILE (file);
   int res, chained_res;
-  GFileIface *default_iface;
+  xfile_iface_t *default_iface;
 
   res = _g_local_file_info_set_attributes (local->filename,
 					   info, flags,
@@ -1318,14 +1318,14 @@ g_local_file_set_attributes_from_info (xfile_t                *file,
   if (!res)
     error = NULL; /* Don't write over error if further errors */
 
-  default_iface = g_type_default_interface_peek (XTYPE_FILE);
+  default_iface = xtype_default_interface_peek (XTYPE_FILE);
 
   chained_res = (default_iface->set_attributes_from_info) (file, info, flags, cancellable, error);
 
   return res && chained_res;
 }
 
-static GFileInputStream *
+static xfile_input_stream_t *
 g_local_file_read (xfile_t         *file,
 		   xcancellable_t  *cancellable,
 		   xerror_t       **error)
@@ -1368,9 +1368,9 @@ g_local_file_read (xfile_t         *file,
   return _g_local_file_input_stream_new (fd);
 }
 
-static GFileOutputStream *
+static xfile_output_stream_t *
 g_local_file_append_to (xfile_t             *file,
-			GFileCreateFlags   flags,
+			xfile_create_flags_t   flags,
 			xcancellable_t      *cancellable,
 			xerror_t           **error)
 {
@@ -1378,9 +1378,9 @@ g_local_file_append_to (xfile_t             *file,
 					     flags, cancellable, error);
 }
 
-static GFileOutputStream *
+static xfile_output_stream_t *
 g_local_file_create (xfile_t             *file,
-		     GFileCreateFlags   flags,
+		     xfile_create_flags_t   flags,
 		     xcancellable_t      *cancellable,
 		     xerror_t           **error)
 {
@@ -1389,11 +1389,11 @@ g_local_file_create (xfile_t             *file,
                                              cancellable, error);
 }
 
-static GFileOutputStream *
+static xfile_output_stream_t *
 g_local_file_replace (xfile_t             *file,
 		      const char        *etag,
 		      xboolean_t           make_backup,
-		      GFileCreateFlags   flags,
+		      xfile_create_flags_t   flags,
 		      xcancellable_t      *cancellable,
 		      xerror_t           **error)
 {
@@ -1403,13 +1403,13 @@ g_local_file_replace (xfile_t             *file,
                                               cancellable, error);
 }
 
-static GFileIOStream *
+static xfile_io_stream_t *
 g_local_file_open_readwrite (xfile_t                      *file,
 			     xcancellable_t               *cancellable,
 			     xerror_t                    **error)
 {
-  GFileOutputStream *output;
-  GFileIOStream *res;
+  xfile_output_stream_t *output;
+  xfile_io_stream_t *res;
 
   output = _g_local_file_output_stream_open (G_LOCAL_FILE (file)->filename,
 					     TRUE,
@@ -1417,19 +1417,19 @@ g_local_file_open_readwrite (xfile_t                      *file,
   if (output == NULL)
     return NULL;
 
-  res = _g_local_file_io_stream_new (G_LOCAL_FILE_OUTPUT_STREAM (output));
-  g_object_unref (output);
+  res = _xlocal_file_io_stream_new (G_LOCAL_FILE_OUTPUT_STREAM (output));
+  xobject_unref (output);
   return res;
 }
 
-static GFileIOStream *
+static xfile_io_stream_t *
 g_local_file_create_readwrite (xfile_t                      *file,
-			       GFileCreateFlags            flags,
+			       xfile_create_flags_t            flags,
 			       xcancellable_t               *cancellable,
 			       xerror_t                    **error)
 {
-  GFileOutputStream *output;
-  GFileIOStream *res;
+  xfile_output_stream_t *output;
+  xfile_io_stream_t *res;
 
   output = _g_local_file_output_stream_create (G_LOCAL_FILE (file)->filename,
 					       TRUE, flags, NULL,
@@ -1437,21 +1437,21 @@ g_local_file_create_readwrite (xfile_t                      *file,
   if (output == NULL)
     return NULL;
 
-  res = _g_local_file_io_stream_new (G_LOCAL_FILE_OUTPUT_STREAM (output));
-  g_object_unref (output);
+  res = _xlocal_file_io_stream_new (G_LOCAL_FILE_OUTPUT_STREAM (output));
+  xobject_unref (output);
   return res;
 }
 
-static GFileIOStream *
+static xfile_io_stream_t *
 g_local_file_replace_readwrite (xfile_t                      *file,
 				const char                 *etag,
 				xboolean_t                    make_backup,
-				GFileCreateFlags            flags,
+				xfile_create_flags_t            flags,
 				xcancellable_t               *cancellable,
 				xerror_t                    **error)
 {
-  GFileOutputStream *output;
-  GFileIOStream *res;
+  xfile_output_stream_t *output;
+  xfile_io_stream_t *res;
 
   output = _g_local_file_output_stream_replace (G_LOCAL_FILE (file)->filename,
                                                 TRUE,
@@ -1460,8 +1460,8 @@ g_local_file_replace_readwrite (xfile_t                      *file,
   if (output == NULL)
     return NULL;
 
-  res = _g_local_file_io_stream_new (G_LOCAL_FILE_OUTPUT_STREAM (output));
-  g_object_unref (output);
+  res = _xlocal_file_io_stream_new (G_LOCAL_FILE_OUTPUT_STREAM (output));
+  xobject_unref (output);
   return res;
 }
 
@@ -1471,8 +1471,8 @@ g_local_file_delete (xfile_t         *file,
 		     xerror_t       **error)
 {
   GLocalFile *local = G_LOCAL_FILE (file);
-  GVfsClass *class;
-  GVfs *vfs;
+  xvfs_class_t *class;
+  xvfs_t *vfs;
 
   if (g_remove (local->filename) == -1)
     {
@@ -1490,8 +1490,8 @@ g_local_file_delete (xfile_t         *file,
       return FALSE;
     }
 
-  vfs = g_vfs_get_default ();
-  class = G_VFS_GET_CLASS (vfs);
+  vfs = xvfs_get_default ();
+  class = XVFS_GET_CLASS (vfs);
   if (class->local_file_removed)
     class->local_file_removed (vfs, local->filename);
 
@@ -1506,7 +1506,7 @@ strip_trailing_slashes (const char *path)
   char *path_copy;
   int len;
 
-  path_copy = g_strdup (path);
+  path_copy = xstrdup (path);
   len = strlen (path_copy);
   while (len > 1 && path_copy[len-1] == '/')
     path_copy[--len] = 0;
@@ -1521,7 +1521,7 @@ expand_symlink (const char *link)
   char symlink_value[4096];
 #ifdef G_OS_WIN32
 #else
-  gssize res;
+  xssize_t res;
 #endif
 
 #ifdef G_OS_WIN32
@@ -1529,7 +1529,7 @@ expand_symlink (const char *link)
   res = readlink (link, symlink_value, sizeof (symlink_value) - 1);
 
   if (res == -1)
-    return g_strdup (link);
+    return xstrdup (link);
   symlink_value[res] = 0;
 #endif
 
@@ -1560,7 +1560,7 @@ expand_symlinks (const char *path,
   GStatBuf target_stat;
   int num_recursions;
 
-  target = g_strdup (path);
+  target = xstrdup (path);
 
   num_recursions = 0;
   do
@@ -1636,7 +1636,7 @@ expand_all_symlinks (const char *path)
   if (parent == NULL)
     return NULL;
 
-  if (g_strcmp0 (parent, "/") != 0)
+  if (xstrcmp0 (parent, "/") != 0)
     {
       parent_expanded = expand_all_symlinks (parent);
       basename = g_path_get_basename (path);
@@ -1645,7 +1645,7 @@ expand_all_symlinks (const char *path)
       g_free (parent_expanded);
     }
   else
-    res = g_strdup (path);
+    res = xstrdup (path);
 
   g_free (parent);
 
@@ -1667,11 +1667,11 @@ find_mountpoint_for (const char *file,
         return NULL;
     }
   else
-    dir = g_strdup (file);
+    dir = xstrdup (file);
 
   dir_dev = dev;
 
-  while (g_strcmp0 (dir, "/") != 0)
+  while (xstrcmp0 (dir, "/") != 0)
     {
       parent = get_parent (dir, &parent_dev);
       if (parent == NULL)
@@ -1717,13 +1717,13 @@ get_unique_filename (const char *basename,
   const char *dot;
 
   if (id == 1)
-    return g_strdup (basename);
+    return xstrdup (basename);
 
   dot = strchr (basename, '.');
   if (dot)
-    return g_strdup_printf ("%.*s.%d%s", (int)(dot - basename), basename, id, dot);
+    return xstrdup_printf ("%.*s.%d%s", (int)(dot - basename), basename, id, dot);
   else
-    return g_strdup_printf ("%s.%d", basename, id);
+    return xstrdup_printf ("%s.%d", basename, id);
 }
 
 static xboolean_t
@@ -1763,7 +1763,7 @@ try_make_relative (const char *path,
       relative = path2 + strlen (base2);
       while (*relative == '/')
 	relative ++;
-      relative = g_strdup (relative);
+      relative = xstrdup (relative);
     }
   g_free (path2);
   g_free (base2);
@@ -1772,7 +1772,7 @@ try_make_relative (const char *path,
     return relative;
 
   /* Failed, use abs path */
-  return g_strdup (path);
+  return xstrdup (path);
 }
 
 static xboolean_t
@@ -1887,7 +1887,7 @@ _g_local_file_has_trash_dir (const char *dirname, dev_t dir_dev)
   uid = geteuid ();
   g_snprintf (uid_str, sizeof (uid_str), "%lu", (unsigned long) uid);
 
-  tmpname = g_strdup_printf (".Trash-%s", uid_str);
+  tmpname = xstrdup_printf (".Trash-%s", uid_str);
   trashdir = g_build_filename (topdir, tmpname, NULL);
   g_free (tmpname);
 
@@ -1916,7 +1916,7 @@ _g_local_file_is_lost_found_dir (const char *path, dev_t path_dev)
   size_t mount_dir_len;
   GStatBuf statbuf;
 
-  if (!g_str_has_suffix (path, "/lost+found"))
+  if (!xstr_has_suffix (path, "/lost+found"))
     goto out;
 
   mount_dir = find_mountpoint_for (path, path_dev, FALSE);
@@ -1967,8 +1967,8 @@ g_local_file_trash (xfile_t         *file,
   int fd;
   GStatBuf trash_stat, global_stat;
   char *dirname, *globaldir;
-  GVfsClass *class;
-  GVfs *vfs;
+  xvfs_class_t *class;
+  xvfs_t *vfs;
   int errsv;
 
   if (glib_should_use_portal ())
@@ -2034,16 +2034,16 @@ g_local_file_trash (xfile_t         *file,
           char *display_name;
           errsv = errno;
 
-          display_name = g_filename_display_name (trashdir);
+          display_name = xfilename_display_name (trashdir);
           g_set_error (error, G_IO_ERROR,
                        g_io_error_from_errno (errsv),
                        _("Unable to create trash directory %s: %s"),
-                       display_name, g_strerror (errsv));
+                       display_name, xstrerror (errsv));
           g_free (display_name);
           g_free (trashdir);
           return FALSE;
 	}
-      topdir = g_strdup (g_get_user_data_dir ());
+      topdir = xstrdup (g_get_user_data_dir ());
     }
   else
     {
@@ -2106,7 +2106,7 @@ g_local_file_trash (xfile_t         *file,
 	  xboolean_t tried_create;
 
 	  /* No global trash dir, or it failed the tests, fall back to $topdir/.Trash-$uid */
-	  dirname = g_strdup_printf (".Trash-%s", uid_str);
+	  dirname = xstrdup_printf (".Trash-%s", uid_str);
 	  trashdir = g_build_filename (topdir, dirname, NULL);
           success = TRUE;
 	  g_free (dirname);
@@ -2148,8 +2148,8 @@ g_local_file_trash (xfile_t         *file,
 	{
           xchar_t *trashdir_display_name = NULL, *file_display_name = NULL;
 
-          trashdir_display_name = g_filename_display_name (trashdir);
-          file_display_name = g_filename_display_name (local->filename);
+          trashdir_display_name = xfilename_display_name (trashdir);
+          file_display_name = xfilename_display_name (local->filename);
           g_set_error (error, G_IO_ERROR,
                        G_IO_ERROR_NOT_SUPPORTED,
                        _("Unable to find or create trash directory %s to trash %s"),
@@ -2176,8 +2176,8 @@ g_local_file_trash (xfile_t         *file,
     {
       xchar_t *trashdir_display_name = NULL, *file_display_name = NULL;
 
-      trashdir_display_name = g_filename_display_name (trashdir);
-      file_display_name = g_filename_display_name (local->filename);
+      trashdir_display_name = xfilename_display_name (trashdir);
+      file_display_name = xfilename_display_name (local->filename);
       g_set_error (error, G_IO_ERROR,
                    G_IO_ERROR_NOT_SUPPORTED,
                    _("Unable to find or create trash directory %s to trash %s"),
@@ -2205,7 +2205,7 @@ g_local_file_trash (xfile_t         *file,
     g_free (infofile);
 
     trashname = get_unique_filename (basename, i++);
-    infoname = g_strconcat (trashname, ".trashinfo", NULL);
+    infoname = xstrconcat (trashname, ".trashinfo", NULL);
     infofile = g_build_filename (infodir, infoname, NULL);
     g_free (infoname);
 
@@ -2239,29 +2239,29 @@ g_local_file_trash (xfile_t         *file,
 
   /* Use absolute names for homedir */
   if (is_homedir_trash)
-    original_name = g_strdup (local->filename);
+    original_name = xstrdup (local->filename);
   else
     original_name = try_make_relative (local->filename, topdir);
-  original_name_escaped = g_uri_escape_string (original_name, "/", FALSE);
+  original_name_escaped = xuri_escape_string (original_name, "/", FALSE);
 
   g_free (original_name);
   g_free (topdir);
 
   {
-    GDateTime *now = g_date_time_new_now_local ();
+    xdatetime_t *now = xdate_time_new_now_local ();
     if (now != NULL)
-      delete_time = g_date_time_format (now, "%Y-%m-%dT%H:%M:%S");
+      delete_time = xdate_time_format (now, "%Y-%m-%dT%H:%M:%S");
     else
-      delete_time = g_strdup ("9999-12-31T23:59:59");
-    g_date_time_unref (now);
+      delete_time = xstrdup ("9999-12-31T23:59:59");
+    xdate_time_unref (now);
   }
 
-  data = g_strdup_printf ("[Trash Info]\nPath=%s\nDeletionDate=%s\n",
+  data = xstrdup_printf ("[Trash Info]\nPath=%s\nDeletionDate=%s\n",
 			  original_name_escaped, delete_time);
   g_free (delete_time);
 
-  g_file_set_contents_full (infofile, data, -1,
-                            G_FILE_SET_CONTENTS_CONSISTENT | G_FILE_SET_CONTENTS_ONLY_EXISTING,
+  xfile_set_contents_full (infofile, data, -1,
+                            XFILE_SET_CONTENTS_CONSISTENT | XFILE_SET_CONTENTS_ONLY_EXISTING,
                             0600, NULL);
 
   /* TODO: Maybe we should verify that you can delete the file from the trash
@@ -2297,8 +2297,8 @@ g_local_file_trash (xfile_t         *file,
       return FALSE;
     }
 
-  vfs = g_vfs_get_default ();
-  class = G_VFS_GET_CLASS (vfs);
+  vfs = xvfs_get_default ();
+  class = XVFS_GET_CLASS (vfs);
   if (class->local_file_moved)
     class->local_file_moved (vfs, local->filename, trashfile);
 
@@ -2332,7 +2332,7 @@ g_local_file_trash (xfile_t         *file,
   wchar_t *wfilename;
   long len;
 
-  wfilename = g_utf8_to_utf16 (local->filename, -1, NULL, &len, NULL);
+  wfilename = xutf8_to_utf16 (local->filename, -1, NULL, &len, NULL);
   /* SHFILEOPSTRUCT.pFrom is double-zero-terminated */
   wfilename = g_renew (wchar_t, wfilename, len + 2);
   wfilename[len + 1] = 0;
@@ -2423,9 +2423,9 @@ g_local_file_make_symbolic_link (xfile_t         *file,
 static xboolean_t
 g_local_file_move (xfile_t                  *source,
 		   xfile_t                  *destination,
-		   GFileCopyFlags          flags,
+		   xfile_copy_flags_t          flags,
 		   xcancellable_t           *cancellable,
-		   GFileProgressCallback   progress_callback,
+		   xfile_progress_callback_t   progress_callback,
 		   xpointer_t                progress_callback_data,
 		   xerror_t                **error)
 {
@@ -2435,8 +2435,8 @@ g_local_file_move (xfile_t                  *source,
   char *backup_name;
   int res;
   off_t source_size;
-  GVfsClass *class;
-  GVfs *vfs;
+  xvfs_class_t *class;
+  xvfs_t *vfs;
 
   if (!X_IS_LOCAL_FILE (source) ||
       !X_IS_LOCAL_FILE (destination))
@@ -2469,7 +2469,7 @@ g_local_file_move (xfile_t                  *source,
     {
       destination_exist = TRUE; /* Target file exists */
 
-      if (flags & G_FILE_COPY_OVERWRITE)
+      if (flags & XFILE_COPY_OVERWRITE)
 	{
 	  /* Always fail on dirs, even with overwrite */
 	  if (S_ISDIR (statbuf.st_mode))
@@ -2496,9 +2496,9 @@ g_local_file_move (xfile_t                  *source,
 	}
     }
 
-  if (flags & G_FILE_COPY_BACKUP && destination_exist)
+  if (flags & XFILE_COPY_BACKUP && destination_exist)
     {
-      backup_name = g_strconcat (local_destination->filename, "~", NULL);
+      backup_name = xstrconcat (local_destination->filename, "~", NULL);
       if (g_rename (local_destination->filename, backup_name) == -1)
 	{
       	  g_set_error_literal (error,
@@ -2512,7 +2512,7 @@ g_local_file_move (xfile_t                  *source,
       destination_exist = FALSE; /* It did, but no more */
     }
 
-  if (source_is_dir && destination_exist && (flags & G_FILE_COPY_OVERWRITE))
+  if (source_is_dir && destination_exist && (flags & XFILE_COPY_OVERWRITE))
     {
       /* Source is a dir, destination exists (and is not a dir, because that would have failed
 	 earlier), and we're overwriting. Manually remove the target so we can do the rename. */
@@ -2524,7 +2524,7 @@ g_local_file_move (xfile_t                  *source,
 	  g_set_error (error, G_IO_ERROR,
 		       g_io_error_from_errno (errsv),
 		       _("Error removing target file: %s"),
-		       g_strerror (errsv));
+		       xstrerror (errsv));
 	  return FALSE;
 	}
     }
@@ -2552,8 +2552,8 @@ g_local_file_move (xfile_t                  *source,
       return FALSE;
     }
 
-  vfs = g_vfs_get_default ();
-  class = G_VFS_GET_CLASS (vfs);
+  vfs = xvfs_get_default ();
+  class = XVFS_GET_CLASS (vfs);
   if (class->local_file_moved)
     class->local_file_moved (vfs, local_source->filename, local_destination->filename);
 
@@ -2607,17 +2607,17 @@ g_local_file_is_nfs_home (const xchar_t *filename)
       if (g_once_init_enter (&initialized))
         {
           xfile_t *file;
-          GFileInfo *info;
+          xfile_info_t *info;
           const xchar_t *fs_type = NULL;
 
           file = _g_local_file_new (home);
-          info = g_local_file_query_filesystem_info (file, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, NULL, NULL);
+          info = g_local_file_query_filesystem_info (file, XFILE_ATTRIBUTE_FILESYSTEM_TYPE, NULL, NULL);
           if (info != NULL)
-            fs_type = g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE);
-          if (g_strcmp0 (fs_type, "nfs") == 0 || g_strcmp0 (fs_type, "nfs4") == 0)
+            fs_type = xfile_info_get_attribute_string (info, XFILE_ATTRIBUTE_FILESYSTEM_TYPE);
+          if (xstrcmp0 (fs_type, "nfs") == 0 || xstrcmp0 (fs_type, "nfs4") == 0)
             remote_home = TRUE;
           g_clear_object (&info);
-          g_object_unref (file);
+          xobject_unref (file);
 
           g_once_init_leave (&initialized, TRUE);
         }
@@ -2628,9 +2628,9 @@ g_local_file_is_nfs_home (const xchar_t *filename)
 }
 #endif /* !G_OS_WIN32 */
 
-static GFileMonitor*
+static xfile_monitor_t*
 g_local_file_monitor_dir (xfile_t             *file,
-			  GFileMonitorFlags  flags,
+			  xfile_monitor_flags_t  flags,
 			  xcancellable_t      *cancellable,
 			  xerror_t           **error)
 {
@@ -2639,9 +2639,9 @@ g_local_file_monitor_dir (xfile_t             *file,
   return g_local_file_monitor_new_for_path (local_file->filename, TRUE, flags, error);
 }
 
-static GFileMonitor*
+static xfile_monitor_t*
 g_local_file_monitor_file (xfile_t             *file,
-			   GFileMonitorFlags  flags,
+			   xfile_monitor_flags_t  flags,
 			   xcancellable_t      *cancellable,
 			   xerror_t           **error)
 {
@@ -2650,14 +2650,14 @@ g_local_file_monitor_file (xfile_t             *file,
   return g_local_file_monitor_new_for_path (local_file->filename, FALSE, flags, error);
 }
 
-/* Here is the GLocalFile implementation of g_file_measure_disk_usage().
+/* Here is the GLocalFile implementation of xfile_measure_disk_usage().
  *
  * If available, we use fopenat() in preference to filenames for
  * efficiency and safety reasons.  We know that fopenat() is available
  * based on if AT_FDCWD is defined.  POSIX guarantees that this will be
  * defined as a macro.
  *
- * We use a linked list of stack-allocated GSList nodes in order to be
+ * We use a linked list of stack-allocated xslist_t nodes in order to be
  * able to reconstruct the filename for error messages.  We actually
  * pass the filename to operate on through the top node of the list.
  *
@@ -2668,18 +2668,18 @@ g_local_file_monitor_file (xfile_t             *file,
  */
 
 static xboolean_t
-g_local_file_measure_size_error (GFileMeasureFlags   flags,
+g_local_file_measure_size_error (xfile_measure_flags_t   flags,
                                  xint_t                saved_errno,
-                                 GSList             *name,
+                                 xslist_t             *name,
                                  xerror_t            **error)
 {
   /* Only report an error if we were at the toplevel or if the caller
    * requested reporting of all errors.
    */
-  if ((name->next == NULL) || (flags & G_FILE_MEASURE_REPORT_ANY_ERROR))
+  if ((name->next == NULL) || (flags & XFILE_MEASURE_REPORT_ANY_ERROR))
     {
-      GString *filename;
-      GSList *node;
+      xstring_t *filename;
+      xslist_t *node;
 
       /* Skip some work if there is no error return */
       if (!error)
@@ -2687,14 +2687,14 @@ g_local_file_measure_size_error (GFileMeasureFlags   flags,
 
 #ifdef AT_FDCWD
       /* If using openat() we need to rebuild the filename for the message */
-      filename = g_string_new (name->data);
+      filename = xstring_new (name->data);
       for (node = name->next; node; node = node->next)
         {
           xchar_t *utf8;
 
-          g_string_prepend_c (filename, G_DIR_SEPARATOR);
-          utf8 = g_filename_display_name (node->data);
-          g_string_prepend (filename, utf8);
+          xstring_prepend_c (filename, G_DIR_SEPARATOR);
+          utf8 = xfilename_display_name (node->data);
+          xstring_prepend (filename, utf8);
           g_free (utf8);
         }
 #else
@@ -2703,18 +2703,18 @@ g_local_file_measure_size_error (GFileMeasureFlags   flags,
 
         /* Otherwise, we already have it, so just use it. */
         node = name;
-        filename = g_string_new (NULL);
-        utf8 = g_filename_display_name (node->data);
-        g_string_append (filename, utf8);
+        filename = xstring_new (NULL);
+        utf8 = xfilename_display_name (node->data);
+        xstring_append (filename, utf8);
         g_free (utf8);
       }
 #endif
 
       g_set_error (error, G_IO_ERROR, g_io_error_from_errno (saved_errno),
                    _("Could not determine the disk usage of %s: %s"),
-                   filename->str, g_strerror (saved_errno));
+                   filename->str, xstrerror (saved_errno));
 
-      g_string_free (filename, TRUE);
+      xstring_free (filename, TRUE);
 
       return FALSE;
     }
@@ -2726,29 +2726,29 @@ g_local_file_measure_size_error (GFileMeasureFlags   flags,
 
 typedef struct
 {
-  GFileMeasureFlags  flags;
+  xfile_measure_flags_t  flags;
   dev_t              contained_on;
   xcancellable_t      *cancellable;
 
-  GFileMeasureProgressCallback progress_callback;
+  xfile_measure_progress_callback_t progress_callback;
   xpointer_t                     progress_data;
 
-  guint64 disk_usage;
-  guint64 num_dirs;
-  guint64 num_files;
+  xuint64_t disk_usage;
+  xuint64_t num_dirs;
+  xuint64_t num_files;
 
-  guint64 last_progress_report;
+  xuint64_t last_progress_report;
 } MeasureState;
 
 static xboolean_t
 g_local_file_measure_size_of_contents (xint_t           fd,
-                                       GSList        *dir_name,
+                                       xslist_t        *dir_name,
                                        MeasureState  *state,
                                        xerror_t       **error);
 
 static xboolean_t
 g_local_file_measure_size_of_file (xint_t           parent_fd,
-                                   GSList        *name,
+                                   xslist_t        *name,
                                    MeasureState  *state,
                                    xerror_t       **error)
 {
@@ -2784,7 +2784,7 @@ g_local_file_measure_size_of_file (xint_t           parent_fd,
     {
       /* If not at the toplevel, check for a device boundary. */
 
-      if (state->flags & G_FILE_MEASURE_NO_XDEV)
+      if (state->flags & XFILE_MEASURE_NO_XDEV)
         if (state->contained_on != _g_stat_dev (&buf))
           return TRUE;
     }
@@ -2797,11 +2797,11 @@ g_local_file_measure_size_of_file (xint_t           parent_fd,
     }
 
 #if defined (G_OS_WIN32)
-  if (~state->flags & G_FILE_MEASURE_APPARENT_SIZE)
+  if (~state->flags & XFILE_MEASURE_APPARENT_SIZE)
     state->disk_usage += buf.allocated_size;
   else
 #elif defined (HAVE_STRUCT_STAT_ST_BLOCKS)
-  if (~state->flags & G_FILE_MEASURE_APPARENT_SIZE)
+  if (~state->flags & XFILE_MEASURE_APPARENT_SIZE)
     state->disk_usage += _g_stat_blocks (&buf) * G_GUINT64_CONSTANT (512);
   else
 #endif
@@ -2820,7 +2820,7 @@ g_local_file_measure_size_of_file (xint_t           parent_fd,
        */
       if (state->last_progress_report)
         {
-          guint64 now;
+          xuint64_t now;
 
           now = g_get_monotonic_time ();
 
@@ -2872,13 +2872,13 @@ g_local_file_measure_size_of_file (xint_t           parent_fd,
 
 static xboolean_t
 g_local_file_measure_size_of_contents (xint_t           fd,
-                                       GSList        *dir_name,
+                                       xslist_t        *dir_name,
                                        MeasureState  *state,
                                        xerror_t       **error)
 {
   xboolean_t success = TRUE;
   const xchar_t *name;
-  GDir *dir;
+  xdir_t *dir;
   xint_t saved_errno;
 
 #ifdef AT_FDCWD
@@ -2906,7 +2906,7 @@ g_local_file_measure_size_of_contents (xint_t           fd,
 
   while (success && (name = g_dir_read_name (dir)))
     {
-      GSList node;
+      xslist_t node;
 
       node.next = dir_name;
 #ifdef AT_FDCWD
@@ -2929,19 +2929,19 @@ g_local_file_measure_size_of_contents (xint_t           fd,
 
 static xboolean_t
 g_local_file_measure_disk_usage (xfile_t                         *file,
-                                 GFileMeasureFlags              flags,
+                                 xfile_measure_flags_t              flags,
                                  xcancellable_t                  *cancellable,
-                                 GFileMeasureProgressCallback   progress_callback,
+                                 xfile_measure_progress_callback_t   progress_callback,
                                  xpointer_t                       progress_data,
-                                 guint64                       *disk_usage,
-                                 guint64                       *num_dirs,
-                                 guint64                       *num_files,
+                                 xuint64_t                       *disk_usage,
+                                 xuint64_t                       *num_dirs,
+                                 xuint64_t                       *num_files,
                                  xerror_t                       **error)
 {
   GLocalFile *local_file = G_LOCAL_FILE (file);
   MeasureState state = { 0, };
   xint_t root_fd = -1;
-  GSList node;
+  xslist_t node;
 
   state.flags = flags;
   state.cancellable = cancellable;
@@ -2971,7 +2971,7 @@ g_local_file_measure_disk_usage (xfile_t                         *file,
 }
 
 static void
-g_local_file_file_iface_init (GFileIface *iface)
+g_local_file_file_iface_init (xfile_iface_t *iface)
 {
   iface->dup = g_local_file_dup;
   iface->hash = g_local_file_hash;

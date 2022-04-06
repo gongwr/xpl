@@ -45,14 +45,14 @@ enum {
  * @short_description: Zlib compressor
  * @include: gio/gio.h
  *
- * #GZlibCompressor is an implementation of #GConverter that
+ * #xzlib_compressor_t is an implementation of #xconverter_t that
  * compresses data using zlib.
  */
 
 static void g_zlib_compressor_iface_init          (GConverterIface *iface);
 
 /**
- * GZlibCompressor:
+ * xzlib_compressor_t:
  *
  * Zlib decompression
  */
@@ -64,11 +64,11 @@ struct _GZlibCompressor
   int level;
   z_stream zstream;
   gz_header gzheader;
-  GFileInfo *file_info;
+  xfile_info_t *file_info;
 };
 
 static void
-g_zlib_compressor_set_gzheader (GZlibCompressor *compressor)
+g_zlib_compressor_set_gzheader (xzlib_compressor_t *compressor)
 {
   /* On win32, these functions were not exported before 1.2.4 */
 #if !defined (G_OS_WIN32) || ZLIB_VERNUM >= 0x1240
@@ -81,34 +81,34 @@ g_zlib_compressor_set_gzheader (GZlibCompressor *compressor)
   memset (&compressor->gzheader, 0, sizeof (gz_header));
   compressor->gzheader.os = 0x03; /* Unix */
 
-  filename = g_file_info_get_name (compressor->file_info);
+  filename = xfile_info_get_name (compressor->file_info);
   compressor->gzheader.name = (Bytef *) filename;
   compressor->gzheader.name_max = filename ? strlen (filename) + 1 : 0;
 
   compressor->gzheader.time =
-      (uLong) g_file_info_get_attribute_uint64 (compressor->file_info,
-                                                G_FILE_ATTRIBUTE_TIME_MODIFIED);
+      (uLong) xfile_info_get_attribute_uint64 (compressor->file_info,
+                                                XFILE_ATTRIBUTE_TIME_MODIFIED);
 
   if (deflateSetHeader (&compressor->zstream, &compressor->gzheader) != Z_OK)
     g_warning ("unexpected zlib error: %s", compressor->zstream.msg);
 #endif /* !G_OS_WIN32 || ZLIB >= 1.2.4 */
 }
 
-G_DEFINE_TYPE_WITH_CODE (GZlibCompressor, g_zlib_compressor, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (xzlib_compressor, g_zlib_compressor, XTYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (XTYPE_CONVERTER,
 						g_zlib_compressor_iface_init))
 
 static void
 g_zlib_compressor_finalize (xobject_t *object)
 {
-  GZlibCompressor *compressor;
+  xzlib_compressor_t *compressor;
 
   compressor = G_ZLIB_COMPRESSOR (object);
 
   deflateEnd (&compressor->zstream);
 
   if (compressor->file_info)
-    g_object_unref (compressor->file_info);
+    xobject_unref (compressor->file_info);
 
   G_OBJECT_CLASS (g_zlib_compressor_parent_class)->finalize (object);
 }
@@ -117,25 +117,25 @@ g_zlib_compressor_finalize (xobject_t *object)
 static void
 g_zlib_compressor_set_property (xobject_t      *object,
 				  xuint_t         prop_id,
-				  const GValue *value,
-				  GParamSpec   *pspec)
+				  const xvalue_t *value,
+				  xparam_spec_t   *pspec)
 {
-  GZlibCompressor *compressor;
+  xzlib_compressor_t *compressor;
 
   compressor = G_ZLIB_COMPRESSOR (object);
 
   switch (prop_id)
     {
     case PROP_FORMAT:
-      compressor->format = g_value_get_enum (value);
+      compressor->format = xvalue_get_enum (value);
       break;
 
     case PROP_LEVEL:
-      compressor->level = g_value_get_int (value);
+      compressor->level = xvalue_get_int (value);
       break;
 
     case PROP_FILE_INFO:
-      g_zlib_compressor_set_file_info (compressor, g_value_get_object (value));
+      g_zlib_compressor_set_file_info (compressor, xvalue_get_object (value));
       break;
 
     default:
@@ -148,25 +148,25 @@ g_zlib_compressor_set_property (xobject_t      *object,
 static void
 g_zlib_compressor_get_property (xobject_t    *object,
 				  xuint_t       prop_id,
-				  GValue     *value,
-				  GParamSpec *pspec)
+				  xvalue_t     *value,
+				  xparam_spec_t *pspec)
 {
-  GZlibCompressor *compressor;
+  xzlib_compressor_t *compressor;
 
   compressor = G_ZLIB_COMPRESSOR (object);
 
   switch (prop_id)
     {
     case PROP_FORMAT:
-      g_value_set_enum (value, compressor->format);
+      xvalue_set_enum (value, compressor->format);
       break;
 
     case PROP_LEVEL:
-      g_value_set_int (value, compressor->level);
+      xvalue_set_int (value, compressor->level);
       break;
 
     case PROP_FILE_INFO:
-      g_value_set_object (value, compressor->file_info);
+      xvalue_set_object (value, compressor->file_info);
       break;
 
     default:
@@ -176,14 +176,14 @@ g_zlib_compressor_get_property (xobject_t    *object,
 }
 
 static void
-g_zlib_compressor_init (GZlibCompressor *compressor)
+g_zlib_compressor_init (xzlib_compressor_t *compressor)
 {
 }
 
 static void
 g_zlib_compressor_constructed (xobject_t *object)
 {
-  GZlibCompressor *compressor;
+  xzlib_compressor_t *compressor;
   int res;
 
   compressor = G_ZLIB_COMPRESSOR (object);
@@ -208,7 +208,7 @@ g_zlib_compressor_constructed (xobject_t *object)
     res = deflateInit (&compressor->zstream, compressor->level);
 
   if (res == Z_MEM_ERROR )
-    g_error ("GZlibCompressor: Not enough memory for zlib use");
+    xerror ("xzlib_compressor_t: Not enough memory for zlib use");
 
   if (res != Z_OK)
     g_warning ("unexpected zlib error: %s", compressor->zstream.msg);
@@ -226,7 +226,7 @@ g_zlib_compressor_class_init (GZlibCompressorClass *klass)
   gobject_class->get_property = g_zlib_compressor_get_property;
   gobject_class->set_property = g_zlib_compressor_set_property;
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
 				   PROP_FORMAT,
 				   g_param_spec_enum ("format",
 						      P_("compression format"),
@@ -235,7 +235,7 @@ g_zlib_compressor_class_init (GZlibCompressorClass *klass)
 						      G_ZLIB_COMPRESSOR_FORMAT_ZLIB,
 						      G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
 						      G_PARAM_STATIC_STRINGS));
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
 				   PROP_LEVEL,
 				   g_param_spec_int ("level",
 						     P_("compression level"),
@@ -247,15 +247,15 @@ g_zlib_compressor_class_init (GZlibCompressorClass *klass)
 						     G_PARAM_STATIC_STRINGS));
 
   /**
-   * GZlibCompressor:file-info:
+   * xzlib_compressor_t:file-info:
    *
-   * If set to a non-%NULL #GFileInfo object, and #GZlibCompressor:format is
+   * If set to a non-%NULL #xfile_info_t object, and #xzlib_compressor_t:format is
    * %G_ZLIB_COMPRESSOR_FORMAT_GZIP, the compressor will write the file name
    * and modification time from the file info to the GZIP header.
    *
    * Since: 2.26
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_FILE_INFO,
                                    g_param_spec_object ("file-info",
                                                        P_("file info"),
@@ -270,19 +270,19 @@ g_zlib_compressor_class_init (GZlibCompressorClass *klass)
  * @format: The format to use for the compressed data
  * @level: compression level (0-9), -1 for default
  *
- * Creates a new #GZlibCompressor.
+ * Creates a new #xzlib_compressor_t.
  *
- * Returns: a new #GZlibCompressor
+ * Returns: a new #xzlib_compressor_t
  *
  * Since: 2.24
  **/
-GZlibCompressor *
+xzlib_compressor_t *
 g_zlib_compressor_new (GZlibCompressorFormat format,
 		       int level)
 {
-  GZlibCompressor *compressor;
+  xzlib_compressor_t *compressor;
 
-  compressor = g_object_new (XTYPE_ZLIB_COMPRESSOR,
+  compressor = xobject_new (XTYPE_ZLIB_COMPRESSOR,
 			     "format", format,
 			     "level", level,
 			     NULL);
@@ -292,16 +292,16 @@ g_zlib_compressor_new (GZlibCompressorFormat format,
 
 /**
  * g_zlib_compressor_get_file_info:
- * @compressor: a #GZlibCompressor
+ * @compressor: a #xzlib_compressor_t
  *
- * Returns the #GZlibCompressor:file-info property.
+ * Returns the #xzlib_compressor_t:file-info property.
  *
- * Returns: (nullable) (transfer none): a #GFileInfo, or %NULL
+ * Returns: (nullable) (transfer none): a #xfile_info_t, or %NULL
  *
  * Since: 2.26
  */
-GFileInfo *
-g_zlib_compressor_get_file_info (GZlibCompressor *compressor)
+xfile_info_t *
+g_zlib_compressor_get_file_info (xzlib_compressor_t *compressor)
 {
   g_return_val_if_fail (X_IS_ZLIB_COMPRESSOR (compressor), NULL);
 
@@ -310,11 +310,11 @@ g_zlib_compressor_get_file_info (GZlibCompressor *compressor)
 
 /**
  * g_zlib_compressor_set_file_info:
- * @compressor: a #GZlibCompressor
- * @file_info: (nullable): a #GFileInfo
+ * @compressor: a #xzlib_compressor_t
+ * @file_info: (nullable): a #xfile_info_t
  *
  * Sets @file_info in @compressor. If non-%NULL, and @compressor's
- * #GZlibCompressor:format property is %G_ZLIB_COMPRESSOR_FORMAT_GZIP,
+ * #xzlib_compressor_t:format property is %G_ZLIB_COMPRESSOR_FORMAT_GZIP,
  * it will be used to set the file name and modification time in
  * the GZIP header of the compressed data.
  *
@@ -325,8 +325,8 @@ g_zlib_compressor_get_file_info (GZlibCompressor *compressor)
  * Since: 2.26
  */
 void
-g_zlib_compressor_set_file_info (GZlibCompressor *compressor,
-                                 GFileInfo       *file_info)
+g_zlib_compressor_set_file_info (xzlib_compressor_t *compressor,
+                                 xfile_info_t       *file_info)
 {
   g_return_if_fail (X_IS_ZLIB_COMPRESSOR (compressor));
 
@@ -334,19 +334,19 @@ g_zlib_compressor_set_file_info (GZlibCompressor *compressor,
     return;
 
   if (compressor->file_info)
-    g_object_unref (compressor->file_info);
+    xobject_unref (compressor->file_info);
   if (file_info)
-    g_object_ref (file_info);
+    xobject_ref (file_info);
   compressor->file_info = file_info;
-  g_object_notify (G_OBJECT (compressor), "file-info");
+  xobject_notify (G_OBJECT (compressor), "file-info");
 
   g_zlib_compressor_set_gzheader (compressor);
 }
 
 static void
-g_zlib_compressor_reset (GConverter *converter)
+g_zlib_compressor_reset (xconverter_t *converter)
 {
-  GZlibCompressor *compressor = G_ZLIB_COMPRESSOR (converter);
+  xzlib_compressor_t *compressor = G_ZLIB_COMPRESSOR (converter);
   int res;
 
   res = deflateReset (&compressor->zstream);
@@ -358,7 +358,7 @@ g_zlib_compressor_reset (GConverter *converter)
 }
 
 static GConverterResult
-g_zlib_compressor_convert (GConverter *converter,
+g_zlib_compressor_convert (xconverter_t *converter,
 			   const void *inbuf,
 			   xsize_t       inbuf_size,
 			   void       *outbuf,
@@ -368,7 +368,7 @@ g_zlib_compressor_convert (GConverter *converter,
 			   xsize_t      *bytes_written,
 			   xerror_t    **error)
 {
-  GZlibCompressor *compressor;
+  xzlib_compressor_t *compressor;
   int res;
   int flush;
 

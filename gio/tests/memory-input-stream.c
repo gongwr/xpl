@@ -50,7 +50,7 @@ test_read_chunks (void)
       pos = 0;
       while (pos < len)
         {
-          bytes_read = g_input_stream_read (stream, buffer, chunk_size, NULL, &error);
+          bytes_read = xinput_stream_read (stream, buffer, chunk_size, NULL, &error);
           g_assert_no_error (error);
           g_assert_cmpint (bytes_read, ==, MIN (chunk_size, len - pos));
           g_assert (strncmp (buffer, result + pos, bytes_read) == 0);
@@ -59,15 +59,15 @@ test_read_chunks (void)
         }
 
       g_assert_cmpint (pos, ==, len);
-      res = g_seekable_seek (G_SEEKABLE (stream), 0, G_SEEK_SET, NULL, &error);
+      res = xseekable_seek (G_SEEKABLE (stream), 0, G_SEEK_SET, NULL, &error);
       g_assert_cmpint (res, ==, TRUE);
       g_assert_no_error (error);
     }
 
-  g_object_unref (stream);
+  xobject_unref (stream);
 }
 
-GMainLoop *loop;
+xmain_loop_t *loop;
 
 static void
 async_read_chunk (xobject_t      *object,
@@ -77,11 +77,11 @@ async_read_chunk (xobject_t      *object,
   xsize_t *bytes_read = user_data;
   xerror_t *error = NULL;
 
-  *bytes_read = g_input_stream_read_finish (G_INPUT_STREAM (object),
+  *bytes_read = xinput_stream_read_finish (G_INPUT_STREAM (object),
 					    result, &error);
   g_assert_no_error (error);
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
@@ -92,11 +92,11 @@ async_skipped_chunk (xobject_t      *object,
   xsize_t *bytes_skipped = user_data;
   xerror_t *error = NULL;
 
-  *bytes_skipped = g_input_stream_skip_finish (G_INPUT_STREAM (object),
+  *bytes_skipped = xinput_stream_skip_finish (G_INPUT_STREAM (object),
                                                result, &error);
   g_assert_no_error (error);
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
@@ -112,7 +112,7 @@ test_async (void)
   xinput_stream_t *stream;
   xboolean_t res;
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   stream = g_memory_input_stream_new ();
 
@@ -127,10 +127,10 @@ test_async (void)
       pos = 0;
       while (pos < len)
         {
-          g_input_stream_read_async (stream, buffer, chunk_size,
+          xinput_stream_read_async (stream, buffer, chunk_size,
 				     G_PRIORITY_DEFAULT, NULL,
 				     async_read_chunk, &bytes_read);
-	  g_main_loop_run (loop);
+	  xmain_loop_run (loop);
 
           g_assert_cmpint (bytes_read, ==, MIN (chunk_size, len - pos));
           g_assert (strncmp (buffer, result + pos, bytes_read) == 0);
@@ -139,38 +139,38 @@ test_async (void)
         }
 
       g_assert_cmpint (pos, ==, len);
-      res = g_seekable_seek (G_SEEKABLE (stream), 0, G_SEEK_SET, NULL, &error);
+      res = xseekable_seek (G_SEEKABLE (stream), 0, G_SEEK_SET, NULL, &error);
       g_assert_cmpint (res, ==, TRUE);
       g_assert_no_error (error);
 
       pos = 0;
       while (pos + chunk_size + 1 < len)
         {
-          g_input_stream_skip_async (stream, chunk_size,
+          xinput_stream_skip_async (stream, chunk_size,
 				     G_PRIORITY_DEFAULT, NULL,
 				     async_skipped_chunk, &bytes_skipped);
-	  g_main_loop_run (loop);
+	  xmain_loop_run (loop);
 
           g_assert_cmpint (bytes_skipped, ==, MIN (chunk_size, len - pos));
 
           pos += bytes_skipped;
         }
 
-      g_input_stream_read_async (stream, buffer, len - pos,
+      xinput_stream_read_async (stream, buffer, len - pos,
                                  G_PRIORITY_DEFAULT, NULL,
                                  async_read_chunk, &bytes_read);
-      g_main_loop_run (loop);
+      xmain_loop_run (loop);
 
       g_assert_cmpint (bytes_read, ==, len - pos);
       g_assert (strncmp (buffer, result + pos, bytes_read) == 0);
 
-      res = g_seekable_seek (G_SEEKABLE (stream), 0, G_SEEK_SET, NULL, &error);
+      res = xseekable_seek (G_SEEKABLE (stream), 0, G_SEEK_SET, NULL, &error);
       g_assert_cmpint (res, ==, TRUE);
       g_assert_no_error (error);
     }
 
-  g_object_unref (stream);
-  g_main_loop_unref (loop);
+  xobject_unref (stream);
+  xmain_loop_unref (loop);
 }
 
 static void
@@ -190,23 +190,23 @@ test_seek (void)
                                   data2, -1, NULL);
 
   g_assert (X_IS_SEEKABLE (stream));
-  g_assert (g_seekable_can_seek (G_SEEKABLE (stream)));
+  g_assert (xseekable_can_seek (G_SEEKABLE (stream)));
 
   error = NULL;
-  g_assert (g_seekable_seek (G_SEEKABLE (stream), 26, G_SEEK_SET, NULL, &error));
+  g_assert (xseekable_seek (G_SEEKABLE (stream), 26, G_SEEK_SET, NULL, &error));
   g_assert_no_error (error);
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (stream)), ==, 26);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (stream)), ==, 26);
 
-  g_assert (g_input_stream_read (stream, buffer, 1, NULL, &error) == 1);
+  g_assert (xinput_stream_read (stream, buffer, 1, NULL, &error) == 1);
   g_assert_no_error (error);
 
   g_assert (buffer[0] == 'A');
 
-  g_assert (!g_seekable_seek (G_SEEKABLE (stream), 26, G_SEEK_CUR, NULL, &error));
+  g_assert (!xseekable_seek (G_SEEKABLE (stream), 26, G_SEEK_CUR, NULL, &error));
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
-  g_error_free (error);
+  xerror_free (error);
 
-  g_object_unref (stream);
+  xobject_unref (stream);
 }
 
 static void
@@ -225,14 +225,14 @@ test_truncate (void)
                                   data2, -1, NULL);
 
   g_assert (X_IS_SEEKABLE (stream));
-  g_assert (!g_seekable_can_truncate (G_SEEKABLE (stream)));
+  g_assert (!xseekable_can_truncate (G_SEEKABLE (stream)));
 
   error = NULL;
-  g_assert (!g_seekable_truncate (G_SEEKABLE (stream), 26, NULL, &error));
+  g_assert (!xseekable_truncate (G_SEEKABLE (stream), 26, NULL, &error));
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED);
-  g_error_free (error);
+  xerror_free (error);
 
-  g_object_unref (stream);
+  xobject_unref (stream);
 }
 
 static void
@@ -242,9 +242,9 @@ test_read_bytes (void)
   const char *data2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   xinput_stream_t *stream;
   xerror_t *error = NULL;
-  GBytes *bytes;
+  xbytes_t *bytes;
   xsize_t size;
-  gconstpointer data;
+  xconstpointer data;
 
   stream = g_memory_input_stream_new ();
   g_memory_input_stream_add_data (G_MEMORY_INPUT_STREAM (stream),
@@ -252,22 +252,22 @@ test_read_bytes (void)
   g_memory_input_stream_add_data (G_MEMORY_INPUT_STREAM (stream),
                                   data2, -1, NULL);
 
-  bytes = g_input_stream_read_bytes (stream, 26, NULL, &error);
+  bytes = xinput_stream_read_bytes (stream, 26, NULL, &error);
   g_assert_no_error (error);
 
-  data = g_bytes_get_data (bytes, &size);
+  data = xbytes_get_data (bytes, &size);
   g_assert_cmpint (size, ==, 26);
   g_assert (strncmp (data, data1, 26) == 0);
 
-  g_bytes_unref (bytes);
-  g_object_unref (stream);
+  xbytes_unref (bytes);
+  xobject_unref (stream);
 }
 
 static void
 test_from_bytes (void)
 {
   xchar_t data[4096], buffer[4096];
-  GBytes *bytes;
+  xbytes_t *bytes;
   xerror_t *error = NULL;
   xinput_stream_t *stream;
   xint_t i;
@@ -275,14 +275,14 @@ test_from_bytes (void)
   for (i = 0; i < 4096; i++)
     data[i] = 1 + i % 255;
 
-  bytes = g_bytes_new_static (data, 4096);
+  bytes = xbytes_new_static (data, 4096);
   stream = g_memory_input_stream_new_from_bytes (bytes);
-  g_assert (g_input_stream_read (stream, buffer, 2048, NULL, &error) == 2048);
+  g_assert (xinput_stream_read (stream, buffer, 2048, NULL, &error) == 2048);
   g_assert_no_error (error);
   g_assert (strncmp (data, buffer, 2048) == 0);
 
-  g_object_unref (stream);
-  g_bytes_unref (bytes);
+  xobject_unref (stream);
+  xbytes_unref (bytes);
 }
 
 int

@@ -45,7 +45,7 @@ try:
             except AttributeError:
                 raise unittest.SkipTest('Low memory monitor not in '
                                         'introspection data. Requires '
-                                        'xobject_t-Introspection ≥ 1.63.2')
+                                        'xobject-Introspection ≥ 1.63.2')
             try:
                 (self.p_mock, self.obj_lmm) = self.spawn_server_template(
                     'low_memory_monitor', {}, stdout=subprocess.PIPE)

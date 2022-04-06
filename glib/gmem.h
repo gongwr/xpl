@@ -73,7 +73,7 @@ void	 g_free	          (xpointer_t	 mem);
 
 XPL_AVAILABLE_IN_2_34
 void     g_clear_pointer  (xpointer_t      *pp,
-                           GDestroyNotify destroy);
+                           xdestroy_notify_t destroy);
 
 XPL_AVAILABLE_IN_ALL
 xpointer_t g_malloc         (xsize_t	 n_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
@@ -143,7 +143,7 @@ void     g_aligned_free   (xpointer_t      mem);
     union { char *in; xpointer_t *out; } _pp;                                    \
     xpointer_t _p;                                                               \
     /* This assignment is needed to avoid a gcc warning */                     \
-    GDestroyNotify _destroy = (GDestroyNotify) (destroy);                      \
+    xdestroy_notify_t _destroy = (xdestroy_notify_t) (destroy);                      \
                                                                                \
     _pp.in = (char *) (pp);                                                    \
     _p = *_pp.out;                                                             \
@@ -169,7 +169,7 @@ void     g_aligned_free   (xpointer_t      mem);
  * The return value will be properly typed, according to the type of
  * @pp.
  *
- * This can be very useful when combined with g_autoptr() to prevent the
+ * This can be very useful when combined with x_autoptr() to prevent the
  * return value of a function from being automatically freed.  Consider
  * the following example (which only works on GCC and clang):
  *
@@ -177,7 +177,7 @@ void     g_aligned_free   (xpointer_t      mem);
  * xobject_t *
  * create_object (void)
  * {
- *   g_autoptr(xobject_t) obj = g_object_new (XTYPE_OBJECT, NULL);
+ *   x_autoptr(xobject) obj = xobject_new (XTYPE_OBJECT, NULL);
  *
  *   if (early_error_case)
  *     return NULL;
@@ -193,7 +193,7 @@ void     g_aligned_free   (xpointer_t      mem);
  * xboolean_t
  * get_object (xobject_t **obj_out)
  * {
- *   g_autoptr(xobject_t) obj = g_object_new (XTYPE_OBJECT, NULL);
+ *   x_autoptr(xobject) obj = xobject_new (XTYPE_OBJECT, NULL);
  *
  *   if (early_error_case)
  *     return FALSE;

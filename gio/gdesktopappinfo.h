@@ -35,7 +35,7 @@ G_BEGIN_DECLS
 typedef struct _GDesktopAppInfo        GDesktopAppInfo;
 typedef struct _GDesktopAppInfoClass   GDesktopAppInfoClass;
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GDesktopAppInfo, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(xdesktop_app_info, xobject_unref)
 
 struct _GDesktopAppInfoClass
 {
@@ -49,7 +49,7 @@ xtype_t            g_desktop_app_info_get_type          (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
 GDesktopAppInfo *g_desktop_app_info_new_from_filename (const char      *filename);
 XPL_AVAILABLE_IN_ALL
-GDesktopAppInfo *g_desktop_app_info_new_from_keyfile  (GKeyFile        *key_file);
+GDesktopAppInfo *g_desktop_app_info_new_from_keyfile  (xkey_file_t        *key_file);
 
 XPL_AVAILABLE_IN_ALL
 const char *     g_desktop_app_info_get_filename      (GDesktopAppInfo *info);
@@ -100,7 +100,7 @@ const xchar_t * const *   g_desktop_app_info_list_actions                 (GDesk
 XPL_AVAILABLE_IN_2_38
 void                    g_desktop_app_info_launch_action                (GDesktopAppInfo   *info,
                                                                          const xchar_t       *action_name,
-                                                                         GAppLaunchContext *launch_context);
+                                                                         xapp_launch_context_t *launch_context);
 
 XPL_AVAILABLE_IN_2_38
 xchar_t *                 g_desktop_app_info_get_action_name              (GDesktopAppInfo   *info,
@@ -137,7 +137,7 @@ struct _GDesktopAppInfoLookupIface
 {
   xtype_interface_t x_iface;
 
-  GAppInfo * (* get_default_for_uri_scheme) (GDesktopAppInfoLookup *lookup,
+  xapp_info_t * (* get_default_for_uri_scheme) (GDesktopAppInfoLookup *lookup,
                                              const char            *uri_scheme);
 };
 
@@ -145,7 +145,7 @@ XPL_DEPRECATED
 xtype_t     g_desktop_app_info_lookup_get_type                   (void) G_GNUC_CONST;
 
 XPL_DEPRECATED
-GAppInfo *g_desktop_app_info_lookup_get_default_for_uri_scheme (GDesktopAppInfoLookup *lookup,
+xapp_info_t *g_desktop_app_info_lookup_get_default_for_uri_scheme (GDesktopAppInfoLookup *lookup,
                                                                 const char            *uri_scheme);
 
 /**
@@ -159,13 +159,13 @@ GAppInfo *g_desktop_app_info_lookup_get_default_for_uri_scheme (GDesktopAppInfoL
  * for each, providing the process ID.
  */
 typedef void (*GDesktopAppLaunchCallback) (GDesktopAppInfo  *appinfo,
-					   GPid              pid,
+					   xpid_t              pid,
 					   xpointer_t          user_data);
 
 XPL_AVAILABLE_IN_2_28
 xboolean_t    g_desktop_app_info_launch_uris_as_manager (GDesktopAppInfo            *appinfo,
 						       xlist_t                      *uris,
-						       GAppLaunchContext          *launch_context,
+						       xapp_launch_context_t          *launch_context,
 						       GSpawnFlags                 spawn_flags,
 						       GSpawnChildSetupFunc        user_setup,
 						       xpointer_t                    user_setup_data,
@@ -176,7 +176,7 @@ xboolean_t    g_desktop_app_info_launch_uris_as_manager (GDesktopAppInfo        
 XPL_AVAILABLE_IN_2_58
 xboolean_t    g_desktop_app_info_launch_uris_as_manager_with_fds (GDesktopAppInfo            *appinfo,
 								xlist_t                      *uris,
-								GAppLaunchContext          *launch_context,
+								xapp_launch_context_t          *launch_context,
 								GSpawnFlags                 spawn_flags,
 								GSpawnChildSetupFunc        user_setup,
 								xpointer_t                    user_setup_data,

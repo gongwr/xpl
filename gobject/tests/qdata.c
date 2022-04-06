@@ -33,19 +33,19 @@ thread_func (xpointer_t data)
       d = g_random_int_range (-10, 100);
       bucket[idx] += d;
 retry:
-      value = GPOINTER_TO_INT (g_object_get_data (object, "test"));
+      value = GPOINTER_TO_INT (xobject_get_data (object, "test"));
       new_value = value + d;
       if (fail)
-        g_object_set_data (object, "test", GINT_TO_POINTER (new_value));
+        xobject_set_data (object, "test", GINT_TO_POINTER (new_value));
       else
         {
-          if (!g_object_replace_data (object, "test",
+          if (!xobject_replace_data (object, "test",
                                       GINT_TO_POINTER (value),
                                       GINT_TO_POINTER (new_value),
                                       NULL, NULL))
             goto retry;
         }
-      g_thread_yield ();
+      xthread_yield ();
     }
 
   return NULL;
@@ -56,57 +56,57 @@ test_qdata_threaded (void)
 {
   xint_t sum;
   xint_t i;
-  GThread *threads[THREADS];
+  xthread_t *threads[THREADS];
   xint_t result;
 
-  object = g_object_new (XTYPE_OBJECT, NULL);
-  g_object_set_data (object, "test", GINT_TO_POINTER (0));
+  object = xobject_new (XTYPE_OBJECT, NULL);
+  xobject_set_data (object, "test", GINT_TO_POINTER (0));
 
   for (i = 0; i < THREADS; i++)
     bucket[i] = 0;
 
   for (i = 0; i < THREADS; i++)
-    threads[i] = g_thread_new ("qdata", thread_func, GINT_TO_POINTER (i));
+    threads[i] = xthread_new ("qdata", thread_func, GINT_TO_POINTER (i));
 
   for (i = 0; i < THREADS; i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 
   sum = 0;
   for (i = 0; i < THREADS; i++)
     sum += bucket[i];
 
-  result = GPOINTER_TO_INT (g_object_get_data (object, "test"));
+  result = GPOINTER_TO_INT (xobject_get_data (object, "test"));
 
   g_assert_cmpint (sum, ==, result);
 
-  g_object_unref (object);
+  xobject_unref (object);
 }
 
 static void
 test_qdata_dup (void)
 {
   xchar_t *s, *s2;
-  GQuark quark;
+  xquark quark;
   xboolean_t b;
 
   quark = g_quark_from_static_string ("test");
-  object = g_object_new (XTYPE_OBJECT, NULL);
-  s = g_strdup ("s");
-  g_object_set_qdata_full (object, quark, s, g_free);
+  object = xobject_new (XTYPE_OBJECT, NULL);
+  s = xstrdup ("s");
+  xobject_set_qdata_full (object, quark, s, g_free);
 
-  s2 = g_object_dup_qdata (object, quark, (GDuplicateFunc)g_strdup, NULL);
+  s2 = xobject_dup_qdata (object, quark, (GDuplicateFunc)xstrdup, NULL);
 
   g_assert_cmpstr (s, ==, s2);
   g_assert (s != s2);
 
   g_free (s2);
 
-  b = g_object_replace_qdata (object, quark, s, "s2", NULL, NULL);
+  b = xobject_replace_qdata (object, quark, s, "s2", NULL, NULL);
   g_assert (b);
 
   g_free (s);
 
-  g_object_unref (object);
+  xobject_unref (object);
 }
 
 int

@@ -25,7 +25,7 @@
  * GLib at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-/* The GMutex, GCond and GPrivate implementations in this file are some
+/* The xmutex_t, xcond_t and GPrivate implementations in this file are some
  * of the lowest-level code in GLib.  All other parts of GLib (messages,
  * memory, slices, etc) assume that they can freely use these facilities
  * without risking recursion.
@@ -78,7 +78,7 @@
 #endif
 
 static void
-g_thread_abort (xint_t         status,
+xthread_abort (xint_t         status,
                 const xchar_t *function)
 {
   fprintf (stderr, "GLib (gthread-posix.c): Unexpected error from C library during '%s': %s.  Aborting.\n",
@@ -86,7 +86,7 @@ g_thread_abort (xint_t         status,
   g_abort ();
 }
 
-/* {{{1 GMutex */
+/* {{{1 xmutex_t */
 
 #if !defined(USE_NATIVE_MUTEX)
 
@@ -102,7 +102,7 @@ g_mutex_impl_new (void)
 
   mutex = malloc (sizeof (pthread_mutex_t));
   if G_UNLIKELY (mutex == NULL)
-    g_thread_abort (errno, "malloc");
+    xthread_abort (errno, "malloc");
 
 #ifdef PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP
   pthread_mutexattr_init (&attr);
@@ -111,7 +111,7 @@ g_mutex_impl_new (void)
 #endif
 
   if G_UNLIKELY ((status = pthread_mutex_init (mutex, pattr)) != 0)
-    g_thread_abort (status, "pthread_mutex_init");
+    xthread_abort (status, "pthread_mutex_init");
 
 #ifdef PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP
   pthread_mutexattr_destroy (&attr);
@@ -128,7 +128,7 @@ g_mutex_impl_free (pthread_mutex_t *mutex)
 }
 
 static inline pthread_mutex_t *
-g_mutex_get_impl (GMutex *mutex)
+g_mutex_get_impl (xmutex_t *mutex)
 {
   pthread_mutex_t *impl = g_atomic_pointer_get (&mutex->p);
 
@@ -146,9 +146,9 @@ g_mutex_get_impl (GMutex *mutex)
 
 /**
  * g_mutex_init:
- * @mutex: an uninitialized #GMutex
+ * @mutex: an uninitialized #xmutex_t
  *
- * Initializes a #GMutex so that it can be used.
+ * Initializes a #xmutex_t so that it can be used.
  *
  * This function is useful to initialize a mutex that has been
  * allocated on the stack, or as part of a larger structure.
@@ -157,7 +157,7 @@ g_mutex_get_impl (GMutex *mutex)
  *
  * |[<!-- language="C" -->
  *   typedef struct {
- *     GMutex m;
+ *     xmutex_t m;
  *     ...
  *   } Blob;
  *
@@ -170,24 +170,24 @@ g_mutex_get_impl (GMutex *mutex)
  * To undo the effect of g_mutex_init() when a mutex is no longer
  * needed, use g_mutex_clear().
  *
- * Calling g_mutex_init() on an already initialized #GMutex leads
+ * Calling g_mutex_init() on an already initialized #xmutex_t leads
  * to undefined behaviour.
  *
  * Since: 2.32
  */
 void
-g_mutex_init (GMutex *mutex)
+g_mutex_init (xmutex_t *mutex)
 {
   mutex->p = g_mutex_impl_new ();
 }
 
 /**
  * g_mutex_clear:
- * @mutex: an initialized #GMutex
+ * @mutex: an initialized #xmutex_t
  *
  * Frees the resources allocated to a mutex with g_mutex_init().
  *
- * This function should not be used with a #GMutex that has been
+ * This function should not be used with a #xmutex_t that has been
  * statically allocated.
  *
  * Calling g_mutex_clear() on a locked mutex leads to undefined
@@ -196,36 +196,36 @@ g_mutex_init (GMutex *mutex)
  * Sine: 2.32
  */
 void
-g_mutex_clear (GMutex *mutex)
+g_mutex_clear (xmutex_t *mutex)
 {
   g_mutex_impl_free (mutex->p);
 }
 
 /**
  * g_mutex_lock:
- * @mutex: a #GMutex
+ * @mutex: a #xmutex_t
  *
  * Locks @mutex. If @mutex is already locked by another thread, the
  * current thread will block until @mutex is unlocked by the other
  * thread.
  *
- * #GMutex is neither guaranteed to be recursive nor to be
- * non-recursive.  As such, calling g_mutex_lock() on a #GMutex that has
+ * #xmutex_t is neither guaranteed to be recursive nor to be
+ * non-recursive.  As such, calling g_mutex_lock() on a #xmutex_t that has
  * already been locked by the same thread results in undefined behaviour
  * (including but not limited to deadlocks).
  */
 void
-g_mutex_lock (GMutex *mutex)
+g_mutex_lock (xmutex_t *mutex)
 {
   xint_t status;
 
   if G_UNLIKELY ((status = pthread_mutex_lock (g_mutex_get_impl (mutex))) != 0)
-    g_thread_abort (status, "pthread_mutex_lock");
+    xthread_abort (status, "pthread_mutex_lock");
 }
 
 /**
  * g_mutex_unlock:
- * @mutex: a #GMutex
+ * @mutex: a #xmutex_t
  *
  * Unlocks @mutex. If another thread is blocked in a g_mutex_lock()
  * call for @mutex, it will become unblocked and can lock @mutex itself.
@@ -234,31 +234,31 @@ g_mutex_lock (GMutex *mutex)
  * current thread leads to undefined behaviour.
  */
 void
-g_mutex_unlock (GMutex *mutex)
+g_mutex_unlock (xmutex_t *mutex)
 {
   xint_t status;
 
   if G_UNLIKELY ((status = pthread_mutex_unlock (g_mutex_get_impl (mutex))) != 0)
-    g_thread_abort (status, "pthread_mutex_unlock");
+    xthread_abort (status, "pthread_mutex_unlock");
 }
 
 /**
  * g_mutex_trylock:
- * @mutex: a #GMutex
+ * @mutex: a #xmutex_t
  *
  * Tries to lock @mutex. If @mutex is already locked by another thread,
  * it immediately returns %FALSE. Otherwise it locks @mutex and returns
  * %TRUE.
  *
- * #GMutex is neither guaranteed to be recursive nor to be
- * non-recursive.  As such, calling g_mutex_lock() on a #GMutex that has
+ * #xmutex_t is neither guaranteed to be recursive nor to be
+ * non-recursive.  As such, calling g_mutex_lock() on a #xmutex_t that has
  * already been locked by the same thread results in undefined behaviour
  * (including but not limited to deadlocks or arbitrary return values).
  *
  * Returns: %TRUE if @mutex could be locked
  */
 xboolean_t
-g_mutex_trylock (GMutex *mutex)
+g_mutex_trylock (xmutex_t *mutex)
 {
   xint_t status;
 
@@ -266,7 +266,7 @@ g_mutex_trylock (GMutex *mutex)
     return TRUE;
 
   if G_UNLIKELY (status != EBUSY)
-    g_thread_abort (status, "pthread_mutex_trylock");
+    xthread_abort (status, "pthread_mutex_trylock");
 
   return FALSE;
 }
@@ -283,7 +283,7 @@ g_rec_mutex_impl_new (void)
 
   mutex = malloc (sizeof (pthread_mutex_t));
   if G_UNLIKELY (mutex == NULL)
-    g_thread_abort (errno, "malloc");
+    xthread_abort (errno, "malloc");
 
   pthread_mutexattr_init (&attr);
   pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -445,10 +445,10 @@ g_rw_lock_impl_new (void)
 
   rwlock = malloc (sizeof (pthread_rwlock_t));
   if G_UNLIKELY (rwlock == NULL)
-    g_thread_abort (errno, "malloc");
+    xthread_abort (errno, "malloc");
 
   if G_UNLIKELY ((status = pthread_rwlock_init (rwlock, NULL)) != 0)
-    g_thread_abort (status, "pthread_rwlock_init");
+    xthread_abort (status, "pthread_rwlock_init");
 
   return rwlock;
 }
@@ -552,7 +552,7 @@ g_rw_lock_writer_lock (GRWLock *rw_lock)
   int retval = pthread_rwlock_wrlock (g_rw_lock_get_impl (rw_lock));
 
   if (retval != 0)
-    g_critical ("Failed to get RW lock %p: %s", rw_lock, g_strerror (retval));
+    g_critical ("Failed to get RW lock %p: %s", rw_lock, xstrerror (retval));
 }
 
 /**
@@ -622,7 +622,7 @@ g_rw_lock_reader_lock (GRWLock *rw_lock)
   int retval = pthread_rwlock_rdlock (g_rw_lock_get_impl (rw_lock));
 
   if (retval != 0)
-    g_critical ("Failed to get RW lock %p: %s", rw_lock, g_strerror (retval));
+    g_critical ("Failed to get RW lock %p: %s", rw_lock, xstrerror (retval));
 }
 
 /**
@@ -663,7 +663,7 @@ g_rw_lock_reader_unlock (GRWLock *rw_lock)
   pthread_rwlock_unlock (g_rw_lock_get_impl (rw_lock));
 }
 
-/* {{{1 GCond */
+/* {{{1 xcond_t */
 
 #if !defined(USE_NATIVE_MUTEX)
 
@@ -679,17 +679,17 @@ g_cond_impl_new (void)
 #ifdef HAVE_PTHREAD_COND_TIMEDWAIT_RELATIVE_NP
 #elif defined (HAVE_PTHREAD_CONDATTR_SETCLOCK) && defined (CLOCK_MONOTONIC)
   if G_UNLIKELY ((status = pthread_condattr_setclock (&attr, CLOCK_MONOTONIC)) != 0)
-    g_thread_abort (status, "pthread_condattr_setclock");
+    xthread_abort (status, "pthread_condattr_setclock");
 #else
-#error Cannot support GCond on your platform.
+#error Cannot support xcond_t on your platform.
 #endif
 
   cond = malloc (sizeof (pthread_cond_t));
   if G_UNLIKELY (cond == NULL)
-    g_thread_abort (errno, "malloc");
+    xthread_abort (errno, "malloc");
 
   if G_UNLIKELY ((status = pthread_cond_init (cond, &attr)) != 0)
-    g_thread_abort (status, "pthread_cond_init");
+    xthread_abort (status, "pthread_cond_init");
 
   pthread_condattr_destroy (&attr);
 
@@ -704,7 +704,7 @@ g_cond_impl_free (pthread_cond_t *cond)
 }
 
 static inline pthread_cond_t *
-g_cond_get_impl (GCond *cond)
+g_cond_get_impl (xcond_t *cond)
 {
   pthread_cond_t *impl = g_atomic_pointer_get (&cond->p);
 
@@ -721,52 +721,52 @@ g_cond_get_impl (GCond *cond)
 
 /**
  * g_cond_init:
- * @cond: an uninitialized #GCond
+ * @cond: an uninitialized #xcond_t
  *
- * Initialises a #GCond so that it can be used.
+ * Initialises a #xcond_t so that it can be used.
  *
- * This function is useful to initialise a #GCond that has been
+ * This function is useful to initialise a #xcond_t that has been
  * allocated as part of a larger structure.  It is not necessary to
- * initialise a #GCond that has been statically allocated.
+ * initialise a #xcond_t that has been statically allocated.
  *
- * To undo the effect of g_cond_init() when a #GCond is no longer
+ * To undo the effect of g_cond_init() when a #xcond_t is no longer
  * needed, use g_cond_clear().
  *
- * Calling g_cond_init() on an already-initialised #GCond leads
+ * Calling g_cond_init() on an already-initialised #xcond_t leads
  * to undefined behaviour.
  *
  * Since: 2.32
  */
 void
-g_cond_init (GCond *cond)
+g_cond_init (xcond_t *cond)
 {
   cond->p = g_cond_impl_new ();
 }
 
 /**
  * g_cond_clear:
- * @cond: an initialised #GCond
+ * @cond: an initialised #xcond_t
  *
- * Frees the resources allocated to a #GCond with g_cond_init().
+ * Frees the resources allocated to a #xcond_t with g_cond_init().
  *
- * This function should not be used with a #GCond that has been
+ * This function should not be used with a #xcond_t that has been
  * statically allocated.
  *
- * Calling g_cond_clear() for a #GCond on which threads are
+ * Calling g_cond_clear() for a #xcond_t on which threads are
  * blocking leads to undefined behaviour.
  *
  * Since: 2.32
  */
 void
-g_cond_clear (GCond *cond)
+g_cond_clear (xcond_t *cond)
 {
   g_cond_impl_free (cond->p);
 }
 
 /**
  * g_cond_wait:
- * @cond: a #GCond
- * @mutex: a #GMutex that is currently locked
+ * @cond: a #xcond_t
+ * @mutex: a #xmutex_t that is currently locked
  *
  * Atomically releases @mutex and waits until @cond is signalled.
  * When this function returns, @mutex is locked again and owned by the
@@ -781,21 +781,21 @@ g_cond_clear (GCond *cond)
  * condition is no longer met.
  *
  * For this reason, g_cond_wait() must always be used in a loop.  See
- * the documentation for #GCond for a complete example.
+ * the documentation for #xcond_t for a complete example.
  **/
 void
-g_cond_wait (GCond  *cond,
-             GMutex *mutex)
+g_cond_wait (xcond_t  *cond,
+             xmutex_t *mutex)
 {
   xint_t status;
 
   if G_UNLIKELY ((status = pthread_cond_wait (g_cond_get_impl (cond), g_mutex_get_impl (mutex))) != 0)
-    g_thread_abort (status, "pthread_cond_wait");
+    xthread_abort (status, "pthread_cond_wait");
 }
 
 /**
  * g_cond_signal:
- * @cond: a #GCond
+ * @cond: a #xcond_t
  *
  * If threads are waiting for @cond, at least one of them is unblocked.
  * If no threads are waiting for @cond, this function has no effect.
@@ -803,17 +803,17 @@ g_cond_wait (GCond  *cond,
  * while calling this function, though not required.
  */
 void
-g_cond_signal (GCond *cond)
+g_cond_signal (xcond_t *cond)
 {
   xint_t status;
 
   if G_UNLIKELY ((status = pthread_cond_signal (g_cond_get_impl (cond))) != 0)
-    g_thread_abort (status, "pthread_cond_signal");
+    xthread_abort (status, "pthread_cond_signal");
 }
 
 /**
  * g_cond_broadcast:
- * @cond: a #GCond
+ * @cond: a #xcond_t
  *
  * If threads are waiting for @cond, all of them are unblocked.
  * If no threads are waiting for @cond, this function has no effect.
@@ -821,18 +821,18 @@ g_cond_signal (GCond *cond)
  * while calling this function, though not required.
  */
 void
-g_cond_broadcast (GCond *cond)
+g_cond_broadcast (xcond_t *cond)
 {
   xint_t status;
 
   if G_UNLIKELY ((status = pthread_cond_broadcast (g_cond_get_impl (cond))) != 0)
-    g_thread_abort (status, "pthread_cond_broadcast");
+    xthread_abort (status, "pthread_cond_broadcast");
 }
 
 /**
  * g_cond_wait_until:
- * @cond: a #GCond
- * @mutex: a #GMutex that is currently locked
+ * @cond: a #xcond_t
+ * @mutex: a #xmutex_t that is currently locked
  * @end_time: the monotonic time to wait until
  *
  * Waits until either @cond is signalled or @end_time has passed.
@@ -847,7 +847,7 @@ g_cond_broadcast (GCond *cond)
  *
  * The following code shows how to correctly perform a timed wait on a
  * condition variable (extending the example presented in the
- * documentation for #GCond):
+ * documentation for #xcond_t):
  *
  * |[<!-- language="C" -->
  * xpointer_t
@@ -888,8 +888,8 @@ g_cond_broadcast (GCond *cond)
  * Since: 2.32
  **/
 xboolean_t
-g_cond_wait_until (GCond  *cond,
-                   GMutex *mutex,
+g_cond_wait_until (xcond_t  *cond,
+                   xmutex_t *mutex,
                    gint64  end_time)
 {
   struct timespec ts;
@@ -929,11 +929,11 @@ g_cond_wait_until (GCond  *cond,
       return TRUE;
   }
 #else
-#error Cannot support GCond on your platform.
+#error Cannot support xcond_t on your platform.
 #endif
 
   if G_UNLIKELY (status != ETIMEDOUT)
-    g_thread_abort (status, "pthread_cond_timedwait");
+    xthread_abort (status, "pthread_cond_timedwait");
 
   return FALSE;
 }
@@ -966,19 +966,19 @@ g_cond_wait_until (GCond  *cond,
 
 /**
  * G_PRIVATE_INIT:
- * @notify: a #GDestroyNotify
+ * @notify: a #xdestroy_notify_t
  *
  * A macro to assist with the static initialisation of a #GPrivate.
  *
- * This macro is useful for the case that a #GDestroyNotify function
+ * This macro is useful for the case that a #xdestroy_notify_t function
  * should be associated with the key.  This is needed when the key will be
  * used to point at memory that should be deallocated when the thread
  * exits.
  *
- * Additionally, the #GDestroyNotify will also be called on the previous
+ * Additionally, the #xdestroy_notify_t will also be called on the previous
  * value stored in the key when g_private_replace() is used.
  *
- * If no #GDestroyNotify is needed, then use of this macro is not
+ * If no #xdestroy_notify_t is needed, then use of this macro is not
  * required -- if the #GPrivate is declared in static scope then it will
  * be properly initialised by default (ie: to all zeros).  See the
  * examples below.
@@ -996,7 +996,7 @@ g_cond_wait_until (GCond  *cond,
  * void
  * set_local_name (const xchar_t *name)
  * {
- *   g_private_replace (&name_key, g_strdup (name));
+ *   g_private_replace (&name_key, xstrdup (name));
  * }
  *
  *
@@ -1019,17 +1019,17 @@ g_cond_wait_until (GCond  *cond,
  **/
 
 static pthread_key_t *
-g_private_impl_new (GDestroyNotify notify)
+g_private_impl_new (xdestroy_notify_t notify)
 {
   pthread_key_t *key;
   xint_t status;
 
   key = malloc (sizeof (pthread_key_t));
   if G_UNLIKELY (key == NULL)
-    g_thread_abort (errno, "malloc");
+    xthread_abort (errno, "malloc");
   status = pthread_key_create (key, notify);
   if G_UNLIKELY (status != 0)
-    g_thread_abort (status, "pthread_key_create");
+    xthread_abort (status, "pthread_key_create");
 
   return key;
 }
@@ -1041,7 +1041,7 @@ g_private_impl_free (pthread_key_t *key)
 
   status = pthread_key_delete (*key);
   if G_UNLIKELY (status != 0)
-    g_thread_abort (status, "pthread_key_delete");
+    xthread_abort (status, "pthread_key_delete");
   free (key);
 }
 
@@ -1091,7 +1091,7 @@ g_private_get (GPrivate *key)
  * current thread.
  *
  * This function differs from g_private_replace() in the following way:
- * the #GDestroyNotify for @key is not called on the old value.
+ * the #xdestroy_notify_t for @key is not called on the old value.
  */
 void
 g_private_set (GPrivate *key,
@@ -1100,7 +1100,7 @@ g_private_set (GPrivate *key,
   xint_t status;
 
   if G_UNLIKELY ((status = pthread_setspecific (*g_private_get_impl (key), value)) != 0)
-    g_thread_abort (status, "pthread_setspecific");
+    xthread_abort (status, "pthread_setspecific");
 }
 
 /**
@@ -1112,7 +1112,7 @@ g_private_set (GPrivate *key,
  * current thread.
  *
  * This function differs from g_private_set() in the following way: if
- * the previous value was non-%NULL then the #GDestroyNotify handler for
+ * the previous value was non-%NULL then the #xdestroy_notify_t handler for
  * @key is run on it.
  *
  * Since: 2.32
@@ -1128,20 +1128,20 @@ g_private_replace (GPrivate *key,
   old = pthread_getspecific (*impl);
 
   if G_UNLIKELY ((status = pthread_setspecific (*impl, value)) != 0)
-    g_thread_abort (status, "pthread_setspecific");
+    xthread_abort (status, "pthread_setspecific");
 
   if (old && key->notify)
     key->notify (old);
 }
 
-/* {{{1 GThread */
+/* {{{1 xthread_t */
 
 #define posix_check_err(err, name) G_STMT_START{			\
   int error = (err); 							\
   if (error)	 		 		 			\
-    g_error ("file %s: line %d (%s): error '%s' during '%s'",		\
+    xerror ("file %s: line %d (%s): error '%s' during '%s'",		\
            __FILE__, __LINE__, G_STRFUNC,				\
-           g_strerror (error), name);					\
+           xstrerror (error), name);					\
   }G_STMT_END
 
 #define posix_check_cmd(cmd) posix_check_err (cmd, #cmd)
@@ -1152,7 +1152,7 @@ typedef struct
 
   pthread_t system_thread;
   xboolean_t  joined;
-  GMutex    lock;
+  xmutex_t    lock;
 
   void *(*proxy) (void *);
 
@@ -1213,7 +1213,7 @@ g_system_thread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_sett
             }
           else
             {
-              g_debug ("Failed to get thread scheduler attributes: %s", g_strerror (errsv));
+              g_debug ("Failed to get thread scheduler attributes: %s", xstrerror (errsv));
               g_free (scheduler_settings->attr);
 
               return FALSE;
@@ -1229,7 +1229,7 @@ g_system_thread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_sett
     {
       int errsv = errno;
 
-      g_debug ("Failed to set thread scheduler attributes: %s", g_strerror (errsv));
+      g_debug ("Failed to set thread scheduler attributes: %s", xstrerror (errsv));
       g_free (scheduler_settings->attr);
 
       return FALSE;
@@ -1260,9 +1260,9 @@ linux_pthread_proxy (void *data)
       res = syscall (SYS_sched_setattr, tid, thread->scheduler_settings->attr, flags);
       errsv = errno;
       if (res == -1 && g_atomic_int_compare_and_exchange (&printed_scheduler_warning, FALSE, TRUE))
-        g_critical ("Failed to set scheduler settings: %s", g_strerror (errsv));
+        g_critical ("Failed to set scheduler settings: %s", xstrerror (errsv));
       else if (res == -1)
-        g_debug ("Failed to set scheduler settings: %s", g_strerror (errsv));
+        g_debug ("Failed to set scheduler settings: %s", xstrerror (errsv));
       printed_scheduler_warning = TRUE;
     }
 
@@ -1291,7 +1291,7 @@ g_system_thread_new (GThreadFunc proxy,
   base_thread->thread.joinable = TRUE;
   base_thread->thread.func = func;
   base_thread->thread.data = data;
-  base_thread->name = g_strdup (name);
+  base_thread->name = xstrdup (name);
   thread->scheduler_settings = scheduler_settings;
   thread->proxy = proxy;
 
@@ -1330,7 +1330,7 @@ g_system_thread_new (GThreadFunc proxy,
   if (ret == EAGAIN)
     {
       g_set_error (error, G_THREAD_ERROR, G_THREAD_ERROR_AGAIN,
-                   "Error creating thread: %s", g_strerror (ret));
+                   "Error creating thread: %s", xstrerror (ret));
       g_free (thread->thread.name);
       g_slice_free (GThreadPosix, thread);
       return NULL;
@@ -1344,7 +1344,7 @@ g_system_thread_new (GThreadFunc proxy,
 }
 
 /**
- * g_thread_yield:
+ * xthread_yield:
  *
  * Causes the calling thread to voluntarily relinquish the CPU, so
  * that other threads can run.
@@ -1352,7 +1352,7 @@ g_system_thread_new (GThreadFunc proxy,
  * This function is often used as a method to make busy wait less evil.
  */
 void
-g_thread_yield (void)
+xthread_yield (void)
 {
   sched_yield ();
 }
@@ -1393,7 +1393,7 @@ g_system_thread_set_name (const xchar_t *name)
 #endif
 }
 
-/* {{{1 GMutex and GCond futex implementation */
+/* {{{1 xmutex_t and xcond_t futex implementation */
 
 #if defined(USE_NATIVE_MUTEX)
 
@@ -1466,13 +1466,13 @@ g_system_thread_set_name (const xchar_t *name)
  */
 
 void
-g_mutex_init (GMutex *mutex)
+g_mutex_init (xmutex_t *mutex)
 {
   mutex->i[0] = 0;
 }
 
 void
-g_mutex_clear (GMutex *mutex)
+g_mutex_clear (xmutex_t *mutex)
 {
   if G_UNLIKELY (mutex->i[0] != 0)
     {
@@ -1482,7 +1482,7 @@ g_mutex_clear (GMutex *mutex)
 }
 
 static void __attribute__((noinline))
-g_mutex_lock_slowpath (GMutex *mutex)
+g_mutex_lock_slowpath (xmutex_t *mutex)
 {
   /* Set to 2 to indicate contention.  If it was zero before then we
    * just acquired the lock.
@@ -1494,7 +1494,7 @@ g_mutex_lock_slowpath (GMutex *mutex)
 }
 
 static void __attribute__((noinline))
-g_mutex_unlock_slowpath (GMutex *mutex,
+g_mutex_unlock_slowpath (xmutex_t *mutex,
                          xuint_t   prev)
 {
   /* We seem to get better code for the uncontended case by splitting
@@ -1510,7 +1510,7 @@ g_mutex_unlock_slowpath (GMutex *mutex,
 }
 
 void
-g_mutex_lock (GMutex *mutex)
+g_mutex_lock (xmutex_t *mutex)
 {
   /* 0 -> 1 and we're done.  Anything else, and we need to wait... */
   if G_UNLIKELY (g_atomic_int_add (&mutex->i[0], 1) != 0)
@@ -1518,7 +1518,7 @@ g_mutex_lock (GMutex *mutex)
 }
 
 void
-g_mutex_unlock (GMutex *mutex)
+g_mutex_unlock (xmutex_t *mutex)
 {
   xuint_t prev;
 
@@ -1530,7 +1530,7 @@ g_mutex_unlock (GMutex *mutex)
 }
 
 xboolean_t
-g_mutex_trylock (GMutex *mutex)
+g_mutex_trylock (xmutex_t *mutex)
 {
   xuint_t zero = 0;
 
@@ -1555,19 +1555,19 @@ g_mutex_trylock (GMutex *mutex)
  */
 
 void
-g_cond_init (GCond *cond)
+g_cond_init (xcond_t *cond)
 {
   cond->i[0] = 0;
 }
 
 void
-g_cond_clear (GCond *cond)
+g_cond_clear (xcond_t *cond)
 {
 }
 
 void
-g_cond_wait (GCond  *cond,
-             GMutex *mutex)
+g_cond_wait (xcond_t  *cond,
+             xmutex_t *mutex)
 {
   xuint_t sampled = (xuint_t) g_atomic_int_get (&cond->i[0]);
 
@@ -1577,7 +1577,7 @@ g_cond_wait (GCond  *cond,
 }
 
 void
-g_cond_signal (GCond *cond)
+g_cond_signal (xcond_t *cond)
 {
   g_atomic_int_inc (&cond->i[0]);
 
@@ -1585,7 +1585,7 @@ g_cond_signal (GCond *cond)
 }
 
 void
-g_cond_broadcast (GCond *cond)
+g_cond_broadcast (xcond_t *cond)
 {
   g_atomic_int_inc (&cond->i[0]);
 
@@ -1593,8 +1593,8 @@ g_cond_broadcast (GCond *cond)
 }
 
 xboolean_t
-g_cond_wait_until (GCond  *cond,
-                   GMutex *mutex,
+g_cond_wait_until (xcond_t  *cond,
+                   xmutex_t *mutex,
                    gint64  end_time)
 {
   struct timespec now;

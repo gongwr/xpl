@@ -33,23 +33,23 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GStringChunk GStringChunk;
+typedef struct _GStringChunk xstring_chunk_t;
 
 XPL_AVAILABLE_IN_ALL
-GStringChunk* g_string_chunk_new          (xsize_t size);
+xstring_chunk_t* xstring_chunk_new          (xsize_t size);
 XPL_AVAILABLE_IN_ALL
-void          g_string_chunk_free         (GStringChunk *chunk);
+void          xstring_chunk_free         (xstring_chunk_t *chunk);
 XPL_AVAILABLE_IN_ALL
-void          g_string_chunk_clear        (GStringChunk *chunk);
+void          xstring_chunk_clear        (xstring_chunk_t *chunk);
 XPL_AVAILABLE_IN_ALL
-xchar_t*        g_string_chunk_insert       (GStringChunk *chunk,
+xchar_t*        xstring_chunk_insert       (xstring_chunk_t *chunk,
                                            const xchar_t  *string);
 XPL_AVAILABLE_IN_ALL
-xchar_t*        g_string_chunk_insert_len   (GStringChunk *chunk,
+xchar_t*        xstring_chunk_insert_len   (xstring_chunk_t *chunk,
                                            const xchar_t  *string,
-                                           gssize        len);
+                                           xssize_t        len);
 XPL_AVAILABLE_IN_ALL
-xchar_t*        g_string_chunk_insert_const (GStringChunk *chunk,
+xchar_t*        xstring_chunk_insert_const (xstring_chunk_t *chunk,
                                            const xchar_t  *string);
 
 G_END_DECLS

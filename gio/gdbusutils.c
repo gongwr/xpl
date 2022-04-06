@@ -318,25 +318,25 @@ g_dbus_is_error_name (const xchar_t *string)
 xchar_t *
 g_dbus_generate_guid (void)
 {
-  GString *s;
-  guint32 r1;
-  guint32 r2;
-  guint32 r3;
+  xstring_t *s;
+  xuint32_t r1;
+  xuint32_t r2;
+  xuint32_t r3;
   gint64 now_us;
 
-  s = g_string_new (NULL);
+  s = xstring_new (NULL);
 
   r1 = g_random_int ();
   r2 = g_random_int ();
   r3 = g_random_int ();
   now_us = g_get_real_time ();
 
-  g_string_append_printf (s, "%08x", r1);
-  g_string_append_printf (s, "%08x", r2);
-  g_string_append_printf (s, "%08x", r3);
-  g_string_append_printf (s, "%08x", (guint32) (now_us / G_USEC_PER_SEC));
+  xstring_append_printf (s, "%08x", r1);
+  xstring_append_printf (s, "%08x", r2);
+  xstring_append_printf (s, "%08x", r3);
+  xstring_append_printf (s, "%08x", (xuint32_t) (now_us / G_USEC_PER_SEC));
 
-  return g_string_free (s, FALSE);
+  return xstring_free (s, FALSE);
 }
 
 /**
@@ -381,25 +381,25 @@ g_dbus_is_guid (const xchar_t *string)
 /**
  * g_dbus_gvariant_to_gvalue:
  * @value: A #xvariant_t.
- * @out_gvalue: (out): Return location pointing to a zero-filled (uninitialized) #GValue.
+ * @out_gvalue: (out): Return location pointing to a zero-filled (uninitialized) #xvalue_t.
  *
- * Converts a #xvariant_t to a #GValue. If @value is floating, it is consumed.
+ * Converts a #xvariant_t to a #xvalue_t. If @value is floating, it is consumed.
  *
  * The rules specified in the g_dbus_gvalue_to_gvariant() function are
  * used - this function is essentially its reverse form. So, a #xvariant_t
- * containing any basic or string array type will be converted to a #GValue
+ * containing any basic or string array type will be converted to a #xvalue_t
  * containing a basic value or string array. Any other #xvariant_t (handle,
- * variant, tuple, dict entry) will be converted to a #GValue containing that
+ * variant, tuple, dict entry) will be converted to a #xvalue_t containing that
  * #xvariant_t.
  *
- * The conversion never fails - a valid #GValue is always returned in
+ * The conversion never fails - a valid #xvalue_t is always returned in
  * @out_gvalue.
  *
  * Since: 2.30
  */
 void
 g_dbus_gvariant_to_gvalue (xvariant_t  *value,
-                           GValue    *out_gvalue)
+                           xvalue_t    *out_gvalue)
 {
   const xvariant_type_t *type;
   xchar_t **array;
@@ -407,121 +407,121 @@ g_dbus_gvariant_to_gvalue (xvariant_t  *value,
   g_return_if_fail (value != NULL);
   g_return_if_fail (out_gvalue != NULL);
 
-  memset (out_gvalue, '\0', sizeof (GValue));
+  memset (out_gvalue, '\0', sizeof (xvalue_t));
 
-  switch (g_variant_classify (value))
+  switch (xvariant_classify (value))
     {
-    case G_VARIANT_CLASS_BOOLEAN:
-      g_value_init (out_gvalue, XTYPE_BOOLEAN);
-      g_value_set_boolean (out_gvalue, g_variant_get_boolean (value));
+    case XVARIANT_CLASS_BOOLEAN:
+      xvalue_init (out_gvalue, XTYPE_BOOLEAN);
+      xvalue_set_boolean (out_gvalue, xvariant_get_boolean (value));
       break;
 
-    case G_VARIANT_CLASS_BYTE:
-      g_value_init (out_gvalue, XTYPE_UCHAR);
-      g_value_set_uchar (out_gvalue, g_variant_get_byte (value));
+    case XVARIANT_CLASS_BYTE:
+      xvalue_init (out_gvalue, XTYPE_UCHAR);
+      xvalue_set_uchar (out_gvalue, xvariant_get_byte (value));
       break;
 
-    case G_VARIANT_CLASS_INT16:
-      g_value_init (out_gvalue, XTYPE_INT);
-      g_value_set_int (out_gvalue, g_variant_get_int16 (value));
+    case XVARIANT_CLASS_INT16:
+      xvalue_init (out_gvalue, XTYPE_INT);
+      xvalue_set_int (out_gvalue, xvariant_get_int16 (value));
       break;
 
-    case G_VARIANT_CLASS_UINT16:
-      g_value_init (out_gvalue, XTYPE_UINT);
-      g_value_set_uint (out_gvalue, g_variant_get_uint16 (value));
+    case XVARIANT_CLASS_UINT16:
+      xvalue_init (out_gvalue, XTYPE_UINT);
+      xvalue_set_uint (out_gvalue, xvariant_get_uint16 (value));
       break;
 
-    case G_VARIANT_CLASS_INT32:
-      g_value_init (out_gvalue, XTYPE_INT);
-      g_value_set_int (out_gvalue, g_variant_get_int32 (value));
+    case XVARIANT_CLASS_INT32:
+      xvalue_init (out_gvalue, XTYPE_INT);
+      xvalue_set_int (out_gvalue, xvariant_get_int32 (value));
       break;
 
-    case G_VARIANT_CLASS_UINT32:
-      g_value_init (out_gvalue, XTYPE_UINT);
-      g_value_set_uint (out_gvalue, g_variant_get_uint32 (value));
+    case XVARIANT_CLASS_UINT32:
+      xvalue_init (out_gvalue, XTYPE_UINT);
+      xvalue_set_uint (out_gvalue, xvariant_get_uint32 (value));
       break;
 
-    case G_VARIANT_CLASS_INT64:
-      g_value_init (out_gvalue, XTYPE_INT64);
-      g_value_set_int64 (out_gvalue, g_variant_get_int64 (value));
+    case XVARIANT_CLASS_INT64:
+      xvalue_init (out_gvalue, XTYPE_INT64);
+      xvalue_set_int64 (out_gvalue, xvariant_get_int64 (value));
       break;
 
-    case G_VARIANT_CLASS_UINT64:
-      g_value_init (out_gvalue, XTYPE_UINT64);
-      g_value_set_uint64 (out_gvalue, g_variant_get_uint64 (value));
+    case XVARIANT_CLASS_UINT64:
+      xvalue_init (out_gvalue, XTYPE_UINT64);
+      xvalue_set_uint64 (out_gvalue, xvariant_get_uint64 (value));
       break;
 
-    case G_VARIANT_CLASS_DOUBLE:
-      g_value_init (out_gvalue, XTYPE_DOUBLE);
-      g_value_set_double (out_gvalue, g_variant_get_double (value));
+    case XVARIANT_CLASS_DOUBLE:
+      xvalue_init (out_gvalue, XTYPE_DOUBLE);
+      xvalue_set_double (out_gvalue, xvariant_get_double (value));
       break;
 
-    case G_VARIANT_CLASS_STRING:
-      g_value_init (out_gvalue, XTYPE_STRING);
-      g_value_set_string (out_gvalue, g_variant_get_string (value, NULL));
+    case XVARIANT_CLASS_STRING:
+      xvalue_init (out_gvalue, XTYPE_STRING);
+      xvalue_set_string (out_gvalue, xvariant_get_string (value, NULL));
       break;
 
-    case G_VARIANT_CLASS_OBJECT_PATH:
-      g_value_init (out_gvalue, XTYPE_STRING);
-      g_value_set_string (out_gvalue, g_variant_get_string (value, NULL));
+    case XVARIANT_CLASS_OBJECT_PATH:
+      xvalue_init (out_gvalue, XTYPE_STRING);
+      xvalue_set_string (out_gvalue, xvariant_get_string (value, NULL));
       break;
 
-    case G_VARIANT_CLASS_SIGNATURE:
-      g_value_init (out_gvalue, XTYPE_STRING);
-      g_value_set_string (out_gvalue, g_variant_get_string (value, NULL));
+    case XVARIANT_CLASS_SIGNATURE:
+      xvalue_init (out_gvalue, XTYPE_STRING);
+      xvalue_set_string (out_gvalue, xvariant_get_string (value, NULL));
       break;
 
-    case G_VARIANT_CLASS_ARRAY:
-      type = g_variant_get_type (value);
-      switch (g_variant_type_peek_string (type)[1])
+    case XVARIANT_CLASS_ARRAY:
+      type = xvariant_get_type (value);
+      switch (xvariant_type_peek_string (type)[1])
         {
-        case G_VARIANT_CLASS_BYTE:
-          g_value_init (out_gvalue, XTYPE_STRING);
-          g_value_set_string (out_gvalue, g_variant_get_bytestring (value));
+        case XVARIANT_CLASS_BYTE:
+          xvalue_init (out_gvalue, XTYPE_STRING);
+          xvalue_set_string (out_gvalue, xvariant_get_bytestring (value));
           break;
 
-        case G_VARIANT_CLASS_STRING:
-          g_value_init (out_gvalue, XTYPE_STRV);
-          array = g_variant_dup_strv (value, NULL);
-          g_value_take_boxed (out_gvalue, array);
+        case XVARIANT_CLASS_STRING:
+          xvalue_init (out_gvalue, XTYPE_STRV);
+          array = xvariant_dup_strv (value, NULL);
+          xvalue_take_boxed (out_gvalue, array);
           break;
 
-        case G_VARIANT_CLASS_OBJECT_PATH:
-          g_value_init (out_gvalue, XTYPE_STRV);
-          array = g_variant_dup_objv (value, NULL);
-          g_value_take_boxed (out_gvalue, array);
+        case XVARIANT_CLASS_OBJECT_PATH:
+          xvalue_init (out_gvalue, XTYPE_STRV);
+          array = xvariant_dup_objv (value, NULL);
+          xvalue_take_boxed (out_gvalue, array);
           break;
 
-        case G_VARIANT_CLASS_ARRAY:
-          switch (g_variant_type_peek_string (type)[2])
+        case XVARIANT_CLASS_ARRAY:
+          switch (xvariant_type_peek_string (type)[2])
             {
-            case G_VARIANT_CLASS_BYTE:
-              g_value_init (out_gvalue, XTYPE_STRV);
-              array = g_variant_dup_bytestring_array (value, NULL);
-              g_value_take_boxed (out_gvalue, array);
+            case XVARIANT_CLASS_BYTE:
+              xvalue_init (out_gvalue, XTYPE_STRV);
+              array = xvariant_dup_bytestring_array (value, NULL);
+              xvalue_take_boxed (out_gvalue, array);
               break;
 
             default:
-              g_value_init (out_gvalue, XTYPE_VARIANT);
-              g_value_set_variant (out_gvalue, value);
+              xvalue_init (out_gvalue, XTYPE_VARIANT);
+              xvalue_set_variant (out_gvalue, value);
               break;
             }
           break;
 
         default:
-          g_value_init (out_gvalue, XTYPE_VARIANT);
-          g_value_set_variant (out_gvalue, value);
+          xvalue_init (out_gvalue, XTYPE_VARIANT);
+          xvalue_set_variant (out_gvalue, value);
           break;
         }
       break;
 
-    case G_VARIANT_CLASS_HANDLE:
-    case G_VARIANT_CLASS_VARIANT:
-    case G_VARIANT_CLASS_MAYBE:
-    case G_VARIANT_CLASS_TUPLE:
-    case G_VARIANT_CLASS_DICT_ENTRY:
-      g_value_init (out_gvalue, XTYPE_VARIANT);
-      g_value_set_variant (out_gvalue, value);
+    case XVARIANT_CLASS_HANDLE:
+    case XVARIANT_CLASS_VARIANT:
+    case XVARIANT_CLASS_MAYBE:
+    case XVARIANT_CLASS_TUPLE:
+    case XVARIANT_CLASS_DICT_ENTRY:
+      xvalue_init (out_gvalue, XTYPE_VARIANT);
+      xvalue_set_variant (out_gvalue, value);
       break;
     }
 }
@@ -529,10 +529,10 @@ g_dbus_gvariant_to_gvalue (xvariant_t  *value,
 
 /**
  * g_dbus_gvalue_to_gvariant:
- * @gvalue: A #GValue to convert to a #xvariant_t
+ * @gvalue: A #xvalue_t to convert to a #xvariant_t
  * @type: A #xvariant_type_t
  *
- * Converts a #GValue to a #xvariant_t of the type indicated by the @type
+ * Converts a #xvalue_t to a #xvariant_t of the type indicated by the @type
  * parameter.
  *
  * The conversion is using the following rules:
@@ -559,16 +559,16 @@ g_dbus_gvariant_to_gvalue (xvariant_t  *value,
  * '/' for object path types, the empty array for any array type and so on).
  *
  * See the g_dbus_gvariant_to_gvalue() function for how to convert a
- * #xvariant_t to a #GValue.
+ * #xvariant_t to a #xvalue_t.
  *
  * Returns: (transfer full): A #xvariant_t (never floating) of
  *     #xvariant_type_t @type holding the data from @gvalue or an empty #xvariant_t
- *     in case of failure. Free with g_variant_unref().
+ *     in case of failure. Free with xvariant_unref().
  *
  * Since: 2.30
  */
 xvariant_t *
-g_dbus_gvalue_to_gvariant (const GValue       *gvalue,
+g_dbus_gvalue_to_gvariant (const xvalue_t       *gvalue,
                            const xvariant_type_t *type)
 {
   xvariant_t *ret;
@@ -581,150 +581,150 @@ g_dbus_gvalue_to_gvariant (const GValue       *gvalue,
 
   ret = NULL;
 
-  /* @type can easily be e.g. "s" with the GValue holding a xvariant_t - for example this
+  /* @type can easily be e.g. "s" with the xvalue_t holding a xvariant_t - for example this
    * can happen when using the org.gtk.GDBus.C.ForceGVariant annotation with the
    * gdbus-codegen(1) tool.
    */
   if (G_VALUE_TYPE (gvalue) == XTYPE_VARIANT)
     {
-      ret = g_value_dup_variant (gvalue);
+      ret = xvalue_dup_variant (gvalue);
     }
   else
     {
-      switch (g_variant_type_peek_string (type)[0])
+      switch (xvariant_type_peek_string (type)[0])
         {
-        case G_VARIANT_CLASS_BOOLEAN:
-          ret = g_variant_ref_sink (g_variant_new_boolean (g_value_get_boolean (gvalue)));
+        case XVARIANT_CLASS_BOOLEAN:
+          ret = xvariant_ref_sink (xvariant_new_boolean (xvalue_get_boolean (gvalue)));
           break;
 
-        case G_VARIANT_CLASS_BYTE:
-          ret = g_variant_ref_sink (g_variant_new_byte (g_value_get_uchar (gvalue)));
+        case XVARIANT_CLASS_BYTE:
+          ret = xvariant_ref_sink (xvariant_new_byte (xvalue_get_uchar (gvalue)));
           break;
 
-        case G_VARIANT_CLASS_INT16:
-          ret = g_variant_ref_sink (g_variant_new_int16 (g_value_get_int (gvalue)));
+        case XVARIANT_CLASS_INT16:
+          ret = xvariant_ref_sink (xvariant_new_int16 (xvalue_get_int (gvalue)));
           break;
 
-        case G_VARIANT_CLASS_UINT16:
-          ret = g_variant_ref_sink (g_variant_new_uint16 (g_value_get_uint (gvalue)));
+        case XVARIANT_CLASS_UINT16:
+          ret = xvariant_ref_sink (xvariant_new_uint16 (xvalue_get_uint (gvalue)));
           break;
 
-        case G_VARIANT_CLASS_INT32:
-          ret = g_variant_ref_sink (g_variant_new_int32 (g_value_get_int (gvalue)));
+        case XVARIANT_CLASS_INT32:
+          ret = xvariant_ref_sink (xvariant_new_int32 (xvalue_get_int (gvalue)));
           break;
 
-        case G_VARIANT_CLASS_UINT32:
-          ret = g_variant_ref_sink (g_variant_new_uint32 (g_value_get_uint (gvalue)));
+        case XVARIANT_CLASS_UINT32:
+          ret = xvariant_ref_sink (xvariant_new_uint32 (xvalue_get_uint (gvalue)));
           break;
 
-        case G_VARIANT_CLASS_INT64:
-          ret = g_variant_ref_sink (g_variant_new_int64 (g_value_get_int64 (gvalue)));
+        case XVARIANT_CLASS_INT64:
+          ret = xvariant_ref_sink (xvariant_new_int64 (xvalue_get_int64 (gvalue)));
           break;
 
-        case G_VARIANT_CLASS_UINT64:
-          ret = g_variant_ref_sink (g_variant_new_uint64 (g_value_get_uint64 (gvalue)));
+        case XVARIANT_CLASS_UINT64:
+          ret = xvariant_ref_sink (xvariant_new_uint64 (xvalue_get_uint64 (gvalue)));
           break;
 
-        case G_VARIANT_CLASS_DOUBLE:
-          ret = g_variant_ref_sink (g_variant_new_double (g_value_get_double (gvalue)));
+        case XVARIANT_CLASS_DOUBLE:
+          ret = xvariant_ref_sink (xvariant_new_double (xvalue_get_double (gvalue)));
           break;
 
-        case G_VARIANT_CLASS_STRING:
-          s = g_value_get_string (gvalue);
+        case XVARIANT_CLASS_STRING:
+          s = xvalue_get_string (gvalue);
           if (s == NULL)
             s = "";
-          ret = g_variant_ref_sink (g_variant_new_string (s));
+          ret = xvariant_ref_sink (xvariant_new_string (s));
           break;
 
-        case G_VARIANT_CLASS_OBJECT_PATH:
-          s = g_value_get_string (gvalue);
+        case XVARIANT_CLASS_OBJECT_PATH:
+          s = xvalue_get_string (gvalue);
           if (s == NULL)
             s = "/";
-          ret = g_variant_ref_sink (g_variant_new_object_path (s));
+          ret = xvariant_ref_sink (xvariant_new_object_path (s));
           break;
 
-        case G_VARIANT_CLASS_SIGNATURE:
-          s = g_value_get_string (gvalue);
+        case XVARIANT_CLASS_SIGNATURE:
+          s = xvalue_get_string (gvalue);
           if (s == NULL)
             s = "";
-          ret = g_variant_ref_sink (g_variant_new_signature (s));
+          ret = xvariant_ref_sink (xvariant_new_signature (s));
           break;
 
-        case G_VARIANT_CLASS_ARRAY:
-          switch (g_variant_type_peek_string (type)[1])
+        case XVARIANT_CLASS_ARRAY:
+          switch (xvariant_type_peek_string (type)[1])
             {
-            case G_VARIANT_CLASS_BYTE:
-              s = g_value_get_string (gvalue);
+            case XVARIANT_CLASS_BYTE:
+              s = xvalue_get_string (gvalue);
               if (s == NULL)
                 s = "";
-              ret = g_variant_ref_sink (g_variant_new_bytestring (s));
+              ret = xvariant_ref_sink (xvariant_new_bytestring (s));
               break;
 
-            case G_VARIANT_CLASS_STRING:
-              as = g_value_get_boxed (gvalue);
+            case XVARIANT_CLASS_STRING:
+              as = xvalue_get_boxed (gvalue);
               if (as == NULL)
                 as = empty_strv;
-              ret = g_variant_ref_sink (g_variant_new_strv (as, -1));
+              ret = xvariant_ref_sink (xvariant_new_strv (as, -1));
               break;
 
-            case G_VARIANT_CLASS_OBJECT_PATH:
-              as = g_value_get_boxed (gvalue);
+            case XVARIANT_CLASS_OBJECT_PATH:
+              as = xvalue_get_boxed (gvalue);
               if (as == NULL)
                 as = empty_strv;
-              ret = g_variant_ref_sink (g_variant_new_objv (as, -1));
+              ret = xvariant_ref_sink (xvariant_new_objv (as, -1));
               break;
 
-            case G_VARIANT_CLASS_ARRAY:
-              switch (g_variant_type_peek_string (type)[2])
+            case XVARIANT_CLASS_ARRAY:
+              switch (xvariant_type_peek_string (type)[2])
                 {
-                case G_VARIANT_CLASS_BYTE:
-                  as = g_value_get_boxed (gvalue);
+                case XVARIANT_CLASS_BYTE:
+                  as = xvalue_get_boxed (gvalue);
                   if (as == NULL)
                     as = empty_strv;
-                  ret = g_variant_ref_sink (g_variant_new_bytestring_array (as, -1));
+                  ret = xvariant_ref_sink (xvariant_new_bytestring_array (as, -1));
                   break;
 
                 default:
-                  ret = g_value_dup_variant (gvalue);
+                  ret = xvalue_dup_variant (gvalue);
                   break;
                 }
               break;
 
             default:
-              ret = g_value_dup_variant (gvalue);
+              ret = xvalue_dup_variant (gvalue);
               break;
             }
           break;
 
-        case G_VARIANT_CLASS_HANDLE:
-        case G_VARIANT_CLASS_VARIANT:
-        case G_VARIANT_CLASS_MAYBE:
-        case G_VARIANT_CLASS_TUPLE:
-        case G_VARIANT_CLASS_DICT_ENTRY:
-          ret = g_value_dup_variant (gvalue);
+        case XVARIANT_CLASS_HANDLE:
+        case XVARIANT_CLASS_VARIANT:
+        case XVARIANT_CLASS_MAYBE:
+        case XVARIANT_CLASS_TUPLE:
+        case XVARIANT_CLASS_DICT_ENTRY:
+          ret = xvalue_dup_variant (gvalue);
           break;
         }
     }
 
-  /* Could be that the GValue is holding a NULL xvariant_t - in that case,
+  /* Could be that the xvalue_t is holding a NULL xvariant_t - in that case,
    * we return an "empty" xvariant_t instead of a NULL xvariant_t
    */
   if (ret == NULL)
     {
       xvariant_t *untrusted_empty;
-      untrusted_empty = g_variant_new_from_data (type, NULL, 0, FALSE, NULL, NULL);
-      ret = g_variant_take_ref (g_variant_get_normal_form (untrusted_empty));
-      g_variant_unref (untrusted_empty);
+      untrusted_empty = xvariant_new_from_data (type, NULL, 0, FALSE, NULL, NULL);
+      ret = xvariant_take_ref (xvariant_get_normal_form (untrusted_empty));
+      xvariant_unref (untrusted_empty);
     }
 
-  g_assert (!g_variant_is_floating (ret));
+  g_assert (!xvariant_is_floating (ret));
 
   return ret;
 }
 
 /**
  * g_dbus_escape_object_path_bytestring:
- * @bytes: (array zero-terminated=1) (element-type guint8): the string of bytes to escape
+ * @bytes: (array zero-terminated=1) (element-type xuint8_t): the string of bytes to escape
  *
  * Escapes @bytes for use in a D-Bus object path component.
  * @bytes is an array of zero or more nonzero bytes in an
@@ -749,26 +749,26 @@ g_dbus_gvalue_to_gvariant (const GValue       *gvalue,
  *
  */
 xchar_t *
-g_dbus_escape_object_path_bytestring (const guint8 *bytes)
+g_dbus_escape_object_path_bytestring (const xuint8_t *bytes)
 {
-  GString *escaped;
-  const guint8 *p;
+  xstring_t *escaped;
+  const xuint8_t *p;
 
   g_return_val_if_fail (bytes != NULL, NULL);
 
   if (*bytes == '\0')
-    return g_strdup ("_");
+    return xstrdup ("_");
 
-  escaped = g_string_new (NULL);
+  escaped = xstring_new (NULL);
   for (p = bytes; *p; p++)
     {
       if (g_ascii_isalnum (*p))
-        g_string_append_c (escaped, *p);
+        xstring_append_c (escaped, *p);
       else
-        g_string_append_printf (escaped, "_%02x", *p);
+        xstring_append_printf (escaped, "_%02x", *p);
     }
 
-  return g_string_free (escaped, FALSE);
+  return xstring_free (escaped, FALSE);
 }
 
 /**
@@ -784,7 +784,7 @@ g_dbus_escape_object_path_bytestring (const guint8 *bytes)
 xchar_t *
 g_dbus_escape_object_path (const xchar_t *s)
 {
-  return (xchar_t *) g_dbus_escape_object_path_bytestring ((const guint8 *) s);
+  return (xchar_t *) g_dbus_escape_object_path_bytestring ((const xuint8_t *) s);
 }
 
 /**
@@ -800,31 +800,31 @@ g_dbus_escape_object_path (const xchar_t *s)
  * encoded is not allowed (e.g `_63` is not valid, the string
  * should contain `c` instead).
  *
- * Returns: (array zero-terminated=1) (element-type guint8) (nullable): an
+ * Returns: (array zero-terminated=1) (element-type xuint8_t) (nullable): an
  *   unescaped version of @s, or %NULL if @s is not a string returned
  *   from g_dbus_escape_object_path(). Free with g_free().
  *
  * Since: 2.68
  */
-guint8 *
+xuint8_t *
 g_dbus_unescape_object_path (const xchar_t *s)
 {
-  GString *unescaped;
+  xstring_t *unescaped;
   const xchar_t *p;
 
   g_return_val_if_fail (s != NULL, NULL);
 
-  if (g_str_equal (s, "_"))
-    return (guint8 *) g_strdup ("");
+  if (xstr_equal (s, "_"))
+    return (xuint8_t *) xstrdup ("");
 
-  unescaped = g_string_new (NULL);
+  unescaped = xstring_new (NULL);
   for (p = s; *p; p++)
     {
       xint_t hi, lo;
 
       if (g_ascii_isalnum (*p))
         {
-          g_string_append_c (unescaped, *p);
+          xstring_append_c (unescaped, *p);
         }
       else if (*p == '_' &&
                ((hi = g_ascii_xdigit_value (p[1])) >= 0) &&
@@ -832,16 +832,16 @@ g_dbus_unescape_object_path (const xchar_t *s)
                (hi || lo) &&                      /* \0 is not allowed */
                !g_ascii_isalnum ((hi << 4) | lo)) /* alnums must not be encoded */
         {
-          g_string_append_c (unescaped, (hi << 4) | lo);
+          xstring_append_c (unescaped, (hi << 4) | lo);
           p += 2;
         }
       else
         {
           /* the string was not encoded correctly */
-          g_string_free (unescaped, TRUE);
+          xstring_free (unescaped, TRUE);
           return NULL;
         }
     }
 
-  return (guint8 *) g_string_free (unescaped, FALSE);
+  return (xuint8_t *) xstring_free (unescaped, FALSE);
 }

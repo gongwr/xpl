@@ -59,21 +59,21 @@
  * @title: Timers
  * @short_description: keep track of elapsed time
  *
- * #GTimer records a start time, and counts microseconds elapsed since
+ * #xtimer_t records a start time, and counts microseconds elapsed since
  * that time. This is done somewhat differently on different platforms,
- * and can be tricky to get exactly right, so #GTimer provides a
+ * and can be tricky to get exactly right, so #xtimer_t provides a
  * portable/convenient interface.
  **/
 
 /**
- * GTimer:
+ * xtimer_t:
  *
  * Opaque datatype that records a start time.
  **/
 struct _GTimer
 {
-  guint64 start;
-  guint64 end;
+  xuint64_t start;
+  xuint64_t end;
 
   xuint_t active : 1;
 };
@@ -84,14 +84,14 @@ struct _GTimer
  * Creates a new timer, and starts timing (i.e. g_timer_start() is
  * implicitly called for you).
  *
- * Returns: a new #GTimer.
+ * Returns: a new #xtimer_t.
  **/
-GTimer*
+xtimer_t*
 g_timer_new (void)
 {
-  GTimer *timer;
+  xtimer_t *timer;
 
-  timer = g_new (GTimer, 1);
+  timer = g_new (xtimer_t, 1);
   timer->active = TRUE;
 
   timer->start = g_get_monotonic_time ();
@@ -101,12 +101,12 @@ g_timer_new (void)
 
 /**
  * g_timer_destroy:
- * @timer: a #GTimer to destroy.
+ * @timer: a #xtimer_t to destroy.
  *
  * Destroys a timer, freeing associated resources.
  **/
 void
-g_timer_destroy (GTimer *timer)
+g_timer_destroy (xtimer_t *timer)
 {
   g_return_if_fail (timer != NULL);
 
@@ -115,7 +115,7 @@ g_timer_destroy (GTimer *timer)
 
 /**
  * g_timer_start:
- * @timer: a #GTimer.
+ * @timer: a #xtimer_t.
  *
  * Marks a start time, so that future calls to g_timer_elapsed() will
  * report the time since g_timer_start() was called. g_timer_new()
@@ -123,7 +123,7 @@ g_timer_destroy (GTimer *timer)
  * g_timer_start() immediately after creating the timer.
  **/
 void
-g_timer_start (GTimer *timer)
+g_timer_start (xtimer_t *timer)
 {
   g_return_if_fail (timer != NULL);
 
@@ -134,13 +134,13 @@ g_timer_start (GTimer *timer)
 
 /**
  * g_timer_stop:
- * @timer: a #GTimer.
+ * @timer: a #xtimer_t.
  *
  * Marks an end time, so calls to g_timer_elapsed() will return the
  * difference between this end time and the start time.
  **/
 void
-g_timer_stop (GTimer *timer)
+g_timer_stop (xtimer_t *timer)
 {
   g_return_if_fail (timer != NULL);
 
@@ -151,14 +151,14 @@ g_timer_stop (GTimer *timer)
 
 /**
  * g_timer_reset:
- * @timer: a #GTimer.
+ * @timer: a #xtimer_t.
  *
  * This function is useless; it's fine to call g_timer_start() on an
  * already-started timer to reset the start time, so g_timer_reset()
  * serves no purpose.
  **/
 void
-g_timer_reset (GTimer *timer)
+g_timer_reset (xtimer_t *timer)
 {
   g_return_if_fail (timer != NULL);
 
@@ -167,7 +167,7 @@ g_timer_reset (GTimer *timer)
 
 /**
  * g_timer_continue:
- * @timer: a #GTimer.
+ * @timer: a #xtimer_t.
  *
  * Resumes a timer that has previously been stopped with
  * g_timer_stop(). g_timer_stop() must be called before using this
@@ -176,9 +176,9 @@ g_timer_reset (GTimer *timer)
  * Since: 2.4
  **/
 void
-g_timer_continue (GTimer *timer)
+g_timer_continue (xtimer_t *timer)
 {
-  guint64 elapsed;
+  xuint64_t elapsed;
 
   g_return_if_fail (timer != NULL);
   g_return_if_fail (timer->active == FALSE);
@@ -199,7 +199,7 @@ g_timer_continue (GTimer *timer)
 
 /**
  * g_timer_elapsed:
- * @timer: a #GTimer.
+ * @timer: a #xtimer_t.
  * @microseconds: return location for the fractional part of seconds
  *                elapsed, in microseconds (that is, the total number
  *                of microseconds elapsed, modulo 1000000), or %NULL
@@ -215,7 +215,7 @@ g_timer_continue (GTimer *timer)
  *          fractional part.
  **/
 xdouble_t
-g_timer_elapsed (GTimer *timer,
+g_timer_elapsed (xtimer_t *timer,
 		 gulong *microseconds)
 {
   xdouble_t total;
@@ -238,7 +238,7 @@ g_timer_elapsed (GTimer *timer,
 
 /**
  * g_timer_is_active:
- * @timer: a #GTimer.
+ * @timer: a #xtimer_t.
  *
  * Exposes whether the timer is currently active.
  *
@@ -246,7 +246,7 @@ g_timer_elapsed (GTimer *timer,
  * Since: 2.62
  **/
 xboolean_t
-g_timer_is_active (GTimer *timer)
+g_timer_is_active (xtimer_t *timer)
 {
   g_return_val_if_fail (timer != NULL, FALSE);
 
@@ -287,12 +287,12 @@ g_usleep (gulong microseconds)
  * Adds the given number of microseconds to @time_. @microseconds can
  * also be negative to decrease the value of @time_.
  *
- * Deprecated: 2.62: #GTimeVal is not year-2038-safe. Use `guint64` for
- *    representing microseconds since the epoch, or use #GDateTime.
+ * Deprecated: 2.62: #GTimeVal is not year-2038-safe. Use `xuint64_t` for
+ *    representing microseconds since the epoch, or use #xdatetime_t.
  **/
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 void
-g_time_val_add (GTimeVal *time_, glong microseconds)
+g_time_val_add (GTimeVal *time_, xlong_t microseconds)
 {
   g_return_if_fail (time_ != NULL &&
                     time_->tv_usec >= 0 &&
@@ -374,16 +374,16 @@ mktime_utc (struct tm *tm)
  * This function was deprecated, along with #GTimeVal itself, in GLib 2.62.
  * Equivalent functionality is available using code like:
  * |[
- * GDateTime *dt = g_date_time_new_from_iso8601 (iso8601_string, NULL);
- * gint64 time_val = g_date_time_to_unix (dt);
- * g_date_time_unref (dt);
+ * xdatetime_t *dt = xdate_time_new_from_iso8601 (iso8601_string, NULL);
+ * gint64 time_val = xdate_time_to_unix (dt);
+ * xdate_time_unref (dt);
  * ]|
  *
  * Returns: %TRUE if the conversion was successful.
  *
  * Since: 2.12
  * Deprecated: 2.62: #GTimeVal is not year-2038-safe. Use
- *    g_date_time_new_from_iso8601() instead.
+ *    xdate_time_new_from_iso8601() instead.
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 xboolean_t
@@ -489,7 +489,7 @@ g_time_val_from_iso8601 (const xchar_t *iso_date,
 
   if (*iso_date == ',' || *iso_date == '.')
     {
-      glong mul = 100000;
+      xlong_t mul = 100000;
 
       while (mul >= 1 && g_ascii_isdigit (*++iso_date))
         {
@@ -570,18 +570,18 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * [Date and Time Formats](http://www.w3.org/TR/NOTE-datetime-19980827).
  * Both of these documents are profiles of ISO 8601.
  *
- * Use g_date_time_format() or g_strdup_printf() if a different
+ * Use xdate_time_format() or xstrdup_printf() if a different
  * variation of ISO 8601 format is required.
  *
  * If @time_ represents a date which is too large to fit into a `struct tm`,
  * %NULL will be returned. This is platform dependent. Note also that since
- * `GTimeVal` stores the number of seconds as a `glong`, on 32-bit systems it
+ * `GTimeVal` stores the number of seconds as a `xlong_t`, on 32-bit systems it
  * is subject to the year 2038 problem. Accordingly, since GLib 2.62, this
  * function has been deprecated. Equivalent functionality is available using:
  * |[
- * GDateTime *dt = g_date_time_new_from_unix_utc (time_val);
- * iso8601_string = g_date_time_format_iso8601 (dt);
- * g_date_time_unref (dt);
+ * xdatetime_t *dt = xdate_time_new_from_unix_utc (time_val);
+ * iso8601_string = xdate_time_format_iso8601 (dt);
+ * xdate_time_unref (dt);
  * ]|
  *
  * The return value of g_time_val_to_iso8601() has been nullable since GLib
@@ -592,7 +592,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  *
  * Since: 2.12
  * Deprecated: 2.62: #GTimeVal is not year-2038-safe. Use
- *    g_date_time_format_iso8601(dt) instead.
+ *    xdate_time_format_iso8601(dt) instead.
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 xchar_t *
@@ -629,7 +629,7 @@ g_time_val_to_iso8601 (GTimeVal *time_)
       /* ISO 8601 date and time format, with fractionary seconds:
        *   YYYY-MM-DDTHH:MM:SS.MMMMMMZ
        */
-      retval = g_strdup_printf ("%4d-%02d-%02dT%02d:%02d:%02d.%06ldZ",
+      retval = xstrdup_printf ("%4d-%02d-%02dT%02d:%02d:%02d.%06ldZ",
                                 tm->tm_year + 1900,
                                 tm->tm_mon + 1,
                                 tm->tm_mday,
@@ -643,7 +643,7 @@ g_time_val_to_iso8601 (GTimeVal *time_)
       /* ISO 8601 date and time format:
        *   YYYY-MM-DDTHH:MM:SSZ
        */
-      retval = g_strdup_printf ("%4d-%02d-%02dT%02d:%02d:%02dZ",
+      retval = xstrdup_printf ("%4d-%02d-%02dT%02d:%02d:%02dZ",
                                 tm->tm_year + 1900,
                                 tm->tm_mon + 1,
                                 tm->tm_mday,

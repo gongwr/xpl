@@ -44,17 +44,17 @@
  * They are not intended for normal control flow, only to give a
  * perhaps-helpful warning before giving up.
  *
- * Structured logging output is supported using g_log_structured(). This differs
+ * Structured logging output is supported using g_loxstructured(). This differs
  * from the traditional g_log() API in that log messages are handled as a
  * collection of key–value pairs representing individual pieces of information,
  * rather than as a single string containing all the information in an arbitrary
  * format.
  *
- * The convenience macros g_info(), g_message(), g_debug(), g_warning() and g_error()
+ * The convenience macros g_info(), g_message(), g_debug(), g_warning() and xerror()
  * will use the traditional g_log() API unless you define the symbol
  * %G_LOG_USE_STRUCTURED before including `glib.h`. But note that even messages
  * logged through the traditional g_log() API are ultimatively passed to
- * g_log_structured(), so that all log messages end up in same destination.
+ * g_loxstructured(), so that all log messages end up in same destination.
  * If %G_LOG_USE_STRUCTURED is defined, g_test_expect_message() will become
  * ineffective for the wrapper macros g_warning() and friends (see
  * [Testing for Messages][testing-for-messages]).
@@ -63,7 +63,7 @@
  * of which were supported previously; others weren’t):
  *  * Support for multiple logging levels.
  *  * Structured log support with the ability to add `MESSAGE_ID`s (see
- *    g_log_structured()).
+ *    g_loxstructured()).
  *  * Moving the responsibility for filtering log messages from the program to
  *    the log viewer — instead of libraries and programs installing log handlers
  *    (with g_log_set_handler()) which filter messages before output, all log
@@ -72,7 +72,7 @@
  *    to reproduce, so it is better to log everything possible and then use
  *    tools to analyse the logs than it is to not be able to reproduce a bug to
  *    get additional log data. Code which uses logging in performance-critical
- *    sections should compile out the g_log_structured() calls in
+ *    sections should compile out the g_loxstructured() calls in
  *    release builds, and compile them in in debugging builds.
  *  * A single writer function which handles all log messages in a process, from
  *    all libraries and program code; rather than multiple log handlers with
@@ -85,23 +85,23 @@
  *  * If a library wants to add standard information to all of its log messages
  *    (such as library state) or to redact private data (such as passwords or
  *    network credentials), it should use a wrapper function around its
- *    g_log_structured() calls or implement that in the single log writer
+ *    g_loxstructured() calls or implement that in the single log writer
  *    function.
- *  * If a program wants to pass context data from a g_log_structured() call to
+ *  * If a program wants to pass context data from a g_loxstructured() call to
  *    its log writer function so that, for example, it can use the correct
  *    server connection to submit logs to, that user data can be passed as a
- *    zero-length #GLogField to g_log_structured_array().
+ *    zero-length #GLogField to g_loxstructured_array().
  *  * Color output needed to be supported on the terminal, to make reading
  *    through logs easier.
  *
  * ## Using Structured Logging ## {#using-structured-logging}
  *
  * To use structured logging (rather than the old-style logging), either use
- * the g_log_structured() and g_log_structured_array() functions; or define
+ * the g_loxstructured() and g_loxstructured_array() functions; or define
  * `G_LOG_USE_STRUCTURED` before including any GLib header, and use the
- * g_message(), g_debug(), g_error() (etc.) macros.
+ * g_message(), g_debug(), xerror() (etc.) macros.
  *
- * You do not need to define `G_LOG_USE_STRUCTURED` to use g_log_structured(),
+ * You do not need to define `G_LOG_USE_STRUCTURED` to use g_loxstructured(),
  * but it is a good idea to avoid confusion.
  *
  * ## Log Domains ## {#log-domains}
@@ -144,7 +144,7 @@
  *  * They do not support structured log fields.
  *  * Examining the log output of code is a bad approach to testing it, and
  *    while it might be necessary for legacy code which uses g_log(), it should
- *    be avoided for new code using g_log_structured().
+ *    be avoided for new code using g_loxstructured().
  *
  * They will continue to work as before if g_log() is in use (and
  * %G_LOG_USE_STRUCTURED is not defined). They will do nothing if used with the
@@ -295,7 +295,7 @@ myInvalidParameterHandler(const wchar_t *expression,
  * GLogLevelFlags:
  * @G_LOG_FLAG_RECURSION: internal flag
  * @G_LOG_FLAG_FATAL: internal flag
- * @G_LOG_LEVEL_ERROR: log level for errors, see g_error().
+ * @G_LOG_LEVEL_ERROR: log level for errors, see xerror().
  *     This level is also used for messages produced by g_assert().
  * @G_LOG_LEVEL_CRITICAL: log level for critical warning messages, see
  *     g_critical().
@@ -331,7 +331,7 @@ myInvalidParameterHandler(const wchar_t *expression,
  * character will automatically be appended to @..., and need not be entered
  * manually.
  *
- * If structured logging is enabled, this will use g_log_structured();
+ * If structured logging is enabled, this will use g_loxstructured();
  * otherwise it will use g_log(). See
  * [Using Structured Logging][using-structured-logging].
  */
@@ -373,7 +373,7 @@ myInvalidParameterHandler(const wchar_t *expression,
  * a newline character will automatically be appended to @..., and
  * need not be entered manually.
  *
- * If structured logging is enabled, this will use g_log_structured();
+ * If structured logging is enabled, this will use g_loxstructured();
  * otherwise it will use g_log(). See
  * [Using Structured Logging][using-structured-logging].
  */
@@ -413,13 +413,13 @@ myInvalidParameterHandler(const wchar_t *expression,
  * character will automatically be appended to @..., and need not be entered
  * manually.
  *
- * If structured logging is enabled, this will use g_log_structured();
+ * If structured logging is enabled, this will use g_loxstructured();
  * otherwise it will use g_log(). See
  * [Using Structured Logging][using-structured-logging].
  */
 
 /**
- * g_error:
+ * xerror:
  * @...: format string, followed by parameters to insert
  *     into the format string (as with printf())
  *
@@ -440,7 +440,7 @@ myInvalidParameterHandler(const wchar_t *expression,
  * character will automatically be appended to @..., and need not be entered
  * manually.
  *
- * If structured logging is enabled, this will use g_log_structured();
+ * If structured logging is enabled, this will use g_loxstructured();
  * otherwise it will use g_log(). See
  * [Using Structured Logging][using-structured-logging].
  */
@@ -460,7 +460,7 @@ myInvalidParameterHandler(const wchar_t *expression,
  * g_log_writer_default() unless the `G_MESSAGES_DEBUG` environment variable is
  * set appropriately.
  *
- * If structured logging is enabled, this will use g_log_structured();
+ * If structured logging is enabled, this will use g_loxstructured();
  * otherwise it will use g_log(). See
  * [Using Structured Logging][using-structured-logging].
  *
@@ -483,7 +483,7 @@ myInvalidParameterHandler(const wchar_t *expression,
  * g_log_writer_default() unless the `G_MESSAGES_DEBUG` environment variable is
  * set appropriately.
  *
- * If structured logging is enabled, this will use g_log_structured();
+ * If structured logging is enabled, this will use g_loxstructured();
  * otherwise it will use g_log(). See
  * [Using Structured Logging][using-structured-logging].
  *
@@ -506,25 +506,25 @@ struct _GLogHandler
   GLogLevelFlags log_level;
   GLogFunc	 log_func;
   xpointer_t	 data;
-  GDestroyNotify destroy;
+  xdestroy_notify_t destroy;
   GLogHandler	*next;
 };
 
 
 /* --- variables --- */
-static GMutex         g_messages_lock;
+static xmutex_t         g_messages_lock;
 static GLogDomain    *g_log_domains = NULL;
 static GPrintFunc     glib_print_func = NULL;
 static GPrintFunc     glib_printerr_func = NULL;
 static GPrivate       g_log_depth;
-static GPrivate       g_log_structured_depth;
+static GPrivate       g_loxstructured_depth;
 static GLogFunc       default_log_func = g_log_default_handler;
 static xpointer_t       default_log_data = NULL;
 static GTestLogFatalFunc fatal_log_func = NULL;
 static xpointer_t          fatal_log_data;
 static GLogWriterFunc log_writer_func = g_log_writer_default;
 static xpointer_t       log_writer_user_data = NULL;
-static GDestroyNotify log_writer_user_data_free = NULL;
+static xdestroy_notify_t log_writer_user_data_free = NULL;
 static xboolean_t       g_log_debug_enabled = FALSE;  /* (atomic) */
 
 /* --- functions --- */
@@ -563,7 +563,7 @@ _g_log_abort (xboolean_t breakpoint)
 static xboolean_t win32_keep_fatal_message = FALSE;
 
 /* This default message will usually be overwritten. */
-/* Yes, a fixed size buffer is bad. So sue me. But g_error() is never
+/* Yes, a fixed size buffer is bad. So sue me. But xerror() is never
  * called with huge strings, is it?
  */
 static xchar_t  fatal_msg_buf[1000] = "Unspecified fatal error encountered, aborting.";
@@ -601,7 +601,7 @@ write_string (FILE        *stream,
 static void
 write_string_sized (FILE        *stream,
                     const xchar_t *string,
-                    gssize       length)
+                    xssize_t       length)
 {
   /* Is it nul-terminated? */
   if (length < 0)
@@ -631,7 +631,7 @@ g_log_domain_new_L (const xchar_t *log_domain)
   GLogDomain *domain;
 
   domain = g_new (GLogDomain, 1);
-  domain->log_domain = g_strdup (log_domain);
+  domain->log_domain = xstrdup (log_domain);
   domain->fatal_mask = G_LOG_FATAL_MASK;
   domain->handlers = NULL;
 
@@ -712,8 +712,8 @@ g_log_domain_get_handler_L (GLogDomain	*domain,
  * Libraries should not call this function, as it affects all messages logged
  * by a process, including those from other libraries.
  *
- * Structured log messages (using g_log_structured() and
- * g_log_structured_array()) are fatal only if the default log writer is used;
+ * Structured log messages (using g_loxstructured() and
+ * g_loxstructured_array()) are fatal only if the default log writer is used;
  * otherwise it is up to the writer function to determine which log messages
  * are fatal. See [Using Structured Logging][using-structured-logging].
  *
@@ -749,8 +749,8 @@ g_log_set_always_fatal (GLogLevelFlags fatal_mask)
  * Sets the log levels which are fatal in the given domain.
  * %G_LOG_LEVEL_ERROR is always fatal.
  *
- * This has no effect on structured log messages (using g_log_structured() or
- * g_log_structured_array()). To change the fatal behaviour for specific log
+ * This has no effect on structured log messages (using g_loxstructured() or
+ * g_loxstructured_array()). To change the fatal behaviour for specific log
  * messages, programs must install a custom log writer function using
  * g_log_set_writer_func(). See
  * [Using Structured Logging][using-structured-logging].
@@ -875,7 +875,7 @@ g_log_set_handler_full (const xchar_t    *log_domain,
                         GLogLevelFlags  log_levels,
                         GLogFunc        log_func,
                         xpointer_t        user_data,
-                        GDestroyNotify  destroy)
+                        xdestroy_notify_t  destroy)
 {
   static xuint_t handler_id = 0;
   GLogDomain *domain;
@@ -959,10 +959,10 @@ g_log_set_default_handler (GLogFunc log_func,
  * any test case, so you have to set it inside each test
  * function which needs the special behavior.
  *
- * This handler has no effect on g_error messages.
+ * This handler has no effect on xerror messages.
  *
  * This handler also has no effect on structured log messages (using
- * g_log_structured() or g_log_structured_array()). To change the fatal
+ * g_loxstructured() or g_loxstructured_array()). To change the fatal
  * behaviour for specific log messages, programs must install a custom log
  * writer function using g_log_set_writer_func().See
  * [Using Structured Logging][using-structured-logging].
@@ -1041,9 +1041,9 @@ static xchar_t*
 strdup_convert (const xchar_t *string,
 		const xchar_t *charset)
 {
-  if (!g_utf8_validate (string, -1, NULL))
+  if (!xutf8_validate (string, -1, NULL))
     {
-      GString *gstring = g_string_new ("[Invalid UTF-8] ");
+      xstring_t *xstring = xstring_new ("[Invalid UTF-8] ");
       guchar *p;
 
       for (p = (guchar *)string; *p; p++)
@@ -1051,12 +1051,12 @@ strdup_convert (const xchar_t *string,
 	  if (CHAR_IS_SAFE(*p) &&
 	      !(*p == '\r' && *(p + 1) != '\n') &&
 	      *p < 0x80)
-	    g_string_append_c (gstring, *p);
+	    xstring_append_c (xstring, *p);
 	  else
-	    g_string_append_printf (gstring, "\\x%02x", (xuint_t)(guchar)*p);
+	    xstring_append_printf (xstring, "\\x%02x", (xuint_t)(guchar)*p);
 	}
 
-      return g_string_free (gstring, FALSE);
+      return xstring_free (xstring, FALSE);
     }
   else
     {
@@ -1075,9 +1075,9 @@ strdup_convert (const xchar_t *string,
 	      warned = TRUE;
 	      _g_fprintf (stderr, "GLib: Cannot convert message: %s\n", err->message);
 	    }
-	  g_error_free (err);
+	  xerror_free (err);
 
-	  return g_strdup (string);
+	  return xstrdup (string);
 	}
     }
 }
@@ -1193,7 +1193,7 @@ static xboolean_t gmessages_use_stderr = FALSE;
 void
 g_log_writer_default_set_use_stderr (xboolean_t use_stderr)
 {
-  g_return_if_fail (g_thread_n_created () == 0);
+  g_return_if_fail (xthread_n_created () == 0);
   gmessages_use_stderr = use_stderr;
 }
 
@@ -1263,7 +1263,7 @@ typedef struct {
   xchar_t          *pattern;
 } GTestExpectedMessage;
 
-static GSList *expected_messages = NULL;
+static xslist_t *expected_messages = NULL;
 
 /**
  * g_logv:
@@ -1312,17 +1312,17 @@ g_logv (const xchar_t   *log_domain,
       msg = buffer;
     }
   else
-    msg = msg_alloc = g_strdup_vprintf (format, args);
+    msg = msg_alloc = xstrdup_vprintf (format, args);
 
   if (expected_messages)
     {
       GTestExpectedMessage *expected = expected_messages->data;
 
-      if (g_strcmp0 (expected->log_domain, log_domain) == 0 &&
+      if (xstrcmp0 (expected->log_domain, log_domain) == 0 &&
           ((log_level & expected->log_level) == expected->log_level) &&
           g_pattern_match_simple (expected->pattern, msg))
         {
-          expected_messages = g_slist_delete_link (expected_messages,
+          expected_messages = xslist_delete_link (expected_messages,
                                                    expected_messages);
           g_free (expected->log_domain);
           g_free (expected->pattern);
@@ -1336,7 +1336,7 @@ g_logv (const xchar_t   *log_domain,
           xchar_t *expected_message;
 
           mklevel_prefix (level_prefix, expected->log_level, FALSE);
-          expected_message = g_strdup_printf ("Did not see expected message %s-%s: %s",
+          expected_message = xstrdup_printf ("Did not see expected message %s-%s: %s",
                                               expected->log_domain ? expected->log_domain : "**",
                                               level_prefix, expected->pattern);
           g_log_default_handler (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, expected_message, NULL);
@@ -1402,7 +1402,7 @@ g_logv (const xchar_t   *log_domain,
                 {
                   WCHAR *wide_msg;
 
-                  wide_msg = g_utf8_to_utf16 (fatal_msg_buf, -1, NULL, NULL, NULL);
+                  wide_msg = xutf8_to_utf16 (fatal_msg_buf, -1, NULL, NULL, NULL);
 
                   MessageBoxW (NULL, wide_msg, NULL,
                                MB_ICONERROR | MB_SETFOREGROUND);
@@ -1608,7 +1608,7 @@ done_query:
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
 /**
- * g_log_structured:
+ * g_loxstructured:
  * @log_domain: log domain, usually %G_LOG_DOMAIN
  * @log_level: log level, either from #GLogLevelFlags, or a user-defined
  *    level
@@ -1629,7 +1629,7 @@ done_query:
  * The structured data is provided as key–value pairs, where keys are UTF-8
  * strings, and values are arbitrary pointers — typically pointing to UTF-8
  * strings, but that is not a requirement. To pass binary (non-nul-terminated)
- * structured data, use g_log_structured_array(). The keys for structured data
+ * structured data, use g_loxstructured_array(). The keys for structured data
  * should follow the [systemd journal
  * fields](https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html)
  * specification. It is suggested that custom keys are namespaced according to
@@ -1654,13 +1654,13 @@ done_query:
  *
  * Note that `CODE_FILE`, `CODE_LINE` and `CODE_FUNC` are automatically set by
  * the logging macros, G_DEBUG_HERE(), g_message(), g_warning(), g_critical(),
- * g_error(), etc, if the symbols `G_LOG_USE_STRUCTURED` is defined before including
+ * xerror(), etc, if the symbols `G_LOG_USE_STRUCTURED` is defined before including
  * `glib.h`.
  *
  * For example:
  *
  * |[<!-- language="C" -->
- * g_log_structured (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,
+ * g_loxstructured (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,
  *                   "MESSAGE_ID", "06d4df59e6c24647bfe69d2c27ef0b4e",
  *                   "MY_APPLICATION_CUSTOM_FIELD", "some debug string",
  *                   "MESSAGE", "This is a debug message about pointer %p and integer %u.",
@@ -1674,7 +1674,7 @@ done_query:
  * your software.
  *
  * To pass a user data pointer to the log writer function which is specific to
- * this logging call, you must use g_log_structured_array() and pass the pointer
+ * this logging call, you must use g_loxstructured_array() and pass the pointer
  * as a field with #GLogField.length set to zero, otherwise it will be
  * interpreted as a string.
  *
@@ -1687,7 +1687,7 @@ done_query:
  *   { "MY_APPLICATION_CUSTOM_FIELD", "some debug string", -1 },
  *   { "MY_APPLICATION_STATE", state_object, 0 },
  * };
- * g_log_structured_array (G_LOG_LEVEL_DEBUG, fields, G_N_ELEMENTS (fields));
+ * g_loxstructured_array (G_LOG_LEVEL_DEBUG, fields, G_N_ELEMENTS (fields));
  * ]|
  *
  * Note also that, even if no other structured fields are specified, there
@@ -1702,7 +1702,7 @@ done_query:
  * Since: 2.50
  */
 void
-g_log_structured (const xchar_t    *log_domain,
+g_loxstructured (const xchar_t    *log_domain,
                   GLogLevelFlags  log_level,
                   ...)
 {
@@ -1715,7 +1715,7 @@ g_log_structured (const xchar_t    *log_domain,
   GLogField stack_fields[16];
   GLogField *fields = stack_fields;
   GLogField *fields_allocated = NULL;
-  GArray *array = NULL;
+  xarray_t *array = NULL;
 
   va_start (args, log_level);
 
@@ -1731,7 +1731,7 @@ g_log_structured (const xchar_t    *log_domain,
     {
       GLogField field;
       const xchar_t *key = p;
-      gconstpointer value = va_arg (args, xpointer_t);
+      xconstpointer value = va_arg (args, xpointer_t);
 
       field.key = key;
       field.value = value;
@@ -1777,7 +1777,7 @@ g_log_structured (const xchar_t    *log_domain,
     }
   else
     {
-      message = message_allocated = g_strdup_vprintf (format, args);
+      message = message_allocated = xstrdup_vprintf (format, args);
     }
 
   /* Add MESSAGE, PRIORITY and XPL_DOMAIN. */
@@ -1797,7 +1797,7 @@ g_log_structured (const xchar_t    *log_domain,
     }
 
   /* Log it. */
-  g_log_structured_array (log_level, fields, n_fields);
+  g_loxstructured_array (log_level, fields, n_fields);
 
   g_free (fields_allocated);
   g_free (message_allocated);
@@ -1824,9 +1824,9 @@ g_log_structured (const xchar_t    *log_domain,
  * supported. In this case the message is handled as binary and will be forwarded
  * to the log writer as such. The size of the array should not be higher than
  * %G_MAXSSIZE. Otherwise it will be truncated to this size. For other types
- * g_variant_print() will be used to convert the value into a string.
+ * xvariant_print() will be used to convert the value into a string.
  *
- * For more details on its usage and about the parameters, see g_log_structured().
+ * For more details on its usage and about the parameters, see g_loxstructured().
  *
  * Since: 2.50
  */
@@ -1836,14 +1836,14 @@ g_log_variant (const xchar_t    *log_domain,
                GLogLevelFlags  log_level,
                xvariant_t       *fields)
 {
-  GVariantIter iter;
+  xvariant_iter_t iter;
   xvariant_t *value;
   xchar_t *key;
-  GArray *fields_array;
+  xarray_t *fields_array;
   GLogField field;
-  GSList *values_list, *print_list;
+  xslist_t *values_list, *print_list;
 
-  g_return_if_fail (g_variant_is_of_type (fields, G_VARIANT_TYPE_VARDICT));
+  g_return_if_fail (xvariant_is_of_type (fields, G_VARIANT_TYPE_VARDICT));
 
   values_list = print_list = NULL;
   fields_array = g_array_new (FALSE, FALSE, sizeof (GLogField));
@@ -1861,22 +1861,22 @@ g_log_variant (const xchar_t    *log_domain,
       g_array_append_val (fields_array, field);
     }
 
-  g_variant_iter_init (&iter, fields);
-  while (g_variant_iter_next (&iter, "{&sv}", &key, &value))
+  xvariant_iter_init (&iter, fields);
+  while (xvariant_iter_next (&iter, "{&sv}", &key, &value))
     {
       xboolean_t defer_unref = TRUE;
 
       field.key = key;
       field.length = -1;
 
-      if (g_variant_is_of_type (value, G_VARIANT_TYPE_STRING))
+      if (xvariant_is_of_type (value, G_VARIANT_TYPE_STRING))
         {
-          field.value = g_variant_get_string (value, NULL);
+          field.value = xvariant_get_string (value, NULL);
         }
-      else if (g_variant_is_of_type (value, G_VARIANT_TYPE_BYTESTRING))
+      else if (xvariant_is_of_type (value, G_VARIANT_TYPE_BYTESTRING))
         {
           xsize_t s;
-          field.value = g_variant_get_fixed_array (value, &s, sizeof (guchar));
+          field.value = xvariant_get_fixed_array (value, &s, sizeof (guchar));
           if (G_LIKELY (s <= G_MAXSSIZE))
             {
               field.length = s;
@@ -1892,26 +1892,26 @@ g_log_variant (const xchar_t    *log_domain,
         }
       else
         {
-          char *s = g_variant_print (value, FALSE);
+          char *s = xvariant_print (value, FALSE);
           field.value = s;
-          print_list = g_slist_prepend (print_list, s);
+          print_list = xslist_prepend (print_list, s);
           defer_unref = FALSE;
         }
 
       g_array_append_val (fields_array, field);
 
       if (G_LIKELY (defer_unref))
-        values_list = g_slist_prepend (values_list, value);
+        values_list = xslist_prepend (values_list, value);
       else
-        g_variant_unref (value);
+        xvariant_unref (value);
     }
 
   /* Log it. */
-  g_log_structured_array (log_level, (GLogField *) fields_array->data, fields_array->len);
+  g_loxstructured_array (log_level, (GLogField *) fields_array->data, fields_array->len);
 
   g_array_free (fields_array, TRUE);
-  g_slist_free_full (values_list, (GDestroyNotify) g_variant_unref);
-  g_slist_free_full (print_list, g_free);
+  xslist_free_full (values_list, (xdestroy_notify_t) xvariant_unref);
+  xslist_free_full (print_list, g_free);
 }
 
 
@@ -1923,7 +1923,7 @@ static GLogWriterOutput _g_log_writer_fallback (GLogLevelFlags   log_level,
                                                 xpointer_t         user_data);
 
 /**
- * g_log_structured_array:
+ * g_loxstructured_array:
  * @log_level: log level, either from #GLogLevelFlags, or a user-defined
  *    level
  * @fields: (array length=n_fields): key–value pairs of structured data to add
@@ -1935,7 +1935,7 @@ static GLogWriterOutput _g_log_writer_fallback (GLogLevelFlags   log_level,
  * message is fatal (i.e. its log level is %G_LOG_LEVEL_ERROR), the program will
  * be aborted at the end of this function.
  *
- * See g_log_structured() for more documentation.
+ * See g_loxstructured() for more documentation.
  *
  * This assumes that @log_level is already present in @fields (typically as the
  * `PRIORITY` field).
@@ -1943,7 +1943,7 @@ static GLogWriterOutput _g_log_writer_fallback (GLogLevelFlags   log_level,
  * Since: 2.50
  */
 void
-g_log_structured_array (GLogLevelFlags   log_level,
+g_loxstructured_array (GLogLevelFlags   log_level,
                         const GLogField *fields,
                         xsize_t            n_fields)
 {
@@ -1956,7 +1956,7 @@ g_log_structured_array (GLogLevelFlags   log_level,
     return;
 
   /* Check for recursion and look up the writer function. */
-  depth = GPOINTER_TO_UINT (g_private_get (&g_log_structured_depth));
+  depth = GPOINTER_TO_UINT (g_private_get (&g_loxstructured_depth));
   recursion = (depth > 0);
 
   g_mutex_lock (&g_messages_lock);
@@ -1967,12 +1967,12 @@ g_log_structured_array (GLogLevelFlags   log_level,
   g_mutex_unlock (&g_messages_lock);
 
   /* Write the log entry. */
-  g_private_set (&g_log_structured_depth, GUINT_TO_POINTER (++depth));
+  g_private_set (&g_loxstructured_depth, GUINT_TO_POINTER (++depth));
 
   g_assert (writer_func != NULL);
   writer_func (log_level, fields, n_fields, writer_user_data);
 
-  g_private_set (&g_log_structured_depth, GUINT_TO_POINTER (--depth));
+  g_private_set (&g_loxstructured_depth, GUINT_TO_POINTER (--depth));
 
   /* Abort if the message was fatal. */
   if (log_level & G_LOG_FATAL_MASK)
@@ -1983,7 +1983,7 @@ g_log_structured_array (GLogLevelFlags   log_level,
  * with support for G_GNUC_PRINTF so that @message_format can be checked
  * with -Wformat. */
 void
-g_log_structured_standard (const xchar_t    *log_domain,
+g_loxstructured_standard (const xchar_t    *log_domain,
                            GLogLevelFlags  log_level,
                            const xchar_t    *file,
                            const xchar_t    *line,
@@ -2021,13 +2021,13 @@ g_log_structured_standard (const xchar_t    *log_domain,
     }
   else
     {
-      fields[4].value = message_allocated = g_strdup_vprintf (message_format, args);
+      fields[4].value = message_allocated = xstrdup_vprintf (message_format, args);
     }
 
   va_end (args);
 
   n_fields = G_N_ELEMENTS (fields) - ((log_domain == NULL) ? 1 : 0);
-  g_log_structured_array (log_level, fields, n_fields);
+  g_loxstructured_array (log_level, fields, n_fields);
 
   g_free (message_allocated);
 }
@@ -2054,7 +2054,7 @@ g_log_structured_standard (const xchar_t    *log_domain,
 void
 g_log_set_writer_func (GLogWriterFunc func,
                        xpointer_t       user_data,
-                       GDestroyNotify user_data_free)
+                       xdestroy_notify_t user_data_free)
 {
   g_return_if_fail (func != NULL);
 
@@ -2232,14 +2232,14 @@ g_log_writer_is_journald (xint_t output_fd)
   addr_len = sizeof(addr);
   err = getpeername (output_fd, &addr.sa, &addr_len);
   if (err == 0 && addr.storage.ss_family == AF_UNIX)
-    return (g_str_has_prefix (addr.un.sun_path, "/run/systemd/journal/") ||
-            g_str_has_prefix (addr.un.sun_path, "/run/systemd/journal."));
+    return (xstr_has_prefix (addr.un.sun_path, "/run/systemd/journal/") ||
+            xstr_has_prefix (addr.un.sun_path, "/run/systemd/journal."));
 #endif
 
   return FALSE;
 }
 
-static void escape_string (GString *string);
+static void escape_string (xstring_t *string);
 
 /**
  * g_log_writer_format_fields:
@@ -2254,7 +2254,7 @@ static void escape_string (GString *string);
  * Format a structured log message as a string suitable for outputting to the
  * terminal (or elsewhere). This will include the values of all fields it knows
  * how to interpret, which includes `MESSAGE` and `XPL_DOMAIN` (see the
- * documentation for g_log_structured()). It does not include values from
+ * documentation for g_loxstructured()). It does not include values from
  * unknown fields.
  *
  * The returned string does **not** have a trailing new-line character. It is
@@ -2275,7 +2275,7 @@ g_log_writer_format_fields (GLogLevelFlags   log_level,
   const xchar_t *message = NULL;
   const xchar_t *log_domain = NULL;
   xchar_t level_prefix[STRING_BUFFER_SIZE];
-  GString *gstring;
+  xstring_t *xstring;
   gint64 now;
   time_t now_secs;
   struct tm *now_tm;
@@ -2286,20 +2286,20 @@ g_log_writer_format_fields (GLogLevelFlags   log_level,
     {
       const GLogField *field = &fields[i];
 
-      if (g_strcmp0 (field->key, "MESSAGE") == 0)
+      if (xstrcmp0 (field->key, "MESSAGE") == 0)
         message = field->value;
-      else if (g_strcmp0 (field->key, "XPL_DOMAIN") == 0)
+      else if (xstrcmp0 (field->key, "XPL_DOMAIN") == 0)
         log_domain = field->value;
     }
 
   /* Format things. */
   mklevel_prefix (level_prefix, log_level, use_color);
 
-  gstring = g_string_new (NULL);
+  xstring = xstring_new (NULL);
   if (log_level & ALERT_LEVELS)
-    g_string_append (gstring, "\n");
+    xstring_append (xstring, "\n");
   if (!log_domain)
-    g_string_append (gstring, "** ");
+    xstring_append (xstring, "** ");
 
   if ((g_log_msg_prefix & (log_level & G_LOG_LEVEL_MASK)) ==
       (log_level & G_LOG_LEVEL_MASK))
@@ -2308,19 +2308,19 @@ g_log_writer_format_fields (GLogLevelFlags   log_level,
       gulong pid = getpid ();
 
       if (prg_name == NULL)
-        g_string_append_printf (gstring, "(process:%lu): ", pid);
+        xstring_append_printf (xstring, "(process:%lu): ", pid);
       else
-        g_string_append_printf (gstring, "(%s:%lu): ", prg_name, pid);
+        xstring_append_printf (xstring, "(%s:%lu): ", prg_name, pid);
     }
 
   if (log_domain != NULL)
     {
-      g_string_append (gstring, log_domain);
-      g_string_append_c (gstring, '-');
+      xstring_append (xstring, log_domain);
+      xstring_append_c (xstring, '-');
     }
-  g_string_append (gstring, level_prefix);
+  xstring_append (xstring, level_prefix);
 
-  g_string_append (gstring, ": ");
+  xstring_append (xstring, ": ");
 
   /* Timestamp */
   now = g_get_real_time ();
@@ -2331,39 +2331,39 @@ g_log_writer_format_fields (GLogLevelFlags   log_level,
   else
     strcpy (time_buf, "(error)");
 
-  g_string_append_printf (gstring, "%s%s.%03d%s: ",
+  xstring_append_printf (xstring, "%s%s.%03d%s: ",
                           use_color ? "\033[34m" : "",
                           time_buf, (xint_t) ((now / 1000) % 1000),
                           color_reset (use_color));
 
   if (message == NULL)
     {
-      g_string_append (gstring, "(NULL) message");
+      xstring_append (xstring, "(NULL) message");
     }
   else
     {
-      GString *msg;
+      xstring_t *msg;
       const xchar_t *charset;
 
-      msg = g_string_new (message);
+      msg = xstring_new (message);
       escape_string (msg);
 
       if (g_get_console_charset (&charset))
         {
           /* charset is UTF-8 already */
-          g_string_append (gstring, msg->str);
+          xstring_append (xstring, msg->str);
         }
       else
         {
           xchar_t *lstring = strdup_convert (msg->str, charset);
-          g_string_append (gstring, lstring);
+          xstring_append (xstring, lstring);
           g_free (lstring);
         }
 
-      g_string_free (msg, TRUE);
+      xstring_free (msg, TRUE);
     }
 
-  return g_string_free (gstring, FALSE);
+  return xstring_free (xstring, FALSE);
 }
 
 /* Enable support for the journal if we're on a recent enough Linux */
@@ -2381,7 +2381,7 @@ journal_sendv (struct iovec *iov,
   struct sockaddr_un sa;
   union {
     struct cmsghdr cmsghdr;
-    guint8 buf[CMSG_SPACE(sizeof(int))];
+    xuint8_t buf[CMSG_SPACE(sizeof(int))];
   } control;
   struct cmsghdr *cmsg;
   char path[] = "/dev/shm/journal.XXXXXX";
@@ -2394,7 +2394,7 @@ journal_sendv (struct iovec *iov,
 
   memset (&sa, 0, sizeof (sa));
   sa.sun_family = AF_UNIX;
-  if (g_strlcpy (sa.sun_path, "/run/systemd/journal/socket", sizeof (sa.sun_path)) >= sizeof (sa.sun_path))
+  if (xstrlcpy (sa.sun_path, "/run/systemd/journal/socket", sizeof (sa.sun_path)) >= sizeof (sa.sun_path))
     return -1;
 
   memset (&mh, 0, sizeof (mh));
@@ -2510,7 +2510,7 @@ g_log_writer_journald (GLogLevelFlags   log_level,
   v = iov;
   for (i = 0; i < n_fields; i++)
     {
-      guint64 length;
+      xuint64_t length;
       xboolean_t binary;
 
       if (fields[i].length < 0)
@@ -2526,7 +2526,7 @@ g_log_writer_journald (GLogLevelFlags   log_level,
 
       if (binary)
         {
-          guint64 nstr;
+          xuint64_t nstr;
 
           v[0].iov_base = (xpointer_t)fields[i].key;
           v[0].iov_len = strlen (fields[i].key);
@@ -2627,15 +2627,15 @@ g_log_writer_standard_streams (GLogLevelFlags   log_level,
  * handling in the structured log API when called from the old g_log() API.
  *
  * We can guarantee that g_log_default_handler() will pass XPL_OLD_LOG_API as
- * the first field to g_log_structured_array(), if that is the case.
+ * the first field to g_loxstructured_array(), if that is the case.
  */
 static xboolean_t
 log_is_old_api (const GLogField *fields,
                 xsize_t            n_fields)
 {
   return (n_fields >= 1 &&
-          g_strcmp0 (fields[0].key, "XPL_OLD_LOG_API") == 0 &&
-          g_strcmp0 (fields[0].value, "1") == 0);
+          xstrcmp0 (fields[0].key, "XPL_OLD_LOG_API") == 0 &&
+          xstrcmp0 (fields[0].value, "1") == 0);
 }
 
 /*
@@ -2668,7 +2668,7 @@ should_drop_message (GLogLevelFlags   log_level,
         {
           for (i = 0; i < n_fields; i++)
             {
-              if (g_strcmp0 (fields[i].key, "XPL_DOMAIN") == 0)
+              if (xstrcmp0 (fields[i].key, "XPL_DOMAIN") == 0)
                 {
                   log_domain = fields[i].value;
                   break;
@@ -2813,7 +2813,7 @@ handled:
         {
           WCHAR *wide_msg;
 
-          wide_msg = g_utf8_to_utf16 (fatal_msg_buf, -1, NULL, NULL, NULL);
+          wide_msg = xutf8_to_utf16 (fatal_msg_buf, -1, NULL, NULL, NULL);
 
           MessageBoxW (NULL, wide_msg, NULL, MB_ICONERROR | MB_SETFOREGROUND);
 
@@ -2967,11 +2967,11 @@ g_warn_message (const char     *domain,
   char *s, lstr[32];
   g_snprintf (lstr, 32, "%d", line);
   if (warnexpr)
-    s = g_strconcat ("(", file, ":", lstr, "):",
+    s = xstrconcat ("(", file, ":", lstr, "):",
                      func, func[0] ? ":" : "",
                      " runtime check failed: (", warnexpr, ")", NULL);
   else
-    s = g_strconcat ("(", file, ":", lstr, "):",
+    s = xstrconcat ("(", file, ":", lstr, "):",
                      func, func[0] ? ":" : "",
                      " ", "code should not be reached", NULL);
   g_log (domain, G_LOG_LEVEL_WARNING, "%s", s);
@@ -3029,17 +3029,17 @@ g_assert_warning (const char *log_domain,
  * For example:
  *
  * |[<!-- language="C" -->
- *   // g_main_context_push_thread_default() should fail if the
+ *   // xmain_context_push_thread_default() should fail if the
  *   // context is already owned by another thread.
  *   g_test_expect_message (G_LOG_DOMAIN,
  *                          G_LOG_LEVEL_CRITICAL,
  *                          "assertion*acquired_context*failed");
- *   g_main_context_push_thread_default (bad_context);
+ *   xmain_context_push_thread_default (bad_context);
  *   g_test_assert_expected_messages ();
  * ]|
  *
- * Note that you cannot use this to test g_error() messages, since
- * g_error() intentionally never returns even if the program doesn't
+ * Note that you cannot use this to test xerror() messages, since
+ * xerror() intentionally never returns even if the program doesn't
  * abort; use g_test_trap_subprocess() in this case.
  *
  * If messages at %G_LOG_LEVEL_DEBUG are emitted, but not explicitly
@@ -3059,11 +3059,11 @@ g_test_expect_message (const xchar_t    *log_domain,
   g_return_if_fail (~log_level & G_LOG_LEVEL_ERROR);
 
   expected = g_new (GTestExpectedMessage, 1);
-  expected->log_domain = g_strdup (log_domain);
+  expected->log_domain = xstrdup (log_domain);
   expected->log_level = log_level;
-  expected->pattern = g_strdup (pattern);
+  expected->pattern = xstrdup (pattern);
 
-  expected_messages = g_slist_append (expected_messages, expected);
+  expected_messages = xslist_append (expected_messages, expected);
 }
 
 void
@@ -3081,7 +3081,7 @@ g_test_assert_expected_messages_internal (const char     *domain,
       expected = expected_messages->data;
 
       mklevel_prefix (level_prefix, expected->log_level, FALSE);
-      message = g_strdup_printf ("Did not see expected message %s-%s: %s",
+      message = xstrdup_printf ("Did not see expected message %s-%s: %s",
                                  expected->log_domain ? expected->log_domain : "**",
                                  level_prefix, expected->pattern);
       g_assertion_message (G_LOG_DOMAIN, file, line, func, message);
@@ -3154,17 +3154,17 @@ _g_log_fallback_handler (const xchar_t   *log_domain,
 }
 
 static void
-escape_string (GString *string)
+escape_string (xstring_t *string)
 {
   const char *p = string->str;
-  gunichar wc;
+  xunichar_t wc;
 
   while (p < string->str + string->len)
     {
       xboolean_t safe;
 
-      wc = g_utf8_get_char_validated (p, -1);
-      if (wc == (gunichar)-1 || wc == (gunichar)-2)
+      wc = xutf8_get_char_validated (p, -1);
+      if (wc == (xunichar_t)-1 || wc == (xunichar_t)-2)
 	{
 	  xchar_t *tmp;
 	  xuint_t pos;
@@ -3173,9 +3173,9 @@ escape_string (GString *string)
 
 	  /* Emit invalid UTF-8 as hex escapes
            */
-	  tmp = g_strdup_printf ("\\x%02x", (xuint_t)(guchar)*p);
-	  g_string_erase (string, pos, 1);
-	  g_string_insert (string, pos, tmp);
+	  tmp = xstrdup_printf ("\\x%02x", (xuint_t)(guchar)*p);
+	  xstring_erase (string, pos, 1);
+	  xstring_insert (string, pos, tmp);
 
 	  p = string->str + (pos + 4); /* Skip over escape sequence */
 
@@ -3201,15 +3201,15 @@ escape_string (GString *string)
 	  /* Largest char we escape is 0x0a, so we don't have to worry
 	   * about 8-digit \Uxxxxyyyy
 	   */
-	  tmp = g_strdup_printf ("\\u%04x", wc);
-	  g_string_erase (string, pos, g_utf8_next_char (p) - p);
-	  g_string_insert (string, pos, tmp);
+	  tmp = xstrdup_printf ("\\u%04x", wc);
+	  xstring_erase (string, pos, xutf8_next_char (p) - p);
+	  xstring_insert (string, pos, tmp);
 	  g_free (tmp);
 
 	  p = string->str + (pos + 6); /* Skip over escape sequence */
 	}
       else
-	p = g_utf8_next_char (p);
+	p = xutf8_next_char (p);
     }
 }
 
@@ -3292,7 +3292,7 @@ g_log_default_handler (const xchar_t   *log_domain,
    * API is more coarse-grained than in the old g_log() API, so we don't want
    * to use it here.
    */
-  g_log_structured_array (log_level & ~G_LOG_FLAG_FATAL, fields, n_fields);
+  g_loxstructured_array (log_level & ~G_LOG_FLAG_FATAL, fields, n_fields);
 }
 
 /**
@@ -3335,8 +3335,8 @@ g_set_print_handler (GPrintFunc func)
  * g_print() should not be used from within libraries for debugging
  * messages, since it may be redirected by applications to special
  * purpose message windows or even files. Instead, libraries should
- * use g_log(), g_log_structured(), or the convenience macros g_message(),
- * g_warning() and g_error().
+ * use g_log(), g_loxstructured(), or the convenience macros g_message(),
+ * g_warning() and xerror().
  */
 void
 g_print (const xchar_t *format,
@@ -3349,7 +3349,7 @@ g_print (const xchar_t *format,
   g_return_if_fail (format != NULL);
 
   va_start (args, format);
-  string = g_strdup_vprintf (format, args);
+  string = xstrdup_vprintf (format, args);
   va_end (args);
 
   g_mutex_lock (&g_messages_lock);
@@ -3414,8 +3414,8 @@ g_set_printerr_handler (GPrintFunc func)
  * new-line character.
  *
  * g_printerr() should not be used from within libraries.
- * Instead g_log() or g_log_structured() should be used, or the convenience
- * macros g_message(), g_warning() and g_error().
+ * Instead g_log() or g_loxstructured() should be used, or the convenience
+ * macros g_message(), g_warning() and xerror().
  */
 void
 g_printerr (const xchar_t *format,
@@ -3428,7 +3428,7 @@ g_printerr (const xchar_t *format,
   g_return_if_fail (format != NULL);
 
   va_start (args, format);
-  string = g_strdup_vprintf (format, args);
+  string = xstrdup_vprintf (format, args);
   va_end (args);
 
   g_mutex_lock (&g_messages_lock);

@@ -30,7 +30,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_SIMPLE_IO_STREAM                  (g_simple_io_stream_get_type ())
-#define G_SIMPLE_IO_STREAM(obj)                  (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SIMPLE_IO_STREAM, GSimpleIOStream))
+#define G_SIMPLE_IO_STREAM(obj)                  (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SIMPLE_IO_STREAM, xsimple_io_stream))
 #define X_IS_SIMPLE_IO_STREAM(obj)               (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_SIMPLE_IO_STREAM))
 
 XPL_AVAILABLE_IN_2_44

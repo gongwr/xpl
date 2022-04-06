@@ -67,7 +67,7 @@ struct _GUnixOutputStreamPrivate {
   xuint_t can_poll : 1;
 };
 
-static void g_unix_output_stream_pollable_iface_init (GPollableOutputStreamInterface *iface);
+static void g_unix_output_stream_pollable_iface_init (xpollable_output_stream_interface_t *iface);
 static void g_unix_output_stream_file_descriptor_based_iface_init (GFileDescriptorBasedIface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (GUnixOutputStream, g_unix_output_stream, XTYPE_OUTPUT_STREAM,
@@ -80,19 +80,19 @@ G_DEFINE_TYPE_WITH_CODE (GUnixOutputStream, g_unix_output_stream, XTYPE_OUTPUT_S
 
 static void     g_unix_output_stream_set_property (xobject_t              *object,
 						   xuint_t                 prop_id,
-						   const GValue         *value,
-						   GParamSpec           *pspec);
+						   const xvalue_t         *value,
+						   xparam_spec_t           *pspec);
 static void     g_unix_output_stream_get_property (xobject_t              *object,
 						   xuint_t                 prop_id,
-						   GValue               *value,
-						   GParamSpec           *pspec);
-static gssize   g_unix_output_stream_write        (xoutput_stream_t        *stream,
+						   xvalue_t               *value,
+						   xparam_spec_t           *pspec);
+static xssize_t   g_unix_output_stream_write        (xoutput_stream_t        *stream,
 						   const void           *buffer,
 						   xsize_t                 count,
 						   xcancellable_t         *cancellable,
 						   xerror_t              **error);
 static xboolean_t g_unix_output_stream_writev       (xoutput_stream_t        *stream,
-						   const GOutputVector  *vectors,
+						   const xoutput_vector_t  *vectors,
 						   xsize_t                 n_vectors,
 						   xsize_t                *bytes_written,
 						   xcancellable_t         *cancellable,
@@ -101,12 +101,12 @@ static xboolean_t g_unix_output_stream_close        (xoutput_stream_t        *st
 						   xcancellable_t         *cancellable,
 						   xerror_t              **error);
 
-static xboolean_t g_unix_output_stream_pollable_can_poll      (GPollableOutputStream *stream);
-static xboolean_t g_unix_output_stream_pollable_is_writable   (GPollableOutputStream *stream);
-static GSource *g_unix_output_stream_pollable_create_source (GPollableOutputStream *stream,
+static xboolean_t g_unix_output_stream_pollable_can_poll      (xpollable_output_stream_t *stream);
+static xboolean_t g_unix_output_stream_pollable_is_writable   (xpollable_output_stream_t *stream);
+static xsource_t *g_unix_output_stream_pollable_create_source (xpollable_output_stream_t *stream,
 							     xcancellable_t         *cancellable);
-static GPollableReturn g_unix_output_stream_pollable_writev_nonblocking (GPollableOutputStream  *stream,
-									 const GOutputVector    *vectors,
+static GPollableReturn g_unix_output_stream_pollable_writev_nonblocking (xpollable_output_stream_t  *stream,
+									 const xoutput_vector_t    *vectors,
 									 xsize_t                   n_vectors,
 									 xsize_t                  *bytes_written,
 									 xerror_t                **error);
@@ -131,7 +131,7 @@ g_unix_output_stream_class_init (GUnixOutputStreamClass *klass)
    *
    * Since: 2.20
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
 				   PROP_FD,
 				   g_param_spec_int ("fd",
 						     P_("File descriptor"),
@@ -146,7 +146,7 @@ g_unix_output_stream_class_init (GUnixOutputStreamClass *klass)
    *
    * Since: 2.20
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
 				   PROP_CLOSE_FD,
 				   g_param_spec_boolean ("close-fd",
 							 P_("Close file descriptor"),
@@ -156,7 +156,7 @@ g_unix_output_stream_class_init (GUnixOutputStreamClass *klass)
 }
 
 static void
-g_unix_output_stream_pollable_iface_init (GPollableOutputStreamInterface *iface)
+g_unix_output_stream_pollable_iface_init (xpollable_output_stream_interface_t *iface)
 {
   iface->can_poll = g_unix_output_stream_pollable_can_poll;
   iface->is_writable = g_unix_output_stream_pollable_is_writable;
@@ -167,14 +167,14 @@ g_unix_output_stream_pollable_iface_init (GPollableOutputStreamInterface *iface)
 static void
 g_unix_output_stream_file_descriptor_based_iface_init (GFileDescriptorBasedIface *iface)
 {
-  iface->get_fd = (int (*) (GFileDescriptorBased *))g_unix_output_stream_get_fd;
+  iface->get_fd = (int (*) (xfile_descriptor_based_t *))g_unix_output_stream_get_fd;
 }
 
 static void
 g_unix_output_stream_set_property (xobject_t         *object,
 				   xuint_t            prop_id,
-				   const GValue    *value,
-				   GParamSpec      *pspec)
+				   const xvalue_t    *value,
+				   xparam_spec_t      *pspec)
 {
   GUnixOutputStream *unix_stream;
 
@@ -183,11 +183,11 @@ g_unix_output_stream_set_property (xobject_t         *object,
   switch (prop_id)
     {
     case PROP_FD:
-      unix_stream->priv->fd = g_value_get_int (value);
+      unix_stream->priv->fd = xvalue_get_int (value);
       unix_stream->priv->can_poll = _g_fd_is_pollable (unix_stream->priv->fd);
       break;
     case PROP_CLOSE_FD:
-      unix_stream->priv->close_fd = g_value_get_boolean (value);
+      unix_stream->priv->close_fd = xvalue_get_boolean (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -198,8 +198,8 @@ g_unix_output_stream_set_property (xobject_t         *object,
 static void
 g_unix_output_stream_get_property (xobject_t    *object,
 				   xuint_t       prop_id,
-				   GValue     *value,
-				   GParamSpec *pspec)
+				   xvalue_t     *value,
+				   xparam_spec_t *pspec)
 {
   GUnixOutputStream *unix_stream;
 
@@ -208,10 +208,10 @@ g_unix_output_stream_get_property (xobject_t    *object,
   switch (prop_id)
     {
     case PROP_FD:
-      g_value_set_int (value, unix_stream->priv->fd);
+      xvalue_set_int (value, unix_stream->priv->fd);
       break;
     case PROP_CLOSE_FD:
-      g_value_set_boolean (value, unix_stream->priv->close_fd);
+      xvalue_set_boolean (value, unix_stream->priv->close_fd);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -246,7 +246,7 @@ g_unix_output_stream_new (xint_t     fd,
 
   g_return_val_if_fail (fd != -1, NULL);
 
-  stream = g_object_new (XTYPE_UNIX_OUTPUT_STREAM,
+  stream = xobject_new (XTYPE_UNIX_OUTPUT_STREAM,
 			 "fd", fd,
 			 "close-fd", close_fd,
 			 NULL);
@@ -274,7 +274,7 @@ g_unix_output_stream_set_close_fd (GUnixOutputStream *stream,
   if (stream->priv->close_fd != close_fd)
     {
       stream->priv->close_fd = close_fd;
-      g_object_notify (G_OBJECT (stream), "close-fd");
+      xobject_notify (G_OBJECT (stream), "close-fd");
     }
 }
 
@@ -315,7 +315,7 @@ g_unix_output_stream_get_fd (GUnixOutputStream *stream)
   return stream->priv->fd;
 }
 
-static gssize
+static xssize_t
 g_unix_output_stream_write (xoutput_stream_t  *stream,
 			    const void     *buffer,
 			    xsize_t           count,
@@ -323,8 +323,8 @@ g_unix_output_stream_write (xoutput_stream_t  *stream,
 			    xerror_t        **error)
 {
   GUnixOutputStream *unix_stream;
-  gssize res = -1;
-  GPollFD poll_fds[2];
+  xssize_t res = -1;
+  xpollfd_t poll_fds[2];
   int nfds = 0;
   int poll_ret;
 
@@ -355,7 +355,7 @@ g_unix_output_stream_write (xoutput_stream_t  *stream,
 	  g_set_error (error, G_IO_ERROR,
 		       g_io_error_from_errno (errsv),
 		       _("Error writing to file descriptor: %s"),
-		       g_strerror (errsv));
+		       xstrerror (errsv));
 	  break;
 	}
 
@@ -375,7 +375,7 @@ g_unix_output_stream_write (xoutput_stream_t  *stream,
 	  g_set_error (error, G_IO_ERROR,
 		       g_io_error_from_errno (errsv),
 		       _("Error writing to file descriptor: %s"),
-		       g_strerror (errsv));
+		       xstrerror (errsv));
 	}
 
       break;
@@ -386,24 +386,24 @@ g_unix_output_stream_write (xoutput_stream_t  *stream,
   return res;
 }
 
-/* Macro to check if struct iovec and GOutputVector have the same ABI */
-#define G_OUTPUT_VECTOR_IS_IOVEC (sizeof (struct iovec) == sizeof (GOutputVector) && \
-      G_SIZEOF_MEMBER (struct iovec, iov_base) == G_SIZEOF_MEMBER (GOutputVector, buffer) && \
-      G_STRUCT_OFFSET (struct iovec, iov_base) == G_STRUCT_OFFSET (GOutputVector, buffer) && \
-      G_SIZEOF_MEMBER (struct iovec, iov_len) == G_SIZEOF_MEMBER (GOutputVector, size) && \
-      G_STRUCT_OFFSET (struct iovec, iov_len) == G_STRUCT_OFFSET (GOutputVector, size))
+/* Macro to check if struct iovec and xoutput_vector_t have the same ABI */
+#define G_OUTPUT_VECTOR_IS_IOVEC (sizeof (struct iovec) == sizeof (xoutput_vector_t) && \
+      G_SIZEOF_MEMBER (struct iovec, iov_base) == G_SIZEOF_MEMBER (xoutput_vector_t, buffer) && \
+      G_STRUCT_OFFSET (struct iovec, iov_base) == G_STRUCT_OFFSET (xoutput_vector_t, buffer) && \
+      G_SIZEOF_MEMBER (struct iovec, iov_len) == G_SIZEOF_MEMBER (xoutput_vector_t, size) && \
+      G_STRUCT_OFFSET (struct iovec, iov_len) == G_STRUCT_OFFSET (xoutput_vector_t, size))
 
 static xboolean_t
 g_unix_output_stream_writev (xoutput_stream_t        *stream,
-			     const GOutputVector  *vectors,
+			     const xoutput_vector_t  *vectors,
 			     xsize_t                 n_vectors,
 			     xsize_t                *bytes_written,
 			     xcancellable_t         *cancellable,
 			     xerror_t              **error)
 {
   GUnixOutputStream *unix_stream;
-  gssize res = -1;
-  GPollFD poll_fds[2];
+  xssize_t res = -1;
+  xpollfd_t poll_fds[2];
   int nfds = 0;
   int poll_ret;
   struct iovec *iov;
@@ -462,7 +462,7 @@ g_unix_output_stream_writev (xoutput_stream_t        *stream,
 	  g_set_error (error, G_IO_ERROR,
 		       g_io_error_from_errno (errsv),
 		       _("Error writing to file descriptor: %s"),
-		       g_strerror (errsv));
+		       xstrerror (errsv));
 	  break;
 	}
 
@@ -482,7 +482,7 @@ g_unix_output_stream_writev (xoutput_stream_t        *stream,
 	  g_set_error (error, G_IO_ERROR,
 		       g_io_error_from_errno (errsv),
 		       _("Error writing to file descriptor: %s"),
-		       g_strerror (errsv));
+		       xstrerror (errsv));
 	}
 
       if (bytes_written)
@@ -518,23 +518,23 @@ g_unix_output_stream_close (xoutput_stream_t  *stream,
       g_set_error (error, G_IO_ERROR,
 		   g_io_error_from_errno (errsv),
 		   _("Error closing file descriptor: %s"),
-		   g_strerror (errsv));
+		   xstrerror (errsv));
     }
 
   return res != -1;
 }
 
 static xboolean_t
-g_unix_output_stream_pollable_can_poll (GPollableOutputStream *stream)
+g_unix_output_stream_pollable_can_poll (xpollable_output_stream_t *stream)
 {
   return G_UNIX_OUTPUT_STREAM (stream)->priv->can_poll;
 }
 
 static xboolean_t
-g_unix_output_stream_pollable_is_writable (GPollableOutputStream *stream)
+g_unix_output_stream_pollable_is_writable (xpollable_output_stream_t *stream)
 {
   GUnixOutputStream *unix_stream = G_UNIX_OUTPUT_STREAM (stream);
-  GPollFD poll_fd;
+  xpollfd_t poll_fd;
   xint_t result;
 
   poll_fd.fd = unix_stream->priv->fd;
@@ -548,43 +548,43 @@ g_unix_output_stream_pollable_is_writable (GPollableOutputStream *stream)
   return poll_fd.revents != 0;
 }
 
-static GSource *
-g_unix_output_stream_pollable_create_source (GPollableOutputStream *stream,
+static xsource_t *
+g_unix_output_stream_pollable_create_source (xpollable_output_stream_t *stream,
 					     xcancellable_t          *cancellable)
 {
   GUnixOutputStream *unix_stream = G_UNIX_OUTPUT_STREAM (stream);
-  GSource *inner_source, *cancellable_source, *pollable_source;
+  xsource_t *inner_source, *cancellable_source, *pollable_source;
 
   pollable_source = g_pollable_source_new (G_OBJECT (stream));
 
   inner_source = g_unix_fd_source_new (unix_stream->priv->fd, G_IO_OUT);
-  g_source_set_dummy_callback (inner_source);
-  g_source_add_child_source (pollable_source, inner_source);
-  g_source_unref (inner_source);
+  xsource_set_dummy_callback (inner_source);
+  xsource_add_child_source (pollable_source, inner_source);
+  xsource_unref (inner_source);
 
   if (cancellable)
     {
       cancellable_source = g_cancellable_source_new (cancellable);
-      g_source_set_dummy_callback (cancellable_source);
-      g_source_add_child_source (pollable_source, cancellable_source);
-      g_source_unref (cancellable_source);
+      xsource_set_dummy_callback (cancellable_source);
+      xsource_add_child_source (pollable_source, cancellable_source);
+      xsource_unref (cancellable_source);
     }
 
   return pollable_source;
 }
 
 static GPollableReturn
-g_unix_output_stream_pollable_writev_nonblocking (GPollableOutputStream  *stream,
-						  const GOutputVector    *vectors,
+g_unix_output_stream_pollable_writev_nonblocking (xpollable_output_stream_t  *stream,
+						  const xoutput_vector_t    *vectors,
 						  xsize_t                   n_vectors,
 						  xsize_t                  *bytes_written,
 						  xerror_t                **error)
 {
   GUnixOutputStream *unix_stream = G_UNIX_OUTPUT_STREAM (stream);
   struct iovec *iov;
-  gssize res = -1;
+  xssize_t res = -1;
 
-  if (!g_pollable_output_stream_is_writable (stream))
+  if (!xpollable_output_stream_is_writable (stream))
     {
       *bytes_written = 0;
       return G_POLLABLE_RETURN_WOULD_BLOCK;
@@ -628,7 +628,7 @@ g_unix_output_stream_pollable_writev_nonblocking (GPollableOutputStream  *stream
 	  g_set_error (error, G_IO_ERROR,
 		       g_io_error_from_errno (errsv),
 		       _("Error writing to file descriptor: %s"),
-		       g_strerror (errsv));
+		       xstrerror (errsv));
 	}
 
       if (bytes_written)

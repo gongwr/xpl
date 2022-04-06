@@ -32,10 +32,10 @@
 
 #define G_TEMP_FAILURE_RETRY(expression)      \
   ({                                          \
-    gssize __result;                          \
+    xssize_t __result;                          \
                                               \
     do                                        \
-      __result = (gssize) (expression);       \
+      __result = (xssize_t) (expression);       \
     while (__result == -1 && errno == EINTR); \
                                               \
     __result;                                 \
@@ -82,7 +82,7 @@ _g_fd_is_pollable (int fd)
 
   efd = epoll_create (1);
   if (efd == -1)
-    g_error ("epoll_create () failed: %s", g_strerror (errno));
+    xerror ("epoll_create () failed: %s", xstrerror (errno));
 
   ev.events = EPOLLIN;
 
@@ -110,7 +110,7 @@ _g_fd_is_pollable (int fd)
 
   kfd = kqueue ();
   if (kfd == -1)
-    g_error ("kqueue () failed: %s", g_strerror (errno));
+    xerror ("kqueue () failed: %s", xstrerror (errno));
 
   EV_SET (&ev, fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
 

@@ -33,14 +33,14 @@ XPL_AVAILABLE_IN_2_58
 xpointer_t        g_rc_box_alloc0                 (xsize_t           block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
 XPL_AVAILABLE_IN_2_58
 xpointer_t        g_rc_box_dup                    (xsize_t           block_size,
-                                                 gconstpointer   mem_block) G_GNUC_ALLOC_SIZE(1);
+                                                 xconstpointer   mem_block) G_GNUC_ALLOC_SIZE(1);
 XPL_AVAILABLE_IN_2_58
 xpointer_t        g_rc_box_acquire                (xpointer_t        mem_block);
 XPL_AVAILABLE_IN_2_58
 void            g_rc_box_release                (xpointer_t        mem_block);
 XPL_AVAILABLE_IN_2_58
 void            g_rc_box_release_full           (xpointer_t        mem_block,
-                                                 GDestroyNotify  clear_func);
+                                                 xdestroy_notify_t  clear_func);
 
 XPL_AVAILABLE_IN_2_58
 xsize_t           g_rc_box_get_size               (xpointer_t        mem_block);
@@ -51,14 +51,14 @@ XPL_AVAILABLE_IN_2_58
 xpointer_t        g_atomic_rc_box_alloc0          (xsize_t           block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
 XPL_AVAILABLE_IN_2_58
 xpointer_t        g_atomic_rc_box_dup             (xsize_t           block_size,
-                                                 gconstpointer   mem_block) G_GNUC_ALLOC_SIZE(1);
+                                                 xconstpointer   mem_block) G_GNUC_ALLOC_SIZE(1);
 XPL_AVAILABLE_IN_2_58
 xpointer_t        g_atomic_rc_box_acquire         (xpointer_t        mem_block);
 XPL_AVAILABLE_IN_2_58
 void            g_atomic_rc_box_release         (xpointer_t        mem_block);
 XPL_AVAILABLE_IN_2_58
 void            g_atomic_rc_box_release_full    (xpointer_t        mem_block,
-                                                 GDestroyNotify  clear_func);
+                                                 xdestroy_notify_t  clear_func);
 
 XPL_AVAILABLE_IN_2_58
 xsize_t           g_atomic_rc_box_get_size        (xpointer_t        mem_block);

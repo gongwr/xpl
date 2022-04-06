@@ -20,7 +20,7 @@
 
 <refnamediv>
   <refname>gsettings</refname>
-  <refpurpose>GSettings configuration tool</refpurpose>
+  <refpurpose>xsettings_t configuration tool</refpurpose>
 </refnamediv>
 
 <refsynopsisdiv>
@@ -105,7 +105,7 @@
 
 <refsect1><title>Description</title>
 <para><command>gsettings</command> offers a simple commandline
-interface to <link linkend="GSettings"><type>GSettings</type></link>.
+interface to <link linkend="xsettings_t"><type>xsettings_t</type></link>.
 It lets you get, set or monitor an individual key for changes.
 </para>
 <para>

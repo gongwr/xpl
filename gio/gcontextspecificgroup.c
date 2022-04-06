@@ -26,16 +26,16 @@
 
 typedef struct
 {
-  GSource   source;
+  xsource_t   source;
 
-  GMutex    lock;
+  xmutex_t    lock;
   xpointer_t  instance;
-  GQueue    pending;
+  xqueue_t    pending;
 } GContextSpecificSource;
 
 static xboolean_t
-g_context_specific_source_dispatch (GSource     *source,
-                                    GSourceFunc  callback,
+g_context_specific_source_dispatch (xsource_t     *source,
+                                    xsource_func_t  callback,
                                     xpointer_t     user_data)
 {
   GContextSpecificSource *css = (GContextSpecificSource *) source;
@@ -47,7 +47,7 @@ g_context_specific_source_dispatch (GSource     *source,
   signal_id = GPOINTER_TO_UINT (g_queue_pop_head (&css->pending));
 
   if (g_queue_is_empty (&css->pending))
-    g_source_set_ready_time (source, -1);
+    xsource_set_ready_time (source, -1);
 
   g_mutex_unlock (&css->lock);
 
@@ -57,7 +57,7 @@ g_context_specific_source_dispatch (GSource     *source,
 }
 
 static void
-g_context_specific_source_finalize (GSource *source)
+g_context_specific_source_finalize (xsource_t *source)
 {
   GContextSpecificSource *css = (GContextSpecificSource *) source;
 
@@ -69,7 +69,7 @@ static GContextSpecificSource *
 g_context_specific_source_new (const xchar_t *name,
                                xpointer_t     instance)
 {
-  static GSourceFuncs source_funcs = {
+  static xsource_funcs_t source_funcs = {
     NULL,
     NULL,
     g_context_specific_source_dispatch,
@@ -77,12 +77,12 @@ g_context_specific_source_new (const xchar_t *name,
     NULL, NULL
   };
   GContextSpecificSource *css;
-  GSource *source;
+  xsource_t *source;
 
-  source = g_source_new (&source_funcs, sizeof (GContextSpecificSource));
+  source = xsource_new (&source_funcs, sizeof (GContextSpecificSource));
   css = (GContextSpecificSource *) source;
 
-  g_source_set_name (source, name);
+  xsource_set_name (source, name);
 
   g_mutex_init (&css->lock);
   g_queue_init (&css->pending);
@@ -128,7 +128,7 @@ g_context_specific_group_change_state (xpointer_t user_data)
 static void
 g_context_specific_group_request_state (GContextSpecificGroup *group,
                                         xboolean_t               requested_state,
-                                        GCallback              requested_func)
+                                        xcallback_t              requested_func)
 {
   if (requested_state != group->requested_state)
     {
@@ -146,7 +146,7 @@ g_context_specific_group_request_state (GContextSpecificGroup *group,
           group->requested_state = requested_state;
           group->requested_func = requested_func;
 
-          g_main_context_invoke (XPL_PRIVATE_CALL(g_get_worker_context) (),
+          xmain_context_invoke (XPL_PRIVATE_CALL(g_get_worker_context) (),
                                  g_context_specific_group_change_state, group);
         }
     }
@@ -168,36 +168,36 @@ g_context_specific_group_request_state (GContextSpecificGroup *group,
 xpointer_t
 g_context_specific_group_get (GContextSpecificGroup *group,
                               xtype_t                  type,
-                              goffset                context_offset,
-                              GCallback              start_func)
+                              xoffset_t                context_offset,
+                              xcallback_t              start_func)
 {
   GContextSpecificSource *css;
-  GMainContext *context;
+  xmain_context_t *context;
 
-  context = g_main_context_get_thread_default ();
+  context = xmain_context_get_thread_default ();
   if (!context)
-    context = g_main_context_default ();
+    context = xmain_context_default ();
 
   g_mutex_lock (&group->lock);
 
   if (!group->table)
-    group->table = g_hash_table_new (NULL, NULL);
+    group->table = xhash_table_new (NULL, NULL);
 
-  css = g_hash_table_lookup (group->table, context);
+  css = xhash_table_lookup (group->table, context);
 
   if (!css)
     {
       xpointer_t instance;
 
-      instance = g_object_new (type, NULL);
-      css = g_context_specific_source_new (g_type_name (type), instance);
-      G_STRUCT_MEMBER (GMainContext *, instance, context_offset) = g_main_context_ref (context);
-      g_source_attach ((GSource *) css, context);
+      instance = xobject_new (type, NULL);
+      css = g_context_specific_source_new (xtype_name (type), instance);
+      G_STRUCT_MEMBER (xmain_context_t *, instance, context_offset) = xmain_context_ref (context);
+      xsource_attach ((xsource_t *) css, context);
 
-      g_hash_table_insert (group->table, context, css);
+      xhash_table_insert (group->table, context, css);
     }
   else
-    g_object_ref (css->instance);
+    xobject_ref (css->instance);
 
   if (start_func)
     g_context_specific_group_request_state (group, TRUE, start_func);
@@ -209,9 +209,9 @@ g_context_specific_group_get (GContextSpecificGroup *group,
 
 void
 g_context_specific_group_remove (GContextSpecificGroup *group,
-                                 GMainContext          *context,
+                                 xmain_context_t          *context,
                                  xpointer_t               instance,
-                                 GCallback              stop_func)
+                                 xcallback_t              stop_func)
 {
   GContextSpecificSource *css;
 
@@ -223,21 +223,21 @@ g_context_specific_group_remove (GContextSpecificGroup *group,
     }
 
   g_mutex_lock (&group->lock);
-  css = g_hash_table_lookup (group->table, context);
-  g_hash_table_remove (group->table, context);
+  css = xhash_table_lookup (group->table, context);
+  xhash_table_remove (group->table, context);
   g_assert (css);
 
   /* stop only if we were the last one */
-  if (stop_func && g_hash_table_size (group->table) == 0)
+  if (stop_func && xhash_table_size (group->table) == 0)
     g_context_specific_group_request_state (group, FALSE, stop_func);
 
   g_mutex_unlock (&group->lock);
 
   g_assert (css->instance == instance);
 
-  g_source_destroy ((GSource *) css);
-  g_source_unref ((GSource *) css);
-  g_main_context_unref (context);
+  xsource_destroy ((xsource_t *) css);
+  xsource_unref ((xsource_t *) css);
+  xmain_context_unref (context);
 }
 
 void
@@ -248,14 +248,14 @@ g_context_specific_group_emit (GContextSpecificGroup *group,
 
   if (group->table)
     {
-      GHashTableIter iter;
+      xhash_table_iter_t iter;
       xpointer_t value;
       xpointer_t ptr;
 
       ptr = GUINT_TO_POINTER (signal_id);
 
-      g_hash_table_iter_init (&iter, group->table);
-      while (g_hash_table_iter_next (&iter, NULL, &value))
+      xhash_table_iter_init (&iter, group->table);
+      while (xhash_table_iter_next (&iter, NULL, &value))
         {
           GContextSpecificSource *css = value;
 
@@ -264,7 +264,7 @@ g_context_specific_group_emit (GContextSpecificGroup *group,
           g_queue_remove (&css->pending, ptr);
           g_queue_push_tail (&css->pending, ptr);
 
-          g_source_set_ready_time ((GSource *) css, 0);
+          xsource_set_ready_time ((xsource_t *) css, 0);
 
           g_mutex_unlock (&css->lock);
         }

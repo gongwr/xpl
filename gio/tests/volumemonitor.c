@@ -1,12 +1,12 @@
 #include <gio/gio.h>
 
-static GVolumeMonitor *monitor;
+static xvolume_monitor_t *monitor;
 
 static void
-do_mount_tests (xdrive_t *drive, GVolume *volume, GMount *mount)
+do_mount_tests (xdrive_t *drive, xvolume_t *volume, xmount_t *mount)
 {
   xdrive_t *d;
-  GVolume *v;
+  xvolume_t *v;
   xchar_t *name;
   xchar_t *uuid;
 
@@ -17,30 +17,30 @@ do_mount_tests (xdrive_t *drive, GVolume *volume, GMount *mount)
   v = g_mount_get_volume (mount);
   g_assert (v == volume);
   if (v != NULL)
-    g_object_unref (v);
+    xobject_unref (v);
 
   d = g_mount_get_drive (mount);
   g_assert (d == drive);
   if (d != NULL)
-    g_object_unref (d);
+    xobject_unref (d);
 
   uuid = g_mount_get_uuid (mount);
   if (uuid)
     {
-      GMount *m;
+      xmount_t *m;
       m = g_volume_monitor_get_mount_for_uuid (monitor, uuid);
       g_assert (m == mount);
-      g_object_unref (m);
+      xobject_unref (m);
       g_free (uuid);
     }
 }
 
 static void
-do_volume_tests (xdrive_t *drive, GVolume *volume)
+do_volume_tests (xdrive_t *drive, xvolume_t *volume)
 {
   xdrive_t *d;
   xchar_t *name;
-  GMount *mount;
+  xmount_t *mount;
   xchar_t *uuid;
 
   name = g_volume_get_name (volume);
@@ -50,22 +50,22 @@ do_volume_tests (xdrive_t *drive, GVolume *volume)
   d = g_volume_get_drive (volume);
   g_assert (d == drive);
   if (d != NULL)
-    g_object_unref (d);
+    xobject_unref (d);
 
   mount = g_volume_get_mount (volume);
   if (mount != NULL)
     {
       do_mount_tests (drive, volume, mount);
-      g_object_unref (mount);
+      xobject_unref (mount);
     }
 
   uuid = g_volume_get_uuid (volume);
   if (uuid)
     {
-      GVolume *v;
+      xvolume_t *v;
       v = g_volume_monitor_get_volume_for_uuid (monitor, uuid);
       g_assert (v == volume);
-      g_object_unref (v);
+      xobject_unref (v);
       g_free (uuid);
     }
 }
@@ -87,11 +87,11 @@ do_drive_tests (xdrive_t *drive)
   g_assert (has_volumes == (volumes != NULL));
   for (l = volumes; l; l = l->next)
     {
-      GVolume *volume = l->data;
+      xvolume_t *volume = l->data;
       do_volume_tests (drive, volume);
     }
 
-  g_list_free_full (volumes, g_object_unref);
+  xlist_free_full (volumes, xobject_unref);
 }
 
 static void
@@ -108,7 +108,7 @@ test_connected_drives (void)
       do_drive_tests (drive);
     }
 
-  g_list_free_full (drives, g_object_unref);
+  xlist_free_full (drives, xobject_unref);
 }
 
 static void
@@ -120,16 +120,16 @@ test_volumes (void)
 
   for (l = volumes; l; l = l->next)
     {
-      GVolume *volume = l->data;
+      xvolume_t *volume = l->data;
       xdrive_t *drive;
 
       drive = g_volume_get_drive (volume);
       do_volume_tests (drive, volume);
       if (drive != NULL)
-        g_object_unref (drive);
+        xobject_unref (drive);
     }
 
-  g_list_free_full (volumes, g_object_unref);
+  xlist_free_full (volumes, xobject_unref);
 }
 
 static void
@@ -141,8 +141,8 @@ test_mounts (void)
 
   for (l = mounts; l; l = l->next)
     {
-      GMount *mount = l->data;
-      GVolume *volume;
+      xmount_t *mount = l->data;
+      xvolume_t *volume;
       xdrive_t *drive;
 
       drive = g_mount_get_drive (mount);
@@ -150,12 +150,12 @@ test_mounts (void)
       do_mount_tests (drive, volume, mount);
 
       if (drive != NULL)
-        g_object_unref (drive);
+        xobject_unref (drive);
       if (volume != NULL)
-        g_object_unref (volume);
+        xobject_unref (volume);
     }
 
-  g_list_free_full (mounts, g_object_unref);
+  xlist_free_full (mounts, xobject_unref);
 }
 int
 main (int argc, char *argv[])
@@ -174,7 +174,7 @@ main (int argc, char *argv[])
 
   ret = g_test_run ();
 
-  g_object_unref (monitor);
+  xobject_unref (monitor);
 
   return ret;
 }

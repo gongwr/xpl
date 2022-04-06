@@ -18,7 +18,7 @@
 #include <glib.h>
 
 static int
-int_compare_data (gconstpointer p1, gconstpointer p2, xpointer_t data)
+int_compare_data (xconstpointer p1, xconstpointer p2, xpointer_t data)
 {
   const xint_t *i1 = p1;
   const xint_t *i2 = p2;
@@ -82,7 +82,7 @@ typedef struct {
 } BigItem;
 
 static int
-item_compare_data (gconstpointer p1, gconstpointer p2, xpointer_t data)
+item_compare_data (xconstpointer p1, xconstpointer p2, xpointer_t data)
 {
   const SortItem *i1 = p1;
   const SortItem *i2 = p2;

@@ -76,8 +76,8 @@
  * abstract type in other type systems.  No value can exist that has an
  * indefinite type as its type, but values can exist that have types
  * that are subtypes of indefinite types.  That is to say,
- * g_variant_get_type() will never return an indefinite type, but
- * calling g_variant_is_of_type() with an indefinite type may return
+ * xvariant_get_type() will never return an indefinite type, but
+ * calling xvariant_is_of_type() with an indefinite type may return
  * %TRUE.  For example, you cannot have a value that represents "an
  * array of no particular type", but you can have an "array of integers"
  * which certainly matches the type of "an array of no particular type",
@@ -109,7 +109,7 @@
  *   followed by another type string, followed by the character '}'
  *
  * A basic type string describes a basic type (as per
- * g_variant_type_is_basic()) and is always a single character in length.
+ * xvariant_type_is_basic()) and is always a single character in length.
  * The valid basic type strings are "b", "y", "n", "q", "i", "u", "x", "t",
  * "h", "d", "s", "o", "g" and "?".
  *
@@ -117,7 +117,7 @@
  * "(ui(nq((y)))s)" are both valid type strings, as is
  * "a(aa(ui)(qna{ya(yd)}))". In order to not hit memory limits, #xvariant_t
  * imposes a limit on recursion depth of 65 nested containers. This is the
- * limit in the D-Bus specification (64) plus one to allow a #GDBusMessage to
+ * limit in the D-Bus specification (64) plus one to allow a #xdbus_message_t to
  * be nested in a top-level tuple.
  *
  * The meaning of each of the characters is as follows:
@@ -186,13 +186,13 @@
 
 
 static xboolean_t
-g_variant_type_check (const xvariant_type_t *type)
+xvariant_type_check (const xvariant_type_t *type)
 {
   if (type == NULL)
     return FALSE;
 
 #if 0
-  return g_variant_type_string_scan ((const xchar_t *) type, NULL, NULL);
+  return xvariant_type_string_scan ((const xchar_t *) type, NULL, NULL);
 #else
   return TRUE;
 #endif
@@ -269,7 +269,7 @@ variant_type_string_scan_internal (const xchar_t  *string,
 }
 
 /**
- * g_variant_type_string_scan:
+ * xvariant_type_string_scan:
  * @string: a pointer to any string
  * @limit: (nullable): the end of @string, or %NULL
  * @endptr: (out) (optional): location to store the end pointer, or %NULL
@@ -286,14 +286,14 @@ variant_type_string_scan_internal (const xchar_t  *string,
  * string does not end before @limit then %FALSE is returned.
  *
  * For the simple case of checking if a string is a valid type string,
- * see g_variant_type_string_is_valid().
+ * see xvariant_type_string_is_valid().
  *
  * Returns: %TRUE if a valid type string was found
  *
  * Since: 2.24
  **/
 xboolean_t
-g_variant_type_string_scan (const xchar_t  *string,
+xvariant_type_string_scan (const xchar_t  *string,
                             const xchar_t  *limit,
                             const xchar_t **endptr)
 {
@@ -302,7 +302,7 @@ g_variant_type_string_scan (const xchar_t  *string,
 }
 
 /* < private >
- * g_variant_type_string_get_depth_:
+ * xvariant_type_string_get_depth_:
  * @type_string: a pointer to any string
  *
  * Get the maximum depth of the nested types in @type_string. A basic type will
@@ -315,7 +315,7 @@ g_variant_type_string_scan (const xchar_t  *string,
  * Since: 2.60
  */
 xsize_t
-g_variant_type_string_get_depth_ (const xchar_t *type_string)
+xvariant_type_string_get_depth_ (const xchar_t *type_string)
 {
   const xchar_t *endptr;
   xsize_t depth = 0;
@@ -331,11 +331,11 @@ g_variant_type_string_get_depth_ (const xchar_t *type_string)
 }
 
 /**
- * g_variant_type_string_is_valid:
+ * xvariant_type_string_is_valid:
  * @type_string: a pointer to any string
  *
  * Checks if @type_string is a valid xvariant_t type string.  This call is
- * equivalent to calling g_variant_type_string_scan() and confirming
+ * equivalent to calling xvariant_type_string_scan() and confirming
  * that the following character is a nul terminator.
  *
  * Returns: %TRUE if @type_string is exactly one valid type string
@@ -343,24 +343,24 @@ g_variant_type_string_get_depth_ (const xchar_t *type_string)
  * Since 2.24
  **/
 xboolean_t
-g_variant_type_string_is_valid (const xchar_t *type_string)
+xvariant_type_string_is_valid (const xchar_t *type_string)
 {
   const xchar_t *endptr;
 
   g_return_val_if_fail (type_string != NULL, FALSE);
 
-  if (!g_variant_type_string_scan (type_string, NULL, &endptr))
+  if (!xvariant_type_string_scan (type_string, NULL, &endptr))
     return FALSE;
 
   return *endptr == '\0';
 }
 
 /**
- * g_variant_type_free:
+ * xvariant_type_free:
  * @type: (nullable): a #xvariant_type_t, or %NULL
  *
  * Frees a #xvariant_type_t that was allocated with
- * g_variant_type_copy(), g_variant_type_new() or one of the container
+ * xvariant_type_copy(), xvariant_type_new() or one of the container
  * type constructor functions.
  *
  * In the case that @type is %NULL, this function does nothing.
@@ -368,33 +368,33 @@ g_variant_type_string_is_valid (const xchar_t *type_string)
  * Since 2.24
  **/
 void
-g_variant_type_free (xvariant_type_t *type)
+xvariant_type_free (xvariant_type_t *type)
 {
-  g_return_if_fail (type == NULL || g_variant_type_check (type));
+  g_return_if_fail (type == NULL || xvariant_type_check (type));
 
   g_free (type);
 }
 
 /**
- * g_variant_type_copy:
+ * xvariant_type_copy:
  * @type: a #xvariant_type_t
  *
  * Makes a copy of a #xvariant_type_t.  It is appropriate to call
- * g_variant_type_free() on the return value.  @type may not be %NULL.
+ * xvariant_type_free() on the return value.  @type may not be %NULL.
  *
  * Returns: (transfer full): a new #xvariant_type_t
  *
  * Since 2.24
  **/
 xvariant_type_t *
-g_variant_type_copy (const xvariant_type_t *type)
+xvariant_type_copy (const xvariant_type_t *type)
 {
   xsize_t length;
   xchar_t *new;
 
-  g_return_val_if_fail (g_variant_type_check (type), NULL);
+  g_return_val_if_fail (xvariant_type_check (type), NULL);
 
-  length = g_variant_type_get_string_length (type);
+  length = xvariant_type_get_string_length (type);
   new = g_malloc (length + 1);
 
   memcpy (new, type, length);
@@ -404,48 +404,48 @@ g_variant_type_copy (const xvariant_type_t *type)
 }
 
 /**
- * g_variant_type_new:
+ * xvariant_type_new:
  * @type_string: a valid xvariant_t type string
  *
  * Creates a new #xvariant_type_t corresponding to the type string given
- * by @type_string.  It is appropriate to call g_variant_type_free() on
+ * by @type_string.  It is appropriate to call xvariant_type_free() on
  * the return value.
  *
  * It is a programmer error to call this function with an invalid type
- * string.  Use g_variant_type_string_is_valid() if you are unsure.
+ * string.  Use xvariant_type_string_is_valid() if you are unsure.
  *
  * Returns: (transfer full): a new #xvariant_type_t
  *
  * Since: 2.24
  */
 xvariant_type_t *
-g_variant_type_new (const xchar_t *type_string)
+xvariant_type_new (const xchar_t *type_string)
 {
   g_return_val_if_fail (type_string != NULL, NULL);
 
-  return g_variant_type_copy (G_VARIANT_TYPE (type_string));
+  return xvariant_type_copy (G_VARIANT_TYPE (type_string));
 }
 
 /**
- * g_variant_type_get_string_length:
+ * xvariant_type_get_string_length:
  * @type: a #xvariant_type_t
  *
  * Returns the length of the type string corresponding to the given
  * @type.  This function must be used to determine the valid extent of
- * the memory region returned by g_variant_type_peek_string().
+ * the memory region returned by xvariant_type_peek_string().
  *
  * Returns: the length of the corresponding type string
  *
  * Since 2.24
  **/
 xsize_t
-g_variant_type_get_string_length (const xvariant_type_t *type)
+xvariant_type_get_string_length (const xvariant_type_t *type)
 {
   const xchar_t *type_string = (const xchar_t *) type;
   xint_t brackets = 0;
   xsize_t index = 0;
 
-  g_return_val_if_fail (g_variant_type_check (type), 0);
+  g_return_val_if_fail (xvariant_type_check (type), 0);
 
   do
     {
@@ -470,29 +470,29 @@ g_variant_type_get_string_length (const xvariant_type_t *type)
   is not an array and neither a string
 */
 /**
- * g_variant_type_peek_string: (skip)
+ * xvariant_type_peek_string: (skip)
  * @type: a #xvariant_type_t
  *
  * Returns the type string corresponding to the given @type.  The
  * result is not nul-terminated; in order to determine its length you
- * must call g_variant_type_get_string_length().
+ * must call xvariant_type_get_string_length().
  *
- * To get a nul-terminated string, see g_variant_type_dup_string().
+ * To get a nul-terminated string, see xvariant_type_dup_string().
  *
  * Returns: the corresponding type string (not nul-terminated)
  *
  * Since 2.24
  **/
 const xchar_t *
-g_variant_type_peek_string (const xvariant_type_t *type)
+xvariant_type_peek_string (const xvariant_type_t *type)
 {
-  g_return_val_if_fail (g_variant_type_check (type), NULL);
+  g_return_val_if_fail (xvariant_type_check (type), NULL);
 
   return (const xchar_t *) type;
 }
 
 /**
- * g_variant_type_dup_string:
+ * xvariant_type_dup_string:
  * @type: a #xvariant_type_t
  *
  * Returns a newly-allocated copy of the type string corresponding to
@@ -504,16 +504,16 @@ g_variant_type_peek_string (const xvariant_type_t *type)
  * Since 2.24
  **/
 xchar_t *
-g_variant_type_dup_string (const xvariant_type_t *type)
+xvariant_type_dup_string (const xvariant_type_t *type)
 {
-  g_return_val_if_fail (g_variant_type_check (type), NULL);
+  g_return_val_if_fail (xvariant_type_check (type), NULL);
 
-  return g_strndup (g_variant_type_peek_string (type),
-                    g_variant_type_get_string_length (type));
+  return xstrndup (xvariant_type_peek_string (type),
+                    xvariant_type_get_string_length (type));
 }
 
 /**
- * g_variant_type_is_definite:
+ * xvariant_type_is_definite:
  * @type: a #xvariant_type_t
  *
  * Determines if the given @type is definite (ie: not indefinite).
@@ -522,7 +522,7 @@ g_variant_type_dup_string (const xvariant_type_t *type)
  * type characters ('*', '?', or 'r').
  *
  * A #xvariant_t instance may not have an indefinite type, so calling
- * this function on the result of g_variant_get_type() will always
+ * this function on the result of xvariant_get_type() will always
  * result in %TRUE being returned.  Calling this function on an
  * indefinite type like %G_VARIANT_TYPE_ARRAY, however, will result in
  * %FALSE being returned.
@@ -532,16 +532,16 @@ g_variant_type_dup_string (const xvariant_type_t *type)
  * Since 2.24
  **/
 xboolean_t
-g_variant_type_is_definite (const xvariant_type_t *type)
+xvariant_type_is_definite (const xvariant_type_t *type)
 {
   const xchar_t *type_string;
   xsize_t type_length;
   xsize_t i;
 
-  g_return_val_if_fail (g_variant_type_check (type), FALSE);
+  g_return_val_if_fail (xvariant_type_check (type), FALSE);
 
-  type_length = g_variant_type_get_string_length (type);
-  type_string = g_variant_type_peek_string (type);
+  type_length = xvariant_type_get_string_length (type);
+  type_string = xvariant_type_peek_string (type);
 
   for (i = 0; i < type_length; i++)
     if (type_string[i] == '*' ||
@@ -553,7 +553,7 @@ g_variant_type_is_definite (const xvariant_type_t *type)
 }
 
 /**
- * g_variant_type_is_container:
+ * xvariant_type_is_container:
  * @type: a #xvariant_type_t
  *
  * Determines if the given @type is a container type.
@@ -570,13 +570,13 @@ g_variant_type_is_definite (const xvariant_type_t *type)
  * Since 2.24
  **/
 xboolean_t
-g_variant_type_is_container (const xvariant_type_t *type)
+xvariant_type_is_container (const xvariant_type_t *type)
 {
   xchar_t first_char;
 
-  g_return_val_if_fail (g_variant_type_check (type), FALSE);
+  g_return_val_if_fail (xvariant_type_check (type), FALSE);
 
-  first_char = g_variant_type_peek_string (type)[0];
+  first_char = xvariant_type_peek_string (type)[0];
   switch (first_char)
   {
     case 'a':
@@ -593,7 +593,7 @@ g_variant_type_is_container (const xvariant_type_t *type)
 }
 
 /**
- * g_variant_type_is_basic:
+ * xvariant_type_is_basic:
  * @type: a #xvariant_type_t
  *
  * Determines if the given @type is a basic type.
@@ -611,13 +611,13 @@ g_variant_type_is_container (const xvariant_type_t *type)
  * Since 2.24
  **/
 xboolean_t
-g_variant_type_is_basic (const xvariant_type_t *type)
+xvariant_type_is_basic (const xvariant_type_t *type)
 {
   xchar_t first_char;
 
-  g_return_val_if_fail (g_variant_type_check (type), FALSE);
+  g_return_val_if_fail (xvariant_type_check (type), FALSE);
 
-  first_char = g_variant_type_peek_string (type)[0];
+  first_char = xvariant_type_peek_string (type)[0];
   switch (first_char)
   {
     case 'b':
@@ -642,7 +642,7 @@ g_variant_type_is_basic (const xvariant_type_t *type)
 }
 
 /**
- * g_variant_type_is_maybe:
+ * xvariant_type_is_maybe:
  * @type: a #xvariant_type_t
  *
  * Determines if the given @type is a maybe type.  This is true if the
@@ -657,15 +657,15 @@ g_variant_type_is_basic (const xvariant_type_t *type)
  * Since 2.24
  **/
 xboolean_t
-g_variant_type_is_maybe (const xvariant_type_t *type)
+xvariant_type_is_maybe (const xvariant_type_t *type)
 {
-  g_return_val_if_fail (g_variant_type_check (type), FALSE);
+  g_return_val_if_fail (xvariant_type_check (type), FALSE);
 
-  return g_variant_type_peek_string (type)[0] == 'm';
+  return xvariant_type_peek_string (type)[0] == 'm';
 }
 
 /**
- * g_variant_type_is_array:
+ * xvariant_type_is_array:
  * @type: a #xvariant_type_t
  *
  * Determines if the given @type is an array type.  This is true if the
@@ -680,15 +680,15 @@ g_variant_type_is_maybe (const xvariant_type_t *type)
  * Since 2.24
  **/
 xboolean_t
-g_variant_type_is_array (const xvariant_type_t *type)
+xvariant_type_is_array (const xvariant_type_t *type)
 {
-  g_return_val_if_fail (g_variant_type_check (type), FALSE);
+  g_return_val_if_fail (xvariant_type_check (type), FALSE);
 
-  return g_variant_type_peek_string (type)[0] == 'a';
+  return xvariant_type_peek_string (type)[0] == 'a';
 }
 
 /**
- * g_variant_type_is_tuple:
+ * xvariant_type_is_tuple:
  * @type: a #xvariant_type_t
  *
  * Determines if the given @type is a tuple type.  This is true if the
@@ -704,18 +704,18 @@ g_variant_type_is_array (const xvariant_type_t *type)
  * Since 2.24
  **/
 xboolean_t
-g_variant_type_is_tuple (const xvariant_type_t *type)
+xvariant_type_is_tuple (const xvariant_type_t *type)
 {
   xchar_t type_char;
 
-  g_return_val_if_fail (g_variant_type_check (type), FALSE);
+  g_return_val_if_fail (xvariant_type_check (type), FALSE);
 
-  type_char = g_variant_type_peek_string (type)[0];
+  type_char = xvariant_type_peek_string (type)[0];
   return type_char == 'r' || type_char == '(';
 }
 
 /**
- * g_variant_type_is_dict_entry:
+ * xvariant_type_is_dict_entry:
  * @type: a #xvariant_type_t
  *
  * Determines if the given @type is a dictionary entry type.  This is
@@ -730,15 +730,15 @@ g_variant_type_is_tuple (const xvariant_type_t *type)
  * Since 2.24
  **/
 xboolean_t
-g_variant_type_is_dict_entry (const xvariant_type_t *type)
+xvariant_type_is_dict_entry (const xvariant_type_t *type)
 {
-  g_return_val_if_fail (g_variant_type_check (type), FALSE);
+  g_return_val_if_fail (xvariant_type_check (type), FALSE);
 
-  return g_variant_type_peek_string (type)[0] == '{';
+  return xvariant_type_peek_string (type)[0] == '{';
 }
 
 /**
- * g_variant_type_is_variant:
+ * xvariant_type_is_variant:
  * @type: a #xvariant_type_t
  *
  * Determines if the given @type is the variant type.
@@ -748,21 +748,21 @@ g_variant_type_is_dict_entry (const xvariant_type_t *type)
  * Since 2.24
  **/
 xboolean_t
-g_variant_type_is_variant (const xvariant_type_t *type)
+xvariant_type_is_variant (const xvariant_type_t *type)
 {
-  g_return_val_if_fail (g_variant_type_check (type), FALSE);
+  g_return_val_if_fail (xvariant_type_check (type), FALSE);
 
-  return g_variant_type_peek_string (type)[0] == 'v';
+  return xvariant_type_peek_string (type)[0] == 'v';
 }
 
 /**
- * g_variant_type_hash:
+ * xvariant_type_hash:
  * @type: (type xvariant_type_t): a #xvariant_type_t
  *
  * Hashes @type.
  *
- * The argument type of @type is only #gconstpointer to allow use with
- * #GHashTable without function pointer casting.  A valid
+ * The argument type of @type is only #xconstpointer to allow use with
+ * #xhashtable_t without function pointer casting.  A valid
  * #xvariant_type_t must be provided.
  *
  * Returns: the hash value
@@ -770,17 +770,17 @@ g_variant_type_is_variant (const xvariant_type_t *type)
  * Since 2.24
  **/
 xuint_t
-g_variant_type_hash (gconstpointer type)
+xvariant_type_hash (xconstpointer type)
 {
   const xchar_t *type_string;
   xuint_t value = 0;
   xsize_t length;
   xsize_t i;
 
-  g_return_val_if_fail (g_variant_type_check (type), 0);
+  g_return_val_if_fail (xvariant_type_check (type), 0);
 
-  type_string = g_variant_type_peek_string (type);
-  length = g_variant_type_get_string_length (type);
+  type_string = xvariant_type_peek_string (type);
+  length = xvariant_type_get_string_length (type);
 
   for (i = 0; i < length; i++)
     value = (value << 5) - value + type_string[i];
@@ -789,7 +789,7 @@ g_variant_type_hash (gconstpointer type)
 }
 
 /**
- * g_variant_type_equal:
+ * xvariant_type_equal:
  * @type1: (type xvariant_type_t): a #xvariant_type_t
  * @type2: (type xvariant_type_t): a #xvariant_type_t
  *
@@ -798,10 +798,10 @@ g_variant_type_hash (gconstpointer type)
  * Only returns %TRUE if the types are exactly equal.  Even if one type
  * is an indefinite type and the other is a subtype of it, %FALSE will
  * be returned if they are not exactly equal.  If you want to check for
- * subtypes, use g_variant_type_is_subtype_of().
+ * subtypes, use xvariant_type_is_subtype_of().
  *
- * The argument types of @type1 and @type2 are only #gconstpointer to
- * allow use with #GHashTable without function pointer casting.  For
+ * The argument types of @type1 and @type2 are only #xconstpointer to
+ * allow use with #xhashtable_t without function pointer casting.  For
  * both arguments, a valid #xvariant_type_t must be provided.
  *
  * Returns: %TRUE if @type1 and @type2 are exactly equal
@@ -809,32 +809,32 @@ g_variant_type_hash (gconstpointer type)
  * Since 2.24
  **/
 xboolean_t
-g_variant_type_equal (gconstpointer type1,
-                      gconstpointer type2)
+xvariant_type_equal (xconstpointer type1,
+                      xconstpointer type2)
 {
   const xchar_t *string1, *string2;
   xsize_t size1, size2;
 
-  g_return_val_if_fail (g_variant_type_check (type1), FALSE);
-  g_return_val_if_fail (g_variant_type_check (type2), FALSE);
+  g_return_val_if_fail (xvariant_type_check (type1), FALSE);
+  g_return_val_if_fail (xvariant_type_check (type2), FALSE);
 
   if (type1 == type2)
     return TRUE;
 
-  size1 = g_variant_type_get_string_length (type1);
-  size2 = g_variant_type_get_string_length (type2);
+  size1 = xvariant_type_get_string_length (type1);
+  size2 = xvariant_type_get_string_length (type2);
 
   if (size1 != size2)
     return FALSE;
 
-  string1 = g_variant_type_peek_string (type1);
-  string2 = g_variant_type_peek_string (type2);
+  string1 = xvariant_type_peek_string (type1);
+  string2 = xvariant_type_peek_string (type2);
 
   return memcmp (string1, string2, size1) == 0;
 }
 
 /**
- * g_variant_type_is_subtype_of:
+ * xvariant_type_is_subtype_of:
  * @type: a #xvariant_type_t
  * @supertype: a #xvariant_type_t
  *
@@ -849,21 +849,21 @@ g_variant_type_equal (gconstpointer type1,
  * Since 2.24
  **/
 xboolean_t
-g_variant_type_is_subtype_of (const xvariant_type_t *type,
+xvariant_type_is_subtype_of (const xvariant_type_t *type,
                               const xvariant_type_t *supertype)
 {
   const xchar_t *supertype_string;
   const xchar_t *supertype_end;
   const xchar_t *type_string;
 
-  g_return_val_if_fail (g_variant_type_check (type), FALSE);
-  g_return_val_if_fail (g_variant_type_check (supertype), FALSE);
+  g_return_val_if_fail (xvariant_type_check (type), FALSE);
+  g_return_val_if_fail (xvariant_type_check (supertype), FALSE);
 
-  supertype_string = g_variant_type_peek_string (supertype);
-  type_string = g_variant_type_peek_string (type);
+  supertype_string = xvariant_type_peek_string (supertype);
+  type_string = xvariant_type_peek_string (type);
 
   supertype_end = supertype_string +
-                  g_variant_type_get_string_length (supertype);
+                  xvariant_type_get_string_length (supertype);
 
   /* we know that type and supertype are both well-formed, so it's
    * safe to treat this merely as a text processing problem.
@@ -885,7 +885,7 @@ g_variant_type_is_subtype_of (const xvariant_type_t *type,
           switch (supertype_char)
             {
             case 'r':
-              if (!g_variant_type_is_tuple (target_type))
+              if (!xvariant_type_is_tuple (target_type))
                 return FALSE;
               break;
 
@@ -893,7 +893,7 @@ g_variant_type_is_subtype_of (const xvariant_type_t *type,
               break;
 
             case '?':
-              if (!g_variant_type_is_basic (target_type))
+              if (!xvariant_type_is_basic (target_type))
                 return FALSE;
               break;
 
@@ -901,7 +901,7 @@ g_variant_type_is_subtype_of (const xvariant_type_t *type,
               return FALSE;
             }
 
-          type_string += g_variant_type_get_string_length (target_type);
+          type_string += xvariant_type_get_string_length (target_type);
         }
     }
 
@@ -909,7 +909,7 @@ g_variant_type_is_subtype_of (const xvariant_type_t *type,
 }
 
 /**
- * g_variant_type_element:
+ * xvariant_type_element:
  * @type: an array or maybe #xvariant_type_t
  *
  * Determines the element type of an array or maybe type.
@@ -921,13 +921,13 @@ g_variant_type_is_subtype_of (const xvariant_type_t *type,
  * Since 2.24
  **/
 const xvariant_type_t *
-g_variant_type_element (const xvariant_type_t *type)
+xvariant_type_element (const xvariant_type_t *type)
 {
   const xchar_t *type_string;
 
-  g_return_val_if_fail (g_variant_type_check (type), NULL);
+  g_return_val_if_fail (xvariant_type_check (type), NULL);
 
-  type_string = g_variant_type_peek_string (type);
+  type_string = xvariant_type_peek_string (type);
 
   g_assert (type_string[0] == 'a' || type_string[0] == 'm');
 
@@ -935,7 +935,7 @@ g_variant_type_element (const xvariant_type_t *type)
 }
 
 /**
- * g_variant_type_first:
+ * xvariant_type_first:
  * @type: a tuple or dictionary entry #xvariant_type_t
  *
  * Determines the first item type of a tuple or dictionary entry
@@ -950,7 +950,7 @@ g_variant_type_element (const xvariant_type_t *type)
  *
  * %NULL is returned in case of @type being %G_VARIANT_TYPE_UNIT.
  *
- * This call, together with g_variant_type_next() provides an iterator
+ * This call, together with xvariant_type_next() provides an iterator
  * interface over tuple and dictionary entry types.
  *
  * Returns: (transfer none): the first item type of @type, or %NULL
@@ -958,13 +958,13 @@ g_variant_type_element (const xvariant_type_t *type)
  * Since 2.24
  **/
 const xvariant_type_t *
-g_variant_type_first (const xvariant_type_t *type)
+xvariant_type_first (const xvariant_type_t *type)
 {
   const xchar_t *type_string;
 
-  g_return_val_if_fail (g_variant_type_check (type), NULL);
+  g_return_val_if_fail (xvariant_type_check (type), NULL);
 
-  type_string = g_variant_type_peek_string (type);
+  type_string = xvariant_type_peek_string (type);
   g_assert (type_string[0] == '(' || type_string[0] == '{');
 
   if (type_string[1] == ')')
@@ -974,14 +974,14 @@ g_variant_type_first (const xvariant_type_t *type)
 }
 
 /**
- * g_variant_type_next:
+ * xvariant_type_next:
  * @type: a #xvariant_type_t from a previous call
  *
  * Determines the next item type of a tuple or dictionary entry
  * type.
  *
  * @type must be the result of a previous call to
- * g_variant_type_first() or g_variant_type_next().
+ * xvariant_type_first() or xvariant_type_next().
  *
  * If called on the key type of a dictionary entry then this call
  * returns the value type.  If called on the value type of a dictionary
@@ -994,14 +994,14 @@ g_variant_type_first (const xvariant_type_t *type)
  * Since 2.24
  **/
 const xvariant_type_t *
-g_variant_type_next (const xvariant_type_t *type)
+xvariant_type_next (const xvariant_type_t *type)
 {
   const xchar_t *type_string;
 
-  g_return_val_if_fail (g_variant_type_check (type), NULL);
+  g_return_val_if_fail (xvariant_type_check (type), NULL);
 
-  type_string = g_variant_type_peek_string (type);
-  type_string += g_variant_type_get_string_length (type);
+  type_string = xvariant_type_peek_string (type);
+  type_string += xvariant_type_get_string_length (type);
 
   if (*type_string == ')' || *type_string == '}')
     return NULL;
@@ -1010,7 +1010,7 @@ g_variant_type_next (const xvariant_type_t *type)
 }
 
 /**
- * g_variant_type_n_items:
+ * xvariant_type_n_items:
  * @type: a tuple or dictionary entry #xvariant_type_t
  *
  * Determines the number of items contained in a tuple or
@@ -1028,49 +1028,49 @@ g_variant_type_next (const xvariant_type_t *type)
  * Since 2.24
  **/
 xsize_t
-g_variant_type_n_items (const xvariant_type_t *type)
+xvariant_type_n_items (const xvariant_type_t *type)
 {
   xsize_t count = 0;
 
-  g_return_val_if_fail (g_variant_type_check (type), 0);
+  g_return_val_if_fail (xvariant_type_check (type), 0);
 
-  for (type = g_variant_type_first (type);
+  for (type = xvariant_type_first (type);
        type;
-       type = g_variant_type_next (type))
+       type = xvariant_type_next (type))
     count++;
 
   return count;
 }
 
 /**
- * g_variant_type_key:
+ * xvariant_type_key:
  * @type: a dictionary entry #xvariant_type_t
  *
  * Determines the key type of a dictionary entry type.
  *
  * This function may only be used with a dictionary entry type.  Other
  * than the additional restriction, this call is equivalent to
- * g_variant_type_first().
+ * xvariant_type_first().
  *
  * Returns: (transfer none): the key type of the dictionary entry
  *
  * Since 2.24
  **/
 const xvariant_type_t *
-g_variant_type_key (const xvariant_type_t *type)
+xvariant_type_key (const xvariant_type_t *type)
 {
   const xchar_t *type_string;
 
-  g_return_val_if_fail (g_variant_type_check (type), NULL);
+  g_return_val_if_fail (xvariant_type_check (type), NULL);
 
-  type_string = g_variant_type_peek_string (type);
+  type_string = xvariant_type_peek_string (type);
   g_assert (type_string[0] == '{');
 
   return (const xvariant_type_t *) &type_string[1];
 }
 
 /**
- * g_variant_type_value:
+ * xvariant_type_value:
  * @type: a dictionary entry #xvariant_type_t
  *
  * Determines the value type of a dictionary entry type.
@@ -1082,24 +1082,24 @@ g_variant_type_key (const xvariant_type_t *type)
  * Since 2.24
  **/
 const xvariant_type_t *
-g_variant_type_value (const xvariant_type_t *type)
+xvariant_type_value (const xvariant_type_t *type)
 {
 #ifndef G_DISABLE_ASSERT
   const xchar_t *type_string;
 #endif
 
-  g_return_val_if_fail (g_variant_type_check (type), NULL);
+  g_return_val_if_fail (xvariant_type_check (type), NULL);
 
 #ifndef G_DISABLE_ASSERT
-  type_string = g_variant_type_peek_string (type);
+  type_string = xvariant_type_peek_string (type);
   g_assert (type_string[0] == '{');
 #endif
 
-  return g_variant_type_next (g_variant_type_key (type));
+  return xvariant_type_next (xvariant_type_key (type));
 }
 
 /**
- * g_variant_type_new_tuple:
+ * xvariant_type_new_tuple:
  * @items: (array length=length): an array of #GVariantTypes, one for each item
  * @length: the length of @items, or -1
  *
@@ -1108,42 +1108,42 @@ g_variant_type_value (const xvariant_type_t *type)
  * @length is the number of items in @items, or -1 to indicate that
  * @items is %NULL-terminated.
  *
- * It is appropriate to call g_variant_type_free() on the return value.
+ * It is appropriate to call xvariant_type_free() on the return value.
  *
  * Returns: (transfer full): a new tuple #xvariant_type_t
  *
  * Since 2.24
  **/
 static xvariant_type_t *
-g_variant_type_new_tuple_slow (const xvariant_type_t * const *items,
+xvariant_type_new_tuple_slow (const xvariant_type_t * const *items,
                                xint_t                        length)
 {
   /* the "slow" version is needed in case the static buffer of 1024
    * bytes is exceeded when running the normal version.  this will
    * happen only with very unusually large types, so it can be slow.
    */
-  GString *string;
+  xstring_t *string;
   xint_t i;
 
-  string = g_string_new ("(");
+  string = xstring_new ("(");
   for (i = 0; i < length; i++)
     {
       const xvariant_type_t *type;
       xsize_t size;
 
-      g_return_val_if_fail (g_variant_type_check (items[i]), NULL);
+      g_return_val_if_fail (xvariant_type_check (items[i]), NULL);
 
       type = items[i];
-      size = g_variant_type_get_string_length (type);
-      g_string_append_len (string, (const xchar_t *) type, size);
+      size = xvariant_type_get_string_length (type);
+      xstring_append_len (string, (const xchar_t *) type, size);
     }
-  g_string_append_c (string, ')');
+  xstring_append_c (string, ')');
 
-  return (xvariant_type_t *) g_string_free (string, FALSE);
+  return (xvariant_type_t *) xstring_free (string, FALSE);
 }
 
 xvariant_type_t *
-g_variant_type_new_tuple (const xvariant_type_t * const *items,
+xvariant_type_new_tuple (const xvariant_type_t * const *items,
                           xint_t                        length)
 {
   char buffer[1024];
@@ -1166,13 +1166,13 @@ g_variant_type_new_tuple (const xvariant_type_t * const *items,
       const xvariant_type_t *type;
       xsize_t size;
 
-      g_return_val_if_fail (g_variant_type_check (items[i]), NULL);
+      g_return_val_if_fail (xvariant_type_check (items[i]), NULL);
 
       type = items[i];
-      size = g_variant_type_get_string_length (type);
+      size = xvariant_type_get_string_length (type);
 
       if (offset + size >= sizeof buffer) /* leave room for ')' */
-        return g_variant_type_new_tuple_slow (items, length_unsigned);
+        return xvariant_type_new_tuple_slow (items, length_unsigned);
 
       memcpy (&buffer[offset], type, size);
       offset += size;
@@ -1185,27 +1185,27 @@ g_variant_type_new_tuple (const xvariant_type_t * const *items,
 }
 
 /**
- * g_variant_type_new_array: (constructor)
+ * xvariant_type_new_array: (constructor)
  * @element: a #xvariant_type_t
  *
  * Constructs the type corresponding to an array of elements of the
  * type @type.
  *
- * It is appropriate to call g_variant_type_free() on the return value.
+ * It is appropriate to call xvariant_type_free() on the return value.
  *
  * Returns: (transfer full): a new array #xvariant_type_t
  *
  * Since 2.24
  **/
 xvariant_type_t *
-g_variant_type_new_array (const xvariant_type_t *element)
+xvariant_type_new_array (const xvariant_type_t *element)
 {
   xsize_t size;
   xchar_t *new;
 
-  g_return_val_if_fail (g_variant_type_check (element), NULL);
+  g_return_val_if_fail (xvariant_type_check (element), NULL);
 
-  size = g_variant_type_get_string_length (element);
+  size = xvariant_type_get_string_length (element);
   new = g_malloc (size + 1);
 
   new[0] = 'a';
@@ -1215,27 +1215,27 @@ g_variant_type_new_array (const xvariant_type_t *element)
 }
 
 /**
- * g_variant_type_new_maybe: (constructor)
+ * xvariant_type_new_maybe: (constructor)
  * @element: a #xvariant_type_t
  *
  * Constructs the type corresponding to a maybe instance containing
  * type @type or Nothing.
  *
- * It is appropriate to call g_variant_type_free() on the return value.
+ * It is appropriate to call xvariant_type_free() on the return value.
  *
  * Returns: (transfer full): a new maybe #xvariant_type_t
  *
  * Since 2.24
  **/
 xvariant_type_t *
-g_variant_type_new_maybe (const xvariant_type_t *element)
+xvariant_type_new_maybe (const xvariant_type_t *element)
 {
   xsize_t size;
   xchar_t *new;
 
-  g_return_val_if_fail (g_variant_type_check (element), NULL);
+  g_return_val_if_fail (xvariant_type_check (element), NULL);
 
-  size = g_variant_type_get_string_length (element);
+  size = xvariant_type_get_string_length (element);
   new = g_malloc (size + 1);
 
   new[0] = 'm';
@@ -1245,31 +1245,31 @@ g_variant_type_new_maybe (const xvariant_type_t *element)
 }
 
 /**
- * g_variant_type_new_dict_entry: (constructor)
+ * xvariant_type_new_dict_entry: (constructor)
  * @key: a basic #xvariant_type_t
  * @value: a #xvariant_type_t
  *
  * Constructs the type corresponding to a dictionary entry with a key
  * of type @key and a value of type @value.
  *
- * It is appropriate to call g_variant_type_free() on the return value.
+ * It is appropriate to call xvariant_type_free() on the return value.
  *
  * Returns: (transfer full): a new dictionary entry #xvariant_type_t
  *
  * Since 2.24
  **/
 xvariant_type_t *
-g_variant_type_new_dict_entry (const xvariant_type_t *key,
+xvariant_type_new_dict_entry (const xvariant_type_t *key,
                                const xvariant_type_t *value)
 {
   xsize_t keysize, valsize;
   xchar_t *new;
 
-  g_return_val_if_fail (g_variant_type_check (key), NULL);
-  g_return_val_if_fail (g_variant_type_check (value), NULL);
+  g_return_val_if_fail (xvariant_type_check (key), NULL);
+  g_return_val_if_fail (xvariant_type_check (value), NULL);
 
-  keysize = g_variant_type_get_string_length (key);
-  valsize = g_variant_type_get_string_length (value);
+  keysize = xvariant_type_get_string_length (key);
+  valsize = xvariant_type_get_string_length (value);
 
   new = g_malloc (1 + keysize + valsize + 1);
 
@@ -1283,8 +1283,8 @@ g_variant_type_new_dict_entry (const xvariant_type_t *key,
 
 /* private */
 const xvariant_type_t *
-g_variant_type_checked_ (const xchar_t *type_string)
+xvariant_type_checked_ (const xchar_t *type_string)
 {
-  g_return_val_if_fail (g_variant_type_string_is_valid (type_string), NULL);
+  g_return_val_if_fail (xvariant_type_string_is_valid (type_string), NULL);
   return (const xvariant_type_t *) type_string;
 }

@@ -165,9 +165,9 @@ class HeaderCodeGenerator:
                     key = (m.since, "_method_%s" % m.name_lower)
                     value = "  xboolean_t (*handle_%s) (\n" % (m.name_lower)
                     value += "    %s *object,\n" % (i.camel_name)
-                    value += "    GDBusMethodInvocation *invocation"
+                    value += "    xdbus_method_invocation_t *invocation"
                     if m.unix_fd:
-                        value += ",\n    GUnixFDList *fd_list"
+                        value += ",\n    xunix_fd_list_t *fd_list"
                     for a in m.in_args:
                         value += ",\n    %sarg_%s" % (a.ctype_in, a.name)
                     value += ");\n\n"
@@ -214,7 +214,7 @@ class HeaderCodeGenerator:
             if self.generate_autocleanup == "all":
                 self.outfile.write("#if XPL_CHECK_VERSION(2, 44, 0)\n")
                 self.outfile.write(
-                    "G_DEFINE_AUTOPTR_CLEANUP_FUNC (%s, g_object_unref)\n"
+                    "G_DEFINE_AUTOPTR_CLEANUP_FUNC (%s, xobject_unref)\n"
                     % (i.camel_name)
                 )
                 self.outfile.write("#endif\n")
@@ -228,7 +228,7 @@ class HeaderCodeGenerator:
             if self.symbol_decorator is not None:
                 self.outfile.write("%s\n" % self.symbol_decorator)
             self.outfile.write(
-                "GDBusInterfaceInfo *%s_interface_info (void);\n" % (i.name_lower)
+                "xdbus_interface_info_t *%s_interface_info (void);\n" % (i.name_lower)
             )
             if self.symbol_decorator is not None:
                 self.outfile.write("%s\n" % self.symbol_decorator)
@@ -250,11 +250,11 @@ class HeaderCodeGenerator:
                     self.outfile.write(
                         "void %s_complete_%s (\n"
                         "    %s *object,\n"
-                        "    GDBusMethodInvocation *invocation"
+                        "    xdbus_method_invocation_t *invocation"
                         % (i.name_lower, m.name_lower, i.camel_name)
                     )
                     if m.unix_fd:
-                        self.outfile.write(",\n    GUnixFDList *fd_list")
+                        self.outfile.write(",\n    xunix_fd_list_t *fd_list")
                     for a in m.out_args:
                         self.outfile.write(",\n    %s%s" % (a.ctype_in, a.name))
                     self.outfile.write(");\n")
@@ -302,7 +302,7 @@ class HeaderCodeGenerator:
                             ",\n    xint_t timeout_msec"
                         )
                     if m.unix_fd:
-                        self.outfile.write(",\n    GUnixFDList *fd_list")
+                        self.outfile.write(",\n    xunix_fd_list_t *fd_list")
                     self.outfile.write(
                         ",\n"
                         "    xcancellable_t *cancellable,\n"
@@ -322,7 +322,7 @@ class HeaderCodeGenerator:
                     for a in m.out_args:
                         self.outfile.write(",\n    %sout_%s" % (a.ctype_out, a.name))
                     if m.unix_fd:
-                        self.outfile.write(",\n    GUnixFDList **out_fd_list")
+                        self.outfile.write(",\n    xunix_fd_list_t **out_fd_list")
                     self.outfile.write(
                         ",\n" "    xasync_result_t *res,\n" "    xerror_t **error);\n"
                     )
@@ -344,11 +344,11 @@ class HeaderCodeGenerator:
                             ",\n    xint_t timeout_msec"
                         )
                     if m.unix_fd:
-                        self.outfile.write(",\n    GUnixFDList  *fd_list")
+                        self.outfile.write(",\n    xunix_fd_list_t  *fd_list")
                     for a in m.out_args:
                         self.outfile.write(",\n    %sout_%s" % (a.ctype_out, a.name))
                     if m.unix_fd:
-                        self.outfile.write(",\n    GUnixFDList **out_fd_list")
+                        self.outfile.write(",\n    xunix_fd_list_t **out_fd_list")
                     self.outfile.write(
                         ",\n"
                         "    xcancellable_t *cancellable,\n"
@@ -440,7 +440,7 @@ class HeaderCodeGenerator:
             self.outfile.write("struct _%sProxy\n" % (i.camel_name))
             self.outfile.write("{\n")
             self.outfile.write("  /*< private >*/\n")
-            self.outfile.write("  GDBusProxy parent_instance;\n")
+            self.outfile.write("  xdbus_proxy_t parent_instance;\n")
             self.outfile.write("  %sProxyPrivate *priv;\n" % (i.camel_name))
             self.outfile.write("};\n")
             self.outfile.write("\n")
@@ -458,7 +458,7 @@ class HeaderCodeGenerator:
             if self.generate_autocleanup in ("objects", "all"):
                 self.outfile.write("#if XPL_CHECK_VERSION(2, 44, 0)\n")
                 self.outfile.write(
-                    "G_DEFINE_AUTOPTR_CLEANUP_FUNC (%sProxy, g_object_unref)\n"
+                    "G_DEFINE_AUTOPTR_CLEANUP_FUNC (%sProxy, xobject_unref)\n"
                     % (i.camel_name)
                 )
                 self.outfile.write("#endif\n")
@@ -469,7 +469,7 @@ class HeaderCodeGenerator:
                 self.outfile.write("G_GNUC_DEPRECATED ")
             self.outfile.write(
                 "void %s_proxy_new (\n"
-                "    GDBusConnection     *connection,\n"
+                "    xdbus_connection_t     *connection,\n"
                 "    GDBusProxyFlags      flags,\n"
                 "    const xchar_t         *name,\n"
                 "    const xchar_t         *object_path,\n"
@@ -492,7 +492,7 @@ class HeaderCodeGenerator:
                 self.outfile.write("G_GNUC_DEPRECATED ")
             self.outfile.write(
                 "%s *%s_proxy_new_sync (\n"
-                "    GDBusConnection     *connection,\n"
+                "    xdbus_connection_t     *connection,\n"
                 "    GDBusProxyFlags      flags,\n"
                 "    const xchar_t         *name,\n"
                 "    const xchar_t         *object_path,\n"
@@ -583,7 +583,7 @@ class HeaderCodeGenerator:
             self.outfile.write("struct _%sSkeleton\n" % (i.camel_name))
             self.outfile.write("{\n")
             self.outfile.write("  /*< private >*/\n")
-            self.outfile.write("  GDBusInterfaceSkeleton parent_instance;\n")
+            self.outfile.write("  xdbus_interface_skeleton_t parent_instance;\n")
             self.outfile.write("  %sSkeletonPrivate *priv;\n" % (i.camel_name))
             self.outfile.write("};\n")
             self.outfile.write("\n")
@@ -601,7 +601,7 @@ class HeaderCodeGenerator:
             if self.generate_autocleanup in ("objects", "all"):
                 self.outfile.write("#if XPL_CHECK_VERSION(2, 44, 0)\n")
                 self.outfile.write(
-                    "G_DEFINE_AUTOPTR_CLEANUP_FUNC (%sSkeleton, g_object_unref)\n"
+                    "G_DEFINE_AUTOPTR_CLEANUP_FUNC (%sSkeleton, xobject_unref)\n"
                     % (i.camel_name)
                 )
                 self.outfile.write("#endif\n")
@@ -658,7 +658,7 @@ class HeaderCodeGenerator:
             if self.generate_autocleanup == "all":
                 self.outfile.write("#if XPL_CHECK_VERSION(2, 44, 0)\n")
                 self.outfile.write(
-                    "G_DEFINE_AUTOPTR_CLEANUP_FUNC (%sObject, g_object_unref)\n"
+                    "G_DEFINE_AUTOPTR_CLEANUP_FUNC (%sObject, xobject_unref)\n"
                     % (self.namespace)
                 )
                 self.outfile.write("#endif\n")
@@ -733,7 +733,7 @@ class HeaderCodeGenerator:
             self.outfile.write("struct _%sObjectProxy\n" % (self.namespace))
             self.outfile.write("{\n")
             self.outfile.write("  /*< private >*/\n")
-            self.outfile.write("  GDBusObjectProxy parent_instance;\n")
+            self.outfile.write("  xdbus_object_proxy_t parent_instance;\n")
             self.outfile.write("  %sObjectProxyPrivate *priv;\n" % (self.namespace))
             self.outfile.write("};\n")
             self.outfile.write("\n")
@@ -751,7 +751,7 @@ class HeaderCodeGenerator:
             if self.generate_autocleanup in ("objects", "all"):
                 self.outfile.write("#if XPL_CHECK_VERSION(2, 44, 0)\n")
                 self.outfile.write(
-                    "G_DEFINE_AUTOPTR_CLEANUP_FUNC (%sObjectProxy, g_object_unref)\n"
+                    "G_DEFINE_AUTOPTR_CLEANUP_FUNC (%sObjectProxy, xobject_unref)\n"
                     % (self.namespace)
                 )
                 self.outfile.write("#endif\n")
@@ -759,7 +759,7 @@ class HeaderCodeGenerator:
             if self.symbol_decorator is not None:
                 self.outfile.write("%s\n" % self.symbol_decorator)
             self.outfile.write(
-                "%sObjectProxy *%sobject_proxy_new (GDBusConnection *connection, const xchar_t *object_path);\n"
+                "%sObjectProxy *%sobject_proxy_new (xdbus_connection_t *connection, const xchar_t *object_path);\n"
                 % (self.namespace, self.ns_lower)
             )
             self.outfile.write("\n")
@@ -804,7 +804,7 @@ class HeaderCodeGenerator:
             self.outfile.write("struct _%sObjectSkeleton\n" % (self.namespace))
             self.outfile.write("{\n")
             self.outfile.write("  /*< private >*/\n")
-            self.outfile.write("  GDBusObjectSkeleton parent_instance;\n")
+            self.outfile.write("  xdbus_object_skeleton_t parent_instance;\n")
             self.outfile.write("  %sObjectSkeletonPrivate *priv;\n" % (self.namespace))
             self.outfile.write("};\n")
             self.outfile.write("\n")
@@ -823,7 +823,7 @@ class HeaderCodeGenerator:
             if self.generate_autocleanup in ("objects", "all"):
                 self.outfile.write("#if XPL_CHECK_VERSION(2, 44, 0)\n")
                 self.outfile.write(
-                    "G_DEFINE_AUTOPTR_CLEANUP_FUNC (%sObjectSkeleton, g_object_unref)\n"
+                    "G_DEFINE_AUTOPTR_CLEANUP_FUNC (%sObjectSkeleton, xobject_unref)\n"
                     % (self.namespace)
                 )
                 self.outfile.write("#endif\n")
@@ -893,7 +893,7 @@ class HeaderCodeGenerator:
             self.outfile.write("struct _%sObjectManagerClient\n" % (self.namespace))
             self.outfile.write("{\n")
             self.outfile.write("  /*< private >*/\n")
-            self.outfile.write("  GDBusObjectManagerClient parent_instance;\n")
+            self.outfile.write("  xdbus_object_manager_client_t parent_instance;\n")
             self.outfile.write(
                 "  %sObjectManagerClientPrivate *priv;\n" % (self.namespace)
             )
@@ -909,7 +909,7 @@ class HeaderCodeGenerator:
             if self.generate_autocleanup in ("objects", "all"):
                 self.outfile.write("#if XPL_CHECK_VERSION(2, 44, 0)\n")
                 self.outfile.write(
-                    "G_DEFINE_AUTOPTR_CLEANUP_FUNC (%sObjectManagerClient, g_object_unref)\n"
+                    "G_DEFINE_AUTOPTR_CLEANUP_FUNC (%sObjectManagerClient, xobject_unref)\n"
                     % (self.namespace)
                 )
                 self.outfile.write("#endif\n")
@@ -924,7 +924,7 @@ class HeaderCodeGenerator:
             if self.symbol_decorator is not None:
                 self.outfile.write("%s\n" % self.symbol_decorator)
             self.outfile.write(
-                "xtype_t %sobject_manager_client_get_proxy_type (GDBusObjectManagerClient *manager, const xchar_t *object_path, const xchar_t *interface_name, xpointer_t user_data);\n"
+                "xtype_t %sobject_manager_client_get_proxy_type (xdbus_object_manager_client_t *manager, const xchar_t *object_path, const xchar_t *interface_name, xpointer_t user_data);\n"
                 % (self.ns_lower)
             )
             self.outfile.write("\n")
@@ -932,7 +932,7 @@ class HeaderCodeGenerator:
                 self.outfile.write("%s\n" % self.symbol_decorator)
             self.outfile.write(
                 "void %sobject_manager_client_new (\n"
-                "    GDBusConnection        *connection,\n"
+                "    xdbus_connection_t        *connection,\n"
                 "    GDBusObjectManagerClientFlags  flags,\n"
                 "    const xchar_t            *name,\n"
                 "    const xchar_t            *object_path,\n"
@@ -943,15 +943,15 @@ class HeaderCodeGenerator:
             if self.symbol_decorator is not None:
                 self.outfile.write("%s\n" % self.symbol_decorator)
             self.outfile.write(
-                "GDBusObjectManager *%sobject_manager_client_new_finish (\n"
+                "xdbus_object_manager_t *%sobject_manager_client_new_finish (\n"
                 "    xasync_result_t        *res,\n"
                 "    xerror_t             **error);\n" % (self.ns_lower)
             )
             if self.symbol_decorator is not None:
                 self.outfile.write("%s\n" % self.symbol_decorator)
             self.outfile.write(
-                "GDBusObjectManager *%sobject_manager_client_new_sync (\n"
-                "    GDBusConnection        *connection,\n"
+                "xdbus_object_manager_t *%sobject_manager_client_new_sync (\n"
+                "    xdbus_connection_t        *connection,\n"
                 "    GDBusObjectManagerClientFlags  flags,\n"
                 "    const xchar_t            *name,\n"
                 "    const xchar_t            *object_path,\n"
@@ -974,14 +974,14 @@ class HeaderCodeGenerator:
             if self.symbol_decorator is not None:
                 self.outfile.write("%s\n" % self.symbol_decorator)
             self.outfile.write(
-                "GDBusObjectManager *%sobject_manager_client_new_for_bus_finish (\n"
+                "xdbus_object_manager_t *%sobject_manager_client_new_for_bus_finish (\n"
                 "    xasync_result_t        *res,\n"
                 "    xerror_t             **error);\n" % (self.ns_lower)
             )
             if self.symbol_decorator is not None:
                 self.outfile.write("%s\n" % self.symbol_decorator)
             self.outfile.write(
-                "GDBusObjectManager *%sobject_manager_client_new_for_bus_sync (\n"
+                "xdbus_object_manager_t *%sobject_manager_client_new_for_bus_sync (\n"
                 "    GBusType                bus_type,\n"
                 "    GDBusObjectManagerClientFlags  flags,\n"
                 "    const xchar_t            *name,\n"
@@ -1065,7 +1065,7 @@ class InterfaceInfoHeaderCodeGenerator:
     def declare_infos(self):
         for i in self.ifaces:
             self.outfile.write(
-                "extern %s const GDBusInterfaceInfo %s_interface;\n"
+                "extern %s const xdbus_interface_info_t %s_interface;\n"
                 % (self.symbol_decorator, i.name_lower)
             )
 
@@ -1160,7 +1160,7 @@ class InterfaceInfoBodyCodeGenerator:
             )
 
             self.outfile.write(
-                "const GDBusAnnotationInfo %s__%s_annotation =\n"
+                "const xdbus_annotation_info_t %s__%s_annotation =\n"
                 % (array_name_lower, a.key_lower)
             )
             self.outfile.write("{\n")
@@ -1169,7 +1169,7 @@ class InterfaceInfoBodyCodeGenerator:
             self.outfile.write('  (xchar_t *) "%s",\n' % a.value)
             if len(a.annotations) > 0:
                 self.outfile.write(
-                    "  (GDBusAnnotationInfo **) %s__%s_annotations,\n"
+                    "  (xdbus_annotation_info_t **) %s__%s_annotations,\n"
                     % (array_name_lower, a.key_lower)
                 )
             else:
@@ -1181,7 +1181,7 @@ class InterfaceInfoBodyCodeGenerator:
             annotation_pointers.append(key)
 
         self.generate_array(
-            array_name_lower, "GDBusAnnotationInfo", annotation_pointers
+            array_name_lower, "xdbus_annotation_info_t", annotation_pointers
         )
 
     def define_args(self, array_name_lower, args):
@@ -1196,7 +1196,7 @@ class InterfaceInfoBodyCodeGenerator:
             )
 
             self.outfile.write(
-                "const GDBusArgInfo %s__%s_arg =\n" % (array_name_lower, a.name)
+                "const xdbus_arg_info_t %s__%s_arg =\n" % (array_name_lower, a.name)
             )
             self.outfile.write("{\n")
             self.outfile.write("  -1,  /* ref count */\n")
@@ -1204,7 +1204,7 @@ class InterfaceInfoBodyCodeGenerator:
             self.outfile.write('  (xchar_t *) "%s",\n' % a.signature)
             if len(a.annotations) > 0:
                 self.outfile.write(
-                    "  (GDBusAnnotationInfo **) %s__%s_arg_annotations,\n"
+                    "  (xdbus_annotation_info_t **) %s__%s_arg_annotations,\n"
                     % (array_name_lower, a.name)
                 )
             else:
@@ -1215,7 +1215,7 @@ class InterfaceInfoBodyCodeGenerator:
             key = (a.since, "%s__%s_arg" % (array_name_lower, a.name))
             arg_pointers.append(key)
 
-        self.generate_array(array_name_lower, "GDBusArgInfo", arg_pointers)
+        self.generate_array(array_name_lower, "xdbus_arg_info_t", arg_pointers)
 
     def define_infos(self):
         for i in self.ifaces:
@@ -1247,7 +1247,7 @@ class InterfaceInfoBodyCodeGenerator:
                     )
 
                     self.outfile.write(
-                        "const GDBusMethodInfo %s_interface__%s_method =\n"
+                        "const xdbus_method_info_t %s_interface__%s_method =\n"
                         % (i.name_lower, m.name_lower)
                     )
                     self.outfile.write("{\n")
@@ -1255,21 +1255,21 @@ class InterfaceInfoBodyCodeGenerator:
                     self.outfile.write('  (xchar_t *) "%s",\n' % m.name)
                     if len(m.in_args) > 0:
                         self.outfile.write(
-                            "  (GDBusArgInfo **) %s_interface__%s_method_in_args,\n"
+                            "  (xdbus_arg_info_t **) %s_interface__%s_method_in_args,\n"
                             % (i.name_lower, m.name_lower)
                         )
                     else:
                         self.outfile.write("  NULL,  /* no in args */\n")
                     if len(m.out_args) > 0:
                         self.outfile.write(
-                            "  (GDBusArgInfo **) %s_interface__%s_method_out_args,\n"
+                            "  (xdbus_arg_info_t **) %s_interface__%s_method_out_args,\n"
                             % (i.name_lower, m.name_lower)
                         )
                     else:
                         self.outfile.write("  NULL,  /* no out args */\n")
                     if len(m.annotations) > 0:
                         self.outfile.write(
-                            "  (GDBusAnnotationInfo **) %s_interface__%s_method_annotations,\n"
+                            "  (xdbus_annotation_info_t **) %s_interface__%s_method_annotations,\n"
                             % (i.name_lower, m.name_lower)
                         )
                     else:
@@ -1285,7 +1285,7 @@ class InterfaceInfoBodyCodeGenerator:
 
                 self.generate_array(
                     "%s_interface_methods" % i.name_lower,
-                    "GDBusMethodInfo",
+                    "xdbus_method_info_t",
                     method_pointers,
                 )
 
@@ -1305,7 +1305,7 @@ class InterfaceInfoBodyCodeGenerator:
                     )
 
                     self.outfile.write(
-                        "const GDBusSignalInfo %s_interface__%s_signal =\n"
+                        "const xdbus_signalInfo_t %s_interface__%s_signal =\n"
                         % (i.name_lower, s.name_lower)
                     )
                     self.outfile.write("{\n")
@@ -1313,14 +1313,14 @@ class InterfaceInfoBodyCodeGenerator:
                     self.outfile.write('  (xchar_t *) "%s",\n' % s.name)
                     if len(s.args) > 0:
                         self.outfile.write(
-                            "  (GDBusArgInfo **) %s_interface__%s_signal_args,\n"
+                            "  (xdbus_arg_info_t **) %s_interface__%s_signal_args,\n"
                             % (i.name_lower, s.name_lower)
                         )
                     else:
                         self.outfile.write("  NULL,  /* no args */\n")
                     if len(s.annotations) > 0:
                         self.outfile.write(
-                            "  (GDBusAnnotationInfo **) %s_interface__%s_signal_annotations,\n"
+                            "  (xdbus_annotation_info_t **) %s_interface__%s_signal_annotations,\n"
                             % (i.name_lower, s.name_lower)
                         )
                     else:
@@ -1336,7 +1336,7 @@ class InterfaceInfoBodyCodeGenerator:
 
                 self.generate_array(
                     "%s_interface_signals" % i.name_lower,
-                    "GDBusSignalInfo",
+                    "xdbus_signalInfo_t",
                     signal_pointers,
                 )
 
@@ -1361,7 +1361,7 @@ class InterfaceInfoBodyCodeGenerator:
                     )
 
                     self.outfile.write(
-                        "const GDBusPropertyInfo %s_interface__%s_property =\n"
+                        "const xdbus_property_info_t %s_interface__%s_property =\n"
                         % (i.name_lower, p.name_lower)
                     )
                     self.outfile.write("{\n")
@@ -1371,7 +1371,7 @@ class InterfaceInfoBodyCodeGenerator:
                     self.outfile.write("  %s,\n" % flags)
                     if len(p.annotations) > 0:
                         self.outfile.write(
-                            "  (GDBusAnnotationInfo **) %s_interface__%s_property_annotations,\n"
+                            "  (xdbus_annotation_info_t **) %s_interface__%s_property_annotations,\n"
                             % (i.name_lower, p.name_lower)
                         )
                     else:
@@ -1387,42 +1387,42 @@ class InterfaceInfoBodyCodeGenerator:
 
                 self.generate_array(
                     "%s_interface_properties" % i.name_lower,
-                    "GDBusPropertyInfo",
+                    "xdbus_property_info_t",
                     property_pointers,
                 )
 
-            # Finally the GDBusInterfaceInfo.
+            # Finally the xdbus_interface_info_t.
             self.define_annotations(
                 "%s_interface_annotations" % i.name_lower, i.annotations
             )
 
             self.outfile.write(
-                "const GDBusInterfaceInfo %s_interface =\n" % i.name_lower
+                "const xdbus_interface_info_t %s_interface =\n" % i.name_lower
             )
             self.outfile.write("{\n")
             self.outfile.write("  -1,  /* ref count */\n")
             self.outfile.write('  (xchar_t *) "%s",\n' % i.name)
             if len(i.methods) > 0:
                 self.outfile.write(
-                    "  (GDBusMethodInfo **) %s_interface_methods,\n" % i.name_lower
+                    "  (xdbus_method_info_t **) %s_interface_methods,\n" % i.name_lower
                 )
             else:
                 self.outfile.write("  NULL,  /* no methods */\n")
             if len(i.signals) > 0:
                 self.outfile.write(
-                    "  (GDBusSignalInfo **) %s_interface_signals,\n" % i.name_lower
+                    "  (xdbus_signalInfo_t **) %s_interface_signals,\n" % i.name_lower
                 )
             else:
                 self.outfile.write("  NULL,  /* no signals */\n")
             if len(i.properties) > 0:
                 self.outfile.write(
-                    "  (GDBusPropertyInfo **) %s_interface_properties,\n" % i.name_lower
+                    "  (xdbus_property_info_t **) %s_interface_properties,\n" % i.name_lower
                 )
             else:
                 self.outfile.write("NULL,  /* no properties */\n")
             if len(i.annotations) > 0:
                 self.outfile.write(
-                    "  (GDBusAnnotationInfo **) %s_interface_annotations,\n"
+                    "  (xdbus_annotation_info_t **) %s_interface_annotations,\n"
                     % i.name_lower
                 )
             else:
@@ -1489,7 +1489,7 @@ class CodeGenerator:
         self.outfile.write(
             "typedef struct\n"
             "{\n"
-            "  GDBusArgInfo parent_struct;\n"
+            "  xdbus_arg_info_t parent_struct;\n"
             "  xboolean_t use_gvariant;\n"
             "} _ExtendedGDBusArgInfo;\n"
             "\n"
@@ -1498,7 +1498,7 @@ class CodeGenerator:
         self.outfile.write(
             "typedef struct\n"
             "{\n"
-            "  GDBusMethodInfo parent_struct;\n"
+            "  xdbus_method_info_t parent_struct;\n"
             "  const xchar_t *signal_name;\n"
             "  xboolean_t pass_fdlist;\n"
             "} _ExtendedGDBusMethodInfo;\n"
@@ -1508,7 +1508,7 @@ class CodeGenerator:
         self.outfile.write(
             "typedef struct\n"
             "{\n"
-            "  GDBusSignalInfo parent_struct;\n"
+            "  xdbus_signalInfo_t parent_struct;\n"
             "  const xchar_t *signal_name;\n"
             "} _ExtendedGDBusSignalInfo;\n"
             "\n"
@@ -1517,7 +1517,7 @@ class CodeGenerator:
         self.outfile.write(
             "typedef struct\n"
             "{\n"
-            "  GDBusPropertyInfo parent_struct;\n"
+            "  xdbus_property_info_t parent_struct;\n"
             "  const xchar_t *hyphen_name;\n"
             "  xuint_t use_gvariant : 1;\n"
             "  xuint_t emits_changed_signal : 1;\n"
@@ -1528,7 +1528,7 @@ class CodeGenerator:
         self.outfile.write(
             "typedef struct\n"
             "{\n"
-            "  GDBusInterfaceInfo parent_struct;\n"
+            "  xdbus_interface_info_t parent_struct;\n"
             "  const xchar_t *hyphen_name;\n"
             "} _ExtendedGDBusInterfaceInfo;\n"
             "\n"
@@ -1539,13 +1539,13 @@ class CodeGenerator:
             "{\n"
             "  const _ExtendedGDBusPropertyInfo *info;\n"
             "  xuint_t prop_id;\n"
-            "  GValue orig_value; /* the value before the change */\n"
+            "  xvalue_t orixvalue; /* the value before the change */\n"
             "} ChangedProperty;\n"
             "\n"
             "static void\n"
             "_changed_property_free (ChangedProperty *data)\n"
             "{\n"
-            "  g_value_unset (&data->orig_value);\n"
+            "  xvalue_unset (&data->orixvalue);\n"
             "  g_free (data);\n"
             "}\n"
             "\n"
@@ -1553,7 +1553,7 @@ class CodeGenerator:
 
         self.outfile.write(
             "static xboolean_t\n"
-            "_g_strv_equal0 (xchar_t **a, xchar_t **b)\n"
+            "_xstrv_equal0 (xchar_t **a, xchar_t **b)\n"
             "{\n"
             "  xboolean_t ret = FALSE;\n"
             "  xuint_t n;\n"
@@ -1564,10 +1564,10 @@ class CodeGenerator:
             "    }\n"
             "  if (a == NULL || b == NULL)\n"
             "    goto out;\n"
-            "  if (g_strv_length (a) != g_strv_length (b))\n"
+            "  if (xstrv_length (a) != xstrv_length (b))\n"
             "    goto out;\n"
             "  for (n = 0; a[n] != NULL; n++)\n"
-            "    if (g_strcmp0 (a[n], b[n]) != 0)\n"
+            "    if (xstrcmp0 (a[n], b[n]) != 0)\n"
             "      goto out;\n"
             "  ret = TRUE;\n"
             "out:\n"
@@ -1578,7 +1578,7 @@ class CodeGenerator:
 
         self.outfile.write(
             "static xboolean_t\n"
-            "_g_variant_equal0 (xvariant_t *a, xvariant_t *b)\n"
+            "_xvariant_equal0 (xvariant_t *a, xvariant_t *b)\n"
             "{\n"
             "  xboolean_t ret = FALSE;\n"
             "  if (a == NULL && b == NULL)\n"
@@ -1588,7 +1588,7 @@ class CodeGenerator:
             "    }\n"
             "  if (a == NULL || b == NULL)\n"
             "    goto out;\n"
-            "  ret = g_variant_equal (a, b);\n"
+            "  ret = xvariant_equal (a, b);\n"
             "out:\n"
             "  return ret;\n"
             "}\n"
@@ -1598,49 +1598,49 @@ class CodeGenerator:
         # simplified - only supports the types we use
         self.outfile.write(
             "G_GNUC_UNUSED static xboolean_t\n"
-            "_g_value_equal (const GValue *a, const GValue *b)\n"
+            "_xvalue_equal (const xvalue_t *a, const xvalue_t *b)\n"
             "{\n"
             "  xboolean_t ret = FALSE;\n"
             "  g_assert (G_VALUE_TYPE (a) == G_VALUE_TYPE (b));\n"
             "  switch (G_VALUE_TYPE (a))\n"
             "    {\n"
             "      case XTYPE_BOOLEAN:\n"
-            "        ret = (g_value_get_boolean (a) == g_value_get_boolean (b));\n"
+            "        ret = (xvalue_get_boolean (a) == xvalue_get_boolean (b));\n"
             "        break;\n"
             "      case XTYPE_UCHAR:\n"
-            "        ret = (g_value_get_uchar (a) == g_value_get_uchar (b));\n"
+            "        ret = (xvalue_get_uchar (a) == xvalue_get_uchar (b));\n"
             "        break;\n"
             "      case XTYPE_INT:\n"
-            "        ret = (g_value_get_int (a) == g_value_get_int (b));\n"
+            "        ret = (xvalue_get_int (a) == xvalue_get_int (b));\n"
             "        break;\n"
             "      case XTYPE_UINT:\n"
-            "        ret = (g_value_get_uint (a) == g_value_get_uint (b));\n"
+            "        ret = (xvalue_get_uint (a) == xvalue_get_uint (b));\n"
             "        break;\n"
             "      case XTYPE_INT64:\n"
-            "        ret = (g_value_get_int64 (a) == g_value_get_int64 (b));\n"
+            "        ret = (xvalue_get_int64 (a) == xvalue_get_int64 (b));\n"
             "        break;\n"
             "      case XTYPE_UINT64:\n"
-            "        ret = (g_value_get_uint64 (a) == g_value_get_uint64 (b));\n"
+            "        ret = (xvalue_get_uint64 (a) == xvalue_get_uint64 (b));\n"
             "        break;\n"
             "      case XTYPE_DOUBLE:\n"
             "        {\n"
             "          /* Avoid -Wfloat-equal warnings by doing a direct bit compare */\n"
-            "          xdouble_t da = g_value_get_double (a);\n"
-            "          xdouble_t db = g_value_get_double (b);\n"
+            "          xdouble_t da = xvalue_get_double (a);\n"
+            "          xdouble_t db = xvalue_get_double (b);\n"
             "          ret = memcmp (&da, &db, sizeof (xdouble_t)) == 0;\n"
             "        }\n"
             "        break;\n"
             "      case XTYPE_STRING:\n"
-            "        ret = (g_strcmp0 (g_value_get_string (a), g_value_get_string (b)) == 0);\n"
+            "        ret = (xstrcmp0 (xvalue_get_string (a), xvalue_get_string (b)) == 0);\n"
             "        break;\n"
             "      case XTYPE_VARIANT:\n"
-            "        ret = _g_variant_equal0 (g_value_get_variant (a), g_value_get_variant (b));\n"
+            "        ret = _xvariant_equal0 (xvalue_get_variant (a), xvalue_get_variant (b));\n"
             "        break;\n"
             "      default:\n"
             "        if (G_VALUE_TYPE (a) == XTYPE_STRV)\n"
-            "          ret = _g_strv_equal0 (g_value_get_boxed (a), g_value_get_boxed (b));\n"
+            "          ret = _xstrv_equal0 (xvalue_get_boxed (a), xvalue_get_boxed (b));\n"
             "        else\n"
-            '          g_critical ("_g_value_equal() does not handle type %s", g_type_name (G_VALUE_TYPE (a)));\n'
+            '          g_critical ("_xvalue_equal() does not handle type %s", xtype_name (G_VALUE_TYPE (a)));\n'
             "        break;\n"
             "    }\n"
             "  return ret;\n"
@@ -1661,7 +1661,7 @@ class CodeGenerator:
                 continue
 
             self.outfile.write(
-                "static const GDBusAnnotationInfo %s_%d =\n"
+                "static const xdbus_annotation_info_t %s_%d =\n"
                 "{\n"
                 "  -1,\n"
                 '  (xchar_t *) "%s",\n'
@@ -1671,14 +1671,14 @@ class CodeGenerator:
                 self.outfile.write("  NULL\n")
             else:
                 self.outfile.write(
-                    "  (GDBusAnnotationInfo **) &%s_%d_pointers\n" % (prefix, n)
+                    "  (xdbus_annotation_info_t **) &%s_%d_pointers\n" % (prefix, n)
                 )
             self.outfile.write("};\n" "\n")
             n += 1
 
         if n > 0:
             self.outfile.write(
-                "static const GDBusAnnotationInfo * const %s_pointers[] =\n"
+                "static const xdbus_annotation_info_t * const %s_pointers[] =\n"
                 "{\n" % (prefix)
             )
             m = 0
@@ -1708,7 +1708,7 @@ class CodeGenerator:
                 self.outfile.write("    NULL\n")
             else:
                 self.outfile.write(
-                    "    (GDBusAnnotationInfo **) &%s_arg_%s_annotation_info_pointers\n"
+                    "    (xdbus_annotation_info_t **) &%s_arg_%s_annotation_info_pointers\n"
                     % (prefix, a.name)
                 )
             self.outfile.write("  },\n")
@@ -1722,7 +1722,7 @@ class CodeGenerator:
 
         if len(args) > 0:
             self.outfile.write(
-                "static const GDBusArgInfo * const %s_pointers[] =\n" "{\n" % (prefix)
+                "static const xdbus_arg_info_t * const %s_pointers[] =\n" "{\n" % (prefix)
             )
             for a in args:
                 self.outfile.write("  &%s_%s.parent_struct,\n" % (prefix, a.name))
@@ -1760,21 +1760,21 @@ class CodeGenerator:
                     self.outfile.write("    NULL,\n")
                 else:
                     self.outfile.write(
-                        "    (GDBusArgInfo **) &_%s_method_info_%s_IN_ARG_pointers,\n"
+                        "    (xdbus_arg_info_t **) &_%s_method_info_%s_IN_ARG_pointers,\n"
                         % (i.name_lower, m.name_lower)
                     )
                 if len(m.out_args) == 0:
                     self.outfile.write("    NULL,\n")
                 else:
                     self.outfile.write(
-                        "    (GDBusArgInfo **) &_%s_method_info_%s_OUT_ARG_pointers,\n"
+                        "    (xdbus_arg_info_t **) &_%s_method_info_%s_OUT_ARG_pointers,\n"
                         % (i.name_lower, m.name_lower)
                     )
                 if num_anno == 0:
                     self.outfile.write("    NULL\n")
                 else:
                     self.outfile.write(
-                        "    (GDBusAnnotationInfo **) &_%s_method_%s_annotation_info_pointers\n"
+                        "    (xdbus_annotation_info_t **) &_%s_method_%s_annotation_info_pointers\n"
                         % (i.name_lower, m.name_lower)
                     )
                 self.outfile.write(
@@ -1785,7 +1785,7 @@ class CodeGenerator:
                 self.outfile.write("};\n" "\n")
 
             self.outfile.write(
-                "static const GDBusMethodInfo * const _%s_method_info_pointers[] =\n"
+                "static const xdbus_method_info_t * const _%s_method_info_pointers[] =\n"
                 "{\n" % (i.name_lower)
             )
             for m in i.methods:
@@ -1818,21 +1818,21 @@ class CodeGenerator:
                     self.outfile.write("    NULL,\n")
                 else:
                     self.outfile.write(
-                        "    (GDBusArgInfo **) &_%s_signal_info_%s_ARG_pointers,\n"
+                        "    (xdbus_arg_info_t **) &_%s_signal_info_%s_ARG_pointers,\n"
                         % (i.name_lower, s.name_lower)
                     )
                 if num_anno == 0:
                     self.outfile.write("    NULL\n")
                 else:
                     self.outfile.write(
-                        "    (GDBusAnnotationInfo **) &_%s_signal_%s_annotation_info_pointers\n"
+                        "    (xdbus_annotation_info_t **) &_%s_signal_%s_annotation_info_pointers\n"
                         % (i.name_lower, s.name_lower)
                     )
                 self.outfile.write("  },\n" '  "%s"\n' % (s.name_hyphen))
                 self.outfile.write("};\n" "\n")
 
             self.outfile.write(
-                "static const GDBusSignalInfo * const _%s_signal_info_pointers[] =\n"
+                "static const xdbus_signalInfo_t * const _%s_signal_info_pointers[] =\n"
                 "{\n" % (i.name_lower)
             )
             for s in i.signals:
@@ -1872,7 +1872,7 @@ class CodeGenerator:
                     self.outfile.write("    NULL\n")
                 else:
                     self.outfile.write(
-                        "    (GDBusAnnotationInfo **) &_%s_property_%s_annotation_info_pointers\n"
+                        "    (xdbus_annotation_info_t **) &_%s_property_%s_annotation_info_pointers\n"
                         % (i.name_lower, p.name_lower)
                     )
                 self.outfile.write("  },\n" '  "%s",\n' % (p.name_hyphen))
@@ -1889,7 +1889,7 @@ class CodeGenerator:
                 self.outfile.write("};\n" "\n")
 
             self.outfile.write(
-                "static const GDBusPropertyInfo * const _%s_property_info_pointers[] =\n"
+                "static const xdbus_property_info_t * const _%s_property_info_pointers[] =\n"
                 "{\n" % (i.name_lower)
             )
             for p in i.properties:
@@ -1913,26 +1913,26 @@ class CodeGenerator:
             self.outfile.write("    NULL,\n")
         else:
             self.outfile.write(
-                "    (GDBusMethodInfo **) &_%s_method_info_pointers,\n" % (i.name_lower)
+                "    (xdbus_method_info_t **) &_%s_method_info_pointers,\n" % (i.name_lower)
             )
         if len(i.signals) == 0:
             self.outfile.write("    NULL,\n")
         else:
             self.outfile.write(
-                "    (GDBusSignalInfo **) &_%s_signal_info_pointers,\n" % (i.name_lower)
+                "    (xdbus_signalInfo_t **) &_%s_signal_info_pointers,\n" % (i.name_lower)
             )
         if len(i.properties) == 0:
             self.outfile.write("    NULL,\n")
         else:
             self.outfile.write(
-                "    (GDBusPropertyInfo **) &_%s_property_info_pointers,\n"
+                "    (xdbus_property_info_t **) &_%s_property_info_pointers,\n"
                 % (i.name_lower)
             )
         if num_anno == 0:
             self.outfile.write("    NULL\n")
         else:
             self.outfile.write(
-                "    (GDBusAnnotationInfo **) &_%s_annotation_info_pointers\n"
+                "    (xdbus_annotation_info_t **) &_%s_annotation_info_pointers\n"
                 % (i.name_lower)
             )
         self.outfile.write("  },\n" '  "%s",\n' "};\n" "\n" % (i.name_hyphen))
@@ -1944,17 +1944,17 @@ class CodeGenerator:
                 " *\n"
                 " * Gets a machine-readable description of the #%s D-Bus interface.\n"
                 " *\n"
-                " * Returns: (transfer none): A #GDBusInterfaceInfo. Do not free.\n"
+                " * Returns: (transfer none): A #xdbus_interface_info_t. Do not free.\n"
                 % (i.name_lower, i.name),
                 False,
             )
         )
         self.write_gtkdoc_deprecated_and_since_and_close(i, self.outfile, 0)
         self.outfile.write(
-            "GDBusInterfaceInfo *\n"
+            "xdbus_interface_info_t *\n"
             "%s_interface_info (void)\n"
             "{\n"
-            "  return (GDBusInterfaceInfo *) &_%s_interface_info.parent_struct;\n"
+            "  return (xdbus_interface_info_t *) &_%s_interface_info.parent_struct;\n"
             "}\n"
             "\n" % (i.name_lower, i.name_lower)
         )
@@ -1982,7 +1982,7 @@ class CodeGenerator:
         self.outfile.write(", xuint_t property_id_begin)\n" "{\n")
         for p in i.properties:
             self.outfile.write(
-                '  g_object_class_override_property (klass, property_id_begin++, "%s");\n'
+                '  xobject_class_override_property (klass, property_id_begin++, "%s");\n'
                 % (p.name_hyphen)
             )
         self.outfile.write("  return property_id_begin - 1;\n" "}\n" "\n")
@@ -2083,14 +2083,14 @@ class CodeGenerator:
                         "  /**\n"
                         "   * %s::handle-%s:\n"
                         "   * @object: A #%s.\n"
-                        "   * @invocation: A #GDBusMethodInvocation.\n"
+                        "   * @invocation: A #xdbus_method_invocation_t.\n"
                         % (i.camel_name, m.name_hyphen, i.camel_name),
                         False,
                     )
                 )
                 if m.unix_fd:
                     self.outfile.write(
-                        "   * @fd_list: (nullable): A #GUnixFDList or %NULL.\n"
+                        "   * @fd_list: (nullable): A #xunix_fd_list_t or %NULL.\n"
                     )
                 for a in m.in_args:
                     self.outfile.write(
@@ -2101,7 +2101,7 @@ class CodeGenerator:
                         "   *\n"
                         "   * Signal emitted when a remote caller is invoking the %s.%s() D-Bus method.\n"
                         "   *\n"
-                        "   * If a signal handler returns %%TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call %s_complete_%s() or e.g. g_dbus_method_invocation_return_error() on it) and no other signal handlers will run. If no signal handler handles the invocation, the %%G_DBUS_ERROR_UNKNOWN_METHOD error is returned.\n"
+                        "   * If a signal handler returns %%TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call %s_complete_%s() or e.g. xdbus_method_invocation_return_error() on it) and no other signal handlers will run. If no signal handler handles the invocation, the %%G_DBUS_ERROR_UNKNOWN_METHOD error is returned.\n"
                         "   *\n"
                         "   * Returns: %%G_DBUS_METHOD_INVOCATION_HANDLED or %%TRUE if the invocation was handled, %%G_DBUS_METHOD_INVOCATION_UNHANDLED or %%FALSE to let other signal handlers run.\n"
                         % (i.name, m.name, i.name_lower, m.name_lower),
@@ -2207,7 +2207,7 @@ class CodeGenerator:
                     )
                 )
                 self.write_gtkdoc_deprecated_and_since_and_close(p, self.outfile, 2)
-                self.outfile.write("  g_object_interface_install_property (iface,\n")
+                self.outfile.write("  xobject_interface_install_property (iface,\n")
                 if p.arg.gtype == "XTYPE_VARIANT":
                     s = (
                         'g_param_spec_variant ("%s", "%s", "%s", G_VARIANT_TYPE ("%s"), NULL'
@@ -2307,7 +2307,7 @@ class CodeGenerator:
                     )
                 else:
                     print_error(
-                        'Unsupported gtype "{}" for GParamSpec'.format(p.arg.gtype)
+                        'Unsupported gtype "{}" for xparam_spec_t'.format(p.arg.gtype)
                     )
                 flags = "G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS"
                 if p.deprecated:
@@ -2409,7 +2409,7 @@ class CodeGenerator:
                     )
                 )
                 self.outfile.write(
-                    '  g_object_get (G_OBJECT (object), "%s", &value, NULL);\n'
+                    '  xobject_get (G_OBJECT (object), "%s", &value, NULL);\n'
                     % (p.name_hyphen)
                 )
                 self.outfile.write("  return value;\n")
@@ -2450,7 +2450,7 @@ class CodeGenerator:
                 "{\n" % (i.name_lower, p.name_lower, i.camel_name, p.arg.ctype_in)
             )
             self.outfile.write(
-                '  g_object_set (G_OBJECT (object), "%s", value, NULL);\n'
+                '  xobject_set (G_OBJECT (object), "%s", value, NULL);\n'
                 % (p.name_hyphen)
             )
             self.outfile.write("}\n")
@@ -2518,7 +2518,7 @@ class CodeGenerator:
                 )
             if m.unix_fd:
                 self.outfile.write(
-                    " * @fd_list: (nullable): A #GUnixFDList or %NULL.\n"
+                    " * @fd_list: (nullable): A #xunix_fd_list_t or %NULL.\n"
                 )
             self.outfile.write(
                 self.docbook_gen.expand(
@@ -2527,7 +2527,7 @@ class CodeGenerator:
                     " * @user_data: User data to pass to @callback.\n"
                     " *\n"
                     " * Asynchronously invokes the %s.%s() D-Bus method on @proxy.\n"
-                    " * When the operation is finished, @callback will be invoked in the thread-default main loop of the thread you are calling this method from (see g_main_context_push_thread_default()).\n"
+                    " * When the operation is finished, @callback will be invoked in the thread-default main loop of the thread you are calling this method from (see xmain_context_push_thread_default()).\n"
                     " * You can then call %s_call_%s_finish() to get the result of the operation.\n"
                     " *\n"
                     " * See %s_call_%s_sync() for the synchronous, blocking version of this method.\n"
@@ -2555,7 +2555,7 @@ class CodeGenerator:
                     ",\n    GDBusCallFlags call_flags" ",\n    xint_t timeout_msec"
                 )
             if m.unix_fd:
-                self.outfile.write(",\n    GUnixFDList *fd_list")
+                self.outfile.write(",\n    xunix_fd_list_t *fd_list")
             self.outfile.write(
                 ",\n"
                 "    xcancellable_t *cancellable,\n"
@@ -2569,7 +2569,7 @@ class CodeGenerator:
                 )
             else:
                 self.outfile.write("  g_dbus_proxy_call (G_DBUS_PROXY (proxy),\n")
-            self.outfile.write('    "%s",\n' '    g_variant_new ("(' % (m.name))
+            self.outfile.write('    "%s",\n' '    xvariant_new ("(' % (m.name))
             for a in m.in_args:
                 self.outfile.write("%s" % (a.format_in))
             self.outfile.write(')"')
@@ -2599,7 +2599,7 @@ class CodeGenerator:
                 )
             if m.unix_fd:
                 self.outfile.write(
-                    " * @out_fd_list: (out) (optional): Return location for a #GUnixFDList or %NULL to ignore.\n"
+                    " * @out_fd_list: (out) (optional): Return location for a #xunix_fd_list_t or %NULL to ignore.\n"
                 )
             self.outfile.write(
                 self.docbook_gen.expand(
@@ -2622,7 +2622,7 @@ class CodeGenerator:
             for a in m.out_args:
                 self.outfile.write(",\n    %sout_%s" % (a.ctype_out, a.name))
             if m.unix_fd:
-                self.outfile.write(",\n    GUnixFDList **out_fd_list")
+                self.outfile.write(",\n    xunix_fd_list_t **out_fd_list")
             self.outfile.write(
                 ",\n"
                 "    xasync_result_t *res,\n"
@@ -2639,13 +2639,13 @@ class CodeGenerator:
                     "  _ret = g_dbus_proxy_call_finish (G_DBUS_PROXY (proxy), res, error);\n"
                 )
             self.outfile.write("  if (_ret == NULL)\n" "    goto _out;\n")
-            self.outfile.write("  g_variant_get (_ret,\n" '                 "(')
+            self.outfile.write("  xvariant_get (_ret,\n" '                 "(')
             for a in m.out_args:
                 self.outfile.write("%s" % (a.format_out))
             self.outfile.write(')"')
             for a in m.out_args:
                 self.outfile.write(",\n                 out_%s" % (a.name))
-            self.outfile.write(");\n" "  g_variant_unref (_ret);\n")
+            self.outfile.write(");\n" "  xvariant_unref (_ret);\n")
             self.outfile.write("_out:\n" "  return _ret != NULL;\n" "}\n" "\n")
 
             # sync
@@ -2668,7 +2668,7 @@ class CodeGenerator:
                 )
             if m.unix_fd:
                 self.outfile.write(
-                    " * @fd_list: (nullable): A #GUnixFDList or %NULL.\n"
+                    " * @fd_list: (nullable): A #xunix_fd_list_t or %NULL.\n"
                 )
             for a in m.out_args:
                 self.outfile.write(
@@ -2677,7 +2677,7 @@ class CodeGenerator:
                 )
             if m.unix_fd:
                 self.outfile.write(
-                    " * @out_fd_list: (out): Return location for a #GUnixFDList or %NULL.\n"
+                    " * @out_fd_list: (out): Return location for a #xunix_fd_list_t or %NULL.\n"
                 )
             self.outfile.write(
                 self.docbook_gen.expand(
@@ -2706,11 +2706,11 @@ class CodeGenerator:
                     ",\n    GDBusCallFlags call_flags" ",\n    xint_t timeout_msec"
                 )
             if m.unix_fd:
-                self.outfile.write(",\n    GUnixFDList  *fd_list")
+                self.outfile.write(",\n    xunix_fd_list_t  *fd_list")
             for a in m.out_args:
                 self.outfile.write(",\n    %sout_%s" % (a.ctype_out, a.name))
             if m.unix_fd:
-                self.outfile.write(",\n    GUnixFDList **out_fd_list")
+                self.outfile.write(",\n    xunix_fd_list_t **out_fd_list")
             self.outfile.write(
                 ",\n"
                 "    xcancellable_t *cancellable,\n"
@@ -2726,7 +2726,7 @@ class CodeGenerator:
                 self.outfile.write(
                     "  _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),\n"
                 )
-            self.outfile.write('    "%s",\n' '    g_variant_new ("(' % (m.name))
+            self.outfile.write('    "%s",\n' '    xvariant_new ("(' % (m.name))
             for a in m.in_args:
                 self.outfile.write("%s" % (a.format_in))
             self.outfile.write(')"')
@@ -2745,13 +2745,13 @@ class CodeGenerator:
                 "  if (_ret == NULL)\n"
                 "    goto _out;\n"
             )
-            self.outfile.write("  g_variant_get (_ret,\n" '                 "(')
+            self.outfile.write("  xvariant_get (_ret,\n" '                 "(')
             for a in m.out_args:
                 self.outfile.write("%s" % (a.format_out))
             self.outfile.write(')"')
             for a in m.out_args:
                 self.outfile.write(",\n                 out_%s" % (a.name))
-            self.outfile.write(");\n" "  g_variant_unref (_ret);\n")
+            self.outfile.write(");\n" "  xvariant_unref (_ret);\n")
             self.outfile.write("_out:\n" "  return _ret != NULL;\n" "}\n" "\n")
 
     # ---------------------------------------------------------------------------------------------------
@@ -2762,19 +2762,19 @@ class CodeGenerator:
                 "/**\n"
                 " * %s_complete_%s:\n"
                 " * @object: A #%s.\n"
-                " * @invocation: (transfer full): A #GDBusMethodInvocation.\n"
+                " * @invocation: (transfer full): A #xdbus_method_invocation_t.\n"
                 % (i.name_lower, m.name_lower, i.camel_name)
             )
             if m.unix_fd:
                 self.outfile.write(
-                    " * @fd_list: (nullable): A #GUnixFDList or %NULL.\n"
+                    " * @fd_list: (nullable): A #xunix_fd_list_t or %NULL.\n"
                 )
             for a in m.out_args:
                 self.outfile.write(" * @%s: Parameter to return.\n" % (a.name))
             self.outfile.write(
                 self.docbook_gen.expand(
                     " *\n"
-                    " * Helper function used in service implementations to finish handling invocations of the %s.%s() D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.\n"
+                    " * Helper function used in service implementations to finish handling invocations of the %s.%s() D-Bus method. If you instead want to finish handling an invocation by returning an error, use xdbus_method_invocation_return_error() or similar.\n"
                     " *\n"
                     " * This method will free @invocation, you cannot use it afterwards.\n"
                     % (i.name, m.name),
@@ -2786,24 +2786,24 @@ class CodeGenerator:
                 "void\n"
                 "%s_complete_%s (\n"
                 "    %s *object G_GNUC_UNUSED,\n"
-                "    GDBusMethodInvocation *invocation"
+                "    xdbus_method_invocation_t *invocation"
                 % (i.name_lower, m.name_lower, i.camel_name)
             )
             if m.unix_fd:
-                self.outfile.write(",\n    GUnixFDList *fd_list")
+                self.outfile.write(",\n    xunix_fd_list_t *fd_list")
             for a in m.out_args:
                 self.outfile.write(",\n    %s%s" % (a.ctype_in, a.name))
             self.outfile.write(")\n" "{\n")
 
             if m.unix_fd:
                 self.outfile.write(
-                    "  g_dbus_method_invocation_return_value_with_unix_fd_list (invocation,\n"
-                    '    g_variant_new ("('
+                    "  xdbus_method_invocation_return_value_with_unix_fd_list (invocation,\n"
+                    '    xvariant_new ("('
                 )
             else:
                 self.outfile.write(
-                    "  g_dbus_method_invocation_return_value (invocation,\n"
-                    '    g_variant_new ("('
+                    "  xdbus_method_invocation_return_value (invocation,\n"
+                    '    xvariant_new ("('
                 )
             for a in m.out_args:
                 self.outfile.write("%s" % (a.format_in))
@@ -2916,13 +2916,13 @@ class CodeGenerator:
             self.outfile.write(
                 " G_GNUC_UNUSED,\n"
                 "  xuint_t         prop_id G_GNUC_UNUSED,\n"
-                "  GValue       *value G_GNUC_UNUSED,\n"
+                "  xvalue_t       *value G_GNUC_UNUSED,\n"
             )
         else:
             self.outfile.write(
-                ",\n" "  xuint_t         prop_id,\n" "  GValue       *value,\n"
+                ",\n" "  xuint_t         prop_id,\n" "  xvalue_t       *value,\n"
             )
-        self.outfile.write("  GParamSpec   *pspec G_GNUC_UNUSED)\n" "{\n")
+        self.outfile.write("  xparam_spec_t   *pspec G_GNUC_UNUSED)\n" "{\n")
         if len(i.properties) > 0:
             self.outfile.write(
                 "  const _ExtendedGDBusPropertyInfo *info;\n"
@@ -2932,7 +2932,7 @@ class CodeGenerator:
                 "  variant = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (object), info->parent_struct.name);\n"
                 "  if (info->use_gvariant)\n"
                 "    {\n"
-                "      g_value_set_variant (value, variant);\n"
+                "      xvalue_set_variant (value, variant);\n"
                 "    }\n"
                 "  else\n"
                 "    {\n"
@@ -2942,13 +2942,13 @@ class CodeGenerator:
                 "        g_dbus_gvariant_to_gvalue (variant, value);\n"
                 "    }\n"
                 "  if (variant != NULL)\n"
-                "    g_variant_unref (variant);\n" % (len(i.properties), i.name_lower)
+                "    xvariant_unref (variant);\n" % (len(i.properties), i.name_lower)
             )
         self.outfile.write("}\n" "\n")
         if len(i.properties) > 0:
             self.outfile.write(
                 "static void\n"
-                "%s_proxy_set_property_cb (GDBusProxy *proxy,\n"
+                "%s_proxy_set_property_cb (xdbus_proxy_t *proxy,\n"
                 "  xasync_result_t *res,\n"
                 "  xpointer_t      user_data)\n"
                 "{\n" % (i.name_lower)
@@ -2964,11 +2964,11 @@ class CodeGenerator:
                 "      g_warning (\"Error setting property '%%s' on interface %s: %%s (%%s, %%d)\",\n"
                 "                 info->parent_struct.name, \n"
                 "                 error->message, g_quark_to_string (error->domain), error->code);\n"
-                "      g_error_free (error);\n"
+                "      xerror_free (error);\n"
                 "    }\n"
                 "  else\n"
                 "    {\n"
-                "      g_variant_unref (_ret);\n"
+                "      xvariant_unref (_ret);\n"
                 "    }\n" % (i.name)
             )
             self.outfile.write("}\n" "\n")
@@ -2977,15 +2977,15 @@ class CodeGenerator:
             self.outfile.write(
                 "xobject_t      *object G_GNUC_UNUSED,\n"
                 "  xuint_t         prop_id G_GNUC_UNUSED,\n"
-                "  const GValue *value G_GNUC_UNUSED,\n"
+                "  const xvalue_t *value G_GNUC_UNUSED,\n"
             )
         else:
             self.outfile.write(
                 "xobject_t      *object,\n"
                 "  xuint_t         prop_id,\n"
-                "  const GValue *value,\n"
+                "  const xvalue_t *value,\n"
             )
-        self.outfile.write("  GParamSpec   *pspec G_GNUC_UNUSED)\n" "{\n")
+        self.outfile.write("  xparam_spec_t   *pspec G_GNUC_UNUSED)\n" "{\n")
         if len(i.properties) > 0:
             self.outfile.write(
                 "  const _ExtendedGDBusPropertyInfo *info;\n"
@@ -2995,11 +2995,11 @@ class CodeGenerator:
                 "  variant = g_dbus_gvalue_to_gvariant (value, G_VARIANT_TYPE (info->parent_struct.signature));\n"
                 "  g_dbus_proxy_call (G_DBUS_PROXY (object),\n"
                 '    "org.freedesktop.DBus.Properties.Set",\n'
-                '    g_variant_new ("(ssv)", "%s", info->parent_struct.name, variant),\n'
+                '    xvariant_new ("(ssv)", "%s", info->parent_struct.name, variant),\n'
                 "    G_DBUS_CALL_FLAGS_NONE,\n"
                 "    -1,\n"
-                "    NULL, (xasync_ready_callback_t) %s_proxy_set_property_cb, (GDBusPropertyInfo *) &info->parent_struct);\n"
-                "  g_variant_unref (variant);\n"
+                "    NULL, (xasync_ready_callback_t) %s_proxy_set_property_cb, (xdbus_property_info_t *) &info->parent_struct);\n"
+                "  xvariant_unref (variant);\n"
                 % (len(i.properties), i.name_lower, i.name, i.name_lower)
             )
         self.outfile.write("}\n" "\n")
@@ -3007,7 +3007,7 @@ class CodeGenerator:
         # signal received
         self.outfile.write(
             "static void\n"
-            "%s_proxy_g_signal (GDBusProxy *proxy,\n"
+            "%s_proxy_g_signal (xdbus_proxy_t *proxy,\n"
             "  const xchar_t *sender_name G_GNUC_UNUSED,\n"
             "  const xchar_t *signal_name,\n"
             "  xvariant_t *parameters)\n"
@@ -3015,40 +3015,40 @@ class CodeGenerator:
         )
         self.outfile.write(
             "  _ExtendedGDBusSignalInfo *info;\n"
-            "  GVariantIter iter;\n"
+            "  xvariant_iter_t iter;\n"
             "  xvariant_t *child;\n"
-            "  GValue *paramv;\n"
+            "  xvalue_t *paramv;\n"
             "  xsize_t num_params;\n"
             "  xsize_t n;\n"
             "  xuint_t signal_id;\n"
         )
         # Note: info could be NULL if we are talking to a newer version of the interface
         self.outfile.write(
-            "  info = (_ExtendedGDBusSignalInfo *) g_dbus_interface_info_lookup_signal ((GDBusInterfaceInfo *) &_%s_interface_info.parent_struct, signal_name);\n"
+            "  info = (_ExtendedGDBusSignalInfo *) g_dbus_interface_info_lookup_signal ((xdbus_interface_info_t *) &_%s_interface_info.parent_struct, signal_name);\n"
             "  if (info == NULL)\n"
             "    return;\n" % (i.name_lower)
         )
         self.outfile.write(
-            "  num_params = g_variant_n_children (parameters);\n"
-            "  paramv = g_new0 (GValue, num_params + 1);\n"
-            "  g_value_init (&paramv[0], %sTYPE_%s);\n"
-            "  g_value_set_object (&paramv[0], proxy);\n" % (i.ns_upper, i.name_upper)
+            "  num_params = xvariant_n_children (parameters);\n"
+            "  paramv = g_new0 (xvalue_t, num_params + 1);\n"
+            "  xvalue_init (&paramv[0], %sTYPE_%s);\n"
+            "  xvalue_set_object (&paramv[0], proxy);\n" % (i.ns_upper, i.name_upper)
         )
         self.outfile.write(
-            "  g_variant_iter_init (&iter, parameters);\n"
+            "  xvariant_iter_init (&iter, parameters);\n"
             "  n = 1;\n"
-            "  while ((child = g_variant_iter_next_value (&iter)) != NULL)\n"
+            "  while ((child = xvariant_iter_next_value (&iter)) != NULL)\n"
             "    {\n"
             "      _ExtendedGDBusArgInfo *arg_info = (_ExtendedGDBusArgInfo *) info->parent_struct.args[n - 1];\n"
             "      if (arg_info->use_gvariant)\n"
             "        {\n"
-            "          g_value_init (&paramv[n], XTYPE_VARIANT);\n"
-            "          g_value_set_variant (&paramv[n], child);\n"
+            "          xvalue_init (&paramv[n], XTYPE_VARIANT);\n"
+            "          xvalue_set_variant (&paramv[n], child);\n"
             "          n++;\n"
             "        }\n"
             "      else\n"
             "        g_dbus_gvariant_to_gvalue (child, &paramv[n++]);\n"
-            "      g_variant_unref (child);\n"
+            "      xvariant_unref (child);\n"
             "    }\n"
         )
         self.outfile.write(
@@ -3058,7 +3058,7 @@ class CodeGenerator:
         self.outfile.write("  g_signal_emitv (paramv, signal_id, 0, NULL);\n")
         self.outfile.write(
             "  for (n = 0; n < num_params + 1; n++)\n"
-            "    g_value_unset (&paramv[n]);\n"
+            "    xvalue_unset (&paramv[n]);\n"
             "  g_free (paramv);\n"
         )
         self.outfile.write("}\n" "\n")
@@ -3066,7 +3066,7 @@ class CodeGenerator:
         # property changed
         self.outfile.write(
             "static void\n"
-            "%s_proxy_g_properties_changed (GDBusProxy *_proxy,\n"
+            "%s_proxy_g_properties_changed (xdbus_proxy_t *_proxy,\n"
             "  xvariant_t *changed_properties,\n"
             "  const xchar_t *const *invalidated_properties)\n"
             "{\n" % (i.name_lower)
@@ -3076,23 +3076,23 @@ class CodeGenerator:
             "  %sProxy *proxy = %s%s_PROXY (_proxy);\n"
             "  xuint_t n;\n"
             "  const xchar_t *key;\n"
-            "  GVariantIter *iter;\n"
+            "  xvariant_iter_t *iter;\n"
             "  _ExtendedGDBusPropertyInfo *info;\n"
-            '  g_variant_get (changed_properties, "a{sv}", &iter);\n'
-            '  while (g_variant_iter_next (iter, "{&sv}", &key, NULL))\n'
+            '  xvariant_get (changed_properties, "a{sv}", &iter);\n'
+            '  while (xvariant_iter_next (iter, "{&sv}", &key, NULL))\n'
             "    {\n"
-            "      info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property ((GDBusInterfaceInfo *) &_%s_interface_info.parent_struct, key);\n"
+            "      info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property ((xdbus_interface_info_t *) &_%s_interface_info.parent_struct, key);\n"
             "      g_datalist_remove_data (&proxy->priv->qdata, key);\n"
             "      if (info != NULL)\n"
-            "        g_object_notify (G_OBJECT (proxy), info->hyphen_name);\n"
+            "        xobject_notify (G_OBJECT (proxy), info->hyphen_name);\n"
             "    }\n"
-            "  g_variant_iter_free (iter);\n"
+            "  xvariant_iter_free (iter);\n"
             "  for (n = 0; invalidated_properties[n] != NULL; n++)\n"
             "    {\n"
-            "      info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property ((GDBusInterfaceInfo *) &_%s_interface_info.parent_struct, invalidated_properties[n]);\n"
+            "      info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property ((xdbus_interface_info_t *) &_%s_interface_info.parent_struct, invalidated_properties[n]);\n"
             "      g_datalist_remove_data (&proxy->priv->qdata, invalidated_properties[n]);\n"
             "      if (info != NULL)\n"
-            "        g_object_notify (G_OBJECT (proxy), info->hyphen_name);\n"
+            "        xobject_notify (G_OBJECT (proxy), info->hyphen_name);\n"
             "    }\n"
             "}\n"
             "\n" % (i.camel_name, i.ns_upper, i.name_upper, i.name_lower, i.name_lower)
@@ -3129,9 +3129,9 @@ class CodeGenerator:
             #
             free_container = False
             if (
-                p.arg.gvariant_get == "g_variant_get_strv"
-                or p.arg.gvariant_get == "g_variant_get_objv"
-                or p.arg.gvariant_get == "g_variant_get_bytestring_array"
+                p.arg.gvariant_get == "xvariant_get_strv"
+                or p.arg.gvariant_get == "xvariant_get_objv"
+                or p.arg.gvariant_get == "xvariant_get_bytestring_array"
             ):
                 free_container = True
             # If already using an old value for strv, objv, bytestring_array (see below),
@@ -3151,15 +3151,15 @@ class CodeGenerator:
             if p.arg.gtype == "XTYPE_VARIANT":
                 self.outfile.write("  value = variant;\n")
                 self.outfile.write("  if (variant != NULL)\n")
-                self.outfile.write("    g_variant_unref (variant);\n")
+                self.outfile.write("    xvariant_unref (variant);\n")
             else:
                 self.outfile.write("  if (variant != NULL)\n" "    {\n")
                 extra_len = ""
                 if (
-                    p.arg.gvariant_get == "g_variant_get_string"
-                    or p.arg.gvariant_get == "g_variant_get_strv"
-                    or p.arg.gvariant_get == "g_variant_get_objv"
-                    or p.arg.gvariant_get == "g_variant_get_bytestring_array"
+                    p.arg.gvariant_get == "xvariant_get_string"
+                    or p.arg.gvariant_get == "xvariant_get_strv"
+                    or p.arg.gvariant_get == "xvariant_get_objv"
+                    or p.arg.gvariant_get == "xvariant_get_bytestring_array"
                 ):
                     extra_len = ", NULL"
                 self.outfile.write(
@@ -3170,7 +3170,7 @@ class CodeGenerator:
                         '      g_datalist_set_data_full (&proxy->priv->qdata, "%s", (xpointer_t) value, g_free);\n'
                         % (p.name)
                     )
-                self.outfile.write("      g_variant_unref (variant);\n")
+                self.outfile.write("      xvariant_unref (variant);\n")
                 self.outfile.write("    }\n")
             self.outfile.write("  return value;\n")
             self.outfile.write("}\n")
@@ -3231,7 +3231,7 @@ class CodeGenerator:
             )
         self.outfile.write(
             "#if XPL_VERSION_MAX_ALLOWED < XPL_VERSION_2_38\n"
-            "  g_type_class_add_private (klass, sizeof (%sProxyPrivate));\n"
+            "  xtype_class_add_private (klass, sizeof (%sProxyPrivate));\n"
             "#endif\n" % (i.camel_name)
         )
         self.outfile.write("}\n" "\n")
@@ -3257,7 +3257,7 @@ class CodeGenerator:
             self.docbook_gen.expand(
                 "/**\n"
                 " * %s_proxy_new:\n"
-                " * @connection: A #GDBusConnection.\n"
+                " * @connection: A #xdbus_connection_t.\n"
                 " * @flags: Flags from the #GDBusProxyFlags enumeration.\n"
                 " * @name: (nullable): A bus name (well-known or unique) or %%NULL if @connection is not a message bus connection.\n"
                 " * @object_path: An object path.\n"
@@ -3267,7 +3267,7 @@ class CodeGenerator:
                 " *\n"
                 " * Asynchronously creates a proxy for the D-Bus interface #%s. See g_dbus_proxy_new() for more details.\n"
                 " *\n"
-                " * When the operation is finished, @callback will be invoked in the thread-default main loop of the thread you are calling this method from (see g_main_context_push_thread_default()).\n"
+                " * When the operation is finished, @callback will be invoked in the thread-default main loop of the thread you are calling this method from (see xmain_context_push_thread_default()).\n"
                 " * You can then call %s_proxy_new_finish() to get the result of the operation.\n"
                 " *\n"
                 " * See %s_proxy_new_sync() for the synchronous, blocking version of this constructor.\n"
@@ -3279,7 +3279,7 @@ class CodeGenerator:
         self.outfile.write(
             "void\n"
             "%s_proxy_new (\n"
-            "    GDBusConnection     *connection,\n"
+            "    xdbus_connection_t     *connection,\n"
             "    GDBusProxyFlags      flags,\n"
             "    const xchar_t         *name,\n"
             "    const xchar_t         *object_path,\n"
@@ -3287,7 +3287,7 @@ class CodeGenerator:
             "    xasync_ready_callback_t  callback,\n"
             "    xpointer_t             user_data)\n"
             "{\n"
-            '  g_async_initable_new_async (%sTYPE_%s_PROXY, G_PRIORITY_DEFAULT, cancellable, callback, user_data, "g-flags", flags, "g-name", name, "g-connection", connection, "g-object-path", object_path, "g-interface-name", "%s", NULL);\n'
+            '  xasync_initable_new_async (%sTYPE_%s_PROXY, G_PRIORITY_DEFAULT, cancellable, callback, user_data, "g-flags", flags, "g-name", name, "g-connection", connection, "g-object-path", object_path, "g-interface-name", "%s", NULL);\n'
             "}\n"
             "\n" % (i.name_lower, i.ns_upper, i.name_upper, i.name)
         )
@@ -3311,9 +3311,9 @@ class CodeGenerator:
             "{\n"
             "  xobject_t *ret;\n"
             "  xobject_t *source_object;\n"
-            "  source_object = g_async_result_get_source_object (res);\n"
-            "  ret = g_async_initable_new_finish (G_ASYNC_INITABLE (source_object), res, error);\n"
-            "  g_object_unref (source_object);\n"
+            "  source_object = xasync_result_get_source_object (res);\n"
+            "  ret = xasync_initable_new_finish (XASYNC_INITABLE (source_object), res, error);\n"
+            "  xobject_unref (source_object);\n"
             "  if (ret != NULL)\n"
             "    return %s%s (ret);\n"
             "  else\n"
@@ -3325,7 +3325,7 @@ class CodeGenerator:
             self.docbook_gen.expand(
                 "/**\n"
                 " * %s_proxy_new_sync:\n"
-                " * @connection: A #GDBusConnection.\n"
+                " * @connection: A #xdbus_connection_t.\n"
                 " * @flags: Flags from the #GDBusProxyFlags enumeration.\n"
                 " * @name: (nullable): A bus name (well-known or unique) or %%NULL if @connection is not a message bus connection.\n"
                 " * @object_path: An object path.\n"
@@ -3347,15 +3347,15 @@ class CodeGenerator:
         self.outfile.write(
             "%s *\n"
             "%s_proxy_new_sync (\n"
-            "    GDBusConnection     *connection,\n"
+            "    xdbus_connection_t     *connection,\n"
             "    GDBusProxyFlags      flags,\n"
             "    const xchar_t         *name,\n"
             "    const xchar_t         *object_path,\n"
             "    xcancellable_t        *cancellable,\n"
             "    xerror_t             **error)\n"
             "{\n"
-            "  GInitable *ret;\n"
-            '  ret = g_initable_new (%sTYPE_%s_PROXY, cancellable, error, "g-flags", flags, "g-name", name, "g-connection", connection, "g-object-path", object_path, "g-interface-name", "%s", NULL);\n'
+            "  xinitable_t *ret;\n"
+            '  ret = xinitable_new (%sTYPE_%s_PROXY, cancellable, error, "g-flags", flags, "g-name", name, "g-connection", connection, "g-object-path", object_path, "g-interface-name", "%s", NULL);\n'
             "  if (ret != NULL)\n"
             "    return %s%s (ret);\n"
             "  else\n"
@@ -3385,9 +3385,9 @@ class CodeGenerator:
                 " * @callback: A #xasync_ready_callback_t to call when the request is satisfied.\n"
                 " * @user_data: User data to pass to @callback.\n"
                 " *\n"
-                " * Like %s_proxy_new() but takes a #GBusType instead of a #GDBusConnection.\n"
+                " * Like %s_proxy_new() but takes a #GBusType instead of a #xdbus_connection_t.\n"
                 " *\n"
-                " * When the operation is finished, @callback will be invoked in the thread-default main loop of the thread you are calling this method from (see g_main_context_push_thread_default()).\n"
+                " * When the operation is finished, @callback will be invoked in the thread-default main loop of the thread you are calling this method from (see xmain_context_push_thread_default()).\n"
                 " * You can then call %s_proxy_new_for_bus_finish() to get the result of the operation.\n"
                 " *\n"
                 " * See %s_proxy_new_for_bus_sync() for the synchronous, blocking version of this constructor.\n"
@@ -3407,7 +3407,7 @@ class CodeGenerator:
             "    xasync_ready_callback_t  callback,\n"
             "    xpointer_t             user_data)\n"
             "{\n"
-            '  g_async_initable_new_async (%sTYPE_%s_PROXY, G_PRIORITY_DEFAULT, cancellable, callback, user_data, "g-flags", flags, "g-name", name, "g-bus-type", bus_type, "g-object-path", object_path, "g-interface-name", "%s", NULL);\n'
+            '  xasync_initable_new_async (%sTYPE_%s_PROXY, G_PRIORITY_DEFAULT, cancellable, callback, user_data, "g-flags", flags, "g-name", name, "g-bus-type", bus_type, "g-object-path", object_path, "g-interface-name", "%s", NULL);\n'
             "}\n"
             "\n" % (i.name_lower, i.ns_upper, i.name_upper, i.name)
         )
@@ -3431,9 +3431,9 @@ class CodeGenerator:
             "{\n"
             "  xobject_t *ret;\n"
             "  xobject_t *source_object;\n"
-            "  source_object = g_async_result_get_source_object (res);\n"
-            "  ret = g_async_initable_new_finish (G_ASYNC_INITABLE (source_object), res, error);\n"
-            "  g_object_unref (source_object);\n"
+            "  source_object = xasync_result_get_source_object (res);\n"
+            "  ret = xasync_initable_new_finish (XASYNC_INITABLE (source_object), res, error);\n"
+            "  xobject_unref (source_object);\n"
             "  if (ret != NULL)\n"
             "    return %s%s (ret);\n"
             "  else\n"
@@ -3452,7 +3452,7 @@ class CodeGenerator:
                 " * @cancellable: (nullable): A #xcancellable_t or %%NULL.\n"
                 " * @error: Return location for error or %%NULL\n"
                 " *\n"
-                " * Like %s_proxy_new_sync() but takes a #GBusType instead of a #GDBusConnection.\n"
+                " * Like %s_proxy_new_sync() but takes a #GBusType instead of a #xdbus_connection_t.\n"
                 " *\n"
                 " * The calling thread is blocked until a reply is received.\n"
                 " *\n"
@@ -3474,8 +3474,8 @@ class CodeGenerator:
             "    xcancellable_t        *cancellable,\n"
             "    xerror_t             **error)\n"
             "{\n"
-            "  GInitable *ret;\n"
-            '  ret = g_initable_new (%sTYPE_%s_PROXY, cancellable, error, "g-flags", flags, "g-name", name, "g-bus-type", bus_type, "g-object-path", object_path, "g-interface-name", "%s", NULL);\n'
+            "  xinitable_t *ret;\n"
+            '  ret = xinitable_new (%sTYPE_%s_PROXY, cancellable, error, "g-flags", flags, "g-name", name, "g-bus-type", bus_type, "g-object-path", object_path, "g-interface-name", "%s", NULL);\n'
             "  if (ret != NULL)\n"
             "    return %s%s (ret);\n"
             "  else\n"
@@ -3532,11 +3532,11 @@ class CodeGenerator:
         self.outfile.write(
             "struct _%sSkeletonPrivate\n"
             "{\n"
-            "  GValue *properties;\n"
+            "  xvalue_t *properties;\n"
             "  xlist_t *changed_properties;\n"
-            "  GSource *changed_properties_idle_source;\n"
-            "  GMainContext *context;\n"
-            "  GMutex lock;\n"
+            "  xsource_t *changed_properties_idle_source;\n"
+            "  xmain_context_t *context;\n"
+            "  xmutex_t lock;\n"
             "};\n"
             "\n" % i.camel_name
         )
@@ -3544,64 +3544,64 @@ class CodeGenerator:
         self.outfile.write(
             "static void\n"
             "_%s_skeleton_handle_method_call (\n"
-            "  GDBusConnection *connection G_GNUC_UNUSED,\n"
+            "  xdbus_connection_t *connection G_GNUC_UNUSED,\n"
             "  const xchar_t *sender G_GNUC_UNUSED,\n"
             "  const xchar_t *object_path G_GNUC_UNUSED,\n"
             "  const xchar_t *interface_name,\n"
             "  const xchar_t *method_name,\n"
             "  xvariant_t *parameters,\n"
-            "  GDBusMethodInvocation *invocation,\n"
+            "  xdbus_method_invocation_t *invocation,\n"
             "  xpointer_t user_data)\n"
             "{\n"
             "  %sSkeleton *skeleton = %s%s_SKELETON (user_data);\n"
             "  _ExtendedGDBusMethodInfo *info;\n"
-            "  GVariantIter iter;\n"
+            "  xvariant_iter_t iter;\n"
             "  xvariant_t *child;\n"
-            "  GValue *paramv;\n"
+            "  xvalue_t *paramv;\n"
             "  xsize_t num_params;\n"
             "  xuint_t num_extra;\n"
             "  xsize_t n;\n"
             "  xuint_t signal_id;\n"
-            "  GValue return_value = G_VALUE_INIT;\n"
+            "  xvalue_t return_value = G_VALUE_INIT;\n"
             % (i.name_lower, i.camel_name, i.ns_upper, i.name_upper)
         )
         self.outfile.write(
-            "  info = (_ExtendedGDBusMethodInfo *) g_dbus_method_invocation_get_method_info (invocation);\n"
+            "  info = (_ExtendedGDBusMethodInfo *) xdbus_method_invocation_get_method_info (invocation);\n"
             "  g_assert (info != NULL);\n"
         )
         self.outfile.write(
-            "  num_params = g_variant_n_children (parameters);\n"
+            "  num_params = xvariant_n_children (parameters);\n"
             "  num_extra = info->pass_fdlist ? 3 : 2;"
-            "  paramv = g_new0 (GValue, num_params + num_extra);\n"
+            "  paramv = g_new0 (xvalue_t, num_params + num_extra);\n"
             "  n = 0;\n"
-            "  g_value_init (&paramv[n], %sTYPE_%s);\n"
-            "  g_value_set_object (&paramv[n++], skeleton);\n"
-            "  g_value_init (&paramv[n], XTYPE_DBUS_METHOD_INVOCATION);\n"
-            "  g_value_set_object (&paramv[n++], invocation);\n"
+            "  xvalue_init (&paramv[n], %sTYPE_%s);\n"
+            "  xvalue_set_object (&paramv[n++], skeleton);\n"
+            "  xvalue_init (&paramv[n], XTYPE_DBUS_METHOD_INVOCATION);\n"
+            "  xvalue_set_object (&paramv[n++], invocation);\n"
             "  if (info->pass_fdlist)\n"
             "    {\n"
             "#ifdef G_OS_UNIX\n"
-            "      g_value_init (&paramv[n], XTYPE_UNIX_FD_LIST);\n"
-            "      g_value_set_object (&paramv[n++], g_dbus_message_get_unix_fd_list (g_dbus_method_invocation_get_message (invocation)));\n"
+            "      xvalue_init (&paramv[n], XTYPE_UNIX_FD_LIST);\n"
+            "      xvalue_set_object (&paramv[n++], xdbus_message_get_unix_fd_list (xdbus_method_invocation_get_message (invocation)));\n"
             "#else\n"
             "      g_assert_not_reached ();\n"
             "#endif\n"
             "    }\n" % (i.ns_upper, i.name_upper)
         )
         self.outfile.write(
-            "  g_variant_iter_init (&iter, parameters);\n"
-            "  while ((child = g_variant_iter_next_value (&iter)) != NULL)\n"
+            "  xvariant_iter_init (&iter, parameters);\n"
+            "  while ((child = xvariant_iter_next_value (&iter)) != NULL)\n"
             "    {\n"
             "      _ExtendedGDBusArgInfo *arg_info = (_ExtendedGDBusArgInfo *) info->parent_struct.in_args[n - num_extra];\n"
             "      if (arg_info->use_gvariant)\n"
             "        {\n"
-            "          g_value_init (&paramv[n], XTYPE_VARIANT);\n"
-            "          g_value_set_variant (&paramv[n], child);\n"
+            "          xvalue_init (&paramv[n], XTYPE_VARIANT);\n"
+            "          xvalue_set_variant (&paramv[n], child);\n"
             "          n++;\n"
             "        }\n"
             "      else\n"
             "        g_dbus_gvariant_to_gvalue (child, &paramv[n++]);\n"
-            "      g_variant_unref (child);\n"
+            "      xvariant_unref (child);\n"
             "    }\n"
         )
         self.outfile.write(
@@ -3609,15 +3609,15 @@ class CodeGenerator:
             % (i.ns_upper, i.name_upper)
         )
         self.outfile.write(
-            "  g_value_init (&return_value, XTYPE_BOOLEAN);\n"
+            "  xvalue_init (&return_value, XTYPE_BOOLEAN);\n"
             "  g_signal_emitv (paramv, signal_id, 0, &return_value);\n"
-            "  if (!g_value_get_boolean (&return_value))\n"
-            '    g_dbus_method_invocation_return_error (invocation, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD, "Method %s is not implemented on interface %s", method_name, interface_name);\n'
-            "  g_value_unset (&return_value);\n"
+            "  if (!xvalue_get_boolean (&return_value))\n"
+            '    xdbus_method_invocation_return_error (invocation, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD, "Method %s is not implemented on interface %s", method_name, interface_name);\n'
+            "  xvalue_unset (&return_value);\n"
         )
         self.outfile.write(
             "  for (n = 0; n < num_params + num_extra; n++)\n"
-            "    g_value_unset (&paramv[n]);\n"
+            "    xvalue_unset (&paramv[n]);\n"
             "  g_free (paramv);\n"
         )
         self.outfile.write("}\n" "\n")
@@ -3625,7 +3625,7 @@ class CodeGenerator:
         self.outfile.write(
             "static xvariant_t *\n"
             "_%s_skeleton_handle_get_property (\n"
-            "  GDBusConnection *connection G_GNUC_UNUSED,\n"
+            "  xdbus_connection_t *connection G_GNUC_UNUSED,\n"
             "  const xchar_t *sender G_GNUC_UNUSED,\n"
             "  const xchar_t *object_path G_GNUC_UNUSED,\n"
             "  const xchar_t *interface_name G_GNUC_UNUSED,\n"
@@ -3634,27 +3634,27 @@ class CodeGenerator:
             "  xpointer_t user_data)\n"
             "{\n"
             "  %sSkeleton *skeleton = %s%s_SKELETON (user_data);\n"
-            "  GValue value = G_VALUE_INIT;\n"
-            "  GParamSpec *pspec;\n"
+            "  xvalue_t value = G_VALUE_INIT;\n"
+            "  xparam_spec_t *pspec;\n"
             "  _ExtendedGDBusPropertyInfo *info;\n"
             "  xvariant_t *ret;\n"
             % (i.name_lower, i.camel_name, i.ns_upper, i.name_upper)
         )
         self.outfile.write(
             "  ret = NULL;\n"
-            "  info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property ((GDBusInterfaceInfo *) &_%s_interface_info.parent_struct, property_name);\n"
+            "  info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property ((xdbus_interface_info_t *) &_%s_interface_info.parent_struct, property_name);\n"
             "  g_assert (info != NULL);\n"
-            "  pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (skeleton), info->hyphen_name);\n"
+            "  pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (skeleton), info->hyphen_name);\n"
             "  if (pspec == NULL)\n"
             "    {\n"
             '      g_set_error (error, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS, "No property with name %%s", property_name);\n'
             "    }\n"
             "  else\n"
             "    {\n"
-            "      g_value_init (&value, pspec->value_type);\n"
-            "      g_object_get_property (G_OBJECT (skeleton), info->hyphen_name, &value);\n"
+            "      xvalue_init (&value, pspec->value_type);\n"
+            "      xobject_get_property (G_OBJECT (skeleton), info->hyphen_name, &value);\n"
             "      ret = g_dbus_gvalue_to_gvariant (&value, G_VARIANT_TYPE (info->parent_struct.signature));\n"
-            "      g_value_unset (&value);\n"
+            "      xvalue_unset (&value);\n"
             "    }\n"
             "  return ret;\n"
             "}\n"
@@ -3664,7 +3664,7 @@ class CodeGenerator:
         self.outfile.write(
             "static xboolean_t\n"
             "_%s_skeleton_handle_set_property (\n"
-            "  GDBusConnection *connection G_GNUC_UNUSED,\n"
+            "  xdbus_connection_t *connection G_GNUC_UNUSED,\n"
             "  const xchar_t *sender G_GNUC_UNUSED,\n"
             "  const xchar_t *object_path G_GNUC_UNUSED,\n"
             "  const xchar_t *interface_name G_GNUC_UNUSED,\n"
@@ -3674,16 +3674,16 @@ class CodeGenerator:
             "  xpointer_t user_data)\n"
             "{\n"
             "  %sSkeleton *skeleton = %s%s_SKELETON (user_data);\n"
-            "  GValue value = G_VALUE_INIT;\n"
-            "  GParamSpec *pspec;\n"
+            "  xvalue_t value = G_VALUE_INIT;\n"
+            "  xparam_spec_t *pspec;\n"
             "  _ExtendedGDBusPropertyInfo *info;\n"
             "  xboolean_t ret;\n" % (i.name_lower, i.camel_name, i.ns_upper, i.name_upper)
         )
         self.outfile.write(
             "  ret = FALSE;\n"
-            "  info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property ((GDBusInterfaceInfo *) &_%s_interface_info.parent_struct, property_name);\n"
+            "  info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property ((xdbus_interface_info_t *) &_%s_interface_info.parent_struct, property_name);\n"
             "  g_assert (info != NULL);\n"
-            "  pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (skeleton), info->hyphen_name);\n"
+            "  pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (skeleton), info->hyphen_name);\n"
             "  if (pspec == NULL)\n"
             "    {\n"
             '      g_set_error (error, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS, "No property with name %%s", property_name);\n'
@@ -3691,11 +3691,11 @@ class CodeGenerator:
             "  else\n"
             "    {\n"
             "      if (info->use_gvariant)\n"
-            "        g_value_set_variant (&value, variant);\n"
+            "        xvalue_set_variant (&value, variant);\n"
             "      else\n"
             "        g_dbus_gvariant_to_gvalue (variant, &value);\n"
-            "      g_object_set_property (G_OBJECT (skeleton), info->hyphen_name, &value);\n"
-            "      g_value_unset (&value);\n"
+            "      xobject_set_property (G_OBJECT (skeleton), info->hyphen_name, &value);\n"
+            "      xvalue_unset (&value);\n"
             "      ret = TRUE;\n"
             "    }\n"
             "  return ret;\n"
@@ -3704,7 +3704,7 @@ class CodeGenerator:
         )
 
         self.outfile.write(
-            "static const GDBusInterfaceVTable _%s_skeleton_vtable =\n"
+            "static const xdbus_interface_vtable_t _%s_skeleton_vtable =\n"
             "{\n"
             "  _%s_skeleton_handle_method_call,\n"
             "  _%s_skeleton_handle_get_property,\n"
@@ -3715,53 +3715,53 @@ class CodeGenerator:
         )
 
         self.outfile.write(
-            "static GDBusInterfaceInfo *\n"
-            "%s_skeleton_dbus_interface_get_info (GDBusInterfaceSkeleton *skeleton G_GNUC_UNUSED)\n"
+            "static xdbus_interface_info_t *\n"
+            "%s_skeleton_dbus_interface_get_info (xdbus_interface_skeleton_t *skeleton G_GNUC_UNUSED)\n"
             "{\n"
             "  return %s_interface_info ();\n" % (i.name_lower, i.name_lower)
         )
         self.outfile.write("}\n" "\n")
 
         self.outfile.write(
-            "static GDBusInterfaceVTable *\n"
-            "%s_skeleton_dbus_interface_get_vtable (GDBusInterfaceSkeleton *skeleton G_GNUC_UNUSED)\n"
+            "static xdbus_interface_vtable_t *\n"
+            "%s_skeleton_dbus_interface_get_vtable (xdbus_interface_skeleton_t *skeleton G_GNUC_UNUSED)\n"
             "{\n"
-            "  return (GDBusInterfaceVTable *) &_%s_skeleton_vtable;\n"
+            "  return (xdbus_interface_vtable_t *) &_%s_skeleton_vtable;\n"
             % (i.name_lower, i.name_lower)
         )
         self.outfile.write("}\n" "\n")
 
         self.outfile.write(
             "static xvariant_t *\n"
-            "%s_skeleton_dbus_interface_get_properties (GDBusInterfaceSkeleton *_skeleton)\n"
+            "%s_skeleton_dbus_interface_get_properties (xdbus_interface_skeleton_t *_skeleton)\n"
             "{\n"
             "  %sSkeleton *skeleton = %s%s_SKELETON (_skeleton);\n"
             % (i.name_lower, i.camel_name, i.ns_upper, i.name_upper)
         )
         self.outfile.write(
             "\n"
-            "  GVariantBuilder builder;\n"
+            "  xvariant_builder_t builder;\n"
             "  xuint_t n;\n"
-            '  g_variant_builder_init (&builder, G_VARIANT_TYPE ("a{sv}"));\n'
+            '  xvariant_builder_init (&builder, G_VARIANT_TYPE ("a{sv}"));\n'
             "  if (_%s_interface_info.parent_struct.properties == NULL)\n"
             "    goto out;\n"
             "  for (n = 0; _%s_interface_info.parent_struct.properties[n] != NULL; n++)\n"
             "    {\n"
-            "      GDBusPropertyInfo *info = _%s_interface_info.parent_struct.properties[n];\n"
+            "      xdbus_property_info_t *info = _%s_interface_info.parent_struct.properties[n];\n"
             "      if (info->flags & G_DBUS_PROPERTY_INFO_FLAGS_READABLE)\n"
             "        {\n"
             "          xvariant_t *value;\n"
             '          value = _%s_skeleton_handle_get_property (g_dbus_interface_skeleton_get_connection (G_DBUS_INTERFACE_SKELETON (skeleton)), NULL, g_dbus_interface_skeleton_get_object_path (G_DBUS_INTERFACE_SKELETON (skeleton)), "%s", info->name, NULL, skeleton);\n'
             "          if (value != NULL)\n"
             "            {\n"
-            "              g_variant_take_ref (value);\n"
-            '              g_variant_builder_add (&builder, "{sv}", info->name, value);\n'
-            "              g_variant_unref (value);\n"
+            "              xvariant_take_ref (value);\n"
+            '              xvariant_builder_add (&builder, "{sv}", info->name, value);\n'
+            "              xvariant_unref (value);\n"
             "            }\n"
             "        }\n"
             "    }\n"
             "out:\n"
-            "  return g_variant_builder_end (&builder);\n"
+            "  return xvariant_builder_end (&builder);\n"
             "}\n"
             "\n" % (i.name_lower, i.name_lower, i.name_lower, i.name_lower, i.name)
         )
@@ -3774,7 +3774,7 @@ class CodeGenerator:
 
         self.outfile.write(
             "static void\n"
-            "%s_skeleton_dbus_interface_flush (GDBusInterfaceSkeleton *_skeleton"
+            "%s_skeleton_dbus_interface_flush (xdbus_interface_skeleton_t *_skeleton"
             % (i.name_lower)
         )
         if len(i.properties) == 0:
@@ -3790,7 +3790,7 @@ class CodeGenerator:
                 "  g_mutex_lock (&skeleton->priv->lock);\n"
                 "  if (skeleton->priv->changed_properties_idle_source != NULL)\n"
                 "    {\n"
-                "      g_source_destroy (skeleton->priv->changed_properties_idle_source);\n"
+                "      xsource_destroy (skeleton->priv->changed_properties_idle_source);\n"
                 "      skeleton->priv->changed_properties_idle_source = NULL;\n"
                 "      emit_changed = TRUE;\n"
                 "    }\n"
@@ -3820,7 +3820,7 @@ class CodeGenerator:
                 % (i.camel_name, i.ns_upper, i.name_upper)
             )
             self.outfile.write(
-                "\n" '  signal_variant = g_variant_ref_sink (g_variant_new ("('
+                "\n" '  signal_variant = xvariant_ref_sink (xvariant_new ("('
             )
             for a in s.args:
                 self.outfile.write("%s" % (a.format_in))
@@ -3832,14 +3832,14 @@ class CodeGenerator:
             self.outfile.write(
                 "  for (l = connections; l != NULL; l = l->next)\n"
                 "    {\n"
-                "      GDBusConnection *connection = l->data;\n"
+                "      xdbus_connection_t *connection = l->data;\n"
                 "      g_dbus_connection_emit_signal (connection,\n"
                 '        NULL, g_dbus_interface_skeleton_get_object_path (G_DBUS_INTERFACE_SKELETON (skeleton)), "%s", "%s",\n'
                 "        signal_variant, NULL);\n"
                 "    }\n" % (i.name, s.name)
             )
-            self.outfile.write("  g_variant_unref (signal_variant);\n")
-            self.outfile.write("  g_list_free_full (connections, g_object_unref);\n")
+            self.outfile.write("  xvariant_unref (signal_variant);\n")
+            self.outfile.write("  xlist_free_full (connections, xobject_unref);\n")
             self.outfile.write("}\n" "\n")
 
         self.outfile.write(
@@ -3884,20 +3884,20 @@ class CodeGenerator:
             self.outfile.write(
                 "  xuint_t n;\n"
                 "  for (n = 0; n < %d; n++)\n"
-                "    g_value_unset (&skeleton->priv->properties[n]);\n"
+                "    xvalue_unset (&skeleton->priv->properties[n]);\n"
                 % (len(i.properties))
             )
             self.outfile.write("  g_free (skeleton->priv->properties);\n")
         self.outfile.write(
-            "  g_list_free_full (skeleton->priv->changed_properties, (GDestroyNotify) _changed_property_free);\n"
+            "  xlist_free_full (skeleton->priv->changed_properties, (xdestroy_notify_t) _changed_property_free);\n"
         )
         self.outfile.write(
             "  if (skeleton->priv->changed_properties_idle_source != NULL)\n"
         )
         self.outfile.write(
-            "    g_source_destroy (skeleton->priv->changed_properties_idle_source);\n"
+            "    xsource_destroy (skeleton->priv->changed_properties_idle_source);\n"
         )
-        self.outfile.write("  g_main_context_unref (skeleton->priv->context);\n")
+        self.outfile.write("  xmain_context_unref (skeleton->priv->context);\n")
         self.outfile.write("  g_mutex_clear (&skeleton->priv->lock);\n")
         self.outfile.write(
             "  G_OBJECT_CLASS (%s_skeleton_parent_class)->finalize (object);\n"
@@ -3911,15 +3911,15 @@ class CodeGenerator:
                 "static void\n"
                 "%s_skeleton_get_property (xobject_t      *object,\n"
                 "  xuint_t         prop_id,\n"
-                "  GValue       *value,\n"
-                "  GParamSpec   *pspec G_GNUC_UNUSED)\n"
+                "  xvalue_t       *value,\n"
+                "  xparam_spec_t   *pspec G_GNUC_UNUSED)\n"
                 "{\n" % (i.name_lower)
             )
             self.outfile.write(
                 "  %sSkeleton *skeleton = %s%s_SKELETON (object);\n"
                 "  g_assert (prop_id != 0 && prop_id - 1 < %d);\n"
                 "  g_mutex_lock (&skeleton->priv->lock);\n"
-                "  g_value_copy (&skeleton->priv->properties[prop_id - 1], value);\n"
+                "  xvalue_copy (&skeleton->priv->properties[prop_id - 1], value);\n"
                 "  g_mutex_unlock (&skeleton->priv->lock);\n"
                 % (i.camel_name, i.ns_upper, i.name_upper, len(i.properties))
             )
@@ -3946,25 +3946,25 @@ class CodeGenerator:
             )
             self.outfile.write(
                 "  xlist_t *l;\n"
-                "  GVariantBuilder builder;\n"
-                "  GVariantBuilder invalidated_builder;\n"
+                "  xvariant_builder_t builder;\n"
+                "  xvariant_builder_t invalidated_builder;\n"
                 "  xuint_t num_changes;\n"
                 "\n"
                 "  g_mutex_lock (&skeleton->priv->lock);\n"
-                '  g_variant_builder_init (&builder, G_VARIANT_TYPE ("a{sv}"));\n'
-                '  g_variant_builder_init (&invalidated_builder, G_VARIANT_TYPE ("as"));\n'
+                '  xvariant_builder_init (&builder, G_VARIANT_TYPE ("a{sv}"));\n'
+                '  xvariant_builder_init (&invalidated_builder, G_VARIANT_TYPE ("as"));\n'
                 "  for (l = skeleton->priv->changed_properties, num_changes = 0; l != NULL; l = l->next)\n"
                 "    {\n"
                 "      ChangedProperty *cp = l->data;\n"
                 "      xvariant_t *variant;\n"
-                "      const GValue *cur_value;\n"
+                "      const xvalue_t *cur_value;\n"
                 "\n"
                 "      cur_value = &skeleton->priv->properties[cp->prop_id - 1];\n"
-                "      if (!_g_value_equal (cur_value, &cp->orig_value))\n"
+                "      if (!_xvalue_equal (cur_value, &cp->orixvalue))\n"
                 "        {\n"
                 "          variant = g_dbus_gvalue_to_gvariant (cur_value, G_VARIANT_TYPE (cp->info->parent_struct.signature));\n"
-                '          g_variant_builder_add (&builder, "{sv}", cp->info->parent_struct.name, variant);\n'
-                "          g_variant_unref (variant);\n"
+                '          xvariant_builder_add (&builder, "{sv}", cp->info->parent_struct.name, variant);\n'
+                "          xvariant_unref (variant);\n"
                 "          num_changes++;\n"
                 "        }\n"
                 "    }\n"
@@ -3973,12 +3973,12 @@ class CodeGenerator:
                 "      xlist_t *connections, *ll;\n"
                 "      xvariant_t *signal_variant;"
                 "\n"
-                '      signal_variant = g_variant_ref_sink (g_variant_new ("(sa{sv}as)", "%s",\n'
+                '      signal_variant = xvariant_ref_sink (xvariant_new ("(sa{sv}as)", "%s",\n'
                 "                                           &builder, &invalidated_builder));\n"
                 "      connections = g_dbus_interface_skeleton_get_connections (G_DBUS_INTERFACE_SKELETON (skeleton));\n"
                 "      for (ll = connections; ll != NULL; ll = ll->next)\n"
                 "        {\n"
-                "          GDBusConnection *connection = ll->data;\n"
+                "          xdbus_connection_t *connection = ll->data;\n"
                 "\n"
                 "          g_dbus_connection_emit_signal (connection,\n"
                 "                                         NULL, g_dbus_interface_skeleton_get_object_path (G_DBUS_INTERFACE_SKELETON (skeleton)),\n"
@@ -3987,17 +3987,17 @@ class CodeGenerator:
                 "                                         signal_variant,\n"
                 "                                         NULL);\n"
                 "        }\n"
-                "      g_variant_unref (signal_variant);\n"
-                "      g_list_free_full (connections, g_object_unref);\n"
+                "      xvariant_unref (signal_variant);\n"
+                "      xlist_free_full (connections, xobject_unref);\n"
                 "    }\n"
                 "  else\n"
                 "    {\n"
-                "      g_variant_builder_clear (&builder);\n"
-                "      g_variant_builder_clear (&invalidated_builder);\n"
+                "      xvariant_builder_clear (&builder);\n"
+                "      xvariant_builder_clear (&invalidated_builder);\n"
                 "    }\n" % (i.name)
             )
             self.outfile.write(
-                "  g_list_free_full (skeleton->priv->changed_properties, (GDestroyNotify) _changed_property_free);\n"
+                "  xlist_free_full (skeleton->priv->changed_properties, (xdestroy_notify_t) _changed_property_free);\n"
             )
             self.outfile.write("  skeleton->priv->changed_properties = NULL;\n")
             self.outfile.write(
@@ -4008,7 +4008,7 @@ class CodeGenerator:
             # holding lock while being called
             self.outfile.write(
                 "static void\n"
-                "_%s_schedule_emit_changed (%sSkeleton *skeleton, const _ExtendedGDBusPropertyInfo *info, xuint_t prop_id, const GValue *orig_value)\n"
+                "_%s_schedule_emit_changed (%sSkeleton *skeleton, const _ExtendedGDBusPropertyInfo *info, xuint_t prop_id, const xvalue_t *orixvalue)\n"
                 "{\n"
                 "  ChangedProperty *cp;\n"
                 "  xlist_t *l;\n"
@@ -4029,22 +4029,22 @@ class CodeGenerator:
                 "      cp = g_new0 (ChangedProperty, 1);\n"
                 "      cp->prop_id = prop_id;\n"
                 "      cp->info = info;\n"
-                "      skeleton->priv->changed_properties = g_list_prepend (skeleton->priv->changed_properties, cp);\n"
-                "      g_value_init (&cp->orig_value, G_VALUE_TYPE (orig_value));\n"
-                "      g_value_copy (orig_value, &cp->orig_value);\n"
+                "      skeleton->priv->changed_properties = xlist_prepend (skeleton->priv->changed_properties, cp);\n"
+                "      xvalue_init (&cp->orixvalue, G_VALUE_TYPE (orixvalue));\n"
+                "      xvalue_copy (orixvalue, &cp->orixvalue);\n"
                 "    }\n"
                 "}\n"
                 "\n"
             )
 
             # Postpone setting up the refresh source until the ::notify signal is emitted as
-            # this allows use of g_object_freeze_notify()/g_object_thaw_notify() ...
+            # this allows use of xobject_freeze_notify()/xobject_thaw_notify() ...
             # This is useful when updating several properties from another thread than
             # where the idle will be emitted from
             self.outfile.write(
                 "static void\n"
                 "%s_skeleton_notify (xobject_t      *object,\n"
-                "  GParamSpec *pspec G_GNUC_UNUSED)\n"
+                "  xparam_spec_t *pspec G_GNUC_UNUSED)\n"
                 "{\n"
                 "  %sSkeleton *skeleton = %s%s_SKELETON (object);\n"
                 "  g_mutex_lock (&skeleton->priv->lock);\n"
@@ -4052,11 +4052,11 @@ class CodeGenerator:
                 "      skeleton->priv->changed_properties_idle_source == NULL)\n"
                 "    {\n"
                 "      skeleton->priv->changed_properties_idle_source = g_idle_source_new ();\n"
-                "      g_source_set_priority (skeleton->priv->changed_properties_idle_source, G_PRIORITY_DEFAULT);\n"
-                "      g_source_set_callback (skeleton->priv->changed_properties_idle_source, _%s_emit_changed, g_object_ref (skeleton), (GDestroyNotify) g_object_unref);\n"
-                '      g_source_set_name (skeleton->priv->changed_properties_idle_source, "[generated] _%s_emit_changed");\n'
-                "      g_source_attach (skeleton->priv->changed_properties_idle_source, skeleton->priv->context);\n"
-                "      g_source_unref (skeleton->priv->changed_properties_idle_source);\n"
+                "      xsource_set_priority (skeleton->priv->changed_properties_idle_source, G_PRIORITY_DEFAULT);\n"
+                "      xsource_set_callback (skeleton->priv->changed_properties_idle_source, _%s_emit_changed, xobject_ref (skeleton), (xdestroy_notify_t) xobject_unref);\n"
+                '      xsource_set_name (skeleton->priv->changed_properties_idle_source, "[generated] _%s_emit_changed");\n'
+                "      xsource_attach (skeleton->priv->changed_properties_idle_source, skeleton->priv->context);\n"
+                "      xsource_unref (skeleton->priv->changed_properties_idle_source);\n"
                 "    }\n"
                 "  g_mutex_unlock (&skeleton->priv->lock);\n"
                 "}\n"
@@ -4075,8 +4075,8 @@ class CodeGenerator:
                 "static void\n"
                 "%s_skeleton_set_property (xobject_t      *object,\n"
                 "  xuint_t         prop_id,\n"
-                "  const GValue *value,\n"
-                "  GParamSpec   *pspec)\n"
+                "  const xvalue_t *value,\n"
+                "  xparam_spec_t   *pspec)\n"
                 "{\n" % (i.name_lower)
             )
             self.outfile.write(
@@ -4085,17 +4085,17 @@ class CodeGenerator:
                 "  g_assert (prop_id != 0 && prop_id - 1 < %d);\n"
                 "  info = (const _ExtendedGDBusPropertyInfo *) _%s_property_info_pointers[prop_id - 1];\n"
                 "  g_mutex_lock (&skeleton->priv->lock);\n"
-                "  g_object_freeze_notify (object);\n"
-                "  if (!_g_value_equal (value, &skeleton->priv->properties[prop_id - 1]))\n"
+                "  xobject_freeze_notify (object);\n"
+                "  if (!_xvalue_equal (value, &skeleton->priv->properties[prop_id - 1]))\n"
                 "    {\n"
                 "      if (g_dbus_interface_skeleton_get_connection (G_DBUS_INTERFACE_SKELETON (skeleton)) != NULL &&\n"
                 "          info->emits_changed_signal)\n"
                 "        _%s_schedule_emit_changed (skeleton, info, prop_id, &skeleton->priv->properties[prop_id - 1]);\n"
-                "      g_value_copy (value, &skeleton->priv->properties[prop_id - 1]);\n"
-                "      g_object_notify_by_pspec (object, pspec);\n"
+                "      xvalue_copy (value, &skeleton->priv->properties[prop_id - 1]);\n"
+                "      xobject_notify_by_pspec (object, pspec);\n"
                 "    }\n"
                 "  g_mutex_unlock (&skeleton->priv->lock);\n"
-                "  g_object_thaw_notify (object);\n"
+                "  xobject_thaw_notify (object);\n"
                 % (
                     i.camel_name,
                     i.ns_upper,
@@ -4127,17 +4127,17 @@ class CodeGenerator:
         )
         self.outfile.write("  g_mutex_init (&skeleton->priv->lock);\n")
         self.outfile.write(
-            "  skeleton->priv->context = g_main_context_ref_thread_default ();\n"
+            "  skeleton->priv->context = xmain_context_ref_thread_default ();\n"
         )
         if len(i.properties) > 0:
             self.outfile.write(
-                "  skeleton->priv->properties = g_new0 (GValue, %d);\n"
+                "  skeleton->priv->properties = g_new0 (xvalue_t, %d);\n"
                 % (len(i.properties))
             )
             n = 0
             for p in i.properties:
                 self.outfile.write(
-                    "  g_value_init (&skeleton->priv->properties[%d], %s);\n"
+                    "  xvalue_init (&skeleton->priv->properties[%d], %s);\n"
                     % (n, p.arg.gtype)
                 )
                 n += 1
@@ -4211,7 +4211,7 @@ class CodeGenerator:
         self.outfile.write(
             "\n"
             "#if XPL_VERSION_MAX_ALLOWED < XPL_VERSION_2_38\n"
-            "  g_type_class_add_private (klass, sizeof (%sSkeletonPrivate));\n"
+            "  xtype_class_add_private (klass, sizeof (%sSkeletonPrivate));\n"
             "#endif\n" % (i.camel_name)
         )
 
@@ -4256,7 +4256,7 @@ class CodeGenerator:
             "%s *\n"
             "%s_skeleton_new (void)\n"
             "{\n"
-            "  return %s%s (g_object_new (%sTYPE_%s_SKELETON, NULL));\n"
+            "  return %s%s (xobject_new (%sTYPE_%s_SKELETON, NULL));\n"
             "}\n"
             "\n"
             % (
@@ -4285,7 +4285,7 @@ class CodeGenerator:
                 "/**\n"
                 " * SECTION:%sObject\n"
                 " * @title: %sObject\n"
-                " * @short_description: Specialized GDBusObject types\n"
+                " * @short_description: Specialized xdbus_object_t types\n"
                 " *\n"
                 " * This section contains the #%sObject, #%sObjectProxy, and #%sObjectSkeleton types which make it easier to work with objects implementing generated types for D-Bus interfaces.\n"
                 " */\n"
@@ -4331,7 +4331,7 @@ class CodeGenerator:
             % (self.namespace, self.namespace)
         )
         self.outfile.write(
-            "G_DEFINE_INTERFACE_WITH_CODE (%sObject, %sobject, XTYPE_OBJECT, g_type_interface_add_prerequisite (g_define_type_id, XTYPE_DBUS_OBJECT);)\n"
+            "G_DEFINE_INTERFACE_WITH_CODE (%sObject, %sobject, XTYPE_OBJECT, xtype_interface_add_prerequisite (g_define_type_id, XTYPE_DBUS_OBJECT);)\n"
             % (self.namespace, self.ns_lower)
         )
         self.outfile.write("\n")
@@ -4358,7 +4358,7 @@ class CodeGenerator:
             if i.deprecated:
                 flags = "G_PARAM_DEPRECATED | " + flags
             self.outfile.write(
-                '  g_object_interface_install_property (iface, g_param_spec_object ("%s", "%s", "%s", %sTYPE_%s, %s));\n'
+                '  xobject_interface_install_property (iface, g_param_spec_object ("%s", "%s", "%s", %sTYPE_%s, %s));\n'
                 "\n"
                 % (
                     i.name_hyphen,
@@ -4380,7 +4380,7 @@ class CodeGenerator:
                     " *\n"
                     " * Gets the #%s instance for the D-Bus interface #%s on @object, if any.\n"
                     " *\n"
-                    " * Returns: (transfer full) (nullable): A #%s that must be freed with g_object_unref() or %%NULL if @object does not implement the interface.\n"
+                    " * Returns: (transfer full) (nullable): A #%s that must be freed with xobject_unref() or %%NULL if @object does not implement the interface.\n"
                     % (
                         self.ns_lower,
                         i.name_upper.lower(),
@@ -4399,7 +4399,7 @@ class CodeGenerator:
             )
             self.outfile.write(
                 "{\n"
-                "  GDBusInterface *ret;\n"
+                "  xdbus_interface_t *ret;\n"
                 '  ret = g_dbus_object_get_interface (G_DBUS_OBJECT (object), "%s");\n'
                 "  if (ret == NULL)\n"
                 "    return NULL;\n"
@@ -4417,7 +4417,7 @@ class CodeGenerator:
                     " *\n"
                     " * Like %sobject_get_%s() but doesn't increase the reference count on the returned object.\n"
                     " *\n"
-                    " * It is not safe to use the returned object if you are on another thread than the one where the #GDBusObjectManagerClient or #GDBusObjectManagerServer for @object is running.\n"
+                    " * It is not safe to use the returned object if you are on another thread than the one where the #xdbus_object_manager_client_t or #xdbus_object_manager_server_t for @object is running.\n"
                     " *\n"
                     " * Returns: (transfer none) (nullable): A #%s or %%NULL if @object does not implement the interface. Do not free the returned object, it is owned by @object.\n"
                     % (
@@ -4438,11 +4438,11 @@ class CodeGenerator:
             )
             self.outfile.write(
                 "{\n"
-                "  GDBusInterface *ret;\n"
+                "  xdbus_interface_t *ret;\n"
                 '  ret = g_dbus_object_get_interface (G_DBUS_OBJECT (object), "%s");\n'
                 "  if (ret == NULL)\n"
                 "    return NULL;\n"
-                "  g_object_unref (ret);\n"
+                "  xobject_unref (ret);\n"
                 "  return %s%s (ret);\n"
                 "}\n"
                 "\n" % (i.name, self.ns_upper, i.name_upper)
@@ -4451,14 +4451,14 @@ class CodeGenerator:
         # shared by ObjectProxy and ObjectSkeleton classes
         self.outfile.write(
             "static void\n"
-            "%sobject_notify (GDBusObject *object, GDBusInterface *interface)\n"
+            "%sobject_notify (xdbus_object_t *object, xdbus_interface_t *interface)\n"
             "{\n"
             "  _ExtendedGDBusInterfaceInfo *info = (_ExtendedGDBusInterfaceInfo *) g_dbus_interface_get_info (interface);\n"
             "  /* info can be NULL if the other end is using a D-Bus interface we don't know\n"
             "   * anything about, for example old generated code in this process talking to\n"
             "   * newer generated code in the other process. */\n"
             "  if (info != NULL)\n"
-            "    g_object_notify (G_OBJECT (object), info->hyphen_name);\n"
+            "    xobject_notify (G_OBJECT (object), info->hyphen_name);\n"
             "}\n"
             "\n" % (self.ns_lower)
         )
@@ -4532,8 +4532,8 @@ class CodeGenerator:
             "static void\n"
             "%sobject_proxy_set_property (xobject_t      *gobject,\n"
             "  xuint_t         prop_id,\n"
-            "  const GValue *value G_GNUC_UNUSED,\n"
-            "  GParamSpec   *pspec)\n"
+            "  const xvalue_t *value G_GNUC_UNUSED,\n"
+            "  xparam_spec_t   *pspec)\n"
             "{\n"
             "  G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);\n"
             % (self.ns_lower)
@@ -4543,11 +4543,11 @@ class CodeGenerator:
             "static void\n"
             "%sobject_proxy_get_property (xobject_t      *gobject,\n"
             "  xuint_t         prop_id,\n"
-            "  GValue       *value,\n"
-            "  GParamSpec   *pspec)\n"
+            "  xvalue_t       *value,\n"
+            "  xparam_spec_t   *pspec)\n"
             "{\n"
             "  %sObjectProxy *object = %sOBJECT_PROXY (gobject);\n"
-            "  GDBusInterface *interface;\n"
+            "  xdbus_interface_t *interface;\n"
             "\n"
             "  switch (prop_id)\n"
             "    {\n" % (self.ns_lower, self.namespace, self.ns_upper)
@@ -4557,7 +4557,7 @@ class CodeGenerator:
             self.outfile.write(
                 "    case %d:\n"
                 '      interface = g_dbus_object_get_interface (G_DBUS_OBJECT (object), "%s");\n'
-                "      g_value_take_object (value, interface);\n"
+                "      xvalue_take_object (value, interface);\n"
                 "      break;\n"
                 "\n" % (n, i.name)
             )
@@ -4583,7 +4583,7 @@ class CodeGenerator:
         n = 1
         for i in self.ifaces:
             self.outfile.write(
-                '  g_object_class_override_property (gobject_class, %d, "%s");'
+                '  xobject_class_override_property (gobject_class, %d, "%s");'
                 "\n" % (n, i.name_hyphen)
             )
             n += 1
@@ -4593,7 +4593,7 @@ class CodeGenerator:
             self.docbook_gen.expand(
                 "/**\n"
                 " * %sobject_proxy_new:\n"
-                " * @connection: A #GDBusConnection.\n"
+                " * @connection: A #xdbus_connection_t.\n"
                 " * @object_path: An object path.\n"
                 " *\n"
                 " * Creates a new proxy object.\n"
@@ -4605,12 +4605,12 @@ class CodeGenerator:
         )
         self.outfile.write(
             "%sObjectProxy *\n"
-            "%sobject_proxy_new (GDBusConnection *connection,\n"
+            "%sobject_proxy_new (xdbus_connection_t *connection,\n"
             "  const xchar_t *object_path)\n"
             "{\n"
             "  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);\n"
-            "  g_return_val_if_fail (g_variant_is_object_path (object_path), NULL);\n"
-            '  return %sOBJECT_PROXY (g_object_new (%sTYPE_OBJECT_PROXY, "g-connection", connection, "g-object-path", object_path, NULL));\n'
+            "  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);\n"
+            '  return %sOBJECT_PROXY (xobject_new (%sTYPE_OBJECT_PROXY, "g-connection", connection, "g-object-path", object_path, NULL));\n'
             "}\n"
             "\n" % (self.namespace, self.ns_lower, self.ns_upper, self.ns_upper)
         )
@@ -4684,11 +4684,11 @@ class CodeGenerator:
             "static void\n"
             "%sobject_skeleton_set_property (xobject_t      *gobject,\n"
             "  xuint_t         prop_id,\n"
-            "  const GValue *value,\n"
-            "  GParamSpec   *pspec)\n"
+            "  const xvalue_t *value,\n"
+            "  xparam_spec_t   *pspec)\n"
             "{\n"
             "  %sObjectSkeleton *object = %sOBJECT_SKELETON (gobject);\n"
-            "  GDBusInterfaceSkeleton *interface;\n"
+            "  xdbus_interface_skeleton_t *interface;\n"
             "\n"
             "  switch (prop_id)\n"
             "    {\n" % (self.ns_lower, self.namespace, self.ns_upper)
@@ -4697,7 +4697,7 @@ class CodeGenerator:
         for i in self.ifaces:
             self.outfile.write(
                 "    case %d:\n"
-                "      interface = g_value_get_object (value);\n"
+                "      interface = xvalue_get_object (value);\n"
                 "      if (interface != NULL)\n"
                 "        {\n"
                 "          g_warn_if_fail (%sIS_%s (interface));\n"
@@ -4723,11 +4723,11 @@ class CodeGenerator:
             "static void\n"
             "%sobject_skeleton_get_property (xobject_t      *gobject,\n"
             "  xuint_t         prop_id,\n"
-            "  GValue       *value,\n"
-            "  GParamSpec   *pspec)\n"
+            "  xvalue_t       *value,\n"
+            "  xparam_spec_t   *pspec)\n"
             "{\n"
             "  %sObjectSkeleton *object = %sOBJECT_SKELETON (gobject);\n"
-            "  GDBusInterface *interface;\n"
+            "  xdbus_interface_t *interface;\n"
             "\n"
             "  switch (prop_id)\n"
             "    {\n" % (self.ns_lower, self.namespace, self.ns_upper)
@@ -4737,7 +4737,7 @@ class CodeGenerator:
             self.outfile.write(
                 "    case %d:\n"
                 '      interface = g_dbus_object_get_interface (G_DBUS_OBJECT (object), "%s");\n'
-                "      g_value_take_object (value, interface);\n"
+                "      xvalue_take_object (value, interface);\n"
                 "      break;\n"
                 "\n" % (n, i.name)
             )
@@ -4763,7 +4763,7 @@ class CodeGenerator:
         n = 1
         for i in self.ifaces:
             self.outfile.write(
-                '  g_object_class_override_property (gobject_class, %d, "%s");'
+                '  xobject_class_override_property (gobject_class, %d, "%s");'
                 "\n" % (n, i.name_hyphen)
             )
             n += 1
@@ -4785,8 +4785,8 @@ class CodeGenerator:
             "%sObjectSkeleton *\n"
             "%sobject_skeleton_new (const xchar_t *object_path)\n"
             "{\n"
-            "  g_return_val_if_fail (g_variant_is_object_path (object_path), NULL);\n"
-            '  return %sOBJECT_SKELETON (g_object_new (%sTYPE_OBJECT_SKELETON, "g-object-path", object_path, NULL));\n'
+            "  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);\n"
+            '  return %sOBJECT_SKELETON (xobject_new (%sTYPE_OBJECT_SKELETON, "g-object-path", object_path, NULL));\n'
             "}\n"
             "\n" % (self.namespace, self.ns_lower, self.ns_upper, self.ns_upper)
         )
@@ -4817,7 +4817,7 @@ class CodeGenerator:
             )
             self.outfile.write(
                 "{\n"
-                '  g_object_set (G_OBJECT (object), "%s", interface_, NULL);\n'
+                '  xobject_set (G_OBJECT (object), "%s", interface_, NULL);\n'
                 "}\n"
                 "\n" % (i.name_hyphen)
             )
@@ -4837,9 +4837,9 @@ class CodeGenerator:
                 "/**\n"
                 " * SECTION:%sObjectManagerClient\n"
                 " * @title: %sObjectManagerClient\n"
-                " * @short_description: Generated GDBusObjectManagerClient type\n"
+                " * @short_description: Generated xdbus_object_manager_client_t type\n"
                 " *\n"
-                " * This section contains a #GDBusObjectManagerClient that uses %sobject_manager_client_get_proxy_type() as the #GDBusProxyTypeFunc.\n"
+                " * This section contains a #xdbus_object_manager_client_t that uses %sobject_manager_client_get_proxy_type() as the #xdbus_proxy_type_func_t.\n"
                 " */\n" % (self.namespace, self.namespace, self.ns_lower),
                 False,
             )
@@ -4899,14 +4899,14 @@ class CodeGenerator:
             self.docbook_gen.expand(
                 "/**\n"
                 " * %sobject_manager_client_get_proxy_type:\n"
-                " * @manager: A #GDBusObjectManagerClient.\n"
+                " * @manager: A #xdbus_object_manager_client_t.\n"
                 " * @object_path: The object path of the remote object (unused).\n"
                 " * @interface_name: (nullable): Interface name of the remote object or %%NULL to get the object proxy #xtype_t.\n"
                 " * @user_data: User data (unused).\n"
                 " *\n"
-                " * A #GDBusProxyTypeFunc that maps @interface_name to the generated #GDBusObjectProxy derived and #GDBusProxy derived types.\n"
+                " * A #xdbus_proxy_type_func_t that maps @interface_name to the generated #xdbus_object_proxy_t derived and #xdbus_proxy_t derived types.\n"
                 " *\n"
-                " * Returns: A #GDBusProxy derived #xtype_t if @interface_name is not %%NULL, otherwise the #xtype_t for #%sObjectProxy.\n"
+                " * Returns: A #xdbus_proxy_t derived #xtype_t if @interface_name is not %%NULL, otherwise the #xtype_t for #%sObjectProxy.\n"
                 % (self.ns_lower, self.namespace),
                 False,
             )
@@ -4914,29 +4914,29 @@ class CodeGenerator:
         self.outfile.write(" */\n")
         self.outfile.write(
             "xtype_t\n"
-            "%sobject_manager_client_get_proxy_type (GDBusObjectManagerClient *manager G_GNUC_UNUSED, const xchar_t *object_path G_GNUC_UNUSED, const xchar_t *interface_name, xpointer_t user_data G_GNUC_UNUSED)\n"
+            "%sobject_manager_client_get_proxy_type (xdbus_object_manager_client_t *manager G_GNUC_UNUSED, const xchar_t *object_path G_GNUC_UNUSED, const xchar_t *interface_name, xpointer_t user_data G_GNUC_UNUSED)\n"
             "{\n" % (self.ns_lower)
         )
         self.outfile.write(
             "  static xsize_t once_init_value = 0;\n"
-            "  static GHashTable *lookup_hash;\n"
+            "  static xhashtable_t *lookup_hash;\n"
             "  xtype_t ret;\n"
             "\n"
             "  if (interface_name == NULL)\n"
             "    return %sTYPE_OBJECT_PROXY;\n"
             "  if (g_once_init_enter (&once_init_value))\n"
             "    {\n"
-            "      lookup_hash = g_hash_table_new (g_str_hash, g_str_equal);\n"
+            "      lookup_hash = xhash_table_new (xstr_hash, xstr_equal);\n"
             % (self.ns_upper)
         )
         for i in self.ifaces:
             self.outfile.write(
-                '      g_hash_table_insert (lookup_hash, (xpointer_t) "%s", GSIZE_TO_POINTER (%sTYPE_%s_PROXY));\n'
+                '      xhash_table_insert (lookup_hash, (xpointer_t) "%s", GSIZE_TO_POINTER (%sTYPE_%s_PROXY));\n'
                 % (i.name, i.ns_upper, i.name_upper)
             )
         self.outfile.write("      g_once_init_leave (&once_init_value, 1);\n" "    }\n")
         self.outfile.write(
-            "  ret = (xtype_t) GPOINTER_TO_SIZE (g_hash_table_lookup (lookup_hash, interface_name));\n"
+            "  ret = (xtype_t) GPOINTER_TO_SIZE (xhash_table_lookup (lookup_hash, interface_name));\n"
             "  if (ret == (xtype_t) 0)\n"
             "    ret = XTYPE_DBUS_PROXY;\n"
         )
@@ -4947,7 +4947,7 @@ class CodeGenerator:
             self.docbook_gen.expand(
                 "/**\n"
                 " * %sobject_manager_client_new:\n"
-                " * @connection: A #GDBusConnection.\n"
+                " * @connection: A #xdbus_connection_t.\n"
                 " * @flags: Flags from the #GDBusObjectManagerClientFlags enumeration.\n"
                 " * @name: (nullable): A bus name (well-known or unique) or %%NULL if @connection is not a message bus connection.\n"
                 " * @object_path: An object path.\n"
@@ -4955,9 +4955,9 @@ class CodeGenerator:
                 " * @callback: A #xasync_ready_callback_t to call when the request is satisfied.\n"
                 " * @user_data: User data to pass to @callback.\n"
                 " *\n"
-                " * Asynchronously creates #GDBusObjectManagerClient using %sobject_manager_client_get_proxy_type() as the #GDBusProxyTypeFunc. See g_dbus_object_manager_client_new() for more details.\n"
+                " * Asynchronously creates #xdbus_object_manager_client_t using %sobject_manager_client_get_proxy_type() as the #xdbus_proxy_type_func_t. See g_dbus_object_manager_client_new() for more details.\n"
                 " *\n"
-                " * When the operation is finished, @callback will be invoked in the thread-default main loop of the thread you are calling this method from (see g_main_context_push_thread_default()).\n"
+                " * When the operation is finished, @callback will be invoked in the thread-default main loop of the thread you are calling this method from (see xmain_context_push_thread_default()).\n"
                 " * You can then call %sobject_manager_client_new_finish() to get the result of the operation.\n"
                 " *\n"
                 " * See %sobject_manager_client_new_sync() for the synchronous, blocking version of this constructor.\n"
@@ -4969,7 +4969,7 @@ class CodeGenerator:
         self.outfile.write(
             "void\n"
             "%sobject_manager_client_new (\n"
-            "    GDBusConnection        *connection,\n"
+            "    xdbus_connection_t        *connection,\n"
             "    GDBusObjectManagerClientFlags  flags,\n"
             "    const xchar_t            *name,\n"
             "    const xchar_t            *object_path,\n"
@@ -4977,7 +4977,7 @@ class CodeGenerator:
             "    xasync_ready_callback_t     callback,\n"
             "    xpointer_t                user_data)\n"
             "{\n"
-            '  g_async_initable_new_async (%sTYPE_OBJECT_MANAGER_CLIENT, G_PRIORITY_DEFAULT, cancellable, callback, user_data, "flags", flags, "name", name, "connection", connection, "object-path", object_path, "get-proxy-type-func", %sobject_manager_client_get_proxy_type, NULL);\n'
+            '  xasync_initable_new_async (%sTYPE_OBJECT_MANAGER_CLIENT, G_PRIORITY_DEFAULT, cancellable, callback, user_data, "flags", flags, "name", name, "connection", connection, "object-path", object_path, "get-proxy-type-func", %sobject_manager_client_get_proxy_type, NULL);\n'
             "}\n"
             "\n" % (self.ns_lower, self.ns_upper, self.ns_lower)
         )
@@ -4994,16 +4994,16 @@ class CodeGenerator:
         )
         self.outfile.write(" */\n")
         self.outfile.write(
-            "GDBusObjectManager *\n"
+            "xdbus_object_manager_t *\n"
             "%sobject_manager_client_new_finish (\n"
             "    xasync_result_t        *res,\n"
             "    xerror_t             **error)\n"
             "{\n"
             "  xobject_t *ret;\n"
             "  xobject_t *source_object;\n"
-            "  source_object = g_async_result_get_source_object (res);\n"
-            "  ret = g_async_initable_new_finish (G_ASYNC_INITABLE (source_object), res, error);\n"
-            "  g_object_unref (source_object);\n"
+            "  source_object = xasync_result_get_source_object (res);\n"
+            "  ret = xasync_initable_new_finish (XASYNC_INITABLE (source_object), res, error);\n"
+            "  xobject_unref (source_object);\n"
             "  if (ret != NULL)\n"
             "    return G_DBUS_OBJECT_MANAGER (ret);\n"
             "  else\n"
@@ -5015,14 +5015,14 @@ class CodeGenerator:
             self.docbook_gen.expand(
                 "/**\n"
                 " * %sobject_manager_client_new_sync:\n"
-                " * @connection: A #GDBusConnection.\n"
+                " * @connection: A #xdbus_connection_t.\n"
                 " * @flags: Flags from the #GDBusObjectManagerClientFlags enumeration.\n"
                 " * @name: (nullable): A bus name (well-known or unique) or %%NULL if @connection is not a message bus connection.\n"
                 " * @object_path: An object path.\n"
                 " * @cancellable: (nullable): A #xcancellable_t or %%NULL.\n"
                 " * @error: Return location for error or %%NULL\n"
                 " *\n"
-                " * Synchronously creates #GDBusObjectManagerClient using %sobject_manager_client_get_proxy_type() as the #GDBusProxyTypeFunc. See g_dbus_object_manager_client_new_sync() for more details.\n"
+                " * Synchronously creates #xdbus_object_manager_client_t using %sobject_manager_client_get_proxy_type() as the #xdbus_proxy_type_func_t. See g_dbus_object_manager_client_new_sync() for more details.\n"
                 " *\n"
                 " * The calling thread is blocked until a reply is received.\n"
                 " *\n"
@@ -5035,17 +5035,17 @@ class CodeGenerator:
         )
         self.outfile.write(" */\n")
         self.outfile.write(
-            "GDBusObjectManager *\n"
+            "xdbus_object_manager_t *\n"
             "%sobject_manager_client_new_sync (\n"
-            "    GDBusConnection        *connection,\n"
+            "    xdbus_connection_t        *connection,\n"
             "    GDBusObjectManagerClientFlags  flags,\n"
             "    const xchar_t            *name,\n"
             "    const xchar_t            *object_path,\n"
             "    xcancellable_t           *cancellable,\n"
             "    xerror_t                **error)\n"
             "{\n"
-            "  GInitable *ret;\n"
-            '  ret = g_initable_new (%sTYPE_OBJECT_MANAGER_CLIENT, cancellable, error, "flags", flags, "name", name, "connection", connection, "object-path", object_path, "get-proxy-type-func", %sobject_manager_client_get_proxy_type, NULL);\n'
+            "  xinitable_t *ret;\n"
+            '  ret = xinitable_new (%sTYPE_OBJECT_MANAGER_CLIENT, cancellable, error, "flags", flags, "name", name, "connection", connection, "object-path", object_path, "get-proxy-type-func", %sobject_manager_client_get_proxy_type, NULL);\n'
             "  if (ret != NULL)\n"
             "    return G_DBUS_OBJECT_MANAGER (ret);\n"
             "  else\n"
@@ -5066,9 +5066,9 @@ class CodeGenerator:
                 " * @callback: A #xasync_ready_callback_t to call when the request is satisfied.\n"
                 " * @user_data: User data to pass to @callback.\n"
                 " *\n"
-                " * Like %sobject_manager_client_new() but takes a #GBusType instead of a #GDBusConnection.\n"
+                " * Like %sobject_manager_client_new() but takes a #GBusType instead of a #xdbus_connection_t.\n"
                 " *\n"
-                " * When the operation is finished, @callback will be invoked in the thread-default main loop of the thread you are calling this method from (see g_main_context_push_thread_default()).\n"
+                " * When the operation is finished, @callback will be invoked in the thread-default main loop of the thread you are calling this method from (see xmain_context_push_thread_default()).\n"
                 " * You can then call %sobject_manager_client_new_for_bus_finish() to get the result of the operation.\n"
                 " *\n"
                 " * See %sobject_manager_client_new_for_bus_sync() for the synchronous, blocking version of this constructor.\n"
@@ -5088,7 +5088,7 @@ class CodeGenerator:
             "    xasync_ready_callback_t     callback,\n"
             "    xpointer_t                user_data)\n"
             "{\n"
-            '  g_async_initable_new_async (%sTYPE_OBJECT_MANAGER_CLIENT, G_PRIORITY_DEFAULT, cancellable, callback, user_data, "flags", flags, "name", name, "bus-type", bus_type, "object-path", object_path, "get-proxy-type-func", %sobject_manager_client_get_proxy_type, NULL);\n'
+            '  xasync_initable_new_async (%sTYPE_OBJECT_MANAGER_CLIENT, G_PRIORITY_DEFAULT, cancellable, callback, user_data, "flags", flags, "name", name, "bus-type", bus_type, "object-path", object_path, "get-proxy-type-func", %sobject_manager_client_get_proxy_type, NULL);\n'
             "}\n"
             "\n" % (self.ns_lower, self.ns_upper, self.ns_lower)
         )
@@ -5105,16 +5105,16 @@ class CodeGenerator:
         )
         self.outfile.write(" */\n")
         self.outfile.write(
-            "GDBusObjectManager *\n"
+            "xdbus_object_manager_t *\n"
             "%sobject_manager_client_new_for_bus_finish (\n"
             "    xasync_result_t        *res,\n"
             "    xerror_t             **error)\n"
             "{\n"
             "  xobject_t *ret;\n"
             "  xobject_t *source_object;\n"
-            "  source_object = g_async_result_get_source_object (res);\n"
-            "  ret = g_async_initable_new_finish (G_ASYNC_INITABLE (source_object), res, error);\n"
-            "  g_object_unref (source_object);\n"
+            "  source_object = xasync_result_get_source_object (res);\n"
+            "  ret = xasync_initable_new_finish (XASYNC_INITABLE (source_object), res, error);\n"
+            "  xobject_unref (source_object);\n"
             "  if (ret != NULL)\n"
             "    return G_DBUS_OBJECT_MANAGER (ret);\n"
             "  else\n"
@@ -5133,7 +5133,7 @@ class CodeGenerator:
                 " * @cancellable: (nullable): A #xcancellable_t or %%NULL.\n"
                 " * @error: Return location for error or %%NULL\n"
                 " *\n"
-                " * Like %sobject_manager_client_new_sync() but takes a #GBusType instead of a #GDBusConnection.\n"
+                " * Like %sobject_manager_client_new_sync() but takes a #GBusType instead of a #xdbus_connection_t.\n"
                 " *\n"
                 " * The calling thread is blocked until a reply is received.\n"
                 " *\n"
@@ -5146,7 +5146,7 @@ class CodeGenerator:
         )
         self.outfile.write(" */\n")
         self.outfile.write(
-            "GDBusObjectManager *\n"
+            "xdbus_object_manager_t *\n"
             "%sobject_manager_client_new_for_bus_sync (\n"
             "    GBusType                bus_type,\n"
             "    GDBusObjectManagerClientFlags  flags,\n"
@@ -5155,8 +5155,8 @@ class CodeGenerator:
             "    xcancellable_t           *cancellable,\n"
             "    xerror_t                **error)\n"
             "{\n"
-            "  GInitable *ret;\n"
-            '  ret = g_initable_new (%sTYPE_OBJECT_MANAGER_CLIENT, cancellable, error, "flags", flags, "name", name, "bus-type", bus_type, "object-path", object_path, "get-proxy-type-func", %sobject_manager_client_get_proxy_type, NULL);\n'
+            "  xinitable_t *ret;\n"
+            '  ret = xinitable_new (%sTYPE_OBJECT_MANAGER_CLIENT, cancellable, error, "flags", flags, "name", name, "bus-type", bus_type, "object-path", object_path, "get-proxy-type-func", %sobject_manager_client_get_proxy_type, NULL);\n'
             "  if (ret != NULL)\n"
             "    return G_DBUS_OBJECT_MANAGER (ret);\n"
             "  else\n"

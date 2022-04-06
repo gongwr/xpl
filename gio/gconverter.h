@@ -30,12 +30,12 @@
 G_BEGIN_DECLS
 
 #define XTYPE_CONVERTER            (g_converter_get_type ())
-#define G_CONVERTER(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_CONVERTER, GConverter))
+#define G_CONVERTER(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_CONVERTER, xconverter))
 #define X_IS_CONVERTER(obj)         (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_CONVERTER))
 #define G_CONVERTER_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_CONVERTER, GConverterIface))
 
 /**
- * GConverter:
+ * xconverter_t:
  *
  * Seek object for streaming operations.
  *
@@ -61,7 +61,7 @@ struct _GConverterIface
 
   /* Virtual Table */
 
-  GConverterResult (* convert) (GConverter *converter,
+  GConverterResult (* convert) (xconverter_t *converter,
 				const void *inbuf,
 				xsize_t       inbuf_size,
 				void       *outbuf,
@@ -70,14 +70,14 @@ struct _GConverterIface
 				xsize_t      *bytes_read,
 				xsize_t      *bytes_written,
 				xerror_t    **error);
-  void  (* reset)   (GConverter *converter);
+  void  (* reset)   (xconverter_t *converter);
 };
 
 XPL_AVAILABLE_IN_ALL
 xtype_t            g_converter_get_type     (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GConverterResult g_converter_convert (GConverter       *converter,
+GConverterResult g_converter_convert (xconverter_t       *converter,
 				      const void       *inbuf,
 				      xsize_t             inbuf_size,
 				      void             *outbuf,
@@ -87,7 +87,7 @@ GConverterResult g_converter_convert (GConverter       *converter,
 				      xsize_t            *bytes_written,
 				      xerror_t          **error);
 XPL_AVAILABLE_IN_ALL
-void             g_converter_reset   (GConverter       *converter);
+void             g_converter_reset   (xconverter_t       *converter);
 
 
 G_END_DECLS

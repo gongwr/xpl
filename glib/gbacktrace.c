@@ -212,7 +212,7 @@ g_on_error_query (const xchar_t *prg_name)
 
     if (prg_name && *prg_name)
       {
-        caption = g_utf8_to_utf16 (prg_name, -1, NULL, NULL, NULL);
+        caption = xutf8_to_utf16 (prg_name, -1, NULL, NULL, NULL);
       }
 
     MessageBoxW (NULL, L"g_on_error_query called, program terminating",

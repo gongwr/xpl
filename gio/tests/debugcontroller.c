@@ -26,8 +26,8 @@
 static void
 test_dbus_basic (void)
 {
-  GTestDBus *bus;
-  GDBusConnection *connection = NULL, *connection2 = NULL;
+  xtest_dbus_t *bus;
+  xdbus_connection_t *connection = NULL, *connection2 = NULL;
   GDebugControllerDBus *controller = NULL;
   xboolean_t old_value;
   xboolean_t debug_enabled;
@@ -57,10 +57,10 @@ test_dbus_basic (void)
   g_debug_controller_set_debug_enabled (G_DEBUG_CONTROLLER (controller), FALSE);
   g_assert_false (g_debug_controller_get_debug_enabled (G_DEBUG_CONTROLLER (controller)));
 
-  /* Reset the debug state and check using g_object_get(), to exercise that. */
+  /* Reset the debug state and check using xobject_get(), to exercise that. */
   g_debug_controller_set_debug_enabled (G_DEBUG_CONTROLLER (controller), old_value);
 
-  g_object_get (G_OBJECT (controller),
+  xobject_get (G_OBJECT (controller),
                 "debug-enabled", &debug_enabled,
                 "connection", &connection2,
                 NULL);
@@ -69,7 +69,7 @@ test_dbus_basic (void)
   g_clear_object (&connection2);
 
   g_debug_controller_dbus_stop (controller);
-  while (g_main_context_iteration (NULL, FALSE));
+  while (xmain_context_iteration (NULL, FALSE));
   g_assert_finalize_object (controller);
   g_clear_object (&connection);
 
@@ -80,8 +80,8 @@ test_dbus_basic (void)
 static void
 test_dbus_duplicate (void)
 {
-  GTestDBus *bus;
-  GDBusConnection *connection = NULL;
+  xtest_dbus_t *bus;
+  xdbus_connection_t *connection = NULL;
   GDebugControllerDBus *controller1 = NULL, *controller2 = NULL;
   xerror_t *local_error = NULL;
 
@@ -106,7 +106,7 @@ test_dbus_duplicate (void)
   g_clear_error (&local_error);
 
   g_debug_controller_dbus_stop (controller1);
-  while (g_main_context_iteration (NULL, FALSE));
+  while (xmain_context_iteration (NULL, FALSE));
   g_assert_finalize_object (controller1);
   g_clear_object (&connection);
 
@@ -122,14 +122,14 @@ async_result_cb (xobject_t      *source_object,
   xasync_result_t **result_out = user_data;
 
   g_assert_null (*result_out);
-  *result_out = g_object_ref (result);
+  *result_out = xobject_ref (result);
 
-  g_main_context_wakeup (g_main_context_get_thread_default ());
+  xmain_context_wakeup (xmain_context_get_thread_default ());
 }
 
 static xboolean_t
 authorize_false_cb (GDebugControllerDBus  *debug_controller,
-                    GDBusMethodInvocation *invocation,
+                    xdbus_method_invocation_t *invocation,
                     xpointer_t               user_data)
 {
   return FALSE;
@@ -137,7 +137,7 @@ authorize_false_cb (GDebugControllerDBus  *debug_controller,
 
 static xboolean_t
 authorize_true_cb (GDebugControllerDBus  *debug_controller,
-                   GDBusMethodInvocation *invocation,
+                   xdbus_method_invocation_t *invocation,
                    xpointer_t               user_data)
 {
   return TRUE;
@@ -145,7 +145,7 @@ authorize_true_cb (GDebugControllerDBus  *debug_controller,
 
 static void
 notify_debug_enabled_cb (xobject_t    *object,
-                         GParamSpec *pspec,
+                         xparam_spec_t *pspec,
                          xpointer_t    user_data)
 {
   xuint_t *notify_count_out = user_data;
@@ -154,7 +154,7 @@ notify_debug_enabled_cb (xobject_t    *object,
 }
 
 static void
-properties_changed_cb (GDBusConnection *connection,
+properties_changed_cb (xdbus_connection_t *connection,
                        const xchar_t     *sender_name,
                        const xchar_t     *object_path,
                        const xchar_t     *interface_name,
@@ -165,15 +165,15 @@ properties_changed_cb (GDBusConnection *connection,
   xuint_t *properties_changed_count_out = user_data;
 
   *properties_changed_count_out = *properties_changed_count_out + 1;
-  g_main_context_wakeup (g_main_context_get_thread_default ());
+  xmain_context_wakeup (xmain_context_get_thread_default ());
 }
 
 static void
 test_dbus_properties (void)
 {
-  GTestDBus *bus;
-  GDBusConnection *controller_connection = NULL;
-  GDBusConnection *remote_connection = NULL;
+  xtest_dbus_t *bus;
+  xdbus_connection_t *controller_connection = NULL;
+  xdbus_connection_t *remote_connection = NULL;
   GDebugControllerDBus *controller = NULL;
   xboolean_t old_value;
   xasync_result_t *result = NULL;
@@ -231,7 +231,7 @@ test_dbus_properties (void)
                           "/org/gtk/Debugging",
                           "org.freedesktop.DBus.Properties",
                           "Get",
-                          g_variant_new ("(ss)", "org.gtk.Debugging", "DebugEnabled"),
+                          xvariant_new ("(ss)", "org.gtk.Debugging", "DebugEnabled"),
                           G_VARIANT_TYPE ("(v)"),
                           G_DBUS_CALL_FLAGS_NONE,
                           -1,
@@ -241,20 +241,20 @@ test_dbus_properties (void)
   g_assert_no_error (local_error);
 
   while (result == NULL)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   reply = g_dbus_connection_call_finish (remote_connection, result, &local_error);
   g_assert_no_error (local_error);
   g_clear_object (&result);
 
-  g_variant_get (reply, "(v)", &debug_enabled_variant);
-  debug_enabled = g_variant_get_boolean (debug_enabled_variant);
+  xvariant_get (reply, "(v)", &debug_enabled_variant);
+  debug_enabled = xvariant_get_boolean (debug_enabled_variant);
   g_assert_true (debug_enabled == old_value);
   g_assert_cmpuint (notify_count, ==, 0);
   g_assert_cmpuint (properties_changed_count, ==, 0);
 
-  g_clear_pointer (&debug_enabled_variant, g_variant_unref);
-  g_clear_pointer (&reply, g_variant_unref);
+  g_clear_pointer (&debug_enabled_variant, xvariant_unref);
+  g_clear_pointer (&reply, xvariant_unref);
 
   /* Set the debug status remotely. The first attempt should fail due to no
    * authorisation handler being connected. The second should fail due to the
@@ -265,7 +265,7 @@ test_dbus_properties (void)
                           "/org/gtk/Debugging",
                           "org.gtk.Debugging",
                           "SetDebugEnabled",
-                          g_variant_new ("(b)", !old_value),
+                          xvariant_new ("(b)", !old_value),
                           NULL,
                           G_DBUS_CALL_FLAGS_NONE,
                           -1,
@@ -274,7 +274,7 @@ test_dbus_properties (void)
                           &result);
 
   while (result == NULL)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   reply = g_dbus_connection_call_finish (remote_connection, result, &local_error);
   g_assert_error (local_error, G_DBUS_ERROR, G_DBUS_ERROR_ACCESS_DENIED);
@@ -285,8 +285,8 @@ test_dbus_properties (void)
   g_assert_cmpuint (notify_count, ==, 0);
   g_assert_cmpuint (properties_changed_count, ==, 0);
 
-  g_clear_pointer (&debug_enabled_variant, g_variant_unref);
-  g_clear_pointer (&reply, g_variant_unref);
+  g_clear_pointer (&debug_enabled_variant, xvariant_unref);
+  g_clear_pointer (&reply, xvariant_unref);
 
   /* Attach an authorisation handler and try again. */
   handler_id = g_signal_connect (controller, "authorize", G_CALLBACK (authorize_false_cb), NULL);
@@ -296,7 +296,7 @@ test_dbus_properties (void)
                           "/org/gtk/Debugging",
                           "org.gtk.Debugging",
                           "SetDebugEnabled",
-                          g_variant_new ("(b)", !old_value),
+                          xvariant_new ("(b)", !old_value),
                           NULL,
                           G_DBUS_CALL_FLAGS_NONE,
                           -1,
@@ -305,7 +305,7 @@ test_dbus_properties (void)
                           &result);
 
   while (result == NULL)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   reply = g_dbus_connection_call_finish (remote_connection, result, &local_error);
   g_assert_error (local_error, G_DBUS_ERROR, G_DBUS_ERROR_ACCESS_DENIED);
@@ -316,8 +316,8 @@ test_dbus_properties (void)
   g_assert_cmpuint (notify_count, ==, 0);
   g_assert_cmpuint (properties_changed_count, ==, 0);
 
-  g_clear_pointer (&debug_enabled_variant, g_variant_unref);
-  g_clear_pointer (&reply, g_variant_unref);
+  g_clear_pointer (&debug_enabled_variant, xvariant_unref);
+  g_clear_pointer (&reply, xvariant_unref);
 
   g_signal_handler_disconnect (controller, handler_id);
   handler_id = 0;
@@ -330,7 +330,7 @@ test_dbus_properties (void)
                           "/org/gtk/Debugging",
                           "org.gtk.Debugging",
                           "SetDebugEnabled",
-                          g_variant_new ("(b)", !old_value),
+                          xvariant_new ("(b)", !old_value),
                           NULL,
                           G_DBUS_CALL_FLAGS_NONE,
                           -1,
@@ -339,7 +339,7 @@ test_dbus_properties (void)
                           &result);
 
   while (result == NULL)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   reply = g_dbus_connection_call_finish (remote_connection, result, &local_error);
   g_assert_no_error (local_error);
@@ -349,8 +349,8 @@ test_dbus_properties (void)
   g_assert_cmpuint (notify_count, ==, 1);
   g_assert_cmpuint (properties_changed_count, ==, 1);
 
-  g_clear_pointer (&debug_enabled_variant, g_variant_unref);
-  g_clear_pointer (&reply, g_variant_unref);
+  g_clear_pointer (&debug_enabled_variant, xvariant_unref);
+  g_clear_pointer (&reply, xvariant_unref);
 
   g_signal_handler_disconnect (controller, handler_id);
   handler_id = 0;
@@ -361,7 +361,7 @@ test_dbus_properties (void)
   g_assert_cmpuint (notify_count, ==, 2);
 
   while (properties_changed_count != 2)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   g_assert_cmpuint (properties_changed_count, ==, 2);
 
@@ -372,7 +372,7 @@ test_dbus_properties (void)
   properties_changed_id = 0;
 
   g_debug_controller_dbus_stop (controller);
-  while (g_main_context_iteration (NULL, FALSE));
+  while (xmain_context_iteration (NULL, FALSE));
   g_assert_finalize_object (controller);
   g_clear_object (&controller_connection);
   g_clear_object (&remote_connection);

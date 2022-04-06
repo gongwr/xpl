@@ -49,16 +49,16 @@ msgstr ""
 "Indstilling af program som det sidst brugte til typen understøttes endnu ikke"
 
 #: gio/gapplication.c:497
-msgid "GApplication options"
-msgstr "GApplication-indstillinger"
+msgid "xapplication_t options"
+msgstr "xapplication_t-indstillinger"
 
 #: gio/gapplication.c:497
-msgid "Show GApplication options"
-msgstr "Vis GApplication-indstillinger"
+msgid "Show xapplication_t options"
+msgstr "Vis xapplication_t-indstillinger"
 
 #: gio/gapplication.c:542
-msgid "Enter GApplication service mode (use from D-Bus service files)"
-msgstr "Indtast GApplication-tjenestetilstand (brug fra D-Bus-tjenestefiler)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgstr "Indtast xapplication_t-tjenestetilstand (brug fra D-Bus-tjenestefiler)"
 
 #: gio/gapplication.c:554
 msgid "Override the application’s ID"
@@ -294,8 +294,8 @@ msgid "Seek not supported on base stream"
 msgstr "Søgning understøttes ikke af basisstrømmen"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "Kan ikke afkorte GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "Kan ikke afkorte xbuffered_input_stream"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -366,20 +366,20 @@ msgid "%s filetype"
 msgstr "%s-filtype"
 
 #: gio/gcredentials.c:335
-msgid "GCredentials contains invalid data"
-msgstr "GCredentials indeholder ugyldige data"
+msgid "xcredentials_t contains invalid data"
+msgstr "xcredentials_t indeholder ugyldige data"
 
 #: gio/gcredentials.c:395 gio/gcredentials.c:686
-msgid "GCredentials is not implemented on this OS"
-msgstr "GCredentials er ikke implementeret på dette operativsystem"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "xcredentials_t er ikke implementeret på dette operativsystem"
 
 #: gio/gcredentials.c:550 gio/gcredentials.c:568
-msgid "There is no GCredentials support for your platform"
-msgstr "Der er ingen understøttelse for GCredentials på din platform"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "Der er ingen understøttelse for xcredentials_t på din platform"
 
 #: gio/gcredentials.c:626
-msgid "GCredentials does not contain a process ID on this OS"
-msgstr "GCredentials indeholder ikke en proces-id på dette operativsystem"
+msgid "xcredentials_t does not contain a process ID on this OS"
+msgstr "xcredentials_t indeholder ikke en proces-id på dette operativsystem"
 
 #: gio/gcredentials.c:680
 msgid "Credentials spoofing is not possible on this OS"
@@ -578,8 +578,8 @@ msgid "User IDs must be the same for peer and server"
 msgstr "Bruger-id'er skal være de samme for peer og server"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "Annulleret via GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "Annulleret via xdbus_auth_observer_t::authorize-authenticated-peer"
 
 #: gio/gdbusauthmechanismsha1.c:299
 #, c-format
@@ -1391,27 +1391,27 @@ msgstr "DTLS-understøttelse er ikke tilgængelig"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of GEmblem encoding"
-msgstr "Kan ikke håndtere version %d af GEmblem-kodning"
+msgid "Can’t handle version %d of xemblem_t encoding"
+msgstr "Kan ikke håndtere version %d af xemblem_t-kodning"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "Forkert antal symboler (%d) i GEmblem-kodning"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "Forkert antal symboler (%d) i xemblem_t-kodning"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of GEmblemedIcon encoding"
+msgid "Can’t handle version %d of xemblemed_icon_t encoding"
 msgstr "Kan ikke håndtere version %d af GEmblemIcon-kodning"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "Forkert antal symboler (%d) i GEmblemedIcon-kodning"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "Forkert antal symboler (%d) i xemblemed_icon_t-kodning"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "Forventede et GEmblem til GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "Forventede et xemblem_t til xemblemed_icon_t"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1470,7 +1470,7 @@ msgstr "Ugyldig værdi givet for symlink"
 msgid "Symbolic links not supported"
 msgstr "Symbolske links er ikke understøttet"
 
-# I koden er det en funktion der hedder g_file_trash, som kan give dette som en fejlmeddelelse
+# I koden er det en funktion der hedder xfile_trash, som kan give dette som en fejlmeddelelse
 #: gio/gfile.c:4316
 msgid "Trash not supported"
 msgstr "Flyt til papirkurv understøttes ikke"
@@ -1504,12 +1504,12 @@ msgstr "Filoptæller er allerede lukket"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of GFileIcon encoding"
-msgstr "Kan ikke håndtere version %d af GFileIcon-kodning"
+msgid "Can’t handle version %d of xfile_icon_t encoding"
+msgstr "Kan ikke håndtere version %d af xfile_icon_t-kodning"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for GFileIcon"
-msgstr "Fejlformateret inddata til GFileIcon"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "Fejlformateret inddata til xfile_icon_t"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -3005,11 +3005,11 @@ msgstr "Gennemtving ikke begrænsninger på nøglenavn"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Kompilér alle GSettings-skemafiler til et skemamellemlager.\n"
+"Kompilér alle xsettings_t-skemafiler til et skemamellemlager.\n"
 "Schemafiler skal have filendelsen .gschema.xml,\n"
 "og mellemlagerfilen kaldes gschemas.compiled."
 
@@ -3374,8 +3374,8 @@ msgid "Invalid seek request"
 msgstr "Ugyldig søgeforespørgsel"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "Kan ikke afkorte GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "Kan ikke afkorte xmemory_input_stream_t"
 
 #: gio/gmemoryoutputstream.c:568
 msgid "Memory output stream not resizable"
@@ -4048,8 +4048,8 @@ msgid "Error sending message: %s"
 msgstr "Fejl ved afsendelse af meddelelse: %s"
 
 #: gio/gsocket.c:5032
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "GSocketControlMessage understøttes ikke af Windows"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "xsocket_control_message_t understøttes ikke af Windows"
 
 #: gio/gsocket.c:5505 gio/gsocket.c:5581 gio/gsocket.c:5807
 #, c-format
@@ -4195,8 +4195,8 @@ msgstr "Kanaler understøttes ikke på denne platform"
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of GThemedIcon encoding"
-msgstr "Kan ikke håndtere version %d af GThemedIcon-kodningen"
+msgid "Can’t handle version %d of xthemed_icon_t encoding"
+msgstr "Kan ikke håndtere version %d af xthemed_icon_t-kodningen"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4249,9 +4249,9 @@ msgid "The current TLS backend does not support PKCS #12"
 msgstr "Den nuværende TLS-motor understøtter ikke PKCS #12"
 
 #: gio/gtlscertificate.c:1013
-msgid "This GTlsBackend does not support creating PKCS #11 certificates"
+msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
 msgstr ""
-"Denne GTlsBackend understøtter ikke oprettelse af PKCS #11-certifikater"
+"Denne xtls_backend_t understøtter ikke oprettelse af PKCS #11-certifikater"
 
 #: gio/gtlspassword.c:111
 msgid ""
@@ -4560,26 +4560,26 @@ msgstr "Stinavnet “%s” er ikke en absolut sti"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %d %b %Y %T %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%d/%m-%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 # Læg mærke til programmørkommentaren. Selvom vi ikke bruger AM/PM %p må det jo stadig være den foretrukne måde at udtrykke 12-timers tid.
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -4962,13 +4962,13 @@ msgstr "dec"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "AM"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "PM"
 

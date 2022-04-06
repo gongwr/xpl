@@ -28,11 +28,11 @@
 G_BEGIN_DECLS
 
 #define XTYPE_INET_ADDRESS_MASK         (xinet_address_mask_get_type ())
-#define XINET_ADDRESS_MASK(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_INET_ADDRESS_MASK, xinet_address_mask_t))
-#define XINET_ADDRESS_MASK_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_INET_ADDRESS_MASK, xinet_address_mask_class_t))
+#define XINET_ADDRESS_MASK(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_INET_ADDRESS_MASK, xinet_address_mask))
+#define XINET_ADDRESS_MASK_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_INET_ADDRESS_MASK, xinet_address_mask_class))
 #define X_IS_INET_ADDRESS_MASK(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_INET_ADDRESS_MASK))
 #define X_IS_INET_ADDRESS_MASK_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_INET_ADDRESS_MASK))
-#define XINET_ADDRESS_MASK_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_INET_ADDRESS_MASK, xinet_address_mask_class_t))
+#define XINET_ADDRESS_MASK_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_INET_ADDRESS_MASK, xinet_address_mask_class))
 
 typedef struct _xinet_address_mask_class   xinet_address_mask_class_t;
 typedef struct _xinet_address_mask_private xinet_address_mask_private_t;

@@ -25,21 +25,21 @@
 #include "gdbus-tests.h"
 
 /* all tests rely on a shared mainloop */
-static GMainLoop *loop = NULL;
+static xmain_loop_t *loop = NULL;
 
 /* ---------------------------------------------------------------------------------------------------- */
 /* Test introspection parser */
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-test_introspection (GDBusProxy *proxy)
+test_introspection (xdbus_proxy_t *proxy)
 {
   xerror_t *error;
   const xchar_t *xml_data;
-  GDBusNodeInfo *node_info;
-  GDBusInterfaceInfo *interface_info;
-  GDBusMethodInfo *method_info;
-  GDBusSignalInfo *signal_info;
+  xdbus_node_info_t *node_info;
+  xdbus_interface_info_t *interface_info;
+  xdbus_method_info_t *method_info;
+  xdbus_signalInfo_t *signal_info;
   xvariant_t *result;
 
   error = NULL;
@@ -56,7 +56,7 @@ test_introspection (GDBusProxy *proxy)
                                    &error);
   g_assert_no_error (error);
   g_assert (result != NULL);
-  g_variant_get (result, "(&s)", &xml_data);
+  xvariant_get (result, "(&s)", &xml_data);
 
   node_info = g_dbus_node_info_new_for_xml (xml_data, &error);
   g_assert_no_error (error);
@@ -94,16 +94,16 @@ test_introspection (GDBusProxy *proxy)
   g_assert (signal_info->args[3] == NULL);
 
   g_dbus_node_info_unref (node_info);
-  g_variant_unref (result);
+  xvariant_unref (result);
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
 test_introspection_parser (void)
 {
-  GDBusProxy *proxy;
-  GDBusConnection *connection;
+  xdbus_proxy_t *proxy;
+  xdbus_connection_t *connection;
   xerror_t *error;
 
   error = NULL;
@@ -114,9 +114,9 @@ test_introspection_parser (void)
   error = NULL;
   proxy = g_dbus_proxy_new_sync (connection,
                                  G_DBUS_PROXY_FLAGS_NONE,
-                                 NULL,                      /* GDBusInterfaceInfo */
+                                 NULL,                      /* xdbus_interface_info_t */
                                  "com.example.TestService", /* name */
-                                 "/com/example/TestObject", /* object path */
+                                 "/com/example/test_object_t", /* object path */
                                  "com.example.Frob",        /* interface */
                                  NULL, /* xcancellable_t */
                                  &error);
@@ -129,8 +129,8 @@ test_introspection_parser (void)
 
   test_introspection (proxy);
 
-  g_object_unref (proxy);
-  g_object_unref (connection);
+  xobject_unref (proxy);
+  xobject_unref (connection);
 }
 
 /* check that a parse-generate roundtrip produces identical results
@@ -138,14 +138,14 @@ test_introspection_parser (void)
 static void
 test_generate (void)
 {
-  GDBusNodeInfo *info;
-  GDBusNodeInfo *info2;
-  GDBusInterfaceInfo *iinfo;
-  GDBusMethodInfo *minfo;
-  GDBusSignalInfo *sinfo;
-  GDBusArgInfo *arginfo;
-  GDBusPropertyInfo *pinfo;
-  GDBusAnnotationInfo *aninfo;
+  xdbus_node_info_t *info;
+  xdbus_node_info_t *info2;
+  xdbus_interface_info_t *iinfo;
+  xdbus_method_info_t *minfo;
+  xdbus_signalInfo_t *sinfo;
+  xdbus_arg_info_t *arginfo;
+  xdbus_property_info_t *pinfo;
+  xdbus_annotation_info_t *aninfo;
   const xchar_t *data =
   "  <node>"
   "    <interface name='com.example.Frob'>"
@@ -167,8 +167,8 @@ test_generate (void)
   "    </interface>"
   "  </node>";
 
-  GString *string;
-  GString *string2;
+  xstring_t *string;
+  xstring_t *string2;
   xerror_t *error;
 
   error = NULL;
@@ -200,16 +200,16 @@ test_generate (void)
   g_assert_cmpint (pinfo->flags, ==, G_DBUS_PROPERTY_INFO_FLAGS_READABLE |
                                      G_DBUS_PROPERTY_INFO_FLAGS_WRITABLE);
 
-  string = g_string_new ("");
+  string = xstring_new ("");
   g_dbus_node_info_generate_xml (info, 2, string);
 
   info2 = g_dbus_node_info_new_for_xml (string->str, &error);
-  string2 = g_string_new ("");
+  string2 = xstring_new ("");
   g_dbus_node_info_generate_xml (info2, 2, string2);
 
   g_assert_cmpstr (string->str, ==, string2->str);
-  g_string_free (string, TRUE);
-  g_string_free (string2, TRUE);
+  xstring_free (string, TRUE);
+  xstring_free (string2, TRUE);
 
   g_dbus_node_info_unref (info);
   g_dbus_node_info_unref (info2);
@@ -221,11 +221,11 @@ test_generate (void)
 static void
 test_default_direction (void)
 {
-  GDBusNodeInfo *info;
-  GDBusInterfaceInfo *iinfo;
-  GDBusMethodInfo *minfo;
-  GDBusSignalInfo *sinfo;
-  GDBusArgInfo *arginfo;
+  xdbus_node_info_t *info;
+  xdbus_interface_info_t *iinfo;
+  xdbus_method_info_t *minfo;
+  xdbus_signalInfo_t *sinfo;
+  xdbus_arg_info_t *arginfo;
   const xchar_t *data =
   "  <node>"
   "    <interface name='com.example.Frob'>"
@@ -262,7 +262,7 @@ test_default_direction (void)
 static void
 test_extra_data (void)
 {
-  GDBusNodeInfo *info;
+  xdbus_node_info_t *info;
   const xchar_t *data =
   "  <node>"
   "    <interface name='com.example.Frob' version='1.0'>"
@@ -308,7 +308,7 @@ main (int   argc,
   g_test_init (&argc, &argv, NULL);
 
   /* all the tests rely on a shared main loop */
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   g_test_add_func ("/gdbus/introspection-parser", test_introspection_parser);
   g_test_add_func ("/gdbus/introspection-generate", test_generate);
@@ -317,8 +317,8 @@ main (int   argc,
 
   ret = session_bus_run ();
 
-  while (g_main_context_iteration (NULL, FALSE));
-  g_main_loop_unref (loop);
+  while (xmain_context_iteration (NULL, FALSE));
+  xmain_loop_unref (loop);
 
   return ret;
 }

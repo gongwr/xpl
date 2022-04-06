@@ -71,13 +71,13 @@ GAllocator *    g_allocator_new         (const xchar_t  *name,
 XPL_DEPRECATED
 void            g_allocator_free        (GAllocator   *allocator);
 XPL_DEPRECATED
-void            g_list_push_allocator   (GAllocator   *allocator);
+void            xlist_push_allocator   (GAllocator   *allocator);
 XPL_DEPRECATED
-void            g_list_pop_allocator    (void);
+void            xlist_pop_allocator    (void);
 XPL_DEPRECATED
-void            g_slist_push_allocator  (GAllocator   *allocator);
+void            xslist_push_allocator  (GAllocator   *allocator);
 XPL_DEPRECATED
-void            g_slist_pop_allocator   (void);
+void            xslist_pop_allocator   (void);
 XPL_DEPRECATED
 void            g_node_push_allocator   (GAllocator   *allocator);
 XPL_DEPRECATED

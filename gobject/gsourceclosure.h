@@ -27,11 +27,11 @@
 G_BEGIN_DECLS
 
 XPL_AVAILABLE_IN_ALL
-void g_source_set_closure        (GSource  *source,
-				  GClosure *closure);
+void xsource_set_closure        (xsource_t  *source,
+				  xclosure_t *closure);
 
 XPL_AVAILABLE_IN_ALL
-void g_source_set_dummy_callback (GSource  *source);
+void xsource_set_dummy_callback (xsource_t  *source);
 
 G_END_DECLS
 

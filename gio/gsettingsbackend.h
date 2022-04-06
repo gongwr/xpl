@@ -34,7 +34,7 @@ G_BEGIN_DECLS
 
 #define XTYPE_SETTINGS_BACKEND                             (g_settings_backend_get_type ())
 #define G_SETTINGS_BACKEND(inst)                            (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_SETTINGS_BACKEND, GSettingsBackend))
+                                                             XTYPE_SETTINGS_BACKEND, xsettings_backend))
 #define G_SETTINGS_BACKEND_CLASS(class)                     (XTYPE_CHECK_CLASS_CAST ((class),                       \
                                                              XTYPE_SETTINGS_BACKEND, GSettingsBackendClass))
 #define X_IS_SETTINGS_BACKEND(inst)                         (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
@@ -47,12 +47,12 @@ G_BEGIN_DECLS
 /**
  * G_SETTINGS_BACKEND_EXTENSION_POINT_NAME:
  *
- * Extension point for #GSettingsBackend functionality.
+ * Extension point for #xsettings_backend_t functionality.
  **/
 #define G_SETTINGS_BACKEND_EXTENSION_POINT_NAME "gsettings-backend"
 
 /**
- * GSettingsBackend:
+ * xsettings_backend_t:
  *
  * An implementation of a settings storage repository.
  **/
@@ -72,41 +72,41 @@ typedef struct _GSettingsBackendClass                       GSettingsBackendClas
  * @get_permission: virtual method to get permission of a key
  * @read_user_value: virtual method to read user's key value
  *
- * Class structure for #GSettingsBackend.
+ * Class structure for #xsettings_backend_t.
  */
 struct _GSettingsBackendClass
 {
   xobject_class_t parent_class;
 
-  xvariant_t *    (*read)             (GSettingsBackend    *backend,
+  xvariant_t *    (*read)             (xsettings_backend_t    *backend,
                                      const xchar_t         *key,
                                      const xvariant_type_t  *expected_type,
                                      xboolean_t             default_value);
 
-  xboolean_t      (*get_writable)     (GSettingsBackend    *backend,
+  xboolean_t      (*get_writable)     (xsettings_backend_t    *backend,
                                      const xchar_t         *key);
 
-  xboolean_t      (*write)            (GSettingsBackend    *backend,
+  xboolean_t      (*write)            (xsettings_backend_t    *backend,
                                      const xchar_t         *key,
                                      xvariant_t            *value,
                                      xpointer_t             origin_tag);
-  xboolean_t      (*write_tree)       (GSettingsBackend    *backend,
-                                     GTree               *tree,
+  xboolean_t      (*write_tree)       (xsettings_backend_t    *backend,
+                                     xtree_t               *tree,
                                      xpointer_t             origin_tag);
-  void          (*reset)            (GSettingsBackend    *backend,
+  void          (*reset)            (xsettings_backend_t    *backend,
                                      const xchar_t         *key,
                                      xpointer_t             origin_tag);
 
-  void          (*subscribe)        (GSettingsBackend    *backend,
+  void          (*subscribe)        (xsettings_backend_t    *backend,
                                      const xchar_t         *name);
-  void          (*unsubscribe)      (GSettingsBackend    *backend,
+  void          (*unsubscribe)      (xsettings_backend_t    *backend,
                                      const xchar_t         *name);
-  void          (*sync)             (GSettingsBackend    *backend);
+  void          (*sync)             (xsettings_backend_t    *backend);
 
-  GPermission * (*get_permission)   (GSettingsBackend    *backend,
+  xpermission_t * (*get_permission)   (xsettings_backend_t    *backend,
                                      const xchar_t         *path);
 
-  xvariant_t *    (*read_user_value)  (GSettingsBackend    *backend,
+  xvariant_t *    (*read_user_value)  (xsettings_backend_t    *backend,
                                      const xchar_t         *key,
                                      const xvariant_type_t  *expected_type);
 
@@ -126,48 +126,48 @@ XPL_AVAILABLE_IN_ALL
 xtype_t                   g_settings_backend_get_type                     (void);
 
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_backend_changed                      (GSettingsBackend    *backend,
+void                    g_settings_backend_changed                      (xsettings_backend_t    *backend,
                                                                          const xchar_t         *key,
                                                                          xpointer_t             origin_tag);
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_backend_path_changed                 (GSettingsBackend    *backend,
+void                    g_settings_backend_path_changed                 (xsettings_backend_t    *backend,
                                                                          const xchar_t         *path,
                                                                          xpointer_t             origin_tag);
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_backend_flatten_tree                 (GTree               *tree,
+void                    g_settings_backend_flatten_tree                 (xtree_t               *tree,
                                                                          xchar_t              **path,
                                                                          const xchar_t       ***keys,
                                                                          xvariant_t          ***values);
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_backend_keys_changed                 (GSettingsBackend    *backend,
+void                    g_settings_backend_keys_changed                 (xsettings_backend_t    *backend,
                                                                          const xchar_t         *path,
                                                                          xchar_t const * const *items,
                                                                          xpointer_t             origin_tag);
 
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_backend_path_writable_changed        (GSettingsBackend    *backend,
+void                    g_settings_backend_path_writable_changed        (xsettings_backend_t    *backend,
                                                                          const xchar_t         *path);
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_backend_writable_changed             (GSettingsBackend    *backend,
+void                    g_settings_backend_writable_changed             (xsettings_backend_t    *backend,
                                                                          const xchar_t         *key);
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_backend_changed_tree                 (GSettingsBackend    *backend,
-                                                                         GTree               *tree,
+void                    g_settings_backend_changed_tree                 (xsettings_backend_t    *backend,
+                                                                         xtree_t               *tree,
                                                                          xpointer_t             origin_tag);
 
 XPL_AVAILABLE_IN_ALL
-GSettingsBackend *      g_settings_backend_get_default                  (void);
+xsettings_backend_t *      g_settings_backend_get_default                  (void);
 
 XPL_AVAILABLE_IN_ALL
-GSettingsBackend *      g_keyfile_settings_backend_new                  (const xchar_t         *filename,
+xsettings_backend_t *      g_keyfile_settings_backend_new                  (const xchar_t         *filename,
                                                                          const xchar_t         *root_path,
                                                                          const xchar_t         *root_group);
 
 XPL_AVAILABLE_IN_ALL
-GSettingsBackend *      g_null_settings_backend_new                     (void);
+xsettings_backend_t *      g_null_settings_backend_new                     (void);
 
 XPL_AVAILABLE_IN_ALL
-GSettingsBackend *      g_memory_settings_backend_new                   (void);
+xsettings_backend_t *      g_memory_settings_backend_new                   (void);
 
 G_END_DECLS
 

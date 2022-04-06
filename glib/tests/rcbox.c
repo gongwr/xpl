@@ -91,11 +91,11 @@ test_rcbox_release_full (void)
 
   g_assert_true (g_rc_box_acquire (p) == p);
 
-  g_rc_box_release_full (p, (GDestroyNotify) point_clear);
+  g_rc_box_release_full (p, (xdestroy_notify_t) point_clear);
   g_assert_nonnull (global_point);
   g_assert_true (p == global_point);
 
-  g_rc_box_release_full (p, (GDestroyNotify) point_clear);
+  g_rc_box_release_full (p, (xdestroy_notify_t) point_clear);
   g_assert_null (global_point);
 }
 
@@ -115,11 +115,11 @@ test_atomic_rcbox_release_full (void)
 
   g_assert_true (g_atomic_rc_box_acquire (p) == p);
 
-  g_atomic_rc_box_release_full (p, (GDestroyNotify) point_clear);
+  g_atomic_rc_box_release_full (p, (xdestroy_notify_t) point_clear);
   g_assert_nonnull (global_point);
   g_assert_true (p == global_point);
 
-  g_atomic_rc_box_release_full (p, (GDestroyNotify) point_clear);
+  g_atomic_rc_box_release_full (p, (xdestroy_notify_t) point_clear);
   g_assert_null (global_point);
 }
 
@@ -174,11 +174,11 @@ test_rcbox_dup (void)
   g_assert_cmpfloat (a->x, !=, b->x);
   g_assert_cmpfloat (a->y, !=, b->y);
 
-  g_rc_box_release_full (a, (GDestroyNotify) point_clear_dup_a);
+  g_rc_box_release_full (a, (xdestroy_notify_t) point_clear_dup_a);
   g_assert_null (global_point_a);
   g_assert_nonnull (global_point_b);
 
-  g_rc_box_release_full (b, (GDestroyNotify) point_clear_dup_b);
+  g_rc_box_release_full (b, (xdestroy_notify_t) point_clear_dup_b);
   g_assert_null (global_point_b);
 }
 
@@ -212,11 +212,11 @@ test_atomic_rcbox_dup (void)
   g_assert_cmpfloat (a->x, !=, b->x);
   g_assert_cmpfloat (a->y, !=, b->y);
 
-  g_atomic_rc_box_release_full (a, (GDestroyNotify) point_clear_dup_a);
+  g_atomic_rc_box_release_full (a, (xdestroy_notify_t) point_clear_dup_a);
   g_assert_null (global_point_a);
   g_assert_nonnull (global_point_b);
 
-  g_atomic_rc_box_release_full (b, (GDestroyNotify) point_clear_dup_b);
+  g_atomic_rc_box_release_full (b, (xdestroy_notify_t) point_clear_dup_b);
   g_assert_null (global_point_b);
 }
 

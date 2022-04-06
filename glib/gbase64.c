@@ -58,10 +58,10 @@ static const char base64_alphabet[] =
 
 /**
  * g_base64_encode_step:
- * @in: (array length=len) (element-type guint8): the binary data to encode
+ * @in: (array length=len) (element-type xuint8_t): the binary data to encode
  * @len: the length of @in
  * @break_lines: whether to break long lines
- * @out: (out) (array) (element-type guint8): pointer to destination buffer
+ * @out: (out) (array) (element-type xuint8_t): pointer to destination buffer
  * @state: (inout): Saved state between steps, initialize to 0
  * @save: (inout): Saved state between steps, initialize to 0
  *
@@ -186,7 +186,7 @@ g_base64_encode_step (const guchar *in,
 /**
  * g_base64_encode_close:
  * @break_lines: whether to break long lines
- * @out: (out) (array) (element-type guint8): pointer to destination buffer
+ * @out: (out) (array) (element-type xuint8_t): pointer to destination buffer
  * @state: (inout): Saved state from g_base64_encode_step()
  * @save: (inout): Saved state from g_base64_encode_step()
  *
@@ -245,7 +245,7 @@ g_base64_encode_close (xboolean_t  break_lines,
 
 /**
  * g_base64_encode:
- * @data: (array length=len) (element-type guint8) (nullable): the binary data to encode
+ * @data: (array length=len) (element-type xuint8_t) (nullable): the binary data to encode
  * @len: the length of @data
  *
  * Encode a sequence of binary data into its Base-64 stringified
@@ -301,9 +301,9 @@ static const unsigned char mime_base64_rank[256] = {
 
 /**
  * g_base64_decode_step: (skip)
- * @in: (array length=len) (element-type guint8): binary input data
+ * @in: (array length=len) (element-type xuint8_t): binary input data
  * @len: max length of @in data to decode
- * @out: (out caller-allocates) (array) (element-type guint8): output buffer
+ * @out: (out caller-allocates) (array) (element-type xuint8_t): output buffer
  * @state: (inout): Saved state between steps, initialize to 0
  * @save: (inout): Saved state between steps, initialize to 0
  *
@@ -398,7 +398,7 @@ g_base64_decode_step (const xchar_t  *in,
  * that the returned binary data is not necessarily zero-terminated,
  * so it should not be used as a character string.
  *
- * Returns: (transfer full) (array length=out_len) (element-type guint8):
+ * Returns: (transfer full) (array length=out_len) (element-type xuint8_t):
  *               newly allocated buffer containing the binary data
  *               that @text represents. The returned buffer must
  *               be freed with g_free().
@@ -430,7 +430,7 @@ g_base64_decode (const xchar_t *text,
 
 /**
  * g_base64_decode_inplace:
- * @text: (inout) (array length=out_len) (element-type guint8): zero-terminated
+ * @text: (inout) (array length=out_len) (element-type xuint8_t): zero-terminated
  *        string with base64 text to decode
  * @out_len: (inout): The length of the decoded data is written here
  *

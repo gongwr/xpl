@@ -20,7 +20,7 @@
 #include <gio/gio.h>
 
 static void
-event_cb (GSocketListener      *listener,
+event_cb (xsocket_listener_t      *listener,
           GSocketListenerEvent  event,
           xsocket_t              *socket,
           xpointer_t              data)
@@ -55,12 +55,12 @@ test_event_signal (void)
   xboolean_t success = FALSE;
   xinet_address_t *iaddr;
   xsocket_address_t *saddr;
-  GSocketListener *listener;
+  xsocket_listener_t *listener;
   xerror_t *error = NULL;
 
   iaddr = xinet_address_new_loopback (XSOCKET_FAMILY_IPV4);
   saddr = g_inet_socket_address_new (iaddr, 0);
-  g_object_unref (iaddr);
+  xobject_unref (iaddr);
 
   listener = xsocket_listener_new ();
 
@@ -76,8 +76,8 @@ test_event_signal (void)
   g_assert_no_error (error);
   g_assert_true (success);
 
-  g_object_unref (saddr);
-  g_object_unref (listener);
+  xobject_unref (saddr);
+  xobject_unref (listener);
 }
 
 int

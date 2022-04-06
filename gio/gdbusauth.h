@@ -64,18 +64,18 @@ GDBusAuth  *_g_dbus_auth_new      (xio_stream_t *stream);
 /* TODO: need to expose encode()/decode() from the AuthMechanism (and whether it is needed at all) */
 
 xboolean_t    _g_dbus_auth_run_server (GDBusAuth             *auth,
-                                     GDBusAuthObserver     *observer,
+                                     xdbus_auth_observer_t     *observer,
                                      const xchar_t           *guid,
                                      xboolean_t               allow_anonymous,
                                      xboolean_t               require_same_user,
                                      GDBusCapabilityFlags   offered_capabilities,
                                      GDBusCapabilityFlags  *out_negotiated_capabilities,
-                                     GCredentials         **out_received_credentials,
+                                     xcredentials_t         **out_received_credentials,
                                      xcancellable_t          *cancellable,
                                      xerror_t               **error);
 
 xchar_t      *_g_dbus_auth_run_client (GDBusAuth     *auth,
-                                     GDBusAuthObserver     *observer,
+                                     xdbus_auth_observer_t     *observer,
                                      GDBusCapabilityFlags offered_capabilities,
                                      GDBusCapabilityFlags *out_negotiated_capabilities,
                                      xcancellable_t  *cancellable,

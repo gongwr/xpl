@@ -99,23 +99,23 @@ test_srv_target_ordering (void)
 
   targets = NULL;
   /*                                 name, port, priority, weight */
-  targets = g_list_append (targets, g_srv_target_new ("a", 0, 2, 0));
-  targets = g_list_append (targets, g_srv_target_new ("b", 0, 2, 10));
-  targets = g_list_append (targets, g_srv_target_new ("c", 0, 2, 15));
-  targets = g_list_append (targets, g_srv_target_new ("d", 0, 2, 5));
-  targets = g_list_append (targets, g_srv_target_new ("e", 0, 1, 0));
-  targets = g_list_append (targets, g_srv_target_new ("f", 0, 1, 50));
+  targets = xlist_append (targets, g_srv_target_new ("a", 0, 2, 0));
+  targets = xlist_append (targets, g_srv_target_new ("b", 0, 2, 10));
+  targets = xlist_append (targets, g_srv_target_new ("c", 0, 2, 15));
+  targets = xlist_append (targets, g_srv_target_new ("d", 0, 2, 5));
+  targets = xlist_append (targets, g_srv_target_new ("e", 0, 1, 0));
+  targets = xlist_append (targets, g_srv_target_new ("f", 0, 1, 50));
 
   for (i = 0; i < NUM_TRIALS; i++)
     {
       g_random_set_seed (i);
 
-      sorted = g_srv_target_list_sort (g_list_copy (targets));
+      sorted = g_srv_target_list_sort (xlist_copy (targets));
 
       for (t = sorted, p = result; t; t = t->next)
 	*(p++) = *g_srv_target_get_hostname (t->data);
       *p = '\0';
-      g_list_free (sorted);
+      xlist_free (sorted);
 
       for (o = 0; o < NUM_ORDERINGS; o++)
 	{
@@ -129,7 +129,7 @@ test_srv_target_ordering (void)
       /* Assert that @result matched one of the valid orderings */
       if (o == NUM_ORDERINGS)
 	{
-	  char *msg = g_strdup_printf ("result '%s' is invalid", result);
+	  char *msg = xstrdup_printf ("result '%s' is invalid", result);
 	  g_assertion_message (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
 	}
     }

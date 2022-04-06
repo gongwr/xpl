@@ -62,19 +62,19 @@ key_destroy (xpointer_t key)
 }
 
 static xuint_t
-key_hash (gconstpointer key)
+key_hash (xconstpointer key)
 {
   return *(xuint_t*)key;
 }
 
 static xuint_t
-value_hash (gconstpointer value)
+value_hash (xconstpointer value)
 {
   return *(xuint_t*)value;
 }
 
 static xboolean_t
-key_equal (gconstpointer key1, gconstpointer key2)
+key_equal (xconstpointer key1, xconstpointer key2)
 {
   return *(xint_t*)key1 == *(xint_t*)key2;
 }

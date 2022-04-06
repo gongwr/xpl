@@ -14,12 +14,12 @@
 
 /**
  * SECTION:gsocketcontrolmessage
- * @title: GSocketControlMessage
+ * @title: xsocket_control_message_t
  * @short_description: A xsocket_t control message
  * @include: gio/gio.h
  * @see_also: #xsocket_t.
  *
- * A #GSocketControlMessage is a special-purpose utility message that
+ * A #xsocket_control_message_t is a special-purpose utility message that
  * can be sent to or received from a #xsocket_t. These types of
  * messages are often called "ancillary data".
  *
@@ -54,11 +54,11 @@
 #endif
 
 
-G_DEFINE_ABSTRACT_TYPE (GSocketControlMessage, xsocket_control_message, XTYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE (xsocket_control_message, xsocket_control_message, XTYPE_OBJECT)
 
 /**
  * xsocket_control_message_get_size:
- * @message: a #GSocketControlMessage
+ * @message: a #xsocket_control_message_t
  *
  * Returns the space required for the control message, not including
  * headers or alignment.
@@ -68,7 +68,7 @@ G_DEFINE_ABSTRACT_TYPE (GSocketControlMessage, xsocket_control_message, XTYPE_OB
  * Since: 2.22
  */
 xsize_t
-xsocket_control_message_get_size (GSocketControlMessage *message)
+xsocket_control_message_get_size (xsocket_control_message_t *message)
 {
   g_return_val_if_fail (X_IS_SOCKET_CONTROL_MESSAGE (message), 0);
 
@@ -77,7 +77,7 @@ xsocket_control_message_get_size (GSocketControlMessage *message)
 
 /**
  * xsocket_control_message_get_level:
- * @message: a #GSocketControlMessage
+ * @message: a #xsocket_control_message_t
  *
  * Returns the "level" (i.e. the originating protocol) of the control message.
  * This is often SOL_SOCKET.
@@ -87,7 +87,7 @@ xsocket_control_message_get_size (GSocketControlMessage *message)
  * Since: 2.22
  */
 int
-xsocket_control_message_get_level (GSocketControlMessage *message)
+xsocket_control_message_get_level (xsocket_control_message_t *message)
 {
   g_return_val_if_fail (X_IS_SOCKET_CONTROL_MESSAGE (message), 0);
 
@@ -96,7 +96,7 @@ xsocket_control_message_get_level (GSocketControlMessage *message)
 
 /**
  * xsocket_control_message_get_msg_type:
- * @message: a #GSocketControlMessage
+ * @message: a #xsocket_control_message_t
  *
  * Returns the protocol specific type of the control message.
  * For instance, for UNIX fd passing this would be SCM_RIGHTS.
@@ -106,7 +106,7 @@ xsocket_control_message_get_level (GSocketControlMessage *message)
  * Since: 2.22
  */
 int
-xsocket_control_message_get_msg_type (GSocketControlMessage *message)
+xsocket_control_message_get_msg_type (xsocket_control_message_t *message)
 {
   g_return_val_if_fail (X_IS_SOCKET_CONTROL_MESSAGE (message), 0);
 
@@ -115,7 +115,7 @@ xsocket_control_message_get_msg_type (GSocketControlMessage *message)
 
 /**
  * xsocket_control_message_serialize:
- * @message: a #GSocketControlMessage
+ * @message: a #xsocket_control_message_t
  * @data: (not nullable): A buffer to write data to
  *
  * Converts the data in the message to bytes placed in the
@@ -128,7 +128,7 @@ xsocket_control_message_get_msg_type (GSocketControlMessage *message)
  * Since: 2.22
  */
 void
-xsocket_control_message_serialize (GSocketControlMessage *message,
+xsocket_control_message_serialize (xsocket_control_message_t *message,
 				    xpointer_t               data)
 {
   g_return_if_fail (X_IS_SOCKET_CONTROL_MESSAGE (message));
@@ -138,12 +138,12 @@ xsocket_control_message_serialize (GSocketControlMessage *message,
 
 
 static void
-xsocket_control_message_init (GSocketControlMessage *message)
+xsocket_control_message_init (xsocket_control_message_t *message)
 {
 }
 
 static void
-xsocket_control_message_class_init (GSocketControlMessageClass *class)
+xsocket_control_message_class_init (xsocket_control_message_class_t *class)
 {
 }
 
@@ -152,12 +152,12 @@ xsocket_control_message_class_init (GSocketControlMessageClass *class)
  * @level: a socket level
  * @type: a socket control message type for the given @level
  * @size: the size of the data in bytes
- * @data: (array length=size) (element-type guint8): pointer to the message data
+ * @data: (array length=size) (element-type xuint8_t): pointer to the message data
  *
  * Tries to deserialize a socket control message of a given
  * @level and @type. This will ask all known (to xtype_t) subclasses
- * of #GSocketControlMessage if they can understand this kind
- * of message and if so deserialize it into a #GSocketControlMessage.
+ * of #xsocket_control_message_t if they can understand this kind
+ * of message and if so deserialize it into a #xsocket_control_message_t.
  *
  * If there is no implementation for this kind of control message, %NULL
  * will be returned.
@@ -166,33 +166,33 @@ xsocket_control_message_class_init (GSocketControlMessageClass *class)
  *
  * Since: 2.22
  */
-GSocketControlMessage *
+xsocket_control_message_t *
 xsocket_control_message_deserialize (int      level,
 				      int      type,
 				      xsize_t    size,
 				      xpointer_t data)
 {
-  GSocketControlMessage *message;
+  xsocket_control_message_t *message;
   xtype_t *message_types;
   xuint_t n_message_types;
   xuint_t i;
 
   /* Ensure we know about the built in types */
 #ifndef G_OS_WIN32
-  g_type_ensure (XTYPE_UNIX_CREDENTIALS_MESSAGE);
-  g_type_ensure (XTYPE_UNIX_FD_MESSAGE);
+  xtype_ensure (XTYPE_UNIX_CREDENTIALS_MESSAGE);
+  xtype_ensure (XTYPE_UNIX_FD_MESSAGE);
 #endif
 
-  message_types = g_type_children (XTYPE_SOCKET_CONTROL_MESSAGE, &n_message_types);
+  message_types = xtype_children (XTYPE_SOCKET_CONTROL_MESSAGE, &n_message_types);
 
   message = NULL;
   for (i = 0; i < n_message_types; i++)
     {
-      GSocketControlMessageClass *class;
+      xsocket_control_message_class_t *class;
 
-      class = g_type_class_ref (message_types[i]);
+      class = xtype_class_ref (message_types[i]);
       message = class->deserialize (level, type, size, data);
-      g_type_class_unref (class);
+      xtype_class_unref (class);
 
       if (message != NULL)
         break;

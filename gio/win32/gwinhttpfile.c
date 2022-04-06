@@ -37,7 +37,7 @@
 
 #include "glibintl.h"
 
-static void g_winhttp_file_file_iface_init (GFileIface *iface);
+static void g_winhttp_file_file_iface_init (xfile_iface_t *iface);
 
 #define g_winhttp_file_get_type _g_winhttp_file_get_type
 G_DEFINE_TYPE_WITH_CODE (GWinHttpFile, g_winhttp_file, XTYPE_OBJECT,
@@ -58,7 +58,7 @@ g_winhttp_file_finalize (xobject_t *object)
   g_free (file->url.lpszUrlPath);
   g_free (file->url.lpszExtraInfo);
 
-  g_object_unref (file->vfs);
+  xobject_unref (file->vfs);
 
   G_OBJECT_CLASS (g_winhttp_file_parent_class)->finalize (object);
 }
@@ -90,13 +90,13 @@ _g_winhttp_file_new (GWinHttpVfs *vfs,
   wchar_t *wuri;
   GWinHttpFile *file;
 
-  wuri = g_utf8_to_utf16 (uri, -1, NULL, NULL, NULL);
+  wuri = xutf8_to_utf16 (uri, -1, NULL, NULL, NULL);
 
   if (wuri == NULL)
     return NULL;
 
-  file = g_object_new (XTYPE_WINHTTP_FILE, NULL);
-  file->vfs = g_object_ref (vfs);
+  file = xobject_new (XTYPE_WINHTTP_FILE, NULL);
+  file->vfs = xobject_ref (vfs);
 
   memset (&file->url, 0, sizeof (file->url));
   file->url.dwStructSize = sizeof (file->url);
@@ -133,7 +133,7 @@ _g_winhttp_file_new (GWinHttpVfs *vfs,
     }
 
   g_free (wuri);
-  return G_FILE (file);
+  return XFILE (file);
 }
 
 static xboolean_t
@@ -155,7 +155,7 @@ g_winhttp_file_get_uri_scheme (xfile_t *file)
 {
   GWinHttpFile *winhttp_file = G_WINHTTP_FILE (file);
 
-  return g_utf16_to_utf8 (winhttp_file->url.lpszScheme, -1, NULL, NULL, NULL);
+  return xutf16_to_utf8 (winhttp_file->url.lpszScheme, -1, NULL, NULL, NULL);
 }
 
 static char *
@@ -166,13 +166,13 @@ g_winhttp_file_get_basename (xfile_t *file)
   char *last_slash;
   char *retval;
 
-  basename = g_utf16_to_utf8 (winhttp_file->url.lpszUrlPath, -1, NULL, NULL, NULL);
+  basename = xutf16_to_utf8 (winhttp_file->url.lpszUrlPath, -1, NULL, NULL, NULL);
   last_slash = strrchr (basename, '/');
   /* If no slash, or only "/" fallback to full path part of URI */
   if (last_slash == NULL || last_slash[1] == '\0')
     return basename;
 
-  retval = g_strdup (last_slash + 1);
+  retval = xstrdup (last_slash + 1);
   g_free (basename);
 
   return retval;
@@ -183,12 +183,12 @@ g_winhttp_file_get_display_name (xfile_t *file)
 {
   char *basename;
 
-  /* FIXME: This could be improved by using a new g_utf16_make_valid() function
+  /* FIXME: This could be improved by using a new xutf16_make_valid() function
    * to recover what we can from the URI, and then suffixing it with
-   * “ (invalid encoding)” as per g_filename_display_basename(). */
+   * “ (invalid encoding)” as per xfilename_display_basename(). */
   basename = g_winhttp_file_get_basename (file);
   if (!basename)
-    return g_strdup (_(" (invalid encoding)"));
+    return xstrdup (_(" (invalid encoding)"));
 
   return g_steal_pointer (&basename);
 }
@@ -220,15 +220,15 @@ g_winhttp_file_get_uri (xfile_t *file)
       return NULL;
     }
 
-  retval = g_utf16_to_utf8 (wuri, -1, NULL, NULL, NULL);
+  retval = xutf16_to_utf8 (wuri, -1, NULL, NULL, NULL);
   g_free (wuri);
 
-  if (g_str_has_prefix (retval, "http://:@"))
+  if (xstr_has_prefix (retval, "http://:@"))
     {
       memmove (retval + 7, retval + 9, strlen (retval) - 9);
       retval[strlen (retval) - 2] = '\0';
     }
-  else if (g_str_has_prefix (retval, "https://:@"))
+  else if (xstr_has_prefix (retval, "https://:@"))
     {
       memmove (retval + 8, retval + 10, strlen (retval) - 10);
       retval[strlen (retval) - 2] = '\0';
@@ -293,7 +293,7 @@ static xuint_t
 g_winhttp_file_hash (xfile_t *file)
 {
   char *uri = g_winhttp_file_get_uri (file);
-  xuint_t retval = g_str_hash (uri);
+  xuint_t retval = xstr_hash (uri);
 
   g_free (uri);
 
@@ -306,7 +306,7 @@ g_winhttp_file_equal (xfile_t *file1,
 {
   char *uri1 = g_winhttp_file_get_uri (file1);
   char *uri2 = g_winhttp_file_get_uri (file2);
-  xboolean_t retval = g_str_equal (uri1, uri2);
+  xboolean_t retval = xstr_equal (uri1, uri2);
 
   g_free (uri1);
   g_free (uri2);
@@ -364,7 +364,7 @@ g_winhttp_file_get_relative_path (xfile_t *parent,
   remainder = match_prefix (descendant_uri, parent_uri);
 
   if (remainder != NULL && *remainder == '/')
-    retval = g_strdup (remainder + 1);
+    retval = xstrdup (remainder + 1);
   else
     retval = NULL;
 
@@ -380,7 +380,7 @@ g_winhttp_file_resolve_relative_path (xfile_t      *file,
 {
   GWinHttpFile *winhttp_file = G_WINHTTP_FILE (file);
   GWinHttpFile *child;
-  wchar_t *wnew_path = g_utf8_to_utf16 (relative_path, -1, NULL, NULL, NULL);
+  wchar_t *wnew_path = xutf8_to_utf16 (relative_path, -1, NULL, NULL, NULL);
 
   if (wnew_path == NULL)
     return NULL;
@@ -406,7 +406,7 @@ g_winhttp_file_resolve_relative_path (xfile_t      *file,
       wnew_path = tmp;
     }
 
-  child = g_object_new (XTYPE_WINHTTP_FILE, NULL);
+  child = xobject_new (XTYPE_WINHTTP_FILE, NULL);
   child->vfs = winhttp_file->vfs;
   child->url = winhttp_file->url;
   child->url.lpszScheme = g_memdup2 (winhttp_file->url.lpszScheme, ((xsize_t) winhttp_file->url.dwSchemeLength + 1) * 2);
@@ -437,7 +437,7 @@ g_winhttp_file_get_child_for_display_name (xfile_t        *file,
       return NULL;
     }
 
-  new_file = g_file_get_child (file, basename);
+  new_file = xfile_get_child (file, basename);
   g_free (basename);
 
   return new_file;
@@ -455,10 +455,10 @@ g_winhttp_file_set_display_name (xfile_t         *file,
   return NULL;
 }
 
-static GFileInfo *
+static xfile_info_t *
 g_winhttp_file_query_info (xfile_t                *file,
                            const char           *attributes,
-                           GFileQueryInfoFlags   flags,
+                           xfile_query_info_flags_t   flags,
                            xcancellable_t         *cancellable,
                            xerror_t              **error)
 {
@@ -469,8 +469,8 @@ g_winhttp_file_query_info (xfile_t                *file,
       L"*/*",
       NULL,
     };
-  GFileInfo *info;
-  GFileAttributeMatcher *matcher;
+  xfile_info_t *info;
+  xfile_attribute_matcher_t *matcher;
   char *basename;
   wchar_t *content_length;
   wchar_t *content_type;
@@ -521,19 +521,19 @@ g_winhttp_file_query_info (xfile_t                *file,
   if (!_g_winhttp_response (winhttp_file->vfs, request, error, "HEAD request"))
     return NULL;
 
-  matcher = g_file_attribute_matcher_new (attributes);
-  info = g_file_info_new ();
-  g_file_info_set_attribute_mask (info, matcher);
+  matcher = xfile_attribute_matcher_new (attributes);
+  info = xfile_info_new ();
+  xfile_info_set_attribute_mask (info, matcher);
 
   basename = g_winhttp_file_get_basename (file);
-  g_file_info_set_name (info, basename);
+  xfile_info_set_name (info, basename);
   g_free (basename);
 
-  if (_g_file_attribute_matcher_matches_id (matcher,
-                                            G_FILE_ATTRIBUTE_ID_STANDARD_DISPLAY_NAME))
+  if (_xfile_attribute_matcher_matches_id (matcher,
+                                            XFILE_ATTRIBUTE_ID_STANDARD_DISPLAY_NAME))
     {
       char *display_name = g_winhttp_file_get_display_name (file);
-      g_file_info_set_display_name (info, display_name);
+      xfile_info_set_display_name (info, display_name);
       g_free (display_name);
     }
 
@@ -548,11 +548,11 @@ g_winhttp_file_query_info (xfile_t                *file,
       gint64 cl;
       size_t n;
       const char *gint64_format = "%"G_GINT64_FORMAT"%n";
-      wchar_t *gint64_format_w = g_utf8_to_utf16 (gint64_format, -1, NULL, NULL, NULL);
+      wchar_t *gint64_format_w = xutf8_to_utf16 (gint64_format, -1, NULL, NULL, NULL);
 
       if (swscanf (content_length, gint64_format_w, &cl, &n) == 1 &&
           n == wcslen (content_length))
-        g_file_info_set_size (info, cl);
+        xfile_info_set_size (info, cl);
 
       g_free (content_length);
       g_free (gint64_format_w);
@@ -569,7 +569,7 @@ g_winhttp_file_query_info (xfile_t                *file,
                                &content_type,
                                NULL))
     {
-      char *ct = g_utf16_to_utf8 (content_type, -1, NULL, NULL, NULL);
+      char *ct = xutf16_to_utf8 (content_type, -1, NULL, NULL, NULL);
 
       if (ct != NULL)
         {
@@ -577,13 +577,13 @@ g_winhttp_file_query_info (xfile_t                *file,
 
           if (p != NULL)
             {
-              char *tmp = g_strndup (ct, p - ct);
+              char *tmp = xstrndup (ct, p - ct);
 
-              g_file_info_set_content_type (info, tmp);
+              xfile_info_set_content_type (info, tmp);
               g_free (tmp);
             }
           else
-            g_file_info_set_content_type (info, ct);
+            xfile_info_set_content_type (info, ct);
         }
 
       g_free (ct);
@@ -602,23 +602,23 @@ g_winhttp_file_query_info (xfile_t                *file,
       last_modified.wYear >= 1970 &&
       last_modified.wYear < 2038)
     {
-      GDateTime *dt = NULL, *dt2 = NULL;
+      xdatetime_t *dt = NULL, *dt2 = NULL;
 
-      dt = g_date_time_new_from_unix_utc (last_modified.wMilliseconds / 1000);
-      dt2 = g_date_time_add_seconds (dt, (last_modified.wMilliseconds % 1000) / 1000);
+      dt = xdate_time_new_from_unix_utc (last_modified.wMilliseconds / 1000);
+      dt2 = xdate_time_add_seconds (dt, (last_modified.wMilliseconds % 1000) / 1000);
 
-      g_file_info_set_modification_date_time (info, dt2);
+      xfile_info_set_modification_date_time (info, dt2);
 
-      g_date_time_unref (dt2);
-      g_date_time_unref (dt);
+      xdate_time_unref (dt2);
+      xdate_time_unref (dt);
     }
 
-  g_file_attribute_matcher_unref (matcher);
+  xfile_attribute_matcher_unref (matcher);
 
   return info;
 }
 
-static GFileInputStream *
+static xfile_input_stream_t *
 g_winhttp_file_read (xfile_t         *file,
                      xcancellable_t  *cancellable,
                      xerror_t       **error)
@@ -663,9 +663,9 @@ g_winhttp_file_read (xfile_t         *file,
   return _g_winhttp_file_input_stream_new (winhttp_file, connection, request);
 }
 
-static GFileOutputStream *
+static xfile_output_stream_t *
 g_winhttp_file_create (xfile_t             *file,
-                       GFileCreateFlags   flags,
+                       xfile_create_flags_t   flags,
                        xcancellable_t      *cancellable,
                        xerror_t           **error)
 {
@@ -690,11 +690,11 @@ g_winhttp_file_create (xfile_t             *file,
 
 #if 0
 
-static GFileOutputStream *
+static xfile_output_stream_t *
 g_winhttp_file_replace (xfile_t             *file,
                         const char        *etag,
                         xboolean_t           make_backup,
-                        GFileCreateFlags   flags,
+                        xfile_create_flags_t   flags,
                         xcancellable_t      *cancellable,
                         xerror_t           **error)
 {
@@ -727,9 +727,9 @@ g_winhttp_file_make_directory (xfile_t         *file,
 static xboolean_t
 g_winhttp_file_copy (xfile_t                  *source,
                      xfile_t                  *destination,
-                     GFileCopyFlags          flags,
+                     xfile_copy_flags_t          flags,
                      xcancellable_t           *cancellable,
-                     GFileProgressCallback   progress_callback,
+                     xfile_progress_callback_t   progress_callback,
                      xpointer_t                progress_callback_data,
                      xerror_t                **error)
 {
@@ -743,9 +743,9 @@ g_winhttp_file_copy (xfile_t                  *source,
 static xboolean_t
 g_winhttp_file_move (xfile_t                  *source,
                      xfile_t                  *destination,
-                     GFileCopyFlags          flags,
+                     xfile_copy_flags_t          flags,
                      xcancellable_t           *cancellable,
-                     GFileProgressCallback   progress_callback,
+                     xfile_progress_callback_t   progress_callback,
                      xpointer_t                progress_callback_data,
                      xerror_t                **error)
 {
@@ -757,7 +757,7 @@ g_winhttp_file_move (xfile_t                  *source,
 #endif
 
 static void
-g_winhttp_file_file_iface_init (GFileIface *iface)
+g_winhttp_file_file_iface_init (xfile_iface_t *iface)
 {
   iface->dup = g_winhttp_file_dup;
   iface->hash = g_winhttp_file_hash;

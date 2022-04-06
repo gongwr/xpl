@@ -36,68 +36,68 @@ typedef enum /*< flags >*/
   G_IO_ERR	XPL_SYSDEF_POLLERR,
   G_IO_HUP	XPL_SYSDEF_POLLHUP,
   G_IO_NVAL	XPL_SYSDEF_POLLNVAL
-} GIOCondition;
+} xio_condition_t;
 
 /**
  * GMainContextFlags:
- * @G_MAIN_CONTEXT_FLAGS_NONE: Default behaviour.
- * @G_MAIN_CONTEXT_FLAGS_OWNERLESS_POLLING: Assume that polling for events will
+ * @XMAIN_CONTEXT_FLAGS_NONE: Default behaviour.
+ * @XMAIN_CONTEXT_FLAGS_OWNERLESS_POLLING: Assume that polling for events will
  * free the thread to process other jobs. That's useful if you're using
- * `g_main_context_{prepare,query,check,dispatch}` to integrate GMainContext in
+ * `xmain_context_{prepare,query,check,dispatch}` to integrate xmain_context_t in
  * other event loops.
  *
- * Flags to pass to g_main_context_new_with_flags() which affect the behaviour
- * of a #GMainContext.
+ * Flags to pass to xmain_context_new_with_flags() which affect the behaviour
+ * of a #xmain_context_t.
  *
  * Since: 2.72
  */
 XPL_AVAILABLE_TYPE_IN_2_72
 typedef enum /*< flags >*/
 {
-  G_MAIN_CONTEXT_FLAGS_NONE = 0,
-  G_MAIN_CONTEXT_FLAGS_OWNERLESS_POLLING = 1
+  XMAIN_CONTEXT_FLAGS_NONE = 0,
+  XMAIN_CONTEXT_FLAGS_OWNERLESS_POLLING = 1
 } GMainContextFlags;
 
 
 /**
- * GMainContext:
+ * xmain_context_t:
  *
- * The `GMainContext` struct is an opaque data
+ * The `xmain_context_t` struct is an opaque data
  * type representing a set of sources to be handled in a main loop.
  */
-typedef struct _GMainContext            GMainContext;
+typedef struct _GMainContext            xmain_context_t;
 
 /**
- * GMainLoop:
+ * xmain_loop_t:
  *
- * The `GMainLoop` struct is an opaque data type
+ * The `xmain_loop_t` struct is an opaque data type
  * representing the main event loop of a GLib or GTK+ application.
  */
-typedef struct _GMainLoop               GMainLoop;
+typedef struct _GMainLoop               xmain_loop_t;
 
 /**
- * GSource:
+ * xsource_t:
  *
- * The `GSource` struct is an opaque data type
+ * The `xsource_t` struct is an opaque data type
  * representing an event source.
  */
-typedef struct _GSource                 GSource;
-typedef struct _GSourcePrivate          GSourcePrivate;
+typedef struct _GSource                 xsource_t;
+typedef struct _GSourcePrivate          xsource_private_t;
 
 /**
- * GSourceCallbackFuncs:
+ * xsource_callback_funcs_t:
  * @ref: Called when a reference is added to the callback object
  * @unref: Called when a reference to the callback object is dropped
  * @get: Called to extract the callback function and data from the
  *     callback object.
  *
- * The `GSourceCallbackFuncs` struct contains
+ * The `xsource_callback_funcs_t` struct contains
  * functions for managing callback objects.
  */
-typedef struct _GSourceCallbackFuncs    GSourceCallbackFuncs;
+typedef struct _GSourceCallbackFuncs    xsource_callback_funcs_t;
 
 /**
- * GSourceFuncs:
+ * xsource_funcs_t:
  * @prepare: Called before all the file descriptors are polled. If the
  *     source can determine that it is ready here (without waiting for the
  *     results of the poll() call) it should return %TRUE. It can also return
@@ -119,17 +119,17 @@ typedef struct _GSourceCallbackFuncs    GSourceCallbackFuncs;
  *     %TRUE in either its @prepare or its @check function, or if a ready time
  *     has been reached. The @dispatch function receives a callback function and
  *     user data. The callback function may be %NULL if the source was never
- *     connected to a callback using g_source_set_callback(). The @dispatch
+ *     connected to a callback using xsource_set_callback(). The @dispatch
  *     function should call the callback function with @user_data and whatever
  *     additional parameters are needed for this type of event source. The
  *     return value of the @dispatch function should be %G_SOURCE_REMOVE if the
  *     source should be removed or %G_SOURCE_CONTINUE to keep it.
  * @finalize: Called when the source is finalized. At this point, the source
  *     will have been destroyed, had its callback cleared, and have been removed
- *     from its #GMainContext, but it will still have its final reference count,
+ *     from its #xmain_context_t, but it will still have its final reference count,
  *     so methods can be called on it from within this function.
  *
- * The `GSourceFuncs` struct contains a table of
+ * The `xsource_funcs_t` struct contains a table of
  * functions used to handle event sources in a generic manner.
  *
  * For idle sources, the prepare and check functions always return %TRUE
@@ -150,17 +150,17 @@ typedef struct _GSourceCallbackFuncs    GSourceCallbackFuncs;
  * check function, it tests the results of the poll() call to see if the
  * required condition has been met, and returns %TRUE if so.
  */
-typedef struct _GSourceFuncs            GSourceFuncs;
+typedef struct _GSourceFuncs            xsource_funcs_t;
 
 /**
- * GPid:
+ * xpid_t:
  *
  * A type which is used to hold a process identification.
  *
  * On UNIX, processes are identified by a process id (an integer),
  * while Windows uses process handles (which are pointers).
  *
- * GPid is used in GLib only for descendant processes spawned with
+ * xpid_t is used in GLib only for descendant processes spawned with
  * the g_spawn functions.
  */
 /* defined in glibconfig.h */
@@ -169,46 +169,46 @@ typedef struct _GSourceFuncs            GSourceFuncs;
  * G_PID_FORMAT:
  *
  * A format specifier that can be used in printf()-style format strings
- * when printing a #GPid.
+ * when printing a #xpid_t.
  *
  * Since: 2.50
  */
 /* defined in glibconfig.h */
 
 /**
- * GSourceFunc:
+ * xsource_func_t:
  * @user_data: data passed to the function, set when the source was
  *     created with one of the above functions
  *
  * Specifies the type of function passed to g_timeout_add(),
  * g_timeout_add_full(), g_idle_add(), and g_idle_add_full().
  *
- * When calling g_source_set_callback(), you may need to cast a function of a
+ * When calling xsource_set_callback(), you may need to cast a function of a
  * different type to this type. Use G_SOURCE_FUNC() to avoid warnings about
  * incompatible function types.
  *
  * Returns: %FALSE if the source should be removed. %G_SOURCE_CONTINUE and
  * %G_SOURCE_REMOVE are more memorable names for the return value.
  */
-typedef xboolean_t (*GSourceFunc)       (xpointer_t user_data);
+typedef xboolean_t (*xsource_func_t)       (xpointer_t user_data);
 
 /**
  * G_SOURCE_FUNC:
  * @f: a function pointer.
  *
- * Cast a function pointer to a #GSourceFunc, suppressing warnings from GCC 8
+ * Cast a function pointer to a #xsource_func_t, suppressing warnings from GCC 8
  * onwards with `-Wextra` or `-Wcast-function-type` enabled about the function
  * types being incompatible.
  *
  * For example, the correct type of callback for a source created by
  * g_child_watch_source_new() is #GChildWatchFunc, which accepts more arguments
- * than #GSourceFunc. Casting the function with `(GSourceFunc)` to call
- * g_source_set_callback() will trigger a warning, even though it will be cast
+ * than #xsource_func_t. Casting the function with `(xsource_func_t)` to call
+ * xsource_set_callback() will trigger a warning, even though it will be cast
  * back to the correct type before it is called by the source.
  *
  * Since: 2.58
  */
-#define G_SOURCE_FUNC(f) ((GSourceFunc) (void (*)(void)) (f)) XPL_AVAILABLE_MACRO_IN_2_58
+#define G_SOURCE_FUNC(f) ((xsource_func_t) (void (*)(void)) (f)) XPL_AVAILABLE_MACRO_IN_2_58
 
 /**
  * GChildWatchFunc:
@@ -225,46 +225,46 @@ typedef xboolean_t (*GSourceFunc)       (xpointer_t user_data);
  * on Unix platforms, note that it is usually not equal
  * to the integer passed to `exit()` or returned from `main()`.
  */
-typedef void     (*GChildWatchFunc)   (GPid     pid,
+typedef void     (*GChildWatchFunc)   (xpid_t     pid,
                                        xint_t     wait_status,
                                        xpointer_t user_data);
 
 
 /**
  * GSourceDisposeFunc:
- * @source: #GSource that is currently being disposed
+ * @source: #xsource_t that is currently being disposed
  *
- * Dispose function for @source. See g_source_set_dispose_function() for
+ * Dispose function for @source. See xsource_set_dispose_function() for
  * details.
  *
  * Since: 2.64
  */
 XPL_AVAILABLE_TYPE_IN_2_64
-typedef void (*GSourceDisposeFunc)       (GSource *source);
+typedef void (*GSourceDisposeFunc)       (xsource_t *source);
 
 struct _GSource
 {
   /*< private >*/
   xpointer_t callback_data;
-  GSourceCallbackFuncs *callback_funcs;
+  xsource_callback_funcs_t *callback_funcs;
 
-  const GSourceFuncs *source_funcs;
+  const xsource_funcs_t *source_funcs;
   xuint_t ref_count;
 
-  GMainContext *context;
+  xmain_context_t *context;
 
   xint_t priority;
   xuint_t flags;
   xuint_t source_id;
 
-  GSList *poll_fds;
+  xslist_t *poll_fds;
 
-  GSource *prev;
-  GSource *next;
+  xsource_t *prev;
+  xsource_t *next;
 
   char    *name;
 
-  GSourcePrivate *priv;
+  xsource_private_t *priv;
 };
 
 struct _GSourceCallbackFuncs
@@ -272,8 +272,8 @@ struct _GSourceCallbackFuncs
   void (*ref)   (xpointer_t     cb_data);
   void (*unref) (xpointer_t     cb_data);
   void (*get)   (xpointer_t     cb_data,
-                 GSource     *source,
-                 GSourceFunc *func,
+                 xsource_t     *source,
+                 xsource_func_t *func,
                  xpointer_t    *data);
 };
 
@@ -287,17 +287,17 @@ typedef void (*GSourceDummyMarshal) (void);
 
 struct _GSourceFuncs
 {
-  xboolean_t (*prepare)  (GSource    *source,
+  xboolean_t (*prepare)  (xsource_t    *source,
                         xint_t       *timeout_);/* Can be NULL */
-  xboolean_t (*check)    (GSource    *source);/* Can be NULL */
-  xboolean_t (*dispatch) (GSource    *source,
-                        GSourceFunc callback,
+  xboolean_t (*check)    (xsource_t    *source);/* Can be NULL */
+  xboolean_t (*dispatch) (xsource_t    *source,
+                        xsource_func_t callback,
                         xpointer_t    user_data);
-  void     (*finalize) (GSource    *source); /* Can be NULL */
+  void     (*finalize) (xsource_t    *source); /* Can be NULL */
 
   /*< private >*/
-  /* For use by g_source_set_closure */
-  GSourceFunc     closure_callback;
+  /* For use by xsource_set_closure */
+  xsource_func_t     closure_callback;
   GSourceDummyMarshal closure_marshal; /* Really is of type GClosureMarshal */
 };
 
@@ -357,8 +357,8 @@ struct _GSourceFuncs
 /**
  * G_SOURCE_REMOVE:
  *
- * Use this macro as the return value of a #GSourceFunc to remove
- * the #GSource from the main loop.
+ * Use this macro as the return value of a #xsource_func_t to remove
+ * the #xsource_t from the main loop.
  *
  * Since: 2.32
  */
@@ -367,148 +367,148 @@ struct _GSourceFuncs
 /**
  * G_SOURCE_CONTINUE:
  *
- * Use this macro as the return value of a #GSourceFunc to leave
- * the #GSource in the main loop.
+ * Use this macro as the return value of a #xsource_func_t to leave
+ * the #xsource_t in the main loop.
  *
  * Since: 2.32
  */
 #define G_SOURCE_CONTINUE       TRUE
 
-/* GMainContext: */
+/* xmain_context_t: */
 
 XPL_AVAILABLE_IN_ALL
-GMainContext *g_main_context_new       (void);
+xmain_context_t *xmain_context_new       (void);
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 XPL_AVAILABLE_IN_2_72
-GMainContext *g_main_context_new_with_flags (GMainContextFlags flags);
+xmain_context_t *xmain_context_new_with_flags (GMainContextFlags flags);
 G_GNUC_END_IGNORE_DEPRECATIONS
 XPL_AVAILABLE_IN_ALL
-GMainContext *g_main_context_ref       (GMainContext *context);
+xmain_context_t *xmain_context_ref       (xmain_context_t *context);
 XPL_AVAILABLE_IN_ALL
-void          g_main_context_unref     (GMainContext *context);
+void          xmain_context_unref     (xmain_context_t *context);
 XPL_AVAILABLE_IN_ALL
-GMainContext *g_main_context_default   (void);
+xmain_context_t *xmain_context_default   (void);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t      g_main_context_iteration (GMainContext *context,
+xboolean_t      xmain_context_iteration (xmain_context_t *context,
                                         xboolean_t      may_block);
 XPL_AVAILABLE_IN_ALL
-xboolean_t      g_main_context_pending   (GMainContext *context);
+xboolean_t      xmain_context_pending   (xmain_context_t *context);
 
 /* For implementation of legacy interfaces
  */
 XPL_AVAILABLE_IN_ALL
-GSource      *g_main_context_find_source_by_id              (GMainContext *context,
+xsource_t      *xmain_context_find_source_by_id              (xmain_context_t *context,
                                                              xuint_t         source_id);
 XPL_AVAILABLE_IN_ALL
-GSource      *g_main_context_find_source_by_user_data       (GMainContext *context,
+xsource_t      *xmain_context_find_source_by_user_data       (xmain_context_t *context,
                                                              xpointer_t      user_data);
 XPL_AVAILABLE_IN_ALL
-GSource      *g_main_context_find_source_by_funcs_user_data (GMainContext *context,
-                                                             GSourceFuncs *funcs,
+xsource_t      *xmain_context_find_source_by_funcs_user_data (xmain_context_t *context,
+                                                             xsource_funcs_t *funcs,
                                                              xpointer_t      user_data);
 
 /* Low level functions for implementing custom main loops.
  */
 XPL_AVAILABLE_IN_ALL
-void     g_main_context_wakeup  (GMainContext *context);
+void     xmain_context_wakeup  (xmain_context_t *context);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_main_context_acquire (GMainContext *context);
+xboolean_t xmain_context_acquire (xmain_context_t *context);
 XPL_AVAILABLE_IN_ALL
-void     g_main_context_release (GMainContext *context);
+void     xmain_context_release (xmain_context_t *context);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_main_context_is_owner (GMainContext *context);
-XPL_DEPRECATED_IN_2_58_FOR(g_main_context_is_owner)
-xboolean_t g_main_context_wait    (GMainContext *context,
-                                 GCond        *cond,
-                                 GMutex       *mutex);
+xboolean_t xmain_context_is_owner (xmain_context_t *context);
+XPL_DEPRECATED_IN_2_58_FOR(xmain_context_is_owner)
+xboolean_t xmain_context_wait    (xmain_context_t *context,
+                                 xcond_t        *cond,
+                                 xmutex_t       *mutex);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_main_context_prepare  (GMainContext *context,
+xboolean_t xmain_context_prepare  (xmain_context_t *context,
                                   xint_t         *priority);
 XPL_AVAILABLE_IN_ALL
-xint_t     g_main_context_query    (GMainContext *context,
+xint_t     xmain_context_query    (xmain_context_t *context,
                                   xint_t          max_priority,
                                   xint_t         *timeout_,
-                                  GPollFD      *fds,
+                                  xpollfd_t      *fds,
                                   xint_t          n_fds);
 XPL_AVAILABLE_IN_ALL
-xboolean_t     g_main_context_check    (GMainContext *context,
+xboolean_t     xmain_context_check    (xmain_context_t *context,
                                       xint_t          max_priority,
-                                      GPollFD      *fds,
+                                      xpollfd_t      *fds,
                                       xint_t          n_fds);
 XPL_AVAILABLE_IN_ALL
-void     g_main_context_dispatch (GMainContext *context);
+void     xmain_context_dispatch (xmain_context_t *context);
 
 XPL_AVAILABLE_IN_ALL
-void     g_main_context_set_poll_func (GMainContext *context,
+void     xmain_context_set_poll_func (xmain_context_t *context,
                                        GPollFunc     func);
 XPL_AVAILABLE_IN_ALL
-GPollFunc g_main_context_get_poll_func (GMainContext *context);
+GPollFunc xmain_context_get_poll_func (xmain_context_t *context);
 
 /* Low level functions for use by source implementations
  */
 XPL_AVAILABLE_IN_ALL
-void     g_main_context_add_poll    (GMainContext *context,
-                                     GPollFD      *fd,
+void     xmain_context_add_poll    (xmain_context_t *context,
+                                     xpollfd_t      *fd,
                                      xint_t          priority);
 XPL_AVAILABLE_IN_ALL
-void     g_main_context_remove_poll (GMainContext *context,
-                                     GPollFD      *fd);
+void     xmain_context_remove_poll (xmain_context_t *context,
+                                     xpollfd_t      *fd);
 
 XPL_AVAILABLE_IN_ALL
 xint_t     g_main_depth               (void);
 XPL_AVAILABLE_IN_ALL
-GSource *g_main_current_source      (void);
+xsource_t *g_main_current_source      (void);
 
 /* GMainContexts for other threads
  */
 XPL_AVAILABLE_IN_ALL
-void          g_main_context_push_thread_default (GMainContext *context);
+void          xmain_context_push_thread_default (xmain_context_t *context);
 XPL_AVAILABLE_IN_ALL
-void          g_main_context_pop_thread_default  (GMainContext *context);
+void          xmain_context_pop_thread_default  (xmain_context_t *context);
 XPL_AVAILABLE_IN_ALL
-GMainContext *g_main_context_get_thread_default  (void);
+xmain_context_t *xmain_context_get_thread_default  (void);
 XPL_AVAILABLE_IN_ALL
-GMainContext *g_main_context_ref_thread_default  (void);
+xmain_context_t *xmain_context_ref_thread_default  (void);
 
 /**
- * GMainContextPusher:
+ * xmain_context_pusher_t:
  *
- * Opaque type. See g_main_context_pusher_new() for details.
+ * Opaque type. See xmain_context_pusher_new() for details.
  *
  * Since: 2.64
  */
-typedef void GMainContextPusher XPL_AVAILABLE_TYPE_IN_2_64;
+typedef void xmain_context_pusher_t XPL_AVAILABLE_TYPE_IN_2_64;
 
 /**
- * g_main_context_pusher_new:
+ * xmain_context_pusher_new:
  * @main_context: (transfer none): a main context to push
  *
  * Push @main_context as the new thread-default main context for the current
- * thread, using g_main_context_push_thread_default(), and return a new
- * #GMainContextPusher. Pop with g_main_context_pusher_free(). Using
- * g_main_context_pop_thread_default() on @main_context while a
- * #GMainContextPusher exists for it can lead to undefined behaviour.
+ * thread, using xmain_context_push_thread_default(), and return a new
+ * #xmain_context_pusher_t. Pop with xmain_context_pusher_free(). Using
+ * xmain_context_pop_thread_default() on @main_context while a
+ * #xmain_context_pusher_t exists for it can lead to undefined behaviour.
  *
  * Using two #GMainContextPushers in the same scope is not allowed, as it leads
  * to an undefined pop order.
  *
- * This is intended to be used with g_autoptr().  Note that g_autoptr()
+ * This is intended to be used with x_autoptr().  Note that x_autoptr()
  * is only available when using GCC or clang, so the following example
  * will only work with those compilers:
  * |[
  * typedef struct
  * {
  *   ...
- *   GMainContext *context;
+ *   xmain_context_t *context;
  *   ...
- * } MyObject;
+ * } xobject_t;
  *
  * static void
- * my_object_do_stuff (MyObject *self)
+ * my_object_do_stuff (xobject_t *self)
  * {
- *   g_autoptr(GMainContextPusher) pusher = g_main_context_pusher_new (self->context);
+ *   x_autoptr(xmain_context_pusher) pusher = xmain_context_pusher_new (self->context);
  *
  *   // Code with main context as the thread default here
  *
@@ -517,193 +517,193 @@ typedef void GMainContextPusher XPL_AVAILABLE_TYPE_IN_2_64;
  *     return;
  *
  *   // Optionally early pop
- *   g_clear_pointer (&pusher, g_main_context_pusher_free);
+ *   g_clear_pointer (&pusher, xmain_context_pusher_free);
  *
  *   // Code with main context no longer the thread default here
  * }
  * ]|
  *
- * Returns: (transfer full): a #GMainContextPusher
+ * Returns: (transfer full): a #xmain_context_pusher_t
  * Since: 2.64
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 XPL_AVAILABLE_STATIC_INLINE_IN_2_64
-static inline GMainContextPusher *
-g_main_context_pusher_new (GMainContext *main_context)
+static inline xmain_context_pusher_t *
+xmain_context_pusher_new (xmain_context_t *main_context)
 {
-  g_main_context_push_thread_default (main_context);
-  return (GMainContextPusher *) main_context;
+  xmain_context_push_thread_default (main_context);
+  return (xmain_context_pusher_t *) main_context;
 }
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
- * g_main_context_pusher_free:
- * @pusher: (transfer full): a #GMainContextPusher
+ * xmain_context_pusher_free:
+ * @pusher: (transfer full): a #xmain_context_pusher_t
  *
  * Pop @pusher’s main context as the thread default main context.
- * See g_main_context_pusher_new() for details.
+ * See xmain_context_pusher_new() for details.
  *
- * This will pop the #GMainContext as the current thread-default main context,
- * but will not call g_main_context_unref() on it.
+ * This will pop the #xmain_context_t as the current thread-default main context,
+ * but will not call xmain_context_unref() on it.
  *
  * Since: 2.64
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 XPL_AVAILABLE_STATIC_INLINE_IN_2_64
 static inline void
-g_main_context_pusher_free (GMainContextPusher *pusher)
+xmain_context_pusher_free (xmain_context_pusher_t *pusher)
 {
-  g_main_context_pop_thread_default ((GMainContext *) pusher);
+  xmain_context_pop_thread_default ((xmain_context_t *) pusher);
 }
 G_GNUC_END_IGNORE_DEPRECATIONS
 
-/* GMainLoop: */
+/* xmain_loop_t: */
 
 XPL_AVAILABLE_IN_ALL
-GMainLoop *g_main_loop_new        (GMainContext *context,
+xmain_loop_t *xmain_loop_new        (xmain_context_t *context,
                                    xboolean_t      is_running);
 XPL_AVAILABLE_IN_ALL
-void       g_main_loop_run        (GMainLoop    *loop);
+void       xmain_loop_run        (xmain_loop_t    *loop);
 XPL_AVAILABLE_IN_ALL
-void       g_main_loop_quit       (GMainLoop    *loop);
+void       xmain_loop_quit       (xmain_loop_t    *loop);
 XPL_AVAILABLE_IN_ALL
-GMainLoop *g_main_loop_ref        (GMainLoop    *loop);
+xmain_loop_t *xmain_loop_ref        (xmain_loop_t    *loop);
 XPL_AVAILABLE_IN_ALL
-void       g_main_loop_unref      (GMainLoop    *loop);
+void       xmain_loop_unref      (xmain_loop_t    *loop);
 XPL_AVAILABLE_IN_ALL
-xboolean_t   g_main_loop_is_running (GMainLoop    *loop);
+xboolean_t   xmain_loop_is_running (xmain_loop_t    *loop);
 XPL_AVAILABLE_IN_ALL
-GMainContext *g_main_loop_get_context (GMainLoop    *loop);
+xmain_context_t *xmain_loop_get_context (xmain_loop_t    *loop);
 
-/* GSource: */
+/* xsource_t: */
 
 XPL_AVAILABLE_IN_ALL
-GSource *g_source_new             (GSourceFuncs   *source_funcs,
+xsource_t *xsource_new             (xsource_funcs_t   *source_funcs,
                                    xuint_t           struct_size);
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 XPL_AVAILABLE_IN_2_64
-void     g_source_set_dispose_function (GSource            *source,
+void     xsource_set_dispose_function (xsource_t            *source,
                                         GSourceDisposeFunc  dispose);
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 XPL_AVAILABLE_IN_ALL
-GSource *g_source_ref             (GSource        *source);
+xsource_t *xsource_ref             (xsource_t        *source);
 XPL_AVAILABLE_IN_ALL
-void     g_source_unref           (GSource        *source);
+void     xsource_unref           (xsource_t        *source);
 
 XPL_AVAILABLE_IN_ALL
-xuint_t    g_source_attach          (GSource        *source,
-                                   GMainContext   *context);
+xuint_t    xsource_attach          (xsource_t        *source,
+                                   xmain_context_t   *context);
 XPL_AVAILABLE_IN_ALL
-void     g_source_destroy         (GSource        *source);
+void     xsource_destroy         (xsource_t        *source);
 
 XPL_AVAILABLE_IN_ALL
-void     g_source_set_priority    (GSource        *source,
+void     xsource_set_priority    (xsource_t        *source,
                                    xint_t            priority);
 XPL_AVAILABLE_IN_ALL
-xint_t     g_source_get_priority    (GSource        *source);
+xint_t     xsource_get_priority    (xsource_t        *source);
 XPL_AVAILABLE_IN_ALL
-void     g_source_set_can_recurse (GSource        *source,
+void     xsource_set_can_recurse (xsource_t        *source,
                                    xboolean_t        can_recurse);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_source_get_can_recurse (GSource        *source);
+xboolean_t xsource_get_can_recurse (xsource_t        *source);
 XPL_AVAILABLE_IN_ALL
-xuint_t    g_source_get_id          (GSource        *source);
+xuint_t    xsource_get_id          (xsource_t        *source);
 
 XPL_AVAILABLE_IN_ALL
-GMainContext *g_source_get_context (GSource       *source);
+xmain_context_t *xsource_get_context (xsource_t       *source);
 
 XPL_AVAILABLE_IN_ALL
-void     g_source_set_callback    (GSource        *source,
-                                   GSourceFunc     func,
+void     xsource_set_callback    (xsource_t        *source,
+                                   xsource_func_t     func,
                                    xpointer_t        data,
-                                   GDestroyNotify  notify);
+                                   xdestroy_notify_t  notify);
 
 XPL_AVAILABLE_IN_ALL
-void     g_source_set_funcs       (GSource        *source,
-                                   GSourceFuncs   *funcs);
+void     xsource_set_funcs       (xsource_t        *source,
+                                   xsource_funcs_t   *funcs);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_source_is_destroyed    (GSource        *source);
+xboolean_t xsource_is_destroyed    (xsource_t        *source);
 
 XPL_AVAILABLE_IN_ALL
-void                 g_source_set_name       (GSource        *source,
+void                 xsource_set_name       (xsource_t        *source,
                                               const char     *name);
 XPL_AVAILABLE_IN_2_70
-void                 g_source_set_static_name (GSource        *source,
+void                 xsource_set_static_name (xsource_t        *source,
                                                const char     *name);
 XPL_AVAILABLE_IN_ALL
-const char *         g_source_get_name       (GSource        *source);
+const char *         xsource_get_name       (xsource_t        *source);
 XPL_AVAILABLE_IN_ALL
-void                 g_source_set_name_by_id (xuint_t           tag,
+void                 xsource_set_name_by_id (xuint_t           tag,
                                               const char     *name);
 
 XPL_AVAILABLE_IN_2_36
-void                 g_source_set_ready_time (GSource        *source,
+void                 xsource_set_ready_time (xsource_t        *source,
                                               gint64          ready_time);
 XPL_AVAILABLE_IN_2_36
-gint64               g_source_get_ready_time (GSource        *source);
+gint64               xsource_get_ready_time (xsource_t        *source);
 
 #ifdef G_OS_UNIX
 XPL_AVAILABLE_IN_2_36
-xpointer_t             g_source_add_unix_fd    (GSource        *source,
+xpointer_t             xsource_add_unix_fd    (xsource_t        *source,
                                               xint_t            fd,
-                                              GIOCondition    events);
+                                              xio_condition_t    events);
 XPL_AVAILABLE_IN_2_36
-void                 g_source_modify_unix_fd (GSource        *source,
+void                 xsource_modify_unix_fd (xsource_t        *source,
                                               xpointer_t        tag,
-                                              GIOCondition    new_events);
+                                              xio_condition_t    new_events);
 XPL_AVAILABLE_IN_2_36
-void                 g_source_remove_unix_fd (GSource        *source,
+void                 xsource_remove_unix_fd (xsource_t        *source,
                                               xpointer_t        tag);
 XPL_AVAILABLE_IN_2_36
-GIOCondition         g_source_query_unix_fd  (GSource        *source,
+xio_condition_t         xsource_query_unix_fd  (xsource_t        *source,
                                               xpointer_t        tag);
 #endif
 
-/* Used to implement g_source_connect_closure and internally*/
+/* Used to implement xsource_connect_closure and internally*/
 XPL_AVAILABLE_IN_ALL
-void g_source_set_callback_indirect (GSource              *source,
+void xsource_set_callback_indirect (xsource_t              *source,
                                      xpointer_t              callback_data,
-                                     GSourceCallbackFuncs *callback_funcs);
+                                     xsource_callback_funcs_t *callback_funcs);
 
 XPL_AVAILABLE_IN_ALL
-void     g_source_add_poll            (GSource        *source,
-				       GPollFD        *fd);
+void     xsource_add_poll            (xsource_t        *source,
+				       xpollfd_t        *fd);
 XPL_AVAILABLE_IN_ALL
-void     g_source_remove_poll         (GSource        *source,
-				       GPollFD        *fd);
+void     xsource_remove_poll         (xsource_t        *source,
+				       xpollfd_t        *fd);
 
 XPL_AVAILABLE_IN_ALL
-void     g_source_add_child_source    (GSource        *source,
-				       GSource        *child_source);
+void     xsource_add_child_source    (xsource_t        *source,
+				       xsource_t        *child_source);
 XPL_AVAILABLE_IN_ALL
-void     g_source_remove_child_source (GSource        *source,
-				       GSource        *child_source);
+void     xsource_remove_child_source (xsource_t        *source,
+				       xsource_t        *child_source);
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-XPL_DEPRECATED_IN_2_28_FOR(g_source_get_time)
-void     g_source_get_current_time (GSource        *source,
+XPL_DEPRECATED_IN_2_28_FOR(xsource_get_time)
+void     xsource_get_current_time (xsource_t        *source,
                                     GTimeVal       *timeval);
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 XPL_AVAILABLE_IN_ALL
-gint64   g_source_get_time         (GSource        *source);
+gint64   xsource_get_time         (xsource_t        *source);
 
- /* void g_source_connect_closure (GSource        *source,
-                                  GClosure       *closure);
+ /* void xsource_connect_closure (xsource_t        *source,
+                                  xclosure_t       *closure);
  */
 
 /* Specific source types
  */
 XPL_AVAILABLE_IN_ALL
-GSource *g_idle_source_new        (void);
+xsource_t *g_idle_source_new        (void);
 XPL_AVAILABLE_IN_ALL
-GSource *g_child_watch_source_new (GPid pid);
+xsource_t *g_child_watch_source_new (xpid_t pid);
 XPL_AVAILABLE_IN_ALL
-GSource *g_timeout_source_new     (xuint_t interval);
+xsource_t *g_timeout_source_new     (xuint_t interval);
 XPL_AVAILABLE_IN_ALL
-GSource *g_timeout_source_new_seconds (xuint_t interval);
+xsource_t *g_timeout_source_new_seconds (xuint_t interval);
 
 /* Miscellaneous functions
  */
@@ -720,11 +720,11 @@ gint64 g_get_real_time                    (void);
 
 /* Source manipulation by ID */
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_source_remove                     (xuint_t          tag);
+xboolean_t xsource_remove                     (xuint_t          tag);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_source_remove_by_user_data        (xpointer_t       user_data);
+xboolean_t xsource_remove_by_user_data        (xpointer_t       user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_source_remove_by_funcs_user_data  (GSourceFuncs  *funcs,
+xboolean_t xsource_remove_by_funcs_user_data  (xsource_funcs_t  *funcs,
                                               xpointer_t       user_data);
 
 /**
@@ -733,8 +733,8 @@ xboolean_t g_source_remove_by_funcs_user_data  (GSourceFuncs  *funcs,
  *
  * Specifies the type of function passed to g_clear_handle_id().
  * The implementation is expected to free the resource identified
- * by @handle_id; for instance, if @handle_id is a #GSource ID,
- * g_source_remove() can be used.
+ * by @handle_id; for instance, if @handle_id is a #xsource_t ID,
+ * xsource_remove() can be used.
  *
  * Since: 2.56
  */
@@ -763,53 +763,53 @@ void    g_clear_handle_id (xuint_t           *tag_ptr,
 XPL_AVAILABLE_IN_ALL
 xuint_t    g_timeout_add_full         (xint_t            priority,
                                      xuint_t           interval,
-                                     GSourceFunc     function,
+                                     xsource_func_t     function,
                                      xpointer_t        data,
-                                     GDestroyNotify  notify);
+                                     xdestroy_notify_t  notify);
 XPL_AVAILABLE_IN_ALL
 xuint_t    g_timeout_add              (xuint_t           interval,
-                                     GSourceFunc     function,
+                                     xsource_func_t     function,
                                      xpointer_t        data);
 XPL_AVAILABLE_IN_ALL
 xuint_t    g_timeout_add_seconds_full (xint_t            priority,
                                      xuint_t           interval,
-                                     GSourceFunc     function,
+                                     xsource_func_t     function,
                                      xpointer_t        data,
-                                     GDestroyNotify  notify);
+                                     xdestroy_notify_t  notify);
 XPL_AVAILABLE_IN_ALL
 xuint_t    g_timeout_add_seconds      (xuint_t           interval,
-                                     GSourceFunc     function,
+                                     xsource_func_t     function,
                                      xpointer_t        data);
 XPL_AVAILABLE_IN_ALL
 xuint_t    g_child_watch_add_full     (xint_t            priority,
-                                     GPid            pid,
+                                     xpid_t            pid,
                                      GChildWatchFunc function,
                                      xpointer_t        data,
-                                     GDestroyNotify  notify);
+                                     xdestroy_notify_t  notify);
 XPL_AVAILABLE_IN_ALL
-xuint_t    g_child_watch_add          (GPid            pid,
+xuint_t    g_child_watch_add          (xpid_t            pid,
                                      GChildWatchFunc function,
                                      xpointer_t        data);
 XPL_AVAILABLE_IN_ALL
-xuint_t    g_idle_add                 (GSourceFunc     function,
+xuint_t    g_idle_add                 (xsource_func_t     function,
                                      xpointer_t        data);
 XPL_AVAILABLE_IN_ALL
 xuint_t    g_idle_add_full            (xint_t            priority,
-                                     GSourceFunc     function,
+                                     xsource_func_t     function,
                                      xpointer_t        data,
-                                     GDestroyNotify  notify);
+                                     xdestroy_notify_t  notify);
 XPL_AVAILABLE_IN_ALL
 xboolean_t g_idle_remove_by_data      (xpointer_t        data);
 
 XPL_AVAILABLE_IN_ALL
-void     g_main_context_invoke_full (GMainContext   *context,
+void     xmain_context_invoke_full (xmain_context_t   *context,
                                      xint_t            priority,
-                                     GSourceFunc     function,
+                                     xsource_func_t     function,
                                      xpointer_t        data,
-                                     GDestroyNotify  notify);
+                                     xdestroy_notify_t  notify);
 XPL_AVAILABLE_IN_ALL
-void     g_main_context_invoke      (GMainContext   *context,
-                                     GSourceFunc     function,
+void     xmain_context_invoke      (xmain_context_t   *context,
+                                     xsource_func_t     function,
                                      xpointer_t        data);
 
 XPL_AVAILABLE_STATIC_INLINE_IN_2_70
@@ -821,13 +821,13 @@ g_steal_fd (int *fd_ptr)
   return fd;
 }
 
-/* Hook for GClosure / GSource integration. Don't touch */
-XPL_VAR GSourceFuncs g_timeout_funcs;
-XPL_VAR GSourceFuncs g_child_watch_funcs;
-XPL_VAR GSourceFuncs g_idle_funcs;
+/* Hook for xclosure_t / xsource_t integration. Don't touch */
+XPL_VAR xsource_funcs_t g_timeout_funcs;
+XPL_VAR xsource_funcs_t g_child_watch_funcs;
+XPL_VAR xsource_funcs_t g_idle_funcs;
 #ifdef G_OS_UNIX
-XPL_VAR GSourceFuncs g_unix_signal_funcs;
-XPL_VAR GSourceFuncs g_unix_fd_source_funcs;
+XPL_VAR xsource_funcs_t g_unix_signal_funcs;
+XPL_VAR xsource_funcs_t g_unix_fd_source_funcs;
 #endif
 
 G_END_DECLS

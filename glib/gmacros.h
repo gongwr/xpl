@@ -161,7 +161,7 @@
  * Place the attribute after the declaration, just before the semicolon.
  *
  * |[<!-- language="C" -->
- * xboolean_t g_type_check_value (const GValue *value) G_GNUC_PURE;
+ * xboolean_t xtype_check_value (const xvalue_t *value) G_GNUC_PURE;
  * ]|
  *
  * See the [GNU C documentation](https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-pure-function-attribute) for more details.
@@ -263,7 +263,7 @@
  * Place the attribute after the declaration, just before the semicolon.
  *
  * |[<!-- language="C" -->
- * xchar_t *g_strconcat (const xchar_t *string1,
+ * xchar_t *xstrconcat (const xchar_t *string1,
  *                     ...) G_GNUC_NULL_TERMINATED;
  * ]|
  *
@@ -751,7 +751,7 @@
  * Place the attribute after the declaration, just before the semicolon.
  *
  * |[<!-- language="C" -->
- * xlist_t *g_list_append (xlist_t *list,
+ * xlist_t *xlist_append (xlist_t *list,
  *                       xpointer_t data) G_GNUC_WARN_UNUSED_RESULT;
  * ]|
  *
@@ -912,14 +912,14 @@
 
 #if G_GNUC_CHECK_VERSION(4, 0) || defined(_MSC_VER)
 #define G_STRUCT_OFFSET(struct_type, member) \
-      ((glong) offsetof (struct_type, member))
+      ((xlong_t) offsetof (struct_type, member))
 #else
 #define G_STRUCT_OFFSET(struct_type, member)	\
-      ((glong) ((guint8*) &((struct_type*) 0)->member))
+      ((xlong_t) ((xuint8_t*) &((struct_type*) 0)->member))
 #endif
 
 #define G_STRUCT_MEMBER_P(struct_p, struct_offset)   \
-    ((xpointer_t) ((guint8*) (struct_p) + (glong) (struct_offset)))
+    ((xpointer_t) ((xuint8_t*) (struct_p) + (xlong_t) (struct_offset)))
 #define G_STRUCT_MEMBER(member_type, struct_p, struct_offset)   \
     (*(member_type*) G_STRUCT_MEMBER_P ((struct_p), (struct_offset)))
 
@@ -1191,54 +1191,54 @@
 #if g_macro__has_attribute(cleanup)
 
 /* these macros are private */
-#define _XPL_AUTOPTR_FUNC_NAME(TypeName) glib_autoptr_cleanup_##TypeName
-#define _XPL_AUTOPTR_CLEAR_FUNC_NAME(TypeName) glib_autoptr_clear_##TypeName
-#define _XPL_AUTOPTR_TYPENAME(TypeName)  TypeName##_autoptr
-#define _XPL_AUTOPTR_LIST_FUNC_NAME(TypeName) glib_listautoptr_cleanup_##TypeName
-#define _XPL_AUTOPTR_LIST_TYPENAME(TypeName)  TypeName##_listautoptr
-#define _XPL_AUTOPTR_SLIST_FUNC_NAME(TypeName) glib_slistautoptr_cleanup_##TypeName
-#define _XPL_AUTOPTR_SLIST_TYPENAME(TypeName)  TypeName##_slistautoptr
-#define _XPL_AUTOPTR_QUEUE_FUNC_NAME(TypeName) glib_queueautoptr_cleanup_##TypeName
-#define _XPL_AUTOPTR_QUEUE_TYPENAME(TypeName)  TypeName##_queueautoptr
-#define _XPL_AUTO_FUNC_NAME(TypeName)    glib_auto_cleanup_##TypeName
+#define _XPL_AUTOPTR_FUNC_NAME(TypeNameNoT) glib_autoptr_cleanup_##TypeNameNoT
+#define _XPL_AUTOPTR_CLEAR_FUNC_NAME(TypeNameNoT) glib_autoptr_clear_##TypeNameNoT
+#define _XPL_AUTOPTR_TYPENAME(TypeNameNoT)  TypeNameNoT##_autoptr_t
+#define _XPL_AUTOPTR_LIST_FUNC_NAME(TypeNameNoT) glib_listautoptr_cleanup_##TypeNameNoT
+#define _XPL_AUTOPTR_LIST_TYPENAME(TypeNameNoT)  TypeNameNoT##_listautoptr_t
+#define _XPL_AUTOPTR_SLIST_FUNC_NAME(TypeNameNoT) glib_slistautoptr_cleanup_##TypeNameNoT
+#define _XPL_AUTOPTR_SLIST_TYPENAME(TypeNameNoT)  TypeNameNoT##_slistautoptr_t
+#define _XPL_AUTOPTR_QUEUE_FUNC_NAME(TypeNameNoT) glib_queueautoptr_cleanup_##TypeNameNoT
+#define _XPL_AUTOPTR_QUEUE_TYPENAME(TypeNameNoT)  TypeNameNoT##_queueautoptr_t
+#define _XPL_AUTO_FUNC_NAME(TypeNameNoT)    glib_auto_cleanup_##TypeNameNoT
 #define _XPL_CLEANUP(func)               __attribute__((cleanup(func)))
-#define _XPL_DEFINE_AUTOPTR_CLEANUP_FUNCS(TypeName, ParentName, cleanup) \
-  typedef TypeName *_XPL_AUTOPTR_TYPENAME(TypeName);                                                           \
-  typedef xlist_t *_XPL_AUTOPTR_LIST_TYPENAME(TypeName);                                                         \
-  typedef GSList *_XPL_AUTOPTR_SLIST_TYPENAME(TypeName);                                                       \
-  typedef GQueue *_XPL_AUTOPTR_QUEUE_TYPENAME(TypeName);                                                       \
+#define _XPL_DEFINE_AUTOPTR_CLEANUP_FUNCS(TypeNameNoT, ParentNameNoT, cleanup) \
+  typedef TypeNameNoT##_t *_XPL_AUTOPTR_TYPENAME(TypeNameNoT);                                                           \
+  typedef xlist_t *_XPL_AUTOPTR_LIST_TYPENAME(TypeNameNoT);                                                         \
+  typedef xslist_t *_XPL_AUTOPTR_SLIST_TYPENAME(TypeNameNoT);                                                       \
+  typedef xqueue_t *_XPL_AUTOPTR_QUEUE_TYPENAME(TypeNameNoT);                                                       \
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS                                                                              \
-  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_CLEAR_FUNC_NAME(TypeName) (TypeName *_ptr)                     \
-    { if (_ptr) (cleanup) ((ParentName *) _ptr); }                                                              \
-  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_FUNC_NAME(TypeName) (TypeName **_ptr)                          \
-    { _XPL_AUTOPTR_CLEAR_FUNC_NAME(TypeName) (*_ptr); }                                                        \
-  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_LIST_FUNC_NAME(TypeName) (xlist_t **_l)                          \
-    { g_list_free_full (*_l, (GDestroyNotify) (void(*)(void)) cleanup); }                                       \
-  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_SLIST_FUNC_NAME(TypeName) (GSList **_l)                        \
-    { g_slist_free_full (*_l, (GDestroyNotify) (void(*)(void)) cleanup); }                                      \
-  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_QUEUE_FUNC_NAME(TypeName) (GQueue **_q)                        \
-    { if (*_q) g_queue_free_full (*_q, (GDestroyNotify) (void(*)(void)) cleanup); }                             \
+  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_CLEAR_FUNC_NAME(TypeNameNoT) (TypeNameNoT##_t *_ptr)                     \
+    { if (_ptr) (cleanup) ((ParentNameNoT##_t *) _ptr); }                                                              \
+  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_FUNC_NAME(TypeNameNoT) (TypeNameNoT##_t **_ptr)                          \
+    { _XPL_AUTOPTR_CLEAR_FUNC_NAME(TypeNameNoT) (*_ptr); }                                                        \
+  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_LIST_FUNC_NAME(TypeNameNoT) (xlist_t **_l)                          \
+    { xlist_free_full (*_l, (xdestroy_notify_t) (void(*)(void)) cleanup); }                                       \
+  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_SLIST_FUNC_NAME(TypeNameNoT) (xslist_t **_l)                        \
+    { xslist_free_full (*_l, (xdestroy_notify_t) (void(*)(void)) cleanup); }                                      \
+  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_QUEUE_FUNC_NAME(TypeNameNoT) (xqueue_t **_q)                        \
+    { if (*_q) g_queue_free_full (*_q, (xdestroy_notify_t) (void(*)(void)) cleanup); }                             \
   G_GNUC_END_IGNORE_DEPRECATIONS
-#define _XPL_DEFINE_AUTOPTR_CHAINUP(ModuleObjName, ParentName) \
-  _XPL_DEFINE_AUTOPTR_CLEANUP_FUNCS(ModuleObjName, ParentName, _XPL_AUTOPTR_CLEAR_FUNC_NAME(ParentName))
+#define _XPL_DEFINE_AUTOPTR_CHAINUP(ModuleObjNameNoT, ParentNameNoT) \
+  _XPL_DEFINE_AUTOPTR_CLEANUP_FUNCS(ModuleObjNameNoT, ParentNameNoT, _XPL_AUTOPTR_CLEAR_FUNC_NAME(ParentNameNoT))
 
 
 /* these macros are API */
-#define G_DEFINE_AUTOPTR_CLEANUP_FUNC(TypeName, func) \
-  _XPL_DEFINE_AUTOPTR_CLEANUP_FUNCS(TypeName, TypeName, func)
+#define G_DEFINE_AUTOPTR_CLEANUP_FUNC(TypeNameNoT, func) \
+  _XPL_DEFINE_AUTOPTR_CLEANUP_FUNCS(TypeNameNoT, TypeNameNoT, func)
 #define G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(TypeName, func) \
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS                                                                              \
-  static G_GNUC_UNUSED inline void _XPL_AUTO_FUNC_NAME(TypeName) (TypeName *_ptr) { (func) (_ptr); }                         \
+  static G_GNUC_UNUSED inline void _XPL_AUTO_FUNC_NAME(TypeName) (TypeName##_t *_ptr) { (func) (_ptr); }                         \
   G_GNUC_END_IGNORE_DEPRECATIONS
 #define G_DEFINE_AUTO_CLEANUP_FREE_FUNC(TypeName, func, none) \
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS                                                                              \
-  static G_GNUC_UNUSED inline void _XPL_AUTO_FUNC_NAME(TypeName) (TypeName *_ptr) { if (*_ptr != none) (func) (*_ptr); }     \
+  static G_GNUC_UNUSED inline void _XPL_AUTO_FUNC_NAME(TypeName) (TypeName##_t *_ptr) { if (*_ptr != none) (func) (*_ptr); }     \
   G_GNUC_END_IGNORE_DEPRECATIONS
-#define g_autoptr(TypeName) _XPL_CLEANUP(_XPL_AUTOPTR_FUNC_NAME(TypeName)) _XPL_AUTOPTR_TYPENAME(TypeName)
+#define x_autoptr(TypeName) _XPL_CLEANUP(_XPL_AUTOPTR_FUNC_NAME(TypeName)) _XPL_AUTOPTR_TYPENAME(TypeName)
 #define g_autolist(TypeName) _XPL_CLEANUP(_XPL_AUTOPTR_LIST_FUNC_NAME(TypeName)) _XPL_AUTOPTR_LIST_TYPENAME(TypeName)
 #define g_autoslist(TypeName) _XPL_CLEANUP(_XPL_AUTOPTR_SLIST_FUNC_NAME(TypeName)) _XPL_AUTOPTR_SLIST_TYPENAME(TypeName)
 #define g_autoqueue(TypeName) _XPL_CLEANUP(_XPL_AUTOPTR_QUEUE_FUNC_NAME(TypeName)) _XPL_AUTOPTR_QUEUE_TYPENAME(TypeName)
-#define g_auto(TypeName) _XPL_CLEANUP(_XPL_AUTO_FUNC_NAME(TypeName)) TypeName
+#define x_auto(TypeName) _XPL_CLEANUP(_XPL_AUTO_FUNC_NAME(TypeName)) TypeName##_t
 #define g_autofree _XPL_CLEANUP(g_autoptr_cleanup_generic_gfree)
 
 #else /* not GNU C */
@@ -1250,7 +1250,7 @@
 #define G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(TypeName, func)
 #define G_DEFINE_AUTO_CLEANUP_FREE_FUNC(TypeName, func, none)
 
-/* no declaration of g_auto() or g_autoptr() here */
+/* no declaration of x_auto() or x_autoptr() here */
 #endif /* __GNUC__ */
 
 #else
@@ -1265,7 +1265,7 @@
 
 /**
  * G_SIZEOF_MEMBER:
- * @struct_type: a structure type, e.g. #GOutputVector
+ * @struct_type: a structure type, e.g. #xoutput_vector_t
  * @member: a field in the structure, e.g. `size`
  *
  * Returns the size of @member in the struct definition without having a

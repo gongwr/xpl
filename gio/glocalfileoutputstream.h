@@ -38,7 +38,7 @@ typedef struct _GLocalFileOutputStreamPrivate  GLocalFileOutputStreamPrivate;
 
 struct _GLocalFileOutputStream
 {
-  GFileOutputStream parent_instance;
+  xfile_output_stream_t parent_instance;
 
   /*< private >*/
   GLocalFileOutputStreamPrivate *priv;
@@ -57,31 +57,31 @@ xboolean_t _g_local_file_output_stream_really_close (GLocalFileOutputStream *out
 						   xcancellable_t   *cancellable,
 						   xerror_t        **error);
 
-GFileOutputStream * _g_local_file_output_stream_new      (int               fd);
-GFileOutputStream * _g_local_file_output_stream_open     (const char       *filename,
+xfile_output_stream_t * _g_local_file_output_stream_new      (int               fd);
+xfile_output_stream_t * _g_local_file_output_stream_open     (const char       *filename,
 							  xboolean_t          readable,
                                                           xcancellable_t     *cancellable,
                                                           xerror_t          **error);
-GFileOutputStream * _g_local_file_output_stream_create   (const char       *filename,
+xfile_output_stream_t * _g_local_file_output_stream_create   (const char       *filename,
 							  xboolean_t          readable,
-                                                          GFileCreateFlags  flags,
-                                                          GFileInfo        *reference_info,
+                                                          xfile_create_flags_t  flags,
+                                                          xfile_info_t        *reference_info,
                                                           xcancellable_t     *cancellable,
                                                           xerror_t          **error);
-GFileOutputStream * _g_local_file_output_stream_append   (const char       *filename,
-                                                          GFileCreateFlags  flags,
+xfile_output_stream_t * _g_local_file_output_stream_append   (const char       *filename,
+                                                          xfile_create_flags_t  flags,
                                                           xcancellable_t     *cancellable,
                                                           xerror_t          **error);
-GFileOutputStream * _g_local_file_output_stream_replace  (const char       *filename,
+xfile_output_stream_t * _g_local_file_output_stream_replace  (const char       *filename,
 							  xboolean_t          readable,
                                                           const char       *etag,
                                                           xboolean_t          create_backup,
-                                                          GFileCreateFlags  flags,
-                                                          GFileInfo        *reference_info,
+                                                          xfile_create_flags_t  flags,
+                                                          xfile_info_t        *reference_info,
                                                           xcancellable_t     *cancellable,
                                                           xerror_t          **error);
 
-/* Hack to get the fd since GFileDescriptorBased (which is how you
+/* Hack to get the fd since xfile_descriptor_based_t (which is how you
  * _should_ get the fd) is only available on UNIX but things like
  * win32 needs this as well
  */

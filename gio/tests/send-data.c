@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 
-GMainLoop *loop;
+xmain_loop_t *loop;
 
 int cancel_timeout = 0;
 int io_timeout = 0;
@@ -44,7 +44,7 @@ socket_address_to_string (xsocket_address_t *address)
   inet_address = g_inet_socket_address_get_address (G_INET_SOCKET_ADDRESS (address));
   str = xinet_address_to_string (inet_address);
   port = g_inet_socket_address_get_port (G_INET_SOCKET_ADDRESS (address));
-  res = g_strdup_printf ("%s:%d", str, port);
+  res = xstrdup_printf ("%s:%d", str, port);
   g_free (str);
   return res;
 }
@@ -55,34 +55,34 @@ async_cb (xobject_t *source_object,
 	  xpointer_t user_data)
 {
   xasync_result_t **resp = user_data;
-  *resp = g_object_ref (res);
-  g_main_loop_quit (loop);
+  *resp = xobject_ref (res);
+  xmain_loop_quit (loop);
 }
 
 static void
-socket_client_event (GSocketClient *client,
+socket_client_event (xsocket_client_t *client,
 		     GSocketClientEvent event,
-		     GSocketConnectable *connectable,
+		     xsocket_connectable_t *connectable,
 		     xsocket_connection_t *connection)
 {
-  static GEnumClass *event_class;
+  static xenum_class_t *event_class;
   gint64 now_us;
 
   if (!event_class)
-    event_class = g_type_class_ref (XTYPE_SOCKET_CLIENT_EVENT);
+    event_class = xtype_class_ref (XTYPE_SOCKET_CLIENT_EVENT);
 
   now_us = g_get_real_time ();
-  g_print ("%" G_GINT64_FORMAT " GSocketClient => %s [%s]\n",
+  g_print ("%" G_GINT64_FORMAT " xsocket_client_t => %s [%s]\n",
 	  now_us,
-	  g_enum_get_value (event_class, event)->value_nick,
+	  xenum_get_value (event_class, event)->value_nick,
 	  connection ? G_OBJECT_TYPE_NAME (connection) : "");
 }
 
 int
 main (int argc, char *argv[])
 {
-  GOptionContext *context;
-  GSocketClient *client;
+  xoption_context_t *context;
+  xsocket_client_t *client;
   xsocket_connection_t *connection;
   xsocket_address_t *address;
   xcancellable_t *cancellable;
@@ -105,14 +105,14 @@ main (int argc, char *argv[])
     }
 
   if (async)
-    loop = g_main_loop_new (NULL, FALSE);
+    loop = xmain_loop_new (NULL, FALSE);
 
   if (cancel_timeout)
     {
-      GThread *thread;
+      xthread_t *thread;
       cancellable = g_cancellable_new ();
-      thread = g_thread_new ("cancel", cancel_thread, cancellable);
-      g_thread_unref (thread);
+      thread = xthread_new ("cancel", cancel_thread, cancellable);
+      xthread_unref (thread);
     }
   else
     {
@@ -130,9 +130,9 @@ main (int argc, char *argv[])
       xasync_result_t *res;
       xsocket_client_connect_to_host_async (client, argv[1], 7777,
 					     cancellable, async_cb, &res);
-      g_main_loop_run (loop);
+      xmain_loop_run (loop);
       connection = xsocket_client_connect_to_host_finish (client, res, &error);
-      g_object_unref (res);
+      xobject_unref (res);
     }
   else
     {
@@ -146,7 +146,7 @@ main (int argc, char *argv[])
       g_printerr ("%s can't connect: %s\n", argv[0], error->message);
       return 1;
     }
-  g_object_unref (client);
+  xobject_unref (client);
 
   address = xsocket_connection_get_remote_address (connection, &error);
   if (!address)
@@ -157,7 +157,7 @@ main (int argc, char *argv[])
     }
   g_print ("Connected to address: %s\n",
 	   socket_address_to_string (address));
-  g_object_unref (address);
+  xobject_unref (address);
 
   if (graceful)
     g_tcp_connection_set_graceful_disconnect (G_TCP_CONNECTION (connection), TRUE);
@@ -167,11 +167,11 @@ main (int argc, char *argv[])
   while (fgets(buffer, sizeof (buffer), stdin) != NULL)
     {
       /* FIXME if (async) */
-      if (!g_output_stream_write_all (out, buffer, strlen (buffer),
+      if (!xoutput_stream_write_all (out, buffer, strlen (buffer),
 				      NULL, cancellable, &error))
 	{
 	  g_warning ("send error: %s",  error->message);
-	  g_error_free (error);
+	  xerror_free (error);
 	  error = NULL;
 	}
     }
@@ -182,15 +182,15 @@ main (int argc, char *argv[])
       xasync_result_t *res;
       g_io_stream_close_async (XIO_STREAM (connection),
 			       0, cancellable, async_cb, &res);
-      g_main_loop_run (loop);
+      xmain_loop_run (loop);
       if (!g_io_stream_close_finish (XIO_STREAM (connection),
 				     res, &error))
 	{
-	  g_object_unref (res);
+	  xobject_unref (res);
 	  g_warning ("close error: %s",  error->message);
 	  return 1;
 	}
-      g_object_unref (res);
+      xobject_unref (res);
     }
   else
     {
@@ -201,7 +201,7 @@ main (int argc, char *argv[])
 	}
     }
 
-  g_object_unref (connection);
+  xobject_unref (connection);
 
   return 0;
 }

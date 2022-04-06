@@ -34,30 +34,30 @@
 #endif
 
 
-#define g_local_file_io_stream_get_type _g_local_file_io_stream_get_type
-G_DEFINE_TYPE (GLocalFileIOStream, g_local_file_io_stream, XTYPE_FILE_IO_STREAM)
+#define xlocal_file_io_stream_get_type _xlocal_file_io_stream_get_type
+G_DEFINE_TYPE (xlocal_file_io_stream, xlocal_file_io_stream, XTYPE_FILE_IO_STREAM)
 
 static void
-g_local_file_io_stream_finalize (xobject_t *object)
+xlocal_file_io_stream_finalize (xobject_t *object)
 {
-  GLocalFileIOStream *file;
+  xlocal_file_io_stream_t *file;
 
   file = G_LOCAL_FILE_IO_STREAM (object);
 
-  g_object_unref (file->input_stream);
-  g_object_unref (file->output_stream);
+  xobject_unref (file->input_stream);
+  xobject_unref (file->output_stream);
 
-  G_OBJECT_CLASS (g_local_file_io_stream_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xlocal_file_io_stream_parent_class)->finalize (object);
 }
 
-GFileIOStream *
-_g_local_file_io_stream_new (GLocalFileOutputStream *output_stream)
+xfile_io_stream_t *
+_xlocal_file_io_stream_new (GLocalFileOutputStream *output_stream)
 {
-  GLocalFileIOStream *stream;
+  xlocal_file_io_stream_t *stream;
   int fd;
 
-  stream = g_object_new (XTYPE_LOCAL_FILE_IO_STREAM, NULL);
-  stream->output_stream = g_object_ref (G_OUTPUT_STREAM (output_stream));
+  stream = xobject_new (XTYPE_LOCAL_FILE_IO_STREAM, NULL);
+  stream->output_stream = xobject_ref (G_OUTPUT_STREAM (output_stream));
   _g_local_file_output_stream_set_do_close (output_stream, FALSE);
   fd = _g_local_file_output_stream_get_fd (output_stream);
   stream->input_stream = (xinput_stream_t *)_g_local_file_input_stream_new (fd);
@@ -65,32 +65,32 @@ _g_local_file_io_stream_new (GLocalFileOutputStream *output_stream)
   _g_local_file_input_stream_set_do_close (G_LOCAL_FILE_INPUT_STREAM (stream->input_stream),
 					   FALSE);
 
-  return G_FILE_IO_STREAM (stream);
+  return XFILE_IO_STREAM (stream);
 }
 
 static xinput_stream_t *
-g_local_file_io_stream_get_input_stream (xio_stream_t *stream)
+xlocal_file_io_stream_get_input_stream (xio_stream_t *stream)
 {
   return G_LOCAL_FILE_IO_STREAM (stream)->input_stream;
 }
 
 static xoutput_stream_t *
-g_local_file_io_stream_get_output_stream (xio_stream_t *stream)
+xlocal_file_io_stream_get_output_stream (xio_stream_t *stream)
 {
   return G_LOCAL_FILE_IO_STREAM (stream)->output_stream;
 }
 
 
 static xboolean_t
-g_local_file_io_stream_close (xio_stream_t  *stream,
+xlocal_file_io_stream_close (xio_stream_t  *stream,
 			      xcancellable_t   *cancellable,
 			      xerror_t        **error)
 {
-  GLocalFileIOStream *file = G_LOCAL_FILE_IO_STREAM (stream);
+  xlocal_file_io_stream_t *file = G_LOCAL_FILE_IO_STREAM (stream);
 
   /* There are shortcutted and can't fail */
-  g_output_stream_close (file->output_stream, cancellable, NULL);
-  g_input_stream_close (file->input_stream, cancellable, NULL);
+  xoutput_stream_close (file->output_stream, cancellable, NULL);
+  xinput_stream_close (file->input_stream, cancellable, NULL);
 
   return
     _g_local_file_output_stream_really_close (G_LOCAL_FILE_OUTPUT_STREAM (file->output_stream),
@@ -98,19 +98,19 @@ g_local_file_io_stream_close (xio_stream_t  *stream,
 }
 
 static void
-g_local_file_io_stream_class_init (GLocalFileIOStreamClass *klass)
+xlocal_file_io_stream_class_init (xlocal_file_io_stream_class_t *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
   xio_stream_class_t *stream_class = XIO_STREAM_CLASS (klass);
 
-  gobject_class->finalize = g_local_file_io_stream_finalize;
+  gobject_class->finalize = xlocal_file_io_stream_finalize;
 
-  stream_class->get_input_stream = g_local_file_io_stream_get_input_stream;
-  stream_class->get_output_stream = g_local_file_io_stream_get_output_stream;
-  stream_class->close_fn = g_local_file_io_stream_close;
+  stream_class->get_input_stream = xlocal_file_io_stream_get_input_stream;
+  stream_class->get_output_stream = xlocal_file_io_stream_get_output_stream;
+  stream_class->close_fn = xlocal_file_io_stream_close;
 }
 
 static void
-g_local_file_io_stream_init (GLocalFileIOStream *stream)
+xlocal_file_io_stream_init (xlocal_file_io_stream_t *stream)
 {
 }

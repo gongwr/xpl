@@ -33,7 +33,7 @@ G_BEGIN_DECLS
 #define G_UNIX_MOUNT_CLASS(k)    (XTYPE_CHECK_CLASS_CAST((k), XTYPE_UNIX_MOUNT, GUnixMountClass))
 #define X_IS_UNIX_MOUNT(o)       (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_UNIX_MOUNT))
 #define X_IS_UNIX_MOUNT_CLASS(k) (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_UNIX_MOUNT))
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixMount, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixMount, xobject_unref)
 
 typedef struct _GUnixMountClass GUnixMountClass;
 
@@ -44,7 +44,7 @@ struct _GUnixMountClass
 
 xtype_t        _g_unix_mount_get_type       (void) G_GNUC_CONST;
 
-GUnixMount * _g_unix_mount_new            (GVolumeMonitor  *volume_monitor,
+GUnixMount * _g_unix_mount_new            (xvolume_monitor_t  *volume_monitor,
                                            GUnixMountEntry *mount_entry,
                                            GUnixVolume     *volume);
 xboolean_t     _g_unix_mount_has_mount_path (GUnixMount      *mount,

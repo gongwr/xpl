@@ -40,7 +40,7 @@
 
 
 
-struct _GDataOutputStreamPrivate {
+struct _xdata_output_stream_private {
   GDataStreamByteOrder byte_order;
 };
 
@@ -51,37 +51,37 @@ enum {
 
 static void g_data_output_stream_set_property (xobject_t      *object,
 					       xuint_t         prop_id,
-					       const GValue *value,
-					       GParamSpec   *pspec);
+					       const xvalue_t *value,
+					       xparam_spec_t   *pspec);
 static void g_data_output_stream_get_property (xobject_t      *object,
 					       xuint_t         prop_id,
-					       GValue       *value,
-					       GParamSpec   *pspec);
+					       xvalue_t       *value,
+					       xparam_spec_t   *pspec);
 
-static void     g_data_output_stream_seekable_iface_init (GSeekableIface  *iface);
-static goffset  g_data_output_stream_tell                (GSeekable       *seekable);
-static xboolean_t g_data_output_stream_can_seek            (GSeekable       *seekable);
-static xboolean_t g_data_output_stream_seek                (GSeekable       *seekable,
-							  goffset          offset,
+static void     g_data_output_stream_seekable_iface_init (xseekable_iface_t  *iface);
+static xoffset_t  g_data_output_stream_tell                (xseekable__t       *seekable);
+static xboolean_t g_data_output_stream_can_seek            (xseekable__t       *seekable);
+static xboolean_t g_data_output_stream_seek                (xseekable__t       *seekable,
+							  xoffset_t          offset,
 							  GSeekType        type,
 							  xcancellable_t    *cancellable,
 							  xerror_t         **error);
-static xboolean_t g_data_output_stream_can_truncate        (GSeekable       *seekable);
-static xboolean_t g_data_output_stream_truncate            (GSeekable       *seekable,
-							  goffset          offset,
+static xboolean_t g_data_output_stream_can_truncate        (xseekable__t       *seekable);
+static xboolean_t g_data_output_stream_truncate            (xseekable__t       *seekable,
+							  xoffset_t          offset,
 							  xcancellable_t    *cancellable,
 							  xerror_t         **error);
 
-G_DEFINE_TYPE_WITH_CODE (GDataOutputStream,
+G_DEFINE_TYPE_WITH_CODE (xdata_output_stream,
 			 g_data_output_stream,
 			 XTYPE_FILTER_OUTPUT_STREAM,
-                         G_ADD_PRIVATE (GDataOutputStream)
+                         G_ADD_PRIVATE (xdata_output_stream_t)
 			 G_IMPLEMENT_INTERFACE (XTYPE_SEEKABLE,
 						g_data_output_stream_seekable_iface_init))
 
 
 static void
-g_data_output_stream_class_init (GDataOutputStreamClass *klass)
+g_data_output_stream_class_init (xdata_output_stream_class_t *klass)
 {
   xobject_class_t *object_class;
 
@@ -90,12 +90,12 @@ g_data_output_stream_class_init (GDataOutputStreamClass *klass)
   object_class->set_property = g_data_output_stream_set_property;
 
   /**
-   * GDataOutputStream:byte-order:
+   * xdata_output_stream_t:byte-order:
    *
    * Determines the byte ordering that is used when writing
    * multi-byte entities (such as integers) to the stream.
    */
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_BYTE_ORDER,
                                    g_param_spec_enum ("byte-order",
                                                       P_("Byte order"),
@@ -109,17 +109,17 @@ g_data_output_stream_class_init (GDataOutputStreamClass *klass)
 static void
 g_data_output_stream_set_property (xobject_t     *object,
 				  xuint_t         prop_id,
-				  const GValue *value,
-				  GParamSpec   *pspec)
+				  const xvalue_t *value,
+				  xparam_spec_t   *pspec)
 {
-  GDataOutputStream *dstream;
+  xdata_output_stream_t *dstream;
 
   dstream = G_DATA_OUTPUT_STREAM (object);
 
   switch (prop_id)
     {
     case PROP_BYTE_ORDER:
-      g_data_output_stream_set_byte_order (dstream, g_value_get_enum (value));
+      g_data_output_stream_set_byte_order (dstream, xvalue_get_enum (value));
       break;
 
     default:
@@ -131,11 +131,11 @@ g_data_output_stream_set_property (xobject_t     *object,
 static void
 g_data_output_stream_get_property (xobject_t    *object,
 				   xuint_t       prop_id,
-				   GValue     *value,
-				   GParamSpec *pspec)
+				   xvalue_t     *value,
+				   xparam_spec_t *pspec)
 {
-  GDataOutputStreamPrivate *priv;
-  GDataOutputStream        *dstream;
+  xdata_output_stream_private_t *priv;
+  xdata_output_stream_t        *dstream;
 
   dstream = G_DATA_OUTPUT_STREAM (object);
   priv = dstream->priv;
@@ -143,7 +143,7 @@ g_data_output_stream_get_property (xobject_t    *object,
   switch (prop_id)
     {
     case PROP_BYTE_ORDER:
-      g_value_set_enum (value, priv->byte_order);
+      xvalue_set_enum (value, priv->byte_order);
       break;
 
     default:
@@ -153,14 +153,14 @@ g_data_output_stream_get_property (xobject_t    *object,
 }
 
 static void
-g_data_output_stream_init (GDataOutputStream *stream)
+g_data_output_stream_init (xdata_output_stream_t *stream)
 {
   stream->priv = g_data_output_stream_get_instance_private (stream);
   stream->priv->byte_order = G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN;
 }
 
 static void
-g_data_output_stream_seekable_iface_init (GSeekableIface *iface)
+g_data_output_stream_seekable_iface_init (xseekable_iface_t *iface)
 {
   iface->tell         = g_data_output_stream_tell;
   iface->can_seek     = g_data_output_stream_can_seek;
@@ -175,16 +175,16 @@ g_data_output_stream_seekable_iface_init (GSeekableIface *iface)
  *
  * Creates a new data output stream for @base_stream.
  *
- * Returns: #GDataOutputStream.
+ * Returns: #xdata_output_stream_t.
  **/
-GDataOutputStream *
+xdata_output_stream_t *
 g_data_output_stream_new (xoutput_stream_t *base_stream)
 {
-  GDataOutputStream *stream;
+  xdata_output_stream_t *stream;
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (base_stream), NULL);
 
-  stream = g_object_new (XTYPE_DATA_OUTPUT_STREAM,
+  stream = xobject_new (XTYPE_DATA_OUTPUT_STREAM,
                          "base-stream", base_stream,
                          NULL);
 
@@ -193,35 +193,35 @@ g_data_output_stream_new (xoutput_stream_t *base_stream)
 
 /**
  * g_data_output_stream_set_byte_order:
- * @stream: a #GDataOutputStream.
+ * @stream: a #xdata_output_stream_t.
  * @order: a %GDataStreamByteOrder.
  *
  * Sets the byte order of the data output stream to @order.
  **/
 void
-g_data_output_stream_set_byte_order (GDataOutputStream    *stream,
+g_data_output_stream_set_byte_order (xdata_output_stream_t    *stream,
                                      GDataStreamByteOrder  order)
 {
-  GDataOutputStreamPrivate *priv;
+  xdata_output_stream_private_t *priv;
   g_return_if_fail (X_IS_DATA_OUTPUT_STREAM (stream));
   priv = stream->priv;
   if (priv->byte_order != order)
     {
       priv->byte_order = order;
-      g_object_notify (G_OBJECT (stream), "byte-order");
+      xobject_notify (G_OBJECT (stream), "byte-order");
     }
 }
 
 /**
  * g_data_output_stream_get_byte_order:
- * @stream: a #GDataOutputStream.
+ * @stream: a #xdata_output_stream_t.
  *
  * Gets the byte order for the stream.
  *
  * Returns: the #GDataStreamByteOrder for the @stream.
  **/
 GDataStreamByteOrder
-g_data_output_stream_get_byte_order (GDataOutputStream *stream)
+g_data_output_stream_get_byte_order (xdata_output_stream_t *stream)
 {
   g_return_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), G_DATA_STREAM_BYTE_ORDER_HOST_ENDIAN);
 
@@ -230,7 +230,7 @@ g_data_output_stream_get_byte_order (GDataOutputStream *stream)
 
 /**
  * g_data_output_stream_put_byte:
- * @stream: a #GDataOutputStream.
+ * @stream: a #xdata_output_stream_t.
  * @data: a #guchar.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: a #xerror_t, %NULL to ignore.
@@ -240,7 +240,7 @@ g_data_output_stream_get_byte_order (GDataOutputStream *stream)
  * Returns: %TRUE if @data was successfully added to the @stream.
  **/
 xboolean_t
-g_data_output_stream_put_byte (GDataOutputStream  *stream,
+g_data_output_stream_put_byte (xdata_output_stream_t  *stream,
 			       guchar              data,
 			       xcancellable_t       *cancellable,
 			       xerror_t            **error)
@@ -249,7 +249,7 @@ g_data_output_stream_put_byte (GDataOutputStream  *stream,
 
   g_return_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
 
-  return g_output_stream_write_all (G_OUTPUT_STREAM (stream),
+  return xoutput_stream_write_all (G_OUTPUT_STREAM (stream),
 				    &data, 1,
 				    &bytes_written,
 				    cancellable, error);
@@ -257,7 +257,7 @@ g_data_output_stream_put_byte (GDataOutputStream  *stream,
 
 /**
  * g_data_output_stream_put_int16:
- * @stream: a #GDataOutputStream.
+ * @stream: a #xdata_output_stream_t.
  * @data: a #gint16.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: a #xerror_t, %NULL to ignore.
@@ -267,7 +267,7 @@ g_data_output_stream_put_byte (GDataOutputStream  *stream,
  * Returns: %TRUE if @data was successfully added to the @stream.
  **/
 xboolean_t
-g_data_output_stream_put_int16 (GDataOutputStream  *stream,
+g_data_output_stream_put_int16 (xdata_output_stream_t  *stream,
 				gint16              data,
 				xcancellable_t       *cancellable,
 				xerror_t            **error)
@@ -289,7 +289,7 @@ g_data_output_stream_put_int16 (GDataOutputStream  *stream,
       break;
     }
 
-  return g_output_stream_write_all (G_OUTPUT_STREAM (stream),
+  return xoutput_stream_write_all (G_OUTPUT_STREAM (stream),
 				    &data, 2,
 				    &bytes_written,
 				    cancellable, error);
@@ -297,8 +297,8 @@ g_data_output_stream_put_int16 (GDataOutputStream  *stream,
 
 /**
  * g_data_output_stream_put_uint16:
- * @stream: a #GDataOutputStream.
- * @data: a #guint16.
+ * @stream: a #xdata_output_stream_t.
+ * @data: a #xuint16_t.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: a #xerror_t, %NULL to ignore.
  *
@@ -307,8 +307,8 @@ g_data_output_stream_put_int16 (GDataOutputStream  *stream,
  * Returns: %TRUE if @data was successfully added to the @stream.
  **/
 xboolean_t
-g_data_output_stream_put_uint16 (GDataOutputStream  *stream,
-				 guint16             data,
+g_data_output_stream_put_uint16 (xdata_output_stream_t  *stream,
+				 xuint16_t             data,
 				 xcancellable_t       *cancellable,
 				 xerror_t            **error)
 {
@@ -329,7 +329,7 @@ g_data_output_stream_put_uint16 (GDataOutputStream  *stream,
       break;
     }
 
-  return g_output_stream_write_all (G_OUTPUT_STREAM (stream),
+  return xoutput_stream_write_all (G_OUTPUT_STREAM (stream),
 				    &data, 2,
 				    &bytes_written,
 				    cancellable, error);
@@ -337,7 +337,7 @@ g_data_output_stream_put_uint16 (GDataOutputStream  *stream,
 
 /**
  * g_data_output_stream_put_int32:
- * @stream: a #GDataOutputStream.
+ * @stream: a #xdata_output_stream_t.
  * @data: a #gint32.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: a #xerror_t, %NULL to ignore.
@@ -347,7 +347,7 @@ g_data_output_stream_put_uint16 (GDataOutputStream  *stream,
  * Returns: %TRUE if @data was successfully added to the @stream.
  **/
 xboolean_t
-g_data_output_stream_put_int32 (GDataOutputStream  *stream,
+g_data_output_stream_put_int32 (xdata_output_stream_t  *stream,
 				gint32              data,
 				xcancellable_t       *cancellable,
 				xerror_t            **error)
@@ -369,7 +369,7 @@ g_data_output_stream_put_int32 (GDataOutputStream  *stream,
       break;
     }
 
-  return g_output_stream_write_all (G_OUTPUT_STREAM (stream),
+  return xoutput_stream_write_all (G_OUTPUT_STREAM (stream),
 				    &data, 4,
 				    &bytes_written,
 				    cancellable, error);
@@ -377,8 +377,8 @@ g_data_output_stream_put_int32 (GDataOutputStream  *stream,
 
 /**
  * g_data_output_stream_put_uint32:
- * @stream: a #GDataOutputStream.
- * @data: a #guint32.
+ * @stream: a #xdata_output_stream_t.
+ * @data: a #xuint32_t.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: a #xerror_t, %NULL to ignore.
  *
@@ -387,8 +387,8 @@ g_data_output_stream_put_int32 (GDataOutputStream  *stream,
  * Returns: %TRUE if @data was successfully added to the @stream.
  **/
 xboolean_t
-g_data_output_stream_put_uint32 (GDataOutputStream  *stream,
-				 guint32             data,
+g_data_output_stream_put_uint32 (xdata_output_stream_t  *stream,
+				 xuint32_t             data,
 				 xcancellable_t       *cancellable,
 				 xerror_t            **error)
 {
@@ -409,7 +409,7 @@ g_data_output_stream_put_uint32 (GDataOutputStream  *stream,
       break;
     }
 
-  return g_output_stream_write_all (G_OUTPUT_STREAM (stream),
+  return xoutput_stream_write_all (G_OUTPUT_STREAM (stream),
 				    &data, 4,
 				    &bytes_written,
 				    cancellable, error);
@@ -417,7 +417,7 @@ g_data_output_stream_put_uint32 (GDataOutputStream  *stream,
 
 /**
  * g_data_output_stream_put_int64:
- * @stream: a #GDataOutputStream.
+ * @stream: a #xdata_output_stream_t.
  * @data: a #gint64.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: a #xerror_t, %NULL to ignore.
@@ -427,7 +427,7 @@ g_data_output_stream_put_uint32 (GDataOutputStream  *stream,
  * Returns: %TRUE if @data was successfully added to the @stream.
  **/
 xboolean_t
-g_data_output_stream_put_int64 (GDataOutputStream  *stream,
+g_data_output_stream_put_int64 (xdata_output_stream_t  *stream,
 				gint64              data,
 				xcancellable_t       *cancellable,
 				xerror_t            **error)
@@ -449,7 +449,7 @@ g_data_output_stream_put_int64 (GDataOutputStream  *stream,
       break;
     }
 
-  return g_output_stream_write_all (G_OUTPUT_STREAM (stream),
+  return xoutput_stream_write_all (G_OUTPUT_STREAM (stream),
 				    &data, 8,
 				    &bytes_written,
 				    cancellable, error);
@@ -457,8 +457,8 @@ g_data_output_stream_put_int64 (GDataOutputStream  *stream,
 
 /**
  * g_data_output_stream_put_uint64:
- * @stream: a #GDataOutputStream.
- * @data: a #guint64.
+ * @stream: a #xdata_output_stream_t.
+ * @data: a #xuint64_t.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: a #xerror_t, %NULL to ignore.
  *
@@ -467,8 +467,8 @@ g_data_output_stream_put_int64 (GDataOutputStream  *stream,
  * Returns: %TRUE if @data was successfully added to the @stream.
  **/
 xboolean_t
-g_data_output_stream_put_uint64 (GDataOutputStream  *stream,
-				 guint64             data,
+g_data_output_stream_put_uint64 (xdata_output_stream_t  *stream,
+				 xuint64_t             data,
 				 xcancellable_t       *cancellable,
 				 xerror_t            **error)
 {
@@ -489,7 +489,7 @@ g_data_output_stream_put_uint64 (GDataOutputStream  *stream,
       break;
     }
 
-  return g_output_stream_write_all (G_OUTPUT_STREAM (stream),
+  return xoutput_stream_write_all (G_OUTPUT_STREAM (stream),
 				    &data, 8,
 				    &bytes_written,
 				    cancellable, error);
@@ -497,7 +497,7 @@ g_data_output_stream_put_uint64 (GDataOutputStream  *stream,
 
 /**
  * g_data_output_stream_put_string:
- * @stream: a #GDataOutputStream.
+ * @stream: a #xdata_output_stream_t.
  * @str: a string.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: a #xerror_t, %NULL to ignore.
@@ -507,7 +507,7 @@ g_data_output_stream_put_uint64 (GDataOutputStream  *stream,
  * Returns: %TRUE if @string was successfully added to the @stream.
  **/
 xboolean_t
-g_data_output_stream_put_string (GDataOutputStream  *stream,
+g_data_output_stream_put_string (xdata_output_stream_t  *stream,
 				 const char         *str,
 				 xcancellable_t       *cancellable,
 				 xerror_t            **error)
@@ -517,43 +517,43 @@ g_data_output_stream_put_string (GDataOutputStream  *stream,
   g_return_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
   g_return_val_if_fail (str != NULL, FALSE);
 
-  return g_output_stream_write_all (G_OUTPUT_STREAM (stream),
+  return xoutput_stream_write_all (G_OUTPUT_STREAM (stream),
 				    str, strlen (str),
 				    &bytes_written,
 				    cancellable, error);
 }
 
-static goffset
-g_data_output_stream_tell (GSeekable *seekable)
+static xoffset_t
+g_data_output_stream_tell (xseekable__t *seekable)
 {
   xoutput_stream_t *base_stream;
-  GSeekable *base_stream_seekable;
+  xseekable__t *base_stream_seekable;
 
   base_stream = G_FILTER_OUTPUT_STREAM (seekable)->base_stream;
   if (!X_IS_SEEKABLE (base_stream))
     return 0;
   base_stream_seekable = G_SEEKABLE (base_stream);
-  return g_seekable_tell (base_stream_seekable);
+  return xseekable_tell (base_stream_seekable);
 }
 
 static xboolean_t
-g_data_output_stream_can_seek (GSeekable *seekable)
+g_data_output_stream_can_seek (xseekable__t *seekable)
 {
   xoutput_stream_t *base_stream;
 
   base_stream = G_FILTER_OUTPUT_STREAM (seekable)->base_stream;
-  return X_IS_SEEKABLE (base_stream) && g_seekable_can_seek (G_SEEKABLE (base_stream));
+  return X_IS_SEEKABLE (base_stream) && xseekable_can_seek (G_SEEKABLE (base_stream));
 }
 
 static xboolean_t
-g_data_output_stream_seek (GSeekable     *seekable,
-			   goffset        offset,
+g_data_output_stream_seek (xseekable__t     *seekable,
+			   xoffset_t        offset,
 			   GSeekType      type,
 			   xcancellable_t  *cancellable,
 			   xerror_t       **error)
 {
   xoutput_stream_t *base_stream;
-  GSeekable *base_stream_seekable;
+  xseekable__t *base_stream_seekable;
 
   base_stream = G_FILTER_OUTPUT_STREAM (seekable)->base_stream;
   if (!X_IS_SEEKABLE (base_stream))
@@ -564,26 +564,26 @@ g_data_output_stream_seek (GSeekable     *seekable,
     }
 
   base_stream_seekable = G_SEEKABLE (base_stream);
-  return g_seekable_seek (base_stream_seekable, offset, type, cancellable, error);
+  return xseekable_seek (base_stream_seekable, offset, type, cancellable, error);
 }
 
 static xboolean_t
-g_data_output_stream_can_truncate (GSeekable *seekable)
+g_data_output_stream_can_truncate (xseekable__t *seekable)
 {
   xoutput_stream_t *base_stream;
 
   base_stream = G_FILTER_OUTPUT_STREAM (seekable)->base_stream;
-  return X_IS_SEEKABLE (base_stream) && g_seekable_can_truncate (G_SEEKABLE (base_stream));
+  return X_IS_SEEKABLE (base_stream) && xseekable_can_truncate (G_SEEKABLE (base_stream));
 }
 
 static xboolean_t
-g_data_output_stream_truncate (GSeekable     *seekable,
-				   goffset        offset,
+g_data_output_stream_truncate (xseekable__t     *seekable,
+				   xoffset_t        offset,
 				   xcancellable_t  *cancellable,
 				   xerror_t       **error)
 {
   xoutput_stream_t *base_stream;
-  GSeekable *base_stream_seekable;
+  xseekable__t *base_stream_seekable;
 
   base_stream = G_FILTER_OUTPUT_STREAM (seekable)->base_stream;
   if (!X_IS_SEEKABLE (base_stream))
@@ -594,5 +594,5 @@ g_data_output_stream_truncate (GSeekable     *seekable,
     }
 
   base_stream_seekable = G_SEEKABLE (base_stream);
-  return g_seekable_truncate (base_stream_seekable, offset, cancellable, error);
+  return xseekable_truncate (base_stream_seekable, offset, cancellable, error);
 }

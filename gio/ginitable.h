@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __G_INITABLE_H__
-#define __G_INITABLE_H__
+#ifndef __XINITABLE_H__
+#define __XINITABLE_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,23 +29,23 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_INITABLE            (g_initable_get_type ())
-#define G_INITABLE(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_INITABLE, GInitable))
+#define XTYPE_INITABLE            (xinitable_get_type ())
+#define XINITABLE(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_INITABLE, xinitable_t))
 #define X_IS_INITABLE(obj)         (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_INITABLE))
-#define G_INITABLE_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_INITABLE, GInitableIface))
-#define XTYPE_IS_INITABLE(type)   (g_type_is_a ((type), XTYPE_INITABLE))
+#define XINITABLE_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_INITABLE, xinitable_iface_t))
+#define XTYPE_IS_INITABLE(type)   (xtype_is_a ((type), XTYPE_INITABLE))
 
 /**
- * GInitable:
+ * xinitable_t:
  *
  * Interface for initializable objects.
  *
  * Since: 2.22
  **/
-typedef struct _GInitableIface GInitableIface;
+typedef struct _xinitable_iface xinitable_iface_t;
 
 /**
- * GInitableIface:
+ * xinitable_iface_t:
  * @x_iface: The parent interface.
  * @init: Initializes the object.
  *
@@ -54,28 +54,28 @@ typedef struct _GInitableIface GInitableIface;
  *
  * Since: 2.22
  **/
-struct _GInitableIface
+struct _xinitable_iface
 {
   xtype_interface_t x_iface;
 
   /* Virtual Table */
 
-  xboolean_t    (* init) (GInitable    *initable,
+  xboolean_t    (* init) (xinitable_t    *initable,
 			xcancellable_t *cancellable,
 			xerror_t      **error);
 };
 
 
 XPL_AVAILABLE_IN_ALL
-xtype_t    g_initable_get_type   (void) G_GNUC_CONST;
+xtype_t    xinitable_get_type   (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_initable_init       (GInitable     *initable,
+xboolean_t xinitable_init       (xinitable_t     *initable,
 				xcancellable_t  *cancellable,
 				xerror_t       **error);
 
 XPL_AVAILABLE_IN_ALL
-xpointer_t g_initable_new        (xtype_t          object_type,
+xpointer_t xinitable_new        (xtype_t          object_type,
 				xcancellable_t  *cancellable,
 				xerror_t       **error,
 				const xchar_t   *first_property_name,
@@ -83,8 +83,8 @@ xpointer_t g_initable_new        (xtype_t          object_type,
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 
-XPL_DEPRECATED_IN_2_54_FOR(g_object_new_with_properties and g_initable_init)
-xpointer_t g_initable_newv       (xtype_t          object_type,
+XPL_DEPRECATED_IN_2_54_FOR(xobject_new_with_properties and xinitable_init)
+xpointer_t xinitable_newv       (xtype_t          object_type,
 				xuint_t          n_parameters,
 				GParameter    *parameters,
 				xcancellable_t  *cancellable,
@@ -93,7 +93,7 @@ xpointer_t g_initable_newv       (xtype_t          object_type,
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 XPL_AVAILABLE_IN_ALL
-xobject_t* g_initable_new_valist (xtype_t          object_type,
+xobject_t* xinitable_new_valist (xtype_t          object_type,
 				const xchar_t   *first_property_name,
 				va_list        var_args,
 				xcancellable_t  *cancellable,
@@ -102,4 +102,4 @@ xobject_t* g_initable_new_valist (xtype_t          object_type,
 G_END_DECLS
 
 
-#endif /* __G_INITABLE_H__ */
+#endif /* __XINITABLE_H__ */

@@ -3,60 +3,60 @@
 #include <string.h>
 
 static void
-activate (GApplication *application)
+activate (xapplication_t *application)
 {
-  g_application_hold (application);
+  xapplication_hold (application);
   g_print ("activated\n");
-  g_application_release (application);
+  xapplication_release (application);
 }
 
 static void
-activate_action (GAction  *action,
+activate_action (xaction_t  *action,
                  xvariant_t *parameter,
                  xpointer_t  data)
 {
-  GApplication *application = G_APPLICATION (data);
+  xapplication_t *application = G_APPLICATION (data);
 
-  g_application_hold (application);
+  xapplication_hold (application);
   g_print ("action %s activated\n", g_action_get_name (action));
-  g_application_release (application);
+  xapplication_release (application);
 }
 
 static void
-activate_toggle_action (GSimpleAction *action,
+activate_toggle_action (xsimple_action_t *action,
                         xvariant_t      *parameter,
                         xpointer_t       data)
 {
-  GApplication *application = G_APPLICATION (data);
+  xapplication_t *application = G_APPLICATION (data);
   xvariant_t *state;
   xboolean_t b;
 
   g_print ("action %s activated\n", g_action_get_name (G_ACTION (action)));
 
-  g_application_hold (application);
+  xapplication_hold (application);
   state = g_action_get_state (G_ACTION (action));
-  b = g_variant_get_boolean (state);
-  g_variant_unref (state);
-  g_simple_action_set_state (action, g_variant_new_boolean (!b));
+  b = xvariant_get_boolean (state);
+  xvariant_unref (state);
+  g_simple_action_set_state (action, xvariant_new_boolean (!b));
   g_print ("state change %d -> %d\n", b, !b);
-  g_application_release (application);
+  xapplication_release (application);
 }
 
 static void
-add_actions (GApplication *app)
+add_actions (xapplication_t *app)
 {
-  GSimpleAction *action;
+  xsimple_action_t *action;
 
   action = g_simple_action_new ("simple-action", NULL);
   g_signal_connect (action, "activate", G_CALLBACK (activate_action), app);
-  g_action_map_add_action (G_ACTION_MAP (app), G_ACTION (action));
-  g_object_unref (action);
+  xaction_map_add_action (G_ACTION_MAP (app), G_ACTION (action));
+  xobject_unref (action);
 
   action = g_simple_action_new_stateful ("toggle-action", NULL,
-                                         g_variant_new_boolean (FALSE));
+                                         xvariant_new_boolean (FALSE));
   g_signal_connect (action, "activate", G_CALLBACK (activate_toggle_action), app);
-  g_action_map_add_action (G_ACTION_MAP (app), G_ACTION (action));
-  g_object_unref (action);
+  xaction_map_add_action (G_ACTION_MAP (app), G_ACTION (action));
+  xobject_unref (action);
 }
 
 static void
@@ -73,18 +73,18 @@ describe_and_activate_action (xaction_group_t *group,
   enabled = xaction_group_get_action_enabled (group, name);
 
   g_print ("action name:      %s\n", name);
-  tmp = param_type ? g_variant_type_dup_string (param_type) : NULL;
+  tmp = param_type ? xvariant_type_dup_string (param_type) : NULL;
   g_print ("parameter type:   %s\n", tmp ? tmp : "<none>");
   g_free (tmp);
   g_print ("state type:       %s\n",
-           state ? g_variant_get_type_string (state) : "<none>");
-  tmp = state ? g_variant_print (state, FALSE) : NULL;
+           state ? xvariant_get_type_string (state) : "<none>");
+  tmp = state ? xvariant_print (state, FALSE) : NULL;
   g_print ("state:            %s\n", tmp ? tmp : "<none>");
   g_free (tmp);
   g_print ("enabled:          %s\n", enabled ? "true" : "false");
 
   if (state != NULL)
-    g_variant_unref (state);
+    xvariant_unref (state);
 
   xaction_group_activate_action (group, name, NULL);
 }
@@ -92,31 +92,31 @@ describe_and_activate_action (xaction_group_t *group,
 int
 main (int argc, char **argv)
 {
-  GApplication *app;
+  xapplication_t *app;
   int status;
 
-  app = g_application_new ("org.gtk.TestApplication", 0);
+  app = xapplication_new ("org.gtk.TestApplication", 0);
   g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
-  g_application_set_inactivity_timeout (app, 10000);
+  xapplication_set_inactivity_timeout (app, 10000);
 
   add_actions (app);
 
   if (argc > 1 && strcmp (argv[1], "--simple-action") == 0)
     {
-      g_application_register (app, NULL, NULL);
+      xapplication_register (app, NULL, NULL);
       describe_and_activate_action (XACTION_GROUP (app), "simple-action");
       exit (0);
     }
   else if (argc > 1 && strcmp (argv[1], "--toggle-action") == 0)
     {
-      g_application_register (app, NULL, NULL);
+      xapplication_register (app, NULL, NULL);
       describe_and_activate_action (XACTION_GROUP (app), "toggle-action");
       exit (0);
     }
 
-  status = g_application_run (app, argc, argv);
+  status = xapplication_run (app, argc, argv);
 
-  g_object_unref (app);
+  xobject_unref (app);
 
   return status;
 }

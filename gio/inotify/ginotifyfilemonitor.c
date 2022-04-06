@@ -32,7 +32,7 @@
 
 struct _GInotifyFileMonitor
 {
-  GLocalFileMonitor parent_instance;
+  xlocal_file_monitor_t parent_instance;
 
   inotify_sub *sub;
 };
@@ -48,7 +48,7 @@ g_inotify_file_monitor_is_supported (void)
 }
 
 static void
-g_inotify_file_monitor_start (GLocalFileMonitor  *local_monitor,
+g_inotify_file_monitor_start (xlocal_file_monitor_t  *local_monitor,
                               const xchar_t        *dirname,
                               const xchar_t        *basename,
                               const xchar_t        *filename,
@@ -66,7 +66,7 @@ g_inotify_file_monitor_start (GLocalFileMonitor  *local_monitor,
 }
 
 static xboolean_t
-g_inotify_file_monitor_cancel (GFileMonitor *monitor)
+g_inotify_file_monitor_cancel (xfile_monitor_t *monitor)
 {
   GInotifyFileMonitor *inotify_monitor = G_INOTIFY_FILE_MONITOR (monitor);
 
@@ -102,8 +102,8 @@ static void
 g_inotify_file_monitor_class_init (GInotifyFileMonitorClass* klass)
 {
   xobject_class_t* gobject_class = G_OBJECT_CLASS (klass);
-  GFileMonitorClass *file_monitor_class = G_FILE_MONITOR_CLASS (klass);
-  GLocalFileMonitorClass *local_file_monitor_class = G_LOCAL_FILE_MONITOR_CLASS (klass);
+  xfile_monitor_class_t *file_monitor_class = XFILE_MONITOR_CLASS (klass);
+  xlocal_file_monitor_class_t *local_file_monitor_class = G_LOCAL_FILE_MONITOR_CLASS (klass);
 
   local_file_monitor_class->is_supported = g_inotify_file_monitor_is_supported;
   local_file_monitor_class->start = g_inotify_file_monitor_start;

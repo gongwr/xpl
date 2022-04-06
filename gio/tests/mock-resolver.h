@@ -23,7 +23,7 @@
 G_BEGIN_DECLS
 
 #define MOCK_TYPE_RESOLVER (mock_resolver_get_type())
-G_DECLARE_FINAL_TYPE (MockResolver, mock_resolver, MOCK, RESOLVER, GResolver)
+G_DECLARE_FINAL_TYPE (MockResolver, mock_resolver, MOCK, RESOLVER, xresolver_t)
 
 MockResolver *mock_resolver_new (void);
 void mock_resolver_set_ipv4_delay_ms (MockResolver *self, xuint_t delay_ms);

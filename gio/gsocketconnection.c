@@ -41,15 +41,15 @@
  * SECTION:gsocketconnection
  * @short_description: A socket connection
  * @include: gio/gio.h
- * @see_also: #xio_stream_t, #GSocketClient, #GSocketListener
+ * @see_also: #xio_stream_t, #xsocket_client_t, #xsocket_listener_t
  *
  * #xsocket_connection_t is a #xio_stream_t for a connected socket. They
- * can be created either by #GSocketClient when connecting to a host,
- * or by #GSocketListener when accepting a new client.
+ * can be created either by #xsocket_client_t when connecting to a host,
+ * or by #xsocket_listener_t when accepting a new client.
  *
  * The type of the #xsocket_connection_t object returned from these calls
  * depends on the type of the underlying socket that is in use. For
- * instance, for a TCP/IP connection it will be a #GTcpConnection.
+ * instance, for a TCP/IP connection it will be a #xtcp_connection_t.
  *
  * Choosing what type of object to construct is done with the socket
  * connection factory, and it is possible for 3rd parties to register
@@ -162,7 +162,7 @@ xsocket_connection_connect (xsocket_connection_t  *connection,
 }
 
 static xboolean_t xsocket_connection_connect_callback (xsocket_t      *socket,
-						      GIOCondition  condition,
+						      xio_condition_t  condition,
 						      xpointer_t      user_data);
 
 /**
@@ -189,56 +189,56 @@ xsocket_connection_connect_async (xsocket_connection_t   *connection,
 				   xasync_ready_callback_t  callback,
 				   xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
   xerror_t *tmp_error = NULL;
 
   g_return_if_fail (X_IS_SOCKET_CONNECTION (connection));
   g_return_if_fail (X_IS_SOCKET_ADDRESS (address));
 
-  task = g_task_new (connection, cancellable, callback, user_data);
-  g_task_set_source_tag (task, xsocket_connection_connect_async);
+  task = xtask_new (connection, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xsocket_connection_connect_async);
 
   xsocket_set_blocking (connection->priv->socket, FALSE);
 
   if (xsocket_connect (connection->priv->socket, address,
 			cancellable, &tmp_error))
     {
-      g_task_return_boolean (task, TRUE);
-      g_object_unref (task);
+      xtask_return_boolean (task, TRUE);
+      xobject_unref (task);
     }
-  else if (g_error_matches (tmp_error, G_IO_ERROR, G_IO_ERROR_PENDING))
+  else if (xerror_matches (tmp_error, G_IO_ERROR, G_IO_ERROR_PENDING))
     {
-      GSource *source;
+      xsource_t *source;
 
-      g_error_free (tmp_error);
+      xerror_free (tmp_error);
       source = xsocket_create_source (connection->priv->socket,
 				       G_IO_OUT, cancellable);
-      g_task_attach_source (task, source,
-			    (GSourceFunc) xsocket_connection_connect_callback);
-      g_source_unref (source);
+      xtask_attach_source (task, source,
+			    (xsource_func_t) xsocket_connection_connect_callback);
+      xsource_unref (source);
     }
   else
     {
-      g_task_return_error (task, tmp_error);
-      g_object_unref (task);
+      xtask_return_error (task, tmp_error);
+      xobject_unref (task);
     }
 }
 
 static xboolean_t
 xsocket_connection_connect_callback (xsocket_t      *socket,
-				      GIOCondition  condition,
+				      xio_condition_t  condition,
 				      xpointer_t      user_data)
 {
-  GTask *task = user_data;
-  xsocket_connection_t *connection = g_task_get_source_object (task);
+  xtask_t *task = user_data;
+  xsocket_connection_t *connection = xtask_get_source_object (task);
   xerror_t *error = NULL;
 
   if (xsocket_check_connect_result (connection->priv->socket, &error))
-    g_task_return_boolean (task, TRUE);
+    xtask_return_boolean (task, TRUE);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 
-  g_object_unref (task);
+  xobject_unref (task);
   return FALSE;
 }
 
@@ -260,9 +260,9 @@ xsocket_connection_connect_finish (xsocket_connection_t  *connection,
 				    xerror_t            **error)
 {
   g_return_val_if_fail (X_IS_SOCKET_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (g_task_is_valid (result, connection), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, connection), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 /**
@@ -293,7 +293,7 @@ xsocket_connection_get_socket (xsocket_connection_t *connection)
  * Try to get the local address of a socket connection.
  *
  * Returns: (transfer full): a #xsocket_address_t or %NULL on error.
- *     Free the returned object with g_object_unref().
+ *     Free the returned object with xobject_unref().
  *
  * Since: 2.22
  */
@@ -319,7 +319,7 @@ xsocket_connection_get_local_address (xsocket_connection_t  *connection,
  * (10.42.77.3)...".
  *
  * Returns: (transfer full): a #xsocket_address_t or %NULL on error.
- *     Free the returned object with g_object_unref().
+ *     Free the returned object with xobject_unref().
  *
  * Since: 2.22
  */
@@ -330,7 +330,7 @@ xsocket_connection_get_remote_address (xsocket_connection_t  *connection,
   if (!xsocket_is_connected (connection->priv->socket))
     {
       return connection->priv->cached_remote_address ?
-        g_object_ref (connection->priv->cached_remote_address) : NULL;
+        xobject_ref (connection->priv->cached_remote_address) : NULL;
     }
   return xsocket_get_remote_address (connection->priv->socket, error);
 }
@@ -345,21 +345,21 @@ xsocket_connection_set_cached_remote_address (xsocket_connection_t *connection,
                                                xsocket_address_t    *address)
 {
   g_clear_object (&connection->priv->cached_remote_address);
-  connection->priv->cached_remote_address = address ? g_object_ref (address) : NULL;
+  connection->priv->cached_remote_address = address ? xobject_ref (address) : NULL;
 }
 
 static void
 xsocket_connection_get_property (xobject_t    *object,
                                   xuint_t       prop_id,
-                                  GValue     *value,
-                                  GParamSpec *pspec)
+                                  xvalue_t     *value,
+                                  xparam_spec_t *pspec)
 {
   xsocket_connection_t *connection = XSOCKET_CONNECTION (object);
 
   switch (prop_id)
     {
      case PROP_SOCKET:
-      g_value_set_object (value, connection->priv->socket);
+      xvalue_set_object (value, connection->priv->socket);
       break;
 
      default:
@@ -370,15 +370,15 @@ xsocket_connection_get_property (xobject_t    *object,
 static void
 xsocket_connection_set_property (xobject_t      *object,
                                   xuint_t         prop_id,
-                                  const GValue *value,
-                                  GParamSpec   *pspec)
+                                  const xvalue_t *value,
+                                  xparam_spec_t   *pspec)
 {
   xsocket_connection_t *connection = XSOCKET_CONNECTION (object);
 
   switch (prop_id)
     {
      case PROP_SOCKET:
-      connection->priv->socket = G_SOCKET (g_value_dup_object (value));
+      connection->priv->socket = G_SOCKET (xvalue_dup_object (value));
       break;
 
      default:
@@ -417,12 +417,12 @@ xsocket_connection_finalize (xobject_t *object)
   xsocket_connection_t *connection = XSOCKET_CONNECTION (object);
 
   if (connection->priv->input_stream)
-    g_object_unref (connection->priv->input_stream);
+    xobject_unref (connection->priv->input_stream);
 
   if (connection->priv->output_stream)
-    g_object_unref (connection->priv->output_stream);
+    xobject_unref (connection->priv->output_stream);
 
-  g_object_unref (connection->priv->socket);
+  xobject_unref (connection->priv->socket);
 
   G_OBJECT_CLASS (xsocket_connection_parent_class)
     ->finalize (object);
@@ -446,7 +446,7 @@ xsocket_connection_class_init (xsocket_connection_class_t *klass)
   stream_class->close_async = xsocket_connection_close_async;
   stream_class->close_finish = xsocket_connection_close_finish;
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_SOCKET,
                                    g_param_spec_object ("socket",
 			                                P_("Socket"),
@@ -471,10 +471,10 @@ xsocket_connection_close (xio_stream_t     *stream,
   xsocket_connection_t *connection = XSOCKET_CONNECTION (stream);
 
   if (connection->priv->output_stream)
-    g_output_stream_close (connection->priv->output_stream,
+    xoutput_stream_close (connection->priv->output_stream,
 			   cancellable, NULL);
   if (connection->priv->input_stream)
-    g_input_stream_close (connection->priv->input_stream,
+    xinput_stream_close (connection->priv->input_stream,
 			  cancellable, NULL);
 
   /* Don't close the underlying socket if this is being called
@@ -497,24 +497,24 @@ xsocket_connection_close_async (xio_stream_t           *stream,
 				 xasync_ready_callback_t  callback,
 				 xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
   xio_stream_class_t *class;
   xerror_t *error;
 
   class = XIO_STREAM_GET_CLASS (stream);
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, xsocket_connection_close_async);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xsocket_connection_close_async);
 
   /* socket close is not blocked, just do it! */
   error = NULL;
   if (class->close_fn &&
       !class->close_fn (stream, cancellable, &error))
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_boolean (task, TRUE);
+    xtask_return_boolean (task, TRUE);
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 static xboolean_t
@@ -522,7 +522,7 @@ xsocket_connection_close_finish (xio_stream_t     *stream,
 				  xasync_result_t  *result,
 				  xerror_t       **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 typedef struct {
@@ -533,7 +533,7 @@ typedef struct {
 } ConnectionFactory;
 
 static xuint_t
-connection_factory_hash (gconstpointer key)
+connection_factory_hash (xconstpointer key)
 {
   const ConnectionFactory *factory = key;
   xuint_t h;
@@ -547,8 +547,8 @@ connection_factory_hash (gconstpointer key)
 }
 
 static xboolean_t
-connection_factory_equal (gconstpointer _a,
-			  gconstpointer _b)
+connection_factory_equal (xconstpointer _a,
+			  xconstpointer _b)
 {
   const ConnectionFactory *a = _a;
   const ConnectionFactory *b = _b;
@@ -565,7 +565,7 @@ connection_factory_equal (gconstpointer _a,
   return TRUE;
 }
 
-static GHashTable *connection_factories = NULL;
+static xhashtable_t *connection_factories = NULL;
 G_LOCK_DEFINE_STATIC(connection_factories);
 
 /**
@@ -590,14 +590,14 @@ xsocket_connection_factory_register_type (xtype_t         g_type,
 {
   ConnectionFactory *factory;
 
-  g_return_if_fail (g_type_is_a (g_type, XTYPE_SOCKET_CONNECTION));
+  g_return_if_fail (xtype_is_a (g_type, XTYPE_SOCKET_CONNECTION));
 
   G_LOCK (connection_factories);
 
   if (connection_factories == NULL)
-    connection_factories = g_hash_table_new_full (connection_factory_hash,
+    connection_factories = xhash_table_new_full (connection_factory_hash,
 						  connection_factory_equal,
-						  (GDestroyNotify)g_free,
+						  (xdestroy_notify_t)g_free,
 						  NULL);
 
   factory = g_new0 (ConnectionFactory, 1);
@@ -606,7 +606,7 @@ xsocket_connection_factory_register_type (xtype_t         g_type,
   factory->protocol = protocol;
   factory->implementation = g_type;
 
-  g_hash_table_insert (connection_factories,
+  xhash_table_insert (connection_factories,
 		       factory, factory);
 
   G_UNLOCK (connection_factories);
@@ -615,8 +615,8 @@ xsocket_connection_factory_register_type (xtype_t         g_type,
 static void
 init_builtin_types (void)
 {
-  g_type_ensure (XTYPE_UNIX_CONNECTION);
-  g_type_ensure (XTYPE_TCP_CONNECTION);
+  xtype_ensure (XTYPE_UNIX_CONNECTION);
+  xtype_ensure (XTYPE_TCP_CONNECTION);
 }
 
 /**
@@ -654,7 +654,7 @@ xsocket_connection_factory_lookup_type (xsocket_family_t family,
       key.socket_type = type;
       key.protocol = protocol_id;
 
-      factory = g_hash_table_lookup (connection_factories, &key);
+      factory = xhash_table_lookup (connection_factories, &key);
       if (factory)
 	g_type = factory->implementation;
     }
@@ -683,5 +683,5 @@ xsocket_connection_factory_create_connection (xsocket_t *socket)
   type = xsocket_connection_factory_lookup_type (xsocket_get_family (socket),
 						  xsocket_get_socket_type (socket),
 						  xsocket_get_protocol (socket));
-  return g_object_new (type, "socket", socket, NULL);
+  return xobject_new (type, "socket", socket, NULL);
 }

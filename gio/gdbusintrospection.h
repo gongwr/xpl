@@ -30,11 +30,11 @@
 G_BEGIN_DECLS
 
 /**
- * GDBusAnnotationInfo:
+ * xdbus_annotation_info_t:
  * @ref_count: The reference count or -1 if statically allocated.
  * @key: The name of the annotation, e.g. "org.freedesktop.DBus.Deprecated".
  * @value: The value of the annotation.
- * @annotations: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusAnnotationInfo structures or %NULL if there are no annotations.
+ * @annotations: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_annotation_info_t structures or %NULL if there are no annotations.
  *
  * Information about an annotation.
  *
@@ -46,15 +46,15 @@ struct _GDBusAnnotationInfo
   xint_t                  ref_count;  /* (atomic) */
   xchar_t                *key;
   xchar_t                *value;
-  GDBusAnnotationInfo **annotations;
+  xdbus_annotation_info_t **annotations;
 };
 
 /**
- * GDBusArgInfo:
+ * xdbus_arg_info_t:
  * @ref_count: The reference count or -1 if statically allocated.
  * @name: Name of the argument, e.g. @unix_user_id.
  * @signature: D-Bus signature of the argument (a single complete type).
- * @annotations: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusAnnotationInfo structures or %NULL if there are no annotations.
+ * @annotations: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_annotation_info_t structures or %NULL if there are no annotations.
  *
  * Information about an argument for a method or a signal.
  *
@@ -66,16 +66,16 @@ struct _GDBusArgInfo
   xint_t                  ref_count;  /* (atomic) */
   xchar_t                *name;
   xchar_t                *signature;
-  GDBusAnnotationInfo **annotations;
+  xdbus_annotation_info_t **annotations;
 };
 
 /**
- * GDBusMethodInfo:
+ * xdbus_method_info_t:
  * @ref_count: The reference count or -1 if statically allocated.
  * @name: The name of the D-Bus method, e.g. @RequestName.
- * @in_args: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusArgInfo structures or %NULL if there are no in arguments.
- * @out_args: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusArgInfo structures or %NULL if there are no out arguments.
- * @annotations: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusAnnotationInfo structures or %NULL if there are no annotations.
+ * @in_args: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_arg_info_t structures or %NULL if there are no in arguments.
+ * @out_args: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_arg_info_t structures or %NULL if there are no out arguments.
+ * @annotations: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_annotation_info_t structures or %NULL if there are no annotations.
  *
  * Information about a method on an D-Bus interface.
  *
@@ -86,17 +86,17 @@ struct _GDBusMethodInfo
   /*< public >*/
   xint_t                  ref_count;  /* (atomic) */
   xchar_t                *name;
-  GDBusArgInfo        **in_args;
-  GDBusArgInfo        **out_args;
-  GDBusAnnotationInfo **annotations;
+  xdbus_arg_info_t        **in_args;
+  xdbus_arg_info_t        **out_args;
+  xdbus_annotation_info_t **annotations;
 };
 
 /**
- * GDBusSignalInfo:
+ * xdbus_signalInfo_t:
  * @ref_count: The reference count or -1 if statically allocated.
  * @name: The name of the D-Bus signal, e.g. "NameOwnerChanged".
- * @args: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusArgInfo structures or %NULL if there are no arguments.
- * @annotations: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusAnnotationInfo structures or %NULL if there are no annotations.
+ * @args: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_arg_info_t structures or %NULL if there are no arguments.
+ * @annotations: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_annotation_info_t structures or %NULL if there are no annotations.
  *
  * Information about a signal on a D-Bus interface.
  *
@@ -107,17 +107,17 @@ struct _GDBusSignalInfo
   /*< public >*/
   xint_t                  ref_count;  /* (atomic) */
   xchar_t                *name;
-  GDBusArgInfo        **args;
-  GDBusAnnotationInfo **annotations;
+  xdbus_arg_info_t        **args;
+  xdbus_annotation_info_t **annotations;
 };
 
 /**
- * GDBusPropertyInfo:
+ * xdbus_property_info_t:
  * @ref_count: The reference count or -1 if statically allocated.
  * @name: The name of the D-Bus property, e.g. "SupportedFilesystems".
  * @signature: The D-Bus signature of the property (a single complete type).
  * @flags: Access control flags for the property.
- * @annotations: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusAnnotationInfo structures or %NULL if there are no annotations.
+ * @annotations: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_annotation_info_t structures or %NULL if there are no annotations.
  *
  * Information about a D-Bus property on a D-Bus interface.
  *
@@ -130,17 +130,17 @@ struct _GDBusPropertyInfo
   xchar_t                    *name;
   xchar_t                    *signature;
   GDBusPropertyInfoFlags    flags;
-  GDBusAnnotationInfo     **annotations;
+  xdbus_annotation_info_t     **annotations;
 };
 
 /**
- * GDBusInterfaceInfo:
+ * xdbus_interface_info_t:
  * @ref_count: The reference count or -1 if statically allocated.
  * @name: The name of the D-Bus interface, e.g. "org.freedesktop.DBus.Properties".
- * @methods: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusMethodInfo structures or %NULL if there are no methods.
- * @signals: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusSignalInfo structures or %NULL if there are no signals.
- * @properties: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusPropertyInfo structures or %NULL if there are no properties.
- * @annotations: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusAnnotationInfo structures or %NULL if there are no annotations.
+ * @methods: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_method_info_t structures or %NULL if there are no methods.
+ * @signals: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_signalInfo_t structures or %NULL if there are no signals.
+ * @properties: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_property_info_t structures or %NULL if there are no properties.
+ * @annotations: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_annotation_info_t structures or %NULL if there are no annotations.
  *
  * Information about a D-Bus interface.
  *
@@ -151,19 +151,19 @@ struct _GDBusInterfaceInfo
   /*< public >*/
   xint_t                  ref_count;  /* (atomic) */
   xchar_t                *name;
-  GDBusMethodInfo     **methods;
-  GDBusSignalInfo     **signals;
-  GDBusPropertyInfo   **properties;
-  GDBusAnnotationInfo **annotations;
+  xdbus_method_info_t     **methods;
+  xdbus_signalInfo_t     **signals;
+  xdbus_property_info_t   **properties;
+  xdbus_annotation_info_t **annotations;
 };
 
 /**
- * GDBusNodeInfo:
+ * xdbus_node_info_t:
  * @ref_count: The reference count or -1 if statically allocated.
  * @path: The path of the node or %NULL if omitted. Note that this may be a relative path. See the D-Bus specification for more details.
- * @interfaces: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusInterfaceInfo structures or %NULL if there are no interfaces.
- * @nodes: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusNodeInfo structures or %NULL if there are no nodes.
- * @annotations: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #GDBusAnnotationInfo structures or %NULL if there are no annotations.
+ * @interfaces: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_interface_info_t structures or %NULL if there are no interfaces.
+ * @nodes: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_node_info_t structures or %NULL if there are no nodes.
+ * @annotations: (array zero-terminated=1): A pointer to a %NULL-terminated array of pointers to #xdbus_annotation_info_t structures or %NULL if there are no annotations.
  *
  * Information about nodes in a remote object hierarchy.
  *
@@ -174,78 +174,78 @@ struct _GDBusNodeInfo
   /*< public >*/
   xint_t                  ref_count;  /* (atomic) */
   xchar_t                *path;
-  GDBusInterfaceInfo  **interfaces;
-  GDBusNodeInfo       **nodes;
-  GDBusAnnotationInfo **annotations;
+  xdbus_interface_info_t  **interfaces;
+  xdbus_node_info_t       **nodes;
+  xdbus_annotation_info_t **annotations;
 };
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t        *g_dbus_annotation_info_lookup          (GDBusAnnotationInfo **annotations,
+const xchar_t        *g_dbus_annotation_info_lookup          (xdbus_annotation_info_t **annotations,
                                                             const xchar_t          *name);
 XPL_AVAILABLE_IN_ALL
-GDBusMethodInfo    *g_dbus_interface_info_lookup_method    (GDBusInterfaceInfo   *info,
+xdbus_method_info_t    *g_dbus_interface_info_lookup_method    (xdbus_interface_info_t   *info,
                                                             const xchar_t          *name);
 XPL_AVAILABLE_IN_ALL
-GDBusSignalInfo    *g_dbus_interface_info_lookup_signal    (GDBusInterfaceInfo   *info,
+xdbus_signalInfo_t    *g_dbus_interface_info_lookup_signal    (xdbus_interface_info_t   *info,
                                                             const xchar_t          *name);
 XPL_AVAILABLE_IN_ALL
-GDBusPropertyInfo  *g_dbus_interface_info_lookup_property  (GDBusInterfaceInfo   *info,
+xdbus_property_info_t  *g_dbus_interface_info_lookup_property  (xdbus_interface_info_t   *info,
                                                             const xchar_t          *name);
 XPL_AVAILABLE_IN_ALL
-void                g_dbus_interface_info_cache_build      (GDBusInterfaceInfo   *info);
+void                g_dbus_interface_info_cache_build      (xdbus_interface_info_t   *info);
 XPL_AVAILABLE_IN_ALL
-void                g_dbus_interface_info_cache_release    (GDBusInterfaceInfo   *info);
+void                g_dbus_interface_info_cache_release    (xdbus_interface_info_t   *info);
 
 XPL_AVAILABLE_IN_ALL
-void                g_dbus_interface_info_generate_xml     (GDBusInterfaceInfo   *info,
+void                g_dbus_interface_info_generate_xml     (xdbus_interface_info_t   *info,
                                                             xuint_t                 indent,
-                                                            GString              *string_builder);
+                                                            xstring_t              *string_builder);
 
 XPL_AVAILABLE_IN_ALL
-GDBusNodeInfo      *g_dbus_node_info_new_for_xml           (const xchar_t          *xml_data,
+xdbus_node_info_t      *g_dbus_node_info_new_for_xml           (const xchar_t          *xml_data,
                                                             xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-GDBusInterfaceInfo *g_dbus_node_info_lookup_interface      (GDBusNodeInfo        *info,
+xdbus_interface_info_t *g_dbus_node_info_lookup_interface      (xdbus_node_info_t        *info,
                                                             const xchar_t          *name);
 XPL_AVAILABLE_IN_ALL
-void                g_dbus_node_info_generate_xml          (GDBusNodeInfo        *info,
+void                g_dbus_node_info_generate_xml          (xdbus_node_info_t        *info,
                                                             xuint_t                 indent,
-                                                            GString              *string_builder);
+                                                            xstring_t              *string_builder);
 
 XPL_AVAILABLE_IN_ALL
-GDBusNodeInfo       *g_dbus_node_info_ref                  (GDBusNodeInfo        *info);
+xdbus_node_info_t       *g_dbus_node_info_ref                  (xdbus_node_info_t        *info);
 XPL_AVAILABLE_IN_ALL
-GDBusInterfaceInfo  *g_dbus_interface_info_ref             (GDBusInterfaceInfo   *info);
+xdbus_interface_info_t  *g_dbus_interface_info_ref             (xdbus_interface_info_t   *info);
 XPL_AVAILABLE_IN_ALL
-GDBusMethodInfo     *g_dbus_method_info_ref                (GDBusMethodInfo      *info);
+xdbus_method_info_t     *g_dbus_method_info_ref                (xdbus_method_info_t      *info);
 XPL_AVAILABLE_IN_ALL
-GDBusSignalInfo     *g_dbus_signal_info_ref                (GDBusSignalInfo      *info);
+xdbus_signalInfo_t     *g_dbus_signal_info_ref                (xdbus_signalInfo_t      *info);
 XPL_AVAILABLE_IN_ALL
-GDBusPropertyInfo   *g_dbus_property_info_ref              (GDBusPropertyInfo    *info);
+xdbus_property_info_t   *g_dbus_property_info_ref              (xdbus_property_info_t    *info);
 XPL_AVAILABLE_IN_ALL
-GDBusArgInfo        *g_dbus_arg_info_ref                   (GDBusArgInfo         *info);
+xdbus_arg_info_t        *g_dbus_arg_info_ref                   (xdbus_arg_info_t         *info);
 XPL_AVAILABLE_IN_ALL
-GDBusAnnotationInfo *g_dbus_annotation_info_ref            (GDBusAnnotationInfo  *info);
+xdbus_annotation_info_t *g_dbus_annotation_info_ref            (xdbus_annotation_info_t  *info);
 
 XPL_AVAILABLE_IN_ALL
-void                 g_dbus_node_info_unref                (GDBusNodeInfo        *info);
+void                 g_dbus_node_info_unref                (xdbus_node_info_t        *info);
 XPL_AVAILABLE_IN_ALL
-void                 g_dbus_interface_info_unref           (GDBusInterfaceInfo   *info);
+void                 g_dbus_interface_info_unref           (xdbus_interface_info_t   *info);
 XPL_AVAILABLE_IN_ALL
-void                 g_dbus_method_info_unref              (GDBusMethodInfo      *info);
+void                 g_dbus_method_info_unref              (xdbus_method_info_t      *info);
 XPL_AVAILABLE_IN_ALL
-void                 g_dbus_signal_info_unref              (GDBusSignalInfo      *info);
+void                 g_dbus_signal_info_unref              (xdbus_signalInfo_t      *info);
 XPL_AVAILABLE_IN_ALL
-void                 g_dbus_property_info_unref            (GDBusPropertyInfo    *info);
+void                 g_dbus_property_info_unref            (xdbus_property_info_t    *info);
 XPL_AVAILABLE_IN_ALL
-void                 g_dbus_arg_info_unref                 (GDBusArgInfo         *info);
+void                 g_dbus_arg_info_unref                 (xdbus_arg_info_t         *info);
 XPL_AVAILABLE_IN_ALL
-void                 g_dbus_annotation_info_unref          (GDBusAnnotationInfo  *info);
+void                 g_dbus_annotation_info_unref          (xdbus_annotation_info_t  *info);
 
 /**
  * XTYPE_DBUS_NODE_INFO:
  *
- * The #xtype_t for a boxed type holding a #GDBusNodeInfo.
+ * The #xtype_t for a boxed type holding a #xdbus_node_info_t.
  *
  * Since: 2.26
  */
@@ -254,7 +254,7 @@ void                 g_dbus_annotation_info_unref          (GDBusAnnotationInfo 
 /**
  * XTYPE_DBUS_INTERFACE_INFO:
  *
- * The #xtype_t for a boxed type holding a #GDBusInterfaceInfo.
+ * The #xtype_t for a boxed type holding a #xdbus_interface_info_t.
  *
  * Since: 2.26
  */
@@ -263,7 +263,7 @@ void                 g_dbus_annotation_info_unref          (GDBusAnnotationInfo 
 /**
  * XTYPE_DBUS_METHOD_INFO:
  *
- * The #xtype_t for a boxed type holding a #GDBusMethodInfo.
+ * The #xtype_t for a boxed type holding a #xdbus_method_info_t.
  *
  * Since: 2.26
  */
@@ -272,7 +272,7 @@ void                 g_dbus_annotation_info_unref          (GDBusAnnotationInfo 
 /**
  * XTYPE_DBUS_SIGNAL_INFO:
  *
- * The #xtype_t for a boxed type holding a #GDBusSignalInfo.
+ * The #xtype_t for a boxed type holding a #xdbus_signalInfo_t.
  *
  * Since: 2.26
  */
@@ -281,7 +281,7 @@ void                 g_dbus_annotation_info_unref          (GDBusAnnotationInfo 
 /**
  * XTYPE_DBUS_PROPERTY_INFO:
  *
- * The #xtype_t for a boxed type holding a #GDBusPropertyInfo.
+ * The #xtype_t for a boxed type holding a #xdbus_property_info_t.
  *
  * Since: 2.26
  */
@@ -290,7 +290,7 @@ void                 g_dbus_annotation_info_unref          (GDBusAnnotationInfo 
 /**
  * XTYPE_DBUS_ARG_INFO:
  *
- * The #xtype_t for a boxed type holding a #GDBusArgInfo.
+ * The #xtype_t for a boxed type holding a #xdbus_arg_info_t.
  *
  * Since: 2.26
  */
@@ -299,7 +299,7 @@ void                 g_dbus_annotation_info_unref          (GDBusAnnotationInfo 
 /**
  * XTYPE_DBUS_ANNOTATION_INFO:
  *
- * The #xtype_t for a boxed type holding a #GDBusAnnotationInfo.
+ * The #xtype_t for a boxed type holding a #xdbus_annotation_info_t.
  *
  * Since: 2.26
  */

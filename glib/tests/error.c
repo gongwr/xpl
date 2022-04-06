@@ -10,7 +10,7 @@ test_overwrite (void)
   if (!g_test_undefined ())
     return;
 
-  error = g_error_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
+  error = xerror_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
 
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
                          "*set over the top*");
@@ -18,10 +18,10 @@ test_overwrite (void)
   g_test_assert_expected_messages ();
 
   g_assert_error (error, G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY);
-  g_error_free (error);
+  xerror_free (error);
 
 
-  error = g_error_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
+  error = xerror_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
 
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
                          "*set over the top*");
@@ -29,11 +29,11 @@ test_overwrite (void)
   g_test_assert_expected_messages ();
 
   g_assert_error (error, G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY);
-  g_error_free (error);
+  xerror_free (error);
 
 
-  dest = g_error_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
-  src = g_error_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_PARSE, "bla");
+  dest = xerror_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
+  src = xerror_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_PARSE, "bla");
 
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
                          "*set over the top*");
@@ -41,7 +41,7 @@ test_overwrite (void)
   g_test_assert_expected_messages ();
 
   g_assert_error (dest, G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY);
-  g_error_free (dest);
+  xerror_free (dest);
 }
 
 static void
@@ -54,18 +54,18 @@ test_prefix (void)
   g_prefix_error (&error, "foo %d %s: ", 1, "two");
   g_assert (error == NULL);
 
-  error = g_error_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
+  error = xerror_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
   g_prefix_error (&error, "foo %d %s: ", 1, "two");
   g_assert_cmpstr (error->message, ==, "foo 1 two: bla");
-  g_error_free (error);
+  xerror_free (error);
 
   dest = NULL;
-  src = g_error_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
+  src = xerror_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
   g_propagate_prefixed_error (&dest, src, "foo %d %s: ", 1, "two");
   g_assert_cmpstr (dest->message, ==, "foo 1 two: bla");
-  g_error_free (dest);
+  xerror_free (dest);
 
-  src = g_error_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
+  src = xerror_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
   g_propagate_prefixed_error (NULL, src, "foo %d %s: ", 1, "two");
 }
 
@@ -83,11 +83,11 @@ test_prefix_literal (void)
   g_prefix_error_literal (&error, "foo: ");
   g_assert_null (error);
 
-  error = g_error_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
+  error = xerror_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
   g_assert_nonnull (error);
   g_prefix_error_literal (&error, "foo: ");
   g_assert_cmpstr (error->message, ==, "foo: bla");
-  g_error_free (error);
+  xerror_free (error);
 }
 
 static void
@@ -99,7 +99,7 @@ test_literal (void)
   g_set_error_literal (&error, G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "%s %d %x");
   g_assert_error (error, G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY);
   g_assert_cmpstr (error->message, ==, "%s %d %x");
-  g_error_free (error);
+  xerror_free (error);
 }
 
 static void
@@ -110,13 +110,13 @@ test_copy (void)
 
   error = NULL;
   g_set_error_literal (&error, G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "%s %d %x");
-  copy = g_error_copy (error);
+  copy = xerror_copy (error);
 
   g_assert_error (copy, G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY);
   g_assert_cmpstr (copy->message, ==, "%s %d %x");
 
-  g_error_free (error);
-  g_error_free (copy);
+  xerror_free (error);
+  xerror_free (copy);
 }
 
 static void
@@ -125,13 +125,13 @@ test_new_valist_invalid_va (xpointer_t dummy,
 {
 #ifdef __linux__
   /* Only worth testing this on Linux; if other platforms regress on this legacy
-   * behaviour, we don’t care. In particular, calling g_error_new_valist() with
+   * behaviour, we don’t care. In particular, calling xerror_new_valist() with
    * a %NULL format will crash on FreeBSD as its implementation of vasprintf()
    * is less forgiving than Linux’s. That’s fine: it’s a programmer error in
    * either case. */
   const struct
     {
-      GQuark domain;
+      xquark domain;
       const xchar_t *format;
     }
   tests[] =
@@ -141,7 +141,7 @@ test_new_valist_invalid_va (xpointer_t dummy,
     };
   xsize_t i;
 
-  g_test_summary ("Test that g_error_new_valist() rejects invalid input");
+  g_test_summary ("Test that xerror_new_valist() rejects invalid input");
 
   if (!g_test_undefined ())
     {
@@ -163,8 +163,8 @@ test_new_valist_invalid_va (xpointer_t dummy,
 
       g_test_expect_message (G_LOG_DOMAIN,
                              G_LOG_LEVEL_WARNING,
-                             "*g_error_new_valist: runtime check failed*");
-      error = g_error_new_valist (tests[i].domain, G_MARKUP_ERROR_EMPTY, tests[i].format, ap);
+                             "*xerror_new_valist: runtime check failed*");
+      error = xerror_new_valist (tests[i].domain, G_MARKUP_ERROR_EMPTY, tests[i].format, ap);
       g_test_assert_expected_messages ();
       g_assert_nonnull (error);
 
@@ -172,8 +172,8 @@ test_new_valist_invalid_va (xpointer_t dummy,
 
       g_test_expect_message (G_LOG_DOMAIN,
                              G_LOG_LEVEL_WARNING,
-                             "*g_error_copy: runtime check failed*");
-      error_copy = g_error_copy (error);
+                             "*xerror_copy: runtime check failed*");
+      error_copy = xerror_copy (error);
       g_test_assert_expected_messages ();
       g_assert_nonnull (error_copy);
 
@@ -183,7 +183,7 @@ test_new_valist_invalid_va (xpointer_t dummy,
       va_end (ap);
     }
 #else  /* if !__linux__ */
-  g_test_skip ("g_error_new_valist() programmer error handling is only relevant on Linux");
+  g_test_skip ("xerror_new_valist() programmer error handling is only relevant on Linux");
 #endif  /* !__linux__ */
 }
 
@@ -199,17 +199,17 @@ test_matches (void)
 {
   xerror_t *error = NULL;
 
-  g_test_summary ("Test g_error_matches()");
+  g_test_summary ("Test xerror_matches()");
 
-  error = g_error_new (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "Oh no!");
+  error = xerror_new (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "Oh no!");
 
-  g_assert_true (g_error_matches (error, G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY));
-  g_assert_false (g_error_matches (NULL, G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY));
-  g_assert_false (g_error_matches (error, G_OPTION_ERROR, G_OPTION_ERROR_BAD_VALUE));  /* same numeric value as G_MARKUP_ERROR_EMPTY */
-  g_assert_false (g_error_matches (error, G_OPTION_ERROR, G_OPTION_ERROR_FAILED));  /* different numeric value from G_MARKUP_ERROR_EMPTY */
-  g_assert_false (g_error_matches (error, G_MARKUP_ERROR, G_MARKUP_ERROR_BAD_UTF8));
+  g_assert_true (xerror_matches (error, G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY));
+  g_assert_false (xerror_matches (NULL, G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY));
+  g_assert_false (xerror_matches (error, G_OPTION_ERROR, G_OPTION_ERROR_BAD_VALUE));  /* same numeric value as G_MARKUP_ERROR_EMPTY */
+  g_assert_false (xerror_matches (error, G_OPTION_ERROR, G_OPTION_ERROR_FAILED));  /* different numeric value from G_MARKUP_ERROR_EMPTY */
+  g_assert_false (xerror_matches (error, G_MARKUP_ERROR, G_MARKUP_ERROR_BAD_UTF8));
 
-  g_error_free (error);
+  xerror_free (error);
 }
 
 static void
@@ -217,14 +217,14 @@ test_clear (void)
 {
   xerror_t *error = NULL;
 
-  g_test_summary ("Test g_error_clear()");
+  g_test_summary ("Test xerror_clear()");
 
   g_clear_error (&error);
   g_assert_null (error);
 
   g_clear_error (NULL);
 
-  error = g_error_new (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "Oh no!");
+  error = xerror_new (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "Oh no!");
   g_clear_error (&error);
   g_assert_null (error);
 }
@@ -238,7 +238,7 @@ typedef struct
 
 static TestErrorCheck *init_check;
 
-GQuark test_error_quark (void);
+xquark test_error_quark (void);
 #define TEST_ERROR (test_error_quark ())
 
 typedef struct
@@ -298,7 +298,7 @@ test_extended (void)
   TestErrorPrivate *copy_test_priv;
 
   init_check = &check;
-  error = g_error_new_literal (TEST_ERROR, 0, "foo");
+  error = xerror_new_literal (TEST_ERROR, 0, "foo");
   test_priv = fill_test_error (error, &check);
 
   g_assert_cmpint (check.init_called, ==, 1);
@@ -308,7 +308,7 @@ test_extended (void)
   g_assert_cmpuint (error->domain, ==, TEST_ERROR);
   g_assert_cmpint (test_priv->foo, ==, 13);
 
-  copy_error = g_error_copy (error);
+  copy_error = xerror_copy (error);
   g_assert_cmpint (check.init_called, ==, 2);
   g_assert_cmpint (check.copy_called, ==, 1);
   g_assert_cmpint (check.free_called, ==, 0);
@@ -320,8 +320,8 @@ test_extended (void)
   copy_test_priv = test_error_get_private (copy_error);
   g_assert_cmpint (test_priv->foo, ==, copy_test_priv->foo);
 
-  g_error_free (error);
-  g_error_free (copy_error);
+  xerror_free (error);
+  xerror_free (copy_error);
 
   g_assert_cmpint (check.init_called, ==, 2);
   g_assert_cmpint (check.copy_called, ==, 1);
@@ -342,16 +342,16 @@ test_extended_duplicate (void)
     }
   else
     {
-      GQuark q;
+      xquark q;
       xuint_t i;
 
       for (i = 0; i < 2; i++)
         {
-          q = g_error_domain_register_static ("TestError",
+          q = xerror_domain_register_static ("TestError",
                                               sizeof (TestErrorPrivate),
-                                              g_error_with_test_error_private_init,
-                                              g_error_with_test_error_private_copy,
-                                              g_error_with_test_error_private_clear);
+                                              xerror_with_test_error_private_init,
+                                              xerror_with_test_error_private_copy,
+                                              xerror_with_test_error_private_clear);
           g_assert_cmpstr (g_quark_to_string (q), ==, "TestError");
         }
     }
@@ -369,23 +369,23 @@ static void test_error_non_static_private_clear (xerror_t *error) {}
 static void
 test_extended_non_static (void)
 {
-  xchar_t *domain_name = g_strdup ("TestErrorNonStatic");
-  GQuark q;
+  xchar_t *domain_name = xstrdup ("TestErrorNonStatic");
+  xquark q;
   xerror_t *error = NULL;
 
   g_test_summary ("Test registering an extended error domain with a non-static name");
 
-  q = g_error_domain_register (domain_name,
+  q = xerror_domain_register (domain_name,
                                sizeof (TestErrorNonStaticPrivate),
                                test_error_non_static_private_init,
                                test_error_non_static_private_copy,
                                test_error_non_static_private_clear);
   g_free (domain_name);
 
-  error = g_error_new (q, 0, "Test error: %s", "hello");
-  g_assert_true (g_error_matches (error, q, 0));
+  error = xerror_new (q, 0, "Test error: %s", "hello");
+  g_assert_true (xerror_matches (error, q, 0));
   g_assert_cmpstr (g_quark_to_string (q), ==, "TestErrorNonStatic");
-  g_error_free (error);
+  xerror_free (error);
 }
 
 int

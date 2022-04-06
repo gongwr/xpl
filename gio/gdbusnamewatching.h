@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 
 /**
  * GBusNameAppearedCallback:
- * @connection: The #GDBusConnection the name is being watched on.
+ * @connection: The #xdbus_connection_t the name is being watched on.
  * @name: The name being watched.
  * @name_owner: Unique name of the owner of the name being watched.
  * @user_data: User data passed to g_bus_watch_name().
@@ -40,27 +40,27 @@ G_BEGIN_DECLS
  *
  * Since: 2.26
  */
-typedef void (*GBusNameAppearedCallback) (GDBusConnection *connection,
+typedef void (*GBusNameAppearedCallback) (xdbus_connection_t *connection,
                                           const xchar_t     *name,
                                           const xchar_t     *name_owner,
                                           xpointer_t         user_data);
 
 /**
  * GBusNameVanishedCallback:
- * @connection: The #GDBusConnection the name is being watched on, or
+ * @connection: The #xdbus_connection_t the name is being watched on, or
  *     %NULL.
  * @name: The name being watched.
  * @user_data: User data passed to g_bus_watch_name().
  *
  * Invoked when the name being watched is known not to have to have an owner.
  *
- * This is also invoked when the #GDBusConnection on which the watch was
+ * This is also invoked when the #xdbus_connection_t on which the watch was
  * established has been closed.  In that case, @connection will be
  * %NULL.
  *
  * Since: 2.26
  */
-typedef void (*GBusNameVanishedCallback) (GDBusConnection *connection,
+typedef void (*GBusNameVanishedCallback) (xdbus_connection_t *connection,
                                           const xchar_t     *name,
                                           xpointer_t         user_data);
 
@@ -72,28 +72,28 @@ xuint_t g_bus_watch_name               (GBusType                  bus_type,
                                       GBusNameAppearedCallback  name_appeared_handler,
                                       GBusNameVanishedCallback  name_vanished_handler,
                                       xpointer_t                  user_data,
-                                      GDestroyNotify            user_data_free_func);
+                                      xdestroy_notify_t            user_data_free_func);
 XPL_AVAILABLE_IN_ALL
-xuint_t g_bus_watch_name_on_connection (GDBusConnection          *connection,
+xuint_t g_bus_watch_name_on_connection (xdbus_connection_t          *connection,
                                       const xchar_t              *name,
                                       GBusNameWatcherFlags      flags,
                                       GBusNameAppearedCallback  name_appeared_handler,
                                       GBusNameVanishedCallback  name_vanished_handler,
                                       xpointer_t                  user_data,
-                                      GDestroyNotify            user_data_free_func);
+                                      xdestroy_notify_t            user_data_free_func);
 XPL_AVAILABLE_IN_ALL
 xuint_t g_bus_watch_name_with_closures (GBusType                  bus_type,
                                       const xchar_t              *name,
                                       GBusNameWatcherFlags      flags,
-                                      GClosure                 *name_appeared_closure,
-                                      GClosure                 *name_vanished_closure);
+                                      xclosure_t                 *name_appeared_closure,
+                                      xclosure_t                 *name_vanished_closure);
 XPL_AVAILABLE_IN_ALL
 xuint_t g_bus_watch_name_on_connection_with_closures (
-                                      GDBusConnection          *connection,
+                                      xdbus_connection_t          *connection,
                                       const xchar_t              *name,
                                       GBusNameWatcherFlags      flags,
-                                      GClosure                 *name_appeared_closure,
-                                      GClosure                 *name_vanished_closure);
+                                      xclosure_t                 *name_appeared_closure,
+                                      xclosure_t                 *name_vanished_closure);
 XPL_AVAILABLE_IN_ALL
 void  g_bus_unwatch_name             (xuint_t                     watcher_id);
 

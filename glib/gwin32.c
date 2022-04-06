@@ -126,13 +126,13 @@ g_win32_getlocale (void)
   if (((ev = g_getenv ("LC_ALL")) != NULL && ev[0] != '\0')
       || ((ev = g_getenv ("LC_MESSAGES")) != NULL && ev[0] != '\0')
       || ((ev = g_getenv ("LANG")) != NULL && ev[0] != '\0'))
-    return g_strdup (ev);
+    return xstrdup (ev);
 
   lcid = GetThreadLocale ();
 
   if (!GetLocaleInfoW (lcid, LOCALE_SISO639LANGNAME, iso639, sizeof (iso639)) ||
       !GetLocaleInfoW (lcid, LOCALE_SISO3166CTRYNAME, iso3166, sizeof (iso3166)))
-    return g_strdup ("C");
+    return xstrdup ("C");
 
   /* Strip off the sorting rules, keep only the language part.  */
   langid = LANGIDFROMLCID (lcid);
@@ -177,10 +177,10 @@ g_win32_getlocale (void)
       break;
     }
 
-  iso639_utf8 = g_utf16_to_utf8 (iso639, -1, NULL, NULL, NULL);
-  iso3166_utf8 = g_utf16_to_utf8 (iso3166, -1, NULL, NULL, NULL);
+  iso639_utf8 = xutf16_to_utf8 (iso639, -1, NULL, NULL, NULL);
+  iso3166_utf8 = xutf16_to_utf8 (iso3166, -1, NULL, NULL, NULL);
 
-  result = g_strconcat (iso639_utf8, "_", iso3166_utf8, script, NULL);
+  result = xstrconcat (iso639_utf8, "_", iso3166_utf8, script, NULL);
 
   g_free (iso3166_utf8);
   g_free (iso639_utf8);
@@ -220,12 +220,12 @@ g_win32_error_message (xint_t error)
       if (nchars >= 2 && msg[nchars-1] == L'\n' && msg[nchars-2] == L'\r')
         msg[nchars-2] = L'\0';
 
-      retval = g_utf16_to_utf8 (msg, -1, NULL, NULL, NULL);
+      retval = xutf16_to_utf8 (msg, -1, NULL, NULL, NULL);
 
       LocalFree (msg);
     }
   else
-    retval = g_strdup ("");
+    retval = xstrdup ("");
 
   return retval;
 }
@@ -278,12 +278,12 @@ g_win32_get_package_installation_directory_of_module (xpointer_t hmodule)
   if (!GetModuleFileNameW (hmodule, wc_fn, MAX_PATH))
     return NULL;
 
-  filename = g_utf16_to_utf8 (wc_fn, -1, NULL, NULL, NULL);
+  filename = xutf16_to_utf8 (wc_fn, -1, NULL, NULL, NULL);
 
   if ((p = strrchr (filename, G_DIR_SEPARATOR)) != NULL)
     *p = '\0';
 
-  retval = g_strdup (filename);
+  retval = xstrdup (filename);
 
   do
     {
@@ -314,7 +314,7 @@ g_win32_get_package_installation_directory_of_module (xpointer_t hmodule)
 
     cygwin_conv_to_posix_path (retval, tmp);
     g_free (retval);
-    retval = g_strdup (tmp);
+    retval = xstrdup (tmp);
   }
 #endif
 
@@ -324,7 +324,7 @@ g_win32_get_package_installation_directory_of_module (xpointer_t hmodule)
 static xchar_t *
 get_package_directory_from_module (const xchar_t *module_name)
 {
-  static GHashTable *module_dirs = NULL;
+  static xhashtable_t *module_dirs = NULL;
   G_LOCK_DEFINE_STATIC (module_dirs);
   HMODULE hmodule = NULL;
   xchar_t *fn;
@@ -332,19 +332,19 @@ get_package_directory_from_module (const xchar_t *module_name)
   G_LOCK (module_dirs);
 
   if (module_dirs == NULL)
-    module_dirs = g_hash_table_new (g_str_hash, g_str_equal);
+    module_dirs = xhash_table_new (xstr_hash, xstr_equal);
 
-  fn = g_hash_table_lookup (module_dirs, module_name ? module_name : "");
+  fn = xhash_table_lookup (module_dirs, module_name ? module_name : "");
 
   if (fn)
     {
       G_UNLOCK (module_dirs);
-      return g_strdup (fn);
+      return xstrdup (fn);
     }
 
   if (module_name)
     {
-      wchar_t *wc_module_name = g_utf8_to_utf16 (module_name, -1, NULL, NULL, NULL);
+      wchar_t *wc_module_name = xutf8_to_utf16 (module_name, -1, NULL, NULL, NULL);
       hmodule = GetModuleHandleW (wc_module_name);
       g_free (wc_module_name);
 
@@ -363,11 +363,11 @@ get_package_directory_from_module (const xchar_t *module_name)
       return NULL;
     }
 
-  g_hash_table_insert (module_dirs, module_name ? g_strdup (module_name) : "", fn);
+  xhash_table_insert (module_dirs, module_name ? xstrdup (module_name) : "", fn);
 
   G_UNLOCK (module_dirs);
 
-  return g_strdup (fn);
+  return xstrdup (fn);
 }
 
 /**
@@ -728,7 +728,7 @@ g_win32_locale_filename_from_utf8 (const xchar_t *utf8filename)
   xchar_t *retval;
   wchar_t *wname;
 
-  wname = g_utf8_to_utf16 (utf8filename, -1, NULL, NULL, NULL);
+  wname = xutf8_to_utf16 (utf8filename, -1, NULL, NULL, NULL);
 
   if (wname == NULL)
     return NULL;
@@ -773,14 +773,14 @@ g_win32_locale_filename_from_utf8 (const xchar_t *utf8filename)
  * is UTF-8 on Windows).
  *
  * The strings returned by this function are suitable for use with
- * functions such as g_open() and g_file_new_for_commandline_arg() but
+ * functions such as g_open() and xfile_new_for_commandline_arg() but
  * are not suitable for use with g_option_context_parse(), which assumes
  * that its input will be in the system codepage.  The return value is
  * suitable for use with g_option_context_parse_strv(), however, which
  * is a better match anyway because it won't leak memory.
  *
  * Unlike argv, the returned value is a normal strv and can (and should)
- * be freed with g_strfreev() when no longer needed.
+ * be freed with xstrfreev() when no longer needed.
  *
  * Returns: (transfer full): the commandline arguments in the GLib
  *   filename encoding (ie: UTF-8)
@@ -798,7 +798,7 @@ g_win32_get_command_line (void)
 
   result = g_new (xchar_t *, n + 1);
   for (i = 0; i < n; i++)
-    result[i] = g_utf16_to_utf8 (args[i], -1, NULL, NULL, NULL);
+    result[i] = xutf16_to_utf8 (args[i], -1, NULL, NULL, NULL);
   result[i] = NULL;
 
   LocalFree (args);
@@ -887,7 +887,7 @@ g_console_win32_init (void)
    * to be called before CRT DllMain().
    */
 
-  if (g_strcmp0 (g_getenv ("G_WIN32_ALLOC_CONSOLE"), "1") == 0)
+  if (xstrcmp0 (g_getenv ("G_WIN32_ALLOC_CONSOLE"), "1") == 0)
     AllocConsole (); /* no error handling, fails if console already exists */
 
   attach_envvar = g_getenv ("G_WIN32_ATTACH_CONSOLE");
@@ -900,21 +900,21 @@ g_console_win32_init (void)
    */
   AttachConsole (ATTACH_PARENT_PROCESS);
 
-  attach_strs = g_strsplit (attach_envvar, ",", -1);
+  attach_strs = xstrsplit (attach_envvar, ",", -1);
 
   for (i = 0; attach_strs[i]; i++)
     {
-      if (g_strcmp0 (attach_strs[i], "stdout") == 0)
+      if (xstrcmp0 (attach_strs[i], "stdout") == 0)
         streams[1].redirect = TRUE;
-      else if (g_strcmp0 (attach_strs[i], "stderr") == 0)
+      else if (xstrcmp0 (attach_strs[i], "stderr") == 0)
         streams[2].redirect = TRUE;
-      else if (g_strcmp0 (attach_strs[i], "stdin") == 0)
+      else if (xstrcmp0 (attach_strs[i], "stdin") == 0)
         streams[0].redirect = TRUE;
       else
         g_warning ("Unrecognized stream name %s", attach_strs[i]);
     }
 
-  g_strfreev (attach_strs);
+  xstrfreev (attach_strs);
 
   for (i = 0; i < G_N_ELEMENTS (streams); i++)
     {
@@ -1128,7 +1128,7 @@ g_win32_veh_handler (PEXCEPTION_POINTERS ExceptionInfo)
   char                 itoa_buffer[ITOA_BUFFER_SIZE];
 #define DEBUG_STRING_SIZE 1024
   xsize_t                dbgs = DEBUG_STRING_SIZE;
-  char                 debug_string[DEBUG_STRING_SIZE];
+  char                 debuxstring[DEBUG_STRING_SIZE];
   char                *dbgp;
 
   if (ExceptionInfo == NULL ||
@@ -1173,7 +1173,7 @@ g_win32_veh_handler (PEXCEPTION_POINTERS ExceptionInfo)
        */
       WaitForSingleObject (debugger_wakeup_event, 60000);
 
-      dbgp = &debug_string[0];
+      dbgp = &debuxstring[0];
 
       dbgp = copy_chars (dbgp, &dbgs, "Exception code=0x");
       itoa_buffer[0] = 0;
@@ -1229,7 +1229,7 @@ g_win32_veh_handler (PEXCEPTION_POINTERS ExceptionInfo)
         }
 
       dbgp = copy_chars (dbgp, &dbgs, "\n");
-      OutputDebugStringA (debug_string);
+      OutputDebugStringA (debuxstring);
     }
 
   /* Now the debugger is present, and we can try
@@ -1398,7 +1398,7 @@ g_win32_find_helper_executable_path (const xchar_t *executable_name, void *dll_h
   if (module_path_len == 0 || module_path_len > MAX_PATH)
     return NULL;
 
-  base_searching_path = g_utf16_to_utf8 (module_path, -1, NULL, NULL, NULL);
+  base_searching_path = xutf16_to_utf8 (module_path, -1, NULL, NULL, NULL);
   if (base_searching_path == NULL)
     return NULL;
 
@@ -1425,7 +1425,7 @@ g_win32_find_helper_executable_path (const xchar_t *executable_name, void *dll_h
            */
           executable_path = g_build_filename (base_searching_path, subdirs[i], executable_name, NULL);
           g_assert (g_path_is_absolute (executable_path));
-          if (g_file_test (executable_path, G_FILE_TEST_IS_REGULAR))
+          if (xfile_test (executable_path, XFILE_TEST_IS_REGULAR))
             break;
 
           g_free (executable_path);
@@ -1449,7 +1449,7 @@ g_win32_find_helper_executable_path (const xchar_t *executable_name, void *dll_h
       /* Search in system PATH */
       executable_path = g_find_program_in_path (executable_name);
       if (executable_path == NULL)
-        executable_path = g_strdup (executable_name);
+        executable_path = xstrdup (executable_name);
     }
 
   return executable_path;

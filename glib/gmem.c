@@ -127,7 +127,7 @@ g_malloc (xsize_t n_bytes)
       if (mem)
 	return mem;
 
-      g_error ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
+      xerror ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
                G_STRLOC, n_bytes);
     }
 
@@ -157,7 +157,7 @@ g_malloc0 (xsize_t n_bytes)
       if (mem)
 	return mem;
 
-      g_error ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
+      xerror ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
                G_STRLOC, n_bytes);
     }
 
@@ -192,7 +192,7 @@ g_realloc (xpointer_t mem,
       if (newmem)
 	return newmem;
 
-      g_error ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
+      xerror ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
                G_STRLOC, n_bytes);
     }
 
@@ -236,7 +236,7 @@ g_free (xpointer_t mem)
  * A macro is also included that allows this function to be used without
  * pointer casts. This will mask any warnings about incompatible function types
  * or calling conventions, so you must ensure that your @destroy function is
- * compatible with being called as `GDestroyNotify` using the standard calling
+ * compatible with being called as `xdestroy_notify_t` using the standard calling
  * convention for the platform that GLib was compiled for; otherwise the program
  * will experience undefined behaviour.
  *
@@ -245,7 +245,7 @@ g_free (xpointer_t mem)
 #undef g_clear_pointer
 void
 g_clear_pointer (xpointer_t      *pp,
-                 GDestroyNotify destroy)
+                 xdestroy_notify_t destroy)
 {
   xpointer_t _p;
 
@@ -356,7 +356,7 @@ g_malloc_n (xsize_t n_blocks,
 {
   if (SIZE_OVERFLOWS (n_blocks, n_block_bytes))
     {
-      g_error ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
+      xerror ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
                G_STRLOC, n_blocks, n_block_bytes);
     }
 
@@ -380,7 +380,7 @@ g_malloc0_n (xsize_t n_blocks,
 {
   if (SIZE_OVERFLOWS (n_blocks, n_block_bytes))
     {
-      g_error ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
+      xerror ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
                G_STRLOC, n_blocks, n_block_bytes);
     }
 
@@ -406,7 +406,7 @@ g_realloc_n (xpointer_t mem,
 {
   if (SIZE_OVERFLOWS (n_blocks, n_block_bytes))
     {
-      g_error ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
+      xerror ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
                G_STRLOC, n_blocks, n_block_bytes);
     }
 
@@ -571,19 +571,19 @@ g_aligned_alloc (xsize_t n_blocks,
 
   if (G_UNLIKELY ((alignment == 0) || (alignment & (alignment - 1)) != 0))
     {
-      g_error ("%s: alignment %"G_GSIZE_FORMAT" must be a positive power of two",
+      xerror ("%s: alignment %"G_GSIZE_FORMAT" must be a positive power of two",
                G_STRLOC, alignment);
     }
 
   if (G_UNLIKELY ((alignment % sizeof (void *)) != 0))
     {
-      g_error ("%s: alignment %"G_GSIZE_FORMAT" must be a multiple of %"G_GSIZE_FORMAT,
+      xerror ("%s: alignment %"G_GSIZE_FORMAT" must be a multiple of %"G_GSIZE_FORMAT,
                G_STRLOC, alignment, sizeof (void *));
     }
 
   if (SIZE_OVERFLOWS (n_blocks, n_block_bytes))
     {
-      g_error ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
+      xerror ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
                G_STRLOC, n_blocks, n_block_bytes);
     }
 
@@ -615,7 +615,7 @@ g_aligned_alloc (xsize_t n_blocks,
 
       if (G_MAXSIZE - real_size < (alignment - offset))
         {
-          g_error ("%s: overflow allocating %"G_GSIZE_FORMAT"+%"G_GSIZE_FORMAT" bytes",
+          xerror ("%s: overflow allocating %"G_GSIZE_FORMAT"+%"G_GSIZE_FORMAT" bytes",
                    G_STRLOC, real_size, (alignment - offset));
         }
 
@@ -633,7 +633,7 @@ g_aligned_alloc (xsize_t n_blocks,
   if (res)
     return res;
 
-  g_error ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
+  xerror ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
            G_STRLOC, real_size);
 
   return NULL;

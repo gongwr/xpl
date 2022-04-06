@@ -35,7 +35,7 @@ G_BEGIN_DECLS
 
 typedef struct _GData           GData;
 
-typedef void            (*GDataForeachFunc)     (GQuark         key_id,
+typedef void            (*GDataForeachFunc)     (xquark         key_id,
                                                  xpointer_t       data,
                                                  xpointer_t       user_data);
 
@@ -47,31 +47,31 @@ XPL_AVAILABLE_IN_ALL
 void     g_datalist_clear               (GData            **datalist);
 XPL_AVAILABLE_IN_ALL
 xpointer_t g_datalist_id_get_data         (GData            **datalist,
-					 GQuark             key_id);
+					 xquark             key_id);
 XPL_AVAILABLE_IN_ALL
 void     g_datalist_id_set_data_full    (GData            **datalist,
-					 GQuark             key_id,
+					 xquark             key_id,
 					 xpointer_t           data,
-					 GDestroyNotify     destroy_func);
+					 xdestroy_notify_t     destroy_func);
 
 typedef xpointer_t (*GDuplicateFunc) (xpointer_t data, xpointer_t user_data);
 
 XPL_AVAILABLE_IN_2_34
 xpointer_t g_datalist_id_dup_data         (GData            **datalist,
-                                         GQuark             key_id,
+                                         xquark             key_id,
                                          GDuplicateFunc     dup_func,
 					 xpointer_t           user_data);
 XPL_AVAILABLE_IN_2_34
 xboolean_t g_datalist_id_replace_data     (GData            **datalist,
-                                         GQuark             key_id,
+                                         xquark             key_id,
                                          xpointer_t           oldval,
                                          xpointer_t           newval,
-                                         GDestroyNotify     destroy,
-					 GDestroyNotify    *old_destroy);
+                                         xdestroy_notify_t     destroy,
+					 xdestroy_notify_t    *old_destroy);
 
 XPL_AVAILABLE_IN_ALL
 xpointer_t g_datalist_id_remove_no_notify (GData            **datalist,
-					 GQuark             key_id);
+					 xquark             key_id);
 XPL_AVAILABLE_IN_ALL
 void     g_datalist_foreach             (GData            **datalist,
 					 GDataForeachFunc   func,
@@ -111,23 +111,23 @@ xuint_t    g_datalist_get_flags           (GData            **datalist);
 /* Location Associated Keyed Data
  */
 XPL_AVAILABLE_IN_ALL
-void      g_dataset_destroy             (gconstpointer    dataset_location);
+void      g_dataset_destroy             (xconstpointer    dataset_location);
 XPL_AVAILABLE_IN_ALL
-xpointer_t  g_dataset_id_get_data         (gconstpointer    dataset_location,
-                                         GQuark           key_id);
+xpointer_t  g_dataset_id_get_data         (xconstpointer    dataset_location,
+                                         xquark           key_id);
 XPL_AVAILABLE_IN_ALL
 xpointer_t  g_datalist_get_data            (GData	 **datalist,
 					  const xchar_t *key);
 XPL_AVAILABLE_IN_ALL
-void      g_dataset_id_set_data_full    (gconstpointer    dataset_location,
-                                         GQuark           key_id,
+void      g_dataset_id_set_data_full    (xconstpointer    dataset_location,
+                                         xquark           key_id,
                                          xpointer_t         data,
-                                         GDestroyNotify   destroy_func);
+                                         xdestroy_notify_t   destroy_func);
 XPL_AVAILABLE_IN_ALL
-xpointer_t  g_dataset_id_remove_no_notify (gconstpointer    dataset_location,
-                                         GQuark           key_id);
+xpointer_t  g_dataset_id_remove_no_notify (xconstpointer    dataset_location,
+                                         xquark           key_id);
 XPL_AVAILABLE_IN_ALL
-void      g_dataset_foreach             (gconstpointer    dataset_location,
+void      g_dataset_foreach             (xconstpointer    dataset_location,
                                          GDataForeachFunc func,
                                          xpointer_t         user_data);
 #define   g_dataset_id_set_data(l, k, d)        \

@@ -1,4 +1,4 @@
-/* Unit tests for GOptionContext
+/* Unit tests for xoption_context_t
  * Copyright (C) 2007 Openismus GmbH
  * Authors: Mathias Hasselmann
  *
@@ -42,11 +42,11 @@ static GOptionEntry global_group_entries[] = {
   G_OPTION_ENTRY_NULL
 };
 
-static GOptionContext *
+static xoption_context_t *
 make_options (int test_number)
 {
-  GOptionContext *options;
-  GOptionGroup   *group = NULL;
+  xoption_context_t *options;
+  xoption_group_t   *group = NULL;
   xboolean_t have_main_entries = (0 != (test_number & 1));
   xboolean_t have_test_entries = (0 != (test_number & 2));
 
@@ -56,18 +56,18 @@ make_options (int test_number)
     g_option_context_add_main_entries (options, global_main_entries, NULL);
   if (have_test_entries)
     {
-      group = g_option_group_new ("test", "Test Options",
+      group = xoption_group_new ("test", "Test Options",
                                   "Show all test options",
                                   NULL, NULL);
       g_option_context_add_group (options, group);
-      g_option_group_add_entries (group, global_group_entries);
+      xoption_group_add_entries (group, global_group_entries);
     }
 
   return options;
 }
 
 static void
-print_help (GOptionContext *options, xchar_t **argv)
+print_help (xoption_context_t *options, xchar_t **argv)
 {
   xint_t    argc = 3;
   xerror_t *error = NULL;
@@ -78,9 +78,9 @@ print_help (GOptionContext *options, xchar_t **argv)
 }
 
 static void
-test_group_captions_help (gconstpointer test_number)
+test_group_captions_help (xconstpointer test_number)
 {
-  GOptionContext *options;
+  xoption_context_t *options;
   xchar_t *argv[] = { __FILE__, "--help", NULL };
 
   options = make_options (GPOINTER_TO_INT (test_number));
@@ -88,9 +88,9 @@ test_group_captions_help (gconstpointer test_number)
 }
 
 static void
-test_group_captions_help_all (gconstpointer test_number)
+test_group_captions_help_all (xconstpointer test_number)
 {
-  GOptionContext *options;
+  xoption_context_t *options;
   xchar_t *argv[] = { __FILE__, "--help-all", NULL };
 
   options = make_options (GPOINTER_TO_INT (test_number));
@@ -98,9 +98,9 @@ test_group_captions_help_all (gconstpointer test_number)
 }
 
 static void
-test_group_captions_help_test (gconstpointer test_number)
+test_group_captions_help_test (xconstpointer test_number)
 {
-  GOptionContext *options;
+  xoption_context_t *options;
   xchar_t *argv[] = { __FILE__, "--help-test", NULL };
 
   options = make_options (GPOINTER_TO_INT (test_number));
@@ -134,7 +134,7 @@ test_group_captions (void)
           if (g_test_verbose ())
             trap_flags |= G_TEST_SUBPROCESS_INHERIT_STDOUT | G_TEST_SUBPROCESS_INHERIT_STDERR;
 
-          test_name = g_strdup_printf ("/option/group/captions/subprocess/%s-%u",
+          test_name = xstrdup_printf ("/option/group/captions/subprocess/%s-%u",
                                        test_name_base[j], i);
           g_test_trap_subprocess (test_name, 0, trap_flags);
           g_free (test_name);
@@ -225,7 +225,7 @@ split_string (const char *str, int *argc)
   xchar_t **argv;
   int len;
 
-  argv = g_strsplit (str, " ", 0);
+  argv = xstrsplit (str, " ", 0);
 
   for (len = 0; argv[len] != NULL; len++);
 
@@ -239,19 +239,19 @@ static xchar_t *
 join_stringv (int argc, char **argv)
 {
   int i;
-  GString *str;
+  xstring_t *str;
 
-  str = g_string_new (NULL);
+  str = xstring_new (NULL);
 
   for (i = 0; i < argc; i++)
     {
-      g_string_append (str, argv[i]);
+      xstring_append (str, argv[i]);
 
       if (i < argc - 1)
-	g_string_append_c (str, ' ');
+	xstring_append_c (str, ' ');
     }
 
-  return g_string_free (str, FALSE);
+  return xstring_free (str, FALSE);
 }
 
 /* Performs a shallow copy */
@@ -279,8 +279,8 @@ check_identical_stringv (xchar_t **before, xchar_t **after)
 
 
 static xboolean_t
-error_test1_pre_parse (GOptionContext *context,
-		       GOptionGroup   *group,
+error_test1_pre_parse (xoption_context_t *context,
+		       xoption_group_t   *group,
 		       xpointer_t	       data,
 		       xerror_t        **error)
 {
@@ -290,8 +290,8 @@ error_test1_pre_parse (GOptionContext *context,
 }
 
 static xboolean_t
-error_test1_post_parse (GOptionContext *context,
-			GOptionGroup   *group,
+error_test1_post_parse (xoption_context_t *context,
+			xoption_group_t   *group,
 			xpointer_t	  data,
 			xerror_t        **error)
 {
@@ -306,13 +306,13 @@ error_test1_post_parse (GOptionContext *context,
 static void
 error_test1 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
   xchar_t **argv_copy;
   int argc;
-  GOptionGroup *main_group;
+  xoption_group_t *main_group;
   GOptionEntry entries [] =
     { { "test", 0, 0, G_OPTION_ARG_INT, &error_test1_int, NULL, NULL },
       G_OPTION_ENTRY_NULL };
@@ -324,7 +324,7 @@ error_test1 (void)
 
   /* Set pre and post parse hooks */
   main_group = g_option_context_get_main_group (context);
-  g_option_group_set_parse_hooks (main_group,
+  xoption_group_set_parse_hooks (main_group,
 				  error_test1_pre_parse, error_test1_post_parse);
 
   /* Now try parsing */
@@ -341,14 +341,14 @@ error_test1 (void)
   /* On failure, values should be reset */
   g_assert (error_test1_int == 0x12345678);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
 
 static xboolean_t
-error_test2_pre_parse (GOptionContext *context,
-		       GOptionGroup   *group,
+error_test2_pre_parse (xoption_context_t *context,
+		       xoption_group_t   *group,
 		       xpointer_t	  data,
 		       xerror_t        **error)
 {
@@ -358,8 +358,8 @@ error_test2_pre_parse (GOptionContext *context,
 }
 
 static xboolean_t
-error_test2_post_parse (GOptionContext *context,
-			GOptionGroup   *group,
+error_test2_post_parse (xoption_context_t *context,
+			xoption_group_t   *group,
 			xpointer_t	  data,
 			xerror_t        **error)
 {
@@ -374,13 +374,13 @@ error_test2_post_parse (GOptionContext *context,
 static void
 error_test2 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
   xchar_t **argv_copy;
   int argc;
-  GOptionGroup *main_group;
+  xoption_group_t *main_group;
   GOptionEntry entries [] =
     { { "test", 0, 0, G_OPTION_ARG_STRING, &error_test2_string, NULL, NULL },
       G_OPTION_ENTRY_NULL };
@@ -392,7 +392,7 @@ error_test2 (void)
 
   /* Set pre and post parse hooks */
   main_group = g_option_context_get_main_group (context);
-  g_option_group_set_parse_hooks (main_group,
+  xoption_group_set_parse_hooks (main_group,
 				  error_test2_pre_parse, error_test2_post_parse);
 
   /* Now try parsing */
@@ -407,14 +407,14 @@ error_test2 (void)
 
   g_assert (strcmp (error_test2_string, "foo") == 0);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
 
 static xboolean_t
-error_test3_pre_parse (GOptionContext *context,
-		       GOptionGroup   *group,
+error_test3_pre_parse (xoption_context_t *context,
+		       xoption_group_t   *group,
 		       xpointer_t	  data,
 		       xerror_t        **error)
 {
@@ -424,8 +424,8 @@ error_test3_pre_parse (GOptionContext *context,
 }
 
 static xboolean_t
-error_test3_post_parse (GOptionContext *context,
-			GOptionGroup   *group,
+error_test3_post_parse (xoption_context_t *context,
+			xoption_group_t   *group,
 			xpointer_t	  data,
 			xerror_t        **error)
 {
@@ -440,13 +440,13 @@ error_test3_post_parse (GOptionContext *context,
 static void
 error_test3 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
   xchar_t **argv_copy;
   int argc;
-  GOptionGroup *main_group;
+  xoption_group_t *main_group;
   GOptionEntry entries [] =
     { { "test", 0, 0, G_OPTION_ARG_NONE, &error_test3_boolean, NULL, NULL },
       G_OPTION_ENTRY_NULL };
@@ -458,7 +458,7 @@ error_test3 (void)
 
   /* Set pre and post parse hooks */
   main_group = g_option_context_get_main_group (context);
-  g_option_group_set_parse_hooks (main_group,
+  xoption_group_set_parse_hooks (main_group,
 				  error_test3_pre_parse, error_test3_post_parse);
 
   /* Now try parsing */
@@ -473,7 +473,7 @@ error_test3 (void)
 
   g_assert (!error_test3_boolean);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -481,7 +481,7 @@ error_test3 (void)
 static void
 arg_test1 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -508,7 +508,7 @@ arg_test1 (void)
   /* We free all of the strings in a copy of argv, because now argv is a
    * subset - some have been removed in-place
    */
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -516,7 +516,7 @@ arg_test1 (void)
 static void
 arg_test2 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -542,7 +542,7 @@ arg_test2 (void)
 
   g_free (arg_test2_string);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -550,14 +550,14 @@ arg_test2 (void)
 static void
 arg_test3 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
   xchar_t **argv_copy;
   int argc;
   GOptionEntry entries [] =
-    { { "test", 0, 0, G_OPTION_ARG_FILENAME, &arg_test3_filename, NULL, NULL },
+    { { "test", 0, 0, G_OPTION_ARXFILENAME, &arg_test3_filename, NULL, NULL },
       G_OPTION_ENTRY_NULL };
 
   context = g_option_context_new (NULL);
@@ -576,7 +576,7 @@ arg_test3 (void)
 
   g_free (arg_test3_filename);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -584,7 +584,7 @@ arg_test3 (void)
 static void
 arg_test4 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv_copy;
@@ -608,7 +608,7 @@ arg_test4 (void)
   /* Last arg specified is the one that should be stored */
   g_assert (arg_test4_double == 30.03);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -616,7 +616,7 @@ arg_test4 (void)
 static void
 arg_test5 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -637,7 +637,7 @@ arg_test5 (void)
 
   /* set it to some locale that uses commas instead of decimal points */
 
-  old_locale = g_strdup (setlocale (LC_NUMERIC, locale));
+  old_locale = xstrdup (setlocale (LC_NUMERIC, locale));
   current_locale = setlocale (LC_NUMERIC, NULL);
   if (strcmp (current_locale, locale) != 0)
     {
@@ -656,7 +656,7 @@ arg_test5 (void)
   setlocale (LC_NUMERIC, old_locale);
   g_free (old_locale);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -664,7 +664,7 @@ arg_test5 (void)
 static void
 arg_test6 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -690,7 +690,7 @@ arg_test6 (void)
   g_assert (arg_test6_int64 == G_GINT64_CONSTANT(4294967296));
   g_assert (arg_test6_int64_2 == G_GINT64_CONSTANT(0xfffffffff));
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -699,14 +699,14 @@ static xboolean_t
 callback_parse1 (const xchar_t *option_name, const xchar_t *value,
 		 xpointer_t data, xerror_t **error)
 {
-	callback_test1_string = g_strdup (value);
+	callback_test1_string = xstrdup (value);
 	return TRUE;
 }
 
 static void
 callback_test1 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -731,7 +731,7 @@ callback_test1 (void)
 
   g_free (callback_test1_string);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -747,7 +747,7 @@ callback_parse2 (const xchar_t *option_name, const xchar_t *value,
 static void
 callback_test2 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -770,7 +770,7 @@ callback_test2 (void)
 
   g_assert (callback_test2_int == 2);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -781,7 +781,7 @@ callback_parse_optional (const xchar_t *option_name, const xchar_t *value,
 {
 	callback_test_optional_boolean = TRUE;
 	if (value)
-		callback_test_optional_string = g_strdup (value);
+		callback_test_optional_string = xstrdup (value);
 	else
 		callback_test_optional_string = NULL;
 	return TRUE;
@@ -790,7 +790,7 @@ callback_parse_optional (const xchar_t *option_name, const xchar_t *value,
 static void
 callback_test_optional_1 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -818,7 +818,7 @@ callback_test_optional_1 (void)
 
   g_free (callback_test_optional_string);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -826,7 +826,7 @@ callback_test_optional_1 (void)
 static void
 callback_test_optional_2 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -854,7 +854,7 @@ callback_test_optional_2 (void)
 
   g_free (callback_test_optional_string);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -862,7 +862,7 @@ callback_test_optional_2 (void)
 static void
 callback_test_optional_3 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv_copy;
@@ -890,7 +890,7 @@ callback_test_optional_3 (void)
 
   g_free (callback_test_optional_string);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -899,7 +899,7 @@ callback_test_optional_3 (void)
 static void
 callback_test_optional_4 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -927,7 +927,7 @@ callback_test_optional_4 (void)
 
   g_free (callback_test_optional_string);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -935,7 +935,7 @@ callback_test_optional_4 (void)
 static void
 callback_test_optional_5 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t dummy;
   xboolean_t retval;
   xerror_t *error = NULL;
@@ -965,7 +965,7 @@ callback_test_optional_5 (void)
 
   g_free (callback_test_optional_string);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -973,7 +973,7 @@ callback_test_optional_5 (void)
 static void
 callback_test_optional_6 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t dummy;
   xboolean_t retval;
   xerror_t *error = NULL;
@@ -1003,7 +1003,7 @@ callback_test_optional_6 (void)
 
   g_free (callback_test_optional_string);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1011,7 +1011,7 @@ callback_test_optional_6 (void)
 static void
 callback_test_optional_7 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t dummy;
   xboolean_t retval;
   xerror_t *error = NULL;
@@ -1041,7 +1041,7 @@ callback_test_optional_7 (void)
 
   g_free (callback_test_optional_string);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1049,7 +1049,7 @@ callback_test_optional_7 (void)
 static void
 callback_test_optional_8 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t dummy;
   xboolean_t retval;
   xerror_t *error = NULL;
@@ -1079,24 +1079,24 @@ callback_test_optional_8 (void)
 
   g_free (callback_test_optional_string);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
 
-static GPtrArray *callback_remaining_args;
+static xptr_array_t *callback_remaining_args;
 static xboolean_t
 callback_remaining_test1_callback (const xchar_t *option_name, const xchar_t *value,
 		         xpointer_t data, xerror_t **error)
 {
-	g_ptr_array_add (callback_remaining_args, g_strdup (value));
+	xptr_array_add (callback_remaining_args, xstrdup (value));
 	return TRUE;
 }
 
 static void
 callback_remaining_test1 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1106,7 +1106,7 @@ callback_remaining_test1 (void)
     { { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_CALLBACK, callback_remaining_test1_callback, NULL, NULL },
       G_OPTION_ENTRY_NULL };
 
-  callback_remaining_args = g_ptr_array_new ();
+  callback_remaining_args = xptr_array_new ();
   context = g_option_context_new (NULL);
   g_option_context_add_main_entries (context, entries, NULL);
 
@@ -1122,10 +1122,10 @@ callback_remaining_test1 (void)
   g_assert (strcmp (callback_remaining_args->pdata[0], "foo.txt") == 0);
   g_assert (strcmp (callback_remaining_args->pdata[1], "blah.txt") == 0);
 
-  g_ptr_array_foreach (callback_remaining_args, (GFunc) g_free, NULL);
-  g_ptr_array_free (callback_remaining_args, TRUE);
+  xptr_array_foreach (callback_remaining_args, (GFunc) g_free, NULL);
+  xptr_array_free (callback_remaining_args, TRUE);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1141,7 +1141,7 @@ callback_error (const xchar_t *option_name, const xchar_t *value,
 static void
 callback_returns_false (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1167,7 +1167,7 @@ callback_returns_false (void)
 
   g_option_context_free (context);
   g_clear_error (&error);
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
 
   /* And again, this time with a no-arg variant */
@@ -1184,7 +1184,7 @@ callback_returns_false (void)
 
   g_option_context_free (context);
   g_clear_error (&error);
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
 
   /* And again, this time with an optional arg variant, with argument */
@@ -1201,7 +1201,7 @@ callback_returns_false (void)
 
   g_option_context_free (context);
   g_clear_error (&error);
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
 
   /* And again, this time with an optional arg variant, without argument */
@@ -1218,7 +1218,7 @@ callback_returns_false (void)
 
   g_option_context_free (context);
   g_clear_error (&error);
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
 }
 
@@ -1226,7 +1226,7 @@ callback_returns_false (void)
 static void
 ignore_test1 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv, **argv_copy;
@@ -1253,7 +1253,7 @@ ignore_test1 (void)
   g_assert (strcmp (arg, "program --hello") == 0);
 
   g_free (arg);
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1261,7 +1261,7 @@ ignore_test1 (void)
 static void
 ignore_test2 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1289,7 +1289,7 @@ ignore_test2 (void)
   g_assert (strcmp (arg, "program -es") == 0);
 
   g_free (arg);
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1297,7 +1297,7 @@ ignore_test2 (void)
 static void
 ignore_test3 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv, **argv_copy;
@@ -1327,7 +1327,7 @@ ignore_test3 (void)
   g_free (ignore_test3_string);
 
   g_free (arg);
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1335,7 +1335,7 @@ ignore_test3 (void)
 static void
 array_test1 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1361,9 +1361,9 @@ array_test1 (void)
   g_assert (strcmp (array_test1_array[1], "bar") == 0);
   g_assert (array_test1_array[2] == NULL);
 
-  g_strfreev (array_test1_array);
+  xstrfreev (array_test1_array);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1371,7 +1371,7 @@ array_test1 (void)
 static void
 add_test1 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
 
   GOptionEntry entries1 [] =
     { { "test1", 0, 0, G_OPTION_ARG_STRING_ARRAY, NULL, NULL, NULL },
@@ -1390,7 +1390,7 @@ add_test1 (void)
 static void
 empty_test2 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
 
   context = g_option_context_new (NULL);
   g_option_context_parse (context, NULL, NULL, NULL);
@@ -1401,7 +1401,7 @@ empty_test2 (void)
 static void
 empty_test3 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xint_t argc;
   xchar_t **argv;
 
@@ -1418,7 +1418,7 @@ empty_test3 (void)
 static void
 rest_test1 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1447,7 +1447,7 @@ rest_test1 (void)
   g_assert (strcmp (argv[2], "bar") == 0);
   g_assert (argv[3] == NULL);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1456,7 +1456,7 @@ rest_test1 (void)
 static void
 rest_test2 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1486,7 +1486,7 @@ rest_test2 (void)
   g_assert (strcmp (argv[3], "-bar") == 0);
   g_assert (argv[4] == NULL);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1495,7 +1495,7 @@ rest_test2 (void)
 static void
 rest_test2a (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1524,7 +1524,7 @@ rest_test2a (void)
   g_assert (strcmp (argv[2], "bar") == 0);
   g_assert (argv[3] == NULL);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1532,7 +1532,7 @@ rest_test2a (void)
 static void
 rest_test2b (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1562,7 +1562,7 @@ rest_test2b (void)
   g_assert (strcmp (argv[2], "-bar") == 0);
   g_assert (argv[3] == NULL);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1570,7 +1570,7 @@ rest_test2b (void)
 static void
 rest_test2c (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1599,7 +1599,7 @@ rest_test2c (void)
   g_assert (strcmp (argv[2], "bar") == 0);
   g_assert (argv[3] == NULL);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1607,7 +1607,7 @@ rest_test2c (void)
 static void
 rest_test2d (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1636,7 +1636,7 @@ rest_test2d (void)
   g_assert (strcmp (argv[2], "-bar") == 0);
   g_assert (argv[3] == NULL);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1646,7 +1646,7 @@ rest_test2d (void)
 static void
 rest_test3 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1675,9 +1675,9 @@ rest_test3 (void)
   g_assert (strcmp (array_test1_array[1], "bar") == 0);
   g_assert (array_test1_array[2] == NULL);
 
-  g_strfreev (array_test1_array);
+  xstrfreev (array_test1_array);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1687,7 +1687,7 @@ rest_test3 (void)
 static void
 rest_test4 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1716,18 +1716,18 @@ rest_test4 (void)
   g_assert (strcmp (array_test1_array[1], "-bar") == 0);
   g_assert (array_test1_array[2] == NULL);
 
-  g_strfreev (array_test1_array);
+  xstrfreev (array_test1_array);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
 
-/* test that G_OPTION_REMAINING works with G_OPTION_ARG_FILENAME_ARRAY */
+/* test that G_OPTION_REMAINING works with G_OPTION_ARXFILENAME_ARRAY */
 static void
 rest_test5 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1735,7 +1735,7 @@ rest_test5 (void)
   int argc;
   GOptionEntry entries [] = {
       { "test", 0, 0, G_OPTION_ARG_NONE, &ignore_test1_boolean, NULL, NULL },
-      { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &array_test1_array, NULL, NULL },
+      { G_OPTION_REMAINING, 0, 0, G_OPTION_ARXFILENAME_ARRAY, &array_test1_array, NULL, NULL },
       G_OPTION_ENTRY_NULL
   };
 
@@ -1756,9 +1756,9 @@ rest_test5 (void)
   g_assert (strcmp (array_test1_array[1], "bar") == 0);
   g_assert (array_test1_array[2] == NULL);
 
-  g_strfreev (array_test1_array);
+  xstrfreev (array_test1_array);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1766,7 +1766,7 @@ rest_test5 (void)
 static void
 unknown_short_test (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1788,7 +1788,7 @@ unknown_short_test (void)
   g_assert (error != NULL);
   g_clear_error (&error);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1797,7 +1797,7 @@ unknown_short_test (void)
 static void
 lonely_dash_test (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1818,7 +1818,7 @@ lonely_dash_test (void)
 
   g_assert (argv[1] && strcmp (argv[1], "-") == 0);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -1827,8 +1827,8 @@ lonely_dash_test (void)
 static void
 triple_dash_test (void)
 {
-  GOptionContext *context;
-  GOptionGroup *group;
+  xoption_context_t *context;
+  xoption_group_t *group;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1847,8 +1847,8 @@ triple_dash_test (void)
   context = g_option_context_new (NULL);
   g_option_context_add_main_entries (context, entries, NULL);
 
-  group = g_option_group_new ("group", "Group description", "Group help", NULL, NULL);
-  g_option_group_add_entries (group, group_entries);
+  group = xoption_group_new ("group", "Group description", "Group help", NULL, NULL);
+  xoption_group_add_entries (group, group_entries);
 
   g_option_context_add_group (context, group);
 
@@ -1862,14 +1862,14 @@ triple_dash_test (void)
 
   g_option_context_free (context);
   g_clear_error (&error);
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
 }
 
 static void
 missing_arg_test (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1896,7 +1896,7 @@ missing_arg_test (void)
   check_identical_stringv (argv_copy, argv);
   g_clear_error (&error);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
 
   /* Try parsing again */
@@ -1910,7 +1910,7 @@ missing_arg_test (void)
   check_identical_stringv (argv_copy, argv);
   g_clear_error (&error);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 
@@ -1927,14 +1927,14 @@ static xboolean_t cb (const xchar_t  *option_name,
                     xpointer_t      data,
                     xerror_t      **error)
 {
-  test_arg = g_strdup (value);
+  test_arg = xstrdup (value);
   return TRUE;
 }
 
 static void
 dash_arg_test (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv;
@@ -1962,7 +1962,7 @@ dash_arg_test (void)
   g_assert_no_error (error);
   g_assert_cmpstr (test_arg, ==, "-3");
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_free (test_arg);
   test_arg = NULL;
@@ -1978,14 +1978,14 @@ dash_arg_test (void)
   g_assert_cmpstr (test_arg, ==, NULL);
 
   g_option_context_free (context);
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
 }
 
 static void
 test_basic (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xchar_t *arg = NULL;
   GOptionEntry entries [] =
     { { "test", 't', 0, G_OPTION_ARG_STRING, &arg, NULL, NULL },
@@ -2046,7 +2046,7 @@ destroy_notify (xpointer_t data)
 static void
 test_translate (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xchar_t *arg = NULL;
   GOptionEntry entries [] =
     { { "test", 't', 0, G_OPTION_ARG_STRING, &arg, NULL, NULL },
@@ -2074,8 +2074,8 @@ test_translate (void)
 static void
 test_help (void)
 {
-  GOptionContext *context;
-  GOptionGroup *group;
+  xoption_context_t *context;
+  xoption_group_t *group;
   xchar_t *str;
   xchar_t *arg = NULL;
   xchar_t **sarr = NULL;
@@ -2097,8 +2097,8 @@ test_help (void)
   g_option_context_set_summary (context, "Summary");
   g_option_context_set_description (context, "Description");
 
-  group = g_option_group_new ("group1", "Group1-description", "Group1-help", NULL, NULL);
-  g_option_group_add_entries (group, group_entries);
+  group = xoption_group_new ("group1", "Group1-description", "Group1-help", NULL, NULL);
+  xoption_group_add_entries (group, group_entries);
 
   g_option_context_add_group (context, group);
 
@@ -2129,7 +2129,7 @@ test_help (void)
 static void
 test_help_no_options (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xchar_t **sarr = NULL;
   GOptionEntry entries[] = {
     { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_STRING_ARRAY, &sarr, "Rest goes here", "REST" },
@@ -2153,8 +2153,8 @@ test_help_no_options (void)
 static void
 test_help_no_help_options (void)
 {
-  GOptionContext *context;
-  GOptionGroup *group;
+  xoption_context_t *context;
+  xoption_group_t *group;
   xchar_t *str;
   xchar_t *arg = NULL;
   xchar_t **sarr = NULL;
@@ -2179,8 +2179,8 @@ test_help_no_help_options (void)
   g_option_context_set_description (context, "Description");
   g_option_context_set_help_enabled (context, FALSE);
 
-  group = g_option_group_new ("group1", "Group1-description", "Group1-help", NULL, NULL);
-  g_option_group_add_entries (group, group_entries);
+  group = xoption_group_new ("group1", "Group1-description", "Group1-help", NULL, NULL);
+  xoption_group_add_entries (group, group_entries);
 
   g_option_context_add_group (context, group);
 
@@ -2220,18 +2220,18 @@ set_bool (xpointer_t data)
 static void
 test_main_group (void)
 {
-  GOptionContext *context;
-  GOptionGroup *group;
+  xoption_context_t *context;
+  xoption_group_t *group;
   xboolean_t b = FALSE;
 
   context = g_option_context_new (NULL);
   g_assert (g_option_context_get_main_group (context) == NULL);
-  group = g_option_group_new ("name", "description", "hlep", &b, set_bool);
+  group = xoption_group_new ("name", "description", "hlep", &b, set_bool);
   g_option_context_add_group (context, group);
-  group = g_option_group_new ("name2", "description", "hlep", NULL, NULL);
+  group = xoption_group_new ("name2", "description", "hlep", NULL, NULL);
   g_option_context_add_group (context, group);
   g_assert (g_option_context_get_main_group (context) == NULL);
-  group = g_option_group_new ("name", "description", "hlep", NULL, NULL);
+  group = xoption_group_new ("name", "description", "hlep", NULL, NULL);
   g_option_context_set_main_group (context, group);
   g_assert (g_option_context_get_main_group (context) == group);
 
@@ -2243,8 +2243,8 @@ test_main_group (void)
 static xboolean_t error_func_called = FALSE;
 
 static void
-error_func (GOptionContext  *context,
-            GOptionGroup    *group,
+error_func (xoption_context_t  *context,
+            xoption_group_t    *group,
             xpointer_t         data,
             xerror_t         **error)
 {
@@ -2255,12 +2255,12 @@ error_func (GOptionContext  *context,
 static void
 test_error_hook (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xchar_t *arg = NULL;
   GOptionEntry entries [] =
     { { "test", 't', 0, G_OPTION_ARG_STRING, &arg, NULL, NULL },
       G_OPTION_ENTRY_NULL };
-  GOptionGroup *group;
+  xoption_group_t *group;
   xchar_t **argv;
   xchar_t **argv_copy;
   xint_t argc;
@@ -2268,10 +2268,10 @@ test_error_hook (void)
   xerror_t *error = NULL;
 
   context = g_option_context_new (NULL);
-  group = g_option_group_new ("name", "description", "hlep", GINT_TO_POINTER(1234), NULL);
-  g_option_group_add_entries (group, entries);
+  group = xoption_group_new ("name", "description", "hlep", GINT_TO_POINTER(1234), NULL);
+  xoption_group_add_entries (group, entries);
   g_option_context_set_main_group (context, group);
-  g_option_group_set_error_hook (g_option_context_get_main_group (context),
+  xoption_group_set_error_hook (g_option_context_get_main_group (context),
                                  error_func);
 
   argv = split_string ("program --test", &argc);
@@ -2286,7 +2286,7 @@ test_error_hook (void)
 
   g_assert (error_func_called);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -2294,8 +2294,8 @@ test_error_hook (void)
 static void
 test_group_parse (void)
 {
-  GOptionContext *context;
-  GOptionGroup *group;
+  xoption_context_t *context;
+  xoption_group_t *group;
   xchar_t *arg1 = NULL;
   xchar_t *arg2 = NULL;
   xchar_t *arg3 = NULL;
@@ -2319,8 +2319,8 @@ test_group_parse (void)
 
   context = g_option_context_new (NULL);
   g_option_context_add_main_entries (context, entries, NULL);
-  group = g_option_group_new ("group", "A group", "help for group", NULL, NULL);
-  g_option_group_add_entries (group, group_entries);
+  group = xoption_group_new ("group", "A group", "help for group", NULL, NULL);
+  xoption_group_add_entries (group, group_entries);
   g_option_context_add_group (context, group);
 
   argv = split_string ("program --test arg1 -f arg2 --group-test arg3 --frob arg4 -z arg5", &argc);
@@ -2343,12 +2343,12 @@ test_group_parse (void)
   g_free (arg5);
 
   g_free (argv);
-  g_strfreev (orig_argv);
+  xstrfreev (orig_argv);
   g_option_context_free (context);
 }
 
 static xint_t
-option_context_parse_command_line (GOptionContext *context,
+option_context_parse_command_line (xoption_context_t *context,
                                    const xchar_t    *command_line)
 {
   xchar_t **argv;
@@ -2356,19 +2356,19 @@ option_context_parse_command_line (GOptionContext *context,
   xboolean_t success;
 
   argv = split_string (command_line, NULL);
-  argv_len = g_strv_length (argv);
+  argv_len = xstrv_length (argv);
 
   success = g_option_context_parse_strv (context, &argv, NULL);
-  argv_new_len = g_strv_length (argv);
+  argv_new_len = xstrv_length (argv);
 
-  g_strfreev (argv);
+  xstrfreev (argv);
   return success ? (xint_t) (argv_len - argv_new_len) : -1;
 }
 
 static void
 test_strict_posix (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t foo;
   xboolean_t bar;
   GOptionEntry entries[] = {
@@ -2415,7 +2415,7 @@ test_strict_posix (void)
 static void
 flag_reverse_string (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xchar_t *arg = NULL;
   GOptionEntry entries [] =
     { { "test", 't', G_OPTION_FLAG_REVERSE, G_OPTION_ARG_STRING, &arg, NULL, NULL },
@@ -2440,7 +2440,7 @@ flag_reverse_string (void)
   retval = g_option_context_parse_strv (context, &argv, &error);
   g_assert (retval == TRUE);
   g_assert_no_error (error);
-  g_strfreev (argv);
+  xstrfreev (argv);
   g_option_context_free (context);
   g_free (arg);
 }
@@ -2448,7 +2448,7 @@ flag_reverse_string (void)
 static void
 flag_optional_int (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xint_t arg = 0;
   GOptionEntry entries [] =
     { { "test", 't', G_OPTION_FLAG_OPTIONAL_ARG, G_OPTION_ARG_INT, &arg, NULL, NULL },
@@ -2473,7 +2473,7 @@ flag_optional_int (void)
   retval = g_option_context_parse_strv (context, &argv, &error);
   g_assert (retval == TRUE);
   g_assert_no_error (error);
-  g_strfreev (argv);
+  xstrfreev (argv);
   g_option_context_free (context);
 }
 
@@ -2492,10 +2492,10 @@ short_remaining (void)
     { "remaining", 'r', 0, G_OPTION_ARG_NONE, &remaining, NULL, NULL },
     { "number", 'n', 0, G_OPTION_ARG_INT, &number, NULL, NULL },
     { "text", 't', 0, G_OPTION_ARG_STRING, &text, NULL, NULL },
-    { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &files, NULL, NULL },
+    { G_OPTION_REMAINING, 0, 0, G_OPTION_ARXFILENAME_ARRAY, &files, NULL, NULL },
     G_OPTION_ENTRY_NULL
   };
-  GOptionContext* context;
+  xoption_context_t* context;
   xchar_t **argv, **argv_copy;
   xint_t argc;
 
@@ -2521,8 +2521,8 @@ short_remaining (void)
   g_assert (files[2] == NULL);
 
   g_free (text);
-  g_strfreev (files);
-  g_strfreev (argv_copy);
+  xstrfreev (files);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -2536,7 +2536,7 @@ double_free (void)
     { "known", 0, 0, G_OPTION_ARG_STRING, &text, NULL, NULL },
     G_OPTION_ENTRY_NULL
   };
-  GOptionContext* context;
+  xoption_context_t* context;
   xchar_t **argv;
   xint_t argc;
   xerror_t *error = NULL;
@@ -2556,14 +2556,14 @@ double_free (void)
 
   g_option_context_free (context);
   g_clear_error (&error);
-  g_strfreev (argv);
+  xstrfreev (argv);
 
 }
 
 static void
 double_zero (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t retval;
   xerror_t *error = NULL;
   xchar_t **argv_copy;
@@ -2588,7 +2588,7 @@ double_zero (void)
   /* Last arg specified is the one that should be stored */
   g_assert (test_val == 0);
 
-  g_strfreev (argv_copy);
+  xstrfreev (argv_copy);
   g_free (argv);
   g_option_context_free (context);
 }
@@ -2613,15 +2613,15 @@ main (int   argc,
   g_test_add_func ("/option/group/captions", test_group_captions);
   for (i = 0; i < 4; i++)
     {
-      test_name = g_strdup_printf ("/option/group/captions/subprocess/help-%d", i);
+      test_name = xstrdup_printf ("/option/group/captions/subprocess/help-%d", i);
       g_test_add_data_func (test_name, GINT_TO_POINTER (i),
                             test_group_captions_help);
       g_free (test_name);
-      test_name = g_strdup_printf ("/option/group/captions/subprocess/help-all-%d", i);
+      test_name = xstrdup_printf ("/option/group/captions/subprocess/help-all-%d", i);
       g_test_add_data_func (test_name, GINT_TO_POINTER (i),
                             test_group_captions_help_all);
       g_free (test_name);
-      test_name = g_strdup_printf ("/option/group/captions/subprocess/help-test-%d", i);
+      test_name = xstrdup_printf ("/option/group/captions/subprocess/help-test-%d", i);
       g_test_add_data_func (test_name, GINT_TO_POINTER (i),
                             test_group_captions_help_test);
 

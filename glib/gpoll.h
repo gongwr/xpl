@@ -27,7 +27,7 @@
 
 G_BEGIN_DECLS
 
-/* Any definitions using GPollFD or GPollFunc are primarily
+/* Any definitions using xpollfd_t or GPollFunc are primarily
  * for Unix and not guaranteed to be the compatible on all
  * operating systems on which GLib runs. Right now, the
  * GLib does use these functions on Win32 as well, but interprets
@@ -37,9 +37,9 @@ G_BEGIN_DECLS
  *
  * Note that on systems with a working poll(2), that function is used
  * in place of g_poll(). Thus g_poll() must have the same signature as
- * poll(), meaning GPollFD must have the same layout as struct pollfd.
+ * poll(), meaning xpollfd_t must have the same layout as struct pollfd.
  *
- * On Win32, the fd in a GPollFD should be Win32 HANDLE (*not* a file
+ * On Win32, the fd in a xpollfd_t should be Win32 HANDLE (*not* a file
  * descriptor as provided by the C runtime) that can be used by
  * MsgWaitForMultipleObjects. This does *not* include file handles
  * from CreateFile, SOCKETs, nor pipe handles. (But you can use
@@ -56,33 +56,33 @@ G_BEGIN_DECLS
  * to use the main loop polling stuff for your own needs on
  * Windows.
  */
-typedef struct _GPollFD GPollFD;
+typedef struct _GPollFD xpollfd_t;
 
 /**
  * GPollFunc:
- * @ufds: an array of #GPollFD elements
+ * @ufds: an array of #xpollfd_t elements
  * @nfsd: the number of elements in @ufds
  * @timeout_: the maximum time to wait for an event of the file descriptors.
  *     A negative value indicates an infinite timeout.
  *
- * Specifies the type of function passed to g_main_context_set_poll_func().
+ * Specifies the type of function passed to xmain_context_set_poll_func().
  * The semantics of the function should match those of the poll() system call.
  *
- * Returns: the number of #GPollFD elements which have events or errors
+ * Returns: the number of #xpollfd_t elements which have events or errors
  *     reported, or -1 if an error occurred.
  */
-typedef xint_t    (*GPollFunc)    (GPollFD *ufds,
+typedef xint_t    (*GPollFunc)    (xpollfd_t *ufds,
                                  xuint_t    nfsd,
                                  xint_t     timeout_);
 
 /**
- * GPollFD:
+ * xpollfd_t:
  * @fd: the file descriptor to poll (or a HANDLE on Win32)
- * @events: a bitwise combination from #GIOCondition, specifying which
+ * @events: a bitwise combination from #xio_condition_t, specifying which
  *     events should be polled for. Typically for reading from a file
  *     descriptor you would use %G_IO_IN | %G_IO_HUP | %G_IO_ERR, and
  *     for writing you would use %G_IO_OUT | %G_IO_ERR.
- * @revents: a bitwise combination of flags from #GIOCondition, returned
+ * @revents: a bitwise combination of flags from #xio_condition_t, returned
  *     from the poll() function to indicate which events occurred.
  *
  * Represents a file descriptor, which events to poll for, and which events
@@ -105,13 +105,13 @@ struct _GPollFD
  * G_POLLFD_FORMAT:
  *
  * A format specifier that can be used in printf()-style format strings
- * when printing the @fd member of a #GPollFD.
+ * when printing the @fd member of a #xpollfd_t.
  */
 /* defined in glibconfig.h */
 
 XPL_AVAILABLE_IN_ALL
 xint_t
-g_poll (GPollFD *fds,
+g_poll (xpollfd_t *fds,
 	xuint_t    nfds,
 	xint_t     timeout);
 

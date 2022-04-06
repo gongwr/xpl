@@ -40,10 +40,10 @@
  * like MD5, SHA-1 and SHA-256. Checksums are commonly used in various
  * environments and specifications.
  *
- * GLib supports incremental checksums using the GChecksum data
- * structure, by calling g_checksum_update() as long as there's data
- * available and then using g_checksum_get_string() or
- * g_checksum_get_digest() to compute the checksum and return it either
+ * GLib supports incremental checksums using the xchecksum_t data
+ * structure, by calling xchecksum_update() as long as there's data
+ * available and then using xchecksum_get_string() or
+ * xchecksum_get_digest() to compute the checksum and return it either
  * as a string in hexadecimal form, or as a raw sequence of bytes. To
  * compute the checksum for binary blobs and NUL-terminated strings in
  * one go, use the convenience functions g_compute_checksum_for_data()
@@ -62,12 +62,12 @@ static const xchar_t hex_digits[] = "0123456789abcdef";
 
 typedef struct
 {
-  guint32 buf[4];
-  guint32 bits[2];
+  xuint32_t buf[4];
+  xuint32_t bits[2];
 
   union {
     guchar data[MD5_DATASIZE];
-    guint32 data32[MD5_DATASIZE / 4];
+    xuint32_t data32[MD5_DATASIZE / 4];
   } u;
 
   guchar digest[MD5_DIGEST_LEN];
@@ -78,11 +78,11 @@ typedef struct
 
 typedef struct
 {
-  guint32 buf[5];
-  guint32 bits[2];
+  xuint32_t buf[5];
+  xuint32_t bits[2];
 
   /* we pack 64 unsigned chars into 16 32-bit unsigned integers */
-  guint32 data[16];
+  xuint32_t data[16];
 
   guchar digest[SHA1_DIGEST_LEN];
 } Sha1sum;
@@ -92,10 +92,10 @@ typedef struct
 
 typedef struct
 {
-  guint32 buf[8];
-  guint32 bits[2];
+  xuint32_t buf[8];
+  xuint32_t bits[2];
 
-  guint8 data[SHA256_DATASIZE];
+  xuint8_t data[SHA256_DATASIZE];
 
   guchar digest[SHA256_DIGEST_LEN];
 } Sha256sum;
@@ -107,12 +107,12 @@ typedef struct
 
 typedef struct
 {
-  guint64 H[8];
+  xuint64_t H[8];
 
-  guint8 block[SHA2_BLOCK_LEN];
-  guint8 block_len;
+  xuint8_t block[SHA2_BLOCK_LEN];
+  xuint8_t block_len;
 
-  guint64 data_len[2];
+  xuint64_t data_len[2];
 
   guchar digest[SHA512_DIGEST_LEN];
 } Sha512sum;
@@ -144,13 +144,13 @@ static inline void
 md5_byte_reverse (guchar *buffer,
                   gulong  length)
 {
-  guint32 bit;
+  xuint32_t bit;
 
   do
     {
-      bit = (guint32) ((unsigned) buffer[3] << 8 | buffer[2]) << 16 |
+      bit = (xuint32_t) ((unsigned) buffer[3] << 8 | buffer[2]) << 16 |
                       ((unsigned) buffer[1] << 8 | buffer[0]);
-      * (guint32 *) buffer = bit;
+      * (xuint32_t *) buffer = bit;
       buffer += 4;
     }
   while (--length);
@@ -161,10 +161,10 @@ md5_byte_reverse (guchar *buffer,
 #define sha_byte_reverse(buffer,length)
 #else
 static inline void
-sha_byte_reverse (guint32 *buffer,
+sha_byte_reverse (xuint32_t *buffer,
                   xint_t     length)
 {
-  length /= sizeof (guint32);
+  length /= sizeof (xuint32_t);
   while (length--)
     {
       *buffer = GUINT32_SWAP_LE_BE (*buffer);
@@ -174,7 +174,7 @@ sha_byte_reverse (guint32 *buffer,
 #endif /* G_BYTE_ORDER == G_BIG_ENDIAN */
 
 static xchar_t *
-digest_to_string (guint8 *digest,
+digest_to_string (xuint8_t *digest,
                   xsize_t   digest_len)
 {
   xsize_t i, len = digest_len * 2;
@@ -184,7 +184,7 @@ digest_to_string (guint8 *digest,
 
   for (i = 0; i < digest_len; i++)
     {
-      guint8 byte = digest[i];
+      xuint8_t byte = digest[i];
 
       retval[2 * i] = hex_digits[byte >> 4];
       retval[2 * i + 1] = hex_digits[byte & 0xf];
@@ -231,10 +231,10 @@ md5_sum_init (Md5sum *md5)
  * blocks the data and converts bytes into longwords for this routine.
  */
 static void
-md5_transform (guint32       buf[4],
-               guint32 const in[16])
+md5_transform (xuint32_t       buf[4],
+               xuint32_t const in[16])
 {
-  guint32 a, b, c, d;
+  xuint32_t a, b, c, d;
 
 /* The four core functions - F1 is optimized somewhat */
 #define F1(x, y, z)     (z ^ (x & (y ^ z)))
@@ -336,10 +336,10 @@ md5_sum_update (Md5sum       *md5,
                 const guchar *data,
                 xsize_t         length)
 {
-  guint32 bit;
+  xuint32_t bit;
 
   bit = md5->bits[0];
-  md5->bits[0] = bit + ((guint32) length << 3);
+  md5->bits[0] = bit + ((xuint32_t) length << 3);
 
   /* carry from low to high */
   if (md5->bits[0] < bit)
@@ -448,7 +448,7 @@ md5_sum_to_string (Md5sum *md5)
 
 static void
 md5_sum_digest (Md5sum *md5,
-                guint8 *digest)
+                xuint8_t *digest)
 {
   xint_t i;
 
@@ -571,10 +571,10 @@ sha1_sum_init (Sha1sum *sha1)
    (e += ROTL (5, a) + f(b, c, d) + k + data, b = ROTL (30, b))
 
 static void
-sha1_transform (guint32  buf[5],
-                guint32  in[16])
+sha1_transform (xuint32_t  buf[5],
+                xuint32_t  in[16])
 {
-  guint32 A, B, C, D, E;
+  xuint32_t A, B, C, D, E;
 
   A = buf[0];
   B = buf[1];
@@ -692,12 +692,12 @@ sha1_sum_update (Sha1sum      *sha1,
                  const guchar *buffer,
                  xsize_t         count)
 {
-  guint32 tmp;
+  xuint32_t tmp;
   xuint_t dataCount;
 
   /* Update bitcount */
   tmp = sha1->bits[0];
-  if ((sha1->bits[0] = tmp + ((guint32) count << 3) ) < tmp)
+  if ((sha1->bits[0] = tmp + ((xuint32_t) count << 3) ) < tmp)
     sha1->bits[1] += 1;             /* Carry from low to high */
   sha1->bits[1] += count >> 29;
 
@@ -801,7 +801,7 @@ sha1_sum_to_string (Sha1sum *sha1)
 
 static void
 sha1_sum_digest (Sha1sum *sha1,
-                 guint8  *digest)
+                 xuint8_t  *digest)
 {
   xint_t i;
 
@@ -835,23 +835,23 @@ sha256_sum_init (Sha256sum *sha256)
 }
 
 #define GET_UINT32(n,b,i)               G_STMT_START{   \
-    (n) = ((guint32) (b)[(i)    ] << 24)                \
-        | ((guint32) (b)[(i) + 1] << 16)                \
-        | ((guint32) (b)[(i) + 2] <<  8)                \
-        | ((guint32) (b)[(i) + 3]      ); } G_STMT_END
+    (n) = ((xuint32_t) (b)[(i)    ] << 24)                \
+        | ((xuint32_t) (b)[(i) + 1] << 16)                \
+        | ((xuint32_t) (b)[(i) + 2] <<  8)                \
+        | ((xuint32_t) (b)[(i) + 3]      ); } G_STMT_END
 
 #define PUT_UINT32(n,b,i)               G_STMT_START{   \
-    (b)[(i)    ] = (guint8) ((n) >> 24);                \
-    (b)[(i) + 1] = (guint8) ((n) >> 16);                \
-    (b)[(i) + 2] = (guint8) ((n) >>  8);                \
-    (b)[(i) + 3] = (guint8) ((n)      ); } G_STMT_END
+    (b)[(i)    ] = (xuint8_t) ((n) >> 24);                \
+    (b)[(i) + 1] = (xuint8_t) ((n) >> 16);                \
+    (b)[(i) + 2] = (xuint8_t) ((n) >>  8);                \
+    (b)[(i) + 3] = (xuint8_t) ((n)      ); } G_STMT_END
 
 static void
-sha256_transform (guint32      buf[8],
-                  guint8 const data[64])
+sha256_transform (xuint32_t      buf[8],
+                  xuint8_t const data[64])
 {
-  guint32 temp1, temp2, W[64];
-  guint32 A, B, C, D, E, F, G, H;
+  xuint32_t temp1, temp2, W[64];
+  xuint32_t A, B, C, D, E, F, G, H;
 
   GET_UINT32 (W[0],  data,  0);
   GET_UINT32 (W[1],  data,  4);
@@ -989,8 +989,8 @@ sha256_sum_update (Sha256sum    *sha256,
                    const guchar *buffer,
                    xsize_t         length)
 {
-  guint32 left, fill;
-  const guint8 *input = buffer;
+  xuint32_t left, fill;
+  const xuint8_t *input = buffer;
 
   if (length == 0)
     return;
@@ -1027,7 +1027,7 @@ sha256_sum_update (Sha256sum    *sha256,
     memcpy (sha256->data + left, input, length);
 }
 
-static guint8 sha256_padding[64] =
+static xuint8_t sha256_padding[64] =
 {
  0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1038,9 +1038,9 @@ static guint8 sha256_padding[64] =
 static void
 sha256_sum_close (Sha256sum *sha256)
 {
-  guint32 last, padn;
-  guint32 high, low;
-  guint8 msglen[8];
+  xuint32_t last, padn;
+  xuint32_t high, low;
+  xuint8_t msglen[8];
 
   high = (sha256->bits[0] >> 29)
        | (sha256->bits[1] <<  3);
@@ -1076,7 +1076,7 @@ sha256_sum_to_string (Sha256sum *sha256)
 
 static void
 sha256_sum_digest (Sha256sum *sha256,
-                   guint8    *digest)
+                   xuint8_t    *digest)
 {
   xint_t i;
 
@@ -1106,17 +1106,17 @@ sha256_sum_digest (Sha256sum *sha256,
 #define sigma1(x)  (ROTR (19, x) ^ ROTR (61, x) ^ SHR  ( 6, x))
 
 #define PUT_UINT64(n,b,i)                G_STMT_START{   \
-    (b)[(i)    ] = (guint8) (n >> 56);                   \
-    (b)[(i) + 1] = (guint8) (n >> 48);                   \
-    (b)[(i) + 2] = (guint8) (n >> 40);                   \
-    (b)[(i) + 3] = (guint8) (n >> 32);                   \
-    (b)[(i) + 4] = (guint8) (n >> 24);                   \
-    (b)[(i) + 5] = (guint8) (n >> 16);                   \
-    (b)[(i) + 6] = (guint8) (n >>  8);                   \
-    (b)[(i) + 7] = (guint8) (n      ); } G_STMT_END
+    (b)[(i)    ] = (xuint8_t) (n >> 56);                   \
+    (b)[(i) + 1] = (xuint8_t) (n >> 48);                   \
+    (b)[(i) + 2] = (xuint8_t) (n >> 40);                   \
+    (b)[(i) + 3] = (xuint8_t) (n >> 32);                   \
+    (b)[(i) + 4] = (xuint8_t) (n >> 24);                   \
+    (b)[(i) + 5] = (xuint8_t) (n >> 16);                   \
+    (b)[(i) + 6] = (xuint8_t) (n >>  8);                   \
+    (b)[(i) + 7] = (xuint8_t) (n      ); } G_STMT_END
 
 /* SHA-384 and SHA-512 constants [§4.2.3] */
-static const guint64 SHA2_K[80] = {
+static const xuint64_t SHA2_K[80] = {
   G_GUINT64_CONSTANT (0x428a2f98d728ae22), G_GUINT64_CONSTANT (0x7137449123ef65cd),
   G_GUINT64_CONSTANT (0xb5c0fbcfec4d3b2f), G_GUINT64_CONSTANT (0xe9b5dba58189dbbc),
   G_GUINT64_CONSTANT (0x3956c25bf348b538), G_GUINT64_CONSTANT (0x59f111f1b605d019),
@@ -1199,14 +1199,14 @@ sha512_sum_init (Sha512sum *sha512)
 }
 
 static void
-sha512_transform (guint64      H[8],
-                  guint8 const data[SHA2_BLOCK_LEN])
+sha512_transform (xuint64_t      H[8],
+                  xuint8_t const data[SHA2_BLOCK_LEN])
 {
   xint_t i;
   xint_t t;
-  guint64 a, b, c, d, e, f, g, h;
-  guint64 M[16];
-  guint64 W[80];
+  xuint64_t a, b, c, d, e, f, g, h;
+  xuint64_t M[16];
+  xuint64_t W[80];
 
   /* SHA-512 hash computation [§6.4.2] */
 
@@ -1216,14 +1216,14 @@ sha512_transform (guint64      H[8],
       xint_t p = i * 8;
 
       M[i] =
-        ((guint64) data[p + 0] << 56) |
-        ((guint64) data[p + 1] << 48) |
-        ((guint64) data[p + 2] << 40) |
-        ((guint64) data[p + 3] << 32) |
-        ((guint64) data[p + 4] << 24) |
-        ((guint64) data[p + 5] << 16) |
-        ((guint64) data[p + 6] <<  8) |
-        ((guint64) data[p + 7]      );
+        ((xuint64_t) data[p + 0] << 56) |
+        ((xuint64_t) data[p + 1] << 48) |
+        ((xuint64_t) data[p + 2] << 40) |
+        ((xuint64_t) data[p + 3] << 32) |
+        ((xuint64_t) data[p + 4] << 24) |
+        ((xuint64_t) data[p + 5] << 16) |
+        ((xuint64_t) data[p + 6] <<  8) |
+        ((xuint64_t) data[p + 7]      );
     }
 
   for (t = 0; t < 80; t++)
@@ -1244,7 +1244,7 @@ sha512_transform (guint64      H[8],
 
   for (t = 0; t < 80; t++)
     {
-      guint64 T1, T2;
+      xuint64_t T1, T2;
 
       T1 = h + SIGMA1 (e) + Ch (e, f, g) + SHA2_K[t] + W[t];
       T2 = SIGMA0 (a) + Maj (a, b, c);
@@ -1326,7 +1326,7 @@ sha512_sum_close (Sha512sum *sha512)
 {
   xuint_t l;
   xint_t zeros;
-  guint8 pad[SHA2_BLOCK_LEN * 2] = { 0, };
+  xuint8_t pad[SHA2_BLOCK_LEN * 2] = { 0, };
   xuint_t pad_len = 0;
   xint_t i;
 
@@ -1375,14 +1375,14 @@ sha512_sum_to_string (Sha512sum *sha512)
 
 static void
 sha384_sum_digest (Sha512sum *sha512,
-                   guint8    *digest)
+                   xuint8_t    *digest)
 {
   memcpy (digest, sha512->digest, SHA384_DIGEST_LEN);
 }
 
 static void
 sha512_sum_digest (Sha512sum *sha512,
-                   guint8    *digest)
+                   xuint8_t    *digest)
 {
   memcpy (digest, sha512->digest, SHA512_DIGEST_LEN);
 }
@@ -1403,7 +1403,7 @@ sha512_sum_digest (Sha512sum *sha512,
  */
 
 /**
- * g_checksum_type_get_length:
+ * xchecksum_type_get_length:
  * @checksum_type: a #GChecksumType
  *
  * Gets the length in bytes of digests of type @checksum_type
@@ -1413,10 +1413,10 @@ sha512_sum_digest (Sha512sum *sha512,
  *
  * Since: 2.16
  */
-gssize
-g_checksum_type_get_length (GChecksumType checksum_type)
+xssize_t
+xchecksum_type_get_length (GChecksumType checksum_type)
 {
-  gssize len = -1;
+  xssize_t len = -1;
 
   switch (checksum_type)
     {
@@ -1444,54 +1444,54 @@ g_checksum_type_get_length (GChecksumType checksum_type)
 }
 
 /**
- * g_checksum_new:
+ * xchecksum_new:
  * @checksum_type: the desired type of checksum
  *
- * Creates a new #GChecksum, using the checksum algorithm @checksum_type.
+ * Creates a new #xchecksum_t, using the checksum algorithm @checksum_type.
  * If the @checksum_type is not known, %NULL is returned.
- * A #GChecksum can be used to compute the checksum, or digest, of an
+ * A #xchecksum_t can be used to compute the checksum, or digest, of an
  * arbitrary binary blob, using different hashing algorithms.
  *
- * A #GChecksum works by feeding a binary blob through g_checksum_update()
+ * A #xchecksum_t works by feeding a binary blob through xchecksum_update()
  * until there is data to be checked; the digest can then be extracted
- * using g_checksum_get_string(), which will return the checksum as a
- * hexadecimal string; or g_checksum_get_digest(), which will return a
- * vector of raw bytes. Once either g_checksum_get_string() or
- * g_checksum_get_digest() have been called on a #GChecksum, the checksum
- * will be closed and it won't be possible to call g_checksum_update()
+ * using xchecksum_get_string(), which will return the checksum as a
+ * hexadecimal string; or xchecksum_get_digest(), which will return a
+ * vector of raw bytes. Once either xchecksum_get_string() or
+ * xchecksum_get_digest() have been called on a #xchecksum_t, the checksum
+ * will be closed and it won't be possible to call xchecksum_update()
  * on it anymore.
  *
- * Returns: (transfer full) (nullable): the newly created #GChecksum, or %NULL.
- *   Use g_checksum_free() to free the memory allocated by it.
+ * Returns: (transfer full) (nullable): the newly created #xchecksum_t, or %NULL.
+ *   Use xchecksum_free() to free the memory allocated by it.
  *
  * Since: 2.16
  */
-GChecksum *
-g_checksum_new (GChecksumType checksum_type)
+xchecksum_t *
+xchecksum_new (GChecksumType checksum_type)
 {
-  GChecksum *checksum;
+  xchecksum_t *checksum;
 
   if (! IS_VALID_TYPE (checksum_type))
     return NULL;
 
-  checksum = g_slice_new0 (GChecksum);
+  checksum = g_slice_new0 (xchecksum_t);
   checksum->type = checksum_type;
 
-  g_checksum_reset (checksum);
+  xchecksum_reset (checksum);
 
   return checksum;
 }
 
 /**
- * g_checksum_reset:
- * @checksum: the #GChecksum to reset
+ * xchecksum_reset:
+ * @checksum: the #xchecksum_t to reset
  *
  * Resets the state of the @checksum back to its initial state.
  *
  * Since: 2.18
  **/
 void
-g_checksum_reset (GChecksum *checksum)
+xchecksum_reset (xchecksum_t *checksum)
 {
   g_return_if_fail (checksum != NULL);
 
@@ -1522,68 +1522,68 @@ g_checksum_reset (GChecksum *checksum)
 }
 
 /**
- * g_checksum_copy:
- * @checksum: the #GChecksum to copy
+ * xchecksum_copy:
+ * @checksum: the #xchecksum_t to copy
  *
- * Copies a #GChecksum. If @checksum has been closed, by calling
- * g_checksum_get_string() or g_checksum_get_digest(), the copied
+ * Copies a #xchecksum_t. If @checksum has been closed, by calling
+ * xchecksum_get_string() or xchecksum_get_digest(), the copied
  * checksum will be closed as well.
  *
- * Returns: (transfer full): the copy of the passed #GChecksum. Use
- *   g_checksum_free() when finished using it.
+ * Returns: (transfer full): the copy of the passed #xchecksum_t. Use
+ *   xchecksum_free() when finished using it.
  *
  * Since: 2.16
  */
-GChecksum *
-g_checksum_copy (const GChecksum *checksum)
+xchecksum_t *
+xchecksum_copy (const xchecksum_t *checksum)
 {
-  GChecksum *copy;
+  xchecksum_t *copy;
 
   g_return_val_if_fail (checksum != NULL, NULL);
 
-  copy = g_slice_new (GChecksum);
+  copy = g_slice_new (xchecksum_t);
   *copy = *checksum;
 
-  copy->digest_str = g_strdup (checksum->digest_str);
+  copy->digest_str = xstrdup (checksum->digest_str);
 
   return copy;
 }
 
 /**
- * g_checksum_free:
- * @checksum: a #GChecksum
+ * xchecksum_free:
+ * @checksum: a #xchecksum_t
  *
  * Frees the memory allocated for @checksum.
  *
  * Since: 2.16
  */
 void
-g_checksum_free (GChecksum *checksum)
+xchecksum_free (xchecksum_t *checksum)
 {
   if (G_LIKELY (checksum))
     {
       g_free (checksum->digest_str);
 
-      g_slice_free (GChecksum, checksum);
+      g_slice_free (xchecksum_t, checksum);
     }
 }
 
 /**
- * g_checksum_update:
- * @checksum: a #GChecksum
- * @data: (array length=length) (element-type guint8): buffer used to compute the checksum
+ * xchecksum_update:
+ * @checksum: a #xchecksum_t
+ * @data: (array length=length) (element-type xuint8_t): buffer used to compute the checksum
  * @length: size of the buffer, or -1 if it is a null-terminated string.
  *
- * Feeds @data into an existing #GChecksum. The checksum must still be
- * open, that is g_checksum_get_string() or g_checksum_get_digest() must
+ * Feeds @data into an existing #xchecksum_t. The checksum must still be
+ * open, that is xchecksum_get_string() or xchecksum_get_digest() must
  * not have been called on @checksum.
  *
  * Since: 2.16
  */
 void
-g_checksum_update (GChecksum    *checksum,
+xchecksum_update (xchecksum_t    *checksum,
                    const guchar *data,
-                   gssize        length)
+                   xssize_t        length)
 {
   g_return_if_fail (checksum != NULL);
   g_return_if_fail (length == 0 || data != NULL);
@@ -1621,13 +1621,13 @@ g_checksum_update (GChecksum    *checksum,
 }
 
 /**
- * g_checksum_get_string:
- * @checksum: a #GChecksum
+ * xchecksum_get_string:
+ * @checksum: a #xchecksum_t
  *
  * Gets the digest as a hexadecimal string.
  *
- * Once this function has been called the #GChecksum can no longer be
- * updated with g_checksum_update().
+ * Once this function has been called the #xchecksum_t can no longer be
+ * updated with xchecksum_update().
  *
  * The hexadecimal characters will be lower case.
  *
@@ -1638,7 +1638,7 @@ g_checksum_update (GChecksum    *checksum,
  * Since: 2.16
  */
 const xchar_t *
-g_checksum_get_string (GChecksum *checksum)
+xchecksum_get_string (xchecksum_t *checksum)
 {
   xchar_t *str = NULL;
 
@@ -1680,8 +1680,8 @@ g_checksum_get_string (GChecksum *checksum)
 }
 
 /**
- * g_checksum_get_digest: (skip)
- * @checksum: a #GChecksum
+ * xchecksum_get_digest: (skip)
+ * @checksum: a #xchecksum_t
  * @buffer: (array length=digest_len): output buffer
  * @digest_len: (inout): an inout parameter. The caller initializes it to the size of @buffer.
  *   After the call it contains the length of the digest.
@@ -1689,14 +1689,14 @@ g_checksum_get_string (GChecksum *checksum)
  * Gets the digest from @checksum as a raw binary vector and places it
  * into @buffer. The size of the digest depends on the type of checksum.
  *
- * Once this function has been called, the #GChecksum is closed and can
- * no longer be updated with g_checksum_update().
+ * Once this function has been called, the #xchecksum_t is closed and can
+ * no longer be updated with xchecksum_update().
  *
  * Since: 2.16
  */
 void
-g_checksum_get_digest (GChecksum  *checksum,
-                       guint8     *buffer,
+xchecksum_get_digest (xchecksum_t  *checksum,
+                       xuint8_t     *buffer,
                        xsize_t      *digest_len)
 {
   xboolean_t checksum_open = FALSE;
@@ -1705,7 +1705,7 @@ g_checksum_get_digest (GChecksum  *checksum,
 
   g_return_if_fail (checksum != NULL);
 
-  len = g_checksum_type_get_length (checksum->type);
+  len = xchecksum_type_get_length (checksum->type);
   g_return_if_fail (*digest_len >= len);
 
   checksum_open = !!(checksum->digest_str == NULL);
@@ -1766,17 +1766,17 @@ g_checksum_get_digest (GChecksum  *checksum,
 /**
  * g_compute_checksum_for_data:
  * @checksum_type: a #GChecksumType
- * @data: (array length=length) (element-type guint8): binary blob to compute the digest of
+ * @data: (array length=length) (element-type xuint8_t): binary blob to compute the digest of
  * @length: length of @data
  *
  * Computes the checksum for a binary @data of @length. This is a
- * convenience wrapper for g_checksum_new(), g_checksum_get_string()
- * and g_checksum_free().
+ * convenience wrapper for xchecksum_new(), xchecksum_get_string()
+ * and xchecksum_free().
  *
  * The hexadecimal string returned will be in lower case.
  *
  * Returns: (transfer full) (nullable): the digest of the binary data as a
- *   string in hexadecimal, or %NULL if g_checksum_new() fails for
+ *   string in hexadecimal, or %NULL if xchecksum_new() fails for
  *   @checksum_type. The returned string should be freed with g_free() when
  *   done using it.
  *
@@ -1787,18 +1787,18 @@ g_compute_checksum_for_data (GChecksumType  checksum_type,
                              const guchar  *data,
                              xsize_t          length)
 {
-  GChecksum *checksum;
+  xchecksum_t *checksum;
   xchar_t *retval;
 
   g_return_val_if_fail (length == 0 || data != NULL, NULL);
 
-  checksum = g_checksum_new (checksum_type);
+  checksum = xchecksum_new (checksum_type);
   if (!checksum)
     return NULL;
 
-  g_checksum_update (checksum, data, length);
-  retval = g_strdup (g_checksum_get_string (checksum));
-  g_checksum_free (checksum);
+  xchecksum_update (checksum, data, length);
+  retval = xstrdup (xchecksum_get_string (checksum));
+  xchecksum_free (checksum);
 
   return retval;
 }
@@ -1814,7 +1814,7 @@ g_compute_checksum_for_data (GChecksumType  checksum_type,
  * The hexadecimal string returned will be in lower case.
  *
  * Returns: (transfer full) (nullable): the checksum as a hexadecimal string,
- *   or %NULL if g_checksum_new() fails for @checksum_type. The returned string
+ *   or %NULL if xchecksum_new() fails for @checksum_type. The returned string
  *   should be freed with g_free() when done using it.
  *
  * Since: 2.16
@@ -1822,7 +1822,7 @@ g_compute_checksum_for_data (GChecksumType  checksum_type,
 xchar_t *
 g_compute_checksum_for_string (GChecksumType  checksum_type,
                                const xchar_t   *str,
-                               gssize         length)
+                               xssize_t         length)
 {
   g_return_val_if_fail (length == 0 || str != NULL, NULL);
 
@@ -1838,13 +1838,13 @@ g_compute_checksum_for_string (GChecksumType  checksum_type,
  * @data: binary blob to compute the digest of
  *
  * Computes the checksum for a binary @data. This is a
- * convenience wrapper for g_checksum_new(), g_checksum_get_string()
- * and g_checksum_free().
+ * convenience wrapper for xchecksum_new(), xchecksum_get_string()
+ * and xchecksum_free().
  *
  * The hexadecimal string returned will be in lower case.
  *
  * Returns: (transfer full) (nullable): the digest of the binary data as a
- *   string in hexadecimal, or %NULL if g_checksum_new() fails for
+ *   string in hexadecimal, or %NULL if xchecksum_new() fails for
  *   @checksum_type. The returned string should be freed with g_free() when
  *   done using it.
  *
@@ -1852,13 +1852,13 @@ g_compute_checksum_for_string (GChecksumType  checksum_type,
  */
 xchar_t *
 g_compute_checksum_for_bytes (GChecksumType  checksum_type,
-                              GBytes        *data)
+                              xbytes_t        *data)
 {
-  gconstpointer byte_data;
+  xconstpointer byte_data;
   xsize_t length;
 
   g_return_val_if_fail (data != NULL, NULL);
 
-  byte_data = g_bytes_get_data (data, &length);
+  byte_data = xbytes_get_data (data, &length);
   return g_compute_checksum_for_data (checksum_type, byte_data, length);
 }

@@ -65,7 +65,7 @@
  * @title: Threads
  * @short_description: portable support for threads, mutexes, locks,
  *     conditions and thread private data
- * @see_also: #GThreadPool, #GAsyncQueue
+ * @see_also: #GThreadPool, #xasync_queue_t
  *
  * Threads act almost like processes, but unlike processes all threads
  * of one process share the same memory. This is good, as it provides
@@ -80,22 +80,22 @@
  * The aim of the thread-related functions in GLib is to provide a
  * portable means for writing multi-threaded software. There are
  * primitives for mutexes to protect the access to portions of memory
- * (#GMutex, #GRecMutex and #GRWLock). There is a facility to use
+ * (#xmutex_t, #GRecMutex and #GRWLock). There is a facility to use
  * individual bits for locks (g_bit_lock()). There are primitives
- * for condition variables to allow synchronization of threads (#GCond).
+ * for condition variables to allow synchronization of threads (#xcond_t).
  * There are primitives for thread-private data - data that every
  * thread has a private instance of (#GPrivate). There are facilities
  * for one-time initialization (#GOnce, g_once_init_enter()). Finally,
- * there are primitives to create and manage threads (#GThread).
+ * there are primitives to create and manage threads (#xthread_t).
  *
- * The GLib threading system used to be initialized with g_thread_init().
+ * The GLib threading system used to be initialized with xthread_init().
  * This is no longer necessary. Since version 2.32, the GLib threading
  * system is automatically initialized at the start of your program,
  * and all thread-creation functions and synchronization primitives
  * are available right away.
  *
  * Note that it is not safe to assume that your program has no threads
- * even if you don't call g_thread_new() yourself. GLib and GIO can
+ * even if you don't call xthread_new() yourself. GLib and GIO can
  * and will create threads for their own purposes in some cases, such
  * as when using g_unix_signal_source_new() or when using GDBus.
  *
@@ -106,7 +106,7 @@
  * - C library functions that return data in statically allocated
  *   buffers, such as strtok() or strerror(). For many of these,
  *   there are thread-safe variants with a _r suffix, or you can
- *   look at corresponding GLib APIs (like g_strsplit() or g_strerror()).
+ *   look at corresponding GLib APIs (like xstrsplit() or xstrerror()).
  *
  * - The functions setenv() and unsetenv() manipulate the process
  *   environment in a not thread-safe way, and may interfere with getenv()
@@ -137,11 +137,11 @@
  * GLib itself is internally completely thread-safe (all global data is
  * automatically locked), but individual data structure instances are
  * not automatically locked for performance reasons. For example,
- * you must coordinate accesses to the same #GHashTable from multiple
- * threads. The two notable exceptions from this rule are #GMainLoop
- * and #GAsyncQueue, which are thread-safe and need no further
+ * you must coordinate accesses to the same #xhashtable_t from multiple
+ * threads. The two notable exceptions from this rule are #xmain_loop_t
+ * and #xasync_queue_t, which are thread-safe and need no further
  * application-level locking to be accessed from multiple threads.
- * Most refcounting functions such as g_object_ref() are also thread-safe.
+ * Most refcounting functions such as xobject_ref() are also thread-safe.
  *
  * A common use for #GThreads is to move a long-running blocking operation out
  * of the main thread and into a worker thread. For GLib functions, such as
@@ -149,12 +149,12 @@
  * Instead, the `…_async()` version of the function should be used from the main
  * thread, eliminating the need for locking and synchronisation between multiple
  * threads. If an operation does need to be moved to a worker thread, consider
- * using g_task_run_in_thread(), or a #GThreadPool. #GThreadPool is often a
- * better choice than #GThread, as it handles thread reuse and task queueing;
- * #GTask uses this internally.
+ * using xtask_run_in_thread(), or a #GThreadPool. #GThreadPool is often a
+ * better choice than #xthread_t, as it handles thread reuse and task queueing;
+ * #xtask_t uses this internally.
  *
  * However, if multiple blocking operations need to be performed in sequence,
- * and it is not possible to use #GTask for them, moving them to a worker thread
+ * and it is not possible to use #xtask_t for them, moving them to a worker thread
  * can clarify the code.
  */
 
@@ -164,11 +164,11 @@
  * G_LOCK_DEFINE:
  * @name: the name of the lock
  *
- * The `G_LOCK_` macros provide a convenient interface to #GMutex.
+ * The `G_LOCK_` macros provide a convenient interface to #xmutex_t.
  * %G_LOCK_DEFINE defines a lock. It can appear in any place where
  * variable definitions may appear in programs, i.e. in the first block
  * of a function or outside of functions. The @name parameter will be
- * mangled to get the name of the #GMutex. This means that you
+ * mangled to get the name of the #xmutex_t. This means that you
  * can use names of existing variables as the parameter - e.g. the name
  * of the variable you intend to protect with the lock. Look at our
  * give_me_next_number() example using the `G_LOCK` macros:
@@ -234,12 +234,12 @@
  * %G_LOCK_DEFINE.
  */
 
-/* GMutex Documentation {{{1 ------------------------------------------ */
+/* xmutex_t Documentation {{{1 ------------------------------------------ */
 
 /**
- * GMutex:
+ * xmutex_t:
  *
- * The #GMutex struct is an opaque data structure to represent a mutex
+ * The #xmutex_t struct is an opaque data structure to represent a mutex
  * (mutual exclusion). It can be used to protect data against shared
  * access.
  *
@@ -259,12 +259,12 @@
  * ]|
  * It is easy to see that this won't work in a multi-threaded
  * application. There current_number must be protected against shared
- * access. A #GMutex can be used as a solution to this problem:
+ * access. A #xmutex_t can be used as a solution to this problem:
  * |[<!-- language="C" -->
  *   int
  *   give_me_next_number (void)
  *   {
- *     static GMutex mutex;
+ *     static xmutex_t mutex;
  *     static int current_number = 0;
  *     int ret_val;
  *
@@ -275,14 +275,14 @@
  *     return ret_val;
  *   }
  * ]|
- * Notice that the #GMutex is not initialised to any particular value.
+ * Notice that the #xmutex_t is not initialised to any particular value.
  * Its placement in static storage ensures that it will be initialised
  * to all-zeros, which is appropriate.
  *
- * If a #GMutex is placed in other contexts (eg: embedded in a struct)
+ * If a #xmutex_t is placed in other contexts (eg: embedded in a struct)
  * then it must be explicitly initialised using g_mutex_init().
  *
- * A #GMutex should only be accessed via g_mutex_ functions.
+ * A #xmutex_t should only be accessed via g_mutex_ functions.
  */
 
 /* GRecMutex Documentation {{{1 -------------------------------------- */
@@ -291,7 +291,7 @@
  * GRecMutex:
  *
  * The GRecMutex struct is an opaque data structure to represent a
- * recursive mutex. It is similar to a #GMutex with the difference
+ * recursive mutex. It is similar to a #xmutex_t with the difference
  * that it is possible to lock a GRecMutex multiple times in the same
  * thread without deadlock. When doing so, care has to be taken to
  * unlock the recursive mutex as often as it has been locked.
@@ -312,7 +312,7 @@
  * GRWLock:
  *
  * The GRWLock struct is an opaque data structure to represent a
- * reader-writer lock. It is similar to a #GMutex in that it allows
+ * reader-writer lock. It is similar to a #xmutex_t in that it allows
  * multiple threads to coordinate access to a shared resource.
  *
  * The difference to a mutex is that a reader-writer lock discriminates
@@ -329,7 +329,7 @@
  * Here is an example for an array with access functions:
  * |[<!-- language="C" -->
  *   GRWLock lock;
- *   GPtrArray *array;
+ *   xptr_array_t *array;
  *
  *   xpointer_t
  *   my_array_get (xuint_t index)
@@ -341,7 +341,7 @@
  *
  *     g_rw_lock_reader_lock (&lock);
  *     if (index < array->len)
- *       retval = g_ptr_array_index (array, index);
+ *       retval = xptr_array_index (array, index);
  *     g_rw_lock_reader_unlock (&lock);
  *
  *     return retval;
@@ -353,11 +353,11 @@
  *     g_rw_lock_writer_lock (&lock);
  *
  *     if (!array)
- *       array = g_ptr_array_new ();
+ *       array = xptr_array_new ();
  *
  *     if (index >= array->len)
- *       g_ptr_array_set_size (array, index+1);
- *     g_ptr_array_index (array, index) = data;
+ *       xptr_array_set_size (array, index+1);
+ *     xptr_array_index (array, index) = data;
  *
  *     g_rw_lock_writer_unlock (&lock);
  *   }
@@ -378,15 +378,15 @@
  * Since: 2.32
  */
 
-/* GCond Documentation {{{1 ------------------------------------------ */
+/* xcond_t Documentation {{{1 ------------------------------------------ */
 
 /**
- * GCond:
+ * xcond_t:
  *
- * The #GCond struct is an opaque data structure that represents a
- * condition. Threads can block on a #GCond if they find a certain
+ * The #xcond_t struct is an opaque data structure that represents a
+ * condition. Threads can block on a #xcond_t if they find a certain
  * condition to be false. If other threads change the state of this
- * condition they signal the #GCond, and that causes the waiting
+ * condition they signal the #xcond_t, and that causes the waiting
  * threads to be woken up.
  *
  * Consider the following example of a shared variable.  One or more
@@ -394,12 +394,12 @@
  * another thread publishes the data, it can signal one of the waiting
  * threads to wake up to collect the data.
  *
- * Here is an example for using GCond to block a thread until a condition
+ * Here is an example for using xcond_t to block a thread until a condition
  * is satisfied:
  * |[<!-- language="C" -->
  *   xpointer_t current_data = NULL;
- *   GMutex data_mutex;
- *   GCond data_cond;
+ *   xmutex_t data_mutex;
+ *   xcond_t data_cond;
  *
  *   void
  *   push_data (xpointer_t data)
@@ -434,7 +434,7 @@
  * race between the check of @current_data by the while loop in
  * pop_data() and waiting. Specifically, another thread could set
  * @current_data after the check, and signal the cond (with nobody
- * waiting on it) before the first thread goes to sleep. #GCond is
+ * waiting on it) before the first thread goes to sleep. #xcond_t is
  * specifically useful for its ability to release the mutex and go
  * to sleep atomically.
  *
@@ -443,27 +443,27 @@
  * true.  See g_cond_wait() for an explanation of why the condition may
  * not be true even after it returns.
  *
- * If a #GCond is allocated in static storage then it can be used
+ * If a #xcond_t is allocated in static storage then it can be used
  * without initialisation.  Otherwise, you should call g_cond_init()
  * on it and g_cond_clear() when done.
  *
- * A #GCond should only be accessed via the g_cond_ functions.
+ * A #xcond_t should only be accessed via the g_cond_ functions.
  */
 
-/* GThread Documentation {{{1 ---------------------------------------- */
+/* xthread_t Documentation {{{1 ---------------------------------------- */
 
 /**
- * GThread:
+ * xthread_t:
  *
- * The #GThread struct represents a running thread. This struct
- * is returned by g_thread_new() or g_thread_try_new(). You can
- * obtain the #GThread struct representing the current thread by
- * calling g_thread_self().
+ * The #xthread_t struct represents a running thread. This struct
+ * is returned by xthread_new() or xthread_try_new(). You can
+ * obtain the #xthread_t struct representing the current thread by
+ * calling xthread_self().
  *
- * GThread is refcounted, see g_thread_ref() and g_thread_unref().
+ * xthread_t is refcounted, see xthread_ref() and xthread_unref().
  * The thread represented by it holds a reference while it is running,
- * and g_thread_join() consumes the reference that it is given, so
- * it is normally not necessary to manage GThread references
+ * and xthread_join() consumes the reference that it is given, so
+ * it is normally not necessary to manage xthread_t references
  * explicitly.
  *
  * The structure is opaque -- none of its fields may be directly
@@ -474,19 +474,19 @@
  * GThreadFunc:
  * @data: data passed to the thread
  *
- * Specifies the type of the @func functions passed to g_thread_new()
- * or g_thread_try_new().
+ * Specifies the type of the @func functions passed to xthread_new()
+ * or xthread_try_new().
  *
  * Returns: the return value of the thread
  */
 
 /**
- * g_thread_supported:
+ * xthread_supported:
  *
  * This macro returns %TRUE if the thread system is initialized,
  * and %FALSE if it is not.
  *
- * For language bindings, g_thread_get_initialized() provides
+ * For language bindings, xthread_get_initialized() provides
  * the same functionality as a function.
  *
  * Returns: %TRUE, if the thread system is initialized
@@ -506,18 +506,18 @@
  *
  * The error domain of the GLib thread subsystem.
  **/
-G_DEFINE_QUARK (g_thread_error, g_thread_error)
+G_DEFINE_QUARK (xthread_error, xthread_error)
 
 /* Local Data {{{1 -------------------------------------------------------- */
 
-static GMutex    g_once_mutex;
-static GCond     g_once_cond;
-static GSList   *g_once_init_list = NULL;
+static xmutex_t    g_once_mutex;
+static xcond_t     g_once_cond;
+static xslist_t   *g_once_init_list = NULL;
 
-static xuint_t g_thread_n_created_counter = 0;  /* (atomic) */
+static xuint_t xthread_n_created_counter = 0;  /* (atomic) */
 
-static void g_thread_cleanup (xpointer_t data);
-static GPrivate     g_thread_specific_private = G_PRIVATE_INIT (g_thread_cleanup);
+static void xthread_cleanup (xpointer_t data);
+static GPrivate     xthread_specific_private = G_PRIVATE_INIT (xthread_cleanup);
 
 /*
  * g_private_set_alloc0:
@@ -703,15 +703,15 @@ xboolean_t
   g_mutex_lock (&g_once_mutex);
   if (g_atomic_pointer_get (value_location) == 0)
     {
-      if (!g_slist_find (g_once_init_list, (void*) value_location))
+      if (!xslist_find (g_once_init_list, (void*) value_location))
         {
           need_init = TRUE;
-          g_once_init_list = g_slist_prepend (g_once_init_list, (void*) value_location);
+          g_once_init_list = xslist_prepend (g_once_init_list, (void*) value_location);
         }
       else
         do
           g_cond_wait (&g_once_cond, &g_once_mutex);
-        while (g_slist_find (g_once_init_list, (void*) value_location));
+        while (xslist_find (g_once_init_list, (void*) value_location));
     }
   g_mutex_unlock (&g_once_mutex);
   return need_init;
@@ -746,16 +746,16 @@ void
   g_atomic_pointer_set (value_location, result);
   g_mutex_lock (&g_once_mutex);
   g_return_if_fail (g_once_init_list != NULL);
-  g_once_init_list = g_slist_remove (g_once_init_list, (void*) value_location);
+  g_once_init_list = xslist_remove (g_once_init_list, (void*) value_location);
   g_cond_broadcast (&g_once_cond);
   g_mutex_unlock (&g_once_mutex);
 }
 
-/* GThread {{{1 -------------------------------------------------------- */
+/* xthread_t {{{1 -------------------------------------------------------- */
 
 /**
- * g_thread_ref:
- * @thread: a #GThread
+ * xthread_ref:
+ * @thread: a #xthread_t
  *
  * Increase the reference count on @thread.
  *
@@ -763,8 +763,8 @@ void
  *
  * Since: 2.32
  */
-GThread *
-g_thread_ref (GThread *thread)
+xthread_t *
+xthread_ref (xthread_t *thread)
 {
   GRealThread *real = (GRealThread *) thread;
 
@@ -774,20 +774,20 @@ g_thread_ref (GThread *thread)
 }
 
 /**
- * g_thread_unref:
- * @thread: (transfer full): a #GThread
+ * xthread_unref:
+ * @thread: (transfer full): a #xthread_t
  *
  * Decrease the reference count on @thread, possibly freeing all
  * resources associated with it.
  *
- * Note that each thread holds a reference to its #GThread while
+ * Note that each thread holds a reference to its #xthread_t while
  * it is running, so it is safe to drop your own reference to it
  * if you don't need it anymore.
  *
  * Since: 2.32
  */
 void
-g_thread_unref (GThread *thread)
+xthread_unref (xthread_t *thread)
 {
   GRealThread *real = (GRealThread *) thread;
 
@@ -801,18 +801,18 @@ g_thread_unref (GThread *thread)
 }
 
 static void
-g_thread_cleanup (xpointer_t data)
+xthread_cleanup (xpointer_t data)
 {
-  g_thread_unref (data);
+  xthread_unref (data);
 }
 
 xpointer_t
-g_thread_proxy (xpointer_t data)
+xthread_proxy (xpointer_t data)
 {
   GRealThread* thread = data;
 
   g_assert (data);
-  g_private_set (&g_thread_specific_private, data);
+  g_private_set (&xthread_specific_private, data);
 
   TRACE (XPL_THREAD_SPAWNED (thread->thread.func, thread->thread.data,
                               thread->name));
@@ -830,36 +830,36 @@ g_thread_proxy (xpointer_t data)
 }
 
 xuint_t
-g_thread_n_created (void)
+xthread_n_created (void)
 {
-  return g_atomic_int_get (&g_thread_n_created_counter);
+  return g_atomic_int_get (&xthread_n_created_counter);
 }
 
 /**
- * g_thread_new:
+ * xthread_new:
  * @name: (nullable): an (optional) name for the new thread
  * @func: (closure data) (scope async): a function to execute in the new thread
  * @data: (nullable): an argument to supply to the new thread
  *
  * This function creates a new thread. The new thread starts by invoking
  * @func with the argument data. The thread will run until @func returns
- * or until g_thread_exit() is called from the new thread. The return value
+ * or until xthread_exit() is called from the new thread. The return value
  * of @func becomes the return value of the thread, which can be obtained
- * with g_thread_join().
+ * with xthread_join().
  *
  * The @name can be useful for discriminating threads in a debugger.
  * It is not used for other purposes and does not have to be unique.
  * Some systems restrict the length of @name to 16 bytes.
  *
  * If the thread can not be created the program aborts. See
- * g_thread_try_new() if you want to attempt to deal with failures.
+ * xthread_try_new() if you want to attempt to deal with failures.
  *
  * If you are using threads to offload (potentially many) short-lived tasks,
  * #GThreadPool may be more appropriate than manually spawning and tracking
  * multiple #GThreads.
  *
- * To free the struct returned by this function, use g_thread_unref().
- * Note that g_thread_join() implicitly unrefs the #GThread as well.
+ * To free the struct returned by this function, use xthread_unref().
+ * Note that xthread_join() implicitly unrefs the #xthread_t as well.
  *
  * New threads by default inherit their scheduler policy (POSIX) or thread
  * priority (Windows) of the thread creating the new thread.
@@ -869,54 +869,54 @@ g_thread_n_created (void)
  * Starting with GLib 2.64 the behaviour is now consistent between Windows and
  * POSIX and all threads inherit their parent thread's priority.
  *
- * Returns: (transfer full): the new #GThread
+ * Returns: (transfer full): the new #xthread_t
  *
  * Since: 2.32
  */
-GThread *
-g_thread_new (const xchar_t *name,
+xthread_t *
+xthread_new (const xchar_t *name,
               GThreadFunc  func,
               xpointer_t     data)
 {
   xerror_t *error = NULL;
-  GThread *thread;
+  xthread_t *thread;
 
-  thread = g_thread_new_internal (name, g_thread_proxy, func, data, 0, NULL, &error);
+  thread = xthread_new_internal (name, xthread_proxy, func, data, 0, NULL, &error);
 
   if G_UNLIKELY (thread == NULL)
-    g_error ("creating thread '%s': %s", name ? name : "", error->message);
+    xerror ("creating thread '%s': %s", name ? name : "", error->message);
 
   return thread;
 }
 
 /**
- * g_thread_try_new:
+ * xthread_try_new:
  * @name: (nullable): an (optional) name for the new thread
  * @func: (closure data) (scope async): a function to execute in the new thread
  * @data: (nullable): an argument to supply to the new thread
  * @error: return location for error, or %NULL
  *
- * This function is the same as g_thread_new() except that
+ * This function is the same as xthread_new() except that
  * it allows for the possibility of failure.
  *
  * If a thread can not be created (due to resource limits),
  * @error is set and %NULL is returned.
  *
- * Returns: (transfer full): the new #GThread, or %NULL if an error occurred
+ * Returns: (transfer full): the new #xthread_t, or %NULL if an error occurred
  *
  * Since: 2.32
  */
-GThread *
-g_thread_try_new (const xchar_t  *name,
+xthread_t *
+xthread_try_new (const xchar_t  *name,
                   GThreadFunc   func,
                   xpointer_t      data,
                   xerror_t      **error)
 {
-  return g_thread_new_internal (name, g_thread_proxy, func, data, 0, NULL, error);
+  return xthread_new_internal (name, xthread_proxy, func, data, 0, NULL, error);
 }
 
-GThread *
-g_thread_new_internal (const xchar_t *name,
+xthread_t *
+xthread_new_internal (const xchar_t *name,
                        GThreadFunc proxy,
                        GThreadFunc func,
                        xpointer_t data,
@@ -926,15 +926,15 @@ g_thread_new_internal (const xchar_t *name,
 {
   g_return_val_if_fail (func != NULL, NULL);
 
-  g_atomic_int_inc (&g_thread_n_created_counter);
+  g_atomic_int_inc (&xthread_n_created_counter);
 
-  g_trace_mark (G_TRACE_CURRENT_TIME, 0, "GLib", "GThread created", "%s", name ? name : "(unnamed)");
-  return (GThread *) g_system_thread_new (proxy, stack_size, scheduler_settings,
+  g_trace_mark (G_TRACE_CURRENT_TIME, 0, "GLib", "xthread_t created", "%s", name ? name : "(unnamed)");
+  return (xthread_t *) g_system_thread_new (proxy, stack_size, scheduler_settings,
                                           name, func, data, error);
 }
 
 xboolean_t
-g_thread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_settings)
+xthread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_settings)
 {
   g_return_val_if_fail (scheduler_settings != NULL, FALSE);
 
@@ -942,30 +942,30 @@ g_thread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_settings)
 }
 
 /**
- * g_thread_exit:
+ * xthread_exit:
  * @retval: the return value of this thread
  *
  * Terminates the current thread.
  *
- * If another thread is waiting for us using g_thread_join() then the
+ * If another thread is waiting for us using xthread_join() then the
  * waiting thread will be woken up and get @retval as the return value
- * of g_thread_join().
+ * of xthread_join().
  *
- * Calling g_thread_exit() with a parameter @retval is equivalent to
- * returning @retval from the function @func, as given to g_thread_new().
+ * Calling xthread_exit() with a parameter @retval is equivalent to
+ * returning @retval from the function @func, as given to xthread_new().
  *
- * You must only call g_thread_exit() from a thread that you created
- * yourself with g_thread_new() or related APIs. You must not call
+ * You must only call xthread_exit() from a thread that you created
+ * yourself with xthread_new() or related APIs. You must not call
  * this function from a thread created with another threading library
  * or or from within a #GThreadPool.
  */
 void
-g_thread_exit (xpointer_t retval)
+xthread_exit (xpointer_t retval)
 {
-  GRealThread* real = (GRealThread*) g_thread_self ();
+  GRealThread* real = (GRealThread*) xthread_self ();
 
   if G_UNLIKELY (!real->ours)
-    g_error ("attempt to g_thread_exit() a thread not created by GLib");
+    xerror ("attempt to xthread_exit() a thread not created by GLib");
 
   real->retval = retval;
 
@@ -973,30 +973,30 @@ g_thread_exit (xpointer_t retval)
 }
 
 /**
- * g_thread_join:
- * @thread: (transfer full): a #GThread
+ * xthread_join:
+ * @thread: (transfer full): a #xthread_t
  *
  * Waits until @thread finishes, i.e. the function @func, as
- * given to g_thread_new(), returns or g_thread_exit() is called.
- * If @thread has already terminated, then g_thread_join()
+ * given to xthread_new(), returns or xthread_exit() is called.
+ * If @thread has already terminated, then xthread_join()
  * returns immediately.
  *
- * Any thread can wait for any other thread by calling g_thread_join(),
- * not just its 'creator'. Calling g_thread_join() from multiple threads
+ * Any thread can wait for any other thread by calling xthread_join(),
+ * not just its 'creator'. Calling xthread_join() from multiple threads
  * for the same @thread leads to undefined behaviour.
  *
- * The value returned by @func or given to g_thread_exit() is
+ * The value returned by @func or given to xthread_exit() is
  * returned by this function.
  *
- * g_thread_join() consumes the reference to the passed-in @thread.
- * This will usually cause the #GThread struct and associated resources
- * to be freed. Use g_thread_ref() to obtain an extra reference if you
- * want to keep the GThread alive beyond the g_thread_join() call.
+ * xthread_join() consumes the reference to the passed-in @thread.
+ * This will usually cause the #xthread_t struct and associated resources
+ * to be freed. Use xthread_ref() to obtain an extra reference if you
+ * want to keep the xthread_t alive beyond the xthread_join() call.
  *
  * Returns: (transfer full): the return value of the thread
  */
 xpointer_t
-g_thread_join (GThread *thread)
+xthread_join (xthread_t *thread)
 {
   GRealThread *real = (GRealThread*) thread;
   xpointer_t retval;
@@ -1011,30 +1011,30 @@ g_thread_join (GThread *thread)
   /* Just to make sure, this isn't used any more */
   thread->joinable = 0;
 
-  g_thread_unref (thread);
+  xthread_unref (thread);
 
   return retval;
 }
 
 /**
- * g_thread_self:
+ * xthread_self:
  *
- * This function returns the #GThread corresponding to the
+ * This function returns the #xthread_t corresponding to the
  * current thread. Note that this function does not increase
  * the reference count of the returned struct.
  *
- * This function will return a #GThread even for threads that
+ * This function will return a #xthread_t even for threads that
  * were not created by GLib (i.e. those created by other threading
  * APIs). This may be useful for thread identification purposes
  * (i.e. comparisons) but you must not use GLib functions (such
- * as g_thread_join()) on these threads.
+ * as xthread_join()) on these threads.
  *
- * Returns: (transfer none): the #GThread representing the current thread
+ * Returns: (transfer none): the #xthread_t representing the current thread
  */
-GThread*
-g_thread_self (void)
+xthread_t*
+xthread_self (void)
 {
-  GRealThread* thread = g_private_get (&g_thread_specific_private);
+  GRealThread* thread = g_private_get (&xthread_specific_private);
 
   if (!thread)
     {
@@ -1045,10 +1045,10 @@ g_thread_self (void)
       thread = g_slice_new0 (GRealThread);
       thread->ref_count = 1;
 
-      g_private_set (&g_thread_specific_private, thread);
+      g_private_set (&xthread_specific_private, thread);
     }
 
-  return (GThread*) thread;
+  return (xthread_t*) thread;
 }
 
 /**
@@ -1056,7 +1056,7 @@ g_thread_self (void)
  *
  * Determine the approximate number of threads that the system will
  * schedule simultaneously for this process.  This is intended to be
- * used as a parameter to g_thread_pool_new() for CPU bound tasks and
+ * used as a parameter to xthread_pool_new() for CPU bound tasks and
  * similar cases.
  *
  * Returns: Number of schedulable threads, always greater than 0

@@ -203,7 +203,7 @@ _g_win32_sid_to_string (SID *sid, xerror_t **error)
       return NULL;
     }
 
-  ret = g_strdup (tmp);
+  ret = xstrdup (tmp);
   LocalFree (tmp);
   return ret;
 }

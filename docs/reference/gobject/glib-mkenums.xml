@@ -36,7 +36,7 @@
 extract enum definitions and produces enum descriptions based on text templates
 specified by the user. Typically, you can use this tool to generate enumeration
 types for the xtype_t type system, for xobject_t properties and signal marshalling;
-additionally, you can use it to generate enumeration values of GSettings schemas.
+additionally, you can use it to generate enumeration values of xsettings_t schemas.
 </para>
 
 <para><command>glib-mkenums</command> takes a list of valid C code files as
@@ -484,7 +484,7 @@ xtype_t
 
   if (g_once_init_enter (&amp;static_g_@type@_type_id))
     {
-      static const G@Type@Value values[] = {
+      static const @type@_value_t values[] = {
 /*** END value-header ***/
 
 /*** BEGIN value-production ***/
@@ -496,7 +496,7 @@ xtype_t
       };
 
       xtype_t g_@type@_type_id =
-        g_@type@_register_static (g_intern_static_string ("@EnumName@"), values);
+        @type@_register_static (g_intern_static_string ("@EnumName@"), values);
 
       g_once_init_leave (&amp;static_g_@type@_type_id, g_@type@_type_id);
     }

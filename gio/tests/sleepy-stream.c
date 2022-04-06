@@ -53,7 +53,7 @@ cook_piece (void)
       g_assert_cmpint (i, <=, sizeof buffer);
     }
 
-  return g_strndup (buffer, i);
+  return xstrndup (buffer, i);
 }
 
 static xchar_t **
@@ -89,7 +89,7 @@ xtype_t sleepy_stream_get_type (void);
 
 G_DEFINE_TYPE (SleepyStream, sleepy_stream, XTYPE_INPUT_STREAM)
 
-static gssize
+static xssize_t
 sleepy_stream_read (xinput_stream_t  *stream,
                     void          *buffer,
                     xsize_t          length,
@@ -137,7 +137,7 @@ sleepy_stream_finalize (xobject_t *object)
 {
   SleepyStream *sleepy = (SleepyStream *) object;
 
-  g_strfreev (sleepy->pieces);
+  xstrfreev (sleepy->pieces);
   G_OBJECT_CLASS (sleepy_stream_parent_class)
     ->finalize (object);
 }
@@ -156,12 +156,12 @@ sleepy_stream_class_init (SleepyStreamClass *class)
 static SleepyStream *
 sleepy_stream_new (void)
 {
-  return g_object_new (sleepy_stream_get_type (), NULL);
+  return xobject_new (sleepy_stream_get_type (), NULL);
 }
 
 static xboolean_t
-read_line (GDataInputStream  *stream,
-           GString           *string,
+read_line (xdata_input_stream_t  *stream,
+           xstring_t           *string,
            const xchar_t       *eol,
            xerror_t           **error)
 {
@@ -176,25 +176,25 @@ read_line (GDataInputStream  *stream,
   g_assert (strstr (str, eol) == NULL);
   g_assert (strlen (str) == length);
 
-  g_string_append (string, str);
-  g_string_append (string, eol);
+  xstring_append (string, str);
+  xstring_append (string, eol);
   g_free (str);
 
   return TRUE;
 }
 
 static void
-build_comparison (GString      *str,
+build_comparison (xstring_t      *str,
                   SleepyStream *stream)
 {
   /* build this for comparison */
   xint_t i;
 
   for (i = 0; stream->pieces[i]; i++)
-    g_string_append (str, stream->pieces[i]);
+    xstring_append (str, stream->pieces[i]);
 
   if (str->len && str->str[str->len - 1] != '\n')
-    g_string_append_c (str, '\n');
+    xstring_append_c (str, '\n');
 }
 
 
@@ -202,13 +202,13 @@ static void
 test (void)
 {
   SleepyStream *stream = sleepy_stream_new ();
-  GDataInputStream *data;
+  xdata_input_stream_t *data;
   xerror_t *error = NULL;
-  GString *one;
-  GString *two;
+  xstring_t *one;
+  xstring_t *two;
 
-  one = g_string_new (NULL);
-  two = g_string_new (NULL);
+  one = xstring_new (NULL);
+  two = xstring_new (NULL);
 
   data = g_data_input_stream_new (G_INPUT_STREAM (stream));
   g_data_input_stream_set_newline_type (data, G_DATA_STREAM_NEWLINE_TYPE_LF);
@@ -217,15 +217,15 @@ test (void)
   while (read_line (data, two, "\n", &error));
 
   g_assert_cmpstr (one->str, ==, two->str);
-  g_string_free (one, TRUE);
-  g_string_free (two, TRUE);
-  g_object_unref (stream);
-  g_object_unref (data);
+  xstring_free (one, TRUE);
+  xstring_free (two, TRUE);
+  xobject_unref (stream);
+  xobject_unref (data);
 }
 
-static GDataInputStream *data;
-static GString *one, *two;
-static GMainLoop *loop;
+static xdata_input_stream_t *data;
+static xstring_t *one, *two;
+static xmain_loop_t *loop;
 static const xchar_t *eol;
 
 static void
@@ -243,15 +243,15 @@ asynch_ready (xobject_t      *object,
 
   if (str == NULL)
     {
-      g_main_loop_quit (loop);
+      xmain_loop_quit (loop);
       if (error)
-        g_error_free (error);
+        xerror_free (error);
     }
   else
     {
       g_assert (length == strlen (str));
-      g_string_append (two, str);
-      g_string_append (two, eol);
+      xstring_append (two, str);
+      xstring_append (two, eol);
       g_free (str);
 
       /* MOAR!! */
@@ -266,19 +266,19 @@ asynch (void)
   SleepyStream *sleepy = sleepy_stream_new ();
 
   data = g_data_input_stream_new (G_INPUT_STREAM (sleepy));
-  one = g_string_new (NULL);
-  two = g_string_new (NULL);
+  one = xstring_new (NULL);
+  two = xstring_new (NULL);
   eol = "\n";
 
   build_comparison (one, sleepy);
   g_data_input_stream_read_line_async (data, 0, NULL, asynch_ready, NULL);
-  g_main_loop_run (loop = g_main_loop_new (NULL, FALSE));
+  xmain_loop_run (loop = xmain_loop_new (NULL, FALSE));
 
   g_assert_cmpstr (one->str, ==, two->str);
-  g_string_free (one, TRUE);
-  g_string_free (two, TRUE);
-  g_object_unref (sleepy);
-  g_object_unref (data);
+  xstring_free (one, TRUE);
+  xstring_free (two, TRUE);
+  xobject_unref (sleepy);
+  xobject_unref (data);
 }
 
 int

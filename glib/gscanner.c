@@ -1,7 +1,7 @@
 /* XPL - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
- * GScanner: Flexible lexical scanner for general purpose.
+ * xscanner_t: Flexible lexical scanner for general purpose.
  * Copyright (C) 1997, 1998 Tim Janik
  *
  * This library is free software; you can redistribute it and/or
@@ -57,13 +57,13 @@
  * @title: Lexical Scanner
  * @short_description: a general purpose lexical scanner
  *
- * The #GScanner and its associated functions provide a
+ * The #xscanner_t and its associated functions provide a
  * general purpose lexical scanner.
  */
 
 /**
  * GScannerMsgFunc:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @message: the message
  * @error: %TRUE if the message signals an error,
  *     %FALSE if it signals a warning.
@@ -177,7 +177,7 @@
  */
 
 /**
- * GScanner:
+ * xscanner_t:
  * @user_data: unused
  * @max_parse_errors: unused
  * @parse_errors: g_scanner_error() increments this field
@@ -269,7 +269,7 @@
  *     default scope in addition to the current scope (the default is %FALSE).
  * @store_int64: use value.v_int64 rather than v_int
  *
- * Specifies the #GScanner parser configuration. Most settings can
+ * Specifies the #xscanner_t parser configuration. Most settings can
  * be changed during the parsing phase and will affect the lexical
  * parsing of the next unpeeked token.
  */
@@ -347,28 +347,28 @@ static const GScannerConfig g_scanner_config_template =
 
 /* --- prototypes --- */
 static inline
-GScannerKey*	g_scanner_lookup_internal (GScanner	*scanner,
+GScannerKey*	g_scanner_lookup_internal (xscanner_t	*scanner,
 					   xuint_t	 scope_id,
 					   const xchar_t	*symbol);
-static xboolean_t	g_scanner_key_equal	  (gconstpointer v1,
-					   gconstpointer v2);
-static xuint_t	g_scanner_key_hash	  (gconstpointer v);
-static void	g_scanner_get_token_ll	  (GScanner	*scanner,
+static xboolean_t	g_scanner_key_equal	  (xconstpointer v1,
+					   xconstpointer v2);
+static xuint_t	g_scanner_key_hash	  (xconstpointer v);
+static void	g_scanner_get_token_ll	  (xscanner_t	*scanner,
 					   GTokenType	*token_p,
 					   GTokenValue	*value_p,
 					   xuint_t	*line_p,
 					   xuint_t	*position_p);
-static void	g_scanner_get_token_i	  (GScanner	*scanner,
+static void	g_scanner_get_token_i	  (xscanner_t	*scanner,
 					   GTokenType	*token_p,
 					   GTokenValue	*value_p,
 					   xuint_t	*line_p,
 					   xuint_t	*position_p);
 
-static guchar	g_scanner_peek_next_char  (GScanner	*scanner);
-static guchar	g_scanner_get_char	  (GScanner	*scanner,
+static guchar	g_scanner_peek_next_char  (xscanner_t	*scanner);
+static guchar	g_scanner_get_char	  (xscanner_t	*scanner,
 					   xuint_t	*line_p,
 					   xuint_t	*position_p);
-static void	g_scanner_msg_handler	  (GScanner	*scanner,
+static void	g_scanner_msg_handler	  (xscanner_t	*scanner,
 					   xchar_t	*message,
 					   xboolean_t	 is_error);
 
@@ -397,24 +397,24 @@ g_scanner_char_2_num (guchar	c,
  * g_scanner_new:
  * @config_templ: the initial scanner settings
  *
- * Creates a new #GScanner.
+ * Creates a new #xscanner_t.
  *
  * The @config_templ structure specifies the initial settings
- * of the scanner, which are copied into the #GScanner
+ * of the scanner, which are copied into the #xscanner_t
  * @config field. If you pass %NULL then the default settings
  * are used.
  *
- * Returns: the new #GScanner
+ * Returns: the new #xscanner_t
  */
-GScanner *
+xscanner_t *
 g_scanner_new (const GScannerConfig *config_templ)
 {
-  GScanner *scanner;
+  xscanner_t *scanner;
 
   if (!config_templ)
     config_templ = &g_scanner_config_template;
 
-  scanner = g_new0 (GScanner, 1);
+  scanner = g_new0 (xscanner_t, 1);
 
   scanner->user_data = NULL;
   scanner->max_parse_errors = 1;
@@ -463,7 +463,7 @@ g_scanner_new (const GScannerConfig *config_templ)
   scanner->next_line = 1;
   scanner->next_position = 0;
 
-  scanner->symbol_table = g_hash_table_new (g_scanner_key_hash, g_scanner_key_equal);
+  scanner->symbol_table = xhash_table_new (g_scanner_key_hash, g_scanner_key_equal);
   scanner->input_fd = -1;
   scanner->text = NULL;
   scanner->text_end = NULL;
@@ -509,19 +509,19 @@ g_scanner_destroy_symbol_table_entry (xpointer_t _key,
 
 /**
  * g_scanner_destroy:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  *
- * Frees all memory used by the #GScanner.
+ * Frees all memory used by the #xscanner_t.
  */
 void
-g_scanner_destroy (GScanner *scanner)
+g_scanner_destroy (xscanner_t *scanner)
 {
   g_return_if_fail (scanner != NULL);
 
   g_datalist_clear (&scanner->qdata);
-  g_hash_table_foreach (scanner->symbol_table,
+  xhash_table_foreach (scanner->symbol_table,
 			g_scanner_destroy_symbol_table_entry, NULL);
-  g_hash_table_destroy (scanner->symbol_table);
+  xhash_table_destroy (scanner->symbol_table);
   g_scanner_free_value (&scanner->token, &scanner->value);
   g_scanner_free_value (&scanner->next_token, &scanner->next_value);
   g_free (scanner->config);
@@ -530,7 +530,7 @@ g_scanner_destroy (GScanner *scanner)
 }
 
 static void
-g_scanner_msg_handler (GScanner		*scanner,
+g_scanner_msg_handler (xscanner_t		*scanner,
 		       xchar_t		*message,
 		       xboolean_t		is_error)
 {
@@ -546,14 +546,14 @@ g_scanner_msg_handler (GScanner		*scanner,
 
 /**
  * g_scanner_error:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @format: the message format. See the printf() documentation
  * @...: the parameters to insert into the format string
  *
- * Outputs an error message, via the #GScanner message handler.
+ * Outputs an error message, via the #xscanner_t message handler.
  */
 void
-g_scanner_error (GScanner	*scanner,
+g_scanner_error (xscanner_t	*scanner,
 		 const xchar_t	*format,
 		 ...)
 {
@@ -568,7 +568,7 @@ g_scanner_error (GScanner	*scanner,
       xchar_t *string;
 
       va_start (args, format);
-      string = g_strdup_vprintf (format, args);
+      string = xstrdup_vprintf (format, args);
       va_end (args);
 
       scanner->msg_handler (scanner, string, TRUE);
@@ -579,14 +579,14 @@ g_scanner_error (GScanner	*scanner,
 
 /**
  * g_scanner_warn:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @format: the message format. See the printf() documentation
  * @...: the parameters to insert into the format string
  *
- * Outputs a warning message, via the #GScanner message handler.
+ * Outputs a warning message, via the #xscanner_t message handler.
  */
 void
-g_scanner_warn (GScanner       *scanner,
+g_scanner_warn (xscanner_t       *scanner,
 		const xchar_t    *format,
 		...)
 {
@@ -599,7 +599,7 @@ g_scanner_warn (GScanner       *scanner,
       xchar_t *string;
 
       va_start (args, format);
-      string = g_strdup_vprintf (format, args);
+      string = xstrdup_vprintf (format, args);
       va_end (args);
 
       scanner->msg_handler (scanner, string, FALSE);
@@ -609,8 +609,8 @@ g_scanner_warn (GScanner       *scanner,
 }
 
 static xboolean_t
-g_scanner_key_equal (gconstpointer v1,
-		     gconstpointer v2)
+g_scanner_key_equal (xconstpointer v1,
+		     xconstpointer v2)
 {
   const GScannerKey *key1 = v1;
   const GScannerKey *key2 = v2;
@@ -619,7 +619,7 @@ g_scanner_key_equal (gconstpointer v1,
 }
 
 static xuint_t
-g_scanner_key_hash (gconstpointer v)
+g_scanner_key_hash (xconstpointer v)
 {
   const GScannerKey *key = v;
   xchar_t *c;
@@ -633,7 +633,7 @@ g_scanner_key_hash (gconstpointer v)
 }
 
 static inline GScannerKey*
-g_scanner_lookup_internal (GScanner	*scanner,
+g_scanner_lookup_internal (xscanner_t	*scanner,
 			   xuint_t	 scope_id,
 			   const xchar_t	*symbol)
 {
@@ -651,13 +651,13 @@ g_scanner_lookup_internal (GScanner	*scanner,
       for (d = key.symbol, c = symbol; *c; c++, d++)
 	*d = to_lower (*c);
       *d = 0;
-      key_p = g_hash_table_lookup (scanner->symbol_table, &key);
+      key_p = xhash_table_lookup (scanner->symbol_table, &key);
       g_free (key.symbol);
     }
   else
     {
       key.symbol = (xchar_t*) symbol;
-      key_p = g_hash_table_lookup (scanner->symbol_table, &key);
+      key_p = xhash_table_lookup (scanner->symbol_table, &key);
     }
 
   return key_p;
@@ -665,7 +665,7 @@ g_scanner_lookup_internal (GScanner	*scanner,
 
 /**
  * g_scanner_add_symbol:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @symbol: the symbol to add
  * @value: the value of the symbol
  *
@@ -676,7 +676,7 @@ g_scanner_lookup_internal (GScanner	*scanner,
 
 /**
  * g_scanner_scope_add_symbol:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @scope_id: the scope id
  * @symbol: the symbol to add
  * @value: the value of the symbol
@@ -684,7 +684,7 @@ g_scanner_lookup_internal (GScanner	*scanner,
  * Adds a symbol to the given scope.
  */
 void
-g_scanner_scope_add_symbol (GScanner	*scanner,
+g_scanner_scope_add_symbol (xscanner_t	*scanner,
 			    xuint_t	 scope_id,
 			    const xchar_t	*symbol,
 			    xpointer_t	 value)
@@ -700,7 +700,7 @@ g_scanner_scope_add_symbol (GScanner	*scanner,
     {
       key = g_new (GScannerKey, 1);
       key->scope_id = scope_id;
-      key->symbol = g_strdup (symbol);
+      key->symbol = xstrdup (symbol);
       key->value = value;
       if (!scanner->config->case_sensitive)
 	{
@@ -713,7 +713,7 @@ g_scanner_scope_add_symbol (GScanner	*scanner,
 	      c++;
 	    }
 	}
-      g_hash_table_add (scanner->symbol_table, key);
+      xhash_table_add (scanner->symbol_table, key);
     }
   else
     key->value = value;
@@ -721,7 +721,7 @@ g_scanner_scope_add_symbol (GScanner	*scanner,
 
 /**
  * g_scanner_remove_symbol:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @symbol: the symbol to remove
  *
  * Removes a symbol from the default scope.
@@ -731,14 +731,14 @@ g_scanner_scope_add_symbol (GScanner	*scanner,
 
 /**
  * g_scanner_scope_remove_symbol:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @scope_id: the scope id
  * @symbol: the symbol to remove
  *
  * Removes a symbol from a scope.
  */
 void
-g_scanner_scope_remove_symbol (GScanner	   *scanner,
+g_scanner_scope_remove_symbol (xscanner_t	   *scanner,
 			       xuint_t	    scope_id,
 			       const xchar_t *symbol)
 {
@@ -751,7 +751,7 @@ g_scanner_scope_remove_symbol (GScanner	   *scanner,
 
   if (key)
     {
-      g_hash_table_remove (scanner->symbol_table, key);
+      xhash_table_remove (scanner->symbol_table, key);
       g_free (key->symbol);
       g_free (key);
     }
@@ -759,7 +759,7 @@ g_scanner_scope_remove_symbol (GScanner	   *scanner,
 
 /**
  * g_scanner_freeze_symbol_table:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  *
  * There is no reason to use this macro, since it does nothing.
  *
@@ -768,7 +768,7 @@ g_scanner_scope_remove_symbol (GScanner	   *scanner,
 
 /**
  * g_scanner_thaw_symbol_table:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  *
  * There is no reason to use this macro, since it does nothing.
  *
@@ -777,7 +777,7 @@ g_scanner_scope_remove_symbol (GScanner	   *scanner,
 
 /**
  * g_scanner_lookup_symbol:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @symbol: the symbol to look up
  *
  * Looks up a symbol in the current scope and return its value.
@@ -788,7 +788,7 @@ g_scanner_scope_remove_symbol (GScanner	   *scanner,
  *     if @symbol is not bound in the current scope
  */
 xpointer_t
-g_scanner_lookup_symbol (GScanner	*scanner,
+g_scanner_lookup_symbol (xscanner_t	*scanner,
 			 const xchar_t	*symbol)
 {
   GScannerKey	*key;
@@ -812,7 +812,7 @@ g_scanner_lookup_symbol (GScanner	*scanner,
 
 /**
  * g_scanner_scope_lookup_symbol:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @scope_id: the scope id
  * @symbol: the symbol to look up
  *
@@ -824,7 +824,7 @@ g_scanner_lookup_symbol (GScanner	*scanner,
  *
  */
 xpointer_t
-g_scanner_scope_lookup_symbol (GScanner	      *scanner,
+g_scanner_scope_lookup_symbol (xscanner_t	      *scanner,
 			       xuint_t	       scope_id,
 			       const xchar_t    *symbol)
 {
@@ -845,7 +845,7 @@ g_scanner_scope_lookup_symbol (GScanner	      *scanner,
 
 /**
  * g_scanner_set_scope:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @scope_id: the new scope id
  *
  * Sets the current scope.
@@ -853,7 +853,7 @@ g_scanner_scope_lookup_symbol (GScanner	      *scanner,
  * Returns: the old scope id
  */
 xuint_t
-g_scanner_set_scope (GScanner	    *scanner,
+g_scanner_set_scope (xscanner_t	    *scanner,
 		     xuint_t	     scope_id)
 {
   xuint_t old_scope_id;
@@ -889,7 +889,7 @@ g_scanner_foreach_internal (xpointer_t  _key,
 
 /**
  * g_scanner_foreach_symbol:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @func: the function to call with each symbol
  * @data: data to pass to the function
  *
@@ -900,18 +900,18 @@ g_scanner_foreach_internal (xpointer_t  _key,
 
 /**
  * g_scanner_scope_foreach_symbol:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @scope_id: the scope id
  * @func: the function to call for each symbol/value pair
  * @user_data: user data to pass to the function
  *
  * Calls the given function for each of the symbol/value pairs
- * in the given scope of the #GScanner. The function is passed
+ * in the given scope of the #xscanner_t. The function is passed
  * the symbol and value of each pair, and the given @user_data
  * parameter.
  */
 void
-g_scanner_scope_foreach_symbol (GScanner       *scanner,
+g_scanner_scope_foreach_symbol (xscanner_t       *scanner,
 				xuint_t		scope_id,
 				GHFunc		func,
 				xpointer_t	user_data)
@@ -924,16 +924,16 @@ g_scanner_scope_foreach_symbol (GScanner       *scanner,
   d[1] = user_data;
   d[2] = &scope_id;
 
-  g_hash_table_foreach (scanner->symbol_table, g_scanner_foreach_internal, d);
+  xhash_table_foreach (scanner->symbol_table, g_scanner_foreach_internal, d);
 }
 
 /**
  * g_scanner_peek_next_token:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  *
  * Parses the next token, without removing it from the input stream.
  * The token data is placed in the @next_token, @next_value, @next_line,
- * and @next_position fields of the #GScanner structure.
+ * and @next_position fields of the #xscanner_t structure.
  *
  * Note that, while the token is not removed from the input stream
  * (i.e. the next call to g_scanner_get_next_token() will return the
@@ -946,7 +946,7 @@ g_scanner_scope_foreach_symbol (GScanner       *scanner,
  * Returns: the type of the token
  */
 GTokenType
-g_scanner_peek_next_token (GScanner	*scanner)
+g_scanner_peek_next_token (xscanner_t	*scanner)
 {
   g_return_val_if_fail (scanner != NULL, G_TOKEN_EOF);
 
@@ -966,17 +966,17 @@ g_scanner_peek_next_token (GScanner	*scanner)
 
 /**
  * g_scanner_get_next_token:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  *
  * Parses the next token just like g_scanner_peek_next_token()
  * and also removes it from the input stream. The token data is
  * placed in the @token, @value, @line, and @position fields of
- * the #GScanner structure.
+ * the #xscanner_t structure.
  *
  * Returns: the type of the token
  */
 GTokenType
-g_scanner_get_next_token (GScanner	*scanner)
+g_scanner_get_next_token (xscanner_t	*scanner)
 {
   g_return_val_if_fail (scanner != NULL, G_TOKEN_EOF);
 
@@ -1002,15 +1002,15 @@ g_scanner_get_next_token (GScanner	*scanner)
 
 /**
  * g_scanner_cur_token:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  *
  * Gets the current token type. This is simply the @token
- * field in the #GScanner structure.
+ * field in the #xscanner_t structure.
  *
  * Returns: the current token type
  */
 GTokenType
-g_scanner_cur_token (GScanner *scanner)
+g_scanner_cur_token (xscanner_t *scanner)
 {
   g_return_val_if_fail (scanner != NULL, G_TOKEN_EOF);
 
@@ -1019,15 +1019,15 @@ g_scanner_cur_token (GScanner *scanner)
 
 /**
  * g_scanner_cur_value:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  *
  * Gets the current token value. This is simply the @value
- * field in the #GScanner structure.
+ * field in the #xscanner_t structure.
  *
  * Returns: the current token value
  */
 GTokenValue
-g_scanner_cur_value (GScanner *scanner)
+g_scanner_cur_value (xscanner_t *scanner)
 {
   GTokenValue v;
 
@@ -1044,7 +1044,7 @@ g_scanner_cur_value (GScanner *scanner)
 
 /**
  * g_scanner_cur_line:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  *
  * Returns the current line in the input stream (counting
  * from 1). This is the line of the last token parsed via
@@ -1053,7 +1053,7 @@ g_scanner_cur_value (GScanner *scanner)
  * Returns: the current line
  */
 xuint_t
-g_scanner_cur_line (GScanner *scanner)
+g_scanner_cur_line (xscanner_t *scanner)
 {
   g_return_val_if_fail (scanner != NULL, 0);
 
@@ -1062,7 +1062,7 @@ g_scanner_cur_line (GScanner *scanner)
 
 /**
  * g_scanner_cur_position:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  *
  * Returns the current position in the current line (counting
  * from 0). This is the position of the last token parsed via
@@ -1071,7 +1071,7 @@ g_scanner_cur_line (GScanner *scanner)
  * Returns: the current position on the line
  */
 xuint_t
-g_scanner_cur_position (GScanner *scanner)
+g_scanner_cur_position (xscanner_t *scanner)
 {
   g_return_val_if_fail (scanner != NULL, 0);
 
@@ -1080,7 +1080,7 @@ g_scanner_cur_position (GScanner *scanner)
 
 /**
  * g_scanner_eof:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  *
  * Returns %TRUE if the scanner has reached the end of
  * the file or text buffer.
@@ -1089,7 +1089,7 @@ g_scanner_cur_position (GScanner *scanner)
  *     the file or text buffer
  */
 xboolean_t
-g_scanner_eof (GScanner	*scanner)
+g_scanner_eof (xscanner_t	*scanner)
 {
   g_return_val_if_fail (scanner != NULL, TRUE);
 
@@ -1098,13 +1098,13 @@ g_scanner_eof (GScanner	*scanner)
 
 /**
  * g_scanner_input_file:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @input_fd: a file descriptor
  *
  * Prepares to scan a file.
  */
 void
-g_scanner_input_file (GScanner *scanner,
+g_scanner_input_file (xscanner_t *scanner,
 		      xint_t	input_fd)
 {
   g_return_if_fail (scanner != NULL);
@@ -1129,14 +1129,14 @@ g_scanner_input_file (GScanner *scanner,
 
 /**
  * g_scanner_input_text:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @text: the text buffer to scan
  * @text_len: the length of the text buffer
  *
  * Prepares to scan a text buffer.
  */
 void
-g_scanner_input_text (GScanner	  *scanner,
+g_scanner_input_text (xscanner_t	  *scanner,
 		      const xchar_t *text,
 		      xuint_t	   text_len)
 {
@@ -1167,7 +1167,7 @@ g_scanner_input_text (GScanner	  *scanner,
 }
 
 static guchar
-g_scanner_peek_next_char (GScanner *scanner)
+g_scanner_peek_next_char (xscanner_t *scanner)
 {
   if (scanner->text < scanner->text_end)
     {
@@ -1205,7 +1205,7 @@ g_scanner_peek_next_char (GScanner *scanner)
 
 /**
  * g_scanner_sync_file_offset:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  *
  * Rewinds the filedescriptor to the current buffer position
  * and blows the file read ahead buffer. This is useful for
@@ -1213,7 +1213,7 @@ g_scanner_peek_next_char (GScanner *scanner)
  * onto the current scanning position.
  */
 void
-g_scanner_sync_file_offset (GScanner *scanner)
+g_scanner_sync_file_offset (xscanner_t *scanner)
 {
   g_return_if_fail (scanner != NULL);
 
@@ -1240,7 +1240,7 @@ g_scanner_sync_file_offset (GScanner *scanner)
 }
 
 static guchar
-g_scanner_get_char (GScanner	*scanner,
+g_scanner_get_char (xscanner_t	*scanner,
 		    xuint_t	*line_p,
 		    xuint_t	*position_p)
 {
@@ -1296,7 +1296,7 @@ g_scanner_get_char (GScanner	*scanner,
 
 /**
  * g_scanner_unexp_token:
- * @scanner: a #GScanner
+ * @scanner: a #xscanner_t
  * @expected_token: the expected token
  * @identifier_spec: a string describing how the scanner's user
  *     refers to identifiers (%NULL defaults to "identifier").
@@ -1322,7 +1322,7 @@ g_scanner_get_char (GScanner	*scanner,
  * to construct part of the message.
  */
 void
-g_scanner_unexp_token (GScanner		*scanner,
+g_scanner_unexp_token (xscanner_t		*scanner,
 		       GTokenType	 expected_token,
 		       const xchar_t	*identifier_spec,
 		       const xchar_t	*symbol_spec,
@@ -1336,7 +1336,7 @@ g_scanner_unexp_token (GScanner		*scanner,
   xuint_t	expected_string_len;
   xchar_t	*message_prefix;
   xboolean_t print_unexp;
-  void (*msg_handler)	(GScanner*, const xchar_t*, ...);
+  void (*msg_handler)	(xscanner_t*, const xchar_t*, ...);
 
   g_return_if_fail (scanner != NULL);
 
@@ -1649,7 +1649,7 @@ g_scanner_unexp_token (GScanner		*scanner,
 }
 
 static void
-g_scanner_get_token_i (GScanner	*scanner,
+g_scanner_get_token_i (xscanner_t	*scanner,
 		       GTokenType	*token_p,
 		       GTokenValue	*value_p,
 		       xuint_t		*line_p,
@@ -1715,7 +1715,7 @@ g_scanner_get_token_i (GScanner	*scanner,
 }
 
 static void
-g_scanner_get_token_ll	(GScanner	*scanner,
+g_scanner_get_token_ll	(xscanner_t	*scanner,
 			 GTokenType	*token_p,
 			 GTokenValue	*value_p,
 			 xuint_t		*line_p,
@@ -1727,7 +1727,7 @@ g_scanner_get_token_ll	(GScanner	*scanner,
   xboolean_t	   in_comment_single;
   xboolean_t	   in_string_sq;
   xboolean_t	   in_string_dq;
-  GString	  *gstring;
+  xstring_t	  *xstring;
   GTokenValue	   value;
   guchar	   ch;
 
@@ -1745,7 +1745,7 @@ g_scanner_get_token_ll	(GScanner	*scanner,
   in_comment_single = FALSE;
   in_string_sq = FALSE;
   in_string_dq = FALSE;
-  gstring = NULL;
+  xstring = NULL;
 
   do /* while (ch != 0) */
     {
@@ -1779,7 +1779,7 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 	  g_scanner_get_char (scanner, line_p, position_p);
 	  token = G_TOKEN_COMMENT_MULTI;
 	  in_comment_multi = TRUE;
-	  gstring = g_string_new (NULL);
+	  xstring = xstring_new (NULL);
 	  while ((ch = g_scanner_get_char (scanner, line_p, position_p)) != 0)
 	    {
 	      if (ch == '*' && g_scanner_peek_next_char (scanner) == '/')
@@ -1789,7 +1789,7 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 		  break;
 		}
 	      else
-		gstring = g_string_append_c (gstring, ch);
+		xstring = xstring_append_c (xstring, ch);
 	    }
 	  ch = 0;
 	  break;
@@ -1799,7 +1799,7 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 	    goto default_case;
 	  token = G_TOKEN_STRING;
 	  in_string_sq = TRUE;
-	  gstring = g_string_new (NULL);
+	  xstring = xstring_new (NULL);
 	  while ((ch = g_scanner_get_char (scanner, line_p, position_p)) != 0)
 	    {
 	      if (ch == '\'')
@@ -1808,7 +1808,7 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 		  break;
 		}
 	      else
-		gstring = g_string_append_c (gstring, ch);
+		xstring = xstring_append_c (xstring, ch);
 	    }
 	  ch = 0;
 	  break;
@@ -1818,7 +1818,7 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 	    goto default_case;
 	  token = G_TOKEN_STRING;
 	  in_string_dq = TRUE;
-	  gstring = g_string_new (NULL);
+	  xstring = xstring_new (NULL);
 	  while ((ch = g_scanner_get_char (scanner, line_p, position_p)) != 0)
 	    {
 	      if (ch == '"')
@@ -1840,27 +1840,27 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 			  break;
 
 			case '\\':
-			  gstring = g_string_append_c (gstring, '\\');
+			  xstring = xstring_append_c (xstring, '\\');
 			  break;
 
 			case 'n':
-			  gstring = g_string_append_c (gstring, '\n');
+			  xstring = xstring_append_c (xstring, '\n');
 			  break;
 
 			case 't':
-			  gstring = g_string_append_c (gstring, '\t');
+			  xstring = xstring_append_c (xstring, '\t');
 			  break;
 
 			case 'r':
-			  gstring = g_string_append_c (gstring, '\r');
+			  xstring = xstring_append_c (xstring, '\r');
 			  break;
 
 			case 'b':
-			  gstring = g_string_append_c (gstring, '\b');
+			  xstring = xstring_append_c (xstring, '\b');
 			  break;
 
 			case 'f':
-			  gstring = g_string_append_c (gstring, '\f');
+			  xstring = xstring_append_c (xstring, '\f');
 			  break;
 
 			case '0':
@@ -1884,16 +1884,16 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 				  i = i * 8 + ch - '0';
 				}
 			    }
-			  gstring = g_string_append_c (gstring, i);
+			  xstring = xstring_append_c (xstring, i);
 			  break;
 
 			default:
-			  gstring = g_string_append_c (gstring, ch);
+			  xstring = xstring_append_c (xstring, ch);
 			  break;
 			}
 		    }
 		  else
-		    gstring = g_string_append_c (gstring, ch);
+		    xstring = xstring_append_c (xstring, ch);
 		}
 	    }
 	  ch = 0;
@@ -1980,8 +1980,8 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 	  if (token == G_TOKEN_NONE)
 	    token = G_TOKEN_INT;
 
-	  gstring = g_string_new (dotted_float ? "0." : "");
-	  gstring = g_string_append_c (gstring, ch);
+	  xstring = xstring_new (dotted_float ? "0." : "");
+	  xstring = xstring_append_c (xstring, ch);
 
 	  do /* while (in_number) */
 	    {
@@ -2009,7 +2009,7 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 		      else
 			{
 			  token = G_TOKEN_FLOAT;
-			  gstring = g_string_append_c (gstring, ch);
+			  xstring = xstring_append_c (xstring, ch);
 			}
 		      break;
 
@@ -2023,7 +2023,7 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 		    case '7':
 		    case '8':
 		    case '9':
-		      gstring = g_string_append_c (gstring, ch);
+		      xstring = xstring_append_c (xstring, ch);
 		      break;
 
 		    case '-':
@@ -2035,7 +2035,7 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 			  in_number = FALSE;
 			}
 		      else
-			gstring = g_string_append_c (gstring, ch);
+			xstring = xstring_append_c (xstring, ch);
 		      break;
 
 		    case 'e':
@@ -2054,7 +2054,7 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 			{
 			  if (token != G_TOKEN_HEX)
 			    token = G_TOKEN_FLOAT;
-			  gstring = g_string_append_c (gstring, ch);
+			  xstring = xstring_append_c (xstring, ch);
 			}
 		      break;
 
@@ -2066,7 +2066,7 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 			  in_number = FALSE;
 			}
 		      else
-			gstring = g_string_append_c (gstring, ch);
+			xstring = xstring_append_c (xstring, ch);
 		      break;
 		    }
 		}
@@ -2077,23 +2077,23 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 
 	  endptr = NULL;
 	  if (token == G_TOKEN_FLOAT)
-	    value.v_float = g_strtod (gstring->str, &endptr);
+	    value.v_float = xstrtod (xstring->str, &endptr);
 	  else
 	    {
-	      guint64 ui64 = 0;
+	      xuint64_t ui64 = 0;
 	      switch (token)
 		{
 		case G_TOKEN_BINARY:
-		  ui64 = g_ascii_strtoull (gstring->str, &endptr, 2);
+		  ui64 = g_ascii_strtoull (xstring->str, &endptr, 2);
 		  break;
 		case G_TOKEN_OCTAL:
-		  ui64 = g_ascii_strtoull (gstring->str, &endptr, 8);
+		  ui64 = g_ascii_strtoull (xstring->str, &endptr, 8);
 		  break;
 		case G_TOKEN_INT:
-		  ui64 = g_ascii_strtoull (gstring->str, &endptr, 10);
+		  ui64 = g_ascii_strtoull (xstring->str, &endptr, 10);
 		  break;
 		case G_TOKEN_HEX:
-		  ui64 = g_ascii_strtoull (gstring->str, &endptr, 16);
+		  ui64 = g_ascii_strtoull (xstring->str, &endptr, 16);
 		  break;
 		default: ;
 		}
@@ -2110,8 +2110,8 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 	      else
 		value.v_error = G_ERR_DIGIT_RADIX;
 	    }
-	  g_string_free (gstring, TRUE);
-	  gstring = NULL;
+	  xstring_free (xstring, TRUE);
+	  xstring = NULL;
 	  ch = 0;
 	} /* number_parsing:... */
 	break;
@@ -2124,7 +2124,7 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 	    {
 	      token = G_TOKEN_COMMENT_SINGLE;
 	      in_comment_single = TRUE;
-	      gstring = g_string_new (NULL);
+	      xstring = xstring_new (NULL);
 	      ch = g_scanner_get_char (scanner, line_p, position_p);
 	      while (ch != 0)
 		{
@@ -2135,7 +2135,7 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 		      break;
 		    }
 
-		  gstring = g_string_append_c (gstring, ch);
+		  xstring = xstring_append_c (xstring, ch);
 		  ch = g_scanner_get_char (scanner, line_p, position_p);
 		}
 	      /* ignore a missing newline at EOF for single line comments */
@@ -2153,12 +2153,12 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 			  g_scanner_peek_next_char (scanner)))
 		{
 		  token = G_TOKEN_IDENTIFIER;
-		  gstring = g_string_new (NULL);
-		  gstring = g_string_append_c (gstring, ch);
+		  xstring = xstring_new (NULL);
+		  xstring = xstring_append_c (xstring, ch);
 		  do
 		    {
 		      ch = g_scanner_get_char (scanner, line_p, position_p);
-		      gstring = g_string_append_c (gstring, ch);
+		      xstring = xstring_append_c (xstring, ch);
 		      ch = g_scanner_peek_next_char (scanner);
 		    }
 		  while (ch && strchr (config->cset_identifier_nth, ch));
@@ -2194,10 +2194,10 @@ g_scanner_get_token_ll	(GScanner	*scanner,
       in_string_sq || in_string_dq)
     {
       token = G_TOKEN_ERROR;
-      if (gstring)
+      if (xstring)
 	{
-	  g_string_free (gstring, TRUE);
-	  gstring = NULL;
+	  xstring_free (xstring, TRUE);
+	  xstring = NULL;
 	}
       (*position_p)++;
       if (in_comment_multi || in_comment_single)
@@ -2206,10 +2206,10 @@ g_scanner_get_token_ll	(GScanner	*scanner,
 	value.v_error = G_ERR_UNEXP_EOF_IN_STRING;
     }
 
-  if (gstring)
+  if (xstring)
     {
-      value.v_string = g_string_free (gstring, FALSE);
-      gstring = NULL;
+      value.v_string = xstring_free (xstring, FALSE);
+      xstring = NULL;
     }
 
   if (token == G_TOKEN_IDENTIFIER)

@@ -53,7 +53,7 @@
  * generate nicely formatted help output. Unless it is explicitly turned
  * off with g_option_context_set_help_enabled(), GOption will recognize
  * the `--help`, `-?`, `--help-all` and `--help-groupname` options
- * (where `groupname` is the name of a #GOptionGroup) and write a text
+ * (where `groupname` is the name of a #xoption_group_t) and write a text
  * similar to the one shown in the following example to stdout.
  *
  * |[
@@ -77,7 +77,7 @@
  * GOption groups options in #GOptionGroups, which makes it easy to
  * incorporate options from multiple sources. The intended use for this is
  * to let applications collect option groups from the libraries it uses,
- * add them to their #GOptionContext, and parse all options by a single call
+ * add them to their #xoption_context_t, and parse all options by a single call
  * to g_option_context_parse(). See gtk_get_option_group() for an example.
  *
  * If an option is declared to be of type string or filename, GOption takes
@@ -109,7 +109,7 @@
  * main (int argc, char *argv[])
  * {
  *   xerror_t *error = NULL;
- *   GOptionContext *context;
+ *   xoption_context_t *context;
  *
  *   context = g_option_context_new ("- test tree model performance");
  *   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
@@ -129,11 +129,11 @@
  * encoding, even to the extent that different parts of it may have
  * different encodings.  In general, normal arguments and flags will be
  * in the current locale and filenames should be considered to be opaque
- * byte strings.  Proper use of %G_OPTION_ARG_FILENAME vs
+ * byte strings.  Proper use of %G_OPTION_ARXFILENAME vs
  * %G_OPTION_ARG_STRING is therefore important.
  *
  * Note that on Windows, filenames do have an encoding, but using
- * #GOptionContext with the argv as passed to main() will result in a
+ * #xoption_context_t with the argv as passed to main() will result in a
  * program that can only accept commandline arguments with characters
  * from the system codepage.  This can cause problems when attempting to
  * deal with filenames containing Unicode characters that fall outside
@@ -141,10 +141,10 @@
  *
  * A solution to this is to use g_win32_get_command_line() and
  * g_option_context_parse_strv() which will properly handle full Unicode
- * filenames.  If you are using #GApplication, this is done
+ * filenames.  If you are using #xapplication_t, this is done
  * automatically for you.
  *
- * The following example shows how you can use #GOptionContext directly
+ * The following example shows how you can use #xoption_context_t directly
  * in order to correctly deal with Unicode filenames on Windows:
  *
  * |[<!-- language="C" -->
@@ -152,13 +152,13 @@
  * main (int argc, char **argv)
  * {
  *   xerror_t *error = NULL;
- *   GOptionContext *context;
+ *   xoption_context_t *context;
  *   xchar_t **args;
  *
  * #ifdef G_OS_WIN32
  *   args = g_win32_get_command_line ();
  * #else
- *   args = g_strdupv (argv);
+ *   args = xstrdupv (argv);
  * #endif
  *
  *   // set up context
@@ -170,7 +170,7 @@
  *
  *   ...
  *
- *   g_strfreev (args);
+ *   xstrfreev (args);
  *
  *   ...
  * }
@@ -246,7 +246,7 @@ struct _GOptionContext
   xchar_t           *description;
 
   GTranslateFunc   translate_func;
-  GDestroyNotify   translate_notify;
+  xdestroy_notify_t   translate_notify;
   xpointer_t         translate_data;
 
   xuint_t            help_enabled   : 1;
@@ -254,7 +254,7 @@ struct _GOptionContext
   xuint_t            strv_mode      : 1;
   xuint_t            strict_posix   : 1;
 
-  GOptionGroup    *main_group;
+  xoption_group_t    *main_group;
 
   /* We keep a list of change so we can revert them */
   xlist_t           *changes;
@@ -273,11 +273,11 @@ struct _GOptionGroup
 
   xint_t             ref_count;
 
-  GDestroyNotify   destroy_notify;
+  xdestroy_notify_t   destroy_notify;
   xpointer_t         user_data;
 
   GTranslateFunc   translate_func;
-  GDestroyNotify   translate_notify;
+  xdestroy_notify_t   translate_notify;
   xpointer_t         translate_data;
 
   GOptionEntry    *entries;
@@ -288,36 +288,36 @@ struct _GOptionGroup
   GOptionErrorFunc error_func;
 };
 
-static void free_changes_list (GOptionContext *context,
+static void free_changes_list (xoption_context_t *context,
                                xboolean_t        revert);
-static void free_pending_nulls (GOptionContext *context,
+static void free_pending_nulls (xoption_context_t *context,
                                 xboolean_t        perform_nulls);
 
 
 static int
-_g_unichar_get_width (gunichar c)
+_xunichar_get_width (xunichar_t c)
 {
-  if (G_UNLIKELY (g_unichar_iszerowidth (c)))
+  if (G_UNLIKELY (xunichar_iszerowidth (c)))
     return 0;
 
-  /* we ignore the fact that we should call g_unichar_iswide_cjk() under
+  /* we ignore the fact that we should call xunichar_iswide_cjk() under
    * some locales (legacy East Asian ones) */
-  if (g_unichar_iswide (c))
+  if (xunichar_iswide (c))
     return 2;
 
   return 1;
 }
 
-static glong
-_g_utf8_strwidth (const xchar_t *p)
+static xlong_t
+_xutf8_strwidth (const xchar_t *p)
 {
-  glong len = 0;
+  xlong_t len = 0;
   g_return_val_if_fail (p != NULL, 0);
 
   while (*p)
     {
-      len += _g_unichar_get_width (g_utf8_get_char (p));
-      p = g_utf8_next_char (p);
+      len += _xunichar_get_width (xutf8_get_char (p));
+      p = xutf8_next_char (p);
     }
 
   return len;
@@ -335,7 +335,7 @@ G_DEFINE_QUARK (g-option-context-error-quark, g_option_error)
  *
  * The @parameter_string can serve multiple purposes. It can be used
  * to add descriptions for "rest" arguments, which are not parsed by
- * the #GOptionContext, typically something like "FILES" or
+ * the #xoption_context_t, typically something like "FILES" or
  * "FILE1 FILE2...". If you are using %G_OPTION_REMAINING for
  * collecting "rest" arguments, GLib handles this automatically by
  * using the @arg_description of the corresponding #GOptionEntry in
@@ -351,25 +351,25 @@ G_DEFINE_QUARK (g-option-context-error-quark, g_option_error)
  * function set with g_option_context_set_translate_func(), so
  * it should normally be passed untranslated.
  *
- * Returns: a newly created #GOptionContext, which must be
+ * Returns: a newly created #xoption_context_t, which must be
  *    freed with g_option_context_free() after use.
  *
  * Since: 2.6
  */
-GOptionContext *
+xoption_context_t *
 g_option_context_new (const xchar_t *parameter_string)
 
 {
-  GOptionContext *context;
+  xoption_context_t *context;
 
-  context = g_new0 (GOptionContext, 1);
+  context = g_new0 (xoption_context_t, 1);
 
   /* Clear the empty string to NULL, otherwise we end up calling gettext(""),
    * which returns the translation header. */
   if (parameter_string != NULL && *parameter_string == '\0')
     parameter_string = NULL;
 
-  context->parameter_string = g_strdup (parameter_string);
+  context->parameter_string = xstrdup (parameter_string);
   context->strict_posix = FALSE;
   context->help_enabled = TRUE;
   context->ignore_unknown = FALSE;
@@ -379,7 +379,7 @@ g_option_context_new (const xchar_t *parameter_string)
 
 /**
  * g_option_context_free:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  *
  * Frees context and all the groups which have been
  * added to it.
@@ -389,14 +389,14 @@ g_option_context_new (const xchar_t *parameter_string)
  *
  * Since: 2.6
  */
-void g_option_context_free (GOptionContext *context)
+void g_option_context_free (xoption_context_t *context)
 {
   g_return_if_fail (context != NULL);
 
-  g_list_free_full (context->groups, (GDestroyNotify) g_option_group_unref);
+  xlist_free_full (context->groups, (xdestroy_notify_t) xoption_group_unref);
 
   if (context->main_group)
-    g_option_group_unref (context->main_group);
+    xoption_group_unref (context->main_group);
 
   free_changes_list (context, FALSE);
   free_pending_nulls (context, FALSE);
@@ -414,7 +414,7 @@ void g_option_context_free (GOptionContext *context)
 
 /**
  * g_option_context_set_help_enabled:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  * @help_enabled: %TRUE to enable `--help`, %FALSE to disable it
  *
  * Enables or disables automatic generation of `--help` output.
@@ -424,7 +424,7 @@ void g_option_context_free (GOptionContext *context)
  *
  * Since: 2.6
  */
-void g_option_context_set_help_enabled (GOptionContext *context,
+void g_option_context_set_help_enabled (xoption_context_t *context,
                                         xboolean_t        help_enabled)
 
 {
@@ -435,7 +435,7 @@ void g_option_context_set_help_enabled (GOptionContext *context,
 
 /**
  * g_option_context_get_help_enabled:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  *
  * Returns whether automatic `--help` generation
  * is turned on for @context. See g_option_context_set_help_enabled().
@@ -445,7 +445,7 @@ void g_option_context_set_help_enabled (GOptionContext *context,
  * Since: 2.6
  */
 xboolean_t
-g_option_context_get_help_enabled (GOptionContext *context)
+g_option_context_get_help_enabled (xoption_context_t *context)
 {
   g_return_val_if_fail (context != NULL, FALSE);
 
@@ -454,7 +454,7 @@ g_option_context_get_help_enabled (GOptionContext *context)
 
 /**
  * g_option_context_set_ignore_unknown_options:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  * @ignore_unknown: %TRUE to ignore unknown options, %FALSE to produce
  *    an error when unknown options are met
  *
@@ -469,7 +469,7 @@ g_option_context_get_help_enabled (GOptionContext *context)
  * Since: 2.6
  **/
 void
-g_option_context_set_ignore_unknown_options (GOptionContext *context,
+g_option_context_set_ignore_unknown_options (xoption_context_t *context,
                                              xboolean_t        ignore_unknown)
 {
   g_return_if_fail (context != NULL);
@@ -479,7 +479,7 @@ g_option_context_set_ignore_unknown_options (GOptionContext *context,
 
 /**
  * g_option_context_get_ignore_unknown_options:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  *
  * Returns whether unknown options are ignored or not. See
  * g_option_context_set_ignore_unknown_options().
@@ -489,7 +489,7 @@ g_option_context_set_ignore_unknown_options (GOptionContext *context,
  * Since: 2.6
  **/
 xboolean_t
-g_option_context_get_ignore_unknown_options (GOptionContext *context)
+g_option_context_get_ignore_unknown_options (xoption_context_t *context)
 {
   g_return_val_if_fail (context != NULL, FALSE);
 
@@ -498,7 +498,7 @@ g_option_context_get_ignore_unknown_options (GOptionContext *context)
 
 /**
  * g_option_context_set_strict_posix:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  * @strict_posix: the new value
  *
  * Sets strict POSIX mode.
@@ -529,7 +529,7 @@ g_option_context_get_ignore_unknown_options (GOptionContext *context)
  * Since: 2.44
  **/
 void
-g_option_context_set_strict_posix (GOptionContext *context,
+g_option_context_set_strict_posix (xoption_context_t *context,
                                    xboolean_t        strict_posix)
 {
   g_return_if_fail (context != NULL);
@@ -539,7 +539,7 @@ g_option_context_set_strict_posix (GOptionContext *context,
 
 /**
  * g_option_context_get_strict_posix:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  *
  * Returns whether strict POSIX code is enabled.
  *
@@ -550,7 +550,7 @@ g_option_context_set_strict_posix (GOptionContext *context,
  * Since: 2.44
  **/
 xboolean_t
-g_option_context_get_strict_posix (GOptionContext *context)
+g_option_context_get_strict_posix (xoption_context_t *context)
 {
   g_return_val_if_fail (context != NULL, FALSE);
 
@@ -559,18 +559,18 @@ g_option_context_get_strict_posix (GOptionContext *context)
 
 /**
  * g_option_context_add_group:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  * @group: (transfer full): the group to add
  *
- * Adds a #GOptionGroup to the @context, so that parsing with @context
+ * Adds a #xoption_group_t to the @context, so that parsing with @context
  * will recognize the options in the group. Note that this will take
  * ownership of the @group and thus the @group should not be freed.
  *
  * Since: 2.6
  **/
 void
-g_option_context_add_group (GOptionContext *context,
-                            GOptionGroup   *group)
+g_option_context_add_group (xoption_context_t *context,
+                            xoption_group_t   *group)
 {
   xlist_t *list;
 
@@ -582,23 +582,23 @@ g_option_context_add_group (GOptionContext *context,
 
   for (list = context->groups; list; list = list->next)
     {
-      GOptionGroup *g = (GOptionGroup *)list->data;
+      xoption_group_t *g = (xoption_group_t *)list->data;
 
       if ((group->name == NULL && g->name == NULL) ||
           (group->name && g->name && strcmp (group->name, g->name) == 0))
-        g_warning ("A group named \"%s\" is already part of this GOptionContext",
+        g_warning ("A group named \"%s\" is already part of this xoption_context_t",
                    group->name);
     }
 
-  context->groups = g_list_append (context->groups, group);
+  context->groups = xlist_append (context->groups, group);
 }
 
 /**
  * g_option_context_set_main_group:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  * @group: (transfer full): the group to set as main group
  *
- * Sets a #GOptionGroup as main group of the @context.
+ * Sets a #xoption_group_t as main group of the @context.
  * This has the same effect as calling g_option_context_add_group(),
  * the only difference is that the options in the main group are
  * treated differently when generating `--help` output.
@@ -606,15 +606,15 @@ g_option_context_add_group (GOptionContext *context,
  * Since: 2.6
  **/
 void
-g_option_context_set_main_group (GOptionContext *context,
-                                 GOptionGroup   *group)
+g_option_context_set_main_group (xoption_context_t *context,
+                                 xoption_group_t   *group)
 {
   g_return_if_fail (context != NULL);
   g_return_if_fail (group != NULL);
 
   if (context->main_group)
     {
-      g_warning ("This GOptionContext already has a main group");
+      g_warning ("This xoption_context_t already has a main group");
 
       return;
     }
@@ -624,7 +624,7 @@ g_option_context_set_main_group (GOptionContext *context,
 
 /**
  * g_option_context_get_main_group:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  *
  * Returns a pointer to the main group of @context.
  *
@@ -634,8 +634,8 @@ g_option_context_set_main_group (GOptionContext *context,
  *
  * Since: 2.6
  **/
-GOptionGroup *
-g_option_context_get_main_group (GOptionContext *context)
+xoption_group_t *
+g_option_context_get_main_group (xoption_context_t *context)
 {
   g_return_val_if_fail (context != NULL, NULL);
 
@@ -644,7 +644,7 @@ g_option_context_get_main_group (GOptionContext *context)
 
 /**
  * g_option_context_add_main_entries:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  * @entries: (array zero-terminated=1): a %NULL-terminated array of #GOptionEntrys
  * @translation_domain: (nullable): a translation domain to use for translating
  *    the `--help` output for the options in @entries
@@ -656,7 +656,7 @@ g_option_context_get_main_group (GOptionContext *context)
  * Since: 2.6
  **/
 void
-g_option_context_add_main_entries (GOptionContext      *context,
+g_option_context_add_main_entries (xoption_context_t      *context,
                                    const GOptionEntry  *entries,
                                    const xchar_t         *translation_domain)
 {
@@ -664,15 +664,15 @@ g_option_context_add_main_entries (GOptionContext      *context,
   g_return_if_fail (entries != NULL);
 
   if (!context->main_group)
-    context->main_group = g_option_group_new (NULL, NULL, NULL, NULL, NULL);
+    context->main_group = xoption_group_new (NULL, NULL, NULL, NULL, NULL);
 
-  g_option_group_add_entries (context->main_group, entries);
-  g_option_group_set_translation_domain (context->main_group, translation_domain);
+  xoption_group_add_entries (context->main_group, entries);
+  xoption_group_set_translation_domain (context->main_group, translation_domain);
 }
 
 static xint_t
-calculate_max_length (GOptionGroup *group,
-                      GHashTable   *aliases)
+calculate_max_length (xoption_group_t *group,
+                      xhashtable_t   *aliases)
 {
   GOptionEntry *entry;
   xsize_t i, len, max_length;
@@ -687,16 +687,16 @@ calculate_max_length (GOptionGroup *group,
       if (entry->flags & G_OPTION_FLAG_HIDDEN)
         continue;
 
-      long_name = g_hash_table_lookup (aliases, &entry->long_name);
+      long_name = xhash_table_lookup (aliases, &entry->long_name);
       if (!long_name)
         long_name = entry->long_name;
-      len = _g_utf8_strwidth (long_name);
+      len = _xutf8_strwidth (long_name);
 
       if (entry->short_name)
         len += 4;
 
       if (!NO_ARG (entry) && entry->arg_description)
-        len += 1 + _g_utf8_strwidth (TRANSLATE (group, entry->arg_description));
+        len += 1 + _xutf8_strwidth (TRANSLATE (group, entry->arg_description));
 
       max_length = MAX (max_length, len);
     }
@@ -705,13 +705,13 @@ calculate_max_length (GOptionGroup *group,
 }
 
 static void
-print_entry (GOptionGroup       *group,
+print_entry (xoption_group_t       *group,
              xint_t                max_length,
              const GOptionEntry *entry,
-             GString            *string,
-             GHashTable         *aliases)
+             xstring_t            *string,
+             xhashtable_t         *aliases)
 {
-  GString *str;
+  xstring_t *str;
   const xchar_t *long_name;
 
   if (entry->flags & G_OPTION_FLAG_HIDDEN)
@@ -720,29 +720,29 @@ print_entry (GOptionGroup       *group,
   if (entry->long_name[0] == 0)
     return;
 
-  long_name = g_hash_table_lookup (aliases, &entry->long_name);
+  long_name = xhash_table_lookup (aliases, &entry->long_name);
   if (!long_name)
     long_name = entry->long_name;
 
-  str = g_string_new (NULL);
+  str = xstring_new (NULL);
 
   if (entry->short_name)
-    g_string_append_printf (str, "  -%c, --%s", entry->short_name, long_name);
+    xstring_append_printf (str, "  -%c, --%s", entry->short_name, long_name);
   else
-    g_string_append_printf (str, "  --%s", long_name);
+    xstring_append_printf (str, "  --%s", long_name);
 
   if (entry->arg_description)
-    g_string_append_printf (str, "=%s", TRANSLATE (group, entry->arg_description));
+    xstring_append_printf (str, "=%s", TRANSLATE (group, entry->arg_description));
 
-  g_string_append_printf (string, "%s%*s %s\n", str->str,
-                          (int) (max_length + 4 - _g_utf8_strwidth (str->str)), "",
+  xstring_append_printf (string, "%s%*s %s\n", str->str,
+                          (int) (max_length + 4 - _xutf8_strwidth (str->str)), "",
                           entry->description ? TRANSLATE (group, entry->description) : "");
-  g_string_free (str, TRUE);
+  xstring_free (str, TRUE);
 }
 
 static xboolean_t
-group_has_visible_entries (GOptionContext *context,
-                           GOptionGroup *group,
+group_has_visible_entries (xoption_context_t *context,
+                           xoption_group_t *group,
                            xboolean_t      main_entries)
 {
   GOptionFlags reject_filter = G_OPTION_FLAG_HIDDEN;
@@ -769,7 +769,7 @@ group_has_visible_entries (GOptionContext *context,
 }
 
 static xboolean_t
-group_list_has_visible_entries (GOptionContext *context,
+group_list_has_visible_entries (xoption_context_t *context,
                                 xlist_t          *group_list,
                                 xboolean_t       main_entries)
 {
@@ -785,7 +785,7 @@ group_list_has_visible_entries (GOptionContext *context,
 }
 
 static xboolean_t
-context_has_h_entry (GOptionContext *context)
+context_has_h_entry (xoption_context_t *context)
 {
   xsize_t i;
   xlist_t *list;
@@ -799,11 +799,11 @@ context_has_h_entry (GOptionContext *context)
         }
     }
 
-  for (list = context->groups; list != NULL; list = g_list_next (list))
+  for (list = context->groups; list != NULL; list = xlist_next (list))
     {
-     GOptionGroup *group;
+     xoption_group_t *group;
 
-      group = (GOptionGroup*)list->data;
+      group = (xoption_group_t*)list->data;
       for (i = 0; i < group->n_entries; i++)
         {
           if (group->entries[i].short_name == 'h')
@@ -815,9 +815,9 @@ context_has_h_entry (GOptionContext *context)
 
 /**
  * g_option_context_get_help:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  * @main_help: if %TRUE, only include the main group
- * @group: (nullable): the #GOptionGroup to create help for, or %NULL
+ * @group: (nullable): the #xoption_group_t to create help for, or %NULL
  *
  * Returns a formatted, translated help text for the given context.
  * To obtain the text produced by `--help`, call
@@ -832,24 +832,24 @@ context_has_h_entry (GOptionContext *context)
  * Since: 2.14
  */
 xchar_t *
-g_option_context_get_help (GOptionContext *context,
+g_option_context_get_help (xoption_context_t *context,
                            xboolean_t        main_help,
-                           GOptionGroup   *group)
+                           xoption_group_t   *group)
 {
   xlist_t *list;
   xint_t max_length = 0, len;
   xsize_t i;
   GOptionEntry *entry;
-  GHashTable *shadow_map;
-  GHashTable *aliases;
+  xhashtable_t *shadow_map;
+  xhashtable_t *aliases;
   xboolean_t seen[256];
   const xchar_t *rest_description;
-  GString *string;
+  xstring_t *string;
   guchar token;
 
   g_return_val_if_fail (context != NULL, NULL);
 
-  string = g_string_sized_new (1024);
+  string = xstring_sized_new (1024);
 
   rest_description = NULL;
   if (context->main_group)
@@ -866,42 +866,42 @@ g_option_context_get_help (GOptionContext *context,
         }
     }
 
-  g_string_append_printf (string, "%s\n  %s", _("Usage:"), g_get_prgname ());
+  xstring_append_printf (string, "%s\n  %s", _("Usage:"), g_get_prgname ());
   if (context->help_enabled ||
       (context->main_group && context->main_group->n_entries > 0) ||
       context->groups != NULL)
-    g_string_append_printf (string, " %s", _("[OPTION…]"));
+    xstring_append_printf (string, " %s", _("[OPTION…]"));
 
   if (rest_description)
     {
-      g_string_append (string, " ");
-      g_string_append (string, rest_description);
+      xstring_append (string, " ");
+      xstring_append (string, rest_description);
     }
 
   if (context->parameter_string)
     {
-      g_string_append (string, " ");
-      g_string_append (string, TRANSLATE (context, context->parameter_string));
+      xstring_append (string, " ");
+      xstring_append (string, TRANSLATE (context, context->parameter_string));
     }
 
-  g_string_append (string, "\n\n");
+  xstring_append (string, "\n\n");
 
   if (context->summary)
     {
-      g_string_append (string, TRANSLATE (context, context->summary));
-      g_string_append (string, "\n\n");
+      xstring_append (string, TRANSLATE (context, context->summary));
+      xstring_append (string, "\n\n");
     }
 
   memset (seen, 0, sizeof (xboolean_t) * 256);
-  shadow_map = g_hash_table_new (g_str_hash, g_str_equal);
-  aliases = g_hash_table_new_full (NULL, NULL, NULL, g_free);
+  shadow_map = xhash_table_new (xstr_hash, xstr_equal);
+  aliases = xhash_table_new_full (NULL, NULL, NULL, g_free);
 
   if (context->main_group)
     {
       for (i = 0; i < context->main_group->n_entries; i++)
         {
           entry = &context->main_group->entries[i];
-          g_hash_table_insert (shadow_map,
+          xhash_table_insert (shadow_map,
                                (xpointer_t)entry->long_name,
                                entry);
 
@@ -915,18 +915,18 @@ g_option_context_get_help (GOptionContext *context,
   list = context->groups;
   while (list != NULL)
     {
-      GOptionGroup *g = list->data;
+      xoption_group_t *g = list->data;
       for (i = 0; i < g->n_entries; i++)
         {
           entry = &g->entries[i];
-          if (g_hash_table_lookup (shadow_map, entry->long_name) &&
+          if (xhash_table_lookup (shadow_map, entry->long_name) &&
               !(entry->flags & G_OPTION_FLAG_NOALIAS))
             {
-              g_hash_table_insert (aliases, &entry->long_name,
-                                   g_strdup_printf ("%s-%s", g->name, entry->long_name));
+              xhash_table_insert (aliases, &entry->long_name,
+                                   xstrdup_printf ("%s-%s", g->name, entry->long_name));
             }
           else
-            g_hash_table_insert (shadow_map, (xpointer_t)entry->long_name, entry);
+            xhash_table_insert (shadow_map, (xpointer_t)entry->long_name, entry);
 
           if (seen[(guchar)entry->short_name] &&
               !(entry->flags & G_OPTION_FLAG_NOALIAS))
@@ -937,17 +937,17 @@ g_option_context_get_help (GOptionContext *context,
       list = list->next;
     }
 
-  g_hash_table_destroy (shadow_map);
+  xhash_table_destroy (shadow_map);
 
   list = context->groups;
 
   if (context->help_enabled)
     {
-      max_length = _g_utf8_strwidth ("-?, --help");
+      max_length = _xutf8_strwidth ("-?, --help");
 
       if (list)
         {
-          len = _g_utf8_strwidth ("--help-all");
+          len = _xutf8_strwidth ("--help-all");
           max_length = MAX (max_length, len);
         }
     }
@@ -960,12 +960,12 @@ g_option_context_get_help (GOptionContext *context,
 
   while (list != NULL)
     {
-      GOptionGroup *g = list->data;
+      xoption_group_t *g = list->data;
 
       if (context->help_enabled)
         {
           /* First, we check the --help-<groupname> options */
-          len = _g_utf8_strwidth ("--help-") + _g_utf8_strwidth (g->name);
+          len = _xutf8_strwidth ("--help-") + _xutf8_strwidth (g->name);
           max_length = MAX (max_length, len);
         }
 
@@ -985,29 +985,29 @@ g_option_context_get_help (GOptionContext *context,
 
       token = context_has_h_entry (context) ? '?' : 'h';
 
-      g_string_append_printf (string, "%s\n  -%c, --%-*s %s\n",
+      xstring_append_printf (string, "%s\n  -%c, --%-*s %s\n",
                               _("Help Options:"), token, max_length - 4, "help",
                               _("Show help options"));
 
       /* We only want --help-all when there are groups */
       if (list)
-        g_string_append_printf (string, "  --%-*s %s\n",
+        xstring_append_printf (string, "  --%-*s %s\n",
                                 max_length, "help-all",
                                 _("Show all help options"));
 
       while (list)
         {
-          GOptionGroup *g = list->data;
+          xoption_group_t *g = list->data;
 
           if (group_has_visible_entries (context, g, FALSE))
-            g_string_append_printf (string, "  --help-%-*s %s\n",
+            xstring_append_printf (string, "  --help-%-*s %s\n",
                                     max_length - 5, g->name,
                                     TRANSLATE (g, g->help_description));
 
           list = list->next;
         }
 
-      g_string_append (string, "\n");
+      xstring_append (string, "\n");
     }
 
   if (group)
@@ -1016,11 +1016,11 @@ g_option_context_get_help (GOptionContext *context,
 
       if (group_has_visible_entries (context, group, FALSE))
         {
-          g_string_append (string, TRANSLATE (group, group->description));
-          g_string_append (string, "\n");
+          xstring_append (string, TRANSLATE (group, group->description));
+          xstring_append (string, "\n");
           for (i = 0; i < group->n_entries; i++)
             print_entry (group, max_length, &group->entries[i], string, aliases);
-          g_string_append (string, "\n");
+          xstring_append (string, "\n");
         }
     }
   else if (!main_help)
@@ -1031,17 +1031,17 @@ g_option_context_get_help (GOptionContext *context,
 
       while (list)
         {
-          GOptionGroup *g = list->data;
+          xoption_group_t *g = list->data;
 
           if (group_has_visible_entries (context, g, FALSE))
             {
-              g_string_append (string, g->description);
-              g_string_append (string, "\n");
+              xstring_append (string, g->description);
+              xstring_append (string, "\n");
               for (i = 0; i < g->n_entries; i++)
                 if (!(g->entries[i].flags & G_OPTION_FLAG_IN_MAIN))
                   print_entry (g, max_length, &g->entries[i], string, aliases);
 
-              g_string_append (string, "\n");
+              xstring_append (string, "\n");
             }
 
           list = list->next;
@@ -1056,10 +1056,10 @@ g_option_context_get_help (GOptionContext *context,
       list = context->groups;
 
       if (context->help_enabled || list)
-        g_string_append (string,  _("Application Options:"));
+        xstring_append (string,  _("Application Options:"));
       else
-        g_string_append (string, _("Options:"));
-      g_string_append (string, "\n");
+        xstring_append (string, _("Options:"));
+      xstring_append (string, "\n");
       if (context->main_group)
         for (i = 0; i < context->main_group->n_entries; i++)
           print_entry (context->main_group, max_length,
@@ -1067,7 +1067,7 @@ g_option_context_get_help (GOptionContext *context,
 
       while (list != NULL)
         {
-          GOptionGroup *g = list->data;
+          xoption_group_t *g = list->data;
 
           /* Print main entries from other groups */
           for (i = 0; i < g->n_entries; i++)
@@ -1077,25 +1077,25 @@ g_option_context_get_help (GOptionContext *context,
           list = list->next;
         }
 
-      g_string_append (string, "\n");
+      xstring_append (string, "\n");
     }
 
   if (context->description)
     {
-      g_string_append (string, TRANSLATE (context, context->description));
-      g_string_append (string, "\n");
+      xstring_append (string, TRANSLATE (context, context->description));
+      xstring_append (string, "\n");
     }
 
-  g_hash_table_destroy (aliases);
+  xhash_table_destroy (aliases);
 
-  return g_string_free (string, FALSE);
+  return xstring_free (string, FALSE);
 }
 
 G_NORETURN
 static void
-print_help (GOptionContext *context,
+print_help (xoption_context_t *context,
             xboolean_t        main_help,
-            GOptionGroup   *group)
+            xoption_group_t   *group)
 {
   xchar_t *help;
 
@@ -1113,7 +1113,7 @@ parse_int (const xchar_t *arg_name,
            xerror_t     **error)
 {
   xchar_t *end;
-  glong tmp;
+  xlong_t tmp;
 
   errno = 0;
   tmp = strtol (arg, &end, 0);
@@ -1151,7 +1151,7 @@ parse_double (const xchar_t *arg_name,
   xdouble_t tmp;
 
   errno = 0;
-  tmp = g_strtod (arg, &end);
+  tmp = xstrtod (arg, &end);
 
   if (*arg == '\0' || *end != '\0')
     {
@@ -1212,7 +1212,7 @@ parse_int64 (const xchar_t *arg_name,
 
 
 static Change *
-get_change (GOptionContext *context,
+get_change (xoption_context_t *context,
             GOptionArg      arg_type,
             xpointer_t        arg_data)
 {
@@ -1231,7 +1231,7 @@ get_change (GOptionContext *context,
   change->arg_type = arg_type;
   change->arg_data = arg_data;
 
-  context->changes = g_list_prepend (context->changes, change);
+  context->changes = xlist_prepend (context->changes, change);
 
  found:
 
@@ -1239,7 +1239,7 @@ get_change (GOptionContext *context,
 }
 
 static void
-add_pending_null (GOptionContext *context,
+add_pending_null (xoption_context_t *context,
                   xchar_t         **ptr,
                   xchar_t          *value)
 {
@@ -1249,12 +1249,12 @@ add_pending_null (GOptionContext *context,
   n->ptr = ptr;
   n->value = value;
 
-  context->pending_nulls = g_list_prepend (context->pending_nulls, n);
+  context->pending_nulls = xlist_prepend (context->pending_nulls, n);
 }
 
 static xboolean_t
-parse_arg (GOptionContext *context,
-           GOptionGroup   *group,
+parse_arg (xoption_context_t *context,
+           xoption_group_t   *group,
            GOptionEntry   *entry,
            const xchar_t    *value,
            const xchar_t    *option_name,
@@ -1283,7 +1283,7 @@ parse_arg (GOptionContext *context,
         if (!context->strv_mode)
           data = g_locale_to_utf8 (value, -1, NULL, NULL, error);
         else
-          data = g_strdup (value);
+          data = xstrdup (value);
 #else
         data = g_locale_to_utf8 (value, -1, NULL, NULL, error);
 #endif
@@ -1312,7 +1312,7 @@ parse_arg (GOptionContext *context,
         if (!context->strv_mode)
           data = g_locale_to_utf8 (value, -1, NULL, NULL, error);
         else
-          data = g_strdup (value);
+          data = xstrdup (value);
 #else
         data = g_locale_to_utf8 (value, -1, NULL, NULL, error);
 #endif
@@ -1343,7 +1343,7 @@ parse_arg (GOptionContext *context,
         break;
       }
 
-    case G_OPTION_ARG_FILENAME:
+    case G_OPTION_ARXFILENAME:
       {
         xchar_t *data;
 
@@ -1351,14 +1351,14 @@ parse_arg (GOptionContext *context,
         if (!context->strv_mode)
           data = g_locale_to_utf8 (value, -1, NULL, NULL, error);
         else
-          data = g_strdup (value);
+          data = xstrdup (value);
 
         if (!data)
           return FALSE;
 #else
-        data = g_strdup (value);
+        data = xstrdup (value);
 #endif
-        change = get_change (context, G_OPTION_ARG_FILENAME,
+        change = get_change (context, G_OPTION_ARXFILENAME,
                              entry->arg_data);
 
         if (!change->allocated.str)
@@ -1372,7 +1372,7 @@ parse_arg (GOptionContext *context,
         break;
       }
 
-    case G_OPTION_ARG_FILENAME_ARRAY:
+    case G_OPTION_ARXFILENAME_ARRAY:
       {
         xchar_t *data;
 
@@ -1380,12 +1380,12 @@ parse_arg (GOptionContext *context,
         if (!context->strv_mode)
           data = g_locale_to_utf8 (value, -1, NULL, NULL, error);
         else
-          data = g_strdup (value);
+          data = xstrdup (value);
 
         if (!data)
           return FALSE;
 #else
-        data = g_strdup (value);
+        data = xstrdup (value);
 #endif
         change = get_change (context, G_OPTION_ARG_STRING_ARRAY,
                              entry->arg_data);
@@ -1434,15 +1434,15 @@ parse_arg (GOptionContext *context,
           data = NULL;
         else if (entry->flags & G_OPTION_FLAG_NO_ARG)
           data = NULL;
-        else if (entry->flags & G_OPTION_FLAG_FILENAME)
+        else if (entry->flags & G_OPTION_FLAXFILENAME)
           {
 #ifdef G_OS_WIN32
             if (!context->strv_mode)
               data = g_locale_to_utf8 (value, -1, NULL, NULL, error);
             else
-              data = g_strdup (value);
+              data = xstrdup (value);
 #else
-            data = g_strdup (value);
+            data = xstrdup (value);
 #endif
           }
         else
@@ -1507,8 +1507,8 @@ parse_arg (GOptionContext *context,
 }
 
 static xboolean_t
-parse_short_option (GOptionContext *context,
-                    GOptionGroup   *group,
+parse_short_option (xoption_context_t *context,
+                    xoption_group_t   *group,
                     xint_t            idx,
                     xint_t           *new_idx,
                     xchar_t           arg,
@@ -1526,7 +1526,7 @@ parse_short_option (GOptionContext *context,
           xchar_t *option_name;
           xchar_t *value = NULL;
 
-          option_name = g_strdup_printf ("-%c", group->entries[j].short_name);
+          option_name = xstrdup_printf ("-%c", group->entries[j].short_name);
 
           if (NO_ARG (&group->entries[j]))
             value = NULL;
@@ -1580,8 +1580,8 @@ parse_short_option (GOptionContext *context,
 }
 
 static xboolean_t
-parse_long_option (GOptionContext *context,
-                   GOptionGroup   *group,
+parse_long_option (xoption_context_t *context,
+                   xoption_group_t   *group,
                    xint_t           *idx,
                    xchar_t          *arg,
                    xboolean_t        aliased,
@@ -1606,7 +1606,7 @@ parse_long_option (GOptionContext *context,
           xchar_t *option_name;
           xboolean_t retval;
 
-          option_name = g_strconcat ("--", group->entries[j].long_name, NULL);
+          option_name = xstrconcat ("--", group->entries[j].long_name, NULL);
           retval = parse_arg (context, group, &group->entries[j],
                               NULL, option_name, error);
           g_free (option_name);
@@ -1627,7 +1627,7 @@ parse_long_option (GOptionContext *context,
               xchar_t *option_name;
 
               add_pending_null (context, &((*argv)[*idx]), NULL);
-              option_name = g_strconcat ("--", group->entries[j].long_name, NULL);
+              option_name = xstrconcat ("--", group->entries[j].long_name, NULL);
 
               if (arg[len] == '=')
                 value = arg + len + 1;
@@ -1693,8 +1693,8 @@ parse_long_option (GOptionContext *context,
 }
 
 static xboolean_t
-parse_remaining_arg (GOptionContext *context,
-                     GOptionGroup   *group,
+parse_remaining_arg (xoption_context_t *context,
+                     xoption_group_t   *group,
                      xint_t           *idx,
                      xint_t           *argc,
                      xchar_t        ***argv,
@@ -1713,7 +1713,7 @@ parse_remaining_arg (GOptionContext *context,
 
       g_return_val_if_fail (group->entries[j].arg == G_OPTION_ARG_CALLBACK ||
                             group->entries[j].arg == G_OPTION_ARG_STRING_ARRAY ||
-                            group->entries[j].arg == G_OPTION_ARG_FILENAME_ARRAY, FALSE);
+                            group->entries[j].arg == G_OPTION_ARXFILENAME_ARRAY, FALSE);
 
       add_pending_null (context, &((*argv)[*idx]), NULL);
 
@@ -1728,7 +1728,7 @@ parse_remaining_arg (GOptionContext *context,
 }
 
 static void
-free_changes_list (GOptionContext *context,
+free_changes_list (xoption_context_t *context,
                    xboolean_t        revert)
 {
   xlist_t *list;
@@ -1748,13 +1748,13 @@ free_changes_list (GOptionContext *context,
               *(xint_t *)change->arg_data = change->prev.integer;
               break;
             case G_OPTION_ARG_STRING:
-            case G_OPTION_ARG_FILENAME:
+            case G_OPTION_ARXFILENAME:
               g_free (change->allocated.str);
               *(xchar_t **)change->arg_data = change->prev.str;
               break;
             case G_OPTION_ARG_STRING_ARRAY:
-            case G_OPTION_ARG_FILENAME_ARRAY:
-              g_strfreev (change->allocated.array.data);
+            case G_OPTION_ARXFILENAME_ARRAY:
+              xstrfreev (change->allocated.array.data);
               *(xchar_t ***)change->arg_data = change->prev.array;
               break;
             case G_OPTION_ARG_DOUBLE:
@@ -1771,12 +1771,12 @@ free_changes_list (GOptionContext *context,
       g_free (change);
     }
 
-  g_list_free (context->changes);
+  xlist_free (context->changes);
   context->changes = NULL;
 }
 
 static void
-free_pending_nulls (GOptionContext *context,
+free_pending_nulls (xoption_context_t *context,
                     xboolean_t        perform_nulls)
 {
   xlist_t *list;
@@ -1806,7 +1806,7 @@ free_pending_nulls (GOptionContext *context,
       g_free (n);
     }
 
-  g_list_free (context->pending_nulls);
+  xlist_free (context->pending_nulls);
   context->pending_nulls = NULL;
 }
 
@@ -1823,13 +1823,13 @@ platform_get_argv0 (void)
   char *base_arg0;
   xsize_t len;
 
-  if (!g_file_get_contents ("/proc/self/cmdline",
+  if (!xfile_get_contents ("/proc/self/cmdline",
 			    &cmdline,
 			    &len,
 			    NULL))
     return NULL;
 
-  /* g_file_get_contents() guarantees to put a NUL immediately after the
+  /* xfile_get_contents() guarantees to put a NUL immediately after the
    * file's contents (at cmdline[len] here), even if the file itself was
    * not NUL-terminated. */
   g_assert (memchr (cmdline, 0, len + 1));
@@ -1897,7 +1897,7 @@ platform_get_argv0 (void)
     return NULL;
 
   if (wargc > 0)
-    utf8_buf = g_utf16_to_utf8 (wargv[0], -1, NULL, NULL, NULL);
+    utf8_buf = xutf16_to_utf8 (wargv[0], -1, NULL, NULL, NULL);
 
   LocalFree (wargv);
 
@@ -1918,7 +1918,7 @@ platform_get_argv0 (void)
 
 /**
  * g_option_context_parse:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  * @argc: (inout) (optional): a pointer to the number of command line arguments
  * @argv: (inout) (array length=argc) (optional): a pointer to the array of command line arguments
  * @error: a return location for errors
@@ -1951,7 +1951,7 @@ platform_get_argv0 (void)
  * Since: 2.6
  **/
 xboolean_t
-g_option_context_parse (GOptionContext   *context,
+g_option_context_parse (xoption_context_t   *context,
                         xint_t             *argc,
                         xchar_t          ***argv,
                         xerror_t          **error)
@@ -1983,7 +1983,7 @@ g_option_context_parse (GOptionContext   *context,
   list = context->groups;
   while (list)
     {
-      GOptionGroup *group = list->data;
+      xoption_group_t *group = list->data;
 
       if (group->pre_parse_func)
         {
@@ -2042,7 +2042,7 @@ g_option_context_parse (GOptionContext   *context,
 
                           while (list)
                             {
-                              GOptionGroup *group = list->data;
+                              xoption_group_t *group = list->data;
 
                               if (strcmp (arg + 5, group->name) == 0)
                                 print_help (context, FALSE, group);
@@ -2064,7 +2064,7 @@ g_option_context_parse (GOptionContext   *context,
                   list = context->groups;
                   while (list)
                     {
-                      GOptionGroup *group = list->data;
+                      xoption_group_t *group = list->data;
 
                       if (!parse_long_option (context, group, &i, arg,
                                               FALSE, argc, argv, error, &parsed))
@@ -2087,7 +2087,7 @@ g_option_context_parse (GOptionContext   *context,
                       list = context->groups;
                       while (list)
                         {
-                          GOptionGroup *group = list->data;
+                          xoption_group_t *group = list->data;
 
                           if (strncmp (group->name, arg, dash - arg) == 0)
                             {
@@ -2131,7 +2131,7 @@ g_option_context_parse (GOptionContext   *context,
                           list = context->groups;
                           while (list)
                             {
-                              GOptionGroup *group = list->data;
+                              xoption_group_t *group = list->data;
                               if (!parse_short_option (context, group, i, &new_i, arg[j],
                                                        argc, argv, error, &parsed))
                                 goto fail;
@@ -2210,7 +2210,7 @@ g_option_context_parse (GOptionContext   *context,
   list = context->groups;
   while (list)
     {
-      GOptionGroup *group = list->data;
+      xoption_group_t *group = list->data;
 
       if (group->post_parse_func)
         {
@@ -2260,7 +2260,7 @@ g_option_context_parse (GOptionContext   *context,
   list = context->groups;
   while (list)
     {
-      GOptionGroup *group = list->data;
+      xoption_group_t *group = list->data;
 
       if (group->error_func)
         (* group->error_func) (context, group,
@@ -2280,7 +2280,7 @@ g_option_context_parse (GOptionContext   *context,
 }
 
 /**
- * g_option_group_new:
+ * xoption_group_new:
  * @name: the name for the option group, this is used to provide
  *   help for the options in this group with `--help-`@name
  * @description: a description for this group to be shown in
@@ -2293,28 +2293,28 @@ g_option_context_parse (GOptionContext   *context,
  *   the error hook and to callbacks of %G_OPTION_ARG_CALLBACK options, or %NULL
  * @destroy: (nullable): a function that will be called to free @user_data, or %NULL
  *
- * Creates a new #GOptionGroup.
+ * Creates a new #xoption_group_t.
  *
  * Returns: a newly created option group. It should be added
- *   to a #GOptionContext or freed with g_option_group_unref().
+ *   to a #xoption_context_t or freed with xoption_group_unref().
  *
  * Since: 2.6
  **/
-GOptionGroup *
-g_option_group_new (const xchar_t    *name,
+xoption_group_t *
+xoption_group_new (const xchar_t    *name,
                     const xchar_t    *description,
                     const xchar_t    *help_description,
                     xpointer_t        user_data,
-                    GDestroyNotify  destroy)
+                    xdestroy_notify_t  destroy)
 
 {
-  GOptionGroup *group;
+  xoption_group_t *group;
 
-  group = g_new0 (GOptionGroup, 1);
+  group = g_new0 (xoption_group_t, 1);
   group->ref_count = 1;
-  group->name = g_strdup (name);
-  group->description = g_strdup (description);
-  group->help_description = g_strdup (help_description);
+  group->name = xstrdup (name);
+  group->description = xstrdup (description);
+  group->help_description = xstrdup (help_description);
   group->user_data = user_data;
   group->destroy_notify = destroy;
 
@@ -2323,34 +2323,34 @@ g_option_group_new (const xchar_t    *name,
 
 
 /**
- * g_option_group_free:
- * @group: a #GOptionGroup
+ * xoption_group_free:
+ * @group: a #xoption_group_t
  *
- * Frees a #GOptionGroup. Note that you must not free groups
- * which have been added to a #GOptionContext.
+ * Frees a #xoption_group_t. Note that you must not free groups
+ * which have been added to a #xoption_context_t.
  *
  * Since: 2.6
  *
- * Deprecated: 2.44: Use g_option_group_unref() instead.
+ * Deprecated: 2.44: Use xoption_group_unref() instead.
  */
 void
-g_option_group_free (GOptionGroup *group)
+xoption_group_free (xoption_group_t *group)
 {
-  g_option_group_unref (group);
+  xoption_group_unref (group);
 }
 
 /**
- * g_option_group_ref:
- * @group: a #GOptionGroup
+ * xoption_group_ref:
+ * @group: a #xoption_group_t
  *
  * Increments the reference count of @group by one.
  *
- * Returns: a #GOptionGroup
+ * Returns: a #xoption_group_t
  *
  * Since: 2.44
  */
-GOptionGroup *
-g_option_group_ref (GOptionGroup *group)
+xoption_group_t *
+xoption_group_ref (xoption_group_t *group)
 {
   g_return_val_if_fail (group != NULL, NULL);
 
@@ -2360,8 +2360,8 @@ g_option_group_ref (GOptionGroup *group)
 }
 
 /**
- * g_option_group_unref:
- * @group: a #GOptionGroup
+ * xoption_group_unref:
+ * @group: a #xoption_group_t
  *
  * Decrements the reference count of @group by one.
  * If the reference count drops to 0, the @group will be freed.
@@ -2370,7 +2370,7 @@ g_option_group_ref (GOptionGroup *group)
  * Since: 2.44
  */
 void
-g_option_group_unref (GOptionGroup *group)
+xoption_group_unref (xoption_group_t *group)
 {
   g_return_if_fail (group != NULL);
 
@@ -2393,8 +2393,8 @@ g_option_group_unref (GOptionGroup *group)
 }
 
 /**
- * g_option_group_add_entries:
- * @group: a #GOptionGroup
+ * xoption_group_add_entries:
+ * @group: a #xoption_group_t
  * @entries: (array zero-terminated=1): a %NULL-terminated array of #GOptionEntrys
  *
  * Adds the options specified in @entries to @group.
@@ -2402,7 +2402,7 @@ g_option_group_unref (GOptionGroup *group)
  * Since: 2.6
  **/
 void
-g_option_group_add_entries (GOptionGroup       *group,
+xoption_group_add_entries (xoption_group_t       *group,
                             const GOptionEntry *entries)
 {
   xsize_t i, n_entries;
@@ -2442,12 +2442,12 @@ g_option_group_add_entries (GOptionGroup       *group,
         }
 
       if (group->entries[i].arg != G_OPTION_ARG_CALLBACK &&
-          (group->entries[i].flags & (G_OPTION_FLAG_NO_ARG|G_OPTION_FLAG_OPTIONAL_ARG|G_OPTION_FLAG_FILENAME)) != 0)
+          (group->entries[i].flags & (G_OPTION_FLAG_NO_ARG|G_OPTION_FLAG_OPTIONAL_ARG|G_OPTION_FLAXFILENAME)) != 0)
         {
           g_warning (G_STRLOC ": ignoring no-arg, optional-arg or filename flags (%d) on option of arg-type %d in entry %s:%s",
               group->entries[i].flags, group->entries[i].arg, group->name, group->entries[i].long_name);
 
-          group->entries[i].flags &= ~(G_OPTION_FLAG_NO_ARG|G_OPTION_FLAG_OPTIONAL_ARG|G_OPTION_FLAG_FILENAME);
+          group->entries[i].flags &= ~(G_OPTION_FLAG_NO_ARG|G_OPTION_FLAG_OPTIONAL_ARG|G_OPTION_FLAXFILENAME);
         }
     }
 
@@ -2455,8 +2455,8 @@ g_option_group_add_entries (GOptionGroup       *group,
 }
 
 /**
- * g_option_group_set_parse_hooks:
- * @group: a #GOptionGroup
+ * xoption_group_set_parse_hooks:
+ * @group: a #xoption_group_t
  * @pre_parse_func: (nullable): a function to call before parsing, or %NULL
  * @post_parse_func: (nullable): a function to call after parsing, or %NULL
  *
@@ -2466,12 +2466,12 @@ g_option_group_add_entries (GOptionGroup       *group,
  *
  * Note that the user data to be passed to @pre_parse_func and
  * @post_parse_func can be specified when constructing the group
- * with g_option_group_new().
+ * with xoption_group_new().
  *
  * Since: 2.6
  **/
 void
-g_option_group_set_parse_hooks (GOptionGroup     *group,
+xoption_group_set_parse_hooks (xoption_group_t     *group,
                                 GOptionParseFunc  pre_parse_func,
                                 GOptionParseFunc  post_parse_func)
 {
@@ -2482,20 +2482,20 @@ g_option_group_set_parse_hooks (GOptionGroup     *group,
 }
 
 /**
- * g_option_group_set_error_hook:
- * @group: a #GOptionGroup
+ * xoption_group_set_error_hook:
+ * @group: a #xoption_group_t
  * @error_func: a function to call when an error occurs
  *
  * Associates a function with @group which will be called
  * from g_option_context_parse() when an error occurs.
  *
  * Note that the user data to be passed to @error_func can be
- * specified when constructing the group with g_option_group_new().
+ * specified when constructing the group with xoption_group_new().
  *
  * Since: 2.6
  **/
 void
-g_option_group_set_error_hook (GOptionGroup     *group,
+xoption_group_set_error_hook (xoption_group_t     *group,
                                GOptionErrorFunc  error_func)
 {
   g_return_if_fail (group != NULL);
@@ -2505,8 +2505,8 @@ g_option_group_set_error_hook (GOptionGroup     *group,
 
 
 /**
- * g_option_group_set_translate_func:
- * @group: a #GOptionGroup
+ * xoption_group_set_translate_func:
+ * @group: a #xoption_group_t
  * @func: (nullable): the #GTranslateFunc, or %NULL
  * @data: (nullable): user data to pass to @func, or %NULL
  * @destroy_notify: (nullable): a function which gets called to free @data, or %NULL
@@ -2516,15 +2516,15 @@ g_option_group_set_error_hook (GOptionGroup     *group,
  * #GTranslateFuncs. If @func is %NULL, strings are not translated.
  *
  * If you are using gettext(), you only need to set the translation
- * domain, see g_option_group_set_translation_domain().
+ * domain, see xoption_group_set_translation_domain().
  *
  * Since: 2.6
  **/
 void
-g_option_group_set_translate_func (GOptionGroup   *group,
+xoption_group_set_translate_func (xoption_group_t   *group,
                                    GTranslateFunc  func,
                                    xpointer_t        data,
-                                   GDestroyNotify  destroy_notify)
+                                   xdestroy_notify_t  destroy_notify)
 {
   g_return_if_fail (group != NULL);
 
@@ -2544,8 +2544,8 @@ dgettext_swapped (const xchar_t *msgid,
 }
 
 /**
- * g_option_group_set_translation_domain:
- * @group: a #GOptionGroup
+ * xoption_group_set_translation_domain:
+ * @group: a #xoption_group_t
  * @domain: the domain to use
  *
  * A convenience function to use gettext() for translating
@@ -2554,20 +2554,20 @@ dgettext_swapped (const xchar_t *msgid,
  * Since: 2.6
  **/
 void
-g_option_group_set_translation_domain (GOptionGroup *group,
+xoption_group_set_translation_domain (xoption_group_t *group,
                                        const xchar_t  *domain)
 {
   g_return_if_fail (group != NULL);
 
-  g_option_group_set_translate_func (group,
+  xoption_group_set_translate_func (group,
                                      (GTranslateFunc)dgettext_swapped,
-                                     g_strdup (domain),
+                                     xstrdup (domain),
                                      g_free);
 }
 
 /**
  * g_option_context_set_translate_func:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  * @func: (nullable): the #GTranslateFunc, or %NULL
  * @data: (nullable): user data to pass to @func, or %NULL
  * @destroy_notify: (nullable): a function which gets called to free @data, or %NULL
@@ -2587,10 +2587,10 @@ g_option_group_set_translation_domain (GOptionGroup *group,
  * Since: 2.12
  **/
 void
-g_option_context_set_translate_func (GOptionContext *context,
+g_option_context_set_translate_func (xoption_context_t *context,
                                      GTranslateFunc func,
                                      xpointer_t       data,
-                                     GDestroyNotify destroy_notify)
+                                     xdestroy_notify_t destroy_notify)
 {
   g_return_if_fail (context != NULL);
 
@@ -2604,7 +2604,7 @@ g_option_context_set_translate_func (GOptionContext *context,
 
 /**
  * g_option_context_set_translation_domain:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  * @domain: the domain to use
  *
  * A convenience function to use gettext() for translating
@@ -2613,20 +2613,20 @@ g_option_context_set_translate_func (GOptionContext *context,
  * Since: 2.12
  **/
 void
-g_option_context_set_translation_domain (GOptionContext *context,
+g_option_context_set_translation_domain (xoption_context_t *context,
                                          const xchar_t     *domain)
 {
   g_return_if_fail (context != NULL);
 
   g_option_context_set_translate_func (context,
                                        (GTranslateFunc)dgettext_swapped,
-                                       g_strdup (domain),
+                                       xstrdup (domain),
                                        g_free);
 }
 
 /**
  * g_option_context_set_summary:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  * @summary: (nullable): a string to be shown in `--help` output
  *  before the list of options, or %NULL
  *
@@ -2640,19 +2640,19 @@ g_option_context_set_translation_domain (GOptionContext *context,
  * Since: 2.12
  */
 void
-g_option_context_set_summary (GOptionContext *context,
+g_option_context_set_summary (xoption_context_t *context,
                               const xchar_t    *summary)
 {
   g_return_if_fail (context != NULL);
 
   g_free (context->summary);
-  context->summary = g_strdup (summary);
+  context->summary = xstrdup (summary);
 }
 
 
 /**
  * g_option_context_get_summary:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  *
  * Returns the summary. See g_option_context_set_summary().
  *
@@ -2661,7 +2661,7 @@ g_option_context_set_summary (GOptionContext *context,
  * Since: 2.12
  */
 const xchar_t *
-g_option_context_get_summary (GOptionContext *context)
+g_option_context_get_summary (xoption_context_t *context)
 {
   g_return_val_if_fail (context != NULL, NULL);
 
@@ -2670,7 +2670,7 @@ g_option_context_get_summary (GOptionContext *context)
 
 /**
  * g_option_context_set_description:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  * @description: (nullable): a string to be shown in `--help` output
  *   after the list of options, or %NULL
  *
@@ -2683,19 +2683,19 @@ g_option_context_get_summary (GOptionContext *context)
  * Since: 2.12
  */
 void
-g_option_context_set_description (GOptionContext *context,
+g_option_context_set_description (xoption_context_t *context,
                                   const xchar_t    *description)
 {
   g_return_if_fail (context != NULL);
 
   g_free (context->description);
-  context->description = g_strdup (description);
+  context->description = xstrdup (description);
 }
 
 
 /**
  * g_option_context_get_description:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  *
  * Returns the description. See g_option_context_set_description().
  *
@@ -2704,7 +2704,7 @@ g_option_context_set_description (GOptionContext *context,
  * Since: 2.12
  */
 const xchar_t *
-g_option_context_get_description (GOptionContext *context)
+g_option_context_get_description (xoption_context_t *context)
 {
   g_return_val_if_fail (context != NULL, NULL);
 
@@ -2713,7 +2713,7 @@ g_option_context_get_description (GOptionContext *context)
 
 /**
  * g_option_context_parse_strv:
- * @context: a #GOptionContext
+ * @context: a #xoption_context_t
  * @arguments: (inout) (array null-terminated=1) (optional): a pointer
  *    to the command line arguments (which must be in UTF-8 on Windows).
  *    Starting with GLib 2.62, @arguments can be %NULL, which matches
@@ -2734,8 +2734,8 @@ g_option_context_get_description (GOptionContext *context)
  * system codepage, which is how they are passed as @argv to main().
  * See g_win32_get_command_line() for a solution.
  *
- * This function is useful if you are trying to use #GOptionContext with
- * #GApplication.
+ * This function is useful if you are trying to use #xoption_context_t with
+ * #xapplication_t.
  *
  * Returns: %TRUE if the parsing was successful,
  *          %FALSE if an error occurred
@@ -2743,7 +2743,7 @@ g_option_context_get_description (GOptionContext *context)
  * Since: 2.40
  **/
 xboolean_t
-g_option_context_parse_strv (GOptionContext   *context,
+g_option_context_parse_strv (xoption_context_t   *context,
                              xchar_t          ***arguments,
                              xerror_t          **error)
 {
@@ -2753,7 +2753,7 @@ g_option_context_parse_strv (GOptionContext   *context,
   g_return_val_if_fail (context != NULL, FALSE);
 
   context->strv_mode = TRUE;
-  argc = arguments && *arguments ? g_strv_length (*arguments) : 0;
+  argc = arguments && *arguments ? xstrv_length (*arguments) : 0;
   success = g_option_context_parse (context, &argc, arguments, error);
   context->strv_mode = FALSE;
 

@@ -39,14 +39,14 @@
 
 /**
  * SECTION:gapplicationcommandline
- * @title: GApplicationCommandLine
+ * @title: xapplication_command_line_t
  * @short_description: A command-line invocation of an application
  * @include: gio/gio.h
- * @see_also: #GApplication
+ * @see_also: #xapplication_t
  *
- * #GApplicationCommandLine represents a command-line invocation of
- * an application.  It is created by #GApplication and emitted
- * in the #GApplication::command-line signal and virtual function.
+ * #xapplication_command_line_t represents a command-line invocation of
+ * an application.  It is created by #xapplication_t and emitted
+ * in the #xapplication_t::command-line signal and virtual function.
  *
  * The class contains the list of arguments that the program was invoked
  * with.  It is also possible to query if the commandline invocation was
@@ -54,9 +54,9 @@
  * invocation) or remote (ie: some other process forwarded the
  * commandline to this process).
  *
- * The GApplicationCommandLine object can provide the @argc and @argv
- * parameters for use with the #GOptionContext command-line parsing API,
- * with the g_application_command_line_get_arguments() function. See
+ * The xapplication_command_line_t object can provide the @argc and @argv
+ * parameters for use with the #xoption_context_t command-line parsing API,
+ * with the xapplication_command_line_get_arguments() function. See
  * [gapplication-example-cmdline3.c][gapplication-example-cmdline3]
  * for an example.
  *
@@ -66,8 +66,8 @@
  * of this object (ie: the process exits when the last reference is
  * dropped).
  *
- * The main use for #GApplicationCommandLine (and the
- * #GApplication::command-line signal) is 'Emacs server' like use cases:
+ * The main use for #xapplication_command_line_t (and the
+ * #xapplication_t::command-line signal) is 'Emacs server' like use cases:
  * You can set the `EDITOR` environment variable to have e.g. git use
  * your favourite editor to edit commit messages, and if you already
  * have an instance of the editor running, the editing will happen
@@ -76,29 +76,29 @@
  * does not return until the editing is done.
  *
  * Normally, the commandline is completely handled in the
- * #GApplication::command-line handler. The launching instance exits
+ * #xapplication_t::command-line handler. The launching instance exits
  * once the signal handler in the primary instance has returned, and
  * the return value of the signal handler becomes the exit status
  * of the launching instance.
  * |[<!-- language="C" -->
  * static int
- * command_line (GApplication            *application,
- *               GApplicationCommandLine *cmdline)
+ * command_line (xapplication_t            *application,
+ *               xapplication_command_line_t *cmdline)
  * {
  *   xchar_t **argv;
  *   xint_t argc;
  *   xint_t i;
  *
- *   argv = g_application_command_line_get_arguments (cmdline, &argc);
+ *   argv = xapplication_command_line_get_arguments (cmdline, &argc);
  *
- *   g_application_command_line_print (cmdline,
+ *   xapplication_command_line_print (cmdline,
  *                                     "This text is written back\n"
  *                                     "to stdout of the caller\n");
  *
  *   for (i = 0; i < argc; i++)
  *     g_print ("argument %d: %s\n", i, argv[i]);
  *
- *   g_strfreev (argv);
+ *   xstrfreev (argv);
  *
  *   return 0;
  * }
@@ -110,7 +110,7 @@
  * split between the launcher and the primary instance.
  * |[<!-- language="C" -->
  * static xboolean_t
- *  test_local_cmdline (GApplication   *application,
+ *  test_local_cmdline (xapplication_t   *application,
  *                      xchar_t        ***arguments,
  *                      xint_t           *exit_status)
  * {
@@ -128,7 +128,7 @@
  *   i = 1;
  *   while (argv[i])
  *     {
- *       if (g_str_has_prefix (argv[i], "--local-"))
+ *       if (xstr_has_prefix (argv[i], "--local-"))
  *         {
  *           g_print ("handling argument %s locally\n", argv[i]);
  *           g_free (argv[i]);
@@ -157,7 +157,7 @@
  * ]|
  * In this example of split commandline handling, options that start
  * with `--local-` are handled locally, all other options are passed
- * to the #GApplication::command-line handler which runs in the primary
+ * to the #xapplication_t::command-line handler which runs in the primary
  * instance.
  *
  * The complete example can be found here:
@@ -169,36 +169,36 @@
  * static xboolean_t
  * my_cmdline_handler (xpointer_t data)
  * {
- *   GApplicationCommandLine *cmdline = data;
+ *   xapplication_command_line_t *cmdline = data;
  *
  *   // do the heavy lifting in an idle
  *
- *   g_application_command_line_set_exit_status (cmdline, 0);
- *   g_object_unref (cmdline); // this releases the application
+ *   xapplication_command_line_set_exit_status (cmdline, 0);
+ *   xobject_unref (cmdline); // this releases the application
  *
  *   return G_SOURCE_REMOVE;
  * }
  *
  * static int
- * command_line (GApplication            *application,
- *               GApplicationCommandLine *cmdline)
+ * command_line (xapplication_t            *application,
+ *               xapplication_command_line_t *cmdline)
  * {
  *   // keep the application running until we are done with this commandline
- *   g_application_hold (application);
+ *   xapplication_hold (application);
  *
- *   g_object_set_data_full (G_OBJECT (cmdline),
+ *   xobject_set_data_full (G_OBJECT (cmdline),
  *                           "application", application,
- *                           (GDestroyNotify)g_application_release);
+ *                           (xdestroy_notify_t)xapplication_release);
  *
- *   g_object_ref (cmdline);
+ *   xobject_ref (cmdline);
  *   g_idle_add (my_cmdline_handler, cmdline);
  *
  *   return 0;
  * }
  * ]|
  * In this example the commandline is not completely handled before
- * the #GApplication::command-line handler returns. Instead, we keep
- * a reference to the #GApplicationCommandLine object and handle it
+ * the #xapplication_t::command-line handler returns. Instead, we keep
+ * a reference to the #xapplication_command_line_t object and handle it
  * later (in this example, in an idle). Note that it is necessary to
  * hold the application until you are done with the commandline.
  *
@@ -207,16 +207,16 @@
  */
 
 /**
- * GApplicationCommandLine:
+ * xapplication_command_line_t:
  *
- * #GApplicationCommandLine is an opaque data structure and can only be accessed
+ * #xapplication_command_line_t is an opaque data structure and can only be accessed
  * using the following functions.
  */
 
 /**
- * GApplicationCommandLineClass:
+ * xapplication_command_line_class_t:
  *
- * The #GApplicationCommandLineClass-struct
+ * The #xapplication_command_line_class_t-struct
  * contains private data only.
  *
  * Since: 2.28
@@ -235,65 +235,65 @@ struct _GApplicationCommandLinePrivate
   xvariant_t *platform_data;
   xvariant_t *arguments;
   xvariant_t *options;
-  GVariantDict *options_dict;
+  xvariant_dict_t *options_dict;
   xchar_t *cwd;  /* in GLib filename encoding, not UTF-8 */
 
   xchar_t **environ;
   xint_t exit_status;
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (GApplicationCommandLine, g_application_command_line, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (xapplication_command_line_t, xapplication_command_line, XTYPE_OBJECT)
 
 /* All subclasses represent remote invocations of some kind. */
 #define IS_REMOTE(cmdline) (XTYPE_FROM_INSTANCE (cmdline) != \
                             XTYPE_APPLICATION_COMMAND_LINE)
 
 static void
-grok_platform_data (GApplicationCommandLine *cmdline)
+grok_platform_data (xapplication_command_line_t *cmdline)
 {
-  GVariantIter iter;
+  xvariant_iter_t iter;
   const xchar_t *key;
   xvariant_t *value;
 
-  g_variant_iter_init (&iter, cmdline->priv->platform_data);
+  xvariant_iter_init (&iter, cmdline->priv->platform_data);
 
-  while (g_variant_iter_loop (&iter, "{&sv}", &key, &value))
+  while (xvariant_iter_loop (&iter, "{&sv}", &key, &value))
     if (strcmp (key, "cwd") == 0)
       {
         if (!cmdline->priv->cwd)
-          cmdline->priv->cwd = g_variant_dup_bytestring (value, NULL);
+          cmdline->priv->cwd = xvariant_dup_bytestring (value, NULL);
       }
 
     else if (strcmp (key, "environ") == 0)
       {
         if (!cmdline->priv->environ)
           cmdline->priv->environ =
-            g_variant_dup_bytestring_array (value, NULL);
+            xvariant_dup_bytestring_array (value, NULL);
       }
 
     else if (strcmp (key, "options") == 0)
       {
         if (!cmdline->priv->options)
-          cmdline->priv->options = g_variant_ref (value);
+          cmdline->priv->options = xvariant_ref (value);
       }
 }
 
 static void
-g_application_command_line_real_print_literal (GApplicationCommandLine *cmdline,
+xapplication_command_line_real_print_literal (xapplication_command_line_t *cmdline,
                                                const xchar_t             *message)
 {
   g_print ("%s", message);
 }
 
 static void
-g_application_command_line_real_printerr_literal (GApplicationCommandLine *cmdline,
+xapplication_command_line_real_printerr_literal (xapplication_command_line_t *cmdline,
                                                   const xchar_t             *message)
 {
   g_printerr ("%s", message);
 }
 
 static xinput_stream_t *
-g_application_command_line_real_get_stdin (GApplicationCommandLine *cmdline)
+xapplication_command_line_real_get_stdin (xapplication_command_line_t *cmdline)
 {
 #ifdef G_OS_UNIX
   return g_unix_input_stream_new (0, FALSE);
@@ -303,25 +303,25 @@ g_application_command_line_real_get_stdin (GApplicationCommandLine *cmdline)
 }
 
 static void
-g_application_command_line_get_property (xobject_t    *object,
+xapplication_command_line_get_property (xobject_t    *object,
                                          xuint_t       prop_id,
-                                         GValue     *value,
-                                         GParamSpec *pspec)
+                                         xvalue_t     *value,
+                                         xparam_spec_t *pspec)
 {
-  GApplicationCommandLine *cmdline = G_APPLICATION_COMMAND_LINE (object);
+  xapplication_command_line_t *cmdline = G_APPLICATION_COMMAND_LINE (object);
 
   switch (prop_id)
     {
     case PROP_ARGUMENTS:
-      g_value_set_variant (value, cmdline->priv->arguments);
+      xvalue_set_variant (value, cmdline->priv->arguments);
       break;
 
     case PROP_PLATFORM_DATA:
-      g_value_set_variant (value, cmdline->priv->platform_data);
+      xvalue_set_variant (value, cmdline->priv->platform_data);
       break;
 
     case PROP_IS_REMOTE:
-      g_value_set_boolean (value, IS_REMOTE (cmdline));
+      xvalue_set_boolean (value, IS_REMOTE (cmdline));
       break;
 
     default:
@@ -330,28 +330,28 @@ g_application_command_line_get_property (xobject_t    *object,
 }
 
 static void
-g_application_command_line_set_property (xobject_t      *object,
+xapplication_command_line_set_property (xobject_t      *object,
                                          xuint_t         prop_id,
-                                         const GValue *value,
-                                         GParamSpec   *pspec)
+                                         const xvalue_t *value,
+                                         xparam_spec_t   *pspec)
 {
-  GApplicationCommandLine *cmdline = G_APPLICATION_COMMAND_LINE (object);
+  xapplication_command_line_t *cmdline = G_APPLICATION_COMMAND_LINE (object);
 
   switch (prop_id)
     {
     case PROP_ARGUMENTS:
       g_assert (cmdline->priv->arguments == NULL);
-      cmdline->priv->arguments = g_value_dup_variant (value);
+      cmdline->priv->arguments = xvalue_dup_variant (value);
       break;
 
     case PROP_OPTIONS:
       g_assert (cmdline->priv->options == NULL);
-      cmdline->priv->options = g_value_dup_variant (value);
+      cmdline->priv->options = xvalue_dup_variant (value);
       break;
 
     case PROP_PLATFORM_DATA:
       g_assert (cmdline->priv->platform_data == NULL);
-      cmdline->priv->platform_data = g_value_dup_variant (value);
+      cmdline->priv->platform_data = xvalue_dup_variant (value);
       if (cmdline->priv->platform_data != NULL)
         grok_platform_data (cmdline);
       break;
@@ -362,38 +362,38 @@ g_application_command_line_set_property (xobject_t      *object,
 }
 
 static void
-g_application_command_line_finalize (xobject_t *object)
+xapplication_command_line_finalize (xobject_t *object)
 {
-  GApplicationCommandLine *cmdline = G_APPLICATION_COMMAND_LINE (object);
+  xapplication_command_line_t *cmdline = G_APPLICATION_COMMAND_LINE (object);
 
   if (cmdline->priv->options_dict)
-    g_variant_dict_unref (cmdline->priv->options_dict);
+    xvariant_dict_unref (cmdline->priv->options_dict);
 
   if (cmdline->priv->options)
-      g_variant_unref (cmdline->priv->options);
+      xvariant_unref (cmdline->priv->options);
 
   if (cmdline->priv->platform_data)
-    g_variant_unref (cmdline->priv->platform_data);
+    xvariant_unref (cmdline->priv->platform_data);
   if (cmdline->priv->arguments)
-    g_variant_unref (cmdline->priv->arguments);
+    xvariant_unref (cmdline->priv->arguments);
 
   g_free (cmdline->priv->cwd);
-  g_strfreev (cmdline->priv->environ);
+  xstrfreev (cmdline->priv->environ);
 
-  G_OBJECT_CLASS (g_application_command_line_parent_class)
+  G_OBJECT_CLASS (xapplication_command_line_parent_class)
     ->finalize (object);
 }
 
 static void
-g_application_command_line_init (GApplicationCommandLine *cmdline)
+xapplication_command_line_init (xapplication_command_line_t *cmdline)
 {
-  cmdline->priv = g_application_command_line_get_instance_private (cmdline);
+  cmdline->priv = xapplication_command_line_get_instance_private (cmdline);
 }
 
 static void
-g_application_command_line_constructed (xobject_t *object)
+xapplication_command_line_constructed (xobject_t *object)
 {
-  GApplicationCommandLine *cmdline = G_APPLICATION_COMMAND_LINE (object);
+  xapplication_command_line_t *cmdline = G_APPLICATION_COMMAND_LINE (object);
 
   if (IS_REMOTE (cmdline))
     return;
@@ -407,20 +407,20 @@ g_application_command_line_constructed (xobject_t *object)
 }
 
 static void
-g_application_command_line_class_init (GApplicationCommandLineClass *class)
+xapplication_command_line_class_init (xapplication_command_line_class_t *class)
 {
   xobject_class_t *object_class = G_OBJECT_CLASS (class);
 
-  object_class->get_property = g_application_command_line_get_property;
-  object_class->set_property = g_application_command_line_set_property;
-  object_class->finalize = g_application_command_line_finalize;
-  object_class->constructed = g_application_command_line_constructed;
+  object_class->get_property = xapplication_command_line_get_property;
+  object_class->set_property = xapplication_command_line_set_property;
+  object_class->finalize = xapplication_command_line_finalize;
+  object_class->constructed = xapplication_command_line_constructed;
 
-  class->printerr_literal = g_application_command_line_real_printerr_literal;
-  class->print_literal = g_application_command_line_real_print_literal;
-  class->get_stdin = g_application_command_line_real_get_stdin;
+  class->printerr_literal = xapplication_command_line_real_printerr_literal;
+  class->print_literal = xapplication_command_line_real_print_literal;
+  class->get_stdin = xapplication_command_line_real_get_stdin;
 
-  g_object_class_install_property (object_class, PROP_ARGUMENTS,
+  xobject_class_install_property (object_class, PROP_ARGUMENTS,
     g_param_spec_variant ("arguments",
                           P_("Commandline arguments"),
                           P_("The commandline that caused this ::command-line signal emission"),
@@ -428,14 +428,14 @@ g_application_command_line_class_init (GApplicationCommandLineClass *class)
                           G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (object_class, PROP_OPTIONS,
+  xobject_class_install_property (object_class, PROP_OPTIONS,
     g_param_spec_variant ("options",
                           P_("Options"),
                           P_("The options sent along with the commandline"),
                           G_VARIANT_TYPE_VARDICT, NULL, G_PARAM_WRITABLE |
                           G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (object_class, PROP_PLATFORM_DATA,
+  xobject_class_install_property (object_class, PROP_PLATFORM_DATA,
     g_param_spec_variant ("platform-data",
                           P_("Platform data"),
                           P_("Platform-specific data for the commandline"),
@@ -443,7 +443,7 @@ g_application_command_line_class_init (GApplicationCommandLineClass *class)
                           G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (object_class, PROP_IS_REMOTE,
+  xobject_class_install_property (object_class, PROP_IS_REMOTE,
     g_param_spec_boolean ("is-remote",
                           P_("Is remote"),
                           P_("TRUE if this is a remote commandline"),
@@ -453,8 +453,8 @@ g_application_command_line_class_init (GApplicationCommandLineClass *class)
 
 
 /**
- * g_application_command_line_get_arguments:
- * @cmdline: a #GApplicationCommandLine
+ * xapplication_command_line_get_arguments:
+ * @cmdline: a #xapplication_command_line_t
  * @argc: (out) (optional): the length of the arguments array, or %NULL
  *
  * Gets the list of arguments that was passed on the command line.
@@ -463,11 +463,11 @@ g_application_command_line_class_init (GApplicationCommandLineClass *class)
  * filenames or arguments given in the system locale) but are always in
  * UTF-8 on Windows.
  *
- * If you wish to use the return value with #GOptionContext, you must
+ * If you wish to use the return value with #xoption_context_t, you must
  * use g_option_context_parse_strv().
  *
  * The return value is %NULL-terminated and should be freed using
- * g_strfreev().
+ * xstrfreev().
  *
  * Returns: (array length=argc) (element-type filename) (transfer full)
  *      the string array containing the arguments (the argv)
@@ -475,7 +475,7 @@ g_application_command_line_class_init (GApplicationCommandLineClass *class)
  * Since: 2.28
  **/
 xchar_t **
-g_application_command_line_get_arguments (GApplicationCommandLine *cmdline,
+xapplication_command_line_get_arguments (xapplication_command_line_t *cmdline,
                                           int                     *argc)
 {
   xchar_t **argv;
@@ -483,7 +483,7 @@ g_application_command_line_get_arguments (GApplicationCommandLine *cmdline,
 
   g_return_val_if_fail (X_IS_APPLICATION_COMMAND_LINE (cmdline), NULL);
 
-  argv = g_variant_dup_bytestring_array (cmdline->priv->arguments, &len);
+  argv = xvariant_dup_bytestring_array (cmdline->priv->arguments, &len);
 
   if (argc)
     *argc = len;
@@ -492,37 +492,37 @@ g_application_command_line_get_arguments (GApplicationCommandLine *cmdline,
 }
 
 /**
- * g_application_command_line_get_options_dict:
- * @cmdline: a #GApplicationCommandLine
+ * xapplication_command_line_get_options_dict:
+ * @cmdline: a #xapplication_command_line_t
  *
- * Gets the options there were passed to g_application_command_line().
+ * Gets the options there were passed to xapplication_command_line().
  *
  * If you did not override local_command_line() then these are the same
  * options that were parsed according to the #GOptionEntrys added to the
- * application with g_application_add_main_option_entries() and possibly
- * modified from your GApplication::handle-local-options handler.
+ * application with xapplication_add_main_option_entries() and possibly
+ * modified from your xapplication_t::handle-local-options handler.
  *
  * If no options were sent then an empty dictionary is returned so that
  * you don't need to check for %NULL.
  *
- * Returns: (transfer none): a #GVariantDict with the options
+ * Returns: (transfer none): a #xvariant_dict_t with the options
  *
  * Since: 2.40
  **/
-GVariantDict *
-g_application_command_line_get_options_dict (GApplicationCommandLine *cmdline)
+xvariant_dict_t *
+xapplication_command_line_get_options_dict (xapplication_command_line_t *cmdline)
 {
   g_return_val_if_fail (X_IS_APPLICATION_COMMAND_LINE (cmdline), NULL);
 
   if (!cmdline->priv->options_dict)
-    cmdline->priv->options_dict = g_variant_dict_new (cmdline->priv->options);
+    cmdline->priv->options_dict = xvariant_dict_new (cmdline->priv->options);
 
   return cmdline->priv->options_dict;
 }
 
 /**
- * g_application_command_line_get_stdin:
- * @cmdline: a #GApplicationCommandLine
+ * xapplication_command_line_get_stdin:
+ * @cmdline: a #xapplication_command_line_t
  *
  * Gets the stdin of the invoking process.
  *
@@ -540,14 +540,14 @@ g_application_command_line_get_options_dict (GApplicationCommandLine *cmdline)
  * Since: 2.34
  **/
 xinput_stream_t *
-g_application_command_line_get_stdin (GApplicationCommandLine *cmdline)
+xapplication_command_line_get_stdin (xapplication_command_line_t *cmdline)
 {
   return G_APPLICATION_COMMAND_LINE_GET_CLASS (cmdline)->get_stdin (cmdline);
 }
 
 /**
- * g_application_command_line_get_cwd:
- * @cmdline: a #GApplicationCommandLine
+ * xapplication_command_line_get_cwd:
+ * @cmdline: a #xapplication_command_line_t
  *
  * Gets the working directory of the command line invocation.
  * The string may contain non-utf8 data.
@@ -563,14 +563,14 @@ g_application_command_line_get_stdin (GApplicationCommandLine *cmdline)
  * Since: 2.28
  **/
 const xchar_t *
-g_application_command_line_get_cwd (GApplicationCommandLine *cmdline)
+xapplication_command_line_get_cwd (xapplication_command_line_t *cmdline)
 {
   return cmdline->priv->cwd;
 }
 
 /**
- * g_application_command_line_get_environ:
- * @cmdline: a #GApplicationCommandLine
+ * xapplication_command_line_get_environ:
+ * @cmdline: a #xapplication_command_line_t
  *
  * Gets the contents of the 'environ' variable of the command line
  * invocation, as would be returned by g_get_environ(), ie as a
@@ -585,7 +585,7 @@ g_application_command_line_get_cwd (GApplicationCommandLine *cmdline)
  * The return value should not be modified or freed and is valid for as
  * long as @cmdline exists.
  *
- * See g_application_command_line_getenv() if you are only interested
+ * See xapplication_command_line_getenv() if you are only interested
  * in the value of a single environment variable.
  *
  * Returns: (array zero-terminated=1) (element-type filename) (transfer none):
@@ -594,14 +594,14 @@ g_application_command_line_get_cwd (GApplicationCommandLine *cmdline)
  * Since: 2.28
  **/
 const xchar_t * const *
-g_application_command_line_get_environ (GApplicationCommandLine *cmdline)
+xapplication_command_line_get_environ (xapplication_command_line_t *cmdline)
 {
   return (const xchar_t **)cmdline->priv->environ;
 }
 
 /**
- * g_application_command_line_getenv:
- * @cmdline: a #GApplicationCommandLine
+ * xapplication_command_line_getenv:
+ * @cmdline: a #xapplication_command_line_t
  * @name: (type filename): the environment variable to get
  *
  * Gets the value of a particular environment variable of the command
@@ -621,7 +621,7 @@ g_application_command_line_get_environ (GApplicationCommandLine *cmdline)
  * Since: 2.28
  **/
 const xchar_t *
-g_application_command_line_getenv (GApplicationCommandLine *cmdline,
+xapplication_command_line_getenv (xapplication_command_line_t *cmdline,
                                    const xchar_t             *name)
 {
   xint_t length = strlen (name);
@@ -638,8 +638,8 @@ g_application_command_line_getenv (GApplicationCommandLine *cmdline,
 }
 
 /**
- * g_application_command_line_get_is_remote:
- * @cmdline: a #GApplicationCommandLine
+ * xapplication_command_line_get_is_remote:
+ * @cmdline: a #xapplication_command_line_t
  *
  * Determines if @cmdline represents a remote invocation.
  *
@@ -648,14 +648,14 @@ g_application_command_line_getenv (GApplicationCommandLine *cmdline,
  * Since: 2.28
  **/
 xboolean_t
-g_application_command_line_get_is_remote (GApplicationCommandLine *cmdline)
+xapplication_command_line_get_is_remote (xapplication_command_line_t *cmdline)
 {
   return IS_REMOTE (cmdline);
 }
 
 /**
- * g_application_command_line_print:
- * @cmdline: a #GApplicationCommandLine
+ * xapplication_command_line_print:
+ * @cmdline: a #xapplication_command_line_t
  * @format: a printf-style format string
  * @...: arguments, as per @format
  *
@@ -669,7 +669,7 @@ g_application_command_line_get_is_remote (GApplicationCommandLine *cmdline)
  * Since: 2.28
  **/
 void
-g_application_command_line_print (GApplicationCommandLine *cmdline,
+xapplication_command_line_print (xapplication_command_line_t *cmdline,
                                   const xchar_t             *format,
                                   ...)
 {
@@ -680,7 +680,7 @@ g_application_command_line_print (GApplicationCommandLine *cmdline,
   g_return_if_fail (format != NULL);
 
   va_start (ap, format);
-  message = g_strdup_vprintf (format, ap);
+  message = xstrdup_vprintf (format, ap);
   va_end (ap);
 
   G_APPLICATION_COMMAND_LINE_GET_CLASS (cmdline)
@@ -689,8 +689,8 @@ g_application_command_line_print (GApplicationCommandLine *cmdline,
 }
 
 /**
- * g_application_command_line_printerr:
- * @cmdline: a #GApplicationCommandLine
+ * xapplication_command_line_printerr:
+ * @cmdline: a #xapplication_command_line_t
  * @format: a printf-style format string
  * @...: arguments, as per @format
  *
@@ -704,7 +704,7 @@ g_application_command_line_print (GApplicationCommandLine *cmdline,
  * Since: 2.28
  **/
 void
-g_application_command_line_printerr (GApplicationCommandLine *cmdline,
+xapplication_command_line_printerr (xapplication_command_line_t *cmdline,
                                      const xchar_t             *format,
                                      ...)
 {
@@ -715,7 +715,7 @@ g_application_command_line_printerr (GApplicationCommandLine *cmdline,
   g_return_if_fail (format != NULL);
 
   va_start (ap, format);
-  message = g_strdup_vprintf (format, ap);
+  message = xstrdup_vprintf (format, ap);
   va_end (ap);
 
   G_APPLICATION_COMMAND_LINE_GET_CLASS (cmdline)
@@ -724,14 +724,14 @@ g_application_command_line_printerr (GApplicationCommandLine *cmdline,
 }
 
 /**
- * g_application_command_line_set_exit_status:
- * @cmdline: a #GApplicationCommandLine
+ * xapplication_command_line_set_exit_status:
+ * @cmdline: a #xapplication_command_line_t
  * @exit_status: the exit status
  *
  * Sets the exit status that will be used when the invoking process
  * exits.
  *
- * The return value of the #GApplication::command-line signal is
+ * The return value of the #xapplication_t::command-line signal is
  * passed to this function when the handler returns.  This is the usual
  * way of setting the exit status.
  *
@@ -748,12 +748,12 @@ g_application_command_line_printerr (GApplicationCommandLine *cmdline,
  * increased to a non-zero value) then the application is considered to
  * have been 'successful' in a certain sense, and the exit status is
  * always zero.  If the application use count is zero, though, the exit
- * status of the local #GApplicationCommandLine is used.
+ * status of the local #xapplication_command_line_t is used.
  *
  * Since: 2.28
  **/
 void
-g_application_command_line_set_exit_status (GApplicationCommandLine *cmdline,
+xapplication_command_line_set_exit_status (xapplication_command_line_t *cmdline,
                                             int                      exit_status)
 {
   g_return_if_fail (X_IS_APPLICATION_COMMAND_LINE (cmdline));
@@ -762,18 +762,18 @@ g_application_command_line_set_exit_status (GApplicationCommandLine *cmdline,
 }
 
 /**
- * g_application_command_line_get_exit_status:
- * @cmdline: a #GApplicationCommandLine
+ * xapplication_command_line_get_exit_status:
+ * @cmdline: a #xapplication_command_line_t
  *
  * Gets the exit status of @cmdline.  See
- * g_application_command_line_set_exit_status() for more information.
+ * xapplication_command_line_set_exit_status() for more information.
  *
  * Returns: the exit status
  *
  * Since: 2.28
  **/
 int
-g_application_command_line_get_exit_status (GApplicationCommandLine *cmdline)
+xapplication_command_line_get_exit_status (xapplication_command_line_t *cmdline)
 {
   g_return_val_if_fail (X_IS_APPLICATION_COMMAND_LINE (cmdline), -1);
 
@@ -781,8 +781,8 @@ g_application_command_line_get_exit_status (GApplicationCommandLine *cmdline)
 }
 
 /**
- * g_application_command_line_get_platform_data:
- * @cmdline: #GApplicationCommandLine
+ * xapplication_command_line_get_platform_data:
+ * @cmdline: #xapplication_command_line_t
  *
  * Gets the platform data associated with the invocation of @cmdline.
  *
@@ -798,25 +798,25 @@ g_application_command_line_get_exit_status (GApplicationCommandLine *cmdline)
  * Since: 2.28
  **/
 xvariant_t *
-g_application_command_line_get_platform_data (GApplicationCommandLine *cmdline)
+xapplication_command_line_get_platform_data (xapplication_command_line_t *cmdline)
 {
   g_return_val_if_fail (X_IS_APPLICATION_COMMAND_LINE (cmdline), NULL);
 
   if (cmdline->priv->platform_data)
-    return g_variant_ref (cmdline->priv->platform_data);
+    return xvariant_ref (cmdline->priv->platform_data);
   else
       return NULL;
 }
 
 /**
- * g_application_command_line_create_file_for_arg:
- * @cmdline: a #GApplicationCommandLine
+ * xapplication_command_line_create_file_for_arg:
+ * @cmdline: a #xapplication_command_line_t
  * @arg: (type filename): an argument from @cmdline
  *
  * Creates a #xfile_t corresponding to a filename that was given as part
  * of the invocation of @cmdline.
  *
- * This differs from g_file_new_for_commandline_arg() in that it
+ * This differs from xfile_new_for_commandline_arg() in that it
  * resolves relative pathnames using the current working directory of
  * the invoking process rather than the local process.
  *
@@ -825,16 +825,16 @@ g_application_command_line_get_platform_data (GApplicationCommandLine *cmdline)
  * Since: 2.36
  **/
 xfile_t *
-g_application_command_line_create_file_for_arg (GApplicationCommandLine *cmdline,
+xapplication_command_line_create_file_for_arg (xapplication_command_line_t *cmdline,
                                                 const xchar_t             *arg)
 {
   g_return_val_if_fail (arg != NULL, NULL);
 
   if (cmdline->priv->cwd)
-    return g_file_new_for_commandline_arg_and_cwd (arg, cmdline->priv->cwd);
+    return xfile_new_for_commandline_arg_and_cwd (arg, cmdline->priv->cwd);
 
   g_warning ("Requested creation of xfile_t for commandline invocation that did not send cwd. "
              "Using cwd of local process to resolve relative path names.");
 
-  return g_file_new_for_commandline_arg (arg);
+  return xfile_new_for_commandline_arg (arg);
 }

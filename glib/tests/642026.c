@@ -17,8 +17,8 @@
 #include <glib.h>
 
 static GStaticPrivate sp;
-static GMutex *mutex;
-static GCond *cond;
+static xmutex_t *mutex;
+static xcond_t *cond;
 static xuint_t i;
 
 static xint_t freed = 0;  /* (atomic) */
@@ -28,7 +28,7 @@ notify (xpointer_t p)
 {
   if (!g_atomic_int_compare_and_exchange (&freed, 0, 1))
     {
-      g_error ("someone already freed it after %u iterations", i);
+      xerror ("someone already freed it after %u iterations", i);
     }
 }
 
@@ -69,12 +69,12 @@ testcase (void)
 
   for (i = 0; i < n_iterations; i++)
     {
-      GThread *t1;
+      xthread_t *t1;
 
       g_static_private_init (&sp);
       g_atomic_int_set (&freed, 0);
 
-      t1 = g_thread_create (thread_func, NULL, TRUE, NULL);
+      t1 = xthread_create (thread_func, NULL, TRUE, NULL);
       g_assert (t1 != NULL);
 
       /* wait for t1 to set up its thread-private data */
@@ -82,7 +82,7 @@ testcase (void)
 
       /* exercise the bug, by racing with t1 to free the private data */
       g_static_private_free (&sp);
-      g_thread_join (t1);
+      xthread_join (t1);
     }
 
   g_cond_free (cond);

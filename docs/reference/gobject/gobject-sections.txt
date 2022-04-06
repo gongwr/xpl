@@ -20,11 +20,11 @@ XTYPE_IS_INTERFACE
 XTYPE_IS_FINAL
 xtype_interface_t
 GTypeInstance
-GTypeClass
-GTypeInfo
+xtype_class_t
+xtype_info_t
 GTypeFundamentalInfo
-GInterfaceInfo
-GTypeValueTable
+xinterface_info_t
+xtype_value_table_t
 XTYPE_FROM_INSTANCE
 XTYPE_FROM_CLASS
 XTYPE_FROM_INTERFACE
@@ -41,69 +41,69 @@ XTYPE_CHECK_CLASS_TYPE
 XTYPE_CHECK_VALUE
 XTYPE_CHECK_VALUE_TYPE
 XTYPE_FLAG_RESERVED_ID_BIT
-g_type_init
+xtype_init
 GTypeDebugFlags
-g_type_init_with_debug_flags
-g_type_name
-g_type_qname
-g_type_from_name
-g_type_parent
-g_type_depth
-g_type_next_base
-g_type_is_a
-g_type_class_ref
-g_type_class_peek
-g_type_class_peek_static
-g_type_class_unref
-g_type_class_peek_parent
-g_type_class_add_private
-g_type_add_class_private
-g_type_interface_peek
-g_type_interface_peek_parent
-g_type_default_interface_ref
-g_type_default_interface_peek
-g_type_default_interface_unref
-g_type_children
-g_type_interfaces
-g_type_interface_prerequisites
-g_type_interface_instantiatable_prerequisite
-g_type_set_qdata
-g_type_get_qdata
-g_type_query
+xtype_init_with_debug_flags
+xtype_name
+xtype_qname
+xtype_from_name
+xtype_parent
+xtype_depth
+xtype_next_base
+xtype_is_a
+xtype_class_ref
+xtype_class_peek
+xtype_class_peek_static
+xtype_class_unref
+xtype_class_peek_parent
+xtype_class_add_private
+xtype_add_class_private
+xtype_interface_peek
+xtype_interface_peek_parent
+xtype_default_interface_ref
+xtype_default_interface_peek
+xtype_default_interface_unref
+xtype_children
+xtype_interfaces
+xtype_interface_prerequisites
+xtype_interface_instantiatable_prerequisite
+xtype_set_qdata
+xtype_get_qdata
+xtype_query
 GTypeQuery
-GBaseInitFunc
-GBaseFinalizeFunc
-GClassInitFunc
-GClassFinalizeFunc
-GInstanceInitFunc
+xbase_init_func_t
+xbase_finalize_func_t
+xclass_init_func_t
+xclass_finalize_func_t
+xinstance_init_func_t
 GInterfaceInitFunc
 GInterfaceFinalizeFunc
 GTypeClassCacheFunc
-GTypeFlags
+xtype_flags_t
 GTypeFundamentalFlags
-g_type_register_static
-g_type_register_static_simple
-g_type_register_dynamic
-g_type_register_fundamental
-g_type_add_interface_static
-g_type_add_interface_dynamic
-g_type_interface_add_prerequisite
-g_type_get_plugin
-g_type_interface_get_plugin
-g_type_fundamental_next
-g_type_fundamental
-g_type_create_instance
-g_type_free_instance
-g_type_add_class_cache_func
-g_type_remove_class_cache_func
-g_type_class_unref_uncached
-g_type_add_interface_check
-g_type_remove_interface_check
+xtype_register_static
+xtype_register_static_simple
+xtype_register_dynamic
+xtype_register_fundamental
+xtype_add_interface_static
+xtype_add_interface_dynamic
+xtype_interface_add_prerequisite
+xtype_get_plugin
+xtype_interface_get_plugin
+xtype_fundamental_next
+xtype_fundamental
+xtype_create_instance
+xtype_free_instance
+xtype_add_class_cache_func
+xtype_remove_class_cache_func
+xtype_class_unref_uncached
+xtype_add_interface_check
+xtype_remove_interface_check
 GTypeInterfaceCheckFunc
-g_type_value_table_peek
-g_type_ensure
-g_type_get_type_registration_serial
-g_type_get_instance_count
+xtype_value_table_peek
+xtype_ensure
+xtype_get_type_registration_serial
+xtype_get_instance_count
 
 G_DECLARE_FINAL_TYPE
 G_DECLARE_DERIVABLE_TYPE
@@ -132,23 +132,23 @@ G_DEFINE_POINTER_TYPE_WITH_CODE
 
 <SUBSECTION Private>
 XTYPE_FUNDAMENTAL_SHIFT
-g_type_check_instance
-g_type_check_instance_cast
-g_type_check_instance_is_a
-g_type_check_instance_is_fundamentally_a
-g_type_check_class_cast
-g_type_check_class_is_a
-g_type_check_is_value_type
-g_type_check_value
-g_type_check_value_holds
-g_type_class_adjust_private_offset
-g_type_add_instance_private
-g_type_instance_get_private
-g_type_class_get_instance_private_offset
-g_type_class_get_private
-g_type_test_flags
-g_type_name_from_instance
-g_type_name_from_class
+xtype_check_instance
+xtype_check_instance_cast
+xtype_check_instance_is_a
+xtype_check_instance_is_fundamentally_a
+xtype_check_class_cast
+xtype_check_class_is_a
+xtype_check_is_value_type
+xtype_check_value
+xtype_check_value_holds
+xtype_class_adjust_private_offset
+xtype_add_instance_private
+xtype_instance_get_private
+xtype_class_get_instance_private_offset
+xtype_class_get_private
+xtype_test_flags
+xtype_name_from_instance
+xtype_name_from_class
 
 <SUBSECTION>
 XTYPE_INVALID
@@ -196,15 +196,15 @@ GTypePluginUse
 GTypePluginUnuse
 GTypePluginCompleteTypeInfo
 GTypePluginCompleteInterfaceInfo
-g_type_plugin_use
-g_type_plugin_unuse
-g_type_plugin_complete_type_info
-g_type_plugin_complete_interface_info
+xtype_plugin_use
+xtype_plugin_unuse
+xtype_plugin_complete_type_info
+xtype_plugin_complete_interface_info
 <SUBSECTION Standard>
 XTYPE_PLUGIN
 X_IS_TYPE_PLUGIN
 XTYPE_TYPE_PLUGIN
-g_type_plugin_get_type
+xtype_plugin_get_type
 XTYPE_PLUGIN_CLASS
 X_IS_TYPE_PLUGIN_CLASS
 XTYPE_PLUGIN_GET_CLASS
@@ -212,16 +212,16 @@ XTYPE_PLUGIN_GET_CLASS
 
 <SECTION>
 <FILE>gtypemodule</FILE>
-<TITLE>GTypeModule</TITLE>
-GTypeModule
-GTypeModuleClass
-g_type_module_use
-g_type_module_unuse
-g_type_module_set_name
-g_type_module_register_type
-g_type_module_add_interface
-g_type_module_register_enum
-g_type_module_register_flags
+<TITLE>xtype_module_t</TITLE>
+xtype_module_t
+xtype_module_class_t
+xtype_module_use
+xtype_module_unuse
+xtype_module_set_name
+xtype_module_register_type
+xtype_module_add_interface
+xtype_module_register_enum
+xtype_module_register_flags
 
 G_DEFINE_DYNAMIC_TYPE
 G_DEFINE_DYNAMIC_TYPE_EXTENDED
@@ -232,7 +232,7 @@ G_ADD_PRIVATE_DYNAMIC
 XTYPE_MODULE
 X_IS_TYPE_MODULE
 XTYPE_TYPE_MODULE
-g_type_module_get_type
+xtype_module_get_type
 XTYPE_MODULE_CLASS
 X_IS_TYPE_MODULE_CLASS
 XTYPE_MODULE_GET_CLASS
@@ -257,68 +257,68 @@ G_OBJECT_TYPE
 G_OBJECT_TYPE_NAME
 G_OBJECT_CLASS_TYPE
 G_OBJECT_CLASS_NAME
-g_object_class_install_property
-g_object_class_install_properties
-g_object_class_find_property
-g_object_class_list_properties
-g_object_class_override_property
-g_object_interface_install_property
-g_object_interface_find_property
-g_object_interface_list_properties
-g_object_new
-g_object_new_with_properties
-g_object_newv
+xobject_class_install_property
+xobject_class_install_properties
+xobject_class_find_property
+xobject_class_list_properties
+xobject_class_override_property
+xobject_interface_install_property
+xobject_interface_find_property
+xobject_interface_list_properties
+xobject_new
+xobject_new_with_properties
+xobject_newv
 GParameter
-g_object_ref
-g_object_unref
-g_object_ref_sink
-g_object_take_ref
+xobject_ref
+xobject_unref
+xobject_ref_sink
+xobject_take_ref
 g_set_object
 g_clear_object
-GInitiallyUnowned
-GInitiallyUnownedClass
+xinitially_unowned_t
+xinitially_unowned_class_t
 XTYPE_INITIALLY_UNOWNED
-g_object_is_floating
-g_object_force_floating
+xobject_is_floating
+xobject_force_floating
 GWeakNotify
-g_object_weak_ref
-g_object_weak_unref
-g_object_add_weak_pointer
-g_object_remove_weak_pointer
+xobject_weak_ref
+xobject_weak_unref
+xobject_add_weak_pointer
+xobject_remove_weak_pointer
 g_set_weak_pointer
 g_clear_weak_pointer
 GToggleNotify
-g_object_add_toggle_ref
-g_object_remove_toggle_ref
-g_object_connect
-g_object_disconnect
-g_object_set
-g_object_setv
-g_object_get
-g_object_getv
-g_object_notify
-g_object_notify_by_pspec
-g_object_freeze_notify
-g_object_thaw_notify
-g_object_get_data
-g_object_set_data
-g_object_set_data_full
-g_object_steal_data
-g_object_dup_data
-g_object_replace_data
-g_object_get_qdata
-g_object_set_qdata
-g_object_set_qdata_full
-g_object_steal_qdata
-g_object_dup_qdata
-g_object_replace_qdata
-g_object_set_property
-g_object_get_property
-g_object_new_valist
-g_object_set_valist
-g_object_get_valist
-g_object_watch_closure
-g_object_run_dispose
+xobject_add_toggle_ref
+xobject_remove_toggle_ref
+xobject_connect
+xobject_disconnect
+xobject_set
+xobject_setv
+xobject_get
+xobject_getv
+xobject_notify
+xobject_notify_by_pspec
+xobject_freeze_notify
+xobject_thaw_notify
+xobject_get_data
+xobject_set_data
+xobject_set_data_full
+xobject_steal_data
+xobject_dup_data
+xobject_replace_data
+xobject_get_qdata
+xobject_set_qdata
+xobject_set_qdata_full
+xobject_steal_qdata
+xobject_dup_qdata
+xobject_replace_qdata
+xobject_set_property
+xobject_get_property
+xobject_new_valist
+xobject_set_valist
+xobject_get_valist
+xobject_watch_closure
+xobject_run_dispose
 G_OBJECT_WARN_INVALID_PROPERTY_ID
 
 <SUBSECTION Weak references>
@@ -340,40 +340,40 @@ X_IS_INITIALLY_UNOWNED_CLASS
 
 <SUBSECTION Private>
 G_OBJECT_WARN_INVALID_PSPEC
-g_initially_unowned_get_type
-g_object_compat_control
-g_object_get_type
+xinitially_unowned_get_type
+xobject_compat_control
+xobject_get_type
 </SECTION>
 
 <SECTION>
 <TITLE>Enumeration and Flag Types</TITLE>
 <FILE>enumerations_flags</FILE>
-GEnumClass
-GFlagsClass
-G_ENUM_CLASS_TYPE
-G_ENUM_CLASS_TYPE_NAME
+xenum_class_t
+xflags_class_t
+XENUM_CLASS_TYPE
+XENUM_CLASS_TYPE_NAME
 XTYPE_IS_ENUM
-G_ENUM_CLASS
+XENUM_CLASS
 X_IS_ENUM_CLASS
 XTYPE_IS_FLAGS
-G_FLAGS_CLASS
+XFLAGS_CLASS
 X_IS_FLAGS_CLASS
-G_FLAGS_CLASS_TYPE
-G_FLAGS_CLASS_TYPE_NAME
-GEnumValue
-GFlagsValue
-g_enum_get_value
-g_enum_get_value_by_name
-g_enum_get_value_by_nick
-g_enum_to_string
-g_flags_get_first_value
-g_flags_get_value_by_name
-g_flags_get_value_by_nick
-g_flags_to_string
-g_enum_register_static
-g_flags_register_static
-g_enum_complete_type_info
-g_flags_complete_type_info
+XFLAGS_CLASS_TYPE
+XFLAGS_CLASS_TYPE_NAME
+xenum_value_t
+xflags_value_t
+xenum_get_value
+xenum_get_value_by_name
+xenum_get_value_by_nick
+xenum_to_string
+xflags_get_first_value
+xflags_get_value_by_name
+xflags_get_value_by_nick
+xflags_to_string
+xenum_register_static
+xflags_register_static
+xenum_complete_type_info
+xflags_complete_type_info
 </SECTION>
 
 <SECTION>
@@ -381,9 +381,9 @@ g_flags_complete_type_info
 <TITLE>Boxed Types</TITLE>
 GBoxedCopyFunc
 GBoxedFreeFunc
-g_boxed_copy
-g_boxed_free
-g_boxed_type_register_static
+xboxed_copy
+xboxed_free
+xboxed_type_register_static
 g_pointer_type_register_static
 
 <SUBSECTION>
@@ -422,37 +422,37 @@ XTYPE_PATTERN_SPEC
 XTYPE_IS_BOXED
 
 <SUBSECTION Private>
-g_gstring_get_type
-g_strv_get_type
-g_date_get_type
-g_hash_table_get_type
-g_regex_get_type
-g_match_info_get_type
+xstring_get_type
+xstrv_get_type
+xdate_get_type
+xhash_table_get_type
+xregex_get_type
+xmatch_info_get_type
 g_array_get_type
-g_byte_array_get_type
-g_ptr_array_get_type
-g_error_get_type
-g_date_time_get_type
-g_time_zone_get_type
-g_variant_get_gtype
-g_variant_type_get_gtype
-g_variant_builder_get_type
-g_variant_dict_get_type
+xbyte_array_get_type
+xptr_array_get_type
+xerror_get_type
+xdate_time_get_type
+xtime_zone_get_type
+xvariant_get_gtype
+xvariant_type_get_gtype
+xvariant_builder_get_type
+xvariant_dict_get_type
 g_gtype_get_type
-g_main_context_get_type
-g_main_loop_get_type
-g_source_get_type
-g_pollfd_get_type
-g_bytes_get_type
-g_key_file_get_type
-g_checksum_get_type
-g_mapped_file_get_type
-g_markup_parse_context_get_type
-g_thread_get_type
-g_option_group_get_type
-g_uri_get_type
-g_tree_get_type
-g_pattern_spec_get_type
+xmain_context_get_type
+xmain_loop_get_type
+xsource_get_type
+xpollfd_get_type
+xbytes_get_type
+xkey_file_get_type
+xchecksum_get_type
+xmapped_file_get_type
+xmarkup_parse_context_get_type
+xthread_get_type
+xoption_group_get_type
+xuri_get_type
+xtree_get_type
+xpattern_spec_get_type
 </SECTION>
 
 <SECTION>
@@ -465,48 +465,48 @@ G_VALUE_TYPE_NAME
 XTYPE_IS_VALUE
 XTYPE_IS_VALUE_ABSTRACT
 X_IS_VALUE
-GValue
+xvalue_t
 XTYPE_VALUE
 XTYPE_VALUE_ARRAY
-g_value_init
-g_value_copy
-g_value_reset
-g_value_unset
-g_value_init_from_instance
-g_value_set_instance
-g_value_fits_pointer
-g_value_peek_pointer
-g_value_type_compatible
-g_value_type_transformable
-g_value_transform
+xvalue_init
+xvalue_copy
+xvalue_reset
+xvalue_unset
+xvalue_init_from_instance
+xvalue_set_instance
+xvalue_fits_pointer
+xvalue_peek_pointer
+xvalue_type_compatible
+xvalue_type_transformable
+xvalue_transform
 GValueTransform
-g_value_register_transform_func
-g_strdup_value_contents
+xvalue_register_transform_func
+xstrdup_value_contents
 
 <SUBSECTION Private>
 G_VALUE_NOCOPY_CONTENTS
-g_value_get_type
-g_value_array_get_type
+xvalue_get_type
+xvalue_array_get_type
 </SECTION>
 
 <SECTION>
 <TITLE>Value arrays</TITLE>
 <FILE>value_arrays</FILE>
-GValueArray
-g_value_array_get_nth
-g_value_array_new
-g_value_array_copy
-g_value_array_free
-g_value_array_append
-g_value_array_prepend
-g_value_array_insert
-g_value_array_remove
-g_value_array_sort
-g_value_array_sort_with_data
+xvalue_array_t
+xvalue_array_get_nth
+xvalue_array_new
+xvalue_array_copy
+xvalue_array_free
+xvalue_array_append
+xvalue_array_prepend
+xvalue_array_insert
+xvalue_array_remove
+xvalue_array_sort
+xvalue_array_sort_with_data
 </SECTION>
 
 <SECTION>
-<TITLE>GParamSpec</TITLE>
+<TITLE>xparam_spec_t</TITLE>
 <FILE>gparamspec</FILE>
 XTYPE_IS_PARAM
 G_PARAM_SPEC
@@ -517,7 +517,7 @@ G_PARAM_SPEC_GET_CLASS
 G_PARAM_SPEC_TYPE
 G_PARAM_SPEC_TYPE_NAME
 G_PARAM_SPEC_VALUE_TYPE
-GParamSpec
+xparam_spec_t
 GParamSpecClass
 GParamFlags
 G_PARAM_STATIC_STRINGS
@@ -566,8 +566,8 @@ G_VALUE_HOLDS_BOOLEAN
 XTYPE_PARAM_BOOLEAN
 GParamSpecBoolean
 g_param_spec_boolean
-g_value_set_boolean
-g_value_get_boolean
+xvalue_set_boolean
+xvalue_get_boolean
 
 <SUBSECTION xchar_t>
 X_IS_PARAM_SPEC_CHAR
@@ -576,10 +576,10 @@ G_VALUE_HOLDS_CHAR
 XTYPE_PARAM_CHAR
 GParamSpecChar
 g_param_spec_char
-g_value_set_char
-g_value_get_char
-g_value_get_schar
-g_value_set_schar
+xvalue_set_char
+xvalue_get_char
+xvalue_get_schar
+xvalue_set_schar
 
 <SUBSECTION guchar>
 X_IS_PARAM_SPEC_UCHAR
@@ -588,8 +588,8 @@ G_VALUE_HOLDS_UCHAR
 XTYPE_PARAM_UCHAR
 GParamSpecUChar
 g_param_spec_uchar
-g_value_set_uchar
-g_value_get_uchar
+xvalue_set_uchar
+xvalue_get_uchar
 
 <SUBSECTION xint_t>
 X_IS_PARAM_SPEC_INT
@@ -598,8 +598,8 @@ G_VALUE_HOLDS_INT
 XTYPE_PARAM_INT
 GParamSpecInt
 g_param_spec_int
-g_value_set_int
-g_value_get_int
+xvalue_set_int
+xvalue_get_int
 
 <SUBSECTION xuint_t>
 X_IS_PARAM_SPEC_UINT
@@ -608,18 +608,18 @@ G_VALUE_HOLDS_UINT
 XTYPE_PARAM_UINT
 GParamSpecUInt
 g_param_spec_uint
-g_value_set_uint
-g_value_get_uint
+xvalue_set_uint
+xvalue_get_uint
 
-<SUBSECTION glong>
+<SUBSECTION xlong_t>
 X_IS_PARAM_SPEC_LONG
 G_PARAM_SPEC_LONG
 G_VALUE_HOLDS_LONG
 XTYPE_PARAM_LONG
 GParamSpecLong
 g_param_spec_long
-g_value_set_long
-g_value_get_long
+xvalue_set_long
+xvalue_get_long
 
 <SUBSECTION gulong>
 X_IS_PARAM_SPEC_ULONG
@@ -628,8 +628,8 @@ G_VALUE_HOLDS_ULONG
 XTYPE_PARAM_ULONG
 GParamSpecULong
 g_param_spec_ulong
-g_value_set_ulong
-g_value_get_ulong
+xvalue_set_ulong
+xvalue_get_ulong
 
 <SUBSECTION gint64>
 X_IS_PARAM_SPEC_INT64
@@ -638,18 +638,18 @@ G_VALUE_HOLDS_INT64
 XTYPE_PARAM_INT64
 GParamSpecInt64
 g_param_spec_int64
-g_value_set_int64
-g_value_get_int64
+xvalue_set_int64
+xvalue_get_int64
 
-<SUBSECTION guint64>
+<SUBSECTION xuint64_t>
 X_IS_PARAM_SPEC_UINT64
 G_PARAM_SPEC_UINT64
 G_VALUE_HOLDS_UINT64
 XTYPE_PARAM_UINT64
 GParamSpecUInt64
 g_param_spec_uint64
-g_value_set_uint64
-g_value_get_uint64
+xvalue_set_uint64
+xvalue_get_uint64
 
 <SUBSECTION gfloat>
 X_IS_PARAM_SPEC_FLOAT
@@ -658,8 +658,8 @@ G_VALUE_HOLDS_FLOAT
 XTYPE_PARAM_FLOAT
 GParamSpecFloat
 g_param_spec_float
-g_value_set_float
-g_value_get_float
+xvalue_set_float
+xvalue_get_float
 
 <SUBSECTION xdouble_t>
 X_IS_PARAM_SPEC_DOUBLE
@@ -668,18 +668,18 @@ G_VALUE_HOLDS_DOUBLE
 XTYPE_PARAM_DOUBLE
 GParamSpecDouble
 g_param_spec_double
-g_value_set_double
-g_value_get_double
+xvalue_set_double
+xvalue_get_double
 
-<SUBSECTION GEnum>
+<SUBSECTION xenum_t>
 X_IS_PARAM_SPEC_ENUM
 G_PARAM_SPEC_ENUM
 G_VALUE_HOLDS_ENUM
 XTYPE_PARAM_ENUM
 GParamSpecEnum
 g_param_spec_enum
-g_value_set_enum
-g_value_get_enum
+xvalue_set_enum
+xvalue_get_enum
 
 <SUBSECTION GFLags>
 X_IS_PARAM_SPEC_FLAGS
@@ -688,8 +688,8 @@ G_VALUE_HOLDS_FLAGS
 XTYPE_PARAM_FLAGS
 GParamSpecFlags
 g_param_spec_flags
-g_value_set_flags
-g_value_get_flags
+xvalue_set_flags
+xvalue_get_flags
 
 <SUBSECTION gchararray>
 X_IS_PARAM_SPEC_STRING
@@ -701,26 +701,26 @@ G_VALUE_INTERNED_STRING
 GParamSpecString
 gchararray
 g_param_spec_string
-g_value_set_string
-g_value_set_static_string
-g_value_take_string
-g_value_set_string_take_ownership
-g_value_get_string
-g_value_dup_string
-g_value_set_interned_string
+xvalue_set_string
+xvalue_set_static_string
+xvalue_take_string
+xvalue_set_string_take_ownership
+xvalue_get_string
+xvalue_dup_string
+xvalue_set_interned_string
 
-<SUBSECTION GParamSpec>
+<SUBSECTION xparam_spec_t>
 X_IS_PARAM_SPEC_PARAM
 G_PARAM_SPEC_PARAM
 G_VALUE_HOLDS_PARAM
 XTYPE_PARAM_PARAM
 GParamSpecParam
 g_param_spec_param
-g_value_set_param
-g_value_take_param
-g_value_set_param_take_ownership
-g_value_get_param
-g_value_dup_param
+xvalue_set_param
+xvalue_take_param
+xvalue_set_param_take_ownership
+xvalue_get_param
+xvalue_dup_param
 
 <SUBSECTION GBoxed>
 X_IS_PARAM_SPEC_BOXED
@@ -729,12 +729,12 @@ G_VALUE_HOLDS_BOXED
 XTYPE_PARAM_BOXED
 GParamSpecBoxed
 g_param_spec_boxed
-g_value_set_boxed
-g_value_set_static_boxed
-g_value_take_boxed
-g_value_set_boxed_take_ownership
-g_value_get_boxed
-g_value_dup_boxed
+xvalue_set_boxed
+xvalue_set_static_boxed
+xvalue_take_boxed
+xvalue_set_boxed_take_ownership
+xvalue_get_boxed
+xvalue_dup_boxed
 
 <SUBSECTION xpointer_t>
 X_IS_PARAM_SPEC_POINTER
@@ -743,8 +743,8 @@ G_VALUE_HOLDS_POINTER
 XTYPE_PARAM_POINTER
 GParamSpecPointer
 g_param_spec_pointer
-g_value_set_pointer
-g_value_get_pointer
+xvalue_set_pointer
+xvalue_get_pointer
 
 <SUBSECTION xobject_t>
 X_IS_PARAM_SPEC_OBJECT
@@ -753,20 +753,20 @@ G_VALUE_HOLDS_OBJECT
 XTYPE_PARAM_OBJECT
 GParamSpecObject
 g_param_spec_object
-g_value_set_object
-g_value_take_object
-g_value_set_object_take_ownership
-g_value_get_object
-g_value_dup_object
+xvalue_set_object
+xvalue_take_object
+xvalue_set_object_take_ownership
+xvalue_get_object
+xvalue_dup_object
 
-<SUBSECTION gunichar>
+<SUBSECTION xunichar_t>
 X_IS_PARAM_SPEC_UNICHAR
 G_PARAM_SPEC_UNICHAR
 XTYPE_PARAM_UNICHAR
 GParamSpecUnichar
 g_param_spec_unichar
 
-<SUBSECTION GValueArray>
+<SUBSECTION xvalue_array_t>
 X_IS_PARAM_SPEC_VALUE_ARRAY
 G_PARAM_SPEC_VALUE_ARRAY
 XTYPE_PARAM_VALUE_ARRAY
@@ -787,8 +787,8 @@ G_VALUE_HOLDS_GTYPE
 XTYPE_PARAM_GTYPE
 GParamSpecGType
 g_param_spec_gtype
-g_value_get_gtype
-g_value_set_gtype
+xvalue_get_gtype
+xvalue_set_gtype
 
 <SUBSECTION xvariant_t>
 X_IS_PARAM_SPEC_VARIANT
@@ -797,13 +797,13 @@ G_VALUE_HOLDS_VARIANT
 XTYPE_PARAM_VARIANT
 GParamSpecVariant
 g_param_spec_variant
-g_value_get_variant
-g_value_dup_variant
-g_value_set_variant
-g_value_take_variant
+xvalue_get_variant
+xvalue_dup_variant
+xvalue_set_variant
+xvalue_take_variant
 
 <SUBSECTION Private>
-g_value_set_instance
+xvalue_set_instance
 g_param_spec_types
 </SECTION>
 
@@ -811,7 +811,7 @@ g_param_spec_types
 <TITLE>Varargs Value Collection</TITLE>
 <FILE>value_collection</FILE>
 <INCLUDE>glib-object.h,gobject/gvaluecollector.h</INCLUDE>
-GTypeCValue
+xtype_c_value_t
 G_VALUE_COLLECT_INIT
 G_VALUE_COLLECT
 G_VALUE_COLLECT_SKIP
@@ -822,7 +822,7 @@ G_VALUE_COLLECT_FORMAT_MAX_LENGTH
 <SECTION>
 <TITLE>Signals</TITLE>
 <FILE>signals</FILE>
-GSignalInvocationHint
+xsignal_invocation_hint_t
 GSignalAccumulator
 GSignalCMarshaller
 GSignalCVaMarshaller
@@ -893,34 +893,34 @@ G_CLOSURE_NEEDS_MARSHAL
 G_CLOSURE_N_NOTIFIERS
 G_CCLOSURE_SWAP_DATA
 G_CALLBACK
-GCallback
-GClosure
+xcallback_t
+xclosure_t
 XTYPE_CLOSURE
 GCClosure
 GClosureMarshal
 GVaClosureMarshal
-GClosureNotify
+xclosure_notify_t
 g_cclosure_new
 g_cclosure_new_swap
 g_cclosure_new_object
 g_cclosure_new_object_swap
 g_cclosure_marshal_generic
-g_closure_new_object
-g_closure_ref
-g_closure_sink
-g_closure_unref
-g_closure_invoke
-g_closure_invalidate
-g_closure_add_finalize_notifier
-g_closure_add_invalidate_notifier
-g_closure_remove_finalize_notifier
-g_closure_remove_invalidate_notifier
-g_closure_new_simple
-g_closure_set_marshal
-g_closure_add_marshal_guards
-g_closure_set_meta_marshal
-g_source_set_closure
-g_source_set_dummy_callback
+xclosure_new_object
+xclosure_ref
+xclosure_sink
+xclosure_unref
+xclosure_invoke
+xclosure_invalidate
+xclosure_add_finalize_notifier
+xclosure_add_invalidate_notifier
+xclosure_remove_finalize_notifier
+xclosure_remove_invalidate_notifier
+xclosure_new_simple
+xclosure_set_marshal
+xclosure_add_marshal_guards
+xclosure_set_meta_marshal
+xsource_set_closure
+xsource_set_dummy_callback
 
 <SUBSECTION>
 g_cclosure_marshal_VOID__VOID
@@ -974,75 +974,75 @@ g_cclosure_marshal_BOOLEAN__FLAGSv
 g_cclosure_marshal_BOOLEAN__BOXED_BOXEDv
 
 <SUBSECTION Private>
-GClosureNotifyData
-g_closure_get_type
+xclosure_notify_data_t
+xclosure_get_type
 g_io_channel_get_type
 g_io_condition_get_type
 </SECTION>
 
 <SECTION>
 <FILE>gbinding</FILE>
-GBinding
-GBindingFlags
-g_binding_get_source
-g_binding_dup_source
-g_binding_get_source_property
-g_binding_get_target
-g_binding_dup_target
-g_binding_get_target_property
-g_binding_get_flags
-g_binding_unbind
+xbinding_t
+xbinding_flags_t
+xbinding_get_source
+xbinding_dup_source
+xbinding_get_source_property
+xbinding_get_target
+xbinding_dup_target
+xbinding_get_target_property
+xbinding_get_flags
+xbinding_unbind
 <SUBSECTION>
-g_object_bind_property
-GBindingTransformFunc
-g_object_bind_property_full
-g_object_bind_property_with_closures
+xobject_bind_property
+xbinding_transform_func
+xobject_bind_property_full
+xobject_bind_property_with_closures
 <SUBSECTION Standard>
 XTYPE_BINDING
 XTYPE_BINDING_FLAGS
 G_BINDING
 X_IS_BINDING
 <SUBSECTION Private>
-g_binding_flags_get_type
-g_binding_get_type
+xbinding_flags_get_type
+xbinding_get_type
 </SECTION>
 
 <SECTION>
 <FILE>gbindinggroup</FILE>
-GBindingGroup
-g_binding_group_new
-g_binding_group_dup_source
-g_binding_group_set_source
-g_binding_group_bind
-g_binding_group_bind_full
-g_binding_group_bind_with_closures
+xbinding_group_t
+xbinding_group_new
+xbinding_group_dup_source
+xbinding_group_set_source
+xbinding_group_bind
+xbinding_group_bind_full
+xbinding_group_bind_with_closures
 <SUBSECTION Standard>
 XTYPE_BINDING_GROUP
 XTYPE_BINDING_GROUP_CLASS
-G_BINDING_GROUP
+XBINDING_GROUP
 X_IS_BINDING_GROUP
 <SUBSECTION Private>
-g_binding_group_get_type
+xbinding_group_get_type
 </SECTION>
 
 <SECTION>
 <FILE>gsignalgroup</FILE>
-GSignalGroup
-g_signal_group_block
-g_signal_group_connect
-g_signal_group_connect_after
-g_signal_group_connect_data
-g_signal_group_connect_object
-g_signal_group_connect_swapped
-g_signal_group_dup_target
-g_signal_group_get_type
-g_signal_group_new
-g_signal_group_set_target
-g_signal_group_unblock
+xsignal_group_t
+xsignal_group_block
+xsignal_group_connect
+xsignal_group_connect_after
+xsignal_group_connect_data
+xsignal_group_connect_object
+xsignal_group_connect_swapped
+xsignal_group_dup_target
+xsignal_group_get_type
+xsignal_group_new
+xsignal_group_set_target
+xsignal_group_unblock
 <SUBSECTION Standard>
 X_IS_SIGNAL_GROUP
 G_SIGNAL_GROUP
 XTYPE_SIGNAL_GROUP
 <SUBSECTION Private>
-g_signal_group_get_type
+xsignal_group_get_type
 </SECTION>

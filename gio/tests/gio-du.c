@@ -8,9 +8,9 @@ static xint_t     outstanding_asyncs;
 
 static void
 print_result (const xchar_t *filename,
-              guint64      disk_usage,
-              guint64      num_dirs,
-              guint64      num_files,
+              xuint64_t      disk_usage,
+              xuint64_t      num_dirs,
+              xuint64_t      num_files,
               xerror_t      *error,
               xchar_t        nl)
 {
@@ -34,7 +34,7 @@ print_result (const xchar_t *filename,
   else
     {
       g_printerr ("%s: %s\n", filename, error->message);
-      g_error_free (error);
+      xerror_free (error);
     }
 }
 
@@ -45,11 +45,11 @@ async_ready_func (xobject_t      *source,
 {
   xchar_t *filename = user_data;
   xerror_t *error = NULL;
-  guint64 disk_usage;
-  guint64 num_dirs;
-  guint64 num_files;
+  xuint64_t disk_usage;
+  xuint64_t num_dirs;
+  xuint64_t num_files;
 
-  g_file_measure_disk_usage_finish (G_FILE (source), result, &disk_usage, &num_dirs, &num_files, &error);
+  xfile_measure_disk_usage_finish (XFILE (source), result, &disk_usage, &num_dirs, &num_files, &error);
   print_result (filename, disk_usage, num_dirs, num_files, error, '\n');
   outstanding_asyncs--;
   g_free (filename);
@@ -57,9 +57,9 @@ async_ready_func (xobject_t      *source,
 
 static void
 report_progress (xboolean_t reporting,
-                 guint64  disk_usage,
-                 guint64  num_dirs,
-                 guint64  num_files,
+                 xuint64_t  disk_usage,
+                 xuint64_t  num_dirs,
+                 xuint64_t  num_files,
                  xpointer_t user_data)
 {
   const xchar_t *filename = user_data;
@@ -73,8 +73,8 @@ report_progress (xboolean_t reporting,
 int
 main (int argc, char **argv)
 {
-  GFileMeasureProgressCallback progress = NULL;
-  GFileMeasureFlags flags = 0;
+  xfile_measure_progress_callback_t progress = NULL;
+  xfile_measure_flags_t flags = 0;
   xint_t i;
 
 #ifdef G_OS_WIN32
@@ -87,28 +87,28 @@ main (int argc, char **argv)
 
   for (i = 1; argv[i] && argv[i][0] == '-'; i++)
     {
-      if (g_str_equal (argv[i], "--"))
+      if (xstr_equal (argv[i], "--"))
         break;
 
-      if (g_str_equal (argv[i], "--help"))
+      if (xstr_equal (argv[i], "--help"))
         {
           g_print ("usage: du [--progress] [--async] [-x] [-h] [-h] [--apparent-size] [--any-error] [--] files...\n");
 #ifdef G_OS_WIN32
-          g_strfreev (argv);
+          xstrfreev (argv);
 #endif
           return 0;
         }
-      else if (g_str_equal (argv[i], "-x"))
-        flags |= G_FILE_MEASURE_NO_XDEV;
-      else if (g_str_equal (argv[i], "-h"))
+      else if (xstr_equal (argv[i], "-x"))
+        flags |= XFILE_MEASURE_NO_XDEV;
+      else if (xstr_equal (argv[i], "-h"))
         option_format_size++;
-      else if (g_str_equal (argv[i], "--apparent-size"))
-        flags |= G_FILE_MEASURE_APPARENT_SIZE;
-      else if (g_str_equal (argv[i], "--any-error"))
-        flags |= G_FILE_MEASURE_REPORT_ANY_ERROR;
-      else if (g_str_equal (argv[i], "--async"))
+      else if (xstr_equal (argv[i], "--apparent-size"))
+        flags |= XFILE_MEASURE_APPARENT_SIZE;
+      else if (xstr_equal (argv[i], "--any-error"))
+        flags |= XFILE_MEASURE_REPORT_ANY_ERROR;
+      else if (xstr_equal (argv[i], "--async"))
         option_use_async = TRUE;
-      else if (g_str_equal (argv[i], "--progress"))
+      else if (xstr_equal (argv[i], "--progress"))
         progress = report_progress;
       else
         {
@@ -120,43 +120,43 @@ main (int argc, char **argv)
     {
       g_printerr ("usage: du [--progress] [--async] [-x] [-h] [-h] [--apparent-size] [--any-error] [--] files...\n");
 #ifdef G_OS_WIN32
-      g_strfreev (argv);
+      xstrfreev (argv);
 #endif
       return 1;
     }
 
   while (argv[i])
   {
-    xfile_t *file = g_file_new_for_commandline_arg (argv[i]);
+    xfile_t *file = xfile_new_for_commandline_arg (argv[i]);
 
     if (option_use_async)
     {
-      g_file_measure_disk_usage_async (file, flags, G_PRIORITY_DEFAULT, NULL,
+      xfile_measure_disk_usage_async (file, flags, G_PRIORITY_DEFAULT, NULL,
                                        progress, argv[i], async_ready_func, argv[i]);
       outstanding_asyncs++;
     }
     else
     {
       xerror_t *error = NULL;
-      guint64 disk_usage;
-      guint64 num_dirs;
-      guint64 num_files;
+      xuint64_t disk_usage;
+      xuint64_t num_dirs;
+      xuint64_t num_files;
 
-      g_file_measure_disk_usage (file, flags, NULL, progress, argv[i],
+      xfile_measure_disk_usage (file, flags, NULL, progress, argv[i],
                                  &disk_usage, &num_dirs, &num_files, &error);
       print_result (argv[i], disk_usage, num_dirs, num_files, error, '\n');
     }
 
-    g_object_unref (file);
+    xobject_unref (file);
 
     i++;
   }
 
   while (outstanding_asyncs)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
 #ifdef G_OS_WIN32
-  g_strfreev (argv);
+  xstrfreev (argv);
 #endif
 
   return 0;

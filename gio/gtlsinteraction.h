@@ -29,8 +29,8 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_TLS_INTERACTION         (g_tls_interaction_get_type ())
-#define G_TLS_INTERACTION(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_TLS_INTERACTION, GTlsInteraction))
+#define XTYPE_TLS_INTERACTION         (xtls_interaction_get_type ())
+#define G_TLS_INTERACTION(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_TLS_INTERACTION, xtls_interaction))
 #define G_TLS_INTERACTION_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_TLS_INTERACTION, GTlsInteractionClass))
 #define X_IS_TLS_INTERACTION(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_TLS_INTERACTION))
 #define X_IS_TLS_INTERACTION_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_TLS_INTERACTION))
@@ -52,35 +52,35 @@ struct _GTlsInteractionClass
   xobject_class_t parent_class;
 
   /*< public >*/
-  GTlsInteractionResult  (* ask_password)        (GTlsInteraction    *interaction,
-                                                  GTlsPassword       *password,
+  GTlsInteractionResult  (* ask_password)        (xtls_interaction_t    *interaction,
+                                                  xtls_password_t       *password,
                                                   xcancellable_t       *cancellable,
                                                   xerror_t            **error);
 
-  void                   (* ask_password_async)  (GTlsInteraction    *interaction,
-                                                  GTlsPassword       *password,
+  void                   (* ask_password_async)  (xtls_interaction_t    *interaction,
+                                                  xtls_password_t       *password,
                                                   xcancellable_t       *cancellable,
                                                   xasync_ready_callback_t callback,
                                                   xpointer_t            user_data);
 
-  GTlsInteractionResult  (* ask_password_finish) (GTlsInteraction    *interaction,
+  GTlsInteractionResult  (* ask_password_finish) (xtls_interaction_t    *interaction,
                                                   xasync_result_t       *result,
                                                   xerror_t            **error);
 
-  GTlsInteractionResult  (* request_certificate)        (GTlsInteraction              *interaction,
-                                                         GTlsConnection               *connection,
+  GTlsInteractionResult  (* request_certificate)        (xtls_interaction_t              *interaction,
+                                                         xtls_connection_t               *connection,
                                                          GTlsCertificateRequestFlags   flags,
                                                          xcancellable_t                 *cancellable,
                                                          xerror_t                      **error);
 
-  void                   (* request_certificate_async)  (GTlsInteraction              *interaction,
-                                                         GTlsConnection               *connection,
+  void                   (* request_certificate_async)  (xtls_interaction_t              *interaction,
+                                                         xtls_connection_t               *connection,
                                                          GTlsCertificateRequestFlags   flags,
                                                          xcancellable_t                 *cancellable,
                                                          xasync_ready_callback_t           callback,
                                                          xpointer_t                      user_data);
 
-  GTlsInteractionResult  (* request_certificate_finish) (GTlsInteraction              *interaction,
+  GTlsInteractionResult  (* request_certificate_finish) (xtls_interaction_t              *interaction,
                                                          xasync_result_t                 *result,
                                                          xerror_t                      **error);
 
@@ -90,56 +90,56 @@ struct _GTlsInteractionClass
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t                  g_tls_interaction_get_type            (void) G_GNUC_CONST;
+xtype_t                  xtls_interaction_get_type            (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GTlsInteractionResult  g_tls_interaction_invoke_ask_password (GTlsInteraction    *interaction,
-                                                              GTlsPassword       *password,
+GTlsInteractionResult  xtls_interaction_invoke_ask_password (xtls_interaction_t    *interaction,
+                                                              xtls_password_t       *password,
                                                               xcancellable_t       *cancellable,
                                                               xerror_t            **error);
 
 XPL_AVAILABLE_IN_ALL
-GTlsInteractionResult  g_tls_interaction_ask_password        (GTlsInteraction    *interaction,
-                                                              GTlsPassword       *password,
+GTlsInteractionResult  xtls_interaction_ask_password        (xtls_interaction_t    *interaction,
+                                                              xtls_password_t       *password,
                                                               xcancellable_t       *cancellable,
                                                               xerror_t            **error);
 
 XPL_AVAILABLE_IN_ALL
-void                   g_tls_interaction_ask_password_async  (GTlsInteraction    *interaction,
-                                                              GTlsPassword       *password,
+void                   xtls_interaction_ask_password_async  (xtls_interaction_t    *interaction,
+                                                              xtls_password_t       *password,
                                                               xcancellable_t       *cancellable,
                                                               xasync_ready_callback_t callback,
                                                               xpointer_t            user_data);
 
 XPL_AVAILABLE_IN_ALL
-GTlsInteractionResult  g_tls_interaction_ask_password_finish (GTlsInteraction    *interaction,
+GTlsInteractionResult  xtls_interaction_ask_password_finish (xtls_interaction_t    *interaction,
                                                               xasync_result_t       *result,
                                                               xerror_t            **error);
 
 XPL_AVAILABLE_IN_2_40
-GTlsInteractionResult  g_tls_interaction_invoke_request_certificate (GTlsInteraction              *interaction,
-                                                                     GTlsConnection               *connection,
+GTlsInteractionResult  xtls_interaction_invoke_request_certificate (xtls_interaction_t              *interaction,
+                                                                     xtls_connection_t               *connection,
                                                                      GTlsCertificateRequestFlags   flags,
                                                                      xcancellable_t                 *cancellable,
                                                                      xerror_t                      **error);
 
 XPL_AVAILABLE_IN_2_40
-GTlsInteractionResult  g_tls_interaction_request_certificate        (GTlsInteraction              *interaction,
-                                                                     GTlsConnection               *connection,
+GTlsInteractionResult  xtls_interaction_request_certificate        (xtls_interaction_t              *interaction,
+                                                                     xtls_connection_t               *connection,
                                                                      GTlsCertificateRequestFlags   flags,
                                                                      xcancellable_t                 *cancellable,
                                                                      xerror_t                      **error);
 
 XPL_AVAILABLE_IN_2_40
-void                   g_tls_interaction_request_certificate_async  (GTlsInteraction              *interaction,
-                                                                     GTlsConnection               *connection,
+void                   xtls_interaction_request_certificate_async  (xtls_interaction_t              *interaction,
+                                                                     xtls_connection_t               *connection,
                                                                      GTlsCertificateRequestFlags   flags,
                                                                      xcancellable_t                 *cancellable,
                                                                      xasync_ready_callback_t           callback,
                                                                      xpointer_t                      user_data);
 
 XPL_AVAILABLE_IN_2_40
-GTlsInteractionResult  g_tls_interaction_request_certificate_finish (GTlsInteraction              *interaction,
+GTlsInteractionResult  xtls_interaction_request_certificate_finish (xtls_interaction_t              *interaction,
                                                                      xasync_result_t                 *result,
                                                                      xerror_t                      **error);
 

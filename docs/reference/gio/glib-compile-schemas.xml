@@ -20,7 +20,7 @@
 
 <refnamediv>
   <refname>glib-compile-schemas</refname>
-  <refpurpose>GSettings schema compiler</refpurpose>
+  <refpurpose>xsettings_t schema compiler</refpurpose>
 </refnamediv>
 
 <refsynopsisdiv>
@@ -32,16 +32,16 @@
 </refsynopsisdiv>
 
 <refsect1><title>Description</title>
-<para><command>glib-compile-schemas</command> compiles all the GSettings XML
+<para><command>glib-compile-schemas</command> compiles all the xsettings_t XML
 schema files in <replaceable>DIRECTORY</replaceable> into a binary file
 with the name <filename>gschemas.compiled</filename> that can be used
-by <link linkend="GSettings"><type>GSettings</type></link>. The XML schema
+by <link linkend="xsettings_t"><type>xsettings_t</type></link>. The XML schema
 files must have the filename extension <filename>.gschema.xml</filename>.
 For a detailed description of the XML file format, see the
-<link linkend="GSettings"><type>GSettings</type></link> documentation.
+<link linkend="xsettings_t"><type>xsettings_t</type></link> documentation.
 </para>
 <para>
-At runtime, GSettings looks for schemas in the
+At runtime, xsettings_t looks for schemas in the
 <filename>glib-2.0/schemas</filename> subdirectories of all directories
 specified in the <envar>XDG_DATA_DIRS</envar> environment variable. The
 usual location to install schema files is

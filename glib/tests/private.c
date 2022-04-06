@@ -76,7 +76,7 @@ private2_func (xpointer_t data)
     }
 
   if (value % 2 == 0)
-    g_thread_exit (NULL);
+    xthread_exit (NULL);
 
   return NULL;
 }
@@ -84,24 +84,24 @@ private2_func (xpointer_t data)
 /* test that
  * - threads do not interfere with each other
  * - destroy notifies are called for each thread exit
- * - destroy notifies are called for g_thread_exit() too
+ * - destroy notifies are called for xthread_exit() too
  * - destroy notifies are not called on g_private_set()
  * - destroy notifies are called on g_private_replace()
  */
 static void
 test_private2 (void)
 {
-  GThread *thread[10];
+  xthread_t *thread[10];
   xint_t i;
 
   g_private_set (&private2, GINT_TO_POINTER (234));
   g_private_replace (&private2, GINT_TO_POINTER (123));
 
   for (i = 0; i < 10; i++)
-    thread[i] = g_thread_create (private2_func, GINT_TO_POINTER (i), TRUE, NULL);
+    thread[i] = xthread_create (private2_func, GINT_TO_POINTER (i), TRUE, NULL);
 
   for (i = 0; i < 10; i++)
-    g_thread_join (thread[i]);
+    xthread_join (thread[i]);
 
   g_assert_cmpint (private2_destroy_count, ==, 11);
 }
@@ -296,7 +296,7 @@ sp4_func (xpointer_t data)
     }
 
   if (value % 2 == 0)
-    g_thread_exit (NULL);
+    xthread_exit (NULL);
 
   return NULL;
 }
@@ -306,22 +306,22 @@ sp4_func (xpointer_t data)
 static void
 test_static_private4 (void)
 {
-  GThread *thread[10];
+  xthread_t *thread[10];
   xint_t i;
 
   for (i = 0; i < 10; i++)
-    thread[i] = g_thread_create (sp4_func, GINT_TO_POINTER (i), TRUE, NULL);
+    thread[i] = xthread_create (sp4_func, GINT_TO_POINTER (i), TRUE, NULL);
 
   for (i = 0; i < 10; i++)
-    g_thread_join (thread[i]);
+    xthread_join (thread[i]);
 
   g_static_private_free (&sp4);
 }
 
 static GStaticPrivate sp5 = G_STATIC_PRIVATE_INIT;
-static GMutex m5;
-static GCond c5a;
-static GCond c5b;
+static xmutex_t m5;
+static xcond_t c5a;
+static xcond_t c5b;
 static xint_t count5;
 
 static xpointer_t
@@ -356,13 +356,13 @@ sp5_func (xpointer_t data)
 static void
 test_static_private5 (void)
 {
-  GThread *thread[10];
+  xthread_t *thread[10];
   xint_t i;
 
   g_atomic_int_set (&count5, 0);
 
   for (i = 0; i < 10; i++)
-    thread[i] = g_thread_create (sp5_func, GINT_TO_POINTER (i), TRUE, NULL);
+    thread[i] = xthread_create (sp5_func, GINT_TO_POINTER (i), TRUE, NULL);
 
   g_mutex_lock (&m5);
   while (g_atomic_int_get (&count5) < 10)
@@ -377,7 +377,7 @@ test_static_private5 (void)
   g_mutex_unlock (&m5);
 
   for (i = 0; i < 10; i++)
-    g_thread_join (thread[i]);
+    xthread_join (thread[i]);
 }
 
 int

@@ -23,34 +23,34 @@
 #include "gdbus-sessionbus.h"
 
 static void
-activate_app (GApplication *application,
+activate_app (xapplication_t *application,
               xpointer_t      user_data)
 {
-  GNotification *notification;
+  xnotification_t *notification;
   xicon_t *icon;
 
-  notification = g_notification_new ("Test");
+  notification = xnotification_new ("Test");
 
-  g_application_send_notification (application, "test1", notification);
-  g_application_send_notification (application, "test2", notification);
-  g_application_withdraw_notification (application, "test1");
-  g_application_send_notification (application, "test3", notification);
+  xapplication_send_notification (application, "test1", notification);
+  xapplication_send_notification (application, "test2", notification);
+  xapplication_withdraw_notification (application, "test1");
+  xapplication_send_notification (application, "test3", notification);
 
   icon = g_themed_icon_new ("i-c-o-n");
-  g_notification_set_icon (notification, icon);
-  g_object_unref (icon);
+  xnotification_set_icon (notification, icon);
+  xobject_unref (icon);
 
-  g_notification_set_body (notification, "body");
-  g_notification_set_priority (notification, G_NOTIFICATION_PRIORITY_URGENT);
-  g_notification_set_default_action_and_target (notification, "app.action", "i", 42);
-  g_notification_add_button_with_target (notification, "label", "app.action2", "s", "bla");
+  xnotification_set_body (notification, "body");
+  xnotification_set_priority (notification, G_NOTIFICATION_PRIORITY_URGENT);
+  xnotification_set_default_action_and_target (notification, "app.action", "i", 42);
+  xnotification_add_button_with_target (notification, "label", "app.action2", "s", "bla");
 
-  g_application_send_notification (application, "test4", notification);
-  g_application_send_notification (application, NULL, notification);
+  xapplication_send_notification (application, "test4", notification);
+  xapplication_send_notification (application, NULL, notification);
 
-  g_dbus_connection_flush_sync (g_application_get_dbus_connection (application), NULL, NULL);
+  g_dbus_connection_flush_sync (xapplication_get_dbus_connection (application), NULL, NULL);
 
-  g_object_unref (notification);
+  xobject_unref (notification);
 }
 
 static void
@@ -69,7 +69,7 @@ notification_received (GNotificationServer *server,
     {
     case 0:
       g_assert_cmpstr (notification_id, ==, "test1");
-      g_assert (g_variant_lookup (notification, "title", "&s", &title));
+      g_assert (xvariant_lookup (notification, "title", "&s", &title));
       g_assert_cmpstr (title, ==, "Test");
       break;
 
@@ -88,7 +88,7 @@ notification_received (GNotificationServer *server,
     case 4:
       g_assert (g_dbus_is_guid (notification_id));
 
-      g_notification_server_stop (server);
+      xnotification_server_stop (server);
       break;
     }
 
@@ -111,26 +111,26 @@ notification_removed (GNotificationServer *server,
 
 static void
 server_notify_is_running (xobject_t    *object,
-                          GParamSpec *pspec,
+                          xparam_spec_t *pspec,
                           xpointer_t    user_data)
 {
-  GMainLoop *loop = user_data;
+  xmain_loop_t *loop = user_data;
   GNotificationServer *server = G_NOTIFICATION_SERVER (object);
 
-  if (g_notification_server_get_is_running (server))
+  if (xnotification_server_get_is_running (server))
     {
-      GApplication *app;
+      xapplication_t *app;
 
-      app = g_application_new ("org.gtk.TestApplication", G_APPLICATION_FLAGS_NONE);
+      app = xapplication_new ("org.gtk.TestApplication", G_APPLICATION_FLAGS_NONE);
       g_signal_connect (app, "activate", G_CALLBACK (activate_app), NULL);
 
-      g_application_run (app, 0, NULL);
+      xapplication_run (app, 0, NULL);
 
-      g_object_unref (app);
+      xobject_unref (app);
     }
   else
     {
-      g_main_loop_quit (loop);
+      xmain_loop_quit (loop);
     }
 }
 
@@ -139,7 +139,7 @@ timeout (xpointer_t user_data)
 {
   GNotificationServer *server = user_data;
 
-  g_notification_server_stop (server);
+  xnotification_server_stop (server);
 
   return G_SOURCE_REMOVE;
 }
@@ -148,27 +148,27 @@ static void
 basic (void)
 {
   GNotificationServer *server;
-  GMainLoop *loop;
+  xmain_loop_t *loop;
   xint_t received_count = 0;
   xint_t removed_count = 0;
 
   session_bus_up ();
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
-  server = g_notification_server_new ();
+  server = xnotification_server_new ();
   g_signal_connect (server, "notification-received", G_CALLBACK (notification_received), &received_count);
   g_signal_connect (server, "notification-removed", G_CALLBACK (notification_removed), &removed_count);
   g_signal_connect (server, "notify::is-running", G_CALLBACK (server_notify_is_running), loop);
   g_timeout_add_seconds (1, timeout, server);
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   g_assert_cmpint (received_count, ==, 5);
   g_assert_cmpint (removed_count, ==, 1);
 
-  g_object_unref (server);
-  g_main_loop_unref (loop);
+  xobject_unref (server);
+  xmain_loop_unref (loop);
   session_bus_stop ();
 }
 
@@ -181,7 +181,7 @@ struct _GNotification
   xicon_t *icon;
   GNotificationPriority priority;
   xchar_t *category;
-  GPtrArray *buttons;
+  xptr_array_t *buttons;
   xchar_t *default_action;
   xvariant_t *default_action_target;
 };
@@ -196,24 +196,24 @@ typedef struct
 static void
 test_properties (void)
 {
-  GNotification *n;
+  xnotification_t *n;
   struct _GNotification *rn;
   xicon_t *icon;
   const xchar_t * const *names;
   Button *b;
 
-  n = g_notification_new ("Test");
+  n = xnotification_new ("Test");
 
-  g_notification_set_title (n, "title");
-  g_notification_set_body (n, "body");
-  g_notification_set_category (n, "cate.gory");
+  xnotification_set_title (n, "title");
+  xnotification_set_body (n, "body");
+  xnotification_set_category (n, "cate.gory");
   icon = g_themed_icon_new ("i-c-o-n");
-  g_notification_set_icon (n, icon);
-  g_object_unref (icon);
-  g_notification_set_priority (n, G_NOTIFICATION_PRIORITY_HIGH);
-  g_notification_set_category (n, "cate.gory");
-  g_notification_add_button (n, "label1", "app.action1::target1");
-  g_notification_set_default_action (n, "app.action2::target2");
+  xnotification_set_icon (n, icon);
+  xobject_unref (icon);
+  xnotification_set_priority (n, G_NOTIFICATION_PRIORITY_HIGH);
+  xnotification_set_category (n, "cate.gory");
+  xnotification_add_button (n, "label1", "app.action1::target1");
+  xnotification_set_default_action (n, "app.action2::target2");
 
   rn = (struct _GNotification *)n;
 
@@ -231,12 +231,12 @@ test_properties (void)
   b = (Button*)rn->buttons->pdata[0];
   g_assert_cmpstr (b->label, ==, "label1");
   g_assert_cmpstr (b->action_name, ==, "app.action1");
-  g_assert_cmpstr (g_variant_get_string (b->target, NULL), ==, "target1");
+  g_assert_cmpstr (xvariant_get_string (b->target, NULL), ==, "target1");
 
   g_assert_cmpstr (rn->default_action, ==, "app.action2");
-  g_assert_cmpstr (g_variant_get_string (rn->default_action_target, NULL), ==, "target2");
+  g_assert_cmpstr (xvariant_get_string (rn->default_action_target, NULL), ==, "target2");
 
-  g_object_unref (n);
+  xobject_unref (n);
 }
 
 int main (int argc, char *argv[])

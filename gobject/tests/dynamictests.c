@@ -25,39 +25,39 @@
 /* This test tests the macros for defining dynamic types.
  */
 
-static GMutex sync_mutex;
+static xmutex_t sync_mutex;
 static xboolean_t loaded = FALSE;
 
 /* MODULE */
-typedef struct _TestModule      TestModule;
-typedef struct _TestModuleClass TestModuleClass;
+typedef struct _test_module      test_module_t;
+typedef struct _test_module_class test_module_class_t;
 
 #define TEST_TYPE_MODULE              (test_module_get_type ())
-#define TEST_MODULE(module)           (XTYPE_CHECK_INSTANCE_CAST ((module), TEST_TYPE_MODULE, TestModule))
-#define TEST_MODULE_CLASS(class)      (XTYPE_CHECK_CLASS_CAST ((class), TEST_TYPE_MODULE, TestModuleClass))
+#define TEST_MODULE(module)           (XTYPE_CHECK_INSTANCE_CAST ((module), TEST_TYPE_MODULE, test_module_t))
+#define TEST_MODULE_CLASS(class)      (XTYPE_CHECK_CLASS_CAST ((class), TEST_TYPE_MODULE, test_module_class_t))
 #define TEST_IS_MODULE(module)        (XTYPE_CHECK_INSTANCE_TYPE ((module), TEST_TYPE_MODULE))
 #define TEST_IS_MODULE_CLASS(class)   (XTYPE_CHECK_CLASS_TYPE ((class), TEST_TYPE_MODULE))
-#define TEST_MODULE_GET_CLASS(module) (XTYPE_INSTANCE_GET_CLASS ((module), TEST_TYPE_MODULE, TestModuleClass))
-typedef void (*TestModuleRegisterFunc) (GTypeModule *module);
+#define TEST_MODULE_GET_CLASS(module) (XTYPE_INSTANCE_GET_CLASS ((module), TEST_TYPE_MODULE, test_module_class_t))
+typedef void (*test_module_register_func_t) (xtype_module_t *module);
 
-struct _TestModule
+struct _test_module
 {
-  GTypeModule parent_instance;
+  xtype_module_t parent_instance;
 
-  TestModuleRegisterFunc register_func;
+  test_module_register_func_t register_func;
 };
 
-struct _TestModuleClass
+struct _test_module_class
 {
-  GTypeModuleClass parent_class;
+  xtype_module_class_t parent_class;
 };
 
 static xtype_t test_module_get_type (void);
 
 static xboolean_t
-test_module_load (GTypeModule *module)
+test_module_load (xtype_module_t *module)
 {
-  TestModule *test_module = TEST_MODULE (module);
+  test_module_t *test_module = TEST_MODULE (module);
 
   test_module->register_func (module);
 
@@ -65,14 +65,14 @@ test_module_load (GTypeModule *module)
 }
 
 static void
-test_module_unload (GTypeModule *module)
+test_module_unload (xtype_module_t *module)
 {
 }
 
 static void
-test_module_class_init (TestModuleClass *class)
+test_module_class_init (test_module_class_t *class)
 {
-  GTypeModuleClass *module_class = XTYPE_MODULE_CLASS (class);
+  xtype_module_class_t *module_class = XTYPE_MODULE_CLASS (class);
 
   module_class->load = test_module_load;
   module_class->unload = test_module_unload;
@@ -83,36 +83,36 @@ static xtype_t test_module_get_type (void)
   static xtype_t object_type = 0;
 
   if (!object_type) {
-    static const GTypeInfo object_info =
+    static const xtype_info_t object_info =
       {
-	sizeof (TestModuleClass),
-	(GBaseInitFunc) NULL,
-	(GBaseFinalizeFunc) NULL,
-	(GClassInitFunc) test_module_class_init,
-	(GClassFinalizeFunc) NULL,
+	sizeof (test_module_class_t),
+	(xbase_init_func_t) NULL,
+	(xbase_finalize_func_t) NULL,
+	(xclass_init_func_t) test_module_class_init,
+	(xclass_finalize_func_t) NULL,
 	NULL,
-	sizeof (TestModule),
+	sizeof (test_module_t),
 	0,
-        (GInstanceInitFunc)NULL,
+        (xinstance_init_func_t)NULL,
         NULL,
       };
-    object_type = g_type_register_static (XTYPE_TYPE_MODULE, "TestModule", &object_info, 0);
+    object_type = xtype_register_static (XTYPE_TYPE_MODULE, "test_module_t", &object_info, 0);
   }
   return object_type;
 }
 
 
-static GTypeModule *
-test_module_new (TestModuleRegisterFunc register_func)
+static xtype_module_t *
+test_module_new (test_module_register_func_t register_func)
 {
-  TestModule *test_module = g_object_new (TEST_TYPE_MODULE, NULL);
-  GTypeModule *module = XTYPE_MODULE (test_module);
+  test_module_t *test_module = xobject_new (TEST_TYPE_MODULE, NULL);
+  xtype_module_t *module = XTYPE_MODULE (test_module);
 
   test_module->register_func = register_func;
 
   /* Register the types initially */
-  g_type_module_use (module);
-  g_type_module_unuse (module);
+  xtype_module_use (module);
+  xtype_module_unuse (module);
 
   return XTYPE_MODULE (module);
 }
@@ -121,20 +121,20 @@ test_module_new (TestModuleRegisterFunc register_func)
 
 #define DYNAMIC_OBJECT_TYPE (dynamic_object_get_type ())
 
-typedef xobject_t DynamicObject;
-typedef struct _DynamicObjectClass DynamicObjectClass;
+typedef xobject_t dynamic_object_t;
+typedef struct _dynamic_object_class dynamic_object_class_t;
 
-struct _DynamicObjectClass
+struct _dynamic_object_class
 {
   xobject_class_t parent_class;
   xuint_t val;
 };
 
 static xtype_t dynamic_object_get_type (void);
-G_DEFINE_DYNAMIC_TYPE(DynamicObject, dynamic_object, XTYPE_OBJECT)
+G_DEFINE_DYNAMIC_TYPE(dynamic_object, dynamic_object, XTYPE_OBJECT)
 
 static void
-dynamic_object_class_init (DynamicObjectClass *class)
+dynamic_object_class_init (dynamic_object_class_t *class)
 {
   class->val = 42;
   g_assert (loaded == FALSE);
@@ -142,20 +142,20 @@ dynamic_object_class_init (DynamicObjectClass *class)
 }
 
 static void
-dynamic_object_class_finalize (DynamicObjectClass *class)
+dynamic_object_class_finalize (dynamic_object_class_t *class)
 {
   g_assert (loaded == TRUE);
   loaded = FALSE;
 }
 
 static void
-dynamic_object_init (DynamicObject *dynamic_object)
+dynamic_object_init (dynamic_object_t *dynamic_object)
 {
 }
 
 
 static void
-module_register (GTypeModule *module)
+module_register (xtype_module_t *module)
 {
   dynamic_object_register_type (module);
 }
@@ -181,7 +181,7 @@ ref_unref_thread (xpointer_t data)
     if (g_test_verbose ())
       if (i % 10)
 	g_printerr ("%d\n", i);
-    g_type_class_unref (g_type_class_ref ((xtype_t) data));
+    xtype_class_unref (xtype_class_ref ((xtype_t) data));
   }
 
   if (g_test_verbose())
@@ -193,17 +193,17 @@ ref_unref_thread (xpointer_t data)
 static void
 test_multithreaded_dynamic_type_init (void)
 {
-  GTypeModule *module;
-  DynamicObjectClass *class;
+  xtype_module_t *module;
+  dynamic_object_class_t *class;
   /* Create N_THREADS threads that are going to just ref/unref a class */
-  GThread *threads[N_THREADS];
+  xthread_t *threads[N_THREADS];
   xuint_t i;
 
   module = test_module_new (module_register);
   g_assert (module != NULL);
 
   /* Not loaded until we call ref for the first time */
-  class = g_type_class_peek (DYNAMIC_OBJECT_TYPE);
+  class = xtype_class_peek (DYNAMIC_OBJECT_TYPE);
   g_assert (class == NULL);
   g_assert (!loaded);
 
@@ -212,14 +212,14 @@ test_multithreaded_dynamic_type_init (void)
 
   /* create threads */
   for (i = 0; i < N_THREADS; i++) {
-    threads[i] = g_thread_new ("test", ref_unref_thread, (xpointer_t) DYNAMIC_OBJECT_TYPE);
+    threads[i] = xthread_new ("test", ref_unref_thread, (xpointer_t) DYNAMIC_OBJECT_TYPE);
   }
 
   /* execute threads */
   g_mutex_unlock (&sync_mutex);
 
   for (i = 0; i < N_THREADS; i++) {
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
   }
 }
 
@@ -229,18 +229,18 @@ enum
   PROP_FOO
 };
 
-typedef struct _DynObj DynObj;
-typedef struct _DynObjClass DynObjClass;
-typedef struct _DynIfaceInterface DynIfaceInterface;
+typedef struct _dyn_obj dyn_obj_t;
+typedef struct _dyn_obj_class dyn_obj_class_t;
+typedef struct _DynIfaceInterface dyn_iface_interface_t;
 
-struct _DynObj
+struct _dyn_obj
 {
   xobject_t obj;
 
   xint_t foo;
 };
 
-struct _DynObjClass
+struct _dyn_obj_class
 {
   xobject_class_t class;
 };
@@ -250,30 +250,30 @@ struct _DynIfaceInterface
   xtype_interface_t iface;
 };
 
-static void dyn_obj_iface_init (DynIfaceInterface *iface);
+static void dyn_obj_iface_init (dyn_iface_interface_t *iface);
 
 static xtype_t dyn_iface_get_type (void);
-G_DEFINE_INTERFACE (DynIface, dyn_iface, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (dyn_iface, dyn_iface, XTYPE_OBJECT)
 
 static xtype_t dyn_obj_get_type (void);
-G_DEFINE_DYNAMIC_TYPE_EXTENDED(DynObj, dyn_obj, XTYPE_OBJECT, 0,
+G_DEFINE_DYNAMIC_TYPE_EXTENDED(dyn_obj, dyn_obj, XTYPE_OBJECT, 0,
                       G_IMPLEMENT_INTERFACE_DYNAMIC(dyn_iface_get_type (), dyn_obj_iface_init))
 
 
 static void
-dyn_iface_default_init (DynIfaceInterface *iface)
+dyn_iface_default_init (dyn_iface_interface_t *iface)
 {
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
     g_param_spec_int ("foo", NULL, NULL, 0, 100, 0, G_PARAM_READWRITE));
 }
 
 static void
-dyn_obj_iface_init (DynIfaceInterface *iface)
+dyn_obj_iface_init (dyn_iface_interface_t *iface)
 {
 }
 
 static void
-dyn_obj_init (DynObj *obj)
+dyn_obj_init (dyn_obj_t *obj)
 {
   obj->foo = 0;
 }
@@ -281,15 +281,15 @@ dyn_obj_init (DynObj *obj)
 static void
 set_prop (xobject_t      *object,
           xuint_t         prop_id,
-          const GValue *value,
-          GParamSpec   *pspec)
+          const xvalue_t *value,
+          xparam_spec_t   *pspec)
 {
-  DynObj *obj = (DynObj *)object;
+  dyn_obj_t *obj = (dyn_obj_t *)object;
 
   switch (prop_id)
     {
     case PROP_FOO:
-      obj->foo = g_value_get_int (value);
+      obj->foo = xvalue_get_int (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -300,15 +300,15 @@ set_prop (xobject_t      *object,
 static void
 get_prop (xobject_t    *object,
           xuint_t       prop_id,
-          GValue     *value,
-          GParamSpec *pspec)
+          xvalue_t     *value,
+          xparam_spec_t *pspec)
 {
-  DynObj *obj = (DynObj *)object;
+  dyn_obj_t *obj = (dyn_obj_t *)object;
 
   switch (prop_id)
     {
     case PROP_FOO:
-      g_value_set_int (value, obj->foo);
+      xvalue_set_int (value, obj->foo);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -317,23 +317,23 @@ get_prop (xobject_t    *object,
 }
 
 static void
-dyn_obj_class_init (DynObjClass *class)
+dyn_obj_class_init (dyn_obj_class_t *class)
 {
   xobject_class_t *object_class = G_OBJECT_CLASS (class);
 
   object_class->set_property = set_prop;
   object_class->get_property = get_prop;
 
-  g_object_class_override_property (object_class, PROP_FOO, "foo");
+  xobject_class_override_property (object_class, PROP_FOO, "foo");
 }
 
 static void
-dyn_obj_class_finalize (DynObjClass *class)
+dyn_obj_class_finalize (dyn_obj_class_t *class)
 {
 }
 
 static void
-mod_register (GTypeModule *module)
+mod_register (xtype_module_t *module)
 {
   dyn_obj_register_type (module);
 }
@@ -341,18 +341,18 @@ mod_register (GTypeModule *module)
 static void
 test_dynamic_interface_properties (void)
 {
-  GTypeModule *module;
-  DynObj *obj;
+  xtype_module_t *module;
+  dyn_obj_t *obj;
   xint_t val;
 
   module = test_module_new (mod_register);
   g_assert (module != NULL);
 
-  obj = g_object_new (dyn_obj_get_type (), "foo", 1, NULL);
-  g_object_get (obj, "foo", &val, NULL);
+  obj = xobject_new (dyn_obj_get_type (), "foo", 1, NULL);
+  xobject_get (obj, "foo", &val, NULL);
   g_assert_cmpint (val, ==, 1);
 
-  g_object_unref (obj);
+  xobject_unref (obj);
 }
 
 int

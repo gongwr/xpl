@@ -25,19 +25,19 @@
 static xtype_t
 simple_register_class (const char *name, xtype_t parent, ...)
 {
-  GInterfaceInfo interface_info = { NULL, NULL, NULL };
+  xinterface_info_t interface_info = { NULL, NULL, NULL };
   va_list args;
   xtype_t type, interface;
 
   va_start (args, parent);
-  type = g_type_register_static_simple (parent, name, sizeof (xobject_class_t),
+  type = xtype_register_static_simple (parent, name, sizeof (xobject_class_t),
       NULL, parent == XTYPE_INTERFACE ? 0 : sizeof (xobject_t), NULL, 0);
   for (;;)
     {
       interface = va_arg (args, xtype_t);
       if (interface == 0)
         break;
-      g_type_add_interface_static (type, interface, &interface_info);
+      xtype_add_interface_static (type, interface, &interface_info);
     }
   va_end (args);
 
@@ -78,12 +78,12 @@ liststore_is_a_run (xpointer_t data)
 
   for (i = 0; i < 1000; i++)
     {
-      g_assert (g_type_is_a (liststore, liststore_interfaces[0]));
-      g_assert (g_type_is_a (liststore, liststore_interfaces[1]));
-      g_assert (g_type_is_a (liststore, liststore_interfaces[2]));
-      g_assert (g_type_is_a (liststore, liststore_interfaces[3]));
-      g_assert (g_type_is_a (liststore, liststore_interfaces[4]));
-      g_assert (!g_type_is_a (liststore, liststore_interfaces[5]));
+      g_assert (xtype_is_a (liststore, liststore_interfaces[0]));
+      g_assert (xtype_is_a (liststore, liststore_interfaces[1]));
+      g_assert (xtype_is_a (liststore, liststore_interfaces[2]));
+      g_assert (xtype_is_a (liststore, liststore_interfaces[3]));
+      g_assert (xtype_is_a (liststore, liststore_interfaces[4]));
+      g_assert (!xtype_is_a (liststore, liststore_interfaces[5]));
     }
 }
 
@@ -91,7 +91,7 @@ static xpointer_t
 liststore_get_class (void)
 {
   register_types ();
-  return g_type_class_ref (liststore);
+  return xtype_class_ref (liststore);
 }
 
 static void
@@ -102,15 +102,15 @@ liststore_interface_peek_run (xpointer_t klass)
 
   for (i = 0; i < 1000; i++)
     {
-      iface = g_type_interface_peek (klass, liststore_interfaces[0]);
+      iface = xtype_interface_peek (klass, liststore_interfaces[0]);
       g_assert (iface);
-      iface = g_type_interface_peek (klass, liststore_interfaces[1]);
+      iface = xtype_interface_peek (klass, liststore_interfaces[1]);
       g_assert (iface);
-      iface = g_type_interface_peek (klass, liststore_interfaces[2]);
+      iface = xtype_interface_peek (klass, liststore_interfaces[2]);
       g_assert (iface);
-      iface = g_type_interface_peek (klass, liststore_interfaces[3]);
+      iface = xtype_interface_peek (klass, liststore_interfaces[3]);
       g_assert (iface);
-      iface = g_type_interface_peek (klass, liststore_interfaces[4]);
+      iface = xtype_interface_peek (klass, liststore_interfaces[4]);
       g_assert (iface);
     }
 }
@@ -123,15 +123,15 @@ liststore_interface_peek_same_run (xpointer_t klass)
 
   for (i = 0; i < 1000; i++)
     {
-      iface = g_type_interface_peek (klass, liststore_interfaces[0]);
+      iface = xtype_interface_peek (klass, liststore_interfaces[0]);
       g_assert (iface);
-      iface = g_type_interface_peek (klass, liststore_interfaces[0]);
+      iface = xtype_interface_peek (klass, liststore_interfaces[0]);
       g_assert (iface);
-      iface = g_type_interface_peek (klass, liststore_interfaces[0]);
+      iface = xtype_interface_peek (klass, liststore_interfaces[0]);
       g_assert (iface);
-      iface = g_type_interface_peek (klass, liststore_interfaces[0]);
+      iface = xtype_interface_peek (klass, liststore_interfaces[0]);
       g_assert (iface);
-      iface = g_type_interface_peek (klass, liststore_interfaces[0]);
+      iface = xtype_interface_peek (klass, liststore_interfaces[0]);
       g_assert (iface);
     }
 }
@@ -181,12 +181,12 @@ static const PerformanceTest tests[] = {
     liststore_get_class,
     liststore_interface_peek_run,
     no_reset,
-    g_type_class_unref },
+    xtype_class_unref },
   { "liststore-interface-peek-same",
     liststore_get_class,
     liststore_interface_peek_same_run,
     no_reset,
-    g_type_class_unref },
+    xtype_class_unref },
 #if 0
   { "nothing",
     no_setup,
@@ -219,8 +219,8 @@ run_test_thread (xpointer_t user_data)
   const PerformanceTest *test = user_data;
   xpointer_t data;
   double elapsed;
-  GTimer *timer, *total;
-  GArray *results;
+  xtimer_t *timer, *total;
+  xarray_t *results;
 
   total = g_timer_new ();
   g_timer_start (total);
@@ -251,7 +251,7 @@ run_test_thread (xpointer_t user_data)
 }
 
 static int
-compare_doubles (gconstpointer a, gconstpointer b)
+compare_doubles (xconstpointer a, xconstpointer b)
 {
   double d = *(double *) a - *(double *) b;
 
@@ -263,7 +263,7 @@ compare_doubles (gconstpointer a, gconstpointer b)
 }
 
 static void
-print_results (GArray *array)
+print_results (xarray_t *array)
 {
   double min, max, avg;
   xuint_t i;
@@ -287,7 +287,7 @@ print_results (GArray *array)
 static void
 run_test (const PerformanceTest *test)
 {
-  GArray *results;
+  xarray_t *results;
 
   g_print ("Running test \"%s\"\n", test->name);
 
@@ -295,18 +295,18 @@ run_test (const PerformanceTest *test)
     results = run_test_thread ((xpointer_t) test);
   } else {
     xuint_t i;
-    GThread **threads;
-    GArray *thread_results;
+    xthread_t **threads;
+    xarray_t *thread_results;
 
-    threads = g_new (GThread *, n_threads);
+    threads = g_new (xthread_t *, n_threads);
     for (i = 0; i < n_threads; i++) {
-      threads[i] = g_thread_create (run_test_thread, (xpointer_t) test, TRUE, NULL);
+      threads[i] = xthread_create (run_test_thread, (xpointer_t) test, TRUE, NULL);
       g_assert (threads[i] != NULL);
     }
 
     results = g_array_new (FALSE, FALSE, sizeof (double));
     for (i = 0; i < n_threads; i++) {
-      thread_results = g_thread_join (threads[i]);
+      thread_results = xthread_join (threads[i]);
       g_array_append_vals (results, thread_results->data, thread_results->len);
       g_array_free (thread_results, TRUE);
     }
@@ -334,7 +334,7 @@ main (int   argc,
       char *argv[])
 {
   const PerformanceTest *test;
-  GOptionContext *context;
+  xoption_context_t *context;
   xerror_t *error = NULL;
   xsize_t i;
 

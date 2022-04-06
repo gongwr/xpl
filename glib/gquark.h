@@ -33,24 +33,24 @@
 
 G_BEGIN_DECLS
 
-typedef guint32 GQuark;
+typedef xuint32_t xquark;
 
 /* Quarks (string<->id association)
  */
 XPL_AVAILABLE_IN_ALL
-GQuark                g_quark_try_string         (const xchar_t *string);
+xquark                g_quark_try_string         (const xchar_t *string);
 XPL_AVAILABLE_IN_ALL
-GQuark                g_quark_from_static_string (const xchar_t *string);
+xquark                g_quark_from_static_string (const xchar_t *string);
 XPL_AVAILABLE_IN_ALL
-GQuark                g_quark_from_string        (const xchar_t *string);
+xquark                g_quark_from_string        (const xchar_t *string);
 XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_quark_to_string          (GQuark       quark) G_GNUC_CONST;
+const xchar_t *         g_quark_to_string          (xquark       quark) G_GNUC_CONST;
 
 #define G_DEFINE_QUARK(QN, q_n)                                         \
-GQuark                                                                  \
+xquark                                                                  \
 q_n##_quark (void)                                                      \
 {                                                                       \
-  static GQuark q;                                                      \
+  static xquark q;                                                      \
                                                                         \
   if G_UNLIKELY (q == 0)                                                \
     q = g_quark_from_static_string (#QN);                               \

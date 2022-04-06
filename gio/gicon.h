@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __G_ICON_H__
-#define __G_ICON_H__
+#ifndef __XICON_H__
+#define __XICON_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,20 +29,20 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_ICON            (g_icon_get_type ())
-#define G_ICON(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_ICON, xicon_t))
+#define XTYPE_ICON            (xicon_get_type ())
+#define XICON(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_ICON, xicon))
 #define X_IS_ICON(obj)	       (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_ICON))
-#define G_ICON_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_ICON, GIconIface))
+#define XICON_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_ICON, xicon_iface_t))
 
 /**
  * xicon_t:
  *
  * An abstract type that specifies an icon.
  **/
-typedef struct _GIconIface GIconIface;
+typedef struct _GIconIface xicon_iface_t;
 
 /**
- * GIconIface:
+ * xicon_iface_t:
  * @x_iface: The parent interface.
  * @hash: A hash for a given #xicon_t.
  * @equal: Checks if two #GIcons are equal.
@@ -54,8 +54,8 @@ typedef struct _GIconIface GIconIface;
  * serialized (Since 2.20).
  * @serialize: Serializes a #xicon_t into a #xvariant_t. Since: 2.38
  *
- * GIconIface is used to implement xicon_t types for various
- * different systems. See #GThemedIcon and #GLoadableIcon for
+ * xicon_iface_t is used to implement xicon_t types for various
+ * different systems. See #xthemed_icon_t and #xloadable_icon_t for
  * examples of how to implement this interface.
  */
 struct _GIconIface
@@ -68,7 +68,7 @@ struct _GIconIface
   xboolean_t    (* equal)       (xicon_t   *icon1,
                                xicon_t   *icon2);
   xboolean_t    (* to_tokens)   (xicon_t   *icon,
-			       GPtrArray *tokens,
+			       xptr_array_t *tokens,
                                xint_t    *out_version);
   xicon_t *     (* from_tokens) (xchar_t  **tokens,
                                xint_t     num_tokens,
@@ -79,24 +79,24 @@ struct _GIconIface
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t    g_icon_get_type  (void) G_GNUC_CONST;
+xtype_t    xicon_get_type  (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-xuint_t    g_icon_hash            (gconstpointer  icon);
+xuint_t    xicon_hash            (xconstpointer  icon);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_icon_equal           (xicon_t         *icon1,
+xboolean_t xicon_equal           (xicon_t         *icon1,
                                  xicon_t         *icon2);
 XPL_AVAILABLE_IN_ALL
-xchar_t   *g_icon_to_string       (xicon_t         *icon);
+xchar_t   *xicon_to_string       (xicon_t         *icon);
 XPL_AVAILABLE_IN_ALL
-xicon_t   *g_icon_new_for_string  (const xchar_t   *str,
+xicon_t   *xicon_new_for_string  (const xchar_t   *str,
                                  xerror_t       **error);
 
 XPL_AVAILABLE_IN_2_38
-xvariant_t * g_icon_serialize     (xicon_t         *icon);
+xvariant_t * xicon_serialize     (xicon_t         *icon);
 XPL_AVAILABLE_IN_2_38
-xicon_t *    g_icon_deserialize   (xvariant_t      *value);
+xicon_t *    xicon_deserialize   (xvariant_t      *value);
 
 G_END_DECLS
 
-#endif /* __G_ICON_H__ */
+#endif /* __XICON_H__ */

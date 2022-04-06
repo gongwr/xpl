@@ -34,11 +34,11 @@ G_BEGIN_DECLS
 typedef struct GDBusWorker GDBusWorker;
 
 typedef void (*GDBusWorkerMessageReceivedCallback) (GDBusWorker   *worker,
-                                                    GDBusMessage  *message,
+                                                    xdbus_message_t  *message,
                                                     xpointer_t       user_data);
 
-typedef GDBusMessage *(*GDBusWorkerMessageAboutToBeSentCallback) (GDBusWorker   *worker,
-                                                                  GDBusMessage  *message,
+typedef xdbus_message_t *(*GDBusWorkerMessageAboutToBeSentCallback) (GDBusWorker   *worker,
+                                                                  xdbus_message_t  *message,
                                                                   xpointer_t       user_data);
 
 typedef void (*GDBusWorkerDisconnectedCallback)    (GDBusWorker   *worker,
@@ -59,7 +59,7 @@ GDBusWorker *_g_dbus_worker_new          (xio_stream_t                          
 
 /* can be called from any thread - steals blob */
 void         _g_dbus_worker_send_message (GDBusWorker    *worker,
-                                          GDBusMessage   *message,
+                                          xdbus_message_t   *message,
                                           xchar_t          *blob,
                                           xsize_t           blob_len);
 
@@ -76,7 +76,7 @@ xboolean_t     _g_dbus_worker_flush_sync   (GDBusWorker    *worker,
 
 /* can be called from any thread */
 void         _g_dbus_worker_close        (GDBusWorker         *worker,
-                                          GTask               *task);
+                                          xtask_t               *task);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
@@ -98,10 +98,10 @@ void     _g_dbus_debug_print_unlock (void);
 
 xboolean_t _g_dbus_address_parse_entry (const xchar_t  *address_entry,
                                       xchar_t       **out_transport_name,
-                                      GHashTable  **out_key_value_pairs,
+                                      xhashtable_t  **out_key_value_pairs,
                                       xerror_t      **error);
 
-xvariant_type_t * _g_dbus_compute_complete_signature (GDBusArgInfo **args);
+xvariant_type_t * _g_dbus_compute_complete_signature (xdbus_arg_info_t **args);
 
 xchar_t *_g_dbus_hexdump (const xchar_t *data, xsize_t len, xuint_t indent);
 
@@ -128,36 +128,36 @@ xchar_t *_g_dbus_enum_to_string (xtype_t enum_type, xint_t value);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-GDBusMethodInvocation *_g_dbus_method_invocation_new (const xchar_t             *sender,
+xdbus_method_invocation_t *_xdbus_method_invocation_new (const xchar_t             *sender,
                                                       const xchar_t             *object_path,
                                                       const xchar_t             *interface_name,
                                                       const xchar_t             *method_name,
-                                                      const GDBusMethodInfo   *method_info,
-                                                      const GDBusPropertyInfo *property_info,
-                                                      GDBusConnection         *connection,
-                                                      GDBusMessage            *message,
+                                                      const xdbus_method_info_t   *method_info,
+                                                      const xdbus_property_info_t *property_info,
+                                                      xdbus_connection_t         *connection,
+                                                      xdbus_message_t            *message,
                                                       xvariant_t                *parameters,
                                                       xpointer_t                 user_data);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-xboolean_t _g_signal_accumulator_false_handled (GSignalInvocationHint *ihint,
-                                              GValue                *return_accu,
-                                              const GValue          *handler_return,
+xboolean_t _g_signal_accumulator_false_handled (xsignal_invocation_hint_t *ihint,
+                                              xvalue_t                *return_accu,
+                                              const xvalue_t          *handler_return,
                                               xpointer_t               dummy);
 
-xboolean_t _g_dbus_object_skeleton_has_authorize_method_handlers (GDBusObjectSkeleton *object);
+xboolean_t _g_dbus_object_skeleton_has_authorize_method_handlers (xdbus_object_skeleton_t *object);
 
-void _g_dbus_object_proxy_add_interface (GDBusObjectProxy *proxy,
-                                         GDBusProxy       *interface_proxy);
-void _g_dbus_object_proxy_remove_interface (GDBusObjectProxy *proxy,
+void _g_dbus_object_proxy_add_interface (xdbus_object_proxy_t *proxy,
+                                         xdbus_proxy_t       *interface_proxy);
+void _g_dbus_object_proxy_remove_interface (xdbus_object_proxy_t *proxy,
                                             const xchar_t      *interface_name);
 
 xchar_t *_g_dbus_hexencode (const xchar_t *str,
                           xsize_t        str_len);
 
 /* Implemented in gdbusconnection.c */
-GDBusConnection *_g_bus_get_singleton_if_exists (GBusType bus_type);
+xdbus_connection_t *_g_bus_get_singleton_if_exists (GBusType bus_type);
 void             _g_bus_forget_singleton        (GBusType bus_type);
 
 G_END_DECLS

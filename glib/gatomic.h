@@ -65,8 +65,8 @@ xboolean_t                g_atomic_pointer_compare_and_exchange (volatile void  
                                                                xpointer_t        oldval,
                                                                xpointer_t        newval);
 XPL_AVAILABLE_IN_ALL
-gssize                  g_atomic_pointer_add                  (volatile void  *atomic,
-                                                               gssize          val);
+xssize_t                  g_atomic_pointer_add                  (volatile void  *atomic,
+                                                               xssize_t          val);
 XPL_AVAILABLE_IN_2_30
 xsize_t                   g_atomic_pointer_and                  (volatile void  *atomic,
                                                                xsize_t           val);
@@ -216,7 +216,7 @@ G_END_DECLS
     G_STATIC_ASSERT (sizeof *(atomic) == sizeof (xpointer_t));                 \
     (void) (0 ? (xpointer_t) *(atomic) : NULL);                                \
     (void) (0 ? (val) ^ (val) : 1);                                          \
-    (gssize) __atomic_fetch_add ((atomic), (val), __ATOMIC_SEQ_CST);         \
+    (xssize_t) __atomic_fetch_add ((atomic), (val), __ATOMIC_SEQ_CST);         \
   }))
 #define g_atomic_pointer_and(atomic, val) \
   (G_GNUC_EXTENSION ({                                                       \
@@ -377,7 +377,7 @@ G_END_DECLS
     G_STATIC_ASSERT (sizeof *(atomic) == sizeof (xpointer_t));                 \
     (void) (0 ? (xpointer_t) *(atomic) : NULL);                                \
     (void) (0 ? (val) ^ (val) : 1);                                          \
-    (gssize) __sync_fetch_and_add ((atomic), (val));                         \
+    (xssize_t) __sync_fetch_and_add ((atomic), (val));                         \
   }))
 #define g_atomic_pointer_and(atomic, val) \
   (G_GNUC_EXTENSION ({                                                       \
@@ -445,7 +445,7 @@ G_END_DECLS
 #define g_atomic_pointer_compare_and_exchange(atomic, oldval, newval) \
   (g_atomic_pointer_compare_and_exchange ((atomic), (xpointer_t) (oldval), (xpointer_t) (newval)))
 #define g_atomic_pointer_add(atomic, val) \
-  (g_atomic_pointer_add ((atomic), (gssize) (val)))
+  (g_atomic_pointer_add ((atomic), (xssize_t) (val)))
 #define g_atomic_pointer_and(atomic, val) \
   (g_atomic_pointer_and ((atomic), (xsize_t) (val)))
 #define g_atomic_pointer_or(atomic, val) \

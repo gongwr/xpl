@@ -9,15 +9,15 @@
         </thead>
         <tbody>
           <row><entry>GnomeVFSURI</entry><entry>xfile_t</entry></row>
-          <row><entry>GnomeVFSFileInfo</entry><entry>GFileInfo</entry></row>
+          <row><entry>GnomeVFSFileInfo</entry><entry>xfile_info_t</entry></row>
           <row><entry>GnomeVFSResult</entry><entry>xerror_t, with G_IO_ERROR values</entry></row>
           <row><entry>GnomeVFSHandle &amp; GnomeVFSAsyncHandle</entry><entry>xinput_stream_t or xoutput_stream_t</entry></row>
-          <row><entry>GnomeVFSDirectoryHandle</entry><entry>GFileEnumerator</entry></row>
+          <row><entry>GnomeVFSDirectoryHandle</entry><entry>xfile_enumerator_t</entry></row>
           <row><entry>mime type</entry><entry>content type</entry></row>
-          <row><entry>GnomeVFSMonitor</entry><entry>GFileMonitor</entry></row>
-          <row><entry>GnomeVFSVolumeMonitor</entry><entry>GVolumeMonitor</entry></row>
-          <row><entry>GnomeVFSVolume</entry><entry>GMount</entry></row>
-          <row><entry>GnomeVFSDrive</entry><entry>GVolume</entry></row>
+          <row><entry>GnomeVFSMonitor</entry><entry>xfile_monitor_t</entry></row>
+          <row><entry>GnomeVFSVolumeMonitor</entry><entry>xvolume_monitor_t</entry></row>
+          <row><entry>GnomeVFSVolume</entry><entry>xmount_t</entry></row>
+          <row><entry>GnomeVFSDrive</entry><entry>xvolume_t</entry></row>
           <row><entry>-</entry><entry>xdrive_t</entry></row>
           <row><entry>GnomeVFSContext</entry><entry>xcancellable_t</entry></row>
           <row><entry>gnome_vfs_async_cancel</entry><entry>g_cancellable_cancel</entry></row>
@@ -49,19 +49,19 @@
       </para>
 <informalexample><programlisting>
 static void
-file_changed (GFileMonitor      *file_monitor,
+file_changed (xfile_monitor_t      *file_monitor,
               xfile_t             *child,
               xfile_t             *other_file,
-              GFileMonitorEvent  event_type,
+              xfile_monitor_event_t  event_type,
               xpointer_t           user_data)
 {
   switch (event_type)
   {
-  case G_FILE_MONITOR_EVENT_DELETED:
-    g_print ("'%s' removed from trash\n", g_file_get_basename (child));
+  case XFILE_MONITOR_EVENT_DELETED:
+    g_print ("'%s' removed from trash\n", xfile_get_basename (child));
     break;
-  case G_FILE_MONITOR_EVENT_CREATED:
-    g_print ("'%s' added to trash\n", g_file_get_basename (child));
+  case XFILE_MONITOR_EVENT_CREATED:
+    g_print ("'%s' added to trash\n", xfile_get_basename (child));
     break;
   default: ;
   }
@@ -71,11 +71,11 @@ static void
 start_monitoring_trash (void)
 {
   xfile_t *file;
-  GFileMonitor *monitor;
+  xfile_monitor_t *monitor;
 
-  file = g_file_new_for_uri ("trash://");
-  monitor = g_file_monitor_directory (file, 0, NULL, NULL);
-  g_object_unref (file);
+  file = xfile_new_for_uri ("trash://");
+  monitor = xfile_monitor_directory (file, 0, NULL, NULL);
+  xobject_unref (file);
 
   g_signal_connect (monitor, "changed", G_CALLBACK (file_changed), NULL);
 
@@ -95,7 +95,7 @@ start_monitoring_trash (void)
       <para>
         Moving a file to the trash is much simpler with GIO. Instead of
         using gnome_vfs_find_directory() with %GNOME_VFS_DIRECTORY_KIND_TRASH
-        to find out where to move the trashed file, just use the g_file_trash()
+        to find out where to move the trashed file, just use the xfile_trash()
         function.
       </para>
     </section>

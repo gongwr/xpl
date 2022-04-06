@@ -43,22 +43,22 @@ enum {
 
 static void     g_filter_input_stream_set_property (xobject_t      *object,
                                                     xuint_t         prop_id,
-                                                    const GValue *value,
-                                                    GParamSpec   *pspec);
+                                                    const xvalue_t *value,
+                                                    xparam_spec_t   *pspec);
 
 static void     g_filter_input_stream_get_property (xobject_t      *object,
                                                     xuint_t         prop_id,
-                                                    GValue       *value,
-                                                    GParamSpec   *pspec);
+                                                    xvalue_t       *value,
+                                                    xparam_spec_t   *pspec);
 static void     g_filter_input_stream_finalize     (xobject_t *object);
 
 
-static gssize   g_filter_input_stream_read         (xinput_stream_t         *stream,
+static xssize_t   g_filter_input_stream_read         (xinput_stream_t         *stream,
                                                     void                 *buffer,
                                                     xsize_t                 count,
                                                     xcancellable_t         *cancellable,
                                                     xerror_t              **error);
-static gssize   g_filter_input_stream_skip         (xinput_stream_t         *stream,
+static xssize_t   g_filter_input_stream_skip         (xinput_stream_t         *stream,
                                                     xsize_t                 count,
                                                     xcancellable_t         *cancellable,
                                                     xerror_t              **error);
@@ -71,7 +71,7 @@ typedef struct
   xboolean_t close_base;
 } GFilterInputStreamPrivate;
 
-G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (GFilterInputStream, g_filter_input_stream, XTYPE_INPUT_STREAM)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (xfilter_input_stream_t, g_filter_input_stream, XTYPE_INPUT_STREAM)
 
 static void
 g_filter_input_stream_class_init (GFilterInputStreamClass *klass)
@@ -89,7 +89,7 @@ g_filter_input_stream_class_init (GFilterInputStreamClass *klass)
   istream_class->skip  = g_filter_input_stream_skip;
   istream_class->close_fn = g_filter_input_stream_close;
 
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_BASE_STREAM,
                                    g_param_spec_object ("base-stream",
                                                          P_("The Filter Base Stream"),
@@ -98,7 +98,7 @@ g_filter_input_stream_class_init (GFilterInputStreamClass *klass)
                                                          G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
                                                          G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
 
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_CLOSE_BASE,
                                    g_param_spec_boolean ("close-base-stream",
                                                          P_("Close Base Stream"),
@@ -110,10 +110,10 @@ g_filter_input_stream_class_init (GFilterInputStreamClass *klass)
 static void
 g_filter_input_stream_set_property (xobject_t         *object,
                                     xuint_t            prop_id,
-                                    const GValue    *value,
-                                    GParamSpec      *pspec)
+                                    const xvalue_t    *value,
+                                    xparam_spec_t      *pspec)
 {
-  GFilterInputStream *filter_stream;
+  xfilter_input_stream_t *filter_stream;
   xobject_t *obj;
 
   filter_stream = G_FILTER_INPUT_STREAM (object);
@@ -121,13 +121,13 @@ g_filter_input_stream_set_property (xobject_t         *object,
   switch (prop_id)
     {
     case PROP_BASE_STREAM:
-      obj = g_value_dup_object (value);
+      obj = xvalue_dup_object (value);
       filter_stream->base_stream = G_INPUT_STREAM (obj);
       break;
 
     case PROP_CLOSE_BASE:
       g_filter_input_stream_set_close_base_stream (filter_stream,
-                                                   g_value_get_boolean (value));
+                                                   xvalue_get_boolean (value));
       break;
 
     default:
@@ -140,10 +140,10 @@ g_filter_input_stream_set_property (xobject_t         *object,
 static void
 g_filter_input_stream_get_property (xobject_t    *object,
                                     xuint_t       prop_id,
-                                    GValue     *value,
-                                    GParamSpec *pspec)
+                                    xvalue_t     *value,
+                                    xparam_spec_t *pspec)
 {
-  GFilterInputStream *filter_stream;
+  xfilter_input_stream_t *filter_stream;
   GFilterInputStreamPrivate *priv;
 
   filter_stream = G_FILTER_INPUT_STREAM (object);
@@ -152,11 +152,11 @@ g_filter_input_stream_get_property (xobject_t    *object,
   switch (prop_id)
     {
     case PROP_BASE_STREAM:
-      g_value_set_object (value, filter_stream->base_stream);
+      xvalue_set_object (value, filter_stream->base_stream);
       break;
 
     case PROP_CLOSE_BASE:
-      g_value_set_boolean (value, priv->close_base);
+      xvalue_set_boolean (value, priv->close_base);
       break;
 
     default:
@@ -169,30 +169,30 @@ g_filter_input_stream_get_property (xobject_t    *object,
 static void
 g_filter_input_stream_finalize (xobject_t *object)
 {
-  GFilterInputStream *stream;
+  xfilter_input_stream_t *stream;
 
   stream = G_FILTER_INPUT_STREAM (object);
 
-  g_object_unref (stream->base_stream);
+  xobject_unref (stream->base_stream);
 
   G_OBJECT_CLASS (g_filter_input_stream_parent_class)->finalize (object);
 }
 
 static void
-g_filter_input_stream_init (GFilterInputStream *stream)
+g_filter_input_stream_init (xfilter_input_stream_t *stream)
 {
 }
 
 /**
  * g_filter_input_stream_get_base_stream:
- * @stream: a #GFilterInputStream.
+ * @stream: a #xfilter_input_stream_t.
  *
  * Gets the base stream for the filter stream.
  *
  * Returns: (transfer none): a #xinput_stream_t.
  **/
 xinput_stream_t *
-g_filter_input_stream_get_base_stream (GFilterInputStream *stream)
+g_filter_input_stream_get_base_stream (xfilter_input_stream_t *stream)
 {
   g_return_val_if_fail (X_IS_FILTER_INPUT_STREAM (stream), NULL);
 
@@ -201,7 +201,7 @@ g_filter_input_stream_get_base_stream (GFilterInputStream *stream)
 
 /**
  * g_filter_input_stream_get_close_base_stream:
- * @stream: a #GFilterInputStream.
+ * @stream: a #xfilter_input_stream_t.
  *
  * Returns whether the base stream will be closed when @stream is
  * closed.
@@ -209,7 +209,7 @@ g_filter_input_stream_get_base_stream (GFilterInputStream *stream)
  * Returns: %TRUE if the base stream will be closed.
  **/
 xboolean_t
-g_filter_input_stream_get_close_base_stream (GFilterInputStream *stream)
+g_filter_input_stream_get_close_base_stream (xfilter_input_stream_t *stream)
 {
   GFilterInputStreamPrivate *priv;
 
@@ -222,13 +222,13 @@ g_filter_input_stream_get_close_base_stream (GFilterInputStream *stream)
 
 /**
  * g_filter_input_stream_set_close_base_stream:
- * @stream: a #GFilterInputStream.
+ * @stream: a #xfilter_input_stream_t.
  * @close_base: %TRUE to close the base stream.
  *
  * Sets whether the base stream will be closed when @stream is closed.
  **/
 void
-g_filter_input_stream_set_close_base_stream (GFilterInputStream *stream,
+g_filter_input_stream_set_close_base_stream (xfilter_input_stream_t *stream,
                                              xboolean_t            close_base)
 {
   GFilterInputStreamPrivate *priv;
@@ -242,25 +242,25 @@ g_filter_input_stream_set_close_base_stream (GFilterInputStream *stream,
   if (priv->close_base != close_base)
     {
       priv->close_base = close_base;
-      g_object_notify (G_OBJECT (stream), "close-base-stream");
+      xobject_notify (G_OBJECT (stream), "close-base-stream");
     }
 }
 
-static gssize
+static xssize_t
 g_filter_input_stream_read (xinput_stream_t  *stream,
                             void          *buffer,
                             xsize_t          count,
                             xcancellable_t  *cancellable,
                             xerror_t       **error)
 {
-  GFilterInputStream *filter_stream;
+  xfilter_input_stream_t *filter_stream;
   xinput_stream_t       *base_stream;
-  gssize              nread;
+  xssize_t              nread;
 
   filter_stream = G_FILTER_INPUT_STREAM (stream);
   base_stream = filter_stream->base_stream;
 
-  nread = g_input_stream_read (base_stream,
+  nread = xinput_stream_read (base_stream,
                                buffer,
                                count,
                                cancellable,
@@ -269,20 +269,20 @@ g_filter_input_stream_read (xinput_stream_t  *stream,
   return nread;
 }
 
-static gssize
+static xssize_t
 g_filter_input_stream_skip (xinput_stream_t  *stream,
                             xsize_t          count,
                             xcancellable_t  *cancellable,
                             xerror_t       **error)
 {
-  GFilterInputStream *filter_stream;
+  xfilter_input_stream_t *filter_stream;
   xinput_stream_t       *base_stream;
-  gssize              nskipped;
+  xssize_t              nskipped;
 
   filter_stream = G_FILTER_INPUT_STREAM (stream);
   base_stream = filter_stream->base_stream;
 
-  nskipped = g_input_stream_skip (base_stream,
+  nskipped = xinput_stream_skip (base_stream,
                                   count,
                                   cancellable,
                                   error);
@@ -294,13 +294,13 @@ g_filter_input_stream_close (xinput_stream_t  *stream,
                              xcancellable_t  *cancellable,
                              xerror_t       **error)
 {
-  GFilterInputStream *filter_stream = G_FILTER_INPUT_STREAM (stream);
+  xfilter_input_stream_t *filter_stream = G_FILTER_INPUT_STREAM (stream);
   GFilterInputStreamPrivate *priv = g_filter_input_stream_get_instance_private (filter_stream);
   xboolean_t res = TRUE;
 
   if (priv->close_base)
     {
-      res = g_input_stream_close (filter_stream->base_stream,
+      res = xinput_stream_close (filter_stream->base_stream,
                                   cancellable,
                                   error);
     }

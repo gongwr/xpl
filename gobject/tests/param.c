@@ -32,8 +32,8 @@
 static void
 test_param_spec_char (void)
 {
-  GParamSpec *pspec;
-  GValue value = G_VALUE_INIT;
+  xparam_spec_t *pspec;
+  xvalue_t value = G_VALUE_INIT;
 
   pspec = g_param_spec_char ("char", "nick", "blurb",
                              20, 40, 30, G_PARAM_READWRITE);
@@ -42,42 +42,42 @@ test_param_spec_char (void)
   g_assert_cmpstr (g_param_spec_get_nick (pspec), ==, "nick");
   g_assert_cmpstr (g_param_spec_get_blurb (pspec), ==, "blurb");
 
-  g_value_init (&value, XTYPE_CHAR);
-  g_value_set_char (&value, 30);
+  xvalue_init (&value, XTYPE_CHAR);
+  xvalue_set_char (&value, 30);
 
   g_assert_true (g_param_value_defaults (pspec, &value));
 
-  g_value_set_char (&value, 0);
+  xvalue_set_char (&value, 0);
   g_assert_true (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_char (&value), ==, 20);
+  g_assert_cmpint (xvalue_get_char (&value), ==, 20);
 
-  g_value_set_char (&value, 20);
+  xvalue_set_char (&value, 20);
   g_assert_false (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_char (&value), ==, 20);
+  g_assert_cmpint (xvalue_get_char (&value), ==, 20);
 
-  g_value_set_char (&value, 40);
+  xvalue_set_char (&value, 40);
   g_assert_false (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_char (&value), ==, 40);
+  g_assert_cmpint (xvalue_get_char (&value), ==, 40);
 
-  g_value_set_char (&value, 60);
+  xvalue_set_char (&value, 60);
   g_assert_true (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_char (&value), ==, 40);
+  g_assert_cmpint (xvalue_get_char (&value), ==, 40);
 
-  g_value_set_schar (&value, 0);
+  xvalue_set_schar (&value, 0);
   g_assert_true (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_schar (&value), ==, 20);
+  g_assert_cmpint (xvalue_get_schar (&value), ==, 20);
 
-  g_value_set_schar (&value, 20);
+  xvalue_set_schar (&value, 20);
   g_assert_false (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_schar (&value), ==, 20);
+  g_assert_cmpint (xvalue_get_schar (&value), ==, 20);
 
-  g_value_set_schar (&value, 40);
+  xvalue_set_schar (&value, 40);
   g_assert_false (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_schar (&value), ==, 40);
+  g_assert_cmpint (xvalue_get_schar (&value), ==, 40);
 
-  g_value_set_schar (&value, 60);
+  xvalue_set_schar (&value, 60);
   g_assert_true (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_schar (&value), ==, 40);
+  g_assert_cmpint (xvalue_get_schar (&value), ==, 40);
 
   g_param_spec_unref (pspec);
 }
@@ -85,27 +85,27 @@ test_param_spec_char (void)
 static void
 test_param_spec_string (void)
 {
-  GParamSpec *pspec;
-  GValue value = G_VALUE_INIT;
+  xparam_spec_t *pspec;
+  xvalue_t value = G_VALUE_INIT;
 
   pspec = g_param_spec_string ("string", "nick", "blurb",
                                NULL, G_PARAM_READWRITE);
-  g_value_init (&value, XTYPE_STRING);
+  xvalue_init (&value, XTYPE_STRING);
 
-  g_value_set_string (&value, "foobar");
+  xvalue_set_string (&value, "foobar");
   g_assert_false (g_param_value_validate (pspec, &value));
 
-  g_value_set_string (&value, "");
+  xvalue_set_string (&value, "");
   g_assert_false (g_param_value_validate (pspec, &value));
-  g_assert_nonnull (g_value_get_string (&value));
+  g_assert_nonnull (xvalue_get_string (&value));
 
   /* test ensure_non_null */
 
   G_PARAM_SPEC_STRING (pspec)->ensure_non_null = TRUE;
 
-  g_value_set_string (&value, NULL);
+  xvalue_set_string (&value, NULL);
   g_assert_true (g_param_value_validate (pspec, &value));
-  g_assert_nonnull (g_value_get_string (&value));
+  g_assert_nonnull (xvalue_get_string (&value));
 
   G_PARAM_SPEC_STRING (pspec)->ensure_non_null = FALSE;
 
@@ -113,50 +113,50 @@ test_param_spec_string (void)
 
   G_PARAM_SPEC_STRING (pspec)->null_fold_if_empty = TRUE;
 
-  g_value_set_string (&value, "");
+  xvalue_set_string (&value, "");
   g_assert_true (g_param_value_validate (pspec, &value));
-  g_assert_null (g_value_get_string (&value));
+  g_assert_null (xvalue_get_string (&value));
 
-  g_value_set_static_string (&value, "");
+  xvalue_set_static_string (&value, "");
   g_assert_true (g_param_value_validate (pspec, &value));
-  g_assert_null (g_value_get_string (&value));
+  g_assert_null (xvalue_get_string (&value));
 
   G_PARAM_SPEC_STRING (pspec)->null_fold_if_empty = FALSE;
 
   /* test cset_first */
 
-  G_PARAM_SPEC_STRING (pspec)->cset_first = g_strdup ("abc");
+  G_PARAM_SPEC_STRING (pspec)->cset_first = xstrdup ("abc");
   G_PARAM_SPEC_STRING (pspec)->substitutor = '-';
 
-  g_value_set_string (&value, "ABC");
+  xvalue_set_string (&value, "ABC");
   g_assert_true (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_string (&value)[0], ==, '-');
+  g_assert_cmpint (xvalue_get_string (&value)[0], ==, '-');
 
-  g_value_set_static_string (&value, "ABC");
+  xvalue_set_static_string (&value, "ABC");
   g_assert_true (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_string (&value)[0], ==, '-');
+  g_assert_cmpint (xvalue_get_string (&value)[0], ==, '-');
 
   /* test cset_nth */
 
-  G_PARAM_SPEC_STRING (pspec)->cset_nth = g_strdup ("abc");
+  G_PARAM_SPEC_STRING (pspec)->cset_nth = xstrdup ("abc");
 
-  g_value_set_string (&value, "aBC");
+  xvalue_set_string (&value, "aBC");
   g_assert_true (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_string (&value)[1], ==, '-');
+  g_assert_cmpint (xvalue_get_string (&value)[1], ==, '-');
 
-  g_value_set_static_string (&value, "aBC");
+  xvalue_set_static_string (&value, "aBC");
   g_assert_true (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_string (&value)[1], ==, '-');
+  g_assert_cmpint (xvalue_get_string (&value)[1], ==, '-');
 
-  g_value_unset (&value);
+  xvalue_unset (&value);
   g_param_spec_unref (pspec);
 }
 
 static void
 test_param_spec_override (void)
 {
-  GParamSpec *ospec, *pspec;
-  GValue value = G_VALUE_INIT;
+  xparam_spec_t *ospec, *pspec;
+  xvalue_t value = G_VALUE_INIT;
 
   ospec = g_param_spec_char ("char", "nick", "blurb",
                              20, 40, 30, G_PARAM_READWRITE);
@@ -167,26 +167,26 @@ test_param_spec_override (void)
   g_assert_cmpstr (g_param_spec_get_nick (pspec), ==, "nick");
   g_assert_cmpstr (g_param_spec_get_blurb (pspec), ==, "blurb");
 
-  g_value_init (&value, XTYPE_CHAR);
-  g_value_set_char (&value, 30);
+  xvalue_init (&value, XTYPE_CHAR);
+  xvalue_set_char (&value, 30);
 
   g_assert_true (g_param_value_defaults (pspec, &value));
 
-  g_value_set_char (&value, 0);
+  xvalue_set_char (&value, 0);
   g_assert_true (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_char (&value), ==, 20);
+  g_assert_cmpint (xvalue_get_char (&value), ==, 20);
 
-  g_value_set_char (&value, 20);
+  xvalue_set_char (&value, 20);
   g_assert_false (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_char (&value), ==, 20);
+  g_assert_cmpint (xvalue_get_char (&value), ==, 20);
 
-  g_value_set_char (&value, 40);
+  xvalue_set_char (&value, 40);
   g_assert_false (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_char (&value), ==, 40);
+  g_assert_cmpint (xvalue_get_char (&value), ==, 40);
 
-  g_value_set_char (&value, 60);
+  xvalue_set_char (&value, 60);
   g_assert_true (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_char (&value), ==, 40);
+  g_assert_cmpint (xvalue_get_char (&value), ==, 40);
 
   g_param_spec_unref (pspec);
   g_param_spec_unref (ospec);
@@ -195,24 +195,24 @@ test_param_spec_override (void)
 static void
 test_param_spec_gtype (void)
 {
-  GParamSpec *pspec;
-  GValue value = G_VALUE_INIT;
+  xparam_spec_t *pspec;
+  xvalue_t value = G_VALUE_INIT;
 
   pspec = g_param_spec_gtype ("gtype", "nick", "blurb",
                               XTYPE_PARAM, G_PARAM_READWRITE);
 
-  g_value_init (&value, XTYPE_GTYPE);
-  g_value_set_gtype (&value, XTYPE_PARAM);
+  xvalue_init (&value, XTYPE_GTYPE);
+  xvalue_set_gtype (&value, XTYPE_PARAM);
 
   g_assert_true (g_param_value_defaults (pspec, &value));
 
-  g_value_set_gtype (&value, XTYPE_INT);
+  xvalue_set_gtype (&value, XTYPE_INT);
   g_assert_true (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_gtype (&value), ==, XTYPE_PARAM);
+  g_assert_cmpint (xvalue_get_gtype (&value), ==, XTYPE_PARAM);
 
-  g_value_set_gtype (&value, XTYPE_PARAM_INT);
+  xvalue_set_gtype (&value, XTYPE_PARAM_INT);
   g_assert_false (g_param_value_validate (pspec, &value));
-  g_assert_cmpint (g_value_get_gtype (&value), ==, XTYPE_PARAM_INT);
+  g_assert_cmpint (xvalue_get_gtype (&value), ==, XTYPE_PARAM_INT);
 
   g_param_spec_unref (pspec);
 }
@@ -220,33 +220,33 @@ test_param_spec_gtype (void)
 static void
 test_param_spec_variant (void)
 {
-  GParamSpec *pspec;
-  GValue value = G_VALUE_INIT;
-  GValue value2 = G_VALUE_INIT;
-  GValue value3 = G_VALUE_INIT;
-  GValue value4 = G_VALUE_INIT;
-  GValue value5 = G_VALUE_INIT;
+  xparam_spec_t *pspec;
+  xvalue_t value = G_VALUE_INIT;
+  xvalue_t value2 = G_VALUE_INIT;
+  xvalue_t value3 = G_VALUE_INIT;
+  xvalue_t value4 = G_VALUE_INIT;
+  xvalue_t value5 = G_VALUE_INIT;
   xboolean_t modified;
 
   pspec = g_param_spec_variant ("variant", "nick", "blurb",
                                 G_VARIANT_TYPE ("i"),
-                                g_variant_new_int32 (42),
+                                xvariant_new_int32 (42),
                                 G_PARAM_READWRITE);
 
-  g_value_init (&value, XTYPE_VARIANT);
-  g_value_set_variant (&value, g_variant_new_int32 (42));
+  xvalue_init (&value, XTYPE_VARIANT);
+  xvalue_set_variant (&value, xvariant_new_int32 (42));
 
-  g_value_init (&value2, XTYPE_VARIANT);
-  g_value_set_variant (&value2, g_variant_new_int32 (43));
+  xvalue_init (&value2, XTYPE_VARIANT);
+  xvalue_set_variant (&value2, xvariant_new_int32 (43));
 
-  g_value_init (&value3, XTYPE_VARIANT);
-  g_value_set_variant (&value3, g_variant_new_int16 (42));
+  xvalue_init (&value3, XTYPE_VARIANT);
+  xvalue_set_variant (&value3, xvariant_new_int16 (42));
 
-  g_value_init (&value4, XTYPE_VARIANT);
-  g_value_set_variant (&value4, g_variant_new_parsed ("[@u 15, @u 10]"));
+  xvalue_init (&value4, XTYPE_VARIANT);
+  xvalue_set_variant (&value4, xvariant_new_parsed ("[@u 15, @u 10]"));
 
-  g_value_init (&value5, XTYPE_VARIANT);
-  g_value_set_variant (&value5, NULL);
+  xvalue_init (&value5, XTYPE_VARIANT);
+  xvalue_set_variant (&value5, NULL);
 
   g_assert_true (g_param_value_defaults (pspec, &value));
   g_assert_false (g_param_value_defaults (pspec, &value2));
@@ -257,17 +257,17 @@ test_param_spec_variant (void)
   modified = g_param_value_validate (pspec, &value);
   g_assert_false (modified);
 
-  g_value_reset (&value);
-  g_value_set_variant (&value, g_variant_new_uint32 (41));
+  xvalue_reset (&value);
+  xvalue_set_variant (&value, xvariant_new_uint32 (41));
   modified = g_param_value_validate (pspec, &value);
   g_assert_true (modified);
-  g_assert_cmpint (g_variant_get_int32 (g_value_get_variant (&value)), ==, 42);
-  g_value_unset (&value);
+  g_assert_cmpint (xvariant_get_int32 (xvalue_get_variant (&value)), ==, 42);
+  xvalue_unset (&value);
 
-  g_value_unset (&value5);
-  g_value_unset (&value4);
-  g_value_unset (&value3);
-  g_value_unset (&value2);
+  xvalue_unset (&value5);
+  xvalue_unset (&value4);
+  xvalue_unset (&value3);
+  xvalue_unset (&value2);
 
   g_param_spec_unref (pspec);
 }
@@ -306,9 +306,9 @@ test_param_spec_variant_cmp (void)
 
   for (i = 0; i < G_N_ELEMENTS (vectors); i++)
     {
-      GParamSpec *pspec;
-      GValue v1 = G_VALUE_INIT;
-      GValue v2 = G_VALUE_INIT;
+      xparam_spec_t *pspec;
+      xvalue_t v1 = G_VALUE_INIT;
+      xvalue_t v2 = G_VALUE_INIT;
       xint_t cmp;
 
       pspec = g_param_spec_variant ("variant", "nick", "blurb",
@@ -316,15 +316,15 @@ test_param_spec_variant_cmp (void)
                                     NULL,
                                     G_PARAM_READWRITE);
 
-      g_value_init (&v1, XTYPE_VARIANT);
-      g_value_set_variant (&v1,
+      xvalue_init (&v1, XTYPE_VARIANT);
+      xvalue_set_variant (&v1,
                            (vectors[i].v1 != NULL) ?
-                           g_variant_new_parsed (vectors[i].v1) : NULL);
+                           xvariant_new_parsed (vectors[i].v1) : NULL);
 
-      g_value_init (&v2, XTYPE_VARIANT);
-      g_value_set_variant (&v2,
+      xvalue_init (&v2, XTYPE_VARIANT);
+      xvalue_set_variant (&v2,
                            (vectors[i].v2 != NULL) ?
-                           g_variant_new_parsed (vectors[i].v2) : NULL);
+                           xvariant_new_parsed (vectors[i].v2) : NULL);
 
       cmp = g_param_values_cmp (pspec, &v1, &v2);
 
@@ -342,8 +342,8 @@ test_param_spec_variant_cmp (void)
           g_assert_not_reached ();
         }
 
-      g_value_unset (&v2);
-      g_value_unset (&v1);
+      xvalue_unset (&v2);
+      xvalue_unset (&v1);
       g_param_spec_unref (pspec);
     }
 }
@@ -351,27 +351,27 @@ test_param_spec_variant_cmp (void)
 static void
 test_param_value (void)
 {
-  GParamSpec *p, *p2;
-  GParamSpec *pp;
-  GValue value = G_VALUE_INIT;
+  xparam_spec_t *p, *p2;
+  xparam_spec_t *pp;
+  xvalue_t value = G_VALUE_INIT;
 
-  g_value_init (&value, XTYPE_PARAM);
+  xvalue_init (&value, XTYPE_PARAM);
   g_assert_true (G_VALUE_HOLDS_PARAM (&value));
 
   p = g_param_spec_int ("my-int", "My Int", "Blurb", 0, 20, 10, G_PARAM_READWRITE);
 
-  g_value_take_param (&value, p);
-  p2 = g_value_get_param (&value);
+  xvalue_take_param (&value, p);
+  p2 = xvalue_get_param (&value);
   g_assert_true (p2 == p);
 
   pp = g_param_spec_uint ("my-uint", "My UInt", "Blurb", 0, 10, 5, G_PARAM_READWRITE);
-  g_value_set_param (&value, pp);
+  xvalue_set_param (&value, pp);
 
-  p2 = g_value_dup_param (&value);
+  p2 = xvalue_dup_param (&value);
   g_assert_true (p2 == pp); /* param specs use ref/unref for copy/free */
   g_param_spec_unref (p2);
 
-  g_value_unset (&value);
+  xvalue_unset (&value);
   g_param_spec_unref (pp);
 }
 
@@ -386,9 +386,9 @@ my_destroy (xpointer_t data)
 static void
 test_param_qdata (void)
 {
-  GParamSpec *p;
+  xparam_spec_t *p;
   xchar_t *bla;
-  GQuark q;
+  xquark q;
 
   q = g_quark_from_string ("bla");
 
@@ -413,20 +413,20 @@ test_param_qdata (void)
 static void
 test_param_validate (void)
 {
-  GParamSpec *p;
-  GValue value = G_VALUE_INIT;
+  xparam_spec_t *p;
+  xvalue_t value = G_VALUE_INIT;
 
   p = g_param_spec_int ("my-int", "My Int", "Blurb", 0, 20, 10, G_PARAM_READWRITE);
 
-  g_value_init (&value, XTYPE_INT);
-  g_value_set_int (&value, 100);
+  xvalue_init (&value, XTYPE_INT);
+  xvalue_set_int (&value, 100);
   g_assert_false (g_param_value_defaults (p, &value));
   g_assert_true (g_param_value_validate (p, &value));
-  g_assert_cmpint (g_value_get_int (&value), ==, 20);
+  g_assert_cmpint (xvalue_get_int (&value), ==, 20);
 
   g_param_value_set_default (p, &value);
   g_assert_true (g_param_value_defaults (p, &value));
-  g_assert_cmpint (g_value_get_int (&value), ==, 10);
+  g_assert_cmpint (xvalue_get_int (&value), ==, 10);
 
   g_param_spec_unref (p);
 }
@@ -434,7 +434,7 @@ test_param_validate (void)
 static void
 test_param_strings (void)
 {
-  GParamSpec *p;
+  xparam_spec_t *p;
 
   /* test canonicalization */
   p = g_param_spec_int ("my_int", "My Int", "Blurb", 0, 20, 10, G_PARAM_READWRITE);
@@ -456,7 +456,7 @@ test_param_strings (void)
 }
 
 static void
-test_param_invalid_name (gconstpointer test_data)
+test_param_invalid_name (xconstpointer test_data)
 {
   const xchar_t *invalid_name = test_data;
 
@@ -464,7 +464,7 @@ test_param_invalid_name (gconstpointer test_data)
 
   if (g_test_subprocess ())
     {
-      GParamSpec *p;
+      xparam_spec_t *p;
       p = g_param_spec_int (invalid_name, "My Int", "Blurb", 0, 20, 10, G_PARAM_READWRITE);
       g_param_spec_unref (p);
       return;
@@ -478,22 +478,22 @@ test_param_invalid_name (gconstpointer test_data)
 static void
 test_param_convert (void)
 {
-  GParamSpec *p;
-  GValue v1 = G_VALUE_INIT;
-  GValue v2 = G_VALUE_INIT;
+  xparam_spec_t *p;
+  xvalue_t v1 = G_VALUE_INIT;
+  xvalue_t v2 = G_VALUE_INIT;
 
   p = g_param_spec_int ("my-int", "My Int", "Blurb", 0, 20, 10, G_PARAM_READWRITE);
-  g_value_init (&v1, XTYPE_UINT);
-  g_value_set_uint (&v1, 43);
+  xvalue_init (&v1, XTYPE_UINT);
+  xvalue_set_uint (&v1, 43);
 
-  g_value_init (&v2, XTYPE_INT);
-  g_value_set_int (&v2, -4);
+  xvalue_init (&v2, XTYPE_INT);
+  xvalue_set_int (&v2, -4);
 
   g_assert_false (g_param_value_convert (p, &v1, &v2, TRUE));
-  g_assert_cmpint (g_value_get_int (&v2), ==, -4);
+  g_assert_cmpint (xvalue_get_int (&v2), ==, -4);
 
   g_assert_true (g_param_value_convert (p, &v1, &v2, FALSE));
-  g_assert_cmpint (g_value_get_int (&v2), ==, 20);
+  g_assert_cmpint (xvalue_get_int (&v2), ==, 20);
 
   g_param_spec_unref (p);
 }
@@ -501,21 +501,21 @@ test_param_convert (void)
 static void
 test_value_transform (void)
 {
-  GValue src = G_VALUE_INIT;
-  GValue dest = G_VALUE_INIT;
+  xvalue_t src = G_VALUE_INIT;
+  xvalue_t dest = G_VALUE_INIT;
 
 #define CHECK_INT_CONVERSION(type, getter, value)                       \
-  g_assert_true (g_value_type_transformable (XTYPE_INT, type));        \
-  g_value_init (&src, XTYPE_INT);                                      \
-  g_value_init (&dest, type);                                           \
-  g_value_set_int (&src, value);                                        \
-  g_assert_true (g_value_transform (&src, &dest));                      \
-  g_assert_cmpint (g_value_get_##getter (&dest), ==, value);            \
-  g_value_unset (&src);                                                 \
-  g_value_unset (&dest);
+  g_assert_true (xvalue_type_transformable (XTYPE_INT, type));        \
+  xvalue_init (&src, XTYPE_INT);                                      \
+  xvalue_init (&dest, type);                                           \
+  xvalue_set_int (&src, value);                                        \
+  g_assert_true (xvalue_transform (&src, &dest));                      \
+  g_assert_cmpint (xvalue_get_##getter (&dest), ==, value);            \
+  xvalue_unset (&src);                                                 \
+  xvalue_unset (&dest);
 
   /* Keep a check for an integer in the range of 0-127 so we're
-   * still testing g_value_get_char().  See
+   * still testing xvalue_get_char().  See
    * https://bugzilla.gnome.org/show_bug.cgi?id=659870
    * for why it is broken.
    */
@@ -537,14 +537,14 @@ test_value_transform (void)
   CHECK_INT_CONVERSION(XTYPE_DOUBLE, double, 12345678)
 
 #define CHECK_UINT_CONVERSION(type, getter, value)                      \
-  g_assert_true (g_value_type_transformable (XTYPE_UINT, type));       \
-  g_value_init (&src, XTYPE_UINT);                                     \
-  g_value_init (&dest, type);                                           \
-  g_value_set_uint (&src, value);                                       \
-  g_assert_true (g_value_transform (&src, &dest));                      \
-  g_assert_cmpuint (g_value_get_##getter (&dest), ==, value);           \
-  g_value_unset (&src);                                                 \
-  g_value_unset (&dest);
+  g_assert_true (xvalue_type_transformable (XTYPE_UINT, type));       \
+  xvalue_init (&src, XTYPE_UINT);                                     \
+  xvalue_init (&dest, type);                                           \
+  xvalue_set_uint (&src, value);                                       \
+  g_assert_true (xvalue_transform (&src, &dest));                      \
+  g_assert_cmpuint (xvalue_get_##getter (&dest), ==, value);           \
+  xvalue_unset (&src);                                                 \
+  xvalue_unset (&dest);
 
   CHECK_UINT_CONVERSION(XTYPE_CHAR, char, 124)
   CHECK_UINT_CONVERSION(XTYPE_CHAR, char, 124)
@@ -562,14 +562,14 @@ test_value_transform (void)
   CHECK_UINT_CONVERSION(XTYPE_DOUBLE, double, 12345678)
 
 #define CHECK_LONG_CONVERSION(type, getter, value)                      \
-  g_assert_true (g_value_type_transformable (XTYPE_LONG, type));       \
-  g_value_init (&src, XTYPE_LONG);                                     \
-  g_value_init (&dest, type);                                           \
-  g_value_set_long (&src, value);                                       \
-  g_assert_true (g_value_transform (&src, &dest));                      \
-  g_assert_cmpint (g_value_get_##getter (&dest), ==, value);            \
-  g_value_unset (&src);                                                 \
-  g_value_unset (&dest);
+  g_assert_true (xvalue_type_transformable (XTYPE_LONG, type));       \
+  xvalue_init (&src, XTYPE_LONG);                                     \
+  xvalue_init (&dest, type);                                           \
+  xvalue_set_long (&src, value);                                       \
+  g_assert_true (xvalue_transform (&src, &dest));                      \
+  g_assert_cmpint (xvalue_get_##getter (&dest), ==, value);            \
+  xvalue_unset (&src);                                                 \
+  xvalue_unset (&dest);
 
   CHECK_LONG_CONVERSION(XTYPE_CHAR, schar, -124)
   CHECK_LONG_CONVERSION(XTYPE_CHAR, schar, 124)
@@ -587,14 +587,14 @@ test_value_transform (void)
   CHECK_LONG_CONVERSION(XTYPE_DOUBLE, double, 12345678)
 
 #define CHECK_ULONG_CONVERSION(type, getter, value)                     \
-  g_assert_true (g_value_type_transformable (XTYPE_ULONG, type));      \
-  g_value_init (&src, XTYPE_ULONG);                                    \
-  g_value_init (&dest, type);                                           \
-  g_value_set_ulong (&src, value);                                      \
-  g_assert_true (g_value_transform (&src, &dest));                      \
-  g_assert_cmpuint (g_value_get_##getter (&dest), ==, value);           \
-  g_value_unset (&src);                                                 \
-  g_value_unset (&dest);
+  g_assert_true (xvalue_type_transformable (XTYPE_ULONG, type));      \
+  xvalue_init (&src, XTYPE_ULONG);                                    \
+  xvalue_init (&dest, type);                                           \
+  xvalue_set_ulong (&src, value);                                      \
+  g_assert_true (xvalue_transform (&src, &dest));                      \
+  g_assert_cmpuint (xvalue_get_##getter (&dest), ==, value);           \
+  xvalue_unset (&src);                                                 \
+  xvalue_unset (&dest);
 
   CHECK_ULONG_CONVERSION(XTYPE_CHAR, char, 124)
   CHECK_ULONG_CONVERSION(XTYPE_CHAR, char, 124)
@@ -612,14 +612,14 @@ test_value_transform (void)
   CHECK_ULONG_CONVERSION(XTYPE_DOUBLE, double, 12345678)
 
 #define CHECK_INT64_CONVERSION(type, getter, value)                     \
-  g_assert_true (g_value_type_transformable (XTYPE_INT64, type));      \
-  g_value_init (&src, XTYPE_INT64);                                    \
-  g_value_init (&dest, type);                                           \
-  g_value_set_int64 (&src, value);                                      \
-  g_assert_true (g_value_transform (&src, &dest));                      \
-  g_assert_cmpint (g_value_get_##getter (&dest), ==, value);            \
-  g_value_unset (&src);                                                 \
-  g_value_unset (&dest);
+  g_assert_true (xvalue_type_transformable (XTYPE_INT64, type));      \
+  xvalue_init (&src, XTYPE_INT64);                                    \
+  xvalue_init (&dest, type);                                           \
+  xvalue_set_int64 (&src, value);                                      \
+  g_assert_true (xvalue_transform (&src, &dest));                      \
+  g_assert_cmpint (xvalue_get_##getter (&dest), ==, value);            \
+  xvalue_unset (&src);                                                 \
+  xvalue_unset (&dest);
 
   CHECK_INT64_CONVERSION(XTYPE_CHAR, schar, -124)
   CHECK_INT64_CONVERSION(XTYPE_CHAR, schar, 124)
@@ -637,14 +637,14 @@ test_value_transform (void)
   CHECK_INT64_CONVERSION(XTYPE_DOUBLE, double, 12345678)
 
 #define CHECK_UINT64_CONVERSION(type, getter, value)                    \
-  g_assert_true (g_value_type_transformable (XTYPE_UINT64, type));     \
-  g_value_init (&src, XTYPE_UINT64);                                   \
-  g_value_init (&dest, type);                                           \
-  g_value_set_uint64 (&src, value);                                     \
-  g_assert_true (g_value_transform (&src, &dest));                      \
-  g_assert_cmpuint (g_value_get_##getter (&dest), ==, value);           \
-  g_value_unset (&src);                                                 \
-  g_value_unset (&dest);
+  g_assert_true (xvalue_type_transformable (XTYPE_UINT64, type));     \
+  xvalue_init (&src, XTYPE_UINT64);                                   \
+  xvalue_init (&dest, type);                                           \
+  xvalue_set_uint64 (&src, value);                                     \
+  g_assert_true (xvalue_transform (&src, &dest));                      \
+  g_assert_cmpuint (xvalue_get_##getter (&dest), ==, value);           \
+  xvalue_unset (&src);                                                 \
+  xvalue_unset (&dest);
 
   CHECK_UINT64_CONVERSION(XTYPE_CHAR, schar, -124)
   CHECK_UINT64_CONVERSION(XTYPE_CHAR, schar, 124)
@@ -662,14 +662,14 @@ test_value_transform (void)
   CHECK_UINT64_CONVERSION(XTYPE_DOUBLE, double, 12345678)
 
 #define CHECK_FLOAT_CONVERSION(type, getter, value)                    \
-  g_assert_true (g_value_type_transformable (XTYPE_FLOAT, type));     \
-  g_value_init (&src, XTYPE_FLOAT);                                   \
-  g_value_init (&dest, type);                                          \
-  g_value_set_float (&src, value);                                     \
-  g_assert_true (g_value_transform (&src, &dest));                     \
-  g_assert_cmpfloat (g_value_get_##getter (&dest), ==, value);         \
-  g_value_unset (&src);                                                \
-  g_value_unset (&dest);
+  g_assert_true (xvalue_type_transformable (XTYPE_FLOAT, type));     \
+  xvalue_init (&src, XTYPE_FLOAT);                                   \
+  xvalue_init (&dest, type);                                          \
+  xvalue_set_float (&src, value);                                     \
+  g_assert_true (xvalue_transform (&src, &dest));                     \
+  g_assert_cmpfloat (xvalue_get_##getter (&dest), ==, value);         \
+  xvalue_unset (&src);                                                \
+  xvalue_unset (&dest);
 
   CHECK_FLOAT_CONVERSION(XTYPE_CHAR, schar, -124)
   CHECK_FLOAT_CONVERSION(XTYPE_CHAR, schar, 124)
@@ -687,14 +687,14 @@ test_value_transform (void)
   CHECK_FLOAT_CONVERSION(XTYPE_DOUBLE, double, 12345678)
 
 #define CHECK_DOUBLE_CONVERSION(type, getter, value)                    \
-  g_assert_true (g_value_type_transformable (XTYPE_DOUBLE, type));     \
-  g_value_init (&src, XTYPE_DOUBLE);                                   \
-  g_value_init (&dest, type);                                           \
-  g_value_set_double (&src, value);                                     \
-  g_assert_true (g_value_transform (&src, &dest));                      \
-  g_assert_cmpfloat (g_value_get_##getter (&dest), ==, value);          \
-  g_value_unset (&src);                                                 \
-  g_value_unset (&dest);
+  g_assert_true (xvalue_type_transformable (XTYPE_DOUBLE, type));     \
+  xvalue_init (&src, XTYPE_DOUBLE);                                   \
+  xvalue_init (&dest, type);                                           \
+  xvalue_set_double (&src, value);                                     \
+  g_assert_true (xvalue_transform (&src, &dest));                      \
+  g_assert_cmpfloat (xvalue_get_##getter (&dest), ==, value);          \
+  xvalue_unset (&src);                                                 \
+  xvalue_unset (&dest);
 
   CHECK_DOUBLE_CONVERSION(XTYPE_CHAR, schar, -124)
   CHECK_DOUBLE_CONVERSION(XTYPE_CHAR, schar, 124)
@@ -712,17 +712,17 @@ test_value_transform (void)
   CHECK_DOUBLE_CONVERSION(XTYPE_DOUBLE, double, 12345678)
 
 #define CHECK_BOOLEAN_CONVERSION(type, setter, value)                   \
-  g_assert_true (g_value_type_transformable (type, XTYPE_BOOLEAN));    \
-  g_value_init (&src, type);                                            \
-  g_value_init (&dest, XTYPE_BOOLEAN);                                 \
-  g_value_set_##setter (&src, value);                                   \
-  g_assert_true (g_value_transform (&src, &dest));                      \
-  g_assert_cmpint (g_value_get_boolean (&dest), ==, TRUE);              \
-  g_value_set_##setter (&src, 0);                                       \
-  g_assert_true (g_value_transform (&src, &dest));                      \
-  g_assert_cmpint (g_value_get_boolean (&dest), ==, FALSE);             \
-  g_value_unset (&src);                                                 \
-  g_value_unset (&dest);
+  g_assert_true (xvalue_type_transformable (type, XTYPE_BOOLEAN));    \
+  xvalue_init (&src, type);                                            \
+  xvalue_init (&dest, XTYPE_BOOLEAN);                                 \
+  xvalue_set_##setter (&src, value);                                   \
+  g_assert_true (xvalue_transform (&src, &dest));                      \
+  g_assert_cmpint (xvalue_get_boolean (&dest), ==, TRUE);              \
+  xvalue_set_##setter (&src, 0);                                       \
+  g_assert_true (xvalue_transform (&src, &dest));                      \
+  g_assert_cmpint (xvalue_get_boolean (&dest), ==, FALSE);             \
+  xvalue_unset (&src);                                                 \
+  xvalue_unset (&dest);
 
   CHECK_BOOLEAN_CONVERSION(XTYPE_INT, int, -12345)
   CHECK_BOOLEAN_CONVERSION(XTYPE_UINT, uint, 12345)
@@ -732,14 +732,14 @@ test_value_transform (void)
   CHECK_BOOLEAN_CONVERSION(XTYPE_UINT64, uint64, 12345678)
 
 #define CHECK_STRING_CONVERSION(int_type, setter, int_value)            \
-  g_assert_true (g_value_type_transformable (int_type, XTYPE_STRING)); \
-  g_value_init (&src, int_type);                                        \
-  g_value_init (&dest, XTYPE_STRING);                                  \
-  g_value_set_##setter (&src, int_value);                               \
-  g_assert_true (g_value_transform (&src, &dest));                      \
-  g_assert_cmpstr (g_value_get_string (&dest), ==, #int_value);         \
-  g_value_unset (&src);                                                 \
-  g_value_unset (&dest);
+  g_assert_true (xvalue_type_transformable (int_type, XTYPE_STRING)); \
+  xvalue_init (&src, int_type);                                        \
+  xvalue_init (&dest, XTYPE_STRING);                                  \
+  xvalue_set_##setter (&src, int_value);                               \
+  g_assert_true (xvalue_transform (&src, &dest));                      \
+  g_assert_cmpstr (xvalue_get_string (&dest), ==, #int_value);         \
+  xvalue_unset (&src);                                                 \
+  xvalue_unset (&dest);
 
   CHECK_STRING_CONVERSION(XTYPE_INT, int, -12345)
   CHECK_STRING_CONVERSION(XTYPE_UINT, uint, 12345)
@@ -750,15 +750,15 @@ test_value_transform (void)
   CHECK_STRING_CONVERSION(XTYPE_FLOAT, float, 0.500000)
   CHECK_STRING_CONVERSION(XTYPE_DOUBLE, double, -1.234567)
 
-  g_assert_false (g_value_type_transformable (XTYPE_STRING, XTYPE_CHAR));
-  g_value_init (&src, XTYPE_STRING);
-  g_value_init (&dest, XTYPE_CHAR);
-  g_value_set_static_string (&src, "bla");
-  g_value_set_schar (&dest, 'c');
-  g_assert_false (g_value_transform (&src, &dest));
-  g_assert_cmpint (g_value_get_schar (&dest), ==, 'c');
-  g_value_unset (&src);
-  g_value_unset (&dest);
+  g_assert_false (xvalue_type_transformable (XTYPE_STRING, XTYPE_CHAR));
+  xvalue_init (&src, XTYPE_STRING);
+  xvalue_init (&dest, XTYPE_CHAR);
+  xvalue_set_static_string (&src, "bla");
+  xvalue_set_schar (&dest, 'c');
+  g_assert_false (xvalue_transform (&src, &dest));
+  g_assert_cmpint (xvalue_get_schar (&dest), ==, 'c');
+  xvalue_unset (&src);
+  xvalue_unset (&dest);
 }
 
 
@@ -766,31 +766,31 @@ test_value_transform (void)
  *
  *           xobject_t
  *          /       \
- * TestObjectA     TestObjectC
+ * test_object_a_t     test_object_c_t
  *      |
- * TestObjectB
+ * test_object_b_t
  *
- * ie: TestObjectB is a subclass of TestObjectA and TestObjectC is
+ * ie: test_object_b_t is a subclass of test_object_a_t and test_object_c_t is
  * related to neither.
  */
 
 static xtype_t test_object_a_get_type (void);
-typedef xobject_t TestObjectA; typedef xobject_class_t TestObjectAClass;
-G_DEFINE_TYPE (TestObjectA, test_object_a, XTYPE_OBJECT)
-static void test_object_a_class_init (TestObjectAClass *class) { }
-static void test_object_a_init (TestObjectA *a) { }
+typedef xobject_t test_object_a_t; typedef xobject_class_t test_object_a_class_t;
+G_DEFINE_TYPE (test_object_a_t, test_object_a, XTYPE_OBJECT)
+static void test_object_a_class_init (test_object_a_class_t *class) { }
+static void test_object_a_init (test_object_a_t *a) { }
 
 static xtype_t test_object_b_get_type (void);
-typedef xobject_t TestObjectB; typedef xobject_class_t TestObjectBClass;
-G_DEFINE_TYPE (TestObjectB, test_object_b, test_object_a_get_type ())
-static void test_object_b_class_init (TestObjectBClass *class) { }
-static void test_object_b_init (TestObjectB *b) { }
+typedef xobject_t test_object_b_t; typedef xobject_class_t test_object_b_class_t;
+G_DEFINE_TYPE (test_object_b_t, test_object_b, test_object_a_get_type ())
+static void test_object_b_class_init (test_object_b_class_t *class) { }
+static void test_object_b_init (test_object_b_t *b) { }
 
 static xtype_t test_object_c_get_type (void);
-typedef xobject_t TestObjectC; typedef xobject_class_t TestObjectCClass;
-G_DEFINE_TYPE (TestObjectC, test_object_c, XTYPE_OBJECT)
-static void test_object_c_class_init (TestObjectCClass *class) { }
-static void test_object_c_init (TestObjectC *c) { }
+typedef xobject_t test_object_c_t; typedef xobject_class_t test_object_c_class_t;
+G_DEFINE_TYPE (test_object_c_t, test_object_c, XTYPE_OBJECT)
+static void test_object_c_class_init (test_object_c_class_t *class) { }
+static void test_object_c_init (test_object_c_t *c) { }
 
 /* We create an interface and programmatically populate it with
  * properties of each of the above type, with various flag combinations.
@@ -822,12 +822,12 @@ static void test_object_c_init (TestObjectC *c) { }
  *
  * That gives 21 (7 * 3) properties that will be installed.
  */
-typedef xtype_interface_t TestInterfaceInterface;
+typedef xtype_interface_t test_interface_interface_t;
 static xtype_t test_interface_get_type (void);
-//typedef struct _TestInterface TestInterface;
-G_DEFINE_INTERFACE (TestInterface, test_interface, XTYPE_OBJECT)
+//typedef struct _TestInterface test_interface_t;
+G_DEFINE_INTERFACE (test_interface, test_interface, XTYPE_OBJECT)
 static void
-test_interface_default_init (TestInterfaceInterface *iface)
+test_interface_default_init (test_interface_interface_t *iface)
 {
   const xchar_t *names[] = { "a", "b", "c" };
   const xchar_t *perms[] = { NULL, "r",  "w",  "rw",
@@ -841,7 +841,7 @@ test_interface_default_init (TestInterfaceInterface *iface)
     for (j = 0; j < G_N_ELEMENTS (perms); j++)
       {
         xchar_t prop_name[10];
-        GParamSpec *pspec;
+        xparam_spec_t *pspec;
 
         if (perms[j] == NULL)
           {
@@ -853,7 +853,7 @@ test_interface_default_init (TestInterfaceInterface *iface)
 
             g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                                    "*assertion*pspec->flags*failed*");
-            g_object_interface_install_property (iface, pspec);
+            xobject_interface_install_property (iface, pspec);
             g_test_assert_expected_messages ();
 
             g_param_spec_unref (pspec);
@@ -863,7 +863,7 @@ test_interface_default_init (TestInterfaceInterface *iface)
         /* install the property */
         g_snprintf (prop_name, sizeof prop_name, "%s-%s", names[i], perms[j]);
         pspec = g_param_spec_object (prop_name, prop_name, prop_name, types[i], j);
-        g_object_interface_install_property (iface, pspec);
+        xobject_interface_install_property (iface, pspec);
       }
 }
 
@@ -1009,17 +1009,17 @@ static xuint_t change_this_type;
 static xuint_t use_this_flag;
 static xuint_t use_this_type;
 
-typedef xobject_class_t TestImplementationClass;
-typedef xobject_t TestImplementation;
+typedef xobject_class_t test_implementation_class_t;
+typedef xobject_t test_implementation_t;
 
-static void test_implementation_init (TestImplementation *impl) { }
-static void test_implementation_iface_init (TestInterfaceInterface *iface) { }
+static void test_implementation_init (test_implementation_t *impl) { }
+static void test_implementation_iface_init (test_interface_interface_t *iface) { }
 
 static xtype_t test_implementation_get_type (void);
-G_DEFINE_TYPE_WITH_CODE (TestImplementation, test_implementation, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (test_implementation, test_implementation, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (test_interface_get_type (), test_implementation_iface_init))
 
-static void test_implementation_class_init (TestImplementationClass *class)
+static void test_implementation_class_init (test_implementation_class_t *class)
 {
   const xchar_t *names[] = { "a", "b", "c" };
   const xchar_t *perms[] = { NULL, "r",  "w",  "rw",
@@ -1029,7 +1029,7 @@ static void test_implementation_class_init (TestImplementationClass *class)
   const xtype_t types[] = { test_object_a_get_type (), test_object_b_get_type (),
                           test_object_c_get_type (), XTYPE_OBJECT };
   xchar_t prop_name[10];
-  GParamSpec *pspec;
+  xparam_spec_t *pspec;
   xuint_t i, j;
 
   class->get_property = GINT_TO_POINTER (1);
@@ -1048,17 +1048,17 @@ static void test_implementation_class_init (TestImplementationClass *class)
           {
             /* override the property without making changes */
             g_snprintf (prop_name, sizeof prop_name, "%s-%s", names[i], perms[j]);
-            g_object_class_override_property (class, 1, prop_name);
+            xobject_class_override_property (class, 1, prop_name);
           }
       }
 
   /* Now try installing our modified property */
   if (perms[change_this_flag] == NULL)
-    g_error ("Interface property does not exist");
+    xerror ("Interface property does not exist");
 
   g_snprintf (prop_name, sizeof prop_name, "%s-%s", names[change_this_type], perms[change_this_flag]);
   pspec = g_param_spec_object (prop_name, prop_name, prop_name, types[use_this_type], use_this_flag);
-  g_object_class_install_property (class, 1, pspec);
+  xobject_class_install_property (class, 1, pspec);
 }
 
 typedef struct {
@@ -1069,17 +1069,17 @@ typedef struct {
 } TestParamImplementData;
 
 static void
-test_param_implement_child (gconstpointer user_data)
+test_param_implement_child (xconstpointer user_data)
 {
   TestParamImplementData *data = (xpointer_t) user_data;
 
   /* xobject_t oddity: xobject_class_t must be initialised before we can
    * initialise a xtype_interface_t.
    */
-  g_type_class_ref (XTYPE_OBJECT);
+  xtype_class_ref (XTYPE_OBJECT);
 
   /* Bring up the interface first. */
-  g_type_default_interface_ref (test_interface_get_type ());
+  xtype_default_interface_ref (test_interface_get_type ());
 
   /* Copy the flags into the global vars so
    * test_implementation_class_init() will see them.
@@ -1089,7 +1089,7 @@ test_param_implement_child (gconstpointer user_data)
   use_this_flag = data->use_this_flag;
   use_this_type = data->use_this_type;
 
-  g_type_class_ref (test_implementation_get_type ());
+  xtype_class_ref (test_implementation_get_type ());
 }
 
 static void
@@ -1112,7 +1112,7 @@ test_param_implement (void)
                   continue;
               }
 
-            test_path = g_strdup_printf ("/param/implement/subprocess/%d-%d-%d-%d",
+            test_path = xstrdup_printf ("/param/implement/subprocess/%d-%d-%d-%d",
                                          change_this_flag, change_this_type,
                                          use_this_flag, use_this_type);
             g_test_trap_subprocess (test_path, G_TIME_SPAN_SECOND, 0);
@@ -1130,7 +1130,7 @@ test_param_implement (void)
 
               case 'i':
                 g_test_trap_assert_failed ();
-                g_test_trap_assert_stderr ("*g_object_class_install_property*");
+                g_test_trap_assert_stderr ("*xobject_class_install_property*");
                 continue;
 
               case 'f':
@@ -1180,14 +1180,14 @@ test_param_implement (void)
 static void
 test_param_default (void)
 {
-  GParamSpec *param;
-  const GValue *def;
+  xparam_spec_t *param;
+  const xvalue_t *def;
 
   param = g_param_spec_int ("my-int", "My Int", "Blurb", 0, 20, 10, G_PARAM_READWRITE);
   def = g_param_spec_get_default_value (param);
 
   g_assert_true (G_VALUE_HOLDS (def, XTYPE_INT));
-  g_assert_cmpint (g_value_get_int (def), ==, 10);
+  g_assert_cmpint (xvalue_get_int (def), ==, 10);
 
   g_param_spec_unref (param);
 }
@@ -1243,7 +1243,7 @@ main (int argc, char *argv[])
       for (data.use_this_flag = 0; data.use_this_flag < 16; data.use_this_flag++)
         for (data.use_this_type = 0; data.use_this_type < 4; data.use_this_type++)
           {
-            test_path = g_strdup_printf ("/param/implement/subprocess/%d-%d-%d-%d",
+            test_path = xstrdup_printf ("/param/implement/subprocess/%d-%d-%d-%d",
                                          data.change_this_flag, data.change_this_type,
                                          data.use_this_flag, data.use_this_type);
             test_data = g_memdup2 (&data, sizeof (TestParamImplementData));

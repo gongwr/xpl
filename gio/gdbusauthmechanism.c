@@ -33,7 +33,7 @@
 struct _GDBusAuthMechanismPrivate
 {
   xio_stream_t *stream;
-  GCredentials *credentials;
+  xcredentials_t *credentials;
 };
 
 enum
@@ -53,9 +53,9 @@ _g_dbus_auth_mechanism_finalize (xobject_t *object)
   GDBusAuthMechanism *mechanism = G_DBUS_AUTH_MECHANISM (object);
 
   if (mechanism->priv->stream != NULL)
-    g_object_unref (mechanism->priv->stream);
+    xobject_unref (mechanism->priv->stream);
   if (mechanism->priv->credentials != NULL)
-    g_object_unref (mechanism->priv->credentials);
+    xobject_unref (mechanism->priv->credentials);
 
   G_OBJECT_CLASS (_g_dbus_auth_mechanism_parent_class)->finalize (object);
 }
@@ -63,19 +63,19 @@ _g_dbus_auth_mechanism_finalize (xobject_t *object)
 static void
 _g_dbus_auth_mechanism_get_property (xobject_t    *object,
                                      xuint_t       prop_id,
-                                     GValue     *value,
-                                     GParamSpec *pspec)
+                                     xvalue_t     *value,
+                                     xparam_spec_t *pspec)
 {
   GDBusAuthMechanism *mechanism = G_DBUS_AUTH_MECHANISM (object);
 
   switch (prop_id)
     {
     case PROP_STREAM:
-      g_value_set_object (value, mechanism->priv->stream);
+      xvalue_set_object (value, mechanism->priv->stream);
       break;
 
     case PROP_CREDENTIALS:
-      g_value_set_object (value, mechanism->priv->credentials);
+      xvalue_set_object (value, mechanism->priv->credentials);
       break;
 
     default:
@@ -87,19 +87,19 @@ _g_dbus_auth_mechanism_get_property (xobject_t    *object,
 static void
 _g_dbus_auth_mechanism_set_property (xobject_t      *object,
                                      xuint_t         prop_id,
-                                     const GValue *value,
-                                     GParamSpec   *pspec)
+                                     const xvalue_t *value,
+                                     xparam_spec_t   *pspec)
 {
   GDBusAuthMechanism *mechanism = G_DBUS_AUTH_MECHANISM (object);
 
   switch (prop_id)
     {
     case PROP_STREAM:
-      mechanism->priv->stream = g_value_dup_object (value);
+      mechanism->priv->stream = xvalue_dup_object (value);
       break;
 
     case PROP_CREDENTIALS:
-      mechanism->priv->credentials = g_value_dup_object (value);
+      mechanism->priv->credentials = xvalue_dup_object (value);
       break;
 
     default:
@@ -118,7 +118,7 @@ _g_dbus_auth_mechanism_class_init (GDBusAuthMechanismClass *klass)
   gobject_class->set_property = _g_dbus_auth_mechanism_set_property;
   gobject_class->finalize     = _g_dbus_auth_mechanism_finalize;
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_STREAM,
                                    g_param_spec_object ("stream",
                                                         P_("IO Stream"),
@@ -140,7 +140,7 @@ _g_dbus_auth_mechanism_class_init (GDBusAuthMechanismClass *klass)
    * If authenticating as a client, the property contains the
    * credentials that were sent, if any.
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_CREDENTIALS,
                                    g_param_spec_object ("credentials",
                                                         P_("Credentials"),
@@ -169,7 +169,7 @@ _g_dbus_auth_mechanism_get_stream (GDBusAuthMechanism *mechanism)
   return mechanism->priv->stream;
 }
 
-GCredentials *
+xcredentials_t *
 _g_dbus_auth_mechanism_get_credentials (GDBusAuthMechanism *mechanism)
 {
   g_return_val_if_fail (X_IS_DBUS_AUTH_MECHANISM (mechanism), NULL);
@@ -184,12 +184,12 @@ _g_dbus_auth_mechanism_get_name (xtype_t mechanism_type)
   const xchar_t *name;
   GDBusAuthMechanismClass *klass;
 
-  g_return_val_if_fail (g_type_is_a (mechanism_type, XTYPE_DBUS_AUTH_MECHANISM), NULL);
+  g_return_val_if_fail (xtype_is_a (mechanism_type, XTYPE_DBUS_AUTH_MECHANISM), NULL);
 
-  klass = g_type_class_ref (mechanism_type);
+  klass = xtype_class_ref (mechanism_type);
   g_assert (klass != NULL);
   name = klass->get_name ();
-  //g_type_class_unref (klass);
+  //xtype_class_unref (klass);
 
   return name;
 }
@@ -200,12 +200,12 @@ _g_dbus_auth_mechanism_get_priority (xtype_t mechanism_type)
   xint_t priority;
   GDBusAuthMechanismClass *klass;
 
-  g_return_val_if_fail (g_type_is_a (mechanism_type, XTYPE_DBUS_AUTH_MECHANISM), 0);
+  g_return_val_if_fail (xtype_is_a (mechanism_type, XTYPE_DBUS_AUTH_MECHANISM), 0);
 
-  klass = g_type_class_ref (mechanism_type);
+  klass = xtype_class_ref (mechanism_type);
   g_assert (klass != NULL);
   priority = klass->get_priority ();
-  //g_type_class_unref (klass);
+  //xtype_class_unref (klass);
 
   return priority;
 }

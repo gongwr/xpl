@@ -40,10 +40,10 @@ G_BEGIN_DECLS
 #define G_MAXULONG	ULONG_MAX
 
 typedef signed char gint8;
-typedef unsigned char guint8;
+typedef unsigned char xuint8_t;
 
 typedef signed @gint16@ gint16;
-typedef unsigned @gint16@ guint16;
+typedef unsigned @gint16@ xuint16_t;
 
 #define G_GINT16_MODIFIER @gint16_modifier@
 #define G_GINT16_FORMAT @gint16_format@
@@ -51,7 +51,7 @@ typedef unsigned @gint16@ guint16;
 
 
 typedef signed @gint32@ gint32;
-typedef unsigned @gint32@ guint32;
+typedef unsigned @gint32@ xuint32_t;
 
 #define G_GINT32_MODIFIER @gint32_modifier@
 #define G_GINT32_FORMAT @gint32_format@
@@ -61,7 +61,7 @@ typedef unsigned @gint32@ guint32;
 #define G_HAVE_GINT64 1          /* deprecated, always true */
 
 @glib_extension@typedef signed @gint64@ gint64;
-@glib_extension@typedef unsigned @gint64@ guint64;
+@glib_extension@typedef unsigned @gint64@ xuint64_t;
 
 #define G_GINT64_CONSTANT(val)	@gint64_constant@
 #define G_GUINT64_CONSTANT(val)	@guint64_constant@
@@ -76,7 +76,7 @@ typedef unsigned @gint32@ guint32;
 #define XPL_SIZEOF_SIZE_T @glib_size_t@
 #define XPL_SIZEOF_SSIZE_T @glib_ssize_t@
 
-typedef signed @glib_size_type_define@ gssize;
+typedef signed @glib_size_type_define@ xssize_t;
 typedef unsigned @glib_size_type_define@ xsize_t;
 #define G_GSIZE_MODIFIER @gsize_modifier@
 #define G_GSSIZE_MODIFIER @gssize_modifier@
@@ -87,7 +87,7 @@ typedef unsigned @glib_size_type_define@ xsize_t;
 #define G_MINSSIZE	G_MIN@glib_msize_type@
 #define G_MAXSSIZE	G_MAX@glib_msize_type@
 
-typedef gint64 goffset;
+typedef gint64 xoffset_t;
 #define G_MINOFFSET	G_MININT64
 #define G_MAXOFFSET	G_MAXINT64
 
@@ -95,7 +95,7 @@ typedef gint64 goffset;
 #define G_GOFFSET_FORMAT        G_GINT64_FORMAT
 #define G_GOFFSET_CONSTANT(val) G_GINT64_CONSTANT(val)
 
-#define G_POLLFD_FORMAT @g_pollfd_format@
+#define G_POLLFD_FORMAT @xpollfd_format@
 
 #define GPOINTER_TO_INT(p)	((xint_t)  @glib_gpi_cast@ (p))
 #define GPOINTER_TO_UINT(p)	((xuint_t) @glib_gpui_cast@ (p))
@@ -147,37 +147,37 @@ typedef unsigned @glib_intptr_type_define@ guintptr;
 #endif
 
 #define G_THREADS_ENABLED
-#define G_THREADS_IMPL_@g_threads_impl_def@
+#define G_THREADS_IMPL_@xthreads_impl_def@
 
 #mesondefine G_ATOMIC_LOCK_FREE
 
 #define GINT16_TO_@g_bs_native@(val)	((gint16) (val))
-#define GUINT16_TO_@g_bs_native@(val)	((guint16) (val))
+#define GUINT16_TO_@g_bs_native@(val)	((xuint16_t) (val))
 #define GINT16_TO_@g_bs_alien@(val)	((gint16) GUINT16_SWAP_LE_BE (val))
 #define GUINT16_TO_@g_bs_alien@(val)	(GUINT16_SWAP_LE_BE (val))
 
 #define GINT32_TO_@g_bs_native@(val)	((gint32) (val))
-#define GUINT32_TO_@g_bs_native@(val)	((guint32) (val))
+#define GUINT32_TO_@g_bs_native@(val)	((xuint32_t) (val))
 #define GINT32_TO_@g_bs_alien@(val)	((gint32) GUINT32_SWAP_LE_BE (val))
 #define GUINT32_TO_@g_bs_alien@(val)	(GUINT32_SWAP_LE_BE (val))
 
 #define GINT64_TO_@g_bs_native@(val)	((gint64) (val))
-#define GUINT64_TO_@g_bs_native@(val)	((guint64) (val))
+#define GUINT64_TO_@g_bs_native@(val)	((xuint64_t) (val))
 #define GINT64_TO_@g_bs_alien@(val)	((gint64) GUINT64_SWAP_LE_BE (val))
 #define GUINT64_TO_@g_bs_alien@(val)	(GUINT64_SWAP_LE_BE (val))
 
-#define GLONG_TO_LE(val)	((glong) GINT@glongbits@_TO_LE (val))
+#define GLONG_TO_LE(val)	((xlong_t) GINT@glongbits@_TO_LE (val))
 #define GULONG_TO_LE(val)	((gulong) GUINT@glongbits@_TO_LE (val))
-#define GLONG_TO_BE(val)	((glong) GINT@glongbits@_TO_BE (val))
+#define GLONG_TO_BE(val)	((xlong_t) GINT@glongbits@_TO_BE (val))
 #define GULONG_TO_BE(val)	((gulong) GUINT@glongbits@_TO_BE (val))
 #define GINT_TO_LE(val)		((xint_t) GINT@gintbits@_TO_LE (val))
 #define GUINT_TO_LE(val)	((xuint_t) GUINT@gintbits@_TO_LE (val))
 #define GINT_TO_BE(val)		((xint_t) GINT@gintbits@_TO_BE (val))
 #define GUINT_TO_BE(val)	((xuint_t) GUINT@gintbits@_TO_BE (val))
 #define GSIZE_TO_LE(val)	((xsize_t) GUINT@gsizebits@_TO_LE (val))
-#define GSSIZE_TO_LE(val)	((gssize) GINT@gsizebits@_TO_LE (val))
+#define GSSIZE_TO_LE(val)	((xssize_t) GINT@gsizebits@_TO_LE (val))
 #define GSIZE_TO_BE(val)	((xsize_t) GUINT@gsizebits@_TO_BE (val))
-#define GSSIZE_TO_BE(val)	((gssize) GINT@gsizebits@_TO_BE (val))
+#define GSSIZE_TO_BE(val)	((xssize_t) GINT@gsizebits@_TO_BE (val))
 #define G_BYTE_ORDER @g_byte_order@
 
 #define XPL_SYSDEF_POLLIN =@g_pollin@
@@ -189,7 +189,7 @@ typedef unsigned @glib_intptr_type_define@ guintptr;
 
 #define G_MODULE_SUFFIX "@g_module_suffix@"
 
-typedef @g_pid_type@ GPid;
+typedef @g_pid_type@ xpid_t;
 #define G_PID_FORMAT @g_pid_format@
 
 #define XPL_SYSDEF_AF_UNIX @g_af_unix@

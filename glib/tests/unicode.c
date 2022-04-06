@@ -34,79 +34,79 @@
 
 #include "glib/gunidecomp.h"
 
-/* Test that g_unichar_validate() returns the correct value for various
+/* Test that xunichar_validate() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_unichar_validate (void)
 {
-  g_assert_true (g_unichar_validate ('j'));
-  g_assert_true (g_unichar_validate (8356));
-  g_assert_true (g_unichar_validate (8356));
-  g_assert_true (g_unichar_validate (0xFDD1));
-  g_assert_true (g_unichar_validate (917760));
-  g_assert_false (g_unichar_validate (0x110000));
+  g_assert_true (xunichar_validate ('j'));
+  g_assert_true (xunichar_validate (8356));
+  g_assert_true (xunichar_validate (8356));
+  g_assert_true (xunichar_validate (0xFDD1));
+  g_assert_true (xunichar_validate (917760));
+  g_assert_false (xunichar_validate (0x110000));
 }
 
-/* Test that g_unichar_type() returns the correct value for various
+/* Test that xunichar_type() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_unichar_character_type (void)
 {
   xuint_t i;
   struct {
-    GUnicodeType type;
-    gunichar     c;
+    xunicode_type_t type;
+    xunichar_t     c;
   } examples[] = {
-    { G_UNICODE_CONTROL,              0x000D },
-    { G_UNICODE_FORMAT,               0x200E },
-     /* G_UNICODE_UNASSIGNED */
-    { G_UNICODE_PRIVATE_USE,          0xE000 },
-    { G_UNICODE_SURROGATE,            0xD800 },
-    { G_UNICODE_LOWERCASE_LETTER,     0x0061 },
-    { G_UNICODE_MODIFIER_LETTER,      0x02B0 },
-    { G_UNICODE_OTHER_LETTER,         0x3400 },
-    { G_UNICODE_TITLECASE_LETTER,     0x01C5 },
-    { G_UNICODE_UPPERCASE_LETTER,     0xFF21 },
-    { G_UNICODE_SPACING_MARK,         0x0903 },
-    { G_UNICODE_ENCLOSING_MARK,       0x20DD },
-    { G_UNICODE_NON_SPACING_MARK,     0xA806 },
-    { G_UNICODE_DECIMAL_NUMBER,       0xFF10 },
-    { G_UNICODE_LETTER_NUMBER,        0x16EE },
-    { G_UNICODE_OTHER_NUMBER,         0x17F0 },
-    { G_UNICODE_CONNECT_PUNCTUATION,  0x005F },
-    { G_UNICODE_DASH_PUNCTUATION,     0x058A },
-    { G_UNICODE_CLOSE_PUNCTUATION,    0x0F3B },
-    { G_UNICODE_FINAL_PUNCTUATION,    0x2019 },
-    { G_UNICODE_INITIAL_PUNCTUATION,  0x2018 },
-    { G_UNICODE_OTHER_PUNCTUATION,    0x2016 },
-    { G_UNICODE_OPEN_PUNCTUATION,     0x0F3A },
-    { G_UNICODE_CURRENCY_SYMBOL,      0x20A0 },
-    { G_UNICODE_MODIFIER_SYMBOL,      0x309B },
-    { G_UNICODE_MATH_SYMBOL,          0xFB29 },
-    { G_UNICODE_OTHER_SYMBOL,         0x00A6 },
-    { G_UNICODE_LINE_SEPARATOR,       0x2028 },
-    { G_UNICODE_PARAGRAPH_SEPARATOR,  0x2029 },
-    { G_UNICODE_SPACE_SEPARATOR,      0x202F },
+    { XUNICODE_CONTROL,              0x000D },
+    { XUNICODE_FORMAT,               0x200E },
+     /* XUNICODE_UNASSIGNED */
+    { XUNICODE_PRIVATE_USE,          0xE000 },
+    { XUNICODE_SURROGATE,            0xD800 },
+    { XUNICODE_LOWERCASE_LETTER,     0x0061 },
+    { XUNICODE_MODIFIER_LETTER,      0x02B0 },
+    { XUNICODE_OTHER_LETTER,         0x3400 },
+    { XUNICODE_TITLECASE_LETTER,     0x01C5 },
+    { XUNICODE_UPPERCASE_LETTER,     0xFF21 },
+    { XUNICODE_SPACING_MARK,         0x0903 },
+    { XUNICODE_ENCLOSING_MARK,       0x20DD },
+    { XUNICODE_NON_SPACING_MARK,     0xA806 },
+    { XUNICODE_DECIMAL_NUMBER,       0xFF10 },
+    { XUNICODE_LETTER_NUMBER,        0x16EE },
+    { XUNICODE_OTHER_NUMBER,         0x17F0 },
+    { XUNICODE_CONNECT_PUNCTUATION,  0x005F },
+    { XUNICODE_DASH_PUNCTUATION,     0x058A },
+    { XUNICODE_CLOSE_PUNCTUATION,    0x0F3B },
+    { XUNICODE_FINAL_PUNCTUATION,    0x2019 },
+    { XUNICODE_INITIAL_PUNCTUATION,  0x2018 },
+    { XUNICODE_OTHER_PUNCTUATION,    0x2016 },
+    { XUNICODE_OPEN_PUNCTUATION,     0x0F3A },
+    { XUNICODE_CURRENCY_SYMBOL,      0x20A0 },
+    { XUNICODE_MODIFIER_SYMBOL,      0x309B },
+    { XUNICODE_MATH_SYMBOL,          0xFB29 },
+    { XUNICODE_OTHER_SYMBOL,         0x00A6 },
+    { XUNICODE_LINE_SEPARATOR,       0x2028 },
+    { XUNICODE_PARAGRAPH_SEPARATOR,  0x2029 },
+    { XUNICODE_SPACE_SEPARATOR,      0x202F },
   };
 
   for (i = 0; i < G_N_ELEMENTS (examples); i++)
     {
-      g_assert_cmpint (g_unichar_type (examples[i].c), ==, examples[i].type);
+      g_assert_cmpint (xunichar_type (examples[i].c), ==, examples[i].type);
     }
 
   /*** Testing TYPE() border cases ***/
-  g_assert_cmpint (g_unichar_type (0x3FF5), ==, 0x07);
+  g_assert_cmpint (xunichar_type (0x3FF5), ==, 0x07);
   /* U+FFEFF Plane 15 Private Use */
-  g_assert_cmpint (g_unichar_type (0xFFEFF), ==, 0x03);
+  g_assert_cmpint (xunichar_type (0xFFEFF), ==, 0x03);
   /* U+E0001 Language Tag */
-  g_assert_cmpint (g_unichar_type (0xE0001), ==, 0x01);
-  g_assert_cmpint (g_unichar_type (G_UNICODE_LAST_CHAR), ==, 0x02);
-  g_assert_cmpint (g_unichar_type (G_UNICODE_LAST_CHAR + 1), ==, 0x02);
-  g_assert_cmpint (g_unichar_type (G_UNICODE_LAST_CHAR_PART1), ==, 0x02);
-  g_assert_cmpint (g_unichar_type (G_UNICODE_LAST_CHAR_PART1 + 1), ==, 0x02);
+  g_assert_cmpint (xunichar_type (0xE0001), ==, 0x01);
+  g_assert_cmpint (xunichar_type (XUNICODE_LAST_CHAR), ==, 0x02);
+  g_assert_cmpint (xunichar_type (XUNICODE_LAST_CHAR + 1), ==, 0x02);
+  g_assert_cmpint (xunichar_type (XUNICODE_LAST_CHAR_PART1), ==, 0x02);
+  g_assert_cmpint (xunichar_type (XUNICODE_LAST_CHAR_PART1 + 1), ==, 0x02);
 }
 
-/* Test that g_unichar_break_type() returns the correct value for various
+/* Test that xunichar_break_type() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_unichar_break_type (void)
@@ -114,241 +114,241 @@ test_unichar_break_type (void)
   xuint_t i;
   struct {
     GUnicodeBreakType type;
-    gunichar          c;
+    xunichar_t          c;
   } examples[] = {
-    { G_UNICODE_BREAK_MANDATORY,           0x2028 },
-    { G_UNICODE_BREAK_CARRIAGE_RETURN,     0x000D },
-    { G_UNICODE_BREAK_LINE_FEED,           0x000A },
-    { G_UNICODE_BREAK_COMBINING_MARK,      0x0300 },
-    { G_UNICODE_BREAK_SURROGATE,           0xD800 },
-    { G_UNICODE_BREAK_ZERO_WIDTH_SPACE,    0x200B },
-    { G_UNICODE_BREAK_INSEPARABLE,         0x2024 },
-    { G_UNICODE_BREAK_NON_BREAKING_GLUE,   0x00A0 },
-    { G_UNICODE_BREAK_CONTINGENT,          0xFFFC },
-    { G_UNICODE_BREAK_SPACE,               0x0020 },
-    { G_UNICODE_BREAK_AFTER,               0x05BE },
-    { G_UNICODE_BREAK_BEFORE,              0x02C8 },
-    { G_UNICODE_BREAK_BEFORE_AND_AFTER,    0x2014 },
-    { G_UNICODE_BREAK_HYPHEN,              0x002D },
-    { G_UNICODE_BREAK_NON_STARTER,         0x17D6 },
-    { G_UNICODE_BREAK_OPEN_PUNCTUATION,    0x0028 },
-    { G_UNICODE_BREAK_CLOSE_PARENTHESIS,   0x0029 },
-    { G_UNICODE_BREAK_CLOSE_PUNCTUATION,   0x007D },
-    { G_UNICODE_BREAK_QUOTATION,           0x0022 },
-    { G_UNICODE_BREAK_EXCLAMATION,         0x0021 },
-    { G_UNICODE_BREAK_IDEOGRAPHIC,         0x2E80 },
-    { G_UNICODE_BREAK_NUMERIC,             0x0030 },
-    { G_UNICODE_BREAK_INFIX_SEPARATOR,     0x002C },
-    { G_UNICODE_BREAK_SYMBOL,              0x002F },
-    { G_UNICODE_BREAK_ALPHABETIC,          0x0023 },
-    { G_UNICODE_BREAK_PREFIX,              0x0024 },
-    { G_UNICODE_BREAK_POSTFIX,             0x0025 },
-    { G_UNICODE_BREAK_COMPLEX_CONTEXT,     0x0E01 },
-    { G_UNICODE_BREAK_AMBIGUOUS,           0x00F7 },
-    { G_UNICODE_BREAK_UNKNOWN,             0xE000 },
-    { G_UNICODE_BREAK_NEXT_LINE,           0x0085 },
-    { G_UNICODE_BREAK_WORD_JOINER,         0x2060 },
-    { G_UNICODE_BREAK_HANGUL_L_JAMO,       0x1100 },
-    { G_UNICODE_BREAK_HANGUL_V_JAMO,       0x1160 },
-    { G_UNICODE_BREAK_HANGUL_T_JAMO,       0x11A8 },
-    { G_UNICODE_BREAK_HANGUL_LV_SYLLABLE,  0xAC00 },
-    { G_UNICODE_BREAK_HANGUL_LVT_SYLLABLE, 0xAC01 },
-    { G_UNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER, 0x3041 },
-    { G_UNICODE_BREAK_HEBREW_LETTER,                0x05D0 },
-    { G_UNICODE_BREAK_REGIONAL_INDICATOR,           0x1F1F6 },
-    { G_UNICODE_BREAK_EMOJI_BASE,          0x1F466 },
-    { G_UNICODE_BREAK_EMOJI_MODIFIER,      0x1F3FB },
-    { G_UNICODE_BREAK_ZERO_WIDTH_JOINER,   0x200D },
+    { XUNICODE_BREAK_MANDATORY,           0x2028 },
+    { XUNICODE_BREAK_CARRIAGE_RETURN,     0x000D },
+    { XUNICODE_BREAK_LINE_FEED,           0x000A },
+    { XUNICODE_BREAK_COMBINING_MARK,      0x0300 },
+    { XUNICODE_BREAK_SURROGATE,           0xD800 },
+    { XUNICODE_BREAK_ZERO_WIDTH_SPACE,    0x200B },
+    { XUNICODE_BREAK_INSEPARABLE,         0x2024 },
+    { XUNICODE_BREAK_NON_BREAKING_GLUE,   0x00A0 },
+    { XUNICODE_BREAK_CONTINGENT,          0xFFFC },
+    { XUNICODE_BREAK_SPACE,               0x0020 },
+    { XUNICODE_BREAK_AFTER,               0x05BE },
+    { XUNICODE_BREAK_BEFORE,              0x02C8 },
+    { XUNICODE_BREAK_BEFORE_AND_AFTER,    0x2014 },
+    { XUNICODE_BREAK_HYPHEN,              0x002D },
+    { XUNICODE_BREAK_NON_STARTER,         0x17D6 },
+    { XUNICODE_BREAK_OPEN_PUNCTUATION,    0x0028 },
+    { XUNICODE_BREAK_CLOSE_PARENTHESIS,   0x0029 },
+    { XUNICODE_BREAK_CLOSE_PUNCTUATION,   0x007D },
+    { XUNICODE_BREAK_QUOTATION,           0x0022 },
+    { XUNICODE_BREAK_EXCLAMATION,         0x0021 },
+    { XUNICODE_BREAK_IDEOGRAPHIC,         0x2E80 },
+    { XUNICODE_BREAK_NUMERIC,             0x0030 },
+    { XUNICODE_BREAK_INFIX_SEPARATOR,     0x002C },
+    { XUNICODE_BREAK_SYMBOL,              0x002F },
+    { XUNICODE_BREAK_ALPHABETIC,          0x0023 },
+    { XUNICODE_BREAK_PREFIX,              0x0024 },
+    { XUNICODE_BREAK_POSTFIX,             0x0025 },
+    { XUNICODE_BREAK_COMPLEX_CONTEXT,     0x0E01 },
+    { XUNICODE_BREAK_AMBIGUOUS,           0x00F7 },
+    { XUNICODE_BREAK_UNKNOWN,             0xE000 },
+    { XUNICODE_BREAK_NEXT_LINE,           0x0085 },
+    { XUNICODE_BREAK_WORD_JOINER,         0x2060 },
+    { XUNICODE_BREAK_HANGUL_L_JAMO,       0x1100 },
+    { XUNICODE_BREAK_HANGUL_V_JAMO,       0x1160 },
+    { XUNICODE_BREAK_HANGUL_T_JAMO,       0x11A8 },
+    { XUNICODE_BREAK_HANGUL_LV_SYLLABLE,  0xAC00 },
+    { XUNICODE_BREAK_HANGUL_LVT_SYLLABLE, 0xAC01 },
+    { XUNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER, 0x3041 },
+    { XUNICODE_BREAK_HEBREW_LETTER,                0x05D0 },
+    { XUNICODE_BREAK_REGIONAL_INDICATOR,           0x1F1F6 },
+    { XUNICODE_BREAK_EMOJI_BASE,          0x1F466 },
+    { XUNICODE_BREAK_EMOJI_MODIFIER,      0x1F3FB },
+    { XUNICODE_BREAK_ZERO_WIDTH_JOINER,   0x200D },
   };
 
   for (i = 0; i < G_N_ELEMENTS (examples); i++)
     {
-      g_assert_cmpint (g_unichar_break_type (examples[i].c), ==, examples[i].type);
+      g_assert_cmpint (xunichar_break_type (examples[i].c), ==, examples[i].type);
     }
 }
 
-/* Test that g_unichar_get_script() returns the correct value for various
+/* Test that xunichar_get_script() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_unichar_script (void)
 {
   xuint_t i;
   struct {
-    GUnicodeScript script;
-    gunichar          c;
+    xunicode_script_t script;
+    xunichar_t          c;
   } examples[] = {
-    { G_UNICODE_SCRIPT_COMMON,                  0x002A },
-    { G_UNICODE_SCRIPT_INHERITED,               0x1CED },
-    { G_UNICODE_SCRIPT_INHERITED,               0x0670 },
-    { G_UNICODE_SCRIPT_ARABIC,                  0x060D },
-    { G_UNICODE_SCRIPT_ARMENIAN,                0x0559 },
-    { G_UNICODE_SCRIPT_BENGALI,                 0x09CD },
-    { G_UNICODE_SCRIPT_BOPOMOFO,                0x31B6 },
-    { G_UNICODE_SCRIPT_CHEROKEE,                0x13A2 },
-    { G_UNICODE_SCRIPT_COPTIC,                  0x2CFD },
-    { G_UNICODE_SCRIPT_CYRILLIC,                0x0482 },
-    { G_UNICODE_SCRIPT_DESERET,                0x10401 },
-    { G_UNICODE_SCRIPT_DEVANAGARI,              0x094D },
-    { G_UNICODE_SCRIPT_ETHIOPIC,                0x1258 },
-    { G_UNICODE_SCRIPT_GEORGIAN,                0x10FC },
-    { G_UNICODE_SCRIPT_GOTHIC,                 0x10341 },
-    { G_UNICODE_SCRIPT_GREEK,                   0x0375 },
-    { G_UNICODE_SCRIPT_GUJARATI,                0x0A83 },
-    { G_UNICODE_SCRIPT_GURMUKHI,                0x0A3C },
-    { G_UNICODE_SCRIPT_HAN,                     0x3005 },
-    { G_UNICODE_SCRIPT_HANGUL,                  0x1100 },
-    { G_UNICODE_SCRIPT_HEBREW,                  0x05BF },
-    { G_UNICODE_SCRIPT_HIRAGANA,                0x309F },
-    { G_UNICODE_SCRIPT_KANNADA,                 0x0CBC },
-    { G_UNICODE_SCRIPT_KATAKANA,                0x30FF },
-    { G_UNICODE_SCRIPT_KHMER,                   0x17DD },
-    { G_UNICODE_SCRIPT_LAO,                     0x0EDD },
-    { G_UNICODE_SCRIPT_LATIN,                   0x0061 },
-    { G_UNICODE_SCRIPT_MALAYALAM,               0x0D3D },
-    { G_UNICODE_SCRIPT_MONGOLIAN,               0x1843 },
-    { G_UNICODE_SCRIPT_MYANMAR,                 0x1031 },
-    { G_UNICODE_SCRIPT_OGHAM,                   0x169C },
-    { G_UNICODE_SCRIPT_OLD_ITALIC,             0x10322 },
-    { G_UNICODE_SCRIPT_ORIYA,                   0x0B3C },
-    { G_UNICODE_SCRIPT_RUNIC,                   0x16EF },
-    { G_UNICODE_SCRIPT_SINHALA,                 0x0DBD },
-    { G_UNICODE_SCRIPT_SYRIAC,                  0x0711 },
-    { G_UNICODE_SCRIPT_TAMIL,                   0x0B82 },
-    { G_UNICODE_SCRIPT_TELUGU,                  0x0C03 },
-    { G_UNICODE_SCRIPT_THAANA,                  0x07B1 },
-    { G_UNICODE_SCRIPT_THAI,                    0x0E31 },
-    { G_UNICODE_SCRIPT_TIBETAN,                 0x0FD4 },
-    { G_UNICODE_SCRIPT_CANADIAN_ABORIGINAL,     0x1400 },
-    { G_UNICODE_SCRIPT_CANADIAN_ABORIGINAL,     0x1401 },
-    { G_UNICODE_SCRIPT_YI,                      0xA015 },
-    { G_UNICODE_SCRIPT_TAGALOG,                 0x1700 },
-    { G_UNICODE_SCRIPT_HANUNOO,                 0x1720 },
-    { G_UNICODE_SCRIPT_BUHID,                   0x1740 },
-    { G_UNICODE_SCRIPT_TAGBANWA,                0x1760 },
-    { G_UNICODE_SCRIPT_BRAILLE,                 0x2800 },
-    { G_UNICODE_SCRIPT_CYPRIOT,                0x10808 },
-    { G_UNICODE_SCRIPT_LIMBU,                   0x1932 },
-    { G_UNICODE_SCRIPT_OSMANYA,                0x10480 },
-    { G_UNICODE_SCRIPT_SHAVIAN,                0x10450 },
-    { G_UNICODE_SCRIPT_LINEAR_B,               0x10000 },
-    { G_UNICODE_SCRIPT_TAI_LE,                  0x1950 },
-    { G_UNICODE_SCRIPT_UGARITIC,               0x1039F },
-    { G_UNICODE_SCRIPT_NEW_TAI_LUE,             0x1980 },
-    { G_UNICODE_SCRIPT_BUGINESE,                0x1A1F },
-    { G_UNICODE_SCRIPT_GLAGOLITIC,              0x2C00 },
-    { G_UNICODE_SCRIPT_TIFINAGH,                0x2D6F },
-    { G_UNICODE_SCRIPT_SYLOTI_NAGRI,            0xA800 },
-    { G_UNICODE_SCRIPT_OLD_PERSIAN,            0x103D0 },
-    { G_UNICODE_SCRIPT_KHAROSHTHI,             0x10A3F },
-    { G_UNICODE_SCRIPT_UNKNOWN,              0x1111111 },
-    { G_UNICODE_SCRIPT_BALINESE,                0x1B04 },
-    { G_UNICODE_SCRIPT_CUNEIFORM,              0x12000 },
-    { G_UNICODE_SCRIPT_PHOENICIAN,             0x10900 },
-    { G_UNICODE_SCRIPT_PHAGS_PA,                0xA840 },
-    { G_UNICODE_SCRIPT_NKO,                     0x07C0 },
-    { G_UNICODE_SCRIPT_KAYAH_LI,                0xA900 },
-    { G_UNICODE_SCRIPT_LEPCHA,                  0x1C00 },
-    { G_UNICODE_SCRIPT_REJANG,                  0xA930 },
-    { G_UNICODE_SCRIPT_SUNDANESE,               0x1B80 },
-    { G_UNICODE_SCRIPT_SAURASHTRA,              0xA880 },
-    { G_UNICODE_SCRIPT_CHAM,                    0xAA00 },
-    { G_UNICODE_SCRIPT_OL_CHIKI,                0x1C50 },
-    { G_UNICODE_SCRIPT_VAI,                     0xA500 },
-    { G_UNICODE_SCRIPT_CARIAN,                 0x102A0 },
-    { G_UNICODE_SCRIPT_LYCIAN,                 0x10280 },
-    { G_UNICODE_SCRIPT_LYDIAN,                 0x1093F },
-    { G_UNICODE_SCRIPT_AVESTAN,                0x10B00 },
-    { G_UNICODE_SCRIPT_BAMUM,                   0xA6A0 },
-    { G_UNICODE_SCRIPT_EGYPTIAN_HIEROGLYPHS,   0x13000 },
-    { G_UNICODE_SCRIPT_IMPERIAL_ARAMAIC,       0x10840 },
-    { G_UNICODE_SCRIPT_INSCRIPTIONAL_PAHLAVI,  0x10B60 },
-    { G_UNICODE_SCRIPT_INSCRIPTIONAL_PARTHIAN, 0x10B40 },
-    { G_UNICODE_SCRIPT_JAVANESE,                0xA980 },
-    { G_UNICODE_SCRIPT_KAITHI,                 0x11082 },
-    { G_UNICODE_SCRIPT_LISU,                    0xA4D0 },
-    { G_UNICODE_SCRIPT_MEETEI_MAYEK,            0xABE5 },
-    { G_UNICODE_SCRIPT_OLD_SOUTH_ARABIAN,      0x10A60 },
-    { G_UNICODE_SCRIPT_OLD_TURKIC,             0x10C00 },
-    { G_UNICODE_SCRIPT_SAMARITAN,               0x0800 },
-    { G_UNICODE_SCRIPT_TAI_THAM,                0x1A20 },
-    { G_UNICODE_SCRIPT_TAI_VIET,                0xAA80 },
-    { G_UNICODE_SCRIPT_BATAK,                   0x1BC0 },
-    { G_UNICODE_SCRIPT_BRAHMI,                 0x11000 },
-    { G_UNICODE_SCRIPT_MANDAIC,                 0x0840 },
-    { G_UNICODE_SCRIPT_CHAKMA,                 0x11100 },
-    { G_UNICODE_SCRIPT_MEROITIC_CURSIVE,       0x109A0 },
-    { G_UNICODE_SCRIPT_MEROITIC_HIEROGLYPHS,   0x10980 },
-    { G_UNICODE_SCRIPT_MIAO,                   0x16F00 },
-    { G_UNICODE_SCRIPT_SHARADA,                0x11180 },
-    { G_UNICODE_SCRIPT_SORA_SOMPENG,           0x110D0 },
-    { G_UNICODE_SCRIPT_TAKRI,                  0x11680 },
-    { G_UNICODE_SCRIPT_BASSA_VAH,              0x16AD0 },
-    { G_UNICODE_SCRIPT_CAUCASIAN_ALBANIAN,     0x10530 },
-    { G_UNICODE_SCRIPT_DUPLOYAN,               0x1BC00 },
-    { G_UNICODE_SCRIPT_ELBASAN,                0x10500 },
-    { G_UNICODE_SCRIPT_GRANTHA,                0x11301 },
-    { G_UNICODE_SCRIPT_KHOJKI,                 0x11200 },
-    { G_UNICODE_SCRIPT_KHUDAWADI,              0x112B0 },
-    { G_UNICODE_SCRIPT_LINEAR_A,               0x10600 },
-    { G_UNICODE_SCRIPT_MAHAJANI,               0x11150 },
-    { G_UNICODE_SCRIPT_MANICHAEAN,             0x10AC0 },
-    { G_UNICODE_SCRIPT_MENDE_KIKAKUI,          0x1E800 },
-    { G_UNICODE_SCRIPT_MODI,                   0x11600 },
-    { G_UNICODE_SCRIPT_MRO,                    0x16A40 },
-    { G_UNICODE_SCRIPT_NABATAEAN,              0x10880 },
-    { G_UNICODE_SCRIPT_OLD_NORTH_ARABIAN,      0x10A80 },
-    { G_UNICODE_SCRIPT_OLD_PERMIC,             0x10350 },
-    { G_UNICODE_SCRIPT_PAHAWH_HMONG,           0x16B00 },
-    { G_UNICODE_SCRIPT_PALMYRENE,              0x10860 },
-    { G_UNICODE_SCRIPT_PAU_CIN_HAU,            0x11AC0 },
-    { G_UNICODE_SCRIPT_PSALTER_PAHLAVI,        0x10B80 },
-    { G_UNICODE_SCRIPT_SIDDHAM,                0x11580 },
-    { G_UNICODE_SCRIPT_TIRHUTA,                0x11480 },
-    { G_UNICODE_SCRIPT_WARANG_CITI,            0x118A0 },
-    { G_UNICODE_SCRIPT_CHEROKEE,               0x0AB71 },
-    { G_UNICODE_SCRIPT_HATRAN,                 0x108E0 },
-    { G_UNICODE_SCRIPT_OLD_HUNGARIAN,          0x10C80 },
-    { G_UNICODE_SCRIPT_MULTANI,                0x11280 },
-    { G_UNICODE_SCRIPT_AHOM,                   0x11700 },
-    { G_UNICODE_SCRIPT_CUNEIFORM,              0x12480 },
-    { G_UNICODE_SCRIPT_ANATOLIAN_HIEROGLYPHS,  0x14400 },
-    { G_UNICODE_SCRIPT_SIGNWRITING,            0x1D800 },
-    { G_UNICODE_SCRIPT_ADLAM,                  0x1E900 },
-    { G_UNICODE_SCRIPT_BHAIKSUKI,              0x11C00 },
-    { G_UNICODE_SCRIPT_MARCHEN,                0x11C70 },
-    { G_UNICODE_SCRIPT_NEWA,                   0x11400 },
-    { G_UNICODE_SCRIPT_OSAGE,                  0x104B0 },
-    { G_UNICODE_SCRIPT_TANGUT,                 0x16FE0 },
-    { G_UNICODE_SCRIPT_MASARAM_GONDI,          0x11D00 },
-    { G_UNICODE_SCRIPT_NUSHU,                  0x1B170 },
-    { G_UNICODE_SCRIPT_SOYOMBO,                0x11A50 },
-    { G_UNICODE_SCRIPT_ZANABAZAR_SQUARE,       0x11A00 },
-    { G_UNICODE_SCRIPT_DOGRA,                  0x11800 },
-    { G_UNICODE_SCRIPT_GUNJALA_GONDI,          0x11D60 },
-    { G_UNICODE_SCRIPT_HANIFI_ROHINGYA,        0x10D00 },
-    { G_UNICODE_SCRIPT_MAKASAR,                0x11EE0 },
-    { G_UNICODE_SCRIPT_MEDEFAIDRIN,            0x16E40 },
-    { G_UNICODE_SCRIPT_OLD_SOGDIAN,            0x10F00 },
-    { G_UNICODE_SCRIPT_SOGDIAN,                0x10F30 },
-    { G_UNICODE_SCRIPT_ELYMAIC,                0x10FE0 },
-    { G_UNICODE_SCRIPT_NANDINAGARI,            0x119A0 },
-    { G_UNICODE_SCRIPT_NYIAKENG_PUACHUE_HMONG, 0x1E100 },
-    { G_UNICODE_SCRIPT_WANCHO,                 0x1E2C0 },
-    { G_UNICODE_SCRIPT_CHORASMIAN,             0x10FB0 },
-    { G_UNICODE_SCRIPT_DIVES_AKURU,            0x11900 },
-    { G_UNICODE_SCRIPT_KHITAN_SMALL_SCRIPT,    0x18B00 },
-    { G_UNICODE_SCRIPT_YEZIDI,                 0x10E80 },
-    { G_UNICODE_SCRIPT_CYPRO_MINOAN,           0x12F90 },
-    { G_UNICODE_SCRIPT_OLD_UYGHUR,             0x10F70 },
-    { G_UNICODE_SCRIPT_TANGSA,                 0x16A70 },
-    { G_UNICODE_SCRIPT_TOTO,                   0x1E290 },
-    { G_UNICODE_SCRIPT_VITHKUQI,               0x10570 }
+    { XUNICODE_SCRIPT_COMMON,                  0x002A },
+    { XUNICODE_SCRIPT_INHERITED,               0x1CED },
+    { XUNICODE_SCRIPT_INHERITED,               0x0670 },
+    { XUNICODE_SCRIPT_ARABIC,                  0x060D },
+    { XUNICODE_SCRIPT_ARMENIAN,                0x0559 },
+    { XUNICODE_SCRIPT_BENGALI,                 0x09CD },
+    { XUNICODE_SCRIPT_BOPOMOFO,                0x31B6 },
+    { XUNICODE_SCRIPT_CHEROKEE,                0x13A2 },
+    { XUNICODE_SCRIPT_COPTIC,                  0x2CFD },
+    { XUNICODE_SCRIPT_CYRILLIC,                0x0482 },
+    { XUNICODE_SCRIPT_DESERET,                0x10401 },
+    { XUNICODE_SCRIPT_DEVANAGARI,              0x094D },
+    { XUNICODE_SCRIPT_ETHIOPIC,                0x1258 },
+    { XUNICODE_SCRIPT_GEORGIAN,                0x10FC },
+    { XUNICODE_SCRIPT_GOTHIC,                 0x10341 },
+    { XUNICODE_SCRIPT_GREEK,                   0x0375 },
+    { XUNICODE_SCRIPT_GUJARATI,                0x0A83 },
+    { XUNICODE_SCRIPT_GURMUKHI,                0x0A3C },
+    { XUNICODE_SCRIPT_HAN,                     0x3005 },
+    { XUNICODE_SCRIPT_HANGUL,                  0x1100 },
+    { XUNICODE_SCRIPT_HEBREW,                  0x05BF },
+    { XUNICODE_SCRIPT_HIRAGANA,                0x309F },
+    { XUNICODE_SCRIPT_KANNADA,                 0x0CBC },
+    { XUNICODE_SCRIPT_KATAKANA,                0x30FF },
+    { XUNICODE_SCRIPT_KHMER,                   0x17DD },
+    { XUNICODE_SCRIPT_LAO,                     0x0EDD },
+    { XUNICODE_SCRIPT_LATIN,                   0x0061 },
+    { XUNICODE_SCRIPT_MALAYALAM,               0x0D3D },
+    { XUNICODE_SCRIPT_MONGOLIAN,               0x1843 },
+    { XUNICODE_SCRIPT_MYANMAR,                 0x1031 },
+    { XUNICODE_SCRIPT_OGHAM,                   0x169C },
+    { XUNICODE_SCRIPT_OLD_ITALIC,             0x10322 },
+    { XUNICODE_SCRIPT_ORIYA,                   0x0B3C },
+    { XUNICODE_SCRIPT_RUNIC,                   0x16EF },
+    { XUNICODE_SCRIPT_SINHALA,                 0x0DBD },
+    { XUNICODE_SCRIPT_SYRIAC,                  0x0711 },
+    { XUNICODE_SCRIPT_TAMIL,                   0x0B82 },
+    { XUNICODE_SCRIPT_TELUGU,                  0x0C03 },
+    { XUNICODE_SCRIPT_THAANA,                  0x07B1 },
+    { XUNICODE_SCRIPT_THAI,                    0x0E31 },
+    { XUNICODE_SCRIPT_TIBETAN,                 0x0FD4 },
+    { XUNICODE_SCRIPT_CANADIAN_ABORIGINAL,     0x1400 },
+    { XUNICODE_SCRIPT_CANADIAN_ABORIGINAL,     0x1401 },
+    { XUNICODE_SCRIPT_YI,                      0xA015 },
+    { XUNICODE_SCRIPT_TAGALOG,                 0x1700 },
+    { XUNICODE_SCRIPT_HANUNOO,                 0x1720 },
+    { XUNICODE_SCRIPT_BUHID,                   0x1740 },
+    { XUNICODE_SCRIPT_TAGBANWA,                0x1760 },
+    { XUNICODE_SCRIPT_BRAILLE,                 0x2800 },
+    { XUNICODE_SCRIPT_CYPRIOT,                0x10808 },
+    { XUNICODE_SCRIPT_LIMBU,                   0x1932 },
+    { XUNICODE_SCRIPT_OSMANYA,                0x10480 },
+    { XUNICODE_SCRIPT_SHAVIAN,                0x10450 },
+    { XUNICODE_SCRIPT_LINEAR_B,               0x10000 },
+    { XUNICODE_SCRIPT_TAI_LE,                  0x1950 },
+    { XUNICODE_SCRIPT_UGARITIC,               0x1039F },
+    { XUNICODE_SCRIPT_NEW_TAI_LUE,             0x1980 },
+    { XUNICODE_SCRIPT_BUGINESE,                0x1A1F },
+    { XUNICODE_SCRIPT_GLAGOLITIC,              0x2C00 },
+    { XUNICODE_SCRIPT_TIFINAGH,                0x2D6F },
+    { XUNICODE_SCRIPT_SYLOTI_NAGRI,            0xA800 },
+    { XUNICODE_SCRIPT_OLD_PERSIAN,            0x103D0 },
+    { XUNICODE_SCRIPT_KHAROSHTHI,             0x10A3F },
+    { XUNICODE_SCRIPT_UNKNOWN,              0x1111111 },
+    { XUNICODE_SCRIPT_BALINESE,                0x1B04 },
+    { XUNICODE_SCRIPT_CUNEIFORM,              0x12000 },
+    { XUNICODE_SCRIPT_PHOENICIAN,             0x10900 },
+    { XUNICODE_SCRIPT_PHAGS_PA,                0xA840 },
+    { XUNICODE_SCRIPT_NKO,                     0x07C0 },
+    { XUNICODE_SCRIPT_KAYAH_LI,                0xA900 },
+    { XUNICODE_SCRIPT_LEPCHA,                  0x1C00 },
+    { XUNICODE_SCRIPT_REJANG,                  0xA930 },
+    { XUNICODE_SCRIPT_SUNDANESE,               0x1B80 },
+    { XUNICODE_SCRIPT_SAURASHTRA,              0xA880 },
+    { XUNICODE_SCRIPT_CHAM,                    0xAA00 },
+    { XUNICODE_SCRIPT_OL_CHIKI,                0x1C50 },
+    { XUNICODE_SCRIPT_VAI,                     0xA500 },
+    { XUNICODE_SCRIPT_CARIAN,                 0x102A0 },
+    { XUNICODE_SCRIPT_LYCIAN,                 0x10280 },
+    { XUNICODE_SCRIPT_LYDIAN,                 0x1093F },
+    { XUNICODE_SCRIPT_AVESTAN,                0x10B00 },
+    { XUNICODE_SCRIPT_BAMUM,                   0xA6A0 },
+    { XUNICODE_SCRIPT_EGYPTIAN_HIEROGLYPHS,   0x13000 },
+    { XUNICODE_SCRIPT_IMPERIAL_ARAMAIC,       0x10840 },
+    { XUNICODE_SCRIPT_INSCRIPTIONAL_PAHLAVI,  0x10B60 },
+    { XUNICODE_SCRIPT_INSCRIPTIONAL_PARTHIAN, 0x10B40 },
+    { XUNICODE_SCRIPT_JAVANESE,                0xA980 },
+    { XUNICODE_SCRIPT_KAITHI,                 0x11082 },
+    { XUNICODE_SCRIPT_LISU,                    0xA4D0 },
+    { XUNICODE_SCRIPT_MEETEI_MAYEK,            0xABE5 },
+    { XUNICODE_SCRIPT_OLD_SOUTH_ARABIAN,      0x10A60 },
+    { XUNICODE_SCRIPT_OLD_TURKIC,             0x10C00 },
+    { XUNICODE_SCRIPT_SAMARITAN,               0x0800 },
+    { XUNICODE_SCRIPT_TAI_THAM,                0x1A20 },
+    { XUNICODE_SCRIPT_TAI_VIET,                0xAA80 },
+    { XUNICODE_SCRIPT_BATAK,                   0x1BC0 },
+    { XUNICODE_SCRIPT_BRAHMI,                 0x11000 },
+    { XUNICODE_SCRIPT_MANDAIC,                 0x0840 },
+    { XUNICODE_SCRIPT_CHAKMA,                 0x11100 },
+    { XUNICODE_SCRIPT_MEROITIC_CURSIVE,       0x109A0 },
+    { XUNICODE_SCRIPT_MEROITIC_HIEROGLYPHS,   0x10980 },
+    { XUNICODE_SCRIPT_MIAO,                   0x16F00 },
+    { XUNICODE_SCRIPT_SHARADA,                0x11180 },
+    { XUNICODE_SCRIPT_SORA_SOMPENG,           0x110D0 },
+    { XUNICODE_SCRIPT_TAKRI,                  0x11680 },
+    { XUNICODE_SCRIPT_BASSA_VAH,              0x16AD0 },
+    { XUNICODE_SCRIPT_CAUCASIAN_ALBANIAN,     0x10530 },
+    { XUNICODE_SCRIPT_DUPLOYAN,               0x1BC00 },
+    { XUNICODE_SCRIPT_ELBASAN,                0x10500 },
+    { XUNICODE_SCRIPT_GRANTHA,                0x11301 },
+    { XUNICODE_SCRIPT_KHOJKI,                 0x11200 },
+    { XUNICODE_SCRIPT_KHUDAWADI,              0x112B0 },
+    { XUNICODE_SCRIPT_LINEAR_A,               0x10600 },
+    { XUNICODE_SCRIPT_MAHAJANI,               0x11150 },
+    { XUNICODE_SCRIPT_MANICHAEAN,             0x10AC0 },
+    { XUNICODE_SCRIPT_MENDE_KIKAKUI,          0x1E800 },
+    { XUNICODE_SCRIPT_MODI,                   0x11600 },
+    { XUNICODE_SCRIPT_MRO,                    0x16A40 },
+    { XUNICODE_SCRIPT_NABATAEAN,              0x10880 },
+    { XUNICODE_SCRIPT_OLD_NORTH_ARABIAN,      0x10A80 },
+    { XUNICODE_SCRIPT_OLD_PERMIC,             0x10350 },
+    { XUNICODE_SCRIPT_PAHAWH_HMONG,           0x16B00 },
+    { XUNICODE_SCRIPT_PALMYRENE,              0x10860 },
+    { XUNICODE_SCRIPT_PAU_CIN_HAU,            0x11AC0 },
+    { XUNICODE_SCRIPT_PSALTER_PAHLAVI,        0x10B80 },
+    { XUNICODE_SCRIPT_SIDDHAM,                0x11580 },
+    { XUNICODE_SCRIPT_TIRHUTA,                0x11480 },
+    { XUNICODE_SCRIPT_WARANG_CITI,            0x118A0 },
+    { XUNICODE_SCRIPT_CHEROKEE,               0x0AB71 },
+    { XUNICODE_SCRIPT_HATRAN,                 0x108E0 },
+    { XUNICODE_SCRIPT_OLD_HUNGARIAN,          0x10C80 },
+    { XUNICODE_SCRIPT_MULTANI,                0x11280 },
+    { XUNICODE_SCRIPT_AHOM,                   0x11700 },
+    { XUNICODE_SCRIPT_CUNEIFORM,              0x12480 },
+    { XUNICODE_SCRIPT_ANATOLIAN_HIEROGLYPHS,  0x14400 },
+    { XUNICODE_SCRIPT_SIGNWRITING,            0x1D800 },
+    { XUNICODE_SCRIPT_ADLAM,                  0x1E900 },
+    { XUNICODE_SCRIPT_BHAIKSUKI,              0x11C00 },
+    { XUNICODE_SCRIPT_MARCHEN,                0x11C70 },
+    { XUNICODE_SCRIPT_NEWA,                   0x11400 },
+    { XUNICODE_SCRIPT_OSAGE,                  0x104B0 },
+    { XUNICODE_SCRIPT_TANGUT,                 0x16FE0 },
+    { XUNICODE_SCRIPT_MASARAM_GONDI,          0x11D00 },
+    { XUNICODE_SCRIPT_NUSHU,                  0x1B170 },
+    { XUNICODE_SCRIPT_SOYOMBO,                0x11A50 },
+    { XUNICODE_SCRIPT_ZANABAZAR_SQUARE,       0x11A00 },
+    { XUNICODE_SCRIPT_DOGRA,                  0x11800 },
+    { XUNICODE_SCRIPT_GUNJALA_GONDI,          0x11D60 },
+    { XUNICODE_SCRIPT_HANIFI_ROHINGYA,        0x10D00 },
+    { XUNICODE_SCRIPT_MAKASAR,                0x11EE0 },
+    { XUNICODE_SCRIPT_MEDEFAIDRIN,            0x16E40 },
+    { XUNICODE_SCRIPT_OLD_SOGDIAN,            0x10F00 },
+    { XUNICODE_SCRIPT_SOGDIAN,                0x10F30 },
+    { XUNICODE_SCRIPT_ELYMAIC,                0x10FE0 },
+    { XUNICODE_SCRIPT_NANDINAGARI,            0x119A0 },
+    { XUNICODE_SCRIPT_NYIAKENG_PUACHUE_HMONG, 0x1E100 },
+    { XUNICODE_SCRIPT_WANCHO,                 0x1E2C0 },
+    { XUNICODE_SCRIPT_CHORASMIAN,             0x10FB0 },
+    { XUNICODE_SCRIPT_DIVES_AKURU,            0x11900 },
+    { XUNICODE_SCRIPT_KHITAN_SMALL_SCRIPT,    0x18B00 },
+    { XUNICODE_SCRIPT_YEZIDI,                 0x10E80 },
+    { XUNICODE_SCRIPT_CYPRO_MINOAN,           0x12F90 },
+    { XUNICODE_SCRIPT_OLD_UYGHUR,             0x10F70 },
+    { XUNICODE_SCRIPT_TANGSA,                 0x16A70 },
+    { XUNICODE_SCRIPT_TOTO,                   0x1E290 },
+    { XUNICODE_SCRIPT_VITHKUQI,               0x10570 }
   };
   for (i = 0; i < G_N_ELEMENTS (examples); i++)
-    g_assert_cmpint (g_unichar_get_script (examples[i].c), ==, examples[i].script);
+    g_assert_cmpint (xunichar_get_script (examples[i].c), ==, examples[i].script);
 }
 
-/* Test that g_unichar_combining_class() returns the correct value for
+/* Test that xunichar_combining_class() returns the correct value for
  * various ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_combining_class (void)
@@ -356,7 +356,7 @@ test_combining_class (void)
   xuint_t i;
   struct {
     xint_t class;
-    gunichar          c;
+    xunichar_t          c;
   } examples[] = {
     {   0, 0x0020 },
     {   1, 0x0334 },
@@ -394,33 +394,33 @@ test_combining_class (void)
   };
   for (i = 0; i < G_N_ELEMENTS (examples); i++)
     {
-      g_assert_cmpint (g_unichar_combining_class (examples[i].c), ==, examples[i].class);
+      g_assert_cmpint (xunichar_combining_class (examples[i].c), ==, examples[i].class);
     }
 }
 
-/* Test that g_unichar_get_mirror() returns the correct value for various
+/* Test that xunichar_get_mirror() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_mirror (void)
 {
-  gunichar mirror;
+  xunichar_t mirror;
 
-  g_assert_true (g_unichar_get_mirror_char ('(', &mirror));
+  g_assert_true (xunichar_get_mirror_char ('(', &mirror));
   g_assert_cmpint (mirror, ==, ')');
-  g_assert_true (g_unichar_get_mirror_char (')', &mirror));
+  g_assert_true (xunichar_get_mirror_char (')', &mirror));
   g_assert_cmpint (mirror, ==, '(');
-  g_assert_true (g_unichar_get_mirror_char ('{', &mirror));
+  g_assert_true (xunichar_get_mirror_char ('{', &mirror));
   g_assert_cmpint (mirror, ==, '}');
-  g_assert_true (g_unichar_get_mirror_char ('}', &mirror));
+  g_assert_true (xunichar_get_mirror_char ('}', &mirror));
   g_assert_cmpint (mirror, ==, '{');
-  g_assert_true (g_unichar_get_mirror_char (0x208D, &mirror));
+  g_assert_true (xunichar_get_mirror_char (0x208D, &mirror));
   g_assert_cmpint (mirror, ==, 0x208E);
-  g_assert_true (g_unichar_get_mirror_char (0x208E, &mirror));
+  g_assert_true (xunichar_get_mirror_char (0x208E, &mirror));
   g_assert_cmpint (mirror, ==, 0x208D);
-  g_assert_false (g_unichar_get_mirror_char ('a', &mirror));
+  g_assert_false (xunichar_get_mirror_char ('a', &mirror));
 }
 
-/* Test that g_utf8_strup() returns the correct value for various
+/* Test that xutf8_strup() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_strup (void)
@@ -435,17 +435,17 @@ test_strup (void)
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      str_up = g_utf8_strup (NULL, 0);
+      str_up = xutf8_strup (NULL, 0);
       g_test_assert_expected_messages ();
     }
 
-  str_up = g_utf8_strup (str, strlen (str));
+  str_up = xutf8_strup (str, strlen (str));
   /* Tricky, comparing two unicode strings with an ASCII function */
   g_assert_cmpstr (str_up, ==, "AAZZ09X;\003E\357\274\241\357\274\241");
   g_free (str_up);
 }
 
-/* Test that g_utf8_strdown() returns the correct value for various
+/* Test that xutf8_strdown() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_strdown (void)
@@ -460,17 +460,17 @@ test_strdown (void)
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      str_down = g_utf8_strdown (NULL, 0);
+      str_down = xutf8_strdown (NULL, 0);
       g_test_assert_expected_messages ();
     }
 
-  str_down = g_utf8_strdown (str, strlen (str));
+  str_down = xutf8_strdown (str, strlen (str));
   /* Tricky, comparing two unicode strings with an ASCII function */
   g_assert_cmpstr (str_down, ==, "aazz09x;\003\007\357\275\201\357\275\201");
   g_free (str_down);
 }
 
-/* Test that g_utf8_strup() and g_utf8_strdown() return the correct
+/* Test that xutf8_strup() and xutf8_strdown() return the correct
  * value for Turkish 'i' with and without dot above. */
 static void
 test_turkish_strupdown (void)
@@ -482,7 +482,7 @@ test_turkish_strupdown (void)
                     "\xc4\xb1"  /* LATIN SMALL LETTER DOTLESS I (U+131) */
                     "\xc4\xb0"; /* LATIN CAPITAL LETTER I WITH DOT ABOVE (U+130) */
 
-  char *oldlocale = g_strdup (setlocale (LC_ALL, "tr_TR"));
+  char *oldlocale = xstrdup (setlocale (LC_ALL, "tr_TR"));
 
   if (oldlocale == NULL)
     {
@@ -490,8 +490,8 @@ test_turkish_strupdown (void)
       return;
     }
 
-  str_up = g_utf8_strup (str, strlen (str));
-  str_down = g_utf8_strdown (str, strlen (str));
+  str_up = xutf8_strup (str, strlen (str));
+  str_down = xutf8_strdown (str, strlen (str));
   /* i => LATIN CAPITAL LETTER I WITH DOT ABOVE,
    * I => I,
    * I + COMBINING DOT ABOVE => I + COMBINING DOT ABOVE,
@@ -511,7 +511,7 @@ test_turkish_strupdown (void)
   g_free (oldlocale);
 }
 
-/* Test that g_utf8_casefold() returns the correct value for various
+/* Test that xutf8_casefold() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_casefold (void)
@@ -526,11 +526,11 @@ test_casefold (void)
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      str_casefold = g_utf8_casefold (NULL, 0);
+      str_casefold = xutf8_casefold (NULL, 0);
       g_test_assert_expected_messages ();
     }
 
-  str_casefold = g_utf8_casefold (str, strlen (str));
+  str_casefold = xutf8_casefold (str, strlen (str));
   /* Tricky, comparing two unicode strings with an ASCII function */
   g_assert_cmpstr (str_casefold, ==, "aazz09x;\357\275\201\357\275\201");
   g_free (str_casefold);
@@ -558,7 +558,7 @@ test_casemap_and_casefold (void)
       if (buffer[0] == '#')
         continue;
 
-      strings = g_strsplit (buffer, "\t", -1);
+      strings = xstrsplit (buffer, "\t", -1);
       locale = strings[0];
       if (!locale[0])
         locale = "C";
@@ -586,18 +586,18 @@ test_casemap_and_casefold (void)
        * original"
        */
 
-      convert = g_utf8_strup (test, -1);
+      convert = xutf8_strup (test, -1);
       expected = strings[4][0] ? strings[4] : test;
       g_assert_cmpstr (convert, ==, expected);
       g_free (convert);
 
-      convert = g_utf8_strdown (test, -1);
+      convert = xutf8_strdown (test, -1);
       expected = strings[2][0] ? strings[2] : test;
       g_assert_cmpstr (convert, ==, expected);
       g_free (convert);
 
     next:
-      g_strfreev (strings);
+      xstrfreev (strings);
     }
 
   fclose (infile);
@@ -614,629 +614,629 @@ test_casemap_and_casefold (void)
         continue;
 
       buffer[strlen (buffer) - 1] = '\0';
-      strings = g_strsplit (buffer, "\t", -1);
+      strings = xstrsplit (buffer, "\t", -1);
 
       test = strings[0];
 
-      convert = g_utf8_casefold (test, -1);
+      convert = xutf8_casefold (test, -1);
       g_assert_cmpstr (convert, ==, strings[1]);
       g_free (convert);
 
-      g_strfreev (strings);
+      xstrfreev (strings);
     }
 
   fclose (infile);
   g_free (filename);
 }
 
-/* Test that g_unichar_ismark() returns the correct value for various
+/* Test that xunichar_ismark() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_mark (void)
 {
-  g_assert_true (g_unichar_ismark (0x0903));
-  g_assert_true (g_unichar_ismark (0x20DD));
-  g_assert_true (g_unichar_ismark (0xA806));
-  g_assert_false (g_unichar_ismark ('a'));
+  g_assert_true (xunichar_ismark (0x0903));
+  g_assert_true (xunichar_ismark (0x20DD));
+  g_assert_true (xunichar_ismark (0xA806));
+  g_assert_false (xunichar_ismark ('a'));
 
   /*** Testing TYPE() border cases ***/
-  g_assert_false (g_unichar_ismark (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_false (g_unichar_ismark (0xFFEFF));
+  g_assert_false (xunichar_ismark (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_false (xunichar_ismark (0xFFEFF));
   /* U+E0001 Language Tag */
-  g_assert_false (g_unichar_ismark (0xE0001));
-  g_assert_false (g_unichar_ismark (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_ismark (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_ismark (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_ismark (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_false (xunichar_ismark (0xE0001));
+  g_assert_false (xunichar_ismark (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_ismark (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_ismark (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_ismark (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_isspace() returns the correct value for various
+/* Test that xunichar_isspace() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_space (void)
 {
-  g_assert_false (g_unichar_isspace ('a'));
-  g_assert_true (g_unichar_isspace (' '));
-  g_assert_true (g_unichar_isspace ('\t'));
-  g_assert_true (g_unichar_isspace ('\n'));
-  g_assert_true (g_unichar_isspace ('\r'));
-  g_assert_true (g_unichar_isspace ('\f'));
-  g_assert_false (g_unichar_isspace (0xff41)); /* Unicode fullwidth 'a' */
-  g_assert_true (g_unichar_isspace (0x202F)); /* Unicode space separator */
-  g_assert_true (g_unichar_isspace (0x2028)); /* Unicode line separator */
-  g_assert_true (g_unichar_isspace (0x2029)); /* Unicode paragraph separator */
+  g_assert_false (xunichar_isspace ('a'));
+  g_assert_true (xunichar_isspace (' '));
+  g_assert_true (xunichar_isspace ('\t'));
+  g_assert_true (xunichar_isspace ('\n'));
+  g_assert_true (xunichar_isspace ('\r'));
+  g_assert_true (xunichar_isspace ('\f'));
+  g_assert_false (xunichar_isspace (0xff41)); /* Unicode fullwidth 'a' */
+  g_assert_true (xunichar_isspace (0x202F)); /* Unicode space separator */
+  g_assert_true (xunichar_isspace (0x2028)); /* Unicode line separator */
+  g_assert_true (xunichar_isspace (0x2029)); /* Unicode paragraph separator */
 
   /*** Testing TYPE() border cases ***/
-  g_assert_false (g_unichar_isspace (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_false (g_unichar_isspace (0xFFEFF));
+  g_assert_false (xunichar_isspace (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_false (xunichar_isspace (0xFFEFF));
   /* U+E0001 Language Tag */
-  g_assert_false (g_unichar_isspace (0xE0001));
-  g_assert_false (g_unichar_isspace (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_isspace (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_isspace (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_isspace (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_false (xunichar_isspace (0xE0001));
+  g_assert_false (xunichar_isspace (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_isspace (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_isspace (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_isspace (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_isalnum() returns the correct value for various
+/* Test that xunichar_isalnum() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_alnum (void)
 {
-  g_assert_false (g_unichar_isalnum (' '));
-  g_assert_true (g_unichar_isalnum ('a'));
-  g_assert_true (g_unichar_isalnum ('z'));
-  g_assert_true (g_unichar_isalnum ('0'));
-  g_assert_true (g_unichar_isalnum ('9'));
-  g_assert_true (g_unichar_isalnum ('A'));
-  g_assert_true (g_unichar_isalnum ('Z'));
-  g_assert_false (g_unichar_isalnum ('-'));
-  g_assert_false (g_unichar_isalnum ('*'));
-  g_assert_true (g_unichar_isalnum (0xFF21));  /* Unichar fullwidth 'A' */
-  g_assert_true (g_unichar_isalnum (0xFF3A));  /* Unichar fullwidth 'Z' */
-  g_assert_true (g_unichar_isalnum (0xFF41));  /* Unichar fullwidth 'a' */
-  g_assert_true (g_unichar_isalnum (0xFF5A));  /* Unichar fullwidth 'z' */
-  g_assert_true (g_unichar_isalnum (0xFF10));  /* Unichar fullwidth '0' */
-  g_assert_true (g_unichar_isalnum (0xFF19));  /* Unichar fullwidth '9' */
-  g_assert_false (g_unichar_isalnum (0xFF0A)); /* Unichar fullwidth '*' */
+  g_assert_false (xunichar_isalnum (' '));
+  g_assert_true (xunichar_isalnum ('a'));
+  g_assert_true (xunichar_isalnum ('z'));
+  g_assert_true (xunichar_isalnum ('0'));
+  g_assert_true (xunichar_isalnum ('9'));
+  g_assert_true (xunichar_isalnum ('A'));
+  g_assert_true (xunichar_isalnum ('Z'));
+  g_assert_false (xunichar_isalnum ('-'));
+  g_assert_false (xunichar_isalnum ('*'));
+  g_assert_true (xunichar_isalnum (0xFF21));  /* Unichar fullwidth 'A' */
+  g_assert_true (xunichar_isalnum (0xFF3A));  /* Unichar fullwidth 'Z' */
+  g_assert_true (xunichar_isalnum (0xFF41));  /* Unichar fullwidth 'a' */
+  g_assert_true (xunichar_isalnum (0xFF5A));  /* Unichar fullwidth 'z' */
+  g_assert_true (xunichar_isalnum (0xFF10));  /* Unichar fullwidth '0' */
+  g_assert_true (xunichar_isalnum (0xFF19));  /* Unichar fullwidth '9' */
+  g_assert_false (xunichar_isalnum (0xFF0A)); /* Unichar fullwidth '*' */
 
   /*** Testing TYPE() border cases ***/
-  g_assert_true (g_unichar_isalnum (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_false (g_unichar_isalnum (0xFFEFF));
+  g_assert_true (xunichar_isalnum (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_false (xunichar_isalnum (0xFFEFF));
   /* U+E0001 Language Tag */
-  g_assert_false (g_unichar_isalnum (0xE0001));
-  g_assert_false (g_unichar_isalnum (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_isalnum (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_isalnum (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_isalnum (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_false (xunichar_isalnum (0xE0001));
+  g_assert_false (xunichar_isalnum (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_isalnum (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_isalnum (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_isalnum (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_isalpha() returns the correct value for various
+/* Test that xunichar_isalpha() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_alpha (void)
 {
-  g_assert_false (g_unichar_isalpha (' '));
-  g_assert_true (g_unichar_isalpha ('a'));
-  g_assert_true (g_unichar_isalpha ('z'));
-  g_assert_false (g_unichar_isalpha ('0'));
-  g_assert_false (g_unichar_isalpha ('9'));
-  g_assert_true (g_unichar_isalpha ('A'));
-  g_assert_true (g_unichar_isalpha ('Z'));
-  g_assert_false (g_unichar_isalpha ('-'));
-  g_assert_false (g_unichar_isalpha ('*'));
-  g_assert_true (g_unichar_isalpha (0xFF21));  /* Unichar fullwidth 'A' */
-  g_assert_true (g_unichar_isalpha (0xFF3A));  /* Unichar fullwidth 'Z' */
-  g_assert_true (g_unichar_isalpha (0xFF41));  /* Unichar fullwidth 'a' */
-  g_assert_true (g_unichar_isalpha (0xFF5A));  /* Unichar fullwidth 'z' */
-  g_assert_false (g_unichar_isalpha (0xFF10)); /* Unichar fullwidth '0' */
-  g_assert_false (g_unichar_isalpha (0xFF19)); /* Unichar fullwidth '9' */
-  g_assert_false (g_unichar_isalpha (0xFF0A)); /* Unichar fullwidth '*' */
+  g_assert_false (xunichar_isalpha (' '));
+  g_assert_true (xunichar_isalpha ('a'));
+  g_assert_true (xunichar_isalpha ('z'));
+  g_assert_false (xunichar_isalpha ('0'));
+  g_assert_false (xunichar_isalpha ('9'));
+  g_assert_true (xunichar_isalpha ('A'));
+  g_assert_true (xunichar_isalpha ('Z'));
+  g_assert_false (xunichar_isalpha ('-'));
+  g_assert_false (xunichar_isalpha ('*'));
+  g_assert_true (xunichar_isalpha (0xFF21));  /* Unichar fullwidth 'A' */
+  g_assert_true (xunichar_isalpha (0xFF3A));  /* Unichar fullwidth 'Z' */
+  g_assert_true (xunichar_isalpha (0xFF41));  /* Unichar fullwidth 'a' */
+  g_assert_true (xunichar_isalpha (0xFF5A));  /* Unichar fullwidth 'z' */
+  g_assert_false (xunichar_isalpha (0xFF10)); /* Unichar fullwidth '0' */
+  g_assert_false (xunichar_isalpha (0xFF19)); /* Unichar fullwidth '9' */
+  g_assert_false (xunichar_isalpha (0xFF0A)); /* Unichar fullwidth '*' */
 
   /*** Testing TYPE() border cases ***/
-  g_assert_true (g_unichar_isalpha (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_false (g_unichar_isalpha (0xFFEFF));
+  g_assert_true (xunichar_isalpha (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_false (xunichar_isalpha (0xFFEFF));
   /* U+E0001 Language Tag */
-  g_assert_false (g_unichar_isalpha (0xE0001));
-  g_assert_false (g_unichar_isalpha (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_isalpha (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_isalpha (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_isalpha (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_false (xunichar_isalpha (0xE0001));
+  g_assert_false (xunichar_isalpha (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_isalpha (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_isalpha (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_isalpha (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_isdigit() returns the correct value for various
+/* Test that xunichar_isdigit() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_digit (void)
 {
-  g_assert_false (g_unichar_isdigit (' '));
-  g_assert_false (g_unichar_isdigit ('a'));
-  g_assert_true (g_unichar_isdigit ('0'));
-  g_assert_true (g_unichar_isdigit ('9'));
-  g_assert_false (g_unichar_isdigit ('A'));
-  g_assert_false (g_unichar_isdigit ('-'));
-  g_assert_false (g_unichar_isdigit ('*'));
-  g_assert_false (g_unichar_isdigit (0xFF21)); /* Unichar fullwidth 'A' */
-  g_assert_false (g_unichar_isdigit (0xFF3A)); /* Unichar fullwidth 'Z' */
-  g_assert_false (g_unichar_isdigit (0xFF41)); /* Unichar fullwidth 'a' */
-  g_assert_false (g_unichar_isdigit (0xFF5A)); /* Unichar fullwidth 'z' */
-  g_assert_true (g_unichar_isdigit (0xFF10));  /* Unichar fullwidth '0' */
-  g_assert_true (g_unichar_isdigit (0xFF19));  /* Unichar fullwidth '9' */
-  g_assert_false (g_unichar_isdigit (0xFF0A)); /* Unichar fullwidth '*' */
+  g_assert_false (xunichar_isdigit (' '));
+  g_assert_false (xunichar_isdigit ('a'));
+  g_assert_true (xunichar_isdigit ('0'));
+  g_assert_true (xunichar_isdigit ('9'));
+  g_assert_false (xunichar_isdigit ('A'));
+  g_assert_false (xunichar_isdigit ('-'));
+  g_assert_false (xunichar_isdigit ('*'));
+  g_assert_false (xunichar_isdigit (0xFF21)); /* Unichar fullwidth 'A' */
+  g_assert_false (xunichar_isdigit (0xFF3A)); /* Unichar fullwidth 'Z' */
+  g_assert_false (xunichar_isdigit (0xFF41)); /* Unichar fullwidth 'a' */
+  g_assert_false (xunichar_isdigit (0xFF5A)); /* Unichar fullwidth 'z' */
+  g_assert_true (xunichar_isdigit (0xFF10));  /* Unichar fullwidth '0' */
+  g_assert_true (xunichar_isdigit (0xFF19));  /* Unichar fullwidth '9' */
+  g_assert_false (xunichar_isdigit (0xFF0A)); /* Unichar fullwidth '*' */
 
   /*** Testing TYPE() border cases ***/
-  g_assert_false (g_unichar_isdigit (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_false (g_unichar_isdigit (0xFFEFF));
+  g_assert_false (xunichar_isdigit (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_false (xunichar_isdigit (0xFFEFF));
   /* U+E0001 Language Tag */
-  g_assert_false (g_unichar_isdigit (0xE0001));
-  g_assert_false (g_unichar_isdigit (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_isdigit (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_isdigit (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_isdigit (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_false (xunichar_isdigit (0xE0001));
+  g_assert_false (xunichar_isdigit (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_isdigit (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_isdigit (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_isdigit (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_digit_value() returns the correct value for various
+/* Test that xunichar_digit_value() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_digit_value (void)
 {
-  g_assert_cmpint (g_unichar_digit_value (' '), ==, -1);
-  g_assert_cmpint (g_unichar_digit_value ('a'), ==, -1);
-  g_assert_cmpint (g_unichar_digit_value ('0'), ==, 0);
-  g_assert_cmpint (g_unichar_digit_value ('9'), ==, 9);
-  g_assert_cmpint (g_unichar_digit_value ('A'), ==, -1);
-  g_assert_cmpint (g_unichar_digit_value ('-'), ==, -1);
-  g_assert_cmpint (g_unichar_digit_value (0xFF21), ==, -1); /* Unichar 'A' */
-  g_assert_cmpint (g_unichar_digit_value (0xFF3A), ==, -1); /* Unichar 'Z' */
-  g_assert_cmpint (g_unichar_digit_value (0xFF41), ==, -1); /* Unichar 'a' */
-  g_assert_cmpint (g_unichar_digit_value (0xFF5A), ==, -1); /* Unichar 'z' */
-  g_assert_cmpint (g_unichar_digit_value (0xFF10), ==, 0);  /* Unichar '0' */
-  g_assert_cmpint (g_unichar_digit_value (0xFF19), ==, 9);  /* Unichar '9' */
-  g_assert_cmpint (g_unichar_digit_value (0xFF0A), ==, -1); /* Unichar '*' */
+  g_assert_cmpint (xunichar_digit_value (' '), ==, -1);
+  g_assert_cmpint (xunichar_digit_value ('a'), ==, -1);
+  g_assert_cmpint (xunichar_digit_value ('0'), ==, 0);
+  g_assert_cmpint (xunichar_digit_value ('9'), ==, 9);
+  g_assert_cmpint (xunichar_digit_value ('A'), ==, -1);
+  g_assert_cmpint (xunichar_digit_value ('-'), ==, -1);
+  g_assert_cmpint (xunichar_digit_value (0xFF21), ==, -1); /* Unichar 'A' */
+  g_assert_cmpint (xunichar_digit_value (0xFF3A), ==, -1); /* Unichar 'Z' */
+  g_assert_cmpint (xunichar_digit_value (0xFF41), ==, -1); /* Unichar 'a' */
+  g_assert_cmpint (xunichar_digit_value (0xFF5A), ==, -1); /* Unichar 'z' */
+  g_assert_cmpint (xunichar_digit_value (0xFF10), ==, 0);  /* Unichar '0' */
+  g_assert_cmpint (xunichar_digit_value (0xFF19), ==, 9);  /* Unichar '9' */
+  g_assert_cmpint (xunichar_digit_value (0xFF0A), ==, -1); /* Unichar '*' */
 
   /*** Testing TYPE() border cases ***/
-  g_assert_cmpint (g_unichar_digit_value (0x3FF5), ==, -1);
-   /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_cmpint (g_unichar_digit_value (0xFFEFF), ==, -1);
+  g_assert_cmpint (xunichar_digit_value (0x3FF5), ==, -1);
+   /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_cmpint (xunichar_digit_value (0xFFEFF), ==, -1);
   /* U+E0001 Language Tag */
-  g_assert_cmpint (g_unichar_digit_value (0xE0001), ==, -1);
-  g_assert_cmpint (g_unichar_digit_value (G_UNICODE_LAST_CHAR), ==, -1);
-  g_assert_cmpint (g_unichar_digit_value (G_UNICODE_LAST_CHAR + 1), ==, -1);
-  g_assert_cmpint (g_unichar_digit_value (G_UNICODE_LAST_CHAR_PART1), ==, -1);
-  g_assert_cmpint (g_unichar_digit_value (G_UNICODE_LAST_CHAR_PART1 + 1), ==, -1);
+  g_assert_cmpint (xunichar_digit_value (0xE0001), ==, -1);
+  g_assert_cmpint (xunichar_digit_value (XUNICODE_LAST_CHAR), ==, -1);
+  g_assert_cmpint (xunichar_digit_value (XUNICODE_LAST_CHAR + 1), ==, -1);
+  g_assert_cmpint (xunichar_digit_value (XUNICODE_LAST_CHAR_PART1), ==, -1);
+  g_assert_cmpint (xunichar_digit_value (XUNICODE_LAST_CHAR_PART1 + 1), ==, -1);
 }
 
-/* Test that g_unichar_isxdigit() returns the correct value for various
+/* Test that xunichar_isxdigit() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_xdigit (void)
 {
-  g_assert_false (g_unichar_isxdigit (' '));
-  g_assert_true (g_unichar_isxdigit ('a'));
-  g_assert_true (g_unichar_isxdigit ('f'));
-  g_assert_false (g_unichar_isxdigit ('g'));
-  g_assert_false (g_unichar_isxdigit ('z'));
-  g_assert_true (g_unichar_isxdigit ('0'));
-  g_assert_true (g_unichar_isxdigit ('9'));
-  g_assert_true (g_unichar_isxdigit ('A'));
-  g_assert_true (g_unichar_isxdigit ('F'));
-  g_assert_false (g_unichar_isxdigit ('G'));
-  g_assert_false (g_unichar_isxdigit ('Z'));
-  g_assert_false (g_unichar_isxdigit ('-'));
-  g_assert_false (g_unichar_isxdigit ('*'));
-  g_assert_true (g_unichar_isxdigit (0xFF21));  /* Unichar fullwidth 'A' */
-  g_assert_true (g_unichar_isxdigit (0xFF26));  /* Unichar fullwidth 'F' */
-  g_assert_false (g_unichar_isxdigit (0xFF27)); /* Unichar fullwidth 'G' */
-  g_assert_false (g_unichar_isxdigit (0xFF3A)); /* Unichar fullwidth 'Z' */
-  g_assert_true (g_unichar_isxdigit (0xFF41));  /* Unichar fullwidth 'a' */
-  g_assert_true (g_unichar_isxdigit (0xFF46));  /* Unichar fullwidth 'f' */
-  g_assert_false (g_unichar_isxdigit (0xFF47)); /* Unichar fullwidth 'g' */
-  g_assert_false (g_unichar_isxdigit (0xFF5A)); /* Unichar fullwidth 'z' */
-  g_assert_true (g_unichar_isxdigit (0xFF10));  /* Unichar fullwidth '0' */
-  g_assert_true (g_unichar_isxdigit (0xFF19));  /* Unichar fullwidth '9' */
-  g_assert_false (g_unichar_isxdigit (0xFF0A)); /* Unichar fullwidth '*' */
+  g_assert_false (xunichar_isxdigit (' '));
+  g_assert_true (xunichar_isxdigit ('a'));
+  g_assert_true (xunichar_isxdigit ('f'));
+  g_assert_false (xunichar_isxdigit ('g'));
+  g_assert_false (xunichar_isxdigit ('z'));
+  g_assert_true (xunichar_isxdigit ('0'));
+  g_assert_true (xunichar_isxdigit ('9'));
+  g_assert_true (xunichar_isxdigit ('A'));
+  g_assert_true (xunichar_isxdigit ('F'));
+  g_assert_false (xunichar_isxdigit ('G'));
+  g_assert_false (xunichar_isxdigit ('Z'));
+  g_assert_false (xunichar_isxdigit ('-'));
+  g_assert_false (xunichar_isxdigit ('*'));
+  g_assert_true (xunichar_isxdigit (0xFF21));  /* Unichar fullwidth 'A' */
+  g_assert_true (xunichar_isxdigit (0xFF26));  /* Unichar fullwidth 'F' */
+  g_assert_false (xunichar_isxdigit (0xFF27)); /* Unichar fullwidth 'G' */
+  g_assert_false (xunichar_isxdigit (0xFF3A)); /* Unichar fullwidth 'Z' */
+  g_assert_true (xunichar_isxdigit (0xFF41));  /* Unichar fullwidth 'a' */
+  g_assert_true (xunichar_isxdigit (0xFF46));  /* Unichar fullwidth 'f' */
+  g_assert_false (xunichar_isxdigit (0xFF47)); /* Unichar fullwidth 'g' */
+  g_assert_false (xunichar_isxdigit (0xFF5A)); /* Unichar fullwidth 'z' */
+  g_assert_true (xunichar_isxdigit (0xFF10));  /* Unichar fullwidth '0' */
+  g_assert_true (xunichar_isxdigit (0xFF19));  /* Unichar fullwidth '9' */
+  g_assert_false (xunichar_isxdigit (0xFF0A)); /* Unichar fullwidth '*' */
 
   /*** Testing TYPE() border cases ***/
-  g_assert_false (g_unichar_isxdigit (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_false (g_unichar_isxdigit (0xFFEFF));
+  g_assert_false (xunichar_isxdigit (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_false (xunichar_isxdigit (0xFFEFF));
   /* U+E0001 Language Tag */
-  g_assert_false (g_unichar_isxdigit (0xE0001));
-  g_assert_false (g_unichar_isxdigit (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_isxdigit (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_isxdigit (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_isxdigit (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_false (xunichar_isxdigit (0xE0001));
+  g_assert_false (xunichar_isxdigit (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_isxdigit (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_isxdigit (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_isxdigit (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_xdigit_value() returns the correct value for various
+/* Test that xunichar_xdigit_value() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_xdigit_value (void)
 {
-  g_assert_cmpint (g_unichar_xdigit_value (' '), ==, -1);
-  g_assert_cmpint (g_unichar_xdigit_value ('a'), ==, 10);
-  g_assert_cmpint (g_unichar_xdigit_value ('f'), ==, 15);
-  g_assert_cmpint (g_unichar_xdigit_value ('g'), ==, -1);
-  g_assert_cmpint (g_unichar_xdigit_value ('0'), ==, 0);
-  g_assert_cmpint (g_unichar_xdigit_value ('9'), ==, 9);
-  g_assert_cmpint (g_unichar_xdigit_value ('A'), ==, 10);
-  g_assert_cmpint (g_unichar_xdigit_value ('F'), ==, 15);
-  g_assert_cmpint (g_unichar_xdigit_value ('G'), ==, -1);
-  g_assert_cmpint (g_unichar_xdigit_value ('-'), ==, -1);
-  g_assert_cmpint (g_unichar_xdigit_value (0xFF21), ==, 10); /* Unichar 'A' */
-  g_assert_cmpint (g_unichar_xdigit_value (0xFF26), ==, 15); /* Unichar 'F' */
-  g_assert_cmpint (g_unichar_xdigit_value (0xFF27), ==, -1); /* Unichar 'G' */
-  g_assert_cmpint (g_unichar_xdigit_value (0xFF3A), ==, -1); /* Unichar 'Z' */
-  g_assert_cmpint (g_unichar_xdigit_value (0xFF41), ==, 10); /* Unichar 'a' */
-  g_assert_cmpint (g_unichar_xdigit_value (0xFF46), ==, 15); /* Unichar 'f' */
-  g_assert_cmpint (g_unichar_xdigit_value (0xFF47), ==, -1); /* Unichar 'g' */
-  g_assert_cmpint (g_unichar_xdigit_value (0xFF5A), ==, -1); /* Unichar 'z' */
-  g_assert_cmpint (g_unichar_xdigit_value (0xFF10), ==, 0);  /* Unichar '0' */
-  g_assert_cmpint (g_unichar_xdigit_value (0xFF19), ==, 9);  /* Unichar '9' */
-  g_assert_cmpint (g_unichar_xdigit_value (0xFF0A), ==, -1); /* Unichar '*' */
+  g_assert_cmpint (xunichar_xdigit_value (' '), ==, -1);
+  g_assert_cmpint (xunichar_xdigit_value ('a'), ==, 10);
+  g_assert_cmpint (xunichar_xdigit_value ('f'), ==, 15);
+  g_assert_cmpint (xunichar_xdigit_value ('g'), ==, -1);
+  g_assert_cmpint (xunichar_xdigit_value ('0'), ==, 0);
+  g_assert_cmpint (xunichar_xdigit_value ('9'), ==, 9);
+  g_assert_cmpint (xunichar_xdigit_value ('A'), ==, 10);
+  g_assert_cmpint (xunichar_xdigit_value ('F'), ==, 15);
+  g_assert_cmpint (xunichar_xdigit_value ('G'), ==, -1);
+  g_assert_cmpint (xunichar_xdigit_value ('-'), ==, -1);
+  g_assert_cmpint (xunichar_xdigit_value (0xFF21), ==, 10); /* Unichar 'A' */
+  g_assert_cmpint (xunichar_xdigit_value (0xFF26), ==, 15); /* Unichar 'F' */
+  g_assert_cmpint (xunichar_xdigit_value (0xFF27), ==, -1); /* Unichar 'G' */
+  g_assert_cmpint (xunichar_xdigit_value (0xFF3A), ==, -1); /* Unichar 'Z' */
+  g_assert_cmpint (xunichar_xdigit_value (0xFF41), ==, 10); /* Unichar 'a' */
+  g_assert_cmpint (xunichar_xdigit_value (0xFF46), ==, 15); /* Unichar 'f' */
+  g_assert_cmpint (xunichar_xdigit_value (0xFF47), ==, -1); /* Unichar 'g' */
+  g_assert_cmpint (xunichar_xdigit_value (0xFF5A), ==, -1); /* Unichar 'z' */
+  g_assert_cmpint (xunichar_xdigit_value (0xFF10), ==, 0);  /* Unichar '0' */
+  g_assert_cmpint (xunichar_xdigit_value (0xFF19), ==, 9);  /* Unichar '9' */
+  g_assert_cmpint (xunichar_xdigit_value (0xFF0A), ==, -1); /* Unichar '*' */
 
   /*** Testing TYPE() border cases ***/
-  g_assert_cmpint (g_unichar_xdigit_value (0x3FF5), ==, -1);
-   /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_cmpint (g_unichar_xdigit_value (0xFFEFF), ==, -1);
+  g_assert_cmpint (xunichar_xdigit_value (0x3FF5), ==, -1);
+   /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_cmpint (xunichar_xdigit_value (0xFFEFF), ==, -1);
   /* U+E0001 Language Tag */
-  g_assert_cmpint (g_unichar_xdigit_value (0xE0001), ==, -1);
-  g_assert_cmpint (g_unichar_xdigit_value (G_UNICODE_LAST_CHAR), ==, -1);
-  g_assert_cmpint (g_unichar_xdigit_value (G_UNICODE_LAST_CHAR + 1), ==, -1);
-  g_assert_cmpint (g_unichar_xdigit_value (G_UNICODE_LAST_CHAR_PART1), ==, -1);
-  g_assert_cmpint (g_unichar_xdigit_value (G_UNICODE_LAST_CHAR_PART1 + 1), ==, -1);
+  g_assert_cmpint (xunichar_xdigit_value (0xE0001), ==, -1);
+  g_assert_cmpint (xunichar_xdigit_value (XUNICODE_LAST_CHAR), ==, -1);
+  g_assert_cmpint (xunichar_xdigit_value (XUNICODE_LAST_CHAR + 1), ==, -1);
+  g_assert_cmpint (xunichar_xdigit_value (XUNICODE_LAST_CHAR_PART1), ==, -1);
+  g_assert_cmpint (xunichar_xdigit_value (XUNICODE_LAST_CHAR_PART1 + 1), ==, -1);
 }
 
-/* Test that g_unichar_ispunct() returns the correct value for various
+/* Test that xunichar_ispunct() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_punctuation (void)
 {
-  g_assert_false (g_unichar_ispunct (' '));
-  g_assert_false (g_unichar_ispunct ('a'));
-  g_assert_true (g_unichar_ispunct ('.'));
-  g_assert_true (g_unichar_ispunct (','));
-  g_assert_true (g_unichar_ispunct (';'));
-  g_assert_true (g_unichar_ispunct (':'));
-  g_assert_true (g_unichar_ispunct ('-'));
+  g_assert_false (xunichar_ispunct (' '));
+  g_assert_false (xunichar_ispunct ('a'));
+  g_assert_true (xunichar_ispunct ('.'));
+  g_assert_true (xunichar_ispunct (','));
+  g_assert_true (xunichar_ispunct (';'));
+  g_assert_true (xunichar_ispunct (':'));
+  g_assert_true (xunichar_ispunct ('-'));
 
-  g_assert_false (g_unichar_ispunct (0xFF21)); /* Unichar fullwidth 'A' */
-  g_assert_true (g_unichar_ispunct (0x005F));  /* Unichar fullwidth '.' */
-  g_assert_true (g_unichar_ispunct (0x058A));  /* Unichar fullwidth '-' */
+  g_assert_false (xunichar_ispunct (0xFF21)); /* Unichar fullwidth 'A' */
+  g_assert_true (xunichar_ispunct (0x005F));  /* Unichar fullwidth '.' */
+  g_assert_true (xunichar_ispunct (0x058A));  /* Unichar fullwidth '-' */
 
   /*** Testing TYPE() border cases ***/
-  g_assert_false (g_unichar_ispunct (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_false (g_unichar_ispunct (0xFFEFF));
+  g_assert_false (xunichar_ispunct (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_false (xunichar_ispunct (0xFFEFF));
   /* U+E0001 Language Tag */
-  g_assert_false (g_unichar_ispunct (0xE0001));
-  g_assert_false (g_unichar_ispunct (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_ispunct (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_ispunct (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_ispunct (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_false (xunichar_ispunct (0xE0001));
+  g_assert_false (xunichar_ispunct (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_ispunct (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_ispunct (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_ispunct (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_iscntrl() returns the correct value for various
+/* Test that xunichar_iscntrl() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_cntrl (void)
 {
-  g_assert_true (g_unichar_iscntrl (0x08));
-  g_assert_false (g_unichar_iscntrl ('a'));
-  g_assert_true (g_unichar_iscntrl (0x007F)); /* Unichar fullwidth <del> */
-  g_assert_true (g_unichar_iscntrl (0x009F)); /* Unichar fullwidth control */
+  g_assert_true (xunichar_iscntrl (0x08));
+  g_assert_false (xunichar_iscntrl ('a'));
+  g_assert_true (xunichar_iscntrl (0x007F)); /* Unichar fullwidth <del> */
+  g_assert_true (xunichar_iscntrl (0x009F)); /* Unichar fullwidth control */
 
   /*** Testing TYPE() border cases ***/
-  g_assert_false (g_unichar_iscntrl (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_false (g_unichar_iscntrl (0xFFEFF));
+  g_assert_false (xunichar_iscntrl (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_false (xunichar_iscntrl (0xFFEFF));
   /* U+E0001 Language Tag */
-  g_assert_false (g_unichar_iscntrl (0xE0001));
-  g_assert_false (g_unichar_iscntrl (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_iscntrl (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_iscntrl (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_iscntrl (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_false (xunichar_iscntrl (0xE0001));
+  g_assert_false (xunichar_iscntrl (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_iscntrl (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_iscntrl (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_iscntrl (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_isgraph() returns the correct value for various
+/* Test that xunichar_isgraph() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_graph (void)
 {
-  g_assert_false (g_unichar_isgraph (0x08));
-  g_assert_false (g_unichar_isgraph (' '));
-  g_assert_true (g_unichar_isgraph ('a'));
-  g_assert_true (g_unichar_isgraph ('0'));
-  g_assert_true (g_unichar_isgraph ('9'));
-  g_assert_true (g_unichar_isgraph ('A'));
-  g_assert_true (g_unichar_isgraph ('-'));
-  g_assert_true (g_unichar_isgraph ('*'));
-  g_assert_true (g_unichar_isgraph (0xFF21));  /* Unichar fullwidth 'A' */
-  g_assert_true (g_unichar_isgraph (0xFF3A));  /* Unichar fullwidth 'Z' */
-  g_assert_true (g_unichar_isgraph (0xFF41));  /* Unichar fullwidth 'a' */
-  g_assert_true (g_unichar_isgraph (0xFF5A));  /* Unichar fullwidth 'z' */
-  g_assert_true (g_unichar_isgraph (0xFF10));  /* Unichar fullwidth '0' */
-  g_assert_true (g_unichar_isgraph (0xFF19));  /* Unichar fullwidth '9' */
-  g_assert_true (g_unichar_isgraph (0xFF0A));  /* Unichar fullwidth '*' */
-  g_assert_false (g_unichar_isgraph (0x007F)); /* Unichar fullwidth <del> */
-  g_assert_false (g_unichar_isgraph (0x009F)); /* Unichar fullwidth control */
+  g_assert_false (xunichar_isgraph (0x08));
+  g_assert_false (xunichar_isgraph (' '));
+  g_assert_true (xunichar_isgraph ('a'));
+  g_assert_true (xunichar_isgraph ('0'));
+  g_assert_true (xunichar_isgraph ('9'));
+  g_assert_true (xunichar_isgraph ('A'));
+  g_assert_true (xunichar_isgraph ('-'));
+  g_assert_true (xunichar_isgraph ('*'));
+  g_assert_true (xunichar_isgraph (0xFF21));  /* Unichar fullwidth 'A' */
+  g_assert_true (xunichar_isgraph (0xFF3A));  /* Unichar fullwidth 'Z' */
+  g_assert_true (xunichar_isgraph (0xFF41));  /* Unichar fullwidth 'a' */
+  g_assert_true (xunichar_isgraph (0xFF5A));  /* Unichar fullwidth 'z' */
+  g_assert_true (xunichar_isgraph (0xFF10));  /* Unichar fullwidth '0' */
+  g_assert_true (xunichar_isgraph (0xFF19));  /* Unichar fullwidth '9' */
+  g_assert_true (xunichar_isgraph (0xFF0A));  /* Unichar fullwidth '*' */
+  g_assert_false (xunichar_isgraph (0x007F)); /* Unichar fullwidth <del> */
+  g_assert_false (xunichar_isgraph (0x009F)); /* Unichar fullwidth control */
 
   /*** Testing TYPE() border cases ***/
-  g_assert_true (g_unichar_isgraph (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_true (g_unichar_isgraph (0xFFEFF));
+  g_assert_true (xunichar_isgraph (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_true (xunichar_isgraph (0xFFEFF));
   /* U+E0001 Language Tag */
-  g_assert_false (g_unichar_isgraph (0xE0001));
-  g_assert_false (g_unichar_isgraph (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_isgraph (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_isgraph (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_isgraph (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_false (xunichar_isgraph (0xE0001));
+  g_assert_false (xunichar_isgraph (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_isgraph (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_isgraph (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_isgraph (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_iszerowidth() returns the correct value for various
+/* Test that xunichar_iszerowidth() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_zerowidth (void)
 {
-  g_assert_false (g_unichar_iszerowidth (0x00AD));
-  g_assert_false (g_unichar_iszerowidth (0x115F));
-  g_assert_true (g_unichar_iszerowidth (0x1160));
-  g_assert_true (g_unichar_iszerowidth (0x11AA));
-  g_assert_true (g_unichar_iszerowidth (0x11FF));
-  g_assert_false (g_unichar_iszerowidth (0x1200));
-  g_assert_false (g_unichar_iszerowidth (0x200A));
-  g_assert_true (g_unichar_iszerowidth (0x200B));
-  g_assert_true (g_unichar_iszerowidth (0x200C));
-  g_assert_true (g_unichar_iszerowidth (0x591));
+  g_assert_false (xunichar_iszerowidth (0x00AD));
+  g_assert_false (xunichar_iszerowidth (0x115F));
+  g_assert_true (xunichar_iszerowidth (0x1160));
+  g_assert_true (xunichar_iszerowidth (0x11AA));
+  g_assert_true (xunichar_iszerowidth (0x11FF));
+  g_assert_false (xunichar_iszerowidth (0x1200));
+  g_assert_false (xunichar_iszerowidth (0x200A));
+  g_assert_true (xunichar_iszerowidth (0x200B));
+  g_assert_true (xunichar_iszerowidth (0x200C));
+  g_assert_true (xunichar_iszerowidth (0x591));
 
   /*** Testing TYPE() border cases ***/
-  g_assert_false (g_unichar_iszerowidth (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_false (g_unichar_iszerowidth (0xFFEFF));
+  g_assert_false (xunichar_iszerowidth (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_false (xunichar_iszerowidth (0xFFEFF));
   /* U+E0001 Language Tag */
-  g_assert_true (g_unichar_iszerowidth (0xE0001));
-  g_assert_false (g_unichar_iszerowidth (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_iszerowidth (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_iszerowidth (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_iszerowidth (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_true (xunichar_iszerowidth (0xE0001));
+  g_assert_false (xunichar_iszerowidth (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_iszerowidth (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_iszerowidth (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_iszerowidth (XUNICODE_LAST_CHAR_PART1 + 1));
 
   /* Hangul Jamo Extended-B block, containing jungseong and jongseong for
    * Old Korean */
-  g_assert_true (g_unichar_iszerowidth (0xD7B0));
-  g_assert_true (g_unichar_iszerowidth (0xD7FB));
+  g_assert_true (xunichar_iszerowidth (0xD7B0));
+  g_assert_true (xunichar_iszerowidth (0xD7FB));
 }
 
-/* Test that g_unichar_istitle() returns the correct value for various
+/* Test that xunichar_istitle() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_title (void)
 {
-  g_assert_true (g_unichar_istitle (0x01c5));
-  g_assert_true (g_unichar_istitle (0x1f88));
-  g_assert_true (g_unichar_istitle (0x1fcc));
-  g_assert_false (g_unichar_istitle ('a'));
-  g_assert_false (g_unichar_istitle ('A'));
-  g_assert_false (g_unichar_istitle (';'));
+  g_assert_true (xunichar_istitle (0x01c5));
+  g_assert_true (xunichar_istitle (0x1f88));
+  g_assert_true (xunichar_istitle (0x1fcc));
+  g_assert_false (xunichar_istitle ('a'));
+  g_assert_false (xunichar_istitle ('A'));
+  g_assert_false (xunichar_istitle (';'));
 
   /*** Testing TYPE() border cases ***/
-  g_assert_false (g_unichar_istitle (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_false (g_unichar_istitle (0xFFEFF));
+  g_assert_false (xunichar_istitle (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_false (xunichar_istitle (0xFFEFF));
   /* U+E0001 Language Tag */
-  g_assert_false (g_unichar_istitle (0xE0001));
-  g_assert_false (g_unichar_istitle (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_istitle (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_istitle (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_istitle (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_false (xunichar_istitle (0xE0001));
+  g_assert_false (xunichar_istitle (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_istitle (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_istitle (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_istitle (XUNICODE_LAST_CHAR_PART1 + 1));
 
-  g_assert_cmphex (g_unichar_totitle (0x0000), ==, 0x0000);
-  g_assert_cmphex (g_unichar_totitle (0x01c6), ==, 0x01c5);
-  g_assert_cmphex (g_unichar_totitle (0x01c4), ==, 0x01c5);
-  g_assert_cmphex (g_unichar_totitle (0x01c5), ==, 0x01c5);
-  g_assert_cmphex (g_unichar_totitle (0x1f80), ==, 0x1f88);
-  g_assert_cmphex (g_unichar_totitle (0x1f88), ==, 0x1f88);
-  g_assert_cmphex (g_unichar_totitle ('a'), ==, 'A');
-  g_assert_cmphex (g_unichar_totitle ('A'), ==, 'A');
+  g_assert_cmphex (xunichar_totitle (0x0000), ==, 0x0000);
+  g_assert_cmphex (xunichar_totitle (0x01c6), ==, 0x01c5);
+  g_assert_cmphex (xunichar_totitle (0x01c4), ==, 0x01c5);
+  g_assert_cmphex (xunichar_totitle (0x01c5), ==, 0x01c5);
+  g_assert_cmphex (xunichar_totitle (0x1f80), ==, 0x1f88);
+  g_assert_cmphex (xunichar_totitle (0x1f88), ==, 0x1f88);
+  g_assert_cmphex (xunichar_totitle ('a'), ==, 'A');
+  g_assert_cmphex (xunichar_totitle ('A'), ==, 'A');
 
   /*** Testing TYPE() border cases ***/
-  g_assert_cmphex (g_unichar_totitle (0x3FF5), ==, 0x3FF5);
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_cmphex (g_unichar_totitle (0xFFEFF), ==, 0xFFEFF);
-  g_assert_cmphex (g_unichar_totitle (0xDFFFF), ==, 0xDFFFF);
+  g_assert_cmphex (xunichar_totitle (0x3FF5), ==, 0x3FF5);
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_cmphex (xunichar_totitle (0xFFEFF), ==, 0xFFEFF);
+  g_assert_cmphex (xunichar_totitle (0xDFFFF), ==, 0xDFFFF);
   /* U+E0001 Language Tag */
-  g_assert_cmphex (g_unichar_totitle (0xE0001), ==, 0xE0001);
-  g_assert_cmphex (g_unichar_totitle (G_UNICODE_LAST_CHAR), ==,
-                   G_UNICODE_LAST_CHAR);
-  g_assert_cmphex (g_unichar_totitle (G_UNICODE_LAST_CHAR + 1), ==,
-                   (G_UNICODE_LAST_CHAR + 1));
-  g_assert_cmphex (g_unichar_totitle (G_UNICODE_LAST_CHAR_PART1), ==,
-                   (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_cmphex (g_unichar_totitle (G_UNICODE_LAST_CHAR_PART1 + 1), ==,
-                   (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_cmphex (xunichar_totitle (0xE0001), ==, 0xE0001);
+  g_assert_cmphex (xunichar_totitle (XUNICODE_LAST_CHAR), ==,
+                   XUNICODE_LAST_CHAR);
+  g_assert_cmphex (xunichar_totitle (XUNICODE_LAST_CHAR + 1), ==,
+                   (XUNICODE_LAST_CHAR + 1));
+  g_assert_cmphex (xunichar_totitle (XUNICODE_LAST_CHAR_PART1), ==,
+                   (XUNICODE_LAST_CHAR_PART1));
+  g_assert_cmphex (xunichar_totitle (XUNICODE_LAST_CHAR_PART1 + 1), ==,
+                   (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_isupper() returns the correct value for various
+/* Test that xunichar_isupper() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_upper (void)
 {
-  g_assert_false (g_unichar_isupper (' '));
-  g_assert_false (g_unichar_isupper ('0'));
-  g_assert_false (g_unichar_isupper ('a'));
-  g_assert_true (g_unichar_isupper ('A'));
-  g_assert_false (g_unichar_isupper (0xff41)); /* Unicode fullwidth 'a' */
-  g_assert_true (g_unichar_isupper (0xff21)); /* Unicode fullwidth 'A' */
+  g_assert_false (xunichar_isupper (' '));
+  g_assert_false (xunichar_isupper ('0'));
+  g_assert_false (xunichar_isupper ('a'));
+  g_assert_true (xunichar_isupper ('A'));
+  g_assert_false (xunichar_isupper (0xff41)); /* Unicode fullwidth 'a' */
+  g_assert_true (xunichar_isupper (0xff21)); /* Unicode fullwidth 'A' */
 
   /*** Testing TYPE() border cases ***/
-  g_assert_false (g_unichar_isupper (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_false (g_unichar_isupper (0xFFEFF));
+  g_assert_false (xunichar_isupper (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_false (xunichar_isupper (0xFFEFF));
   /* U+E0001 Language Tag */
-  g_assert_false (g_unichar_isupper (0xE0001));
-  g_assert_false (g_unichar_isupper (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_isupper (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_isupper (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_isupper (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_false (xunichar_isupper (0xE0001));
+  g_assert_false (xunichar_isupper (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_isupper (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_isupper (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_isupper (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_islower() returns the correct value for various
+/* Test that xunichar_islower() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_lower (void)
 {
-  g_assert_false (g_unichar_islower (' '));
-  g_assert_false (g_unichar_islower ('0'));
-  g_assert_true (g_unichar_islower ('a'));
-  g_assert_false (g_unichar_islower ('A'));
-  g_assert_true (g_unichar_islower (0xff41)); /* Unicode fullwidth 'a' */
-  g_assert_false (g_unichar_islower (0xff21)); /* Unicode fullwidth 'A' */
+  g_assert_false (xunichar_islower (' '));
+  g_assert_false (xunichar_islower ('0'));
+  g_assert_true (xunichar_islower ('a'));
+  g_assert_false (xunichar_islower ('A'));
+  g_assert_true (xunichar_islower (0xff41)); /* Unicode fullwidth 'a' */
+  g_assert_false (xunichar_islower (0xff21)); /* Unicode fullwidth 'A' */
 
   /*** Testing TYPE() border cases ***/
-  g_assert_false (g_unichar_islower (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_false (g_unichar_islower (0xFFEFF));
+  g_assert_false (xunichar_islower (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_false (xunichar_islower (0xFFEFF));
   /* U+E0001 Language Tag */
-  g_assert_false (g_unichar_islower (0xE0001));
-  g_assert_false (g_unichar_islower (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_islower (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_islower (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_islower (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_false (xunichar_islower (0xE0001));
+  g_assert_false (xunichar_islower (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_islower (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_islower (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_islower (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_isprint() returns the correct value for various
+/* Test that xunichar_isprint() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_print (void)
 {
-  g_assert_true (g_unichar_isprint (' '));
-  g_assert_true (g_unichar_isprint ('0'));
-  g_assert_true (g_unichar_isprint ('a'));
-  g_assert_true (g_unichar_isprint ('A'));
-  g_assert_true (g_unichar_isprint (0xff41)); /* Unicode fullwidth 'a' */
-  g_assert_true (g_unichar_isprint (0xff21)); /* Unicode fullwidth 'A' */
+  g_assert_true (xunichar_isprint (' '));
+  g_assert_true (xunichar_isprint ('0'));
+  g_assert_true (xunichar_isprint ('a'));
+  g_assert_true (xunichar_isprint ('A'));
+  g_assert_true (xunichar_isprint (0xff41)); /* Unicode fullwidth 'a' */
+  g_assert_true (xunichar_isprint (0xff21)); /* Unicode fullwidth 'A' */
 
   /*** Testing TYPE() border cases ***/
-  g_assert_true (g_unichar_isprint (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_true (g_unichar_isprint (0xFFEFF));
+  g_assert_true (xunichar_isprint (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_true (xunichar_isprint (0xFFEFF));
   /* U+E0001 Language Tag */
-  g_assert_false (g_unichar_isprint (0xE0001));
-  g_assert_false (g_unichar_isprint (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_isprint (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_isprint (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_isprint (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_false (xunichar_isprint (0xE0001));
+  g_assert_false (xunichar_isprint (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_isprint (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_isprint (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_isprint (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_toupper() and g_unichar_tolower() return the
+/* Test that xunichar_toupper() and xunichar_tolower() return the
  * correct values for various ASCII and Unicode alphabetic, numeric,
  * and other, codepoints. */
 static void
 test_cases (void)
 {
-  g_assert_cmphex (g_unichar_toupper (0x0), ==, 0x0);
-  g_assert_cmphex (g_unichar_tolower (0x0), ==, 0x0);
-  g_assert_cmphex (g_unichar_toupper ('a'), ==, 'A');
-  g_assert_cmphex (g_unichar_toupper ('A'), ==, 'A');
+  g_assert_cmphex (xunichar_toupper (0x0), ==, 0x0);
+  g_assert_cmphex (xunichar_tolower (0x0), ==, 0x0);
+  g_assert_cmphex (xunichar_toupper ('a'), ==, 'A');
+  g_assert_cmphex (xunichar_toupper ('A'), ==, 'A');
   /* Unicode fullwidth 'a' == 'A' */
-  g_assert_cmphex (g_unichar_toupper (0xff41), ==, 0xff21);
+  g_assert_cmphex (xunichar_toupper (0xff41), ==, 0xff21);
   /* Unicode fullwidth 'A' == 'A' */
-  g_assert_cmphex (g_unichar_toupper (0xff21), ==, 0xff21);
-  g_assert_cmphex (g_unichar_toupper (0x01C5), ==, 0x01C4);
-  g_assert_cmphex (g_unichar_toupper (0x01C6), ==, 0x01C4);
-  g_assert_cmphex (g_unichar_tolower ('A'), ==, 'a');
-  g_assert_cmphex (g_unichar_tolower ('a'), ==, 'a');
+  g_assert_cmphex (xunichar_toupper (0xff21), ==, 0xff21);
+  g_assert_cmphex (xunichar_toupper (0x01C5), ==, 0x01C4);
+  g_assert_cmphex (xunichar_toupper (0x01C6), ==, 0x01C4);
+  g_assert_cmphex (xunichar_tolower ('A'), ==, 'a');
+  g_assert_cmphex (xunichar_tolower ('a'), ==, 'a');
   /* Unicode fullwidth 'A' == 'a' */
-  g_assert_cmphex (g_unichar_tolower (0xff21), ==, 0xff41);
+  g_assert_cmphex (xunichar_tolower (0xff21), ==, 0xff41);
   /* Unicode fullwidth 'a' == 'a' */
-  g_assert_cmphex (g_unichar_tolower (0xff41), ==, 0xff41);
-  g_assert_cmphex (g_unichar_tolower (0x01C4), ==, 0x01C6);
-  g_assert_cmphex (g_unichar_tolower (0x01C5), ==, 0x01C6);
-  g_assert_cmphex (g_unichar_tolower (0x1F8A), ==, 0x1F82);
-  g_assert_cmphex (g_unichar_totitle (0x1F8A), ==, 0x1F8A);
-  g_assert_cmphex (g_unichar_toupper (0x1F8A), ==, 0x1F8A);
-  g_assert_cmphex (g_unichar_tolower (0x1FB2), ==, 0x1FB2);
-  g_assert_cmphex (g_unichar_toupper (0x1FB2), ==, 0x1FB2);
+  g_assert_cmphex (xunichar_tolower (0xff41), ==, 0xff41);
+  g_assert_cmphex (xunichar_tolower (0x01C4), ==, 0x01C6);
+  g_assert_cmphex (xunichar_tolower (0x01C5), ==, 0x01C6);
+  g_assert_cmphex (xunichar_tolower (0x1F8A), ==, 0x1F82);
+  g_assert_cmphex (xunichar_totitle (0x1F8A), ==, 0x1F8A);
+  g_assert_cmphex (xunichar_toupper (0x1F8A), ==, 0x1F8A);
+  g_assert_cmphex (xunichar_tolower (0x1FB2), ==, 0x1FB2);
+  g_assert_cmphex (xunichar_toupper (0x1FB2), ==, 0x1FB2);
 
   /* U+130 is a special case, it's a 'I' with a dot on top */
-  g_assert_cmphex (g_unichar_tolower (0x130), ==, 0x69);
+  g_assert_cmphex (xunichar_tolower (0x130), ==, 0x69);
 
   /* Testing ATTTABLE() border cases */
-  g_assert_cmphex (g_unichar_toupper (0x1D6FE), ==, 0x1D6FE);
+  g_assert_cmphex (xunichar_toupper (0x1D6FE), ==, 0x1D6FE);
 
   /*** Testing TYPE() border cases ***/
-  g_assert_cmphex (g_unichar_toupper (0x3FF5), ==, 0x3FF5);
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_cmphex (g_unichar_toupper (0xFFEFF), ==, 0xFFEFF);
-  g_assert_cmphex (g_unichar_toupper (0xDFFFF), ==, 0xDFFFF);
+  g_assert_cmphex (xunichar_toupper (0x3FF5), ==, 0x3FF5);
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_cmphex (xunichar_toupper (0xFFEFF), ==, 0xFFEFF);
+  g_assert_cmphex (xunichar_toupper (0xDFFFF), ==, 0xDFFFF);
   /* U+E0001 Language Tag */
-  g_assert_cmphex (g_unichar_toupper (0xE0001), ==, 0xE0001);
-  g_assert_cmphex (g_unichar_toupper (G_UNICODE_LAST_CHAR), ==,
-                   G_UNICODE_LAST_CHAR);
-  g_assert_cmphex (g_unichar_toupper (G_UNICODE_LAST_CHAR + 1), ==,
-                   (G_UNICODE_LAST_CHAR + 1));
-  g_assert_cmphex (g_unichar_toupper (G_UNICODE_LAST_CHAR_PART1), ==,
-                   (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_cmphex (g_unichar_toupper (G_UNICODE_LAST_CHAR_PART1 + 1), ==,
-                   (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_cmphex (xunichar_toupper (0xE0001), ==, 0xE0001);
+  g_assert_cmphex (xunichar_toupper (XUNICODE_LAST_CHAR), ==,
+                   XUNICODE_LAST_CHAR);
+  g_assert_cmphex (xunichar_toupper (XUNICODE_LAST_CHAR + 1), ==,
+                   (XUNICODE_LAST_CHAR + 1));
+  g_assert_cmphex (xunichar_toupper (XUNICODE_LAST_CHAR_PART1), ==,
+                   (XUNICODE_LAST_CHAR_PART1));
+  g_assert_cmphex (xunichar_toupper (XUNICODE_LAST_CHAR_PART1 + 1), ==,
+                   (XUNICODE_LAST_CHAR_PART1 + 1));
 
   /* Testing ATTTABLE() border cases */
-  g_assert_cmphex (g_unichar_tolower (0x1D6FA), ==, 0x1D6FA);
+  g_assert_cmphex (xunichar_tolower (0x1D6FA), ==, 0x1D6FA);
 
   /*** Testing TYPE() border cases ***/
-  g_assert_cmphex (g_unichar_tolower (0x3FF5), ==, 0x3FF5);
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_cmphex (g_unichar_tolower (0xFFEFF), ==, 0xFFEFF);
-  g_assert_cmphex (g_unichar_tolower (0xDFFFF), ==, 0xDFFFF);
+  g_assert_cmphex (xunichar_tolower (0x3FF5), ==, 0x3FF5);
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_cmphex (xunichar_tolower (0xFFEFF), ==, 0xFFEFF);
+  g_assert_cmphex (xunichar_tolower (0xDFFFF), ==, 0xDFFFF);
   /* U+E0001 Language Tag */
-  g_assert_cmphex (g_unichar_tolower (0xE0001), ==, 0xE0001);
-  g_assert_cmphex (g_unichar_tolower (G_UNICODE_LAST_CHAR), ==,
-                   G_UNICODE_LAST_CHAR);
-  g_assert_cmphex (g_unichar_tolower (G_UNICODE_LAST_CHAR + 1), ==,
-                   (G_UNICODE_LAST_CHAR + 1));
-  g_assert_cmphex (g_unichar_tolower (G_UNICODE_LAST_CHAR_PART1), ==,
-                   G_UNICODE_LAST_CHAR_PART1);
-  g_assert_cmphex (g_unichar_tolower (G_UNICODE_LAST_CHAR_PART1 + 1), ==,
-                   (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_cmphex (xunichar_tolower (0xE0001), ==, 0xE0001);
+  g_assert_cmphex (xunichar_tolower (XUNICODE_LAST_CHAR), ==,
+                   XUNICODE_LAST_CHAR);
+  g_assert_cmphex (xunichar_tolower (XUNICODE_LAST_CHAR + 1), ==,
+                   (XUNICODE_LAST_CHAR + 1));
+  g_assert_cmphex (xunichar_tolower (XUNICODE_LAST_CHAR_PART1), ==,
+                   XUNICODE_LAST_CHAR_PART1);
+  g_assert_cmphex (xunichar_tolower (XUNICODE_LAST_CHAR_PART1 + 1), ==,
+                   (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_isdefined() returns the correct value for various
+/* Test that xunichar_isdefined() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_defined (void)
 {
-  g_assert_true (g_unichar_isdefined (0x0903));
-  g_assert_true (g_unichar_isdefined (0x20DD));
-  g_assert_true (g_unichar_isdefined (0x20BA));
-  g_assert_true (g_unichar_isdefined (0xA806));
-  g_assert_true (g_unichar_isdefined ('a'));
-  g_assert_false (g_unichar_isdefined (0x10C49));
-  g_assert_false (g_unichar_isdefined (0x169D));
+  g_assert_true (xunichar_isdefined (0x0903));
+  g_assert_true (xunichar_isdefined (0x20DD));
+  g_assert_true (xunichar_isdefined (0x20BA));
+  g_assert_true (xunichar_isdefined (0xA806));
+  g_assert_true (xunichar_isdefined ('a'));
+  g_assert_false (xunichar_isdefined (0x10C49));
+  g_assert_false (xunichar_isdefined (0x169D));
 
   /*** Testing TYPE() border cases ***/
-  g_assert_true (g_unichar_isdefined (0x3FF5));
-  /* U+FFEFF Plane 15 Private Use (needed to be > G_UNICODE_MAX_TABLE_INDEX) */
-  g_assert_true (g_unichar_isdefined (0xFFEFF));
-  g_assert_false (g_unichar_isdefined (0xDFFFF));
+  g_assert_true (xunichar_isdefined (0x3FF5));
+  /* U+FFEFF Plane 15 Private Use (needed to be > XUNICODE_MAX_TABLE_INDEX) */
+  g_assert_true (xunichar_isdefined (0xFFEFF));
+  g_assert_false (xunichar_isdefined (0xDFFFF));
   /* U+E0001 Language Tag */
-  g_assert_true (g_unichar_isdefined (0xE0001));
-  g_assert_false (g_unichar_isdefined (G_UNICODE_LAST_CHAR));
-  g_assert_false (g_unichar_isdefined (G_UNICODE_LAST_CHAR + 1));
-  g_assert_false (g_unichar_isdefined (G_UNICODE_LAST_CHAR_PART1));
-  g_assert_false (g_unichar_isdefined (G_UNICODE_LAST_CHAR_PART1 + 1));
+  g_assert_true (xunichar_isdefined (0xE0001));
+  g_assert_false (xunichar_isdefined (XUNICODE_LAST_CHAR));
+  g_assert_false (xunichar_isdefined (XUNICODE_LAST_CHAR + 1));
+  g_assert_false (xunichar_isdefined (XUNICODE_LAST_CHAR_PART1));
+  g_assert_false (xunichar_isdefined (XUNICODE_LAST_CHAR_PART1 + 1));
 }
 
-/* Test that g_unichar_iswide() returns the correct value for various
+/* Test that xunichar_iswide() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_wide (void)
 {
   xuint_t i;
   struct {
-    gunichar c;
+    xunichar_t c;
     enum {
       NOT_WIDE,
       WIDE_CJK,
@@ -1310,94 +1310,94 @@ test_wide (void)
 
   for (i = 0; i < G_N_ELEMENTS (examples); i++)
     {
-      g_assert_cmpint (g_unichar_iswide (examples[i].c), ==,
+      g_assert_cmpint (xunichar_iswide (examples[i].c), ==,
                        (examples[i].wide == WIDE));
-      g_assert_cmpint (g_unichar_iswide_cjk (examples[i].c), ==,
+      g_assert_cmpint (xunichar_iswide_cjk (examples[i].c), ==,
                        (examples[i].wide != NOT_WIDE));
     }
 };
 
-/* Test that g_unichar_compose() returns the correct value for various
+/* Test that xunichar_compose() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_compose (void)
 {
-  gunichar ch;
+  xunichar_t ch;
 
   /* Not composable */
-  g_assert_false (g_unichar_compose (0x0041, 0x0042, &ch) && ch == 0);
-  g_assert_false (g_unichar_compose (0x0041, 0, &ch) && ch == 0);
-  g_assert_false (g_unichar_compose (0x0066, 0x0069, &ch) && ch == 0);
+  g_assert_false (xunichar_compose (0x0041, 0x0042, &ch) && ch == 0);
+  g_assert_false (xunichar_compose (0x0041, 0, &ch) && ch == 0);
+  g_assert_false (xunichar_compose (0x0066, 0x0069, &ch) && ch == 0);
 
   /* Tricky non-composable */
-  g_assert_false (g_unichar_compose (0x0308, 0x0301, &ch) && ch == 0); /* !0x0344 */
-  g_assert_false (g_unichar_compose (0x0F71, 0x0F72, &ch) && ch == 0); /* !0x0F73 */
+  g_assert_false (xunichar_compose (0x0308, 0x0301, &ch) && ch == 0); /* !0x0344 */
+  g_assert_false (xunichar_compose (0x0F71, 0x0F72, &ch) && ch == 0); /* !0x0F73 */
 
   /* Singletons should not compose */
-  g_assert_false (g_unichar_compose (0x212B, 0, &ch) && ch == 0);
-  g_assert_false (g_unichar_compose (0x00C5, 0, &ch) && ch == 0);
-  g_assert_false (g_unichar_compose (0x2126, 0, &ch) && ch == 0);
-  g_assert_false (g_unichar_compose (0x03A9, 0, &ch) && ch == 0);
+  g_assert_false (xunichar_compose (0x212B, 0, &ch) && ch == 0);
+  g_assert_false (xunichar_compose (0x00C5, 0, &ch) && ch == 0);
+  g_assert_false (xunichar_compose (0x2126, 0, &ch) && ch == 0);
+  g_assert_false (xunichar_compose (0x03A9, 0, &ch) && ch == 0);
 
   /* Pairs */
-  g_assert_true (g_unichar_compose (0x0041, 0x030A, &ch) && ch == 0x00C5);
-  g_assert_true (g_unichar_compose (0x006F, 0x0302, &ch) && ch == 0x00F4);
-  g_assert_true (g_unichar_compose (0x1E63, 0x0307, &ch) && ch == 0x1E69);
-  g_assert_true (g_unichar_compose (0x0073, 0x0323, &ch) && ch == 0x1E63);
-  g_assert_true (g_unichar_compose (0x0064, 0x0307, &ch) && ch == 0x1E0B);
-  g_assert_true (g_unichar_compose (0x0064, 0x0323, &ch) && ch == 0x1E0D);
+  g_assert_true (xunichar_compose (0x0041, 0x030A, &ch) && ch == 0x00C5);
+  g_assert_true (xunichar_compose (0x006F, 0x0302, &ch) && ch == 0x00F4);
+  g_assert_true (xunichar_compose (0x1E63, 0x0307, &ch) && ch == 0x1E69);
+  g_assert_true (xunichar_compose (0x0073, 0x0323, &ch) && ch == 0x1E63);
+  g_assert_true (xunichar_compose (0x0064, 0x0307, &ch) && ch == 0x1E0B);
+  g_assert_true (xunichar_compose (0x0064, 0x0323, &ch) && ch == 0x1E0D);
 
   /* Hangul */
-  g_assert_true (g_unichar_compose (0xD4CC, 0x11B6, &ch) && ch == 0xD4DB);
-  g_assert_true (g_unichar_compose (0x1111, 0x1171, &ch) && ch == 0xD4CC);
-  g_assert_true (g_unichar_compose (0xCE20, 0x11B8, &ch) && ch == 0xCE31);
-  g_assert_true (g_unichar_compose (0x110E, 0x1173, &ch) && ch == 0xCE20);
+  g_assert_true (xunichar_compose (0xD4CC, 0x11B6, &ch) && ch == 0xD4DB);
+  g_assert_true (xunichar_compose (0x1111, 0x1171, &ch) && ch == 0xD4CC);
+  g_assert_true (xunichar_compose (0xCE20, 0x11B8, &ch) && ch == 0xCE31);
+  g_assert_true (xunichar_compose (0x110E, 0x1173, &ch) && ch == 0xCE20);
 }
 
-/* Test that g_unichar_decompose() returns the correct value for various
+/* Test that xunichar_decompose() returns the correct value for various
  * ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_decompose (void)
 {
-  gunichar a, b;
+  xunichar_t a, b;
 
   /* Not decomposable */
-  g_assert_false (g_unichar_decompose (0x0041, &a, &b) && a == 0x0041 && b == 0);
-  g_assert_false (g_unichar_decompose (0xFB01, &a, &b) && a == 0xFB01 && b == 0);
+  g_assert_false (xunichar_decompose (0x0041, &a, &b) && a == 0x0041 && b == 0);
+  g_assert_false (xunichar_decompose (0xFB01, &a, &b) && a == 0xFB01 && b == 0);
 
   /* Singletons */
-  g_assert_true (g_unichar_decompose (0x212B, &a, &b) && a == 0x00C5 && b == 0);
-  g_assert_true (g_unichar_decompose (0x2126, &a, &b) && a == 0x03A9 && b == 0);
+  g_assert_true (xunichar_decompose (0x212B, &a, &b) && a == 0x00C5 && b == 0);
+  g_assert_true (xunichar_decompose (0x2126, &a, &b) && a == 0x03A9 && b == 0);
 
   /* Tricky pairs */
-  g_assert_true (g_unichar_decompose (0x0344, &a, &b) && a == 0x0308 && b == 0x0301);
-  g_assert_true (g_unichar_decompose (0x0F73, &a, &b) && a == 0x0F71 && b == 0x0F72);
+  g_assert_true (xunichar_decompose (0x0344, &a, &b) && a == 0x0308 && b == 0x0301);
+  g_assert_true (xunichar_decompose (0x0F73, &a, &b) && a == 0x0F71 && b == 0x0F72);
 
   /* Pairs */
-  g_assert_true (g_unichar_decompose (0x00C5, &a, &b) && a == 0x0041 && b == 0x030A);
-  g_assert_true (g_unichar_decompose (0x00F4, &a, &b) && a == 0x006F && b == 0x0302);
-  g_assert_true (g_unichar_decompose (0x1E69, &a, &b) && a == 0x1E63 && b == 0x0307);
-  g_assert_true (g_unichar_decompose (0x1E63, &a, &b) && a == 0x0073 && b == 0x0323);
-  g_assert_true (g_unichar_decompose (0x1E0B, &a, &b) && a == 0x0064 && b == 0x0307);
-  g_assert_true (g_unichar_decompose (0x1E0D, &a, &b) && a == 0x0064 && b == 0x0323);
+  g_assert_true (xunichar_decompose (0x00C5, &a, &b) && a == 0x0041 && b == 0x030A);
+  g_assert_true (xunichar_decompose (0x00F4, &a, &b) && a == 0x006F && b == 0x0302);
+  g_assert_true (xunichar_decompose (0x1E69, &a, &b) && a == 0x1E63 && b == 0x0307);
+  g_assert_true (xunichar_decompose (0x1E63, &a, &b) && a == 0x0073 && b == 0x0323);
+  g_assert_true (xunichar_decompose (0x1E0B, &a, &b) && a == 0x0064 && b == 0x0307);
+  g_assert_true (xunichar_decompose (0x1E0D, &a, &b) && a == 0x0064 && b == 0x0323);
 
   /* Hangul */
-  g_assert_true (g_unichar_decompose (0xD4DB, &a, &b) && a == 0xD4CC && b == 0x11B6);
-  g_assert_true (g_unichar_decompose (0xD4CC, &a, &b) && a == 0x1111 && b == 0x1171);
-  g_assert_true (g_unichar_decompose (0xCE31, &a, &b) && a == 0xCE20 && b == 0x11B8);
-  g_assert_true (g_unichar_decompose (0xCE20, &a, &b) && a == 0x110E && b == 0x1173);
+  g_assert_true (xunichar_decompose (0xD4DB, &a, &b) && a == 0xD4CC && b == 0x11B6);
+  g_assert_true (xunichar_decompose (0xD4CC, &a, &b) && a == 0x1111 && b == 0x1171);
+  g_assert_true (xunichar_decompose (0xCE31, &a, &b) && a == 0xCE20 && b == 0x11B8);
+  g_assert_true (xunichar_decompose (0xCE20, &a, &b) && a == 0x110E && b == 0x1173);
 }
 
-/* Test that g_unichar_fully_decompose() returns the correct value for
+/* Test that xunichar_fully_decompose() returns the correct value for
  * various ASCII and Unicode alphabetic, numeric, and other, codepoints. */
 static void
 test_fully_decompose_canonical (void)
 {
-  gunichar decomp[5];
+  xunichar_t decomp[5];
   xsize_t len;
 
 #define TEST_DECOMP(ch, expected_len, a, b, c, d) \
-  len = g_unichar_fully_decompose (ch, FALSE, decomp, G_N_ELEMENTS (decomp)); \
+  len = xunichar_fully_decompose (ch, FALSE, decomp, G_N_ELEMENTS (decomp)); \
   g_assert_cmpint (expected_len, ==, len); \
   if (expected_len >= 1) g_assert_cmphex (decomp[0], ==, a); \
   if (expected_len >= 2) g_assert_cmphex (decomp[1], ==, b); \
@@ -1439,17 +1439,17 @@ test_fully_decompose_canonical (void)
 #undef TEST_DECOMP
 }
 
-/* Test that g_unicode_canonical_decomposition() returns the correct
+/* Test that xunicode_canonical_decomposition() returns the correct
  * value for various ASCII and Unicode alphabetic, numeric, and other,
  * codepoints. */
 static void
 test_canonical_decomposition (void)
 {
-  gunichar *decomp;
+  xunichar_t *decomp;
   xsize_t len;
 
 #define TEST_DECOMP(ch, expected_len, a, b, c, d) \
-  decomp = g_unicode_canonical_decomposition (ch, &len); \
+  decomp = xunicode_canonical_decomposition (ch, &len); \
   g_assert_cmpint (expected_len, ==, len); \
   if (expected_len >= 1) g_assert_cmphex (decomp[0], ==, a); \
   if (expected_len >= 2) g_assert_cmphex (decomp[1], ==, b); \
@@ -1492,19 +1492,19 @@ test_canonical_decomposition (void)
 #undef TEST_DECOMP
 }
 
-/* Test that g_unichar_decompose() whenever encouttering a char ch
+/* Test that xunichar_decompose() whenever encouttering a char ch
  * decomposes into a and b, b itself won't decompose any further. */
 static void
 test_decompose_tail (void)
 {
-  gunichar ch, a, b, c, d;
+  xunichar_t ch, a, b, c, d;
 
   /* Test that whenever a char ch decomposes into a and b, b itself
    * won't decompose any further. */
 
   for (ch = 0; ch < 0x110000; ch++)
-    if (g_unichar_decompose (ch, &a, &b))
-      g_assert_false (g_unichar_decompose (b, &c, &d));
+    if (xunichar_decompose (ch, &a, &b))
+      g_assert_false (xunichar_decompose (b, &c, &d));
     else
       {
         g_assert_cmpuint (a, ==, ch);
@@ -1512,21 +1512,21 @@ test_decompose_tail (void)
       }
 }
 
-/* Test that all canonical decompositions of g_unichar_fully_decompose()
+/* Test that all canonical decompositions of xunichar_fully_decompose()
  * are at most 4 in length, and compatibility decompositions are
  * at most 18 in length. */
 static void
 test_fully_decompose_len (void)
 {
-  gunichar ch;
+  xunichar_t ch;
 
   /* Test that all canonical decompositions are at most 4 in length,
    * and compatibility decompositions are at most 18 in length.
    */
 
   for (ch = 0; ch < 0x110000; ch++) {
-    g_assert_cmpint (g_unichar_fully_decompose (ch, FALSE, NULL, 0), <=, 4);
-    g_assert_cmpint (g_unichar_fully_decompose (ch, TRUE,  NULL, 0), <=, 18);
+    g_assert_cmpint (xunichar_fully_decompose (ch, FALSE, NULL, 0), <=, 4);
+    g_assert_cmpint (xunichar_fully_decompose (ch, TRUE,  NULL, 0), <=, 18);
   }
 }
 
@@ -1567,10 +1567,10 @@ test_normalization (void)
     {
       char *nfd, *nfc;
 
-      nfd = g_utf8_normalize (tests[i].source, -1, G_NORMALIZE_NFD);
+      nfd = xutf8_normalize (tests[i].source, -1, XNORMALIZE_NFD);
       g_assert_cmpstr (nfd, ==, tests[i].nfd);
 
-      nfc = g_utf8_normalize (tests[i].nfd, -1, G_NORMALIZE_NFC);
+      nfc = xutf8_normalize (tests[i].nfd, -1, XNORMALIZE_NFC);
       g_assert_cmpstr (nfc, ==, tests[i].nfc);
 
       g_free (nfd);
@@ -1582,228 +1582,228 @@ static void
 test_iso15924 (void)
 {
   const struct {
-    GUnicodeScript script;
+    xunicode_script_t script;
     char four_letter_code[5];
   } data[] = {
-    { G_UNICODE_SCRIPT_COMMON,             "Zyyy" },
-    { G_UNICODE_SCRIPT_INHERITED,          "Zinh" },
-    { G_UNICODE_SCRIPT_MATH,               "Zmth" },
-    { G_UNICODE_SCRIPT_ARABIC,             "Arab" },
-    { G_UNICODE_SCRIPT_ARMENIAN,           "Armn" },
-    { G_UNICODE_SCRIPT_BENGALI,            "Beng" },
-    { G_UNICODE_SCRIPT_BOPOMOFO,           "Bopo" },
-    { G_UNICODE_SCRIPT_CHEROKEE,           "Cher" },
-    { G_UNICODE_SCRIPT_COPTIC,             "Copt" },
-    { G_UNICODE_SCRIPT_CYRILLIC,           "Cyrl" },
-    { G_UNICODE_SCRIPT_DESERET,            "Dsrt" },
-    { G_UNICODE_SCRIPT_DEVANAGARI,         "Deva" },
-    { G_UNICODE_SCRIPT_ETHIOPIC,           "Ethi" },
-    { G_UNICODE_SCRIPT_GEORGIAN,           "Geor" },
-    { G_UNICODE_SCRIPT_GOTHIC,             "Goth" },
-    { G_UNICODE_SCRIPT_GREEK,              "Grek" },
-    { G_UNICODE_SCRIPT_GUJARATI,           "Gujr" },
-    { G_UNICODE_SCRIPT_GURMUKHI,           "Guru" },
-    { G_UNICODE_SCRIPT_HAN,                "Hani" },
-    { G_UNICODE_SCRIPT_HANGUL,             "Hang" },
-    { G_UNICODE_SCRIPT_HEBREW,             "Hebr" },
-    { G_UNICODE_SCRIPT_HIRAGANA,           "Hira" },
-    { G_UNICODE_SCRIPT_KANNADA,            "Knda" },
-    { G_UNICODE_SCRIPT_KATAKANA,           "Kana" },
-    { G_UNICODE_SCRIPT_KHMER,              "Khmr" },
-    { G_UNICODE_SCRIPT_LAO,                "Laoo" },
-    { G_UNICODE_SCRIPT_LATIN,              "Latn" },
-    { G_UNICODE_SCRIPT_MALAYALAM,          "Mlym" },
-    { G_UNICODE_SCRIPT_MONGOLIAN,          "Mong" },
-    { G_UNICODE_SCRIPT_MYANMAR,            "Mymr" },
-    { G_UNICODE_SCRIPT_OGHAM,              "Ogam" },
-    { G_UNICODE_SCRIPT_OLD_ITALIC,         "Ital" },
-    { G_UNICODE_SCRIPT_ORIYA,              "Orya" },
-    { G_UNICODE_SCRIPT_RUNIC,              "Runr" },
-    { G_UNICODE_SCRIPT_SINHALA,            "Sinh" },
-    { G_UNICODE_SCRIPT_SYRIAC,             "Syrc" },
-    { G_UNICODE_SCRIPT_TAMIL,              "Taml" },
-    { G_UNICODE_SCRIPT_TELUGU,             "Telu" },
-    { G_UNICODE_SCRIPT_THAANA,             "Thaa" },
-    { G_UNICODE_SCRIPT_THAI,               "Thai" },
-    { G_UNICODE_SCRIPT_TIBETAN,            "Tibt" },
-    { G_UNICODE_SCRIPT_CANADIAN_ABORIGINAL, "Cans" },
-    { G_UNICODE_SCRIPT_YI,                 "Yiii" },
-    { G_UNICODE_SCRIPT_TAGALOG,            "Tglg" },
-    { G_UNICODE_SCRIPT_HANUNOO,            "Hano" },
-    { G_UNICODE_SCRIPT_BUHID,              "Buhd" },
-    { G_UNICODE_SCRIPT_TAGBANWA,           "Tagb" },
+    { XUNICODE_SCRIPT_COMMON,             "Zyyy" },
+    { XUNICODE_SCRIPT_INHERITED,          "Zinh" },
+    { XUNICODE_SCRIPT_MATH,               "Zmth" },
+    { XUNICODE_SCRIPT_ARABIC,             "Arab" },
+    { XUNICODE_SCRIPT_ARMENIAN,           "Armn" },
+    { XUNICODE_SCRIPT_BENGALI,            "Beng" },
+    { XUNICODE_SCRIPT_BOPOMOFO,           "Bopo" },
+    { XUNICODE_SCRIPT_CHEROKEE,           "Cher" },
+    { XUNICODE_SCRIPT_COPTIC,             "Copt" },
+    { XUNICODE_SCRIPT_CYRILLIC,           "Cyrl" },
+    { XUNICODE_SCRIPT_DESERET,            "Dsrt" },
+    { XUNICODE_SCRIPT_DEVANAGARI,         "Deva" },
+    { XUNICODE_SCRIPT_ETHIOPIC,           "Ethi" },
+    { XUNICODE_SCRIPT_GEORGIAN,           "Geor" },
+    { XUNICODE_SCRIPT_GOTHIC,             "Goth" },
+    { XUNICODE_SCRIPT_GREEK,              "Grek" },
+    { XUNICODE_SCRIPT_GUJARATI,           "Gujr" },
+    { XUNICODE_SCRIPT_GURMUKHI,           "Guru" },
+    { XUNICODE_SCRIPT_HAN,                "Hani" },
+    { XUNICODE_SCRIPT_HANGUL,             "Hang" },
+    { XUNICODE_SCRIPT_HEBREW,             "Hebr" },
+    { XUNICODE_SCRIPT_HIRAGANA,           "Hira" },
+    { XUNICODE_SCRIPT_KANNADA,            "Knda" },
+    { XUNICODE_SCRIPT_KATAKANA,           "Kana" },
+    { XUNICODE_SCRIPT_KHMER,              "Khmr" },
+    { XUNICODE_SCRIPT_LAO,                "Laoo" },
+    { XUNICODE_SCRIPT_LATIN,              "Latn" },
+    { XUNICODE_SCRIPT_MALAYALAM,          "Mlym" },
+    { XUNICODE_SCRIPT_MONGOLIAN,          "Mong" },
+    { XUNICODE_SCRIPT_MYANMAR,            "Mymr" },
+    { XUNICODE_SCRIPT_OGHAM,              "Ogam" },
+    { XUNICODE_SCRIPT_OLD_ITALIC,         "Ital" },
+    { XUNICODE_SCRIPT_ORIYA,              "Orya" },
+    { XUNICODE_SCRIPT_RUNIC,              "Runr" },
+    { XUNICODE_SCRIPT_SINHALA,            "Sinh" },
+    { XUNICODE_SCRIPT_SYRIAC,             "Syrc" },
+    { XUNICODE_SCRIPT_TAMIL,              "Taml" },
+    { XUNICODE_SCRIPT_TELUGU,             "Telu" },
+    { XUNICODE_SCRIPT_THAANA,             "Thaa" },
+    { XUNICODE_SCRIPT_THAI,               "Thai" },
+    { XUNICODE_SCRIPT_TIBETAN,            "Tibt" },
+    { XUNICODE_SCRIPT_CANADIAN_ABORIGINAL, "Cans" },
+    { XUNICODE_SCRIPT_YI,                 "Yiii" },
+    { XUNICODE_SCRIPT_TAGALOG,            "Tglg" },
+    { XUNICODE_SCRIPT_HANUNOO,            "Hano" },
+    { XUNICODE_SCRIPT_BUHID,              "Buhd" },
+    { XUNICODE_SCRIPT_TAGBANWA,           "Tagb" },
 
     /* Unicode-4.0 additions */
-    { G_UNICODE_SCRIPT_BRAILLE,            "Brai" },
-    { G_UNICODE_SCRIPT_CYPRIOT,            "Cprt" },
-    { G_UNICODE_SCRIPT_LIMBU,              "Limb" },
-    { G_UNICODE_SCRIPT_OSMANYA,            "Osma" },
-    { G_UNICODE_SCRIPT_SHAVIAN,            "Shaw" },
-    { G_UNICODE_SCRIPT_LINEAR_B,           "Linb" },
-    { G_UNICODE_SCRIPT_TAI_LE,             "Tale" },
-    { G_UNICODE_SCRIPT_UGARITIC,           "Ugar" },
+    { XUNICODE_SCRIPT_BRAILLE,            "Brai" },
+    { XUNICODE_SCRIPT_CYPRIOT,            "Cprt" },
+    { XUNICODE_SCRIPT_LIMBU,              "Limb" },
+    { XUNICODE_SCRIPT_OSMANYA,            "Osma" },
+    { XUNICODE_SCRIPT_SHAVIAN,            "Shaw" },
+    { XUNICODE_SCRIPT_LINEAR_B,           "Linb" },
+    { XUNICODE_SCRIPT_TAI_LE,             "Tale" },
+    { XUNICODE_SCRIPT_UGARITIC,           "Ugar" },
 
     /* Unicode-4.1 additions */
-    { G_UNICODE_SCRIPT_NEW_TAI_LUE,        "Talu" },
-    { G_UNICODE_SCRIPT_BUGINESE,           "Bugi" },
-    { G_UNICODE_SCRIPT_GLAGOLITIC,         "Glag" },
-    { G_UNICODE_SCRIPT_TIFINAGH,           "Tfng" },
-    { G_UNICODE_SCRIPT_SYLOTI_NAGRI,       "Sylo" },
-    { G_UNICODE_SCRIPT_OLD_PERSIAN,        "Xpeo" },
-    { G_UNICODE_SCRIPT_KHAROSHTHI,         "Khar" },
+    { XUNICODE_SCRIPT_NEW_TAI_LUE,        "Talu" },
+    { XUNICODE_SCRIPT_BUGINESE,           "Bugi" },
+    { XUNICODE_SCRIPT_GLAGOLITIC,         "Glag" },
+    { XUNICODE_SCRIPT_TIFINAGH,           "Tfng" },
+    { XUNICODE_SCRIPT_SYLOTI_NAGRI,       "Sylo" },
+    { XUNICODE_SCRIPT_OLD_PERSIAN,        "Xpeo" },
+    { XUNICODE_SCRIPT_KHAROSHTHI,         "Khar" },
 
     /* Unicode-5.0 additions */
-    { G_UNICODE_SCRIPT_UNKNOWN,            "Zzzz" },
-    { G_UNICODE_SCRIPT_BALINESE,           "Bali" },
-    { G_UNICODE_SCRIPT_CUNEIFORM,          "Xsux" },
-    { G_UNICODE_SCRIPT_PHOENICIAN,         "Phnx" },
-    { G_UNICODE_SCRIPT_PHAGS_PA,           "Phag" },
-    { G_UNICODE_SCRIPT_NKO,                "Nkoo" },
+    { XUNICODE_SCRIPT_UNKNOWN,            "Zzzz" },
+    { XUNICODE_SCRIPT_BALINESE,           "Bali" },
+    { XUNICODE_SCRIPT_CUNEIFORM,          "Xsux" },
+    { XUNICODE_SCRIPT_PHOENICIAN,         "Phnx" },
+    { XUNICODE_SCRIPT_PHAGS_PA,           "Phag" },
+    { XUNICODE_SCRIPT_NKO,                "Nkoo" },
 
     /* Unicode-5.1 additions */
-    { G_UNICODE_SCRIPT_KAYAH_LI,           "Kali" },
-    { G_UNICODE_SCRIPT_LEPCHA,             "Lepc" },
-    { G_UNICODE_SCRIPT_REJANG,             "Rjng" },
-    { G_UNICODE_SCRIPT_SUNDANESE,          "Sund" },
-    { G_UNICODE_SCRIPT_SAURASHTRA,         "Saur" },
-    { G_UNICODE_SCRIPT_CHAM,               "Cham" },
-    { G_UNICODE_SCRIPT_OL_CHIKI,           "Olck" },
-    { G_UNICODE_SCRIPT_VAI,                "Vaii" },
-    { G_UNICODE_SCRIPT_CARIAN,             "Cari" },
-    { G_UNICODE_SCRIPT_LYCIAN,             "Lyci" },
-    { G_UNICODE_SCRIPT_LYDIAN,             "Lydi" },
+    { XUNICODE_SCRIPT_KAYAH_LI,           "Kali" },
+    { XUNICODE_SCRIPT_LEPCHA,             "Lepc" },
+    { XUNICODE_SCRIPT_REJANG,             "Rjng" },
+    { XUNICODE_SCRIPT_SUNDANESE,          "Sund" },
+    { XUNICODE_SCRIPT_SAURASHTRA,         "Saur" },
+    { XUNICODE_SCRIPT_CHAM,               "Cham" },
+    { XUNICODE_SCRIPT_OL_CHIKI,           "Olck" },
+    { XUNICODE_SCRIPT_VAI,                "Vaii" },
+    { XUNICODE_SCRIPT_CARIAN,             "Cari" },
+    { XUNICODE_SCRIPT_LYCIAN,             "Lyci" },
+    { XUNICODE_SCRIPT_LYDIAN,             "Lydi" },
 
     /* Unicode-5.2 additions */
-    { G_UNICODE_SCRIPT_AVESTAN,                "Avst" },
-    { G_UNICODE_SCRIPT_BAMUM,                  "Bamu" },
-    { G_UNICODE_SCRIPT_EGYPTIAN_HIEROGLYPHS,   "Egyp" },
-    { G_UNICODE_SCRIPT_IMPERIAL_ARAMAIC,       "Armi" },
-    { G_UNICODE_SCRIPT_INSCRIPTIONAL_PAHLAVI,  "Phli" },
-    { G_UNICODE_SCRIPT_INSCRIPTIONAL_PARTHIAN, "Prti" },
-    { G_UNICODE_SCRIPT_JAVANESE,               "Java" },
-    { G_UNICODE_SCRIPT_KAITHI,                 "Kthi" },
-    { G_UNICODE_SCRIPT_LISU,                   "Lisu" },
-    { G_UNICODE_SCRIPT_MEETEI_MAYEK,           "Mtei" },
-    { G_UNICODE_SCRIPT_OLD_SOUTH_ARABIAN,      "Sarb" },
-    { G_UNICODE_SCRIPT_OLD_TURKIC,             "Orkh" },
-    { G_UNICODE_SCRIPT_SAMARITAN,              "Samr" },
-    { G_UNICODE_SCRIPT_TAI_THAM,               "Lana" },
-    { G_UNICODE_SCRIPT_TAI_VIET,               "Tavt" },
+    { XUNICODE_SCRIPT_AVESTAN,                "Avst" },
+    { XUNICODE_SCRIPT_BAMUM,                  "Bamu" },
+    { XUNICODE_SCRIPT_EGYPTIAN_HIEROGLYPHS,   "Egyp" },
+    { XUNICODE_SCRIPT_IMPERIAL_ARAMAIC,       "Armi" },
+    { XUNICODE_SCRIPT_INSCRIPTIONAL_PAHLAVI,  "Phli" },
+    { XUNICODE_SCRIPT_INSCRIPTIONAL_PARTHIAN, "Prti" },
+    { XUNICODE_SCRIPT_JAVANESE,               "Java" },
+    { XUNICODE_SCRIPT_KAITHI,                 "Kthi" },
+    { XUNICODE_SCRIPT_LISU,                   "Lisu" },
+    { XUNICODE_SCRIPT_MEETEI_MAYEK,           "Mtei" },
+    { XUNICODE_SCRIPT_OLD_SOUTH_ARABIAN,      "Sarb" },
+    { XUNICODE_SCRIPT_OLD_TURKIC,             "Orkh" },
+    { XUNICODE_SCRIPT_SAMARITAN,              "Samr" },
+    { XUNICODE_SCRIPT_TAI_THAM,               "Lana" },
+    { XUNICODE_SCRIPT_TAI_VIET,               "Tavt" },
 
     /* Unicode-6.0 additions */
-    { G_UNICODE_SCRIPT_BATAK,                  "Batk" },
-    { G_UNICODE_SCRIPT_BRAHMI,                 "Brah" },
-    { G_UNICODE_SCRIPT_MANDAIC,                "Mand" },
+    { XUNICODE_SCRIPT_BATAK,                  "Batk" },
+    { XUNICODE_SCRIPT_BRAHMI,                 "Brah" },
+    { XUNICODE_SCRIPT_MANDAIC,                "Mand" },
 
     /* Unicode-6.1 additions */
-    { G_UNICODE_SCRIPT_CHAKMA,                 "Cakm" },
-    { G_UNICODE_SCRIPT_MEROITIC_CURSIVE,       "Merc" },
-    { G_UNICODE_SCRIPT_MEROITIC_HIEROGLYPHS,   "Mero" },
-    { G_UNICODE_SCRIPT_MIAO,                   "Plrd" },
-    { G_UNICODE_SCRIPT_SHARADA,                "Shrd" },
-    { G_UNICODE_SCRIPT_SORA_SOMPENG,           "Sora" },
-    { G_UNICODE_SCRIPT_TAKRI,                  "Takr" },
+    { XUNICODE_SCRIPT_CHAKMA,                 "Cakm" },
+    { XUNICODE_SCRIPT_MEROITIC_CURSIVE,       "Merc" },
+    { XUNICODE_SCRIPT_MEROITIC_HIEROGLYPHS,   "Mero" },
+    { XUNICODE_SCRIPT_MIAO,                   "Plrd" },
+    { XUNICODE_SCRIPT_SHARADA,                "Shrd" },
+    { XUNICODE_SCRIPT_SORA_SOMPENG,           "Sora" },
+    { XUNICODE_SCRIPT_TAKRI,                  "Takr" },
 
     /* Unicode 7.0 additions */
-    { G_UNICODE_SCRIPT_BASSA_VAH,              "Bass" },
-    { G_UNICODE_SCRIPT_CAUCASIAN_ALBANIAN,     "Aghb" },
-    { G_UNICODE_SCRIPT_DUPLOYAN,               "Dupl" },
-    { G_UNICODE_SCRIPT_ELBASAN,                "Elba" },
-    { G_UNICODE_SCRIPT_GRANTHA,                "Gran" },
-    { G_UNICODE_SCRIPT_KHOJKI,                 "Khoj" },
-    { G_UNICODE_SCRIPT_KHUDAWADI,              "Sind" },
-    { G_UNICODE_SCRIPT_LINEAR_A,               "Lina" },
-    { G_UNICODE_SCRIPT_MAHAJANI,               "Mahj" },
-    { G_UNICODE_SCRIPT_MANICHAEAN,             "Mani" },
-    { G_UNICODE_SCRIPT_MENDE_KIKAKUI,          "Mend" },
-    { G_UNICODE_SCRIPT_MODI,                   "Modi" },
-    { G_UNICODE_SCRIPT_MRO,                    "Mroo" },
-    { G_UNICODE_SCRIPT_NABATAEAN,              "Nbat" },
-    { G_UNICODE_SCRIPT_OLD_NORTH_ARABIAN,      "Narb" },
-    { G_UNICODE_SCRIPT_OLD_PERMIC,             "Perm" },
-    { G_UNICODE_SCRIPT_PAHAWH_HMONG,           "Hmng" },
-    { G_UNICODE_SCRIPT_PALMYRENE,              "Palm" },
-    { G_UNICODE_SCRIPT_PAU_CIN_HAU,            "Pauc" },
-    { G_UNICODE_SCRIPT_PSALTER_PAHLAVI,        "Phlp" },
-    { G_UNICODE_SCRIPT_SIDDHAM,                "Sidd" },
-    { G_UNICODE_SCRIPT_TIRHUTA,                "Tirh" },
-    { G_UNICODE_SCRIPT_WARANG_CITI,            "Wara" },
+    { XUNICODE_SCRIPT_BASSA_VAH,              "Bass" },
+    { XUNICODE_SCRIPT_CAUCASIAN_ALBANIAN,     "Aghb" },
+    { XUNICODE_SCRIPT_DUPLOYAN,               "Dupl" },
+    { XUNICODE_SCRIPT_ELBASAN,                "Elba" },
+    { XUNICODE_SCRIPT_GRANTHA,                "Gran" },
+    { XUNICODE_SCRIPT_KHOJKI,                 "Khoj" },
+    { XUNICODE_SCRIPT_KHUDAWADI,              "Sind" },
+    { XUNICODE_SCRIPT_LINEAR_A,               "Lina" },
+    { XUNICODE_SCRIPT_MAHAJANI,               "Mahj" },
+    { XUNICODE_SCRIPT_MANICHAEAN,             "Mani" },
+    { XUNICODE_SCRIPT_MENDE_KIKAKUI,          "Mend" },
+    { XUNICODE_SCRIPT_MODI,                   "Modi" },
+    { XUNICODE_SCRIPT_MRO,                    "Mroo" },
+    { XUNICODE_SCRIPT_NABATAEAN,              "Nbat" },
+    { XUNICODE_SCRIPT_OLD_NORTH_ARABIAN,      "Narb" },
+    { XUNICODE_SCRIPT_OLD_PERMIC,             "Perm" },
+    { XUNICODE_SCRIPT_PAHAWH_HMONG,           "Hmng" },
+    { XUNICODE_SCRIPT_PALMYRENE,              "Palm" },
+    { XUNICODE_SCRIPT_PAU_CIN_HAU,            "Pauc" },
+    { XUNICODE_SCRIPT_PSALTER_PAHLAVI,        "Phlp" },
+    { XUNICODE_SCRIPT_SIDDHAM,                "Sidd" },
+    { XUNICODE_SCRIPT_TIRHUTA,                "Tirh" },
+    { XUNICODE_SCRIPT_WARANG_CITI,            "Wara" },
 
     /* Unicode 8.0 additions */
-    { G_UNICODE_SCRIPT_AHOM,                   "Ahom" },
-    { G_UNICODE_SCRIPT_ANATOLIAN_HIEROGLYPHS,  "Hluw" },
-    { G_UNICODE_SCRIPT_HATRAN,                 "Hatr" },
-    { G_UNICODE_SCRIPT_MULTANI,                "Mult" },
-    { G_UNICODE_SCRIPT_OLD_HUNGARIAN,          "Hung" },
-    { G_UNICODE_SCRIPT_SIGNWRITING,            "Sgnw" },
+    { XUNICODE_SCRIPT_AHOM,                   "Ahom" },
+    { XUNICODE_SCRIPT_ANATOLIAN_HIEROGLYPHS,  "Hluw" },
+    { XUNICODE_SCRIPT_HATRAN,                 "Hatr" },
+    { XUNICODE_SCRIPT_MULTANI,                "Mult" },
+    { XUNICODE_SCRIPT_OLD_HUNGARIAN,          "Hung" },
+    { XUNICODE_SCRIPT_SIGNWRITING,            "Sgnw" },
 
     /* Unicode 9.0 additions */
-    { G_UNICODE_SCRIPT_ADLAM,                  "Adlm" },
-    { G_UNICODE_SCRIPT_BHAIKSUKI,              "Bhks" },
-    { G_UNICODE_SCRIPT_MARCHEN,                "Marc" },
-    { G_UNICODE_SCRIPT_NEWA,                   "Newa" },
-    { G_UNICODE_SCRIPT_OSAGE,                  "Osge" },
-    { G_UNICODE_SCRIPT_TANGUT,                 "Tang" },
+    { XUNICODE_SCRIPT_ADLAM,                  "Adlm" },
+    { XUNICODE_SCRIPT_BHAIKSUKI,              "Bhks" },
+    { XUNICODE_SCRIPT_MARCHEN,                "Marc" },
+    { XUNICODE_SCRIPT_NEWA,                   "Newa" },
+    { XUNICODE_SCRIPT_OSAGE,                  "Osge" },
+    { XUNICODE_SCRIPT_TANGUT,                 "Tang" },
 
     /* Unicode 10.0 additions */
-    { G_UNICODE_SCRIPT_MASARAM_GONDI,          "Gonm" },
-    { G_UNICODE_SCRIPT_NUSHU,                  "Nshu" },
-    { G_UNICODE_SCRIPT_SOYOMBO,                "Soyo" },
-    { G_UNICODE_SCRIPT_ZANABAZAR_SQUARE,       "Zanb" },
+    { XUNICODE_SCRIPT_MASARAM_GONDI,          "Gonm" },
+    { XUNICODE_SCRIPT_NUSHU,                  "Nshu" },
+    { XUNICODE_SCRIPT_SOYOMBO,                "Soyo" },
+    { XUNICODE_SCRIPT_ZANABAZAR_SQUARE,       "Zanb" },
 
     /* Unicode 11.0 additions */
-    { G_UNICODE_SCRIPT_DOGRA,                  "Dogr" },
-    { G_UNICODE_SCRIPT_GUNJALA_GONDI,          "Gong" },
-    { G_UNICODE_SCRIPT_HANIFI_ROHINGYA,        "Rohg" },
-    { G_UNICODE_SCRIPT_MAKASAR,                "Maka" },
-    { G_UNICODE_SCRIPT_MEDEFAIDRIN,            "Medf" },
-    { G_UNICODE_SCRIPT_OLD_SOGDIAN,            "Sogo" },
-    { G_UNICODE_SCRIPT_SOGDIAN,                "Sogd" },
+    { XUNICODE_SCRIPT_DOGRA,                  "Dogr" },
+    { XUNICODE_SCRIPT_GUNJALA_GONDI,          "Gong" },
+    { XUNICODE_SCRIPT_HANIFI_ROHINGYA,        "Rohg" },
+    { XUNICODE_SCRIPT_MAKASAR,                "Maka" },
+    { XUNICODE_SCRIPT_MEDEFAIDRIN,            "Medf" },
+    { XUNICODE_SCRIPT_OLD_SOGDIAN,            "Sogo" },
+    { XUNICODE_SCRIPT_SOGDIAN,                "Sogd" },
 
     /* Unicode 12.0 additions */
-    { G_UNICODE_SCRIPT_ELYMAIC,                "Elym" },
-    { G_UNICODE_SCRIPT_NANDINAGARI,            "Nand" },
-    { G_UNICODE_SCRIPT_NYIAKENG_PUACHUE_HMONG, "Hmnp" },
-    { G_UNICODE_SCRIPT_WANCHO,                 "Wcho" },
+    { XUNICODE_SCRIPT_ELYMAIC,                "Elym" },
+    { XUNICODE_SCRIPT_NANDINAGARI,            "Nand" },
+    { XUNICODE_SCRIPT_NYIAKENG_PUACHUE_HMONG, "Hmnp" },
+    { XUNICODE_SCRIPT_WANCHO,                 "Wcho" },
 
     /* Unicode 13.0 additions */
-    { G_UNICODE_SCRIPT_CHORASMIAN,             "Chrs" },
-    { G_UNICODE_SCRIPT_DIVES_AKURU,            "Diak" },
-    { G_UNICODE_SCRIPT_KHITAN_SMALL_SCRIPT,    "Kits" },
-    { G_UNICODE_SCRIPT_YEZIDI,                 "Yezi" },
+    { XUNICODE_SCRIPT_CHORASMIAN,             "Chrs" },
+    { XUNICODE_SCRIPT_DIVES_AKURU,            "Diak" },
+    { XUNICODE_SCRIPT_KHITAN_SMALL_SCRIPT,    "Kits" },
+    { XUNICODE_SCRIPT_YEZIDI,                 "Yezi" },
 
     /* Unicode 14.0 additions */
-    { G_UNICODE_SCRIPT_CYPRO_MINOAN,           "Cpmn" },
-    { G_UNICODE_SCRIPT_OLD_UYGHUR,             "Ougr" },
-    { G_UNICODE_SCRIPT_TANGSA,                 "Tnsa" },
-    { G_UNICODE_SCRIPT_TOTO,                   "Toto" },
-    { G_UNICODE_SCRIPT_VITHKUQI,               "Vith" }
+    { XUNICODE_SCRIPT_CYPRO_MINOAN,           "Cpmn" },
+    { XUNICODE_SCRIPT_OLD_UYGHUR,             "Ougr" },
+    { XUNICODE_SCRIPT_TANGSA,                 "Tnsa" },
+    { XUNICODE_SCRIPT_TOTO,                   "Toto" },
+    { XUNICODE_SCRIPT_VITHKUQI,               "Vith" }
   };
   xuint_t i;
 
   g_assert_cmphex (0, ==,
-                   g_unicode_script_to_iso15924 (G_UNICODE_SCRIPT_INVALID_CODE));
-  g_assert_cmphex (0x5A7A7A7A, ==, g_unicode_script_to_iso15924 (1000));
+                   xunicode_script_to_iso15924 (XUNICODE_SCRIPT_INVALID_CODE));
+  g_assert_cmphex (0x5A7A7A7A, ==, xunicode_script_to_iso15924 (1000));
   g_assert_cmphex (0x41726162, ==,
-                   g_unicode_script_to_iso15924 (G_UNICODE_SCRIPT_ARABIC));
+                   xunicode_script_to_iso15924 (XUNICODE_SCRIPT_ARABIC));
 
-  g_assert_cmphex (G_UNICODE_SCRIPT_INVALID_CODE, ==,
-                   g_unicode_script_from_iso15924 (0));
-  g_assert_cmphex (G_UNICODE_SCRIPT_UNKNOWN, ==,
-                   g_unicode_script_from_iso15924 (0x12345678));
+  g_assert_cmphex (XUNICODE_SCRIPT_INVALID_CODE, ==,
+                   xunicode_script_from_iso15924 (0));
+  g_assert_cmphex (XUNICODE_SCRIPT_UNKNOWN, ==,
+                   xunicode_script_from_iso15924 (0x12345678));
 
 #define PACK(a,b,c,d) \
-  ((guint32)((((guint8)(a))<<24)|(((guint8)(b))<<16)|(((guint8)(c))<<8)|((guint8)(d))))
+  ((xuint32_t)((((xuint8_t)(a))<<24)|(((xuint8_t)(b))<<16)|(((xuint8_t)(c))<<8)|((xuint8_t)(d))))
 
   for (i = 0; i < G_N_ELEMENTS (data); i++)
     {
-      guint32 code = PACK (data[i].four_letter_code[0],
+      xuint32_t code = PACK (data[i].four_letter_code[0],
                            data[i].four_letter_code[1],
                            data[i].four_letter_code[2],
                            data[i].four_letter_code[3]);
 
-      g_assert_cmphex (g_unicode_script_to_iso15924 (data[i].script), ==, code);
-      g_assert_cmpint (g_unicode_script_from_iso15924 (code), ==, data[i].script);
+      g_assert_cmphex (xunicode_script_to_iso15924 (data[i].script), ==, code);
+      g_assert_cmpint (xunicode_script_from_iso15924 (code), ==, data[i].script);
     }
 
 #undef PACK

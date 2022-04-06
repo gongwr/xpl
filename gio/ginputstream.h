@@ -29,8 +29,8 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_INPUT_STREAM         (g_input_stream_get_type ())
-#define G_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_INPUT_STREAM, xinput_stream_t))
+#define XTYPE_INPUT_STREAM         (xinput_stream_get_type ())
+#define G_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_INPUT_STREAM, xinput_stream))
 #define G_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_INPUT_STREAM, GInputStreamClass))
 #define X_IS_INPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_INPUT_STREAM))
 #define X_IS_INPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_INPUT_STREAM))
@@ -58,12 +58,12 @@ struct _GInputStreamClass
 
   /* Sync ops: */
 
-  gssize   (* read_fn)      (xinput_stream_t        *stream,
+  xssize_t   (* read_fn)      (xinput_stream_t        *stream,
                              void                *buffer,
                              xsize_t                count,
                              xcancellable_t        *cancellable,
                              xerror_t             **error);
-  gssize   (* skip)         (xinput_stream_t        *stream,
+  xssize_t   (* skip)         (xinput_stream_t        *stream,
                              xsize_t                count,
                              xcancellable_t        *cancellable,
                              xerror_t             **error);
@@ -79,7 +79,7 @@ struct _GInputStreamClass
                              xcancellable_t        *cancellable,
                              xasync_ready_callback_t  callback,
                              xpointer_t             user_data);
-  gssize   (* read_finish)  (xinput_stream_t        *stream,
+  xssize_t   (* read_finish)  (xinput_stream_t        *stream,
                              xasync_result_t        *result,
                              xerror_t             **error);
   void     (* skip_async)   (xinput_stream_t        *stream,
@@ -88,7 +88,7 @@ struct _GInputStreamClass
                              xcancellable_t        *cancellable,
                              xasync_ready_callback_t  callback,
                              xpointer_t             user_data);
-  gssize   (* skip_finish)  (xinput_stream_t        *stream,
+  xssize_t   (* skip_finish)  (xinput_stream_t        *stream,
                              xasync_result_t        *result,
                              xerror_t             **error);
   void     (* close_async)  (xinput_stream_t        *stream,
@@ -110,37 +110,37 @@ struct _GInputStreamClass
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t    g_input_stream_get_type      (void) G_GNUC_CONST;
+xtype_t    xinput_stream_get_type      (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-gssize   g_input_stream_read          (xinput_stream_t          *stream,
+xssize_t   xinput_stream_read          (xinput_stream_t          *stream,
 				       void                  *buffer,
 				       xsize_t                  count,
 				       xcancellable_t          *cancellable,
 				       xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_input_stream_read_all      (xinput_stream_t          *stream,
+xboolean_t xinput_stream_read_all      (xinput_stream_t          *stream,
 				       void                  *buffer,
 				       xsize_t                  count,
 				       xsize_t                 *bytes_read,
 				       xcancellable_t          *cancellable,
 				       xerror_t               **error);
 XPL_AVAILABLE_IN_2_34
-GBytes  *g_input_stream_read_bytes    (xinput_stream_t          *stream,
+xbytes_t  *xinput_stream_read_bytes    (xinput_stream_t          *stream,
 				       xsize_t                  count,
 				       xcancellable_t          *cancellable,
 				       xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-gssize   g_input_stream_skip          (xinput_stream_t          *stream,
+xssize_t   xinput_stream_skip          (xinput_stream_t          *stream,
 				       xsize_t                  count,
 				       xcancellable_t          *cancellable,
 				       xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_input_stream_close         (xinput_stream_t          *stream,
+xboolean_t xinput_stream_close         (xinput_stream_t          *stream,
 				       xcancellable_t          *cancellable,
 				       xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-void     g_input_stream_read_async    (xinput_stream_t          *stream,
+void     xinput_stream_read_async    (xinput_stream_t          *stream,
 				       void                  *buffer,
 				       xsize_t                  count,
 				       int                    io_priority,
@@ -148,12 +148,12 @@ void     g_input_stream_read_async    (xinput_stream_t          *stream,
 				       xasync_ready_callback_t    callback,
 				       xpointer_t               user_data);
 XPL_AVAILABLE_IN_ALL
-gssize   g_input_stream_read_finish   (xinput_stream_t          *stream,
+xssize_t   xinput_stream_read_finish   (xinput_stream_t          *stream,
 				       xasync_result_t          *result,
 				       xerror_t               **error);
 
 XPL_AVAILABLE_IN_2_44
-void     g_input_stream_read_all_async    (xinput_stream_t          *stream,
+void     xinput_stream_read_all_async    (xinput_stream_t          *stream,
                                            void                  *buffer,
                                            xsize_t                  count,
                                            int                    io_priority,
@@ -161,55 +161,55 @@ void     g_input_stream_read_all_async    (xinput_stream_t          *stream,
                                            xasync_ready_callback_t    callback,
                                            xpointer_t               user_data);
 XPL_AVAILABLE_IN_2_44
-xboolean_t g_input_stream_read_all_finish   (xinput_stream_t          *stream,
+xboolean_t xinput_stream_read_all_finish   (xinput_stream_t          *stream,
                                            xasync_result_t          *result,
                                            xsize_t                 *bytes_read,
                                            xerror_t               **error);
 
 XPL_AVAILABLE_IN_2_34
-void     g_input_stream_read_bytes_async  (xinput_stream_t          *stream,
+void     xinput_stream_read_bytes_async  (xinput_stream_t          *stream,
 					   xsize_t                  count,
 					   int                    io_priority,
 					   xcancellable_t          *cancellable,
 					   xasync_ready_callback_t    callback,
 					   xpointer_t               user_data);
 XPL_AVAILABLE_IN_2_34
-GBytes  *g_input_stream_read_bytes_finish (xinput_stream_t          *stream,
+xbytes_t  *xinput_stream_read_bytes_finish (xinput_stream_t          *stream,
 					   xasync_result_t          *result,
 					   xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-void     g_input_stream_skip_async    (xinput_stream_t          *stream,
+void     xinput_stream_skip_async    (xinput_stream_t          *stream,
 				       xsize_t                  count,
 				       int                    io_priority,
 				       xcancellable_t          *cancellable,
 				       xasync_ready_callback_t    callback,
 				       xpointer_t               user_data);
 XPL_AVAILABLE_IN_ALL
-gssize   g_input_stream_skip_finish   (xinput_stream_t          *stream,
+xssize_t   xinput_stream_skip_finish   (xinput_stream_t          *stream,
 				       xasync_result_t          *result,
 				       xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-void     g_input_stream_close_async   (xinput_stream_t          *stream,
+void     xinput_stream_close_async   (xinput_stream_t          *stream,
 				       int                    io_priority,
 				       xcancellable_t          *cancellable,
 				       xasync_ready_callback_t    callback,
 				       xpointer_t               user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_input_stream_close_finish  (xinput_stream_t          *stream,
+xboolean_t xinput_stream_close_finish  (xinput_stream_t          *stream,
 				       xasync_result_t          *result,
 				       xerror_t               **error);
 
 /* For implementations: */
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_input_stream_is_closed     (xinput_stream_t          *stream);
+xboolean_t xinput_stream_is_closed     (xinput_stream_t          *stream);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_input_stream_has_pending   (xinput_stream_t          *stream);
+xboolean_t xinput_stream_has_pending   (xinput_stream_t          *stream);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_input_stream_set_pending   (xinput_stream_t          *stream,
+xboolean_t xinput_stream_set_pending   (xinput_stream_t          *stream,
 				       xerror_t               **error);
 XPL_AVAILABLE_IN_ALL
-void     g_input_stream_clear_pending (xinput_stream_t          *stream);
+void     xinput_stream_clear_pending (xinput_stream_t          *stream);
 
 G_END_DECLS
 

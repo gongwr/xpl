@@ -37,14 +37,14 @@
 static int global_array[10000];
 
 static void
-fill_hash_table_and_array (GHashTable *hash_table)
+fill_hash_table_and_array (xhashtable_t *hash_table)
 {
   int i;
 
   for (i = 0; i < 10000; i++)
     {
       global_array[i] = i;
-      g_hash_table_insert (hash_table, &global_array[i], &global_array[i]);
+      xhash_table_insert (hash_table, &global_array[i], &global_array[i]);
     }
 }
 
@@ -114,14 +114,14 @@ my_hash_callback (xpointer_t key,
 }
 
 static xuint_t
-my_hash (gconstpointer key)
+my_hash (xconstpointer key)
 {
   return (xuint_t) *((const xint_t*) key);
 }
 
 static xboolean_t
-my_hash_equal (gconstpointer a,
-               gconstpointer b)
+my_hash_equal (xconstpointer a,
+               xconstpointer b)
 {
   return *((const xint_t*) a) == *((const xint_t*) b);
 }
@@ -178,7 +178,7 @@ static void crcinit(void)
  - hash - Honeyman's nice hashing function
  */
 static xuint_t
-honeyman_hash (gconstpointer key)
+honeyman_hash (xconstpointer key)
 {
   const xchar_t *name = (const xchar_t *) key;
   xsize_t size;
@@ -197,7 +197,7 @@ honeyman_hash (gconstpointer key)
 
 
 static xboolean_t
-second_hash_cmp (gconstpointer a, gconstpointer b)
+second_hash_cmp (xconstpointer a, xconstpointer b)
 {
   return strcmp (a, b) == 0;
 }
@@ -205,7 +205,7 @@ second_hash_cmp (gconstpointer a, gconstpointer b)
 
 
 static xuint_t
-one_hash (gconstpointer key)
+one_hash (xconstpointer key)
 {
   return 1;
 }
@@ -262,18 +262,18 @@ remove_even_foreach (xpointer_t key,
 
 
 static void
-second_hash_test (gconstpointer d)
+second_hash_test (xconstpointer d)
 {
   xboolean_t simple_hash = GPOINTER_TO_INT (d);
 
   int       i;
   char      key[20] = "", val[20]="", *v, *orig_key, *orig_val;
-  GHashTable     *h;
+  xhashtable_t     *h;
   xboolean_t found;
 
   crcinit ();
 
-  h = g_hash_table_new_full (simple_hash ? one_hash : honeyman_hash,
+  h = xhash_table_new_full (simple_hash ? one_hash : honeyman_hash,
                              second_hash_cmp,
                              g_free, g_free);
   g_assert (h != NULL);
@@ -285,17 +285,17 @@ second_hash_test (gconstpointer d)
       sprintf (val, "%d value", i);
       g_assert (atoi (val) == i);
 
-      g_hash_table_insert (h, g_strdup (key), g_strdup (val));
+      xhash_table_insert (h, xstrdup (key), xstrdup (val));
     }
 
-  g_assert (g_hash_table_size (h) == 20);
+  g_assert (xhash_table_size (h) == 20);
 
   for (i = 0; i < 20; i++)
     {
       sprintf (key, "%d", i);
       g_assert (atoi(key) == i);
 
-      v = (char *) g_hash_table_lookup (h, key);
+      v = (char *) xhash_table_lookup (h, key);
 
       g_assert (v != NULL);
       g_assert (*v != 0);
@@ -303,11 +303,11 @@ second_hash_test (gconstpointer d)
     }
 
   sprintf (key, "%d", 3);
-  g_hash_table_remove (h, key);
-  g_assert (g_hash_table_size (h) == 19);
-  g_hash_table_foreach_remove (h, remove_even_foreach, NULL);
-  g_assert (g_hash_table_size (h) == 9);
-  g_hash_table_foreach (h, not_even_foreach, NULL);
+  xhash_table_remove (h, key);
+  g_assert (xhash_table_size (h) == 19);
+  xhash_table_foreach_remove (h, remove_even_foreach, NULL);
+  g_assert (xhash_table_size (h) == 9);
+  xhash_table_foreach (h, not_even_foreach, NULL);
 
   for (i = 0; i < 20; i++)
     {
@@ -318,7 +318,7 @@ second_hash_test (gconstpointer d)
       g_assert (atoi (val) == i);
 
       orig_key = orig_val = NULL;
-      found = g_hash_table_lookup_extended (h, key,
+      found = xhash_table_lookup_extended (h, key,
                                             (xpointer_t)&orig_key,
                                             (xpointer_t)&orig_val);
       if ((i % 2) == 0 || i == 3)
@@ -336,7 +336,7 @@ second_hash_test (gconstpointer d)
       g_assert (strcmp (val, orig_val) == 0);
     }
 
-  g_hash_table_destroy (h);
+  xhash_table_destroy (h);
 }
 
 static xboolean_t
@@ -353,181 +353,181 @@ static void
 direct_hash_test (void)
 {
   xint_t       i, rc;
-  GHashTable     *h;
+  xhashtable_t     *h;
 
-  h = g_hash_table_new (NULL, NULL);
+  h = xhash_table_new (NULL, NULL);
   g_assert (h != NULL);
   for (i = 1; i <= 20; i++)
-    g_hash_table_insert (h, GINT_TO_POINTER (i),
+    xhash_table_insert (h, GINT_TO_POINTER (i),
                          GINT_TO_POINTER (i + 42));
 
-  g_assert (g_hash_table_size (h) == 20);
+  g_assert (xhash_table_size (h) == 20);
 
   for (i = 1; i <= 20; i++)
     {
-      rc = GPOINTER_TO_INT (g_hash_table_lookup (h, GINT_TO_POINTER (i)));
+      rc = GPOINTER_TO_INT (xhash_table_lookup (h, GINT_TO_POINTER (i)));
 
       g_assert (rc != 0);
       g_assert ((rc - 42) == i);
     }
 
-  g_hash_table_destroy (h);
+  xhash_table_destroy (h);
 }
 
 static void
 direct_hash_test2 (void)
 {
   xint_t       i, rc;
-  GHashTable     *h;
+  xhashtable_t     *h;
 
-  h = g_hash_table_new (g_direct_hash, g_direct_equal);
+  h = xhash_table_new (g_direct_hash, g_direct_equal);
   g_assert (h != NULL);
   for (i = 1; i <= 20; i++)
-    g_hash_table_insert (h, GINT_TO_POINTER (i),
+    xhash_table_insert (h, GINT_TO_POINTER (i),
                          GINT_TO_POINTER (i + 42));
 
-  g_assert (g_hash_table_size (h) == 20);
+  g_assert (xhash_table_size (h) == 20);
 
   for (i = 1; i <= 20; i++)
     {
-      rc = GPOINTER_TO_INT (g_hash_table_lookup (h, GINT_TO_POINTER (i)));
+      rc = GPOINTER_TO_INT (xhash_table_lookup (h, GINT_TO_POINTER (i)));
 
       g_assert (rc != 0);
       g_assert ((rc - 42) == i);
     }
 
-  g_hash_table_destroy (h);
+  xhash_table_destroy (h);
 }
 
 static void
 int_hash_test (void)
 {
   xint_t       i, rc;
-  GHashTable     *h;
+  xhashtable_t     *h;
   xint_t     values[20];
   xint_t key;
 
-  h = g_hash_table_new (g_int_hash, g_int_equal);
+  h = xhash_table_new (g_int_hash, g_int_equal);
   g_assert (h != NULL);
   for (i = 0; i < 20; i++)
     {
       values[i] = i + 42;
-      g_hash_table_insert (h, &values[i], GINT_TO_POINTER (i + 42));
+      xhash_table_insert (h, &values[i], GINT_TO_POINTER (i + 42));
     }
 
-  g_assert (g_hash_table_size (h) == 20);
+  g_assert (xhash_table_size (h) == 20);
 
   for (i = 0; i < 20; i++)
     {
       key = i + 42;
-      rc = GPOINTER_TO_INT (g_hash_table_lookup (h, &key));
+      rc = GPOINTER_TO_INT (xhash_table_lookup (h, &key));
 
       g_assert_cmpint (rc, ==, i + 42);
     }
 
-  g_hash_table_destroy (h);
+  xhash_table_destroy (h);
 }
 
 static void
 int64_hash_test (void)
 {
   xint_t       i, rc;
-  GHashTable     *h;
+  xhashtable_t     *h;
   gint64     values[20];
   gint64 key;
 
-  h = g_hash_table_new (g_int64_hash, g_int64_equal);
+  h = xhash_table_new (g_int64_hash, g_int64_equal);
   g_assert (h != NULL);
   for (i = 0; i < 20; i++)
     {
       values[i] = i + 42;
-      g_hash_table_insert (h, &values[i], GINT_TO_POINTER (i + 42));
+      xhash_table_insert (h, &values[i], GINT_TO_POINTER (i + 42));
     }
 
-  g_assert (g_hash_table_size (h) == 20);
+  g_assert (xhash_table_size (h) == 20);
 
   for (i = 0; i < 20; i++)
     {
       key = i + 42;
-      rc = GPOINTER_TO_INT (g_hash_table_lookup (h, &key));
+      rc = GPOINTER_TO_INT (xhash_table_lookup (h, &key));
 
       g_assert_cmpint (rc, ==, i + 42);
     }
 
-  g_hash_table_destroy (h);
+  xhash_table_destroy (h);
 }
 
 static void
 double_hash_test (void)
 {
   xint_t       i, rc;
-  GHashTable     *h;
+  xhashtable_t     *h;
   xdouble_t values[20];
   xdouble_t key;
 
-  h = g_hash_table_new (g_double_hash, g_double_equal);
+  h = xhash_table_new (g_double_hash, g_double_equal);
   g_assert (h != NULL);
   for (i = 0; i < 20; i++)
     {
       values[i] = i + 42.5;
-      g_hash_table_insert (h, &values[i], GINT_TO_POINTER (i + 42));
+      xhash_table_insert (h, &values[i], GINT_TO_POINTER (i + 42));
     }
 
-  g_assert (g_hash_table_size (h) == 20);
+  g_assert (xhash_table_size (h) == 20);
 
   for (i = 0; i < 20; i++)
     {
       key = i + 42.5;
-      rc = GPOINTER_TO_INT (g_hash_table_lookup (h, &key));
+      rc = GPOINTER_TO_INT (xhash_table_lookup (h, &key));
 
       g_assert_cmpint (rc, ==, i + 42);
     }
 
-  g_hash_table_destroy (h);
+  xhash_table_destroy (h);
 }
 
 static void
 string_free (xpointer_t data)
 {
-  GString *s = data;
+  xstring_t *s = data;
 
-  g_string_free (s, TRUE);
+  xstring_free (s, TRUE);
 }
 
 static void
 string_hash_test (void)
 {
   xint_t       i, rc;
-  GHashTable     *h;
-  GString *s;
+  xhashtable_t     *h;
+  xstring_t *s;
 
-  h = g_hash_table_new_full ((GHashFunc)g_string_hash, (GEqualFunc)g_string_equal, string_free, NULL);
+  h = xhash_table_new_full ((GHashFunc)xstring_hash, (GEqualFunc)xstring_equal, string_free, NULL);
   g_assert (h != NULL);
   for (i = 0; i < 20; i++)
     {
-      s = g_string_new ("");
-      g_string_append_printf (s, "%d", i + 42);
-      g_string_append_c (s, '.');
-      g_string_prepend_unichar (s, 0x2301);
-      g_hash_table_insert (h, s, GINT_TO_POINTER (i + 42));
+      s = xstring_new ("");
+      xstring_append_printf (s, "%d", i + 42);
+      xstring_append_c (s, '.');
+      xstring_prepend_unichar (s, 0x2301);
+      xhash_table_insert (h, s, GINT_TO_POINTER (i + 42));
     }
 
-  g_assert (g_hash_table_size (h) == 20);
+  g_assert (xhash_table_size (h) == 20);
 
-  s = g_string_new ("");
+  s = xstring_new ("");
   for (i = 0; i < 20; i++)
     {
-      g_string_assign (s, "");
-      g_string_append_printf (s, "%d", i + 42);
-      g_string_append_c (s, '.');
-      g_string_prepend_unichar (s, 0x2301);
-      rc = GPOINTER_TO_INT (g_hash_table_lookup (h, s));
+      xstring_assign (s, "");
+      xstring_append_printf (s, "%d", i + 42);
+      xstring_append_c (s, '.');
+      xstring_prepend_unichar (s, 0x2301);
+      rc = GPOINTER_TO_INT (xhash_table_lookup (h, s));
 
       g_assert_cmpint (rc, ==, i + 42);
     }
 
-  g_string_free (s, TRUE);
-  g_hash_table_destroy (h);
+  xstring_free (s, TRUE);
+  xhash_table_destroy (h);
 }
 
 static void
@@ -547,130 +547,130 @@ set_check (xpointer_t key,
 static void
 set_hash_test (void)
 {
-  GHashTable *hash_table =
-    g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+  xhashtable_t *hash_table =
+    xhash_table_new_full (xstr_hash, xstr_equal, g_free, NULL);
   int i;
 
   for (i = 2; i < 5000; i += 7)
     {
-      char *s = g_strdup_printf ("%d", i);
-      g_assert (g_hash_table_add (hash_table, s));
+      char *s = xstrdup_printf ("%d", i);
+      g_assert (xhash_table_add (hash_table, s));
     }
 
-  g_assert (!g_hash_table_add (hash_table, g_strdup_printf ("%d", 2)));
+  g_assert (!xhash_table_add (hash_table, xstrdup_printf ("%d", 2)));
 
   i = 0;
-  g_hash_table_foreach (hash_table, set_check, &i);
-  g_assert_cmpint (i, ==, g_hash_table_size (hash_table));
+  xhash_table_foreach (hash_table, set_check, &i);
+  g_assert_cmpint (i, ==, xhash_table_size (hash_table));
 
-  g_assert (g_hash_table_contains (hash_table, "2"));
-  g_assert (g_hash_table_contains (hash_table, "9"));
-  g_assert (!g_hash_table_contains (hash_table, "a"));
+  g_assert (xhash_table_contains (hash_table, "2"));
+  g_assert (xhash_table_contains (hash_table, "9"));
+  g_assert (!xhash_table_contains (hash_table, "a"));
 
   /* this will cause the hash table to loose set nature */
-  g_assert (g_hash_table_insert (hash_table, g_strdup ("a"), "b"));
-  g_assert (!g_hash_table_insert (hash_table, g_strdup ("a"), "b"));
+  g_assert (xhash_table_insert (hash_table, xstrdup ("a"), "b"));
+  g_assert (!xhash_table_insert (hash_table, xstrdup ("a"), "b"));
 
-  g_assert (g_hash_table_replace (hash_table, g_strdup ("c"), "d"));
-  g_assert (!g_hash_table_replace (hash_table, g_strdup ("c"), "d"));
+  g_assert (xhash_table_replace (hash_table, xstrdup ("c"), "d"));
+  g_assert (!xhash_table_replace (hash_table, xstrdup ("c"), "d"));
 
-  g_assert_cmpstr (g_hash_table_lookup (hash_table, "2"), ==, "2");
-  g_assert_cmpstr (g_hash_table_lookup (hash_table, "a"), ==, "b");
+  g_assert_cmpstr (xhash_table_lookup (hash_table, "2"), ==, "2");
+  g_assert_cmpstr (xhash_table_lookup (hash_table, "a"), ==, "b");
 
-  g_hash_table_destroy (hash_table);
+  xhash_table_destroy (hash_table);
 }
 
 
 static void
 test_hash_misc (void)
 {
-  GHashTable *hash_table;
+  xhashtable_t *hash_table;
   xint_t i;
   xint_t value = 120;
   xint_t *pvalue;
   xlist_t *keys, *values;
   xsize_t keys_len, values_len;
-  GHashTableIter iter;
+  xhash_table_iter_t iter;
   xpointer_t ikey, ivalue;
   int result_array[10000];
   int n_array[1];
 
-  hash_table = g_hash_table_new (my_hash, my_hash_equal);
+  hash_table = xhash_table_new (my_hash, my_hash_equal);
   fill_hash_table_and_array (hash_table);
-  pvalue = g_hash_table_find (hash_table, find_first, &value);
+  pvalue = xhash_table_find (hash_table, find_first, &value);
   if (!pvalue || *pvalue != value)
     g_assert_not_reached();
 
-  keys = g_hash_table_get_keys (hash_table);
+  keys = xhash_table_get_keys (hash_table);
   if (!keys)
     g_assert_not_reached ();
 
-  values = g_hash_table_get_values (hash_table);
+  values = xhash_table_get_values (hash_table);
   if (!values)
     g_assert_not_reached ();
 
-  keys_len = g_list_length (keys);
-  values_len = g_list_length (values);
-  if (values_len != keys_len &&  keys_len != g_hash_table_size (hash_table))
+  keys_len = xlist_length (keys);
+  values_len = xlist_length (values);
+  if (values_len != keys_len &&  keys_len != xhash_table_size (hash_table))
     g_assert_not_reached ();
 
-  g_list_free (keys);
-  g_list_free (values);
+  xlist_free (keys);
+  xlist_free (values);
 
   init_result_array (result_array);
-  g_hash_table_iter_init (&iter, hash_table);
+  xhash_table_iter_init (&iter, hash_table);
   for (i = 0; i < 10000; i++)
     {
-      g_assert (g_hash_table_iter_next (&iter, &ikey, &ivalue));
+      g_assert (xhash_table_iter_next (&iter, &ikey, &ivalue));
 
       handle_pair (ikey, ivalue, result_array);
 
       if (i % 2)
-        g_hash_table_iter_remove (&iter);
+        xhash_table_iter_remove (&iter);
     }
-  g_assert (! g_hash_table_iter_next (&iter, &ikey, &ivalue));
-  g_assert (g_hash_table_size (hash_table) == 5000);
+  g_assert (! xhash_table_iter_next (&iter, &ikey, &ivalue));
+  g_assert (xhash_table_size (hash_table) == 5000);
   verify_result_array (result_array);
 
   fill_hash_table_and_array (hash_table);
 
   init_result_array (result_array);
-  g_hash_table_foreach (hash_table, my_hash_callback, result_array);
+  xhash_table_foreach (hash_table, my_hash_callback, result_array);
   verify_result_array (result_array);
 
   for (i = 0; i < 10000; i++)
-    g_hash_table_remove (hash_table, &global_array[i]);
+    xhash_table_remove (hash_table, &global_array[i]);
 
   fill_hash_table_and_array (hash_table);
 
-  if (g_hash_table_foreach_remove (hash_table, my_hash_callback_remove, NULL) != 5000 ||
-      g_hash_table_size (hash_table) != 5000)
+  if (xhash_table_foreach_remove (hash_table, my_hash_callback_remove, NULL) != 5000 ||
+      xhash_table_size (hash_table) != 5000)
     g_assert_not_reached();
 
-  g_hash_table_foreach (hash_table, my_hash_callback_remove_test, NULL);
-  g_hash_table_destroy (hash_table);
+  xhash_table_foreach (hash_table, my_hash_callback_remove_test, NULL);
+  xhash_table_destroy (hash_table);
 
-  hash_table = g_hash_table_new (my_hash, my_hash_equal);
+  hash_table = xhash_table_new (my_hash, my_hash_equal);
   fill_hash_table_and_array (hash_table);
 
   n_array[0] = 1;
 
-  g_hash_table_iter_init (&iter, hash_table);
+  xhash_table_iter_init (&iter, hash_table);
   for (i = 0; i < 10000; i++)
     {
-      g_assert (g_hash_table_iter_next (&iter, &ikey, &ivalue));
-      g_hash_table_iter_replace (&iter, &n_array[0]);
+      g_assert (xhash_table_iter_next (&iter, &ikey, &ivalue));
+      xhash_table_iter_replace (&iter, &n_array[0]);
     }
 
-  g_hash_table_iter_init (&iter, hash_table);
+  xhash_table_iter_init (&iter, hash_table);
   for (i = 0; i < 10000; i++)
     {
-      g_assert (g_hash_table_iter_next (&iter, &ikey, &ivalue));
+      g_assert (xhash_table_iter_next (&iter, &ikey, &ivalue));
 
       g_assert (ivalue == &n_array[0]);
     }
 
-  g_hash_table_destroy (hash_table);
+  xhash_table_destroy (hash_table);
 }
 
 static xint_t destroy_counter;
@@ -684,29 +684,29 @@ value_destroy (xpointer_t value)
 static void
 test_hash_ref (void)
 {
-  GHashTable *h;
-  GHashTableIter iter;
+  xhashtable_t *h;
+  xhash_table_iter_t iter;
   xchar_t *key, *value;
   xboolean_t abc_seen = FALSE;
   xboolean_t cde_seen = FALSE;
   xboolean_t xyz_seen = FALSE;
 
-  h = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, value_destroy);
-  g_hash_table_insert (h, "abc", "ABC");
-  g_hash_table_insert (h, "cde", "CDE");
-  g_hash_table_insert (h, "xyz", "XYZ");
+  h = xhash_table_new_full (xstr_hash, xstr_equal, NULL, value_destroy);
+  xhash_table_insert (h, "abc", "ABC");
+  xhash_table_insert (h, "cde", "CDE");
+  xhash_table_insert (h, "xyz", "XYZ");
 
-  g_assert_cmpint (g_hash_table_size (h), == , 3);
+  g_assert_cmpint (xhash_table_size (h), == , 3);
 
-  g_hash_table_iter_init (&iter, h);
+  xhash_table_iter_init (&iter, h);
 
-  while (g_hash_table_iter_next (&iter, (xpointer_t*)&key, (xpointer_t*)&value))
+  while (xhash_table_iter_next (&iter, (xpointer_t*)&key, (xpointer_t*)&value))
     {
       if (strcmp (key, "abc") == 0)
         {
           g_assert_cmpstr (value, ==, "ABC");
           abc_seen = TRUE;
-          g_hash_table_iter_steal (&iter);
+          xhash_table_iter_steal (&iter);
         }
       else if (strcmp (key, "cde") == 0)
         {
@@ -721,57 +721,57 @@ test_hash_ref (void)
     }
   g_assert_cmpint (destroy_counter, ==, 0);
 
-  g_assert (g_hash_table_iter_get_hash_table (&iter) == h);
+  g_assert (xhash_table_iter_get_hash_table (&iter) == h);
   g_assert (abc_seen && cde_seen && xyz_seen);
-  g_assert_cmpint (g_hash_table_size (h), == , 2);
+  g_assert_cmpint (xhash_table_size (h), == , 2);
 
-  g_hash_table_ref (h);
-  g_hash_table_destroy (h);
-  g_assert_cmpint (g_hash_table_size (h), == , 0);
+  xhash_table_ref (h);
+  xhash_table_destroy (h);
+  g_assert_cmpint (xhash_table_size (h), == , 0);
   g_assert_cmpint (destroy_counter, ==, 2);
-  g_hash_table_insert (h, "uvw", "UVW");
-  g_hash_table_unref (h);
+  xhash_table_insert (h, "uvw", "UVW");
+  xhash_table_unref (h);
   g_assert_cmpint (destroy_counter, ==, 3);
 }
 
 static xuint_t
-null_safe_str_hash (gconstpointer key)
+null_safe_str_hash (xconstpointer key)
 {
   if (key == NULL)
     return 0;
   else
-    return g_str_hash (key);
+    return xstr_hash (key);
 }
 
 static xboolean_t
-null_safe_str_equal (gconstpointer a, gconstpointer b)
+null_safe_str_equal (xconstpointer a, xconstpointer b)
 {
-  return g_strcmp0 (a, b) == 0;
+  return xstrcmp0 (a, b) == 0;
 }
 
 static void
 test_lookup_null_key (void)
 {
-  GHashTable *h;
+  xhashtable_t *h;
   xboolean_t res;
   xpointer_t key;
   xpointer_t value;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=642944");
 
-  h = g_hash_table_new (null_safe_str_hash, null_safe_str_equal);
-  g_hash_table_insert (h, "abc", "ABC");
+  h = xhash_table_new (null_safe_str_hash, null_safe_str_equal);
+  xhash_table_insert (h, "abc", "ABC");
 
-  res = g_hash_table_lookup_extended (h, NULL, &key, &value);
+  res = xhash_table_lookup_extended (h, NULL, &key, &value);
   g_assert (!res);
 
-  g_hash_table_insert (h, NULL, "NULL");
+  xhash_table_insert (h, NULL, "NULL");
 
-  res = g_hash_table_lookup_extended (h, NULL, &key, &value);
+  res = xhash_table_lookup_extended (h, NULL, &key, &value);
   g_assert (res);
   g_assert_cmpstr (value, ==, "NULL");
 
-  g_hash_table_unref (h);
+  xhash_table_unref (h);
 }
 
 static xint_t destroy_key_counter;
@@ -785,89 +785,89 @@ key_destroy (xpointer_t key)
 static void
 test_remove_all (void)
 {
-  GHashTable *h;
+  xhashtable_t *h;
   xboolean_t res;
 
-  h = g_hash_table_new_full (g_str_hash, g_str_equal, key_destroy, value_destroy);
+  h = xhash_table_new_full (xstr_hash, xstr_equal, key_destroy, value_destroy);
 
-  g_hash_table_insert (h, "abc", "cde");
-  g_hash_table_insert (h, "cde", "xyz");
-  g_hash_table_insert (h, "xyz", "abc");
+  xhash_table_insert (h, "abc", "cde");
+  xhash_table_insert (h, "cde", "xyz");
+  xhash_table_insert (h, "xyz", "abc");
 
   destroy_counter = 0;
   destroy_key_counter = 0;
 
-  g_hash_table_steal_all (h);
+  xhash_table_steal_all (h);
   g_assert_cmpint (destroy_counter, ==, 0);
   g_assert_cmpint (destroy_key_counter, ==, 0);
 
   /* Test stealing on an empty hash table. */
-  g_hash_table_steal_all (h);
+  xhash_table_steal_all (h);
   g_assert_cmpint (destroy_counter, ==, 0);
   g_assert_cmpint (destroy_key_counter, ==, 0);
 
-  g_hash_table_insert (h, "abc", "ABC");
-  g_hash_table_insert (h, "cde", "CDE");
-  g_hash_table_insert (h, "xyz", "XYZ");
+  xhash_table_insert (h, "abc", "ABC");
+  xhash_table_insert (h, "cde", "CDE");
+  xhash_table_insert (h, "xyz", "XYZ");
 
-  res = g_hash_table_steal (h, "nosuchkey");
+  res = xhash_table_steal (h, "nosuchkey");
   g_assert (!res);
   g_assert_cmpint (destroy_counter, ==, 0);
   g_assert_cmpint (destroy_key_counter, ==, 0);
 
-  res = g_hash_table_steal (h, "xyz");
+  res = xhash_table_steal (h, "xyz");
   g_assert (res);
   g_assert_cmpint (destroy_counter, ==, 0);
   g_assert_cmpint (destroy_key_counter, ==, 0);
 
-  g_hash_table_remove_all (h);
+  xhash_table_remove_all (h);
   g_assert_cmpint (destroy_counter, ==, 2);
   g_assert_cmpint (destroy_key_counter, ==, 2);
 
-  g_hash_table_remove_all (h);
+  xhash_table_remove_all (h);
   g_assert_cmpint (destroy_counter, ==, 2);
   g_assert_cmpint (destroy_key_counter, ==, 2);
 
-  g_hash_table_unref (h);
+  xhash_table_unref (h);
 }
 
-GHashTable *recursive_destruction_table = NULL;
+xhashtable_t *recursive_destruction_table = NULL;
 static void
 recursive_value_destroy (xpointer_t value)
 {
   destroy_counter++;
 
   if (recursive_destruction_table)
-    g_hash_table_remove (recursive_destruction_table, value);
+    xhash_table_remove (recursive_destruction_table, value);
 }
 
 static void
 test_recursive_remove_all_subprocess (void)
 {
-  GHashTable *h;
+  xhashtable_t *h;
 
-  h = g_hash_table_new_full (g_str_hash, g_str_equal, key_destroy, recursive_value_destroy);
+  h = xhash_table_new_full (xstr_hash, xstr_equal, key_destroy, recursive_value_destroy);
   recursive_destruction_table = h;
 
   /* Add more items compared to test_remove_all, as it would not fail otherwise. */
-  g_hash_table_insert (h, "abc", "cde");
-  g_hash_table_insert (h, "cde", "fgh");
-  g_hash_table_insert (h, "fgh", "ijk");
-  g_hash_table_insert (h, "ijk", "lmn");
-  g_hash_table_insert (h, "lmn", "opq");
-  g_hash_table_insert (h, "opq", "rst");
-  g_hash_table_insert (h, "rst", "uvw");
-  g_hash_table_insert (h, "uvw", "xyz");
-  g_hash_table_insert (h, "xyz", "abc");
+  xhash_table_insert (h, "abc", "cde");
+  xhash_table_insert (h, "cde", "fgh");
+  xhash_table_insert (h, "fgh", "ijk");
+  xhash_table_insert (h, "ijk", "lmn");
+  xhash_table_insert (h, "lmn", "opq");
+  xhash_table_insert (h, "opq", "rst");
+  xhash_table_insert (h, "rst", "uvw");
+  xhash_table_insert (h, "uvw", "xyz");
+  xhash_table_insert (h, "xyz", "abc");
 
   destroy_counter = 0;
   destroy_key_counter = 0;
 
-  g_hash_table_remove_all (h);
+  xhash_table_remove_all (h);
   g_assert_cmpint (destroy_counter, ==, 9);
   g_assert_cmpint (destroy_key_counter, ==, 9);
 
-  g_hash_table_unref (h);
+  xhash_table_unref (h);
 }
 
 static void
@@ -883,20 +883,20 @@ typedef struct {
 } RefCountedKey;
 
 static xuint_t
-hash_func (gconstpointer key)
+hash_func (xconstpointer key)
 {
   const RefCountedKey *rkey = key;
 
-  return g_str_hash (rkey->key);
+  return xstr_hash (rkey->key);
 }
 
 static xboolean_t
-eq_func (gconstpointer a, gconstpointer b)
+eq_func (xconstpointer a, xconstpointer b)
 {
   const RefCountedKey *aa = a;
   const RefCountedKey *bb = b;
 
-  return g_strcmp0 (aa->key, bb->key) == 0;
+  return xstrcmp0 (aa->key, bb->key) == 0;
 }
 
 static void
@@ -936,11 +936,11 @@ key_new (const xchar_t *key)
 static void
 set_ref_hash_test (void)
 {
-  GHashTable *h;
+  xhashtable_t *h;
   RefCountedKey *key1;
   RefCountedKey *key2;
 
-  h = g_hash_table_new_full (hash_func, eq_func, key_unref, key_unref);
+  h = xhash_table_new_full (hash_func, eq_func, key_unref, key_unref);
 
   key1 = key_new ("a");
   key2 = key_new ("a");
@@ -948,35 +948,35 @@ set_ref_hash_test (void)
   g_assert_cmpint (key1->ref_count, ==, 1);
   g_assert_cmpint (key2->ref_count, ==, 1);
 
-  g_hash_table_insert (h, key_ref (key1), key_ref (key1));
+  xhash_table_insert (h, key_ref (key1), key_ref (key1));
 
   g_assert_cmpint (key1->ref_count, ==, 3);
   g_assert_cmpint (key2->ref_count, ==, 1);
 
-  g_hash_table_replace (h, key_ref (key2), key_ref (key2));
+  xhash_table_replace (h, key_ref (key2), key_ref (key2));
 
   g_assert_cmpint (key1->ref_count, ==, 1);
   g_assert_cmpint (key2->ref_count, ==, 3);
 
-  g_hash_table_remove (h, key1);
+  xhash_table_remove (h, key1);
 
   g_assert_cmpint (key1->ref_count, ==, 1);
   g_assert_cmpint (key2->ref_count, ==, 1);
 
-  g_hash_table_unref (h);
+  xhash_table_unref (h);
 
   key_unref (key1);
   key_unref (key2);
 }
 
-static GHashTable *global_hashtable;
+static xhashtable_t *global_hashtable;
 
 typedef struct {
     xchar_t *string;
     xboolean_t freed;
 } FakeFreeData;
 
-static GPtrArray *fake_free_data;
+static xptr_array_t *fake_free_data;
 
 static void
 fake_free (xpointer_t dead)
@@ -985,7 +985,7 @@ fake_free (xpointer_t dead)
 
   for (i = 0; i < fake_free_data->len; i++)
     {
-      FakeFreeData *ffd = g_ptr_array_index (fake_free_data, i);
+      FakeFreeData *ffd = xptr_array_index (fake_free_data, i);
 
       if (ffd->string == (xchar_t *) dead)
         {
@@ -1001,7 +1001,7 @@ fake_free (xpointer_t dead)
 static void
 value_destroy_insert (xpointer_t value)
 {
-  g_hash_table_remove_all (global_hashtable);
+  xhash_table_remove_all (global_hashtable);
 }
 
 static void
@@ -1012,103 +1012,103 @@ test_destroy_modify (void)
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=650459");
 
-  fake_free_data = g_ptr_array_new ();
+  fake_free_data = xptr_array_new ();
 
-  global_hashtable = g_hash_table_new_full (g_str_hash, g_str_equal, fake_free, value_destroy_insert);
-
-  ffd = g_new0 (FakeFreeData, 1);
-  ffd->string = g_strdup ("a");
-  g_ptr_array_add (fake_free_data, ffd);
-  g_hash_table_insert (global_hashtable, ffd->string, "b");
+  global_hashtable = xhash_table_new_full (xstr_hash, xstr_equal, fake_free, value_destroy_insert);
 
   ffd = g_new0 (FakeFreeData, 1);
-  ffd->string = g_strdup ("c");
-  g_ptr_array_add (fake_free_data, ffd);
-  g_hash_table_insert (global_hashtable, ffd->string, "d");
+  ffd->string = xstrdup ("a");
+  xptr_array_add (fake_free_data, ffd);
+  xhash_table_insert (global_hashtable, ffd->string, "b");
 
   ffd = g_new0 (FakeFreeData, 1);
-  ffd->string = g_strdup ("e");
-  g_ptr_array_add (fake_free_data, ffd);
-  g_hash_table_insert (global_hashtable, ffd->string, "f");
+  ffd->string = xstrdup ("c");
+  xptr_array_add (fake_free_data, ffd);
+  xhash_table_insert (global_hashtable, ffd->string, "d");
 
   ffd = g_new0 (FakeFreeData, 1);
-  ffd->string = g_strdup ("g");
-  g_ptr_array_add (fake_free_data, ffd);
-  g_hash_table_insert (global_hashtable, ffd->string, "h");
+  ffd->string = xstrdup ("e");
+  xptr_array_add (fake_free_data, ffd);
+  xhash_table_insert (global_hashtable, ffd->string, "f");
 
   ffd = g_new0 (FakeFreeData, 1);
-  ffd->string = g_strdup ("h");
-  g_ptr_array_add (fake_free_data, ffd);
-  g_hash_table_insert (global_hashtable, ffd->string, "k");
+  ffd->string = xstrdup ("g");
+  xptr_array_add (fake_free_data, ffd);
+  xhash_table_insert (global_hashtable, ffd->string, "h");
 
   ffd = g_new0 (FakeFreeData, 1);
-  ffd->string = g_strdup ("a");
-  g_ptr_array_add (fake_free_data, ffd);
-  g_hash_table_insert (global_hashtable, ffd->string, "c");
+  ffd->string = xstrdup ("h");
+  xptr_array_add (fake_free_data, ffd);
+  xhash_table_insert (global_hashtable, ffd->string, "k");
 
-  g_hash_table_remove (global_hashtable, "c");
+  ffd = g_new0 (FakeFreeData, 1);
+  ffd->string = xstrdup ("a");
+  xptr_array_add (fake_free_data, ffd);
+  xhash_table_insert (global_hashtable, ffd->string, "c");
+
+  xhash_table_remove (global_hashtable, "c");
 
   /* that removed everything... */
   for (i = 0; i < fake_free_data->len; i++)
     {
-      ffd = g_ptr_array_index (fake_free_data, i);
+      ffd = xptr_array_index (fake_free_data, i);
 
       g_assert (ffd->freed);
       g_free (ffd->string);
       g_free (ffd);
     }
 
-  g_ptr_array_unref (fake_free_data);
+  xptr_array_unref (fake_free_data);
 
   /* ... so this is a no-op */
-  g_hash_table_remove (global_hashtable, "e");
+  xhash_table_remove (global_hashtable, "e");
 
-  g_hash_table_unref (global_hashtable);
+  xhash_table_unref (global_hashtable);
 }
 
 static xboolean_t
 find_str (xpointer_t key, xpointer_t value, xpointer_t data)
 {
-  return g_str_equal (key, data);
+  return xstr_equal (key, data);
 }
 
 static void
 test_find (void)
 {
-  GHashTable *hash;
+  xhashtable_t *hash;
   const xchar_t *value;
 
-  hash = g_hash_table_new (g_str_hash, g_str_equal);
+  hash = xhash_table_new (xstr_hash, xstr_equal);
 
-  g_hash_table_insert (hash, "a", "A");
-  g_hash_table_insert (hash, "b", "B");
-  g_hash_table_insert (hash, "c", "C");
-  g_hash_table_insert (hash, "d", "D");
-  g_hash_table_insert (hash, "e", "E");
-  g_hash_table_insert (hash, "f", "F");
+  xhash_table_insert (hash, "a", "A");
+  xhash_table_insert (hash, "b", "B");
+  xhash_table_insert (hash, "c", "C");
+  xhash_table_insert (hash, "d", "D");
+  xhash_table_insert (hash, "e", "E");
+  xhash_table_insert (hash, "f", "F");
 
-  value = g_hash_table_find (hash, find_str, "a");
+  value = xhash_table_find (hash, find_str, "a");
   g_assert_cmpstr (value, ==, "A");
 
-  value = g_hash_table_find (hash, find_str, "b");
+  value = xhash_table_find (hash, find_str, "b");
   g_assert_cmpstr (value, ==, "B");
 
-  value = g_hash_table_find (hash, find_str, "c");
+  value = xhash_table_find (hash, find_str, "c");
   g_assert_cmpstr (value, ==, "C");
 
-  value = g_hash_table_find (hash, find_str, "d");
+  value = xhash_table_find (hash, find_str, "d");
   g_assert_cmpstr (value, ==, "D");
 
-  value = g_hash_table_find (hash, find_str, "e");
+  value = xhash_table_find (hash, find_str, "e");
   g_assert_cmpstr (value, ==, "E");
 
-  value = g_hash_table_find (hash, find_str, "f");
+  value = xhash_table_find (hash, find_str, "f");
   g_assert_cmpstr (value, ==, "F");
 
-  value = g_hash_table_find (hash, find_str, "0");
+  value = xhash_table_find (hash, find_str, "0");
   g_assert (value == NULL);
 
-  g_hash_table_unref (hash);
+  xhash_table_unref (hash);
 }
 
 xboolean_t seen_key[6];
@@ -1122,37 +1122,37 @@ foreach_func (xpointer_t key, xpointer_t value, xpointer_t data)
 static void
 test_foreach (void)
 {
-  GHashTable *hash;
+  xhashtable_t *hash;
   xint_t i;
 
-  hash = g_hash_table_new (g_str_hash, g_str_equal);
+  hash = xhash_table_new (xstr_hash, xstr_equal);
 
-  g_hash_table_insert (hash, "a", "A");
-  g_hash_table_insert (hash, "b", "B");
-  g_hash_table_insert (hash, "c", "C");
-  g_hash_table_insert (hash, "d", "D");
-  g_hash_table_insert (hash, "e", "E");
-  g_hash_table_insert (hash, "f", "F");
+  xhash_table_insert (hash, "a", "A");
+  xhash_table_insert (hash, "b", "B");
+  xhash_table_insert (hash, "c", "C");
+  xhash_table_insert (hash, "d", "D");
+  xhash_table_insert (hash, "e", "E");
+  xhash_table_insert (hash, "f", "F");
 
   for (i = 0; i < 6; i++)
     seen_key[i] = FALSE;
 
-  g_hash_table_foreach (hash, foreach_func, NULL);
+  xhash_table_foreach (hash, foreach_func, NULL);
 
   for (i = 0; i < 6; i++)
     g_assert (seen_key[i]);
 
-  g_hash_table_unref (hash);
+  xhash_table_unref (hash);
 }
 
 static xboolean_t
 foreach_steal_func (xpointer_t key, xpointer_t value, xpointer_t data)
 {
-  GHashTable *hash2 = data;
+  xhashtable_t *hash2 = data;
 
   if (strstr ("ace", (xchar_t*)key))
     {
-      g_hash_table_insert (hash2, key, value);
+      xhash_table_insert (hash2, key, value);
       return TRUE;
     }
 
@@ -1163,53 +1163,53 @@ foreach_steal_func (xpointer_t key, xpointer_t value, xpointer_t data)
 static void
 test_foreach_steal (void)
 {
-  GHashTable *hash;
-  GHashTable *hash2;
+  xhashtable_t *hash;
+  xhashtable_t *hash2;
 
-  hash = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
-  hash2 = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+  hash = xhash_table_new_full (xstr_hash, xstr_equal, g_free, g_free);
+  hash2 = xhash_table_new_full (xstr_hash, xstr_equal, g_free, g_free);
 
-  g_hash_table_insert (hash, g_strdup ("a"), g_strdup ("A"));
-  g_hash_table_insert (hash, g_strdup ("b"), g_strdup ("B"));
-  g_hash_table_insert (hash, g_strdup ("c"), g_strdup ("C"));
-  g_hash_table_insert (hash, g_strdup ("d"), g_strdup ("D"));
-  g_hash_table_insert (hash, g_strdup ("e"), g_strdup ("E"));
-  g_hash_table_insert (hash, g_strdup ("f"), g_strdup ("F"));
+  xhash_table_insert (hash, xstrdup ("a"), xstrdup ("A"));
+  xhash_table_insert (hash, xstrdup ("b"), xstrdup ("B"));
+  xhash_table_insert (hash, xstrdup ("c"), xstrdup ("C"));
+  xhash_table_insert (hash, xstrdup ("d"), xstrdup ("D"));
+  xhash_table_insert (hash, xstrdup ("e"), xstrdup ("E"));
+  xhash_table_insert (hash, xstrdup ("f"), xstrdup ("F"));
 
-  g_hash_table_foreach_steal (hash, foreach_steal_func, hash2);
+  xhash_table_foreach_steal (hash, foreach_steal_func, hash2);
 
-  g_assert_cmpint (g_hash_table_size (hash), ==, 3);
-  g_assert_cmpint (g_hash_table_size (hash2), ==, 3);
+  g_assert_cmpint (xhash_table_size (hash), ==, 3);
+  g_assert_cmpint (xhash_table_size (hash2), ==, 3);
 
-  g_assert_cmpstr (g_hash_table_lookup (hash2, "a"), ==, "A");
-  g_assert_cmpstr (g_hash_table_lookup (hash, "b"), ==, "B");
-  g_assert_cmpstr (g_hash_table_lookup (hash2, "c"), ==, "C");
-  g_assert_cmpstr (g_hash_table_lookup (hash, "d"), ==, "D");
-  g_assert_cmpstr (g_hash_table_lookup (hash2, "e"), ==, "E");
-  g_assert_cmpstr (g_hash_table_lookup (hash, "f"), ==, "F");
+  g_assert_cmpstr (xhash_table_lookup (hash2, "a"), ==, "A");
+  g_assert_cmpstr (xhash_table_lookup (hash, "b"), ==, "B");
+  g_assert_cmpstr (xhash_table_lookup (hash2, "c"), ==, "C");
+  g_assert_cmpstr (xhash_table_lookup (hash, "d"), ==, "D");
+  g_assert_cmpstr (xhash_table_lookup (hash2, "e"), ==, "E");
+  g_assert_cmpstr (xhash_table_lookup (hash, "f"), ==, "F");
 
-  g_hash_table_unref (hash);
-  g_hash_table_unref (hash2);
+  xhash_table_unref (hash);
+  xhash_table_unref (hash2);
 }
 
-/* Test g_hash_table_steal_extended() works properly with existing and
+/* Test xhash_table_steal_extended() works properly with existing and
  * non-existing keys. */
 static void
 test_steal_extended (void)
 {
-  GHashTable *hash;
+  xhashtable_t *hash;
   xchar_t *stolen_key = NULL, *stolen_value = NULL;
 
-  hash = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+  hash = xhash_table_new_full (xstr_hash, xstr_equal, g_free, g_free);
 
-  g_hash_table_insert (hash, g_strdup ("a"), g_strdup ("A"));
-  g_hash_table_insert (hash, g_strdup ("b"), g_strdup ("B"));
-  g_hash_table_insert (hash, g_strdup ("c"), g_strdup ("C"));
-  g_hash_table_insert (hash, g_strdup ("d"), g_strdup ("D"));
-  g_hash_table_insert (hash, g_strdup ("e"), g_strdup ("E"));
-  g_hash_table_insert (hash, g_strdup ("f"), g_strdup ("F"));
+  xhash_table_insert (hash, xstrdup ("a"), xstrdup ("A"));
+  xhash_table_insert (hash, xstrdup ("b"), xstrdup ("B"));
+  xhash_table_insert (hash, xstrdup ("c"), xstrdup ("C"));
+  xhash_table_insert (hash, xstrdup ("d"), xstrdup ("D"));
+  xhash_table_insert (hash, xstrdup ("e"), xstrdup ("E"));
+  xhash_table_insert (hash, xstrdup ("f"), xstrdup ("F"));
 
-  g_assert_true (g_hash_table_steal_extended (hash, "a",
+  g_assert_true (xhash_table_steal_extended (hash, "a",
                                               (xpointer_t *) &stolen_key,
                                               (xpointer_t *) &stolen_value));
   g_assert_cmpstr (stolen_key, ==, "a");
@@ -1217,130 +1217,130 @@ test_steal_extended (void)
   g_clear_pointer (&stolen_key, g_free);
   g_clear_pointer (&stolen_value, g_free);
 
-  g_assert_cmpuint (g_hash_table_size (hash), ==, 5);
+  g_assert_cmpuint (xhash_table_size (hash), ==, 5);
 
-  g_assert_false (g_hash_table_steal_extended (hash, "a",
+  g_assert_false (xhash_table_steal_extended (hash, "a",
                                                (xpointer_t *) &stolen_key,
                                                (xpointer_t *) &stolen_value));
   g_assert_null (stolen_key);
   g_assert_null (stolen_value);
 
-  g_assert_false (g_hash_table_steal_extended (hash, "never a key",
+  g_assert_false (xhash_table_steal_extended (hash, "never a key",
                                                (xpointer_t *) &stolen_key,
                                                (xpointer_t *) &stolen_value));
   g_assert_null (stolen_key);
   g_assert_null (stolen_value);
 
-  g_assert_cmpuint (g_hash_table_size (hash), ==, 5);
+  g_assert_cmpuint (xhash_table_size (hash), ==, 5);
 
-  g_hash_table_unref (hash);
+  xhash_table_unref (hash);
 }
 
-/* Test that passing %NULL to the optional g_hash_table_steal_extended()
+/* Test that passing %NULL to the optional xhash_table_steal_extended()
  * arguments works. */
 static void
 test_steal_extended_optional (void)
 {
-  GHashTable *hash;
+  xhashtable_t *hash;
   const xchar_t *stolen_key = NULL, *stolen_value = NULL;
 
-  hash = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, NULL);
+  hash = xhash_table_new_full (xstr_hash, xstr_equal, NULL, NULL);
 
-  g_hash_table_insert (hash, "b", "B");
-  g_hash_table_insert (hash, "c", "C");
-  g_hash_table_insert (hash, "d", "D");
-  g_hash_table_insert (hash, "e", "E");
-  g_hash_table_insert (hash, "f", "F");
+  xhash_table_insert (hash, "b", "B");
+  xhash_table_insert (hash, "c", "C");
+  xhash_table_insert (hash, "d", "D");
+  xhash_table_insert (hash, "e", "E");
+  xhash_table_insert (hash, "f", "F");
 
-  g_assert_true (g_hash_table_steal_extended (hash, "b",
+  g_assert_true (xhash_table_steal_extended (hash, "b",
                                               (xpointer_t *) &stolen_key,
                                               NULL));
   g_assert_cmpstr (stolen_key, ==, "b");
 
-  g_assert_cmpuint (g_hash_table_size (hash), ==, 4);
+  g_assert_cmpuint (xhash_table_size (hash), ==, 4);
 
-  g_assert_false (g_hash_table_steal_extended (hash, "b",
+  g_assert_false (xhash_table_steal_extended (hash, "b",
                                                (xpointer_t *) &stolen_key,
                                                NULL));
   g_assert_null (stolen_key);
 
-  g_assert_true (g_hash_table_steal_extended (hash, "c",
+  g_assert_true (xhash_table_steal_extended (hash, "c",
                                               NULL,
                                               (xpointer_t *) &stolen_value));
   g_assert_cmpstr (stolen_value, ==, "C");
 
-  g_assert_cmpuint (g_hash_table_size (hash), ==, 3);
+  g_assert_cmpuint (xhash_table_size (hash), ==, 3);
 
-  g_assert_false (g_hash_table_steal_extended (hash, "c",
+  g_assert_false (xhash_table_steal_extended (hash, "c",
                                                NULL,
                                                (xpointer_t *) &stolen_value));
   g_assert_null (stolen_value);
 
-  g_assert_true (g_hash_table_steal_extended (hash, "d", NULL, NULL));
+  g_assert_true (xhash_table_steal_extended (hash, "d", NULL, NULL));
 
-  g_assert_cmpuint (g_hash_table_size (hash), ==, 2);
+  g_assert_cmpuint (xhash_table_size (hash), ==, 2);
 
-  g_assert_false (g_hash_table_steal_extended (hash, "d", NULL, NULL));
+  g_assert_false (xhash_table_steal_extended (hash, "d", NULL, NULL));
 
-  g_assert_cmpuint (g_hash_table_size (hash), ==, 2);
+  g_assert_cmpuint (xhash_table_size (hash), ==, 2);
 
-  g_hash_table_unref (hash);
+  xhash_table_unref (hash);
 }
 
-/* Test g_hash_table_lookup_extended() works with its optional parameters
+/* Test xhash_table_lookup_extended() works with its optional parameters
  * sometimes set to %NULL. */
 static void
 test_lookup_extended (void)
 {
-  GHashTable *hash;
+  xhashtable_t *hash;
   const xchar_t *original_key = NULL, *value = NULL;
 
-  hash = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+  hash = xhash_table_new_full (xstr_hash, xstr_equal, g_free, g_free);
 
-  g_hash_table_insert (hash, g_strdup ("a"), g_strdup ("A"));
-  g_hash_table_insert (hash, g_strdup ("b"), g_strdup ("B"));
-  g_hash_table_insert (hash, g_strdup ("c"), g_strdup ("C"));
-  g_hash_table_insert (hash, g_strdup ("d"), g_strdup ("D"));
-  g_hash_table_insert (hash, g_strdup ("e"), g_strdup ("E"));
-  g_hash_table_insert (hash, g_strdup ("f"), g_strdup ("F"));
+  xhash_table_insert (hash, xstrdup ("a"), xstrdup ("A"));
+  xhash_table_insert (hash, xstrdup ("b"), xstrdup ("B"));
+  xhash_table_insert (hash, xstrdup ("c"), xstrdup ("C"));
+  xhash_table_insert (hash, xstrdup ("d"), xstrdup ("D"));
+  xhash_table_insert (hash, xstrdup ("e"), xstrdup ("E"));
+  xhash_table_insert (hash, xstrdup ("f"), xstrdup ("F"));
 
-  g_assert_true (g_hash_table_lookup_extended (hash, "a",
+  g_assert_true (xhash_table_lookup_extended (hash, "a",
                                                (xpointer_t *) &original_key,
                                                (xpointer_t *) &value));
   g_assert_cmpstr (original_key, ==, "a");
   g_assert_cmpstr (value, ==, "A");
 
-  g_assert_true (g_hash_table_lookup_extended (hash, "b",
+  g_assert_true (xhash_table_lookup_extended (hash, "b",
                                                NULL,
                                                (xpointer_t *) &value));
   g_assert_cmpstr (value, ==, "B");
 
-  g_assert_true (g_hash_table_lookup_extended (hash, "c",
+  g_assert_true (xhash_table_lookup_extended (hash, "c",
                                                (xpointer_t *) &original_key,
                                                NULL));
   g_assert_cmpstr (original_key, ==, "c");
 
-  g_assert_true (g_hash_table_lookup_extended (hash, "d", NULL, NULL));
+  g_assert_true (xhash_table_lookup_extended (hash, "d", NULL, NULL));
 
-  g_assert_false (g_hash_table_lookup_extended (hash, "not a key",
+  g_assert_false (xhash_table_lookup_extended (hash, "not a key",
                                                 (xpointer_t *) &original_key,
                                                 (xpointer_t *) &value));
   g_assert_null (original_key);
   g_assert_null (value);
 
-  g_assert_false (g_hash_table_lookup_extended (hash, "not a key",
+  g_assert_false (xhash_table_lookup_extended (hash, "not a key",
                                                 NULL,
                                                 (xpointer_t *) &value));
   g_assert_null (value);
 
-  g_assert_false (g_hash_table_lookup_extended (hash, "not a key",
+  g_assert_false (xhash_table_lookup_extended (hash, "not a key",
                                                 (xpointer_t *) &original_key,
                                                 NULL));
   g_assert_null (original_key);
 
-  g_assert_false (g_hash_table_lookup_extended (hash, "not a key", NULL, NULL));
+  g_assert_false (xhash_table_lookup_extended (hash, "not a key", NULL, NULL));
 
-  g_hash_table_unref (hash);
+  xhash_table_unref (hash);
 }
 
 static void
@@ -1354,36 +1354,36 @@ inc_state (xpointer_t user_data)
 static void
 test_new_similar (void)
 {
-  GHashTable *hash1;
-  GHashTable *hash2;
+  xhashtable_t *hash1;
+  xhashtable_t *hash2;
   int state1;
   int state2;
 
-  hash1 = g_hash_table_new_full (g_str_hash, g_str_equal,
+  hash1 = xhash_table_new_full (xstr_hash, xstr_equal,
                                  g_free, inc_state);
   state1 = 0;
-  g_hash_table_insert (hash1,
-                       g_strdup ("test"),
+  xhash_table_insert (hash1,
+                       xstrdup ("test"),
                        &state1);
-  g_assert_true (g_hash_table_lookup (hash1, "test") == &state1);
+  g_assert_true (xhash_table_lookup (hash1, "test") == &state1);
 
-  hash2 = g_hash_table_new_similar (hash1);
+  hash2 = xhash_table_new_similar (hash1);
 
-  g_assert_true (g_hash_table_lookup (hash1, "test") == &state1);
-  g_assert_null (g_hash_table_lookup (hash2, "test"));
+  g_assert_true (xhash_table_lookup (hash1, "test") == &state1);
+  g_assert_null (xhash_table_lookup (hash2, "test"));
 
   state2 = 0;
-  g_hash_table_insert (hash2, g_strdup ("test"), &state2);
-  g_assert_true (g_hash_table_lookup (hash2, "test") == &state2);
-  g_hash_table_remove (hash2, "test");
+  xhash_table_insert (hash2, xstrdup ("test"), &state2);
+  g_assert_true (xhash_table_lookup (hash2, "test") == &state2);
+  xhash_table_remove (hash2, "test");
   g_assert_cmpint (state2, ==, 1);
 
   g_assert_cmpint (state1, ==, 0);
-  g_hash_table_remove (hash1, "test");
+  xhash_table_remove (hash1, "test");
   g_assert_cmpint (state1, ==, 1);
 
-  g_hash_table_unref (hash1);
-  g_hash_table_unref (hash2);
+  xhash_table_unref (hash1);
+  xhash_table_unref (hash2);
 }
 
 struct _GHashTable
@@ -1395,7 +1395,7 @@ struct _GHashTable
   xint_t             noccupied;  /* nnodes + tombstones */
 
   xuint_t            have_big_keys : 1;
-  xuint_t            have_big_values : 1;
+  xuint_t            have_bixvalues : 1;
 
   xpointer_t        *keys;
   xuint_t           *hashes;
@@ -1408,12 +1408,12 @@ struct _GHashTable
 #ifndef G_DISABLE_ASSERT
   int              version;
 #endif
-  GDestroyNotify   key_destroy_func;
-  GDestroyNotify   value_destroy_func;
+  xdestroy_notify_t   key_destroy_func;
+  xdestroy_notify_t   value_destroy_func;
 };
 
 static void
-count_keys (GHashTable *h, xint_t *unused, xint_t *occupied, xint_t *tombstones)
+count_keys (xhashtable_t *h, xint_t *unused, xint_t *occupied, xint_t *tombstones)
 {
   xsize_t i;
 
@@ -1449,7 +1449,7 @@ fetch_key_or_value (xpointer_t a, xuint_t index, xboolean_t is_big)
 }
 
 static void
-check_data (GHashTable *h)
+check_data (xhashtable_t *h)
 {
   xsize_t i;
 
@@ -1463,7 +1463,7 @@ check_data (GHashTable *h)
 }
 
 static void
-check_consistency (GHashTable *h)
+check_consistency (xhashtable_t *h)
 {
   xint_t unused;
   xint_t occupied;
@@ -1479,7 +1479,7 @@ check_consistency (GHashTable *h)
 }
 
 static void
-check_counts (GHashTable *h, xint_t occupied, xint_t tombstones)
+check_counts (xhashtable_t *h, xint_t occupied, xint_t tombstones)
 {
   g_assert_cmpint (occupied, ==, h->nnodes);
   g_assert_cmpint (occupied + tombstones, ==, h->noccupied);
@@ -1493,44 +1493,44 @@ trivial_key_destroy (xpointer_t key)
 static void
 test_internal_consistency (void)
 {
-  GHashTable *h;
+  xhashtable_t *h;
 
-  h = g_hash_table_new_full (g_str_hash, g_str_equal, trivial_key_destroy, NULL);
+  h = xhash_table_new_full (xstr_hash, xstr_equal, trivial_key_destroy, NULL);
 
   check_counts (h, 0, 0);
   check_consistency (h);
 
-  g_hash_table_insert (h, "a", "A");
-  g_hash_table_insert (h, "b", "B");
-  g_hash_table_insert (h, "c", "C");
-  g_hash_table_insert (h, "d", "D");
-  g_hash_table_insert (h, "e", "E");
-  g_hash_table_insert (h, "f", "F");
+  xhash_table_insert (h, "a", "A");
+  xhash_table_insert (h, "b", "B");
+  xhash_table_insert (h, "c", "C");
+  xhash_table_insert (h, "d", "D");
+  xhash_table_insert (h, "e", "E");
+  xhash_table_insert (h, "f", "F");
 
   check_counts (h, 6, 0);
   check_consistency (h);
 
-  g_hash_table_remove (h, "a");
+  xhash_table_remove (h, "a");
   check_counts (h, 5, 1);
   check_consistency (h);
 
-  g_hash_table_remove (h, "b");
+  xhash_table_remove (h, "b");
   check_counts (h, 4, 2);
   check_consistency (h);
 
-  g_hash_table_insert (h, "c", "c");
+  xhash_table_insert (h, "c", "c");
   check_counts (h, 4, 2);
   check_consistency (h);
 
-  g_hash_table_insert (h, "a", "A");
+  xhash_table_insert (h, "a", "A");
   check_counts (h, 5, 1);
   check_consistency (h);
 
-  g_hash_table_remove_all (h);
+  xhash_table_remove_all (h);
   check_counts (h, 0, 0);
   check_consistency (h);
 
-  g_hash_table_unref (h);
+  xhash_table_unref (h);
 }
 
 static void
@@ -1554,29 +1554,29 @@ my_value_free (xpointer_t v)
 static void
 test_iter_replace (void)
 {
-  GHashTable *h;
-  GHashTableIter iter;
+  xhashtable_t *h;
+  xhash_table_iter_t iter;
   xpointer_t k, v;
   xchar_t *s;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=662544");
 
-  h = g_hash_table_new_full (g_str_hash, g_str_equal, my_key_free, my_value_free);
+  h = xhash_table_new_full (xstr_hash, xstr_equal, my_key_free, my_value_free);
 
-  g_hash_table_insert (h, g_strdup ("A"), g_strdup ("a"));
-  g_hash_table_insert (h, g_strdup ("B"), g_strdup ("b"));
-  g_hash_table_insert (h, g_strdup ("C"), g_strdup ("c"));
+  xhash_table_insert (h, xstrdup ("A"), xstrdup ("a"));
+  xhash_table_insert (h, xstrdup ("B"), xstrdup ("b"));
+  xhash_table_insert (h, xstrdup ("C"), xstrdup ("c"));
 
-  g_hash_table_iter_init (&iter, h);
+  xhash_table_iter_init (&iter, h);
 
-  while (g_hash_table_iter_next (&iter, &k, &v))
+  while (xhash_table_iter_next (&iter, &k, &v))
     {
        s = (xchar_t*)v;
        g_assert (g_ascii_islower (s[0]));
-       g_hash_table_iter_replace (&iter, g_strdup (k));
+       xhash_table_iter_replace (&iter, xstrdup (k));
     }
 
-  g_hash_table_unref (h);
+  xhash_table_unref (h);
 }
 
 static void
@@ -1588,27 +1588,27 @@ replace_first_character (xchar_t *string)
 static void
 test_set_insert_corruption (void)
 {
-  GHashTable *hash_table =
-    g_hash_table_new_full (g_str_hash, g_str_equal,
-        (GDestroyNotify) replace_first_character, NULL);
-  GHashTableIter iter;
+  xhashtable_t *hash_table =
+    xhash_table_new_full (xstr_hash, xstr_equal,
+        (xdestroy_notify_t) replace_first_character, NULL);
+  xhash_table_iter_t iter;
   xchar_t a[] = "foo";
   xchar_t b[] = "foo";
   xpointer_t key, value;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=692815");
 
-  g_hash_table_insert (hash_table, a, a);
-  g_assert (g_hash_table_contains (hash_table, "foo"));
+  xhash_table_insert (hash_table, a, a);
+  g_assert (xhash_table_contains (hash_table, "foo"));
 
-  g_hash_table_insert (hash_table, b, b);
+  xhash_table_insert (hash_table, b, b);
 
-  g_assert_cmpuint (g_hash_table_size (hash_table), ==, 1);
-  g_hash_table_iter_init (&iter, hash_table);
-  if (!g_hash_table_iter_next (&iter, &key, &value))
+  g_assert_cmpuint (xhash_table_size (hash_table), ==, 1);
+  xhash_table_iter_init (&iter, hash_table);
+  if (!xhash_table_iter_next (&iter, &key, &value))
     g_assert_not_reached();
 
-  /* per the documentation to g_hash_table_insert(), 'b' has now been freed,
+  /* per the documentation to xhash_table_insert(), 'b' has now been freed,
    * and the sole key in 'hash_table' should be 'a'.
    */
   g_assert (key != b);
@@ -1616,43 +1616,43 @@ test_set_insert_corruption (void)
 
   g_assert_cmpstr (b, ==, "boo");
 
-  /* g_hash_table_insert() also says that the value should now be 'b',
+  /* xhash_table_insert() also says that the value should now be 'b',
    * which is probably not what the caller intended but is precisely what they
    * asked for.
    */
   g_assert (value == b);
 
   /* even though the hash has now been de-set-ified: */
-  g_assert (g_hash_table_contains (hash_table, "foo"));
+  g_assert (xhash_table_contains (hash_table, "foo"));
 
-  g_hash_table_unref (hash_table);
+  xhash_table_unref (hash_table);
 }
 
 static void
 test_set_to_strv (void)
 {
-  GHashTable *set;
+  xhashtable_t *set;
   xchar_t **strv;
   xuint_t n;
 
-  set = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
-  g_hash_table_add (set, g_strdup ("xyz"));
-  g_hash_table_add (set, g_strdup ("xyz"));
-  g_hash_table_add (set, g_strdup ("abc"));
-  strv = (xchar_t **) g_hash_table_get_keys_as_array (set, &n);
-  g_hash_table_steal_all (set);
-  g_hash_table_unref (set);
+  set = xhash_table_new_full (xstr_hash, xstr_equal, g_free, NULL);
+  xhash_table_add (set, xstrdup ("xyz"));
+  xhash_table_add (set, xstrdup ("xyz"));
+  xhash_table_add (set, xstrdup ("abc"));
+  strv = (xchar_t **) xhash_table_get_keys_as_array (set, &n);
+  xhash_table_steal_all (set);
+  xhash_table_unref (set);
   g_assert_cmpint (n, ==, 2);
-  n = g_strv_length (strv);
+  n = xstrv_length (strv);
   g_assert_cmpint (n, ==, 2);
-  if (g_str_equal (strv[0], "abc"))
+  if (xstr_equal (strv[0], "abc"))
     g_assert_cmpstr (strv[1], ==, "xyz");
   else
     {
     g_assert_cmpstr (strv[0], ==, "xyz");
     g_assert_cmpstr (strv[1], ==, "abc");
     }
-  g_strfreev (strv);
+  xstrfreev (strv);
 }
 
 static xboolean_t

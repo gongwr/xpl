@@ -23,7 +23,7 @@
 
 G_BEGIN_DECLS
 
-guint64  g_resolver_get_serial             (GResolver        *resolver);
+xuint64_t  g_resolver_get_serial             (xresolver_t        *resolver);
 
 xint_t g_socket (xint_t     domain,
                xint_t     type,

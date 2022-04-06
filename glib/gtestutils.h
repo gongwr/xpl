@@ -35,14 +35,14 @@ G_BEGIN_DECLS
 typedef struct GTestCase  GTestCase;
 typedef struct GTestSuite GTestSuite;
 typedef void (*GTestFunc)        (void);
-typedef void (*GTestDataFunc)    (gconstpointer user_data);
+typedef void (*GTestDataFunc)    (xconstpointer user_data);
 typedef void (*GTestFixtureFunc) (xpointer_t      fixture,
-                                  gconstpointer user_data);
+                                  xconstpointer user_data);
 
 /* assertion API */
 #define g_assert_cmpstr(s1, cmp, s2)    G_STMT_START { \
                                              const char *__s1 = (s1), *__s2 = (s2); \
-                                             if (g_strcmp0 (__s1, __s2) cmp 0) ; else \
+                                             if (xstrcmp0 (__s1, __s2) cmp 0) ; else \
                                                g_assertion_message_cmpstr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, \
                                                  #s1 " " #cmp " " #s2, __s1, #cmp, __s2); \
                                         } G_STMT_END
@@ -53,13 +53,13 @@ typedef void (*GTestFixtureFunc) (xpointer_t      fixture,
                                                  #n1 " " #cmp " " #n2, (long double) __n1, #cmp, (long double) __n2, 'i'); \
                                         } G_STMT_END
 #define g_assert_cmpuint(n1, cmp, n2)   G_STMT_START { \
-                                             guint64 __n1 = (n1), __n2 = (n2); \
+                                             xuint64_t __n1 = (n1), __n2 = (n2); \
                                              if (__n1 cmp __n2) ; else \
                                                g_assertion_message_cmpnum (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, \
                                                  #n1 " " #cmp " " #n2, (long double) __n1, #cmp, (long double) __n2, 'i'); \
                                         } G_STMT_END
 #define g_assert_cmphex(n1, cmp, n2)    G_STMT_START {\
-                                             guint64 __n1 = (n1), __n2 = (n2); \
+                                             xuint64_t __n1 = (n1), __n2 = (n2); \
                                              if (__n1 cmp __n2) ; else \
                                                g_assertion_message_cmpnum (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, \
                                                  #n1 " " #cmp " " #n2, (long double) __n1, #cmp, (long double) __n2, 'x'); \
@@ -78,7 +78,7 @@ typedef void (*GTestFixtureFunc) (xpointer_t      fixture,
                                                  #n1 " == " #n2 " (+/- " #epsilon ")", __n1, "==", __n2, 'f'); \
                                         } G_STMT_END
 #define g_assert_cmpmem(m1, l1, m2, l2) G_STMT_START {\
-                                             gconstpointer __m1 = m1, __m2 = m2; \
+                                             xconstpointer __m1 = m1, __m2 = m2; \
                                              int __l1 = l1, __l2 = l2; \
                                              if (__l1 != 0 && __m1 == NULL) \
                                                g_assertion_message (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, \
@@ -98,12 +98,12 @@ typedef void (*GTestFixtureFunc) (xpointer_t      fixture,
   G_STMT_START \
   { \
     xvariant_t *__v1 = (v1), *__v2 = (v2); \
-    if (!g_variant_equal (__v1, __v2)) \
+    if (!xvariant_equal (__v1, __v2)) \
       { \
         xchar_t *__s1, *__s2, *__msg; \
-        __s1 = g_variant_print (__v1, TRUE); \
-        __s2 = g_variant_print (__v2, TRUE); \
-        __msg = g_strdup_printf ("assertion failed (" #v1 " == " #v2 "): %s does not equal %s", __s1, __s2); \
+        __s1 = xvariant_print (__v1, TRUE); \
+        __s2 = xvariant_print (__v2, TRUE); \
+        __msg = xstrdup_printf ("assertion failed (" #v1 " == " #v2 "): %s does not equal %s", __s1, __s2); \
         g_assertion_message (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, __msg); \
         g_free (__s1); \
         g_free (__s2); \
@@ -131,12 +131,12 @@ typedef void (*GTestFixtureFunc) (xpointer_t      fixture,
       } \
     else \
       { \
-        xuint_t __l1 = g_strv_length ((char **) __strv1); \
-        xuint_t __l2 = g_strv_length ((char **) __strv2); \
+        xuint_t __l1 = xstrv_length ((char **) __strv1); \
+        xuint_t __l2 = xstrv_length ((char **) __strv2); \
         if (__l1 != __l2) \
           { \
             char *__msg; \
-            __msg = g_strdup_printf ("assertion failed (" #strv1 " == " #strv2 "): length %u does not equal length %u", __l1, __l2); \
+            __msg = xstrdup_printf ("assertion failed (" #strv1 " == " #strv2 "): length %u does not equal length %u", __l1, __l2); \
             g_assertion_message (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, __msg); \
             g_free (__msg); \
           } \
@@ -145,7 +145,7 @@ typedef void (*GTestFixtureFunc) (xpointer_t      fixture,
             xuint_t __i; \
             for (__i = 0; __i < __l1; __i++) \
               { \
-                if (g_strcmp0 (__strv1[__i], __strv2[__i]) != 0) \
+                if (xstrcmp0 (__strv1[__i], __strv2[__i]) != 0) \
                   { \
                     g_assertion_message_cmpstrv (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, \
                                                  #strv1 " == " #strv2, \
@@ -164,7 +164,7 @@ typedef void (*GTestFixtureFunc) (xpointer_t      fixture,
                                              if (__ret < 0) \
                                                { \
                                                  xchar_t *__msg; \
-                                                 __msg = g_strdup_printf ("assertion failed (" #expr " >= 0): errno %i: %s", __errsv, g_strerror (__errsv)); \
+                                                 __msg = xstrdup_printf ("assertion failed (" #expr " >= 0): errno %i: %s", __errsv, xstrerror (__errsv)); \
                                                  g_assertion_message (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, __msg); \
                                                  g_free (__msg); \
                                                } \
@@ -236,7 +236,7 @@ typedef void (*GTestFixtureFunc) (xpointer_t      fixture,
 #endif /* !G_DISABLE_ASSERT */
 
 XPL_AVAILABLE_IN_ALL
-int     g_strcmp0                       (const char     *str1,
+int     xstrcmp0                       (const char     *str1,
                                          const char     *str2);
 
 /* report performance results */
@@ -330,14 +330,14 @@ void    g_test_add_func                 (const char     *testpath,
 
 XPL_AVAILABLE_IN_ALL
 void    g_test_add_data_func            (const char     *testpath,
-                                         gconstpointer   test_data,
+                                         xconstpointer   test_data,
                                          GTestDataFunc   test_func);
 
 XPL_AVAILABLE_IN_2_34
 void    g_test_add_data_func_full       (const char     *testpath,
                                          xpointer_t        test_data,
                                          GTestDataFunc   test_func,
-                                         GDestroyNotify  data_free_func);
+                                         xdestroy_notify_t  data_free_func);
 
 /* tell about currently run test */
 XPL_AVAILABLE_IN_2_68
@@ -387,10 +387,10 @@ void    g_test_set_nonfatal_assertions  (void);
 					G_STMT_START {			\
                                          void (*add_vtable) (const char*,       \
                                                     xsize_t,             \
-                                                    gconstpointer,     \
-                                                    void (*) (Fixture*, gconstpointer),   \
-                                                    void (*) (Fixture*, gconstpointer),   \
-                                                    void (*) (Fixture*, gconstpointer)) =  (void (*) (const xchar_t *, xsize_t, gconstpointer, void (*) (Fixture*, gconstpointer), void (*) (Fixture*, gconstpointer), void (*) (Fixture*, gconstpointer))) g_test_add_vtable; \
+                                                    xconstpointer,     \
+                                                    void (*) (Fixture*, xconstpointer),   \
+                                                    void (*) (Fixture*, xconstpointer),   \
+                                                    void (*) (Fixture*, xconstpointer)) =  (void (*) (const xchar_t *, xsize_t, xconstpointer, void (*) (Fixture*, xconstpointer), void (*) (Fixture*, xconstpointer), void (*) (Fixture*, xconstpointer))) g_test_add_vtable; \
                                          add_vtable \
                                           (testpath, sizeof (Fixture), tdata, fsetup, ftest, fteardown); \
 					} G_STMT_END
@@ -402,7 +402,7 @@ void    g_test_message                  (const char *format,
 XPL_AVAILABLE_IN_ALL
 void    g_test_bug_base                 (const char *uri_pattern);
 XPL_AVAILABLE_IN_ALL
-void    g_test_bug                      (const char *bug_uri_snippet);
+void    g_test_bug                      (const char *buxuri_snippet);
 XPL_AVAILABLE_IN_2_62
 void    g_test_summary                  (const char *summary);
 /* measure test timings */
@@ -413,13 +413,13 @@ double  g_test_timer_elapsed            (void); /* elapsed seconds */
 XPL_AVAILABLE_IN_ALL
 double  g_test_timer_last               (void); /* repeat last elapsed() result */
 
-/* automatically g_free or g_object_unref upon teardown */
+/* automatically g_free or xobject_unref upon teardown */
 XPL_AVAILABLE_IN_ALL
 void    g_test_queue_free               (xpointer_t gfree_pointer);
 XPL_AVAILABLE_IN_ALL
-void    g_test_queue_destroy            (GDestroyNotify destroy_func,
+void    g_test_queue_destroy            (xdestroy_notify_t destroy_func,
                                          xpointer_t       destroy_data);
-#define g_test_queue_unref(gobject)     g_test_queue_destroy (g_object_unref, gobject)
+#define g_test_queue_unref(gobject)     g_test_queue_destroy (xobject_unref, gobject)
 
 /**
  * GTestTrapFlags:
@@ -451,7 +451,7 @@ typedef enum {
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 
 XPL_DEPRECATED_IN_2_38_FOR (g_test_trap_subprocess)
-xboolean_t g_test_trap_fork               (guint64              usec_timeout,
+xboolean_t g_test_trap_fork               (xuint64_t              usec_timeout,
                                          GTestTrapFlags       test_trap_flags);
 
 G_GNUC_END_IGNORE_DEPRECATIONS
@@ -464,7 +464,7 @@ typedef enum {
 
 XPL_AVAILABLE_IN_2_38
 void     g_test_trap_subprocess         (const char           *test_path,
-                                         guint64               usec_timeout,
+                                         xuint64_t               usec_timeout,
                                          GTestSubprocessFlags  test_flags);
 
 XPL_AVAILABLE_IN_ALL
@@ -499,7 +499,7 @@ double   g_test_rand_double_range       (double          range_start,
 XPL_AVAILABLE_IN_ALL
 GTestCase*    g_test_create_case        (const char       *test_name,
                                          xsize_t             data_size,
-                                         gconstpointer     test_data,
+                                         xconstpointer     test_data,
                                          GTestFixtureFunc  data_setup,
                                          GTestFixtureFunc  data_test,
                                          GTestFixtureFunc  data_teardown);
@@ -527,7 +527,7 @@ void    g_test_trap_assertions          (const char     *domain,
                                          const char     *file,
                                          int             line,
                                          const char     *func,
-                                         guint64         assertion_flags, /* 0-pass, 1-fail, 2-outpattern, 4-errpattern */
+                                         xuint64_t         assertion_flags, /* 0-pass, 1-fail, 2-outpattern, 4-errpattern */
                                          const char     *pattern);
 XPL_AVAILABLE_IN_ALL
 void    g_assertion_message             (const char     *domain,
@@ -578,12 +578,12 @@ void    g_assertion_message_error       (const char     *domain,
                                          const char     *func,
                                          const char     *expr,
                                          const xerror_t   *error,
-                                         GQuark          error_domain,
+                                         xquark          error_domain,
                                          int             error_code) G_ANALYZER_NORETURN;
 XPL_AVAILABLE_IN_ALL
 void    g_test_add_vtable               (const char     *testpath,
                                          xsize_t           data_size,
-                                         gconstpointer   test_data,
+                                         xconstpointer   test_data,
                                          GTestFixtureFunc  data_setup,
                                          GTestFixtureFunc  data_test,
                                          GTestFixtureFunc  data_teardown);
@@ -609,7 +609,7 @@ typedef enum {
   G_TEST_LOG_NONE,
   G_TEST_LOG_ERROR,             /* s:msg */
   G_TEST_LOG_START_BINARY,      /* s:binaryname s:seed */
-  G_TEST_LOG_LIST_CASE,         /* s:testpath */
+  G_TEST_LOXLIST_CASE,         /* s:testpath */
   G_TEST_LOG_SKIP_CASE,         /* s:testpath */
   G_TEST_LOG_START_CASE,        /* s:testpath */
   G_TEST_LOG_STOP_CASE,         /* d:status d:nforks d:elapsed */
@@ -629,12 +629,12 @@ typedef struct {
 } GTestLogMsg;
 typedef struct {
   /*< private >*/
-  GString     *data;
-  GSList      *msgs;
+  xstring_t     *data;
+  xslist_t      *msgs;
 } GTestLogBuffer;
 
 XPL_AVAILABLE_IN_ALL
-const char*     g_test_log_type_name    (GTestLogType    log_type);
+const char*     g_test_loxtype_name    (GTestLogType    log_type);
 XPL_AVAILABLE_IN_ALL
 GTestLogBuffer* g_test_log_buffer_new   (void);
 XPL_AVAILABLE_IN_ALL
@@ -642,7 +642,7 @@ void            g_test_log_buffer_free  (GTestLogBuffer *tbuffer);
 XPL_AVAILABLE_IN_ALL
 void            g_test_log_buffer_push  (GTestLogBuffer *tbuffer,
                                          xuint_t           n_bytes,
-                                         const guint8   *bytes);
+                                         const xuint8_t   *bytes);
 XPL_AVAILABLE_IN_ALL
 GTestLogMsg*    g_test_log_buffer_pop   (GTestLogBuffer *tbuffer);
 XPL_AVAILABLE_IN_ALL

@@ -33,7 +33,7 @@ typedef struct {
   /* A "magic" number, used to perform additional integrity
    * checks on the allocated data
    */
-  guint32 magic;
+  xuint32_t magic;
 #endif
 } GRcBox;
 
@@ -44,7 +44,7 @@ typedef struct {
   xsize_t private_offset;
 
 #ifndef G_DISABLE_ASSERT
-  guint32 magic;
+  xuint32_t magic;
 #endif
 } GArcBox;
 

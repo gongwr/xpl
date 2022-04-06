@@ -3,25 +3,25 @@
 #include <string.h>
 
 static int
-command_line (GApplication            *application,
-              GApplicationCommandLine *cmdline)
+command_line (xapplication_t            *application,
+              xapplication_command_line_t *cmdline)
 {
   xchar_t **argv;
   xint_t argc;
   xint_t i;
 
-  argv = g_application_command_line_get_arguments (cmdline, &argc);
+  argv = xapplication_command_line_get_arguments (cmdline, &argc);
 
   for (i = 0; i < argc; i++)
     g_print ("handling argument %s remotely\n", argv[i]);
 
-  g_strfreev (argv);
+  xstrfreev (argv);
 
   return 0;
 }
 
 static xboolean_t
-test_local_cmdline (GApplication   *application,
+test_local_cmdline (xapplication_t   *application,
                     xchar_t        ***arguments,
                     xint_t           *exit_status)
 {
@@ -33,7 +33,7 @@ test_local_cmdline (GApplication   *application,
   i = 1;
   while (argv[i])
     {
-      if (g_str_has_prefix (argv[i], "--local-"))
+      if (xstr_has_prefix (argv[i], "--local-"))
         {
           g_print ("handling argument %s locally\n", argv[i]);
           g_free (argv[i]);
@@ -52,8 +52,8 @@ test_local_cmdline (GApplication   *application,
   return FALSE;
 }
 
-typedef GApplication TestApplication;
-typedef GApplicationClass TestApplicationClass;
+typedef xapplication_t TestApplication;
+typedef xapplication_class_t TestApplicationClass;
 
 static xtype_t test_application_get_type (void);
 G_DEFINE_TYPE (TestApplication, test_application, XTYPE_APPLICATION)
@@ -76,13 +76,13 @@ test_application_class_init (TestApplicationClass *class)
   G_APPLICATION_CLASS (class)->local_command_line = test_local_cmdline;
 }
 
-static GApplication *
+static xapplication_t *
 test_application_new (const xchar_t       *application_id,
                       GApplicationFlags  flags)
 {
-  g_return_val_if_fail (g_application_id_is_valid (application_id), NULL);
+  g_return_val_if_fail (xapplication_id_is_valid (application_id), NULL);
 
-  return g_object_new (test_application_get_type (),
+  return xobject_new (test_application_get_type (),
                        "application-id", application_id,
                        "flags", flags,
                        NULL);
@@ -91,16 +91,16 @@ test_application_new (const xchar_t       *application_id,
 int
 main (int argc, char **argv)
 {
-  GApplication *app;
+  xapplication_t *app;
   int status;
 
   app = test_application_new ("org.gtk.TestApplication", 0);
-  g_application_set_inactivity_timeout (app, 10000);
+  xapplication_set_inactivity_timeout (app, 10000);
   g_signal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
 
-  status = g_application_run (app, argc, argv);
+  status = xapplication_run (app, argc, argv);
 
-  g_object_unref (app);
+  xobject_unref (app);
 
   return status;
 }

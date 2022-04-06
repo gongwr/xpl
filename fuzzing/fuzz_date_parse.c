@@ -4,16 +4,16 @@ int
 LLVMFuzzerTestOneInput (const unsigned char *data, size_t size)
 {
   unsigned char *nul_terminated_data = NULL;
-  GDate *date = g_date_new ();
+  xdate_t *date = xdate_new ();
 
   fuzz_set_logging_func ();
 
-  /* ignore @size (g_date_set_parse() doesn’t support it); ensure @data is nul-terminated */
-  nul_terminated_data = (unsigned char *) g_strndup ((const xchar_t *) data, size);
-  g_date_set_parse (date, (const xchar_t *) nul_terminated_data);
+  /* ignore @size (xdate_set_parse() doesn’t support it); ensure @data is nul-terminated */
+  nul_terminated_data = (unsigned char *) xstrndup ((const xchar_t *) data, size);
+  xdate_set_parse (date, (const xchar_t *) nul_terminated_data);
   g_free (nul_terminated_data);
 
-  g_date_free (date);
+  xdate_free (date);
 
   return 0;
 }

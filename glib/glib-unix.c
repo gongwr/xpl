@@ -34,10 +34,10 @@
 #include <pwd.h>
 
 G_STATIC_ASSERT (sizeof (ssize_t) == XPL_SIZEOF_SSIZE_T);
-G_STATIC_ASSERT (G_ALIGNOF (gssize) == G_ALIGNOF (ssize_t));
+G_STATIC_ASSERT (G_ALIGNOF (xssize_t) == G_ALIGNOF (ssize_t));
 
-G_STATIC_ASSERT (sizeof (GPid) == sizeof (pid_t));
-G_STATIC_ASSERT (G_ALIGNOF (GPid) == G_ALIGNOF (pid_t));
+G_STATIC_ASSERT (sizeof (xpid_t) == sizeof (pid_t));
+G_STATIC_ASSERT (G_ALIGNOF (xpid_t) == G_ALIGNOF (pid_t));
 
 /**
  * SECTION:gunix
@@ -63,7 +63,7 @@ g_unix_set_error_from_errno (xerror_t **error,
   g_set_error_literal (error,
                        G_UNIX_ERROR,
                        0,
-                       g_strerror (saved_errno));
+                       xstrerror (saved_errno));
   errno = saved_errno;
   return FALSE;
 }
@@ -157,7 +157,7 @@ g_unix_set_fd_nonblocking (xint_t       fd,
                            xerror_t   **error)
 {
 #ifdef F_GETFL
-  glong fcntl_flags;
+  xlong_t fcntl_flags;
   fcntl_flags = fcntl (fd, F_GETFL);
 
   if (fcntl_flags == -1)
@@ -192,7 +192,7 @@ g_unix_set_fd_nonblocking (xint_t       fd,
  * g_unix_signal_source_new:
  * @signum: A signal number
  *
- * Create a #GSource that will be dispatched upon delivery of the UNIX
+ * Create a #xsource_t that will be dispatched upon delivery of the UNIX
  * signal @signum.  In GLib versions before 2.36, only `SIGHUP`, `SIGINT`,
  * `SIGTERM` can be monitored.  In GLib 2.36, `SIGUSR1` and `SIGUSR2`
  * were added. In GLib 2.54, `SIGWINCH` was added.
@@ -203,7 +203,7 @@ g_unix_set_fd_nonblocking (xint_t       fd,
  *
  * For example, an effective use of this function is to handle `SIGTERM`
  * cleanly; flushing any outstanding files, and then calling
- * g_main_loop_quit ().  It is not safe to do any of this a regular
+ * xmain_loop_quit ().  It is not safe to do any of this a regular
  * UNIX signal handler; your handler may be invoked while malloc() or
  * another library function is running, causing reentrancy if you
  * attempt to use it from the handler.  None of the GLib/xobject_t API
@@ -212,15 +212,15 @@ g_unix_set_fd_nonblocking (xint_t       fd,
  * The interaction of this source when combined with native UNIX
  * functions like sigprocmask() is not defined.
  *
- * The source will not initially be associated with any #GMainContext
- * and must be added to one with g_source_attach() before it will be
+ * The source will not initially be associated with any #xmain_context_t
+ * and must be added to one with xsource_attach() before it will be
  * executed.
  *
- * Returns: A newly created #GSource
+ * Returns: A newly created #xsource_t
  *
  * Since: 2.30
  */
-GSource *
+xsource_t *
 g_unix_signal_source_new (int signum)
 {
   g_return_val_if_fail (signum == SIGHUP || signum == SIGINT || signum == SIGTERM ||
@@ -237,11 +237,11 @@ g_unix_signal_source_new (int signum)
  * @signum: Signal number
  * @handler: Callback
  * @user_data: Data for @handler
- * @notify: #GDestroyNotify for @handler
+ * @notify: #xdestroy_notify_t for @handler
  *
  * A convenience function for g_unix_signal_source_new(), which
- * attaches to the default #GMainContext.  You can remove the watch
- * using g_source_remove().
+ * attaches to the default #xmain_context_t.  You can remove the watch
+ * using xsource_remove().
  *
  * Returns: An ID (greater than 0) for the event source
  *
@@ -250,21 +250,21 @@ g_unix_signal_source_new (int signum)
 xuint_t
 g_unix_signal_add_full (int            priority,
                         int            signum,
-                        GSourceFunc    handler,
+                        xsource_func_t    handler,
                         xpointer_t       user_data,
-                        GDestroyNotify notify)
+                        xdestroy_notify_t notify)
 {
   xuint_t id;
-  GSource *source;
+  xsource_t *source;
 
   source = g_unix_signal_source_new (signum);
 
   if (priority != G_PRIORITY_DEFAULT)
-    g_source_set_priority (source, priority);
+    xsource_set_priority (source, priority);
 
-  g_source_set_callback (source, handler, user_data, notify);
-  id = g_source_attach (source, NULL);
-  g_source_unref (source);
+  xsource_set_callback (source, handler, user_data, notify);
+  id = xsource_attach (source, NULL);
+  xsource_unref (source);
 
   return id;
 }
@@ -276,8 +276,8 @@ g_unix_signal_add_full (int            priority,
  * @user_data: Data for @handler
  *
  * A convenience function for g_unix_signal_source_new(), which
- * attaches to the default #GMainContext.  You can remove the watch
- * using g_source_remove().
+ * attaches to the default #xmain_context_t.  You can remove the watch
+ * using xsource_remove().
  *
  * Returns: An ID (greater than 0) for the event source
  *
@@ -285,7 +285,7 @@ g_unix_signal_add_full (int            priority,
  */
 xuint_t
 g_unix_signal_add (int         signum,
-                   GSourceFunc handler,
+                   xsource_func_t handler,
                    xpointer_t    user_data)
 {
   return g_unix_signal_add_full (G_PRIORITY_DEFAULT, signum, handler, user_data, NULL);
@@ -293,15 +293,15 @@ g_unix_signal_add (int         signum,
 
 typedef struct
 {
-  GSource source;
+  xsource_t source;
 
   xint_t     fd;
   xpointer_t tag;
 } GUnixFDSource;
 
 static xboolean_t
-g_unix_fd_source_dispatch (GSource     *source,
-                           GSourceFunc  callback,
+g_unix_fd_source_dispatch (xsource_t     *source,
+                           xsource_func_t  callback,
                            xpointer_t     user_data)
 {
   GUnixFDSource *fd_source = (GUnixFDSource *) source;
@@ -310,14 +310,14 @@ g_unix_fd_source_dispatch (GSource     *source,
   if (!callback)
     {
       g_warning ("GUnixFDSource dispatched without callback. "
-                 "You must call g_source_set_callback().");
+                 "You must call xsource_set_callback().");
       return FALSE;
     }
 
-  return (* func) (fd_source->fd, g_source_query_unix_fd (source, fd_source->tag), user_data);
+  return (* func) (fd_source->fd, xsource_query_unix_fd (source, fd_source->tag), user_data);
 }
 
-GSourceFuncs g_unix_fd_source_funcs = {
+xsource_funcs_t g_unix_fd_source_funcs = {
   NULL, NULL, g_unix_fd_source_dispatch, NULL, NULL, NULL
 };
 
@@ -326,27 +326,27 @@ GSourceFuncs g_unix_fd_source_funcs = {
  * @fd: a file descriptor
  * @condition: IO conditions to watch for on @fd
  *
- * Creates a #GSource to watch for a particular IO condition on a file
+ * Creates a #xsource_t to watch for a particular IO condition on a file
  * descriptor.
  *
  * The source will never close the fd -- you must do it yourself.
  *
- * Returns: the newly created #GSource
+ * Returns: the newly created #xsource_t
  *
  * Since: 2.36
  **/
-GSource *
+xsource_t *
 g_unix_fd_source_new (xint_t         fd,
-                      GIOCondition condition)
+                      xio_condition_t condition)
 {
   GUnixFDSource *fd_source;
-  GSource *source;
+  xsource_t *source;
 
-  source = g_source_new (&g_unix_fd_source_funcs, sizeof (GUnixFDSource));
+  source = xsource_new (&g_unix_fd_source_funcs, sizeof (GUnixFDSource));
   fd_source = (GUnixFDSource *) source;
 
   fd_source->fd = fd;
-  fd_source->tag = g_source_add_unix_fd (source, fd, condition);
+  fd_source->tag = xsource_add_unix_fd (source, fd, condition);
 
   return source;
 }
@@ -364,7 +364,7 @@ g_unix_fd_source_new (xint_t         fd,
  * @condition becomes true for @fd.
  *
  * This is the same as g_unix_fd_add(), except that it allows you to
- * specify a non-default priority and a provide a #GDestroyNotify for
+ * specify a non-default priority and a provide a #xdestroy_notify_t for
  * @user_data.
  *
  * Returns: the ID (greater than 0) of the event source
@@ -374,12 +374,12 @@ g_unix_fd_source_new (xint_t         fd,
 xuint_t
 g_unix_fd_add_full (xint_t              priority,
                     xint_t              fd,
-                    GIOCondition      condition,
+                    xio_condition_t      condition,
                     GUnixFDSourceFunc function,
                     xpointer_t          user_data,
-                    GDestroyNotify    notify)
+                    xdestroy_notify_t    notify)
 {
-  GSource *source;
+  xsource_t *source;
   xuint_t id;
 
   g_return_val_if_fail (function != NULL, 0);
@@ -387,11 +387,11 @@ g_unix_fd_add_full (xint_t              priority,
   source = g_unix_fd_source_new (fd, condition);
 
   if (priority != G_PRIORITY_DEFAULT)
-    g_source_set_priority (source, priority);
+    xsource_set_priority (source, priority);
 
-  g_source_set_callback (source, (GSourceFunc) function, user_data, notify);
-  id = g_source_attach (source, NULL);
-  g_source_unref (source);
+  xsource_set_callback (source, (xsource_func_t) function, user_data, notify);
+  id = xsource_attach (source, NULL);
+  xsource_unref (source);
 
   return id;
 }
@@ -412,7 +412,7 @@ g_unix_fd_add_full (xint_t              priority,
  * when it happens again.  If @function returns %FALSE then the watch
  * will be cancelled.
  *
- * The return value of this function can be passed to g_source_remove()
+ * The return value of this function can be passed to xsource_remove()
  * to cancel the watch at any time that it exists.
  *
  * The source will never close the fd -- you must do it yourself.
@@ -423,7 +423,7 @@ g_unix_fd_add_full (xint_t              priority,
  **/
 xuint_t
 g_unix_fd_add (xint_t              fd,
-               GIOCondition      condition,
+               xio_condition_t      condition,
                GUnixFDSourceFunc function,
                xpointer_t          user_data)
 {
@@ -470,7 +470,7 @@ g_unix_get_passwd_entry (const xchar_t  *user_name,
 #ifdef _SC_GETPW_R_SIZE_MAX
     {
       /* Get the recommended buffer size */
-      glong string_buffer_size_long = sysconf (_SC_GETPW_R_SIZE_MAX);
+      xlong_t string_buffer_size_long = sysconf (_SC_GETPW_R_SIZE_MAX);
       if (string_buffer_size_long > 0)
         string_buffer_size = string_buffer_size_long;
     }

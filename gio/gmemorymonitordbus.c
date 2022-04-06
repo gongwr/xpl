@@ -29,10 +29,10 @@
 #include "gdbusproxy.h"
 #include "gdbusnamewatching.h"
 
-#define G_MEMORY_MONITOR_DBUS_GET_INITABLE_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_INITABLE, GInitable))
+#define G_MEMORY_MONITOR_DBUS_GET_INITABLE_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_INITABLE, xinitable_t))
 
-static void g_memory_monitor_dbus_iface_init (GMemoryMonitorInterface *iface);
-static void g_memory_monitor_dbus_initable_iface_init (GInitableIface *iface);
+static void xmemory_monitor_dbus_iface_init (GMemoryMonitorInterface *iface);
+static void xmemory_monitor_dbus_initable_iface_init (xinitable_iface_t *iface);
 
 struct _GMemoryMonitorDBus
 {
@@ -40,15 +40,15 @@ struct _GMemoryMonitorDBus
 
   xuint_t watch_id;
   xcancellable_t *cancellable;
-  GDBusProxy *proxy;
+  xdbus_proxy_t *proxy;
   gulong signal_id;
 };
 
-G_DEFINE_TYPE_WITH_CODE (GMemoryMonitorDBus, g_memory_monitor_dbus, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (GMemoryMonitorDBus, xmemory_monitor_dbus, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (XTYPE_INITABLE,
-                                                g_memory_monitor_dbus_initable_iface_init)
+                                                xmemory_monitor_dbus_initable_iface_init)
                          G_IMPLEMENT_INTERFACE (XTYPE_MEMORY_MONITOR,
-                                                g_memory_monitor_dbus_iface_init)
+                                                xmemory_monitor_dbus_iface_init)
                          _xio_modules_ensure_extension_points_registered ();
                          g_io_extension_point_implement (G_MEMORY_MONITOR_EXTENSION_POINT_NAME,
                                                          g_define_type_id,
@@ -56,25 +56,25 @@ G_DEFINE_TYPE_WITH_CODE (GMemoryMonitorDBus, g_memory_monitor_dbus, XTYPE_OBJECT
                                                          30))
 
 static void
-g_memory_monitor_dbus_init (GMemoryMonitorDBus *dbus)
+xmemory_monitor_dbus_init (GMemoryMonitorDBus *dbus)
 {
 }
 
 static void
-proxy_signal_cb (GDBusProxy         *proxy,
+proxy_signal_cb (xdbus_proxy_t         *proxy,
                  const xchar_t        *sender_name,
                  const xchar_t        *signal_name,
                  xvariant_t           *parameters,
                  GMemoryMonitorDBus *dbus)
 {
-  guint8 level;
+  xuint8_t level;
 
-  if (g_strcmp0 (signal_name, "LowMemoryWarning") != 0)
+  if (xstrcmp0 (signal_name, "LowMemoryWarning") != 0)
     return;
   if (parameters == NULL)
     return;
 
-  g_variant_get (parameters, "(y)", &level);
+  xvariant_get (parameters, "(y)", &level);
   g_signal_emit_by_name (dbus, "low-memory-warning", level);
 }
 
@@ -84,7 +84,7 @@ lmm_proxy_cb (xobject_t      *source_object,
               xpointer_t      user_data)
 {
   GMemoryMonitorDBus *dbus = user_data;
-  GDBusProxy *proxy;
+  xdbus_proxy_t *proxy;
   xerror_t *error = NULL;
 
   proxy = g_dbus_proxy_new_finish (res, &error);
@@ -92,7 +92,7 @@ lmm_proxy_cb (xobject_t      *source_object,
     {
       g_debug ("Failed to create LowMemoryMonitor D-Bus proxy: %s",
                error->message);
-      g_error_free (error);
+      xerror_free (error);
       return;
     }
 
@@ -103,7 +103,7 @@ lmm_proxy_cb (xobject_t      *source_object,
 }
 
 static void
-lmm_appeared_cb (GDBusConnection *connection,
+lmm_appeared_cb (xdbus_connection_t *connection,
                  const xchar_t     *name,
                  const xchar_t     *name_owner,
                  xpointer_t         user_data)
@@ -122,7 +122,7 @@ lmm_appeared_cb (GDBusConnection *connection,
 }
 
 static void
-lmm_vanished_cb (GDBusConnection *connection,
+lmm_vanished_cb (xdbus_connection_t *connection,
                  const xchar_t     *name,
                  xpointer_t         user_data)
 {
@@ -133,7 +133,7 @@ lmm_vanished_cb (GDBusConnection *connection,
 }
 
 static xboolean_t
-g_memory_monitor_dbus_initable_init (GInitable     *initable,
+xmemory_monitor_dbus_initable_init (xinitable_t     *initable,
                                      xcancellable_t  *cancellable,
                                      xerror_t       **error)
 {
@@ -152,7 +152,7 @@ g_memory_monitor_dbus_initable_init (GInitable     *initable,
 }
 
 static void
-g_memory_monitor_dbus_finalize (xobject_t *object)
+xmemory_monitor_dbus_finalize (xobject_t *object)
 {
   GMemoryMonitorDBus *dbus = G_MEMORY_MONITOR_DBUS (object);
 
@@ -162,24 +162,24 @@ g_memory_monitor_dbus_finalize (xobject_t *object)
   g_clear_object (&dbus->proxy);
   g_clear_handle_id (&dbus->watch_id, g_bus_unwatch_name);
 
-  G_OBJECT_CLASS (g_memory_monitor_dbus_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xmemory_monitor_dbus_parent_class)->finalize (object);
 }
 
 static void
-g_memory_monitor_dbus_class_init (GMemoryMonitorDBusClass *nl_class)
+xmemory_monitor_dbus_class_init (GMemoryMonitorDBusClass *nl_class)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (nl_class);
 
-  gobject_class->finalize = g_memory_monitor_dbus_finalize;
+  gobject_class->finalize = xmemory_monitor_dbus_finalize;
 }
 
 static void
-g_memory_monitor_dbus_iface_init (GMemoryMonitorInterface *monitor_iface)
+xmemory_monitor_dbus_iface_init (GMemoryMonitorInterface *monitor_iface)
 {
 }
 
 static void
-g_memory_monitor_dbus_initable_iface_init (GInitableIface *iface)
+xmemory_monitor_dbus_initable_iface_init (xinitable_iface_t *iface)
 {
-  iface->init = g_memory_monitor_dbus_initable_init;
+  iface->init = xmemory_monitor_dbus_initable_init;
 }

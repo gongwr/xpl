@@ -36,7 +36,7 @@
 #include <windows.h>
 
 struct _GWin32VolumeMonitor {
-  GNativeVolumeMonitor parent;
+  xnative_volume_monitor_t parent;
 };
 
 #define g_win32_volume_monitor_get_type _g_win32_volume_monitor_get_type
@@ -57,7 +57,7 @@ G_DEFINE_TYPE_WITH_CODE (GWin32VolumeMonitor, g_win32_volume_monitor, XTYPE_NATI
  *
  * Returns: bitmask with same meaning as returned by GetLogicalDrives()
  */
-static guint32
+static xuint32_t
 get_viewable_logical_drives (void)
 {
   xuint_t viewable_drives = GetLogicalDrives ();
@@ -107,11 +107,11 @@ get_viewable_logical_drives (void)
 
 /* deliver accessible (aka 'mounted') volumes */
 static xlist_t *
-get_mounts (GVolumeMonitor *volume_monitor)
+get_mounts (xvolume_monitor_t *volume_monitor)
 {
   DWORD   drives;
   xchar_t   drive[4] = "A:\\";
-  GQueue  queue = G_QUEUE_INIT;
+  xqueue_t  queue = G_QUEUE_INIT;
 
   drives = get_viewable_logical_drives ();
 
@@ -132,14 +132,14 @@ get_mounts (GVolumeMonitor *volume_monitor)
 
 /* actually 'mounting' volumes is out of GIOs business on win32, so no volumes are delivered either */
 static xlist_t *
-get_volumes (GVolumeMonitor *volume_monitor)
+get_volumes (xvolume_monitor_t *volume_monitor)
 {
   return NULL;
 }
 
 /* real hardware */
 static xlist_t *
-get_connected_drives (GVolumeMonitor *volume_monitor)
+get_connected_drives (xvolume_monitor_t *volume_monitor)
 {
   xlist_t *list = NULL;
 
@@ -174,7 +174,7 @@ get_connected_drives (GVolumeMonitor *volume_monitor)
       wc_name[trailing] = L'\0';
       if (QueryDosDeviceW (&wc_name[4], wc_dev_name, MAX_PATH))
         {
-          xchar_t *name = g_utf16_to_utf8 (wc_dev_name, -1, NULL, NULL, NULL);
+          xchar_t *name = xutf16_to_utf8 (wc_dev_name, -1, NULL, NULL, NULL);
           g_print ("%s\n", name);
 	  g_free (name);
 	}
@@ -188,14 +188,14 @@ get_connected_drives (GVolumeMonitor *volume_monitor)
   return list;
 }
 
-static GVolume *
-get_volume_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
+static xvolume_t *
+get_volume_for_uuid (xvolume_monitor_t *volume_monitor, const char *uuid)
 {
   return NULL;
 }
 
-static GMount *
-get_mount_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
+static xmount_t *
+get_mount_for_uuid (xvolume_monitor_t *volume_monitor, const char *uuid)
 {
   return NULL;
 }
@@ -206,7 +206,7 @@ is_supported (void)
   return TRUE;
 }
 
-static GMount *
+static xmount_t *
 get_mount_for_mount_path (const char *mount_path,
                           xcancellable_t *cancellable)
 {

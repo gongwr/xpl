@@ -37,7 +37,7 @@
  * #GDebugControllerDBus is an implementation of #GDebugController which exposes
  * debug settings as a D-Bus object.
  *
- * It is a #GInitable object, and will register an object at
+ * It is a #xinitable_t object, and will register an object at
  * `/org/gtk/Debugging` on the bus given as
  * #GDebugControllerDBus:connection once it’s initialized. The object will be
  * unregistered when the last reference to the #GDebugControllerDBus is dropped.
@@ -79,15 +79,15 @@
  * connect to the #GDebugControllerDBus::authorize signal and query polkit in
  * it:
  * |[<!-- language="C" -->
- *   g_autoptr(xerror_t) child_error = NULL;
- *   g_autoptr(GDBusConnection) connection = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, NULL);
+ *   x_autoptr(xerror) child_error = NULL;
+ *   x_autoptr(xdbus_connection_t) connection = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, NULL);
  *   gulong debug_controller_authorize_id = 0;
  *
  *   // Set up the debug controller.
  *   debug_controller = G_DEBUG_CONTROLLER (g_debug_controller_dbus_new (priv->connection, NULL, &child_error));
  *   if (debug_controller == NULL)
  *     {
- *       g_error ("Could not register debug controller on bus: %s"),
+ *       xerror ("Could not register debug controller on bus: %s"),
  *                child_error->message);
  *     }
  *
@@ -98,19 +98,19 @@
  *
  *   static xboolean_t
  *   debug_controller_authorize_cb (GDebugControllerDBus  *debug_controller,
- *                                  GDBusMethodInvocation *invocation,
+ *                                  xdbus_method_invocation_t *invocation,
  *                                  xpointer_t               user_data)
  *   {
- *     g_autoptr(PolkitAuthority) authority = NULL;
- *     g_autoptr(PolkitSubject) subject = NULL;
- *     g_autoptr(PolkitAuthorizationResult) auth_result = NULL;
- *     g_autoptr(xerror_t) local_error = NULL;
- *     GDBusMessage *message;
+ *     x_autoptr(PolkitAuthority) authority = NULL;
+ *     x_autoptr(PolkitSubject) subject = NULL;
+ *     x_autoptr(PolkitAuthorizationResult) auth_result = NULL;
+ *     x_autoptr(xerror) local_error = NULL;
+ *     xdbus_message_t *message;
  *     GDBusMessageFlags message_flags;
  *     PolkitCheckAuthorizationFlags flags = POLKIT_CHECK_AUTHORIZATION_FLAGS_NONE;
  *
- *     message = g_dbus_method_invocation_get_message (invocation);
- *     message_flags = g_dbus_message_get_flags (message);
+ *     message = xdbus_method_invocation_get_message (invocation);
+ *     message_flags = xdbus_message_get_flags (message);
  *
  *     authority = polkit_authority_get_sync (NULL, &local_error);
  *     if (authority == NULL)
@@ -122,7 +122,7 @@
  *     if (message_flags & G_DBUS_MESSAGE_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION)
  *       flags |= POLKIT_CHECK_AUTHORIZATION_FLAGS_ALLOW_USER_INTERACTION;
  *
- *     subject = polkit_system_bus_name_new (g_dbus_method_invocation_get_sender (invocation));
+ *     subject = polkit_system_bus_name_new (xdbus_method_invocation_get_sender (invocation));
  *
  *     auth_result = polkit_authority_check_authorization_sync (authority,
  *                                                              subject,
@@ -154,14 +154,14 @@ static const xchar_t org_gtk_Debugging_xml[] =
     "</interface>"
   "</node>";
 
-static GDBusInterfaceInfo *org_gtk_Debugging;
+static xdbus_interface_info_t *org_gtk_Debugging;
 
-#define G_DEBUG_CONTROLLER_DBUS_GET_INITABLE_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_INITABLE, GInitable))
+#define G_DEBUG_CONTROLLER_DBUS_GET_INITABLE_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_INITABLE, xinitable_t))
 
 static void g_debug_controller_dbus_iface_init (GDebugControllerInterface *iface);
-static void g_debug_controller_dbus_initable_iface_init (GInitableIface *iface);
+static void g_debug_controller_dbus_initable_iface_init (xinitable_iface_t *iface);
 static xboolean_t g_debug_controller_dbus_authorize_default (GDebugControllerDBus  *self,
-                                                           GDBusMethodInvocation *invocation);
+                                                           xdbus_method_invocation_t *invocation);
 
 typedef enum
 {
@@ -170,7 +170,7 @@ typedef enum
   PROP_DEBUG_ENABLED,
 } GDebugControllerDBusProperty;
 
-static GParamSpec *props[PROP_CONNECTION + 1] = { NULL, };
+static xparam_spec_t *props[PROP_CONNECTION + 1] = { NULL, };
 
 typedef enum
 {
@@ -184,9 +184,9 @@ typedef struct
   xobject_t parent_instance;
 
   xcancellable_t *cancellable;  /* (owned) */
-  GDBusConnection *connection;  /* (owned) */
+  xdbus_connection_t *connection;  /* (owned) */
   xuint_t object_id;
-  GPtrArray *pending_authorize_tasks;  /* (element-type GWeakRef) (owned) (nullable) */
+  xptr_array_t *pending_authorize_tasks;  /* (element-type GWeakRef) (owned) (nullable) */
 
   xboolean_t debug_enabled;
 } GDebugControllerDBusPrivate;
@@ -222,7 +222,7 @@ set_debug_enabled (GDebugControllerDBus *self,
 
   if (debug_enabled != priv->debug_enabled)
     {
-      GVariantBuilder builder;
+      xvariant_builder_t builder;
 
       priv->debug_enabled = debug_enabled;
 
@@ -230,17 +230,17 @@ set_debug_enabled (GDebugControllerDBus *self,
       g_log_set_debug_enabled (debug_enabled);
 
       /* Notify internally and externally of the property change. */
-      g_object_notify (G_OBJECT (self), "debug-enabled");
+      xobject_notify (G_OBJECT (self), "debug-enabled");
 
-      g_variant_builder_init (&builder, G_VARIANT_TYPE ("a{sv}"));
-      g_variant_builder_add (&builder, "{sv}", "DebugEnabled", g_variant_new_boolean (priv->debug_enabled));
+      xvariant_builder_init (&builder, G_VARIANT_TYPE ("a{sv}"));
+      xvariant_builder_add (&builder, "{sv}", "DebugEnabled", xvariant_new_boolean (priv->debug_enabled));
 
       g_dbus_connection_emit_signal (priv->connection,
                                      NULL,
                                      "/org/gtk/Debugging",
                                      "org.freedesktop.DBus.Properties",
                                      "PropertiesChanged",
-                                     g_variant_new ("(sa{sv}as)",
+                                     xvariant_new ("(sa{sv}as)",
                                                     "org.gtk.Debugging",
                                                     &builder,
                                                     NULL),
@@ -250,10 +250,10 @@ set_debug_enabled (GDebugControllerDBus *self,
     }
 }
 
-/* Called in the #GMainContext which was default when the #GDebugControllerDBus
+/* Called in the #xmain_context_t which was default when the #GDebugControllerDBus
  * was initialised. */
 static xvariant_t *
-dbus_get_property (GDBusConnection  *connection,
+dbus_get_property (xdbus_connection_t  *connection,
                    const xchar_t      *sender,
                    const xchar_t      *object_path,
                    const xchar_t      *interface_name,
@@ -264,8 +264,8 @@ dbus_get_property (GDBusConnection  *connection,
   GDebugControllerDBus *self = user_data;
   GDebugControllerDBusPrivate *priv = g_debug_controller_dbus_get_instance_private (self);
 
-  if (g_str_equal (property_name, "DebugEnabled"))
-    return g_variant_new_boolean (priv->debug_enabled);
+  if (xstr_equal (property_name, "DebugEnabled"))
+    return xvariant_new_boolean (priv->debug_enabled);
 
   g_assert_not_reached ();
 
@@ -289,7 +289,7 @@ weak_ref_free (GWeakRef *weak_ref)
   g_free (weak_ref);
 }
 
-/* Called in the #GMainContext which was default when the #GDebugControllerDBus
+/* Called in the #xmain_context_t which was default when the #GDebugControllerDBus
  * was initialised. */
 static void
 garbage_collect_weak_refs (GDebugControllerDBus *self)
@@ -304,37 +304,37 @@ garbage_collect_weak_refs (GDebugControllerDBus *self)
    * filled by an element we haven’t checked yet. */
   for (i = priv->pending_authorize_tasks->len; i > 0; i--)
     {
-      GWeakRef *weak_ref = g_ptr_array_index (priv->pending_authorize_tasks, i - 1);
+      GWeakRef *weak_ref = xptr_array_index (priv->pending_authorize_tasks, i - 1);
       xobject_t *obj = g_weak_ref_get (weak_ref);
 
       if (obj == NULL)
-        g_ptr_array_remove_index_fast (priv->pending_authorize_tasks, i - 1);
+        xptr_array_remove_index_fast (priv->pending_authorize_tasks, i - 1);
       else
-        g_object_unref (obj);
+        xobject_unref (obj);
     }
 
   /* Don’t need to keep the array around any more if it’s empty. */
   if (priv->pending_authorize_tasks->len == 0)
-    g_clear_pointer (&priv->pending_authorize_tasks, g_ptr_array_unref);
+    g_clear_pointer (&priv->pending_authorize_tasks, xptr_array_unref);
 }
 
 /* Called in a worker thread. */
 static void
-authorize_task_cb (GTask        *task,
+authorize_task_cb (xtask_t        *task,
                    xpointer_t      source_object,
                    xpointer_t      task_data,
                    xcancellable_t *cancellable)
 {
   GDebugControllerDBus *self = G_DEBUG_CONTROLLER_DBUS (source_object);
-  GDBusMethodInvocation *invocation = G_DBUS_METHOD_INVOCATION (task_data);
+  xdbus_method_invocation_t *invocation = G_DBUS_METHOD_INVOCATION (task_data);
   xboolean_t authorized = TRUE;
 
   g_signal_emit (self, signals[SIGNAL_AUTHORIZE], 0, invocation, &authorized);
 
-  g_task_return_boolean (task, authorized);
+  xtask_return_boolean (task, authorized);
 }
 
-/* Called in the #GMainContext which was default when the #GDebugControllerDBus
+/* Called in the #xmain_context_t which was default when the #GDebugControllerDBus
  * was initialised. */
 static void
 authorize_cb (xobject_t      *object,
@@ -343,45 +343,45 @@ authorize_cb (xobject_t      *object,
 {
   GDebugControllerDBus *self = G_DEBUG_CONTROLLER_DBUS (object);
   GDebugControllerDBusPrivate *priv G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
-  GTask *task = G_TASK (result);
-  GDBusMethodInvocation *invocation = g_task_get_task_data (task);
-  xvariant_t *parameters = g_dbus_method_invocation_get_parameters (invocation);
+  xtask_t *task = XTASK (result);
+  xdbus_method_invocation_t *invocation = xtask_get_task_data (task);
+  xvariant_t *parameters = xdbus_method_invocation_get_parameters (invocation);
   xboolean_t enabled = FALSE;
   xboolean_t authorized;
 
   priv = g_debug_controller_dbus_get_instance_private (self);
-  authorized = g_task_propagate_boolean (task, NULL);
+  authorized = xtask_propagate_boolean (task, NULL);
 
   if (!authorized)
     {
-      xerror_t *local_error = g_error_new (G_DBUS_ERROR, G_DBUS_ERROR_ACCESS_DENIED,
+      xerror_t *local_error = xerror_new (G_DBUS_ERROR, G_DBUS_ERROR_ACCESS_DENIED,
                                          _("Not authorized to change debug settings"));
-      g_dbus_method_invocation_take_error (invocation, g_steal_pointer (&local_error));
+      xdbus_method_invocation_take_error (invocation, g_steal_pointer (&local_error));
     }
   else
     {
       /* Update the property value. */
-      g_variant_get (parameters, "(b)", &enabled);
+      xvariant_get (parameters, "(b)", &enabled);
       set_debug_enabled (self, enabled);
 
-      g_dbus_method_invocation_return_value (invocation, NULL);
+      xdbus_method_invocation_return_value (invocation, NULL);
     }
 
-  /* The GTask will stay alive for a bit longer as the worker thread is
+  /* The xtask_t will stay alive for a bit longer as the worker thread is
    * potentially still in the process of dropping its reference to it. */
   g_assert (priv->pending_authorize_tasks != NULL && priv->pending_authorize_tasks->len > 0);
 }
 
-/* Called in the #GMainContext which was default when the #GDebugControllerDBus
+/* Called in the #xmain_context_t which was default when the #GDebugControllerDBus
  * was initialised. */
 static void
-dbus_method_call (GDBusConnection       *connection,
+dbus_method_call (xdbus_connection_t       *connection,
                   const xchar_t           *sender,
                   const xchar_t           *object_path,
                   const xchar_t           *interface_name,
                   const xchar_t           *method_name,
                   xvariant_t              *parameters,
-                  GDBusMethodInvocation *invocation,
+                  xdbus_method_invocation_t *invocation,
                   xpointer_t               user_data)
 {
   GDebugControllerDBus *self = user_data;
@@ -389,20 +389,20 @@ dbus_method_call (GDBusConnection       *connection,
   GDebugControllerDBusClass *klass = G_DEBUG_CONTROLLER_DBUS_GET_CLASS (self);
 
   /* Only on the org.gtk.Debugging interface */
-  if (g_str_equal (method_name, "SetDebugEnabled"))
+  if (xstr_equal (method_name, "SetDebugEnabled"))
     {
-      GTask *task = NULL;
+      xtask_t *task = NULL;
 
-      task = g_task_new (self, priv->cancellable, authorize_cb, NULL);
-      g_task_set_source_tag (task, dbus_method_call);
-      g_task_set_task_data (task, g_object_ref (invocation), (GDestroyNotify) g_object_unref);
+      task = xtask_new (self, priv->cancellable, authorize_cb, NULL);
+      xtask_set_source_tag (task, dbus_method_call);
+      xtask_set_task_data (task, xobject_ref (invocation), (xdestroy_notify_t) xobject_unref);
 
-      /* Track the pending #GTask with a weak ref as its final strong ref could
-       * be dropped from this thread or an arbitrary #GTask worker thread. The
+      /* Track the pending #xtask_t with a weak ref as its final strong ref could
+       * be dropped from this thread or an arbitrary #xtask_t worker thread. The
        * weak refs will be evaluated in g_debug_controller_dbus_stop(). */
       if (priv->pending_authorize_tasks == NULL)
-        priv->pending_authorize_tasks = g_ptr_array_new_with_free_func ((GDestroyNotify) weak_ref_free);
-      g_ptr_array_add (priv->pending_authorize_tasks, weak_ref_new (G_OBJECT (task)));
+        priv->pending_authorize_tasks = xptr_array_new_with_free_func ((xdestroy_notify_t) weak_ref_free);
+      xptr_array_add (priv->pending_authorize_tasks, weak_ref_new (G_OBJECT (task)));
 
       /* Take the opportunity to clean up a bit. */
       garbage_collect_weak_refs (self);
@@ -412,15 +412,15 @@ dbus_method_call (GDBusConnection       *connection,
        * definitely involves D-Bus calls, and might involve user interaction),
        * emit the #GDebugControllerDBus::authorize signal in a worker thread, so
        * that handlers can synchronously block it. This is similar to how
-       * #GDBusInterfaceSkeleton::g-authorize-method works.
+       * #xdbus_interface_skeleton_t::g-authorize-method works.
        *
        * If no signal handlers are connected, don’t bother running the worker
        * thread, and just return a default value of %FALSE. Fail closed. */
       if (g_signal_has_handler_pending (self, signals[SIGNAL_AUTHORIZE], 0, FALSE) ||
           klass->authorize != g_debug_controller_dbus_authorize_default)
-        g_task_run_in_thread (task, authorize_task_cb);
+        xtask_run_in_thread (task, authorize_task_cb);
       else
-        g_task_return_boolean (task, FALSE);
+        xtask_return_boolean (task, FALSE);
 
       g_clear_object (&task);
     }
@@ -429,13 +429,13 @@ dbus_method_call (GDBusConnection       *connection,
 }
 
 static xboolean_t
-g_debug_controller_dbus_initable_init (GInitable     *initable,
+g_debug_controller_dbus_initable_init (xinitable_t     *initable,
                                        xcancellable_t  *cancellable,
                                        xerror_t       **error)
 {
   GDebugControllerDBus *self = G_DEBUG_CONTROLLER_DBUS (initable);
   GDebugControllerDBusPrivate *priv = g_debug_controller_dbus_get_instance_private (self);
-  static const GDBusInterfaceVTable vtable = {
+  static const xdbus_interface_vtable_t vtable = {
     dbus_method_call,
     dbus_get_property,
     NULL /* set_property */,
@@ -445,11 +445,11 @@ g_debug_controller_dbus_initable_init (GInitable     *initable,
   if (org_gtk_Debugging == NULL)
     {
       xerror_t *local_error = NULL;
-      GDBusNodeInfo *info;
+      xdbus_node_info_t *info;
 
       info = g_dbus_node_info_new_for_xml (org_gtk_Debugging_xml, &local_error);
       if G_UNLIKELY (info == NULL)
-        g_error ("%s", local_error->message);
+        xerror ("%s", local_error->message);
       org_gtk_Debugging = g_dbus_node_info_lookup_interface (info, "org.gtk.Debugging");
       g_assert (org_gtk_Debugging != NULL);
       g_dbus_interface_info_ref (org_gtk_Debugging);
@@ -469,8 +469,8 @@ g_debug_controller_dbus_initable_init (GInitable     *initable,
 static void
 g_debug_controller_dbus_get_property (xobject_t    *object,
                                       xuint_t       prop_id,
-                                      GValue     *value,
-                                      GParamSpec *pspec)
+                                      xvalue_t     *value,
+                                      xparam_spec_t *pspec)
 {
   GDebugControllerDBus *self = G_DEBUG_CONTROLLER_DBUS (object);
   GDebugControllerDBusPrivate *priv = g_debug_controller_dbus_get_instance_private (self);
@@ -478,10 +478,10 @@ g_debug_controller_dbus_get_property (xobject_t    *object,
   switch ((GDebugControllerDBusProperty) prop_id)
     {
     case PROP_CONNECTION:
-      g_value_set_object (value, priv->connection);
+      xvalue_set_object (value, priv->connection);
       break;
     case PROP_DEBUG_ENABLED:
-      g_value_set_boolean (value, priv->debug_enabled);
+      xvalue_set_boolean (value, priv->debug_enabled);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -492,8 +492,8 @@ g_debug_controller_dbus_get_property (xobject_t    *object,
 static void
 g_debug_controller_dbus_set_property (xobject_t      *object,
                                       xuint_t         prop_id,
-                                      const GValue *value,
-                                      GParamSpec   *pspec)
+                                      const xvalue_t *value,
+                                      xparam_spec_t   *pspec)
 {
   GDebugControllerDBus *self = G_DEBUG_CONTROLLER_DBUS (object);
   GDebugControllerDBusPrivate *priv = g_debug_controller_dbus_get_instance_private (self);
@@ -503,10 +503,10 @@ g_debug_controller_dbus_set_property (xobject_t      *object,
     case PROP_CONNECTION:
       /* Construct only */
       g_assert (priv->connection == NULL);
-      priv->connection = g_value_dup_object (value);
+      priv->connection = xvalue_dup_object (value);
       break;
     case PROP_DEBUG_ENABLED:
-      set_debug_enabled (self, g_value_get_boolean (value));
+      set_debug_enabled (self, xvalue_get_boolean (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -530,7 +530,7 @@ g_debug_controller_dbus_dispose (xobject_t *object)
 
 static xboolean_t
 g_debug_controller_dbus_authorize_default (GDebugControllerDBus  *self,
-                                           GDBusMethodInvocation *invocation)
+                                           xdbus_method_invocation_t *invocation)
 {
   return TRUE;
 }
@@ -565,14 +565,14 @@ g_debug_controller_dbus_class_init (GDebugControllerDBusClass *klass)
                            G_PARAM_CONSTRUCT_ONLY |
                            G_PARAM_STATIC_STRINGS);
 
-  g_object_class_install_properties (gobject_class, G_N_ELEMENTS (props), props);
+  xobject_class_install_properties (gobject_class, G_N_ELEMENTS (props), props);
 
-  g_object_class_override_property (gobject_class, PROP_DEBUG_ENABLED, "debug-enabled");
+  xobject_class_override_property (gobject_class, PROP_DEBUG_ENABLED, "debug-enabled");
 
   /**
    * GDebugControllerDBus::authorize:
    * @controller: The #GDebugControllerDBus emitting the signal.
-   * @invocation: A #GDBusMethodInvocation.
+   * @invocation: A #xdbus_method_invocation_t.
    *
    * Emitted when a D-Bus peer is trying to change the debug settings and used
    * to determine if that is authorized.
@@ -618,14 +618,14 @@ g_debug_controller_dbus_iface_init (GDebugControllerInterface *iface)
 }
 
 static void
-g_debug_controller_dbus_initable_iface_init (GInitableIface *iface)
+g_debug_controller_dbus_initable_iface_init (xinitable_iface_t *iface)
 {
   iface->init = g_debug_controller_dbus_initable_init;
 }
 
 /**
  * g_debug_controller_dbus_new:
- * @connection: a #GDBusConnection to register the debug object on
+ * @connection: a #xdbus_connection_t to register the debug object on
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
  * @error: return location for a #xerror_t, or %NULL
  *
@@ -642,7 +642,7 @@ g_debug_controller_dbus_initable_iface_init (GInitableIface *iface)
  * Since: 2.72
  */
 GDebugControllerDBus *
-g_debug_controller_dbus_new (GDBusConnection  *connection,
+g_debug_controller_dbus_new (xdbus_connection_t  *connection,
                              xcancellable_t     *cancellable,
                              xerror_t          **error)
 {
@@ -650,7 +650,7 @@ g_debug_controller_dbus_new (GDBusConnection  *connection,
   g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  return g_initable_new (XTYPE_DEBUG_CONTROLLER_DBUS,
+  return xinitable_new (XTYPE_DEBUG_CONTROLLER_DBUS,
                          cancellable,
                          error,
                          "connection", connection,
@@ -704,6 +704,6 @@ g_debug_controller_dbus_stop (GDebugControllerDBus *self)
   while (priv->pending_authorize_tasks != NULL)
     {
       garbage_collect_weak_refs (self);
-      g_thread_yield ();
+      xthread_yield ();
     }
 }

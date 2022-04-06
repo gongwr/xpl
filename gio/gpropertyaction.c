@@ -27,16 +27,16 @@
 
 /**
  * SECTION:gpropertyaction
- * @title: GPropertyAction
- * @short_description: A GAction reflecting a xobject_t property
+ * @title: xproperty_action_t
+ * @short_description: A xaction_t reflecting a xobject_t property
  * @include: gio/gio.h
  *
- * A #GPropertyAction is a way to get a #GAction with a state value
+ * A #xproperty_action_t is a way to get a #xaction_t with a state value
  * reflecting and controlling the value of a #xobject_t property.
  *
  * The state of the action will correspond to the value of the property.
  * Changing it will change the property (assuming the requested value
- * matches the requirements as specified in the #GParamSpec).
+ * matches the requirements as specified in the #xparam_spec_t).
  *
  * Only the most common types are presently supported.  Booleans are
  * mapped to booleans, strings to strings, signed/unsigned integers to
@@ -44,7 +44,7 @@
  *
  * If the property is an enum then the state will be string-typed and
  * conversion will automatically be performed between the enum value and
- * "nick" string as per the #GEnumValue table.
+ * "nick" string as per the #xenum_value_t table.
  *
  * Flags types are not currently supported.
  *
@@ -62,10 +62,10 @@
  *
  * The general idea here is to reduce the number of locations where a
  * particular piece of state is kept (and therefore has to be synchronised
- * between). #GPropertyAction does not have a separate state that is kept
+ * between). #xproperty_action_t does not have a separate state that is kept
  * in sync with the property value -- its state is the property value.
  *
- * For example, it might be useful to create a #GAction corresponding to
+ * For example, it might be useful to create a #xaction_t corresponding to
  * the "visible-child-name" property of a #GtkStack so that the current
  * page can be switched from a menu.  The active radio indication in the
  * menu is then directly determined from the active page of the
@@ -78,9 +78,9 @@
  *
  * Another anti-example would be to bind to the "visible-child-name"
  * property of a #GtkStack if this value is actually stored in
- * #GSettings.  In that case, the real source of the value is
- * #GSettings.  If you want a #GAction to control a setting stored in
- * #GSettings, see g_settings_create_action() instead, and possibly
+ * #xsettings_t.  In that case, the real source of the value is
+ * #xsettings_t.  If you want a #xaction_t to control a setting stored in
+ * #xsettings_t, see g_settings_create_action() instead, and possibly
  * combine its use with g_settings_bind().
  *
  * Since: 2.38
@@ -91,13 +91,13 @@ struct _GPropertyAction
 
   xchar_t              *name;
   xpointer_t            object;
-  GParamSpec         *pspec;
+  xparam_spec_t         *pspec;
   const xvariant_type_t *state_type;
   xboolean_t            invert_boolean;
 };
 
 /**
- * GPropertyAction:
+ * xproperty_action_t:
  *
  * This type is opaque.
  *
@@ -106,8 +106,8 @@ struct _GPropertyAction
 
 typedef xobject_class_t GPropertyActionClass;
 
-static void g_property_action_iface_init (GActionInterface *iface);
-G_DEFINE_TYPE_WITH_CODE (GPropertyAction, g_property_action, XTYPE_OBJECT,
+static void g_property_action_iface_init (xaction_interface_t *iface);
+G_DEFINE_TYPE_WITH_CODE (xproperty_action, g_property_action, XTYPE_OBJECT,
   G_IMPLEMENT_INTERFACE (XTYPE_ACTION, g_property_action_iface_init))
 
 enum
@@ -124,123 +124,123 @@ enum
 };
 
 static xboolean_t
-g_property_action_get_invert_boolean (GAction *action)
+g_property_action_get_invert_boolean (xaction_t *action)
 {
-  GPropertyAction *paction = G_PROPERTY_ACTION (action);
+  xproperty_action_t *paction = G_PROPERTY_ACTION (action);
 
   return paction->invert_boolean;
 }
 
 static const xchar_t *
-g_property_action_get_name (GAction *action)
+g_property_action_get_name (xaction_t *action)
 {
-  GPropertyAction *paction = G_PROPERTY_ACTION (action);
+  xproperty_action_t *paction = G_PROPERTY_ACTION (action);
 
   return paction->name;
 }
 
 static const xvariant_type_t *
-g_property_action_get_parameter_type (GAction *action)
+g_property_action_get_parameter_type (xaction_t *action)
 {
-  GPropertyAction *paction = G_PROPERTY_ACTION (action);
+  xproperty_action_t *paction = G_PROPERTY_ACTION (action);
 
   return paction->pspec->value_type == XTYPE_BOOLEAN ? NULL : paction->state_type;
 }
 
 static const xvariant_type_t *
-g_property_action_get_state_type (GAction *action)
+g_property_action_get_state_type (xaction_t *action)
 {
-  GPropertyAction *paction = G_PROPERTY_ACTION (action);
+  xproperty_action_t *paction = G_PROPERTY_ACTION (action);
 
   return paction->state_type;
 }
 
 static xvariant_t *
-g_property_action_get_state_hint (GAction *action)
+g_property_action_get_state_hint (xaction_t *action)
 {
-  GPropertyAction *paction = G_PROPERTY_ACTION (action);
+  xproperty_action_t *paction = G_PROPERTY_ACTION (action);
 
   if (paction->pspec->value_type == XTYPE_INT)
     {
       GParamSpecInt *pspec = (GParamSpecInt *)paction->pspec;
-      return g_variant_new ("(ii)", pspec->minimum, pspec->maximum);
+      return xvariant_new ("(ii)", pspec->minimum, pspec->maximum);
     }
   else if (paction->pspec->value_type == XTYPE_UINT)
     {
       GParamSpecUInt *pspec = (GParamSpecUInt *)paction->pspec;
-      return g_variant_new ("(uu)", pspec->minimum, pspec->maximum);
+      return xvariant_new ("(uu)", pspec->minimum, pspec->maximum);
     }
   else if (paction->pspec->value_type == XTYPE_FLOAT)
     {
       GParamSpecFloat *pspec = (GParamSpecFloat *)paction->pspec;
-      return g_variant_new ("(dd)", (double)pspec->minimum, (double)pspec->maximum);
+      return xvariant_new ("(dd)", (double)pspec->minimum, (double)pspec->maximum);
     }
   else if (paction->pspec->value_type == XTYPE_DOUBLE)
     {
       GParamSpecDouble *pspec = (GParamSpecDouble *)paction->pspec;
-      return g_variant_new ("(dd)", pspec->minimum, pspec->maximum);
+      return xvariant_new ("(dd)", pspec->minimum, pspec->maximum);
     }
 
   return NULL;
 }
 
 static xboolean_t
-g_property_action_get_enabled (GAction *action)
+g_property_action_get_enabled (xaction_t *action)
 {
   return TRUE;
 }
 
 static void
-g_property_action_set_state (GPropertyAction *paction,
+g_property_action_set_state (xproperty_action_t *paction,
                              xvariant_t        *variant)
 {
-  GValue value = G_VALUE_INIT;
+  xvalue_t value = G_VALUE_INIT;
 
-  g_value_init (&value, paction->pspec->value_type);
+  xvalue_init (&value, paction->pspec->value_type);
   g_settings_get_mapping (&value, variant, NULL);
 
   if (paction->pspec->value_type == XTYPE_BOOLEAN && paction->invert_boolean)
-    g_value_set_boolean (&value, !g_value_get_boolean (&value));
+    xvalue_set_boolean (&value, !xvalue_get_boolean (&value));
 
-  g_object_set_property (paction->object, paction->pspec->name, &value);
-  g_value_unset (&value);
+  xobject_set_property (paction->object, paction->pspec->name, &value);
+  xvalue_unset (&value);
 }
 
 static void
-g_property_action_change_state (GAction  *action,
+g_property_action_change_state (xaction_t  *action,
                                 xvariant_t *value)
 {
-  GPropertyAction *paction = G_PROPERTY_ACTION (action);
+  xproperty_action_t *paction = G_PROPERTY_ACTION (action);
 
-  g_return_if_fail (g_variant_is_of_type (value, paction->state_type));
+  g_return_if_fail (xvariant_is_of_type (value, paction->state_type));
 
   g_property_action_set_state (paction, value);
 }
 
 static xvariant_t *
-g_property_action_get_state (GAction *action)
+g_property_action_get_state (xaction_t *action)
 {
-  GPropertyAction *paction = G_PROPERTY_ACTION (action);
-  GValue value = G_VALUE_INIT;
+  xproperty_action_t *paction = G_PROPERTY_ACTION (action);
+  xvalue_t value = G_VALUE_INIT;
   xvariant_t *result;
 
-  g_value_init (&value, paction->pspec->value_type);
-  g_object_get_property (paction->object, paction->pspec->name, &value);
+  xvalue_init (&value, paction->pspec->value_type);
+  xobject_get_property (paction->object, paction->pspec->name, &value);
 
   if (paction->pspec->value_type == XTYPE_BOOLEAN && paction->invert_boolean)
-    g_value_set_boolean (&value, !g_value_get_boolean (&value));
+    xvalue_set_boolean (&value, !xvalue_get_boolean (&value));
 
   result = g_settings_set_mapping (&value, paction->state_type, NULL);
-  g_value_unset (&value);
+  xvalue_unset (&value);
 
-  return g_variant_ref_sink (result);
+  return xvariant_ref_sink (result);
 }
 
 static void
-g_property_action_activate (GAction  *action,
+g_property_action_activate (xaction_t  *action,
                             xvariant_t *parameter)
 {
-  GPropertyAction *paction = G_PROPERTY_ACTION (action);
+  xproperty_action_t *paction = G_PROPERTY_ACTION (action);
 
   if (paction->pspec->value_type == XTYPE_BOOLEAN)
     {
@@ -248,20 +248,20 @@ g_property_action_activate (GAction  *action,
 
       g_return_if_fail (paction->pspec->value_type == XTYPE_BOOLEAN && parameter == NULL);
 
-      g_object_get (paction->object, paction->pspec->name, &value, NULL);
+      xobject_get (paction->object, paction->pspec->name, &value, NULL);
       value = !value;
-      g_object_set (paction->object, paction->pspec->name, value, NULL);
+      xobject_set (paction->object, paction->pspec->name, value, NULL);
     }
   else
     {
-      g_return_if_fail (parameter != NULL && g_variant_is_of_type (parameter, paction->state_type));
+      g_return_if_fail (parameter != NULL && xvariant_is_of_type (parameter, paction->state_type));
 
       g_property_action_set_state (paction, parameter);
     }
 }
 
 static const xvariant_type_t *
-g_property_action_determine_type (GParamSpec *pspec)
+g_property_action_determine_type (xparam_spec_t *pspec)
 {
   if (XTYPE_IS_ENUM (pspec->value_type))
     return G_VARIANT_TYPE_STRING;
@@ -285,51 +285,51 @@ g_property_action_determine_type (GParamSpec *pspec)
       return G_VARIANT_TYPE_STRING;
 
     default:
-      g_critical ("Unable to use GPropertyAction with property '%s::%s' of type '%s'",
-                  g_type_name (pspec->owner_type), pspec->name, g_type_name (pspec->value_type));
+      g_critical ("Unable to use xproperty_action_t with property '%s::%s' of type '%s'",
+                  xtype_name (pspec->owner_type), pspec->name, xtype_name (pspec->value_type));
       return NULL;
     }
 }
 
 static void
 g_property_action_notify (xobject_t    *object,
-                          GParamSpec *pspec,
+                          xparam_spec_t *pspec,
                           xpointer_t    user_data)
 {
-  GPropertyAction *paction = user_data;
+  xproperty_action_t *paction = user_data;
 
   g_assert (object == paction->object);
   g_assert (pspec == paction->pspec);
 
-  g_object_notify (G_OBJECT (paction), "state");
+  xobject_notify (G_OBJECT (paction), "state");
 }
 
 static void
-g_property_action_set_property_name (GPropertyAction *paction,
+g_property_action_set_property_name (xproperty_action_t *paction,
                                      const xchar_t     *property_name)
 {
-  GParamSpec *pspec;
+  xparam_spec_t *pspec;
   xchar_t *detailed;
 
-  pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (paction->object), property_name);
+  pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (paction->object), property_name);
 
   if (pspec == NULL)
     {
-      g_critical ("Attempted to use non-existent property '%s::%s' for GPropertyAction",
+      g_critical ("Attempted to use non-existent property '%s::%s' for xproperty_action_t",
                   G_OBJECT_TYPE_NAME (paction->object), property_name);
       return;
     }
 
   if (~pspec->flags & G_PARAM_READABLE || ~pspec->flags & G_PARAM_WRITABLE || pspec->flags & G_PARAM_CONSTRUCT_ONLY)
     {
-      g_critical ("Property '%s::%s' used with GPropertyAction must be readable, writable, and not construct-only",
+      g_critical ("Property '%s::%s' used with xproperty_action_t must be readable, writable, and not construct-only",
                   G_OBJECT_TYPE_NAME (paction->object), property_name);
       return;
     }
 
   paction->pspec = pspec;
 
-  detailed = g_strconcat ("notify::", paction->pspec->name, NULL);
+  detailed = xstrconcat ("notify::", paction->pspec->name, NULL);
   paction->state_type = g_property_action_determine_type (paction->pspec);
   g_signal_connect (paction->object, detailed, G_CALLBACK (g_property_action_notify), paction);
   g_free (detailed);
@@ -338,27 +338,27 @@ g_property_action_set_property_name (GPropertyAction *paction,
 static void
 g_property_action_set_property (xobject_t      *object,
                                 xuint_t         prop_id,
-                                const GValue *value,
-                                GParamSpec   *pspec)
+                                const xvalue_t *value,
+                                xparam_spec_t   *pspec)
 {
-  GPropertyAction *paction = G_PROPERTY_ACTION (object);
+  xproperty_action_t *paction = G_PROPERTY_ACTION (object);
 
   switch (prop_id)
     {
     case PROP_NAME:
-      paction->name = g_value_dup_string (value);
+      paction->name = xvalue_dup_string (value);
       break;
 
     case PROP_OBJECT:
-      paction->object = g_value_dup_object (value);
+      paction->object = xvalue_dup_object (value);
       break;
 
     case PROP_PROPERTY_NAME:
-      g_property_action_set_property_name (paction, g_value_get_string (value));
+      g_property_action_set_property_name (paction, xvalue_get_string (value));
       break;
 
     case PROP_INVERT_BOOLEAN:
-      paction->invert_boolean = g_value_get_boolean (value);
+      paction->invert_boolean = xvalue_get_boolean (value);
       break;
 
     default:
@@ -369,35 +369,35 @@ g_property_action_set_property (xobject_t      *object,
 static void
 g_property_action_get_property (xobject_t    *object,
                                 xuint_t       prop_id,
-                                GValue     *value,
-                                GParamSpec *pspec)
+                                xvalue_t     *value,
+                                xparam_spec_t *pspec)
 {
-  GAction *action = G_ACTION (object);
+  xaction_t *action = G_ACTION (object);
 
   switch (prop_id)
     {
     case PROP_NAME:
-      g_value_set_string (value, g_property_action_get_name (action));
+      xvalue_set_string (value, g_property_action_get_name (action));
       break;
 
     case PROP_PARAMETER_TYPE:
-      g_value_set_boxed (value, g_property_action_get_parameter_type (action));
+      xvalue_set_boxed (value, g_property_action_get_parameter_type (action));
       break;
 
     case PROP_ENABLED:
-      g_value_set_boolean (value, g_property_action_get_enabled (action));
+      xvalue_set_boolean (value, g_property_action_get_enabled (action));
       break;
 
     case PROP_STATE_TYPE:
-      g_value_set_boxed (value, g_property_action_get_state_type (action));
+      xvalue_set_boxed (value, g_property_action_get_state_type (action));
       break;
 
     case PROP_STATE:
-      g_value_take_variant (value, g_property_action_get_state (action));
+      xvalue_take_variant (value, g_property_action_get_state (action));
       break;
 
     case PROP_INVERT_BOOLEAN:
-      g_value_set_boolean (value, g_property_action_get_invert_boolean (action));
+      xvalue_set_boolean (value, g_property_action_get_invert_boolean (action));
       break;
 
     default:
@@ -408,10 +408,10 @@ g_property_action_get_property (xobject_t    *object,
 static void
 g_property_action_finalize (xobject_t *object)
 {
-  GPropertyAction *paction = G_PROPERTY_ACTION (object);
+  xproperty_action_t *paction = G_PROPERTY_ACTION (object);
 
   g_signal_handlers_disconnect_by_func (paction->object, g_property_action_notify, paction);
-  g_object_unref (paction->object);
+  xobject_unref (paction->object);
   g_free (paction->name);
 
   G_OBJECT_CLASS (g_property_action_parent_class)
@@ -419,12 +419,12 @@ g_property_action_finalize (xobject_t *object)
 }
 
 void
-g_property_action_init (GPropertyAction *property)
+g_property_action_init (xproperty_action_t *property)
 {
 }
 
 void
-g_property_action_iface_init (GActionInterface *iface)
+g_property_action_iface_init (xaction_interface_t *iface)
 {
   iface->get_name = g_property_action_get_name;
   iface->get_parameter_type = g_property_action_get_parameter_type;
@@ -446,14 +446,14 @@ g_property_action_class_init (GPropertyActionClass *class)
   object_class->finalize = g_property_action_finalize;
 
   /**
-   * GPropertyAction:name:
+   * xproperty_action_t:name:
    *
    * The name of the action.  This is mostly meaningful for identifying
-   * the action once it has been added to a #GActionMap.
+   * the action once it has been added to a #xaction_map_t.
    *
    * Since: 2.38
    **/
-  g_object_class_install_property (object_class, PROP_NAME,
+  xobject_class_install_property (object_class, PROP_NAME,
                                    g_param_spec_string ("name",
                                                         P_("Action Name"),
                                                         P_("The name used to invoke the action"),
@@ -463,14 +463,14 @@ g_property_action_class_init (GPropertyActionClass *class)
                                                         G_PARAM_STATIC_STRINGS));
 
   /**
-   * GPropertyAction:parameter-type:
+   * xproperty_action_t:parameter-type:
    *
    * The type of the parameter that must be given when activating the
    * action.
    *
    * Since: 2.38
    **/
-  g_object_class_install_property (object_class, PROP_PARAMETER_TYPE,
+  xobject_class_install_property (object_class, PROP_PARAMETER_TYPE,
                                    g_param_spec_boxed ("parameter-type",
                                                        P_("Parameter Type"),
                                                        P_("The type of xvariant_t passed to activate()"),
@@ -479,7 +479,7 @@ g_property_action_class_init (GPropertyActionClass *class)
                                                        G_PARAM_STATIC_STRINGS));
 
   /**
-   * GPropertyAction:enabled:
+   * xproperty_action_t:enabled:
    *
    * If @action is currently enabled.
    *
@@ -488,7 +488,7 @@ g_property_action_class_init (GPropertyActionClass *class)
    *
    * Since: 2.38
    **/
-  g_object_class_install_property (object_class, PROP_ENABLED,
+  xobject_class_install_property (object_class, PROP_ENABLED,
                                    g_param_spec_boolean ("enabled",
                                                          P_("Enabled"),
                                                          P_("If the action can be activated"),
@@ -497,14 +497,14 @@ g_property_action_class_init (GPropertyActionClass *class)
                                                          G_PARAM_STATIC_STRINGS));
 
   /**
-   * GPropertyAction:state-type:
+   * xproperty_action_t:state-type:
    *
    * The #xvariant_type_t of the state that the action has, or %NULL if the
    * action is stateless.
    *
    * Since: 2.38
    **/
-  g_object_class_install_property (object_class, PROP_STATE_TYPE,
+  xobject_class_install_property (object_class, PROP_STATE_TYPE,
                                    g_param_spec_boxed ("state-type",
                                                        P_("State Type"),
                                                        P_("The type of the state kept by the action"),
@@ -513,13 +513,13 @@ g_property_action_class_init (GPropertyActionClass *class)
                                                        G_PARAM_STATIC_STRINGS));
 
   /**
-   * GPropertyAction:state:
+   * xproperty_action_t:state:
    *
    * The state of the action, or %NULL if the action is stateless.
    *
    * Since: 2.38
    **/
-  g_object_class_install_property (object_class, PROP_STATE,
+  xobject_class_install_property (object_class, PROP_STATE,
                                    g_param_spec_variant ("state",
                                                          P_("State"),
                                                          P_("The state the action is in"),
@@ -529,7 +529,7 @@ g_property_action_class_init (GPropertyActionClass *class)
                                                          G_PARAM_STATIC_STRINGS));
 
   /**
-   * GPropertyAction:object:
+   * xproperty_action_t:object:
    *
    * The object to wrap a property on.
    *
@@ -537,7 +537,7 @@ g_property_action_class_init (GPropertyActionClass *class)
    *
    * Since: 2.38
    **/
-  g_object_class_install_property (object_class, PROP_OBJECT,
+  xobject_class_install_property (object_class, PROP_OBJECT,
                                    g_param_spec_object ("object",
                                                         P_("Object"),
                                                         P_("The object with the property to wrap"),
@@ -547,7 +547,7 @@ g_property_action_class_init (GPropertyActionClass *class)
                                                         G_PARAM_STATIC_STRINGS));
 
   /**
-   * GPropertyAction:property-name:
+   * xproperty_action_t:property-name:
    *
    * The name of the property to wrap on the object.
    *
@@ -556,7 +556,7 @@ g_property_action_class_init (GPropertyActionClass *class)
    *
    * Since: 2.38
    **/
-  g_object_class_install_property (object_class, PROP_PROPERTY_NAME,
+  xobject_class_install_property (object_class, PROP_PROPERTY_NAME,
                                    g_param_spec_string ("property-name",
                                                         P_("Property name"),
                                                         P_("The name of the property to wrap"),
@@ -566,14 +566,14 @@ g_property_action_class_init (GPropertyActionClass *class)
                                                         G_PARAM_STATIC_STRINGS));
 
   /**
-   * GPropertyAction:invert-boolean:
+   * xproperty_action_t:invert-boolean:
    *
    * If %TRUE, the state of the action will be the negation of the
    * property value, provided the property is boolean.
    *
    * Since: 2.46
    */
-  g_object_class_install_property (object_class, PROP_INVERT_BOOLEAN,
+  xobject_class_install_property (object_class, PROP_INVERT_BOOLEAN,
                                    g_param_spec_boolean ("invert-boolean",
                                                          P_("Invert boolean"),
                                                          P_("Whether to invert the value of a boolean property"),
@@ -590,7 +590,7 @@ g_property_action_class_init (GPropertyActionClass *class)
  *   to wrap
  * @property_name: the name of the property
  *
- * Creates a #GAction corresponding to the value of property
+ * Creates a #xaction_t corresponding to the value of property
  * @property_name on @object.
  *
  * The property must be existent and readable and writable (and not
@@ -599,11 +599,11 @@ g_property_action_class_init (GPropertyActionClass *class)
  * This function takes a reference on @object and doesn't release it
  * until the action is destroyed.
  *
- * Returns: a new #GPropertyAction
+ * Returns: a new #xproperty_action_t
  *
  * Since: 2.38
  **/
-GPropertyAction *
+xproperty_action_t *
 g_property_action_new (const xchar_t *name,
                        xpointer_t     object,
                        const xchar_t *property_name)
@@ -612,7 +612,7 @@ g_property_action_new (const xchar_t *name,
   g_return_val_if_fail (X_IS_OBJECT (object), NULL);
   g_return_val_if_fail (property_name != NULL, NULL);
 
-  return g_object_new (XTYPE_PROPERTY_ACTION,
+  return xobject_new (XTYPE_PROPERTY_ACTION,
                        "name", name,
                        "object", object,
                        "property-name", property_name,

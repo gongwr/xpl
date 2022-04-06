@@ -21,15 +21,15 @@ G_BEGIN_DECLS
 
 /* VOID:VOID */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__VOID (GClosure     *closure,
-                                    GValue       *return_value,
+void g_cclosure_marshal_VOID__VOID (xclosure_t     *closure,
+                                    xvalue_t       *return_value,
                                     xuint_t         n_param_values,
-                                    const GValue *param_values,
+                                    const xvalue_t *param_values,
                                     xpointer_t      invocation_hint,
                                     xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__VOIDv (GClosure *closure,
-                                     GValue   *return_value,
+void g_cclosure_marshal_VOID__VOIDv (xclosure_t *closure,
+                                     xvalue_t   *return_value,
                                      xpointer_t  instance,
                                      va_list   args,
                                      xpointer_t  marshal_data,
@@ -38,15 +38,15 @@ void g_cclosure_marshal_VOID__VOIDv (GClosure *closure,
 
 /* VOID:BOOLEAN */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__BOOLEAN (GClosure     *closure,
-                                       GValue       *return_value,
+void g_cclosure_marshal_VOID__BOOLEAN (xclosure_t     *closure,
+                                       xvalue_t       *return_value,
                                        xuint_t         n_param_values,
-                                       const GValue *param_values,
+                                       const xvalue_t *param_values,
                                        xpointer_t      invocation_hint,
                                        xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__BOOLEANv (GClosure *closure,
-                                        GValue   *return_value,
+void g_cclosure_marshal_VOID__BOOLEANv (xclosure_t *closure,
+                                        xvalue_t   *return_value,
                                         xpointer_t  instance,
                                         va_list   args,
                                         xpointer_t  marshal_data,
@@ -55,15 +55,15 @@ void g_cclosure_marshal_VOID__BOOLEANv (GClosure *closure,
 
 /* VOID:CHAR */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__CHAR (GClosure     *closure,
-                                    GValue       *return_value,
+void g_cclosure_marshal_VOID__CHAR (xclosure_t     *closure,
+                                    xvalue_t       *return_value,
                                     xuint_t         n_param_values,
-                                    const GValue *param_values,
+                                    const xvalue_t *param_values,
                                     xpointer_t      invocation_hint,
                                     xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__CHARv (GClosure *closure,
-                                     GValue   *return_value,
+void g_cclosure_marshal_VOID__CHARv (xclosure_t *closure,
+                                     xvalue_t   *return_value,
                                      xpointer_t  instance,
                                      va_list   args,
                                      xpointer_t  marshal_data,
@@ -72,15 +72,15 @@ void g_cclosure_marshal_VOID__CHARv (GClosure *closure,
 
 /* VOID:UCHAR */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__UCHAR (GClosure     *closure,
-                                     GValue       *return_value,
+void g_cclosure_marshal_VOID__UCHAR (xclosure_t     *closure,
+                                     xvalue_t       *return_value,
                                      xuint_t         n_param_values,
-                                     const GValue *param_values,
+                                     const xvalue_t *param_values,
                                      xpointer_t      invocation_hint,
                                      xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__UCHARv (GClosure *closure,
-                                      GValue   *return_value,
+void g_cclosure_marshal_VOID__UCHARv (xclosure_t *closure,
+                                      xvalue_t   *return_value,
                                       xpointer_t  instance,
                                       va_list   args,
                                       xpointer_t  marshal_data,
@@ -89,15 +89,15 @@ void g_cclosure_marshal_VOID__UCHARv (GClosure *closure,
 
 /* VOID:INT */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__INT (GClosure     *closure,
-                                   GValue       *return_value,
+void g_cclosure_marshal_VOID__INT (xclosure_t     *closure,
+                                   xvalue_t       *return_value,
                                    xuint_t         n_param_values,
-                                   const GValue *param_values,
+                                   const xvalue_t *param_values,
                                    xpointer_t      invocation_hint,
                                    xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__INTv (GClosure *closure,
-                                    GValue   *return_value,
+void g_cclosure_marshal_VOID__INTv (xclosure_t *closure,
+                                    xvalue_t   *return_value,
                                     xpointer_t  instance,
                                     va_list   args,
                                     xpointer_t  marshal_data,
@@ -106,15 +106,15 @@ void g_cclosure_marshal_VOID__INTv (GClosure *closure,
 
 /* VOID:UINT */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__UINT (GClosure     *closure,
-                                    GValue       *return_value,
+void g_cclosure_marshal_VOID__UINT (xclosure_t     *closure,
+                                    xvalue_t       *return_value,
                                     xuint_t         n_param_values,
-                                    const GValue *param_values,
+                                    const xvalue_t *param_values,
                                     xpointer_t      invocation_hint,
                                     xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__UINTv (GClosure *closure,
-                                     GValue   *return_value,
+void g_cclosure_marshal_VOID__UINTv (xclosure_t *closure,
+                                     xvalue_t   *return_value,
                                      xpointer_t  instance,
                                      va_list   args,
                                      xpointer_t  marshal_data,
@@ -123,15 +123,15 @@ void g_cclosure_marshal_VOID__UINTv (GClosure *closure,
 
 /* VOID:LONG */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__LONG (GClosure     *closure,
-                                    GValue       *return_value,
+void g_cclosure_marshal_VOID__LONG (xclosure_t     *closure,
+                                    xvalue_t       *return_value,
                                     xuint_t         n_param_values,
-                                    const GValue *param_values,
+                                    const xvalue_t *param_values,
                                     xpointer_t      invocation_hint,
                                     xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__LONGv (GClosure *closure,
-                                     GValue   *return_value,
+void g_cclosure_marshal_VOID__LONGv (xclosure_t *closure,
+                                     xvalue_t   *return_value,
                                      xpointer_t  instance,
                                      va_list   args,
                                      xpointer_t  marshal_data,
@@ -140,15 +140,15 @@ void g_cclosure_marshal_VOID__LONGv (GClosure *closure,
 
 /* VOID:ULONG */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__ULONG (GClosure     *closure,
-                                     GValue       *return_value,
+void g_cclosure_marshal_VOID__ULONG (xclosure_t     *closure,
+                                     xvalue_t       *return_value,
                                      xuint_t         n_param_values,
-                                     const GValue *param_values,
+                                     const xvalue_t *param_values,
                                      xpointer_t      invocation_hint,
                                      xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__ULONGv (GClosure *closure,
-                                      GValue   *return_value,
+void g_cclosure_marshal_VOID__ULONGv (xclosure_t *closure,
+                                      xvalue_t   *return_value,
                                       xpointer_t  instance,
                                       va_list   args,
                                       xpointer_t  marshal_data,
@@ -157,15 +157,15 @@ void g_cclosure_marshal_VOID__ULONGv (GClosure *closure,
 
 /* VOID:ENUM */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__ENUM (GClosure     *closure,
-                                    GValue       *return_value,
+void g_cclosure_marshal_VOID__ENUM (xclosure_t     *closure,
+                                    xvalue_t       *return_value,
                                     xuint_t         n_param_values,
-                                    const GValue *param_values,
+                                    const xvalue_t *param_values,
                                     xpointer_t      invocation_hint,
                                     xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__ENUMv (GClosure *closure,
-                                     GValue   *return_value,
+void g_cclosure_marshal_VOID__ENUMv (xclosure_t *closure,
+                                     xvalue_t   *return_value,
                                      xpointer_t  instance,
                                      va_list   args,
                                      xpointer_t  marshal_data,
@@ -174,15 +174,15 @@ void g_cclosure_marshal_VOID__ENUMv (GClosure *closure,
 
 /* VOID:FLAGS */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__FLAGS (GClosure     *closure,
-                                     GValue       *return_value,
+void g_cclosure_marshal_VOID__FLAGS (xclosure_t     *closure,
+                                     xvalue_t       *return_value,
                                      xuint_t         n_param_values,
-                                     const GValue *param_values,
+                                     const xvalue_t *param_values,
                                      xpointer_t      invocation_hint,
                                      xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__FLAGSv (GClosure *closure,
-                                      GValue   *return_value,
+void g_cclosure_marshal_VOID__FLAGSv (xclosure_t *closure,
+                                      xvalue_t   *return_value,
                                       xpointer_t  instance,
                                       va_list   args,
                                       xpointer_t  marshal_data,
@@ -191,15 +191,15 @@ void g_cclosure_marshal_VOID__FLAGSv (GClosure *closure,
 
 /* VOID:FLOAT */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__FLOAT (GClosure     *closure,
-                                     GValue       *return_value,
+void g_cclosure_marshal_VOID__FLOAT (xclosure_t     *closure,
+                                     xvalue_t       *return_value,
                                      xuint_t         n_param_values,
-                                     const GValue *param_values,
+                                     const xvalue_t *param_values,
                                      xpointer_t      invocation_hint,
                                      xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__FLOATv (GClosure *closure,
-                                      GValue   *return_value,
+void g_cclosure_marshal_VOID__FLOATv (xclosure_t *closure,
+                                      xvalue_t   *return_value,
                                       xpointer_t  instance,
                                       va_list   args,
                                       xpointer_t  marshal_data,
@@ -208,15 +208,15 @@ void g_cclosure_marshal_VOID__FLOATv (GClosure *closure,
 
 /* VOID:DOUBLE */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__DOUBLE (GClosure     *closure,
-                                      GValue       *return_value,
+void g_cclosure_marshal_VOID__DOUBLE (xclosure_t     *closure,
+                                      xvalue_t       *return_value,
                                       xuint_t         n_param_values,
-                                      const GValue *param_values,
+                                      const xvalue_t *param_values,
                                       xpointer_t      invocation_hint,
                                       xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__DOUBLEv (GClosure *closure,
-                                       GValue   *return_value,
+void g_cclosure_marshal_VOID__DOUBLEv (xclosure_t *closure,
+                                       xvalue_t   *return_value,
                                        xpointer_t  instance,
                                        va_list   args,
                                        xpointer_t  marshal_data,
@@ -225,15 +225,15 @@ void g_cclosure_marshal_VOID__DOUBLEv (GClosure *closure,
 
 /* VOID:STRING */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__STRING (GClosure     *closure,
-                                      GValue       *return_value,
+void g_cclosure_marshal_VOID__STRING (xclosure_t     *closure,
+                                      xvalue_t       *return_value,
                                       xuint_t         n_param_values,
-                                      const GValue *param_values,
+                                      const xvalue_t *param_values,
                                       xpointer_t      invocation_hint,
                                       xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__STRINGv (GClosure *closure,
-                                       GValue   *return_value,
+void g_cclosure_marshal_VOID__STRINGv (xclosure_t *closure,
+                                       xvalue_t   *return_value,
                                        xpointer_t  instance,
                                        va_list   args,
                                        xpointer_t  marshal_data,
@@ -242,15 +242,15 @@ void g_cclosure_marshal_VOID__STRINGv (GClosure *closure,
 
 /* VOID:PARAM */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__PARAM (GClosure     *closure,
-                                     GValue       *return_value,
+void g_cclosure_marshal_VOID__PARAM (xclosure_t     *closure,
+                                     xvalue_t       *return_value,
                                      xuint_t         n_param_values,
-                                     const GValue *param_values,
+                                     const xvalue_t *param_values,
                                      xpointer_t      invocation_hint,
                                      xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__PARAMv (GClosure *closure,
-                                      GValue   *return_value,
+void g_cclosure_marshal_VOID__PARAMv (xclosure_t *closure,
+                                      xvalue_t   *return_value,
                                       xpointer_t  instance,
                                       va_list   args,
                                       xpointer_t  marshal_data,
@@ -259,15 +259,15 @@ void g_cclosure_marshal_VOID__PARAMv (GClosure *closure,
 
 /* VOID:BOXED */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__BOXED (GClosure     *closure,
-                                     GValue       *return_value,
+void g_cclosure_marshal_VOID__BOXED (xclosure_t     *closure,
+                                     xvalue_t       *return_value,
                                      xuint_t         n_param_values,
-                                     const GValue *param_values,
+                                     const xvalue_t *param_values,
                                      xpointer_t      invocation_hint,
                                      xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__BOXEDv (GClosure *closure,
-                                      GValue   *return_value,
+void g_cclosure_marshal_VOID__BOXEDv (xclosure_t *closure,
+                                      xvalue_t   *return_value,
                                       xpointer_t  instance,
                                       va_list   args,
                                       xpointer_t  marshal_data,
@@ -276,15 +276,15 @@ void g_cclosure_marshal_VOID__BOXEDv (GClosure *closure,
 
 /* VOID:POINTER */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__POINTER (GClosure     *closure,
-                                       GValue       *return_value,
+void g_cclosure_marshal_VOID__POINTER (xclosure_t     *closure,
+                                       xvalue_t       *return_value,
                                        xuint_t         n_param_values,
-                                       const GValue *param_values,
+                                       const xvalue_t *param_values,
                                        xpointer_t      invocation_hint,
                                        xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__POINTERv (GClosure *closure,
-                                        GValue   *return_value,
+void g_cclosure_marshal_VOID__POINTERv (xclosure_t *closure,
+                                        xvalue_t   *return_value,
                                         xpointer_t  instance,
                                         va_list   args,
                                         xpointer_t  marshal_data,
@@ -293,15 +293,15 @@ void g_cclosure_marshal_VOID__POINTERv (GClosure *closure,
 
 /* VOID:OBJECT */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__OBJECT (GClosure     *closure,
-                                      GValue       *return_value,
+void g_cclosure_marshal_VOID__OBJECT (xclosure_t     *closure,
+                                      xvalue_t       *return_value,
                                       xuint_t         n_param_values,
-                                      const GValue *param_values,
+                                      const xvalue_t *param_values,
                                       xpointer_t      invocation_hint,
                                       xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__OBJECTv (GClosure *closure,
-                                       GValue   *return_value,
+void g_cclosure_marshal_VOID__OBJECTv (xclosure_t *closure,
+                                       xvalue_t   *return_value,
                                        xpointer_t  instance,
                                        va_list   args,
                                        xpointer_t  marshal_data,
@@ -310,15 +310,15 @@ void g_cclosure_marshal_VOID__OBJECTv (GClosure *closure,
 
 /* VOID:VARIANT */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__VARIANT (GClosure     *closure,
-                                       GValue       *return_value,
+void g_cclosure_marshal_VOID__VARIANT (xclosure_t     *closure,
+                                       xvalue_t       *return_value,
                                        xuint_t         n_param_values,
-                                       const GValue *param_values,
+                                       const xvalue_t *param_values,
                                        xpointer_t      invocation_hint,
                                        xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__VARIANTv (GClosure *closure,
-                                        GValue   *return_value,
+void g_cclosure_marshal_VOID__VARIANTv (xclosure_t *closure,
+                                        xvalue_t   *return_value,
                                         xpointer_t  instance,
                                         va_list   args,
                                         xpointer_t  marshal_data,
@@ -327,15 +327,15 @@ void g_cclosure_marshal_VOID__VARIANTv (GClosure *closure,
 
 /* VOID:UINT,POINTER */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__UINT_POINTER (GClosure     *closure,
-                                            GValue       *return_value,
+void g_cclosure_marshal_VOID__UINT_POINTER (xclosure_t     *closure,
+                                            xvalue_t       *return_value,
                                             xuint_t         n_param_values,
-                                            const GValue *param_values,
+                                            const xvalue_t *param_values,
                                             xpointer_t      invocation_hint,
                                             xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_VOID__UINT_POINTERv (GClosure *closure,
-                                             GValue   *return_value,
+void g_cclosure_marshal_VOID__UINT_POINTERv (xclosure_t *closure,
+                                             xvalue_t   *return_value,
                                              xpointer_t  instance,
                                              va_list   args,
                                              xpointer_t  marshal_data,
@@ -344,15 +344,15 @@ void g_cclosure_marshal_VOID__UINT_POINTERv (GClosure *closure,
 
 /* BOOL:FLAGS */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_BOOLEAN__FLAGS (GClosure     *closure,
-                                        GValue       *return_value,
+void g_cclosure_marshal_BOOLEAN__FLAGS (xclosure_t     *closure,
+                                        xvalue_t       *return_value,
                                         xuint_t         n_param_values,
-                                        const GValue *param_values,
+                                        const xvalue_t *param_values,
                                         xpointer_t      invocation_hint,
                                         xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_BOOLEAN__FLAGSv (GClosure *closure,
-                                         GValue   *return_value,
+void g_cclosure_marshal_BOOLEAN__FLAGSv (xclosure_t *closure,
+                                         xvalue_t   *return_value,
                                          xpointer_t  instance,
                                          va_list   args,
                                          xpointer_t  marshal_data,
@@ -361,17 +361,17 @@ void g_cclosure_marshal_BOOLEAN__FLAGSv (GClosure *closure,
 
 /**
  * g_cclosure_marshal_BOOL__FLAGS:
- * @closure: A #GClosure.
- * @return_value: A #GValue to store the return value. May be %NULL
+ * @closure: A #xclosure_t.
+ * @return_value: A #xvalue_t to store the return value. May be %NULL
  *   if the callback of closure doesn't return a value.
  * @n_param_values: The length of the @param_values array.
  * @param_values: An array of #GValues holding the arguments
  *   on which to invoke the callback of closure.
  * @invocation_hint: The invocation hint given as the last argument to
- *   g_closure_invoke().
+ *   xclosure_invoke().
  * @marshal_data: Additional data specified when registering the
- *   marshaller, see g_closure_set_marshal() and
- *   g_closure_set_meta_marshal()
+ *   marshaller, see xclosure_set_marshal() and
+ *   xclosure_set_meta_marshal()
  *
  * An old alias for g_cclosure_marshal_BOOLEAN__FLAGS().
  */
@@ -379,15 +379,15 @@ void g_cclosure_marshal_BOOLEAN__FLAGSv (GClosure *closure,
 
 /* STRING:OBJECT,POINTER */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_STRING__OBJECT_POINTER (GClosure     *closure,
-                                                GValue       *return_value,
+void g_cclosure_marshal_STRING__OBJECT_POINTER (xclosure_t     *closure,
+                                                xvalue_t       *return_value,
                                                 xuint_t         n_param_values,
-                                                const GValue *param_values,
+                                                const xvalue_t *param_values,
                                                 xpointer_t      invocation_hint,
                                                 xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_STRING__OBJECT_POINTERv (GClosure *closure,
-                                                 GValue   *return_value,
+void g_cclosure_marshal_STRING__OBJECT_POINTERv (xclosure_t *closure,
+                                                 xvalue_t   *return_value,
                                                  xpointer_t  instance,
                                                  va_list   args,
                                                  xpointer_t  marshal_data,
@@ -396,15 +396,15 @@ void g_cclosure_marshal_STRING__OBJECT_POINTERv (GClosure *closure,
 
 /* BOOL:BOXED,BOXED */
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_BOOLEAN__BOXED_BOXED (GClosure     *closure,
-                                              GValue       *return_value,
+void g_cclosure_marshal_BOOLEAN__BOXED_BOXED (xclosure_t     *closure,
+                                              xvalue_t       *return_value,
                                               xuint_t         n_param_values,
-                                              const GValue *param_values,
+                                              const xvalue_t *param_values,
                                               xpointer_t      invocation_hint,
                                               xpointer_t      marshal_data);
 XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_BOOLEAN__BOXED_BOXEDv (GClosure *closure,
-                                               GValue   *return_value,
+void g_cclosure_marshal_BOOLEAN__BOXED_BOXEDv (xclosure_t *closure,
+                                               xvalue_t   *return_value,
                                                xpointer_t  instance,
                                                va_list   args,
                                                xpointer_t  marshal_data,
@@ -413,17 +413,17 @@ void g_cclosure_marshal_BOOLEAN__BOXED_BOXEDv (GClosure *closure,
 
 /**
  * g_cclosure_marshal_BOOL__BOXED_BOXED:
- * @closure: A #GClosure.
- * @return_value: A #GValue to store the return value. May be %NULL
+ * @closure: A #xclosure_t.
+ * @return_value: A #xvalue_t to store the return value. May be %NULL
  *   if the callback of closure doesn't return a value.
  * @n_param_values: The length of the @param_values array.
  * @param_values: An array of #GValues holding the arguments
  *   on which to invoke the callback of closure.
  * @invocation_hint: The invocation hint given as the last argument to
- *   g_closure_invoke().
+ *   xclosure_invoke().
  * @marshal_data: Additional data specified when registering the
- *   marshaller, see g_closure_set_marshal() and
- *   g_closure_set_meta_marshal()
+ *   marshaller, see xclosure_set_marshal() and
+ *   xclosure_set_meta_marshal()
  *
  * An old alias for g_cclosure_marshal_BOOLEAN__BOXED_BOXED().
  */

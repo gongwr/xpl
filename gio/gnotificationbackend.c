@@ -24,48 +24,48 @@
 #include "gactiongroup.h"
 #include "giomodule-priv.h"
 
-G_DEFINE_TYPE (GNotificationBackend, g_notification_backend, XTYPE_OBJECT)
+G_DEFINE_TYPE (xnotification_backend_t, xnotification_backend, XTYPE_OBJECT)
 
 static void
-g_notification_backend_class_init (GNotificationBackendClass *class)
+xnotification_backend_class_init (xnotification_backend_class_t *class)
 {
 }
 
 static void
-g_notification_backend_init (GNotificationBackend *backend)
+xnotification_backend_init (xnotification_backend_t *backend)
 {
 }
 
-GNotificationBackend *
-g_notification_backend_new_default (GApplication *application)
+xnotification_backend_t *
+xnotification_backend_new_default (xapplication_t *application)
 {
   xtype_t backend_type;
-  GNotificationBackend *backend;
+  xnotification_backend_t *backend;
 
   g_return_val_if_fail (X_IS_APPLICATION (application), NULL);
 
   backend_type = _xio_module_get_default_type (G_NOTIFICATION_BACKEND_EXTENSION_POINT_NAME,
                                                 "GNOTIFICATION_BACKEND",
-                                                G_STRUCT_OFFSET (GNotificationBackendClass, is_supported));
+                                                G_STRUCT_OFFSET (xnotification_backend_class_t, is_supported));
 
-  backend = g_object_new (backend_type, NULL);
+  backend = xobject_new (backend_type, NULL);
 
   /* Avoid ref cycle by not taking a ref to the application at all. The
    * backend only lives as long as the application does.
    */
   backend->application = application;
 
-  backend->dbus_connection = g_application_get_dbus_connection (application);
+  backend->dbus_connection = xapplication_get_dbus_connection (application);
   if (backend->dbus_connection)
-    g_object_ref (backend->dbus_connection);
+    xobject_ref (backend->dbus_connection);
 
   return backend;
 }
 
 void
-g_notification_backend_send_notification (GNotificationBackend *backend,
+xnotification_backend_send_notification (xnotification_backend_t *backend,
                                           const xchar_t          *id,
-                                          GNotification        *notification)
+                                          xnotification_t        *notification)
 {
   g_return_if_fail (X_IS_NOTIFICATION_BACKEND (backend));
   g_return_if_fail (X_IS_NOTIFICATION (notification));
@@ -74,7 +74,7 @@ g_notification_backend_send_notification (GNotificationBackend *backend,
 }
 
 void
-g_notification_backend_withdraw_notification (GNotificationBackend *backend,
+xnotification_backend_withdraw_notification (xnotification_backend_t *backend,
                                               const xchar_t          *id)
 {
   g_return_if_fail (X_IS_NOTIFICATION_BACKEND (backend));

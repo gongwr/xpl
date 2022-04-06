@@ -21,14 +21,14 @@
 
 #include <glib-object.h>
 
-G_DECLARE_FINAL_TYPE (SignalTarget, signal_target, TEST, SIGNAL_TARGET, xobject_t)
+G_DECLARE_FINAL_TYPE (signal_target_t, signal_target, TEST, SIGNAL_TARGET, xobject)
 
-struct _SignalTarget
+struct _signal_target_t
 {
   xobject_t parent_instance;
 };
 
-G_DEFINE_TYPE (SignalTarget, signal_target, XTYPE_OBJECT)
+G_DEFINE_TYPE (signal_target, signal_target, XTYPE_OBJECT)
 
 static G_DEFINE_QUARK (detail, signal_detail);
 
@@ -41,7 +41,7 @@ enum {
 static xuint_t signals[LAST_SIGNAL];
 
 static void
-signal_target_class_init (SignalTargetClass *klass)
+signal_target_class_init (signal_target_class_t *klass)
 {
   signals[THE_SIGNAL] =
       g_signal_new ("the-signal",
@@ -65,7 +65,7 @@ signal_target_class_init (SignalTargetClass *klass)
 }
 
 static void
-signal_target_init (SignalTarget *self)
+signal_target_init (signal_target_t *self)
 {
 }
 
@@ -73,39 +73,39 @@ static xint_t global_signal_calls;
 static xint_t global_weak_notify_called;
 
 static void
-connect_before_cb (SignalTarget *target,
-                   GSignalGroup *group,
+connect_before_cb (signal_target_t *target,
+                   xsignal_group_t *group,
                    xint_t         *signal_calls)
 {
-  SignalTarget *readback;
+  signal_target_t *readback;
 
   g_assert_true (TEST_IS_SIGNAL_TARGET (target));
   g_assert_true (X_IS_SIGNAL_GROUP (group));
   g_assert_nonnull (signal_calls);
   g_assert_true (signal_calls == &global_signal_calls);
 
-  readback = g_signal_group_dup_target (group);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target);
-  g_object_unref (readback);
+  xobject_unref (readback);
 
   *signal_calls += 1;
 }
 
 static void
-connect_after_cb (SignalTarget *target,
-                  GSignalGroup *group,
+connect_after_cb (signal_target_t *target,
+                  xsignal_group_t *group,
                   xint_t         *signal_calls)
 {
-  SignalTarget *readback;
+  signal_target_t *readback;
 
   g_assert_true (TEST_IS_SIGNAL_TARGET (target));
   g_assert_true (X_IS_SIGNAL_GROUP (group));
   g_assert_nonnull (signal_calls);
   g_assert_true (signal_calls == &global_signal_calls);
 
-  readback = g_signal_group_dup_target (group);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target);
-  g_object_unref (readback);
+  xobject_unref (readback);
 
   g_assert_cmpint (*signal_calls, ==, 4);
   *signal_calls += 1;
@@ -113,40 +113,40 @@ connect_after_cb (SignalTarget *target,
 
 static void
 connect_swapped_cb (xint_t         *signal_calls,
-                    GSignalGroup *group,
-                    SignalTarget *target)
+                    xsignal_group_t *group,
+                    signal_target_t *target)
 {
-  SignalTarget *readback;
+  signal_target_t *readback;
 
   g_assert_true (signal_calls != NULL);
   g_assert_true (signal_calls == &global_signal_calls);
   g_assert_true (X_IS_SIGNAL_GROUP (group));
   g_assert_true (TEST_IS_SIGNAL_TARGET (target));
 
-  readback = g_signal_group_dup_target (group);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target);
-  g_object_unref (readback);
+  xobject_unref (readback);
 
   *signal_calls += 1;
 }
 
 static void
-connect_object_cb (SignalTarget *target,
-                   GSignalGroup *group,
+connect_object_cb (signal_target_t *target,
+                   xsignal_group_t *group,
                    xobject_t      *object)
 {
-  SignalTarget *readback;
+  signal_target_t *readback;
   xint_t *signal_calls;
 
   g_assert_true (TEST_IS_SIGNAL_TARGET (target));
   g_assert_true (X_IS_SIGNAL_GROUP (group));
   g_assert_true (X_IS_OBJECT (object));
 
-  readback = g_signal_group_dup_target (group);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target);
-  g_object_unref (readback);
+  xobject_unref (readback);
 
-  signal_calls = g_object_get_data (object, "signal-calls");
+  signal_calls = xobject_get_data (object, "signal-calls");
   g_assert_nonnull (signal_calls);
   g_assert_true (signal_calls == &global_signal_calls);
 
@@ -154,23 +154,23 @@ connect_object_cb (SignalTarget *target,
 }
 
 static void
-connect_bad_detail_cb (SignalTarget *target,
-                       GSignalGroup *group,
+connect_bad_detail_cb (signal_target_t *target,
+                       xsignal_group_t *group,
                        xobject_t      *object)
 {
-  g_error ("This detailed signal is never emitted!");
+  xerror ("This detailed signal is never emitted!");
 }
 
 static void
-connect_never_emitted_cb (SignalTarget *target,
+connect_never_emitted_cb (signal_target_t *target,
                           xboolean_t     *weak_notify_called)
 {
-  g_error ("This signal is never emitted!");
+  xerror ("This signal is never emitted!");
 }
 
 static void
 connect_data_notify_cb (xboolean_t *weak_notify_called,
-                        GClosure *closure)
+                        xclosure_t *closure)
 {
   g_assert_nonnull (weak_notify_called);
   g_assert_true (weak_notify_called == &global_weak_notify_called);
@@ -182,7 +182,7 @@ connect_data_notify_cb (xboolean_t *weak_notify_called,
 
 static void
 connect_data_weak_notify_cb (xboolean_t     *weak_notify_called,
-                             GSignalGroup *group)
+                             xsignal_group_t *group)
 {
   g_assert_nonnull (weak_notify_called);
   g_assert_true (weak_notify_called == &global_weak_notify_called);
@@ -192,64 +192,64 @@ connect_data_weak_notify_cb (xboolean_t     *weak_notify_called,
 }
 
 static void
-connect_all_signals (GSignalGroup *group)
+connect_all_signals (xsignal_group_t *group)
 {
   xobject_t *object;
 
   /* Check that these are called in the right order */
-  g_signal_group_connect (group,
+  xsignal_group_connect (group,
                           "the-signal",
                           G_CALLBACK (connect_before_cb),
                           &global_signal_calls);
-  g_signal_group_connect_after (group,
+  xsignal_group_connect_after (group,
                                 "the-signal",
                                 G_CALLBACK (connect_after_cb),
                                 &global_signal_calls);
 
   /* Check that this is called with the arguments swapped */
-  g_signal_group_connect_swapped (group,
+  xsignal_group_connect_swapped (group,
                                   "the-signal",
                                   G_CALLBACK (connect_swapped_cb),
                                   &global_signal_calls);
 
   /* Check that this is called with the arguments swapped */
-  object = g_object_new (XTYPE_OBJECT, NULL);
-  g_object_set_data (object, "signal-calls", &global_signal_calls);
-  g_signal_group_connect_object (group,
+  object = xobject_new (XTYPE_OBJECT, NULL);
+  xobject_set_data (object, "signal-calls", &global_signal_calls);
+  xsignal_group_connect_object (group,
                                  "the-signal",
                                  G_CALLBACK (connect_object_cb),
                                  object,
                                  0);
-  g_object_weak_ref (G_OBJECT (group),
-                     (GWeakNotify)g_object_unref,
+  xobject_weak_ref (G_OBJECT (group),
+                     (GWeakNotify)xobject_unref,
                      object);
 
   /* Check that a detailed signal is handled correctly */
-  g_signal_group_connect (group,
+  xsignal_group_connect (group,
                           "the-signal::detail",
                           G_CALLBACK (connect_before_cb),
                           &global_signal_calls);
-  g_signal_group_connect (group,
+  xsignal_group_connect (group,
                           "the-signal::bad-detail",
                           G_CALLBACK (connect_bad_detail_cb),
                           NULL);
 
   /* Check that the notify is called correctly */
   global_weak_notify_called = FALSE;
-  g_signal_group_connect_data (group,
+  xsignal_group_connect_data (group,
                                "never-emitted",
                                G_CALLBACK (connect_never_emitted_cb),
                                &global_weak_notify_called,
-                               (GClosureNotify)connect_data_notify_cb,
+                               (xclosure_notify_t)connect_data_notify_cb,
                                0);
-  g_object_weak_ref (G_OBJECT (group),
+  xobject_weak_ref (G_OBJECT (group),
                      (GWeakNotify)connect_data_weak_notify_cb,
                      &global_weak_notify_called);
 }
 
 static void
-assert_signals (SignalTarget *target,
-                GSignalGroup *group,
+assert_signals (signal_target_t *target,
+                xsignal_group_t *group,
                 xboolean_t      success)
 {
   g_assert (TEST_IS_SIGNAL_TARGET (target));
@@ -269,28 +269,28 @@ dummy_handler (void)
 static void
 test_signal_group_invalid (void)
 {
-  xobject_t *invalid_target = g_object_new (XTYPE_OBJECT, NULL);
-  SignalTarget *target = g_object_new (signal_target_get_type (), NULL);
-  GSignalGroup *group = g_signal_group_new (signal_target_get_type ());
+  xobject_t *invalid_target = xobject_new (XTYPE_OBJECT, NULL);
+  signal_target_t *target = xobject_new (signal_target_get_type (), NULL);
+  xsignal_group_t *group = xsignal_group_new (signal_target_get_type ());
 
   /* Invalid Target Type */
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                         "*g_type_is_a*XTYPE_OBJECT*");
-  g_signal_group_new (XTYPE_DATE_TIME);
+                         "*xtype_is_a*XTYPE_OBJECT*");
+  xsignal_group_new (XTYPE_DATE_TIME);
   g_test_assert_expected_messages ();
 
   /* Invalid Target */
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                         "*Failed to set GSignalGroup of target type SignalTarget using target * of type xobject_t*");
-  g_signal_group_set_target (group, invalid_target);
+                         "*Failed to set xsignal_group_t of target type signal_target_t using target * of type xobject_t*");
+  xsignal_group_set_target (group, invalid_target);
   g_assert_finalize_object (group);
   g_test_assert_expected_messages ();
 
   /* Invalid Signal Name */
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                          "*g_signal_parse_name*");
-  group = g_signal_group_new (signal_target_get_type ());
-  g_signal_group_connect (group,
+  group = xsignal_group_new (signal_target_get_type ());
+  xsignal_group_connect (group,
                           "does-not-exist",
                           G_CALLBACK (connect_before_cb),
                           NULL);
@@ -300,8 +300,8 @@ test_signal_group_invalid (void)
   /* Invalid Callback */
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                          "*c_handler != NULL*");
-  group = g_signal_group_new (signal_target_get_type ());
-  g_signal_group_connect (group,
+  group = xsignal_group_new (signal_target_get_type ());
+  xsignal_group_connect (group,
                           "the-signal",
                           G_CALLBACK (NULL),
                           NULL);
@@ -311,9 +311,9 @@ test_signal_group_invalid (void)
   /* Connecting after setting target */
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                          "*Cannot add signals after setting target*");
-  group = g_signal_group_new (signal_target_get_type ());
-  g_signal_group_set_target (group, target);
-  g_signal_group_connect (group,
+  group = xsignal_group_new (signal_target_get_type ());
+  xsignal_group_set_target (group, target);
+  xsignal_group_connect (group,
                           "the-signal",
                           G_CALLBACK (dummy_handler),
                           NULL);
@@ -327,26 +327,26 @@ test_signal_group_invalid (void)
 static void
 test_signal_group_simple (void)
 {
-  SignalTarget *target;
-  GSignalGroup *group;
-  SignalTarget *readback;
+  signal_target_t *target;
+  xsignal_group_t *group;
+  signal_target_t *readback;
 
   /* Set the target before connecting the signals */
-  group = g_signal_group_new (signal_target_get_type ());
-  target = g_object_new (signal_target_get_type (), NULL);
-  g_assert_null (g_signal_group_dup_target (group));
-  g_signal_group_set_target (group, target);
-  readback = g_signal_group_dup_target (group);
+  group = xsignal_group_new (signal_target_get_type ());
+  target = xobject_new (signal_target_get_type (), NULL);
+  g_assert_null (xsignal_group_dup_target (group));
+  xsignal_group_set_target (group, target);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target);
-  g_object_unref (readback);
+  xobject_unref (readback);
   g_assert_finalize_object (group);
   assert_signals (target, NULL, FALSE);
   g_assert_finalize_object (target);
 
-  group = g_signal_group_new (signal_target_get_type ());
-  target = g_object_new (signal_target_get_type (), NULL);
+  group = xsignal_group_new (signal_target_get_type ());
+  target = xobject_new (signal_target_get_type (), NULL);
   connect_all_signals (group);
-  g_signal_group_set_target (group, target);
+  xsignal_group_set_target (group, target);
   assert_signals (target, group, TRUE);
   g_assert_finalize_object (target);
   g_assert_finalize_object (group);
@@ -355,44 +355,44 @@ test_signal_group_simple (void)
 static void
 test_signal_group_changing_target (void)
 {
-  SignalTarget *target1, *target2;
-  GSignalGroup *group = g_signal_group_new (signal_target_get_type ());
-  SignalTarget *readback;
+  signal_target_t *target1, *target2;
+  xsignal_group_t *group = xsignal_group_new (signal_target_get_type ());
+  signal_target_t *readback;
 
   connect_all_signals (group);
-  g_assert_null (g_signal_group_dup_target (group));
+  g_assert_null (xsignal_group_dup_target (group));
 
   /* Set the target after connecting the signals */
-  target1 = g_object_new (signal_target_get_type (), NULL);
-  g_signal_group_set_target (group, target1);
-  readback = g_signal_group_dup_target (group);
+  target1 = xobject_new (signal_target_get_type (), NULL);
+  xsignal_group_set_target (group, target1);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target1);
-  g_object_unref (readback);
+  xobject_unref (readback);
 
   assert_signals (target1, group, TRUE);
 
   /* Set the same target */
-  readback = g_signal_group_dup_target (group);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target1);
-  g_object_unref (readback);
-  g_signal_group_set_target (group, target1);
+  xobject_unref (readback);
+  xsignal_group_set_target (group, target1);
 
-  readback = g_signal_group_dup_target (group);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target1);
-  g_object_unref (readback);
+  xobject_unref (readback);
 
   assert_signals (target1, group, TRUE);
 
   /* Set a new target when the current target is non-NULL */
-  target2 = g_object_new (signal_target_get_type (), NULL);
-  readback = g_signal_group_dup_target (group);
+  target2 = xobject_new (signal_target_get_type (), NULL);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target1);
-  g_object_unref (readback);
+  xobject_unref (readback);
 
-  g_signal_group_set_target (group, target2);
-  readback = g_signal_group_dup_target (group);
+  xsignal_group_set_target (group, target2);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target2);
-  g_object_unref (readback);
+  xobject_unref (readback);
 
   assert_signals (target2, group, TRUE);
 
@@ -402,8 +402,8 @@ test_signal_group_changing_target (void)
 }
 
 static void
-assert_blocking (SignalTarget *target,
-                 GSignalGroup *group,
+assert_blocking (signal_target_t *target,
+                 xsignal_group_t *group,
                  xint_t          count)
 {
   xint_t i;
@@ -413,7 +413,7 @@ assert_blocking (SignalTarget *target,
   /* Assert that multiple blocks are effective */
   for (i = 0; i < count; ++i)
     {
-      g_signal_group_block (group);
+      xsignal_group_block (group);
       assert_signals (target, group, FALSE);
     }
 
@@ -421,7 +421,7 @@ assert_blocking (SignalTarget *target,
   for (i = 0; i < count; ++i)
     {
       assert_signals (target, group, FALSE);
-      g_signal_group_unblock (group);
+      xsignal_group_unblock (group);
     }
 
   assert_signals (target, group, TRUE);
@@ -430,44 +430,44 @@ assert_blocking (SignalTarget *target,
 static void
 test_signal_group_blocking (void)
 {
-  SignalTarget *target1, *target2, *readback;
-  GSignalGroup *group = g_signal_group_new (signal_target_get_type ());
+  signal_target_t *target1, *target2, *readback;
+  xsignal_group_t *group = xsignal_group_new (signal_target_get_type ());
 
   /* Test blocking and unblocking null target */
-  g_signal_group_block (group);
-  g_signal_group_unblock (group);
+  xsignal_group_block (group);
+  xsignal_group_unblock (group);
 
   connect_all_signals (group);
-  g_assert_null (g_signal_group_dup_target (group));
+  g_assert_null (xsignal_group_dup_target (group));
 
-  target1 = g_object_new (signal_target_get_type (), NULL);
-  g_signal_group_set_target (group, target1);
-  readback = g_signal_group_dup_target (group);
+  target1 = xobject_new (signal_target_get_type (), NULL);
+  xsignal_group_set_target (group, target1);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target1);
-  g_object_unref (readback);
+  xobject_unref (readback);
 
   assert_blocking (target1, group, 1);
   assert_blocking (target1, group, 3);
   assert_blocking (target1, group, 15);
 
   /* Assert that blocking transfers across changing the target */
-  g_signal_group_block (group);
-  g_signal_group_block (group);
+  xsignal_group_block (group);
+  xsignal_group_block (group);
 
   /* Set a new target when the current target is non-NULL */
-  target2 = g_object_new (signal_target_get_type (), NULL);
-  readback = g_signal_group_dup_target (group);
+  target2 = xobject_new (signal_target_get_type (), NULL);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target1);
-  g_object_unref (readback);
-  g_signal_group_set_target (group, target2);
-  readback = g_signal_group_dup_target (group);
+  xobject_unref (readback);
+  xsignal_group_set_target (group, target2);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target2);
-  g_object_unref (readback);
+  xobject_unref (readback);
 
   assert_signals (target2, group, FALSE);
-  g_signal_group_unblock (group);
+  xsignal_group_unblock (group);
   assert_signals (target2, group, FALSE);
-  g_signal_group_unblock (group);
+  xsignal_group_unblock (group);
   assert_signals (target2, group, TRUE);
 
   g_assert_finalize_object (target2);
@@ -478,55 +478,55 @@ test_signal_group_blocking (void)
 static void
 test_signal_group_weak_ref_target (void)
 {
-  SignalTarget *target = g_object_new (signal_target_get_type (), NULL);
-  GSignalGroup *group = g_signal_group_new (signal_target_get_type ());
-  SignalTarget *readback;
+  signal_target_t *target = xobject_new (signal_target_get_type (), NULL);
+  xsignal_group_t *group = xsignal_group_new (signal_target_get_type ());
+  signal_target_t *readback;
 
-  g_assert_null (g_signal_group_dup_target (group));
-  g_signal_group_set_target (group, target);
-  readback = g_signal_group_dup_target (group);
+  g_assert_null (xsignal_group_dup_target (group));
+  xsignal_group_set_target (group, target);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target);
-  g_object_unref (readback);
+  xobject_unref (readback);
 
   g_assert_finalize_object (target);
-  g_assert_null (g_signal_group_dup_target (group));
+  g_assert_null (xsignal_group_dup_target (group));
   g_assert_finalize_object (group);
 }
 
 static void
 test_signal_group_connect_object (void)
 {
-  xobject_t *object = g_object_new (XTYPE_OBJECT, NULL);
-  SignalTarget *target = g_object_new (signal_target_get_type (), NULL);
-  GSignalGroup *group = g_signal_group_new (signal_target_get_type ());
-  SignalTarget *readback;
+  xobject_t *object = xobject_new (XTYPE_OBJECT, NULL);
+  signal_target_t *target = xobject_new (signal_target_get_type (), NULL);
+  xsignal_group_t *group = xsignal_group_new (signal_target_get_type ());
+  signal_target_t *readback;
 
   /* We already do basic connect_object() tests in connect_signals(),
    * this is only needed to test the specifics of connect_object()
    */
-  g_signal_group_connect_object (group,
+  xsignal_group_connect_object (group,
                                  "the-signal",
                                  G_CALLBACK (connect_object_cb),
                                  object,
                                  0);
 
-  g_assert_null (g_signal_group_dup_target (group));
-  g_signal_group_set_target (group, target);
-  readback = g_signal_group_dup_target (group);
+  g_assert_null (xsignal_group_dup_target (group));
+  xsignal_group_set_target (group, target);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target);
-  g_object_unref (readback);
+  xobject_unref (readback);
 
   g_assert_finalize_object (object);
 
   /* This would cause a warning if the SignalGroup did not
    * have a weakref on the object as it would try to connect again
    */
-  g_signal_group_set_target (group, NULL);
-  g_assert_null (g_signal_group_dup_target (group));
-  g_signal_group_set_target (group, target);
-  readback = g_signal_group_dup_target (group);
+  xsignal_group_set_target (group, NULL);
+  g_assert_null (xsignal_group_dup_target (group));
+  xsignal_group_set_target (group, target);
+  readback = xsignal_group_dup_target (group);
   g_assert_true (readback == target);
-  g_object_unref (readback);
+  xobject_unref (readback);
 
   g_assert_finalize_object (group);
   g_assert_finalize_object (target);
@@ -544,16 +544,16 @@ test_signal_group_signal_parsing (void)
 static void
 test_signal_group_signal_parsing_subprocess (void)
 {
-  GSignalGroup *group;
+  xsignal_group_t *group;
 
   /* Check that the class has not been created and with it the
    * signals registered. This will cause g_signal_parse_name()
-   * to fail unless GSignalGroup calls g_type_class_ref().
+   * to fail unless xsignal_group_t calls xtype_class_ref().
    */
-  g_assert_null (g_type_class_peek (signal_target_get_type ()));
+  g_assert_null (xtype_class_peek (signal_target_get_type ()));
 
-  group = g_signal_group_new (signal_target_get_type ());
-  g_signal_group_connect (group,
+  group = xsignal_group_new (signal_target_get_type ());
+  xsignal_group_connect (group,
                           "the-signal",
                           G_CALLBACK (connect_before_cb),
                           NULL);
@@ -564,55 +564,55 @@ test_signal_group_signal_parsing_subprocess (void)
 static void
 test_signal_group_properties (void)
 {
-  GSignalGroup *group;
-  SignalTarget *target, *other;
+  xsignal_group_t *group;
+  signal_target_t *target, *other;
   xtype_t gtype;
 
-  group = g_signal_group_new (signal_target_get_type ());
-  g_object_get (group,
+  group = xsignal_group_new (signal_target_get_type ());
+  xobject_get (group,
                 "target", &target,
                 "target-type", &gtype,
                 NULL);
   g_assert_cmpint (gtype, ==, signal_target_get_type ());
   g_assert_null (target);
 
-  target = g_object_new (signal_target_get_type (), NULL);
-  g_object_set (group, "target", target, NULL);
-  g_object_get (group, "target", &other, NULL);
+  target = xobject_new (signal_target_get_type (), NULL);
+  xobject_set (group, "target", target, NULL);
+  xobject_get (group, "target", &other, NULL);
   g_assert_true (target == other);
-  g_object_unref (other);
+  xobject_unref (other);
 
   g_assert_finalize_object (target);
-  g_assert_null (g_signal_group_dup_target (group));
+  g_assert_null (xsignal_group_dup_target (group));
   g_assert_finalize_object (group);
 }
 
-G_DECLARE_INTERFACE (SignalThing, signal_thing, SIGNAL, THING, xobject_t)
+G_DECLARE_INTERFACE (signal_thing, signal_thing, SIGNAL, THING, xobject)
 
-struct _SignalThingInterface
+struct _signal_thing_interface
 {
   xtype_interface_t iface;
-  void (*changed) (SignalThing *thing);
+  void (*changed) (signal_thing_t *thing);
 };
 
-G_DEFINE_INTERFACE (SignalThing, signal_thing, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (signal_thing, signal_thing, XTYPE_OBJECT)
 
 static xuint_t signal_thing_changed;
 
 static void
-signal_thing_default_init (SignalThingInterface *iface)
+signal_thing_default_init (signal_thing_interface_t *iface)
 {
   signal_thing_changed =
       g_signal_new ("changed",
                     XTYPE_FROM_INTERFACE (iface),
                     G_SIGNAL_RUN_LAST,
-                    G_STRUCT_OFFSET (SignalThingInterface, changed),
+                    G_STRUCT_OFFSET (signal_thing_interface_t, changed),
                     NULL, NULL, NULL,
                     XTYPE_NONE, 0);
 }
 
 G_GNUC_NORETURN static void
-thing_changed_cb (SignalThing *thing,
+thing_changed_cb (signal_thing_t *thing,
                   xpointer_t     user_data G_GNUC_UNUSED)
 {
   g_assert_not_reached ();
@@ -621,10 +621,10 @@ thing_changed_cb (SignalThing *thing,
 static void
 test_signal_group_interface (void)
 {
-  GSignalGroup *group;
+  xsignal_group_t *group;
 
-  group = g_signal_group_new (signal_thing_get_type ());
-  g_signal_group_connect (group,
+  group = xsignal_group_new (signal_thing_get_type ());
+  xsignal_group_connect (group,
                           "changed",
                           G_CALLBACK (thing_changed_cb),
                           NULL);

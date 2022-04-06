@@ -40,7 +40,7 @@ G_BEGIN_DECLS
 #define XDRIVE_IDENTIFIER_KIND_UNIX_DEVICE "unix-device"
 
 #define XTYPE_DRIVE           (xdrive_get_type ())
-#define G_DRIVE(obj)           (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_DRIVE, xdrive_t))
+#define G_DRIVE(obj)           (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_DRIVE, xdrive))
 #define X_IS_DRIVE(obj)        (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_DRIVE))
 #define XDRIVE_GET_IFACE(obj) (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_DRIVE, xdrive_iface_t))
 
@@ -53,7 +53,7 @@ G_BEGIN_DECLS
  * @get_name: Returns the name for the given #xdrive_t.
  * @get_icon: Returns a #xicon_t for the given #xdrive_t.
  * @has_volumes: Returns %TRUE if the #xdrive_t has mountable volumes.
- * @get_volumes: Returns a list #xlist_t of #GVolume for the #xdrive_t.
+ * @get_volumes: Returns a list #xlist_t of #xvolume_t for the #xdrive_t.
  * @is_removable: Returns %TRUE if the #xdrive_t and/or its media is considered removable by the user. Since 2.50.
  * @is_media_removable: Returns %TRUE if the #xdrive_t supports removal and insertion of media.
  * @has_media: Returns %TRUE if the #xdrive_t has media inserted.

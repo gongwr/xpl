@@ -31,7 +31,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_ZLIB_COMPRESSOR         (g_zlib_compressor_get_type ())
-#define G_ZLIB_COMPRESSOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_ZLIB_COMPRESSOR, GZlibCompressor))
+#define G_ZLIB_COMPRESSOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_ZLIB_COMPRESSOR, xzlib_compressor))
 #define G_ZLIB_COMPRESSOR_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_ZLIB_COMPRESSOR, GZlibCompressorClass))
 #define X_IS_ZLIB_COMPRESSOR(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_ZLIB_COMPRESSOR))
 #define X_IS_ZLIB_COMPRESSOR_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_ZLIB_COMPRESSOR))
@@ -48,14 +48,14 @@ XPL_AVAILABLE_IN_ALL
 xtype_t            g_zlib_compressor_get_type (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GZlibCompressor *g_zlib_compressor_new (GZlibCompressorFormat format,
+xzlib_compressor_t *g_zlib_compressor_new (GZlibCompressorFormat format,
 					int level);
 
 XPL_AVAILABLE_IN_ALL
-GFileInfo       *g_zlib_compressor_get_file_info (GZlibCompressor *compressor);
+xfile_info_t       *g_zlib_compressor_get_file_info (xzlib_compressor_t *compressor);
 XPL_AVAILABLE_IN_ALL
-void             g_zlib_compressor_set_file_info (GZlibCompressor *compressor,
-                                                  GFileInfo       *file_info);
+void             g_zlib_compressor_set_file_info (xzlib_compressor_t *compressor,
+                                                  xfile_info_t       *file_info);
 
 G_END_DECLS
 

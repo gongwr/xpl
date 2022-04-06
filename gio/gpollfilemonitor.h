@@ -36,12 +36,12 @@ typedef struct _GPollFileMonitorClass GPollFileMonitorClass;
 
 struct _GPollFileMonitorClass
 {
-  GFileMonitorClass parent_class;
+  xfile_monitor_class_t parent_class;
 };
 
 xtype_t          _g_poll_file_monitor_get_type (void) G_GNUC_CONST;
 
-GFileMonitor * _g_poll_file_monitor_new      (xfile_t *file);
+xfile_monitor_t * _g_poll_file_monitor_new      (xfile_t *file);
 
 G_END_DECLS
 

@@ -42,7 +42,7 @@ get_document_portal (GXdpDocuments **documents,
                      char          **documents_mountpoint,
                      xerror_t        **error)
 {
-  GDBusConnection *connection = NULL;
+  xdbus_connection_t *connection = NULL;
 
   *documents = NULL;
   *documents_mountpoint = NULL;
@@ -98,8 +98,8 @@ g_document_portal_add_documents (xlist_t       *uris,
   int length;
   xlist_t *ruris = NULL;
   xboolean_t *as_is;
-  GVariantBuilder builder;
-  GUnixFDList *fd_list = NULL;
+  xvariant_builder_t builder;
+  xunix_fd_list_t *fd_list = NULL;
   xlist_t *l;
   xsize_t i, j;
   const char *permissions[] = { "read", "write", NULL };
@@ -111,10 +111,10 @@ g_document_portal_add_documents (xlist_t       *uris,
       return NULL;
     }
 
-  length = g_list_length (uris);
+  length = xlist_length (uris);
   as_is = g_new0 (xboolean_t, length);
 
-  g_variant_builder_init (&builder, G_VARIANT_TYPE ("ah"));
+  xvariant_builder_init (&builder, G_VARIANT_TYPE ("ah"));
 
   fd_list = g_unix_fd_list_new ();
   for (l = uris, i = 0; l; l = l->next, i++)
@@ -123,7 +123,7 @@ g_document_portal_add_documents (xlist_t       *uris,
       int idx = -1;
       char *path = NULL;
 
-      path = g_filename_from_uri (uri, NULL, NULL);
+      path = xfilename_from_uri (uri, NULL, NULL);
       if (path != NULL)
         {
           int fd;
@@ -149,7 +149,7 @@ g_document_portal_add_documents (xlist_t       *uris,
       g_free (path);
 
       if (idx != -1)
-        g_variant_builder_add (&builder, "h", idx);
+        xvariant_builder_add (&builder, "h", idx);
       else
         as_is[i] = TRUE;
     }
@@ -157,7 +157,7 @@ g_document_portal_add_documents (xlist_t       *uris,
   if (g_unix_fd_list_get_length (fd_list) > 0)
     {
       if (!gxdp_documents_call_add_full_sync (documents,
-                                              g_variant_builder_end (&builder),
+                                              xvariant_builder_end (&builder),
                                               XDP_ADD_FLAGS_AS_NEEDED_BY_APP,
                                               app_id,
                                               permissions,
@@ -176,39 +176,39 @@ g_document_portal_add_documents (xlist_t       *uris,
 
           if (as_is[i]) /* use as-is, not a file uri */
             {
-              ruri = g_strdup (uri);
+              ruri = xstrdup (uri);
             }
           else if (strcmp (doc_ids[j], "") == 0) /* not rewritten */
             {
-              ruri = g_strdup (uri);
+              ruri = xstrdup (uri);
               j++;
             }
           else
             {
               char *basename = g_path_get_basename (uri + strlen ("file:"));
               char *doc_path = g_build_filename (documents_mountpoint, doc_ids[j], basename, NULL);
-              ruri = g_strconcat ("file:", doc_path, NULL);
+              ruri = xstrconcat ("file:", doc_path, NULL);
               g_free (basename);
               g_free (doc_path);
               j++;
             }
 
-          ruris = g_list_prepend (ruris, ruri);
+          ruris = xlist_prepend (ruris, ruri);
         }
 
-      ruris = g_list_reverse (ruris);
+      ruris = xlist_reverse (ruris);
     }
   else
     {
-      ruris = g_list_copy_deep (uris, (GCopyFunc)g_strdup, NULL);
+      ruris = xlist_copy_deep (uris, (GCopyFunc)xstrdup, NULL);
     }
 
 out:
   g_clear_object (&documents);
   g_clear_pointer (&documents_mountpoint, g_free);
   g_clear_object (&fd_list);
-  g_clear_pointer (&extra_out, g_variant_unref);
-  g_clear_pointer (&doc_ids, g_strfreev);
+  g_clear_pointer (&extra_out, xvariant_unref);
+  g_clear_pointer (&doc_ids, xstrfreev);
   g_free (as_is);
 
   return ruris;

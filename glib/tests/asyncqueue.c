@@ -1,4 +1,4 @@
-/* Unit tests for GAsyncQueue
+/* Unit tests for xasync_queue_t
  * Copyright (C) 2011 Red Hat, Inc
  * Author: Matthias Clasen
  *
@@ -28,7 +28,7 @@
 #include <glib.h>
 
 static xint_t
-compare_func (gconstpointer d1, gconstpointer d2, xpointer_t data)
+compare_func (xconstpointer d1, xconstpointer d2, xpointer_t data)
 {
   xint_t i1, i2;
 
@@ -41,7 +41,7 @@ compare_func (gconstpointer d1, gconstpointer d2, xpointer_t data)
 static
 void test_async_queue_sort (void)
 {
-  GAsyncQueue *q;
+  xasync_queue_t *q;
 
   q = g_async_queue_new ();
 
@@ -111,7 +111,7 @@ destroy_notify (xpointer_t item)
 static void
 test_async_queue_destroy (void)
 {
-  GAsyncQueue *q;
+  xasync_queue_t *q;
 
   destroy_count = 0;
 
@@ -131,9 +131,9 @@ test_async_queue_destroy (void)
   g_assert_cmpint (destroy_count, ==, 4);
 }
 
-static GAsyncQueue *q;
+static xasync_queue_t *q;
 
-static GThread *threads[10];
+static xthread_t *threads[10];
 static xint_t counts[10];
 static xint_t sums[10];
 static xint_t total;
@@ -170,7 +170,7 @@ test_async_queue_threads (void)
   q = g_async_queue_new ();
 
   for (i = 0; i < 10; i++)
-    threads[i] = g_thread_new ("test", thread_func, GINT_TO_POINTER (i));
+    threads[i] = xthread_new ("test", thread_func, GINT_TO_POINTER (i));
 
   for (i = 0; i < 100; i++)
     {
@@ -190,7 +190,7 @@ test_async_queue_threads (void)
     g_async_queue_push (q, GINT_TO_POINTER(-1));
 
   for (i = 0; i < 10; i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 
   g_assert_cmpint (g_async_queue_length (q), ==, 0);
 
@@ -213,7 +213,7 @@ test_async_queue_threads (void)
 static void
 test_async_queue_timed (void)
 {
-  GAsyncQueue *q;
+  xasync_queue_t *q;
   GTimeVal tv;
   gint64 start, end, diff;
   xpointer_t val;
@@ -283,7 +283,7 @@ test_async_queue_timed (void)
 static void
 test_async_queue_remove (void)
 {
-  GAsyncQueue *q;
+  xasync_queue_t *q;
 
   q = g_async_queue_new ();
 
@@ -329,7 +329,7 @@ test_async_queue_remove (void)
 static void
 test_async_queue_push_front (void)
 {
-  GAsyncQueue *q;
+  xasync_queue_t *q;
 
   q = g_async_queue_new ();
 
@@ -375,7 +375,7 @@ test_async_queue_push_front (void)
 static void
 test_basics (void)
 {
-  GAsyncQueue *q;
+  xasync_queue_t *q;
   xpointer_t item;
 
   destroy_count = 0;

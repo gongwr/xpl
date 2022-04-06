@@ -46,13 +46,13 @@ G_BEGIN_DECLS
  */
 #define G_RESOURCE_ERROR (g_resource_error_quark ())
 XPL_AVAILABLE_IN_2_32
-GQuark g_resource_error_quark (void);
+xquark g_resource_error_quark (void);
 
 typedef struct _GStaticResource GStaticResource;
 
 struct _GStaticResource {
   /*< private >*/
-  const guint8 *data;
+  const xuint8_t *data;
   xsize_t data_len;
   xresource_t *resource;
   GStaticResource *next;
@@ -62,7 +62,7 @@ struct _GStaticResource {
 XPL_AVAILABLE_IN_2_32
 xtype_t         g_resource_get_type            (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_2_32
-xresource_t *   g_resource_new_from_data       (GBytes                *data,
+xresource_t *   g_resource_new_from_data       (xbytes_t                *data,
 					      xerror_t               **error);
 XPL_AVAILABLE_IN_2_32
 xresource_t *   g_resource_ref                 (xresource_t             *resource);
@@ -77,7 +77,7 @@ xinput_stream_t *g_resource_open_stream         (xresource_t             *resour
 					      GResourceLookupFlags   lookup_flags,
 					      xerror_t               **error);
 XPL_AVAILABLE_IN_2_32
-GBytes *      g_resource_lookup_data         (xresource_t             *resource,
+xbytes_t *      g_resource_lookup_data         (xresource_t             *resource,
 					      const char            *path,
 					      GResourceLookupFlags   lookup_flags,
 					      xerror_t               **error);
@@ -91,7 +91,7 @@ xboolean_t      g_resource_get_info            (xresource_t             *resourc
 					      const char            *path,
 					      GResourceLookupFlags   lookup_flags,
 					      xsize_t                 *size,
-					      guint32               *flags,
+					      xuint32_t               *flags,
 					      xerror_t               **error);
 
 XPL_AVAILABLE_IN_2_32
@@ -103,7 +103,7 @@ xinput_stream_t *g_resources_open_stream        (const char            *path,
 					      GResourceLookupFlags   lookup_flags,
 					      xerror_t               **error);
 XPL_AVAILABLE_IN_2_32
-GBytes *      g_resources_lookup_data        (const char            *path,
+xbytes_t *      g_resources_lookup_data        (const char            *path,
 					      GResourceLookupFlags   lookup_flags,
 					      xerror_t               **error);
 XPL_AVAILABLE_IN_2_32
@@ -114,7 +114,7 @@ XPL_AVAILABLE_IN_2_32
 xboolean_t      g_resources_get_info           (const char            *path,
 					      GResourceLookupFlags   lookup_flags,
 					      xsize_t                 *size,
-					      guint32               *flags,
+					      xuint32_t               *flags,
 					      xerror_t               **error);
 
 

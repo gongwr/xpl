@@ -189,7 +189,7 @@ mechanism_server_get_state (GDBusAuthMechanism   *mechanism)
 static xboolean_t
 data_matches_credentials (const xchar_t  *data,
                           xsize_t         data_len,
-                          GCredentials *credentials)
+                          xcredentials_t *credentials)
 {
   xboolean_t match;
 
@@ -210,7 +210,7 @@ data_matches_credentials (const xchar_t  *data,
     alleged_uid = g_ascii_strtoll (data, &endp, 10);
     if (*endp == '\0')
       {
-        if (g_credentials_get_unix_user (credentials, NULL) == alleged_uid)
+        if (xcredentials_get_unix_user (credentials, NULL) == alleged_uid)
           {
             match = TRUE;
           }
@@ -340,7 +340,7 @@ mechanism_client_initiate (GDBusAuthMechanism   *mechanism,
   GDBusAuthMechanismExternal *m = G_DBUS_AUTH_MECHANISM_EXTERNAL (mechanism);
   xchar_t *initial_response = NULL;
 #if defined(G_OS_UNIX)
-  GCredentials *credentials;
+  xcredentials_t *credentials;
 #endif
 
   g_return_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_EXTERNAL (mechanism), NULL);
@@ -356,7 +356,7 @@ mechanism_client_initiate (GDBusAuthMechanism   *mechanism,
   credentials = _g_dbus_auth_mechanism_get_credentials (mechanism);
   g_assert (credentials != NULL);
 
-  initial_response = g_strdup_printf ("%" G_GINT64_FORMAT, (gint64) g_credentials_get_unix_user (credentials, NULL));
+  initial_response = xstrdup_printf ("%" G_GINT64_FORMAT, (gint64) xcredentials_get_unix_user (credentials, NULL));
 #elif defined(G_OS_WIN32)
   initial_response = _g_win32_current_process_sid_string (NULL);
 #else

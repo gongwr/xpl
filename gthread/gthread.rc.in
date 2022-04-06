@@ -14,7 +14,7 @@ VS_VERSION_INFO VERSIONINFO
       BLOCK "040904B0"
       BEGIN
 	VALUE "CompanyName", "The GLib developer community"
-	VALUE "FileDescription", "GThread"
+	VALUE "FileDescription", "xthread_t"
 	VALUE "FileVersion", "@XPL_VERSION@.0"
 	VALUE "InternalName", "libgthread-2.0-@LT_CURRENT_MINUS_AGE@"
 	VALUE "LegalCopyright", "Copyright 1995-2011 Peter Mattis, Spencer Kimball, Josh MacDonald, Sebastian Wilhelmi and others."

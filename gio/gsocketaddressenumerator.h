@@ -28,14 +28,14 @@
 G_BEGIN_DECLS
 
 #define XTYPE_SOCKET_ADDRESS_ENUMERATOR         (xsocket_address_enumerator_get_type ())
-#define XSOCKET_ADDRESS_ENUMERATOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_SOCKET_ADDRESS_ENUMERATOR, GSocketAddressEnumerator))
+#define XSOCKET_ADDRESS_ENUMERATOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_SOCKET_ADDRESS_ENUMERATOR, xsocket_address_enumerator))
 #define XSOCKET_ADDRESS_ENUMERATOR_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_SOCKET_ADDRESS_ENUMERATOR, GSocketAddressEnumeratorClass))
 #define X_IS_SOCKET_ADDRESS_ENUMERATOR(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_SOCKET_ADDRESS_ENUMERATOR))
 #define X_IS_SOCKET_ADDRESS_ENUMERATOR_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_SOCKET_ADDRESS_ENUMERATOR))
 #define XSOCKET_ADDRESS_ENUMERATOR_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_SOCKET_ADDRESS_ENUMERATOR, GSocketAddressEnumeratorClass))
 
 /**
- * GSocketAddressEnumerator:
+ * xsocket_address_enumerator_t:
  *
  * Enumerator type for objects that contain or generate
  * #xsocket_address_t instances.
@@ -54,7 +54,7 @@ struct _GSocketAddressEnumerator
  * @next_async: Virtual method for xsocket_address_enumerator_next_async().
  * @next_finish: Virtual method for xsocket_address_enumerator_next_finish().
  *
- * Class structure for #GSocketAddressEnumerator.
+ * Class structure for #xsocket_address_enumerator_t.
  */
 struct _GSocketAddressEnumeratorClass
 {
@@ -64,15 +64,15 @@ struct _GSocketAddressEnumeratorClass
   /*< public >*/
   /* Virtual Table */
 
-  xsocket_address_t * (* next)        (GSocketAddressEnumerator  *enumerator,
+  xsocket_address_t * (* next)        (xsocket_address_enumerator_t  *enumerator,
 				    xcancellable_t              *cancellable,
 				    xerror_t                   **error);
 
-  void             (* next_async)  (GSocketAddressEnumerator  *enumerator,
+  void             (* next_async)  (xsocket_address_enumerator_t  *enumerator,
 				    xcancellable_t              *cancellable,
 				    xasync_ready_callback_t        callback,
 				    xpointer_t                   user_data);
-  xsocket_address_t * (* next_finish) (GSocketAddressEnumerator  *enumerator,
+  xsocket_address_t * (* next_finish) (xsocket_address_enumerator_t  *enumerator,
 				    xasync_result_t              *result,
 				    xerror_t                   **error);
 };
@@ -81,17 +81,17 @@ XPL_AVAILABLE_IN_ALL
 xtype_t           xsocket_address_enumerator_get_type        (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-xsocket_address_t *xsocket_address_enumerator_next        (GSocketAddressEnumerator  *enumerator,
+xsocket_address_t *xsocket_address_enumerator_next        (xsocket_address_enumerator_t  *enumerator,
 							 xcancellable_t              *cancellable,
 							 xerror_t                   **error);
 
 XPL_AVAILABLE_IN_ALL
-void            xsocket_address_enumerator_next_async  (GSocketAddressEnumerator  *enumerator,
+void            xsocket_address_enumerator_next_async  (xsocket_address_enumerator_t  *enumerator,
 							 xcancellable_t              *cancellable,
 							 xasync_ready_callback_t        callback,
 							 xpointer_t                   user_data);
 XPL_AVAILABLE_IN_ALL
-xsocket_address_t *xsocket_address_enumerator_next_finish (GSocketAddressEnumerator  *enumerator,
+xsocket_address_t *xsocket_address_enumerator_next_finish (xsocket_address_enumerator_t  *enumerator,
 							 xasync_result_t              *result,
 							 xerror_t                   **error);
 

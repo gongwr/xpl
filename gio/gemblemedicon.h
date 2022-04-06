@@ -32,30 +32,30 @@
 G_BEGIN_DECLS
 
 #define XTYPE_EMBLEMED_ICON         (g_emblemed_icon_get_type ())
-#define G_EMBLEMED_ICON(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_EMBLEMED_ICON, GEmblemedIcon))
-#define G_EMBLEMED_ICON_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_EMBLEMED_ICON, GEmblemedIconClass))
+#define G_EMBLEMED_ICON(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_EMBLEMED_ICON, xemblemed_icon))
+#define G_EMBLEMED_ICON_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_EMBLEMED_ICON, xemblemed_icon_tClass))
 #define X_IS_EMBLEMED_ICON(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_EMBLEMED_ICON))
 #define X_IS_EMBLEMED_ICON_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_EMBLEMED_ICON))
-#define G_EMBLEMED_ICON_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_EMBLEMED_ICON, GEmblemedIconClass))
+#define G_EMBLEMED_ICON_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_EMBLEMED_ICON, xemblemed_icon_tClass))
 
 /**
- * GEmblemedIcon:
+ * xemblemed_icon_t:
  *
  * An implementation of #xicon_t for icons with emblems.
  **/
-typedef struct _GEmblemedIcon        GEmblemedIcon;
-typedef struct _GEmblemedIconClass   GEmblemedIconClass;
-typedef struct _GEmblemedIconPrivate GEmblemedIconPrivate;
+typedef struct _xemblemed_icon_t        xemblemed_icon_t;
+typedef struct _xemblemed_icon_tClass   xemblemed_icon_tClass;
+typedef struct _xemblemed_icon_tPrivate xemblemed_icon_tPrivate;
 
-struct _GEmblemedIcon
+struct _xemblemed_icon_t
 {
   xobject_t parent_instance;
 
   /*< private >*/
-  GEmblemedIconPrivate *priv;
+  xemblemed_icon_tPrivate *priv;
 };
 
-struct _GEmblemedIconClass
+struct _xemblemed_icon_tClass
 {
   xobject_class_t parent_class;
 };
@@ -65,16 +65,16 @@ xtype_t  g_emblemed_icon_get_type    (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
 xicon_t *g_emblemed_icon_new         (xicon_t         *icon,
-                                    GEmblem       *emblem);
+                                    xemblem_t       *emblem);
 XPL_AVAILABLE_IN_ALL
-xicon_t *g_emblemed_icon_get_icon    (GEmblemedIcon *emblemed);
+xicon_t *g_emblemed_icon_get_icon    (xemblemed_icon_t *emblemed);
 XPL_AVAILABLE_IN_ALL
-xlist_t *g_emblemed_icon_get_emblems (GEmblemedIcon *emblemed);
+xlist_t *g_emblemed_icon_get_emblems (xemblemed_icon_t *emblemed);
 XPL_AVAILABLE_IN_ALL
-void   g_emblemed_icon_add_emblem  (GEmblemedIcon *emblemed,
-                                    GEmblem       *emblem);
+void   g_emblemed_icon_add_emblem  (xemblemed_icon_t *emblemed,
+                                    xemblem_t       *emblem);
 XPL_AVAILABLE_IN_ALL
-void   g_emblemed_icon_clear_emblems  (GEmblemedIcon *emblemed);
+void   g_emblemed_icon_clear_emblems  (xemblemed_icon_t *emblemed);
 
 G_END_DECLS
 

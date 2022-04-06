@@ -114,15 +114,15 @@ test_rwlock6 (void)
 #define THREADS    100
 
 
-GThread *owners[LOCKS];
+xthread_t *owners[LOCKS];
 GRWLock  locks[LOCKS];
 
 static void
 acquire (xint_t nr)
 {
-  GThread *self;
+  xthread_t *self;
 
-  self = g_thread_self ();
+  self = xthread_self ();
 
   if (!g_rw_lock_writer_trylock (&locks[nr]))
     {
@@ -136,9 +136,9 @@ acquire (xint_t nr)
   owners[nr] = self;
 
   /* let some other threads try to ruin our day */
-  g_thread_yield ();
-  g_thread_yield ();
-  g_thread_yield ();
+  xthread_yield ();
+  xthread_yield ();
+  xthread_yield ();
 
   g_assert (owners[nr] == self);   /* hopefully this is still us... */
   owners[nr] = NULL;               /* make way for the next guy */
@@ -150,7 +150,7 @@ static xpointer_t
 thread_func (xpointer_t data)
 {
   xint_t i;
-  GRand *rand;
+  xrand_t *rand;
 
   rand = g_rand_new ();
 
@@ -166,16 +166,16 @@ static void
 test_rwlock7 (void)
 {
   xint_t i;
-  GThread *threads[THREADS];
+  xthread_t *threads[THREADS];
 
   for (i = 0; i < LOCKS; i++)
     g_rw_lock_init (&locks[i]);
 
   for (i = 0; i < THREADS; i++)
-    threads[i] = g_thread_new ("test", thread_func, NULL);
+    threads[i] = xthread_new ("test", thread_func, NULL);
 
   for (i = 0; i < THREADS; i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 
   for (i = 0; i < LOCKS; i++)
     g_rw_lock_clear (&locks[i]);
@@ -186,8 +186,8 @@ test_rwlock7 (void)
 
 static xint_t even;
 static GRWLock even_lock;
-GThread *writers[2];
-GThread *readers[10];
+xthread_t *writers[2];
+xthread_t *readers[10];
 
 static void
 change_even (xpointer_t data)
@@ -255,16 +255,16 @@ test_rwlock8 (void)
   g_rw_lock_init (&even_lock);
 
   for (i = 0; i < 2; i++)
-    writers[i] = g_thread_new ("a", writer_func, GINT_TO_POINTER (i));
+    writers[i] = xthread_new ("a", writer_func, GINT_TO_POINTER (i));
 
   for (i = 0; i < 10; i++)
-    readers[i] = g_thread_new ("b", reader_func, NULL);
+    readers[i] = xthread_new ("b", reader_func, NULL);
 
   for (i = 0; i < 2; i++)
-    g_thread_join (writers[i]);
+    xthread_join (writers[i]);
 
   for (i = 0; i < 10; i++)
-    g_thread_join (readers[i]);
+    xthread_join (readers[i]);
 
   g_assert (even % 2 == 0);
 

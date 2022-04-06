@@ -28,7 +28,7 @@
 
 static xboolean_t
 on_handle_get_mount_point (FakeDocuments         *object,
-                           GDBusMethodInvocation *invocation,
+                           xdbus_method_invocation_t *invocation,
                            xpointer_t               user_data)
 {
   fake_documents_complete_get_mount_point (object,
@@ -39,8 +39,8 @@ on_handle_get_mount_point (FakeDocuments         *object,
 
 static xboolean_t
 on_handle_add_full (FakeDocuments         *object,
-                    GDBusMethodInvocation *invocation,
-                    GUnixFDList           *o_path_fds,
+                    xdbus_method_invocation_t *invocation,
+                    xunix_fd_list_t           *o_path_fds,
                     xuint_t                  flags,
                     const xchar_t           *app_id,
                     const xchar_t * const   *permissions,
@@ -60,7 +60,7 @@ on_handle_add_full (FakeDocuments         *object,
     {
       doc_ids[i] = "document-id";
     }
-  extra_out = g_variant_new_array (G_VARIANT_TYPE ("{sv}"), NULL, 0);
+  extra_out = xvariant_new_array (G_VARIANT_TYPE ("{sv}"), NULL, 0);
 
   fake_documents_complete_add_full (object,
                                     invocation,
@@ -74,7 +74,7 @@ on_handle_add_full (FakeDocuments         *object,
 }
 
 static void
-on_bus_acquired (GDBusConnection *connection,
+on_bus_acquired (xdbus_connection_t *connection,
                  const xchar_t     *name,
                  xpointer_t         user_data)
 {
@@ -101,7 +101,7 @@ on_bus_acquired (GDBusConnection *connection,
 }
 
 static void
-on_name_acquired (GDBusConnection *connection,
+on_name_acquired (xdbus_connection_t *connection,
                   const xchar_t     *name,
                   xpointer_t         user_data)
 {
@@ -109,7 +109,7 @@ on_name_acquired (GDBusConnection *connection,
 }
 
 static void
-on_name_lost (GDBusConnection *connection,
+on_name_lost (xdbus_connection_t *connection,
               const xchar_t     *name,
               xpointer_t         user_data)
 {
@@ -120,10 +120,10 @@ on_name_lost (GDBusConnection *connection,
 xint_t
 main (xint_t argc, xchar_t *argv[])
 {
-  GMainLoop *loop;
+  xmain_loop_t *loop;
   xuint_t id;
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   id = g_bus_own_name (G_BUS_TYPE_SESSION,
                        "org.freedesktop.portal.Documents",
@@ -135,10 +135,10 @@ main (xint_t argc, xchar_t *argv[])
                        loop,
                        NULL);
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   g_bus_unown_name (id);
-  g_main_loop_unref (loop);
+  xmain_loop_unref (loop);
 
   return 0;
 }

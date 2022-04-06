@@ -239,25 +239,25 @@ random_ascii (void)
 static xchar_t *
 random_ascii_string (xuint_t len)
 {
-  GString *challenge;
+  xstring_t *challenge;
   xuint_t n;
 
-  challenge = g_string_new (NULL);
+  challenge = xstring_new (NULL);
   for (n = 0; n < len; n++)
-    g_string_append_c (challenge, random_ascii ());
-  return g_string_free (challenge, FALSE);
+    xstring_append_c (challenge, random_ascii ());
+  return xstring_free (challenge, FALSE);
 }
 
 static xchar_t *
 random_blob (xuint_t len)
 {
-  GString *challenge;
+  xstring_t *challenge;
   xuint_t n;
 
-  challenge = g_string_new (NULL);
+  challenge = xstring_new (NULL);
   for (n = 0; n < len; n++)
-    g_string_append_c (challenge, g_random_int_range (0, 256));
-  return g_string_free (challenge, FALSE);
+    xstring_append_c (challenge, g_random_int_range (0, 256));
+  return xstring_free (challenge, FALSE);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -278,7 +278,7 @@ ensure_keyring_directory (xerror_t **error)
   e = g_getenv ("G_DBUS_COOKIE_SHA1_KEYRING_DIR");
   if (e != NULL)
     {
-      path = g_strdup (e);
+      path = xstrdup (e);
     }
   else
     {
@@ -299,7 +299,7 @@ ensure_keyring_directory (xerror_t **error)
                        g_io_error_from_errno (errsv),
                        _("Error when getting information for directory “%s”: %s"),
                        path,
-                       g_strerror (errsv));
+                       xstrerror (errsv));
           g_clear_pointer (&path, g_free);
           return NULL;
         }
@@ -324,7 +324,7 @@ ensure_keyring_directory (xerror_t **error)
 #else  /* if !G_OS_UNIX */
   /* On non-Unix platforms, check that it exists as a directory, but don’t do
    * permissions checks at the moment. */
-  if (g_file_test (path, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))
+  if (xfile_test (path, XFILE_TEST_EXISTS | XFILE_TEST_IS_DIR))
     {
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -347,7 +347,7 @@ ensure_keyring_directory (xerror_t **error)
                    g_io_error_from_errno (errsv),
                    _("Error creating directory “%s”: %s"),
                    path,
-                   g_strerror (errsv));
+                   xstrerror (errsv));
       g_clear_pointer (&path, g_free);
       return NULL;
     }
@@ -395,7 +395,7 @@ keyring_lookup_entry (const xchar_t  *cookie_context,
 
   path = g_build_filename (keyring_dir, cookie_context, NULL);
 
-  if (!g_file_get_contents (path,
+  if (!xfile_get_contents (path,
                             &contents,
                             NULL,
                             error))
@@ -407,7 +407,7 @@ keyring_lookup_entry (const xchar_t  *cookie_context,
     }
   g_assert (contents != NULL);
 
-  lines = g_strsplit (contents, "\n", 0);
+  lines = xstrsplit (contents, "\n", 0);
   for (n = 0; lines[n] != NULL; n++)
     {
       const xchar_t *line = lines[n];
@@ -418,8 +418,8 @@ keyring_lookup_entry (const xchar_t  *cookie_context,
       if (line[0] == '\0')
         continue;
 
-      tokens = g_strsplit (line, " ", 0);
-      if (g_strv_length (tokens) != 3)
+      tokens = xstrsplit (line, " ", 0);
+      if (xstrv_length (tokens) != 3)
         {
           g_set_error (error,
                        G_IO_ERROR,
@@ -428,7 +428,7 @@ keyring_lookup_entry (const xchar_t  *cookie_context,
                        n + 1,
                        path,
                        line);
-          g_strfreev (tokens);
+          xstrfreev (tokens);
           goto out;
         }
 
@@ -442,7 +442,7 @@ keyring_lookup_entry (const xchar_t  *cookie_context,
                        n + 1,
                        path,
                        line);
-          g_strfreev (tokens);
+          xstrfreev (tokens);
           goto out;
         }
 
@@ -456,7 +456,7 @@ keyring_lookup_entry (const xchar_t  *cookie_context,
                        n + 1,
                        path,
                        line);
-          g_strfreev (tokens);
+          xstrfreev (tokens);
           goto out;
         }
 
@@ -465,11 +465,11 @@ keyring_lookup_entry (const xchar_t  *cookie_context,
           /* YAY, success */
           ret = tokens[2]; /* steal pointer */
           tokens[2] = NULL;
-          g_strfreev (tokens);
+          xstrfreev (tokens);
           goto out;
         }
 
-      g_strfreev (tokens);
+      xstrfreev (tokens);
     }
 
   /* BOOH, didn't find the cookie */
@@ -484,7 +484,7 @@ keyring_lookup_entry (const xchar_t  *cookie_context,
   g_free (keyring_dir);
   g_free (path);
   g_free (contents);
-  g_strfreev (lines);
+  xstrfreev (lines);
   return ret;
 }
 
@@ -498,7 +498,7 @@ _log (const xchar_t *message,
   va_list var_args;
 
   va_start (var_args, message);
-  s = g_strdup_vprintf (message, var_args);
+  s = xstrdup_vprintf (message, var_args);
   va_end (var_args);
 
   /* TODO: might want to send this to syslog instead */
@@ -535,7 +535,7 @@ create_lock_exclusive (const xchar_t  *lock_path,
                    g_io_error_from_errno (errsv),
                    _("Error creating lock file “%s”: %s"),
                    lock_path,
-                   g_strerror (errsv));
+                   xstrerror (errsv));
       return -1;
     }
 
@@ -560,7 +560,7 @@ keyring_acquire_lock (const xchar_t  *path,
   g_return_val_if_fail (error == NULL || *error == NULL, -1);
 
   ret = -1;
-  lock = g_strconcat (path, ".lock", NULL);
+  lock = xstrconcat (path, ".lock", NULL);
 
   /* This is what the D-Bus spec says
    * (https://dbus.freedesktop.org/doc/dbus-specification.html#auth-mechanisms-sha)
@@ -608,7 +608,7 @@ keyring_acquire_lock (const xchar_t  *path,
                        g_io_error_from_errno (errsv),
                        _("Error deleting stale lock file “%s”: %s"),
                        lock,
-                       g_strerror (errsv));
+                       xstrerror (errsv));
           goto out;
         }
 
@@ -638,7 +638,7 @@ keyring_release_lock (const xchar_t  *path,
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   ret = FALSE;
-  lock = g_strdup_printf ("%s.lock", path);
+  lock = xstrdup_printf ("%s.lock", path);
   if (close (lock_fd) != 0)
     {
       int errsv = errno;
@@ -647,7 +647,7 @@ keyring_release_lock (const xchar_t  *path,
                    g_io_error_from_errno (errsv),
                    _("Error closing (unlinked) lock file “%s”: %s"),
                    lock,
-                   g_strerror (errsv));
+                   xstrerror (errsv));
       goto out;
     }
   if (g_unlink (lock) != 0)
@@ -658,7 +658,7 @@ keyring_release_lock (const xchar_t  *path,
                    g_io_error_from_errno (errsv),
                    _("Error unlinking lock file “%s”: %s"),
                    lock,
-                   g_strerror (errsv));
+                   xstrerror (errsv));
       goto out;
     }
 
@@ -684,7 +684,7 @@ keyring_generate_entry (const xchar_t  *cookie_context,
   xerror_t *local_error;
   xchar_t **lines;
   xint_t max_line_id;
-  GString *new_contents;
+  xstring_t *new_contents;
   gint64 now;
   xboolean_t have_id;
   xint_t use_id;
@@ -719,15 +719,15 @@ keyring_generate_entry (const xchar_t  *cookie_context,
 
   local_error = NULL;
   contents = NULL;
-  if (!g_file_get_contents (path,
+  if (!xfile_get_contents (path,
                             &contents,
                             NULL,
                             &local_error))
     {
-      if (local_error->domain == G_FILE_ERROR && local_error->code == G_FILE_ERROR_NOENT)
+      if (local_error->domain == XFILE_ERROR && local_error->code == XFILE_ERROR_NOENT)
         {
           /* file doesn't have to exist */
-          g_error_free (local_error);
+          xerror_free (local_error);
         }
       else
         {
@@ -739,7 +739,7 @@ keyring_generate_entry (const xchar_t  *cookie_context,
         }
     }
 
-  new_contents = g_string_new (NULL);
+  new_contents = xstring_new (NULL);
   now = g_get_real_time () / G_USEC_PER_SEC;
   changed_file = FALSE;
 
@@ -747,7 +747,7 @@ keyring_generate_entry (const xchar_t  *cookie_context,
   if (contents != NULL)
     {
       xuint_t n;
-      lines = g_strsplit (contents, "\n", 0);
+      lines = xstrsplit (contents, "\n", 0);
       for (n = 0; lines[n] != NULL; n++)
         {
           const xchar_t *line = lines[n];
@@ -760,8 +760,8 @@ keyring_generate_entry (const xchar_t  *cookie_context,
           if (line[0] == '\0')
             continue;
 
-          tokens = g_strsplit (line, " ", 0);
-          if (g_strv_length (tokens) != 3)
+          tokens = xstrsplit (line, " ", 0);
+          if (xstrv_length (tokens) != 3)
             {
               g_set_error (error,
                            G_IO_ERROR,
@@ -770,7 +770,7 @@ keyring_generate_entry (const xchar_t  *cookie_context,
                            n + 1,
                            path,
                            line);
-              g_strfreev (tokens);
+              xstrfreev (tokens);
               goto out;
             }
 
@@ -784,7 +784,7 @@ keyring_generate_entry (const xchar_t  *cookie_context,
                            n + 1,
                            path,
                            line);
-              g_strfreev (tokens);
+              xstrfreev (tokens);
               goto out;
             }
 
@@ -798,7 +798,7 @@ keyring_generate_entry (const xchar_t  *cookie_context,
                            n + 1,
                            path,
                            line);
-              g_strfreev (tokens);
+              xstrfreev (tokens);
               goto out;
             }
 
@@ -841,7 +841,7 @@ keyring_generate_entry (const xchar_t  *cookie_context,
             }
           else
             {
-              g_string_append_printf (new_contents,
+              xstring_append_printf (new_contents,
                                       "%d %" G_GUINT64_FORMAT " %s\n",
                                       line_id,
                                       line_when,
@@ -864,7 +864,7 @@ keyring_generate_entry (const xchar_t  *cookie_context,
                     }
                 }
             }
-          g_strfreev (tokens);
+          xstrfreev (tokens);
         }
     } /* for each line */
 
@@ -884,7 +884,7 @@ keyring_generate_entry (const xchar_t  *cookie_context,
       *out_cookie = _g_dbus_hexencode (raw_cookie, 32);
       g_free (raw_cookie);
 
-      g_string_append_printf (new_contents,
+      xstring_append_printf (new_contents,
                               "%d %" G_GINT64_FORMAT " %s\n",
                               *out_id,
                               g_get_real_time () / G_USEC_PER_SEC,
@@ -895,10 +895,10 @@ keyring_generate_entry (const xchar_t  *cookie_context,
   /* and now actually write the cookie file if there are changes (this is atomic) */
   if (changed_file)
     {
-      if (!g_file_set_contents_full (path,
+      if (!xfile_set_contents_full (path,
                                      new_contents->str,
                                      -1,
-                                     G_FILE_SET_CONTENTS_CONSISTENT,
+                                     XFILE_SET_CONTENTS_CONSISTENT,
                                      0600,
                                      error))
         {
@@ -930,22 +930,22 @@ keyring_generate_entry (const xchar_t  *cookie_context,
                                   _("(Additionally, releasing the lock for “%s” also failed: %s) "),
                                   path,
                                   local_error->message);
-                  g_error_free (local_error);
+                  xerror_free (local_error);
                 }
             }
           else
             {
-              g_error_free (local_error);
+              xerror_free (local_error);
             }
         }
     }
 
   g_free (keyring_dir);
   g_free (path);
-  g_strfreev (lines);
+  xstrfreev (lines);
   g_free (contents);
   if (new_contents != NULL)
-    g_string_free (new_contents, TRUE);
+    xstring_free (new_contents, TRUE);
   g_free (use_cookie);
   return ret;
 }
@@ -957,16 +957,16 @@ generate_sha1 (const xchar_t *server_challenge,
                const xchar_t *client_challenge,
                const xchar_t *cookie)
 {
-  GString *str;
+  xstring_t *str;
   xchar_t *sha1;
 
-  str = g_string_new (server_challenge);
-  g_string_append_c (str, ':');
-  g_string_append (str, client_challenge);
-  g_string_append_c (str, ':');
-  g_string_append (str, cookie);
+  str = xstring_new (server_challenge);
+  xstring_append_c (str, ':');
+  xstring_append (str, client_challenge);
+  xstring_append_c (str, ':');
+  xstring_append (str, cookie);
   sha1 = g_compute_checksum_for_string (G_CHECKSUM_SHA1, str->str, -1);
-  g_string_free (str, TRUE);
+  xstring_free (str, TRUE);
 
   return sha1;
 }
@@ -1016,7 +1016,7 @@ mechanism_server_initiate (GDBusAuthMechanism   *mechanism,
 
       sid = _g_win32_current_process_sid_string (NULL);
 
-      if (g_strcmp0 (initial_response, sid) == 0)
+      if (xstrcmp0 (initial_response, sid) == 0)
         m->priv->state = G_DBUS_AUTH_MECHANISM_STATE_HAVE_DATA_TO_SEND;
 
       g_free (sid);
@@ -1044,11 +1044,11 @@ mechanism_server_data_receive (GDBusAuthMechanism   *mechanism,
   tokens = NULL;
   sha1 = NULL;
 
-  tokens = g_strsplit (data, " ", 0);
-  if (g_strv_length (tokens) != 2)
+  tokens = xstrsplit (data, " ", 0);
+  if (xstrv_length (tokens) != 2)
     {
       g_free (m->priv->reject_reason);
-      m->priv->reject_reason = g_strdup_printf ("Malformed data '%s'", data);
+      m->priv->reject_reason = xstrdup_printf ("Malformed data '%s'", data);
       m->priv->state = G_DBUS_AUTH_MECHANISM_STATE_REJECTED;
       goto out;
     }
@@ -1058,19 +1058,19 @@ mechanism_server_data_receive (GDBusAuthMechanism   *mechanism,
 
   sha1 = generate_sha1 (m->priv->server_challenge, client_challenge, m->priv->cookie);
 
-  if (g_strcmp0 (sha1, alleged_sha1) == 0)
+  if (xstrcmp0 (sha1, alleged_sha1) == 0)
     {
       m->priv->state = G_DBUS_AUTH_MECHANISM_STATE_ACCEPTED;
     }
   else
     {
       g_free (m->priv->reject_reason);
-      m->priv->reject_reason = g_strdup_printf ("SHA-1 mismatch");
+      m->priv->reject_reason = xstrdup_printf ("SHA-1 mismatch");
       m->priv->state = G_DBUS_AUTH_MECHANISM_STATE_REJECTED;
     }
 
  out:
-  g_strfreev (tokens);
+  xstrfreev (tokens);
   g_free (sha1);
 }
 
@@ -1091,7 +1091,7 @@ mechanism_server_data_send (GDBusAuthMechanism   *mechanism,
   s = NULL;
   *out_data_len = 0;
 
-  /* TODO: use GDBusAuthObserver here to get the cookie context to use? */
+  /* TODO: use xdbus_auth_observer_t here to get the cookie context to use? */
   cookie_context = "org_gtk_gdbus_general";
 
   cookie_id = -1;
@@ -1102,14 +1102,14 @@ mechanism_server_data_send (GDBusAuthMechanism   *mechanism,
                                &error))
     {
       g_free (m->priv->reject_reason);
-      m->priv->reject_reason = g_strdup_printf ("Error adding entry to keyring: %s", error->message);
-      g_error_free (error);
+      m->priv->reject_reason = xstrdup_printf ("Error adding entry to keyring: %s", error->message);
+      xerror_free (error);
       m->priv->state = G_DBUS_AUTH_MECHANISM_STATE_REJECTED;
       goto out;
     }
 
   m->priv->server_challenge = random_ascii_string (16);
-  s = g_strdup_printf ("%s %d %s",
+  s = xstrdup_printf ("%s %d %s",
                        cookie_context,
                        cookie_id,
                        m->priv->server_challenge);
@@ -1130,7 +1130,7 @@ mechanism_server_get_reject_reason (GDBusAuthMechanism   *mechanism)
   g_return_val_if_fail (m->priv->is_server && !m->priv->is_client, NULL);
   g_return_val_if_fail (m->priv->state == G_DBUS_AUTH_MECHANISM_STATE_REJECTED, NULL);
 
-  return g_strdup (m->priv->reject_reason);
+  return xstrdup (m->priv->reject_reason);
 }
 
 static void
@@ -1172,7 +1172,7 @@ mechanism_client_initiate (GDBusAuthMechanism   *mechanism,
   *out_initial_response_len = 0;
 
 #ifdef G_OS_UNIX
-  initial_response = g_strdup_printf ("%" G_GINT64_FORMAT, (gint64) getuid ());
+  initial_response = xstrdup_printf ("%" G_GINT64_FORMAT, (gint64) getuid ());
 #elif defined (G_OS_WIN32)
   initial_response = _g_win32_current_process_sid_string (NULL);
 #else
@@ -1215,11 +1215,11 @@ mechanism_client_data_receive (GDBusAuthMechanism   *mechanism,
   cookie = NULL;
   client_challenge = NULL;
 
-  tokens = g_strsplit (data, " ", 0);
-  if (g_strv_length (tokens) != 3)
+  tokens = xstrsplit (data, " ", 0);
+  if (xstrv_length (tokens) != 3)
     {
       g_free (m->priv->reject_reason);
-      m->priv->reject_reason = g_strdup_printf ("Malformed data '%s'", data);
+      m->priv->reject_reason = xstrdup_printf ("Malformed data '%s'", data);
       m->priv->state = G_DBUS_AUTH_MECHANISM_STATE_REJECTED;
       goto out;
     }
@@ -1229,7 +1229,7 @@ mechanism_client_data_receive (GDBusAuthMechanism   *mechanism,
   if (*endp != '\0')
     {
       g_free (m->priv->reject_reason);
-      m->priv->reject_reason = g_strdup_printf ("Malformed cookie_id '%s'", tokens[1]);
+      m->priv->reject_reason = xstrdup_printf ("Malformed cookie_id '%s'", tokens[1]);
       m->priv->state = G_DBUS_AUTH_MECHANISM_STATE_REJECTED;
       goto out;
     }
@@ -1240,20 +1240,20 @@ mechanism_client_data_receive (GDBusAuthMechanism   *mechanism,
   if (cookie == NULL)
     {
       g_free (m->priv->reject_reason);
-      m->priv->reject_reason = g_strdup_printf ("Problems looking up entry in keyring: %s", error->message);
-      g_error_free (error);
+      m->priv->reject_reason = xstrdup_printf ("Problems looking up entry in keyring: %s", error->message);
+      xerror_free (error);
       m->priv->state = G_DBUS_AUTH_MECHANISM_STATE_REJECTED;
       goto out;
     }
 
   client_challenge = random_ascii_string (16);
   sha1 = generate_sha1 (server_challenge, client_challenge, cookie);
-  m->priv->to_send = g_strdup_printf ("%s %s", client_challenge, sha1);
+  m->priv->to_send = xstrdup_printf ("%s %s", client_challenge, sha1);
   g_free (sha1);
   m->priv->state = G_DBUS_AUTH_MECHANISM_STATE_HAVE_DATA_TO_SEND;
 
  out:
-  g_strfreev (tokens);
+  xstrfreev (tokens);
   g_free (cookie);
   g_free (client_challenge);
 }
@@ -1273,7 +1273,7 @@ mechanism_client_data_send (GDBusAuthMechanism   *mechanism,
   m->priv->state = G_DBUS_AUTH_MECHANISM_STATE_ACCEPTED;
 
   *out_data_len = strlen (m->priv->to_send);
-  return g_strdup (m->priv->to_send);
+  return xstrdup (m->priv->to_send);
 }
 
 static void

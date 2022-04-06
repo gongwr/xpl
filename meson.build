@@ -1492,16 +1492,16 @@ if host_system == 'windows'
   glibconfig_conf.set('g_pid_type', 'void*')
   glibconfig_conf.set_quoted('g_pid_format', 'p')
   if host_machine.cpu_family() == 'x86_64'
-    glibconfig_conf.set_quoted('g_pollfd_format', '%#' + int64_m + 'x')
+    glibconfig_conf.set_quoted('xpollfd_format', '%#' + int64_m + 'x')
   else
-    glibconfig_conf.set_quoted('g_pollfd_format', '%#x')
+    glibconfig_conf.set_quoted('xpollfd_format', '%#x')
   endif
   glibconfig_conf.set('g_dir_separator', '\\\\')
   glibconfig_conf.set('g_searchpath_separator', ';')
 else
   glibconfig_conf.set('g_pid_type', 'int')
   glibconfig_conf.set_quoted('g_pid_format', 'i')
-  glibconfig_conf.set_quoted('g_pollfd_format', '%d')
+  glibconfig_conf.set_quoted('xpollfd_format', '%d')
   glibconfig_conf.set('g_dir_separator', '/')
   glibconfig_conf.set('g_searchpath_separator', ':')
 endif
@@ -1608,7 +1608,7 @@ elif voidp_size == long_size
   glibconfig_conf.set_quoted('gintptr_modifier', 'l')
   glibconfig_conf.set_quoted('gintptr_format', 'li')
   glibconfig_conf.set_quoted('guintptr_format', 'lu')
-  glibconfig_conf.set('glib_gpi_cast', '(glong)')
+  glibconfig_conf.set('glib_gpi_cast', '(xlong_t)')
   glibconfig_conf.set('glib_gpui_cast', '(gulong)')
 elif voidp_size == long_long_size
   glibconfig_conf.set('glib_intptr_type_define', 'long long')
@@ -1616,7 +1616,7 @@ elif voidp_size == long_long_size
   glibconfig_conf.set_quoted('gintptr_format', int64_m + 'i')
   glibconfig_conf.set_quoted('guintptr_format', int64_m + 'u')
   glibconfig_conf.set('glib_gpi_cast', '(gint64)')
-  glibconfig_conf.set('glib_gpui_cast', '(guint64)')
+  glibconfig_conf.set('glib_gpui_cast', '(xuint64_t)')
 else
   error('Could not determine size of void *')
 endif
@@ -1894,7 +1894,7 @@ endif
 if host_system == 'windows' and not get_option('force_posix_threads')
   thread_dep = []
   threads_implementation = 'win32'
-  glibconfig_conf.set('g_threads_impl_def', 'WIN32')
+  glibconfig_conf.set('xthreads_impl_def', 'WIN32')
   glib_conf.set('THREADS_WIN32', 1)
 else
   thread_dep = dependency('threads')
@@ -1904,7 +1904,7 @@ else
       # define _GNU_SOURCE
       #endif
       #include <pthread.h>'''
-  glibconfig_conf.set('g_threads_impl_def', 'POSIX')
+  glibconfig_conf.set('xthreads_impl_def', 'POSIX')
   glib_conf.set('THREADS_POSIX', 1)
   if cc.has_header_symbol('pthread.h', 'pthread_attr_setstacksize')
     glib_conf.set('HAVE_PTHREAD_ATTR_SETSTACKSIZE', 1)
@@ -2224,7 +2224,7 @@ cmdline_test_code = '''
 static int
 __getcmdline (void)
 {
-/* This code is a dumbed-down version of g_file_get_contents() */
+/* This code is a dumbed-down version of xfile_get_contents() */
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif

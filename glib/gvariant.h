@@ -31,270 +31,270 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GVariant        xvariant_t;
+typedef struct _xvariant        xvariant_t;
 
 typedef enum
 {
-  G_VARIANT_CLASS_BOOLEAN       = 'b',
-  G_VARIANT_CLASS_BYTE          = 'y',
-  G_VARIANT_CLASS_INT16         = 'n',
-  G_VARIANT_CLASS_UINT16        = 'q',
-  G_VARIANT_CLASS_INT32         = 'i',
-  G_VARIANT_CLASS_UINT32        = 'u',
-  G_VARIANT_CLASS_INT64         = 'x',
-  G_VARIANT_CLASS_UINT64        = 't',
-  G_VARIANT_CLASS_HANDLE        = 'h',
-  G_VARIANT_CLASS_DOUBLE        = 'd',
-  G_VARIANT_CLASS_STRING        = 's',
-  G_VARIANT_CLASS_OBJECT_PATH   = 'o',
-  G_VARIANT_CLASS_SIGNATURE     = 'g',
-  G_VARIANT_CLASS_VARIANT       = 'v',
-  G_VARIANT_CLASS_MAYBE         = 'm',
-  G_VARIANT_CLASS_ARRAY         = 'a',
-  G_VARIANT_CLASS_TUPLE         = '(',
-  G_VARIANT_CLASS_DICT_ENTRY    = '{'
-} GVariantClass;
+  XVARIANT_CLASS_BOOLEAN       = 'b',
+  XVARIANT_CLASS_BYTE          = 'y',
+  XVARIANT_CLASS_INT16         = 'n',
+  XVARIANT_CLASS_UINT16        = 'q',
+  XVARIANT_CLASS_INT32         = 'i',
+  XVARIANT_CLASS_UINT32        = 'u',
+  XVARIANT_CLASS_INT64         = 'x',
+  XVARIANT_CLASS_UINT64        = 't',
+  XVARIANT_CLASS_HANDLE        = 'h',
+  XVARIANT_CLASS_DOUBLE        = 'd',
+  XVARIANT_CLASS_STRING        = 's',
+  XVARIANT_CLASS_OBJECT_PATH   = 'o',
+  XVARIANT_CLASS_SIGNATURE     = 'g',
+  XVARIANT_CLASS_VARIANT       = 'v',
+  XVARIANT_CLASS_MAYBE         = 'm',
+  XVARIANT_CLASS_ARRAY         = 'a',
+  XVARIANT_CLASS_TUPLE         = '(',
+  XVARIANT_CLASS_DICT_ENTRY    = '{'
+} xvariant_class_t;
 
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_unref                         (xvariant_t             *value);
+void                            xvariant_unref                         (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_ref                           (xvariant_t             *value);
+xvariant_t *                      xvariant_ref                           (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_ref_sink                      (xvariant_t             *value);
+xvariant_t *                      xvariant_ref_sink                      (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_is_floating                   (xvariant_t             *value);
+xboolean_t                        xvariant_is_floating                   (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_take_ref                      (xvariant_t             *value);
+xvariant_t *                      xvariant_take_ref                      (xvariant_t             *value);
 
 XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *            g_variant_get_type                      (xvariant_t             *value);
+const xvariant_type_t *            xvariant_get_type                      (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-const xchar_t *                   g_variant_get_type_string               (xvariant_t             *value);
+const xchar_t *                   xvariant_get_type_string               (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_is_of_type                    (xvariant_t             *value,
+xboolean_t                        xvariant_is_of_type                    (xvariant_t             *value,
                                                                          const xvariant_type_t   *type);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_is_container                  (xvariant_t             *value);
+xboolean_t                        xvariant_is_container                  (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-GVariantClass                   g_variant_classify                      (xvariant_t             *value);
+xvariant_class_t                   xvariant_classify                      (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_boolean                   (xboolean_t              value);
+xvariant_t *                      xvariant_new_boolean                   (xboolean_t              value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_byte                      (guint8                value);
+xvariant_t *                      xvariant_new_byte                      (xuint8_t                value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_int16                     (gint16                value);
+xvariant_t *                      xvariant_new_int16                     (gint16                value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_uint16                    (guint16               value);
+xvariant_t *                      xvariant_new_uint16                    (xuint16_t               value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_int32                     (gint32                value);
+xvariant_t *                      xvariant_new_int32                     (gint32                value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_uint32                    (guint32               value);
+xvariant_t *                      xvariant_new_uint32                    (xuint32_t               value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_int64                     (gint64                value);
+xvariant_t *                      xvariant_new_int64                     (gint64                value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_uint64                    (guint64               value);
+xvariant_t *                      xvariant_new_uint64                    (xuint64_t               value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_handle                    (gint32                value);
+xvariant_t *                      xvariant_new_handle                    (gint32                value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_double                    (xdouble_t               value);
+xvariant_t *                      xvariant_new_double                    (xdouble_t               value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_string                    (const xchar_t          *string);
+xvariant_t *                      xvariant_new_string                    (const xchar_t          *string);
 XPL_AVAILABLE_IN_2_38
-xvariant_t *                      g_variant_new_take_string               (xchar_t                *string);
+xvariant_t *                      xvariant_new_take_string               (xchar_t                *string);
 XPL_AVAILABLE_IN_2_38
-xvariant_t *                      g_variant_new_printf                    (const xchar_t          *format_string,
+xvariant_t *                      xvariant_new_printf                    (const xchar_t          *format_string,
                                                                          ...) G_GNUC_PRINTF (1, 2);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_object_path               (const xchar_t          *object_path);
+xvariant_t *                      xvariant_new_object_path               (const xchar_t          *object_path);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_is_object_path                (const xchar_t          *string);
+xboolean_t                        xvariant_is_object_path                (const xchar_t          *string);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_signature                 (const xchar_t          *signature);
+xvariant_t *                      xvariant_new_signature                 (const xchar_t          *signature);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_is_signature                  (const xchar_t          *string);
+xboolean_t                        xvariant_is_signature                  (const xchar_t          *string);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_variant                   (xvariant_t             *value);
+xvariant_t *                      xvariant_new_variant                   (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_strv                      (const xchar_t * const  *strv,
-                                                                         gssize                length);
+xvariant_t *                      xvariant_new_strv                      (const xchar_t * const  *strv,
+                                                                         xssize_t                length);
 XPL_AVAILABLE_IN_2_30
-xvariant_t *                      g_variant_new_objv                      (const xchar_t * const  *strv,
-                                                                         gssize                length);
+xvariant_t *                      xvariant_new_objv                      (const xchar_t * const  *strv,
+                                                                         xssize_t                length);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_bytestring                (const xchar_t          *string);
+xvariant_t *                      xvariant_new_bytestring                (const xchar_t          *string);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_bytestring_array          (const xchar_t * const  *strv,
-                                                                         gssize                length);
+xvariant_t *                      xvariant_new_bytestring_array          (const xchar_t * const  *strv,
+                                                                         xssize_t                length);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_fixed_array               (const xvariant_type_t   *element_type,
-                                                                         gconstpointer         elements,
+xvariant_t *                      xvariant_new_fixed_array               (const xvariant_type_t   *element_type,
+                                                                         xconstpointer         elements,
                                                                          xsize_t                 n_elements,
                                                                          xsize_t                 element_size);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_get_boolean                   (xvariant_t             *value);
+xboolean_t                        xvariant_get_boolean                   (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-guint8                          g_variant_get_byte                      (xvariant_t             *value);
+xuint8_t                          xvariant_get_byte                      (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-gint16                          g_variant_get_int16                     (xvariant_t             *value);
+gint16                          xvariant_get_int16                     (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-guint16                         g_variant_get_uint16                    (xvariant_t             *value);
+xuint16_t                         xvariant_get_uint16                    (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-gint32                          g_variant_get_int32                     (xvariant_t             *value);
+gint32                          xvariant_get_int32                     (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-guint32                         g_variant_get_uint32                    (xvariant_t             *value);
+xuint32_t                         xvariant_get_uint32                    (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-gint64                          g_variant_get_int64                     (xvariant_t             *value);
+gint64                          xvariant_get_int64                     (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-guint64                         g_variant_get_uint64                    (xvariant_t             *value);
+xuint64_t                         xvariant_get_uint64                    (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-gint32                          g_variant_get_handle                    (xvariant_t             *value);
+gint32                          xvariant_get_handle                    (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-xdouble_t                         g_variant_get_double                    (xvariant_t             *value);
+xdouble_t                         xvariant_get_double                    (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_get_variant                   (xvariant_t             *value);
+xvariant_t *                      xvariant_get_variant                   (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-const xchar_t *                   g_variant_get_string                    (xvariant_t             *value,
+const xchar_t *                   xvariant_get_string                    (xvariant_t             *value,
                                                                          xsize_t                *length);
 XPL_AVAILABLE_IN_ALL
-xchar_t *                         g_variant_dup_string                    (xvariant_t             *value,
+xchar_t *                         xvariant_dup_string                    (xvariant_t             *value,
                                                                          xsize_t                *length);
 XPL_AVAILABLE_IN_ALL
-const xchar_t **                  g_variant_get_strv                      (xvariant_t             *value,
+const xchar_t **                  xvariant_get_strv                      (xvariant_t             *value,
                                                                          xsize_t                *length);
 XPL_AVAILABLE_IN_ALL
-xchar_t **                        g_variant_dup_strv                      (xvariant_t             *value,
+xchar_t **                        xvariant_dup_strv                      (xvariant_t             *value,
                                                                          xsize_t                *length);
 XPL_AVAILABLE_IN_2_30
-const xchar_t **                  g_variant_get_objv                      (xvariant_t             *value,
+const xchar_t **                  xvariant_get_objv                      (xvariant_t             *value,
                                                                          xsize_t                *length);
 XPL_AVAILABLE_IN_ALL
-xchar_t **                        g_variant_dup_objv                      (xvariant_t             *value,
+xchar_t **                        xvariant_dup_objv                      (xvariant_t             *value,
                                                                          xsize_t                *length);
 XPL_AVAILABLE_IN_ALL
-const xchar_t *                   g_variant_get_bytestring                (xvariant_t             *value);
+const xchar_t *                   xvariant_get_bytestring                (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-xchar_t *                         g_variant_dup_bytestring                (xvariant_t             *value,
+xchar_t *                         xvariant_dup_bytestring                (xvariant_t             *value,
                                                                          xsize_t                *length);
 XPL_AVAILABLE_IN_ALL
-const xchar_t **                  g_variant_get_bytestring_array          (xvariant_t             *value,
+const xchar_t **                  xvariant_get_bytestring_array          (xvariant_t             *value,
                                                                          xsize_t                *length);
 XPL_AVAILABLE_IN_ALL
-xchar_t **                        g_variant_dup_bytestring_array          (xvariant_t             *value,
+xchar_t **                        xvariant_dup_bytestring_array          (xvariant_t             *value,
                                                                          xsize_t                *length);
 
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_maybe                     (const xvariant_type_t   *child_type,
+xvariant_t *                      xvariant_new_maybe                     (const xvariant_type_t   *child_type,
                                                                          xvariant_t             *child);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_array                     (const xvariant_type_t   *child_type,
+xvariant_t *                      xvariant_new_array                     (const xvariant_type_t   *child_type,
                                                                          xvariant_t * const     *children,
                                                                          xsize_t                 n_children);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_tuple                     (xvariant_t * const     *children,
+xvariant_t *                      xvariant_new_tuple                     (xvariant_t * const     *children,
                                                                          xsize_t                 n_children);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_dict_entry                (xvariant_t             *key,
+xvariant_t *                      xvariant_new_dict_entry                (xvariant_t             *key,
                                                                          xvariant_t             *value);
 
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_get_maybe                     (xvariant_t             *value);
+xvariant_t *                      xvariant_get_maybe                     (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-xsize_t                           g_variant_n_children                    (xvariant_t             *value);
+xsize_t                           xvariant_n_children                    (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_get_child                     (xvariant_t             *value,
+void                            xvariant_get_child                     (xvariant_t             *value,
                                                                          xsize_t                 index_,
                                                                          const xchar_t          *format_string,
                                                                          ...);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_get_child_value               (xvariant_t             *value,
+xvariant_t *                      xvariant_get_child_value               (xvariant_t             *value,
                                                                          xsize_t                 index_);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_lookup                        (xvariant_t             *dictionary,
+xboolean_t                        xvariant_lookup                        (xvariant_t             *dictionary,
                                                                          const xchar_t          *key,
                                                                          const xchar_t          *format_string,
                                                                          ...);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_lookup_value                  (xvariant_t             *dictionary,
+xvariant_t *                      xvariant_lookup_value                  (xvariant_t             *dictionary,
                                                                          const xchar_t          *key,
                                                                          const xvariant_type_t   *expected_type);
 XPL_AVAILABLE_IN_ALL
-gconstpointer                   g_variant_get_fixed_array               (xvariant_t             *value,
+xconstpointer                   xvariant_get_fixed_array               (xvariant_t             *value,
                                                                          xsize_t                *n_elements,
                                                                          xsize_t                 element_size);
 
 XPL_AVAILABLE_IN_ALL
-xsize_t                           g_variant_get_size                      (xvariant_t             *value);
+xsize_t                           xvariant_get_size                      (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-gconstpointer                   g_variant_get_data                      (xvariant_t             *value);
+xconstpointer                   xvariant_get_data                      (xvariant_t             *value);
 XPL_AVAILABLE_IN_2_36
-GBytes *                        g_variant_get_data_as_bytes             (xvariant_t             *value);
+xbytes_t *                        xvariant_get_data_as_bytes             (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_store                         (xvariant_t             *value,
+void                            xvariant_store                         (xvariant_t             *value,
                                                                          xpointer_t              data);
 
 XPL_AVAILABLE_IN_ALL
-xchar_t *                         g_variant_print                         (xvariant_t             *value,
+xchar_t *                         xvariant_print                         (xvariant_t             *value,
                                                                          xboolean_t              type_annotate);
 XPL_AVAILABLE_IN_ALL
-GString *                       g_variant_print_string                  (xvariant_t             *value,
-                                                                         GString              *string,
+xstring_t *                       xvariant_print_string                  (xvariant_t             *value,
+                                                                         xstring_t              *string,
                                                                          xboolean_t              type_annotate);
 
 XPL_AVAILABLE_IN_ALL
-xuint_t                           g_variant_hash                          (gconstpointer         value);
+xuint_t                           xvariant_hash                          (xconstpointer         value);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_equal                         (gconstpointer         one,
-                                                                         gconstpointer         two);
+xboolean_t                        xvariant_equal                         (xconstpointer         one,
+                                                                         xconstpointer         two);
 
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_get_normal_form               (xvariant_t             *value);
+xvariant_t *                      xvariant_get_normal_form               (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_is_normal_form                (xvariant_t             *value);
+xboolean_t                        xvariant_is_normal_form                (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_byteswap                      (xvariant_t             *value);
+xvariant_t *                      xvariant_byteswap                      (xvariant_t             *value);
 
 XPL_AVAILABLE_IN_2_36
-xvariant_t *                      g_variant_new_from_bytes                (const xvariant_type_t   *type,
-                                                                         GBytes               *bytes,
+xvariant_t *                      xvariant_new_from_bytes                (const xvariant_type_t   *type,
+                                                                         xbytes_t               *bytes,
                                                                          xboolean_t              trusted);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_from_data                 (const xvariant_type_t   *type,
-                                                                         gconstpointer         data,
+xvariant_t *                      xvariant_new_from_data                 (const xvariant_type_t   *type,
+                                                                         xconstpointer         data,
                                                                          xsize_t                 size,
                                                                          xboolean_t              trusted,
-                                                                         GDestroyNotify        notify,
+                                                                         xdestroy_notify_t        notify,
                                                                          xpointer_t              user_data);
 
-typedef struct _GVariantIter GVariantIter;
+typedef struct _GVariantIter xvariant_iter_t;
 struct _GVariantIter {
   /*< private >*/
   xsize_t x[16];
 };
 
 XPL_AVAILABLE_IN_ALL
-GVariantIter *                  g_variant_iter_new                      (xvariant_t             *value);
+xvariant_iter_t *                  xvariant_iter_new                      (xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-xsize_t                           g_variant_iter_init                     (GVariantIter         *iter,
+xsize_t                           xvariant_iter_init                     (xvariant_iter_t         *iter,
                                                                          xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-GVariantIter *                  g_variant_iter_copy                     (GVariantIter         *iter);
+xvariant_iter_t *                  xvariant_iter_copy                     (xvariant_iter_t         *iter);
 XPL_AVAILABLE_IN_ALL
-xsize_t                           g_variant_iter_n_children               (GVariantIter         *iter);
+xsize_t                           xvariant_iter_n_children               (xvariant_iter_t         *iter);
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_iter_free                     (GVariantIter         *iter);
+void                            xvariant_iter_free                     (xvariant_iter_t         *iter);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_iter_next_value               (GVariantIter         *iter);
+xvariant_t *                      xvariant_iter_next_value               (xvariant_iter_t         *iter);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_iter_next                     (GVariantIter         *iter,
+xboolean_t                        xvariant_iter_next                     (xvariant_iter_t         *iter,
                                                                          const xchar_t          *format_string,
                                                                          ...);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_iter_loop                     (GVariantIter         *iter,
+xboolean_t                        xvariant_iter_loop                     (xvariant_iter_t         *iter,
                                                                          const xchar_t          *format_string,
                                                                          ...);
 
 
-typedef struct _GVariantBuilder GVariantBuilder;
+typedef struct _GVariantBuilder xvariant_builder_t;
 struct _GVariantBuilder {
   /*< private >*/
   union
@@ -330,34 +330,34 @@ typedef enum
   G_VARIANT_PARSE_ERROR_VALUE_EXPECTED,
   G_VARIANT_PARSE_ERROR_RECURSION
 } GVariantParseError;
-#define G_VARIANT_PARSE_ERROR (g_variant_parse_error_quark ())
+#define G_VARIANT_PARSE_ERROR (xvariant_parse_error_quark ())
 
-XPL_DEPRECATED_IN_2_38_FOR(g_variant_parse_error_quark)
-GQuark                          g_variant_parser_get_error_quark        (void);
+XPL_DEPRECATED_IN_2_38_FOR(xvariant_parse_error_quark)
+xquark                          xvariant_parser_get_error_quark        (void);
 
 XPL_AVAILABLE_IN_ALL
-GQuark                          g_variant_parse_error_quark             (void);
+xquark                          xvariant_parse_error_quark             (void);
 
 /**
  * G_VARIANT_BUILDER_INIT:
  * @variant_type: a const xvariant_type_t*
  *
- * A stack-allocated #GVariantBuilder must be initialized if it is
- * used together with g_auto() to avoid warnings or crashes if
- * function returns before g_variant_builder_init() is called on the
+ * A stack-allocated #xvariant_builder_t must be initialized if it is
+ * used together with x_auto() to avoid warnings or crashes if
+ * function returns before xvariant_builder_init() is called on the
  * builder.
  *
  * This macro can be used as initializer instead of an
  * explicit zeroing a variable when declaring it and a following
- * g_variant_builder_init(), but it cannot be assigned to a variable.
+ * xvariant_builder_init(), but it cannot be assigned to a variable.
  *
  * The passed @variant_type should be a static xvariant_type_t to avoid
  * lifetime issues, as copying the @variant_type does not happen in
  * the G_VARIANT_BUILDER_INIT() call, but rather in functions that
- * make sure that #GVariantBuilder is valid.
+ * make sure that #xvariant_builder_t is valid.
  *
  * |[<!-- language="C" -->
- *   g_auto(GVariantBuilder) builder = G_VARIANT_BUILDER_INIT (G_VARIANT_TYPE_BYTESTRING);
+ *   x_auto(xvariant_builder) builder = G_VARIANT_BUILDER_INIT (G_VARIANT_TYPE_BYTESTRING);
  * ]|
  *
  * Since: 2.50
@@ -372,79 +372,79 @@ GQuark                          g_variant_parse_error_quark             (void);
   }
 
 XPL_AVAILABLE_IN_ALL
-GVariantBuilder *               g_variant_builder_new                   (const xvariant_type_t   *type);
+xvariant_builder_t *               xvariant_builder_new                   (const xvariant_type_t   *type);
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_builder_unref                 (GVariantBuilder      *builder);
+void                            xvariant_builder_unref                 (xvariant_builder_t      *builder);
 XPL_AVAILABLE_IN_ALL
-GVariantBuilder *               g_variant_builder_ref                   (GVariantBuilder      *builder);
+xvariant_builder_t *               xvariant_builder_ref                   (xvariant_builder_t      *builder);
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_builder_init                  (GVariantBuilder      *builder,
+void                            xvariant_builder_init                  (xvariant_builder_t      *builder,
                                                                          const xvariant_type_t   *type);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_builder_end                   (GVariantBuilder      *builder);
+xvariant_t *                      xvariant_builder_end                   (xvariant_builder_t      *builder);
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_builder_clear                 (GVariantBuilder      *builder);
+void                            xvariant_builder_clear                 (xvariant_builder_t      *builder);
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_builder_open                  (GVariantBuilder      *builder,
+void                            xvariant_builder_open                  (xvariant_builder_t      *builder,
                                                                          const xvariant_type_t   *type);
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_builder_close                 (GVariantBuilder      *builder);
+void                            xvariant_builder_close                 (xvariant_builder_t      *builder);
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_builder_add_value             (GVariantBuilder      *builder,
+void                            xvariant_builder_add_value             (xvariant_builder_t      *builder,
                                                                          xvariant_t             *value);
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_builder_add                   (GVariantBuilder      *builder,
+void                            xvariant_builder_add                   (xvariant_builder_t      *builder,
                                                                          const xchar_t          *format_string,
                                                                          ...);
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_builder_add_parsed            (GVariantBuilder      *builder,
+void                            xvariant_builder_add_parsed            (xvariant_builder_t      *builder,
                                                                          const xchar_t          *format,
                                                                          ...);
 
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new                           (const xchar_t          *format_string,
+xvariant_t *                      xvariant_new                           (const xchar_t          *format_string,
                                                                          ...);
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_get                           (xvariant_t             *value,
+void                            xvariant_get                           (xvariant_t             *value,
                                                                          const xchar_t          *format_string,
                                                                          ...);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_va                        (const xchar_t          *format_string,
+xvariant_t *                      xvariant_new_va                        (const xchar_t          *format_string,
                                                                          const xchar_t         **endptr,
                                                                          va_list              *app);
 XPL_AVAILABLE_IN_ALL
-void                            g_variant_get_va                        (xvariant_t             *value,
+void                            xvariant_get_va                        (xvariant_t             *value,
                                                                          const xchar_t          *format_string,
                                                                          const xchar_t         **endptr,
                                                                          va_list              *app);
 XPL_AVAILABLE_IN_2_34
-xboolean_t                        g_variant_check_format_string           (xvariant_t             *value,
+xboolean_t                        xvariant_check_format_string           (xvariant_t             *value,
                                                                          const xchar_t          *format_string,
                                                                          xboolean_t              copy_only);
 
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_parse                         (const xvariant_type_t   *type,
+xvariant_t *                      xvariant_parse                         (const xvariant_type_t   *type,
                                                                          const xchar_t          *text,
                                                                          const xchar_t          *limit,
                                                                          const xchar_t         **endptr,
                                                                          xerror_t              **error);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_parsed                    (const xchar_t          *format,
+xvariant_t *                      xvariant_new_parsed                    (const xchar_t          *format,
                                                                          ...);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *                      g_variant_new_parsed_va                 (const xchar_t          *format,
+xvariant_t *                      xvariant_new_parsed_va                 (const xchar_t          *format,
                                                                          va_list              *app);
 
 XPL_AVAILABLE_IN_2_40
-xchar_t *                         g_variant_parse_error_print_context     (xerror_t               *error,
+xchar_t *                         xvariant_parse_error_print_context     (xerror_t               *error,
                                                                          const xchar_t          *source_str);
 
 XPL_AVAILABLE_IN_ALL
-xint_t                            g_variant_compare                       (gconstpointer one,
-                                                                         gconstpointer two);
+xint_t                            xvariant_compare                       (xconstpointer one,
+                                                                         xconstpointer two);
 
-typedef struct _GVariantDict GVariantDict;
-struct _GVariantDict {
+typedef struct _xvariant_dict xvariant_dict_t;
+struct _xvariant_dict {
   /*< private >*/
   union
   {
@@ -458,34 +458,34 @@ struct _GVariantDict {
 };
 
 /**
- * G_VARIANT_DICT_INIT:
+ * XVARIANT_DICT_INIT:
  * @asv: (nullable): a xvariant_t*
  *
- * A stack-allocated #GVariantDict must be initialized if it is used
- * together with g_auto() to avoid warnings or crashes if function
- * returns before g_variant_dict_init() is called on the builder.
+ * A stack-allocated #xvariant_dict_t must be initialized if it is used
+ * together with x_auto() to avoid warnings or crashes if function
+ * returns before xvariant_dict_init() is called on the builder.
  *
  * This macro can be used as initializer instead of an explicit
  * zeroing a variable when declaring it and a following
- * g_variant_dict_init(), but it cannot be assigned to a variable.
+ * xvariant_dict_init(), but it cannot be assigned to a variable.
  *
- * The passed @asv has to live long enough for #GVariantDict to gather
+ * The passed @asv has to live long enough for #xvariant_dict_t to gather
  * the entries from, as the gathering does not happen in the
- * G_VARIANT_DICT_INIT() call, but rather in functions that make sure
- * that #GVariantDict is valid.  In context where the initialization
+ * XVARIANT_DICT_INIT() call, but rather in functions that make sure
+ * that #xvariant_dict_t is valid.  In context where the initialization
  * value has to be a constant expression, the only possible value of
- * @asv is %NULL.  It is still possible to call g_variant_dict_init()
+ * @asv is %NULL.  It is still possible to call xvariant_dict_init()
  * safely with a different @asv right after the variable was
- * initialized with G_VARIANT_DICT_INIT().
+ * initialized with XVARIANT_DICT_INIT().
  *
  * |[<!-- language="C" -->
- *   g_autoptr(xvariant_t) variant = get_asv_variant ();
- *   g_auto(GVariantDict) dict = G_VARIANT_DICT_INIT (variant);
+ *   x_autoptr(xvariant) variant = get_asv_variant ();
+ *   x_auto(xvariant_dict) dict = XVARIANT_DICT_INIT (variant);
  * ]|
  *
  * Since: 2.50
  */
-#define G_VARIANT_DICT_INIT(asv)                                             \
+#define XVARIANT_DICT_INIT(asv)                                             \
   {                                                                          \
     {                                                                        \
       {                                                                      \
@@ -495,44 +495,44 @@ struct _GVariantDict {
   }
 
 XPL_AVAILABLE_IN_2_40
-GVariantDict *                  g_variant_dict_new                      (xvariant_t             *from_asv);
+xvariant_dict_t *                  xvariant_dict_new                      (xvariant_t             *from_asv);
 
 XPL_AVAILABLE_IN_2_40
-void                            g_variant_dict_init                     (GVariantDict         *dict,
+void                            xvariant_dict_init                     (xvariant_dict_t         *dict,
                                                                          xvariant_t             *from_asv);
 
 XPL_AVAILABLE_IN_2_40
-xboolean_t                        g_variant_dict_lookup                   (GVariantDict         *dict,
+xboolean_t                        xvariant_dict_lookup                   (xvariant_dict_t         *dict,
                                                                          const xchar_t          *key,
                                                                          const xchar_t          *format_string,
                                                                          ...);
 XPL_AVAILABLE_IN_2_40
-xvariant_t *                      g_variant_dict_lookup_value             (GVariantDict         *dict,
+xvariant_t *                      xvariant_dict_lookup_value             (xvariant_dict_t         *dict,
                                                                          const xchar_t          *key,
                                                                          const xvariant_type_t   *expected_type);
 XPL_AVAILABLE_IN_2_40
-xboolean_t                        g_variant_dict_contains                 (GVariantDict         *dict,
+xboolean_t                        xvariant_dict_contains                 (xvariant_dict_t         *dict,
                                                                          const xchar_t          *key);
 XPL_AVAILABLE_IN_2_40
-void                            g_variant_dict_insert                   (GVariantDict         *dict,
+void                            xvariant_dict_insert                   (xvariant_dict_t         *dict,
                                                                          const xchar_t          *key,
                                                                          const xchar_t          *format_string,
                                                                          ...);
 XPL_AVAILABLE_IN_2_40
-void                            g_variant_dict_insert_value             (GVariantDict         *dict,
+void                            xvariant_dict_insert_value             (xvariant_dict_t         *dict,
                                                                          const xchar_t          *key,
                                                                          xvariant_t             *value);
 XPL_AVAILABLE_IN_2_40
-xboolean_t                        g_variant_dict_remove                   (GVariantDict         *dict,
+xboolean_t                        xvariant_dict_remove                   (xvariant_dict_t         *dict,
                                                                          const xchar_t          *key);
 XPL_AVAILABLE_IN_2_40
-void                            g_variant_dict_clear                    (GVariantDict         *dict);
+void                            xvariant_dict_clear                    (xvariant_dict_t         *dict);
 XPL_AVAILABLE_IN_2_40
-xvariant_t *                      g_variant_dict_end                      (GVariantDict         *dict);
+xvariant_t *                      xvariant_dict_end                      (xvariant_dict_t         *dict);
 XPL_AVAILABLE_IN_2_40
-GVariantDict *                  g_variant_dict_ref                      (GVariantDict         *dict);
+xvariant_dict_t *                  xvariant_dict_ref                      (xvariant_dict_t         *dict);
 XPL_AVAILABLE_IN_2_40
-void                            g_variant_dict_unref                    (GVariantDict         *dict);
+void                            xvariant_dict_unref                    (xvariant_dict_t         *dict);
 
 G_END_DECLS
 

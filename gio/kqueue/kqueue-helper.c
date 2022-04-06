@@ -49,7 +49,7 @@ typedef struct {
  * @inode: inode number of a new file.
  *
  * A callback function for the directory diff calculation routine,
- * produces G_FILE_MONITOR_EVENT_CREATED event for a created file.
+ * produces XFILE_MONITOR_EVENT_CREATED event for a created file.
  **/
 static void
 handle_created (void *udata, const char *path, ino_t inode)
@@ -66,13 +66,13 @@ handle_created (void *udata, const char *path, ino_t inode)
   g_assert (ctx->source != NULL);
 
   now = g_get_monotonic_time ();
-  g_file_monitor_source_handle_event (ctx->source, G_FILE_MONITOR_EVENT_CREATED, path,
+  xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_CREATED, path,
                                       NULL, NULL, now);
 
   /* Copied from ih_event_callback to report 'CHANGES_DONE_HINT' earlier. */
   fullname = g_build_filename (ctx->sub->filename, path, NULL);
   if (stat (fullname, &st) != 0 || !S_ISREG (st.st_mode) || st.st_nlink != 1)
-    g_file_monitor_source_handle_event (ctx->source, G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT, path,
+    xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_CHANGES_DONE_HINT, path,
                                         NULL, NULL, now);
   g_free (fullname);
 }
@@ -84,7 +84,7 @@ handle_created (void *udata, const char *path, ino_t inode)
  * @inode: inode number of the removed file.
  *
  * A callback function for the directory diff calculation routine,
- * produces G_FILE_MONITOR_EVENT_DELETED event for a deleted file.
+ * produces XFILE_MONITOR_EVENT_DELETED event for a deleted file.
  **/
 static void
 handle_deleted (void *udata, const char *path, ino_t inode)
@@ -100,7 +100,7 @@ handle_deleted (void *udata, const char *path, ino_t inode)
   if (!ctx->handle_deleted)
     return;
 
-  g_file_monitor_source_handle_event (ctx->source, G_FILE_MONITOR_EVENT_DELETED, path,
+  xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_DELETED, path,
                                       NULL, NULL, g_get_monotonic_time ());
 }
 
@@ -113,7 +113,7 @@ handle_deleted (void *udata, const char *path, ino_t inode)
  * @to_inode: inode number of the replaced file.
  *
  * A callback function for the directory diff calculation routine,
- * produces G_FILE_MONITOR_EVENT_RENAMED event on a move.
+ * produces XFILE_MONITOR_EVENT_RENAMED event on a move.
  **/
 static void
 handle_moved (void       *udata,
@@ -132,7 +132,7 @@ handle_moved (void       *udata,
   g_assert (ctx->sub != NULL);
   g_assert (ctx->source != NULL);
 
-  g_file_monitor_source_handle_event (ctx->source, G_FILE_MONITOR_EVENT_RENAMED,
+  xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_RENAMED,
                                       from_path, to_path, NULL, g_get_monotonic_time ());
 }
 
@@ -143,7 +143,7 @@ handle_moved (void       *udata,
  * @node: inode number of the overwritten file.
  *
  * A callback function for the directory diff calculation routine,
- * produces G_FILE_MONITOR_EVENT_DELETED/CREATED event pair when
+ * produces XFILE_MONITOR_EVENT_DELETED/CREATED event pair when
  * an overwrite occurs in the directory (see dep-list for details).
  **/
 static void
@@ -157,10 +157,10 @@ handle_overwritten (void *udata, const char *path, ino_t inode)
   g_assert (ctx->sub != NULL);
   g_assert (ctx->source != NULL);
 
-  g_file_monitor_source_handle_event (ctx->source, G_FILE_MONITOR_EVENT_DELETED,
+  xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_DELETED,
                                       path, NULL, NULL, g_get_monotonic_time ());
 
-  g_file_monitor_source_handle_event (ctx->source, G_FILE_MONITOR_EVENT_CREATED,
+  xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_CREATED,
                                       path, NULL, NULL, g_get_monotonic_time ());
 }
 

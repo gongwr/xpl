@@ -38,37 +38,37 @@
  * SECTION:gmount
  * @short_description: Mount management
  * @include: gio/gio.h
- * @see_also: GVolume, GUnixMountEntry, GUnixMountPoint
+ * @see_also: xvolume_t, GUnixMountEntry, GUnixMountPoint
  *
- * The #GMount interface represents user-visible mounts. Note, when
- * porting from GnomeVFS, #GMount is the moral equivalent of #GnomeVFSVolume.
+ * The #xmount_t interface represents user-visible mounts. Note, when
+ * porting from GnomeVFS, #xmount_t is the moral equivalent of #GnomeVFSVolume.
  *
- * #GMount is a "mounted" filesystem that you can access. Mounted is in
+ * #xmount_t is a "mounted" filesystem that you can access. Mounted is in
  * quotes because it's not the same as a unix mount, it might be a gvfs
  * mount, but you can still access the files on it if you use GIO. Might or
  * might not be related to a volume object.
  *
- * Unmounting a #GMount instance is an asynchronous operation. For
+ * Unmounting a #xmount_t instance is an asynchronous operation. For
  * more information about asynchronous operations, see #xasync_result_t
- * and #GTask. To unmount a #GMount instance, first call
- * g_mount_unmount_with_operation() with (at least) the #GMount instance and a
+ * and #xtask_t. To unmount a #xmount_t instance, first call
+ * g_mount_unmount_with_operation() with (at least) the #xmount_t instance and a
  * #xasync_ready_callback_t.  The callback will be fired when the
  * operation has resolved (either with success or failure), and a
  * #xasync_result_t structure will be passed to the callback.  That
- * callback should then call g_mount_unmount_with_operation_finish() with the #GMount
+ * callback should then call g_mount_unmount_with_operation_finish() with the #xmount_t
  * and the #xasync_result_t data to see if the operation was completed
  * successfully.  If an @error is present when g_mount_unmount_with_operation_finish()
  * is called, then it will be filled with any error information.
  **/
 
 typedef GMountIface GMountInterface;
-G_DEFINE_INTERFACE (GMount, g_mount, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (xmount, g_mount, XTYPE_OBJECT)
 
 static void
 g_mount_default_init (GMountInterface *iface)
 {
   /**
-   * GMount::changed:
+   * xmount_t::changed:
    * @mount: the object on which the signal is emitted
    *
    * Emitted when the mount has been changed.
@@ -82,10 +82,10 @@ g_mount_default_init (GMountInterface *iface)
                 XTYPE_NONE, 0);
 
   /**
-   * GMount::unmounted:
+   * xmount_t::unmounted:
    * @mount: the object on which the signal is emitted
    *
-   * This signal is emitted when the #GMount have been
+   * This signal is emitted when the #xmount_t have been
    * unmounted. If the recipient is holding references to the
    * object they should release them so the object can be
    * finalized.
@@ -98,10 +98,10 @@ g_mount_default_init (GMountInterface *iface)
                 NULL,
                 XTYPE_NONE, 0);
   /**
-   * GMount::pre-unmount:
+   * xmount_t::pre-unmount:
    * @mount: the object on which the signal is emitted
    *
-   * This signal may be emitted when the #GMount is about to be
+   * This signal may be emitted when the #xmount_t is about to be
    * unmounted.
    *
    * This signal depends on the backend and is only emitted if
@@ -120,16 +120,16 @@ g_mount_default_init (GMountInterface *iface)
 
 /**
  * g_mount_get_root:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  *
  * Gets the root directory on @mount.
  *
  * Returns: (transfer full): a #xfile_t.
  *      The returned object should be unreffed with
- *      g_object_unref() when no longer needed.
+ *      xobject_unref() when no longer needed.
  **/
 xfile_t *
-g_mount_get_root (GMount *mount)
+g_mount_get_root (xmount_t *mount)
 {
   GMountIface *iface;
 
@@ -142,7 +142,7 @@ g_mount_get_root (GMount *mount)
 
 /**
  * g_mount_get_default_location:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  *
  * Gets the default location of @mount. The default location of the given
  * @mount is a path that reflects the main entry point for the user (e.g.
@@ -150,10 +150,10 @@ g_mount_get_root (GMount *mount)
  *
  * Returns: (transfer full): a #xfile_t.
  *      The returned object should be unreffed with
- *      g_object_unref() when no longer needed.
+ *      xobject_unref() when no longer needed.
  **/
 xfile_t *
-g_mount_get_default_location (GMount *mount)
+g_mount_get_default_location (xmount_t *mount)
 {
   GMountIface *iface;
   xfile_t       *file;
@@ -173,7 +173,7 @@ g_mount_get_default_location (GMount *mount)
 
 /**
  * g_mount_get_name:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  *
  * Gets the name of @mount.
  *
@@ -182,7 +182,7 @@ g_mount_get_default_location (GMount *mount)
  *     when no longer needed.
  **/
 char *
-g_mount_get_name (GMount *mount)
+g_mount_get_name (xmount_t *mount)
 {
   GMountIface *iface;
 
@@ -195,16 +195,16 @@ g_mount_get_name (GMount *mount)
 
 /**
  * g_mount_get_icon:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  *
  * Gets the icon for @mount.
  *
  * Returns: (transfer full): a #xicon_t.
  *      The returned object should be unreffed with
- *      g_object_unref() when no longer needed.
+ *      xobject_unref() when no longer needed.
  **/
 xicon_t *
-g_mount_get_icon (GMount *mount)
+g_mount_get_icon (xmount_t *mount)
 {
   GMountIface *iface;
 
@@ -218,18 +218,18 @@ g_mount_get_icon (GMount *mount)
 
 /**
  * g_mount_get_symbolic_icon:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  *
  * Gets the symbolic icon for @mount.
  *
  * Returns: (transfer full): a #xicon_t.
  *      The returned object should be unreffed with
- *      g_object_unref() when no longer needed.
+ *      xobject_unref() when no longer needed.
  *
  * Since: 2.34
  **/
 xicon_t *
-g_mount_get_symbolic_icon (GMount *mount)
+g_mount_get_symbolic_icon (xmount_t *mount)
 {
   GMountIface *iface;
   xicon_t *ret;
@@ -248,7 +248,7 @@ g_mount_get_symbolic_icon (GMount *mount)
 
 /**
  * g_mount_get_uuid:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  *
  * Gets the UUID for the @mount. The reference is typically based on
  * the file system UUID for the mount in question and should be
@@ -261,7 +261,7 @@ g_mount_get_symbolic_icon (GMount *mount)
  *     when no longer needed.
  **/
 char *
-g_mount_get_uuid (GMount *mount)
+g_mount_get_uuid (xmount_t *mount)
 {
   GMountIface *iface;
 
@@ -274,17 +274,17 @@ g_mount_get_uuid (GMount *mount)
 
 /**
  * g_mount_get_volume:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  *
  * Gets the volume for the @mount.
  *
- * Returns: (transfer full) (nullable): a #GVolume or %NULL if @mount is not
+ * Returns: (transfer full) (nullable): a #xvolume_t or %NULL if @mount is not
  *      associated with a volume.
  *      The returned object should be unreffed with
- *      g_object_unref() when no longer needed.
+ *      xobject_unref() when no longer needed.
  **/
-GVolume *
-g_mount_get_volume (GMount *mount)
+xvolume_t *
+g_mount_get_volume (xmount_t *mount)
 {
   GMountIface *iface;
 
@@ -297,20 +297,20 @@ g_mount_get_volume (GMount *mount)
 
 /**
  * g_mount_get_drive:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  *
  * Gets the drive for the @mount.
  *
- * This is a convenience method for getting the #GVolume and then
+ * This is a convenience method for getting the #xvolume_t and then
  * using that object to get the #xdrive_t.
  *
  * Returns: (transfer full) (nullable): a #xdrive_t or %NULL if @mount is not
  *      associated with a volume or a drive.
  *      The returned object should be unreffed with
- *      g_object_unref() when no longer needed.
+ *      xobject_unref() when no longer needed.
  **/
 xdrive_t *
-g_mount_get_drive (GMount *mount)
+g_mount_get_drive (xmount_t *mount)
 {
   GMountIface *iface;
 
@@ -323,14 +323,14 @@ g_mount_get_drive (GMount *mount)
 
 /**
  * g_mount_can_unmount:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  *
  * Checks if @mount can be unmounted.
  *
  * Returns: %TRUE if the @mount can be unmounted.
  **/
 xboolean_t
-g_mount_can_unmount (GMount *mount)
+g_mount_can_unmount (xmount_t *mount)
 {
   GMountIface *iface;
 
@@ -343,14 +343,14 @@ g_mount_can_unmount (GMount *mount)
 
 /**
  * g_mount_can_eject:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  *
  * Checks if @mount can be ejected.
  *
  * Returns: %TRUE if the @mount can be ejected.
  **/
 xboolean_t
-g_mount_can_eject (GMount *mount)
+g_mount_can_eject (xmount_t *mount)
 {
   GMountIface *iface;
 
@@ -363,7 +363,7 @@ g_mount_can_eject (GMount *mount)
 
 /**
  * g_mount_unmount:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  * @flags: flags affecting the operation
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @callback: (nullable): a #xasync_ready_callback_t, or %NULL.
@@ -376,7 +376,7 @@ g_mount_can_eject (GMount *mount)
  * Deprecated: 2.22: Use g_mount_unmount_with_operation() instead.
  **/
 void
-g_mount_unmount (GMount              *mount,
+g_mount_unmount (xmount_t              *mount,
                  xmount_unmount_flags_t   flags,
                  xcancellable_t        *cancellable,
                  xasync_ready_callback_t  callback,
@@ -390,7 +390,7 @@ g_mount_unmount (GMount              *mount,
 
   if (iface->unmount == NULL)
     {
-      g_task_report_new_error (mount, callback, user_data,
+      xtask_report_new_error (mount, callback, user_data,
                                g_mount_unmount_with_operation,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                /* Translators: This is an error
@@ -405,7 +405,7 @@ g_mount_unmount (GMount              *mount,
 
 /**
  * g_mount_unmount_finish:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  *     ignore.
@@ -418,7 +418,7 @@ g_mount_unmount (GMount              *mount,
  * Deprecated: 2.22: Use g_mount_unmount_with_operation_finish() instead.
  **/
 xboolean_t
-g_mount_unmount_finish (GMount        *mount,
+g_mount_unmount_finish (xmount_t        *mount,
                         xasync_result_t  *result,
                         xerror_t       **error)
 {
@@ -427,10 +427,10 @@ g_mount_unmount_finish (GMount        *mount,
   g_return_val_if_fail (X_IS_MOUNT (mount), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_mount_unmount_with_operation))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, g_mount_unmount_with_operation))
+    return xtask_propagate_boolean (XTASK (result), error);
 
   iface = G_MOUNT_GET_IFACE (mount);
   return (* iface->unmount_finish) (mount, result, error);
@@ -439,7 +439,7 @@ g_mount_unmount_finish (GMount        *mount,
 
 /**
  * g_mount_eject:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  * @flags: flags affecting the unmount if required for eject
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @callback: (nullable): a #xasync_ready_callback_t, or %NULL.
@@ -452,7 +452,7 @@ g_mount_unmount_finish (GMount        *mount,
  * Deprecated: 2.22: Use g_mount_eject_with_operation() instead.
  **/
 void
-g_mount_eject (GMount              *mount,
+g_mount_eject (xmount_t              *mount,
                xmount_unmount_flags_t   flags,
                xcancellable_t        *cancellable,
                xasync_ready_callback_t  callback,
@@ -466,7 +466,7 @@ g_mount_eject (GMount              *mount,
 
   if (iface->eject == NULL)
     {
-      g_task_report_new_error (mount, callback, user_data,
+      xtask_report_new_error (mount, callback, user_data,
                                g_mount_eject_with_operation,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                /* Translators: This is an error
@@ -481,7 +481,7 @@ g_mount_eject (GMount              *mount,
 
 /**
  * g_mount_eject_finish:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  *     ignore.
@@ -494,7 +494,7 @@ g_mount_eject (GMount              *mount,
  * Deprecated: 2.22: Use g_mount_eject_with_operation_finish() instead.
  **/
 xboolean_t
-g_mount_eject_finish (GMount        *mount,
+g_mount_eject_finish (xmount_t        *mount,
                       xasync_result_t  *result,
                       xerror_t       **error)
 {
@@ -503,10 +503,10 @@ g_mount_eject_finish (GMount        *mount,
   g_return_val_if_fail (X_IS_MOUNT (mount), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_mount_eject_with_operation))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, g_mount_eject_with_operation))
+    return xtask_propagate_boolean (XTASK (result), error);
 
   iface = G_MOUNT_GET_IFACE (mount);
   return (* iface->eject_finish) (mount, result, error);
@@ -514,7 +514,7 @@ g_mount_eject_finish (GMount        *mount,
 
 /**
  * g_mount_unmount_with_operation:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  * @flags: flags affecting the operation
  * @mount_operation: (nullable): a #xmount_operation_t or %NULL to avoid
  *     user interaction.
@@ -529,7 +529,7 @@ g_mount_eject_finish (GMount        *mount,
  * Since: 2.22
  **/
 void
-g_mount_unmount_with_operation (GMount              *mount,
+g_mount_unmount_with_operation (xmount_t              *mount,
                                 xmount_unmount_flags_t   flags,
                                 xmount_operation_t     *mount_operation,
                                 xcancellable_t        *cancellable,
@@ -544,7 +544,7 @@ g_mount_unmount_with_operation (GMount              *mount,
 
   if (iface->unmount == NULL && iface->unmount_with_operation == NULL)
     {
-      g_task_report_new_error (mount, callback, user_data,
+      xtask_report_new_error (mount, callback, user_data,
                                g_mount_unmount_with_operation,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                /* Translators: This is an error
@@ -562,7 +562,7 @@ g_mount_unmount_with_operation (GMount              *mount,
 
 /**
  * g_mount_unmount_with_operation_finish:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  *     ignore.
@@ -575,7 +575,7 @@ g_mount_unmount_with_operation (GMount              *mount,
  * Since: 2.22
  **/
 xboolean_t
-g_mount_unmount_with_operation_finish (GMount        *mount,
+g_mount_unmount_with_operation_finish (xmount_t        *mount,
                                        xasync_result_t  *result,
                                        xerror_t       **error)
 {
@@ -584,10 +584,10 @@ g_mount_unmount_with_operation_finish (GMount        *mount,
   g_return_val_if_fail (X_IS_MOUNT (mount), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_mount_unmount_with_operation))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, g_mount_unmount_with_operation))
+    return xtask_propagate_boolean (XTASK (result), error);
 
   iface = G_MOUNT_GET_IFACE (mount);
   if (iface->unmount_with_operation_finish != NULL)
@@ -599,7 +599,7 @@ g_mount_unmount_with_operation_finish (GMount        *mount,
 
 /**
  * g_mount_eject_with_operation:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  * @flags: flags affecting the unmount if required for eject
  * @mount_operation: (nullable): a #xmount_operation_t or %NULL to avoid
  *     user interaction.
@@ -614,7 +614,7 @@ g_mount_unmount_with_operation_finish (GMount        *mount,
  * Since: 2.22
  **/
 void
-g_mount_eject_with_operation (GMount              *mount,
+g_mount_eject_with_operation (xmount_t              *mount,
                               xmount_unmount_flags_t   flags,
                               xmount_operation_t     *mount_operation,
                               xcancellable_t        *cancellable,
@@ -629,7 +629,7 @@ g_mount_eject_with_operation (GMount              *mount,
 
   if (iface->eject == NULL && iface->eject_with_operation == NULL)
     {
-      g_task_report_new_error (mount, callback, user_data,
+      xtask_report_new_error (mount, callback, user_data,
                                g_mount_eject_with_operation,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                /* Translators: This is an error
@@ -647,7 +647,7 @@ g_mount_eject_with_operation (GMount              *mount,
 
 /**
  * g_mount_eject_with_operation_finish:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  *     ignore.
@@ -660,7 +660,7 @@ g_mount_eject_with_operation (GMount              *mount,
  * Since: 2.22
  **/
 xboolean_t
-g_mount_eject_with_operation_finish (GMount        *mount,
+g_mount_eject_with_operation_finish (xmount_t        *mount,
                                      xasync_result_t  *result,
                                      xerror_t       **error)
 {
@@ -669,10 +669,10 @@ g_mount_eject_with_operation_finish (GMount        *mount,
   g_return_val_if_fail (X_IS_MOUNT (mount), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_mount_eject_with_operation))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, g_mount_eject_with_operation))
+    return xtask_propagate_boolean (XTASK (result), error);
 
   iface = G_MOUNT_GET_IFACE (mount);
   if (iface->eject_with_operation_finish != NULL)
@@ -683,7 +683,7 @@ g_mount_eject_with_operation_finish (GMount        *mount,
 
 /**
  * g_mount_remount:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  * @flags: flags affecting the operation
  * @mount_operation: (nullable): a #xmount_operation_t or %NULL to avoid
  *     user interaction.
@@ -702,7 +702,7 @@ g_mount_eject_with_operation_finish (GMount        *mount,
  * unmounted.
  **/
 void
-g_mount_remount (GMount              *mount,
+g_mount_remount (xmount_t              *mount,
                  GMountMountFlags     flags,
                  xmount_operation_t     *mount_operation,
                  xcancellable_t        *cancellable,
@@ -717,7 +717,7 @@ g_mount_remount (GMount              *mount,
 
   if (iface->remount == NULL)
     {
-      g_task_report_new_error (mount, callback, user_data,
+      xtask_report_new_error (mount, callback, user_data,
                                g_mount_remount,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                /* Translators: This is an error
@@ -732,7 +732,7 @@ g_mount_remount (GMount              *mount,
 
 /**
  * g_mount_remount_finish:
- * @mount: a #GMount.
+ * @mount: a #xmount_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  *     ignore.
@@ -743,7 +743,7 @@ g_mount_remount (GMount              *mount,
  * Returns: %TRUE if the mount was successfully remounted. %FALSE otherwise.
  **/
 xboolean_t
-g_mount_remount_finish (GMount        *mount,
+g_mount_remount_finish (xmount_t        *mount,
                         xasync_result_t  *result,
                         xerror_t       **error)
 {
@@ -752,10 +752,10 @@ g_mount_remount_finish (GMount        *mount,
   g_return_val_if_fail (X_IS_MOUNT (mount), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_mount_remount))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, g_mount_remount))
+    return xtask_propagate_boolean (XTASK (result), error);
 
   iface = G_MOUNT_GET_IFACE (mount);
   return (* iface->remount_finish) (mount, result, error);
@@ -763,7 +763,7 @@ g_mount_remount_finish (GMount        *mount,
 
 /**
  * g_mount_guess_content_type:
- * @mount: a #GMount
+ * @mount: a #xmount_t
  * @force_rescan: Whether to force a rescan of the content.
  *     Otherwise a cached result will be used if available
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore
@@ -785,7 +785,7 @@ g_mount_remount_finish (GMount        *mount,
  * Since: 2.18
  */
 void
-g_mount_guess_content_type (GMount              *mount,
+g_mount_guess_content_type (xmount_t              *mount,
                             xboolean_t             force_rescan,
                             xcancellable_t        *cancellable,
                             xasync_ready_callback_t  callback,
@@ -799,7 +799,7 @@ g_mount_guess_content_type (GMount              *mount,
 
   if (iface->guess_content_type == NULL)
     {
-      g_task_report_new_error (mount, callback, user_data,
+      xtask_report_new_error (mount, callback, user_data,
                                g_mount_guess_content_type,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                /* Translators: This is an error
@@ -814,7 +814,7 @@ g_mount_guess_content_type (GMount              *mount,
 
 /**
  * g_mount_guess_content_type_finish:
- * @mount: a #GMount
+ * @mount: a #xmount_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  *     ignore
@@ -826,12 +826,12 @@ g_mount_guess_content_type (GMount              *mount,
  * guessing.
  *
  * Returns: (transfer full) (element-type utf8): a %NULL-terminated array of content types or %NULL on error.
- *     Caller should free this array with g_strfreev() when done with it.
+ *     Caller should free this array with xstrfreev() when done with it.
  *
  * Since: 2.18
  **/
 xchar_t **
-g_mount_guess_content_type_finish (GMount        *mount,
+g_mount_guess_content_type_finish (xmount_t        *mount,
                                    xasync_result_t  *result,
                                    xerror_t       **error)
 {
@@ -840,10 +840,10 @@ g_mount_guess_content_type_finish (GMount        *mount,
   g_return_val_if_fail (X_IS_MOUNT (mount), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return NULL;
-  else if (g_async_result_is_tagged (result, g_mount_guess_content_type))
-    return g_task_propagate_pointer (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, g_mount_guess_content_type))
+    return xtask_propagate_pointer (XTASK (result), error);
 
   iface = G_MOUNT_GET_IFACE (mount);
   return (* iface->guess_content_type_finish) (mount, result, error);
@@ -851,7 +851,7 @@ g_mount_guess_content_type_finish (GMount        *mount,
 
 /**
  * g_mount_guess_content_type_sync:
- * @mount: a #GMount
+ * @mount: a #xmount_t
  * @force_rescan: Whether to force a rescan of the content.
  *     Otherwise a cached result will be used if available
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore
@@ -869,12 +869,12 @@ g_mount_guess_content_type_finish (GMount        *mount,
  * see g_mount_guess_content_type() for the asynchronous version.
  *
  * Returns: (transfer full) (element-type utf8): a %NULL-terminated array of content types or %NULL on error.
- *     Caller should free this array with g_strfreev() when done with it.
+ *     Caller should free this array with xstrfreev() when done with it.
  *
  * Since: 2.18
  */
 char **
-g_mount_guess_content_type_sync (GMount              *mount,
+g_mount_guess_content_type_sync (xmount_t              *mount,
                                  xboolean_t             force_rescan,
                                  xcancellable_t        *cancellable,
                                  xerror_t             **error)
@@ -918,19 +918,19 @@ free_private (GMountPrivate *private)
 
 /* may only be called when holding priv_lock */
 static GMountPrivate *
-get_private (GMount *mount)
+get_private (xmount_t *mount)
 {
   GMountPrivate *private;
 
-  private = g_object_get_data (G_OBJECT (mount), "g-mount-private");
+  private = xobject_get_data (G_OBJECT (mount), "g-mount-private");
   if (G_LIKELY (private != NULL))
     goto out;
 
   private = g_new0 (GMountPrivate, 1);
-  g_object_set_data_full (G_OBJECT (mount),
+  xobject_set_data_full (G_OBJECT (mount),
                           "g-mount-private",
                           private,
-                          (GDestroyNotify) free_private);
+                          (xdestroy_notify_t) free_private);
 
  out:
   return private;
@@ -938,38 +938,38 @@ get_private (GMount *mount)
 
 /**
  * g_mount_is_shadowed:
- * @mount: A #GMount.
+ * @mount: A #xmount_t.
  *
  * Determines if @mount is shadowed. Applications or libraries should
  * avoid displaying @mount in the user interface if it is shadowed.
  *
  * A mount is said to be shadowed if there exists one or more user
- * visible objects (currently #GMount objects) with a root that is
+ * visible objects (currently #xmount_t objects) with a root that is
  * inside the root of @mount.
  *
  * One application of shadow mounts is when exposing a single file
  * system that is used to address several logical volumes. In this
- * situation, a #GVolumeMonitor implementation would create two
- * #GVolume objects (for example, one for the camera functionality of
+ * situation, a #xvolume_monitor_t implementation would create two
+ * #xvolume_t objects (for example, one for the camera functionality of
  * the device and one for a SD card reader on the device) with
  * activation URIs `gphoto2://[usb:001,002]/store1/`
  * and `gphoto2://[usb:001,002]/store2/`. When the
  * underlying mount (with root
  * `gphoto2://[usb:001,002]/`) is mounted, said
- * #GVolumeMonitor implementation would create two #GMount objects
+ * #xvolume_monitor_t implementation would create two #xmount_t objects
  * (each with their root matching the corresponding volume activation
  * root) that would shadow the original mount.
  *
- * The proxy monitor in GVfs 2.26 and later, automatically creates and
+ * The proxy monitor in xvfs_t 2.26 and later, automatically creates and
  * manage shadow mounts (and shadows the underlying mount) if the
- * activation root on a #GVolume is set.
+ * activation root on a #xvolume_t is set.
  *
  * Returns: %TRUE if @mount is shadowed.
  *
  * Since: 2.20
  **/
 xboolean_t
-g_mount_is_shadowed (GMount *mount)
+g_mount_is_shadowed (xmount_t *mount)
 {
   GMountPrivate *priv;
   xboolean_t ret;
@@ -986,17 +986,17 @@ g_mount_is_shadowed (GMount *mount)
 
 /**
  * g_mount_shadow:
- * @mount: A #GMount.
+ * @mount: A #xmount_t.
  *
  * Increments the shadow count on @mount. Usually used by
- * #GVolumeMonitor implementations when creating a shadow mount for
+ * #xvolume_monitor_t implementations when creating a shadow mount for
  * @mount, see g_mount_is_shadowed() for more information. The caller
- * will need to emit the #GMount::changed signal on @mount manually.
+ * will need to emit the #xmount_t::changed signal on @mount manually.
  *
  * Since: 2.20
  **/
 void
-g_mount_shadow (GMount *mount)
+g_mount_shadow (xmount_t *mount)
 {
   GMountPrivate *priv;
 
@@ -1010,17 +1010,17 @@ g_mount_shadow (GMount *mount)
 
 /**
  * g_mount_unshadow:
- * @mount: A #GMount.
+ * @mount: A #xmount_t.
  *
  * Decrements the shadow count on @mount. Usually used by
- * #GVolumeMonitor implementations when destroying a shadow mount for
+ * #xvolume_monitor_t implementations when destroying a shadow mount for
  * @mount, see g_mount_is_shadowed() for more information. The caller
- * will need to emit the #GMount::changed signal on @mount manually.
+ * will need to emit the #xmount_t::changed signal on @mount manually.
  *
  * Since: 2.20
  **/
 void
-g_mount_unshadow (GMount *mount)
+g_mount_unshadow (xmount_t *mount)
 {
   GMountPrivate *priv;
 
@@ -1030,13 +1030,13 @@ g_mount_unshadow (GMount *mount)
   priv = get_private (mount);
   priv->shadow_ref_count -= 1;
   if (priv->shadow_ref_count < 0)
-    g_warning ("Shadow ref count on GMount is negative");
+    g_warning ("Shadow ref count on xmount_t is negative");
   G_UNLOCK (priv_lock);
 }
 
 /**
  * g_mount_get_sort_key:
- * @mount: A #GMount.
+ * @mount: A #xmount_t.
  *
  * Gets the sort key for @mount, if any.
  *
@@ -1045,7 +1045,7 @@ g_mount_unshadow (GMount *mount)
  * Since: 2.32
  */
 const xchar_t *
-g_mount_get_sort_key (GMount  *mount)
+g_mount_get_sort_key (xmount_t  *mount)
 {
   const xchar_t *ret = NULL;
   GMountIface *iface;

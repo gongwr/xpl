@@ -38,17 +38,17 @@
  * @short_description: Interaction with the user during TLS operations.
  * @include: gio/gio.h
  *
- * #GTlsInteraction provides a mechanism for the TLS connection and database
+ * #xtls_interaction_t provides a mechanism for the TLS connection and database
  * code to interact with the user. It can be used to ask the user for passwords.
  *
- * To use a #GTlsInteraction with a TLS connection use
- * g_tls_connection_set_interaction().
+ * To use a #xtls_interaction_t with a TLS connection use
+ * xtls_connection_set_interaction().
  *
  * Callers should instantiate a derived class that implements the various
  * interaction methods to show the required dialogs.
  *
  * Callers should use the 'invoke' functions like
- * g_tls_interaction_invoke_ask_password() to run interaction methods. These
+ * xtls_interaction_invoke_ask_password() to run interaction methods. These
  * functions make sure that the interaction is invoked in the main loop
  * and not in the current thread, if the current thread is not running the
  * main loop.
@@ -61,7 +61,7 @@
  */
 
 /**
- * GTlsInteraction:
+ * xtls_interaction_t:
  *
  * An object representing interaction that the TLS connection and database
  * might have with the user.
@@ -73,24 +73,24 @@
  * GTlsInteractionClass:
  * @ask_password: ask for a password synchronously. If the implementation
  *     returns %G_TLS_INTERACTION_HANDLED, then the password argument should
- *     have been filled in by using g_tls_password_set_value() or a similar
+ *     have been filled in by using xtls_password_set_value() or a similar
  *     function.
  * @ask_password_async: ask for a password asynchronously.
  * @ask_password_finish: complete operation to ask for a password asynchronously.
  *     If the implementation returns %G_TLS_INTERACTION_HANDLED, then the
  *     password argument of the async method should have been filled in by using
- *     g_tls_password_set_value() or a similar function.
+ *     xtls_password_set_value() or a similar function.
  * @request_certificate: ask for a certificate synchronously. If the
  *     implementation returns %G_TLS_INTERACTION_HANDLED, then the connection
  *     argument should have been filled in by using
- *     g_tls_connection_set_certificate().
+ *     xtls_connection_set_certificate().
  * @request_certificate_async: ask for a certificate asynchronously.
  * @request_certificate_finish: complete operation to ask for a certificate
  *     asynchronously. If the implementation returns %G_TLS_INTERACTION_HANDLED,
  *     then the connection argument of the async method should have been
- *     filled in by using g_tls_connection_set_certificate().
+ *     filled in by using xtls_connection_set_certificate().
  *
- * The class for #GTlsInteraction. Derived classes implement the various
+ * The class for #xtls_interaction_t. Derived classes implement the various
  * virtual interaction methods to handle TLS interactions.
  *
  * Derived classes can choose to implement whichever interactions methods they'd
@@ -109,16 +109,16 @@
  */
 
 struct _GTlsInteractionPrivate {
-  GMainContext *context;
+  xmain_context_t *context;
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (GTlsInteraction, g_tls_interaction, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (xtls_interaction_t, xtls_interaction, XTYPE_OBJECT)
 
 typedef struct {
-  GMutex mutex;
+  xmutex_t mutex;
 
   /* Input arguments */
-  GTlsInteraction *interaction;
+  xtls_interaction_t *interaction;
   xobject_t *argument;
   xcancellable_t *cancellable;
 
@@ -130,7 +130,7 @@ typedef struct {
   GTlsInteractionResult result;
   xerror_t *error;
   xboolean_t complete;
-  GCond cond;
+  xcond_t cond;
 } InvokeClosure;
 
 static void
@@ -138,7 +138,7 @@ invoke_closure_free (xpointer_t data)
 {
   InvokeClosure *closure = data;
   g_assert (closure);
-  g_object_unref (closure->interaction);
+  xobject_unref (closure->interaction);
   g_clear_object (&closure->argument);
   g_clear_object (&closure->cancellable);
   g_cond_clear (&closure->cond);
@@ -153,14 +153,14 @@ invoke_closure_free (xpointer_t data)
 }
 
 static InvokeClosure *
-invoke_closure_new (GTlsInteraction *interaction,
+invoke_closure_new (xtls_interaction_t *interaction,
                     xobject_t         *argument,
                     xcancellable_t    *cancellable)
 {
   InvokeClosure *closure = g_new0 (InvokeClosure, 1);
-  closure->interaction = g_object_ref (interaction);
-  closure->argument = argument ? g_object_ref (argument) : NULL;
-  closure->cancellable = cancellable ? g_object_ref (cancellable) : NULL;
+  closure->interaction = xobject_ref (interaction);
+  closure->argument = argument ? xobject_ref (argument) : NULL;
+  closure->cancellable = cancellable ? xobject_ref (cancellable) : NULL;
   g_mutex_init (&closure->mutex);
   g_cond_init (&closure->cond);
   closure->result = G_TLS_INTERACTION_UNHANDLED;
@@ -192,7 +192,7 @@ invoke_closure_wait_and_free (InvokeClosure *closure,
 }
 
 static GTlsInteractionResult
-invoke_closure_complete_and_free (GTlsInteraction *interaction,
+invoke_closure_complete_and_free (xtls_interaction_t *interaction,
                                   InvokeClosure *closure,
                                   xerror_t **error)
 {
@@ -204,7 +204,7 @@ invoke_closure_complete_and_free (GTlsInteraction *interaction,
    * or in the case where the main context is not running. This approximates
    * the behavior of a modal dialog.
    */
-  if (g_main_context_acquire (interaction->priv->context))
+  if (xmain_context_acquire (interaction->priv->context))
     {
       for (;;)
         {
@@ -213,10 +213,10 @@ invoke_closure_complete_and_free (GTlsInteraction *interaction,
           g_mutex_unlock (&closure->mutex);
           if (complete)
             break;
-          g_main_context_iteration (interaction->priv->context, TRUE);
+          xmain_context_iteration (interaction->priv->context, TRUE);
         }
 
-      g_main_context_release (interaction->priv->context);
+      xmain_context_release (interaction->priv->context);
 
       if (closure->error)
         {
@@ -241,28 +241,28 @@ invoke_closure_complete_and_free (GTlsInteraction *interaction,
 }
 
 static void
-g_tls_interaction_init (GTlsInteraction *interaction)
+xtls_interaction_init (xtls_interaction_t *interaction)
 {
-  interaction->priv = g_tls_interaction_get_instance_private (interaction);
-  interaction->priv->context = g_main_context_ref_thread_default ();
+  interaction->priv = xtls_interaction_get_instance_private (interaction);
+  interaction->priv->context = xmain_context_ref_thread_default ();
 }
 
 static void
-g_tls_interaction_finalize (xobject_t *object)
+xtls_interaction_finalize (xobject_t *object)
 {
-  GTlsInteraction *interaction = G_TLS_INTERACTION (object);
+  xtls_interaction_t *interaction = G_TLS_INTERACTION (object);
 
-  g_main_context_unref (interaction->priv->context);
+  xmain_context_unref (interaction->priv->context);
 
-  G_OBJECT_CLASS (g_tls_interaction_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xtls_interaction_parent_class)->finalize (object);
 }
 
 static void
-g_tls_interaction_class_init (GTlsInteractionClass *klass)
+xtls_interaction_class_init (GTlsInteractionClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_tls_interaction_finalize;
+  gobject_class->finalize = xtls_interaction_finalize;
 }
 
 static xboolean_t
@@ -337,16 +337,16 @@ on_invoke_ask_password_async_as_sync (xpointer_t user_data)
 }
 
 /**
- * g_tls_interaction_invoke_ask_password:
- * @interaction: a #GTlsInteraction object
- * @password: a #GTlsPassword object
+ * xtls_interaction_invoke_ask_password:
+ * @interaction: a #xtls_interaction_t object
+ * @password: a #xtls_password_t object
  * @cancellable: an optional #xcancellable_t cancellation object
  * @error: an optional location to place an error on failure
  *
  * Invoke the interaction to ask the user for a password. It invokes this
- * interaction in the main loop, specifically the #GMainContext returned by
- * g_main_context_get_thread_default() when the interaction is created. This
- * is called by called by #GTlsConnection or #GTlsDatabase to ask the user
+ * interaction in the main loop, specifically the #xmain_context_t returned by
+ * xmain_context_get_thread_default() when the interaction is created. This
+ * is called by called by #xtls_connection_t or #xtls_database_t to ask the user
  * for a password.
  *
  * Derived subclasses usually implement a password prompt, although they may
@@ -368,8 +368,8 @@ on_invoke_ask_password_async_as_sync (xpointer_t user_data)
  * Since: 2.30
  */
 GTlsInteractionResult
-g_tls_interaction_invoke_ask_password (GTlsInteraction    *interaction,
-                                       GTlsPassword       *password,
+xtls_interaction_invoke_ask_password (xtls_interaction_t    *interaction,
+                                       xtls_password_t       *password,
                                        xcancellable_t       *cancellable,
                                        xerror_t            **error)
 {
@@ -386,7 +386,7 @@ g_tls_interaction_invoke_ask_password (GTlsInteraction    *interaction,
   if (klass->ask_password)
     {
       closure = invoke_closure_new (interaction, G_OBJECT (password), cancellable);
-      g_main_context_invoke (interaction->priv->context,
+      xmain_context_invoke (interaction->priv->context,
                              on_invoke_ask_password_sync, closure);
       result = invoke_closure_wait_and_free (closure, error);
     }
@@ -395,7 +395,7 @@ g_tls_interaction_invoke_ask_password (GTlsInteraction    *interaction,
       g_return_val_if_fail (klass->ask_password_finish, G_TLS_INTERACTION_UNHANDLED);
 
       closure = invoke_closure_new (interaction, G_OBJECT (password), cancellable);
-      g_main_context_invoke (interaction->priv->context,
+      xmain_context_invoke (interaction->priv->context,
                              on_invoke_ask_password_async_as_sync, closure);
 
       result = invoke_closure_complete_and_free (interaction, closure, error);
@@ -409,14 +409,14 @@ g_tls_interaction_invoke_ask_password (GTlsInteraction    *interaction,
 }
 
 /**
- * g_tls_interaction_ask_password:
- * @interaction: a #GTlsInteraction object
- * @password: a #GTlsPassword object
+ * xtls_interaction_ask_password:
+ * @interaction: a #xtls_interaction_t object
+ * @password: a #xtls_password_t object
  * @cancellable: an optional #xcancellable_t cancellation object
  * @error: an optional location to place an error on failure
  *
  * Run synchronous interaction to ask the user for a password. In general,
- * g_tls_interaction_invoke_ask_password() should be used instead of this
+ * xtls_interaction_invoke_ask_password() should be used instead of this
  * function.
  *
  * Derived subclasses usually implement a password prompt, although they may
@@ -434,8 +434,8 @@ g_tls_interaction_invoke_ask_password (GTlsInteraction    *interaction,
  * Since: 2.30
  */
 GTlsInteractionResult
-g_tls_interaction_ask_password (GTlsInteraction    *interaction,
-                                GTlsPassword       *password,
+xtls_interaction_ask_password (xtls_interaction_t    *interaction,
+                                xtls_password_t       *password,
                                 xcancellable_t       *cancellable,
                                 xerror_t            **error)
 {
@@ -453,15 +453,15 @@ g_tls_interaction_ask_password (GTlsInteraction    *interaction,
 }
 
 /**
- * g_tls_interaction_ask_password_async:
- * @interaction: a #GTlsInteraction object
- * @password: a #GTlsPassword object
+ * xtls_interaction_ask_password_async:
+ * @interaction: a #xtls_interaction_t object
+ * @password: a #xtls_password_t object
  * @cancellable: an optional #xcancellable_t cancellation object
  * @callback: (nullable): will be called when the interaction completes
  * @user_data: (nullable): data to pass to the @callback
  *
  * Run asynchronous interaction to ask the user for a password. In general,
- * g_tls_interaction_invoke_ask_password() should be used instead of this
+ * xtls_interaction_invoke_ask_password() should be used instead of this
  * function.
  *
  * Derived subclasses usually implement a password prompt, although they may
@@ -479,14 +479,14 @@ g_tls_interaction_ask_password (GTlsInteraction    *interaction,
  * Since: 2.30
  */
 void
-g_tls_interaction_ask_password_async (GTlsInteraction    *interaction,
-                                      GTlsPassword       *password,
+xtls_interaction_ask_password_async (xtls_interaction_t    *interaction,
+                                      xtls_password_t       *password,
                                       xcancellable_t       *cancellable,
                                       xasync_ready_callback_t callback,
                                       xpointer_t            user_data)
 {
   GTlsInteractionClass *klass;
-  GTask *task;
+  xtask_t *task;
 
   g_return_if_fail (X_IS_TLS_INTERACTION (interaction));
   g_return_if_fail (X_IS_TLS_PASSWORD (password));
@@ -501,24 +501,24 @@ g_tls_interaction_ask_password_async (GTlsInteraction    *interaction,
     }
   else
     {
-      task = g_task_new (interaction, cancellable, callback, user_data);
-      g_task_set_source_tag (task, g_tls_interaction_ask_password_async);
-      g_task_return_int (task, G_TLS_INTERACTION_UNHANDLED);
-      g_object_unref (task);
+      task = xtask_new (interaction, cancellable, callback, user_data);
+      xtask_set_source_tag (task, xtls_interaction_ask_password_async);
+      xtask_return_int (task, G_TLS_INTERACTION_UNHANDLED);
+      xobject_unref (task);
     }
 }
 
 /**
- * g_tls_interaction_ask_password_finish:
- * @interaction: a #GTlsInteraction object
+ * xtls_interaction_ask_password_finish:
+ * @interaction: a #xtls_interaction_t object
  * @result: the result passed to the callback
  * @error: an optional location to place an error on failure
  *
  * Complete an ask password user interaction request. This should be once
- * the g_tls_interaction_ask_password_async() completion callback is called.
+ * the xtls_interaction_ask_password_async() completion callback is called.
  *
- * If %G_TLS_INTERACTION_HANDLED is returned, then the #GTlsPassword passed
- * to g_tls_interaction_ask_password() will have its password filled in.
+ * If %G_TLS_INTERACTION_HANDLED is returned, then the #xtls_password_t passed
+ * to xtls_interaction_ask_password() will have its password filled in.
  *
  * If the interaction is cancelled by the cancellation object, or by the
  * user then %G_TLS_INTERACTION_FAILED will be returned with an error that
@@ -529,7 +529,7 @@ g_tls_interaction_ask_password_async (GTlsInteraction    *interaction,
  * Since: 2.30
  */
 GTlsInteractionResult
-g_tls_interaction_ask_password_finish (GTlsInteraction    *interaction,
+xtls_interaction_ask_password_finish (xtls_interaction_t    *interaction,
                                        xasync_result_t       *result,
                                        xerror_t            **error)
 {
@@ -547,9 +547,9 @@ g_tls_interaction_ask_password_finish (GTlsInteraction    *interaction,
     }
   else
     {
-      g_return_val_if_fail (g_async_result_is_tagged (result, g_tls_interaction_ask_password_async), G_TLS_INTERACTION_UNHANDLED);
+      g_return_val_if_fail (xasync_result_is_tagged (result, xtls_interaction_ask_password_async), G_TLS_INTERACTION_UNHANDLED);
 
-      return g_task_propagate_int (G_TASK (result), error);
+      return xtask_propagate_int (XTASK (result), error);
     }
 }
 
@@ -625,18 +625,18 @@ on_invoke_request_certificate_async_as_sync (xpointer_t user_data)
 }
 
 /**
- * g_tls_interaction_invoke_request_certificate:
- * @interaction: a #GTlsInteraction object
- * @connection: a #GTlsConnection object
+ * xtls_interaction_invoke_request_certificate:
+ * @interaction: a #xtls_interaction_t object
+ * @connection: a #xtls_connection_t object
  * @flags: flags providing more information about the request
  * @cancellable: an optional #xcancellable_t cancellation object
  * @error: an optional location to place an error on failure
  *
  * Invoke the interaction to ask the user to choose a certificate to
  * use with the connection. It invokes this interaction in the main
- * loop, specifically the #GMainContext returned by
- * g_main_context_get_thread_default() when the interaction is
- * created. This is called by called by #GTlsConnection when the peer
+ * loop, specifically the #xmain_context_t returned by
+ * xmain_context_get_thread_default() when the interaction is
+ * created. This is called by called by #xtls_connection_t when the peer
  * requests a certificate during the handshake.
  *
  * Derived subclasses usually implement a certificate selector,
@@ -658,8 +658,8 @@ on_invoke_request_certificate_async_as_sync (xpointer_t user_data)
  * Since: 2.40
  */
 GTlsInteractionResult
-g_tls_interaction_invoke_request_certificate (GTlsInteraction    *interaction,
-                                              GTlsConnection               *connection,
+xtls_interaction_invoke_request_certificate (xtls_interaction_t    *interaction,
+                                              xtls_connection_t               *connection,
                                               GTlsCertificateRequestFlags   flags,
                                               xcancellable_t       *cancellable,
                                               xerror_t            **error)
@@ -677,7 +677,7 @@ g_tls_interaction_invoke_request_certificate (GTlsInteraction    *interaction,
   if (klass->request_certificate)
     {
       closure = invoke_closure_new (interaction, G_OBJECT (connection), cancellable);
-      g_main_context_invoke (interaction->priv->context,
+      xmain_context_invoke (interaction->priv->context,
                              on_invoke_request_certificate_sync, closure);
       result = invoke_closure_wait_and_free (closure, error);
     }
@@ -686,7 +686,7 @@ g_tls_interaction_invoke_request_certificate (GTlsInteraction    *interaction,
       g_return_val_if_fail (klass->request_certificate_finish, G_TLS_INTERACTION_UNHANDLED);
 
       closure = invoke_closure_new (interaction, G_OBJECT (connection), cancellable);
-      g_main_context_invoke (interaction->priv->context,
+      xmain_context_invoke (interaction->priv->context,
                              on_invoke_request_certificate_async_as_sync, closure);
 
       result = invoke_closure_complete_and_free (interaction, closure, error);
@@ -700,24 +700,24 @@ g_tls_interaction_invoke_request_certificate (GTlsInteraction    *interaction,
 }
 
 /**
- * g_tls_interaction_request_certificate:
- * @interaction: a #GTlsInteraction object
- * @connection: a #GTlsConnection object
+ * xtls_interaction_request_certificate:
+ * @interaction: a #xtls_interaction_t object
+ * @connection: a #xtls_connection_t object
  * @flags: flags providing more information about the request
  * @cancellable: an optional #xcancellable_t cancellation object
  * @error: an optional location to place an error on failure
  *
  * Run synchronous interaction to ask the user to choose a certificate to use
- * with the connection. In general, g_tls_interaction_invoke_request_certificate()
+ * with the connection. In general, xtls_interaction_invoke_request_certificate()
  * should be used instead of this function.
  *
  * Derived subclasses usually implement a certificate selector, although they may
  * also choose to provide a certificate from elsewhere. Alternatively the user may
  * abort this certificate request, which will usually abort the TLS connection.
  *
- * If %G_TLS_INTERACTION_HANDLED is returned, then the #GTlsConnection
- * passed to g_tls_interaction_request_certificate() will have had its
- * #GTlsConnection:certificate filled in.
+ * If %G_TLS_INTERACTION_HANDLED is returned, then the #xtls_connection_t
+ * passed to xtls_interaction_request_certificate() will have had its
+ * #xtls_connection_t:certificate filled in.
  *
  * If the interaction is cancelled by the cancellation object, or by the
  * user then %G_TLS_INTERACTION_FAILED will be returned with an error that
@@ -729,8 +729,8 @@ g_tls_interaction_invoke_request_certificate (GTlsInteraction    *interaction,
  * Since: 2.40
  */
 GTlsInteractionResult
-g_tls_interaction_request_certificate (GTlsInteraction              *interaction,
-                                       GTlsConnection               *connection,
+xtls_interaction_request_certificate (xtls_interaction_t              *interaction,
+                                       xtls_connection_t               *connection,
                                        GTlsCertificateRequestFlags   flags,
                                        xcancellable_t                 *cancellable,
                                        xerror_t                      **error)
@@ -749,16 +749,16 @@ g_tls_interaction_request_certificate (GTlsInteraction              *interaction
 }
 
 /**
- * g_tls_interaction_request_certificate_async:
- * @interaction: a #GTlsInteraction object
- * @connection: a #GTlsConnection object
+ * xtls_interaction_request_certificate_async:
+ * @interaction: a #xtls_interaction_t object
+ * @connection: a #xtls_connection_t object
  * @flags: flags providing more information about the request
  * @cancellable: an optional #xcancellable_t cancellation object
  * @callback: (nullable): will be called when the interaction completes
  * @user_data: (nullable): data to pass to the @callback
  *
  * Run asynchronous interaction to ask the user for a certificate to use with
- * the connection. In general, g_tls_interaction_invoke_request_certificate() should
+ * the connection. In general, xtls_interaction_invoke_request_certificate() should
  * be used instead of this function.
  *
  * Derived subclasses usually implement a certificate selector, although they may
@@ -769,15 +769,15 @@ g_tls_interaction_request_certificate (GTlsInteraction              *interaction
  * Since: 2.40
  */
 void
-g_tls_interaction_request_certificate_async (GTlsInteraction              *interaction,
-                                             GTlsConnection               *connection,
+xtls_interaction_request_certificate_async (xtls_interaction_t              *interaction,
+                                             xtls_connection_t               *connection,
                                              GTlsCertificateRequestFlags   flags,
                                              xcancellable_t                 *cancellable,
                                              xasync_ready_callback_t           callback,
                                              xpointer_t                      user_data)
 {
   GTlsInteractionClass *klass;
-  GTask *task;
+  xtask_t *task;
 
   g_return_if_fail (X_IS_TLS_INTERACTION (interaction));
   g_return_if_fail (X_IS_TLS_CONNECTION (connection));
@@ -792,25 +792,25 @@ g_tls_interaction_request_certificate_async (GTlsInteraction              *inter
     }
   else
     {
-      task = g_task_new (interaction, cancellable, callback, user_data);
-      g_task_set_source_tag (task, g_tls_interaction_request_certificate_async);
-      g_task_return_int (task, G_TLS_INTERACTION_UNHANDLED);
-      g_object_unref (task);
+      task = xtask_new (interaction, cancellable, callback, user_data);
+      xtask_set_source_tag (task, xtls_interaction_request_certificate_async);
+      xtask_return_int (task, G_TLS_INTERACTION_UNHANDLED);
+      xobject_unref (task);
     }
 }
 
 /**
- * g_tls_interaction_request_certificate_finish:
- * @interaction: a #GTlsInteraction object
+ * xtls_interaction_request_certificate_finish:
+ * @interaction: a #xtls_interaction_t object
  * @result: the result passed to the callback
  * @error: an optional location to place an error on failure
  *
  * Complete a request certificate user interaction request. This should be once
- * the g_tls_interaction_request_certificate_async() completion callback is called.
+ * the xtls_interaction_request_certificate_async() completion callback is called.
  *
- * If %G_TLS_INTERACTION_HANDLED is returned, then the #GTlsConnection
- * passed to g_tls_interaction_request_certificate_async() will have had its
- * #GTlsConnection:certificate filled in.
+ * If %G_TLS_INTERACTION_HANDLED is returned, then the #xtls_connection_t
+ * passed to xtls_interaction_request_certificate_async() will have had its
+ * #xtls_connection_t:certificate filled in.
  *
  * If the interaction is cancelled by the cancellation object, or by the
  * user then %G_TLS_INTERACTION_FAILED will be returned with an error that
@@ -821,7 +821,7 @@ g_tls_interaction_request_certificate_async (GTlsInteraction              *inter
  * Since: 2.40
  */
 GTlsInteractionResult
-g_tls_interaction_request_certificate_finish (GTlsInteraction    *interaction,
+xtls_interaction_request_certificate_finish (xtls_interaction_t    *interaction,
                                               xasync_result_t       *result,
                                               xerror_t            **error)
 {
@@ -839,8 +839,8 @@ g_tls_interaction_request_certificate_finish (GTlsInteraction    *interaction,
     }
   else
     {
-      g_return_val_if_fail (g_async_result_is_tagged (result, g_tls_interaction_request_certificate_async), G_TLS_INTERACTION_UNHANDLED);
+      g_return_val_if_fail (xasync_result_is_tagged (result, xtls_interaction_request_certificate_async), G_TLS_INTERACTION_UNHANDLED);
 
-      return g_task_propagate_int (G_TASK (result), error);
+      return xtask_propagate_int (XTASK (result), error);
     }
 }

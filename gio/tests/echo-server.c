@@ -12,25 +12,25 @@ static GOptionEntry cmd_entries[] = {
 
 
 static xboolean_t
-handler (GThreadedSocketService *service,
+handler (xthreaded_socket_service_t *service,
          xsocket_connection_t      *connection,
-         GSocketListener        *listener,
+         xsocket_listener_t        *listener,
          xpointer_t                user_data)
 {
   xoutput_stream_t *out;
   xinput_stream_t *in;
   char buffer[1024];
-  gssize size;
+  xssize_t size;
 
   out = g_io_stream_get_output_stream (XIO_STREAM (connection));
   in = g_io_stream_get_input_stream (XIO_STREAM (connection));
 
-  g_output_stream_write_all (out, MESSAGE, strlen (MESSAGE),
+  xoutput_stream_write_all (out, MESSAGE, strlen (MESSAGE),
                              NULL, NULL, NULL);
 
-  while (0 < (size = g_input_stream_read (in, buffer,
+  while (0 < (size = xinput_stream_read (in, buffer,
                                           sizeof buffer, NULL, NULL)))
-    g_output_stream_write (out, buffer, size, NULL, NULL);
+    xoutput_stream_write (out, buffer, size, NULL, NULL);
 
   return TRUE;
 }
@@ -38,8 +38,8 @@ handler (GThreadedSocketService *service,
 int
 main (int argc, char *argv[])
 {
-  GSocketService *service;
-  GOptionContext *context;
+  xsocket_service_t *service;
+  xoption_context_t *context;
   xerror_t *error = NULL;
 
   context = g_option_context_new (" - Test xsocket_t server stuff");
@@ -50,7 +50,7 @@ main (int argc, char *argv[])
       return 1;
     }
 
-  service = g_threaded_socket_service_new (10);
+  service = xthreaded_socket_service_new (10);
 
   if (!xsocket_listener_add_inet_port (XSOCKET_LISTENER (service),
 					port,
@@ -65,6 +65,6 @@ main (int argc, char *argv[])
 
   g_signal_connect (service, "run", G_CALLBACK (handler), NULL);
 
-  g_main_loop_run (g_main_loop_new (NULL, FALSE));
+  xmain_loop_run (xmain_loop_new (NULL, FALSE));
   g_assert_not_reached ();
 }

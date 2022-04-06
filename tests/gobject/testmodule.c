@@ -19,26 +19,26 @@
 #include "testmodule.h"
 #include "testcommon.h"
 
-static xboolean_t test_module_load   (GTypeModule *module);
-static void     test_module_unload (GTypeModule *module);
+static xboolean_t test_module_load   (xtype_module_t *module);
+static void     test_module_unload (xtype_module_t *module);
 
 static void
-test_module_class_init (TestModuleClass *class)
+test_module_class_init (test_module_class_t *class)
 {
-  GTypeModuleClass *module_class = XTYPE_MODULE_CLASS (class);
+  xtype_module_class_t *module_class = XTYPE_MODULE_CLASS (class);
 
   module_class->load = test_module_load;
   module_class->unload = test_module_unload;
 }
 
-DEFINE_TYPE (TestModule, test_module,
+DEFINE_TYPE (test_module, test_module,
 	     test_module_class_init, NULL, NULL,
 	     XTYPE_TYPE_MODULE)
 
 static xboolean_t
-test_module_load (GTypeModule *module)
+test_module_load (xtype_module_t *module)
 {
-  TestModule *test_module = TEST_MODULE (module);
+  test_module_t *test_module = TEST_MODULE (module);
 
   test_module->register_func (module);
 
@@ -46,21 +46,21 @@ test_module_load (GTypeModule *module)
 }
 
 static void
-test_module_unload (GTypeModule *module)
+test_module_unload (xtype_module_t *module)
 {
 }
 
-GTypeModule *
-test_module_new (TestModuleRegisterFunc register_func)
+xtype_module_t *
+test_module_new (test_module_register_func_t register_func)
 {
-  TestModule *test_module = g_object_new (TEST_TYPE_MODULE, NULL);
-  GTypeModule *module = XTYPE_MODULE (test_module);
+  test_module_t *test_module = xobject_new (TEST_TYPE_MODULE, NULL);
+  xtype_module_t *module = XTYPE_MODULE (test_module);
 
   test_module->register_func = register_func;
 
   /* Register the types initially */
-  g_type_module_use (module);
-  g_type_module_unuse (module);
+  xtype_module_use (module);
+  xtype_module_unuse (module);
 
   return XTYPE_MODULE (module);
 }

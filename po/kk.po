@@ -28,15 +28,15 @@ msgid "Setting application as last used for type not supported yet"
 msgstr ""
 
 #: gio/gapplication.c:497
-msgid "GApplication options"
-msgstr "GApplication опциялары"
+msgid "xapplication_t options"
+msgstr "xapplication_t опциялары"
 
 #: gio/gapplication.c:497
-msgid "Show GApplication options"
-msgstr "GApplication опцияларын көрсету"
+msgid "Show xapplication_t options"
+msgstr "xapplication_t опцияларын көрсету"
 
 #: gio/gapplication.c:542
-msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
 msgstr ""
 
 #: gio/gapplication.c:554
@@ -264,7 +264,7 @@ msgid "Seek not supported on base stream"
 msgstr ""
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
 msgstr ""
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
@@ -336,19 +336,19 @@ msgid "%s filetype"
 msgstr "%s файл түрі"
 
 #: gio/gcredentials.c:335
-msgid "GCredentials contains invalid data"
+msgid "xcredentials_t contains invalid data"
 msgstr ""
 
 #: gio/gcredentials.c:395 gio/gcredentials.c:686
-msgid "GCredentials is not implemented on this OS"
+msgid "xcredentials_t is not implemented on this OS"
 msgstr ""
 
 #: gio/gcredentials.c:550 gio/gcredentials.c:568
-msgid "There is no GCredentials support for your platform"
+msgid "There is no xcredentials_t support for your platform"
 msgstr ""
 
 #: gio/gcredentials.c:626
-msgid "GCredentials does not contain a process ID on this OS"
+msgid "xcredentials_t does not contain a process ID on this OS"
 msgstr ""
 
 #: gio/gcredentials.c:680
@@ -528,7 +528,7 @@ msgid "User IDs must be the same for peer and server"
 msgstr ""
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
 msgstr ""
 
 #: gio/gdbusauthmechanismsha1.c:299
@@ -1290,26 +1290,26 @@ msgstr "DTLS қолдауы қолжетерсіз"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of GEmblem encoding"
+msgid "Can’t handle version %d of xemblem_t encoding"
 msgstr ""
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
 msgstr ""
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of GEmblemedIcon encoding"
+msgid "Can’t handle version %d of xemblemed_icon_t encoding"
 msgstr ""
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
 msgstr ""
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
 msgstr ""
 
 #. Translators: This is an error message when
@@ -1401,11 +1401,11 @@ msgstr ""
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of GFileIcon encoding"
+msgid "Can’t handle version %d of xfile_icon_t encoding"
 msgstr ""
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for GFileIcon"
+msgid "Malformed input data for xfile_icon_t"
 msgstr ""
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
@@ -2809,7 +2809,7 @@ msgstr ""
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
@@ -3171,7 +3171,7 @@ msgid "Invalid seek request"
 msgstr ""
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
 msgstr ""
 
 #: gio/gmemoryoutputstream.c:568
@@ -3781,7 +3781,7 @@ msgid "Error sending message: %s"
 msgstr "Хабарламаны жіберу сәтсіз: %s"
 
 #: gio/gsocket.c:5032
-msgid "GSocketControlMessage not supported on Windows"
+msgid "xsocket_control_message_t not supported on Windows"
 msgstr ""
 
 #: gio/gsocket.c:5505 gio/gsocket.c:5581 gio/gsocket.c:5807
@@ -3926,7 +3926,7 @@ msgstr ""
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of GThemedIcon encoding"
+msgid "Can’t handle version %d of xthemed_icon_t encoding"
 msgstr ""
 
 #: gio/gthreadedresolver.c:152
@@ -3980,7 +3980,7 @@ msgid "The current TLS backend does not support PKCS #12"
 msgstr ""
 
 #: gio/gtlscertificate.c:1013
-msgid "This GTlsBackend does not support creating PKCS #11 certificates"
+msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
 msgstr ""
 
 #: gio/gtlspassword.c:111
@@ -4285,25 +4285,25 @@ msgstr ""
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %d %b %Y %T"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%d.%m.%Y"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%T"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -4686,13 +4686,13 @@ msgstr "Жел"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "AM"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "PM"
 

@@ -49,7 +49,7 @@
  * @include: gio/gio.h
  *
  * #xsocket_address_t is the equivalent of struct sockaddr in the BSD
- * sockets API. This is an abstract class; use #GInetSocketAddress
+ * sockets API. This is an abstract class; use #xinet_socket_address_t
  * for internet sockets, or #GUnixSocketAddress for UNIX domain sockets.
  */
 
@@ -66,9 +66,9 @@ enum
   PROP_FAMILY
 };
 
-static void                      xsocket_address_connectable_iface_init       (GSocketConnectableIface *iface);
-static GSocketAddressEnumerator *xsocket_address_connectable_enumerate	       (GSocketConnectable      *connectable);
-static GSocketAddressEnumerator *xsocket_address_connectable_proxy_enumerate  (GSocketConnectable      *connectable);
+static void                      xsocket_address_connectable_iface_init       (xsocket_connectable_iface_t *iface);
+static xsocket_address_enumerator_t *xsocket_address_connectable_enumerate	       (xsocket_connectable_t      *connectable);
+static xsocket_address_enumerator_t *xsocket_address_connectable_proxy_enumerate  (xsocket_connectable_t      *connectable);
 
 G_DEFINE_ABSTRACT_TYPE_WITH_CODE (xsocket_address_t, xsocket_address, XTYPE_OBJECT,
 				  G_IMPLEMENT_INTERFACE (XTYPE_SOCKET_CONNECTABLE,
@@ -94,14 +94,14 @@ xsocket_address_get_family (xsocket_address_t *address)
 
 static void
 xsocket_address_get_property (xobject_t *object, xuint_t prop_id,
-			       GValue *value, GParamSpec *pspec)
+			       xvalue_t *value, xparam_spec_t *pspec)
 {
   xsocket_address_t *address = XSOCKET_ADDRESS (object);
 
   switch (prop_id)
     {
      case PROP_FAMILY:
-      g_value_set_enum (value, xsocket_address_get_family (address));
+      xvalue_set_enum (value, xsocket_address_get_family (address));
       break;
 
      default:
@@ -116,7 +116,7 @@ xsocket_address_class_init (GSocketAddressClass *klass)
 
   gobject_class->get_property = xsocket_address_get_property;
 
-  g_object_class_install_property (gobject_class, PROP_FAMILY,
+  xobject_class_install_property (gobject_class, PROP_FAMILY,
                                    g_param_spec_enum ("family",
 						      P_("Address family"),
 						      P_("The family of the socket address"),
@@ -127,7 +127,7 @@ xsocket_address_class_init (GSocketAddressClass *klass)
 }
 
 static void
-xsocket_address_connectable_iface_init (GSocketConnectableIface *connectable_iface)
+xsocket_address_connectable_iface_init (xsocket_connectable_iface_t *connectable_iface)
 {
   connectable_iface->enumerate  = xsocket_address_connectable_enumerate;
   connectable_iface->proxy_enumerate  = xsocket_address_connectable_proxy_enumerate;
@@ -153,7 +153,7 @@ xsocket_address_init (xsocket_address_t *address)
  *
  * Since: 2.22
  */
-gssize
+xssize_t
 xsocket_address_get_native_size (xsocket_address_t *address)
 {
   g_return_val_if_fail (X_IS_SOCKET_ADDRESS (address), -1);
@@ -228,9 +228,9 @@ xsocket_address_new_from_native (xpointer_t native,
       if (len < sizeof (*addr))
 	return NULL;
 
-      iaddr = xinet_address_new_from_bytes ((guint8 *) &(addr->sin_addr), AF_INET);
+      iaddr = xinet_address_new_from_bytes ((xuint8_t *) &(addr->sin_addr), AF_INET);
       sockaddr = g_inet_socket_address_new (iaddr, g_ntohs (addr->sin_port));
-      g_object_unref (iaddr);
+      xobject_unref (iaddr);
       return sockaddr;
     }
 
@@ -250,20 +250,20 @@ xsocket_address_new_from_native (xpointer_t native,
 	  sin_addr.sin_family = AF_INET;
 	  sin_addr.sin_port = addr->sin6_port;
 	  memcpy (&(sin_addr.sin_addr.s_addr), addr->sin6_addr.s6_addr + 12, 4);
-	  iaddr = xinet_address_new_from_bytes ((guint8 *) &(sin_addr.sin_addr), AF_INET);
+	  iaddr = xinet_address_new_from_bytes ((xuint8_t *) &(sin_addr.sin_addr), AF_INET);
 	}
       else
 	{
-	  iaddr = xinet_address_new_from_bytes ((guint8 *) &(addr->sin6_addr), AF_INET6);
+	  iaddr = xinet_address_new_from_bytes ((xuint8_t *) &(addr->sin6_addr), AF_INET6);
 	}
 
-      sockaddr = g_object_new (XTYPE_INET_SOCKET_ADDRESS,
+      sockaddr = xobject_new (XTYPE_INET_SOCKET_ADDRESS,
 			       "address", iaddr,
 			       "port", g_ntohs (addr->sin6_port),
 			       "flowinfo", addr->sin6_flowinfo,
 			       "scope_id", addr->sin6_scope_id,
 			       NULL);
-      g_object_unref (iaddr);
+      xobject_unref (iaddr);
       return sockaddr;
     }
 
@@ -309,7 +309,7 @@ xsocket_address_new_from_native (xpointer_t native,
 #define XSOCKET_ADDRESS_ADDRESS_ENUMERATOR(obj) (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SOCKET_ADDRESS_ADDRESS_ENUMERATOR, GSocketAddressAddressEnumerator))
 
 typedef struct {
-  GSocketAddressEnumerator parent_instance;
+  xsocket_address_enumerator_t parent_instance;
 
   xsocket_address_t *sockaddr;
 } GSocketAddressAddressEnumerator;
@@ -329,13 +329,13 @@ xsocket_address_address_enumerator_finalize (xobject_t *object)
     XSOCKET_ADDRESS_ADDRESS_ENUMERATOR (object);
 
   if (sockaddr_enum->sockaddr)
-    g_object_unref (sockaddr_enum->sockaddr);
+    xobject_unref (sockaddr_enum->sockaddr);
 
   G_OBJECT_CLASS (_xsocket_address_address_enumerator_parent_class)->finalize (object);
 }
 
 static xsocket_address_t *
-xsocket_address_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
+xsocket_address_address_enumerator_next (xsocket_address_enumerator_t  *enumerator,
 					  xcancellable_t              *cancellable,
 					  xerror_t                   **error)
 {
@@ -369,21 +369,21 @@ _xsocket_address_address_enumerator_class_init (GSocketAddressAddressEnumeratorC
   object_class->finalize = xsocket_address_address_enumerator_finalize;
 }
 
-static GSocketAddressEnumerator *
-xsocket_address_connectable_enumerate (GSocketConnectable *connectable)
+static xsocket_address_enumerator_t *
+xsocket_address_connectable_enumerate (xsocket_connectable_t *connectable)
 {
   GSocketAddressAddressEnumerator *sockaddr_enum;
 
-  sockaddr_enum = g_object_new (XTYPE_SOCKET_ADDRESS_ADDRESS_ENUMERATOR, NULL);
-  sockaddr_enum->sockaddr = g_object_ref (XSOCKET_ADDRESS (connectable));
+  sockaddr_enum = xobject_new (XTYPE_SOCKET_ADDRESS_ADDRESS_ENUMERATOR, NULL);
+  sockaddr_enum->sockaddr = xobject_ref (XSOCKET_ADDRESS (connectable));
 
-  return (GSocketAddressEnumerator *)sockaddr_enum;
+  return (xsocket_address_enumerator_t *)sockaddr_enum;
 }
 
-static GSocketAddressEnumerator *
-xsocket_address_connectable_proxy_enumerate (GSocketConnectable *connectable)
+static xsocket_address_enumerator_t *
+xsocket_address_connectable_proxy_enumerate (xsocket_connectable_t *connectable)
 {
-  GSocketAddressEnumerator *addr_enum = NULL;
+  xsocket_address_enumerator_t *addr_enum = NULL;
 
   g_assert (connectable != NULL);
 
@@ -395,17 +395,17 @@ xsocket_address_connectable_proxy_enumerate (GSocketConnectable *connectable)
       xchar_t *uri;
       xchar_t *ip;
 
-      g_object_get (connectable, "address", &addr, "port", &port, NULL);
+      xobject_get (connectable, "address", &addr, "port", &port, NULL);
 
       ip = xinet_address_to_string (addr);
-      uri = g_uri_join (G_URI_FLAGS_NONE, "none", NULL, ip, port, "", NULL, NULL);
+      uri = xuri_join (XURI_FLAGS_NONE, "none", NULL, ip, port, "", NULL, NULL);
 
-      addr_enum = g_object_new (XTYPE_PROXY_ADDRESS_ENUMERATOR,
+      addr_enum = xobject_new (XTYPE_PROXY_ADDRESS_ENUMERATOR,
       	       	       	       	"connectable", connectable,
       	       	       	       	"uri", uri,
       	       	       	       	NULL);
 
-      g_object_unref (addr);
+      xobject_unref (addr);
       g_free (ip);
       g_free (uri);
     }

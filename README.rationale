@@ -12,5 +12,5 @@ giving a brief rationale of each decision, plus a link to further discussion.
  * Main loop API:
 
    The ID-based mainloop APIs (g_idle_add, g_timeout_add, etc) are considered
-   legacy, and new features (such as g_source_set_static_name) will only be
-   added to the explicit GSource APIs.
+   legacy, and new features (such as xsource_set_static_name) will only be
+   added to the explicit xsource_t APIs.

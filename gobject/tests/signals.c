@@ -25,15 +25,15 @@ typedef enum {
   TEST_UNSIGNED_ENUM_FOO = 1,
   TEST_UNSIGNED_ENUM_BAR = 42
   /* Don't test 0x80000000 for now- nothing appears to do this in
-   * practice, and it triggers GValue/GEnum bugs on ppc64.
+   * practice, and it triggers xvalue_t/xenum_t bugs on ppc64.
    */
 } TestUnsignedEnum;
 
 static void
-custom_marshal_VOID__INVOCATIONHINT (GClosure     *closure,
-                                     GValue       *return_value G_GNUC_UNUSED,
+custom_marshal_VOID__INVOCATIONHINT (xclosure_t     *closure,
+                                     xvalue_t       *return_value G_GNUC_UNUSED,
                                      xuint_t         n_param_values,
-                                     const GValue *param_values,
+                                     const xvalue_t *param_values,
                                      xpointer_t      invocation_hint,
                                      xpointer_t      marshal_data)
 {
@@ -49,11 +49,11 @@ custom_marshal_VOID__INVOCATIONHINT (GClosure     *closure,
   if (G_CCLOSURE_SWAP_DATA (closure))
     {
       data1 = closure->data;
-      data2 = g_value_peek_pointer (param_values + 0);
+      data2 = xvalue_peek_pointer (param_values + 0);
     }
   else
     {
-      data1 = g_value_peek_pointer (param_values + 0);
+      data1 = xvalue_peek_pointer (param_values + 0);
       data2 = closure->data;
     }
   callback = (GMarshalFunc_VOID__INVOCATIONHINT) (marshal_data ? marshal_data : cc->callback);
@@ -70,7 +70,7 @@ test_enum_get_type (void)
 
   if (g_once_init_enter (&static_g_define_type_id))
     {
-      static const GEnumValue values[] = {
+      static const xenum_value_t values[] = {
         { TEST_ENUM_NEGATIVE, "TEST_ENUM_NEGATIVE", "negative" },
         { TEST_ENUM_NONE, "TEST_ENUM_NONE", "none" },
         { TEST_ENUM_FOO, "TEST_ENUM_FOO", "foo" },
@@ -78,7 +78,7 @@ test_enum_get_type (void)
         { 0, NULL, NULL }
       };
       xtype_t g_define_type_id =
-        g_enum_register_static (g_intern_static_string ("TestEnum"), values);
+        xenum_register_static (g_intern_static_string ("TestEnum"), values);
       g_once_init_leave (&static_g_define_type_id, g_define_type_id);
     }
 
@@ -92,13 +92,13 @@ test_unsigned_enum_get_type (void)
 
   if (g_once_init_enter (&static_g_define_type_id))
     {
-      static const GEnumValue values[] = {
+      static const xenum_value_t values[] = {
         { TEST_UNSIGNED_ENUM_FOO, "TEST_UNSIGNED_ENUM_FOO", "foo" },
         { TEST_UNSIGNED_ENUM_BAR, "TEST_UNSIGNED_ENUM_BAR", "bar" },
         { 0, NULL, NULL }
       };
       xtype_t g_define_type_id =
-        g_enum_register_static (g_intern_static_string ("TestUnsignedEnum"), values);
+        xenum_register_static (g_intern_static_string ("TestUnsignedEnum"), values);
       g_once_init_leave (&static_g_define_type_id, g_define_type_id);
     }
 
@@ -109,7 +109,7 @@ typedef enum {
   MY_ENUM_VALUE = 1,
 } MyEnum;
 
-static const GEnumValue my_enum_values[] =
+static const xenum_value_t my_enum_values[] =
 {
   { MY_ENUM_VALUE, "the first value", "one" },
   { 0, NULL, NULL }
@@ -121,7 +121,7 @@ typedef enum {
   MY_FLAGS_LAST_BIT = (1 << 31)
 } MyFlags;
 
-static const GFlagsValue my_flag_values[] =
+static const xflags_value_t my_flaxvalues[] =
 {
   { MY_FLAGS_FIRST_BIT, "the first bit", "first-bit" },
   { MY_FLAGS_THIRD_BIT, "the third bit", "third-bit" },
@@ -137,42 +137,42 @@ static xuint_t simple2_id;
 
 typedef struct {
   xtype_interface_t x_iface;
-} FooInterface;
+} foo_interface_t;
 
 xtype_t foo_get_type (void);
 
-G_DEFINE_INTERFACE (Foo, foo, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (foo, foo, XTYPE_OBJECT)
 
 static void
-foo_default_init (FooInterface *iface)
+foo_default_init (foo_interface_t *iface)
 {
 }
 
 typedef struct {
   xobject_t parent;
-} Baa;
+} baa_t;
 
 typedef struct {
   xobject_class_t parent_class;
-} BaaClass;
+} baa_class_t;
 
 static void
-baa_init_foo (FooInterface *iface)
+baa_init_foo (foo_interface_t *iface)
 {
 }
 
 xtype_t baa_get_type (void);
 
-G_DEFINE_TYPE_WITH_CODE (Baa, baa, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (baa_t, baa, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (foo_get_type (), baa_init_foo))
 
 static void
-baa_init (Baa *baa)
+baa_init (baa_t *baa)
 {
 }
 
 static void
-baa_class_init (BaaClass *class)
+baa_class_init (baa_class_t *class)
 {
 }
 
@@ -184,9 +184,9 @@ struct _Test
   xobject_t parent_instance;
 };
 
-static void all_types_handler (Test *test, int i, xboolean_t b, char c, guchar uc, xuint_t ui, glong l, gulong ul, MyEnum e, MyFlags f, float fl, double db, char *str, GParamSpec *param, GBytes *bytes, xpointer_t ptr, Test *obj, xvariant_t *var, gint64 i64, guint64 ui64);
-static xboolean_t accumulator_sum (GSignalInvocationHint *ihint, GValue *return_accu, const GValue *handler_return, xpointer_t data);
-static xboolean_t accumulator_concat_string (GSignalInvocationHint *ihint, GValue *return_accu, const GValue *handler_return, xpointer_t data);
+static void all_types_handler (Test *test, int i, xboolean_t b, char c, guchar uc, xuint_t ui, xlong_t l, gulong ul, MyEnum e, MyFlags f, float fl, double db, char *str, xparam_spec_t *param, xbytes_t *bytes, xpointer_t ptr, Test *obj, xvariant_t *var, gint64 i64, xuint64_t ui64);
+static xboolean_t accumulator_sum (xsignal_invocation_hint_t *ihint, xvalue_t *return_accu, const xvalue_t *handler_return, xpointer_t data);
+static xboolean_t accumulator_concat_string (xsignal_invocation_hint_t *ihint, xvalue_t *return_accu, const xvalue_t *handler_return, xpointer_t data);
 static xchar_t * accumulator_class (Test *test);
 
 struct _TestClass
@@ -194,8 +194,8 @@ struct _TestClass
   xobject_class_t parent_class;
 
   void (* variant_changed) (Test *, xvariant_t *);
-  void (* all_types) (Test *test, int i, xboolean_t b, char c, guchar uc, xuint_t ui, glong l, gulong ul, MyEnum e, MyFlags f, float fl, double db, char *str, GParamSpec *param, GBytes *bytes, xpointer_t ptr, Test *obj, xvariant_t *var, gint64 i64, guint64 ui64);
-  void (* all_types_null) (Test *test, int i, xboolean_t b, char c, guchar uc, xuint_t ui, glong l, gulong ul, MyEnum e, MyFlags f, float fl, double db, char *str, GParamSpec *param, GBytes *bytes, xpointer_t ptr, Test *obj, xvariant_t *var, gint64 i64, guint64 ui64);
+  void (* all_types) (Test *test, int i, xboolean_t b, char c, guchar uc, xuint_t ui, xlong_t l, gulong ul, MyEnum e, MyFlags f, float fl, double db, char *str, xparam_spec_t *param, xbytes_t *bytes, xpointer_t ptr, Test *obj, xvariant_t *var, gint64 i64, xuint64_t ui64);
+  void (* all_types_null) (Test *test, int i, xboolean_t b, char c, guchar uc, xuint_t ui, xlong_t l, gulong ul, MyEnum e, MyFlags f, float fl, double db, char *str, xparam_spec_t *param, xbytes_t *bytes, xpointer_t ptr, Test *obj, xvariant_t *var, gint64 i64, xuint64_t ui64);
   xchar_t * (*accumulator_class) (Test *test);
 };
 
@@ -212,8 +212,8 @@ test_class_init (TestClass *klass)
 {
   xuint_t s;
 
-  enum_type = g_enum_register_static ("MyEnum", my_enum_values);
-  flags_type = g_flags_register_static ("MyFlag", my_flag_values);
+  enum_type = xenum_register_static ("MyEnum", my_enum_values);
+  flags_type = xflags_register_static ("MyFlag", my_flaxvalues);
 
   klass->all_types = all_types_handler;
   klass->accumulator_class = accumulator_class;
@@ -409,7 +409,7 @@ test_class_init (TestClass *klass)
                 G_SIGNAL_RUN_LAST,
                 G_STRUCT_OFFSET (TestClass, all_types),
                 NULL, NULL,
-                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONG_ENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
+                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
                 XTYPE_NONE,
                 19,
 		XTYPE_INT,
@@ -436,7 +436,7 @@ test_class_init (TestClass *klass)
                 G_SIGNAL_RUN_LAST,
                 G_STRUCT_OFFSET (TestClass, all_types),
                 NULL, NULL,
-                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONG_ENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
+                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
                 XTYPE_NONE,
                 19,
 		XTYPE_INT,
@@ -459,7 +459,7 @@ test_class_init (TestClass *klass)
 		XTYPE_INT64,
 		XTYPE_UINT64);
   g_signal_set_va_marshaller (s, XTYPE_FROM_CLASS (klass),
-			      test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONG_ENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64v);
+			      test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64v);
 
   g_signal_new ("all-types-generic",
                 XTYPE_FROM_CLASS (klass),
@@ -493,7 +493,7 @@ test_class_init (TestClass *klass)
                 G_SIGNAL_RUN_LAST,
                 G_STRUCT_OFFSET (TestClass, all_types_null),
                 NULL, NULL,
-                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONG_ENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
+                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
                 XTYPE_NONE,
                 19,
 		XTYPE_INT,
@@ -520,7 +520,7 @@ test_class_init (TestClass *klass)
                 G_SIGNAL_RUN_LAST,
                 0,
                 NULL, NULL,
-                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONG_ENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
+                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
                 XTYPE_NONE,
                 19,
 		XTYPE_INT,
@@ -570,31 +570,31 @@ test_variant_signal (void)
    * even if there are no handlers connected.
    */
 
-  test = g_object_new (test_get_type (), NULL);
+  test = xobject_new (test_get_type (), NULL);
 
-  v = g_variant_new_boolean (TRUE);
-  g_variant_ref (v);
-  g_assert_true (g_variant_is_floating (v));
+  v = xvariant_new_boolean (TRUE);
+  xvariant_ref (v);
+  g_assert_true (xvariant_is_floating (v));
   g_signal_emit_by_name (test, "variant-changed-no-slot", v);
-  g_assert_false (g_variant_is_floating (v));
-  g_variant_unref (v);
+  g_assert_false (xvariant_is_floating (v));
+  xvariant_unref (v);
 
-  v = g_variant_new_boolean (TRUE);
-  g_variant_ref (v);
-  g_assert_true (g_variant_is_floating (v));
+  v = xvariant_new_boolean (TRUE);
+  xvariant_ref (v);
+  g_assert_true (xvariant_is_floating (v));
   g_signal_emit_by_name (test, "variant-changed", v);
-  g_assert_false (g_variant_is_floating (v));
-  g_variant_unref (v);
+  g_assert_false (xvariant_is_floating (v));
+  xvariant_unref (v);
 
-  g_object_unref (test);
+  xobject_unref (test);
 }
 
 static void
 on_generic_marshaller_1 (Test *obj,
 			 gint8 v_schar,
-			 guint8 v_uchar,
+			 xuint8_t v_uchar,
 			 xint_t v_int,
-			 glong v_long,
+			 xlong_t v_long,
 			 xpointer_t v_pointer,
 			 xdouble_t v_double,
 			 gfloat v_float,
@@ -615,13 +615,13 @@ static void
 test_generic_marshaller_signal_1 (void)
 {
   Test *test;
-  test = g_object_new (test_get_type (), NULL);
+  test = xobject_new (test_get_type (), NULL);
 
   g_signal_connect (test, "generic-marshaller-1", G_CALLBACK (on_generic_marshaller_1), NULL);
 
   g_signal_emit_by_name (test, "generic-marshaller-1", 42, 43, 4096, 8192, NULL, 0.5, 5.5);
 
-  g_object_unref (test);
+  xobject_unref (test);
 }
 
 static void
@@ -643,13 +643,13 @@ static void
 test_generic_marshaller_signal_2 (void)
 {
   Test *test;
-  test = g_object_new (test_get_type (), NULL);
+  test = xobject_new (test_get_type (), NULL);
 
   g_signal_connect (test, "generic-marshaller-2", G_CALLBACK (on_generic_marshaller_2), NULL);
 
   g_signal_emit_by_name (test, "generic-marshaller-2", 42, TEST_ENUM_BAR, 43, TEST_UNSIGNED_ENUM_BAR, 44);
 
-  g_object_unref (test);
+  xobject_unref (test);
 }
 
 static TestEnum
@@ -671,7 +671,7 @@ test_generic_marshaller_signal_enum_return_signed (void)
   xuint_t id;
   TestEnum retval = 0;
 
-  test = g_object_new (test_get_type (), NULL);
+  test = xobject_new (test_get_type (), NULL);
 
   /* Test return value NEGATIVE */
   id = g_signal_connect (test,
@@ -692,7 +692,7 @@ test_generic_marshaller_signal_enum_return_signed (void)
   g_assert_cmpint (retval, ==, TEST_ENUM_BAR);
   g_signal_handler_disconnect (test, id);
 
-  g_object_unref (test);
+  xobject_unref (test);
 }
 
 static TestUnsignedEnum
@@ -714,7 +714,7 @@ test_generic_marshaller_signal_enum_return_unsigned (void)
   xuint_t id;
   TestUnsignedEnum retval = 0;
 
-  test = g_object_new (test_get_type (), NULL);
+  test = xobject_new (test_get_type (), NULL);
 
   /* Test return value FOO */
   id = g_signal_connect (test,
@@ -735,7 +735,7 @@ test_generic_marshaller_signal_enum_return_unsigned (void)
   g_assert_cmpint (retval, ==, TEST_UNSIGNED_ENUM_BAR);
   g_signal_handler_disconnect (test, id);
 
-  g_object_unref (test);
+  xobject_unref (test);
 }
 
 /**********************/
@@ -759,7 +759,7 @@ test_generic_marshaller_signal_int_return (void)
   xuint_t id;
   xint_t retval = 0;
 
-  test = g_object_new (test_get_type (), NULL);
+  test = xobject_new (test_get_type (), NULL);
 
   /* Test return value -30 */
   id = g_signal_connect (test,
@@ -801,7 +801,7 @@ test_generic_marshaller_signal_int_return (void)
   g_assert_cmpint (retval, ==, 2);
   g_signal_handler_disconnect (test, id);
 
-  g_object_unref (test);
+  xobject_unref (test);
 }
 
 static xuint_t
@@ -823,7 +823,7 @@ test_generic_marshaller_signal_uint_return (void)
   xuint_t id;
   xuint_t retval = 0;
 
-  test = g_object_new (test_get_type (), NULL);
+  test = xobject_new (test_get_type (), NULL);
 
   id = g_signal_connect (test,
                          "generic-marshaller-uint-return",
@@ -861,13 +861,13 @@ test_generic_marshaller_signal_uint_return (void)
   g_assert_cmpint (retval, ==, G_MAXUINT);
   g_signal_handler_disconnect (test, id);
 
-  g_object_unref (test);
+  xobject_unref (test);
 }
 
 static xpointer_t
 on_generic_marshaller_interface_return (Test *test)
 {
-  return g_object_new (baa_get_type (), NULL);
+  return xobject_new (baa_get_type (), NULL);
 }
 
 static void
@@ -877,7 +877,7 @@ test_generic_marshaller_signal_interface_return (void)
   xuint_t id;
   xpointer_t retval;
 
-  test = g_object_new (test_get_type (), NULL);
+  test = xobject_new (test_get_type (), NULL);
 
   /* Test return value -30 */
   id = g_signal_connect (test,
@@ -885,22 +885,22 @@ test_generic_marshaller_signal_interface_return (void)
                          G_CALLBACK (on_generic_marshaller_interface_return),
                          NULL);
   g_signal_emit_by_name (test, "generic-marshaller-interface-return", &retval);
-  g_assert_true (g_type_check_instance_is_a ((GTypeInstance*)retval, foo_get_type ()));
-  g_object_unref (retval);
+  g_assert_true (xtype_check_instance_is_a ((GTypeInstance*)retval, foo_get_type ()));
+  xobject_unref (retval);
 
   g_signal_handler_disconnect (test, id);
 
-  g_object_unref (test);
+  xobject_unref (test);
 }
 
-static const GSignalInvocationHint dont_use_this = { 0, };
+static const xsignal_invocation_hint_t dont_use_this = { 0, };
 
 static void
 custom_marshaller_callback (Test                  *test,
-                            GSignalInvocationHint *hint,
+                            xsignal_invocation_hint_t *hint,
                             xpointer_t               unused)
 {
-  GSignalInvocationHint *ihint;
+  xsignal_invocation_hint_t *ihint;
 
   g_assert_true (hint != &dont_use_this);
 
@@ -916,7 +916,7 @@ test_custom_marshaller (void)
 {
   Test *test;
 
-  test = g_object_new (test_get_type (), NULL);
+  test = xobject_new (test_get_type (), NULL);
 
   g_signal_connect (test,
                     "custom-marshaller",
@@ -925,13 +925,13 @@ test_custom_marshaller (void)
 
   g_signal_emit_by_name (test, "custom-marshaller", &dont_use_this);
 
-  g_object_unref (test);
+  xobject_unref (test);
 }
 
 static int all_type_handlers_count = 0;
 
 static void
-all_types_handler (Test *test, int i, xboolean_t b, char c, guchar uc, xuint_t ui, glong l, gulong ul, MyEnum e, MyFlags f, float fl, double db, char *str, GParamSpec *param, GBytes *bytes, xpointer_t ptr, Test *obj, xvariant_t *var, gint64 i64, guint64 ui64)
+all_types_handler (Test *test, int i, xboolean_t b, char c, guchar uc, xuint_t ui, xlong_t l, gulong ul, MyEnum e, MyFlags f, float fl, double db, char *str, xparam_spec_t *param, xbytes_t *bytes, xpointer_t ptr, Test *obj, xvariant_t *var, gint64 i64, xuint64_t ui64)
 {
   all_type_handlers_count++;
 
@@ -948,15 +948,15 @@ all_types_handler (Test *test, int i, xboolean_t b, char c, guchar uc, xuint_t u
   g_assert_cmpfloat (db, ==, 1.5);
   g_assert_cmpstr (str, ==, "Test");
   g_assert_cmpstr (g_param_spec_get_nick (param), ==, "nick");
-  g_assert_cmpstr (g_bytes_get_data (bytes, NULL), ==, "Blah");
+  g_assert_cmpstr (xbytes_get_data (bytes, NULL), ==, "Blah");
   g_assert_true (ptr == &enum_type);
-  g_assert_cmpuint (g_variant_get_uint16 (var), == , 99);
+  g_assert_cmpuint (xvariant_get_uint16 (var), == , 99);
   g_assert_cmpint (i64, ==, G_MAXINT64 - 1234);
   g_assert_cmpuint (ui64, ==, G_MAXUINT64 - 123456);
 }
 
 static void
-all_types_handler_cb (Test *test, int i, xboolean_t b, char c, guchar uc, xuint_t ui, glong l, gulong ul, MyEnum e, xuint_t f, float fl, double db, char *str, GParamSpec *param, GBytes *bytes, xpointer_t ptr, Test *obj, xvariant_t *var, gint64 i64, guint64 ui64, xpointer_t user_data)
+all_types_handler_cb (Test *test, int i, xboolean_t b, char c, guchar uc, xuint_t ui, xlong_t l, gulong ul, MyEnum e, xuint_t f, float fl, double db, char *str, xparam_spec_t *param, xbytes_t *bytes, xpointer_t ptr, Test *obj, xvariant_t *var, gint64 i64, xuint64_t ui64, xpointer_t user_data)
 {
   g_assert_true (user_data == &flags_type);
   all_types_handler (test, i, b, c, uc, ui, l, ul, e, f, fl, db, str, param, bytes, ptr, obj, var, i64, ui64);
@@ -972,24 +972,24 @@ test_all_types (void)
   char c = 17;
   guchar uc = 140;
   xuint_t ui = G_MAXUINT - 42;
-  glong l =  -1117;
+  xlong_t l =  -1117;
   gulong ul = G_MAXULONG - 999;
   MyEnum e = MY_ENUM_VALUE;
   MyFlags f = MY_FLAGS_FIRST_BIT | MY_FLAGS_THIRD_BIT | MY_FLAGS_LAST_BIT;
   float fl = 0.25;
   double db = 1.5;
   char *str = "Test";
-  GParamSpec *param = g_param_spec_long	 ("param", "nick", "blurb", 0, 10, 4, 0);
-  GBytes *bytes = g_bytes_new_static ("Blah", 5);
+  xparam_spec_t *param = g_param_spec_long	 ("param", "nick", "blurb", 0, 10, 4, 0);
+  xbytes_t *bytes = xbytes_new_static ("Blah", 5);
   xpointer_t ptr = &enum_type;
-  xvariant_t *var = g_variant_new_uint16 (99);
+  xvariant_t *var = xvariant_new_uint16 (99);
   gint64 i64;
-  guint64 ui64;
-  g_variant_ref_sink (var);
+  xuint64_t ui64;
+  xvariant_ref_sink (var);
   i64 = G_MAXINT64 - 1234;
   ui64 = G_MAXUINT64 - 123456;
 
-  test = g_object_new (test_get_type (), NULL);
+  test = xobject_new (test_get_type (), NULL);
 
   all_type_handlers_count = 0;
 
@@ -1048,10 +1048,10 @@ test_all_types (void)
 
   g_assert_cmpint (all_type_handlers_count, ==, 3 + 5 + 5);
 
-  g_object_unref (test);
+  xobject_unref (test);
   g_param_spec_unref (param);
-  g_bytes_unref (bytes);
-  g_variant_unref (var);
+  xbytes_unref (bytes);
+  xvariant_unref (var);
 }
 
 static void
@@ -1060,9 +1060,9 @@ test_connect (void)
   xobject_t *test;
   xint_t retval;
 
-  test = g_object_new (test_get_type (), NULL);
+  test = xobject_new (test_get_type (), NULL);
 
-  g_object_connect (test,
+  xobject_connect (test,
                     "signal::generic-marshaller-int-return",
                     G_CALLBACK (on_generic_marshaller_int_return_signed_1),
                     NULL,
@@ -1075,7 +1075,7 @@ test_connect (void)
   g_signal_emit_by_name (test, "va-marshaller-int-return", &retval);
   g_assert_cmpint (retval, ==, 2);
 
-  g_object_disconnect (test,
+  xobject_disconnect (test,
                        "any-signal",
                        G_CALLBACK (on_generic_marshaller_int_return_signed_1),
                        NULL,
@@ -1084,21 +1084,21 @@ test_connect (void)
                        NULL,
                        NULL);
 
-  g_object_unref (test);
+  xobject_unref (test);
 }
 
 static void
 simple_handler1 (xobject_t *sender,
                  xobject_t *target)
 {
-  g_object_unref (target);
+  xobject_unref (target);
 }
 
 static void
 simple_handler2 (xobject_t *sender,
                  xobject_t *target)
 {
-  g_object_unref (target);
+  xobject_unref (target);
 }
 
 static void
@@ -1106,19 +1106,19 @@ test_destroy_target_object (void)
 {
   Test *sender, *target1, *target2;
 
-  sender = g_object_new (test_get_type (), NULL);
-  target1 = g_object_new (test_get_type (), NULL);
-  target2 = g_object_new (test_get_type (), NULL);
+  sender = xobject_new (test_get_type (), NULL);
+  target1 = xobject_new (test_get_type (), NULL);
+  target2 = xobject_new (test_get_type (), NULL);
   g_signal_connect_object (sender, "simple", G_CALLBACK (simple_handler1), target1, 0);
   g_signal_connect_object (sender, "simple", G_CALLBACK (simple_handler2), target2, 0);
   g_signal_emit_by_name (sender, "simple");
-  g_object_unref (sender);
+  xobject_unref (sender);
 }
 
 static xboolean_t
-hook_func (GSignalInvocationHint *ihint,
+hook_func (xsignal_invocation_hint_t *ihint,
            xuint_t                  n_params,
-           const GValue          *params,
+           const xvalue_t          *params,
            xpointer_t               data)
 {
   xint_t *count = data;
@@ -1135,8 +1135,8 @@ test_emission_hook (void)
   xint_t count = 0;
   gulong hook;
 
-  test1 = g_object_new (test_get_type (), NULL);
-  test2 = g_object_new (test_get_type (), NULL);
+  test1 = xobject_new (test_get_type (), NULL);
+  test2 = xobject_new (test_get_type (), NULL);
 
   hook = g_signal_add_emission_hook (simple_id, 0, hook_func, &count, NULL);
   g_assert_cmpint (count, ==, 0);
@@ -1148,14 +1148,14 @@ test_emission_hook (void)
   g_signal_emit_by_name (test1, "simple");
   g_assert_cmpint (count, ==, 2);
 
-  g_object_unref (test1);
-  g_object_unref (test2);
+  xobject_unref (test1);
+  xobject_unref (test2);
 }
 
 static void
 simple_cb (xpointer_t instance, xpointer_t data)
 {
-  GSignalInvocationHint *ihint;
+  xsignal_invocation_hint_t *ihint;
 
   ihint = g_signal_get_invocation_hint (instance);
 
@@ -1167,7 +1167,7 @@ simple_cb (xpointer_t instance, xpointer_t data)
 static void
 simple2_cb (xpointer_t instance, xpointer_t data)
 {
-  GSignalInvocationHint *ihint;
+  xsignal_invocation_hint_t *ihint;
 
   ihint = g_signal_get_invocation_hint (instance);
 
@@ -1179,23 +1179,23 @@ test_invocation_hint (void)
 {
   xobject_t *test;
 
-  test = g_object_new (test_get_type (), NULL);
+  test = xobject_new (test_get_type (), NULL);
 
   g_signal_connect (test, "simple", G_CALLBACK (simple_cb), NULL);
   g_signal_connect (test, "simple-2", G_CALLBACK (simple2_cb), NULL);
   g_signal_emit_by_name (test, "simple");
 
-  g_object_unref (test);
+  xobject_unref (test);
 }
 
 static xboolean_t
-accumulator_sum (GSignalInvocationHint *ihint,
-                 GValue                *return_accu,
-                 const GValue          *handler_return,
+accumulator_sum (xsignal_invocation_hint_t *ihint,
+                 xvalue_t                *return_accu,
+                 const xvalue_t          *handler_return,
                  xpointer_t               data)
 {
-  xint_t acc = g_value_get_int (return_accu);
-  xint_t ret = g_value_get_int (handler_return);
+  xint_t acc = xvalue_get_int (return_accu);
+  xint_t ret = xvalue_get_int (handler_return);
 
   g_assert_cmpint (ret, >, 0);
 
@@ -1225,7 +1225,7 @@ accumulator_sum (GSignalInvocationHint *ihint,
       g_assert_not_reached ();
     }
 
-  g_value_set_int (return_accu, acc + ret);
+  xvalue_set_int (return_accu, acc + ret);
 
   /* Continue with the other signal handlers as long as the sum is < 6,
    * i.e. don't run simple_accumulator_4_cb() */
@@ -1262,7 +1262,7 @@ test_accumulator (void)
   xobject_t *test;
   xint_t ret = -1;
 
-  test = g_object_new (test_get_type (), NULL);
+  test = xobject_new (test_get_type (), NULL);
 
   /* Connect in reverse order to make sure that LAST signal handlers are
    * called after FIRST signal handlers but signal handlers in each "group"
@@ -1276,21 +1276,21 @@ test_accumulator (void)
   /* simple_accumulator_4_cb() is not run because accumulator is 6 */
   g_assert_cmpint (ret, ==, 6);
 
-  g_object_unref (test);
+  xobject_unref (test);
 }
 
 static xboolean_t
-accumulator_concat_string (GSignalInvocationHint *ihint, GValue *return_accu, const GValue *handler_return, xpointer_t data)
+accumulator_concat_string (xsignal_invocation_hint_t *ihint, xvalue_t *return_accu, const xvalue_t *handler_return, xpointer_t data)
 {
-  const xchar_t *acc = g_value_get_string (return_accu);
-  const xchar_t *ret = g_value_get_string (handler_return);
+  const xchar_t *acc = xvalue_get_string (return_accu);
+  const xchar_t *ret = xvalue_get_string (handler_return);
 
   g_assert_nonnull (ret);
 
   if (acc == NULL)
-    g_value_set_string (return_accu, ret);
+    xvalue_set_string (return_accu, ret);
   else
-    g_value_take_string (return_accu, g_strconcat (acc, ret, NULL));
+    xvalue_take_string (return_accu, xstrconcat (acc, ret, NULL));
 
   return TRUE;
 }
@@ -1298,19 +1298,19 @@ accumulator_concat_string (GSignalInvocationHint *ihint, GValue *return_accu, co
 static xchar_t *
 accumulator_class_before_cb (xpointer_t instance, xpointer_t data)
 {
-  return g_strdup ("before");
+  return xstrdup ("before");
 }
 
 static xchar_t *
 accumulator_class_after_cb (xpointer_t instance, xpointer_t data)
 {
-  return g_strdup ("after");
+  return xstrdup ("after");
 }
 
 static xchar_t *
 accumulator_class (Test *test)
 {
-  return g_strdup ("class");
+  return xstrdup ("class");
 }
 
 static void
@@ -1336,7 +1336,7 @@ test_accumulator_class (void)
 
       g_test_message ("Signal: %s", tests[i].signal_name);
 
-      test = g_object_new (test_get_type (), NULL);
+      test = xobject_new (test_get_type (), NULL);
 
       g_signal_connect (test, tests[i].signal_name, G_CALLBACK (accumulator_class_before_cb), NULL);
       g_signal_connect_after (test, tests[i].signal_name, G_CALLBACK (accumulator_class_after_cb), NULL);
@@ -1345,7 +1345,7 @@ test_accumulator_class (void)
       g_assert_cmpstr (ret, ==, tests[i].return_string);
       g_free (ret);
 
-      g_object_unref (test);
+      xobject_unref (test);
     }
 }
 
@@ -1357,7 +1357,7 @@ in_set (const xchar_t *s,
 
   for (i = 0; set[i]; i++)
     {
-      if (g_strcmp0 (s, set[i]) == 0)
+      if (xstrcmp0 (s, set[i]) == 0)
         return TRUE;
     }
 
@@ -1404,7 +1404,7 @@ test_introspection (void)
   GSignalQuery query;
 
   ids = g_signal_list_ids (test_get_type (), &n_ids);
-  g_assert_cmpuint (n_ids, ==, g_strv_length ((xchar_t**)names));
+  g_assert_cmpuint (n_ids, ==, xstrv_length ((xchar_t**)names));
 
   for (i = 0; i < n_ids; i++)
     {
@@ -1439,8 +1439,8 @@ test_block_handler (void)
   xint_t count2 = 0;
   gulong handler1, handler;
 
-  test1 = g_object_new (test_get_type (), NULL);
-  test2 = g_object_new (test_get_type (), NULL);
+  test1 = xobject_new (test_get_type (), NULL);
+  test2 = xobject_new (test_get_type (), NULL);
 
   handler1 = g_signal_connect (test1, "simple", G_CALLBACK (test_handler), &count1);
   g_signal_connect (test2, "simple", G_CALLBACK (test_handler), &count2);
@@ -1485,8 +1485,8 @@ test_block_handler (void)
 
   g_signal_handlers_unblock_matched (test2, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, test_handler, NULL);
 
-  g_object_unref (test1);
-  g_object_unref (test2);
+  xobject_unref (test1);
+  xobject_unref (test2);
 }
 
 static void
@@ -1513,7 +1513,7 @@ test_stop_emission (void)
   xobject_t *test1;
   gulong handler;
 
-  test1 = g_object_new (test_get_type (), NULL);
+  test1 = xobject_new (test_get_type (), NULL);
   handler = g_signal_connect (test1, "simple", G_CALLBACK (stop_emission), NULL);
   g_signal_connect_after (test1, "simple", G_CALLBACK (dont_reach), NULL);
 
@@ -1524,7 +1524,7 @@ test_stop_emission (void)
 
   g_signal_emit_by_name (test1, "simple");
 
-  g_object_unref (test1);
+  xobject_unref (test1);
 }
 
 static void
@@ -1534,9 +1534,9 @@ test_signal_disconnect_wrong_object (void)
   Test2 *object3;
   xuint_t signal_id;
 
-  object = g_object_new (test_get_type (), NULL);
-  object2 = g_object_new (test_get_type (), NULL);
-  object3 = g_object_new (test2_get_type (), NULL);
+  object = xobject_new (test_get_type (), NULL);
+  object2 = xobject_new (test_get_type (), NULL);
+  object3 = xobject_new (test2_get_type (), NULL);
 
   signal_id = g_signal_connect (object,
                                 "simple",
@@ -1558,9 +1558,9 @@ test_signal_disconnect_wrong_object (void)
   /* it's still connected */
   g_assert_true (g_signal_handler_is_connected (object, signal_id));
 
-  g_object_unref (object);
-  g_object_unref (object2);
-  g_object_unref (object3);
+  xobject_unref (object);
+  xobject_unref (object2);
+  xobject_unref (object3);
 }
 
 static void
@@ -1569,7 +1569,7 @@ test_clear_signal_handler (void)
   xobject_t *test_obj;
   gulong handler;
 
-  test_obj = g_object_new (test_get_type (), NULL);
+  test_obj = xobject_new (test_get_type (), NULL);
 
   handler = g_signal_connect (test_obj, "simple", G_CALLBACK (dont_reach), NULL);
   g_assert_cmpuint (handler, >, 0);
@@ -1591,18 +1591,18 @@ test_clear_signal_handler (void)
       g_test_assert_expected_messages ();
     }
 
-  g_object_unref (test_obj);
+  xobject_unref (test_obj);
 }
 
 static void
 test_lookup (void)
 {
-  GTypeClass *test_class;
+  xtype_class_t *test_class;
   xuint_t signal_id, saved_signal_id;
 
   g_test_summary ("Test that g_signal_lookup() works with a variety of inputs.");
 
-  test_class = g_type_class_ref (test_get_type ());
+  test_class = xtype_class_ref (test_get_type ());
 
   signal_id = g_signal_lookup ("all-types", test_get_type ());
   g_assert_cmpint (signal_id, !=, 0);
@@ -1616,7 +1616,7 @@ test_lookup (void)
   /* Looking up a non-existent signal should return nothing. */
   g_assert_cmpint (g_signal_lookup ("nope", test_get_type ()), ==, 0);
 
-  g_type_class_unref (test_class);
+  xtype_class_unref (test_class);
 }
 
 static void
@@ -1626,15 +1626,15 @@ test_lookup_invalid (void)
 
   if (g_test_subprocess ())
     {
-      GTypeClass *test_class;
+      xtype_class_t *test_class;
       xuint_t signal_id;
 
-      test_class = g_type_class_ref (test_get_type ());
+      test_class = xtype_class_ref (test_get_type ());
 
       signal_id = g_signal_lookup ("", test_get_type ());
       g_assert_cmpint (signal_id, ==, 0);
 
-      g_type_class_unref (test_class);
+      xtype_class_unref (test_class);
       return;
     }
 
@@ -1646,14 +1646,14 @@ test_lookup_invalid (void)
 static void
 test_parse_name (void)
 {
-  GTypeClass *test_class;
+  xtype_class_t *test_class;
   xuint_t signal_id, saved_signal_id;
   xboolean_t retval;
-  GQuark detail, saved_detail;
+  xquark detail, saved_detail;
 
   g_test_summary ("Test that g_signal_parse_name() works with a variety of inputs.");
 
-  test_class = g_type_class_ref (test_get_type ());
+  test_class = xtype_class_ref (test_get_type ());
 
   /* Simple test. */
   retval = g_signal_parse_name ("simple-detailed", test_get_type (), &signal_id, &detail, TRUE);
@@ -1699,16 +1699,16 @@ test_parse_name (void)
   retval = g_signal_parse_name ("all-types::a-detail", test_get_type (), &signal_id, &detail, FALSE);
   g_assert_false (retval);
 
-  g_type_class_unref (test_class);
+  xtype_class_unref (test_class);
 }
 
 static void
 test_parse_name_invalid (void)
 {
-  GTypeClass *test_class;
+  xtype_class_t *test_class;
   xsize_t i;
   xuint_t signal_id;
-  GQuark detail;
+  xquark detail;
   const xchar_t *vectors[] =
     {
       "",
@@ -1724,7 +1724,7 @@ test_parse_name_invalid (void)
 
   g_test_summary ("Test that g_signal_parse_name() ignores a variety of invalid inputs.");
 
-  test_class = g_type_class_ref (test_get_type ());
+  test_class = xtype_class_ref (test_get_type ());
 
   for (i = 0; i < G_N_ELEMENTS (vectors); i++)
     {
@@ -1732,11 +1732,11 @@ test_parse_name_invalid (void)
       g_assert_false (g_signal_parse_name (vectors[i], test_get_type (), &signal_id, &detail, TRUE));
     }
 
-  g_type_class_unref (test_class);
+  xtype_class_unref (test_class);
 }
 
 static void
-test_signals_invalid_name (gconstpointer test_data)
+test_signals_invalid_name (xconstpointer test_data)
 {
   const xchar_t *signal_name = test_data;
 

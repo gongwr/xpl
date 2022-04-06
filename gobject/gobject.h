@@ -103,7 +103,7 @@ G_BEGIN_DECLS
  * Returns: Type name of @object. The string is owned by the type system and
  *  should not be freed.
  */
-#define G_OBJECT_TYPE_NAME(object)  (g_type_name (G_OBJECT_TYPE (object)))
+#define G_OBJECT_TYPE_NAME(object)  (xtype_name (G_OBJECT_TYPE (object)))
 /**
  * G_OBJECT_CLASS_TYPE:
  * @class: a valid #xobject_class_t
@@ -122,12 +122,12 @@ G_BEGIN_DECLS
  * Returns: Type name of @class. The string is owned by the type system and
  *  should not be freed.
  */
-#define G_OBJECT_CLASS_NAME(class)  (g_type_name (G_OBJECT_CLASS_TYPE (class)))
+#define G_OBJECT_CLASS_NAME(class)  (xtype_name (G_OBJECT_CLASS_TYPE (class)))
 /**
  * G_VALUE_HOLDS_OBJECT:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values derived from type %XTYPE_OBJECT.
+ * Checks whether the given #xvalue_t can hold values derived from type %XTYPE_OBJECT.
  *
  * Returns: %TRUE on success.
  */
@@ -137,28 +137,28 @@ G_BEGIN_DECLS
 /**
  * XTYPE_INITIALLY_UNOWNED:
  *
- * The type for #GInitiallyUnowned.
+ * The type for #xinitially_unowned_t.
  */
-#define XTYPE_INITIALLY_UNOWNED	      (g_initially_unowned_get_type())
+#define XTYPE_INITIALLY_UNOWNED	      (xinitially_unowned_get_type())
 /**
  * G_INITIALLY_UNOWNED:
  * @object: Object which is subject to casting.
  *
- * Casts a #GInitiallyUnowned or derived pointer into a (GInitiallyUnowned*)
+ * Casts a #xinitially_unowned_t or derived pointer into a (xinitially_unowned_t*)
  * pointer.
  *
  * Depending on the current debugging level, this function may invoke
  * certain runtime checks to identify invalid casts.
  */
-#define G_INITIALLY_UNOWNED(object)           (XTYPE_CHECK_INSTANCE_CAST ((object), XTYPE_INITIALLY_UNOWNED, GInitiallyUnowned))
+#define G_INITIALLY_UNOWNED(object)           (XTYPE_CHECK_INSTANCE_CAST ((object), XTYPE_INITIALLY_UNOWNED, xinitially_unowned_t))
 /**
  * G_INITIALLY_UNOWNED_CLASS:
- * @class: a valid #GInitiallyUnownedClass
+ * @class: a valid #xinitially_unowned_class_t
  *
- * Casts a derived #GInitiallyUnownedClass structure into a
- * #GInitiallyUnownedClass structure.
+ * Casts a derived #xinitially_unowned_class_t structure into a
+ * #xinitially_unowned_class_t structure.
  */
-#define G_INITIALLY_UNOWNED_CLASS(class)      (XTYPE_CHECK_CLASS_CAST ((class), XTYPE_INITIALLY_UNOWNED, GInitiallyUnownedClass))
+#define G_INITIALLY_UNOWNED_CLASS(class)      (XTYPE_CHECK_CLASS_CAST ((class), XTYPE_INITIALLY_UNOWNED, xinitially_unowned_class_t))
 /**
  * X_IS_INITIALLY_UNOWNED:
  * @object: Instance to check for being a %XTYPE_INITIALLY_UNOWNED.
@@ -168,58 +168,58 @@ G_BEGIN_DECLS
 #define X_IS_INITIALLY_UNOWNED(object)        (XTYPE_CHECK_INSTANCE_TYPE ((object), XTYPE_INITIALLY_UNOWNED))
 /**
  * X_IS_INITIALLY_UNOWNED_CLASS:
- * @class: a #GInitiallyUnownedClass
+ * @class: a #xinitially_unowned_class_t
  *
- * Checks whether @class "is a" valid #GInitiallyUnownedClass structure of type
+ * Checks whether @class "is a" valid #xinitially_unowned_class_t structure of type
  * %XTYPE_INITIALLY_UNOWNED or derived.
  */
 #define X_IS_INITIALLY_UNOWNED_CLASS(class)   (XTYPE_CHECK_CLASS_TYPE ((class), XTYPE_INITIALLY_UNOWNED))
 /**
  * G_INITIALLY_UNOWNED_GET_CLASS:
- * @object: a #GInitiallyUnowned instance.
+ * @object: a #xinitially_unowned_t instance.
  *
- * Get the class structure associated to a #GInitiallyUnowned instance.
+ * Get the class structure associated to a #xinitially_unowned_t instance.
  *
  * Returns: pointer to object class structure.
  */
-#define G_INITIALLY_UNOWNED_GET_CLASS(object) (XTYPE_INSTANCE_GET_CLASS ((object), XTYPE_INITIALLY_UNOWNED, GInitiallyUnownedClass))
-/* GInitiallyUnowned ia a xobject_t with initially floating reference count */
+#define G_INITIALLY_UNOWNED_GET_CLASS(object) (XTYPE_INSTANCE_GET_CLASS ((object), XTYPE_INITIALLY_UNOWNED, xinitially_unowned_class_t))
+/* xinitially_unowned_t ia a xobject_t with initially floating reference count */
 
 
 /* --- typedefs & structures --- */
 typedef struct _GObject                  xobject_t;
 typedef struct _GObjectClass             xobject_class_t;
-typedef struct _GObject                  GInitiallyUnowned;
-typedef struct _GObjectClass             GInitiallyUnownedClass;
+typedef struct _GObject                  xinitially_unowned_t;
+typedef struct _GObjectClass             xinitially_unowned_class_t;
 typedef struct _GObjectConstructParam    GObjectConstructParam;
 /**
  * GObjectGetPropertyFunc:
  * @object: a #xobject_t
  * @property_id: the numeric id under which the property was registered with
- *  g_object_class_install_property().
- * @value: a #GValue to return the property value in
- * @pspec: the #GParamSpec describing the property
+ *  xobject_class_install_property().
+ * @value: a #xvalue_t to return the property value in
+ * @pspec: the #xparam_spec_t describing the property
  *
  * The type of the @get_property function of #xobject_class_t.
  */
 typedef void (*GObjectGetPropertyFunc)  (xobject_t      *object,
                                          xuint_t         property_id,
-                                         GValue       *value,
-                                         GParamSpec   *pspec);
+                                         xvalue_t       *value,
+                                         xparam_spec_t   *pspec);
 /**
  * GObjectSetPropertyFunc:
  * @object: a #xobject_t
  * @property_id: the numeric id under which the property was registered with
- *  g_object_class_install_property().
+ *  xobject_class_install_property().
  * @value: the new value for the property
- * @pspec: the #GParamSpec describing the property
+ * @pspec: the #xparam_spec_t describing the property
  *
  * The type of the @set_property function of #xobject_class_t.
  */
 typedef void (*GObjectSetPropertyFunc)  (xobject_t      *object,
                                          xuint_t         property_id,
-                                         const GValue *value,
-                                         GParamSpec   *pspec);
+                                         const xvalue_t *value,
+                                         xparam_spec_t   *pspec);
 /**
  * GObjectFinalizeFunc:
  * @object: the #xobject_t being finalized
@@ -239,9 +239,9 @@ typedef void (*GObjectFinalizeFunc)     (xobject_t      *object);
  * there's not much you could do with the object, apart from e.g. using its
  * address as hash-index or the like.
  *
- * In particular, this means it’s invalid to call g_object_ref(),
- * g_weak_ref_init(), g_weak_ref_set(), g_object_add_toggle_ref(),
- * g_object_weak_ref(), g_object_add_weak_pointer() or any function which calls
+ * In particular, this means it’s invalid to call xobject_ref(),
+ * g_weak_ref_init(), g_weak_ref_set(), xobject_add_toggle_ref(),
+ * xobject_weak_ref(), xobject_add_weak_pointer() or any function which calls
  * them on the object from this callback.
  */
 typedef void (*GWeakNotify)		(xpointer_t      data,
@@ -255,7 +255,7 @@ typedef void (*GWeakNotify)		(xpointer_t      data,
  * and should never be accessed directly.
  *
  * Since GLib 2.72, all #GObjects are guaranteed to be aligned to at least the
- * alignment of the largest basic GLib type (typically this is #guint64 or
+ * alignment of the largest basic GLib type (typically this is #xuint64_t or
  * #xdouble_t). If you need larger alignment for an element in a #xobject_t, you
  * should allocate it on the heap (aligned), or arrange for your #xobject_t to be
  * appropriately padded. This guarantee applies to the #xobject_t (or derived)
@@ -264,7 +264,7 @@ typedef void (*GWeakNotify)		(xpointer_t      data,
  */
 struct  _GObject
 {
-  GTypeInstance  g_type_instance;
+  GTypeInstance  xtype_instance;
 
   /*< private >*/
   xuint_t          ref_count;  /* (atomic) */
@@ -272,8 +272,8 @@ struct  _GObject
 };
 /**
  * xobject_class_t:
- * @g_type_class: the parent class
- * @constructor: the @constructor function is called by g_object_new () to
+ * @xtype_class: the parent class
+ * @constructor: the @constructor function is called by xobject_new () to
  *  complete the object initialization after all the construction properties are
  *  set. The first thing a @constructor implementation must do is chain up to the
  *  @constructor of the parent class. Overriding @constructor should be rarely
@@ -297,7 +297,7 @@ struct  _GObject
  *  of properties. Overriding @dispatch_properties_changed should be rarely
  *  needed.
  * @notify: the class closure for the notify signal
- * @constructed: the @constructed function is called by g_object_new() as the
+ * @constructed: the @constructed function is called by xobject_new() as the
  *  final step of the object creation process.  At the point of the call, all
  *  construction properties have been set on the object.  The purpose of this
  *  call is to allow for object initialisation steps that can only be performed
@@ -326,7 +326,7 @@ struct  _GObject
  *       the_singleton = MY_SINGLETON (object);
  *     }
  *   else
- *     object = g_object_ref (G_OBJECT (the_singleton));
+ *     object = xobject_ref (G_OBJECT (the_singleton));
  *
  *   return object;
  * }
@@ -334,10 +334,10 @@ struct  _GObject
  */
 struct  _GObjectClass
 {
-  GTypeClass   g_type_class;
+  xtype_class_t   xtype_class;
 
   /*< private >*/
-  GSList      *construct_properties;
+  xslist_t      *construct_properties;
 
   /*< public >*/
   /* seldom overridden */
@@ -347,21 +347,21 @@ struct  _GObjectClass
   /* overridable methods */
   void       (*set_property)		(xobject_t        *object,
                                          xuint_t           property_id,
-                                         const GValue   *value,
-                                         GParamSpec     *pspec);
+                                         const xvalue_t   *value,
+                                         xparam_spec_t     *pspec);
   void       (*get_property)		(xobject_t        *object,
                                          xuint_t           property_id,
-                                         GValue         *value,
-                                         GParamSpec     *pspec);
+                                         xvalue_t         *value,
+                                         xparam_spec_t     *pspec);
   void       (*dispose)			(xobject_t        *object);
   void       (*finalize)		(xobject_t        *object);
   /* seldom overridden */
   void       (*dispatch_properties_changed) (xobject_t      *object,
 					     xuint_t	   n_pspecs,
-					     GParamSpec  **pspecs);
+					     xparam_spec_t  **pspecs);
   /* signals */
   void	     (*notify)			(xobject_t	*object,
-					 GParamSpec	*pspec);
+					 xparam_spec_t	*pspec);
 
   /* called when done constructing */
   void	     (*constructed)		(xobject_t	*object);
@@ -375,177 +375,177 @@ struct  _GObjectClass
 
 /**
  * GObjectConstructParam:
- * @pspec: the #GParamSpec of the construct parameter
+ * @pspec: the #xparam_spec_t of the construct parameter
  * @value: the value to set the parameter to
  *
  * The GObjectConstructParam struct is an auxiliary structure used to hand
- * #GParamSpec/#GValue pairs to the @constructor of a #xobject_class_t.
+ * #xparam_spec_t/#xvalue_t pairs to the @constructor of a #xobject_class_t.
  */
 struct _GObjectConstructParam
 {
-  GParamSpec *pspec;
-  GValue     *value;
+  xparam_spec_t *pspec;
+  xvalue_t     *value;
 };
 
 /**
- * GInitiallyUnowned:
+ * xinitially_unowned_t:
  *
  * A type for objects that have an initially floating reference.
  *
- * All the fields in the `GInitiallyUnowned` structure are private to the
+ * All the fields in the `xinitially_unowned_t` structure are private to the
  * implementation and should never be accessed directly.
  */
 /**
- * GInitiallyUnownedClass:
+ * xinitially_unowned_class_t:
  *
- * The class structure for the GInitiallyUnowned type.
+ * The class structure for the xinitially_unowned_t type.
  */
 
 
 /* --- prototypes --- */
 XPL_AVAILABLE_IN_ALL
-xtype_t       g_initially_unowned_get_type      (void);
+xtype_t       xinitially_unowned_get_type      (void);
 XPL_AVAILABLE_IN_ALL
-void        g_object_class_install_property   (xobject_class_t   *oclass,
+void        xobject_class_install_property   (xobject_class_t   *oclass,
 					       xuint_t           property_id,
-					       GParamSpec     *pspec);
+					       xparam_spec_t     *pspec);
 XPL_AVAILABLE_IN_ALL
-GParamSpec* g_object_class_find_property      (xobject_class_t   *oclass,
+xparam_spec_t* xobject_class_find_property      (xobject_class_t   *oclass,
 					       const xchar_t    *property_name);
 XPL_AVAILABLE_IN_ALL
-GParamSpec**g_object_class_list_properties    (xobject_class_t   *oclass,
+xparam_spec_t**xobject_class_list_properties    (xobject_class_t   *oclass,
 					       xuint_t	      *n_properties);
 XPL_AVAILABLE_IN_ALL
-void        g_object_class_override_property  (xobject_class_t   *oclass,
+void        xobject_class_override_property  (xobject_class_t   *oclass,
 					       xuint_t           property_id,
 					       const xchar_t    *name);
 XPL_AVAILABLE_IN_ALL
-void        g_object_class_install_properties (xobject_class_t   *oclass,
+void        xobject_class_install_properties (xobject_class_t   *oclass,
                                                xuint_t           n_pspecs,
-                                               GParamSpec    **pspecs);
+                                               xparam_spec_t    **pspecs);
 
 XPL_AVAILABLE_IN_ALL
-void        g_object_interface_install_property (xpointer_t     x_iface,
-						 GParamSpec  *pspec);
+void        xobject_interface_install_property (xpointer_t     x_iface,
+						 xparam_spec_t  *pspec);
 XPL_AVAILABLE_IN_ALL
-GParamSpec* g_object_interface_find_property    (xpointer_t     x_iface,
+xparam_spec_t* xobject_interface_find_property    (xpointer_t     x_iface,
 						 const xchar_t *property_name);
 XPL_AVAILABLE_IN_ALL
-GParamSpec**g_object_interface_list_properties  (xpointer_t     x_iface,
+xparam_spec_t**xobject_interface_list_properties  (xpointer_t     x_iface,
 						 xuint_t       *n_properties_p);
 
 XPL_AVAILABLE_IN_ALL
-xtype_t       g_object_get_type                 (void) G_GNUC_CONST;
+xtype_t       xobject_get_type                 (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xpointer_t    g_object_new                      (xtype_t           object_type,
+xpointer_t    xobject_new                      (xtype_t           object_type,
 					       const xchar_t    *first_property_name,
 					       ...);
 XPL_AVAILABLE_IN_2_54
-xobject_t*    g_object_new_with_properties      (xtype_t           object_type,
+xobject_t*    xobject_new_with_properties      (xtype_t           object_type,
                                                xuint_t           n_properties,
                                                const char     *names[],
-                                               const GValue    values[]);
+                                               const xvalue_t    values[]);
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 
-XPL_DEPRECATED_IN_2_54_FOR(g_object_new_with_properties)
-xpointer_t    g_object_newv		      (xtype_t           object_type,
+XPL_DEPRECATED_IN_2_54_FOR(xobject_new_with_properties)
+xpointer_t    xobject_newv		      (xtype_t           object_type,
 					       xuint_t	       n_parameters,
 					       GParameter     *parameters);
 
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 XPL_AVAILABLE_IN_ALL
-xobject_t*    g_object_new_valist               (xtype_t           object_type,
+xobject_t*    xobject_new_valist               (xtype_t           object_type,
 					       const xchar_t    *first_property_name,
 					       va_list         var_args);
 XPL_AVAILABLE_IN_ALL
-void	    g_object_set                      (xpointer_t	       object,
+void	    xobject_set                      (xpointer_t	       object,
 					       const xchar_t    *first_property_name,
 					       ...) G_GNUC_NULL_TERMINATED;
 XPL_AVAILABLE_IN_ALL
-void        g_object_get                      (xpointer_t        object,
+void        xobject_get                      (xpointer_t        object,
 					       const xchar_t    *first_property_name,
 					       ...) G_GNUC_NULL_TERMINATED;
 XPL_AVAILABLE_IN_ALL
-xpointer_t    g_object_connect                  (xpointer_t	       object,
+xpointer_t    xobject_connect                  (xpointer_t	       object,
 					       const xchar_t    *signal_spec,
 					       ...) G_GNUC_NULL_TERMINATED;
 XPL_AVAILABLE_IN_ALL
-void	    g_object_disconnect               (xpointer_t	       object,
+void	    xobject_disconnect               (xpointer_t	       object,
 					       const xchar_t    *signal_spec,
 					       ...) G_GNUC_NULL_TERMINATED;
 XPL_AVAILABLE_IN_2_54
-void        g_object_setv                     (xobject_t        *object,
+void        xobject_setv                     (xobject_t        *object,
                                                xuint_t           n_properties,
                                                const xchar_t    *names[],
-                                               const GValue    values[]);
+                                               const xvalue_t    values[]);
 XPL_AVAILABLE_IN_ALL
-void        g_object_set_valist               (xobject_t        *object,
+void        xobject_set_valist               (xobject_t        *object,
 					       const xchar_t    *first_property_name,
 					       va_list         var_args);
 XPL_AVAILABLE_IN_2_54
-void        g_object_getv                     (xobject_t        *object,
+void        xobject_getv                     (xobject_t        *object,
                                                xuint_t           n_properties,
                                                const xchar_t    *names[],
-                                               GValue          values[]);
+                                               xvalue_t          values[]);
 XPL_AVAILABLE_IN_ALL
-void        g_object_get_valist               (xobject_t        *object,
+void        xobject_get_valist               (xobject_t        *object,
 					       const xchar_t    *first_property_name,
 					       va_list         var_args);
 XPL_AVAILABLE_IN_ALL
-void        g_object_set_property             (xobject_t        *object,
+void        xobject_set_property             (xobject_t        *object,
 					       const xchar_t    *property_name,
-					       const GValue   *value);
+					       const xvalue_t   *value);
 XPL_AVAILABLE_IN_ALL
-void        g_object_get_property             (xobject_t        *object,
+void        xobject_get_property             (xobject_t        *object,
 					       const xchar_t    *property_name,
-					       GValue         *value);
+					       xvalue_t         *value);
 XPL_AVAILABLE_IN_ALL
-void        g_object_freeze_notify            (xobject_t        *object);
+void        xobject_freeze_notify            (xobject_t        *object);
 XPL_AVAILABLE_IN_ALL
-void        g_object_notify                   (xobject_t        *object,
+void        xobject_notify                   (xobject_t        *object,
 					       const xchar_t    *property_name);
 XPL_AVAILABLE_IN_ALL
-void        g_object_notify_by_pspec          (xobject_t        *object,
-					       GParamSpec     *pspec);
+void        xobject_notify_by_pspec          (xobject_t        *object,
+					       xparam_spec_t     *pspec);
 XPL_AVAILABLE_IN_ALL
-void        g_object_thaw_notify              (xobject_t        *object);
+void        xobject_thaw_notify              (xobject_t        *object);
 XPL_AVAILABLE_IN_ALL
-xboolean_t    g_object_is_floating    	      (xpointer_t        object);
+xboolean_t    xobject_is_floating    	      (xpointer_t        object);
 XPL_AVAILABLE_IN_ALL
-xpointer_t    g_object_ref_sink       	      (xpointer_t	       object);
+xpointer_t    xobject_ref_sink       	      (xpointer_t	       object);
 XPL_AVAILABLE_IN_2_70
-xpointer_t    g_object_take_ref                 (xpointer_t        object);
+xpointer_t    xobject_take_ref                 (xpointer_t        object);
 XPL_AVAILABLE_IN_ALL
-xpointer_t    g_object_ref                      (xpointer_t        object);
+xpointer_t    xobject_ref                      (xpointer_t        object);
 XPL_AVAILABLE_IN_ALL
-void        g_object_unref                    (xpointer_t        object);
+void        xobject_unref                    (xpointer_t        object);
 XPL_AVAILABLE_IN_ALL
-void	    g_object_weak_ref		      (xobject_t	      *object,
+void	    xobject_weak_ref		      (xobject_t	      *object,
 					       GWeakNotify     notify,
 					       xpointer_t	       data);
 XPL_AVAILABLE_IN_ALL
-void	    g_object_weak_unref		      (xobject_t	      *object,
+void	    xobject_weak_unref		      (xobject_t	      *object,
 					       GWeakNotify     notify,
 					       xpointer_t	       data);
 XPL_AVAILABLE_IN_ALL
-void        g_object_add_weak_pointer         (xobject_t        *object,
+void        xobject_add_weak_pointer         (xobject_t        *object,
                                                xpointer_t       *weak_pointer_location);
 XPL_AVAILABLE_IN_ALL
-void        g_object_remove_weak_pointer      (xobject_t        *object,
+void        xobject_remove_weak_pointer      (xobject_t        *object,
                                                xpointer_t       *weak_pointer_location);
 
 #if defined(glib_typeof) && XPL_VERSION_MAX_ALLOWED >= XPL_VERSION_2_56
 /* Make reference APIs type safe with macros */
-#define g_object_ref(Obj) ((glib_typeof (Obj)) (g_object_ref) (Obj))
-#define g_object_ref_sink(Obj) ((glib_typeof (Obj)) (g_object_ref_sink) (Obj))
+#define xobject_ref(Obj) ((glib_typeof (Obj)) (xobject_ref) (Obj))
+#define xobject_ref_sink(Obj) ((glib_typeof (Obj)) (xobject_ref_sink) (Obj))
 #endif
 
 /**
  * GToggleNotify:
- * @data: Callback data passed to g_object_add_toggle_ref()
- * @object: The object on which g_object_add_toggle_ref() was called.
+ * @data: Callback data passed to xobject_add_toggle_ref()
+ * @object: The object on which xobject_add_toggle_ref() was called.
  * @is_last_ref: %TRUE if the toggle reference is now the
  *  last reference to the object. %FALSE if the toggle
  *  reference was the last reference and there are now other
@@ -554,143 +554,143 @@ void        g_object_remove_weak_pointer      (xobject_t        *object,
  * A callback function used for notification when the state
  * of a toggle reference changes.
  *
- * See also: g_object_add_toggle_ref()
+ * See also: xobject_add_toggle_ref()
  */
 typedef void (*GToggleNotify) (xpointer_t      data,
 			       xobject_t      *object,
 			       xboolean_t      is_last_ref);
 
 XPL_AVAILABLE_IN_ALL
-void g_object_add_toggle_ref    (xobject_t       *object,
+void xobject_add_toggle_ref    (xobject_t       *object,
 				 GToggleNotify  notify,
 				 xpointer_t       data);
 XPL_AVAILABLE_IN_ALL
-void g_object_remove_toggle_ref (xobject_t       *object,
+void xobject_remove_toggle_ref (xobject_t       *object,
 				 GToggleNotify  notify,
 				 xpointer_t       data);
 
 XPL_AVAILABLE_IN_ALL
-xpointer_t    g_object_get_qdata                (xobject_t        *object,
-					       GQuark          quark);
+xpointer_t    xobject_get_qdata                (xobject_t        *object,
+					       xquark          quark);
 XPL_AVAILABLE_IN_ALL
-void        g_object_set_qdata                (xobject_t        *object,
-					       GQuark          quark,
+void        xobject_set_qdata                (xobject_t        *object,
+					       xquark          quark,
 					       xpointer_t        data);
 XPL_AVAILABLE_IN_ALL
-void        g_object_set_qdata_full           (xobject_t        *object,
-					       GQuark          quark,
+void        xobject_set_qdata_full           (xobject_t        *object,
+					       xquark          quark,
 					       xpointer_t        data,
-					       GDestroyNotify  destroy);
+					       xdestroy_notify_t  destroy);
 XPL_AVAILABLE_IN_ALL
-xpointer_t    g_object_steal_qdata              (xobject_t        *object,
-					       GQuark          quark);
+xpointer_t    xobject_steal_qdata              (xobject_t        *object,
+					       xquark          quark);
 
 XPL_AVAILABLE_IN_2_34
-xpointer_t    g_object_dup_qdata                (xobject_t        *object,
-                                               GQuark          quark,
+xpointer_t    xobject_dup_qdata                (xobject_t        *object,
+                                               xquark          quark,
                                                GDuplicateFunc  dup_func,
 					       xpointer_t         user_data);
 XPL_AVAILABLE_IN_2_34
-xboolean_t    g_object_replace_qdata            (xobject_t        *object,
-                                               GQuark          quark,
+xboolean_t    xobject_replace_qdata            (xobject_t        *object,
+                                               xquark          quark,
                                                xpointer_t        oldval,
                                                xpointer_t        newval,
-                                               GDestroyNotify  destroy,
-					       GDestroyNotify *old_destroy);
+                                               xdestroy_notify_t  destroy,
+					       xdestroy_notify_t *old_destroy);
 
 XPL_AVAILABLE_IN_ALL
-xpointer_t    g_object_get_data                 (xobject_t        *object,
+xpointer_t    xobject_get_data                 (xobject_t        *object,
 					       const xchar_t    *key);
 XPL_AVAILABLE_IN_ALL
-void        g_object_set_data                 (xobject_t        *object,
+void        xobject_set_data                 (xobject_t        *object,
 					       const xchar_t    *key,
 					       xpointer_t        data);
 XPL_AVAILABLE_IN_ALL
-void        g_object_set_data_full            (xobject_t        *object,
+void        xobject_set_data_full            (xobject_t        *object,
 					       const xchar_t    *key,
 					       xpointer_t        data,
-					       GDestroyNotify  destroy);
+					       xdestroy_notify_t  destroy);
 XPL_AVAILABLE_IN_ALL
-xpointer_t    g_object_steal_data               (xobject_t        *object,
+xpointer_t    xobject_steal_data               (xobject_t        *object,
 					       const xchar_t    *key);
 
 XPL_AVAILABLE_IN_2_34
-xpointer_t    g_object_dup_data                 (xobject_t        *object,
+xpointer_t    xobject_dup_data                 (xobject_t        *object,
                                                const xchar_t    *key,
                                                GDuplicateFunc  dup_func,
 					       xpointer_t         user_data);
 XPL_AVAILABLE_IN_2_34
-xboolean_t    g_object_replace_data             (xobject_t        *object,
+xboolean_t    xobject_replace_data             (xobject_t        *object,
                                                const xchar_t    *key,
                                                xpointer_t        oldval,
                                                xpointer_t        newval,
-                                               GDestroyNotify  destroy,
-					       GDestroyNotify *old_destroy);
+                                               xdestroy_notify_t  destroy,
+					       xdestroy_notify_t *old_destroy);
 
 
 XPL_AVAILABLE_IN_ALL
-void        g_object_watch_closure            (xobject_t        *object,
-					       GClosure       *closure);
+void        xobject_watch_closure            (xobject_t        *object,
+					       xclosure_t       *closure);
 XPL_AVAILABLE_IN_ALL
-GClosure*   g_cclosure_new_object             (GCallback       callback_func,
+xclosure_t*   g_cclosure_new_object             (xcallback_t       callback_func,
 					       xobject_t	      *object);
 XPL_AVAILABLE_IN_ALL
-GClosure*   g_cclosure_new_object_swap        (GCallback       callback_func,
+xclosure_t*   g_cclosure_new_object_swap        (xcallback_t       callback_func,
 					       xobject_t	      *object);
 XPL_AVAILABLE_IN_ALL
-GClosure*   g_closure_new_object              (xuint_t           sizeof_closure,
+xclosure_t*   xclosure_new_object              (xuint_t           sizeof_closure,
 					       xobject_t        *object);
 XPL_AVAILABLE_IN_ALL
-void        g_value_set_object                (GValue         *value,
+void        xvalue_set_object                (xvalue_t         *value,
 					       xpointer_t        v_object);
 XPL_AVAILABLE_IN_ALL
-xpointer_t    g_value_get_object                (const GValue   *value);
+xpointer_t    xvalue_get_object                (const xvalue_t   *value);
 XPL_AVAILABLE_IN_ALL
-xpointer_t    g_value_dup_object                (const GValue   *value);
+xpointer_t    xvalue_dup_object                (const xvalue_t   *value);
 XPL_AVAILABLE_IN_ALL
 gulong	    g_signal_connect_object           (xpointer_t	       instance,
 					       const xchar_t    *detailed_signal,
-					       GCallback       c_handler,
+					       xcallback_t       c_handler,
 					       xpointer_t	       gobject,
 					       GConnectFlags   connect_flags);
 
 /*< protected >*/
 XPL_AVAILABLE_IN_ALL
-void        g_object_force_floating           (xobject_t        *object);
+void        xobject_force_floating           (xobject_t        *object);
 XPL_AVAILABLE_IN_ALL
-void        g_object_run_dispose	      (xobject_t	      *object);
+void        xobject_run_dispose	      (xobject_t	      *object);
 
 
 XPL_AVAILABLE_IN_ALL
-void        g_value_take_object               (GValue         *value,
+void        xvalue_take_object               (xvalue_t         *value,
 					       xpointer_t        v_object);
-XPL_DEPRECATED_FOR(g_value_take_object)
-void        g_value_set_object_take_ownership (GValue         *value,
+XPL_DEPRECATED_FOR(xvalue_take_object)
+void        xvalue_set_object_take_ownership (xvalue_t         *value,
                                                xpointer_t        v_object);
 
 XPL_DEPRECATED
-xsize_t	    g_object_compat_control	      (xsize_t	       what,
+xsize_t	    xobject_compat_control	      (xsize_t	       what,
 					       xpointer_t	       data);
 
 /* --- implementation macros --- */
 #define G_OBJECT_WARN_INVALID_PSPEC(object, pname, property_id, pspec) \
 G_STMT_START { \
   xobject_t *_glib__object = (xobject_t*) (object); \
-  GParamSpec *_glib__pspec = (GParamSpec*) (pspec); \
+  xparam_spec_t *_glib__pspec = (xparam_spec_t*) (pspec); \
   xuint_t _glib__property_id = (property_id); \
   g_warning ("%s:%d: invalid %s id %u for \"%s\" of type '%s' in '%s'", \
              __FILE__, __LINE__, \
              (pname), \
              _glib__property_id, \
              _glib__pspec->name, \
-             g_type_name (G_PARAM_SPEC_TYPE (_glib__pspec)), \
+             xtype_name (G_PARAM_SPEC_TYPE (_glib__pspec)), \
              G_OBJECT_TYPE_NAME (_glib__object)); \
 } G_STMT_END
 /**
  * G_OBJECT_WARN_INVALID_PROPERTY_ID:
  * @object: the #xobject_t on which set_property() or get_property() was called
  * @property_id: the numeric id of the property
- * @pspec: the #GParamSpec of the property
+ * @pspec: the #xparam_spec_t of the property
  *
  * This macro should be used to emit a standard warning about unexpected
  * properties in set_property() and get_property() implementations.
@@ -700,7 +700,7 @@ G_STMT_START { \
 
 XPL_AVAILABLE_IN_ALL
 void    g_clear_object (xobject_t **object_ptr);
-#define g_clear_object(object_ptr) g_clear_pointer ((object_ptr), g_object_unref)
+#define g_clear_object(object_ptr) g_clear_pointer ((object_ptr), xobject_unref)
 
 /**
  * g_set_object: (skip)
@@ -723,14 +723,14 @@ void    g_clear_object (xobject_t **object_ptr);
  * One convenient usage of this function is in implementing property setters:
  * |[
  *   void
- *   foo_set_bar (Foo *foo,
+ *   foo_set_bar (foo_t *foo,
  *                Bar *new_bar)
  *   {
  *     g_return_if_fail (IS_FOO (foo));
  *     g_return_if_fail (new_bar == NULL || IS_BAR (new_bar));
  *
  *     if (g_set_object (&foo->bar, new_bar))
- *       g_object_notify (foo, "bar");
+ *       xobject_notify (foo, "bar");
  *   }
  * ]|
  *
@@ -744,7 +744,7 @@ static inline xboolean_t
 {
   xobject_t *old_object = *object_ptr;
 
-  /* rely on g_object_[un]ref() to check the pointers are actually GObjects;
+  /* rely on xobject_[un]ref() to check the pointers are actually GObjects;
    * elide a (object_ptr != NULL) check because most of the time we will be
    * operating on struct members with a constant offset, so a NULL check would
    * not catch bugs
@@ -754,12 +754,12 @@ static inline xboolean_t
     return FALSE;
 
   if (new_object != NULL)
-    g_object_ref (new_object);
+    xobject_ref (new_object);
 
   *object_ptr = new_object;
 
   if (old_object != NULL)
-    g_object_unref (old_object);
+    xobject_unref (old_object);
 
   return TRUE;
 }
@@ -794,11 +794,11 @@ static inline xboolean_t
  * @object: (transfer full) (type xobject_t.Object): an object
  *
  * Assert that @object is non-%NULL, then release one reference to it with
- * g_object_unref() and assert that it has been finalized (i.e. that there
+ * xobject_unref() and assert that it has been finalized (i.e. that there
  * are no more references).
  *
  * If assertions are disabled via `G_DISABLE_ASSERT`,
- * this macro just calls g_object_unref() without any further checks.
+ * this macro just calls xobject_unref() without any further checks.
  *
  * This macro should only be used in regression tests.
  *
@@ -810,13 +810,13 @@ static inline void
   xpointer_t weak_pointer = object;
 
   g_assert_true (X_IS_OBJECT (weak_pointer));
-  g_object_add_weak_pointer (object, &weak_pointer);
-  g_object_unref (weak_pointer);
+  xobject_add_weak_pointer (object, &weak_pointer);
+  xobject_unref (weak_pointer);
   g_assert_null (weak_pointer);
 }
 
 #ifdef G_DISABLE_ASSERT
-#define g_assert_finalize_object(object) g_object_unref (object)
+#define g_assert_finalize_object(object) xobject_unref (object)
 #else
 #define g_assert_finalize_object(object) (g_assert_finalize_object ((xobject_t *) object))
 #endif
@@ -846,7 +846,7 @@ static inline void
 
   if (object != NULL)
     {
-      g_object_remove_weak_pointer (object, weak_pointer_location);
+      xobject_remove_weak_pointer (object, weak_pointer_location);
       *weak_pointer_location = NULL;
     }
 }
@@ -867,7 +867,7 @@ static inline void
  * It assigns @new_object to @weak_pointer_location and ensures
  * that @weak_pointer_location will automatically be set to %NULL
  * if @new_object gets destroyed. The assignment is not atomic.
- * The weak reference is not thread-safe, see g_object_add_weak_pointer()
+ * The weak reference is not thread-safe, see xobject_add_weak_pointer()
  * for details.
  *
  * The @weak_pointer_location argument must not be %NULL.
@@ -879,14 +879,14 @@ static inline void
  * One convenient usage of this function is in implementing property setters:
  * |[
  *   void
- *   foo_set_bar (Foo *foo,
+ *   foo_set_bar (foo_t *foo,
  *                Bar *new_bar)
  *   {
  *     g_return_if_fail (IS_FOO (foo));
  *     g_return_if_fail (new_bar == NULL || IS_BAR (new_bar));
  *
  *     if (g_set_weak_pointer (&foo->bar, new_bar))
- *       g_object_notify (foo, "bar");
+ *       xobject_notify (foo, "bar");
  *   }
  * ]|
  *
@@ -909,12 +909,12 @@ static inline xboolean_t
     return FALSE;
 
   if (old_object != NULL)
-    g_object_remove_weak_pointer (old_object, weak_pointer_location);
+    xobject_remove_weak_pointer (old_object, weak_pointer_location);
 
   *weak_pointer_location = new_object;
 
   if (new_object != NULL)
-    g_object_add_weak_pointer (new_object, weak_pointer_location);
+    xobject_add_weak_pointer (new_object, weak_pointer_location);
 
   return TRUE;
 }

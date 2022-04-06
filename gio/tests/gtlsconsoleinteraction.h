@@ -25,7 +25,7 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_TLS_CONSOLE_INTERACTION         (g_tls_console_interaction_get_type ())
+#define XTYPE_TLS_CONSOLE_INTERACTION         (xtls_console_interaction_get_type ())
 #define G_TLS_CONSOLE_INTERACTION(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_TLS_CONSOLE_INTERACTION, GTlsConsoleInteraction))
 #define G_TLS_CONSOLE_INTERACTION_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_TLS_CONSOLE_INTERACTION, GTlsConsoleInteractionClass))
 #define X_IS_TLS_CONSOLE_INTERACTION(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_TLS_CONSOLE_INTERACTION))
@@ -37,7 +37,7 @@ typedef struct _GTlsConsoleInteractionClass   GTlsConsoleInteractionClass;
 
 struct _GTlsConsoleInteraction
 {
-  GTlsInteraction parent_instance;
+  xtls_interaction_t parent_instance;
 };
 
 struct _GTlsConsoleInteractionClass
@@ -45,9 +45,9 @@ struct _GTlsConsoleInteractionClass
   GTlsInteractionClass parent_class;
 };
 
-xtype_t                  g_tls_console_interaction_get_type    (void) G_GNUC_CONST;
+xtype_t                  xtls_console_interaction_get_type    (void) G_GNUC_CONST;
 
-GTlsInteraction *      g_tls_console_interaction_new         (void);
+xtls_interaction_t *      xtls_console_interaction_new         (void);
 
 G_END_DECLS
 

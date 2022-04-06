@@ -27,7 +27,7 @@ G_BEGIN_DECLS
 
 #define XTYPE_UNIX_FD_LIST                                 (g_unix_fd_list_get_type ())
 #define G_UNIX_FD_LIST(inst)                                (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_UNIX_FD_LIST, GUnixFDList))
+                                                             XTYPE_UNIX_FD_LIST, xunix_fd_list))
 #define G_UNIX_FD_LIST_CLASS(class)                         (XTYPE_CHECK_CLASS_CAST ((class),                       \
                                                              XTYPE_UNIX_FD_LIST, GUnixFDListClass))
 #define X_IS_UNIX_FD_LIST(inst)                             (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
@@ -36,7 +36,7 @@ G_BEGIN_DECLS
                                                              XTYPE_UNIX_FD_LIST))
 #define G_UNIX_FD_LIST_GET_CLASS(inst)                      (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
                                                              XTYPE_UNIX_FD_LIST, GUnixFDListClass))
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixFDList, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(xunix_fd_list, xobject_unref)
 
 typedef struct _GUnixFDListPrivate                       GUnixFDListPrivate;
 typedef struct _GUnixFDListClass                         GUnixFDListClass;
@@ -64,30 +64,30 @@ struct _GUnixFDList
 XPL_AVAILABLE_IN_ALL
 xtype_t                   g_unix_fd_list_get_type                         (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-GUnixFDList *           g_unix_fd_list_new                              (void);
+xunix_fd_list_t *           g_unix_fd_list_new                              (void);
 XPL_AVAILABLE_IN_ALL
-GUnixFDList *           g_unix_fd_list_new_from_array                   (const xint_t   *fds,
+xunix_fd_list_t *           g_unix_fd_list_new_from_array                   (const xint_t   *fds,
                                                                          xint_t          n_fds);
 
 XPL_AVAILABLE_IN_ALL
-xint_t                    g_unix_fd_list_append                           (GUnixFDList  *list,
+xint_t                    g_unix_fd_list_append                           (xunix_fd_list_t  *list,
                                                                          xint_t          fd,
                                                                          xerror_t      **error);
 
 XPL_AVAILABLE_IN_ALL
-xint_t                    g_unix_fd_list_get_length                       (GUnixFDList  *list);
+xint_t                    g_unix_fd_list_get_length                       (xunix_fd_list_t  *list);
 
 XPL_AVAILABLE_IN_ALL
-xint_t                    g_unix_fd_list_get                              (GUnixFDList  *list,
+xint_t                    g_unix_fd_list_get                              (xunix_fd_list_t  *list,
                                                                          xint_t          index_,
                                                                          xerror_t      **error);
 
 XPL_AVAILABLE_IN_ALL
-const xint_t *            g_unix_fd_list_peek_fds                         (GUnixFDList  *list,
+const xint_t *            g_unix_fd_list_peek_fds                         (xunix_fd_list_t  *list,
                                                                          xint_t         *length);
 
 XPL_AVAILABLE_IN_ALL
-xint_t *                  g_unix_fd_list_steal_fds                        (GUnixFDList  *list,
+xint_t *                  g_unix_fd_list_steal_fds                        (xunix_fd_list_t  *list,
                                                                          xint_t         *length);
 
 G_END_DECLS

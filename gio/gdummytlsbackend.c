@@ -48,10 +48,10 @@ static xtype_t _g_dummy_tls_database_get_type (void);
 
 struct _GDummyTlsBackend {
   xobject_t       parent_instance;
-  GTlsDatabase *database;
+  xtls_database_t *database;
 };
 
-static void g_dummy_tls_backend_iface_init (GTlsBackendInterface *iface);
+static void g_dummy_tls_backend_iface_init (xtls_backend_interface_t *iface);
 
 #define g_dummy_tls_backend_get_type _g_dummy_tls_backend_get_type
 G_DEFINE_TYPE_WITH_CODE (GDummyTlsBackend, g_dummy_tls_backend, XTYPE_OBJECT,
@@ -86,24 +86,24 @@ g_dummy_tls_backend_class_init (GDummyTlsBackendClass *backend_class)
   object_class->finalize = g_dummy_tls_backend_finalize;
 }
 
-static GTlsDatabase *
-g_dummy_tls_backend_get_default_database (GTlsBackend *backend)
+static xtls_database_t *
+g_dummy_tls_backend_get_default_database (xtls_backend_t *backend)
 {
   GDummyTlsBackend *dummy = G_DUMMY_TLS_BACKEND (backend);
 
   if (g_once_init_enter (&dummy->database))
     {
-      GTlsDatabase *tlsdb;
+      xtls_database_t *tlsdb;
 
-      tlsdb = g_object_new (_g_dummy_tls_database_get_type (), NULL);
+      tlsdb = xobject_new (_g_dummy_tls_database_get_type (), NULL);
       g_once_init_leave (&dummy->database, tlsdb);
     }
 
-  return g_object_ref (dummy->database);
+  return xobject_ref (dummy->database);
 }
 
 static void
-g_dummy_tls_backend_iface_init (GTlsBackendInterface *iface)
+g_dummy_tls_backend_iface_init (xtls_backend_interface_t *iface)
 {
   iface->get_certificate_type = _g_dummy_tls_certificate_get_type;
   iface->get_client_connection_type = _g_dummy_tls_connection_get_type;
@@ -120,7 +120,7 @@ typedef struct _GDummyTlsCertificate      GDummyTlsCertificate;
 typedef struct _GDummyTlsCertificateClass GDummyTlsCertificateClass;
 
 struct _GDummyTlsCertificate {
-  GTlsCertificate parent_instance;
+  xtls_certificate_t parent_instance;
 };
 
 struct _GDummyTlsCertificateClass {
@@ -138,7 +138,7 @@ enum
   PROP_CERT_ISSUER
 };
 
-static void g_dummy_tls_certificate_initable_iface_init (GInitableIface *iface);
+static void g_dummy_tls_certificate_initable_iface_init (xinitable_iface_t *iface);
 
 #define g_dummy_tls_certificate_get_type _g_dummy_tls_certificate_get_type
 G_DEFINE_TYPE_WITH_CODE (GDummyTlsCertificate, g_dummy_tls_certificate, XTYPE_TLS_CERTIFICATE,
@@ -148,8 +148,8 @@ G_DEFINE_TYPE_WITH_CODE (GDummyTlsCertificate, g_dummy_tls_certificate, XTYPE_TL
 static void
 g_dummy_tls_certificate_get_property (xobject_t    *object,
 				      xuint_t       prop_id,
-				      GValue     *value,
-				      GParamSpec *pspec)
+				      xvalue_t     *value,
+				      xparam_spec_t *pspec)
 {
   /* We need to define this method to make xobject_t happy, but it will
    * never be possible to construct a working GDummyTlsCertificate, so
@@ -160,8 +160,8 @@ g_dummy_tls_certificate_get_property (xobject_t    *object,
 static void
 g_dummy_tls_certificate_set_property (xobject_t      *object,
 				      xuint_t         prop_id,
-				      const GValue *value,
-				      GParamSpec   *pspec)
+				      const xvalue_t *value,
+				      xparam_spec_t   *pspec)
 {
   /* Just ignore all attempts to set properties. */
 }
@@ -174,11 +174,11 @@ g_dummy_tls_certificate_class_init (GDummyTlsCertificateClass *certificate_class
   gobject_class->get_property = g_dummy_tls_certificate_get_property;
   gobject_class->set_property = g_dummy_tls_certificate_set_property;
 
-  g_object_class_override_property (gobject_class, PROP_CERT_CERTIFICATE, "certificate");
-  g_object_class_override_property (gobject_class, PROP_CERT_CERTIFICATE_PEM, "certificate-pem");
-  g_object_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY, "private-key");
-  g_object_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY_PEM, "private-key-pem");
-  g_object_class_override_property (gobject_class, PROP_CERT_ISSUER, "issuer");
+  xobject_class_override_property (gobject_class, PROP_CERT_CERTIFICATE, "certificate");
+  xobject_class_override_property (gobject_class, PROP_CERT_CERTIFICATE_PEM, "certificate-pem");
+  xobject_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY, "private-key");
+  xobject_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY_PEM, "private-key-pem");
+  xobject_class_override_property (gobject_class, PROP_CERT_ISSUER, "issuer");
 }
 
 static void
@@ -187,7 +187,7 @@ g_dummy_tls_certificate_init (GDummyTlsCertificate *certificate)
 }
 
 static xboolean_t
-g_dummy_tls_certificate_initable_init (GInitable       *initable,
+g_dummy_tls_certificate_initable_init (xinitable_t       *initable,
 				       xcancellable_t    *cancellable,
 				       xerror_t         **error)
 {
@@ -197,13 +197,13 @@ g_dummy_tls_certificate_initable_init (GInitable       *initable,
 }
 
 static void
-g_dummy_tls_certificate_initable_iface_init (GInitableIface  *iface)
+g_dummy_tls_certificate_initable_iface_init (xinitable_iface_t  *iface)
 {
   iface->init = g_dummy_tls_certificate_initable_init;
 }
 
-/* Dummy connection type; since GTlsClientConnection and
- * GTlsServerConnection are just interfaces, we can implement them
+/* Dummy connection type; since xtls_client_connection_t and
+ * xtls_server_connection_t are just interfaces, we can implement them
  * both on a single object.
  */
 
@@ -211,7 +211,7 @@ typedef struct _GDummyTlsConnection      GDummyTlsConnection;
 typedef struct _GDummyTlsConnectionClass GDummyTlsConnectionClass;
 
 struct _GDummyTlsConnection {
-  GTlsConnection parent_instance;
+  xtls_connection_t parent_instance;
 };
 
 struct _GDummyTlsConnectionClass {
@@ -240,7 +240,7 @@ enum
   PROP_CONN_NEGOTIATED_PROTOCOL,
 };
 
-static void g_dummy_tls_connection_initable_iface_init (GInitableIface *iface);
+static void g_dummy_tls_connection_initable_iface_init (xinitable_iface_t *iface);
 
 #define g_dummy_tls_connection_get_type _g_dummy_tls_connection_get_type
 G_DEFINE_TYPE_WITH_CODE (GDummyTlsConnection, g_dummy_tls_connection, XTYPE_TLS_CONNECTION,
@@ -252,16 +252,16 @@ G_DEFINE_TYPE_WITH_CODE (GDummyTlsConnection, g_dummy_tls_connection, XTYPE_TLS_
 static void
 g_dummy_tls_connection_get_property (xobject_t    *object,
 				     xuint_t       prop_id,
-				     GValue     *value,
-				     GParamSpec *pspec)
+				     xvalue_t     *value,
+				     xparam_spec_t *pspec)
 {
 }
 
 static void
 g_dummy_tls_connection_set_property (xobject_t      *object,
 				     xuint_t         prop_id,
-				     const GValue *value,
-				     GParamSpec   *pspec)
+				     const xvalue_t *value,
+				     xparam_spec_t   *pspec)
 {
 }
 
@@ -289,22 +289,22 @@ g_dummy_tls_connection_class_init (GDummyTlsConnectionClass *connection_class)
    */
   io_stream_class->close_fn = g_dummy_tls_connection_close;
 
-  g_object_class_override_property (gobject_class, PROP_CONN_BASE_IO_STREAM, "base-io-stream");
-  g_object_class_override_property (gobject_class, PROP_CONN_USE_SYSTEM_CERTDB, "use-system-certdb");
-  g_object_class_override_property (gobject_class, PROP_CONN_REQUIRE_CLOSE_NOTIFY, "require-close-notify");
-  g_object_class_override_property (gobject_class, PROP_CONN_REHANDSHAKE_MODE, "rehandshake-mode");
-  g_object_class_override_property (gobject_class, PROP_CONN_CERTIFICATE, "certificate");
-  g_object_class_override_property (gobject_class, PROP_CONN_DATABASE, "database");
-  g_object_class_override_property (gobject_class, PROP_CONN_INTERACTION, "interaction");
-  g_object_class_override_property (gobject_class, PROP_CONN_PEER_CERTIFICATE, "peer-certificate");
-  g_object_class_override_property (gobject_class, PROP_CONN_PEER_CERTIFICATE_ERRORS, "peer-certificate-errors");
-  g_object_class_override_property (gobject_class, PROP_CONN_VALIDATION_FLAGS, "validation-flags");
-  g_object_class_override_property (gobject_class, PROP_CONN_SERVER_IDENTITY, "server-identity");
-  g_object_class_override_property (gobject_class, PROP_CONN_USE_SSL3, "use-ssl3");
-  g_object_class_override_property (gobject_class, PROP_CONN_ACCEPTED_CAS, "accepted-cas");
-  g_object_class_override_property (gobject_class, PROP_CONN_AUTHENTICATION_MODE, "authentication-mode");
-  g_object_class_override_property (gobject_class, PROP_CONN_ADVERTISED_PROTOCOLS, "advertised-protocols");
-  g_object_class_override_property (gobject_class, PROP_CONN_NEGOTIATED_PROTOCOL, "negotiated-protocol");
+  xobject_class_override_property (gobject_class, PROP_CONN_BASE_IO_STREAM, "base-io-stream");
+  xobject_class_override_property (gobject_class, PROP_CONN_USE_SYSTEM_CERTDB, "use-system-certdb");
+  xobject_class_override_property (gobject_class, PROP_CONN_REQUIRE_CLOSE_NOTIFY, "require-close-notify");
+  xobject_class_override_property (gobject_class, PROP_CONN_REHANDSHAKE_MODE, "rehandshake-mode");
+  xobject_class_override_property (gobject_class, PROP_CONN_CERTIFICATE, "certificate");
+  xobject_class_override_property (gobject_class, PROP_CONN_DATABASE, "database");
+  xobject_class_override_property (gobject_class, PROP_CONN_INTERACTION, "interaction");
+  xobject_class_override_property (gobject_class, PROP_CONN_PEER_CERTIFICATE, "peer-certificate");
+  xobject_class_override_property (gobject_class, PROP_CONN_PEER_CERTIFICATE_ERRORS, "peer-certificate-errors");
+  xobject_class_override_property (gobject_class, PROP_CONN_VALIDATION_FLAGS, "validation-flags");
+  xobject_class_override_property (gobject_class, PROP_CONN_SERVER_IDENTITY, "server-identity");
+  xobject_class_override_property (gobject_class, PROP_CONN_USE_SSL3, "use-ssl3");
+  xobject_class_override_property (gobject_class, PROP_CONN_ACCEPTED_CAS, "accepted-cas");
+  xobject_class_override_property (gobject_class, PROP_CONN_AUTHENTICATION_MODE, "authentication-mode");
+  xobject_class_override_property (gobject_class, PROP_CONN_ADVERTISED_PROTOCOLS, "advertised-protocols");
+  xobject_class_override_property (gobject_class, PROP_CONN_NEGOTIATED_PROTOCOL, "negotiated-protocol");
 }
 
 static void
@@ -313,7 +313,7 @@ g_dummy_tls_connection_init (GDummyTlsConnection *connection)
 }
 
 static xboolean_t
-g_dummy_tls_connection_initable_init (GInitable       *initable,
+g_dummy_tls_connection_initable_init (xinitable_t       *initable,
 				      xcancellable_t    *cancellable,
 				      xerror_t         **error)
 {
@@ -323,13 +323,13 @@ g_dummy_tls_connection_initable_init (GInitable       *initable,
 }
 
 static void
-g_dummy_tls_connection_initable_iface_init (GInitableIface  *iface)
+g_dummy_tls_connection_initable_iface_init (xinitable_iface_t  *iface)
 {
   iface->init = g_dummy_tls_connection_initable_init;
 }
 
-/* Dummy DTLS connection type; since GDtlsClientConnection and
- * GDtlsServerConnection are just interfaces, we can implement them
+/* Dummy DTLS connection type; since xdtls_client_connection_t and
+ * xdtls_server_connection_t are just interfaces, we can implement them
  * both on a single object.
  */
 
@@ -361,7 +361,7 @@ enum
   PROP_DTLS_CONN_AUTHENTICATION_MODE,
 };
 
-static void g_dummy_dtls_connection_initable_iface_init (GInitableIface *iface);
+static void g_dummy_dtls_connection_initable_iface_init (xinitable_iface_t *iface);
 
 #define g_dummy_dtls_connection_get_type _g_dummy_dtls_connection_get_type
 G_DEFINE_TYPE_WITH_CODE (GDummyDtlsConnection, g_dummy_dtls_connection, XTYPE_OBJECT,
@@ -374,16 +374,16 @@ G_DEFINE_TYPE_WITH_CODE (GDummyDtlsConnection, g_dummy_dtls_connection, XTYPE_OB
 static void
 g_dummy_dtls_connection_get_property (xobject_t    *object,
                                       xuint_t       prop_id,
-                                      GValue     *value,
-                                      GParamSpec *pspec)
+                                      xvalue_t     *value,
+                                      xparam_spec_t *pspec)
 {
 }
 
 static void
 g_dummy_dtls_connection_set_property (xobject_t      *object,
                                       xuint_t         prop_id,
-                                      const GValue *value,
-                                      GParamSpec   *pspec)
+                                      const xvalue_t *value,
+                                      xparam_spec_t   *pspec)
 {
 }
 
@@ -395,18 +395,18 @@ g_dummy_dtls_connection_class_init (GDummyDtlsConnectionClass *connection_class)
   gobject_class->get_property = g_dummy_dtls_connection_get_property;
   gobject_class->set_property = g_dummy_dtls_connection_set_property;
 
-  g_object_class_override_property (gobject_class, PROP_DTLS_CONN_BASE_SOCKET, "base-socket");
-  g_object_class_override_property (gobject_class, PROP_DTLS_CONN_REQUIRE_CLOSE_NOTIFY, "require-close-notify");
-  g_object_class_override_property (gobject_class, PROP_DTLS_CONN_REHANDSHAKE_MODE, "rehandshake-mode");
-  g_object_class_override_property (gobject_class, PROP_DTLS_CONN_CERTIFICATE, "certificate");
-  g_object_class_override_property (gobject_class, PROP_DTLS_CONN_DATABASE, "database");
-  g_object_class_override_property (gobject_class, PROP_DTLS_CONN_INTERACTION, "interaction");
-  g_object_class_override_property (gobject_class, PROP_DTLS_CONN_PEER_CERTIFICATE, "peer-certificate");
-  g_object_class_override_property (gobject_class, PROP_DTLS_CONN_PEER_CERTIFICATE_ERRORS, "peer-certificate-errors");
-  g_object_class_override_property (gobject_class, PROP_DTLS_CONN_VALIDATION_FLAGS, "validation-flags");
-  g_object_class_override_property (gobject_class, PROP_DTLS_CONN_SERVER_IDENTITY, "server-identity");
-  g_object_class_override_property (gobject_class, PROP_DTLS_CONN_ACCEPTED_CAS, "accepted-cas");
-  g_object_class_override_property (gobject_class, PROP_DTLS_CONN_AUTHENTICATION_MODE, "authentication-mode");
+  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_BASE_SOCKET, "base-socket");
+  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_REQUIRE_CLOSE_NOTIFY, "require-close-notify");
+  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_REHANDSHAKE_MODE, "rehandshake-mode");
+  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_CERTIFICATE, "certificate");
+  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_DATABASE, "database");
+  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_INTERACTION, "interaction");
+  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_PEER_CERTIFICATE, "peer-certificate");
+  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_PEER_CERTIFICATE_ERRORS, "peer-certificate-errors");
+  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_VALIDATION_FLAGS, "validation-flags");
+  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_SERVER_IDENTITY, "server-identity");
+  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_ACCEPTED_CAS, "accepted-cas");
+  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_AUTHENTICATION_MODE, "authentication-mode");
 }
 
 static void
@@ -415,7 +415,7 @@ g_dummy_dtls_connection_init (GDummyDtlsConnection *connection)
 }
 
 static xboolean_t
-g_dummy_dtls_connection_initable_init (GInitable       *initable,
+g_dummy_dtls_connection_initable_init (xinitable_t       *initable,
                                        xcancellable_t    *cancellable,
                                        xerror_t         **error)
 {
@@ -425,7 +425,7 @@ g_dummy_dtls_connection_initable_init (GInitable       *initable,
 }
 
 static void
-g_dummy_dtls_connection_initable_iface_init (GInitableIface  *iface)
+g_dummy_dtls_connection_initable_iface_init (xinitable_iface_t  *iface)
 {
   iface->init = g_dummy_dtls_connection_initable_init;
 }
@@ -437,7 +437,7 @@ typedef struct _GDummyTlsDatabase      GDummyTlsDatabase;
 typedef struct _GDummyTlsDatabaseClass GDummyTlsDatabaseClass;
 
 struct _GDummyTlsDatabase {
-  GTlsDatabase parent_instance;
+  xtls_database_t parent_instance;
 };
 
 struct _GDummyTlsDatabaseClass {
@@ -451,8 +451,8 @@ enum
   PROP_ANCHORS,
 };
 
-static void g_dummy_tls_database_file_database_iface_init (GTlsFileDatabaseInterface *iface);
-static void g_dummy_tls_database_initable_iface_init (GInitableIface *iface);
+static void g_dummy_tls_database_file_database_iface_init (xtls_file_database_interface_t *iface);
+static void g_dummy_tls_database_initable_iface_init (xinitable_iface_t *iface);
 
 #define g_dummy_tls_database_get_type _g_dummy_tls_database_get_type
 G_DEFINE_TYPE_WITH_CODE (GDummyTlsDatabase, g_dummy_tls_database, XTYPE_TLS_DATABASE,
@@ -465,8 +465,8 @@ G_DEFINE_TYPE_WITH_CODE (GDummyTlsDatabase, g_dummy_tls_database, XTYPE_TLS_DATA
 static void
 g_dummy_tls_database_get_property (xobject_t    *object,
                                    xuint_t       prop_id,
-                                   GValue     *value,
-                                   GParamSpec *pspec)
+                                   xvalue_t     *value,
+                                   xparam_spec_t *pspec)
 {
   /* We need to define this method to make xobject_t happy, but it will
    * never be possible to construct a working GDummyTlsDatabase, so
@@ -477,8 +477,8 @@ g_dummy_tls_database_get_property (xobject_t    *object,
 static void
 g_dummy_tls_database_set_property (xobject_t      *object,
                                    xuint_t         prop_id,
-                                   const GValue *value,
-                                   GParamSpec   *pspec)
+                                   const xvalue_t *value,
+                                   xparam_spec_t   *pspec)
 {
   /* Just ignore all attempts to set properties. */
 }
@@ -491,7 +491,7 @@ g_dummy_tls_database_class_init (GDummyTlsDatabaseClass *database_class)
   gobject_class->get_property = g_dummy_tls_database_get_property;
   gobject_class->set_property = g_dummy_tls_database_set_property;
 
-  g_object_class_override_property (gobject_class, PROP_ANCHORS, "anchors");
+  xobject_class_override_property (gobject_class, PROP_ANCHORS, "anchors");
 }
 
 static void
@@ -500,12 +500,12 @@ g_dummy_tls_database_init (GDummyTlsDatabase *database)
 }
 
 static void
-g_dummy_tls_database_file_database_iface_init (GTlsFileDatabaseInterface  *iface)
+g_dummy_tls_database_file_database_iface_init (xtls_file_database_interface_t  *iface)
 {
 }
 
 static xboolean_t
-g_dummy_tls_database_initable_init (GInitable       *initable,
+g_dummy_tls_database_initable_init (xinitable_t       *initable,
                                     xcancellable_t    *cancellable,
                                     xerror_t         **error)
 {
@@ -515,7 +515,7 @@ g_dummy_tls_database_initable_init (GInitable       *initable,
 }
 
 static void
-g_dummy_tls_database_initable_iface_init (GInitableIface  *iface)
+g_dummy_tls_database_initable_iface_init (xinitable_iface_t  *iface)
 {
   iface->init = g_dummy_tls_database_initable_init;
 }

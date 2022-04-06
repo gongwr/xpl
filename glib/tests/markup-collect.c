@@ -14,14 +14,14 @@
 #include <glib.h>
 
 static void
-start (GMarkupParseContext  *context,
+start (xmarkup_parse_context_t  *context,
        const char           *element_name,
        const char          **attribute_names,
        const char          **attribute_values,
        xpointer_t              user_data,
        xerror_t              **error)
 {
-  GString *string = user_data;
+  xstring_t *string = user_data;
   xboolean_t result;
 
 #define collect(...) \
@@ -51,7 +51,7 @@ start (GMarkupParseContext  *context,
       if (tri != FALSE && tri != TRUE)
         tri = -1;
 
-      g_string_append_printf (string, "<bool(%d) %d %d %d>",
+      xstring_append_printf (string, "<bool(%d) %d %d %d>",
                               result, mb, ob, tri);
     }
 
@@ -68,7 +68,7 @@ start (GMarkupParseContext  *context,
       g_assert (result ||
                 (cm == NULL && am == NULL && ao == NULL && co == NULL));
 
-      g_string_append_printf (string, "<str(%d) %s %s %s %s>",
+      xstring_append_printf (string, "<str(%d) %s %s %s %s>",
                               result, n (cm), n (am), n (ao), n (co));
 
       g_free (am);
@@ -141,22 +141,22 @@ static struct test tests[] =
 };
 
 static void
-test_collect (gconstpointer d)
+test_collect (xconstpointer d)
 {
   const struct test *test = d;
 
-  GMarkupParseContext *ctx;
+  xmarkup_parse_context_t *ctx;
   xerror_t *error = NULL;
-  GString *string;
+  xstring_t *string;
   xboolean_t result;
 
-  string = g_string_new ("");
-  ctx = g_markup_parse_context_new (&parser, G_MARKUP_IGNORE_QUALIFIED, string, NULL);
-  result = g_markup_parse_context_parse (ctx,
+  string = xstring_new ("");
+  ctx = xmarkup_parse_context_new (&parser, G_MARKUP_IGNORE_QUALIFIED, string, NULL);
+  result = xmarkup_parse_context_parse (ctx,
                                          test->document,
                                          -1, &error);
   if (result)
-    result = g_markup_parse_context_end_parse (ctx, &error);
+    result = xmarkup_parse_context_end_parse (ctx, &error);
 
   if (result)
     {
@@ -169,15 +169,15 @@ test_collect (gconstpointer d)
       g_assert_error (error, G_MARKUP_ERROR, (xint_t) test->error_code);
     }
 
-  g_markup_parse_context_free (ctx);
-  g_string_free (string, TRUE);
+  xmarkup_parse_context_free (ctx);
+  xstring_free (string, TRUE);
   g_clear_error (&error);
 }
 
 #define XML "<element a='1' b='2' c='3'/>"
 
 static void
-start_element (GMarkupParseContext  *context,
+start_element (xmarkup_parse_context_t  *context,
                const xchar_t          *element_name,
                const xchar_t         **attribute_names,
                const xchar_t         **attribute_values,
@@ -201,20 +201,20 @@ static GMarkupParser cleanup_parser = {
 static void
 test_cleanup (void)
 {
-  GMarkupParseContext *context;
+  xmarkup_parse_context_t *context;
 
   if (!g_test_undefined ())
     return;
 
-  context = g_markup_parse_context_new (&cleanup_parser, 0, NULL, NULL);
-  g_markup_parse_context_parse (context, XML, -1, NULL);
+  context = xmarkup_parse_context_new (&cleanup_parser, 0, NULL, NULL);
+  xmarkup_parse_context_parse (context, XML, -1, NULL);
 
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                         "g_markup_parse_context_end_parse: assertion 'context->state != STATE_ERROR' failed");
-  g_markup_parse_context_end_parse (context, NULL);
+                         "xmarkup_parse_context_end_parse: assertion 'context->state != STATE_ERROR' failed");
+  xmarkup_parse_context_end_parse (context, NULL);
   g_test_assert_expected_messages ();
 
-  g_markup_parse_context_free (context);
+  xmarkup_parse_context_free (context);
 }
 
 int
@@ -227,7 +227,7 @@ main (int argc, char **argv)
 
   for (i = 0; i < G_N_ELEMENTS (tests); i++)
     {
-      path = g_strdup_printf ("/markup/collect/%" G_GSIZE_FORMAT, i);
+      path = xstrdup_printf ("/markup/collect/%" G_GSIZE_FORMAT, i);
       g_test_add_data_func (path, &tests[i], test_collect);
       g_free (path);
     }

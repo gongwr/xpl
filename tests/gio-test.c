@@ -45,7 +45,7 @@
 #endif
 
 static int nrunning;
-static GMainLoop *main_loop;
+static xmain_loop_t *main_loop;
 
 #define BUFSIZE 5000		/* Larger than the circular buffer in
 				 * giowin32.c on purpose.
@@ -60,7 +60,7 @@ static struct {
 
 static GIOError
 read_all (int         fd,
-	  GIOChannel *channel,
+	  xio_channel_t *channel,
 	  char       *buffer,
 	  xuint_t       nbytes,
 	  xuint_t      *bytes_read)
@@ -97,17 +97,17 @@ read_all (int         fd,
 static void
 shutdown_source (xpointer_t data)
 {
-  if (g_source_remove (*(xuint_t *) data))
+  if (xsource_remove (*(xuint_t *) data))
     {
       nrunning--;
       if (nrunning == 0)
-	g_main_loop_quit (main_loop);
+	xmain_loop_quit (main_loop);
     }
 }
 
 static xboolean_t
-recv_message (GIOChannel  *channel,
-	      GIOCondition cond,
+recv_message (xio_channel_t  *channel,
+	      xio_condition_t cond,
 	      xpointer_t    data)
 {
   xint_t fd = g_io_channel_unix_get_fd (channel);
@@ -197,8 +197,8 @@ recv_message (GIOChannel  *channel,
 #ifdef G_OS_WIN32
 
 static xboolean_t
-recv_windows_message (GIOChannel  *channel,
-		      GIOCondition cond,
+recv_windows_message (xio_channel_t  *channel,
+		      xio_condition_t cond,
 		      xpointer_t    data)
 {
   GIOError error;
@@ -253,17 +253,17 @@ main (int    argc,
     {
       /* Parent */
 
-      GIOChannel *my_read_channel;
+      xio_channel_t *my_read_channel;
       xchar_t *cmdline;
       int i;
 #ifdef G_OS_WIN32
       GTimeVal start, end;
-      GPollFD pollfd;
+      xpollfd_t pollfd;
       int pollresult;
       ATOM klass;
       static WNDCLASS wcl;
       HWND hwnd;
-      GIOChannel *windows_messages_channel;
+      xio_channel_t *windows_messages_channel;
 #endif
 
       nkiddies = (argc == 1 ? 1 : atoi(argv[1]));
@@ -326,13 +326,13 @@ main (int    argc,
 	  nrunning++;
 
 #ifdef G_OS_WIN32
-	  cmdline = g_strdup_printf ("%d:%d:0x%p",
+	  cmdline = xstrdup_printf ("%d:%d:0x%p",
 				     pipe_to_sub[0],
 				     pipe_from_sub[1],
 				     hwnd);
 	  _spawnl (_P_NOWAIT, argv[0], argv[0], "--child", cmdline, NULL);
 #else
-	  cmdline = g_strdup_printf ("%s --child %d:%d &", argv[0],
+	  cmdline = xstrdup_printf ("%s --child %d:%d &", argv[0],
 				     pipe_to_sub[0], pipe_from_sub[1]);
 
 	  system (cmdline);
@@ -356,11 +356,11 @@ main (int    argc,
           g_io_channel_unref (my_read_channel);
 	}
 
-      main_loop = g_main_loop_new (NULL, FALSE);
+      main_loop = xmain_loop_new (NULL, FALSE);
 
-      g_main_loop_run (main_loop);
+      xmain_loop_run (main_loop);
 
-      g_main_loop_unref (main_loop);
+      xmain_loop_unref (main_loop);
       g_free (seqtab);
     }
   else if (argc == 3)

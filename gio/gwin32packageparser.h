@@ -27,17 +27,17 @@ typedef struct _GWin32PackageExtGroup GWin32PackageExtGroup;
 
 struct _GWin32PackageExtGroup
 {
-  GPtrArray *verbs;
-  GPtrArray *extensions;
+  xptr_array_t *verbs;
+  xptr_array_t *extensions;
 };
 
 typedef xboolean_t (*GWin32PackageParserCallback)(xpointer_t         user_data,
-                                                const gunichar2 *full_package_name,
-                                                const gunichar2 *package_name,
-                                                const gunichar2 *app_user_model_id,
+                                                const xunichar2_t *full_package_name,
+                                                const xunichar2_t *package_name,
+                                                const xunichar2_t *app_user_model_id,
                                                 xboolean_t         show_in_applist,
-                                                GPtrArray       *supported_extgroups,
-                                                GPtrArray       *supported_protocols);
+                                                xptr_array_t       *supported_extgroups,
+                                                xptr_array_t       *supported_protocols);
 
 xboolean_t g_win32_package_parser_enum_packages (GWin32PackageParserCallback   callback,
                                                xpointer_t                      user_data,

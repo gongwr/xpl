@@ -32,60 +32,60 @@
 
 G_BEGIN_DECLS
 
-#define G_SIGNAL_GROUP(obj)    (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SIGNAL_GROUP, GSignalGroup))
+#define G_SIGNAL_GROUP(obj)    (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SIGNAL_GROUP, xsignal_group_t))
 #define X_IS_SIGNAL_GROUP(obj) (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_SIGNAL_GROUP))
-#define XTYPE_SIGNAL_GROUP    (g_signal_group_get_type())
+#define XTYPE_SIGNAL_GROUP    (xsignal_group_get_type())
 
 /**
- * GSignalGroup:
+ * xsignal_group_t:
  *
- * #GSignalGroup is an opaque structure whose members
+ * #xsignal_group_t is an opaque structure whose members
  * cannot be accessed directly.
  *
  * Since: 2.72
  */
-typedef struct _GSignalGroup GSignalGroup;
+typedef struct _GSignalGroup xsignal_group_t;
 
 XPL_AVAILABLE_IN_2_72
-xtype_t         g_signal_group_get_type        (void) G_GNUC_CONST;
+xtype_t         xsignal_group_get_type        (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_2_72
-GSignalGroup *g_signal_group_new             (xtype_t           target_type);
+xsignal_group_t *xsignal_group_new             (xtype_t           target_type);
 XPL_AVAILABLE_IN_2_72
-void          g_signal_group_set_target      (GSignalGroup   *self,
+void          xsignal_group_set_target      (xsignal_group_t   *self,
                                               xpointer_t        target);
 XPL_AVAILABLE_IN_2_72
-xpointer_t      g_signal_group_dup_target      (GSignalGroup   *self);
+xpointer_t      xsignal_group_dup_target      (xsignal_group_t   *self);
 XPL_AVAILABLE_IN_2_72
-void          g_signal_group_block           (GSignalGroup   *self);
+void          xsignal_group_block           (xsignal_group_t   *self);
 XPL_AVAILABLE_IN_2_72
-void          g_signal_group_unblock         (GSignalGroup   *self);
+void          xsignal_group_unblock         (xsignal_group_t   *self);
 XPL_AVAILABLE_IN_2_72
-void          g_signal_group_connect_object  (GSignalGroup   *self,
+void          xsignal_group_connect_object  (xsignal_group_t   *self,
                                               const xchar_t    *detailed_signal,
-                                              GCallback       c_handler,
+                                              xcallback_t       c_handler,
                                               xpointer_t        object,
                                               GConnectFlags   flags);
 XPL_AVAILABLE_IN_2_72
-void          g_signal_group_connect_data    (GSignalGroup   *self,
+void          xsignal_group_connect_data    (xsignal_group_t   *self,
                                               const xchar_t    *detailed_signal,
-                                              GCallback       c_handler,
+                                              xcallback_t       c_handler,
                                               xpointer_t        data,
-                                              GClosureNotify  notify,
+                                              xclosure_notify_t  notify,
                                               GConnectFlags   flags);
 XPL_AVAILABLE_IN_2_72
-void          g_signal_group_connect         (GSignalGroup   *self,
+void          xsignal_group_connect         (xsignal_group_t   *self,
                                               const xchar_t    *detailed_signal,
-                                              GCallback       c_handler,
+                                              xcallback_t       c_handler,
                                               xpointer_t        data);
 XPL_AVAILABLE_IN_2_72
-void          g_signal_group_connect_after   (GSignalGroup   *self,
+void          xsignal_group_connect_after   (xsignal_group_t   *self,
                                               const xchar_t    *detailed_signal,
-                                              GCallback       c_handler,
+                                              xcallback_t       c_handler,
                                               xpointer_t        data);
 XPL_AVAILABLE_IN_2_72
-void          g_signal_group_connect_swapped (GSignalGroup   *self,
+void          xsignal_group_connect_swapped (xsignal_group_t   *self,
                                               const xchar_t    *detailed_signal,
-                                              GCallback       c_handler,
+                                              xcallback_t       c_handler,
                                               xpointer_t        data);
 
 G_END_DECLS

@@ -35,12 +35,12 @@
  * PersonDetails *
  * person_details_from_data (const char *data)
  * {
- *   // Use g_autoptr() to simplify error cases
- *   g_autoptr(GRefString) full_name = NULL;
- *   g_autoptr(GRefString) address =  NULL;
- *   g_autoptr(GRefString) city = NULL;
- *   g_autoptr(GRefString) state = NULL;
- *   g_autoptr(GRefString) zip_code = NULL;
+ *   // Use x_autoptr() to simplify error cases
+ *   x_autoptr(xref_string) full_name = NULL;
+ *   x_autoptr(xref_string) address =  NULL;
+ *   x_autoptr(xref_string) city = NULL;
+ *   x_autoptr(xref_string) state = NULL;
+ *   x_autoptr(xref_string) zip_code = NULL;
  *
  *   // parse_person_details() is defined elsewhere; returns refcounted strings
  *   if (!parse_person_details (data, &full_name, &address, &city, &state, &zip_code))
@@ -101,7 +101,7 @@
  * are removed from the table
  */
 G_LOCK_DEFINE_STATIC (interned_ref_strings);
-static GHashTable *interned_ref_strings;
+static xhashtable_t *interned_ref_strings;
 
 /**
  * g_ref_string_new:
@@ -145,7 +145,7 @@ g_ref_string_new (const char *str)
  * Since: 2.58
  */
 char *
-g_ref_string_new_len (const char *str, gssize len)
+g_ref_string_new_len (const char *str, xssize_t len)
 {
   char *res;
 
@@ -162,7 +162,7 @@ g_ref_string_new_len (const char *str, gssize len)
   return res;
 }
 
-/* interned_str_equal: variant of g_str_equal() that compares
+/* interned_str_equal: variant of xstr_equal() that compares
  * pointers as well as contents; this avoids running strcmp()
  * on arbitrarily long strings, as it's more likely to have
  * g_ref_string_new_intern() being called on the same refcounted
@@ -170,8 +170,8 @@ g_ref_string_new_len (const char *str, gssize len)
  * contents
  */
 static xboolean_t
-interned_str_equal (gconstpointer v1,
-                    gconstpointer v2)
+interned_str_equal (xconstpointer v1,
+                    xconstpointer v2)
 {
   const char *str1 = v1;
   const char *str2 = v2;
@@ -208,9 +208,9 @@ g_ref_string_new_intern (const char *str)
   G_LOCK (interned_ref_strings);
 
   if (G_UNLIKELY (interned_ref_strings == NULL))
-    interned_ref_strings = g_hash_table_new (g_str_hash, interned_str_equal);
+    interned_ref_strings = xhash_table_new (xstr_hash, interned_str_equal);
 
-  res = g_hash_table_lookup (interned_ref_strings, str);
+  res = xhash_table_lookup (interned_ref_strings, str);
   if (res != NULL)
     {
       /* We acquire the reference while holding the lock, to
@@ -224,7 +224,7 @@ g_ref_string_new_intern (const char *str)
     }
 
   res = g_ref_string_new (str);
-  g_hash_table_add (interned_ref_strings, res);
+  xhash_table_add (interned_ref_strings, res);
   G_UNLOCK (interned_ref_strings);
 
   return res;
@@ -257,10 +257,10 @@ remove_if_interned (xpointer_t data)
 
   if (G_LIKELY (interned_ref_strings != NULL))
     {
-      g_hash_table_remove (interned_ref_strings, str);
+      xhash_table_remove (interned_ref_strings, str);
 
-      if (g_hash_table_size (interned_ref_strings) == 0)
-        g_clear_pointer (&interned_ref_strings, g_hash_table_destroy);
+      if (xhash_table_size (interned_ref_strings) == 0)
+        g_clear_pointer (&interned_ref_strings, xhash_table_destroy);
     }
 
   G_UNLOCK (interned_ref_strings);

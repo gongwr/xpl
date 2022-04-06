@@ -51,7 +51,7 @@ corruption (void)
   if (G_UNLIKELY (want_corruption))
     {
       /* corruption per call likelyness is about 1:4000000 */
-      guint32 r = g_random_int() % 8000009;
+      xuint32_t r = g_random_int() % 8000009;
       return r == 277 ? +1 : r == 281 ? -1 : 0;
     }
   return 0;
@@ -81,12 +81,12 @@ test_memchunk_thread (xpointer_t data)
 {
   GMemChunk **memchunks;
   xuint_t i, j;
-  guint8 **ps;
+  xuint8_t **ps;
   xuint_t   *ss;
-  guint32 rand_accu = 2147483563;
+  xuint32_t rand_accu = 2147483563;
   /* initialize random numbers */
   if (data)
-    rand_accu = *(guint32*) data;
+    rand_accu = *(xuint32_t*) data;
   else
     {
       GTimeVal rand_tv;
@@ -97,7 +97,7 @@ test_memchunk_thread (xpointer_t data)
   /* prepare for memchunk creation */
   memchunks = g_newa0 (GMemChunk*, prime_size);
 
-  ps = g_new (guint8*, number_of_blocks);
+  ps = g_new (xuint8_t*, number_of_blocks);
   ss = g_new (xuint_t, number_of_blocks);
   /* create number_of_blocks random sizes */
   for (i = 0; i < number_of_blocks; i++)
@@ -143,14 +143,14 @@ test_memchunk_thread (xpointer_t data)
 static xpointer_t
 test_sliced_mem_thread (xpointer_t data)
 {
-  guint32 rand_accu = 2147483563;
+  xuint32_t rand_accu = 2147483563;
   xuint_t i, j;
-  guint8 **ps;
+  xuint8_t **ps;
   xuint_t   *ss;
 
   /* initialize random numbers */
   if (data)
-    rand_accu = *(guint32*) data;
+    rand_accu = *(xuint32_t*) data;
   else
     {
       GTimeVal rand_tv;
@@ -158,7 +158,7 @@ test_sliced_mem_thread (xpointer_t data)
       rand_accu = rand_tv.tv_usec + (rand_tv.tv_sec << 16);
     }
 
-  ps = g_new (guint8*, number_of_blocks);
+  ps = g_new (xuint8_t*, number_of_blocks);
   ss = g_new (xuint_t, number_of_blocks);
   /* create number_of_blocks random sizes */
   for (i = 0; i < number_of_blocks; i++)
@@ -266,24 +266,24 @@ main (int   argc,
 
   {
     xchar_t strseed[64] = "<random>";
-    GThread **threads;
+    xthread_t **threads;
     xuint_t i;
 
     if (seedp)
       g_snprintf (strseed, 64, "%u", *seedp);
     g_print ("Starting %d threads allocating random blocks <= %u bytes with seed=%s using %s%s\n", n_threads, prime_size, strseed, mode, emode);
 
-    threads = g_alloca (sizeof(GThread*) * n_threads);
+    threads = g_alloca (sizeof(xthread_t*) * n_threads);
     if (!use_memchunks)
       for (i = 0; i < n_threads; i++)
-        threads[i] = g_thread_create (test_sliced_mem_thread, seedp, TRUE, NULL);
+        threads[i] = xthread_create (test_sliced_mem_thread, seedp, TRUE, NULL);
     else
       {
         for (i = 0; i < n_threads; i++)
-          threads[i] = g_thread_create (test_memchunk_thread, seedp, TRUE, NULL);
+          threads[i] = xthread_create (test_memchunk_thread, seedp, TRUE, NULL);
       }
     for (i = 0; i < n_threads; i++)
-      g_thread_join (threads[i]);
+      xthread_join (threads[i]);
 
     if (ccounters)
       {

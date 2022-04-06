@@ -37,7 +37,7 @@
 
 
 struct _GUnixVolumeMonitor {
-  GNativeVolumeMonitor parent;
+  xnative_volume_monitor_t parent;
 
   GUnixMountMonitor *mount_monitor;
 
@@ -72,13 +72,13 @@ g_unix_volume_monitor_finalize (xobject_t *object)
   g_signal_handlers_disconnect_by_func (monitor->mount_monitor, mountpoints_changed, monitor);
   g_signal_handlers_disconnect_by_func (monitor->mount_monitor, mounts_changed, monitor);
 
-  g_object_unref (monitor->mount_monitor);
+  xobject_unref (monitor->mount_monitor);
 
-  g_list_free_full (monitor->last_mountpoints, (GDestroyNotify) g_unix_mount_point_free);
-  g_list_free_full (monitor->last_mounts, (GDestroyNotify) g_unix_mount_free);
+  xlist_free_full (monitor->last_mountpoints, (xdestroy_notify_t) g_unix_mount_point_free);
+  xlist_free_full (monitor->last_mounts, (xdestroy_notify_t) g_unix_mount_free);
 
-  g_list_free_full (monitor->volumes, g_object_unref);
-  g_list_free_full (monitor->mounts, g_object_unref);
+  xlist_free_full (monitor->volumes, xobject_unref);
+  xlist_free_full (monitor->mounts, xobject_unref);
 
   G_OBJECT_CLASS (g_unix_volume_monitor_parent_class)->finalize (object);
 }
@@ -90,49 +90,49 @@ g_unix_volume_monitor_dispose (xobject_t *object)
 
   monitor = G_UNIX_VOLUME_MONITOR (object);
 
-  g_list_free_full (monitor->volumes, g_object_unref);
+  xlist_free_full (monitor->volumes, xobject_unref);
   monitor->volumes = NULL;
 
-  g_list_free_full (monitor->mounts, g_object_unref);
+  xlist_free_full (monitor->mounts, xobject_unref);
   monitor->mounts = NULL;
 
   G_OBJECT_CLASS (g_unix_volume_monitor_parent_class)->dispose (object);
 }
 
 static xlist_t *
-get_mounts (GVolumeMonitor *volume_monitor)
+get_mounts (xvolume_monitor_t *volume_monitor)
 {
   GUnixVolumeMonitor *monitor;
 
   monitor = G_UNIX_VOLUME_MONITOR (volume_monitor);
 
-  return g_list_copy_deep (monitor->mounts, (GCopyFunc) g_object_ref, NULL);
+  return xlist_copy_deep (monitor->mounts, (GCopyFunc) xobject_ref, NULL);
 }
 
 static xlist_t *
-get_volumes (GVolumeMonitor *volume_monitor)
+get_volumes (xvolume_monitor_t *volume_monitor)
 {
   GUnixVolumeMonitor *monitor;
 
   monitor = G_UNIX_VOLUME_MONITOR (volume_monitor);
 
-  return g_list_copy_deep (monitor->volumes, (GCopyFunc) g_object_ref, NULL);
+  return xlist_copy_deep (monitor->volumes, (GCopyFunc) xobject_ref, NULL);
 }
 
 static xlist_t *
-get_connected_drives (GVolumeMonitor *volume_monitor)
+get_connected_drives (xvolume_monitor_t *volume_monitor)
 {
   return NULL;
 }
 
-static GVolume *
-get_volume_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
+static xvolume_t *
+get_volume_for_uuid (xvolume_monitor_t *volume_monitor, const char *uuid)
 {
   return NULL;
 }
 
-static GMount *
-get_mount_for_uuid (GVolumeMonitor *volume_monitor, const char *uuid)
+static xmount_t *
+get_mount_for_uuid (xvolume_monitor_t *volume_monitor, const char *uuid)
 {
   return NULL;
 }
@@ -143,7 +143,7 @@ is_supported (void)
   return TRUE;
 }
 
-static GMount *
+static xmount_t *
 get_mount_for_mount_path (const char *mount_path,
                           xcancellable_t *cancellable)
 {
@@ -226,12 +226,12 @@ g_unix_volume_monitor_init (GUnixVolumeMonitor *unix_monitor)
   _g_unix_volume_monitor_update (unix_monitor);
 }
 
-GVolumeMonitor *
+xvolume_monitor_t *
 _g_unix_volume_monitor_new (void)
 {
   GUnixVolumeMonitor *monitor;
 
-  monitor = g_object_new (XTYPE_UNIX_VOLUME_MONITOR, NULL);
+  monitor = xobject_new (XTYPE_UNIX_VOLUME_MONITOR, NULL);
 
   return G_VOLUME_MONITOR (monitor);
 }
@@ -253,12 +253,12 @@ diff_sorted_lists (xlist_t         *list1,
       order = (*compare) (list1->data, list2->data);
       if (order < 0)
 	{
-	  *removed = g_list_prepend (*removed, list1->data);
+	  *removed = xlist_prepend (*removed, list1->data);
 	  list1 = list1->next;
 	}
       else if (order > 0)
 	{
-	  *added = g_list_prepend (*added, list2->data);
+	  *added = xlist_prepend (*added, list2->data);
 	  list2 = list2->next;
 	}
       else
@@ -270,12 +270,12 @@ diff_sorted_lists (xlist_t         *list1,
 
   while (list1 != NULL)
     {
-      *removed = g_list_prepend (*removed, list1->data);
+      *removed = xlist_prepend (*removed, list1->data);
       list1 = list1->next;
     }
   while (list2 != NULL)
     {
-      *added = g_list_prepend (*added, list2->data);
+      *added = xlist_prepend (*added, list2->data);
       list2 = list2->next;
     }
 }
@@ -324,7 +324,7 @@ update_volumes (GUnixVolumeMonitor *monitor)
 
   new_mountpoints = g_unix_mount_points_get (NULL);
 
-  new_mountpoints = g_list_sort (new_mountpoints, (GCompareFunc) g_unix_mount_point_compare);
+  new_mountpoints = xlist_sort (new_mountpoints, (GCompareFunc) g_unix_mount_point_compare);
 
   diff_sorted_lists (monitor->last_mountpoints,
 		     new_mountpoints, (GCompareFunc) g_unix_mount_point_compare,
@@ -339,10 +339,10 @@ update_volumes (GUnixVolumeMonitor *monitor)
       if (volume)
 	{
 	  _g_unix_volume_disconnected (volume);
-	  monitor->volumes = g_list_remove (monitor->volumes, volume);
+	  monitor->volumes = xlist_remove (monitor->volumes, volume);
 	  g_signal_emit_by_name (monitor, "volume-removed", volume);
 	  g_signal_emit_by_name (volume, "removed");
-	  g_object_unref (volume);
+	  xobject_unref (volume);
 	}
     }
 
@@ -353,14 +353,14 @@ update_volumes (GUnixVolumeMonitor *monitor)
       volume = _g_unix_volume_new (G_VOLUME_MONITOR (monitor), mountpoint);
       if (volume)
 	{
-	  monitor->volumes = g_list_prepend (monitor->volumes, volume);
+	  monitor->volumes = xlist_prepend (monitor->volumes, volume);
 	  g_signal_emit_by_name (monitor, "volume-added", volume);
 	}
     }
 
-  g_list_free (added);
-  g_list_free (removed);
-  g_list_free_full (monitor->last_mountpoints, (GDestroyNotify) g_unix_mount_point_free);
+  xlist_free (added);
+  xlist_free (removed);
+  xlist_free_full (monitor->last_mountpoints, (xdestroy_notify_t) g_unix_mount_point_free);
   monitor->last_mountpoints = new_mountpoints;
 }
 
@@ -376,7 +376,7 @@ update_mounts (GUnixVolumeMonitor *monitor)
 
   new_mounts = g_unix_mounts_get (NULL);
 
-  new_mounts = g_list_sort (new_mounts, (GCompareFunc) g_unix_mount_compare);
+  new_mounts = xlist_sort (new_mounts, (GCompareFunc) g_unix_mount_compare);
 
   diff_sorted_lists (monitor->last_mounts,
 		     new_mounts, (GCompareFunc) g_unix_mount_compare,
@@ -390,10 +390,10 @@ update_mounts (GUnixVolumeMonitor *monitor)
       if (mount)
 	{
 	  _g_unix_mount_unmounted (mount);
-	  monitor->mounts = g_list_remove (monitor->mounts, mount);
+	  monitor->mounts = xlist_remove (monitor->mounts, mount);
 	  g_signal_emit_by_name (monitor, "mount-removed", mount);
 	  g_signal_emit_by_name (mount, "unmounted");
-	  g_object_unref (mount);
+	  xobject_unref (mount);
 	}
     }
 
@@ -407,13 +407,13 @@ update_mounts (GUnixVolumeMonitor *monitor)
       mount = _g_unix_mount_new (G_VOLUME_MONITOR (monitor), mount_entry, volume);
       if (mount)
 	{
-	  monitor->mounts = g_list_prepend (monitor->mounts, mount);
+	  monitor->mounts = xlist_prepend (monitor->mounts, mount);
 	  g_signal_emit_by_name (monitor, "mount-added", mount);
 	}
     }
 
-  g_list_free (added);
-  g_list_free (removed);
-  g_list_free_full (monitor->last_mounts, (GDestroyNotify) g_unix_mount_free);
+  xlist_free (added);
+  xlist_free (removed);
+  xlist_free_full (monitor->last_mounts, (xdestroy_notify_t) g_unix_mount_free);
   monitor->last_mounts = new_mounts;
 }

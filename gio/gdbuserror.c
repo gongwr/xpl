@@ -48,18 +48,18 @@
  * always use g_dbus_error_strip_remote_error().
  *
  * In addition, facilities used to return errors to a remote peer also
- * use #xerror_t. See g_dbus_method_invocation_return_error() for
+ * use #xerror_t. See xdbus_method_invocation_return_error() for
  * discussion about how the D-Bus error name is set.
  *
  * Applications can associate a #xerror_t error domain with a set of D-Bus errors in order to
  * automatically map from D-Bus errors to #xerror_t and back. This
- * is typically done in the function returning the #GQuark for the
+ * is typically done in the function returning the #xquark for the
  * error domain:
  * |[<!-- language="C" -->
  * // foo-bar-error.h:
  *
  * #define FOO_BAR_ERROR (foo_bar_error_quark ())
- * GQuark foo_bar_error_quark (void);
+ * xquark foo_bar_error_quark (void);
  *
  * typedef enum
  * {
@@ -71,17 +71,17 @@
  *
  * // foo-bar-error.c:
  *
- * static const GDBusErrorEntry foo_bar_error_entries[] =
+ * static const xdbus_error_entry_t foo_bar_error_entries[] =
  * {
- *   {FOO_BAR_ERROR_FAILED,           "org.project.Foo.Bar.Error.Failed"},
- *   {FOO_BAR_ERROR_ANOTHER_ERROR,    "org.project.Foo.Bar.Error.AnotherError"},
- *   {FOO_BAR_ERROR_SOME_THIRD_ERROR, "org.project.Foo.Bar.Error.SomeThirdError"},
+ *   {FOO_BAR_ERROR_FAILED,           "org.project.foo_t.Bar.Error.Failed"},
+ *   {FOO_BAR_ERROR_ANOTHER_ERROR,    "org.project.foo_t.Bar.Error.AnotherError"},
+ *   {FOO_BAR_ERROR_SOME_THIRD_ERROR, "org.project.foo_t.Bar.Error.SomeThirdError"},
  * };
  *
  * // Ensure that every error code has an associated D-Bus error name
  * G_STATIC_ASSERT (G_N_ELEMENTS (foo_bar_error_entries) == FOO_BAR_N_ERRORS);
  *
- * GQuark
+ * xquark
  * foo_bar_error_quark (void)
  * {
  *   static xsize_t quark = 0;
@@ -89,25 +89,25 @@
  *                                       &quark,
  *                                       foo_bar_error_entries,
  *                                       G_N_ELEMENTS (foo_bar_error_entries));
- *   return (GQuark) quark;
+ *   return (xquark) quark;
  * }
  * ]|
  * With this setup, a D-Bus peer can transparently pass e.g. %FOO_BAR_ERROR_ANOTHER_ERROR and
- * other peers will see the D-Bus error name org.project.Foo.Bar.Error.AnotherError.
+ * other peers will see the D-Bus error name org.project.foo_t.Bar.Error.AnotherError.
  *
  * If the other peer is using GDBus, and has registered the association with
  * g_dbus_error_register_error_domain() in advance (e.g. by invoking the %FOO_BAR_ERROR quark
  * generation itself in the previous example) the peer will see also %FOO_BAR_ERROR_ANOTHER_ERROR instead
  * of %G_IO_ERROR_DBUS_ERROR. Note that GDBus clients can still recover
- * org.project.Foo.Bar.Error.AnotherError using g_dbus_error_get_remote_error().
+ * org.project.foo_t.Bar.Error.AnotherError using g_dbus_error_get_remote_error().
  *
  * Note that the %G_DBUS_ERROR error domain is intended only
  * for returning errors from a remote message bus process. Errors
- * generated locally in-process by e.g. #GDBusConnection should use the
+ * generated locally in-process by e.g. #xdbus_connection_t should use the
  * %G_IO_ERROR domain.
  */
 
-static const GDBusErrorEntry g_dbus_error_entries[] =
+static const xdbus_error_entry_t g_dbus_error_entries[] =
 {
   {G_DBUS_ERROR_FAILED,                           "org.freedesktop.DBus.Error.Failed"},
   {G_DBUS_ERROR_NO_MEMORY,                        "org.freedesktop.DBus.Error.NoMemory"},
@@ -156,7 +156,7 @@ static const GDBusErrorEntry g_dbus_error_entries[] =
   {G_DBUS_ERROR_PROPERTY_READ_ONLY,               "org.freedesktop.DBus.Error.PropertyReadOnly"},
 };
 
-GQuark
+xquark
 g_dbus_error_quark (void)
 {
   G_STATIC_ASSERT (G_N_ELEMENTS (g_dbus_error_entries) - 1 == G_DBUS_ERROR_PROPERTY_READ_ONLY);
@@ -165,14 +165,14 @@ g_dbus_error_quark (void)
                                       &quark,
                                       g_dbus_error_entries,
                                       G_N_ELEMENTS (g_dbus_error_entries));
-  return (GQuark) quark;
+  return (xquark) quark;
 }
 
 /**
  * g_dbus_error_register_error_domain:
  * @error_domain_quark_name: The error domain name.
- * @quark_volatile: A pointer where to store the #GQuark.
- * @entries: (array length=num_entries): A pointer to @num_entries #GDBusErrorEntry struct items.
+ * @quark_volatile: A pointer where to store the #xquark.
+ * @entries: (array length=num_entries): A pointer to @num_entries #xdbus_error_entry_t struct items.
  * @num_entries: Number of items to register.
  *
  * Helper function for associating a #xerror_t error domain with D-Bus error names.
@@ -185,7 +185,7 @@ g_dbus_error_quark (void)
 void
 g_dbus_error_register_error_domain (const xchar_t           *error_domain_quark_name,
                                     volatile xsize_t        *quark_volatile,
-                                    const GDBusErrorEntry *entries,
+                                    const xdbus_error_entry_t *entries,
                                     xuint_t                  num_entries)
 {
   xsize_t *quark;
@@ -202,7 +202,7 @@ g_dbus_error_register_error_domain (const xchar_t           *error_domain_quark_
   if (g_once_init_enter (quark))
     {
       xuint_t n;
-      GQuark new_quark;
+      xquark new_quark;
 
       new_quark = g_quark_from_static_string (error_domain_quark_name);
 
@@ -218,20 +218,20 @@ g_dbus_error_register_error_domain (const xchar_t           *error_domain_quark_
 
 static xboolean_t
 _g_dbus_error_decode_gerror (const xchar_t *dbus_name,
-                             GQuark      *out_error_domain,
+                             xquark      *out_error_domain,
                              xint_t        *out_error_code)
 {
   xboolean_t ret;
   xuint_t n;
-  GString *s;
+  xstring_t *s;
   xchar_t *domain_quark_string;
 
   ret = FALSE;
   s = NULL;
 
-  if (g_str_has_prefix (dbus_name, "org.gtk.GDBus.UnmappedGError.Quark._"))
+  if (xstr_has_prefix (dbus_name, "org.gtk.GDBus.UnmappedGError.Quark._"))
     {
-      s = g_string_new (NULL);
+      s = xstring_new (NULL);
 
       for (n = sizeof "org.gtk.GDBus.UnmappedGError.Quark._" - 1;
            dbus_name[n] != '.' && dbus_name[n] != '\0';
@@ -239,7 +239,7 @@ _g_dbus_error_decode_gerror (const xchar_t *dbus_name,
         {
           if (g_ascii_isalnum (dbus_name[n]))
             {
-              g_string_append_c (s, dbus_name[n]);
+              xstring_append_c (s, dbus_name[n]);
             }
           else if (dbus_name[n] == '_')
             {
@@ -266,7 +266,7 @@ _g_dbus_error_decode_gerror (const xchar_t *dbus_name,
               else
                 goto not_mapped;
 
-              g_string_append_c (s, (nibble_top<<4) | nibble_bottom);
+              xstring_append_c (s, (nibble_top<<4) | nibble_bottom);
             }
           else
             {
@@ -274,10 +274,10 @@ _g_dbus_error_decode_gerror (const xchar_t *dbus_name,
             }
         }
 
-      if (!g_str_has_prefix (dbus_name + n, ".Code"))
+      if (!xstr_has_prefix (dbus_name + n, ".Code"))
         goto not_mapped;
 
-      domain_quark_string = g_string_free (s, FALSE);
+      domain_quark_string = xstring_free (s, FALSE);
       s = NULL;
 
       if (out_error_domain != NULL)
@@ -293,7 +293,7 @@ _g_dbus_error_decode_gerror (const xchar_t *dbus_name,
  not_mapped:
 
   if (s != NULL)
-    g_string_free (s, TRUE);
+    xstring_free (s, TRUE);
 
   return ret;
 }
@@ -302,7 +302,7 @@ _g_dbus_error_decode_gerror (const xchar_t *dbus_name,
 
 typedef struct
 {
-  GQuark error_domain;
+  xquark error_domain;
   xint_t   error_code;
 } QuarkCodePair;
 
@@ -337,21 +337,21 @@ registered_error_free (RegisteredError *re)
 G_LOCK_DEFINE_STATIC (error_lock);
 
 /* maps from QuarkCodePair* -> RegisteredError* */
-static GHashTable *quark_code_pair_to_re = NULL;
+static xhashtable_t *quark_code_pair_to_re = NULL;
 
 /* maps from xchar_t* -> RegisteredError* */
-static GHashTable *dbus_error_name_to_re = NULL;
+static xhashtable_t *dbus_error_name_to_re = NULL;
 
 /**
  * g_dbus_error_register_error:
- * @error_domain: A #GQuark for an error domain.
+ * @error_domain: A #xquark for an error domain.
  * @error_code: An error code.
  * @dbus_error_name: A D-Bus error name.
  *
  * Creates an association to map between @dbus_error_name and
  * #GErrors specified by @error_domain and @error_code.
  *
- * This is typically done in the routine that returns the #GQuark for
+ * This is typically done in the routine that returns the #xquark for
  * an error domain.
  *
  * Returns: %TRUE if the association was created, %FALSE if it already
@@ -360,7 +360,7 @@ static GHashTable *dbus_error_name_to_re = NULL;
  * Since: 2.26
  */
 xboolean_t
-g_dbus_error_register_error (GQuark       error_domain,
+g_dbus_error_register_error (xquark       error_domain,
                              xint_t         error_code,
                              const xchar_t *dbus_error_name)
 {
@@ -377,29 +377,29 @@ g_dbus_error_register_error (GQuark       error_domain,
   if (quark_code_pair_to_re == NULL)
     {
       g_assert (dbus_error_name_to_re == NULL); /* check invariant */
-      quark_code_pair_to_re = g_hash_table_new ((GHashFunc) quark_code_pair_hash_func,
+      quark_code_pair_to_re = xhash_table_new ((GHashFunc) quark_code_pair_hash_func,
                                                 (GEqualFunc) quark_code_pair_equal_func);
-      dbus_error_name_to_re = g_hash_table_new_full (g_str_hash,
-                                                     g_str_equal,
+      dbus_error_name_to_re = xhash_table_new_full (xstr_hash,
+                                                     xstr_equal,
                                                      NULL,
-                                                     (GDestroyNotify) registered_error_free);
+                                                     (xdestroy_notify_t) registered_error_free);
     }
 
-  if (g_hash_table_lookup (dbus_error_name_to_re, dbus_error_name) != NULL)
+  if (xhash_table_lookup (dbus_error_name_to_re, dbus_error_name) != NULL)
     goto out;
 
   pair.error_domain = error_domain;
   pair.error_code = error_code;
 
-  if (g_hash_table_lookup (quark_code_pair_to_re, &pair) != NULL)
+  if (xhash_table_lookup (quark_code_pair_to_re, &pair) != NULL)
     goto out;
 
   re = g_new0 (RegisteredError, 1);
   re->pair = pair;
-  re->dbus_error_name = g_strdup (dbus_error_name);
+  re->dbus_error_name = xstrdup (dbus_error_name);
 
-  g_hash_table_insert (quark_code_pair_to_re, &(re->pair), re);
-  g_hash_table_insert (dbus_error_name_to_re, re->dbus_error_name, re);
+  xhash_table_insert (quark_code_pair_to_re, &(re->pair), re);
+  xhash_table_insert (dbus_error_name_to_re, re->dbus_error_name, re);
 
   ret = TRUE;
 
@@ -410,7 +410,7 @@ g_dbus_error_register_error (GQuark       error_domain,
 
 /**
  * g_dbus_error_unregister_error:
- * @error_domain: A #GQuark for an error domain.
+ * @error_domain: A #xquark for an error domain.
  * @error_code: An error code.
  * @dbus_error_name: A D-Bus error name.
  *
@@ -421,7 +421,7 @@ g_dbus_error_register_error (GQuark       error_domain,
  * Since: 2.26
  */
 xboolean_t
-g_dbus_error_unregister_error (GQuark       error_domain,
+g_dbus_error_unregister_error (xquark       error_domain,
                                xint_t         error_code,
                                const xchar_t *dbus_error_name)
 {
@@ -441,37 +441,37 @@ g_dbus_error_unregister_error (GQuark       error_domain,
       goto out;
     }
 
-  re = g_hash_table_lookup (dbus_error_name_to_re, dbus_error_name);
+  re = xhash_table_lookup (dbus_error_name_to_re, dbus_error_name);
   if (re == NULL)
     {
       QuarkCodePair pair;
       pair.error_domain = error_domain;
       pair.error_code = error_code;
-      g_warn_if_fail (g_hash_table_lookup (quark_code_pair_to_re, &pair) == NULL); /* check invariant */
+      g_warn_if_fail (xhash_table_lookup (quark_code_pair_to_re, &pair) == NULL); /* check invariant */
       goto out;
     }
 
   ret = TRUE;
 
-  g_warn_if_fail (g_hash_table_lookup (quark_code_pair_to_re, &(re->pair)) == re); /* check invariant */
+  g_warn_if_fail (xhash_table_lookup (quark_code_pair_to_re, &(re->pair)) == re); /* check invariant */
 
-  g_warn_if_fail (g_hash_table_remove (quark_code_pair_to_re, &(re->pair)));
-  g_warn_if_fail (g_hash_table_remove (dbus_error_name_to_re, re->dbus_error_name));
+  g_warn_if_fail (xhash_table_remove (quark_code_pair_to_re, &(re->pair)));
+  g_warn_if_fail (xhash_table_remove (dbus_error_name_to_re, re->dbus_error_name));
 
   /* destroy hashes if empty */
-  hash_size = g_hash_table_size (dbus_error_name_to_re);
+  hash_size = xhash_table_size (dbus_error_name_to_re);
   if (hash_size == 0)
     {
-      g_warn_if_fail (g_hash_table_size (quark_code_pair_to_re) == 0); /* check invariant */
+      g_warn_if_fail (xhash_table_size (quark_code_pair_to_re) == 0); /* check invariant */
 
-      g_hash_table_unref (dbus_error_name_to_re);
+      xhash_table_unref (dbus_error_name_to_re);
       dbus_error_name_to_re = NULL;
-      g_hash_table_unref (quark_code_pair_to_re);
+      xhash_table_unref (quark_code_pair_to_re);
       quark_code_pair_to_re = NULL;
     }
   else
     {
-      g_warn_if_fail (g_hash_table_size (quark_code_pair_to_re) == hash_size); /* check invariant */
+      g_warn_if_fail (xhash_table_size (quark_code_pair_to_re) == hash_size); /* check invariant */
     }
 
  out:
@@ -497,7 +497,7 @@ xboolean_t
 g_dbus_error_is_remote_error (const xerror_t *error)
 {
   g_return_val_if_fail (error != NULL, FALSE);
-  return g_str_has_prefix (error->message, "GDBus.Error:");
+  return xstr_has_prefix (error->message, "GDBus.Error:");
 }
 
 
@@ -539,16 +539,16 @@ g_dbus_error_get_remote_error (const xerror_t *error)
       pair.error_domain = error->domain;
       pair.error_code = error->code;
       g_assert (dbus_error_name_to_re != NULL); /* check invariant */
-      re = g_hash_table_lookup (quark_code_pair_to_re, &pair);
+      re = xhash_table_lookup (quark_code_pair_to_re, &pair);
     }
 
   if (re != NULL)
     {
-      ret = g_strdup (re->dbus_error_name);
+      ret = xstrdup (re->dbus_error_name);
     }
   else
     {
-      if (g_str_has_prefix (error->message, "GDBus.Error:"))
+      if (xstr_has_prefix (error->message, "GDBus.Error:"))
         {
           const xchar_t *begin;
           const xchar_t *end;
@@ -556,7 +556,7 @@ g_dbus_error_get_remote_error (const xerror_t *error)
           end = strstr (begin, ":");
           if (end != NULL && end[1] == ' ')
             {
-              ret = g_strndup (begin, end - begin);
+              ret = xstrndup (begin, end - begin);
             }
         }
     }
@@ -600,7 +600,7 @@ g_dbus_error_get_remote_error (const xerror_t *error)
  * #xerror_t instances for applications. Regular applications should not use
  * it.
  *
- * Returns: (transfer full): An allocated #xerror_t. Free with g_error_free().
+ * Returns: (transfer full): An allocated #xerror_t. Free with xerror_free().
  *
  * Since: 2.26
  */
@@ -623,12 +623,12 @@ g_dbus_error_new_for_dbus_error (const xchar_t *dbus_error_name,
   if (dbus_error_name_to_re != NULL)
     {
       g_assert (quark_code_pair_to_re != NULL); /* check invariant */
-      re = g_hash_table_lookup (dbus_error_name_to_re, dbus_error_name);
+      re = xhash_table_lookup (dbus_error_name_to_re, dbus_error_name);
     }
 
   if (re != NULL)
     {
-      error = g_error_new (re->pair.error_domain,
+      error = xerror_new (re->pair.error_domain,
                            re->pair.error_code,
                            "GDBus.Error:%s: %s",
                            dbus_error_name,
@@ -636,14 +636,14 @@ g_dbus_error_new_for_dbus_error (const xchar_t *dbus_error_name,
     }
   else
     {
-      GQuark error_domain = 0;
+      xquark error_domain = 0;
       xint_t error_code = 0;
 
       if (_g_dbus_error_decode_gerror (dbus_error_name,
                                        &error_domain,
                                        &error_code))
         {
-          error = g_error_new (error_domain,
+          error = xerror_new (error_domain,
                                error_code,
                                "GDBus.Error:%s: %s",
                                dbus_error_name,
@@ -651,7 +651,7 @@ g_dbus_error_new_for_dbus_error (const xchar_t *dbus_error_name,
         }
       else
         {
-          error = g_error_new (G_IO_ERROR,
+          error = xerror_new (G_IO_ERROR,
                                G_IO_ERROR_DBUS_ERROR,
                                "GDBus.Error:%s: %s",
                                dbus_error_name,
@@ -738,8 +738,8 @@ g_dbus_error_set_dbus_error_valist (xerror_t      **error,
     {
       xchar_t *message;
       xchar_t *s;
-      message = g_strdup_vprintf (format, var_args);
-      s = g_strdup_printf ("%s: %s", message, dbus_error_message);
+      message = xstrdup_vprintf (format, var_args);
+      s = xstrdup_printf ("%s: %s", message, dbus_error_message);
       *error = g_dbus_error_new_for_dbus_error (dbus_error_name, s);
       g_free (s);
       g_free (message);
@@ -774,7 +774,7 @@ g_dbus_error_strip_remote_error (xerror_t *error)
 
   ret = FALSE;
 
-  if (g_str_has_prefix (error->message, "GDBus.Error:"))
+  if (xstr_has_prefix (error->message, "GDBus.Error:"))
     {
       const xchar_t *begin;
       const xchar_t *end;
@@ -784,7 +784,7 @@ g_dbus_error_strip_remote_error (xerror_t *error)
       end = strstr (begin, ":");
       if (end != NULL && end[1] == ' ')
         {
-          new_message = g_strdup (end + 2);
+          new_message = xstrdup (end + 2);
           g_free (error->message);
           error->message = new_message;
           ret = TRUE;
@@ -836,17 +836,17 @@ g_dbus_error_encode_gerror (const xerror_t *error)
       pair.error_domain = error->domain;
       pair.error_code = error->code;
       g_assert (dbus_error_name_to_re != NULL); /* check invariant */
-      re = g_hash_table_lookup (quark_code_pair_to_re, &pair);
+      re = xhash_table_lookup (quark_code_pair_to_re, &pair);
     }
   if (re != NULL)
     {
-      error_name = g_strdup (re->dbus_error_name);
+      error_name = xstrdup (re->dbus_error_name);
       G_UNLOCK (error_lock);
     }
   else
     {
       const xchar_t *domain_as_string;
-      GString *s;
+      xstring_t *s;
       xuint_t n;
 
       G_UNLOCK (error_lock);
@@ -860,19 +860,19 @@ g_dbus_error_encode_gerror (const xerror_t *error)
       /* 0 is not a domain; neither are non-quark integers */
       g_return_val_if_fail (domain_as_string != NULL, NULL);
 
-      s = g_string_new ("org.gtk.GDBus.UnmappedGError.Quark._");
+      s = xstring_new ("org.gtk.GDBus.UnmappedGError.Quark._");
       for (n = 0; domain_as_string[n] != 0; n++)
         {
           xint_t c = domain_as_string[n];
           if (g_ascii_isalnum (c))
             {
-              g_string_append_c (s, c);
+              xstring_append_c (s, c);
             }
           else
             {
               xuint_t nibble_top;
               xuint_t nibble_bottom;
-              g_string_append_c (s, '_');
+              xstring_append_c (s, '_');
               nibble_top = ((int) domain_as_string[n]) >> 4;
               nibble_bottom = ((int) domain_as_string[n]) & 0x0f;
               if (nibble_top < 10)
@@ -883,12 +883,12 @@ g_dbus_error_encode_gerror (const xerror_t *error)
                 nibble_bottom += '0';
               else
                 nibble_bottom += 'a' - 10;
-              g_string_append_c (s, nibble_top);
-              g_string_append_c (s, nibble_bottom);
+              xstring_append_c (s, nibble_top);
+              xstring_append_c (s, nibble_bottom);
             }
         }
-      g_string_append_printf (s, ".Code%d", error->code);
-      error_name = g_string_free (s, FALSE);
+      xstring_append_printf (s, ".Code%d", error->code);
+      error_name = xstring_free (s, FALSE);
     }
 
   return error_name;

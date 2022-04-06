@@ -46,8 +46,8 @@
  * // some code which might take a while
  *
  * g_trace_mark (begin_time_nsec, G_TRACE_CURRENT_TIME - begin_time_nsec,
- *               "GLib", "GSource.dispatch",
- *               "%s ⇒ %s", g_source_get_name (source), need_destroy ? "destroy" : "keep");
+ *               "GLib", "xsource_t.dispatch",
+ *               "%s ⇒ %s", xsource_get_name (source), need_destroy ? "destroy" : "keep");
  * ]|
  *
  * The tracing API is currently internal to GLib.
@@ -132,9 +132,9 @@ xuint_t
 
   counter.type = SYSPROF_CAPTURE_COUNTER_INT64;
   counter.value.v64 = 0;
-  g_strlcpy (counter.category, group, sizeof counter.category);
-  g_strlcpy (counter.name, name, sizeof counter.name);
-  g_strlcpy (counter.description, description, sizeof counter.description);
+  xstrlcpy (counter.category, group, sizeof counter.category);
+  xstrlcpy (counter.name, name, sizeof counter.name);
+  xstrlcpy (counter.description, description, sizeof counter.description);
 
   sysprof_collector_define_counters (&counter, 1);
 

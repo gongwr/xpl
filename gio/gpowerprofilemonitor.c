@@ -31,11 +31,11 @@
 
 /**
  * SECTION:gpowerprofilemonitor
- * @title: GPowerProfileMonitor
+ * @title: xpower_profile_monitor_t
  * @short_description: Power profile monitor
  * @include: gio/gio.h
  *
- * #GPowerProfileMonitor makes it possible for applications as well as OS components
+ * #xpower_profile_monitor_t makes it possible for applications as well as OS components
  * to monitor system power profiles and act upon them. It currently only exports
  * whether the system is in “Power Saver” mode (known as “Low Power” mode on
  * some systems).
@@ -55,59 +55,59 @@
  * or activity at all), `sysprof` to inspect CPU usage, and `intel_gpu_time` to
  * profile GPU usage.
  *
- * Don't forget to disconnect the #GPowerProfileMonitor::notify::power-saver-enabled
- * signal, and unref the #GPowerProfileMonitor itself when exiting.
+ * Don't forget to disconnect the #xpower_profile_monitor_t::notify::power-saver-enabled
+ * signal, and unref the #xpower_profile_monitor_t itself when exiting.
  *
  * Since: 2.70
  */
 
 /**
- * GPowerProfileMonitor:
+ * xpower_profile_monitor_t:
  *
- * #GPowerProfileMonitor monitors system power profile and notifies on
+ * #xpower_profile_monitor_t monitors system power profile and notifies on
  * changes.
  *
  * Since: 2.70
  */
 
 /**
- * GPowerProfileMonitorInterface:
+ * xpower_profile_monitor_tInterface:
  * @x_iface: The parent interface.
  *
- * The virtual function table for #GPowerProfileMonitor.
+ * The virtual function table for #xpower_profile_monitor_t.
  *
  * Since: 2.70
  */
 
-G_DEFINE_INTERFACE_WITH_CODE (GPowerProfileMonitor, g_power_profile_monitor, XTYPE_OBJECT,
-                              g_type_interface_add_prerequisite (g_define_type_id, XTYPE_INITABLE))
+G_DEFINE_INTERFACE_WITH_CODE (xpower_profile_monitor_t, g_power_profile_monitor, XTYPE_OBJECT,
+                              xtype_interface_add_prerequisite (g_define_type_id, XTYPE_INITABLE))
 
 
 /**
  * g_power_profile_monitor_dup_default:
  *
- * Gets a reference to the default #GPowerProfileMonitor for the system.
+ * Gets a reference to the default #xpower_profile_monitor_t for the system.
  *
- * Returns: (not nullable) (transfer full): a new reference to the default #GPowerProfileMonitor
+ * Returns: (not nullable) (transfer full): a new reference to the default #xpower_profile_monitor_t
  *
  * Since: 2.70
  */
-GPowerProfileMonitor *
+xpower_profile_monitor_t *
 g_power_profile_monitor_dup_default (void)
 {
-  return g_object_ref (_xio_module_get_default (G_POWER_PROFILE_MONITOR_EXTENSION_POINT_NAME,
+  return xobject_ref (_xio_module_get_default (G_POWER_PROFILE_MONITOR_EXTENSION_POINT_NAME,
                                                  "GIO_USE_POWER_PROFILE_MONITOR",
                                                  NULL));
 }
 
 /**
  * g_power_profile_monitor_get_power_saver_enabled:
- * @monitor: a #GPowerProfileMonitor
+ * @monitor: a #xpower_profile_monitor_t
  *
  * Gets whether the system is in “Power Saver” mode.
  *
  * You are expected to listen to the
- * #GPowerProfileMonitor::notify::power-saver-enabled signal to know when the profile has
+ * #xpower_profile_monitor_t::notify::power-saver-enabled signal to know when the profile has
  * changed.
  *
  * Returns: Whether the system is in “Power Saver” mode.
@@ -115,24 +115,24 @@ g_power_profile_monitor_dup_default (void)
  * Since: 2.70
  */
 xboolean_t
-g_power_profile_monitor_get_power_saver_enabled (GPowerProfileMonitor *monitor)
+g_power_profile_monitor_get_power_saver_enabled (xpower_profile_monitor_t *monitor)
 {
   xboolean_t enabled;
-  g_object_get (monitor, "power-saver-enabled", &enabled, NULL);
+  xobject_get (monitor, "power-saver-enabled", &enabled, NULL);
   return enabled;
 }
 
 static void
-g_power_profile_monitor_default_init (GPowerProfileMonitorInterface *iface)
+g_power_profile_monitor_default_init (xpower_profile_monitor_tInterface *iface)
 {
   /**
-   * GPowerProfileMonitor:power-saver-enabled:
+   * xpower_profile_monitor_t:power-saver-enabled:
    *
    * Whether “Power Saver” mode is enabled on the system.
    *
    * Since: 2.70
    */
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
                                        g_param_spec_boolean ("power-saver-enabled",
                                                              "power-saver-enabled",
                                                              "Power Saver Enabled",

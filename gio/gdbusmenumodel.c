@@ -27,20 +27,20 @@
 
 /**
  * SECTION:gdbusmenumodel
- * @title: GDBusMenuModel
- * @short_description: A D-Bus GMenuModel implementation
+ * @title: xdbus_menu_model_t
+ * @short_description: A D-Bus xmenu_model_t implementation
  * @include: gio/gio.h
- * @see_also: [GMenuModel Exporter][gio-GMenuModel-exporter]
+ * @see_also: [xmenu_model_t Exporter][gio-xmenu_model_t-exporter]
  *
- * #GDBusMenuModel is an implementation of #GMenuModel that can be used
+ * #xdbus_menu_model_t is an implementation of #xmenu_model_t that can be used
  * as a proxy for a menu model that is exported over D-Bus with
  * g_dbus_connection_export_menu_model().
  */
 
 /**
- * GDBusMenuModel:
+ * xdbus_menu_model_t:
  *
- * #GDBusMenuModel is an opaque data structure and can only be accessed
+ * #xdbus_menu_model_t is an opaque data structure and can only be accessed
  * using the following functions.
  */
 
@@ -49,19 +49,19 @@
  *
  *   - GDBusMenuPath
  *   - GDBusMenuGroup
- *   - GDBusMenuModel
+ *   - xdbus_menu_model_t
  *
  * Each of these classes exists as a parameterised singleton keyed to a
  * particular thing:
  *
  *   - GDBusMenuPath represents a D-Bus object path on a particular
- *     unique bus name on a particular GDBusConnection and in a
- *     particular GMainContext.
+ *     unique bus name on a particular xdbus_connection_t and in a
+ *     particular xmain_context_t.
  *
  *   - GDBusMenuGroup represents a particular group on a particular
  *     GDBusMenuPath.
  *
- *   - GDBusMenuModel represents a particular menu within a particular
+ *   - xdbus_menu_model_t represents a particular menu within a particular
  *     GDBusMenuGroup.
  *
  * There are also two (and a half) utility structs:
@@ -69,7 +69,7 @@
  *  - PathIdentifier and ConstPathIdentifier
  *  - GDBusMenuModelItem
  *
- * PathIdentifier is the 4-tuple of (GMainContext, GDBusConnection,
+ * PathIdentifier is the 4-tuple of (xmain_context_t, xdbus_connection_t,
  * unique name, object path) that uniquely identifies a particular
  * GDBusMenuPath.  It holds ownership on each of these things, so we
  * have a ConstPathIdentifier variant that does not.
@@ -83,33 +83,33 @@
  *     number) to GDBusMenuGroup
  *
  *   - each GDBusMenuGroup has a hashtable mapping from xuint_t (menu
- *     number) to GDBusMenuModel.
+ *     number) to xdbus_menu_model_t.
  *
  * In this way, each quintuplet of (connection, bus name, object path,
- * group id, menu id) maps to a single GDBusMenuModel instance that can be
+ * group id, menu id) maps to a single xdbus_menu_model_t instance that can be
  * located via 3 hashtable lookups.
  *
  * All of the 3 classes are refcounted (GDBusMenuPath and
- * GDBusMenuGroup manually, and GDBusMenuModel by virtue of being a
+ * GDBusMenuGroup manually, and xdbus_menu_model_t by virtue of being a
  * xobject_t).  The hashtables do not hold references -- rather, when the
  * last reference is dropped, the object is removed from the hashtable.
  *
- * The hard references go in the other direction: GDBusMenuModel is created
+ * The hard references go in the other direction: xdbus_menu_model_t is created
  * as the user requests it and only exists as long as the user holds a
- * reference on it.  GDBusMenuModel holds a reference on the GDBusMenuGroup
+ * reference on it.  xdbus_menu_model_t holds a reference on the GDBusMenuGroup
  * from which it came. GDBusMenuGroup holds a reference on
  * GDBusMenuPath.
  *
  * In addition to refcounts, each object has an 'active' variable (ints
- * for GDBusMenuPath and GDBusMenuGroup, boolean for GDBusMenuModel).
+ * for GDBusMenuPath and GDBusMenuGroup, boolean for xdbus_menu_model_t).
  *
- *   - GDBusMenuModel is inactive when created and becomes active only when
+ *   - xdbus_menu_model_t is inactive when created and becomes active only when
  *     first queried for information.  This prevents extra work from
- *     happening just by someone acquiring a GDBusMenuModel (and not
+ *     happening just by someone acquiring a xdbus_menu_model_t (and not
  *     actually trying to display it yet).
  *
  *   - The active count on GDBusMenuGroup is equal to the number of
- *     GDBusMenuModel instances in that group that are active.  When the
+ *     xdbus_menu_model_t instances in that group that are active.  When the
  *     active count transitions from 0 to 1, the group calls the 'Start'
  *     method on the service to begin monitoring that group.  When it
  *     drops from 1 to 0, the group calls the 'End' method to stop
@@ -128,28 +128,28 @@
  * group.  If the group is inactive, the change signal is ignored.
  *
  * Most of the "work" occurs in GDBusMenuGroup.  In addition to the
- * hashtable of GDBusMenuModel instances, it keeps a hashtable of the actual
- * menu contents, each encoded as GSequence of GDBusMenuModelItem.  It
+ * hashtable of xdbus_menu_model_t instances, it keeps a hashtable of the actual
+ * menu contents, each encoded as xsequence_t of GDBusMenuModelItem.  It
  * initially populates this table with the results of the "Start" method
  * call and then updates it according to incoming change signals.  If
  * the change signal mentions a menu for which we current have an active
- * GDBusMenuModel, the change signal is passed along to that model.  If the
+ * xdbus_menu_model_t, the change signal is passed along to that model.  If the
  * model is inactive, the change signal is ignored.
  *
  * GDBusMenuModelItem is just a pair of hashtables, one for the attributes
  * and one for the links of the item.  Both map strings to xvariant_t
  * instances.  In the case of links, the xvariant_t has type '(uu)' and is
- * turned into a GDBusMenuModel at the point that the user pulls it through
+ * turned into a xdbus_menu_model_t at the point that the user pulls it through
  * the API.
  *
  * Following the "empty is the same as non-existent" rule, the hashtable
- * of GSequence of GDBusMenuModelItem holds NULL for empty menus.
+ * of xsequence_t of GDBusMenuModelItem holds NULL for empty menus.
  *
- * GDBusMenuModel contains very little functionality of its own.  It holds a
- * (weak) reference to the GSequence of GDBusMenuModelItem contained in the
- * GDBusMenuGroup.  It uses this GSequence to implement the GMenuModel
+ * xdbus_menu_model_t contains very little functionality of its own.  It holds a
+ * (weak) reference to the xsequence_t of GDBusMenuModelItem contained in the
+ * GDBusMenuGroup.  It uses this xsequence_t to implement the xmenu_model_t
  * interface.  It also emits the "items-changed" signal if it is active
- * and it was told that the contents of the GSequence changed.
+ * and it was told that the contents of the xsequence_t changed.
  */
 
 typedef struct _GDBusMenuGroup GDBusMenuGroup;
@@ -160,58 +160,58 @@ static void                     g_dbus_menu_group_changed               (GDBusMe
                                                                          xint_t             position,
                                                                          xint_t             removed,
                                                                          xvariant_t        *added);
-static void                     g_dbus_menu_model_changed               (GDBusMenuModel  *proxy,
-                                                                         GSequence       *items,
+static void                     g_dbus_menu_model_changed               (xdbus_menu_model_t  *proxy,
+                                                                         xsequence_t       *items,
                                                                          xint_t             position,
                                                                          xint_t             removed,
                                                                          xint_t             added);
 static GDBusMenuGroup *         g_dbus_menu_group_get_from_path         (GDBusMenuPath   *path,
                                                                          xuint_t            group_id);
-static GDBusMenuModel *         g_dbus_menu_model_get_from_group        (GDBusMenuGroup  *group,
+static xdbus_menu_model_t *         g_dbus_menu_model_get_from_group        (GDBusMenuGroup  *group,
                                                                          xuint_t            menu_id);
 
 /* PathIdentifier {{{1 */
 typedef struct
 {
-  GMainContext *context;
-  GDBusConnection *connection;
+  xmain_context_t *context;
+  xdbus_connection_t *connection;
   xchar_t *bus_name;
   xchar_t *object_path;
 } PathIdentifier;
 
 typedef const struct
 {
-  GMainContext *context;
-  GDBusConnection *connection;
+  xmain_context_t *context;
+  xdbus_connection_t *connection;
   const xchar_t *bus_name;
   const xchar_t *object_path;
 } ConstPathIdentifier;
 
 static xuint_t
-path_identifier_hash (gconstpointer data)
+path_identifier_hash (xconstpointer data)
 {
   ConstPathIdentifier *id = data;
 
-  return g_str_hash (id->object_path);
+  return xstr_hash (id->object_path);
 }
 
 static xboolean_t
-path_identifier_equal (gconstpointer a,
-                       gconstpointer b)
+path_identifier_equal (xconstpointer a,
+                       xconstpointer b)
 {
   ConstPathIdentifier *id_a = a;
   ConstPathIdentifier *id_b = b;
 
   return id_a->connection == id_b->connection &&
-         g_strcmp0 (id_a->bus_name, id_b->bus_name) == 0 &&
-         g_str_equal (id_a->object_path, id_b->object_path);
+         xstrcmp0 (id_a->bus_name, id_b->bus_name) == 0 &&
+         xstr_equal (id_a->object_path, id_b->object_path);
 }
 
 static void
 path_identifier_free (PathIdentifier *id)
 {
-  g_main_context_unref (id->context);
-  g_object_unref (id->connection);
+  xmain_context_unref (id->context);
+  xobject_unref (id->connection);
   g_free (id->bus_name);
   g_free (id->object_path);
 
@@ -224,10 +224,10 @@ path_identifier_new (ConstPathIdentifier *cid)
   PathIdentifier *id;
 
   id = g_slice_new (PathIdentifier);
-  id->context = g_main_context_ref (cid->context);
-  id->connection = g_object_ref (cid->connection);
-  id->bus_name = g_strdup (cid->bus_name);
-  id->object_path = g_strdup (cid->object_path);
+  id->context = xmain_context_ref (cid->context);
+  id->connection = xobject_ref (cid->connection);
+  id->bus_name = xstrdup (cid->bus_name);
+  id->object_path = xstrdup (cid->object_path);
 
   return id;
 }
@@ -239,12 +239,12 @@ struct _GDBusMenuPath
   PathIdentifier *id;
   xint_t ref_count;
 
-  GHashTable *groups;
+  xhashtable_t *groups;
   xint_t active;
   xuint_t watch_id;
 };
 
-static GHashTable *g_dbus_menu_paths;
+static xhashtable_t *g_dbus_menu_paths;
 
 static GDBusMenuPath *
 g_dbus_menu_path_ref (GDBusMenuPath *path)
@@ -259,8 +259,8 @@ g_dbus_menu_path_unref (GDBusMenuPath *path)
 {
   if (--path->ref_count == 0)
     {
-      g_hash_table_remove (g_dbus_menu_paths, path->id);
-      g_hash_table_unref (path->groups);
+      xhash_table_remove (g_dbus_menu_paths, path->id);
+      xhash_table_unref (path->groups);
       path_identifier_free (path->id);
 
       g_slice_free (GDBusMenuPath, path);
@@ -268,7 +268,7 @@ g_dbus_menu_path_unref (GDBusMenuPath *path)
 }
 
 static void
-g_dbus_menu_path_signal (GDBusConnection *connection,
+g_dbus_menu_path_signal (xdbus_connection_t *connection,
                          const xchar_t     *sender_name,
                          const xchar_t     *object_path,
                          const xchar_t     *interface_name,
@@ -277,27 +277,27 @@ g_dbus_menu_path_signal (GDBusConnection *connection,
                          xpointer_t         user_data)
 {
   GDBusMenuPath *path = user_data;
-  GVariantIter *iter;
+  xvariant_iter_t *iter;
   xuint_t group_id;
   xuint_t menu_id;
   xuint_t position;
   xuint_t removes;
   xvariant_t *adds;
 
-  if (!g_variant_is_of_type (parameters, G_VARIANT_TYPE ("(a(uuuuaa{sv}))")))
+  if (!xvariant_is_of_type (parameters, G_VARIANT_TYPE ("(a(uuuuaa{sv}))")))
     return;
 
-  g_variant_get (parameters, "(a(uuuuaa{sv}))", &iter);
-  while (g_variant_iter_loop (iter, "(uuuu@aa{sv})", &group_id, &menu_id, &position, &removes, &adds))
+  xvariant_get (parameters, "(a(uuuuaa{sv}))", &iter);
+  while (xvariant_iter_loop (iter, "(uuuu@aa{sv})", &group_id, &menu_id, &position, &removes, &adds))
     {
       GDBusMenuGroup *group;
 
-      group = g_hash_table_lookup (path->groups, GINT_TO_POINTER (group_id));
+      group = xhash_table_lookup (path->groups, GINT_TO_POINTER (group_id));
 
       if (group != NULL)
         g_dbus_menu_group_changed (group, menu_id, position, removes, adds);
     }
-  g_variant_iter_free (iter);
+  xvariant_iter_free (iter);
 }
 
 static void
@@ -318,8 +318,8 @@ g_dbus_menu_path_deactivate (GDBusMenuPath *path)
 }
 
 static GDBusMenuPath *
-g_dbus_menu_path_get (GMainContext    *context,
-                      GDBusConnection *connection,
+g_dbus_menu_path_get (xmain_context_t    *context,
+                      xdbus_connection_t *connection,
                       const xchar_t     *bus_name,
                       const xchar_t     *object_path)
 {
@@ -327,19 +327,19 @@ g_dbus_menu_path_get (GMainContext    *context,
   GDBusMenuPath *path;
 
   if (g_dbus_menu_paths == NULL)
-    g_dbus_menu_paths = g_hash_table_new (path_identifier_hash, path_identifier_equal);
+    g_dbus_menu_paths = xhash_table_new (path_identifier_hash, path_identifier_equal);
 
-  path = g_hash_table_lookup (g_dbus_menu_paths, &cid);
+  path = xhash_table_lookup (g_dbus_menu_paths, &cid);
 
   if (path == NULL)
     {
       path = g_slice_new (GDBusMenuPath);
       path->id = path_identifier_new (&cid);
-      path->groups = g_hash_table_new (NULL, NULL);
+      path->groups = xhash_table_new (NULL, NULL);
       path->ref_count = 0;
       path->active = 0;
 
-      g_hash_table_insert (g_dbus_menu_paths, path->id, path);
+      xhash_table_insert (g_dbus_menu_paths, path->id, path);
     }
 
   return g_dbus_menu_path_ref (path);
@@ -358,8 +358,8 @@ struct _GDBusMenuGroup
   GDBusMenuPath *path;
   xuint_t id;
 
-  GHashTable *proxies; /* uint -> unowned GDBusMenuModel */
-  GHashTable *menus;   /* uint -> owned GSequence */
+  xhashtable_t *proxies; /* uint -> unowned xdbus_menu_model_t */
+  xhashtable_t *menus;   /* uint -> owned xsequence_t */
   xint_t ref_count;
   GroupStatus state;
   xint_t active;
@@ -367,8 +367,8 @@ struct _GDBusMenuGroup
 
 typedef struct
 {
-  GHashTable *attributes;
-  GHashTable *links;
+  xhashtable_t *attributes;
+  xhashtable_t *links;
 } GDBusMenuModelItem;
 
 static GDBusMenuGroup *
@@ -387,9 +387,9 @@ g_dbus_menu_group_unref (GDBusMenuGroup *group)
       g_assert (group->state == GROUP_OFFLINE);
       g_assert (group->active == 0);
 
-      g_hash_table_remove (group->path->groups, GINT_TO_POINTER (group->id));
-      g_hash_table_unref (group->proxies);
-      g_hash_table_unref (group->menus);
+      xhash_table_remove (group->path->groups, GINT_TO_POINTER (group->id));
+      xhash_table_unref (group->proxies);
+      xhash_table_unref (group->menus);
 
       g_dbus_menu_path_unref (group->path);
 
@@ -402,8 +402,8 @@ g_dbus_menu_model_item_free (xpointer_t data)
 {
   GDBusMenuModelItem *item = data;
 
-  g_hash_table_unref (item->attributes);
-  g_hash_table_unref (item->links);
+  xhash_table_unref (item->attributes);
+  xhash_table_unref (item->links);
 
   g_slice_free (GDBusMenuModelItem, item);
 }
@@ -412,21 +412,21 @@ static GDBusMenuModelItem *
 g_dbus_menu_group_create_item (xvariant_t *description)
 {
   GDBusMenuModelItem *item;
-  GVariantIter iter;
+  xvariant_iter_t iter;
   const xchar_t *key;
   xvariant_t *value;
 
   item = g_slice_new (GDBusMenuModelItem);
-  item->attributes = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify) g_variant_unref);
-  item->links = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify) g_variant_unref);
+  item->attributes = xhash_table_new_full (xstr_hash, xstr_equal, g_free, (xdestroy_notify_t) xvariant_unref);
+  item->links = xhash_table_new_full (xstr_hash, xstr_equal, g_free, (xdestroy_notify_t) xvariant_unref);
 
-  g_variant_iter_init (&iter, description);
-  while (g_variant_iter_loop (&iter, "{&sv}", &key, &value))
+  xvariant_iter_init (&iter, description);
+  while (xvariant_iter_loop (&iter, "{&sv}", &key, &value))
     if (key[0] == ':')
       /* key + 1 to skip the ':' */
-      g_hash_table_insert (item->links, g_strdup (key + 1), g_variant_ref (value));
+      xhash_table_insert (item->links, xstrdup (key + 1), xvariant_ref (value));
     else
-      g_hash_table_insert (item->attributes, g_strdup (key), g_variant_ref (value));
+      xhash_table_insert (item->attributes, xstrdup (key), xvariant_ref (value));
 
   return item;
 }
@@ -486,7 +486,7 @@ g_dbus_menu_group_go_offline (GDBusMenuGroup *group)
                           group->path->id->bus_name,
                           group->path->id->object_path,
                           "org.gtk.Menus", "End",
-                          g_variant_new_parsed ("([ %u ],)", group->id),
+                          xvariant_new_parsed ("([ %u ],)", group->id),
                           NULL, G_DBUS_CALL_FLAGS_NONE, -1,
                           NULL, NULL, NULL);
   group->state = GROUP_OFFLINE;
@@ -498,7 +498,7 @@ g_dbus_menu_group_start_ready (xobject_t      *source_object,
                                xasync_result_t *result,
                                xpointer_t      user_data)
 {
-  GDBusConnection *connection = G_DBUS_CONNECTION (source_object);
+  xdbus_connection_t *connection = G_DBUS_CONNECTION (source_object);
   GDBusMenuGroup *group = user_data;
   xvariant_t *reply;
 
@@ -513,23 +513,23 @@ g_dbus_menu_group_start_ready (xobject_t      *source_object,
       /* If we receive no reply, just act like we got an empty reply. */
       if (reply)
         {
-          GVariantIter *iter;
+          xvariant_iter_t *iter;
           xvariant_t *items;
           xuint_t group_id;
           xuint_t menu_id;
 
-          g_variant_get (reply, "(a(uuaa{sv}))", &iter);
-          while (g_variant_iter_loop (iter, "(uu@aa{sv})", &group_id, &menu_id, &items))
+          xvariant_get (reply, "(a(uuaa{sv}))", &iter);
+          while (xvariant_iter_loop (iter, "(uu@aa{sv})", &group_id, &menu_id, &items))
             if (group_id == group->id)
               g_dbus_menu_group_changed (group, menu_id, 0, 0, items);
-          g_variant_iter_free (iter);
+          xvariant_iter_free (iter);
         }
     }
   else
     g_dbus_menu_group_go_offline (group);
 
   if (reply)
-    g_variant_unref (reply);
+    xvariant_unref (reply);
 
   g_dbus_menu_group_unref (group);
 }
@@ -549,7 +549,7 @@ g_dbus_menu_group_activate (GDBusMenuGroup *group)
                                   group->path->id->bus_name,
                                   group->path->id->object_path,
                                   "org.gtk.Menus", "Start",
-                                  g_variant_new_parsed ("([ %u ],)", group->id),
+                                  xvariant_new_parsed ("([ %u ],)", group->id),
                                   G_VARIANT_TYPE ("(a(uuaa{sv}))"),
                                   G_DBUS_CALL_FLAGS_NONE, -1, NULL,
                                   g_dbus_menu_group_start_ready,
@@ -571,7 +571,7 @@ g_dbus_menu_group_deactivate (GDBusMenuGroup *group)
           /* We are here because nobody is watching, so just free
            * everything and don't bother with the notifications.
            */
-          g_hash_table_remove_all (group->menus);
+          xhash_table_remove_all (group->menus);
 
           g_dbus_menu_group_go_offline (group);
         }
@@ -586,9 +586,9 @@ g_dbus_menu_group_changed (GDBusMenuGroup *group,
                            xvariant_t       *added)
 {
   GSequenceIter *point;
-  GVariantIter iter;
-  GDBusMenuModel *proxy;
-  GSequence *items;
+  xvariant_iter_t iter;
+  xdbus_menu_model_t *proxy;
+  xsequence_t *items;
   xvariant_t *item;
   xint_t n_added;
 
@@ -601,12 +601,12 @@ g_dbus_menu_group_changed (GDBusMenuGroup *group,
   if (group->state != GROUP_ONLINE)
     return;
 
-  items = g_hash_table_lookup (group->menus, GINT_TO_POINTER (menu_id));
+  items = xhash_table_lookup (group->menus, GINT_TO_POINTER (menu_id));
 
   if (items == NULL)
     {
       items = g_sequence_new (g_dbus_menu_model_item_free);
-      g_hash_table_insert (group->menus, GINT_TO_POINTER (menu_id), items);
+      xhash_table_insert (group->menus, GINT_TO_POINTER (menu_id), items);
     }
 
   point = g_sequence_get_iter_at_pos (items, position + removed);
@@ -621,17 +621,17 @@ g_dbus_menu_group_changed (GDBusMenuGroup *group,
       g_sequence_remove_range (start, point);
     }
 
-  n_added = g_variant_iter_init (&iter, added);
-  while (g_variant_iter_loop (&iter, "@a{sv}", &item))
+  n_added = xvariant_iter_init (&iter, added);
+  while (xvariant_iter_loop (&iter, "@a{sv}", &item))
     g_sequence_insert_before (point, g_dbus_menu_group_create_item (item));
 
   if (g_sequence_is_empty (items))
     {
-      g_hash_table_remove (group->menus, GINT_TO_POINTER (menu_id));
+      xhash_table_remove (group->menus, GINT_TO_POINTER (menu_id));
       items = NULL;
     }
 
-  if ((proxy = g_hash_table_lookup (group->proxies, GINT_TO_POINTER (menu_id))))
+  if ((proxy = xhash_table_lookup (group->proxies, GINT_TO_POINTER (menu_id))))
     g_dbus_menu_model_changed (proxy, items, position, removed, n_added);
 }
 
@@ -641,28 +641,28 @@ g_dbus_menu_group_get_from_path (GDBusMenuPath *path,
 {
   GDBusMenuGroup *group;
 
-  group = g_hash_table_lookup (path->groups, GINT_TO_POINTER (group_id));
+  group = xhash_table_lookup (path->groups, GINT_TO_POINTER (group_id));
 
   if (group == NULL)
     {
       group = g_slice_new (GDBusMenuGroup);
       group->path = g_dbus_menu_path_ref (path);
       group->id = group_id;
-      group->proxies = g_hash_table_new (NULL, NULL);
-      group->menus = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) g_sequence_free);
+      group->proxies = xhash_table_new (NULL, NULL);
+      group->menus = xhash_table_new_full (NULL, NULL, NULL, (xdestroy_notify_t) g_sequence_free);
       group->state = GROUP_OFFLINE;
       group->active = 0;
       group->ref_count = 0;
 
-      g_hash_table_insert (path->groups, GINT_TO_POINTER (group->id), group);
+      xhash_table_insert (path->groups, GINT_TO_POINTER (group->id), group);
     }
 
   return g_dbus_menu_group_ref (group);
 }
 
 static GDBusMenuGroup *
-g_dbus_menu_group_get (GMainContext    *context,
-                       GDBusConnection *connection,
+g_dbus_menu_group_get (xmain_context_t    *context,
+                       xdbus_connection_t *connection,
                        const xchar_t     *bus_name,
                        const xchar_t     *object_path,
                        xuint_t            group_id)
@@ -677,32 +677,32 @@ g_dbus_menu_group_get (GMainContext    *context,
   return group;
 }
 
-/* GDBusMenuModel {{{1 */
+/* xdbus_menu_model_t {{{1 */
 
-typedef GMenuModelClass GDBusMenuModelClass;
+typedef xmenu_model_class_t xdbus_menu_model_class_t;
 struct _GDBusMenuModel
 {
-  GMenuModel parent;
+  xmenu_model_t parent;
 
   GDBusMenuGroup *group;
   xuint_t id;
 
-  GSequence *items; /* unowned */
+  xsequence_t *items; /* unowned */
   xboolean_t active;
 };
 
-G_DEFINE_TYPE (GDBusMenuModel, g_dbus_menu_model, XTYPE_MENU_MODEL)
+G_DEFINE_TYPE (xdbus_menu_model, xdbus_menu_model, XTYPE_MENU_MODEL)
 
 static xboolean_t
-g_dbus_menu_model_is_mutable (GMenuModel *model)
+g_dbus_menu_model_is_mutable (xmenu_model_t *model)
 {
   return TRUE;
 }
 
 static xint_t
-g_dbus_menu_model_get_n_items (GMenuModel *model)
+g_dbus_menu_model_get_n_items (xmenu_model_t *model)
 {
-  GDBusMenuModel *proxy = G_DBUS_MENU_MODEL (model);
+  xdbus_menu_model_t *proxy = G_DBUS_MENU_MODEL (model);
 
   if (!proxy->active)
     {
@@ -714,11 +714,11 @@ g_dbus_menu_model_get_n_items (GMenuModel *model)
 }
 
 static void
-g_dbus_menu_model_get_item_attributes (GMenuModel  *model,
+g_dbus_menu_model_get_item_attributes (xmenu_model_t  *model,
                                        xint_t         item_index,
-                                       GHashTable **table)
+                                       xhashtable_t **table)
 {
-  GDBusMenuModel *proxy = G_DBUS_MENU_MODEL (model);
+  xdbus_menu_model_t *proxy = G_DBUS_MENU_MODEL (model);
   GDBusMenuModelItem *item;
   GSequenceIter *iter;
 
@@ -731,15 +731,15 @@ g_dbus_menu_model_get_item_attributes (GMenuModel  *model,
   item = g_sequence_get (iter);
   g_return_if_fail (item);
 
-  *table = g_hash_table_ref (item->attributes);
+  *table = xhash_table_ref (item->attributes);
 }
 
 static void
-g_dbus_menu_model_get_item_links (GMenuModel  *model,
+g_dbus_menu_model_get_item_links (xmenu_model_t  *model,
                                   xint_t         item_index,
-                                  GHashTable **table)
+                                  xhashtable_t **table)
 {
-  GDBusMenuModel *proxy = G_DBUS_MENU_MODEL (model);
+  xdbus_menu_model_t *proxy = G_DBUS_MENU_MODEL (model);
   GDBusMenuModelItem *item;
   GSequenceIter *iter;
 
@@ -752,23 +752,23 @@ g_dbus_menu_model_get_item_links (GMenuModel  *model,
   item = g_sequence_get (iter);
   g_return_if_fail (item);
 
-  *table = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+  *table = xhash_table_new_full (xstr_hash, xstr_equal, g_free, xobject_unref);
 
   {
-    GHashTableIter tmp;
+    xhash_table_iter_t tmp;
     xpointer_t key;
     xpointer_t value;
 
-    g_hash_table_iter_init (&tmp, item->links);
-    while (g_hash_table_iter_next (&tmp, &key, &value))
+    xhash_table_iter_init (&tmp, item->links);
+    while (xhash_table_iter_next (&tmp, &key, &value))
       {
-        if (g_variant_is_of_type (value, G_VARIANT_TYPE ("(uu)")))
+        if (xvariant_is_of_type (value, G_VARIANT_TYPE ("(uu)")))
           {
             xuint_t group_id, menu_id;
             GDBusMenuGroup *group;
-            GDBusMenuModel *link;
+            xdbus_menu_model_t *link;
 
-            g_variant_get (value, "(uu)", &group_id, &menu_id);
+            xvariant_get (value, "(uu)", &group_id, &menu_id);
 
             /* save the hash lookup in a relatively common case */
             if (proxy->group->id != group_id)
@@ -778,7 +778,7 @@ g_dbus_menu_model_get_item_links (GMenuModel  *model,
 
             link = g_dbus_menu_model_get_from_group (group, menu_id);
 
-            g_hash_table_insert (*table, g_strdup (key), link);
+            xhash_table_insert (*table, xstrdup (key), link);
 
             g_dbus_menu_group_unref (group);
           }
@@ -789,12 +789,12 @@ g_dbus_menu_model_get_item_links (GMenuModel  *model,
 static void
 g_dbus_menu_model_finalize (xobject_t *object)
 {
-  GDBusMenuModel *proxy = G_DBUS_MENU_MODEL (object);
+  xdbus_menu_model_t *proxy = G_DBUS_MENU_MODEL (object);
 
   if (proxy->active)
     g_dbus_menu_group_deactivate (proxy->group);
 
-  g_hash_table_remove (proxy->group->proxies, GINT_TO_POINTER (proxy->id));
+  xhash_table_remove (proxy->group->proxies, GINT_TO_POINTER (proxy->id));
   g_dbus_menu_group_unref (proxy->group);
 
   G_OBJECT_CLASS (g_dbus_menu_model_parent_class)
@@ -802,12 +802,12 @@ g_dbus_menu_model_finalize (xobject_t *object)
 }
 
 static void
-g_dbus_menu_model_init (GDBusMenuModel *proxy)
+g_dbus_menu_model_init (xdbus_menu_model_t *proxy)
 {
 }
 
 static void
-g_dbus_menu_model_class_init (GDBusMenuModelClass *class)
+g_dbus_menu_model_class_init (xdbus_menu_model_class_t *class)
 {
   xobject_class_t *object_class = G_OBJECT_CLASS (class);
 
@@ -820,8 +820,8 @@ g_dbus_menu_model_class_init (GDBusMenuModelClass *class)
 }
 
 static void
-g_dbus_menu_model_changed (GDBusMenuModel *proxy,
-                           GSequence      *items,
+g_dbus_menu_model_changed (xdbus_menu_model_t *proxy,
+                           xsequence_t      *items,
                            xint_t            position,
                            xint_t            removed,
                            xint_t            added)
@@ -829,24 +829,24 @@ g_dbus_menu_model_changed (GDBusMenuModel *proxy,
   proxy->items = items;
 
   if (proxy->active && (removed || added))
-    g_menu_model_items_changed (G_MENU_MODEL (proxy), position, removed, added);
+    xmenu_model_items_changed (XMENU_MODEL (proxy), position, removed, added);
 }
 
-static GDBusMenuModel *
+static xdbus_menu_model_t *
 g_dbus_menu_model_get_from_group (GDBusMenuGroup *group,
                                   xuint_t           menu_id)
 {
-  GDBusMenuModel *proxy;
+  xdbus_menu_model_t *proxy;
 
-  proxy = g_hash_table_lookup (group->proxies, GINT_TO_POINTER (menu_id));
+  proxy = xhash_table_lookup (group->proxies, GINT_TO_POINTER (menu_id));
   if (proxy)
-    g_object_ref (proxy);
+    xobject_ref (proxy);
 
   if (proxy == NULL)
     {
-      proxy = g_object_new (XTYPE_DBUS_MENU_MODEL, NULL);
-      proxy->items = g_hash_table_lookup (group->menus, GINT_TO_POINTER (menu_id));
-      g_hash_table_insert (group->proxies, GINT_TO_POINTER (menu_id), proxy);
+      proxy = xobject_new (XTYPE_DBUS_MENU_MODEL, NULL);
+      proxy->items = xhash_table_lookup (group->menus, GINT_TO_POINTER (menu_id));
+      xhash_table_insert (group->proxies, GINT_TO_POINTER (menu_id), proxy);
       proxy->group = g_dbus_menu_group_ref (group);
       proxy->id = menu_id;
     }
@@ -856,12 +856,12 @@ g_dbus_menu_model_get_from_group (GDBusMenuGroup *group,
 
 /**
  * g_dbus_menu_model_get:
- * @connection: a #GDBusConnection
+ * @connection: a #xdbus_connection_t
  * @bus_name: (nullable): the bus name which exports the menu model
  *     or %NULL if @connection is not a message bus connection
  * @object_path: the object path at which the menu model is exported
  *
- * Obtains a #GDBusMenuModel for the menu model which is exported
+ * Obtains a #xdbus_menu_model_t for the menu model which is exported
  * at the given @bus_name and @object_path.
  *
  * The thread default main context is taken at the time of this call.
@@ -870,25 +870,25 @@ g_dbus_menu_model_get_from_group (GDBusMenuGroup *group,
  * (and linked models) must also originate from this same context, with
  * the thread default main context unchanged.
  *
- * Returns: (transfer full): a #GDBusMenuModel object. Free with
- *     g_object_unref().
+ * Returns: (transfer full): a #xdbus_menu_model_t object. Free with
+ *     xobject_unref().
  *
  * Since: 2.32
  */
-GDBusMenuModel *
-g_dbus_menu_model_get (GDBusConnection *connection,
+xdbus_menu_model_t *
+g_dbus_menu_model_get (xdbus_connection_t *connection,
                        const xchar_t     *bus_name,
                        const xchar_t     *object_path)
 {
   GDBusMenuGroup *group;
-  GDBusMenuModel *proxy;
-  GMainContext *context;
+  xdbus_menu_model_t *proxy;
+  xmain_context_t *context;
 
   g_return_val_if_fail (bus_name != NULL || g_dbus_connection_get_unique_name (connection) == NULL, NULL);
 
-  context = g_main_context_get_thread_default ();
+  context = xmain_context_get_thread_default ();
   if (context == NULL)
-    context = g_main_context_default ();
+    context = xmain_context_default ();
 
   group = g_dbus_menu_group_get (context, connection, bus_name, object_path, 0);
   proxy = g_dbus_menu_model_get_from_group (group, 0);
@@ -901,7 +901,7 @@ g_dbus_menu_model_get (GDBusConnection *connection,
 static void
 dump_proxy (xpointer_t key, xpointer_t value, xpointer_t data)
 {
-  GDBusMenuModel *proxy = value;
+  xdbus_menu_model_t *proxy = value;
 
   g_print ("    menu %d refcount %d active %d\n",
            proxy->id, G_OBJECT (proxy)->ref_count, proxy->active);
@@ -915,7 +915,7 @@ dump_group (xpointer_t key, xpointer_t value, xpointer_t data)
   g_print ("  group %d refcount %d state %d active %d\n",
            group->id, group->ref_count, group->state, group->active);
 
-  g_hash_table_foreach (group->proxies, dump_proxy, NULL);
+  xhash_table_foreach (group->proxies, dump_proxy, NULL);
 }
 
 static void
@@ -925,13 +925,13 @@ dump_path (xpointer_t key, xpointer_t value, xpointer_t data)
   GDBusMenuPath *path = value;
 
   g_print ("%s active %d\n", pid->object_path, path->active);
-  g_hash_table_foreach (path->groups, dump_group, NULL);
+  xhash_table_foreach (path->groups, dump_group, NULL);
 }
 
 void
 g_dbus_menu_model_dump (void)
 {
-  g_hash_table_foreach (g_dbus_menu_paths, dump_path, NULL);
+  xhash_table_foreach (g_dbus_menu_paths, dump_path, NULL);
 }
 
 #endif

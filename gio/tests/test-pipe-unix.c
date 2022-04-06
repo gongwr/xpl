@@ -63,7 +63,7 @@ test_pipe (xinput_stream_t  **is,
       int e = errno;
 
       g_set_error (error, G_IO_ERROR, g_io_error_from_errno (e),
-                   "%s", g_strerror (e));
+                   "%s", xstrerror (e));
       return FALSE;
     }
 

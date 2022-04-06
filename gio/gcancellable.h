@@ -30,7 +30,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_CANCELLABLE         (g_cancellable_get_type ())
-#define G_CANCELLABLE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CANCELLABLE, xcancellable_t))
+#define G_CANCELLABLE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CANCELLABLE, xcancellable))
 #define G_CANCELLABLE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CANCELLABLE, GCancellableClass))
 #define X_IS_CANCELLABLE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_CANCELLABLE))
 #define X_IS_CANCELLABLE_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_CANCELLABLE))
@@ -84,12 +84,12 @@ XPL_AVAILABLE_IN_ALL
 int           g_cancellable_get_fd                 (xcancellable_t  *cancellable);
 XPL_AVAILABLE_IN_ALL
 xboolean_t      g_cancellable_make_pollfd            (xcancellable_t  *cancellable,
-						    GPollFD       *pollfd);
+						    xpollfd_t       *pollfd);
 XPL_AVAILABLE_IN_ALL
 void          g_cancellable_release_fd             (xcancellable_t  *cancellable);
 
 XPL_AVAILABLE_IN_ALL
-GSource *     g_cancellable_source_new             (xcancellable_t  *cancellable);
+xsource_t *     g_cancellable_source_new             (xcancellable_t  *cancellable);
 
 XPL_AVAILABLE_IN_ALL
 xcancellable_t *g_cancellable_get_current            (void);
@@ -101,9 +101,9 @@ XPL_AVAILABLE_IN_ALL
 void          g_cancellable_reset                  (xcancellable_t  *cancellable);
 XPL_AVAILABLE_IN_ALL
 gulong        g_cancellable_connect                (xcancellable_t  *cancellable,
-						    GCallback      callback,
+						    xcallback_t      callback,
 						    xpointer_t       data,
-						    GDestroyNotify data_destroy_func);
+						    xdestroy_notify_t data_destroy_func);
 XPL_AVAILABLE_IN_ALL
 void          g_cancellable_disconnect             (xcancellable_t  *cancellable,
 						    gulong         handler_id);

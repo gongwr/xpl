@@ -29,29 +29,29 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GMappedFile GMappedFile;
+typedef struct _GMappedFile xmapped_file_t;
 
 XPL_AVAILABLE_IN_ALL
-GMappedFile *g_mapped_file_new          (const xchar_t  *filename,
+xmapped_file_t *xmapped_file_new          (const xchar_t  *filename,
 				         xboolean_t      writable,
 				         xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
-GMappedFile *g_mapped_file_new_from_fd  (xint_t          fd,
+xmapped_file_t *xmapped_file_new_from_fd  (xint_t          fd,
 					 xboolean_t      writable,
 					 xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
-xsize_t        g_mapped_file_get_length   (GMappedFile  *file);
+xsize_t        xmapped_file_get_length   (xmapped_file_t  *file);
 XPL_AVAILABLE_IN_ALL
-xchar_t       *g_mapped_file_get_contents (GMappedFile  *file);
+xchar_t       *xmapped_file_get_contents (xmapped_file_t  *file);
 XPL_AVAILABLE_IN_2_34
-GBytes *     g_mapped_file_get_bytes    (GMappedFile  *file);
+xbytes_t *     xmapped_file_get_bytes    (xmapped_file_t  *file);
 XPL_AVAILABLE_IN_ALL
-GMappedFile *g_mapped_file_ref          (GMappedFile  *file);
+xmapped_file_t *xmapped_file_ref          (xmapped_file_t  *file);
 XPL_AVAILABLE_IN_ALL
-void         g_mapped_file_unref        (GMappedFile  *file);
+void         xmapped_file_unref        (xmapped_file_t  *file);
 
-XPL_DEPRECATED_FOR(g_mapped_file_unref)
-void         g_mapped_file_free         (GMappedFile  *file);
+XPL_DEPRECATED_FOR(xmapped_file_unref)
+void         xmapped_file_free         (xmapped_file_t  *file);
 
 G_END_DECLS
 

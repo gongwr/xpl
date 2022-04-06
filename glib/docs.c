@@ -34,17 +34,17 @@
  * GLib defines a number of commonly used types, which can be divided
  * into several groups:
  * - New types which are not part of standard C (but are defined in
- *   various C standard library header files) — #xboolean_t, #gssize.
+ *   various C standard library header files) — #xboolean_t, #xssize_t.
  * - Integer types which are guaranteed to be the same size across
- *   all platforms — #gint8, #guint8, #gint16, #guint16, #gint32,
- *   #guint32, #gint64, #guint64.
+ *   all platforms — #gint8, #xuint8_t, #gint16, #xuint16_t, #gint32,
+ *   #xuint32_t, #gint64, #xuint64_t.
  * - Types which are easier to use than their standard C counterparts -
- *   #xpointer_t, #gconstpointer, #guchar, #xuint_t, #gushort, #gulong.
+ *   #xpointer_t, #xconstpointer, #guchar, #xuint_t, #gushort, #gulong.
  * - Types which correspond exactly to standard C types, but are
- *   included for completeness — #xchar_t, #xint_t, #gshort, #glong,
+ *   included for completeness — #xchar_t, #xint_t, #gshort, #xlong_t,
  *   #gfloat, #xdouble_t.
  * - Types which correspond exactly to standard C99 types, but are available
- *   to use even if your compiler does not support C99 — #xsize_t, #goffset,
+ *   to use even if your compiler does not support C99 — #xsize_t, #xoffset_t,
  *   #gintptr, #guintptr.
  *
  * GLib also defines macros for the limits of some of the standard
@@ -83,7 +83,7 @@
  */
 
 /**
- * gconstpointer:
+ * xconstpointer:
  *
  * An untyped pointer to constant data.
  * The data pointed to should not be changed.
@@ -169,7 +169,7 @@
  */
 
 /**
- * glong:
+ * xlong_t:
  *
  * Corresponds to the standard C long type.
  * Values of this type can range from %G_MINLONG to %G_MAXLONG.
@@ -178,13 +178,13 @@
 /**
  * G_MINLONG:
  *
- * The minimum value which can be held in a #glong.
+ * The minimum value which can be held in a #xlong_t.
  */
 
 /**
  * G_MAXLONG:
  *
- * The maximum value which can be held in a #glong.
+ * The maximum value which can be held in a #xlong_t.
  */
 
 /**
@@ -217,7 +217,7 @@
  */
 
 /**
- * guint8:
+ * xuint8_t:
  *
  * An unsigned integer guaranteed to be 8 bits on all platforms.
  * Values of this type can range from 0 to %G_MAXUINT8 (= 255).
@@ -226,7 +226,7 @@
 /**
  * G_MAXUINT8:
  *
- * The maximum value which can be held in a #guint8.
+ * The maximum value which can be held in a #xuint8_t.
  *
  * Since: 2.4
  */
@@ -254,7 +254,7 @@
  * G_GINT16_MODIFIER:
  *
  * The platform dependent length modifier for conversion specifiers
- * for scanning and printing values of type #gint16 or #guint16. It
+ * for scanning and printing values of type #gint16 or #xuint16_t. It
  * is a string literal, but doesn't include the percent-sign, such
  * that you can add precision and length modifiers between percent-sign
  * and conversion specifier and append a conversion specifier.
@@ -286,7 +286,7 @@
  */
 
 /**
- * guint16:
+ * xuint16_t:
  *
  * An unsigned integer guaranteed to be 16 bits on all platforms.
  * Values of this type can range from 0 to %G_MAXUINT16 (= 65,535).
@@ -298,7 +298,7 @@
 /**
  * G_MAXUINT16:
  *
- * The maximum value which can be held in a #guint16.
+ * The maximum value which can be held in a #xuint16_t.
  *
  * Since: 2.4
  */
@@ -307,7 +307,7 @@
  * G_GUINT16_FORMAT:
  *
  * This is the platform dependent conversion specifier for scanning
- * and printing values of type #guint16. See also %G_GINT16_FORMAT
+ * and printing values of type #xuint16_t. See also %G_GINT16_FORMAT
  */
 
 /**
@@ -333,7 +333,7 @@
  * G_GINT32_MODIFIER:
  *
  * The platform dependent length modifier for conversion specifiers
- * for scanning and printing values of type #gint32 or #guint32. It
+ * for scanning and printing values of type #gint32 or #xuint32_t. It
  * is a string literal. See also %G_GINT16_MODIFIER.
  *
  * Since: 2.4
@@ -347,7 +347,7 @@
  */
 
 /**
- * guint32:
+ * xuint32_t:
  *
  * An unsigned integer guaranteed to be 32 bits on all platforms.
  * Values of this type can range from 0 to %G_MAXUINT32 (= 4,294,967,295).
@@ -359,7 +359,7 @@
 /**
  * G_MAXUINT32:
  *
- * The maximum value which can be held in a #guint32.
+ * The maximum value which can be held in a #xuint32_t.
  *
  * Since: 2.4
  */
@@ -368,7 +368,7 @@
  * G_GUINT32_FORMAT:
  *
  * This is the platform dependent conversion specifier for scanning
- * and printing values of type #guint32. See also %G_GINT16_FORMAT.
+ * and printing values of type #xuint32_t. See also %G_GINT16_FORMAT.
  */
 
 /**
@@ -393,7 +393,7 @@
  * G_GINT64_MODIFIER:
  *
  * The platform dependent length modifier for conversion specifiers
- * for scanning and printing values of type #gint64 or #guint64.
+ * for scanning and printing values of type #gint64 or #xuint64_t.
  * It is a string literal.
  *
  * Some platforms do not support printing 64-bit integers, even
@@ -418,7 +418,7 @@
  */
 
 /**
- * guint64:
+ * xuint64_t:
  *
  * An unsigned integer guaranteed to be 64-bits on all platforms.
  * Values of this type can range from 0 to %G_MAXUINT64
@@ -431,14 +431,14 @@
 /**
  * G_MAXUINT64:
  *
- * The maximum value which can be held in a #guint64.
+ * The maximum value which can be held in a #xuint64_t.
  */
 
 /**
  * G_GUINT64_FORMAT:
  *
  * This is the platform dependent conversion specifier for scanning
- * and printing values of type #guint64. See also %G_GINT16_FORMAT.
+ * and printing values of type #xuint64_t. See also %G_GINT16_FORMAT.
  *
  * Some platforms do not support scanning and printing 64-bit integers,
  * even though the types are supported. On such platforms %G_GUINT64_FORMAT
@@ -552,7 +552,7 @@
  */
 
 /**
- * gssize:
+ * xssize_t:
  *
  * A signed variant of #xsize_t, corresponding to the
  * ssize_t defined on most platforms.
@@ -566,7 +566,7 @@
 /**
  * G_MINSSIZE:
  *
- * The minimum value which can be held in a #gssize.
+ * The minimum value which can be held in a #xssize_t.
  *
  * Since: 2.14
  */
@@ -574,7 +574,7 @@
 /**
  * G_MAXSSIZE:
  *
- * The maximum value which can be held in a #gssize.
+ * The maximum value which can be held in a #xssize_t.
  *
  * Since: 2.14
  */
@@ -583,7 +583,7 @@
  * G_GSSIZE_FORMAT:
  *
  * This is the platform dependent conversion specifier for scanning
- * and printing values of type #gssize. See also %G_GINT16_FORMAT.
+ * and printing values of type #xssize_t. See also %G_GINT16_FORMAT.
  *
  * Since: 2.6
  */
@@ -592,18 +592,18 @@
  * G_GSSIZE_MODIFIER:
  *
  * The platform dependent length modifier for conversion specifiers
- * for scanning and printing values of type #gssize. It
+ * for scanning and printing values of type #xssize_t. It
  * is a string literal.
  *
  * Since: 2.6
  */
 
 /**
- * goffset:
+ * xoffset_t:
  *
  * A signed integer type that is used for file offsets,
  * corresponding to the POSIX type `off_t` as if compiling with
- * `_FILE_OFFSET_BITS` set to 64. #goffset is always 64 bits wide, even on
+ * `_FILE_OFFSET_BITS` set to 64. #xoffset_t is always 64 bits wide, even on
  * 32-bit architectures.
  * Values of this type can range from %G_MINOFFSET to
  * %G_MAXOFFSET.
@@ -617,20 +617,20 @@
 /**
  * G_MINOFFSET:
  *
- * The minimum value which can be held in a #goffset.
+ * The minimum value which can be held in a #xoffset_t.
  */
 
 /**
  * G_MAXOFFSET:
  *
- * The maximum value which can be held in a #goffset.
+ * The maximum value which can be held in a #xoffset_t.
  */
 
 /**
  * G_GOFFSET_MODIFIER:
  *
  * The platform dependent length modifier for conversion specifiers
- * for scanning and printing values of type #goffset. It is a string
+ * for scanning and printing values of type #xoffset_t. It is a string
  * literal. See also %G_GINT64_MODIFIER.
  *
  * Since: 2.20
@@ -640,7 +640,7 @@
  * G_GOFFSET_FORMAT:
  *
  * This is the platform dependent conversion specifier for scanning
- * and printing values of type #goffset. See also %G_GINT64_FORMAT.
+ * and printing values of type #xoffset_t. See also %G_GINT64_FORMAT.
  *
  * Since: 2.20
  */
@@ -649,7 +649,7 @@
  * G_GOFFSET_CONSTANT:
  * @val: a literal integer value, e.g. 0x1d636b02300a7aa7
  *
- * This macro is used to insert #goffset 64-bit integer literals
+ * This macro is used to insert #xoffset_t 64-bit integer literals
  * into the source code.
  *
  * See also G_GINT64_CONSTANT().
@@ -819,7 +819,7 @@
  * and to convert values between different byte orders.
  *
  * The byte order is the order in which bytes are stored to create larger
- * data types such as the #xint_t and #glong values.
+ * data types such as the #xint_t and #xlong_t values.
  * The host byte order is the byte order used on the current machine.
  *
  * Some processors store the most significant bytes (i.e. the bytes that
@@ -984,36 +984,36 @@
 
 /**
  * GLONG_FROM_BE:
- * @val: a #glong value in big-endian byte order
+ * @val: a #xlong_t value in big-endian byte order
  *
- * Converts a #glong value from big-endian to the host byte order.
+ * Converts a #xlong_t value from big-endian to the host byte order.
  *
  * Returns: @val converted to host byte order
  */
 
 /**
  * GLONG_FROM_LE:
- * @val: a #glong value in little-endian byte order
+ * @val: a #xlong_t value in little-endian byte order
  *
- * Converts a #glong value from little-endian to host byte order.
+ * Converts a #xlong_t value from little-endian to host byte order.
  *
  * Returns: @val converted to host byte order
  */
 
 /**
  * GLONG_TO_BE:
- * @val: a #glong value in host byte order
+ * @val: a #xlong_t value in host byte order
  *
- * Converts a #glong value from host byte order to big-endian.
+ * Converts a #xlong_t value from host byte order to big-endian.
  *
  * Returns: @val converted to big-endian byte order
  */
 
 /**
  * GLONG_TO_LE:
- * @val: a #glong value in host byte order
+ * @val: a #xlong_t value in host byte order
  *
- * Converts a #glong value from host byte order to little-endian.
+ * Converts a #xlong_t value from host byte order to little-endian.
  *
  * Returns: @val converted to little-endian
  */
@@ -1092,36 +1092,36 @@
 
 /**
  * GSSIZE_FROM_BE:
- * @val: a #gssize value in big-endian byte order
+ * @val: a #xssize_t value in big-endian byte order
  *
- * Converts a #gssize value from big-endian to host byte order.
+ * Converts a #xssize_t value from big-endian to host byte order.
  *
  * Returns: @val converted to host byte order
  */
 
 /**
  * GSSIZE_FROM_LE:
- * @val: a #gssize value in little-endian byte order
+ * @val: a #xssize_t value in little-endian byte order
  *
- * Converts a #gssize value from little-endian to host byte order.
+ * Converts a #xssize_t value from little-endian to host byte order.
  *
  * Returns: @val converted to host byte order
  */
 
 /**
  * GSSIZE_TO_BE:
- * @val: a #gssize value in host byte order
+ * @val: a #xssize_t value in host byte order
  *
- * Converts a #gssize value from host byte order to big-endian.
+ * Converts a #xssize_t value from host byte order to big-endian.
  *
  * Returns: @val converted to big-endian
  */
 
 /**
  * GSSIZE_TO_LE:
- * @val: a #gssize value in host byte order
+ * @val: a #xssize_t value in host byte order
  *
- * Converts a #gssize value from host byte order to little-endian.
+ * Converts a #xssize_t value from host byte order to little-endian.
  *
  * Returns: @val converted to little-endian
  */
@@ -1164,36 +1164,36 @@
 
 /**
  * GUINT16_FROM_BE:
- * @val: a #guint16 value in big-endian byte order
+ * @val: a #xuint16_t value in big-endian byte order
  *
- * Converts a #guint16 value from big-endian to host byte order.
+ * Converts a #xuint16_t value from big-endian to host byte order.
  *
  * Returns: @val converted to host byte order
  */
 
 /**
  * GUINT16_FROM_LE:
- * @val: a #guint16 value in little-endian byte order
+ * @val: a #xuint16_t value in little-endian byte order
  *
- * Converts a #guint16 value from little-endian to host byte order.
+ * Converts a #xuint16_t value from little-endian to host byte order.
  *
  * Returns: @val converted to host byte order
  */
 
 /**
  * GUINT16_TO_BE:
- * @val: a #guint16 value in host byte order
+ * @val: a #xuint16_t value in host byte order
  *
- * Converts a #guint16 value from host byte order to big-endian.
+ * Converts a #xuint16_t value from host byte order to big-endian.
  *
  * Returns: @val converted to big-endian
  */
 
 /**
  * GUINT16_TO_LE:
- * @val: a #guint16 value in host byte order
+ * @val: a #xuint16_t value in host byte order
  *
- * Converts a #guint16 value from host byte order to little-endian.
+ * Converts a #xuint16_t value from host byte order to little-endian.
  *
  * Returns: @val converted to little-endian
  */
@@ -1236,36 +1236,36 @@
 
 /**
  * GUINT32_FROM_BE:
- * @val: a #guint32 value in big-endian byte order
+ * @val: a #xuint32_t value in big-endian byte order
  *
- * Converts a #guint32 value from big-endian to host byte order.
+ * Converts a #xuint32_t value from big-endian to host byte order.
  *
  * Returns: @val converted to host byte order
  */
 
 /**
  * GUINT32_FROM_LE:
- * @val: a #guint32 value in little-endian byte order
+ * @val: a #xuint32_t value in little-endian byte order
  *
- * Converts a #guint32 value from little-endian to host byte order.
+ * Converts a #xuint32_t value from little-endian to host byte order.
  *
  * Returns: @val converted to host byte order
  */
 
 /**
  * GUINT32_TO_BE:
- * @val: a #guint32 value in host byte order
+ * @val: a #xuint32_t value in host byte order
  *
- * Converts a #guint32 value from host byte order to big-endian.
+ * Converts a #xuint32_t value from host byte order to big-endian.
  *
  * Returns: @val converted to big-endian
  */
 
 /**
  * GUINT32_TO_LE:
- * @val: a #guint32 value in host byte order
+ * @val: a #xuint32_t value in host byte order
  *
- * Converts a #guint32 value from host byte order to little-endian.
+ * Converts a #xuint32_t value from host byte order to little-endian.
  *
  * Returns: @val converted to little-endian
  */
@@ -1308,45 +1308,45 @@
 
 /**
  * GUINT64_FROM_BE:
- * @val: a #guint64 value in big-endian byte order
+ * @val: a #xuint64_t value in big-endian byte order
  *
- * Converts a #guint64 value from big-endian to host byte order.
+ * Converts a #xuint64_t value from big-endian to host byte order.
  *
  * Returns: @val converted to host byte order
  */
 
 /**
  * GUINT64_FROM_LE:
- * @val: a #guint64 value in little-endian byte order
+ * @val: a #xuint64_t value in little-endian byte order
  *
- * Converts a #guint64 value from little-endian to host byte order.
+ * Converts a #xuint64_t value from little-endian to host byte order.
  *
  * Returns: @val converted to host byte order
  */
 
 /**
  * GUINT64_TO_BE:
- * @val: a #guint64 value in host byte order
+ * @val: a #xuint64_t value in host byte order
  *
- * Converts a #guint64 value from host byte order to big-endian.
+ * Converts a #xuint64_t value from host byte order to big-endian.
  *
  * Returns: @val converted to big-endian
  */
 
 /**
  * GUINT64_TO_LE:
- * @val: a #guint64 value in host byte order
+ * @val: a #xuint64_t value in host byte order
  *
- * Converts a #guint64 value from host byte order to little-endian.
+ * Converts a #xuint64_t value from host byte order to little-endian.
  *
  * Returns: @val converted to little-endian
  */
 
 /**
  * GUINT16_SWAP_BE_PDP:
- * @val: a #guint16 value in big-endian or pdp-endian byte order
+ * @val: a #xuint16_t value in big-endian or pdp-endian byte order
  *
- * Converts a #guint16 value between big-endian and pdp-endian byte order.
+ * Converts a #xuint16_t value between big-endian and pdp-endian byte order.
  * The conversion is symmetric so it can be used both ways.
  *
  * Returns: @val converted to the opposite byte order
@@ -1354,9 +1354,9 @@
 
 /**
  * GUINT16_SWAP_LE_BE:
- * @val: a #guint16 value in little-endian or big-endian byte order
+ * @val: a #xuint16_t value in little-endian or big-endian byte order
  *
- * Converts a #guint16 value between little-endian and big-endian byte order.
+ * Converts a #xuint16_t value between little-endian and big-endian byte order.
  * The conversion is symmetric so it can be used both ways.
  *
  * Returns: @val converted to the opposite byte order
@@ -1364,9 +1364,9 @@
 
 /**
  * GUINT16_SWAP_LE_PDP:
- * @val: a #guint16 value in little-endian or pdp-endian byte order
+ * @val: a #xuint16_t value in little-endian or pdp-endian byte order
  *
- * Converts a #guint16 value between little-endian and pdp-endian byte order.
+ * Converts a #xuint16_t value between little-endian and pdp-endian byte order.
  * The conversion is symmetric so it can be used both ways.
  *
  * Returns: @val converted to the opposite byte order
@@ -1374,9 +1374,9 @@
 
 /**
  * GUINT32_SWAP_BE_PDP:
- * @val: a #guint32 value in big-endian or pdp-endian byte order
+ * @val: a #xuint32_t value in big-endian or pdp-endian byte order
  *
- * Converts a #guint32 value between big-endian and pdp-endian byte order.
+ * Converts a #xuint32_t value between big-endian and pdp-endian byte order.
  * The conversion is symmetric so it can be used both ways.
  *
  * Returns: @val converted to the opposite byte order
@@ -1384,9 +1384,9 @@
 
 /**
  * GUINT32_SWAP_LE_BE:
- * @val: a #guint32 value in little-endian or big-endian byte order
+ * @val: a #xuint32_t value in little-endian or big-endian byte order
  *
- * Converts a #guint32 value between little-endian and big-endian byte order.
+ * Converts a #xuint32_t value between little-endian and big-endian byte order.
  * The conversion is symmetric so it can be used both ways.
  *
  * Returns: @val converted to the opposite byte order
@@ -1394,9 +1394,9 @@
 
 /**
  * GUINT32_SWAP_LE_PDP:
- * @val: a #guint32 value in little-endian or pdp-endian byte order
+ * @val: a #xuint32_t value in little-endian or pdp-endian byte order
  *
- * Converts a #guint32 value between little-endian and pdp-endian byte order.
+ * Converts a #xuint32_t value between little-endian and pdp-endian byte order.
  * The conversion is symmetric so it can be used both ways.
  *
  * Returns: @val converted to the opposite byte order
@@ -1404,9 +1404,9 @@
 
 /**
  * GUINT64_SWAP_LE_BE:
- * @val: a #guint64 value in little-endian or big-endian byte order
+ * @val: a #xuint64_t value in little-endian or big-endian byte order
  *
- * Converts a #guint64 value between little-endian and big-endian byte order.
+ * Converts a #xuint64_t value between little-endian and big-endian byte order.
  * The conversion is symmetric so it can be used both ways.
  *
  * Returns: @val converted to the opposite byte order
@@ -1471,9 +1471,9 @@
 
 /**
  * g_uint64_checked_add
- * @dest: a pointer to the #guint64 destination
- * @a: the #guint64 left operand
- * @b: the #guint64 right operand
+ * @dest: a pointer to the #xuint64_t destination
+ * @a: the #xuint64_t left operand
+ * @b: the #xuint64_t right operand
  *
  * Performs a checked addition of @a and @b, storing the result in
  * @dest.
@@ -1488,9 +1488,9 @@
 
 /**
  * g_uint64_checked_mul
- * @dest: a pointer to the #guint64 destination
- * @a: the #guint64 left operand
- * @b: the #guint64 right operand
+ * @dest: a pointer to the #xuint64_t destination
+ * @a: the #xuint64_t left operand
+ * @b: the #xuint64_t right operand
  *
  * Performs a checked multiplication of @a and @b, storing the result in
  * @dest.
@@ -2208,10 +2208,10 @@
  * Defined to 1 if gcc-style visibility handling is supported.
  */
 
-/* g_auto(), g_autoptr() and helpers {{{1 */
+/* x_auto(), x_autoptr() and helpers {{{1 */
 
 /**
- * g_auto:
+ * x_auto:
  * @TypeName: a supported variable type
  *
  * Helper to declare a variable with automatic cleanup.
@@ -2227,7 +2227,7 @@
  *
  * This is meant to be used with stack-allocated structures and
  * non-pointer types.  For the (more commonly used) pointer version, see
- * g_autoptr().
+ * x_autoptr().
  *
  * This macro can be used to avoid having to do explicit cleanups of
  * local variables when exiting functions.  It often vastly simplifies
@@ -2241,12 +2241,12 @@
  * xvariant_t *
  * my_func(void)
  * {
- *   g_auto(GQueue) queue = G_QUEUE_INIT;
- *   g_auto(GVariantBuilder) builder;
- *   g_auto(GStrv) strv;
+ *   x_auto(xqueue) queue = G_QUEUE_INIT;
+ *   x_auto(xvariant_builder) builder;
+ *   x_auto(xstrv) strv;
  *
- *   g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
- *   strv = g_strsplit("a:b:c", ":", -1);
+ *   xvariant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
+ *   strv = xstrsplit("a:b:c", ":", -1);
  *
  *   ...
  *
@@ -2255,7 +2255,7 @@
  *
  *   ...
  *
- *   return g_variant_builder_end (&builder);
+ *   return xvariant_builder_end (&builder);
  * }
  * ]|
  *
@@ -2267,7 +2267,7 @@
  */
 
 /**
- * g_autoptr:
+ * x_autoptr:
  * @TypeName: a supported variable type
  *
  * Helper to declare a pointer variable with automatic cleanup.
@@ -2297,21 +2297,21 @@
  * xboolean_t
  * check_exists(xvariant_t *dict)
  * {
- *   g_autoptr(xvariant_t) dirname, basename = NULL;
+ *   x_autoptr(xvariant) dirname, basename = NULL;
  *   g_autofree xchar_t *path = NULL;
  *
- *   dirname = g_variant_lookup_value (dict, "dirname", G_VARIANT_TYPE_STRING);
+ *   dirname = xvariant_lookup_value (dict, "dirname", G_VARIANT_TYPE_STRING);
  *
  *   if (dirname == NULL)
  *     return FALSE;
  *
- *   basename = g_variant_lookup_value (dict, "basename", G_VARIANT_TYPE_STRING);
+ *   basename = xvariant_lookup_value (dict, "basename", G_VARIANT_TYPE_STRING);
  *
  *   if (basename == NULL)
  *     return FALSE;
  *
- *   path = g_build_filename (g_variant_get_string (dirname, NULL),
- *                            g_variant_get_string (basename, NULL),
+ *   path = g_build_filename (xvariant_get_string (dirname, NULL),
+ *                            xvariant_get_string (basename, NULL),
  *                            NULL);
  *
  *   return g_access (path, R_OK) == 0;
@@ -2322,7 +2322,7 @@
  * initialiser or by ensuring that it is assigned to unconditionally
  * before it goes out of scope.
  *
- * See also g_auto(), g_autofree() and g_steal_pointer().
+ * See also x_auto(), g_autofree() and g_steal_pointer().
  *
  * Since: 2.44
  */
@@ -2333,21 +2333,21 @@
  * Macro to add an attribute to pointer variable to ensure automatic
  * cleanup using g_free().
  *
- * This macro differs from g_autoptr() in that it is an attribute supplied
+ * This macro differs from x_autoptr() in that it is an attribute supplied
  * before the type name, rather than wrapping the type definition.  Instead
  * of using a type-specific lookup, this macro always calls g_free() directly.
  *
  * This means it's useful for any type that is returned from
  * g_malloc().
  *
- * Otherwise, this macro has similar constraints as g_autoptr(): only
+ * Otherwise, this macro has similar constraints as x_autoptr(): only
  * supported on GCC and clang, the variable must be initialized, etc.
  *
  * |[
  * xboolean_t
  * operate_on_malloc_buf (void)
  * {
- *   g_autofree guint8* membuf = NULL;
+ *   g_autofree xuint8_t* membuf = NULL;
  *
  *   membuf = g_malloc (8192);
  *
@@ -2384,7 +2384,7 @@
  * such as `goto out` or repeating of cleanup code.  It is also helpful
  * for non-error cases.
  *
- * See also g_autoslist(), g_autoptr() and g_steal_pointer().
+ * See also g_autoslist(), x_autoptr() and g_steal_pointer().
  *
  * Since: 2.56
  */
@@ -2403,7 +2403,7 @@
  * are intended to be portable to those compilers.
  *
  * This is meant to be used to declare lists of a type with a cleanup
- * function.  The type of the variable is a `GSList *`.  You
+ * function.  The type of the variable is a `xslist_t *`.  You
  * must not add your own `*`.
  *
  * This macro can be used to avoid having to do explicit cleanups of
@@ -2412,7 +2412,7 @@
  * such as `goto out` or repeating of cleanup code.  It is also helpful
  * for non-error cases.
  *
- * See also g_autolist(), g_autoptr() and g_steal_pointer().
+ * See also g_autolist(), x_autoptr() and g_steal_pointer().
  *
  * Since: 2.56
  */
@@ -2431,7 +2431,7 @@
  * are intended to be portable to those compilers.
  *
  * This is meant to be used to declare queues of a type with a cleanup
- * function.  The type of the variable is a `GQueue *`.  You
+ * function.  The type of the variable is a `xqueue_t *`.  You
  * must not add your own `*`.
  *
  * This macro can be used to avoid having to do explicit cleanups of
@@ -2440,7 +2440,7 @@
  * such as `goto out` or repeating of cleanup code.  It is also helpful
  * for non-error cases.
  *
- * See also g_autolist(), g_autoptr() and g_steal_pointer().
+ * See also g_autolist(), x_autoptr() and g_steal_pointer().
  *
  * Since: 2.62
  */
@@ -2448,7 +2448,7 @@
 
 /**
  * G_DEFINE_AUTOPTR_CLEANUP_FUNC:
- * @TypeName: a type name to define a g_autoptr() cleanup function for
+ * @TypeName: a type name to define a x_autoptr() cleanup function for
  * @func: the cleanup function
  *
  * Defines the appropriate cleanup function for a pointer type.
@@ -2459,11 +2459,11 @@
  * This will typically be the `_free()` or `_unref()` function for the given
  * type.
  *
- * With this definition, it will be possible to use g_autoptr() with
+ * With this definition, it will be possible to use x_autoptr() with
  * @TypeName.
  *
  * |[
- * G_DEFINE_AUTOPTR_CLEANUP_FUNC(xobject_t, g_object_unref)
+ * G_DEFINE_AUTOPTR_CLEANUP_FUNC(xobject, xobject_unref)
  * ]|
  *
  * This macro should be used unconditionally; it is a no-op on compilers
@@ -2474,18 +2474,18 @@
 
 /**
  * G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC:
- * @TypeName: a type name to define a g_auto() cleanup function for
+ * @TypeName: a type name to define a x_auto() cleanup function for
  * @func: the clear function
  *
  * Defines the appropriate cleanup function for a type.
  *
  * This will typically be the `_clear()` function for the given type.
  *
- * With this definition, it will be possible to use g_auto() with
+ * With this definition, it will be possible to use x_auto() with
  * @TypeName.
  *
  * |[
- * G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(GQueue, g_queue_clear)
+ * G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(xqueue_t, g_queue_clear)
  * ]|
  *
  * This macro should be used unconditionally; it is a no-op on compilers
@@ -2496,18 +2496,18 @@
 
 /**
  * G_DEFINE_AUTO_CLEANUP_FREE_FUNC:
- * @TypeName: a type name to define a g_auto() cleanup function for
+ * @TypeName: a type name to define a x_auto() cleanup function for
  * @func: the free function
  * @none: the "none" value for the type
  *
  * Defines the appropriate cleanup function for a type.
  *
- * With this definition, it will be possible to use g_auto() with
+ * With this definition, it will be possible to use x_auto() with
  * @TypeName.
  *
  * This function will be rarely used.  It is used with pointer-based
  * typedefs and non-pointer types where the value of the variable
- * represents a resource that must be freed.  Two examples are #GStrv
+ * represents a resource that must be freed.  Two examples are #xstrv_t
  * and file descriptors.
  *
  * @none specifies the "none" value for the type in question.  It is
@@ -2515,7 +2515,7 @@
  * contain this value then the free function will not be called.
  *
  * |[
- * G_DEFINE_AUTO_CLEANUP_FREE_FUNC(GStrv, g_strfreev, NULL)
+ * G_DEFINE_AUTO_CLEANUP_FREE_FUNC(xstrv_t, xstrfreev, NULL)
  * ]|
  *
  * This macro should be used unconditionally; it is a no-op on compilers
@@ -2547,7 +2547,7 @@
  * For example:
  * |[<!-- language="C" -->
  * xboolean_t
- * g_dtls_connection_shutdown (GDtlsConnection  *conn,
+ * g_dtls_connection_shutdown (xdtls_connection_t  *conn,
  *                             xboolean_t          shutdown_read,
  *                             xboolean_t          shutdown_write,
  *                             xcancellable_t     *cancellable,

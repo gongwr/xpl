@@ -53,10 +53,10 @@ set_error (xerror_t      **error,
   win32_error = g_win32_error_message (GetLastError ());
 
   va_start (args, format);
-  detail = g_strdup_vprintf (format, args);
+  detail = xstrdup_vprintf (format, args);
   va_end (args);
 
-  message = g_strconcat (detail, win32_error, NULL);
+  message = xstrconcat (detail, win32_error, NULL);
 
   g_module_set_error (message);
   g_set_error_literal (error, G_MODULE_ERROR, G_MODULE_ERROR_FAILED, message);
@@ -83,7 +83,7 @@ _g_module_open (const xchar_t *file_name,
   cygwin_conv_to_win32_path(file_name, tmp);
   file_name = tmp;
 #endif
-  wfilename = g_utf8_to_utf16 (file_name, -1, NULL, NULL, NULL);
+  wfilename = xutf8_to_utf16 (file_name, -1, NULL, NULL, NULL);
 
   /* suppress error dialog */
   success = SetThreadErrorMode (SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS, &old_mode);
@@ -143,7 +143,7 @@ find_in_any_module_using_toolhelp (const xchar_t *symbol_name)
       snapshot = CreateToolhelp32Snapshot (TH32CS_SNAPMODULE, 0);
       if (snapshot == INVALID_HANDLE_VALUE && GetLastError () == ERROR_BAD_LENGTH)
         {
-          g_thread_yield ();
+          xthread_yield ();
           continue;
         }
       break;
@@ -209,29 +209,29 @@ _g_module_build_path (const xchar_t *directory,
 
   if (directory && *directory)
     if (k > 4 && g_ascii_strcasecmp (module_name + k - 4, ".dll") == 0)
-      return g_strconcat (directory, G_DIR_SEPARATOR_S, module_name, NULL);
+      return xstrconcat (directory, G_DIR_SEPARATOR_S, module_name, NULL);
 #ifdef G_WITH_CYGWIN
     else if (strncmp (module_name, "lib", 3) == 0 || strncmp (module_name, "cyg", 3) == 0)
-      return g_strconcat (directory, G_DIR_SEPARATOR_S, module_name, ".dll", NULL);
+      return xstrconcat (directory, G_DIR_SEPARATOR_S, module_name, ".dll", NULL);
     else
-      return g_strconcat (directory, G_DIR_SEPARATOR_S, "cyg", module_name, ".dll", NULL);
+      return xstrconcat (directory, G_DIR_SEPARATOR_S, "cyg", module_name, ".dll", NULL);
 #else
     else if (strncmp (module_name, "lib", 3) == 0)
-      return g_strconcat (directory, G_DIR_SEPARATOR_S, module_name, ".dll", NULL);
+      return xstrconcat (directory, G_DIR_SEPARATOR_S, module_name, ".dll", NULL);
     else
-      return g_strconcat (directory, G_DIR_SEPARATOR_S, "lib", module_name, ".dll", NULL);
+      return xstrconcat (directory, G_DIR_SEPARATOR_S, "lib", module_name, ".dll", NULL);
 #endif
   else if (k > 4 && g_ascii_strcasecmp (module_name + k - 4, ".dll") == 0)
-    return g_strdup (module_name);
+    return xstrdup (module_name);
 #ifdef G_WITH_CYGWIN
   else if (strncmp (module_name, "lib", 3) == 0 || strncmp (module_name, "cyg", 3) == 0)
-    return g_strconcat (module_name, ".dll", NULL);
+    return xstrconcat (module_name, ".dll", NULL);
   else
-    return g_strconcat ("cyg", module_name, ".dll", NULL);
+    return xstrconcat ("cyg", module_name, ".dll", NULL);
 #else
   else if (strncmp (module_name, "lib", 3) == 0)
-    return g_strconcat (module_name, ".dll", NULL);
+    return xstrconcat (module_name, ".dll", NULL);
   else
-    return g_strconcat ("lib", module_name, ".dll", NULL);
+    return xstrconcat ("lib", module_name, ".dll", NULL);
 #endif
 }

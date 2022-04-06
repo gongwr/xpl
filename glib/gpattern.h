@@ -27,32 +27,32 @@
 G_BEGIN_DECLS
 
 
-typedef struct _GPatternSpec    GPatternSpec;
+typedef struct _GPatternSpec    xpattern_spec_t;
 
 XPL_AVAILABLE_IN_ALL
-GPatternSpec* g_pattern_spec_new       (const xchar_t  *pattern);
+xpattern_spec_t* xpattern_spec_new       (const xchar_t  *pattern);
 XPL_AVAILABLE_IN_ALL
-void          g_pattern_spec_free      (GPatternSpec *pspec);
+void          xpattern_spec_free      (xpattern_spec_t *pspec);
 XPL_AVAILABLE_IN_2_70
-GPatternSpec *g_pattern_spec_copy (GPatternSpec *pspec);
+xpattern_spec_t *xpattern_spec_copy (xpattern_spec_t *pspec);
 XPL_AVAILABLE_IN_ALL
-xboolean_t      g_pattern_spec_equal     (GPatternSpec *pspec1,
-					GPatternSpec *pspec2);
+xboolean_t      xpattern_spec_equal     (xpattern_spec_t *pspec1,
+					xpattern_spec_t *pspec2);
 XPL_AVAILABLE_IN_2_70
-xboolean_t g_pattern_spec_match (GPatternSpec *pspec,
+xboolean_t xpattern_spec_match (xpattern_spec_t *pspec,
                                xsize_t string_length,
                                const xchar_t *string,
                                const xchar_t *string_reversed);
 XPL_AVAILABLE_IN_2_70
-xboolean_t g_pattern_spec_match_string (GPatternSpec *pspec,
+xboolean_t xpattern_spec_match_string (xpattern_spec_t *pspec,
                                       const xchar_t *string);
-XPL_DEPRECATED_IN_2_70_FOR (g_pattern_spec_match)
-xboolean_t      g_pattern_match          (GPatternSpec *pspec,
+XPL_DEPRECATED_IN_2_70_FOR (xpattern_spec_match)
+xboolean_t      g_pattern_match          (xpattern_spec_t *pspec,
 					xuint_t         string_length,
 					const xchar_t  *string,
 					const xchar_t  *string_reversed);
-XPL_DEPRECATED_IN_2_70_FOR (g_pattern_spec_match_string)
-xboolean_t      g_pattern_match_string   (GPatternSpec *pspec,
+XPL_DEPRECATED_IN_2_70_FOR (xpattern_spec_match_string)
+xboolean_t      g_pattern_match_string   (xpattern_spec_t *pspec,
 					const xchar_t  *string);
 XPL_AVAILABLE_IN_ALL
 xboolean_t      g_pattern_match_simple   (const xchar_t  *pattern,

@@ -31,7 +31,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_DBUS_PROXY         (g_dbus_proxy_get_type ())
-#define G_DBUS_PROXY(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_PROXY, GDBusProxy))
+#define G_DBUS_PROXY(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_PROXY, xdbus_proxy))
 #define G_DBUS_PROXY_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DBUS_PROXY, GDBusProxyClass))
 #define G_DBUS_PROXY_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DBUS_PROXY, GDBusProxyClass))
 #define X_IS_DBUS_PROXY(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_PROXY))
@@ -41,9 +41,9 @@ typedef struct _GDBusProxyClass   GDBusProxyClass;
 typedef struct _GDBusProxyPrivate GDBusProxyPrivate;
 
 /**
- * GDBusProxy:
+ * xdbus_proxy_t:
  *
- * The #GDBusProxy structure contains only private data and
+ * The #xdbus_proxy_t structure contains only private data and
  * should only be accessed using the provided API.
  *
  * Since: 2.26
@@ -57,10 +57,10 @@ struct _GDBusProxy
 
 /**
  * GDBusProxyClass:
- * @g_properties_changed: Signal class handler for the #GDBusProxy::g-properties-changed signal.
- * @g_signal: Signal class handler for the #GDBusProxy::g-signal signal.
+ * @g_properties_changed: Signal class handler for the #xdbus_proxy_t::g-properties-changed signal.
+ * @g_signal: Signal class handler for the #xdbus_proxy_t::g-signal signal.
  *
- * Class structure for #GDBusProxy.
+ * Class structure for #xdbus_proxy_t.
  *
  * Since: 2.26
  */
@@ -71,10 +71,10 @@ struct _GDBusProxyClass
 
   /*< public >*/
   /* Signals */
-  void (*g_properties_changed) (GDBusProxy          *proxy,
+  void (*g_properties_changed) (xdbus_proxy_t          *proxy,
                                 xvariant_t            *changed_properties,
                                 const xchar_t* const  *invalidated_properties);
-  void (*g_signal)             (GDBusProxy          *proxy,
+  void (*g_signal)             (xdbus_proxy_t          *proxy,
                                 const xchar_t         *sender_name,
                                 const xchar_t         *signal_name,
                                 xvariant_t            *parameters);
@@ -87,9 +87,9 @@ struct _GDBusProxyClass
 XPL_AVAILABLE_IN_ALL
 xtype_t            g_dbus_proxy_get_type                  (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-void             g_dbus_proxy_new                       (GDBusConnection     *connection,
+void             g_dbus_proxy_new                       (xdbus_connection_t     *connection,
                                                          GDBusProxyFlags      flags,
-                                                         GDBusInterfaceInfo *info,
+                                                         xdbus_interface_info_t *info,
                                                          const xchar_t         *name,
                                                          const xchar_t         *object_path,
                                                          const xchar_t         *interface_name,
@@ -97,12 +97,12 @@ void             g_dbus_proxy_new                       (GDBusConnection     *co
                                                          xasync_ready_callback_t  callback,
                                                          xpointer_t             user_data);
 XPL_AVAILABLE_IN_ALL
-GDBusProxy      *g_dbus_proxy_new_finish                (xasync_result_t        *res,
+xdbus_proxy_t      *g_dbus_proxy_new_finish                (xasync_result_t        *res,
                                                          xerror_t             **error);
 XPL_AVAILABLE_IN_ALL
-GDBusProxy      *g_dbus_proxy_new_sync                  (GDBusConnection     *connection,
+xdbus_proxy_t      *g_dbus_proxy_new_sync                  (xdbus_connection_t     *connection,
                                                          GDBusProxyFlags      flags,
-                                                         GDBusInterfaceInfo *info,
+                                                         xdbus_interface_info_t *info,
                                                          const xchar_t         *name,
                                                          const xchar_t         *object_path,
                                                          const xchar_t         *interface_name,
@@ -111,7 +111,7 @@ GDBusProxy      *g_dbus_proxy_new_sync                  (GDBusConnection     *co
 XPL_AVAILABLE_IN_ALL
 void             g_dbus_proxy_new_for_bus               (GBusType             bus_type,
                                                          GDBusProxyFlags      flags,
-                                                         GDBusInterfaceInfo *info,
+                                                         xdbus_interface_info_t *info,
                                                          const xchar_t         *name,
                                                          const xchar_t         *object_path,
                                                          const xchar_t         *interface_name,
@@ -119,50 +119,50 @@ void             g_dbus_proxy_new_for_bus               (GBusType             bu
                                                          xasync_ready_callback_t  callback,
                                                          xpointer_t             user_data);
 XPL_AVAILABLE_IN_ALL
-GDBusProxy      *g_dbus_proxy_new_for_bus_finish        (xasync_result_t        *res,
+xdbus_proxy_t      *g_dbus_proxy_new_for_bus_finish        (xasync_result_t        *res,
                                                          xerror_t             **error);
 XPL_AVAILABLE_IN_ALL
-GDBusProxy      *g_dbus_proxy_new_for_bus_sync          (GBusType             bus_type,
+xdbus_proxy_t      *g_dbus_proxy_new_for_bus_sync          (GBusType             bus_type,
                                                          GDBusProxyFlags      flags,
-                                                         GDBusInterfaceInfo *info,
+                                                         xdbus_interface_info_t *info,
                                                          const xchar_t         *name,
                                                          const xchar_t         *object_path,
                                                          const xchar_t         *interface_name,
                                                          xcancellable_t        *cancellable,
                                                          xerror_t             **error);
 XPL_AVAILABLE_IN_ALL
-GDBusConnection *g_dbus_proxy_get_connection            (GDBusProxy          *proxy);
+xdbus_connection_t *g_dbus_proxy_get_connection            (xdbus_proxy_t          *proxy);
 XPL_AVAILABLE_IN_ALL
-GDBusProxyFlags  g_dbus_proxy_get_flags                 (GDBusProxy          *proxy);
+GDBusProxyFlags  g_dbus_proxy_get_flags                 (xdbus_proxy_t          *proxy);
 XPL_AVAILABLE_IN_ALL
-const xchar_t     *g_dbus_proxy_get_name                  (GDBusProxy          *proxy);
+const xchar_t     *g_dbus_proxy_get_name                  (xdbus_proxy_t          *proxy);
 XPL_AVAILABLE_IN_ALL
-xchar_t           *g_dbus_proxy_get_name_owner            (GDBusProxy          *proxy);
+xchar_t           *g_dbus_proxy_get_name_owner            (xdbus_proxy_t          *proxy);
 XPL_AVAILABLE_IN_ALL
-const xchar_t     *g_dbus_proxy_get_object_path           (GDBusProxy          *proxy);
+const xchar_t     *g_dbus_proxy_get_object_path           (xdbus_proxy_t          *proxy);
 XPL_AVAILABLE_IN_ALL
-const xchar_t     *g_dbus_proxy_get_interface_name        (GDBusProxy          *proxy);
+const xchar_t     *g_dbus_proxy_get_interface_name        (xdbus_proxy_t          *proxy);
 XPL_AVAILABLE_IN_ALL
-xint_t             g_dbus_proxy_get_default_timeout       (GDBusProxy          *proxy);
+xint_t             g_dbus_proxy_get_default_timeout       (xdbus_proxy_t          *proxy);
 XPL_AVAILABLE_IN_ALL
-void             g_dbus_proxy_set_default_timeout       (GDBusProxy          *proxy,
+void             g_dbus_proxy_set_default_timeout       (xdbus_proxy_t          *proxy,
                                                          xint_t                 timeout_msec);
 XPL_AVAILABLE_IN_ALL
-GDBusInterfaceInfo *g_dbus_proxy_get_interface_info     (GDBusProxy          *proxy);
+xdbus_interface_info_t *g_dbus_proxy_get_interface_info     (xdbus_proxy_t          *proxy);
 XPL_AVAILABLE_IN_ALL
-void             g_dbus_proxy_set_interface_info        (GDBusProxy           *proxy,
-                                                         GDBusInterfaceInfo   *info);
+void             g_dbus_proxy_set_interface_info        (xdbus_proxy_t           *proxy,
+                                                         xdbus_interface_info_t   *info);
 XPL_AVAILABLE_IN_ALL
-xvariant_t        *g_dbus_proxy_get_cached_property       (GDBusProxy          *proxy,
+xvariant_t        *g_dbus_proxy_get_cached_property       (xdbus_proxy_t          *proxy,
                                                          const xchar_t         *property_name);
 XPL_AVAILABLE_IN_ALL
-void             g_dbus_proxy_set_cached_property       (GDBusProxy          *proxy,
+void             g_dbus_proxy_set_cached_property       (xdbus_proxy_t          *proxy,
                                                          const xchar_t         *property_name,
                                                          xvariant_t            *value);
 XPL_AVAILABLE_IN_ALL
-xchar_t          **g_dbus_proxy_get_cached_property_names (GDBusProxy          *proxy);
+xchar_t          **g_dbus_proxy_get_cached_property_names (xdbus_proxy_t          *proxy);
 XPL_AVAILABLE_IN_ALL
-void             g_dbus_proxy_call                      (GDBusProxy          *proxy,
+void             g_dbus_proxy_call                      (xdbus_proxy_t          *proxy,
                                                          const xchar_t         *method_name,
                                                          xvariant_t            *parameters,
                                                          GDBusCallFlags       flags,
@@ -171,11 +171,11 @@ void             g_dbus_proxy_call                      (GDBusProxy          *pr
                                                          xasync_ready_callback_t  callback,
                                                          xpointer_t             user_data);
 XPL_AVAILABLE_IN_ALL
-xvariant_t        *g_dbus_proxy_call_finish               (GDBusProxy          *proxy,
+xvariant_t        *g_dbus_proxy_call_finish               (xdbus_proxy_t          *proxy,
                                                          xasync_result_t        *res,
                                                          xerror_t             **error);
 XPL_AVAILABLE_IN_ALL
-xvariant_t        *g_dbus_proxy_call_sync                 (GDBusProxy          *proxy,
+xvariant_t        *g_dbus_proxy_call_sync                 (xdbus_proxy_t          *proxy,
                                                          const xchar_t         *method_name,
                                                          xvariant_t            *parameters,
                                                          GDBusCallFlags       flags,
@@ -184,28 +184,28 @@ xvariant_t        *g_dbus_proxy_call_sync                 (GDBusProxy          *
                                                          xerror_t             **error);
 
 XPL_AVAILABLE_IN_ALL
-void             g_dbus_proxy_call_with_unix_fd_list        (GDBusProxy          *proxy,
+void             g_dbus_proxy_call_with_unix_fd_list        (xdbus_proxy_t          *proxy,
                                                              const xchar_t         *method_name,
                                                              xvariant_t            *parameters,
                                                              GDBusCallFlags       flags,
                                                              xint_t                 timeout_msec,
-                                                             GUnixFDList         *fd_list,
+                                                             xunix_fd_list_t         *fd_list,
                                                              xcancellable_t        *cancellable,
                                                              xasync_ready_callback_t  callback,
                                                              xpointer_t             user_data);
 XPL_AVAILABLE_IN_ALL
-xvariant_t        *g_dbus_proxy_call_with_unix_fd_list_finish (GDBusProxy          *proxy,
-                                                             GUnixFDList        **out_fd_list,
+xvariant_t        *g_dbus_proxy_call_with_unix_fd_list_finish (xdbus_proxy_t          *proxy,
+                                                             xunix_fd_list_t        **out_fd_list,
                                                              xasync_result_t        *res,
                                                              xerror_t             **error);
 XPL_AVAILABLE_IN_ALL
-xvariant_t        *g_dbus_proxy_call_with_unix_fd_list_sync   (GDBusProxy          *proxy,
+xvariant_t        *g_dbus_proxy_call_with_unix_fd_list_sync   (xdbus_proxy_t          *proxy,
                                                              const xchar_t         *method_name,
                                                              xvariant_t            *parameters,
                                                              GDBusCallFlags       flags,
                                                              xint_t                 timeout_msec,
-                                                             GUnixFDList         *fd_list,
-                                                             GUnixFDList        **out_fd_list,
+                                                             xunix_fd_list_t         *fd_list,
+                                                             xunix_fd_list_t        **out_fd_list,
                                                              xcancellable_t        *cancellable,
                                                              xerror_t             **error);
 

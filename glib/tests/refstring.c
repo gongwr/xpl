@@ -19,7 +19,7 @@
 #include <glib.h>
 #include <string.h>
 
-/* test_refstring_base: Test the base API of GRefString */
+/* test_refstring_base: Test the base API of xref_string_t */
 static void
 test_refstring_base (void)
 {
@@ -72,7 +72,7 @@ test_refstring_length_nuls (void)
   g_ref_string_release (s);
 }
 
-/* test_refstring_intern: Test the interning API of GRefString */
+/* test_refstring_intern: Test the interning API of xref_string_t */
 static void
 test_refstring_intern (void)
 {

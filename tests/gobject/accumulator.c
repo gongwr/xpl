@@ -38,77 +38,77 @@
  */
 
 /*
- * TestObject, a parent class for TestObject
+ * test_object_t, a parent class for test_object_t
  */
 #define TEST_TYPE_OBJECT          (test_object_get_type ())
-typedef struct _TestObject        TestObject;
-typedef struct _TestObjectClass   TestObjectClass;
+typedef struct _test_object        test_object_t;
+typedef struct _test_object_class   test_object_class_t;
 
-struct _TestObject
+struct _test_object
 {
   xobject_t parent_instance;
 };
-struct _TestObjectClass
+struct _test_object_class
 {
   xobject_class_t parent_class;
 
-  xchar_t*   (*test_signal1) (TestObject *tobject,
+  xchar_t*   (*test_signal1) (test_object_t *tobject,
 			    xint_t        param);
-  xboolean_t (*test_signal2) (TestObject *tobject,
+  xboolean_t (*test_signal2) (test_object_t *tobject,
 			    xint_t        param);
-  xvariant_t* (*test_signal3) (TestObject *tobject,
+  xvariant_t* (*test_signal3) (test_object_t *tobject,
                              xboolean_t *weak_ptr);
 };
 
 static xtype_t test_object_get_type (void);
 
 static xboolean_t
-test_signal1_accumulator (GSignalInvocationHint *ihint,
-			  GValue                *return_accu,
-			  const GValue          *handler_return,
+test_signal1_accumulator (xsignal_invocation_hint_t *ihint,
+			  xvalue_t                *return_accu,
+			  const xvalue_t          *handler_return,
 			  xpointer_t               data)
 {
-  const xchar_t *accu_string = g_value_get_string (return_accu);
-  const xchar_t *new_string = g_value_get_string (handler_return);
+  const xchar_t *accu_string = xvalue_get_string (return_accu);
+  const xchar_t *new_string = xvalue_get_string (handler_return);
   xchar_t *result_string;
 
   if (accu_string)
-    result_string = g_strconcat (accu_string, new_string, NULL);
+    result_string = xstrconcat (accu_string, new_string, NULL);
   else if (new_string)
-    result_string = g_strdup (new_string);
+    result_string = xstrdup (new_string);
   else
     result_string = NULL;
 
-  g_value_set_string_take_ownership (return_accu, result_string);
+  xvalue_set_string_take_ownership (return_accu, result_string);
 
   return TRUE;
 }
 
 static xchar_t *
-test_object_signal1_callback_before (TestObject *tobject,
+test_object_signal1_callback_before (test_object_t *tobject,
 				     xint_t        param,
 				     xpointer_t    data)
 {
-  return g_strdup ("<before>");
+  return xstrdup ("<before>");
 }
 
 static xchar_t *
-test_object_real_signal1 (TestObject *tobject,
+test_object_real_signal1 (test_object_t *tobject,
 			  xint_t        param)
 {
-  return g_strdup ("<default>");
+  return xstrdup ("<default>");
 }
 
 static xchar_t *
-test_object_signal1_callback_after (TestObject *tobject,
+test_object_signal1_callback_after (test_object_t *tobject,
 				    xint_t        param,
 				    xpointer_t    data)
 {
-  return g_strdup ("<after>");
+  return xstrdup ("<after>");
 }
 
 static xboolean_t
-test_object_signal2_callback_before (TestObject *tobject,
+test_object_signal2_callback_before (test_object_t *tobject,
 				     xint_t        param)
 {
   switch (param)
@@ -124,7 +124,7 @@ test_object_signal2_callback_before (TestObject *tobject,
 }
 
 static xboolean_t
-test_object_real_signal2 (TestObject *tobject,
+test_object_real_signal2 (test_object_t *tobject,
 			  xint_t        param)
 {
   switch (param)
@@ -140,7 +140,7 @@ test_object_real_signal2 (TestObject *tobject,
 }
 
 static xboolean_t
-test_object_signal2_callback_after (TestObject *tobject,
+test_object_signal2_callback_after (test_object_t *tobject,
 				     xint_t        param)
 {
   switch (param)
@@ -156,23 +156,23 @@ test_object_signal2_callback_after (TestObject *tobject,
 }
 
 static xboolean_t
-test_signal3_accumulator (GSignalInvocationHint *ihint,
-			  GValue                *return_accu,
-			  const GValue          *handler_return,
+test_signal3_accumulator (xsignal_invocation_hint_t *ihint,
+			  xvalue_t                *return_accu,
+			  const xvalue_t          *handler_return,
 			  xpointer_t               data)
 {
   xvariant_t *variant;
 
-  variant = g_value_get_variant (handler_return);
-  g_assert (!g_variant_is_floating (variant));
+  variant = xvalue_get_variant (handler_return);
+  g_assert (!xvariant_is_floating (variant));
 
-  g_value_set_variant (return_accu, variant);
+  xvalue_set_variant (return_accu, variant);
 
   return variant == NULL;
 }
 
 /* To be notified when the variant is finalised, we construct
- * it from data with a custom GDestroyNotify.
+ * it from data with a custom xdestroy_notify_t.
  */
 
 typedef struct {
@@ -190,31 +190,31 @@ free_data (VariantData *data)
 }
 
 static xvariant_t *
-test_object_real_signal3 (TestObject *tobject,
+test_object_real_signal3 (test_object_t *tobject,
                           xboolean_t *weak_ptr)
 {
   xvariant_t *variant;
   VariantData *data;
 
-  variant = g_variant_ref_sink (g_variant_new_uint32 (42));
+  variant = xvariant_ref_sink (xvariant_new_uint32 (42));
   data = g_slice_new (VariantData);
   data->weak_ptr = weak_ptr;
-  data->n = g_variant_get_size (variant);
+  data->n = xvariant_get_size (variant);
   data->mem = g_malloc (data->n);
-  g_variant_store (variant, data->mem);
-  g_variant_unref (variant);
+  xvariant_store (variant, data->mem);
+  xvariant_unref (variant);
 
-  variant = g_variant_new_from_data (G_VARIANT_TYPE ("u"),
+  variant = xvariant_new_from_data (G_VARIANT_TYPE ("u"),
                                      data->mem,
                                      data->n,
                                      TRUE,
-                                     (GDestroyNotify) free_data,
+                                     (xdestroy_notify_t) free_data,
                                      data);
-  return g_variant_ref_sink (variant);
+  return xvariant_ref_sink (variant);
 }
 
 static void
-test_object_class_init (TestObjectClass *class)
+test_object_class_init (test_object_class_t *class)
 {
   class->test_signal1 = test_object_real_signal1;
   class->test_signal2 = test_object_real_signal2;
@@ -223,27 +223,27 @@ test_object_class_init (TestObjectClass *class)
   g_signal_new ("test-signal1",
 		G_OBJECT_CLASS_TYPE (class),
 		G_SIGNAL_RUN_LAST,
-		G_STRUCT_OFFSET (TestObjectClass, test_signal1),
+		G_STRUCT_OFFSET (test_object_class_t, test_signal1),
 		test_signal1_accumulator, NULL,
 		test_marshal_STRING__INT,
 		XTYPE_STRING, 1, XTYPE_INT);
   g_signal_new ("test-signal2",
 		G_OBJECT_CLASS_TYPE (class),
 		G_SIGNAL_RUN_LAST,
-		G_STRUCT_OFFSET (TestObjectClass, test_signal2),
+		G_STRUCT_OFFSET (test_object_class_t, test_signal2),
 		g_signal_accumulator_true_handled, NULL,
 		test_marshal_BOOLEAN__INT,
 		XTYPE_BOOLEAN, 1, XTYPE_INT);
   g_signal_new ("test-signal3",
 		G_OBJECT_CLASS_TYPE (class),
 		G_SIGNAL_RUN_LAST,
-		G_STRUCT_OFFSET (TestObjectClass, test_signal3),
+		G_STRUCT_OFFSET (test_object_class_t, test_signal3),
 		test_signal3_accumulator, NULL,
 		test_marshal_VARIANT__POINTER,
 		XTYPE_VARIANT, 1, XTYPE_POINTER);
 }
 
-static DEFINE_TYPE(TestObject, test_object,
+static DEFINE_TYPE(test_object, test_object,
 		   test_object_class_init, NULL, NULL,
 		   XTYPE_OBJECT)
 
@@ -251,7 +251,7 @@ int
 main (int   argc,
       char *argv[])
 {
-  TestObject *object;
+  test_object_t *object;
   xchar_t *string_result;
   xboolean_t bool_result;
   xboolean_t variant_finalised;
@@ -261,7 +261,7 @@ main (int   argc,
 			  G_LOG_LEVEL_WARNING |
 			  G_LOG_LEVEL_CRITICAL);
 
-  object = g_object_new (TEST_TYPE_OBJECT, NULL);
+  object = xobject_new (TEST_TYPE_OBJECT, NULL);
 
   g_signal_connect (object, "test-signal1",
 		    G_CALLBACK (test_object_signal1_callback_before), NULL);
@@ -294,14 +294,14 @@ main (int   argc,
   variant_result = NULL;
   g_signal_emit_by_name (object, "test-signal3", &variant_finalised, &variant_result);
   g_assert (variant_result != NULL);
-  g_assert (!g_variant_is_floating (variant_result));
+  g_assert (!xvariant_is_floating (variant_result));
 
   /* Test that variant_result had refcount 1 */
   g_assert (!variant_finalised);
-  g_variant_unref (variant_result);
+  xvariant_unref (variant_result);
   g_assert (variant_finalised);
 
-  g_object_unref (object);
+  xobject_unref (object);
 
   return 0;
 }

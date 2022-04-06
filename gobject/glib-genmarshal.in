@@ -30,29 +30,29 @@ GLib source package. Sources, examples and contact
 information are available at http://www.gtk.org'''
 
 GETTERS_STR = '''#ifdef G_ENABLE_DEBUG
-#define g_marshal_value_peek_boolean(v)  g_value_get_boolean (v)
-#define g_marshal_value_peek_char(v)     g_value_get_schar (v)
-#define g_marshal_value_peek_uchar(v)    g_value_get_uchar (v)
-#define g_marshal_value_peek_int(v)      g_value_get_int (v)
-#define g_marshal_value_peek_uint(v)     g_value_get_uint (v)
-#define g_marshal_value_peek_long(v)     g_value_get_long (v)
-#define g_marshal_value_peek_ulong(v)    g_value_get_ulong (v)
-#define g_marshal_value_peek_int64(v)    g_value_get_int64 (v)
-#define g_marshal_value_peek_uint64(v)   g_value_get_uint64 (v)
-#define g_marshal_value_peek_enum(v)     g_value_get_enum (v)
-#define g_marshal_value_peek_flags(v)    g_value_get_flags (v)
-#define g_marshal_value_peek_float(v)    g_value_get_float (v)
-#define g_marshal_value_peek_double(v)   g_value_get_double (v)
-#define g_marshal_value_peek_string(v)   (char*) g_value_get_string (v)
-#define g_marshal_value_peek_param(v)    g_value_get_param (v)
-#define g_marshal_value_peek_boxed(v)    g_value_get_boxed (v)
-#define g_marshal_value_peek_pointer(v)  g_value_get_pointer (v)
-#define g_marshal_value_peek_object(v)   g_value_get_object (v)
-#define g_marshal_value_peek_variant(v)  g_value_get_variant (v)
+#define g_marshal_value_peek_boolean(v)  xvalue_get_boolean (v)
+#define g_marshal_value_peek_char(v)     xvalue_get_schar (v)
+#define g_marshal_value_peek_uchar(v)    xvalue_get_uchar (v)
+#define g_marshal_value_peek_int(v)      xvalue_get_int (v)
+#define g_marshal_value_peek_uint(v)     xvalue_get_uint (v)
+#define g_marshal_value_peek_long(v)     xvalue_get_long (v)
+#define g_marshal_value_peek_ulong(v)    xvalue_get_ulong (v)
+#define g_marshal_value_peek_int64(v)    xvalue_get_int64 (v)
+#define g_marshal_value_peek_uint64(v)   xvalue_get_uint64 (v)
+#define g_marshal_value_peek_enum(v)     xvalue_get_enum (v)
+#define g_marshal_value_peek_flags(v)    xvalue_get_flags (v)
+#define g_marshal_value_peek_float(v)    xvalue_get_float (v)
+#define g_marshal_value_peek_double(v)   xvalue_get_double (v)
+#define g_marshal_value_peek_string(v)   (char*) xvalue_get_string (v)
+#define g_marshal_value_peek_param(v)    xvalue_get_param (v)
+#define g_marshal_value_peek_boxed(v)    xvalue_get_boxed (v)
+#define g_marshal_value_peek_pointer(v)  xvalue_get_pointer (v)
+#define g_marshal_value_peek_object(v)   xvalue_get_object (v)
+#define g_marshal_value_peek_variant(v)  xvalue_get_variant (v)
 #else /* !G_ENABLE_DEBUG */
 /* WARNING: This code accesses GValues directly, which is UNSUPPORTED API.
  *          Do not access GValues directly in your code. Instead, use the
- *          g_value_get_*() functions
+ *          xvalue_get_*() functions
  */
 #define g_marshal_value_peek_boolean(v)  (v)->data[0].v_int
 #define g_marshal_value_peek_char(v)     (v)->data[0].v_int
@@ -235,7 +235,7 @@ def generate_body_preamble(outfile, std_includes=True, include_headers=None, cpp
 #
 #   - signal: the token used in the marshaller prototype (mandatory)
 #   - ctype: the C type for the marshaller argument (mandatory)
-#   - getter: the function used to retrieve the argument from the GValue
+#   - getter: the function used to retrieve the argument from the xvalue_t
 #       array when invoking the callback (optional)
 #   - promoted: the C type used by va_arg() to retrieve the argument from
 #       the va_list when invoking the callback (optional, only used when
@@ -286,7 +286,7 @@ IN_ARGS = {
     },
     'LONG': {
         'signal': 'LONG',
-        'ctype': 'glong',
+        'ctype': 'xlong_t',
         'getter': 'g_marshal_value_peek_long',
     },
     'ULONG': {
@@ -301,7 +301,7 @@ IN_ARGS = {
     },
     'UINT64': {
         'signal': 'UINT64',
-        'ctype': 'guint64',
+        'ctype': 'xuint64_t',
         'getter': 'g_marshal_value_peek_uint64',
     },
     'ENUM': {
@@ -329,7 +329,7 @@ IN_ARGS = {
         'signal': 'STRING',
         'ctype': 'xpointer_t',
         'getter': 'g_marshal_value_peek_string',
-        'box': ['g_strdup', 'g_free'],
+        'box': ['xstrdup', 'g_free'],
         'static-check': True,
     },
     'PARAM': {
@@ -343,7 +343,7 @@ IN_ARGS = {
         'signal': 'BOXED',
         'ctype': 'xpointer_t',
         'getter': 'g_marshal_value_peek_boxed',
-        'box': ['g_boxed_copy', 'g_boxed_free'],
+        'box': ['xboxed_copy', 'xboxed_free'],
         'static-check': True,
         'takes-type': True,
     },
@@ -356,13 +356,13 @@ IN_ARGS = {
         'signal': 'OBJECT',
         'ctype': 'xpointer_t',
         'getter': 'g_marshal_value_peek_object',
-        'box': ['g_object_ref', 'g_object_unref'],
+        'box': ['xobject_ref', 'xobject_unref'],
     },
     'VARIANT': {
         'signal': 'VARIANT',
         'ctype': 'xpointer_t',
         'getter': 'g_marshal_value_peek_variant',
-        'box': ['g_variant_ref_sink', 'g_variant_unref'],
+        'box': ['xvariant_ref_sink', 'xvariant_unref'],
         'static-check': True,
         'takes-type': False,
     },
@@ -391,7 +391,7 @@ IN_ARGS = {
 #   - signal: the token used in the marshaller prototype (mandatory)
 #   - ctype: the C type for the marshaller argument (mandatory)
 #   - setter: the function used to set the return value of the callback
-#       into a GValue (optional)
+#       into a xvalue_t (optional)
 #   - deprecated: whether the token has been deprecated (optional)
 #   - replaced-by: the token used to replace a deprecated token (optional,
 #       only used if deprecated is True)
@@ -403,97 +403,97 @@ OUT_ARGS = {
     'BOOLEAN': {
         'signal': 'BOOLEAN',
         'ctype': 'xboolean_t',
-        'setter': 'g_value_set_boolean',
+        'setter': 'xvalue_set_boolean',
     },
     'CHAR': {
         'signal': 'CHAR',
         'ctype': 'xchar_t',
-        'setter': 'g_value_set_char',
+        'setter': 'xvalue_set_char',
     },
     'UCHAR': {
         'signal': 'UCHAR',
         'ctype': 'guchar',
-        'setter': 'g_value_set_uchar',
+        'setter': 'xvalue_set_uchar',
     },
     'INT': {
         'signal': 'INT',
         'ctype': 'xint_t',
-        'setter': 'g_value_set_int',
+        'setter': 'xvalue_set_int',
     },
     'UINT': {
         'signal': 'UINT',
         'ctype': 'xuint_t',
-        'setter': 'g_value_set_uint',
+        'setter': 'xvalue_set_uint',
     },
     'LONG': {
         'signal': 'LONG',
-        'ctype': 'glong',
-        'setter': 'g_value_set_long',
+        'ctype': 'xlong_t',
+        'setter': 'xvalue_set_long',
     },
     'ULONG': {
         'signal': 'ULONG',
         'ctype': 'gulong',
-        'setter': 'g_value_set_ulong',
+        'setter': 'xvalue_set_ulong',
     },
     'INT64': {
         'signal': 'INT64',
         'ctype': 'gint64',
-        'setter': 'g_value_set_int64',
+        'setter': 'xvalue_set_int64',
     },
     'UINT64': {
         'signal': 'UINT64',
-        'ctype': 'guint64',
-        'setter': 'g_value_set_uint64',
+        'ctype': 'xuint64_t',
+        'setter': 'xvalue_set_uint64',
     },
     'ENUM': {
         'signal': 'ENUM',
         'ctype': 'xint_t',
-        'setter': 'g_value_set_enum',
+        'setter': 'xvalue_set_enum',
     },
     'FLAGS': {
         'signal': 'FLAGS',
         'ctype': 'xuint_t',
-        'setter': 'g_value_set_flags',
+        'setter': 'xvalue_set_flags',
     },
     'FLOAT': {
         'signal': 'FLOAT',
         'ctype': 'gfloat',
-        'setter': 'g_value_set_float',
+        'setter': 'xvalue_set_float',
     },
     'DOUBLE': {
         'signal': 'DOUBLE',
         'ctype': 'xdouble_t',
-        'setter': 'g_value_set_double',
+        'setter': 'xvalue_set_double',
     },
     'STRING': {
         'signal': 'STRING',
         'ctype': 'xchar_t*',
-        'setter': 'g_value_take_string',
+        'setter': 'xvalue_take_string',
     },
     'PARAM': {
         'signal': 'PARAM',
-        'ctype': 'GParamSpec*',
-        'setter': 'g_value_take_param',
+        'ctype': 'xparam_spec_t*',
+        'setter': 'xvalue_take_param',
     },
     'BOXED': {
         'signal': 'BOXED',
         'ctype': 'xpointer_t',
-        'setter': 'g_value_take_boxed',
+        'setter': 'xvalue_take_boxed',
     },
     'POINTER': {
         'signal': 'POINTER',
         'ctype': 'xpointer_t',
-        'setter': 'g_value_set_pointer',
+        'setter': 'xvalue_set_pointer',
     },
     'OBJECT': {
         'signal': 'OBJECT',
         'ctype': 'xobject_t*',
-        'setter': 'g_value_take_object',
+        'setter': 'xvalue_take_object',
     },
     'VARIANT': {
         'signal': 'VARIANT',
         'ctype': 'xvariant_t*',
-        'setter': 'g_value_take_variant',
+        'setter': 'xvalue_take_variant',
     },
 
     # Deprecated tokens
@@ -507,7 +507,7 @@ OUT_ARGS = {
     'BOOL': {
         'signal': 'BOOLEAN',
         'ctype': 'xboolean_t',
-        'setter': 'g_value_set_boolean',
+        'setter': 'xvalue_set_boolean',
         'deprecated': True,
         'replaced_by': 'BOOLEAN',
     },
@@ -567,7 +567,7 @@ def generate_prototype(retval, params,
                        visibility=Visibility.NONE,
                        va_marshal=False):
     '''Generate a marshaller declaration with the given @visibility. If @va_marshal
-    is True, the marshaller will use variadic arguments in place of a GValue array.'''
+    is True, the marshaller will use variadic arguments in place of a xvalue_t array.'''
     signature = []
 
     if visibility == Visibility.INTERNAL:
@@ -578,19 +578,19 @@ def generate_prototype(retval, params,
     function_name = generate_marshaller_name(prefix, retval, params)
 
     if not va_marshal:
-        signature += ['void ' + function_name + ' (GClosure     *closure,']
+        signature += ['void ' + function_name + ' (xclosure_t     *closure,']
         width = len('void ') + len(function_name) + 2
 
-        signature += [indent('GValue       *return_value,', level=width, fill=' ')]
+        signature += [indent('xvalue_t       *return_value,', level=width, fill=' ')]
         signature += [indent('xuint_t         n_param_values,', level=width, fill=' ')]
-        signature += [indent('const GValue *param_values,', level=width, fill=' ')]
+        signature += [indent('const xvalue_t *param_values,', level=width, fill=' ')]
         signature += [indent('xpointer_t      invocation_hint,', level=width, fill=' ')]
         signature += [indent('xpointer_t      marshal_data);', level=width, fill=' ')]
     else:
-        signature += ['void ' + function_name + 'v (GClosure *closure,']
+        signature += ['void ' + function_name + 'v (xclosure_t *closure,']
         width = len('void ') + len(function_name) + 3
 
-        signature += [indent('GValue   *return_value,', level=width, fill=' ')]
+        signature += [indent('xvalue_t   *return_value,', level=width, fill=' ')]
         signature += [indent('xpointer_t  instance,', level=width, fill=' ')]
         signature += [indent('va_list   args,', level=width, fill=' ')]
         signature += [indent('xpointer_t  marshal_data,', level=width, fill=' ')]
@@ -603,7 +603,7 @@ def generate_prototype(retval, params,
 # pylint: disable=too-many-statements, too-many-locals, too-many-branches
 def generate_body(retval, params, prefix, va_marshal=False):
     '''Generate a marshaller definition. If @va_marshal is True, the marshaller
-    will use va_list and variadic arguments in place of a GValue array.'''
+    will use va_list and variadic arguments in place of a xvalue_t array.'''
     retval_setter = OUT_ARGS[retval].get('setter', None)
     # If there's no return value then we can mark the retval argument as unused
     # and get a minor optimisation, as well as avoid a compiler warning
@@ -617,19 +617,19 @@ def generate_body(retval, params, prefix, va_marshal=False):
     function_name = generate_marshaller_name(prefix, retval, params)
 
     if not va_marshal:
-        body += [function_name + ' (GClosure     *closure,']
+        body += [function_name + ' (xclosure_t     *closure,']
         width = len(function_name) + 2
 
-        body += [indent('GValue       *return_value{},'.format(unused), level=width, fill=' ')]
+        body += [indent('xvalue_t       *return_value{},'.format(unused), level=width, fill=' ')]
         body += [indent('xuint_t         n_param_values,', level=width, fill=' ')]
-        body += [indent('const GValue *param_values,', level=width, fill=' ')]
+        body += [indent('const xvalue_t *param_values,', level=width, fill=' ')]
         body += [indent('xpointer_t      invocation_hint G_GNUC_UNUSED,', level=width, fill=' ')]
         body += [indent('xpointer_t      marshal_data)', level=width, fill=' ')]
     else:
-        body += [function_name + 'v (GClosure *closure,']
+        body += [function_name + 'v (xclosure_t *closure,']
         width = len(function_name) + 3
 
-        body += [indent('GValue   *return_value{},'.format(unused), level=width, fill=' ')]
+        body += [indent('xvalue_t   *return_value{},'.format(unused), level=width, fill=' ')]
         body += [indent('xpointer_t  instance,', level=width, fill=' ')]
         body += [indent('va_list   args,', level=width, fill=' ')]
         body += [indent('xpointer_t  marshal_data,', level=width, fill=' ')]
@@ -710,14 +710,14 @@ def generate_body(retval, params, prefix, va_marshal=False):
     if va_marshal:
         body += ['      data2 = instance;']
     else:
-        body += ['      data2 = g_value_peek_pointer (param_values + 0);']
+        body += ['      data2 = xvalue_peek_pointer (param_values + 0);']
     body += ['    }']
     body += ['  else']
     body += ['    {']
     if va_marshal:
         body += ['      data1 = instance;']
     else:
-        body += ['      data1 = g_value_peek_pointer (param_values + 0);']
+        body += ['      data1 = xvalue_peek_pointer (param_values + 0);']
     body += ['      data2 = closure->data;']
     body += ['    }']
     # pylint: disable=line-too-long

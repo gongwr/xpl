@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 
 #define XTYPE_SETTINGS                                     (g_settings_get_type ())
 #define G_SETTINGS(inst)                                    (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_SETTINGS, GSettings))
+                                                             XTYPE_SETTINGS, xsettings))
 #define G_SETTINGS_CLASS(class)                             (XTYPE_CHECK_CLASS_CAST ((class),                       \
                                                              XTYPE_SETTINGS, GSettingsClass))
 #define X_IS_SETTINGS(inst)                                 (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_SETTINGS))
@@ -47,14 +47,14 @@ struct _GSettingsClass
   xobject_class_t parent_class;
 
   /* Signals */
-  void        (*writable_changed)      (GSettings    *settings,
+  void        (*writable_changed)      (xsettings_t    *settings,
                                         const xchar_t  *key);
-  void        (*changed)               (GSettings    *settings,
+  void        (*changed)               (xsettings_t    *settings,
                                         const xchar_t  *key);
-  xboolean_t    (*writable_change_event) (GSettings    *settings,
-                                        GQuark        key);
-  xboolean_t    (*change_event)          (GSettings    *settings,
-                                        const GQuark *keys,
+  xboolean_t    (*writable_change_event) (xsettings_t    *settings,
+                                        xquark        key);
+  xboolean_t    (*change_event)          (xsettings_t    *settings,
+                                        const xquark *keys,
                                         xint_t          n_keys);
 
   xpointer_t padding[20];
@@ -75,164 +75,164 @@ const xchar_t * const *   g_settings_list_schemas                         (void)
 XPL_DEPRECATED_IN_2_40_FOR(g_settings_schema_source_list_schemas)
 const xchar_t * const *   g_settings_list_relocatable_schemas             (void);
 XPL_AVAILABLE_IN_ALL
-GSettings *             g_settings_new                                  (const xchar_t        *schema_id);
+xsettings_t *             g_settings_new                                  (const xchar_t        *schema_id);
 XPL_AVAILABLE_IN_ALL
-GSettings *             g_settings_new_with_path                        (const xchar_t        *schema_id,
+xsettings_t *             g_settings_new_with_path                        (const xchar_t        *schema_id,
                                                                          const xchar_t        *path);
 XPL_AVAILABLE_IN_ALL
-GSettings *             g_settings_new_with_backend                     (const xchar_t        *schema_id,
-                                                                         GSettingsBackend   *backend);
+xsettings_t *             g_settings_new_with_backend                     (const xchar_t        *schema_id,
+                                                                         xsettings_backend_t   *backend);
 XPL_AVAILABLE_IN_ALL
-GSettings *             g_settings_new_with_backend_and_path            (const xchar_t        *schema_id,
-                                                                         GSettingsBackend   *backend,
+xsettings_t *             g_settings_new_with_backend_and_path            (const xchar_t        *schema_id,
+                                                                         xsettings_backend_t   *backend,
                                                                          const xchar_t        *path);
 XPL_AVAILABLE_IN_2_32
-GSettings *             g_settings_new_full                             (GSettingsSchema    *schema,
-                                                                         GSettingsBackend   *backend,
+xsettings_t *             g_settings_new_full                             (xsettings_schema_t    *schema,
+                                                                         xsettings_backend_t   *backend,
                                                                          const xchar_t        *path);
 XPL_AVAILABLE_IN_ALL
-xchar_t **                g_settings_list_children                        (GSettings          *settings);
+xchar_t **                g_settings_list_children                        (xsettings_t          *settings);
 XPL_DEPRECATED_IN_2_46_FOR(g_settings_schema_list_keys)
-xchar_t **                g_settings_list_keys                            (GSettings          *settings);
+xchar_t **                g_settings_list_keys                            (xsettings_t          *settings);
 XPL_DEPRECATED_IN_2_40_FOR(g_settings_schema_key_get_range)
-xvariant_t *              g_settings_get_range                            (GSettings          *settings,
+xvariant_t *              g_settings_get_range                            (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 XPL_DEPRECATED_IN_2_40_FOR(g_settings_schema_key_range_check)
-xboolean_t                g_settings_range_check                          (GSettings          *settings,
+xboolean_t                g_settings_range_check                          (xsettings_t          *settings,
                                                                          const xchar_t        *key,
                                                                          xvariant_t           *value);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_settings_set_value                            (GSettings          *settings,
+xboolean_t                g_settings_set_value                            (xsettings_t          *settings,
                                                                          const xchar_t        *key,
                                                                          xvariant_t           *value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *              g_settings_get_value                            (GSettings          *settings,
+xvariant_t *              g_settings_get_value                            (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 
 XPL_AVAILABLE_IN_2_40
-xvariant_t *              g_settings_get_user_value                       (GSettings          *settings,
+xvariant_t *              g_settings_get_user_value                       (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 XPL_AVAILABLE_IN_2_40
-xvariant_t *              g_settings_get_default_value                    (GSettings          *settings,
+xvariant_t *              g_settings_get_default_value                    (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_settings_set                                  (GSettings          *settings,
+xboolean_t                g_settings_set                                  (xsettings_t          *settings,
                                                                          const xchar_t        *key,
                                                                          const xchar_t        *format,
                                                                          ...);
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_get                                  (GSettings          *settings,
+void                    g_settings_get                                  (xsettings_t          *settings,
                                                                          const xchar_t        *key,
                                                                          const xchar_t        *format,
                                                                          ...);
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_reset                                (GSettings          *settings,
+void                    g_settings_reset                                (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 
 XPL_AVAILABLE_IN_ALL
-xint_t                    g_settings_get_int                              (GSettings          *settings,
+xint_t                    g_settings_get_int                              (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_settings_set_int                              (GSettings          *settings,
+xboolean_t                g_settings_set_int                              (xsettings_t          *settings,
                                                                          const xchar_t        *key,
                                                                          xint_t                value);
 XPL_AVAILABLE_IN_2_50
-gint64                  g_settings_get_int64                            (GSettings          *settings,
+gint64                  g_settings_get_int64                            (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 XPL_AVAILABLE_IN_2_50
-xboolean_t                g_settings_set_int64                            (GSettings          *settings,
+xboolean_t                g_settings_set_int64                            (xsettings_t          *settings,
                                                                          const xchar_t        *key,
                                                                          gint64              value);
 XPL_AVAILABLE_IN_2_32
-xuint_t                   g_settings_get_uint                             (GSettings          *settings,
+xuint_t                   g_settings_get_uint                             (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 XPL_AVAILABLE_IN_2_32
-xboolean_t                g_settings_set_uint                             (GSettings          *settings,
+xboolean_t                g_settings_set_uint                             (xsettings_t          *settings,
                                                                          const xchar_t        *key,
                                                                          xuint_t               value);
 XPL_AVAILABLE_IN_2_50
-guint64                 g_settings_get_uint64                           (GSettings          *settings,
+xuint64_t                 g_settings_get_uint64                           (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 XPL_AVAILABLE_IN_2_50
-xboolean_t                g_settings_set_uint64                           (GSettings          *settings,
+xboolean_t                g_settings_set_uint64                           (xsettings_t          *settings,
                                                                          const xchar_t        *key,
-                                                                         guint64             value);
+                                                                         xuint64_t             value);
 XPL_AVAILABLE_IN_ALL
-xchar_t *                 g_settings_get_string                           (GSettings          *settings,
+xchar_t *                 g_settings_get_string                           (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_settings_set_string                           (GSettings          *settings,
+xboolean_t                g_settings_set_string                           (xsettings_t          *settings,
                                                                          const xchar_t        *key,
                                                                          const xchar_t        *value);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_settings_get_boolean                          (GSettings          *settings,
+xboolean_t                g_settings_get_boolean                          (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_settings_set_boolean                          (GSettings          *settings,
+xboolean_t                g_settings_set_boolean                          (xsettings_t          *settings,
                                                                          const xchar_t        *key,
                                                                          xboolean_t            value);
 XPL_AVAILABLE_IN_ALL
-xdouble_t                 g_settings_get_double                           (GSettings          *settings,
+xdouble_t                 g_settings_get_double                           (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_settings_set_double                           (GSettings          *settings,
+xboolean_t                g_settings_set_double                           (xsettings_t          *settings,
                                                                          const xchar_t        *key,
                                                                          xdouble_t             value);
 XPL_AVAILABLE_IN_ALL
-xchar_t **                g_settings_get_strv                             (GSettings          *settings,
+xchar_t **                g_settings_get_strv                             (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_settings_set_strv                             (GSettings          *settings,
+xboolean_t                g_settings_set_strv                             (xsettings_t          *settings,
                                                                          const xchar_t        *key,
                                                                          const xchar_t *const *value);
 XPL_AVAILABLE_IN_ALL
-xint_t                    g_settings_get_enum                             (GSettings          *settings,
+xint_t                    g_settings_get_enum                             (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_settings_set_enum                             (GSettings          *settings,
+xboolean_t                g_settings_set_enum                             (xsettings_t          *settings,
                                                                          const xchar_t        *key,
                                                                          xint_t                value);
 XPL_AVAILABLE_IN_ALL
-xuint_t                   g_settings_get_flags                            (GSettings          *settings,
+xuint_t                   g_settings_get_flags                            (xsettings_t          *settings,
                                                                          const xchar_t        *key);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_settings_set_flags                            (GSettings          *settings,
+xboolean_t                g_settings_set_flags                            (xsettings_t          *settings,
                                                                          const xchar_t        *key,
                                                                          xuint_t               value);
 XPL_AVAILABLE_IN_ALL
-GSettings *             g_settings_get_child                            (GSettings          *settings,
+xsettings_t *             g_settings_get_child                            (xsettings_t          *settings,
                                                                          const xchar_t        *name);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_settings_is_writable                          (GSettings          *settings,
+xboolean_t                g_settings_is_writable                          (xsettings_t          *settings,
                                                                          const xchar_t        *name);
 
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_delay                                (GSettings          *settings);
+void                    g_settings_delay                                (xsettings_t          *settings);
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_apply                                (GSettings          *settings);
+void                    g_settings_apply                                (xsettings_t          *settings);
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_revert                               (GSettings          *settings);
+void                    g_settings_revert                               (xsettings_t          *settings);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_settings_get_has_unapplied                    (GSettings          *settings);
+xboolean_t                g_settings_get_has_unapplied                    (xsettings_t          *settings);
 XPL_AVAILABLE_IN_ALL
 void                    g_settings_sync                                 (void);
 
 /**
  * GSettingsBindSetMapping:
- * @value: a #GValue containing the property value to map
+ * @value: a #xvalue_t containing the property value to map
  * @expected_type: the #xvariant_type_t to create
  * @user_data: user data that was specified when the binding was created
  *
  * The type for the function that is used to convert an object property
- * value to a #xvariant_t for storing it in #GSettings.
+ * value to a #xvariant_t for storing it in #xsettings_t.
  *
  * Returns: a new #xvariant_t holding the data from @value,
  *     or %NULL in case of an error
  */
-typedef xvariant_t *    (*GSettingsBindSetMapping)                        (const GValue       *value,
+typedef xvariant_t *    (*GSettingsBindSetMapping)                        (const xvalue_t       *value,
                                                                          const xvariant_type_t *expected_type,
                                                                          xpointer_t            user_data);
 
@@ -242,13 +242,13 @@ typedef xvariant_t *    (*GSettingsBindSetMapping)                        (const
  * @variant: the #xvariant_t
  * @user_data: user data that was specified when the binding was created
  *
- * The type for the function that is used to convert from #GSettings to
+ * The type for the function that is used to convert from #xsettings_t to
  * an object property. The @value is already initialized to hold values
  * of the appropriate type.
  *
  * Returns: %TRUE if the conversion succeeded, %FALSE in case of an error
  */
-typedef xboolean_t      (*GSettingsBindGetMapping)                        (GValue             *value,
+typedef xboolean_t      (*GSettingsBindGetMapping)                        (xvalue_t             *value,
                                                                          xvariant_t           *variant,
                                                                          xpointer_t            user_data);
 
@@ -260,7 +260,7 @@ typedef xboolean_t      (*GSettingsBindGetMapping)                        (GValu
  * g_settings_get_mapped()
  *
  * The type of the function that is used to convert from a value stored
- * in a #GSettings to a value that is useful to the application.
+ * in a #xsettings_t to a value that is useful to the application.
  *
  * If the value is successfully mapped, the result should be stored at
  * @result and %TRUE returned.  If mapping fails (for example, if @value
@@ -305,13 +305,13 @@ typedef enum
 } GSettingsBindFlags;
 
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_bind                                 (GSettings               *settings,
+void                    g_settings_bind                                 (xsettings_t               *settings,
                                                                          const xchar_t             *key,
                                                                          xpointer_t                 object,
                                                                          const xchar_t             *property,
                                                                          GSettingsBindFlags       flags);
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_bind_with_mapping                    (GSettings               *settings,
+void                    g_settings_bind_with_mapping                    (xsettings_t               *settings,
                                                                          const xchar_t             *key,
                                                                          xpointer_t                 object,
                                                                          const xchar_t             *property,
@@ -319,9 +319,9 @@ void                    g_settings_bind_with_mapping                    (GSettin
                                                                          GSettingsBindGetMapping  get_mapping,
                                                                          GSettingsBindSetMapping  set_mapping,
                                                                          xpointer_t                 user_data,
-                                                                         GDestroyNotify           destroy);
+                                                                         xdestroy_notify_t           destroy);
 XPL_AVAILABLE_IN_ALL
-void                    g_settings_bind_writable                        (GSettings               *settings,
+void                    g_settings_bind_writable                        (xsettings_t               *settings,
                                                                          const xchar_t             *key,
                                                                          xpointer_t                 object,
                                                                          const xchar_t             *property,
@@ -331,11 +331,11 @@ void                    g_settings_unbind                               (xpointe
                                                                          const xchar_t             *property);
 
 XPL_AVAILABLE_IN_2_32
-GAction *               g_settings_create_action                        (GSettings               *settings,
+xaction_t *               g_settings_create_action                        (xsettings_t               *settings,
                                                                          const xchar_t             *key);
 
 XPL_AVAILABLE_IN_ALL
-xpointer_t                g_settings_get_mapped                           (GSettings               *settings,
+xpointer_t                g_settings_get_mapped                           (xsettings_t               *settings,
                                                                          const xchar_t             *key,
                                                                          GSettingsGetMapping      mapping,
                                                                          xpointer_t                 user_data);

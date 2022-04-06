@@ -31,7 +31,7 @@
 #include "gfile.h"
 
 
-static void g_dummy_file_file_iface_init (GFileIface *iface);
+static void g_dummy_file_file_iface_init (xfile_iface_t *iface);
 
 typedef struct {
   char *scheme;
@@ -67,7 +67,7 @@ static char * unescape_string (const xchar_t *escaped_string,
 			       const xchar_t *escaped_string_end,
 			       const xchar_t *illegal_characters);
 
-static void g_string_append_encoded (GString    *string,
+static void xstring_append_encoded (xstring_t    *string,
                                      const char *encoded,
 				     const char *reserved_chars_allowed);
 
@@ -106,11 +106,11 @@ _g_dummy_file_new (const char *uri)
 
   g_return_val_if_fail (uri != NULL, NULL);
 
-  dummy = g_object_new (XTYPE_DUMMY_FILE, NULL);
-  dummy->text_uri = g_strdup (uri);
+  dummy = xobject_new (XTYPE_DUMMY_FILE, NULL);
+  dummy->text_uri = xstrdup (uri);
   dummy->decoded_uri = _g_decode_uri (uri);
 
-  return G_FILE (dummy);
+  return XFILE (dummy);
 }
 
 static xboolean_t
@@ -138,13 +138,13 @@ g_dummy_file_get_path (xfile_t *file)
 static char *
 g_dummy_file_get_uri (xfile_t *file)
 {
-  return g_strdup (G_DUMMY_FILE (file)->text_uri);
+  return xstrdup (G_DUMMY_FILE (file)->text_uri);
 }
 
 static char *
 g_dummy_file_get_parse_name (xfile_t *file)
 {
-  return g_strdup (G_DUMMY_FILE (file)->text_uri);
+  return xstrdup (G_DUMMY_FILE (file)->text_uri);
 }
 
 static xfile_t *
@@ -157,7 +157,7 @@ g_dummy_file_get_parent (xfile_t *file)
   GDecodedUri new_decoded_uri;
 
   if (dummy->decoded_uri == NULL ||
-      g_strcmp0 (dummy->decoded_uri->path, "/") == 0)
+      xstrcmp0 (dummy->decoded_uri->path, "/") == 0)
     return NULL;
 
   dirname = g_path_get_dirname (dummy->decoded_uri->path);
@@ -192,7 +192,7 @@ g_dummy_file_hash (xfile_t *file)
 {
   GDummyFile *dummy = G_DUMMY_FILE (file);
 
-  return g_str_hash (dummy->text_uri);
+  return xstr_hash (dummy->text_uri);
 }
 
 static xboolean_t
@@ -202,7 +202,7 @@ g_dummy_file_equal (xfile_t *file1,
   GDummyFile *dummy1 = G_DUMMY_FILE (file1);
   GDummyFile *dummy2 = G_DUMMY_FILE (file2);
 
-  return g_str_equal (dummy1->text_uri, dummy2->text_uri);
+  return xstr_equal (dummy1->text_uri, dummy2->text_uri);
 }
 
 static int
@@ -306,7 +306,7 @@ g_dummy_file_get_relative_path (xfile_t *parent,
 	      while (*remainder == '/')
 	        remainder++;
 	      if (*remainder != 0)
-	        return g_strdup (remainder);
+	        return xstrdup (remainder);
 	    }
         }
     }
@@ -335,22 +335,22 @@ g_dummy_file_resolve_relative_path (xfile_t      *file,
   xfile_t *child;
   char *uri;
   GDecodedUri new_decoded_uri;
-  GString *str;
+  xstring_t *str;
 
   if (dummy->decoded_uri == NULL)
     {
-      str = g_string_new (dummy->text_uri);
-      g_string_append (str, "/");
-      g_string_append_encoded (str, relative_path, SUB_DELIM_CHARS ":@/");
+      str = xstring_new (dummy->text_uri);
+      xstring_append (str, "/");
+      xstring_append_encoded (str, relative_path, SUB_DELIM_CHARS ":@/");
       child = _g_dummy_file_new (str->str);
-      g_string_free (str, TRUE);
+      xstring_free (str, TRUE);
     }
   else
     {
       new_decoded_uri = *dummy->decoded_uri;
 
       if (g_path_is_absolute (relative_path))
-	new_decoded_uri.path = g_strdup (relative_path);
+	new_decoded_uri.path = xstrdup (relative_path);
       else
 	new_decoded_uri.path = g_build_filename (new_decoded_uri.path, relative_path, NULL);
 
@@ -369,7 +369,7 @@ g_dummy_file_get_child_for_display_name (xfile_t        *file,
 					 const char   *display_name,
 					 xerror_t      **error)
 {
-  return g_file_get_child (file, display_name);
+  return xfile_get_child (file, display_name);
 }
 
 static xboolean_t
@@ -389,14 +389,14 @@ g_dummy_file_get_uri_scheme (xfile_t *file)
   GDummyFile *dummy = G_DUMMY_FILE (file);
 
   if (dummy->decoded_uri)
-    return g_strdup (dummy->decoded_uri->scheme);
+    return xstrdup (dummy->decoded_uri->scheme);
 
   return NULL;
 }
 
 
 static void
-g_dummy_file_file_iface_init (GFileIface *iface)
+g_dummy_file_file_iface_init (xfile_iface_t *iface)
 {
   iface->dup = g_dummy_file_dup;
   iface->hash = g_dummy_file_hash;
@@ -564,12 +564,12 @@ _g_decode_uri (const char *uri)
       fragment_start = strchr (query_start, '#');
       if (fragment_start)
 	{
-	  decoded->query = g_strndup (query_start, fragment_start - query_start);
-	  decoded->fragment = g_strdup (fragment_start+1);
+	  decoded->query = xstrndup (query_start, fragment_start - query_start);
+	  decoded->fragment = xstrdup (fragment_start+1);
 	}
       else
 	{
-	  decoded->query = g_strdup (query_start);
+	  decoded->query = xstrdup (query_start);
 	  decoded->fragment = NULL;
 	}
     }
@@ -581,7 +581,7 @@ _g_decode_uri (const char *uri)
       if (fragment_start)
 	{
 	  hier_part_end = fragment_start++;
-	  decoded->fragment = g_strdup (fragment_start);
+	  decoded->fragment = xstrdup (fragment_start);
 	}
       else
 	{
@@ -644,7 +644,7 @@ _g_decode_uri (const char *uri)
 	  decoded->port = -1;
 	}
 
-      decoded->host = g_strndup (host_start, host_end - host_start);
+      decoded->host = xstrndup (host_start, host_end - host_start);
 
       hier_part_start = authority_end;
     }
@@ -678,7 +678,7 @@ is_valid (char c, const char *reserved_chars_allowed)
 }
 
 static void
-g_string_append_encoded (GString    *string,
+xstring_append_encoded (xstring_t    *string,
                          const char *encoded,
 			 const char *reserved_chars_allowed)
 {
@@ -689,14 +689,14 @@ g_string_append_encoded (GString    *string,
     {
       if (is_valid (c, reserved_chars_allowed))
 	{
-	  g_string_append_c (string, c);
+	  xstring_append_c (string, c);
 	  encoded++;
 	}
       else
 	{
-	  g_string_append_c (string, '%');
-	  g_string_append_c (string, hex[((guchar)c) >> 4]);
-	  g_string_append_c (string, hex[((guchar)c) & 0xf]);
+	  xstring_append_c (string, '%');
+	  xstring_append_c (string, hex[((guchar)c) >> 4]);
+	  xstring_append_c (string, hex[((guchar)c) & 0xf]);
 	  encoded++;
 	}
     }
@@ -705,44 +705,44 @@ g_string_append_encoded (GString    *string,
 static char *
 _g_encode_uri (GDecodedUri *decoded)
 {
-  GString *uri;
+  xstring_t *uri;
 
-  uri = g_string_new (NULL);
+  uri = xstring_new (NULL);
 
-  g_string_append (uri, decoded->scheme);
-  g_string_append (uri, "://");
+  xstring_append (uri, decoded->scheme);
+  xstring_append (uri, "://");
 
   if (decoded->host != NULL)
     {
       if (decoded->userinfo)
 	{
 	  /* userinfo    = *( unreserved / pct-encoded / sub-delims / ":" ) */
-	  g_string_append_encoded (uri, decoded->userinfo, SUB_DELIM_CHARS ":");
-	  g_string_append_c (uri, '@');
+	  xstring_append_encoded (uri, decoded->userinfo, SUB_DELIM_CHARS ":");
+	  xstring_append_c (uri, '@');
 	}
 
-      g_string_append (uri, decoded->host);
+      xstring_append (uri, decoded->host);
 
       if (decoded->port != -1)
 	{
-	  g_string_append_c (uri, ':');
-	  g_string_append_printf (uri, "%d", decoded->port);
+	  xstring_append_c (uri, ':');
+	  xstring_append_printf (uri, "%d", decoded->port);
 	}
     }
 
-  g_string_append_encoded (uri, decoded->path, SUB_DELIM_CHARS ":@/");
+  xstring_append_encoded (uri, decoded->path, SUB_DELIM_CHARS ":@/");
 
   if (decoded->query)
     {
-      g_string_append_c (uri, '?');
-      g_string_append (uri, decoded->query);
+      xstring_append_c (uri, '?');
+      xstring_append (uri, decoded->query);
     }
 
   if (decoded->fragment)
     {
-      g_string_append_c (uri, '#');
-      g_string_append (uri, decoded->fragment);
+      xstring_append_c (uri, '#');
+      xstring_append (uri, decoded->fragment);
     }
 
-  return g_string_free (uri, FALSE);
+  return xstring_free (uri, FALSE);
 }

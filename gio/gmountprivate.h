@@ -25,7 +25,7 @@
 
 G_BEGIN_DECLS
 
-GMount *_g_mount_get_for_mount_path (const char *mount_path,
+xmount_t *_g_mount_get_for_mount_path (const char *mount_path,
 				     xcancellable_t *cancellable);
 
 G_END_DECLS

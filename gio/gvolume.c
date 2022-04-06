@@ -34,14 +34,14 @@
  * @short_description: Volume management
  * @include: gio/gio.h
  *
- * The #GVolume interface represents user-visible objects that can be
- * mounted. Note, when porting from GnomeVFS, #GVolume is the moral
+ * The #xvolume_t interface represents user-visible objects that can be
+ * mounted. Note, when porting from GnomeVFS, #xvolume_t is the moral
  * equivalent of #GnomeVFSDrive.
  *
- * Mounting a #GVolume instance is an asynchronous operation. For more
+ * Mounting a #xvolume_t instance is an asynchronous operation. For more
  * information about asynchronous operations, see #xasync_result_t and
- * #GTask. To mount a #GVolume, first call g_volume_mount() with (at
- * least) the #GVolume instance, optionally a #xmount_operation_t object
+ * #xtask_t. To mount a #xvolume_t, first call g_volume_mount() with (at
+ * least) the #xvolume_t instance, optionally a #xmount_operation_t object
  * and a #xasync_ready_callback_t.
  *
  * Typically, one will only want to pass %NULL for the
@@ -52,7 +52,7 @@
  * The callback will be fired when the operation has resolved (either
  * with success or failure), and a #xasync_result_t instance will be
  * passed to the callback.  That callback should then call
- * g_volume_mount_finish() with the #GVolume instance and the
+ * g_volume_mount_finish() with the #xvolume_t instance and the
  * #xasync_result_t data to see if the operation was completed
  * successfully.  If an @error is present when g_volume_mount_finish()
  * is called, then it will be filled with any error information.
@@ -78,13 +78,13 @@
  */
 
 typedef GVolumeIface GVolumeInterface;
-G_DEFINE_INTERFACE(GVolume, g_volume, XTYPE_OBJECT)
+G_DEFINE_INTERFACE(xvolume_t, g_volume, XTYPE_OBJECT)
 
 static void
 g_volume_default_init (GVolumeInterface *iface)
 {
   /**
-   * GVolume::changed:
+   * xvolume_t::changed:
    *
    * Emitted when the volume has been changed.
    */
@@ -97,9 +97,9 @@ g_volume_default_init (GVolumeInterface *iface)
 		XTYPE_NONE, 0);
 
   /**
-   * GVolume::removed:
+   * xvolume_t::removed:
    *
-   * This signal is emitted when the #GVolume have been removed. If
+   * This signal is emitted when the #xvolume_t have been removed. If
    * the recipient is holding references to the object they should
    * release them so the object can be finalized.
    */
@@ -114,7 +114,7 @@ g_volume_default_init (GVolumeInterface *iface)
 
 /**
  * g_volume_get_name:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  *
  * Gets the name of @volume.
  *
@@ -122,7 +122,7 @@ g_volume_default_init (GVolumeInterface *iface)
  *     be freed with g_free() when no longer needed.
  */
 char *
-g_volume_get_name (GVolume *volume)
+g_volume_get_name (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
@@ -135,16 +135,16 @@ g_volume_get_name (GVolume *volume)
 
 /**
  * g_volume_get_icon:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  *
  * Gets the icon for @volume.
  *
  * Returns: (transfer full): a #xicon_t.
- *     The returned object should be unreffed with g_object_unref()
+ *     The returned object should be unreffed with xobject_unref()
  *     when no longer needed.
  */
 xicon_t *
-g_volume_get_icon (GVolume *volume)
+g_volume_get_icon (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
@@ -157,18 +157,18 @@ g_volume_get_icon (GVolume *volume)
 
 /**
  * g_volume_get_symbolic_icon:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  *
  * Gets the symbolic icon for @volume.
  *
  * Returns: (transfer full): a #xicon_t.
- *     The returned object should be unreffed with g_object_unref()
+ *     The returned object should be unreffed with xobject_unref()
  *     when no longer needed.
  *
  * Since: 2.34
  */
 xicon_t *
-g_volume_get_symbolic_icon (GVolume *volume)
+g_volume_get_symbolic_icon (xvolume_t *volume)
 {
   GVolumeIface *iface;
   xicon_t *ret;
@@ -188,7 +188,7 @@ g_volume_get_symbolic_icon (GVolume *volume)
 
 /**
  * g_volume_get_uuid:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  *
  * Gets the UUID for the @volume. The reference is typically based on
  * the file system UUID for the volume in question and should be
@@ -201,7 +201,7 @@ g_volume_get_symbolic_icon (GVolume *volume)
  *     when no longer needed.
  */
 char *
-g_volume_get_uuid (GVolume *volume)
+g_volume_get_uuid (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
@@ -214,16 +214,16 @@ g_volume_get_uuid (GVolume *volume)
 
 /**
  * g_volume_get_drive:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  *
  * Gets the drive for the @volume.
  *
  * Returns: (transfer full) (nullable): a #xdrive_t or %NULL if @volume is not
  *     associated with a drive. The returned object should be unreffed
- *     with g_object_unref() when no longer needed.
+ *     with xobject_unref() when no longer needed.
  */
 xdrive_t *
-g_volume_get_drive (GVolume *volume)
+g_volume_get_drive (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
@@ -236,16 +236,16 @@ g_volume_get_drive (GVolume *volume)
 
 /**
  * g_volume_get_mount:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  *
  * Gets the mount for the @volume.
  *
- * Returns: (transfer full) (nullable): a #GMount or %NULL if @volume isn't mounted.
- *     The returned object should be unreffed with g_object_unref()
+ * Returns: (transfer full) (nullable): a #xmount_t or %NULL if @volume isn't mounted.
+ *     The returned object should be unreffed with xobject_unref()
  *     when no longer needed.
  */
-GMount *
-g_volume_get_mount (GVolume *volume)
+xmount_t *
+g_volume_get_mount (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
@@ -259,14 +259,14 @@ g_volume_get_mount (GVolume *volume)
 
 /**
  * g_volume_can_mount:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  *
  * Checks if a volume can be mounted.
  *
  * Returns: %TRUE if the @volume can be mounted. %FALSE otherwise
  */
 xboolean_t
-g_volume_can_mount (GVolume *volume)
+g_volume_can_mount (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
@@ -282,14 +282,14 @@ g_volume_can_mount (GVolume *volume)
 
 /**
  * g_volume_can_eject:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  *
  * Checks if a volume can be ejected.
  *
  * Returns: %TRUE if the @volume can be ejected. %FALSE otherwise
  */
 xboolean_t
-g_volume_can_eject (GVolume *volume)
+g_volume_can_eject (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
@@ -305,14 +305,14 @@ g_volume_can_eject (GVolume *volume)
 
 /**
  * g_volume_should_automount:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  *
  * Returns whether the volume should be automatically mounted.
  *
  * Returns: %TRUE if the volume should be automatically mounted
  */
 xboolean_t
-g_volume_should_automount (GVolume *volume)
+g_volume_should_automount (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
@@ -329,7 +329,7 @@ g_volume_should_automount (GVolume *volume)
 
 /**
  * g_volume_mount:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  * @flags: flags affecting the operation
  * @mount_operation: (nullable): a #xmount_operation_t or %NULL to avoid user interaction
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore
@@ -343,7 +343,7 @@ g_volume_should_automount (GVolume *volume)
  * Virtual: mount_fn
  */
 void
-g_volume_mount (GVolume             *volume,
+g_volume_mount (xvolume_t             *volume,
 		GMountMountFlags     flags,
                 xmount_operation_t     *mount_operation,
                 xcancellable_t        *cancellable,
@@ -358,7 +358,7 @@ g_volume_mount (GVolume             *volume,
 
   if (iface->mount_fn == NULL)
     {
-      g_task_report_new_error (volume, callback, user_data,
+      xtask_report_new_error (volume, callback, user_data,
                                g_volume_mount,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("volume doesn’t implement mount"));
@@ -370,7 +370,7 @@ g_volume_mount (GVolume             *volume,
 
 /**
  * g_volume_mount_finish:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t location to store an error, or %NULL to ignore
  *
@@ -380,12 +380,12 @@ g_volume_mount (GVolume             *volume,
  * If the mount operation succeeded, g_volume_get_mount() on @volume
  * is guaranteed to return the mount right after calling this
  * function; there's no need to listen for the 'mount-added' signal on
- * #GVolumeMonitor.
+ * #xvolume_monitor_t.
  *
  * Returns: %TRUE, %FALSE if operation failed
  */
 xboolean_t
-g_volume_mount_finish (GVolume       *volume,
+g_volume_mount_finish (xvolume_t       *volume,
                        xasync_result_t  *result,
                        xerror_t       **error)
 {
@@ -394,10 +394,10 @@ g_volume_mount_finish (GVolume       *volume,
   g_return_val_if_fail (X_IS_VOLUME (volume), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_volume_mount))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, g_volume_mount))
+    return xtask_propagate_boolean (XTASK (result), error);
 
   iface = G_VOLUME_GET_IFACE (volume);
   return (* iface->mount_finish) (volume, result, error);
@@ -405,7 +405,7 @@ g_volume_mount_finish (GVolume       *volume,
 
 /**
  * g_volume_eject:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  * @flags: flags affecting the unmount if required for eject
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore
  * @callback: (nullable): a #xasync_ready_callback_t, or %NULL
@@ -418,7 +418,7 @@ g_volume_mount_finish (GVolume       *volume,
  * Deprecated: 2.22: Use g_volume_eject_with_operation() instead.
  */
 void
-g_volume_eject (GVolume             *volume,
+g_volume_eject (xvolume_t             *volume,
 		xmount_unmount_flags_t   flags,
                 xcancellable_t        *cancellable,
                 xasync_ready_callback_t  callback,
@@ -432,7 +432,7 @@ g_volume_eject (GVolume             *volume,
 
   if (iface->eject == NULL)
     {
-      g_task_report_new_error (volume, callback, user_data,
+      xtask_report_new_error (volume, callback, user_data,
                                g_volume_eject_with_operation,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("volume doesn’t implement eject"));
@@ -444,7 +444,7 @@ g_volume_eject (GVolume             *volume,
 
 /**
  * g_volume_eject_finish:
- * @volume: pointer to a #GVolume
+ * @volume: pointer to a #xvolume_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t location to store an error, or %NULL to ignore
  *
@@ -456,7 +456,7 @@ g_volume_eject (GVolume             *volume,
  * Deprecated: 2.22: Use g_volume_eject_with_operation_finish() instead.
  **/
 xboolean_t
-g_volume_eject_finish (GVolume       *volume,
+g_volume_eject_finish (xvolume_t       *volume,
                        xasync_result_t  *result,
                        xerror_t       **error)
 {
@@ -465,10 +465,10 @@ g_volume_eject_finish (GVolume       *volume,
   g_return_val_if_fail (X_IS_VOLUME (volume), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  if (g_async_result_is_tagged (result, g_volume_eject_with_operation))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  if (xasync_result_is_tagged (result, g_volume_eject_with_operation))
+    return xtask_propagate_boolean (XTASK (result), error);
 
   iface = G_VOLUME_GET_IFACE (volume);
   return (* iface->eject_finish) (volume, result, error);
@@ -476,7 +476,7 @@ g_volume_eject_finish (GVolume       *volume,
 
 /**
  * g_volume_eject_with_operation:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  * @flags: flags affecting the unmount if required for eject
  * @mount_operation: (nullable): a #xmount_operation_t or %NULL to
  *     avoid user interaction
@@ -491,7 +491,7 @@ g_volume_eject_finish (GVolume       *volume,
  * Since: 2.22
  **/
 void
-g_volume_eject_with_operation (GVolume              *volume,
+g_volume_eject_with_operation (xvolume_t              *volume,
                                xmount_unmount_flags_t   flags,
                                xmount_operation_t     *mount_operation,
                                xcancellable_t        *cancellable,
@@ -506,7 +506,7 @@ g_volume_eject_with_operation (GVolume              *volume,
 
   if (iface->eject == NULL && iface->eject_with_operation == NULL)
     {
-      g_task_report_new_error (volume, callback, user_data,
+      xtask_report_new_error (volume, callback, user_data,
                                g_volume_eject_with_operation,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                /* Translators: This is an error
@@ -524,7 +524,7 @@ g_volume_eject_with_operation (GVolume              *volume,
 
 /**
  * g_volume_eject_with_operation_finish:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t location to store the error occurring, or %NULL
  *
@@ -536,7 +536,7 @@ g_volume_eject_with_operation (GVolume              *volume,
  * Since: 2.22
  **/
 xboolean_t
-g_volume_eject_with_operation_finish (GVolume        *volume,
+g_volume_eject_with_operation_finish (xvolume_t        *volume,
                                       xasync_result_t  *result,
                                       xerror_t       **error)
 {
@@ -545,10 +545,10 @@ g_volume_eject_with_operation_finish (GVolume        *volume,
   g_return_val_if_fail (X_IS_VOLUME (volume), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_volume_eject_with_operation))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, g_volume_eject_with_operation))
+    return xtask_propagate_boolean (XTASK (result), error);
 
   iface = G_VOLUME_GET_IFACE (volume);
   if (iface->eject_with_operation_finish != NULL)
@@ -559,7 +559,7 @@ g_volume_eject_with_operation_finish (GVolume        *volume,
 
 /**
  * g_volume_get_identifier:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  * @kind: the kind of identifier to return
  *
  * Gets the identifier of the given kind for @volume.
@@ -567,11 +567,11 @@ g_volume_eject_with_operation_finish (GVolume        *volume,
  * information about volume identifiers.
  *
  * Returns: (nullable) (transfer full): a newly allocated string containing the
- *     requested identifier, or %NULL if the #GVolume
+ *     requested identifier, or %NULL if the #xvolume_t
  *     doesn't have this kind of identifier
  */
 char *
-g_volume_get_identifier (GVolume    *volume,
+g_volume_get_identifier (xvolume_t    *volume,
 			 const char *kind)
 {
   GVolumeIface *iface;
@@ -589,16 +589,16 @@ g_volume_get_identifier (GVolume    *volume,
 
 /**
  * g_volume_enumerate_identifiers:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  *
  * Gets the kinds of [identifiers][volume-identifier] that @volume has.
  * Use g_volume_get_identifier() to obtain the identifiers themselves.
  *
  * Returns: (array zero-terminated=1) (transfer full): a %NULL-terminated array
- *   of strings containing kinds of identifiers. Use g_strfreev() to free.
+ *   of strings containing kinds of identifiers. Use xstrfreev() to free.
  */
 char **
-g_volume_enumerate_identifiers (GVolume *volume)
+g_volume_enumerate_identifiers (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
@@ -613,17 +613,17 @@ g_volume_enumerate_identifiers (GVolume *volume)
 
 /**
  * g_volume_get_activation_root:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  *
- * Gets the activation root for a #GVolume if it is known ahead of
+ * Gets the activation root for a #xvolume_t if it is known ahead of
  * mount time. Returns %NULL otherwise. If not %NULL and if @volume
  * is mounted, then the result of g_mount_get_root() on the
- * #GMount object obtained from g_volume_get_mount() will always
+ * #xmount_t object obtained from g_volume_get_mount() will always
  * either be equal or a prefix of what this function returns. In
  * other words, in code
  *
  * |[<!-- language="C" -->
- *   GMount *mount;
+ *   xmount_t *mount;
  *   xfile_t *mount_root
  *   xfile_t *volume_activation_root;
  *
@@ -633,22 +633,22 @@ g_volume_enumerate_identifiers (GVolume *volume)
  * ]|
  * then the expression
  * |[<!-- language="C" -->
- *   (g_file_has_prefix (volume_activation_root, mount_root) ||
- *    g_file_equal (volume_activation_root, mount_root))
+ *   (xfile_has_prefix (volume_activation_root, mount_root) ||
+ *    xfile_equal (volume_activation_root, mount_root))
  * ]|
  * will always be %TRUE.
  *
- * Activation roots are typically used in #GVolumeMonitor
+ * Activation roots are typically used in #xvolume_monitor_t
  * implementations to find the underlying mount to shadow, see
  * g_mount_is_shadowed() for more details.
  *
  * Returns: (nullable) (transfer full): the activation root of @volume
- *     or %NULL. Use g_object_unref() to free.
+ *     or %NULL. Use xobject_unref() to free.
  *
  * Since: 2.18
  */
 xfile_t *
-g_volume_get_activation_root (GVolume *volume)
+g_volume_get_activation_root (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
@@ -663,7 +663,7 @@ g_volume_get_activation_root (GVolume *volume)
 
 /**
  * g_volume_get_sort_key:
- * @volume: a #GVolume
+ * @volume: a #xvolume_t
  *
  * Gets the sort key for @volume, if any.
  *
@@ -672,7 +672,7 @@ g_volume_get_activation_root (GVolume *volume)
  * Since: 2.32
  */
 const xchar_t *
-g_volume_get_sort_key (GVolume *volume)
+g_volume_get_sort_key (xvolume_t *volume)
 {
   const xchar_t *ret = NULL;
   GVolumeIface *iface;

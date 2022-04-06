@@ -28,9 +28,9 @@
 struct ThreadData
 {
   int	   thread_id;
-  GThread* gthread;
+  xthread_t* gthread;
 
-  GMutex   to_free_mutex;
+  xmutex_t   to_free_mutex;
   void*    to_free [N_THREADS * N_ALLOCS];
   int      bytes_to_free [N_THREADS * N_ALLOCS];
   int      n_to_free;
@@ -72,7 +72,7 @@ thread_func (void *arg)
       if (rand() % 97 == 0)
         {
           if (rand() % 2)
-            g_thread_yield();   /* concurrent shuffling for single core */
+            xthread_yield();   /* concurrent shuffling for single core */
           else
             g_usleep (1000);    /* concurrent shuffling for multi core */
         }
@@ -105,12 +105,12 @@ main (void)
   g_print ("Starting %d threads for concurrent GSlice usage...\n", N_THREADS);
   for (t = 0; t < N_THREADS; t++)
     {
-      tdata[t].gthread   = g_thread_create (thread_func, &tdata[t], TRUE, NULL);
+      tdata[t].gthread   = xthread_create (thread_func, &tdata[t], TRUE, NULL);
       g_assert (tdata[t].gthread != NULL);
     }
   for (t = 0; t < N_THREADS; t++)
     {
-      g_thread_join (tdata[t].gthread);
+      xthread_join (tdata[t].gthread);
     }
   g_print ("\n");
   for (t = 0; t < N_THREADS; t++)

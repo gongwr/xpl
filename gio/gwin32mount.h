@@ -33,7 +33,7 @@ G_BEGIN_DECLS
 #define G_WIN32_MOUNT_CLASS(k)    (XTYPE_CHECK_CLASS_CAST((k), XTYPE_WIN32_MOUNT, GWin32MountClass))
 #define X_IS_WIN32_MOUNT(o)       (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_WIN32_MOUNT))
 #define X_IS_WIN32_MOUNT_CLASS(k) (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_WIN32_MOUNT))
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GWin32Mount, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GWin32Mount, xobject_unref)
 
 typedef struct _GWin32MountClass GWin32MountClass;
 
@@ -44,7 +44,7 @@ struct _GWin32MountClass
 
 xtype_t         _g_win32_mount_get_type     (void) G_GNUC_CONST;
 
-GWin32Mount * _g_win32_mount_new          (GVolumeMonitor *volume_monitor,
+GWin32Mount * _g_win32_mount_new          (xvolume_monitor_t *volume_monitor,
                                            const char     *path,
                                            GWin32Volume   *volume);
 void          _g_win32_mount_unset_volume (GWin32Mount    *mount,

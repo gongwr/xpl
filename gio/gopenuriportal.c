@@ -48,7 +48,7 @@ init_openuri_portal (void)
   if (g_once_init_enter (&openuri_inited))
     {
       xerror_t *error = NULL;
-      GDBusConnection *connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
+      xdbus_connection_t *connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
 
       if (connection != NULL)
         {
@@ -59,16 +59,16 @@ init_openuri_portal (void)
           if (openuri == NULL)
             {
               g_warning ("Cannot create document portal proxy: %s", error->message);
-              g_error_free (error);
+              xerror_free (error);
             }
 
-          g_object_unref (connection);
+          xobject_unref (connection);
         }
       else
         {
           g_warning ("Cannot connect to session bus when initializing document portal: %s",
                      error->message);
-          g_error_free (error);
+          xerror_free (error);
         }
 
       g_once_init_leave (&openuri_inited, 1);
@@ -83,7 +83,7 @@ g_openuri_portal_open_uri (const char  *uri,
                            xerror_t     **error)
 {
   xfile_t *file = NULL;
-  GVariantBuilder opt_builder;
+  xvariant_builder_t opt_builder;
   xboolean_t res;
 
   if (!init_openuri_portal ())
@@ -93,23 +93,23 @@ g_openuri_portal_open_uri (const char  *uri,
       return FALSE;
     }
 
-  g_variant_builder_init (&opt_builder, G_VARIANT_TYPE_VARDICT);
+  xvariant_builder_init (&opt_builder, G_VARIANT_TYPE_VARDICT);
 
-  file = g_file_new_for_uri (uri);
-  if (g_file_is_native (file))
+  file = xfile_new_for_uri (uri);
+  if (xfile_is_native (file))
     {
       char *path = NULL;
-      GUnixFDList *fd_list = NULL;
+      xunix_fd_list_t *fd_list = NULL;
       int fd, fd_id, errsv;
 
-      path = g_file_get_path (file);
+      path = xfile_get_path (file);
 
       fd = g_open (path, O_RDONLY | O_CLOEXEC);
       errsv = errno;
       if (fd == -1)
         {
 	  g_free (path);
-	  g_variant_builder_clear (&opt_builder);
+	  xvariant_builder_clear (&opt_builder);
           g_set_error (error, G_IO_ERROR, g_io_error_from_errno (errsv),
                        "Failed to open '%s'", path);
           return FALSE;
@@ -124,28 +124,28 @@ g_openuri_portal_open_uri (const char  *uri,
 
       res = gxdp_open_uri_call_open_file_sync (openuri,
                                                parent_window ? parent_window : "",
-                                               g_variant_new ("h", fd_id),
-                                               g_variant_builder_end (&opt_builder),
+                                               xvariant_new ("h", fd_id),
+                                               xvariant_builder_end (&opt_builder),
                                                fd_list,
                                                NULL,
                                                NULL,
                                                NULL,
                                                error);
       g_free (path);
-      g_object_unref (fd_list);
+      xobject_unref (fd_list);
     }
   else
     {
       res = gxdp_open_uri_call_open_uri_sync (openuri,
                                               parent_window ? parent_window : "",
                                               uri,
-                                              g_variant_builder_end (&opt_builder),
+                                              xvariant_builder_end (&opt_builder),
                                               NULL,
                                               NULL,
                                               error);
     }
 
-  g_object_unref (file);
+  xobject_unref (file);
 
   return res;
 }
@@ -157,7 +157,7 @@ enum {
 };
 
 static void
-response_received (GDBusConnection *connection,
+response_received (xdbus_connection_t *connection,
                    const char      *sender_name,
                    const char      *object_path,
                    const char      *interface_name,
@@ -165,30 +165,30 @@ response_received (GDBusConnection *connection,
                    xvariant_t        *parameters,
                    xpointer_t         user_data)
 {
-  GTask *task = user_data;
-  guint32 response;
+  xtask_t *task = user_data;
+  xuint32_t response;
   xuint_t signal_id;
 
-  signal_id = GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (task), "signal-id"));
+  signal_id = GPOINTER_TO_UINT (xobject_get_data (G_OBJECT (task), "signal-id"));
   g_dbus_connection_signal_unsubscribe (connection, signal_id);
 
-  g_variant_get (parameters, "(u@a{sv})", &response, NULL);
+  xvariant_get (parameters, "(u@a{sv})", &response, NULL);
 
   switch (response)
     {
     case XDG_DESKTOP_PORTAL_SUCCESS:
-      g_task_return_boolean (task, TRUE);
+      xtask_return_boolean (task, TRUE);
       break;
     case XDG_DESKTOP_PORTAL_CANCELLED:
-      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_CANCELLED, "Launch cancelled");
+      xtask_return_new_error (task, G_IO_ERROR, G_IO_ERROR_CANCELLED, "Launch cancelled");
       break;
     case XDG_DESKTOP_PORTAL_FAILED:
     default:
-      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED, "Launch failed");
+      xtask_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED, "Launch failed");
       break;
     }
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 static void
@@ -197,8 +197,8 @@ open_call_done (xobject_t      *source,
                 xpointer_t      user_data)
 {
   GXdpOpenURI *openuri = GXDP_OPEN_URI (source);
-  GDBusConnection *connection;
-  GTask *task = user_data;
+  xdbus_connection_t *connection;
+  xtask_t *task = user_data;
   xerror_t *error = NULL;
   xboolean_t open_file;
   xboolean_t res;
@@ -207,7 +207,7 @@ open_call_done (xobject_t      *source,
   xuint_t signal_id;
 
   connection = g_dbus_proxy_get_connection (G_DBUS_PROXY (openuri));
-  open_file = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (task), "open-file"));
+  open_file = GPOINTER_TO_INT (xobject_get_data (G_OBJECT (task), "open-file"));
 
   if (open_file)
     res = gxdp_open_uri_call_open_file_finish (openuri, &path, NULL, result, &error);
@@ -216,16 +216,16 @@ open_call_done (xobject_t      *source,
 
   if (!res)
     {
-      g_task_return_error (task, error);
-      g_object_unref (task);
+      xtask_return_error (task, error);
+      xobject_unref (task);
       g_free (path);
       return;
     }
 
-  handle = (const char *)g_object_get_data (G_OBJECT (task), "handle");
-  if (g_strcmp0 (handle, path) != 0)
+  handle = (const char *)xobject_get_data (G_OBJECT (task), "handle");
+  if (xstrcmp0 (handle, path) != 0)
     {
-      signal_id = GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (task), "signal-id"));
+      signal_id = GPOINTER_TO_UINT (xobject_get_data (G_OBJECT (task), "signal-id"));
       g_dbus_connection_signal_unsubscribe (connection, signal_id);
 
       signal_id = g_dbus_connection_signal_subscribe (connection,
@@ -238,7 +238,7 @@ open_call_done (xobject_t      *source,
                                                       response_received,
                                                       task,
                                                       NULL);
-      g_object_set_data (G_OBJECT (task), "signal-id", GINT_TO_POINTER (signal_id));
+      xobject_set_data (G_OBJECT (task), "signal-id", GINT_TO_POINTER (signal_id));
     }
 }
 
@@ -249,8 +249,8 @@ g_openuri_portal_open_uri_async (const char          *uri,
                                  xasync_ready_callback_t  callback,
                                  xpointer_t             user_data)
 {
-  GDBusConnection *connection;
-  GTask *task;
+  xdbus_connection_t *connection;
+  xtask_t *task;
   xfile_t *file;
   xvariant_t *opts = NULL;
   int i;
@@ -258,7 +258,7 @@ g_openuri_portal_open_uri_async (const char          *uri,
 
   if (!init_openuri_portal ())
     {
-      g_task_report_new_error (NULL, callback, user_data, NULL,
+      xtask_report_new_error (NULL, callback, user_data, NULL,
                                G_IO_ERROR, G_IO_ERROR_NOT_INITIALIZED,
                                "OpenURI portal is not available");
       return;
@@ -268,21 +268,21 @@ g_openuri_portal_open_uri_async (const char          *uri,
 
   if (callback)
     {
-      GVariantBuilder opt_builder;
+      xvariant_builder_t opt_builder;
       char *token;
       char *sender;
       char *handle;
 
-      task = g_task_new (NULL, cancellable, callback, user_data);
+      task = xtask_new (NULL, cancellable, callback, user_data);
 
-      token = g_strdup_printf ("gio%d", g_random_int_range (0, G_MAXINT));
-      sender = g_strdup (g_dbus_connection_get_unique_name (connection) + 1);
+      token = xstrdup_printf ("gio%d", g_random_int_range (0, G_MAXINT));
+      sender = xstrdup (g_dbus_connection_get_unique_name (connection) + 1);
       for (i = 0; sender[i]; i++)
         if (sender[i] == '.')
           sender[i] = '_';
 
-      handle = g_strdup_printf ("/org/freedesktop/portal/desktop/request/%s/%s", sender, token);
-      g_object_set_data_full (G_OBJECT (task), "handle", handle, g_free);
+      handle = xstrdup_printf ("/org/freedesktop/portal/desktop/request/%s/%s", sender, token);
+      xobject_set_data_full (G_OBJECT (task), "handle", handle, g_free);
       g_free (sender);
 
       signal_id = g_dbus_connection_signal_subscribe (connection,
@@ -295,33 +295,33 @@ g_openuri_portal_open_uri_async (const char          *uri,
                                                       response_received,
                                                       task,
                                                       NULL);
-      g_object_set_data (G_OBJECT (task), "signal-id", GINT_TO_POINTER (signal_id));
+      xobject_set_data (G_OBJECT (task), "signal-id", GINT_TO_POINTER (signal_id));
 
-      g_variant_builder_init (&opt_builder, G_VARIANT_TYPE_VARDICT);
-      g_variant_builder_add (&opt_builder, "{sv}", "handle_token", g_variant_new_string (token));
+      xvariant_builder_init (&opt_builder, G_VARIANT_TYPE_VARDICT);
+      xvariant_builder_add (&opt_builder, "{sv}", "handle_token", xvariant_new_string (token));
       g_free (token);
 
-      opts = g_variant_builder_end (&opt_builder);
+      opts = xvariant_builder_end (&opt_builder);
     }
   else
     task = NULL;
 
-  file = g_file_new_for_uri (uri);
-  if (g_file_is_native (file))
+  file = xfile_new_for_uri (uri);
+  if (xfile_is_native (file))
     {
       char *path = NULL;
-      GUnixFDList *fd_list = NULL;
+      xunix_fd_list_t *fd_list = NULL;
       int fd, fd_id, errsv;
 
       if (task)
-        g_object_set_data (G_OBJECT (task), "open-file", GINT_TO_POINTER (TRUE));
+        xobject_set_data (G_OBJECT (task), "open-file", GINT_TO_POINTER (TRUE));
 
-      path = g_file_get_path (file);
+      path = xfile_get_path (file);
       fd = g_open (path, O_RDONLY | O_CLOEXEC);
       errsv = errno;
       if (fd == -1)
         {
-          g_task_report_new_error (NULL, callback, user_data, NULL,
+          xtask_report_new_error (NULL, callback, user_data, NULL,
                                    G_IO_ERROR, g_io_error_from_errno (errsv),
                                    "OpenURI portal is not available");
           return;
@@ -336,13 +336,13 @@ g_openuri_portal_open_uri_async (const char          *uri,
 
       gxdp_open_uri_call_open_file (openuri,
                                     parent_window ? parent_window : "",
-                                    g_variant_new ("h", fd_id),
+                                    xvariant_new ("h", fd_id),
                                     opts,
                                     fd_list,
                                     cancellable,
                                     task ? open_call_done : NULL,
                                     task);
-      g_object_unref (fd_list);
+      xobject_unref (fd_list);
       g_free (path);
     }
   else
@@ -356,12 +356,12 @@ g_openuri_portal_open_uri_async (const char          *uri,
                                    task);
     }
 
-  g_object_unref (file);
+  xobject_unref (file);
 }
 
 xboolean_t
 g_openuri_portal_open_uri_finish (xasync_result_t  *result,
                                   xerror_t       **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }

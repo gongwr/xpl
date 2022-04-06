@@ -32,8 +32,8 @@
 typedef GSettingsBackendClass GMemorySettingsBackendClass;
 typedef struct
 {
-  GSettingsBackend parent_instance;
-  GHashTable *table;
+  xsettings_backend_t parent_instance;
+  xhashtable_t *table;
 } GMemorySettingsBackend;
 
 G_DEFINE_TYPE_WITH_CODE (GMemorySettingsBackend,
@@ -43,7 +43,7 @@ G_DEFINE_TYPE_WITH_CODE (GMemorySettingsBackend,
                                                          g_define_type_id, "memory", 10))
 
 static xvariant_t *
-g_memory_settings_backend_read (GSettingsBackend   *backend,
+g_memory_settings_backend_read (xsettings_backend_t   *backend,
                                 const xchar_t        *key,
                                 const xvariant_type_t *expected_type,
                                 xboolean_t            default_value)
@@ -54,16 +54,16 @@ g_memory_settings_backend_read (GSettingsBackend   *backend,
   if (default_value)
     return NULL;
 
-  value = g_hash_table_lookup (memory->table, key);
+  value = xhash_table_lookup (memory->table, key);
 
   if (value != NULL)
-    g_variant_ref (value);
+    xvariant_ref (value);
 
   return value;
 }
 
 static xboolean_t
-g_memory_settings_backend_write (GSettingsBackend *backend,
+g_memory_settings_backend_write (xsettings_backend_t *backend,
                                  const xchar_t      *key,
                                  xvariant_t         *value,
                                  xpointer_t          origin_tag)
@@ -71,16 +71,16 @@ g_memory_settings_backend_write (GSettingsBackend *backend,
   GMemorySettingsBackend *memory = G_MEMORY_SETTINGS_BACKEND (backend);
   xvariant_t *old_value;
 
-  old_value = g_hash_table_lookup (memory->table, key);
-  g_variant_ref_sink (value);
+  old_value = xhash_table_lookup (memory->table, key);
+  xvariant_ref_sink (value);
 
-  if (old_value == NULL || !g_variant_equal (value, old_value))
+  if (old_value == NULL || !xvariant_equal (value, old_value))
     {
-      g_hash_table_insert (memory->table, g_strdup (key), value);
+      xhash_table_insert (memory->table, xstrdup (key), value);
       g_settings_backend_changed (backend, key, origin_tag);
     }
   else
-    g_variant_unref (value);
+    xvariant_unref (value);
 
   return TRUE;
 }
@@ -93,47 +93,47 @@ g_memory_settings_backend_write_one (xpointer_t key,
   GMemorySettingsBackend *memory = data;
 
   if (value != NULL)
-    g_hash_table_insert (memory->table, g_strdup (key), g_variant_ref (value));
+    xhash_table_insert (memory->table, xstrdup (key), xvariant_ref (value));
   else
-    g_hash_table_remove (memory->table, key);
+    xhash_table_remove (memory->table, key);
 
   return FALSE;
 }
 
 static xboolean_t
-g_memory_settings_backend_write_tree (GSettingsBackend *backend,
-                                      GTree            *tree,
+g_memory_settings_backend_write_tree (xsettings_backend_t *backend,
+                                      xtree_t            *tree,
                                       xpointer_t          origin_tag)
 {
-  g_tree_foreach (tree, g_memory_settings_backend_write_one, backend);
+  xtree_foreach (tree, g_memory_settings_backend_write_one, backend);
   g_settings_backend_changed_tree (backend, tree, origin_tag);
 
   return TRUE;
 }
 
 static void
-g_memory_settings_backend_reset (GSettingsBackend *backend,
+g_memory_settings_backend_reset (xsettings_backend_t *backend,
                                  const xchar_t      *key,
                                  xpointer_t          origin_tag)
 {
   GMemorySettingsBackend *memory = G_MEMORY_SETTINGS_BACKEND (backend);
 
-  if (g_hash_table_lookup (memory->table, key))
+  if (xhash_table_lookup (memory->table, key))
     {
-      g_hash_table_remove (memory->table, key);
+      xhash_table_remove (memory->table, key);
       g_settings_backend_changed (backend, key, origin_tag);
     }
 }
 
 static xboolean_t
-g_memory_settings_backend_get_writable (GSettingsBackend *backend,
+g_memory_settings_backend_get_writable (xsettings_backend_t *backend,
                                         const xchar_t      *name)
 {
   return TRUE;
 }
 
-static GPermission *
-g_memory_settings_backend_get_permission (GSettingsBackend *backend,
+static xpermission_t *
+g_memory_settings_backend_get_permission (xsettings_backend_t *backend,
                                           const xchar_t      *path)
 {
   return g_simple_permission_new (TRUE);
@@ -144,7 +144,7 @@ g_memory_settings_backend_finalize (xobject_t *object)
 {
   GMemorySettingsBackend *memory = G_MEMORY_SETTINGS_BACKEND (object);
 
-  g_hash_table_unref (memory->table);
+  xhash_table_unref (memory->table);
 
   G_OBJECT_CLASS (g_memory_settings_backend_parent_class)
     ->finalize (object);
@@ -153,8 +153,8 @@ g_memory_settings_backend_finalize (xobject_t *object)
 static void
 g_memory_settings_backend_init (GMemorySettingsBackend *memory)
 {
-  memory->table = g_hash_table_new_full (g_str_hash, g_str_equal, g_free,
-                                         (GDestroyNotify) g_variant_unref);
+  memory->table = xhash_table_new_full (xstr_hash, xstr_equal, g_free,
+                                         (xdestroy_notify_t) xvariant_unref);
 }
 
 static void
@@ -175,18 +175,18 @@ g_memory_settings_backend_class_init (GMemorySettingsBackendClass *class)
 /**
  * g_memory_settings_backend_new:
  *
- * Creates a memory-backed #GSettingsBackend.
+ * Creates a memory-backed #xsettings_backend_t.
  *
  * This backend allows changes to settings, but does not write them
  * to any backing storage, so the next time you run your application,
  * the memory backend will start out with the default values again.
  *
- * Returns: (transfer full): a newly created #GSettingsBackend
+ * Returns: (transfer full): a newly created #xsettings_backend_t
  *
  * Since: 2.28
  */
-GSettingsBackend *
+xsettings_backend_t *
 g_memory_settings_backend_new (void)
 {
-  return g_object_new (XTYPE_MEMORY_SETTINGS_BACKEND, NULL);
+  return xobject_new (XTYPE_MEMORY_SETTINGS_BACKEND, NULL);
 }

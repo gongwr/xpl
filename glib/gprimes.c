@@ -75,7 +75,7 @@ static const xuint_t g_primes[] =
  *
  * Gets the smallest prime number from a built-in array of primes which
  * is larger than @num. This is used within GLib to calculate the optimum
- * size of a #GHashTable.
+ * size of a #xhashtable_t.
  *
  * The built-in array of primes ranges from 11 to 13845163 such that
  * each prime is approximately 1.5-2 times the previous prime.

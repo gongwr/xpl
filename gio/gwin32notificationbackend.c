@@ -32,11 +32,11 @@
 #define G_WIN32_NOTIFICATION_BACKEND(o)    (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_WIN32_NOTIFICATION_BACKEND, GWin32NotificationBackend))
 
 typedef struct _GWin32NotificationBackend GWin32NotificationBackend;
-typedef GNotificationBackendClass         GWin32NotificationBackendClass;
+typedef xnotification_backend_class_t         GWin32NotificationBackendClass;
 
 struct _GWin32NotificationBackend
 {
-  GNotificationBackend parent;
+  xnotification_backend_t parent;
 };
 
 xtype_t g_win32_notification_backend_get_type (void);
@@ -55,16 +55,16 @@ g_win32_notification_backend_is_supported (void)
 }
 
 static void
-g_win32_notification_backend_send_notification (GNotificationBackend *backend,
+g_win32_notification_backend_send_notification (xnotification_backend_t *backend,
                                                 const xchar_t          *id,
-                                                GNotification        *notification)
+                                                xnotification_t        *notification)
 {
   static xsize_t warned = 0;
 
   /* FIXME: See https://bugzilla.gnome.org/show_bug.cgi?id=776583. This backend
-   * exists purely to stop crashes when applications use g_notification*()
+   * exists purely to stop crashes when applications use xnotification*()
    * on Windows, by providing a dummy backend implementation. (The alternative
-   * was to modify all of the backend call sites in g_notification*(), which
+   * was to modify all of the backend call sites in xnotification*(), which
    * seemed less scalable.) */
   if (g_once_init_enter (&warned))
     {
@@ -74,7 +74,7 @@ g_win32_notification_backend_send_notification (GNotificationBackend *backend,
 }
 
 static void
-g_win32_notification_backend_withdraw_notification (GNotificationBackend *backend,
+g_win32_notification_backend_withdraw_notification (xnotification_backend_t *backend,
                                                     const xchar_t          *id)
 {
   /* FIXME: Nothing needs doing here until send_notification() is implemented. */
@@ -88,7 +88,7 @@ g_win32_notification_backend_init (GWin32NotificationBackend *backend)
 static void
 g_win32_notification_backend_class_init (GWin32NotificationBackendClass *class)
 {
-  GNotificationBackendClass *backend_class = G_NOTIFICATION_BACKEND_CLASS (class);
+  xnotification_backend_class_t *backend_class = G_NOTIFICATION_BACKEND_CLASS (class);
 
   backend_class->is_supported = g_win32_notification_backend_is_supported;
   backend_class->send_notification = g_win32_notification_backend_send_notification;

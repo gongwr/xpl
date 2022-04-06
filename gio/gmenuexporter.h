@@ -17,8 +17,8 @@
  * Author: Ryan Lortie <desrt@desrt.ca>
  */
 
-#ifndef __G_MENU_EXPORTER_H__
-#define __G_MENU_EXPORTER_H__
+#ifndef __XMENU_EXPORTER_H__
+#define __XMENU_EXPORTER_H__
 
 #include <gio/gdbusconnection.h>
 #include <gio/gmenumodel.h>
@@ -26,15 +26,15 @@
 G_BEGIN_DECLS
 
 XPL_AVAILABLE_IN_2_32
-xuint_t                   g_dbus_connection_export_menu_model             (GDBusConnection  *connection,
+xuint_t                   g_dbus_connection_export_menu_model             (xdbus_connection_t  *connection,
                                                                          const xchar_t      *object_path,
-                                                                         GMenuModel       *menu,
+                                                                         xmenu_model_t       *menu,
                                                                          xerror_t          **error);
 
 XPL_AVAILABLE_IN_2_32
-void                    g_dbus_connection_unexport_menu_model           (GDBusConnection  *connection,
+void                    g_dbus_connection_unexport_menu_model           (xdbus_connection_t  *connection,
                                                                          xuint_t             export_id);
 
 G_END_DECLS
 
-#endif /* __G_MENU_EXPORTER_H__ */
+#endif /* __XMENU_EXPORTER_H__ */

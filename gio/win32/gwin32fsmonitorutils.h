@@ -48,7 +48,7 @@ struct _GWin32FSMonitorPrivate
   DWORD file_attribs;
   PFILE_NOTIFY_INFORMATION pfni_prev;
   /* Needed in the APC where we only have this private struct */
-  GFileMonitor *self;
+  xfile_monitor_t *self;
   GFileMonitorSource *fms;
 };
 

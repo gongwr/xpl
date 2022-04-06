@@ -4,15 +4,15 @@ int
 LLVMFuzzerTestOneInput (const unsigned char *data, size_t size)
 {
   xerror_t *error = NULL;
-  GHashTable *parsed_params = NULL;
+  xhashtable_t *parsed_params = NULL;
 
   fuzz_set_logging_func ();
 
   if (size > G_MAXSSIZE)
     return 0;
 
-  parsed_params = g_uri_parse_params ((const xchar_t *) data, (gssize) size,
-                                      "&", G_URI_PARAMS_NONE, &error);
+  parsed_params = xuri_parse_params ((const xchar_t *) data, (xssize_t) size,
+                                      "&", XURI_PARAMS_NONE, &error);
   if (parsed_params == NULL)
     {
       g_assert (error);
@@ -22,7 +22,7 @@ LLVMFuzzerTestOneInput (const unsigned char *data, size_t size)
 
 
   g_assert_no_error (error);
-  g_hash_table_unref (parsed_params);
+  xhash_table_unref (parsed_params);
 
   return 0;
 }

@@ -3,7 +3,7 @@
 int
 LLVMFuzzerTestOneInput (const unsigned char *data, size_t size)
 {
-  GBookmarkFile *bookmark = NULL;
+  xbookmark_file_t *bookmark = NULL;
 
   fuzz_set_logging_func ();
 

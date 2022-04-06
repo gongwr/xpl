@@ -28,21 +28,21 @@
  * Returns TRUE if @str was modified.
  */
 static xboolean_t
-_g_win32_strip_extended_ntobjm_prefix (gunichar2 *str,
+_g_win32_strip_extended_ntobjm_prefix (xunichar2_t *str,
                                        xsize_t     *str_size)
 {
   const wchar_t *extended_prefix = L"\\\\?\\";
   const xsize_t    extended_prefix_len = wcslen (extended_prefix);
-  const xsize_t    extended_prefix_len_bytes = sizeof (gunichar2) * extended_prefix_len;
-  const xsize_t    extended_prefix_with_drive_len_bytes = sizeof (gunichar2) * (extended_prefix_len + 2);
+  const xsize_t    extended_prefix_len_bytes = sizeof (xunichar2_t) * extended_prefix_len;
+  const xsize_t    extended_prefix_with_drive_len_bytes = sizeof (xunichar2_t) * (extended_prefix_len + 2);
   const wchar_t *ntobjm_prefix = L"\\??\\";
   const xsize_t    ntobjm_prefix_len = wcslen (ntobjm_prefix);
-  const xsize_t    ntobjm_prefix_len_bytes = sizeof (gunichar2) * ntobjm_prefix_len;
-  const xsize_t    ntobjm_prefix_with_drive_len_bytes = sizeof (gunichar2) * (ntobjm_prefix_len + 2);
+  const xsize_t    ntobjm_prefix_len_bytes = sizeof (xunichar2_t) * ntobjm_prefix_len;
+  const xsize_t    ntobjm_prefix_with_drive_len_bytes = sizeof (xunichar2_t) * (ntobjm_prefix_len + 2);
   xboolean_t do_move = FALSE;
   xsize_t move_shift = 0;
 
-  if ((*str_size) * sizeof (gunichar2) > extended_prefix_with_drive_len_bytes &&
+  if ((*str_size) * sizeof (xunichar2_t) > extended_prefix_with_drive_len_bytes &&
       memcmp (str,
               extended_prefix,
               extended_prefix_len_bytes) == 0 &&
@@ -53,7 +53,7 @@ _g_win32_strip_extended_ntobjm_prefix (gunichar2 *str,
      do_move = TRUE;
      move_shift = extended_prefix_len;
    }
-  else if ((*str_size) * sizeof (gunichar2) > ntobjm_prefix_with_drive_len_bytes &&
+  else if ((*str_size) * sizeof (xunichar2_t) > ntobjm_prefix_with_drive_len_bytes &&
            memcmp (str,
                    ntobjm_prefix,
                    ntobjm_prefix_len_bytes) == 0 &&
@@ -70,7 +70,7 @@ _g_win32_strip_extended_ntobjm_prefix (gunichar2 *str,
       *str_size -= move_shift;
       memmove (str,
                str + move_shift,
-               (*str_size) * sizeof (gunichar2));
+               (*str_size) * sizeof (xunichar2_t));
     }
 
   return do_move;
@@ -79,9 +79,9 @@ _g_win32_strip_extended_ntobjm_prefix (gunichar2 *str,
 static int
 _g_win32_copy_and_maybe_terminate (const guchar *data,
                                    xsize_t         in_to_copy,
-                                   gunichar2    *buf,
+                                   xunichar2_t    *buf,
                                    xsize_t         buf_size,
-                                   gunichar2   **alloc_buf,
+                                   xunichar2_t   **alloc_buf,
                                    xboolean_t      terminate)
 {
   xsize_t to_copy = in_to_copy;

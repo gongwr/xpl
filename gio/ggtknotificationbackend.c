@@ -29,11 +29,11 @@
 #define G_GTK_NOTIFICATION_BACKEND(o)    (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_GTK_NOTIFICATION_BACKEND, GGtkNotificationBackend))
 
 typedef struct _GGtkNotificationBackend GGtkNotificationBackend;
-typedef GNotificationBackendClass       GGtkNotificationBackendClass;
+typedef xnotification_backend_class_t       GGtkNotificationBackendClass;
 
 struct _GGtkNotificationBackend
 {
-  GNotificationBackend parent;
+  xnotification_backend_t parent;
 };
 
 xtype_t g_gtk_notification_backend_get_type (void);
@@ -46,7 +46,7 @@ G_DEFINE_TYPE_WITH_CODE (GGtkNotificationBackend, g_gtk_notification_backend, XT
 static xboolean_t
 g_gtk_notification_backend_is_supported (void)
 {
-  GDBusConnection *session_bus;
+  xdbus_connection_t *session_bus;
   xvariant_t *reply;
 
   /* Find out if the notification server is running. This is a
@@ -60,14 +60,14 @@ g_gtk_notification_backend_is_supported (void)
 
   reply = g_dbus_connection_call_sync (session_bus, "org.freedesktop.DBus", "/org/freedesktop/DBus",
                                        "org.freedesktop.DBus",
-                                       "GetNameOwner", g_variant_new ("(s)", "org.gtk.Notifications"),
+                                       "GetNameOwner", xvariant_new ("(s)", "org.gtk.Notifications"),
                                        G_VARIANT_TYPE ("(s)"), G_DBUS_CALL_FLAGS_NONE, -1, NULL, NULL);
 
-  g_object_unref (session_bus);
+  xobject_unref (session_bus);
 
   if (reply)
     {
-      g_variant_unref (reply);
+      xvariant_unref (reply);
       return TRUE;
     }
   else
@@ -75,15 +75,15 @@ g_gtk_notification_backend_is_supported (void)
 }
 
 static void
-g_gtk_notification_backend_send_notification (GNotificationBackend *backend,
+g_gtk_notification_backend_send_notification (xnotification_backend_t *backend,
                                               const xchar_t          *id,
-                                              GNotification        *notification)
+                                              xnotification_t        *notification)
 {
   xvariant_t *params;
 
-  params = g_variant_new ("(ss@a{sv})", g_application_get_application_id (backend->application),
+  params = xvariant_new ("(ss@a{sv})", xapplication_get_application_id (backend->application),
                                         id,
-                                        g_notification_serialize (notification));
+                                        xnotification_serialize (notification));
 
   g_dbus_connection_call (backend->dbus_connection,
                           "org.gtk.Notifications", "/org/gtk/Notifications",
@@ -93,12 +93,12 @@ g_gtk_notification_backend_send_notification (GNotificationBackend *backend,
 }
 
 static void
-g_gtk_notification_backend_withdraw_notification (GNotificationBackend *backend,
+g_gtk_notification_backend_withdraw_notification (xnotification_backend_t *backend,
                                                   const xchar_t          *id)
 {
   xvariant_t *params;
 
-  params = g_variant_new ("(ss)", g_application_get_application_id (backend->application), id);
+  params = xvariant_new ("(ss)", xapplication_get_application_id (backend->application), id);
 
   g_dbus_connection_call (backend->dbus_connection, "org.gtk.Notifications",
                           "/org/gtk/Notifications", "org.gtk.Notifications",
@@ -114,7 +114,7 @@ g_gtk_notification_backend_init (GGtkNotificationBackend *backend)
 static void
 g_gtk_notification_backend_class_init (GGtkNotificationBackendClass *class)
 {
-  GNotificationBackendClass *backend_class = G_NOTIFICATION_BACKEND_CLASS (class);
+  xnotification_backend_class_t *backend_class = G_NOTIFICATION_BACKEND_CLASS (class);
 
   backend_class->is_supported = g_gtk_notification_backend_is_supported;
   backend_class->send_notification = g_gtk_notification_backend_send_notification;

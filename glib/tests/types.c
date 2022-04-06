@@ -36,19 +36,19 @@ test_basic_types (void)
   xsize_t gsz;
   gshort gs;
   xint_t gi;
-  glong gl;
+  xlong_t gl;
   gint16 gi16t1;
   gint16 gi16t2;
   gint32 gi32t1;
   gint32 gi32t2;
-  guint16 gu16t1 = 0x44afU, gu16t2 = 0xaf44U;
-  guint32 gu32t1 = 0x02a7f109U, gu32t2 = 0x09f1a702U;
-  guint64 gu64t1 = G_GINT64_CONSTANT(0x1d636b02300a7aa7U),
+  xuint16_t gu16t1 = 0x44afU, gu16t2 = 0xaf44U;
+  xuint32_t gu32t1 = 0x02a7f109U, gu32t2 = 0x09f1a702U;
+  xuint64_t gu64t1 = G_GINT64_CONSTANT(0x1d636b02300a7aa7U),
           gu64t2 = G_GINT64_CONSTANT(0xa77a0a30026b631dU);
   gint64 gi64t1;
   gint64 gi64t2;
-  gssize gsst1;
-  gssize gsst2;
+  xssize_t gsst1;
+  xssize_t gsst2;
   xsize_t  gst1;
   xsize_t  gst2;
 
@@ -90,7 +90,7 @@ test_basic_types (void)
   g_assert_cmpint (gi, ==, G_MININT);
 
   gl = G_MAXLONG;
-  gl = (glong) (1 + (gulong) gl);
+  gl = (xlong_t) (1 + (gulong) gl);
   g_assert_cmpint (gl, ==, G_MINLONG);
 
   /* Test the G_G(U)?INT(16|32|64)_FORMAT macros */
@@ -102,7 +102,7 @@ test_basic_types (void)
 
 #define FORMAT "%" G_GINT16_FORMAT " %" G_GINT32_FORMAT \
                " %" G_GUINT16_FORMAT " %" G_GUINT32_FORMAT "\n"
-  string = g_strdup_printf (FORMAT, gi16t1, gi32t1, gu16t1, gu32t1);
+  string = xstrdup_printf (FORMAT, gi16t1, gi32t1, gu16t1, gu32t1);
   sscanf (string, FORMAT, &gi16t2, &gi32t2, &gu16t2, &gu32t2);
   g_free (string);
   g_assert_cmpint (gi16t1, ==, gi16t2);
@@ -120,7 +120,7 @@ test_basic_types (void)
 #  define sscanf sscanf_s
 #  define SCAN_FORMAT64 "%I64d %I64u\n"
 #endif
-  string = g_strdup_printf (FORMAT64, gi64t1, gu64t1);
+  string = xstrdup_printf (FORMAT64, gi64t1, gu64t1);
   sscanf (string, SCAN_FORMAT64, &gi64t2, &gu64t2);
   g_free (string);
   g_assert_cmpint (gi64t1, ==, gi64t2);
@@ -136,7 +136,7 @@ test_basic_types (void)
 #  define sscanf sscanf_s
 #  define SCAN_FORMATSIZE "%Id %Iu\n"
 #endif
-  string = g_strdup_printf (FORMATSIZE, gsst1, gst1);
+  string = xstrdup_printf (FORMATSIZE, gsst1, gst1);
   sscanf (string, SCAN_FORMATSIZE, &gsst2, &gst2);
   g_free (string);
   g_assert_cmpint (gsst1, ==, gsst2);

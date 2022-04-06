@@ -45,26 +45,26 @@
 typedef struct {
   char *name;
   long inode;
-  GFileType type;
+  xfile_type_t type;
 } DirEntry;
 
 #endif
 
-struct _GLocalFileEnumerator
+struct _xlocal_file_enumerator
 {
-  GFileEnumerator parent;
+  xfile_enumerator_t parent;
 
-  GFileAttributeMatcher *matcher;
-  GFileAttributeMatcher *reduced_matcher;
+  xfile_attribute_matcher_t *matcher;
+  xfile_attribute_matcher_t *reduced_matcher;
   char *filename;
   char *attributes;
-  GFileQueryInfoFlags flags;
+  xfile_query_info_flags_t flags;
 
   xboolean_t got_parent_info;
   GLocalParentFileInfo parent_info;
 
 #ifdef USE_GDIR
-  GDir *dir;
+  xdir_t *dir;
 #else
   DIR *dir;
   DirEntry *entries;
@@ -75,19 +75,19 @@ struct _GLocalFileEnumerator
   xboolean_t follow_symlinks;
 };
 
-#define g_local_file_enumerator_get_type _g_local_file_enumerator_get_type
-G_DEFINE_TYPE (GLocalFileEnumerator, g_local_file_enumerator, XTYPE_FILE_ENUMERATOR)
+#define xlocal_file_enumerator_get_type _xlocal_file_enumerator_get_type
+G_DEFINE_TYPE (xlocal_file_enumerator, xlocal_file_enumerator, XTYPE_FILE_ENUMERATOR)
 
-static GFileInfo *g_local_file_enumerator_next_file (GFileEnumerator  *enumerator,
+static xfile_info_t *xlocal_file_enumerator_next_file (xfile_enumerator_t  *enumerator,
 						     xcancellable_t     *cancellable,
 						     xerror_t          **error);
-static xboolean_t   g_local_file_enumerator_close     (GFileEnumerator  *enumerator,
+static xboolean_t   xlocal_file_enumerator_close     (xfile_enumerator_t  *enumerator,
 						     xcancellable_t     *cancellable,
 						     xerror_t          **error);
 
 
 static void
-free_entries (GLocalFileEnumerator *local)
+free_entries (xlocal_file_enumerator_t *local)
 {
 #ifndef USE_GDIR
   int i;
@@ -103,17 +103,17 @@ free_entries (GLocalFileEnumerator *local)
 }
 
 static void
-g_local_file_enumerator_finalize (xobject_t *object)
+xlocal_file_enumerator_finalize (xobject_t *object)
 {
-  GLocalFileEnumerator *local;
+  xlocal_file_enumerator_t *local;
 
   local = G_LOCAL_FILE_ENUMERATOR (object);
 
   if (local->got_parent_info)
     _g_local_file_info_free_parent_info (&local->parent_info);
   g_free (local->filename);
-  g_file_attribute_matcher_unref (local->matcher);
-  g_file_attribute_matcher_unref (local->reduced_matcher);
+  xfile_attribute_matcher_unref (local->matcher);
+  xfile_attribute_matcher_unref (local->reduced_matcher);
   if (local->dir)
     {
 #ifdef USE_GDIR
@@ -126,24 +126,24 @@ g_local_file_enumerator_finalize (xobject_t *object)
 
   free_entries (local);
 
-  G_OBJECT_CLASS (g_local_file_enumerator_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xlocal_file_enumerator_parent_class)->finalize (object);
 }
 
 
 static void
-g_local_file_enumerator_class_init (GLocalFileEnumeratorClass *klass)
+xlocal_file_enumerator_class_init (xlocal_file_enumerator_class_t *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
-  GFileEnumeratorClass *enumerator_class = G_FILE_ENUMERATOR_CLASS (klass);
+  xfile_enumerator_class_t *enumerator_class = XFILE_ENUMERATOR_CLASS (klass);
 
-  gobject_class->finalize = g_local_file_enumerator_finalize;
+  gobject_class->finalize = xlocal_file_enumerator_finalize;
 
-  enumerator_class->next_file = g_local_file_enumerator_next_file;
-  enumerator_class->close_fn = g_local_file_enumerator_close;
+  enumerator_class->next_file = xlocal_file_enumerator_next_file;
+  enumerator_class->close_fn = xlocal_file_enumerator_close;
 }
 
 static void
-g_local_file_enumerator_init (GLocalFileEnumerator *local)
+xlocal_file_enumerator_init (xlocal_file_enumerator_t *local)
 {
 }
 
@@ -159,20 +159,20 @@ convert_file_to_io_error (xerror_t **error,
 
   new_code = G_IO_ERROR_FAILED;
 
-  if (file_error->domain == G_FILE_ERROR)
+  if (file_error->domain == XFILE_ERROR)
     {
       switch (file_error->code)
         {
-        case G_FILE_ERROR_NOENT:
+        case XFILE_ERROR_NOENT:
           new_code = G_IO_ERROR_NOT_FOUND;
           break;
-        case G_FILE_ERROR_ACCES:
+        case XFILE_ERROR_ACCES:
           new_code = G_IO_ERROR_PERMISSION_DENIED;
           break;
-        case G_FILE_ERROR_NOTDIR:
+        case XFILE_ERROR_NOTDIR:
           new_code = G_IO_ERROR_NOT_DIRECTORY;
           break;
-        case G_FILE_ERROR_MFILE:
+        case XFILE_ERROR_MFILE:
           new_code = G_IO_ERROR_TOO_MANY_OPEN_FILES;
           break;
         default:
@@ -185,33 +185,33 @@ convert_file_to_io_error (xerror_t **error,
                        file_error->message);
 }
 #else
-static GFileAttributeMatcher *
-g_file_attribute_matcher_subtract_attributes (GFileAttributeMatcher *matcher,
+static xfile_attribute_matcher_t *
+xfile_attribute_matcher_subtract_attributes (xfile_attribute_matcher_t *matcher,
                                               const char *           attributes)
 {
-  GFileAttributeMatcher *result, *tmp;
+  xfile_attribute_matcher_t *result, *tmp;
 
-  tmp = g_file_attribute_matcher_new (attributes);
-  result = g_file_attribute_matcher_subtract (matcher, tmp);
-  g_file_attribute_matcher_unref (tmp);
+  tmp = xfile_attribute_matcher_new (attributes);
+  result = xfile_attribute_matcher_subtract (matcher, tmp);
+  xfile_attribute_matcher_unref (tmp);
 
   return result;
 }
 #endif
 
-GFileEnumerator *
-_g_local_file_enumerator_new (GLocalFile *file,
+xfile_enumerator_t *
+_xlocal_file_enumerator_new (GLocalFile *file,
 			      const char           *attributes,
-			      GFileQueryInfoFlags   flags,
+			      xfile_query_info_flags_t   flags,
 			      xcancellable_t         *cancellable,
 			      xerror_t              **error)
 {
-  GLocalFileEnumerator *local;
-  char *filename = g_file_get_path (G_FILE (file));
+  xlocal_file_enumerator_t *local;
+  char *filename = xfile_get_path (XFILE (file));
 
 #ifdef USE_GDIR
   xerror_t *dir_error;
-  GDir *dir;
+  xdir_t *dir;
 
   dir_error = NULL;
   dir = g_dir_open (filename, 0, error != NULL ? &dir_error : NULL);
@@ -220,7 +220,7 @@ _g_local_file_enumerator_new (GLocalFile *file,
       if (error != NULL)
 	{
 	  convert_file_to_io_error (error, dir_error);
-	  g_error_free (dir_error);
+	  xerror_free (dir_error);
 	}
       g_free (filename);
       return NULL;
@@ -235,11 +235,11 @@ _g_local_file_enumerator_new (GLocalFile *file,
       xchar_t *utf8_filename;
       errsv = errno;
 
-      utf8_filename = g_filename_to_utf8 (filename, -1, NULL, NULL, NULL);
+      utf8_filename = xfilename_to_utf8 (filename, -1, NULL, NULL, NULL);
       g_set_error (error, G_IO_ERROR,
                    g_io_error_from_errno (errsv),
                    "Error opening directory '%s': %s",
-                   utf8_filename, g_strerror (errsv));
+                   utf8_filename, xstrerror (errsv));
       g_free (utf8_filename);
       g_free (filename);
       return NULL;
@@ -247,21 +247,21 @@ _g_local_file_enumerator_new (GLocalFile *file,
 
 #endif
 
-  local = g_object_new (XTYPE_LOCAL_FILE_ENUMERATOR,
+  local = xobject_new (XTYPE_LOCAL_FILE_ENUMERATOR,
                         "container", file,
                         NULL);
 
   local->dir = dir;
   local->filename = filename;
-  local->matcher = g_file_attribute_matcher_new (attributes);
+  local->matcher = xfile_attribute_matcher_new (attributes);
 #ifndef USE_GDIR
-  local->reduced_matcher = g_file_attribute_matcher_subtract_attributes (local->matcher,
+  local->reduced_matcher = xfile_attribute_matcher_subtract_attributes (local->matcher,
                                                                          G_LOCAL_FILE_INFO_NOSTAT_ATTRIBUTES","
                                                                          "standard::type");
 #endif
   local->flags = flags;
 
-  return G_FILE_ENUMERATOR (local);
+  return XFILE_ENUMERATOR (local);
 }
 
 #ifndef USE_GDIR
@@ -276,7 +276,7 @@ sort_by_inode (const void *_a, const void *_b)
 }
 
 #ifdef HAVE_STRUCT_DIRENT_D_TYPE
-static GFileType
+static xfile_type_t
 file_type_from_dirent (char d_type)
 {
   switch (d_type)
@@ -285,22 +285,22 @@ file_type_from_dirent (char d_type)
     case DT_CHR:
     case DT_FIFO:
     case DT_SOCK:
-      return G_FILE_TYPE_SPECIAL;
+      return XFILE_TYPE_SPECIAL;
     case DT_DIR:
-      return G_FILE_TYPE_DIRECTORY;
+      return XFILE_TYPE_DIRECTORY;
     case DT_LNK:
-      return G_FILE_TYPE_SYMBOLIC_LINK;
+      return XFILE_TYPE_SYMBOLIC_LINK;
     case DT_REG:
-      return G_FILE_TYPE_REGULAR;
+      return XFILE_TYPE_REGULAR;
     case DT_UNKNOWN:
     default:
-      return G_FILE_TYPE_UNKNOWN;
+      return XFILE_TYPE_UNKNOWN;
     }
 }
 #endif
 
 static const char *
-next_file_helper (GLocalFileEnumerator *local, GFileType *file_type)
+next_file_helper (xlocal_file_enumerator_t *local, xfile_type_t *file_type)
 {
   struct dirent *entry;
   const char *filename;
@@ -331,12 +331,12 @@ next_file_helper (GLocalFileEnumerator *local, GFileType *file_type)
 
 	  if (entry)
 	    {
-	      local->entries[i].name = g_strdup (entry->d_name);
+	      local->entries[i].name = xstrdup (entry->d_name);
 	      local->entries[i].inode = entry->d_ino;
 #if HAVE_STRUCT_DIRENT_D_TYPE
               local->entries[i].type = file_type_from_dirent (entry->d_type);
 #else
-              local->entries[i].type = G_FILE_TYPE_UNKNOWN;
+              local->entries[i].type = XFILE_TYPE_UNKNOWN;
 #endif
 	    }
 	  else
@@ -361,17 +361,17 @@ next_file_helper (GLocalFileEnumerator *local, GFileType *file_type)
 
 #endif
 
-static GFileInfo *
-g_local_file_enumerator_next_file (GFileEnumerator  *enumerator,
+static xfile_info_t *
+xlocal_file_enumerator_next_file (xfile_enumerator_t  *enumerator,
 				   xcancellable_t     *cancellable,
 				   xerror_t          **error)
 {
-  GLocalFileEnumerator *local = G_LOCAL_FILE_ENUMERATOR (enumerator);
+  xlocal_file_enumerator_t *local = G_LOCAL_FILE_ENUMERATOR (enumerator);
   const char *filename;
   char *path;
-  GFileInfo *info;
+  xfile_info_t *info;
   xerror_t *my_error;
-  GFileType file_type;
+  xfile_type_t file_type;
 
   if (!local->got_parent_info)
     {
@@ -383,7 +383,7 @@ g_local_file_enumerator_next_file (GFileEnumerator  *enumerator,
 
 #ifdef USE_GDIR
   filename = g_dir_read_name (local->dir);
-  file_type = G_FILE_TYPE_UNKNOWN;
+  file_type = XFILE_TYPE_UNKNOWN;
 #else
   filename = next_file_helper (local, &file_type);
 #endif
@@ -393,8 +393,8 @@ g_local_file_enumerator_next_file (GFileEnumerator  *enumerator,
 
   my_error = NULL;
   path = g_build_filename (local->filename, filename, NULL);
-  if (file_type == G_FILE_TYPE_UNKNOWN ||
-      (file_type == G_FILE_TYPE_SYMBOLIC_LINK && !(local->flags & G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)))
+  if (file_type == XFILE_TYPE_UNKNOWN ||
+      (file_type == XFILE_TYPE_SYMBOLIC_LINK && !(local->flags & XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS)))
     {
       info = _g_local_file_info_get (filename, path,
                                      local->matcher,
@@ -412,9 +412,9 @@ g_local_file_enumerator_next_file (GFileEnumerator  *enumerator,
       if (info)
         {
           _g_local_file_info_get_nostat (info, filename, path, local->matcher);
-          g_file_info_set_file_type (info, file_type);
-          if (file_type == G_FILE_TYPE_SYMBOLIC_LINK)
-            g_file_info_set_is_symlink (info, TRUE);
+          xfile_info_set_file_type (info, file_type);
+          if (file_type == XFILE_TYPE_SYMBOLIC_LINK)
+            xfile_info_set_is_symlink (info, TRUE);
         }
     }
   g_free (path);
@@ -425,9 +425,9 @@ g_local_file_enumerator_next_file (GFileEnumerator  *enumerator,
       /* If the file does not exist there might have been a race where
        * the file was removed between the readdir and the stat, so we
        * ignore the file. */
-      if (g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+      if (xerror_matches (my_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
 	{
-	  g_error_free (my_error);
+	  xerror_free (my_error);
 	  goto next_file;
 	}
       else
@@ -438,11 +438,11 @@ g_local_file_enumerator_next_file (GFileEnumerator  *enumerator,
 }
 
 static xboolean_t
-g_local_file_enumerator_close (GFileEnumerator  *enumerator,
+xlocal_file_enumerator_close (xfile_enumerator_t  *enumerator,
 			       xcancellable_t     *cancellable,
 			       xerror_t          **error)
 {
-  GLocalFileEnumerator *local = G_LOCAL_FILE_ENUMERATOR (enumerator);
+  xlocal_file_enumerator_t *local = G_LOCAL_FILE_ENUMERATOR (enumerator);
 
   if (local->dir)
     {

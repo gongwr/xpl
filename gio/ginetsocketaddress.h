@@ -31,7 +31,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_INET_SOCKET_ADDRESS         (g_inet_socket_address_get_type ())
-#define G_INET_SOCKET_ADDRESS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_INET_SOCKET_ADDRESS, GInetSocketAddress))
+#define G_INET_SOCKET_ADDRESS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_INET_SOCKET_ADDRESS, xinet_socket_address))
 #define G_INET_SOCKET_ADDRESS_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_INET_SOCKET_ADDRESS, GInetSocketAddressClass))
 #define X_IS_INET_SOCKET_ADDRESS(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_INET_SOCKET_ADDRESS))
 #define X_IS_INET_SOCKET_ADDRESS_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_INET_SOCKET_ADDRESS))
@@ -58,20 +58,20 @@ xtype_t           g_inet_socket_address_get_type        (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
 xsocket_address_t *g_inet_socket_address_new             (xinet_address_t       *address,
-                                                       guint16             port);
+                                                       xuint16_t             port);
 XPL_AVAILABLE_IN_2_40
 xsocket_address_t *g_inet_socket_address_new_from_string (const char         *address,
                                                        xuint_t               port);
 
 XPL_AVAILABLE_IN_ALL
-xinet_address_t *  g_inet_socket_address_get_address     (GInetSocketAddress *address);
+xinet_address_t *  g_inet_socket_address_get_address     (xinet_socket_address_t *address);
 XPL_AVAILABLE_IN_ALL
-guint16         g_inet_socket_address_get_port        (GInetSocketAddress *address);
+xuint16_t         g_inet_socket_address_get_port        (xinet_socket_address_t *address);
 
 XPL_AVAILABLE_IN_2_32
-guint32         g_inet_socket_address_get_flowinfo    (GInetSocketAddress *address);
+xuint32_t         g_inet_socket_address_get_flowinfo    (xinet_socket_address_t *address);
 XPL_AVAILABLE_IN_2_32
-guint32         g_inet_socket_address_get_scope_id    (GInetSocketAddress *address);
+xuint32_t         g_inet_socket_address_get_scope_id    (xinet_socket_address_t *address);
 
 G_END_DECLS
 

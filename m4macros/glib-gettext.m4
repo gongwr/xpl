@@ -328,7 +328,7 @@ msgstr ""
     POSUB=po
 
     AC_OUTPUT_COMMANDS(
-      [case "$CONFIG_FILES" in *po/Makefile.in*)
+      [case "$CONFIXFILES" in *po/Makefile.in*)
         sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile
       esac])
 

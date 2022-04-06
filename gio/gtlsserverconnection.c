@@ -32,27 +32,27 @@
  * @short_description: TLS server-side connection
  * @include: gio/gio.h
  *
- * #GTlsServerConnection is the server-side subclass of #GTlsConnection,
+ * #xtls_server_connection_t is the server-side subclass of #xtls_connection_t,
  * representing a server-side TLS connection.
  *
  * Since: 2.28
  */
 
-G_DEFINE_INTERFACE (GTlsServerConnection, g_tls_server_connection, XTYPE_TLS_CONNECTION)
+G_DEFINE_INTERFACE (xtls_server_connection, xtls_server_connection, XTYPE_TLS_CONNECTION)
 
 static void
-g_tls_server_connection_default_init (GTlsServerConnectionInterface *iface)
+xtls_server_connection_default_init (xtls_server_connection_interface_t *iface)
 {
   /**
-   * GTlsServerConnection:authentication-mode:
+   * xtls_server_connection_t:authentication-mode:
    *
    * The #GTlsAuthenticationMode for the server. This can be changed
-   * before calling g_tls_connection_handshake() if you want to
+   * before calling xtls_connection_handshake() if you want to
    * rehandshake with a different mode from the initial handshake.
    *
    * Since: 2.28
    */
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
 				       g_param_spec_enum ("authentication-mode",
 							  P_("Authentication Mode"),
 							  P_("The client authentication mode"),
@@ -63,33 +63,33 @@ g_tls_server_connection_default_init (GTlsServerConnectionInterface *iface)
 }
 
 /**
- * g_tls_server_connection_new:
+ * xtls_server_connection_new:
  * @base_io_stream: the #xio_stream_t to wrap
  * @certificate: (nullable): the default server certificate, or %NULL
  * @error: #xerror_t for error reporting, or %NULL to ignore.
  *
- * Creates a new #GTlsServerConnection wrapping @base_io_stream (which
+ * Creates a new #xtls_server_connection_t wrapping @base_io_stream (which
  * must have pollable input and output streams).
  *
- * See the documentation for #GTlsConnection:base-io-stream for restrictions
+ * See the documentation for #xtls_connection_t:base-io-stream for restrictions
  * on when application code can run operations on the @base_io_stream after
  * this function has returned.
  *
- * Returns: (transfer full) (type GTlsServerConnection): the new
- * #GTlsServerConnection, or %NULL on error
+ * Returns: (transfer full) (type xtls_server_connection_t): the new
+ * #xtls_server_connection_t, or %NULL on error
  *
  * Since: 2.28
  */
 xio_stream_t *
-g_tls_server_connection_new (xio_stream_t        *base_io_stream,
-			     GTlsCertificate  *certificate,
+xtls_server_connection_new (xio_stream_t        *base_io_stream,
+			     xtls_certificate_t  *certificate,
 			     xerror_t          **error)
 {
   xobject_t *conn;
-  GTlsBackend *backend;
+  xtls_backend_t *backend;
 
-  backend = g_tls_backend_get_default ();
-  conn = g_initable_new (g_tls_backend_get_server_connection_type (backend),
+  backend = xtls_backend_get_default ();
+  conn = xinitable_new (xtls_backend_get_server_connection_type (backend),
 			 NULL, error,
 			 "base-io-stream", base_io_stream,
 			 "certificate", certificate,

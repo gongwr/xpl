@@ -26,11 +26,11 @@
 
 /**
  * SECTION:gremoteactiongroup
- * @title: GRemoteActionGroup
+ * @title: xremote_action_group_t
  * @short_description: A xaction_group_t that interacts with other processes
  * @include: gio/gio.h
  *
- * The GRemoteActionGroup interface is implemented by #xaction_group_t
+ * The xremote_action_group_t interface is implemented by #xaction_group_t
  * instances that either transmit action invocations to other processes
  * or receive action invocations in the local process from other
  * processes.
@@ -43,11 +43,11 @@
  * context for the action invocation (for example: timestamps, startup
  * notification IDs, etc).
  *
- * #GDBusActionGroup implements #GRemoteActionGroup.  This provides a
+ * #xdbus_action_group_t implements #xremote_action_group_t.  This provides a
  * mechanism to send platform data for action invocations over D-Bus.
  *
  * Additionally, g_dbus_connection_export_action_group() will check if
- * the exported #xaction_group_t implements #GRemoteActionGroup and use the
+ * the exported #xaction_group_t implements #xremote_action_group_t and use the
  * `_full` variants of the calls if available.  This
  * provides a mechanism by which to receive platform data for action
  * invocations that arrive by way of D-Bus.
@@ -56,18 +56,18 @@
  **/
 
 /**
- * GRemoteActionGroup:
+ * xremote_action_group_t:
  *
- * #GRemoteActionGroup is an opaque data structure and can only be accessed
+ * #xremote_action_group_t is an opaque data structure and can only be accessed
  * using the following functions.
  **/
 
 /**
- * GRemoteActionGroupInterface:
- * @activate_action_full: the virtual function pointer for g_remote_action_group_activate_action_full()
- * @change_action_state_full: the virtual function pointer for g_remote_action_group_change_action_state_full()
+ * xremote_action_group_interface_t:
+ * @activate_action_full: the virtual function pointer for xremote_action_group_activate_action_full()
+ * @change_action_state_full: the virtual function pointer for xremote_action_group_change_action_state_full()
  *
- * The virtual function table for #GRemoteActionGroup.
+ * The virtual function table for #xremote_action_group_t.
  *
  * Since: 2.32
  **/
@@ -76,16 +76,16 @@
 
 #include "gremoteactiongroup.h"
 
-G_DEFINE_INTERFACE (GRemoteActionGroup, g_remote_action_group, XTYPE_ACTION_GROUP)
+G_DEFINE_INTERFACE (xremote_action_group, g_remote_action_group, XTYPE_ACTION_GROUP)
 
 static void
-g_remote_action_group_default_init (GRemoteActionGroupInterface *iface)
+xremote_action_group_default_init (xremote_action_group_interface_t *iface)
 {
 }
 
 /**
- * g_remote_action_group_activate_action_full:
- * @remote: a #GDBusActionGroup
+ * xremote_action_group_activate_action_full:
+ * @remote: a #xdbus_action_group_t
  * @action_name: the name of the action to activate
  * @parameter: (nullable): the optional parameter to the activation
  * @platform_data: the platform data to send
@@ -103,7 +103,7 @@ g_remote_action_group_default_init (GRemoteActionGroupInterface *iface)
  * Since: 2.32
  **/
 void
-g_remote_action_group_activate_action_full (GRemoteActionGroup *remote,
+xremote_action_group_activate_action_full (xremote_action_group_t *remote,
                                             const xchar_t        *action_name,
                                             xvariant_t           *parameter,
                                             xvariant_t           *platform_data)
@@ -113,8 +113,8 @@ g_remote_action_group_activate_action_full (GRemoteActionGroup *remote,
 }
 
 /**
- * g_remote_action_group_change_action_state_full:
- * @remote: a #GRemoteActionGroup
+ * xremote_action_group_change_action_state_full:
+ * @remote: a #xremote_action_group_t
  * @action_name: the name of the action to change the state of
  * @value: the new requested value for the state
  * @platform_data: the platform data to send
@@ -132,7 +132,7 @@ g_remote_action_group_activate_action_full (GRemoteActionGroup *remote,
  * Since: 2.32
  **/
 void
-g_remote_action_group_change_action_state_full (GRemoteActionGroup *remote,
+xremote_action_group_change_action_state_full (xremote_action_group_t *remote,
                                                 const xchar_t        *action_name,
                                                 xvariant_t           *value,
                                                 xvariant_t           *platform_data)

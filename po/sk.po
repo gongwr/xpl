@@ -24,17 +24,17 @@ msgstr ""
 "X-Generator: Gtranslator 40.0\n"
 
 #: gio/gapplication.c:500
-msgid "GApplication options"
-msgstr "Voľby GApplication"
+msgid "xapplication_t options"
+msgstr "Voľby xapplication_t"
 
 #: gio/gapplication.c:500
-msgid "Show GApplication options"
-msgstr "Zobrazí voľby GApplication"
+msgid "Show xapplication_t options"
+msgstr "Zobrazí voľby xapplication_t"
 
 #: gio/gapplication.c:545
-msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
 msgstr ""
-"Vstúpi do režimu služby GApplication (použije súbory zo služby zbernice D-"
+"Vstúpi do režimu služby xapplication_t (použije súbory zo služby zbernice D-"
 "Bus)"
 
 #: gio/gapplication.c:557
@@ -276,8 +276,8 @@ msgid "Seek not supported on base stream"
 msgstr "Presúvanie v základnom prúde nie je podporované"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "GBufferedInputStream sa nedá skrátiť"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "xbuffered_input_stream sa nedá skrátiť"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -348,21 +348,21 @@ msgid "%s filetype"
 msgstr "typ súboru %s"
 
 #: gio/gcredentials.c:323
-msgid "GCredentials contains invalid data"
-msgstr "GCredentials obsahuje neplatné údaje"
+msgid "xcredentials_t contains invalid data"
+msgstr "xcredentials_t obsahuje neplatné údaje"
 
 #: gio/gcredentials.c:383 gio/gcredentials.c:667
-msgid "GCredentials is not implemented on this OS"
-msgstr "GCredentials nie je implementované v tomto operačnom systéme"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "xcredentials_t nie je implementované v tomto operačnom systéme"
 
 #: gio/gcredentials.c:538 gio/gcredentials.c:556
-msgid "There is no GCredentials support for your platform"
-msgstr "Neexistuje podpora GCredentials pre vašu platformu"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "Neexistuje podpora xcredentials_t pre vašu platformu"
 
 #: gio/gcredentials.c:607
-msgid "GCredentials does not contain a process ID on this OS"
+msgid "xcredentials_t does not contain a process ID on this OS"
 msgstr ""
-"GCredentials neobsahuje identifikátor procesu v tomto operačnom systéme"
+"xcredentials_t neobsahuje identifikátor procesu v tomto operačnom systéme"
 
 #: gio/gcredentials.c:661
 msgid "Credentials spoofing is not possible on this OS"
@@ -570,8 +570,8 @@ msgid "User IDs must be the same for peer and server"
 msgstr "Identifikátory používateľa musia byť rovnaké pre partnera a server"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "Zrušené cez GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "Zrušené cez xdbus_auth_observer_t::authorize-authenticated-peer"
 
 #: gio/gdbusauthmechanismsha1.c:298
 #, c-format
@@ -1404,27 +1404,27 @@ msgstr "Podpora DTLS nie je dostupná"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of GEmblem encoding"
-msgstr "Nedá sa spracovať kódovanie GEmblem verzie %d"
+msgid "Can’t handle version %d of xemblem_t encoding"
+msgstr "Nedá sa spracovať kódovanie xemblem_t verzie %d"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "Chybný počet tokenov (%d) v kódovaní GEmblem"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "Chybný počet tokenov (%d) v kódovaní xemblem_t"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of GEmblemedIcon encoding"
-msgstr "Nedá sa spracovať kódovanie GEmblemedIcon verzie %d"
+msgid "Can’t handle version %d of xemblemed_icon_t encoding"
+msgstr "Nedá sa spracovať kódovanie xemblemed_icon_t verzie %d"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "Chybný počet tokenov (%d) v kódovaní GEmblemedIcon"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "Chybný počet tokenov (%d) v kódovaní xemblemed_icon_t"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "Očakávaný GEmblem pre GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "Očakávaný xemblem_t pre xemblemed_icon_t"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1523,12 +1523,12 @@ msgstr "Enumerátor súborov je už uzatvorený"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of GFileIcon encoding"
-msgstr "Nedá sa spracovať kódovanie GFileIcon verzie %d"
+msgid "Can’t handle version %d of xfile_icon_t encoding"
+msgstr "Nedá sa spracovať kódovanie xfile_icon_t verzie %d"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for GFileIcon"
-msgstr "Zle formátované vstupné údaje pre GFileIcon"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "Zle formátované vstupné údaje pre xfile_icon_t"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -1985,9 +1985,9 @@ msgstr "Neposkytnuté žiadne súbory"
 
 #: gio/gio-tool-launch.c:85
 #, fuzzy
-#| msgid "There is no GCredentials support for your platform"
+#| msgid "There is no xcredentials_t support for your platform"
 msgid "The launch command is not currently supported on this platform"
-msgstr "Neexistuje podpora GCredentials pre vašu platformu"
+msgstr "Neexistuje podpora xcredentials_t pre vašu platformu"
 
 #: gio/gio-tool-launch.c:98
 #, fuzzy, c-format
@@ -3068,11 +3068,11 @@ msgstr "Nevynúti obmedzenia pre názvy kľúčov"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Preklad všetkých súborov schém GSettings do vyrovnávacej pamäte schém.\n"
+"Preklad všetkých súborov schém xsettings_t do vyrovnávacej pamäte schém.\n"
 "Súbory schém musia mať príponu .gschema.xml,\n"
 "a súbor vyrovnávacej pamäte sa nazýva gschemas.compiled."
 
@@ -3440,8 +3440,8 @@ msgid "Invalid seek request"
 msgstr "Neplatná požiadavka na presunutie"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "GMemoryInputStream sa nedá skrátiť"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "xmemory_input_stream_t sa nedá skrátiť"
 
 #: gio/gmemoryoutputstream.c:567
 msgid "Memory output stream not resizable"
@@ -4130,8 +4130,8 @@ msgid "Error sending message: %s"
 msgstr "Chyba pri odosielaní správy: %s"
 
 #: gio/gsocket.c:5026
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "GSocketControlMessage nie je podporovaný vo Windows"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "xsocket_control_message_t nie je podporovaný vo Windows"
 
 #: gio/gsocket.c:5495 gio/gsocket.c:5571 gio/gsocket.c:5797
 #, c-format
@@ -4269,8 +4269,8 @@ msgstr "Neznáma chyba proxy SOCKSv5."
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of GThemedIcon encoding"
-msgstr "Nedá sa spracovať kódovanie GThemedIcon verzie %d"
+msgid "Can’t handle version %d of xthemed_icon_t encoding"
+msgstr "Nedá sa spracovať kódovanie xthemed_icon_t verzie %d"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4320,7 +4320,7 @@ msgid "Could not parse PEM-encoded certificate"
 msgstr "Neporarilo sa analyzovať certifikát v kódovaní PEM"
 
 #: gio/gtlscertificate.c:832
-msgid "This GTlsBackend does not support creating PKCS #11 certificates"
+msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
 msgstr ""
 
 #: gio/gtlspassword.c:111
@@ -4641,25 +4641,25 @@ msgstr "Cesta „%s“ nie je absolútna"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %-d. %B %Y, %H:%M:%S %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%d.%m.%Y"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%H:%M:%S"
 
@@ -5043,13 +5043,13 @@ msgstr "dec"
 # PM: ale myslím si ze by to malo byť preložené, lebo ak si niekto v hodinách prepne na 12 hodinový formát tak si potom nebude vedieť nastaviť správny čas
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "Doobeda"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "Poobede"
 

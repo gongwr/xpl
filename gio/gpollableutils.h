@@ -28,15 +28,15 @@
 G_BEGIN_DECLS
 
 XPL_AVAILABLE_IN_ALL
-GSource *g_pollable_source_new       (xobject_t        *pollable_stream);
+xsource_t *g_pollable_source_new       (xobject_t        *pollable_stream);
 
 XPL_AVAILABLE_IN_2_34
-GSource *g_pollable_source_new_full  (xpointer_t        pollable_stream,
-				      GSource        *child_source,
+xsource_t *g_pollable_source_new_full  (xpointer_t        pollable_stream,
+				      xsource_t        *child_source,
 				      xcancellable_t   *cancellable);
 
 XPL_AVAILABLE_IN_2_34
-gssize   g_pollable_stream_read      (xinput_stream_t   *stream,
+xssize_t   g_pollable_stream_read      (xinput_stream_t   *stream,
 				      void           *buffer,
 				      xsize_t           count,
 				      xboolean_t        blocking,
@@ -44,7 +44,7 @@ gssize   g_pollable_stream_read      (xinput_stream_t   *stream,
 				      xerror_t        **error);
 
 XPL_AVAILABLE_IN_2_34
-gssize   g_pollable_stream_write     (xoutput_stream_t  *stream,
+xssize_t   g_pollable_stream_write     (xoutput_stream_t  *stream,
 				      const void     *buffer,
 				      xsize_t           count,
 				      xboolean_t        blocking,

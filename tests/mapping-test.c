@@ -48,14 +48,14 @@ handle_usr1 (int signum)
 static xboolean_t
 check_stop (xpointer_t data)
 {
-  GMainLoop *loop = data;
+  xmain_loop_t *loop = data;
 
 #ifdef G_OS_WIN32
-  stop = g_file_test ("STOP", G_FILE_TEST_EXISTS);
+  stop = xfile_test ("STOP", XFILE_TEST_EXISTS);
 #endif
 
   if (stop)
-    g_main_loop_quit (loop);
+    xmain_loop_quit (loop);
 
   return TRUE;
 }
@@ -63,32 +63,32 @@ check_stop (xpointer_t data)
 static void
 write_or_die (const xchar_t *filename,
 	      const xchar_t *contents,
-	      gssize       length)
+	      xssize_t       length)
 {
   xerror_t *error = NULL;
   xchar_t *displayname;
 
-  if (!g_file_set_contents (filename, contents, length, &error))
+  if (!xfile_set_contents (filename, contents, length, &error))
     {
-      displayname = g_filename_display_name (childname);
+      displayname = xfilename_display_name (childname);
       g_print ("failed to write '%s': %s\n",
 	       displayname, error->message);
       exit (1);
     }
 }
 
-static GMappedFile *
+static xmapped_file_t *
 map_or_die (const xchar_t *filename,
 	    xboolean_t     writable)
 {
   xerror_t *error = NULL;
-  GMappedFile *map;
+  xmapped_file_t *map;
   xchar_t *displayname;
 
-  map = g_mapped_file_new (filename, writable, &error);
+  map = xmapped_file_new (filename, writable, &error);
   if (!map)
     {
-      displayname = g_filename_display_name (childname);
+      displayname = xfilename_display_name (childname);
       g_print ("failed to map '%s' non-writable, shared: %s\n",
 	       displayname, error->message);
       exit (1);
@@ -109,8 +109,8 @@ signal_parent (xpointer_t data)
 static int
 child_main (int argc, char *argv[])
 {
-  GMappedFile *map;
-  GMainLoop *loop;
+  xmapped_file_t *map;
+  xmain_loop_t *loop;
 
   parent_pid = atoi (argv[2]);
   map = map_or_die (global_filename, FALSE);
@@ -118,16 +118,16 @@ child_main (int argc, char *argv[])
 #ifndef G_OS_WIN32
   signal (SIGUSR1, handle_usr1);
 #endif
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
   g_idle_add (check_stop, loop);
   g_idle_add (signal_parent, NULL);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
  g_message ("test_child_private: received parent signal");
 
   write_or_die (childname,
-		g_mapped_file_get_contents (map),
-		g_mapped_file_get_length (map));
+		xmapped_file_get_contents (map),
+		xmapped_file_get_length (map));
 
   signal_parent (NULL);
 
@@ -137,17 +137,17 @@ child_main (int argc, char *argv[])
 static void
 test_mapping (void)
 {
-  GMappedFile *map;
+  xmapped_file_t *map;
 
   write_or_die (global_filename, "ABC", -1);
 
   map = map_or_die (global_filename, FALSE);
-  g_assert (g_mapped_file_get_length (map) == 3);
-  g_mapped_file_free (map);
+  g_assert (xmapped_file_get_length (map) == 3);
+  xmapped_file_free (map);
 
   map = map_or_die (global_filename, TRUE);
-  g_assert (g_mapped_file_get_length (map) == 3);
-  g_mapped_file_free (map);
+  g_assert (xmapped_file_get_length (map) == 3);
+  xmapped_file_free (map);
   g_message ("test_mapping: ok");
 }
 
@@ -155,20 +155,20 @@ static void
 test_private (void)
 {
   xerror_t *error = NULL;
-  GMappedFile *map;
+  xmapped_file_t *map;
   xchar_t *buffer;
   xsize_t len;
 
   write_or_die (global_filename, "ABC", -1);
   map = map_or_die (global_filename, TRUE);
 
-  buffer = (xchar_t *)g_mapped_file_get_contents (map);
+  buffer = (xchar_t *)xmapped_file_get_contents (map);
   buffer[0] = '1';
   buffer[1] = '2';
   buffer[2] = '3';
-  g_mapped_file_free (map);
+  xmapped_file_free (map);
 
-  if (!g_file_get_contents (global_filename, &buffer, &len, &error))
+  if (!xfile_get_contents (global_filename, &buffer, &len, &error))
     {
       g_print ("failed to read '%s': %s\n",
                global_displayname, error->message);
@@ -186,19 +186,19 @@ static void
 test_child_private (xchar_t *argv0)
 {
   xerror_t *error = NULL;
-  GMappedFile *map;
+  xmapped_file_t *map;
   xchar_t *buffer;
   xsize_t len;
   xchar_t *child_argv[4];
-  GPid  child_pid;
+  xpid_t  child_pid;
 #ifndef G_OS_WIN32
-  GMainLoop *loop;
+  xmain_loop_t *loop;
 #endif
   xchar_t pid[100];
 
 #ifdef G_OS_WIN32
   g_remove ("STOP");
-  g_assert (!g_file_test ("STOP", G_FILE_TEST_EXISTS));
+  g_assert (!xfile_test ("STOP", XFILE_TEST_EXISTS));
 #endif
 
   write_or_die (global_filename, "ABC", -1);
@@ -223,9 +223,9 @@ test_child_private (xchar_t *argv0)
  g_message ("test_child_private: child spawned");
 
 #ifndef G_OS_WIN32
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
   g_idle_add (check_stop, loop);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
   stop = FALSE;
 #else
   g_usleep (2000000);
@@ -233,32 +233,32 @@ test_child_private (xchar_t *argv0)
 
  g_message ("test_child_private: received first child signal");
 
-  buffer = (xchar_t *)g_mapped_file_get_contents (map);
+  buffer = (xchar_t *)xmapped_file_get_contents (map);
   buffer[0] = '1';
   buffer[1] = '2';
   buffer[2] = '3';
-  g_mapped_file_free (map);
+  xmapped_file_free (map);
 
 #ifndef G_OS_WIN32
   kill (child_pid, SIGUSR1);
 #else
-  g_file_set_contents ("STOP", "Hey there\n", -1, NULL);
+  xfile_set_contents ("STOP", "Hey there\n", -1, NULL);
 #endif
 
 #ifndef G_OS_WIN32
   g_idle_add (check_stop, loop);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 #else
   g_usleep (2000000);
 #endif
 
  g_message ("test_child_private: received second child signal");
 
-  if (!g_file_get_contents (childname, &buffer, &len, &error))
+  if (!xfile_get_contents (childname, &buffer, &len, &error))
     {
       xchar_t *name;
 
-      name = g_filename_display_name (childname);
+      name = xfilename_display_name (childname);
       g_print ("failed to read '%s': %s\n", name, error->message);
       exit (1);
     }
@@ -304,7 +304,7 @@ main (int argc,
 
   dir = g_get_current_dir ();
   global_filename = g_build_filename (dir, "maptest", NULL);
-  global_displayname = g_filename_display_name (global_filename);
+  global_displayname = xfilename_display_name (global_filename);
   childname = g_build_filename (dir, "mapchild", NULL);
 
   if (argc > 1)

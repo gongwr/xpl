@@ -33,13 +33,13 @@
  * SECTION:gvolumemonitor
  * @short_description: Volume Monitor
  * @include: gio/gio.h
- * @see_also: #GFileMonitor
+ * @see_also: #xfile_monitor_t
  *
- * #GVolumeMonitor is for listing the user interesting devices and volumes
+ * #xvolume_monitor_t is for listing the user interesting devices and volumes
  * on the computer. In other words, what a file selector or file manager
  * would show in a sidebar.
  *
- * #GVolumeMonitor is not
+ * #xvolume_monitor_t is not
  * [thread-default-context aware][g-main-context-push-thread-default],
  * and so should not be used other than from the main thread, with no
  * thread-default-context active.
@@ -48,7 +48,7 @@
  * a main loop must be running.
  **/
 
-G_DEFINE_TYPE (GVolumeMonitor, g_volume_monitor, XTYPE_OBJECT)
+G_DEFINE_TYPE (xvolume_monitor, g_volume_monitor, XTYPE_OBJECT)
 
 enum {
   VOLUME_ADDED,
@@ -83,9 +83,9 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
   gobject_class->finalize = g_volume_monitor_finalize;
 
   /**
-   * GVolumeMonitor::volume-added:
+   * xvolume_monitor_t::volume-added:
    * @volume_monitor: The volume monitor emitting the signal.
-   * @volume: a #GVolume that was added.
+   * @volume: a #xvolume_t that was added.
    *
    * Emitted when a mountable volume is added to the system.
    **/
@@ -98,9 +98,9 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
                                         XTYPE_NONE, 1, XTYPE_VOLUME);
 
   /**
-   * GVolumeMonitor::volume-removed:
+   * xvolume_monitor_t::volume-removed:
    * @volume_monitor: The volume monitor emitting the signal.
-   * @volume: a #GVolume that was removed.
+   * @volume: a #xvolume_t that was removed.
    *
    * Emitted when a mountable volume is removed from the system.
    **/
@@ -113,9 +113,9 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
                                           XTYPE_NONE, 1, XTYPE_VOLUME);
 
   /**
-   * GVolumeMonitor::volume-changed:
+   * xvolume_monitor_t::volume-changed:
    * @volume_monitor: The volume monitor emitting the signal.
-   * @volume: a #GVolume that changed.
+   * @volume: a #xvolume_t that changed.
    *
    * Emitted when mountable volume is changed.
    **/
@@ -128,9 +128,9 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
                                           XTYPE_NONE, 1, XTYPE_VOLUME);
 
   /**
-   * GVolumeMonitor::mount-added:
+   * xvolume_monitor_t::mount-added:
    * @volume_monitor: The volume monitor emitting the signal.
-   * @mount: a #GMount that was added.
+   * @mount: a #xmount_t that was added.
    *
    * Emitted when a mount is added.
    **/
@@ -143,9 +143,9 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
                                        XTYPE_NONE, 1, XTYPE_MOUNT);
 
   /**
-   * GVolumeMonitor::mount-removed:
+   * xvolume_monitor_t::mount-removed:
    * @volume_monitor: The volume monitor emitting the signal.
-   * @mount: a #GMount that was removed.
+   * @mount: a #xmount_t that was removed.
    *
    * Emitted when a mount is removed.
    **/
@@ -158,9 +158,9 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
                                          XTYPE_NONE, 1, XTYPE_MOUNT);
 
   /**
-   * GVolumeMonitor::mount-pre-unmount:
+   * xvolume_monitor_t::mount-pre-unmount:
    * @volume_monitor: The volume monitor emitting the signal.
-   * @mount: a #GMount that is being unmounted.
+   * @mount: a #xmount_t that is being unmounted.
    *
    * May be emitted when a mount is about to be removed.
    *
@@ -176,9 +176,9 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
                                              XTYPE_NONE, 1, XTYPE_MOUNT);
 
   /**
-   * GVolumeMonitor::mount-changed:
+   * xvolume_monitor_t::mount-changed:
    * @volume_monitor: The volume monitor emitting the signal.
-   * @mount: a #GMount that changed.
+   * @mount: a #xmount_t that changed.
    *
    * Emitted when a mount changes.
    **/
@@ -191,7 +191,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
                                          XTYPE_NONE, 1, XTYPE_MOUNT);
 
   /**
-   * GVolumeMonitor::drive-connected:
+   * xvolume_monitor_t::drive-connected:
    * @volume_monitor: The volume monitor emitting the signal.
    * @drive: a #xdrive_t that was connected.
    *
@@ -206,7 +206,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
 					   XTYPE_NONE, 1, XTYPE_DRIVE);
 
   /**
-   * GVolumeMonitor::drive-disconnected:
+   * xvolume_monitor_t::drive-disconnected:
    * @volume_monitor: The volume monitor emitting the signal.
    * @drive: a #xdrive_t that was disconnected.
    *
@@ -221,7 +221,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
 					      XTYPE_NONE, 1, XTYPE_DRIVE);
 
   /**
-   * GVolumeMonitor::drive-changed:
+   * xvolume_monitor_t::drive-changed:
    * @volume_monitor: The volume monitor emitting the signal.
    * @drive: the drive that changed
    *
@@ -236,7 +236,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
                                          XTYPE_NONE, 1, XTYPE_DRIVE);
 
   /**
-   * GVolumeMonitor::drive-eject-button:
+   * xvolume_monitor_t::drive-eject-button:
    * @volume_monitor: The volume monitor emitting the signal.
    * @drive: the drive where the eject button was pressed
    *
@@ -253,7 +253,7 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
                                               XTYPE_NONE, 1, XTYPE_DRIVE);
 
   /**
-   * GVolumeMonitor::drive-stop-button:
+   * xvolume_monitor_t::drive-stop-button:
    * @volume_monitor: The volume monitor emitting the signal.
    * @drive: the drive where the stop button was pressed
    *
@@ -272,24 +272,24 @@ g_volume_monitor_class_init (GVolumeMonitorClass *klass)
 }
 
 static void
-g_volume_monitor_init (GVolumeMonitor *monitor)
+g_volume_monitor_init (xvolume_monitor_t *monitor)
 {
 }
 
 
 /**
  * g_volume_monitor_get_connected_drives:
- * @volume_monitor: a #GVolumeMonitor.
+ * @volume_monitor: a #xvolume_monitor_t.
  *
  * Gets a list of drives connected to the system.
  *
- * The returned list should be freed with g_list_free(), after
- * its elements have been unreffed with g_object_unref().
+ * The returned list should be freed with xlist_free(), after
+ * its elements have been unreffed with xobject_unref().
  *
  * Returns: (element-type xdrive_t) (transfer full): a #xlist_t of connected #xdrive_t objects.
  **/
 xlist_t *
-g_volume_monitor_get_connected_drives (GVolumeMonitor *volume_monitor)
+g_volume_monitor_get_connected_drives (xvolume_monitor_t *volume_monitor)
 {
   GVolumeMonitorClass *class;
 
@@ -302,17 +302,17 @@ g_volume_monitor_get_connected_drives (GVolumeMonitor *volume_monitor)
 
 /**
  * g_volume_monitor_get_volumes:
- * @volume_monitor: a #GVolumeMonitor.
+ * @volume_monitor: a #xvolume_monitor_t.
  *
  * Gets a list of the volumes on the system.
  *
- * The returned list should be freed with g_list_free(), after
- * its elements have been unreffed with g_object_unref().
+ * The returned list should be freed with xlist_free(), after
+ * its elements have been unreffed with xobject_unref().
  *
- * Returns: (element-type GVolume) (transfer full): a #xlist_t of #GVolume objects.
+ * Returns: (element-type xvolume_t) (transfer full): a #xlist_t of #xvolume_t objects.
  **/
 xlist_t *
-g_volume_monitor_get_volumes (GVolumeMonitor *volume_monitor)
+g_volume_monitor_get_volumes (xvolume_monitor_t *volume_monitor)
 {
   GVolumeMonitorClass *class;
 
@@ -325,17 +325,17 @@ g_volume_monitor_get_volumes (GVolumeMonitor *volume_monitor)
 
 /**
  * g_volume_monitor_get_mounts:
- * @volume_monitor: a #GVolumeMonitor.
+ * @volume_monitor: a #xvolume_monitor_t.
  *
  * Gets a list of the mounts on the system.
  *
- * The returned list should be freed with g_list_free(), after
- * its elements have been unreffed with g_object_unref().
+ * The returned list should be freed with xlist_free(), after
+ * its elements have been unreffed with xobject_unref().
  *
- * Returns: (element-type GMount) (transfer full): a #xlist_t of #GMount objects.
+ * Returns: (element-type xmount_t) (transfer full): a #xlist_t of #xmount_t objects.
  **/
 xlist_t *
-g_volume_monitor_get_mounts (GVolumeMonitor *volume_monitor)
+g_volume_monitor_get_mounts (xvolume_monitor_t *volume_monitor)
 {
   GVolumeMonitorClass *class;
 
@@ -348,16 +348,16 @@ g_volume_monitor_get_mounts (GVolumeMonitor *volume_monitor)
 
 /**
  * g_volume_monitor_get_volume_for_uuid:
- * @volume_monitor: a #GVolumeMonitor.
+ * @volume_monitor: a #xvolume_monitor_t.
  * @uuid: the UUID to look for
  *
- * Finds a #GVolume object by its UUID (see g_volume_get_uuid())
+ * Finds a #xvolume_t object by its UUID (see g_volume_get_uuid())
  *
- * Returns: (nullable) (transfer full): a #GVolume or %NULL if no such volume is available.
- *     Free the returned object with g_object_unref().
+ * Returns: (nullable) (transfer full): a #xvolume_t or %NULL if no such volume is available.
+ *     Free the returned object with xobject_unref().
  **/
-GVolume *
-g_volume_monitor_get_volume_for_uuid (GVolumeMonitor *volume_monitor,
+xvolume_t *
+g_volume_monitor_get_volume_for_uuid (xvolume_monitor_t *volume_monitor,
                                       const char     *uuid)
 {
   GVolumeMonitorClass *class;
@@ -372,16 +372,16 @@ g_volume_monitor_get_volume_for_uuid (GVolumeMonitor *volume_monitor,
 
 /**
  * g_volume_monitor_get_mount_for_uuid:
- * @volume_monitor: a #GVolumeMonitor.
+ * @volume_monitor: a #xvolume_monitor_t.
  * @uuid: the UUID to look for
  *
- * Finds a #GMount object by its UUID (see g_mount_get_uuid())
+ * Finds a #xmount_t object by its UUID (see g_mount_get_uuid())
  *
- * Returns: (nullable) (transfer full): a #GMount or %NULL if no such mount is available.
- *     Free the returned object with g_object_unref().
+ * Returns: (nullable) (transfer full): a #xmount_t or %NULL if no such mount is available.
+ *     Free the returned object with xobject_unref().
  **/
-GMount *
-g_volume_monitor_get_mount_for_uuid (GVolumeMonitor *volume_monitor,
+xmount_t *
+g_volume_monitor_get_mount_for_uuid (xvolume_monitor_t *volume_monitor,
                                      const char     *uuid)
 {
   GVolumeMonitorClass *class;

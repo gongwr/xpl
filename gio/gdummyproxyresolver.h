@@ -29,22 +29,22 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DUMMY_PROXY_RESOLVER         (_g_dummy_proxy_resolver_get_type ())
-#define G_DUMMY_PROXY_RESOLVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DUMMY_PROXY_RESOLVER, GDummyProxyResolver))
-#define G_DUMMY_PROXY_RESOLVER_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DUMMY_PROXY_RESOLVER, GDummyProxyResolverClass))
+#define XTYPE_DUMMY_PROXY_RESOLVER         (_xdummy_proxy_resolver_get_type ())
+#define G_DUMMY_PROXY_RESOLVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DUMMY_PROXY_RESOLVER, xdummy_proxy_resolver_t))
+#define G_DUMMY_PROXY_RESOLVER_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DUMMY_PROXY_RESOLVER, xdummy_proxy_resolver_class_t))
 #define X_IS_DUMMY_PROXY_RESOLVER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DUMMY_PROXY_RESOLVER))
 #define X_IS_DUMMY_PROXY_RESOLVER_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_DUMMY_PROXY_RESOLVER))
-#define G_DUMMY_PROXY_RESOLVER_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DUMMY_PROXY_RESOLVER, GDummyProxyResolverClass))
+#define G_DUMMY_PROXY_RESOLVER_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DUMMY_PROXY_RESOLVER, xdummy_proxy_resolver_class_t))
 
-typedef struct _GDummyProxyResolver       GDummyProxyResolver;
-typedef struct _GDummyProxyResolverClass  GDummyProxyResolverClass;
+typedef struct _xdummy_proxy_resolver       xdummy_proxy_resolver_t;
+typedef struct _xdummy_proxy_resolver_class  xdummy_proxy_resolver_class_t;
 
 
-struct _GDummyProxyResolverClass {
+struct _xdummy_proxy_resolver_class {
   xobject_class_t parent_class;
 };
 
-xtype_t		_g_dummy_proxy_resolver_get_type       (void);
+xtype_t		_xdummy_proxy_resolver_get_type       (void);
 
 
 G_END_DECLS

@@ -51,14 +51,14 @@ typedef int (* GrindFunc) (const char *, xsize_t);
 static int
 grind_get_char (const char *str, xsize_t len)
 {
-  gunichar acc = 0;
+  xunichar_t acc = 0;
   GRIND_LOOP_BEGIN
     {
       const char *p = str;
       while (*p)
         {
-          acc += g_utf8_get_char (p);
-          p = g_utf8_next_char (p);
+          acc += xutf8_get_char (p);
+          p = xutf8_next_char (p);
         }
     }
   GRIND_LOOP_END;
@@ -68,14 +68,14 @@ grind_get_char (const char *str, xsize_t len)
 static int
 grind_get_char_validated (const char *str, xsize_t len)
 {
-  gunichar acc = 0;
+  xunichar_t acc = 0;
   GRIND_LOOP_BEGIN
     {
       const char *p = str;
       while (*p)
         {
-          acc += g_utf8_get_char_validated (p, -1);
-          p = g_utf8_next_char (p);
+          acc += xutf8_get_char_validated (p, -1);
+          p = xutf8_next_char (p);
         }
     }
   GRIND_LOOP_END;
@@ -87,8 +87,8 @@ grind_utf8_to_ucs4 (const char *str, xsize_t len)
 {
   GRIND_LOOP_BEGIN
     {
-      gunichar *ustr;
-      ustr = g_utf8_to_ucs4 (str, -1, NULL, NULL, NULL);
+      xunichar_t *ustr;
+      ustr = xutf8_to_ucs4 (str, -1, NULL, NULL, NULL);
       g_free (ustr);
     }
   GRIND_LOOP_END;
@@ -98,14 +98,14 @@ grind_utf8_to_ucs4 (const char *str, xsize_t len)
 static int
 grind_get_char_backwards (const char *str, xsize_t len)
 {
-  gunichar acc = 0;
+  xunichar_t acc = 0;
   GRIND_LOOP_BEGIN
     {
       const char *p = str + len;
       do
 	{
-	  p = g_utf8_prev_char (p);
-	  acc += g_utf8_get_char (p);
+	  p = xutf8_prev_char (p);
+	  acc += xutf8_get_char (p);
         }
       while (p != str);
     }
@@ -118,8 +118,8 @@ grind_utf8_to_ucs4_sized (const char *str, xsize_t len)
 {
   GRIND_LOOP_BEGIN
     {
-      gunichar *ustr;
-      ustr = g_utf8_to_ucs4 (str, len, NULL, NULL, NULL);
+      xunichar_t *ustr;
+      ustr = xutf8_to_ucs4 (str, len, NULL, NULL, NULL);
       g_free (ustr);
     }
   GRIND_LOOP_END;
@@ -131,8 +131,8 @@ grind_utf8_to_ucs4_fast (const char *str, xsize_t len)
 {
   GRIND_LOOP_BEGIN
     {
-      gunichar *ustr;
-      ustr = g_utf8_to_ucs4_fast (str, -1, NULL);
+      xunichar_t *ustr;
+      ustr = xutf8_to_ucs4_fast (str, -1, NULL);
       g_free (ustr);
     }
   GRIND_LOOP_END;
@@ -144,8 +144,8 @@ grind_utf8_to_ucs4_fast_sized (const char *str, xsize_t len)
 {
   GRIND_LOOP_BEGIN
     {
-      gunichar *ustr;
-      ustr = g_utf8_to_ucs4_fast (str, len, NULL);
+      xunichar_t *ustr;
+      ustr = xutf8_to_ucs4_fast (str, len, NULL);
       g_free (ustr);
     }
   GRIND_LOOP_END;
@@ -156,7 +156,7 @@ static int
 grind_utf8_validate (const char *str, xsize_t len)
 {
   GRIND_LOOP_BEGIN
-    g_utf8_validate (str, -1, NULL);
+    xutf8_validate (str, -1, NULL);
   GRIND_LOOP_END;
   return 0;
 }
@@ -165,7 +165,7 @@ static int
 grind_utf8_validate_sized (const char *str, xsize_t len)
 {
   GRIND_LOOP_BEGIN
-    g_utf8_validate (str, len, NULL);
+    xutf8_validate (str, len, NULL);
   GRIND_LOOP_END;
   return 0;
 }
@@ -176,7 +176,7 @@ typedef struct _GrindData {
 } GrindData;
 
 static void
-perform (gconstpointer data)
+perform (xconstpointer data)
 {
   GrindData *gd = (GrindData *) data;
   GrindFunc grind_func = gd->func;
@@ -212,7 +212,7 @@ add_cases(const char *path, GrindFunc func)
     gd = g_slice_new0(GrindData);                     \
     gd->func = func;                                  \
     gd->str = str_##script;                           \
-    full_path = g_strdup_printf("%s/" #script, path); \
+    full_path = xstrdup_printf("%s/" #script, path); \
     g_test_add_data_func (full_path, gd, perform);    \
     g_free (full_path);                               \
   } G_STMT_END

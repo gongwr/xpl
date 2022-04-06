@@ -33,89 +33,89 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GAsyncQueue GAsyncQueue;
+typedef struct _GAsyncQueue xasync_queue_t;
 
 XPL_AVAILABLE_IN_ALL
-GAsyncQueue *g_async_queue_new                  (void);
+xasync_queue_t *g_async_queue_new                  (void);
 XPL_AVAILABLE_IN_ALL
-GAsyncQueue *g_async_queue_new_full             (GDestroyNotify item_free_func);
+xasync_queue_t *g_async_queue_new_full             (xdestroy_notify_t item_free_func);
 XPL_AVAILABLE_IN_ALL
-void         g_async_queue_lock                 (GAsyncQueue      *queue);
+void         g_async_queue_lock                 (xasync_queue_t      *queue);
 XPL_AVAILABLE_IN_ALL
-void         g_async_queue_unlock               (GAsyncQueue      *queue);
+void         g_async_queue_unlock               (xasync_queue_t      *queue);
 XPL_AVAILABLE_IN_ALL
-GAsyncQueue *g_async_queue_ref                  (GAsyncQueue      *queue);
+xasync_queue_t *g_async_queue_ref                  (xasync_queue_t      *queue);
 XPL_AVAILABLE_IN_ALL
-void         g_async_queue_unref                (GAsyncQueue      *queue);
+void         g_async_queue_unref                (xasync_queue_t      *queue);
 
 XPL_DEPRECATED_FOR(g_async_queue_ref)
-void         g_async_queue_ref_unlocked         (GAsyncQueue      *queue);
+void         g_async_queue_ref_unlocked         (xasync_queue_t      *queue);
 
 XPL_DEPRECATED_FOR(g_async_queue_unref)
-void         g_async_queue_unref_and_unlock     (GAsyncQueue      *queue);
+void         g_async_queue_unref_and_unlock     (xasync_queue_t      *queue);
 
 XPL_AVAILABLE_IN_ALL
-void         g_async_queue_push                 (GAsyncQueue      *queue,
+void         g_async_queue_push                 (xasync_queue_t      *queue,
                                                  xpointer_t          data);
 XPL_AVAILABLE_IN_ALL
-void         g_async_queue_push_unlocked        (GAsyncQueue      *queue,
+void         g_async_queue_push_unlocked        (xasync_queue_t      *queue,
                                                  xpointer_t          data);
 XPL_AVAILABLE_IN_ALL
-void         g_async_queue_push_sorted          (GAsyncQueue      *queue,
+void         g_async_queue_push_sorted          (xasync_queue_t      *queue,
                                                  xpointer_t          data,
                                                  GCompareDataFunc  func,
                                                  xpointer_t          user_data);
 XPL_AVAILABLE_IN_ALL
-void         g_async_queue_push_sorted_unlocked (GAsyncQueue      *queue,
+void         g_async_queue_push_sorted_unlocked (xasync_queue_t      *queue,
                                                  xpointer_t          data,
                                                  GCompareDataFunc  func,
                                                  xpointer_t          user_data);
 XPL_AVAILABLE_IN_ALL
-xpointer_t     g_async_queue_pop                  (GAsyncQueue      *queue);
+xpointer_t     g_async_queue_pop                  (xasync_queue_t      *queue);
 XPL_AVAILABLE_IN_ALL
-xpointer_t     g_async_queue_pop_unlocked         (GAsyncQueue      *queue);
+xpointer_t     g_async_queue_pop_unlocked         (xasync_queue_t      *queue);
 XPL_AVAILABLE_IN_ALL
-xpointer_t     g_async_queue_try_pop              (GAsyncQueue      *queue);
+xpointer_t     g_async_queue_try_pop              (xasync_queue_t      *queue);
 XPL_AVAILABLE_IN_ALL
-xpointer_t     g_async_queue_try_pop_unlocked     (GAsyncQueue      *queue);
+xpointer_t     g_async_queue_try_pop_unlocked     (xasync_queue_t      *queue);
 XPL_AVAILABLE_IN_ALL
-xpointer_t     g_async_queue_timeout_pop          (GAsyncQueue      *queue,
-                                                 guint64           timeout);
+xpointer_t     g_async_queue_timeout_pop          (xasync_queue_t      *queue,
+                                                 xuint64_t           timeout);
 XPL_AVAILABLE_IN_ALL
-xpointer_t     g_async_queue_timeout_pop_unlocked (GAsyncQueue      *queue,
-                                                 guint64           timeout);
+xpointer_t     g_async_queue_timeout_pop_unlocked (xasync_queue_t      *queue,
+                                                 xuint64_t           timeout);
 XPL_AVAILABLE_IN_ALL
-xint_t         g_async_queue_length               (GAsyncQueue      *queue);
+xint_t         g_async_queue_length               (xasync_queue_t      *queue);
 XPL_AVAILABLE_IN_ALL
-xint_t         g_async_queue_length_unlocked      (GAsyncQueue      *queue);
+xint_t         g_async_queue_length_unlocked      (xasync_queue_t      *queue);
 XPL_AVAILABLE_IN_ALL
-void         g_async_queue_sort                 (GAsyncQueue      *queue,
+void         g_async_queue_sort                 (xasync_queue_t      *queue,
                                                  GCompareDataFunc  func,
                                                  xpointer_t          user_data);
 XPL_AVAILABLE_IN_ALL
-void         g_async_queue_sort_unlocked        (GAsyncQueue      *queue,
+void         g_async_queue_sort_unlocked        (xasync_queue_t      *queue,
                                                  GCompareDataFunc  func,
                                                  xpointer_t          user_data);
 
 XPL_AVAILABLE_IN_2_46
-xboolean_t     g_async_queue_remove               (GAsyncQueue      *queue,
+xboolean_t     g_async_queue_remove               (xasync_queue_t      *queue,
                                                  xpointer_t          item);
 XPL_AVAILABLE_IN_2_46
-xboolean_t     g_async_queue_remove_unlocked      (GAsyncQueue      *queue,
+xboolean_t     g_async_queue_remove_unlocked      (xasync_queue_t      *queue,
                                                  xpointer_t          item);
 XPL_AVAILABLE_IN_2_46
-void         g_async_queue_push_front           (GAsyncQueue      *queue,
+void         g_async_queue_push_front           (xasync_queue_t      *queue,
                                                  xpointer_t          item);
 XPL_AVAILABLE_IN_2_46
-void         g_async_queue_push_front_unlocked  (GAsyncQueue      *queue,
+void         g_async_queue_push_front_unlocked  (xasync_queue_t      *queue,
                                                  xpointer_t          item);
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 XPL_DEPRECATED_FOR(g_async_queue_timeout_pop)
-xpointer_t     g_async_queue_timed_pop            (GAsyncQueue      *queue,
+xpointer_t     g_async_queue_timed_pop            (xasync_queue_t      *queue,
                                                  GTimeVal         *end_time);
 XPL_DEPRECATED_FOR(g_async_queue_timeout_pop_unlocked)
-xpointer_t     g_async_queue_timed_pop_unlocked   (GAsyncQueue      *queue,
+xpointer_t     g_async_queue_timed_pop_unlocked   (xasync_queue_t      *queue,
                                                  GTimeVal         *end_time);
 G_GNUC_END_IGNORE_DEPRECATIONS
 

@@ -27,11 +27,11 @@
 
 struct _GDelayedSettingsBackendPrivate
 {
-  GSettingsBackend *backend;
-  GMutex lock;
-  GTree *delayed;
+  xsettings_backend_t *backend;
+  xmutex_t lock;
+  xtree_t *delayed;
 
-  GMainContext *owner_context;
+  xmain_context_t *owner_context;
   xpointer_t owner;
 };
 
@@ -42,8 +42,8 @@ G_DEFINE_TYPE_WITH_PRIVATE (GDelayedSettingsBackend,
 static xboolean_t
 invoke_notify_unapplied (xpointer_t data)
 {
-  g_object_notify (data, "has-unapplied");
-  g_object_unref (data);
+  xobject_notify (data, "has-unapplied");
+  xobject_unref (data);
 
   return FALSE;
 }
@@ -51,14 +51,14 @@ invoke_notify_unapplied (xpointer_t data)
 static void
 g_delayed_settings_backend_notify_unapplied (GDelayedSettingsBackend *delayed)
 {
-  GMainContext *target_context;
+  xmain_context_t *target_context;
   xobject_t *target;
 
   g_mutex_lock (&delayed->priv->lock);
   if (delayed->priv->owner)
     {
       target_context = delayed->priv->owner_context;
-      target = g_object_ref (delayed->priv->owner);
+      target = xobject_ref (delayed->priv->owner);
     }
   else
     {
@@ -68,12 +68,12 @@ g_delayed_settings_backend_notify_unapplied (GDelayedSettingsBackend *delayed)
   g_mutex_unlock (&delayed->priv->lock);
 
   if (target != NULL)
-    g_main_context_invoke (target_context, invoke_notify_unapplied, target);
+    xmain_context_invoke (target_context, invoke_notify_unapplied, target);
 }
 
 
 static xvariant_t *
-g_delayed_settings_backend_read (GSettingsBackend   *backend,
+g_delayed_settings_backend_read (xsettings_backend_t   *backend,
                                  const xchar_t        *key,
                                  const xvariant_type_t *expected_type,
                                  xboolean_t            default_value)
@@ -84,11 +84,11 @@ g_delayed_settings_backend_read (GSettingsBackend   *backend,
   if (!default_value)
     {
       g_mutex_lock (&delayed->priv->lock);
-      if (g_tree_lookup_extended (delayed->priv->delayed, key, NULL, &result))
+      if (xtree_lookup_extended (delayed->priv->delayed, key, NULL, &result))
         {
           /* NULL in the tree means we should consult the default value */
           if (result != NULL)
-            g_variant_ref (result);
+            xvariant_ref (result);
           else
             default_value = TRUE;
         }
@@ -103,7 +103,7 @@ g_delayed_settings_backend_read (GSettingsBackend   *backend,
 }
 
 static xvariant_t *
-g_delayed_settings_backend_read_user_value (GSettingsBackend   *backend,
+g_delayed_settings_backend_read_user_value (xsettings_backend_t   *backend,
                                             const xchar_t        *key,
                                             const xvariant_type_t *expected_type)
 {
@@ -117,9 +117,9 @@ g_delayed_settings_backend_read_user_value (GSettingsBackend   *backend,
    * Otherwise, chain up.
    */
   g_mutex_lock (&delayed->priv->lock);
-  value_found = g_tree_lookup_extended (delayed->priv->delayed, key, NULL, &result);
+  value_found = xtree_lookup_extended (delayed->priv->delayed, key, NULL, &result);
   if (result)
-    g_variant_ref (result);
+    xvariant_ref (result);
   g_mutex_unlock (&delayed->priv->lock);
 
   if (value_found)
@@ -129,7 +129,7 @@ g_delayed_settings_backend_read_user_value (GSettingsBackend   *backend,
 }
 
 static xboolean_t
-g_delayed_settings_backend_write (GSettingsBackend *backend,
+g_delayed_settings_backend_write (xsettings_backend_t *backend,
                                   const xchar_t      *key,
                                   xvariant_t         *value,
                                   xpointer_t          origin_tag)
@@ -138,9 +138,9 @@ g_delayed_settings_backend_write (GSettingsBackend *backend,
   xboolean_t was_empty;
 
   g_mutex_lock (&delayed->priv->lock);
-  was_empty = g_tree_nnodes (delayed->priv->delayed) == 0;
-  g_tree_insert (delayed->priv->delayed, g_strdup (key),
-                 g_variant_ref_sink (value));
+  was_empty = xtree_nnodes (delayed->priv->delayed) == 0;
+  xtree_insert (delayed->priv->delayed, xstrdup (key),
+                 xvariant_ref_sink (value));
   g_mutex_unlock (&delayed->priv->lock);
 
   g_settings_backend_changed (backend, key, origin_tag);
@@ -157,22 +157,22 @@ add_to_tree (xpointer_t key,
              xpointer_t user_data)
 {
   /* A value may be %NULL if its key has been reset */
-  g_tree_insert (user_data, g_strdup (key), (value != NULL) ? g_variant_ref (value) : NULL);
+  xtree_insert (user_data, xstrdup (key), (value != NULL) ? xvariant_ref (value) : NULL);
   return FALSE;
 }
 
 static xboolean_t
-g_delayed_settings_backend_write_tree (GSettingsBackend *backend,
-                                       GTree            *tree,
+g_delayed_settings_backend_write_tree (xsettings_backend_t *backend,
+                                       xtree_t            *tree,
                                        xpointer_t          origin_tag)
 {
   GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (backend);
   xboolean_t was_empty;
 
   g_mutex_lock (&delayed->priv->lock);
-  was_empty = g_tree_nnodes (delayed->priv->delayed) == 0;
+  was_empty = xtree_nnodes (delayed->priv->delayed) == 0;
 
-  g_tree_foreach (tree, add_to_tree, delayed->priv->delayed);
+  xtree_foreach (tree, add_to_tree, delayed->priv->delayed);
   g_mutex_unlock (&delayed->priv->lock);
 
   g_settings_backend_changed_tree (backend, tree, origin_tag);
@@ -184,7 +184,7 @@ g_delayed_settings_backend_write_tree (GSettingsBackend *backend,
 }
 
 static xboolean_t
-g_delayed_settings_backend_get_writable (GSettingsBackend *backend,
+g_delayed_settings_backend_get_writable (xsettings_backend_t *backend,
                                          const xchar_t      *name)
 {
   GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (backend);
@@ -193,7 +193,7 @@ g_delayed_settings_backend_get_writable (GSettingsBackend *backend,
 }
 
 static void
-g_delayed_settings_backend_reset (GSettingsBackend *backend,
+g_delayed_settings_backend_reset (xsettings_backend_t *backend,
                                   const xchar_t      *key,
                                   xpointer_t          origin_tag)
 {
@@ -201,8 +201,8 @@ g_delayed_settings_backend_reset (GSettingsBackend *backend,
   xboolean_t was_empty;
 
   g_mutex_lock (&delayed->priv->lock);
-  was_empty = g_tree_nnodes (delayed->priv->delayed) == 0;
-  g_tree_insert (delayed->priv->delayed, g_strdup (key), NULL);
+  was_empty = xtree_nnodes (delayed->priv->delayed) == 0;
+  xtree_insert (delayed->priv->delayed, xstrdup (key), NULL);
   g_mutex_unlock (&delayed->priv->lock);
 
   g_settings_backend_changed (backend, key, origin_tag);
@@ -212,7 +212,7 @@ g_delayed_settings_backend_reset (GSettingsBackend *backend,
 }
 
 static void
-g_delayed_settings_backend_subscribe (GSettingsBackend *backend,
+g_delayed_settings_backend_subscribe (xsettings_backend_t *backend,
                                       const char       *name)
 {
   GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (backend);
@@ -221,7 +221,7 @@ g_delayed_settings_backend_subscribe (GSettingsBackend *backend,
 }
 
 static void
-g_delayed_settings_backend_unsubscribe (GSettingsBackend *backend,
+g_delayed_settings_backend_unsubscribe (xsettings_backend_t *backend,
                                         const char       *name)
 {
   GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (backend);
@@ -229,8 +229,8 @@ g_delayed_settings_backend_unsubscribe (GSettingsBackend *backend,
   g_settings_backend_unsubscribe (delayed->priv->backend, name);
 }
 
-static GPermission *
-g_delayed_settings_backend_get_permission (GSettingsBackend *backend,
+static xpermission_t *
+g_delayed_settings_backend_get_permission (xsettings_backend_t *backend,
                                            const xchar_t      *path)
 {
   GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (backend);
@@ -245,16 +245,16 @@ g_delayed_settings_backend_get_has_unapplied (GDelayedSettingsBackend *delayed)
 {
   /* we don't need to lock for this... */
 
-  return g_tree_nnodes (delayed->priv->delayed) > 0;
+  return xtree_nnodes (delayed->priv->delayed) > 0;
 }
 
 void
 g_delayed_settings_backend_apply (GDelayedSettingsBackend *delayed)
 {
-  if (g_tree_nnodes (delayed->priv->delayed) > 0)
+  if (xtree_nnodes (delayed->priv->delayed) > 0)
     {
       xboolean_t success;
-      GTree *tmp;
+      xtree_t *tmp;
 
       g_mutex_lock (&delayed->priv->lock);
       tmp = delayed->priv->delayed;
@@ -267,7 +267,7 @@ g_delayed_settings_backend_apply (GDelayedSettingsBackend *delayed)
         g_settings_backend_changed_tree (G_SETTINGS_BACKEND (delayed),
                                          tmp, NULL);
 
-      g_tree_unref (tmp);
+      xtree_unref (tmp);
 
       g_delayed_settings_backend_notify_unapplied (delayed);
     }
@@ -276,16 +276,16 @@ g_delayed_settings_backend_apply (GDelayedSettingsBackend *delayed)
 void
 g_delayed_settings_backend_revert (GDelayedSettingsBackend *delayed)
 {
-  if (g_tree_nnodes (delayed->priv->delayed) > 0)
+  if (xtree_nnodes (delayed->priv->delayed) > 0)
     {
-      GTree *tmp;
+      xtree_t *tmp;
 
       g_mutex_lock (&delayed->priv->lock);
       tmp = delayed->priv->delayed;
       delayed->priv->delayed = g_settings_backend_create_tree ();
       g_mutex_unlock (&delayed->priv->lock);
       g_settings_backend_changed_tree (G_SETTINGS_BACKEND (delayed), tmp, NULL);
-      g_tree_unref (tmp);
+      xtree_unref (tmp);
 
       g_delayed_settings_backend_notify_unapplied (delayed);
     }
@@ -294,7 +294,7 @@ g_delayed_settings_backend_revert (GDelayedSettingsBackend *delayed)
 /* change notification */
 static void
 delayed_backend_changed (xobject_t          *target,
-                         GSettingsBackend *backend,
+                         xsettings_backend_t *backend,
                          const xchar_t      *key,
                          xpointer_t          origin_tag)
 {
@@ -307,7 +307,7 @@ delayed_backend_changed (xobject_t          *target,
 
 static void
 delayed_backend_keys_changed (xobject_t             *target,
-                              GSettingsBackend    *backend,
+                              xsettings_backend_t    *backend,
                               const xchar_t         *path,
                               xpointer_t             origin_tag,
                               const xchar_t * const *items)
@@ -321,7 +321,7 @@ delayed_backend_keys_changed (xobject_t             *target,
 
 static void
 delayed_backend_path_changed (xobject_t          *target,
-                              GSettingsBackend *backend,
+                              xsettings_backend_t *backend,
                               const xchar_t      *path,
                               xpointer_t          origin_tag)
 {
@@ -334,7 +334,7 @@ delayed_backend_path_changed (xobject_t          *target,
 
 static void
 delayed_backend_writable_changed (xobject_t          *target,
-                                  GSettingsBackend *backend,
+                                  xsettings_backend_t *backend,
                                   const xchar_t      *key)
 {
   GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (target);
@@ -342,7 +342,7 @@ delayed_backend_writable_changed (xobject_t          *target,
 
   g_mutex_lock (&delayed->priv->lock);
 
-  if (g_tree_lookup (delayed->priv->delayed, key) != NULL &&
+  if (xtree_lookup (delayed->priv->delayed, key) != NULL &&
       !g_settings_backend_get_writable (delayed->priv->backend, key))
     {
       /* drop the key from our changeset if it just became read-only.
@@ -353,10 +353,10 @@ delayed_backend_writable_changed (xobject_t          *target,
        * drop the key in this case since a reset will always succeed
        * (even against a non-writable key).
        */
-      g_tree_remove (delayed->priv->delayed, key);
+      xtree_remove (delayed->priv->delayed, key);
 
       /* if that was the only key... */
-      last_one = g_tree_nnodes (delayed->priv->delayed) == 0;
+      last_one = xtree_nnodes (delayed->priv->delayed) == 0;
     }
 
   g_mutex_unlock (&delayed->priv->lock);
@@ -367,7 +367,7 @@ delayed_backend_writable_changed (xobject_t          *target,
   g_settings_backend_writable_changed (G_SETTINGS_BACKEND (delayed), key);
 }
 
-/* slow method until we get foreach-with-remove in GTree
+/* slow method until we get foreach-with-remove in xtree_t
  */
 typedef struct
 {
@@ -383,7 +383,7 @@ check_prefix (xpointer_t key,
 {
   CheckPrefixState *state = data;
 
-  if (g_str_has_prefix (key, state->path))
+  if (xstr_has_prefix (key, state->path))
     state->keys[state->index++] = key;
 
   return FALSE;
@@ -391,7 +391,7 @@ check_prefix (xpointer_t key,
 
 static void
 delayed_backend_path_writable_changed (xobject_t          *target,
-                                       GSettingsBackend *backend,
+                                       xsettings_backend_t *backend,
                                        const xchar_t      *path)
 {
   GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (target);
@@ -400,7 +400,7 @@ delayed_backend_path_writable_changed (xobject_t          *target,
 
   g_mutex_lock (&delayed->priv->lock);
 
-  n_keys = g_tree_nnodes (delayed->priv->delayed);
+  n_keys = xtree_nnodes (delayed->priv->delayed);
 
   if (n_keys > 0)
     {
@@ -408,20 +408,20 @@ delayed_backend_path_writable_changed (xobject_t          *target,
       xsize_t i;
 
       /* collect a list of possibly-affected keys (ie: matching the path) */
-      g_tree_foreach (delayed->priv->delayed, check_prefix, &state);
+      xtree_foreach (delayed->priv->delayed, check_prefix, &state);
 
       /* drop the keys that have been affected.
        *
        * don't drop 'reset' keys (see above) */
       for (i = 0; i < state.index; i++)
-        if (g_tree_lookup (delayed->priv->delayed, state.keys[i]) != NULL &&
+        if (xtree_lookup (delayed->priv->delayed, state.keys[i]) != NULL &&
             !g_settings_backend_get_writable (delayed->priv->backend,
                                               state.keys[i]))
-          g_tree_remove (delayed->priv->delayed, state.keys[i]);
+          xtree_remove (delayed->priv->delayed, state.keys[i]);
 
       g_free (state.keys);
 
-      last_one = g_tree_nnodes (delayed->priv->delayed) == 0;
+      last_one = xtree_nnodes (delayed->priv->delayed) == 0;
     }
 
   g_mutex_unlock (&delayed->priv->lock);
@@ -439,8 +439,8 @@ g_delayed_settings_backend_finalize (xobject_t *object)
   GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (object);
 
   g_mutex_clear (&delayed->priv->lock);
-  g_object_unref (delayed->priv->backend);
-  g_tree_unref (delayed->priv->delayed);
+  xobject_unref (delayed->priv->backend);
+  xtree_unref (delayed->priv->delayed);
 
   /* if our owner is still alive, why are we finalizing? */
   g_assert (delayed->priv->owner == NULL);
@@ -489,9 +489,9 @@ g_delayed_settings_backend_disown (xpointer_t  data,
 }
 
 GDelayedSettingsBackend *
-g_delayed_settings_backend_new (GSettingsBackend *backend,
+g_delayed_settings_backend_new (xsettings_backend_t *backend,
                                 xpointer_t          owner,
-                                GMainContext     *owner_context)
+                                xmain_context_t     *owner_context)
 {
   static GSettingsListenerVTable vtable = {
     delayed_backend_changed,
@@ -502,12 +502,12 @@ g_delayed_settings_backend_new (GSettingsBackend *backend,
   };
   GDelayedSettingsBackend *delayed;
 
-  delayed = g_object_new (XTYPE_DELAYED_SETTINGS_BACKEND, NULL);
-  delayed->priv->backend = g_object_ref (backend);
+  delayed = xobject_new (XTYPE_DELAYED_SETTINGS_BACKEND, NULL);
+  delayed->priv->backend = xobject_ref (backend);
   delayed->priv->owner_context = owner_context;
   delayed->priv->owner = owner;
 
-  g_object_weak_ref (owner, g_delayed_settings_backend_disown, delayed);
+  xobject_weak_ref (owner, g_delayed_settings_backend_disown, delayed);
 
   g_settings_backend_watch (delayed->priv->backend,
                             &vtable, G_OBJECT (delayed), NULL);

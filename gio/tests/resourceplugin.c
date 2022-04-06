@@ -1,9 +1,9 @@
 /*
- * Ensure the g_io_module_*() symbols are exported
+ * Ensure the xio_module_*() symbols are exported
  * on all supported compilers without using config.h.
  * This must be done before including any GLib headers,
  * since XPL_AVAILABLE_IN_ALL, which is used to mark the
- * g_io_module*() symbols, is defined to be _XPL_EXTERN,
+ * xio_module*() symbols, is defined to be _XPL_EXTERN,
  * which must be overridden to export the symbols.
  */
 #include "modules/symbol-visibility.h"
@@ -12,17 +12,17 @@
 #include <gio/gio.h>
 
 void
-g_io_module_load (GIOModule *module)
+xio_module_load (xio_module_t *module)
 {
 }
 
 void
-g_io_module_unload (GIOModule   *module)
+xio_module_unload (xio_module_t   *module)
 {
 }
 
 char **
-g_io_module_query (void)
+xio_module_query (void)
 {
   return NULL;
 }

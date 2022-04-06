@@ -34,18 +34,18 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GDir GDir;
+typedef struct _GDir xdir_t;
 
 XPL_AVAILABLE_IN_ALL
-GDir    *                g_dir_open           (const xchar_t  *path,
+xdir_t    *                g_dir_open           (const xchar_t  *path,
 					       xuint_t         flags,
 					       xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
-const xchar_t *            g_dir_read_name      (GDir         *dir);
+const xchar_t *            g_dir_read_name      (xdir_t         *dir);
 XPL_AVAILABLE_IN_ALL
-void                     g_dir_rewind         (GDir         *dir);
+void                     g_dir_rewind         (xdir_t         *dir);
 XPL_AVAILABLE_IN_ALL
-void                     g_dir_close          (GDir         *dir);
+void                     g_dir_close          (xdir_t         *dir);
 
 G_END_DECLS
 

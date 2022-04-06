@@ -64,7 +64,7 @@ test_incremental (xboolean_t line_break,
 }
 
 static void
-test_incremental_break (gconstpointer d)
+test_incremental_break (xconstpointer d)
 {
   xint_t length = GPOINTER_TO_INT (d);
 
@@ -72,7 +72,7 @@ test_incremental_break (gconstpointer d)
 }
 
 static void
-test_incremental_nobreak (gconstpointer d)
+test_incremental_nobreak (xconstpointer d)
 {
   xint_t length = GPOINTER_TO_INT (d);
 
@@ -80,7 +80,7 @@ test_incremental_nobreak (gconstpointer d)
 }
 
 static void
-test_full (gconstpointer d)
+test_full (xconstpointer d)
 {
   xint_t length = GPOINTER_TO_INT (d);
   char *text;
@@ -242,7 +242,7 @@ test_base64_encode (void)
  * split up. This is like the test_base64_decode_smallblock() test, but for
  * encoding. */
 static void
-test_base64_encode_incremental_small_block (gconstpointer block_size_p)
+test_base64_encode_incremental_small_block (xconstpointer block_size_p)
 {
   xsize_t i;
   struct MyRawData myraw;
@@ -309,7 +309,7 @@ decode_inplace_and_compare (const xchar_t            *datap,
   guchar *data2;
   xsize_t len;
 
-  data = g_strdup (datap);
+  data = xstrdup (datap);
   data2 = g_base64_decode_inplace (data, &len);
   g_assert_cmpmem (p->data, p->length, data2, len);
   g_free (data2);
@@ -366,7 +366,7 @@ test_base64_encode_decode (void)
 }
 
 static void
-test_base64_decode_smallblock (gconstpointer blocksize_p)
+test_base64_decode_smallblock (xconstpointer blocksize_p)
 {
   const xuint_t blocksize = GPOINTER_TO_UINT (blocksize_p);
   xuint_t i;

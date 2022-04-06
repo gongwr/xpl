@@ -42,7 +42,7 @@ typedef struct _GInotifyFileMonitor      GInotifyFileMonitor;
 typedef struct _GInotifyFileMonitorClass GInotifyFileMonitorClass;
 
 struct _GInotifyFileMonitorClass {
-  GLocalFileMonitorClass parent_class;
+  xlocal_file_monitor_class_t parent_class;
 };
 
 xtype_t g_inotify_file_monitor_get_type (void);

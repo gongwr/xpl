@@ -40,7 +40,7 @@ _g_win32_overlap_wait_result (HANDLE           hfile,
                               DWORD           *transferred,
                               xcancellable_t    *cancellable)
 {
-  GPollFD pollfd[2];
+  xpollfd_t pollfd[2];
   xboolean_t result = FALSE;
   xint_t num, npoll;
 

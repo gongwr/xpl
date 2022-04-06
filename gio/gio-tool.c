@@ -37,7 +37,7 @@ print_error (const xchar_t *format, ...)
   va_list args;
 
   va_start (args, format);
-  message = g_strdup_vprintf (format, args);
+  message = xstrdup_vprintf (format, args);
   va_end (args);
 
   g_printerr ("gio: %s\n", message);
@@ -49,13 +49,13 @@ print_file_error (xfile_t *file, const xchar_t *message)
 {
   xchar_t *uri;
 
-  uri = g_file_get_uri (file);
+  uri = xfile_get_uri (file);
   print_error ("%s: %s", uri, message);
   g_free (uri);
 }
 
 void
-show_help (GOptionContext *context, const char *message)
+show_help (xoption_context_t *context, const char *message)
 {
   char *help;
 
@@ -68,23 +68,23 @@ show_help (GOptionContext *context, const char *message)
 }
 
 const char *
-file_type_to_string (GFileType type)
+file_type_to_string (xfile_type_t type)
 {
   switch (type)
     {
-    case G_FILE_TYPE_UNKNOWN:
+    case XFILE_TYPE_UNKNOWN:
       return "unknown";
-    case G_FILE_TYPE_REGULAR:
+    case XFILE_TYPE_REGULAR:
       return "regular";
-    case G_FILE_TYPE_DIRECTORY:
+    case XFILE_TYPE_DIRECTORY:
       return "directory";
-    case G_FILE_TYPE_SYMBOLIC_LINK:
+    case XFILE_TYPE_SYMBOLIC_LINK:
       return "symlink";
-    case G_FILE_TYPE_SPECIAL:
+    case XFILE_TYPE_SPECIAL:
       return "special";
-    case G_FILE_TYPE_SHORTCUT:
+    case XFILE_TYPE_SHORTCUT:
       return "shortcut";
-    case G_FILE_TYPE_MOUNTABLE:
+    case XFILE_TYPE_MOUNTABLE:
       return "mountable";
     default:
       return "invalid type";
@@ -92,106 +92,106 @@ file_type_to_string (GFileType type)
 }
 
 const char *
-attribute_type_to_string (GFileAttributeType type)
+attribute_type_to_string (xfile_attribute_type_t type)
 {
   switch (type)
     {
-    case G_FILE_ATTRIBUTE_TYPE_INVALID:
+    case XFILE_ATTRIBUTE_TYPE_INVALID:
       return "invalid";
-    case G_FILE_ATTRIBUTE_TYPE_STRING:
+    case XFILE_ATTRIBUTE_TYPE_STRING:
       return "string";
-    case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
+    case XFILE_ATTRIBUTE_TYPE_BYTE_STRING:
       return "bytestring";
-    case G_FILE_ATTRIBUTE_TYPE_BOOLEAN:
+    case XFILE_ATTRIBUTE_TYPE_BOOLEAN:
       return "boolean";
-    case G_FILE_ATTRIBUTE_TYPE_UINT32:
+    case XFILE_ATTRIBUTE_TYPE_UINT32:
       return "uint32";
-    case G_FILE_ATTRIBUTE_TYPE_INT32:
+    case XFILE_ATTRIBUTE_TYPE_INT32:
       return "int32";
-    case G_FILE_ATTRIBUTE_TYPE_UINT64:
+    case XFILE_ATTRIBUTE_TYPE_UINT64:
       return "uint64";
-    case G_FILE_ATTRIBUTE_TYPE_INT64:
+    case XFILE_ATTRIBUTE_TYPE_INT64:
       return "int64";
-    case G_FILE_ATTRIBUTE_TYPE_OBJECT:
+    case XFILE_ATTRIBUTE_TYPE_OBJECT:
       return "object";
     default:
       return "unknown type";
     }
 }
 
-GFileAttributeType
+xfile_attribute_type_t
 attribute_type_from_string (const char *str)
 {
   if (strcmp (str, "string") == 0)
-    return G_FILE_ATTRIBUTE_TYPE_STRING;
+    return XFILE_ATTRIBUTE_TYPE_STRING;
   if (strcmp (str, "stringv") == 0)
-    return G_FILE_ATTRIBUTE_TYPE_STRINGV;
+    return XFILE_ATTRIBUTE_TYPE_STRINGV;
   if (strcmp (str, "bytestring") == 0)
-    return G_FILE_ATTRIBUTE_TYPE_BYTE_STRING;
+    return XFILE_ATTRIBUTE_TYPE_BYTE_STRING;
   if (strcmp (str, "boolean") == 0)
-    return G_FILE_ATTRIBUTE_TYPE_BOOLEAN;
+    return XFILE_ATTRIBUTE_TYPE_BOOLEAN;
   if (strcmp (str, "uint32") == 0)
-    return G_FILE_ATTRIBUTE_TYPE_UINT32;
+    return XFILE_ATTRIBUTE_TYPE_UINT32;
   if (strcmp (str, "int32") == 0)
-    return G_FILE_ATTRIBUTE_TYPE_INT32;
+    return XFILE_ATTRIBUTE_TYPE_INT32;
   if (strcmp (str, "uint64") == 0)
-    return G_FILE_ATTRIBUTE_TYPE_UINT64;
+    return XFILE_ATTRIBUTE_TYPE_UINT64;
   if (strcmp (str, "int64") == 0)
-    return G_FILE_ATTRIBUTE_TYPE_INT64;
+    return XFILE_ATTRIBUTE_TYPE_INT64;
   if (strcmp (str, "object") == 0)
-    return G_FILE_ATTRIBUTE_TYPE_OBJECT;
+    return XFILE_ATTRIBUTE_TYPE_OBJECT;
   if (strcmp (str, "unset") == 0)
-    return G_FILE_ATTRIBUTE_TYPE_INVALID;
+    return XFILE_ATTRIBUTE_TYPE_INVALID;
   return -1;
 }
 
 char *
-attribute_flags_to_string (GFileAttributeInfoFlags flags)
+attribute_flags_to_string (xfile_attribute_info_flags_t flags)
 {
-  GString *s;
+  xstring_t *s;
   xsize_t i;
   xboolean_t first;
   struct {
-    guint32 mask;
+    xuint32_t mask;
     char *descr;
   } flag_descr[] = {
     {
-      G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE,
+      XFILE_ATTRIBUTE_INFO_COPY_WITH_FILE,
       N_("Copy with file")
     },
     {
-      G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED,
+      XFILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED,
       N_("Keep with file when moved")
     }
   };
 
   first = TRUE;
 
-  s = g_string_new ("");
+  s = xstring_new ("");
   for (i = 0; i < G_N_ELEMENTS (flag_descr); i++)
     {
       if (flags & flag_descr[i].mask)
         {
           if (!first)
-            g_string_append (s, ", ");
-          g_string_append (s, gettext (flag_descr[i].descr));
+            xstring_append (s, ", ");
+          xstring_append (s, gettext (flag_descr[i].descr));
           first = FALSE;
         }
     }
 
-  return g_string_free (s, FALSE);
+  return xstring_free (s, FALSE);
 }
 
 xboolean_t
 file_is_dir (xfile_t *file)
 {
-  GFileInfo *info;
+  xfile_info_t *info;
   xboolean_t res;
 
-  info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_TYPE, 0, NULL, NULL);
-  res = info && g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY;
+  info = xfile_query_info (file, XFILE_ATTRIBUTE_STANDARD_TYPE, 0, NULL, NULL);
+  res = info && xfile_info_get_file_type (info) == XFILE_TYPE_DIRECTORY;
   if (info)
-    g_object_unref (info);
+    xobject_unref (info);
   return res;
 }
 
@@ -284,7 +284,7 @@ main (int argc, char **argv)
   argv += 1;
 
   do_help = FALSE;
-  if (g_str_equal (command, "help"))
+  if (xstr_equal (command, "help"))
     {
       if (argc == 1)
         {
@@ -297,49 +297,49 @@ main (int argc, char **argv)
           do_help = TRUE;
         }
     }
-  else if (g_str_equal (command, "--help"))
+  else if (xstr_equal (command, "--help"))
     {
       usage ();
       return 0;
     }
-  else if (g_str_equal (command, "--version"))
+  else if (xstr_equal (command, "--version"))
     command = "version";
 
-  if (g_str_equal (command, "version"))
+  if (xstr_equal (command, "version"))
     return handle_version (argc, argv, do_help);
-  else if (g_str_equal (command, "cat"))
+  else if (xstr_equal (command, "cat"))
     return handle_cat (argc, argv, do_help);
-  else if (g_str_equal (command, "copy"))
+  else if (xstr_equal (command, "copy"))
     return handle_copy (argc, argv, do_help);
-  else if (g_str_equal (command, "info"))
+  else if (xstr_equal (command, "info"))
     return handle_info (argc, argv, do_help);
-  else if (g_str_equal (command, "launch"))
+  else if (xstr_equal (command, "launch"))
     return handle_launch (argc, argv, do_help);
-  else if (g_str_equal (command, "list"))
+  else if (xstr_equal (command, "list"))
     return handle_list (argc, argv, do_help);
-  else if (g_str_equal (command, "mime"))
+  else if (xstr_equal (command, "mime"))
     return handle_mime (argc, argv, do_help);
-  else if (g_str_equal (command, "mkdir"))
+  else if (xstr_equal (command, "mkdir"))
     return handle_mkdir (argc, argv, do_help);
-  else if (g_str_equal (command, "monitor"))
+  else if (xstr_equal (command, "monitor"))
     return handle_monitor (argc, argv, do_help);
-  else if (g_str_equal (command, "mount"))
+  else if (xstr_equal (command, "mount"))
     return handle_mount (argc, argv, do_help);
-  else if (g_str_equal (command, "move"))
+  else if (xstr_equal (command, "move"))
     return handle_move (argc, argv, do_help);
-  else if (g_str_equal (command, "open"))
+  else if (xstr_equal (command, "open"))
     return handle_open (argc, argv, do_help);
-  else if (g_str_equal (command, "rename"))
+  else if (xstr_equal (command, "rename"))
     return handle_rename (argc, argv, do_help);
-  else if (g_str_equal (command, "remove"))
+  else if (xstr_equal (command, "remove"))
     return handle_remove (argc, argv, do_help);
-  else if (g_str_equal (command, "save"))
+  else if (xstr_equal (command, "save"))
     return handle_save (argc, argv, do_help);
-  else if (g_str_equal (command, "set"))
+  else if (xstr_equal (command, "set"))
     return handle_set (argc, argv, do_help);
-  else if (g_str_equal (command, "trash"))
+  else if (xstr_equal (command, "trash"))
     return handle_trash (argc, argv, do_help);
-  else if (g_str_equal (command, "tree"))
+  else if (xstr_equal (command, "tree"))
     return handle_tree (argc, argv, do_help);
   else
     usage ();

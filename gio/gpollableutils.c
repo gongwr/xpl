@@ -29,66 +29,66 @@
  * @short_description: Utilities for pollable streams
  * @include: gio/gio.h
  *
- * Utility functions for #GPollableInputStream and
- * #GPollableOutputStream implementations.
+ * Utility functions for #xpollable_input_stream_t and
+ * #xpollable_output_stream_t implementations.
  */
 
 typedef struct {
-  GSource       source;
+  xsource_t       source;
 
   xobject_t      *stream;
 } GPollableSource;
 
 static xboolean_t
-pollable_source_dispatch (GSource     *source,
-			  GSourceFunc  callback,
+pollable_source_dispatch (xsource_t     *source,
+			  xsource_func_t  callback,
 			  xpointer_t     user_data)
 {
-  GPollableSourceFunc func = (GPollableSourceFunc)callback;
+  xpollable_source_func_t func = (xpollable_source_func_t)callback;
   GPollableSource *pollable_source = (GPollableSource *)source;
 
   return (*func) (pollable_source->stream, user_data);
 }
 
 static void
-pollable_source_finalize (GSource *source)
+pollable_source_finalize (xsource_t *source)
 {
   GPollableSource *pollable_source = (GPollableSource *)source;
 
-  g_object_unref (pollable_source->stream);
+  xobject_unref (pollable_source->stream);
 }
 
 static xboolean_t
 pollable_source_closure_callback (xobject_t  *stream,
 				  xpointer_t  data)
 {
-  GClosure *closure = data;
+  xclosure_t *closure = data;
 
-  GValue param = G_VALUE_INIT;
-  GValue result_value = G_VALUE_INIT;
+  xvalue_t param = G_VALUE_INIT;
+  xvalue_t result_value = G_VALUE_INIT;
   xboolean_t result;
 
-  g_value_init (&result_value, XTYPE_BOOLEAN);
+  xvalue_init (&result_value, XTYPE_BOOLEAN);
 
-  g_value_init (&param, XTYPE_OBJECT);
-  g_value_set_object (&param, stream);
+  xvalue_init (&param, XTYPE_OBJECT);
+  xvalue_set_object (&param, stream);
 
-  g_closure_invoke (closure, &result_value, 1, &param, NULL);
+  xclosure_invoke (closure, &result_value, 1, &param, NULL);
 
-  result = g_value_get_boolean (&result_value);
-  g_value_unset (&result_value);
-  g_value_unset (&param);
+  result = xvalue_get_boolean (&result_value);
+  xvalue_unset (&result_value);
+  xvalue_unset (&param);
 
   return result;
 }
 
-static GSourceFuncs pollable_source_funcs =
+static xsource_funcs_t pollable_source_funcs =
 {
   NULL,
   NULL,
   pollable_source_dispatch,
   pollable_source_finalize,
-  (GSourceFunc)pollable_source_closure_callback,
+  (xsource_func_t)pollable_source_closure_callback,
   NULL,
 };
 
@@ -96,29 +96,29 @@ static GSourceFuncs pollable_source_funcs =
  * g_pollable_source_new:
  * @pollable_stream: the stream associated with the new source
  *
- * Utility method for #GPollableInputStream and #GPollableOutputStream
- * implementations. Creates a new #GSource that expects a callback of
- * type #GPollableSourceFunc. The new source does not actually do
- * anything on its own; use g_source_add_child_source() to add other
+ * Utility method for #xpollable_input_stream_t and #xpollable_output_stream_t
+ * implementations. Creates a new #xsource_t that expects a callback of
+ * type #xpollable_source_func_t. The new source does not actually do
+ * anything on its own; use xsource_add_child_source() to add other
  * sources to it to cause it to trigger.
  *
- * Returns: (transfer full): the new #GSource.
+ * Returns: (transfer full): the new #xsource_t.
  *
  * Since: 2.28
  */
-GSource *
+xsource_t *
 g_pollable_source_new (xobject_t *pollable_stream)
 {
-  GSource *source;
+  xsource_t *source;
   GPollableSource *pollable_source;
 
   g_return_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (pollable_stream) ||
 			X_IS_POLLABLE_OUTPUT_STREAM (pollable_stream), NULL);
 
-  source = g_source_new (&pollable_source_funcs, sizeof (GPollableSource));
-  g_source_set_static_name (source, "GPollableSource");
+  source = xsource_new (&pollable_source_funcs, sizeof (GPollableSource));
+  xsource_set_static_name (source, "GPollableSource");
   pollable_source = (GPollableSource *)source;
-  pollable_source->stream = g_object_ref (pollable_stream);
+  pollable_source->stream = xobject_ref (pollable_stream);
 
   return source;
 }
@@ -130,21 +130,21 @@ g_pollable_source_new (xobject_t *pollable_stream)
  * @child_source: (nullable): optional child source to attach
  * @cancellable: (nullable): optional #xcancellable_t to attach
  *
- * Utility method for #GPollableInputStream and #GPollableOutputStream
- * implementations. Creates a new #GSource, as with
+ * Utility method for #xpollable_input_stream_t and #xpollable_output_stream_t
+ * implementations. Creates a new #xsource_t, as with
  * g_pollable_source_new(), but also attaching @child_source (with a
  * dummy callback), and @cancellable, if they are non-%NULL.
  *
- * Returns: (transfer full): the new #GSource.
+ * Returns: (transfer full): the new #xsource_t.
  *
  * Since: 2.34
  */
-GSource *
+xsource_t *
 g_pollable_source_new_full (xpointer_t      pollable_stream,
-			    GSource      *child_source,
+			    xsource_t      *child_source,
 			    xcancellable_t *cancellable)
 {
-  GSource *source;
+  xsource_t *source;
 
   g_return_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (pollable_stream) ||
 			X_IS_POLLABLE_OUTPUT_STREAM (pollable_stream), NULL);
@@ -152,16 +152,16 @@ g_pollable_source_new_full (xpointer_t      pollable_stream,
   source = g_pollable_source_new (pollable_stream);
   if (child_source)
     {
-      g_source_set_dummy_callback (child_source);
-      g_source_add_child_source (source, child_source);
+      xsource_set_dummy_callback (child_source);
+      xsource_add_child_source (source, child_source);
     }
   if (cancellable)
     {
-      GSource *cancellable_source = g_cancellable_source_new (cancellable);
+      xsource_t *cancellable_source = g_cancellable_source_new (cancellable);
 
-      g_source_set_dummy_callback (cancellable_source);
-      g_source_add_child_source (source, cancellable_source);
-      g_source_unref (cancellable_source);
+      xsource_set_dummy_callback (cancellable_source);
+      xsource_add_child_source (source, cancellable_source);
+      xsource_unref (cancellable_source);
     }
 
   return source;
@@ -170,28 +170,28 @@ g_pollable_source_new_full (xpointer_t      pollable_stream,
 /**
  * g_pollable_stream_read:
  * @stream: a #xinput_stream_t
- * @buffer: (array length=count) (element-type guint8): a buffer to
+ * @buffer: (array length=count) (element-type xuint8_t): a buffer to
  *   read data into
  * @count: the number of bytes to read
  * @blocking: whether to do blocking I/O
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: location to store the error occurring, or %NULL to ignore
  *
- * Tries to read from @stream, as with g_input_stream_read() (if
+ * Tries to read from @stream, as with xinput_stream_read() (if
  * @blocking is %TRUE) or g_pollable_input_stream_read_nonblocking()
  * (if @blocking is %FALSE). This can be used to more easily share
  * code between blocking and non-blocking implementations of a method.
  *
  * If @blocking is %FALSE, then @stream must be a
- * #GPollableInputStream for which g_pollable_input_stream_can_poll()
+ * #xpollable_input_stream_t for which g_pollable_input_stream_can_poll()
  * returns %TRUE, or else the behavior is undefined. If @blocking is
- * %TRUE, then @stream does not need to be a #GPollableInputStream.
+ * %TRUE, then @stream does not need to be a #xpollable_input_stream_t.
  *
  * Returns: the number of bytes read, or -1 on error.
  *
  * Since: 2.34
  */
-gssize
+xssize_t
 g_pollable_stream_read (xinput_stream_t   *stream,
 			void           *buffer,
 			xsize_t           count,
@@ -201,7 +201,7 @@ g_pollable_stream_read (xinput_stream_t   *stream,
 {
   if (blocking)
     {
-      return g_input_stream_read (stream,
+      return xinput_stream_read (stream,
 				  buffer, count,
 				  cancellable, error);
     }
@@ -216,29 +216,29 @@ g_pollable_stream_read (xinput_stream_t   *stream,
 /**
  * g_pollable_stream_write:
  * @stream: a #xoutput_stream_t.
- * @buffer: (array length=count) (element-type guint8): the buffer
+ * @buffer: (array length=count) (element-type xuint8_t): the buffer
  *   containing the data to write.
  * @count: the number of bytes to write
  * @blocking: whether to do blocking I/O
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: location to store the error occurring, or %NULL to ignore
  *
- * Tries to write to @stream, as with g_output_stream_write() (if
- * @blocking is %TRUE) or g_pollable_output_stream_write_nonblocking()
+ * Tries to write to @stream, as with xoutput_stream_write() (if
+ * @blocking is %TRUE) or xpollable_output_stream_write_nonblocking()
  * (if @blocking is %FALSE). This can be used to more easily share
  * code between blocking and non-blocking implementations of a method.
  *
  * If @blocking is %FALSE, then @stream must be a
- * #GPollableOutputStream for which
- * g_pollable_output_stream_can_poll() returns %TRUE or else the
+ * #xpollable_output_stream_t for which
+ * xpollable_output_stream_can_poll() returns %TRUE or else the
  * behavior is undefined. If @blocking is %TRUE, then @stream does not
- * need to be a #GPollableOutputStream.
+ * need to be a #xpollable_output_stream_t.
  *
  * Returns: the number of bytes written, or -1 on error.
  *
  * Since: 2.34
  */
-gssize
+xssize_t
 g_pollable_stream_write (xoutput_stream_t   *stream,
 			 const void      *buffer,
 			 xsize_t            count,
@@ -248,13 +248,13 @@ g_pollable_stream_write (xoutput_stream_t   *stream,
 {
   if (blocking)
     {
-      return g_output_stream_write (stream,
+      return xoutput_stream_write (stream,
 				    buffer, count,
 				    cancellable, error);
     }
   else
     {
-      return g_pollable_output_stream_write_nonblocking (G_POLLABLE_OUTPUT_STREAM (stream),
+      return xpollable_output_stream_write_nonblocking (G_POLLABLE_OUTPUT_STREAM (stream),
 							 buffer, count,
 							 cancellable, error);
     }
@@ -263,7 +263,7 @@ g_pollable_stream_write (xoutput_stream_t   *stream,
 /**
  * g_pollable_stream_write_all:
  * @stream: a #xoutput_stream_t.
- * @buffer: (array length=count) (element-type guint8): the buffer
+ * @buffer: (array length=count) (element-type xuint8_t): the buffer
  *   containing the data to write.
  * @count: the number of bytes to write
  * @blocking: whether to do blocking I/O
@@ -273,8 +273,8 @@ g_pollable_stream_write (xoutput_stream_t   *stream,
  * @error: location to store the error occurring, or %NULL to ignore
  *
  * Tries to write @count bytes to @stream, as with
- * g_output_stream_write_all(), but using g_pollable_stream_write()
- * rather than g_output_stream_write().
+ * xoutput_stream_write_all(), but using g_pollable_stream_write()
+ * rather than xoutput_stream_write().
  *
  * On a successful write of @count bytes, %TRUE is returned, and
  * @bytes_written is set to @count.
@@ -286,10 +286,10 @@ g_pollable_stream_write (xoutput_stream_t   *stream,
  * into the stream before the error occurred.
  *
  * As with g_pollable_stream_write(), if @blocking is %FALSE, then
- * @stream must be a #GPollableOutputStream for which
- * g_pollable_output_stream_can_poll() returns %TRUE or else the
+ * @stream must be a #xpollable_output_stream_t for which
+ * xpollable_output_stream_can_poll() returns %TRUE or else the
  * behavior is undefined. If @blocking is %TRUE, then @stream does not
- * need to be a #GPollableOutputStream.
+ * need to be a #xpollable_output_stream_t.
  *
  * Returns: %TRUE on success, %FALSE if there was an error
  *
@@ -305,7 +305,7 @@ g_pollable_stream_write_all (xoutput_stream_t  *stream,
 			     xerror_t        **error)
 {
   xsize_t _bytes_written;
-  gssize res;
+  xssize_t res;
 
   _bytes_written = 0;
   while (_bytes_written < count)

@@ -22,7 +22,7 @@
 
 G_BEGIN_DECLS
 
-GMutex *_g_async_queue_get_mutex (GAsyncQueue *queue);
+xmutex_t *_g_async_queue_get_mutex (xasync_queue_t *queue);
 
 G_END_DECLS
 

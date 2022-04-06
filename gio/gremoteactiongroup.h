@@ -29,43 +29,43 @@
 G_BEGIN_DECLS
 
 
-#define XTYPE_REMOTE_ACTION_GROUP                          (g_remote_action_group_get_type ())
+#define XTYPE_REMOTE_ACTION_GROUP                          (xremote_action_group_get_type ())
 #define G_REMOTE_ACTION_GROUP(inst)                         (XTYPE_CHECK_INSTANCE_CAST ((inst),                      \
-                                                             XTYPE_REMOTE_ACTION_GROUP, GRemoteActionGroup))
+                                                             XTYPE_REMOTE_ACTION_GROUP, xremote_action_group))
 #define X_IS_REMOTE_ACTION_GROUP(inst)                      (XTYPE_CHECK_INSTANCE_TYPE ((inst),                      \
                                                              XTYPE_REMOTE_ACTION_GROUP))
 #define G_REMOTE_ACTION_GROUP_GET_IFACE(inst)               (XTYPE_INSTANCE_GET_INTERFACE ((inst),                   \
                                                              XTYPE_REMOTE_ACTION_GROUP,                              \
-                                                             GRemoteActionGroupInterface))
+                                                             xremote_action_group_interface_t))
 
-typedef struct _GRemoteActionGroupInterface                 GRemoteActionGroupInterface;
+typedef struct _xremote_action_group_interface_t                 xremote_action_group_interface_t;
 
-struct _GRemoteActionGroupInterface
+struct _xremote_action_group_interface_t
 {
   xtype_interface_t x_iface;
 
-  void (* activate_action_full)     (GRemoteActionGroup *remote,
+  void (* activate_action_full)     (xremote_action_group_t *remote,
                                      const xchar_t        *action_name,
                                      xvariant_t           *parameter,
                                      xvariant_t           *platform_data);
 
-  void (* change_action_state_full) (GRemoteActionGroup *remote,
+  void (* change_action_state_full) (xremote_action_group_t *remote,
                                      const xchar_t        *action_name,
                                      xvariant_t           *value,
                                      xvariant_t           *platform_data);
 };
 
 XPL_AVAILABLE_IN_2_32
-xtype_t                   g_remote_action_group_get_type                  (void) G_GNUC_CONST;
+xtype_t                   xremote_action_group_get_type                  (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_2_32
-void                    g_remote_action_group_activate_action_full      (GRemoteActionGroup *remote,
+void                    xremote_action_group_activate_action_full      (xremote_action_group_t *remote,
                                                                          const xchar_t        *action_name,
                                                                          xvariant_t           *parameter,
                                                                          xvariant_t           *platform_data);
 
 XPL_AVAILABLE_IN_2_32
-void                    g_remote_action_group_change_action_state_full  (GRemoteActionGroup *remote,
+void                    xremote_action_group_change_action_state_full  (xremote_action_group_t *remote,
                                                                          const xchar_t        *action_name,
                                                                          xvariant_t           *value,
                                                                          xvariant_t           *platform_data);

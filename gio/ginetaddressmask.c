@@ -54,9 +54,9 @@ struct _xinet_address_mask_private
   xuint_t         length;
 };
 
-static void     xinet_address_mask_initable_iface_init (GInitableIface  *iface);
+static void     xinet_address_mask_initable_iface_init (xinitable_iface_t  *iface);
 
-G_DEFINE_TYPE_WITH_CODE (xinet_address_mask_t, xinet_address_mask, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (xinet_address_mask, xinet_address_mask, XTYPE_OBJECT,
                          G_ADD_PRIVATE (xinet_address_mask_t)
 			 G_IMPLEMENT_INTERFACE (XTYPE_INITABLE,
 						xinet_address_mask_initable_iface_init))
@@ -72,8 +72,8 @@ enum
 static void
 xinet_address_mask_set_property (xobject_t      *object,
 				  xuint_t         prop_id,
-				  const GValue *value,
-				  GParamSpec   *pspec)
+				  const xvalue_t *value,
+				  xparam_spec_t   *pspec)
 {
   xinet_address_mask_t *mask = XINET_ADDRESS_MASK (object);
 
@@ -81,12 +81,12 @@ xinet_address_mask_set_property (xobject_t      *object,
     {
     case PROP_ADDRESS:
       if (mask->priv->addr)
-	g_object_unref (mask->priv->addr);
-      mask->priv->addr = g_value_dup_object (value);
+	xobject_unref (mask->priv->addr);
+      mask->priv->addr = xvalue_dup_object (value);
       break;
 
     case PROP_LENGTH:
-      mask->priv->length = g_value_get_uint (value);
+      mask->priv->length = xvalue_get_uint (value);
       break;
 
     default:
@@ -99,23 +99,23 @@ xinet_address_mask_set_property (xobject_t      *object,
 static void
 xinet_address_mask_get_property (xobject_t    *object,
 				  xuint_t       prop_id,
-				  GValue     *value,
-				  GParamSpec *pspec)
+				  xvalue_t     *value,
+				  xparam_spec_t *pspec)
 {
   xinet_address_mask_t *mask = XINET_ADDRESS_MASK (object);
 
   switch (prop_id)
     {
     case PROP_FAMILY:
-      g_value_set_enum (value, xinet_address_get_family (mask->priv->addr));
+      xvalue_set_enum (value, xinet_address_get_family (mask->priv->addr));
       break;
 
     case PROP_ADDRESS:
-      g_value_set_object (value, mask->priv->addr);
+      xvalue_set_object (value, mask->priv->addr);
       break;
 
     case PROP_LENGTH:
-      g_value_set_uint (value, mask->priv->length);
+      xvalue_set_uint (value, mask->priv->length);
       break;
 
     default:
@@ -142,7 +142,7 @@ xinet_address_mask_class_init (xinet_address_mask_class_t *klass)
   gobject_class->get_property = xinet_address_mask_get_property;
   gobject_class->dispose = xinet_address_mask_dispose;
 
-  g_object_class_install_property (gobject_class, PROP_FAMILY,
+  xobject_class_install_property (gobject_class, PROP_FAMILY,
                                    g_param_spec_enum ("family",
 						      P_("Address family"),
 						      P_("The address family (IPv4 or IPv6)"),
@@ -150,14 +150,14 @@ xinet_address_mask_class_init (xinet_address_mask_class_t *klass)
 						      XSOCKET_FAMILY_INVALID,
 						      G_PARAM_READABLE |
                                                       G_PARAM_STATIC_STRINGS));
-  g_object_class_install_property (gobject_class, PROP_ADDRESS,
+  xobject_class_install_property (gobject_class, PROP_ADDRESS,
                                    g_param_spec_object ("address",
 							P_("Address"),
 							P_("The base address"),
 							XTYPE_INET_ADDRESS,
 							G_PARAM_READWRITE |
 							G_PARAM_STATIC_STRINGS));
-  g_object_class_install_property (gobject_class, PROP_LENGTH,
+  xobject_class_install_property (gobject_class, PROP_LENGTH,
                                    g_param_spec_uint ("length",
 						      P_("Length"),
 						      P_("The prefix length"),
@@ -167,13 +167,13 @@ xinet_address_mask_class_init (xinet_address_mask_class_t *klass)
 }
 
 static xboolean_t
-xinet_address_mask_initable_init (GInitable     *initable,
+xinet_address_mask_initable_init (xinitable_t     *initable,
 				   xcancellable_t  *cancellable,
 				   xerror_t       **error)
 {
   xinet_address_mask_t *mask = XINET_ADDRESS_MASK (initable);
   xuint_t addrlen, nbytes, nbits;
-  const guint8 *bytes;
+  const xuint8_t *bytes;
   xboolean_t ok;
 
   if (!mask->priv->addr)
@@ -228,7 +228,7 @@ xinet_address_mask_initable_init (GInitable     *initable,
 }
 
 static void
-xinet_address_mask_initable_iface_init (GInitableIface  *iface)
+xinet_address_mask_initable_iface_init (xinitable_iface_t  *iface)
 {
   iface->init = xinet_address_mask_initable_init;
 }
@@ -257,7 +257,7 @@ xinet_address_mask_new (xinet_address_t  *addr,
 			 xuint_t          length,
 			 xerror_t       **error)
 {
-  return g_initable_new (XTYPE_INET_ADDRESS_MASK, NULL, error,
+  return xinitable_new (XTYPE_INET_ADDRESS_MASK, NULL, error,
 			 "address", addr,
 			 "length", length,
 			 NULL);
@@ -302,7 +302,7 @@ xinet_address_mask_new_from_string (const xchar_t  *mask_string,
 	  return NULL;
 	}
 
-      address = g_strndup (mask_string, slash - mask_string);
+      address = xstrndup (mask_string, slash - mask_string);
       addr = xinet_address_new_from_string (address);
       g_free (address);
 
@@ -319,7 +319,7 @@ xinet_address_mask_new_from_string (const xchar_t  *mask_string,
     }
 
   mask = xinet_address_mask_new (addr, length, error);
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   return mask;
 }
@@ -346,7 +346,7 @@ xinet_address_mask_to_string (xinet_address_mask_t *mask)
   if (mask->priv->length == (xinet_address_get_native_size (mask->priv->addr) * 8))
     return addr_string;
 
-  mask_string = g_strdup_printf ("%s/%u", addr_string, mask->priv->length);
+  mask_string = xstrdup_printf ("%s/%u", addr_string, mask->priv->length);
   g_free (addr_string);
 
   return mask_string;
@@ -422,7 +422,7 @@ xboolean_t
 xinet_address_mask_matches (xinet_address_mask_t *mask,
 			     xinet_address_t     *address)
 {
-  const guint8 *maskbytes, *addrbytes;
+  const xuint8_t *maskbytes, *addrbytes;
   int nbytes, nbits;
 
   g_return_val_if_fail (X_IS_INET_ADDRESS_MASK (mask), FALSE);

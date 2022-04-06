@@ -5,14 +5,14 @@
 static xboolean_t
 my_cmdline_handler (xpointer_t data)
 {
-  GApplicationCommandLine *cmdline = data;
+  xapplication_command_line_t *cmdline = data;
   xchar_t **args;
   xchar_t **argv;
   xint_t argc;
   xint_t arg1;
   xboolean_t arg2;
   xboolean_t help;
-  GOptionContext *context;
+  xoption_context_t *context;
   GOptionEntry entries[] = {
     { "arg1", 0, 0, G_OPTION_ARG_INT, &arg1, NULL, NULL },
     { "arg2", 0, 0, G_OPTION_ARG_NONE, &arg2, NULL, NULL },
@@ -22,7 +22,7 @@ my_cmdline_handler (xpointer_t data)
   xerror_t *error;
   xint_t i;
 
-  args = g_application_command_line_get_arguments (cmdline, &argc);
+  args = xapplication_command_line_get_arguments (cmdline, &argc);
 
   /* We have to make an extra copy of the array, since g_option_context_parse()
    * assumes that it can remove strings from the array without freeing them.
@@ -41,47 +41,47 @@ my_cmdline_handler (xpointer_t data)
   error = NULL;
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
-      g_application_command_line_printerr (cmdline, "%s\n", error->message);
-      g_error_free (error);
-      g_application_command_line_set_exit_status (cmdline, 1);
+      xapplication_command_line_printerr (cmdline, "%s\n", error->message);
+      xerror_free (error);
+      xapplication_command_line_set_exit_status (cmdline, 1);
     }
   else if (help)
     {
       xchar_t *text;
       text = g_option_context_get_help (context, FALSE, NULL);
-      g_application_command_line_print (cmdline, "%s",  text);
+      xapplication_command_line_print (cmdline, "%s",  text);
       g_free (text);
     }
   else
     {
-      g_application_command_line_print (cmdline, "arg1 is %d and arg2 is %s\n",
+      xapplication_command_line_print (cmdline, "arg1 is %d and arg2 is %s\n",
                                         arg1, arg2 ? "TRUE" : "FALSE");
-      g_application_command_line_set_exit_status (cmdline, 0);
+      xapplication_command_line_set_exit_status (cmdline, 0);
     }
 
   g_free (argv);
-  g_strfreev (args);
+  xstrfreev (args);
 
   g_option_context_free (context);
 
   /* we are done handling this commandline */
-  g_object_unref (cmdline);
+  xobject_unref (cmdline);
 
   return G_SOURCE_REMOVE;
 }
 
 static int
-command_line (GApplication            *application,
-              GApplicationCommandLine *cmdline)
+command_line (xapplication_t            *application,
+              xapplication_command_line_t *cmdline)
 {
   /* keep the application running until we are done with this commandline */
-  g_application_hold (application);
+  xapplication_hold (application);
 
-  g_object_set_data_full (G_OBJECT (cmdline),
+  xobject_set_data_full (G_OBJECT (cmdline),
                           "application", application,
-                          (GDestroyNotify)g_application_release);
+                          (xdestroy_notify_t)xapplication_release);
 
-  g_object_ref (cmdline);
+  xobject_ref (cmdline);
   g_idle_add (my_cmdline_handler, cmdline);
 
   return 0;
@@ -90,17 +90,17 @@ command_line (GApplication            *application,
 int
 main (int argc, char **argv)
 {
-  GApplication *app;
+  xapplication_t *app;
   int status;
 
-  app = g_application_new ("org.gtk.TestApplication",
+  app = xapplication_new ("org.gtk.TestApplication",
                            G_APPLICATION_HANDLES_COMMAND_LINE);
   g_signal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
-  g_application_set_inactivity_timeout (app, 10000);
+  xapplication_set_inactivity_timeout (app, 10000);
 
-  status = g_application_run (app, argc, argv);
+  status = xapplication_run (app, argc, argv);
 
-  g_object_unref (app);
+  xobject_unref (app);
 
   return status;
 }

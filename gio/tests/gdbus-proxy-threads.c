@@ -39,13 +39,13 @@
 #endif
 
 #define MY_NAME "com.example.Test.Myself"
-/* This many threads create and destroy GDBusProxy instances, in addition
+/* This many threads create and destroy xdbus_proxy_t instances, in addition
  * to the main thread processing their NameOwnerChanged signals.
  * N_THREADS_MAX is used with "-m slow", N_THREADS otherwise.
  */
 #define N_THREADS_MAX 10
 #define N_THREADS 2
-/* This many GDBusProxy instances are created by each thread. */
+/* This many xdbus_proxy_t instances are created by each thread. */
 #define N_REPEATS 100
 /* The main thread requests/releases a name this many times as rapidly as
  * possible, before performing one "slow" cycle that waits for each method
@@ -55,19 +55,19 @@
  */
 #define N_RAPID_CYCLES 50
 
-static GMainLoop *loop;
+static xmain_loop_t *loop;
 
 static xpointer_t
 run_proxy_thread (xpointer_t data)
 {
-  GDBusConnection *connection = data;
+  xdbus_connection_t *connection = data;
   int i;
 
-  g_assert (g_main_context_get_thread_default () == NULL);
+  g_assert (xmain_context_get_thread_default () == NULL);
 
   for (i = 0; i < N_REPEATS; i++)
     {
-      GDBusProxy *proxy;
+      xdbus_proxy_t *proxy;
       xerror_t *error = NULL;
       xvariant_t *ret;
 
@@ -79,7 +79,7 @@ run_proxy_thread (xpointer_t data)
                                      G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                      NULL,
                                      MY_NAME,
-                                     "/com/example/TestObject",
+                                     "/com/example/test_object_t",
                                      "com.example.Frob",
                                      NULL,
                                      &error);
@@ -100,34 +100,34 @@ run_proxy_thread (xpointer_t data)
        * this races with the NameOwnerChanged signal being emitted in an
        * idle
        */
-      g_object_unref (proxy);
+      xobject_unref (proxy);
     }
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
   return NULL;
 }
 
-static void release_name (GDBusConnection *connection, xboolean_t wait);
+static void release_name (xdbus_connection_t *connection, xboolean_t wait);
 
 static void
 request_name_cb (xobject_t *source,
                  xasync_result_t *res,
                  xpointer_t user_data)
 {
-  GDBusConnection *connection = G_DBUS_CONNECTION (source);
+  xdbus_connection_t *connection = G_DBUS_CONNECTION (source);
   xerror_t *error = NULL;
   xvariant_t *var;
 
   var = g_dbus_connection_call_finish (connection, res, &error);
   g_assert_no_error (error);
-  g_assert_cmpuint (g_variant_get_uint32 (g_variant_get_child_value (var, 0)),
+  g_assert_cmpuint (xvariant_get_uint32 (xvariant_get_child_value (var, 0)),
                     ==, DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER);
 
   release_name (connection, TRUE);
 }
 
 static void
-request_name (GDBusConnection *connection,
+request_name (xdbus_connection_t *connection,
               xboolean_t         wait)
 {
   g_dbus_connection_call (connection,
@@ -135,7 +135,7 @@ request_name (GDBusConnection *connection,
                           DBUS_PATH_DBUS,
                           DBUS_INTERFACE_DBUS,
                           "RequestName",
-                          g_variant_new ("(su)", MY_NAME, 0),
+                          xvariant_new ("(su)", MY_NAME, 0),
                           G_VARIANT_TYPE ("(u)"),
                           G_DBUS_CALL_FLAGS_NONE,
                           -1,
@@ -149,14 +149,14 @@ release_name_cb (xobject_t *source,
                  xasync_result_t *res,
                  xpointer_t user_data)
 {
-  GDBusConnection *connection = G_DBUS_CONNECTION (source);
+  xdbus_connection_t *connection = G_DBUS_CONNECTION (source);
   xerror_t *error = NULL;
   xvariant_t *var;
   int i;
 
   var = g_dbus_connection_call_finish (connection, res, &error);
   g_assert_no_error (error);
-  g_assert_cmpuint (g_variant_get_uint32 (g_variant_get_child_value (var, 0)),
+  g_assert_cmpuint (xvariant_get_uint32 (xvariant_get_child_value (var, 0)),
                     ==, DBUS_RELEASE_NAME_REPLY_RELEASED);
 
   /* generate some rapid NameOwnerChanged signals to try to trigger crashes */
@@ -171,7 +171,7 @@ release_name_cb (xobject_t *source,
 }
 
 static void
-release_name (GDBusConnection *connection,
+release_name (xdbus_connection_t *connection,
               xboolean_t         wait)
 {
   g_dbus_connection_call (connection,
@@ -179,7 +179,7 @@ release_name (GDBusConnection *connection,
                           DBUS_PATH_DBUS,
                           DBUS_INTERFACE_DBUS,
                           "ReleaseName",
-                          g_variant_new ("(s)", MY_NAME),
+                          xvariant_new ("(s)", MY_NAME),
                           G_VARIANT_TYPE ("(u)"),
                           G_DBUS_CALL_FLAGS_NONE,
                           -1,
@@ -191,9 +191,9 @@ release_name (GDBusConnection *connection,
 static void
 test_proxy (void)
 {
-  GDBusConnection *connection;
+  xdbus_connection_t *connection;
   xerror_t *error = NULL;
-  GThread *proxy_threads[N_THREADS_MAX];
+  xthread_t *proxy_threads[N_THREADS_MAX];
   int i;
   int n_threads;
 
@@ -204,7 +204,7 @@ test_proxy (void)
 
   session_bus_up ();
 
-  loop = g_main_loop_new (NULL, TRUE);
+  loop = xmain_loop_new (NULL, TRUE);
 
   connection = g_bus_get_sync (G_BUS_TYPE_SESSION,
                                NULL,
@@ -215,19 +215,19 @@ test_proxy (void)
 
   for (i = 0; i < n_threads; i++)
     {
-      proxy_threads[i] = g_thread_new ("run-proxy",
+      proxy_threads[i] = xthread_new ("run-proxy",
                                        run_proxy_thread, connection);
     }
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   for (i = 0; i < n_threads; i++)
     {
-      g_thread_join (proxy_threads[i]);
+      xthread_join (proxy_threads[i]);
     }
 
-  g_object_unref (connection);
-  g_main_loop_unref (loop);
+  xobject_unref (connection);
+  xmain_loop_unref (loop);
 
   /* TODO: should call session_bus_down() but that requires waiting
    * for all the outstanding method calls to complete...

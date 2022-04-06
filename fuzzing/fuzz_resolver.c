@@ -4,7 +4,7 @@
 #include "../gio/gthreadedresolver.h"
 
 static void
-test_for_rrtype (const guint8 *data,
+test_for_rrtype (const xuint8_t *data,
                  xsize_t         data_len,
                  xint_t          rrtype)
 {
@@ -25,7 +25,7 @@ test_for_rrtype (const guint8 *data,
                                                    0,
                                                    NULL);
 
-  g_list_free_full (record_list, (GDestroyNotify) g_variant_unref);
+  xlist_free_full (record_list, (xdestroy_notify_t) xvariant_unref);
 #endif  /* G_OS_UNIX */
 }
 

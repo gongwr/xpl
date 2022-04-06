@@ -13,7 +13,7 @@ static GOptionEntry opt_entries[] =
 };
 
 static void
-on_name_appeared (GDBusConnection *connection,
+on_name_appeared (xdbus_connection_t *connection,
                   const xchar_t     *name,
                   const xchar_t     *name_owner,
                   xpointer_t         user_data)
@@ -25,7 +25,7 @@ on_name_appeared (GDBusConnection *connection,
 }
 
 static void
-on_name_vanished (GDBusConnection *connection,
+on_name_vanished (xdbus_connection_t *connection,
                   const xchar_t     *name,
                   xpointer_t         user_data)
 {
@@ -38,8 +38,8 @@ int
 main (int argc, char *argv[])
 {
   xuint_t watcher_id;
-  GMainLoop *loop;
-  GOptionContext *opt_context;
+  xmain_loop_t *loop;
+  xoption_context_t *opt_context;
   xerror_t *error;
   GBusNameWatcherFlags flags;
 
@@ -73,8 +73,8 @@ main (int argc, char *argv[])
                                  NULL,
                                  NULL);
 
-  loop = g_main_loop_new (NULL, FALSE);
-  g_main_loop_run (loop);
+  loop = xmain_loop_new (NULL, FALSE);
+  xmain_loop_run (loop);
 
   g_bus_unwatch_name (watcher_id);
 

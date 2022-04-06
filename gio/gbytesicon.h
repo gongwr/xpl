@@ -29,23 +29,23 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_BYTES_ICON         (g_bytes_icon_get_type ())
-#define G_BYTES_ICON(inst)        (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_BYTES_ICON, GBytesIcon))
+#define XTYPE_BYTES_ICON         (xbytes_icon_get_type ())
+#define G_BYTES_ICON(inst)        (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_BYTES_ICON, xbytes_icon))
 #define X_IS_BYTES_ICON(inst)     (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_BYTES_ICON))
 
 /**
- * GBytesIcon:
+ * xbytes_icon_t:
  *
- * Gets an icon for a #GBytes. Implements #GLoadableIcon.
+ * Gets an icon for a #xbytes_t. Implements #xloadable_icon_t.
  **/
 XPL_AVAILABLE_IN_2_38
-xtype_t   g_bytes_icon_get_type   (void) G_GNUC_CONST;
+xtype_t   xbytes_icon_get_type   (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_2_38
-xicon_t * g_bytes_icon_new        (GBytes     *bytes);
+xicon_t * xbytes_icon_new        (xbytes_t     *bytes);
 
 XPL_AVAILABLE_IN_2_38
-GBytes * g_bytes_icon_get_bytes (GBytesIcon *icon);
+xbytes_t * xbytes_icon_get_bytes (xbytes_icon_t *icon);
 
 G_END_DECLS
 

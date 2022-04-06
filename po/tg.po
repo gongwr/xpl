@@ -34,7 +34,7 @@ msgid "Seek not supported on base stream"
 msgstr ""
 
 #: ../gio/gbufferedinputstream.c:945
-msgid "Cannot truncate GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
 msgstr ""
 
 #: ../gio/gbufferedinputstream.c:990 ../gio/ginputstream.c:1023
@@ -110,15 +110,15 @@ msgid "%s filetype"
 msgstr ""
 
 #: ../gio/gcredentials.c:264 ../gio/gcredentials.c:528
-msgid "GCredentials is not implemented on this OS"
+msgid "xcredentials_t is not implemented on this OS"
 msgstr ""
 
 #: ../gio/gcredentials.c:438
-msgid "There is no GCredentials support for your platform"
+msgid "There is no xcredentials_t support for your platform"
 msgstr ""
 
 #: ../gio/gcredentials.c:480
-msgid "GCredentials does not contain a process ID on this OS"
+msgid "xcredentials_t does not contain a process ID on this OS"
 msgstr ""
 
 #: ../gio/gdatainputstream.c:311
@@ -288,7 +288,7 @@ msgid ""
 msgstr ""
 
 #: ../gio/gdbusauth.c:1175
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
 msgstr ""
 
 #: ../gio/gdbusauthmechanismsha1.c:266
@@ -940,26 +940,26 @@ msgstr ""
 
 #: ../gio/gemblem.c:324
 #, c-format
-msgid "Can't handle version %d of GEmblem encoding"
+msgid "Can't handle version %d of xemblem_t encoding"
 msgstr ""
 
 #: ../gio/gemblem.c:334
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:367
 #, c-format
-msgid "Can't handle version %d of GEmblemedIcon encoding"
+msgid "Can't handle version %d of xemblemed_icon_t encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:377
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:400
-msgid "Expected a GEmblem for GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
 msgstr ""
 
 #: ../gio/gfile.c:917 ../gio/gfile.c:1156 ../gio/gfile.c:1295
@@ -1068,11 +1068,11 @@ msgstr ""
 
 #: ../gio/gfileicon.c:237
 #, c-format
-msgid "Can't handle version %d of GFileIcon encoding"
+msgid "Can't handle version %d of xfile_icon_t encoding"
 msgstr ""
 
 #: ../gio/gfileicon.c:247
-msgid "Malformed input data for GFileIcon"
+msgid "Malformed input data for xfile_icon_t"
 msgstr ""
 
 #: ../gio/gfileinputstream.c:154 ../gio/gfileinputstream.c:400
@@ -1515,7 +1515,7 @@ msgstr ""
 
 #: ../gio/glib-compile-schemas.c:2031
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
@@ -1836,7 +1836,7 @@ msgid "Invalid seek request"
 msgstr ""
 
 #: ../gio/gmemoryinputstream.c:510
-msgid "Cannot truncate GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
 msgstr ""
 
 #: ../gio/gmemoryoutputstream.c:544
@@ -2386,7 +2386,7 @@ msgid "Error sending message: %s"
 msgstr ""
 
 #: ../gio/gsocket.c:3821
-msgid "GSocketControlMessage not supported on Windows"
+msgid "xsocket_control_message_t not supported on Windows"
 msgstr ""
 
 #: ../gio/gsocket.c:4155 ../gio/gsocket.c:4290
@@ -2526,7 +2526,7 @@ msgstr ""
 
 #: ../gio/gthemedicon.c:498
 #, c-format
-msgid "Can't handle version %d of GThemedIcon encoding"
+msgid "Can't handle version %d of xthemed_icon_t encoding"
 msgstr ""
 
 #: ../gio/gthreadedresolver.c:110
@@ -2865,37 +2865,37 @@ msgstr ""
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:205
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr ""
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:207
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr ""
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:210
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr ""
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:213
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr ""
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:216
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr ""
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:219
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr ""
 

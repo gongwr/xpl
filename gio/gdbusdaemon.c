@@ -42,12 +42,12 @@ struct _GDBusDaemon
   xchar_t *address;
   xuint_t timeout;
   xchar_t *tmpdir;
-  GDBusServer *server;
+  xdbus_server_t *server;
   xchar_t *guid;
-  GHashTable *clients;
-  GHashTable *names;
-  guint32 next_major_id;
-  guint32 next_minor_id;
+  xhashtable_t *clients;
+  xhashtable_t *names;
+  xuint32_t next_major_id;
+  xuint32_t next_minor_id;
 };
 
 struct _GDBusDaemonClass
@@ -69,7 +69,7 @@ enum
 static xuint_t g_dbus_daemon_signals[NR_SIGNALS];
 
 
-static void initable_iface_init      (GInitableIface         *initable_iface);
+static void initable_iface_init      (xinitable_iface_t         *initable_iface);
 static void g_dbus_daemon_iface_init (_GFreedesktopDBusIface *iface);
 
 #define g_dbus_daemon_get_type _g_dbus_daemon_get_type
@@ -80,13 +80,13 @@ G_DEFINE_TYPE_WITH_CODE (GDBusDaemon, g_dbus_daemon, _XTYPE_FREEDESKTOP_DBUS_SKE
 typedef struct {
   GDBusDaemon *daemon;
   char *id;
-  GDBusConnection *connection;
+  xdbus_connection_t *connection;
   xlist_t *matches;
 } Client;
 
 typedef struct {
   Client *client;
-  guint32 flags;
+  xuint32_t flags;
 } NameOwner;
 
 typedef struct {
@@ -114,8 +114,8 @@ enum {
 };
 
 typedef struct {
-  guint16 type;
-  guint16 arg;
+  xuint16_t type;
+  xuint16_t arg;
   char *value;
 } MatchElement;
 
@@ -126,17 +126,17 @@ typedef struct {
   MatchElement *elements;
 } Match;
 
-static GDBusMessage *filter_function   (GDBusConnection *connection,
-					GDBusMessage    *message,
+static xdbus_message_t *filter_function   (xdbus_connection_t *connection,
+					xdbus_message_t    *message,
 					xboolean_t         incoming,
 					xpointer_t         user_data);
-static void          connection_closed (GDBusConnection *connection,
+static void          connection_closed (xdbus_connection_t *connection,
 					xboolean_t         remote_peer_vanished,
 					xerror_t          *error,
 					Client          *client);
 
 static NameOwner *
-name_owner_new (Client *client, guint32 flags)
+name_owner_new (Client *client, xuint32_t flags)
 {
   NameOwner *owner;
 
@@ -160,9 +160,9 @@ name_new (GDBusDaemon *daemon, const char *str)
   name = g_new0 (Name, 1);
   name->refcount = 1;
   name->daemon = daemon;
-  name->name = g_strdup (str);
+  name->name = xstrdup (str);
 
-  g_hash_table_insert (daemon->names, name->name, name);
+  xhash_table_insert (daemon->names, name->name, name);
 
   return name;
 }
@@ -181,7 +181,7 @@ name_unref (Name *name)
   g_assert (name->refcount > 0);
   if (--name->refcount == 0)
     {
-      g_hash_table_remove (name->daemon->names, name->name);
+      xhash_table_remove (name->daemon->names, name->name);
       g_free (name->name);
       g_free (name);
     }
@@ -192,7 +192,7 @@ name_ensure (GDBusDaemon *daemon, const char *str)
 {
   Name *name;
 
-  name = g_hash_table_lookup (daemon->names, str);
+  name = xhash_table_lookup (daemon->names, str);
 
   if (name != NULL)
     return name_ref (name);
@@ -202,7 +202,7 @@ name_ensure (GDBusDaemon *daemon, const char *str)
 static Name *
 name_lookup (GDBusDaemon *daemon, const char *str)
 {
-  return g_hash_table_lookup (daemon->names, str);
+  return xhash_table_lookup (daemon->names, str);
 }
 
 static xboolean_t
@@ -289,9 +289,9 @@ static const char *
 parse_value (MatchElement *element, const char *s)
 {
   char quote_char;
-  GString *value;
+  xstring_t *value;
 
-  value = g_string_new ("");
+  value = xstring_new ("");
 
   quote_char = 0;
 
@@ -314,7 +314,7 @@ parse_value (MatchElement *element, const char *s)
 	      break;
 
 	    default:
-	      g_string_append_c (value, *s);
+	      xstring_append_c (value, *s);
 	      break;
 	    }
 	}
@@ -322,9 +322,9 @@ parse_value (MatchElement *element, const char *s)
 	{
 	  /* \ only counts as an escape if escaping a quote mark */
 	  if (*s != '\'')
-	    g_string_append_c (value, '\\');
+	    xstring_append_c (value, '\\');
 
-	  g_string_append_c (value, *s);
+	  xstring_append_c (value, *s);
 	  quote_char = 0;
 	}
       else /* quote_char == ' */
@@ -332,21 +332,21 @@ parse_value (MatchElement *element, const char *s)
 	  if (*s == '\'')
 	    quote_char = 0;
 	  else
-	    g_string_append_c (value, *s);
+	    xstring_append_c (value, *s);
 	}
     }
 
  out:
 
   if (quote_char == '\\')
-    g_string_append_c (value, '\\');
+    xstring_append_c (value, '\\');
   else if (quote_char == '\'')
     {
-      g_string_free (value, TRUE);
+      xstring_free (value, TRUE);
       return NULL;
     }
 
-  element->value = g_string_free (value, FALSE);
+  element->value = xstring_free (value, FALSE);
   return s;
 }
 
@@ -354,7 +354,7 @@ static Match *
 match_new (const char *str)
 {
   Match *match;
-  GArray *elements;
+  xarray_t *elements;
   const char *p;
   const char *key_start;
   const char *key_end;
@@ -485,23 +485,23 @@ match_equal (Match *a, Match *b)
 }
 
 static const xchar_t *
-message_get_argN (GDBusMessage *message, int n, xboolean_t allow_path)
+message_get_argN (xdbus_message_t *message, int n, xboolean_t allow_path)
 {
   const xchar_t *ret;
   xvariant_t *body;
 
   ret = NULL;
 
-  body = g_dbus_message_get_body (message);
+  body = xdbus_message_get_body (message);
 
-  if (body != NULL && g_variant_is_of_type (body, G_VARIANT_TYPE_TUPLE))
+  if (body != NULL && xvariant_is_of_type (body, G_VARIANT_TYPE_TUPLE))
     {
       xvariant_t *item;
-      item = g_variant_get_child_value (body, n);
-      if (g_variant_is_of_type (item, G_VARIANT_TYPE_STRING) ||
-	  (allow_path && g_variant_is_of_type (item, G_VARIANT_TYPE_OBJECT_PATH)))
-	ret = g_variant_get_string (item, NULL);
-      g_variant_unref (item);
+      item = xvariant_get_child_value (body, n);
+      if (xvariant_is_of_type (item, G_VARIANT_TYPE_STRING) ||
+	  (allow_path && xvariant_is_of_type (item, G_VARIANT_TYPE_OBJECT_PATH)))
+	ret = xvariant_get_string (item, NULL);
+      xvariant_unref (item);
     }
 
   return ret;
@@ -517,7 +517,7 @@ enum {
 
 static xboolean_t
 match_matches (GDBusDaemon *daemon,
-	       Match *match, GDBusMessage *message,
+	       Match *match, xdbus_message_t *message,
 	       xboolean_t has_destination)
 {
   MatchElement *element;
@@ -530,7 +530,7 @@ match_matches (GDBusDaemon *daemon,
     return FALSE;
 
   if (match->type != G_DBUS_MESSAGE_TYPE_INVALID &&
-      g_dbus_message_get_message_type (message) != match->type)
+      xdbus_message_get_message_type (message) != match->type)
     return FALSE;
 
   for (i = 0; i < match->n_elements; i++)
@@ -541,26 +541,26 @@ match_matches (GDBusDaemon *daemon,
 	{
 	case MATCH_ELEMENT_SENDER:
 	  check_type = CHECK_TYPE_NAME;
-	  value = g_dbus_message_get_sender (message);
+	  value = xdbus_message_get_sender (message);
 	  if (value == NULL)
 	    value = DBUS_SERVICE_NAME;
 	  break;
 	case MATCH_ELEMENT_DESTINATION:
 	  check_type = CHECK_TYPE_NAME;
-	  value = g_dbus_message_get_destination (message);
+	  value = xdbus_message_get_destination (message);
 	  break;
 	case MATCH_ELEMENT_INTERFACE:
-	  value = g_dbus_message_get_interface (message);
+	  value = xdbus_message_get_interface (message);
 	  break;
 	case MATCH_ELEMENT_MEMBER:
-	  value = g_dbus_message_get_member (message);
+	  value = xdbus_message_get_member (message);
 	  break;
 	case MATCH_ELEMENT_PATH:
-	  value = g_dbus_message_get_path (message);
+	  value = xdbus_message_get_path (message);
 	  break;
 	case MATCH_ELEMENT_PATH_NAMESPACE:
 	  check_type = CHECK_TYPE_PATH_PREFIX;
-	  value = g_dbus_message_get_path (message);
+	  value = xdbus_message_get_path (message);
 	  break;
 	case MATCH_ELEMENT_ARG0NAMESPACE:
 	  check_type = CHECK_TYPE_NAMESPACE_PREFIX;
@@ -607,7 +607,7 @@ match_matches (GDBusDaemon *daemon,
 
 	  /* Fail if there's no prefix match, or if the prefix match doesn't
 	   * finish at the end of or at a separator in the @value. */
-	  if (!g_str_has_prefix (value, element->value))
+	  if (!xstr_has_prefix (value, element->value))
 	    return FALSE;
 	  if (value[len] != 0 && value[len] != '/')
 	    return FALSE;
@@ -618,13 +618,13 @@ match_matches (GDBusDaemon *daemon,
 	  len2 = strlen (value);
 
 	  if (!(strcmp (value, element->value) == 0 ||
-		(len2 > 0 && value[len2-1] == '/' && g_str_has_prefix (element->value, value)) ||
-		(len > 0 && element->value[len-1] == '/' && g_str_has_prefix (value, element->value))))
+		(len2 > 0 && value[len2-1] == '/' && xstr_has_prefix (element->value, value)) ||
+		(len > 0 && element->value[len-1] == '/' && xstr_has_prefix (value, element->value))))
 	    return FALSE;
 	  break;
 	case CHECK_TYPE_NAMESPACE_PREFIX:
 	  len = strlen (element->value);
-	  if (!(g_str_has_prefix (value, element->value) &&
+	  if (!(xstr_has_prefix (value, element->value) &&
 		(value[len] == 0 || value[len] == '.')))
 	    return FALSE;
 	  break;
@@ -638,15 +638,15 @@ match_matches (GDBusDaemon *daemon,
 
 static void
 broadcast_message (GDBusDaemon *daemon,
-		   GDBusMessage *message,
+		   xdbus_message_t *message,
 		   xboolean_t has_destination,
 		   xboolean_t preserve_serial,
 		   Client *not_to)
 {
   xlist_t *clients, *l, *ll;
-  GDBusMessage *copy;
+  xdbus_message_t *copy;
 
-  clients = g_hash_table_get_values (daemon->clients);
+  clients = xhash_table_get_values (daemon->clients);
   for (l = clients; l != NULL; l = l->next)
     {
       Client *client = l->data;
@@ -664,17 +664,17 @@ broadcast_message (GDBusDaemon *daemon,
 
       if (ll != NULL)
 	{
-	  copy = g_dbus_message_copy (message, NULL);
+	  copy = xdbus_message_copy (message, NULL);
 	  if (copy)
 	    {
 	      g_dbus_connection_send_message (client->connection, copy,
 					      preserve_serial?G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL:0, NULL, NULL);
-	      g_object_unref (copy);
+	      xobject_unref (copy);
 	    }
 	}
     }
 
-  g_list_free (clients);
+  xlist_free (clients);
 }
 
 static void
@@ -683,19 +683,19 @@ send_name_owner_changed (GDBusDaemon *daemon,
 			 const char *old_owner,
 			 const char *new_owner)
 {
-  GDBusMessage *signal_message;
+  xdbus_message_t *signal_message;
 
-  signal_message = g_dbus_message_new_signal ("/org/freedesktop/DBus",
+  signal_message = xdbus_message_new_signal ("/org/freedesktop/DBus",
 					      "org.freedesktop.DBus",
 					      "NameOwnerChanged");
-  g_dbus_message_set_body (signal_message,
-			   g_variant_new ("(sss)",
+  xdbus_message_set_body (signal_message,
+			   xvariant_new ("(sss)",
 					  name,
 					  old_owner ? old_owner : "",
 					  new_owner ? new_owner : ""));
 
   broadcast_message (daemon, signal_message, FALSE, FALSE, NULL);
-  g_object_unref (signal_message);
+  xobject_unref (signal_message);
 
 }
 
@@ -710,7 +710,7 @@ name_unqueue_owner (Name *name, Client *client)
 
       if (other->client == client)
 	{
-	  name->queue = g_list_delete_link (name->queue, l);
+	  name->queue = xlist_delete_link (name->queue, l);
 	  name_unref (name);
 	  name_owner_free (other);
 	  return TRUE;
@@ -743,17 +743,17 @@ name_replace_owner (Name *name, NameOwner *owner)
       g_dbus_connection_emit_signal (old_client->connection,
 				     NULL, "/org/freedesktop/DBus",
 				     "org.freedesktop.DBus", "NameLost",
-				     g_variant_new ("(s)",
+				     xvariant_new ("(s)",
 						    name->name), NULL);
 
-      old_name = g_strdup (old_client->id);
+      old_name = xstrdup (old_client->id);
       if (old_owner->flags & DBUS_NAME_FLAG_DO_NOT_QUEUE)
 	{
 	  name_unref (name);
 	  name_owner_free (old_owner);
 	}
       else
-	name->queue = g_list_prepend (name->queue, old_owner);
+	name->queue = xlist_prepend (name->queue, old_owner);
     }
 
   name->owner = owner;
@@ -766,7 +766,7 @@ name_replace_owner (Name *name, NameOwner *owner)
       g_dbus_connection_emit_signal (new_client->connection,
 				     NULL, "/org/freedesktop/DBus",
 				     "org.freedesktop.DBus", "NameAcquired",
-				     g_variant_new ("(s)",
+				     xvariant_new ("(s)",
 						    name->name), NULL);
     }
 
@@ -789,7 +789,7 @@ name_release_owner (Name *name)
     {
       next_owner = name->queue->data;
       name_unref (name);
-      name->queue = g_list_delete_link (name->queue, name->queue);
+      name->queue = xlist_delete_link (name->queue, name->queue);
     }
 
   name->owner->flags |= DBUS_NAME_FLAG_DO_NOT_QUEUE;
@@ -815,20 +815,20 @@ name_queue_owner (Name *name, NameOwner *owner)
 	}
     }
 
-  name->queue = g_list_append (name->queue, owner);
+  name->queue = xlist_append (name->queue, owner);
   name_ref (name);
 }
 
 static Client *
-client_new (GDBusDaemon *daemon, GDBusConnection *connection)
+client_new (GDBusDaemon *daemon, xdbus_connection_t *connection)
 {
   Client *client;
   xerror_t *error = NULL;
 
   client = g_new0 (Client, 1);
   client->daemon = daemon;
-  client->id = g_strdup_printf (":%d.%d", daemon->next_major_id, daemon->next_minor_id);
-  client->connection = g_object_ref (connection);
+  client->id = xstrdup_printf (":%d.%d", daemon->next_major_id, daemon->next_minor_id);
+  client->connection = xobject_ref (connection);
 
   if (daemon->next_minor_id == G_MAXUINT32)
     {
@@ -838,8 +838,8 @@ client_new (GDBusDaemon *daemon, GDBusConnection *connection)
   else
     daemon->next_minor_id++;
 
-  g_object_set_data (G_OBJECT (connection), "client", client);
-  g_hash_table_insert (daemon->clients, client->id, client);
+  xobject_set_data (G_OBJECT (connection), "client", client);
+  xhash_table_insert (daemon->clients, client->id, client);
 
   g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (daemon), connection,
 				    "/org/freedesktop/DBus", &error);
@@ -864,9 +864,9 @@ client_free (Client *client)
   g_dbus_interface_skeleton_unexport_from_connection (G_DBUS_INTERFACE_SKELETON (daemon),
 						      client->connection);
 
-  g_hash_table_remove (daemon->clients, client->id);
+  xhash_table_remove (daemon->clients, client->id);
 
-  names = g_hash_table_get_values (daemon->names);
+  names = xhash_table_get_values (daemon->names);
   for (l = names; l != NULL; l = l->next)
     {
       Name *name = l->data;
@@ -880,15 +880,15 @@ client_free (Client *client)
 
       name_unref (name);
     }
-  g_list_free (names);
+  xlist_free (names);
 
   send_name_owner_changed (daemon, client->id, client->id, NULL);
 
-  g_object_unref (client->connection);
+  xobject_unref (client->connection);
 
   for (l = client->matches; l != NULL; l = l->next)
     match_free (l->data);
-  g_list_free (client->matches);
+  xlist_free (client->matches);
 
   g_free (client->id);
   g_free (client);
@@ -909,7 +909,7 @@ idle_timeout_cb (xpointer_t user_data)
 }
 
 static void
-connection_closed (GDBusConnection *connection,
+connection_closed (xdbus_connection_t *connection,
 		   xboolean_t remote_peer_vanished,
 		   xerror_t *error,
 		   Client *client)
@@ -918,7 +918,7 @@ connection_closed (GDBusConnection *connection,
 
   client_free (client);
 
-  if (g_hash_table_size (daemon->clients) == 0)
+  if (xhash_table_size (daemon->clients) == 0)
     daemon->timeout = g_timeout_add (IDLE_TIMEOUT_MSEC,
 				     idle_timeout_cb,
 				     daemon);
@@ -926,21 +926,21 @@ connection_closed (GDBusConnection *connection,
 
 static xboolean_t
 handle_add_match (_GFreedesktopDBus *object,
-		  GDBusMethodInvocation *invocation,
+		  xdbus_method_invocation_t *invocation,
 		  const xchar_t *arg_rule)
 {
-  Client *client = g_object_get_data (G_OBJECT (g_dbus_method_invocation_get_connection (invocation)), "client");
+  Client *client = xobject_get_data (G_OBJECT (xdbus_method_invocation_get_connection (invocation)), "client");
   Match *match;
 
   match = match_new (arg_rule);
 
   if (match == NULL)
-    g_dbus_method_invocation_return_error (invocation,
+    xdbus_method_invocation_return_error (invocation,
 					   G_DBUS_ERROR, G_DBUS_ERROR_MATCH_RULE_INVALID,
 					   "Invalid rule: %s", arg_rule);
   else
     {
-      client->matches = g_list_prepend (client->matches, match);
+      client->matches = xlist_prepend (client->matches, match);
       _g_freedesktop_dbus_complete_add_match (object, invocation);
     }
   return TRUE;
@@ -948,10 +948,10 @@ handle_add_match (_GFreedesktopDBus *object,
 
 static xboolean_t
 handle_get_connection_selinux_security_context (_GFreedesktopDBus *object,
-						GDBusMethodInvocation *invocation,
+						xdbus_method_invocation_t *invocation,
 						const xchar_t *arg_name)
 {
-  g_dbus_method_invocation_return_error (invocation,
+  xdbus_method_invocation_return_error (invocation,
 					 G_DBUS_ERROR, G_DBUS_ERROR_SELINUX_SECURITY_CONTEXT_UNKNOWN,
 					 "selinux context not supported");
   _g_freedesktop_dbus_complete_get_connection_selinux_security_context (object, invocation, "");
@@ -960,10 +960,10 @@ handle_get_connection_selinux_security_context (_GFreedesktopDBus *object,
 
 static xboolean_t
 handle_get_connection_unix_process_id (_GFreedesktopDBus *object,
-				       GDBusMethodInvocation *invocation,
+				       xdbus_method_invocation_t *invocation,
 				       const xchar_t *arg_name)
 {
-  g_dbus_method_invocation_return_error (invocation,
+  xdbus_method_invocation_return_error (invocation,
 					 G_DBUS_ERROR, G_DBUS_ERROR_UNIX_PROCESS_ID_UNKNOWN,
 					 "connection pid not supported");
   return TRUE;
@@ -971,10 +971,10 @@ handle_get_connection_unix_process_id (_GFreedesktopDBus *object,
 
 static xboolean_t
 handle_get_connection_unix_user (_GFreedesktopDBus *object,
-				 GDBusMethodInvocation *invocation,
+				 xdbus_method_invocation_t *invocation,
 				 const xchar_t *arg_name)
 {
-  g_dbus_method_invocation_return_error (invocation,
+  xdbus_method_invocation_return_error (invocation,
 					 G_DBUS_ERROR, G_DBUS_ERROR_UNIX_PROCESS_ID_UNKNOWN,
 					 "connection user not supported");
   return TRUE;
@@ -982,7 +982,7 @@ handle_get_connection_unix_user (_GFreedesktopDBus *object,
 
 static xboolean_t
 handle_get_id (_GFreedesktopDBus *object,
-	       GDBusMethodInvocation *invocation)
+	       xdbus_method_invocation_t *invocation)
 {
   GDBusDaemon *daemon = G_DBUS_DAEMON (object);
   _g_freedesktop_dbus_complete_get_id (object, invocation,
@@ -992,7 +992,7 @@ handle_get_id (_GFreedesktopDBus *object,
 
 static xboolean_t
 handle_get_name_owner (_GFreedesktopDBus *object,
-		       GDBusMethodInvocation *invocation,
+		       xdbus_method_invocation_t *invocation,
 		       const xchar_t *arg_name)
 {
   GDBusDaemon *daemon = G_DBUS_DAEMON (object);
@@ -1006,8 +1006,8 @@ handle_get_name_owner (_GFreedesktopDBus *object,
 
   if (arg_name[0] == ':')
     {
-      if (g_hash_table_lookup (daemon->clients, arg_name) == NULL)
-	g_dbus_method_invocation_return_error (invocation,
+      if (xhash_table_lookup (daemon->clients, arg_name) == NULL)
+	xdbus_method_invocation_return_error (invocation,
 					       G_DBUS_ERROR, G_DBUS_ERROR_NAME_HAS_NO_OWNER,
 					       "Could not get owner of name '%s': no such name", arg_name);
       else
@@ -1018,7 +1018,7 @@ handle_get_name_owner (_GFreedesktopDBus *object,
   name = name_lookup (daemon, arg_name);
   if (name == NULL || name->owner == NULL)
     {
-      g_dbus_method_invocation_return_error (invocation,
+      xdbus_method_invocation_return_error (invocation,
 					     G_DBUS_ERROR, G_DBUS_ERROR_NAME_HAS_NO_OWNER,
 					     "Could not get owner of name '%s': no such name", arg_name);
       return TRUE;
@@ -1030,15 +1030,15 @@ handle_get_name_owner (_GFreedesktopDBus *object,
 
 static xboolean_t
 handle_hello (_GFreedesktopDBus *object,
-	      GDBusMethodInvocation *invocation)
+	      xdbus_method_invocation_t *invocation)
 {
-  Client *client = g_object_get_data (G_OBJECT (g_dbus_method_invocation_get_connection (invocation)), "client");
+  Client *client = xobject_get_data (G_OBJECT (xdbus_method_invocation_get_connection (invocation)), "client");
   _g_freedesktop_dbus_complete_hello (object, invocation, client->id);
 
   g_dbus_connection_emit_signal (client->connection,
 				 NULL, "/org/freedesktop/DBus",
 				 "org.freedesktop.DBus", "NameAcquired",
-				 g_variant_new ("(s)",
+				 xvariant_new ("(s)",
 						client->id), NULL);
 
   return TRUE;
@@ -1046,7 +1046,7 @@ handle_hello (_GFreedesktopDBus *object,
 
 static xboolean_t
 handle_list_activatable_names (_GFreedesktopDBus *object,
-			       GDBusMethodInvocation *invocation)
+			       xdbus_method_invocation_t *invocation)
 {
   const char *names[] = { NULL };
 
@@ -1058,54 +1058,54 @@ handle_list_activatable_names (_GFreedesktopDBus *object,
 
 static xboolean_t
 handle_list_names (_GFreedesktopDBus *object,
-		   GDBusMethodInvocation *invocation)
+		   xdbus_method_invocation_t *invocation)
 {
   GDBusDaemon *daemon = G_DBUS_DAEMON (object);
-  GPtrArray *array;
+  xptr_array_t *array;
   xlist_t *clients, *names, *l;
 
-  array = g_ptr_array_new ();
+  array = xptr_array_new ();
 
-  clients = g_hash_table_get_values (daemon->clients);
+  clients = xhash_table_get_values (daemon->clients);
   for (l = clients; l != NULL; l = l->next)
     {
       Client *client = l->data;
 
-      g_ptr_array_add (array, client->id);
+      xptr_array_add (array, client->id);
     }
 
-  g_list_free (clients);
+  xlist_free (clients);
 
-  names = g_hash_table_get_values (daemon->names);
+  names = xhash_table_get_values (daemon->names);
   for (l = names; l != NULL; l = l->next)
     {
       Name *name = l->data;
 
-      g_ptr_array_add (array, name->name);
+      xptr_array_add (array, name->name);
     }
 
-  g_list_free (names);
+  xlist_free (names);
 
-  g_ptr_array_add (array, NULL);
+  xptr_array_add (array, NULL);
 
   _g_freedesktop_dbus_complete_list_names (object,
 					   invocation,
 					   (const xchar_t * const*)array->pdata);
-  g_ptr_array_free (array, TRUE);
+  xptr_array_free (array, TRUE);
   return TRUE;
 }
 
 static xboolean_t
 handle_list_queued_owners (_GFreedesktopDBus *object,
-			   GDBusMethodInvocation *invocation,
+			   xdbus_method_invocation_t *invocation,
 			   const xchar_t *arg_name)
 {
   GDBusDaemon *daemon = G_DBUS_DAEMON (object);
-  GPtrArray *array;
+  xptr_array_t *array;
   Name *name;
   xlist_t *l;
 
-  array = g_ptr_array_new ();
+  array = xptr_array_new ();
 
   name = name_lookup (daemon, arg_name);
   if (name && name->owner)
@@ -1114,22 +1114,22 @@ handle_list_queued_owners (_GFreedesktopDBus *object,
 	{
 	  Client *client = l->data;
 
-	  g_ptr_array_add (array, client->id);
+	  xptr_array_add (array, client->id);
 	}
     }
 
-  g_ptr_array_add (array, NULL);
+  xptr_array_add (array, NULL);
 
   _g_freedesktop_dbus_complete_list_queued_owners (object,
 						   invocation,
 						   (const xchar_t * const*)array->pdata);
-  g_ptr_array_free (array, TRUE);
+  xptr_array_free (array, TRUE);
   return TRUE;
 }
 
 static xboolean_t
 handle_name_has_owner (_GFreedesktopDBus *object,
-		       GDBusMethodInvocation *invocation,
+		       xdbus_method_invocation_t *invocation,
 		       const xchar_t *arg_name)
 {
   GDBusDaemon *daemon = G_DBUS_DAEMON (object);
@@ -1137,7 +1137,7 @@ handle_name_has_owner (_GFreedesktopDBus *object,
   Client *client;
 
   name = name_lookup (daemon, arg_name);
-  client = g_hash_table_lookup (daemon->clients, arg_name);
+  client = xhash_table_lookup (daemon->clients, arg_name);
 
   _g_freedesktop_dbus_complete_name_has_owner (object, invocation,
 					       name != NULL || client != NULL);
@@ -1146,17 +1146,17 @@ handle_name_has_owner (_GFreedesktopDBus *object,
 
 static xboolean_t
 handle_release_name (_GFreedesktopDBus *object,
-		     GDBusMethodInvocation *invocation,
+		     xdbus_method_invocation_t *invocation,
 		     const xchar_t *arg_name)
 {
-  Client *client = g_object_get_data (G_OBJECT (g_dbus_method_invocation_get_connection (invocation)), "client");
+  Client *client = xobject_get_data (G_OBJECT (xdbus_method_invocation_get_connection (invocation)), "client");
   GDBusDaemon *daemon = G_DBUS_DAEMON (object);
   Name *name;
-  guint32 result;
+  xuint32_t result;
 
   if (!g_dbus_is_name (arg_name))
     {
-      g_dbus_method_invocation_return_error (invocation,
+      xdbus_method_invocation_return_error (invocation,
 					     G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS,
 					     "Given bus name \"%s\" is not valid", arg_name);
       return TRUE;
@@ -1164,7 +1164,7 @@ handle_release_name (_GFreedesktopDBus *object,
 
   if (*arg_name == ':')
     {
-      g_dbus_method_invocation_return_error (invocation,
+      xdbus_method_invocation_return_error (invocation,
 					     G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS,
 					     "Cannot release a service starting with ':' such as \"%s\"", arg_name);
       return TRUE;
@@ -1172,7 +1172,7 @@ handle_release_name (_GFreedesktopDBus *object,
 
   if (strcmp (arg_name, DBUS_SERVICE_NAME) == 0)
     {
-      g_dbus_method_invocation_return_error (invocation,
+      xdbus_method_invocation_return_error (invocation,
 					     G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS,
 					     "Cannot release a service named " DBUS_SERVICE_NAME ", because that is owned by the bus");
       return TRUE;
@@ -1198,7 +1198,7 @@ handle_release_name (_GFreedesktopDBus *object,
 
 static xboolean_t
 handle_reload_config (_GFreedesktopDBus *object,
-		      GDBusMethodInvocation *invocation)
+		      xdbus_method_invocation_t *invocation)
 {
   _g_freedesktop_dbus_complete_reload_config (object, invocation);
   return TRUE;
@@ -1206,10 +1206,10 @@ handle_reload_config (_GFreedesktopDBus *object,
 
 static xboolean_t
 handle_update_activation_environment (_GFreedesktopDBus *object,
-				      GDBusMethodInvocation *invocation,
+				      xdbus_method_invocation_t *invocation,
 				      xvariant_t *arg_environment)
 {
-  g_dbus_method_invocation_return_error (invocation,
+  xdbus_method_invocation_return_error (invocation,
 					 G_DBUS_ERROR, G_DBUS_ERROR_FAILED,
 					 "UpdateActivationEnvironment not implemented");
   return TRUE;
@@ -1217,17 +1217,17 @@ handle_update_activation_environment (_GFreedesktopDBus *object,
 
 static xboolean_t
 handle_remove_match (_GFreedesktopDBus *object,
-		     GDBusMethodInvocation *invocation,
+		     xdbus_method_invocation_t *invocation,
 		     const xchar_t *arg_rule)
 {
-  Client *client = g_object_get_data (G_OBJECT (g_dbus_method_invocation_get_connection (invocation)), "client");
+  Client *client = xobject_get_data (G_OBJECT (xdbus_method_invocation_get_connection (invocation)), "client");
   Match *match, *other_match;
   xlist_t *l;
 
   match = match_new (arg_rule);
 
   if (match == NULL)
-    g_dbus_method_invocation_return_error (invocation,
+    xdbus_method_invocation_return_error (invocation,
 					   G_DBUS_ERROR, G_DBUS_ERROR_MATCH_RULE_INVALID,
 					   "Invalid rule: %s", arg_rule);
   else
@@ -1238,13 +1238,13 @@ handle_remove_match (_GFreedesktopDBus *object,
 	  if (match_equal (match, other_match))
 	    {
 	      match_free (other_match);
-	      client->matches = g_list_delete_link (client->matches, l);
+	      client->matches = xlist_delete_link (client->matches, l);
 	      break;
 	    }
 	}
 
       if (l == NULL)
-	g_dbus_method_invocation_return_error (invocation,
+	xdbus_method_invocation_return_error (invocation,
 					       G_DBUS_ERROR, G_DBUS_ERROR_MATCH_RULE_NOT_FOUND,
 					       "The given match rule wasn't found and can't be removed");
       else
@@ -1258,19 +1258,19 @@ handle_remove_match (_GFreedesktopDBus *object,
 
 static xboolean_t
 handle_request_name (_GFreedesktopDBus *object,
-		     GDBusMethodInvocation *invocation,
+		     xdbus_method_invocation_t *invocation,
 		     const xchar_t *arg_name,
 		     xuint_t flags)
 {
-  Client *client = g_object_get_data (G_OBJECT (g_dbus_method_invocation_get_connection (invocation)), "client");
+  Client *client = xobject_get_data (G_OBJECT (xdbus_method_invocation_get_connection (invocation)), "client");
   GDBusDaemon *daemon = G_DBUS_DAEMON (object);
   Name *name;
   NameOwner *owner;
-  guint32 result;
+  xuint32_t result;
 
   if (!g_dbus_is_name (arg_name))
     {
-      g_dbus_method_invocation_return_error (invocation,
+      xdbus_method_invocation_return_error (invocation,
 					     G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS,
 					     "Requested bus name \"%s\" is not valid", arg_name);
       return TRUE;
@@ -1278,7 +1278,7 @@ handle_request_name (_GFreedesktopDBus *object,
 
   if (*arg_name == ':')
     {
-      g_dbus_method_invocation_return_error (invocation,
+      xdbus_method_invocation_return_error (invocation,
 					     G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS,
 					     "Cannot acquire a service starting with ':' such as \"%s\"", arg_name);
       return TRUE;
@@ -1286,7 +1286,7 @@ handle_request_name (_GFreedesktopDBus *object,
 
   if (strcmp (arg_name, DBUS_SERVICE_NAME) == 0)
     {
-      g_dbus_method_invocation_return_error (invocation,
+      xdbus_method_invocation_return_error (invocation,
 					     G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS,
 					     "Cannot acquire a service named " DBUS_SERVICE_NAME ", because that is reserved");
       return TRUE;
@@ -1340,7 +1340,7 @@ handle_request_name (_GFreedesktopDBus *object,
 
 static xboolean_t
 handle_start_service_by_name (_GFreedesktopDBus *object,
-			      GDBusMethodInvocation *invocation,
+			      xdbus_method_invocation_t *invocation,
 			      const xchar_t *arg_name,
 			      xuint_t arg_flags)
 {
@@ -1352,7 +1352,7 @@ handle_start_service_by_name (_GFreedesktopDBus *object,
     _g_freedesktop_dbus_complete_start_service_by_name (object, invocation,
 							DBUS_START_REPLY_ALREADY_RUNNING);
   else
-    g_dbus_method_invocation_return_error (invocation,
+    xdbus_method_invocation_return_error (invocation,
 					   G_DBUS_ERROR, G_DBUS_ERROR_SERVICE_UNKNOWN,
 					   "No support for activation for name: %s", arg_name);
 
@@ -1361,40 +1361,40 @@ handle_start_service_by_name (_GFreedesktopDBus *object,
 
 G_GNUC_PRINTF(5, 6)
 static void
-return_error (Client *client, GDBusMessage *message,
-	      GQuark                 domain,
+return_error (Client *client, xdbus_message_t *message,
+	      xquark                 domain,
 	      xint_t                   code,
 	      const xchar_t           *format,
 	      ...)
 {
-  GDBusMessage *reply;
+  xdbus_message_t *reply;
   va_list var_args;
   char *error_message;
   xerror_t *error;
   xchar_t *dbus_error_name;
 
   va_start (var_args, format);
-  error_message = g_strdup_vprintf (format, var_args);
+  error_message = xstrdup_vprintf (format, var_args);
   va_end (var_args);
 
-  error = g_error_new_literal (domain, code, "");
+  error = xerror_new_literal (domain, code, "");
   dbus_error_name = g_dbus_error_encode_gerror (error);
 
-  reply = g_dbus_message_new_method_error_literal (message,
+  reply = xdbus_message_new_method_error_literal (message,
 						   dbus_error_name,
 						   error_message);
 
-  g_error_free (error);
+  xerror_free (error);
   g_free (dbus_error_name);
   g_free (error_message);
 
   if (!g_dbus_connection_send_message (client->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL))
       g_warning ("Error sending reply");
-  g_object_unref (reply);
+  xobject_unref (reply);
 }
 
-static GDBusMessage *
-route_message (Client *source_client, GDBusMessage *message)
+static xdbus_message_t *
+route_message (Client *source_client, xdbus_message_t *message)
 {
   const char *dest;
   Client *dest_client;
@@ -1403,10 +1403,10 @@ route_message (Client *source_client, GDBusMessage *message)
   daemon = source_client->daemon;
 
   dest_client = NULL;
-  dest = g_dbus_message_get_destination (message);
+  dest = xdbus_message_get_destination (message);
   if (dest != NULL && strcmp (dest, DBUS_SERVICE_NAME) != 0)
     {
-      dest_client = g_hash_table_lookup (daemon->clients, dest);
+      dest_client = xhash_table_lookup (daemon->clients, dest);
 
       if (dest_client == NULL)
 	{
@@ -1418,7 +1418,7 @@ route_message (Client *source_client, GDBusMessage *message)
 
       if (dest_client == NULL)
 	{
-	  if (g_dbus_message_get_message_type (message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL)
+	  if (xdbus_message_get_message_type (message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL)
 	    return_error (source_client, message,
 			  G_DBUS_ERROR, G_DBUS_ERROR_SERVICE_UNKNOWN,
 			  "The name %s is unknown", dest);
@@ -1430,7 +1430,7 @@ route_message (Client *source_client, GDBusMessage *message)
 	  if (!g_dbus_connection_send_message (dest_client->connection, message, G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL, NULL, &error))
 	    {
 	      g_warning ("Error forwarding message: %s", error->message);
-	      g_error_free (error);
+	      xerror_free (error);
 	    }
 	}
     }
@@ -1440,28 +1440,28 @@ route_message (Client *source_client, GDBusMessage *message)
   /* Swallow messages not for the bus */
   if (dest == NULL || strcmp (dest, DBUS_SERVICE_NAME) != 0)
     {
-      g_object_unref (message);
+      xobject_unref (message);
       message = NULL;
     }
 
   return message;
 }
 
-static GDBusMessage *
-copy_if_locked (GDBusMessage *message)
+static xdbus_message_t *
+copy_if_locked (xdbus_message_t *message)
 {
-  if (g_dbus_message_get_locked (message))
+  if (xdbus_message_get_locked (message))
     {
-      GDBusMessage *copy = g_dbus_message_copy (message, NULL);
-      g_object_unref (message);
+      xdbus_message_t *copy = xdbus_message_copy (message, NULL);
+      xobject_unref (message);
       message = copy;
     }
   return message;
 }
 
-static GDBusMessage *
-filter_function (GDBusConnection *connection,
-		 GDBusMessage    *message,
+static xdbus_message_t *
+filter_function (xdbus_connection_t *connection,
+		 xdbus_message_t    *message,
 		 xboolean_t         incoming,
 		 xpointer_t         user_data)
 {
@@ -1473,14 +1473,14 @@ filter_function (GDBusConnection *connection,
       g_printerr ("%s%s %s %d(%d) sender: %s destination: %s %s %s.%s\n",
 		client->id,
 		incoming? "->" : "<-",
-		types[g_dbus_message_get_message_type (message)],
-		g_dbus_message_get_serial (message),
-		g_dbus_message_get_reply_serial (message),
-		g_dbus_message_get_sender (message),
-		g_dbus_message_get_destination (message),
-		g_dbus_message_get_path (message),
-		g_dbus_message_get_interface (message),
-		g_dbus_message_get_member (message));
+		types[xdbus_message_get_message_type (message)],
+		xdbus_message_get_serial (message),
+		xdbus_message_get_reply_serial (message),
+		xdbus_message_get_sender (message),
+		xdbus_message_get_destination (message),
+		xdbus_message_get_path (message),
+		xdbus_message_get_interface (message),
+		xdbus_message_get_member (message));
     }
 
   if (incoming)
@@ -1492,14 +1492,14 @@ filter_function (GDBusConnection *connection,
 	  g_warning ("Failed to copy incoming message");
 	  return NULL;
 	}
-      g_dbus_message_set_sender (message, client->id);
+      xdbus_message_set_sender (message, client->id);
 
       return route_message (client, message);
     }
   else
     {
-      if (g_dbus_message_get_sender (message) == NULL ||
-          g_dbus_message_get_destination (message) == NULL)
+      if (xdbus_message_get_sender (message) == NULL ||
+          xdbus_message_get_destination (message) == NULL)
         {
           message = copy_if_locked (message);
           if (message == NULL)
@@ -1509,18 +1509,18 @@ filter_function (GDBusConnection *connection,
             }
         }
 
-      if (g_dbus_message_get_sender (message) == NULL)
-        g_dbus_message_set_sender (message, DBUS_SERVICE_NAME);
-      if (g_dbus_message_get_destination (message) == NULL)
-        g_dbus_message_set_destination (message, client->id);
+      if (xdbus_message_get_sender (message) == NULL)
+        xdbus_message_set_sender (message, DBUS_SERVICE_NAME);
+      if (xdbus_message_get_destination (message) == NULL)
+        xdbus_message_set_destination (message, client->id);
     }
 
   return message;
 }
 
 static xboolean_t
-on_new_connection (GDBusServer *server,
-		   GDBusConnection *connection,
+on_new_connection (xdbus_server_t *server,
+		   xdbus_connection_t *connection,
 		   xpointer_t user_data)
 {
   GDBusDaemon *daemon = user_data;
@@ -1529,7 +1529,7 @@ on_new_connection (GDBusServer *server,
 
   if (daemon->timeout)
     {
-      g_source_remove (daemon->timeout);
+      xsource_remove (daemon->timeout);
       daemon->timeout = 0;
     }
 
@@ -1545,20 +1545,20 @@ g_dbus_daemon_finalize (xobject_t *object)
   xlist_t *clients, *l;
 
   if (daemon->timeout)
-    g_source_remove (daemon->timeout);
+    xsource_remove (daemon->timeout);
 
-  clients = g_hash_table_get_values (daemon->clients);
+  clients = xhash_table_get_values (daemon->clients);
   for (l = clients; l != NULL; l = l->next)
     client_free (l->data);
-  g_list_free (clients);
+  xlist_free (clients);
 
-  g_assert (g_hash_table_size (daemon->clients) == 0);
-  g_assert (g_hash_table_size (daemon->names) == 0);
+  g_assert (xhash_table_size (daemon->clients) == 0);
+  g_assert (xhash_table_size (daemon->names) == 0);
 
-  g_hash_table_destroy (daemon->clients);
-  g_hash_table_destroy (daemon->names);
+  xhash_table_destroy (daemon->clients);
+  xhash_table_destroy (daemon->names);
 
-  g_object_unref (daemon->server);
+  xobject_unref (daemon->server);
 
   if (daemon->tmpdir)
     {
@@ -1576,13 +1576,13 @@ static void
 g_dbus_daemon_init (GDBusDaemon *daemon)
 {
   daemon->next_major_id = 1;
-  daemon->clients = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, NULL);
-  daemon->names = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, NULL);
+  daemon->clients = xhash_table_new_full (xstr_hash, xstr_equal, NULL, NULL);
+  daemon->names = xhash_table_new_full (xstr_hash, xstr_equal, NULL, NULL);
   daemon->guid = g_dbus_generate_guid ();
 }
 
 static xboolean_t
-initable_init (GInitable     *initable,
+initable_init (xinitable_t     *initable,
 	       xcancellable_t  *cancellable,
 	       xerror_t       **error)
 {
@@ -1594,17 +1594,17 @@ initable_init (GInitable     *initable,
     {
 #ifdef G_OS_UNIX
       if (g_unix_socket_address_abstract_names_supported ())
-	daemon->address = g_strdup ("unix:tmpdir=/tmp/gdbus-daemon");
+	daemon->address = xstrdup ("unix:tmpdir=/tmp/gdbus-daemon");
       else
 	{
 	  daemon->tmpdir = g_dir_make_tmp ("gdbus-daemon-XXXXXX", NULL);
-	  daemon->address = g_strdup_printf ("unix:tmpdir=%s", daemon->tmpdir);
+	  daemon->address = xstrdup_printf ("unix:tmpdir=%s", daemon->tmpdir);
 	}
       flags |= G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER;
 #else
       /* Don’t require authentication on Windows as that hasn’t been
        * implemented yet. */
-      daemon->address = g_strdup ("nonce-tcp:");
+      daemon->address = xstrdup ("nonce-tcp:");
       flags |= G_DBUS_SERVER_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS;
 #endif
     }
@@ -1631,8 +1631,8 @@ initable_init (GInitable     *initable,
 static void
 g_dbus_daemon_set_property (xobject_t      *object,
 			    xuint_t         prop_id,
-			    const GValue *value,
-			    GParamSpec   *pspec)
+			    const xvalue_t *value,
+			    xparam_spec_t   *pspec)
 {
   GDBusDaemon *daemon = G_DBUS_DAEMON (object);
 
@@ -1640,7 +1640,7 @@ g_dbus_daemon_set_property (xobject_t      *object,
     {
     case PROP_ADDRESS:
       g_free (daemon->address);
-      daemon->address = g_value_dup_string (value);
+      daemon->address = xvalue_dup_string (value);
       break;
 
     default:
@@ -1651,15 +1651,15 @@ g_dbus_daemon_set_property (xobject_t      *object,
 static void
 g_dbus_daemon_get_property (xobject_t    *object,
 			    xuint_t       prop_id,
-			    GValue     *value,
-			    GParamSpec *pspec)
+			    xvalue_t     *value,
+			    xparam_spec_t *pspec)
 {
   GDBusDaemon *daemon = G_DBUS_DAEMON (object);
 
   switch (prop_id)
     {
       case PROP_ADDRESS:
-	g_value_set_string (value, daemon->address);
+	xvalue_set_string (value, daemon->address);
 	break;
 
     default:
@@ -1686,7 +1686,7 @@ g_dbus_daemon_class_init (GDBusDaemonClass *klass)
 		  NULL,
 		  XTYPE_NONE, 0);
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
 				   PROP_ADDRESS,
 				   g_param_spec_string ("address",
 							"Bus Address",
@@ -1720,7 +1720,7 @@ g_dbus_daemon_iface_init (_GFreedesktopDBusIface *iface)
 }
 
 static void
-initable_iface_init (GInitableIface *initable_iface)
+initable_iface_init (xinitable_iface_t *initable_iface)
 {
   initable_iface->init = initable_init;
 }
@@ -1730,7 +1730,7 @@ _g_dbus_daemon_new (const char *address,
 		    xcancellable_t *cancellable,
 		    xerror_t **error)
 {
-  return g_initable_new (XTYPE_DBUS_DAEMON,
+  return xinitable_new (XTYPE_DBUS_DAEMON,
 			 cancellable,
 			 error,
 			 "address", address,

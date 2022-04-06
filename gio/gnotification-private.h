@@ -22,33 +22,33 @@
 
 #include "gnotification.h"
 
-const xchar_t *           g_notification_get_id                           (GNotification *notification);
+const xchar_t *           xnotification_get_id                           (xnotification_t *notification);
 
-const xchar_t *           g_notification_get_title                        (GNotification *notification);
+const xchar_t *           xnotification_get_title                        (xnotification_t *notification);
 
-const xchar_t *           g_notification_get_body                         (GNotification *notification);
+const xchar_t *           xnotification_get_body                         (xnotification_t *notification);
 
-const xchar_t *           g_notification_get_category                     (GNotification *notification);
+const xchar_t *           xnotification_get_category                     (xnotification_t *notification);
 
-xicon_t *                 g_notification_get_icon                         (GNotification *notification);
+xicon_t *                 xnotification_get_icon                         (xnotification_t *notification);
 
-GNotificationPriority   g_notification_get_priority                     (GNotification *notification);
+GNotificationPriority   xnotification_get_priority                     (xnotification_t *notification);
 
-xuint_t                   g_notification_get_n_buttons                    (GNotification *notification);
+xuint_t                   xnotification_get_n_buttons                    (xnotification_t *notification);
 
-void                    g_notification_get_button                       (GNotification  *notification,
+void                    xnotification_get_button                       (xnotification_t  *notification,
                                                                          xint_t            index,
                                                                          xchar_t         **label,
                                                                          xchar_t         **action,
                                                                          xvariant_t      **target);
 
-xint_t                    g_notification_get_button_with_action           (GNotification *notification,
+xint_t                    xnotification_get_button_with_action           (xnotification_t *notification,
                                                                          const xchar_t   *action);
 
-xboolean_t                g_notification_get_default_action               (GNotification  *notification,
+xboolean_t                xnotification_get_default_action               (xnotification_t  *notification,
                                                                          xchar_t         **action,
                                                                          xvariant_t      **target);
 
-xvariant_t *              g_notification_serialize                        (GNotification *notification);
+xvariant_t *              xnotification_serialize                        (xnotification_t *notification);
 
 #endif

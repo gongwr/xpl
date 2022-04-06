@@ -3,18 +3,18 @@
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static GDBusObjectManagerServer *manager = NULL;
+static xdbus_object_manager_server_t *manager = NULL;
 
 static xboolean_t
 on_animal_poke (ExampleAnimal          *animal,
-                GDBusMethodInvocation  *invocation,
+                xdbus_method_invocation_t  *invocation,
                 xboolean_t                make_sad,
                 xboolean_t                make_happy,
                 xpointer_t                user_data)
 {
   if ((make_sad && make_happy) || (!make_sad && !make_happy))
     {
-      g_dbus_method_invocation_return_dbus_error (invocation,
+      xdbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.GDBus.Examples.ObjectManager.Error.Failed",
                                                   "Exactly one of make_sad or make_happy must be TRUE");
       goto out;
@@ -22,9 +22,9 @@ on_animal_poke (ExampleAnimal          *animal,
 
   if (make_sad)
     {
-      if (g_strcmp0 (example_animal_get_mood (animal), "Sad") == 0)
+      if (xstrcmp0 (example_animal_get_mood (animal), "Sad") == 0)
         {
-          g_dbus_method_invocation_return_dbus_error (invocation,
+          xdbus_method_invocation_return_dbus_error (invocation,
                                                       "org.gtk.GDBus.Examples.ObjectManager.Error.SadAnimalIsSad",
                                                       "Sad animal is already sad");
           goto out;
@@ -37,9 +37,9 @@ on_animal_poke (ExampleAnimal          *animal,
 
   if (make_happy)
     {
-      if (g_strcmp0 (example_animal_get_mood (animal), "Happy") == 0)
+      if (xstrcmp0 (example_animal_get_mood (animal), "Happy") == 0)
         {
-          g_dbus_method_invocation_return_dbus_error (invocation,
+          xdbus_method_invocation_return_dbus_error (invocation,
                                                       "org.gtk.GDBus.Examples.ObjectManager.Error.HappyAnimalIsHappy",
                                                       "Happy animal is already happy");
           goto out;
@@ -58,7 +58,7 @@ on_animal_poke (ExampleAnimal          *animal,
 
 
 static void
-on_bus_acquired (GDBusConnection *connection,
+on_bus_acquired (xdbus_connection_t *connection,
                  const xchar_t     *name,
                  xpointer_t         user_data)
 {
@@ -76,7 +76,7 @@ on_bus_acquired (GDBusConnection *connection,
       ExampleAnimal *animal;
 
       /* Create a new D-Bus object at the path /example/Animals/N where N is 000..009 */
-      s = g_strdup_printf ("/example/Animals/%03d", n);
+      s = xstrdup_printf ("/example/Animals/%03d", n);
       object = example_object_skeleton_new (s);
       g_free (s);
 
@@ -87,7 +87,7 @@ on_bus_acquired (GDBusConnection *connection,
       animal = example_animal_skeleton_new ();
       example_animal_set_mood (animal, "Happy");
       example_object_skeleton_set_animal (object, animal);
-      g_object_unref (animal);
+      xobject_unref (animal);
 
       /* Cats are odd animals - so some of our objects implement the
        * org.gtk.GDBus.Example.ObjectManager.Cat interface in addition
@@ -98,7 +98,7 @@ on_bus_acquired (GDBusConnection *connection,
           ExampleCat *cat;
           cat = example_cat_skeleton_new ();
           example_object_skeleton_set_cat (object, cat);
-          g_object_unref (cat);
+          xobject_unref (cat);
         }
 
       /* Handle Poke() D-Bus method invocations on the .Animal interface */
@@ -109,7 +109,7 @@ on_bus_acquired (GDBusConnection *connection,
 
       /* Export the object (@manager takes its own reference to @object) */
       g_dbus_object_manager_server_export (manager, G_DBUS_OBJECT_SKELETON (object));
-      g_object_unref (object);
+      xobject_unref (object);
     }
 
   /* Export all objects */
@@ -117,7 +117,7 @@ on_bus_acquired (GDBusConnection *connection,
 }
 
 static void
-on_name_acquired (GDBusConnection *connection,
+on_name_acquired (xdbus_connection_t *connection,
                   const xchar_t     *name,
                   xpointer_t         user_data)
 {
@@ -125,7 +125,7 @@ on_name_acquired (GDBusConnection *connection,
 }
 
 static void
-on_name_lost (GDBusConnection *connection,
+on_name_lost (xdbus_connection_t *connection,
               const xchar_t     *name,
               xpointer_t         user_data)
 {
@@ -136,10 +136,10 @@ on_name_lost (GDBusConnection *connection,
 xint_t
 main (xint_t argc, xchar_t *argv[])
 {
-  GMainLoop *loop;
+  xmain_loop_t *loop;
   xuint_t id;
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   id = g_bus_own_name (G_BUS_TYPE_SESSION,
                        "org.gtk.GDBus.Examples.ObjectManager",
@@ -151,10 +151,10 @@ main (xint_t argc, xchar_t *argv[])
                        loop,
                        NULL);
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   g_bus_unown_name (id);
-  g_main_loop_unref (loop);
+  xmain_loop_unref (loop);
 
   return 0;
 }

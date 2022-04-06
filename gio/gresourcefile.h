@@ -26,11 +26,11 @@
 G_BEGIN_DECLS
 
 #define XTYPE_RESOURCE_FILE         (_xresource_file_get_type ())
-#define XRESOURCE_FILE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_RESOURCE_FILE, xresource_file_t))
-#define XRESOURCE_FILE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_RESOURCE_FILE, xresource_file_class_t))
+#define XRESOURCE_FILE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_RESOURCE_FILE, xresource_file))
+#define XRESOURCE_FILE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_RESOURCE_FILE, xresource_file_class))
 #define X_IS_RESOURCE_FILE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_RESOURCE_FILE))
 #define X_IS_RESOURCE_FILE_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_RESOURCE_FILE))
-#define XRESOURCE_FILE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_RESOURCE_FILE, xresource_file_class_t))
+#define XRESOURCE_FILE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_RESOURCE_FILE, xresource_file_class))
 
 typedef struct _xresource_file        xresource_file_t;
 typedef struct _xresource_file_class   xresource_file_class_t;

@@ -7,13 +7,13 @@ int
 main (int argc, char *argv[])
 {
   GDBusDaemon *daemon;
-  GMainLoop *loop;
+  xmain_loop_t *loop;
   const char *address = NULL;
   const char *config_file = NULL;
   xerror_t *error = NULL;
   xboolean_t print_address = FALSE;
   xboolean_t print_env = FALSE;
-  GOptionContext *context;
+  xoption_context_t *context;
   GOptionEntry entries[] = {
     { "address", 0, 0, G_OPTION_ARG_STRING, &address, N_("Address to listen on"), NULL },
     { "config-file", 0, 0, G_OPTION_ARG_STRING, &config_file, N_("Ignored, for compat with GTestDbus"), NULL },
@@ -44,7 +44,7 @@ main (int argc, char *argv[])
     }
 
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   if (argc >= 2)
     address = argv[1];
@@ -62,9 +62,9 @@ main (int argc, char *argv[])
   if (print_address)
     g_print ("%s\n", _g_dbus_daemon_get_address (daemon));
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
-  g_main_loop_unref (loop);
+  xmain_loop_unref (loop);
 
   return 0;
 }

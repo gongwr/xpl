@@ -40,9 +40,9 @@
  * flags types. (Flags types are like enumerations, but allow their
  * values to be combined by bitwise or). A registered enumeration or
  * flags type associates a name and a nickname with each allowed
- * value, and the methods g_enum_get_value_by_name(),
- * g_enum_get_value_by_nick(), g_flags_get_value_by_name() and
- * g_flags_get_value_by_nick() can look up values by their name or
+ * value, and the methods xenum_get_value_by_name(),
+ * xenum_get_value_by_nick(), xflags_get_value_by_name() and
+ * xflags_get_value_by_nick() can look up values by their name or
  * nickname.  When an enumeration or flags type is registered with the
  * GLib type system, it can be used as value type for object
  * properties, using g_param_spec_enum() or g_param_spec_flags().
@@ -53,42 +53,42 @@
  *
  * Example of how to get a string representation of an enum value:
  * |[<!-- language="C" -->
- * GEnumClass *enum_class;
- * GEnumValue *enum_value;
+ * xenum_class_t *enum_class;
+ * xenum_value_t *enum_value;
  *
- * enum_class = g_type_class_ref (MAMAN_TYPE_MY_ENUM);
- * enum_value = g_enum_get_value (enum_class, MAMAN_MY_ENUM_FOO);
+ * enum_class = xtype_class_ref (MAMAN_TYPE_MY_ENUM);
+ * enum_value = xenum_get_value (enum_class, MAMAN_MY_ENUM_FOO);
  *
  * g_print ("Name: %s\n", enum_value->value_name);
  *
- * g_type_class_unref (enum_class);
+ * xtype_class_unref (enum_class);
  * ]|
  */
 
 
 /* --- prototypes --- */
-static void	g_enum_class_init		(GEnumClass	*class,
+static void	xenum_class_init		(xenum_class_t	*class,
 						 xpointer_t	 class_data);
-static void	g_flags_class_init		(GFlagsClass	*class,
+static void	xflags_class_init		(xflags_class_t	*class,
 						 xpointer_t	 class_data);
-static void	value_flags_enum_init		(GValue		*value);
-static void	value_flags_enum_copy_value	(const GValue	*src_value,
-						 GValue		*dest_value);
-static xchar_t*	value_flags_enum_collect_value  (GValue		*value,
+static void	value_flags_enum_init		(xvalue_t		*value);
+static void	value_flags_enum_copy_value	(const xvalue_t	*src_value,
+						 xvalue_t		*dest_value);
+static xchar_t*	value_flags_enum_collect_value  (xvalue_t		*value,
 						 xuint_t           n_collect_values,
-						 GTypeCValue    *collect_values,
+						 xtype_c_value_t    *collect_values,
 						 xuint_t           collect_flags);
-static xchar_t*	value_flags_enum_lcopy_value	(const GValue	*value,
+static xchar_t*	value_flags_enum_lcopy_value	(const xvalue_t	*value,
 						 xuint_t           n_collect_values,
-						 GTypeCValue    *collect_values,
+						 xtype_c_value_t    *collect_values,
 						 xuint_t           collect_flags);
 
 /* --- functions --- */
 void
-_g_enum_types_init (void)
+_xenum_types_init (void)
 {
   static xboolean_t initialized = FALSE;
-  static const GTypeValueTable flags_enum_value_table = {
+  static const xtype_value_table_t flags_enum_value_table = {
     value_flags_enum_init,	    /* value_init */
     NULL,			    /* value_free */
     value_flags_enum_copy_value,    /* value_copy */
@@ -98,7 +98,7 @@ _g_enum_types_init (void)
     "p",			    /* lcopy_format */
     value_flags_enum_lcopy_value,   /* lcopy_value */
   };
-  GTypeInfo info = {
+  xtype_info_t info = {
     0,                          /* class_size */
     NULL,                       /* base_init */
     NULL,                       /* base_destroy */
@@ -120,36 +120,36 @@ _g_enum_types_init (void)
 
   /* XTYPE_ENUM
    */
-  info.class_size = sizeof (GEnumClass);
-  type = g_type_register_fundamental (XTYPE_ENUM, g_intern_static_string ("GEnum"), &info, &finfo,
+  info.class_size = sizeof (xenum_class_t);
+  type = xtype_register_fundamental (XTYPE_ENUM, g_intern_static_string ("xenum_t"), &info, &finfo,
 				      XTYPE_FLAG_ABSTRACT | XTYPE_FLAG_VALUE_ABSTRACT);
   g_assert (type == XTYPE_ENUM);
 
   /* XTYPE_FLAGS
    */
-  info.class_size = sizeof (GFlagsClass);
-  type = g_type_register_fundamental (XTYPE_FLAGS, g_intern_static_string ("GFlags"), &info, &finfo,
+  info.class_size = sizeof (xflags_class_t);
+  type = xtype_register_fundamental (XTYPE_FLAGS, g_intern_static_string ("GFlags"), &info, &finfo,
 				      XTYPE_FLAG_ABSTRACT | XTYPE_FLAG_VALUE_ABSTRACT);
   g_assert (type == XTYPE_FLAGS);
 }
 
 static void
-value_flags_enum_init (GValue *value)
+value_flags_enum_init (xvalue_t *value)
 {
   value->data[0].v_long = 0;
 }
 
 static void
-value_flags_enum_copy_value (const GValue *src_value,
-			     GValue	  *dest_value)
+value_flags_enum_copy_value (const xvalue_t *src_value,
+			     xvalue_t	  *dest_value)
 {
   dest_value->data[0].v_long = src_value->data[0].v_long;
 }
 
 static xchar_t*
-value_flags_enum_collect_value (GValue      *value,
+value_flags_enum_collect_value (xvalue_t      *value,
 				xuint_t        n_collect_values,
-				GTypeCValue *collect_values,
+				xtype_c_value_t *collect_values,
 				xuint_t        collect_flags)
 {
   if (G_VALUE_HOLDS_ENUM (value))
@@ -161,14 +161,14 @@ value_flags_enum_collect_value (GValue      *value,
 }
 
 static xchar_t*
-value_flags_enum_lcopy_value (const GValue *value,
+value_flags_enum_lcopy_value (const xvalue_t *value,
 			      xuint_t         n_collect_values,
-			      GTypeCValue  *collect_values,
+			      xtype_c_value_t  *collect_values,
 			      xuint_t         collect_flags)
 {
   xint_t *int_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (int_p != NULL, g_strdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  g_return_val_if_fail (int_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   *int_p = value->data[0].v_long;
 
@@ -176,9 +176,9 @@ value_flags_enum_lcopy_value (const GValue *value,
 }
 
 /**
- * g_enum_register_static:
+ * xenum_register_static:
  * @name: A nul-terminated string used as the name of the new type.
- * @const_static_values: An array of #GEnumValue structs for the possible
+ * @const_static_values: An array of #xenum_value_t structs for the possible
  *  enumeration values. The array is terminated by a struct with all
  *  members being 0. xobject_t keeps a reference to the data, so it cannot
  *  be stack-allocated.
@@ -187,19 +187,19 @@ value_flags_enum_lcopy_value (const GValue *value,
  *
  * It is normally more convenient to let [glib-mkenums][glib-mkenums],
  * generate a my_enum_get_type() function from a usual C enumeration
- * definition  than to write one yourself using g_enum_register_static().
+ * definition  than to write one yourself using xenum_register_static().
  *
  * Returns: The new type identifier.
  */
 xtype_t
-g_enum_register_static (const xchar_t	 *name,
-			const GEnumValue *const_static_values)
+xenum_register_static (const xchar_t	 *name,
+			const xenum_value_t *const_static_values)
 {
-  GTypeInfo enum_type_info = {
-    sizeof (GEnumClass), /* class_size */
+  xtype_info_t enum_type_info = {
+    sizeof (xenum_class_t), /* class_size */
     NULL,                /* base_init */
     NULL,                /* base_finalize */
-    (GClassInitFunc) g_enum_class_init,
+    (xclass_init_func_t) xenum_class_init,
     NULL,                /* class_finalize */
     NULL,                /* class_data */
     0,                   /* instance_size */
@@ -214,15 +214,15 @@ g_enum_register_static (const xchar_t	 *name,
 
   enum_type_info.class_data = const_static_values;
 
-  type = g_type_register_static (XTYPE_ENUM, name, &enum_type_info, 0);
+  type = xtype_register_static (XTYPE_ENUM, name, &enum_type_info, 0);
 
   return type;
 }
 
 /**
- * g_flags_register_static:
+ * xflags_register_static:
  * @name: A nul-terminated string used as the name of the new type.
- * @const_static_values: An array of #GFlagsValue structs for the possible
+ * @const_static_values: An array of #xflags_value_t structs for the possible
  *  flags values. The array is terminated by a struct with all members being 0.
  *  xobject_t keeps a reference to the data, so it cannot be stack-allocated.
  *
@@ -230,19 +230,19 @@ g_enum_register_static (const xchar_t	 *name,
  *
  * It is normally more convenient to let [glib-mkenums][glib-mkenums]
  * generate a my_flags_get_type() function from a usual C enumeration
- * definition than to write one yourself using g_flags_register_static().
+ * definition than to write one yourself using xflags_register_static().
  *
  * Returns: The new type identifier.
  */
 xtype_t
-g_flags_register_static (const xchar_t	   *name,
-			 const GFlagsValue *const_static_values)
+xflags_register_static (const xchar_t	   *name,
+			 const xflags_value_t *const_static_values)
 {
-  GTypeInfo flags_type_info = {
-    sizeof (GFlagsClass), /* class_size */
+  xtype_info_t flags_type_info = {
+    sizeof (xflags_class_t), /* class_size */
     NULL,                 /* base_init */
     NULL,                 /* base_finalize */
-    (GClassInitFunc) g_flags_class_init,
+    (xclass_init_func_t) xflags_class_init,
     NULL,                 /* class_finalize */
     NULL,                 /* class_data */
     0,                    /* instance_size */
@@ -257,16 +257,16 @@ g_flags_register_static (const xchar_t	   *name,
 
   flags_type_info.class_data = const_static_values;
 
-  type = g_type_register_static (XTYPE_FLAGS, name, &flags_type_info, 0);
+  type = xtype_register_static (XTYPE_FLAGS, name, &flags_type_info, 0);
 
   return type;
 }
 
 /**
- * g_enum_complete_type_info:
- * @g_enum_type: the type identifier of the type being completed
- * @info: (out callee-allocates): the #GTypeInfo struct to be filled in
- * @const_values: An array of #GEnumValue structs for the possible
+ * xenum_complete_type_info:
+ * @xenum_type: the type identifier of the type being completed
+ * @info: (out callee-allocates): the #xtype_info_t struct to be filled in
+ * @const_values: An array of #xenum_value_t structs for the possible
  *  enumeration values. The array is terminated by a struct with all
  *  members being 0.
  *
@@ -278,67 +278,67 @@ g_flags_register_static (const xchar_t	   *name,
  * static void
  * my_enum_complete_type_info (GTypePlugin     *plugin,
  *                             xtype_t            g_type,
- *                             GTypeInfo       *info,
- *                             GTypeValueTable *value_table)
+ *                             xtype_info_t       *info,
+ *                             xtype_value_table_t *value_table)
  * {
- *   static const GEnumValue values[] = {
+ *   static const xenum_value_t values[] = {
  *     { MY_ENUM_FOO, "MY_ENUM_FOO", "foo" },
  *     { MY_ENUM_BAR, "MY_ENUM_BAR", "bar" },
  *     { 0, NULL, NULL }
  *   };
  *
- *   g_enum_complete_type_info (type, info, values);
+ *   xenum_complete_type_info (type, info, values);
  * }
  * ]|
  */
 void
-g_enum_complete_type_info (xtype_t	     g_enum_type,
-			   GTypeInfo	    *info,
-			   const GEnumValue *const_values)
+xenum_complete_type_info (xtype_t	     xenum_type,
+			   xtype_info_t	    *info,
+			   const xenum_value_t *const_values)
 {
-  g_return_if_fail (XTYPE_IS_ENUM (g_enum_type));
+  g_return_if_fail (XTYPE_IS_ENUM (xenum_type));
   g_return_if_fail (info != NULL);
   g_return_if_fail (const_values != NULL);
 
-  info->class_size = sizeof (GEnumClass);
+  info->class_size = sizeof (xenum_class_t);
   info->base_init = NULL;
   info->base_finalize = NULL;
-  info->class_init = (GClassInitFunc) g_enum_class_init;
+  info->class_init = (xclass_init_func_t) xenum_class_init;
   info->class_finalize = NULL;
   info->class_data = const_values;
 }
 
 /**
- * g_flags_complete_type_info:
- * @g_flags_type: the type identifier of the type being completed
- * @info: (out callee-allocates): the #GTypeInfo struct to be filled in
- * @const_values: An array of #GFlagsValue structs for the possible
+ * xflags_complete_type_info:
+ * @xflags_type: the type identifier of the type being completed
+ * @info: (out callee-allocates): the #xtype_info_t struct to be filled in
+ * @const_values: An array of #xflags_value_t structs for the possible
  *  enumeration values. The array is terminated by a struct with all
  *  members being 0.
  *
  * This function is meant to be called from the complete_type_info()
  * function of a #GTypePlugin implementation, see the example for
- * g_enum_complete_type_info() above.
+ * xenum_complete_type_info() above.
  */
 void
-g_flags_complete_type_info (xtype_t	       g_flags_type,
-			    GTypeInfo	      *info,
-			    const GFlagsValue *const_values)
+xflags_complete_type_info (xtype_t	       xflags_type,
+			    xtype_info_t	      *info,
+			    const xflags_value_t *const_values)
 {
-  g_return_if_fail (XTYPE_IS_FLAGS (g_flags_type));
+  g_return_if_fail (XTYPE_IS_FLAGS (xflags_type));
   g_return_if_fail (info != NULL);
   g_return_if_fail (const_values != NULL);
 
-  info->class_size = sizeof (GFlagsClass);
+  info->class_size = sizeof (xflags_class_t);
   info->base_init = NULL;
   info->base_finalize = NULL;
-  info->class_init = (GClassInitFunc) g_flags_class_init;
+  info->class_init = (xclass_init_func_t) xflags_class_init;
   info->class_finalize = NULL;
   info->class_data = const_values;
 }
 
 static void
-g_enum_class_init (GEnumClass *class,
+xenum_class_init (xenum_class_t *class,
 		   xpointer_t    class_data)
 {
   g_return_if_fail (X_IS_ENUM_CLASS (class));
@@ -350,7 +350,7 @@ g_enum_class_init (GEnumClass *class,
 
   if (class->values)
     {
-      GEnumValue *values;
+      xenum_value_t *values;
 
       class->minimum = class->values->value;
       class->maximum = class->values->value;
@@ -364,7 +364,7 @@ g_enum_class_init (GEnumClass *class,
 }
 
 static void
-g_flags_class_init (GFlagsClass *class,
+xflags_class_init (xflags_class_t *class,
 		    xpointer_t	 class_data)
 {
   g_return_if_fail (X_IS_FLAGS_CLASS (class));
@@ -375,7 +375,7 @@ g_flags_class_init (GFlagsClass *class,
 
   if (class->values)
     {
-      GFlagsValue *values;
+      xflags_value_t *values;
 
       for (values = class->values; values->value_name; values++)
 	{
@@ -386,18 +386,18 @@ g_flags_class_init (GFlagsClass *class,
 }
 
 /**
- * g_enum_get_value_by_name:
- * @enum_class: a #GEnumClass
+ * xenum_get_value_by_name:
+ * @enum_class: a #xenum_class_t
  * @name: the name to look up
  *
- * Looks up a #GEnumValue by name.
+ * Looks up a #xenum_value_t by name.
  *
- * Returns: (transfer none) (nullable): the #GEnumValue with name @name,
+ * Returns: (transfer none) (nullable): the #xenum_value_t with name @name,
  *          or %NULL if the enumeration doesn't have a member
  *          with that name
  */
-GEnumValue*
-g_enum_get_value_by_name (GEnumClass  *enum_class,
+xenum_value_t*
+xenum_get_value_by_name (xenum_class_t  *enum_class,
 			  const xchar_t *name)
 {
   g_return_val_if_fail (X_IS_ENUM_CLASS (enum_class), NULL);
@@ -405,7 +405,7 @@ g_enum_get_value_by_name (GEnumClass  *enum_class,
 
   if (enum_class->n_values)
     {
-      GEnumValue *enum_value;
+      xenum_value_t *enum_value;
 
       for (enum_value = enum_class->values; enum_value->value_name; enum_value++)
 	if (strcmp (name, enum_value->value_name) == 0)
@@ -416,17 +416,17 @@ g_enum_get_value_by_name (GEnumClass  *enum_class,
 }
 
 /**
- * g_flags_get_value_by_name:
- * @flags_class: a #GFlagsClass
+ * xflags_get_value_by_name:
+ * @flags_class: a #xflags_class_t
  * @name: the name to look up
  *
- * Looks up a #GFlagsValue by name.
+ * Looks up a #xflags_value_t by name.
  *
- * Returns: (transfer none) (nullable): the #GFlagsValue with name @name,
+ * Returns: (transfer none) (nullable): the #xflags_value_t with name @name,
  *          or %NULL if there is no flag with that name
  */
-GFlagsValue*
-g_flags_get_value_by_name (GFlagsClass *flags_class,
+xflags_value_t*
+xflags_get_value_by_name (xflags_class_t *flags_class,
 			   const xchar_t *name)
 {
   g_return_val_if_fail (X_IS_FLAGS_CLASS (flags_class), NULL);
@@ -434,7 +434,7 @@ g_flags_get_value_by_name (GFlagsClass *flags_class,
 
   if (flags_class->n_values)
     {
-      GFlagsValue *flags_value;
+      xflags_value_t *flags_value;
 
       for (flags_value = flags_class->values; flags_value->value_name; flags_value++)
 	if (strcmp (name, flags_value->value_name) == 0)
@@ -445,18 +445,18 @@ g_flags_get_value_by_name (GFlagsClass *flags_class,
 }
 
 /**
- * g_enum_get_value_by_nick:
- * @enum_class: a #GEnumClass
+ * xenum_get_value_by_nick:
+ * @enum_class: a #xenum_class_t
  * @nick: the nickname to look up
  *
- * Looks up a #GEnumValue by nickname.
+ * Looks up a #xenum_value_t by nickname.
  *
- * Returns: (transfer none) (nullable): the #GEnumValue with nickname @nick,
+ * Returns: (transfer none) (nullable): the #xenum_value_t with nickname @nick,
  *          or %NULL if the enumeration doesn't have a member
  *          with that nickname
  */
-GEnumValue*
-g_enum_get_value_by_nick (GEnumClass  *enum_class,
+xenum_value_t*
+xenum_get_value_by_nick (xenum_class_t  *enum_class,
 			  const xchar_t *nick)
 {
   g_return_val_if_fail (X_IS_ENUM_CLASS (enum_class), NULL);
@@ -464,7 +464,7 @@ g_enum_get_value_by_nick (GEnumClass  *enum_class,
 
   if (enum_class->n_values)
     {
-      GEnumValue *enum_value;
+      xenum_value_t *enum_value;
 
       for (enum_value = enum_class->values; enum_value->value_name; enum_value++)
 	if (enum_value->value_nick && strcmp (nick, enum_value->value_nick) == 0)
@@ -475,17 +475,17 @@ g_enum_get_value_by_nick (GEnumClass  *enum_class,
 }
 
 /**
- * g_flags_get_value_by_nick:
- * @flags_class: a #GFlagsClass
+ * xflags_get_value_by_nick:
+ * @flags_class: a #xflags_class_t
  * @nick: the nickname to look up
  *
- * Looks up a #GFlagsValue by nickname.
+ * Looks up a #xflags_value_t by nickname.
  *
- * Returns: (transfer none) (nullable): the #GFlagsValue with nickname @nick,
+ * Returns: (transfer none) (nullable): the #xflags_value_t with nickname @nick,
  *          or %NULL if there is no flag with that nickname
  */
-GFlagsValue*
-g_flags_get_value_by_nick (GFlagsClass *flags_class,
+xflags_value_t*
+xflags_get_value_by_nick (xflags_class_t *flags_class,
 			   const xchar_t *nick)
 {
   g_return_val_if_fail (X_IS_FLAGS_CLASS (flags_class), NULL);
@@ -493,7 +493,7 @@ g_flags_get_value_by_nick (GFlagsClass *flags_class,
 
   if (flags_class->n_values)
     {
-      GFlagsValue *flags_value;
+      xflags_value_t *flags_value;
 
       for (flags_value = flags_class->values; flags_value->value_nick; flags_value++)
 	if (flags_value->value_nick && strcmp (nick, flags_value->value_nick) == 0)
@@ -504,24 +504,24 @@ g_flags_get_value_by_nick (GFlagsClass *flags_class,
 }
 
 /**
- * g_enum_get_value:
- * @enum_class: a #GEnumClass
+ * xenum_get_value:
+ * @enum_class: a #xenum_class_t
  * @value: the value to look up
  *
- * Returns the #GEnumValue for a value.
+ * Returns the #xenum_value_t for a value.
  *
- * Returns: (transfer none) (nullable): the #GEnumValue for @value, or %NULL
+ * Returns: (transfer none) (nullable): the #xenum_value_t for @value, or %NULL
  *          if @value is not a member of the enumeration
  */
-GEnumValue*
-g_enum_get_value (GEnumClass *enum_class,
+xenum_value_t*
+xenum_get_value (xenum_class_t *enum_class,
 		  xint_t	      value)
 {
   g_return_val_if_fail (X_IS_ENUM_CLASS (enum_class), NULL);
 
   if (enum_class->n_values)
     {
-      GEnumValue *enum_value;
+      xenum_value_t *enum_value;
 
       for (enum_value = enum_class->values; enum_value->value_name; enum_value++)
 	if (enum_value->value == value)
@@ -532,24 +532,24 @@ g_enum_get_value (GEnumClass *enum_class,
 }
 
 /**
- * g_flags_get_first_value:
- * @flags_class: a #GFlagsClass
+ * xflags_get_first_value:
+ * @flags_class: a #xflags_class_t
  * @value: the value
  *
- * Returns the first #GFlagsValue which is set in @value.
+ * Returns the first #xflags_value_t which is set in @value.
  *
- * Returns: (transfer none) (nullable): the first #GFlagsValue which is set in
+ * Returns: (transfer none) (nullable): the first #xflags_value_t which is set in
  *          @value, or %NULL if none is set
  */
-GFlagsValue*
-g_flags_get_first_value (GFlagsClass *flags_class,
+xflags_value_t*
+xflags_get_first_value (xflags_class_t *flags_class,
 			 xuint_t	      value)
 {
   g_return_val_if_fail (X_IS_FLAGS_CLASS (flags_class), NULL);
 
   if (flags_class->n_values)
     {
-      GFlagsValue *flags_value;
+      xflags_value_t *flags_value;
 
       if (value == 0)
         {
@@ -569,8 +569,8 @@ g_flags_get_first_value (GFlagsClass *flags_class,
 }
 
 /**
- * g_enum_to_string:
- * @g_enum_type: the type identifier of a #GEnumClass type
+ * xenum_to_string:
+ * @xenum_type: the type identifier of a #xenum_class_t type
  * @value: the value
  *
  * Pretty-prints @value in the form of the enum’s name.
@@ -583,35 +583,35 @@ g_flags_get_first_value (GFlagsClass *flags_class,
  * Since: 2.54
  */
 xchar_t *
-g_enum_to_string (xtype_t g_enum_type,
+xenum_to_string (xtype_t xenum_type,
                   xint_t  value)
 {
   xchar_t *result;
-  GEnumClass *enum_class;
-  GEnumValue *enum_value;
+  xenum_class_t *enum_class;
+  xenum_value_t *enum_value;
 
-  g_return_val_if_fail (XTYPE_IS_ENUM (g_enum_type), NULL);
+  g_return_val_if_fail (XTYPE_IS_ENUM (xenum_type), NULL);
 
-  enum_class = g_type_class_ref (g_enum_type);
+  enum_class = xtype_class_ref (xenum_type);
 
   /* Already warned */
   if (enum_class == NULL)
-    return g_strdup_printf ("%d", value);
+    return xstrdup_printf ("%d", value);
 
-  enum_value = g_enum_get_value (enum_class, value);
+  enum_value = xenum_get_value (enum_class, value);
 
   if (enum_value == NULL)
-    result = g_strdup_printf ("%d", value);
+    result = xstrdup_printf ("%d", value);
   else
-    result = g_strdup (enum_value->value_name);
+    result = xstrdup (enum_value->value_name);
 
-  g_type_class_unref (enum_class);
+  xtype_class_unref (enum_class);
   return result;
 }
 
 /*
- * g_flags_get_value_string:
- * @flags_class: a #GFlagsClass
+ * xflags_get_value_string:
+ * @flags_class: a #xflags_class_t
  * @value: the value
  *
  * Pretty-prints @value in the form of the flag names separated by ` | ` and
@@ -625,23 +625,23 @@ g_enum_to_string (xtype_t g_enum_type,
  * Since: 2.54
  */
 static xchar_t *
-g_flags_get_value_string (GFlagsClass *flags_class,
+xflags_get_value_string (xflags_class_t *flags_class,
                           xuint_t        value)
 {
-  GString *str;
-  GFlagsValue *flags_value;
+  xstring_t *str;
+  xflags_value_t *flags_value;
 
   g_return_val_if_fail (X_IS_FLAGS_CLASS (flags_class), NULL);
 
-  str = g_string_new (NULL);
+  str = xstring_new (NULL);
 
   while ((str->len == 0 || value != 0) &&
-         (flags_value = g_flags_get_first_value (flags_class, value)) != NULL)
+         (flags_value = xflags_get_first_value (flags_class, value)) != NULL)
     {
       if (str->len > 0)
-        g_string_append (str, " | ");
+        xstring_append (str, " | ");
 
-      g_string_append (str, flags_value->value_name);
+      xstring_append (str, flags_value->value_name);
 
       value &= ~flags_value->value;
     }
@@ -650,17 +650,17 @@ g_flags_get_value_string (GFlagsClass *flags_class,
   if (value != 0 || str->len == 0)
     {
       if (str->len > 0)
-        g_string_append (str, " | ");
+        xstring_append (str, " | ");
 
-      g_string_append_printf (str, "0x%x", value);
+      xstring_append_printf (str, "0x%x", value);
     }
 
-  return g_string_free (str, FALSE);
+  return xstring_free (str, FALSE);
 }
 
 /**
- * g_flags_to_string:
- * @flags_type: the type identifier of a #GFlagsClass type
+ * xflags_to_string:
+ * @flags_type: the type identifier of a #xflags_class_t type
  * @value: the value
  *
  * Pretty-prints @value in the form of the flag names separated by ` | ` and
@@ -674,36 +674,36 @@ g_flags_get_value_string (GFlagsClass *flags_class,
  * Since: 2.54
  */
 xchar_t *
-g_flags_to_string (xtype_t flags_type,
+xflags_to_string (xtype_t flags_type,
                    xuint_t value)
 {
   xchar_t *result;
-  GFlagsClass *flags_class;
+  xflags_class_t *flags_class;
 
   g_return_val_if_fail (XTYPE_IS_FLAGS (flags_type), NULL);
 
-  flags_class = g_type_class_ref (flags_type);
+  flags_class = xtype_class_ref (flags_type);
 
   /* Already warned */
   if (flags_class == NULL)
     return NULL;
 
-  result = g_flags_get_value_string (flags_class, value);
+  result = xflags_get_value_string (flags_class, value);
 
-  g_type_class_unref (flags_class);
+  xtype_class_unref (flags_class);
   return result;
 }
 
 
 /**
- * g_value_set_enum:
- * @value: a valid #GValue whose type is derived from %XTYPE_ENUM
+ * xvalue_set_enum:
+ * @value: a valid #xvalue_t whose type is derived from %XTYPE_ENUM
  * @v_enum: enum value to be set
  *
- * Set the contents of a %XTYPE_ENUM #GValue to @v_enum.
+ * Set the contents of a %XTYPE_ENUM #xvalue_t to @v_enum.
  */
 void
-g_value_set_enum (GValue *value,
+xvalue_set_enum (xvalue_t *value,
 		  xint_t    v_enum)
 {
   g_return_if_fail (G_VALUE_HOLDS_ENUM (value));
@@ -712,15 +712,15 @@ g_value_set_enum (GValue *value,
 }
 
 /**
- * g_value_get_enum:
- * @value: a valid #GValue whose type is derived from %XTYPE_ENUM
+ * xvalue_get_enum:
+ * @value: a valid #xvalue_t whose type is derived from %XTYPE_ENUM
  *
- * Get the contents of a %XTYPE_ENUM #GValue.
+ * Get the contents of a %XTYPE_ENUM #xvalue_t.
  *
  * Returns: enum contents of @value
  */
 xint_t
-g_value_get_enum (const GValue *value)
+xvalue_get_enum (const xvalue_t *value)
 {
   g_return_val_if_fail (G_VALUE_HOLDS_ENUM (value), 0);
 
@@ -728,14 +728,14 @@ g_value_get_enum (const GValue *value)
 }
 
 /**
- * g_value_set_flags:
- * @value: a valid #GValue whose type is derived from %XTYPE_FLAGS
+ * xvalue_set_flags:
+ * @value: a valid #xvalue_t whose type is derived from %XTYPE_FLAGS
  * @v_flags: flags value to be set
  *
- * Set the contents of a %XTYPE_FLAGS #GValue to @v_flags.
+ * Set the contents of a %XTYPE_FLAGS #xvalue_t to @v_flags.
  */
 void
-g_value_set_flags (GValue *value,
+xvalue_set_flags (xvalue_t *value,
 		   xuint_t   v_flags)
 {
   g_return_if_fail (G_VALUE_HOLDS_FLAGS (value));
@@ -744,15 +744,15 @@ g_value_set_flags (GValue *value,
 }
 
 /**
- * g_value_get_flags:
- * @value: a valid #GValue whose type is derived from %XTYPE_FLAGS
+ * xvalue_get_flags:
+ * @value: a valid #xvalue_t whose type is derived from %XTYPE_FLAGS
  *
- * Get the contents of a %XTYPE_FLAGS #GValue.
+ * Get the contents of a %XTYPE_FLAGS #xvalue_t.
  *
  * Returns: flags contents of @value
  */
 xuint_t
-g_value_get_flags (const GValue *value)
+xvalue_get_flags (const xvalue_t *value)
 {
   g_return_val_if_fail (G_VALUE_HOLDS_FLAGS (value), 0);
 

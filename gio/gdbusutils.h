@@ -47,16 +47,16 @@ xboolean_t g_dbus_is_error_name (const xchar_t *string);
 
 XPL_AVAILABLE_IN_ALL
 void g_dbus_gvariant_to_gvalue (xvariant_t  *value,
-                                GValue    *out_gvalue);
+                                xvalue_t    *out_gvalue);
 XPL_AVAILABLE_IN_ALL
-xvariant_t *g_dbus_gvalue_to_gvariant (const GValue         *gvalue,
+xvariant_t *g_dbus_gvalue_to_gvariant (const xvalue_t         *gvalue,
                                      const xvariant_type_t   *type);
 XPL_AVAILABLE_IN_2_68
-xchar_t *g_dbus_escape_object_path_bytestring (const guint8 *bytes);
+xchar_t *g_dbus_escape_object_path_bytestring (const xuint8_t *bytes);
 XPL_AVAILABLE_IN_2_68
 xchar_t *g_dbus_escape_object_path (const xchar_t *s);
 XPL_AVAILABLE_IN_2_68
-guint8 *g_dbus_unescape_object_path (const xchar_t *s);
+xuint8_t *g_dbus_unescape_object_path (const xchar_t *s);
 
 G_END_DECLS
 

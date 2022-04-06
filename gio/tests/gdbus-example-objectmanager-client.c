@@ -4,7 +4,7 @@
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-print_objects (GDBusObjectManager *manager)
+print_objects (xdbus_object_manager_t *manager)
 {
   xlist_t *objects;
   xlist_t *l;
@@ -21,10 +21,10 @@ print_objects (GDBusObjectManager *manager)
       interfaces = g_dbus_object_get_interfaces (G_DBUS_OBJECT (object));
       for (ll = interfaces; ll != NULL; ll = ll->next)
         {
-          GDBusInterface *interface = G_DBUS_INTERFACE (ll->data);
+          xdbus_interface_t *interface = G_DBUS_INTERFACE (ll->data);
           g_print ("   - Interface %s\n", g_dbus_interface_get_info (interface)->name);
 
-          /* Note that @interface is really a GDBusProxy instance - and additionally also
+          /* Note that @interface is really a xdbus_proxy_t instance - and additionally also
            * an ExampleAnimal or ExampleCat instance - either of these can be used to
            * invoke methods on the remote object. For example, the generated function
            *
@@ -42,14 +42,14 @@ print_objects (GDBusObjectManager *manager)
            * can be used to get the value of the :Mood property.
            */
         }
-      g_list_free_full (interfaces, g_object_unref);
+      xlist_free_full (interfaces, xobject_unref);
     }
-  g_list_free_full (objects, g_object_unref);
+  xlist_free_full (objects, xobject_unref);
 }
 
 static void
-on_object_added (GDBusObjectManager *manager,
-                 GDBusObject        *object,
+on_object_added (xdbus_object_manager_t *manager,
+                 xdbus_object_t        *object,
                  xpointer_t            user_data)
 {
   xchar_t *owner;
@@ -59,8 +59,8 @@ on_object_added (GDBusObjectManager *manager,
 }
 
 static void
-on_object_removed (GDBusObjectManager *manager,
-                   GDBusObject        *object,
+on_object_removed (xdbus_object_manager_t *manager,
+                   xdbus_object_t        *object,
                    xpointer_t            user_data)
 {
   xchar_t *owner;
@@ -71,10 +71,10 @@ on_object_removed (GDBusObjectManager *manager,
 
 static void
 on_notify_name_owner (xobject_t    *object,
-                      GParamSpec *pspec,
+                      xparam_spec_t *pspec,
                       xpointer_t    user_data)
 {
-  GDBusObjectManagerClient *manager = G_DBUS_OBJECT_MANAGER_CLIENT (object);
+  xdbus_object_manager_client_t *manager = G_DBUS_OBJECT_MANAGER_CLIENT (object);
   xchar_t *name_owner;
 
   name_owner = g_dbus_object_manager_client_get_name_owner (manager);
@@ -83,25 +83,25 @@ on_notify_name_owner (xobject_t    *object,
 }
 
 static void
-on_interface_proxy_properties_changed (GDBusObjectManagerClient *manager,
-                                       GDBusObjectProxy         *object_proxy,
-                                       GDBusProxy               *interface_proxy,
+on_interface_proxy_properties_changed (xdbus_object_manager_client_t *manager,
+                                       xdbus_object_proxy_t         *object_proxy,
+                                       xdbus_proxy_t               *interface_proxy,
                                        xvariant_t                 *changed_properties,
                                        const xchar_t *const       *invalidated_properties,
                                        xpointer_t                  user_data)
 {
-  GVariantIter iter;
+  xvariant_iter_t iter;
   const xchar_t *key;
   xvariant_t *value;
   xchar_t *s;
 
   g_print ("Properties Changed on %s:\n", g_dbus_object_get_object_path (G_DBUS_OBJECT (object_proxy)));
-  g_variant_iter_init (&iter, changed_properties);
-  while (g_variant_iter_next (&iter, "{&sv}", &key, &value))
+  xvariant_iter_init (&iter, changed_properties);
+  while (xvariant_iter_next (&iter, "{&sv}", &key, &value))
     {
-      s = g_variant_print (value, TRUE);
+      s = xvariant_print (value, TRUE);
       g_print ("  %s -> %s\n", key, s);
-      g_variant_unref (value);
+      xvariant_unref (value);
       g_free (s);
     }
 }
@@ -109,15 +109,15 @@ on_interface_proxy_properties_changed (GDBusObjectManagerClient *manager,
 xint_t
 main (xint_t argc, xchar_t *argv[])
 {
-  GDBusObjectManager *manager;
-  GMainLoop *loop;
+  xdbus_object_manager_t *manager;
+  xmain_loop_t *loop;
   xerror_t *error;
   xchar_t *name_owner;
 
   manager = NULL;
   loop = NULL;
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   error = NULL;
   manager = example_object_manager_client_new_for_bus_sync (G_BUS_TYPE_SESSION,
@@ -129,7 +129,7 @@ main (xint_t argc, xchar_t *argv[])
   if (manager == NULL)
     {
       g_printerr ("Error getting object manager client: %s", error->message);
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
 
@@ -156,13 +156,13 @@ main (xint_t argc, xchar_t *argv[])
                     G_CALLBACK (on_interface_proxy_properties_changed),
                     NULL);
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
  out:
   if (manager != NULL)
-    g_object_unref (manager);
+    xobject_unref (manager);
   if (loop != NULL)
-    g_main_loop_unref (loop);
+    xmain_loop_unref (loop);
 
   return 0;
 }

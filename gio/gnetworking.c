@@ -68,7 +68,7 @@ g_networking_init (void)
       WSADATA wsadata;
 
       if (WSAStartup (MAKEWORD (2, 0), &wsadata) != 0)
-        g_error ("Windows Sockets could not be initialized");
+        xerror ("Windows Sockets could not be initialized");
 
       g_once_init_leave (&inited, 1);
     }

@@ -104,7 +104,7 @@ xinet_address_mask_t *ip4_default, *ip6_default;
 
 static void
 notify_handler (xobject_t    *object,
-                GParamSpec *pspec,
+                xparam_spec_t *pspec,
                 xpointer_t    user_data)
 {
   xboolean_t *emitted = user_data;
@@ -113,7 +113,7 @@ notify_handler (xobject_t    *object,
 }
 
 static void
-network_changed_handler (GNetworkMonitor *monitor,
+network_changed_handler (xnetwork_monitor_t *monitor,
                          xboolean_t         available,
                          xpointer_t         user_data)
 {
@@ -123,7 +123,7 @@ network_changed_handler (GNetworkMonitor *monitor,
 }
 
 static void
-assert_signals (GNetworkMonitor *monitor,
+assert_signals (xnetwork_monitor_t *monitor,
                 xboolean_t         should_emit_notify,
                 xboolean_t         should_emit_network_changed,
                 xboolean_t         expected_network_available)
@@ -138,7 +138,7 @@ assert_signals (GNetworkMonitor *monitor,
                          G_CALLBACK (network_changed_handler),
                          &emitted_network_changed);
 
-  g_main_context_iteration (NULL, FALSE);
+  xmain_context_iteration (NULL, FALSE);
 
   g_signal_handler_disconnect (monitor, h1);
   g_signal_handler_disconnect (monitor, h2);
@@ -150,8 +150,8 @@ assert_signals (GNetworkMonitor *monitor,
 }
 
 typedef struct {
-  GNetworkMonitor *monitor;
-  GMainLoop       *loop;
+  xnetwork_monitor_t *monitor;
+  xmain_loop_t       *loop;
   xsocket_address_t  *sockaddr;
   xboolean_t         should_be_reachable;
 } CanReachData;
@@ -176,7 +176,7 @@ reach_cb (xobject_t      *source,
     }
   g_assert (reachable == data->should_be_reachable);
 
-  g_main_loop_quit (data->loop);
+  xmain_loop_quit (data->loop);
 }
 
 static xboolean_t
@@ -193,7 +193,7 @@ test_reach_async (xpointer_t user_data)
 }
 
 static void
-run_tests (GNetworkMonitor *monitor,
+run_tests (xnetwork_monitor_t *monitor,
            TestAddress     *addresses,
            xboolean_t         should_be_reachable)
 {
@@ -204,7 +204,7 @@ run_tests (GNetworkMonitor *monitor,
   CanReachData data;
 
   data.monitor = monitor;
-  data.loop = g_main_loop_new (NULL, FALSE);
+  data.loop = xmain_loop_new (NULL, FALSE);
 
   for (i = 0; addresses[i].address; i++)
     {
@@ -216,9 +216,9 @@ run_tests (GNetworkMonitor *monitor,
       data.should_be_reachable = should_be_reachable;
 
       g_idle_add (test_reach_async, &data);
-      g_main_loop_run (data.loop);
+      xmain_loop_run (data.loop);
 
-      g_object_unref (sockaddr);
+      xobject_unref (sockaddr);
       g_assert_cmpint (reachable, ==, should_be_reachable);
       if (should_be_reachable)
         g_assert_no_error (error);
@@ -229,20 +229,20 @@ run_tests (GNetworkMonitor *monitor,
         }
     }
 
-  g_main_loop_unref (data.loop);
+  xmain_loop_unref (data.loop);
 }
 
 static void
 test_default (void)
 {
-  GNetworkMonitor *monitor, *m;
+  xnetwork_monitor_t *monitor, *m;
   xerror_t *error = NULL;
 
   m = g_network_monitor_get_default ();
   g_assert (X_IS_NETWORK_MONITOR (m));
 
-  monitor = g_object_new (XTYPE_NETWORK_MONITOR_BASE, NULL);
-  g_initable_init (G_INITABLE (monitor), NULL, &error);
+  monitor = xobject_new (XTYPE_NETWORK_MONITOR_BASE, NULL);
+  xinitable_init (XINITABLE (monitor), NULL, &error);
   g_assert_no_error (error);
 
   /* In the default configuration, all addresses are reachable */
@@ -255,16 +255,16 @@ test_default (void)
 
   assert_signals (monitor, FALSE, FALSE, TRUE);
 
-  g_object_unref (monitor);
+  xobject_unref (monitor);
 }
 
 static void
 test_remove_default (void)
 {
-  GNetworkMonitor *monitor;
+  xnetwork_monitor_t *monitor;
   xerror_t *error = NULL;
 
-  monitor = g_initable_new (XTYPE_NETWORK_MONITOR_BASE, NULL, &error, NULL);
+  monitor = xinitable_new (XTYPE_NETWORK_MONITOR_BASE, NULL, &error, NULL);
   g_assert_no_error (error);
   assert_signals (monitor, FALSE, FALSE, TRUE);
 
@@ -283,16 +283,16 @@ test_remove_default (void)
   run_tests (monitor, netfe80.addresses, FALSE);
   run_tests (monitor, unmatched, FALSE);
 
-  g_object_unref (monitor);
+  xobject_unref (monitor);
 }
 
 static void
 test_add_networks (void)
 {
-  GNetworkMonitor *monitor;
+  xnetwork_monitor_t *monitor;
   xerror_t *error = NULL;
 
-  monitor = g_initable_new (XTYPE_NETWORK_MONITOR_BASE, NULL, &error, NULL);
+  monitor = xinitable_new (XTYPE_NETWORK_MONITOR_BASE, NULL, &error, NULL);
   g_assert_no_error (error);
   assert_signals (monitor, FALSE, FALSE, TRUE);
 
@@ -356,16 +356,16 @@ test_add_networks (void)
   run_tests (monitor, netfe80.addresses, TRUE);
   run_tests (monitor, unmatched, FALSE);
 
-  g_object_unref (monitor);
+  xobject_unref (monitor);
 }
 
 static void
 test_remove_networks (void)
 {
-  GNetworkMonitor *monitor;
+  xnetwork_monitor_t *monitor;
   xerror_t *error = NULL;
 
-  monitor = g_initable_new (XTYPE_NETWORK_MONITOR_BASE, NULL, &error, NULL);
+  monitor = xinitable_new (XTYPE_NETWORK_MONITOR_BASE, NULL, &error, NULL);
   g_assert_no_error (error);
   assert_signals (monitor, FALSE, FALSE, TRUE);
 
@@ -451,7 +451,7 @@ test_remove_networks (void)
   run_tests (monitor, netfe80.addresses, FALSE);
   run_tests (monitor, unmatched, FALSE);
 
-  g_object_unref (monitor);
+  xobject_unref (monitor);
 }
 
 
@@ -479,13 +479,13 @@ cleanup_test (TestMask *test)
 {
   int i;
 
-  g_object_unref (test->mask);
+  xobject_unref (test->mask);
   for (i = 0; test->addresses[i].string; i++)
-    g_object_unref (test->addresses[i].address);
+    xobject_unref (test->addresses[i].address);
 }
 
 static void
-watch_network_changed (GNetworkMonitor *monitor,
+watch_network_changed (xnetwork_monitor_t *monitor,
                        xboolean_t         available,
                        xpointer_t         user_data)
 {
@@ -493,16 +493,16 @@ watch_network_changed (GNetworkMonitor *monitor,
 }
 
 static void
-watch_connectivity_changed (GNetworkMonitor *monitor,
-			    GParamSpec      *pspec,
+watch_connectivity_changed (xnetwork_monitor_t *monitor,
+			    xparam_spec_t      *pspec,
 			    xpointer_t         user_data)
 {
   g_print ("Connectivity is %d\n", g_network_monitor_get_connectivity (monitor));
 }
 
 static void
-watch_metered_changed (GNetworkMonitor *monitor,
-                       GParamSpec      *pspec,
+watch_metered_changed (xnetwork_monitor_t *monitor,
+                       xparam_spec_t      *pspec,
                        xpointer_t         user_data)
 {
   g_print ("Metered is %d\n", g_network_monitor_get_network_metered (monitor));
@@ -511,10 +511,10 @@ watch_metered_changed (GNetworkMonitor *monitor,
 static void
 do_watch_network (void)
 {
-  GNetworkMonitor *monitor = g_network_monitor_get_default ();
-  GMainLoop *loop;
+  xnetwork_monitor_t *monitor = g_network_monitor_get_default ();
+  xmain_loop_t *loop;
 
-  g_print ("Monitoring via %s\n", g_type_name_from_instance ((GTypeInstance *) monitor));
+  g_print ("Monitoring via %s\n", xtype_name_from_instance ((GTypeInstance *) monitor));
 
   g_signal_connect (monitor, "network-changed",
                     G_CALLBACK (watch_network_changed), NULL);
@@ -526,8 +526,8 @@ do_watch_network (void)
   watch_connectivity_changed (monitor, NULL, NULL);
   watch_metered_changed (monitor, NULL, NULL);
 
-  loop = g_main_loop_new (NULL, FALSE);
-  g_main_loop_run (loop);
+  loop = xmain_loop_new (NULL, FALSE);
+  xmain_loop_run (loop);
 }
 
 int
@@ -543,7 +543,7 @@ main (int argc, char **argv)
 
   g_test_init (&argc, &argv, NULL);
 
-  /* GNetworkMonitor will resolve addresses through a proxy if one is set and a
+  /* xnetwork_monitor_t will resolve addresses through a proxy if one is set and a
    * GIO module is available to handle it. In these tests we deliberately
    * change the idea of a reachable network to exclude the proxy, which will
    * lead to negative results. We're not trying to test the proxy-resolving
@@ -573,8 +573,8 @@ main (int argc, char **argv)
   cleanup_test (&net192);
   cleanup_test (&netlocal6);
   cleanup_test (&netfe80);
-  g_object_unref (ip4_default);
-  g_object_unref (ip6_default);
+  xobject_unref (ip4_default);
+  xobject_unref (ip6_default);
 
   return ret;
 }

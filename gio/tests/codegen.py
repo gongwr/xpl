@@ -122,26 +122,26 @@ class TestCodegen(unittest.TestCase):
             "#endif",
             "standard_typedefs_and_helpers": "typedef struct\n"
             "{\n"
-            "  GDBusArgInfo parent_struct;\n"
+            "  xdbus_arg_info_t parent_struct;\n"
             "  xboolean_t use_gvariant;\n"
             "} _ExtendedGDBusArgInfo;\n"
             "\n"
             "typedef struct\n"
             "{\n"
-            "  GDBusMethodInfo parent_struct;\n"
+            "  xdbus_method_info_t parent_struct;\n"
             "  const xchar_t *signal_name;\n"
             "  xboolean_t pass_fdlist;\n"
             "} _ExtendedGDBusMethodInfo;\n"
             "\n"
             "typedef struct\n"
             "{\n"
-            "  GDBusSignalInfo parent_struct;\n"
+            "  xdbus_signalInfo_t parent_struct;\n"
             "  const xchar_t *signal_name;\n"
             "} _ExtendedGDBusSignalInfo;\n"
             "\n"
             "typedef struct\n"
             "{\n"
-            "  GDBusPropertyInfo parent_struct;\n"
+            "  xdbus_property_info_t parent_struct;\n"
             "  const xchar_t *hyphen_name;\n"
             "  xuint_t use_gvariant : 1;\n"
             "  xuint_t emits_changed_signal : 1;\n"
@@ -149,7 +149,7 @@ class TestCodegen(unittest.TestCase):
             "\n"
             "typedef struct\n"
             "{\n"
-            "  GDBusInterfaceInfo parent_struct;\n"
+            "  xdbus_interface_info_t parent_struct;\n"
             "  const xchar_t *hyphen_name;\n"
             "} _ExtendedGDBusInterfaceInfo;\n"
             "\n"
@@ -157,18 +157,18 @@ class TestCodegen(unittest.TestCase):
             "{\n"
             "  const _ExtendedGDBusPropertyInfo *info;\n"
             "  xuint_t prop_id;\n"
-            "  GValue orig_value; /* the value before the change */\n"
+            "  xvalue_t orixvalue; /* the value before the change */\n"
             "} ChangedProperty;\n"
             "\n"
             "static void\n"
             "_changed_property_free (ChangedProperty *data)\n"
             "{\n"
-            "  g_value_unset (&data->orig_value);\n"
+            "  xvalue_unset (&data->orixvalue);\n"
             "  g_free (data);\n"
             "}\n"
             "\n"
             "static xboolean_t\n"
-            "_g_strv_equal0 (xchar_t **a, xchar_t **b)\n"
+            "_xstrv_equal0 (xchar_t **a, xchar_t **b)\n"
             "{\n"
             "  xboolean_t ret = FALSE;\n"
             "  xuint_t n;\n"
@@ -179,10 +179,10 @@ class TestCodegen(unittest.TestCase):
             "    }\n"
             "  if (a == NULL || b == NULL)\n"
             "    goto out;\n"
-            "  if (g_strv_length (a) != g_strv_length (b))\n"
+            "  if (xstrv_length (a) != xstrv_length (b))\n"
             "    goto out;\n"
             "  for (n = 0; a[n] != NULL; n++)\n"
-            "    if (g_strcmp0 (a[n], b[n]) != 0)\n"
+            "    if (xstrcmp0 (a[n], b[n]) != 0)\n"
             "      goto out;\n"
             "  ret = TRUE;\n"
             "out:\n"
@@ -190,7 +190,7 @@ class TestCodegen(unittest.TestCase):
             "}\n"
             "\n"
             "static xboolean_t\n"
-            "_g_variant_equal0 (xvariant_t *a, xvariant_t *b)\n"
+            "_xvariant_equal0 (xvariant_t *a, xvariant_t *b)\n"
             "{\n"
             "  xboolean_t ret = FALSE;\n"
             "  if (a == NULL && b == NULL)\n"
@@ -200,55 +200,55 @@ class TestCodegen(unittest.TestCase):
             "    }\n"
             "  if (a == NULL || b == NULL)\n"
             "    goto out;\n"
-            "  ret = g_variant_equal (a, b);\n"
+            "  ret = xvariant_equal (a, b);\n"
             "out:\n"
             "  return ret;\n"
             "}\n"
             "\n"
             "G_GNUC_UNUSED static xboolean_t\n"
-            "_g_value_equal (const GValue *a, const GValue *b)\n"
+            "_xvalue_equal (const xvalue_t *a, const xvalue_t *b)\n"
             "{\n"
             "  xboolean_t ret = FALSE;\n"
             "  g_assert (G_VALUE_TYPE (a) == G_VALUE_TYPE (b));\n"
             "  switch (G_VALUE_TYPE (a))\n"
             "    {\n"
             "      case XTYPE_BOOLEAN:\n"
-            "        ret = (g_value_get_boolean (a) == g_value_get_boolean (b));\n"
+            "        ret = (xvalue_get_boolean (a) == xvalue_get_boolean (b));\n"
             "        break;\n"
             "      case XTYPE_UCHAR:\n"
-            "        ret = (g_value_get_uchar (a) == g_value_get_uchar (b));\n"
+            "        ret = (xvalue_get_uchar (a) == xvalue_get_uchar (b));\n"
             "        break;\n"
             "      case XTYPE_INT:\n"
-            "        ret = (g_value_get_int (a) == g_value_get_int (b));\n"
+            "        ret = (xvalue_get_int (a) == xvalue_get_int (b));\n"
             "        break;\n"
             "      case XTYPE_UINT:\n"
-            "        ret = (g_value_get_uint (a) == g_value_get_uint (b));\n"
+            "        ret = (xvalue_get_uint (a) == xvalue_get_uint (b));\n"
             "        break;\n"
             "      case XTYPE_INT64:\n"
-            "        ret = (g_value_get_int64 (a) == g_value_get_int64 (b));\n"
+            "        ret = (xvalue_get_int64 (a) == xvalue_get_int64 (b));\n"
             "        break;\n"
             "      case XTYPE_UINT64:\n"
-            "        ret = (g_value_get_uint64 (a) == g_value_get_uint64 (b));\n"
+            "        ret = (xvalue_get_uint64 (a) == xvalue_get_uint64 (b));\n"
             "        break;\n"
             "      case XTYPE_DOUBLE:\n"
             "        {\n"
             "          /* Avoid -Wfloat-equal warnings by doing a direct bit compare */\n"
-            "          xdouble_t da = g_value_get_double (a);\n"
-            "          xdouble_t db = g_value_get_double (b);\n"
+            "          xdouble_t da = xvalue_get_double (a);\n"
+            "          xdouble_t db = xvalue_get_double (b);\n"
             "          ret = memcmp (&da, &db, sizeof (xdouble_t)) == 0;\n"
             "        }\n"
             "        break;\n"
             "      case XTYPE_STRING:\n"
-            "        ret = (g_strcmp0 (g_value_get_string (a), g_value_get_string (b)) == 0);\n"
+            "        ret = (xstrcmp0 (xvalue_get_string (a), xvalue_get_string (b)) == 0);\n"
             "        break;\n"
             "      case XTYPE_VARIANT:\n"
-            "        ret = _g_variant_equal0 (g_value_get_variant (a), g_value_get_variant (b));\n"
+            "        ret = _xvariant_equal0 (xvalue_get_variant (a), xvalue_get_variant (b));\n"
             "        break;\n"
             "      default:\n"
             "        if (G_VALUE_TYPE (a) == XTYPE_STRV)\n"
-            "          ret = _g_strv_equal0 (g_value_get_boxed (a), g_value_get_boxed (b));\n"
+            "          ret = _xstrv_equal0 (xvalue_get_boxed (a), xvalue_get_boxed (b));\n"
             "        else\n"
-            '          g_critical ("_g_value_equal() does not handle type %s", g_type_name (G_VALUE_TYPE (a)));\n'
+            '          g_critical ("_xvalue_equal() does not handle type %s", xtype_name (G_VALUE_TYPE (a)));\n'
             "        break;\n"
             "    }\n"
             "  return ret;\n"
@@ -551,7 +551,7 @@ G_END_DECLS
             interface_xml, "--output", "/dev/stdout", "--header"
         )
         self.assertEqual("", result.err)
-        self.assertEqual(result.out.strip().count("GUnixFDList"), 6)
+        self.assertEqual(result.out.strip().count("xunix_fd_list_t"), 6)
 
         # Specify an old --glib-min-required.
         result = self.runCodegenWithInterface(
@@ -563,10 +563,10 @@ G_END_DECLS
             "2.32",
         )
         self.assertEqual("", result.err)
-        self.assertEqual(result.out.strip().count("GUnixFDList"), 6)
+        self.assertEqual(result.out.strip().count("xunix_fd_list_t"), 6)
 
         # Specify a --glib-min-required ≥ 2.64. There should be more
-        # mentions of `GUnixFDList` now, since the annotation is not needed to
+        # mentions of `xunix_fd_list_t` now, since the annotation is not needed to
         # trigger its use.
         result = self.runCodegenWithInterface(
             interface_xml,
@@ -577,7 +577,7 @@ G_END_DECLS
             "2.64",
         )
         self.assertEqual("", result.err)
-        self.assertEqual(result.out.strip().count("GUnixFDList"), 18)
+        self.assertEqual(result.out.strip().count("xunix_fd_list_t"), 18)
 
     def test_call_flags_and_timeout_method_args(self):
         """Test that generated method call functions have @call_flags and

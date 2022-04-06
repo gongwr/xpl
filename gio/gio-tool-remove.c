@@ -35,7 +35,7 @@ static const GOptionEntry entries[] = {
 int
 handle_remove (int argc, char *argv[], xboolean_t do_help)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xchar_t *param;
   xerror_t *error = NULL;
   xfile_t *file;
@@ -45,7 +45,7 @@ handle_remove (int argc, char *argv[], xboolean_t do_help)
   g_set_prgname ("gio remove");
 
   /* Translators: commandline placeholder */
-  param = g_strdup_printf ("%s…", _("LOCATION"));
+  param = xstrdup_printf ("%s…", _("LOCATION"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -62,7 +62,7 @@ handle_remove (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      g_error_free (error);
+      xerror_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -79,18 +79,18 @@ handle_remove (int argc, char *argv[], xboolean_t do_help)
   retval = 0;
   for (i = 1; i < argc; i++)
     {
-      file = g_file_new_for_commandline_arg (argv[i]);
-      if (!g_file_delete (file, NULL, &error))
+      file = xfile_new_for_commandline_arg (argv[i]);
+      if (!xfile_delete (file, NULL, &error))
         {
           if (!force ||
-              !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+              !xerror_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
             {
               print_file_error (file, error->message);
               retval = 1;
             }
           g_clear_error (&error);
         }
-      g_object_unref (file);
+      xobject_unref (file);
     }
 
   return retval;

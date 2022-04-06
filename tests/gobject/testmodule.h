@@ -23,32 +23,32 @@
 
 G_BEGIN_DECLS
 
-typedef struct _TestModule      TestModule;
-typedef struct _TestModuleClass TestModuleClass;
+typedef struct _test_module      test_module_t;
+typedef struct _test_module_class test_module_class_t;
 
 #define TEST_TYPE_MODULE              (test_module_get_type ())
-#define TEST_MODULE(module)           (XTYPE_CHECK_INSTANCE_CAST ((module), TEST_TYPE_MODULE, TestModule))
-#define TEST_MODULE_CLASS(class)      (XTYPE_CHECK_CLASS_CAST ((class), TEST_TYPE_MODULE, TestModuleClass))
+#define TEST_MODULE(module)           (XTYPE_CHECK_INSTANCE_CAST ((module), TEST_TYPE_MODULE, test_module_t))
+#define TEST_MODULE_CLASS(class)      (XTYPE_CHECK_CLASS_CAST ((class), TEST_TYPE_MODULE, test_module_class_t))
 #define TEST_IS_MODULE(module)        (XTYPE_CHECK_INSTANCE_TYPE ((module), TEST_TYPE_MODULE))
 #define TEST_IS_MODULE_CLASS(class)   (XTYPE_CHECK_CLASS_TYPE ((class), TEST_TYPE_MODULE))
-#define TEST_MODULE_GET_CLASS(module) (XTYPE_INSTANCE_GET_CLASS ((module), TEST_TYPE_MODULE, TestModuleClass))
+#define TEST_MODULE_GET_CLASS(module) (XTYPE_INSTANCE_GET_CLASS ((module), TEST_TYPE_MODULE, test_module_class_t))
 
-typedef void (*TestModuleRegisterFunc) (GTypeModule *module);
+typedef void (*test_module_register_func_t) (xtype_module_t *module);
 
-struct _TestModule
+struct _test_module
 {
-  GTypeModule parent_instance;
+  xtype_module_t parent_instance;
 
-  TestModuleRegisterFunc register_func;
+  test_module_register_func_t register_func;
 };
 
-struct _TestModuleClass
+struct _test_module_class
 {
-  GTypeModuleClass parent_class;
+  xtype_module_class_t parent_class;
 };
 
 xtype_t        test_module_get_type      (void);
-GTypeModule *test_module_new           (TestModuleRegisterFunc register_func);
+xtype_module_t *test_module_new           (test_module_register_func_t register_func);
 
 G_END_DECLS
 

@@ -32,7 +32,7 @@
  * SECTION:gfileattribute
  * @short_description: Key-Value Paired File Attributes
  * @include: gio/gio.h
- * @see_also: #xfile_t, #GFileInfo
+ * @see_also: #xfile_t, #xfile_info_t
  *
  * File attributes in GIO consist of a list of key-value pairs.
  *
@@ -43,15 +43,15 @@
  * "standard" namespace.
  *
  * The list of possible attributes for a filesystem (pointed to by a #xfile_t) is
- * available as a #GFileAttributeInfoList. This list is queryable by key names
+ * available as a #xfile_attribute_info_list_t. This list is queryable by key names
  * as indicated earlier.
  *
- * Information is stored within the list in #GFileAttributeInfo structures.
+ * Information is stored within the list in #xfile_attribute_info_t structures.
  * The info structure can store different types, listed in the enum
- * #GFileAttributeType. Upon creation of a #GFileAttributeInfo, the type will
- * be set to %G_FILE_ATTRIBUTE_TYPE_INVALID.
+ * #xfile_attribute_type_t. Upon creation of a #xfile_attribute_info_t, the type will
+ * be set to %XFILE_ATTRIBUTE_TYPE_INVALID.
  *
- * Classes that implement #GFileIface will create a #GFileAttributeInfoList and
+ * Classes that implement #xfile_iface_t will create a #xfile_attribute_info_list_t and
  * install default keys and values for their given file system, architecture,
  * and other possible implementation details (e.g., on a UNIX system, a file
  * attribute key will be registered for the user id for a given file).
@@ -75,7 +75,7 @@
  *   these values.
  * - `"mountable"`: The "Mountable" namespace. Includes simple boolean keys
  *   for checking if a file or path supports mount operations, e.g. mount,
- *   unmount, eject. These are used for files of type %G_FILE_TYPE_MOUNTABLE.
+ *   unmount, eject. These are used for files of type %XFILE_TYPE_MOUNTABLE.
  * - `"time"`: The "Time" namespace. Includes file access, changed, created
  *   times.
  * - `"unix"`: The "Unix" namespace. Includes UNIX-specific information and
@@ -115,7 +115,7 @@
  *
  * Please note that these are not all of the possible namespaces.
  * More namespaces can be added from GIO modules or by individual applications.
- * For more information about writing GIO modules, see #GIOModule.
+ * For more information about writing GIO modules, see #xio_module_t.
  *
  * <!-- TODO: Implementation note about using extended attributes on supported
  * file systems -->
@@ -123,7 +123,7 @@
  * ## Default Keys
  *
  * For a list of the built-in keys and their types, see the
- * [GFileInfo][GFileInfo] documentation.
+ * [xfile_info_t][xfile_info_t] documentation.
  *
  * Note that there are no predefined keys in the "xattr" and "xattr-sys"
  * namespaces. Keys for the "xattr" namespace are constructed by stripping
@@ -136,104 +136,104 @@
  */
 
 /**
- * _g_file_attribute_value_free:
+ * _xfile_attribute_value_free:
  * @attr: a #GFileAttributeValue.
  *
  * Frees the memory used by @attr.
  *
  **/
 void
-_g_file_attribute_value_free (GFileAttributeValue *attr)
+_xfile_attribute_value_free (GFileAttributeValue *attr)
 {
   g_return_if_fail (attr != NULL);
 
-  _g_file_attribute_value_clear (attr);
+  _xfile_attribute_value_clear (attr);
   g_free (attr);
 }
 
 /**
- * _g_file_attribute_value_clear:
+ * _xfile_attribute_value_clear:
  * @attr: a #GFileAttributeValue.
  *
  * Clears the value of @attr and sets its type to
- * %G_FILE_ATTRIBUTE_TYPE_INVALID.
+ * %XFILE_ATTRIBUTE_TYPE_INVALID.
  *
  **/
 void
-_g_file_attribute_value_clear (GFileAttributeValue *attr)
+_xfile_attribute_value_clear (GFileAttributeValue *attr)
 {
   g_return_if_fail (attr != NULL);
 
-  if (attr->type == G_FILE_ATTRIBUTE_TYPE_STRING ||
-      attr->type == G_FILE_ATTRIBUTE_TYPE_BYTE_STRING)
+  if (attr->type == XFILE_ATTRIBUTE_TYPE_STRING ||
+      attr->type == XFILE_ATTRIBUTE_TYPE_BYTE_STRING)
     g_free (attr->u.string);
 
-  if (attr->type == G_FILE_ATTRIBUTE_TYPE_STRINGV)
-    g_strfreev (attr->u.stringv);
+  if (attr->type == XFILE_ATTRIBUTE_TYPE_STRINGV)
+    xstrfreev (attr->u.stringv);
 
-  if (attr->type == G_FILE_ATTRIBUTE_TYPE_OBJECT &&
+  if (attr->type == XFILE_ATTRIBUTE_TYPE_OBJECT &&
       attr->u.obj != NULL)
-    g_object_unref (attr->u.obj);
+    xobject_unref (attr->u.obj);
 
-  attr->type = G_FILE_ATTRIBUTE_TYPE_INVALID;
+  attr->type = XFILE_ATTRIBUTE_TYPE_INVALID;
 }
 
 /**
- * g_file_attribute_value_set:
+ * xfile_attribute_value_set:
  * @attr: a #GFileAttributeValue to set the value in.
  * @new_value: a #GFileAttributeValue to get the value from.
  *
  * Sets an attribute's value from another attribute.
  **/
 void
-_g_file_attribute_value_set (GFileAttributeValue        *attr,
+_xfile_attribute_value_set (GFileAttributeValue        *attr,
 			     const GFileAttributeValue *new_value)
 {
   g_return_if_fail (attr != NULL);
   g_return_if_fail (new_value != NULL);
 
-  _g_file_attribute_value_clear (attr);
+  _xfile_attribute_value_clear (attr);
   *attr = *new_value;
 
-  if (attr->type == G_FILE_ATTRIBUTE_TYPE_STRING ||
-      attr->type == G_FILE_ATTRIBUTE_TYPE_BYTE_STRING)
-    attr->u.string = g_strdup (attr->u.string);
+  if (attr->type == XFILE_ATTRIBUTE_TYPE_STRING ||
+      attr->type == XFILE_ATTRIBUTE_TYPE_BYTE_STRING)
+    attr->u.string = xstrdup (attr->u.string);
 
-  if (attr->type == G_FILE_ATTRIBUTE_TYPE_STRINGV)
-    attr->u.stringv = g_strdupv (attr->u.stringv);
+  if (attr->type == XFILE_ATTRIBUTE_TYPE_STRINGV)
+    attr->u.stringv = xstrdupv (attr->u.stringv);
 
-  if (attr->type == G_FILE_ATTRIBUTE_TYPE_OBJECT &&
+  if (attr->type == XFILE_ATTRIBUTE_TYPE_OBJECT &&
       attr->u.obj != NULL)
-    g_object_ref (attr->u.obj);
+    xobject_ref (attr->u.obj);
 }
 
 /**
- * _g_file_attribute_value_new:
+ * _xfile_attribute_value_new:
  *
  * Creates a new file attribute.
  *
  * Returns: a #GFileAttributeValue.
  **/
 GFileAttributeValue *
-_g_file_attribute_value_new (void)
+_xfile_attribute_value_new (void)
 {
   GFileAttributeValue *attr;
 
   attr = g_new (GFileAttributeValue, 1);
-  attr->type = G_FILE_ATTRIBUTE_TYPE_INVALID;
+  attr->type = XFILE_ATTRIBUTE_TYPE_INVALID;
   return attr;
 }
 
 xpointer_t
-_g_file_attribute_value_peek_as_pointer (GFileAttributeValue *attr)
+_xfile_attribute_value_peek_as_pointer (GFileAttributeValue *attr)
 {
   switch (attr->type) {
-  case G_FILE_ATTRIBUTE_TYPE_STRING:
-  case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
+  case XFILE_ATTRIBUTE_TYPE_STRING:
+  case XFILE_ATTRIBUTE_TYPE_BYTE_STRING:
     return attr->u.string;
-  case G_FILE_ATTRIBUTE_TYPE_STRINGV:
+  case XFILE_ATTRIBUTE_TYPE_STRINGV:
     return attr->u.stringv;
-  case G_FILE_ATTRIBUTE_TYPE_OBJECT:
+  case XFILE_ATTRIBUTE_TYPE_OBJECT:
     return attr->u.obj;
   default:
     return (xpointer_t) &attr->u;
@@ -241,7 +241,7 @@ _g_file_attribute_value_peek_as_pointer (GFileAttributeValue *attr)
 }
 
 /**
- * g_file_attribute_value_dup:
+ * xfile_attribute_value_dup:
  * @other: a #GFileAttributeValue to duplicate.
  *
  * Duplicates a file attribute.
@@ -249,21 +249,21 @@ _g_file_attribute_value_peek_as_pointer (GFileAttributeValue *attr)
  * Returns: a duplicate of the @other.
  **/
 GFileAttributeValue *
-_g_file_attribute_value_dup (const GFileAttributeValue *other)
+_xfile_attribute_value_dup (const GFileAttributeValue *other)
 {
   GFileAttributeValue *attr;
 
   g_return_val_if_fail (other != NULL, NULL);
 
   attr = g_new (GFileAttributeValue, 1);
-  attr->type = G_FILE_ATTRIBUTE_TYPE_INVALID;
-  _g_file_attribute_value_set (attr, other);
+  attr->type = XFILE_ATTRIBUTE_TYPE_INVALID;
+  _xfile_attribute_value_set (attr, other);
   return attr;
 }
 
-G_DEFINE_BOXED_TYPE (GFileAttributeInfoList, g_file_attribute_info_list,
-                     g_file_attribute_info_list_dup,
-                     g_file_attribute_info_list_unref)
+G_DEFINE_BOXED_TYPE (xfile_attribute_info_list_t, xfile_attribute_info_list,
+                     xfile_attribute_info_list_dup,
+                     xfile_attribute_info_list_unref)
 
 static xboolean_t
 valid_char (char c)
@@ -290,7 +290,7 @@ escape_byte_string (const char *str)
     }
 
   if (num_invalid == 0)
-    return g_strdup (str);
+    return xstrdup (str);
   else
     {
       escaped_val = g_malloc (len + num_invalid*3 + 1);
@@ -315,19 +315,19 @@ escape_byte_string (const char *str)
 }
 
 /**
- * _g_file_attribute_value_as_string:
+ * _xfile_attribute_value_as_string:
  * @attr: a #GFileAttributeValue.
  *
  * Converts a #GFileAttributeValue to a string for display.
  * The returned string should be freed when no longer needed.
  *
  * Returns: a string from the @attr, %NULL on error, or "<invalid>"
- * if @attr is of type %G_FILE_ATTRIBUTE_TYPE_INVALID.
+ * if @attr is of type %XFILE_ATTRIBUTE_TYPE_INVALID.
  */
 char *
-_g_file_attribute_value_as_string (const GFileAttributeValue *attr)
+_xfile_attribute_value_as_string (const GFileAttributeValue *attr)
 {
-  GString *s;
+  xstring_t *s;
   int i;
   char *str;
 
@@ -335,49 +335,49 @@ _g_file_attribute_value_as_string (const GFileAttributeValue *attr)
 
   switch (attr->type)
     {
-    case G_FILE_ATTRIBUTE_TYPE_STRING:
-      str = g_strdup (attr->u.string);
+    case XFILE_ATTRIBUTE_TYPE_STRING:
+      str = xstrdup (attr->u.string);
       break;
-    case G_FILE_ATTRIBUTE_TYPE_STRINGV:
-      s = g_string_new ("[");
+    case XFILE_ATTRIBUTE_TYPE_STRINGV:
+      s = xstring_new ("[");
       for (i = 0; attr->u.stringv[i] != NULL; i++)
 	{
-	  g_string_append (s, attr->u.stringv[i]);
+	  xstring_append (s, attr->u.stringv[i]);
 	  if (attr->u.stringv[i+1] != NULL)
-	    g_string_append (s, ", ");
+	    xstring_append (s, ", ");
 	}
-      g_string_append (s, "]");
-      str = g_string_free (s, FALSE);
+      xstring_append (s, "]");
+      str = xstring_free (s, FALSE);
       break;
-    case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
+    case XFILE_ATTRIBUTE_TYPE_BYTE_STRING:
       str = escape_byte_string (attr->u.string);
       break;
-    case G_FILE_ATTRIBUTE_TYPE_BOOLEAN:
-      str = g_strdup_printf ("%s", attr->u.boolean?"TRUE":"FALSE");
+    case XFILE_ATTRIBUTE_TYPE_BOOLEAN:
+      str = xstrdup_printf ("%s", attr->u.boolean?"TRUE":"FALSE");
       break;
-    case G_FILE_ATTRIBUTE_TYPE_UINT32:
-      str = g_strdup_printf ("%u", (unsigned int)attr->u.uint32);
+    case XFILE_ATTRIBUTE_TYPE_UINT32:
+      str = xstrdup_printf ("%u", (unsigned int)attr->u.uint32);
       break;
-    case G_FILE_ATTRIBUTE_TYPE_INT32:
-      str = g_strdup_printf ("%i", (int)attr->u.int32);
+    case XFILE_ATTRIBUTE_TYPE_INT32:
+      str = xstrdup_printf ("%i", (int)attr->u.int32);
       break;
-    case G_FILE_ATTRIBUTE_TYPE_UINT64:
-      str = g_strdup_printf ("%"G_GUINT64_FORMAT, attr->u.uint64);
+    case XFILE_ATTRIBUTE_TYPE_UINT64:
+      str = xstrdup_printf ("%"G_GUINT64_FORMAT, attr->u.uint64);
       break;
-    case G_FILE_ATTRIBUTE_TYPE_INT64:
-      str = g_strdup_printf ("%"G_GINT64_FORMAT, attr->u.int64);
+    case XFILE_ATTRIBUTE_TYPE_INT64:
+      str = xstrdup_printf ("%"G_GINT64_FORMAT, attr->u.int64);
       break;
-    case G_FILE_ATTRIBUTE_TYPE_OBJECT:
-      str = g_strdup_printf ("%s:%p", g_type_name_from_instance
+    case XFILE_ATTRIBUTE_TYPE_OBJECT:
+      str = xstrdup_printf ("%s:%p", xtype_name_from_instance
                                           ((GTypeInstance *) attr->u.obj),
                                       attr->u.obj);
       break;
-    case G_FILE_ATTRIBUTE_TYPE_INVALID:
-      str = g_strdup ("<unset>");
+    case XFILE_ATTRIBUTE_TYPE_INVALID:
+      str = xstrdup ("<unset>");
       break;
     default:
-      g_warning ("Invalid type in GFileInfo attribute");
-      str = g_strdup ("<invalid>");
+      g_warning ("Invalid type in xfile_info_t attribute");
+      str = xstrdup ("<invalid>");
       break;
     }
 
@@ -385,7 +385,7 @@ _g_file_attribute_value_as_string (const GFileAttributeValue *attr)
 }
 
 /**
- * _g_file_attribute_value_get_string:
+ * _xfile_attribute_value_get_string:
  * @attr: a #GFileAttributeValue.
  *
  * Gets the string from a file attribute value. If the value is not the
@@ -394,18 +394,18 @@ _g_file_attribute_value_as_string (const GFileAttributeValue *attr)
  * Returns: the UTF-8 string value contained within the attribute, or %NULL.
  */
 const char *
-_g_file_attribute_value_get_string (const GFileAttributeValue *attr)
+_xfile_attribute_value_get_string (const GFileAttributeValue *attr)
 {
   if (attr == NULL)
     return NULL;
 
-  g_return_val_if_fail (attr->type == G_FILE_ATTRIBUTE_TYPE_STRING, NULL);
+  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_STRING, NULL);
 
   return attr->u.string;
 }
 
 /**
- * _g_file_attribute_value_get_byte_string:
+ * _xfile_attribute_value_get_byte_string:
  * @attr: a #GFileAttributeValue.
  *
  * Gets the byte string from a file attribute value. If the value is not the
@@ -414,29 +414,29 @@ _g_file_attribute_value_get_string (const GFileAttributeValue *attr)
  * Returns: the byte string contained within the attribute or %NULL.
  */
 const char *
-_g_file_attribute_value_get_byte_string (const GFileAttributeValue *attr)
+_xfile_attribute_value_get_byte_string (const GFileAttributeValue *attr)
 {
   if (attr == NULL)
     return NULL;
 
-  g_return_val_if_fail (attr->type == G_FILE_ATTRIBUTE_TYPE_BYTE_STRING, NULL);
+  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_BYTE_STRING, NULL);
 
   return attr->u.string;
 }
 
 char **
-_g_file_attribute_value_get_stringv (const GFileAttributeValue *attr)
+_xfile_attribute_value_get_stringv (const GFileAttributeValue *attr)
 {
   if (attr == NULL)
     return NULL;
 
-  g_return_val_if_fail (attr->type == G_FILE_ATTRIBUTE_TYPE_STRINGV, NULL);
+  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_STRINGV, NULL);
 
   return attr->u.stringv;
 }
 
 /**
- * _g_file_attribute_value_get_boolean:
+ * _xfile_attribute_value_get_boolean:
  * @attr: a #GFileAttributeValue.
  *
  * Gets the boolean value from a file attribute value. If the value is not the
@@ -445,18 +445,18 @@ _g_file_attribute_value_get_stringv (const GFileAttributeValue *attr)
  * Returns: the boolean value contained within the attribute, or %FALSE.
  */
 xboolean_t
-_g_file_attribute_value_get_boolean (const GFileAttributeValue *attr)
+_xfile_attribute_value_get_boolean (const GFileAttributeValue *attr)
 {
   if (attr == NULL)
     return FALSE;
 
-  g_return_val_if_fail (attr->type == G_FILE_ATTRIBUTE_TYPE_BOOLEAN, FALSE);
+  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_BOOLEAN, FALSE);
 
   return attr->u.boolean;
 }
 
 /**
- * _g_file_attribute_value_get_uint32:
+ * _xfile_attribute_value_get_uint32:
  * @attr: a #GFileAttributeValue.
  *
  * Gets the unsigned 32-bit integer from a file attribute value. If the value
@@ -464,19 +464,19 @@ _g_file_attribute_value_get_boolean (const GFileAttributeValue *attr)
  *
  * Returns: the unsigned 32-bit integer from the attribute, or 0.
  */
-guint32
-_g_file_attribute_value_get_uint32 (const GFileAttributeValue *attr)
+xuint32_t
+_xfile_attribute_value_get_uint32 (const GFileAttributeValue *attr)
 {
   if (attr == NULL)
     return 0;
 
-  g_return_val_if_fail (attr->type == G_FILE_ATTRIBUTE_TYPE_UINT32, 0);
+  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_UINT32, 0);
 
   return attr->u.uint32;
 }
 
 /**
- * _g_file_attribute_value_get_int32:
+ * _xfile_attribute_value_get_int32:
  * @attr: a #GFileAttributeValue.
  *
  * Gets the signed 32-bit integer from a file attribute value. If the value
@@ -485,18 +485,18 @@ _g_file_attribute_value_get_uint32 (const GFileAttributeValue *attr)
  * Returns: the signed 32-bit integer from the attribute, or 0.
  */
 gint32
-_g_file_attribute_value_get_int32 (const GFileAttributeValue *attr)
+_xfile_attribute_value_get_int32 (const GFileAttributeValue *attr)
 {
   if (attr == NULL)
     return 0;
 
-  g_return_val_if_fail (attr->type == G_FILE_ATTRIBUTE_TYPE_INT32, 0);
+  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_INT32, 0);
 
   return attr->u.int32;
 }
 
 /**
- * _g_file_attribute_value_get_uint64:
+ * _xfile_attribute_value_get_uint64:
  * @attr: a #GFileAttributeValue.
  *
  * Gets the unsigned 64-bit integer from a file attribute value. If the value
@@ -504,19 +504,19 @@ _g_file_attribute_value_get_int32 (const GFileAttributeValue *attr)
  *
  * Returns: the unsigned 64-bit integer from the attribute, or 0.
  */
-guint64
-_g_file_attribute_value_get_uint64 (const GFileAttributeValue *attr)
+xuint64_t
+_xfile_attribute_value_get_uint64 (const GFileAttributeValue *attr)
 {
   if (attr == NULL)
     return 0;
 
-  g_return_val_if_fail (attr->type == G_FILE_ATTRIBUTE_TYPE_UINT64, 0);
+  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_UINT64, 0);
 
   return attr->u.uint64;
 }
 
 /**
- * _g_file_attribute_value_get_int64:
+ * _xfile_attribute_value_get_int64:
  * @attr: a #GFileAttributeValue.
  *
  * Gets the signed 64-bit integer from a file attribute value. If the value
@@ -525,18 +525,18 @@ _g_file_attribute_value_get_uint64 (const GFileAttributeValue *attr)
  * Returns: the signed 64-bit integer from the attribute, or 0.
  */
 gint64
-_g_file_attribute_value_get_int64 (const GFileAttributeValue *attr)
+_xfile_attribute_value_get_int64 (const GFileAttributeValue *attr)
 {
   if (attr == NULL)
     return 0;
 
-  g_return_val_if_fail (attr->type == G_FILE_ATTRIBUTE_TYPE_INT64, 0);
+  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_INT64, 0);
 
   return attr->u.int64;
 }
 
 /**
- * _g_file_attribute_value_get_object:
+ * _xfile_attribute_value_get_object:
  * @attr: a #GFileAttributeValue.
  *
  * Gets the xobject_t from a file attribute value. If the value
@@ -545,221 +545,221 @@ _g_file_attribute_value_get_int64 (const GFileAttributeValue *attr)
  * Returns: the xobject_t from the attribute, or %NULL.
  **/
 xobject_t *
-_g_file_attribute_value_get_object (const GFileAttributeValue *attr)
+_xfile_attribute_value_get_object (const GFileAttributeValue *attr)
 {
   if (attr == NULL)
     return NULL;
 
-  g_return_val_if_fail (attr->type == G_FILE_ATTRIBUTE_TYPE_OBJECT, NULL);
+  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_OBJECT, NULL);
 
   return attr->u.obj;
 }
 
 
 void
-_g_file_attribute_value_set_from_pointer (GFileAttributeValue *value,
-					  GFileAttributeType   type,
+_xfile_attribute_value_set_from_pointer (GFileAttributeValue *value,
+					  xfile_attribute_type_t   type,
 					  xpointer_t             value_p,
 					  xboolean_t             dup)
 {
-  _g_file_attribute_value_clear (value);
+  _xfile_attribute_value_clear (value);
   value->type = type;
   switch (type)
     {
-    case G_FILE_ATTRIBUTE_TYPE_STRING:
-    case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
+    case XFILE_ATTRIBUTE_TYPE_STRING:
+    case XFILE_ATTRIBUTE_TYPE_BYTE_STRING:
       if (dup)
-	value->u.string = g_strdup (value_p);
+	value->u.string = xstrdup (value_p);
       else
 	value->u.string = value_p;
       break;
 
-    case G_FILE_ATTRIBUTE_TYPE_STRINGV:
+    case XFILE_ATTRIBUTE_TYPE_STRINGV:
       if (dup)
-	value->u.stringv = g_strdupv (value_p);
+	value->u.stringv = xstrdupv (value_p);
       else
 	value->u.stringv = value_p;
       break;
 
-    case G_FILE_ATTRIBUTE_TYPE_OBJECT:
+    case XFILE_ATTRIBUTE_TYPE_OBJECT:
       if (dup)
-	value->u.obj = g_object_ref (value_p);
+	value->u.obj = xobject_ref (value_p);
       else
 	value->u.obj = value_p;
       break;
 
-    case G_FILE_ATTRIBUTE_TYPE_BOOLEAN:
+    case XFILE_ATTRIBUTE_TYPE_BOOLEAN:
       value->u.boolean = *(xboolean_t *)value_p;
       break;
 
-    case G_FILE_ATTRIBUTE_TYPE_UINT32:
-      value->u.uint32 = *(guint32 *)value_p;
+    case XFILE_ATTRIBUTE_TYPE_UINT32:
+      value->u.uint32 = *(xuint32_t *)value_p;
       break;
 
-    case G_FILE_ATTRIBUTE_TYPE_INT32:
+    case XFILE_ATTRIBUTE_TYPE_INT32:
       value->u.int32 = *(gint32 *)value_p;
       break;
 
-    case G_FILE_ATTRIBUTE_TYPE_UINT64:
-      value->u.uint64 = *(guint64 *)value_p;
+    case XFILE_ATTRIBUTE_TYPE_UINT64:
+      value->u.uint64 = *(xuint64_t *)value_p;
       break;
 
-    case G_FILE_ATTRIBUTE_TYPE_INT64:
+    case XFILE_ATTRIBUTE_TYPE_INT64:
       value->u.int64 = *(gint64 *)value_p;
       break;
 
-    case G_FILE_ATTRIBUTE_TYPE_INVALID:
+    case XFILE_ATTRIBUTE_TYPE_INVALID:
       break;
 
     default:
-      g_warning ("Unknown type specified in g_file_info_set_attribute");
+      g_warning ("Unknown type specified in xfile_info_set_attribute");
       break;
     }
 }
 
 /**
- * _g_file_attribute_value_set_string:
+ * _xfile_attribute_value_set_string:
  * @attr: a #GFileAttributeValue.
  * @string: a UTF-8 string to set within the type.
  *
  * Sets the attribute value to a given UTF-8 string.
  */
 void
-_g_file_attribute_value_set_string (GFileAttributeValue *attr,
+_xfile_attribute_value_set_string (GFileAttributeValue *attr,
 				    const char          *string)
 {
   g_return_if_fail (attr != NULL);
   g_return_if_fail (string != NULL);
 
-  _g_file_attribute_value_clear (attr);
-  attr->type = G_FILE_ATTRIBUTE_TYPE_STRING;
-  attr->u.string = g_strdup (string);
+  _xfile_attribute_value_clear (attr);
+  attr->type = XFILE_ATTRIBUTE_TYPE_STRING;
+  attr->u.string = xstrdup (string);
 }
 
 /**
- * _g_file_attribute_value_set_byte_string:
+ * _xfile_attribute_value_set_byte_string:
  * @attr: a #GFileAttributeValue.
  * @string: a byte string to set within the type.
  *
  * Sets the attribute value to a given byte string.
  */
 void
-_g_file_attribute_value_set_byte_string (GFileAttributeValue *attr,
+_xfile_attribute_value_set_byte_string (GFileAttributeValue *attr,
 					 const char          *string)
 {
   g_return_if_fail (attr != NULL);
   g_return_if_fail (string != NULL);
 
-  _g_file_attribute_value_clear (attr);
-  attr->type = G_FILE_ATTRIBUTE_TYPE_BYTE_STRING;
-  attr->u.string = g_strdup (string);
+  _xfile_attribute_value_clear (attr);
+  attr->type = XFILE_ATTRIBUTE_TYPE_BYTE_STRING;
+  attr->u.string = xstrdup (string);
 }
 
 void
-_g_file_attribute_value_set_stringv (GFileAttributeValue *attr,
+_xfile_attribute_value_set_stringv (GFileAttributeValue *attr,
 				     char               **value)
 {
   g_return_if_fail (attr != NULL);
   g_return_if_fail (value != NULL);
 
-  _g_file_attribute_value_clear (attr);
-  attr->type = G_FILE_ATTRIBUTE_TYPE_STRINGV;
-  attr->u.stringv = g_strdupv (value);
+  _xfile_attribute_value_clear (attr);
+  attr->type = XFILE_ATTRIBUTE_TYPE_STRINGV;
+  attr->u.stringv = xstrdupv (value);
 }
 
 
 /**
- * _g_file_attribute_value_set_boolean:
+ * _xfile_attribute_value_set_boolean:
  * @attr: a #GFileAttributeValue.
  * @value: a #xboolean_t to set within the type.
  *
  * Sets the attribute value to the given boolean value.
  */
 void
-_g_file_attribute_value_set_boolean (GFileAttributeValue *attr,
+_xfile_attribute_value_set_boolean (GFileAttributeValue *attr,
 				     xboolean_t             value)
 {
   g_return_if_fail (attr != NULL);
 
-  _g_file_attribute_value_clear (attr);
-  attr->type = G_FILE_ATTRIBUTE_TYPE_BOOLEAN;
+  _xfile_attribute_value_clear (attr);
+  attr->type = XFILE_ATTRIBUTE_TYPE_BOOLEAN;
   attr->u.boolean = !!value;
 }
 
 /**
- * _g_file_attribute_value_set_uint32:
+ * _xfile_attribute_value_set_uint32:
  * @attr: a #GFileAttributeValue.
- * @value: a #guint32 to set within the type.
+ * @value: a #xuint32_t to set within the type.
  *
  * Sets the attribute value to the given unsigned 32-bit integer.
  */
 void
-_g_file_attribute_value_set_uint32 (GFileAttributeValue *attr,
-				    guint32              value)
+_xfile_attribute_value_set_uint32 (GFileAttributeValue *attr,
+				    xuint32_t              value)
 {
   g_return_if_fail (attr != NULL);
 
-  _g_file_attribute_value_clear (attr);
-  attr->type = G_FILE_ATTRIBUTE_TYPE_UINT32;
+  _xfile_attribute_value_clear (attr);
+  attr->type = XFILE_ATTRIBUTE_TYPE_UINT32;
   attr->u.uint32 = value;
 }
 
 /**
- * _g_file_attribute_value_set_int32:
+ * _xfile_attribute_value_set_int32:
  * @attr: a #GFileAttributeValue.
  * @value: a #gint32 to set within the type.
  *
  * Sets the attribute value to the given signed 32-bit integer.
  */
 void
-_g_file_attribute_value_set_int32 (GFileAttributeValue *attr,
+_xfile_attribute_value_set_int32 (GFileAttributeValue *attr,
 				   gint32               value)
 {
   g_return_if_fail (attr != NULL);
 
-  _g_file_attribute_value_clear (attr);
-  attr->type = G_FILE_ATTRIBUTE_TYPE_INT32;
+  _xfile_attribute_value_clear (attr);
+  attr->type = XFILE_ATTRIBUTE_TYPE_INT32;
   attr->u.int32 = value;
 }
 
 /**
- * _g_file_attribute_value_set_uint64:
+ * _xfile_attribute_value_set_uint64:
  * @attr: a #GFileAttributeValue.
- * @value: a #guint64 to set within the type.
+ * @value: a #xuint64_t to set within the type.
  *
  * Sets the attribute value to a given unsigned 64-bit integer.
  */
 void
-_g_file_attribute_value_set_uint64 (GFileAttributeValue *attr,
-				    guint64              value)
+_xfile_attribute_value_set_uint64 (GFileAttributeValue *attr,
+				    xuint64_t              value)
 {
   g_return_if_fail (attr != NULL);
 
-  _g_file_attribute_value_clear (attr);
-  attr->type = G_FILE_ATTRIBUTE_TYPE_UINT64;
+  _xfile_attribute_value_clear (attr);
+  attr->type = XFILE_ATTRIBUTE_TYPE_UINT64;
   attr->u.uint64 = value;
 }
 
 /**
- * _g_file_attribute_value_set_int64:
+ * _xfile_attribute_value_set_int64:
  * @attr: a #GFileAttributeValue.
  * @value: a #gint64 to set within the type.
  *
  * Sets the attribute value to a given signed 64-bit integer.
  */
 void
-_g_file_attribute_value_set_int64 (GFileAttributeValue *attr,
+_xfile_attribute_value_set_int64 (GFileAttributeValue *attr,
 				   gint64               value)
 {
   g_return_if_fail (attr != NULL);
 
-  _g_file_attribute_value_clear (attr);
-  attr->type = G_FILE_ATTRIBUTE_TYPE_INT64;
+  _xfile_attribute_value_clear (attr);
+  attr->type = XFILE_ATTRIBUTE_TYPE_INT64;
   attr->u.int64 = value;
 }
 
 /**
- * _g_file_attribute_value_set_object:
+ * _xfile_attribute_value_set_object:
  * @attr: a #GFileAttributeValue.
  * @obj: a #xobject_t.
  *
@@ -767,62 +767,62 @@ _g_file_attribute_value_set_int64 (GFileAttributeValue *attr,
  * The @attr references the xobject_t internally.
  */
 void
-_g_file_attribute_value_set_object (GFileAttributeValue *attr,
+_xfile_attribute_value_set_object (GFileAttributeValue *attr,
 				    xobject_t             *obj)
 {
   g_return_if_fail (attr != NULL);
   g_return_if_fail (obj != NULL);
 
-  _g_file_attribute_value_clear (attr);
-  attr->type = G_FILE_ATTRIBUTE_TYPE_OBJECT;
-  attr->u.obj = g_object_ref (obj);
+  _xfile_attribute_value_clear (attr);
+  attr->type = XFILE_ATTRIBUTE_TYPE_OBJECT;
+  attr->u.obj = xobject_ref (obj);
 }
 
 typedef struct {
-  GFileAttributeInfoList public;
-  GArray *array;
+  xfile_attribute_info_list_t public;
+  xarray_t *array;
   int ref_count;
 } GFileAttributeInfoListPriv;
 
 static void
 list_update_public (GFileAttributeInfoListPriv *priv)
 {
-  priv->public.infos = (GFileAttributeInfo *)priv->array->data;
+  priv->public.infos = (xfile_attribute_info_t *)priv->array->data;
   priv->public.n_infos = priv->array->len;
 }
 
 /**
- * g_file_attribute_info_list_new:
+ * xfile_attribute_info_list_new:
  *
  * Creates a new file attribute info list.
  *
- * Returns: a #GFileAttributeInfoList.
+ * Returns: a #xfile_attribute_info_list_t.
  */
-GFileAttributeInfoList *
-g_file_attribute_info_list_new (void)
+xfile_attribute_info_list_t *
+xfile_attribute_info_list_new (void)
 {
   GFileAttributeInfoListPriv *priv;
 
   priv = g_new0 (GFileAttributeInfoListPriv, 1);
 
   priv->ref_count = 1;
-  priv->array = g_array_new (TRUE, FALSE, sizeof (GFileAttributeInfo));
+  priv->array = g_array_new (TRUE, FALSE, sizeof (xfile_attribute_info_t));
 
   list_update_public (priv);
 
-  return (GFileAttributeInfoList *)priv;
+  return (xfile_attribute_info_list_t *)priv;
 }
 
 /**
- * g_file_attribute_info_list_dup:
- * @list: a #GFileAttributeInfoList to duplicate.
+ * xfile_attribute_info_list_dup:
+ * @list: a #xfile_attribute_info_list_t to duplicate.
  *
  * Makes a duplicate of a file attribute info list.
  *
  * Returns: a copy of the given @list.
  */
-GFileAttributeInfoList *
-g_file_attribute_info_list_dup (GFileAttributeInfoList *list)
+xfile_attribute_info_list_t *
+xfile_attribute_info_list_dup (xfile_attribute_info_list_t *list)
 {
   GFileAttributeInfoListPriv *new;
   int i;
@@ -831,30 +831,30 @@ g_file_attribute_info_list_dup (GFileAttributeInfoList *list)
 
   new = g_new0 (GFileAttributeInfoListPriv, 1);
   new->ref_count = 1;
-  new->array = g_array_new (TRUE, FALSE, sizeof (GFileAttributeInfo));
+  new->array = g_array_new (TRUE, FALSE, sizeof (xfile_attribute_info_t));
 
   g_array_set_size (new->array, list->n_infos);
   list_update_public (new);
   for (i = 0; i < list->n_infos; i++)
     {
-      new->public.infos[i].name = g_strdup (list->infos[i].name);
+      new->public.infos[i].name = xstrdup (list->infos[i].name);
       new->public.infos[i].type = list->infos[i].type;
       new->public.infos[i].flags = list->infos[i].flags;
     }
 
-  return (GFileAttributeInfoList *)new;
+  return (xfile_attribute_info_list_t *)new;
 }
 
 /**
- * g_file_attribute_info_list_ref:
- * @list: a #GFileAttributeInfoList to reference.
+ * xfile_attribute_info_list_ref:
+ * @list: a #xfile_attribute_info_list_t to reference.
  *
  * References a file attribute info list.
  *
- * Returns: #GFileAttributeInfoList or %NULL on error.
+ * Returns: #xfile_attribute_info_list_t or %NULL on error.
  */
-GFileAttributeInfoList *
-g_file_attribute_info_list_ref (GFileAttributeInfoList *list)
+xfile_attribute_info_list_t *
+xfile_attribute_info_list_ref (xfile_attribute_info_list_t *list)
 {
   GFileAttributeInfoListPriv *priv = (GFileAttributeInfoListPriv *)list;
 
@@ -867,14 +867,14 @@ g_file_attribute_info_list_ref (GFileAttributeInfoList *list)
 }
 
 /**
- * g_file_attribute_info_list_unref:
- * @list: The #GFileAttributeInfoList to unreference.
+ * xfile_attribute_info_list_unref:
+ * @list: The #xfile_attribute_info_list_t to unreference.
  *
  * Removes a reference from the given @list. If the reference count
  * falls to zero, the @list is deleted.
  */
 void
-g_file_attribute_info_list_unref (GFileAttributeInfoList *list)
+xfile_attribute_info_list_unref (xfile_attribute_info_list_t *list)
 {
   GFileAttributeInfoListPriv *priv = (GFileAttributeInfoListPriv *)list;
   int i;
@@ -892,7 +892,7 @@ g_file_attribute_info_list_unref (GFileAttributeInfoList *list)
 }
 
 static int
-g_file_attribute_info_list_bsearch (GFileAttributeInfoList *list,
+xfile_attribute_info_list_bsearch (xfile_attribute_info_list_t *list,
 				    const char             *name)
 {
   int start, end, mid;
@@ -915,17 +915,17 @@ g_file_attribute_info_list_bsearch (GFileAttributeInfoList *list,
 }
 
 /**
- * g_file_attribute_info_list_lookup:
- * @list: a #GFileAttributeInfoList.
+ * xfile_attribute_info_list_lookup:
+ * @list: a #xfile_attribute_info_list_t.
  * @name: the name of the attribute to look up.
  *
  * Gets the file attribute with the name @name from @list.
  *
- * Returns: a #GFileAttributeInfo for the @name, or %NULL if an
+ * Returns: a #xfile_attribute_info_t for the @name, or %NULL if an
  * attribute isn't found.
  */
-const GFileAttributeInfo *
-g_file_attribute_info_list_lookup (GFileAttributeInfoList *list,
+const xfile_attribute_info_t *
+xfile_attribute_info_list_lookup (xfile_attribute_info_list_t *list,
 				   const char             *name)
 {
   int i;
@@ -933,7 +933,7 @@ g_file_attribute_info_list_lookup (GFileAttributeInfoList *list,
   g_return_val_if_fail (list != NULL, NULL);
   g_return_val_if_fail (name != NULL, NULL);
 
-  i = g_file_attribute_info_list_bsearch (list, name);
+  i = xfile_attribute_info_list_bsearch (list, name);
 
   if (i < list->n_infos && strcmp (list->infos[i].name, name) == 0)
     return &list->infos[i];
@@ -942,29 +942,29 @@ g_file_attribute_info_list_lookup (GFileAttributeInfoList *list,
 }
 
 /**
- * g_file_attribute_info_list_add:
- * @list: a #GFileAttributeInfoList.
+ * xfile_attribute_info_list_add:
+ * @list: a #xfile_attribute_info_list_t.
  * @name: the name of the attribute to add.
- * @type: the #GFileAttributeType for the attribute.
- * @flags: #GFileAttributeInfoFlags for the attribute.
+ * @type: the #xfile_attribute_type_t for the attribute.
+ * @flags: #xfile_attribute_info_flags_t for the attribute.
  *
  * Adds a new attribute with @name to the @list, setting
  * its @type and @flags.
  */
 void
-g_file_attribute_info_list_add (GFileAttributeInfoList *list,
+xfile_attribute_info_list_add (xfile_attribute_info_list_t *list,
 				const char             *name,
-				GFileAttributeType      type,
-				GFileAttributeInfoFlags flags)
+				xfile_attribute_type_t      type,
+				xfile_attribute_info_flags_t flags)
 {
   GFileAttributeInfoListPriv *priv = (GFileAttributeInfoListPriv *)list;
-  GFileAttributeInfo info;
+  xfile_attribute_info_t info;
   int i;
 
   g_return_if_fail (list != NULL);
   g_return_if_fail (name != NULL);
 
-  i = g_file_attribute_info_list_bsearch (list, name);
+  i = xfile_attribute_info_list_bsearch (list, name);
 
   if (i < list->n_infos && strcmp (list->infos[i].name, name) == 0)
     {
@@ -972,7 +972,7 @@ g_file_attribute_info_list_add (GFileAttributeInfoList *list,
       return;
     }
 
-  info.name = g_strdup (name);
+  info.name = xstrdup (name);
   info.type = type;
   info.flags = flags;
   g_array_insert_vals (priv->array, i, &info, 1);

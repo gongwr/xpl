@@ -2,7 +2,7 @@
 #include <gio/gio.h>
 
 /* ---------------------------------------------------------------------------------------------------- */
-/* The D-Bus interface definition we want to create a GDBusProxy-derived type for: */
+/* The D-Bus interface definition we want to create a xdbus_proxy_t-derived type for: */
 /* ---------------------------------------------------------------------------------------------------- */
 
 static const xchar_t introspection_xml[] =
@@ -38,7 +38,7 @@ typedef struct _AccountsUserPrivate AccountsUserPrivate;
 struct _AccountsUser
 {
   /*< private >*/
-  GDBusProxy parent_instance;
+  xdbus_proxy_t parent_instance;
   AccountsUserPrivate *priv;
 };
 
@@ -75,16 +75,16 @@ xchar_t       *accounts_user_frobnicate_sync     (AccountsUser        *user,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /* A more efficient approach than parsing XML is to use const static
- * GDBusInterfaceInfo, GDBusMethodInfo, ... structures
+ * xdbus_interface_info_t, xdbus_method_info_t, ... structures
  */
-static GDBusInterfaceInfo *
+static xdbus_interface_info_t *
 accounts_user_get_interface_info (void)
 {
   static xsize_t has_info = 0;
-  static GDBusInterfaceInfo *info = NULL;
+  static xdbus_interface_info_t *info = NULL;
   if (g_once_init_enter (&has_info))
     {
-      GDBusNodeInfo *introspection_data;
+      xdbus_node_info_t *introspection_data;
       introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
       info = introspection_data->interfaces[0];
       g_once_init_leave (&has_info, 1);
@@ -129,23 +129,23 @@ accounts_user_init (AccountsUser *user)
 static void
 accounts_user_get_property (xobject_t    *object,
                             xuint_t       prop_id,
-                            GValue     *value,
-                            GParamSpec *pspec)
+                            xvalue_t     *value,
+                            xparam_spec_t *pspec)
 {
   AccountsUser *user = ACCOUNTS_USER (object);
 
   switch (prop_id)
     {
     case PROP_USER_NAME:
-      g_value_set_string (value, accounts_user_get_user_name (user));
+      xvalue_set_string (value, accounts_user_get_user_name (user));
       break;
 
     case PROP_REAL_NAME:
-      g_value_set_string (value, accounts_user_get_real_name (user));
+      xvalue_set_string (value, accounts_user_get_real_name (user));
       break;
 
     case PROP_AUTOMATIC_LOGIN:
-      g_value_set_boolean (value, accounts_user_get_automatic_login (user));
+      xvalue_set_boolean (value, accounts_user_get_automatic_login (user));
       break;
 
     default:
@@ -161,8 +161,8 @@ accounts_user_get_user_name (AccountsUser *user)
   const xchar_t *ret;
   g_return_val_if_fail (ACCOUNTS_IS_USER (user), NULL);
   value = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (user), "UserName");
-  ret = g_variant_get_string (value, NULL);
-  g_variant_unref (value);
+  ret = xvariant_get_string (value, NULL);
+  xvariant_unref (value);
   return ret;
 }
 
@@ -173,8 +173,8 @@ accounts_user_get_real_name (AccountsUser *user)
   const xchar_t *ret;
   g_return_val_if_fail (ACCOUNTS_IS_USER (user), NULL);
   value = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (user), "RealName");
-  ret = g_variant_get_string (value, NULL);
-  g_variant_unref (value);
+  ret = xvariant_get_string (value, NULL);
+  xvariant_unref (value);
   return ret;
 }
 
@@ -185,44 +185,44 @@ accounts_user_get_automatic_login (AccountsUser *user)
   xboolean_t ret;
   g_return_val_if_fail (ACCOUNTS_IS_USER (user), FALSE);
   value = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (user), "AutomaticLogin");
-  ret = g_variant_get_boolean (value);
-  g_variant_unref (value);
+  ret = xvariant_get_boolean (value);
+  xvariant_unref (value);
   return ret;
 }
 
 static void
-accounts_user_g_signal (GDBusProxy   *proxy,
+accounts_user_g_signal (xdbus_proxy_t   *proxy,
                         const xchar_t  *sender_name,
                         const xchar_t  *signal_name,
                         xvariant_t     *parameters)
 {
   AccountsUser *user = ACCOUNTS_USER (proxy);
-  if (g_strcmp0 (signal_name, "Changed") == 0)
+  if (xstrcmp0 (signal_name, "Changed") == 0)
     g_signal_emit (user, signals[CHANGED_SIGNAL], 0);
 }
 
 static void
-accounts_user_g_properties_changed (GDBusProxy          *proxy,
+accounts_user_g_properties_changed (xdbus_proxy_t          *proxy,
                                     xvariant_t            *changed_properties,
                                     const xchar_t* const  *invalidated_properties)
 {
   AccountsUser *user = ACCOUNTS_USER (proxy);
-  GVariantIter *iter;
+  xvariant_iter_t *iter;
   const xchar_t *key;
 
   if (changed_properties != NULL)
     {
-      g_variant_get (changed_properties, "a{sv}", &iter);
-      while (g_variant_iter_next (iter, "{&sv}", &key, NULL))
+      xvariant_get (changed_properties, "a{sv}", &iter);
+      while (xvariant_iter_next (iter, "{&sv}", &key, NULL))
         {
-          if (g_strcmp0 (key, "AutomaticLogin") == 0)
-            g_object_notify (G_OBJECT (user), "automatic-login");
-          else if (g_strcmp0 (key, "RealName") == 0)
-            g_object_notify (G_OBJECT (user), "real-name");
-          else if (g_strcmp0 (key, "UserName") == 0)
-            g_object_notify (G_OBJECT (user), "user-name");
+          if (xstrcmp0 (key, "AutomaticLogin") == 0)
+            xobject_notify (G_OBJECT (user), "automatic-login");
+          else if (xstrcmp0 (key, "RealName") == 0)
+            xobject_notify (G_OBJECT (user), "real-name");
+          else if (xstrcmp0 (key, "UserName") == 0)
+            xobject_notify (G_OBJECT (user), "user-name");
         }
-      g_variant_iter_free (iter);
+      xvariant_iter_free (iter);
     }
 }
 
@@ -240,7 +240,7 @@ accounts_user_class_init (AccountsUserClass *klass)
   proxy_class->g_signal             = accounts_user_g_signal;
   proxy_class->g_properties_changed = accounts_user_g_properties_changed;
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_USER_NAME,
                                    g_param_spec_string ("user-name",
                                                         "User Name",
@@ -249,7 +249,7 @@ accounts_user_class_init (AccountsUserClass *klass)
                                                         G_PARAM_READABLE |
                                                         G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_REAL_NAME,
                                    g_param_spec_string ("real-name",
                                                         "Real Name",
@@ -258,7 +258,7 @@ accounts_user_class_init (AccountsUserClass *klass)
                                                         G_PARAM_READABLE |
                                                         G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_AUTOMATIC_LOGIN,
                                    g_param_spec_boolean ("automatic-login",
                                                          "Automatic Login",
@@ -294,7 +294,7 @@ accounts_user_frobnicate_sync (AccountsUser        *user,
 
   value = g_dbus_proxy_call_sync (G_DBUS_PROXY (user),
                                   "Frobnicate",
-                                  g_variant_new ("(si)",
+                                  xvariant_new ("(si)",
                                                  flux,
                                                  baz),
                                   G_DBUS_CALL_FLAGS_NONE,
@@ -303,8 +303,8 @@ accounts_user_frobnicate_sync (AccountsUser        *user,
                                   error);
   if (value != NULL)
     {
-      g_variant_get (value, "(s)", &ret);
-      g_variant_unref (value);
+      xvariant_get (value, "(s)", &ret);
+      xvariant_unref (value);
     }
   return ret;
 }
@@ -320,7 +320,7 @@ accounts_user_frobnicate (AccountsUser        *user,
   g_return_if_fail (ACCOUNTS_IS_USER (user));
   g_dbus_proxy_call (G_DBUS_PROXY (user),
                      "Frobnicate",
-                     g_variant_new ("(si)",
+                     xvariant_new ("(si)",
                                     flux,
                                     baz),
                      G_DBUS_CALL_FLAGS_NONE,
@@ -343,8 +343,8 @@ accounts_user_frobnicate_finish (AccountsUser        *user,
   value = g_dbus_proxy_call_finish (G_DBUS_PROXY (user), res, error);
   if (value != NULL)
     {
-      g_variant_get (value, "(s)", &ret);
-      g_variant_unref (value);
+      xvariant_get (value, "(s)", &ret);
+      xvariant_unref (value);
     }
   return ret;
 }

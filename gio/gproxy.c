@@ -31,7 +31,7 @@
  * @short_description: Interface for proxy handling
  * @include: gio/gio.h
  *
- * A #GProxy handles connecting to a remote host via a given type of
+ * A #xproxy_t handles connecting to a remote host via a given type of
  * proxy server. It is implemented by the 'gio-proxy' extension point.
  * The extensions are named after their proxy protocol name. As an
  * example, a SOCKS5 proxy implementation can be retrieved with the
@@ -41,30 +41,30 @@
  * Since: 2.26
  **/
 
-G_DEFINE_INTERFACE (GProxy, g_proxy, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (xproxy, xproxy, XTYPE_OBJECT)
 
 static void
-g_proxy_default_init (GProxyInterface *iface)
+xproxy_default_init (xproxy_interface_t *iface)
 {
 }
 
 /**
- * g_proxy_get_default_for_protocol:
+ * xproxy_get_default_for_protocol:
  * @protocol: the proxy protocol name (e.g. http, socks, etc)
  *
  * Find the `gio-proxy` extension point for a proxy implementation that supports
  * the specified protocol.
  *
- * Returns: (nullable) (transfer full): return a #GProxy or NULL if protocol
+ * Returns: (nullable) (transfer full): return a #xproxy_t or NULL if protocol
  *               is not supported.
  *
  * Since: 2.26
  **/
-GProxy *
-g_proxy_get_default_for_protocol (const xchar_t *protocol)
+xproxy_t *
+xproxy_get_default_for_protocol (const xchar_t *protocol)
 {
-  GIOExtensionPoint *ep;
-  GIOExtension *extension;
+  xio_extension_point_t *ep;
+  xio_extension_t *extension;
 
   /* Ensure proxy modules loaded */
   _xio_modules_ensure_loaded ();
@@ -74,16 +74,16 @@ g_proxy_get_default_for_protocol (const xchar_t *protocol)
   extension = g_io_extension_point_get_extension_by_name (ep, protocol);
 
   if (extension)
-      return g_object_new (g_io_extension_get_type (extension), NULL);
+      return xobject_new (g_io_extension_get_type (extension), NULL);
 
   return NULL;
 }
 
 /**
- * g_proxy_connect:
- * @proxy: a #GProxy
+ * xproxy_connect:
+ * @proxy: a #xproxy_t
  * @connection: a #xio_stream_t
- * @proxy_address: a #GProxyAddress
+ * @proxy_address: a #xproxy_address_t
  * @cancellable: (nullable): a #xcancellable_t
  * @error: return #xerror_t
  *
@@ -99,13 +99,13 @@ g_proxy_get_default_for_protocol (const xchar_t *protocol)
  * Since: 2.26
  */
 xio_stream_t *
-g_proxy_connect (GProxy            *proxy,
+xproxy_connect (xproxy_t            *proxy,
 		 xio_stream_t         *connection,
-		 GProxyAddress     *proxy_address,
+		 xproxy_address_t     *proxy_address,
 		 xcancellable_t      *cancellable,
 		 xerror_t           **error)
 {
-  GProxyInterface *iface;
+  xproxy_interface_t *iface;
 
   g_return_val_if_fail (X_IS_PROXY (proxy), NULL);
 
@@ -119,27 +119,27 @@ g_proxy_connect (GProxy            *proxy,
 }
 
 /**
- * g_proxy_connect_async:
- * @proxy: a #GProxy
+ * xproxy_connect_async:
+ * @proxy: a #xproxy_t
  * @connection: a #xio_stream_t
- * @proxy_address: a #GProxyAddress
+ * @proxy_address: a #xproxy_address_t
  * @cancellable: (nullable): a #xcancellable_t
  * @callback: (scope async): a #xasync_ready_callback_t
  * @user_data: (closure): callback data
  *
- * Asynchronous version of g_proxy_connect().
+ * Asynchronous version of xproxy_connect().
  *
  * Since: 2.26
  */
 void
-g_proxy_connect_async (GProxy               *proxy,
+xproxy_connect_async (xproxy_t               *proxy,
 		       xio_stream_t            *connection,
-		       GProxyAddress        *proxy_address,
+		       xproxy_address_t        *proxy_address,
 		       xcancellable_t         *cancellable,
 		       xasync_ready_callback_t   callback,
 		       xpointer_t              user_data)
 {
-  GProxyInterface *iface;
+  xproxy_interface_t *iface;
 
   g_return_if_fail (X_IS_PROXY (proxy));
 
@@ -154,23 +154,23 @@ g_proxy_connect_async (GProxy               *proxy,
 }
 
 /**
- * g_proxy_connect_finish:
- * @proxy: a #GProxy
+ * xproxy_connect_finish:
+ * @proxy: a #xproxy_t
  * @result: a #xasync_result_t
  * @error: return #xerror_t
  *
- * See g_proxy_connect().
+ * See xproxy_connect().
  *
  * Returns: (transfer full): a #xio_stream_t.
  *
  * Since: 2.26
  */
 xio_stream_t *
-g_proxy_connect_finish (GProxy       *proxy,
+xproxy_connect_finish (xproxy_t       *proxy,
 			xasync_result_t *result,
 			xerror_t      **error)
 {
-  GProxyInterface *iface;
+  xproxy_interface_t *iface;
 
   g_return_val_if_fail (X_IS_PROXY (proxy), NULL);
 
@@ -180,25 +180,25 @@ g_proxy_connect_finish (GProxy       *proxy,
 }
 
 /**
- * g_proxy_supports_hostname:
- * @proxy: a #GProxy
+ * xproxy_supports_hostname:
+ * @proxy: a #xproxy_t
  *
  * Some proxy protocols expect to be passed a hostname, which they
  * will resolve to an IP address themselves. Others, like SOCKS4, do
  * not allow this. This function will return %FALSE if @proxy is
  * implementing such a protocol. When %FALSE is returned, the caller
  * should resolve the destination hostname first, and then pass a
- * #GProxyAddress containing the stringified IP address to
- * g_proxy_connect() or g_proxy_connect_async().
+ * #xproxy_address_t containing the stringified IP address to
+ * xproxy_connect() or xproxy_connect_async().
  *
  * Returns: %TRUE if hostname resolution is supported.
  *
  * Since: 2.26
  */
 xboolean_t
-g_proxy_supports_hostname (GProxy *proxy)
+xproxy_supports_hostname (xproxy_t *proxy)
 {
-  GProxyInterface *iface;
+  xproxy_interface_t *iface;
 
   g_return_val_if_fail (X_IS_PROXY (proxy), FALSE);
 

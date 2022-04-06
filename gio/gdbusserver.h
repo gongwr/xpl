@@ -30,30 +30,30 @@
 G_BEGIN_DECLS
 
 #define XTYPE_DBUS_SERVER         (g_dbus_server_get_type ())
-#define G_DBUS_SERVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_SERVER, GDBusServer))
+#define G_DBUS_SERVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_SERVER, xdbus_server))
 #define X_IS_DBUS_SERVER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_SERVER))
 
 XPL_AVAILABLE_IN_ALL
 xtype_t             g_dbus_server_get_type           (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-GDBusServer      *g_dbus_server_new_sync           (const xchar_t       *address,
+xdbus_server_t      *g_dbus_server_new_sync           (const xchar_t       *address,
                                                     GDBusServerFlags   flags,
                                                     const xchar_t       *guid,
-                                                    GDBusAuthObserver *observer,
+                                                    xdbus_auth_observer_t *observer,
                                                     xcancellable_t      *cancellable,
                                                     xerror_t           **error);
 XPL_AVAILABLE_IN_ALL
-const xchar_t      *g_dbus_server_get_client_address (GDBusServer       *server);
+const xchar_t      *g_dbus_server_get_client_address (xdbus_server_t       *server);
 XPL_AVAILABLE_IN_ALL
-const xchar_t      *g_dbus_server_get_guid           (GDBusServer       *server);
+const xchar_t      *g_dbus_server_get_guid           (xdbus_server_t       *server);
 XPL_AVAILABLE_IN_ALL
-GDBusServerFlags  g_dbus_server_get_flags          (GDBusServer       *server);
+GDBusServerFlags  g_dbus_server_get_flags          (xdbus_server_t       *server);
 XPL_AVAILABLE_IN_ALL
-void              g_dbus_server_start              (GDBusServer       *server);
+void              g_dbus_server_start              (xdbus_server_t       *server);
 XPL_AVAILABLE_IN_ALL
-void              g_dbus_server_stop               (GDBusServer       *server);
+void              g_dbus_server_stop               (xdbus_server_t       *server);
 XPL_AVAILABLE_IN_ALL
-xboolean_t          g_dbus_server_is_active          (GDBusServer       *server);
+xboolean_t          g_dbus_server_is_active          (xdbus_server_t       *server);
 
 G_END_DECLS
 

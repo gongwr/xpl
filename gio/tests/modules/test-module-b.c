@@ -1,4 +1,4 @@
-/* Test module for GIOModule tests
+/* Test module for xio_module_t tests
  * Copyright (C) 2013 Red Hat, Inc
  * Author: Matthias Clasen
  *
@@ -49,7 +49,7 @@ test_b_init (TestB *self)
 }
 
 XPL_TEST_EXPORT_SYMBOL void
-g_io_module_load (GIOModule *module)
+xio_module_load (xio_module_t *module)
 {
   g_io_extension_point_implement ("test-extension-point",
                                   test_b_get_type (),
@@ -58,6 +58,6 @@ g_io_module_load (GIOModule *module)
 }
 
 XPL_TEST_EXPORT_SYMBOL void
-g_io_module_unload (GIOModule *module)
+xio_module_unload (xio_module_t *module)
 {
 }

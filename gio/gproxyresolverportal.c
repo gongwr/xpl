@@ -31,11 +31,11 @@ struct _GProxyResolverPortal {
   xboolean_t network_available;
 };
 
-static void g_proxy_resolver_portal_iface_init (GProxyResolverInterface *iface);
+static void xproxy_resolver_portal_iface_init (xproxy_resolver_interface_t *iface);
 
-G_DEFINE_TYPE_WITH_CODE (GProxyResolverPortal, g_proxy_resolver_portal, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (GProxyResolverPortal, xproxy_resolver_portal, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (XTYPE_PROXY_RESOLVER,
-                                                g_proxy_resolver_portal_iface_init)
+                                                xproxy_resolver_portal_iface_init)
                          _xio_modules_ensure_extension_points_registered ();
                          g_io_extension_point_implement (G_PROXY_RESOLVER_EXTENSION_POINT_NAME,
                                                          g_define_type_id,
@@ -64,12 +64,12 @@ ensure_resolver_proxy (GProxyResolverPortal *resolver)
 }
 
 static void
-g_proxy_resolver_portal_init (GProxyResolverPortal *resolver)
+xproxy_resolver_portal_init (GProxyResolverPortal *resolver)
 {
 }
 
 static xboolean_t
-g_proxy_resolver_portal_is_supported (GProxyResolver *object)
+xproxy_resolver_portal_is_supported (xproxy_resolver_t *object)
 {
   GProxyResolverPortal *resolver = G_PROXY_RESOLVER_PORTAL (object);
   char *name_owner;
@@ -88,7 +88,7 @@ g_proxy_resolver_portal_is_supported (GProxyResolver *object)
 static const char *no_proxy[2] = { "direct://", NULL };
 
 static xchar_t **
-g_proxy_resolver_portal_lookup (GProxyResolver *proxy_resolver,
+xproxy_resolver_portal_lookup (xproxy_resolver_t *proxy_resolver,
                                 const xchar_t     *uri,
                                 xcancellable_t    *cancellable,
                                 xerror_t         **error)
@@ -108,8 +108,8 @@ g_proxy_resolver_portal_lookup (GProxyResolver *proxy_resolver,
 
   if (!resolver->network_available)
     {
-      g_strfreev (proxy);
-      proxy = g_strdupv ((xchar_t **)no_proxy);
+      xstrfreev (proxy);
+      proxy = xstrdupv ((xchar_t **)no_proxy);
     }
 
   return proxy;
@@ -120,7 +120,7 @@ lookup_done (xobject_t      *source,
              xasync_result_t *result,
              xpointer_t      data)
 {
-  GTask *task = data;
+  xtask_t *task = data;
   xerror_t *error = NULL;
   xchar_t **proxies = NULL;
 
@@ -128,81 +128,81 @@ lookup_done (xobject_t      *source,
                                                &proxies,
                                                result,
                                                &error))
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_pointer (task, proxies, NULL);
+    xtask_return_pointer (task, proxies, NULL);
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 static void
-g_proxy_resolver_portal_lookup_async (GProxyResolver      *proxy_resolver,
+xproxy_resolver_portal_lookup_async (xproxy_resolver_t      *proxy_resolver,
                                       const xchar_t         *uri,
                                       xcancellable_t        *cancellable,
                                       xasync_ready_callback_t  callback,
                                       xpointer_t             user_data)
 {
   GProxyResolverPortal *resolver = G_PROXY_RESOLVER_PORTAL (proxy_resolver);
-  GTask *task;
+  xtask_t *task;
 
   ensure_resolver_proxy (resolver);
   g_assert (resolver->resolver);
 
-  task = g_task_new (proxy_resolver, cancellable, callback, user_data);
+  task = xtask_new (proxy_resolver, cancellable, callback, user_data);
   gxdp_proxy_resolver_call_lookup (resolver->resolver,
                                    uri,
                                    cancellable,
                                    lookup_done,
-                                   g_object_ref (task));
-  g_object_unref (task);
+                                   xobject_ref (task));
+  xobject_unref (task);
 }
 
 static xchar_t **
-g_proxy_resolver_portal_lookup_finish (GProxyResolver  *proxy_resolver,
+xproxy_resolver_portal_lookup_finish (xproxy_resolver_t  *proxy_resolver,
                                        xasync_result_t    *result,
                                        xerror_t         **error)
 {
   GProxyResolverPortal *resolver = G_PROXY_RESOLVER_PORTAL (proxy_resolver);
-  GTask *task = G_TASK (result);
+  xtask_t *task = XTASK (result);
   char **proxies;
 
-  proxies = g_task_propagate_pointer (task, error);
+  proxies = xtask_propagate_pointer (task, error);
   if (proxies == NULL)
     return NULL;
 
   if (!resolver->network_available)
     {
-      g_strfreev (proxies);
-      proxies = g_strdupv ((xchar_t **)no_proxy);
+      xstrfreev (proxies);
+      proxies = xstrdupv ((xchar_t **)no_proxy);
     }
 
   return proxies;
 }
 
 static void
-g_proxy_resolver_portal_finalize (xobject_t *object)
+xproxy_resolver_portal_finalize (xobject_t *object)
 {
   GProxyResolverPortal *resolver = G_PROXY_RESOLVER_PORTAL (object);
 
   g_clear_object (&resolver->resolver);
 
-  G_OBJECT_CLASS (g_proxy_resolver_portal_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xproxy_resolver_portal_parent_class)->finalize (object);
 }
 
 static void
-g_proxy_resolver_portal_class_init (GProxyResolverPortalClass *resolver_class)
+xproxy_resolver_portal_class_init (GProxyResolverPortalClass *resolver_class)
 {
   xobject_class_t *object_class;
 
   object_class = G_OBJECT_CLASS (resolver_class);
-  object_class->finalize = g_proxy_resolver_portal_finalize;
+  object_class->finalize = xproxy_resolver_portal_finalize;
 }
 
 static void
-g_proxy_resolver_portal_iface_init (GProxyResolverInterface *iface)
+xproxy_resolver_portal_iface_init (xproxy_resolver_interface_t *iface)
 {
-  iface->is_supported = g_proxy_resolver_portal_is_supported;
-  iface->lookup = g_proxy_resolver_portal_lookup;
-  iface->lookup_async = g_proxy_resolver_portal_lookup_async;
-  iface->lookup_finish = g_proxy_resolver_portal_lookup_finish;
+  iface->is_supported = xproxy_resolver_portal_is_supported;
+  iface->lookup = xproxy_resolver_portal_lookup;
+  iface->lookup_async = xproxy_resolver_portal_lookup_async;
+  iface->lookup_finish = xproxy_resolver_portal_lookup_finish;
 }

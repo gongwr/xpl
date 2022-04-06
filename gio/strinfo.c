@@ -22,7 +22,7 @@
 
 /*
  * The string info map is an efficient data structure designed to be
- * used with a small set of items.  It is used by GSettings schemas for
+ * used with a small set of items.  It is used by xsettings_t schemas for
  * three purposes:
  *
  *  1) Implement <choices> with a list of valid strings
@@ -117,7 +117,7 @@
 #define STRINFO_MAX_WORDS   17
 G_GNUC_UNUSED static xuint_t
 strinfo_string_to_words (const xchar_t *string,
-                         guint32     *words,
+                         xuint32_t     *words,
                          xboolean_t     alias)
 {
   xuint_t n_words;
@@ -138,9 +138,9 @@ strinfo_string_to_words (const xchar_t *string,
 }
 
 G_GNUC_UNUSED static xint_t
-strinfo_scan (const guint32 *strinfo,
+strinfo_scan (const xuint32_t *strinfo,
               xuint_t          length,
-              const guint32 *words,
+              const xuint32_t *words,
               xuint_t          n_words)
 {
   xuint_t i = 0;
@@ -167,12 +167,12 @@ strinfo_scan (const guint32 *strinfo,
 }
 
 G_GNUC_UNUSED static xint_t
-strinfo_find_string (const guint32 *strinfo,
+strinfo_find_string (const xuint32_t *strinfo,
                      xuint_t          length,
                      const xchar_t   *string,
                      xboolean_t       alias)
 {
-  guint32 words[STRINFO_MAX_WORDS];
+  xuint32_t words[STRINFO_MAX_WORDS];
   xuint_t n_words;
 
   if (length == 0)
@@ -184,9 +184,9 @@ strinfo_find_string (const guint32 *strinfo,
 }
 
 G_GNUC_UNUSED static xint_t
-strinfo_find_integer (const guint32 *strinfo,
+strinfo_find_integer (const xuint32_t *strinfo,
                       xuint_t          length,
-                      guint32        value)
+                      xuint32_t        value)
 {
   xuint_t i;
 
@@ -204,7 +204,7 @@ strinfo_find_integer (const guint32 *strinfo,
 }
 
 G_GNUC_UNUSED static xboolean_t
-strinfo_is_string_valid (const guint32 *strinfo,
+strinfo_is_string_valid (const xuint32_t *strinfo,
                          xuint_t          length,
                          const xchar_t   *string)
 {
@@ -212,7 +212,7 @@ strinfo_is_string_valid (const guint32 *strinfo,
 }
 
 G_GNUC_UNUSED static xboolean_t
-strinfo_enum_from_string (const guint32 *strinfo,
+strinfo_enum_from_string (const xuint32_t *strinfo,
                           xuint_t          length,
                           const xchar_t   *string,
                           xuint_t         *result)
@@ -229,7 +229,7 @@ strinfo_enum_from_string (const guint32 *strinfo,
 }
 
 G_GNUC_UNUSED static const xchar_t *
-strinfo_string_from_enum (const guint32 *strinfo,
+strinfo_string_from_enum (const xuint32_t *strinfo,
                           xuint_t          length,
                           xuint_t          value)
 {
@@ -244,7 +244,7 @@ strinfo_string_from_enum (const guint32 *strinfo,
 }
 
 G_GNUC_UNUSED static const xchar_t *
-strinfo_string_from_alias (const guint32 *strinfo,
+strinfo_string_from_alias (const xuint32_t *strinfo,
                            xuint_t          length,
                            const xchar_t   *alias)
 {
@@ -259,10 +259,10 @@ strinfo_string_from_alias (const guint32 *strinfo,
 }
 
 G_GNUC_UNUSED static xvariant_t *
-strinfo_enumerate (const guint32 *strinfo,
+strinfo_enumerate (const xuint32_t *strinfo,
                    xuint_t          length)
 {
-  GVariantBuilder builder;
+  xvariant_builder_t builder;
   const xchar_t *ptr, *end;
 
   ptr = (xpointer_t) strinfo;
@@ -270,13 +270,13 @@ strinfo_enumerate (const guint32 *strinfo,
 
   ptr += 4;
 
-  g_variant_builder_init (&builder, G_VARIANT_TYPE_STRING_ARRAY);
+  xvariant_builder_init (&builder, G_VARIANT_TYPE_STRING_ARRAY);
 
   while (ptr < end)
     {
       /* don't include aliases */
       if (*ptr == '\xff')
-        g_variant_builder_add (&builder, "s", ptr + 1);
+        xvariant_builder_add (&builder, "s", ptr + 1);
 
       /* find the end of this string */
       ptr = memchr (ptr, '\xff', end - ptr);
@@ -286,35 +286,35 @@ strinfo_enumerate (const guint32 *strinfo,
       ptr += 5;
     }
 
-  return g_variant_builder_end (&builder);
+  return xvariant_builder_end (&builder);
 }
 
 G_GNUC_UNUSED static void
-strinfo_builder_append_item (GString     *builder,
+strinfo_builder_append_item (xstring_t     *builder,
                              const xchar_t *string,
                              xuint_t        value)
 {
-  guint32 words[STRINFO_MAX_WORDS];
+  xuint32_t words[STRINFO_MAX_WORDS];
   xuint_t n_words;
 
   value = GUINT32_TO_LE (value);
 
   n_words = strinfo_string_to_words (string, words, FALSE);
-  g_string_append_len (builder, (void *) &value, sizeof value);
-  g_string_append_len (builder, (void *) words, 4 * n_words);
+  xstring_append_len (builder, (void *) &value, sizeof value);
+  xstring_append_len (builder, (void *) words, 4 * n_words);
 }
 
 G_GNUC_UNUSED static xboolean_t
-strinfo_builder_append_alias (GString     *builder,
+strinfo_builder_append_alias (xstring_t     *builder,
                               const xchar_t *alias,
                               const xchar_t *target)
 {
-  guint32 words[STRINFO_MAX_WORDS];
+  xuint32_t words[STRINFO_MAX_WORDS];
   xuint_t n_words;
   xuint_t value;
   xint_t index;
 
-  index = strinfo_find_string ((const guint32 *) builder->str,
+  index = strinfo_find_string ((const xuint32_t *) builder->str,
                                builder->len / 4, target, FALSE);
 
   if (index == -1)
@@ -323,26 +323,26 @@ strinfo_builder_append_alias (GString     *builder,
   value = GUINT32_TO_LE (index);
 
   n_words = strinfo_string_to_words (alias, words, TRUE);
-  g_string_append_len (builder, (void *) &value, sizeof value);
-  g_string_append_len (builder, (void *) words, 4 * n_words);
+  xstring_append_len (builder, (void *) &value, sizeof value);
+  xstring_append_len (builder, (void *) words, 4 * n_words);
 
   return TRUE;
 }
 
 G_GNUC_UNUSED static xboolean_t
-strinfo_builder_contains (GString     *builder,
+strinfo_builder_contains (xstring_t     *builder,
                           const xchar_t *string)
 {
-  return strinfo_find_string ((const guint32 *) builder->str,
+  return strinfo_find_string ((const xuint32_t *) builder->str,
                               builder->len / 4, string, FALSE) != -1 ||
-         strinfo_find_string ((const guint32 *) builder->str,
+         strinfo_find_string ((const xuint32_t *) builder->str,
                               builder->len / 4, string, TRUE) != -1;
 }
 
 G_GNUC_UNUSED static xboolean_t
-strinfo_builder_contains_value (GString *builder,
+strinfo_builder_contains_value (xstring_t *builder,
                                 xuint_t    value)
 {
-  return strinfo_string_from_enum ((const guint32 *) builder->str,
+  return strinfo_string_from_enum ((const xuint32_t *) builder->str,
                                    builder->len / 4, value) != NULL;
 }

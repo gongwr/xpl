@@ -30,130 +30,130 @@ G_BEGIN_DECLS
 /* --- type macros --- */
 /**
  * G_VALUE_HOLDS_CHAR:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_CHAR.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_CHAR.
  *
  * Returns: %TRUE on success.
  */
 #define G_VALUE_HOLDS_CHAR(value)	 (XTYPE_CHECK_VALUE_TYPE ((value), XTYPE_CHAR))
 /**
  * G_VALUE_HOLDS_UCHAR:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_UCHAR.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_UCHAR.
  *
  * Returns: %TRUE on success.
  */
 #define G_VALUE_HOLDS_UCHAR(value)	 (XTYPE_CHECK_VALUE_TYPE ((value), XTYPE_UCHAR))
 /**
  * G_VALUE_HOLDS_BOOLEAN:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_BOOLEAN.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_BOOLEAN.
  *
  * Returns: %TRUE on success.
  */
 #define G_VALUE_HOLDS_BOOLEAN(value)	 (XTYPE_CHECK_VALUE_TYPE ((value), XTYPE_BOOLEAN))
 /**
  * G_VALUE_HOLDS_INT:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_INT.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_INT.
  *
  * Returns: %TRUE on success.
  */
 #define G_VALUE_HOLDS_INT(value)	 (XTYPE_CHECK_VALUE_TYPE ((value), XTYPE_INT))
 /**
  * G_VALUE_HOLDS_UINT:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_UINT.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_UINT.
  *
  * Returns: %TRUE on success.
  */
 #define G_VALUE_HOLDS_UINT(value)	 (XTYPE_CHECK_VALUE_TYPE ((value), XTYPE_UINT))
 /**
  * G_VALUE_HOLDS_LONG:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_LONG.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_LONG.
  *
  * Returns: %TRUE on success.
  */
 #define G_VALUE_HOLDS_LONG(value)	 (XTYPE_CHECK_VALUE_TYPE ((value), XTYPE_LONG))
 /**
  * G_VALUE_HOLDS_ULONG:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_ULONG.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_ULONG.
  *
  * Returns: %TRUE on success.
  */
 #define G_VALUE_HOLDS_ULONG(value)	 (XTYPE_CHECK_VALUE_TYPE ((value), XTYPE_ULONG))
 /**
  * G_VALUE_HOLDS_INT64:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_INT64.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_INT64.
  *
  * Returns: %TRUE on success.
  */
 #define G_VALUE_HOLDS_INT64(value)	 (XTYPE_CHECK_VALUE_TYPE ((value), XTYPE_INT64))
 /**
  * G_VALUE_HOLDS_UINT64:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_UINT64.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_UINT64.
  *
  * Returns: %TRUE on success.
  */
 #define G_VALUE_HOLDS_UINT64(value)	 (XTYPE_CHECK_VALUE_TYPE ((value), XTYPE_UINT64))
 /**
  * G_VALUE_HOLDS_FLOAT:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_FLOAT.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_FLOAT.
  *
  * Returns: %TRUE on success.
  */
 #define G_VALUE_HOLDS_FLOAT(value)	 (XTYPE_CHECK_VALUE_TYPE ((value), XTYPE_FLOAT))
 /**
  * G_VALUE_HOLDS_DOUBLE:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_DOUBLE.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_DOUBLE.
  *
  * Returns: %TRUE on success.
  */
 #define G_VALUE_HOLDS_DOUBLE(value)	 (XTYPE_CHECK_VALUE_TYPE ((value), XTYPE_DOUBLE))
 /**
  * G_VALUE_HOLDS_STRING:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_STRING.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_STRING.
  *
  * Returns: %TRUE on success.
  */
 #define G_VALUE_HOLDS_STRING(value)	 (XTYPE_CHECK_VALUE_TYPE ((value), XTYPE_STRING))
 /**
  * G_VALUE_IS_INTERNED_STRING:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
  * Checks whether @value contains a string which is canonical.
  *
  * Returns: %TRUE if the value contains a string in its canonical
  * representation, as returned by g_intern_string(). See also
- * g_value_set_interned_string().
+ * xvalue_set_interned_string().
  *
  * Since: 2.66
  */
 #define G_VALUE_IS_INTERNED_STRING(value) (G_VALUE_HOLDS_STRING (value) && ((value)->data[1].v_uint & G_VALUE_INTERNED_STRING)) XPL_AVAILABLE_MACRO_IN_2_66
 /**
  * G_VALUE_HOLDS_POINTER:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_POINTER.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_POINTER.
  *
  * Returns: %TRUE on success.
  */
@@ -166,9 +166,9 @@ G_BEGIN_DECLS
 #define	XTYPE_GTYPE			 (g_gtype_get_type())
 /**
  * G_VALUE_HOLDS_GTYPE:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_GTYPE.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_GTYPE.
  *
  * Since: 2.12
  * Returns: %TRUE on success.
@@ -176,9 +176,9 @@ G_BEGIN_DECLS
 #define G_VALUE_HOLDS_GTYPE(value)	 (XTYPE_CHECK_VALUE_TYPE ((value), XTYPE_GTYPE))
 /**
  * G_VALUE_HOLDS_VARIANT:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values of type %XTYPE_VARIANT.
+ * Checks whether the given #xvalue_t can hold values of type %XTYPE_VARIANT.
  *
  * Returns: %TRUE on success.
  *
@@ -188,101 +188,101 @@ G_BEGIN_DECLS
 
 
 /* --- prototypes --- */
-XPL_DEPRECATED_IN_2_32_FOR(g_value_set_schar)
-void                  g_value_set_char          (GValue       *value,
+XPL_DEPRECATED_IN_2_32_FOR(xvalue_set_schar)
+void                  xvalue_set_char          (xvalue_t       *value,
                                                  xchar_t         v_char);
-XPL_DEPRECATED_IN_2_32_FOR(g_value_get_schar)
-xchar_t                 g_value_get_char          (const GValue *value);
+XPL_DEPRECATED_IN_2_32_FOR(xvalue_get_schar)
+xchar_t                 xvalue_get_char          (const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_schar		(GValue	      *value,
+void		      xvalue_set_schar		(xvalue_t	      *value,
 						 gint8	       v_char);
 XPL_AVAILABLE_IN_ALL
-gint8		      g_value_get_schar		(const GValue *value);
+gint8		      xvalue_get_schar		(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_uchar		(GValue	      *value,
+void		      xvalue_set_uchar		(xvalue_t	      *value,
 						 guchar	       v_uchar);
 XPL_AVAILABLE_IN_ALL
-guchar		      g_value_get_uchar		(const GValue *value);
+guchar		      xvalue_get_uchar		(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_boolean	(GValue	      *value,
+void		      xvalue_set_boolean	(xvalue_t	      *value,
 						 xboolean_t      v_boolean);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	      g_value_get_boolean	(const GValue *value);
+xboolean_t	      xvalue_get_boolean	(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_int		(GValue	      *value,
+void		      xvalue_set_int		(xvalue_t	      *value,
 						 xint_t	       v_int);
 XPL_AVAILABLE_IN_ALL
-xint_t		      g_value_get_int		(const GValue *value);
+xint_t		      xvalue_get_int		(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_uint		(GValue	      *value,
+void		      xvalue_set_uint		(xvalue_t	      *value,
 						 xuint_t	       v_uint);
 XPL_AVAILABLE_IN_ALL
-xuint_t		      g_value_get_uint		(const GValue *value);
+xuint_t		      xvalue_get_uint		(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_long		(GValue	      *value,
-						 glong	       v_long);
+void		      xvalue_set_long		(xvalue_t	      *value,
+						 xlong_t	       v_long);
 XPL_AVAILABLE_IN_ALL
-glong		      g_value_get_long		(const GValue *value);
+xlong_t		      xvalue_get_long		(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_ulong		(GValue	      *value,
+void		      xvalue_set_ulong		(xvalue_t	      *value,
 						 gulong	       v_ulong);
 XPL_AVAILABLE_IN_ALL
-gulong		      g_value_get_ulong		(const GValue *value);
+gulong		      xvalue_get_ulong		(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_int64		(GValue	      *value,
+void		      xvalue_set_int64		(xvalue_t	      *value,
 						 gint64	       v_int64);
 XPL_AVAILABLE_IN_ALL
-gint64		      g_value_get_int64		(const GValue *value);
+gint64		      xvalue_get_int64		(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_uint64	(GValue	      *value,
-						 guint64      v_uint64);
+void		      xvalue_set_uint64	(xvalue_t	      *value,
+						 xuint64_t      v_uint64);
 XPL_AVAILABLE_IN_ALL
-guint64		      g_value_get_uint64	(const GValue *value);
+xuint64_t		      xvalue_get_uint64	(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_float		(GValue	      *value,
+void		      xvalue_set_float		(xvalue_t	      *value,
 						 gfloat	       v_float);
 XPL_AVAILABLE_IN_ALL
-gfloat		      g_value_get_float		(const GValue *value);
+gfloat		      xvalue_get_float		(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_double	(GValue	      *value,
+void		      xvalue_set_double	(xvalue_t	      *value,
 						 xdouble_t       v_double);
 XPL_AVAILABLE_IN_ALL
-xdouble_t		      g_value_get_double	(const GValue *value);
+xdouble_t		      xvalue_get_double	(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_string	(GValue	      *value,
+void		      xvalue_set_string	(xvalue_t	      *value,
 						 const xchar_t  *v_string);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_static_string (GValue	      *value,
+void		      xvalue_set_static_string (xvalue_t	      *value,
 						 const xchar_t  *v_string);
 XPL_AVAILABLE_IN_2_66
-void		      g_value_set_interned_string (GValue      *value,
+void		      xvalue_set_interned_string (xvalue_t      *value,
 						   const xchar_t  *v_string);
 XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_value_get_string	(const GValue *value);
+const xchar_t *         xvalue_get_string	(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-xchar_t*		      g_value_dup_string	(const GValue *value);
+xchar_t*		      xvalue_dup_string	(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_pointer	(GValue	      *value,
+void		      xvalue_set_pointer	(xvalue_t	      *value,
 						 xpointer_t      v_pointer);
 XPL_AVAILABLE_IN_ALL
-xpointer_t	      g_value_get_pointer	(const GValue *value);
+xpointer_t	      xvalue_get_pointer	(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
 xtype_t		      g_gtype_get_type		(void);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_gtype	        (GValue	      *value,
+void		      xvalue_set_gtype	        (xvalue_t	      *value,
 						 xtype_t         v_gtype);
 XPL_AVAILABLE_IN_ALL
-xtype_t	              g_value_get_gtype	        (const GValue *value);
+xtype_t	              xvalue_get_gtype	        (const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_set_variant	(GValue	      *value,
+void		      xvalue_set_variant	(xvalue_t	      *value,
 						 xvariant_t     *variant);
 XPL_AVAILABLE_IN_ALL
-void		      g_value_take_variant	(GValue	      *value,
+void		      xvalue_take_variant	(xvalue_t	      *value,
 						 xvariant_t     *variant);
 XPL_AVAILABLE_IN_ALL
-xvariant_t*	      g_value_get_variant	(const GValue *value);
+xvariant_t*	      xvalue_get_variant	(const xvalue_t *value);
 XPL_AVAILABLE_IN_ALL
-xvariant_t*	      g_value_dup_variant	(const GValue *value);
+xvariant_t*	      xvalue_dup_variant	(const xvalue_t *value);
 
 
 /* Convenience for registering new pointer types */
@@ -291,14 +291,14 @@ xtype_t                 g_pointer_type_register_static (const xchar_t *name);
 
 /* debugging aid, describe value contents as string */
 XPL_AVAILABLE_IN_ALL
-xchar_t*                g_strdup_value_contents   (const GValue *value);
+xchar_t*                xstrdup_value_contents   (const xvalue_t *value);
 
 
 XPL_AVAILABLE_IN_ALL
-void g_value_take_string		        (GValue		   *value,
+void xvalue_take_string		        (xvalue_t		   *value,
 						 xchar_t		   *v_string);
-XPL_DEPRECATED_FOR(g_value_take_string)
-void g_value_set_string_take_ownership          (GValue            *value,
+XPL_DEPRECATED_FOR(xvalue_take_string)
+void xvalue_set_string_take_ownership          (xvalue_t            *value,
                                                  xchar_t             *v_string);
 
 

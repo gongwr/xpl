@@ -35,12 +35,12 @@
  * @short_description: Base class for implementing streaming input
  * @include: gio/gio.h
  *
- * #xinput_stream_t has functions to read from a stream (g_input_stream_read()),
- * to close a stream (g_input_stream_close()) and to skip some content
- * (g_input_stream_skip()).
+ * #xinput_stream_t has functions to read from a stream (xinput_stream_read()),
+ * to close a stream (xinput_stream_close()) and to skip some content
+ * (xinput_stream_skip()).
  *
  * To copy the content of an input stream to an output stream without
- * manually handling the reads and writes, use g_output_stream_splice().
+ * manually handling the reads and writes, use xoutput_stream_splice().
  *
  * See the documentation for #xio_stream_t for details of thread safety of
  * streaming APIs.
@@ -54,80 +54,80 @@ struct _GInputStreamPrivate {
   xasync_ready_callback_t outstanding_callback;
 };
 
-G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (xinput_stream_t, g_input_stream, XTYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (xinput_stream, xinput_stream, XTYPE_OBJECT)
 
-static gssize   g_input_stream_real_skip         (xinput_stream_t         *stream,
+static xssize_t   xinput_stream_real_skip         (xinput_stream_t         *stream,
 						  xsize_t                 count,
 						  xcancellable_t         *cancellable,
 						  xerror_t              **error);
-static void     g_input_stream_real_read_async   (xinput_stream_t         *stream,
+static void     xinput_stream_real_read_async   (xinput_stream_t         *stream,
 						  void                 *buffer,
 						  xsize_t                 count,
 						  int                   io_priority,
 						  xcancellable_t         *cancellable,
 						  xasync_ready_callback_t   callback,
 						  xpointer_t              user_data);
-static gssize   g_input_stream_real_read_finish  (xinput_stream_t         *stream,
+static xssize_t   xinput_stream_real_read_finish  (xinput_stream_t         *stream,
 						  xasync_result_t         *result,
 						  xerror_t              **error);
-static void     g_input_stream_real_skip_async   (xinput_stream_t         *stream,
+static void     xinput_stream_real_skip_async   (xinput_stream_t         *stream,
 						  xsize_t                 count,
 						  int                   io_priority,
 						  xcancellable_t         *cancellable,
 						  xasync_ready_callback_t   callback,
 						  xpointer_t              data);
-static gssize   g_input_stream_real_skip_finish  (xinput_stream_t         *stream,
+static xssize_t   xinput_stream_real_skip_finish  (xinput_stream_t         *stream,
 						  xasync_result_t         *result,
 						  xerror_t              **error);
-static void     g_input_stream_real_close_async  (xinput_stream_t         *stream,
+static void     xinput_stream_real_close_async  (xinput_stream_t         *stream,
 						  int                   io_priority,
 						  xcancellable_t         *cancellable,
 						  xasync_ready_callback_t   callback,
 						  xpointer_t              data);
-static xboolean_t g_input_stream_real_close_finish (xinput_stream_t         *stream,
+static xboolean_t xinput_stream_real_close_finish (xinput_stream_t         *stream,
 						  xasync_result_t         *result,
 						  xerror_t              **error);
 
 static void
-g_input_stream_dispose (xobject_t *object)
+xinput_stream_dispose (xobject_t *object)
 {
   xinput_stream_t *stream;
 
   stream = G_INPUT_STREAM (object);
 
   if (!stream->priv->closed)
-    g_input_stream_close (stream, NULL, NULL);
+    xinput_stream_close (stream, NULL, NULL);
 
-  G_OBJECT_CLASS (g_input_stream_parent_class)->dispose (object);
+  G_OBJECT_CLASS (xinput_stream_parent_class)->dispose (object);
 }
 
 
 static void
-g_input_stream_class_init (GInputStreamClass *klass)
+xinput_stream_class_init (GInputStreamClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->dispose = g_input_stream_dispose;
+  gobject_class->dispose = xinput_stream_dispose;
 
-  klass->skip = g_input_stream_real_skip;
-  klass->read_async = g_input_stream_real_read_async;
-  klass->read_finish = g_input_stream_real_read_finish;
-  klass->skip_async = g_input_stream_real_skip_async;
-  klass->skip_finish = g_input_stream_real_skip_finish;
-  klass->close_async = g_input_stream_real_close_async;
-  klass->close_finish = g_input_stream_real_close_finish;
+  klass->skip = xinput_stream_real_skip;
+  klass->read_async = xinput_stream_real_read_async;
+  klass->read_finish = xinput_stream_real_read_finish;
+  klass->skip_async = xinput_stream_real_skip_async;
+  klass->skip_finish = xinput_stream_real_skip_finish;
+  klass->close_async = xinput_stream_real_close_async;
+  klass->close_finish = xinput_stream_real_close_finish;
 }
 
 static void
-g_input_stream_init (xinput_stream_t *stream)
+xinput_stream_init (xinput_stream_t *stream)
 {
-  stream->priv = g_input_stream_get_instance_private (stream);
+  stream->priv = xinput_stream_get_instance_private (stream);
 }
 
 /**
- * g_input_stream_read:
+ * xinput_stream_read:
  * @stream: a #xinput_stream_t.
- * @buffer: (array length=count) (element-type guint8) (out caller-allocates):
+ * @buffer: (array length=count) (element-type xuint8_t) (out caller-allocates):
  *     a buffer to read data into (which should be at least count bytes long).
  * @count: (in): the number of bytes that will be read from the stream
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
@@ -157,15 +157,15 @@ g_input_stream_init (xinput_stream_t *stream)
  *
  * Returns: Number of bytes read, or -1 on error, or 0 on end of file.
  **/
-gssize
-g_input_stream_read  (xinput_stream_t  *stream,
+xssize_t
+xinput_stream_read  (xinput_stream_t  *stream,
 		      void          *buffer,
 		      xsize_t          count,
 		      xcancellable_t  *cancellable,
 		      xerror_t       **error)
 {
   GInputStreamClass *class;
-  gssize res;
+  xssize_t res;
 
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
   g_return_val_if_fail (buffer != NULL, 0);
@@ -173,7 +173,7 @@ g_input_stream_read  (xinput_stream_t  *stream,
   if (count == 0)
     return 0;
 
-  if (((gssize) count) < 0)
+  if (((xssize_t) count) < 0)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Too large count value passed to %s"), G_STRFUNC);
@@ -189,7 +189,7 @@ g_input_stream_read  (xinput_stream_t  *stream,
       return -1;
     }
 
-  if (!g_input_stream_set_pending (stream, error))
+  if (!xinput_stream_set_pending (stream, error))
     return -1;
 
   if (cancellable)
@@ -200,15 +200,15 @@ g_input_stream_read  (xinput_stream_t  *stream,
   if (cancellable)
     g_cancellable_pop_current (cancellable);
 
-  g_input_stream_clear_pending (stream);
+  xinput_stream_clear_pending (stream);
 
   return res;
 }
 
 /**
- * g_input_stream_read_all:
+ * xinput_stream_read_all:
  * @stream: a #xinput_stream_t.
- * @buffer: (array length=count) (element-type guint8) (out caller-allocates):
+ * @buffer: (array length=count) (element-type xuint8_t) (out caller-allocates):
  *     a buffer to read data into (which should be at least count bytes long).
  * @count: (in): the number of bytes that will be read from the stream
  * @bytes_read: (out): location to store the number of bytes that was read from the stream
@@ -218,7 +218,7 @@ g_input_stream_read  (xinput_stream_t  *stream,
  * Tries to read @count bytes from the stream into the buffer starting at
  * @buffer. Will block during this read.
  *
- * This function is similar to g_input_stream_read(), except it tries to
+ * This function is similar to xinput_stream_read(), except it tries to
  * read as many bytes as requested, only stopping on an error or end of stream.
  *
  * On a successful read of @count bytes, or if we reached the end of the
@@ -233,12 +233,12 @@ g_input_stream_read  (xinput_stream_t  *stream,
  * @bytes_read will be set to the number of bytes that were successfully
  * read before the error was encountered.  This functionality is only
  * available from C.  If you need it from another language then you must
- * write your own loop around g_input_stream_read().
+ * write your own loop around xinput_stream_read().
  *
  * Returns: %TRUE on success, %FALSE if there was an error
  **/
 xboolean_t
-g_input_stream_read_all (xinput_stream_t  *stream,
+xinput_stream_read_all (xinput_stream_t  *stream,
 			 void          *buffer,
 			 xsize_t          count,
 			 xsize_t         *bytes_read,
@@ -246,7 +246,7 @@ g_input_stream_read_all (xinput_stream_t  *stream,
 			 xerror_t       **error)
 {
   xsize_t _bytes_read;
-  gssize res;
+  xssize_t res;
 
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
   g_return_val_if_fail (buffer != NULL, FALSE);
@@ -254,7 +254,7 @@ g_input_stream_read_all (xinput_stream_t  *stream,
   _bytes_read = 0;
   while (_bytes_read < count)
     {
-      res = g_input_stream_read (stream, (char *)buffer + _bytes_read, count - _bytes_read,
+      res = xinput_stream_read (stream, (char *)buffer + _bytes_read, count - _bytes_read,
 				 cancellable, error);
       if (res == -1)
 	{
@@ -275,26 +275,26 @@ g_input_stream_read_all (xinput_stream_t  *stream,
 }
 
 /**
- * g_input_stream_read_bytes:
+ * xinput_stream_read_bytes:
  * @stream: a #xinput_stream_t.
  * @count: maximum number of bytes that will be read from the stream. Common
  * values include 4096 and 8192.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: location to store the error occurring, or %NULL to ignore
  *
- * Like g_input_stream_read(), this tries to read @count bytes from
+ * Like xinput_stream_read(), this tries to read @count bytes from
  * the stream in a blocking fashion. However, rather than reading into
- * a user-supplied buffer, this will create a new #GBytes containing
+ * a user-supplied buffer, this will create a new #xbytes_t containing
  * the data that was read. This may be easier to use from language
  * bindings.
  *
- * If count is zero, returns a zero-length #GBytes and does nothing. A
+ * If count is zero, returns a zero-length #xbytes_t and does nothing. A
  * value of @count larger than %G_MAXSSIZE will cause a
  * %G_IO_ERROR_INVALID_ARGUMENT error.
  *
- * On success, a new #GBytes is returned. It is not an error if the
+ * On success, a new #xbytes_t is returned. It is not an error if the
  * size of this object is not the same as the requested size, as it
- * can happen e.g. near the end of a file. A zero-length #GBytes is
+ * can happen e.g. near the end of a file. A zero-length #xbytes_t is
  * returned on end of file (or if @count is zero), but never
  * otherwise.
  *
@@ -306,21 +306,21 @@ g_input_stream_read_all (xinput_stream_t  *stream,
  *
  * On error %NULL is returned and @error is set accordingly.
  *
- * Returns: (transfer full): a new #GBytes, or %NULL on error
+ * Returns: (transfer full): a new #xbytes_t, or %NULL on error
  *
  * Since: 2.34
  **/
-GBytes *
-g_input_stream_read_bytes (xinput_stream_t  *stream,
+xbytes_t *
+xinput_stream_read_bytes (xinput_stream_t  *stream,
 			   xsize_t          count,
 			   xcancellable_t  *cancellable,
 			   xerror_t       **error)
 {
   guchar *buf;
-  gssize nread;
+  xssize_t nread;
 
   buf = g_malloc (count);
-  nread = g_input_stream_read (stream, buf, count, cancellable, error);
+  nread = xinput_stream_read (stream, buf, count, cancellable, error);
   if (nread == -1)
     {
       g_free (buf);
@@ -329,14 +329,14 @@ g_input_stream_read_bytes (xinput_stream_t  *stream,
   else if (nread == 0)
     {
       g_free (buf);
-      return g_bytes_new_static ("", 0);
+      return xbytes_new_static ("", 0);
     }
   else
-    return g_bytes_new_take (buf, nread);
+    return xbytes_new_take (buf, nread);
 }
 
 /**
- * g_input_stream_skip:
+ * xinput_stream_skip:
  * @stream: a #xinput_stream_t.
  * @count: the number of bytes that will be skipped from the stream
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
@@ -344,7 +344,7 @@ g_input_stream_read_bytes (xinput_stream_t  *stream,
  *
  * Tries to skip @count bytes from the stream. Will block during the operation.
  *
- * This is identical to g_input_stream_read(), from a behaviour standpoint,
+ * This is identical to xinput_stream_read(), from a behaviour standpoint,
  * but the bytes that are skipped are not returned to the user. Some
  * streams have an implementation that is more efficient than reading the data.
  *
@@ -359,21 +359,21 @@ g_input_stream_read_bytes (xinput_stream_t  *stream,
  *
  * Returns: Number of bytes skipped, or -1 on error
  **/
-gssize
-g_input_stream_skip (xinput_stream_t  *stream,
+xssize_t
+xinput_stream_skip (xinput_stream_t  *stream,
 		     xsize_t          count,
 		     xcancellable_t  *cancellable,
 		     xerror_t       **error)
 {
   GInputStreamClass *class;
-  gssize res;
+  xssize_t res;
 
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
 
   if (count == 0)
     return 0;
 
-  if (((gssize) count) < 0)
+  if (((xssize_t) count) < 0)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Too large count value passed to %s"), G_STRFUNC);
@@ -382,7 +382,7 @@ g_input_stream_skip (xinput_stream_t  *stream,
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
 
-  if (!g_input_stream_set_pending (stream, error))
+  if (!xinput_stream_set_pending (stream, error))
     return -1;
 
   if (cancellable)
@@ -393,50 +393,50 @@ g_input_stream_skip (xinput_stream_t  *stream,
   if (cancellable)
     g_cancellable_pop_current (cancellable);
 
-  g_input_stream_clear_pending (stream);
+  xinput_stream_clear_pending (stream);
 
   return res;
 }
 
-static gssize
-g_input_stream_real_skip (xinput_stream_t  *stream,
+static xssize_t
+xinput_stream_real_skip (xinput_stream_t  *stream,
 			  xsize_t          count,
 			  xcancellable_t  *cancellable,
 			  xerror_t       **error)
 {
   GInputStreamClass *class;
-  gssize ret, read_bytes;
+  xssize_t ret, read_bytes;
   char buffer[8192];
   xerror_t *my_error;
 
-  if (X_IS_SEEKABLE (stream) && g_seekable_can_seek (G_SEEKABLE (stream)))
+  if (X_IS_SEEKABLE (stream) && xseekable_can_seek (G_SEEKABLE (stream)))
     {
-      GSeekable *seekable = G_SEEKABLE (stream);
-      goffset start, end;
+      xseekable__t *seekable = G_SEEKABLE (stream);
+      xoffset_t start, end;
       xboolean_t success;
 
-      /* g_seekable_seek() may try to set pending itself */
+      /* xseekable_seek() may try to set pending itself */
       stream->priv->pending = FALSE;
 
-      start = g_seekable_tell (seekable);
+      start = xseekable_tell (seekable);
 
-      if (g_seekable_seek (G_SEEKABLE (stream),
+      if (xseekable_seek (G_SEEKABLE (stream),
                            0,
                            G_SEEK_END,
                            cancellable,
                            NULL))
         {
-          end = g_seekable_tell (seekable);
+          end = xseekable_tell (seekable);
           g_assert (start >= 0);
           g_assert (end >= start);
-          if (start > (goffset) (G_MAXOFFSET - count) ||
-              (goffset) (start + count) > end)
+          if (start > (xoffset_t) (G_MAXOFFSET - count) ||
+              (xoffset_t) (start + count) > end)
             {
               stream->priv->pending = TRUE;
               return end - start;
             }
 
-          success = g_seekable_seek (G_SEEKABLE (stream),
+          success = xseekable_seek (G_SEEKABLE (stream),
                                      start + count,
                                      G_SEEK_SET,
                                      cancellable,
@@ -467,7 +467,7 @@ g_input_stream_real_skip (xinput_stream_t  *stream,
 	      my_error->domain == G_IO_ERROR &&
 	      my_error->code == G_IO_ERROR_CANCELLED)
 	    {
-	      g_error_free (my_error);
+	      xerror_free (my_error);
 	      return read_bytes;
 	    }
 
@@ -484,7 +484,7 @@ g_input_stream_real_skip (xinput_stream_t  *stream,
 }
 
 /**
- * g_input_stream_close:
+ * xinput_stream_close:
  * @stream: A #xinput_stream_t.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: location to store the error occurring, or %NULL to ignore
@@ -516,7 +516,7 @@ g_input_stream_real_skip (xinput_stream_t  *stream,
  * Returns: %TRUE on success, %FALSE on failure
  **/
 xboolean_t
-g_input_stream_close (xinput_stream_t  *stream,
+xinput_stream_close (xinput_stream_t  *stream,
 		      xcancellable_t  *cancellable,
 		      xerror_t       **error)
 {
@@ -532,7 +532,7 @@ g_input_stream_close (xinput_stream_t  *stream,
 
   res = TRUE;
 
-  if (!g_input_stream_set_pending (stream, error))
+  if (!xinput_stream_set_pending (stream, error))
     return FALSE;
 
   if (cancellable)
@@ -544,7 +544,7 @@ g_input_stream_close (xinput_stream_t  *stream,
   if (cancellable)
     g_cancellable_pop_current (cancellable);
 
-  g_input_stream_clear_pending (stream);
+  xinput_stream_clear_pending (stream);
 
   stream->priv->closed = TRUE;
 
@@ -558,10 +558,10 @@ async_ready_callback_wrapper (xobject_t      *source_object,
 {
   xinput_stream_t *stream = G_INPUT_STREAM (source_object);
 
-  g_input_stream_clear_pending (stream);
+  xinput_stream_clear_pending (stream);
   if (stream->priv->outstanding_callback)
     (*stream->priv->outstanding_callback) (source_object, res, user_data);
-  g_object_unref (stream);
+  xobject_unref (stream);
 }
 
 static void
@@ -571,17 +571,17 @@ async_ready_close_callback_wrapper (xobject_t      *source_object,
 {
   xinput_stream_t *stream = G_INPUT_STREAM (source_object);
 
-  g_input_stream_clear_pending (stream);
+  xinput_stream_clear_pending (stream);
   stream->priv->closed = TRUE;
   if (stream->priv->outstanding_callback)
     (*stream->priv->outstanding_callback) (source_object, res, user_data);
-  g_object_unref (stream);
+  xobject_unref (stream);
 }
 
 /**
- * g_input_stream_read_async:
+ * xinput_stream_read_async:
  * @stream: A #xinput_stream_t.
- * @buffer: (array length=count) (element-type guint8) (out caller-allocates):
+ * @buffer: (array length=count) (element-type xuint8_t) (out caller-allocates):
  *     a buffer to read data into (which should be at least count bytes long).
  * @count: (in): the number of bytes that will be read from the stream
  * @io_priority: the [I/O priority][io-priority]
@@ -592,7 +592,7 @@ async_ready_close_callback_wrapper (xobject_t      *source_object,
  *
  * Request an asynchronous read of @count bytes from the stream into the buffer
  * starting at @buffer. When the operation is finished @callback will be called.
- * You can then call g_input_stream_read_finish() to get the result of the
+ * You can then call xinput_stream_read_finish() to get the result of the
  * operation.
  *
  * During an async request no other sync and async calls are allowed on @stream, and will
@@ -615,7 +615,7 @@ async_ready_close_callback_wrapper (xobject_t      *source_object,
  * override one you must override all.
  **/
 void
-g_input_stream_read_async (xinput_stream_t        *stream,
+xinput_stream_read_async (xinput_stream_t        *stream,
 			   void                *buffer,
 			   xsize_t                count,
 			   int                  io_priority,
@@ -631,42 +631,42 @@ g_input_stream_read_async (xinput_stream_t        *stream,
 
   if (count == 0)
     {
-      GTask *task;
+      xtask_t *task;
 
-      task = g_task_new (stream, cancellable, callback, user_data);
-      g_task_set_source_tag (task, g_input_stream_read_async);
-      g_task_return_int (task, 0);
-      g_object_unref (task);
+      task = xtask_new (stream, cancellable, callback, user_data);
+      xtask_set_source_tag (task, xinput_stream_read_async);
+      xtask_return_int (task, 0);
+      xobject_unref (task);
       return;
     }
 
-  if (((gssize) count) < 0)
+  if (((xssize_t) count) < 0)
     {
-      g_task_report_new_error (stream, callback, user_data,
-                               g_input_stream_read_async,
+      xtask_report_new_error (stream, callback, user_data,
+                               xinput_stream_read_async,
                                G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
                                _("Too large count value passed to %s"),
                                G_STRFUNC);
       return;
     }
 
-  if (!g_input_stream_set_pending (stream, &error))
+  if (!xinput_stream_set_pending (stream, &error))
     {
-      g_task_report_error (stream, callback, user_data,
-                           g_input_stream_read_async,
+      xtask_report_error (stream, callback, user_data,
+                           xinput_stream_read_async,
                            error);
       return;
     }
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
   stream->priv->outstanding_callback = callback;
-  g_object_ref (stream);
+  xobject_ref (stream);
   class->read_async (stream, buffer, count, io_priority, cancellable,
 		     async_ready_callback_wrapper, user_data);
 }
 
 /**
- * g_input_stream_read_finish:
+ * xinput_stream_read_finish:
  * @stream: a #xinput_stream_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
@@ -676,8 +676,8 @@ g_input_stream_read_async (xinput_stream_t        *stream,
  *
  * Returns: number of bytes read in, or -1 on error, or 0 on end of file.
  **/
-gssize
-g_input_stream_read_finish (xinput_stream_t  *stream,
+xssize_t
+xinput_stream_read_finish (xinput_stream_t  *stream,
 			    xasync_result_t  *result,
 			    xerror_t       **error)
 {
@@ -686,10 +686,10 @@ g_input_stream_read_finish (xinput_stream_t  *stream,
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), -1);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return -1;
-  else if (g_async_result_is_tagged (result, g_input_stream_read_async))
-    return g_task_propagate_int (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xinput_stream_read_async))
+    return xtask_propagate_int (XTASK (result), error);
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
   return class->read_finish (stream, result, error);
@@ -713,21 +713,21 @@ read_all_callback (xobject_t      *stream,
                    xasync_result_t *result,
                    xpointer_t      user_data)
 {
-  GTask *task = user_data;
-  AsyncReadAll *data = g_task_get_task_data (task);
+  xtask_t *task = user_data;
+  AsyncReadAll *data = xtask_get_task_data (task);
   xboolean_t got_eof = FALSE;
 
   if (result)
     {
       xerror_t *error = NULL;
-      gssize nread;
+      xssize_t nread;
 
-      nread = g_input_stream_read_finish (G_INPUT_STREAM (stream), result, &error);
+      nread = xinput_stream_read_finish (G_INPUT_STREAM (stream), result, &error);
 
       if (nread == -1)
         {
-          g_task_return_error (task, error);
-          g_object_unref (task);
+          xtask_return_error (task, error);
+          xobject_unref (task);
           return;
         }
 
@@ -739,22 +739,22 @@ read_all_callback (xobject_t      *stream,
 
   if (got_eof || data->to_read == 0)
     {
-      g_task_return_boolean (task, TRUE);
-      g_object_unref (task);
+      xtask_return_boolean (task, TRUE);
+      xobject_unref (task);
     }
 
   else
-    g_input_stream_read_async (G_INPUT_STREAM (stream),
+    xinput_stream_read_async (G_INPUT_STREAM (stream),
                                data->buffer + data->bytes_read,
                                data->to_read,
-                               g_task_get_priority (task),
-                               g_task_get_cancellable (task),
+                               xtask_get_priority (task),
+                               xtask_get_cancellable (task),
                                read_all_callback, task);
 }
 
 
 static void
-read_all_async_thread (GTask        *task,
+read_all_async_thread (xtask_t        *task,
                        xpointer_t      source_object,
                        xpointer_t      task_data,
                        xcancellable_t *cancellable)
@@ -763,17 +763,17 @@ read_all_async_thread (GTask        *task,
   AsyncReadAll *data = task_data;
   xerror_t *error = NULL;
 
-  if (g_input_stream_read_all (stream, data->buffer, data->to_read, &data->bytes_read,
-                               g_task_get_cancellable (task), &error))
-    g_task_return_boolean (task, TRUE);
+  if (xinput_stream_read_all (stream, data->buffer, data->to_read, &data->bytes_read,
+                               xtask_get_cancellable (task), &error))
+    xtask_return_boolean (task, TRUE);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 /**
- * g_input_stream_read_all_async:
+ * xinput_stream_read_all_async:
  * @stream: A #xinput_stream_t
- * @buffer: (array length=count) (element-type guint8) (out caller-allocates):
+ * @buffer: (array length=count) (element-type xuint8_t) (out caller-allocates):
  *     a buffer to read data into (which should be at least count bytes long)
  * @count: (in): the number of bytes that will be read from the stream
  * @io_priority: the [I/O priority][io-priority] of the request
@@ -784,9 +784,9 @@ read_all_async_thread (GTask        *task,
  * Request an asynchronous read of @count bytes from the stream into the
  * buffer starting at @buffer.
  *
- * This is the asynchronous equivalent of g_input_stream_read_all().
+ * This is the asynchronous equivalent of xinput_stream_read_all().
  *
- * Call g_input_stream_read_all_finish() to collect the result.
+ * Call xinput_stream_read_all_finish() to collect the result.
  *
  * Any outstanding I/O request with higher priority (lower numerical
  * value) will be executed before an outstanding request with lower
@@ -795,7 +795,7 @@ read_all_async_thread (GTask        *task,
  * Since: 2.44
  **/
 void
-g_input_stream_read_all_async (xinput_stream_t        *stream,
+xinput_stream_read_all_async (xinput_stream_t        *stream,
                                void                *buffer,
                                xsize_t                count,
                                int                  io_priority,
@@ -804,75 +804,75 @@ g_input_stream_read_all_async (xinput_stream_t        *stream,
                                xpointer_t             user_data)
 {
   AsyncReadAll *data;
-  GTask *task;
+  xtask_t *task;
 
   g_return_if_fail (X_IS_INPUT_STREAM (stream));
   g_return_if_fail (buffer != NULL || count == 0);
 
-  task = g_task_new (stream, cancellable, callback, user_data);
+  task = xtask_new (stream, cancellable, callback, user_data);
   data = g_slice_new0 (AsyncReadAll);
   data->buffer = buffer;
   data->to_read = count;
 
-  g_task_set_source_tag (task, g_input_stream_read_all_async);
-  g_task_set_task_data (task, data, free_async_read_all);
-  g_task_set_priority (task, io_priority);
+  xtask_set_source_tag (task, xinput_stream_read_all_async);
+  xtask_set_task_data (task, data, free_async_read_all);
+  xtask_set_priority (task, io_priority);
 
   /* If async reads are going to be handled via the threadpool anyway
    * then we may as well do it with a single dispatch instead of
    * bouncing in and out.
    */
-  if (g_input_stream_async_read_is_via_threads (stream))
+  if (xinput_stream_async_read_is_via_threads (stream))
     {
-      g_task_run_in_thread (task, read_all_async_thread);
-      g_object_unref (task);
+      xtask_run_in_thread (task, read_all_async_thread);
+      xobject_unref (task);
     }
   else
     read_all_callback (G_OBJECT (stream), NULL, task);
 }
 
 /**
- * g_input_stream_read_all_finish:
+ * xinput_stream_read_all_finish:
  * @stream: a #xinput_stream_t
  * @result: a #xasync_result_t
  * @bytes_read: (out): location to store the number of bytes that was read from the stream
  * @error: a #xerror_t location to store the error occurring, or %NULL to ignore
  *
  * Finishes an asynchronous stream read operation started with
- * g_input_stream_read_all_async().
+ * xinput_stream_read_all_async().
  *
  * As a special exception to the normal conventions for functions that
  * use #xerror_t, if this function returns %FALSE (and sets @error) then
  * @bytes_read will be set to the number of bytes that were successfully
  * read before the error was encountered.  This functionality is only
  * available from C.  If you need it from another language then you must
- * write your own loop around g_input_stream_read_async().
+ * write your own loop around xinput_stream_read_async().
  *
  * Returns: %TRUE on success, %FALSE if there was an error
  *
  * Since: 2.44
  **/
 xboolean_t
-g_input_stream_read_all_finish (xinput_stream_t  *stream,
+xinput_stream_read_all_finish (xinput_stream_t  *stream,
                                 xasync_result_t  *result,
                                 xsize_t         *bytes_read,
                                 xerror_t       **error)
 {
-  GTask *task;
+  xtask_t *task;
 
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
-  task = G_TASK (result);
+  task = XTASK (result);
 
   if (bytes_read)
     {
-      AsyncReadAll *data = g_task_get_task_data (task);
+      AsyncReadAll *data = xtask_get_task_data (task);
 
       *bytes_read = data->bytes_read;
     }
 
-  return g_task_propagate_boolean (task, error);
+  return xtask_propagate_boolean (task, error);
 }
 
 static void
@@ -880,35 +880,35 @@ read_bytes_callback (xobject_t      *stream,
 		     xasync_result_t *result,
 		     xpointer_t      user_data)
 {
-  GTask *task = user_data;
-  guchar *buf = g_task_get_task_data (task);
+  xtask_t *task = user_data;
+  guchar *buf = xtask_get_task_data (task);
   xerror_t *error = NULL;
-  gssize nread;
-  GBytes *bytes = NULL;
+  xssize_t nread;
+  xbytes_t *bytes = NULL;
 
-  nread = g_input_stream_read_finish (G_INPUT_STREAM (stream),
+  nread = xinput_stream_read_finish (G_INPUT_STREAM (stream),
 				      result, &error);
   if (nread == -1)
     {
       g_free (buf);
-      g_task_return_error (task, error);
+      xtask_return_error (task, error);
     }
   else if (nread == 0)
     {
       g_free (buf);
-      bytes = g_bytes_new_static ("", 0);
+      bytes = xbytes_new_static ("", 0);
     }
   else
-    bytes = g_bytes_new_take (buf, nread);
+    bytes = xbytes_new_take (buf, nread);
 
   if (bytes)
-    g_task_return_pointer (task, bytes, (GDestroyNotify)g_bytes_unref);
+    xtask_return_pointer (task, bytes, (xdestroy_notify_t)xbytes_unref);
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 /**
- * g_input_stream_read_bytes_async:
+ * xinput_stream_read_bytes_async:
  * @stream: A #xinput_stream_t.
  * @count: the number of bytes that will be read from the stream
  * @io_priority: the [I/O priority][io-priority] of the request
@@ -917,8 +917,8 @@ read_bytes_callback (xobject_t      *stream,
  * @user_data: (closure): the data to pass to callback function
  *
  * Request an asynchronous read of @count bytes from the stream into a
- * new #GBytes. When the operation is finished @callback will be
- * called. You can then call g_input_stream_read_bytes_finish() to get the
+ * new #xbytes_t. When the operation is finished @callback will be
+ * called. You can then call xinput_stream_read_bytes_finish() to get the
  * result of the operation.
  *
  * During an async request no other sync and async calls are allowed
@@ -927,7 +927,7 @@ read_bytes_callback (xobject_t      *stream,
  * A value of @count larger than %G_MAXSSIZE will cause a
  * %G_IO_ERROR_INVALID_ARGUMENT error.
  *
- * On success, the new #GBytes will be passed to the callback. It is
+ * On success, the new #xbytes_t will be passed to the callback. It is
  * not an error if this is smaller than the requested size, as it can
  * happen e.g. near the end of a file, but generally we try to read as
  * many bytes as requested. Zero is returned on end of file (or if
@@ -940,53 +940,53 @@ read_bytes_callback (xobject_t      *stream,
  * Since: 2.34
  **/
 void
-g_input_stream_read_bytes_async (xinput_stream_t          *stream,
+xinput_stream_read_bytes_async (xinput_stream_t          *stream,
 				 xsize_t                  count,
 				 int                    io_priority,
 				 xcancellable_t          *cancellable,
 				 xasync_ready_callback_t    callback,
 				 xpointer_t               user_data)
 {
-  GTask *task;
+  xtask_t *task;
   guchar *buf;
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_input_stream_read_bytes_async);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xinput_stream_read_bytes_async);
 
   buf = g_malloc (count);
-  g_task_set_task_data (task, buf, NULL);
+  xtask_set_task_data (task, buf, NULL);
 
-  g_input_stream_read_async (stream, buf, count,
+  xinput_stream_read_async (stream, buf, count,
                              io_priority, cancellable,
                              read_bytes_callback, task);
 }
 
 /**
- * g_input_stream_read_bytes_finish:
+ * xinput_stream_read_bytes_finish:
  * @stream: a #xinput_stream_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  *   ignore.
  *
- * Finishes an asynchronous stream read-into-#GBytes operation.
+ * Finishes an asynchronous stream read-into-#xbytes_t operation.
  *
- * Returns: (transfer full): the newly-allocated #GBytes, or %NULL on error
+ * Returns: (transfer full): the newly-allocated #xbytes_t, or %NULL on error
  *
  * Since: 2.34
  **/
-GBytes *
-g_input_stream_read_bytes_finish (xinput_stream_t  *stream,
+xbytes_t *
+xinput_stream_read_bytes_finish (xinput_stream_t  *stream,
 				  xasync_result_t  *result,
 				  xerror_t       **error)
 {
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), NULL);
-  g_return_val_if_fail (g_task_is_valid (result, stream), NULL);
+  g_return_val_if_fail (xtask_is_valid (result, stream), NULL);
 
-  return g_task_propagate_pointer (G_TASK (result), error);
+  return xtask_propagate_pointer (XTASK (result), error);
 }
 
 /**
- * g_input_stream_skip_async:
+ * xinput_stream_skip_async:
  * @stream: A #xinput_stream_t.
  * @count: the number of bytes that will be skipped from the stream
  * @io_priority: the [I/O priority][io-priority] of the request
@@ -996,7 +996,7 @@ g_input_stream_read_bytes_finish (xinput_stream_t  *stream,
  *
  * Request an asynchronous skip of @count bytes from the stream.
  * When the operation is finished @callback will be called.
- * You can then call g_input_stream_skip_finish() to get the result
+ * You can then call xinput_stream_skip_finish() to get the result
  * of the operation.
  *
  * During an async request no other sync and async calls are allowed,
@@ -1019,7 +1019,7 @@ g_input_stream_read_bytes_finish (xinput_stream_t  *stream,
  * However, if you override one, you must override all.
  **/
 void
-g_input_stream_skip_async (xinput_stream_t        *stream,
+xinput_stream_skip_async (xinput_stream_t        *stream,
 			   xsize_t                count,
 			   int                  io_priority,
 			   xcancellable_t        *cancellable,
@@ -1033,42 +1033,42 @@ g_input_stream_skip_async (xinput_stream_t        *stream,
 
   if (count == 0)
     {
-      GTask *task;
+      xtask_t *task;
 
-      task = g_task_new (stream, cancellable, callback, user_data);
-      g_task_set_source_tag (task, g_input_stream_skip_async);
-      g_task_return_int (task, 0);
-      g_object_unref (task);
+      task = xtask_new (stream, cancellable, callback, user_data);
+      xtask_set_source_tag (task, xinput_stream_skip_async);
+      xtask_return_int (task, 0);
+      xobject_unref (task);
       return;
     }
 
-  if (((gssize) count) < 0)
+  if (((xssize_t) count) < 0)
     {
-      g_task_report_new_error (stream, callback, user_data,
-                               g_input_stream_skip_async,
+      xtask_report_new_error (stream, callback, user_data,
+                               xinput_stream_skip_async,
                                G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
                                _("Too large count value passed to %s"),
                                G_STRFUNC);
       return;
     }
 
-  if (!g_input_stream_set_pending (stream, &error))
+  if (!xinput_stream_set_pending (stream, &error))
     {
-      g_task_report_error (stream, callback, user_data,
-                           g_input_stream_skip_async,
+      xtask_report_error (stream, callback, user_data,
+                           xinput_stream_skip_async,
                            error);
       return;
     }
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
   stream->priv->outstanding_callback = callback;
-  g_object_ref (stream);
+  xobject_ref (stream);
   class->skip_async (stream, count, io_priority, cancellable,
 		     async_ready_callback_wrapper, user_data);
 }
 
 /**
- * g_input_stream_skip_finish:
+ * xinput_stream_skip_finish:
  * @stream: a #xinput_stream_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
@@ -1078,8 +1078,8 @@ g_input_stream_skip_async (xinput_stream_t        *stream,
  *
  * Returns: the size of the bytes skipped, or `-1` on error.
  **/
-gssize
-g_input_stream_skip_finish (xinput_stream_t  *stream,
+xssize_t
+xinput_stream_skip_finish (xinput_stream_t  *stream,
 			    xasync_result_t  *result,
 			    xerror_t       **error)
 {
@@ -1088,17 +1088,17 @@ g_input_stream_skip_finish (xinput_stream_t  *stream,
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), -1);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return -1;
-  else if (g_async_result_is_tagged (result, g_input_stream_skip_async))
-    return g_task_propagate_int (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xinput_stream_skip_async))
+    return xtask_propagate_int (XTASK (result), error);
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
   return class->skip_finish (stream, result, error);
 }
 
 /**
- * g_input_stream_close_async:
+ * xinput_stream_close_async:
  * @stream: A #xinput_stream_t.
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional cancellable object
@@ -1107,17 +1107,17 @@ g_input_stream_skip_finish (xinput_stream_t  *stream,
  *
  * Requests an asynchronous closes of the stream, releasing resources related to it.
  * When the operation is finished @callback will be called.
- * You can then call g_input_stream_close_finish() to get the result of the
+ * You can then call xinput_stream_close_finish() to get the result of the
  * operation.
  *
- * For behaviour details see g_input_stream_close().
+ * For behaviour details see xinput_stream_close().
  *
  * The asynchronous methods have a default fallback that uses threads to implement
  * asynchronicity, so they are optional for inheriting classes. However, if you
  * override one you must override all.
  **/
 void
-g_input_stream_close_async (xinput_stream_t        *stream,
+xinput_stream_close_async (xinput_stream_t        *stream,
 			    int                  io_priority,
 			    xcancellable_t        *cancellable,
 			    xasync_ready_callback_t  callback,
@@ -1130,43 +1130,43 @@ g_input_stream_close_async (xinput_stream_t        *stream,
 
   if (stream->priv->closed)
     {
-      GTask *task;
+      xtask_t *task;
 
-      task = g_task_new (stream, cancellable, callback, user_data);
-      g_task_set_source_tag (task, g_input_stream_close_async);
-      g_task_return_boolean (task, TRUE);
-      g_object_unref (task);
+      task = xtask_new (stream, cancellable, callback, user_data);
+      xtask_set_source_tag (task, xinput_stream_close_async);
+      xtask_return_boolean (task, TRUE);
+      xobject_unref (task);
       return;
     }
 
-  if (!g_input_stream_set_pending (stream, &error))
+  if (!xinput_stream_set_pending (stream, &error))
     {
-      g_task_report_error (stream, callback, user_data,
-                           g_input_stream_close_async,
+      xtask_report_error (stream, callback, user_data,
+                           xinput_stream_close_async,
                            error);
       return;
     }
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
   stream->priv->outstanding_callback = callback;
-  g_object_ref (stream);
+  xobject_ref (stream);
   class->close_async (stream, io_priority, cancellable,
 		      async_ready_close_callback_wrapper, user_data);
 }
 
 /**
- * g_input_stream_close_finish:
+ * xinput_stream_close_finish:
  * @stream: a #xinput_stream_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  * ignore.
  *
- * Finishes closing a stream asynchronously, started from g_input_stream_close_async().
+ * Finishes closing a stream asynchronously, started from xinput_stream_close_async().
  *
  * Returns: %TRUE if the stream was closed successfully.
  **/
 xboolean_t
-g_input_stream_close_finish (xinput_stream_t  *stream,
+xinput_stream_close_finish (xinput_stream_t  *stream,
 			     xasync_result_t  *result,
 			     xerror_t       **error)
 {
@@ -1175,17 +1175,17 @@ g_input_stream_close_finish (xinput_stream_t  *stream,
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_input_stream_close_async))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xinput_stream_close_async))
+    return xtask_propagate_boolean (XTASK (result), error);
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
   return class->close_finish (stream, result, error);
 }
 
 /**
- * g_input_stream_is_closed:
+ * xinput_stream_is_closed:
  * @stream: input stream.
  *
  * Checks if an input stream is closed.
@@ -1193,7 +1193,7 @@ g_input_stream_close_finish (xinput_stream_t  *stream,
  * Returns: %TRUE if the stream is closed.
  **/
 xboolean_t
-g_input_stream_is_closed (xinput_stream_t *stream)
+xinput_stream_is_closed (xinput_stream_t *stream)
 {
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), TRUE);
 
@@ -1201,7 +1201,7 @@ g_input_stream_is_closed (xinput_stream_t *stream)
 }
 
 /**
- * g_input_stream_has_pending:
+ * xinput_stream_has_pending:
  * @stream: input stream.
  *
  * Checks if an input stream has pending actions.
@@ -1209,7 +1209,7 @@ g_input_stream_is_closed (xinput_stream_t *stream)
  * Returns: %TRUE if @stream has pending actions.
  **/
 xboolean_t
-g_input_stream_has_pending (xinput_stream_t *stream)
+xinput_stream_has_pending (xinput_stream_t *stream)
 {
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), TRUE);
 
@@ -1217,7 +1217,7 @@ g_input_stream_has_pending (xinput_stream_t *stream)
 }
 
 /**
- * g_input_stream_set_pending:
+ * xinput_stream_set_pending:
  * @stream: input stream
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  * ignore.
@@ -1229,7 +1229,7 @@ g_input_stream_has_pending (xinput_stream_t *stream)
  * Returns: %TRUE if pending was previously unset and is now set.
  **/
 xboolean_t
-g_input_stream_set_pending (xinput_stream_t *stream, xerror_t **error)
+xinput_stream_set_pending (xinput_stream_t *stream, xerror_t **error)
 {
   g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
 
@@ -1255,13 +1255,13 @@ g_input_stream_set_pending (xinput_stream_t *stream, xerror_t **error)
 }
 
 /**
- * g_input_stream_clear_pending:
+ * xinput_stream_clear_pending:
  * @stream: input stream
  *
  * Clears the pending flag on @stream.
  **/
 void
-g_input_stream_clear_pending (xinput_stream_t *stream)
+xinput_stream_clear_pending (xinput_stream_t *stream)
 {
   g_return_if_fail (X_IS_INPUT_STREAM (stream));
 
@@ -1269,7 +1269,7 @@ g_input_stream_clear_pending (xinput_stream_t *stream)
 }
 
 /*< internal >
- * g_input_stream_async_read_is_via_threads:
+ * xinput_stream_async_read_is_via_threads:
  * @stream: input stream
  *
  * Checks if an input stream's read_async function uses threads.
@@ -1277,7 +1277,7 @@ g_input_stream_clear_pending (xinput_stream_t *stream)
  * Returns: %TRUE if @stream's read_async function uses threads.
  **/
 xboolean_t
-g_input_stream_async_read_is_via_threads (xinput_stream_t *stream)
+xinput_stream_async_read_is_via_threads (xinput_stream_t *stream)
 {
   GInputStreamClass *class;
 
@@ -1285,13 +1285,13 @@ g_input_stream_async_read_is_via_threads (xinput_stream_t *stream)
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
 
-  return (class->read_async == g_input_stream_real_read_async &&
+  return (class->read_async == xinput_stream_real_read_async &&
       !(X_IS_POLLABLE_INPUT_STREAM (stream) &&
         g_pollable_input_stream_can_poll (G_POLLABLE_INPUT_STREAM (stream))));
 }
 
 /*< internal >
- * g_input_stream_async_close_is_via_threads:
+ * xinput_stream_async_close_is_via_threads:
  * @stream: input stream
  *
  * Checks if an input stream's close_async function uses threads.
@@ -1299,7 +1299,7 @@ g_input_stream_async_read_is_via_threads (xinput_stream_t *stream)
  * Returns: %TRUE if @stream's close_async function uses threads.
  **/
 xboolean_t
-g_input_stream_async_close_is_via_threads (xinput_stream_t *stream)
+xinput_stream_async_close_is_via_threads (xinput_stream_t *stream)
 {
   GInputStreamClass *class;
 
@@ -1307,7 +1307,7 @@ g_input_stream_async_close_is_via_threads (xinput_stream_t *stream)
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
 
-  return class->close_async == g_input_stream_real_close_async;
+  return class->close_async == xinput_stream_real_close_async;
 }
 
 /********************************************
@@ -1326,7 +1326,7 @@ free_read_data (ReadData *op)
 }
 
 static void
-read_async_thread (GTask        *task,
+read_async_thread (xtask_t        *task,
                    xpointer_t      source_object,
                    xpointer_t      task_data,
                    xcancellable_t *cancellable)
@@ -1335,71 +1335,71 @@ read_async_thread (GTask        *task,
   ReadData *op = task_data;
   GInputStreamClass *class;
   xerror_t *error = NULL;
-  gssize nread;
+  xssize_t nread;
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
 
   nread = class->read_fn (stream,
                           op->buffer, op->count,
-                          g_task_get_cancellable (task),
+                          xtask_get_cancellable (task),
                           &error);
   if (nread == -1)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_int (task, nread);
+    xtask_return_int (task, nread);
 }
 
-static void read_async_pollable (GPollableInputStream *stream,
-                                 GTask                *task);
+static void read_async_pollable (xpollable_input_stream_t *stream,
+                                 xtask_t                *task);
 
 static xboolean_t
-read_async_pollable_ready (GPollableInputStream *stream,
+read_async_pollable_ready (xpollable_input_stream_t *stream,
 			   xpointer_t              user_data)
 {
-  GTask *task = user_data;
+  xtask_t *task = user_data;
 
   read_async_pollable (stream, task);
   return FALSE;
 }
 
 static void
-read_async_pollable (GPollableInputStream *stream,
-                     GTask                *task)
+read_async_pollable (xpollable_input_stream_t *stream,
+                     xtask_t                *task)
 {
-  ReadData *op = g_task_get_task_data (task);
+  ReadData *op = xtask_get_task_data (task);
   xerror_t *error = NULL;
-  gssize nread;
+  xssize_t nread;
 
-  if (g_task_return_error_if_cancelled (task))
+  if (xtask_return_error_if_cancelled (task))
     return;
 
   nread = G_POLLABLE_INPUT_STREAM_GET_INTERFACE (stream)->
     read_nonblocking (stream, op->buffer, op->count, &error);
 
-  if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
+  if (xerror_matches (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
     {
-      GSource *source;
+      xsource_t *source;
 
-      g_error_free (error);
+      xerror_free (error);
 
       source = g_pollable_input_stream_create_source (stream,
-                                                      g_task_get_cancellable (task));
-      g_task_attach_source (task, source,
-                            (GSourceFunc) read_async_pollable_ready);
-      g_source_unref (source);
+                                                      xtask_get_cancellable (task));
+      xtask_attach_source (task, source,
+                            (xsource_func_t) read_async_pollable_ready);
+      xsource_unref (source);
       return;
     }
 
   if (nread == -1)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_int (task, nread);
-  /* g_input_stream_real_read_async() unrefs task */
+    xtask_return_int (task, nread);
+  /* xinput_stream_real_read_async() unrefs task */
 }
 
 
 static void
-g_input_stream_real_read_async (xinput_stream_t        *stream,
+xinput_stream_real_read_async (xinput_stream_t        *stream,
 				void                *buffer,
 				xsize_t                count,
 				int                  io_priority,
@@ -1407,37 +1407,37 @@ g_input_stream_real_read_async (xinput_stream_t        *stream,
 				xasync_ready_callback_t  callback,
 				xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
   ReadData *op;
 
   op = g_slice_new0 (ReadData);
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_input_stream_real_read_async);
-  g_task_set_task_data (task, op, (GDestroyNotify) free_read_data);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xinput_stream_real_read_async);
+  xtask_set_task_data (task, op, (xdestroy_notify_t) free_read_data);
+  xtask_set_priority (task, io_priority);
   op->buffer = buffer;
   op->count = count;
 
-  if (!g_input_stream_async_read_is_via_threads (stream))
+  if (!xinput_stream_async_read_is_via_threads (stream))
     read_async_pollable (G_POLLABLE_INPUT_STREAM (stream), task);
   else
-    g_task_run_in_thread (task, read_async_thread);
-  g_object_unref (task);
+    xtask_run_in_thread (task, read_async_thread);
+  xobject_unref (task);
 }
 
-static gssize
-g_input_stream_real_read_finish (xinput_stream_t  *stream,
+static xssize_t
+xinput_stream_real_read_finish (xinput_stream_t  *stream,
 				 xasync_result_t  *result,
 				 xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, stream), -1);
+  g_return_val_if_fail (xtask_is_valid (result, stream), -1);
 
-  return g_task_propagate_int (G_TASK (result), error);
+  return xtask_propagate_int (XTASK (result), error);
 }
 
 
 static void
-skip_async_thread (GTask        *task,
+skip_async_thread (xtask_t        *task,
                    xpointer_t      source_object,
                    xpointer_t      task_data,
                    xcancellable_t *cancellable)
@@ -1446,16 +1446,16 @@ skip_async_thread (GTask        *task,
   xsize_t count = GPOINTER_TO_SIZE (task_data);
   GInputStreamClass *class;
   xerror_t *error = NULL;
-  gssize ret;
+  xssize_t ret;
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
   ret = class->skip (stream, count,
-                     g_task_get_cancellable (task),
+                     xtask_get_cancellable (task),
                      &error);
   if (ret == -1)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_int (task, ret);
+    xtask_return_int (task, ret);
 }
 
 typedef struct {
@@ -1470,12 +1470,12 @@ skip_callback_wrapper (xobject_t      *source_object,
 		       xpointer_t      user_data)
 {
   GInputStreamClass *class;
-  GTask *task = user_data;
-  SkipFallbackAsyncData *data = g_task_get_task_data (task);
+  xtask_t *task = user_data;
+  SkipFallbackAsyncData *data = xtask_get_task_data (task);
   xerror_t *error = NULL;
-  gssize ret;
+  xssize_t ret;
 
-  ret = g_input_stream_read_finish (G_INPUT_STREAM (source_object), res, &error);
+  ret = xinput_stream_read_finish (G_INPUT_STREAM (source_object), res, &error);
 
   if (ret > 0)
     {
@@ -1487,15 +1487,15 @@ skip_callback_wrapper (xobject_t      *source_object,
 	  class = G_INPUT_STREAM_GET_CLASS (source_object);
 	  class->read_async (G_INPUT_STREAM (source_object),
                              data->buffer, MIN (8192, data->count),
-                             g_task_get_priority (task),
-                             g_task_get_cancellable (task),
+                             xtask_get_priority (task),
+                             xtask_get_cancellable (task),
                              skip_callback_wrapper, task);
 	  return;
 	}
     }
 
   if (ret == -1 &&
-      g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED) &&
+      xerror_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED) &&
       data->count_skipped)
     {
       /* No error, return partial read */
@@ -1503,14 +1503,14 @@ skip_callback_wrapper (xobject_t      *source_object,
     }
 
   if (error)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_int (task, data->count_skipped);
-  g_object_unref (task);
+    xtask_return_int (task, data->count_skipped);
+  xobject_unref (task);
  }
 
 static void
-g_input_stream_real_skip_async (xinput_stream_t        *stream,
+xinput_stream_real_skip_async (xinput_stream_t        *stream,
 				xsize_t                count,
 				int                  io_priority,
 				xcancellable_t        *cancellable,
@@ -1519,23 +1519,23 @@ g_input_stream_real_skip_async (xinput_stream_t        *stream,
 {
   GInputStreamClass *class;
   SkipFallbackAsyncData *data;
-  GTask *task;
+  xtask_t *task;
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_input_stream_real_skip_async);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xinput_stream_real_skip_async);
+  xtask_set_priority (task, io_priority);
 
-  if (g_input_stream_async_read_is_via_threads (stream))
+  if (xinput_stream_async_read_is_via_threads (stream))
     {
       /* Read is thread-using async fallback.
        * Make skip use threads too, so that we can use a possible sync skip
        * implementation. */
-      g_task_set_task_data (task, GSIZE_TO_POINTER (count), NULL);
+      xtask_set_task_data (task, GSIZE_TO_POINTER (count), NULL);
 
-      g_task_run_in_thread (task, skip_async_thread);
-      g_object_unref (task);
+      xtask_run_in_thread (task, skip_async_thread);
+      xobject_unref (task);
     }
   else
     {
@@ -1545,26 +1545,26 @@ g_input_stream_real_skip_async (xinput_stream_t        *stream,
       data = g_new (SkipFallbackAsyncData, 1);
       data->count = count;
       data->count_skipped = 0;
-      g_task_set_task_data (task, data, g_free);
-      g_task_set_check_cancellable (task, FALSE);
+      xtask_set_task_data (task, data, g_free);
+      xtask_set_check_cancellable (task, FALSE);
       class->read_async (stream, data->buffer, MIN (8192, count), io_priority, cancellable,
 			 skip_callback_wrapper, task);
     }
 
 }
 
-static gssize
-g_input_stream_real_skip_finish (xinput_stream_t  *stream,
+static xssize_t
+xinput_stream_real_skip_finish (xinput_stream_t  *stream,
 				 xasync_result_t  *result,
 				 xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, stream), -1);
+  g_return_val_if_fail (xtask_is_valid (result, stream), -1);
 
-  return g_task_propagate_int (G_TASK (result), error);
+  return xtask_propagate_int (XTASK (result), error);
 }
 
 static void
-close_async_thread (GTask        *task,
+close_async_thread (xtask_t        *task,
                     xpointer_t      source_object,
                     xpointer_t      task_data,
                     xcancellable_t *cancellable)
@@ -1578,42 +1578,42 @@ close_async_thread (GTask        *task,
   if (class->close_fn)
     {
       result = class->close_fn (stream,
-                                g_task_get_cancellable (task),
+                                xtask_get_cancellable (task),
                                 &error);
       if (!result)
         {
-          g_task_return_error (task, error);
+          xtask_return_error (task, error);
           return;
         }
     }
 
-  g_task_return_boolean (task, TRUE);
+  xtask_return_boolean (task, TRUE);
 }
 
 static void
-g_input_stream_real_close_async (xinput_stream_t        *stream,
+xinput_stream_real_close_async (xinput_stream_t        *stream,
 				 int                  io_priority,
 				 xcancellable_t        *cancellable,
 				 xasync_ready_callback_t  callback,
 				 xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_input_stream_real_close_async);
-  g_task_set_check_cancellable (task, FALSE);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xinput_stream_real_close_async);
+  xtask_set_check_cancellable (task, FALSE);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, close_async_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, close_async_thread);
+  xobject_unref (task);
 }
 
 static xboolean_t
-g_input_stream_real_close_finish (xinput_stream_t  *stream,
+xinput_stream_real_close_finish (xinput_stream_t  *stream,
 				  xasync_result_t  *result,
 				  xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }

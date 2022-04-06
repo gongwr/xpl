@@ -35,10 +35,10 @@
 
 G_BEGIN_DECLS
 
-/* GIOChannel
+/* xio_channel_t
  */
 
-typedef struct _GIOChannel	GIOChannel;
+typedef struct _GIOChannel	xio_channel_t;
 typedef struct _GIOFuncs        GIOFuncs;
 
 typedef enum
@@ -107,9 +107,9 @@ struct _GIOChannel
   xuint_t line_term_len;		/* So we can have null in the line term */
 
   xsize_t buf_size;
-  GString *read_buf;		/* Raw data from the channel */
-  GString *encoded_read_buf;    /* Channel data converted to UTF-8 */
-  GString *write_buf;		/* Data ready to be written to the file */
+  xstring_t *read_buf;		/* Raw data from the channel */
+  xstring_t *encoded_read_buf;    /* Channel data converted to UTF-8 */
+  xstring_t *write_buf;		/* Data ready to be written to the file */
   xchar_t partial_write_buf[6];	/* UTF-8 partial characters, null terminated */
 
   /* Group the flags together, immediately after partial_write_buf, to save memory */
@@ -125,80 +125,80 @@ struct _GIOChannel
   xpointer_t reserved2;
 };
 
-typedef xboolean_t (*GIOFunc) (GIOChannel   *source,
-			     GIOCondition  condition,
+typedef xboolean_t (*GIOFunc) (xio_channel_t   *source,
+			     xio_condition_t  condition,
 			     xpointer_t      data);
 struct _GIOFuncs
 {
-  GIOStatus (*io_read)           (GIOChannel   *channel,
+  GIOStatus (*io_read)           (xio_channel_t   *channel,
 			          xchar_t        *buf,
 				  xsize_t         count,
 				  xsize_t        *bytes_read,
 				  xerror_t      **err);
-  GIOStatus (*io_write)          (GIOChannel   *channel,
+  GIOStatus (*io_write)          (xio_channel_t   *channel,
 				  const xchar_t  *buf,
 				  xsize_t         count,
 				  xsize_t        *bytes_written,
 				  xerror_t      **err);
-  GIOStatus (*io_seek)           (GIOChannel   *channel,
+  GIOStatus (*io_seek)           (xio_channel_t   *channel,
 				  gint64        offset,
 				  GSeekType     type,
 				  xerror_t      **err);
-  GIOStatus  (*io_close)         (GIOChannel   *channel,
+  GIOStatus  (*io_close)         (xio_channel_t   *channel,
 				  xerror_t      **err);
-  GSource*   (*io_create_watch)  (GIOChannel   *channel,
-				  GIOCondition  condition);
-  void       (*io_free)          (GIOChannel   *channel);
-  GIOStatus  (*io_set_flags)     (GIOChannel   *channel,
+  xsource_t*   (*io_create_watch)  (xio_channel_t   *channel,
+				  xio_condition_t  condition);
+  void       (*io_free)          (xio_channel_t   *channel);
+  GIOStatus  (*io_set_flags)     (xio_channel_t   *channel,
                                   GIOFlags      flags,
 				  xerror_t      **err);
-  GIOFlags   (*io_get_flags)     (GIOChannel   *channel);
+  GIOFlags   (*io_get_flags)     (xio_channel_t   *channel);
 };
 
 XPL_AVAILABLE_IN_ALL
-void        g_io_channel_init   (GIOChannel    *channel);
+void        g_io_channel_init   (xio_channel_t    *channel);
 XPL_AVAILABLE_IN_ALL
-GIOChannel *g_io_channel_ref    (GIOChannel    *channel);
+xio_channel_t *g_io_channel_ref    (xio_channel_t    *channel);
 XPL_AVAILABLE_IN_ALL
-void        g_io_channel_unref  (GIOChannel    *channel);
+void        g_io_channel_unref  (xio_channel_t    *channel);
 
 XPL_DEPRECATED_FOR(g_io_channel_read_chars)
-GIOError    g_io_channel_read   (GIOChannel    *channel,
+GIOError    g_io_channel_read   (xio_channel_t    *channel,
                                  xchar_t         *buf,
                                  xsize_t          count,
                                  xsize_t         *bytes_read);
 
 XPL_DEPRECATED_FOR(g_io_channel_write_chars)
-GIOError  g_io_channel_write    (GIOChannel    *channel,
+GIOError  g_io_channel_write    (xio_channel_t    *channel,
                                  const xchar_t   *buf,
                                  xsize_t          count,
                                  xsize_t         *bytes_written);
 
 XPL_DEPRECATED_FOR(g_io_channel_seek_position)
-GIOError  g_io_channel_seek     (GIOChannel    *channel,
+GIOError  g_io_channel_seek     (xio_channel_t    *channel,
                                  gint64         offset,
                                  GSeekType      type);
 
 XPL_DEPRECATED_FOR(g_io_channel_shutdown)
-void      g_io_channel_close    (GIOChannel    *channel);
+void      g_io_channel_close    (xio_channel_t    *channel);
 
 XPL_AVAILABLE_IN_ALL
-GIOStatus g_io_channel_shutdown (GIOChannel      *channel,
+GIOStatus g_io_channel_shutdown (xio_channel_t      *channel,
 				 xboolean_t         flush,
 				 xerror_t         **err);
 XPL_AVAILABLE_IN_ALL
-xuint_t     g_io_add_watch_full   (GIOChannel      *channel,
+xuint_t     g_io_add_watch_full   (xio_channel_t      *channel,
 				 xint_t             priority,
-				 GIOCondition     condition,
+				 xio_condition_t     condition,
 				 GIOFunc          func,
 				 xpointer_t         user_data,
-				 GDestroyNotify   notify);
+				 xdestroy_notify_t   notify);
 XPL_AVAILABLE_IN_ALL
-GSource * g_io_create_watch     (GIOChannel      *channel,
-				 GIOCondition     condition);
+xsource_t * g_io_create_watch     (xio_channel_t      *channel,
+				 xio_condition_t     condition);
 XPL_AVAILABLE_IN_ALL
-xuint_t     g_io_add_watch        (GIOChannel      *channel,
-				 GIOCondition     condition,
+xuint_t     g_io_add_watch        (xio_channel_t      *channel,
+				 xio_condition_t     condition,
 				 GIOFunc          func,
 				 xpointer_t         user_data);
 
@@ -206,96 +206,96 @@ xuint_t     g_io_add_watch        (GIOChannel      *channel,
  */
 
 XPL_AVAILABLE_IN_ALL
-void                  g_io_channel_set_buffer_size      (GIOChannel   *channel,
+void                  g_io_channel_set_buffer_size      (xio_channel_t   *channel,
 							 xsize_t         size);
 XPL_AVAILABLE_IN_ALL
-xsize_t                 g_io_channel_get_buffer_size      (GIOChannel   *channel);
+xsize_t                 g_io_channel_get_buffer_size      (xio_channel_t   *channel);
 XPL_AVAILABLE_IN_ALL
-GIOCondition          g_io_channel_get_buffer_condition (GIOChannel   *channel);
+xio_condition_t          g_io_channel_get_buffer_condition (xio_channel_t   *channel);
 XPL_AVAILABLE_IN_ALL
-GIOStatus             g_io_channel_set_flags            (GIOChannel   *channel,
+GIOStatus             g_io_channel_set_flags            (xio_channel_t   *channel,
 							 GIOFlags      flags,
 							 xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
-GIOFlags              g_io_channel_get_flags            (GIOChannel   *channel);
+GIOFlags              g_io_channel_get_flags            (xio_channel_t   *channel);
 XPL_AVAILABLE_IN_ALL
-void                  g_io_channel_set_line_term        (GIOChannel   *channel,
+void                  g_io_channel_set_line_term        (xio_channel_t   *channel,
 							 const xchar_t  *line_term,
 							 xint_t          length);
 XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_io_channel_get_line_term        (GIOChannel   *channel,
+const xchar_t *         g_io_channel_get_line_term        (xio_channel_t   *channel,
 							 xint_t         *length);
 XPL_AVAILABLE_IN_ALL
-void		      g_io_channel_set_buffered		(GIOChannel   *channel,
+void		      g_io_channel_set_buffered		(xio_channel_t   *channel,
 							 xboolean_t      buffered);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	      g_io_channel_get_buffered		(GIOChannel   *channel);
+xboolean_t	      g_io_channel_get_buffered		(xio_channel_t   *channel);
 XPL_AVAILABLE_IN_ALL
-GIOStatus             g_io_channel_set_encoding         (GIOChannel   *channel,
+GIOStatus             g_io_channel_set_encoding         (xio_channel_t   *channel,
 							 const xchar_t  *encoding,
 							 xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_io_channel_get_encoding         (GIOChannel   *channel);
+const xchar_t *         g_io_channel_get_encoding         (xio_channel_t   *channel);
 XPL_AVAILABLE_IN_ALL
-void                  g_io_channel_set_close_on_unref	(GIOChannel   *channel,
+void                  g_io_channel_set_close_on_unref	(xio_channel_t   *channel,
 							 xboolean_t      do_close);
 XPL_AVAILABLE_IN_ALL
-xboolean_t              g_io_channel_get_close_on_unref	(GIOChannel   *channel);
+xboolean_t              g_io_channel_get_close_on_unref	(xio_channel_t   *channel);
 
 
 XPL_AVAILABLE_IN_ALL
-GIOStatus   g_io_channel_flush            (GIOChannel   *channel,
+GIOStatus   g_io_channel_flush            (xio_channel_t   *channel,
 					   xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
-GIOStatus   g_io_channel_read_line        (GIOChannel   *channel,
+GIOStatus   g_io_channel_read_line        (xio_channel_t   *channel,
 					   xchar_t       **str_return,
 					   xsize_t        *length,
 					   xsize_t        *terminator_pos,
 					   xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
-GIOStatus   g_io_channel_read_line_string (GIOChannel   *channel,
-					   GString      *buffer,
+GIOStatus   g_io_channel_read_line_string (xio_channel_t   *channel,
+					   xstring_t      *buffer,
 					   xsize_t        *terminator_pos,
 					   xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
-GIOStatus   g_io_channel_read_to_end      (GIOChannel   *channel,
+GIOStatus   g_io_channel_read_to_end      (xio_channel_t   *channel,
 					   xchar_t       **str_return,
 					   xsize_t        *length,
 					   xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
-GIOStatus   g_io_channel_read_chars       (GIOChannel   *channel,
+GIOStatus   g_io_channel_read_chars       (xio_channel_t   *channel,
 					   xchar_t        *buf,
 					   xsize_t         count,
 					   xsize_t        *bytes_read,
 					   xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
-GIOStatus   g_io_channel_read_unichar     (GIOChannel   *channel,
-					   gunichar     *thechar,
+GIOStatus   g_io_channel_read_unichar     (xio_channel_t   *channel,
+					   xunichar_t     *thechar,
 					   xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
-GIOStatus   g_io_channel_write_chars      (GIOChannel   *channel,
+GIOStatus   g_io_channel_write_chars      (xio_channel_t   *channel,
 					   const xchar_t  *buf,
-					   gssize        count,
+					   xssize_t        count,
 					   xsize_t        *bytes_written,
 					   xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
-GIOStatus   g_io_channel_write_unichar    (GIOChannel   *channel,
-					   gunichar      thechar,
+GIOStatus   g_io_channel_write_unichar    (xio_channel_t   *channel,
+					   xunichar_t      thechar,
 					   xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
-GIOStatus   g_io_channel_seek_position    (GIOChannel   *channel,
+GIOStatus   g_io_channel_seek_position    (xio_channel_t   *channel,
 					   gint64        offset,
 					   GSeekType     type,
 					   xerror_t      **error);
 XPL_AVAILABLE_IN_ALL
-GIOChannel* g_io_channel_new_file         (const xchar_t  *filename,
+xio_channel_t* g_io_channel_new_file         (const xchar_t  *filename,
 					   const xchar_t  *mode,
 					   xerror_t      **error);
 
 /* Error handling */
 
 XPL_AVAILABLE_IN_ALL
-GQuark          g_io_channel_error_quark      (void);
+xquark          g_io_channel_error_quark      (void);
 XPL_AVAILABLE_IN_ALL
 GIOChannelError g_io_channel_error_from_errno (xint_t en);
 
@@ -318,38 +318,38 @@ GIOChannelError g_io_channel_error_from_errno (xint_t en);
  * get GIOChannels for Win32 file HANDLEs.
  */
 XPL_AVAILABLE_IN_ALL
-GIOChannel* g_io_channel_unix_new    (int         fd);
+xio_channel_t* g_io_channel_unix_new    (int         fd);
 XPL_AVAILABLE_IN_ALL
-xint_t        g_io_channel_unix_get_fd (GIOChannel *channel);
+xint_t        g_io_channel_unix_get_fd (xio_channel_t *channel);
 
 
-/* Hook for GClosure / GSource integration. Don't touch */
-XPL_VAR GSourceFuncs g_io_watch_funcs;
+/* Hook for xclosure_t / xsource_t integration. Don't touch */
+XPL_VAR xsource_funcs_t g_io_watch_funcs;
 
 #ifdef G_OS_WIN32
 
-/* You can use this "pseudo file descriptor" in a GPollFD to add
+/* You can use this "pseudo file descriptor" in a xpollfd_t to add
  * polling for Windows messages. GTK applications should not do that.
  */
 
 #define G_WIN32_MSG_HANDLE 19981206
 
-/* Use this to get a GPollFD from a GIOChannel, so that you can call
+/* Use this to get a xpollfd_t from a xio_channel_t, so that you can call
  * g_io_channel_win32_poll(). After calling this you should only use
- * g_io_channel_read() to read from the GIOChannel, i.e. never read()
+ * g_io_channel_read() to read from the xio_channel_t, i.e. never read()
  * from the underlying file descriptor. For SOCKETs, it is possible to call
  * recv().
  */
 XPL_AVAILABLE_IN_ALL
-void        g_io_channel_win32_make_pollfd (GIOChannel   *channel,
-					    GIOCondition  condition,
-					    GPollFD      *fd);
+void        g_io_channel_win32_make_pollfd (xio_channel_t   *channel,
+					    xio_condition_t  condition,
+					    xpollfd_t      *fd);
 
 /* This can be used to wait until at least one of the channels is readable.
  * On Unix you would do a select() on the file descriptors of the channels.
  */
 XPL_AVAILABLE_IN_ALL
-xint_t        g_io_channel_win32_poll   (GPollFD    *fds,
+xint_t        g_io_channel_win32_poll   (xpollfd_t    *fds,
 				       xint_t        n_fds,
 				       xint_t        timeout_);
 
@@ -360,10 +360,10 @@ xint_t        g_io_channel_win32_poll   (GPollFD    *fds,
  * intptr_t as that is not portable enough.
  */
 XPL_AVAILABLE_IN_ALL
-GIOChannel *g_io_channel_win32_new_messages (xsize_t hwnd);
+xio_channel_t *g_io_channel_win32_new_messages (xsize_t hwnd);
 #else
 XPL_AVAILABLE_IN_ALL
-GIOChannel *g_io_channel_win32_new_messages (xuint_t hwnd);
+xio_channel_t *g_io_channel_win32_new_messages (xuint_t hwnd);
 #endif
 
 /* Create an IO channel for C runtime (emulated Unix-like) file
@@ -376,11 +376,11 @@ GIOChannel *g_io_channel_win32_new_messages (xuint_t hwnd);
  * thread. Your code should call only g_io_channel_read_chars().
  */
 XPL_AVAILABLE_IN_ALL
-GIOChannel* g_io_channel_win32_new_fd (xint_t         fd);
+xio_channel_t* g_io_channel_win32_new_fd (xint_t         fd);
 
 /* Get the C runtime file descriptor of a channel. */
 XPL_AVAILABLE_IN_ALL
-xint_t        g_io_channel_win32_get_fd (GIOChannel *channel);
+xint_t        g_io_channel_win32_get_fd (xio_channel_t *channel);
 
 /* Create an IO channel for a winsock socket. The parameter should be
  * a SOCKET. Contrary to IO channels for file descriptors (on *Win32),
@@ -388,13 +388,13 @@ xint_t        g_io_channel_win32_get_fd (GIOChannel *channel);
  * is polling them.
  */
 XPL_AVAILABLE_IN_ALL
-GIOChannel *g_io_channel_win32_new_socket (xint_t socket);
+xio_channel_t *g_io_channel_win32_new_socket (xint_t socket);
 
 XPL_DEPRECATED_FOR(g_io_channel_win32_new_socket)
-GIOChannel *g_io_channel_win32_new_stream_socket (xint_t socket);
+xio_channel_t *g_io_channel_win32_new_stream_socket (xint_t socket);
 
 XPL_AVAILABLE_IN_ALL
-void        g_io_channel_win32_set_debug (GIOChannel *channel,
+void        g_io_channel_win32_set_debug (xio_channel_t *channel,
                                           xboolean_t    flag);
 
 #endif

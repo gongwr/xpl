@@ -26,11 +26,11 @@
 
 G_BEGIN_DECLS
 
-xboolean_t g_input_stream_async_read_is_via_threads (xinput_stream_t *stream);
-xboolean_t g_input_stream_async_close_is_via_threads (xinput_stream_t *stream);
-xboolean_t g_output_stream_async_write_is_via_threads (xoutput_stream_t *stream);
-xboolean_t g_output_stream_async_writev_is_via_threads (xoutput_stream_t *stream);
-xboolean_t g_output_stream_async_close_is_via_threads (xoutput_stream_t *stream);
+xboolean_t xinput_stream_async_read_is_via_threads (xinput_stream_t *stream);
+xboolean_t xinput_stream_async_close_is_via_threads (xinput_stream_t *stream);
+xboolean_t xoutput_stream_async_write_is_via_threads (xoutput_stream_t *stream);
+xboolean_t xoutput_stream_async_writev_is_via_threads (xoutput_stream_t *stream);
+xboolean_t xoutput_stream_async_close_is_via_threads (xoutput_stream_t *stream);
 
 void xsocket_connection_set_cached_remote_address (xsocket_connection_t *connection,
                                                     xsocket_address_t    *address);

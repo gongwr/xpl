@@ -36,15 +36,15 @@ static void my_badger_dispose (xobject_t * object);
 
 static void my_badger_get_property (xobject_t    *object,
 				    xuint_t       prop_id,
-				    GValue     *value,
-				    GParamSpec *pspec);
+				    xvalue_t     *value,
+				    xparam_spec_t *pspec);
 static void my_badger_set_property (xobject_t      *object,
 				    xuint_t         prop_id,
-				    const GValue *value,
-				    GParamSpec   *pspec);
+				    const xvalue_t *value,
+				    xparam_spec_t   *pspec);
 
 static void my_badger_mama_notify (xobject_t    *object,
-				   GParamSpec *pspec);
+				   xparam_spec_t *pspec);
 
 static void
 my_badger_class_init (MyBadgerClass * klass)
@@ -58,7 +58,7 @@ my_badger_class_init (MyBadgerClass * klass)
   gobject_class->get_property = my_badger_get_property;
   gobject_class->set_property = my_badger_set_property;
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
 				   PROP_MAMA,
 				   g_param_spec_object ("mama",
 							NULL,
@@ -83,7 +83,7 @@ my_badger_dispose (xobject_t * object)
 
   if (self->mama != NULL)
     {
-      g_object_unref (self->mama);
+      xobject_unref (self->mama);
       self->mama = NULL;
     }
 
@@ -93,8 +93,8 @@ my_badger_dispose (xobject_t * object)
 static void
 my_badger_get_property (xobject_t    *object,
 			xuint_t        prop_id,
-			GValue     *value,
-			GParamSpec *pspec)
+			xvalue_t     *value,
+			xparam_spec_t *pspec)
 {
   MyBadger *self;
 
@@ -103,7 +103,7 @@ my_badger_get_property (xobject_t    *object,
   switch (prop_id)
     {
     case PROP_MAMA:
-      g_value_set_object (value, self->mama);
+      xvalue_set_object (value, self->mama);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -114,8 +114,8 @@ my_badger_get_property (xobject_t    *object,
 static void
 my_badger_set_property (xobject_t      *object,
 			xuint_t         prop_id,
-			const GValue *value,
-			GParamSpec   *pspec)
+			const xvalue_t *value,
+			xparam_spec_t   *pspec)
 {
   MyBadger *self;
 
@@ -125,10 +125,10 @@ my_badger_set_property (xobject_t      *object,
     {
     case PROP_MAMA:
       if (self->mama)
-	g_object_unref (self->mama);
-      self->mama = g_value_dup_object (value);
+	xobject_unref (self->mama);
+      self->mama = xvalue_dup_object (value);
       if (self->mama)
-	g_object_set (self->mama, "mama", NULL, NULL); /* another notify */
+	xobject_set (self->mama, "mama", NULL, NULL); /* another notify */
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -138,7 +138,7 @@ my_badger_set_property (xobject_t      *object,
 
 static void
 my_badger_mama_notify (xobject_t    *object,
-                       GParamSpec *pspec)
+                       xparam_spec_t *pspec)
 {
   MyBadger *self;
 
@@ -156,18 +156,18 @@ main (int argc, char **argv)
   g_print ("START: %s\n", argv[0]);
   g_log_set_always_fatal (G_LOG_LEVEL_WARNING | G_LOG_LEVEL_CRITICAL | g_log_set_always_fatal (G_LOG_FATAL_MASK));
 
-  badger1 = g_object_new (MY_TYPE_BADGER, NULL);
-  badger2 = g_object_new (MY_TYPE_BADGER, NULL);
+  badger1 = xobject_new (MY_TYPE_BADGER, NULL);
+  badger2 = xobject_new (MY_TYPE_BADGER, NULL);
 
-  g_object_set (badger1, "mama", badger2, NULL);
+  xobject_set (badger1, "mama", badger2, NULL);
   g_assert_cmpuint (badger1->mama_notify_count, ==, 1);
   g_assert_cmpuint (badger2->mama_notify_count, ==, 1);
-  g_object_get (badger1, "mama", &test, NULL);
+  xobject_get (badger1, "mama", &test, NULL);
   g_assert (test == badger2);
-  g_object_unref (test);
+  xobject_unref (test);
 
-  g_object_unref (badger1);
-  g_object_unref (badger2);
+  xobject_unref (badger1);
+  xobject_unref (badger2);
 
   return 0;
 }

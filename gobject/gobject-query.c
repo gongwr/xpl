@@ -59,7 +59,7 @@ show_nodes (xtype_t        type,
   if (!type)
     return;
 
-  children = g_type_children (type, NULL);
+  children = xtype_children (type, NULL);
 
   if (type != root)
     for (i = 0; i < spacing; i++)
@@ -69,9 +69,9 @@ show_nodes (xtype_t        type,
 	   indent,
 	   sibling ? O_BRANCH : (type != root ? O_LLEAF : O_SPACE),
 	   O_ESPACE,
-	   g_type_name (type));
+	   xtype_name (type));
 
-  for (i = strlen (g_type_name (type)); i <= strlen (indent_inc); i++)
+  for (i = strlen (xtype_name (type)); i <= strlen (indent_inc); i++)
     fputs (O_KEY_FILL, f_out);
 
   fputc ('\n', f_out);
@@ -82,9 +82,9 @@ show_nodes (xtype_t        type,
       xtype_t   *child;
 
       if (sibling)
-	new_indent = g_strconcat (indent, O_VLINE, indent_inc, NULL);
+	new_indent = xstrconcat (indent, O_VLINE, indent_inc, NULL);
       else
-	new_indent = g_strconcat (indent, O_SPACE, indent_inc, NULL);
+	new_indent = xstrconcat (indent, O_SPACE, indent_inc, NULL);
 
       for (child = children; *child; child++)
 	show_nodes (child[0], child[1], new_indent);
@@ -169,7 +169,7 @@ main (xint_t   argc,
 	{
 	  i++;
 	  if (i < argc)
-	    root = g_type_from_name (argv[i]);
+	    root = xtype_from_name (argv[i]);
 	}
       else if (strcmp ("-n", argv[i]) == 0)
 	{
@@ -212,7 +212,7 @@ main (xint_t   argc,
       root = ~0;
       for (i = 0; i <= XTYPE_FUNDAMENTAL_MAX; i += XTYPE_MAKE_FUNDAMENTAL (1))
 	{
-	  const xchar_t *name = g_type_name (i);
+	  const xchar_t *name = xtype_name (i);
 
 	  if (name)
 	    show_nodes (i, 0, iindent);

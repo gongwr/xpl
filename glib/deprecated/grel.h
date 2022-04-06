@@ -78,15 +78,15 @@ void       g_relation_insert  (GRelation   *relation,
                                ...);
 XPL_DEPRECATED_IN_2_26
 xint_t       g_relation_delete  (GRelation   *relation,
-                               gconstpointer  key,
+                               xconstpointer  key,
                                xint_t         field);
 XPL_DEPRECATED_IN_2_26
 GTuples*   g_relation_select  (GRelation   *relation,
-                               gconstpointer  key,
+                               xconstpointer  key,
                                xint_t         field);
 XPL_DEPRECATED_IN_2_26
 xint_t       g_relation_count   (GRelation   *relation,
-                               gconstpointer  key,
+                               xconstpointer  key,
                                xint_t         field);
 XPL_DEPRECATED_IN_2_26
 xboolean_t   g_relation_exists  (GRelation   *relation,

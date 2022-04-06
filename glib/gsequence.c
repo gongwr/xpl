@@ -28,17 +28,17 @@
  * @title: Sequences
  * @short_description: scalable lists
  *
- * The #GSequence data structure has the API of a list, but is
+ * The #xsequence_t data structure has the API of a list, but is
  * implemented internally with a balanced binary tree. This means that
  * most of the operations  (access, search, insertion, deletion, ...) on
- * #GSequence are O(log(n)) in average and O(n) in worst case for time
+ * #xsequence_t are O(log(n)) in average and O(n) in worst case for time
  * complexity. But, note that maintaining a balanced sorted list of n
  * elements is done in time O(n log(n)).
  * The data contained in each element can be either integer values, by using
  * of the [Type Conversion Macros][glib-Type-Conversion-Macros], or simply
  * pointers to any type of data.
  *
- * A #GSequence is accessed through "iterators", represented by a
+ * A #xsequence_t is accessed through "iterators", represented by a
  * #GSequenceIter. An iterator represents a position between two
  * elements of the sequence. For example, the "begin" iterator
  * represents the gap immediately before the first element of the
@@ -46,7 +46,7 @@
  * after the last element. In an empty sequence, the begin and end
  * iterators are the same.
  *
- * Some methods on #GSequence operate on ranges of items. For example
+ * Some methods on #xsequence_t operate on ranges of items. For example
  * g_sequence_foreach_range() will call a user-specified function on
  * each element with the given range. The range is delimited by the
  * gaps represented by the passed-in iterators, so if you pass in the
@@ -57,7 +57,7 @@
  * element immediately following the gap that the iterator represents.
  * The iterator is said to "point" to that element.
  *
- * Iterators are stable across most operations on a #GSequence. For
+ * Iterators are stable across most operations on a #xsequence_t. For
  * example an iterator pointing to some element of a sequence will
  * continue to point to that element even after the sequence is sorted.
  * Even moving an element to another sequence using for example
@@ -66,7 +66,7 @@
  * the element it points to is removed from any sequence.
  *
  * To sort the data, either use g_sequence_insert_sorted() or
- * g_sequence_insert_sorted_iter() to add data to the #GSequence or, if
+ * g_sequence_insert_sorted_iter() to add data to the #xsequence_t or, if
  * you want to add a large amount of data, it is more efficient to call
  * g_sequence_sort() or g_sequence_sort_iter() after doing unsorted
  * insertions.
@@ -76,7 +76,7 @@
  * GSequenceIter:
  *
  * The #GSequenceIter struct is an opaque data type representing an
- * iterator pointing into a #GSequence.
+ * iterator pointing into a #xsequence_t.
  */
 
 /**
@@ -96,15 +96,15 @@
 typedef struct _GSequenceNode GSequenceNode;
 
 /**
- * GSequence:
+ * xsequence_t:
  *
- * The #GSequence struct is an opaque data type representing a
+ * The #xsequence_t struct is an opaque data type representing a
  * [sequence][glib-Sequences] data type.
  */
 struct _GSequence
 {
   GSequenceNode *       end_node;
-  GDestroyNotify        data_destroy_notify;
+  xdestroy_notify_t        data_destroy_notify;
   xboolean_t              access_prohibited;
 
   /* The 'real_sequence' is used when temporary sequences are created
@@ -114,13 +114,13 @@ struct _GSequence
    * sort/sort_changed/search_iter() functions call out to the application
    * g_sequence_iter_get_sequence() will return the correct sequence.
    */
-  GSequence *           real_sequence;
+  xsequence_t *           real_sequence;
 };
 
 struct _GSequenceNode
 {
   xint_t                  n_nodes;
-  guint32               priority;
+  xuint32_t               priority;
   GSequenceNode *       parent;
   GSequenceNode *       left;
   GSequenceNode *       right;
@@ -152,7 +152,7 @@ static GSequenceNode *node_find_closest  (GSequenceNode            *haystack,
                                           xpointer_t                  user_data);
 static xint_t           node_get_length    (GSequenceNode            *node);
 static void           node_free          (GSequenceNode            *node,
-                                          GSequence                *seq);
+                                          xsequence_t                *seq);
 static void           node_cut           (GSequenceNode            *split);
 static void           node_insert_before (GSequenceNode            *node,
                                           GSequenceNode            *new);
@@ -170,7 +170,7 @@ static void           node_insert_sorted (GSequenceNode            *node,
  * Various helper functions
  */
 static void
-check_seq_access (GSequence *seq)
+check_seq_access (xsequence_t *seq)
 {
   if (G_UNLIKELY (seq->access_prohibited))
     {
@@ -179,14 +179,14 @@ check_seq_access (GSequence *seq)
     }
 }
 
-static GSequence *
+static xsequence_t *
 get_sequence (GSequenceNode *node)
 {
-  return (GSequence *)node_get_last (node)->data;
+  return (xsequence_t *)node_get_last (node)->data;
 }
 
 static xboolean_t
-seq_is_end (GSequence     *seq,
+seq_is_end (xsequence_t     *seq,
             GSequenceIter *iter)
 {
   return seq->end_node == iter;
@@ -250,20 +250,20 @@ iter_compare (GSequenceIter *node1,
 
 /**
  * g_sequence_new:
- * @data_destroy: (nullable): a #GDestroyNotify function, or %NULL
+ * @data_destroy: (nullable): a #xdestroy_notify_t function, or %NULL
  *
- * Creates a new GSequence. The @data_destroy function, if non-%NULL will
+ * Creates a new xsequence_t. The @data_destroy function, if non-%NULL will
  * be called on all items when the sequence is destroyed and on items that
  * are removed from the sequence.
  *
- * Returns: (transfer full): a new #GSequence
+ * Returns: (transfer full): a new #xsequence_t
  *
  * Since: 2.14
  **/
-GSequence *
-g_sequence_new (GDestroyNotify data_destroy)
+xsequence_t *
+g_sequence_new (xdestroy_notify_t data_destroy)
 {
-  GSequence *seq = g_new (GSequence, 1);
+  xsequence_t *seq = g_new (xsequence_t, 1);
   seq->data_destroy_notify = data_destroy;
 
   seq->end_node = node_new (seq);
@@ -277,7 +277,7 @@ g_sequence_new (GDestroyNotify data_destroy)
 
 /**
  * g_sequence_free:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  *
  * Frees the memory allocated for @seq. If @seq has a data destroy
  * function associated with it, that function is called on all items
@@ -286,7 +286,7 @@ g_sequence_new (GDestroyNotify data_destroy)
  * Since: 2.14
  */
 void
-g_sequence_free (GSequence *seq)
+g_sequence_free (xsequence_t *seq)
 {
   g_return_if_fail (seq != NULL);
 
@@ -316,7 +316,7 @@ g_sequence_foreach_range (GSequenceIter *begin,
                           GFunc          func,
                           xpointer_t       user_data)
 {
-  GSequence *seq;
+  xsequence_t *seq;
   GSequenceIter *iter;
 
   g_return_if_fail (func != NULL);
@@ -342,7 +342,7 @@ g_sequence_foreach_range (GSequenceIter *begin,
 
 /**
  * g_sequence_foreach:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  * @func: the function to call for each item in @seq
  * @user_data: user data passed to @func
  *
@@ -352,7 +352,7 @@ g_sequence_foreach_range (GSequenceIter *begin,
  * Since: 2.14
  */
 void
-g_sequence_foreach (GSequence *seq,
+g_sequence_foreach (xsequence_t *seq,
                     GFunc      func,
                     xpointer_t   user_data)
 {
@@ -423,7 +423,7 @@ g_sequence_iter_compare (GSequenceIter *a,
                          GSequenceIter *b)
 {
   xint_t a_pos, b_pos;
-  GSequence *seq_a, *seq_b;
+  xsequence_t *seq_a, *seq_b;
 
   g_return_val_if_fail (a != NULL, 0);
   g_return_val_if_fail (b != NULL, 0);
@@ -448,7 +448,7 @@ g_sequence_iter_compare (GSequenceIter *a,
 
 /**
  * g_sequence_append:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  * @data: the data for the new item
  *
  * Adds a new item to the end of @seq.
@@ -458,7 +458,7 @@ g_sequence_iter_compare (GSequenceIter *a,
  * Since: 2.14
  */
 GSequenceIter *
-g_sequence_append (GSequence *seq,
+g_sequence_append (xsequence_t *seq,
                    xpointer_t   data)
 {
   GSequenceNode *node;
@@ -475,7 +475,7 @@ g_sequence_append (GSequence *seq,
 
 /**
  * g_sequence_prepend:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  * @data: the data for the new item
  *
  * Adds a new item to the front of @seq
@@ -485,7 +485,7 @@ g_sequence_append (GSequence *seq,
  * Since: 2.14
  */
 GSequenceIter *
-g_sequence_prepend (GSequence *seq,
+g_sequence_prepend (xsequence_t *seq,
                     xpointer_t   data)
 {
   GSequenceNode *node, *first;
@@ -517,7 +517,7 @@ GSequenceIter *
 g_sequence_insert_before (GSequenceIter *iter,
                           xpointer_t       data)
 {
-  GSequence *seq;
+  xsequence_t *seq;
   GSequenceNode *node;
 
   g_return_val_if_fail (iter != NULL, NULL);
@@ -547,7 +547,7 @@ g_sequence_insert_before (GSequenceIter *iter,
 void
 g_sequence_remove (GSequenceIter *iter)
 {
-  GSequence *seq;
+  xsequence_t *seq;
 
   g_return_if_fail (iter != NULL);
 
@@ -576,7 +576,7 @@ void
 g_sequence_remove_range (GSequenceIter *begin,
                          GSequenceIter *end)
 {
-  GSequence *seq_begin, *seq_end;
+  xsequence_t *seq_begin, *seq_end;
 
   seq_begin = get_sequence (begin);
   seq_end = get_sequence (end);
@@ -608,7 +608,7 @@ g_sequence_move_range (GSequenceIter *dest,
                        GSequenceIter *begin,
                        GSequenceIter *end)
 {
-  GSequence *src_seq, *end_seq, *dest_seq = NULL;
+  xsequence_t *src_seq, *end_seq, *dest_seq = NULL;
   GSequenceNode *first;
 
   g_return_if_fail (begin != NULL);
@@ -672,7 +672,7 @@ g_sequence_move_range (GSequenceIter *dest,
 
 /**
  * g_sequence_sort:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  * @cmp_func: the function used to sort the sequence
  * @cmp_data: user data passed to @cmp_func
  *
@@ -686,7 +686,7 @@ g_sequence_move_range (GSequenceIter *dest,
  * Since: 2.14
  */
 void
-g_sequence_sort (GSequence        *seq,
+g_sequence_sort (xsequence_t        *seq,
                  GCompareDataFunc  cmp_func,
                  xpointer_t          cmp_data)
 {
@@ -703,7 +703,7 @@ g_sequence_sort (GSequence        *seq,
 
 /**
  * g_sequence_insert_sorted:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  * @data: the data to insert
  * @cmp_func: the function used to compare items in the sequence
  * @cmp_data: user data passed to @cmp_func.
@@ -717,7 +717,7 @@ g_sequence_sort (GSequence        *seq,
  * if the first item comes before the second, and a positive value
  * if the second item comes before the first.
  *
- * Note that when adding a large amount of data to a #GSequence,
+ * Note that when adding a large amount of data to a #xsequence_t,
  * it is more efficient to do unsorted insertions and then call
  * g_sequence_sort() or g_sequence_sort_iter().
  *
@@ -726,7 +726,7 @@ g_sequence_sort (GSequence        *seq,
  * Since: 2.14
  */
 GSequenceIter *
-g_sequence_insert_sorted (GSequence        *seq,
+g_sequence_insert_sorted (xsequence_t        *seq,
                           xpointer_t          data,
                           GCompareDataFunc  cmp_func,
                           xpointer_t          cmp_data)
@@ -768,7 +768,7 @@ g_sequence_sort_changed (GSequenceIter    *iter,
                          GCompareDataFunc  cmp_func,
                          xpointer_t          cmp_data)
 {
-  GSequence *seq;
+  xsequence_t *seq;
   SortInfo info;
 
   g_return_if_fail (iter != NULL);
@@ -786,7 +786,7 @@ g_sequence_sort_changed (GSequenceIter    *iter,
 
 /**
  * g_sequence_search:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  * @data: data for the new item
  * @cmp_func: the function used to compare items in the sequence
  * @cmp_data: user data passed to @cmp_func
@@ -811,7 +811,7 @@ g_sequence_sort_changed (GSequenceIter    *iter,
  * Since: 2.14
  */
 GSequenceIter *
-g_sequence_search (GSequence        *seq,
+g_sequence_search (xsequence_t        *seq,
                    xpointer_t          data,
                    GCompareDataFunc  cmp_func,
                    xpointer_t          cmp_data)
@@ -830,7 +830,7 @@ g_sequence_search (GSequence        *seq,
 
 /**
  * g_sequence_lookup:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  * @data: data to look up
  * @cmp_func: the function used to compare items in the sequence
  * @cmp_data: user data passed to @cmp_func
@@ -856,7 +856,7 @@ g_sequence_search (GSequence        *seq,
  * Since: 2.28
  */
 GSequenceIter *
-g_sequence_lookup (GSequence        *seq,
+g_sequence_lookup (xsequence_t        *seq,
                    xpointer_t          data,
                    GCompareDataFunc  cmp_func,
                    xpointer_t          cmp_data)
@@ -875,7 +875,7 @@ g_sequence_lookup (GSequence        *seq,
 
 /**
  * g_sequence_sort_iter:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  * @cmp_func: the function used to compare iterators in the sequence
  * @cmp_data: user data passed to @cmp_func
  *
@@ -890,11 +890,11 @@ g_sequence_lookup (GSequence        *seq,
  * Since: 2.14
  */
 void
-g_sequence_sort_iter (GSequence                *seq,
+g_sequence_sort_iter (xsequence_t                *seq,
                       GSequenceIterCompareFunc  cmp_func,
                       xpointer_t                  cmp_data)
 {
-  GSequence *tmp;
+  xsequence_t *tmp;
   GSequenceNode *begin, *end;
 
   g_return_if_fail (seq != NULL);
@@ -937,7 +937,7 @@ g_sequence_sort_iter (GSequence                *seq,
  * a #GSequenceIterCompareFunc instead of a #GCompareDataFunc as
  * the compare function.
  *
- * @iter_cmp is called with two iterators pointing into the #GSequence that
+ * @iter_cmp is called with two iterators pointing into the #xsequence_t that
  * @iter points into. It should
  * return 0 if the iterators are equal, a negative value if the first
  * iterator comes before the second, and a positive value if the second
@@ -950,7 +950,7 @@ g_sequence_sort_changed_iter (GSequenceIter            *iter,
                               GSequenceIterCompareFunc  iter_cmp,
                               xpointer_t                  cmp_data)
 {
-  GSequence *seq, *tmp_seq;
+  xsequence_t *seq, *tmp_seq;
   GSequenceIter *next, *prev;
 
   g_return_if_fail (iter != NULL);
@@ -993,7 +993,7 @@ g_sequence_sort_changed_iter (GSequenceIter            *iter,
 
 /**
  * g_sequence_insert_sorted_iter:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  * @data: data for the new item
  * @iter_cmp: the function used to compare iterators in the sequence
  * @cmp_data: user data passed to @iter_cmp
@@ -1007,7 +1007,7 @@ g_sequence_sort_changed_iter (GSequenceIter            *iter,
  * value if the first iterator comes before the second, and a
  * positive value if the second iterator comes before the first.
  *
- * Note that when adding a large amount of data to a #GSequence,
+ * Note that when adding a large amount of data to a #xsequence_t,
  * it is more efficient to do unsorted insertions and then call
  * g_sequence_sort() or g_sequence_sort_iter().
  *
@@ -1016,13 +1016,13 @@ g_sequence_sort_changed_iter (GSequenceIter            *iter,
  * Since: 2.14
  */
 GSequenceIter *
-g_sequence_insert_sorted_iter (GSequence                *seq,
+g_sequence_insert_sorted_iter (xsequence_t                *seq,
                                xpointer_t                  data,
                                GSequenceIterCompareFunc  iter_cmp,
                                xpointer_t                  cmp_data)
 {
   GSequenceNode *new_node;
-  GSequence *tmp_seq;
+  xsequence_t *tmp_seq;
 
   g_return_val_if_fail (seq != NULL, NULL);
   g_return_val_if_fail (iter_cmp != NULL, NULL);
@@ -1060,7 +1060,7 @@ g_sequence_insert_sorted_iter (GSequence                *seq,
 
 /**
  * g_sequence_search_iter:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  * @data: data for the new item
  * @iter_cmp: the function used to compare iterators in the sequence
  * @cmp_data: user data passed to @iter_cmp
@@ -1086,14 +1086,14 @@ g_sequence_insert_sorted_iter (GSequence                *seq,
  * Since: 2.14
  */
 GSequenceIter *
-g_sequence_search_iter (GSequence                *seq,
+g_sequence_search_iter (xsequence_t                *seq,
                         xpointer_t                  data,
                         GSequenceIterCompareFunc  iter_cmp,
                         xpointer_t                  cmp_data)
 {
   GSequenceNode *node;
   GSequenceNode *dummy;
-  GSequence *tmp_seq;
+  xsequence_t *tmp_seq;
 
   g_return_val_if_fail (seq != NULL, NULL);
 
@@ -1118,7 +1118,7 @@ g_sequence_search_iter (GSequence                *seq,
 
 /**
  * g_sequence_lookup_iter:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  * @data: data to look up
  * @iter_cmp: the function used to compare iterators in the sequence
  * @cmp_data: user data passed to @iter_cmp
@@ -1141,14 +1141,14 @@ g_sequence_search_iter (GSequence                *seq,
  * Since: 2.28
  */
 GSequenceIter *
-g_sequence_lookup_iter (GSequence                *seq,
+g_sequence_lookup_iter (xsequence_t                *seq,
                         xpointer_t                  data,
                         GSequenceIterCompareFunc  iter_cmp,
                         xpointer_t                  cmp_data)
 {
   GSequenceNode *node;
   GSequenceNode *dummy;
-  GSequence *tmp_seq;
+  xsequence_t *tmp_seq;
 
   g_return_val_if_fail (seq != NULL, NULL);
 
@@ -1175,16 +1175,16 @@ g_sequence_lookup_iter (GSequence                *seq,
  * g_sequence_iter_get_sequence:
  * @iter: a #GSequenceIter
  *
- * Returns the #GSequence that @iter points into.
+ * Returns the #xsequence_t that @iter points into.
  *
- * Returns: (transfer none): the #GSequence that @iter points into
+ * Returns: (transfer none): the #xsequence_t that @iter points into
  *
  * Since: 2.14
  */
-GSequence *
+xsequence_t *
 g_sequence_iter_get_sequence (GSequenceIter *iter)
 {
-  GSequence *seq;
+  xsequence_t *seq;
 
   g_return_val_if_fail (iter != NULL, NULL);
 
@@ -1230,7 +1230,7 @@ void
 g_sequence_set (GSequenceIter *iter,
                 xpointer_t       data)
 {
-  GSequence *seq;
+  xsequence_t *seq;
 
   g_return_if_fail (iter != NULL);
 
@@ -1254,7 +1254,7 @@ g_sequence_set (GSequenceIter *iter,
 
 /**
  * g_sequence_get_length:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  *
  * Returns the positive length (>= 0) of @seq. Note that this method is
  * O(h) where `h' is the height of the tree. It is thus more efficient
@@ -1265,14 +1265,14 @@ g_sequence_set (GSequenceIter *iter,
  * Since: 2.14
  */
 xint_t
-g_sequence_get_length (GSequence *seq)
+g_sequence_get_length (xsequence_t *seq)
 {
   return node_get_length (seq->end_node) - 1;
 }
 
 /**
  * g_sequence_is_empty:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  *
  * Returns %TRUE if the sequence contains zero items.
  *
@@ -1285,14 +1285,14 @@ g_sequence_get_length (GSequence *seq)
  * Since: 2.48
  */
 xboolean_t
-g_sequence_is_empty (GSequence *seq)
+g_sequence_is_empty (xsequence_t *seq)
 {
   return (seq->end_node->parent == NULL) && (seq->end_node->left == NULL);
 }
 
 /**
  * g_sequence_get_end_iter:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  *
  * Returns the end iterator for @seg
  *
@@ -1301,7 +1301,7 @@ g_sequence_is_empty (GSequence *seq)
  * Since: 2.14
  */
 GSequenceIter *
-g_sequence_get_end_iter (GSequence *seq)
+g_sequence_get_end_iter (xsequence_t *seq)
 {
   g_return_val_if_fail (seq != NULL, NULL);
 
@@ -1310,7 +1310,7 @@ g_sequence_get_end_iter (GSequence *seq)
 
 /**
  * g_sequence_get_begin_iter:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  *
  * Returns the begin iterator for @seq.
  *
@@ -1319,7 +1319,7 @@ g_sequence_get_end_iter (GSequence *seq)
  * Since: 2.14
  */
 GSequenceIter *
-g_sequence_get_begin_iter (GSequence *seq)
+g_sequence_get_begin_iter (xsequence_t *seq)
 {
   g_return_val_if_fail (seq != NULL, NULL);
 
@@ -1327,7 +1327,7 @@ g_sequence_get_begin_iter (GSequence *seq)
 }
 
 static int
-clamp_position (GSequence *seq,
+clamp_position (xsequence_t *seq,
                 int        pos)
 {
   xint_t len = g_sequence_get_length (seq);
@@ -1340,7 +1340,7 @@ clamp_position (GSequence *seq,
 
 /**
  * g_sequence_get_iter_at_pos:
- * @seq: a #GSequence
+ * @seq: a #xsequence_t
  * @pos: a position in @seq, or -1 for the end
  *
  * Returns the iterator at position @pos. If @pos is negative or larger
@@ -1351,7 +1351,7 @@ clamp_position (GSequence *seq,
  * Since: 2.14
  */
 GSequenceIter *
-g_sequence_get_iter_at_pos (GSequence *seq,
+g_sequence_get_iter_at_pos (xsequence_t *seq,
                             xint_t       pos)
 {
   g_return_val_if_fail (seq != NULL, NULL);
@@ -1573,8 +1573,8 @@ g_sequence_swap (GSequenceIter *a,
  *
  *
  */
-static guint32
-hash_uint32 (guint32 key)
+static xuint32_t
+hash_uint32 (xuint32_t key)
 {
   /* This hash function is based on one found on Thomas Wang's
    * web page at
@@ -1599,7 +1599,7 @@ get_priority (GSequenceNode *node)
 }
 
 static xuint_t
-make_priority (guint32 key)
+make_priority (xuint32_t key)
 {
   key = hash_uint32 (key);
 
@@ -1623,7 +1623,7 @@ node_new (xpointer_t data)
 
   /*
    * Make a random number quickly. Some binary magic is used to avoid
-   * the costs of proper RNG, such as locking around global GRand.
+   * the costs of proper RNG, such as locking around global xrand_t.
    *
    * Using just the node pointer alone is not enough, because in this
    * case freeing and re-allocating sequence causes node's priorities
@@ -1648,9 +1648,9 @@ node_new (xpointer_t data)
    *
    * See https://gitlab.gnome.org/GNOME/glib/-/issues/2468
    */
-  static guint64 counter = 0;
-  guint32 hash_key = (guint32) GPOINTER_TO_UINT (node);
-  hash_key ^= (guint32) counter;
+  static xuint64_t counter = 0;
+  xuint32_t hash_key = (xuint32_t) GPOINTER_TO_UINT (node);
+  hash_key ^= (xuint32_t) counter;
   counter++;
 
   node->n_nodes = 1;
@@ -1871,7 +1871,7 @@ node_get_length    (GSequenceNode            *node)
 
 static void
 real_node_free (GSequenceNode *node,
-                GSequence     *seq)
+                xsequence_t     *seq)
 {
   if (node)
     {
@@ -1887,7 +1887,7 @@ real_node_free (GSequenceNode *node,
 
 static void
 node_free (GSequenceNode *node,
-           GSequence *seq)
+           xsequence_t *seq)
 {
   node = find_root (node);
 

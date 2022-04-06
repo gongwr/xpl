@@ -47,45 +47,45 @@ test_completion (void)
   g_completion_set_compare (cmp, strncmp);
 
   items = NULL;
-  items = g_list_append (items, (xpointer_t) a1);
-  items = g_list_append (items, (xpointer_t) a2);
-  items = g_list_append (items, (xpointer_t) bb);
-  items = g_list_append (items, (xpointer_t) bc);
+  items = xlist_append (items, (xpointer_t) a1);
+  items = xlist_append (items, (xpointer_t) a2);
+  items = xlist_append (items, (xpointer_t) bb);
+  items = xlist_append (items, (xpointer_t) bc);
   g_completion_add_items (cmp, items);
-  g_list_free (items);
+  xlist_free (items);
 
   items = g_completion_complete (cmp, "a", &prefix);
   g_assert_cmpstr (prefix, ==, "a\302");
-  g_assert_cmpint (g_list_length (items), ==, 2);
+  g_assert_cmpint (xlist_length (items), ==, 2);
   g_free (prefix);
 
   items = g_completion_complete_utf8 (cmp, "a", &prefix);
   g_assert_cmpstr (prefix, ==, "a");
-  g_assert_cmpint (g_list_length (items), ==, 2);
+  g_assert_cmpint (xlist_length (items), ==, 2);
   g_free (prefix);
 
   items = g_completion_complete (cmp, "b", &prefix);
   g_assert_cmpstr (prefix, ==, "b");
-  g_assert_cmpint (g_list_length (items), ==, 2);
+  g_assert_cmpint (xlist_length (items), ==, 2);
   g_free (prefix);
 
   items = g_completion_complete_utf8 (cmp, "b", &prefix);
   g_assert_cmpstr (prefix, ==, "b");
-  g_assert_cmpint (g_list_length (items), ==, 2);
+  g_assert_cmpint (xlist_length (items), ==, 2);
   g_free (prefix);
 
   items = g_completion_complete (cmp, "a", NULL);
-  g_assert_cmpint (g_list_length (items), ==, 2);
+  g_assert_cmpint (xlist_length (items), ==, 2);
 
   items = g_completion_complete_utf8 (cmp, "a", NULL);
-  g_assert_cmpint (g_list_length (items), ==, 2);
+  g_assert_cmpint (xlist_length (items), ==, 2);
 
-  items = g_list_append (NULL, (xpointer_t) bb);
+  items = xlist_append (NULL, (xpointer_t) bb);
   g_completion_remove_items (cmp, items);
-  g_list_free (items);
+  xlist_free (items);
 
   items = g_completion_complete_utf8 (cmp, "b", &prefix);
-  g_assert_cmpint (g_list_length (items), ==, 1);
+  g_assert_cmpint (xlist_length (items), ==, 1);
   g_free (prefix);
 
   g_completion_free (cmp);

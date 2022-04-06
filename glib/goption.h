@@ -29,26 +29,26 @@
 G_BEGIN_DECLS
 
 /**
- * GOptionContext:
+ * xoption_context_t:
  *
- * A `GOptionContext` struct defines which options
+ * A `xoption_context_t` struct defines which options
  * are accepted by the commandline option parser. The struct has only private
  * fields and should not be directly accessed.
  */
-typedef struct _GOptionContext GOptionContext;
+typedef struct _GOptionContext xoption_context_t;
 
 /**
- * GOptionGroup:
+ * xoption_group_t:
  *
- * A `GOptionGroup` struct defines the options in a single
+ * A `xoption_group_t` struct defines the options in a single
  * group. The struct has only private fields and should not be directly accessed.
  *
  * All options in a group share the same translation function. Libraries which
  * need to parse commandline options are expected to provide a function for
- * getting a `GOptionGroup` holding their options, which
- * the application can then add to its #GOptionContext.
+ * getting a `xoption_group_t` holding their options, which
+ * the application can then add to its #xoption_context_t.
  */
-typedef struct _GOptionGroup   GOptionGroup;
+typedef struct _GOptionGroup   xoption_group_t;
 typedef struct _GOptionEntry   GOptionEntry;
 
 /**
@@ -62,7 +62,7 @@ typedef struct _GOptionEntry   GOptionEntry;
  * @G_OPTION_FLAG_NO_ARG: For options of the %G_OPTION_ARG_CALLBACK kind,
  *     this flag indicates that the callback does not take any argument
  *     (like a %G_OPTION_ARG_NONE option). Since 2.8
- * @G_OPTION_FLAG_FILENAME: For options of the %G_OPTION_ARG_CALLBACK
+ * @G_OPTION_FLAXFILENAME: For options of the %G_OPTION_ARG_CALLBACK
  *     kind, this flag indicates that the argument should be passed to the
  *     callback in the GLib filename encoding rather than UTF-8. Since 2.8
  * @G_OPTION_FLAG_OPTIONAL_ARG: For options of the %G_OPTION_ARG_CALLBACK
@@ -85,7 +85,7 @@ typedef enum
   G_OPTION_FLAG_IN_MAIN		= 1 << 1,
   G_OPTION_FLAG_REVERSE		= 1 << 2,
   G_OPTION_FLAG_NO_ARG		= 1 << 3,
-  G_OPTION_FLAG_FILENAME	= 1 << 4,
+  G_OPTION_FLAXFILENAME	= 1 << 4,
   G_OPTION_FLAG_OPTIONAL_ARG    = 1 << 5,
   G_OPTION_FLAG_NOALIAS	        = 1 << 6
 } GOptionFlags;
@@ -97,11 +97,11 @@ typedef enum
  * @G_OPTION_ARG_INT: The option takes an integer argument.
  * @G_OPTION_ARG_CALLBACK: The option provides a callback (of type
  *     #GOptionArgFunc) to parse the extra argument.
- * @G_OPTION_ARG_FILENAME: The option takes a filename as argument, which will
+ * @G_OPTION_ARXFILENAME: The option takes a filename as argument, which will
        be in the GLib filename encoding rather than UTF-8.
  * @G_OPTION_ARG_STRING_ARRAY: The option takes a string argument, multiple
  *     uses of the option are collected into an array of strings.
- * @G_OPTION_ARG_FILENAME_ARRAY: The option takes a filename as argument,
+ * @G_OPTION_ARXFILENAME_ARRAY: The option takes a filename as argument,
  *     multiple uses of the option are collected into an array of strings.
  * @G_OPTION_ARG_DOUBLE: The option takes a double argument. The argument
  *     can be formatted either for the user's locale or for the "C" locale.
@@ -122,9 +122,9 @@ typedef enum
   G_OPTION_ARG_STRING,
   G_OPTION_ARG_INT,
   G_OPTION_ARG_CALLBACK,
-  G_OPTION_ARG_FILENAME,
+  G_OPTION_ARXFILENAME,
   G_OPTION_ARG_STRING_ARRAY,
-  G_OPTION_ARG_FILENAME_ARRAY,
+  G_OPTION_ARXFILENAME_ARRAY,
   G_OPTION_ARG_DOUBLE,
   G_OPTION_ARG_INT64
 } GOptionArg;
@@ -135,8 +135,8 @@ typedef enum
  *  single dash followed by a single letter (for a short name) or two dashes
  *  followed by a long option name.
  * @value: The value to be parsed.
- * @data: User data added to the #GOptionGroup containing the option when it
- *  was created with g_option_group_new()
+ * @data: User data added to the #xoption_group_t containing the option when it
+ *  was created with xoption_group_new()
  * @error: A return location for errors. The error code %G_OPTION_ERROR_FAILED
  *  is intended to be used for errors in #GOptionArgFunc callbacks.
  *
@@ -153,10 +153,10 @@ typedef xboolean_t (*GOptionArgFunc) (const xchar_t    *option_name,
 
 /**
  * GOptionParseFunc:
- * @context: The active #GOptionContext
+ * @context: The active #xoption_context_t
  * @group: The group to which the function belongs
- * @data: User data added to the #GOptionGroup containing the option when it
- *  was created with g_option_group_new()
+ * @data: User data added to the #xoption_group_t containing the option when it
+ *  was created with xoption_group_new()
  * @error: A return location for error details
  *
  * The type of function that can be called before and after parsing.
@@ -164,23 +164,23 @@ typedef xboolean_t (*GOptionArgFunc) (const xchar_t    *option_name,
  * Returns: %TRUE if the function completed successfully, %FALSE if an error
  *  occurred, in which case @error should be set with g_set_error()
  */
-typedef xboolean_t (*GOptionParseFunc) (GOptionContext *context,
-				      GOptionGroup   *group,
+typedef xboolean_t (*GOptionParseFunc) (xoption_context_t *context,
+				      xoption_group_t   *group,
 				      xpointer_t	      data,
 				      xerror_t        **error);
 
 /**
  * GOptionErrorFunc:
- * @context: The active #GOptionContext
+ * @context: The active #xoption_context_t
  * @group: The group to which the function belongs
- * @data: User data added to the #GOptionGroup containing the option when it
- *  was created with g_option_group_new()
+ * @data: User data added to the #xoption_group_t containing the option when it
+ *  was created with xoption_group_new()
  * @error: The #xerror_t containing details about the parse error
  *
  * The type of function to be used as callback when a parse error occurs.
  */
-typedef void (*GOptionErrorFunc) (GOptionContext *context,
-				  GOptionGroup   *group,
+typedef void (*GOptionErrorFunc) (xoption_context_t *context,
+				  xoption_group_t   *group,
 				  xpointer_t        data,
 				  xerror_t        **error);
 
@@ -211,7 +211,7 @@ typedef enum
 } GOptionError;
 
 XPL_AVAILABLE_IN_ALL
-GQuark g_option_error_quark (void);
+xquark g_option_error_quark (void);
 
 /**
  * GOptionEntry:
@@ -234,26 +234,26 @@ GQuark g_option_error_quark (void);
  *     - %G_OPTION_ARG_NONE: %xboolean_t
  *     - %G_OPTION_ARG_STRING: %xchar_t*
  *     - %G_OPTION_ARG_INT: %xint_t
- *     - %G_OPTION_ARG_FILENAME: %xchar_t*
+ *     - %G_OPTION_ARXFILENAME: %xchar_t*
  *     - %G_OPTION_ARG_STRING_ARRAY: %xchar_t**
- *     - %G_OPTION_ARG_FILENAME_ARRAY: %xchar_t**
+ *     - %G_OPTION_ARXFILENAME_ARRAY: %xchar_t**
  *     - %G_OPTION_ARG_DOUBLE: %xdouble_t
- *     If @arg type is %G_OPTION_ARG_STRING or %G_OPTION_ARG_FILENAME,
+ *     If @arg type is %G_OPTION_ARG_STRING or %G_OPTION_ARXFILENAME,
  *     the location will contain a newly allocated string if the option
  *     was given. That string needs to be freed by the callee using g_free().
  *     Likewise if @arg type is %G_OPTION_ARG_STRING_ARRAY or
- *     %G_OPTION_ARG_FILENAME_ARRAY, the data should be freed using g_strfreev().
+ *     %G_OPTION_ARXFILENAME_ARRAY, the data should be freed using xstrfreev().
  * @description: the description for the option in `--help`
  *     output. The @description is translated using the @translate_func
- *     of the group, see g_option_group_set_translation_domain().
+ *     of the group, see xoption_group_set_translation_domain().
  * @arg_description: The placeholder to use for the extra argument parsed
  *     by the option in `--help` output. The @arg_description is translated
  *     using the @translate_func of the group, see
- *     g_option_group_set_translation_domain().
+ *     xoption_group_set_translation_domain().
  *
  * A GOptionEntry struct defines a single option. To have an effect, they
- * must be added to a #GOptionGroup with g_option_context_add_main_entries()
- * or g_option_group_add_entries().
+ * must be added to a #xoption_group_t with g_option_context_add_main_entries()
+ * or xoption_group_add_entries().
  */
 struct _GOptionEntry
 {
@@ -275,7 +275,7 @@ struct _GOptionEntry
  * regular option. Instead it collects all non-option arguments which would
  * otherwise be left in `argv`. The option must be of type
  * %G_OPTION_ARG_CALLBACK, %G_OPTION_ARG_STRING_ARRAY
- * or %G_OPTION_ARG_FILENAME_ARRAY.
+ * or %G_OPTION_ARXFILENAME_ARRAY.
  *
  *
  * Using %G_OPTION_REMAINING instead of simply scanning `argv`
@@ -305,100 +305,100 @@ struct _GOptionEntry
 
 
 XPL_AVAILABLE_IN_ALL
-GOptionContext *g_option_context_new              (const xchar_t         *parameter_string);
+xoption_context_t *g_option_context_new              (const xchar_t         *parameter_string);
 XPL_AVAILABLE_IN_ALL
-void            g_option_context_set_summary      (GOptionContext      *context,
+void            g_option_context_set_summary      (xoption_context_t      *context,
                                                    const xchar_t         *summary);
 XPL_AVAILABLE_IN_ALL
-const xchar_t *   g_option_context_get_summary      (GOptionContext     *context);
+const xchar_t *   g_option_context_get_summary      (xoption_context_t     *context);
 XPL_AVAILABLE_IN_ALL
-void            g_option_context_set_description  (GOptionContext      *context,
+void            g_option_context_set_description  (xoption_context_t      *context,
                                                    const xchar_t         *description);
 XPL_AVAILABLE_IN_ALL
-const xchar_t *   g_option_context_get_description  (GOptionContext     *context);
+const xchar_t *   g_option_context_get_description  (xoption_context_t     *context);
 XPL_AVAILABLE_IN_ALL
-void            g_option_context_free             (GOptionContext      *context);
+void            g_option_context_free             (xoption_context_t      *context);
 XPL_AVAILABLE_IN_ALL
-void		g_option_context_set_help_enabled (GOptionContext      *context,
+void		g_option_context_set_help_enabled (xoption_context_t      *context,
 						   xboolean_t		help_enabled);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	g_option_context_get_help_enabled (GOptionContext      *context);
+xboolean_t	g_option_context_get_help_enabled (xoption_context_t      *context);
 XPL_AVAILABLE_IN_ALL
-void		g_option_context_set_ignore_unknown_options (GOptionContext *context,
+void		g_option_context_set_ignore_unknown_options (xoption_context_t *context,
 							     xboolean_t	     ignore_unknown);
 XPL_AVAILABLE_IN_ALL
-xboolean_t        g_option_context_get_ignore_unknown_options (GOptionContext *context);
+xboolean_t        g_option_context_get_ignore_unknown_options (xoption_context_t *context);
 
 XPL_AVAILABLE_IN_2_44
-void            g_option_context_set_strict_posix           (GOptionContext *context,
+void            g_option_context_set_strict_posix           (xoption_context_t *context,
                                                              xboolean_t        strict_posix);
 XPL_AVAILABLE_IN_2_44
-xboolean_t        g_option_context_get_strict_posix           (GOptionContext *context);
+xboolean_t        g_option_context_get_strict_posix           (xoption_context_t *context);
 
 XPL_AVAILABLE_IN_ALL
-void            g_option_context_add_main_entries (GOptionContext      *context,
+void            g_option_context_add_main_entries (xoption_context_t      *context,
 						   const GOptionEntry  *entries,
 						   const xchar_t         *translation_domain);
 XPL_AVAILABLE_IN_ALL
-xboolean_t        g_option_context_parse            (GOptionContext      *context,
+xboolean_t        g_option_context_parse            (xoption_context_t      *context,
 						   xint_t                *argc,
 						   xchar_t             ***argv,
 						   xerror_t             **error);
 XPL_AVAILABLE_IN_2_40
-xboolean_t        g_option_context_parse_strv       (GOptionContext      *context,
+xboolean_t        g_option_context_parse_strv       (xoption_context_t      *context,
                                                    xchar_t             ***arguments,
                                                    xerror_t             **error);
 XPL_AVAILABLE_IN_ALL
-void            g_option_context_set_translate_func (GOptionContext     *context,
+void            g_option_context_set_translate_func (xoption_context_t     *context,
 						     GTranslateFunc      func,
 						     xpointer_t            data,
-						     GDestroyNotify      destroy_notify);
+						     xdestroy_notify_t      destroy_notify);
 XPL_AVAILABLE_IN_ALL
-void            g_option_context_set_translation_domain (GOptionContext  *context,
+void            g_option_context_set_translation_domain (xoption_context_t  *context,
 							 const xchar_t     *domain);
 
 XPL_AVAILABLE_IN_ALL
-void            g_option_context_add_group      (GOptionContext *context,
-						 GOptionGroup   *group);
+void            g_option_context_add_group      (xoption_context_t *context,
+						 xoption_group_t   *group);
 XPL_AVAILABLE_IN_ALL
-void          g_option_context_set_main_group (GOptionContext *context,
-					       GOptionGroup   *group);
+void          g_option_context_set_main_group (xoption_context_t *context,
+					       xoption_group_t   *group);
 XPL_AVAILABLE_IN_ALL
-GOptionGroup *g_option_context_get_main_group (GOptionContext *context);
+xoption_group_t *g_option_context_get_main_group (xoption_context_t *context);
 XPL_AVAILABLE_IN_ALL
-xchar_t        *g_option_context_get_help       (GOptionContext *context,
+xchar_t        *g_option_context_get_help       (xoption_context_t *context,
                                                xboolean_t        main_help,
-                                               GOptionGroup   *group);
+                                               xoption_group_t   *group);
 
 XPL_AVAILABLE_IN_ALL
-GOptionGroup *g_option_group_new                    (const xchar_t        *name,
+xoption_group_t *xoption_group_new                    (const xchar_t        *name,
 						     const xchar_t        *description,
 						     const xchar_t        *help_description,
 						     xpointer_t            user_data,
-						     GDestroyNotify      destroy);
+						     xdestroy_notify_t      destroy);
 XPL_AVAILABLE_IN_ALL
-void	      g_option_group_set_parse_hooks	    (GOptionGroup       *group,
+void	      xoption_group_set_parse_hooks	    (xoption_group_t       *group,
 						     GOptionParseFunc    pre_parse_func,
 						     GOptionParseFunc	 post_parse_func);
 XPL_AVAILABLE_IN_ALL
-void	      g_option_group_set_error_hook	    (GOptionGroup       *group,
+void	      xoption_group_set_error_hook	    (xoption_group_t       *group,
 						     GOptionErrorFunc	 error_func);
 XPL_DEPRECATED_IN_2_44
-void          g_option_group_free                   (GOptionGroup       *group);
+void          xoption_group_free                   (xoption_group_t       *group);
 XPL_AVAILABLE_IN_2_44
-GOptionGroup *g_option_group_ref                    (GOptionGroup       *group);
+xoption_group_t *xoption_group_ref                    (xoption_group_t       *group);
 XPL_AVAILABLE_IN_2_44
-void          g_option_group_unref                  (GOptionGroup       *group);
+void          xoption_group_unref                  (xoption_group_t       *group);
 XPL_AVAILABLE_IN_ALL
-void          g_option_group_add_entries            (GOptionGroup       *group,
+void          xoption_group_add_entries            (xoption_group_t       *group,
 						     const GOptionEntry *entries);
 XPL_AVAILABLE_IN_ALL
-void          g_option_group_set_translate_func     (GOptionGroup       *group,
+void          xoption_group_set_translate_func     (xoption_group_t       *group,
 						     GTranslateFunc      func,
 						     xpointer_t            data,
-						     GDestroyNotify      destroy_notify);
+						     xdestroy_notify_t      destroy_notify);
 XPL_AVAILABLE_IN_ALL
-void          g_option_group_set_translation_domain (GOptionGroup       *group,
+void          xoption_group_set_translation_domain (xoption_group_t       *group,
 						     const xchar_t        *domain);
 
 G_END_DECLS

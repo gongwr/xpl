@@ -46,7 +46,7 @@ class GListNodePrinter:
 
 
 class GSListNodePrinter:
-    "Prints a GSList node"
+    "Prints a xslist_t node"
 
     def __init__(self, val):
         self.val = val
@@ -93,7 +93,7 @@ class GListPrinter:
 
 
 class GHashPrinter:
-    "Prints a GHashTable"
+    "Prints a xhashtable_t"
 
     class _iterator:
         class _pointer_array:
@@ -118,7 +118,7 @@ class GHashPrinter:
             self.ht = ht
             if ht != 0:
                 self.keys = self._pointer_array(ht["keys"], ht["have_big_keys"])
-                self.values = self._pointer_array(ht["values"], ht["have_big_values"])
+                self.values = self._pointer_array(ht["values"], ht["have_bixvalues"])
                 self.hashes = ht["hashes"]
                 self.size = ht["size"]
             self.pos = 0
@@ -160,7 +160,7 @@ class GHashPrinter:
         self.val = val
         self.keys_are_strings = False
         try:
-            string_hash = read_global_var("g_str_hash")
+            string_hash = read_global_var("xstr_hash")
         except Exception:
             string_hash = None
         if (
@@ -194,16 +194,16 @@ def pretty_printer_lookup(val):
         t = str(type)
         if t == "xlist_t":
             return GListPrinter(val, "xlist_t")
-        if t == "GSList":
-            return GListPrinter(val, "GSList")
-        if t == "GHashTable":
+        if t == "xslist_t":
+            return GListPrinter(val, "xslist_t")
+        if t == "xhashtable_t":
             return GHashPrinter(val)
     else:
         t = str(type)
         if t == "xlist_t":
             return GListNodePrinter(val)
-        if t == "GSList *":
-            return GListPrinter(val, "GSList")
+        if t == "xslist_t *":
+            return GListPrinter(val, "xslist_t")
     return None
 
 
@@ -268,7 +268,7 @@ class ForeachCommand(gdb.Command):
         gdb.execute(command)
 
     def slist_iterator(self, arg, container, command):
-        list_element = container.cast(gdb.lookup_type("GSList").pointer())
+        list_element = container.cast(gdb.lookup_type("xslist_t").pointer())
         while long(list_element) != 0:
             self.do_iter(arg, list_element["data"], command)
             list_element = list_element["next"]
@@ -284,7 +284,7 @@ class ForeachCommand(gdb.Command):
         if t.code == gdb.TYPE_CODE_PTR:
             t = t.target().unqualified()
             t = str(t)
-            if t == "GSList":
+            if t == "xslist_t":
                 return self.slist_iterator
             if t == "xlist_t":
                 return self.list_iterator

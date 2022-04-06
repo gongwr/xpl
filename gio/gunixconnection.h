@@ -41,7 +41,7 @@ typedef struct _GUnixConnection                             GUnixConnection;
 typedef struct _GUnixConnectionPrivate                      GUnixConnectionPrivate;
 typedef struct _GUnixConnectionClass                        GUnixConnectionClass;
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixConnection, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixConnection, xobject_unref)
 
 struct _GUnixConnectionClass
 {
@@ -82,7 +82,7 @@ xboolean_t                g_unix_connection_send_credentials_finish       (GUnix
                                                                          xerror_t              **error);
 
 XPL_AVAILABLE_IN_2_32
-GCredentials           *g_unix_connection_receive_credentials           (GUnixConnection      *connection,
+xcredentials_t           *g_unix_connection_receive_credentials           (GUnixConnection      *connection,
                                                                          xcancellable_t         *cancellable,
                                                                          xerror_t              **error);
 XPL_AVAILABLE_IN_2_32
@@ -91,7 +91,7 @@ void                    g_unix_connection_receive_credentials_async     (GUnixCo
                                                                          xasync_ready_callback_t   callback,
                                                                          xpointer_t              user_data);
 XPL_AVAILABLE_IN_ALL
-GCredentials           *g_unix_connection_receive_credentials_finish    (GUnixConnection      *connection,
+xcredentials_t           *g_unix_connection_receive_credentials_finish    (GUnixConnection      *connection,
                                                                          xasync_result_t         *result,
                                                                          xerror_t              **error);
 

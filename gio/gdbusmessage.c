@@ -126,11 +126,11 @@ g_memory_buffer_read_int16 (GMemoryBuffer  *mbuf,
   return v;
 }
 
-static guint16
+static xuint16_t
 g_memory_buffer_read_uint16 (GMemoryBuffer  *mbuf,
                              xerror_t        **error)
 {
-  guint16 v;
+  xuint16_t v;
 
   g_return_val_if_fail (error == NULL || *error == NULL, 0);
 
@@ -178,11 +178,11 @@ g_memory_buffer_read_int32 (GMemoryBuffer  *mbuf,
   return v;
 }
 
-static guint32
+static xuint32_t
 g_memory_buffer_read_uint32 (GMemoryBuffer  *mbuf,
                              xerror_t        **error)
 {
-  guint32 v;
+  xuint32_t v;
 
   g_return_val_if_fail (error == NULL || *error == NULL, 0);
 
@@ -230,11 +230,11 @@ g_memory_buffer_read_int64 (GMemoryBuffer  *mbuf,
   return v;
 }
 
-static guint64
+static xuint64_t
 g_memory_buffer_read_uint64 (GMemoryBuffer  *mbuf,
                              xerror_t        **error)
 {
-  guint64 v;
+  xuint64_t v;
 
   g_return_val_if_fail (error == NULL || *error == NULL, 0);
 
@@ -272,7 +272,7 @@ array_resize (GMemoryBuffer  *mbuf,
   data = g_realloc (mbuf->data, size);
 
   if (size > len)
-    memset ((guint8 *)data + len, 0, size - len);
+    memset ((xuint8_t *)data + len, 0, size - len);
 
   mbuf->data = data;
   mbuf->len = size;
@@ -286,7 +286,7 @@ g_memory_buffer_write (GMemoryBuffer  *mbuf,
                        const void     *buffer,
                        xsize_t           count)
 {
-  guint8   *dest;
+  xuint8_t   *dest;
   xsize_t new_size;
 
   if (count == 0)
@@ -314,7 +314,7 @@ g_memory_buffer_write (GMemoryBuffer  *mbuf,
       array_resize (mbuf, new_size);
     }
 
-  dest = (guint8 *)mbuf->data + mbuf->pos;
+  dest = (xuint8_t *)mbuf->data + mbuf->pos;
   memcpy (dest, buffer, count);
   mbuf->pos += count;
 
@@ -353,7 +353,7 @@ g_memory_buffer_put_int16 (GMemoryBuffer  *mbuf,
 
 static xboolean_t
 g_memory_buffer_put_uint16 (GMemoryBuffer  *mbuf,
-			    guint16         data)
+			    xuint16_t         data)
 {
   switch (mbuf->byte_order)
     {
@@ -393,7 +393,7 @@ g_memory_buffer_put_int32 (GMemoryBuffer  *mbuf,
 
 static xboolean_t
 g_memory_buffer_put_uint32 (GMemoryBuffer  *mbuf,
-			    guint32         data)
+			    xuint32_t         data)
 {
   switch (mbuf->byte_order)
     {
@@ -433,7 +433,7 @@ g_memory_buffer_put_int64 (GMemoryBuffer  *mbuf,
 
 static xboolean_t
 g_memory_buffer_put_uint64 (GMemoryBuffer  *mbuf,
-			    guint64         data)
+			    xuint64_t         data)
 {
   switch (mbuf->byte_order)
     {
@@ -467,7 +467,7 @@ g_memory_buffer_put_string (GMemoryBuffer  *mbuf,
  * @include: gio/gio.h
  *
  * A type for representing D-Bus messages that can be sent or received
- * on a #GDBusConnection.
+ * on a #xdbus_connection_t.
  */
 
 typedef struct _GDBusMessageClass GDBusMessageClass;
@@ -475,7 +475,7 @@ typedef struct _GDBusMessageClass GDBusMessageClass;
 /**
  * GDBusMessageClass:
  *
- * Class structure for #GDBusMessage.
+ * Class structure for #xdbus_message_t.
  *
  * Since: 2.26
  */
@@ -486,9 +486,9 @@ struct _GDBusMessageClass
 };
 
 /**
- * GDBusMessage:
+ * xdbus_message_t:
  *
- * The #GDBusMessage structure contains only private data and should
+ * The #xdbus_message_t structure contains only private data and should
  * only be accessed using the provided API.
  *
  * Since: 2.26
@@ -503,11 +503,11 @@ struct _GDBusMessage
   xboolean_t locked;
   GDBusMessageByteOrder byte_order;
   guchar major_protocol_version;
-  guint32 serial;
-  GHashTable *headers;
+  xuint32_t serial;
+  xhashtable_t *headers;
   xvariant_t *body;
 #ifdef G_OS_UNIX
-  GUnixFDList *fd_list;
+  xunix_fd_list_t *fd_list;
 #endif
 };
 
@@ -517,38 +517,38 @@ enum
   PROP_LOCKED
 };
 
-G_DEFINE_TYPE (GDBusMessage, g_dbus_message, XTYPE_OBJECT)
+G_DEFINE_TYPE (xdbus_message, xdbus_message, XTYPE_OBJECT)
 
 static void
-g_dbus_message_finalize (xobject_t *object)
+xdbus_message_finalize (xobject_t *object)
 {
-  GDBusMessage *message = G_DBUS_MESSAGE (object);
+  xdbus_message_t *message = G_DBUS_MESSAGE (object);
 
   if (message->headers != NULL)
-    g_hash_table_unref (message->headers);
+    xhash_table_unref (message->headers);
   if (message->body != NULL)
-    g_variant_unref (message->body);
+    xvariant_unref (message->body);
 #ifdef G_OS_UNIX
   if (message->fd_list != NULL)
-    g_object_unref (message->fd_list);
+    xobject_unref (message->fd_list);
 #endif
 
-  if (G_OBJECT_CLASS (g_dbus_message_parent_class)->finalize != NULL)
-    G_OBJECT_CLASS (g_dbus_message_parent_class)->finalize (object);
+  if (G_OBJECT_CLASS (xdbus_message_parent_class)->finalize != NULL)
+    G_OBJECT_CLASS (xdbus_message_parent_class)->finalize (object);
 }
 
 static void
-g_dbus_message_get_property (xobject_t    *object,
+xdbus_message_get_property (xobject_t    *object,
                              xuint_t       prop_id,
-                             GValue     *value,
-                             GParamSpec *pspec)
+                             xvalue_t     *value,
+                             xparam_spec_t *pspec)
 {
-  GDBusMessage *message = G_DBUS_MESSAGE (object);
+  xdbus_message_t *message = G_DBUS_MESSAGE (object);
 
   switch (prop_id)
     {
     case PROP_LOCKED:
-      g_value_set_boolean (value, g_dbus_message_get_locked (message));
+      xvalue_set_boolean (value, xdbus_message_get_locked (message));
       break;
 
     default:
@@ -558,22 +558,22 @@ g_dbus_message_get_property (xobject_t    *object,
 }
 
 static void
-g_dbus_message_class_init (GDBusMessageClass *klass)
+xdbus_message_class_init (GDBusMessageClass *klass)
 {
   xobject_class_t *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->finalize     = g_dbus_message_finalize;
-  gobject_class->get_property = g_dbus_message_get_property;
+  gobject_class->finalize     = xdbus_message_finalize;
+  gobject_class->get_property = xdbus_message_get_property;
 
   /**
-   * GDBusConnection:locked:
+   * xdbus_connection_t:locked:
    *
    * A boolean specifying whether the message is locked.
    *
    * Since: 2.26
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_LOCKED,
                                    g_param_spec_boolean ("locked",
                                                          P_("Locked"),
@@ -586,7 +586,7 @@ g_dbus_message_class_init (GDBusMessageClass *klass)
 }
 
 static void
-g_dbus_message_init (GDBusMessage *message)
+xdbus_message_init (xdbus_message_t *message)
 {
   /* Any D-Bus implementation is supposed to handle both Big and
    * Little Endian encodings and the Endianness is part of the D-Bus
@@ -600,161 +600,161 @@ g_dbus_message_init (GDBusMessage *message)
   /* this could also be G_PDP_ENDIAN */
   message->byte_order = G_DBUS_MESSAGE_BYTE_ORDER_BIG_ENDIAN;
 #endif
-  message->headers = g_hash_table_new_full (g_direct_hash,
+  message->headers = xhash_table_new_full (g_direct_hash,
                                             g_direct_equal,
                                             NULL,
-                                            (GDestroyNotify) g_variant_unref);
+                                            (xdestroy_notify_t) xvariant_unref);
 }
 
 /**
- * g_dbus_message_new:
+ * xdbus_message_new:
  *
- * Creates a new empty #GDBusMessage.
+ * Creates a new empty #xdbus_message_t.
  *
- * Returns: A #GDBusMessage. Free with g_object_unref().
+ * Returns: A #xdbus_message_t. Free with xobject_unref().
  *
  * Since: 2.26
  */
-GDBusMessage *
-g_dbus_message_new (void)
+xdbus_message_t *
+xdbus_message_new (void)
 {
-  return g_object_new (XTYPE_DBUS_MESSAGE, NULL);
+  return xobject_new (XTYPE_DBUS_MESSAGE, NULL);
 }
 
 /**
- * g_dbus_message_new_method_call:
+ * xdbus_message_new_method_call:
  * @name: (nullable): A valid D-Bus name or %NULL.
  * @path: A valid object path.
  * @interface_: (nullable): A valid D-Bus interface name or %NULL.
  * @method: A valid method name.
  *
- * Creates a new #GDBusMessage for a method call.
+ * Creates a new #xdbus_message_t for a method call.
  *
- * Returns: A #GDBusMessage. Free with g_object_unref().
+ * Returns: A #xdbus_message_t. Free with xobject_unref().
  *
  * Since: 2.26
  */
-GDBusMessage *
-g_dbus_message_new_method_call (const xchar_t *name,
+xdbus_message_t *
+xdbus_message_new_method_call (const xchar_t *name,
                                 const xchar_t *path,
                                 const xchar_t *interface_,
                                 const xchar_t *method)
 {
-  GDBusMessage *message;
+  xdbus_message_t *message;
 
   g_return_val_if_fail (name == NULL || g_dbus_is_name (name), NULL);
-  g_return_val_if_fail (g_variant_is_object_path (path), NULL);
+  g_return_val_if_fail (xvariant_is_object_path (path), NULL);
   g_return_val_if_fail (g_dbus_is_member_name (method), NULL);
   g_return_val_if_fail (interface_ == NULL || g_dbus_is_interface_name (interface_), NULL);
 
-  message = g_dbus_message_new ();
+  message = xdbus_message_new ();
   message->type = G_DBUS_MESSAGE_TYPE_METHOD_CALL;
 
   if (name != NULL)
-    g_dbus_message_set_destination (message, name);
-  g_dbus_message_set_path (message, path);
-  g_dbus_message_set_member (message, method);
+    xdbus_message_set_destination (message, name);
+  xdbus_message_set_path (message, path);
+  xdbus_message_set_member (message, method);
   if (interface_ != NULL)
-    g_dbus_message_set_interface (message, interface_);
+    xdbus_message_set_interface (message, interface_);
 
   return message;
 }
 
 /**
- * g_dbus_message_new_signal:
+ * xdbus_message_new_signal:
  * @path: A valid object path.
  * @interface_: A valid D-Bus interface name.
  * @signal: A valid signal name.
  *
- * Creates a new #GDBusMessage for a signal emission.
+ * Creates a new #xdbus_message_t for a signal emission.
  *
- * Returns: A #GDBusMessage. Free with g_object_unref().
+ * Returns: A #xdbus_message_t. Free with xobject_unref().
  *
  * Since: 2.26
  */
-GDBusMessage *
-g_dbus_message_new_signal (const xchar_t  *path,
+xdbus_message_t *
+xdbus_message_new_signal (const xchar_t  *path,
                            const xchar_t  *interface_,
                            const xchar_t  *signal)
 {
-  GDBusMessage *message;
+  xdbus_message_t *message;
 
-  g_return_val_if_fail (g_variant_is_object_path (path), NULL);
+  g_return_val_if_fail (xvariant_is_object_path (path), NULL);
   g_return_val_if_fail (g_dbus_is_member_name (signal), NULL);
   g_return_val_if_fail (g_dbus_is_interface_name (interface_), NULL);
 
-  message = g_dbus_message_new ();
+  message = xdbus_message_new ();
   message->type = G_DBUS_MESSAGE_TYPE_SIGNAL;
   message->flags = G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED;
 
-  g_dbus_message_set_path (message, path);
-  g_dbus_message_set_member (message, signal);
-  g_dbus_message_set_interface (message, interface_);
+  xdbus_message_set_path (message, path);
+  xdbus_message_set_member (message, signal);
+  xdbus_message_set_interface (message, interface_);
 
   return message;
 }
 
 
 /**
- * g_dbus_message_new_method_reply:
+ * xdbus_message_new_method_reply:
  * @method_call_message: A message of type %G_DBUS_MESSAGE_TYPE_METHOD_CALL to
  * create a reply message to.
  *
- * Creates a new #GDBusMessage that is a reply to @method_call_message.
+ * Creates a new #xdbus_message_t that is a reply to @method_call_message.
  *
- * Returns: (transfer full):  #GDBusMessage. Free with g_object_unref().
+ * Returns: (transfer full):  #xdbus_message_t. Free with xobject_unref().
  *
  * Since: 2.26
  */
-GDBusMessage *
-g_dbus_message_new_method_reply (GDBusMessage *method_call_message)
+xdbus_message_t *
+xdbus_message_new_method_reply (xdbus_message_t *method_call_message)
 {
-  GDBusMessage *message;
+  xdbus_message_t *message;
   const xchar_t *sender;
 
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (method_call_message), NULL);
-  g_return_val_if_fail (g_dbus_message_get_message_type (method_call_message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL, NULL);
-  g_return_val_if_fail (g_dbus_message_get_serial (method_call_message) != 0, NULL);
+  g_return_val_if_fail (xdbus_message_get_message_type (method_call_message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL, NULL);
+  g_return_val_if_fail (xdbus_message_get_serial (method_call_message) != 0, NULL);
 
-  message = g_dbus_message_new ();
+  message = xdbus_message_new ();
   message->type = G_DBUS_MESSAGE_TYPE_METHOD_RETURN;
   message->flags = G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED;
   /* reply with same endianness */
   message->byte_order = method_call_message->byte_order;
 
-  g_dbus_message_set_reply_serial (message, g_dbus_message_get_serial (method_call_message));
-  sender = g_dbus_message_get_sender (method_call_message);
+  xdbus_message_set_reply_serial (message, xdbus_message_get_serial (method_call_message));
+  sender = xdbus_message_get_sender (method_call_message);
   if (sender != NULL)
-    g_dbus_message_set_destination (message, sender);
+    xdbus_message_set_destination (message, sender);
 
   return message;
 }
 
 /**
- * g_dbus_message_new_method_error:
+ * xdbus_message_new_method_error:
  * @method_call_message: A message of type %G_DBUS_MESSAGE_TYPE_METHOD_CALL to
  * create a reply message to.
  * @error_name: A valid D-Bus error name.
  * @error_message_format: The D-Bus error message in a printf() format.
  * @...: Arguments for @error_message_format.
  *
- * Creates a new #GDBusMessage that is an error reply to @method_call_message.
+ * Creates a new #xdbus_message_t that is an error reply to @method_call_message.
  *
- * Returns: (transfer full): A #GDBusMessage. Free with g_object_unref().
+ * Returns: (transfer full): A #xdbus_message_t. Free with xobject_unref().
  *
  * Since: 2.26
  */
-GDBusMessage *
-g_dbus_message_new_method_error (GDBusMessage             *method_call_message,
+xdbus_message_t *
+xdbus_message_new_method_error (xdbus_message_t             *method_call_message,
                                  const xchar_t              *error_name,
                                  const xchar_t              *error_message_format,
                                  ...)
 {
-  GDBusMessage *ret;
+  xdbus_message_t *ret;
   va_list var_args;
 
   va_start (var_args, error_message_format);
-  ret = g_dbus_message_new_method_error_valist (method_call_message,
+  ret = xdbus_message_new_method_error_valist (method_call_message,
                                                 error_name,
                                                 error_message_format,
                                                 var_args);
@@ -764,74 +764,74 @@ g_dbus_message_new_method_error (GDBusMessage             *method_call_message,
 }
 
 /**
- * g_dbus_message_new_method_error_literal:
+ * xdbus_message_new_method_error_literal:
  * @method_call_message: A message of type %G_DBUS_MESSAGE_TYPE_METHOD_CALL to
  * create a reply message to.
  * @error_name: A valid D-Bus error name.
  * @error_message: The D-Bus error message.
  *
- * Creates a new #GDBusMessage that is an error reply to @method_call_message.
+ * Creates a new #xdbus_message_t that is an error reply to @method_call_message.
  *
- * Returns: (transfer full): A #GDBusMessage. Free with g_object_unref().
+ * Returns: (transfer full): A #xdbus_message_t. Free with xobject_unref().
  *
  * Since: 2.26
  */
-GDBusMessage *
-g_dbus_message_new_method_error_literal (GDBusMessage  *method_call_message,
+xdbus_message_t *
+xdbus_message_new_method_error_literal (xdbus_message_t  *method_call_message,
                                          const xchar_t   *error_name,
                                          const xchar_t   *error_message)
 {
-  GDBusMessage *message;
+  xdbus_message_t *message;
   const xchar_t *sender;
 
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (method_call_message), NULL);
-  g_return_val_if_fail (g_dbus_message_get_message_type (method_call_message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL, NULL);
-  g_return_val_if_fail (g_dbus_message_get_serial (method_call_message) != 0, NULL);
+  g_return_val_if_fail (xdbus_message_get_message_type (method_call_message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL, NULL);
+  g_return_val_if_fail (xdbus_message_get_serial (method_call_message) != 0, NULL);
   g_return_val_if_fail (g_dbus_is_name (error_name), NULL);
   g_return_val_if_fail (error_message != NULL, NULL);
 
-  message = g_dbus_message_new ();
+  message = xdbus_message_new ();
   message->type = G_DBUS_MESSAGE_TYPE_ERROR;
   message->flags = G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED;
   /* reply with same endianness */
   message->byte_order = method_call_message->byte_order;
 
-  g_dbus_message_set_reply_serial (message, g_dbus_message_get_serial (method_call_message));
-  g_dbus_message_set_error_name (message, error_name);
-  g_dbus_message_set_body (message, g_variant_new ("(s)", error_message));
+  xdbus_message_set_reply_serial (message, xdbus_message_get_serial (method_call_message));
+  xdbus_message_set_error_name (message, error_name);
+  xdbus_message_set_body (message, xvariant_new ("(s)", error_message));
 
-  sender = g_dbus_message_get_sender (method_call_message);
+  sender = xdbus_message_get_sender (method_call_message);
   if (sender != NULL)
-    g_dbus_message_set_destination (message, sender);
+    xdbus_message_set_destination (message, sender);
 
   return message;
 }
 
 /**
- * g_dbus_message_new_method_error_valist:
+ * xdbus_message_new_method_error_valist:
  * @method_call_message: A message of type %G_DBUS_MESSAGE_TYPE_METHOD_CALL to
  * create a reply message to.
  * @error_name: A valid D-Bus error name.
  * @error_message_format: The D-Bus error message in a printf() format.
  * @var_args: Arguments for @error_message_format.
  *
- * Like g_dbus_message_new_method_error() but intended for language bindings.
+ * Like xdbus_message_new_method_error() but intended for language bindings.
  *
- * Returns: (transfer full): A #GDBusMessage. Free with g_object_unref().
+ * Returns: (transfer full): A #xdbus_message_t. Free with xobject_unref().
  *
  * Since: 2.26
  */
 G_GNUC_PRINTF(3, 0)
-GDBusMessage *
-g_dbus_message_new_method_error_valist (GDBusMessage             *method_call_message,
+xdbus_message_t *
+xdbus_message_new_method_error_valist (xdbus_message_t             *method_call_message,
                                         const xchar_t              *error_name,
                                         const xchar_t              *error_message_format,
                                         va_list                   var_args)
 {
-  GDBusMessage *ret;
+  xdbus_message_t *ret;
   xchar_t *error_message;
-  error_message = g_strdup_vprintf (error_message_format, var_args);
-  ret = g_dbus_message_new_method_error_literal (method_call_message,
+  error_message = xstrdup_vprintf (error_message_format, var_args);
+  ret = xdbus_message_new_method_error_literal (method_call_message,
                                                  error_name,
                                                  error_message);
   g_free (error_message);
@@ -841,29 +841,29 @@ g_dbus_message_new_method_error_valist (GDBusMessage             *method_call_me
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_get_byte_order:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_byte_order:
+ * @message: A #xdbus_message_t.
  *
  * Gets the byte order of @message.
  *
  * Returns: The byte order.
  */
 GDBusMessageByteOrder
-g_dbus_message_get_byte_order (GDBusMessage *message)
+xdbus_message_get_byte_order (xdbus_message_t *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), (GDBusMessageByteOrder) 0);
   return message->byte_order;
 }
 
 /**
- * g_dbus_message_set_byte_order:
- * @message: A #GDBusMessage.
+ * xdbus_message_set_byte_order:
+ * @message: A #xdbus_message_t.
  * @byte_order: The byte order.
  *
  * Sets the byte order of @message.
  */
 void
-g_dbus_message_set_byte_order (GDBusMessage          *message,
+xdbus_message_set_byte_order (xdbus_message_t          *message,
                                GDBusMessageByteOrder  byte_order)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
@@ -882,8 +882,8 @@ g_dbus_message_set_byte_order (GDBusMessage          *message,
 /* TODO: need GI annotations to specify that any guchar value goes for the type */
 
 /**
- * g_dbus_message_get_message_type:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_message_type:
+ * @message: A #xdbus_message_t.
  *
  * Gets the type of @message.
  *
@@ -892,15 +892,15 @@ g_dbus_message_set_byte_order (GDBusMessage          *message,
  * Since: 2.26
  */
 GDBusMessageType
-g_dbus_message_get_message_type (GDBusMessage  *message)
+xdbus_message_get_message_type (xdbus_message_t  *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), G_DBUS_MESSAGE_TYPE_INVALID);
   return message->type;
 }
 
 /**
- * g_dbus_message_set_message_type:
- * @message: A #GDBusMessage.
+ * xdbus_message_set_message_type:
+ * @message: A #xdbus_message_t.
  * @type: A 8-bit unsigned integer (typically a value from the #GDBusMessageType enumeration).
  *
  * Sets @message to be of @type.
@@ -908,7 +908,7 @@ g_dbus_message_get_message_type (GDBusMessage  *message)
  * Since: 2.26
  */
 void
-g_dbus_message_set_message_type (GDBusMessage      *message,
+xdbus_message_set_message_type (xdbus_message_t      *message,
                                  GDBusMessageType   type)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
@@ -928,8 +928,8 @@ g_dbus_message_set_message_type (GDBusMessage      *message,
 /* TODO: need GI annotations to specify that any guchar value goes for flags */
 
 /**
- * g_dbus_message_get_flags:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_flags:
+ * @message: A #xdbus_message_t.
  *
  * Gets the flags for @message.
  *
@@ -938,15 +938,15 @@ g_dbus_message_set_message_type (GDBusMessage      *message,
  * Since: 2.26
  */
 GDBusMessageFlags
-g_dbus_message_get_flags (GDBusMessage  *message)
+xdbus_message_get_flags (xdbus_message_t  *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), G_DBUS_MESSAGE_FLAGS_NONE);
   return message->flags;
 }
 
 /**
- * g_dbus_message_set_flags:
- * @message: A #GDBusMessage.
+ * xdbus_message_set_flags:
+ * @message: A #xdbus_message_t.
  * @flags: Flags for @message that are set (typically values from the #GDBusMessageFlags
  * enumeration bitwise ORed together).
  *
@@ -955,7 +955,7 @@ g_dbus_message_get_flags (GDBusMessage  *message)
  * Since: 2.26
  */
 void
-g_dbus_message_set_flags (GDBusMessage       *message,
+xdbus_message_set_flags (xdbus_message_t       *message,
                           GDBusMessageFlags   flags)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
@@ -973,34 +973,34 @@ g_dbus_message_set_flags (GDBusMessage       *message,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_get_serial:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_serial:
+ * @message: A #xdbus_message_t.
  *
  * Gets the serial for @message.
  *
- * Returns: A #guint32.
+ * Returns: A #xuint32_t.
  *
  * Since: 2.26
  */
-guint32
-g_dbus_message_get_serial (GDBusMessage *message)
+xuint32_t
+xdbus_message_get_serial (xdbus_message_t *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), 0);
   return message->serial;
 }
 
 /**
- * g_dbus_message_set_serial:
- * @message: A #GDBusMessage.
- * @serial: A #guint32.
+ * xdbus_message_set_serial:
+ * @message: A #xdbus_message_t.
+ * @serial: A #xuint32_t.
  *
  * Sets the serial for @message.
  *
  * Since: 2.26
  */
 void
-g_dbus_message_set_serial (GDBusMessage  *message,
-                           guint32        serial)
+xdbus_message_set_serial (xdbus_message_t  *message,
+                           xuint32_t        serial)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
 
@@ -1018,8 +1018,8 @@ g_dbus_message_set_serial (GDBusMessage  *message,
 /* TODO: need GI annotations to specify that any guchar value goes for header_field */
 
 /**
- * g_dbus_message_get_header:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_header:
+ * @message: A #xdbus_message_t.
  * @header_field: A 8-bit unsigned integer (typically a value from the #GDBusMessageHeaderField enumeration)
  *
  * Gets a header field on @message.
@@ -1033,17 +1033,17 @@ g_dbus_message_set_serial (GDBusMessage  *message,
  * Since: 2.26
  */
 xvariant_t *
-g_dbus_message_get_header (GDBusMessage             *message,
+xdbus_message_get_header (xdbus_message_t             *message,
                            GDBusMessageHeaderField   header_field)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   g_return_val_if_fail ((xuint_t) header_field < 256, NULL);
-  return g_hash_table_lookup (message->headers, GUINT_TO_POINTER (header_field));
+  return xhash_table_lookup (message->headers, GUINT_TO_POINTER (header_field));
 }
 
 /**
- * g_dbus_message_set_header:
- * @message: A #GDBusMessage.
+ * xdbus_message_set_header:
+ * @message: A #xdbus_message_t.
  * @header_field: A 8-bit unsigned integer (typically a value from the #GDBusMessageHeaderField enumeration)
  * @value: (nullable): A #xvariant_t to set the header field or %NULL to clear the header field.
  *
@@ -1054,7 +1054,7 @@ g_dbus_message_get_header (GDBusMessage             *message,
  * Since: 2.26
  */
 void
-g_dbus_message_set_header (GDBusMessage             *message,
+xdbus_message_set_header (xdbus_message_t             *message,
                            GDBusMessageHeaderField   header_field,
                            xvariant_t                 *value)
 {
@@ -1069,17 +1069,17 @@ g_dbus_message_set_header (GDBusMessage             *message,
 
   if (value == NULL)
     {
-      g_hash_table_remove (message->headers, GUINT_TO_POINTER (header_field));
+      xhash_table_remove (message->headers, GUINT_TO_POINTER (header_field));
     }
   else
     {
-      g_hash_table_insert (message->headers, GUINT_TO_POINTER (header_field), g_variant_ref_sink (value));
+      xhash_table_insert (message->headers, GUINT_TO_POINTER (header_field), xvariant_ref_sink (value));
     }
 }
 
 /**
- * g_dbus_message_get_header_fields:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_header_fields:
+ * @message: A #xdbus_message_t.
  *
  * Gets an array of all header fields on @message that are set.
  *
@@ -1090,7 +1090,7 @@ g_dbus_message_set_header (GDBusMessage             *message,
  * Since: 2.26
  */
 guchar *
-g_dbus_message_get_header_fields (GDBusMessage  *message)
+xdbus_message_get_header_fields (xdbus_message_t  *message)
 {
   xlist_t *keys;
   guchar *ret;
@@ -1100,14 +1100,14 @@ g_dbus_message_get_header_fields (GDBusMessage  *message)
 
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
 
-  keys = g_hash_table_get_keys (message->headers);
-  num_keys = g_list_length (keys);
+  keys = xhash_table_get_keys (message->headers);
+  num_keys = xlist_length (keys);
   ret = g_new (guchar, num_keys + 1);
   for (l = keys, n = 0; l != NULL; l = l->next, n++)
     ret[n] = GPOINTER_TO_UINT (l->data);
   g_assert (n == num_keys);
   ret[n] = G_DBUS_MESSAGE_HEADER_FIELD_INVALID;
-  g_list_free (keys);
+  xlist_free (keys);
 
   return ret;
 }
@@ -1115,8 +1115,8 @@ g_dbus_message_get_header_fields (GDBusMessage  *message)
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_get_body:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_body:
+ * @message: A #xdbus_message_t.
  *
  * Gets the body of a message.
  *
@@ -1126,15 +1126,15 @@ g_dbus_message_get_header_fields (GDBusMessage  *message)
  * Since: 2.26
  */
 xvariant_t *
-g_dbus_message_get_body (GDBusMessage  *message)
+xdbus_message_get_body (xdbus_message_t  *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return message->body;
 }
 
 /**
- * g_dbus_message_set_body:
- * @message: A #GDBusMessage.
+ * xdbus_message_set_body:
+ * @message: A #xdbus_message_t.
  * @body: Either %NULL or a #xvariant_t that is a tuple.
  *
  * Sets the body @message. As a side-effect the
@@ -1146,11 +1146,11 @@ g_dbus_message_get_body (GDBusMessage  *message)
  * Since: 2.26
  */
 void
-g_dbus_message_set_body (GDBusMessage  *message,
+xdbus_message_set_body (xdbus_message_t  *message,
                          xvariant_t      *body)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
-  g_return_if_fail ((body == NULL) || g_variant_is_of_type (body, G_VARIANT_TYPE_TUPLE));
+  g_return_if_fail ((body == NULL) || xvariant_is_of_type (body, G_VARIANT_TYPE_TUPLE));
 
   if (message->locked)
     {
@@ -1159,11 +1159,11 @@ g_dbus_message_set_body (GDBusMessage  *message,
     }
 
   if (message->body != NULL)
-    g_variant_unref (message->body);
+    xvariant_unref (message->body);
   if (body == NULL)
     {
       message->body = NULL;
-      g_dbus_message_set_signature (message, NULL);
+      xdbus_message_set_signature (message, NULL);
     }
   else
     {
@@ -1171,13 +1171,13 @@ g_dbus_message_set_body (GDBusMessage  *message,
       xsize_t type_string_len;
       xchar_t *signature;
 
-      message->body = g_variant_ref_sink (body);
+      message->body = xvariant_ref_sink (body);
 
-      type_string = g_variant_get_type_string (body);
+      type_string = xvariant_get_type_string (body);
       type_string_len = strlen (type_string);
       g_assert (type_string_len >= 2);
-      signature = g_strndup (type_string + 1, type_string_len - 2);
-      g_dbus_message_set_signature (message, signature);
+      signature = xstrndup (type_string + 1, type_string_len - 2);
+      xdbus_message_set_signature (message, signature);
       g_free (signature);
     }
 }
@@ -1186,8 +1186,8 @@ g_dbus_message_set_body (GDBusMessage  *message,
 
 #ifdef G_OS_UNIX
 /**
- * g_dbus_message_get_unix_fd_list:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_unix_fd_list:
+ * @message: A #xdbus_message_t.
  *
  * Gets the UNIX file descriptors associated with @message, if any.
  *
@@ -1195,26 +1195,26 @@ g_dbus_message_set_body (GDBusMessage  *message,
  *
  * The file descriptors normally correspond to %G_VARIANT_TYPE_HANDLE
  * values in the body of the message. For example,
- * if g_variant_get_handle() returns 5, that is intended to be a reference
+ * if xvariant_get_handle() returns 5, that is intended to be a reference
  * to the file descriptor that can be accessed by
  * `g_unix_fd_list_get (list, 5, ...)`.
  *
- * Returns: (nullable) (transfer none): A #GUnixFDList or %NULL if no file descriptors are
+ * Returns: (nullable) (transfer none): A #xunix_fd_list_t or %NULL if no file descriptors are
  * associated. Do not free, this object is owned by @message.
  *
  * Since: 2.26
  */
-GUnixFDList *
-g_dbus_message_get_unix_fd_list (GDBusMessage  *message)
+xunix_fd_list_t *
+xdbus_message_get_unix_fd_list (xdbus_message_t  *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return message->fd_list;
 }
 
 /**
- * g_dbus_message_set_unix_fd_list:
- * @message: A #GDBusMessage.
- * @fd_list: (nullable): A #GUnixFDList or %NULL.
+ * xdbus_message_set_unix_fd_list:
+ * @message: A #xdbus_message_t.
+ * @fd_list: (nullable): A #xunix_fd_list_t or %NULL.
  *
  * Sets the UNIX file descriptors associated with @message. As a
  * side-effect the %G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS header
@@ -1231,8 +1231,8 @@ g_dbus_message_get_unix_fd_list (GDBusMessage  *message)
  * Since: 2.26
  */
 void
-g_dbus_message_set_unix_fd_list (GDBusMessage  *message,
-                                 GUnixFDList   *fd_list)
+xdbus_message_set_unix_fd_list (xdbus_message_t  *message,
+                                 xunix_fd_list_t   *fd_list)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
   g_return_if_fail (fd_list == NULL || X_IS_UNIX_FD_LIST (fd_list));
@@ -1244,16 +1244,16 @@ g_dbus_message_set_unix_fd_list (GDBusMessage  *message,
     }
 
   if (message->fd_list != NULL)
-    g_object_unref (message->fd_list);
+    xobject_unref (message->fd_list);
   if (fd_list != NULL)
     {
-      message->fd_list = g_object_ref (fd_list);
-      g_dbus_message_set_num_unix_fds (message, g_unix_fd_list_get_length (fd_list));
+      message->fd_list = xobject_ref (fd_list);
+      xdbus_message_set_num_unix_fds (message, g_unix_fd_list_get_length (fd_list));
     }
   else
     {
       message->fd_list = NULL;
-      g_dbus_message_set_num_unix_fds (message, 0);
+      xdbus_message_set_num_unix_fds (message, 0);
     }
 }
 #endif
@@ -1266,7 +1266,7 @@ get_type_fixed_size (const xvariant_type_t *type)
   /* NB: we do not treat 'b' as fixed-size here because xvariant_t and
    * D-Bus disagree about the size.
    */
-  switch (*g_variant_type_peek_string (type))
+  switch (*xvariant_type_peek_string (type))
     {
     case 'y':
       return 1;
@@ -1282,7 +1282,7 @@ get_type_fixed_size (const xvariant_type_t *type)
 }
 
 static xboolean_t
-validate_headers (GDBusMessage  *message,
+validate_headers (xdbus_message_t  *message,
                   xerror_t       **error)
 {
   xboolean_t ret;
@@ -1303,8 +1303,8 @@ validate_headers (GDBusMessage  *message,
       break;
 
     case G_DBUS_MESSAGE_TYPE_METHOD_CALL:
-      if (g_dbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_PATH) == NULL ||
-          g_dbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_MEMBER) == NULL)
+      if (xdbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_PATH) == NULL ||
+          xdbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_MEMBER) == NULL)
         {
           g_set_error_literal (error,
                                G_IO_ERROR,
@@ -1315,7 +1315,7 @@ validate_headers (GDBusMessage  *message,
       break;
 
     case G_DBUS_MESSAGE_TYPE_METHOD_RETURN:
-      if (g_dbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL) == NULL)
+      if (xdbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL) == NULL)
         {
           g_set_error_literal (error,
                                G_IO_ERROR,
@@ -1326,8 +1326,8 @@ validate_headers (GDBusMessage  *message,
       break;
 
     case G_DBUS_MESSAGE_TYPE_ERROR:
-      if (g_dbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_ERROR_NAME) == NULL ||
-          g_dbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL) == NULL)
+      if (xdbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_ERROR_NAME) == NULL ||
+          xdbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL) == NULL)
         {
           g_set_error_literal (error,
                                G_IO_ERROR,
@@ -1338,9 +1338,9 @@ validate_headers (GDBusMessage  *message,
       break;
 
     case G_DBUS_MESSAGE_TYPE_SIGNAL:
-      if (g_dbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_PATH) == NULL ||
-          g_dbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_INTERFACE) == NULL ||
-          g_dbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_MEMBER) == NULL)
+      if (xdbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_PATH) == NULL ||
+          xdbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_INTERFACE) == NULL ||
+          xdbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_MEMBER) == NULL)
         {
           g_set_error_literal (error,
                                G_IO_ERROR,
@@ -1348,7 +1348,7 @@ validate_headers (GDBusMessage  *message,
                                _("SIGNAL message: PATH, INTERFACE or MEMBER header field is missing"));
           goto out;
         }
-      if (g_strcmp0 (g_dbus_message_get_path (message), "/org/freedesktop/DBus/Local") == 0)
+      if (xstrcmp0 (xdbus_message_get_path (message), "/org/freedesktop/DBus/Local") == 0)
         {
           g_set_error_literal (error,
                                G_IO_ERROR,
@@ -1356,7 +1356,7 @@ validate_headers (GDBusMessage  *message,
                                _("SIGNAL message: The PATH header field is using the reserved value /org/freedesktop/DBus/Local"));
           goto out;
         }
-      if (g_strcmp0 (g_dbus_message_get_interface (message), "org.freedesktop.DBus.Local") == 0)
+      if (xstrcmp0 (xdbus_message_get_interface (message), "org.freedesktop.DBus.Local") == 0)
         {
           g_set_error_literal (error,
                                G_IO_ERROR,
@@ -1419,7 +1419,7 @@ read_string (GMemoryBuffer  *mbuf,
 
   if G_UNLIKELY (mbuf->data[mbuf->pos + len] != '\0')
     {
-      str = g_strndup (mbuf->data + mbuf->pos, len);
+      str = xstrndup (mbuf->data + mbuf->pos, len);
       g_set_error (error,
                    G_IO_ERROR,
                    G_IO_ERROR_INVALID_ARGUMENT,
@@ -1433,12 +1433,12 @@ read_string (GMemoryBuffer  *mbuf,
   str = mbuf->data + mbuf->pos;
   mbuf->pos += len + 1;
 
-  if G_UNLIKELY (!g_utf8_validate (str, -1, &end_valid))
+  if G_UNLIKELY (!xutf8_validate (str, -1, &end_valid))
     {
       xint_t offset;
       xchar_t *valid_str;
       offset = (xint_t) (end_valid - str);
-      valid_str = g_strndup (str, offset);
+      valid_str = xstrndup (str, offset);
       g_set_error (error,
                    G_IO_ERROR,
                    G_IO_ERROR_INVALID_ARGUMENT,
@@ -1454,12 +1454,12 @@ read_string (GMemoryBuffer  *mbuf,
   return str;
 }
 
-static gconstpointer
+static xconstpointer
 read_bytes (GMemoryBuffer  *mbuf,
             xsize_t           len,
             xerror_t        **error)
 {
-  gconstpointer result;
+  xconstpointer result;
 
   if G_UNLIKELY (mbuf->pos + len > mbuf->valid_len || mbuf->pos + len < mbuf->pos)
     {
@@ -1510,12 +1510,12 @@ parse_value_from_blob (GMemoryBuffer       *buf,
       goto fail;
     }
 
-  type_string = g_variant_type_peek_string (type);
+  type_string = xvariant_type_peek_string (type);
 
 #ifdef DEBUG_SERIALIZER
     {
       xchar_t *s;
-      s = g_variant_type_dup_string (type);
+      s = xvariant_type_dup_string (type);
       g_print ("%*s%s type %s from offset 0x%04x",
                indent, "",
                just_align ? "Aligning" : "Reading",
@@ -1538,7 +1538,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
           v = g_memory_buffer_read_uint32 (buf, &local_error);
           if (local_error)
             goto fail;
-          ret = g_variant_new_boolean (v);
+          ret = xvariant_new_boolean (v);
         }
       break;
 
@@ -1549,7 +1549,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
           v = g_memory_buffer_read_byte (buf, &local_error);
           if (local_error)
             goto fail;
-          ret = g_variant_new_byte (v);
+          ret = xvariant_new_byte (v);
         }
       break;
 
@@ -1561,7 +1561,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
           v = g_memory_buffer_read_int16 (buf, &local_error);
           if (local_error)
             goto fail;
-          ret = g_variant_new_int16 (v);
+          ret = xvariant_new_int16 (v);
         }
       break;
 
@@ -1569,11 +1569,11 @@ parse_value_from_blob (GMemoryBuffer       *buf,
       ensure_input_padding (buf, 2);
       if (!just_align)
         {
-          guint16 v;
+          xuint16_t v;
           v = g_memory_buffer_read_uint16 (buf, &local_error);
           if (local_error)
             goto fail;
-          ret = g_variant_new_uint16 (v);
+          ret = xvariant_new_uint16 (v);
         }
       break;
 
@@ -1585,7 +1585,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
           v = g_memory_buffer_read_int32 (buf, &local_error);
           if (local_error)
             goto fail;
-          ret = g_variant_new_int32 (v);
+          ret = xvariant_new_int32 (v);
         }
       break;
 
@@ -1593,11 +1593,11 @@ parse_value_from_blob (GMemoryBuffer       *buf,
       ensure_input_padding (buf, 4);
       if (!just_align)
         {
-          guint32 v;
+          xuint32_t v;
           v = g_memory_buffer_read_uint32 (buf, &local_error);
           if (local_error)
             goto fail;
-          ret = g_variant_new_uint32 (v);
+          ret = xvariant_new_uint32 (v);
         }
       break;
 
@@ -1609,7 +1609,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
           v = g_memory_buffer_read_int64 (buf, &local_error);
           if (local_error)
             goto fail;
-          ret = g_variant_new_int64 (v);
+          ret = xvariant_new_int64 (v);
         }
       break;
 
@@ -1617,11 +1617,11 @@ parse_value_from_blob (GMemoryBuffer       *buf,
       ensure_input_padding (buf, 8);
       if (!just_align)
         {
-          guint64 v;
+          xuint64_t v;
           v = g_memory_buffer_read_uint64 (buf, &local_error);
           if (local_error)
             goto fail;
-          ret = g_variant_new_uint64 (v);
+          ret = xvariant_new_uint64 (v);
         }
       break;
 
@@ -1630,14 +1630,14 @@ parse_value_from_blob (GMemoryBuffer       *buf,
       if (!just_align)
         {
           union {
-            guint64 v_uint64;
+            xuint64_t v_uint64;
             xdouble_t v_double;
           } u;
-          G_STATIC_ASSERT (sizeof (xdouble_t) == sizeof (guint64));
+          G_STATIC_ASSERT (sizeof (xdouble_t) == sizeof (xuint64_t));
           u.v_uint64 = g_memory_buffer_read_uint64 (buf, &local_error);
           if (local_error)
             goto fail;
-          ret = g_variant_new_double (u.v_double);
+          ret = xvariant_new_double (u.v_double);
         }
       break;
 
@@ -1645,7 +1645,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
       ensure_input_padding (buf, 4);
       if (!just_align)
         {
-          guint32 len;
+          xuint32_t len;
           const xchar_t *v;
           len = g_memory_buffer_read_uint32 (buf, &local_error);
           if (local_error)
@@ -1653,7 +1653,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
           v = read_string (buf, (xsize_t) len, &local_error);
           if (v == NULL)
             goto fail;
-          ret = g_variant_new_string (v);
+          ret = xvariant_new_string (v);
         }
       break;
 
@@ -1661,7 +1661,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
       ensure_input_padding (buf, 4);
       if (!just_align)
         {
-          guint32 len;
+          xuint32_t len;
           const xchar_t *v;
           len = g_memory_buffer_read_uint32 (buf, &local_error);
           if (local_error)
@@ -1669,7 +1669,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
           v = read_string (buf, (xsize_t) len, &local_error);
           if (v == NULL)
             goto fail;
-          if (!g_variant_is_object_path (v))
+          if (!xvariant_is_object_path (v))
             {
               g_set_error (&local_error,
                            G_IO_ERROR,
@@ -1678,7 +1678,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
                            v);
               goto fail;
             }
-          ret = g_variant_new_object_path (v);
+          ret = xvariant_new_object_path (v);
         }
       break;
 
@@ -1693,7 +1693,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
           v = read_string (buf, (xsize_t) len, &local_error);
           if (v == NULL)
             goto fail;
-          if (!g_variant_is_signature (v))
+          if (!xvariant_is_signature (v))
             {
               g_set_error (&local_error,
                            G_IO_ERROR,
@@ -1702,7 +1702,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
                        v);
               goto fail;
             }
-          ret = g_variant_new_signature (v);
+          ret = xvariant_new_signature (v);
         }
       break;
 
@@ -1714,7 +1714,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
           v = g_memory_buffer_read_int32 (buf, &local_error);
           if (local_error)
             goto fail;
-          ret = g_variant_new_handle (v);
+          ret = xvariant_new_handle (v);
         }
       break;
 
@@ -1729,7 +1729,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
        */
       if (!just_align)
         {
-          guint32 array_len;
+          xuint32_t array_len;
           const xvariant_type_t *element_type;
           xuint_t fixed_size;
 
@@ -1756,13 +1756,13 @@ parse_value_from_blob (GMemoryBuffer       *buf,
               goto fail;
             }
 
-          element_type = g_variant_type_element (type);
+          element_type = xvariant_type_element (type);
           fixed_size = get_type_fixed_size (element_type);
 
           /* Fast-path the cases like 'ay', etc. */
           if (fixed_size != 0)
             {
-              gconstpointer array_data;
+              xconstpointer array_data;
 
               if (array_len % fixed_size != 0)
                 {
@@ -1771,7 +1771,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
                                G_IO_ERROR_INVALID_ARGUMENT,
                                _("Encountered array of type “a%c”, expected to have a length a multiple "
                                  "of %u bytes, but found to be %u bytes in length"),
-                               g_variant_type_peek_string (element_type)[0], fixed_size, array_len);
+                               xvariant_type_peek_string (element_type)[0], fixed_size, array_len);
                   goto fail;
                 }
 
@@ -1791,22 +1791,22 @@ parse_value_from_blob (GMemoryBuffer       *buf,
               if (array_data == NULL)
                 goto fail;
 
-              ret = g_variant_new_fixed_array (element_type, array_data, array_len / fixed_size, fixed_size);
+              ret = xvariant_new_fixed_array (element_type, array_data, array_len / fixed_size, fixed_size);
 
               if (g_memory_buffer_is_byteswapped (buf))
                 {
-                  xvariant_t *tmp = g_variant_ref_sink (ret);
-                  ret = g_variant_byteswap (tmp);
-                  g_variant_unref (tmp);
+                  xvariant_t *tmp = xvariant_ref_sink (ret);
+                  ret = xvariant_byteswap (tmp);
+                  xvariant_unref (tmp);
                 }
             }
           else
             {
-              GVariantBuilder builder;
-              goffset offset;
-              goffset target;
+              xvariant_builder_t builder;
+              xoffset_t offset;
+              xoffset_t target;
 
-              g_variant_builder_init (&builder, type);
+              xvariant_builder_init (&builder, type);
 
               if (array_len == 0)
                 {
@@ -1834,11 +1834,11 @@ parse_value_from_blob (GMemoryBuffer       *buf,
                                                     &local_error);
                       if (item == NULL)
                         {
-                          g_variant_builder_clear (&builder);
+                          xvariant_builder_clear (&builder);
                           goto fail;
                         }
-                      g_variant_builder_add_value (&builder, item);
-                      g_variant_unref (item);
+                      xvariant_builder_add_value (&builder, item);
+                      xvariant_unref (item);
 
                       /* Array elements must not be zero-length. There are no
                        * valid zero-length serialisations of any types which
@@ -1853,13 +1853,13 @@ parse_value_from_blob (GMemoryBuffer       *buf,
                     }
                 }
 
-              ret = g_variant_builder_end (&builder);
+              ret = xvariant_builder_end (&builder);
             }
         }
       break;
 
     default:
-      if (g_variant_type_is_dict_entry (type))
+      if (xvariant_type_is_dict_entry (type))
         {
           const xvariant_type_t *key_type;
           const xvariant_type_t *value_type;
@@ -1875,7 +1875,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
 
           if (!just_align)
             {
-              key_type = g_variant_type_key (type);
+              key_type = xvariant_type_key (type);
               key = parse_value_from_blob (buf,
                                            key_type,
                                            max_depth - 1,
@@ -1884,7 +1884,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
                                            &local_error);
               if (key == NULL)
                 goto fail;
-              value_type = g_variant_type_value (type);
+              value_type = xvariant_type_value (type);
               value = parse_value_from_blob (buf,
                                              value_type,
                                              max_depth - 1,
@@ -1893,15 +1893,15 @@ parse_value_from_blob (GMemoryBuffer       *buf,
                                              &local_error);
               if (value == NULL)
                 {
-                  g_variant_unref (key);
+                  xvariant_unref (key);
                   goto fail;
                 }
-              ret = g_variant_new_dict_entry (key, value);
-              g_variant_unref (key);
-              g_variant_unref (value);
+              ret = xvariant_new_dict_entry (key, value);
+              xvariant_unref (key);
+              xvariant_unref (value);
             }
         }
-      else if (g_variant_type_is_tuple (type))
+      else if (xvariant_type_is_tuple (type))
         {
           ensure_input_padding (buf, 8);
 
@@ -1913,13 +1913,13 @@ parse_value_from_blob (GMemoryBuffer       *buf,
           if (!just_align)
             {
               const xvariant_type_t *element_type;
-              GVariantBuilder builder;
+              xvariant_builder_t builder;
 
-              g_variant_builder_init (&builder, type);
-              element_type = g_variant_type_first (type);
+              xvariant_builder_init (&builder, type);
+              element_type = xvariant_type_first (type);
               if (!element_type)
                 {
-                  g_variant_builder_clear (&builder);
+                  xvariant_builder_clear (&builder);
                   g_set_error_literal (&local_error,
                                        G_IO_ERROR,
                                        G_IO_ERROR_INVALID_ARGUMENT,
@@ -1938,18 +1938,18 @@ parse_value_from_blob (GMemoryBuffer       *buf,
                                                 &local_error);
                   if (item == NULL)
                     {
-                      g_variant_builder_clear (&builder);
+                      xvariant_builder_clear (&builder);
                       goto fail;
                     }
-                  g_variant_builder_add_value (&builder, item);
-                  g_variant_unref (item);
+                  xvariant_builder_add_value (&builder, item);
+                  xvariant_unref (item);
 
-                  element_type = g_variant_type_next (element_type);
+                  element_type = xvariant_type_next (element_type);
                 }
-              ret = g_variant_builder_end (&builder);
+              ret = xvariant_builder_end (&builder);
             }
         }
-      else if (g_variant_type_is_variant (type))
+      else if (xvariant_type_is_variant (type))
         {
 #ifdef DEBUG_SERIALIZER
           is_leaf = FALSE;
@@ -1969,8 +1969,8 @@ parse_value_from_blob (GMemoryBuffer       *buf,
               sig = read_string (buf, (xsize_t) siglen, &local_error);
               if (sig == NULL)
                 goto fail;
-              if (!g_variant_is_signature (sig) ||
-                  !g_variant_type_string_is_valid (sig))
+              if (!xvariant_is_signature (sig) ||
+                  !xvariant_type_string_is_valid (sig))
                 {
                   /* A D-Bus signature can contain zero or more complete types,
                    * but a xvariant_t has to be exactly one complete type. */
@@ -1982,12 +1982,12 @@ parse_value_from_blob (GMemoryBuffer       *buf,
                   goto fail;
                 }
 
-              if (max_depth <= g_variant_type_string_get_depth_ (sig))
+              if (max_depth <= xvariant_type_string_get_depth_ (sig))
                 {
                   /* Catch the type nesting being too deep without having to
                    * parse the data. We don’t have to check this for static
                    * container types (like arrays and tuples, above) because
-                   * the g_variant_type_string_is_valid() check performed before
+                   * the xvariant_type_string_is_valid() check performed before
                    * the initial parse_value_from_blob() call should check the
                    * static type nesting. */
                   g_set_error_literal (&local_error,
@@ -1997,24 +1997,24 @@ parse_value_from_blob (GMemoryBuffer       *buf,
                   goto fail;
                 }
 
-              variant_type = g_variant_type_new (sig);
+              variant_type = xvariant_type_new (sig);
               value = parse_value_from_blob (buf,
                                              variant_type,
                                              max_depth - 1,
                                              FALSE,
                                              indent + 2,
                                              &local_error);
-              g_variant_type_free (variant_type);
+              xvariant_type_free (variant_type);
               if (value == NULL)
                 goto fail;
-              ret = g_variant_new_variant (value);
-              g_variant_unref (value);
+              ret = xvariant_new_variant (value);
+              xvariant_unref (value);
             }
         }
       else
         {
           xchar_t *s;
-          s = g_variant_type_dup_string (type);
+          s = xvariant_type_dup_string (type);
           g_set_error (&local_error,
                        G_IO_ERROR,
                        G_IO_ERROR_INVALID_ARGUMENT,
@@ -2034,13 +2034,13 @@ parse_value_from_blob (GMemoryBuffer       *buf,
       if (is_leaf)
         {
           xchar_t *s;
-          if (g_variant_type_equal (type, G_VARIANT_TYPE_BYTE))
+          if (xvariant_type_equal (type, G_VARIANT_TYPE_BYTE))
             {
-              s = g_strdup_printf ("0x%02x '%c'", g_variant_get_byte (ret), g_variant_get_byte (ret));
+              s = xstrdup_printf ("0x%02x '%c'", xvariant_get_byte (ret), xvariant_get_byte (ret));
             }
           else
             {
-              s = g_variant_print (ret, FALSE);
+              s = xvariant_print (ret, FALSE);
             }
           g_print (": %s\n", s);
           g_free (s);
@@ -2050,7 +2050,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
 
   /* sink the reference, if floating */
   if (ret != NULL)
-    g_variant_take_ref (ret);
+    xvariant_take_ref (ret);
   return ret;
 
  fail:
@@ -2071,8 +2071,8 @@ parse_value_from_blob (GMemoryBuffer       *buf,
 /* message_header must be at least 16 bytes */
 
 /**
- * g_dbus_message_bytes_needed:
- * @blob: (array length=blob_len) (element-type guint8): A blob representing a binary D-Bus message.
+ * xdbus_message_bytes_needed:
+ * @blob: (array length=blob_len) (element-type xuint8_t): A blob representing a binary D-Bus message.
  * @blob_len: The length of @blob (must be at least 16).
  * @error: Return location for error or %NULL.
  *
@@ -2085,12 +2085,12 @@ parse_value_from_blob (GMemoryBuffer       *buf,
  *
  * Since: 2.26
  */
-gssize
-g_dbus_message_bytes_needed (guchar  *blob,
+xssize_t
+xdbus_message_bytes_needed (guchar  *blob,
                              xsize_t    blob_len,
                              xerror_t **error)
 {
-  gssize ret;
+  xssize_t ret;
 
   ret = -1;
 
@@ -2101,20 +2101,20 @@ g_dbus_message_bytes_needed (guchar  *blob,
   if (blob[0] == 'l')
     {
       /* core header (12 bytes) + ARRAY of STRUCT of (BYTE,VARIANT) */
-      ret = 12 + 4 + GUINT32_FROM_LE (((guint32 *) blob)[3]);
+      ret = 12 + 4 + GUINT32_FROM_LE (((xuint32_t *) blob)[3]);
       /* round up so it's a multiple of 8 */
       ret = 8 * ((ret + 7)/8);
       /* finally add the body size */
-      ret += GUINT32_FROM_LE (((guint32 *) blob)[1]);
+      ret += GUINT32_FROM_LE (((xuint32_t *) blob)[1]);
     }
   else if (blob[0] == 'B')
     {
       /* core header (12 bytes) + ARRAY of STRUCT of (BYTE,VARIANT) */
-      ret = 12 + 4 + GUINT32_FROM_BE (((guint32 *) blob)[3]);
+      ret = 12 + 4 + GUINT32_FROM_BE (((xuint32_t *) blob)[3]);
       /* round up so it's a multiple of 8 */
       ret = 8 * ((ret + 7)/8);
       /* finally add the body size */
-      ret += GUINT32_FROM_BE (((guint32 *) blob)[1]);
+      ret += GUINT32_FROM_BE (((xuint32_t *) blob)[1]);
     }
   else
     {
@@ -2139,39 +2139,39 @@ g_dbus_message_bytes_needed (guchar  *blob,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_new_from_blob:
- * @blob: (array length=blob_len) (element-type guint8): A blob representing a binary D-Bus message.
+ * xdbus_message_new_from_blob:
+ * @blob: (array length=blob_len) (element-type xuint8_t): A blob representing a binary D-Bus message.
  * @blob_len: The length of @blob.
  * @capabilities: A #GDBusCapabilityFlags describing what protocol features are supported.
  * @error: Return location for error or %NULL.
  *
- * Creates a new #GDBusMessage from the data stored at @blob. The byte
+ * Creates a new #xdbus_message_t from the data stored at @blob. The byte
  * order that the message was in can be retrieved using
- * g_dbus_message_get_byte_order().
+ * xdbus_message_get_byte_order().
  *
  * If the @blob cannot be parsed, contains invalid fields, or contains invalid
  * headers, %G_IO_ERROR_INVALID_ARGUMENT will be returned.
  *
- * Returns: A new #GDBusMessage or %NULL if @error is set. Free with
- * g_object_unref().
+ * Returns: A new #xdbus_message_t or %NULL if @error is set. Free with
+ * xobject_unref().
  *
  * Since: 2.26
  */
-GDBusMessage *
-g_dbus_message_new_from_blob (guchar                *blob,
+xdbus_message_t *
+xdbus_message_new_from_blob (guchar                *blob,
                               xsize_t                  blob_len,
                               GDBusCapabilityFlags   capabilities,
                               xerror_t               **error)
 {
   xerror_t *local_error = NULL;
   GMemoryBuffer mbuf;
-  GDBusMessage *message;
+  xdbus_message_t *message;
   guchar endianness;
   guchar major_protocol_version;
-  guint32 message_body_len;
+  xuint32_t message_body_len;
   xvariant_t *headers;
   xvariant_t *item;
-  GVariantIter iter;
+  xvariant_iter_t iter;
   xvariant_t *signature;
 
   /* TODO: check against @capabilities */
@@ -2179,7 +2179,7 @@ g_dbus_message_new_from_blob (guchar                *blob,
   g_return_val_if_fail (blob != NULL, NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  message = g_dbus_message_new ();
+  message = xdbus_message_new ();
 
   memset (&mbuf, 0, sizeof (mbuf));
   mbuf.data = (xchar_t *)blob;
@@ -2254,28 +2254,28 @@ g_dbus_message_new_from_blob (guchar                *blob,
                                    &local_error);
   if (headers == NULL)
     goto fail;
-  g_variant_iter_init (&iter, headers);
-  while ((item = g_variant_iter_next_value (&iter)) != NULL)
+  xvariant_iter_init (&iter, headers);
+  while ((item = xvariant_iter_next_value (&iter)) != NULL)
     {
       guchar header_field;
       xvariant_t *value;
-      g_variant_get (item,
+      xvariant_get (item,
                      "{yv}",
                      &header_field,
                      &value);
-      g_dbus_message_set_header (message, header_field, value);
-      g_variant_unref (value);
-      g_variant_unref (item);
+      xdbus_message_set_header (message, header_field, value);
+      xvariant_unref (value);
+      xvariant_unref (item);
     }
-  g_variant_unref (headers);
+  xvariant_unref (headers);
 
-  signature = g_dbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE);
+  signature = xdbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE);
   if (signature != NULL)
     {
       const xchar_t *signature_str;
       xsize_t signature_str_len;
 
-      if (!g_variant_is_of_type (signature, G_VARIANT_TYPE_SIGNATURE))
+      if (!xvariant_is_of_type (signature, G_VARIANT_TYPE_SIGNATURE))
         {
           g_set_error_literal (&local_error,
                                G_IO_ERROR,
@@ -2284,7 +2284,7 @@ g_dbus_message_new_from_blob (guchar                *blob,
           goto fail;
         }
 
-      signature_str = g_variant_get_string (signature, &signature_str_len);
+      signature_str = xvariant_get_string (signature, &signature_str_len);
 
       /* signature but no body */
       if (message_body_len == 0 && signature_str_len > 0)
@@ -2299,10 +2299,10 @@ g_dbus_message_new_from_blob (guchar                *blob,
       else if (signature_str_len > 0)
         {
           xvariant_type_t *variant_type;
-          xchar_t *tupled_signature_str = g_strdup_printf ("(%s)", signature_str);
+          xchar_t *tupled_signature_str = xstrdup_printf ("(%s)", signature_str);
 
-          if (!g_variant_is_signature (signature_str) ||
-              !g_variant_type_string_is_valid (tupled_signature_str))
+          if (!xvariant_is_signature (signature_str) ||
+              !xvariant_type_string_is_valid (tupled_signature_str))
             {
               g_set_error (&local_error,
                            G_IO_ERROR,
@@ -2313,7 +2313,7 @@ g_dbus_message_new_from_blob (guchar                *blob,
               goto fail;
             }
 
-          variant_type = g_variant_type_new (tupled_signature_str);
+          variant_type = xvariant_type_new (tupled_signature_str);
           g_free (tupled_signature_str);
 #ifdef DEBUG_SERIALIZER
           g_print ("Parsing body (blob_len = 0x%04x bytes)\n", (xint_t) blob_len);
@@ -2324,7 +2324,7 @@ g_dbus_message_new_from_blob (guchar                *blob,
                                                  FALSE,
                                                  2,
                                                  &local_error);
-          g_variant_type_free (variant_type);
+          xvariant_type_free (variant_type);
           if (message->body == NULL)
             goto fail;
         }
@@ -2393,7 +2393,7 @@ append_value_to_blob (xvariant_t            *value,
   xsize_t padding_added;
   const xchar_t *type_string;
 
-  type_string = g_variant_type_peek_string (type);
+  type_string = xvariant_type_peek_string (type);
 
   padding_added = 0;
 
@@ -2403,7 +2403,7 @@ append_value_to_blob (xvariant_t            *value,
       padding_added = ensure_output_padding (mbuf, 4);
       if (value != NULL)
         {
-          xboolean_t v = g_variant_get_boolean (value);
+          xboolean_t v = xvariant_get_boolean (value);
           g_memory_buffer_put_uint32 (mbuf, v);
         }
       break;
@@ -2411,7 +2411,7 @@ append_value_to_blob (xvariant_t            *value,
     case 'y': /* G_VARIANT_TYPE_BYTE */
       if (value != NULL)
         {
-          guint8 v = g_variant_get_byte (value);
+          xuint8_t v = xvariant_get_byte (value);
           g_memory_buffer_put_byte (mbuf, v);
         }
       break;
@@ -2420,7 +2420,7 @@ append_value_to_blob (xvariant_t            *value,
       padding_added = ensure_output_padding (mbuf, 2);
       if (value != NULL)
         {
-          gint16 v = g_variant_get_int16 (value);
+          gint16 v = xvariant_get_int16 (value);
           g_memory_buffer_put_int16 (mbuf, v);
         }
       break;
@@ -2429,7 +2429,7 @@ append_value_to_blob (xvariant_t            *value,
       padding_added = ensure_output_padding (mbuf, 2);
       if (value != NULL)
         {
-          guint16 v = g_variant_get_uint16 (value);
+          xuint16_t v = xvariant_get_uint16 (value);
           g_memory_buffer_put_uint16 (mbuf, v);
         }
       break;
@@ -2438,7 +2438,7 @@ append_value_to_blob (xvariant_t            *value,
       padding_added = ensure_output_padding (mbuf, 4);
       if (value != NULL)
         {
-          gint32 v = g_variant_get_int32 (value);
+          gint32 v = xvariant_get_int32 (value);
           g_memory_buffer_put_int32 (mbuf, v);
         }
       break;
@@ -2447,7 +2447,7 @@ append_value_to_blob (xvariant_t            *value,
       padding_added = ensure_output_padding (mbuf, 4);
       if (value != NULL)
         {
-          guint32 v = g_variant_get_uint32 (value);
+          xuint32_t v = xvariant_get_uint32 (value);
           g_memory_buffer_put_uint32 (mbuf, v);
         }
       break;
@@ -2456,7 +2456,7 @@ append_value_to_blob (xvariant_t            *value,
       padding_added = ensure_output_padding (mbuf, 8);
       if (value != NULL)
         {
-          gint64 v = g_variant_get_int64 (value);
+          gint64 v = xvariant_get_int64 (value);
           g_memory_buffer_put_int64 (mbuf, v);
         }
       break;
@@ -2465,7 +2465,7 @@ append_value_to_blob (xvariant_t            *value,
       padding_added = ensure_output_padding (mbuf, 8);
       if (value != NULL)
         {
-          guint64 v = g_variant_get_uint64 (value);
+          xuint64_t v = xvariant_get_uint64 (value);
           g_memory_buffer_put_uint64 (mbuf, v);
         }
       break;
@@ -2475,11 +2475,11 @@ append_value_to_blob (xvariant_t            *value,
       if (value != NULL)
         {
           union {
-            guint64 v_uint64;
+            xuint64_t v_uint64;
             xdouble_t v_double;
           } u;
-          G_STATIC_ASSERT (sizeof (xdouble_t) == sizeof (guint64));
-          u.v_double = g_variant_get_double (value);
+          G_STATIC_ASSERT (sizeof (xdouble_t) == sizeof (xuint64_t));
+          u.v_double = xvariant_get_double (value);
           g_memory_buffer_put_uint64 (mbuf, u.v_uint64);
         }
       break;
@@ -2494,8 +2494,8 @@ append_value_to_blob (xvariant_t            *value,
           const xchar_t *end;
 #endif
 
-          v = g_variant_get_string (value, &len);
-          g_assert (g_utf8_validate (v, -1, &end) && (end == v + len));
+          v = xvariant_get_string (value, &len);
+          g_assert (xutf8_validate (v, -1, &end) && (end == v + len));
           g_memory_buffer_put_uint32 (mbuf, len);
           g_memory_buffer_put_string (mbuf, v);
           g_memory_buffer_put_byte (mbuf, '\0');
@@ -2507,8 +2507,8 @@ append_value_to_blob (xvariant_t            *value,
       if (value != NULL)
         {
           xsize_t len;
-          const xchar_t *v = g_variant_get_string (value, &len);
-          g_assert (g_variant_is_object_path (v));
+          const xchar_t *v = xvariant_get_string (value, &len);
+          g_assert (xvariant_is_object_path (v));
           g_memory_buffer_put_uint32 (mbuf, len);
           g_memory_buffer_put_string (mbuf, v);
           g_memory_buffer_put_byte (mbuf, '\0');
@@ -2519,8 +2519,8 @@ append_value_to_blob (xvariant_t            *value,
       if (value != NULL)
         {
           xsize_t len;
-          const xchar_t *v = g_variant_get_string (value, &len);
-          g_assert (g_variant_is_signature (v));
+          const xchar_t *v = xvariant_get_string (value, &len);
+          g_assert (xvariant_is_signature (v));
           g_memory_buffer_put_byte (mbuf, len);
           g_memory_buffer_put_string (mbuf, v);
           g_memory_buffer_put_byte (mbuf, '\0');
@@ -2531,7 +2531,7 @@ append_value_to_blob (xvariant_t            *value,
       padding_added = ensure_output_padding (mbuf, 4);
       if (value != NULL)
         {
-          gint32 v = g_variant_get_handle (value);
+          gint32 v = xvariant_get_handle (value);
           g_memory_buffer_put_int32 (mbuf, v);
         }
       break;
@@ -2540,10 +2540,10 @@ append_value_to_blob (xvariant_t            *value,
       {
         const xvariant_type_t *element_type;
         xvariant_t *item;
-        GVariantIter iter;
-        goffset array_len_offset;
-        goffset array_payload_begin_offset;
-        goffset cur_offset;
+        xvariant_iter_t iter;
+        xoffset_t array_len_offset;
+        xoffset_t array_payload_begin_offset;
+        xoffset_t cur_offset;
         xsize_t array_len;
         xuint_t fixed_size;
 
@@ -2569,10 +2569,10 @@ append_value_to_blob (xvariant_t            *value,
              */
             array_payload_begin_offset = mbuf->valid_len;
 
-            element_type = g_variant_type_element (type);
+            element_type = xvariant_type_element (type);
             fixed_size = get_type_fixed_size (element_type);
 
-            if (g_variant_n_children (value) == 0)
+            if (xvariant_n_children (value) == 0)
               {
                 xsize_t padding_added_for_item;
                 if (!append_value_to_blob (NULL,
@@ -2588,34 +2588,34 @@ append_value_to_blob (xvariant_t            *value,
                 xvariant_t *use_value;
 
                 if (g_memory_buffer_is_byteswapped (mbuf))
-                  use_value = g_variant_byteswap (value);
+                  use_value = xvariant_byteswap (value);
                 else
-                  use_value = g_variant_ref (value);
+                  use_value = xvariant_ref (value);
 
                 array_payload_begin_offset += ensure_output_padding (mbuf, fixed_size);
 
-                array_len = g_variant_get_size (use_value);
-                g_memory_buffer_write (mbuf, g_variant_get_data (use_value), array_len);
-                g_variant_unref (use_value);
+                array_len = xvariant_get_size (use_value);
+                g_memory_buffer_write (mbuf, xvariant_get_data (use_value), array_len);
+                xvariant_unref (use_value);
               }
             else
               {
                 xuint_t n;
                 n = 0;
-                g_variant_iter_init (&iter, value);
-                while ((item = g_variant_iter_next_value (&iter)) != NULL)
+                xvariant_iter_init (&iter, value);
+                while ((item = xvariant_iter_next_value (&iter)) != NULL)
                   {
                     xsize_t padding_added_for_item;
                     if (!append_value_to_blob (item,
-                                               g_variant_get_type (item),
+                                               xvariant_get_type (item),
                                                mbuf,
                                                &padding_added_for_item,
                                                error))
                       {
-                        g_variant_unref (item);
+                        xvariant_unref (item);
                         goto fail;
                       }
-                    g_variant_unref (item);
+                    xvariant_unref (item);
                     if (n == 0)
                       {
                         array_payload_begin_offset += padding_added_for_item;
@@ -2635,9 +2635,9 @@ append_value_to_blob (xvariant_t            *value,
       break;
 
     default:
-      if (g_variant_type_is_dict_entry (type) || g_variant_type_is_tuple (type))
+      if (xvariant_type_is_dict_entry (type) || xvariant_type_is_tuple (type))
         {
-          if (!g_variant_type_first (type))
+          if (!xvariant_type_first (type))
             {
               g_set_error_literal (error,
                                    G_IO_ERROR,
@@ -2650,44 +2650,44 @@ append_value_to_blob (xvariant_t            *value,
           if (value != NULL)
             {
               xvariant_t *item;
-              GVariantIter iter;
-              g_variant_iter_init (&iter, value);
-              while ((item = g_variant_iter_next_value (&iter)) != NULL)
+              xvariant_iter_t iter;
+              xvariant_iter_init (&iter, value);
+              while ((item = xvariant_iter_next_value (&iter)) != NULL)
                 {
                   if (!append_value_to_blob (item,
-                                             g_variant_get_type (item),
+                                             xvariant_get_type (item),
                                              mbuf,
                                              NULL,
                                              error))
                     {
-                      g_variant_unref (item);
+                      xvariant_unref (item);
                       goto fail;
                     }
-                  g_variant_unref (item);
+                  xvariant_unref (item);
                 }
             }
         }
-      else if (g_variant_type_is_variant (type))
+      else if (xvariant_type_is_variant (type))
         {
           if (value != NULL)
             {
               xvariant_t *child;
               const xchar_t *signature;
-              child = g_variant_get_child_value (value, 0);
-              signature = g_variant_get_type_string (child);
+              child = xvariant_get_child_value (value, 0);
+              signature = xvariant_get_type_string (child);
               g_memory_buffer_put_byte (mbuf, strlen (signature));
               g_memory_buffer_put_string (mbuf, signature);
               g_memory_buffer_put_byte (mbuf, '\0');
               if (!append_value_to_blob (child,
-                                         g_variant_get_type (child),
+                                         xvariant_get_type (child),
                                          mbuf,
                                          NULL,
                                          error))
                 {
-                  g_variant_unref (child);
+                  xvariant_unref (child);
                   goto fail;
                 }
-              g_variant_unref (child);
+              xvariant_unref (child);
             }
         }
       else
@@ -2696,7 +2696,7 @@ append_value_to_blob (xvariant_t            *value,
                        G_IO_ERROR,
                        G_IO_ERROR_INVALID_ARGUMENT,
                        _("Error serializing xvariant_t with type string “%s” to the D-Bus wire format"),
-                       g_variant_get_type_string (value));
+                       xvariant_get_type_string (value));
           goto fail;
         }
       break;
@@ -2717,30 +2717,30 @@ append_body_to_blob (xvariant_t       *value,
                      xerror_t        **error)
 {
   xvariant_t *item;
-  GVariantIter iter;
+  xvariant_iter_t iter;
 
-  if (!g_variant_is_of_type (value, G_VARIANT_TYPE_TUPLE))
+  if (!xvariant_is_of_type (value, G_VARIANT_TYPE_TUPLE))
     {
       g_set_error (error,
                    G_IO_ERROR,
                    G_IO_ERROR_INVALID_ARGUMENT,
-                   "Expected a tuple for the body of the GDBusMessage.");
+                   "Expected a tuple for the body of the xdbus_message_t.");
       goto fail;
     }
 
-  g_variant_iter_init (&iter, value);
-  while ((item = g_variant_iter_next_value (&iter)) != NULL)
+  xvariant_iter_init (&iter, value);
+  while ((item = xvariant_iter_next_value (&iter)) != NULL)
     {
       if (!append_value_to_blob (item,
-                                 g_variant_get_type (item),
+                                 xvariant_get_type (item),
                                  mbuf,
                                  NULL,
                                  error))
         {
-          g_variant_unref (item);
+          xvariant_unref (item);
           goto fail;
         }
-      g_variant_unref (item);
+      xvariant_unref (item);
     }
   return TRUE;
 
@@ -2751,14 +2751,14 @@ append_body_to_blob (xvariant_t       *value,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_to_blob:
- * @message: A #GDBusMessage.
+ * xdbus_message_to_blob:
+ * @message: A #xdbus_message_t.
  * @out_size: Return location for size of generated blob.
  * @capabilities: A #GDBusCapabilityFlags describing what protocol features are supported.
  * @error: Return location for error.
  *
  * Serializes @message to a blob. The byte order returned by
- * g_dbus_message_get_byte_order() will be used.
+ * xdbus_message_get_byte_order() will be used.
  *
  * Returns: (array length=out_size) (transfer full): A pointer to a
  * valid binary D-Bus message of @out_size bytes generated by @message
@@ -2767,7 +2767,7 @@ append_body_to_blob (xvariant_t       *value,
  * Since: 2.26
  */
 guchar *
-g_dbus_message_to_blob (GDBusMessage          *message,
+xdbus_message_to_blob (xdbus_message_t          *message,
                         xsize_t                 *out_size,
                         GDBusCapabilityFlags   capabilities,
                         xerror_t               **error)
@@ -2775,12 +2775,12 @@ g_dbus_message_to_blob (GDBusMessage          *message,
   GMemoryBuffer mbuf;
   guchar *ret;
   xsize_t size;
-  goffset body_len_offset;
-  goffset body_start_offset;
+  xoffset_t body_len_offset;
+  xoffset_t body_start_offset;
   xsize_t body_size;
   xvariant_t *header_fields;
-  GVariantBuilder builder;
-  GHashTableIter hash_iter;
+  xvariant_builder_t builder;
+  xhash_table_iter_t hash_iter;
   xpointer_t key;
   xvariant_t *header_value;
   xvariant_t *signature;
@@ -2826,7 +2826,7 @@ g_dbus_message_to_blob (GDBusMessage          *message,
   if (message->fd_list != NULL)
     num_fds_in_message = g_unix_fd_list_get_length (message->fd_list);
 #endif
-  num_fds_according_to_header = g_dbus_message_get_num_unix_fds (message);
+  num_fds_according_to_header = xdbus_message_get_num_unix_fds (message);
   if (num_fds_in_message != num_fds_according_to_header)
     {
       g_set_error (error,
@@ -2844,36 +2844,36 @@ g_dbus_message_to_blob (GDBusMessage          *message,
       goto out;
     }
 
-  g_variant_builder_init (&builder, G_VARIANT_TYPE ("a{yv}"));
-  g_hash_table_iter_init (&hash_iter, message->headers);
-  while (g_hash_table_iter_next (&hash_iter, &key, (xpointer_t) &header_value))
+  xvariant_builder_init (&builder, G_VARIANT_TYPE ("a{yv}"));
+  xhash_table_iter_init (&hash_iter, message->headers);
+  while (xhash_table_iter_next (&hash_iter, &key, (xpointer_t) &header_value))
     {
-      g_variant_builder_add (&builder,
+      xvariant_builder_add (&builder,
                              "{yv}",
                              (guchar) GPOINTER_TO_UINT (key),
                              header_value);
     }
-  header_fields = g_variant_builder_end (&builder);
+  header_fields = xvariant_builder_end (&builder);
 
   if (!append_value_to_blob (header_fields,
-                             g_variant_get_type (header_fields),
+                             xvariant_get_type (header_fields),
                              &mbuf,
                              NULL,
                              error))
     {
-      g_variant_unref (header_fields);
+      xvariant_unref (header_fields);
       goto out;
     }
-  g_variant_unref (header_fields);
+  xvariant_unref (header_fields);
 
   /* header size must be a multiple of 8 */
   ensure_output_padding (&mbuf, 8);
 
   body_start_offset = mbuf.valid_len;
 
-  signature = g_dbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE);
+  signature = xdbus_message_get_header (message, G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE);
 
-  if (signature != NULL && !g_variant_is_of_type (signature, G_VARIANT_TYPE_SIGNATURE))
+  if (signature != NULL && !xvariant_is_of_type (signature, G_VARIANT_TYPE_SIGNATURE))
     {
       g_set_error_literal (error,
                            G_IO_ERROR,
@@ -2884,7 +2884,7 @@ g_dbus_message_to_blob (GDBusMessage          *message,
 
   signature_str = NULL;
   if (signature != NULL)
-      signature_str = g_variant_get_string (signature, NULL);
+      signature_str = xvariant_get_string (signature, NULL);
   if (message->body != NULL)
     {
       xchar_t *tupled_signature_str;
@@ -2894,17 +2894,17 @@ g_dbus_message_to_blob (GDBusMessage          *message,
                        G_IO_ERROR,
                        G_IO_ERROR_INVALID_ARGUMENT,
                        _("Message body has signature “%s” but there is no signature header"),
-                       g_variant_get_type_string (message->body));
+                       xvariant_get_type_string (message->body));
           goto out;
         }
-      tupled_signature_str = g_strdup_printf ("(%s)", signature_str);
-      if (g_strcmp0 (tupled_signature_str, g_variant_get_type_string (message->body)) != 0)
+      tupled_signature_str = xstrdup_printf ("(%s)", signature_str);
+      if (xstrcmp0 (tupled_signature_str, xvariant_get_type_string (message->body)) != 0)
         {
           g_set_error (error,
                        G_IO_ERROR,
                        G_IO_ERROR_INVALID_ARGUMENT,
                        _("Message body has type signature “%s” but signature in the header field is “%s”"),
-                       g_variant_get_type_string (message->body), tupled_signature_str);
+                       xvariant_get_type_string (message->body), tupled_signature_str);
           g_free (tupled_signature_str);
           goto out;
         }
@@ -2945,62 +2945,62 @@ g_dbus_message_to_blob (GDBusMessage          *message,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static guint32
-get_uint32_header (GDBusMessage            *message,
+static xuint32_t
+get_uint32_header (xdbus_message_t            *message,
                    GDBusMessageHeaderField  header_field)
 {
   xvariant_t *value;
-  guint32 ret;
+  xuint32_t ret;
 
   ret = 0;
-  value = g_hash_table_lookup (message->headers, GUINT_TO_POINTER (header_field));
-  if (value != NULL && g_variant_is_of_type (value, G_VARIANT_TYPE_UINT32))
-    ret = g_variant_get_uint32 (value);
+  value = xhash_table_lookup (message->headers, GUINT_TO_POINTER (header_field));
+  if (value != NULL && xvariant_is_of_type (value, G_VARIANT_TYPE_UINT32))
+    ret = xvariant_get_uint32 (value);
 
   return ret;
 }
 
 static const xchar_t *
-get_string_header (GDBusMessage            *message,
+get_string_header (xdbus_message_t            *message,
                    GDBusMessageHeaderField  header_field)
 {
   xvariant_t *value;
   const xchar_t *ret;
 
   ret = NULL;
-  value = g_hash_table_lookup (message->headers, GUINT_TO_POINTER (header_field));
-  if (value != NULL && g_variant_is_of_type (value, G_VARIANT_TYPE_STRING))
-    ret = g_variant_get_string (value, NULL);
+  value = xhash_table_lookup (message->headers, GUINT_TO_POINTER (header_field));
+  if (value != NULL && xvariant_is_of_type (value, G_VARIANT_TYPE_STRING))
+    ret = xvariant_get_string (value, NULL);
 
   return ret;
 }
 
 static const xchar_t *
-get_object_path_header (GDBusMessage            *message,
+get_object_path_header (xdbus_message_t            *message,
                         GDBusMessageHeaderField  header_field)
 {
   xvariant_t *value;
   const xchar_t *ret;
 
   ret = NULL;
-  value = g_hash_table_lookup (message->headers, GUINT_TO_POINTER (header_field));
-  if (value != NULL && g_variant_is_of_type (value, G_VARIANT_TYPE_OBJECT_PATH))
-    ret = g_variant_get_string (value, NULL);
+  value = xhash_table_lookup (message->headers, GUINT_TO_POINTER (header_field));
+  if (value != NULL && xvariant_is_of_type (value, G_VARIANT_TYPE_OBJECT_PATH))
+    ret = xvariant_get_string (value, NULL);
 
   return ret;
 }
 
 static const xchar_t *
-get_signature_header (GDBusMessage            *message,
+get_signature_header (xdbus_message_t            *message,
                       GDBusMessageHeaderField  header_field)
 {
   xvariant_t *value;
   const xchar_t *ret;
 
   ret = NULL;
-  value = g_hash_table_lookup (message->headers, GUINT_TO_POINTER (header_field));
-  if (value != NULL && g_variant_is_of_type (value, G_VARIANT_TYPE_SIGNATURE))
-    ret = g_variant_get_string (value, NULL);
+  value = xhash_table_lookup (message->headers, GUINT_TO_POINTER (header_field));
+  if (value != NULL && xvariant_is_of_type (value, G_VARIANT_TYPE_SIGNATURE))
+    ret = xvariant_get_string (value, NULL);
 
   return ret;
 }
@@ -3008,50 +3008,50 @@ get_signature_header (GDBusMessage            *message,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-set_uint32_header (GDBusMessage             *message,
+set_uint32_header (xdbus_message_t             *message,
                    GDBusMessageHeaderField   header_field,
-                   guint32                   value)
+                   xuint32_t                   value)
 {
-  g_dbus_message_set_header (message,
+  xdbus_message_set_header (message,
                              header_field,
-                             g_variant_new_uint32 (value));
+                             xvariant_new_uint32 (value));
 }
 
 static void
-set_string_header (GDBusMessage             *message,
+set_string_header (xdbus_message_t             *message,
                    GDBusMessageHeaderField   header_field,
                    const xchar_t              *value)
 {
-  g_dbus_message_set_header (message,
+  xdbus_message_set_header (message,
                              header_field,
-                             value == NULL ? NULL : g_variant_new_string (value));
+                             value == NULL ? NULL : xvariant_new_string (value));
 }
 
 static void
-set_object_path_header (GDBusMessage             *message,
+set_object_path_header (xdbus_message_t             *message,
                         GDBusMessageHeaderField   header_field,
                         const xchar_t              *value)
 {
-  g_dbus_message_set_header (message,
+  xdbus_message_set_header (message,
                              header_field,
-                             value == NULL ? NULL : g_variant_new_object_path (value));
+                             value == NULL ? NULL : xvariant_new_object_path (value));
 }
 
 static void
-set_signature_header (GDBusMessage             *message,
+set_signature_header (xdbus_message_t             *message,
                       GDBusMessageHeaderField   header_field,
                       const xchar_t              *value)
 {
-  g_dbus_message_set_header (message,
+  xdbus_message_set_header (message,
                              header_field,
-                             value == NULL ? NULL : g_variant_new_signature (value));
+                             value == NULL ? NULL : xvariant_new_signature (value));
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_get_reply_serial:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_reply_serial:
+ * @message: A #xdbus_message_t.
  *
  * Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL header field.
  *
@@ -3059,16 +3059,16 @@ set_signature_header (GDBusMessage             *message,
  *
  * Since: 2.26
  */
-guint32
-g_dbus_message_get_reply_serial (GDBusMessage  *message)
+xuint32_t
+xdbus_message_get_reply_serial (xdbus_message_t  *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), 0);
   return get_uint32_header (message, G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL);
 }
 
 /**
- * g_dbus_message_set_reply_serial:
- * @message: A #GDBusMessage.
+ * xdbus_message_set_reply_serial:
+ * @message: A #xdbus_message_t.
  * @value: The value to set.
  *
  * Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL header field.
@@ -3076,8 +3076,8 @@ g_dbus_message_get_reply_serial (GDBusMessage  *message)
  * Since: 2.26
  */
 void
-g_dbus_message_set_reply_serial (GDBusMessage  *message,
-                                 guint32        value)
+xdbus_message_set_reply_serial (xdbus_message_t  *message,
+                                 xuint32_t        value)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
   set_uint32_header (message, G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL, value);
@@ -3086,8 +3086,8 @@ g_dbus_message_set_reply_serial (GDBusMessage  *message,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_get_interface:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_interface:
+ * @message: A #xdbus_message_t.
  *
  * Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_INTERFACE header field.
  *
@@ -3096,15 +3096,15 @@ g_dbus_message_set_reply_serial (GDBusMessage  *message,
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_message_get_interface (GDBusMessage  *message)
+xdbus_message_get_interface (xdbus_message_t  *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return get_string_header (message, G_DBUS_MESSAGE_HEADER_FIELD_INTERFACE);
 }
 
 /**
- * g_dbus_message_set_interface:
- * @message: A #GDBusMessage.
+ * xdbus_message_set_interface:
+ * @message: A #xdbus_message_t.
  * @value: (nullable): The value to set.
  *
  * Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_INTERFACE header field.
@@ -3112,7 +3112,7 @@ g_dbus_message_get_interface (GDBusMessage  *message)
  * Since: 2.26
  */
 void
-g_dbus_message_set_interface (GDBusMessage  *message,
+xdbus_message_set_interface (xdbus_message_t  *message,
                               const xchar_t   *value)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
@@ -3123,8 +3123,8 @@ g_dbus_message_set_interface (GDBusMessage  *message,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_get_member:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_member:
+ * @message: A #xdbus_message_t.
  *
  * Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_MEMBER header field.
  *
@@ -3133,15 +3133,15 @@ g_dbus_message_set_interface (GDBusMessage  *message,
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_message_get_member (GDBusMessage  *message)
+xdbus_message_get_member (xdbus_message_t  *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return get_string_header (message, G_DBUS_MESSAGE_HEADER_FIELD_MEMBER);
 }
 
 /**
- * g_dbus_message_set_member:
- * @message: A #GDBusMessage.
+ * xdbus_message_set_member:
+ * @message: A #xdbus_message_t.
  * @value: (nullable): The value to set.
  *
  * Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_MEMBER header field.
@@ -3149,7 +3149,7 @@ g_dbus_message_get_member (GDBusMessage  *message)
  * Since: 2.26
  */
 void
-g_dbus_message_set_member (GDBusMessage  *message,
+xdbus_message_set_member (xdbus_message_t  *message,
                            const xchar_t   *value)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
@@ -3160,8 +3160,8 @@ g_dbus_message_set_member (GDBusMessage  *message,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_get_path:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_path:
+ * @message: A #xdbus_message_t.
  *
  * Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_PATH header field.
  *
@@ -3170,15 +3170,15 @@ g_dbus_message_set_member (GDBusMessage  *message,
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_message_get_path (GDBusMessage  *message)
+xdbus_message_get_path (xdbus_message_t  *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return get_object_path_header (message, G_DBUS_MESSAGE_HEADER_FIELD_PATH);
 }
 
 /**
- * g_dbus_message_set_path:
- * @message: A #GDBusMessage.
+ * xdbus_message_set_path:
+ * @message: A #xdbus_message_t.
  * @value: (nullable): The value to set.
  *
  * Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_PATH header field.
@@ -3186,19 +3186,19 @@ g_dbus_message_get_path (GDBusMessage  *message)
  * Since: 2.26
  */
 void
-g_dbus_message_set_path (GDBusMessage  *message,
+xdbus_message_set_path (xdbus_message_t  *message,
                          const xchar_t   *value)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
-  g_return_if_fail (value == NULL || g_variant_is_object_path (value));
+  g_return_if_fail (value == NULL || xvariant_is_object_path (value));
   set_object_path_header (message, G_DBUS_MESSAGE_HEADER_FIELD_PATH, value);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_get_sender:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_sender:
+ * @message: A #xdbus_message_t.
  *
  * Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_SENDER header field.
  *
@@ -3207,15 +3207,15 @@ g_dbus_message_set_path (GDBusMessage  *message,
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_message_get_sender (GDBusMessage *message)
+xdbus_message_get_sender (xdbus_message_t *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return get_string_header (message, G_DBUS_MESSAGE_HEADER_FIELD_SENDER);
 }
 
 /**
- * g_dbus_message_set_sender:
- * @message: A #GDBusMessage.
+ * xdbus_message_set_sender:
+ * @message: A #xdbus_message_t.
  * @value: (nullable): The value to set.
  *
  * Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_SENDER header field.
@@ -3223,7 +3223,7 @@ g_dbus_message_get_sender (GDBusMessage *message)
  * Since: 2.26
  */
 void
-g_dbus_message_set_sender (GDBusMessage  *message,
+xdbus_message_set_sender (xdbus_message_t  *message,
                            const xchar_t   *value)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
@@ -3234,8 +3234,8 @@ g_dbus_message_set_sender (GDBusMessage  *message,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_get_destination:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_destination:
+ * @message: A #xdbus_message_t.
  *
  * Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_DESTINATION header field.
  *
@@ -3244,15 +3244,15 @@ g_dbus_message_set_sender (GDBusMessage  *message,
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_message_get_destination (GDBusMessage  *message)
+xdbus_message_get_destination (xdbus_message_t  *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return get_string_header (message, G_DBUS_MESSAGE_HEADER_FIELD_DESTINATION);
 }
 
 /**
- * g_dbus_message_set_destination:
- * @message: A #GDBusMessage.
+ * xdbus_message_set_destination:
+ * @message: A #xdbus_message_t.
  * @value: (nullable): The value to set.
  *
  * Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_DESTINATION header field.
@@ -3260,7 +3260,7 @@ g_dbus_message_get_destination (GDBusMessage  *message)
  * Since: 2.26
  */
 void
-g_dbus_message_set_destination (GDBusMessage  *message,
+xdbus_message_set_destination (xdbus_message_t  *message,
                                 const xchar_t   *value)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
@@ -3271,8 +3271,8 @@ g_dbus_message_set_destination (GDBusMessage  *message,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_get_error_name:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_error_name:
+ * @message: A #xdbus_message_t.
  *
  * Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_ERROR_NAME header field.
  *
@@ -3281,15 +3281,15 @@ g_dbus_message_set_destination (GDBusMessage  *message,
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_message_get_error_name (GDBusMessage  *message)
+xdbus_message_get_error_name (xdbus_message_t  *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return get_string_header (message, G_DBUS_MESSAGE_HEADER_FIELD_ERROR_NAME);
 }
 
 /**
- * g_dbus_message_set_error_name:
- * @message: (nullable): A #GDBusMessage.
+ * xdbus_message_set_error_name:
+ * @message: (nullable): A #xdbus_message_t.
  * @value: The value to set.
  *
  * Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_ERROR_NAME header field.
@@ -3297,7 +3297,7 @@ g_dbus_message_get_error_name (GDBusMessage  *message)
  * Since: 2.26
  */
 void
-g_dbus_message_set_error_name (GDBusMessage  *message,
+xdbus_message_set_error_name (xdbus_message_t  *message,
                                const xchar_t   *value)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
@@ -3308,8 +3308,8 @@ g_dbus_message_set_error_name (GDBusMessage  *message,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_get_signature:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_signature:
+ * @message: A #xdbus_message_t.
  *
  * Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE header field.
  *
@@ -3320,7 +3320,7 @@ g_dbus_message_set_error_name (GDBusMessage  *message,
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_message_get_signature (GDBusMessage  *message)
+xdbus_message_get_signature (xdbus_message_t  *message)
 {
   const xchar_t *ret;
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
@@ -3331,8 +3331,8 @@ g_dbus_message_get_signature (GDBusMessage  *message)
 }
 
 /**
- * g_dbus_message_set_signature:
- * @message: A #GDBusMessage.
+ * xdbus_message_set_signature:
+ * @message: A #xdbus_message_t.
  * @value: (nullable): The value to set.
  *
  * Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE header field.
@@ -3340,19 +3340,19 @@ g_dbus_message_get_signature (GDBusMessage  *message)
  * Since: 2.26
  */
 void
-g_dbus_message_set_signature (GDBusMessage  *message,
+xdbus_message_set_signature (xdbus_message_t  *message,
                               const xchar_t   *value)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
-  g_return_if_fail (value == NULL || g_variant_is_signature (value));
+  g_return_if_fail (value == NULL || xvariant_is_signature (value));
   set_signature_header (message, G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE, value);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_get_arg0:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_arg0:
+ * @message: A #xdbus_message_t.
  *
  * Convenience to get the first item in the body of @message.
  *
@@ -3362,7 +3362,7 @@ g_dbus_message_set_signature (GDBusMessage  *message,
  * Since: 2.26
  */
 const xchar_t *
-g_dbus_message_get_arg0 (GDBusMessage  *message)
+xdbus_message_get_arg0 (xdbus_message_t  *message)
 {
   const xchar_t *ret;
 
@@ -3370,13 +3370,13 @@ g_dbus_message_get_arg0 (GDBusMessage  *message)
 
   ret = NULL;
 
-  if (message->body != NULL && g_variant_is_of_type (message->body, G_VARIANT_TYPE_TUPLE))
+  if (message->body != NULL && xvariant_is_of_type (message->body, G_VARIANT_TYPE_TUPLE))
     {
       xvariant_t *item;
-      item = g_variant_get_child_value (message->body, 0);
-      if (g_variant_is_of_type (item, G_VARIANT_TYPE_STRING))
-        ret = g_variant_get_string (item, NULL);
-      g_variant_unref (item);
+      item = xvariant_get_child_value (message->body, 0);
+      if (xvariant_is_of_type (item, G_VARIANT_TYPE_STRING))
+        ret = xvariant_get_string (item, NULL);
+      xvariant_unref (item);
     }
 
   return ret;
@@ -3385,8 +3385,8 @@ g_dbus_message_get_arg0 (GDBusMessage  *message)
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_get_num_unix_fds:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_num_unix_fds:
+ * @message: A #xdbus_message_t.
  *
  * Convenience getter for the %G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS header field.
  *
@@ -3394,16 +3394,16 @@ g_dbus_message_get_arg0 (GDBusMessage  *message)
  *
  * Since: 2.26
  */
-guint32
-g_dbus_message_get_num_unix_fds (GDBusMessage *message)
+xuint32_t
+xdbus_message_get_num_unix_fds (xdbus_message_t *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), 0);
   return get_uint32_header (message, G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS);
 }
 
 /**
- * g_dbus_message_set_num_unix_fds:
- * @message: A #GDBusMessage.
+ * xdbus_message_set_num_unix_fds:
+ * @message: A #xdbus_message_t.
  * @value: The value to set.
  *
  * Convenience setter for the %G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS header field.
@@ -3411,8 +3411,8 @@ g_dbus_message_get_num_unix_fds (GDBusMessage *message)
  * Since: 2.26
  */
 void
-g_dbus_message_set_num_unix_fds (GDBusMessage  *message,
-                                 guint32        value)
+xdbus_message_set_num_unix_fds (xdbus_message_t  *message,
+                                 xuint32_t        value)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
   set_uint32_header (message, G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS, value);
@@ -3421,8 +3421,8 @@ g_dbus_message_set_num_unix_fds (GDBusMessage  *message,
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_message_to_gerror:
- * @message: A #GDBusMessage.
+ * xdbus_message_to_gerror:
+ * @message: A #xdbus_message_t.
  * @error: The #xerror_t to set.
  *
  * If @message is not of type %G_DBUS_MESSAGE_TYPE_ERROR does
@@ -3438,7 +3438,7 @@ g_dbus_message_set_num_unix_fds (GDBusMessage  *message,
  * Since: 2.26
  */
 xboolean_t
-g_dbus_message_to_gerror (GDBusMessage   *message,
+xdbus_message_to_gerror (xdbus_message_t   *message,
                           xerror_t        **error)
 {
   xboolean_t ret;
@@ -3450,17 +3450,17 @@ g_dbus_message_to_gerror (GDBusMessage   *message,
   if (message->type != G_DBUS_MESSAGE_TYPE_ERROR)
     goto out;
 
-  error_name = g_dbus_message_get_error_name (message);
+  error_name = xdbus_message_get_error_name (message);
   if (error_name != NULL)
     {
       xvariant_t *body;
 
-      body = g_dbus_message_get_body (message);
+      body = xdbus_message_get_body (message);
 
-      if (body != NULL && g_variant_is_of_type (body, G_VARIANT_TYPE ("(s)")))
+      if (body != NULL && xvariant_is_of_type (body, G_VARIANT_TYPE ("(s)")))
         {
           const xchar_t *error_message;
-          g_variant_get (body, "(&s)", &error_message);
+          xvariant_get (body, "(&s)", &error_message);
           g_dbus_error_set_dbus_error (error,
                                        error_name,
                                        error_message,
@@ -3475,7 +3475,7 @@ g_dbus_message_to_gerror (GDBusMessage   *message,
                                            error_name,
                                            "",
                                            _("Error return with body of type “%s”"),
-                                           g_variant_get_type_string (body));
+                                           xvariant_get_type_string (body));
             }
           else
             {
@@ -3508,35 +3508,35 @@ g_dbus_message_to_gerror (GDBusMessage   *message,
 static xchar_t *
 flags_to_string (xtype_t flags_type, xuint_t value)
 {
-  GString *s;
-  GFlagsClass *klass;
+  xstring_t *s;
+  xflags_class_t *klass;
   xuint_t n;
 
-  klass = g_type_class_ref (flags_type);
-  s = g_string_new (NULL);
+  klass = xtype_class_ref (flags_type);
+  s = xstring_new (NULL);
   for (n = 0; n < 32; n++)
     {
       if ((value & (1<<n)) != 0)
         {
-          GFlagsValue *flags_value;
-          flags_value = g_flags_get_first_value (klass, (1<<n));
+          xflags_value_t *flags_value;
+          flags_value = xflags_get_first_value (klass, (1<<n));
           if (s->len > 0)
-            g_string_append_c (s, ',');
+            xstring_append_c (s, ',');
           if (flags_value != NULL)
-            g_string_append (s, flags_value->value_nick);
+            xstring_append (s, flags_value->value_nick);
           else
-            g_string_append_printf (s, "unknown (bit %d)", n);
+            xstring_append_printf (s, "unknown (bit %d)", n);
         }
     }
   if (s->len == 0)
-    g_string_append (s, "none");
-  g_type_class_unref (klass);
-  return g_string_free (s, FALSE);
+    xstring_append (s, "none");
+  xtype_class_unref (klass);
+  return xstring_free (s, FALSE);
 }
 
 static xint_t
-_sort_keys_func (gconstpointer a,
-                 gconstpointer b)
+_sort_keys_func (xconstpointer a,
+                 xconstpointer b)
 {
   xint_t ia;
   xint_t ib;
@@ -3548,8 +3548,8 @@ _sort_keys_func (gconstpointer a,
 }
 
 /**
- * g_dbus_message_print:
- * @message: A #GDBusMessage.
+ * xdbus_message_print:
+ * @message: A #xdbus_message_t.
  * @indent: Indentation level.
  *
  * Produces a human-readable multi-line description of @message.
@@ -3563,8 +3563,8 @@ _sort_keys_func (gconstpointer a,
  * Version: 0
  * Serial:  4
  * Headers:
- *   path -> objectpath '/org/gtk/GDBus/TestObject'
- *   interface -> 'org.gtk.GDBus.TestInterface'
+ *   path -> objectpath '/org/gtk/GDBus/test_object_t'
+ *   interface -> 'org.gtk.GDBus.test_interface_t'
  *   member -> 'GimmeStdout'
  *   destination -> ':1.146'
  * Body: ()
@@ -3592,30 +3592,30 @@ _sort_keys_func (gconstpointer a,
  * Since: 2.26
  */
 xchar_t *
-g_dbus_message_print (GDBusMessage *message,
+xdbus_message_print (xdbus_message_t *message,
                       xuint_t         indent)
 {
-  GString *str;
+  xstring_t *str;
   xchar_t *s;
   xlist_t *keys;
   xlist_t *l;
 
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
 
-  str = g_string_new (NULL);
+  str = xstring_new (NULL);
 
   s = _g_dbus_enum_to_string (XTYPE_DBUS_MESSAGE_TYPE, message->type);
-  g_string_append_printf (str, "%*sType:    %s\n", indent, "", s);
+  xstring_append_printf (str, "%*sType:    %s\n", indent, "", s);
   g_free (s);
   s = flags_to_string (XTYPE_DBUS_MESSAGE_FLAGS, message->flags);
-  g_string_append_printf (str, "%*sFlags:   %s\n", indent, "", s);
+  xstring_append_printf (str, "%*sFlags:   %s\n", indent, "", s);
   g_free (s);
-  g_string_append_printf (str, "%*sVersion: %d\n", indent, "", message->major_protocol_version);
-  g_string_append_printf (str, "%*sSerial:  %d\n", indent, "", message->serial);
+  xstring_append_printf (str, "%*sVersion: %d\n", indent, "", message->major_protocol_version);
+  xstring_append_printf (str, "%*sSerial:  %d\n", indent, "", message->serial);
 
-  g_string_append_printf (str, "%*sHeaders:\n", indent, "");
-  keys = g_hash_table_get_keys (message->headers);
-  keys = g_list_sort (keys, _sort_keys_func);
+  xstring_append_printf (str, "%*sHeaders:\n", indent, "");
+  keys = xhash_table_get_keys (message->headers);
+  keys = xlist_sort (keys, _sort_keys_func);
   if (keys != NULL)
     {
       for (l = keys; l != NULL; l = l->next)
@@ -3624,35 +3624,35 @@ g_dbus_message_print (GDBusMessage *message,
           xvariant_t *value;
           xchar_t *value_str;
 
-          value = g_hash_table_lookup (message->headers, l->data);
+          value = xhash_table_lookup (message->headers, l->data);
           g_assert (value != NULL);
 
           s = _g_dbus_enum_to_string (XTYPE_DBUS_MESSAGE_HEADER_FIELD, key);
-          value_str = g_variant_print (value, TRUE);
-          g_string_append_printf (str, "%*s  %s -> %s\n", indent, "", s, value_str);
+          value_str = xvariant_print (value, TRUE);
+          xstring_append_printf (str, "%*s  %s -> %s\n", indent, "", s, value_str);
           g_free (s);
           g_free (value_str);
         }
     }
   else
     {
-      g_string_append_printf (str, "%*s  (none)\n", indent, "");
+      xstring_append_printf (str, "%*s  (none)\n", indent, "");
     }
-  g_list_free (keys);
-  g_string_append_printf (str, "%*sBody: ", indent, "");
+  xlist_free (keys);
+  xstring_append_printf (str, "%*sBody: ", indent, "");
   if (message->body != NULL)
     {
-      g_variant_print_string (message->body,
+      xvariant_print_string (message->body,
                               str,
                               TRUE);
     }
   else
     {
-      g_string_append (str, "()");
+      xstring_append (str, "()");
     }
-  g_string_append (str, "\n");
+  xstring_append (str, "\n");
 #ifdef G_OS_UNIX
-  g_string_append_printf (str, "%*sUNIX File Descriptors:\n", indent, "");
+  xstring_append_printf (str, "%*sUNIX File Descriptors:\n", indent, "");
   if (message->fd_list != NULL)
     {
       xint_t num_fds;
@@ -3664,88 +3664,88 @@ g_dbus_message_print (GDBusMessage *message,
         {
           for (n = 0; n < num_fds; n++)
             {
-              GString *fs;
+              xstring_t *fs;
               struct stat statbuf;
-              fs = g_string_new (NULL);
+              fs = xstring_new (NULL);
               if (fstat (fds[n], &statbuf) == 0)
                 {
 #ifndef MAJOR_MINOR_NOT_FOUND
-                  g_string_append_printf (fs, "%s" "dev=%d:%d", fs->len > 0 ? "," : "",
+                  xstring_append_printf (fs, "%s" "dev=%d:%d", fs->len > 0 ? "," : "",
                                           (xint_t) major (statbuf.st_dev), (xint_t) minor (statbuf.st_dev));
 #endif
-                  g_string_append_printf (fs, "%s" "mode=0%o", fs->len > 0 ? "," : "",
+                  xstring_append_printf (fs, "%s" "mode=0%o", fs->len > 0 ? "," : "",
                                           (xuint_t) statbuf.st_mode);
-                  g_string_append_printf (fs, "%s" "ino=%" G_GUINT64_FORMAT, fs->len > 0 ? "," : "",
-                                          (guint64) statbuf.st_ino);
-                  g_string_append_printf (fs, "%s" "uid=%u", fs->len > 0 ? "," : "",
+                  xstring_append_printf (fs, "%s" "ino=%" G_GUINT64_FORMAT, fs->len > 0 ? "," : "",
+                                          (xuint64_t) statbuf.st_ino);
+                  xstring_append_printf (fs, "%s" "uid=%u", fs->len > 0 ? "," : "",
                                           (xuint_t) statbuf.st_uid);
-                  g_string_append_printf (fs, "%s" "gid=%u", fs->len > 0 ? "," : "",
+                  xstring_append_printf (fs, "%s" "gid=%u", fs->len > 0 ? "," : "",
                                           (xuint_t) statbuf.st_gid);
 #ifndef MAJOR_MINOR_NOT_FOUND
-                  g_string_append_printf (fs, "%s" "rdev=%d:%d", fs->len > 0 ? "," : "",
+                  xstring_append_printf (fs, "%s" "rdev=%d:%d", fs->len > 0 ? "," : "",
                                           (xint_t) major (statbuf.st_rdev), (xint_t) minor (statbuf.st_rdev));
 #endif
-                  g_string_append_printf (fs, "%s" "size=%" G_GUINT64_FORMAT, fs->len > 0 ? "," : "",
-                                          (guint64) statbuf.st_size);
-                  g_string_append_printf (fs, "%s" "atime=%" G_GUINT64_FORMAT, fs->len > 0 ? "," : "",
-                                          (guint64) statbuf.st_atime);
-                  g_string_append_printf (fs, "%s" "mtime=%" G_GUINT64_FORMAT, fs->len > 0 ? "," : "",
-                                          (guint64) statbuf.st_mtime);
-                  g_string_append_printf (fs, "%s" "ctime=%" G_GUINT64_FORMAT, fs->len > 0 ? "," : "",
-                                          (guint64) statbuf.st_ctime);
+                  xstring_append_printf (fs, "%s" "size=%" G_GUINT64_FORMAT, fs->len > 0 ? "," : "",
+                                          (xuint64_t) statbuf.st_size);
+                  xstring_append_printf (fs, "%s" "atime=%" G_GUINT64_FORMAT, fs->len > 0 ? "," : "",
+                                          (xuint64_t) statbuf.st_atime);
+                  xstring_append_printf (fs, "%s" "mtime=%" G_GUINT64_FORMAT, fs->len > 0 ? "," : "",
+                                          (xuint64_t) statbuf.st_mtime);
+                  xstring_append_printf (fs, "%s" "ctime=%" G_GUINT64_FORMAT, fs->len > 0 ? "," : "",
+                                          (xuint64_t) statbuf.st_ctime);
                 }
               else
                 {
                   int errsv = errno;
-                  g_string_append_printf (fs, "(fstat failed: %s)", g_strerror (errsv));
+                  xstring_append_printf (fs, "(fstat failed: %s)", xstrerror (errsv));
                 }
-              g_string_append_printf (str, "%*s  fd %d: %s\n", indent, "", fds[n], fs->str);
-              g_string_free (fs, TRUE);
+              xstring_append_printf (str, "%*s  fd %d: %s\n", indent, "", fds[n], fs->str);
+              xstring_free (fs, TRUE);
             }
         }
       else
         {
-          g_string_append_printf (str, "%*s  (empty)\n", indent, "");
+          xstring_append_printf (str, "%*s  (empty)\n", indent, "");
         }
     }
   else
     {
-      g_string_append_printf (str, "%*s  (none)\n", indent, "");
+      xstring_append_printf (str, "%*s  (none)\n", indent, "");
     }
 #endif
 
-  return g_string_free (str, FALSE);
+  return xstring_free (str, FALSE);
 }
 
 /**
- * g_dbus_message_get_locked:
- * @message: A #GDBusMessage.
+ * xdbus_message_get_locked:
+ * @message: A #xdbus_message_t.
  *
  * Checks whether @message is locked. To monitor changes to this
  * value, conncet to the #xobject_t::notify signal to listen for changes
- * on the #GDBusMessage:locked property.
+ * on the #xdbus_message_t:locked property.
  *
  * Returns: %TRUE if @message is locked, %FALSE otherwise.
  *
  * Since: 2.26
  */
 xboolean_t
-g_dbus_message_get_locked (GDBusMessage *message)
+xdbus_message_get_locked (xdbus_message_t *message)
 {
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), FALSE);
   return message->locked;
 }
 
 /**
- * g_dbus_message_lock:
- * @message: A #GDBusMessage.
+ * xdbus_message_lock:
+ * @message: A #xdbus_message_t.
  *
  * If @message is locked, does nothing. Otherwise locks the message.
  *
  * Since: 2.26
  */
 void
-g_dbus_message_lock (GDBusMessage *message)
+xdbus_message_lock (xdbus_message_t *message)
 {
   g_return_if_fail (X_IS_DBUS_MESSAGE (message));
 
@@ -3753,42 +3753,42 @@ g_dbus_message_lock (GDBusMessage *message)
     goto out;
 
   message->locked = TRUE;
-  g_object_notify (G_OBJECT (message), "locked");
+  xobject_notify (G_OBJECT (message), "locked");
 
  out:
   ;
 }
 
 /**
- * g_dbus_message_copy:
- * @message: A #GDBusMessage.
+ * xdbus_message_copy:
+ * @message: A #xdbus_message_t.
  * @error: Return location for error or %NULL.
  *
  * Copies @message. The copy is a deep copy and the returned
- * #GDBusMessage is completely identical except that it is guaranteed
+ * #xdbus_message_t is completely identical except that it is guaranteed
  * to not be locked.
  *
  * This operation can fail if e.g. @message contains file descriptors
  * and the per-process or system-wide open files limit is reached.
  *
- * Returns: (transfer full): A new #GDBusMessage or %NULL if @error is set.
- *     Free with g_object_unref().
+ * Returns: (transfer full): A new #xdbus_message_t or %NULL if @error is set.
+ *     Free with xobject_unref().
  *
  * Since: 2.26
  */
-GDBusMessage *
-g_dbus_message_copy (GDBusMessage  *message,
+xdbus_message_t *
+xdbus_message_copy (xdbus_message_t  *message,
                      xerror_t       **error)
 {
-  GDBusMessage *ret;
-  GHashTableIter iter;
+  xdbus_message_t *ret;
+  xhash_table_iter_t iter;
   xpointer_t header_key;
   xvariant_t *header_value;
 
   g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  ret = g_dbus_message_new ();
+  ret = xdbus_message_new ();
   ret->type                   = message->type;
   ret->flags                  = message->flags;
   ret->byte_order             = message->byte_order;
@@ -3810,7 +3810,7 @@ g_dbus_message_copy (GDBusMessage  *message,
                                      fds[n],
                                      error) == -1)
             {
-              g_object_unref (ret);
+              xobject_unref (ret);
               ret = NULL;
               goto out;
             }
@@ -3821,10 +3821,10 @@ g_dbus_message_copy (GDBusMessage  *message,
   /* see https://bugzilla.gnome.org/show_bug.cgi?id=624546#c8 for why it's fine
    * to just ref (as opposed to deep-copying) the xvariant_t instances
    */
-  ret->body = message->body != NULL ? g_variant_ref (message->body) : NULL;
-  g_hash_table_iter_init (&iter, message->headers);
-  while (g_hash_table_iter_next (&iter, &header_key, (xpointer_t) &header_value))
-    g_hash_table_insert (ret->headers, header_key, g_variant_ref (header_value));
+  ret->body = message->body != NULL ? xvariant_ref (message->body) : NULL;
+  xhash_table_iter_init (&iter, message->headers);
+  while (xhash_table_iter_next (&iter, &header_key, (xpointer_t) &header_value))
+    xhash_table_insert (ret->headers, header_key, xvariant_ref (header_value));
 
 #ifdef G_OS_UNIX
  out:

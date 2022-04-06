@@ -42,14 +42,14 @@
  * @short_description: Proxy wrapper enumerator for socket addresses
  * @include: gio/gio.h
  *
- * #GProxyAddressEnumerator is a wrapper around #GSocketAddressEnumerator which
- * takes the #xsocket_address_t instances returned by the #GSocketAddressEnumerator
- * and wraps them in #GProxyAddress instances, using the given
- * #GProxyAddressEnumerator:proxy-resolver.
+ * #xproxy_address_enumerator_t is a wrapper around #xsocket_address_enumerator_t which
+ * takes the #xsocket_address_t instances returned by the #xsocket_address_enumerator_t
+ * and wraps them in #xproxy_address_t instances, using the given
+ * #xproxy_address_enumerator_t:proxy-resolver.
  *
  * This enumerator will be returned (for example, by
  * xsocket_connectable_enumerate()) as appropriate when a proxy is configured;
- * there should be no need to manually wrap a #GSocketAddressEnumerator instance
+ * there should be no need to manually wrap a #xsocket_address_enumerator_t instance
  * with one.
  */
 
@@ -67,18 +67,18 @@ enum
 struct _GProxyAddressEnumeratorPrivate
 {
   /* Destination address */
-  GSocketConnectable *connectable;
+  xsocket_connectable_t *connectable;
   xchar_t              *dest_uri;
-  guint16             default_port;
+  xuint16_t             default_port;
   xchar_t              *dest_hostname;
-  guint16             dest_port;
+  xuint16_t             dest_port;
   xlist_t              *dest_ips;
 
   /* Proxy enumeration */
-  GProxyResolver           *proxy_resolver;
+  xproxy_resolver_t           *proxy_resolver;
   xchar_t                   **proxies;
   xchar_t                   **next_proxy;
-  GSocketAddressEnumerator *addr_enum;
+  xsocket_address_enumerator_t *addr_enum;
   xsocket_address_t           *proxy_address;
   const xchar_t              *proxy_uri;
   xchar_t                    *proxy_type;
@@ -89,7 +89,7 @@ struct _GProxyAddressEnumeratorPrivate
   xerror_t                   *last_error;
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (GProxyAddressEnumerator, g_proxy_address_enumerator, XTYPE_SOCKET_ADDRESS_ENUMERATOR)
+G_DEFINE_TYPE_WITH_PRIVATE (xproxy_address_enumerator_t, xproxy_address_enumerator, XTYPE_SOCKET_ADDRESS_ENUMERATOR)
 
 static void
 save_userinfo (GProxyAddressEnumeratorPrivate *priv,
@@ -98,7 +98,7 @@ save_userinfo (GProxyAddressEnumeratorPrivate *priv,
   g_clear_pointer (&priv->proxy_username, g_free);
   g_clear_pointer (&priv->proxy_password, g_free);
 
-  g_uri_split_with_user (proxy, G_URI_FLAGS_HAS_PASSWORD, NULL,
+  xuri_split_with_user (proxy, XURI_FLAGS_HAS_PASSWORD, NULL,
                          &priv->proxy_username, &priv->proxy_password,
                          NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 }
@@ -111,29 +111,29 @@ next_enumerator (GProxyAddressEnumeratorPrivate *priv)
 
   while (priv->addr_enum == NULL && *priv->next_proxy)
     {
-      GSocketConnectable *connectable = NULL;
-      GProxy *proxy;
+      xsocket_connectable_t *connectable = NULL;
+      xproxy_t *proxy;
 
       priv->proxy_uri = *priv->next_proxy++;
       g_free (priv->proxy_type);
-      priv->proxy_type = g_uri_parse_scheme (priv->proxy_uri);
+      priv->proxy_type = xuri_parse_scheme (priv->proxy_uri);
 
       if (priv->proxy_type == NULL)
 	continue;
 
       /* Assumes hostnames are supported for unknown protocols */
       priv->supports_hostname = TRUE;
-      proxy = g_proxy_get_default_for_protocol (priv->proxy_type);
+      proxy = xproxy_get_default_for_protocol (priv->proxy_type);
       if (proxy)
         {
-	  priv->supports_hostname = g_proxy_supports_hostname (proxy);
-	  g_object_unref (proxy);
+	  priv->supports_hostname = xproxy_supports_hostname (proxy);
+	  xobject_unref (proxy);
         }
 
       if (strcmp ("direct", priv->proxy_type) == 0)
 	{
 	  if (priv->connectable)
-	    connectable = g_object_ref (priv->connectable);
+	    connectable = xobject_ref (priv->connectable);
 	  else
 	    connectable = g_network_address_new (priv->dest_hostname,
 						 priv->dest_port);
@@ -148,7 +148,7 @@ next_enumerator (GProxyAddressEnumeratorPrivate *priv)
 	    {
 	      g_warning ("Invalid proxy URI '%s': %s",
 			 priv->proxy_uri, error->message);
-	      g_error_free (error);
+	      xerror_free (error);
 	    }
 
 	  save_userinfo (priv, priv->proxy_uri);
@@ -157,13 +157,13 @@ next_enumerator (GProxyAddressEnumeratorPrivate *priv)
       if (connectable)
 	{
 	  priv->addr_enum = xsocket_connectable_enumerate (connectable);
-	  g_object_unref (connectable);
+	  xobject_unref (connectable);
 	}
     }
 }
 
 static xsocket_address_t *
-g_proxy_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
+xproxy_address_enumerator_next (xsocket_address_enumerator_t  *enumerator,
 				 xcancellable_t              *cancellable,
 				 xerror_t                   **error)
 {
@@ -173,7 +173,7 @@ g_proxy_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
 
   if (priv->proxies == NULL)
     {
-      priv->proxies = g_proxy_resolver_lookup (priv->proxy_resolver,
+      priv->proxies = xproxy_resolver_lookup (priv->proxy_resolver,
 					       priv->dest_uri,
 					       cancellable,
 					       error);
@@ -187,9 +187,9 @@ g_proxy_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
     {
       xchar_t *dest_hostname;
       xchar_t *dest_protocol;
-      GInetSocketAddress *inetsaddr;
+      xinet_socket_address_t *inetsaddr;
       xinet_address_t *inetaddr;
-      guint16 port;
+      xuint16_t port;
 
       next_enumerator (priv);
 
@@ -206,7 +206,7 @@ g_proxy_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
 
       if (priv->proxy_address == NULL)
 	{
-	  g_object_unref (priv->addr_enum);
+	  xobject_unref (priv->addr_enum);
 	  priv->addr_enum = NULL;
 
 	  if (priv->dest_ips)
@@ -231,18 +231,18 @@ g_proxy_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
 
 	  if (!priv->dest_ips)
 	    {
-	      GResolver *resolver;
+	      xresolver_t *resolver;
 
 	      resolver = g_resolver_get_default();
 	      priv->dest_ips = g_resolver_lookup_by_name (resolver,
 							  priv->dest_hostname,
 							  cancellable,
 							  first_error ? NULL : &first_error);
-	      g_object_unref (resolver);
+	      xobject_unref (resolver);
 
 	      if (!priv->dest_ips)
 		{
-		  g_object_unref (priv->proxy_address);
+		  xobject_unref (priv->proxy_address);
 		  priv->proxy_address = NULL;
 		  continue;
 		}
@@ -254,13 +254,13 @@ g_proxy_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
 	  dest_ip = G_INET_ADDRESS (priv->next_dest_ip->data);
 	  dest_hostname = xinet_address_to_string (dest_ip);
 
-	  priv->next_dest_ip = g_list_next (priv->next_dest_ip);
+	  priv->next_dest_ip = xlist_next (priv->next_dest_ip);
 	}
       else
 	{
-	  dest_hostname = g_strdup (priv->dest_hostname);
+	  dest_hostname = xstrdup (priv->dest_hostname);
 	}
-      dest_protocol = g_uri_parse_scheme (priv->dest_uri);
+      dest_protocol = xuri_parse_scheme (priv->dest_uri);
 
       if (!X_IS_INET_SOCKET_ADDRESS (priv->proxy_address))
         {
@@ -273,7 +273,7 @@ g_proxy_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
       inetaddr = g_inet_socket_address_get_address (inetsaddr);
       port = g_inet_socket_address_get_port (inetsaddr);
 
-      result = g_object_new (XTYPE_PROXY_ADDRESS,
+      result = xobject_new (XTYPE_PROXY_ADDRESS,
 			     "address", inetaddr,
 			     "port", port,
 			     "protocol", priv->proxy_type,
@@ -289,7 +289,7 @@ g_proxy_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
 
       if (priv->supports_hostname || priv->next_dest_ip == NULL)
 	{
-	  g_object_unref (priv->proxy_address);
+	  xobject_unref (priv->proxy_address);
 	  priv->proxy_address = NULL;
 	}
     }
@@ -297,7 +297,7 @@ g_proxy_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
   if (result == NULL && first_error)
     g_propagate_error (error, first_error);
   else if (first_error)
-    g_error_free (first_error);
+    xerror_free (first_error);
 
   return result;
 }
@@ -305,25 +305,25 @@ g_proxy_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
 
 
 static void
-complete_async (GTask *task)
+complete_async (xtask_t *task)
 {
-  GProxyAddressEnumeratorPrivate *priv = g_task_get_task_data (task);
+  GProxyAddressEnumeratorPrivate *priv = xtask_get_task_data (task);
 
   if (priv->last_error)
     {
-      g_task_return_error (task, priv->last_error);
+      xtask_return_error (task, priv->last_error);
       priv->last_error = NULL;
     }
   else
-    g_task_return_pointer (task, NULL, NULL);
+    xtask_return_pointer (task, NULL, NULL);
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 static void
-return_result (GTask *task)
+return_result (xtask_t *task)
 {
-  GProxyAddressEnumeratorPrivate *priv = g_task_get_task_data (task);
+  GProxyAddressEnumeratorPrivate *priv = xtask_get_task_data (task);
   xsocket_address_t *result;
 
   if (strcmp ("direct", priv->proxy_type) == 0)
@@ -334,9 +334,9 @@ return_result (GTask *task)
   else
     {
       xchar_t *dest_hostname, *dest_protocol;
-      GInetSocketAddress *inetsaddr;
+      xinet_socket_address_t *inetsaddr;
       xinet_address_t *inetaddr;
-      guint16 port;
+      xuint16_t port;
 
       if (!priv->supports_hostname)
 	{
@@ -348,13 +348,13 @@ return_result (GTask *task)
 	  dest_ip = G_INET_ADDRESS (priv->next_dest_ip->data);
 	  dest_hostname = xinet_address_to_string (dest_ip);
 
-	  priv->next_dest_ip = g_list_next (priv->next_dest_ip);
+	  priv->next_dest_ip = xlist_next (priv->next_dest_ip);
 	}
       else
 	{
-	  dest_hostname = g_strdup (priv->dest_hostname);
+	  dest_hostname = xstrdup (priv->dest_hostname);
 	}
-      dest_protocol = g_uri_parse_scheme (priv->dest_uri);
+      dest_protocol = xuri_parse_scheme (priv->dest_uri);
 
       if (!X_IS_INET_SOCKET_ADDRESS (priv->proxy_address))
         {
@@ -367,7 +367,7 @@ return_result (GTask *task)
       inetaddr = g_inet_socket_address_get_address (inetsaddr);
       port = g_inet_socket_address_get_port (inetsaddr);
 
-      result = g_object_new (XTYPE_PROXY_ADDRESS,
+      result = xobject_new (XTYPE_PROXY_ADDRESS,
 			     "address", inetaddr,
 			     "port", port,
 			     "protocol", priv->proxy_type,
@@ -383,13 +383,13 @@ return_result (GTask *task)
 
       if (priv->supports_hostname || priv->next_dest_ip == NULL)
 	{
-	  g_object_unref (priv->proxy_address);
+	  xobject_unref (priv->proxy_address);
 	  priv->proxy_address = NULL;
 	}
     }
 
-  g_task_return_pointer (task, result, g_object_unref);
-  g_object_unref (task);
+  xtask_return_pointer (task, result, xobject_unref);
+  xobject_unref (task);
 }
 
 static void address_enumerate_cb (xobject_t      *object,
@@ -397,13 +397,13 @@ static void address_enumerate_cb (xobject_t      *object,
 				  xpointer_t	user_data);
 
 static void
-next_proxy (GTask *task)
+next_proxy (xtask_t *task)
 {
-  GProxyAddressEnumeratorPrivate *priv = g_task_get_task_data (task);
+  GProxyAddressEnumeratorPrivate *priv = xtask_get_task_data (task);
 
   if (*priv->next_proxy)
     {
-      g_object_unref (priv->addr_enum);
+      xobject_unref (priv->addr_enum);
       priv->addr_enum = NULL;
 
       if (priv->dest_ips)
@@ -417,7 +417,7 @@ next_proxy (GTask *task)
       if (priv->addr_enum)
 	{
 	  xsocket_address_enumerator_next_async (priv->addr_enum,
-						  g_task_get_cancellable (task),
+						  xtask_get_cancellable (task),
 						  address_enumerate_cb,
 						  task);
 	  return;
@@ -432,8 +432,8 @@ dest_hostname_lookup_cb (xobject_t           *object,
 			 xasync_result_t      *result,
 			 xpointer_t           user_data)
 {
-  GTask *task = user_data;
-  GProxyAddressEnumeratorPrivate *priv = g_task_get_task_data (task);
+  xtask_t *task = user_data;
+  GProxyAddressEnumeratorPrivate *priv = xtask_get_task_data (task);
 
   g_clear_error (&priv->last_error);
   priv->dest_ips = g_resolver_lookup_by_name_finish (G_RESOLVER (object),
@@ -453,8 +453,8 @@ address_enumerate_cb (xobject_t	   *object,
 		      xasync_result_t *result,
 		      xpointer_t	    user_data)
 {
-  GTask *task = user_data;
-  GProxyAddressEnumeratorPrivate *priv = g_task_get_task_data (task);
+  xtask_t *task = user_data;
+  GProxyAddressEnumeratorPrivate *priv = xtask_get_task_data (task);
 
   g_clear_error (&priv->last_error);
   priv->proxy_address =
@@ -465,14 +465,14 @@ address_enumerate_cb (xobject_t	   *object,
     {
       if (!priv->supports_hostname && !priv->dest_ips)
 	{
-	  GResolver *resolver;
+	  xresolver_t *resolver;
 	  resolver = g_resolver_get_default();
 	  g_resolver_lookup_by_name_async (resolver,
 					   priv->dest_hostname,
-					   g_task_get_cancellable (task),
+					   xtask_get_cancellable (task),
 					   dest_hostname_lookup_cb,
 					   task);
-	  g_object_unref (resolver);
+	  xobject_unref (resolver);
 	  return;
 	}
 
@@ -487,11 +487,11 @@ proxy_lookup_cb (xobject_t      *object,
 		 xasync_result_t *result,
 		 xpointer_t      user_data)
 {
-  GTask *task = user_data;
-  GProxyAddressEnumeratorPrivate *priv = g_task_get_task_data (task);
+  xtask_t *task = user_data;
+  GProxyAddressEnumeratorPrivate *priv = xtask_get_task_data (task);
 
   g_clear_error (&priv->last_error);
-  priv->proxies = g_proxy_resolver_lookup_finish (G_PROXY_RESOLVER (object),
+  priv->proxies = xproxy_resolver_lookup_finish (G_PROXY_RESOLVER (object),
 						  result,
 						  &priv->last_error);
   priv->next_proxy = priv->proxies;
@@ -507,7 +507,7 @@ proxy_lookup_cb (xobject_t      *object,
       if (priv->addr_enum)
 	{
 	  xsocket_address_enumerator_next_async (priv->addr_enum,
-						  g_task_get_cancellable (task),
+						  xtask_get_cancellable (task),
 						  address_enumerate_cb,
 						  task);
 	  return;
@@ -518,21 +518,21 @@ proxy_lookup_cb (xobject_t      *object,
 }
 
 static void
-g_proxy_address_enumerator_next_async (GSocketAddressEnumerator *enumerator,
+xproxy_address_enumerator_next_async (xsocket_address_enumerator_t *enumerator,
 				       xcancellable_t             *cancellable,
 				       xasync_ready_callback_t       callback,
 				       xpointer_t                  user_data)
 {
   GProxyAddressEnumeratorPrivate *priv = GET_PRIVATE (enumerator);
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (enumerator, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_proxy_address_enumerator_next_async);
-  g_task_set_task_data (task, priv, NULL);
+  task = xtask_new (enumerator, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xproxy_address_enumerator_next_async);
+  xtask_set_task_data (task, priv, NULL);
 
   if (priv->proxies == NULL)
     {
-      g_proxy_resolver_lookup_async (priv->proxy_resolver,
+      xproxy_resolver_lookup_async (priv->proxy_resolver,
 				     priv->dest_uri,
 				     cancellable,
 				     proxy_lookup_cb,
@@ -561,20 +561,20 @@ g_proxy_address_enumerator_next_async (GSocketAddressEnumerator *enumerator,
 }
 
 static xsocket_address_t *
-g_proxy_address_enumerator_next_finish (GSocketAddressEnumerator  *enumerator,
+xproxy_address_enumerator_next_finish (xsocket_address_enumerator_t  *enumerator,
 					xasync_result_t              *result,
 					xerror_t                   **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, enumerator), NULL);
+  g_return_val_if_fail (xtask_is_valid (result, enumerator), NULL);
 
-  return g_task_propagate_pointer (G_TASK (result), error);
+  return xtask_propagate_pointer (XTASK (result), error);
 }
 
 static void
-g_proxy_address_enumerator_constructed (xobject_t *object)
+xproxy_address_enumerator_constructed (xobject_t *object)
 {
   GProxyAddressEnumeratorPrivate *priv = GET_PRIVATE (object);
-  GSocketConnectable *conn;
+  xsocket_connectable_t *conn;
   xuint_t port;
 
   if (priv->dest_uri)
@@ -582,44 +582,44 @@ g_proxy_address_enumerator_constructed (xobject_t *object)
       conn = g_network_address_parse_uri (priv->dest_uri, priv->default_port, NULL);
       if (conn)
         {
-          g_object_get (conn,
+          xobject_get (conn,
                         "hostname", &priv->dest_hostname,
                         "port", &port,
                         NULL);
           priv->dest_port = port;
 
-          g_object_unref (conn);
+          xobject_unref (conn);
         }
       else
         g_warning ("Invalid URI '%s'", priv->dest_uri);
     }
 
-  G_OBJECT_CLASS (g_proxy_address_enumerator_parent_class)->constructed (object);
+  G_OBJECT_CLASS (xproxy_address_enumerator_parent_class)->constructed (object);
 }
 
 static void
-g_proxy_address_enumerator_get_property (xobject_t        *object,
+xproxy_address_enumerator_get_property (xobject_t        *object,
                                          xuint_t           property_id,
-                                         GValue         *value,
-                                         GParamSpec     *pspec)
+                                         xvalue_t         *value,
+                                         xparam_spec_t     *pspec)
 {
   GProxyAddressEnumeratorPrivate *priv = GET_PRIVATE (object);
   switch (property_id)
     {
     case PROP_URI:
-      g_value_set_string (value, priv->dest_uri);
+      xvalue_set_string (value, priv->dest_uri);
       break;
 
     case PROP_DEFAULT_PORT:
-      g_value_set_uint (value, priv->default_port);
+      xvalue_set_uint (value, priv->default_port);
       break;
 
     case PROP_CONNECTABLE:
-      g_value_set_object (value, priv->connectable);
+      xvalue_set_object (value, priv->connectable);
       break;
 
     case PROP_PROXY_RESOLVER:
-      g_value_set_object (value, priv->proxy_resolver);
+      xvalue_set_object (value, priv->proxy_resolver);
       break;
 
     default:
@@ -628,33 +628,33 @@ g_proxy_address_enumerator_get_property (xobject_t        *object,
 }
 
 static void
-g_proxy_address_enumerator_set_property (xobject_t        *object,
+xproxy_address_enumerator_set_property (xobject_t        *object,
                                          xuint_t           property_id,
-                                         const GValue   *value,
-                                         GParamSpec     *pspec)
+                                         const xvalue_t   *value,
+                                         xparam_spec_t     *pspec)
 {
   GProxyAddressEnumeratorPrivate *priv = GET_PRIVATE (object);
   switch (property_id)
     {
     case PROP_URI:
-      priv->dest_uri = g_value_dup_string (value);
+      priv->dest_uri = xvalue_dup_string (value);
       break;
 
     case PROP_DEFAULT_PORT:
-      priv->default_port = g_value_get_uint (value);
+      priv->default_port = xvalue_get_uint (value);
       break;
 
     case PROP_CONNECTABLE:
-      priv->connectable = g_value_dup_object (value);
+      priv->connectable = xvalue_dup_object (value);
       break;
 
     case PROP_PROXY_RESOLVER:
       if (priv->proxy_resolver)
-        g_object_unref (priv->proxy_resolver);
-      priv->proxy_resolver = g_value_get_object (value);
+        xobject_unref (priv->proxy_resolver);
+      priv->proxy_resolver = xvalue_get_object (value);
       if (!priv->proxy_resolver)
-        priv->proxy_resolver = g_proxy_resolver_get_default ();
-      g_object_ref (priv->proxy_resolver);
+        priv->proxy_resolver = xproxy_resolver_get_default ();
+      xobject_ref (priv->proxy_resolver);
       break;
 
     default:
@@ -663,15 +663,15 @@ g_proxy_address_enumerator_set_property (xobject_t        *object,
 }
 
 static void
-g_proxy_address_enumerator_finalize (xobject_t *object)
+xproxy_address_enumerator_finalize (xobject_t *object)
 {
   GProxyAddressEnumeratorPrivate *priv = GET_PRIVATE (object);
 
   if (priv->connectable)
-    g_object_unref (priv->connectable);
+    xobject_unref (priv->connectable);
 
   if (priv->proxy_resolver)
-    g_object_unref (priv->proxy_resolver);
+    xobject_unref (priv->proxy_resolver);
 
   g_free (priv->dest_uri);
   g_free (priv->dest_hostname);
@@ -679,10 +679,10 @@ g_proxy_address_enumerator_finalize (xobject_t *object)
   if (priv->dest_ips)
     g_resolver_free_addresses (priv->dest_ips);
 
-  g_strfreev (priv->proxies);
+  xstrfreev (priv->proxies);
 
   if (priv->addr_enum)
-    g_object_unref (priv->addr_enum);
+    xobject_unref (priv->addr_enum);
 
   g_free (priv->proxy_type);
   g_free (priv->proxy_username);
@@ -690,31 +690,31 @@ g_proxy_address_enumerator_finalize (xobject_t *object)
 
   g_clear_error (&priv->last_error);
 
-  G_OBJECT_CLASS (g_proxy_address_enumerator_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xproxy_address_enumerator_parent_class)->finalize (object);
 }
 
 static void
-g_proxy_address_enumerator_init (GProxyAddressEnumerator *self)
+xproxy_address_enumerator_init (xproxy_address_enumerator_t *self)
 {
-  self->priv = g_proxy_address_enumerator_get_instance_private (self);
+  self->priv = xproxy_address_enumerator_get_instance_private (self);
 }
 
 static void
-g_proxy_address_enumerator_class_init (GProxyAddressEnumeratorClass *proxy_enumerator_class)
+xproxy_address_enumerator_class_init (GProxyAddressEnumeratorClass *proxy_enumerator_class)
 {
   xobject_class_t *object_class = G_OBJECT_CLASS (proxy_enumerator_class);
   GSocketAddressEnumeratorClass *enumerator_class = XSOCKET_ADDRESS_ENUMERATOR_CLASS (proxy_enumerator_class);
 
-  object_class->constructed = g_proxy_address_enumerator_constructed;
-  object_class->set_property = g_proxy_address_enumerator_set_property;
-  object_class->get_property = g_proxy_address_enumerator_get_property;
-  object_class->finalize = g_proxy_address_enumerator_finalize;
+  object_class->constructed = xproxy_address_enumerator_constructed;
+  object_class->set_property = xproxy_address_enumerator_set_property;
+  object_class->get_property = xproxy_address_enumerator_get_property;
+  object_class->finalize = xproxy_address_enumerator_finalize;
 
-  enumerator_class->next = g_proxy_address_enumerator_next;
-  enumerator_class->next_async = g_proxy_address_enumerator_next_async;
-  enumerator_class->next_finish = g_proxy_address_enumerator_next_finish;
+  enumerator_class->next = xproxy_address_enumerator_next;
+  enumerator_class->next_async = xproxy_address_enumerator_next_async;
+  enumerator_class->next_finish = xproxy_address_enumerator_next_finish;
 
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
 				   PROP_URI,
 				   g_param_spec_string ("uri",
 							P_("URI"),
@@ -725,14 +725,14 @@ g_proxy_address_enumerator_class_init (GProxyAddressEnumeratorClass *proxy_enume
 							G_PARAM_STATIC_STRINGS));
 
   /**
-   * GProxyAddressEnumerator:default-port:
+   * xproxy_address_enumerator_t:default-port:
    *
-   * The default port to use if #GProxyAddressEnumerator:uri does not
+   * The default port to use if #xproxy_address_enumerator_t:uri does not
    * specify one.
    *
    * Since: 2.38
    */
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
 				   PROP_DEFAULT_PORT,
 				   g_param_spec_uint ("default-port",
                                                       P_("Default port"),
@@ -742,7 +742,7 @@ g_proxy_address_enumerator_class_init (GProxyAddressEnumeratorClass *proxy_enume
                                                       G_PARAM_CONSTRUCT_ONLY |
                                                       G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
 				   PROP_CONNECTABLE,
 				   g_param_spec_object ("connectable",
 							P_("Connectable"),
@@ -753,13 +753,13 @@ g_proxy_address_enumerator_class_init (GProxyAddressEnumeratorClass *proxy_enume
 							G_PARAM_STATIC_STRINGS));
 
   /**
-   * GProxyAddressEnumerator:proxy-resolver:
+   * xproxy_address_enumerator_t:proxy-resolver:
    *
    * The proxy resolver to use.
    *
    * Since: 2.36
    */
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_PROXY_RESOLVER,
                                    g_param_spec_object ("proxy-resolver",
                                                         P_("Proxy resolver"),

@@ -26,17 +26,17 @@ G_BEGIN_DECLS
 
 #define XTYPE_DBUS_MENU_MODEL          (g_dbus_menu_model_get_type ())
 #define G_DBUS_MENU_MODEL(inst)         (XTYPE_CHECK_INSTANCE_CAST ((inst),   \
-                                         XTYPE_DBUS_MENU_MODEL, GDBusMenuModel))
+                                         XTYPE_DBUS_MENU_MODEL, xdbus_menu_model))
 #define X_IS_DBUS_MENU_MODEL(inst)      (XTYPE_CHECK_INSTANCE_TYPE ((inst),   \
                                          XTYPE_DBUS_MENU_MODEL))
 
-typedef struct _GDBusMenuModel GDBusMenuModel;
+typedef struct _GDBusMenuModel xdbus_menu_model_t;
 
 XPL_AVAILABLE_IN_ALL
 xtype_t                   g_dbus_menu_model_get_type     (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GDBusMenuModel *        g_dbus_menu_model_get          (GDBusConnection *connection,
+xdbus_menu_model_t *        g_dbus_menu_model_get          (xdbus_connection_t *connection,
                                                         const xchar_t     *bus_name,
                                                         const xchar_t     *object_path);
 

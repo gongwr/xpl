@@ -42,7 +42,7 @@
 	Memcheck:Leak
 	match-leak-kinds:reachable
 	fun:g_once_impl
-	fun:g_tls_backend_gnutls_init
+	fun:xtls_backend_gnutls_init
 }
 
 {
@@ -117,7 +117,7 @@
 	match-leak-kinds:reachable
 	fun:malloc
 	...
-	fun:g_type_register_dynamic
+	fun:xtype_register_dynamic
 }
 
 {
@@ -126,7 +126,7 @@
 	match-leak-kinds:possible,reachable
 	fun:malloc
 	...
-	fun:g_type_register_static
+	fun:xtype_register_static
 }
 
 {
@@ -135,7 +135,7 @@
 	match-leak-kinds:possible,reachable
 	fun:realloc
 	...
-	fun:g_type_register_static
+	fun:xtype_register_static
 }
 
 {
@@ -144,7 +144,7 @@
 	match-leak-kinds:possible,reachable
 	fun:calloc
 	...
-	fun:g_type_register_static
+	fun:xtype_register_static
 }
 
 {
@@ -153,7 +153,7 @@
 	match-leak-kinds:possible,reachable
 	fun:malloc
 	...
-	fun:g_type_register_fundamental
+	fun:xtype_register_fundamental
 }
 
 {
@@ -162,7 +162,7 @@
 	match-leak-kinds:possible,reachable
 	fun:calloc
 	...
-	fun:g_type_register_fundamental
+	fun:xtype_register_fundamental
 }
 
 {
@@ -171,7 +171,7 @@
 	match-leak-kinds:reachable
 	fun:malloc
 	...
-	fun:g_type_add_interface_dynamic
+	fun:xtype_add_interface_dynamic
 }
 
 {
@@ -180,7 +180,7 @@
 	match-leak-kinds:reachable
 	fun:malloc
 	...
-	fun:g_type_add_interface_static
+	fun:xtype_add_interface_static
 }
 
 {
@@ -189,7 +189,7 @@
 	match-leak-kinds:reachable
 	fun:realloc
 	...
-	fun:g_type_add_interface_static
+	fun:xtype_add_interface_static
 }
 
 {
@@ -198,7 +198,7 @@
 	match-leak-kinds:reachable
 	fun:calloc
 	...
-	fun:g_type_add_interface_static
+	fun:xtype_add_interface_static
 }
 
 {
@@ -228,7 +228,7 @@
 	g-quark-table-new
 	Memcheck:Leak
 	match-leak-kinds:reachable
-	fun:g_hash_table_new
+	fun:xhash_table_new
 	...
 	fun:quark_new
 }
@@ -238,7 +238,7 @@
 	Memcheck:Leak
 	match-leak-kinds:reachable
 	...
-	fun:g_hash_table_resize
+	fun:xhash_table_resize
 	...
 	fun:quark_new
 }
@@ -265,7 +265,7 @@
 	g-type-class-init
 	Memcheck:Leak
 	match-leak-kinds:reachable
-	fun:g_type_create_instance
+	fun:xtype_create_instance
 	...
 	fun:type_class_init_Wm
 }
@@ -295,7 +295,7 @@
 	match-leak-kinds:reachable
 	fun:malloc
 	...
-	fun:g_type_add_interface_check
+	fun:xtype_add_interface_check
 	...
 	fun:type_class_init_Wm
 }
@@ -306,7 +306,7 @@
 	match-leak-kinds:reachable
 	fun:realloc
 	...
-	fun:g_type_add_interface_check
+	fun:xtype_add_interface_check
 	...
 	fun:type_class_init_Wm
 }
@@ -351,8 +351,8 @@
 	match-leak-kinds:reachable
 	fun:malloc
 	...
-	fun:g_slist_copy
-	fun:g_object_base_class_init
+	fun:xslist_copy
+	fun:xobject_base_class_init
 	fun:type_class_init_Wm
 }
 
@@ -363,7 +363,7 @@
         ...
         fun:type_class_init_Wm
         ...
-        fun:g_type_class_ref
+        fun:xtype_class_ref
 }
 
 {
@@ -373,7 +373,7 @@
 	...
 	fun:UnknownInlinedFun
 	...
-	fun:g_type_class_ref
+	fun:xtype_class_ref
 }
 
 {
@@ -382,7 +382,7 @@
 	match-leak-kinds:reachable
 	fun:malloc
 	...
-	fun:g_type_create_instance
+	fun:xtype_create_instance
 	...
 	fun:_xio_module_get_default
 }
@@ -393,18 +393,18 @@
 	match-leak-kinds:reachable
 	fun:calloc
 	...
-	fun:g_type_create_instance
+	fun:xtype_create_instance
 	...
 	fun:_xio_module_get_default
 }
 
-# This one seems to show up sometimes with g_type_create_instance() at the top
+# This one seems to show up sometimes with xtype_create_instance() at the top
 # of the stack, as well.
 {
 	g-io-module-default-singleton
 	Memcheck:Leak
 	match-leak-kinds:reachable
-	fun:g_type_create_instance
+	fun:xtype_create_instance
 	...
 	fun:_xio_module_get_default
 }
@@ -426,7 +426,7 @@
 	match-leak-kinds:reachable
 	fun:malloc
 	...
-	fun:g_strdup
+	fun:xstrdup
 	...
 	fun:_xio_module_get_default*
 }
@@ -517,9 +517,9 @@
 	match-leak-kinds:possible,reachable,definite
 	fun:malloc
 	...
-	fun:g_thread_new
+	fun:xthread_new
 	...
-	fun:g_task_thread_pool_init
+	fun:xtask_thread_pool_init
 }
 
 {
@@ -528,7 +528,7 @@
 	match-leak-kinds:reachable
 	fun:calloc
 	...
-	fun:g_proxy_resolver_gnome_init
+	fun:xproxy_resolver_gnome_init
 	...
 	fun:_xio_module_get_default
 }
@@ -582,23 +582,23 @@
 {
 	g-type-construct-free
 	drd:ConflictingAccess
-	fun:g_type_free_instance
+	fun:xtype_free_instance
 }
 {
 	g-type-construct-free-helgrind
 	Helgrind:Race
-	fun:g_type_free_instance
+	fun:xtype_free_instance
 }
 
 {
 	g-variant-unref
 	drd:ConflictingAccess
-	fun:g_variant_unref
+	fun:xvariant_unref
 }
 {
 	g-variant-unref-helgrind
 	Helgrind:Race
-	fun:g_variant_unref
+	fun:xvariant_unref
 }
 
 {
@@ -659,34 +659,34 @@
 {
 	g-type-fundamental
 	drd:ConflictingAccess
-	fun:g_type_fundamental
+	fun:xtype_fundamental
 }
 {
 	g-type-fundamental-helgrind
 	Helgrind:Race
-	fun:g_type_fundamental
+	fun:xtype_fundamental
 }
 {
 	g-type-class-peek-static
 	drd:ConflictingAccess
-	fun:g_type_class_peek_static
+	fun:xtype_class_peek_static
 }
 {
 	g-type-class-peek-static-helgrind
 	Helgrind:Race
-	fun:g_type_class_peek_static
+	fun:xtype_class_peek_static
 }
 {
 	g-type-is-a
 	drd:ConflictingAccess
 	...
-	fun:g_type_is_a
+	fun:xtype_is_a
 }
 {
 	g-type-is-a-helgrind
 	Helgrind:Race
 	...
-	fun:g_type_is_a
+	fun:xtype_is_a
 }
 
 {
@@ -721,20 +721,20 @@
 {
 	g-source-set-ready-time
 	drd:ConflictingAccess
-	fun:g_source_set_ready_time
+	fun:xsource_set_ready_time
 }
 {
 	g-source-set-ready-time-helgrind
 	Helgrind:Race
-	fun:g_source_set_ready_time
+	fun:xsource_set_ready_time
 }
 
 {
 	g-source-iter-next
 	Helgrind:Race
-	fun:g_source_iter_next
-	fun:g_main_context_*
-	fun:g_main_context_iterate
+	fun:xsource_iter_next
+	fun:xmain_context_*
+	fun:xmain_context_iterate
 }
 
 {
@@ -754,14 +754,14 @@
 	drd:CondErr
 	...
 	fun:g_cond_signal
-	fun:g_task_thread_complete
+	fun:xtask_thread_complete
 }
 {
 	g-task-thread-complete
 	Helgrind:Misc
 	...
 	fun:g_cond_signal
-	fun:g_task_thread_complete
+	fun:xtask_thread_complete
 }
 
 # False positive, but I can't explain how (FIXME)
@@ -770,7 +770,7 @@
 	Helgrind:Misc
 	...
 	fun:g_cond_clear
-	fun:g_task_finalize
+	fun:xtask_finalize
 }
 
 # Real race, but is_cancelled() is an opportunistic function anyway
@@ -786,34 +786,34 @@
 	Helgrind:Misc
 	...
 	fun:g_cond_clear
-	fun:g_main_context_unref
+	fun:xmain_context_unref
 }
 
 # False positives
 {
 	g-source-unlocked
 	Helgrind:Race
-	fun:g_source_*_unlocked
+	fun:xsource_*_unlocked
 }
 {
 	g-source-internal
 	Helgrind:Race
-	fun:g_source_*_internal
+	fun:xsource_*_internal
 }
 
 # False positive
 {
-	g_object_real_dispose
+	xobject_real_dispose
 	Helgrind:Race
-	fun:g_object_real_dispose
+	fun:xobject_real_dispose
 }
 
 # False positive
 {
-	g_object_new_valist
+	xobject_new_valist
 	Helgrind:Race
 	...
-	fun:g_object_new_valist
+	fun:xobject_new_valist
 }
 
 # g_set_user_dirs() deliberately leaks the previous cached g_get_user_*() values.
@@ -914,15 +914,15 @@
 	fun:g_io_extension_point_register
 }
 
-# g_strerror() caches a one-time allocation global table of @errors.
+# xstrerror() caches a one-time allocation global table of @errors.
 {
-	g_strerror
+	xstrerror
 	Memcheck:Leak
 	match-leak-kinds:reachable
 	fun:malloc
 	...
 	fun:g_locale_to_utf8
-	fun:g_strerror
+	fun:xstrerror
 }
 
 # xsocket_connection_factory_register_type() caches a one-time allocation global table of @connection_types.
@@ -983,57 +983,57 @@
 	fun:g_private_impl_new
 }
 
-# Thread-private GMainContext stack
+# Thread-private xmain_context_t stack
 {
-	g_main_context_push_thread_default
+	xmain_context_push_thread_default
 	Memcheck:Leak
 	match-leak-kinds:definite,reachable
 	fun:malloc
 	...
 	fun:g_queue_new
-	fun:g_main_context_push_thread_default
+	fun:xmain_context_push_thread_default
 }
 
-# One-time allocations for #GFileInfo attribute cache
+# One-time allocations for #xfile_info_t attribute cache
 {
-	g_file_info_attribute_cache
+	xfile_info_attribute_cache
 	Memcheck:Leak
 	match-leak-kinds:reachable
 	fun:malloc
 	...
 	fun:ensure_attribute_hash
 	...
-	fun:g_file_*
+	fun:xfile_*
 }
 {
-	g_file_info_attribute_cache2
+	xfile_info_attribute_cache2
 	Memcheck:Leak
 	match-leak-kinds:reachable
 	fun:calloc
 	...
 	fun:ensure_attribute_hash
 	...
-	fun:g_file_*
+	fun:xfile_*
 }
 {
-	g_file_info_attribute_cache3
+	xfile_info_attribute_cache3
 	Memcheck:Leak
 	match-leak-kinds:reachable
 	fun:malloc
 	...
 	fun:lookup_namespace
 	...
-	fun:g_file_*
+	fun:xfile_*
 }
 {
-	g_file_info_attribute_cache4
+	xfile_info_attribute_cache4
 	Memcheck:Leak
 	match-leak-kinds:reachable
 	fun:calloc
 	...
 	fun:lookup_namespace
 	...
-	fun:g_file_*
+	fun:xfile_*
 }
 
 # Cached charset
@@ -1057,14 +1057,14 @@
 
 # Global unused thread queue
 {
-	g_thread_pool_unused_thread_queue
+	xthread_pool_unused_thread_queue
 	Memcheck:Leak
 	match-leak-kinds:reachable
 	fun:malloc
 	...
 	fun:g_async_queue_new_full
 	...
-	fun:g_thread_pool_new
+	fun:xthread_pool_new
 }
 
 # One-time program name storage
@@ -1079,25 +1079,25 @@
 
 # Error domains hash
 {
-	g_error_init
+	xerror_init
 	Memcheck:Leak
 	match-leak-kinds: reachable
 	fun:malloc
 	...
-	fun:g_hash_table_new_full
-	fun:g_error_init
+	fun:xhash_table_new_full
+	fun:xerror_init
 }
 
 # Error domain static registration
 {
-	g_error_domain_register_static
+	xerror_domain_register_static
 	Memcheck:Leak
 	match-leak-kinds: reachable
 	fun:malloc
 	...
-	fun:g_hash_table_insert
+	fun:xhash_table_insert
 	fun:error_domain_register
-	fun:g_error_domain_register_static
+	fun:xerror_domain_register_static
 }
 
 {
@@ -1106,6 +1106,6 @@
 	match-leak-kinds:reachable
 	fun:malloc
 	...
-	fun:g_hash_table_insert
+	fun:xhash_table_insert
 	fun:quark_new
 }

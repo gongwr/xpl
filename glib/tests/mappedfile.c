@@ -19,32 +19,32 @@
 static void
 test_basic (void)
 {
-  GMappedFile *file;
+  xmapped_file_t *file;
   xerror_t *error;
 
   error = NULL;
-  file = g_mapped_file_new (g_test_get_filename (G_TEST_DIST, "empty", NULL), FALSE, &error);
+  file = xmapped_file_new (g_test_get_filename (G_TEST_DIST, "empty", NULL), FALSE, &error);
   g_assert_no_error (error);
 
-  g_mapped_file_ref (file);
-  g_mapped_file_unref (file);
+  xmapped_file_ref (file);
+  xmapped_file_unref (file);
 
-  g_mapped_file_unref (file);
+  xmapped_file_unref (file);
 }
 
 static void
 test_empty (void)
 {
-  GMappedFile *file;
+  xmapped_file_t *file;
   xerror_t *error;
 
   error = NULL;
-  file = g_mapped_file_new (g_test_get_filename (G_TEST_DIST, "empty", NULL), FALSE, &error);
+  file = xmapped_file_new (g_test_get_filename (G_TEST_DIST, "empty", NULL), FALSE, &error);
   g_assert_no_error (error);
 
-  g_assert_null (g_mapped_file_get_contents (file));
+  g_assert_null (xmapped_file_get_contents (file));
 
-  g_mapped_file_free (file);
+  xmapped_file_free (file);
 }
 
 #ifdef G_OS_UNIX
@@ -52,26 +52,26 @@ static void
 test_device (void)
 {
   xerror_t *error = NULL;
-  GMappedFile *file;
+  xmapped_file_t *file;
 
-  file = g_mapped_file_new ("/dev/null", FALSE, &error);
-  g_assert_true (g_error_matches (error, G_FILE_ERROR, G_FILE_ERROR_INVAL) ||
-                 g_error_matches (error, G_FILE_ERROR, G_FILE_ERROR_NODEV) ||
-                 g_error_matches (error, G_FILE_ERROR, G_FILE_ERROR_NOMEM));
+  file = xmapped_file_new ("/dev/null", FALSE, &error);
+  g_assert_true (xerror_matches (error, XFILE_ERROR, XFILE_ERROR_INVAL) ||
+                 xerror_matches (error, XFILE_ERROR, XFILE_ERROR_NODEV) ||
+                 xerror_matches (error, XFILE_ERROR, XFILE_ERROR_NOMEM));
   g_assert_null (file);
-  g_error_free (error);
+  xerror_free (error);
 }
 #endif
 
 static void
 test_nonexisting (void)
 {
-  GMappedFile *file;
+  xmapped_file_t *file;
   xerror_t *error;
 
   error = NULL;
-  file = g_mapped_file_new ("no-such-file", FALSE, &error);
-  g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_NOENT);
+  file = xmapped_file_new ("no-such-file", FALSE, &error);
+  g_assert_error (error, XFILE_ERROR, XFILE_ERROR_NOENT);
   g_clear_error (&error);
   g_assert_null (file);
 }
@@ -79,7 +79,7 @@ test_nonexisting (void)
 static void
 test_writable (void)
 {
-  GMappedFile *file;
+  xmapped_file_t *file;
   xerror_t *error = NULL;
   xchar_t *contents;
   xsize_t len;
@@ -89,32 +89,32 @@ test_writable (void)
 
   tmp_copy_path = g_build_filename (g_get_tmp_dir (), "glib-test-4096-random-bytes", NULL);
 
-  g_file_get_contents (g_test_get_filename (G_TEST_DIST, "4096-random-bytes", NULL), &contents, &len, &error);
+  xfile_get_contents (g_test_get_filename (G_TEST_DIST, "4096-random-bytes", NULL), &contents, &len, &error);
   g_assert_no_error (error);
-  g_file_set_contents (tmp_copy_path, contents, len, &error);
+  xfile_set_contents (tmp_copy_path, contents, len, &error);
   g_assert_no_error (error);
 
   g_free (contents);
 
-  file = g_mapped_file_new (tmp_copy_path, TRUE, &error);
+  file = xmapped_file_new (tmp_copy_path, TRUE, &error);
   g_assert_no_error (error);
 
-  contents = g_mapped_file_get_contents (file);
+  contents = xmapped_file_get_contents (file);
   g_assert_cmpuint (strncmp (contents, old, strlen (old)), ==, 0);
 
   memcpy (contents, new, strlen (new));
   g_assert_cmpuint (strncmp (contents, new, strlen (new)), ==, 0);
 
-  g_mapped_file_free (file);
+  xmapped_file_free (file);
 
   error = NULL;
-  file = g_mapped_file_new (tmp_copy_path, FALSE, &error);
+  file = xmapped_file_new (tmp_copy_path, FALSE, &error);
   g_assert_no_error (error);
 
-  contents = g_mapped_file_get_contents (file);
+  contents = xmapped_file_get_contents (file);
   g_assert_cmpuint (strncmp (contents, old, strlen (old)), ==, 0);
 
-  g_mapped_file_free (file);
+  xmapped_file_free (file);
 
   g_free (tmp_copy_path);
 }
@@ -122,7 +122,7 @@ test_writable (void)
 static void
 test_writable_fd (void)
 {
-  GMappedFile *file;
+  xmapped_file_t *file;
   xerror_t *error = NULL;
   xchar_t *contents;
   const xchar_t *old = "MMMMMMMMMMMMMMMMMMMMMMMMM";
@@ -133,37 +133,37 @@ test_writable_fd (void)
 
   tmp_copy_path = g_build_filename (g_get_tmp_dir (), "glib-test-4096-random-bytes", NULL);
 
-  g_file_get_contents (g_test_get_filename (G_TEST_DIST, "4096-random-bytes", NULL), &contents, &len, &error);
+  xfile_get_contents (g_test_get_filename (G_TEST_DIST, "4096-random-bytes", NULL), &contents, &len, &error);
   g_assert_no_error (error);
-  g_file_set_contents (tmp_copy_path, contents, len, &error);
+  xfile_set_contents (tmp_copy_path, contents, len, &error);
   g_assert_no_error (error);
 
   g_free (contents);
 
   fd = g_open (tmp_copy_path, O_RDWR, 0);
   g_assert_cmpint (fd, !=, -1);
-  file = g_mapped_file_new_from_fd (fd, TRUE, &error);
+  file = xmapped_file_new_from_fd (fd, TRUE, &error);
   g_assert_no_error (error);
 
-  contents = g_mapped_file_get_contents (file);
+  contents = xmapped_file_get_contents (file);
   g_assert_cmpuint (strncmp (contents, old, strlen (old)), ==, 0);
 
   memcpy (contents, new, strlen (new));
   g_assert_cmpuint (strncmp (contents, new, strlen (new)), ==, 0);
 
-  g_mapped_file_free (file);
+  xmapped_file_free (file);
   close (fd);
 
   error = NULL;
   fd = g_open (tmp_copy_path, O_RDWR, 0);
   g_assert_cmpint (fd, !=, -1);
-  file = g_mapped_file_new_from_fd (fd, TRUE, &error);
+  file = xmapped_file_new_from_fd (fd, TRUE, &error);
   g_assert_no_error (error);
 
-  contents = g_mapped_file_get_contents (file);
+  contents = xmapped_file_get_contents (file);
   g_assert_cmpuint (strncmp (contents, old, strlen (old)), ==, 0);
 
-  g_mapped_file_free (file);
+  xmapped_file_free (file);
 
   g_free (tmp_copy_path);
 }
@@ -171,19 +171,19 @@ test_writable_fd (void)
 static void
 test_gbytes (void)
 {
-  GMappedFile *file;
-  GBytes *bytes;
+  xmapped_file_t *file;
+  xbytes_t *bytes;
   xerror_t *error;
 
   error = NULL;
-  file = g_mapped_file_new (g_test_get_filename (G_TEST_DIST, "empty", NULL), FALSE, &error);
+  file = xmapped_file_new (g_test_get_filename (G_TEST_DIST, "empty", NULL), FALSE, &error);
   g_assert_no_error (error);
 
-  bytes = g_mapped_file_get_bytes (file);
-  g_mapped_file_unref (file);
+  bytes = xmapped_file_get_bytes (file);
+  xmapped_file_unref (file);
 
-  g_assert_cmpint (g_bytes_get_size (bytes), ==, 0);
-  g_bytes_unref (bytes);
+  g_assert_cmpint (xbytes_get_size (bytes), ==, 0);
+  xbytes_unref (bytes);
 }
 
 int

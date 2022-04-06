@@ -42,7 +42,7 @@ typedef struct _GvdbTable GvdbTable;
 G_BEGIN_DECLS
 
 G_GNUC_INTERNAL GVDB_GNUC_WEAK
-GvdbTable *             gvdb_table_new_from_bytes                       (GBytes       *bytes,
+GvdbTable *             gvdb_table_new_from_bytes                       (xbytes_t       *bytes,
                                                                          xboolean_t      trusted,
                                                                          xerror_t      **error);
 G_GNUC_INTERNAL GVDB_GNUC_WEAK

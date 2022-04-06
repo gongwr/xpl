@@ -16,12 +16,12 @@
 
 /**
  * SECTION:gsubprocess
- * @title: GSubprocess
+ * @title: xsubprocess_t
  * @short_description: Child processes
  * @include: gio/gio.h
- * @see_also: #GSubprocessLauncher
+ * @see_also: #xsubprocess_launcher_t
  *
- * #GSubprocess allows the creation of and interaction with child
+ * #xsubprocess_t allows the creation of and interaction with child
  * processes.
  *
  * Processes can be communicated with using standard GIO-style APIs (ie:
@@ -34,31 +34,31 @@
  *
  * One major advantage that GIO brings over the core GLib library is
  * comprehensive API for asynchronous I/O, such
- * g_output_stream_splice_async().  This makes GSubprocess
+ * xoutput_stream_splice_async().  This makes xsubprocess_t
  * significantly more powerful and flexible than equivalent APIs in
  * some other languages such as the `subprocess.py`
- * included with Python.  For example, using #GSubprocess one could
+ * included with Python.  For example, using #xsubprocess_t one could
  * create two child processes, reading standard output from the first,
  * processing it, and writing to the input stream of the second, all
  * without blocking the main loop.
  *
- * A powerful g_subprocess_communicate() API is provided similar to the
+ * A powerful xsubprocess_communicate() API is provided similar to the
  * `communicate()` method of `subprocess.py`. This enables very easy
  * interaction with a subprocess that has been opened with pipes.
  *
- * #GSubprocess defaults to tight control over the file descriptors open
+ * #xsubprocess_t defaults to tight control over the file descriptors open
  * in the child process, avoiding dangling-fd issues that are caused by
  * a simple fork()/exec().  The only open file descriptors in the
  * spawned process are ones that were explicitly specified by the
- * #GSubprocess API (unless %G_SUBPROCESS_FLAGS_INHERIT_FDS was
+ * #xsubprocess_t API (unless %G_SUBPROCESS_FLAGS_INHERIT_FDS was
  * specified).
  *
- * #GSubprocess will quickly reap all child processes as they exit,
+ * #xsubprocess_t will quickly reap all child processes as they exit,
  * avoiding "zombie processes" remaining around for long periods of
- * time.  g_subprocess_wait() can be used to wait for this to happen,
+ * time.  xsubprocess_wait() can be used to wait for this to happen,
  * but it will happen even without the call being explicitly made.
  *
- * As a matter of principle, #GSubprocess has no API that accepts
+ * As a matter of principle, #xsubprocess_t has no API that accepts
  * shell-style space-separated strings.  It will, however, match the
  * typical shell behaviour of searching the PATH for executables that do
  * not contain a directory separator in their name. By default, the `PATH`
@@ -66,17 +66,17 @@
  * %G_SUBPROCESS_FLAGS_SEARCH_PATH_FROM_ENVP to use the `PATH` of the
  * launcher environment instead.
  *
- * #GSubprocess attempts to have a very simple API for most uses (ie:
+ * #xsubprocess_t attempts to have a very simple API for most uses (ie:
  * spawning a subprocess with arguments and support for most typical
- * kinds of input and output redirection).  See g_subprocess_new(). The
- * #GSubprocessLauncher API is provided for more complicated cases
+ * kinds of input and output redirection).  See xsubprocess_new(). The
+ * #xsubprocess_launcher_t API is provided for more complicated cases
  * (advanced types of redirection, environment variable manipulation,
  * change of working directory, child setup functions, etc).
  *
- * A typical use of #GSubprocess will involve calling
- * g_subprocess_new(), followed by g_subprocess_wait_async() or
- * g_subprocess_wait().  After the process exits, the status can be
- * checked using functions such as g_subprocess_get_if_exited() (which
+ * A typical use of #xsubprocess_t will involve calling
+ * xsubprocess_new(), followed by xsubprocess_wait_async() or
+ * xsubprocess_wait().  After the process exits, the status can be
+ * checked using functions such as xsubprocess_get_if_exited() (which
  * are similar to the familiar WIFEXITED-style POSIX macros).
  *
  * Since: 2.40
@@ -119,12 +119,12 @@
 
 #define COMMUNICATE_READ_SIZE 4096
 
-/* A GSubprocess can have two possible states: running and not.
+/* A xsubprocess_t can have two possible states: running and not.
  *
  * These two states are reflected by the value of 'pid'.  If it is
  * non-zero then the process is running, with that pid.
  *
- * When a GSubprocess is first created with g_object_new() it is not
+ * When a xsubprocess_t is first created with xobject_new() it is not
  * running.  When it is finalized, it is also not running.
  *
  * During initable_init(), if the g_spawn() is successful then we
@@ -132,7 +132,7 @@
  * subprocess.  That reference doesn't drop until the child has quit,
  * which is why finalize can only happen in the non-running state.  In
  * the event that the g_spawn() failed we will still be finalizing a
- * non-running GSubprocess (before returning from g_subprocess_new())
+ * non-running xsubprocess_t (before returning from xsubprocess_new())
  * with NULL.
  *
  * We make extensive use of the glib worker thread to guarantee
@@ -143,27 +143,27 @@
  * via the worker thread so that we don't race with waitpid() and
  * accidentally send a signal to an already-reaped child.
  */
-static void initable_iface_init (GInitableIface         *initable_iface);
+static void initable_iface_init (xinitable_iface_t         *initable_iface);
 
 typedef xobject_class_t GSubprocessClass;
 
-struct _GSubprocess
+struct _xsubprocess
 {
   xobject_t parent;
 
   /* only used during construction */
-  GSubprocessLauncher *launcher;
-  GSubprocessFlags flags;
+  xsubprocess_launcher_t *launcher;
+  xsubprocess_flags_t flags;
   xchar_t **argv;
 
   /* state tracking variables */
   xchar_t identifier[24];
   int status;
-  GPid pid;
+  xpid_t pid;
 
-  /* list of GTask */
-  GMutex pending_waits_lock;
-  GSList *pending_waits;
+  /* list of xtask_t */
+  xmutex_t pending_waits_lock;
+  xslist_t *pending_waits;
 
   /* These are the streams created if a pipe is requested via flags. */
   xoutput_stream_t *stdin_pipe;
@@ -171,7 +171,7 @@ struct _GSubprocess
   xinput_stream_t  *stderr_pipe;
 };
 
-G_DEFINE_TYPE_WITH_CODE (GSubprocess, g_subprocess, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (xsubprocess_t, xsubprocess, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (XTYPE_INITABLE, initable_iface_init))
 
 enum
@@ -224,10 +224,10 @@ unix_open_file (const char  *filename,
       xint_t saved_errno = errno;
       char *display_name;
 
-      display_name = g_filename_display_name (filename);
+      display_name = xfilename_display_name (filename);
       g_set_error (error, G_IO_ERROR, g_io_error_from_errno (saved_errno),
                    _("Error opening file “%s”: %s"), display_name,
-                   g_strerror (saved_errno));
+                   xstrerror (saved_errno));
       g_free (display_name);
       /* fall through... */
     }
@@ -241,21 +241,21 @@ unix_open_file (const char  *filename,
 #endif
 
 static void
-g_subprocess_set_property (xobject_t      *object,
+xsubprocess_set_property (xobject_t      *object,
                            xuint_t         prop_id,
-                           const GValue *value,
-                           GParamSpec   *pspec)
+                           const xvalue_t *value,
+                           xparam_spec_t   *pspec)
 {
-  GSubprocess *self = G_SUBPROCESS (object);
+  xsubprocess_t *self = G_SUBPROCESS (object);
 
   switch (prop_id)
     {
     case PROP_FLAGS:
-      self->flags = g_value_get_flags (value);
+      self->flags = xvalue_get_flags (value);
       break;
 
     case PROP_ARGV:
-      self->argv = g_value_dup_boxed (value);
+      self->argv = xvalue_dup_boxed (value);
       break;
 
     default:
@@ -264,12 +264,12 @@ g_subprocess_set_property (xobject_t      *object,
 }
 
 static xboolean_t
-g_subprocess_exited (GPid     pid,
+xsubprocess_exited (xpid_t     pid,
                      xint_t     status,
                      xpointer_t user_data)
 {
-  GSubprocess *self = user_data;
-  GSList *tasks;
+  xsubprocess_t *self = user_data;
+  xslist_t *tasks;
 
   g_assert (self->pid == pid);
 
@@ -280,12 +280,12 @@ g_subprocess_exited (GPid     pid,
   self->pid = 0;
   g_mutex_unlock (&self->pending_waits_lock);
 
-  /* Signal anyone in g_subprocess_wait_async() to wake up now */
+  /* Signal anyone in xsubprocess_wait_async() to wake up now */
   while (tasks)
     {
-      g_task_return_boolean (tasks->data, TRUE);
-      g_object_unref (tasks->data);
-      tasks = g_slist_delete_link (tasks, tasks);
+      xtask_return_boolean (tasks->data, TRUE);
+      xobject_unref (tasks->data);
+      tasks = xslist_delete_link (tasks, tasks);
     }
 
   g_spawn_close_pid (pid);
@@ -294,11 +294,11 @@ g_subprocess_exited (GPid     pid,
 }
 
 static xboolean_t
-initable_init (GInitable     *initable,
+initable_init (xinitable_t     *initable,
                xcancellable_t  *cancellable,
                xerror_t       **error)
 {
-  GSubprocess *self = G_SUBPROCESS (initable);
+  xsubprocess_t *self = G_SUBPROCESS (initable);
   xint_t *pipe_ptrs[3] = { NULL, NULL, NULL };
   xint_t pipe_fds[3] = { -1, -1, -1 };
   xint_t close_fds[3] = { -1, -1, -1 };
@@ -417,13 +417,13 @@ initable_init (GInitable     *initable,
   g_assert (success == (self->pid != 0));
 
   {
-    guint64 identifier;
+    xuint64_t identifier;
     xint_t s G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
 
 #ifdef G_OS_WIN32
-    identifier = (guint64) GetProcessId (self->pid);
+    identifier = (xuint64_t) GetProcessId (self->pid);
 #else
-    identifier = (guint64) self->pid;
+    identifier = (xuint64_t) self->pid;
 #endif
 
     s = g_snprintf (self->identifier, sizeof self->identifier, "%"G_GUINT64_FORMAT, identifier);
@@ -433,14 +433,14 @@ initable_init (GInitable     *initable,
   /* Start attempting to reap the child immediately */
   if (success)
     {
-      GMainContext *worker_context;
-      GSource *source;
+      xmain_context_t *worker_context;
+      xsource_t *source;
 
       worker_context = XPL_PRIVATE_CALL (g_get_worker_context) ();
       source = g_child_watch_source_new (self->pid);
-      g_source_set_callback (source, (GSourceFunc) g_subprocess_exited, g_object_ref (self), g_object_unref);
-      g_source_attach (source, worker_context);
-      g_source_unref (source);
+      xsource_set_callback (source, (xsource_func_t) xsubprocess_exited, xobject_ref (self), xobject_unref);
+      xsource_attach (source, worker_context);
+      xsource_unref (source);
     }
 
 #ifdef G_OS_UNIX
@@ -461,9 +461,9 @@ out:
 }
 
 static void
-g_subprocess_finalize (xobject_t *object)
+xsubprocess_finalize (xobject_t *object)
 {
-  GSubprocess *self = G_SUBPROCESS (object);
+  xsubprocess_t *self = G_SUBPROCESS (object);
 
   g_assert (self->pending_waits == NULL);
   g_assert (self->pid == 0);
@@ -471,45 +471,45 @@ g_subprocess_finalize (xobject_t *object)
   g_clear_object (&self->stdin_pipe);
   g_clear_object (&self->stdout_pipe);
   g_clear_object (&self->stderr_pipe);
-  g_strfreev (self->argv);
+  xstrfreev (self->argv);
 
   g_mutex_clear (&self->pending_waits_lock);
 
-  G_OBJECT_CLASS (g_subprocess_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xsubprocess_parent_class)->finalize (object);
 }
 
 static void
-g_subprocess_init (GSubprocess  *self)
+xsubprocess_init (xsubprocess_t  *self)
 {
   g_mutex_init (&self->pending_waits_lock);
 }
 
 static void
-initable_iface_init (GInitableIface *initable_iface)
+initable_iface_init (xinitable_iface_t *initable_iface)
 {
   initable_iface->init = initable_init;
 }
 
 static void
-g_subprocess_class_init (GSubprocessClass *class)
+xsubprocess_class_init (GSubprocessClass *class)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
 
-  gobject_class->finalize = g_subprocess_finalize;
-  gobject_class->set_property = g_subprocess_set_property;
+  gobject_class->finalize = xsubprocess_finalize;
+  gobject_class->set_property = xsubprocess_set_property;
 
-  g_object_class_install_property (gobject_class, PROP_FLAGS,
+  xobject_class_install_property (gobject_class, PROP_FLAGS,
                                    g_param_spec_flags ("flags", P_("Flags"), P_("Subprocess flags"),
                                                        XTYPE_SUBPROCESS_FLAGS, 0, G_PARAM_WRITABLE |
                                                        G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-  g_object_class_install_property (gobject_class, PROP_ARGV,
+  xobject_class_install_property (gobject_class, PROP_ARGV,
                                    g_param_spec_boxed ("argv", P_("Arguments"), P_("Argument vector"),
                                                        XTYPE_STRV, G_PARAM_WRITABLE |
                                                        G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 }
 
 /**
- * g_subprocess_new: (skip)
+ * xsubprocess_new: (skip)
  * @flags: flags that define the behaviour of the subprocess
  * @error: (nullable): return location for an error, or %NULL
  * @argv0: first commandline argument to pass to the subprocess
@@ -523,43 +523,43 @@ g_subprocess_class_init (GSubprocessClass *class)
  *
  * The argument list must be terminated with %NULL.
  *
- * Returns: A newly created #GSubprocess, or %NULL on error (and @error
+ * Returns: A newly created #xsubprocess_t, or %NULL on error (and @error
  *   will be set)
  *
  * Since: 2.40
  */
-GSubprocess *
-g_subprocess_new (GSubprocessFlags   flags,
+xsubprocess_t *
+xsubprocess_new (xsubprocess_flags_t   flags,
                   xerror_t           **error,
                   const xchar_t       *argv0,
                   ...)
 {
-  GSubprocess *result;
-  GPtrArray *args;
+  xsubprocess_t *result;
+  xptr_array_t *args;
   const xchar_t *arg;
   va_list ap;
 
   g_return_val_if_fail (argv0 != NULL && argv0[0] != '\0', NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  args = g_ptr_array_new ();
+  args = xptr_array_new ();
 
   va_start (ap, argv0);
-  g_ptr_array_add (args, (xchar_t *) argv0);
+  xptr_array_add (args, (xchar_t *) argv0);
   while ((arg = va_arg (ap, const xchar_t *)))
-    g_ptr_array_add (args, (xchar_t *) arg);
-  g_ptr_array_add (args, NULL);
+    xptr_array_add (args, (xchar_t *) arg);
+  xptr_array_add (args, NULL);
   va_end (ap);
 
-  result = g_subprocess_newv ((const xchar_t * const *) args->pdata, flags, error);
+  result = xsubprocess_newv ((const xchar_t * const *) args->pdata, flags, error);
 
-  g_ptr_array_free (args, TRUE);
+  xptr_array_free (args, TRUE);
 
   return result;
 }
 
 /**
- * g_subprocess_newv: (rename-to g_subprocess_new)
+ * xsubprocess_newv: (rename-to xsubprocess_new)
  * @argv: (array zero-terminated=1) (element-type filename): commandline arguments for the subprocess
  * @flags: flags that define the behaviour of the subprocess
  * @error: (nullable): return location for an error, or %NULL
@@ -568,27 +568,27 @@ g_subprocess_new (GSubprocessFlags   flags,
  *
  * The argument list is expected to be %NULL-terminated.
  *
- * Returns: A newly created #GSubprocess, or %NULL on error (and @error
+ * Returns: A newly created #xsubprocess_t, or %NULL on error (and @error
  *   will be set)
  *
  * Since: 2.40
  */
-GSubprocess *
-g_subprocess_newv (const xchar_t * const  *argv,
-                   GSubprocessFlags      flags,
+xsubprocess_t *
+xsubprocess_newv (const xchar_t * const  *argv,
+                   xsubprocess_flags_t      flags,
                    xerror_t              **error)
 {
   g_return_val_if_fail (argv != NULL && argv[0] != NULL && argv[0][0] != '\0', NULL);
 
-  return g_initable_new (XTYPE_SUBPROCESS, NULL, error,
+  return xinitable_new (XTYPE_SUBPROCESS, NULL, error,
                          "argv", argv,
                          "flags", flags,
                          NULL);
 }
 
 /**
- * g_subprocess_get_identifier:
- * @subprocess: a #GSubprocess
+ * xsubprocess_get_identifier:
+ * @subprocess: a #xsubprocess_t
  *
  * On UNIX, returns the process ID as a decimal string.
  * On Windows, returns the result of GetProcessId() also as a string.
@@ -599,7 +599,7 @@ g_subprocess_newv (const xchar_t * const  *argv,
  * Since: 2.40
  */
 const xchar_t *
-g_subprocess_get_identifier (GSubprocess *subprocess)
+xsubprocess_get_identifier (xsubprocess_t *subprocess)
 {
   g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), NULL);
 
@@ -610,8 +610,8 @@ g_subprocess_get_identifier (GSubprocess *subprocess)
 }
 
 /**
- * g_subprocess_get_stdin_pipe:
- * @subprocess: a #GSubprocess
+ * xsubprocess_get_stdin_pipe:
+ * @subprocess: a #xsubprocess_t
  *
  * Gets the #xoutput_stream_t that you can write to in order to give data
  * to the stdin of @subprocess.
@@ -624,7 +624,7 @@ g_subprocess_get_identifier (GSubprocess *subprocess)
  * Since: 2.40
  **/
 xoutput_stream_t *
-g_subprocess_get_stdin_pipe (GSubprocess *subprocess)
+xsubprocess_get_stdin_pipe (xsubprocess_t *subprocess)
 {
   g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), NULL);
 
@@ -632,8 +632,8 @@ g_subprocess_get_stdin_pipe (GSubprocess *subprocess)
 }
 
 /**
- * g_subprocess_get_stdout_pipe:
- * @subprocess: a #GSubprocess
+ * xsubprocess_get_stdout_pipe:
+ * @subprocess: a #xsubprocess_t
  *
  * Gets the #xinput_stream_t from which to read the stdout output of
  * @subprocess.
@@ -646,7 +646,7 @@ g_subprocess_get_stdin_pipe (GSubprocess *subprocess)
  * Since: 2.40
  **/
 xinput_stream_t *
-g_subprocess_get_stdout_pipe (GSubprocess *subprocess)
+xsubprocess_get_stdout_pipe (xsubprocess_t *subprocess)
 {
   g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), NULL);
 
@@ -654,8 +654,8 @@ g_subprocess_get_stdout_pipe (GSubprocess *subprocess)
 }
 
 /**
- * g_subprocess_get_stderr_pipe:
- * @subprocess: a #GSubprocess
+ * xsubprocess_get_stderr_pipe:
+ * @subprocess: a #xsubprocess_t
  *
  * Gets the #xinput_stream_t from which to read the stderr output of
  * @subprocess.
@@ -668,7 +668,7 @@ g_subprocess_get_stdout_pipe (GSubprocess *subprocess)
  * Since: 2.40
  **/
 xinput_stream_t *
-g_subprocess_get_stderr_pipe (GSubprocess *subprocess)
+xsubprocess_get_stderr_pipe (xsubprocess_t *subprocess)
 {
   g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), NULL);
 
@@ -678,10 +678,10 @@ g_subprocess_get_stderr_pipe (GSubprocess *subprocess)
 /* Remove the first list element containing @data, and return %TRUE. If no
  * such element is found, return %FALSE. */
 static xboolean_t
-slist_remove_if_present (GSList        **list,
-                         gconstpointer   data)
+slist_remove_if_present (xslist_t        **list,
+                         xconstpointer   data)
 {
-  GSList *l, *prev;
+  xslist_t *l, *prev;
 
   for (l = *list, prev = NULL; l != NULL; prev = l, l = prev->next)
     {
@@ -692,7 +692,7 @@ slist_remove_if_present (GSList        **list,
           else
             *list = l->next;
 
-          g_slist_free_1 (l);
+          xslist_free_1 (l);
 
           return TRUE;
         }
@@ -702,14 +702,14 @@ slist_remove_if_present (GSList        **list,
 }
 
 static void
-g_subprocess_wait_cancelled (xcancellable_t *cancellable,
+xsubprocess_wait_cancelled (xcancellable_t *cancellable,
                              xpointer_t      user_data)
 {
-  GTask *task = user_data;
-  GSubprocess *self;
+  xtask_t *task = user_data;
+  xsubprocess_t *self;
   xboolean_t task_was_pending;
 
-  self = g_task_get_source_object (task);
+  self = xtask_get_source_object (task);
 
   g_mutex_lock (&self->pending_waits_lock);
   task_was_pending = slist_remove_if_present (&self->pending_waits, task);
@@ -717,34 +717,34 @@ g_subprocess_wait_cancelled (xcancellable_t *cancellable,
 
   if (task_was_pending)
     {
-      g_task_return_boolean (task, FALSE);
-      g_object_unref (task);  /* ref from pending_waits */
+      xtask_return_boolean (task, FALSE);
+      xobject_unref (task);  /* ref from pending_waits */
     }
 }
 
 /**
- * g_subprocess_wait_async:
- * @subprocess: a #GSubprocess
+ * xsubprocess_wait_async:
+ * @subprocess: a #xsubprocess_t
  * @cancellable: a #xcancellable_t, or %NULL
  * @callback: a #xasync_ready_callback_t to call when the operation is complete
  * @user_data: user_data for @callback
  *
  * Wait for the subprocess to terminate.
  *
- * This is the asynchronous version of g_subprocess_wait().
+ * This is the asynchronous version of xsubprocess_wait().
  *
  * Since: 2.40
  */
 void
-g_subprocess_wait_async (GSubprocess         *subprocess,
+xsubprocess_wait_async (xsubprocess_t         *subprocess,
                          xcancellable_t        *cancellable,
                          xasync_ready_callback_t  callback,
                          xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (subprocess, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_subprocess_wait_async);
+  task = xtask_new (subprocess, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xsubprocess_wait_async);
 
   g_mutex_lock (&subprocess->pending_waits_lock);
   if (subprocess->pid)
@@ -754,9 +754,9 @@ g_subprocess_wait_async (GSubprocess         *subprocess,
        * see the cancellation in the _finish().
        */
       if (cancellable)
-        g_signal_connect_object (cancellable, "cancelled", G_CALLBACK (g_subprocess_wait_cancelled), task, 0);
+        g_signal_connect_object (cancellable, "cancelled", G_CALLBACK (xsubprocess_wait_cancelled), task, 0);
 
-      subprocess->pending_waits = g_slist_prepend (subprocess->pending_waits, task);
+      subprocess->pending_waits = xslist_prepend (subprocess->pending_waits, task);
       task = NULL;
     }
   g_mutex_unlock (&subprocess->pending_waits_lock);
@@ -764,87 +764,87 @@ g_subprocess_wait_async (GSubprocess         *subprocess,
   /* If we still have task then it's because did_exit is already TRUE */
   if (task != NULL)
     {
-      g_task_return_boolean (task, TRUE);
-      g_object_unref (task);
+      xtask_return_boolean (task, TRUE);
+      xobject_unref (task);
     }
 }
 
 /**
- * g_subprocess_wait_finish:
- * @subprocess: a #GSubprocess
+ * xsubprocess_wait_finish:
+ * @subprocess: a #xsubprocess_t
  * @result: the #xasync_result_t passed to your #xasync_ready_callback_t
  * @error: a pointer to a %NULL #xerror_t, or %NULL
  *
  * Collects the result of a previous call to
- * g_subprocess_wait_async().
+ * xsubprocess_wait_async().
  *
  * Returns: %TRUE if successful, or %FALSE with @error set
  *
  * Since: 2.40
  */
 xboolean_t
-g_subprocess_wait_finish (GSubprocess   *subprocess,
+xsubprocess_wait_finish (xsubprocess_t   *subprocess,
                           xasync_result_t  *result,
                           xerror_t       **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 /* Some generic helpers for emulating synchronous operations using async
  * operations.
  */
 static void
-g_subprocess_sync_setup (void)
+xsubprocess_sync_setup (void)
 {
-  g_main_context_push_thread_default (g_main_context_new ());
+  xmain_context_push_thread_default (xmain_context_new ());
 }
 
 static void
-g_subprocess_sync_done (xobject_t      *source_object,
+xsubprocess_sync_done (xobject_t      *source_object,
                         xasync_result_t *result,
                         xpointer_t      user_data)
 {
   xasync_result_t **result_ptr = user_data;
 
-  *result_ptr = g_object_ref (result);
+  *result_ptr = xobject_ref (result);
 }
 
 static void
-g_subprocess_sync_complete (xasync_result_t **result)
+xsubprocess_sync_complete (xasync_result_t **result)
 {
-  GMainContext *context = g_main_context_get_thread_default ();
+  xmain_context_t *context = xmain_context_get_thread_default ();
 
   while (!*result)
-    g_main_context_iteration (context, TRUE);
+    xmain_context_iteration (context, TRUE);
 
-  g_main_context_pop_thread_default (context);
-  g_main_context_unref (context);
+  xmain_context_pop_thread_default (context);
+  xmain_context_unref (context);
 }
 
 /**
- * g_subprocess_wait:
- * @subprocess: a #GSubprocess
+ * xsubprocess_wait:
+ * @subprocess: a #xsubprocess_t
  * @cancellable: a #xcancellable_t
  * @error: a #xerror_t
  *
  * Synchronously wait for the subprocess to terminate.
  *
  * After the process terminates you can query its exit status with
- * functions such as g_subprocess_get_if_exited() and
- * g_subprocess_get_exit_status().
+ * functions such as xsubprocess_get_if_exited() and
+ * xsubprocess_get_exit_status().
  *
  * This function does not fail in the case of the subprocess having
- * abnormal termination.  See g_subprocess_wait_check() for that.
+ * abnormal termination.  See xsubprocess_wait_check() for that.
  *
  * Cancelling @cancellable doesn't kill the subprocess.  Call
- * g_subprocess_force_exit() if it is desirable.
+ * xsubprocess_force_exit() if it is desirable.
  *
  * Returns: %TRUE on success, %FALSE if @cancellable was cancelled
  *
  * Since: 2.40
  */
 xboolean_t
-g_subprocess_wait (GSubprocess   *subprocess,
+xsubprocess_wait (xsubprocess_t   *subprocess,
                    xcancellable_t  *cancellable,
                    xerror_t       **error)
 {
@@ -871,22 +871,22 @@ g_subprocess_wait (GSubprocess   *subprocess,
     return TRUE;
 
   /* Otherwise, we need to do this the long way... */
-  g_subprocess_sync_setup ();
-  g_subprocess_wait_async (subprocess, cancellable, g_subprocess_sync_done, &result);
-  g_subprocess_sync_complete (&result);
-  success = g_subprocess_wait_finish (subprocess, result, error);
-  g_object_unref (result);
+  xsubprocess_sync_setup ();
+  xsubprocess_wait_async (subprocess, cancellable, xsubprocess_sync_done, &result);
+  xsubprocess_sync_complete (&result);
+  success = xsubprocess_wait_finish (subprocess, result, error);
+  xobject_unref (result);
 
   return success;
 }
 
 /**
- * g_subprocess_wait_check:
- * @subprocess: a #GSubprocess
+ * xsubprocess_wait_check:
+ * @subprocess: a #xsubprocess_t
  * @cancellable: a #xcancellable_t
  * @error: a #xerror_t
  *
- * Combines g_subprocess_wait() with g_spawn_check_wait_status().
+ * Combines xsubprocess_wait() with g_spawn_check_wait_status().
  *
  * Returns: %TRUE on success, %FALSE if process exited abnormally, or
  * @cancellable was cancelled
@@ -894,67 +894,67 @@ g_subprocess_wait (GSubprocess   *subprocess,
  * Since: 2.40
  */
 xboolean_t
-g_subprocess_wait_check (GSubprocess   *subprocess,
+xsubprocess_wait_check (xsubprocess_t   *subprocess,
                          xcancellable_t  *cancellable,
                          xerror_t       **error)
 {
-  return g_subprocess_wait (subprocess, cancellable, error) &&
+  return xsubprocess_wait (subprocess, cancellable, error) &&
          g_spawn_check_wait_status (subprocess->status, error);
 }
 
 /**
- * g_subprocess_wait_check_async:
- * @subprocess: a #GSubprocess
+ * xsubprocess_wait_check_async:
+ * @subprocess: a #xsubprocess_t
  * @cancellable: a #xcancellable_t, or %NULL
  * @callback: a #xasync_ready_callback_t to call when the operation is complete
  * @user_data: user_data for @callback
  *
- * Combines g_subprocess_wait_async() with g_spawn_check_wait_status().
+ * Combines xsubprocess_wait_async() with g_spawn_check_wait_status().
  *
- * This is the asynchronous version of g_subprocess_wait_check().
+ * This is the asynchronous version of xsubprocess_wait_check().
  *
  * Since: 2.40
  */
 void
-g_subprocess_wait_check_async (GSubprocess         *subprocess,
+xsubprocess_wait_check_async (xsubprocess_t         *subprocess,
                                xcancellable_t        *cancellable,
                                xasync_ready_callback_t  callback,
                                xpointer_t             user_data)
 {
-  g_subprocess_wait_async (subprocess, cancellable, callback, user_data);
+  xsubprocess_wait_async (subprocess, cancellable, callback, user_data);
 }
 
 /**
- * g_subprocess_wait_check_finish:
- * @subprocess: a #GSubprocess
+ * xsubprocess_wait_check_finish:
+ * @subprocess: a #xsubprocess_t
  * @result: the #xasync_result_t passed to your #xasync_ready_callback_t
  * @error: a pointer to a %NULL #xerror_t, or %NULL
  *
  * Collects the result of a previous call to
- * g_subprocess_wait_check_async().
+ * xsubprocess_wait_check_async().
  *
  * Returns: %TRUE if successful, or %FALSE with @error set
  *
  * Since: 2.40
  */
 xboolean_t
-g_subprocess_wait_check_finish (GSubprocess   *subprocess,
+xsubprocess_wait_check_finish (xsubprocess_t   *subprocess,
                                 xasync_result_t  *result,
                                 xerror_t       **error)
 {
-  return g_subprocess_wait_finish (subprocess, result, error) &&
+  return xsubprocess_wait_finish (subprocess, result, error) &&
          g_spawn_check_wait_status (subprocess->status, error);
 }
 
 #ifdef G_OS_UNIX
 typedef struct
 {
-  GSubprocess *subprocess;
+  xsubprocess_t *subprocess;
   xint_t signalnum;
 } SignalRecord;
 
 static xboolean_t
-g_subprocess_actually_send_signal (xpointer_t user_data)
+xsubprocess_actually_send_signal (xpointer_t user_data)
 {
   SignalRecord *signal_record = user_data;
 
@@ -964,7 +964,7 @@ g_subprocess_actually_send_signal (xpointer_t user_data)
   if (signal_record->subprocess->pid)
     kill (signal_record->subprocess->pid, signal_record->signalnum);
 
-  g_object_unref (signal_record->subprocess);
+  xobject_unref (signal_record->subprocess);
 
   g_slice_free (SignalRecord, signal_record);
 
@@ -972,17 +972,17 @@ g_subprocess_actually_send_signal (xpointer_t user_data)
 }
 
 static void
-g_subprocess_dispatch_signal (GSubprocess *subprocess,
+xsubprocess_dispatch_signal (xsubprocess_t *subprocess,
                               xint_t         signalnum)
 {
-  SignalRecord signal_record = { g_object_ref (subprocess), signalnum };
+  SignalRecord signal_record = { xobject_ref (subprocess), signalnum };
 
   g_return_if_fail (X_IS_SUBPROCESS (subprocess));
 
   /* This MUST be a lower priority than the priority that the child
    * watch source uses in initable_init().
    *
-   * Reaping processes, reporting the results back to GSubprocess and
+   * Reaping processes, reporting the results back to xsubprocess_t and
    * sending signals is all done in the glib worker thread.  We cannot
    * have a kill() done after the reap and before the report without
    * risking killing a process that's no longer there so the kill()
@@ -990,16 +990,16 @@ g_subprocess_dispatch_signal (GSubprocess *subprocess,
    *
    * G_PRIORITY_HIGH_IDLE is lower priority than G_PRIORITY_DEFAULT.
    */
-  g_main_context_invoke_full (XPL_PRIVATE_CALL (g_get_worker_context) (),
+  xmain_context_invoke_full (XPL_PRIVATE_CALL (g_get_worker_context) (),
                               G_PRIORITY_HIGH_IDLE,
-                              g_subprocess_actually_send_signal,
+                              xsubprocess_actually_send_signal,
                               g_slice_dup (SignalRecord, &signal_record),
                               NULL);
 }
 
 /**
- * g_subprocess_send_signal:
- * @subprocess: a #GSubprocess
+ * xsubprocess_send_signal:
+ * @subprocess: a #xsubprocess_t
  * @signal_num: the signal number to send
  *
  * Sends the UNIX signal @signal_num to the subprocess, if it is still
@@ -1013,23 +1013,23 @@ g_subprocess_dispatch_signal (GSubprocess *subprocess,
  * Since: 2.40
  **/
 void
-g_subprocess_send_signal (GSubprocess *subprocess,
+xsubprocess_send_signal (xsubprocess_t *subprocess,
                           xint_t         signal_num)
 {
   g_return_if_fail (X_IS_SUBPROCESS (subprocess));
 
-  g_subprocess_dispatch_signal (subprocess, signal_num);
+  xsubprocess_dispatch_signal (subprocess, signal_num);
 }
 #endif
 
 /**
- * g_subprocess_force_exit:
- * @subprocess: a #GSubprocess
+ * xsubprocess_force_exit:
+ * @subprocess: a #xsubprocess_t
  *
  * Use an operating-system specific method to attempt an immediate,
  * forceful termination of the process.  There is no mechanism to
  * determine whether or not the request itself was successful;
- * however, you can use g_subprocess_wait() to monitor the status of
+ * however, you can use xsubprocess_wait() to monitor the status of
  * the process after calling this function.
  *
  * On Unix, this function sends %SIGKILL.
@@ -1037,20 +1037,20 @@ g_subprocess_send_signal (GSubprocess *subprocess,
  * Since: 2.40
  **/
 void
-g_subprocess_force_exit (GSubprocess *subprocess)
+xsubprocess_force_exit (xsubprocess_t *subprocess)
 {
   g_return_if_fail (X_IS_SUBPROCESS (subprocess));
 
 #ifdef G_OS_UNIX
-  g_subprocess_dispatch_signal (subprocess, SIGKILL);
+  xsubprocess_dispatch_signal (subprocess, SIGKILL);
 #else
   TerminateProcess (subprocess->pid, 1);
 #endif
 }
 
 /**
- * g_subprocess_get_status:
- * @subprocess: a #GSubprocess
+ * xsubprocess_get_status:
+ * @subprocess: a #xsubprocess_t
  *
  * Gets the raw status code of the process, as from waitpid().
  *
@@ -1058,10 +1058,10 @@ g_subprocess_force_exit (GSubprocess *subprocess)
  * macros defined by the system headers such as WIFEXITED.  It can also
  * be used with g_spawn_check_wait_status().
  *
- * It is more likely that you want to use g_subprocess_get_if_exited()
- * followed by g_subprocess_get_exit_status().
+ * It is more likely that you want to use xsubprocess_get_if_exited()
+ * followed by xsubprocess_get_exit_status().
  *
- * It is an error to call this function before g_subprocess_wait() has
+ * It is an error to call this function before xsubprocess_wait() has
  * returned.
  *
  * Returns: the (meaningless) waitpid() exit status from the kernel
@@ -1069,7 +1069,7 @@ g_subprocess_force_exit (GSubprocess *subprocess)
  * Since: 2.40
  **/
 xint_t
-g_subprocess_get_status (GSubprocess *subprocess)
+xsubprocess_get_status (xsubprocess_t *subprocess)
 {
   g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
   g_return_val_if_fail (subprocess->pid == 0, FALSE);
@@ -1078,14 +1078,14 @@ g_subprocess_get_status (GSubprocess *subprocess)
 }
 
 /**
- * g_subprocess_get_successful:
- * @subprocess: a #GSubprocess
+ * xsubprocess_get_successful:
+ * @subprocess: a #xsubprocess_t
  *
  * Checks if the process was "successful".  A process is considered
  * successful if it exited cleanly with an exit status of 0, either by
  * way of the exit() system call or return from main().
  *
- * It is an error to call this function before g_subprocess_wait() has
+ * It is an error to call this function before xsubprocess_wait() has
  * returned.
  *
  * Returns: %TRUE if the process exited cleanly with a exit status of 0
@@ -1093,7 +1093,7 @@ g_subprocess_get_status (GSubprocess *subprocess)
  * Since: 2.40
  **/
 xboolean_t
-g_subprocess_get_successful (GSubprocess *subprocess)
+xsubprocess_get_successful (xsubprocess_t *subprocess)
 {
   g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
   g_return_val_if_fail (subprocess->pid == 0, FALSE);
@@ -1106,15 +1106,15 @@ g_subprocess_get_successful (GSubprocess *subprocess)
 }
 
 /**
- * g_subprocess_get_if_exited:
- * @subprocess: a #GSubprocess
+ * xsubprocess_get_if_exited:
+ * @subprocess: a #xsubprocess_t
  *
  * Check if the given subprocess exited normally (ie: by way of exit()
  * or return from main()).
  *
  * This is equivalent to the system WIFEXITED macro.
  *
- * It is an error to call this function before g_subprocess_wait() has
+ * It is an error to call this function before xsubprocess_wait() has
  * returned.
  *
  * Returns: %TRUE if the case of a normal exit
@@ -1122,7 +1122,7 @@ g_subprocess_get_successful (GSubprocess *subprocess)
  * Since: 2.40
  **/
 xboolean_t
-g_subprocess_get_if_exited (GSubprocess *subprocess)
+xsubprocess_get_if_exited (xsubprocess_t *subprocess)
 {
   g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
   g_return_val_if_fail (subprocess->pid == 0, FALSE);
@@ -1135,8 +1135,8 @@ g_subprocess_get_if_exited (GSubprocess *subprocess)
 }
 
 /**
- * g_subprocess_get_exit_status:
- * @subprocess: a #GSubprocess
+ * xsubprocess_get_exit_status:
+ * @subprocess: a #xsubprocess_t
  *
  * Check the exit status of the subprocess, given that it exited
  * normally.  This is the value passed to the exit() system call or the
@@ -1144,15 +1144,15 @@ g_subprocess_get_if_exited (GSubprocess *subprocess)
  *
  * This is equivalent to the system WEXITSTATUS macro.
  *
- * It is an error to call this function before g_subprocess_wait() and
- * unless g_subprocess_get_if_exited() returned %TRUE.
+ * It is an error to call this function before xsubprocess_wait() and
+ * unless xsubprocess_get_if_exited() returned %TRUE.
  *
  * Returns: the exit status
  *
  * Since: 2.40
  **/
 xint_t
-g_subprocess_get_exit_status (GSubprocess *subprocess)
+xsubprocess_get_exit_status (xsubprocess_t *subprocess)
 {
   g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), 1);
   g_return_val_if_fail (subprocess->pid == 0, 1);
@@ -1167,14 +1167,14 @@ g_subprocess_get_exit_status (GSubprocess *subprocess)
 }
 
 /**
- * g_subprocess_get_if_signaled:
- * @subprocess: a #GSubprocess
+ * xsubprocess_get_if_signaled:
+ * @subprocess: a #xsubprocess_t
  *
  * Check if the given subprocess terminated in response to a signal.
  *
  * This is equivalent to the system WIFSIGNALED macro.
  *
- * It is an error to call this function before g_subprocess_wait() has
+ * It is an error to call this function before xsubprocess_wait() has
  * returned.
  *
  * Returns: %TRUE if the case of termination due to a signal
@@ -1182,7 +1182,7 @@ g_subprocess_get_exit_status (GSubprocess *subprocess)
  * Since: 2.40
  **/
 xboolean_t
-g_subprocess_get_if_signaled (GSubprocess *subprocess)
+xsubprocess_get_if_signaled (xsubprocess_t *subprocess)
 {
   g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
   g_return_val_if_fail (subprocess->pid == 0, FALSE);
@@ -1195,23 +1195,23 @@ g_subprocess_get_if_signaled (GSubprocess *subprocess)
 }
 
 /**
- * g_subprocess_get_term_sig:
- * @subprocess: a #GSubprocess
+ * xsubprocess_get_term_sig:
+ * @subprocess: a #xsubprocess_t
  *
  * Get the signal number that caused the subprocess to terminate, given
  * that it terminated due to a signal.
  *
  * This is equivalent to the system WTERMSIG macro.
  *
- * It is an error to call this function before g_subprocess_wait() and
- * unless g_subprocess_get_if_signaled() returned %TRUE.
+ * It is an error to call this function before xsubprocess_wait() and
+ * unless xsubprocess_get_if_signaled() returned %TRUE.
  *
  * Returns: the signal causing termination
  *
  * Since: 2.40
  **/
 xint_t
-g_subprocess_get_term_sig (GSubprocess *subprocess)
+xsubprocess_get_term_sig (xsubprocess_t *subprocess)
 {
   g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), 0);
   g_return_val_if_fail (subprocess->pid == 0, 0);
@@ -1221,22 +1221,22 @@ g_subprocess_get_term_sig (GSubprocess *subprocess)
 
   return WTERMSIG (subprocess->status);
 #else
-  g_critical ("g_subprocess_get_term_sig() called on Windows, where "
-              "g_subprocess_get_if_signaled() always returns FALSE...");
+  g_critical ("xsubprocess_get_term_sig() called on Windows, where "
+              "xsubprocess_get_if_signaled() always returns FALSE...");
   return 0;
 #endif
 }
 
 /*< private >*/
 void
-g_subprocess_set_launcher (GSubprocess         *subprocess,
-                           GSubprocessLauncher *launcher)
+xsubprocess_set_launcher (xsubprocess_t         *subprocess,
+                           xsubprocess_launcher_t *launcher)
 {
   subprocess->launcher = launcher;
 }
 
 
-/* g_subprocess_communicate implementation below:
+/* xsubprocess_communicate implementation below:
  *
  * This is a tough problem.  We have to watch 5 things at the same time:
  *
@@ -1246,8 +1246,8 @@ g_subprocess_set_launcher (GSubprocess         *subprocess,
  *  - process terminated
  *  - cancellable being cancelled by caller
  *
- * We use a GMainContext for all of these (either as async function
- * calls or as a GSource (in the case of the cancellable).  That way at
+ * We use a xmain_context_t for all of these (either as async function
+ * calls or as a xsource_t (in the case of the cancellable).  That way at
  * least we don't have to worry about threading.
  *
  * For the sync case we use the usual trick of creating a private main
@@ -1265,13 +1265,13 @@ g_subprocess_set_launcher (GSubprocess         *subprocess,
  *
  * We keep our own private xcancellable_t.  In the event that any of the
  * above suffers from an error condition (including the user cancelling
- * their cancellable) we immediately dispatch the GTask with the error
+ * their cancellable) we immediately dispatch the xtask_t with the error
  * result and fire our cancellable to cleanup any pending operations.
  * In the case that the error is that the user's cancellable was fired,
- * it's vaguely wasteful to report an error because GTask will handle
+ * it's vaguely wasteful to report an error because xtask_t will handle
  * this automatically, so we just return FALSE.
  *
- * We let each pending sub-operation take a ref on the GTask of the
+ * We let each pending sub-operation take a ref on the xtask_t of the
  * communicate operation.  We have to be careful that we don't report
  * the task completion more than once, though, so we keep a flag for
  * that.
@@ -1285,32 +1285,32 @@ typedef struct
   xboolean_t add_nul;
 
   xinput_stream_t *stdin_buf;
-  GMemoryOutputStream *stdout_buf;
-  GMemoryOutputStream *stderr_buf;
+  xmemory_output_stream_t *stdout_buf;
+  xmemory_output_stream_t *stderr_buf;
 
   xcancellable_t *cancellable;
-  GSource      *cancellable_source;
+  xsource_t      *cancellable_source;
 
   xuint_t         outstanding_ops;
   xboolean_t      reported_error;
 } CommunicateState;
 
 static void
-g_subprocess_communicate_made_progress (xobject_t      *source_object,
+xsubprocess_communicate_made_progress (xobject_t      *source_object,
                                         xasync_result_t *result,
                                         xpointer_t      user_data)
 {
   CommunicateState *state;
-  GSubprocess *subprocess;
+  xsubprocess_t *subprocess;
   xerror_t *error = NULL;
   xpointer_t source;
-  GTask *task;
+  xtask_t *task;
 
   g_assert (source_object != NULL);
 
   task = user_data;
-  subprocess = g_task_get_source_object (task);
-  state = g_task_get_task_data (task);
+  subprocess = xtask_get_source_object (task);
+  state = xtask_get_task_data (task);
   source = source_object;
 
   state->outstanding_ops--;
@@ -1319,7 +1319,7 @@ g_subprocess_communicate_made_progress (xobject_t      *source_object,
       source == state->stdout_buf ||
       source == state->stderr_buf)
     {
-      if (g_output_stream_splice_finish ((xoutput_stream_t*) source, result, &error) == -1)
+      if (xoutput_stream_splice_finish ((xoutput_stream_t*) source, result, &error) == -1)
         goto out;
 
       if (source == state->stdout_buf ||
@@ -1331,17 +1331,17 @@ g_subprocess_communicate_made_progress (xobject_t      *source_object,
           if (state->add_nul)
             {
               xsize_t bytes_written;
-              if (!g_output_stream_write_all (source, "\0", 1, &bytes_written,
+              if (!xoutput_stream_write_all (source, "\0", 1, &bytes_written,
                                               NULL, &error))
                 goto out;
             }
-          if (!g_output_stream_close (source, NULL, &error))
+          if (!xoutput_stream_close (source, NULL, &error))
             goto out;
         }
     }
   else if (source == subprocess)
     {
-      (void) g_subprocess_wait_finish (subprocess, result, &error);
+      (void) xsubprocess_wait_finish (subprocess, result, &error);
     }
   else
     g_assert_not_reached ();
@@ -1358,22 +1358,22 @@ g_subprocess_communicate_made_progress (xobject_t      *source_object,
         {
           state->reported_error = TRUE;
           g_cancellable_cancel (state->cancellable);
-          g_task_return_error (task, error);
+          xtask_return_error (task, error);
         }
       else
-        g_error_free (error);
+        xerror_free (error);
     }
   else if (state->outstanding_ops == 0)
     {
-      g_task_return_boolean (task, TRUE);
+      xtask_return_boolean (task, TRUE);
     }
 
   /* And drop the original ref */
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 static xboolean_t
-g_subprocess_communicate_cancelled (xcancellable_t *cancellable,
+xsubprocess_communicate_cancelled (xcancellable_t *cancellable,
                                     xpointer_t      user_data)
 {
   CommunicateState *state = user_data;
@@ -1384,7 +1384,7 @@ g_subprocess_communicate_cancelled (xcancellable_t *cancellable,
 }
 
 static void
-g_subprocess_communicate_state_free (xpointer_t data)
+xsubprocess_communicate_state_free (xpointer_t data)
 {
   CommunicateState *state = data;
 
@@ -1395,29 +1395,29 @@ g_subprocess_communicate_state_free (xpointer_t data)
 
   if (state->cancellable_source)
     {
-      g_source_destroy (state->cancellable_source);
-      g_source_unref (state->cancellable_source);
+      xsource_destroy (state->cancellable_source);
+      xsource_unref (state->cancellable_source);
     }
 
   g_slice_free (CommunicateState, state);
 }
 
 static CommunicateState *
-g_subprocess_communicate_internal (GSubprocess         *subprocess,
+xsubprocess_communicate_internal (xsubprocess_t         *subprocess,
                                    xboolean_t             add_nul,
-                                   GBytes              *stdin_buf,
+                                   xbytes_t              *stdin_buf,
                                    xcancellable_t        *cancellable,
                                    xasync_ready_callback_t  callback,
                                    xpointer_t             user_data)
 {
   CommunicateState *state;
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (subprocess, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_subprocess_communicate_internal);
+  task = xtask_new (subprocess, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xsubprocess_communicate_internal);
 
   state = g_slice_new0 (CommunicateState);
-  g_task_set_task_data (task, state, g_subprocess_communicate_state_free);
+  xtask_set_task_data (task, state, xsubprocess_communicate_state_free);
 
   state->cancellable = g_cancellable_new ();
   state->add_nul = add_nul;
@@ -1426,10 +1426,10 @@ g_subprocess_communicate_internal (GSubprocess         *subprocess,
     {
       state->cancellable_source = g_cancellable_source_new (cancellable);
       /* No ref held here, but we unref the source from state's free function */
-      g_source_set_callback (state->cancellable_source,
-                             G_SOURCE_FUNC (g_subprocess_communicate_cancelled),
+      xsource_set_callback (state->cancellable_source,
+                             G_SOURCE_FUNC (xsubprocess_communicate_cancelled),
                              state, NULL);
-      g_source_attach (state->cancellable_source, g_main_context_get_thread_default ());
+      xsource_attach (state->cancellable_source, xmain_context_get_thread_default ());
     }
 
   if (subprocess->stdin_pipe)
@@ -1446,51 +1446,51 @@ g_subprocess_communicate_internal (GSubprocess         *subprocess,
        * So, to avoid async blocking on the main loop we make this non-blocking here.
        *
        * It should be safe to change the fd because we're the only user at this point as
-       * per the g_subprocess_communicate() docs, and all the code called by this function
+       * per the xsubprocess_communicate() docs, and all the code called by this function
        * properly handles non-blocking fds.
        */
       g_unix_set_fd_nonblocking (g_unix_output_stream_get_fd (G_UNIX_OUTPUT_STREAM (subprocess->stdin_pipe)), TRUE, NULL);
 #endif
 
       state->stdin_buf = g_memory_input_stream_new_from_bytes (stdin_buf);
-      g_output_stream_splice_async (subprocess->stdin_pipe, (xinput_stream_t*)state->stdin_buf,
+      xoutput_stream_splice_async (subprocess->stdin_pipe, (xinput_stream_t*)state->stdin_buf,
                                     G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE | G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET,
                                     G_PRIORITY_DEFAULT, state->cancellable,
-                                    g_subprocess_communicate_made_progress, g_object_ref (task));
+                                    xsubprocess_communicate_made_progress, xobject_ref (task));
       state->outstanding_ops++;
     }
 
   if (subprocess->stdout_pipe)
     {
-      state->stdout_buf = (GMemoryOutputStream*)g_memory_output_stream_new_resizable ();
-      g_output_stream_splice_async ((xoutput_stream_t*)state->stdout_buf, subprocess->stdout_pipe,
+      state->stdout_buf = (xmemory_output_stream_t*)g_memory_output_stream_new_resizable ();
+      xoutput_stream_splice_async ((xoutput_stream_t*)state->stdout_buf, subprocess->stdout_pipe,
                                     G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE,
                                     G_PRIORITY_DEFAULT, state->cancellable,
-                                    g_subprocess_communicate_made_progress, g_object_ref (task));
+                                    xsubprocess_communicate_made_progress, xobject_ref (task));
       state->outstanding_ops++;
     }
 
   if (subprocess->stderr_pipe)
     {
-      state->stderr_buf = (GMemoryOutputStream*)g_memory_output_stream_new_resizable ();
-      g_output_stream_splice_async ((xoutput_stream_t*)state->stderr_buf, subprocess->stderr_pipe,
+      state->stderr_buf = (xmemory_output_stream_t*)g_memory_output_stream_new_resizable ();
+      xoutput_stream_splice_async ((xoutput_stream_t*)state->stderr_buf, subprocess->stderr_pipe,
                                     G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE,
                                     G_PRIORITY_DEFAULT, state->cancellable,
-                                    g_subprocess_communicate_made_progress, g_object_ref (task));
+                                    xsubprocess_communicate_made_progress, xobject_ref (task));
       state->outstanding_ops++;
     }
 
-  g_subprocess_wait_async (subprocess, state->cancellable,
-                           g_subprocess_communicate_made_progress, g_object_ref (task));
+  xsubprocess_wait_async (subprocess, state->cancellable,
+                           xsubprocess_communicate_made_progress, xobject_ref (task));
   state->outstanding_ops++;
 
-  g_object_unref (task);
+  xobject_unref (task);
   return state;
 }
 
 /**
- * g_subprocess_communicate:
- * @subprocess: a #GSubprocess
+ * xsubprocess_communicate:
+ * @subprocess: a #xsubprocess_t
  * @stdin_buf: (nullable): data to send to the stdin of the subprocess, or %NULL
  * @cancellable: a #xcancellable_t
  * @stdout_buf: (out) (nullable) (optional) (transfer full): data read from the subprocess stdout
@@ -1530,8 +1530,8 @@ g_subprocess_communicate_internal (GSubprocess         *subprocess,
  * been set to anything in particular and should not be inspected.
  *
  * In the case that %TRUE is returned, the subprocess has exited and the
- * exit status inspection APIs (eg: g_subprocess_get_if_exited(),
- * g_subprocess_get_exit_status()) may be used.
+ * exit status inspection APIs (eg: xsubprocess_get_if_exited(),
+ * xsubprocess_get_exit_status()) may be used.
  *
  * You should not attempt to use any of the subprocess pipes after
  * starting this function, since they may be left in strange states,
@@ -1544,11 +1544,11 @@ g_subprocess_communicate_internal (GSubprocess         *subprocess,
  * Since: 2.40
  **/
 xboolean_t
-g_subprocess_communicate (GSubprocess   *subprocess,
-                          GBytes        *stdin_buf,
+xsubprocess_communicate (xsubprocess_t   *subprocess,
+                          xbytes_t        *stdin_buf,
                           xcancellable_t  *cancellable,
-                          GBytes       **stdout_buf,
-                          GBytes       **stderr_buf,
+                          xbytes_t       **stdout_buf,
+                          xbytes_t       **stderr_buf,
                           xerror_t       **error)
 {
   xasync_result_t *result = NULL;
@@ -1559,30 +1559,30 @@ g_subprocess_communicate (GSubprocess   *subprocess,
   g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_subprocess_sync_setup ();
-  g_subprocess_communicate_internal (subprocess, FALSE, stdin_buf, cancellable,
-                                     g_subprocess_sync_done, &result);
-  g_subprocess_sync_complete (&result);
-  success = g_subprocess_communicate_finish (subprocess, result, stdout_buf, stderr_buf, error);
-  g_object_unref (result);
+  xsubprocess_sync_setup ();
+  xsubprocess_communicate_internal (subprocess, FALSE, stdin_buf, cancellable,
+                                     xsubprocess_sync_done, &result);
+  xsubprocess_sync_complete (&result);
+  success = xsubprocess_communicate_finish (subprocess, result, stdout_buf, stderr_buf, error);
+  xobject_unref (result);
 
   return success;
 }
 
 /**
- * g_subprocess_communicate_async:
+ * xsubprocess_communicate_async:
  * @subprocess: Self
  * @stdin_buf: (nullable): Input data, or %NULL
  * @cancellable: (nullable): Cancellable
  * @callback: Callback
  * @user_data: User data
  *
- * Asynchronous version of g_subprocess_communicate().  Complete
- * invocation with g_subprocess_communicate_finish().
+ * Asynchronous version of xsubprocess_communicate().  Complete
+ * invocation with xsubprocess_communicate_finish().
  */
 void
-g_subprocess_communicate_async (GSubprocess         *subprocess,
-                                GBytes              *stdin_buf,
+xsubprocess_communicate_async (xsubprocess_t         *subprocess,
+                                xbytes_t              *stdin_buf,
                                 xcancellable_t        *cancellable,
                                 xasync_ready_callback_t  callback,
                                 xpointer_t             user_data)
@@ -1591,37 +1591,37 @@ g_subprocess_communicate_async (GSubprocess         *subprocess,
   g_return_if_fail (stdin_buf == NULL || (subprocess->flags & G_SUBPROCESS_FLAGS_STDIN_PIPE));
   g_return_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
 
-  g_subprocess_communicate_internal (subprocess, FALSE, stdin_buf, cancellable, callback, user_data);
+  xsubprocess_communicate_internal (subprocess, FALSE, stdin_buf, cancellable, callback, user_data);
 }
 
 /**
- * g_subprocess_communicate_finish:
+ * xsubprocess_communicate_finish:
  * @subprocess: Self
  * @result: Result
  * @stdout_buf: (out) (nullable) (optional) (transfer full): Return location for stdout data
  * @stderr_buf: (out) (nullable) (optional) (transfer full): Return location for stderr data
  * @error: Error
  *
- * Complete an invocation of g_subprocess_communicate_async().
+ * Complete an invocation of xsubprocess_communicate_async().
  */
 xboolean_t
-g_subprocess_communicate_finish (GSubprocess   *subprocess,
+xsubprocess_communicate_finish (xsubprocess_t   *subprocess,
                                  xasync_result_t  *result,
-                                 GBytes       **stdout_buf,
-                                 GBytes       **stderr_buf,
+                                 xbytes_t       **stdout_buf,
+                                 xbytes_t       **stderr_buf,
                                  xerror_t       **error)
 {
   xboolean_t success;
   CommunicateState *state;
 
   g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
-  g_return_val_if_fail (g_task_is_valid (result, subprocess), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, subprocess), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_object_ref (result);
+  xobject_ref (result);
 
-  state = g_task_get_task_data ((GTask*)result);
-  success = g_task_propagate_boolean ((GTask*)result, error);
+  state = xtask_get_task_data ((xtask_t*)result);
+  success = xtask_propagate_boolean ((xtask_t*)result, error);
 
   if (success)
     {
@@ -1631,27 +1631,27 @@ g_subprocess_communicate_finish (GSubprocess   *subprocess,
         *stderr_buf = (state->stderr_buf != NULL) ? g_memory_output_stream_steal_as_bytes (state->stderr_buf) : NULL;
     }
 
-  g_object_unref (result);
+  xobject_unref (result);
   return success;
 }
 
 /**
- * g_subprocess_communicate_utf8:
- * @subprocess: a #GSubprocess
+ * xsubprocess_communicate_utf8:
+ * @subprocess: a #xsubprocess_t
  * @stdin_buf: (nullable): data to send to the stdin of the subprocess, or %NULL
  * @cancellable: a #xcancellable_t
  * @stdout_buf: (out) (nullable) (optional) (transfer full): data read from the subprocess stdout
  * @stderr_buf: (out) (nullable) (optional) (transfer full): data read from the subprocess stderr
  * @error: a pointer to a %NULL #xerror_t pointer, or %NULL
  *
- * Like g_subprocess_communicate(), but validates the output of the
+ * Like xsubprocess_communicate(), but validates the output of the
  * process as UTF-8, and returns it as a regular NUL terminated string.
  *
  * On error, @stdout_buf and @stderr_buf will be set to undefined values and
  * should not be used.
  */
 xboolean_t
-g_subprocess_communicate_utf8 (GSubprocess   *subprocess,
+xsubprocess_communicate_utf8 (xsubprocess_t   *subprocess,
                                const char    *stdin_buf,
                                xcancellable_t  *cancellable,
                                char         **stdout_buf,
@@ -1660,7 +1660,7 @@ g_subprocess_communicate_utf8 (GSubprocess   *subprocess,
 {
   xasync_result_t *result = NULL;
   xboolean_t success;
-  GBytes *stdin_bytes;
+  xbytes_t *stdin_bytes;
   size_t stdin_buf_len = 0;
 
   g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
@@ -1670,38 +1670,38 @@ g_subprocess_communicate_utf8 (GSubprocess   *subprocess,
 
   if (stdin_buf != NULL)
     stdin_buf_len = strlen (stdin_buf);
-  stdin_bytes = g_bytes_new (stdin_buf, stdin_buf_len);
+  stdin_bytes = xbytes_new (stdin_buf, stdin_buf_len);
 
-  g_subprocess_sync_setup ();
-  g_subprocess_communicate_internal (subprocess, TRUE, stdin_bytes, cancellable,
-                                     g_subprocess_sync_done, &result);
-  g_subprocess_sync_complete (&result);
-  success = g_subprocess_communicate_utf8_finish (subprocess, result, stdout_buf, stderr_buf, error);
-  g_object_unref (result);
+  xsubprocess_sync_setup ();
+  xsubprocess_communicate_internal (subprocess, TRUE, stdin_bytes, cancellable,
+                                     xsubprocess_sync_done, &result);
+  xsubprocess_sync_complete (&result);
+  success = xsubprocess_communicate_utf8_finish (subprocess, result, stdout_buf, stderr_buf, error);
+  xobject_unref (result);
 
-  g_bytes_unref (stdin_bytes);
+  xbytes_unref (stdin_bytes);
   return success;
 }
 
 /**
- * g_subprocess_communicate_utf8_async:
+ * xsubprocess_communicate_utf8_async:
  * @subprocess: Self
  * @stdin_buf: (nullable): Input data, or %NULL
  * @cancellable: Cancellable
  * @callback: Callback
  * @user_data: User data
  *
- * Asynchronous version of g_subprocess_communicate_utf8().  Complete
- * invocation with g_subprocess_communicate_utf8_finish().
+ * Asynchronous version of xsubprocess_communicate_utf8().  Complete
+ * invocation with xsubprocess_communicate_utf8_finish().
  */
 void
-g_subprocess_communicate_utf8_async (GSubprocess         *subprocess,
+xsubprocess_communicate_utf8_async (xsubprocess_t         *subprocess,
                                      const char          *stdin_buf,
                                      xcancellable_t        *cancellable,
                                      xasync_ready_callback_t  callback,
                                      xpointer_t             user_data)
 {
-  GBytes *stdin_bytes;
+  xbytes_t *stdin_bytes;
   size_t stdin_buf_len = 0;
 
   g_return_if_fail (X_IS_SUBPROCESS (subprocess));
@@ -1710,17 +1710,17 @@ g_subprocess_communicate_utf8_async (GSubprocess         *subprocess,
 
   if (stdin_buf != NULL)
     stdin_buf_len = strlen (stdin_buf);
-  stdin_bytes = g_bytes_new (stdin_buf, stdin_buf_len);
+  stdin_bytes = xbytes_new (stdin_buf, stdin_buf_len);
 
-  g_subprocess_communicate_internal (subprocess, TRUE, stdin_bytes, cancellable, callback, user_data);
+  xsubprocess_communicate_internal (subprocess, TRUE, stdin_bytes, cancellable, callback, user_data);
 
-  g_bytes_unref (stdin_bytes);
+  xbytes_unref (stdin_bytes);
 }
 
 static xboolean_t
 communicate_result_validate_utf8 (const char            *stream_name,
                                   char                 **return_location,
-                                  GMemoryOutputStream   *buffer,
+                                  xmemory_output_stream_t   *buffer,
                                   xerror_t               **error)
 {
   if (return_location == NULL)
@@ -1730,7 +1730,7 @@ communicate_result_validate_utf8 (const char            *stream_name,
     {
       const char *end;
       *return_location = g_memory_output_stream_steal_data (buffer);
-      if (!g_utf8_validate (*return_location, -1, &end))
+      if (!xutf8_validate (*return_location, -1, &end))
         {
           g_free (*return_location);
           *return_location = NULL;
@@ -1748,17 +1748,17 @@ communicate_result_validate_utf8 (const char            *stream_name,
 }
 
 /**
- * g_subprocess_communicate_utf8_finish:
+ * xsubprocess_communicate_utf8_finish:
  * @subprocess: Self
  * @result: Result
  * @stdout_buf: (out) (nullable) (optional) (transfer full): Return location for stdout data
  * @stderr_buf: (out) (nullable) (optional) (transfer full): Return location for stderr data
  * @error: Error
  *
- * Complete an invocation of g_subprocess_communicate_utf8_async().
+ * Complete an invocation of xsubprocess_communicate_utf8_async().
  */
 xboolean_t
-g_subprocess_communicate_utf8_finish (GSubprocess   *subprocess,
+xsubprocess_communicate_utf8_finish (xsubprocess_t   *subprocess,
                                       xasync_result_t  *result,
                                       char         **stdout_buf,
                                       char         **stderr_buf,
@@ -1769,13 +1769,13 @@ g_subprocess_communicate_utf8_finish (GSubprocess   *subprocess,
   xchar_t *local_stdout_buf = NULL, *local_stderr_buf = NULL;
 
   g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
-  g_return_val_if_fail (g_task_is_valid (result, subprocess), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, subprocess), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  g_object_ref (result);
+  xobject_ref (result);
 
-  state = g_task_get_task_data ((GTask*)result);
-  if (!g_task_propagate_boolean ((GTask*)result, error))
+  state = xtask_get_task_data ((xtask_t*)result);
+  if (!xtask_propagate_boolean ((xtask_t*)result, error))
     goto out;
 
   /* TODO - validate UTF-8 while streaming, rather than all at once.
@@ -1791,7 +1791,7 @@ g_subprocess_communicate_utf8_finish (GSubprocess   *subprocess,
 
   ret = TRUE;
  out:
-  g_object_unref (result);
+  xobject_unref (result);
 
   if (ret && stdout_buf != NULL)
     *stdout_buf = g_steal_pointer (&local_stdout_buf);

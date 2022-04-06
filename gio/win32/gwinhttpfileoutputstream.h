@@ -41,7 +41,7 @@ typedef struct _GWinHttpFileOutputStreamClass    GWinHttpFileOutputStreamClass;
 
 xtype_t _g_winhttp_file_output_stream_get_type (void) G_GNUC_CONST;
 
-GFileOutputStream *_g_winhttp_file_output_stream_new (GWinHttpFile *file,
+xfile_output_stream_t *_g_winhttp_file_output_stream_new (GWinHttpFile *file,
                                                       HINTERNET     connection);
 
 G_END_DECLS

@@ -35,12 +35,12 @@
  * @short_description: Base class for implementing streaming output
  * @include: gio/gio.h
  *
- * #xoutput_stream_t has functions to write to a stream (g_output_stream_write()),
- * to close a stream (g_output_stream_close()) and to flush pending writes
- * (g_output_stream_flush()).
+ * #xoutput_stream_t has functions to write to a stream (xoutput_stream_write()),
+ * to close a stream (xoutput_stream_close()) and to flush pending writes
+ * (xoutput_stream_flush()).
  *
  * To copy the content of an input stream to an output stream without
- * manually handling the reads and writes, use g_output_stream_splice().
+ * manually handling the reads and writes, use xoutput_stream_splice().
  *
  * See the documentation for #xio_stream_t for details of thread safety of
  * streaming APIs.
@@ -55,123 +55,123 @@ struct _GOutputStreamPrivate {
   xasync_ready_callback_t outstanding_callback;
 };
 
-G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (xoutput_stream_t, g_output_stream, XTYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (xoutput_stream, xoutput_stream, XTYPE_OBJECT)
 
-static gssize   g_output_stream_real_splice        (xoutput_stream_t             *stream,
+static xssize_t   xoutput_stream_real_splice        (xoutput_stream_t             *stream,
 						    xinput_stream_t              *source,
 						    GOutputStreamSpliceFlags   flags,
 						    xcancellable_t              *cancellable,
 						    xerror_t                   **error);
-static void     g_output_stream_real_write_async   (xoutput_stream_t             *stream,
+static void     xoutput_stream_real_write_async   (xoutput_stream_t             *stream,
 						    const void                *buffer,
 						    xsize_t                      count,
 						    int                        io_priority,
 						    xcancellable_t              *cancellable,
 						    xasync_ready_callback_t        callback,
 						    xpointer_t                   data);
-static gssize   g_output_stream_real_write_finish  (xoutput_stream_t             *stream,
+static xssize_t   xoutput_stream_real_write_finish  (xoutput_stream_t             *stream,
 						    xasync_result_t              *result,
 						    xerror_t                   **error);
-static xboolean_t g_output_stream_real_writev        (xoutput_stream_t             *stream,
-						    const GOutputVector       *vectors,
+static xboolean_t xoutput_stream_real_writev        (xoutput_stream_t             *stream,
+						    const xoutput_vector_t       *vectors,
 						    xsize_t                      n_vectors,
 						    xsize_t                     *bytes_written,
 						    xcancellable_t              *cancellable,
 						    xerror_t                   **error);
-static void     g_output_stream_real_writev_async  (xoutput_stream_t             *stream,
-						    const GOutputVector       *vectors,
+static void     xoutput_stream_real_writev_async  (xoutput_stream_t             *stream,
+						    const xoutput_vector_t       *vectors,
 						    xsize_t                      n_vectors,
 						    int                        io_priority,
 						    xcancellable_t              *cancellable,
 						    xasync_ready_callback_t        callback,
 						    xpointer_t                   data);
-static xboolean_t g_output_stream_real_writev_finish (xoutput_stream_t             *stream,
+static xboolean_t xoutput_stream_real_writev_finish (xoutput_stream_t             *stream,
 						    xasync_result_t              *result,
 						    xsize_t                     *bytes_written,
 						    xerror_t                   **error);
-static void     g_output_stream_real_splice_async  (xoutput_stream_t             *stream,
+static void     xoutput_stream_real_splice_async  (xoutput_stream_t             *stream,
 						    xinput_stream_t              *source,
 						    GOutputStreamSpliceFlags   flags,
 						    int                        io_priority,
 						    xcancellable_t              *cancellable,
 						    xasync_ready_callback_t        callback,
 						    xpointer_t                   data);
-static gssize   g_output_stream_real_splice_finish (xoutput_stream_t             *stream,
+static xssize_t   xoutput_stream_real_splice_finish (xoutput_stream_t             *stream,
 						    xasync_result_t              *result,
 						    xerror_t                   **error);
-static void     g_output_stream_real_flush_async   (xoutput_stream_t             *stream,
+static void     xoutput_stream_real_flush_async   (xoutput_stream_t             *stream,
 						    int                        io_priority,
 						    xcancellable_t              *cancellable,
 						    xasync_ready_callback_t        callback,
 						    xpointer_t                   data);
-static xboolean_t g_output_stream_real_flush_finish  (xoutput_stream_t             *stream,
+static xboolean_t xoutput_stream_real_flush_finish  (xoutput_stream_t             *stream,
 						    xasync_result_t              *result,
 						    xerror_t                   **error);
-static void     g_output_stream_real_close_async   (xoutput_stream_t             *stream,
+static void     xoutput_stream_real_close_async   (xoutput_stream_t             *stream,
 						    int                        io_priority,
 						    xcancellable_t              *cancellable,
 						    xasync_ready_callback_t        callback,
 						    xpointer_t                   data);
-static xboolean_t g_output_stream_real_close_finish  (xoutput_stream_t             *stream,
+static xboolean_t xoutput_stream_real_close_finish  (xoutput_stream_t             *stream,
 						    xasync_result_t              *result,
 						    xerror_t                   **error);
-static xboolean_t g_output_stream_internal_close     (xoutput_stream_t             *stream,
+static xboolean_t xoutput_stream_internal_close     (xoutput_stream_t             *stream,
                                                     xcancellable_t              *cancellable,
                                                     xerror_t                   **error);
-static void     g_output_stream_internal_close_async (xoutput_stream_t           *stream,
+static void     xoutput_stream_internal_close_async (xoutput_stream_t           *stream,
                                                       int                      io_priority,
                                                       xcancellable_t            *cancellable,
                                                       xasync_ready_callback_t      callback,
                                                       xpointer_t                 data);
-static xboolean_t g_output_stream_internal_close_finish (xoutput_stream_t          *stream,
+static xboolean_t xoutput_stream_internal_close_finish (xoutput_stream_t          *stream,
                                                        xasync_result_t           *result,
                                                        xerror_t                **error);
 
 static void
-g_output_stream_dispose (xobject_t *object)
+xoutput_stream_dispose (xobject_t *object)
 {
   xoutput_stream_t *stream;
 
   stream = G_OUTPUT_STREAM (object);
 
   if (!stream->priv->closed)
-    g_output_stream_close (stream, NULL, NULL);
+    xoutput_stream_close (stream, NULL, NULL);
 
-  G_OBJECT_CLASS (g_output_stream_parent_class)->dispose (object);
+  G_OBJECT_CLASS (xoutput_stream_parent_class)->dispose (object);
 }
 
 static void
-g_output_stream_class_init (GOutputStreamClass *klass)
+xoutput_stream_class_init (GOutputStreamClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->dispose = g_output_stream_dispose;
+  gobject_class->dispose = xoutput_stream_dispose;
 
-  klass->splice = g_output_stream_real_splice;
+  klass->splice = xoutput_stream_real_splice;
 
-  klass->write_async = g_output_stream_real_write_async;
-  klass->write_finish = g_output_stream_real_write_finish;
-  klass->writev_fn = g_output_stream_real_writev;
-  klass->writev_async = g_output_stream_real_writev_async;
-  klass->writev_finish = g_output_stream_real_writev_finish;
-  klass->splice_async = g_output_stream_real_splice_async;
-  klass->splice_finish = g_output_stream_real_splice_finish;
-  klass->flush_async = g_output_stream_real_flush_async;
-  klass->flush_finish = g_output_stream_real_flush_finish;
-  klass->close_async = g_output_stream_real_close_async;
-  klass->close_finish = g_output_stream_real_close_finish;
+  klass->write_async = xoutput_stream_real_write_async;
+  klass->write_finish = xoutput_stream_real_write_finish;
+  klass->writev_fn = xoutput_stream_real_writev;
+  klass->writev_async = xoutput_stream_real_writev_async;
+  klass->writev_finish = xoutput_stream_real_writev_finish;
+  klass->splice_async = xoutput_stream_real_splice_async;
+  klass->splice_finish = xoutput_stream_real_splice_finish;
+  klass->flush_async = xoutput_stream_real_flush_async;
+  klass->flush_finish = xoutput_stream_real_flush_finish;
+  klass->close_async = xoutput_stream_real_close_async;
+  klass->close_finish = xoutput_stream_real_close_finish;
 }
 
 static void
-g_output_stream_init (xoutput_stream_t *stream)
+xoutput_stream_init (xoutput_stream_t *stream)
 {
-  stream->priv = g_output_stream_get_instance_private (stream);
+  stream->priv = xoutput_stream_get_instance_private (stream);
 }
 
 /**
- * g_output_stream_write:
+ * xoutput_stream_write:
  * @stream: a #xoutput_stream_t.
- * @buffer: (array length=count) (element-type guint8): the buffer containing the data to write.
+ * @buffer: (array length=count) (element-type xuint8_t): the buffer containing the data to write.
  * @count: the number of bytes to write
  * @cancellable: (nullable): optional cancellable object
  * @error: location to store the error occurring, or %NULL to ignore
@@ -201,15 +201,15 @@ g_output_stream_init (xoutput_stream_t *stream)
  *
  * Returns: Number of bytes written, or -1 on error
  **/
-gssize
-g_output_stream_write (xoutput_stream_t  *stream,
+xssize_t
+xoutput_stream_write (xoutput_stream_t  *stream,
 		       const void     *buffer,
 		       xsize_t           count,
 		       xcancellable_t   *cancellable,
 		       xerror_t        **error)
 {
   GOutputStreamClass *class;
-  gssize res;
+  xssize_t res;
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), -1);
   g_return_val_if_fail (buffer != NULL, 0);
@@ -217,7 +217,7 @@ g_output_stream_write (xoutput_stream_t  *stream,
   if (count == 0)
     return 0;
 
-  if (((gssize) count) < 0)
+  if (((xssize_t) count) < 0)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Too large count value passed to %s"), G_STRFUNC);
@@ -233,7 +233,7 @@ g_output_stream_write (xoutput_stream_t  *stream,
       return -1;
     }
 
-  if (!g_output_stream_set_pending (stream, error))
+  if (!xoutput_stream_set_pending (stream, error))
     return -1;
 
   if (cancellable)
@@ -244,15 +244,15 @@ g_output_stream_write (xoutput_stream_t  *stream,
   if (cancellable)
     g_cancellable_pop_current (cancellable);
 
-  g_output_stream_clear_pending (stream);
+  xoutput_stream_clear_pending (stream);
 
   return res;
 }
 
 /**
- * g_output_stream_write_all:
+ * xoutput_stream_write_all:
  * @stream: a #xoutput_stream_t.
- * @buffer: (array length=count) (element-type guint8): the buffer containing the data to write.
+ * @buffer: (array length=count) (element-type xuint8_t): the buffer containing the data to write.
  * @count: the number of bytes to write
  * @bytes_written: (out) (optional): location to store the number of bytes that was
  *     written to the stream
@@ -262,7 +262,7 @@ g_output_stream_write (xoutput_stream_t  *stream,
  * Tries to write @count bytes from @buffer into the stream. Will block
  * during the operation.
  *
- * This function is similar to g_output_stream_write(), except it tries to
+ * This function is similar to xoutput_stream_write(), except it tries to
  * write as many bytes as requested, only stopping on an error.
  *
  * On a successful write of @count bytes, %TRUE is returned, and @bytes_written
@@ -277,12 +277,12 @@ g_output_stream_write (xoutput_stream_t  *stream,
  * successfully written before the error was encountered.  This
  * functionality is only available from C.  If you need it from another
  * language then you must write your own loop around
- * g_output_stream_write().
+ * xoutput_stream_write().
  *
  * Returns: %TRUE on success, %FALSE if there was an error
  **/
 xboolean_t
-g_output_stream_write_all (xoutput_stream_t  *stream,
+xoutput_stream_write_all (xoutput_stream_t  *stream,
 			   const void     *buffer,
 			   xsize_t           count,
 			   xsize_t          *bytes_written,
@@ -290,7 +290,7 @@ g_output_stream_write_all (xoutput_stream_t  *stream,
 			   xerror_t        **error)
 {
   xsize_t _bytes_written;
-  gssize res;
+  xssize_t res;
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
   g_return_val_if_fail (buffer != NULL || count == 0, FALSE);
@@ -298,7 +298,7 @@ g_output_stream_write_all (xoutput_stream_t  *stream,
   _bytes_written = 0;
   while (_bytes_written < count)
     {
-      res = g_output_stream_write (stream, (char *)buffer + _bytes_written, count - _bytes_written,
+      res = xoutput_stream_write (stream, (char *)buffer + _bytes_written, count - _bytes_written,
 				   cancellable, error);
       if (res == -1)
 	{
@@ -318,7 +318,7 @@ g_output_stream_write_all (xoutput_stream_t  *stream,
 }
 
 /**
- * g_output_stream_writev:
+ * xoutput_stream_writev:
  * @stream: a #xoutput_stream_t.
  * @vectors: (array length=n_vectors): the buffer containing the #GOutputVectors to write.
  * @n_vectors: the number of vectors to write
@@ -346,7 +346,7 @@ g_output_stream_write_all (xoutput_stream_t  *stream,
  * operation was partially finished when the operation was cancelled the
  * partial result will be returned, without an error.
  *
- * Some implementations of g_output_stream_writev() may have limitations on the
+ * Some implementations of xoutput_stream_writev() may have limitations on the
  * aggregate buffer size, and will return %G_IO_ERROR_INVALID_ARGUMENT if these
  * are exceeded. For example, when writing to a local file on UNIX platforms,
  * the aggregate buffer size must not exceed %G_MAXSSIZE bytes.
@@ -358,8 +358,8 @@ g_output_stream_write_all (xoutput_stream_t  *stream,
  * Since: 2.60
  */
 xboolean_t
-g_output_stream_writev (xoutput_stream_t        *stream,
-		        const GOutputVector  *vectors,
+xoutput_stream_writev (xoutput_stream_t        *stream,
+		        const xoutput_vector_t  *vectors,
 		        xsize_t                 n_vectors,
 		        xsize_t                *bytes_written,
 		        xcancellable_t         *cancellable,
@@ -384,7 +384,7 @@ g_output_stream_writev (xoutput_stream_t        *stream,
 
   g_return_val_if_fail (class->writev_fn != NULL, FALSE);
 
-  if (!g_output_stream_set_pending (stream, error))
+  if (!xoutput_stream_set_pending (stream, error))
     return FALSE;
 
   if (cancellable)
@@ -398,7 +398,7 @@ g_output_stream_writev (xoutput_stream_t        *stream,
   if (cancellable)
     g_cancellable_pop_current (cancellable);
 
-  g_output_stream_clear_pending (stream);
+  xoutput_stream_clear_pending (stream);
 
   if (bytes_written)
     *bytes_written = _bytes_written;
@@ -407,7 +407,7 @@ g_output_stream_writev (xoutput_stream_t        *stream,
 }
 
 /**
- * g_output_stream_writev_all:
+ * xoutput_stream_writev_all:
  * @stream: a #xoutput_stream_t.
  * @vectors: (array length=n_vectors): the buffer containing the #GOutputVectors to write.
  * @n_vectors: the number of vectors to write
@@ -419,7 +419,7 @@ g_output_stream_writev (xoutput_stream_t        *stream,
  * Tries to write the bytes contained in the @n_vectors @vectors into the
  * stream. Will block during the operation.
  *
- * This function is similar to g_output_stream_writev(), except it tries to
+ * This function is similar to xoutput_stream_writev(), except it tries to
  * write as many bytes as requested, only stopping on an error.
  *
  * On a successful write of all @n_vectors vectors, %TRUE is returned, and
@@ -434,7 +434,7 @@ g_output_stream_writev (xoutput_stream_t        *stream,
  * successfully written before the error was encountered.  This
  * functionality is only available from C. If you need it from another
  * language then you must write your own loop around
- * g_output_stream_write().
+ * xoutput_stream_write().
  *
  * The content of the individual elements of @vectors might be changed by this
  * function.
@@ -444,8 +444,8 @@ g_output_stream_writev (xoutput_stream_t        *stream,
  * Since: 2.60
  */
 xboolean_t
-g_output_stream_writev_all (xoutput_stream_t  *stream,
-			    GOutputVector  *vectors,
+xoutput_stream_writev_all (xoutput_stream_t  *stream,
+			    xoutput_vector_t  *vectors,
 			    xsize_t           n_vectors,
 			    xsize_t          *bytes_written,
 			    xcancellable_t   *cancellable,
@@ -481,7 +481,7 @@ g_output_stream_writev_all (xoutput_stream_t  *stream,
       xsize_t n_written = 0;
       xboolean_t res;
 
-      res = g_output_stream_writev (stream, vectors, n_vectors, &n_written, cancellable, error);
+      res = xoutput_stream_writev (stream, vectors, n_vectors, &n_written, cancellable, error);
 
       if (!res)
         {
@@ -504,7 +504,7 @@ g_output_stream_writev_all (xoutput_stream_t  *stream,
       if (n_written > 0 && n_vectors > 0)
         {
           vectors[0].size -= n_written;
-          vectors[0].buffer = ((guint8 *) vectors[0].buffer) + n_written;
+          vectors[0].buffer = ((xuint8_t *) vectors[0].buffer) + n_written;
         }
     }
 
@@ -515,7 +515,7 @@ g_output_stream_writev_all (xoutput_stream_t  *stream,
 }
 
 /**
- * g_output_stream_printf:
+ * xoutput_stream_printf:
  * @stream: a #xoutput_stream_t.
  * @bytes_written: (out) (optional): location to store the number of bytes that was
  *     written to the stream
@@ -524,25 +524,25 @@ g_output_stream_writev_all (xoutput_stream_t  *stream,
  * @format: the format string. See the printf() documentation
  * @...: the parameters to insert into the format string
  *
- * This is a utility function around g_output_stream_write_all(). It
- * uses g_strdup_vprintf() to turn @format and @... into a string that
+ * This is a utility function around xoutput_stream_write_all(). It
+ * uses xstrdup_vprintf() to turn @format and @... into a string that
  * is then written to @stream.
  *
- * See the documentation of g_output_stream_write_all() about the
+ * See the documentation of xoutput_stream_write_all() about the
  * behavior of the actual write operation.
  *
  * Note that partial writes cannot be properly checked with this
  * function due to the variable length of the written string, if you
  * need precise control over partial write failures, you need to
- * create you own printf()-like wrapper around g_output_stream_write()
- * or g_output_stream_write_all().
+ * create you own printf()-like wrapper around xoutput_stream_write()
+ * or xoutput_stream_write_all().
  *
  * Since: 2.40
  *
  * Returns: %TRUE on success, %FALSE if there was an error
  **/
 xboolean_t
-g_output_stream_printf (xoutput_stream_t  *stream,
+xoutput_stream_printf (xoutput_stream_t  *stream,
                         xsize_t          *bytes_written,
                         xcancellable_t   *cancellable,
                         xerror_t        **error,
@@ -553,7 +553,7 @@ g_output_stream_printf (xoutput_stream_t  *stream,
   xboolean_t success;
 
   va_start (args, format);
-  success = g_output_stream_vprintf (stream, bytes_written, cancellable,
+  success = xoutput_stream_vprintf (stream, bytes_written, cancellable,
                                      error, format, args);
   va_end (args);
 
@@ -561,7 +561,7 @@ g_output_stream_printf (xoutput_stream_t  *stream,
 }
 
 /**
- * g_output_stream_vprintf:
+ * xoutput_stream_vprintf:
  * @stream: a #xoutput_stream_t.
  * @bytes_written: (out) (optional): location to store the number of bytes that was
  *     written to the stream
@@ -570,25 +570,25 @@ g_output_stream_printf (xoutput_stream_t  *stream,
  * @format: the format string. See the printf() documentation
  * @args: the parameters to insert into the format string
  *
- * This is a utility function around g_output_stream_write_all(). It
- * uses g_strdup_vprintf() to turn @format and @args into a string that
+ * This is a utility function around xoutput_stream_write_all(). It
+ * uses xstrdup_vprintf() to turn @format and @args into a string that
  * is then written to @stream.
  *
- * See the documentation of g_output_stream_write_all() about the
+ * See the documentation of xoutput_stream_write_all() about the
  * behavior of the actual write operation.
  *
  * Note that partial writes cannot be properly checked with this
  * function due to the variable length of the written string, if you
  * need precise control over partial write failures, you need to
- * create you own printf()-like wrapper around g_output_stream_write()
- * or g_output_stream_write_all().
+ * create you own printf()-like wrapper around xoutput_stream_write()
+ * or xoutput_stream_write_all().
  *
  * Since: 2.40
  *
  * Returns: %TRUE on success, %FALSE if there was an error
  **/
 xboolean_t
-g_output_stream_vprintf (xoutput_stream_t  *stream,
+xoutput_stream_vprintf (xoutput_stream_t  *stream,
                          xsize_t          *bytes_written,
                          xcancellable_t   *cancellable,
                          xerror_t        **error,
@@ -603,8 +603,8 @@ g_output_stream_vprintf (xoutput_stream_t  *stream,
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
   g_return_val_if_fail (format != NULL, FALSE);
 
-  text = g_strdup_vprintf (format, args);
-  success = g_output_stream_write_all (stream,
+  text = xstrdup_vprintf (format, args);
+  success = xoutput_stream_write_all (stream,
                                        text, strlen (text),
                                        bytes_written, cancellable, error);
   g_free (text);
@@ -613,45 +613,45 @@ g_output_stream_vprintf (xoutput_stream_t  *stream,
 }
 
 /**
- * g_output_stream_write_bytes:
+ * xoutput_stream_write_bytes:
  * @stream: a #xoutput_stream_t.
- * @bytes: the #GBytes to write
+ * @bytes: the #xbytes_t to write
  * @cancellable: (nullable): optional cancellable object
  * @error: location to store the error occurring, or %NULL to ignore
  *
- * A wrapper function for g_output_stream_write() which takes a
- * #GBytes as input.  This can be more convenient for use by language
- * bindings or in other cases where the refcounted nature of #GBytes
+ * A wrapper function for xoutput_stream_write() which takes a
+ * #xbytes_t as input.  This can be more convenient for use by language
+ * bindings or in other cases where the refcounted nature of #xbytes_t
  * is helpful over a bare pointer interface.
  *
  * However, note that this function may still perform partial writes,
- * just like g_output_stream_write().  If that occurs, to continue
- * writing, you will need to create a new #GBytes containing just the
- * remaining bytes, using g_bytes_new_from_bytes(). Passing the same
- * #GBytes instance multiple times potentially can result in duplicated
+ * just like xoutput_stream_write().  If that occurs, to continue
+ * writing, you will need to create a new #xbytes_t containing just the
+ * remaining bytes, using xbytes_new_from_bytes(). Passing the same
+ * #xbytes_t instance multiple times potentially can result in duplicated
  * data in the output stream.
  *
  * Returns: Number of bytes written, or -1 on error
  **/
-gssize
-g_output_stream_write_bytes (xoutput_stream_t  *stream,
-			     GBytes         *bytes,
+xssize_t
+xoutput_stream_write_bytes (xoutput_stream_t  *stream,
+			     xbytes_t         *bytes,
 			     xcancellable_t   *cancellable,
 			     xerror_t        **error)
 {
   xsize_t size;
-  gconstpointer data;
+  xconstpointer data;
 
-  data = g_bytes_get_data (bytes, &size);
+  data = xbytes_get_data (bytes, &size);
 
-  return g_output_stream_write (stream,
+  return xoutput_stream_write (stream,
                                 data, size,
 				cancellable,
 				error);
 }
 
 /**
- * g_output_stream_flush:
+ * xoutput_stream_flush:
  * @stream: a #xoutput_stream_t.
  * @cancellable: (nullable): optional cancellable object
  * @error: location to store the error occurring, or %NULL to ignore
@@ -669,7 +669,7 @@ g_output_stream_write_bytes (xoutput_stream_t  *stream,
  * Returns: %TRUE on success, %FALSE on error
  **/
 xboolean_t
-g_output_stream_flush (xoutput_stream_t  *stream,
+xoutput_stream_flush (xoutput_stream_t  *stream,
                        xcancellable_t   *cancellable,
                        xerror_t        **error)
 {
@@ -678,7 +678,7 @@ g_output_stream_flush (xoutput_stream_t  *stream,
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
 
-  if (!g_output_stream_set_pending (stream, error))
+  if (!xoutput_stream_set_pending (stream, error))
     return FALSE;
 
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
@@ -695,13 +695,13 @@ g_output_stream_flush (xoutput_stream_t  *stream,
 	g_cancellable_pop_current (cancellable);
     }
 
-  g_output_stream_clear_pending (stream);
+  xoutput_stream_clear_pending (stream);
 
   return res;
 }
 
 /**
- * g_output_stream_splice:
+ * xoutput_stream_splice:
  * @stream: a #xoutput_stream_t.
  * @source: a #xinput_stream_t.
  * @flags: a set of #GOutputStreamSpliceFlags.
@@ -711,33 +711,33 @@ g_output_stream_flush (xoutput_stream_t  *stream,
  *
  * Splices an input stream into an output stream.
  *
- * Returns: a #gssize containing the size of the data spliced, or
+ * Returns: a #xssize_t containing the size of the data spliced, or
  *     -1 if an error occurred. Note that if the number of bytes
  *     spliced is greater than %G_MAXSSIZE, then that will be
  *     returned, and there is no way to determine the actual number
  *     of bytes spliced.
  **/
-gssize
-g_output_stream_splice (xoutput_stream_t             *stream,
+xssize_t
+xoutput_stream_splice (xoutput_stream_t             *stream,
 			xinput_stream_t              *source,
 			GOutputStreamSpliceFlags   flags,
 			xcancellable_t              *cancellable,
 			xerror_t                   **error)
 {
   GOutputStreamClass *class;
-  gssize bytes_copied;
+  xssize_t bytes_copied;
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), -1);
   g_return_val_if_fail (X_IS_INPUT_STREAM (source), -1);
 
-  if (g_input_stream_is_closed (source))
+  if (xinput_stream_is_closed (source))
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
                            _("Source stream is already closed"));
       return -1;
     }
 
-  if (!g_output_stream_set_pending (stream, error))
+  if (!xoutput_stream_set_pending (stream, error))
     return -1;
 
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
@@ -750,20 +750,20 @@ g_output_stream_splice (xoutput_stream_t             *stream,
   if (cancellable)
     g_cancellable_pop_current (cancellable);
 
-  g_output_stream_clear_pending (stream);
+  xoutput_stream_clear_pending (stream);
 
   return bytes_copied;
 }
 
-static gssize
-g_output_stream_real_splice (xoutput_stream_t             *stream,
+static xssize_t
+xoutput_stream_real_splice (xoutput_stream_t             *stream,
                              xinput_stream_t              *source,
                              GOutputStreamSpliceFlags   flags,
                              xcancellable_t              *cancellable,
                              xerror_t                   **error)
 {
   GOutputStreamClass *class = G_OUTPUT_STREAM_GET_CLASS (stream);
-  gssize n_read, n_written;
+  xssize_t n_read, n_written;
   xsize_t bytes_copied;
   char buffer[8192], *p;
   xboolean_t res;
@@ -780,7 +780,7 @@ g_output_stream_real_splice (xoutput_stream_t             *stream,
   res = TRUE;
   do
     {
-      n_read = g_input_stream_read (source, buffer, sizeof (buffer), cancellable, error);
+      n_read = xinput_stream_read (source, buffer, sizeof (buffer), cancellable, error);
       if (n_read == -1)
 	{
 	  res = FALSE;
@@ -817,13 +817,13 @@ g_output_stream_real_splice (xoutput_stream_t             *stream,
   if (flags & G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE)
     {
       /* Don't care about errors in source here */
-      g_input_stream_close (source, cancellable, NULL);
+      xinput_stream_close (source, cancellable, NULL);
     }
 
   if (flags & G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET)
     {
       /* But write errors on close are bad! */
-      if (!g_output_stream_internal_close (stream, cancellable, error))
+      if (!xoutput_stream_internal_close (stream, cancellable, error))
         res = FALSE;
     }
 
@@ -834,9 +834,9 @@ g_output_stream_real_splice (xoutput_stream_t             *stream,
 }
 
 /* Must always be called inside
- * g_output_stream_set_pending()/g_output_stream_clear_pending(). */
+ * xoutput_stream_set_pending()/xoutput_stream_clear_pending(). */
 static xboolean_t
-g_output_stream_internal_close (xoutput_stream_t  *stream,
+xoutput_stream_internal_close (xoutput_stream_t  *stream,
                                 xcancellable_t   *cancellable,
                                 xerror_t        **error)
 {
@@ -883,7 +883,7 @@ g_output_stream_internal_close (xoutput_stream_t  *stream,
 }
 
 /**
- * g_output_stream_close:
+ * xoutput_stream_close:
  * @stream: A #xoutput_stream_t.
  * @cancellable: (nullable): optional cancellable object
  * @error: location to store the error occurring, or %NULL to ignore
@@ -921,7 +921,7 @@ g_output_stream_internal_close (xoutput_stream_t  *stream,
  * Returns: %TRUE on success, %FALSE on failure
  **/
 xboolean_t
-g_output_stream_close (xoutput_stream_t  *stream,
+xoutput_stream_close (xoutput_stream_t  *stream,
 		       xcancellable_t   *cancellable,
 		       xerror_t        **error)
 {
@@ -932,12 +932,12 @@ g_output_stream_close (xoutput_stream_t  *stream,
   if (stream->priv->closed)
     return TRUE;
 
-  if (!g_output_stream_set_pending (stream, error))
+  if (!xoutput_stream_set_pending (stream, error))
     return FALSE;
 
-  res = g_output_stream_internal_close (stream, cancellable, error);
+  res = xoutput_stream_internal_close (stream, cancellable, error);
 
-  g_output_stream_clear_pending (stream);
+  xoutput_stream_clear_pending (stream);
 
   return res;
 }
@@ -949,13 +949,13 @@ async_ready_write_callback_wrapper (xobject_t      *source_object,
 {
   xoutput_stream_t *stream = G_OUTPUT_STREAM (source_object);
   GOutputStreamClass *class;
-  GTask *task = user_data;
-  gssize nwrote;
+  xtask_t *task = user_data;
+  xssize_t nwrote;
   xerror_t *error = NULL;
 
-  g_output_stream_clear_pending (stream);
+  xoutput_stream_clear_pending (stream);
 
-  if (g_async_result_legacy_propagate_error (res, &error))
+  if (xasync_result_legacy_propagate_error (res, &error))
     nwrote = -1;
   else
     {
@@ -964,16 +964,16 @@ async_ready_write_callback_wrapper (xobject_t      *source_object,
     }
 
   if (nwrote >= 0)
-    g_task_return_int (task, nwrote);
+    xtask_return_int (task, nwrote);
   else
-    g_task_return_error (task, error);
-  g_object_unref (task);
+    xtask_return_error (task, error);
+  xobject_unref (task);
 }
 
 /**
- * g_output_stream_write_async:
+ * xoutput_stream_write_async:
  * @stream: A #xoutput_stream_t.
- * @buffer: (array length=count) (element-type guint8): the buffer containing the data to write.
+ * @buffer: (array length=count) (element-type xuint8_t): the buffer containing the data to write.
  * @count: the number of bytes to write
  * @io_priority: the io priority of the request.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
@@ -982,7 +982,7 @@ async_ready_write_callback_wrapper (xobject_t      *source_object,
  *
  * Request an asynchronous write of @count bytes from @buffer into
  * the stream. When the operation is finished @callback will be called.
- * You can then call g_output_stream_write_finish() to get the result of the
+ * You can then call xoutput_stream_write_finish() to get the result of the
  * operation.
  *
  * During an async request no other sync and async calls are allowed,
@@ -1009,15 +1009,15 @@ async_ready_write_callback_wrapper (xobject_t      *source_object,
  * classes. However, if you override one you must override all.
  *
  * For the synchronous, blocking version of this function, see
- * g_output_stream_write().
+ * xoutput_stream_write().
  *
  * Note that no copy of @buffer will be made, so it must stay valid
- * until @callback is called. See g_output_stream_write_bytes_async()
- * for a #GBytes version that will automatically hold a reference to
+ * until @callback is called. See xoutput_stream_write_bytes_async()
+ * for a #xbytes_t version that will automatically hold a reference to
  * the contents (without copying) for the duration of the call.
  */
 void
-g_output_stream_write_async (xoutput_stream_t       *stream,
+xoutput_stream_write_async (xoutput_stream_t       *stream,
 			     const void          *buffer,
 			     xsize_t                count,
 			     int                  io_priority,
@@ -1027,35 +1027,35 @@ g_output_stream_write_async (xoutput_stream_t       *stream,
 {
   GOutputStreamClass *class;
   xerror_t *error = NULL;
-  GTask *task;
+  xtask_t *task;
 
   g_return_if_fail (X_IS_OUTPUT_STREAM (stream));
   g_return_if_fail (buffer != NULL);
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_output_stream_write_async);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xoutput_stream_write_async);
+  xtask_set_priority (task, io_priority);
 
   if (count == 0)
     {
-      g_task_return_int (task, 0);
-      g_object_unref (task);
+      xtask_return_int (task, 0);
+      xobject_unref (task);
       return;
     }
 
-  if (((gssize) count) < 0)
+  if (((xssize_t) count) < 0)
     {
-      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+      xtask_return_new_error (task, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
                                _("Too large count value passed to %s"),
                                G_STRFUNC);
-      g_object_unref (task);
+      xobject_unref (task);
       return;
     }
 
-  if (!g_output_stream_set_pending (stream, &error))
+  if (!xoutput_stream_set_pending (stream, &error))
     {
-      g_task_return_error (task, error);
-      g_object_unref (task);
+      xtask_return_error (task, error);
+      xobject_unref (task);
       return;
     }
 
@@ -1066,7 +1066,7 @@ g_output_stream_write_async (xoutput_stream_t       *stream,
 }
 
 /**
- * g_output_stream_write_finish:
+ * xoutput_stream_write_finish:
  * @stream: a #xoutput_stream_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
@@ -1074,26 +1074,26 @@ g_output_stream_write_async (xoutput_stream_t       *stream,
  *
  * Finishes a stream write operation.
  *
- * Returns: a #gssize containing the number of bytes written to the stream.
+ * Returns: a #xssize_t containing the number of bytes written to the stream.
  **/
-gssize
-g_output_stream_write_finish (xoutput_stream_t  *stream,
+xssize_t
+xoutput_stream_write_finish (xoutput_stream_t  *stream,
                               xasync_result_t   *result,
                               xerror_t        **error)
 {
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
-  g_return_val_if_fail (g_async_result_is_tagged (result, g_output_stream_write_async), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_write_async), FALSE);
 
-  /* @result is always the GTask created by g_output_stream_write_async();
+  /* @result is always the xtask_t created by xoutput_stream_write_async();
    * we called class->write_finish() from async_ready_write_callback_wrapper.
    */
-  return g_task_propagate_int (G_TASK (result), error);
+  return xtask_propagate_int (XTASK (result), error);
 }
 
 typedef struct
 {
-  const guint8 *buffer;
+  const xuint8_t *buffer;
   xsize_t to_write;
   xsize_t bytes_written;
 } AsyncWriteAll;
@@ -1109,20 +1109,20 @@ write_all_callback (xobject_t      *stream,
                     xasync_result_t *result,
                     xpointer_t      user_data)
 {
-  GTask *task = user_data;
-  AsyncWriteAll *data = g_task_get_task_data (task);
+  xtask_t *task = user_data;
+  AsyncWriteAll *data = xtask_get_task_data (task);
 
   if (result)
     {
       xerror_t *error = NULL;
-      gssize nwritten;
+      xssize_t nwritten;
 
-      nwritten = g_output_stream_write_finish (G_OUTPUT_STREAM (stream), result, &error);
+      nwritten = xoutput_stream_write_finish (G_OUTPUT_STREAM (stream), result, &error);
 
       if (nwritten == -1)
         {
-          g_task_return_error (task, error);
-          g_object_unref (task);
+          xtask_return_error (task, error);
+          xobject_unref (task);
           return;
         }
 
@@ -1135,20 +1135,20 @@ write_all_callback (xobject_t      *stream,
 
   if (data->to_write == 0)
     {
-      g_task_return_boolean (task, TRUE);
-      g_object_unref (task);
+      xtask_return_boolean (task, TRUE);
+      xobject_unref (task);
     }
   else
-    g_output_stream_write_async (G_OUTPUT_STREAM (stream),
+    xoutput_stream_write_async (G_OUTPUT_STREAM (stream),
                                  data->buffer + data->bytes_written,
                                  data->to_write,
-                                 g_task_get_priority (task),
-                                 g_task_get_cancellable (task),
+                                 xtask_get_priority (task),
+                                 xtask_get_cancellable (task),
                                  write_all_callback, task);
 }
 
 static void
-write_all_async_thread (GTask        *task,
+write_all_async_thread (xtask_t        *task,
                         xpointer_t      source_object,
                         xpointer_t      task_data,
                         xcancellable_t *cancellable)
@@ -1157,17 +1157,17 @@ write_all_async_thread (GTask        *task,
   AsyncWriteAll *data = task_data;
   xerror_t *error = NULL;
 
-  if (g_output_stream_write_all (stream, data->buffer, data->to_write, &data->bytes_written,
-                                 g_task_get_cancellable (task), &error))
-    g_task_return_boolean (task, TRUE);
+  if (xoutput_stream_write_all (stream, data->buffer, data->to_write, &data->bytes_written,
+                                 xtask_get_cancellable (task), &error))
+    xtask_return_boolean (task, TRUE);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 /**
- * g_output_stream_write_all_async:
+ * xoutput_stream_write_all_async:
  * @stream: A #xoutput_stream_t
- * @buffer: (array length=count) (element-type guint8): the buffer containing the data to write
+ * @buffer: (array length=count) (element-type xuint8_t): the buffer containing the data to write
  * @count: the number of bytes to write
  * @io_priority: the io priority of the request
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore
@@ -1176,12 +1176,12 @@ write_all_async_thread (GTask        *task,
  *
  * Request an asynchronous write of @count bytes from @buffer into
  * the stream. When the operation is finished @callback will be called.
- * You can then call g_output_stream_write_all_finish() to get the result of the
+ * You can then call xoutput_stream_write_all_finish() to get the result of the
  * operation.
  *
- * This is the asynchronous version of g_output_stream_write_all().
+ * This is the asynchronous version of xoutput_stream_write_all().
  *
- * Call g_output_stream_write_all_finish() to collect the result.
+ * Call xoutput_stream_write_all_finish() to collect the result.
  *
  * Any outstanding I/O request with higher priority (lower numerical
  * value) will be executed before an outstanding request with lower
@@ -1193,7 +1193,7 @@ write_all_async_thread (GTask        *task,
  * Since: 2.44
  */
 void
-g_output_stream_write_all_async (xoutput_stream_t       *stream,
+xoutput_stream_write_all_async (xoutput_stream_t       *stream,
                                  const void          *buffer,
                                  xsize_t                count,
                                  int                  io_priority,
@@ -1202,42 +1202,42 @@ g_output_stream_write_all_async (xoutput_stream_t       *stream,
                                  xpointer_t             user_data)
 {
   AsyncWriteAll *data;
-  GTask *task;
+  xtask_t *task;
 
   g_return_if_fail (X_IS_OUTPUT_STREAM (stream));
   g_return_if_fail (buffer != NULL || count == 0);
 
-  task = g_task_new (stream, cancellable, callback, user_data);
+  task = xtask_new (stream, cancellable, callback, user_data);
   data = g_slice_new0 (AsyncWriteAll);
   data->buffer = buffer;
   data->to_write = count;
 
-  g_task_set_source_tag (task, g_output_stream_write_all_async);
-  g_task_set_task_data (task, data, free_async_write_all);
-  g_task_set_priority (task, io_priority);
+  xtask_set_source_tag (task, xoutput_stream_write_all_async);
+  xtask_set_task_data (task, data, free_async_write_all);
+  xtask_set_priority (task, io_priority);
 
   /* If async writes are going to be handled via the threadpool anyway
    * then we may as well do it with a single dispatch instead of
    * bouncing in and out.
    */
-  if (g_output_stream_async_write_is_via_threads (stream))
+  if (xoutput_stream_async_write_is_via_threads (stream))
     {
-      g_task_run_in_thread (task, write_all_async_thread);
-      g_object_unref (task);
+      xtask_run_in_thread (task, write_all_async_thread);
+      xobject_unref (task);
     }
   else
     write_all_callback (G_OBJECT (stream), NULL, task);
 }
 
 /**
- * g_output_stream_write_all_finish:
+ * xoutput_stream_write_all_finish:
  * @stream: a #xoutput_stream_t
  * @result: a #xasync_result_t
  * @bytes_written: (out) (optional): location to store the number of bytes that was written to the stream
  * @error: a #xerror_t location to store the error occurring, or %NULL to ignore.
  *
  * Finishes an asynchronous stream write operation started with
- * g_output_stream_write_all_async().
+ * xoutput_stream_write_all_async().
  *
  * As a special exception to the normal conventions for functions that
  * use #xerror_t, if this function returns %FALSE (and sets @error) then
@@ -1245,37 +1245,37 @@ g_output_stream_write_all_async (xoutput_stream_t       *stream,
  * successfully written before the error was encountered.  This
  * functionality is only available from C.  If you need it from another
  * language then you must write your own loop around
- * g_output_stream_write_async().
+ * xoutput_stream_write_async().
  *
  * Returns: %TRUE on success, %FALSE if there was an error
  *
  * Since: 2.44
  **/
 xboolean_t
-g_output_stream_write_all_finish (xoutput_stream_t  *stream,
+xoutput_stream_write_all_finish (xoutput_stream_t  *stream,
                                   xasync_result_t   *result,
                                   xsize_t          *bytes_written,
                                   xerror_t        **error)
 {
-  GTask *task;
+  xtask_t *task;
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
-  task = G_TASK (result);
+  task = XTASK (result);
 
   if (bytes_written)
     {
-      AsyncWriteAll *data = (AsyncWriteAll *)g_task_get_task_data (task);
+      AsyncWriteAll *data = (AsyncWriteAll *)xtask_get_task_data (task);
 
       *bytes_written = data->bytes_written;
     }
 
-  return g_task_propagate_boolean (task, error);
+  return xtask_propagate_boolean (task, error);
 }
 
 /**
- * g_output_stream_writev_async:
+ * xoutput_stream_writev_async:
  * @stream: A #xoutput_stream_t.
  * @vectors: (array length=n_vectors): the buffer containing the #GOutputVectors to write.
  * @n_vectors: the number of vectors to write
@@ -1286,7 +1286,7 @@ g_output_stream_write_all_finish (xoutput_stream_t  *stream,
  *
  * Request an asynchronous write of the bytes contained in @n_vectors @vectors into
  * the stream. When the operation is finished @callback will be called.
- * You can then call g_output_stream_writev_finish() to get the result of the
+ * You can then call xoutput_stream_writev_finish() to get the result of the
  * operation.
  *
  * During an async request no other sync and async calls are allowed,
@@ -1310,7 +1310,7 @@ g_output_stream_write_all_finish (xoutput_stream_t  *stream,
  * classes. However, if you override one you must override all.
  *
  * For the synchronous, blocking version of this function, see
- * g_output_stream_writev().
+ * xoutput_stream_writev().
  *
  * Note that no copy of @vectors will be made, so it must stay valid
  * until @callback is called.
@@ -1318,8 +1318,8 @@ g_output_stream_write_all_finish (xoutput_stream_t  *stream,
  * Since: 2.60
  */
 void
-g_output_stream_writev_async (xoutput_stream_t             *stream,
-			      const GOutputVector       *vectors,
+xoutput_stream_writev_async (xoutput_stream_t             *stream,
+			      const xoutput_vector_t       *vectors,
 			      xsize_t                      n_vectors,
 			      int                        io_priority,
 			      xcancellable_t              *cancellable,
@@ -1340,7 +1340,7 @@ g_output_stream_writev_async (xoutput_stream_t             *stream,
 }
 
 /**
- * g_output_stream_writev_finish:
+ * xoutput_stream_writev_finish:
  * @stream: a #xoutput_stream_t.
  * @result: a #xasync_result_t.
  * @bytes_written: (out) (optional): location to store the number of bytes that were written to the stream
@@ -1354,7 +1354,7 @@ g_output_stream_writev_async (xoutput_stream_t             *stream,
  * Since: 2.60
  */
 xboolean_t
-g_output_stream_writev_finish (xoutput_stream_t  *stream,
+xoutput_stream_writev_finish (xoutput_stream_t  *stream,
                                xasync_result_t   *result,
                                xsize_t          *bytes_written,
                                xerror_t        **error)
@@ -1383,7 +1383,7 @@ g_output_stream_writev_finish (xoutput_stream_t  *stream,
 
 typedef struct
 {
-  GOutputVector *vectors;
+  xoutput_vector_t *vectors;
   xsize_t n_vectors; /* (unowned) */
   xsize_t bytes_written;
 } AsyncWritevAll;
@@ -1399,10 +1399,10 @@ writev_all_callback (xobject_t      *stream,
                      xasync_result_t *result,
                      xpointer_t      user_data)
 {
-  GTask *task = user_data;
-  AsyncWritevAll *data = g_task_get_task_data (task);
-  xint_t priority = g_task_get_priority (task);
-  xcancellable_t *cancellable = g_task_get_cancellable (task);
+  xtask_t *task = user_data;
+  AsyncWritevAll *data = xtask_get_task_data (task);
+  xint_t priority = xtask_get_priority (task);
+  xcancellable_t *cancellable = xtask_get_cancellable (task);
 
   if (result)
     {
@@ -1410,12 +1410,12 @@ writev_all_callback (xobject_t      *stream,
       xboolean_t res;
       xsize_t n_written = 0;
 
-      res = g_output_stream_writev_finish (G_OUTPUT_STREAM (stream), result, &n_written, &error);
+      res = xoutput_stream_writev_finish (G_OUTPUT_STREAM (stream), result, &n_written, &error);
 
       if (!res)
         {
-          g_task_return_error (task, g_steal_pointer (&error));
-          g_object_unref (task);
+          xtask_return_error (task, g_steal_pointer (&error));
+          xobject_unref (task);
           return;
         }
 
@@ -1433,17 +1433,17 @@ writev_all_callback (xobject_t      *stream,
       if (n_written > 0 && data->n_vectors > 0)
         {
           data->vectors[0].size -= n_written;
-          data->vectors[0].buffer = ((guint8 *) data->vectors[0].buffer) + n_written;
+          data->vectors[0].buffer = ((xuint8_t *) data->vectors[0].buffer) + n_written;
         }
     }
 
   if (data->n_vectors == 0)
     {
-      g_task_return_boolean (task, TRUE);
-      g_object_unref (task);
+      xtask_return_boolean (task, TRUE);
+      xobject_unref (task);
     }
   else
-    g_output_stream_writev_async (G_OUTPUT_STREAM (stream),
+    xoutput_stream_writev_async (G_OUTPUT_STREAM (stream),
                                   data->vectors,
                                   data->n_vectors,
                                   priority,
@@ -1452,7 +1452,7 @@ writev_all_callback (xobject_t      *stream,
 }
 
 static void
-writev_all_async_thread (GTask        *task,
+writev_all_async_thread (xtask_t        *task,
                          xpointer_t      source_object,
                          xpointer_t      task_data,
                          xcancellable_t *cancellable)
@@ -1461,15 +1461,15 @@ writev_all_async_thread (GTask        *task,
   AsyncWritevAll *data = task_data;
   xerror_t *error = NULL;
 
-  if (g_output_stream_writev_all (stream, data->vectors, data->n_vectors, &data->bytes_written,
-                                  g_task_get_cancellable (task), &error))
-    g_task_return_boolean (task, TRUE);
+  if (xoutput_stream_writev_all (stream, data->vectors, data->n_vectors, &data->bytes_written,
+                                  xtask_get_cancellable (task), &error))
+    xtask_return_boolean (task, TRUE);
   else
-    g_task_return_error (task, g_steal_pointer (&error));
+    xtask_return_error (task, g_steal_pointer (&error));
 }
 
 /**
- * g_output_stream_writev_all_async:
+ * xoutput_stream_writev_all_async:
  * @stream: A #xoutput_stream_t
  * @vectors: (array length=n_vectors): the buffer containing the #GOutputVectors to write.
  * @n_vectors: the number of vectors to write
@@ -1480,12 +1480,12 @@ writev_all_async_thread (GTask        *task,
  *
  * Request an asynchronous write of the bytes contained in the @n_vectors @vectors into
  * the stream. When the operation is finished @callback will be called.
- * You can then call g_output_stream_writev_all_finish() to get the result of the
+ * You can then call xoutput_stream_writev_all_finish() to get the result of the
  * operation.
  *
- * This is the asynchronous version of g_output_stream_writev_all().
+ * This is the asynchronous version of xoutput_stream_writev_all().
  *
- * Call g_output_stream_writev_all_finish() to collect the result.
+ * Call xoutput_stream_writev_all_finish() to collect the result.
  *
  * Any outstanding I/O request with higher priority (lower numerical
  * value) will be executed before an outstanding request with lower
@@ -1498,8 +1498,8 @@ writev_all_async_thread (GTask        *task,
  * Since: 2.60
  */
 void
-g_output_stream_writev_all_async (xoutput_stream_t       *stream,
-                                  GOutputVector       *vectors,
+xoutput_stream_writev_all_async (xoutput_stream_t       *stream,
+                                  xoutput_vector_t       *vectors,
                                   xsize_t                n_vectors,
                                   int                  io_priority,
                                   xcancellable_t        *cancellable,
@@ -1507,21 +1507,21 @@ g_output_stream_writev_all_async (xoutput_stream_t       *stream,
                                   xpointer_t             user_data)
 {
   AsyncWritevAll *data;
-  GTask *task;
+  xtask_t *task;
   xsize_t i, to_be_written = 0;
 
   g_return_if_fail (X_IS_OUTPUT_STREAM (stream));
   g_return_if_fail (vectors != NULL || n_vectors == 0);
   g_return_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
 
-  task = g_task_new (stream, cancellable, callback, user_data);
+  task = xtask_new (stream, cancellable, callback, user_data);
   data = g_slice_new0 (AsyncWritevAll);
   data->vectors = vectors;
   data->n_vectors = n_vectors;
 
-  g_task_set_source_tag (task, g_output_stream_writev_all_async);
-  g_task_set_task_data (task, data, free_async_writev_all);
-  g_task_set_priority (task, io_priority);
+  xtask_set_source_tag (task, xoutput_stream_writev_all_async);
+  xtask_set_task_data (task, data, free_async_writev_all);
+  xtask_set_priority (task, io_priority);
 
   /* We can't write more than G_MAXSIZE bytes overall, otherwise we
    * would overflow the bytes_written counter */
@@ -1529,10 +1529,10 @@ g_output_stream_writev_all_async (xoutput_stream_t       *stream,
     {
        if (to_be_written > G_MAXSIZE - vectors[i].size)
          {
-           g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+           xtask_return_new_error (task, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
                                     _("Sum of vectors passed to %s too large"),
                                     G_STRFUNC);
-           g_object_unref (task);
+           xobject_unref (task);
            return;
          }
        to_be_written += vectors[i].size;
@@ -1542,24 +1542,24 @@ g_output_stream_writev_all_async (xoutput_stream_t       *stream,
    * then we may as well do it with a single dispatch instead of
    * bouncing in and out.
    */
-  if (g_output_stream_async_writev_is_via_threads (stream))
+  if (xoutput_stream_async_writev_is_via_threads (stream))
     {
-      g_task_run_in_thread (task, writev_all_async_thread);
-      g_object_unref (task);
+      xtask_run_in_thread (task, writev_all_async_thread);
+      xobject_unref (task);
     }
   else
     writev_all_callback (G_OBJECT (stream), NULL, g_steal_pointer (&task));
 }
 
 /**
- * g_output_stream_writev_all_finish:
+ * xoutput_stream_writev_all_finish:
  * @stream: a #xoutput_stream_t
  * @result: a #xasync_result_t
  * @bytes_written: (out) (optional): location to store the number of bytes that were written to the stream
  * @error: a #xerror_t location to store the error occurring, or %NULL to ignore.
  *
  * Finishes an asynchronous stream write operation started with
- * g_output_stream_writev_all_async().
+ * xoutput_stream_writev_all_async().
  *
  * As a special exception to the normal conventions for functions that
  * use #xerror_t, if this function returns %FALSE (and sets @error) then
@@ -1567,34 +1567,34 @@ g_output_stream_writev_all_async (xoutput_stream_t       *stream,
  * successfully written before the error was encountered.  This
  * functionality is only available from C.  If you need it from another
  * language then you must write your own loop around
- * g_output_stream_writev_async().
+ * xoutput_stream_writev_async().
  *
  * Returns: %TRUE on success, %FALSE if there was an error
  *
  * Since: 2.60
  */
 xboolean_t
-g_output_stream_writev_all_finish (xoutput_stream_t  *stream,
+xoutput_stream_writev_all_finish (xoutput_stream_t  *stream,
                                    xasync_result_t   *result,
                                    xsize_t          *bytes_written,
                                    xerror_t        **error)
 {
-  GTask *task;
+  xtask_t *task;
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  task = G_TASK (result);
+  task = XTASK (result);
 
   if (bytes_written)
     {
-      AsyncWritevAll *data = (AsyncWritevAll *)g_task_get_task_data (task);
+      AsyncWritevAll *data = (AsyncWritevAll *)xtask_get_task_data (task);
 
       *bytes_written = data->bytes_written;
     }
 
-  return g_task_propagate_boolean (task, error);
+  return xtask_propagate_boolean (task, error);
 }
 
 static void
@@ -1602,21 +1602,21 @@ write_bytes_callback (xobject_t      *stream,
                       xasync_result_t *result,
                       xpointer_t      user_data)
 {
-  GTask *task = user_data;
+  xtask_t *task = user_data;
   xerror_t *error = NULL;
-  gssize nwrote;
+  xssize_t nwrote;
 
-  nwrote = g_output_stream_write_finish (G_OUTPUT_STREAM (stream),
+  nwrote = xoutput_stream_write_finish (G_OUTPUT_STREAM (stream),
                                          result, &error);
   if (nwrote == -1)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_int (task, nwrote);
-  g_object_unref (task);
+    xtask_return_int (task, nwrote);
+  xobject_unref (task);
 }
 
 /**
- * g_output_stream_write_bytes_async:
+ * xoutput_stream_write_bytes_async:
  * @stream: A #xoutput_stream_t.
  * @bytes: The bytes to write
  * @io_priority: the io priority of the request.
@@ -1624,40 +1624,40 @@ write_bytes_callback (xobject_t      *stream,
  * @callback: (scope async): callback to call when the request is satisfied
  * @user_data: (closure): the data to pass to callback function
  *
- * This function is similar to g_output_stream_write_async(), but
- * takes a #GBytes as input.  Due to the refcounted nature of #GBytes,
+ * This function is similar to xoutput_stream_write_async(), but
+ * takes a #xbytes_t as input.  Due to the refcounted nature of #xbytes_t,
  * this allows the stream to avoid taking a copy of the data.
  *
  * However, note that this function may still perform partial writes,
- * just like g_output_stream_write_async(). If that occurs, to continue
- * writing, you will need to create a new #GBytes containing just the
- * remaining bytes, using g_bytes_new_from_bytes(). Passing the same
- * #GBytes instance multiple times potentially can result in duplicated
+ * just like xoutput_stream_write_async(). If that occurs, to continue
+ * writing, you will need to create a new #xbytes_t containing just the
+ * remaining bytes, using xbytes_new_from_bytes(). Passing the same
+ * #xbytes_t instance multiple times potentially can result in duplicated
  * data in the output stream.
  *
  * For the synchronous, blocking version of this function, see
- * g_output_stream_write_bytes().
+ * xoutput_stream_write_bytes().
  **/
 void
-g_output_stream_write_bytes_async (xoutput_stream_t       *stream,
-				   GBytes              *bytes,
+xoutput_stream_write_bytes_async (xoutput_stream_t       *stream,
+				   xbytes_t              *bytes,
 				   int                  io_priority,
 				   xcancellable_t        *cancellable,
 				   xasync_ready_callback_t  callback,
 				   xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
   xsize_t size;
-  gconstpointer data;
+  xconstpointer data;
 
-  data = g_bytes_get_data (bytes, &size);
+  data = xbytes_get_data (bytes, &size);
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_output_stream_write_bytes_async);
-  g_task_set_task_data (task, g_bytes_ref (bytes),
-                        (GDestroyNotify) g_bytes_unref);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xoutput_stream_write_bytes_async);
+  xtask_set_task_data (task, xbytes_ref (bytes),
+                        (xdestroy_notify_t) xbytes_unref);
 
-  g_output_stream_write_async (stream,
+  xoutput_stream_write_async (stream,
                                data, size,
                                io_priority,
                                cancellable,
@@ -1666,25 +1666,25 @@ g_output_stream_write_bytes_async (xoutput_stream_t       *stream,
 }
 
 /**
- * g_output_stream_write_bytes_finish:
+ * xoutput_stream_write_bytes_finish:
  * @stream: a #xoutput_stream_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  * ignore.
  *
- * Finishes a stream write-from-#GBytes operation.
+ * Finishes a stream write-from-#xbytes_t operation.
  *
- * Returns: a #gssize containing the number of bytes written to the stream.
+ * Returns: a #xssize_t containing the number of bytes written to the stream.
  **/
-gssize
-g_output_stream_write_bytes_finish (xoutput_stream_t  *stream,
+xssize_t
+xoutput_stream_write_bytes_finish (xoutput_stream_t  *stream,
 				    xasync_result_t   *result,
 				    xerror_t        **error)
 {
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), -1);
-  g_return_val_if_fail (g_task_is_valid (result, stream), -1);
+  g_return_val_if_fail (xtask_is_valid (result, stream), -1);
 
-  return g_task_propagate_int (G_TASK (result), error);
+  return xtask_propagate_int (XTASK (result), error);
 }
 
 static void
@@ -1694,13 +1694,13 @@ async_ready_splice_callback_wrapper (xobject_t      *source_object,
 {
   xoutput_stream_t *stream = G_OUTPUT_STREAM (source_object);
   GOutputStreamClass *class;
-  GTask *task = _data;
-  gssize nspliced;
+  xtask_t *task = _data;
+  xssize_t nspliced;
   xerror_t *error = NULL;
 
-  g_output_stream_clear_pending (stream);
+  xoutput_stream_clear_pending (stream);
 
-  if (g_async_result_legacy_propagate_error (res, &error))
+  if (xasync_result_legacy_propagate_error (res, &error))
     nspliced = -1;
   else
     {
@@ -1709,14 +1709,14 @@ async_ready_splice_callback_wrapper (xobject_t      *source_object,
     }
 
   if (nspliced >= 0)
-    g_task_return_int (task, nspliced);
+    xtask_return_int (task, nspliced);
   else
-    g_task_return_error (task, error);
-  g_object_unref (task);
+    xtask_return_error (task, error);
+  xobject_unref (task);
 }
 
 /**
- * g_output_stream_splice_async:
+ * xoutput_stream_splice_async:
  * @stream: a #xoutput_stream_t.
  * @source: a #xinput_stream_t.
  * @flags: a set of #GOutputStreamSpliceFlags.
@@ -1727,14 +1727,14 @@ async_ready_splice_callback_wrapper (xobject_t      *source_object,
  *
  * Splices a stream asynchronously.
  * When the operation is finished @callback will be called.
- * You can then call g_output_stream_splice_finish() to get the
+ * You can then call xoutput_stream_splice_finish() to get the
  * result of the operation.
  *
  * For the synchronous, blocking version of this function, see
- * g_output_stream_splice().
+ * xoutput_stream_splice().
  **/
 void
-g_output_stream_splice_async (xoutput_stream_t            *stream,
+xoutput_stream_splice_async (xoutput_stream_t            *stream,
 			      xinput_stream_t             *source,
 			      GOutputStreamSpliceFlags  flags,
 			      int                       io_priority,
@@ -1743,30 +1743,30 @@ g_output_stream_splice_async (xoutput_stream_t            *stream,
 			      xpointer_t                  user_data)
 {
   GOutputStreamClass *class;
-  GTask *task;
+  xtask_t *task;
   xerror_t *error = NULL;
 
   g_return_if_fail (X_IS_OUTPUT_STREAM (stream));
   g_return_if_fail (X_IS_INPUT_STREAM (source));
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_output_stream_splice_async);
-  g_task_set_priority (task, io_priority);
-  g_task_set_task_data (task, g_object_ref (source), g_object_unref);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xoutput_stream_splice_async);
+  xtask_set_priority (task, io_priority);
+  xtask_set_task_data (task, xobject_ref (source), xobject_unref);
 
-  if (g_input_stream_is_closed (source))
+  if (xinput_stream_is_closed (source))
     {
-      g_task_return_new_error (task,
+      xtask_return_new_error (task,
                                G_IO_ERROR, G_IO_ERROR_CLOSED,
                                _("Source stream is already closed"));
-      g_object_unref (task);
+      xobject_unref (task);
       return;
     }
 
-  if (!g_output_stream_set_pending (stream, &error))
+  if (!xoutput_stream_set_pending (stream, &error))
     {
-      g_task_return_error (task, error);
-      g_object_unref (task);
+      xtask_return_error (task, error);
+      xobject_unref (task);
       return;
     }
 
@@ -1777,7 +1777,7 @@ g_output_stream_splice_async (xoutput_stream_t            *stream,
 }
 
 /**
- * g_output_stream_splice_finish:
+ * xoutput_stream_splice_finish:
  * @stream: a #xoutput_stream_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
@@ -1785,24 +1785,24 @@ g_output_stream_splice_async (xoutput_stream_t            *stream,
  *
  * Finishes an asynchronous stream splice operation.
  *
- * Returns: a #gssize of the number of bytes spliced. Note that if the
+ * Returns: a #xssize_t of the number of bytes spliced. Note that if the
  *     number of bytes spliced is greater than %G_MAXSSIZE, then that
  *     will be returned, and there is no way to determine the actual
  *     number of bytes spliced.
  **/
-gssize
-g_output_stream_splice_finish (xoutput_stream_t  *stream,
+xssize_t
+xoutput_stream_splice_finish (xoutput_stream_t  *stream,
 			       xasync_result_t   *result,
 			       xerror_t        **error)
 {
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
-  g_return_val_if_fail (g_async_result_is_tagged (result, g_output_stream_splice_async), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_splice_async), FALSE);
 
-  /* @result is always the GTask created by g_output_stream_splice_async();
+  /* @result is always the xtask_t created by xoutput_stream_splice_async();
    * we called class->splice_finish() from async_ready_splice_callback_wrapper.
    */
-  return g_task_propagate_int (G_TASK (result), error);
+  return xtask_propagate_int (XTASK (result), error);
 }
 
 static void
@@ -1812,13 +1812,13 @@ async_ready_flush_callback_wrapper (xobject_t      *source_object,
 {
   xoutput_stream_t *stream = G_OUTPUT_STREAM (source_object);
   GOutputStreamClass *class;
-  GTask *task = user_data;
+  xtask_t *task = user_data;
   xboolean_t flushed;
   xerror_t *error = NULL;
 
-  g_output_stream_clear_pending (stream);
+  xoutput_stream_clear_pending (stream);
 
-  if (g_async_result_legacy_propagate_error (res, &error))
+  if (xasync_result_legacy_propagate_error (res, &error))
     flushed = FALSE;
   else
     {
@@ -1827,14 +1827,14 @@ async_ready_flush_callback_wrapper (xobject_t      *source_object,
     }
 
   if (flushed)
-    g_task_return_boolean (task, TRUE);
+    xtask_return_boolean (task, TRUE);
   else
-    g_task_return_error (task, error);
-  g_object_unref (task);
+    xtask_return_error (task, error);
+  xobject_unref (task);
 }
 
 /**
- * g_output_stream_flush_async:
+ * xoutput_stream_flush_async:
  * @stream: a #xoutput_stream_t.
  * @io_priority: the io priority of the request.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
@@ -1843,33 +1843,33 @@ async_ready_flush_callback_wrapper (xobject_t      *source_object,
  *
  * Forces an asynchronous write of all user-space buffered data for
  * the given @stream.
- * For behaviour details see g_output_stream_flush().
+ * For behaviour details see xoutput_stream_flush().
  *
  * When the operation is finished @callback will be
- * called. You can then call g_output_stream_flush_finish() to get the
+ * called. You can then call xoutput_stream_flush_finish() to get the
  * result of the operation.
  **/
 void
-g_output_stream_flush_async (xoutput_stream_t       *stream,
+xoutput_stream_flush_async (xoutput_stream_t       *stream,
                              int                  io_priority,
                              xcancellable_t        *cancellable,
                              xasync_ready_callback_t  callback,
                              xpointer_t             user_data)
 {
   GOutputStreamClass *class;
-  GTask *task;
+  xtask_t *task;
   xerror_t *error = NULL;
 
   g_return_if_fail (X_IS_OUTPUT_STREAM (stream));
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_output_stream_flush_async);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xoutput_stream_flush_async);
+  xtask_set_priority (task, io_priority);
 
-  if (!g_output_stream_set_pending (stream, &error))
+  if (!xoutput_stream_set_pending (stream, &error))
     {
-      g_task_return_error (task, error);
-      g_object_unref (task);
+      xtask_return_error (task, error);
+      xobject_unref (task);
       return;
     }
 
@@ -1877,9 +1877,9 @@ g_output_stream_flush_async (xoutput_stream_t       *stream,
 
   if (class->flush_async == NULL)
     {
-      g_output_stream_clear_pending (stream);
-      g_task_return_boolean (task, TRUE);
-      g_object_unref (task);
+      xoutput_stream_clear_pending (stream);
+      xtask_return_boolean (task, TRUE);
+      xobject_unref (task);
       return;
     }
 
@@ -1888,7 +1888,7 @@ g_output_stream_flush_async (xoutput_stream_t       *stream,
 }
 
 /**
- * g_output_stream_flush_finish:
+ * xoutput_stream_flush_finish:
  * @stream: a #xoutput_stream_t.
  * @result: a xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
@@ -1899,18 +1899,18 @@ g_output_stream_flush_async (xoutput_stream_t       *stream,
  * Returns: %TRUE if flush operation succeeded, %FALSE otherwise.
  **/
 xboolean_t
-g_output_stream_flush_finish (xoutput_stream_t  *stream,
+xoutput_stream_flush_finish (xoutput_stream_t  *stream,
                               xasync_result_t   *result,
                               xerror_t        **error)
 {
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
-  g_return_val_if_fail (g_async_result_is_tagged (result, g_output_stream_flush_async), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_flush_async), FALSE);
 
-  /* @result is always the GTask created by g_output_stream_flush_async();
+  /* @result is always the xtask_t created by xoutput_stream_flush_async();
    * we called class->flush_finish() from async_ready_flush_callback_wrapper.
    */
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 
@@ -1921,13 +1921,13 @@ async_ready_close_callback_wrapper (xobject_t      *source_object,
 {
   xoutput_stream_t *stream = G_OUTPUT_STREAM (source_object);
   GOutputStreamClass *class;
-  GTask *task = user_data;
-  xerror_t *error = g_task_get_task_data (task);
+  xtask_t *task = user_data;
+  xerror_t *error = xtask_get_task_data (task);
 
   stream->priv->closing = FALSE;
   stream->priv->closed = TRUE;
 
-  if (!error && !g_async_result_legacy_propagate_error (res, &error))
+  if (!error && !xasync_result_legacy_propagate_error (res, &error))
     {
       class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
@@ -1936,10 +1936,10 @@ async_ready_close_callback_wrapper (xobject_t      *source_object,
     }
 
   if (error != NULL)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_boolean (task, TRUE);
-  g_object_unref (task);
+    xtask_return_boolean (task, TRUE);
+  xobject_unref (task);
 }
 
 static void
@@ -1949,24 +1949,24 @@ async_ready_close_flushed_callback_wrapper (xobject_t      *source_object,
 {
   xoutput_stream_t *stream = G_OUTPUT_STREAM (source_object);
   GOutputStreamClass *class;
-  GTask *task = user_data;
+  xtask_t *task = user_data;
   xerror_t *error = NULL;
 
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
-  if (!g_async_result_legacy_propagate_error (res, &error))
+  if (!xasync_result_legacy_propagate_error (res, &error))
     {
       class->flush_finish (stream, res, &error);
     }
 
   /* propagate the possible error */
   if (error)
-    g_task_set_task_data (task, error, NULL);
+    xtask_set_task_data (task, error, NULL);
 
   /* we still close, even if there was a flush error */
   class->close_async (stream,
-                      g_task_get_priority (task),
-                      g_task_get_cancellable (task),
+                      xtask_get_priority (task),
+                      xtask_get_cancellable (task),
                       async_ready_close_callback_wrapper, task);
 }
 
@@ -1976,24 +1976,24 @@ real_close_async_cb (xobject_t      *source_object,
                      xpointer_t      user_data)
 {
   xoutput_stream_t *stream = G_OUTPUT_STREAM (source_object);
-  GTask *task = user_data;
+  xtask_t *task = user_data;
   xerror_t *error = NULL;
   xboolean_t ret;
 
-  g_output_stream_clear_pending (stream);
+  xoutput_stream_clear_pending (stream);
 
-  ret = g_output_stream_internal_close_finish (stream, res, &error);
+  ret = xoutput_stream_internal_close_finish (stream, res, &error);
 
   if (error != NULL)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_boolean (task, ret);
+    xtask_return_boolean (task, ret);
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 /**
- * g_output_stream_close_async:
+ * xoutput_stream_close_async:
  * @stream: A #xoutput_stream_t.
  * @io_priority: the io priority of the request.
  * @cancellable: (nullable): optional cancellable object
@@ -2002,63 +2002,63 @@ real_close_async_cb (xobject_t      *source_object,
  *
  * Requests an asynchronous close of the stream, releasing resources
  * related to it. When the operation is finished @callback will be
- * called. You can then call g_output_stream_close_finish() to get
+ * called. You can then call xoutput_stream_close_finish() to get
  * the result of the operation.
  *
- * For behaviour details see g_output_stream_close().
+ * For behaviour details see xoutput_stream_close().
  *
  * The asynchronous methods have a default fallback that uses threads
  * to implement asynchronicity, so they are optional for inheriting
  * classes. However, if you override one you must override all.
  **/
 void
-g_output_stream_close_async (xoutput_stream_t       *stream,
+xoutput_stream_close_async (xoutput_stream_t       *stream,
                              int                  io_priority,
                              xcancellable_t        *cancellable,
                              xasync_ready_callback_t  callback,
                              xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
   xerror_t *error = NULL;
 
   g_return_if_fail (X_IS_OUTPUT_STREAM (stream));
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_output_stream_close_async);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xoutput_stream_close_async);
+  xtask_set_priority (task, io_priority);
 
-  if (!g_output_stream_set_pending (stream, &error))
+  if (!xoutput_stream_set_pending (stream, &error))
     {
-      g_task_return_error (task, error);
-      g_object_unref (task);
+      xtask_return_error (task, error);
+      xobject_unref (task);
       return;
     }
 
-  g_output_stream_internal_close_async (stream, io_priority, cancellable,
+  xoutput_stream_internal_close_async (stream, io_priority, cancellable,
                                         real_close_async_cb, task);
 }
 
 /* Must always be called inside
- * g_output_stream_set_pending()/g_output_stream_clear_pending().
+ * xoutput_stream_set_pending()/xoutput_stream_clear_pending().
  */
 void
-g_output_stream_internal_close_async (xoutput_stream_t       *stream,
+xoutput_stream_internal_close_async (xoutput_stream_t       *stream,
                                       int                  io_priority,
                                       xcancellable_t        *cancellable,
                                       xasync_ready_callback_t  callback,
                                       xpointer_t             user_data)
 {
   GOutputStreamClass *class;
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_output_stream_internal_close_async);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xoutput_stream_internal_close_async);
+  xtask_set_priority (task, io_priority);
 
   if (stream->priv->closed)
     {
-      g_task_return_boolean (task, TRUE);
-      g_object_unref (task);
+      xtask_return_boolean (task, TRUE);
+      xobject_unref (task);
       return;
     }
 
@@ -2068,8 +2068,8 @@ g_output_stream_internal_close_async (xoutput_stream_t       *stream,
   /* Call close_async directly if there is no need to flush, or if the flush
      can be done sync (in the output stream async close thread) */
   if (class->flush_async == NULL ||
-      (class->flush_async == g_output_stream_real_flush_async &&
-       (class->flush == NULL || class->close_async == g_output_stream_real_close_async)))
+      (class->flush_async == xoutput_stream_real_flush_async &&
+       (class->flush == NULL || class->close_async == xoutput_stream_real_close_async)))
     {
       class->close_async (stream, io_priority, cancellable,
                           async_ready_close_callback_wrapper, task);
@@ -2084,19 +2084,19 @@ g_output_stream_internal_close_async (xoutput_stream_t       *stream,
 }
 
 static xboolean_t
-g_output_stream_internal_close_finish (xoutput_stream_t  *stream,
+xoutput_stream_internal_close_finish (xoutput_stream_t  *stream,
                                        xasync_result_t   *result,
                                        xerror_t        **error)
 {
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
-  g_return_val_if_fail (g_async_result_is_tagged (result, g_output_stream_internal_close_async), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_internal_close_async), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 /**
- * g_output_stream_close_finish:
+ * xoutput_stream_close_finish:
  * @stream: a #xoutput_stream_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
@@ -2107,22 +2107,22 @@ g_output_stream_internal_close_finish (xoutput_stream_t  *stream,
  * Returns: %TRUE if stream was successfully closed, %FALSE otherwise.
  **/
 xboolean_t
-g_output_stream_close_finish (xoutput_stream_t  *stream,
+xoutput_stream_close_finish (xoutput_stream_t  *stream,
                               xasync_result_t   *result,
                               xerror_t        **error)
 {
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
-  g_return_val_if_fail (g_async_result_is_tagged (result, g_output_stream_close_async), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_close_async), FALSE);
 
-  /* @result is always the GTask created by g_output_stream_close_async();
+  /* @result is always the xtask_t created by xoutput_stream_close_async();
    * we called class->close_finish() from async_ready_close_callback_wrapper.
    */
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 /**
- * g_output_stream_is_closed:
+ * xoutput_stream_is_closed:
  * @stream: a #xoutput_stream_t.
  *
  * Checks if an output stream has already been closed.
@@ -2130,7 +2130,7 @@ g_output_stream_close_finish (xoutput_stream_t  *stream,
  * Returns: %TRUE if @stream is closed. %FALSE otherwise.
  **/
 xboolean_t
-g_output_stream_is_closed (xoutput_stream_t *stream)
+xoutput_stream_is_closed (xoutput_stream_t *stream)
 {
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), TRUE);
 
@@ -2138,7 +2138,7 @@ g_output_stream_is_closed (xoutput_stream_t *stream)
 }
 
 /**
- * g_output_stream_is_closing:
+ * xoutput_stream_is_closing:
  * @stream: a #xoutput_stream_t.
  *
  * Checks if an output stream is being closed. This can be
@@ -2151,7 +2151,7 @@ g_output_stream_is_closed (xoutput_stream_t *stream)
  * Since: 2.24
  **/
 xboolean_t
-g_output_stream_is_closing (xoutput_stream_t *stream)
+xoutput_stream_is_closing (xoutput_stream_t *stream)
 {
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), TRUE);
 
@@ -2159,7 +2159,7 @@ g_output_stream_is_closing (xoutput_stream_t *stream)
 }
 
 /**
- * g_output_stream_has_pending:
+ * xoutput_stream_has_pending:
  * @stream: a #xoutput_stream_t.
  *
  * Checks if an output stream has pending actions.
@@ -2167,7 +2167,7 @@ g_output_stream_is_closing (xoutput_stream_t *stream)
  * Returns: %TRUE if @stream has pending actions.
  **/
 xboolean_t
-g_output_stream_has_pending (xoutput_stream_t *stream)
+xoutput_stream_has_pending (xoutput_stream_t *stream)
 {
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
 
@@ -2175,7 +2175,7 @@ g_output_stream_has_pending (xoutput_stream_t *stream)
 }
 
 /**
- * g_output_stream_set_pending:
+ * xoutput_stream_set_pending:
  * @stream: a #xoutput_stream_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  * ignore.
@@ -2187,7 +2187,7 @@ g_output_stream_has_pending (xoutput_stream_t *stream)
  * Returns: %TRUE if pending was previously unset and is now set.
  **/
 xboolean_t
-g_output_stream_set_pending (xoutput_stream_t *stream,
+xoutput_stream_set_pending (xoutput_stream_t *stream,
 			     xerror_t **error)
 {
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
@@ -2214,13 +2214,13 @@ g_output_stream_set_pending (xoutput_stream_t *stream,
 }
 
 /**
- * g_output_stream_clear_pending:
+ * xoutput_stream_clear_pending:
  * @stream: output stream
  *
  * Clears the pending flag on @stream.
  **/
 void
-g_output_stream_clear_pending (xoutput_stream_t *stream)
+xoutput_stream_clear_pending (xoutput_stream_t *stream)
 {
   g_return_if_fail (X_IS_OUTPUT_STREAM (stream));
 
@@ -2228,7 +2228,7 @@ g_output_stream_clear_pending (xoutput_stream_t *stream)
 }
 
 /*< internal >
- * g_output_stream_async_write_is_via_threads:
+ * xoutput_stream_async_write_is_via_threads:
  * @stream: a #xoutput_stream_t.
  *
  * Checks if an output stream's write_async function uses threads.
@@ -2236,7 +2236,7 @@ g_output_stream_clear_pending (xoutput_stream_t *stream)
  * Returns: %TRUE if @stream's write_async function uses threads.
  **/
 xboolean_t
-g_output_stream_async_write_is_via_threads (xoutput_stream_t *stream)
+xoutput_stream_async_write_is_via_threads (xoutput_stream_t *stream)
 {
   GOutputStreamClass *class;
 
@@ -2244,13 +2244,13 @@ g_output_stream_async_write_is_via_threads (xoutput_stream_t *stream)
 
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
-  return (class->write_async == g_output_stream_real_write_async &&
+  return (class->write_async == xoutput_stream_real_write_async &&
       !(X_IS_POLLABLE_OUTPUT_STREAM (stream) &&
-        g_pollable_output_stream_can_poll (G_POLLABLE_OUTPUT_STREAM (stream))));
+        xpollable_output_stream_can_poll (G_POLLABLE_OUTPUT_STREAM (stream))));
 }
 
 /*< internal >
- * g_output_stream_async_writev_is_via_threads:
+ * xoutput_stream_async_writev_is_via_threads:
  * @stream: a #xoutput_stream_t.
  *
  * Checks if an output stream's writev_async function uses threads.
@@ -2258,7 +2258,7 @@ g_output_stream_async_write_is_via_threads (xoutput_stream_t *stream)
  * Returns: %TRUE if @stream's writev_async function uses threads.
  **/
 xboolean_t
-g_output_stream_async_writev_is_via_threads (xoutput_stream_t *stream)
+xoutput_stream_async_writev_is_via_threads (xoutput_stream_t *stream)
 {
   GOutputStreamClass *class;
 
@@ -2266,13 +2266,13 @@ g_output_stream_async_writev_is_via_threads (xoutput_stream_t *stream)
 
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
-  return (class->writev_async == g_output_stream_real_writev_async &&
+  return (class->writev_async == xoutput_stream_real_writev_async &&
       !(X_IS_POLLABLE_OUTPUT_STREAM (stream) &&
-        g_pollable_output_stream_can_poll (G_POLLABLE_OUTPUT_STREAM (stream))));
+        xpollable_output_stream_can_poll (G_POLLABLE_OUTPUT_STREAM (stream))));
 }
 
 /*< internal >
- * g_output_stream_async_close_is_via_threads:
+ * xoutput_stream_async_close_is_via_threads:
  * @stream: output stream
  *
  * Checks if an output stream's close_async function uses threads.
@@ -2280,7 +2280,7 @@ g_output_stream_async_writev_is_via_threads (xoutput_stream_t *stream)
  * Returns: %TRUE if @stream's close_async function uses threads.
  **/
 xboolean_t
-g_output_stream_async_close_is_via_threads (xoutput_stream_t *stream)
+xoutput_stream_async_close_is_via_threads (xoutput_stream_t *stream)
 {
   GOutputStreamClass *class;
 
@@ -2288,15 +2288,15 @@ g_output_stream_async_close_is_via_threads (xoutput_stream_t *stream)
 
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
-  return class->close_async == g_output_stream_real_close_async;
+  return class->close_async == xoutput_stream_real_close_async;
 }
 
 /********************************************
  *   Default implementation of sync ops    *
  ********************************************/
 static xboolean_t
-g_output_stream_real_writev (xoutput_stream_t         *stream,
-                             const GOutputVector   *vectors,
+xoutput_stream_real_writev (xoutput_stream_t         *stream,
+                             const xoutput_vector_t   *vectors,
                              xsize_t                  n_vectors,
                              xsize_t                 *bytes_written,
                              xcancellable_t          *cancellable,
@@ -2314,7 +2314,7 @@ g_output_stream_real_writev (xoutput_stream_t         *stream,
 
   for (i = 0; i < n_vectors; i++)
     {
-      gssize res = 0;
+      xssize_t res = 0;
 
       /* Would we overflow here? In that case simply return and let the caller
        * handle this like a short write */
@@ -2361,7 +2361,7 @@ g_output_stream_real_writev (xoutput_stream_t         *stream,
 typedef struct {
   const void         *buffer;
   xsize_t               count_requested;
-  gssize              count_written;
+  xssize_t              count_written;
 } WriteData;
 
 static void
@@ -2371,7 +2371,7 @@ free_write_data (WriteData *op)
 }
 
 static void
-write_async_thread (GTask        *task,
+write_async_thread (xtask_t        *task,
                     xpointer_t      source_object,
                     xpointer_t      task_data,
                     xcancellable_t *cancellable)
@@ -2380,66 +2380,66 @@ write_async_thread (GTask        *task,
   WriteData *op = task_data;
   GOutputStreamClass *class;
   xerror_t *error = NULL;
-  gssize count_written;
+  xssize_t count_written;
 
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
   count_written = class->write_fn (stream, op->buffer, op->count_requested,
                                    cancellable, &error);
   if (count_written == -1)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_int (task, count_written);
+    xtask_return_int (task, count_written);
 }
 
-static void write_async_pollable (GPollableOutputStream *stream,
-                                  GTask                 *task);
+static void write_async_pollable (xpollable_output_stream_t *stream,
+                                  xtask_t                 *task);
 
 static xboolean_t
-write_async_pollable_ready (GPollableOutputStream *stream,
+write_async_pollable_ready (xpollable_output_stream_t *stream,
 			    xpointer_t               user_data)
 {
-  GTask *task = user_data;
+  xtask_t *task = user_data;
 
   write_async_pollable (stream, task);
   return FALSE;
 }
 
 static void
-write_async_pollable (GPollableOutputStream *stream,
-                      GTask                 *task)
+write_async_pollable (xpollable_output_stream_t *stream,
+                      xtask_t                 *task)
 {
   xerror_t *error = NULL;
-  WriteData *op = g_task_get_task_data (task);
-  gssize count_written;
+  WriteData *op = xtask_get_task_data (task);
+  xssize_t count_written;
 
-  if (g_task_return_error_if_cancelled (task))
+  if (xtask_return_error_if_cancelled (task))
     return;
 
   count_written = G_POLLABLE_OUTPUT_STREAM_GET_INTERFACE (stream)->
     write_nonblocking (stream, op->buffer, op->count_requested, &error);
 
-  if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
+  if (xerror_matches (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
     {
-      GSource *source;
+      xsource_t *source;
 
-      g_error_free (error);
+      xerror_free (error);
 
-      source = g_pollable_output_stream_create_source (stream,
-                                                       g_task_get_cancellable (task));
-      g_task_attach_source (task, source,
-                            (GSourceFunc) write_async_pollable_ready);
-      g_source_unref (source);
+      source = xpollable_output_stream_create_source (stream,
+                                                       xtask_get_cancellable (task));
+      xtask_attach_source (task, source,
+                            (xsource_func_t) write_async_pollable_ready);
+      xsource_unref (source);
       return;
     }
 
   if (count_written == -1)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_int (task, count_written);
+    xtask_return_int (task, count_written);
 }
 
 static void
-g_output_stream_real_write_async (xoutput_stream_t       *stream,
+xoutput_stream_real_write_async (xoutput_stream_t       *stream,
                                   const void          *buffer,
                                   xsize_t                count,
                                   int                  io_priority,
@@ -2447,35 +2447,35 @@ g_output_stream_real_write_async (xoutput_stream_t       *stream,
                                   xasync_ready_callback_t  callback,
                                   xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
   WriteData *op;
 
   op = g_slice_new0 (WriteData);
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_check_cancellable (task, FALSE);
-  g_task_set_task_data (task, op, (GDestroyNotify) free_write_data);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_check_cancellable (task, FALSE);
+  xtask_set_task_data (task, op, (xdestroy_notify_t) free_write_data);
   op->buffer = buffer;
   op->count_requested = count;
 
-  if (!g_output_stream_async_write_is_via_threads (stream))
+  if (!xoutput_stream_async_write_is_via_threads (stream))
     write_async_pollable (G_POLLABLE_OUTPUT_STREAM (stream), task);
   else
-    g_task_run_in_thread (task, write_async_thread);
-  g_object_unref (task);
+    xtask_run_in_thread (task, write_async_thread);
+  xobject_unref (task);
 }
 
-static gssize
-g_output_stream_real_write_finish (xoutput_stream_t  *stream,
+static xssize_t
+xoutput_stream_real_write_finish (xoutput_stream_t  *stream,
                                    xasync_result_t   *result,
                                    xerror_t        **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
-  return g_task_propagate_int (G_TASK (result), error);
+  return xtask_propagate_int (XTASK (result), error);
 }
 
 typedef struct {
-  const GOutputVector *vectors;
+  const xoutput_vector_t *vectors;
   xsize_t                n_vectors; /* (unowned) */
   xsize_t                bytes_written;
 } WritevData;
@@ -2487,7 +2487,7 @@ free_writev_data (WritevData *op)
 }
 
 static void
-writev_async_thread (GTask        *task,
+writev_async_thread (xtask_t        *task,
                      xpointer_t      source_object,
                      xpointer_t      task_data,
                      xcancellable_t *cancellable)
@@ -2506,34 +2506,34 @@ writev_async_thread (GTask        *task,
   g_warn_if_fail (res || error != NULL);
 
   if (!res)
-    g_task_return_error (task, g_steal_pointer (&error));
+    xtask_return_error (task, g_steal_pointer (&error));
   else
-    g_task_return_boolean (task, TRUE);
+    xtask_return_boolean (task, TRUE);
 }
 
-static void writev_async_pollable (GPollableOutputStream *stream,
-                                   GTask                 *task);
+static void writev_async_pollable (xpollable_output_stream_t *stream,
+                                   xtask_t                 *task);
 
 static xboolean_t
-writev_async_pollable_ready (GPollableOutputStream *stream,
+writev_async_pollable_ready (xpollable_output_stream_t *stream,
 			     xpointer_t               user_data)
 {
-  GTask *task = user_data;
+  xtask_t *task = user_data;
 
   writev_async_pollable (stream, task);
   return G_SOURCE_REMOVE;
 }
 
 static void
-writev_async_pollable (GPollableOutputStream *stream,
-                       GTask                 *task)
+writev_async_pollable (xpollable_output_stream_t *stream,
+                       xtask_t                 *task)
 {
   xerror_t *error = NULL;
-  WritevData *op = g_task_get_task_data (task);
+  WritevData *op = xtask_get_task_data (task);
   GPollableReturn res;
   xsize_t bytes_written = 0;
 
-  if (g_task_return_error_if_cancelled (task))
+  if (xtask_return_error_if_cancelled (task))
     return;
 
   res = G_POLLABLE_OUTPUT_STREAM_GET_INTERFACE (stream)->
@@ -2543,27 +2543,27 @@ writev_async_pollable (GPollableOutputStream *stream,
     {
     case G_POLLABLE_RETURN_WOULD_BLOCK:
         {
-          GSource *source;
+          xsource_t *source;
 
           g_warn_if_fail (error == NULL);
           g_warn_if_fail (bytes_written == 0);
 
-          source = g_pollable_output_stream_create_source (stream,
-                                                           g_task_get_cancellable (task));
-          g_task_attach_source (task, source,
-                                (GSourceFunc) writev_async_pollable_ready);
-          g_source_unref (source);
+          source = xpollable_output_stream_create_source (stream,
+                                                           xtask_get_cancellable (task));
+          xtask_attach_source (task, source,
+                                (xsource_func_t) writev_async_pollable_ready);
+          xsource_unref (source);
         }
         break;
       case G_POLLABLE_RETURN_OK:
         g_warn_if_fail (error == NULL);
         op->bytes_written = bytes_written;
-        g_task_return_boolean (task, TRUE);
+        xtask_return_boolean (task, TRUE);
         break;
       case G_POLLABLE_RETURN_FAILED:
         g_warn_if_fail (bytes_written == 0);
         g_warn_if_fail (error != NULL);
-        g_task_return_error (task, g_steal_pointer (&error));
+        xtask_return_error (task, g_steal_pointer (&error));
         break;
       default:
         g_assert_not_reached ();
@@ -2571,73 +2571,73 @@ writev_async_pollable (GPollableOutputStream *stream,
 }
 
 static void
-g_output_stream_real_writev_async (xoutput_stream_t        *stream,
-                                   const GOutputVector  *vectors,
+xoutput_stream_real_writev_async (xoutput_stream_t        *stream,
+                                   const xoutput_vector_t  *vectors,
                                    xsize_t                 n_vectors,
                                    int                   io_priority,
                                    xcancellable_t         *cancellable,
                                    xasync_ready_callback_t   callback,
                                    xpointer_t              user_data)
 {
-  GTask *task;
+  xtask_t *task;
   WritevData *op;
   xerror_t *error = NULL;
 
   op = g_slice_new0 (WritevData);
-  task = g_task_new (stream, cancellable, callback, user_data);
+  task = xtask_new (stream, cancellable, callback, user_data);
   op->vectors = vectors;
   op->n_vectors = n_vectors;
 
-  g_task_set_check_cancellable (task, FALSE);
-  g_task_set_source_tag (task, g_output_stream_writev_async);
-  g_task_set_priority (task, io_priority);
-  g_task_set_task_data (task, op, (GDestroyNotify) free_writev_data);
+  xtask_set_check_cancellable (task, FALSE);
+  xtask_set_source_tag (task, xoutput_stream_writev_async);
+  xtask_set_priority (task, io_priority);
+  xtask_set_task_data (task, op, (xdestroy_notify_t) free_writev_data);
 
   if (n_vectors == 0)
     {
-      g_task_return_boolean (task, TRUE);
-      g_object_unref (task);
+      xtask_return_boolean (task, TRUE);
+      xobject_unref (task);
       return;
     }
 
-  if (!g_output_stream_set_pending (stream, &error))
+  if (!xoutput_stream_set_pending (stream, &error))
     {
-      g_task_return_error (task, g_steal_pointer (&error));
-      g_object_unref (task);
+      xtask_return_error (task, g_steal_pointer (&error));
+      xobject_unref (task);
       return;
     }
 
-  if (!g_output_stream_async_writev_is_via_threads (stream))
+  if (!xoutput_stream_async_writev_is_via_threads (stream))
     writev_async_pollable (G_POLLABLE_OUTPUT_STREAM (stream), task);
   else
-    g_task_run_in_thread (task, writev_async_thread);
+    xtask_run_in_thread (task, writev_async_thread);
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 static xboolean_t
-g_output_stream_real_writev_finish (xoutput_stream_t   *stream,
+xoutput_stream_real_writev_finish (xoutput_stream_t   *stream,
                                     xasync_result_t    *result,
                                     xsize_t           *bytes_written,
                                     xerror_t         **error)
 {
-  GTask *task;
+  xtask_t *task;
 
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
-  g_return_val_if_fail (g_async_result_is_tagged (result, g_output_stream_writev_async), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_writev_async), FALSE);
 
-  g_output_stream_clear_pending (stream);
+  xoutput_stream_clear_pending (stream);
 
-  task = G_TASK (result);
+  task = XTASK (result);
 
   if (bytes_written)
     {
-      WritevData *op = g_task_get_task_data (task);
+      WritevData *op = xtask_get_task_data (task);
 
       *bytes_written = op->bytes_written;
     }
 
-  return g_task_propagate_boolean (task, error);
+  return xtask_propagate_boolean (task, error);
 }
 
 typedef struct {
@@ -2645,26 +2645,26 @@ typedef struct {
   GOutputStreamSpliceFlags flags;
   xuint_t istream_closed : 1;
   xuint_t ostream_closed : 1;
-  gssize n_read;
-  gssize n_written;
+  xssize_t n_read;
+  xssize_t n_written;
   xsize_t bytes_copied;
   xerror_t *error;
-  guint8 *buffer;
+  xuint8_t *buffer;
 } SpliceData;
 
 static void
 free_splice_data (SpliceData *op)
 {
   g_clear_pointer (&op->buffer, g_free);
-  g_object_unref (op->source);
+  xobject_unref (op->source);
   g_clear_error (&op->error);
   g_free (op);
 }
 
 static void
-real_splice_async_complete_cb (GTask *task)
+real_splice_async_complete_cb (xtask_t *task)
 {
-  SpliceData *op = g_task_get_task_data (task);
+  SpliceData *op = xtask_get_task_data (task);
 
   if (op->flags & G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE &&
       !op->istream_closed)
@@ -2676,15 +2676,15 @@ real_splice_async_complete_cb (GTask *task)
 
   if (op->error != NULL)
     {
-      g_task_return_error (task, op->error);
+      xtask_return_error (task, op->error);
       op->error = NULL;
     }
   else
     {
-      g_task_return_int (task, op->bytes_copied);
+      xtask_return_int (task, op->bytes_copied);
     }
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 static void
@@ -2692,10 +2692,10 @@ real_splice_async_close_input_cb (xobject_t      *source,
                                   xasync_result_t *res,
                                   xpointer_t      user_data)
 {
-  GTask *task = user_data;
-  SpliceData *op = g_task_get_task_data (task);
+  xtask_t *task = user_data;
+  SpliceData *op = xtask_get_task_data (task);
 
-  g_input_stream_close_finish (G_INPUT_STREAM (source), res, NULL);
+  xinput_stream_close_finish (G_INPUT_STREAM (source), res, NULL);
   op->istream_closed = TRUE;
 
   real_splice_async_complete_cb (task);
@@ -2706,36 +2706,36 @@ real_splice_async_close_output_cb (xobject_t      *source,
                                    xasync_result_t *res,
                                    xpointer_t      user_data)
 {
-  GTask *task = G_TASK (user_data);
-  SpliceData *op = g_task_get_task_data (task);
+  xtask_t *task = XTASK (user_data);
+  SpliceData *op = xtask_get_task_data (task);
   xerror_t **error = (op->error == NULL) ? &op->error : NULL;
 
-  g_output_stream_internal_close_finish (G_OUTPUT_STREAM (source), res, error);
+  xoutput_stream_internal_close_finish (G_OUTPUT_STREAM (source), res, error);
   op->ostream_closed = TRUE;
 
   real_splice_async_complete_cb (task);
 }
 
 static void
-real_splice_async_complete (GTask *task)
+real_splice_async_complete (xtask_t *task)
 {
-  SpliceData *op = g_task_get_task_data (task);
+  SpliceData *op = xtask_get_task_data (task);
   xboolean_t done = TRUE;
 
   if (op->flags & G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE)
     {
       done = FALSE;
-      g_input_stream_close_async (op->source, g_task_get_priority (task),
-                                  g_task_get_cancellable (task),
+      xinput_stream_close_async (op->source, xtask_get_priority (task),
+                                  xtask_get_cancellable (task),
                                   real_splice_async_close_input_cb, task);
     }
 
   if (op->flags & G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET)
     {
       done = FALSE;
-      g_output_stream_internal_close_async (g_task_get_source_object (task),
-                                            g_task_get_priority (task),
-                                            g_task_get_cancellable (task),
+      xoutput_stream_internal_close_async (xtask_get_source_object (task),
+                                            xtask_get_priority (task),
+                                            xtask_get_cancellable (task),
                                             real_splice_async_close_output_cb,
                                             task);
     }
@@ -2754,11 +2754,11 @@ real_splice_async_write_cb (xobject_t      *source,
                             xpointer_t      user_data)
 {
   GOutputStreamClass *class;
-  GTask *task = G_TASK (user_data);
-  SpliceData *op = g_task_get_task_data (task);
-  gssize ret;
+  xtask_t *task = XTASK (user_data);
+  SpliceData *op = xtask_get_task_data (task);
+  xssize_t ret;
 
-  class = G_OUTPUT_STREAM_GET_CLASS (g_task_get_source_object (task));
+  class = G_OUTPUT_STREAM_GET_CLASS (xtask_get_source_object (task));
 
   ret = class->write_finish (G_OUTPUT_STREAM (source), res, &op->error);
 
@@ -2775,18 +2775,18 @@ real_splice_async_write_cb (xobject_t      *source,
 
   if (op->n_written < op->n_read)
     {
-      class->write_async (g_task_get_source_object (task),
+      class->write_async (xtask_get_source_object (task),
                           op->buffer + op->n_written,
                           op->n_read - op->n_written,
-                          g_task_get_priority (task),
-                          g_task_get_cancellable (task),
+                          xtask_get_priority (task),
+                          xtask_get_cancellable (task),
                           real_splice_async_write_cb, task);
       return;
     }
 
-  g_input_stream_read_async (op->source, op->buffer, 8192,
-                             g_task_get_priority (task),
-                             g_task_get_cancellable (task),
+  xinput_stream_read_async (op->source, op->buffer, 8192,
+                             xtask_get_priority (task),
+                             xtask_get_cancellable (task),
                              real_splice_async_read_cb, task);
 }
 
@@ -2796,13 +2796,13 @@ real_splice_async_read_cb (xobject_t      *source,
                            xpointer_t      user_data)
 {
   GOutputStreamClass *class;
-  GTask *task = G_TASK (user_data);
-  SpliceData *op = g_task_get_task_data (task);
-  gssize ret;
+  xtask_t *task = XTASK (user_data);
+  SpliceData *op = xtask_get_task_data (task);
+  xssize_t ret;
 
-  class = G_OUTPUT_STREAM_GET_CLASS (g_task_get_source_object (task));
+  class = G_OUTPUT_STREAM_GET_CLASS (xtask_get_source_object (task));
 
-  ret = g_input_stream_read_finish (op->source, res, &op->error);
+  ret = xinput_stream_read_finish (op->source, res, &op->error);
   if (ret == -1 || ret == 0)
     {
       real_splice_async_complete (task);
@@ -2812,14 +2812,14 @@ real_splice_async_read_cb (xobject_t      *source,
   op->n_read = ret;
   op->n_written = 0;
 
-  class->write_async (g_task_get_source_object (task), op->buffer,
-                      op->n_read, g_task_get_priority (task),
-                      g_task_get_cancellable (task),
+  class->write_async (xtask_get_source_object (task), op->buffer,
+                      op->n_read, xtask_get_priority (task),
+                      xtask_get_cancellable (task),
                       real_splice_async_write_cb, task);
 }
 
 static void
-splice_async_thread (GTask        *task,
+splice_async_thread (xtask_t        *task,
                      xpointer_t      source_object,
                      xpointer_t      task_data,
                      xcancellable_t *cancellable)
@@ -2828,7 +2828,7 @@ splice_async_thread (GTask        *task,
   SpliceData *op = task_data;
   GOutputStreamClass *class;
   xerror_t *error = NULL;
-  gssize bytes_copied;
+  xssize_t bytes_copied;
 
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
@@ -2838,13 +2838,13 @@ splice_async_thread (GTask        *task,
                                 cancellable,
                                 &error);
   if (bytes_copied == -1)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_int (task, bytes_copied);
+    xtask_return_int (task, bytes_copied);
 }
 
 static void
-g_output_stream_real_splice_async (xoutput_stream_t             *stream,
+xoutput_stream_real_splice_async (xoutput_stream_t             *stream,
                                    xinput_stream_t              *source,
                                    GOutputStreamSpliceFlags   flags,
                                    int                        io_priority,
@@ -2852,44 +2852,44 @@ g_output_stream_real_splice_async (xoutput_stream_t             *stream,
                                    xasync_ready_callback_t        callback,
                                    xpointer_t                   user_data)
 {
-  GTask *task;
+  xtask_t *task;
   SpliceData *op;
 
   op = g_new0 (SpliceData, 1);
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_task_data (task, op, (GDestroyNotify)free_splice_data);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_task_data (task, op, (xdestroy_notify_t)free_splice_data);
   op->flags = flags;
-  op->source = g_object_ref (source);
+  op->source = xobject_ref (source);
 
-  if (g_input_stream_async_read_is_via_threads (source) &&
-      g_output_stream_async_write_is_via_threads (stream))
+  if (xinput_stream_async_read_is_via_threads (source) &&
+      xoutput_stream_async_write_is_via_threads (stream))
     {
-      g_task_run_in_thread (task, splice_async_thread);
-      g_object_unref (task);
+      xtask_run_in_thread (task, splice_async_thread);
+      xobject_unref (task);
     }
   else
     {
       op->buffer = g_malloc (8192);
-      g_input_stream_read_async (op->source, op->buffer, 8192,
-                                 g_task_get_priority (task),
-                                 g_task_get_cancellable (task),
+      xinput_stream_read_async (op->source, op->buffer, 8192,
+                                 xtask_get_priority (task),
+                                 xtask_get_cancellable (task),
                                  real_splice_async_read_cb, task);
     }
 }
 
-static gssize
-g_output_stream_real_splice_finish (xoutput_stream_t  *stream,
+static xssize_t
+xoutput_stream_real_splice_finish (xoutput_stream_t  *stream,
                                     xasync_result_t   *result,
                                     xerror_t        **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
-  return g_task_propagate_int (G_TASK (result), error);
+  return xtask_propagate_int (XTASK (result), error);
 }
 
 
 static void
-flush_async_thread (GTask        *task,
+flush_async_thread (xtask_t        *task,
                     xpointer_t      source_object,
                     xpointer_t      task_data,
                     xcancellable_t *cancellable)
@@ -2905,38 +2905,38 @@ flush_async_thread (GTask        *task,
     result = class->flush (stream, cancellable, &error);
 
   if (result)
-    g_task_return_boolean (task, TRUE);
+    xtask_return_boolean (task, TRUE);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 static void
-g_output_stream_real_flush_async (xoutput_stream_t       *stream,
+xoutput_stream_real_flush_async (xoutput_stream_t       *stream,
                                   int                  io_priority,
                                   xcancellable_t        *cancellable,
                                   xasync_ready_callback_t  callback,
                                   xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_priority (task, io_priority);
-  g_task_run_in_thread (task, flush_async_thread);
-  g_object_unref (task);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_priority (task, io_priority);
+  xtask_run_in_thread (task, flush_async_thread);
+  xobject_unref (task);
 }
 
 static xboolean_t
-g_output_stream_real_flush_finish (xoutput_stream_t  *stream,
+xoutput_stream_real_flush_finish (xoutput_stream_t  *stream,
                                    xasync_result_t   *result,
                                    xerror_t        **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 static void
-close_async_thread (GTask        *task,
+close_async_thread (xtask_t        *task,
                     xpointer_t      source_object,
                     xpointer_t      task_data,
                     xcancellable_t *cancellable)
@@ -2949,11 +2949,11 @@ close_async_thread (GTask        *task,
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
   /* Do a flush here if there is a flush function, and we did not have to do
-   * an async flush before (see g_output_stream_close_async)
+   * an async flush before (see xoutput_stream_close_async)
    */
   if (class->flush != NULL &&
       (class->flush_async == NULL ||
-       class->flush_async == g_output_stream_real_flush_async))
+       class->flush_async == xoutput_stream_real_flush_async))
     {
       result = class->flush (stream, cancellable, &error);
     }
@@ -2973,32 +2973,32 @@ close_async_thread (GTask        *task,
     }
 
   if (result)
-    g_task_return_boolean (task, TRUE);
+    xtask_return_boolean (task, TRUE);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 static void
-g_output_stream_real_close_async (xoutput_stream_t       *stream,
+xoutput_stream_real_close_async (xoutput_stream_t       *stream,
                                   int                  io_priority,
                                   xcancellable_t        *cancellable,
                                   xasync_ready_callback_t  callback,
                                   xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_priority (task, io_priority);
-  g_task_run_in_thread (task, close_async_thread);
-  g_object_unref (task);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_priority (task, io_priority);
+  xtask_run_in_thread (task, close_async_thread);
+  xobject_unref (task);
 }
 
 static xboolean_t
-g_output_stream_real_close_finish (xoutput_stream_t  *stream,
+xoutput_stream_real_close_finish (xoutput_stream_t  *stream,
                                    xasync_result_t   *result,
                                    xerror_t        **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }

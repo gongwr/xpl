@@ -36,7 +36,7 @@ G_BEGIN_DECLS
  * @G_CHECKSUM_SHA384: Use the SHA-384 hashing algorithm (Since: 2.51)
  * @G_CHECKSUM_SHA512: Use the SHA-512 hashing algorithm (Since: 2.36)
  *
- * The hashing algorithm to be used by #GChecksum when performing the
+ * The hashing algorithm to be used by #xchecksum_t when performing the
  * digest of some data.
  *
  * Note that the #GChecksumType enumeration may be extended at a later
@@ -53,37 +53,37 @@ typedef enum {
 } GChecksumType;
 
 /**
- * GChecksum:
+ * xchecksum_t:
  *
  * An opaque structure representing a checksumming operation.
  *
- * To create a new GChecksum, use g_checksum_new(). To free
- * a GChecksum, use g_checksum_free().
+ * To create a new xchecksum_t, use xchecksum_new(). To free
+ * a xchecksum_t, use xchecksum_free().
  *
  * Since: 2.16
  */
-typedef struct _GChecksum       GChecksum;
+typedef struct _GChecksum       xchecksum_t;
 
 XPL_AVAILABLE_IN_ALL
-gssize                g_checksum_type_get_length    (GChecksumType    checksum_type);
+xssize_t                xchecksum_type_get_length    (GChecksumType    checksum_type);
 
 XPL_AVAILABLE_IN_ALL
-GChecksum *           g_checksum_new                (GChecksumType    checksum_type);
+xchecksum_t *           xchecksum_new                (GChecksumType    checksum_type);
 XPL_AVAILABLE_IN_ALL
-void                  g_checksum_reset              (GChecksum       *checksum);
+void                  xchecksum_reset              (xchecksum_t       *checksum);
 XPL_AVAILABLE_IN_ALL
-GChecksum *           g_checksum_copy               (const GChecksum *checksum);
+xchecksum_t *           xchecksum_copy               (const xchecksum_t *checksum);
 XPL_AVAILABLE_IN_ALL
-void                  g_checksum_free               (GChecksum       *checksum);
+void                  xchecksum_free               (xchecksum_t       *checksum);
 XPL_AVAILABLE_IN_ALL
-void                  g_checksum_update             (GChecksum       *checksum,
+void                  xchecksum_update             (xchecksum_t       *checksum,
                                                      const guchar    *data,
-                                                     gssize           length);
+                                                     xssize_t           length);
 XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_checksum_get_string         (GChecksum       *checksum);
+const xchar_t *         xchecksum_get_string         (xchecksum_t       *checksum);
 XPL_AVAILABLE_IN_ALL
-void                  g_checksum_get_digest         (GChecksum       *checksum,
-                                                     guint8          *buffer,
+void                  xchecksum_get_digest         (xchecksum_t       *checksum,
+                                                     xuint8_t          *buffer,
                                                      xsize_t           *digest_len);
 
 XPL_AVAILABLE_IN_ALL
@@ -93,11 +93,11 @@ xchar_t                *g_compute_checksum_for_data   (GChecksumType    checksum
 XPL_AVAILABLE_IN_ALL
 xchar_t                *g_compute_checksum_for_string (GChecksumType    checksum_type,
                                                      const xchar_t     *str,
-                                                     gssize           length);
+                                                     xssize_t           length);
 
 XPL_AVAILABLE_IN_2_34
 xchar_t                *g_compute_checksum_for_bytes  (GChecksumType    checksum_type,
-                                                     GBytes          *data);
+                                                     xbytes_t          *data);
 
 G_END_DECLS
 

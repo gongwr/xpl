@@ -38,7 +38,7 @@ typedef struct _GLocalFileInputStreamPrivate  GLocalFileInputStreamPrivate;
 
 struct _GLocalFileInputStream
 {
-  GFileInputStream parent_instance;
+  xfile_input_stream_t parent_instance;
 
   /*< private >*/
   GLocalFileInputStreamPrivate *priv;
@@ -51,7 +51,7 @@ struct _GLocalFileInputStreamClass
 
 xtype_t              _g_local_file_input_stream_get_type (void) G_GNUC_CONST;
 
-GFileInputStream *_g_local_file_input_stream_new          (int                    fd);
+xfile_input_stream_t *_g_local_file_input_stream_new          (int                    fd);
 void              _g_local_file_input_stream_set_do_close (GLocalFileInputStream *in,
 							   xboolean_t               do_close);
 

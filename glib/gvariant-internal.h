@@ -38,12 +38,12 @@
 #undef __XPL_H_INSIDE__
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t                        g_variant_format_string_scan            (const xchar_t          *string,
+xboolean_t                        xvariant_format_string_scan            (const xchar_t          *string,
                                                                          const xchar_t          *limit,
                                                                          const xchar_t         **endptr);
 
 XPL_AVAILABLE_IN_ALL
-xvariant_type_t *                  g_variant_format_string_scan_type       (const xchar_t          *string,
+xvariant_type_t *                  xvariant_format_string_scan_type       (const xchar_t          *string,
                                                                          const xchar_t          *limit,
                                                                          const xchar_t         **endptr);
 
@@ -52,7 +52,7 @@ xvariant_type_t *                  g_variant_format_string_scan_type       (cons
  *
  * The limit must be at least 64 + 1, to allow D-Bus messages to be wrapped in
  * a top-level #xvariant_t. This comes from the D-Bus specification (§(Valid
- * Signatures)), but also seems generally reasonable. #GDBusMessage wraps its
+ * Signatures)), but also seems generally reasonable. #xdbus_message_t wraps its
  * payload in a top-level tuple.
  *
  * The limit is actually set to be a lot greater than 64, to allow much greater

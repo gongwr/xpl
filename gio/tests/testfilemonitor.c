@@ -16,7 +16,7 @@ typedef struct
 
 static void
 setup (Fixture       *fixture,
-       gconstpointer  user_data)
+       xconstpointer  user_data)
 {
   xchar_t *path = NULL;
   xerror_t *local_error = NULL;
@@ -24,7 +24,7 @@ setup (Fixture       *fixture,
   path = g_dir_make_tmp ("gio-test-testfilemonitor_XXXXXX", &local_error);
   g_assert_no_error (local_error);
 
-  fixture->tmp_dir = g_file_new_for_path (path);
+  fixture->tmp_dir = xfile_new_for_path (path);
 
   g_test_message ("Using temporary directory: %s", path);
 
@@ -33,11 +33,11 @@ setup (Fixture       *fixture,
 
 static void
 teardown (Fixture       *fixture,
-          gconstpointer  user_data)
+          xconstpointer  user_data)
 {
   xerror_t *local_error = NULL;
 
-  g_file_delete (fixture->tmp_dir, NULL, &local_error);
+  xfile_delete (fixture->tmp_dir, NULL, &local_error);
   g_assert_no_error (local_error);
   g_clear_object (&fixture->tmp_dir);
 }
@@ -74,11 +74,11 @@ free_recorded_event (RecordedEvent *event)
 typedef struct
 {
   xfile_t *file;
-  GFileMonitor *monitor;
-  GMainLoop *loop;
+  xfile_monitor_t *monitor;
+  xmain_loop_t *loop;
   xint_t step;
   xlist_t *events;
-  GFileOutputStream *output_stream;
+  xfile_output_stream_t *output_stream;
 } TestData;
 
 static void
@@ -88,14 +88,14 @@ output_event (const RecordedEvent *event)
     g_test_message (">>>> step %d", event->step);
   else
     {
-      GTypeClass *class;
+      xtype_class_t *class;
 
-      class = g_type_class_ref (g_type_from_name ("GFileMonitorEvent"));
+      class = xtype_class_ref (xtype_from_name ("xfile_monitor_event_t"));
       g_test_message ("%s file=%s other_file=%s\n",
-                      g_enum_get_value (G_ENUM_CLASS (class), event->event_type)->value_nick,
+                      xenum_get_value (XENUM_CLASS (class), event->event_type)->value_nick,
                       event->file,
                       event->other_file);
-      g_type_class_unref (class);
+      xtype_class_unref (class);
     }
 }
 
@@ -103,11 +103,11 @@ output_event (const RecordedEvent *event)
 static const xchar_t DONT_CARE[] = "";
 
 static Environment
-get_environment (GFileMonitor *monitor)
+get_environment (xfile_monitor_t *monitor)
 {
-  if (g_str_equal (G_OBJECT_TYPE_NAME (monitor), "GInotifyFileMonitor"))
+  if (xstr_equal (G_OBJECT_TYPE_NAME (monitor), "GInotifyFileMonitor"))
     return INOTIFY;
-  if (g_str_equal (G_OBJECT_TYPE_NAME (monitor), "GKqueueFileMonitor"))
+  if (xstr_equal (G_OBJECT_TYPE_NAME (monitor), "GKqueueFileMonitor"))
     return KQUEUE;
   return NONE;
 }
@@ -137,13 +137,13 @@ check_expected_events (RecordedEvent *expected,
             break;
 
           /* Kqueue isn't good at detecting file renaming, so
-           * G_FILE_MONITOR_WATCH_MOVES is mostly useless there.  */
+           * XFILE_MONITOR_WATCH_MOVES is mostly useless there.  */
           if (e1->event_type != e2->event_type && env & KQUEUE)
             {
               /* It is possible for kqueue file monitor to emit 'RENAMED' event,
                * but most of the time it is reported as a 'DELETED' event and
                * a 'CREATED' event. */
-              if (e1->event_type == G_FILE_MONITOR_EVENT_RENAMED)
+              if (e1->event_type == XFILE_MONITOR_EVENT_RENAMED)
                 {
                   RecordedEvent *e2_next;
 
@@ -151,21 +151,21 @@ check_expected_events (RecordedEvent *expected,
                     break;
                   e2_next = l->next->data;
 
-                  if (e2->event_type != G_FILE_MONITOR_EVENT_DELETED)
+                  if (e2->event_type != XFILE_MONITOR_EVENT_DELETED)
                     break;
-                  if (e2_next->event_type != G_FILE_MONITOR_EVENT_CREATED)
+                  if (e2_next->event_type != XFILE_MONITOR_EVENT_CREATED)
                     break;
 
                   if (e1->step != e2_next->step)
                     break;
 
                   if (e1->file != DONT_CARE &&
-                      (g_strcmp0 (e1->file, e2->file) != 0 ||
+                      (xstrcmp0 (e1->file, e2->file) != 0 ||
                        e2->other_file != NULL))
                     break;
 
                   if (e1->other_file != DONT_CARE &&
-                      (g_strcmp0 (e1->other_file, e2_next->file) != 0 ||
+                      (xstrcmp0 (e1->other_file, e2_next->file) != 0 ||
                        e2_next->other_file != NULL))
                     break;
 
@@ -176,15 +176,15 @@ check_expected_events (RecordedEvent *expected,
               /* Kqueue won't report 'MOVED_IN' and 'MOVED_OUT' events. We set
                * 'ignore_other_file' here to let the following code know that
                * 'other_file' may not match. */
-              else if (e1->event_type == G_FILE_MONITOR_EVENT_MOVED_IN)
+              else if (e1->event_type == XFILE_MONITOR_EVENT_MOVED_IN)
                 {
-                  if (e2->event_type != G_FILE_MONITOR_EVENT_CREATED)
+                  if (e2->event_type != XFILE_MONITOR_EVENT_CREATED)
                     break;
                   ignore_other_file = TRUE;
                 }
-              else if (e1->event_type == G_FILE_MONITOR_EVENT_MOVED_OUT)
+              else if (e1->event_type == XFILE_MONITOR_EVENT_MOVED_OUT)
                 {
-                  if (e2->event_type != G_FILE_MONITOR_EVENT_DELETED)
+                  if (e2->event_type != XFILE_MONITOR_EVENT_DELETED)
                     break;
                   ignore_other_file = TRUE;
                 }
@@ -193,11 +193,11 @@ check_expected_events (RecordedEvent *expected,
             }
 
           if (e1->file != DONT_CARE &&
-              g_strcmp0 (e1->file, e2->file) != 0)
+              xstrcmp0 (e1->file, e2->file) != 0)
             break;
 
           if (e1->other_file != DONT_CARE && !ignore_other_file &&
-              g_strcmp0 (e1->other_file, e2->other_file) != 0)
+              xstrcmp0 (e1->other_file, e2->other_file) != 0)
             break;
 
           mismatch = FALSE;
@@ -210,12 +210,12 @@ check_expected_events (RecordedEvent *expected,
            * it depends on the ability of file monitor implementation to report
            * 'CHANGES_DONE_HINT' itself. If the file monitor implementation
            * doesn't report 'CHANGES_DONE_HINT' itself, it may be emitted by
-           * GLocalFileMonitor after a few seconds, which causes the event to
+           * xlocal_file_monitor_t after a few seconds, which causes the event to
            * mix with results from different steps. Since 'CHANGES_DONE_HINT'
            * is just a hint, we don't require it to be reliable and we simply
            * ignore unexpected 'CHANGES_DONE_HINT' events here. */
-          if (e1->event_type != G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT &&
-              e2->event_type == G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT)
+          if (e1->event_type != XFILE_MONITOR_EVENT_CHANGES_DONE_HINT &&
+              e2->event_type == XFILE_MONITOR_EVENT_CHANGES_DONE_HINT)
             {
               g_test_message ("Event CHANGES_DONE_HINT ignored at "
                               "expected index %"  G_GSIZE_FORMAT ", recorded index %d", i, li);
@@ -265,7 +265,7 @@ check_expected_events (RecordedEvent *expected,
     }
 
   g_assert_cmpint (i, ==, n_expected);
-  g_assert_cmpint (li, ==, g_list_length (recorded));
+  g_assert_cmpint (li, ==, xlist_length (recorded));
 }
 
 static void
@@ -279,26 +279,26 @@ record_event (TestData    *data,
 
   event = g_new0 (RecordedEvent, 1);
   event->event_type = event_type;
-  event->file = g_strdup (file);
-  event->other_file = g_strdup (other_file);
+  event->file = xstrdup (file);
+  event->other_file = xstrdup (other_file);
   event->step = step;
 
-  data->events = g_list_append (data->events, event);
+  data->events = xlist_append (data->events, event);
 }
 
 static void
-monitor_changed (GFileMonitor      *monitor,
+monitor_changed (xfile_monitor_t      *monitor,
                  xfile_t             *file,
                  xfile_t             *other_file,
-                 GFileMonitorEvent  event_type,
+                 xfile_monitor_event_t  event_type,
                  xpointer_t           user_data)
 {
   TestData *data = user_data;
   xchar_t *basename, *other_base;
 
-  basename = g_file_get_basename (file);
+  basename = xfile_get_basename (file);
   if (other_file)
-    other_base = g_file_get_basename (other_file);
+    other_base = xfile_get_basename (other_file);
   else
     other_base = NULL;
 
@@ -318,21 +318,21 @@ atomic_replace_step (xpointer_t user_data)
     {
     case 0:
       record_event (data, -1, NULL, NULL, 0);
-      g_file_replace_contents (data->file, "step 0", 6, NULL, FALSE, G_FILE_CREATE_NONE, NULL, NULL, &error);
+      xfile_replace_contents (data->file, "step 0", 6, NULL, FALSE, XFILE_CREATE_NONE, NULL, NULL, &error);
       g_assert_no_error (error);
       break;
     case 1:
       record_event (data, -1, NULL, NULL, 1);
-      g_file_replace_contents (data->file, "step 1", 6, NULL, FALSE, G_FILE_CREATE_NONE, NULL, NULL, &error);
+      xfile_replace_contents (data->file, "step 1", 6, NULL, FALSE, XFILE_CREATE_NONE, NULL, NULL, &error);
       g_assert_no_error (error);
       break;
     case 2:
       record_event (data, -1, NULL, NULL, 2);
-      g_file_delete (data->file, NULL, NULL);
+      xfile_delete (data->file, NULL, NULL);
       break;
     case 3:
       record_event (data, -1, NULL, NULL, 3);
-      g_main_loop_quit (data->loop);
+      xmain_loop_quit (data->loop);
       return G_SOURCE_REMOVE;
     }
 
@@ -344,19 +344,19 @@ atomic_replace_step (xpointer_t user_data)
 /* this is the output we expect from the above steps */
 static RecordedEvent atomic_replace_output[] = {
   { -1, NULL, NULL, 0, NONE },
-  { G_FILE_MONITOR_EVENT_CREATED, "atomic_replace_file", NULL, -1, NONE },
-  { G_FILE_MONITOR_EVENT_CHANGED, "atomic_replace_file", NULL, -1, KQUEUE },
-  { G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT, "atomic_replace_file", NULL, -1, KQUEUE },
+  { XFILE_MONITOR_EVENT_CREATED, "atomic_replace_file", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_CHANGED, "atomic_replace_file", NULL, -1, KQUEUE },
+  { XFILE_MONITOR_EVENT_CHANGES_DONE_HINT, "atomic_replace_file", NULL, -1, KQUEUE },
   { -1, NULL, NULL, 1, NONE },
-  { G_FILE_MONITOR_EVENT_RENAMED, (xchar_t*)DONT_CARE, "atomic_replace_file", -1, NONE },
+  { XFILE_MONITOR_EVENT_RENAMED, (xchar_t*)DONT_CARE, "atomic_replace_file", -1, NONE },
   { -1, NULL, NULL, 2, NONE },
-  { G_FILE_MONITOR_EVENT_DELETED, "atomic_replace_file", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_DELETED, "atomic_replace_file", NULL, -1, NONE },
   { -1, NULL, NULL, 3, NONE }
 };
 
 static void
 test_atomic_replace (Fixture       *fixture,
-                     gconstpointer  user_data)
+                     xconstpointer  user_data)
 {
   xerror_t *error = NULL;
   TestData data;
@@ -364,32 +364,32 @@ test_atomic_replace (Fixture       *fixture,
   data.step = 0;
   data.events = NULL;
 
-  data.file = g_file_get_child (fixture->tmp_dir, "atomic_replace_file");
-  g_file_delete (data.file, NULL, NULL);
+  data.file = xfile_get_child (fixture->tmp_dir, "atomic_replace_file");
+  xfile_delete (data.file, NULL, NULL);
 
-  data.monitor = g_file_monitor_file (data.file, G_FILE_MONITOR_WATCH_MOVES, NULL, &error);
+  data.monitor = xfile_monitor_file (data.file, XFILE_MONITOR_WATCH_MOVES, NULL, &error);
   g_assert_no_error (error);
 
-  g_test_message ("Using GFileMonitor %s", G_OBJECT_TYPE_NAME (data.monitor));
+  g_test_message ("Using xfile_monitor_t %s", G_OBJECT_TYPE_NAME (data.monitor));
 
-  g_file_monitor_set_rate_limit (data.monitor, 200);
+  xfile_monitor_set_rate_limit (data.monitor, 200);
   g_signal_connect (data.monitor, "changed", G_CALLBACK (monitor_changed), &data);
 
-  data.loop = g_main_loop_new (NULL, TRUE);
+  data.loop = xmain_loop_new (NULL, TRUE);
 
   g_timeout_add (500, atomic_replace_step, &data);
 
-  g_main_loop_run (data.loop);
+  xmain_loop_run (data.loop);
 
   check_expected_events (atomic_replace_output,
                          G_N_ELEMENTS (atomic_replace_output),
                          data.events,
                          get_environment (data.monitor));
 
-  g_list_free_full (data.events, (GDestroyNotify)free_recorded_event);
-  g_main_loop_unref (data.loop);
-  g_object_unref (data.monitor);
-  g_object_unref (data.file);
+  xlist_free_full (data.events, (xdestroy_notify_t)free_recorded_event);
+  xmain_loop_unref (data.loop);
+  xobject_unref (data.monitor);
+  xobject_unref (data.file);
 }
 
 static xboolean_t
@@ -398,43 +398,43 @@ change_step (xpointer_t user_data)
   TestData *data = user_data;
   xoutput_stream_t *stream;
   xerror_t *error = NULL;
-  guint32 mode = 0660;
+  xuint32_t mode = 0660;
 
   switch (data->step)
     {
     case 0:
       record_event (data, -1, NULL, NULL, 0);
-      g_file_replace_contents (data->file, "step 0", 6, NULL, FALSE, G_FILE_CREATE_NONE, NULL, NULL, &error);
+      xfile_replace_contents (data->file, "step 0", 6, NULL, FALSE, XFILE_CREATE_NONE, NULL, NULL, &error);
       g_assert_no_error (error);
       break;
     case 1:
       record_event (data, -1, NULL, NULL, 1);
-      stream = (xoutput_stream_t *)g_file_append_to (data->file, G_FILE_CREATE_NONE, NULL, &error);
+      stream = (xoutput_stream_t *)xfile_append_to (data->file, XFILE_CREATE_NONE, NULL, &error);
       g_assert_no_error (error);
-      g_output_stream_write_all (stream, " step 1", 7, NULL, NULL, &error);
+      xoutput_stream_write_all (stream, " step 1", 7, NULL, NULL, &error);
       g_assert_no_error (error);
-      g_output_stream_close (stream, NULL, &error);
+      xoutput_stream_close (stream, NULL, &error);
       g_assert_no_error (error);
-      g_object_unref (stream);
+      xobject_unref (stream);
       break;
     case 2:
       record_event (data, -1, NULL, NULL, 2);
-      g_file_set_attribute (data->file,
-                            G_FILE_ATTRIBUTE_UNIX_MODE,
-                            G_FILE_ATTRIBUTE_TYPE_UINT32,
+      xfile_set_attribute (data->file,
+                            XFILE_ATTRIBUTE_UNIX_MODE,
+                            XFILE_ATTRIBUTE_TYPE_UINT32,
                             &mode,
-                            G_FILE_QUERY_INFO_NONE,
+                            XFILE_QUERY_INFO_NONE,
                             NULL,
                             &error);
       g_assert_no_error (error);
       break;
     case 3:
       record_event (data, -1, NULL, NULL, 3);
-      g_file_delete (data->file, NULL, NULL);
+      xfile_delete (data->file, NULL, NULL);
       break;
     case 4:
       record_event (data, -1, NULL, NULL, 4);
-      g_main_loop_quit (data->loop);
+      xmain_loop_quit (data->loop);
       return G_SOURCE_REMOVE;
     }
 
@@ -446,22 +446,22 @@ change_step (xpointer_t user_data)
 /* this is the output we expect from the above steps */
 static RecordedEvent change_output[] = {
   { -1, NULL, NULL, 0, NONE },
-  { G_FILE_MONITOR_EVENT_CREATED, "change_file", NULL, -1, NONE },
-  { G_FILE_MONITOR_EVENT_CHANGED, "change_file", NULL, -1, KQUEUE },
-  { G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT, "change_file", NULL, -1, KQUEUE },
+  { XFILE_MONITOR_EVENT_CREATED, "change_file", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_CHANGED, "change_file", NULL, -1, KQUEUE },
+  { XFILE_MONITOR_EVENT_CHANGES_DONE_HINT, "change_file", NULL, -1, KQUEUE },
   { -1, NULL, NULL, 1, NONE },
-  { G_FILE_MONITOR_EVENT_CHANGED, "change_file", NULL, -1, NONE },
-  { G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT, "change_file", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_CHANGED, "change_file", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_CHANGES_DONE_HINT, "change_file", NULL, -1, NONE },
   { -1, NULL, NULL, 2, NONE },
-  { G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED, "change_file", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_ATTRIBUTE_CHANGED, "change_file", NULL, -1, NONE },
   { -1, NULL, NULL, 3, NONE },
-  { G_FILE_MONITOR_EVENT_DELETED, "change_file", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_DELETED, "change_file", NULL, -1, NONE },
   { -1, NULL, NULL, 4, NONE }
 };
 
 static void
 test_file_changes (Fixture       *fixture,
-                   gconstpointer  user_data)
+                   xconstpointer  user_data)
 {
   xerror_t *error = NULL;
   TestData data;
@@ -469,32 +469,32 @@ test_file_changes (Fixture       *fixture,
   data.step = 0;
   data.events = NULL;
 
-  data.file = g_file_get_child (fixture->tmp_dir, "change_file");
-  g_file_delete (data.file, NULL, NULL);
+  data.file = xfile_get_child (fixture->tmp_dir, "change_file");
+  xfile_delete (data.file, NULL, NULL);
 
-  data.monitor = g_file_monitor_file (data.file, G_FILE_MONITOR_WATCH_MOVES, NULL, &error);
+  data.monitor = xfile_monitor_file (data.file, XFILE_MONITOR_WATCH_MOVES, NULL, &error);
   g_assert_no_error (error);
 
-  g_test_message ("Using GFileMonitor %s", G_OBJECT_TYPE_NAME (data.monitor));
+  g_test_message ("Using xfile_monitor_t %s", G_OBJECT_TYPE_NAME (data.monitor));
 
-  g_file_monitor_set_rate_limit (data.monitor, 200);
+  xfile_monitor_set_rate_limit (data.monitor, 200);
   g_signal_connect (data.monitor, "changed", G_CALLBACK (monitor_changed), &data);
 
-  data.loop = g_main_loop_new (NULL, TRUE);
+  data.loop = xmain_loop_new (NULL, TRUE);
 
   g_timeout_add (500, change_step, &data);
 
-  g_main_loop_run (data.loop);
+  xmain_loop_run (data.loop);
 
   check_expected_events (change_output,
                          G_N_ELEMENTS (change_output),
                          data.events,
                          get_environment (data.monitor));
 
-  g_list_free_full (data.events, (GDestroyNotify)free_recorded_event);
-  g_main_loop_unref (data.loop);
-  g_object_unref (data.monitor);
-  g_object_unref (data.file);
+  xlist_free_full (data.events, (xdestroy_notify_t)free_recorded_event);
+  xmain_loop_unref (data.loop);
+  xobject_unref (data.monitor);
+  xobject_unref (data.file);
 }
 
 static xboolean_t
@@ -508,52 +508,52 @@ dir_step (xpointer_t user_data)
     {
     case 1:
       record_event (data, -1, NULL, NULL, 1);
-      parent = g_file_get_parent (data->file);
-      file = g_file_get_child (parent, "dir_test_file");
-      g_file_replace_contents (file, "step 1", 6, NULL, FALSE, G_FILE_CREATE_NONE, NULL, NULL, &error);
+      parent = xfile_get_parent (data->file);
+      file = xfile_get_child (parent, "dir_test_file");
+      xfile_replace_contents (file, "step 1", 6, NULL, FALSE, XFILE_CREATE_NONE, NULL, NULL, &error);
       g_assert_no_error (error);
-      g_object_unref (file);
-      g_object_unref (parent);
+      xobject_unref (file);
+      xobject_unref (parent);
       break;
     case 2:
       record_event (data, -1, NULL, NULL, 2);
-      parent = g_file_get_parent (data->file);
-      file = g_file_get_child (parent, "dir_test_file");
-      file2 = g_file_get_child (data->file, "dir_test_file");
-      g_file_move (file, file2, G_FILE_COPY_NONE, NULL, NULL, NULL, &error);
+      parent = xfile_get_parent (data->file);
+      file = xfile_get_child (parent, "dir_test_file");
+      file2 = xfile_get_child (data->file, "dir_test_file");
+      xfile_move (file, file2, XFILE_COPY_NONE, NULL, NULL, NULL, &error);
       g_assert_no_error (error);
-      g_object_unref (file);
-      g_object_unref (file2);
-      g_object_unref (parent);
+      xobject_unref (file);
+      xobject_unref (file2);
+      xobject_unref (parent);
       break;
     case 3:
       record_event (data, -1, NULL, NULL, 3);
-      file = g_file_get_child (data->file, "dir_test_file");
-      file2 = g_file_get_child (data->file, "dir_test_file2");
-      g_file_move (file, file2, G_FILE_COPY_NONE, NULL, NULL, NULL, &error);
+      file = xfile_get_child (data->file, "dir_test_file");
+      file2 = xfile_get_child (data->file, "dir_test_file2");
+      xfile_move (file, file2, XFILE_COPY_NONE, NULL, NULL, NULL, &error);
       g_assert_no_error (error);
-      g_object_unref (file);
-      g_object_unref (file2);
+      xobject_unref (file);
+      xobject_unref (file2);
       break;
     case 4:
       record_event (data, -1, NULL, NULL, 4);
-      parent = g_file_get_parent (data->file);
-      file = g_file_get_child (data->file, "dir_test_file2");
-      file2 = g_file_get_child (parent, "dir_test_file2");
-      g_file_move (file, file2, G_FILE_COPY_NONE, NULL, NULL, NULL, &error);
+      parent = xfile_get_parent (data->file);
+      file = xfile_get_child (data->file, "dir_test_file2");
+      file2 = xfile_get_child (parent, "dir_test_file2");
+      xfile_move (file, file2, XFILE_COPY_NONE, NULL, NULL, NULL, &error);
       g_assert_no_error (error);
-      g_file_delete (file2, NULL, NULL);
-      g_object_unref (file);
-      g_object_unref (file2);
-      g_object_unref (parent);
+      xfile_delete (file2, NULL, NULL);
+      xobject_unref (file);
+      xobject_unref (file2);
+      xobject_unref (parent);
       break;
     case 5:
       record_event (data, -1, NULL, NULL, 5);
-      g_file_delete (data->file, NULL, NULL);
+      xfile_delete (data->file, NULL, NULL);
       break;
     case 6:
       record_event (data, -1, NULL, NULL, 6);
-      g_main_loop_quit (data->loop);
+      xmain_loop_quit (data->loop);
       return G_SOURCE_REMOVE;
     }
 
@@ -566,19 +566,19 @@ dir_step (xpointer_t user_data)
 static RecordedEvent dir_output[] = {
   { -1, NULL, NULL, 1, NONE },
   { -1, NULL, NULL, 2, NONE },
-  { G_FILE_MONITOR_EVENT_MOVED_IN, "dir_test_file", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_MOVED_IN, "dir_test_file", NULL, -1, NONE },
   { -1, NULL, NULL, 3, NONE },
-  { G_FILE_MONITOR_EVENT_RENAMED, "dir_test_file", "dir_test_file2", -1, NONE },
+  { XFILE_MONITOR_EVENT_RENAMED, "dir_test_file", "dir_test_file2", -1, NONE },
   { -1, NULL, NULL, 4, NONE },
-  { G_FILE_MONITOR_EVENT_MOVED_OUT, "dir_test_file2", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_MOVED_OUT, "dir_test_file2", NULL, -1, NONE },
   { -1, NULL, NULL, 5, NONE },
-  { G_FILE_MONITOR_EVENT_DELETED, "dir_monitor_test", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_DELETED, "dir_monitor_test", NULL, -1, NONE },
   { -1, NULL, NULL, 6, NONE }
 };
 
 static void
 test_dir_monitor (Fixture       *fixture,
-                  gconstpointer  user_data)
+                  xconstpointer  user_data)
 {
   xerror_t *error = NULL;
   TestData data;
@@ -586,33 +586,33 @@ test_dir_monitor (Fixture       *fixture,
   data.step = 0;
   data.events = NULL;
 
-  data.file = g_file_get_child (fixture->tmp_dir, "dir_monitor_test");
-  g_file_delete (data.file, NULL, NULL);
-  g_file_make_directory (data.file, NULL, &error);
+  data.file = xfile_get_child (fixture->tmp_dir, "dir_monitor_test");
+  xfile_delete (data.file, NULL, NULL);
+  xfile_make_directory (data.file, NULL, &error);
 
-  data.monitor = g_file_monitor_directory (data.file, G_FILE_MONITOR_WATCH_MOVES, NULL, &error);
+  data.monitor = xfile_monitor_directory (data.file, XFILE_MONITOR_WATCH_MOVES, NULL, &error);
   g_assert_no_error (error);
 
-  g_test_message ("Using GFileMonitor %s", G_OBJECT_TYPE_NAME (data.monitor));
+  g_test_message ("Using xfile_monitor_t %s", G_OBJECT_TYPE_NAME (data.monitor));
 
-  g_file_monitor_set_rate_limit (data.monitor, 200);
+  xfile_monitor_set_rate_limit (data.monitor, 200);
   g_signal_connect (data.monitor, "changed", G_CALLBACK (monitor_changed), &data);
 
-  data.loop = g_main_loop_new (NULL, TRUE);
+  data.loop = xmain_loop_new (NULL, TRUE);
 
   g_timeout_add (500, dir_step, &data);
 
-  g_main_loop_run (data.loop);
+  xmain_loop_run (data.loop);
 
   check_expected_events (dir_output,
                          G_N_ELEMENTS (dir_output),
                          data.events,
                          get_environment (data.monitor));
 
-  g_list_free_full (data.events, (GDestroyNotify)free_recorded_event);
-  g_main_loop_unref (data.loop);
-  g_object_unref (data.monitor);
-  g_object_unref (data.file);
+  xlist_free_full (data.events, (xdestroy_notify_t)free_recorded_event);
+  xmain_loop_unref (data.loop);
+  xobject_unref (data.monitor);
+  xobject_unref (data.file);
 }
 
 static xboolean_t
@@ -626,31 +626,31 @@ nodir_step (xpointer_t user_data)
     {
     case 0:
       record_event (data, -1, NULL, NULL, 0);
-      parent = g_file_get_parent (data->file);
-      g_file_make_directory (parent, NULL, &error);
+      parent = xfile_get_parent (data->file);
+      xfile_make_directory (parent, NULL, &error);
       g_assert_no_error (error);
-      g_object_unref (parent);
+      xobject_unref (parent);
       break;
     case 1:
       record_event (data, -1, NULL, NULL, 1);
-      g_file_replace_contents (data->file, "step 1", 6, NULL, FALSE, G_FILE_CREATE_NONE, NULL, NULL, &error);
+      xfile_replace_contents (data->file, "step 1", 6, NULL, FALSE, XFILE_CREATE_NONE, NULL, NULL, &error);
       g_assert_no_error (error);
       break;
     case 2:
       record_event (data, -1, NULL, NULL, 2);
-      g_file_delete (data->file, NULL, &error);
+      xfile_delete (data->file, NULL, &error);
       g_assert_no_error (error);
       break;
     case 3:
       record_event (data, -1, NULL, NULL, 3);
-      parent = g_file_get_parent (data->file);
-      g_file_delete (parent, NULL, &error);
+      parent = xfile_get_parent (data->file);
+      xfile_delete (parent, NULL, &error);
       g_assert_no_error (error);
-      g_object_unref (parent);
+      xobject_unref (parent);
       break;
     case 4:
       record_event (data, -1, NULL, NULL, 4);
-      g_main_loop_quit (data->loop);
+      xmain_loop_quit (data->loop);
       return G_SOURCE_REMOVE;
     }
 
@@ -661,21 +661,21 @@ nodir_step (xpointer_t user_data)
 
 static RecordedEvent nodir_output[] = {
   { -1, NULL, NULL, 0, NONE },
-  { G_FILE_MONITOR_EVENT_CREATED, "nosuchfile", NULL, -1, KQUEUE },
-  { G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT, "nosuchfile", NULL, -1, KQUEUE },
+  { XFILE_MONITOR_EVENT_CREATED, "nosuchfile", NULL, -1, KQUEUE },
+  { XFILE_MONITOR_EVENT_CHANGES_DONE_HINT, "nosuchfile", NULL, -1, KQUEUE },
   { -1, NULL, NULL, 1, NONE },
-  { G_FILE_MONITOR_EVENT_CREATED, "nosuchfile", NULL, -1, NONE },
-  { G_FILE_MONITOR_EVENT_CHANGED, "nosuchfile", NULL, -1, KQUEUE },
-  { G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT, "nosuchfile", NULL, -1, KQUEUE },
+  { XFILE_MONITOR_EVENT_CREATED, "nosuchfile", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_CHANGED, "nosuchfile", NULL, -1, KQUEUE },
+  { XFILE_MONITOR_EVENT_CHANGES_DONE_HINT, "nosuchfile", NULL, -1, KQUEUE },
   { -1, NULL, NULL, 2, NONE },
-  { G_FILE_MONITOR_EVENT_DELETED, "nosuchfile", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_DELETED, "nosuchfile", NULL, -1, NONE },
   { -1, NULL, NULL, 3, NONE },
   { -1, NULL, NULL, 4, NONE }
 };
 
 static void
 test_dir_non_existent (Fixture       *fixture,
-                       gconstpointer  user_data)
+                       xconstpointer  user_data)
 {
   TestData data;
   xerror_t *error = NULL;
@@ -683,33 +683,33 @@ test_dir_non_existent (Fixture       *fixture,
   data.step = 0;
   data.events = NULL;
 
-  data.file = g_file_get_child (fixture->tmp_dir, "nosuchdir/nosuchfile");
-  data.monitor = g_file_monitor_file (data.file, G_FILE_MONITOR_WATCH_MOVES, NULL, &error);
+  data.file = xfile_get_child (fixture->tmp_dir, "nosuchdir/nosuchfile");
+  data.monitor = xfile_monitor_file (data.file, XFILE_MONITOR_WATCH_MOVES, NULL, &error);
   g_assert_no_error (error);
 
-  g_test_message ("Using GFileMonitor %s", G_OBJECT_TYPE_NAME (data.monitor));
+  g_test_message ("Using xfile_monitor_t %s", G_OBJECT_TYPE_NAME (data.monitor));
 
-  g_file_monitor_set_rate_limit (data.monitor, 200);
+  xfile_monitor_set_rate_limit (data.monitor, 200);
   g_signal_connect (data.monitor, "changed", G_CALLBACK (monitor_changed), &data);
 
-  data.loop = g_main_loop_new (NULL, TRUE);
+  data.loop = xmain_loop_new (NULL, TRUE);
 
   /* we need a long timeout here, since the inotify implementation only scans
    * for missing files every 4 seconds.
    */
   g_timeout_add (5000, nodir_step, &data);
 
-  g_main_loop_run (data.loop);
+  xmain_loop_run (data.loop);
 
   check_expected_events (nodir_output,
                          G_N_ELEMENTS (nodir_output),
                          data.events,
                          get_environment (data.monitor));
 
-  g_list_free_full (data.events, (GDestroyNotify)free_recorded_event);
-  g_main_loop_unref (data.loop);
-  g_object_unref (data.monitor);
-  g_object_unref (data.file);
+  xlist_free_full (data.events, (xdestroy_notify_t)free_recorded_event);
+  xmain_loop_unref (data.loop);
+  xobject_unref (data.monitor);
+  xobject_unref (data.file);
 }
 
 static xboolean_t
@@ -724,34 +724,34 @@ cross_dir_step (xpointer_t user_data)
     case 0:
       record_event (&data[0], -1, NULL, NULL, 0);
       record_event (&data[1], -1, NULL, NULL, 0);
-      file = g_file_get_child (data[1].file, "a");
-      g_file_replace_contents (file, "step 0", 6, NULL, FALSE, G_FILE_CREATE_NONE, NULL, NULL, &error);
+      file = xfile_get_child (data[1].file, "a");
+      xfile_replace_contents (file, "step 0", 6, NULL, FALSE, XFILE_CREATE_NONE, NULL, NULL, &error);
       g_assert_no_error (error);
-      g_object_unref (file);
+      xobject_unref (file);
       break;
     case 1:
       record_event (&data[0], -1, NULL, NULL, 1);
       record_event (&data[1], -1, NULL, NULL, 1);
-      file = g_file_get_child (data[1].file, "a");
-      file2 = g_file_get_child (data[0].file, "a");
-      g_file_move (file, file2, 0, NULL, NULL, NULL, &error);
+      file = xfile_get_child (data[1].file, "a");
+      file2 = xfile_get_child (data[0].file, "a");
+      xfile_move (file, file2, 0, NULL, NULL, NULL, &error);
       g_assert_no_error (error);
-      g_object_unref (file);
-      g_object_unref (file2);
+      xobject_unref (file);
+      xobject_unref (file2);
       break;
     case 2:
       record_event (&data[0], -1, NULL, NULL, 2);
       record_event (&data[1], -1, NULL, NULL, 2);
-      file2 = g_file_get_child (data[0].file, "a");
-      g_file_delete (file2, NULL, NULL);
-      g_file_delete (data[0].file, NULL, NULL);
-      g_file_delete (data[1].file, NULL, NULL);
-      g_object_unref (file2);
+      file2 = xfile_get_child (data[0].file, "a");
+      xfile_delete (file2, NULL, NULL);
+      xfile_delete (data[0].file, NULL, NULL);
+      xfile_delete (data[1].file, NULL, NULL);
+      xobject_unref (file2);
       break;
     case 3:
       record_event (&data[0], -1, NULL, NULL, 3);
       record_event (&data[1], -1, NULL, NULL, 3);
-      g_main_loop_quit (data->loop);
+      xmain_loop_quit (data->loop);
       return G_SOURCE_REMOVE;
     }
 
@@ -763,28 +763,28 @@ cross_dir_step (xpointer_t user_data)
 static RecordedEvent cross_dir_a_output[] = {
   { -1, NULL, NULL, 0, NONE },
   { -1, NULL, NULL, 1, NONE },
-  { G_FILE_MONITOR_EVENT_CREATED, "a", NULL, -1, NONE },
-  { G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT, "a", NULL, -1, KQUEUE },
+  { XFILE_MONITOR_EVENT_CREATED, "a", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_CHANGES_DONE_HINT, "a", NULL, -1, KQUEUE },
   { -1, NULL, NULL, 2, NONE },
-  { G_FILE_MONITOR_EVENT_DELETED, "a", NULL, -1, NONE },
-  { G_FILE_MONITOR_EVENT_DELETED, "cross_dir_a", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_DELETED, "a", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_DELETED, "cross_dir_a", NULL, -1, NONE },
   { -1, NULL, NULL, 3, NONE },
 };
 
 static RecordedEvent cross_dir_b_output[] = {
   { -1, NULL, NULL, 0, NONE },
-  { G_FILE_MONITOR_EVENT_CREATED, "a", NULL, -1, NONE },
-  { G_FILE_MONITOR_EVENT_CHANGED, "a", NULL, -1, KQUEUE },
-  { G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT, "a", NULL, -1, KQUEUE },
+  { XFILE_MONITOR_EVENT_CREATED, "a", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_CHANGED, "a", NULL, -1, KQUEUE },
+  { XFILE_MONITOR_EVENT_CHANGES_DONE_HINT, "a", NULL, -1, KQUEUE },
   { -1, NULL, NULL, 1, NONE },
-  { G_FILE_MONITOR_EVENT_MOVED_OUT, "a", "a", -1, NONE },
+  { XFILE_MONITOR_EVENT_MOVED_OUT, "a", "a", -1, NONE },
   { -1, NULL, NULL, 2, NONE },
-  { G_FILE_MONITOR_EVENT_DELETED, "cross_dir_b", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_DELETED, "cross_dir_b", NULL, -1, NONE },
   { -1, NULL, NULL, 3, NONE },
 };
 static void
 test_cross_dir_moves (Fixture       *fixture,
-                      gconstpointer  user_data)
+                      xconstpointer  user_data)
 {
   xerror_t *error = NULL;
   TestData data[2];
@@ -792,38 +792,38 @@ test_cross_dir_moves (Fixture       *fixture,
   data[0].step = 0;
   data[0].events = NULL;
 
-  data[0].file = g_file_get_child (fixture->tmp_dir, "cross_dir_a");
-  g_file_delete (data[0].file, NULL, NULL);
-  g_file_make_directory (data[0].file, NULL, &error);
+  data[0].file = xfile_get_child (fixture->tmp_dir, "cross_dir_a");
+  xfile_delete (data[0].file, NULL, NULL);
+  xfile_make_directory (data[0].file, NULL, &error);
 
-  data[0].monitor = g_file_monitor_directory (data[0].file, 0, NULL, &error);
+  data[0].monitor = xfile_monitor_directory (data[0].file, 0, NULL, &error);
   g_assert_no_error (error);
 
-  g_test_message ("Using GFileMonitor 0 %s", G_OBJECT_TYPE_NAME (data[0].monitor));
+  g_test_message ("Using xfile_monitor_t 0 %s", G_OBJECT_TYPE_NAME (data[0].monitor));
 
-  g_file_monitor_set_rate_limit (data[0].monitor, 200);
+  xfile_monitor_set_rate_limit (data[0].monitor, 200);
   g_signal_connect (data[0].monitor, "changed", G_CALLBACK (monitor_changed), &data[0]);
 
   data[1].step = 0;
   data[1].events = NULL;
 
-  data[1].file = g_file_get_child (fixture->tmp_dir, "cross_dir_b");
-  g_file_delete (data[1].file, NULL, NULL);
-  g_file_make_directory (data[1].file, NULL, &error);
+  data[1].file = xfile_get_child (fixture->tmp_dir, "cross_dir_b");
+  xfile_delete (data[1].file, NULL, NULL);
+  xfile_make_directory (data[1].file, NULL, &error);
 
-  data[1].monitor = g_file_monitor_directory (data[1].file, G_FILE_MONITOR_WATCH_MOVES, NULL, &error);
+  data[1].monitor = xfile_monitor_directory (data[1].file, XFILE_MONITOR_WATCH_MOVES, NULL, &error);
   g_assert_no_error (error);
 
-  g_test_message ("Using GFileMonitor 1 %s", G_OBJECT_TYPE_NAME (data[1].monitor));
+  g_test_message ("Using xfile_monitor_t 1 %s", G_OBJECT_TYPE_NAME (data[1].monitor));
 
-  g_file_monitor_set_rate_limit (data[1].monitor, 200);
+  xfile_monitor_set_rate_limit (data[1].monitor, 200);
   g_signal_connect (data[1].monitor, "changed", G_CALLBACK (monitor_changed), &data[1]);
 
-  data[0].loop = g_main_loop_new (NULL, TRUE);
+  data[0].loop = xmain_loop_new (NULL, TRUE);
 
   g_timeout_add (500, cross_dir_step, data);
 
-  g_main_loop_run (data[0].loop);
+  xmain_loop_run (data[0].loop);
 
   check_expected_events (cross_dir_a_output,
                          G_N_ELEMENTS (cross_dir_a_output),
@@ -834,14 +834,14 @@ test_cross_dir_moves (Fixture       *fixture,
                          data[1].events,
                          get_environment (data[1].monitor));
 
-  g_list_free_full (data[0].events, (GDestroyNotify)free_recorded_event);
-  g_main_loop_unref (data[0].loop);
-  g_object_unref (data[0].monitor);
-  g_object_unref (data[0].file);
+  xlist_free_full (data[0].events, (xdestroy_notify_t)free_recorded_event);
+  xmain_loop_unref (data[0].loop);
+  xobject_unref (data[0].monitor);
+  xobject_unref (data[0].file);
 
-  g_list_free_full (data[1].events, (GDestroyNotify)free_recorded_event);
-  g_object_unref (data[1].monitor);
-  g_object_unref (data[1].file);
+  xlist_free_full (data[1].events, (xdestroy_notify_t)free_recorded_event);
+  xobject_unref (data[1].monitor);
+  xobject_unref (data[1].file);
 }
 
 static xboolean_t
@@ -851,24 +851,24 @@ file_hard_links_step (xpointer_t user_data)
   TestData *data = user_data;
   xerror_t *error = NULL;
 
-  xchar_t *filename = g_file_get_path (data->file);
-  xchar_t *hard_link_name = g_strdup_printf ("%s2", filename);
-  xfile_t *hard_link_file = g_file_new_for_path (hard_link_name);
+  xchar_t *filename = xfile_get_path (data->file);
+  xchar_t *hard_link_name = xstrdup_printf ("%s2", filename);
+  xfile_t *hard_link_file = xfile_new_for_path (hard_link_name);
 
   switch (data->step)
     {
     case 0:
       record_event (data, -1, NULL, NULL, 0);
-      g_output_stream_write_all (G_OUTPUT_STREAM (data->output_stream),
+      xoutput_stream_write_all (G_OUTPUT_STREAM (data->output_stream),
                                  "hello, step 0", 13, NULL, NULL, &error);
       g_assert_no_error (error);
-      g_output_stream_close (G_OUTPUT_STREAM (data->output_stream), NULL, &error);
+      xoutput_stream_close (G_OUTPUT_STREAM (data->output_stream), NULL, &error);
       g_assert_no_error (error);
       break;
     case 1:
       record_event (data, -1, NULL, NULL, 1);
-      g_file_replace_contents (data->file, "step 1", 6, NULL, FALSE,
-                               G_FILE_CREATE_NONE, NULL, NULL, &error);
+      xfile_replace_contents (data->file, "step 1", 6, NULL, FALSE,
+                               XFILE_CREATE_NONE, NULL, NULL, &error);
       g_assert_no_error (error);
       break;
     case 2:
@@ -876,7 +876,7 @@ file_hard_links_step (xpointer_t user_data)
 #ifdef HAVE_LINK
       if (link (filename, hard_link_name) < 0)
         {
-          g_error ("link(%s, %s) failed: %s", filename, hard_link_name, g_strerror (errno));
+          xerror ("link(%s, %s) failed: %s", filename, hard_link_name, xstrerror (errno));
         }
 #endif  /* HAVE_LINK */
       break;
@@ -887,33 +887,33 @@ file_hard_links_step (xpointer_t user_data)
         xoutput_stream_t *hard_link_stream = NULL;
 
         /* Deliberately don’t do an atomic swap on the hard-linked file. */
-        hard_link_stream = G_OUTPUT_STREAM (g_file_append_to (hard_link_file,
-                                                              G_FILE_CREATE_NONE,
+        hard_link_stream = G_OUTPUT_STREAM (xfile_append_to (hard_link_file,
+                                                              XFILE_CREATE_NONE,
                                                               NULL, &error));
         g_assert_no_error (error);
-        g_output_stream_write_all (hard_link_stream, " step 3", 7, NULL, NULL, &error);
+        xoutput_stream_write_all (hard_link_stream, " step 3", 7, NULL, NULL, &error);
         g_assert_no_error (error);
-        g_output_stream_close (hard_link_stream, NULL, &error);
+        xoutput_stream_close (hard_link_stream, NULL, &error);
         g_assert_no_error (error);
-        g_object_unref (hard_link_stream);
+        xobject_unref (hard_link_stream);
       }
 #endif  /* HAVE_LINK */
       break;
     case 4:
       record_event (data, -1, NULL, NULL, 4);
-      g_file_delete (data->file, NULL, &error);
+      xfile_delete (data->file, NULL, &error);
       g_assert_no_error (error);
       break;
     case 5:
       record_event (data, -1, NULL, NULL, 5);
 #ifdef HAVE_LINK
-      g_file_delete (hard_link_file, NULL, &error);
+      xfile_delete (hard_link_file, NULL, &error);
       g_assert_no_error (error);
 #endif  /* HAVE_LINK */
       break;
     case 6:
       record_event (data, -1, NULL, NULL, 6);
-      g_main_loop_quit (data->loop);
+      xmain_loop_quit (data->loop);
       retval = G_SOURCE_REMOVE;
       break;
     }
@@ -921,7 +921,7 @@ file_hard_links_step (xpointer_t user_data)
   if (retval != G_SOURCE_REMOVE)
     data->step++;
 
-  g_object_unref (hard_link_file);
+  xobject_unref (hard_link_file);
   g_free (hard_link_name);
   g_free (filename);
 
@@ -930,10 +930,10 @@ file_hard_links_step (xpointer_t user_data)
 
 static RecordedEvent file_hard_links_output[] = {
   { -1, NULL, NULL, 0, NONE },
-  { G_FILE_MONITOR_EVENT_CHANGED, "testfilemonitor.db", NULL, -1, NONE },
-  { G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT, "testfilemonitor.db", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_CHANGED, "testfilemonitor.db", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_CHANGES_DONE_HINT, "testfilemonitor.db", NULL, -1, NONE },
   { -1, NULL, NULL, 1, NONE },
-  { G_FILE_MONITOR_EVENT_RENAMED, (xchar_t*)DONT_CARE /* .goutputstream-XXXXXX */, "testfilemonitor.db", -1, NONE },
+  { XFILE_MONITOR_EVENT_RENAMED, (xchar_t*)DONT_CARE /* .goutputstream-XXXXXX */, "testfilemonitor.db", -1, NONE },
   { -1, NULL, NULL, 2, NONE },
   { -1, NULL, NULL, 3, NONE },
   /* Kqueue is based on file descriptors. You can get events from all hard
@@ -943,17 +943,17 @@ static RecordedEvent file_hard_links_output[] = {
    * two 'DELETED' events reported here. You have to call 'unlink' twice on
    * different file names to remove 'testfilemonitor.db' from the file system,
    * and each 'unlink' call generates a 'DELETED' event. */
-  { G_FILE_MONITOR_EVENT_CHANGED, "testfilemonitor.db", NULL, -1, INOTIFY },
+  { XFILE_MONITOR_EVENT_CHANGED, "testfilemonitor.db", NULL, -1, INOTIFY },
   { -1, NULL, NULL, 4, NONE },
-  { G_FILE_MONITOR_EVENT_DELETED, "testfilemonitor.db", NULL, -1, NONE },
+  { XFILE_MONITOR_EVENT_DELETED, "testfilemonitor.db", NULL, -1, NONE },
   { -1, NULL, NULL, 5, NONE },
-  { G_FILE_MONITOR_EVENT_DELETED, "testfilemonitor.db", NULL, -1, INOTIFY },
+  { XFILE_MONITOR_EVENT_DELETED, "testfilemonitor.db", NULL, -1, INOTIFY },
   { -1, NULL, NULL, 6, NONE },
 };
 
 static void
 test_file_hard_links (Fixture       *fixture,
-                      gconstpointer  user_data)
+                      xconstpointer  user_data)
 {
   xerror_t *error = NULL;
   TestData data;
@@ -970,41 +970,41 @@ test_file_hard_links (Fixture       *fixture,
   data.events = NULL;
 
   /* Create a file which exists and is not a directory. */
-  data.file = g_file_get_child (fixture->tmp_dir, "testfilemonitor.db");
-  data.output_stream = g_file_replace (data.file, NULL, FALSE,
-                                       G_FILE_CREATE_NONE, NULL, &error);
+  data.file = xfile_get_child (fixture->tmp_dir, "testfilemonitor.db");
+  data.output_stream = xfile_replace (data.file, NULL, FALSE,
+                                       XFILE_CREATE_NONE, NULL, &error);
   g_assert_no_error (error);
 
   /* Monitor it. Creating the monitor should not crash (bug #755721). */
-  data.monitor = g_file_monitor_file (data.file,
-                                      G_FILE_MONITOR_WATCH_MOUNTS |
-                                      G_FILE_MONITOR_WATCH_MOVES |
-                                      G_FILE_MONITOR_WATCH_HARD_LINKS,
+  data.monitor = xfile_monitor_file (data.file,
+                                      XFILE_MONITOR_WATCH_MOUNTS |
+                                      XFILE_MONITOR_WATCH_MOVES |
+                                      XFILE_MONITOR_WATCH_HARD_LINKS,
                                       NULL,
                                       &error);
   g_assert_no_error (error);
   g_assert_nonnull (data.monitor);
 
-  g_test_message ("Using GFileMonitor %s", G_OBJECT_TYPE_NAME (data.monitor));
+  g_test_message ("Using xfile_monitor_t %s", G_OBJECT_TYPE_NAME (data.monitor));
 
   /* Change the file a bit. */
-  g_file_monitor_set_rate_limit (data.monitor, 200);
-  g_signal_connect (data.monitor, "changed", (GCallback) monitor_changed, &data);
+  xfile_monitor_set_rate_limit (data.monitor, 200);
+  g_signal_connect (data.monitor, "changed", (xcallback_t) monitor_changed, &data);
 
-  data.loop = g_main_loop_new (NULL, TRUE);
+  data.loop = xmain_loop_new (NULL, TRUE);
   g_timeout_add (500, file_hard_links_step, &data);
-  g_main_loop_run (data.loop);
+  xmain_loop_run (data.loop);
 
   check_expected_events (file_hard_links_output,
                          G_N_ELEMENTS (file_hard_links_output),
                          data.events,
                          get_environment (data.monitor));
 
-  g_list_free_full (data.events, (GDestroyNotify) free_recorded_event);
-  g_main_loop_unref (data.loop);
-  g_object_unref (data.monitor);
-  g_object_unref (data.file);
-  g_object_unref (data.output_stream);
+  xlist_free_full (data.events, (xdestroy_notify_t) free_recorded_event);
+  xmain_loop_unref (data.loop);
+  xobject_unref (data.monitor);
+  xobject_unref (data.file);
+  xobject_unref (data.output_stream);
 }
 
 int

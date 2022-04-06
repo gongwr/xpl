@@ -38,9 +38,9 @@ msgid "Seek not supported on base stream"
 msgstr "അടിസ്ഥാന സ്ട്രീമില്‍ Seek പിന്തുണയ്ക്കുന്നില്ല"
 
 #: ../gio/gbufferedinputstream.c:945
-#| msgid "Cannot truncate GMemoryInputStream"
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "GBufferedInputStream ട്രന്‍കേറ്റ് ചെയ്യുവാന്‍ സാധ്യമല്ല"
+#| msgid "Cannot truncate xmemory_input_stream_t"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "xbuffered_input_stream ട്രന്‍കേറ്റ് ചെയ്യുവാന്‍ സാധ്യമല്ല"
 
 #: ../gio/gbufferedinputstream.c:990 ../gio/ginputstream.c:1023
 #: ../gio/giostream.c:291 ../gio/goutputstream.c:1334
@@ -119,16 +119,16 @@ msgid "%s filetype"
 msgstr "%s ഫയല്‍ രീതിയിലുള്ള"
 
 #: ../gio/gcredentials.c:264 ../gio/gcredentials.c:528
-msgid "GCredentials is not implemented on this OS"
-msgstr "GCredentials ഈ ഒഎസില്‍ ലഭ്യമാക്കിയിട്ടില്ല"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "xcredentials_t ഈ ഒഎസില്‍ ലഭ്യമാക്കിയിട്ടില്ല"
 
 #: ../gio/gcredentials.c:438
-msgid "There is no GCredentials support for your platform"
-msgstr "നിങ്ങളുടെ പ്ലാറ്റ്ഫോമിനുചിതമായ GCredentials ലഭ്യമല്ല"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "നിങ്ങളുടെ പ്ലാറ്റ്ഫോമിനുചിതമായ xcredentials_t ലഭ്യമല്ല"
 
 #: ../gio/gcredentials.c:480
-msgid "GCredentials does not contain a process ID on this OS"
-msgstr "ഈ ഒഎസില്‍ GCredentials-നു് ഒരു പ്രൊസസ്സ് ഐഡി ലഭ്യമല്ല"
+msgid "xcredentials_t does not contain a process ID on this OS"
+msgstr "ഈ ഒഎസില്‍ xcredentials_t-നു് ഒരു പ്രൊസസ്സ് ഐഡി ലഭ്യമല്ല"
 
 #: ../gio/gdatainputstream.c:311
 msgid "Unexpected early end-of-stream"
@@ -302,9 +302,9 @@ msgid ""
 msgstr ""
 
 #: ../gio/gdbusauth.c:1175
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
 msgstr ""
-"GDBusAuthObserver::authorize-authenticated-peer മുഖേന റദ്ദാക്കിയിരിയ്ക്കുന്നു"
+"xdbus_auth_observer_t::authorize-authenticated-peer മുഖേന റദ്ദാക്കിയിരിയ്ക്കുന്നു"
 
 #: ../gio/gdbusauthmechanismsha1.c:266
 #, c-format
@@ -968,28 +968,28 @@ msgstr "ടിഎല്‍എസ് പിന്തുണ ലഭ്യമല്�
 
 #: ../gio/gemblem.c:324
 #, c-format
-msgid "Can't handle version %d of GEmblem encoding"
-msgstr "GEmblem എന്‍കോഡിങിനുള്ള പതിപ്പു് %d കൈകാര്യം ചെയ്യുവാന്‍ സാധ്യമല്ല"
+msgid "Can't handle version %d of xemblem_t encoding"
+msgstr "xemblem_t എന്‍കോഡിങിനുള്ള പതിപ്പു് %d കൈകാര്യം ചെയ്യുവാന്‍ സാധ്യമല്ല"
 
 #: ../gio/gemblem.c:334
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "GEmblem എന്‍കോഡിങിലുള്ള തെറ്റായ ടോക്കനുകളുടെ എണ്ണം (%d)"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "xemblem_t എന്‍കോഡിങിലുള്ള തെറ്റായ ടോക്കനുകളുടെ എണ്ണം (%d)"
 
 #: ../gio/gemblemedicon.c:367
 #, c-format
-msgid "Can't handle version %d of GEmblemedIcon encoding"
+msgid "Can't handle version %d of xemblemed_icon_t encoding"
 msgstr ""
-"GEmblemedIcon എന്‍കോഡിങിനുള്ള പതിപ്പു് %d കൈകാര്യം ചെയ്യുവാന്‍ സാധ്യമല്ല"
+"xemblemed_icon_t എന്‍കോഡിങിനുള്ള പതിപ്പു് %d കൈകാര്യം ചെയ്യുവാന്‍ സാധ്യമല്ല"
 
 #: ../gio/gemblemedicon.c:377
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "GEmblemedIcon എന്‍കോഡിങിലുള്ള തെറ്റായ ടോക്കനുകളുടെ എണ്ണം (%d)"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t എന്‍കോഡിങിലുള്ള തെറ്റായ ടോക്കനുകളുടെ എണ്ണം (%d)"
 
 #: ../gio/gemblemedicon.c:400
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "GEmblemedIcon-നു് ഒരു GEmblem പ്രതീക്ഷിച്ചു"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "xemblemed_icon_t-നു് ഒരു xemblem_t പ്രതീക്ഷിച്ചു"
 
 #: ../gio/gfile.c:917 ../gio/gfile.c:1156 ../gio/gfile.c:1295
 #: ../gio/gfile.c:1535 ../gio/gfile.c:1590 ../gio/gfile.c:1648
@@ -1099,12 +1099,12 @@ msgstr "ഫയല്‍ എന്യൂമറേറ്റര്‍ നിലവ�
 
 #: ../gio/gfileicon.c:237
 #, c-format
-msgid "Can't handle version %d of GFileIcon encoding"
-msgstr "GFileIcon എന്‍കോഡിങിനുള്ള പതിപ്പു് %d കൈകാര്യം ചെയ്യുവാന്‍ സാധ്യമല്ല"
+msgid "Can't handle version %d of xfile_icon_t encoding"
+msgstr "xfile_icon_t എന്‍കോഡിങിനുള്ള പതിപ്പു് %d കൈകാര്യം ചെയ്യുവാന്‍ സാധ്യമല്ല"
 
 #: ../gio/gfileicon.c:247
-msgid "Malformed input data for GFileIcon"
-msgstr "GFileIcon-നില്‍ തെറ്റായ ഡേറ്റാ"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "xfile_icon_t-നില്‍ തെറ്റായ ഡേറ്റാ"
 
 #: ../gio/gfileinputstream.c:154 ../gio/gfileinputstream.c:400
 #: ../gio/gfileiostream.c:170 ../gio/gfileoutputstream.c:169
@@ -1559,7 +1559,7 @@ msgstr ""
 
 #: ../gio/glib-compile-schemas.c:2031
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
@@ -1886,8 +1886,8 @@ msgid "Invalid seek request"
 msgstr "തെറ്റായ seek ആവശ്യപ്പെട്ടിരിക്കുന്നു"
 
 #: ../gio/gmemoryinputstream.c:510
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "GMemoryInputStream ട്രങ്‌കേറ്റ് ചെയ്യുവാന്‍ സാധ്യമല്ല"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "xmemory_input_stream_t ട്രങ്‌കേറ്റ് ചെയ്യുവാന്‍ സാധ്യമല്ല"
 
 #: ../gio/gmemoryoutputstream.c:544
 msgid "Memory output stream not resizable"
@@ -2445,9 +2445,9 @@ msgid "Error sending message: %s"
 msgstr "സന്ദേശം അയയ്ക്കുന്നതില്‍ പിശക് : %s"
 
 #: ../gio/gsocket.c:3821
-#| msgid "GSocketControlMessage not supported on windows"
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "GSocketControlMessage വിന്‍ഡോസില്‍ പിന്തുണയ്ക്കുന്നില്ല"
+#| msgid "xsocket_control_message_t not supported on windows"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "xsocket_control_message_t വിന്‍ഡോസില്‍ പിന്തുണയ്ക്കുന്നില്ല"
 
 #: ../gio/gsocket.c:4155 ../gio/gsocket.c:4290
 #, c-format
@@ -2589,8 +2589,8 @@ msgstr "അപരിചിതമായ SOCKSv5 പ്രോക്സി സര�
 
 #: ../gio/gthemedicon.c:498
 #, c-format
-msgid "Can't handle version %d of GThemedIcon encoding"
-msgstr "GThemedIcon എന്‍കോഡിങിനുള്ള %d പതിപ്പു് കൈകാര്യം ചെയ്യുവാന്‍ സാധ്യമല്ല"
+msgid "Can't handle version %d of xthemed_icon_t encoding"
+msgstr "xthemed_icon_t എന്‍കോഡിങിനുള്ള %d പതിപ്പു് കൈകാര്യം ചെയ്യുവാന്‍ സാധ്യമല്ല"
 
 #: ../gio/gthreadedresolver.c:110
 #, c-format
@@ -2942,37 +2942,37 @@ msgstr "സാധുതയില്ലാത്ത ഹോസ്റ്റ് ന�
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:205
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "രാവിലെ"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:207
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "വൈകു"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:210
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %b %e %H:%M:%S %Y"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:213
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%m/%d/%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:216
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:219
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 

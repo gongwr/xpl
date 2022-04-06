@@ -34,9 +34,9 @@
  * @short_description: Client-side D-Bus object
  * @include: gio/gio.h
  *
- * A #GDBusObjectProxy is an object used to represent a remote object
+ * A #xdbus_object_proxy_t is an object used to represent a remote object
  * with one or more D-Bus interfaces. Normally, you don't instantiate
- * a #GDBusObjectProxy yourself - typically #GDBusObjectManagerClient
+ * a #xdbus_object_proxy_t yourself - typically #xdbus_object_manager_client_t
  * is used to obtain it.
  *
  * Since: 2.30
@@ -44,10 +44,10 @@
 
 struct _GDBusObjectProxyPrivate
 {
-  GMutex lock;
-  GHashTable *map_name_to_iface;
+  xmutex_t lock;
+  xhashtable_t *map_name_to_iface;
   xchar_t *object_path;
-  GDBusConnection *connection;
+  xdbus_connection_t *connection;
 };
 
 enum
@@ -59,16 +59,16 @@ enum
 
 static void dbus_object_interface_init (GDBusObjectIface *iface);
 
-G_DEFINE_TYPE_WITH_CODE (GDBusObjectProxy, g_dbus_object_proxy, XTYPE_OBJECT,
-                         G_ADD_PRIVATE (GDBusObjectProxy)
+G_DEFINE_TYPE_WITH_CODE (xdbus_object_proxy, g_dbus_object_proxy, XTYPE_OBJECT,
+                         G_ADD_PRIVATE (xdbus_object_proxy_t)
                          G_IMPLEMENT_INTERFACE (XTYPE_DBUS_OBJECT, dbus_object_interface_init))
 
 static void
 g_dbus_object_proxy_finalize (xobject_t *object)
 {
-  GDBusObjectProxy *proxy = G_DBUS_OBJECT_PROXY (object);
+  xdbus_object_proxy_t *proxy = G_DBUS_OBJECT_PROXY (object);
 
-  g_hash_table_unref (proxy->priv->map_name_to_iface);
+  xhash_table_unref (proxy->priv->map_name_to_iface);
 
   g_clear_object (&proxy->priv->connection);
 
@@ -83,21 +83,21 @@ g_dbus_object_proxy_finalize (xobject_t *object)
 static void
 g_dbus_object_proxy_get_property (xobject_t    *object,
                                   xuint_t       prop_id,
-                                  GValue     *value,
-                                  GParamSpec *pspec)
+                                  xvalue_t     *value,
+                                  xparam_spec_t *pspec)
 {
-  GDBusObjectProxy *proxy = G_DBUS_OBJECT_PROXY (object);
+  xdbus_object_proxy_t *proxy = G_DBUS_OBJECT_PROXY (object);
 
   switch (prop_id)
     {
     case PROP_G_OBJECT_PATH:
       g_mutex_lock (&proxy->priv->lock);
-      g_value_set_string (value, proxy->priv->object_path);
+      xvalue_set_string (value, proxy->priv->object_path);
       g_mutex_unlock (&proxy->priv->lock);
       break;
 
     case PROP_G_CONNECTION:
-      g_value_set_object (value, g_dbus_object_proxy_get_connection (proxy));
+      xvalue_set_object (value, g_dbus_object_proxy_get_connection (proxy));
       break;
 
     default:
@@ -109,22 +109,22 @@ g_dbus_object_proxy_get_property (xobject_t    *object,
 static void
 g_dbus_object_proxy_set_property (xobject_t       *object,
                                   xuint_t          prop_id,
-                                  const GValue  *value,
-                                  GParamSpec    *pspec)
+                                  const xvalue_t  *value,
+                                  xparam_spec_t    *pspec)
 {
-  GDBusObjectProxy *proxy = G_DBUS_OBJECT_PROXY (object);
+  xdbus_object_proxy_t *proxy = G_DBUS_OBJECT_PROXY (object);
 
   switch (prop_id)
     {
     case PROP_G_OBJECT_PATH:
       g_mutex_lock (&proxy->priv->lock);
-      proxy->priv->object_path = g_value_dup_string (value);
+      proxy->priv->object_path = xvalue_dup_string (value);
       g_mutex_unlock (&proxy->priv->lock);
       break;
 
     case PROP_G_CONNECTION:
       g_mutex_lock (&proxy->priv->lock);
-      proxy->priv->connection = g_value_dup_object (value);
+      proxy->priv->connection = xvalue_dup_object (value);
       g_mutex_unlock (&proxy->priv->lock);
       break;
 
@@ -144,13 +144,13 @@ g_dbus_object_proxy_class_init (GDBusObjectProxyClass *klass)
   gobject_class->get_property = g_dbus_object_proxy_get_property;
 
   /**
-   * GDBusObjectProxy:g-object-path:
+   * xdbus_object_proxy_t:g-object-path:
    *
    * The object path of the proxy.
    *
    * Since: 2.30
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_G_OBJECT_PATH,
                                    g_param_spec_string ("g-object-path",
                                                         "Object Path",
@@ -161,13 +161,13 @@ g_dbus_object_proxy_class_init (GDBusObjectProxyClass *klass)
                                                         G_PARAM_STATIC_STRINGS));
 
   /**
-   * GDBusObjectProxy:g-connection:
+   * xdbus_object_proxy_t:g-connection:
    *
    * The connection of the proxy.
    *
    * Since: 2.30
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_G_CONNECTION,
                                    g_param_spec_object ("g-connection",
                                                         "Connection",
@@ -179,20 +179,20 @@ g_dbus_object_proxy_class_init (GDBusObjectProxyClass *klass)
 }
 
 static void
-g_dbus_object_proxy_init (GDBusObjectProxy *proxy)
+g_dbus_object_proxy_init (xdbus_object_proxy_t *proxy)
 {
   proxy->priv = g_dbus_object_proxy_get_instance_private (proxy);
   g_mutex_init (&proxy->priv->lock);
-  proxy->priv->map_name_to_iface = g_hash_table_new_full (g_str_hash,
-                                                          g_str_equal,
+  proxy->priv->map_name_to_iface = xhash_table_new_full (xstr_hash,
+                                                          xstr_equal,
                                                           g_free,
-                                                          (GDestroyNotify) g_object_unref);
+                                                          (xdestroy_notify_t) xobject_unref);
 }
 
 static const xchar_t *
-g_dbus_object_proxy_get_object_path (GDBusObject *object)
+g_dbus_object_proxy_get_object_path (xdbus_object_t *object)
 {
-  GDBusObjectProxy *proxy = G_DBUS_OBJECT_PROXY (object);
+  xdbus_object_proxy_t *proxy = G_DBUS_OBJECT_PROXY (object);
   const xchar_t *ret;
   g_mutex_lock (&proxy->priv->lock);
   ret = proxy->priv->object_path;
@@ -202,19 +202,19 @@ g_dbus_object_proxy_get_object_path (GDBusObject *object)
 
 /**
  * g_dbus_object_proxy_get_connection:
- * @proxy: a #GDBusObjectProxy
+ * @proxy: a #xdbus_object_proxy_t
  *
  * Gets the connection that @proxy is for.
  *
- * Returns: (transfer none): A #GDBusConnection. Do not free, the
+ * Returns: (transfer none): A #xdbus_connection_t. Do not free, the
  *   object is owned by @proxy.
  *
  * Since: 2.30
  */
-GDBusConnection *
-g_dbus_object_proxy_get_connection (GDBusObjectProxy *proxy)
+xdbus_connection_t *
+g_dbus_object_proxy_get_connection (xdbus_object_proxy_t *proxy)
 {
-  GDBusConnection *ret;
+  xdbus_connection_t *ret;
   g_return_val_if_fail (X_IS_DBUS_OBJECT_PROXY (proxy), NULL);
   g_mutex_lock (&proxy->priv->lock);
   ret = proxy->priv->connection;
@@ -222,29 +222,29 @@ g_dbus_object_proxy_get_connection (GDBusObjectProxy *proxy)
   return ret;
 }
 
-static GDBusInterface *
-g_dbus_object_proxy_get_interface (GDBusObject *object,
+static xdbus_interface_t *
+g_dbus_object_proxy_get_interface (xdbus_object_t *object,
                                    const xchar_t *interface_name)
 {
-  GDBusObjectProxy *proxy = G_DBUS_OBJECT_PROXY (object);
-  GDBusProxy *ret;
+  xdbus_object_proxy_t *proxy = G_DBUS_OBJECT_PROXY (object);
+  xdbus_proxy_t *ret;
 
   g_return_val_if_fail (X_IS_DBUS_OBJECT_PROXY (proxy), NULL);
   g_return_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
 
   g_mutex_lock (&proxy->priv->lock);
-  ret = g_hash_table_lookup (proxy->priv->map_name_to_iface, interface_name);
+  ret = xhash_table_lookup (proxy->priv->map_name_to_iface, interface_name);
   if (ret != NULL)
-    g_object_ref (ret);
+    xobject_ref (ret);
   g_mutex_unlock (&proxy->priv->lock);
 
-  return (GDBusInterface *) ret; /* TODO: proper cast */
+  return (xdbus_interface_t *) ret; /* TODO: proper cast */
 }
 
 static xlist_t *
-g_dbus_object_proxy_get_interfaces (GDBusObject *object)
+g_dbus_object_proxy_get_interfaces (xdbus_object_t *object)
 {
-  GDBusObjectProxy *proxy = G_DBUS_OBJECT_PROXY (object);
+  xdbus_object_proxy_t *proxy = G_DBUS_OBJECT_PROXY (object);
   xlist_t *ret;
 
   g_return_val_if_fail (X_IS_DBUS_OBJECT_PROXY (proxy), NULL);
@@ -252,8 +252,8 @@ g_dbus_object_proxy_get_interfaces (GDBusObject *object)
   ret = NULL;
 
   g_mutex_lock (&proxy->priv->lock);
-  ret = g_hash_table_get_values (proxy->priv->map_name_to_iface);
-  g_list_foreach (ret, (GFunc) g_object_ref, NULL);
+  ret = xhash_table_get_values (proxy->priv->map_name_to_iface);
+  xlist_foreach (ret, (GFunc) xobject_ref, NULL);
   g_mutex_unlock (&proxy->priv->lock);
 
   return ret;
@@ -263,34 +263,34 @@ g_dbus_object_proxy_get_interfaces (GDBusObject *object)
 
 /**
  * g_dbus_object_proxy_new:
- * @connection: a #GDBusConnection
+ * @connection: a #xdbus_connection_t
  * @object_path: the object path
  *
- * Creates a new #GDBusObjectProxy for the given connection and
+ * Creates a new #xdbus_object_proxy_t for the given connection and
  * object path.
  *
- * Returns: a new #GDBusObjectProxy
+ * Returns: a new #xdbus_object_proxy_t
  *
  * Since: 2.30
  */
-GDBusObjectProxy *
-g_dbus_object_proxy_new (GDBusConnection *connection,
+xdbus_object_proxy_t *
+g_dbus_object_proxy_new (xdbus_connection_t *connection,
                          const xchar_t     *object_path)
 {
   g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
-  g_return_val_if_fail (g_variant_is_object_path (object_path), NULL);
-  return G_DBUS_OBJECT_PROXY (g_object_new (XTYPE_DBUS_OBJECT_PROXY,
+  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
+  return G_DBUS_OBJECT_PROXY (xobject_new (XTYPE_DBUS_OBJECT_PROXY,
                                             "g-object-path", object_path,
                                             "g-connection", connection,
                                             NULL));
 }
 
 void
-_g_dbus_object_proxy_add_interface (GDBusObjectProxy *proxy,
-                                    GDBusProxy       *interface_proxy)
+_g_dbus_object_proxy_add_interface (xdbus_object_proxy_t *proxy,
+                                    xdbus_proxy_t       *interface_proxy)
 {
   const xchar_t *interface_name;
-  GDBusProxy *interface_proxy_to_remove;
+  xdbus_proxy_t *interface_proxy_to_remove;
 
   g_return_if_fail (X_IS_DBUS_OBJECT_PROXY (proxy));
   g_return_if_fail (X_IS_DBUS_PROXY (interface_proxy));
@@ -298,48 +298,48 @@ _g_dbus_object_proxy_add_interface (GDBusObjectProxy *proxy,
   g_mutex_lock (&proxy->priv->lock);
 
   interface_name = g_dbus_proxy_get_interface_name (interface_proxy);
-  interface_proxy_to_remove = g_hash_table_lookup (proxy->priv->map_name_to_iface, interface_name);
+  interface_proxy_to_remove = xhash_table_lookup (proxy->priv->map_name_to_iface, interface_name);
   if (interface_proxy_to_remove != NULL)
     {
-      g_object_ref (interface_proxy_to_remove);
-      g_warn_if_fail (g_hash_table_remove (proxy->priv->map_name_to_iface, interface_name));
+      xobject_ref (interface_proxy_to_remove);
+      g_warn_if_fail (xhash_table_remove (proxy->priv->map_name_to_iface, interface_name));
     }
-  g_hash_table_insert (proxy->priv->map_name_to_iface,
-                       g_strdup (interface_name),
-                       g_object_ref (interface_proxy));
-  g_object_ref (interface_proxy);
+  xhash_table_insert (proxy->priv->map_name_to_iface,
+                       xstrdup (interface_name),
+                       xobject_ref (interface_proxy));
+  xobject_ref (interface_proxy);
 
   g_mutex_unlock (&proxy->priv->lock);
 
   if (interface_proxy_to_remove != NULL)
     {
       g_signal_emit_by_name (proxy, "interface-removed", interface_proxy_to_remove);
-      g_object_unref (interface_proxy_to_remove);
+      xobject_unref (interface_proxy_to_remove);
     }
 
   g_signal_emit_by_name (proxy, "interface-added", interface_proxy);
-  g_object_unref (interface_proxy);
+  xobject_unref (interface_proxy);
 }
 
 void
-_g_dbus_object_proxy_remove_interface (GDBusObjectProxy *proxy,
+_g_dbus_object_proxy_remove_interface (xdbus_object_proxy_t *proxy,
                                        const xchar_t      *interface_name)
 {
-  GDBusProxy *interface_proxy;
+  xdbus_proxy_t *interface_proxy;
 
   g_return_if_fail (X_IS_DBUS_OBJECT_PROXY (proxy));
   g_return_if_fail (g_dbus_is_interface_name (interface_name));
 
   g_mutex_lock (&proxy->priv->lock);
 
-  interface_proxy = g_hash_table_lookup (proxy->priv->map_name_to_iface, interface_name);
+  interface_proxy = xhash_table_lookup (proxy->priv->map_name_to_iface, interface_name);
   if (interface_proxy != NULL)
     {
-      g_object_ref (interface_proxy);
-      g_warn_if_fail (g_hash_table_remove (proxy->priv->map_name_to_iface, interface_name));
+      xobject_ref (interface_proxy);
+      g_warn_if_fail (xhash_table_remove (proxy->priv->map_name_to_iface, interface_name));
       g_mutex_unlock (&proxy->priv->lock);
       g_signal_emit_by_name (proxy, "interface-removed", interface_proxy);
-      g_object_unref (interface_proxy);
+      xobject_unref (interface_proxy);
     }
   else
     {

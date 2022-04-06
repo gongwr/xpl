@@ -30,26 +30,26 @@
 G_BEGIN_DECLS
 
 #define XTYPE_NATIVE_VOLUME_MONITOR        (g_native_volume_monitor_get_type ())
-#define G_NATIVE_VOLUME_MONITOR(o)          (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NATIVE_VOLUME_MONITOR, GNativeVolumeMonitor))
+#define G_NATIVE_VOLUME_MONITOR(o)          (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NATIVE_VOLUME_MONITOR, xnative_volume_monitor))
 #define G_NATIVE_VOLUME_MONITOR_CLASS(k)    (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NATIVE_VOLUME_MONITOR, GNativeVolumeMonitorClass))
 #define X_IS_NATIVE_VOLUME_MONITOR(o)       (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NATIVE_VOLUME_MONITOR))
 #define X_IS_NATIVE_VOLUME_MONITOR_CLASS(k) (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_NATIVE_VOLUME_MONITOR))
 
 #define G_NATIVE_VOLUME_MONITOR_EXTENSION_POINT_NAME "gio-native-volume-monitor"
 
-typedef struct _GNativeVolumeMonitor      GNativeVolumeMonitor;
+typedef struct _GNativeVolumeMonitor      xnative_volume_monitor_t;
 typedef struct _GNativeVolumeMonitorClass GNativeVolumeMonitorClass;
 
 struct _GNativeVolumeMonitor
 {
-  GVolumeMonitor parent_instance;
+  xvolume_monitor_t parent_instance;
 };
 
 struct _GNativeVolumeMonitorClass
 {
   GVolumeMonitorClass parent_class;
 
-  GMount * (* get_mount_for_mount_path) (const char   *mount_path,
+  xmount_t * (* get_mount_for_mount_path) (const char   *mount_path,
                                          xcancellable_t *cancellable);
 };
 

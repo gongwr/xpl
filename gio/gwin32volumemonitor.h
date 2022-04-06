@@ -42,7 +42,7 @@ typedef struct _GWin32VolumeMonitorClass GWin32VolumeMonitorClass;
 /**
  * GWin32Mount:
  *
- * Implementation of the #GMount interface for Win32 systems.
+ * Implementation of the #xmount_t interface for Win32 systems.
  */
 typedef struct _GWin32Mount  GWin32Mount;
 typedef struct _GWin32Volume GWin32Volume;
@@ -54,7 +54,7 @@ struct _GWin32VolumeMonitorClass
 
 xtype_t            _g_win32_volume_monitor_get_type                     (void) G_GNUC_CONST;
 
-GVolumeMonitor * _g_win32_volume_monitor_new                          (void);
+xvolume_monitor_t * _g_win32_volume_monitor_new                          (void);
 GWin32Volume   * _g_win32_volume_monitor_lookup_volume_for_mount_path (GWin32VolumeMonitor *monitor,
                                                                        const char          *mount_path);
 

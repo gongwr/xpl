@@ -24,25 +24,25 @@ G_BEGIN_DECLS
 #if defined (G_OS_WIN32)
 
 typedef struct _gtimespec {
-  guint64 tv_sec;
-  guint32 tv_nsec;
+  xuint64_t tv_sec;
+  xuint32_t tv_nsec;
 } gtimespec;
 
 struct _GWin32PrivateStat
 {
-  guint32 volume_serial;
-  guint64 file_index;
-  guint64 attributes;
-  guint64 allocated_size;
-  guint32 reparse_tag;
+  xuint32_t volume_serial;
+  xuint64_t file_index;
+  xuint64_t attributes;
+  xuint64_t allocated_size;
+  xuint32_t reparse_tag;
 
-  guint32 st_dev;
-  guint32 st_ino;
-  guint16 st_mode;
-  guint16 st_uid;
-  guint16 st_gid;
-  guint32 st_nlink;
-  guint64 st_size;
+  xuint32_t st_dev;
+  xuint32_t st_ino;
+  xuint16_t st_mode;
+  xuint16_t st_uid;
+  xuint16_t st_gid;
+  xuint32_t st_nlink;
+  xuint64_t st_size;
   gtimespec st_ctim;
   gtimespec st_atim;
   gtimespec st_mtim;

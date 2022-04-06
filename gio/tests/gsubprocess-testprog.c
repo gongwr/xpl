@@ -15,16 +15,16 @@ static GOptionEntry options[] = {
 
 static void
 write_all (int           fd,
-	   const guint8* buf,
+	   const xuint8_t* buf,
 	   xsize_t         len)
 {
   while (len > 0)
     {
-      gssize bytes_written = write (fd, buf, len);
+      xssize_t bytes_written = write (fd, buf, len);
       int errsv = errno;
       if (bytes_written < 0)
-	g_error ("Failed to write to fd %d: %s",
-		 fd, g_strerror (errsv));
+	xerror ("Failed to write to fd %d: %s",
+		 fd, xstrerror (errsv));
       buf += bytes_written;
       len -= bytes_written;
     }
@@ -38,8 +38,8 @@ echo_mode (int argc,
 
   for (i = 2; i < argc; i++)
     {
-      write_all (1, (guint8*)argv[i], strlen (argv[i]));
-      write_all (1, (guint8*)"\n", 1);
+      write_all (1, (xuint8_t*)argv[i], strlen (argv[i]));
+      write_all (1, (xuint8_t*)"\n", 1);
     }
 
   return 0;
@@ -53,10 +53,10 @@ echo_stdout_and_stderr_mode (int argc,
 
   for (i = 2; i < argc; i++)
     {
-      write_all (1, (guint8*)argv[i], strlen (argv[i]));
-      write_all (1, (guint8*)"\n", 1);
-      write_all (2, (guint8*)argv[i], strlen (argv[i]));
-      write_all (2, (guint8*)"\n", 1);
+      write_all (1, (xuint8_t*)argv[i], strlen (argv[i]));
+      write_all (1, (xuint8_t*)"\n", 1);
+      write_all (2, (xuint8_t*)argv[i], strlen (argv[i]));
+      write_all (2, (xuint8_t*)"\n", 1);
     }
 
   return 0;
@@ -66,8 +66,8 @@ static int
 cat_mode (int argc,
 	  char **argv)
 {
-  GIOChannel *chan_stdin;
-  GIOChannel *chan_stdout;
+  xio_channel_t *chan_stdin;
+  xio_channel_t *chan_stdout;
   GIOStatus status;
   char buf[1024];
   xsize_t bytes_read, bytes_written;
@@ -116,10 +116,10 @@ static xint_t
 sleep_forever_mode (int argc,
 		    char **argv)
 {
-  GMainLoop *loop;
+  xmain_loop_t *loop;
 
-  loop = g_main_loop_new (NULL, TRUE);
-  g_main_loop_run (loop);
+  loop = xmain_loop_new (NULL, TRUE);
+  xmain_loop_run (loop);
 
   return 0;
 }
@@ -153,7 +153,7 @@ read_from_fd (int argc, char **argv)
 {
   int fd;
   const char expected_result[] = "Yay success!";
-  guint8 buf[sizeof (expected_result) + 1];
+  xuint8_t buf[sizeof (expected_result) + 1];
   xsize_t bytes_read;
   FILE *f;
 
@@ -173,7 +173,7 @@ read_from_fd (int argc, char **argv)
   f = fdopen (fd, "r");
   if (f == NULL)
     {
-      g_warning ("Failed to open fd %d: %s", fd, g_strerror (errno));
+      g_warning ("Failed to open fd %d: %s", fd, xstrerror (errno));
       return 1;
     }
 
@@ -208,7 +208,7 @@ env_mode (int argc, char **argv)
   for (i = 0; env[i]; i++)
     g_print ("%s\n", env[i]);
 
-  g_strfreev (env);
+  xstrfreev (env);
 
   return 0;
 }
@@ -244,12 +244,12 @@ printenv_mode (int argc, char **argv)
 int
 main (int argc, char **argv)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xerror_t *error = NULL;
   const char *mode;
   xboolean_t ret;
 
-  context = g_option_context_new ("MODE - Test GSubprocess stuff");
+  context = g_option_context_new ("MODE - Test xsubprocess_t stuff");
   g_option_context_add_main_entries (context, options, NULL);
   ret = g_option_context_parse (context, &argc, &argv, &error);
   g_option_context_free (context);
@@ -257,7 +257,7 @@ main (int argc, char **argv)
   if (!ret)
     {
       g_printerr ("%s: %s\n", argv[0], error->message);
-      g_error_free (error);
+      xerror_free (error);
       return 1;
     }
 

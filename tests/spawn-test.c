@@ -59,7 +59,7 @@ run_tests (const xchar_t* argv0)
                                   NULL, NULL, NULL,
                                   &err))
     {
-      g_error_free (err);
+      xerror_free (err);
     }
   else
     {
@@ -71,7 +71,7 @@ run_tests (const xchar_t* argv0)
   if (!g_spawn_command_line_async ("nonexistent_application foo bar baz \"blah blah\"",
                                    &err))
     {
-      g_error_free (err);
+      xerror_free (err);
     }
   else
     {
@@ -86,7 +86,7 @@ run_tests (const xchar_t* argv0)
                                   &err))
     {
       fprintf (stderr, "Error: %s\n", err->message);
-      g_error_free (err);
+      xerror_free (err);
       exit (1);
     }
   else
@@ -108,14 +108,14 @@ run_tests (const xchar_t* argv0)
   /* Running sort synchronously, collecting its output. 'sort' command is selected
    * because it is non-builtin command on both unix and win32 with well-defined stdout behaviour.
    */
-  g_file_set_contents ("spawn-test-created-file.txt", "line first\nline 2\nline last\n", -1, &err);
+  xfile_set_contents ("spawn-test-created-file.txt", "line first\nline 2\nline last\n", -1, &err);
   g_assert_no_error(err);
   if (!g_spawn_command_line_sync ("sort spawn-test-created-file.txt",
                                   &output, &erroutput, NULL,
                                   &err))
     {
       fprintf (stderr, "Error: %s\n", err->message);
-      g_error_free (err);
+      xerror_free (err);
       exit (1);
     }
   else
@@ -149,7 +149,7 @@ run_tests (const xchar_t* argv0)
                                   &err))
     {
       fprintf (stderr, "Error: %s\n", err->message);
-      g_error_free (err);
+      xerror_free (err);
       exit (1);
     }
   else
@@ -173,7 +173,7 @@ run_tests (const xchar_t* argv0)
   if (!g_spawn_command_line_async (full_cmdline, &err))
     {
       fprintf (stderr, "Error: %s\n", err->message);
-      g_error_free (err);
+      xerror_free (err);
       exit (1);
     }
 
@@ -184,7 +184,7 @@ run_tests (const xchar_t* argv0)
 				  &err))
     {
       fprintf (stderr, "Error: %s\n", err->message);
-      g_error_free (err);
+      xerror_free (err);
       exit (1);
     }
   else
@@ -195,14 +195,14 @@ run_tests (const xchar_t* argv0)
       if (strcmp (output, "This is stdout\r\n") != 0)
         {
           printf ("output was '%s', should have been 'This is stdout'\n",
-                  g_strescape (output, NULL));
+                  xstrescape (output, NULL));
 
           exit (1);
         }
       if (strcmp (erroutput, "This is stderr\r\n") != 0)
 	{
 	  printf ("error output was '%s', should have been 'This is stderr'\n",
-		  g_strescape (erroutput, NULL));
+		  xstrescape (erroutput, NULL));
 	  exit (1);
 	}
 
@@ -217,7 +217,7 @@ run_tests (const xchar_t* argv0)
   if (!g_shell_parse_argv (full_cmdline, NULL, &argv, &err))
     {
       fprintf (stderr, "Error parsing command line? %s\n", err->message);
-      g_error_free (err);
+      xerror_free (err);
       exit (1);
     }
 
@@ -227,7 +227,7 @@ run_tests (const xchar_t* argv0)
 		      &err))
     {
       fprintf (stderr, "Error: %s\n", err->message);
-      g_error_free (err);
+      xerror_free (err);
       exit (1);
     }
   else
@@ -256,7 +256,7 @@ run_tests (const xchar_t* argv0)
                            &err))
     {
       fprintf (stderr, "Error parsing command line? %s\n", err->message);
-      g_error_free (err);
+      xerror_free (err);
       exit (1);
     }
 
@@ -267,7 +267,7 @@ run_tests (const xchar_t* argv0)
 		      &err))
     {
       fprintf (stderr, "Error: %s\n", err->message);
-      g_error_free (err);
+      xerror_free (err);
       exit (1);
     }
   else
@@ -279,7 +279,7 @@ run_tests (const xchar_t* argv0)
 	{
 	  int errsv = errno;
 	  if (k == -1)
-	    fprintf (stderr, "Read error: %s\n", g_strerror (errsv));
+	    fprintf (stderr, "Read error: %s\n", xstrerror (errsv));
 	  else
 	    fprintf (stderr, "Wanted to read %d bytes, got %d\n",
 		     (int)sizeof (n), k);
@@ -290,7 +290,7 @@ run_tests (const xchar_t* argv0)
 	{
 	  int errsv = errno;
 	  if (k == -1)
-	    fprintf (stderr, "Read error: %s\n", g_strerror (errsv));
+	    fprintf (stderr, "Read error: %s\n", xstrerror (errsv));
 	  else
 	    fprintf (stderr, "Wanted to read %d bytes, got %d\n",
 		     n, k);
@@ -302,7 +302,7 @@ run_tests (const xchar_t* argv0)
 	  write (pipedown[1], "Bye then", n) == -1)
 	{
 	  int errsv = errno;
-	  fprintf (stderr, "Write error: %s\n", g_strerror (errsv));
+	  fprintf (stderr, "Write error: %s\n", xstrerror (errsv));
 	  exit (1);
 	}
 
@@ -310,7 +310,7 @@ run_tests (const xchar_t* argv0)
 	{
 	  int errsv = errno;
 	  if (k == -1)
-	    fprintf (stderr, "Read error: %s\n", g_strerror (errsv));
+	    fprintf (stderr, "Read error: %s\n", xstrerror (errsv));
 	  else
 	    fprintf (stderr, "Wanted to read %d bytes, got %d\n",
 		     (int)sizeof (n), k);
@@ -326,7 +326,7 @@ run_tests (const xchar_t* argv0)
 	{
 	  int errsv = errno;
 	  if (k == -1)
-	    fprintf (stderr, "Read error: %s\n", g_strerror (errsv));
+	    fprintf (stderr, "Read error: %s\n", xstrerror (errsv));
 	  else
 	    fprintf (stderr, "Wanted to read %d bytes, got %d\n",
 		     n, k);

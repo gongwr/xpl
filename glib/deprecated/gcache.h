@@ -33,7 +33,7 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GCache          GCache XPL_DEPRECATED_TYPE_IN_2_26_FOR(GHashTable);
+typedef struct _GCache          GCache XPL_DEPRECATED_TYPE_IN_2_26_FOR(xhashtable_t);
 
 typedef xpointer_t        (*GCacheNewFunc)        (xpointer_t       key) XPL_DEPRECATED_TYPE_IN_2_26;
 typedef xpointer_t        (*GCacheDupFunc)        (xpointer_t       value) XPL_DEPRECATED_TYPE_IN_2_26;
@@ -58,7 +58,7 @@ xpointer_t g_cache_insert        (GCache            *cache,
                                 xpointer_t           key);
 XPL_DEPRECATED
 void     g_cache_remove        (GCache            *cache,
-                                gconstpointer      value);
+                                xconstpointer      value);
 XPL_DEPRECATED
 void     g_cache_key_foreach   (GCache            *cache,
                                 GHFunc             func,

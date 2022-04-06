@@ -22,14 +22,14 @@
 
 static xtype_t _g_test_tls_certificate_get_type (void);
 static xtype_t _g_test_tls_connection_get_type (void);
-static GTlsDatabase * _g_test_tls_backend_get_default_database (GTlsBackend * backend);
+static xtls_database_t * _g_test_tls_backend_get_default_database (xtls_backend_t * backend);
 static xtype_t _g_test_tls_database_get_type (void);
 
 struct _GTestTlsBackend {
   xobject_t parent_instance;
 };
 
-static void g_test_tls_backend_iface_init (GTlsBackendInterface *iface);
+static void g_test_tls_backend_iface_init (xtls_backend_interface_t *iface);
 
 #define g_test_tls_backend_get_type _g_test_tls_backend_get_type
 G_DEFINE_TYPE_WITH_CODE (GTestTlsBackend, g_test_tls_backend, XTYPE_OBJECT,
@@ -54,7 +54,7 @@ g_test_tls_backend_class_init (GTestTlsBackendClass *backend_class)
 }
 
 static void
-g_test_tls_backend_iface_init (GTlsBackendInterface *iface)
+g_test_tls_backend_iface_init (xtls_backend_interface_t *iface)
 {
   iface->get_certificate_type = _g_test_tls_certificate_get_type;
   iface->get_client_connection_type = _g_test_tls_connection_get_type;
@@ -65,15 +65,15 @@ g_test_tls_backend_iface_init (GTlsBackendInterface *iface)
   iface->get_file_database_type = _g_test_tls_database_get_type;
 }
 
-static GTlsDatabase *
-_g_test_tls_backend_get_default_database (GTlsBackend * backend)
+static xtls_database_t *
+_g_test_tls_backend_get_default_database (xtls_backend_t * backend)
 {
-  static GTlsDatabase *default_db;
+  static xtls_database_t *default_db;
   xerror_t *error = NULL;
 
   if (!default_db)
     {
-      default_db = g_initable_new (_g_test_tls_database_get_type (),
+      default_db = xinitable_new (_g_test_tls_database_get_type (),
                                    NULL,
                                    &error,
                                    NULL);
@@ -89,10 +89,10 @@ typedef struct _GTestTlsCertificate      GTestTlsCertificate;
 typedef struct _GTestTlsCertificateClass GTestTlsCertificateClass;
 
 struct _GTestTlsCertificate {
-  GTlsCertificate parent_instance;
+  xtls_certificate_t parent_instance;
   xchar_t *key_pem;
   xchar_t *cert_pem;
-  GTlsCertificate *issuer;
+  xtls_certificate_t *issuer;
   xchar_t *pkcs11_uri;
   xchar_t *private_key_pkcs11_uri;
 };
@@ -118,7 +118,7 @@ enum
   PROP_CERT_IP_ADDRESSES,
 };
 
-static void g_test_tls_certificate_initable_iface_init (GInitableIface *iface);
+static void g_test_tls_certificate_initable_iface_init (xinitable_iface_t *iface);
 
 #define g_test_tls_certificate_get_type _g_test_tls_certificate_get_type
 G_DEFINE_TYPE_WITH_CODE (GTestTlsCertificate, g_test_tls_certificate, XTYPE_TLS_CERTIFICATE,
@@ -126,9 +126,9 @@ G_DEFINE_TYPE_WITH_CODE (GTestTlsCertificate, g_test_tls_certificate, XTYPE_TLS_
 						g_test_tls_certificate_initable_iface_init))
 
 static GTlsCertificateFlags
-g_test_tls_certificate_verify (GTlsCertificate     *cert,
-                               GSocketConnectable  *identity,
-                               GTlsCertificate     *trusted_ca)
+g_test_tls_certificate_verify (xtls_certificate_t     *cert,
+                               xsocket_connectable_t  *identity,
+                               xtls_certificate_t     *trusted_ca)
 {
   /* For now, all of the tests expect the certificate to verify */
   return 0;
@@ -137,54 +137,54 @@ g_test_tls_certificate_verify (GTlsCertificate     *cert,
 static void
 g_test_tls_certificate_get_property (xobject_t    *object,
 				      xuint_t       prop_id,
-				      GValue     *value,
-				      GParamSpec *pspec)
+				      xvalue_t     *value,
+				      xparam_spec_t *pspec)
 {
   GTestTlsCertificate *cert = (GTestTlsCertificate *) object;
-  GPtrArray *data = NULL;
+  xptr_array_t *data = NULL;
   const xchar_t *dns_name = "a.example.com";
 
   switch (prop_id)
     {
     case PROP_CERT_CERTIFICATE_PEM:
-      g_value_set_string (value, cert->cert_pem);
+      xvalue_set_string (value, cert->cert_pem);
       break;
     case PROP_CERT_PRIVATE_KEY_PEM:
-      g_value_set_string (value, cert->key_pem);
+      xvalue_set_string (value, cert->key_pem);
       break;
     case PROP_CERT_ISSUER:
-      g_value_set_object (value, cert->issuer);
+      xvalue_set_object (value, cert->issuer);
       break;
     case PROP_CERT_PKCS11_URI:
       /* This test value simulates a backend that ignores the value
          because it is unsupported */
-      if (g_strcmp0 (cert->pkcs11_uri, "unsupported") != 0)
-        g_value_set_string (value, cert->pkcs11_uri);
+      if (xstrcmp0 (cert->pkcs11_uri, "unsupported") != 0)
+        xvalue_set_string (value, cert->pkcs11_uri);
       break;
     case PROP_CERT_PRIVATE_KEY_PKCS11_URI:
-      g_value_set_string (value, cert->private_key_pkcs11_uri);
+      xvalue_set_string (value, cert->private_key_pkcs11_uri);
       break;
     case PROP_CERT_NOT_VALID_BEFORE:
-      g_value_take_boxed (value, g_date_time_new_from_iso8601 ("2020-10-12T17:49:44Z", NULL));
+      xvalue_take_boxed (value, xdate_time_new_from_iso8601 ("2020-10-12T17:49:44Z", NULL));
       break;
     case PROP_CERT_NOT_VALID_AFTER:
-      g_value_take_boxed (value, g_date_time_new_from_iso8601 ("2045-10-06T17:49:44Z", NULL));
+      xvalue_take_boxed (value, xdate_time_new_from_iso8601 ("2045-10-06T17:49:44Z", NULL));
       break;
     case PROP_CERT_SUBJECT_NAME:
-      g_value_set_string (value, "DC=COM,DC=EXAMPLE,CN=server.example.com");
+      xvalue_set_string (value, "DC=COM,DC=EXAMPLE,CN=server.example.com");
       break;
     case PROP_CERT_ISSUER_NAME:
-      g_value_set_string (value, "DC=COM,DC=EXAMPLE,OU=Certificate Authority,CN=ca.example.com,emailAddress=ca@example.com");
+      xvalue_set_string (value, "DC=COM,DC=EXAMPLE,OU=Certificate Authority,CN=ca.example.com,emailAddress=ca@example.com");
       break;
     case PROP_CERT_DNS_NAMES:
-      data = g_ptr_array_new_with_free_func ((GDestroyNotify)g_bytes_unref);
-      g_ptr_array_add (data, g_bytes_new_static (dns_name, strlen (dns_name)));
-      g_value_take_boxed (value, data);
+      data = xptr_array_new_with_free_func ((xdestroy_notify_t)xbytes_unref);
+      xptr_array_add (data, xbytes_new_static (dns_name, strlen (dns_name)));
+      xvalue_take_boxed (value, data);
       break;
     case PROP_CERT_IP_ADDRESSES:
-      data = g_ptr_array_new_with_free_func (g_object_unref);
-      g_ptr_array_add (data, xinet_address_new_from_string ("192.0.2.1"));
-      g_value_take_boxed (value, data);
+      data = xptr_array_new_with_free_func (xobject_unref);
+      xptr_array_add (data, xinet_address_new_from_string ("192.0.2.1"));
+      xvalue_take_boxed (value, data);
       break;
     default:
       g_assert_not_reached ();
@@ -195,27 +195,27 @@ g_test_tls_certificate_get_property (xobject_t    *object,
 static void
 g_test_tls_certificate_set_property (xobject_t      *object,
 				      xuint_t         prop_id,
-				      const GValue *value,
-				      GParamSpec   *pspec)
+				      const xvalue_t *value,
+				      xparam_spec_t   *pspec)
 {
   GTestTlsCertificate *cert = (GTestTlsCertificate *) object;
 
   switch (prop_id)
     {
     case PROP_CERT_CERTIFICATE_PEM:
-      cert->cert_pem = g_value_dup_string (value);
+      cert->cert_pem = xvalue_dup_string (value);
       break;
     case PROP_CERT_PRIVATE_KEY_PEM:
-      cert->key_pem = g_value_dup_string (value);
+      cert->key_pem = xvalue_dup_string (value);
       break;
     case PROP_CERT_ISSUER:
-      cert->issuer = g_value_dup_object (value);
+      cert->issuer = xvalue_dup_object (value);
       break;
     case PROP_CERT_PKCS11_URI:
-      cert->pkcs11_uri = g_value_dup_string (value);
+      cert->pkcs11_uri = xvalue_dup_string (value);
       break;
     case PROP_CERT_PRIVATE_KEY_PKCS11_URI:
-      cert->private_key_pkcs11_uri = g_value_dup_string (value);
+      cert->private_key_pkcs11_uri = xvalue_dup_string (value);
       break;
     case PROP_CERT_CERTIFICATE:
     case PROP_CERT_PRIVATE_KEY:
@@ -253,19 +253,19 @@ g_test_tls_certificate_class_init (GTestTlsCertificateClass *test_class)
 
   certificate_class->verify = g_test_tls_certificate_verify;
 
-  g_object_class_override_property (gobject_class, PROP_CERT_CERTIFICATE, "certificate");
-  g_object_class_override_property (gobject_class, PROP_CERT_CERTIFICATE_PEM, "certificate-pem");
-  g_object_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY, "private-key");
-  g_object_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY_PEM, "private-key-pem");
-  g_object_class_override_property (gobject_class, PROP_CERT_ISSUER, "issuer");
-  g_object_class_override_property (gobject_class, PROP_CERT_PKCS11_URI, "pkcs11-uri");
-  g_object_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY_PKCS11_URI, "private-key-pkcs11-uri");
-  g_object_class_override_property (gobject_class, PROP_CERT_NOT_VALID_BEFORE, "not-valid-before");
-  g_object_class_override_property (gobject_class, PROP_CERT_NOT_VALID_AFTER, "not-valid-after");
-  g_object_class_override_property (gobject_class, PROP_CERT_SUBJECT_NAME, "subject-name");
-  g_object_class_override_property (gobject_class, PROP_CERT_ISSUER_NAME, "issuer-name");
-  g_object_class_override_property (gobject_class, PROP_CERT_DNS_NAMES, "dns-names");
-  g_object_class_override_property (gobject_class, PROP_CERT_IP_ADDRESSES, "ip-addresses");
+  xobject_class_override_property (gobject_class, PROP_CERT_CERTIFICATE, "certificate");
+  xobject_class_override_property (gobject_class, PROP_CERT_CERTIFICATE_PEM, "certificate-pem");
+  xobject_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY, "private-key");
+  xobject_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY_PEM, "private-key-pem");
+  xobject_class_override_property (gobject_class, PROP_CERT_ISSUER, "issuer");
+  xobject_class_override_property (gobject_class, PROP_CERT_PKCS11_URI, "pkcs11-uri");
+  xobject_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY_PKCS11_URI, "private-key-pkcs11-uri");
+  xobject_class_override_property (gobject_class, PROP_CERT_NOT_VALID_BEFORE, "not-valid-before");
+  xobject_class_override_property (gobject_class, PROP_CERT_NOT_VALID_AFTER, "not-valid-after");
+  xobject_class_override_property (gobject_class, PROP_CERT_SUBJECT_NAME, "subject-name");
+  xobject_class_override_property (gobject_class, PROP_CERT_ISSUER_NAME, "issuer-name");
+  xobject_class_override_property (gobject_class, PROP_CERT_DNS_NAMES, "dns-names");
+  xobject_class_override_property (gobject_class, PROP_CERT_IP_ADDRESSES, "ip-addresses");
 }
 
 static void
@@ -274,7 +274,7 @@ g_test_tls_certificate_init (GTestTlsCertificate *certificate)
 }
 
 static xboolean_t
-g_test_tls_certificate_initable_init (GInitable       *initable,
+g_test_tls_certificate_initable_init (xinitable_t       *initable,
 				       xcancellable_t    *cancellable,
 				       xerror_t         **error)
 {
@@ -282,13 +282,13 @@ g_test_tls_certificate_initable_init (GInitable       *initable,
 }
 
 static void
-g_test_tls_certificate_initable_iface_init (GInitableIface  *iface)
+g_test_tls_certificate_initable_iface_init (xinitable_iface_t  *iface)
 {
   iface->init = g_test_tls_certificate_initable_init;
 }
 
-/* Dummy connection type; since GTlsClientConnection and
- * GTlsServerConnection are just interfaces, we can implement them
+/* Dummy connection type; since xtls_client_connection_t and
+ * xtls_server_connection_t are just interfaces, we can implement them
  * both on a single object.
  */
 
@@ -296,7 +296,7 @@ typedef struct _GTestTlsConnection      GTestTlsConnection;
 typedef struct _GTestTlsConnectionClass GTestTlsConnectionClass;
 
 struct _GTestTlsConnection {
-  GTlsConnection parent_instance;
+  xtls_connection_t parent_instance;
 };
 
 struct _GTestTlsConnectionClass {
@@ -320,7 +320,7 @@ enum
   PROP_CONN_AUTHENTICATION_MODE
 };
 
-static void g_test_tls_connection_initable_iface_init (GInitableIface *iface);
+static void g_test_tls_connection_initable_iface_init (xinitable_iface_t *iface);
 
 #define g_test_tls_connection_get_type _g_test_tls_connection_get_type
 G_DEFINE_TYPE_WITH_CODE (GTestTlsConnection, g_test_tls_connection, XTYPE_TLS_CONNECTION,
@@ -334,16 +334,16 @@ G_DEFINE_TYPE_WITH_CODE (GTestTlsConnection, g_test_tls_connection, XTYPE_TLS_CO
 static void
 g_test_tls_connection_get_property (xobject_t    *object,
 				     xuint_t       prop_id,
-				     GValue     *value,
-				     GParamSpec *pspec)
+				     xvalue_t     *value,
+				     xparam_spec_t *pspec)
 {
 }
 
 static void
 g_test_tls_connection_set_property (xobject_t      *object,
 				     xuint_t         prop_id,
-				     const GValue *value,
-				     GParamSpec   *pspec)
+				     const xvalue_t *value,
+				     xparam_spec_t   *pspec)
 {
 }
 
@@ -371,19 +371,19 @@ g_test_tls_connection_class_init (GTestTlsConnectionClass *connection_class)
    */
   io_stream_class->close_fn = g_test_tls_connection_close;
 
-  g_object_class_override_property (gobject_class, PROP_CONN_BASE_IO_STREAM, "base-io-stream");
-  g_object_class_override_property (gobject_class, PROP_CONN_BASE_SOCKET, "base-socket");
-  g_object_class_override_property (gobject_class, PROP_CONN_USE_SYSTEM_CERTDB, "use-system-certdb");
-  g_object_class_override_property (gobject_class, PROP_CONN_REQUIRE_CLOSE_NOTIFY, "require-close-notify");
-  g_object_class_override_property (gobject_class, PROP_CONN_REHANDSHAKE_MODE, "rehandshake-mode");
-  g_object_class_override_property (gobject_class, PROP_CONN_CERTIFICATE, "certificate");
-  g_object_class_override_property (gobject_class, PROP_CONN_PEER_CERTIFICATE, "peer-certificate");
-  g_object_class_override_property (gobject_class, PROP_CONN_PEER_CERTIFICATE_ERRORS, "peer-certificate-errors");
-  g_object_class_override_property (gobject_class, PROP_CONN_VALIDATION_FLAGS, "validation-flags");
-  g_object_class_override_property (gobject_class, PROP_CONN_SERVER_IDENTITY, "server-identity");
-  g_object_class_override_property (gobject_class, PROP_CONN_USE_SSL3, "use-ssl3");
-  g_object_class_override_property (gobject_class, PROP_CONN_ACCEPTED_CAS, "accepted-cas");
-  g_object_class_override_property (gobject_class, PROP_CONN_AUTHENTICATION_MODE, "authentication-mode");
+  xobject_class_override_property (gobject_class, PROP_CONN_BASE_IO_STREAM, "base-io-stream");
+  xobject_class_override_property (gobject_class, PROP_CONN_BASE_SOCKET, "base-socket");
+  xobject_class_override_property (gobject_class, PROP_CONN_USE_SYSTEM_CERTDB, "use-system-certdb");
+  xobject_class_override_property (gobject_class, PROP_CONN_REQUIRE_CLOSE_NOTIFY, "require-close-notify");
+  xobject_class_override_property (gobject_class, PROP_CONN_REHANDSHAKE_MODE, "rehandshake-mode");
+  xobject_class_override_property (gobject_class, PROP_CONN_CERTIFICATE, "certificate");
+  xobject_class_override_property (gobject_class, PROP_CONN_PEER_CERTIFICATE, "peer-certificate");
+  xobject_class_override_property (gobject_class, PROP_CONN_PEER_CERTIFICATE_ERRORS, "peer-certificate-errors");
+  xobject_class_override_property (gobject_class, PROP_CONN_VALIDATION_FLAGS, "validation-flags");
+  xobject_class_override_property (gobject_class, PROP_CONN_SERVER_IDENTITY, "server-identity");
+  xobject_class_override_property (gobject_class, PROP_CONN_USE_SSL3, "use-ssl3");
+  xobject_class_override_property (gobject_class, PROP_CONN_ACCEPTED_CAS, "accepted-cas");
+  xobject_class_override_property (gobject_class, PROP_CONN_AUTHENTICATION_MODE, "authentication-mode");
 }
 
 static void
@@ -392,7 +392,7 @@ g_test_tls_connection_init (GTestTlsConnection *connection)
 }
 
 static xboolean_t
-g_test_tls_connection_initable_init (GInitable       *initable,
+g_test_tls_connection_initable_init (xinitable_t       *initable,
 				      xcancellable_t    *cancellable,
 				      xerror_t         **error)
 {
@@ -402,7 +402,7 @@ g_test_tls_connection_initable_init (GInitable       *initable,
 }
 
 static void
-g_test_tls_connection_initable_iface_init (GInitableIface  *iface)
+g_test_tls_connection_initable_iface_init (xinitable_iface_t  *iface)
 {
   iface->init = g_test_tls_connection_initable_init;
 }
@@ -413,7 +413,7 @@ typedef struct _GTestTlsDatabase      GTestTlsDatabase;
 typedef struct _GTestTlsDatabaseClass GTestTlsDatabaseClass;
 
 struct _GTestTlsDatabase {
-  GTlsDatabase parent_instance;
+  xtls_database_t parent_instance;
   xchar_t *anchors;
 };
 
@@ -426,8 +426,8 @@ enum
   PROP_DATABASE_ANCHORS = 1,
 };
 
-static void g_test_tls_database_initable_iface_init (GInitableIface *iface);
-static void g_test_tls_file_database_file_database_interface_init (GInitableIface *iface);
+static void g_test_tls_database_initable_iface_init (xinitable_iface_t *iface);
+static void g_test_tls_file_database_file_database_interface_init (xinitable_iface_t *iface);
 
 #define g_test_tls_database_get_type _g_test_tls_database_get_type
 G_DEFINE_TYPE_WITH_CODE (GTestTlsDatabase, g_test_tls_database, XTYPE_TLS_DATABASE,
@@ -439,15 +439,15 @@ G_DEFINE_TYPE_WITH_CODE (GTestTlsDatabase, g_test_tls_database, XTYPE_TLS_DATABA
 static void
 g_test_tls_database_get_property (xobject_t    *object,
                                   xuint_t       prop_id,
-                                  GValue     *value,
-                                  GParamSpec *pspec)
+                                  xvalue_t     *value,
+                                  xparam_spec_t *pspec)
 {
   GTestTlsDatabase *db = (GTestTlsDatabase *) object;
 
   switch (prop_id)
     {
     case PROP_DATABASE_ANCHORS:
-      g_value_set_string (value, db->anchors);
+      xvalue_set_string (value, db->anchors);
       break;
     default:
       g_assert_not_reached ();
@@ -458,8 +458,8 @@ g_test_tls_database_get_property (xobject_t    *object,
 static void
 g_test_tls_database_set_property (xobject_t      *object,
                                   xuint_t         prop_id,
-                                  const GValue *value,
-                                  GParamSpec   *pspec)
+                                  const xvalue_t *value,
+                                  xparam_spec_t   *pspec)
 {
   GTestTlsDatabase *db = (GTestTlsDatabase *) object;
 
@@ -467,7 +467,7 @@ g_test_tls_database_set_property (xobject_t      *object,
     {
     case PROP_DATABASE_ANCHORS:
       g_free (db->anchors);
-      db->anchors = g_value_dup_string (value);
+      db->anchors = xvalue_dup_string (value);
       break;
     default:
       g_assert_not_reached ();
@@ -494,7 +494,7 @@ g_test_tls_database_class_init (GTestTlsDatabaseClass *test_class)
   gobject_class->set_property = g_test_tls_database_set_property;
   gobject_class->finalize = g_test_tls_database_finalize;
 
-  g_object_class_override_property (gobject_class, PROP_DATABASE_ANCHORS, "anchors");
+  xobject_class_override_property (gobject_class, PROP_DATABASE_ANCHORS, "anchors");
 }
 
 static void
@@ -503,7 +503,7 @@ g_test_tls_database_init (GTestTlsDatabase *database)
 }
 
 static xboolean_t
-g_test_tls_database_initable_init (GInitable       *initable,
+g_test_tls_database_initable_init (xinitable_t       *initable,
                                    xcancellable_t    *cancellable,
                                    xerror_t         **error)
 {
@@ -511,12 +511,12 @@ g_test_tls_database_initable_init (GInitable       *initable,
 }
 
 static void
-g_test_tls_file_database_file_database_interface_init (GInitableIface *iface)
+g_test_tls_file_database_file_database_interface_init (xinitable_iface_t *iface)
 {
 }
 
 static void
-g_test_tls_database_initable_iface_init (GInitableIface  *iface)
+g_test_tls_database_initable_iface_init (xinitable_iface_t  *iface)
 {
   iface->init = g_test_tls_database_initable_init;
 }

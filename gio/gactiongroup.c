@@ -28,12 +28,12 @@
  * @title: xaction_group_t
  * @short_description: A group of actions
  * @include: gio/gio.h
- * @see_also: #GAction
+ * @see_also: #xaction_t
  *
  * #xaction_group_t represents a group of actions. Actions can be used to
  * expose functionality in a structured way, either from one part of a
  * program to another, or to the outside world. Action groups are often
- * used together with a #GMenuModel that provides additional
+ * used together with a #xmenu_model_t that provides additional
  * representation data for displaying the actions to the user, e.g. in
  * a menu.
  *
@@ -107,7 +107,7 @@
  * Since: 2.28
  **/
 
-G_DEFINE_INTERFACE (xaction_group_t, xaction_group, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (xaction_group, xaction_group, XTYPE_OBJECT)
 
 enum
 {
@@ -346,7 +346,7 @@ xaction_group_default_init (xaction_group_interface_t *iface)
  *
  * Lists the actions contained within @action_group.
  *
- * The caller is responsible for freeing the list with g_strfreev() when
+ * The caller is responsible for freeing the list with xstrfreev() when
  * it is no longer required.
  *
  * Returns: (transfer full): a %NULL-terminated array of the names of the
@@ -475,7 +475,7 @@ xaction_group_get_action_state_type (xaction_group_t *action_group,
  * within the range may fail.
  *
  * The return value (if non-%NULL) should be freed with
- * g_variant_unref() when it is no longer required.
+ * xvariant_unref() when it is no longer required.
  *
  * Returns: (nullable) (transfer full): the state range hint
  *
@@ -527,7 +527,7 @@ xaction_group_get_action_enabled (xaction_group_t *action_group,
  * given by xaction_group_get_action_state_type().
  *
  * The return value (if non-%NULL) should be freed with
- * g_variant_unref() when it is no longer required.
+ * xvariant_unref() when it is no longer required.
  *
  * Returns: (nullable) (transfer full): the current state of the action
  *

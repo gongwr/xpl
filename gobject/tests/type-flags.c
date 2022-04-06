@@ -4,52 +4,52 @@
 #include <glib-object.h>
 
 #define TEST_TYPE_FINAL (test_final_get_type())
-G_DECLARE_FINAL_TYPE (TestFinal, test_final, TEST, FINAL, xobject_t)
+G_DECLARE_FINAL_TYPE (test_final, test_final, TEST, FINAL, xobject)
 
-struct _TestFinal
+struct _test_final
 {
   xobject_t parent_instance;
 };
 
-struct _TestFinalClass
+struct _test_final_class
 {
   xobject_class_t parent_class;
 };
 
-G_DEFINE_FINAL_TYPE (TestFinal, test_final, XTYPE_OBJECT)
+G_DEFINE_FINAL_TYPE (test_final, test_final, XTYPE_OBJECT)
 
 static void
-test_final_class_init (TestFinalClass *klass)
+test_final_class_init (test_final_class_t *klass)
 {
 }
 
 static void
-test_final_init (TestFinal *self)
+test_final_init (test_final_t *self)
 {
 }
 
 #define TEST_TYPE_FINAL2 (test_final2_get_type())
-G_DECLARE_FINAL_TYPE (TestFinal2, test_final2, TEST, FINAL2, TestFinal)
+G_DECLARE_FINAL_TYPE (test_final2, test_final2, TEST, FINAL2, test_final)
 
-struct _TestFinal2
+struct _test_final2
 {
-  TestFinal parent_instance;
+  test_final_t parent_instance;
 };
 
-struct _TestFinal2Class
+struct _test_final2_class
 {
-  TestFinalClass parent_class;
+  test_final_class_t parent_class;
 };
 
-G_DEFINE_TYPE (TestFinal2, test_final2, TEST_TYPE_FINAL)
+G_DEFINE_TYPE (test_final2, test_final2, TEST_TYPE_FINAL)
 
 static void
-test_final2_class_init (TestFinal2Class *klass)
+test_final2_class_init (test_final2_class_t *klass)
 {
 }
 
 static void
-test_final2_init (TestFinal2 *self)
+test_final2_init (test_final2_t *self)
 {
 }
 

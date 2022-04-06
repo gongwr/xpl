@@ -44,7 +44,7 @@ G_BEGIN_DECLS
  * Error domain for API in the g_unix_ namespace. Note that there is no
  * exported enumeration mapping %errno. Instead, all functions ensure that
  * %errno is relevant. The code for all %G_UNIX_ERROR is always 0, and the
- * error message is always generated via g_strerror().
+ * error message is always generated via xstrerror().
  *
  * It is expected that most code will not look at %errno from these APIs.
  * Important cases where one would want to differentiate between errors are
@@ -54,7 +54,7 @@ G_BEGIN_DECLS
 #define G_UNIX_ERROR (g_unix_error_quark())
 
 XPL_AVAILABLE_IN_2_30
-GQuark g_unix_error_quark (void);
+xquark g_unix_error_quark (void);
 
 XPL_AVAILABLE_IN_2_30
 xboolean_t g_unix_open_pipe (xint_t    *fds,
@@ -67,18 +67,18 @@ xboolean_t g_unix_set_fd_nonblocking (xint_t       fd,
                                     xerror_t   **error);
 
 XPL_AVAILABLE_IN_2_30
-GSource *g_unix_signal_source_new  (xint_t signum);
+xsource_t *g_unix_signal_source_new  (xint_t signum);
 
 XPL_AVAILABLE_IN_2_30
 xuint_t    g_unix_signal_add_full    (xint_t           priority,
                                     xint_t           signum,
-                                    GSourceFunc    handler,
+                                    xsource_func_t    handler,
                                     xpointer_t       user_data,
-                                    GDestroyNotify notify);
+                                    xdestroy_notify_t notify);
 
 XPL_AVAILABLE_IN_2_30
 xuint_t    g_unix_signal_add         (xint_t        signum,
-                                    GSourceFunc handler,
+                                    xsource_func_t handler,
                                     xpointer_t    user_data);
 
 /**
@@ -93,24 +93,24 @@ xuint_t    g_unix_signal_add         (xint_t        signum,
  * Returns: %FALSE if the source should be removed
  **/
 typedef xboolean_t (*GUnixFDSourceFunc) (xint_t         fd,
-                                       GIOCondition condition,
+                                       xio_condition_t condition,
                                        xpointer_t     user_data);
 
 XPL_AVAILABLE_IN_2_36
-GSource *g_unix_fd_source_new      (xint_t         fd,
-                                    GIOCondition condition);
+xsource_t *g_unix_fd_source_new      (xint_t         fd,
+                                    xio_condition_t condition);
 
 XPL_AVAILABLE_IN_2_36
 xuint_t    g_unix_fd_add_full        (xint_t              priority,
                                     xint_t              fd,
-                                    GIOCondition      condition,
+                                    xio_condition_t      condition,
                                     GUnixFDSourceFunc function,
                                     xpointer_t          user_data,
-                                    GDestroyNotify    notify);
+                                    xdestroy_notify_t    notify);
 
 XPL_AVAILABLE_IN_2_36
 xuint_t    g_unix_fd_add             (xint_t              fd,
-                                    GIOCondition      condition,
+                                    xio_condition_t      condition,
                                     GUnixFDSourceFunc function,
                                     xpointer_t          user_data);
 

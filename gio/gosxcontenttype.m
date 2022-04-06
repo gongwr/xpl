@@ -95,7 +95,7 @@ create_cstr_from_cfstring_with_fallback (CFStringRef  str,
   if (str)
     cstr = create_cstr_from_cfstring (str);
   if (!cstr)
-    return g_strdup (fallback);
+    return xstrdup (fallback);
 
   return cstr;
 }
@@ -183,10 +183,10 @@ g_content_type_is_unknown (const xchar_t *type)
   g_return_val_if_fail (type != NULL, FALSE);
 
   /* Should dynamic types be considered "unknown"? */
-  if (g_str_has_prefix (type, "dyn."))
+  if (xstr_has_prefix (type, "dyn."))
     return TRUE;
   /* application/octet-stream */
-  else if (g_strcmp0 (type, "public.data") == 0)
+  else if (xstrcmp0 (type, "public.data") == 0)
     return TRUE;
 
   return FALSE;
@@ -231,14 +231,14 @@ g_content_type_get_description (const xchar_t *type)
 static xchar_t *
 _get_generic_icon_name_from_mime_type (const xchar_t *mime_type)
 {
-  const xchar_t *xdg_icon_name;
+  const xchar_t *xdxicon_name;
   xchar_t *icon_name;
 
   G_LOCK (gio_xdgmime);
-  xdg_icon_name = xdg_mime_get_generic_icon (mime_type);
+  xdxicon_name = xdg_mime_get_generic_icon (mime_type);
   G_UNLOCK (gio_xdgmime);
 
-  if (xdg_icon_name == NULL)
+  if (xdxicon_name == NULL)
     {
       const char *p;
       const char *suffix = "-x-generic";
@@ -257,7 +257,7 @@ _get_generic_icon_name_from_mime_type (const xchar_t *mime_type)
     }
   else
     {
-      icon_name = g_strdup (xdg_icon_name);
+      icon_name = xstrdup (xdxicon_name);
     }
 
   return icon_name;
@@ -287,9 +287,9 @@ g_content_type_get_icon_internal (const xchar_t *uti,
   G_UNLOCK (gio_xdgmime);
 
   if (xdg_icon)
-    icon_names[n++] = g_strdup (xdg_icon);
+    icon_names[n++] = xstrdup (xdg_icon);
 
-  mimetype_icon = g_strdup (mime_type);
+  mimetype_icon = xstrdup (mime_type);
   while ((q = strchr (mimetype_icon, '/')) != NULL)
     *q = '-';
 
@@ -305,7 +305,7 @@ g_content_type_get_icon_internal (const xchar_t *uti,
       for (i = 0; i < n; i++)
         {
           icon_names[n + i] = icon_names[i];
-          icon_names[i] = g_strconcat (icon_names[i], "-symbolic", NULL);
+          icon_names[i] = xstrconcat (icon_names[i], "-symbolic", NULL);
         }
 
       n += n;
@@ -372,51 +372,51 @@ g_content_type_from_mime_type (const xchar_t *mime_type)
   g_return_val_if_fail (mime_type != NULL, NULL);
 
   /* Their api does not handle globs but they are common. */
-  if (g_str_has_suffix (mime_type, "*"))
+  if (xstr_has_suffix (mime_type, "*"))
     {
-      if (g_str_has_prefix (mime_type, "audio"))
-        return g_strdup ("public.audio");
-      if (g_str_has_prefix (mime_type, "image"))
-        return g_strdup ("public.image");
-      if (g_str_has_prefix (mime_type, "text"))
-        return g_strdup ("public.text");
-      if (g_str_has_prefix (mime_type, "video"))
-        return g_strdup ("public.movie");
+      if (xstr_has_prefix (mime_type, "audio"))
+        return xstrdup ("public.audio");
+      if (xstr_has_prefix (mime_type, "image"))
+        return xstrdup ("public.image");
+      if (xstr_has_prefix (mime_type, "text"))
+        return xstrdup ("public.text");
+      if (xstr_has_prefix (mime_type, "video"))
+        return xstrdup ("public.movie");
     }
 
   /* Some exceptions are needed for gdk-pixbuf.
    * This list is not exhaustive.
    */
-  if (g_str_has_prefix (mime_type, "image"))
+  if (xstr_has_prefix (mime_type, "image"))
     {
-      if (g_str_has_suffix (mime_type, "x-icns"))
-        return g_strdup ("com.apple.icns");
-      if (g_str_has_suffix (mime_type, "x-tga"))
-        return g_strdup ("com.truevision.tga-image");
-      if (g_str_has_suffix (mime_type, "x-ico"))
-        return g_strdup ("com.microsoft.ico ");
+      if (xstr_has_suffix (mime_type, "x-icns"))
+        return xstrdup ("com.apple.icns");
+      if (xstr_has_suffix (mime_type, "x-tga"))
+        return xstrdup ("com.truevision.tga-image");
+      if (xstr_has_suffix (mime_type, "x-ico"))
+        return xstrdup ("com.microsoft.ico ");
     }
 
   /* These are also not supported...
    * Used in glocalfileinfo.c
    */
-  if (g_str_has_prefix (mime_type, "inode"))
+  if (xstr_has_prefix (mime_type, "inode"))
     {
-      if (g_str_has_suffix (mime_type, "directory"))
-        return g_strdup ("public.folder");
-      if (g_str_has_suffix (mime_type, "symlink"))
-        return g_strdup ("public.symlink");
+      if (xstr_has_suffix (mime_type, "directory"))
+        return xstrdup ("public.folder");
+      if (xstr_has_suffix (mime_type, "symlink"))
+        return xstrdup ("public.symlink");
     }
 
   /* This is correct according to the Apple docs:
      https://developer.apple.com/library/content/documentation/Miscellaneous/Reference/UTIRef/Articles/System-DeclaredUniformTypeIdentifiers.html
   */
   if (strcmp (mime_type, "text/plain") == 0)
-    return g_strdup ("public.text");
+    return xstrdup ("public.text");
 
   /* Non standard type */
   if (strcmp (mime_type, "application/x-executable") == 0)
-    return g_strdup ("public.executable");
+    return xstrdup ("public.executable");
 
   mime_str = create_cfstring_from_cstr (mime_type);
   uti_str = UTTypeCreatePreferredIdentifierForTag (kUTTagClassMIMEType, mime_str, NULL);
@@ -436,22 +436,22 @@ g_content_type_get_mime_type (const xchar_t *type)
   /* We must match the additions above
    * so conversions back and forth work.
    */
-  if (g_str_has_prefix (type, "public"))
+  if (xstr_has_prefix (type, "public"))
     {
-      if (g_str_has_suffix (type, ".image"))
-        return g_strdup ("image/*");
-      if (g_str_has_suffix (type, ".movie"))
-        return g_strdup ("video/*");
-      if (g_str_has_suffix (type, ".text"))
-        return g_strdup ("text/*");
-      if (g_str_has_suffix (type, ".audio"))
-        return g_strdup ("audio/*");
-      if (g_str_has_suffix (type, ".folder"))
-        return g_strdup ("inode/directory");
-      if (g_str_has_suffix (type, ".symlink"))
-        return g_strdup ("inode/symlink");
-      if (g_str_has_suffix (type, ".executable"))
-        return g_strdup ("application/x-executable");
+      if (xstr_has_suffix (type, ".image"))
+        return xstrdup ("image/*");
+      if (xstr_has_suffix (type, ".movie"))
+        return xstrdup ("video/*");
+      if (xstr_has_suffix (type, ".text"))
+        return xstrdup ("text/*");
+      if (xstr_has_suffix (type, ".audio"))
+        return xstrdup ("audio/*");
+      if (xstr_has_suffix (type, ".folder"))
+        return xstrdup ("inode/directory");
+      if (xstr_has_suffix (type, ".symlink"))
+        return xstrdup ("inode/symlink");
+      if (xstr_has_suffix (type, ".executable"))
+        return xstrdup ("application/x-executable");
     }
 
   uti_str = create_cfstring_from_cstr (type);
@@ -498,7 +498,7 @@ g_content_type_guess (const xchar_t  *filename,
 
       if (filename[i - 1] == '/')
         {
-          if (g_strcmp0 (dirname, "/Volumes") == 0)
+          if (xstrcmp0 (dirname, "/Volumes") == 0)
             {
               uti = CFStringCreateCopy (NULL, kUTTypeVolume);
             }
@@ -526,11 +526,11 @@ g_content_type_guess (const xchar_t  *filename,
       else
         {
           /* GTK needs this... */
-          if (g_str_has_suffix (basename, ".ui"))
+          if (xstr_has_suffix (basename, ".ui"))
             {
               uti = CFStringCreateCopy (NULL, kUTTypeXML);
             }
-          else if (g_str_has_suffix (basename, ".txt"))
+          else if (xstr_has_suffix (basename, ".txt"))
             {
               uti = CFStringCreateCopy (NULL, CFSTR ("public.text"));
             }
@@ -561,7 +561,7 @@ g_content_type_guess (const xchar_t  *filename,
         }
       if (!uti && looks_like_text (data, data_size))
         {
-          if (g_str_has_prefix ((const xchar_t*)data, "#!/"))
+          if (xstr_has_prefix ((const xchar_t*)data, "#!/"))
             uti = CFStringCreateCopy (NULL, CFSTR ("public.script"));
           else
             uti = CFStringCreateCopy (NULL, CFSTR ("public.text"));

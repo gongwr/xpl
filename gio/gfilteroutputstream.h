@@ -30,14 +30,14 @@
 G_BEGIN_DECLS
 
 #define XTYPE_FILTER_OUTPUT_STREAM         (g_filter_output_stream_get_type ())
-#define G_FILTER_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FILTER_OUTPUT_STREAM, GFilterOutputStream))
+#define G_FILTER_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FILTER_OUTPUT_STREAM, xfilter_output_stream))
 #define G_FILTER_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILTER_OUTPUT_STREAM, GFilterOutputStreamClass))
 #define X_IS_FILTER_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_FILTER_OUTPUT_STREAM))
 #define X_IS_FILTER_OUTPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_FILTER_OUTPUT_STREAM))
 #define G_FILTER_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILTER_OUTPUT_STREAM, GFilterOutputStreamClass))
 
 /**
- * GFilterOutputStream:
+ * xfilter_output_stream_t:
  *
  * A base class for all output streams that work on an underlying stream.
  **/
@@ -66,11 +66,11 @@ struct _GFilterOutputStreamClass
 XPL_AVAILABLE_IN_ALL
 xtype_t           g_filter_output_stream_get_type              (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xoutput_stream_t * g_filter_output_stream_get_base_stream       (GFilterOutputStream *stream);
+xoutput_stream_t * g_filter_output_stream_get_base_stream       (xfilter_output_stream_t *stream);
 XPL_AVAILABLE_IN_ALL
-xboolean_t        g_filter_output_stream_get_close_base_stream (GFilterOutputStream *stream);
+xboolean_t        g_filter_output_stream_get_close_base_stream (xfilter_output_stream_t *stream);
 XPL_AVAILABLE_IN_ALL
-void            g_filter_output_stream_set_close_base_stream (GFilterOutputStream *stream,
+void            g_filter_output_stream_set_close_base_stream (xfilter_output_stream_t *stream,
                                                               xboolean_t             close_base);
 
 G_END_DECLS

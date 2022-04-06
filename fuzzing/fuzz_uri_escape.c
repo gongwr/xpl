@@ -1,17 +1,17 @@
 #include "fuzz.h"
 
 static void
-test_bytes (const guint8 *data,
+test_bytes (const xuint8_t *data,
             xsize_t         size)
 {
   xerror_t *error = NULL;
-  GBytes *unescaped_bytes = NULL;
+  xbytes_t *unescaped_bytes = NULL;
   xchar_t *escaped_string = NULL;
 
   if (size > G_MAXSSIZE)
     return;
 
-  unescaped_bytes = g_uri_unescape_bytes ((const xchar_t *) data, (gssize) size, NULL, &error);
+  unescaped_bytes = xuri_unescape_bytes ((const xchar_t *) data, (xssize_t) size, NULL, &error);
   if (unescaped_bytes == NULL)
     {
       g_assert_nonnull (error);
@@ -19,10 +19,10 @@ test_bytes (const guint8 *data,
       return;
     }
 
-  escaped_string = g_uri_escape_bytes (g_bytes_get_data (unescaped_bytes, NULL),
-                                       g_bytes_get_size (unescaped_bytes),
+  escaped_string = xuri_escape_bytes (xbytes_get_data (unescaped_bytes, NULL),
+                                       xbytes_get_size (unescaped_bytes),
                                        NULL);
-  g_bytes_unref (unescaped_bytes);
+  xbytes_unref (unescaped_bytes);
 
   if (escaped_string == NULL)
     return;
@@ -31,17 +31,17 @@ test_bytes (const guint8 *data,
 }
 
 static void
-test_string (const guint8 *data,
+test_string (const xuint8_t *data,
              xsize_t         size)
 {
   xchar_t *unescaped_string = NULL;
   xchar_t *escaped_string = NULL;
 
-  unescaped_string = g_uri_unescape_segment ((const xchar_t *) data, (const xchar_t *) data + size, NULL);
+  unescaped_string = xuri_unescape_segment ((const xchar_t *) data, (const xchar_t *) data + size, NULL);
   if (unescaped_string == NULL)
     return;
 
-  escaped_string = g_uri_escape_string (unescaped_string, NULL, TRUE);
+  escaped_string = xuri_escape_string (unescaped_string, NULL, TRUE);
   g_free (unescaped_string);
 
   if (escaped_string == NULL)

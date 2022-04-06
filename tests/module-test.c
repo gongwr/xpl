@@ -59,7 +59,7 @@ compare (const xchar_t *desc, const xchar_t *expected, const xchar_t *found)
   if (expected && found && strcmp (expected, found) == 0)
     return;
 
-  g_error ("error: %s state should have been \"%s\", but is \"%s\"",
+  xerror ("error: %s state should have been \"%s\", but is \"%s\"",
 	   desc, expected ? expected : "NULL", found ? found : "NULL");
 }
 
@@ -89,7 +89,7 @@ main (int    argc,
   g_test_init (&argc, &argv, NULL);
 
   if (!g_module_supported ())
-    g_error ("dynamic modules not supported");
+    xerror ("dynamic modules not supported");
 
   plugin_a = g_test_build_filename (G_TEST_BUILT, MODULE_FILENAME_PREFIX "moduletestplugin_a_" MODULE_TYPE, NULL);
   plugin_b = g_test_build_filename (G_TEST_BUILT, MODULE_FILENAME_PREFIX "moduletestplugin_b_" MODULE_TYPE, NULL);
@@ -99,44 +99,44 @@ main (int    argc,
   module_self = g_module_open_full (NULL, G_MODULE_BIND_LAZY, &error);
   g_assert_no_error (error);
   if (!module_self)
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
 
     /* On Windows static compilation mode, glib API symbols are not
      * exported dynamically by definition. */
 #if !defined(XPLATFORM_WIN32) || !defined(XPL_STATIC_COMPILATION)
   if (!g_module_symbol (module_self, "g_module_close", (xpointer_t *) &f_self))
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
 #endif
 
   module_a = g_module_open_full (plugin_a, G_MODULE_BIND_LAZY, &error);
   g_assert_no_error (error);
   if (!module_a)
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
 
   module_b = g_module_open_full (plugin_b, G_MODULE_BIND_LAZY, &error);
   g_assert_no_error (error);
   if (!module_b)
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
 
   /* get plugin state vars */
 
   if (!g_module_symbol (module_a, "gplugin_a_state",
 			(xpointer_t *) &gplugin_a_state))
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
 
   if (!g_module_symbol (module_b, "gplugin_b_state",
 			(xpointer_t *) &gplugin_b_state))
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
   test_states (NULL, NULL, "check-init");
 
   /* get plugin specific symbols and call them
    */
   if (!g_module_symbol (module_a, "gplugin_a_func", (xpointer_t *) &f_a))
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
   test_states (NULL, NULL, NULL);
 
   if (!g_module_symbol (module_b, "gplugin_b_func", (xpointer_t *) &f_b))
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
   test_states (NULL, NULL, NULL);
 
   f_a ();
@@ -149,15 +149,15 @@ main (int    argc,
    */
 
   if (!g_module_symbol (module_self, "g_clash_func", (xpointer_t *) &f_self))
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
   test_states (NULL, NULL, NULL);
 
   if (!g_module_symbol (module_a, "g_clash_func", (xpointer_t *) &f_a))
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
   test_states (NULL, NULL, NULL);
 
   if (!g_module_symbol (module_b, "g_clash_func", (xpointer_t *) &f_b))
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
   test_states (NULL, NULL, NULL);
 
   f_self ();
@@ -172,11 +172,11 @@ main (int    argc,
   /* get and call clashing plugin functions  */
 
   if (!g_module_symbol (module_a, "gplugin_clash_func", (xpointer_t *) &f_a))
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
   test_states (NULL, NULL, NULL);
 
   if (!g_module_symbol (module_b, "gplugin_clash_func", (xpointer_t *) &f_b))
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
   test_states (NULL, NULL, NULL);
 
   plugin_clash_func = f_a;
@@ -190,7 +190,7 @@ main (int    argc,
   /* call gmodule function from A  */
 
   if (!g_module_symbol (module_a, "gplugin_a_module_func", (xpointer_t *) &gmod_f))
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
   test_states (NULL, NULL, NULL);
 
   gmod_f (module_b);
@@ -202,10 +202,10 @@ main (int    argc,
   /* unload plugins  */
 
   if (!g_module_close (module_a))
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
 
   if (!g_module_close (module_b))
-    g_error ("error: %s", g_module_error ());
+    xerror ("error: %s", g_module_error ());
 
   g_free (plugin_a);
   g_free (plugin_b);

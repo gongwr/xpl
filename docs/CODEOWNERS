@@ -71,7 +71,7 @@ gobject/	@ebassi @pwithnall @sdroege
 # xvariant_t
 glib/gvariant*	@pwithnall @sdroege
 
-# grefcount, GRcBox and GRefString
+# grefcount, GRcBox and xref_string_t
 glib/gref{count,string}.[ch]	@ebassi @pwithnall @sdroege
 glib/grc*.[ch]			@ebassi @pwithnall @sdroege
 glib/garc*.[ch]			@ebassi @pwithnall @sdroege

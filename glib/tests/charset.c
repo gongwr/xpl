@@ -49,7 +49,7 @@ test_language_names_with_category (void)
       g_test_message ("Test %" G_GSIZE_FORMAT, i);
       g_assert_true (g_setenv (TEST_TABLE[i], TEST_LOCALE, TRUE));
       language_names = g_get_language_names_with_category ("LC_CTYPE");
-      g_assert_cmpuint (g_strv_length ((xchar_t **)language_names), ==, g_strv_length ((xchar_t **)TEST_RESULT));
+      g_assert_cmpuint (xstrv_length ((xchar_t **)language_names), ==, xstrv_length ((xchar_t **)TEST_RESULT));
 
       for (j = 0; language_names[j]; ++j)
         {
@@ -62,7 +62,7 @@ test_language_names_with_category (void)
 static void
 test_language_names_with_category_async (void)
 {
-  g_thread_join (g_thread_new (
+  xthread_join (xthread_new (
       NULL, (GThreadFunc)g_get_language_names_with_category, "LC_CTYPE"));
 
   /* g_get_language_names_with_category returns a pointer to a memory

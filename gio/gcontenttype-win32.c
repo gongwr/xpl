@@ -45,7 +45,7 @@ get_registry_classes_key (const char    *subdir,
   value_utf8 = NULL;
 
   nbytes = 0;
-  wc_key = g_utf8_to_utf16 (subdir, -1, NULL, NULL, NULL);
+  wc_key = xutf8_to_utf16 (subdir, -1, NULL, NULL, NULL);
   if (RegOpenKeyExW (HKEY_CLASSES_ROOT, wc_key, 0,
                      KEY_QUERY_VALUE, &reg_key) == ERROR_SUCCESS &&
       RegQueryValueExW (reg_key, key_name, 0,
@@ -64,13 +64,13 @@ get_registry_classes_key (const char    *subdir,
             {
               wchar_t *wc_temp_expanded = g_new (wchar_t, len);
               if (ExpandEnvironmentStringsW (wc_temp, wc_temp_expanded, len) == len)
-                value_utf8 = g_utf16_to_utf8 (wc_temp_expanded, -1, NULL, NULL, NULL);
+                value_utf8 = xutf16_to_utf8 (wc_temp_expanded, -1, NULL, NULL, NULL);
               g_free (wc_temp_expanded);
             }
         }
       else
         {
-          value_utf8 = g_utf16_to_utf8 (wc_temp, -1, NULL, NULL, NULL);
+          value_utf8 = xutf16_to_utf8 (wc_temp, -1, NULL, NULL, NULL);
         }
       g_free (wc_temp);
 
@@ -189,9 +189,9 @@ g_content_type_get_description (const xchar_t *type)
     }
 
   if (g_content_type_is_unknown (type))
-    return g_strdup (_("Unknown type"));
+    return xstrdup (_("Unknown type"));
 
-  return g_strdup_printf (_("%s filetype"), type);
+  return xstrdup_printf (_("%s filetype"), type);
 }
 
 xchar_t *
@@ -205,18 +205,18 @@ g_content_type_get_mime_type (const xchar_t *type)
   if (mime)
     return mime;
   else if (g_content_type_is_unknown (type))
-    return g_strdup ("application/octet-stream");
+    return xstrdup ("application/octet-stream");
   else if (*type == '.')
-    return g_strdup_printf ("application/x-ext-%s", type+1);
+    return xstrdup_printf ("application/x-ext-%s", type+1);
   else if (strcmp ("inode/directory", type) == 0)
-    return g_strdup (type);
+    return xstrdup (type);
   /* TODO: Map "image" to "image/ *", etc? */
 
-  return g_strdup ("application/octet-stream");
+  return xstrdup ("application/octet-stream");
 }
 
 G_LOCK_DEFINE_STATIC (_type_icons);
-static GHashTable *_type_icons = NULL;
+static xhashtable_t *_type_icons = NULL;
 
 xicon_t *
 g_content_type_get_icon (const xchar_t *type)
@@ -234,17 +234,17 @@ g_content_type_get_icon (const xchar_t *type)
   */
   G_LOCK (_type_icons);
   if (!_type_icons)
-    _type_icons = g_hash_table_new (g_str_hash, g_str_equal);
-  name = g_hash_table_lookup (_type_icons, type);
+    _type_icons = xhash_table_new (xstr_hash, xstr_equal);
+  name = xhash_table_lookup (_type_icons, type);
   if (!name && type[0] == '.')
     {
       /* double lookup by extension */
       xchar_t *key = get_registry_classes_key (type, NULL);
       if (!key)
-        key = g_strconcat (type+1, "file\\DefaultIcon", NULL);
+        key = xstrconcat (type+1, "file\\DefaultIcon", NULL);
       else
         {
-          xchar_t *key2 = g_strconcat (key, "\\DefaultIcon", NULL);
+          xchar_t *key2 = xstrconcat (key, "\\DefaultIcon", NULL);
           g_free (key);
           key = key2;
         }
@@ -255,7 +255,7 @@ g_content_type_get_icon (const xchar_t *type)
           name = NULL;
         }
       if (name)
-        g_hash_table_insert (_type_icons, g_strdup (type), g_strdup (name));
+        xhash_table_insert (_type_icons, xstrdup (type), xstrdup (name));
       g_free (key);
     }
 
@@ -268,12 +268,12 @@ g_content_type_get_icon (const xchar_t *type)
         name = "system-run";
       else
         name = "text-x-generic";
-      g_hash_table_insert (_type_icons, g_strdup (type), g_strdup (name));
+      xhash_table_insert (_type_icons, xstrdup (type), xstrdup (name));
     }
   themed_icon = g_themed_icon_new (name);
   G_UNLOCK (_type_icons);
 
-  return G_ICON (themed_icon);
+  return XICON (themed_icon);
 }
 
 xicon_t *
@@ -336,9 +336,9 @@ g_content_type_from_mime_type (const xchar_t *mime_type)
 
   /* This is a hack to allow directories to have icons in filechooser */
   if (strcmp ("inode/directory", mime_type) == 0)
-    return g_strdup (mime_type);
+    return xstrdup (mime_type);
 
-  key = g_strconcat ("MIME\\DataBase\\Content Type\\", mime_type, NULL);
+  key = xstrconcat ("MIME\\DataBase\\Content Type\\", mime_type, NULL);
   content_type = get_registry_classes_key (key, L"Extension");
   g_free (key);
 
@@ -362,14 +362,14 @@ g_content_type_guess (const xchar_t  *filename,
 
   /* our test suite and potentially other code used -1 in the past, which is
    * not documented and not allowed; guard against that */
-  g_return_val_if_fail (data_size != (xsize_t) -1, g_strdup ("*"));
+  g_return_val_if_fail (data_size != (xsize_t) -1, xstrdup ("*"));
 
   if (filename)
     {
       basename = g_path_get_basename (filename);
       dot = strrchr (basename, '.');
       if (dot)
-        type = g_strdup (dot);
+        type = xstrdup (dot);
       g_free (basename);
     }
 
@@ -377,9 +377,9 @@ g_content_type_guess (const xchar_t  *filename,
     return type;
 
   if (data && looks_like_text (data, data_size))
-    return g_strdup (".txt");
+    return xstrdup (".txt");
 
-  return g_strdup ("*");
+  return xstrdup ("*");
 }
 
 xlist_t *
@@ -403,11 +403,11 @@ g_content_types_get_registered (void)
                        NULL,
                        NULL) == ERROR_SUCCESS)
     {
-      key_utf8 = g_utf16_to_utf8 (keyname, -1, NULL, NULL, NULL);
+      key_utf8 = xutf16_to_utf8 (keyname, -1, NULL, NULL, NULL);
       if (key_utf8)
         {
           if (*key_utf8 == '.')
-            types = g_list_prepend (types, key_utf8);
+            types = xlist_prepend (types, key_utf8);
           else
             g_free (key_utf8);
         }
@@ -415,7 +415,7 @@ g_content_types_get_registered (void)
       key_len = 256;
     }
 
-  return g_list_reverse (types);
+  return xlist_reverse (types);
 }
 
 xchar_t **

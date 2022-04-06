@@ -27,59 +27,59 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_TLS_CLIENT_CONNECTION                (g_tls_client_connection_get_type ())
-#define G_TLS_CLIENT_CONNECTION(inst)               (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_TLS_CLIENT_CONNECTION, GTlsClientConnection))
+#define XTYPE_TLS_CLIENT_CONNECTION                (xtls_client_connection_get_type ())
+#define G_TLS_CLIENT_CONNECTION(inst)               (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_TLS_CLIENT_CONNECTION, xtls_client_connection))
 #define X_IS_TLS_CLIENT_CONNECTION(inst)            (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_TLS_CLIENT_CONNECTION))
-#define G_TLS_CLIENT_CONNECTION_GET_INTERFACE(inst) (XTYPE_INSTANCE_GET_INTERFACE ((inst), XTYPE_TLS_CLIENT_CONNECTION, GTlsClientConnectionInterface))
+#define G_TLS_CLIENT_CONNECTION_GET_INTERFACE(inst) (XTYPE_INSTANCE_GET_INTERFACE ((inst), XTYPE_TLS_CLIENT_CONNECTION, xtls_client_connection_interface_t))
 
-typedef struct _GTlsClientConnectionInterface GTlsClientConnectionInterface;
+typedef struct _xtls_client_connection_interface xtls_client_connection_interface_t;
 
 /**
- * GTlsClientConnectionInterface:
+ * xtls_client_connection_interface_t:
  * @x_iface: The parent interface.
- * @copy_session_state: Copies session state from one #GTlsClientConnection to another.
+ * @copy_session_state: Copies session state from one #xtls_client_connection_t to another.
  *
- * vtable for a #GTlsClientConnection implementation.
+ * vtable for a #xtls_client_connection_t implementation.
  *
  * Since: 2.26
  */
-struct _GTlsClientConnectionInterface
+struct _xtls_client_connection_interface
 {
   xtype_interface_t x_iface;
 
-  void     ( *copy_session_state )     (GTlsClientConnection       *conn,
-                                        GTlsClientConnection       *source);
+  void     ( *copy_session_state )     (xtls_client_connection_t       *conn,
+                                        xtls_client_connection_t       *source);
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t                 g_tls_client_connection_get_type             (void) G_GNUC_CONST;
+xtype_t                 xtls_client_connection_get_type             (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-xio_stream_t *           g_tls_client_connection_new                  (xio_stream_t               *base_io_stream,
-								    GSocketConnectable      *server_identity,
+xio_stream_t *           xtls_client_connection_new                  (xio_stream_t               *base_io_stream,
+								    xsocket_connectable_t      *server_identity,
 								    xerror_t                 **error);
 
 XPL_DEPRECATED_IN_2_72
-GTlsCertificateFlags  g_tls_client_connection_get_validation_flags (GTlsClientConnection    *conn);
+GTlsCertificateFlags  xtls_client_connection_get_validation_flags (xtls_client_connection_t    *conn);
 XPL_DEPRECATED_IN_2_72
-void                  g_tls_client_connection_set_validation_flags (GTlsClientConnection    *conn,
+void                  xtls_client_connection_set_validation_flags (xtls_client_connection_t    *conn,
 								    GTlsCertificateFlags     flags);
 XPL_AVAILABLE_IN_ALL
-GSocketConnectable   *g_tls_client_connection_get_server_identity  (GTlsClientConnection    *conn);
+xsocket_connectable_t   *xtls_client_connection_get_server_identity  (xtls_client_connection_t    *conn);
 XPL_AVAILABLE_IN_ALL
-void                  g_tls_client_connection_set_server_identity  (GTlsClientConnection    *conn,
-								    GSocketConnectable      *identity);
+void                  xtls_client_connection_set_server_identity  (xtls_client_connection_t    *conn,
+								    xsocket_connectable_t      *identity);
 XPL_DEPRECATED_IN_2_56
-xboolean_t              g_tls_client_connection_get_use_ssl3         (GTlsClientConnection    *conn);
+xboolean_t              xtls_client_connection_get_use_ssl3         (xtls_client_connection_t    *conn);
 XPL_DEPRECATED_IN_2_56
-void                  g_tls_client_connection_set_use_ssl3         (GTlsClientConnection    *conn,
+void                  xtls_client_connection_set_use_ssl3         (xtls_client_connection_t    *conn,
 								    xboolean_t                 use_ssl3);
 XPL_AVAILABLE_IN_ALL
-xlist_t *               g_tls_client_connection_get_accepted_cas     (GTlsClientConnection    *conn);
+xlist_t *               xtls_client_connection_get_accepted_cas     (xtls_client_connection_t    *conn);
 
 XPL_AVAILABLE_IN_2_46
-void                  g_tls_client_connection_copy_session_state   (GTlsClientConnection    *conn,
-                                                                    GTlsClientConnection    *source);
+void                  xtls_client_connection_copy_session_state   (xtls_client_connection_t    *conn,
+                                                                    xtls_client_connection_t    *source);
 
 G_END_DECLS
 

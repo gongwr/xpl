@@ -58,7 +58,7 @@ struct _GDBusAuthMechanismClass
   /* VTable */
 
   /* TODO: server_initiate and client_initiate probably needs to have a
-   * GCredentials parameter...
+   * xcredentials_t parameter...
    */
 
   xint_t                      (*get_priority)             (void);
@@ -112,7 +112,7 @@ xint_t                      _g_dbus_auth_mechanism_get_priority             (xty
 const xchar_t              *_g_dbus_auth_mechanism_get_name                 (xtype_t                 mechanism_type);
 
 xio_stream_t                *_g_dbus_auth_mechanism_get_stream               (GDBusAuthMechanism   *mechanism);
-GCredentials             *_g_dbus_auth_mechanism_get_credentials          (GDBusAuthMechanism   *mechanism);
+xcredentials_t             *_g_dbus_auth_mechanism_get_credentials          (GDBusAuthMechanism   *mechanism);
 
 xboolean_t                  _g_dbus_auth_mechanism_is_supported             (GDBusAuthMechanism   *mechanism);
 xchar_t                    *_g_dbus_auth_mechanism_encode_data              (GDBusAuthMechanism   *mechanism,

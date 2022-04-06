@@ -3,12 +3,12 @@
 #include <unistd.h>
 #endif
 
-static GMainLoop *loop;
+static xmain_loop_t *loop;
 
 static xboolean_t
 stop_waiting (xpointer_t data)
 {
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 
   return G_SOURCE_REMOVE;
 }
@@ -42,15 +42,15 @@ test_seconds (void)
    * latency.
    */
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=642052");
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   g_timeout_add (2100, stop_waiting, NULL);
   id = g_timeout_add_seconds (21475, unreachable_callback, NULL);
 
-  g_main_loop_run (loop);
-  g_main_loop_unref (loop);
+  xmain_loop_run (loop);
+  xmain_loop_unref (loop);
 
-  g_source_remove (id);
+  xsource_remove (id);
 }
 
 static void
@@ -79,52 +79,52 @@ test_weeks_overflow (void)
    * latency.
    */
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/issues/1600");
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   g_timeout_add (2100, stop_waiting, NULL);
   interval_seconds = 1 + G_MAXUINT / 1000;
   id = g_timeout_add_seconds (interval_seconds, unreachable_callback, NULL);
 
-  g_main_loop_run (loop);
-  g_main_loop_unref (loop);
+  xmain_loop_run (loop);
+  xmain_loop_unref (loop);
 
-  g_source_remove (id);
+  xsource_remove (id);
 }
 
-/* The ready_time for a GSource is stored as a gint64, as an absolute monotonic
+/* The ready_time for a xsource_t is stored as a gint64, as an absolute monotonic
  * time in microseconds. To call poll(), this must be converted to a relative
  * timeout, in milliseconds, as a xint_t. If the ready_time is sufficiently far
  * in the future, the timeout will not fit. Previously, it would be narrowed in
  * an implementation-defined way; if this gave a negative result, poll() would
  * block forever.
  *
- * This test creates a GSource with the largest possible ready_time (a little
+ * This test creates a xsource_t with the largest possible ready_time (a little
  * over 292 millennia, assuming g_get_monotonic_time() starts from near 0 when
- * the system boots), adds it to a GMainContext, queries it for the parameters
+ * the system boots), adds it to a xmain_context_t, queries it for the parameters
  * to pass to poll() -- essentially the first half of
- * g_main_context_iteration() -- and checks that the timeout is a large
+ * xmain_context_iteration() -- and checks that the timeout is a large
  * positive number.
  */
 static void
 test_far_future_ready_time (void)
 {
-  GSourceFuncs source_funcs = { 0 };
-  GMainContext *context = g_main_context_new ();
-  GSource *source = g_source_new (&source_funcs, sizeof (GSource));
+  xsource_funcs_t source_funcs = { 0 };
+  xmain_context_t *context = xmain_context_new ();
+  xsource_t *source = xsource_new (&source_funcs, sizeof (xsource_t));
   xboolean_t acquired, ready;
   xint_t priority, timeout_, n_fds;
 
-  g_source_set_ready_time (source, G_MAXINT64);
-  g_source_attach (source, context);
+  xsource_set_ready_time (source, G_MAXINT64);
+  xsource_attach (source, context);
 
-  acquired = g_main_context_acquire (context);
+  acquired = xmain_context_acquire (context);
   g_assert_true (acquired);
 
-  ready = g_main_context_prepare (context, &priority);
+  ready = xmain_context_prepare (context, &priority);
   g_assert_false (ready);
 
   n_fds = 0;
-  n_fds = g_main_context_query (context, priority, &timeout_, NULL, n_fds);
+  n_fds = xmain_context_query (context, priority, &timeout_, NULL, n_fds);
 
   g_assert_cmpint (n_fds, >=, 0);
 
@@ -135,9 +135,9 @@ test_far_future_ready_time (void)
   /* Instead, we want it to block for as long as possible: */
   g_assert_cmpint (timeout_, ==, G_MAXINT);
 
-  g_main_context_release (context);
-  g_main_context_unref (context);
-  g_source_unref (source);
+  xmain_context_release (context);
+  xmain_context_unref (context);
+  xsource_unref (source);
 }
 
 static gint64 last_time;
@@ -171,7 +171,7 @@ test_func (xpointer_t data)
   if (count < 10)
     return TRUE;
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 
   return FALSE;
 }
@@ -179,13 +179,13 @@ test_func (xpointer_t data)
 static void
 test_rounding (void)
 {
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   last_time = g_get_monotonic_time ();
   g_timeout_add_seconds (1, test_func, NULL);
 
-  g_main_loop_run (loop);
-  g_main_loop_unref (loop);
+  xmain_loop_run (loop);
+  xmain_loop_unref (loop);
 }
 
 int

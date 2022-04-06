@@ -263,7 +263,7 @@
         [Desktop Entry]
         Version=1.1
         Type=Application
-        Name=Foo Viewer
+        Name=foo_t Viewer
         DBusActivatable=true
         MimeType=image/x-foo;
         Exec=gapplication launch org.example.fooview %F
@@ -274,7 +274,7 @@
         Exec=gapplication action org.example.fooview gallery
 
         [Desktop Action create]
-        Name=Create a new Foo!
+        Name=Create a new foo_t!
         Exec=gapplication action org.example.fooview create
       </programlisting>
     </refsect2>

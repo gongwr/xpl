@@ -112,11 +112,11 @@ _g_module_open (const xchar_t *file_name,
   member = _g_module_get_member (file_name);
   if (member != NULL)
     {
-      full_name = g_strconcat (file_name, "(", member, ")", NULL);
+      full_name = xstrconcat (file_name, "(", member, ")", NULL);
       g_free (member);
     }
   else
-    full_name = g_strdup (file_name);
+    full_name = xstrdup (file_name);
 
   handle = dlopen (full_name,
 		   (bind_local ? RTLD_LOCAL : RTLD_GLOBAL) | RTLD_MEMBER | (bind_lazy ? RTLD_LAZY : RTLD_NOW));
@@ -172,11 +172,11 @@ _g_module_build_path (const xchar_t *directory,
 {
   if (directory && *directory) {
     if (strncmp (module_name, "lib", 3) == 0)
-      return g_strconcat (directory, "/", module_name, NULL);
+      return xstrconcat (directory, "/", module_name, NULL);
     else
-      return g_strconcat (directory, "/lib", module_name, "." G_MODULE_SUFFIX, NULL);
+      return xstrconcat (directory, "/lib", module_name, "." G_MODULE_SUFFIX, NULL);
   } else if (strncmp (module_name, "lib", 3) == 0)
-    return g_strdup (module_name);
+    return xstrdup (module_name);
   else
-    return g_strconcat ("lib", module_name, "." G_MODULE_SUFFIX, NULL);
+    return xstrconcat ("lib", module_name, "." G_MODULE_SUFFIX, NULL);
 }

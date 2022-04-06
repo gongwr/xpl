@@ -33,7 +33,7 @@ G_BEGIN_DECLS
 #define G_UNIX_VOLUME_CLASS(k)    (XTYPE_CHECK_CLASS_CAST((k), XTYPE_UNIX_VOLUME, GUnixVolumeClass))
 #define X_IS_UNIX_VOLUME(o)       (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_UNIX_VOLUME))
 #define X_IS_UNIX_VOLUME_CLASS(k) (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_UNIX_VOLUME))
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixVolume, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixVolume, xobject_unref)
 
 typedef struct _GUnixVolumeClass GUnixVolumeClass;
 
@@ -44,7 +44,7 @@ struct _GUnixVolumeClass
 
 xtype_t         _g_unix_volume_get_type       (void) G_GNUC_CONST;
 
-GUnixVolume * _g_unix_volume_new            (GVolumeMonitor  *volume_monitor,
+GUnixVolume * _g_unix_volume_new            (xvolume_monitor_t  *volume_monitor,
                                              GUnixMountPoint *mountpoint);
 xboolean_t      _g_unix_volume_has_mount_path (GUnixVolume     *volume,
                                              const char      *mount_path);

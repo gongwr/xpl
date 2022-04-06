@@ -33,20 +33,20 @@
  * @short_description: DTLS server-side connection
  * @include: gio/gio.h
  *
- * #GDtlsServerConnection is the server-side subclass of #GDtlsConnection,
+ * #xdtls_server_connection_t is the server-side subclass of #xdtls_connection_t,
  * representing a server-side DTLS connection.
  *
  * Since: 2.48
  */
 
-G_DEFINE_INTERFACE (GDtlsServerConnection, g_dtls_server_connection,
+G_DEFINE_INTERFACE (xdtls_server_connection, g_dtls_server_connection,
                     XTYPE_DTLS_CONNECTION)
 
 static void
 g_dtls_server_connection_default_init (GDtlsServerConnectionInterface *iface)
 {
   /**
-   * GDtlsServerConnection:authentication-mode:
+   * xdtls_server_connection_t:authentication-mode:
    *
    * The #GTlsAuthenticationMode for the server. This can be changed
    * before calling g_dtls_connection_handshake() if you want to
@@ -54,7 +54,7 @@ g_dtls_server_connection_default_init (GDtlsServerConnectionInterface *iface)
    *
    * Since: 2.48
    */
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
                                        g_param_spec_enum ("authentication-mode",
                                                           P_("Authentication Mode"),
                                                           P_("The client authentication mode"),
@@ -66,27 +66,27 @@ g_dtls_server_connection_default_init (GDtlsServerConnectionInterface *iface)
 
 /**
  * g_dtls_server_connection_new:
- * @base_socket: the #GDatagramBased to wrap
+ * @base_socket: the #xdatagram_based_t to wrap
  * @certificate: (nullable): the default server certificate, or %NULL
  * @error: #xerror_t for error reporting, or %NULL to ignore
  *
- * Creates a new #GDtlsServerConnection wrapping @base_socket.
+ * Creates a new #xdtls_server_connection_t wrapping @base_socket.
  *
- * Returns: (transfer full) (type GDtlsServerConnection): the new
- *   #GDtlsServerConnection, or %NULL on error
+ * Returns: (transfer full) (type xdtls_server_connection_t): the new
+ *   #xdtls_server_connection_t, or %NULL on error
  *
  * Since: 2.48
  */
-GDatagramBased *
-g_dtls_server_connection_new (GDatagramBased   *base_socket,
-                              GTlsCertificate  *certificate,
+xdatagram_based_t *
+g_dtls_server_connection_new (xdatagram_based_t   *base_socket,
+                              xtls_certificate_t  *certificate,
                               xerror_t          **error)
 {
   xobject_t *conn;
-  GTlsBackend *backend;
+  xtls_backend_t *backend;
 
-  backend = g_tls_backend_get_default ();
-  conn = g_initable_new (g_tls_backend_get_dtls_server_connection_type (backend),
+  backend = xtls_backend_get_default ();
+  conn = xinitable_new (xtls_backend_get_dtls_server_connection_type (backend),
                          NULL, error,
                          "base-socket", base_socket,
                          "certificate", certificate,

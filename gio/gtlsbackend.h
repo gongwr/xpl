@@ -31,82 +31,82 @@ G_BEGIN_DECLS
 /**
  * G_TLS_BACKEND_EXTENSION_POINT_NAME:
  *
- * Extension point for TLS functionality via #GTlsBackend.
+ * Extension point for TLS functionality via #xtls_backend_t.
  * See [Extending GIO][extending-gio].
  */
 #define G_TLS_BACKEND_EXTENSION_POINT_NAME "gio-tls-backend"
 
-#define XTYPE_TLS_BACKEND               (g_tls_backend_get_type ())
-#define G_TLS_BACKEND(obj)               (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_TLS_BACKEND, GTlsBackend))
+#define XTYPE_TLS_BACKEND               (xtls_backend_get_type ())
+#define G_TLS_BACKEND(obj)               (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_TLS_BACKEND, xtls_backend))
 #define X_IS_TLS_BACKEND(obj)	         (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_TLS_BACKEND))
-#define G_TLS_BACKEND_GET_INTERFACE(obj) (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_TLS_BACKEND, GTlsBackendInterface))
+#define G_TLS_BACKEND_GET_INTERFACE(obj) (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_TLS_BACKEND, xtls_backend_interface_t))
 
-typedef struct _GTlsBackend          GTlsBackend;
-typedef struct _GTlsBackendInterface GTlsBackendInterface;
+typedef struct _GTlsBackend          xtls_backend_t;
+typedef struct _xtls_backend_interface xtls_backend_interface_t;
 
 /**
- * GTlsBackendInterface:
+ * xtls_backend_interface_t:
  * @x_iface: The parent interface.
  * @supports_tls: returns whether the backend supports TLS.
  * @supports_dtls: returns whether the backend supports DTLS
- * @get_default_database: returns a default #GTlsDatabase instance.
- * @get_certificate_type: returns the #GTlsCertificate implementation type
- * @get_client_connection_type: returns the #GTlsClientConnection implementation type
- * @get_server_connection_type: returns the #GTlsServerConnection implementation type
- * @get_file_database_type: returns the #GTlsFileDatabase implementation type.
- * @get_dtls_client_connection_type: returns the #GDtlsClientConnection implementation type
- * @get_dtls_server_connection_type: returns the #GDtlsServerConnection implementation type
+ * @get_default_database: returns a default #xtls_database_t instance.
+ * @get_certificate_type: returns the #xtls_certificate_t implementation type
+ * @get_client_connection_type: returns the #xtls_client_connection_t implementation type
+ * @get_server_connection_type: returns the #xtls_server_connection_t implementation type
+ * @get_file_database_type: returns the #xtls_file_database_t implementation type.
+ * @get_dtls_client_connection_type: returns the #xdtls_client_connection_t implementation type
+ * @get_dtls_server_connection_type: returns the #xdtls_server_connection_t implementation type
  *
  * Provides an interface for describing TLS-related types.
  *
  * Since: 2.28
  */
-struct _GTlsBackendInterface
+struct _xtls_backend_interface
 {
   xtype_interface_t x_iface;
 
   /* methods */
-  xboolean_t       ( *supports_tls)               (GTlsBackend *backend);
+  xboolean_t       ( *supports_tls)               (xtls_backend_t *backend);
   xtype_t          ( *get_certificate_type)       (void);
   xtype_t          ( *get_client_connection_type) (void);
   xtype_t          ( *get_server_connection_type) (void);
   xtype_t          ( *get_file_database_type)     (void);
-  GTlsDatabase * ( *get_default_database)       (GTlsBackend *backend);
-  xboolean_t       ( *supports_dtls)              (GTlsBackend *backend);
+  xtls_database_t * ( *get_default_database)       (xtls_backend_t *backend);
+  xboolean_t       ( *supports_dtls)              (xtls_backend_t *backend);
   xtype_t          ( *get_dtls_client_connection_type) (void);
   xtype_t          ( *get_dtls_server_connection_type) (void);
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t          g_tls_backend_get_type                   (void) G_GNUC_CONST;
+xtype_t          xtls_backend_get_type                   (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GTlsBackend *  g_tls_backend_get_default                (void);
+xtls_backend_t *  xtls_backend_get_default                (void);
 
 XPL_AVAILABLE_IN_ALL
-GTlsDatabase * g_tls_backend_get_default_database       (GTlsBackend *backend);
+xtls_database_t * xtls_backend_get_default_database       (xtls_backend_t *backend);
 XPL_AVAILABLE_IN_2_60
-void           g_tls_backend_set_default_database       (GTlsBackend  *backend,
-                                                         GTlsDatabase *database);
+void           xtls_backend_set_default_database       (xtls_backend_t  *backend,
+                                                         xtls_database_t *database);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t       g_tls_backend_supports_tls               (GTlsBackend *backend);
+xboolean_t       xtls_backend_supports_tls               (xtls_backend_t *backend);
 XPL_AVAILABLE_IN_2_48
-xboolean_t       g_tls_backend_supports_dtls              (GTlsBackend *backend);
+xboolean_t       xtls_backend_supports_dtls              (xtls_backend_t *backend);
 
 XPL_AVAILABLE_IN_ALL
-xtype_t          g_tls_backend_get_certificate_type       (GTlsBackend *backend);
+xtype_t          xtls_backend_get_certificate_type       (xtls_backend_t *backend);
 XPL_AVAILABLE_IN_ALL
-xtype_t          g_tls_backend_get_client_connection_type (GTlsBackend *backend);
+xtype_t          xtls_backend_get_client_connection_type (xtls_backend_t *backend);
 XPL_AVAILABLE_IN_ALL
-xtype_t          g_tls_backend_get_server_connection_type (GTlsBackend *backend);
+xtype_t          xtls_backend_get_server_connection_type (xtls_backend_t *backend);
 XPL_AVAILABLE_IN_ALL
-xtype_t          g_tls_backend_get_file_database_type     (GTlsBackend *backend);
+xtype_t          xtls_backend_get_file_database_type     (xtls_backend_t *backend);
 
 XPL_AVAILABLE_IN_2_48
-xtype_t          g_tls_backend_get_dtls_client_connection_type (GTlsBackend *backend);
+xtype_t          xtls_backend_get_dtls_client_connection_type (xtls_backend_t *backend);
 XPL_AVAILABLE_IN_2_48
-xtype_t          g_tls_backend_get_dtls_server_connection_type (GTlsBackend *backend);
+xtype_t          xtls_backend_get_dtls_server_connection_type (xtls_backend_t *backend);
 
 G_END_DECLS
 

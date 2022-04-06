@@ -1,4 +1,4 @@
-/* Unit tests for GTimer
+/* Unit tests for xtimer_t
  * Copyright (C) 2013 Red Hat, Inc.
  *
  * This work is provided "as is"; redistribution and modification
@@ -29,7 +29,7 @@
 static void
 test_timer_basic (void)
 {
-  GTimer *timer;
+  xtimer_t *timer;
   xdouble_t elapsed;
   gulong micros;
 
@@ -56,7 +56,7 @@ test_timer_basic (void)
   elapsed = g_timer_elapsed (timer, &micros);
 
   g_assert_cmpfloat (elapsed, <, 1.0);
-  g_assert_cmpuint (micros, ==, ((guint64)(elapsed * 1e6)) % 1000000);
+  g_assert_cmpuint (micros, ==, ((xuint64_t)(elapsed * 1e6)) % 1000000);
 
   g_timer_destroy (timer);
 }
@@ -64,7 +64,7 @@ test_timer_basic (void)
 static void
 test_timer_stop (void)
 {
-  GTimer *timer;
+  xtimer_t *timer;
   xdouble_t elapsed, elapsed2;
 
   timer = g_timer_new ();
@@ -83,7 +83,7 @@ test_timer_stop (void)
 static void
 test_timer_continue (void)
 {
-  GTimer *timer;
+  xtimer_t *timer;
   xdouble_t elapsed, elapsed2;
 
   timer = g_timer_new ();
@@ -116,7 +116,7 @@ test_timer_continue (void)
 static void
 test_timer_reset (void)
 {
-  GTimer *timer;
+  xtimer_t *timer;
   xdouble_t elapsed, elapsed2;
 
   timer = g_timer_new ();
@@ -135,7 +135,7 @@ test_timer_reset (void)
 static void
 test_timer_is_active (void)
 {
-  GTimer *timer;
+  xtimer_t *timer;
   xboolean_t is_active;
 
   timer = g_timer_new ();
@@ -184,7 +184,7 @@ typedef struct {
 static void
 test_timeval_from_iso8601 (void)
 {
-  xchar_t *old_tz = g_strdup (g_getenv ("TZ"));
+  xchar_t *old_tz = xstrdup (g_getenv ("TZ"));
   TimeValParseTest tests[] = {
     { TRUE, "1990-11-01T10:21:17Z", { 657454877, 0 } },
     { TRUE, "19901101T102117Z", { 657454877, 0 } },
@@ -329,7 +329,7 @@ test_timeval_to_iso8601_overflow (void)
   GTimeVal val;
   xchar_t *out = NULL;
 
-  if ((glong) G_MAXINT == G_MAXLONG)
+  if ((xlong_t) G_MAXINT == G_MAXLONG)
     {
       g_test_skip ("G_MAXINT == G_MAXLONG - we can't make g_time_val_to_iso8601() overflow.");
       return;

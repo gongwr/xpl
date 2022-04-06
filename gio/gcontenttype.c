@@ -87,7 +87,7 @@ _g_unix_content_type_unalias (const xchar_t *type)
 
   G_LOCK (gio_xdgmime);
   g_begin_ignore_leaks ();
-  res = g_strdup (xdg_mime_unalias_mime_type (type));
+  res = xstrdup (xdg_mime_unalias_mime_type (type));
   g_end_ignore_leaks ();
   G_UNLOCK (gio_xdgmime);
 
@@ -99,30 +99,30 @@ _g_unix_content_type_get_parents (const xchar_t *type)
 {
   const xchar_t *umime;
   xchar_t **parents;
-  GPtrArray *array;
+  xptr_array_t *array;
   int i;
 
-  array = g_ptr_array_new ();
+  array = xptr_array_new ();
 
   G_LOCK (gio_xdgmime);
   g_begin_ignore_leaks ();
 
   umime = xdg_mime_unalias_mime_type (type);
 
-  g_ptr_array_add (array, g_strdup (umime));
+  xptr_array_add (array, xstrdup (umime));
 
   parents = xdg_mime_list_mime_parents (umime);
   for (i = 0; parents && parents[i] != NULL; i++)
-    g_ptr_array_add (array, g_strdup (parents[i]));
+    xptr_array_add (array, xstrdup (parents[i]));
 
   free (parents);
 
   g_end_ignore_leaks ();
   G_UNLOCK (gio_xdgmime);
 
-  g_ptr_array_add (array, NULL);
+  xptr_array_add (array, NULL);
 
-  return (xchar_t **)g_ptr_array_free (array, FALSE);
+  return (xchar_t **)xptr_array_free (array, FALSE);
 }
 
 G_LOCK_DEFINE_STATIC (global_mime_dirs);
@@ -131,23 +131,23 @@ static xchar_t **global_mime_dirs = NULL;
 static void
 _g_content_type_set_mime_dirs_locked (const char * const *dirs)
 {
-  g_clear_pointer (&global_mime_dirs, g_strfreev);
+  g_clear_pointer (&global_mime_dirs, xstrfreev);
 
   if (dirs != NULL)
     {
-      global_mime_dirs = g_strdupv ((xchar_t **) dirs);
+      global_mime_dirs = xstrdupv ((xchar_t **) dirs);
     }
   else
     {
-      GPtrArray *mime_dirs = g_ptr_array_new_with_free_func (g_free);
+      xptr_array_t *mime_dirs = xptr_array_new_with_free_func (g_free);
       const xchar_t * const *system_dirs = g_get_system_data_dirs ();
 
-      g_ptr_array_add (mime_dirs, g_build_filename (g_get_user_data_dir (), "mime", NULL));
+      xptr_array_add (mime_dirs, g_build_filename (g_get_user_data_dir (), "mime", NULL));
       for (; *system_dirs != NULL; system_dirs++)
-        g_ptr_array_add (mime_dirs, g_build_filename (*system_dirs, "mime", NULL));
-      g_ptr_array_add (mime_dirs, NULL);  /* NULL terminator */
+        xptr_array_add (mime_dirs, g_build_filename (*system_dirs, "mime", NULL));
+      xptr_array_add (mime_dirs, NULL);  /* NULL terminator */
 
-      global_mime_dirs = (xchar_t **) g_ptr_array_free (mime_dirs, FALSE);
+      global_mime_dirs = (xchar_t **) xptr_array_free (mime_dirs, FALSE);
     }
 
   xdg_mime_set_dirs ((const xchar_t * const *) global_mime_dirs);
@@ -352,7 +352,7 @@ language_level (const char *lang)
 }
 
 static void
-mime_info_start_element (GMarkupParseContext  *context,
+mime_info_start_element (xmarkup_parse_context_t  *context,
                          const xchar_t          *element_name,
                          const xchar_t         **attribute_names,
                          const xchar_t         **attribute_values,
@@ -381,7 +381,7 @@ mime_info_start_element (GMarkupParseContext  *context,
 }
 
 static void
-mime_info_end_element (GMarkupParseContext  *context,
+mime_info_end_element (xmarkup_parse_context_t  *context,
                        const xchar_t          *element_name,
                        xpointer_t              user_data,
                        xerror_t              **error)
@@ -392,7 +392,7 @@ mime_info_end_element (GMarkupParseContext  *context,
 }
 
 static void
-mime_info_text (GMarkupParseContext  *context,
+mime_info_text (xmarkup_parse_context_t  *context,
                 const xchar_t          *text,
                 xsize_t                 text_len,
                 xpointer_t              user_data,
@@ -404,7 +404,7 @@ mime_info_text (GMarkupParseContext  *context,
       parser->current_lang_level > parser->comment_lang_level)
     {
       g_free (parser->comment);
-      parser->comment = g_strndup (text, text_len);
+      parser->comment = xstrndup (text, text_len);
       parser->comment_lang_level = parser->current_lang_level;
     }
 }
@@ -413,7 +413,7 @@ static char *
 load_comment_for_mime_helper (const char *dir,
                               const char *basename)
 {
-  GMarkupParseContext *context;
+  xmarkup_parse_context_t *context;
   char *filename, *data;
   xsize_t len;
   xboolean_t res;
@@ -428,15 +428,15 @@ load_comment_for_mime_helper (const char *dir,
 
   filename = g_build_filename (dir, basename, NULL);
 
-  res = g_file_get_contents (filename,  &data,  &len,  NULL);
+  res = xfile_get_contents (filename,  &data,  &len,  NULL);
   g_free (filename);
   if (!res)
     return NULL;
 
-  context = g_markup_parse_context_new   (&parser, 0, &parse_data, NULL);
-  res = g_markup_parse_context_parse (context, data, len, NULL);
+  context = xmarkup_parse_context_new   (&parser, 0, &parse_data, NULL);
+  res = xmarkup_parse_context_parse (context, data, len, NULL);
   g_free (data);
-  g_markup_parse_context_free (context);
+  xmarkup_parse_context_free (context);
 
   if (!res)
     return NULL;
@@ -453,7 +453,7 @@ load_comment_for_mime (const char *mimetype)
   char *comment;
   xsize_t i;
 
-  basename = g_strdup_printf ("%s.xml", mimetype);
+  basename = xstrdup_printf ("%s.xml", mimetype);
 
   dirs = g_content_type_get_mime_dirs ();
   for (i = 0; dirs[i] != NULL; i++)
@@ -467,7 +467,7 @@ load_comment_for_mime (const char *mimetype)
     }
   g_free (basename);
 
-  return g_strdup_printf (_("%s type"), mimetype);
+  return xstrdup_printf (_("%s type"), mimetype);
 }
 
 /**
@@ -482,7 +482,7 @@ load_comment_for_mime (const char *mimetype)
 xchar_t *
 g_content_type_get_description (const xchar_t *type)
 {
-  static GHashTable *type_comment_cache = NULL;
+  static xhashtable_t *type_comment_cache = NULL;
   xchar_t *comment;
 
   g_return_val_if_fail (type != NULL, NULL);
@@ -493,10 +493,10 @@ g_content_type_get_description (const xchar_t *type)
   g_end_ignore_leaks ();
 
   if (type_comment_cache == NULL)
-    type_comment_cache = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+    type_comment_cache = xhash_table_new_full (xstr_hash, xstr_equal, g_free, g_free);
 
-  comment = g_hash_table_lookup (type_comment_cache, type);
-  comment = g_strdup (comment);
+  comment = xhash_table_lookup (type_comment_cache, type);
+  comment = xstrdup (comment);
   G_UNLOCK (gio_xdgmime);
 
   if (comment != NULL)
@@ -505,9 +505,9 @@ g_content_type_get_description (const xchar_t *type)
   comment = load_comment_for_mime (type);
 
   G_LOCK (gio_xdgmime);
-  g_hash_table_insert (type_comment_cache,
-                       g_strdup (type),
-                       g_strdup (comment));
+  xhash_table_insert (type_comment_cache,
+                       xstrdup (type),
+                       xstrdup (comment));
   G_UNLOCK (gio_xdgmime);
 
   return comment;
@@ -527,7 +527,7 @@ g_content_type_get_mime_type (const char *type)
 {
   g_return_val_if_fail (type != NULL, NULL);
 
-  return g_strdup (type);
+  return xstrdup (type);
 }
 
 static xicon_t *
@@ -552,9 +552,9 @@ g_content_type_get_icon_internal (const xchar_t *type,
   G_UNLOCK (gio_xdgmime);
 
   if (xdg_icon)
-    icon_names[n++] = g_strdup (xdg_icon);
+    icon_names[n++] = xstrdup (xdg_icon);
 
-  mimetype_icon = g_strdup (type);
+  mimetype_icon = xstrdup (type);
   while ((q = strchr (mimetype_icon, '/')) != NULL)
     *q = '-';
 
@@ -569,7 +569,7 @@ g_content_type_get_icon_internal (const xchar_t *type,
       for (i = 0; i < n; i++)
         {
           icon_names[n + i] = icon_names[i];
-          icon_names[i] = g_strconcat (icon_names[i], "-symbolic", NULL);
+          icon_names[i] = xstrconcat (icon_names[i], "-symbolic", NULL);
         }
 
       n += n;
@@ -590,7 +590,7 @@ g_content_type_get_icon_internal (const xchar_t *type,
  * Gets the icon for a content type.
  *
  * Returns: (transfer full): #xicon_t corresponding to the content type. Free the returned
- *     object with g_object_unref()
+ *     object with xobject_unref()
  */
 xicon_t *
 g_content_type_get_icon (const xchar_t *type)
@@ -605,7 +605,7 @@ g_content_type_get_icon (const xchar_t *type)
  * Gets the symbolic icon for a content type.
  *
  * Returns: (transfer full): symbolic #xicon_t corresponding to the content type.
- *     Free the returned object with g_object_unref()
+ *     Free the returned object with xobject_unref()
  *
  * Since: 2.34
  */
@@ -633,18 +633,18 @@ g_content_type_get_symbolic_icon (const xchar_t *type)
 xchar_t *
 g_content_type_get_generic_icon_name (const xchar_t *type)
 {
-  const xchar_t *xdg_icon_name;
+  const xchar_t *xdxicon_name;
   xchar_t *icon_name;
 
   g_return_val_if_fail (type != NULL, NULL);
 
   G_LOCK (gio_xdgmime);
   g_begin_ignore_leaks ();
-  xdg_icon_name = xdg_mime_get_generic_icon (type);
+  xdxicon_name = xdg_mime_get_generic_icon (type);
   g_end_ignore_leaks ();
   G_UNLOCK (gio_xdgmime);
 
-  if (!xdg_icon_name)
+  if (!xdxicon_name)
     {
       const char *p;
       const char *suffix = "-x-generic";
@@ -660,7 +660,7 @@ g_content_type_get_generic_icon_name (const xchar_t *type)
     }
   else
     {
-      icon_name = g_strdup (xdg_icon_name);
+      icon_name = xstrdup (xdxicon_name);
     }
 
   return icon_name;
@@ -727,7 +727,7 @@ g_content_type_from_mime_type (const xchar_t *mime_type)
   G_LOCK (gio_xdgmime);
   g_begin_ignore_leaks ();
   /* mime type and content type are same on unixes */
-  umime = g_strdup (xdg_mime_unalias_mime_type (mime_type));
+  umime = xstrdup (xdg_mime_unalias_mime_type (mime_type));
   g_end_ignore_leaks ();
   G_UNLOCK (gio_xdgmime);
 
@@ -772,7 +772,7 @@ g_content_type_guess (const xchar_t  *filename,
 
   /* our test suite and potentially other code used -1 in the past, which is
    * not documented and not allowed; guard against that */
-  g_return_val_if_fail (data_size != (xsize_t) -1, g_strdup (XDG_MIME_TYPE_UNKNOWN));
+  g_return_val_if_fail (data_size != (xsize_t) -1, xstrdup (XDG_MIME_TYPE_UNKNOWN));
 
   G_LOCK (gio_xdgmime);
   g_begin_ignore_leaks ();
@@ -799,7 +799,7 @@ g_content_type_guess (const xchar_t  *filename,
   /* Got an extension match, and no conflicts. This is it. */
   if (n_name_mimetypes == 1)
     {
-      xchar_t *s = g_strdup (name_mimetypes[0]);
+      xchar_t *s = xstrdup (name_mimetypes[0]);
       g_end_ignore_leaks ();
       G_UNLOCK (gio_xdgmime);
       return s;
@@ -830,7 +830,7 @@ g_content_type_guess (const xchar_t  *filename,
           result_uncertain)
         *result_uncertain = TRUE;
 
-      mimetype = g_strdup (sniffed_mimetype);
+      mimetype = xstrdup (sniffed_mimetype);
     }
   else
     {
@@ -838,7 +838,7 @@ g_content_type_guess (const xchar_t  *filename,
       if (sniffed_mimetype != XDG_MIME_TYPE_UNKNOWN)
         {
           if (sniffed_prio >= 80) /* High priority sniffing match, use that */
-            mimetype = g_strdup (sniffed_mimetype);
+            mimetype = xstrdup (sniffed_mimetype);
           else
             {
               /* There are conflicts between the name matches and we
@@ -851,7 +851,7 @@ g_content_type_guess (const xchar_t  *filename,
                       /* This nametype match is derived from (or the same as)
                        * the sniffed type). This is probably it.
                        */
-                      mimetype = g_strdup (name_mimetypes[i]);
+                      mimetype = xstrdup (name_mimetypes[i]);
                       break;
                     }
                 }
@@ -863,7 +863,7 @@ g_content_type_guess (const xchar_t  *filename,
           /* Conflicts, and sniffed type was no help or not there.
            * Guess on the first one
            */
-          mimetype = g_strdup (name_mimetypes[0]);
+          mimetype = xstrdup (name_mimetypes[0]);
           if (result_uncertain)
             *result_uncertain = TRUE;
         }
@@ -878,7 +878,7 @@ g_content_type_guess (const xchar_t  *filename,
 static void
 enumerate_mimetypes_subdir (const char *dir,
                             const char *prefix,
-                            GHashTable *mimetypes)
+                            xhashtable_t *mimetypes)
 {
   DIR *d;
   struct dirent *ent;
@@ -889,10 +889,10 @@ enumerate_mimetypes_subdir (const char *dir,
     {
       while ((ent = readdir (d)) != NULL)
         {
-          if (g_str_has_suffix (ent->d_name, ".xml"))
+          if (xstr_has_suffix (ent->d_name, ".xml"))
             {
-              mimetype = g_strdup_printf ("%s/%.*s", prefix, (int) strlen (ent->d_name) - 4, ent->d_name);
-              g_hash_table_replace (mimetypes, mimetype, NULL);
+              mimetype = xstrdup_printf ("%s/%.*s", prefix, (int) strlen (ent->d_name) - 4, ent->d_name);
+              xhash_table_replace (mimetypes, mimetype, NULL);
             }
         }
       closedir (d);
@@ -901,7 +901,7 @@ enumerate_mimetypes_subdir (const char *dir,
 
 static void
 enumerate_mimetypes_dir (const char *dir,
-                         GHashTable *mimetypes)
+                         xhashtable_t *mimetypes)
 {
   DIR *d;
   struct dirent *ent;
@@ -918,7 +918,7 @@ enumerate_mimetypes_dir (const char *dir,
           if (strcmp (ent->d_name, "packages") != 0)
             {
               name = g_build_filename (mimedir, ent->d_name, NULL);
-              if (g_file_test (name, G_FILE_TEST_IS_DIR))
+              if (xfile_test (name, XFILE_TEST_IS_DIR))
                 enumerate_mimetypes_subdir (name, ent->d_name, mimetypes);
               g_free (name);
             }
@@ -932,7 +932,7 @@ enumerate_mimetypes_dir (const char *dir,
  *
  * Gets a list of strings containing all the registered content types
  * known to the system. The list and its data should be freed using
- * `g_list_free_full (list, g_free)`.
+ * `xlist_free_full (list, g_free)`.
  *
  * Returns: (element-type utf8) (transfer full): list of the registered
  *     content types
@@ -941,27 +941,27 @@ xlist_t *
 g_content_types_get_registered (void)
 {
   const char * const *dirs;
-  GHashTable *mimetypes;
-  GHashTableIter iter;
+  xhashtable_t *mimetypes;
+  xhash_table_iter_t iter;
   xpointer_t key;
   xsize_t i;
   xlist_t *l;
 
-  mimetypes = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+  mimetypes = xhash_table_new_full (xstr_hash, xstr_equal, g_free, NULL);
 
   dirs = g_content_type_get_mime_dirs ();
   for (i = 0; dirs[i] != NULL; i++)
     enumerate_mimetypes_dir (dirs[i], mimetypes);
 
   l = NULL;
-  g_hash_table_iter_init (&iter, mimetypes);
-  while (g_hash_table_iter_next (&iter, &key, NULL))
+  xhash_table_iter_init (&iter, mimetypes);
+  while (xhash_table_iter_next (&iter, &key, NULL))
     {
-      l = g_list_prepend (l, key);
-      g_hash_table_iter_steal (&iter);
+      l = xlist_prepend (l, key);
+      xhash_table_iter_steal (&iter);
     }
 
-  g_hash_table_destroy (mimetypes);
+  xhash_table_destroy (mimetypes);
 
   return l;
 }
@@ -976,7 +976,7 @@ G_LOCK_DEFINE_STATIC (gio_treemagic);
 typedef struct
 {
   xchar_t *path;
-  GFileType type;
+  xfile_type_t type;
   xuint_t match_case : 1;
   xuint_t executable : 1;
   xuint_t non_empty  : 1;
@@ -996,7 +996,7 @@ typedef struct
 static void
 tree_matchlet_free (TreeMatchlet *matchlet)
 {
-  g_list_free_full (matchlet->matches, (GDestroyNotify) tree_matchlet_free);
+  xlist_free_full (matchlet->matches, (xdestroy_notify_t) tree_matchlet_free);
   g_free (matchlet->path);
   g_free (matchlet->mimetype);
   g_slice_free (TreeMatchlet, matchlet);
@@ -1005,7 +1005,7 @@ tree_matchlet_free (TreeMatchlet *matchlet)
 static void
 tree_match_free (TreeMatch *match)
 {
-  g_list_free_full (match->matches, (GDestroyNotify) tree_matchlet_free);
+  xlist_free_full (match->matches, (xdestroy_notify_t) tree_matchlet_free);
   g_free (match->contenttype);
   g_slice_free (TreeMatch, match);
 }
@@ -1029,7 +1029,7 @@ parse_header (xchar_t *line)
 
   match = g_slice_new0 (TreeMatch);
   match->priority = atoi (line + 1);
-  match->contenttype = g_strdup (s + 1);
+  match->contenttype = xstrdup (s + 1);
 
   return match;
 }
@@ -1063,17 +1063,17 @@ parse_match_line (xchar_t *line,
     goto handle_error;
   *p = 0;
 
-  matchlet->path = g_strdup (s);
+  matchlet->path = xstrdup (s);
   s = p + 1;
-  parts = g_strsplit (s, ",", 0);
+  parts = xstrsplit (s, ",", 0);
   if (strcmp (parts[0], "=file") == 0)
-    matchlet->type = G_FILE_TYPE_REGULAR;
+    matchlet->type = XFILE_TYPE_REGULAR;
   else if (strcmp (parts[0], "=directory") == 0)
-    matchlet->type = G_FILE_TYPE_DIRECTORY;
+    matchlet->type = XFILE_TYPE_DIRECTORY;
   else if (strcmp (parts[0], "=link") == 0)
-    matchlet->type = G_FILE_TYPE_SYMBOLIC_LINK;
+    matchlet->type = XFILE_TYPE_SYMBOLIC_LINK;
   else
-    matchlet->type = G_FILE_TYPE_UNKNOWN;
+    matchlet->type = XFILE_TYPE_UNKNOWN;
   for (i = 1; parts[i]; i++)
     {
       if (strcmp (parts[i], "executable") == 0)
@@ -1085,10 +1085,10 @@ parse_match_line (xchar_t *line,
       else if (strcmp (parts[i], "on-disc") == 0)
         matchlet->on_disc = 1;
       else
-        matchlet->mimetype = g_strdup (parts[i]);
+        matchlet->mimetype = xstrdup (parts[i]);
     }
 
-  g_strfreev (parts);
+  xstrfreev (parts);
 
   return matchlet;
 
@@ -1098,7 +1098,7 @@ handle_error:
 }
 
 static xint_t
-cmp_match (gconstpointer a, gconstpointer b)
+cmp_match (xconstpointer a, xconstpointer b)
 {
   const TreeMatch *aa = (const TreeMatch *)a;
   const TreeMatch *bb = (const TreeMatch *)b;
@@ -1109,7 +1109,7 @@ cmp_match (gconstpointer a, gconstpointer b)
 static void
 insert_match (TreeMatch *match)
 {
-  tree_matches = g_list_insert_sorted (tree_matches, match, cmp_match);
+  tree_matches = xlist_insert_sorted (tree_matches, match, cmp_match);
 }
 
 static void
@@ -1118,13 +1118,13 @@ insert_matchlet (TreeMatch    *match,
                  xint_t          depth)
 {
   if (depth == 0)
-    match->matches = g_list_append (match->matches, matchlet);
+    match->matches = xlist_append (match->matches, matchlet);
   else
     {
       xlist_t *last;
       TreeMatchlet *m;
 
-      last = g_list_last (match->matches);
+      last = xlist_last (match->matches);
       if (!last)
         {
           tree_matchlet_free (matchlet);
@@ -1135,7 +1135,7 @@ insert_matchlet (TreeMatch    *match,
       m = (TreeMatchlet *) last->data;
       while (--depth > 0)
         {
-          last = g_list_last (m->matches);
+          last = xlist_last (m->matches);
           if (!last)
             {
               tree_matchlet_free (matchlet);
@@ -1145,7 +1145,7 @@ insert_matchlet (TreeMatch    *match,
 
           m = (TreeMatchlet *) last->data;
         }
-      m->matches = g_list_append (m->matches, matchlet);
+      m->matches = xlist_append (m->matches, matchlet);
     }
 }
 
@@ -1163,11 +1163,11 @@ read_tree_magic_from_directory (const xchar_t *prefix)
 
   filename = g_build_filename (prefix, "treemagic", NULL);
 
-  if (g_file_get_contents (filename, &text, &len, NULL))
+  if (xfile_get_contents (filename, &text, &len, NULL))
     {
       if (strcmp (text, "MIME-TreeMagic") == 0)
         {
-          lines = g_strsplit (text + strlen ("MIME-TreeMagic") + 2, "\n", 0);
+          lines = xstrsplit (text + strlen ("MIME-TreeMagic") + 2, "\n", 0);
           match = NULL;
           for (i = 0; lines[i] && lines[i][0]; i++)
             {
@@ -1192,7 +1192,7 @@ read_tree_magic_from_directory (const xchar_t *prefix)
                 }
             }
 
-          g_strfreev (lines);
+          xstrfreev (lines);
         }
       else
         g_warning ("%s: header not found, skipping", filename);
@@ -1218,7 +1218,7 @@ xdg_mime_reload (void *user_data)
 static void
 tree_magic_shutdown (void)
 {
-  g_list_free_full (tree_matches, (GDestroyNotify) tree_match_free);
+  xlist_free_full (tree_matches, (xdestroy_notify_t) tree_match_free);
   tree_matches = NULL;
 }
 
@@ -1259,7 +1259,7 @@ typedef struct
   xboolean_t ignore_case;
   xchar_t **components;
   xchar_t **case_components;
-  GFileEnumerator **enumerators;
+  xfile_enumerator_t **enumerators;
   xfile_t **children;
 } Enumerator;
 
@@ -1277,8 +1277,8 @@ component_match (Enumerator  *e,
   if (!e->ignore_case)
     return FALSE;
 
-  case_folded = g_utf8_casefold (name, -1);
-  key = g_utf8_collate_key (case_folded, -1);
+  case_folded = xutf8_casefold (name, -1);
+  key = xutf8_collate_key (case_folded, -1);
 
   found = strcmp (key, e->case_components[depth]) == 0;
 
@@ -1293,7 +1293,7 @@ next_match_recurse (Enumerator *e,
                     xint_t        depth)
 {
   xfile_t *file;
-  GFileInfo *info;
+  xfile_info_t *info;
   const xchar_t *name;
 
   while (TRUE)
@@ -1306,9 +1306,9 @@ next_match_recurse (Enumerator *e,
               if (file)
                 {
                   e->children[depth] = file;
-                  e->enumerators[depth] = g_file_enumerate_children (file,
-                                                                     G_FILE_ATTRIBUTE_STANDARD_NAME,
-                                                                     G_FILE_QUERY_INFO_NONE,
+                  e->enumerators[depth] = xfile_enumerate_children (file,
+                                                                     XFILE_ATTRIBUTE_STANDARD_NAME,
+                                                                     XFILE_QUERY_INFO_NONE,
                                                                      NULL,
                                                                      NULL);
                 }
@@ -1317,21 +1317,21 @@ next_match_recurse (Enumerator *e,
             return NULL;
         }
 
-      while ((info = g_file_enumerator_next_file (e->enumerators[depth], NULL, NULL)))
+      while ((info = xfile_enumerator_next_file (e->enumerators[depth], NULL, NULL)))
         {
-          name = g_file_info_get_name (info);
+          name = xfile_info_get_name (info);
           if (component_match (e, depth, name))
             {
-              file = g_file_get_child (e->children[depth], name);
-              g_object_unref (info);
+              file = xfile_get_child (e->children[depth], name);
+              xobject_unref (info);
               return file;
             }
-          g_object_unref (info);
+          xobject_unref (info);
         }
 
-      g_object_unref (e->enumerators[depth]);
+      xobject_unref (e->enumerators[depth]);
       e->enumerators[depth] = NULL;
-      g_object_unref (e->children[depth]);
+      xobject_unref (e->children[depth]);
       e->children[depth] = NULL;
     }
 }
@@ -1352,28 +1352,28 @@ enumerator_new (xfile_t      *root,
   xchar_t *case_folded;
 
   e = g_new0 (Enumerator, 1);
-  e->path = g_strdup (path);
+  e->path = xstrdup (path);
   e->ignore_case = ignore_case;
 
-  e->components = g_strsplit (e->path, G_DIR_SEPARATOR_S, -1);
-  e->depth = g_strv_length (e->components);
+  e->components = xstrsplit (e->path, G_DIR_SEPARATOR_S, -1);
+  e->depth = xstrv_length (e->components);
   if (e->ignore_case)
     {
       e->case_components = g_new0 (char *, e->depth + 1);
       for (i = 0; e->components[i]; i++)
         {
-          case_folded = g_utf8_casefold (e->components[i], -1);
-          e->case_components[i] = g_utf8_collate_key (case_folded, -1);
+          case_folded = xutf8_casefold (e->components[i], -1);
+          e->case_components[i] = xutf8_collate_key (case_folded, -1);
           g_free (case_folded);
         }
     }
 
   e->children = g_new0 (xfile_t *, e->depth);
-  e->children[0] = g_object_ref (root);
-  e->enumerators = g_new0 (GFileEnumerator *, e->depth);
-  e->enumerators[0] = g_file_enumerate_children (root,
-                                                 G_FILE_ATTRIBUTE_STANDARD_NAME,
-                                                 G_FILE_QUERY_INFO_NONE,
+  e->children[0] = xobject_ref (root);
+  e->enumerators = g_new0 (xfile_enumerator_t *, e->depth);
+  e->enumerators[0] = xfile_enumerate_children (root,
+                                                 XFILE_ATTRIBUTE_STANDARD_NAME,
+                                                 XFILE_QUERY_INFO_NONE,
                                                  NULL,
                                                  NULL);
 
@@ -1388,16 +1388,16 @@ enumerator_free (Enumerator *e)
   for (i = 0; i < e->depth; i++)
     {
       if (e->enumerators[i])
-        g_object_unref (e->enumerators[i]);
+        xobject_unref (e->enumerators[i]);
       if (e->children[i])
-        g_object_unref (e->children[i]);
+        xobject_unref (e->children[i]);
     }
 
   g_free (e->enumerators);
   g_free (e->children);
-  g_strfreev (e->components);
+  xstrfreev (e->components);
   if (e->case_components)
-    g_strfreev (e->case_components);
+    xstrfreev (e->case_components);
   g_free (e->path);
   g_free (e);
 }
@@ -1407,7 +1407,7 @@ matchlet_match (TreeMatchlet *matchlet,
                 xfile_t        *root)
 {
   xfile_t *file;
-  GFileInfo *info;
+  xfile_info_t *info;
   xboolean_t result;
   const xchar_t *attrs;
   Enumerator *e;
@@ -1425,27 +1425,27 @@ matchlet_match (TreeMatchlet *matchlet,
         }
 
       if (matchlet->mimetype)
-        attrs = G_FILE_ATTRIBUTE_STANDARD_TYPE ","
-                G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE ","
-                G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE;
+        attrs = XFILE_ATTRIBUTE_STANDARD_TYPE ","
+                XFILE_ATTRIBUTE_ACCESS_CAN_EXECUTE ","
+                XFILE_ATTRIBUTE_STANDARD_CONTENT_TYPE;
       else
-        attrs = G_FILE_ATTRIBUTE_STANDARD_TYPE ","
-                G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE;
-      info = g_file_query_info (file,
+        attrs = XFILE_ATTRIBUTE_STANDARD_TYPE ","
+                XFILE_ATTRIBUTE_ACCESS_CAN_EXECUTE;
+      info = xfile_query_info (file,
                                 attrs,
-                                G_FILE_QUERY_INFO_NONE,
+                                XFILE_QUERY_INFO_NONE,
                                 NULL,
                                 NULL);
       if (info)
         {
           result = TRUE;
 
-          if (matchlet->type != G_FILE_TYPE_UNKNOWN &&
-              g_file_info_get_file_type (info) != matchlet->type)
+          if (matchlet->type != XFILE_TYPE_UNKNOWN &&
+              xfile_info_get_file_type (info) != matchlet->type)
             result = FALSE;
 
           if (matchlet->executable &&
-              !g_file_info_get_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_EXECUTE))
+              !xfile_info_get_attribute_boolean (info, XFILE_ATTRIBUTE_ACCESS_CAN_EXECUTE))
             result = FALSE;
         }
       else
@@ -1453,23 +1453,23 @@ matchlet_match (TreeMatchlet *matchlet,
 
       if (result && matchlet->non_empty)
         {
-          GFileEnumerator *child_enum;
-          GFileInfo *child_info;
+          xfile_enumerator_t *child_enum;
+          xfile_info_t *child_info;
 
-          child_enum = g_file_enumerate_children (file,
-                                                  G_FILE_ATTRIBUTE_STANDARD_NAME,
-                                                  G_FILE_QUERY_INFO_NONE,
+          child_enum = xfile_enumerate_children (file,
+                                                  XFILE_ATTRIBUTE_STANDARD_NAME,
+                                                  XFILE_QUERY_INFO_NONE,
                                                   NULL,
                                                   NULL);
 
           if (child_enum)
             {
-              child_info = g_file_enumerator_next_file (child_enum, NULL, NULL);
+              child_info = xfile_enumerator_next_file (child_enum, NULL, NULL);
               if (child_info)
-                g_object_unref (child_info);
+                xobject_unref (child_info);
               else
                 result = FALSE;
-              g_object_unref (child_enum);
+              xobject_unref (child_enum);
             }
           else
             result = FALSE;
@@ -1477,13 +1477,13 @@ matchlet_match (TreeMatchlet *matchlet,
 
       if (result && matchlet->mimetype)
         {
-          if (strcmp (matchlet->mimetype, g_file_info_get_content_type (info)) != 0)
+          if (strcmp (matchlet->mimetype, xfile_info_get_content_type (info)) != 0)
             result = FALSE;
         }
 
       if (info)
-        g_object_unref (info);
-      g_object_unref (file);
+        xobject_unref (info);
+      xobject_unref (file);
     }
   while (!result);
 
@@ -1507,7 +1507,7 @@ matchlet_match (TreeMatchlet *matchlet,
 static void
 match_match (TreeMatch    *match,
              xfile_t        *root,
-             GPtrArray    *types)
+             xptr_array_t    *types)
 {
   xlist_t *l;
 
@@ -1516,7 +1516,7 @@ match_match (TreeMatch    *match,
       TreeMatchlet *matchlet = l->data;
       if (matchlet_match (matchlet, root))
         {
-          g_ptr_array_add (types, g_strdup (match->contenttype));
+          xptr_array_add (types, xstrdup (match->contenttype));
           break;
         }
     }
@@ -1540,17 +1540,17 @@ match_match (TreeMatch    *match,
  * g_mount_guess_content_type().
  *
  * Returns: (transfer full) (array zero-terminated=1): an %NULL-terminated
- *     array of zero or more content types. Free with g_strfreev()
+ *     array of zero or more content types. Free with xstrfreev()
  *
  * Since: 2.18
  */
 xchar_t **
 g_content_type_guess_for_tree (xfile_t *root)
 {
-  GPtrArray *types;
+  xptr_array_t *types;
   xlist_t *l;
 
-  types = g_ptr_array_new ();
+  types = xptr_array_new ();
 
   G_LOCK (gio_treemagic);
 
@@ -1563,7 +1563,7 @@ g_content_type_guess_for_tree (xfile_t *root)
 
   G_UNLOCK (gio_treemagic);
 
-  g_ptr_array_add (types, NULL);
+  xptr_array_add (types, NULL);
 
-  return (xchar_t **)g_ptr_array_free (types, FALSE);
+  return (xchar_t **)xptr_array_free (types, FALSE);
 }

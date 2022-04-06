@@ -107,7 +107,7 @@ g_fprintf (FILE        *file,
  *
  * `glib/gprintf.h` must be explicitly included in order to use this function.
  *
- * See also g_strdup_printf().
+ * See also xstrdup_printf().
  *
  * Returns: the number of bytes printed.
  *
@@ -141,7 +141,7 @@ g_sprintf (xchar_t       *string,
  * to not exceed @n characters (including the terminating nul character), so
  * it is easy to ensure that a buffer overflow cannot occur.
  *
- * See also g_strdup_printf().
+ * See also xstrdup_printf().
  *
  * In versions of GLib prior to 1.2.3, this function may return -1 if the
  * output was truncated, and the truncated string may not be nul-terminated.
@@ -264,7 +264,7 @@ g_vsprintf (xchar_t	 *string,
  * to not exceed @n characters (including the terminating nul character), so
  * it is easy to ensure that a buffer overflow cannot occur.
  *
- * See also g_strdup_vprintf().
+ * See also xstrdup_vprintf().
  *
  * In versions of GLib prior to 1.2.3, this function may return -1 if the
  * output was truncated, and the truncated string may not be nul-terminated.
@@ -340,7 +340,7 @@ g_vasprintf (xchar_t      **string,
     if (len < 0)
       {
         if (saved_errno == ENOMEM)
-          g_error ("%s: failed to allocate memory", G_STRLOC);
+          xerror ("%s: failed to allocate memory", G_STRLOC);
         else
           *string = NULL;
       }

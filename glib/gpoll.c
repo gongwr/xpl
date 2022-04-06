@@ -95,11 +95,11 @@ extern xboolean_t _g_main_poll_debug;
  *
  * Polls @fds, as with the poll() system call, but portably. (On
  * systems that don't have poll(), it is emulated using select().)
- * This is used internally by #GMainContext, but it can be called
+ * This is used internally by #xmain_context_t, but it can be called
  * directly if you need to block until a file descriptor is ready, but
  * don't want to run the full main loop.
  *
- * Each element of @fds is a #GPollFD describing a single file
+ * Each element of @fds is a #xpollfd_t describing a single file
  * descriptor to poll. The @fd field indicates the file descriptor,
  * and the @events field indicates the events to poll for. On return,
  * the @revents fields will be filled with the events that actually
@@ -118,7 +118,7 @@ extern xboolean_t _g_main_poll_debug;
  * Since: 2.20
  **/
 xint_t
-g_poll (GPollFD *fds,
+g_poll (xpollfd_t *fds,
 	xuint_t    nfds,
 	xint_t     timeout)
 {
@@ -130,15 +130,15 @@ g_poll (GPollFD *fds,
 #ifdef G_OS_WIN32
 
 static int
-poll_rest (GPollFD *msg_fd,
-           GPollFD *stop_fd,
+poll_rest (xpollfd_t *msg_fd,
+           xpollfd_t *stop_fd,
            HANDLE  *handles,
-           GPollFD *handle_to_fd[],
+           xpollfd_t *handle_to_fd[],
            xint_t     nhandles,
            DWORD    timeout_ms)
 {
   DWORD ready;
-  GPollFD *f;
+  xpollfd_t *f;
   int recursed_result;
 
   if (msg_fd != NULL)
@@ -235,7 +235,7 @@ poll_rest (GPollFD *msg_fd,
         {
           /* Poll the handles with index > ready */
           HANDLE *shorter_handles;
-          GPollFD **shorter_handle_to_fd;
+          xpollfd_t **shorter_handle_to_fd;
           xint_t shorter_nhandles;
 
           shorter_handles = &handles[ready - WAIT_OBJECT_0 + 1];
@@ -254,9 +254,9 @@ poll_rest (GPollFD *msg_fd,
 typedef struct
 {
   HANDLE handles[MAXIMUM_WAIT_OBJECTS];
-  GPollFD *handle_to_fd[MAXIMUM_WAIT_OBJECTS];
-  GPollFD *msg_fd;
-  GPollFD *stop_fd;
+  xpollfd_t *handle_to_fd[MAXIMUM_WAIT_OBJECTS];
+  xpollfd_t *msg_fd;
+  xpollfd_t *stop_fd;
   xint_t nhandles;
   DWORD    timeout_ms;
 } GWin32PollThreadData;
@@ -293,13 +293,13 @@ poll_single_thread (GWin32PollThreadData *data)
 }
 
 static void
-fill_poll_thread_data (GPollFD              *fds,
+fill_poll_thread_data (xpollfd_t              *fds,
                        xuint_t                 nfds,
                        DWORD                 timeout_ms,
-                       GPollFD              *stop_fd,
+                       xpollfd_t              *stop_fd,
                        GWin32PollThreadData *data)
 {
-  GPollFD *f;
+  xpollfd_t *f;
 
   data->timeout_ms = timeout_ms;
 
@@ -361,20 +361,20 @@ poll_thread_run (xpointer_t user_data)
 #define MAXIMUM_WAIT_OBJECTS_PER_THREAD (MAXIMUM_WAIT_OBJECTS - 1)
 
 xint_t
-g_poll (GPollFD *fds,
+g_poll (xpollfd_t *fds,
 	xuint_t    nfds,
 	xint_t     timeout)
 {
   xuint_t nthreads, threads_remain;
   HANDLE thread_handles[MAXIMUM_WAIT_OBJECTS];
   GWin32PollThreadData *threads_data;
-  GPollFD stop_event = { 0, };
-  GPollFD *f;
+  xpollfd_t stop_event = { 0, };
+  xpollfd_t *f;
   xuint_t i, fds_idx = 0;
   DWORD ready;
   DWORD thread_retval;
   int retval;
-  GPollFD *msg_fd = NULL;
+  xpollfd_t *msg_fd = NULL;
 
   if (timeout == -1)
     timeout = INFINITE;
@@ -502,13 +502,13 @@ g_poll (GPollFD *fds,
 #endif /* HAVE_SYS_SELECT_H */
 
 xint_t
-g_poll (GPollFD *fds,
+g_poll (xpollfd_t *fds,
 	xuint_t    nfds,
 	xint_t     timeout)
 {
   struct timeval tv;
   fd_set rset, wset, xset;
-  GPollFD *f;
+  xpollfd_t *f;
   int ready;
   int maxfd = 0;
 

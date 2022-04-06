@@ -5,24 +5,24 @@ static const GDBusCapabilityFlags flags = G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSIN
 int
 LLVMFuzzerTestOneInput (const unsigned char *data, size_t size)
 {
-  gssize bytes;
-  GDBusMessage *msg = NULL;
+  xssize_t bytes;
+  xdbus_message_t *msg = NULL;
   guchar *blob = NULL;
   xsize_t msg_size;
 
   fuzz_set_logging_func ();
 
-  bytes = g_dbus_message_bytes_needed ((guchar*) data, size, NULL);
+  bytes = xdbus_message_bytes_needed ((guchar*) data, size, NULL);
   if (bytes <= 0)
     return 0;
 
-  msg = g_dbus_message_new_from_blob ((guchar*) data, size, flags, NULL);
+  msg = xdbus_message_new_from_blob ((guchar*) data, size, flags, NULL);
   if (msg == NULL)
     return 0;
 
-  blob = g_dbus_message_to_blob (msg, &msg_size, flags, NULL);
+  blob = xdbus_message_to_blob (msg, &msg_size, flags, NULL);
 
   g_free (blob);
-  g_object_unref (msg);
+  xobject_unref (msg);
   return 0;
 }

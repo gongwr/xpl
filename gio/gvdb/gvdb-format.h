@@ -22,8 +22,8 @@
 
 #include <glib.h>
 
-typedef struct { guint16 value; } guint16_le;
-typedef struct { guint32 value; } guint32_le;
+typedef struct { xuint16_t value; } guint16_le;
+typedef struct { xuint32_t value; } guint32_le;
 
 struct gvdb_pointer {
   guint32_le start;
@@ -52,28 +52,28 @@ struct gvdb_hash_item {
 };
 
 struct gvdb_header {
-  guint32 signature[2];
+  xuint32_t signature[2];
   guint32_le version;
   guint32_le options;
 
   struct gvdb_pointer root;
 };
 
-static inline guint32_le guint32_to_le (guint32 value) {
+static inline guint32_le guint32_to_le (xuint32_t value) {
   guint32_le result = { GUINT32_TO_LE (value) };
   return result;
 }
 
-static inline guint32 guint32_from_le (guint32_le value) {
+static inline xuint32_t guint32_from_le (guint32_le value) {
   return GUINT32_FROM_LE (value.value);
 }
 
-static inline guint16_le guint16_to_le (guint16 value) {
+static inline guint16_le guint16_to_le (xuint16_t value) {
   guint16_le result = { GUINT16_TO_LE (value) };
   return result;
 }
 
-static inline guint16 guint16_from_le (guint16_le value) {
+static inline xuint16_t guint16_from_le (guint16_le value) {
   return GUINT16_FROM_LE (value.value);
 }
 

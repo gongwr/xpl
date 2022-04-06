@@ -161,37 +161,37 @@ msgstr "Անվավեր հոսթի անուն "
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:202
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr ""
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:204
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr ""
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:207
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %d %b %Y %r %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:210
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%m/%d/%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:213
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%r"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:216
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr ""
 
@@ -1487,12 +1487,12 @@ msgid "%s type"
 msgstr "%s տիպ"
 
 #: ../gio/gcredentials.c:273 ../gio/gcredentials.c:495
-msgid "GCredentials is not implemented on this OS"
-msgstr "GCredentials-ը իրականացված չէ այս ՕՀ-ի վրա"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "xcredentials_t-ը իրականացված չէ այս ՕՀ-ի վրա"
 
 #: ../gio/gcredentials.c:447
-msgid "There is no GCredentials support for your platform"
-msgstr "Գոյություն չունի GCredentials աջակցում ձեր պլատֆորմայի համար"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "Գոյություն չունի xcredentials_t աջակցում ձեր պլատֆորմայի համար"
 
 #: ../gio/gdatainputstream.c:311
 msgid "Unexpected early end-of-stream"
@@ -1673,8 +1673,8 @@ msgstr ""
 "են․ %s)"
 
 #: ../gio/gdbusauth.c:1159
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "Անջատվել է GDBusAuthObserver -ով։։հաստատված-վավերացված-հավասարազոր"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "Անջատվել է xdbus_auth_observer_t -ով։։հաստատված-վավերացված-հավասարազոր"
 
 #: ../gio/gdbusauthmechanismsha1.c:266
 #, c-format
@@ -2377,27 +2377,27 @@ msgstr ""
 
 #: ../gio/gemblem.c:324
 #, c-format
-msgid "Can't handle version %d of GEmblem encoding"
-msgstr "Չի հաջողվել մշակել GEmblem կոդավորման %d տարբերակը"
+msgid "Can't handle version %d of xemblem_t encoding"
+msgstr "Չի հաջողվել մշակել xemblem_t կոդավորման %d տարբերակը"
 
 #: ../gio/gemblem.c:334
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "GEmblem կոդավորման մեջ սխալ քանակությամբ բառանիշեր (%d)"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "xemblem_t կոդավորման մեջ սխալ քանակությամբ բառանիշեր (%d)"
 
 #: ../gio/gemblemedicon.c:368
 #, c-format
-msgid "Can't handle version %d of GEmblemedIcon encoding"
-msgstr "Չի հաջողվել մշակել GEmblemedIcon կոդավորման %d տարբերակը"
+msgid "Can't handle version %d of xemblemed_icon_t encoding"
+msgstr "Չի հաջողվել մշակել xemblemed_icon_t կոդավորման %d տարբերակը"
 
 #: ../gio/gemblemedicon.c:378
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "GEmblemedIcon կոդավորման մեջ սխալ քանակությանմ բառանիշեր (%d)"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t կոդավորման մեջ սխալ քանակությանմ բառանիշեր (%d)"
 
 #: ../gio/gemblemedicon.c:401
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "GEmblemedIcon-ի համար սպասվում է GEmblem"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "xemblemed_icon_t-ի համար սպասվում է xemblem_t"
 
 #: ../gio/gfile.c:871 ../gio/gfile.c:1102 ../gio/gfile.c:1237
 #: ../gio/gfile.c:1474 ../gio/gfile.c:1528 ../gio/gfile.c:1585
@@ -2490,12 +2490,12 @@ msgstr "Ֆայլի հաշվիչը արդեն փակ է"
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can't handle version %d of GFileIcon encoding"
-msgstr "Չի հաջողվել փոխել GFileIcon կոդավորման %d տեսակը"
+msgid "Can't handle version %d of xfile_icon_t encoding"
+msgstr "Չի հաջողվել փոխել xfile_icon_t կոդավորման %d տեսակը"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for GFileIcon"
-msgstr "Սխալ ձևավորված մուտքային տվյալ GFileIcon համար"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "Սխալ ձևավորված մուտքային տվյալ xfile_icon_t համար"
 
 #: ../gio/gfileinputstream.c:154 ../gio/gfileinputstream.c:420
 #: ../gio/gfileiostream.c:170 ../gio/gfileoutputstream.c:169
@@ -2828,11 +2828,11 @@ msgstr "Չպարտադրել բանալու անվան սահմանապակու�
 
 #: ../gio/glib-compile-schemas.c:1973
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Կազմարկել բոլոր GSettings schema ֆայլերը schema cache-ում։\n"
+"Կազմարկել բոլոր xsettings_t schema ֆայլերը schema cache-ում։\n"
 "Schema ֆայլերը պետք է ունենան .gschema.xml ընդլայնում,\n"
 "և cache ֆայլը կոչվում է gschemas.compiled։"
 
@@ -3146,11 +3146,11 @@ msgstr "Փոխանցված է անվավեր GSeekType"
 
 #: ../gio/gmemoryinputstream.c:496
 msgid "Invalid seek request"
-msgstr "Չի կարելի վնասել GMemoryInputStream-ը"
+msgstr "Չի կարելի վնասել xmemory_input_stream_t-ը"
 
 #: ../gio/gmemoryinputstream.c:520
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "Չի կարելի վնասել GMemoryInputStream-ը"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "Չի կարելի վնասել xmemory_input_stream_t-ը"
 
 #: ../gio/gmemoryoutputstream.c:496
 msgid "Memory output stream not resizable"
@@ -3578,7 +3578,7 @@ msgid "Error sending message: %s"
 msgstr "Հաղորդագրության ուղարկման սխալ․ %s"
 
 #: ../gio/gsocket.c:3081
-msgid "GSocketControlMessage not supported on windows"
+msgid "xsocket_control_message_t not supported on windows"
 msgstr "SocketControlMessage-ը չի աջակցվում windows-ում "
 
 #: ../gio/gsocket.c:3358 ../gio/gsocket.c:3494
@@ -3710,8 +3710,8 @@ msgstr "Անհայտ SOCKSv5 պրոքսի սխալ։"
 
 #: ../gio/gthemedicon.c:498
 #, c-format
-msgid "Can't handle version %d of GThemedIcon encoding"
-msgstr "Չի հաջողվել մշակել GThemedIcon կոդավորման %d տարբերակը"
+msgid "Can't handle version %d of xthemed_icon_t encoding"
+msgstr "Չի հաջողվել մշակել xthemed_icon_t կոդավորման %d տարբերակը"
 
 #: ../gio/gtlscertificate.c:226
 msgid "No PEM-encoded private key found"

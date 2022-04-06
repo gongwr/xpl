@@ -36,7 +36,7 @@ test_empty_address (void)
                                   NULL,
                                   &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
-  g_error_free (error);
+  xerror_free (error);
 }
 
 /* Test that g_dbus_is_supported_address() returns FALSE for an unparsable

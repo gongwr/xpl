@@ -37,7 +37,7 @@
  * It's generally only created for removable hardware or hardware with
  * removable media.
  *
- * #xdrive_t is a container class for #GVolume objects that stem from
+ * #xdrive_t is a container class for #xvolume_t objects that stem from
  * the same piece of media. As such, #xdrive_t abstracts a drive with
  * (or without) removable media and provides operations for querying
  * whether media is available, determining whether media change is
@@ -159,7 +159,7 @@ xdrive_get_name (xdrive_t *drive)
  * Gets the icon for @drive.
  *
  * Returns: (transfer full): #xicon_t for the @drive.
- *    Free the returned object with g_object_unref().
+ *    Free the returned object with xobject_unref().
  **/
 xicon_t *
 xdrive_get_icon (xdrive_t *drive)
@@ -180,7 +180,7 @@ xdrive_get_icon (xdrive_t *drive)
  * Gets the icon for @drive.
  *
  * Returns: (transfer full): symbolic #xicon_t for the @drive.
- *    Free the returned object with g_object_unref().
+ *    Free the returned object with xobject_unref().
  *
  * Since: 2.34
  **/
@@ -228,10 +228,10 @@ xdrive_has_volumes (xdrive_t *drive)
  *
  * Get a list of mountable volumes for @drive.
  *
- * The returned list should be freed with g_list_free(), after
- * its elements have been unreffed with g_object_unref().
+ * The returned list should be freed with xlist_free(), after
+ * its elements have been unreffed with xobject_unref().
  *
- * Returns: (element-type GVolume) (transfer full): #xlist_t containing any #GVolume objects on the given @drive.
+ * Returns: (element-type xvolume_t) (transfer full): #xlist_t containing any #xvolume_t objects on the given @drive.
  **/
 xlist_t *
 xdrive_get_volumes (xdrive_t *drive)
@@ -411,7 +411,7 @@ xdrive_eject (xdrive_t              *drive,
 
   if (iface->eject == NULL)
     {
-      g_task_report_new_error (drive, callback, user_data,
+      xtask_report_new_error (drive, callback, user_data,
                                xdrive_eject_with_operation,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("drive doesn’t implement eject"));
@@ -444,10 +444,10 @@ xdrive_eject_finish (xdrive_t        *drive,
   g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, xdrive_eject_with_operation))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xdrive_eject_with_operation))
+    return xtask_propagate_boolean (XTASK (result), error);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -486,7 +486,7 @@ xdrive_eject_with_operation (xdrive_t              *drive,
 
   if (iface->eject == NULL && iface->eject_with_operation == NULL)
     {
-      g_task_report_new_error (drive, callback, user_data,
+      xtask_report_new_error (drive, callback, user_data,
                                xdrive_eject_with_operation,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                /* Translators: This is an error
@@ -526,10 +526,10 @@ xdrive_eject_with_operation_finish (xdrive_t        *drive,
   g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, xdrive_eject_with_operation))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xdrive_eject_with_operation))
+    return xtask_propagate_boolean (XTASK (result), error);
 
   iface = XDRIVE_GET_IFACE (drive);
   if (iface->eject_with_operation_finish != NULL)
@@ -565,7 +565,7 @@ xdrive_poll_for_media (xdrive_t              *drive,
 
   if (iface->poll_for_media == NULL)
     {
-      g_task_report_new_error (drive, callback, user_data,
+      xtask_report_new_error (drive, callback, user_data,
                                xdrive_poll_for_media,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("drive doesn’t implement polling for media"));
@@ -596,10 +596,10 @@ xdrive_poll_for_media_finish (xdrive_t        *drive,
   g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, xdrive_poll_for_media))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xdrive_poll_for_media))
+    return xtask_propagate_boolean (XTASK (result), error);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -645,7 +645,7 @@ xdrive_get_identifier (xdrive_t     *drive,
  * themselves.
  *
  * Returns: (transfer full) (array zero-terminated=1): a %NULL-terminated
- *     array of strings containing kinds of identifiers. Use g_strfreev()
+ *     array of strings containing kinds of identifiers. Use xstrfreev()
  *     to free.
  */
 char **
@@ -772,7 +772,7 @@ xdrive_start (xdrive_t              *drive,
 
   if (iface->start == NULL)
     {
-      g_task_report_new_error (drive, callback, user_data,
+      xtask_report_new_error (drive, callback, user_data,
                                xdrive_start,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("drive doesn’t implement start"));
@@ -805,10 +805,10 @@ xdrive_start_finish (xdrive_t         *drive,
   g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, xdrive_start))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xdrive_start))
+    return xtask_propagate_boolean (XTASK (result), error);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -874,7 +874,7 @@ xdrive_stop (xdrive_t               *drive,
 
   if (iface->stop == NULL)
     {
-      g_task_report_new_error (drive, callback, user_data,
+      xtask_report_new_error (drive, callback, user_data,
                                xdrive_start,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("drive doesn’t implement stop"));
@@ -907,10 +907,10 @@ xdrive_stop_finish (xdrive_t        *drive,
   g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, xdrive_start))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xdrive_start))
+    return xtask_propagate_boolean (XTASK (result), error);
 
   iface = XDRIVE_GET_IFACE (drive);
 

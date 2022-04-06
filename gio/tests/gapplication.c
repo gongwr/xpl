@@ -10,13 +10,13 @@
 /* These tests are racy -- there is no guarantee about the order of data
  * arriving over D-Bus.
  *
- * They're also a bit ridiculous -- GApplication was never meant to be
+ * They're also a bit ridiculous -- xapplication_t was never meant to be
  * abused in this way...
  *
  * We need new tests.
  */
 static xint_t outstanding_watches;
-static GMainLoop *main_loop;
+static xmain_loop_t *main_loop;
 
 typedef struct
 {
@@ -29,7 +29,7 @@ typedef struct
 static void
 check_data (xint_t fd, const xchar_t *expected)
 {
-  gssize len, actual;
+  xssize_t len, actual;
   xchar_t *buffer;
 
   len = strlen (expected);
@@ -43,14 +43,14 @@ check_data (xint_t fd, const xchar_t *expected)
     {
       buffer[MIN(len + 100, actual)] = '\0';
 
-      g_error ("\nExpected\n-----\n%s-----\nGot (%s)\n-----\n%s-----\n",
+      xerror ("\nExpected\n-----\n%s-----\nGot (%s)\n-----\n%s-----\n",
                expected,
                (actual > len) ? "truncated" : "full", buffer);
     }
 }
 
 static void
-child_quit (GPid     pid,
+child_quit (xpid_t     pid,
             xint_t     status,
             xpointer_t data)
 {
@@ -59,7 +59,7 @@ child_quit (GPid     pid,
   g_assert_cmpint (status, ==, 0);
 
   if (--outstanding_watches == 0)
-    g_main_loop_quit (main_loop);
+    xmain_loop_quit (main_loop);
 
   check_data (child->stdout_pipe, child->expected_stdout);
   close (child->stdout_pipe);
@@ -83,28 +83,28 @@ spawn (const xchar_t *expected_stdout,
 {
   xerror_t *error = NULL;
   const xchar_t *arg;
-  GPtrArray *array;
+  xptr_array_t *array;
   ChildData *data;
   xchar_t **args;
   va_list ap;
-  GPid pid;
-  GPollFD fd;
+  xpid_t pid;
+  xpollfd_t fd;
   xchar_t **env;
 
   va_start (ap, first_arg);
-  array = g_ptr_array_new ();
-  g_ptr_array_add (array, g_test_build_filename (G_TEST_BUILT, "basic-application", NULL));
+  array = xptr_array_new ();
+  xptr_array_add (array, g_test_build_filename (G_TEST_BUILT, "basic-application", NULL));
   for (arg = first_arg; arg; arg = va_arg (ap, const xchar_t *))
-    g_ptr_array_add (array, g_strdup (arg));
-  g_ptr_array_add (array, NULL);
-  args = (xchar_t **) g_ptr_array_free (array, FALSE);
+    xptr_array_add (array, xstrdup (arg));
+  xptr_array_add (array, NULL);
+  args = (xchar_t **) xptr_array_free (array, FALSE);
   va_end (ap);
 
   env = g_environ_setenv (g_get_environ (), "TEST", "1", TRUE);
 
   data = g_slice_new (ChildData);
-  data->expected_stdout = g_strdup (expected_stdout);
-  data->expected_stderr = g_strdup (expected_stderr);
+  data->expected_stdout = xstrdup (expected_stdout);
+  data->expected_stderr = xstrdup (expected_stderr);
 
   g_spawn_async_with_pipes (NULL, args, env,
                             G_SPAWN_DO_NOT_REAP_CHILD,
@@ -114,7 +114,7 @@ spawn (const xchar_t *expected_stdout,
                             &error);
   g_assert_no_error (error);
 
-  g_strfreev (env);
+  xstrfreev (env);
 
   g_child_watch_add (pid, child_quit, data);
   outstanding_watches++;
@@ -131,14 +131,14 @@ spawn (const xchar_t *expected_stdout,
 static void
 basic (void)
 {
-  GDBusConnection *c;
+  xdbus_connection_t *c;
 
   g_assert (outstanding_watches == 0);
 
   session_bus_up ();
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
 
-  main_loop = g_main_loop_new (NULL, 0);
+  main_loop = xmain_loop_new (NULL, 0);
 
   /* spawn the main instance */
   spawn ("activated\n"
@@ -150,18 +150,18 @@ basic (void)
   spawn ("exit status: 0\n", NULL,
          "./app", "/a", "/b", NULL);
 
-  g_main_loop_run (main_loop);
+  xmain_loop_run (main_loop);
 
-  g_object_unref (c);
+  xobject_unref (c);
   session_bus_down ();
 
-  g_main_loop_unref (main_loop);
+  xmain_loop_unref (main_loop);
 }
 
 static void
 test_remote_command_line (void)
 {
-  GDBusConnection *c;
+  xdbus_connection_t *c;
   xfile_t *file;
   xchar_t *replies;
   xchar_t *cwd;
@@ -171,17 +171,17 @@ test_remote_command_line (void)
   session_bus_up ();
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
 
-  main_loop = g_main_loop_new (NULL, 0);
+  main_loop = xmain_loop_new (NULL, 0);
 
-  file = g_file_new_for_commandline_arg ("foo");
+  file = xfile_new_for_commandline_arg ("foo");
   cwd = g_get_current_dir ();
 
-  replies = g_strconcat ("got ./cmd 0\n",
+  replies = xstrconcat ("got ./cmd 0\n",
                          "got ./cmd 1\n",
                          "cmdline ./cmd echo --abc -d\n",
                          "environment TEST=1\n",
                          "getenv TEST=1\n",
-                         "file ", g_file_get_path (file), "\n",
+                         "file ", xfile_get_path (file), "\n",
                          "properties ok\n",
                          "cwd ", cwd, "\n",
                          "busy\n",
@@ -189,7 +189,7 @@ test_remote_command_line (void)
                          "stdin ok\n",
                          "exit status: 0\n",
                          NULL);
-  g_object_unref (file);
+  xobject_unref (file);
 
   /* spawn the main instance */
   spawn (replies, NULL,
@@ -235,25 +235,25 @@ test_remote_command_line (void)
   spawn ("exit status: 0\n", NULL,
          "./cmd", "stdin", NULL);
 
-  g_main_loop_run (main_loop);
+  xmain_loop_run (main_loop);
 
-  g_object_unref (c);
+  xobject_unref (c);
   session_bus_down ();
 
-  g_main_loop_unref (main_loop);
+  xmain_loop_unref (main_loop);
 }
 
 static void
 test_remote_actions (void)
 {
-  GDBusConnection *c;
+  xdbus_connection_t *c;
 
   g_assert (outstanding_watches == 0);
 
   session_bus_up ();
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
 
-  main_loop = g_main_loop_new (NULL, 0);
+  main_loop = xmain_loop_new (NULL, 0);
 
   /* spawn the main instance */
   spawn ("got ./cmd 0\n"
@@ -272,12 +272,12 @@ test_remote_actions (void)
   spawn ("exit status: 0\n", NULL,
          "./actions", "set-state", NULL);
 
-  g_main_loop_run (main_loop);
+  xmain_loop_run (main_loop);
 
-  g_object_unref (c);
+  xobject_unref (c);
   session_bus_down ();
 
-  g_main_loop_unref (main_loop);
+  xmain_loop_unref (main_loop);
 }
 #endif
 
@@ -290,35 +290,35 @@ test_remote_actions (void)
  * introduced this problem.
  */
 
-static GApplication *recently_activated;
-static GMainLoop *loop;
+static xapplication_t *recently_activated;
+static xmain_loop_t *loop;
 
 static void
-nonunique_activate (GApplication *application)
+nonunique_activate (xapplication_t *application)
 {
   recently_activated = application;
 
   if (loop != NULL)
-    g_main_loop_quit (loop);
+    xmain_loop_quit (loop);
 }
 
-static GApplication *
+static xapplication_t *
 make_app (xboolean_t non_unique)
 {
-  GApplication *app;
+  xapplication_t *app;
   xboolean_t ok;
 
-  app = g_application_new ("org.gtk.Test-Application",
+  app = xapplication_new ("org.gtk.Test-Application",
                            non_unique ? G_APPLICATION_NON_UNIQUE : 0);
   g_signal_connect (app, "activate", G_CALLBACK (nonunique_activate), NULL);
-  ok = g_application_register (app, NULL, NULL);
+  ok = xapplication_register (app, NULL, NULL);
   if (!ok)
     {
-      g_object_unref (app);
+      xobject_unref (app);
       return NULL;
     }
 
-  g_application_activate (app);
+  xapplication_activate (app);
 
   return app;
 }
@@ -326,25 +326,25 @@ make_app (xboolean_t non_unique)
 static void
 test_nonunique (void)
 {
-  GApplication *first, *second, *third, *fourth;
+  xapplication_t *first, *second, *third, *fourth;
 
   session_bus_up ();
 
   first = make_app (TRUE);
   /* non-remote because it is non-unique */
-  g_assert (!g_application_get_is_remote (first));
+  g_assert (!xapplication_get_is_remote (first));
   g_assert (recently_activated == first);
   recently_activated = NULL;
 
   second = make_app (FALSE);
   /* non-remote because it is first */
-  g_assert (!g_application_get_is_remote (second));
+  g_assert (!xapplication_get_is_remote (second));
   g_assert (recently_activated == second);
   recently_activated = NULL;
 
   third = make_app (TRUE);
   /* non-remote because it is non-unique */
-  g_assert (!g_application_get_is_remote (third));
+  g_assert (!xapplication_get_is_remote (third));
   g_assert (recently_activated == third);
   recently_activated = NULL;
 
@@ -355,9 +355,9 @@ test_nonunique (void)
   g_assert (fourth == NULL);
   g_assert (recently_activated == NULL);
 
-  g_object_unref (first);
-  g_object_unref (second);
-  g_object_unref (third);
+  xobject_unref (first);
+  xobject_unref (second);
+  xobject_unref (third);
 
   session_bus_down ();
 }
@@ -366,7 +366,7 @@ test_nonunique (void)
 static void
 properties (void)
 {
-  GDBusConnection *c;
+  xdbus_connection_t *c;
   xobject_t *app;
   xchar_t *id;
   GApplicationFlags flags;
@@ -379,11 +379,11 @@ properties (void)
   session_bus_up ();
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
 
-  app = g_object_new (XTYPE_APPLICATION,
+  app = xobject_new (XTYPE_APPLICATION,
                       "application-id", "org.gtk.TestApplication",
                       NULL);
 
-  g_object_get (app,
+  xobject_get (app,
                 "application-id", &id,
                 "flags", &flags,
                 "is-registered", &registered,
@@ -395,11 +395,11 @@ properties (void)
   g_assert (!registered);
   g_assert_cmpint (timeout, ==, 0);
 
-  ret = g_application_register (G_APPLICATION (app), NULL, &error);
+  ret = xapplication_register (G_APPLICATION (app), NULL, &error);
   g_assert (ret);
   g_assert_no_error (error);
 
-  g_object_get (app,
+  xobject_get (app,
                 "is-registered", &registered,
                 "is-remote", &remote,
                 NULL);
@@ -407,14 +407,14 @@ properties (void)
   g_assert (registered);
   g_assert (!remote);
 
-  g_object_set (app,
+  xobject_set (app,
                 "inactivity-timeout", 1000,
                 NULL);
 
-  g_application_quit (G_APPLICATION (app));
+  xapplication_quit (G_APPLICATION (app));
 
-  g_object_unref (c);
-  g_object_unref (app);
+  xobject_unref (c);
+  xobject_unref (app);
   g_free (id);
 
   session_bus_down ();
@@ -425,38 +425,38 @@ appid (void)
 {
   xchar_t *id;
 
-  g_assert_false (g_application_id_is_valid (""));
-  g_assert_false (g_application_id_is_valid ("."));
-  g_assert_false (g_application_id_is_valid ("a"));
-  g_assert_false (g_application_id_is_valid ("abc"));
-  g_assert_false (g_application_id_is_valid (".abc"));
-  g_assert_false (g_application_id_is_valid ("abc."));
-  g_assert_false (g_application_id_is_valid ("a..b"));
-  g_assert_false (g_application_id_is_valid ("a/b"));
-  g_assert_false (g_application_id_is_valid ("a\nb"));
-  g_assert_false (g_application_id_is_valid ("a\nb"));
-  g_assert_false (g_application_id_is_valid ("emoji_picker"));
-  g_assert_false (g_application_id_is_valid ("emoji-picker"));
-  g_assert_false (g_application_id_is_valid ("emojipicker"));
-  g_assert_false (g_application_id_is_valid ("my.Terminal.0123"));
+  g_assert_false (xapplication_id_is_valid (""));
+  g_assert_false (xapplication_id_is_valid ("."));
+  g_assert_false (xapplication_id_is_valid ("a"));
+  g_assert_false (xapplication_id_is_valid ("abc"));
+  g_assert_false (xapplication_id_is_valid (".abc"));
+  g_assert_false (xapplication_id_is_valid ("abc."));
+  g_assert_false (xapplication_id_is_valid ("a..b"));
+  g_assert_false (xapplication_id_is_valid ("a/b"));
+  g_assert_false (xapplication_id_is_valid ("a\nb"));
+  g_assert_false (xapplication_id_is_valid ("a\nb"));
+  g_assert_false (xapplication_id_is_valid ("emoji_picker"));
+  g_assert_false (xapplication_id_is_valid ("emoji-picker"));
+  g_assert_false (xapplication_id_is_valid ("emojipicker"));
+  g_assert_false (xapplication_id_is_valid ("my.Terminal.0123"));
   id = g_new0 (xchar_t, 261);
   memset (id, 'a', 260);
   id[1] = '.';
   id[260] = 0;
-  g_assert_false (g_application_id_is_valid (id));
+  g_assert_false (xapplication_id_is_valid (id));
   g_free (id);
 
-  g_assert_true (g_application_id_is_valid ("a.b"));
-  g_assert_true (g_application_id_is_valid ("A.B"));
-  g_assert_true (g_application_id_is_valid ("A-.B"));
-  g_assert_true (g_application_id_is_valid ("a_b.c-d"));
-  g_assert_true (g_application_id_is_valid ("_a.b"));
-  g_assert_true (g_application_id_is_valid ("-a.b"));
-  g_assert_true (g_application_id_is_valid ("org.gnome.SessionManager"));
-  g_assert_true (g_application_id_is_valid ("my.Terminal._0123"));
-  g_assert_true (g_application_id_is_valid ("com.example.MyApp"));
-  g_assert_true (g_application_id_is_valid ("com.example.internal_apps.Calculator"));
-  g_assert_true (g_application_id_is_valid ("org._7_zip.Archiver"));
+  g_assert_true (xapplication_id_is_valid ("a.b"));
+  g_assert_true (xapplication_id_is_valid ("A.B"));
+  g_assert_true (xapplication_id_is_valid ("A-.B"));
+  g_assert_true (xapplication_id_is_valid ("a_b.c-d"));
+  g_assert_true (xapplication_id_is_valid ("_a.b"));
+  g_assert_true (xapplication_id_is_valid ("-a.b"));
+  g_assert_true (xapplication_id_is_valid ("org.gnome.SessionManager"));
+  g_assert_true (xapplication_id_is_valid ("my.Terminal._0123"));
+  g_assert_true (xapplication_id_is_valid ("com.example.MyApp"));
+  g_assert_true (xapplication_id_is_valid ("com.example.internal_apps.Calculator"));
+  g_assert_true (xapplication_id_is_valid ("org._7_zip.Archiver"));
 }
 
 static xboolean_t nodbus_activated;
@@ -464,18 +464,18 @@ static xboolean_t nodbus_activated;
 static xboolean_t
 release_app (xpointer_t user_data)
 {
-  g_application_release (user_data);
+  xapplication_release (user_data);
   return G_SOURCE_REMOVE;
 }
 
 static void
-nodbus_activate (GApplication *app)
+nodbus_activate (xapplication_t *app)
 {
   nodbus_activated = TRUE;
-  g_application_hold (app);
+  xapplication_hold (app);
 
-  g_assert (g_application_get_dbus_connection (app) == NULL);
-  g_assert (g_application_get_dbus_object_path (app) == NULL);
+  g_assert (xapplication_get_dbus_connection (app) == NULL);
+  g_assert (xapplication_get_dbus_object_path (app) == NULL);
 
   g_idle_add (release_app, app);
 }
@@ -485,12 +485,12 @@ test_nodbus (void)
 {
   char *binpath = g_test_build_filename (G_TEST_BUILT, "unimportant", NULL);
   xchar_t *argv[] = { binpath, NULL };
-  GApplication *app;
+  xapplication_t *app;
 
-  app = g_application_new ("org.gtk.Unimportant", G_APPLICATION_FLAGS_NONE);
+  app = xapplication_new ("org.gtk.Unimportant", G_APPLICATION_FLAGS_NONE);
   g_signal_connect (app, "activate", G_CALLBACK (nodbus_activate), NULL);
-  g_application_run (app, 1, argv);
-  g_object_unref (app);
+  xapplication_run (app, 1, argv);
+  xobject_unref (app);
 
   g_assert (nodbus_activated);
   g_free (binpath);
@@ -499,12 +499,12 @@ test_nodbus (void)
 static xboolean_t noappid_activated;
 
 static void
-noappid_activate (GApplication *app)
+noappid_activate (xapplication_t *app)
 {
   noappid_activated = TRUE;
-  g_application_hold (app);
+  xapplication_hold (app);
 
-  g_assert (g_application_get_flags (app) & G_APPLICATION_NON_UNIQUE);
+  g_assert (xapplication_get_flags (app) & G_APPLICATION_NON_UNIQUE);
 
   g_idle_add (release_app, app);
 }
@@ -515,12 +515,12 @@ test_noappid (void)
 {
   char *binpath = g_test_build_filename (G_TEST_BUILT, "unimportant", NULL);
   xchar_t *argv[] = { binpath, NULL };
-  GApplication *app;
+  xapplication_t *app;
 
-  app = g_application_new (NULL, G_APPLICATION_FLAGS_NONE);
+  app = xapplication_new (NULL, G_APPLICATION_FLAGS_NONE);
   g_signal_connect (app, "activate", G_CALLBACK (noappid_activate), NULL);
-  g_application_run (app, 1, argv);
-  g_object_unref (app);
+  xapplication_run (app, 1, argv);
+  xobject_unref (app);
 
   g_assert (noappid_activated);
   g_free (binpath);
@@ -533,18 +533,18 @@ static xboolean_t
 quit_app (xpointer_t user_data)
 {
   quitted = TRUE;
-  g_application_quit (user_data);
+  xapplication_quit (user_data);
   return G_SOURCE_REMOVE;
 }
 
 static void
-quit_activate (GApplication *app)
+quit_activate (xapplication_t *app)
 {
   activated = TRUE;
-  g_application_hold (app);
+  xapplication_hold (app);
 
-  g_assert (g_application_get_dbus_connection (app) != NULL);
-  g_assert (g_application_get_dbus_object_path (app) != NULL);
+  g_assert (xapplication_get_dbus_connection (app) != NULL);
+  g_assert (xapplication_get_dbus_object_path (app) != NULL);
 
   g_idle_add (quit_app, app);
 }
@@ -552,22 +552,22 @@ quit_activate (GApplication *app)
 static void
 test_quit (void)
 {
-  GDBusConnection *c;
+  xdbus_connection_t *c;
   char *binpath = g_test_build_filename (G_TEST_BUILT, "unimportant", NULL);
   xchar_t *argv[] = { binpath, NULL };
-  GApplication *app;
+  xapplication_t *app;
 
   session_bus_up ();
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
 
-  app = g_application_new ("org.gtk.Unimportant",
+  app = xapplication_new ("org.gtk.Unimportant",
                            G_APPLICATION_FLAGS_NONE);
   activated = FALSE;
   quitted = FALSE;
   g_signal_connect (app, "activate", G_CALLBACK (quit_activate), NULL);
-  g_application_run (app, 1, argv);
-  g_object_unref (app);
-  g_object_unref (c);
+  xapplication_run (app, 1, argv);
+  xobject_unref (app);
+  xobject_unref (c);
 
   g_assert (activated);
   g_assert (quitted);
@@ -579,11 +579,11 @@ test_quit (void)
 typedef struct
 {
   xboolean_t shutdown;
-  GParamSpec *notify_spec; /* (owned) (nullable) */
+  xparam_spec_t *notify_spec; /* (owned) (nullable) */
 } RegisteredData;
 
 static void
-on_registered_shutdown (GApplication *app,
+on_registered_shutdown (xapplication_t *app,
                         xpointer_t user_data)
 {
   RegisteredData *registered_data = user_data;
@@ -592,14 +592,14 @@ on_registered_shutdown (GApplication *app,
 }
 
 static void
-on_registered_notify (GApplication *app,
-                      GParamSpec *spec,
+on_registered_notify (xapplication_t *app,
+                      xparam_spec_t *spec,
                       xpointer_t user_data)
 {
   RegisteredData *registered_data = user_data;
   registered_data->notify_spec = g_param_spec_ref (spec);
 
-  if (g_application_get_is_registered (app))
+  if (xapplication_get_is_registered (app))
     g_assert_false (registered_data->shutdown);
   else
     g_assert_true (registered_data->shutdown);
@@ -611,17 +611,17 @@ test_registered (void)
   char *binpath = g_test_build_filename (G_TEST_BUILT, "unimportant", NULL);
   xchar_t *argv[] = { binpath, NULL };
   RegisteredData registered_data = { FALSE, NULL };
-  GApplication *app;
+  xapplication_t *app;
 
-  app = g_application_new (NULL, G_APPLICATION_FLAGS_NONE);
+  app = xapplication_new (NULL, G_APPLICATION_FLAGS_NONE);
   g_signal_connect (app, "activate", G_CALLBACK (noappid_activate), NULL);
   g_signal_connect (app, "shutdown", G_CALLBACK (on_registered_shutdown), &registered_data);
   g_signal_connect (app, "notify::is-registered", G_CALLBACK (on_registered_notify), &registered_data);
 
   g_assert_null (registered_data.notify_spec);
 
-  g_assert_true (g_application_register (app, NULL, NULL));
-  g_assert_true (g_application_get_is_registered (app));
+  g_assert_true (xapplication_register (app, NULL, NULL));
+  g_assert_true (xapplication_get_is_registered (app));
 
   g_assert_nonnull (registered_data.notify_spec);
   g_assert_cmpstr (registered_data.notify_spec->name, ==, "is-registered");
@@ -629,60 +629,60 @@ test_registered (void)
 
   g_assert_false (registered_data.shutdown);
 
-  g_application_run (app, 1, argv);
+  xapplication_run (app, 1, argv);
 
   g_assert_true (registered_data.shutdown);
-  g_assert_false (g_application_get_is_registered (app));
+  g_assert_false (xapplication_get_is_registered (app));
   g_assert_nonnull (registered_data.notify_spec);
   g_assert_cmpstr (registered_data.notify_spec->name, ==, "is-registered");
   g_clear_pointer (&registered_data.notify_spec, g_param_spec_unref);
 
   /* Register it again */
   registered_data.shutdown = FALSE;
-  g_assert_true (g_application_register (app, NULL, NULL));
-  g_assert_true (g_application_get_is_registered (app));
+  g_assert_true (xapplication_register (app, NULL, NULL));
+  g_assert_true (xapplication_get_is_registered (app));
   g_assert_nonnull (registered_data.notify_spec);
   g_assert_cmpstr (registered_data.notify_spec->name, ==, "is-registered");
   g_clear_pointer (&registered_data.notify_spec, g_param_spec_unref);
   g_assert_false (registered_data.shutdown);
 
-  g_object_unref (app);
+  xobject_unref (app);
 
   g_free (binpath);
 }
 
 static void
-on_activate (GApplication *app)
+on_activate (xapplication_t *app)
 {
   xchar_t **actions;
-  GAction *action;
+  xaction_t *action;
   xvariant_t *state;
 
-  g_assert (!g_application_get_is_remote (app));
+  g_assert (!xapplication_get_is_remote (app));
 
   actions = xaction_group_list_actions (XACTION_GROUP (app));
-  g_assert (g_strv_length (actions) == 0);
-  g_strfreev (actions);
+  g_assert (xstrv_length (actions) == 0);
+  xstrfreev (actions);
 
-  action = (GAction*)g_simple_action_new_stateful ("test", G_VARIANT_TYPE_BOOLEAN, g_variant_new_boolean (FALSE));
-  g_action_map_add_action (G_ACTION_MAP (app), action);
+  action = (xaction_t*)g_simple_action_new_stateful ("test", G_VARIANT_TYPE_BOOLEAN, xvariant_new_boolean (FALSE));
+  xaction_map_add_action (G_ACTION_MAP (app), action);
 
   actions = xaction_group_list_actions (XACTION_GROUP (app));
-  g_assert (g_strv_length (actions) == 1);
-  g_strfreev (actions);
+  g_assert (xstrv_length (actions) == 1);
+  xstrfreev (actions);
 
-  xaction_group_change_action_state (XACTION_GROUP (app), "test", g_variant_new_boolean (TRUE));
+  xaction_group_change_action_state (XACTION_GROUP (app), "test", xvariant_new_boolean (TRUE));
   state = xaction_group_get_action_state (XACTION_GROUP (app), "test");
-  g_assert (g_variant_get_boolean (state) == TRUE);
+  g_assert (xvariant_get_boolean (state) == TRUE);
 
-  action = g_action_map_lookup_action (G_ACTION_MAP (app), "test");
+  action = xaction_map_lookup_action (G_ACTION_MAP (app), "test");
   g_assert (action != NULL);
 
-  g_action_map_remove_action (G_ACTION_MAP (app), "test");
+  xaction_map_remove_action (G_ACTION_MAP (app), "test");
 
   actions = xaction_group_list_actions (XACTION_GROUP (app));
-  g_assert (g_strv_length (actions) == 0);
-  g_strfreev (actions);
+  g_assert (xstrv_length (actions) == 0);
+  xstrfreev (actions);
 }
 
 static void
@@ -690,18 +690,18 @@ test_local_actions (void)
 {
   char *binpath = g_test_build_filename (G_TEST_BUILT, "unimportant", NULL);
   xchar_t *argv[] = { binpath, NULL };
-  GApplication *app;
+  xapplication_t *app;
 
-  app = g_application_new ("org.gtk.Unimportant",
+  app = xapplication_new ("org.gtk.Unimportant",
                            G_APPLICATION_FLAGS_NONE);
   g_signal_connect (app, "activate", G_CALLBACK (on_activate), NULL);
-  g_application_run (app, 1, argv);
-  g_object_unref (app);
+  xapplication_run (app, 1, argv);
+  xobject_unref (app);
   g_free (binpath);
 }
 
-typedef GApplication TestLocCmdApp;
-typedef GApplicationClass TestLocCmdAppClass;
+typedef xapplication_t TestLocCmdApp;
+typedef xapplication_class_t TestLocCmdAppClass;
 
 static xtype_t test_loc_cmd_app_get_type (void);
 G_DEFINE_TYPE (TestLocCmdApp, test_loc_cmd_app, XTYPE_APPLICATION)
@@ -712,19 +712,19 @@ test_loc_cmd_app_init (TestLocCmdApp *app)
 }
 
 static void
-test_loc_cmd_app_startup (GApplication *app)
+test_loc_cmd_app_startup (xapplication_t *app)
 {
   g_assert_not_reached ();
 }
 
 static void
-test_loc_cmd_app_shutdown (GApplication *app)
+test_loc_cmd_app_shutdown (xapplication_t *app)
 {
   g_assert_not_reached ();
 }
 
 static xboolean_t
-test_loc_cmd_app_local_command_line (GApplication   *application,
+test_loc_cmd_app_local_command_line (xapplication_t   *application,
                                      xchar_t        ***arguments,
                                      xint_t           *exit_status)
 {
@@ -744,53 +744,53 @@ test_local_command_line (void)
 {
   char *binpath = g_test_build_filename (G_TEST_BUILT, "unimportant", NULL);
   xchar_t *argv[] = { binpath, "-invalid", NULL };
-  GApplication *app;
+  xapplication_t *app;
 
-  app = g_object_new (test_loc_cmd_app_get_type (),
+  app = xobject_new (test_loc_cmd_app_get_type (),
                       "application-id", "org.gtk.Unimportant",
                       "flags", G_APPLICATION_FLAGS_NONE,
                       NULL);
-  g_application_run (app, 1, argv);
-  g_object_unref (app);
+  xapplication_run (app, 1, argv);
+  xobject_unref (app);
   g_free (binpath);
 }
 
 static void
 test_resource_path (void)
 {
-  GApplication *app;
+  xapplication_t *app;
 
-  app = g_application_new ("x.y.z", 0);
-  g_assert_cmpstr (g_application_get_resource_base_path (app), ==, "/x/y/z");
+  app = xapplication_new ("x.y.z", 0);
+  g_assert_cmpstr (xapplication_get_resource_base_path (app), ==, "/x/y/z");
 
   /* this should not change anything */
-  g_application_set_application_id (app, "a.b.c");
-  g_assert_cmpstr (g_application_get_resource_base_path (app), ==, "/x/y/z");
+  xapplication_set_application_id (app, "a.b.c");
+  g_assert_cmpstr (xapplication_get_resource_base_path (app), ==, "/x/y/z");
 
   /* but this should... */
-  g_application_set_resource_base_path (app, "/x");
-  g_assert_cmpstr (g_application_get_resource_base_path (app), ==, "/x");
+  xapplication_set_resource_base_path (app, "/x");
+  g_assert_cmpstr (xapplication_get_resource_base_path (app), ==, "/x");
 
   /* ... and this */
-  g_application_set_resource_base_path (app, NULL);
-  g_assert_cmpstr (g_application_get_resource_base_path (app), ==, NULL);
+  xapplication_set_resource_base_path (app, NULL);
+  g_assert_cmpstr (xapplication_get_resource_base_path (app), ==, NULL);
 
-  g_object_unref (app);
+  xobject_unref (app);
 
   /* Make sure that overriding at construction time works properly */
-  app = g_object_new (XTYPE_APPLICATION, "application-id", "x.y.z", "resource-base-path", "/a", NULL);
-  g_assert_cmpstr (g_application_get_resource_base_path (app), ==, "/a");
-  g_object_unref (app);
+  app = xobject_new (XTYPE_APPLICATION, "application-id", "x.y.z", "resource-base-path", "/a", NULL);
+  g_assert_cmpstr (xapplication_get_resource_base_path (app), ==, "/a");
+  xobject_unref (app);
 
   /* ... particularly if we override to NULL */
-  app = g_object_new (XTYPE_APPLICATION, "application-id", "x.y.z", "resource-base-path", NULL, NULL);
-  g_assert_cmpstr (g_application_get_resource_base_path (app), ==, NULL);
-  g_object_unref (app);
+  app = xobject_new (XTYPE_APPLICATION, "application-id", "x.y.z", "resource-base-path", NULL, NULL);
+  g_assert_cmpstr (xapplication_get_resource_base_path (app), ==, NULL);
+  xobject_unref (app);
 }
 
 static xint_t
-test_help_command_line (GApplication            *app,
-                        GApplicationCommandLine *command_line,
+test_help_command_line (xapplication_t            *app,
+                        xapplication_command_line_t *command_line,
                         xpointer_t                 user_data)
 {
   xboolean_t *called = user_data;
@@ -810,19 +810,19 @@ test_help (void)
     {
       char *binpath = g_test_build_filename (G_TEST_BUILT, "unimportant", NULL);
       xchar_t *argv[] = { binpath, "--help", NULL };
-      GApplication *app;
+      xapplication_t *app;
       xboolean_t called = FALSE;
       int status;
 
-      app = g_application_new ("org.gtk.TestApplication", G_APPLICATION_HANDLES_COMMAND_LINE);
-      g_application_add_main_option (app, "foo", 'f', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
+      app = xapplication_new ("org.gtk.TestApplication", G_APPLICATION_HANDLES_COMMAND_LINE);
+      xapplication_add_main_option (app, "foo", 'f', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
       g_signal_connect (app, "command-line", G_CALLBACK (test_help_command_line), &called);
 
-      status = g_application_run (app, G_N_ELEMENTS (argv) -1, argv);
+      status = xapplication_run (app, G_N_ELEMENTS (argv) -1, argv);
       g_assert (called == TRUE);
       g_assert_cmpint (status, ==, 0);
 
-      g_object_unref (app);
+      xobject_unref (app);
       g_free (binpath);
       return;
     }
@@ -835,58 +835,58 @@ test_help (void)
 static void
 test_busy (void)
 {
-  GApplication *app;
+  xapplication_t *app;
 
-  /* use GSimpleAction to bind to the busy state, because it's easy to
+  /* use xsimple_action_t to bind to the busy state, because it's easy to
    * create and has an easily modifiable boolean property */
-  GSimpleAction *action1;
-  GSimpleAction *action2;
+  xsimple_action_t *action1;
+  xsimple_action_t *action2;
 
   session_bus_up ();
 
-  app = g_application_new ("org.gtk.TestApplication", G_APPLICATION_NON_UNIQUE);
-  g_assert (g_application_register (app, NULL, NULL));
+  app = xapplication_new ("org.gtk.TestApplication", G_APPLICATION_NON_UNIQUE);
+  g_assert (xapplication_register (app, NULL, NULL));
 
-  g_assert (!g_application_get_is_busy (app));
-  g_application_mark_busy (app);
-  g_assert (g_application_get_is_busy (app));
-  g_application_unmark_busy (app);
-  g_assert (!g_application_get_is_busy (app));
+  g_assert (!xapplication_get_is_busy (app));
+  xapplication_mark_busy (app);
+  g_assert (xapplication_get_is_busy (app));
+  xapplication_unmark_busy (app);
+  g_assert (!xapplication_get_is_busy (app));
 
   action1 = g_simple_action_new ("action", NULL);
-  g_application_bind_busy_property (app, action1, "enabled");
-  g_assert (g_application_get_is_busy (app));
+  xapplication_bind_busy_property (app, action1, "enabled");
+  g_assert (xapplication_get_is_busy (app));
 
   g_simple_action_set_enabled (action1, FALSE);
-  g_assert (!g_application_get_is_busy (app));
+  g_assert (!xapplication_get_is_busy (app));
 
-  g_application_mark_busy (app);
-  g_assert (g_application_get_is_busy (app));
+  xapplication_mark_busy (app);
+  g_assert (xapplication_get_is_busy (app));
 
   action2 = g_simple_action_new ("action", NULL);
-  g_application_bind_busy_property (app, action2, "enabled");
-  g_assert (g_application_get_is_busy (app));
+  xapplication_bind_busy_property (app, action2, "enabled");
+  g_assert (xapplication_get_is_busy (app));
 
-  g_application_unmark_busy (app);
-  g_assert (g_application_get_is_busy (app));
+  xapplication_unmark_busy (app);
+  g_assert (xapplication_get_is_busy (app));
 
-  g_object_unref (action2);
-  g_assert (!g_application_get_is_busy (app));
+  xobject_unref (action2);
+  g_assert (!xapplication_get_is_busy (app));
 
   g_simple_action_set_enabled (action1, TRUE);
-  g_assert (g_application_get_is_busy (app));
+  g_assert (xapplication_get_is_busy (app));
 
-  g_application_mark_busy (app);
-  g_assert (g_application_get_is_busy (app));
+  xapplication_mark_busy (app);
+  g_assert (xapplication_get_is_busy (app));
 
-  g_application_unbind_busy_property (app, action1, "enabled");
-  g_assert (g_application_get_is_busy (app));
+  xapplication_unbind_busy_property (app, action1, "enabled");
+  g_assert (xapplication_get_is_busy (app));
 
-  g_application_unmark_busy (app);
-  g_assert (!g_application_get_is_busy (app));
+  xapplication_unmark_busy (app);
+  g_assert (!xapplication_get_is_busy (app));
 
-  g_object_unref (action1);
-  g_object_unref (app);
+  xobject_unref (action1);
+  xobject_unref (app);
 
   session_bus_down ();
 }
@@ -896,25 +896,25 @@ test_busy (void)
  */
 
 static xint_t
-test_local_options (GApplication *app,
-                    GVariantDict *options,
+test_local_options (xapplication_t *app,
+                    xvariant_dict_t *options,
                     xpointer_t      data)
 {
   xboolean_t *called = data;
 
   *called = TRUE;
 
-  if (g_variant_dict_contains (options, "success"))
+  if (xvariant_dict_contains (options, "success"))
     return 0;
-  else if (g_variant_dict_contains (options, "failure"))
+  else if (xvariant_dict_contains (options, "failure"))
     return 1;
   else
     return -1;
 }
 
 static xint_t
-second_handler (GApplication *app,
-                GVariantDict *options,
+second_handler (xapplication_t *app,
+                xvariant_dict_t *options,
                 xpointer_t      data)
 {
   xboolean_t *called = data;
@@ -931,23 +931,23 @@ test_handle_local_options_success (void)
     {
       char *binpath = g_test_build_filename (G_TEST_BUILT, "unimportant", NULL);
       xchar_t *argv[] = { binpath, "--success", NULL };
-      GApplication *app;
+      xapplication_t *app;
       xboolean_t called = FALSE;
       xboolean_t called2 = FALSE;
       int status;
 
-      app = g_application_new ("org.gtk.TestApplication", 0);
-      g_application_add_main_option (app, "success", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
-      g_application_add_main_option (app, "failure", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
+      app = xapplication_new ("org.gtk.TestApplication", 0);
+      xapplication_add_main_option (app, "success", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
+      xapplication_add_main_option (app, "failure", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
       g_signal_connect (app, "handle-local-options", G_CALLBACK (test_local_options), &called);
       g_signal_connect (app, "handle-local-options", G_CALLBACK (second_handler), &called2);
 
-      status = g_application_run (app, G_N_ELEMENTS (argv) -1, argv);
+      status = xapplication_run (app, G_N_ELEMENTS (argv) -1, argv);
       g_assert (called);
       g_assert (!called2);
       g_assert_cmpint (status, ==, 0);
 
-      g_object_unref (app);
+      xobject_unref (app);
       g_free (binpath);
       return;
     }
@@ -963,23 +963,23 @@ test_handle_local_options_failure (void)
     {
       char *binpath = g_test_build_filename (G_TEST_BUILT, "unimportant", NULL);
       xchar_t *argv[] = { binpath, "--failure", NULL };
-      GApplication *app;
+      xapplication_t *app;
       xboolean_t called = FALSE;
       xboolean_t called2 = FALSE;
       int status;
 
-      app = g_application_new ("org.gtk.TestApplication", 0);
-      g_application_add_main_option (app, "success", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
-      g_application_add_main_option (app, "failure", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
+      app = xapplication_new ("org.gtk.TestApplication", 0);
+      xapplication_add_main_option (app, "success", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
+      xapplication_add_main_option (app, "failure", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
       g_signal_connect (app, "handle-local-options", G_CALLBACK (test_local_options), &called);
       g_signal_connect (app, "handle-local-options", G_CALLBACK (second_handler), &called2);
 
-      status = g_application_run (app, G_N_ELEMENTS (argv) -1, argv);
+      status = xapplication_run (app, G_N_ELEMENTS (argv) -1, argv);
       g_assert (called);
       g_assert (!called2);
       g_assert_cmpint (status, ==, 1);
 
-      g_object_unref (app);
+      xobject_unref (app);
       g_free (binpath);
       return;
     }
@@ -995,23 +995,23 @@ test_handle_local_options_passthrough (void)
     {
       char *binpath = g_test_build_filename (G_TEST_BUILT, "unimportant", NULL);
       xchar_t *argv[] = { binpath, NULL };
-      GApplication *app;
+      xapplication_t *app;
       xboolean_t called = FALSE;
       xboolean_t called2 = FALSE;
       int status;
 
-      app = g_application_new ("org.gtk.TestApplication", 0);
-      g_application_add_main_option (app, "success", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
-      g_application_add_main_option (app, "failure", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
+      app = xapplication_new ("org.gtk.TestApplication", 0);
+      xapplication_add_main_option (app, "success", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
+      xapplication_add_main_option (app, "failure", 0, G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, "", "");
       g_signal_connect (app, "handle-local-options", G_CALLBACK (test_local_options), &called);
       g_signal_connect (app, "handle-local-options", G_CALLBACK (second_handler), &called2);
 
-      status = g_application_run (app, G_N_ELEMENTS (argv) -1, argv);
+      status = xapplication_run (app, G_N_ELEMENTS (argv) -1, argv);
       g_assert (called);
       g_assert (called2);
       g_assert_cmpint (status, ==, 2);
 
-      g_object_unref (app);
+      xobject_unref (app);
       g_free (binpath);
       return;
     }
@@ -1023,10 +1023,10 @@ test_handle_local_options_passthrough (void)
 static void
 test_api (void)
 {
-  GApplication *app;
-  GSimpleAction *action;
+  xapplication_t *app;
+  xsimple_action_t *action;
 
-  app = g_application_new ("org.gtk.TestApplication", 0);
+  app = xapplication_new ("org.gtk.TestApplication", 0);
 
   /* add an action without a name */
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "*assertion*failed*");
@@ -1035,33 +1035,33 @@ test_api (void)
   g_test_assert_expected_messages ();
 
   /* also, gapplication shouldn't accept actions without names */
-  action = g_object_new (XTYPE_SIMPLE_ACTION, NULL);
+  action = xobject_new (XTYPE_SIMPLE_ACTION, NULL);
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "*action has no name*");
-  g_action_map_add_action (G_ACTION_MAP (app), G_ACTION (action));
+  xaction_map_add_action (G_ACTION_MAP (app), G_ACTION (action));
   g_test_assert_expected_messages ();
 
-  g_object_unref (action);
-  g_object_unref (app);
+  xobject_unref (action);
+  xobject_unref (app);
 }
 
 /* Check that G_APPLICATION_ALLOW_REPLACEMENT works. To do so, we launch
- * a GApplication in this process that allows replacement, and then
+ * a xapplication_t in this process that allows replacement, and then
  * launch a subprocess with --gapplication-replace. We have to do our
  * own async version of g_test_trap_subprocess() here since we need
  * the main process to keep spinning its mainloop.
  */
 
 static xboolean_t
-name_was_lost (GApplication *app,
+name_was_lost (xapplication_t *app,
                xboolean_t     *called)
 {
   *called = TRUE;
-  g_application_quit (app);
+  xapplication_quit (app);
   return TRUE;
 }
 
 static void
-startup_in_subprocess (GApplication *app,
+startup_in_subprocess (xapplication_t *app,
                        xboolean_t     *called)
 {
   *called = TRUE;
@@ -1070,18 +1070,18 @@ startup_in_subprocess (GApplication *app,
 typedef struct
 {
   xboolean_t allow_replacement;
-  GSubprocess *subprocess;
+  xsubprocess_t *subprocess;
 } TestReplaceData;
 
 static void
-startup_cb (GApplication *app,
+startup_cb (xapplication_t *app,
             TestReplaceData *data)
 {
   const char *argv[] = { NULL, "--verbose", "--quiet", "-p", NULL, "--GTestSubprocess", NULL };
-  GSubprocessLauncher *launcher;
+  xsubprocess_launcher_t *launcher;
   xerror_t *local_error = NULL;
 
-  g_application_hold (app);
+  xapplication_hold (app);
 
   argv[0] = g_get_prgname ();
 
@@ -1095,38 +1095,38 @@ startup_cb (GApplication *app,
    */
   g_test_message ("launching subprocess");
 
-  launcher = g_subprocess_launcher_new (G_SUBPROCESS_FLAGS_NONE);
-  g_subprocess_launcher_set_environ (launcher, NULL);
-  data->subprocess = g_subprocess_launcher_spawnv (launcher, argv, &local_error);
+  launcher = xsubprocess_launcher_new (G_SUBPROCESS_FLAGS_NONE);
+  xsubprocess_launcher_set_environ (launcher, NULL);
+  data->subprocess = xsubprocess_launcher_spawnv (launcher, argv, &local_error);
   g_assert_no_error (local_error);
-  g_object_unref (launcher);
+  xobject_unref (launcher);
 
   if (!data->allow_replacement)
     {
       /* make sure we exit after a bit, if the subprocess is not replacing us */
-      g_application_set_inactivity_timeout (app, 500);
-      g_application_release (app);
+      xapplication_set_inactivity_timeout (app, 500);
+      xapplication_release (app);
     }
 }
 
 static void
 activate (xpointer_t data)
 {
-  /* GApplication complains if we don't connect to ::activate */
+  /* xapplication_t complains if we don't connect to ::activate */
 }
 
 static xboolean_t
 quit_already (xpointer_t data)
 {
-  GApplication *app = data;
+  xapplication_t *app = data;
 
-  g_application_quit (app);
+  xapplication_quit (app);
 
   return G_SOURCE_REMOVE;
 }
 
 static void
-test_replace (gconstpointer data)
+test_replace (xconstpointer data)
 {
   xboolean_t allow = GPOINTER_TO_INT (data);
 
@@ -1134,31 +1134,31 @@ test_replace (gconstpointer data)
     {
       char *binpath = g_test_build_filename (G_TEST_BUILT, "unimportant", NULL);
       char *argv[] = { binpath, "--gapplication-replace", NULL };
-      GApplication *app;
+      xapplication_t *app;
       xboolean_t startup = FALSE;
 
-      app = g_application_new ("org.gtk.TestApplication.Replace", G_APPLICATION_ALLOW_REPLACEMENT);
+      app = xapplication_new ("org.gtk.TestApplication.Replace", G_APPLICATION_ALLOW_REPLACEMENT);
       g_signal_connect (app, "startup", G_CALLBACK (startup_in_subprocess), &startup);
       g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
 
-      g_application_run (app, G_N_ELEMENTS (argv) - 1, argv);
+      xapplication_run (app, G_N_ELEMENTS (argv) - 1, argv);
 
       if (allow)
         g_assert_true (startup);
       else
         g_assert_false (startup);
 
-      g_object_unref (app);
+      xobject_unref (app);
       g_free (binpath);
     }
   else
     {
       char *binpath = g_test_build_filename (G_TEST_BUILT, "unimportant", NULL);
       xchar_t *argv[] = { binpath, NULL };
-      GApplication *app;
+      xapplication_t *app;
       xboolean_t name_lost = FALSE;
       TestReplaceData data;
-      GTestDBus *bus;
+      xtest_dbus_t *bus;
 
       data.allow_replacement = allow;
       data.subprocess = NULL;
@@ -1166,8 +1166,8 @@ test_replace (gconstpointer data)
       bus = g_test_dbus_new (0);
       g_test_dbus_up (bus);
 
-      app = g_application_new ("org.gtk.TestApplication.Replace", allow ? G_APPLICATION_ALLOW_REPLACEMENT : G_APPLICATION_FLAGS_NONE);
-      g_application_set_inactivity_timeout (app, 500);
+      app = xapplication_new ("org.gtk.TestApplication.Replace", allow ? G_APPLICATION_ALLOW_REPLACEMENT : G_APPLICATION_FLAGS_NONE);
+      xapplication_set_inactivity_timeout (app, 500);
       g_signal_connect (app, "name-lost", G_CALLBACK (name_was_lost), &name_lost);
       g_signal_connect (app, "startup", G_CALLBACK (startup_cb), &data);
       g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
@@ -1175,7 +1175,7 @@ test_replace (gconstpointer data)
       if (!allow)
         g_timeout_add_seconds (1, quit_already, app);
 
-      g_application_run (app, G_N_ELEMENTS (argv) - 1, argv);
+      xapplication_run (app, G_N_ELEMENTS (argv) - 1, argv);
 
       g_assert_nonnull (data.subprocess);
       if (allow)
@@ -1183,14 +1183,14 @@ test_replace (gconstpointer data)
       else
         g_assert_false (name_lost);
 
-      g_object_unref (app);
+      xobject_unref (app);
       g_free (binpath);
 
-      g_subprocess_wait (data.subprocess, NULL, NULL);
+      xsubprocess_wait (data.subprocess, NULL, NULL);
       g_clear_object (&data.subprocess);
 
       g_test_dbus_down (bus);
-      g_object_unref (bus);
+      xobject_unref (bus);
     }
 }
 

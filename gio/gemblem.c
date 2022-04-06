@@ -32,17 +32,17 @@
  * SECTION:gemblem
  * @short_description: An object for emblems
  * @include: gio/gio.h
- * @see_also: #xicon_t, #GEmblemedIcon, #GLoadableIcon, #GThemedIcon
+ * @see_also: #xicon_t, #xemblemed_icon_t, #xloadable_icon_t, #xthemed_icon_t
  *
- * #GEmblem is an implementation of #xicon_t that supports
+ * #xemblem_t is an implementation of #xicon_t that supports
  * having an emblem, which is an icon with additional properties.
- * It can than be added to a #GEmblemedIcon.
+ * It can than be added to a #xemblemed_icon_t.
  *
  * Currently, only metainformation about the emblem's origin is
  * supported. More may be added in the future.
  */
 
-static void g_emblem_iface_init (GIconIface *iface);
+static void xemblem_iface_init (xicon_iface_t *iface);
 
 struct _GEmblem
 {
@@ -64,25 +64,25 @@ enum
   PROP_ORIGIN
 };
 
-G_DEFINE_TYPE_WITH_CODE (GEmblem, g_emblem, XTYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (XTYPE_ICON, g_emblem_iface_init))
+G_DEFINE_TYPE_WITH_CODE (xemblem, g_emblem, XTYPE_OBJECT,
+                         G_IMPLEMENT_INTERFACE (XTYPE_ICON, xemblem_iface_init))
 
 static void
-g_emblem_get_property (xobject_t    *object,
+xemblem_get_property (xobject_t    *object,
                        xuint_t       prop_id,
-                       GValue     *value,
-                       GParamSpec *pspec)
+                       xvalue_t     *value,
+                       xparam_spec_t *pspec)
 {
-  GEmblem *emblem = G_EMBLEM (object);
+  xemblem_t *emblem = G_EMBLEM (object);
 
   switch (prop_id)
     {
       case PROP_ICON:
-        g_value_set_object (value, emblem->icon);
+        xvalue_set_object (value, emblem->icon);
 	break;
 
       case PROP_ORIGIN:
-        g_value_set_enum (value, emblem->origin);
+        xvalue_set_enum (value, emblem->origin);
         break;
 
       default:
@@ -92,21 +92,21 @@ g_emblem_get_property (xobject_t    *object,
 }
 
 static void
-g_emblem_set_property (xobject_t      *object,
+xemblem_set_property (xobject_t      *object,
                        xuint_t         prop_id,
-                       const GValue *value,
-                       GParamSpec   *pspec)
+                       const xvalue_t *value,
+                       xparam_spec_t   *pspec)
 {
-  GEmblem *emblem = G_EMBLEM (object);
+  xemblem_t *emblem = G_EMBLEM (object);
 
   switch (prop_id)
     {
       case PROP_ICON:
-        emblem->icon = g_value_dup_object (value);
+        emblem->icon = xvalue_dup_object (value);
         break;
 
       case PROP_ORIGIN:
-        emblem->origin = g_value_get_enum (value);
+        emblem->origin = xvalue_get_enum (value);
         break;
 
       default:
@@ -116,35 +116,35 @@ g_emblem_set_property (xobject_t      *object,
 }
 
 static void
-g_emblem_finalize (xobject_t *object)
+xemblem_finalize (xobject_t *object)
 {
-  GEmblem *emblem = G_EMBLEM (object);
+  xemblem_t *emblem = G_EMBLEM (object);
 
   if (emblem->icon)
-    g_object_unref (emblem->icon);
+    xobject_unref (emblem->icon);
 
-  (*G_OBJECT_CLASS (g_emblem_parent_class)->finalize) (object);
+  (*G_OBJECT_CLASS (xemblem_parent_class)->finalize) (object);
 }
 
 static void
-g_emblem_class_init (GEmblemClass *klass)
+xemblem_class_init (GEmblemClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_emblem_finalize;
-  gobject_class->set_property = g_emblem_set_property;
-  gobject_class->get_property = g_emblem_get_property;
+  gobject_class->finalize = xemblem_finalize;
+  gobject_class->set_property = xemblem_set_property;
+  gobject_class->get_property = xemblem_get_property;
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_ORIGIN,
                                    g_param_spec_enum ("origin",
-                                                      P_("GEmblem’s origin"),
+                                                      P_("xemblem_t’s origin"),
                                                       P_("Tells which origin the emblem is derived from"),
                                                       XTYPE_EMBLEM_ORIGIN,
                                                       G_EMBLEM_ORIGIN_UNKNOWN,
                                                       G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_ICON,
                                    g_param_spec_object ("icon",
                                                       P_("The icon of the emblem"),
@@ -155,67 +155,67 @@ g_emblem_class_init (GEmblemClass *klass)
 }
 
 static void
-g_emblem_init (GEmblem *emblem)
+xemblem_init (xemblem_t *emblem)
 {
 }
 
 /**
- * g_emblem_new:
+ * xemblem_new:
  * @icon: a xicon_t containing the icon.
  *
  * Creates a new emblem for @icon.
  *
- * Returns: a new #GEmblem.
+ * Returns: a new #xemblem_t.
  *
  * Since: 2.18
  */
-GEmblem *
-g_emblem_new (xicon_t *icon)
+xemblem_t *
+xemblem_new (xicon_t *icon)
 {
-  GEmblem* emblem;
+  xemblem_t* emblem;
 
   g_return_val_if_fail (icon != NULL, NULL);
   g_return_val_if_fail (X_IS_ICON (icon), NULL);
   g_return_val_if_fail (!X_IS_EMBLEM (icon), NULL);
 
-  emblem = g_object_new (XTYPE_EMBLEM, NULL);
-  emblem->icon = g_object_ref (icon);
+  emblem = xobject_new (XTYPE_EMBLEM, NULL);
+  emblem->icon = xobject_ref (icon);
   emblem->origin = G_EMBLEM_ORIGIN_UNKNOWN;
 
   return emblem;
 }
 
 /**
- * g_emblem_new_with_origin:
+ * xemblem_new_with_origin:
  * @icon: a xicon_t containing the icon.
  * @origin: a GEmblemOrigin enum defining the emblem's origin
  *
  * Creates a new emblem for @icon.
  *
- * Returns: a new #GEmblem.
+ * Returns: a new #xemblem_t.
  *
  * Since: 2.18
  */
-GEmblem *
-g_emblem_new_with_origin (xicon_t         *icon,
+xemblem_t *
+xemblem_new_with_origin (xicon_t         *icon,
                           GEmblemOrigin  origin)
 {
-  GEmblem* emblem;
+  xemblem_t* emblem;
 
   g_return_val_if_fail (icon != NULL, NULL);
   g_return_val_if_fail (X_IS_ICON (icon), NULL);
   g_return_val_if_fail (!X_IS_EMBLEM (icon), NULL);
 
-  emblem = g_object_new (XTYPE_EMBLEM, NULL);
-  emblem->icon = g_object_ref (icon);
+  emblem = xobject_new (XTYPE_EMBLEM, NULL);
+  emblem->icon = xobject_ref (icon);
   emblem->origin = origin;
 
   return emblem;
 }
 
 /**
- * g_emblem_get_icon:
- * @emblem: a #GEmblem from which the icon should be extracted.
+ * xemblem_get_icon:
+ * @emblem: a #xemblem_t from which the icon should be extracted.
  *
  * Gives back the icon from @emblem.
  *
@@ -225,7 +225,7 @@ g_emblem_new_with_origin (xicon_t         *icon,
  * Since: 2.18
  */
 xicon_t *
-g_emblem_get_icon (GEmblem *emblem)
+xemblem_get_icon (xemblem_t *emblem)
 {
   g_return_val_if_fail (X_IS_EMBLEM (emblem), NULL);
 
@@ -234,8 +234,8 @@ g_emblem_get_icon (GEmblem *emblem)
 
 
 /**
- * g_emblem_get_origin:
- * @emblem: a #GEmblem
+ * xemblem_get_origin:
+ * @emblem: a #xemblem_t
  *
  * Gets the origin of the emblem.
  *
@@ -244,7 +244,7 @@ g_emblem_get_icon (GEmblem *emblem)
  * Since: 2.18
  */
 GEmblemOrigin
-g_emblem_get_origin (GEmblem *emblem)
+xemblem_get_origin (xemblem_t *emblem)
 {
   g_return_val_if_fail (X_IS_EMBLEM (emblem), G_EMBLEM_ORIGIN_UNKNOWN);
 
@@ -252,37 +252,37 @@ g_emblem_get_origin (GEmblem *emblem)
 }
 
 static xuint_t
-g_emblem_hash (xicon_t *icon)
+xemblem_hash (xicon_t *icon)
 {
-  GEmblem *emblem = G_EMBLEM (icon);
+  xemblem_t *emblem = G_EMBLEM (icon);
   xuint_t hash;
 
-  hash  = g_icon_hash (g_emblem_get_icon (emblem));
+  hash  = xicon_hash (xemblem_get_icon (emblem));
   hash ^= emblem->origin;
 
   return hash;
 }
 
 static xboolean_t
-g_emblem_equal (xicon_t *icon1,
+xemblem_equal (xicon_t *icon1,
                 xicon_t *icon2)
 {
-  GEmblem *emblem1 = G_EMBLEM (icon1);
-  GEmblem *emblem2 = G_EMBLEM (icon2);
+  xemblem_t *emblem1 = G_EMBLEM (icon1);
+  xemblem_t *emblem2 = G_EMBLEM (icon2);
 
   return emblem1->origin == emblem2->origin &&
-         g_icon_equal (emblem1->icon, emblem2->icon);
+         xicon_equal (emblem1->icon, emblem2->icon);
 }
 
 static xboolean_t
-g_emblem_to_tokens (xicon_t *icon,
-		    GPtrArray *tokens,
+xemblem_to_tokens (xicon_t *icon,
+		    xptr_array_t *tokens,
 		    xint_t  *out_version)
 {
-  GEmblem *emblem = G_EMBLEM (icon);
+  xemblem_t *emblem = G_EMBLEM (icon);
   char *s;
 
-  /* GEmblem are encoded as
+  /* xemblem_t are encoded as
    *
    * <origin> <icon>
    */
@@ -291,25 +291,25 @@ g_emblem_to_tokens (xicon_t *icon,
 
   *out_version = 0;
 
-  s = g_icon_to_string (emblem->icon);
+  s = xicon_to_string (emblem->icon);
   if (s == NULL)
     return FALSE;
 
-  g_ptr_array_add (tokens, s);
+  xptr_array_add (tokens, s);
 
-  s = g_strdup_printf ("%d", emblem->origin);
-  g_ptr_array_add (tokens, s);
+  s = xstrdup_printf ("%d", emblem->origin);
+  xptr_array_add (tokens, s);
 
   return TRUE;
 }
 
 static xicon_t *
-g_emblem_from_tokens (xchar_t  **tokens,
+xemblem_from_tokens (xchar_t  **tokens,
 		      xint_t     num_tokens,
 		      xint_t     version,
 		      xerror_t **error)
 {
-  GEmblem *emblem;
+  xemblem_t *emblem;
   xicon_t *icon;
   GEmblemOrigin origin;
 
@@ -320,7 +320,7 @@ g_emblem_from_tokens (xchar_t  **tokens,
       g_set_error (error,
                    G_IO_ERROR,
                    G_IO_ERROR_INVALID_ARGUMENT,
-                   _("Can’t handle version %d of GEmblem encoding"),
+                   _("Can’t handle version %d of xemblem_t encoding"),
                    version);
       return NULL;
     }
@@ -330,50 +330,50 @@ g_emblem_from_tokens (xchar_t  **tokens,
       g_set_error (error,
                    G_IO_ERROR,
                    G_IO_ERROR_INVALID_ARGUMENT,
-                   _("Malformed number of tokens (%d) in GEmblem encoding"),
+                   _("Malformed number of tokens (%d) in xemblem_t encoding"),
                    num_tokens);
       return NULL;
     }
 
-  icon = g_icon_new_for_string (tokens[0], error);
+  icon = xicon_new_for_string (tokens[0], error);
 
   if (icon == NULL)
     return NULL;
 
   origin = atoi (tokens[1]);
 
-  emblem = g_emblem_new_with_origin (icon, origin);
-  g_object_unref (icon);
+  emblem = xemblem_new_with_origin (icon, origin);
+  xobject_unref (icon);
 
-  return G_ICON (emblem);
+  return XICON (emblem);
 }
 
 static xvariant_t *
-g_emblem_serialize (xicon_t *icon)
+xemblem_serialize (xicon_t *icon)
 {
-  GEmblem *emblem = G_EMBLEM (icon);
+  xemblem_t *emblem = G_EMBLEM (icon);
   xvariant_t *icon_data;
-  GEnumValue *origin;
+  xenum_value_t *origin;
   xvariant_t *result;
 
-  icon_data = g_icon_serialize (emblem->icon);
+  icon_data = xicon_serialize (emblem->icon);
   if (!icon_data)
     return NULL;
 
-  origin = g_enum_get_value (g_type_class_peek (XTYPE_EMBLEM_ORIGIN), emblem->origin);
-  result = g_variant_new_parsed ("('emblem', <(%v, {'origin': <%s>})>)",
+  origin = xenum_get_value (xtype_class_peek (XTYPE_EMBLEM_ORIGIN), emblem->origin);
+  result = xvariant_new_parsed ("('emblem', <(%v, {'origin': <%s>})>)",
                                  icon_data, origin ? origin->value_nick : "unknown");
-  g_variant_unref (icon_data);
+  xvariant_unref (icon_data);
 
   return result;
 }
 
 static void
-g_emblem_iface_init (GIconIface *iface)
+xemblem_iface_init (xicon_iface_t *iface)
 {
-  iface->hash  = g_emblem_hash;
-  iface->equal = g_emblem_equal;
-  iface->to_tokens = g_emblem_to_tokens;
-  iface->from_tokens = g_emblem_from_tokens;
-  iface->serialize = g_emblem_serialize;
+  iface->hash  = xemblem_hash;
+  iface->equal = xemblem_equal;
+  iface->to_tokens = xemblem_to_tokens;
+  iface->from_tokens = xemblem_from_tokens;
+  iface->serialize = xemblem_serialize;
 }

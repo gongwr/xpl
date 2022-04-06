@@ -30,19 +30,19 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 #: ../gio/gapplication.c:514
-msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
 msgstr ""
-"GApplication సేవా రీతి (D-బస్ సేవా దస్త్రాలు నుండి ఉపయోగించు) ప్రవేశపెట్టుము"
+"xapplication_t సేవా రీతి (D-బస్ సేవా దస్త్రాలు నుండి ఉపయోగించు) ప్రవేశపెట్టుము"
 
 #: ../gio/gapplication.c:519
 #| msgid "Application Options:"
-msgid "GApplication options"
-msgstr "GApplication ఐచ్చికాలు"
+msgid "xapplication_t options"
+msgstr "xapplication_t ఐచ్చికాలు"
 
 #: ../gio/gapplication.c:519
 #| msgid "Application Options:"
-msgid "Show GApplication options"
-msgstr "GApplication ఐచ్చికాలు చూపు"
+msgid "Show xapplication_t options"
+msgstr "xapplication_t ఐచ్చికాలు చూపు"
 
 #: ../gio/gapplication-tool.c:45 ../gio/gapplication-tool.c:46
 #: ../gio/gresource-tool.c:485 ../gio/gsettings-tool.c:508
@@ -287,7 +287,7 @@ msgid "Seek not supported on base stream"
 msgstr "ఆధార ప్రవాహం కు మద్దతు లేదు అర్థించు"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
 msgstr "GBuffered ఇన్పుట్ ప్రవాహ ఖండించు సాధ్యం కాదు"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1017
@@ -362,19 +362,19 @@ msgid "%s filetype"
 msgstr "%s దస్త్రమురకము"
 
 #: ../gio/gcredentials.c:312 ../gio/gcredentials.c:571
-msgid "GCredentials is not implemented on this OS"
-msgstr "GCredentials ఈ OS లో అమలు కాలేదు"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "xcredentials_t ఈ OS లో అమలు కాలేదు"
 
 #: ../gio/gcredentials.c:467
-msgid "There is no GCredentials support for your platform"
-msgstr "మీ వేదిక ఎటువంటి GCredentials మద్దతు ఉంది"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "మీ వేదిక ఎటువంటి xcredentials_t మద్దతు ఉంది"
 
 #: ../gio/gcredentials.c:513
-msgid "GCredentials does not contain a process ID on this OS"
-msgstr "GCredentials ఈ OS పైన ప్రోసెస్ ఐడి కలిగివుండదు"
+msgid "xcredentials_t does not contain a process ID on this OS"
+msgstr "xcredentials_t ఈ OS పైన ప్రోసెస్ ఐడి కలిగివుండదు"
 
 #: ../gio/gcredentials.c:565
-#| msgid "GCredentials is not implemented on this OS"
+#| msgid "xcredentials_t is not implemented on this OS"
 msgid "Credentials spoofing is not possible on this OS"
 msgstr "ఈ OS పైన క్రెడెన్షియల్స్ స్పూఫింగ్ సాధ్యపడదు"
 
@@ -555,8 +555,8 @@ msgstr ""
 "అలిసిపోయిన"
 
 #: ../gio/gdbusauth.c:1170
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "GDBusAuthObserver ద్వారా రద్దు అయ్యింది :: అధికారం-అధికారం-పీర్"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "xdbus_auth_observer_t ద్వారా రద్దు అయ్యింది :: అధికారం-అధికారం-పీర్"
 
 #: ../gio/gdbusauthmechanismsha1.c:261
 #, c-format
@@ -1253,27 +1253,27 @@ msgstr "TLS మద్దతు అందుబాటులో లేదు"
 
 #: ../gio/gemblem.c:323
 #, c-format
-msgid "Can't handle version %d of GEmblem encoding"
-msgstr "GEmblem ఎన్కోడింగ్ యొక్క వర్షన్ %dను సంభాలించలేదు"
+msgid "Can't handle version %d of xemblem_t encoding"
+msgstr "xemblem_t ఎన్కోడింగ్ యొక్క వర్షన్ %dను సంభాలించలేదు"
 
 #: ../gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "GEmblem ఎన్కోడింగ్‌నందు టోకెన్సు (%d)యొక్క తప్పుగావున్న సంఖ్య"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "xemblem_t ఎన్కోడింగ్‌నందు టోకెన్సు (%d)యొక్క తప్పుగావున్న సంఖ్య"
 
 #: ../gio/gemblemedicon.c:362
 #, c-format
-msgid "Can't handle version %d of GEmblemedIcon encoding"
-msgstr "GEmblemedIcon ఎన్కోడింగ్ యొక్క వర్షన్ %dను సంభాలించలేదు"
+msgid "Can't handle version %d of xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t ఎన్కోడింగ్ యొక్క వర్షన్ %dను సంభాలించలేదు"
 
 #: ../gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "GEmblemedIcon ఎన్కోడింగ్‌నందు టోకెన్సు (%d)యొక్క తప్పుగావున్న సంఖ్య"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t ఎన్కోడింగ్‌నందు టోకెన్సు (%d)యొక్క తప్పుగావున్న సంఖ్య"
 
 #: ../gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "GEmblemedIcon కొరకు GEmblem కావలసివుంది"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "xemblemed_icon_t కొరకు xemblem_t కావలసివుంది"
 
 #: ../gio/gfile.c:956 ../gio/gfile.c:1194 ../gio/gfile.c:1332
 #: ../gio/gfile.c:1570 ../gio/gfile.c:1625 ../gio/gfile.c:1683
@@ -1379,12 +1379,12 @@ msgstr "దస్త్ర యెన్యూమరేటర్ యిప్ప�
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can't handle version %d of GFileIcon encoding"
-msgstr "GFileIcon ఎన్కోడింగ్ యొక్క వర్షన్ %dను సంభాలించలేదు"
+msgid "Can't handle version %d of xfile_icon_t encoding"
+msgstr "xfile_icon_t ఎన్కోడింగ్ యొక్క వర్షన్ %dను సంభాలించలేదు"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for GFileIcon"
-msgstr "GFileIcon కొరకు తప్పుగావున్న ఇన్పుట్ డాటా"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "xfile_icon_t కొరకు తప్పుగావున్న ఇన్పుట్ డాటా"
 
 #: ../gio/gfileinputstream.c:149 ../gio/gfileinputstream.c:394
 #: ../gio/gfileiostream.c:167 ../gio/gfileoutputstream.c:164
@@ -1825,11 +1825,11 @@ msgstr "కీలక పేరు ఆంక్షలు అమలు లేద�
 
 #: ../gio/glib-compile-schemas.c:2026
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"ఒక స్కీమ కాషె అన్ని GSettings స్కీమ ఫైళ్లు కంఫైల్.\n"
+"ఒక స్కీమ కాషె అన్ని xsettings_t స్కీమ ఫైళ్లు కంఫైల్.\n"
 "స్కీమ ఫైళ్లు పొడిగింపు కలిగి ఉంటుంది. Gschema.xml,\n"
 "మరియు కాషె ఫైల్ gschemas.compiled అని పిలుస్తారు."
 
@@ -2151,7 +2151,7 @@ msgid "Invalid seek request"
 msgstr "చెల్లని యెదురుచూపు అభ్యర్ధన"
 
 #: ../gio/gmemoryinputstream.c:505
-msgid "Cannot truncate GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
 msgstr "GMemoryInputStreamను కుదించ లేము"
 
 #: ../gio/gmemoryoutputstream.c:565
@@ -2771,8 +2771,8 @@ msgid "Error sending message: %s"
 msgstr "సందేశమును పంపుటలో దోషము: %s"
 
 #: ../gio/gsocket.c:3922
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "విండోస్ నందు GSocketControlMessage తోడ్పాటులేదు"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "విండోస్ నందు xsocket_control_message_t తోడ్పాటులేదు"
 
 #: ../gio/gsocket.c:4259 ../gio/gsocket.c:4394
 #, c-format
@@ -2912,8 +2912,8 @@ msgstr "తెలియని SOCKSv5 ప్రాక్సీ లోపం."
 
 #: ../gio/gthemedicon.c:518
 #, c-format
-msgid "Can't handle version %d of GThemedIcon encoding"
-msgstr "GThemedIcon ఎన్కోడింగుయొక్క వర్షన్ %dను సంభాలించలేదు"
+msgid "Can't handle version %d of xthemed_icon_t encoding"
+msgstr "xthemed_icon_t ఎన్కోడింగుయొక్క వర్షన్ %dను సంభాలించలేదు"
 
 #: ../gio/gthreadedresolver.c:118
 msgid "No valid addresses were found"
@@ -3264,37 +3264,37 @@ msgstr "నిస్సారమైన ఆతిథ్య నామము"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:201
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "ఉ."
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:203
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "సా."
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:206
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %b %e %H:%M:%S %Y"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:209
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%m/%d/%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:212
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:215
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 

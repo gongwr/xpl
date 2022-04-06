@@ -32,15 +32,15 @@ msgstr ""
 "X-Generator: Poedit 2.4.2\n"
 
 #: gio/gapplication.c:500
-msgid "GApplication options"
-msgstr "GApplication-valitsimet"
+msgid "xapplication_t options"
+msgstr "xapplication_t-valitsimet"
 
 #: gio/gapplication.c:500
-msgid "Show GApplication options"
-msgstr "Näytä GApplication-valitsimet"
+msgid "Show xapplication_t options"
+msgstr "Näytä xapplication_t-valitsimet"
 
 #: gio/gapplication.c:545
-msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
 msgstr ""
 
 #: gio/gapplication.c:557
@@ -284,9 +284,9 @@ msgstr "Virta ei tue siirtymistä"
 
 #: gio/gbufferedinputstream.c:938
 #, fuzzy
-#| msgid "Cannot truncate GMemoryInputStream"
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "GMemoryInputStream-kohdetta ei voi kutistaa"
+#| msgid "Cannot truncate xmemory_input_stream_t"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "xmemory_input_stream_t-kohdetta ei voi kutistaa"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1237 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -361,28 +361,28 @@ msgid "%s filetype"
 msgstr "%s-tiedostotyyppi"
 
 #: gio/gcredentials.c:323
-msgid "GCredentials contains invalid data"
+msgid "xcredentials_t contains invalid data"
 msgstr ""
 
 #: gio/gcredentials.c:383 gio/gcredentials.c:667
-msgid "GCredentials is not implemented on this OS"
-msgstr "GCredentials ei ole toteutettu tälle käyttöjärjestelmälle"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "xcredentials_t ei ole toteutettu tälle käyttöjärjestelmälle"
 
 #: gio/gcredentials.c:538 gio/gcredentials.c:556
-msgid "There is no GCredentials support for your platform"
-msgstr "Alustallesi ei ole GCredentials-tukea"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "Alustallesi ei ole xcredentials_t-tukea"
 
 #: gio/gcredentials.c:607
 #, fuzzy
-#| msgid "GCredentials is not implemented on this OS"
-msgid "GCredentials does not contain a process ID on this OS"
-msgstr "GCredentials ei ole toteutettu tälle käyttöjärjestelmälle"
+#| msgid "xcredentials_t is not implemented on this OS"
+msgid "xcredentials_t does not contain a process ID on this OS"
+msgstr "xcredentials_t ei ole toteutettu tälle käyttöjärjestelmälle"
 
 #: gio/gcredentials.c:661
 #, fuzzy
-#| msgid "GCredentials is not implemented on this OS"
+#| msgid "xcredentials_t is not implemented on this OS"
 msgid "Credentials spoofing is not possible on this OS"
-msgstr "GCredentials ei ole toteutettu tälle käyttöjärjestelmälle"
+msgstr "xcredentials_t ei ole toteutettu tälle käyttöjärjestelmälle"
 
 #: gio/gdatainputstream.c:304
 msgid "Unexpected early end-of-stream"
@@ -615,9 +615,9 @@ msgid "User IDs must be the same for peer and server"
 msgstr ""
 
 #: gio/gdbusauth.c:1182
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
 msgstr ""
-"Peruutus kohteen GDBusAuthObserver::authorize-authenticated-peer kautta"
+"Peruutus kohteen xdbus_auth_observer_t::authorize-authenticated-peer kautta"
 
 #: gio/gdbusauthmechanismsha1.c:298
 #, fuzzy, c-format
@@ -1515,29 +1515,29 @@ msgstr "DTLS-tukea ei ole saatavilla"
 
 #: gio/gemblem.c:323
 #, fuzzy, c-format
-#| msgid "Can't handle version %d of GEmblem encoding"
-msgid "Can’t handle version %d of GEmblem encoding"
-msgstr "GEmblem-koodauksen versiota %d ei voi käsitellä"
+#| msgid "Can't handle version %d of xemblem_t encoding"
+msgid "Can’t handle version %d of xemblem_t encoding"
+msgstr "xemblem_t-koodauksen versiota %d ei voi käsitellä"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "Virheellinen määrä tunnisteita (%d) GEmblem-koodauksessa"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "Virheellinen määrä tunnisteita (%d) xemblem_t-koodauksessa"
 
 #: gio/gemblemedicon.c:362
 #, fuzzy, c-format
-#| msgid "Can't handle version %d of GEmblemedIcon encoding"
-msgid "Can’t handle version %d of GEmblemedIcon encoding"
-msgstr "GEmblemedIcon-koodauksen versiota %d ei voi käsitellä"
+#| msgid "Can't handle version %d of xemblemed_icon_t encoding"
+msgid "Can’t handle version %d of xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t-koodauksen versiota %d ei voi käsitellä"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "Virheellinen määrä tunnisteita (%d) GEmblemedIcon-koodauksessa"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "Virheellinen määrä tunnisteita (%d) xemblemed_icon_t-koodauksessa"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "Oletettiin GEmblen kohteelle GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "Oletettiin GEmblen kohteelle xemblemed_icon_t"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1638,13 +1638,13 @@ msgstr "Numeraattori on jo suljettu"
 
 #: gio/gfileicon.c:250
 #, fuzzy, c-format
-#| msgid "Can't handle version %d of GFileIcon encoding"
-msgid "Can’t handle version %d of GFileIcon encoding"
-msgstr "GFileIcon-koodauksen versiota %d ei voi käsitellä"
+#| msgid "Can't handle version %d of xfile_icon_t encoding"
+msgid "Can’t handle version %d of xfile_icon_t encoding"
+msgstr "xfile_icon_t-koodauksen versiota %d ei voi käsitellä"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for GFileIcon"
-msgstr "Virheellistä syötetietoa GFileIcon-oliolle"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "Virheellistä syötetietoa xfile_icon_t-oliolle"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -1817,9 +1817,9 @@ msgstr "Kopioi yksi tai useampi tiedosto"
 
 #: gio/gio-tool.c:231
 #, fuzzy
-#| msgid "Show GApplication options"
+#| msgid "Show xapplication_t options"
 msgid "Show information about locations"
-msgstr "Näytä GApplication-valitsimet"
+msgstr "Näytä xapplication_t-valitsimet"
 
 #: gio/gio-tool.c:232
 msgid "Launch an application from a desktop file"
@@ -2066,9 +2066,9 @@ msgstr ""
 
 #: gio/gio-tool-info.c:345
 #, fuzzy
-#| msgid "Show GApplication options"
+#| msgid "Show xapplication_t options"
 msgid "Show information about locations."
-msgstr "Näytä GApplication-valitsimet"
+msgstr "Näytä xapplication_t-valitsimet"
 
 #: gio/gio-tool-info.c:347
 msgid ""
@@ -2096,9 +2096,9 @@ msgstr ""
 
 #: gio/gio-tool-launch.c:85
 #, fuzzy
-#| msgid "There is no GCredentials support for your platform"
+#| msgid "There is no xcredentials_t support for your platform"
 msgid "The launch command is not currently supported on this platform"
-msgstr "Alustallesi ei ole GCredentials-tukea"
+msgstr "Alustallesi ei ole xcredentials_t-tukea"
 
 #: gio/gio-tool-launch.c:98
 #, fuzzy, c-format
@@ -2318,7 +2318,7 @@ msgstr ""
 
 #: gio/gio-tool-mount.c:75
 #, fuzzy
-#| msgctxt "GDateTime"
+#| msgctxt "xdatetime_t"
 #| msgid "PM"
 msgid "PIM"
 msgstr "ip."
@@ -2679,7 +2679,7 @@ msgid ""
 "Resource specification files have the extension .gresource.xml,\n"
 "and the resource file have the extension called .gresource."
 msgstr ""
-"Käännä kaikki GSettings-skeematiedostot skeema-välimuistiin.\n"
+"Käännä kaikki xsettings_t-skeematiedostot skeema-välimuistiin.\n"
 "Skeematiedostoilla tulee olla pääte .gschema.xml ja\n"
 "välimuistitiedoston nimi on gschemas.compiled."
 
@@ -3191,11 +3191,11 @@ msgstr "Älä pakota avainnimirajoituksia"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Käännä kaikki GSettings-skeematiedostot skeema-välimuistiin.\n"
+"Käännä kaikki xsettings_t-skeematiedostot skeema-välimuistiin.\n"
 "Skeematiedostoilla tulee olla pääte .gschema.xml ja\n"
 "välimuistitiedoston nimi on gschemas.compiled."
 
@@ -3582,8 +3582,8 @@ msgid "Invalid seek request"
 msgstr "Virheellinen siirtymispyyntö"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "GMemoryInputStream-kohdetta ei voi kutistaa"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "xmemory_input_stream_t-kohdetta ei voi kutistaa"
 
 #: gio/gmemoryoutputstream.c:567
 msgid "Memory output stream not resizable"
@@ -4273,9 +4273,9 @@ msgid "Error sending message: %s"
 msgstr "Virhe lähetettäessä viestiä: %s"
 
 #: gio/gsocket.c:5026
-#| msgid "GSocketControlMessage not supported on windows"
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "GSocketControlMessage ei ole tuettu Windowsissa"
+#| msgid "xsocket_control_message_t not supported on windows"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "xsocket_control_message_t ei ole tuettu Windowsissa"
 
 #: gio/gsocket.c:5495 gio/gsocket.c:5571 gio/gsocket.c:5797
 #, c-format
@@ -4423,8 +4423,8 @@ msgstr "Tuntematon SOCKSv5-välityspalvelinvirhe."
 
 #: gio/gthemedicon.c:595
 #, fuzzy, c-format
-#| msgid "Can't handle version %d of GThemedIcon encoding"
-msgid "Can’t handle version %d of GThemedIcon encoding"
+#| msgid "Can't handle version %d of xthemed_icon_t encoding"
+msgid "Can’t handle version %d of xthemed_icon_t encoding"
 msgstr "GThemeIcon-koodauksen versiota %d ei voi käsitellä"
 
 #: gio/gthreadedresolver.c:152
@@ -4477,7 +4477,7 @@ msgid "Could not parse PEM-encoded certificate"
 msgstr "PEM-koodattu varmennetta ei voitu jäsentää"
 
 #: gio/gtlscertificate.c:710
-msgid "This GTlsBackend does not support creating PKCS #11 certificates"
+msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
 msgstr ""
 
 #: gio/gtlspassword.c:111
@@ -4810,25 +4810,25 @@ msgstr "Polku ”%s” ei ole absoluuttinen"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %e. %Bta %Y %H.%M.%S"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%-d.%-m.%Y"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H.%M.%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -5211,13 +5211,13 @@ msgstr "joulu"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "ap."
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "ip."
 

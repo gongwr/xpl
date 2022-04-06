@@ -469,7 +469,7 @@ _file_sync_stream_free (GWin32FileSyncStream *self)
  *
  * The returned stream object should be treated just like any other
  * COM object, and released via `IUnknown_Release()`.
- * its elements have been unreffed with g_object_unref().
+ * its elements have been unreffed with xobject_unref().
  *
  * Returns: (nullable) (transfer full): a new IStream object on success, %NULL on failure.
  **/

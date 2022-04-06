@@ -27,7 +27,7 @@
 #include "gdbus-tests.h"
 
 /* all tests rely on a shared mainloop */
-static GMainLoop *loop = NULL;
+static xmain_loop_t *loop = NULL;
 
 #if 0
 G_GNUC_UNUSED static void
@@ -41,7 +41,7 @@ _log (const xchar_t *format, ...)
   va_list var_args;
 
   va_start (var_args, format);
-  str = g_strdup_vprintf (format, var_args);
+  str = xstrdup_vprintf (format, var_args);
   va_end (var_args);
 
   g_get_current_time (&now);
@@ -64,7 +64,7 @@ test_connection_quit_mainloop (xpointer_t user_data)
   xboolean_t *quit_mainloop_fired = user_data;  /* (atomic) */
   _log ("quit_mainloop_fired");
   g_atomic_int_set (quit_mainloop_fired, TRUE);
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
   return G_SOURCE_CONTINUE;
 }
 
@@ -72,17 +72,17 @@ test_connection_quit_mainloop (xpointer_t user_data)
 /* Connection life-cycle testing */
 /* ---------------------------------------------------------------------------------------------------- */
 
-static const GDBusInterfaceInfo boo_interface_info =
+static const xdbus_interface_info_t boo_interface_info =
 {
   -1,
   "org.example.Boo",
-  (GDBusMethodInfo **) NULL,
-  (GDBusSignalInfo **) NULL,
-  (GDBusPropertyInfo **) NULL,
+  (xdbus_method_info_t **) NULL,
+  (xdbus_signalInfo_t **) NULL,
+  (xdbus_property_info_t **) NULL,
   NULL,
 };
 
-static const GDBusInterfaceVTable boo_vtable =
+static const xdbus_interface_vtable_t boo_vtable =
 {
   NULL, /* _method_call */
   NULL, /* _get_property */
@@ -91,9 +91,9 @@ static const GDBusInterfaceVTable boo_vtable =
 };
 
 /* Runs in a worker thread. */
-static GDBusMessage *
-some_filter_func (GDBusConnection *connection,
-                  GDBusMessage    *message,
+static xdbus_message_t *
+some_filter_func (xdbus_connection_t *connection,
+                  xdbus_message_t    *message,
                   xboolean_t         incoming,
                   xpointer_t         user_data)
 {
@@ -101,7 +101,7 @@ some_filter_func (GDBusConnection *connection,
 }
 
 static void
-on_name_owner_changed (GDBusConnection *connection,
+on_name_owner_changed (xdbus_connection_t *connection,
                        const xchar_t     *sender_name,
                        const xchar_t     *object_path,
                        const xchar_t     *interface_name,
@@ -117,13 +117,13 @@ a_gdestroynotify_that_sets_a_gboolean_to_true_and_quits_loop (xpointer_t user_da
   xboolean_t *val = user_data;  /* (atomic) */
   g_atomic_int_set (val, TRUE);
   _log ("destroynotify fired for %p", val);
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
 test_connection_bus_failure (void)
 {
-  GDBusConnection *c;
+  xdbus_connection_t *c;
   xerror_t *error = NULL;
 
   /*
@@ -134,15 +134,15 @@ test_connection_bus_failure (void)
   g_assert_nonnull (error);
   g_assert_false (g_dbus_error_is_remote_error (error));
   g_assert_null (c);
-  g_error_free (error);
+  xerror_free (error);
 }
 
 static void
 test_connection_life_cycle (void)
 {
   xboolean_t ret;
-  GDBusConnection *c;
-  GDBusConnection *c2;
+  xdbus_connection_t *c;
+  xdbus_connection_t *c2;
   xerror_t *error;
   xboolean_t on_signal_registration_freed_called;  /* (atomic) */
   xboolean_t on_filter_freed_called;  /* (atomic) */
@@ -172,7 +172,7 @@ test_connection_life_cycle (void)
   g_assert_no_error (error);
   g_assert_nonnull (c2);
   g_assert_true (c == c2);
-  g_object_unref (c2);
+  xobject_unref (c2);
 
   /*
    * Check that private connections work
@@ -181,7 +181,7 @@ test_connection_life_cycle (void)
   g_assert_no_error (error);
   g_assert_nonnull (c2);
   g_assert_true (c != c2);
-  g_object_unref (c2);
+  xobject_unref (c2);
 
   c2 = _g_bus_get_priv (G_BUS_TYPE_SESSION, NULL, &error);
   g_assert_no_error (error);
@@ -194,14 +194,14 @@ test_connection_life_cycle (void)
   g_assert_true (g_dbus_connection_is_closed (c2));
   ret = g_dbus_connection_close_sync (c2, NULL, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED);
-  g_error_free (error);
+  xerror_free (error);
   g_assert_false (ret);
-  g_object_unref (c2);
+  xobject_unref (c2);
 
   /*
    * Check that the finalization code works
    *
-   * (and that the GDestroyNotify for filters and objects and signal
+   * (and that the xdestroy_notify_t for filters and objects and signal
    * registrations are run as expected)
    */
   error = NULL;
@@ -231,15 +231,15 @@ test_connection_life_cycle (void)
   error = NULL;
   registration_id = g_dbus_connection_register_object (c2,
                                                        "/foo",
-                                                       (GDBusInterfaceInfo *) &boo_interface_info,
+                                                       (xdbus_interface_info_t *) &boo_interface_info,
                                                        &boo_vtable,
                                                        (xpointer_t) &on_register_object_freed_called,
                                                        a_gdestroynotify_that_sets_a_gboolean_to_true_and_quits_loop,
                                                        &error);
   g_assert_no_error (error);
   g_assert_cmpuint (registration_id, >, 0);
-  /* ok, finalize the connection and check that all the GDestroyNotify functions are invoked as expected */
-  g_object_unref (c2);
+  /* ok, finalize the connection and check that all the xdestroy_notify_t functions are invoked as expected */
+  xobject_unref (c2);
   g_atomic_int_set (&quit_mainloop_fired, FALSE);
   quit_mainloop_id = g_timeout_add (30000, test_connection_quit_mainloop, (xpointer_t) &quit_mainloop_fired);
   _log ("destroynotifies for\n"
@@ -258,10 +258,10 @@ test_connection_life_cycle (void)
       if (g_atomic_int_get (&quit_mainloop_fired))
         break;
       _log ("entering loop");
-      g_main_loop_run (loop);
+      xmain_loop_run (loop);
       _log ("exiting loop");
     }
-  g_source_remove (quit_mainloop_id);
+  xsource_remove (quit_mainloop_id);
   g_assert_true (g_atomic_int_get (&on_signal_registration_freed_called));
   g_assert_true (g_atomic_int_get (&on_filter_freed_called));
   g_assert_true (g_atomic_int_get (&on_register_object_freed_called));
@@ -276,7 +276,7 @@ test_connection_life_cycle (void)
   session_bus_stop ();
   _g_assert_signal_received (c, "closed");
   g_assert_true (g_dbus_connection_is_closed (c));
-  g_object_unref (c);
+  xobject_unref (c);
 
   session_bus_down ();
 }
@@ -286,7 +286,7 @@ test_connection_life_cycle (void)
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-msg_cb_expect_error_disconnected (GDBusConnection *connection,
+msg_cb_expect_error_disconnected (xdbus_connection_t *connection,
                                   xasync_result_t    *res,
                                   xpointer_t         user_data)
 {
@@ -302,14 +302,14 @@ msg_cb_expect_error_disconnected (GDBusConnection *connection,
                                           &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED);
   g_assert_false (g_dbus_error_is_remote_error (error));
-  g_error_free (error);
+  xerror_free (error);
   g_assert_null (result);
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
-msg_cb_expect_error_unknown_method (GDBusConnection *connection,
+msg_cb_expect_error_unknown_method (xdbus_connection_t *connection,
                                     xasync_result_t    *res,
                                     xpointer_t         user_data)
 {
@@ -325,14 +325,14 @@ msg_cb_expect_error_unknown_method (GDBusConnection *connection,
                                           &error);
   g_assert_error (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD);
   g_assert_true (g_dbus_error_is_remote_error (error));
-  g_error_free (error);
+  xerror_free (error);
   g_assert_null (result);
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
-msg_cb_expect_success (GDBusConnection *connection,
+msg_cb_expect_success (xdbus_connection_t *connection,
                        xasync_result_t    *res,
                        xpointer_t         user_data)
 {
@@ -348,13 +348,13 @@ msg_cb_expect_success (GDBusConnection *connection,
                                           &error);
   g_assert_no_error (error);
   g_assert_nonnull (result);
-  g_variant_unref (result);
+  xvariant_unref (result);
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
-msg_cb_expect_error_cancelled (GDBusConnection *connection,
+msg_cb_expect_error_cancelled (xdbus_connection_t *connection,
                                xasync_result_t    *res,
                                xpointer_t         user_data)
 {
@@ -370,14 +370,14 @@ msg_cb_expect_error_cancelled (GDBusConnection *connection,
                                           &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
   g_assert_false (g_dbus_error_is_remote_error (error));
-  g_error_free (error);
+  xerror_free (error);
   g_assert_null (result);
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
-msg_cb_expect_error_cancelled_2 (GDBusConnection *connection,
+msg_cb_expect_error_cancelled_2 (xdbus_connection_t *connection,
                                  xasync_result_t    *res,
                                  xpointer_t         user_data)
 {
@@ -393,10 +393,10 @@ msg_cb_expect_error_cancelled_2 (GDBusConnection *connection,
                                           &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
   g_assert_false (g_dbus_error_is_remote_error (error));
-  g_error_free (error);
+  xerror_free (error);
   g_assert_null (result);
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -404,7 +404,7 @@ msg_cb_expect_error_cancelled_2 (GDBusConnection *connection,
 static void
 test_connection_send (void)
 {
-  GDBusConnection *c;
+  xdbus_connection_t *c;
   xcancellable_t *ca;
 
   session_bus_up ();
@@ -432,8 +432,8 @@ test_connection_send (void)
                           ca,
                           (xasync_ready_callback_t) msg_cb_expect_error_cancelled,
                           NULL);
-  g_main_loop_run (loop);
-  g_object_unref (ca);
+  xmain_loop_run (loop);
+  xobject_unref (ca);
 
   /*
    * Check that we get a reply to the GetId() method call.
@@ -449,7 +449,7 @@ test_connection_send (void)
                           NULL,
                           (xasync_ready_callback_t) msg_cb_expect_success,
                           NULL);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   /*
    * Check that we get an error reply to the NonExistantMethod() method call.
@@ -465,7 +465,7 @@ test_connection_send (void)
                           NULL,
                           (xasync_ready_callback_t) msg_cb_expect_error_unknown_method,
                           NULL);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   /*
    * Check that cancellation works when the message is already in flight.
@@ -483,8 +483,8 @@ test_connection_send (void)
                           (xasync_ready_callback_t) msg_cb_expect_error_cancelled_2,
                           NULL);
   g_cancellable_cancel (ca);
-  g_main_loop_run (loop);
-  g_object_unref (ca);
+  xmain_loop_run (loop);
+  xobject_unref (ca);
 
   /*
    * Check that we get an error when sending to a connection that is disconnected.
@@ -505,9 +505,9 @@ test_connection_send (void)
                           NULL,
                           (xasync_ready_callback_t) msg_cb_expect_error_disconnected,
                           NULL);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
-  g_object_unref (c);
+  xobject_unref (c);
 
   session_bus_down ();
 }
@@ -517,7 +517,7 @@ test_connection_send (void)
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-test_connection_signal_handler (GDBusConnection  *connection,
+test_connection_signal_handler (xdbus_connection_t  *connection,
                                 const xchar_t      *sender_name,
                                 const xchar_t      *object_path,
                                 const xchar_t      *interface_name,
@@ -534,15 +534,15 @@ test_connection_signal_handler (GDBusConnection  *connection,
            interface_name,
            signal_name);*/
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
 test_connection_signals (void)
 {
-  GDBusConnection *c1;
-  GDBusConnection *c2;
-  GDBusConnection *c3;
+  xdbus_connection_t *c1;
+  xdbus_connection_t *c2;
+  xdbus_connection_t *c3;
   xuint_t s1;
   xuint_t s1b;
   xuint_t s2;
@@ -571,7 +571,7 @@ test_connection_signals (void)
       c1 = _g_bus_get_priv (G_BUS_TYPE_SESSION, NULL, NULL);
       g_assert_nonnull (c1);
       g_assert_false (g_dbus_connection_is_closed (c1));
-      g_object_unref (c1);
+      xobject_unref (c1);
     }
   c1 = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
   g_assert_nonnull (c1);
@@ -581,15 +581,15 @@ test_connection_signals (void)
   /*
    * Install two signal handlers for the first connection
    *
-   *  - Listen to the signal "Foo" from :1.2 (e.g. c2)
-   *  - Listen to the signal "Foo" from anyone (e.g. both c2 and c3)
+   *  - Listen to the signal "foo_t" from :1.2 (e.g. c2)
+   *  - Listen to the signal "foo_t" from anyone (e.g. both c2 and c3)
    *
    * and then count how many times this signal handler was invoked.
    */
   s1 = g_dbus_connection_signal_subscribe (c1,
                                            ":1.2",
                                            "org.gtk.GDBus.ExampleInterface",
-                                           "Foo",
+                                           "foo_t",
                                            "/org/gtk/GDBus/ExampleInterface",
                                            NULL,
                                            G_DBUS_SIGNAL_FLAGS_NONE,
@@ -599,7 +599,7 @@ test_connection_signals (void)
   s2 = g_dbus_connection_signal_subscribe (c1,
                                            NULL, /* match any sender */
                                            "org.gtk.GDBus.ExampleInterface",
-                                           "Foo",
+                                           "foo_t",
                                            "/org/gtk/GDBus/ExampleInterface",
                                            NULL,
                                            G_DBUS_SIGNAL_FLAGS_NONE,
@@ -623,7 +623,7 @@ test_connection_signals (void)
   s1b = g_dbus_connection_signal_subscribe (c1,
                                             ":1.2",
                                             "org.gtk.GDBus.ExampleInterface",
-                                            "Foo",
+                                            "foo_t",
                                             "/org/gtk/GDBus/ExampleInterface",
                                             NULL,
                                             G_DBUS_SIGNAL_FLAGS_NONE,
@@ -641,7 +641,7 @@ test_connection_signals (void)
   count_name_owner_changed = 0;
 
   /*
-   * Make c2 emit "Foo" - we should catch it twice
+   * Make c2 emit "foo_t" - we should catch it twice
    *
    * Note that there is no way to be sure that the signal subscriptions
    * on c1 are effective yet - for all we know, the AddMatch() messages
@@ -664,7 +664,7 @@ test_connection_signals (void)
                                         &error);
   g_assert_no_error (error);
   g_assert_nonnull (result);
-  g_variant_unref (result);
+  xvariant_unref (result);
 
   /*
    * Bring up two other connections
@@ -683,30 +683,30 @@ test_connection_signals (void)
                                        NULL, /* destination bus name */
                                        "/org/gtk/GDBus/ExampleInterface",
                                        "org.gtk.GDBus.ExampleInterface",
-                                       "Foo",
+                                       "foo_t",
                                        NULL,
                                        &error);
   g_assert_no_error (error);
   g_assert_true (ret);
   while (!(count_s1 >= 1 && count_s2 >= 1))
-    g_main_loop_run (loop);
+    xmain_loop_run (loop);
   g_assert_cmpint (count_s1, ==, 1);
   g_assert_cmpint (count_s2, ==, 1);
 
   /*
-   * Make c3 emit "Foo" - we should catch it only once
+   * Make c3 emit "foo_t" - we should catch it only once
    */
   ret = g_dbus_connection_emit_signal (c3,
                                        NULL, /* destination bus name */
                                        "/org/gtk/GDBus/ExampleInterface",
                                        "org.gtk.GDBus.ExampleInterface",
-                                       "Foo",
+                                       "foo_t",
                                        NULL,
                                        &error);
   g_assert_no_error (error);
   g_assert_true (ret);
   while (!(count_s1 == 1 && count_s2 == 2))
-    g_main_loop_run (loop);
+    xmain_loop_run (loop);
   g_assert_cmpint (count_s1, ==, 1);
   g_assert_cmpint (count_s2, ==, 2);
 
@@ -717,8 +717,8 @@ test_connection_signals (void)
   quit_mainloop_fired = FALSE;
   quit_mainloop_id = g_timeout_add (30000, test_connection_quit_mainloop, &quit_mainloop_fired);
   while (count_name_owner_changed < 2 && !quit_mainloop_fired)
-    g_main_loop_run (loop);
-  g_source_remove (quit_mainloop_id);
+    xmain_loop_run (loop);
+  xsource_remove (quit_mainloop_id);
   g_assert_cmpint (count_s1, ==, 1);
   g_assert_cmpint (count_s2, ==, 2);
   g_assert_cmpint (count_name_owner_changed, ==, 2);
@@ -728,15 +728,15 @@ test_connection_signals (void)
   g_dbus_connection_signal_unsubscribe (c1, s3);
   g_dbus_connection_signal_unsubscribe (c1, s1b);
 
-  g_object_unref (c1);
-  g_object_unref (c2);
-  g_object_unref (c3);
+  xobject_unref (c1);
+  xobject_unref (c2);
+  xobject_unref (c3);
 
   session_bus_down ();
 }
 
 static void
-test_match_rule (GDBusConnection  *connection,
+test_match_rule (xdbus_connection_t  *connection,
                  GDBusSignalFlags  flags,
                  xchar_t            *arg0_rule,
                  xchar_t            *arg0,
@@ -748,13 +748,13 @@ test_match_rule (GDBusConnection  *connection,
   xerror_t *error = NULL;
 
   subscription_ids[0] = g_dbus_connection_signal_subscribe (connection,
-                                                            NULL, "org.gtk.ExampleInterface", "Foo", "/",
+                                                            NULL, "org.gtk.ExampleInterface", "foo_t", "/",
                                                             NULL,
                                                             G_DBUS_SIGNAL_FLAGS_NONE,
                                                             test_connection_signal_handler,
                                                             &emissions, NULL);
   subscription_ids[1] = g_dbus_connection_signal_subscribe (connection,
-                                                            NULL, "org.gtk.ExampleInterface", "Foo", "/",
+                                                            NULL, "org.gtk.ExampleInterface", "foo_t", "/",
                                                             arg0_rule,
                                                             flags,
                                                             test_connection_signal_handler,
@@ -764,16 +764,16 @@ test_match_rule (GDBusConnection  *connection,
 
   g_dbus_connection_emit_signal (connection,
                                  NULL, "/", "org.gtk.ExampleInterface",
-                                 "Foo", g_variant_new ("(s)", arg0),
+                                 "foo_t", xvariant_new ("(s)", arg0),
                                  &error);
   g_assert_no_error (error);
 
   /* synchronously ping a non-existent method to make sure the signals are dispatched */
   g_dbus_connection_call_sync (connection, "org.gtk.ExampleInterface", "/", "org.gtk.ExampleInterface",
-                               "Bar", g_variant_new ("()"), G_VARIANT_TYPE_UNIT, G_DBUS_CALL_FLAGS_NONE,
+                               "Bar", xvariant_new ("()"), G_VARIANT_TYPE_UNIT, G_DBUS_CALL_FLAGS_NONE,
                                -1, NULL, NULL);
 
-  while (g_main_context_iteration (NULL, FALSE))
+  while (xmain_context_iteration (NULL, FALSE))
     ;
 
   g_assert_cmpint (emissions, ==, 1);
@@ -786,7 +786,7 @@ test_match_rule (GDBusConnection  *connection,
 static void
 test_connection_signal_match_rules (void)
 {
-  GDBusConnection *con;
+  xdbus_connection_t *con;
 
   session_bus_up ();
   con = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
@@ -808,7 +808,7 @@ test_connection_signal_match_rules (void)
   test_match_rule (con, G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_PATH, "/org/gtk/Example", "/org/gtk", FALSE);
   test_match_rule (con, G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_PATH, "/org/gtk+", "/org/gtk", FALSE);
 
-  g_object_unref (con);
+  xobject_unref (con);
   session_bus_down ();
 }
 
@@ -818,21 +818,21 @@ test_connection_signal_match_rules (void)
  * so all accesses must be atomic. */
 typedef struct
 {
-  GAsyncQueue *incoming_queue;  /* (element-type GDBusMessage) */
+  xasync_queue_t *incoming_queue;  /* (element-type xdbus_message_t) */
   xuint_t num_outgoing;  /* (atomic) */
 } FilterData;
 
 /* Runs in a worker thread. */
-static GDBusMessage *
-filter_func (GDBusConnection *connection,
-             GDBusMessage    *message,
+static xdbus_message_t *
+filter_func (xdbus_connection_t *connection,
+             xdbus_message_t    *message,
              xboolean_t         incoming,
              xpointer_t         user_data)
 {
   FilterData *data = user_data;
 
   if (incoming)
-    g_async_queue_push (data->incoming_queue, g_object_ref (message));
+    g_async_queue_push (data->incoming_queue, xobject_ref (message));
   else
     g_atomic_int_inc (&data->num_outgoing);
 
@@ -840,15 +840,15 @@ filter_func (GDBusConnection *connection,
 }
 
 static void
-wait_for_filtered_reply (GAsyncQueue *incoming_queue,
-                         guint32      expected_serial)
+wait_for_filtered_reply (xasync_queue_t *incoming_queue,
+                         xuint32_t      expected_serial)
 {
-  GDBusMessage *popped_message = NULL;
+  xdbus_message_t *popped_message = NULL;
 
   while ((popped_message = g_async_queue_pop (incoming_queue)) != NULL)
     {
-      guint32 reply_serial = g_dbus_message_get_reply_serial (popped_message);
-      g_object_unref (popped_message);
+      xuint32_t reply_serial = xdbus_message_get_reply_serial (popped_message);
+      xobject_unref (popped_message);
       if (reply_serial == expected_serial)
         return;
     }
@@ -863,14 +863,14 @@ typedef struct
 } FilterEffects;
 
 /* Runs in a worker thread. */
-static GDBusMessage *
-other_filter_func (GDBusConnection *connection,
-                   GDBusMessage    *message,
+static xdbus_message_t *
+other_filter_func (xdbus_connection_t *connection,
+                   xdbus_message_t    *message,
                    xboolean_t         incoming,
                    xpointer_t         user_data)
 {
   const FilterEffects *effects = user_data;
-  GDBusMessage *ret;
+  xdbus_message_t *ret;
   xboolean_t alter;
 
   if (incoming)
@@ -880,18 +880,18 @@ other_filter_func (GDBusConnection *connection,
 
   if (alter)
     {
-      GDBusMessage *copy;
+      xdbus_message_t *copy;
       xvariant_t *body;
       xchar_t *s;
       xchar_t *s2;
 
-      copy = g_dbus_message_copy (message, NULL);
-      g_object_unref (message);
+      copy = xdbus_message_copy (message, NULL);
+      xobject_unref (message);
 
-      body = g_dbus_message_get_body (copy);
-      g_variant_get (body, "(s)", &s);
-      s2 = g_strdup_printf ("MOD: %s", s);
-      g_dbus_message_set_body (copy, g_variant_new ("(s)", s2));
+      body = xdbus_message_get_body (copy);
+      xvariant_get (body, "(s)", &s);
+      s2 = xstrdup_printf ("MOD: %s", s);
+      xdbus_message_set_body (copy, xvariant_new ("(s)", s2));
       g_free (s2);
       g_free (s);
 
@@ -906,7 +906,7 @@ other_filter_func (GDBusConnection *connection,
 }
 
 static void
-test_connection_filter_name_owner_changed_signal_handler (GDBusConnection  *connection,
+test_connection_filter_name_owner_changed_signal_handler (xdbus_connection_t  *connection,
                                                           const xchar_t      *sender_name,
                                                           const xchar_t      *object_path,
                                                           const xchar_t      *interface_name,
@@ -918,15 +918,15 @@ test_connection_filter_name_owner_changed_signal_handler (GDBusConnection  *conn
   const xchar_t *old_owner;
   const xchar_t *new_owner;
 
-  g_variant_get (parameters,
+  xvariant_get (parameters,
                  "(&s&s&s)",
                  &name,
                  &old_owner,
                  &new_owner);
 
-  if (g_strcmp0 (name, "com.example.TestService") == 0 && strlen (new_owner) > 0)
+  if (xstrcmp0 (name, "com.example.TestService") == 0 && strlen (new_owner) > 0)
     {
-      g_main_loop_quit (loop);
+      xmain_loop_quit (loop);
     }
 }
 
@@ -941,11 +941,11 @@ test_connection_filter_on_timeout (xpointer_t user_data)
 static void
 test_connection_filter (void)
 {
-  GDBusConnection *c;
+  xdbus_connection_t *c;
   FilterData data = { NULL, 0 };
-  GDBusMessage *m;
-  GDBusMessage *m2;
-  GDBusMessage *r;
+  xdbus_message_t *m;
+  xdbus_message_t *m2;
+  xdbus_message_t *r;
   xerror_t *error;
   xuint_t filter_id;
   xuint_t timeout_mainloop_id;
@@ -953,7 +953,7 @@ test_connection_filter (void)
   FilterEffects effects;
   xvariant_t *result;
   const xchar_t *s;
-  guint32 serial_temp;
+  xuint32_t serial_temp;
 
   session_bus_up ();
 
@@ -962,44 +962,44 @@ test_connection_filter (void)
   g_assert_no_error (error);
   g_assert_nonnull (c);
 
-  data.incoming_queue = g_async_queue_new_full (g_object_unref);
+  data.incoming_queue = g_async_queue_new_full (xobject_unref);
   data.num_outgoing = 0;
   filter_id = g_dbus_connection_add_filter (c,
                                             filter_func,
                                             &data,
                                             NULL);
 
-  m = g_dbus_message_new_method_call ("org.freedesktop.DBus", /* name */
+  m = xdbus_message_new_method_call ("org.freedesktop.DBus", /* name */
                                       "/org/freedesktop/DBus", /* path */
                                       "org.freedesktop.DBus", /* interface */
                                       "GetNameOwner");
-  g_dbus_message_set_body (m, g_variant_new ("(s)", "org.freedesktop.DBus"));
+  xdbus_message_set_body (m, xvariant_new ("(s)", "org.freedesktop.DBus"));
   error = NULL;
   g_dbus_connection_send_message (c, m, G_DBUS_SEND_MESSAGE_FLAGS_NONE, &serial_temp, &error);
   g_assert_no_error (error);
 
   wait_for_filtered_reply (data.incoming_queue, serial_temp);
 
-  m2 = g_dbus_message_copy (m, &error);
+  m2 = xdbus_message_copy (m, &error);
   g_assert_no_error (error);
   g_dbus_connection_send_message (c, m2, G_DBUS_SEND_MESSAGE_FLAGS_NONE, &serial_temp, &error);
-  g_object_unref (m2);
+  xobject_unref (m2);
   g_assert_no_error (error);
 
   wait_for_filtered_reply (data.incoming_queue, serial_temp);
 
-  m2 = g_dbus_message_copy (m, &error);
+  m2 = xdbus_message_copy (m, &error);
   g_assert_no_error (error);
-  g_dbus_message_set_serial (m2, serial_temp);
+  xdbus_message_set_serial (m2, serial_temp);
   /* lock the message to test PRESERVE_SERIAL flag. */
-  g_dbus_message_lock (m2);
+  xdbus_message_lock (m2);
   g_dbus_connection_send_message (c, m2, G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL, &serial_temp, &error);
-  g_object_unref (m2);
+  xobject_unref (m2);
   g_assert_no_error (error);
 
   wait_for_filtered_reply (data.incoming_queue, serial_temp);
 
-  m2 = g_dbus_message_copy (m, &error);
+  m2 = xdbus_message_copy (m, &error);
   g_assert_no_error (error);
   r = g_dbus_connection_send_message_with_reply_sync (c,
                                                       m2,
@@ -1008,17 +1008,17 @@ test_connection_filter (void)
                                                       &serial_temp,
                                                       NULL, /* xcancellable_t */
                                                       &error);
-  g_object_unref (m2);
+  xobject_unref (m2);
   g_assert_no_error (error);
   g_assert_nonnull (r);
-  g_object_unref (r);
+  xobject_unref (r);
 
   wait_for_filtered_reply (data.incoming_queue, serial_temp);
   g_assert_cmpint (g_async_queue_length (data.incoming_queue), ==, 0);
 
   g_dbus_connection_remove_filter (c, filter_id);
 
-  m2 = g_dbus_message_copy (m, &error);
+  m2 = xdbus_message_copy (m, &error);
   g_assert_no_error (error);
   r = g_dbus_connection_send_message_with_reply_sync (c,
                                                       m2,
@@ -1027,10 +1027,10 @@ test_connection_filter (void)
                                                       &serial_temp,
                                                       NULL, /* xcancellable_t */
                                                       &error);
-  g_object_unref (m2);
+  xobject_unref (m2);
   g_assert_no_error (error);
   g_assert_nonnull (r);
-  g_object_unref (r);
+  xobject_unref (r);
   g_assert_cmpint (g_async_queue_length (data.incoming_queue), ==, 0);
   g_assert_cmpint (g_atomic_int_get (&data.num_outgoing), ==, 4);
 
@@ -1051,8 +1051,8 @@ test_connection_filter (void)
   g_assert_true (g_spawn_command_line_async (g_test_get_filename (G_TEST_BUILT, "gdbus-testserver", NULL), NULL));
 
   timeout_mainloop_id = g_timeout_add (30000, test_connection_filter_on_timeout, NULL);
-  g_main_loop_run (loop);
-  g_source_remove (timeout_mainloop_id);
+  xmain_loop_run (loop);
+  xsource_remove (timeout_mainloop_id);
   g_dbus_connection_signal_unsubscribe (c, signal_handler_id);
 
   /* now test some combinations... */
@@ -1066,44 +1066,44 @@ test_connection_filter (void)
   error = NULL;
   result = g_dbus_connection_call_sync (c,
                                         "com.example.TestService",      /* bus name */
-                                        "/com/example/TestObject",      /* object path */
+                                        "/com/example/test_object_t",      /* object path */
                                         "com.example.Frob",             /* interface name */
                                         "HelloWorld",                   /* method name */
-                                        g_variant_new ("(s)", "Cat"),   /* parameters */
+                                        xvariant_new ("(s)", "Cat"),   /* parameters */
                                         G_VARIANT_TYPE ("(s)"),         /* return type */
                                         G_DBUS_CALL_FLAGS_NONE,
                                         -1,
                                         NULL,
                                         &error);
   g_assert_no_error (error);
-  g_variant_get (result, "(&s)", &s);
+  xvariant_get (result, "(&s)", &s);
   g_assert_cmpstr (s, ==, "You greeted me with 'Cat'. Thanks!");
-  g_variant_unref (result);
+  xvariant_unref (result);
   /* -- */
   effects.alter_incoming = TRUE;
   effects.alter_outgoing = TRUE;
   error = NULL;
   result = g_dbus_connection_call_sync (c,
                                         "com.example.TestService",      /* bus name */
-                                        "/com/example/TestObject",      /* object path */
+                                        "/com/example/test_object_t",      /* object path */
                                         "com.example.Frob",             /* interface name */
                                         "HelloWorld",                   /* method name */
-                                        g_variant_new ("(s)", "Cat"),   /* parameters */
+                                        xvariant_new ("(s)", "Cat"),   /* parameters */
                                         G_VARIANT_TYPE ("(s)"),         /* return type */
                                         G_DBUS_CALL_FLAGS_NONE,
                                         -1,
                                         NULL,
                                         &error);
   g_assert_no_error (error);
-  g_variant_get (result, "(&s)", &s);
+  xvariant_get (result, "(&s)", &s);
   g_assert_cmpstr (s, ==, "MOD: You greeted me with 'MOD: Cat'. Thanks!");
-  g_variant_unref (result);
+  xvariant_unref (result);
 
 
   g_dbus_connection_remove_filter (c, filter_id);
 
-  g_object_unref (c);
-  g_object_unref (m);
+  xobject_unref (c);
+  xobject_unref (m);
   g_async_queue_unref (data.incoming_queue);
 
   session_bus_down ();
@@ -1114,28 +1114,28 @@ test_connection_filter (void)
 #define NUM_THREADS 50
 
 static void
-send_bogus_message (GDBusConnection *c, guint32 *out_serial)
+send_bogus_message (xdbus_connection_t *c, xuint32_t *out_serial)
 {
-  GDBusMessage *m;
+  xdbus_message_t *m;
   xerror_t *error;
 
-  m = g_dbus_message_new_method_call ("org.freedesktop.DBus", /* name */
+  m = xdbus_message_new_method_call ("org.freedesktop.DBus", /* name */
                                       "/org/freedesktop/DBus", /* path */
                                       "org.freedesktop.DBus", /* interface */
                                       "GetNameOwner");
-  g_dbus_message_set_body (m, g_variant_new ("(s)", "org.freedesktop.DBus"));
+  xdbus_message_set_body (m, xvariant_new ("(s)", "org.freedesktop.DBus"));
   error = NULL;
   g_dbus_connection_send_message (c, m, G_DBUS_SEND_MESSAGE_FLAGS_NONE, out_serial, &error);
   g_assert_no_error (error);
-  g_object_unref (m);
+  xobject_unref (m);
 }
 
 #define SLEEP_USEC (100 * 1000)
 
 static xpointer_t
-serials_thread_func (GDBusConnection *c)
+serials_thread_func (xdbus_connection_t *c)
 {
-  guint32 message_serial;
+  xuint32_t message_serial;
   xuint_t i;
 
   /* No calls on this thread yet */
@@ -1164,9 +1164,9 @@ serials_thread_func (GDBusConnection *c)
 static void
 test_connection_serials (void)
 {
-  GDBusConnection *c;
+  xdbus_connection_t *c;
   xerror_t *error;
-  GThread *pool[NUM_THREADS];
+  xthread_t *pool[NUM_THREADS];
   int i;
 
   session_bus_up ();
@@ -1185,11 +1185,11 @@ test_connection_serials (void)
 
   /* Start the threads */
   for (i = 0; i < NUM_THREADS; i++)
-    pool[i] = g_thread_new (NULL, (GThreadFunc) serials_thread_func, c);
+    pool[i] = xthread_new (NULL, (GThreadFunc) serials_thread_func, c);
 
   /* Wait until threads are finished */
   for (i = 0; i < NUM_THREADS; i++)
-      g_thread_join (pool[i]);
+      xthread_join (pool[i]);
 
   /* No calls in between on this thread, should be the last value */
   g_assert_cmpint (g_dbus_connection_get_last_serial (c), ==, 2);
@@ -1199,7 +1199,7 @@ test_connection_serials (void)
   /* All above calls + calls in threads */
   g_assert_cmpint (g_dbus_connection_get_last_serial (c), ==, 3 + NUM_THREADS);
 
-  g_object_unref (c);
+  xobject_unref (c);
 
   session_bus_down ();
 }
@@ -1209,7 +1209,7 @@ test_connection_serials (void)
 static void
 test_connection_basic (void)
 {
-  GDBusConnection *connection;
+  xdbus_connection_t *connection;
   xerror_t *error;
   GDBusCapabilityFlags flags;
   GDBusConnectionFlags connection_flags;
@@ -1218,7 +1218,7 @@ test_connection_basic (void)
   xboolean_t closed;
   xboolean_t exit_on_close;
   xio_stream_t *stream;
-  GCredentials *credentials;
+  xcredentials_t *credentials;
 
   session_bus_up ();
 
@@ -1239,7 +1239,7 @@ test_connection_basic (void)
   credentials = g_dbus_connection_get_peer_credentials (connection);
   g_assert_null (credentials);
 
-  g_object_get (connection,
+  xobject_get (connection,
                 "stream", &stream,
                 "guid", &guid,
                 "unique-name", &name,
@@ -1255,11 +1255,11 @@ test_connection_basic (void)
   g_assert_true (exit_on_close);
   g_assert_true (flags == G_DBUS_CAPABILITY_FLAGS_NONE ||
                  flags == G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING);
-  g_object_unref (stream);
+  xobject_unref (stream);
   g_free (name);
   g_free (guid);
 
-  g_object_unref (connection);
+  xobject_unref (connection);
 
   session_bus_down ();
 }
@@ -1275,7 +1275,7 @@ main (int   argc,
   g_test_init (&argc, &argv, NULL);
 
   /* all the tests rely on a shared main loop */
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   g_test_dbus_unset ();
 
@@ -1291,6 +1291,6 @@ main (int   argc,
   g_test_add_func ("/gdbus/connection/serials", test_connection_serials);
   ret = g_test_run();
 
-  g_main_loop_unref (loop);
+  xmain_loop_unref (loop);
   return ret;
 }

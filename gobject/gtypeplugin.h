@@ -26,7 +26,7 @@
 G_BEGIN_DECLS
 
 /* --- type macros --- */
-#define XTYPE_TYPE_PLUGIN		(g_type_plugin_get_type ())
+#define XTYPE_TYPE_PLUGIN		(xtype_plugin_get_type ())
 #define XTYPE_PLUGIN(inst)		(XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_TYPE_PLUGIN, GTypePlugin))
 #define XTYPE_PLUGIN_CLASS(vtable)	(XTYPE_CHECK_CLASS_CAST ((vtable), XTYPE_TYPE_PLUGIN, GTypePluginClass))
 #define X_IS_TYPE_PLUGIN(inst)		(XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_TYPE_PLUGIN))
@@ -55,29 +55,29 @@ typedef void  (*GTypePluginUnuse)		  (GTypePlugin     *plugin);
  * GTypePluginCompleteTypeInfo:
  * @plugin: the #GTypePlugin
  * @g_type: the #xtype_t whose info is completed
- * @info: the #GTypeInfo struct to fill in
- * @value_table: the #GTypeValueTable to fill in
+ * @info: the #xtype_info_t struct to fill in
+ * @value_table: the #xtype_value_table_t to fill in
  *
  * The type of the @complete_type_info function of #GTypePluginClass.
  */
 typedef void  (*GTypePluginCompleteTypeInfo)	  (GTypePlugin     *plugin,
 						   xtype_t            g_type,
-						   GTypeInfo       *info,
-						   GTypeValueTable *value_table);
+						   xtype_info_t       *info,
+						   xtype_value_table_t *value_table);
 /**
  * GTypePluginCompleteInterfaceInfo:
  * @plugin: the #GTypePlugin
  * @instance_type: the #xtype_t of an instantiatable type to which the interface
  *  is added
  * @interface_type: the #xtype_t of the interface whose info is completed
- * @info: the #GInterfaceInfo to fill in
+ * @info: the #xinterface_info_t to fill in
  *
  * The type of the @complete_interface_info function of #GTypePluginClass.
  */
 typedef void  (*GTypePluginCompleteInterfaceInfo) (GTypePlugin     *plugin,
 						   xtype_t            instance_type,
 						   xtype_t            interface_type,
-						   GInterfaceInfo  *info);
+						   xinterface_info_t  *info);
 /**
  * GTypePlugin:
  *
@@ -88,10 +88,10 @@ typedef void  (*GTypePluginCompleteInterfaceInfo) (GTypePlugin     *plugin,
  * GTypePluginClass:
  * @use_plugin: Increases the use count of the plugin.
  * @unuse_plugin: Decreases the use count of the plugin.
- * @complete_type_info: Fills in the #GTypeInfo and
- *  #GTypeValueTable structs for the type. The structs are initialized
+ * @complete_type_info: Fills in the #xtype_info_t and
+ *  #xtype_value_table_t structs for the type. The structs are initialized
  *  with `memset(s, 0, sizeof (s))` before calling this function.
- * @complete_interface_info: Fills in missing parts of the #GInterfaceInfo
+ * @complete_interface_info: Fills in missing parts of the #xinterface_info_t
  *  for the interface. The structs is initialized with
  *  `memset(s, 0, sizeof (s))` before calling this function.
  *
@@ -113,21 +113,21 @@ struct _GTypePluginClass
 
 /* --- prototypes --- */
 XPL_AVAILABLE_IN_ALL
-xtype_t	g_type_plugin_get_type			(void)	G_GNUC_CONST;
+xtype_t	xtype_plugin_get_type			(void)	G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-void	g_type_plugin_use			(GTypePlugin	 *plugin);
+void	xtype_plugin_use			(GTypePlugin	 *plugin);
 XPL_AVAILABLE_IN_ALL
-void	g_type_plugin_unuse			(GTypePlugin	 *plugin);
+void	xtype_plugin_unuse			(GTypePlugin	 *plugin);
 XPL_AVAILABLE_IN_ALL
-void	g_type_plugin_complete_type_info	(GTypePlugin     *plugin,
+void	xtype_plugin_complete_type_info	(GTypePlugin     *plugin,
 						 xtype_t            g_type,
-						 GTypeInfo       *info,
-						 GTypeValueTable *value_table);
+						 xtype_info_t       *info,
+						 xtype_value_table_t *value_table);
 XPL_AVAILABLE_IN_ALL
-void	g_type_plugin_complete_interface_info	(GTypePlugin     *plugin,
+void	xtype_plugin_complete_interface_info	(GTypePlugin     *plugin,
 						 xtype_t            instance_type,
 						 xtype_t            interface_type,
-						 GInterfaceInfo  *info);
+						 xinterface_info_t  *info);
 
 G_END_DECLS
 

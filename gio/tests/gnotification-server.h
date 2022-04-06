@@ -22,23 +22,23 @@
 
 #include <glib-object.h>
 
-#define XTYPE_NOTIFICATION_SERVER  (g_notification_server_get_type ())
+#define XTYPE_NOTIFICATION_SERVER  (xnotification_server_get_type ())
 #define G_NOTIFICATION_SERVER(o)    (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NOTIFICATION_SERVER, GNotificationServer))
 #define X_IS_NOTIFICATION_SERVER(o) (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NOTIFICATION_SERVER))
 
 typedef struct _GNotificationServer GNotificationServer;
 
-xtype_t                   g_notification_server_get_type                  (void);
+xtype_t                   xnotification_server_get_type                  (void);
 
-GNotificationServer *   g_notification_server_new                       (void);
+GNotificationServer *   xnotification_server_new                       (void);
 
-void                    g_notification_server_stop                      (GNotificationServer *server);
+void                    xnotification_server_stop                      (GNotificationServer *server);
 
-xboolean_t                g_notification_server_get_is_running            (GNotificationServer *server);
+xboolean_t                xnotification_server_get_is_running            (GNotificationServer *server);
 
-xchar_t **                g_notification_server_list_applications         (GNotificationServer *server);
+xchar_t **                xnotification_server_list_applications         (GNotificationServer *server);
 
-xchar_t **                g_notification_server_list_notifications        (GNotificationServer *server,
+xchar_t **                xnotification_server_list_notifications        (GNotificationServer *server,
                                                                          const xchar_t         *app_id);
 
 #endif

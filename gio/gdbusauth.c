@@ -52,28 +52,28 @@ debug_print (const xchar_t *message, ...)
   if (G_UNLIKELY (_g_dbus_debug_authentication ()))
     {
       xchar_t *s;
-      GString *str;
+      xstring_t *str;
       va_list var_args;
       xuint_t n;
 
       _g_dbus_debug_print_lock ();
 
       va_start (var_args, message);
-      s = g_strdup_vprintf (message, var_args);
+      s = xstrdup_vprintf (message, var_args);
       va_end (var_args);
 
-      str = g_string_new (NULL);
+      str = xstring_new (NULL);
       for (n = 0; s[n] != '\0'; n++)
         {
           if (G_UNLIKELY (s[n] == '\r'))
-            g_string_append (str, "\\r");
+            xstring_append (str, "\\r");
           else if (G_UNLIKELY (s[n] == '\n'))
-            g_string_append (str, "\\n");
+            xstring_append (str, "\\n");
           else
-            g_string_append_c (str, s[n]);
+            xstring_append_c (str, s[n]);
         }
       g_print ("GDBus-debug:Auth: %s\n", str->str);
-      g_string_free (str, TRUE);
+      xstring_free (str, TRUE);
       g_free (s);
 
       _g_dbus_debug_print_unlock ();
@@ -113,8 +113,8 @@ _g_dbus_auth_finalize (xobject_t *object)
   GDBusAuth *auth = G_DBUS_AUTH (object);
 
   if (auth->priv->stream != NULL)
-    g_object_unref (auth->priv->stream);
-  g_list_free_full (auth->priv->available_mechanisms, (GDestroyNotify) mechanism_free);
+    xobject_unref (auth->priv->stream);
+  xlist_free_full (auth->priv->available_mechanisms, (xdestroy_notify_t) mechanism_free);
 
   if (G_OBJECT_CLASS (_g_dbus_auth_parent_class)->finalize != NULL)
     G_OBJECT_CLASS (_g_dbus_auth_parent_class)->finalize (object);
@@ -123,15 +123,15 @@ _g_dbus_auth_finalize (xobject_t *object)
 static void
 _g_dbus_auth_get_property (xobject_t    *object,
                            xuint_t       prop_id,
-                           GValue     *value,
-                           GParamSpec *pspec)
+                           xvalue_t     *value,
+                           xparam_spec_t *pspec)
 {
   GDBusAuth *auth = G_DBUS_AUTH (object);
 
   switch (prop_id)
     {
     case PROP_STREAM:
-      g_value_set_object (value, auth->priv->stream);
+      xvalue_set_object (value, auth->priv->stream);
       break;
 
     default:
@@ -143,15 +143,15 @@ _g_dbus_auth_get_property (xobject_t    *object,
 static void
 _g_dbus_auth_set_property (xobject_t      *object,
                            xuint_t         prop_id,
-                           const GValue *value,
-                           GParamSpec   *pspec)
+                           const xvalue_t *value,
+                           xparam_spec_t   *pspec)
 {
   GDBusAuth *auth = G_DBUS_AUTH (object);
 
   switch (prop_id)
     {
     case PROP_STREAM:
-      auth->priv->stream = g_value_dup_object (value);
+      auth->priv->stream = xvalue_dup_object (value);
       break;
 
     default:
@@ -170,7 +170,7 @@ _g_dbus_auth_class_init (GDBusAuthClass *klass)
   gobject_class->set_property = _g_dbus_auth_set_property;
   gobject_class->finalize     = _g_dbus_auth_finalize;
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_STREAM,
                                    g_param_spec_object ("stream",
                                                         P_("IO Stream"),
@@ -192,20 +192,20 @@ mechanism_free (Mechanism *m)
 
 static void
 add_mechanism (GDBusAuth         *auth,
-               GDBusAuthObserver *observer,
+               xdbus_auth_observer_t *observer,
                xtype_t              mechanism_type)
 {
   const xchar_t *name;
 
   name = _g_dbus_auth_mechanism_get_name (mechanism_type);
-  if (observer == NULL || g_dbus_auth_observer_allow_mechanism (observer, name))
+  if (observer == NULL || xdbus_auth_observer_allow_mechanism (observer, name))
     {
       Mechanism *m;
       m = g_new0 (Mechanism, 1);
       m->name = name;
       m->priority = _g_dbus_auth_mechanism_get_priority (mechanism_type);
       m->gtype = mechanism_type;
-      auth->priv->available_mechanisms = g_list_prepend (auth->priv->available_mechanisms, m);
+      auth->priv->available_mechanisms = xlist_prepend (auth->priv->available_mechanisms, m);
     }
 }
 
@@ -216,7 +216,7 @@ mech_compare_func (Mechanism *a, Mechanism *b)
   /* ensure deterministic order */
   ret = b->priority - a->priority;
   if (ret == 0)
-    ret = g_strcmp0 (b->name, a->name);
+    ret = xstrcmp0 (b->name, a->name);
   return ret;
 }
 
@@ -228,14 +228,14 @@ _g_dbus_auth_init (GDBusAuth *auth)
 
 static void
 _g_dbus_auth_add_mechs (GDBusAuth         *auth,
-                        GDBusAuthObserver *observer)
+                        xdbus_auth_observer_t *observer)
 {
   /* TODO: trawl extension points */
   add_mechanism (auth, observer, XTYPE_DBUS_AUTH_MECHANISM_ANON);
   add_mechanism (auth, observer, XTYPE_DBUS_AUTH_MECHANISM_SHA1);
   add_mechanism (auth, observer, XTYPE_DBUS_AUTH_MECHANISM_EXTERNAL);
 
-  auth->priv->available_mechanisms = g_list_sort (auth->priv->available_mechanisms,
+  auth->priv->available_mechanisms = xlist_sort (auth->priv->available_mechanisms,
                                                   (GCompareFunc) mech_compare_func);
 }
 
@@ -251,7 +251,7 @@ find_mech_by_name (GDBusAuth *auth,
   for (l = auth->priv->available_mechanisms; l != NULL; l = l->next)
     {
       Mechanism *m = l->data;
-      if (g_strcmp0 (name, m->name) == 0)
+      if (xstrcmp0 (name, m->name) == 0)
         {
           ret = m->gtype;
           goto out;
@@ -265,7 +265,7 @@ find_mech_by_name (GDBusAuth *auth,
 GDBusAuth  *
 _g_dbus_auth_new (xio_stream_t *stream)
 {
-  return g_object_new (XTYPE_DBUS_AUTH,
+  return xobject_new (XTYPE_DBUS_AUTH,
                        "stream", stream,
                        NULL);
 }
@@ -273,7 +273,7 @@ _g_dbus_auth_new (xio_stream_t *stream)
 /* ---------------------------------------------------------------------------------------------------- */
 /* like g_data_input_stream_read_line() but sets error if there's no content to read */
 static xchar_t *
-_my_g_data_input_stream_read_line (GDataInputStream  *dis,
+_my_g_data_input_stream_read_line (xdata_input_stream_t  *dis,
                                    xsize_t             *out_line_length,
                                    xcancellable_t      *cancellable,
                                    xerror_t           **error)
@@ -306,22 +306,22 @@ _my_g_data_input_stream_read_line (GDataInputStream  *dis,
  * this)
  */
 static xchar_t *
-_my_g_input_stream_read_line_safe (xinput_stream_t  *i,
+_my_xinput_stream_read_line_safe (xinput_stream_t  *i,
                                    xsize_t         *out_line_length,
                                    xcancellable_t  *cancellable,
                                    xerror_t       **error)
 {
-  GString *str;
+  xstring_t *str;
   xchar_t c;
-  gssize num_read;
+  xssize_t num_read;
   xboolean_t last_was_cr;
 
-  str = g_string_new (NULL);
+  str = xstring_new (NULL);
 
   last_was_cr = FALSE;
   while (TRUE)
     {
-      num_read = g_input_stream_read (i,
+      num_read = xinput_stream_read (i,
                                       &c,
                                       1,
                                       cancellable,
@@ -340,13 +340,13 @@ _my_g_input_stream_read_line_safe (xinput_stream_t  *i,
           goto fail;
         }
 
-      g_string_append_c (str, (xint_t) c);
+      xstring_append_c (str, (xint_t) c);
       if (last_was_cr)
         {
           if (c == 0x0a)
             {
               g_assert (str->len >= 2);
-              g_string_set_size (str, str->len - 2);
+              xstring_set_size (str, str->len - 2);
               goto out;
             }
         }
@@ -356,11 +356,11 @@ _my_g_input_stream_read_line_safe (xinput_stream_t  *i,
  out:
   if (out_line_length != NULL)
     *out_line_length = str->len;
-  return g_string_free (str, FALSE);
+  return xstring_free (str, FALSE);
 
  fail:
   g_assert (error == NULL || *error != NULL);
-  g_string_free (str, TRUE);
+  xstring_free (str, TRUE);
   return NULL;
 }
 
@@ -372,11 +372,11 @@ hexdecode (const xchar_t  *str,
            xerror_t      **error)
 {
   xchar_t *ret;
-  GString *s;
+  xstring_t *s;
   xuint_t n;
 
   ret = NULL;
-  s = g_string_new (NULL);
+  s = xstring_new (NULL);
 
   for (n = 0; str[n] != '\0'; n += 2)
     {
@@ -396,18 +396,18 @@ hexdecode (const xchar_t  *str,
           goto out;
         }
       value = (upper_nibble<<4) | lower_nibble;
-      g_string_append_c (s, value);
+      xstring_append_c (s, value);
     }
 
   *out_len = s->len;
-  ret = g_string_free (s, FALSE);
+  ret = xstring_free (s, FALSE);
   s = NULL;
 
  out:
   if (s != NULL)
     {
       *out_len = 0;
-      g_string_free (s, TRUE);
+      xstring_free (s, TRUE);
     }
    return ret;
 }
@@ -416,10 +416,10 @@ hexdecode (const xchar_t  *str,
 
 static GDBusAuthMechanism *
 client_choose_mech_and_send_initial_response (GDBusAuth           *auth,
-                                              GCredentials        *credentials_that_were_sent,
+                                              xcredentials_t        *credentials_that_were_sent,
                                               const xchar_t* const  *supported_auth_mechs,
-                                              GPtrArray           *attempted_auth_mechs,
-                                              GDataOutputStream   *dos,
+                                              xptr_array_t           *attempted_auth_mechs,
+                                              xdata_output_stream_t   *dos,
                                               xcancellable_t        *cancellable,
                                               xerror_t             **error)
 {
@@ -445,7 +445,7 @@ client_choose_mech_and_send_initial_response (GDBusAuth           *auth,
       attempted_already = FALSE;
       for (m = 0; m < attempted_auth_mechs->len; m++)
         {
-          if (g_strcmp0 (supported_auth_mechs[n], attempted_auth_mechs->pdata[m]) == 0)
+          if (xstrcmp0 (supported_auth_mechs[n], attempted_auth_mechs->pdata[m]) == 0)
             {
               attempted_already = TRUE;
               break;
@@ -463,18 +463,18 @@ client_choose_mech_and_send_initial_response (GDBusAuth           *auth,
     {
       xuint_t n;
       xchar_t *available;
-      GString *tried_str;
+      xstring_t *tried_str;
 
       debug_print ("CLIENT: Exhausted all available mechanisms");
 
-      available = g_strjoinv (", ", (xchar_t **) supported_auth_mechs);
+      available = xstrjoinv (", ", (xchar_t **) supported_auth_mechs);
 
-      tried_str = g_string_new (NULL);
+      tried_str = xstring_new (NULL);
       for (n = 0; n < attempted_auth_mechs->len; n++)
         {
           if (n > 0)
-            g_string_append (tried_str, ", ");
-          g_string_append (tried_str, attempted_auth_mechs->pdata[n]);
+            xstring_append (tried_str, ", ");
+          xstring_append (tried_str, attempted_auth_mechs->pdata[n]);
         }
       g_set_error (error,
                    G_IO_ERROR,
@@ -482,18 +482,18 @@ client_choose_mech_and_send_initial_response (GDBusAuth           *auth,
                    _("Exhausted all available authentication mechanisms (tried: %s) (available: %s)"),
                    tried_str->str,
                    available);
-      g_string_free (tried_str, TRUE);
+      xstring_free (tried_str, TRUE);
       g_free (available);
       goto out;
     }
 
   /* OK, decided on a mechanism - let's do this thing */
-  mech = g_object_new (auth_mech_to_use_gtype,
+  mech = xobject_new (auth_mech_to_use_gtype,
                        "stream", auth->priv->stream,
                        "credentials", credentials_that_were_sent,
                        NULL);
   debug_print ("CLIENT: Trying mechanism '%s'", _g_dbus_auth_mechanism_get_name (auth_mech_to_use_gtype));
-  g_ptr_array_add (attempted_auth_mechs, (xpointer_t) _g_dbus_auth_mechanism_get_name (auth_mech_to_use_gtype));
+  xptr_array_add (attempted_auth_mechs, (xpointer_t) _g_dbus_auth_mechanism_get_name (auth_mech_to_use_gtype));
 
   /* the auth mechanism may not be supported
    * (for example, EXTERNAL only works if credentials were exchanged)
@@ -501,7 +501,7 @@ client_choose_mech_and_send_initial_response (GDBusAuth           *auth,
   if (!_g_dbus_auth_mechanism_is_supported (mech))
     {
       debug_print ("CLIENT: Mechanism '%s' says it is not supported", _g_dbus_auth_mechanism_get_name (auth_mech_to_use_gtype));
-      g_object_unref (mech);
+      xobject_unref (mech);
       mech = NULL;
       goto again;
     }
@@ -512,14 +512,14 @@ client_choose_mech_and_send_initial_response (GDBusAuth           *auth,
 #if 0
   g_printerr ("using auth mechanism with name '%s' of type '%s' with initial response '%s'\n",
               _g_dbus_auth_mechanism_get_name (auth_mech_to_use_gtype),
-              g_type_name (XTYPE_FROM_INSTANCE (mech)),
+              xtype_name (XTYPE_FROM_INSTANCE (mech)),
               initial_response);
 #endif
   if (initial_response != NULL)
     {
       //g_printerr ("initial_response = '%s'\n", initial_response);
       encoded = _g_dbus_hexencode (initial_response, initial_response_len);
-      s = g_strdup_printf ("AUTH %s %s\r\n",
+      s = xstrdup_printf ("AUTH %s %s\r\n",
                            _g_dbus_auth_mechanism_get_name (auth_mech_to_use_gtype),
                            encoded);
       g_free (initial_response);
@@ -527,12 +527,12 @@ client_choose_mech_and_send_initial_response (GDBusAuth           *auth,
     }
   else
     {
-      s = g_strdup_printf ("AUTH %s\r\n", _g_dbus_auth_mechanism_get_name (auth_mech_to_use_gtype));
+      s = xstrdup_printf ("AUTH %s\r\n", _g_dbus_auth_mechanism_get_name (auth_mech_to_use_gtype));
     }
   debug_print ("CLIENT: writing '%s'", s);
   if (!g_data_output_stream_put_string (dos, s, cancellable, error))
     {
-      g_object_unref (mech);
+      xobject_unref (mech);
       mech = NULL;
       g_free (s);
       goto out;
@@ -556,21 +556,21 @@ typedef enum
 
 xchar_t *
 _g_dbus_auth_run_client (GDBusAuth     *auth,
-                         GDBusAuthObserver     *observer,
+                         xdbus_auth_observer_t     *observer,
                          GDBusCapabilityFlags offered_capabilities,
                          GDBusCapabilityFlags *out_negotiated_capabilities,
                          xcancellable_t  *cancellable,
                          xerror_t       **error)
 {
   xchar_t *s;
-  GDataInputStream *dis;
-  GDataOutputStream *dos;
-  GCredentials *credentials;
+  xdata_input_stream_t *dis;
+  xdata_output_stream_t *dos;
+  xcredentials_t *credentials;
   xchar_t *ret_guid;
   xchar_t *line;
   xsize_t line_length;
   xchar_t **supported_auth_mechs;
-  GPtrArray *attempted_auth_mechs;
+  xptr_array_t *attempted_auth_mechs;
   GDBusAuthMechanism *mech;
   ClientState state;
   GDBusCapabilityFlags negotiated_capabilities;
@@ -581,7 +581,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
 
   ret_guid = NULL;
   supported_auth_mechs = NULL;
-  attempted_auth_mechs = g_ptr_array_new ();
+  attempted_auth_mechs = xptr_array_new ();
   mech = NULL;
   negotiated_capabilities = 0;
   credentials = NULL;
@@ -596,7 +596,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
 #ifdef G_OS_UNIX
   if (X_IS_UNIX_CONNECTION (auth->priv->stream))
     {
-      credentials = g_credentials_new ();
+      credentials = xcredentials_new ();
       if (!g_unix_connection_send_credentials (G_UNIX_CONNECTION (auth->priv->stream),
                                                cancellable,
                                                error))
@@ -616,7 +616,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
     {
       if (G_UNLIKELY (_g_dbus_debug_authentication ()))
         {
-          s = g_credentials_to_string (credentials);
+          s = xcredentials_to_string (credentials);
           debug_print ("CLIENT: sent credentials '%s'", s);
           g_free (s);
         }
@@ -647,7 +647,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
           debug_print ("CLIENT: WaitingForReject, read '%s'", line);
 
         choose_mechanism:
-          if (!g_str_has_prefix (line, "REJECTED "))
+          if (!xstr_has_prefix (line, "REJECTED "))
             {
               g_set_error (error,
                            G_IO_ERROR,
@@ -659,7 +659,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
             }
           if (supported_auth_mechs == NULL)
             {
-              supported_auth_mechs = g_strsplit (line + sizeof ("REJECTED ") - 1, " ", 0);
+              supported_auth_mechs = xstrsplit (line + sizeof ("REJECTED ") - 1, " ", 0);
 #if 0
               for (n = 0; supported_auth_mechs != NULL && supported_auth_mechs[n] != NULL; n++)
                 g_printerr ("supported_auth_mechs[%d] = '%s'\n", n, supported_auth_mechs[n]);
@@ -687,7 +687,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
           if (line == NULL)
             goto out;
           debug_print ("CLIENT: WaitingForOK, read '%s'", line);
-          if (g_str_has_prefix (line, "OK "))
+          if (xstr_has_prefix (line, "OK "))
             {
               if (!g_dbus_is_guid (line + 3))
                 {
@@ -699,7 +699,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
                   g_free (line);
                   goto out;
                 }
-              ret_guid = g_strdup (line + 3);
+              ret_guid = xstrdup (line + 3);
               g_free (line);
 
               if (offered_capabilities & G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING)
@@ -720,7 +720,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
                   goto out;
                 }
             }
-          else if (g_str_has_prefix (line, "REJECTED "))
+          else if (xstr_has_prefix (line, "REJECTED "))
             {
               goto choose_mechanism;
             }
@@ -743,7 +743,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
           if (line == NULL)
             goto out;
           debug_print ("CLIENT: WaitingForAgreeUnixFD, read='%s'", line);
-          if (g_strcmp0 (line, "AGREE_UNIX_FD") == 0)
+          if (xstrcmp0 (line, "AGREE_UNIX_FD") == 0)
             {
               g_free (line);
               negotiated_capabilities |= G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING;
@@ -754,9 +754,9 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
               /* and we're done! */
               goto out;
             }
-          else if (g_str_has_prefix (line, "ERROR") && (line[5] == 0 || g_ascii_isspace (line[5])))
+          else if (xstr_has_prefix (line, "ERROR") && (line[5] == 0 || g_ascii_isspace (line[5])))
             {
-              //g_strstrip (line + 5); g_debug ("bah, no unix_fd: '%s'", line + 5);
+              //xstrstrip (line + 5); g_debug ("bah, no unix_fd: '%s'", line + 5);
               g_free (line);
               s = "BEGIN\r\n";
               debug_print ("CLIENT: writing '%s'", s);
@@ -784,15 +784,15 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
           if (line == NULL)
             goto out;
           debug_print ("CLIENT: WaitingForData, read='%s'", line);
-          if (g_str_has_prefix (line, "DATA "))
+          if (xstr_has_prefix (line, "DATA "))
             {
               xchar_t *encoded;
               xchar_t *decoded_data;
               xsize_t decoded_data_len = 0;
 
-              encoded = g_strdup (line + 5);
+              encoded = xstrdup (line + 5);
               g_free (line);
-              g_strstrip (encoded);
+              xstrstrip (encoded);
               decoded_data = hexdecode (encoded, &decoded_data_len, error);
               g_free (encoded);
               if (decoded_data == NULL)
@@ -811,7 +811,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
                   xchar_t *encoded_data;
                   data = _g_dbus_auth_mechanism_client_data_send (mech, &data_len);
                   encoded_data = _g_dbus_hexencode (data, data_len);
-                  s = g_strdup_printf ("DATA %s\r\n", encoded_data);
+                  s = xstrdup_printf ("DATA %s\r\n", encoded_data);
                   g_free (encoded_data);
                   g_free (data);
                   debug_print ("CLIENT: writing '%s'", s);
@@ -824,7 +824,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
                 }
               state = CLIENT_STATE_WAITING_FOR_OK;
             }
-          else if (g_str_has_prefix (line, "REJECTED "))
+          else if (xstr_has_prefix (line, "REJECTED "))
             {
               /* could be the chosen authentication method just doesn't work. Try
                * another one...
@@ -852,11 +852,11 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
 
  out:
   if (mech != NULL)
-    g_object_unref (mech);
-  g_ptr_array_unref (attempted_auth_mechs);
-  g_strfreev (supported_auth_mechs);
-  g_object_unref (dis);
-  g_object_unref (dos);
+    xobject_unref (mech);
+  xptr_array_unref (attempted_auth_mechs);
+  xstrfreev (supported_auth_mechs);
+  xobject_unref (dis);
+  xobject_unref (dos);
 
   /* ensure return value is NULL if error is set */
   if (error != NULL && *error != NULL)
@@ -872,7 +872,7 @@ _g_dbus_auth_run_client (GDBusAuth     *auth,
     }
 
   if (credentials != NULL)
-    g_object_unref (credentials);
+    xobject_unref (credentials);
 
   debug_print ("CLIENT: Done, authenticated=%d", ret_guid != NULL);
 
@@ -889,26 +889,26 @@ get_auth_mechanisms (GDBusAuth     *auth,
                      const xchar_t   *separator)
 {
   xlist_t *l;
-  GString *str;
+  xstring_t *str;
   xboolean_t need_sep;
 
-  str = g_string_new (prefix);
+  str = xstring_new (prefix);
   need_sep = FALSE;
   for (l = auth->priv->available_mechanisms; l != NULL; l = l->next)
     {
       Mechanism *m = l->data;
 
-      if (!allow_anonymous && g_strcmp0 (m->name, "ANONYMOUS") == 0)
+      if (!allow_anonymous && xstrcmp0 (m->name, "ANONYMOUS") == 0)
         continue;
 
       if (need_sep)
-        g_string_append (str, separator);
-      g_string_append (str, m->name);
+        xstring_append (str, separator);
+      xstring_append (str, m->name);
       need_sep = TRUE;
     }
 
-  g_string_append (str, suffix);
-  return g_string_free (str, FALSE);
+  xstring_append (str, suffix);
+  return xstring_free (str, FALSE);
 }
 
 
@@ -921,28 +921,28 @@ typedef enum
 
 xboolean_t
 _g_dbus_auth_run_server (GDBusAuth              *auth,
-                         GDBusAuthObserver      *observer,
+                         xdbus_auth_observer_t      *observer,
                          const xchar_t            *guid,
                          xboolean_t                allow_anonymous,
                          xboolean_t                require_same_user,
                          GDBusCapabilityFlags    offered_capabilities,
                          GDBusCapabilityFlags   *out_negotiated_capabilities,
-                         GCredentials          **out_received_credentials,
+                         xcredentials_t          **out_received_credentials,
                          xcancellable_t           *cancellable,
                          xerror_t                **error)
 {
   xboolean_t ret;
   ServerState state;
-  GDataInputStream *dis;
-  GDataOutputStream *dos;
+  xdata_input_stream_t *dis;
+  xdata_output_stream_t *dos;
   xerror_t *local_error;
   xchar_t *line;
   xsize_t line_length;
   GDBusAuthMechanism *mech;
   xchar_t *s;
   GDBusCapabilityFlags negotiated_capabilities;
-  GCredentials *credentials;
-  GCredentials *own_credentials = NULL;
+  xcredentials_t *credentials;
+  xcredentials_t *own_credentials = NULL;
 
   debug_print ("SERVER: initiating");
 
@@ -982,7 +982,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
       local_error = NULL;
       credentials = xsocket_get_credentials (sock, &local_error);
 
-      if (credentials == NULL && !g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
+      if (credentials == NULL && !xerror_matches (local_error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
         {
           g_propagate_error (error, local_error);
           goto out;
@@ -1002,7 +1002,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
       credentials = g_unix_connection_receive_credentials (G_UNIX_CONNECTION (auth->priv->stream),
                                                            cancellable,
                                                            &local_error);
-      if (credentials == NULL && !g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
+      if (credentials == NULL && !xerror_matches (local_error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
         {
           g_propagate_error (error, local_error);
           goto out;
@@ -1032,7 +1032,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
     {
       if (G_UNLIKELY (_g_dbus_debug_authentication ()))
         {
-          s = g_credentials_to_string (credentials);
+          s = xcredentials_to_string (credentials);
           debug_print ("SERVER: received credentials '%s'", s);
           g_free (s);
         }
@@ -1042,7 +1042,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
       debug_print ("SERVER: didn't receive any credentials");
     }
 
-  own_credentials = g_credentials_new ();
+  own_credentials = xcredentials_new ();
 
   state = SERVER_STATE_WAITING_FOR_AUTH;
   while (TRUE)
@@ -1055,7 +1055,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
           debug_print ("SERVER: WaitingForAuth, read '%s'", line);
           if (line == NULL)
             goto out;
-          if (g_strcmp0 (line, "AUTH") == 0)
+          if (xstrcmp0 (line, "AUTH") == 0)
             {
               s = get_auth_mechanisms (auth, allow_anonymous, "REJECTED ", "\r\n", " ");
               debug_print ("SERVER: writing '%s'", s);
@@ -1068,16 +1068,16 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
               g_free (s);
               g_free (line);
             }
-          else if (g_str_has_prefix (line, "AUTH "))
+          else if (xstr_has_prefix (line, "AUTH "))
             {
               xchar_t **tokens;
               const xchar_t *encoded;
               const xchar_t *mech_name;
               xtype_t auth_mech_to_use_gtype;
 
-              tokens = g_strsplit (line, " ", 0);
+              tokens = xstrsplit (line, " ", 0);
 
-              switch (g_strv_length (tokens))
+              switch (xstrv_length (tokens))
                 {
                 case 2:
                   /* no initial response */
@@ -1097,7 +1097,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
                                G_IO_ERROR_FAILED,
                                "Unexpected line '%s' while in WaitingForAuth state",
                                line);
-                  g_strfreev (tokens);
+                  xstrfreev (tokens);
                   g_free (line);
                   goto out;
                 }
@@ -1109,10 +1109,10 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
 
               auth_mech_to_use_gtype = find_mech_by_name (auth, mech_name);
               if ((auth_mech_to_use_gtype == (xtype_t) 0) ||
-                  (!allow_anonymous && g_strcmp0 (mech_name, "ANONYMOUS") == 0))
+                  (!allow_anonymous && xstrcmp0 (mech_name, "ANONYMOUS") == 0))
                 {
                   /* We don't support this auth mechanism */
-                  g_strfreev (tokens);
+                  xstrfreev (tokens);
                   s = get_auth_mechanisms (auth, allow_anonymous, "REJECTED ", "\r\n", " ");
                   debug_print ("SERVER: writing '%s'", s);
                   if (!g_data_output_stream_put_string (dos, s, cancellable, error))
@@ -1131,7 +1131,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
                   xsize_t initial_response_len;
 
                   g_clear_object (&mech);
-                  mech = g_object_new (auth_mech_to_use_gtype,
+                  mech = xobject_new (auth_mech_to_use_gtype,
                                        "stream", auth->priv->stream,
                                        "credentials", credentials,
                                        NULL);
@@ -1145,7 +1145,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
                         {
                           g_prefix_error (error, "Initial response is malformed: ");
                           /* invalid encoding, disconnect! */
-                          g_strfreev (tokens);
+                          xstrfreev (tokens);
                           goto out;
                         }
                     }
@@ -1154,7 +1154,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
                                                           initial_response,
                                                           initial_response_len);
                   g_free (initial_response);
-                  g_strfreev (tokens);
+                  xstrfreev (tokens);
 
                 change_state:
                   switch (_g_dbus_auth_mechanism_server_get_state (mech))
@@ -1162,7 +1162,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
                     case G_DBUS_AUTH_MECHANISM_STATE_ACCEPTED:
                       if (require_same_user &&
                           (credentials == NULL ||
-                           !g_credentials_is_same_user (credentials, own_credentials, NULL)))
+                           !xcredentials_is_same_user (credentials, own_credentials, NULL)))
                         {
                           /* disconnect */
                           g_set_error_literal (error,
@@ -1172,7 +1172,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
                           goto out;
                         }
                       else if (observer != NULL &&
-                               !g_dbus_auth_observer_authorize_authenticated_peer (observer,
+                               !xdbus_auth_observer_authorize_authenticated_peer (observer,
                                                                                    auth->priv->stream,
                                                                                    credentials))
                         {
@@ -1180,12 +1180,12 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
                           g_set_error_literal (error,
                                                G_IO_ERROR,
                                                G_IO_ERROR_FAILED,
-                                               _("Cancelled via GDBusAuthObserver::authorize-authenticated-peer"));
+                                               _("Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"));
                           goto out;
                         }
                       else
                         {
-                          s = g_strdup_printf ("OK %s\r\n", guid);
+                          s = xstrdup_printf ("OK %s\r\n", guid);
                           debug_print ("SERVER: writing '%s'", s);
                           if (!g_data_output_stream_put_string (dos, s, cancellable, error))
                             {
@@ -1224,7 +1224,7 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
                             xchar_t *encoded_data;
 
                             encoded_data = _g_dbus_hexencode (data, data_len);
-                            s = g_strdup_printf ("DATA %s\r\n", encoded_data);
+                            s = xstrdup_printf ("DATA %s\r\n", encoded_data);
                             g_free (encoded_data);
                             g_free (data);
 
@@ -1265,15 +1265,15 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
           debug_print ("SERVER: WaitingForData, read '%s'", line);
           if (line == NULL)
             goto out;
-          if (g_str_has_prefix (line, "DATA "))
+          if (xstr_has_prefix (line, "DATA "))
             {
               xchar_t *encoded;
               xchar_t *decoded_data;
               xsize_t decoded_data_len = 0;
 
-              encoded = g_strdup (line + 5);
+              encoded = xstrdup (line + 5);
               g_free (line);
-              g_strstrip (encoded);
+              xstrstrip (encoded);
               decoded_data = hexdecode (encoded, &decoded_data_len, error);
               g_free (encoded);
               if (decoded_data == NULL)
@@ -1303,25 +1303,25 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
           /* Use extremely slow (but reliable) line reader - this basically
            * does a recvfrom() system call per character
            *
-           * (the problem with using GDataInputStream's read_line is that because of
+           * (the problem with using xdata_input_stream_t's read_line is that because of
            * buffering it might start reading into the first D-Bus message that
            * appears after "BEGIN\r\n"....)
            */
-          line = _my_g_input_stream_read_line_safe (g_io_stream_get_input_stream (auth->priv->stream),
+          line = _my_xinput_stream_read_line_safe (g_io_stream_get_input_stream (auth->priv->stream),
                                                     &line_length,
                                                     cancellable,
                                                     error);
           if (line == NULL)
             goto out;
           debug_print ("SERVER: WaitingForBegin, read '%s'", line);
-          if (g_strcmp0 (line, "BEGIN") == 0)
+          if (xstrcmp0 (line, "BEGIN") == 0)
             {
               /* YAY, done! */
               ret = TRUE;
               g_free (line);
               goto out;
             }
-          else if (g_strcmp0 (line, "NEGOTIATE_UNIX_FD") == 0)
+          else if (xstrcmp0 (line, "NEGOTIATE_UNIX_FD") == 0)
             {
               g_free (line);
               if (offered_capabilities & G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING)
@@ -1380,11 +1380,11 @@ _g_dbus_auth_run_server (GDBusAuth              *auth,
       if (out_negotiated_capabilities != NULL)
         *out_negotiated_capabilities = negotiated_capabilities;
       if (out_received_credentials != NULL)
-        *out_received_credentials = credentials != NULL ? g_object_ref (credentials) : NULL;
+        *out_received_credentials = credentials != NULL ? xobject_ref (credentials) : NULL;
     }
 
   if (credentials != NULL)
-    g_object_unref (credentials);
+    xobject_unref (credentials);
 
   debug_print ("SERVER: Done, authenticated=%d", ret);
 

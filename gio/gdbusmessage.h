@@ -29,167 +29,167 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_MESSAGE         (g_dbus_message_get_type ())
-#define G_DBUS_MESSAGE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_MESSAGE, GDBusMessage))
+#define XTYPE_DBUS_MESSAGE         (xdbus_message_get_type ())
+#define G_DBUS_MESSAGE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_MESSAGE, xdbus_message))
 #define X_IS_DBUS_MESSAGE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_MESSAGE))
 
 XPL_AVAILABLE_IN_ALL
-xtype_t                     g_dbus_message_get_type           (void) G_GNUC_CONST;
+xtype_t                     xdbus_message_get_type           (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-GDBusMessage             *g_dbus_message_new                (void);
+xdbus_message_t             *xdbus_message_new                (void);
 XPL_AVAILABLE_IN_ALL
-GDBusMessage             *g_dbus_message_new_signal         (const xchar_t              *path,
+xdbus_message_t             *xdbus_message_new_signal         (const xchar_t              *path,
                                                              const xchar_t              *interface_,
                                                              const xchar_t              *signal);
 XPL_AVAILABLE_IN_ALL
-GDBusMessage             *g_dbus_message_new_method_call    (const xchar_t              *name,
+xdbus_message_t             *xdbus_message_new_method_call    (const xchar_t              *name,
                                                              const xchar_t              *path,
                                                              const xchar_t              *interface_,
                                                              const xchar_t              *method);
 XPL_AVAILABLE_IN_ALL
-GDBusMessage             *g_dbus_message_new_method_reply   (GDBusMessage             *method_call_message);
+xdbus_message_t             *xdbus_message_new_method_reply   (xdbus_message_t             *method_call_message);
 XPL_AVAILABLE_IN_ALL
-GDBusMessage             *g_dbus_message_new_method_error   (GDBusMessage             *method_call_message,
+xdbus_message_t             *xdbus_message_new_method_error   (xdbus_message_t             *method_call_message,
                                                              const xchar_t              *error_name,
                                                              const xchar_t              *error_message_format,
                                                              ...) G_GNUC_PRINTF(3, 4);
 XPL_AVAILABLE_IN_ALL
-GDBusMessage             *g_dbus_message_new_method_error_valist (GDBusMessage             *method_call_message,
+xdbus_message_t             *xdbus_message_new_method_error_valist (xdbus_message_t             *method_call_message,
                                                                   const xchar_t              *error_name,
                                                                   const xchar_t              *error_message_format,
                                                                   va_list                   var_args);
 XPL_AVAILABLE_IN_ALL
-GDBusMessage             *g_dbus_message_new_method_error_literal (GDBusMessage             *method_call_message,
+xdbus_message_t             *xdbus_message_new_method_error_literal (xdbus_message_t             *method_call_message,
                                                                    const xchar_t              *error_name,
                                                                    const xchar_t              *error_message);
 XPL_AVAILABLE_IN_ALL
-xchar_t                    *g_dbus_message_print              (GDBusMessage             *message,
+xchar_t                    *xdbus_message_print              (xdbus_message_t             *message,
                                                              xuint_t                     indent);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                  g_dbus_message_get_locked         (GDBusMessage             *message);
+xboolean_t                  xdbus_message_get_locked         (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_lock               (GDBusMessage             *message);
+void                      xdbus_message_lock               (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-GDBusMessage             *g_dbus_message_copy               (GDBusMessage             *message,
+xdbus_message_t             *xdbus_message_copy               (xdbus_message_t             *message,
                                                              xerror_t                  **error);
 XPL_AVAILABLE_IN_ALL
-GDBusMessageByteOrder     g_dbus_message_get_byte_order     (GDBusMessage             *message);
+GDBusMessageByteOrder     xdbus_message_get_byte_order     (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_byte_order     (GDBusMessage             *message,
+void                      xdbus_message_set_byte_order     (xdbus_message_t             *message,
                                                              GDBusMessageByteOrder     byte_order);
 
 XPL_AVAILABLE_IN_ALL
-GDBusMessageType          g_dbus_message_get_message_type   (GDBusMessage             *message);
+GDBusMessageType          xdbus_message_get_message_type   (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_message_type   (GDBusMessage             *message,
+void                      xdbus_message_set_message_type   (xdbus_message_t             *message,
                                                              GDBusMessageType          type);
 XPL_AVAILABLE_IN_ALL
-GDBusMessageFlags         g_dbus_message_get_flags          (GDBusMessage             *message);
+GDBusMessageFlags         xdbus_message_get_flags          (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_flags          (GDBusMessage             *message,
+void                      xdbus_message_set_flags          (xdbus_message_t             *message,
                                                              GDBusMessageFlags         flags);
 XPL_AVAILABLE_IN_ALL
-guint32                   g_dbus_message_get_serial         (GDBusMessage             *message);
+xuint32_t                   xdbus_message_get_serial         (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_serial         (GDBusMessage             *message,
-                                                             guint32                   serial);
+void                      xdbus_message_set_serial         (xdbus_message_t             *message,
+                                                             xuint32_t                   serial);
 XPL_AVAILABLE_IN_ALL
-xvariant_t                 *g_dbus_message_get_header         (GDBusMessage             *message,
+xvariant_t                 *xdbus_message_get_header         (xdbus_message_t             *message,
                                                              GDBusMessageHeaderField   header_field);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_header         (GDBusMessage             *message,
+void                      xdbus_message_set_header         (xdbus_message_t             *message,
                                                              GDBusMessageHeaderField   header_field,
                                                              xvariant_t                 *value);
 XPL_AVAILABLE_IN_ALL
-guchar                   *g_dbus_message_get_header_fields  (GDBusMessage             *message);
+guchar                   *xdbus_message_get_header_fields  (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-xvariant_t                 *g_dbus_message_get_body           (GDBusMessage             *message);
+xvariant_t                 *xdbus_message_get_body           (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_body           (GDBusMessage             *message,
+void                      xdbus_message_set_body           (xdbus_message_t             *message,
                                                              xvariant_t                 *body);
 XPL_AVAILABLE_IN_ALL
-GUnixFDList              *g_dbus_message_get_unix_fd_list   (GDBusMessage             *message);
+xunix_fd_list_t              *xdbus_message_get_unix_fd_list   (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_unix_fd_list   (GDBusMessage             *message,
-                                                             GUnixFDList              *fd_list);
+void                      xdbus_message_set_unix_fd_list   (xdbus_message_t             *message,
+                                                             xunix_fd_list_t              *fd_list);
 
 XPL_AVAILABLE_IN_ALL
-guint32                   g_dbus_message_get_reply_serial   (GDBusMessage             *message);
+xuint32_t                   xdbus_message_get_reply_serial   (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_reply_serial   (GDBusMessage             *message,
-                                                             guint32                   value);
+void                      xdbus_message_set_reply_serial   (xdbus_message_t             *message,
+                                                             xuint32_t                   value);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t              *g_dbus_message_get_interface      (GDBusMessage             *message);
+const xchar_t              *xdbus_message_get_interface      (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_interface      (GDBusMessage             *message,
+void                      xdbus_message_set_interface      (xdbus_message_t             *message,
                                                              const xchar_t              *value);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t              *g_dbus_message_get_member         (GDBusMessage             *message);
+const xchar_t              *xdbus_message_get_member         (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_member         (GDBusMessage             *message,
+void                      xdbus_message_set_member         (xdbus_message_t             *message,
                                                              const xchar_t              *value);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t              *g_dbus_message_get_path           (GDBusMessage             *message);
+const xchar_t              *xdbus_message_get_path           (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_path           (GDBusMessage             *message,
+void                      xdbus_message_set_path           (xdbus_message_t             *message,
                                                              const xchar_t              *value);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t              *g_dbus_message_get_sender         (GDBusMessage             *message);
+const xchar_t              *xdbus_message_get_sender         (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_sender         (GDBusMessage             *message,
+void                      xdbus_message_set_sender         (xdbus_message_t             *message,
                                                              const xchar_t              *value);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t              *g_dbus_message_get_destination    (GDBusMessage             *message);
+const xchar_t              *xdbus_message_get_destination    (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_destination    (GDBusMessage             *message,
+void                      xdbus_message_set_destination    (xdbus_message_t             *message,
                                                              const xchar_t              *value);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t              *g_dbus_message_get_error_name     (GDBusMessage             *message);
+const xchar_t              *xdbus_message_get_error_name     (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_error_name     (GDBusMessage             *message,
+void                      xdbus_message_set_error_name     (xdbus_message_t             *message,
                                                              const xchar_t              *value);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t              *g_dbus_message_get_signature      (GDBusMessage             *message);
+const xchar_t              *xdbus_message_get_signature      (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_signature      (GDBusMessage             *message,
+void                      xdbus_message_set_signature      (xdbus_message_t             *message,
                                                              const xchar_t              *value);
 
 XPL_AVAILABLE_IN_ALL
-guint32                   g_dbus_message_get_num_unix_fds   (GDBusMessage             *message);
+xuint32_t                   xdbus_message_get_num_unix_fds   (xdbus_message_t             *message);
 XPL_AVAILABLE_IN_ALL
-void                      g_dbus_message_set_num_unix_fds   (GDBusMessage             *message,
-                                                             guint32                   value);
+void                      xdbus_message_set_num_unix_fds   (xdbus_message_t             *message,
+                                                             xuint32_t                   value);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t              *g_dbus_message_get_arg0           (GDBusMessage             *message);
+const xchar_t              *xdbus_message_get_arg0           (xdbus_message_t             *message);
 
 
 XPL_AVAILABLE_IN_ALL
-GDBusMessage             *g_dbus_message_new_from_blob      (guchar                   *blob,
+xdbus_message_t             *xdbus_message_new_from_blob      (guchar                   *blob,
                                                              xsize_t                     blob_len,
                                                              GDBusCapabilityFlags      capabilities,
                                                              xerror_t                  **error);
 
 XPL_AVAILABLE_IN_ALL
-gssize                    g_dbus_message_bytes_needed       (guchar                   *blob,
+xssize_t                    xdbus_message_bytes_needed       (guchar                   *blob,
                                                              xsize_t                     blob_len,
                                                              xerror_t                  **error);
 
 XPL_AVAILABLE_IN_ALL
-guchar                   *g_dbus_message_to_blob            (GDBusMessage             *message,
+guchar                   *xdbus_message_to_blob            (xdbus_message_t             *message,
                                                              xsize_t                    *out_size,
                                                              GDBusCapabilityFlags      capabilities,
                                                              xerror_t                  **error);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t                  g_dbus_message_to_gerror          (GDBusMessage             *message,
+xboolean_t                  xdbus_message_to_gerror          (xdbus_message_t             *message,
                                                              xerror_t                  **error);
 
 G_END_DECLS

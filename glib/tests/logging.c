@@ -56,7 +56,7 @@ static void
 test_default_handler_error (void)
 {
   g_log_set_default_handler (g_log_default_handler, NULL);
-  g_error ("message1");
+  xerror ("message1");
   exit (0);
 }
 
@@ -298,7 +298,7 @@ test_printerr_handler (void)
 }
 
 static char *fail_str = "foo";
-static char *log_str = "bar";
+static char *loxstr = "bar";
 
 static xboolean_t
 good_failure_handler (const xchar_t    *log_domain,
@@ -307,7 +307,7 @@ good_failure_handler (const xchar_t    *log_domain,
                       xpointer_t        user_data)
 {
   g_test_message ("The Good Fail Message Handler\n");
-  g_assert ((char *)user_data != log_str);
+  g_assert ((char *)user_data != loxstr);
   g_assert ((char *)user_data == fail_str);
 
   return FALSE;
@@ -320,7 +320,7 @@ bad_failure_handler (const xchar_t    *log_domain,
                      xpointer_t        user_data)
 {
   g_test_message ("The Bad Fail Message Handler\n");
-  g_assert ((char *)user_data == log_str);
+  g_assert ((char *)user_data == loxstr);
   g_assert ((char *)user_data != fail_str);
 
   return FALSE;
@@ -334,7 +334,7 @@ test_handler (const xchar_t    *log_domain,
 {
   g_test_message ("The Log Message Handler\n");
   g_assert ((char *)user_data != fail_str);
-  g_assert ((char *)user_data == log_str);
+  g_assert ((char *)user_data == loxstr);
 }
 
 static void
@@ -343,12 +343,12 @@ bug653052 (void)
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=653052");
 
   g_test_log_set_fatal_handler (good_failure_handler, fail_str);
-  g_log_set_default_handler (test_handler, log_str);
+  g_log_set_default_handler (test_handler, loxstr);
 
   g_return_if_fail (0);
 
   g_test_log_set_fatal_handler (bad_failure_handler, fail_str);
-  g_log_set_default_handler (test_handler, log_str);
+  g_log_set_default_handler (test_handler, loxstr);
 
   g_return_if_fail (0);
 }
@@ -414,7 +414,7 @@ compare_fields (const GLogField *f1, xsize_t n1, const GLogField *f2, xsize_t n2
   return TRUE;
 }
 
-static GSList *expected_messages = NULL;
+static xslist_t *expected_messages = NULL;
 static const guchar binary_field[] = {1, 2, 3, 4, 5};
 
 
@@ -428,7 +428,7 @@ expect_log_writer (GLogLevelFlags   log_level,
 
   if (compare_fields (fields, n_fields, expected->fields, expected->n_fields))
     {
-      expected_messages = g_slist_delete_link (expected_messages, expected_messages);
+      expected_messages = xslist_delete_link (expected_messages, expected_messages);
     }
   else if ((log_level & G_LOG_LEVEL_DEBUG) != G_LOG_LEVEL_DEBUG)
     {
@@ -451,7 +451,7 @@ test_structured_logging_no_state (void)
   log_count = 0;
   g_log_set_writer_func (null_log_writer, NULL, NULL);
 
-  g_log_structured ("some-domain", G_LOG_LEVEL_MESSAGE,
+  g_loxstructured ("some-domain", G_LOG_LEVEL_MESSAGE,
                     "MESSAGE_ID", "06d4df59e6c24647bfe69d2c27ef0b4e",
                     "MY_APPLICATION_CUSTOM_FIELD", "some debug string",
                     "MESSAGE", "This is a debug message about pointer %p and integer %u.",
@@ -474,7 +474,7 @@ test_structured_logging_some_state (void)
   log_count = 0;
   g_log_set_writer_func (null_log_writer, NULL, NULL);
 
-  g_log_structured_array (G_LOG_LEVEL_DEBUG, fields, G_N_ELEMENTS (fields));
+  g_loxstructured_array (G_LOG_LEVEL_DEBUG, fields, G_N_ELEMENTS (fields));
 
   g_assert_cmpint (log_count, ==, 1);
 }
@@ -487,7 +487,7 @@ test_structured_logging_robustness (void)
 
   /* NULL log_domain shouldn't crash */
   g_log (NULL, G_LOG_LEVEL_MESSAGE, "Test");
-  g_log_structured (NULL, G_LOG_LEVEL_MESSAGE, "MESSAGE", "Test");
+  g_loxstructured (NULL, G_LOG_LEVEL_MESSAGE, "MESSAGE", "Test");
 
   g_assert_cmpint (log_count, ==, 1);
 }
@@ -513,10 +513,10 @@ test_structured_logging_roundtrip1 (void)
               some_pointer, some_integer);
   fields[2].value = message;
 
-  expected_messages = g_slist_append (NULL, &expected);
+  expected_messages = xslist_append (NULL, &expected);
   g_log_set_writer_func (expect_log_writer, NULL, NULL);
 
-  g_log_structured ("some-domain", G_LOG_LEVEL_MESSAGE,
+  g_loxstructured ("some-domain", G_LOG_LEVEL_MESSAGE,
                     "MESSAGE_ID", "fcfb2e1e65c3494386b74878f1abf893",
                     "MY_APPLICATION_CUSTOM_FIELD", "some debug string",
                     "MESSAGE", "This is a debug message about pointer %p and integer %u.",
@@ -546,10 +546,10 @@ test_structured_logging_roundtrip2 (void)
   };
   ExpectedMessage expected = { fields, 5 };
 
-  expected_messages = g_slist_append (NULL, &expected);
+  expected_messages = xslist_append (NULL, &expected);
   g_log_set_writer_func (expect_log_writer, NULL, NULL);
 
-  g_log_structured ("some-domain", G_LOG_LEVEL_MESSAGE,
+  g_loxstructured ("some-domain", G_LOG_LEVEL_MESSAGE,
                     "MESSAGE_ID", "fcfb2e1e65c3494386b74878f1abf893",
                     "MY_APPLICATION_CUSTOM_FIELD", "some debug string",
                     "MESSAGE", "This is a debug message about string '%s'.",
@@ -568,10 +568,10 @@ test_structured_logging_roundtrip3 (void)
   };
   ExpectedMessage expected = { fields, 3 };
 
-  expected_messages = g_slist_append (NULL, &expected);
+  expected_messages = xslist_append (NULL, &expected);
   g_log_set_writer_func (expect_log_writer, NULL, NULL);
 
-  g_log_structured ("some-domain", G_LOG_LEVEL_WARNING,
+  g_loxstructured ("some-domain", G_LOG_LEVEL_WARNING,
                     "MESSAGE", "Test test test.");
 
   g_assert (expected_messages == NULL);
@@ -581,17 +581,17 @@ static xvariant_t *
 create_variant_fields (void)
 {
   xvariant_t *binary;
-  GVariantBuilder builder;
+  xvariant_builder_t builder;
 
-  binary = g_variant_new_fixed_array (G_VARIANT_TYPE_BYTE, binary_field, G_N_ELEMENTS (binary_field), sizeof (binary_field[0]));
+  binary = xvariant_new_fixed_array (G_VARIANT_TYPE_BYTE, binary_field, G_N_ELEMENTS (binary_field), sizeof (binary_field[0]));
 
-  g_variant_builder_init (&builder, G_VARIANT_TYPE ("a{sv}"));
-  g_variant_builder_add (&builder, "{sv}", "MESSAGE_ID", g_variant_new_string ("06d4df59e6c24647bfe69d2c27ef0b4e"));
-  g_variant_builder_add (&builder, "{sv}", "MESSAGE", g_variant_new_string ("This is a debug message"));
-  g_variant_builder_add (&builder, "{sv}", "MY_APPLICATION_CUSTOM_FIELD", g_variant_new_string ("some debug string"));
-  g_variant_builder_add (&builder, "{sv}", "MY_APPLICATION_CUSTOM_FIELD_BINARY", binary);
+  xvariant_builder_init (&builder, G_VARIANT_TYPE ("a{sv}"));
+  xvariant_builder_add (&builder, "{sv}", "MESSAGE_ID", xvariant_new_string ("06d4df59e6c24647bfe69d2c27ef0b4e"));
+  xvariant_builder_add (&builder, "{sv}", "MESSAGE", xvariant_new_string ("This is a debug message"));
+  xvariant_builder_add (&builder, "{sv}", "MY_APPLICATION_CUSTOM_FIELD", xvariant_new_string ("some debug string"));
+  xvariant_builder_add (&builder, "{sv}", "MY_APPLICATION_CUSTOM_FIELD_BINARY", binary);
 
-  return g_variant_builder_end (&builder);
+  return xvariant_builder_end (&builder);
 }
 
 static void
@@ -603,7 +603,7 @@ test_structured_logging_variant1 (void)
   g_log_set_writer_func (null_log_writer, NULL, NULL);
 
   g_log_variant ("some-domain", G_LOG_LEVEL_MESSAGE, v);
-  g_variant_unref (v);
+  xvariant_unref (v);
   g_assert_cmpint (log_count, ==, 1);
 }
 
@@ -621,11 +621,11 @@ test_structured_logging_variant2 (void)
   ExpectedMessage expected = { fields, 6 };
   xvariant_t *v = create_variant_fields ();
 
-  expected_messages = g_slist_append (NULL, &expected);
+  expected_messages = xslist_append (NULL, &expected);
   g_log_set_writer_func (expect_log_writer, NULL, NULL);
 
   g_log_variant ("some-domain", G_LOG_LEVEL_MESSAGE, v);
-  g_variant_unref (v);
+  xvariant_unref (v);
   g_assert (expected_messages == NULL);
 }
 

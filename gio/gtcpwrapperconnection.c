@@ -20,15 +20,15 @@
 
 /**
  * SECTION:gtcpwrapperconnection
- * @title: GTcpWrapperConnection
+ * @title: xtcp_wrapper_connection_t
  * @short_description: Wrapper for non-xsocket_connection_t-based,
  *     xsocket_t-based GIOStreams
  * @include: gio/gio.h
  * @see_also: #xsocket_connection_t.
  *
- * A #GTcpWrapperConnection can be used to wrap a #xio_stream_t that is
+ * A #xtcp_wrapper_connection_t can be used to wrap a #xio_stream_t that is
  * based on a #xsocket_t, but which is not actually a
- * #xsocket_connection_t. This is used by #GSocketClient so that it can
+ * #xsocket_connection_t. This is used by #xsocket_client_t so that it can
  * always return a #xsocket_connection_t, even when the connection it has
  * actually created is not directly a #xsocket_connection_t.
  *
@@ -36,9 +36,9 @@
  */
 
 /**
- * GTcpWrapperConnection:
+ * xtcp_wrapper_connection_t:
  *
- * #GTcpWrapperConnection is an opaque data structure and can only be accessed
+ * #xtcp_wrapper_connection_t is an opaque data structure and can only be accessed
  * using the following functions.
  **/
 
@@ -54,7 +54,7 @@ struct _GTcpWrapperConnectionPrivate
   xio_stream_t *base_io_stream;
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (GTcpWrapperConnection, g_tcp_wrapper_connection, XTYPE_TCP_CONNECTION)
+G_DEFINE_TYPE_WITH_PRIVATE (xtcp_wrapper_connection_t, g_tcp_wrapper_connection, XTYPE_TCP_CONNECTION)
 
 enum
 {
@@ -65,7 +65,7 @@ enum
 static xinput_stream_t *
 g_tcp_wrapper_connection_get_input_stream (xio_stream_t *io_stream)
 {
-  GTcpWrapperConnection *connection = G_TCP_WRAPPER_CONNECTION (io_stream);
+  xtcp_wrapper_connection_t *connection = G_TCP_WRAPPER_CONNECTION (io_stream);
 
   return g_io_stream_get_input_stream (connection->priv->base_io_stream);
 }
@@ -73,7 +73,7 @@ g_tcp_wrapper_connection_get_input_stream (xio_stream_t *io_stream)
 static xoutput_stream_t *
 g_tcp_wrapper_connection_get_output_stream (xio_stream_t *io_stream)
 {
-  GTcpWrapperConnection *connection = G_TCP_WRAPPER_CONNECTION (io_stream);
+  xtcp_wrapper_connection_t *connection = G_TCP_WRAPPER_CONNECTION (io_stream);
 
   return g_io_stream_get_output_stream (connection->priv->base_io_stream);
 }
@@ -81,15 +81,15 @@ g_tcp_wrapper_connection_get_output_stream (xio_stream_t *io_stream)
 static void
 g_tcp_wrapper_connection_get_property (xobject_t    *object,
 				       xuint_t       prop_id,
-				       GValue     *value,
-				       GParamSpec *pspec)
+				       xvalue_t     *value,
+				       xparam_spec_t *pspec)
 {
-  GTcpWrapperConnection *connection = G_TCP_WRAPPER_CONNECTION (object);
+  xtcp_wrapper_connection_t *connection = G_TCP_WRAPPER_CONNECTION (object);
 
   switch (prop_id)
     {
      case PROP_BASE_IO_STREAM:
-      g_value_set_object (value, connection->priv->base_io_stream);
+      xvalue_set_object (value, connection->priv->base_io_stream);
       break;
 
      default:
@@ -100,15 +100,15 @@ g_tcp_wrapper_connection_get_property (xobject_t    *object,
 static void
 g_tcp_wrapper_connection_set_property (xobject_t      *object,
                                         xuint_t         prop_id,
-                                        const GValue *value,
-                                        GParamSpec   *pspec)
+                                        const xvalue_t *value,
+                                        xparam_spec_t   *pspec)
 {
-  GTcpWrapperConnection *connection = G_TCP_WRAPPER_CONNECTION (object);
+  xtcp_wrapper_connection_t *connection = G_TCP_WRAPPER_CONNECTION (object);
 
   switch (prop_id)
     {
      case PROP_BASE_IO_STREAM:
-      connection->priv->base_io_stream = g_value_dup_object (value);
+      connection->priv->base_io_stream = xvalue_dup_object (value);
       break;
 
      default:
@@ -119,10 +119,10 @@ g_tcp_wrapper_connection_set_property (xobject_t      *object,
 static void
 g_tcp_wrapper_connection_finalize (xobject_t *object)
 {
-  GTcpWrapperConnection *connection = G_TCP_WRAPPER_CONNECTION (object);
+  xtcp_wrapper_connection_t *connection = G_TCP_WRAPPER_CONNECTION (object);
 
   if (connection->priv->base_io_stream)
-    g_object_unref (connection->priv->base_io_stream);
+    xobject_unref (connection->priv->base_io_stream);
 
   G_OBJECT_CLASS (g_tcp_wrapper_connection_parent_class)->finalize (object);
 }
@@ -140,7 +140,7 @@ g_tcp_wrapper_connection_class_init (GTcpWrapperConnectionClass *klass)
   stream_class->get_input_stream = g_tcp_wrapper_connection_get_input_stream;
   stream_class->get_output_stream = g_tcp_wrapper_connection_get_output_stream;
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_BASE_IO_STREAM,
                                    g_param_spec_object ("base-io-stream",
 			                                P_("Base IO Stream"),
@@ -152,7 +152,7 @@ g_tcp_wrapper_connection_class_init (GTcpWrapperConnectionClass *klass)
 }
 
 static void
-g_tcp_wrapper_connection_init (GTcpWrapperConnection *connection)
+g_tcp_wrapper_connection_init (xtcp_wrapper_connection_t *connection)
 {
   connection->priv = g_tcp_wrapper_connection_get_instance_private (connection);
 }
@@ -178,7 +178,7 @@ g_tcp_wrapper_connection_new (xio_stream_t *base_io_stream,
 			xsocket_get_family (socket) == XSOCKET_FAMILY_IPV6, NULL);
   g_return_val_if_fail (xsocket_get_socket_type (socket) == XSOCKET_TYPE_STREAM, NULL);
 
-  return g_object_new (XTYPE_TCP_WRAPPER_CONNECTION,
+  return xobject_new (XTYPE_TCP_WRAPPER_CONNECTION,
 		       "base-io-stream", base_io_stream,
 		       "socket", socket,
 		       NULL);
@@ -186,14 +186,14 @@ g_tcp_wrapper_connection_new (xio_stream_t *base_io_stream,
 
 /**
  * g_tcp_wrapper_connection_get_base_io_stream:
- * @conn: a #GTcpWrapperConnection
+ * @conn: a #xtcp_wrapper_connection_t
  *
  * Gets @conn's base #xio_stream_t
  *
  * Returns: (transfer none): @conn's base #xio_stream_t
  */
 xio_stream_t *
-g_tcp_wrapper_connection_get_base_io_stream (GTcpWrapperConnection *conn)
+g_tcp_wrapper_connection_get_base_io_stream (xtcp_wrapper_connection_t *conn)
 {
   g_return_val_if_fail (X_IS_TCP_WRAPPER_CONNECTION (conn), NULL);
 

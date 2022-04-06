@@ -24,11 +24,11 @@
 G_BEGIN_DECLS
 
 #define XTYPE_NETWORK_MONITOR_BASE         (g_network_monitor_base_get_type ())
-#define G_NETWORK_MONITOR_BASE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NETWORK_MONITOR_BASE, xnetwork_monitor_base_t))
-#define G_NETWORK_MONITOR_BASE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NETWORK_MONITOR_BASE, xnetwork_monitor_base_class_t))
+#define G_NETWORK_MONITOR_BASE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NETWORK_MONITOR_BASE, xnetwork_monitor_base))
+#define G_NETWORK_MONITOR_BASE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NETWORK_MONITOR_BASE, xnetwork_monitor_base_class))
 #define X_IS_NETWORK_MONITOR_BASE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NETWORK_MONITOR_BASE))
 #define X_IS_NETWORK_MONITOR_BASE_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_NETWORK_MONITOR_BASE))
-#define G_NETWORK_MONITOR_BASE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_NETWORK_MONITOR_BASE, xnetwork_monitor_base_class_t))
+#define G_NETWORK_MONITOR_BASE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_NETWORK_MONITOR_BASE, xnetwork_monitor_base_class))
 
 typedef struct _GNetworkMonitorBase        xnetwork_monitor_base_t;
 typedef struct _Xnetwork_monitor_base_class_t   xnetwork_monitor_base_class_t;

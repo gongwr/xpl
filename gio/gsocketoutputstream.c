@@ -40,11 +40,11 @@ struct _GSocketOutputStreamPrivate
   xsocket_t *socket;
 
   /* pending operation metadata */
-  gconstpointer buffer;
+  xconstpointer buffer;
   xsize_t count;
 };
 
-static void xsocket_output_stream_pollable_iface_init (GPollableOutputStreamInterface *iface);
+static void xsocket_output_stream_pollable_iface_init (xpollable_output_stream_interface_t *iface);
 #ifdef G_OS_UNIX
 static void xsocket_output_stream_file_descriptor_based_iface_init (GFileDescriptorBasedIface *iface);
 #endif
@@ -73,15 +73,15 @@ enum
 static void
 xsocket_output_stream_get_property (xobject_t    *object,
                                      xuint_t       prop_id,
-                                     GValue     *value,
-                                     GParamSpec *pspec)
+                                     xvalue_t     *value,
+                                     xparam_spec_t *pspec)
 {
   GSocketOutputStream *stream = XSOCKET_OUTPUT_STREAM (object);
 
   switch (prop_id)
     {
       case PROP_SOCKET:
-        g_value_set_object (value, stream->priv->socket);
+        xvalue_set_object (value, stream->priv->socket);
         break;
 
       default:
@@ -92,15 +92,15 @@ xsocket_output_stream_get_property (xobject_t    *object,
 static void
 xsocket_output_stream_set_property (xobject_t      *object,
                                      xuint_t         prop_id,
-                                     const GValue *value,
-                                     GParamSpec   *pspec)
+                                     const xvalue_t *value,
+                                     xparam_spec_t   *pspec)
 {
   GSocketOutputStream *stream = XSOCKET_OUTPUT_STREAM (object);
 
   switch (prop_id)
     {
       case PROP_SOCKET:
-        stream->priv->socket = g_value_dup_object (value);
+        stream->priv->socket = xvalue_dup_object (value);
         break;
 
       default:
@@ -114,12 +114,12 @@ xsocket_output_stream_finalize (xobject_t *object)
   GSocketOutputStream *stream = XSOCKET_OUTPUT_STREAM (object);
 
   if (stream->priv->socket)
-    g_object_unref (stream->priv->socket);
+    xobject_unref (stream->priv->socket);
 
   G_OBJECT_CLASS (xsocket_output_stream_parent_class)->finalize (object);
 }
 
-static gssize
+static xssize_t
 xsocket_output_stream_write (xoutput_stream_t  *stream,
                               const void     *buffer,
                               xsize_t           count,
@@ -135,7 +135,7 @@ xsocket_output_stream_write (xoutput_stream_t  *stream,
 
 static xboolean_t
 xsocket_output_stream_writev (xoutput_stream_t        *stream,
-                               const GOutputVector  *vectors,
+                               const xoutput_vector_t  *vectors,
                                xsize_t                 n_vectors,
                                xsize_t                *bytes_written,
                                xcancellable_t         *cancellable,
@@ -163,15 +163,15 @@ xsocket_output_stream_writev (xoutput_stream_t        *stream,
 }
 
 static xboolean_t
-xsocket_output_stream_pollable_is_writable (GPollableOutputStream *pollable)
+xsocket_output_stream_pollable_is_writable (xpollable_output_stream_t *pollable)
 {
   GSocketOutputStream *output_stream = XSOCKET_OUTPUT_STREAM (pollable);
 
   return xsocket_condition_check (output_stream->priv->socket, G_IO_OUT);
 }
 
-static gssize
-xsocket_output_stream_pollable_write_nonblocking (GPollableOutputStream  *pollable,
+static xssize_t
+xsocket_output_stream_pollable_write_nonblocking (xpollable_output_stream_t  *pollable,
 						   const void             *buffer,
 						   xsize_t                   size,
 						   xerror_t                **error)
@@ -184,8 +184,8 @@ xsocket_output_stream_pollable_write_nonblocking (GPollableOutputStream  *pollab
 }
 
 static GPollableReturn
-xsocket_output_stream_pollable_writev_nonblocking (GPollableOutputStream  *pollable,
-                                                    const GOutputVector    *vectors,
+xsocket_output_stream_pollable_writev_nonblocking (xpollable_output_stream_t  *pollable,
+                                                    const xoutput_vector_t    *vectors,
                                                     xsize_t                   n_vectors,
                                                     xsize_t                  *bytes_written,
                                                     xerror_t                **error)
@@ -204,26 +204,26 @@ xsocket_output_stream_pollable_writev_nonblocking (GPollableOutputStream  *polla
                                              bytes_written, NULL, error);
 }
 
-static GSource *
-xsocket_output_stream_pollable_create_source (GPollableOutputStream *pollable,
+static xsource_t *
+xsocket_output_stream_pollable_create_source (xpollable_output_stream_t *pollable,
 					       xcancellable_t          *cancellable)
 {
   GSocketOutputStream *output_stream = XSOCKET_OUTPUT_STREAM (pollable);
-  GSource *socket_source, *pollable_source;
+  xsource_t *socket_source, *pollable_source;
 
   pollable_source = g_pollable_source_new (G_OBJECT (output_stream));
   socket_source = xsocket_create_source (output_stream->priv->socket,
 					  G_IO_OUT, cancellable);
-  g_source_set_dummy_callback (socket_source);
-  g_source_add_child_source (pollable_source, socket_source);
-  g_source_unref (socket_source);
+  xsource_set_dummy_callback (socket_source);
+  xsource_add_child_source (pollable_source, socket_source);
+  xsource_unref (socket_source);
 
   return pollable_source;
 }
 
 #ifdef G_OS_UNIX
 static int
-xsocket_output_stream_get_fd (GFileDescriptorBased *fd_based)
+xsocket_output_stream_get_fd (xfile_descriptor_based_t *fd_based)
 {
   GSocketOutputStream *output_stream = XSOCKET_OUTPUT_STREAM (fd_based);
 
@@ -244,7 +244,7 @@ xsocket_output_stream_class_init (GSocketOutputStreamClass *klass)
   goutputstream_class->write_fn = xsocket_output_stream_write;
   goutputstream_class->writev_fn = xsocket_output_stream_writev;
 
-  g_object_class_install_property (gobject_class, PROP_SOCKET,
+  xobject_class_install_property (gobject_class, PROP_SOCKET,
 				   g_param_spec_object ("socket",
 							P_("socket"),
 							P_("The socket that this stream wraps"),
@@ -261,7 +261,7 @@ xsocket_output_stream_file_descriptor_based_iface_init (GFileDescriptorBasedIfac
 #endif
 
 static void
-xsocket_output_stream_pollable_iface_init (GPollableOutputStreamInterface *iface)
+xsocket_output_stream_pollable_iface_init (xpollable_output_stream_interface_t *iface)
 {
   iface->is_writable = xsocket_output_stream_pollable_is_writable;
   iface->create_source = xsocket_output_stream_pollable_create_source;
@@ -278,5 +278,5 @@ xsocket_output_stream_init (GSocketOutputStream *stream)
 GSocketOutputStream *
 _xsocket_output_stream_new (xsocket_t *socket)
 {
-  return g_object_new (XTYPE_SOCKET_OUTPUT_STREAM, "socket", socket, NULL);
+  return xobject_new (XTYPE_SOCKET_OUTPUT_STREAM, "socket", socket, NULL);
 }

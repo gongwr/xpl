@@ -173,7 +173,7 @@ run_file_to_uri_tests (void)
   for (i = 0; i < G_N_ELEMENTS (file_to_uri_tests); i++)
     {
       error = NULL;
-      res = g_filename_to_uri (file_to_uri_tests[i].filename,
+      res = xfilename_to_uri (file_to_uri_tests[i].filename,
                                file_to_uri_tests[i].hostname,
                                &error);
 
@@ -198,7 +198,7 @@ run_file_from_uri_tests (void)
   for (i = 0; i < G_N_ELEMENTS (file_from_uri_tests); i++)
     {
       error = NULL;
-      res = g_filename_from_uri (file_from_uri_tests[i].uri,
+      res = xfilename_from_uri (file_from_uri_tests[i].uri,
                                  &hostname,
                                  &error);
 
@@ -207,7 +207,7 @@ run_file_from_uri_tests (void)
         {
           xchar_t *p, *slash;
           p = file_from_uri_tests[i].expected_filename =
-            g_strdup (file_from_uri_tests[i].expected_filename);
+            xstrdup (file_from_uri_tests[i].expected_filename);
           while ((slash = strchr (p, '/')) != NULL)
             {
               *slash = '\\';
@@ -231,10 +231,10 @@ static xint_t
 safe_strcmp_filename (const xchar_t *a, const xchar_t *b)
 {
 #ifndef G_OS_WIN32
-  return g_strcmp0 (a, b);
+  return xstrcmp0 (a, b);
 #else
   if (!a || !b)
-    return g_strcmp0 (a, b);
+    return xstrcmp0 (a, b);
   else
     {
       while (*a && *b)
@@ -280,13 +280,13 @@ run_file_roundtrip_tests (void)
         continue;
 
       error = NULL;
-      uri = g_filename_to_uri (file_to_uri_tests[i].filename,
+      uri = xfilename_to_uri (file_to_uri_tests[i].filename,
                                file_to_uri_tests[i].hostname,
                                &error);
       g_assert_no_error (error);
 
       hostname = NULL;
-      res = g_filename_from_uri (uri, &hostname, &error);
+      res = xfilename_from_uri (uri, &hostname, &error);
       g_assert_no_error (error);
 
       g_assert_cmpint (safe_strcmp_filename (file_to_uri_tests[i].filename, res), ==, 0);
@@ -315,17 +315,17 @@ run_uri_list_tests (void)
   xchar_t **uris;
   xint_t j;
 
-  uris = g_uri_list_extract_uris (list);
-  g_assert_cmpint (g_strv_length (uris), ==, 3);
+  uris = xuri_list_extract_uris (list);
+  g_assert_cmpint (xstrv_length (uris), ==, 3);
 
   for (j = 0; j < 3; j++)
     g_assert_cmpstr (uris[j], ==, expected_uris[j]);
 
-  g_strfreev (uris);
+  xstrfreev (uris);
 
-  uris = g_uri_list_extract_uris ("# just hot air\r\n# more hot air");
-  g_assert_cmpint (g_strv_length (uris), ==, 0);
-  g_strfreev (uris);
+  uris = xuri_list_extract_uris ("# just hot air\r\n# more hot air");
+  g_assert_cmpint (xstrv_length (uris), ==, 0);
+  xstrfreev (uris);
 }
 
 static void
@@ -360,14 +360,14 @@ test_uri_unescape_string (void)
 
       g_test_message ("Test %" G_GSIZE_FORMAT ": %s", i, tests[i].escaped);
 
-      s = g_uri_unescape_string (tests[i].escaped, tests[i].illegal_characters);
+      s = xuri_unescape_string (tests[i].escaped, tests[i].illegal_characters);
       g_assert_cmpstr (s, ==, tests[i].expected_unescaped);
       g_free (s);
     }
 }
 
 static void
-test_uri_unescape_bytes (gconstpointer test_data)
+test_uri_unescape_bytes (xconstpointer test_data)
 {
   xerror_t *error = NULL;
   xboolean_t use_nul_terminated = GPOINTER_TO_INT (test_data);
@@ -377,13 +377,13 @@ test_uri_unescape_bytes (gconstpointer test_data)
       const xchar_t *escaped;  /* (nullable) */
       const xchar_t *illegal;
       /* Outputs */
-      gssize expected_unescaped_len;  /* -1 => error expected */
-      const guint8 *expected_unescaped;  /* (nullable) */
+      xssize_t expected_unescaped_len;  /* -1 => error expected */
+      const xuint8_t *expected_unescaped;  /* (nullable) */
     }
   tests[] =
     {
-      { "%00%00", NULL, 2, (const guint8 *) "\x00\x00" },
-      { "/cursors/none.png", "/", 17, (const guint8 *) "/cursors/none.png" },
+      { "%00%00", NULL, 2, (const xuint8_t *) "\x00\x00" },
+      { "/cursors/none.png", "/", 17, (const xuint8_t *) "/cursors/none.png" },
       { "/cursors%2fbad-subdir/none.png", "/", -1, NULL },
       { "%%", NULL, -1, NULL },
       { "%", NULL, -1, NULL },
@@ -392,9 +392,9 @@ test_uri_unescape_bytes (gconstpointer test_data)
 
   for (i = 0; i < G_N_ELEMENTS (tests); i++)
     {
-      gssize escaped_len = 0;
+      xssize_t escaped_len = 0;
       xchar_t *escaped = NULL;
-      GBytes *bytes = NULL;
+      xbytes_t *bytes = NULL;
 
       g_test_message ("Test %" G_GSIZE_FORMAT ": %s", i, tests[i].escaped);
 
@@ -405,7 +405,7 @@ test_uri_unescape_bytes (gconstpointer test_data)
       if (use_nul_terminated)
         {
           escaped_len = -1;
-          escaped = g_strdup (tests[i].escaped);
+          escaped = xstrdup (tests[i].escaped);
         }
       else
         {
@@ -413,24 +413,24 @@ test_uri_unescape_bytes (gconstpointer test_data)
           escaped = g_memdup2 (tests[i].escaped, escaped_len);
         }
 
-      bytes = g_uri_unescape_bytes (escaped, escaped_len, tests[i].illegal, &error);
+      bytes = xuri_unescape_bytes (escaped, escaped_len, tests[i].illegal, &error);
 
       if (tests[i].expected_unescaped_len < 0)
         {
           g_assert_null (bytes);
-          g_assert_error (error, G_URI_ERROR, G_URI_ERROR_FAILED);
+          g_assert_error (error, XURI_ERROR, XURI_ERROR_FAILED);
           g_clear_error (&error);
         }
       else
         {
           g_assert_no_error (error);
-          g_assert_cmpmem (g_bytes_get_data (bytes, NULL),
-                           g_bytes_get_size (bytes),
+          g_assert_cmpmem (xbytes_get_data (bytes, NULL),
+                           xbytes_get_size (bytes),
                            tests[i].expected_unescaped,
                            tests[i].expected_unescaped_len);
         }
 
-      g_clear_pointer (&bytes, g_bytes_unref);
+      g_clear_pointer (&bytes, xbytes_unref);
       g_free (escaped);
     }
 }
@@ -441,11 +441,11 @@ test_uri_unescape_segment (void)
   const xchar_t *escaped_segment = "%2Babc %4F---";
   xchar_t *s = NULL;
 
-  s = g_uri_unescape_segment (escaped_segment, escaped_segment + 10, NULL);
+  s = xuri_unescape_segment (escaped_segment, escaped_segment + 10, NULL);
   g_assert_cmpstr (s, ==, "+abc O");
   g_free (s);
 
-  s = g_uri_unescape_segment ("%2Babc%00cde", NULL, NULL);
+  s = xuri_unescape_segment ("%2Babc%00cde", NULL, NULL);
   g_assert_null (s);
 }
 
@@ -480,7 +480,7 @@ test_uri_escape_string (void)
 
       g_test_message ("Test %" G_GSIZE_FORMAT ": %s", i, tests[i].unescaped);
 
-      s = g_uri_escape_string (tests[i].unescaped,
+      s = xuri_escape_string (tests[i].unescaped,
                                tests[i].reserved_chars_allowed,
                                tests[i].allow_utf8);
       g_assert_cmpstr (s, ==, tests[i].expected_escaped);
@@ -493,7 +493,7 @@ test_uri_escape_bytes (void)
 {
   xchar_t *s = NULL;
 
-  s = g_uri_escape_bytes ((guchar*)"\0\0", 2, NULL);
+  s = xuri_escape_bytes ((guchar*)"\0\0", 2, NULL);
   g_assert_cmpstr (s, ==, "%00%00");
   g_free (s);
 }
@@ -504,33 +504,33 @@ test_uri_scheme (void)
   const xchar_t *s1, *s2;
   xchar_t *s;
 
-  s = g_uri_parse_scheme ("ftp://ftp.gtk.org");
+  s = xuri_parse_scheme ("ftp://ftp.gtk.org");
   g_assert_cmpstr (s, ==, "ftp");
   g_free (s);
 
-  s = g_uri_parse_scheme ("good-scheme.but+weird:gtk.org");
+  s = xuri_parse_scheme ("good-scheme.but+weird:gtk.org");
   g_assert_cmpstr (s, ==, "good-scheme.but+weird");
   g_free (s);
 
-  s = g_uri_parse_scheme ("1bad:");
+  s = xuri_parse_scheme ("1bad:");
   g_assert_null (s);
-  s = g_uri_parse_scheme ("bad");
+  s = xuri_parse_scheme ("bad");
   g_assert_null (s);
-  s = g_uri_parse_scheme ("99http://host/path");
+  s = xuri_parse_scheme ("99http://host/path");
   g_assert_null (s);
-  s = g_uri_parse_scheme (".http://host/path");
+  s = xuri_parse_scheme (".http://host/path");
   g_assert_null (s);
-  s = g_uri_parse_scheme ("+http://host/path");
+  s = xuri_parse_scheme ("+http://host/path");
   g_assert_null (s);
 
-  s1 = g_uri_peek_scheme ("ftp://ftp.gtk.org");
+  s1 = xuri_peek_scheme ("ftp://ftp.gtk.org");
   g_assert_cmpstr (s1, ==, "ftp");
-  s2 = g_uri_peek_scheme ("FTP://ftp.gtk.org");
+  s2 = xuri_peek_scheme ("FTP://ftp.gtk.org");
   g_assert_cmpstr (s2, ==, "ftp");
   g_assert_true (s1 == s2);
-  s1 = g_uri_peek_scheme ("1bad:");
+  s1 = xuri_peek_scheme ("1bad:");
   g_assert_null (s1);
-  s1 = g_uri_peek_scheme ("bad");
+  s1 = xuri_peek_scheme ("bad");
   g_assert_null (s1);
 }
 
@@ -547,7 +547,7 @@ typedef struct {
 typedef struct {
   /* Inputs */
   const xchar_t *orig;
-  GUriFlags flags;
+  xuri_flags_t flags;
   /* Outputs */
   xboolean_t expected_success;
   xint_t expected_error_code;       /* unused if @expected_success is true */
@@ -555,212 +555,212 @@ typedef struct {
 } UriAbsoluteTest;
 
 static const UriAbsoluteTest absolute_tests[] = {
-  { "foo:", G_URI_FLAGS_NONE, TRUE, 0,
+  { "foo:", XURI_FLAGS_NONE, TRUE, 0,
     { "foo", NULL, NULL, -1, "", NULL, NULL }
   },
-  { "file:/dev/null", G_URI_FLAGS_NONE, TRUE, 0,
+  { "file:/dev/null", XURI_FLAGS_NONE, TRUE, 0,
     { "file", NULL, NULL, -1, "/dev/null", NULL, NULL }
   },
-  { "file:///dev/null", G_URI_FLAGS_NONE, TRUE, 0,
+  { "file:///dev/null", XURI_FLAGS_NONE, TRUE, 0,
     { "file", NULL, "", -1, "/dev/null", NULL, NULL }
   },
-  { "ftp://user@host/path", G_URI_FLAGS_NONE, TRUE, 0,
+  { "ftp://user@host/path", XURI_FLAGS_NONE, TRUE, 0,
     { "ftp", "user", "host", -1, "/path", NULL, NULL }
   },
-  { "ftp://user@host:9999/path", G_URI_FLAGS_NONE, TRUE, 0,
+  { "ftp://user@host:9999/path", XURI_FLAGS_NONE, TRUE, 0,
     { "ftp", "user", "host", 9999, "/path", NULL, NULL }
   },
-  { "ftp://user:password@host/path", G_URI_FLAGS_NONE, TRUE, 0,
+  { "ftp://user:password@host/path", XURI_FLAGS_NONE, TRUE, 0,
     { "ftp", "user:password", "host", -1, "/path", NULL, NULL }
   },
-  { "ftp://user:password@host:9999/path", G_URI_FLAGS_NONE, TRUE, 0,
+  { "ftp://user:password@host:9999/path", XURI_FLAGS_NONE, TRUE, 0,
     { "ftp", "user:password", "host", 9999, "/path", NULL, NULL }
   },
-  { "ftp://user:password@host", G_URI_FLAGS_NONE, TRUE, 0,
+  { "ftp://user:password@host", XURI_FLAGS_NONE, TRUE, 0,
     { "ftp", "user:password", "host", -1, "", NULL, NULL }
   },
-  { "http://us%65r@host", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://us%65r@host", XURI_FLAGS_NONE, TRUE, 0,
     { "http", "user", "host", -1, "", NULL, NULL }
   },
-  { "http://us%40r@host", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://us%40r@host", XURI_FLAGS_NONE, TRUE, 0,
     { "http", "us@r", "host", -1, "", NULL, NULL }
   },
-  { "http://us%3ar@host", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://us%3ar@host", XURI_FLAGS_NONE, TRUE, 0,
     { "http", "us:r", "host", -1, "", NULL, NULL }
   },
-  { "http://us%2fr@host", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://us%2fr@host", XURI_FLAGS_NONE, TRUE, 0,
     { "http", "us/r", "host", -1, "", NULL, NULL }
   },
-  { "http://us%3fr@host", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://us%3fr@host", XURI_FLAGS_NONE, TRUE, 0,
     { "http", "us?r", "host", -1, "", NULL, NULL }
   },
-  { "http://host?query", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://host?query", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "host", -1, "", "query", NULL }
   },
-  { "http://host/path?query=http%3A%2F%2Fhost%2Fpath%3Fchildparam%3Dchildvalue&param=value", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://host/path?query=http%3A%2F%2Fhost%2Fpath%3Fchildparam%3Dchildvalue&param=value", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "host", -1, "/path", "query=http://host/path?childparam=childvalue&param=value", NULL }
   },
-  { "http://control-chars/%01%02%03%04%05%06%07%08%09%0A%0B%0C%0D%0E%0F%10%11%12%13%14%15%16%17%18%19%1A%1B%1C%1D%1E%1F%7F", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://control-chars/%01%02%03%04%05%06%07%08%09%0A%0B%0C%0D%0E%0F%10%11%12%13%14%15%16%17%18%19%1A%1B%1C%1D%1E%1F%7F", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "control-chars", -1, "/\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F\x7F", NULL, NULL }
   },
-  { "http://space/%20", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://space/%20", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "space", -1, "/ ", NULL, NULL }
   },
-  { "http://delims/%3C%3E%23%25%22", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://delims/%3C%3E%23%25%22", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "delims", -1, "/<>#%\"", NULL, NULL }
   },
-  { "http://unwise-chars/%7B%7D%7C%5C%5E%5B%5D%60", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://unwise-chars/%7B%7D%7C%5C%5E%5B%5D%60", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "unwise-chars", -1, "/{}|\\^[]`", NULL, NULL }
   },
 
   /* From RFC 2732 */
-  { "http://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:80/index.html", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:80/index.html", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "FEDC:BA98:7654:3210:FEDC:BA98:7654:3210", 80, "/index.html", NULL, NULL }
   },
-  { "http://[1080:0:0:0:8:800:200C:417A]/index.html", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://[1080:0:0:0:8:800:200C:417A]/index.html", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "1080:0:0:0:8:800:200C:417A", -1, "/index.html", NULL, NULL }
   },
-  { "http://[3ffe:2a00:100:7031::1]", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://[3ffe:2a00:100:7031::1]", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "3ffe:2a00:100:7031::1", -1, "", NULL, NULL }
   },
-  { "http://[1080::8:800:200C:417A]/foo", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://[1080::8:800:200C:417A]/foo", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "1080::8:800:200C:417A", -1, "/foo", NULL, NULL }
   },
-  { "http://[::192.9.5.5]/ipng", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://[::192.9.5.5]/ipng", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "::192.9.5.5", -1, "/ipng", NULL, NULL }
   },
-  { "http://[::FFFF:129.144.52.38]:80/index.html", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://[::FFFF:129.144.52.38]:80/index.html", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "::FFFF:129.144.52.38", 80, "/index.html", NULL, NULL }
   },
-  { "http://[2010:836B:4179::836B:4179]", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://[2010:836B:4179::836B:4179]", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "2010:836B:4179::836B:4179", -1, "", NULL, NULL }
   },
 
   /* some problematic URIs that are handled differently in libsoup */
-  { "http://host/path with spaces", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://host/path with spaces", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "host", -1, "/path with spaces", NULL, NULL }
   },
-  { "  http://host/path", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "  http://host/path", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "host", -1, "/path", NULL, NULL }
   },
-  { "http://host/path  ", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://host/path  ", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "host", -1, "/path", NULL, NULL }
   },
-  { "http://host  ", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://host  ", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "host", -1, "", NULL, NULL }
   },
-  { "http://host:999  ", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://host:999  ", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "host", 999, "", NULL, NULL }
   },
-  { "http://host/pa\nth", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://host/pa\nth", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "host", -1, "/path", NULL, NULL }
   },
-  { "http:\r\n//host/path", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http:\r\n//host/path", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "host", -1, "/path", NULL, NULL }
   },
-  { "http://\thost/path", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://\thost/path", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "host", -1, "/path", NULL, NULL }
   },
 
   /* Bug 594405; 0-length is different from not-present */
-  { "http://host/path?", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://host/path?", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "host", -1, "/path", "", NULL }
   },
-  { "http://host/path#", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://host/path#", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "host", -1, "/path", NULL, "" },
   },
 
   /* Bug 590524; ignore bad %-encoding */
-  { "http://host/path%", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://host/path%", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "host", -1, "/path%", NULL, NULL }
   },
-  { "http://h%ost/path", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://h%ost/path", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "h%ost", -1, "/path", NULL, NULL }
   },
-  { "http://host/path%%", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://host/path%%", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "host", -1, "/path%%", NULL, NULL }
   },
-  { "http://host/path%%%", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://host/path%%%", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "host", -1, "/path%%%", NULL, NULL }
   },
-  { "http://host/path%/x/", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://host/path%/x/", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "host", -1, "/path%/x/", NULL, NULL }
   },
-  { "http://host/path%0x/", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://host/path%0x/", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "host", -1, "/path%0x/", NULL, NULL }
   },
-  { "http://host/path%ax", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://host/path%ax", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "host", -1, "/path%ax", NULL, NULL }
   },
 
-  /* GUri doesn't %-encode non-ASCII characters */
-  { "http://host/p\xc3\xa4th/", G_URI_FLAGS_NONE, TRUE, 0,
+  /* xuri_t doesn't %-encode non-ASCII characters */
+  { "http://host/p\xc3\xa4th/", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "host", -1, "/p\xc3\xa4th/", NULL, NULL }
   },
 
-  { "HTTP:////////////////", G_URI_FLAGS_NONE, TRUE, 0,
+  { "HTTP:////////////////", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "", -1, "//////////////", NULL, NULL }
   },
 
-  { "http://@host", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://@host", XURI_FLAGS_NONE, TRUE, 0,
     { "http", "", "host", -1, "", NULL, NULL }
   },
-  { "http://:@host", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://:@host", XURI_FLAGS_NONE, TRUE, 0,
     { "http", ":", "host", -1, "", NULL, NULL }
   },
-  { "scheme://foo%3Abar._webdav._tcp.local", G_URI_FLAGS_NONE, TRUE, 0,
+  { "scheme://foo%3Abar._webdav._tcp.local", XURI_FLAGS_NONE, TRUE, 0,
     { "scheme", NULL, "foo:bar._webdav._tcp.local", -1, "", NULL, NULL}
   },
 
   /* ".." past top */
-  { "http://example.com/..", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://example.com/..", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "example.com", -1, "/", NULL, NULL }
   },
 
   /* scheme parsing */
-  { "foo0://host/path", G_URI_FLAGS_NONE, TRUE, 0,
+  { "foo0://host/path", XURI_FLAGS_NONE, TRUE, 0,
     { "foo0", NULL, "host", -1, "/path", NULL, NULL } },
-  { "f0.o://host/path", G_URI_FLAGS_NONE, TRUE, 0,
+  { "f0.o://host/path", XURI_FLAGS_NONE, TRUE, 0,
     { "f0.o", NULL, "host", -1, "/path", NULL, NULL } },
-  { "http++://host/path", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http++://host/path", XURI_FLAGS_NONE, TRUE, 0,
     { "http++", NULL, "host", -1, "/path", NULL, NULL } },
-  { "http-ish://host/path", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http-ish://host/path", XURI_FLAGS_NONE, TRUE, 0,
     { "http-ish", NULL, "host", -1, "/path", NULL, NULL } },
 
   /* IPv6 scope ID parsing (both correct and incorrect) */
-  { "http://[fe80::dead:beef%]/", G_URI_FLAGS_PARSE_RELAXED, FALSE, G_URI_ERROR_BAD_HOST,
+  { "http://[fe80::dead:beef%]/", XURI_FLAGS_PARSE_RELAXED, FALSE, XURI_ERROR_BAD_HOST,
     { NULL, NULL, NULL, -1, NULL, NULL, NULL } },
-  { "http://[fe80::dead:beef%em1]/", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://[fe80::dead:beef%em1]/", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "fe80::dead:beef%em1", -1, "/", NULL, NULL } },
-  { "http://[fe80::dead:beef%em1]/", G_URI_FLAGS_NONE, FALSE, G_URI_ERROR_BAD_HOST,
+  { "http://[fe80::dead:beef%em1]/", XURI_FLAGS_NONE, FALSE, XURI_ERROR_BAD_HOST,
     { NULL, NULL, NULL, -1, NULL, NULL, NULL } },
-  { "http://[fe80::dead:beef%25em1]/", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://[fe80::dead:beef%25em1]/", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "fe80::dead:beef%em1", -1, "/", NULL, NULL } },
-  { "http://[fe80::dead:beef%25em1%20]/", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://[fe80::dead:beef%25em1%20]/", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "fe80::dead:beef%em1 ", -1, "/", NULL, NULL } },
-  { "http://[fe80::dead:beef%25em%31]/", G_URI_FLAGS_NONE, TRUE, 0,
+  { "http://[fe80::dead:beef%25em%31]/", XURI_FLAGS_NONE, TRUE, 0,
     { "http", NULL, "fe80::dead:beef%em1", -1, "/", NULL, NULL } },
-  { "http://[fe80::dead:beef%10]/", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://[fe80::dead:beef%10]/", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "fe80::dead:beef%10", -1, "/", NULL, NULL } },
-  { "http://[fe80::dead:beef%10]/", G_URI_FLAGS_NONE, FALSE, G_URI_ERROR_BAD_HOST,
+  { "http://[fe80::dead:beef%10]/", XURI_FLAGS_NONE, FALSE, XURI_ERROR_BAD_HOST,
     { NULL, NULL, NULL, -1, NULL, NULL, NULL } },
-  { "http://[fe80::dead:beef%25]/", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://[fe80::dead:beef%25]/", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "fe80::dead:beef%25", -1, "/", NULL, NULL } },
-  { "http://[fe80::dead:beef%25]/", G_URI_FLAGS_NONE, FALSE, G_URI_ERROR_BAD_HOST,
+  { "http://[fe80::dead:beef%25]/", XURI_FLAGS_NONE, FALSE, XURI_ERROR_BAD_HOST,
     { NULL, NULL, NULL, -1, NULL, NULL, NULL } },
-  { "http://[192.168.0.1%25em1]/", G_URI_FLAGS_NONE, FALSE, G_URI_ERROR_BAD_HOST,
+  { "http://[192.168.0.1%25em1]/", XURI_FLAGS_NONE, FALSE, XURI_ERROR_BAD_HOST,
     { NULL, NULL, NULL, -1, NULL, NULL, NULL } },
-  { "http://[fe80::dead:beef%2em1]/", G_URI_FLAGS_PARSE_RELAXED, TRUE, 0,
+  { "http://[fe80::dead:beef%2em1]/", XURI_FLAGS_PARSE_RELAXED, TRUE, 0,
     { "http", NULL, "fe80::dead:beef%2em1", -1, "/", NULL, NULL } },
-  { "http://[fe80::dead:beef%2em1]/", G_URI_FLAGS_NONE, FALSE, G_URI_ERROR_BAD_HOST,
+  { "http://[fe80::dead:beef%2em1]/", XURI_FLAGS_NONE, FALSE, XURI_ERROR_BAD_HOST,
     { NULL, NULL, NULL, -1, NULL, NULL, NULL } },
-  { "http://[fe80::dead:beef%25em1%00]/", G_URI_FLAGS_PARSE_RELAXED, FALSE, G_URI_ERROR_BAD_HOST,
+  { "http://[fe80::dead:beef%25em1%00]/", XURI_FLAGS_PARSE_RELAXED, FALSE, XURI_ERROR_BAD_HOST,
     { NULL, NULL, NULL, -1, NULL, NULL, NULL } },
-  { "http://[fe80::dead:beef%25em1%00]/", G_URI_FLAGS_NONE, FALSE, G_URI_ERROR_BAD_HOST,
+  { "http://[fe80::dead:beef%25em1%00]/", XURI_FLAGS_NONE, FALSE, XURI_ERROR_BAD_HOST,
     { NULL, NULL, NULL, -1, NULL, NULL, NULL } },
 
   /* Invalid IDN hostname */
-  { "http://xn--mixed-\xc3\xbcp/", G_URI_FLAGS_NONE, FALSE, G_URI_ERROR_BAD_HOST,
+  { "http://xn--mixed-\xc3\xbcp/", XURI_FLAGS_NONE, FALSE, XURI_ERROR_BAD_HOST,
     { NULL, NULL, NULL, -1, NULL, NULL, NULL } },
 };
 
@@ -773,30 +773,30 @@ test_uri_parsing_absolute (void)
     {
       const UriAbsoluteTest *test = &absolute_tests[i];
       xerror_t *error = NULL;
-      GUri *uri;
+      xuri_t *uri;
 
       g_test_message ("Test %" G_GSIZE_FORMAT ": %s", i, test->orig);
 
-      uri = g_uri_parse (test->orig, test->flags, &error);
+      uri = xuri_parse (test->orig, test->flags, &error);
       if (test->expected_success)
         {
           g_assert_no_error (error);
 
-          g_assert_cmpstr (g_uri_get_scheme (uri),   ==, test->expected_parts.scheme);
-          g_assert_cmpstr (g_uri_get_userinfo (uri), ==, test->expected_parts.userinfo);
-          g_assert_cmpstr (g_uri_get_host (uri),     ==, test->expected_parts.host);
-          g_assert_cmpint (g_uri_get_port (uri),     ==, test->expected_parts.port);
-          g_assert_cmpstr (g_uri_get_path (uri),     ==, test->expected_parts.path);
-          g_assert_cmpstr (g_uri_get_query (uri),    ==, test->expected_parts.query);
-          g_assert_cmpstr (g_uri_get_fragment (uri), ==, test->expected_parts.fragment);
+          g_assert_cmpstr (xuri_get_scheme (uri),   ==, test->expected_parts.scheme);
+          g_assert_cmpstr (xuri_get_userinfo (uri), ==, test->expected_parts.userinfo);
+          g_assert_cmpstr (xuri_get_host (uri),     ==, test->expected_parts.host);
+          g_assert_cmpint (xuri_get_port (uri),     ==, test->expected_parts.port);
+          g_assert_cmpstr (xuri_get_path (uri),     ==, test->expected_parts.path);
+          g_assert_cmpstr (xuri_get_query (uri),    ==, test->expected_parts.query);
+          g_assert_cmpstr (xuri_get_fragment (uri), ==, test->expected_parts.fragment);
         }
       else
         {
-          g_assert_error (error, G_URI_ERROR, test->expected_error_code);
+          g_assert_error (error, XURI_ERROR, test->expected_error_code);
           g_assert_null (uri);
         }
 
-      g_clear_pointer (&uri, g_uri_unref);
+      g_clear_pointer (&uri, xuri_unref);
       g_clear_error (&error);
     }
 }
@@ -918,11 +918,11 @@ static void
 test_uri_parsing_relative (void)
 {
   int i;
-  GUri *base, *uri;
+  xuri_t *base, *uri;
   xerror_t *error = NULL;
   xchar_t *resolved;
 
-  base = g_uri_parse (relative_test_base, G_URI_FLAGS_NONE, &error);
+  base = xuri_parse (relative_test_base, XURI_FLAGS_NONE, &error);
   g_assert_no_error (error);
 
   for (i = 0; i < num_relative_tests; i++)
@@ -930,179 +930,179 @@ test_uri_parsing_relative (void)
       const UriRelativeTest *test = &relative_tests[i];
       xchar_t *tostring;
 
-      uri = g_uri_parse_relative (base, test->orig, G_URI_FLAGS_NONE, &error);
+      uri = xuri_parse_relative (base, test->orig, XURI_FLAGS_NONE, &error);
       g_assert_no_error (error);
 
-      g_assert_cmpstr (g_uri_get_scheme (uri),   ==, test->parts.scheme);
-      g_assert_cmpstr (g_uri_get_userinfo (uri), ==, test->parts.userinfo);
-      g_assert_cmpstr (g_uri_get_host (uri),     ==, test->parts.host);
-      g_assert_cmpint (g_uri_get_port (uri),     ==, test->parts.port);
-      g_assert_cmpstr (g_uri_get_path (uri),     ==, test->parts.path);
-      g_assert_cmpstr (g_uri_get_query (uri),    ==, test->parts.query);
-      g_assert_cmpstr (g_uri_get_fragment (uri), ==, test->parts.fragment);
+      g_assert_cmpstr (xuri_get_scheme (uri),   ==, test->parts.scheme);
+      g_assert_cmpstr (xuri_get_userinfo (uri), ==, test->parts.userinfo);
+      g_assert_cmpstr (xuri_get_host (uri),     ==, test->parts.host);
+      g_assert_cmpint (xuri_get_port (uri),     ==, test->parts.port);
+      g_assert_cmpstr (xuri_get_path (uri),     ==, test->parts.path);
+      g_assert_cmpstr (xuri_get_query (uri),    ==, test->parts.query);
+      g_assert_cmpstr (xuri_get_fragment (uri), ==, test->parts.fragment);
 
-      tostring = g_uri_to_string (uri);
+      tostring = xuri_to_string (uri);
       g_assert_cmpstr (tostring, ==, test->resolved);
       g_free (tostring);
 
-      g_uri_unref (uri);
+      xuri_unref (uri);
 
-      resolved = g_uri_resolve_relative (relative_test_base, test->orig, G_URI_FLAGS_NONE, &error);
+      resolved = xuri_resolve_relative (relative_test_base, test->orig, XURI_FLAGS_NONE, &error);
       g_assert_no_error (error);
       g_assert_cmpstr (resolved, ==, test->resolved);
       g_free (resolved);
     }
-  uri = g_uri_parse_relative (base, "%%", G_URI_FLAGS_NONE, &error);
+  uri = xuri_parse_relative (base, "%%", XURI_FLAGS_NONE, &error);
   g_assert_null (uri);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_PATH);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_PATH);
   g_clear_error (&error);
 
-  g_uri_unref (base);
+  xuri_unref (base);
 
-  resolved = g_uri_resolve_relative (NULL, "http://a", G_URI_FLAGS_NONE, &error);
+  resolved = xuri_resolve_relative (NULL, "http://a", XURI_FLAGS_NONE, &error);
   g_assert_no_error (error);
   g_assert_cmpstr (resolved, ==, "http://a");
   g_free (resolved);
 
-  resolved = g_uri_resolve_relative ("http://a", "b", G_URI_FLAGS_NONE, &error);
+  resolved = xuri_resolve_relative ("http://a", "b", XURI_FLAGS_NONE, &error);
   g_assert_no_error (error);
   g_assert_cmpstr (resolved, ==, "http://a/b");
   g_free (resolved);
 
-  resolved = g_uri_resolve_relative (NULL, "a", G_URI_FLAGS_NONE, &error);
+  resolved = xuri_resolve_relative (NULL, "a", XURI_FLAGS_NONE, &error);
   g_assert_null (resolved);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_FAILED);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_FAILED);
   g_clear_error (&error);
 
-  resolved = g_uri_resolve_relative ("../b", "a", G_URI_FLAGS_NONE, &error);
+  resolved = xuri_resolve_relative ("../b", "a", XURI_FLAGS_NONE, &error);
   g_assert_null (resolved);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_FAILED);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_FAILED);
   g_clear_error (&error);
 
-  resolved = g_uri_resolve_relative ("%%", "a", G_URI_FLAGS_PARSE_RELAXED, &error);
+  resolved = xuri_resolve_relative ("%%", "a", XURI_FLAGS_PARSE_RELAXED, &error);
   g_assert_null (resolved);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_FAILED);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_FAILED);
   g_clear_error (&error);
 }
 
 static void
 test_uri_to_string (void)
 {
-  GUri *uri;
+  xuri_t *uri;
   xchar_t *tostring;
 
-  uri = g_uri_build (G_URI_FLAGS_NONE, "scheme", "userinfo", "host", 1234,
+  uri = xuri_build (XURI_FLAGS_NONE, "scheme", "userinfo", "host", 1234,
                      "/path", "query", "fragment");
 
-  tostring = g_uri_to_string (uri);
+  tostring = xuri_to_string (uri);
   g_assert_cmpstr (tostring, ==, "scheme://userinfo@host:1234/path?query#fragment");
   g_free (tostring);
-  g_uri_unref (uri);
+  xuri_unref (uri);
 
-  uri = g_uri_build (G_URI_FLAGS_NONE, "scheme", NULL, "fe80::dead:beef%em1", -1, "", NULL, NULL);
-  tostring = g_uri_to_string (uri);
+  uri = xuri_build (XURI_FLAGS_NONE, "scheme", NULL, "fe80::dead:beef%em1", -1, "", NULL, NULL);
+  tostring = xuri_to_string (uri);
   g_assert_cmpstr (tostring, ==, "scheme://[fe80::dead:beef%25em1]");
   g_free (tostring);
-  g_uri_unref (uri);
+  xuri_unref (uri);
 
-  uri = g_uri_build_with_user (G_URI_FLAGS_NONE, "scheme", "user", "pass", "auth", "host", 1234,
+  uri = xuri_build_with_user (XURI_FLAGS_NONE, "scheme", "user", "pass", "auth", "host", 1234,
                                "/path", "query", "fragment");
-  tostring = g_uri_to_string (uri);
+  tostring = xuri_to_string (uri);
   g_assert_cmpstr (tostring, ==, "scheme://user:pass;auth@host:1234/path?query#fragment");
   g_free (tostring);
-  tostring = g_uri_to_string_partial (uri, G_URI_HIDE_USERINFO);
+  tostring = xuri_to_string_partial (uri, XURI_HIDE_USERINFO);
   g_assert_cmpstr (tostring, ==, "scheme://host:1234/path?query#fragment");
   g_free (tostring);
-  tostring = g_uri_to_string_partial (uri, G_URI_HIDE_QUERY);
+  tostring = xuri_to_string_partial (uri, XURI_HIDE_QUERY);
   g_assert_cmpstr (tostring, ==, "scheme://user:pass;auth@host:1234/path#fragment");
   g_free (tostring);
-  tostring = g_uri_to_string_partial (uri, G_URI_HIDE_FRAGMENT);
+  tostring = xuri_to_string_partial (uri, XURI_HIDE_FRAGMENT);
   g_assert_cmpstr (tostring, ==, "scheme://user:pass;auth@host:1234/path?query");
   g_free (tostring);
-  g_uri_unref (uri);
+  xuri_unref (uri);
 
-  uri = g_uri_build_with_user (G_URI_FLAGS_HAS_PASSWORD|G_URI_FLAGS_HAS_AUTH_PARAMS,
+  uri = xuri_build_with_user (XURI_FLAGS_HAS_PASSWORD|XURI_FLAGS_HAS_AUTH_PARAMS,
                                "scheme", "us:er", "pass", "auth", "host", 1234,
                                "/path", "query", "fragment");
-  tostring = g_uri_to_string (uri);
+  tostring = xuri_to_string (uri);
   g_assert_cmpstr (tostring, ==, "scheme://us%3Aer:pass;auth@host:1234/path?query#fragment");
   g_free (tostring);
-  tostring = g_uri_to_string_partial (uri, G_URI_HIDE_PASSWORD);
+  tostring = xuri_to_string_partial (uri, XURI_HIDE_PASSWORD);
   g_assert_cmpstr (tostring, ==, "scheme://us%3Aer;auth@host:1234/path?query#fragment");
   g_free (tostring);
-  tostring = g_uri_to_string_partial (uri, G_URI_HIDE_AUTH_PARAMS);
+  tostring = xuri_to_string_partial (uri, XURI_HIDE_AUTH_PARAMS);
   g_assert_cmpstr (tostring, ==, "scheme://us%3Aer:pass@host:1234/path?query#fragment");
   g_free (tostring);
-  tostring = g_uri_to_string_partial (uri, G_URI_HIDE_QUERY);
+  tostring = xuri_to_string_partial (uri, XURI_HIDE_QUERY);
   g_assert_cmpstr (tostring, ==, "scheme://us%3Aer:pass;auth@host:1234/path#fragment");
   g_free (tostring);
-  g_uri_unref (uri);
+  xuri_unref (uri);
 }
 
 static void
 test_uri_build (void)
 {
-  GUri *uri;
+  xuri_t *uri;
 
-  uri = g_uri_build (G_URI_FLAGS_NON_DNS, "scheme", "userinfo", "host", 1234,
+  uri = xuri_build (XURI_FLAGS_NON_DNS, "scheme", "userinfo", "host", 1234,
                      "/path", "query", "fragment");
 
   /* check ref/unref */
-  g_uri_ref (uri);
-  g_uri_unref (uri);
+  xuri_ref (uri);
+  xuri_unref (uri);
 
-  g_assert_cmpint (g_uri_get_flags (uri), ==, G_URI_FLAGS_NON_DNS);
-  g_assert_cmpstr (g_uri_get_scheme (uri), ==, "scheme");
-  g_assert_cmpstr (g_uri_get_userinfo (uri), ==, "userinfo");
-  g_assert_cmpstr (g_uri_get_host (uri), ==, "host");
-  g_assert_cmpint (g_uri_get_port (uri), ==, 1234);
-  g_assert_cmpstr (g_uri_get_path (uri), ==, "/path");
-  g_assert_cmpstr (g_uri_get_query (uri), ==, "query");
-  g_assert_cmpstr (g_uri_get_fragment (uri), ==, "fragment");
-  g_assert_cmpstr (g_uri_get_user (uri), ==, NULL);
-  g_assert_cmpstr (g_uri_get_password (uri), ==, NULL);
-  g_uri_unref (uri);
+  g_assert_cmpint (xuri_get_flags (uri), ==, XURI_FLAGS_NON_DNS);
+  g_assert_cmpstr (xuri_get_scheme (uri), ==, "scheme");
+  g_assert_cmpstr (xuri_get_userinfo (uri), ==, "userinfo");
+  g_assert_cmpstr (xuri_get_host (uri), ==, "host");
+  g_assert_cmpint (xuri_get_port (uri), ==, 1234);
+  g_assert_cmpstr (xuri_get_path (uri), ==, "/path");
+  g_assert_cmpstr (xuri_get_query (uri), ==, "query");
+  g_assert_cmpstr (xuri_get_fragment (uri), ==, "fragment");
+  g_assert_cmpstr (xuri_get_user (uri), ==, NULL);
+  g_assert_cmpstr (xuri_get_password (uri), ==, NULL);
+  xuri_unref (uri);
 
-  uri = g_uri_build_with_user (G_URI_FLAGS_NON_DNS, "scheme", "user", "password",
+  uri = xuri_build_with_user (XURI_FLAGS_NON_DNS, "scheme", "user", "password",
                                "authparams", "host", 1234,
                                "/path", "query", "fragment");
 
-  g_assert_cmpint (g_uri_get_flags (uri), ==, G_URI_FLAGS_NON_DNS | G_URI_FLAGS_HAS_PASSWORD);
-  g_assert_cmpstr (g_uri_get_scheme (uri), ==, "scheme");
-  g_assert_cmpstr (g_uri_get_userinfo (uri), ==, "user:password;authparams");
-  g_assert_cmpstr (g_uri_get_host (uri), ==, "host");
-  g_assert_cmpint (g_uri_get_port (uri), ==, 1234);
-  g_assert_cmpstr (g_uri_get_path (uri), ==, "/path");
-  g_assert_cmpstr (g_uri_get_query (uri), ==, "query");
-  g_assert_cmpstr (g_uri_get_fragment (uri), ==, "fragment");
-  g_assert_cmpstr (g_uri_get_user (uri), ==, "user");
-  g_assert_cmpstr (g_uri_get_password (uri), ==, "password");
-  g_assert_cmpstr (g_uri_get_auth_params (uri), ==, "authparams");
-  g_uri_unref (uri);
+  g_assert_cmpint (xuri_get_flags (uri), ==, XURI_FLAGS_NON_DNS | XURI_FLAGS_HAS_PASSWORD);
+  g_assert_cmpstr (xuri_get_scheme (uri), ==, "scheme");
+  g_assert_cmpstr (xuri_get_userinfo (uri), ==, "user:password;authparams");
+  g_assert_cmpstr (xuri_get_host (uri), ==, "host");
+  g_assert_cmpint (xuri_get_port (uri), ==, 1234);
+  g_assert_cmpstr (xuri_get_path (uri), ==, "/path");
+  g_assert_cmpstr (xuri_get_query (uri), ==, "query");
+  g_assert_cmpstr (xuri_get_fragment (uri), ==, "fragment");
+  g_assert_cmpstr (xuri_get_user (uri), ==, "user");
+  g_assert_cmpstr (xuri_get_password (uri), ==, "password");
+  g_assert_cmpstr (xuri_get_auth_params (uri), ==, "authparams");
+  xuri_unref (uri);
 
-  uri = g_uri_build_with_user (G_URI_FLAGS_NONE, "scheme", "user\001", "password\002",
+  uri = xuri_build_with_user (XURI_FLAGS_NONE, "scheme", "user\001", "password\002",
                                "authparams\003", "host", 1234,
                                "/path", "query", "fragment");
-  g_assert_cmpstr (g_uri_get_userinfo (uri), ==, "user\001:password\002;authparams\003");
-  g_uri_unref (uri);
+  g_assert_cmpstr (xuri_get_userinfo (uri), ==, "user\001:password\002;authparams\003");
+  xuri_unref (uri);
 
-  uri = g_uri_build_with_user (G_URI_FLAGS_ENCODED, "scheme", "user%01", "password%02",
+  uri = xuri_build_with_user (XURI_FLAGS_ENCODED, "scheme", "user%01", "password%02",
                                "authparams%03", "host", 1234,
                                "/path", "query", "fragment");
-  g_assert_cmpstr (g_uri_get_userinfo (uri), ==, "user%01:password%02;authparams%03");
-  g_uri_unref (uri);
+  g_assert_cmpstr (xuri_get_userinfo (uri), ==, "user%01:password%02;authparams%03");
+  xuri_unref (uri);
 
-  uri = g_uri_build_with_user (G_URI_FLAGS_ENCODED, "scheme", NULL, NULL,
+  uri = xuri_build_with_user (XURI_FLAGS_ENCODED, "scheme", NULL, NULL,
                                NULL, "host", 1234,
                                "/path", "query", "fragment");
-  g_assert_null (g_uri_get_userinfo (uri));
-  g_uri_unref (uri);
+  g_assert_null (xuri_get_userinfo (uri));
+  xuri_unref (uri);
 
-  uri = g_uri_build_with_user (G_URI_FLAGS_NONE, "scheme", "user", NULL, NULL,
+  uri = xuri_build_with_user (XURI_FLAGS_NONE, "scheme", "user", NULL, NULL,
                                "host", 1234,
                                "/path", "query", "fragment");
-  g_assert_cmpstr (g_uri_get_userinfo (uri), ==, "user");
-  g_uri_unref (uri);
+  g_assert_cmpstr (xuri_get_userinfo (uri), ==, "user");
+  xuri_unref (uri);
 }
 
 static void
@@ -1120,8 +1120,8 @@ test_uri_split (void)
   xerror_t *error = NULL;
   xint_t port;
 
-  g_uri_split ("scheme://user%3Apass%3Bauth@host:1234/path?query#fragment",
-               G_URI_FLAGS_NONE,
+  xuri_split ("scheme://user%3Apass%3Bauth@host:1234/path?query#fragment",
+               XURI_FLAGS_NONE,
                &scheme,
                &userinfo,
                &host,
@@ -1145,8 +1145,8 @@ test_uri_split (void)
   g_free (query);
   g_free (fragment);
 
-  g_uri_split ("scheme://user%3Apass%3Bauth@h%01st:1234/path?query#fragment",
-               G_URI_FLAGS_ENCODED,
+  xuri_split ("scheme://user%3Apass%3Bauth@h%01st:1234/path?query#fragment",
+               XURI_FLAGS_ENCODED,
                NULL,
                NULL,
                &host,
@@ -1159,8 +1159,8 @@ test_uri_split (void)
   g_assert_cmpstr (host, ==, "h\001st");
   g_free (host);
 
-  g_uri_split ("scheme://@@@host:1234/path?query#fragment",
-               G_URI_FLAGS_ENCODED | G_URI_FLAGS_PARSE_RELAXED,
+  xuri_split ("scheme://@@@host:1234/path?query#fragment",
+               XURI_FLAGS_ENCODED | XURI_FLAGS_PARSE_RELAXED,
                NULL,
                &userinfo,
                NULL,
@@ -1174,8 +1174,8 @@ test_uri_split (void)
   g_free (userinfo);
 
 
-  g_uri_split ("http://f;oo/",
-               G_URI_FLAGS_NONE | G_URI_FLAGS_PARSE_RELAXED,
+  xuri_split ("http://f;oo/",
+               XURI_FLAGS_NONE | XURI_FLAGS_PARSE_RELAXED,
                NULL,
                NULL,
                NULL,
@@ -1188,8 +1188,8 @@ test_uri_split (void)
   g_assert_cmpstr (path, ==, ";oo/");
   g_free (path);
 
-  g_uri_split ("http://h%01st/path?saisons=%C3%89t%C3%A9%2Bhiver",
-               G_URI_FLAGS_NONE,
+  xuri_split ("http://h%01st/path?saisons=%C3%89t%C3%A9%2Bhiver",
+               XURI_FLAGS_NONE,
                NULL,
                NULL,
                &host,
@@ -1204,8 +1204,8 @@ test_uri_split (void)
   g_free (host);
   g_free (query);
 
-  g_uri_split ("http://h%01st/path?saisons=%C3%89t%C3%A9%2Bhiver",
-               G_URI_FLAGS_ENCODED_QUERY,
+  xuri_split ("http://h%01st/path?saisons=%C3%89t%C3%A9%2Bhiver",
+               XURI_FLAGS_ENCODED_QUERY,
                NULL,
                NULL,
                &host,
@@ -1220,8 +1220,8 @@ test_uri_split (void)
   g_free (host);
   g_free (query);
 
-  g_uri_split ("http://h%01st/%C3%89t%C3%A9%2Bhiver",
-               G_URI_FLAGS_ENCODED_PATH,
+  xuri_split ("http://h%01st/%C3%89t%C3%A9%2Bhiver",
+               XURI_FLAGS_ENCODED_PATH,
                NULL,
                NULL,
                NULL,
@@ -1234,8 +1234,8 @@ test_uri_split (void)
   g_assert_cmpstr (path, ==, "/%C3%89t%C3%A9%2Bhiver");
   g_free (path);
 
-  g_uri_split ("file:///path/to/some%20file",
-               G_URI_FLAGS_NONE,
+  xuri_split ("file:///path/to/some%20file",
+               XURI_FLAGS_NONE,
                NULL,
                NULL,
                NULL,
@@ -1248,8 +1248,8 @@ test_uri_split (void)
   g_assert_cmpstr (path, ==, "/path/to/some file");
   g_free (path);
 
-  g_uri_split ("http://h%01st/path#%C3%89t%C3%A9%2Bhiver",
-               G_URI_FLAGS_ENCODED_FRAGMENT,
+  xuri_split ("http://h%01st/path#%C3%89t%C3%A9%2Bhiver",
+               XURI_FLAGS_ENCODED_FRAGMENT,
                NULL,
                NULL,
                NULL,
@@ -1262,8 +1262,8 @@ test_uri_split (void)
   g_assert_cmpstr (fragment, ==, "%C3%89t%C3%A9%2Bhiver");
   g_free (fragment);
 
-  g_uri_split_with_user ("scheme://user:pass;auth@host:1234/path?query#fragment",
-                         G_URI_FLAGS_HAS_AUTH_PARAMS|G_URI_FLAGS_HAS_PASSWORD,
+  xuri_split_with_user ("scheme://user:pass;auth@host:1234/path?query#fragment",
+                         XURI_FLAGS_HAS_AUTH_PARAMS|XURI_FLAGS_HAS_PASSWORD,
                          NULL,
                          &user,
                          &pass,
@@ -1282,16 +1282,16 @@ test_uri_split (void)
   g_free (pass);
   g_free (authparams);
 
-  g_uri_split_network ("scheme://user:pass;auth@host:1234/path?query#fragment",
-                       G_URI_FLAGS_NONE,
+  xuri_split_network ("scheme://user:pass;auth@host:1234/path?query#fragment",
+                       XURI_FLAGS_NONE,
                        NULL,
                        NULL,
                        NULL,
                        &error);
   g_assert_no_error (error);
 
-  g_uri_split_network ("scheme://user:pass;auth@host:1234/path?query#fragment",
-                       G_URI_FLAGS_NONE,
+  xuri_split_network ("scheme://user:pass;auth@host:1234/path?query#fragment",
+                       XURI_FLAGS_NONE,
                        &scheme,
                        &host,
                        &port,
@@ -1303,60 +1303,60 @@ test_uri_split (void)
   g_free (scheme);
   g_free (host);
 
-  g_uri_split_network ("%00",
-                       G_URI_FLAGS_NONE, NULL, NULL, NULL, &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_PATH);
+  xuri_split_network ("%00",
+                       XURI_FLAGS_NONE, NULL, NULL, NULL, &error);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_PATH);
   g_clear_error (&error);
 
-  g_uri_split_network ("/a",
-                       G_URI_FLAGS_NONE,
+  xuri_split_network ("/a",
+                       XURI_FLAGS_NONE,
                        &scheme,
                        &host,
                        &port,
                        &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_SCHEME);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_SCHEME);
   g_clear_error (&error);
 
-  g_uri_split_network ("schme:#",
-                       G_URI_FLAGS_NONE,
+  xuri_split_network ("schme:#",
+                       XURI_FLAGS_NONE,
                        &scheme,
                        &host,
                        &port,
                        &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_HOST);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_HOST);
   g_clear_error (&error);
 
-  g_uri_split_network ("scheme://[]/a",
-                       G_URI_FLAGS_NONE, NULL, NULL, NULL, &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_HOST);
+  xuri_split_network ("scheme://[]/a",
+                       XURI_FLAGS_NONE, NULL, NULL, NULL, &error);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_HOST);
   g_clear_error (&error);
 
-  g_uri_split_network ("scheme://user%00:pass;auth@host",
-                       G_URI_FLAGS_HAS_PASSWORD|G_URI_FLAGS_HAS_AUTH_PARAMS,
+  xuri_split_network ("scheme://user%00:pass;auth@host",
+                       XURI_FLAGS_HAS_PASSWORD|XURI_FLAGS_HAS_AUTH_PARAMS,
                        NULL, NULL, NULL, &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_USER);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_USER);
   g_clear_error (&error);
 
-  g_uri_split_network ("scheme://user:pass%00;auth@host",
-                       G_URI_FLAGS_HAS_PASSWORD|G_URI_FLAGS_HAS_AUTH_PARAMS,
+  xuri_split_network ("scheme://user:pass%00;auth@host",
+                       XURI_FLAGS_HAS_PASSWORD|XURI_FLAGS_HAS_AUTH_PARAMS,
                        NULL, NULL, NULL, &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_PASSWORD);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_PASSWORD);
   g_clear_error (&error);
 
-  g_uri_split_network ("scheme://user:pass;auth@host:1234/path?quer%00y#fragment",
-                       G_URI_FLAGS_NONE,
+  xuri_split_network ("scheme://user:pass;auth@host:1234/path?quer%00y#fragment",
+                       XURI_FLAGS_NONE,
                        NULL, NULL, NULL, &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_QUERY);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_QUERY);
   g_clear_error (&error);
 
-  g_uri_split_network ("scheme://use%00r:pass;auth@host:1234/path",
-                       G_URI_FLAGS_NONE,
+  xuri_split_network ("scheme://use%00r:pass;auth@host:1234/path",
+                       XURI_FLAGS_NONE,
                        NULL, NULL, NULL, &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_USER);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_USER);
   g_clear_error (&error);
 
-  g_uri_split ("scheme://user:pass;auth@host:1234/path?query#fragm%00ent",
-               G_URI_FLAGS_NONE,
+  xuri_split ("scheme://user:pass;auth@host:1234/path?query#fragm%00ent",
+               XURI_FLAGS_NONE,
                &scheme,
                &userinfo,
                &host,
@@ -1365,11 +1365,11 @@ test_uri_split (void)
                &query,
                &fragment,
                &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_FRAGMENT);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_FRAGMENT);
   g_clear_error (&error);
 
-  g_uri_split_with_user ("scheme://user:pa%x0s;auth@host:1234/path?query#fragment",
-                         G_URI_FLAGS_HAS_PASSWORD,
+  xuri_split_with_user ("scheme://user:pa%x0s;auth@host:1234/path?query#fragment",
+                         XURI_FLAGS_HAS_PASSWORD,
                          &scheme,
                          &user,
                          &pass,
@@ -1380,11 +1380,11 @@ test_uri_split (void)
                          &query,
                          &fragment,
                          &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_PASSWORD);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_PASSWORD);
   g_clear_error (&error);
 
-  g_uri_split_with_user ("scheme://user:pass;auth%00@host",
-                         G_URI_FLAGS_HAS_PASSWORD|G_URI_FLAGS_HAS_AUTH_PARAMS,
+  xuri_split_with_user ("scheme://user:pass;auth%00@host",
+                         XURI_FLAGS_HAS_PASSWORD|XURI_FLAGS_HAS_AUTH_PARAMS,
                          &scheme,
                          &user,
                          &pass,
@@ -1395,18 +1395,18 @@ test_uri_split (void)
                          &query,
                          &fragment,
                          &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_AUTH_PARAMS);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_AUTH_PARAMS);
   g_clear_error (&error);
 
-  g_uri_split_network ("scheme://user:pass%00;auth@host",
-                       G_URI_FLAGS_HAS_PASSWORD|G_URI_FLAGS_HAS_AUTH_PARAMS,
+  xuri_split_network ("scheme://user:pass%00;auth@host",
+                       XURI_FLAGS_HAS_PASSWORD|XURI_FLAGS_HAS_AUTH_PARAMS,
                        NULL, NULL, NULL, &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_PASSWORD);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_PASSWORD);
   g_clear_error (&error);
 
   /* Path not started correctly */
-  g_uri_split("scheme://hostname:123path?query#fragment",
-              G_URI_FLAGS_NONE,
+  xuri_split("scheme://hostname:123path?query#fragment",
+              XURI_FLAGS_NONE,
               &scheme,
               &userinfo,
               &host,
@@ -1415,12 +1415,12 @@ test_uri_split (void)
               &query,
               &fragment,
               &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_PORT);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_PORT);
   g_clear_error (&error);
 
   /* Brackets that don't close */
-  g_uri_split("scheme://[01:23:45:67:89:ab:cd:ef:123/path",
-              G_URI_FLAGS_NONE,
+  xuri_split("scheme://[01:23:45:67:89:ab:cd:ef:123/path",
+              XURI_FLAGS_NONE,
               &scheme,
               &userinfo,
               &host,
@@ -1429,12 +1429,12 @@ test_uri_split (void)
               &query,
               &fragment,
               &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_HOST);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_HOST);
   g_clear_error (&error);
 
   /* IPv6 hostname without brackets */
-  g_uri_split("scheme://01:23:45:67:89:ab:cd:ef:123/path",
-              G_URI_FLAGS_NONE,
+  xuri_split("scheme://01:23:45:67:89:ab:cd:ef:123/path",
+              XURI_FLAGS_NONE,
               &scheme,
               &userinfo,
               &host,
@@ -1443,7 +1443,7 @@ test_uri_split (void)
               &query,
               &fragment,
               &error);
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_PORT);
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_PORT);
   g_clear_error (&error);
 }
 
@@ -1452,71 +1452,71 @@ test_uri_is_valid (void)
 {
   xerror_t *error = NULL;
 
-  g_assert_true (g_uri_is_valid ("http://[::192.9.5.5]/ipng", G_URI_FLAGS_NONE, NULL));
-  g_assert_true (g_uri_is_valid ("http://127.127.127.127/", G_URI_FLAGS_NONE, NULL));
-  g_assert_true (g_uri_is_valid ("http://127.127.127.b/", G_URI_FLAGS_NONE, NULL));
-  g_assert_true (g_uri_is_valid ("http://\xc3\x89XAMPLE.COM/", G_URI_FLAGS_NONE, NULL));
+  g_assert_true (xuri_is_valid ("http://[::192.9.5.5]/ipng", XURI_FLAGS_NONE, NULL));
+  g_assert_true (xuri_is_valid ("http://127.127.127.127/", XURI_FLAGS_NONE, NULL));
+  g_assert_true (xuri_is_valid ("http://127.127.127.b/", XURI_FLAGS_NONE, NULL));
+  g_assert_true (xuri_is_valid ("http://\xc3\x89XAMPLE.COM/", XURI_FLAGS_NONE, NULL));
 
-  g_assert_true (g_uri_is_valid ("  \r http\t://f oo  \t\n ", G_URI_FLAGS_PARSE_RELAXED, NULL));
-  g_assert_false (g_uri_is_valid ("  \r http\t://f oo  \t\n ", G_URI_FLAGS_NONE, &error));
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_SCHEME);
+  g_assert_true (xuri_is_valid ("  \r http\t://f oo  \t\n ", XURI_FLAGS_PARSE_RELAXED, NULL));
+  g_assert_false (xuri_is_valid ("  \r http\t://f oo  \t\n ", XURI_FLAGS_NONE, &error));
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_SCHEME);
   g_clear_error (&error);
 
-  g_assert_false (g_uri_is_valid ("http://[::192.9.5.5/ipng", G_URI_FLAGS_NONE, &error));
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_HOST);
+  g_assert_false (xuri_is_valid ("http://[::192.9.5.5/ipng", XURI_FLAGS_NONE, &error));
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_HOST);
   g_clear_error (&error);
 
-  g_assert_true (g_uri_is_valid ("http://[fe80::dead:beef%25wef]/", G_URI_FLAGS_NONE, NULL));
-  g_assert_false (g_uri_is_valid ("http://[fe80::dead:beef%wef%]/", G_URI_FLAGS_NONE, &error));
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_HOST);
+  g_assert_true (xuri_is_valid ("http://[fe80::dead:beef%25wef]/", XURI_FLAGS_NONE, NULL));
+  g_assert_false (xuri_is_valid ("http://[fe80::dead:beef%wef%]/", XURI_FLAGS_NONE, &error));
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_HOST);
   g_clear_error (&error);
 
-  g_assert_false (g_uri_is_valid ("http://%00/", G_URI_FLAGS_NON_DNS, &error));
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_HOST);
+  g_assert_false (xuri_is_valid ("http://%00/", XURI_FLAGS_NON_DNS, &error));
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_HOST);
   g_clear_error (&error);
 
-  g_assert_true (g_uri_is_valid ("http://foo/", G_URI_FLAGS_NON_DNS, &error));
+  g_assert_true (xuri_is_valid ("http://foo/", XURI_FLAGS_NON_DNS, &error));
 
-  g_assert_false (g_uri_is_valid ("http://%00/", G_URI_FLAGS_NONE, &error));
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_HOST);
+  g_assert_false (xuri_is_valid ("http://%00/", XURI_FLAGS_NONE, &error));
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_HOST);
   g_clear_error (&error);
 
-  g_assert_false (g_uri_is_valid ("http://%30.%30.%30.%30/", G_URI_FLAGS_NONE, &error));
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_HOST);
+  g_assert_false (xuri_is_valid ("http://%30.%30.%30.%30/", XURI_FLAGS_NONE, &error));
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_HOST);
   g_clear_error (&error);
 
-  g_assert_false (g_uri_is_valid ("http://host:port", G_URI_FLAGS_NONE, &error));
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_PORT);
+  g_assert_false (xuri_is_valid ("http://host:port", XURI_FLAGS_NONE, &error));
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_PORT);
   g_clear_error (&error);
 
-  g_assert_false (g_uri_is_valid ("http://host:65536", G_URI_FLAGS_NONE, &error));
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_PORT);
+  g_assert_false (xuri_is_valid ("http://host:65536", XURI_FLAGS_NONE, &error));
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_PORT);
   g_clear_error (&error);
 
-  g_assert_false (g_uri_is_valid ("http://host:6553l", G_URI_FLAGS_NONE, &error));
-  g_assert_error (error, G_URI_ERROR, G_URI_ERROR_BAD_PORT);
+  g_assert_false (xuri_is_valid ("http://host:6553l", XURI_FLAGS_NONE, &error));
+  g_assert_error (error, XURI_ERROR, XURI_ERROR_BAD_PORT);
   g_clear_error (&error);
 
-  g_assert_true (g_uri_is_valid ("data:,Hello", G_URI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("data:,Hello", XURI_FLAGS_NONE, &error));
 
-  g_assert_true (g_uri_is_valid ("B:\\foo.txt", G_URI_FLAGS_NONE, &error));
-  g_assert_true (g_uri_is_valid ("B:/foo.txt", G_URI_FLAGS_NONE, &error));
-  g_assert_true (g_uri_is_valid ("B://foo.txt", G_URI_FLAGS_NONE, &error));
-  g_assert_true (g_uri_is_valid ("B:foo.txt", G_URI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("B:\\foo.txt", XURI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("B:/foo.txt", XURI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("B://foo.txt", XURI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("B:foo.txt", XURI_FLAGS_NONE, &error));
 
-  g_assert_true (g_uri_is_valid ("fd://0", G_URI_FLAGS_NONE, &error));
-  g_assert_true (g_uri_is_valid ("AB:\\foo.txt", G_URI_FLAGS_NONE, &error));
-  g_assert_true (g_uri_is_valid ("AB:/foo.txt", G_URI_FLAGS_NONE, &error));
-  g_assert_true (g_uri_is_valid ("AB://foo.txt", G_URI_FLAGS_NONE, &error));
-  g_assert_true (g_uri_is_valid ("AB:foo.txt", G_URI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("fd://0", XURI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("AB:\\foo.txt", XURI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("AB:/foo.txt", XURI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("AB://foo.txt", XURI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("AB:foo.txt", XURI_FLAGS_NONE, &error));
 
-  g_assert_true (g_uri_is_valid ("ABC:/foo.txt", G_URI_FLAGS_NONE, &error));
-  g_assert_true (g_uri_is_valid ("ABC://foo.txt", G_URI_FLAGS_NONE, &error));
-  g_assert_true (g_uri_is_valid ("ABC:foo.txt", G_URI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("ABC:/foo.txt", XURI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("ABC://foo.txt", XURI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("ABC:foo.txt", XURI_FLAGS_NONE, &error));
 
-  g_assert_true (g_uri_is_valid ("ABCD:/foo.txt", G_URI_FLAGS_NONE, &error));
-  g_assert_true (g_uri_is_valid ("ABCD://foo.txt", G_URI_FLAGS_NONE, &error));
-  g_assert_true (g_uri_is_valid ("ABCD:foo.txt", G_URI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("ABCD:/foo.txt", XURI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("ABCD://foo.txt", XURI_FLAGS_NONE, &error));
+  g_assert_true (xuri_is_valid ("ABCD:foo.txt", XURI_FLAGS_NONE, &error));
 }
 
 static const struct
@@ -1524,58 +1524,58 @@ static const struct
   /* Inputs */
   const xchar_t *uri;
   xchar_t *separators;
-  GUriParamsFlags flags;
+  xuri_params_flags_t flags;
   /* Outputs */
   /* key, value, key, value, …, limited to length 2*expected_n_params */
-  gssize expected_n_iter;  /* -1 => error expected */
+  xssize_t expected_n_iter;  /* -1 => error expected */
   const xchar_t *expected_iter_key_values[6];
-  gssize expected_n_params;  /* -1 => error expected */
+  xssize_t expected_n_params;  /* -1 => error expected */
   const xchar_t *expected_param_key_values[6];
 } params_tests[] =
   {
-    { "p1=foo&p2=bar;p3=baz", "&;", G_URI_PARAMS_NONE,
+    { "p1=foo&p2=bar;p3=baz", "&;", XURI_PARAMS_NONE,
       3, { "p1", "foo", "p2", "bar", "p3", "baz" },
       3, { "p1", "foo", "p2", "bar", "p3", "baz" }},
-    { "p1=foo&p2=bar", "", G_URI_PARAMS_NONE,
+    { "p1=foo&p2=bar", "", XURI_PARAMS_NONE,
       1, { "p1", "foo&p2=bar" },
       1, { "p1", "foo&p2=bar" }},
-    { "p1=foo&&P1=bar", "&", G_URI_PARAMS_NONE,
+    { "p1=foo&&P1=bar", "&", XURI_PARAMS_NONE,
       1, { "p1", "foo" },
       -1, { NULL, }},
-    { "%00=foo", "&", G_URI_PARAMS_NONE,
+    { "%00=foo", "&", XURI_PARAMS_NONE,
       0, { NULL, },
       -1, { NULL, }},
-    { "p1=%00", "&", G_URI_PARAMS_NONE,
+    { "p1=%00", "&", XURI_PARAMS_NONE,
       0, { NULL, },
       -1, { NULL, }},
-    { "p1=foo&p1=bar", "&", G_URI_PARAMS_NONE,
+    { "p1=foo&p1=bar", "&", XURI_PARAMS_NONE,
       2, { "p1", "foo", "p1", "bar" },
       1, { "p1", "bar", NULL, }},
-    { "p1=foo&P1=bar", "&", G_URI_PARAMS_CASE_INSENSITIVE,
+    { "p1=foo&P1=bar", "&", XURI_PARAMS_CASE_INSENSITIVE,
       2, { "p1", "foo", "P1", "bar" },
       1, { "p1", "bar", NULL, }},
-    { "=%", "&", G_URI_PARAMS_PARSE_RELAXED,
+    { "=%", "&", XURI_PARAMS_PARSE_RELAXED,
       1, { "", "%", NULL, },
       1, { "", "%", NULL, }},
-    { "=", "&", G_URI_PARAMS_NONE,
+    { "=", "&", XURI_PARAMS_NONE,
       1, { "", "", NULL, },
       1, { "", "", NULL, }},
-    { "foo", "&", G_URI_PARAMS_NONE,
+    { "foo", "&", XURI_PARAMS_NONE,
       0, { NULL, },
       -1, { NULL, }},
-    { "foo=bar+%26+baz&saisons=%C3%89t%C3%A9%2Bhiver", "&", G_URI_PARAMS_WWW_FORM,
+    { "foo=bar+%26+baz&saisons=%C3%89t%C3%A9%2Bhiver", "&", XURI_PARAMS_WWW_FORM,
       2, { "foo", "bar & baz", "saisons", "Été+hiver", NULL, },
       2, { "foo", "bar & baz", "saisons", "Été+hiver", NULL, }},
-    { "foo=bar+%26+baz&saisons=%C3%89t%C3%A9%2Bhiver", "&", G_URI_PARAMS_NONE,
+    { "foo=bar+%26+baz&saisons=%C3%89t%C3%A9%2Bhiver", "&", XURI_PARAMS_NONE,
       2, { "foo", "bar+&+baz", "saisons", "Été+hiver", NULL, },
       2, { "foo", "bar+&+baz", "saisons", "Été+hiver", NULL, }},
-    { "token=exp=123~acl=/QualityLevels(*~hmac=0cb", "&", G_URI_PARAMS_NONE,
+    { "token=exp=123~acl=/QualityLevels(*~hmac=0cb", "&", XURI_PARAMS_NONE,
       1, { "token", "exp=123~acl=/QualityLevels(*~hmac=0cb", NULL, },
       1, { "token", "exp=123~acl=/QualityLevels(*~hmac=0cb", NULL, }},
   };
 
 static void
-test_uri_iter_params (gconstpointer test_data)
+test_uri_iter_params (xconstpointer test_data)
 {
   xerror_t *err = NULL;
   xboolean_t use_nul_terminated = GPOINTER_TO_INT (test_data);
@@ -1583,14 +1583,14 @@ test_uri_iter_params (gconstpointer test_data)
 
   for (i = 0; i < G_N_ELEMENTS (params_tests); i++)
     {
-      GUriParamsIter iter;
+      xuri_params_iter_t iter;
       xchar_t *uri, *attr, *value;
-      gssize uri_len;
+      xssize_t uri_len;
 
       g_test_message ("URI %" G_GSIZE_FORMAT ": %s", i, params_tests[i].uri);
 
       g_assert (params_tests[i].expected_n_params < 0 ||
-                params_tests[i].expected_n_params <= (gssize) G_N_ELEMENTS (params_tests[i].expected_param_key_values) / 2);
+                params_tests[i].expected_n_params <= (xssize_t) G_N_ELEMENTS (params_tests[i].expected_param_key_values) / 2);
 
       /* The tests get run twice: once with the length unspecified, using a
        * nul-terminated string; and once with the length specified and a copy of
@@ -1599,7 +1599,7 @@ test_uri_iter_params (gconstpointer test_data)
       if (use_nul_terminated)
         {
           uri_len = -1;
-          uri = g_strdup (params_tests[i].uri);
+          uri = xstrdup (params_tests[i].uri);
         }
       else
         {
@@ -1609,20 +1609,20 @@ test_uri_iter_params (gconstpointer test_data)
 
       /* Run once without extracting the attr or value, just to check the numbers. */
       n = 0;
-      g_uri_params_iter_init (&iter, params_tests[i].uri, -1, params_tests[i].separators, params_tests[i].flags);
-      while (g_uri_params_iter_next (&iter, NULL, NULL, &err))
+      xuri_params_iter_init (&iter, params_tests[i].uri, -1, params_tests[i].separators, params_tests[i].flags);
+      while (xuri_params_iter_next (&iter, NULL, NULL, &err))
         n++;
       g_assert_cmpint (n, ==, params_tests[i].expected_n_iter);
       if (err)
         {
-          g_assert_error (err, G_URI_ERROR, G_URI_ERROR_FAILED);
+          g_assert_error (err, XURI_ERROR, XURI_ERROR_FAILED);
           g_clear_error (&err);
         }
 
       /* Run again and check the strings too. */
       n = 0;
-      g_uri_params_iter_init (&iter, params_tests[i].uri, -1, params_tests[i].separators, params_tests[i].flags);
-      while (g_uri_params_iter_next (&iter, &attr, &value, &err))
+      xuri_params_iter_init (&iter, params_tests[i].uri, -1, params_tests[i].separators, params_tests[i].flags);
+      while (xuri_params_iter_next (&iter, &attr, &value, &err))
         {
           g_assert_cmpstr (attr, ==, params_tests[i].expected_iter_key_values[n * 2]);
           g_assert_cmpstr (value, ==, params_tests[i].expected_iter_key_values[n * 2 + 1]);
@@ -1633,7 +1633,7 @@ test_uri_iter_params (gconstpointer test_data)
       g_assert_cmpint (n, ==, params_tests[i].expected_n_iter);
       if (err)
         {
-          g_assert_error (err, G_URI_ERROR, G_URI_ERROR_FAILED);
+          g_assert_error (err, XURI_ERROR, XURI_ERROR_FAILED);
           g_clear_error (&err);
         }
 
@@ -1642,7 +1642,7 @@ test_uri_iter_params (gconstpointer test_data)
 }
 
 static void
-test_uri_parse_params (gconstpointer test_data)
+test_uri_parse_params (xconstpointer test_data)
 {
   xerror_t *err = NULL;
   xboolean_t use_nul_terminated = GPOINTER_TO_INT (test_data);
@@ -1650,14 +1650,14 @@ test_uri_parse_params (gconstpointer test_data)
 
   for (i = 0; i < G_N_ELEMENTS (params_tests); i++)
     {
-      GHashTable *params;
+      xhashtable_t *params;
       xchar_t *uri = NULL;
-      gssize uri_len;
+      xssize_t uri_len;
 
       g_test_message ("URI %" G_GSIZE_FORMAT ": %s", i, params_tests[i].uri);
 
       g_assert (params_tests[i].expected_n_params < 0 ||
-                params_tests[i].expected_n_params <= (gssize) G_N_ELEMENTS (params_tests[i].expected_param_key_values) / 2);
+                params_tests[i].expected_n_params <= (xssize_t) G_N_ELEMENTS (params_tests[i].expected_param_key_values) / 2);
 
       /* The tests get run twice: once with the length unspecified, using a
        * nul-terminated string; and once with the length specified and a copy of
@@ -1666,7 +1666,7 @@ test_uri_parse_params (gconstpointer test_data)
       if (use_nul_terminated)
         {
           uri_len = -1;
-          uri = g_strdup (params_tests[i].uri);
+          uri = xstrdup (params_tests[i].uri);
         }
       else
         {
@@ -1674,12 +1674,12 @@ test_uri_parse_params (gconstpointer test_data)
           uri = g_memdup2 (params_tests[i].uri, uri_len);
         }
 
-      params = g_uri_parse_params (uri, uri_len, params_tests[i].separators, params_tests[i].flags, &err);
+      params = xuri_parse_params (uri, uri_len, params_tests[i].separators, params_tests[i].flags, &err);
 
       if (params_tests[i].expected_n_params < 0)
         {
           g_assert_null (params);
-          g_assert_error (err, G_URI_ERROR, G_URI_ERROR_FAILED);
+          g_assert_error (err, XURI_ERROR, XURI_ERROR_FAILED);
           g_clear_error (&err);
         }
       else
@@ -1687,14 +1687,14 @@ test_uri_parse_params (gconstpointer test_data)
           xsize_t j;
 
           g_assert_no_error (err);
-          g_assert_cmpint (g_hash_table_size (params), ==, params_tests[i].expected_n_params);
+          g_assert_cmpint (xhash_table_size (params), ==, params_tests[i].expected_n_params);
 
           for (j = 0; j < (xsize_t) params_tests[i].expected_n_params; j += 2)
-            g_assert_cmpstr (g_hash_table_lookup (params, params_tests[i].expected_param_key_values[j]), ==,
+            g_assert_cmpstr (xhash_table_lookup (params, params_tests[i].expected_param_key_values[j]), ==,
                              params_tests[i].expected_param_key_values[j + 1]);
         }
 
-      g_clear_pointer (&params, g_hash_table_unref);
+      g_clear_pointer (&params, xhash_table_unref);
       g_free (uri);
     }
 }
@@ -1704,36 +1704,36 @@ test_uri_join (void)
 {
   xchar_t *uri = NULL;
 
-  uri = g_uri_join (G_URI_FLAGS_NONE, "foo", "some:user@info", "bar", -1, "", NULL, NULL);
+  uri = xuri_join (XURI_FLAGS_NONE, "foo", "some:user@info", "bar", -1, "", NULL, NULL);
   g_assert_cmpstr (uri, ==, "foo://some:user%40info@bar");
   g_free (uri);
 
-  uri = g_uri_join (G_URI_FLAGS_NONE, NULL, NULL, NULL, -1, "/foo", "abc", NULL);
+  uri = xuri_join (XURI_FLAGS_NONE, NULL, NULL, NULL, -1, "/foo", "abc", NULL);
   g_assert_cmpstr (uri, ==, "/foo?abc");
   g_free (uri);
 
-  uri = g_uri_join (G_URI_FLAGS_NONE, NULL, NULL, "hostname", -1, "/foo", "abc", NULL);
+  uri = xuri_join (XURI_FLAGS_NONE, NULL, NULL, "hostname", -1, "/foo", "abc", NULL);
   g_assert_cmpstr (uri, ==, "//hostname/foo?abc");
   g_free (uri);
 
-  uri = g_uri_join_with_user (G_URI_FLAGS_NONE, "scheme", "user\001", "pass\002", "authparams\003",
+  uri = xuri_join_with_user (XURI_FLAGS_NONE, "scheme", "user\001", "pass\002", "authparams\003",
                               "host", 9876, "/path", "query", "fragment");
   g_assert_cmpstr (uri, ==, "scheme://user%01:pass%02;authparams%03@host:9876/path?query#fragment");
   g_free (uri);
 
-  uri = g_uri_join_with_user (G_URI_FLAGS_NONE, "scheme", "user\001", "pass\002", "authparams\003",
+  uri = xuri_join_with_user (XURI_FLAGS_NONE, "scheme", "user\001", "pass\002", "authparams\003",
                               "::192.9.5.5", 9876, "/path", "query", "fragment");
   g_assert_cmpstr (uri, ==, "scheme://user%01:pass%02;authparams%03@[::192.9.5.5]:9876/path?query#fragment");
   g_free (uri);
 
-  uri = g_uri_join_with_user (G_URI_FLAGS_ENCODED,
+  uri = xuri_join_with_user (XURI_FLAGS_ENCODED,
                               "scheme", "user%01", "pass%02", "authparams%03",
                               "::192.9.5.5", 9876, "/path", "query", "fragment");
   g_assert_cmpstr (uri, ==,
                    "scheme://user%01:pass%02;authparams%03@[::192.9.5.5]:9876/path?query#fragment");
   g_free (uri);
 
-  uri = g_uri_join (G_URI_FLAGS_NONE, "scheme", NULL, "foo:bar._webdav._tcp.local", -1, "", NULL, NULL);
+  uri = xuri_join (XURI_FLAGS_NONE, "scheme", NULL, "foo:bar._webdav._tcp.local", -1, "", NULL, NULL);
   g_assert_cmpstr (uri, ==, "scheme://foo%3Abar._webdav._tcp.local");
   g_free (uri);
 }
@@ -1741,7 +1741,7 @@ test_uri_join (void)
 static void
 test_uri_join_split_round_trip (void)
 {
-  GUriFlags flags = G_URI_FLAGS_HAS_PASSWORD | G_URI_FLAGS_HAS_AUTH_PARAMS;
+  xuri_flags_t flags = XURI_FLAGS_HAS_PASSWORD | XURI_FLAGS_HAS_AUTH_PARAMS;
   xuint_t i;
 
   g_test_summary ("Test that joining different URI components survives a round trip");
@@ -1772,11 +1772,11 @@ test_uri_join_split_round_trip (void)
       query = (i & (1 << 1)) ? "query" : NULL;
       fragment = (i & (1 << 0)) ? "fragment" : NULL;
 
-      uri = g_uri_join_with_user (flags, scheme, user, password, auth_params,
+      uri = xuri_join_with_user (flags, scheme, user, password, auth_params,
                                   host, port, path, query, fragment);
       g_assert_nonnull (uri);
 
-      split_success = g_uri_split_with_user (uri, flags, &scheme_out, &user_out,
+      split_success = xuri_split_with_user (uri, flags, &scheme_out, &user_out,
                                              &password_out, &auth_params_out,
                                              &host_out, &port_out, &path_out,
                                              &query_out, &fragment_out,
@@ -1811,62 +1811,62 @@ static const struct
   /* Inputs */
   const xchar_t *base;
   const xchar_t *uri;
-  GUriFlags flags;
+  xuri_flags_t flags;
   /* Outputs */
   const xchar_t *uri_string;
   const xchar_t *path;
   int port;
 } normalize_parse_tests[] =
   {
-    { NULL, "http://foo/path with spaces", G_URI_FLAGS_ENCODED,
+    { NULL, "http://foo/path with spaces", XURI_FLAGS_ENCODED,
       "http://foo/path%20with%20spaces", "/path%20with%20spaces", -1 },
-    { NULL, "http://foo/path with spaces 2", G_URI_FLAGS_ENCODED_PATH,
+    { NULL, "http://foo/path with spaces 2", XURI_FLAGS_ENCODED_PATH,
       "http://foo/path%20with%20spaces%202", "/path%20with%20spaces%202", -1 },
-    { NULL, "http://foo/%aa", G_URI_FLAGS_ENCODED,
+    { NULL, "http://foo/%aa", XURI_FLAGS_ENCODED,
       "http://foo/%AA", "/%AA", -1 },
-    { NULL, "http://foo/p\xc3\xa4th/", G_URI_FLAGS_ENCODED | G_URI_FLAGS_PARSE_RELAXED,
+    { NULL, "http://foo/p\xc3\xa4th/", XURI_FLAGS_ENCODED | XURI_FLAGS_PARSE_RELAXED,
       "http://foo/p%C3%A4th/", "/p%C3%A4th/", -1 },
-    { NULL, "http://foo", G_URI_FLAGS_NONE,
+    { NULL, "http://foo", XURI_FLAGS_NONE,
       "http://foo", "", -1 },
-    { NULL, "http://foo", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { NULL, "http://foo", XURI_FLAGS_SCHEME_NORMALIZE,
       "http://foo/", "/", 80 },
-    { NULL, "nothttp://foo", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { NULL, "nothttp://foo", XURI_FLAGS_SCHEME_NORMALIZE,
       "nothttp://foo", "", -1 },
-    { NULL, "http://foo:80", G_URI_FLAGS_NONE,
+    { NULL, "http://foo:80", XURI_FLAGS_NONE,
       "http://foo:80", "", 80 },
-    { NULL, "http://foo:80", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { NULL, "http://foo:80", XURI_FLAGS_SCHEME_NORMALIZE,
       "http://foo/", "/", 80 },
-    { NULL, "http://foo:8080", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { NULL, "http://foo:8080", XURI_FLAGS_SCHEME_NORMALIZE,
       "http://foo:8080/", "/", 8080 },
-    { NULL, "https://foo:443", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { NULL, "https://foo:443", XURI_FLAGS_SCHEME_NORMALIZE,
       "https://foo/", "/", 443 },
-    { NULL, "https://foo:943", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { NULL, "https://foo:943", XURI_FLAGS_SCHEME_NORMALIZE,
       "https://foo:943/", "/", 943 },
-    { NULL, "ws://foo", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { NULL, "ws://foo", XURI_FLAGS_SCHEME_NORMALIZE,
       "ws://foo/", "/", 80 },
-    { NULL, "wss://foo:443", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { NULL, "wss://foo:443", XURI_FLAGS_SCHEME_NORMALIZE,
       "wss://foo/", "/", 443 },
-    { NULL, "ftp://foo", G_URI_FLAGS_NONE,
+    { NULL, "ftp://foo", XURI_FLAGS_NONE,
       "ftp://foo", "", -1 },
-    { NULL, "ftp://foo", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { NULL, "ftp://foo", XURI_FLAGS_SCHEME_NORMALIZE,
       "ftp://foo", "", 21 },
-    { NULL, "ftp://foo:21", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { NULL, "ftp://foo:21", XURI_FLAGS_SCHEME_NORMALIZE,
       "ftp://foo", "", 21 },
-    { NULL, "ftp://foo:2100", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { NULL, "ftp://foo:2100", XURI_FLAGS_SCHEME_NORMALIZE,
       "ftp://foo:2100", "", 2100 },
-    { NULL, "nothttp://foo:80", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { NULL, "nothttp://foo:80", XURI_FLAGS_SCHEME_NORMALIZE,
       "nothttp://foo:80", "", 80 },
-    { "http://foo", "//bar", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { "http://foo", "//bar", XURI_FLAGS_SCHEME_NORMALIZE,
       "http://bar/", "/", 80 },
-    { "http://foo", "//bar:80", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { "http://foo", "//bar:80", XURI_FLAGS_SCHEME_NORMALIZE,
       "http://bar/", "/", 80 },
-    { "nothttp://foo", "//bar:80", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { "nothttp://foo", "//bar:80", XURI_FLAGS_SCHEME_NORMALIZE,
       "nothttp://bar:80", "", 80 },
-    { "http://foo", "//bar", G_URI_FLAGS_NONE,
+    { "http://foo", "//bar", XURI_FLAGS_NONE,
       "http://bar", "", -1 },
     { "ScHeMe://User:P%61ss@HOST.%63om:1234/path",
       "ScHeMe://User:P%61ss@HOST.%63om:1234/path/./from/../to%7d/item%2dobj?qu%65ry=something#fr%61gment",
-      G_URI_FLAGS_SCHEME_NORMALIZE,
+      XURI_FLAGS_SCHEME_NORMALIZE,
       "scheme://User:Pass@HOST.com:1234/path/to%7D/item-obj?query=something#fragment",
       "/path/to}/item-obj", 1234 },
   };
@@ -1875,45 +1875,45 @@ static const struct
 {
   /* Inputs */
   const xchar_t *uri;
-  GUriFlags flags;
+  xuri_flags_t flags;
   /* Outputs */
   const char *scheme;
   const xchar_t *path;
   int port;
 } normalize_split_tests[] =
   {
-    { "HTTP://foo", G_URI_FLAGS_ENCODED,
+    { "HTTP://foo", XURI_FLAGS_ENCODED,
       "http", "", -1 },
-    { "HTTP://foo", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { "HTTP://foo", XURI_FLAGS_SCHEME_NORMALIZE,
       "http", "/", 80 },
-    { "http://foo:80/", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { "http://foo:80/", XURI_FLAGS_SCHEME_NORMALIZE,
       "http", "/", 80 },
-    { "http://foo:8080/bar", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { "http://foo:8080/bar", XURI_FLAGS_SCHEME_NORMALIZE,
       "http", "/bar", 8080 },
-    { "ws://foo", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { "ws://foo", XURI_FLAGS_SCHEME_NORMALIZE,
       "ws", "/", 80 },
-    { "https://foo", G_URI_FLAGS_ENCODED,
+    { "https://foo", XURI_FLAGS_ENCODED,
       "https", "", -1 },
-    { "https://foo", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { "https://foo", XURI_FLAGS_SCHEME_NORMALIZE,
       "https", "/", 443 },
-    { "https://foo:443/", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { "https://foo:443/", XURI_FLAGS_SCHEME_NORMALIZE,
       "https", "/", 443 },
-    { "wss://foo", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { "wss://foo", XURI_FLAGS_SCHEME_NORMALIZE,
       "wss", "/", 443 },
-    { "ftp://foo", G_URI_FLAGS_ENCODED,
+    { "ftp://foo", XURI_FLAGS_ENCODED,
       "ftp", "", -1 },
-    { "ftp://foo", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { "ftp://foo", XURI_FLAGS_SCHEME_NORMALIZE,
       "ftp", "", 21 },
-    { "ftp://foo:21", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { "ftp://foo:21", XURI_FLAGS_SCHEME_NORMALIZE,
       "ftp", "", 21 },
-    { "scheme://foo", G_URI_FLAGS_SCHEME_NORMALIZE,
+    { "scheme://foo", XURI_FLAGS_SCHEME_NORMALIZE,
       "scheme", "", -1 },
   };
 
 static const struct
 {
   /* Inputs */
-  GUriFlags flags;
+  xuri_flags_t flags;
   const xchar_t *scheme;
   const xchar_t *host;
   int port;
@@ -1922,41 +1922,41 @@ static const struct
   const xchar_t *uri;
 } normalize_join_tests[] =
   {
-    { G_URI_FLAGS_NONE, "http", "foo", -1, "",
+    { XURI_FLAGS_NONE, "http", "foo", -1, "",
       "http://foo" },
-    { G_URI_FLAGS_SCHEME_NORMALIZE, "http", "foo", -1, "",
+    { XURI_FLAGS_SCHEME_NORMALIZE, "http", "foo", -1, "",
       "http://foo/" },
-    { G_URI_FLAGS_SCHEME_NORMALIZE, "http", "foo", 80, "",
+    { XURI_FLAGS_SCHEME_NORMALIZE, "http", "foo", 80, "",
       "http://foo/" },
-    { G_URI_FLAGS_SCHEME_NORMALIZE, "http", "foo", 8080, "",
+    { XURI_FLAGS_SCHEME_NORMALIZE, "http", "foo", 8080, "",
       "http://foo:8080/" },
-    { G_URI_FLAGS_NONE, "http", "foo", 80, "",
+    { XURI_FLAGS_NONE, "http", "foo", 80, "",
       "http://foo:80" },
-    { G_URI_FLAGS_SCHEME_NORMALIZE, "ws", "foo", 80, "",
+    { XURI_FLAGS_SCHEME_NORMALIZE, "ws", "foo", 80, "",
       "ws://foo/" },
-    { G_URI_FLAGS_NONE, "https", "foo", -1, "",
+    { XURI_FLAGS_NONE, "https", "foo", -1, "",
       "https://foo" },
-    { G_URI_FLAGS_SCHEME_NORMALIZE, "https", "foo", -1, "",
+    { XURI_FLAGS_SCHEME_NORMALIZE, "https", "foo", -1, "",
       "https://foo/" },
-    { G_URI_FLAGS_SCHEME_NORMALIZE, "https", "foo", 443, "",
+    { XURI_FLAGS_SCHEME_NORMALIZE, "https", "foo", 443, "",
       "https://foo/" },
-    { G_URI_FLAGS_SCHEME_NORMALIZE, "https", "foo", 943, "",
+    { XURI_FLAGS_SCHEME_NORMALIZE, "https", "foo", 943, "",
       "https://foo:943/" },
-    { G_URI_FLAGS_NONE, "https", "foo", 443, "",
+    { XURI_FLAGS_NONE, "https", "foo", 443, "",
       "https://foo:443" },
-    { G_URI_FLAGS_SCHEME_NORMALIZE, "wss", "foo", 443, "",
+    { XURI_FLAGS_SCHEME_NORMALIZE, "wss", "foo", 443, "",
       "wss://foo/" },
-    { G_URI_FLAGS_NONE, "ftp", "foo", -1, "",
+    { XURI_FLAGS_NONE, "ftp", "foo", -1, "",
       "ftp://foo" },
-    { G_URI_FLAGS_SCHEME_NORMALIZE, "ftp", "foo", -1, "",
+    { XURI_FLAGS_SCHEME_NORMALIZE, "ftp", "foo", -1, "",
       "ftp://foo" },
-    { G_URI_FLAGS_SCHEME_NORMALIZE, "ftp", "foo", 21, "",
+    { XURI_FLAGS_SCHEME_NORMALIZE, "ftp", "foo", 21, "",
       "ftp://foo" },
-    { G_URI_FLAGS_SCHEME_NORMALIZE, "ftp", "foo", 2020, "",
+    { XURI_FLAGS_SCHEME_NORMALIZE, "ftp", "foo", 2020, "",
       "ftp://foo:2020" },
-    { G_URI_FLAGS_NONE, "ftp", "foo", 21, "",
+    { XURI_FLAGS_NONE, "ftp", "foo", 21, "",
       "ftp://foo:21" },
-    { G_URI_FLAGS_SCHEME_NORMALIZE, "scheme", "foo", 80, "",
+    { XURI_FLAGS_SCHEME_NORMALIZE, "scheme", "foo", 80, "",
       "scheme://foo:80" },
   };
 
@@ -1970,26 +1970,26 @@ test_uri_normalize (void)
 
   for (i = 0; i < G_N_ELEMENTS (normalize_parse_tests); ++i)
     {
-      GUri *uri, *base = NULL;
+      xuri_t *uri, *base = NULL;
 
       if (normalize_parse_tests[i].base)
-        base = g_uri_parse (normalize_parse_tests[i].base, normalize_parse_tests[i].flags, NULL);
+        base = xuri_parse (normalize_parse_tests[i].base, normalize_parse_tests[i].flags, NULL);
 
-      uri = g_uri_parse_relative (base,
+      uri = xuri_parse_relative (base,
                                   normalize_parse_tests[i].uri,
                                   normalize_parse_tests[i].flags,
                                   NULL);
-      uri_string = g_uri_to_string (uri);
+      uri_string = xuri_to_string (uri);
 
       g_assert_nonnull (uri);
-      g_assert_cmpstr (g_uri_get_path (uri), ==, normalize_parse_tests[i].path);
-      g_assert_cmpint (g_uri_get_port (uri), ==, normalize_parse_tests[i].port);
+      g_assert_cmpstr (xuri_get_path (uri), ==, normalize_parse_tests[i].path);
+      g_assert_cmpint (xuri_get_port (uri), ==, normalize_parse_tests[i].port);
       g_assert_cmpstr (uri_string, ==, normalize_parse_tests[i].uri_string);
 
       g_free (uri_string);
-      g_uri_unref (uri);
+      xuri_unref (uri);
       if (base)
-        g_uri_unref (base);
+        xuri_unref (base);
     }
 
   for (i = 0; i < G_N_ELEMENTS (normalize_split_tests); ++i)
@@ -1997,13 +1997,13 @@ test_uri_normalize (void)
       char *scheme;
 
       /* Testing a codepath where scheme is NULL but internally we still normalize it. */
-      g_assert_true (g_uri_split (normalize_split_tests[i].uri, normalize_split_tests[i].flags,
+      g_assert_true (xuri_split (normalize_split_tests[i].uri, normalize_split_tests[i].flags,
                                   NULL, NULL, NULL, &port, &path, NULL, NULL, NULL));
       g_assert_cmpstr (path, ==, normalize_split_tests[i].path);
       g_assert_cmpint (port, ==, normalize_split_tests[i].port);
       g_free (path);
 
-      g_assert_true (g_uri_split (normalize_split_tests[i].uri, normalize_split_tests[i].flags,
+      g_assert_true (xuri_split (normalize_split_tests[i].uri, normalize_split_tests[i].flags,
                                   &scheme, NULL, NULL, &port, &path, NULL, NULL, NULL));
       g_assert_cmpstr (scheme, ==, normalize_split_tests[i].scheme);
       g_assert_cmpstr (path, ==, normalize_split_tests[i].path);
@@ -2014,7 +2014,7 @@ test_uri_normalize (void)
 
   for (i = 0; i < G_N_ELEMENTS (normalize_join_tests); ++i)
     {
-      uri_string = g_uri_join (normalize_join_tests[i].flags, normalize_join_tests[i].scheme, NULL,
+      uri_string = xuri_join (normalize_join_tests[i].flags, normalize_join_tests[i].scheme, NULL,
                                normalize_join_tests[i].host, normalize_join_tests[i].port,
                                normalize_join_tests[i].path, NULL, NULL);
       g_assert_cmpstr (uri_string, ==, normalize_join_tests[i].uri);

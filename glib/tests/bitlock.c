@@ -5,7 +5,7 @@
 static void
 test_bitlocks (void)
 {
-  guint64 start = g_get_monotonic_time ();
+  xuint64_t start = g_get_monotonic_time ();
   xint_t lock = 0;
   xint_t i;
 

@@ -24,11 +24,11 @@
 G_BEGIN_DECLS
 
 #define XTYPE_NETWORK_MONITOR_NETLINK         (_xnetwork_monitor_netlink_get_type ())
-#define XNETWORK_MONITOR_NETLINK(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NETWORK_MONITOR_NETLINK, xnetwork_monitor_netlink_t))
-#define XNETWORK_MONITOR_NETLINK_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NETWORK_MONITOR_NETLINK, xnetwork_monitor_netlink_class_t))
+#define XNETWORK_MONITOR_NETLINK(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NETWORK_MONITOR_NETLINK, xnetwork_monitor_netlink))
+#define XNETWORK_MONITOR_NETLINK_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NETWORK_MONITOR_NETLINK, xnetwork_monitor_netlink_class))
 #define X_IS_NETWORK_MONITOR_NETLINK(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NETWORK_MONITOR_NETLINK))
 #define X_IS_NETWORK_MONITOR_NETLINK_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_NETWORK_MONITOR_NETLINK))
-#define XNETWORK_MONITOR_NETLINK_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_NETWORK_MONITOR_NETLINK, xnetwork_monitor_netlink_class_t))
+#define XNETWORK_MONITOR_NETLINK_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_NETWORK_MONITOR_NETLINK, xnetwork_monitor_netlink_class))
 
 typedef struct _xnetwork_monitor_netlink        xnetwork_monitor_netlink_t;
 typedef struct _xnetwork_monitor_netlink_class   xnetwork_monitor_netlink_class_t;

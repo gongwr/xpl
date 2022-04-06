@@ -51,7 +51,7 @@ static xboolean_t is_unix = FALSE;
 
 static xchar_t *tmp_address = NULL;
 static xchar_t *test_guid = NULL;
-static GMainLoop *loop = NULL;
+static xmain_loop_t *loop = NULL;
 
 static const xchar_t *test_interface_introspection_xml =
   "<node>"
@@ -71,7 +71,7 @@ static const xchar_t *test_interface_introspection_xml =
   "    <property type='s' name='PeerProperty' access='read'/>"
   "  </interface>"
   "</node>";
-static GDBusInterfaceInfo *test_interface_introspection_data = NULL;
+static xdbus_interface_info_t *test_interface_introspection_data = NULL;
 
 
 #ifdef G_OS_UNIX
@@ -80,9 +80,9 @@ static GDBusInterfaceInfo *test_interface_introspection_data = NULL;
 #define OVERFLOW_NUM_SIGNALS 5000
 #define OVERFLOW_TIMEOUT_SEC 10
 
-static GDBusMessage *
-overflow_filter_func (GDBusConnection *connection,
-                      GDBusMessage    *message,
+static xdbus_message_t *
+overflow_filter_func (xdbus_connection_t *connection,
+                      xdbus_message_t    *message,
                       xboolean_t         incoming,
                       xpointer_t         user_data)
 {
@@ -94,7 +94,7 @@ overflow_filter_func (GDBusConnection *connection,
 static xboolean_t
 overflow_on_500ms_later_func (xpointer_t user_data)
 {
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
   return G_SOURCE_REMOVE;
 }
 
@@ -105,9 +105,9 @@ test_overflow (void)
   xint_t n;
   xsocket_t *socket;
   xsocket_connection_t *socket_connection;
-  GDBusConnection *producer, *consumer;
+  xdbus_connection_t *producer, *consumer;
   xerror_t *error;
-  GTimer *timer;
+  xtimer_t *timer;
   xint_t n_messages_received;  /* (atomic) */
   xint_t n_messages_sent;  /* (atomic) */
 
@@ -118,17 +118,17 @@ test_overflow (void)
   g_assert_no_error (error);
   socket_connection = xsocket_connection_factory_create_connection (socket);
   g_assert (socket_connection != NULL);
-  g_object_unref (socket);
+  xobject_unref (socket);
   producer = g_dbus_connection_new_sync (XIO_STREAM (socket_connection),
 					 NULL, /* guid */
 					 G_DBUS_CONNECTION_FLAGS_NONE,
-					 NULL, /* GDBusAuthObserver */
+					 NULL, /* xdbus_auth_observer_t */
 					 NULL, /* xcancellable_t */
 
 					 &error);
   g_dbus_connection_set_exit_on_close (producer, TRUE);
   g_assert_no_error (error);
-  g_object_unref (socket_connection);
+  xobject_unref (socket_connection);
   g_atomic_int_set (&n_messages_sent, 0);
   g_dbus_connection_add_filter (producer, overflow_filter_func, (xpointer_t) &n_messages_sent, NULL);
 
@@ -141,7 +141,7 @@ test_overflow (void)
                                      "/org/foo/Object",
                                      "org.foo.Interface",
                                      "Member",
-                                     g_variant_new ("(s)", "a string"),
+                                     xvariant_new ("(s)", "a string"),
                                      &error);
       g_assert_no_error (error);
     }
@@ -154,7 +154,7 @@ test_overflow (void)
    * sent to the underlying transport.
    */
   g_timeout_add (500, overflow_on_500ms_later_func, NULL);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
   g_assert_cmpint (g_atomic_int_get (&n_messages_sent), <, OVERFLOW_NUM_SIGNALS);
 
   /* now suck it all out as a client, and add it up */
@@ -162,15 +162,15 @@ test_overflow (void)
   g_assert_no_error (error);
   socket_connection = xsocket_connection_factory_create_connection (socket);
   g_assert (socket_connection != NULL);
-  g_object_unref (socket);
+  xobject_unref (socket);
   consumer = g_dbus_connection_new_sync (XIO_STREAM (socket_connection),
 					 NULL, /* guid */
 					 G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING,
-					 NULL, /* GDBusAuthObserver */
+					 NULL, /* xdbus_auth_observer_t */
 					 NULL, /* xcancellable_t */
 					 &error);
   g_assert_no_error (error);
-  g_object_unref (socket_connection);
+  xobject_unref (socket_connection);
   g_atomic_int_set (&n_messages_received, 0);
   g_dbus_connection_add_filter (consumer, overflow_filter_func, (xpointer_t) &n_messages_received, NULL);
   g_dbus_connection_start_message_processing (consumer);
@@ -179,14 +179,14 @@ test_overflow (void)
   g_timer_start (timer);
 
   while (g_atomic_int_get (&n_messages_received) < OVERFLOW_NUM_SIGNALS && g_timer_elapsed (timer, NULL) < OVERFLOW_TIMEOUT_SEC)
-      g_main_context_iteration (NULL, FALSE);
+      xmain_context_iteration (NULL, FALSE);
 
   g_assert_cmpint (g_atomic_int_get (&n_messages_sent), ==, OVERFLOW_NUM_SIGNALS);
   g_assert_cmpint (g_atomic_int_get (&n_messages_received), ==, OVERFLOW_NUM_SIGNALS);
 
   g_timer_destroy (timer);
-  g_object_unref (consumer);
-  g_object_unref (producer);
+  xobject_unref (consumer);
+  xobject_unref (producer);
 }
 #else
 static void
@@ -204,7 +204,7 @@ main (int   argc,
       char *argv[])
 {
   xint_t ret;
-  GDBusNodeInfo *introspection_data = NULL;
+  xdbus_node_info_t *introspection_data = NULL;
   xchar_t *tmpdir = NULL;
 
   g_test_init (&argc, &argv, NULL);
@@ -218,24 +218,24 @@ main (int   argc,
   if (is_unix)
     {
       if (g_unix_socket_address_abstract_names_supported ())
-	tmp_address = g_strdup ("unix:tmpdir=/tmp/gdbus-test-");
+	tmp_address = xstrdup ("unix:tmpdir=/tmp/gdbus-test-");
       else
 	{
 	  tmpdir = g_dir_make_tmp ("gdbus-test-XXXXXX", NULL);
-	  tmp_address = g_strdup_printf ("unix:tmpdir=%s", tmpdir);
+	  tmp_address = xstrdup_printf ("unix:tmpdir=%s", tmpdir);
 	}
     }
   else
-    tmp_address = g_strdup ("nonce-tcp:");
+    tmp_address = xstrdup ("nonce-tcp:");
 
   /* all the tests rely on a shared main loop */
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   g_test_add_func ("/gdbus/overflow", test_overflow);
 
   ret = g_test_run();
 
-  g_main_loop_unref (loop);
+  xmain_loop_unref (loop);
   g_free (test_guid);
   g_dbus_node_info_unref (introspection_data);
   if (is_unix)

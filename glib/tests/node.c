@@ -32,17 +32,17 @@
 #include "glib.h"
 
 typedef struct {
-  GString *s;
+  xstring_t *s;
   xint_t count;
 } CallbackData;
 
 static xboolean_t
-node_build_string (GNode    *node,
+node_build_string (xnode_t    *node,
                    xpointer_t  data)
 {
   CallbackData *d = data;
 
-  g_string_append_c (d->s, GPOINTER_TO_INT (node->data));
+  xstring_append_c (d->s, GPOINTER_TO_INT (node->data));
 
   d->count--;
 
@@ -63,15 +63,15 @@ typedef struct {
 static void
 traversal_test (void)
 {
-  GNode *root;
-  GNode *node_B;
-  GNode *node_C;
-  GNode *node_D;
-  GNode *node_E;
-  GNode *node_F;
-  GNode *node_G;
-  GNode *node_J;
-  GNode *n;
+  xnode_t *root;
+  xnode_t *node_B;
+  xnode_t *node_C;
+  xnode_t *node_D;
+  xnode_t *node_E;
+  xnode_t *node_F;
+  xnode_t *node_G;
+  xnode_t *node_J;
+  xnode_t *n;
   TraverseData orders[] = {
     { G_PRE_ORDER,   G_TRAVERSE_ALL,       -1, -1, "ABCDEFGHIJK" },
     { G_PRE_ORDER,   G_TRAVERSE_ALL,        1, -1, "A"           },
@@ -207,10 +207,10 @@ traversal_test (void)
   n = g_node_last_sibling (node_E);
   g_assert (n == node_E);
 
-  data.s = g_string_new ("");
+  data.s = xstring_new ("");
   for (i = 0; i < G_N_ELEMENTS (orders); i++)
     {
-      g_string_set_size (data.s, 0);
+      xstring_set_size (data.s, 0);
       data.count = orders[i].limit;
       g_node_traverse (root, orders[i].traverse, orders[i].flags, orders[i].depth, node_build_string, &data);
       g_assert_cmpstr (data.s->str, ==,  orders[i].expected);
@@ -219,7 +219,7 @@ traversal_test (void)
   g_node_reverse_children (node_B);
   g_node_reverse_children (node_G);
 
-  g_string_set_size (data.s, 0);
+  xstring_set_size (data.s, 0);
   data.count = -1;
   g_node_traverse (root, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1, node_build_string, &data);
   g_assert_cmpstr (data.s->str, ==, "ABFEDCGKJIH");
@@ -227,36 +227,36 @@ traversal_test (void)
   g_node_append (node_D, g_node_new (GINT_TO_POINTER ('L')));
   g_node_insert (node_D, -1, g_node_new (GINT_TO_POINTER ('M')));
 
-  g_string_set_size (data.s, 0);
+  xstring_set_size (data.s, 0);
   data.count = -1;
   g_node_traverse (root, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1, node_build_string, &data);
   g_assert_cmpstr (data.s->str, ==, "ABFEDCGLMKJIH");
 
-  g_string_set_size (data.s, 0);
+  xstring_set_size (data.s, 0);
   data.count = -1;
   g_node_traverse (root, G_PRE_ORDER, G_TRAVERSE_LEAFS, -1, node_build_string, &data);
   g_assert_cmpstr (data.s->str, ==, "ELMCKJIH");
 
-  g_string_set_size (data.s, 0);
+  xstring_set_size (data.s, 0);
   data.count = -1;
   g_node_traverse (root, G_PRE_ORDER, G_TRAVERSE_NON_LEAFS, -1, node_build_string, &data);
   g_assert_cmpstr (data.s->str, ==, "ABDFG");
 
   g_node_destroy (root);
-  g_string_free (data.s, TRUE);
+  xstring_free (data.s, TRUE);
 }
 
 static void
 construct_test (void)
 {
-  GNode *root;
-  GNode *node;
-  GNode *node_B;
-  GNode *node_D;
-  GNode *node_F;
-  GNode *node_G;
-  GNode *node_J;
-  GNode *node_H;
+  xnode_t *root;
+  xnode_t *node;
+  xnode_t *node_B;
+  xnode_t *node_D;
+  xnode_t *node_F;
+  xnode_t *node_G;
+  xnode_t *node_J;
+  xnode_t *node_H;
   xuint_t i;
 
   root = g_node_new (GINT_TO_POINTER ('A'));
@@ -322,8 +322,8 @@ construct_test (void)
 static void
 allocation_test (void)
 {
-  GNode *root;
-  GNode *node;
+  xnode_t *root;
+  xnode_t *node;
   xint_t i;
 
   root = g_node_new (NULL);
@@ -345,11 +345,11 @@ allocation_test (void)
 static void
 misc_test (void)
 {
-  GNode *root;
-  GNode *node_B;
-  GNode *node_C;
-  GNode *node_D;
-  GNode *node_E;
+  xnode_t *root;
+  xnode_t *node_B;
+  xnode_t *node_C;
+  xnode_t *node_D;
+  xnode_t *node_E;
   CallbackData data;
 
   root = g_node_new (GINT_TO_POINTER ('A'));
@@ -374,27 +374,27 @@ misc_test (void)
   g_assert_cmpint (g_node_child_index (root, GINT_TO_POINTER ('D')), ==, 2);
   g_assert_cmpint (g_node_child_index (root, GINT_TO_POINTER ('E')), ==, -1);
 
-  data.s = g_string_new ("");
+  data.s = xstring_new ("");
   data.count = -1;
   g_node_children_foreach (root, G_TRAVERSE_ALL, (GNodeForeachFunc)node_build_string, &data);
   g_assert_cmpstr (data.s->str, ==, "BCD");
 
-  g_string_set_size (data.s, 0);
+  xstring_set_size (data.s, 0);
   data.count = -1;
   g_node_children_foreach (root, G_TRAVERSE_LEAVES, (GNodeForeachFunc)node_build_string, &data);
   g_assert_cmpstr (data.s->str, ==, "BD");
 
-  g_string_set_size (data.s, 0);
+  xstring_set_size (data.s, 0);
   data.count = -1;
   g_node_children_foreach (root, G_TRAVERSE_NON_LEAVES, (GNodeForeachFunc)node_build_string, &data);
   g_assert_cmpstr (data.s->str, ==, "C");
-  g_string_free (data.s, TRUE);
+  xstring_free (data.s, TRUE);
 
   g_node_destroy (root);
 }
 
 static xboolean_t
-check_order (GNode    *node,
+check_order (xnode_t    *node,
              xpointer_t  data)
 {
   xchar_t **expected = data;
@@ -410,10 +410,10 @@ check_order (GNode    *node,
 static void
 unlink_test (void)
 {
-  GNode *root;
-  GNode *node;
-  GNode *bnode;
-  GNode *cnode;
+  xnode_t *root;
+  xnode_t *node;
+  xnode_t *bnode;
+  xnode_t *cnode;
   xchar_t *expected;
 
   /*
@@ -462,7 +462,7 @@ unlink_test (void)
 }
 
 static xpointer_t
-copy_up (gconstpointer src,
+copy_up (xconstpointer src,
          xpointer_t      data)
 {
   xchar_t l, u;
@@ -476,8 +476,8 @@ copy_up (gconstpointer src,
 static void
 copy_test (void)
 {
-  GNode *root;
-  GNode *copy;
+  xnode_t *root;
+  xnode_t *copy;
   xchar_t *expected;
 
   root = g_node_new (GINT_TO_POINTER ('a'));

@@ -29,17 +29,17 @@ msgstr ""
 
 #: ../gio/gapplication.c:495
 #, fuzzy
-msgid "GApplication options"
-msgstr "GApplication võtmed"
+msgid "xapplication_t options"
+msgstr "xapplication_t võtmed"
 
 #: ../gio/gapplication.c:495
 #, fuzzy
 #| msgid "Application Options:"
-msgid "Show GApplication options"
+msgid "Show xapplication_t options"
 msgstr "Rakenduse võtmed:"
 
 #: ../gio/gapplication.c:540
-msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
 msgstr ""
 
 #: ../gio/gapplication.c:552
@@ -290,8 +290,8 @@ msgstr "Voogu pole võimalik kerida"
 
 #: ../gio/gbufferedinputstream.c:937
 #, fuzzy
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "GMemoryInputStream'i pole võimalik kärpida"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "xmemory_input_stream_t'i pole võimalik kärpida"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1208
 #: ../gio/giostream.c:300 ../gio/goutputstream.c:1661
@@ -366,22 +366,22 @@ msgid "%s filetype"
 msgstr "%s failitüüp"
 
 #: ../gio/gcredentials.c:312 ../gio/gcredentials.c:571
-msgid "GCredentials is not implemented on this OS"
+msgid "xcredentials_t is not implemented on this OS"
 msgstr "Selle operatsioonisüsteemi jaoks pole loodud GCredentialsi tuge"
 
 #: ../gio/gcredentials.c:467
-msgid "There is no GCredentials support for your platform"
+msgid "There is no xcredentials_t support for your platform"
 msgstr "Sinu platvormile puudub GCredentialsi tugi"
 
 #: ../gio/gcredentials.c:513
 #, fuzzy
-#| msgid "GCredentials is not implemented on this OS"
-msgid "GCredentials does not contain a process ID on this OS"
+#| msgid "xcredentials_t is not implemented on this OS"
+msgid "xcredentials_t does not contain a process ID on this OS"
 msgstr "Selle operatsioonisüsteemi jaoks pole loodud GCredentialsi tuge"
 
 #: ../gio/gcredentials.c:565
 #, fuzzy
-#| msgid "GCredentials is not implemented on this OS"
+#| msgid "xcredentials_t is not implemented on this OS"
 msgid "Credentials spoofing is not possible on this OS"
 msgstr "Selle operatsioonisüsteemi jaoks pole loodud GCredentialsi tuge"
 
@@ -560,7 +560,7 @@ msgid ""
 msgstr ""
 
 #: ../gio/gdbusauth.c:1171
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
 msgstr ""
 
 #: ../gio/gdbusauthmechanismsha1.c:262
@@ -1305,27 +1305,27 @@ msgstr ""
 
 #: ../gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of GEmblem encoding"
-msgstr "GEmblem’i kodeeringu versiooni %d pole võimalik käsitseda"
+msgid "Can’t handle version %d of xemblem_t encoding"
+msgstr "xemblem_t’i kodeeringu versiooni %d pole võimalik käsitseda"
 
 #: ../gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "Vigane märgiste arv (%d) GEmblem’i kodeeringus"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "Vigane märgiste arv (%d) xemblem_t’i kodeeringus"
 
 #: ../gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of GEmblemedIcon encoding"
-msgstr "GEmblemedIcon’i kodeeringu versiooni %d pole võimalik käsitseda"
+msgid "Can’t handle version %d of xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t’i kodeeringu versiooni %d pole võimalik käsitseda"
 
 #: ../gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "Vigane märgiste arv (%d) GEmblemedIcon'i kodeeringus"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "Vigane märgiste arv (%d) xemblemed_icon_t'i kodeeringus"
 
 #: ../gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "Oodati GEmblem'i GEmblemedIcon'i jaoks"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "Oodati xemblem_t'i xemblemed_icon_t'i jaoks"
 
 #: ../gio/gfile.c:1071 ../gio/gfile.c:1309 ../gio/gfile.c:1447
 #: ../gio/gfile.c:1685 ../gio/gfile.c:1740 ../gio/gfile.c:1798
@@ -1427,12 +1427,12 @@ msgstr "Failinummerdaja on juba suletud"
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can’t handle version %d of GFileIcon encoding"
-msgstr "GFileIcon’i kodeeringu versiooni %d pole võimalik käsitseda"
+msgid "Can’t handle version %d of xfile_icon_t encoding"
+msgstr "xfile_icon_t’i kodeeringu versiooni %d pole võimalik käsitseda"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for GFileIcon"
-msgstr "Vigaselt vormindatud andmed GFileIcon'i jaoks"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "Vigaselt vormindatud andmed xfile_icon_t'i jaoks"
 
 #: ../gio/gfileinputstream.c:149 ../gio/gfileinputstream.c:394
 #: ../gio/gfileiostream.c:167 ../gio/gfileoutputstream.c:164
@@ -2733,7 +2733,7 @@ msgstr ""
 
 #: ../gio/glib-compile-schemas.c:2099
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
@@ -3088,8 +3088,8 @@ msgid "Invalid seek request"
 msgstr "Sobimatu kerimise päring"
 
 #: ../gio/gmemoryinputstream.c:508
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "GMemoryInputStream'i pole võimalik kärpida"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "xmemory_input_stream_t'i pole võimalik kärpida"
 
 #: ../gio/gmemoryoutputstream.c:567
 msgid "Memory output stream not resizable"
@@ -3707,8 +3707,8 @@ msgstr "Viga sõnumi saatmisel: %s"
 
 #: ../gio/gsocket.c:4711
 #, fuzzy
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "GSocketControlMessage pole windows-platvormil toetatud"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "xsocket_control_message_t pole windows-platvormil toetatud"
 
 #: ../gio/gsocket.c:5164 ../gio/gsocket.c:5237 ../gio/gsocket.c:5463
 #, c-format
@@ -3849,8 +3849,8 @@ msgstr "SOCKSv5 proksi tundmatu viga."
 
 #: ../gio/gthemedicon.c:518
 #, c-format
-msgid "Can’t handle version %d of GThemedIcon encoding"
-msgstr "GThemedIcon kodeeringu versiooni %d pole võimalik käsitseda"
+msgid "Can’t handle version %d of xthemed_icon_t encoding"
+msgstr "xthemed_icon_t kodeeringu versiooni %d pole võimalik käsitseda"
 
 #: ../gio/gthreadedresolver.c:118
 msgid "No valid addresses were found"
@@ -4197,25 +4197,25 @@ msgstr "Rajanimi „%s“ ei ole absoluutne rada"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:207
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %-d %b %Y, %H∶%M∶%S"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:210
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%-d. %b %Y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:213
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:216
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -4598,13 +4598,13 @@ msgstr "dets"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:563
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "e. l."
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:566
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "p. l."
 
@@ -5891,11 +5891,11 @@ msgstr "%.1f KB"
 #~ msgid "repeating a DEFINE group is not allowed"
 #~ msgstr "DEFINE grupi kordused pole lubatud"
 
-#~ msgctxt "GDateTime"
+#~ msgctxt "xdatetime_t"
 #~ msgid "am"
 #~ msgstr "el"
 
-#~ msgctxt "GDateTime"
+#~ msgctxt "xdatetime_t"
 #~ msgid "pm"
 #~ msgstr "pl"
 

@@ -29,10 +29,10 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_ASYNC_RESULT            (g_async_result_get_type ())
+#define XTYPE_ASYNC_RESULT            (xasync_result_get_type ())
 #define G_ASYNC_RESULT(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_ASYNC_RESULT, xasync_result_t))
 #define X_IS_ASYNC_RESULT(obj)	       (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_ASYNC_RESULT))
-#define G_ASYNC_RESULT_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_ASYNC_RESULT, GAsyncResultIface))
+#define G_ASYNC_RESULT_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_ASYNC_RESULT, xasync_result_iface_t))
 
 /**
  * xasync_result_t:
@@ -40,11 +40,11 @@ G_BEGIN_DECLS
  * Holds results information for an asynchronous operation,
  * usually passed directly to an asynchronous _finish() operation.
  **/
-typedef struct _GAsyncResultIface    GAsyncResultIface;
+typedef struct _GAsyncResultIface    xasync_result_iface_t;
 
 
 /**
- * GAsyncResultIface:
+ * xasync_result_iface_t:
  * @x_iface: The parent interface.
  * @get_user_data: Gets the user data passed to the callback.
  * @get_source_object: Gets the source object that issued the asynchronous operation.
@@ -66,18 +66,18 @@ struct _GAsyncResultIface
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t    g_async_result_get_type          (void) G_GNUC_CONST;
+xtype_t    xasync_result_get_type          (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-xpointer_t g_async_result_get_user_data     (xasync_result_t *res);
+xpointer_t xasync_result_get_user_data     (xasync_result_t *res);
 XPL_AVAILABLE_IN_ALL
-xobject_t *g_async_result_get_source_object (xasync_result_t *res);
+xobject_t *xasync_result_get_source_object (xasync_result_t *res);
 
 XPL_AVAILABLE_IN_2_34
-xboolean_t g_async_result_legacy_propagate_error (xasync_result_t  *res,
+xboolean_t xasync_result_legacy_propagate_error (xasync_result_t  *res,
 						xerror_t       **error);
 XPL_AVAILABLE_IN_2_34
-xboolean_t g_async_result_is_tagged              (xasync_result_t  *res,
+xboolean_t xasync_result_is_tagged              (xasync_result_t  *res,
 						xpointer_t       source_tag);
 
 G_END_DECLS

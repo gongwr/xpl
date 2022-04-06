@@ -20,11 +20,11 @@
 static void
 test_listenv (void)
 {
-  GHashTable *table;
+  xhashtable_t *table;
   xchar_t **list;
   xint_t i;
 
-  table = g_hash_table_new_full (g_str_hash, g_str_equal,
+  table = xhash_table_new_full (xstr_hash, xstr_equal,
                                  g_free, g_free);
 
   list = g_get_environ ();
@@ -32,15 +32,15 @@ test_listenv (void)
     {
       xchar_t **parts;
 
-      parts = g_strsplit (list[i], "=", 2);
-      g_assert_null (g_hash_table_lookup (table, parts[0]));
-      if (g_strcmp0 (parts[0], ""))
-        g_hash_table_insert (table, parts[0], parts[1]);
+      parts = xstrsplit (list[i], "=", 2);
+      g_assert_null (xhash_table_lookup (table, parts[0]));
+      if (xstrcmp0 (parts[0], ""))
+        xhash_table_insert (table, parts[0], parts[1]);
       g_free (parts);
     }
-  g_strfreev (list);
+  xstrfreev (list);
 
-  g_assert_cmpint (g_hash_table_size (table), >, 0);
+  g_assert_cmpint (xhash_table_size (table), >, 0);
 
   list = g_listenv ();
   for (i = 0; list[i]; i++)
@@ -48,14 +48,14 @@ test_listenv (void)
       const xchar_t *expected;
       const xchar_t *value;
 
-      expected = g_hash_table_lookup (table, list[i]);
+      expected = xhash_table_lookup (table, list[i]);
       value = g_getenv (list[i]);
       g_assert_cmpstr (value, ==, expected);
-      g_hash_table_remove (table, list[i]);
+      xhash_table_remove (table, list[i]);
     }
-  g_assert_cmpint (g_hash_table_size (table), ==, 0);
-  g_hash_table_unref (table);
-  g_strfreev (list);
+  g_assert_cmpint (xhash_table_size (table), ==, 0);
+  xhash_table_unref (table);
+  xstrfreev (list);
 }
 
 static void
@@ -186,25 +186,25 @@ test_environ_array (void)
                              "*assertion* != NULL*");
       undefined_env = g_environ_setenv (env, NULL, "bar", TRUE);
       g_test_assert_expected_messages ();
-      g_strfreev (undefined_env);
+      xstrfreev (undefined_env);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion* == NULL*");
       undefined_env = g_environ_setenv (env, "foo=fuz", "bar", TRUE);
       g_test_assert_expected_messages ();
-      g_strfreev (undefined_env);
+      xstrfreev (undefined_env);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion* != NULL*");
       undefined_env = g_environ_setenv (env, "foo", NULL, TRUE);
       g_test_assert_expected_messages ();
-      g_strfreev (undefined_env);
+      xstrfreev (undefined_env);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion* != NULL*");
       undefined_env = g_environ_unsetenv (env, NULL);
       g_test_assert_expected_messages ();
-      g_strfreev (undefined_env);
+      xstrfreev (undefined_env);
     }
 
   env = g_environ_setenv (env, "foo", "bar", TRUE);
@@ -229,7 +229,7 @@ test_environ_array (void)
   value = g_environ_getenv (env, "foo2");
   g_assert_null (value);
 
-  g_strfreev (env);
+  xstrfreev (env);
 }
 
 static void
@@ -245,7 +245,7 @@ test_environ_null (void)
 
   env = g_environ_setenv (NULL, "foo", "bar", TRUE);
   g_assert_nonnull (env);
-  g_strfreev (env);
+  xstrfreev (env);
 
   env = g_environ_unsetenv (NULL, "foo");
   g_assert_null (env);
@@ -263,7 +263,7 @@ test_environ_case (void)
   value = g_environ_getenv (env, "foo");
   g_assert_cmpstr (value, ==, "bar");
 
-  value = g_environ_getenv (env, "Foo");
+  value = g_environ_getenv (env, "foo_t");
 #ifdef G_OS_WIN32
   g_assert_cmpstr (value, ==, "bar");
 #else
@@ -278,7 +278,7 @@ test_environ_case (void)
   g_assert_cmpstr (value, ==, "bar");
 #endif
 
-  env = g_environ_unsetenv (env, "Foo");
+  env = g_environ_unsetenv (env, "foo_t");
   value = g_environ_getenv (env, "foo");
 #ifdef G_OS_WIN32
   g_assert_null (value);
@@ -286,7 +286,7 @@ test_environ_case (void)
   g_assert_cmpstr (value, ==, "bar");
 #endif
 
-  g_strfreev (env);
+  xstrfreev (env);
 }
 
 int

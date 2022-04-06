@@ -24,17 +24,17 @@ msgstr ""
 "X-Generator: Gtranslator 2.91.7\n"
 
 #: ../gio/gapplication.c:493
-msgid "GApplication options"
-msgstr "Tùy chọn GApplication"
+msgid "xapplication_t options"
+msgstr "Tùy chọn xapplication_t"
 
 #: ../gio/gapplication.c:493
-msgid "Show GApplication options"
-msgstr "Hiển thị tùy chọn GApplication"
+msgid "Show xapplication_t options"
+msgstr "Hiển thị tùy chọn xapplication_t"
 
 #: ../gio/gapplication.c:538
-msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
 msgstr ""
-"Nhập vào chế độ dịch vụ GApplication (dùng từ các tập tin dịch vụ D-Bus)"
+"Nhập vào chế độ dịch vụ xapplication_t (dùng từ các tập tin dịch vụ D-Bus)"
 
 #: ../gio/gapplication.c:550
 msgid "Override the application's ID"
@@ -273,8 +273,8 @@ msgstr ""
 "Chức năng seek (di chuyển vị trí đọc) không được hỗ trợ trên luồng cơ bản"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "Không thể cắt GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "Không thể cắt xbuffered_input_stream"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1205
 #: ../gio/giostream.c:300 ../gio/goutputstream.c:1658
@@ -347,16 +347,16 @@ msgid "%s filetype"
 msgstr "kiểu tập tin %s"
 
 #: ../gio/gcredentials.c:312 ../gio/gcredentials.c:571
-msgid "GCredentials is not implemented on this OS"
-msgstr "GCredentials không được hỗ trợ trên hệ điều hành này"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "xcredentials_t không được hỗ trợ trên hệ điều hành này"
 
 #: ../gio/gcredentials.c:467
-msgid "There is no GCredentials support for your platform"
-msgstr "Không có hỗ trợ GCredentials trên hệ điều hành của bạn"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "Không có hỗ trợ xcredentials_t trên hệ điều hành của bạn"
 
 #: ../gio/gcredentials.c:513
-msgid "GCredentials does not contain a process ID on this OS"
-msgstr "GCredentials không chứa ID tiến trình trên hệ điều hành này"
+msgid "xcredentials_t does not contain a process ID on this OS"
+msgstr "xcredentials_t không chứa ID tiến trình trên hệ điều hành này"
 
 #: ../gio/gcredentials.c:565
 msgid "Credentials spoofing is not possible on this OS"
@@ -543,8 +543,8 @@ msgid ""
 msgstr "Hết phương thức xác thực hiện có (thử: %s) (còn: %s)"
 
 #: ../gio/gdbusauth.c:1170
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "Đã hủy thông qua GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "Đã hủy thông qua xdbus_auth_observer_t::authorize-authenticated-peer"
 
 #: ../gio/gdbusauthmechanismsha1.c:261
 #, c-format
@@ -1261,27 +1261,27 @@ msgstr "Không hỗ trợ DTLS"
 
 #: ../gio/gemblem.c:323
 #, c-format
-msgid "Can't handle version %d of GEmblem encoding"
-msgstr "Không thể quản lý phiên bản %d của bảng mã GEmblem"
+msgid "Can't handle version %d of xemblem_t encoding"
+msgstr "Không thể quản lý phiên bản %d của bảng mã xemblem_t"
 
 #: ../gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "Bảng mã GEmblem chứa số các hiệu bài dạng sai (%d)"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "Bảng mã xemblem_t chứa số các hiệu bài dạng sai (%d)"
 
 #: ../gio/gemblemedicon.c:362
 #, c-format
-msgid "Can't handle version %d of GEmblemedIcon encoding"
-msgstr "Không thể quản lý phiên bản %d của bảng mã GEmblemedIcon"
+msgid "Can't handle version %d of xemblemed_icon_t encoding"
+msgstr "Không thể quản lý phiên bản %d của bảng mã xemblemed_icon_t"
 
 #: ../gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "Bảng mã GEmblemedIcon chứa số các hiệu bài dạng sai (%d)"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "Bảng mã xemblemed_icon_t chứa số các hiệu bài dạng sai (%d)"
 
 #: ../gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "Mong đợi một GEmblem cho GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "Mong đợi một xemblem_t cho xemblemed_icon_t"
 
 #: ../gio/gfile.c:969 ../gio/gfile.c:1207 ../gio/gfile.c:1345
 #: ../gio/gfile.c:1583 ../gio/gfile.c:1638 ../gio/gfile.c:1696
@@ -1387,12 +1387,12 @@ msgstr "Bộ đếm tập tin đã bị đóng"
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can't handle version %d of GFileIcon encoding"
-msgstr "Không thể quản lý phiên bản %d của bảng mã GFileIcon"
+msgid "Can't handle version %d of xfile_icon_t encoding"
+msgstr "Không thể quản lý phiên bản %d của bảng mã xfile_icon_t"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for GFileIcon"
-msgstr "Dữ liệu đầu vào có dạng sai cho GFileIcon"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "Dữ liệu đầu vào có dạng sai cho xfile_icon_t"
 
 #: ../gio/gfileinputstream.c:149 ../gio/gfileinputstream.c:394
 #: ../gio/gfileiostream.c:167 ../gio/gfileoutputstream.c:164
@@ -1866,11 +1866,11 @@ msgstr "Không áp đặt ràng buộc tên khóa"
 
 #: ../gio/glib-compile-schemas.c:2068
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Biên dịch tất cả tập tin lược đồ GSettings đệm lược đồ.\n"
+"Biên dịch tất cả tập tin lược đồ xsettings_t đệm lược đồ.\n"
 "Tập tin lược đồ cần có phần mở rộng .gschema.xml,\n"
 "và tập tin nhớ đệm tên là gschemas.compiled."
 
@@ -2187,8 +2187,8 @@ msgid "Invalid seek request"
 msgstr "Yêu cầu tìm không hợp lệ"
 
 #: ../gio/gmemoryinputstream.c:505
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "Không thể cắt GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "Không thể cắt xmemory_input_stream_t"
 
 #: ../gio/gmemoryoutputstream.c:567
 msgid "Memory output stream not resizable"
@@ -2814,8 +2814,8 @@ msgid "Error sending message: %s"
 msgstr "Gặp lỗi khi gửi thông điệp: %s"
 
 #: ../gio/gsocket.c:4385
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "GSocketControlMessage không được hỗ trợ trên Windows"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "xsocket_control_message_t không được hỗ trợ trên Windows"
 
 #: ../gio/gsocket.c:4840 ../gio/gsocket.c:4913 ../gio/gsocket.c:5140
 #, c-format
@@ -2956,8 +2956,8 @@ msgstr "Lỗi ủy nhiệm SOCKSv5 lạ."
 
 #: ../gio/gthemedicon.c:518
 #, c-format
-msgid "Can't handle version %d of GThemedIcon encoding"
-msgstr "Không thể quản lý phiên bản %d của bảng mã GThemedIcon"
+msgid "Can't handle version %d of xthemed_icon_t encoding"
+msgstr "Không thể quản lý phiên bản %d của bảng mã xthemed_icon_t"
 
 #: ../gio/gthreadedresolver.c:118
 msgid "No valid addresses were found"
@@ -3282,37 +3282,37 @@ msgstr "Tên chủ không hợp lệ"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:201
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "AM"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:203
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "PM"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:206
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%A, %d %B năm %Y %T %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:209
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%d/%m/%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:212
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:215
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M %p"
 
@@ -4820,11 +4820,11 @@ msgstr "Th12"
 #~ msgid "Error writing to unix: %s"
 #~ msgstr "Gặp lỗi khi ghi vào UNIX: %s"
 
-#~ msgctxt "GDateTime"
+#~ msgctxt "xdatetime_t"
 #~ msgid "am"
 #~ msgstr "am"
 
-#~ msgctxt "GDateTime"
+#~ msgctxt "xdatetime_t"
 #~ msgid "pm"
 #~ msgstr "pm"
 

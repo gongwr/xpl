@@ -30,11 +30,11 @@
 #define G_PORTAL_NOTIFICATION_BACKEND(o)    (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_PORTAL_NOTIFICATION_BACKEND, GPortalNotificationBackend))
 
 typedef struct _GPortalNotificationBackend GPortalNotificationBackend;
-typedef GNotificationBackendClass       GPortalNotificationBackendClass;
+typedef xnotification_backend_class_t       GPortalNotificationBackendClass;
 
 struct _GPortalNotificationBackend
 {
-  GNotificationBackend parent;
+  xnotification_backend_t parent;
 };
 
 xtype_t g_portal_notification_backend_get_type (void);
@@ -51,24 +51,24 @@ g_portal_notification_backend_is_supported (void)
 }
 
 static void
-g_portal_notification_backend_send_notification (GNotificationBackend *backend,
+g_portal_notification_backend_send_notification (xnotification_backend_t *backend,
                                                  const xchar_t          *id,
-                                                 GNotification        *notification)
+                                                 xnotification_t        *notification)
 {
   g_dbus_connection_call (backend->dbus_connection,
                           "org.freedesktop.portal.Desktop",
                           "/org/freedesktop/portal/desktop",
                           "org.freedesktop.portal.Notification",
                           "AddNotification",
-                          g_variant_new ("(s@a{sv})",
+                          xvariant_new ("(s@a{sv})",
                                          id,
-                                         g_notification_serialize (notification)),
+                                         xnotification_serialize (notification)),
                           G_VARIANT_TYPE_UNIT,
                           G_DBUS_CALL_FLAGS_NONE, -1, NULL, NULL, NULL);
 }
 
 static void
-g_portal_notification_backend_withdraw_notification (GNotificationBackend *backend,
+g_portal_notification_backend_withdraw_notification (xnotification_backend_t *backend,
                                                      const xchar_t          *id)
 {
   g_dbus_connection_call (backend->dbus_connection,
@@ -76,7 +76,7 @@ g_portal_notification_backend_withdraw_notification (GNotificationBackend *backe
                           "/org/freedesktop/portal/desktop",
                           "org.freedesktop.portal.Notification",
                           "RemoveNotification",
-                          g_variant_new ("(s)", id),
+                          xvariant_new ("(s)", id),
                           G_VARIANT_TYPE_UNIT,
                           G_DBUS_CALL_FLAGS_NONE, -1, NULL, NULL, NULL);
 }
@@ -89,7 +89,7 @@ g_portal_notification_backend_init (GPortalNotificationBackend *backend)
 static void
 g_portal_notification_backend_class_init (GPortalNotificationBackendClass *class)
 {
-  GNotificationBackendClass *backend_class = G_NOTIFICATION_BACKEND_CLASS (class);
+  xnotification_backend_class_t *backend_class = G_NOTIFICATION_BACKEND_CLASS (class);
 
   backend_class->is_supported = g_portal_notification_backend_is_supported;
   backend_class->send_notification = g_portal_notification_backend_send_notification;

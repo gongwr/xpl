@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 
 #define XTYPE_TCP_WRAPPER_CONNECTION            (g_tcp_wrapper_connection_get_type ())
 #define G_TCP_WRAPPER_CONNECTION(inst)           (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                  XTYPE_TCP_WRAPPER_CONNECTION, GTcpWrapperConnection))
+                                                  XTYPE_TCP_WRAPPER_CONNECTION, xtcp_wrapper_connection))
 #define G_TCP_WRAPPER_CONNECTION_CLASS(class)    (XTYPE_CHECK_CLASS_CAST ((class),                       \
                                                   XTYPE_TCP_WRAPPER_CONNECTION, GTcpWrapperConnectionClass))
 #define X_IS_TCP_WRAPPER_CONNECTION(inst)        (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
@@ -51,7 +51,7 @@ struct _GTcpWrapperConnectionClass
 
 struct _GTcpWrapperConnection
 {
-  GTcpConnection parent_instance;
+  xtcp_connection_t parent_instance;
   GTcpWrapperConnectionPrivate *priv;
 };
 
@@ -62,7 +62,7 @@ XPL_AVAILABLE_IN_ALL
 xsocket_connection_t *g_tcp_wrapper_connection_new                (xio_stream_t             *base_io_stream,
 								xsocket_t               *socket);
 XPL_AVAILABLE_IN_ALL
-xio_stream_t         *g_tcp_wrapper_connection_get_base_io_stream (GTcpWrapperConnection *conn);
+xio_stream_t         *g_tcp_wrapper_connection_get_base_io_stream (xtcp_wrapper_connection_t *conn);
 
 G_END_DECLS
 

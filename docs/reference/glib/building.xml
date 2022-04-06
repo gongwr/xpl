@@ -152,7 +152,7 @@
       </listitem>
       <listitem>
         <para>
-          GRegex uses the <ulink url="http://www.pcre.org/">PCRE library</ulink>
+          xregex_t uses the <ulink url="http://www.pcre.org/">PCRE library</ulink>
           for regular expression matching. The system version of PCRE is used,
           unless not available (which is the case on Android), in which case a
           fallback subproject is used.

@@ -22,8 +22,8 @@
 #include <gio/gio.h>
 #include <glib.h>
 
-static GDBusNodeInfo *introspection_data = NULL;
-static GMainLoop *loop = NULL;
+static xdbus_node_info_t *introspection_data = NULL;
+static xmain_loop_t *loop = NULL;
 static const xchar_t introspection_xml[] =
     "<node>"
     "    <interface name='org.gtk.GDBus.FakeService'>"
@@ -32,23 +32,23 @@ static const xchar_t introspection_xml[] =
     "</node>";
 
 static void
-incoming_method_call (GDBusConnection       *connection,
+incoming_method_call (xdbus_connection_t       *connection,
                       const xchar_t           *sender,
                       const xchar_t           *object_path,
                       const xchar_t           *interface_name,
                       const xchar_t           *method_name,
                       xvariant_t              *parameters,
-                      GDBusMethodInvocation *invocation,
+                      xdbus_method_invocation_t *invocation,
                       xpointer_t               user_data)
 {
-  if (g_strcmp0 (method_name, "Quit") == 0)
+  if (xstrcmp0 (method_name, "Quit") == 0)
     {
-      g_dbus_method_invocation_return_value (invocation, NULL);
-      g_main_loop_quit (loop);
+      xdbus_method_invocation_return_value (invocation, NULL);
+      xmain_loop_quit (loop);
     }
 }
 
-static const GDBusInterfaceVTable interface_vtable = {
+static const xdbus_interface_vtable_t interface_vtable = {
   incoming_method_call,
   NULL,
   NULL,
@@ -56,7 +56,7 @@ static const GDBusInterfaceVTable interface_vtable = {
 };
 
 static void
-on_bus_acquired (GDBusConnection *connection,
+on_bus_acquired (xdbus_connection_t *connection,
                  const xchar_t     *name,
                  xpointer_t         user_data)
 {
@@ -76,7 +76,7 @@ on_bus_acquired (GDBusConnection *connection,
 }
 
 static void
-on_name_acquired (GDBusConnection *connection,
+on_name_acquired (xdbus_connection_t *connection,
                   const xchar_t     *name,
                   xpointer_t         user_data)
 {
@@ -84,7 +84,7 @@ on_name_acquired (GDBusConnection *connection,
 }
 
 static void
-on_name_lost (GDBusConnection *connection,
+on_name_lost (xdbus_connection_t *connection,
               const xchar_t     *name,
               xpointer_t         user_data)
 {
@@ -96,7 +96,7 @@ main (xint_t argc, xchar_t *argv[])
 {
   xuint_t id;
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
   introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
   g_assert (introspection_data != NULL);
 
@@ -110,10 +110,10 @@ main (xint_t argc, xchar_t *argv[])
                        loop,
                        NULL);
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   g_bus_unown_name (id);
-  g_main_loop_unref (loop);
+  xmain_loop_unref (loop);
   g_dbus_node_info_unref (introspection_data);
 
   return 0;

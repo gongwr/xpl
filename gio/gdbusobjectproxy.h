@@ -26,7 +26,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_DBUS_OBJECT_PROXY         (g_dbus_object_proxy_get_type ())
-#define G_DBUS_OBJECT_PROXY(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_OBJECT_PROXY, GDBusObjectProxy))
+#define G_DBUS_OBJECT_PROXY(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_OBJECT_PROXY, xdbus_object_proxy))
 #define G_DBUS_OBJECT_PROXY_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DBUS_OBJECT_PROXY, GDBusObjectProxyClass))
 #define G_DBUS_OBJECT_PROXY_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DBUS_OBJECT_PROXY, GDBusObjectProxyClass))
 #define X_IS_DBUS_OBJECT_PROXY(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_OBJECT_PROXY))
@@ -36,9 +36,9 @@ typedef struct _GDBusObjectProxyClass   GDBusObjectProxyClass;
 typedef struct _GDBusObjectProxyPrivate GDBusObjectProxyPrivate;
 
 /**
- * GDBusObjectProxy:
+ * xdbus_object_proxy_t:
  *
- * The #GDBusObjectProxy structure contains private data and should
+ * The #xdbus_object_proxy_t structure contains private data and should
  * only be accessed using the provided API.
  *
  * Since: 2.30
@@ -54,7 +54,7 @@ struct _GDBusObjectProxy
  * GDBusObjectProxyClass:
  * @parent_class: The parent class.
  *
- * Class structure for #GDBusObjectProxy.
+ * Class structure for #xdbus_object_proxy_t.
  *
  * Since: 2.30
  */
@@ -69,10 +69,10 @@ struct _GDBusObjectProxyClass
 XPL_AVAILABLE_IN_ALL
 xtype_t             g_dbus_object_proxy_get_type       (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-GDBusObjectProxy *g_dbus_object_proxy_new            (GDBusConnection   *connection,
+xdbus_object_proxy_t *g_dbus_object_proxy_new            (xdbus_connection_t   *connection,
                                                       const xchar_t       *object_path);
 XPL_AVAILABLE_IN_ALL
-GDBusConnection  *g_dbus_object_proxy_get_connection (GDBusObjectProxy  *proxy);
+xdbus_connection_t  *g_dbus_object_proxy_get_connection (xdbus_object_proxy_t  *proxy);
 
 G_END_DECLS
 

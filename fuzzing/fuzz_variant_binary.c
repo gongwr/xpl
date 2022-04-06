@@ -7,15 +7,15 @@ LLVMFuzzerTestOneInput (const unsigned char *data, size_t size)
 
   fuzz_set_logging_func ();
 
-  variant = g_variant_new_from_data (G_VARIANT_TYPE_VARIANT, data, size, FALSE,
+  variant = xvariant_new_from_data (G_VARIANT_TYPE_VARIANT, data, size, FALSE,
                                      NULL, NULL);
   if (variant == NULL)
     return 0;
 
-  normal_variant = g_variant_take_ref (g_variant_get_normal_form (variant));
-  g_variant_get_data (variant);
+  normal_variant = xvariant_take_ref (xvariant_get_normal_form (variant));
+  xvariant_get_data (variant);
 
-  g_variant_unref (normal_variant);
-  g_variant_unref (variant);
+  xvariant_unref (normal_variant);
+  xvariant_unref (variant);
   return 0;
 }

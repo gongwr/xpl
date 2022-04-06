@@ -92,17 +92,17 @@ struct _TestAClass {
 static void
 test_a_foo (TestI *self)
 {
-  GValue args[1] = { G_VALUE_INIT };
+  xvalue_t args[1] = { G_VALUE_INIT };
 
   record ("TestA::foo");
 
-  g_value_init (&args[0], TEST_TYPE_A);
-  g_value_set_object (&args[0], self);
+  xvalue_init (&args[0], TEST_TYPE_A);
+  xvalue_set_object (&args[0], self);
 
   g_assert (g_signal_get_invocation_hint (self)->signal_id == foo_signal_id);
   g_signal_chain_from_overridden (args, NULL);
 
-  g_value_unset (&args[0]);
+  xvalue_unset (&args[0]);
 }
 
 static void
@@ -121,7 +121,7 @@ test_a_baz (TestA    *self,
   g_assert (object == G_OBJECT (self));
   g_assert (GPOINTER_TO_INT (pointer) == 23);
 
-  return g_strdup ("TestA::baz");
+  return xstrdup ("TestA::baz");
 }
 
 static void
@@ -177,33 +177,33 @@ struct _TestBClass {
 static void
 test_b_foo (TestI *self)
 {
-  GValue args[1] = { G_VALUE_INIT };
+  xvalue_t args[1] = { G_VALUE_INIT };
 
   record ("TestB::foo");
 
-  g_value_init (&args[0], TEST_TYPE_A);
-  g_value_set_object (&args[0], self);
+  xvalue_init (&args[0], TEST_TYPE_A);
+  xvalue_set_object (&args[0], self);
 
   g_assert (g_signal_get_invocation_hint (self)->signal_id == foo_signal_id);
   g_signal_chain_from_overridden (args, NULL);
 
-  g_value_unset (&args[0]);
+  xvalue_unset (&args[0]);
 }
 
 static void
 test_b_bar (TestA *self)
 {
-  GValue args[1] = { G_VALUE_INIT };
+  xvalue_t args[1] = { G_VALUE_INIT };
 
   record ("TestB::bar");
 
-  g_value_init (&args[0], TEST_TYPE_A);
-  g_value_set_object (&args[0], self);
+  xvalue_init (&args[0], TEST_TYPE_A);
+  xvalue_set_object (&args[0], self);
 
   g_assert (g_signal_get_invocation_hint (self)->signal_id == bar_signal_id);
   g_signal_chain_from_overridden (args, NULL);
 
-  g_value_unset (&args[0]);
+  xvalue_unset (&args[0]);
 }
 
 static xchar_t *
@@ -222,7 +222,7 @@ test_b_baz (TestA    *self,
 
   if (retval)
     {
-      xchar_t *tmp = g_strconcat (retval , ",TestB::baz", NULL);
+      xchar_t *tmp = xstrconcat (retval , ",TestB::baz", NULL);
       g_free (retval);
       retval = tmp;
     }
@@ -265,33 +265,33 @@ struct _TestCClass {
 static void
 test_c_foo (TestI *self)
 {
-  GValue args[1] = { G_VALUE_INIT };
+  xvalue_t args[1] = { G_VALUE_INIT };
 
   record ("TestC::foo");
 
-  g_value_init (&args[0], TEST_TYPE_A);
-  g_value_set_object (&args[0], self);
+  xvalue_init (&args[0], TEST_TYPE_A);
+  xvalue_set_object (&args[0], self);
 
   g_assert (g_signal_get_invocation_hint (self)->signal_id == foo_signal_id);
   g_signal_chain_from_overridden (args, NULL);
 
-  g_value_unset (&args[0]);
+  xvalue_unset (&args[0]);
 }
 
 static void
 test_c_bar (TestA *self)
 {
-  GValue args[1] = { G_VALUE_INIT };
+  xvalue_t args[1] = { G_VALUE_INIT };
 
   record ("TestC::bar");
 
-  g_value_init (&args[0], TEST_TYPE_A);
-  g_value_set_object (&args[0], self);
+  xvalue_init (&args[0], TEST_TYPE_A);
+  xvalue_set_object (&args[0], self);
 
   g_assert (g_signal_get_invocation_hint (self)->signal_id == bar_signal_id);
   g_signal_chain_from_overridden (args, NULL);
 
-  g_value_unset (&args[0]);
+  xvalue_unset (&args[0]);
 }
 
 static xchar_t *
@@ -310,7 +310,7 @@ test_c_baz (TestA    *self,
 
   if (retval)
     {
-      xchar_t *tmp = g_strconcat (retval , ",TestC::baz", NULL);
+      xchar_t *tmp = xstrconcat (retval , ",TestC::baz", NULL);
       g_free (retval);
       retval = tmp;
     }
@@ -339,15 +339,15 @@ static DEFINE_TYPE (TestC, test_c,
 		    test_c_class_init, NULL, NULL,
 		    TEST_TYPE_B)
 
-static GString *test_string = NULL;
+static xstring_t *test_string = NULL;
 xboolean_t failed = FALSE;
 
 static void
 record (const xchar_t *str)
 {
   if (test_string->len)
-    g_string_append_c (test_string, ',');
-  g_string_append (test_string, str);
+    xstring_append_c (test_string, ',');
+  xstring_append (test_string, str);
 }
 
 static void
@@ -356,9 +356,9 @@ test (xtype_t        type,
       const xchar_t *expected,
       const xchar_t *expected_retval)
 {
-  xobject_t *self = g_object_new (type, NULL);
+  xobject_t *self = xobject_new (type, NULL);
 
-  test_string = g_string_new (NULL);
+  test_string = xstring_new (NULL);
 
   if (strcmp (signal, "baz"))
     {
@@ -383,7 +383,7 @@ test (xtype_t        type,
       g_printerr ("*** emitting %s on a %s instance\n"
 		  "    Expecting: %s\n"
 		  "    Got: %s\n",
-		  signal, g_type_name (type),
+		  signal, xtype_name (type),
 		  expected,
 		  test_string->str);
 
@@ -391,8 +391,8 @@ test (xtype_t        type,
 	failed = TRUE;
     }
 
-  g_string_free (test_string, TRUE);
-  g_object_unref (self);
+  xstring_free (test_string, TRUE);
+  xobject_unref (self);
 }
 
 int

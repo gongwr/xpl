@@ -42,7 +42,7 @@ glib__private__ (void)
     g_get_worker_context,
 
     g_check_setuid,
-    g_main_context_new_with_next_id,
+    xmain_context_new_with_next_id,
 
     g_dir_open_with_errno,
     g_dir_new_from_dirp,

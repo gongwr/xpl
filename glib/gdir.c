@@ -47,7 +47,7 @@
 #include "glib-private.h" /* g_dir_open_with_errno, g_dir_new_from_dirp */
 
 /**
- * GDir:
+ * xdir_t:
  *
  * An opaque structure representing an opened directory.
  */
@@ -78,16 +78,16 @@ struct _GDir
  *
  * This is useful if you want to construct your own error message.
  *
- * Returns: a newly allocated #GDir on success, or %NULL on failure,
+ * Returns: a newly allocated #xdir_t on success, or %NULL on failure,
  *   with errno set accordingly.
  *
  * Since: 2.38
  */
-GDir *
+xdir_t *
 g_dir_open_with_errno (const xchar_t *path,
                        xuint_t        flags)
 {
-  GDir dir;
+  xdir_t dir;
 #ifdef G_OS_WIN32
   xint_t saved_errno;
   wchar_t *wpath;
@@ -96,7 +96,7 @@ g_dir_open_with_errno (const xchar_t *path,
   g_return_val_if_fail (path != NULL, NULL);
 
 #ifdef G_OS_WIN32
-  wpath = g_utf8_to_utf16 (path, -1, NULL, NULL, NULL);
+  wpath = xutf8_to_utf16 (path, -1, NULL, NULL, NULL);
 
   g_return_val_if_fail (wpath != NULL, NULL);
 
@@ -130,17 +130,17 @@ g_dir_open_with_errno (const xchar_t *path,
  * directory can then be retrieved using g_dir_read_name().  Note
  * that the ordering is not defined.
  *
- * Returns: a newly allocated #GDir on success, %NULL on failure.
+ * Returns: a newly allocated #xdir_t on success, %NULL on failure.
  *   If non-%NULL, you must free the result with g_dir_close()
  *   when you are finished with it.
  **/
-GDir *
+xdir_t *
 g_dir_open (const xchar_t  *path,
             xuint_t         flags,
             xerror_t      **error)
 {
   xint_t saved_errno;
-  GDir *dir;
+  xdir_t *dir;
 
   dir = g_dir_open_with_errno (path, flags);
 
@@ -150,10 +150,10 @@ g_dir_open (const xchar_t  *path,
 
       saved_errno = errno;
 
-      utf8_path = g_filename_to_utf8 (path, -1, NULL, NULL, NULL);
+      utf8_path = xfilename_to_utf8 (path, -1, NULL, NULL, NULL);
 
-      g_set_error (error, G_FILE_ERROR, g_file_error_from_errno (saved_errno),
-                   _("Error opening directory “%s”: %s"), utf8_path, g_strerror (saved_errno));
+      g_set_error (error, XFILE_ERROR, xfile_error_from_errno (saved_errno),
+                   _("Error opening directory “%s”: %s"), utf8_path, xstrerror (saved_errno));
       g_free (utf8_path);
     }
 
@@ -164,28 +164,28 @@ g_dir_open (const xchar_t  *path,
  * g_dir_new_from_dirp:
  * @dirp: a #DIR* created by opendir() or fdopendir()
  *
- * Creates a #GDir object from the DIR object that is created using
- * opendir() or fdopendir().  The created #GDir assumes ownership of the
+ * Creates a #xdir_t object from the DIR object that is created using
+ * opendir() or fdopendir().  The created #xdir_t assumes ownership of the
  * passed-in #DIR pointer.
  *
  * @dirp must not be %NULL.
  *
  * This function never fails.
  *
- * Returns: a newly allocated #GDir, which should be closed using
+ * Returns: a newly allocated #xdir_t, which should be closed using
  *     g_dir_close().
  *
  * Since: 2.38
  **/
-GDir *
+xdir_t *
 g_dir_new_from_dirp (xpointer_t dirp)
 {
 #ifdef G_OS_UNIX
-  GDir *dir;
+  xdir_t *dir;
 
   g_return_val_if_fail (dirp != NULL, NULL);
 
-  dir = g_new (GDir, 1);
+  dir = g_new (xdir_t, 1);
   dir->dirp = dirp;
 
   return dir;
@@ -198,7 +198,7 @@ g_dir_new_from_dirp (xpointer_t dirp)
 
 /**
  * g_dir_read_name:
- * @dir: a #GDir* created by g_dir_open()
+ * @dir: a #xdir_t* created by g_dir_open()
  *
  * Retrieves the name of another entry in the directory, or %NULL.
  * The order of entries returned from this function is not defined,
@@ -219,7 +219,7 @@ g_dir_new_from_dirp (xpointer_t dirp)
  *   must not be modified or freed.
  **/
 const xchar_t *
-g_dir_read_name (GDir *dir)
+g_dir_read_name (xdir_t *dir)
 {
 #ifdef G_OS_WIN32
   xchar_t *utf8_name;
@@ -242,7 +242,7 @@ g_dir_read_name (GDir *dir)
       if (wentry == NULL)
 	return NULL;
 
-      utf8_name = g_utf16_to_utf8 (wentry->d_name, -1, NULL, NULL, NULL);
+      utf8_name = xutf16_to_utf8 (wentry->d_name, -1, NULL, NULL, NULL);
 
       if (utf8_name == NULL)
 	continue;		/* Huh, impossible? Skip it anyway */
@@ -268,13 +268,13 @@ g_dir_read_name (GDir *dir)
 
 /**
  * g_dir_rewind:
- * @dir: a #GDir* created by g_dir_open()
+ * @dir: a #xdir_t* created by g_dir_open()
  *
  * Resets the given directory. The next call to g_dir_read_name()
  * will return the first entry again.
  **/
 void
-g_dir_rewind (GDir *dir)
+g_dir_rewind (xdir_t *dir)
 {
   g_return_if_fail (dir != NULL);
 
@@ -287,12 +287,12 @@ g_dir_rewind (GDir *dir)
 
 /**
  * g_dir_close:
- * @dir: a #GDir* created by g_dir_open()
+ * @dir: a #xdir_t* created by g_dir_open()
  *
  * Closes the directory and deallocates all related resources.
  **/
 void
-g_dir_close (GDir *dir)
+g_dir_close (xdir_t *dir)
 {
   g_return_if_fail (dir != NULL);
 
@@ -308,12 +308,12 @@ g_dir_close (GDir *dir)
 
 /* Binary compatibility versions. Not for newly compiled code. */
 
-_XPL_EXTERN GDir        *g_dir_open_utf8      (const xchar_t  *path,
+_XPL_EXTERN xdir_t        *g_dir_open_utf8      (const xchar_t  *path,
                                                 xuint_t         flags,
                                                 xerror_t      **error);
-_XPL_EXTERN const xchar_t *g_dir_read_name_utf8 (GDir         *dir);
+_XPL_EXTERN const xchar_t *g_dir_read_name_utf8 (xdir_t         *dir);
 
-GDir *
+xdir_t *
 g_dir_open_utf8 (const xchar_t  *path,
                  xuint_t         flags,
                  xerror_t      **error)
@@ -322,7 +322,7 @@ g_dir_open_utf8 (const xchar_t  *path,
 }
 
 const xchar_t *
-g_dir_read_name_utf8 (GDir *dir)
+g_dir_read_name_utf8 (xdir_t *dir)
 {
   return g_dir_read_name (dir);
 }

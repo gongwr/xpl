@@ -27,25 +27,25 @@
 #include <string.h>
 #include <unistd.h>
 
-static GAppInfo *
+static xapp_info_t *
 create_app_info (const char *name)
 {
   xerror_t *error;
-  GAppInfo *info;
+  xapp_info_t *info;
 
   error = NULL;
-  info = g_app_info_create_from_commandline ("true blah",
+  info = xapp_info_create_from_commandline ("true blah",
                                              name,
                                              G_APP_INFO_CREATE_NONE,
                                              &error);
   g_assert_no_error (error);
 
   /* this is necessary to ensure that the info is saved */
-  g_app_info_set_as_default_for_type (info, "application/x-blah", &error);
+  xapp_info_set_as_default_for_type (info, "application/x-blah", &error);
   g_assert_no_error (error);
-  g_app_info_remove_supports_type (info, "application/x-blah", &error);
+  xapp_info_remove_supports_type (info, "application/x-blah", &error);
   g_assert_no_error (error);
-  g_app_info_reset_type_associations ("application/x-blah");
+  xapp_info_reset_type_associations ("application/x-blah");
 
   return info;
 }
@@ -53,7 +53,7 @@ create_app_info (const char *name)
 static void
 test_delete (void)
 {
-  GAppInfo *info;
+  xapp_info_t *info;
 
   const char *id;
   char *filename;
@@ -61,34 +61,34 @@ test_delete (void)
 
   info = create_app_info ("Blah");
 
-  id = g_app_info_get_id (info);
+  id = xapp_info_get_id (info);
   g_assert_nonnull (id);
 
   filename = g_build_filename (g_get_user_data_dir (), "applications", id, NULL);
 
-  res = g_file_test (filename, G_FILE_TEST_EXISTS);
+  res = xfile_test (filename, XFILE_TEST_EXISTS);
   g_assert_true (res);
 
-  res = g_app_info_can_delete (info);
+  res = xapp_info_can_delete (info);
   g_assert_true (res);
 
-  res = g_app_info_delete (info);
+  res = xapp_info_delete (info);
   g_assert_true (res);
 
-  res = g_file_test (filename, G_FILE_TEST_EXISTS);
+  res = xfile_test (filename, XFILE_TEST_EXISTS);
   g_assert_false (res);
 
-  g_object_unref (info);
+  xobject_unref (info);
 
-  if (g_file_test ("/usr/share/applications/gedit.desktop", G_FILE_TEST_EXISTS))
+  if (xfile_test ("/usr/share/applications/gedit.desktop", XFILE_TEST_EXISTS))
     {
-      info = (GAppInfo*)g_desktop_app_info_new_from_filename ("/usr/share/applications/gedit.desktop");
+      info = (xapp_info_t*)g_desktop_app_info_new_from_filename ("/usr/share/applications/gedit.desktop");
       g_assert_nonnull (info);
 
-      res = g_app_info_can_delete (info);
+      res = xapp_info_can_delete (info);
       g_assert_false (res);
 
-      res = g_app_info_delete (info);
+      res = xapp_info_delete (info);
       g_assert_false (res);
     }
 
@@ -98,7 +98,7 @@ test_delete (void)
 static void
 test_default (void)
 {
-  GAppInfo *info, *info1, *info2, *info3;
+  xapp_info_t *info, *info1, *info2, *info3;
   xlist_t *list;
   xerror_t *error = NULL;
 
@@ -106,56 +106,56 @@ test_default (void)
   info2 = create_app_info ("Blah2");
   info3 = create_app_info ("Blah3");
 
-  g_app_info_set_as_default_for_type (info1, "application/x-test", &error);
+  xapp_info_set_as_default_for_type (info1, "application/x-test", &error);
   g_assert_no_error (error);
 
-  g_app_info_set_as_default_for_type (info2, "application/x-test", &error);
+  xapp_info_set_as_default_for_type (info2, "application/x-test", &error);
   g_assert_no_error (error);
 
-  info = g_app_info_get_default_for_type ("application/x-test", FALSE);
+  info = xapp_info_get_default_for_type ("application/x-test", FALSE);
   g_assert_nonnull (info);
-  g_assert_cmpstr (g_app_info_get_id (info), ==, g_app_info_get_id (info2));
-  g_object_unref (info);
+  g_assert_cmpstr (xapp_info_get_id (info), ==, xapp_info_get_id (info2));
+  xobject_unref (info);
 
   /* now try adding something, but not setting as default */
-  g_app_info_add_supports_type (info3, "application/x-test", &error);
+  xapp_info_add_supports_type (info3, "application/x-test", &error);
   g_assert_no_error (error);
 
   /* check that info2 is still default */
-  info = g_app_info_get_default_for_type ("application/x-test", FALSE);
+  info = xapp_info_get_default_for_type ("application/x-test", FALSE);
   g_assert_nonnull (info);
-  g_assert_cmpstr (g_app_info_get_id (info), ==, g_app_info_get_id (info2));
-  g_object_unref (info);
+  g_assert_cmpstr (xapp_info_get_id (info), ==, xapp_info_get_id (info2));
+  xobject_unref (info);
 
   /* now remove info1 again */
-  g_app_info_remove_supports_type (info1, "application/x-test", &error);
+  xapp_info_remove_supports_type (info1, "application/x-test", &error);
   g_assert_no_error (error);
 
   /* and make sure info2 is still default */
-  info = g_app_info_get_default_for_type ("application/x-test", FALSE);
+  info = xapp_info_get_default_for_type ("application/x-test", FALSE);
   g_assert_nonnull (info);
-  g_assert_cmpstr (g_app_info_get_id (info), ==, g_app_info_get_id (info2));
-  g_object_unref (info);
+  g_assert_cmpstr (xapp_info_get_id (info), ==, xapp_info_get_id (info2));
+  xobject_unref (info);
 
   /* now clean it all up */
-  g_app_info_reset_type_associations ("application/x-test");
+  xapp_info_reset_type_associations ("application/x-test");
 
-  list = g_app_info_get_all_for_type ("application/x-test");
+  list = xapp_info_get_all_for_type ("application/x-test");
   g_assert_null (list);
 
-  g_app_info_delete (info1);
-  g_app_info_delete (info2);
-  g_app_info_delete (info3);
+  xapp_info_delete (info1);
+  xapp_info_delete (info2);
+  xapp_info_delete (info3);
 
-  g_object_unref (info1);
-  g_object_unref (info2);
-  g_object_unref (info3);
+  xobject_unref (info1);
+  xobject_unref (info2);
+  xobject_unref (info3);
 }
 
 static void
 test_fallback (void)
 {
-  GAppInfo *info1, *info2, *app = NULL;
+  xapp_info_t *info1, *info2, *app = NULL;
   xlist_t *apps, *recomm, *fallback, *list, *l, *m;
   xerror_t *error = NULL;
   xint_t old_length;
@@ -165,116 +165,116 @@ test_fallback (void)
 
   g_assert_true (g_content_type_is_a ("text/x-python", "text/plain"));
 
-  apps = g_app_info_get_all_for_type ("text/x-python");
-  old_length = g_list_length (apps);
-  g_list_free_full (apps, g_object_unref);
+  apps = xapp_info_get_all_for_type ("text/x-python");
+  old_length = xlist_length (apps);
+  xlist_free_full (apps, xobject_unref);
 
-  g_app_info_add_supports_type (info1, "text/x-python", &error);
+  xapp_info_add_supports_type (info1, "text/x-python", &error);
   g_assert_no_error (error);
 
-  g_app_info_add_supports_type (info2, "text/plain", &error);
+  xapp_info_add_supports_type (info2, "text/plain", &error);
   g_assert_no_error (error);
 
   /* check that both apps are registered */
-  apps = g_app_info_get_all_for_type ("text/x-python");
-  g_assert_cmpint (g_list_length (apps), ==, old_length + 2);
+  apps = xapp_info_get_all_for_type ("text/x-python");
+  g_assert_cmpint (xlist_length (apps), ==, old_length + 2);
 
   /* check that Test1 is among the recommended apps */
-  recomm = g_app_info_get_recommended_for_type ("text/x-python");
+  recomm = xapp_info_get_recommended_for_type ("text/x-python");
   g_assert_nonnull (recomm);
   for (l = recomm; l; l = l->next)
     {
       app = l->data;
-      if (g_app_info_equal (info1, app))
+      if (xapp_info_equal (info1, app))
         break;
     }
   g_assert_nonnull (app);
-  g_assert_true (g_app_info_equal (info1, app));
+  g_assert_true (xapp_info_equal (info1, app));
 
   /* and that Test2 is among the fallback apps */
-  fallback = g_app_info_get_fallback_for_type ("text/x-python");
+  fallback = xapp_info_get_fallback_for_type ("text/x-python");
   g_assert_nonnull (fallback);
   for (l = fallback; l; l = l->next)
     {
       app = l->data;
-      if (g_app_info_equal (info2, app))
+      if (xapp_info_equal (info2, app))
         break;
     }
-  g_assert_cmpstr (g_app_info_get_name (app), ==, "Test2");
+  g_assert_cmpstr (xapp_info_get_name (app), ==, "Test2");
 
   /* check that recomm + fallback = all applications */
-  list = g_list_concat (g_list_copy (recomm), g_list_copy (fallback));
-  g_assert_cmpuint (g_list_length (list), ==, g_list_length (apps));
+  list = xlist_concat (xlist_copy (recomm), xlist_copy (fallback));
+  g_assert_cmpuint (xlist_length (list), ==, xlist_length (apps));
 
   for (l = list, m = apps; l != NULL && m != NULL; l = l->next, m = m->next)
     {
-      g_assert_true (g_app_info_equal (l->data, m->data));
+      g_assert_true (xapp_info_equal (l->data, m->data));
     }
 
-  g_list_free (list);
+  xlist_free (list);
 
-  g_list_free_full (apps, g_object_unref);
-  g_list_free_full (recomm, g_object_unref);
-  g_list_free_full (fallback, g_object_unref);
+  xlist_free_full (apps, xobject_unref);
+  xlist_free_full (recomm, xobject_unref);
+  xlist_free_full (fallback, xobject_unref);
 
-  g_app_info_reset_type_associations ("text/x-python");
-  g_app_info_reset_type_associations ("text/plain");
+  xapp_info_reset_type_associations ("text/x-python");
+  xapp_info_reset_type_associations ("text/plain");
 
-  g_app_info_delete (info1);
-  g_app_info_delete (info2);
+  xapp_info_delete (info1);
+  xapp_info_delete (info2);
 
-  g_object_unref (info1);
-  g_object_unref (info2);
+  xobject_unref (info1);
+  xobject_unref (info2);
 }
 
 static void
 test_last_used (void)
 {
   xlist_t *applications;
-  GAppInfo *info1, *info2, *default_app;
+  xapp_info_t *info1, *info2, *default_app;
   xerror_t *error = NULL;
 
   info1 = create_app_info ("Test1");
   info2 = create_app_info ("Test2");
 
-  g_app_info_set_as_default_for_type (info1, "application/x-test", &error);
+  xapp_info_set_as_default_for_type (info1, "application/x-test", &error);
   g_assert_no_error (error);
 
-  g_app_info_add_supports_type (info2, "application/x-test", &error);
+  xapp_info_add_supports_type (info2, "application/x-test", &error);
   g_assert_no_error (error);
 
-  applications = g_app_info_get_recommended_for_type ("application/x-test");
-  g_assert_cmpuint (g_list_length (applications), ==, 2);
+  applications = xapp_info_get_recommended_for_type ("application/x-test");
+  g_assert_cmpuint (xlist_length (applications), ==, 2);
 
   /* the first should be the default app now */
-  g_assert_true (g_app_info_equal (g_list_nth_data (applications, 0), info1));
-  g_assert_true (g_app_info_equal (g_list_nth_data (applications, 1), info2));
+  g_assert_true (xapp_info_equal (xlist_nth_data (applications, 0), info1));
+  g_assert_true (xapp_info_equal (xlist_nth_data (applications, 1), info2));
 
-  g_list_free_full (applications, g_object_unref);
+  xlist_free_full (applications, xobject_unref);
 
-  g_app_info_set_as_last_used_for_type (info2, "application/x-test", &error);
+  xapp_info_set_as_last_used_for_type (info2, "application/x-test", &error);
   g_assert_no_error (error);
 
-  applications = g_app_info_get_recommended_for_type ("application/x-test");
-  g_assert_cmpuint (g_list_length (applications), ==, 2);
+  applications = xapp_info_get_recommended_for_type ("application/x-test");
+  g_assert_cmpuint (xlist_length (applications), ==, 2);
 
-  default_app = g_app_info_get_default_for_type ("application/x-test", FALSE);
-  g_assert_true (g_app_info_equal (default_app, info1));
+  default_app = xapp_info_get_default_for_type ("application/x-test", FALSE);
+  g_assert_true (xapp_info_equal (default_app, info1));
 
   /* the first should be the other app now */
-  g_assert_true (g_app_info_equal (g_list_nth_data (applications, 0), info2));
-  g_assert_true (g_app_info_equal (g_list_nth_data (applications, 1), info1));
+  g_assert_true (xapp_info_equal (xlist_nth_data (applications, 0), info2));
+  g_assert_true (xapp_info_equal (xlist_nth_data (applications, 1), info1));
 
-  g_list_free_full (applications, g_object_unref);
+  xlist_free_full (applications, xobject_unref);
 
-  g_app_info_reset_type_associations ("application/x-test");
+  xapp_info_reset_type_associations ("application/x-test");
 
-  g_app_info_delete (info1);
-  g_app_info_delete (info2);
+  xapp_info_delete (info1);
+  xapp_info_delete (info2);
 
-  g_object_unref (info1);
-  g_object_unref (info2);
-  g_object_unref (default_app);
+  xobject_unref (info1);
+  xobject_unref (info2);
+  xobject_unref (default_app);
 }
 
 static void
@@ -313,7 +313,7 @@ test_extra_getters (void)
   b = g_desktop_app_info_get_boolean (appinfo, "Terminal");
   g_assert_true (b);
 
-  g_object_unref (appinfo);
+  xobject_unref (appinfo);
 
   g_setenv ("LANGUAGE", lang, TRUE);
   setlocale (LC_ALL, "");
@@ -375,7 +375,7 @@ test_actions (void)
 
   name = g_desktop_app_info_get_action_name (appinfo, "broken");
   g_assert_nonnull (name);
-  g_assert_true (g_utf8_validate (name, -1, NULL));
+  g_assert_true (xutf8_validate (name, -1, NULL));
   g_free (name);
 
   unlink ("frob"); unlink ("tweak"); unlink ("twiddle");
@@ -389,7 +389,7 @@ test_actions (void)
   g_desktop_app_info_launch_action (appinfo, "twiddle", NULL);
   wait_for_file ("twiddle", "frob", "tweak");
 
-  g_object_unref (appinfo);
+  xobject_unref (appinfo);
 }
 
 static xchar_t *
@@ -410,8 +410,8 @@ run_apps (const xchar_t *command,
 
   argv = g_new (xchar_t *, 4);
   argv[0] = g_test_build_filename (G_TEST_BUILT, "apps", NULL);
-  argv[1] = g_strdup (command);
-  argv[2] = g_strdup (arg);
+  argv[1] = xstrdup (command);
+  argv[2] = xstrdup (arg);
   argv[3] = NULL;
 
   envp = g_get_environ ();
@@ -455,12 +455,12 @@ run_apps (const xchar_t *command,
   g_assert_true (success);
   g_assert_cmpuint (status, ==, 0);
 
-  argv_str = g_strjoinv (" ", argv);
+  argv_str = xstrjoinv (" ", argv);
   g_test_message ("%s: `%s` returned: %s", G_STRFUNC, argv_str, out);
   g_free (argv_str);
 
-  g_strfreev (envp);
-  g_strfreev (argv);
+  xstrfreev (envp);
+  xstrfreev (argv);
 
   return out;
 }
@@ -473,13 +473,13 @@ assert_strings_equivalent (const xchar_t *expected,
   xchar_t **result_words;
   xint_t i, j;
 
-  expected_words = g_strsplit (expected, " ", 0);
-  result_words = g_strsplit_set (result, " \n", 0);
+  expected_words = xstrsplit (expected, " ", 0);
+  result_words = xstrsplit_set (result, " \n", 0);
 
   for (i = 0; expected_words[i]; i++)
     {
       for (j = 0; result_words[j]; j++)
-        if (g_str_equal (expected_words[i], result_words[j]))
+        if (xstr_equal (expected_words[i], result_words[j]))
           goto got_it;
 
       g_test_fail_printf ("Unable to find expected string '%s' in result '%s'", expected_words[i], result);
@@ -488,9 +488,9 @@ got_it:
       continue;
     }
 
-  g_assert_cmpint (g_strv_length (expected_words), ==, g_strv_length (result_words));
-  g_strfreev (expected_words);
-  g_strfreev (result_words);
+  g_assert_cmpint (xstrv_length (expected_words), ==, xstrv_length (result_words));
+  xstrfreev (expected_words);
+  xstrfreev (result_words);
 }
 
 static void
@@ -503,7 +503,7 @@ assert_list (const xchar_t *expected,
   xchar_t *result;
 
   result = run_apps ("list", NULL, with_usr, with_home, locale_name, language, NULL);
-  g_strchomp (result);
+  xstrchomp (result);
   assert_strings_equivalent (expected, result);
   g_free (result);
 }
@@ -536,14 +536,14 @@ assert_search (const xchar_t *search_string,
   xchar_t *result;
   xint_t i;
 
-  expected_lines = g_strsplit (expected, "\n", -1);
+  expected_lines = xstrsplit (expected, "\n", -1);
   result = run_apps ("search", search_string, with_usr, with_home, locale_name, language, NULL);
-  result_lines = g_strsplit (result, "\n", -1);
-  g_assert_cmpint (g_strv_length (expected_lines), ==, g_strv_length (result_lines));
+  result_lines = xstrsplit (result, "\n", -1);
+  g_assert_cmpint (xstrv_length (expected_lines), ==, xstrv_length (result_lines));
   for (i = 0; expected_lines[i]; i++)
     assert_strings_equivalent (expected_lines[i], result_lines[i]);
-  g_strfreev (expected_lines);
-  g_strfreev (result_lines);
+  xstrfreev (expected_lines);
+  xstrfreev (result_lines);
   g_free (result);
 }
 
@@ -556,7 +556,7 @@ assert_implementations (const xchar_t *interface,
   xchar_t *result;
 
   result = run_apps ("implementations", interface, with_usr, with_home, NULL, NULL, NULL);
-  g_strchomp (result);
+  xstrchomp (result);
   assert_strings_equivalent (expected, result);
   g_free (result);
 }
@@ -729,7 +729,7 @@ test_show_in (void)
 }
 
 static void
-on_launch_started (GAppLaunchContext *context, GAppInfo *info, xvariant_t *platform_data, xpointer_t data)
+on_launch_started (xapp_launch_context_t *context, xapp_info_t *info, xvariant_t *platform_data, xpointer_t data)
 {
   xboolean_t *invoked = data;
 
@@ -753,7 +753,7 @@ test_launch_as_manager (void)
   xboolean_t retval;
   const xchar_t *path;
   xboolean_t invoked = FALSE;
-  GAppLaunchContext *context;
+  xapp_launch_context_t *context;
 
   if (g_getenv ("DISPLAY") == NULL || g_getenv ("DISPLAY")[0] == '\0')
     {
@@ -770,7 +770,7 @@ test_launch_as_manager (void)
       return;
     }
 
-  context = g_app_launch_context_new ();
+  context = xapp_launch_context_new ();
   g_signal_connect (context, "launch-started",
                     G_CALLBACK (on_launch_started),
                     &invoked);
@@ -793,7 +793,7 @@ test_launch_as_manager (void)
   g_assert_true (retval);
   g_assert_true (invoked);
 
-  g_object_unref (appinfo);
+  xobject_unref (appinfo);
   g_assert_finalize_object (context);
 }
 

@@ -28,22 +28,22 @@
 
 /**
  * SECTION:gtlscertificate
- * @title: GTlsCertificate
+ * @title: xtls_certificate_t
  * @short_description: TLS certificate
  * @include: gio/gio.h
- * @see_also: #GTlsConnection
+ * @see_also: #xtls_connection_t
  *
  * A certificate used for TLS authentication and encryption.
  * This can represent either a certificate only (eg, the certificate
  * received by a client from a server), or the combination of
  * a certificate and a private key (which is needed when acting as a
- * #GTlsServerConnection).
+ * #xtls_server_connection_t).
  *
  * Since: 2.28
  */
 
 /**
- * GTlsCertificate:
+ * xtls_certificate_t:
  *
  * Abstract base class for TLS certificate types.
  *
@@ -54,7 +54,7 @@ struct _GTlsCertificatePrivate {
   xboolean_t pkcs12_properties_not_overridden;
 };
 
-G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (GTlsCertificate, g_tls_certificate, XTYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (xtls_certificate_t, xtls_certificate, XTYPE_OBJECT)
 
 enum
 {
@@ -78,15 +78,15 @@ enum
 };
 
 static void
-g_tls_certificate_init (GTlsCertificate *cert)
+xtls_certificate_init (xtls_certificate_t *cert)
 {
 }
 
 static void
-g_tls_certificate_get_property (xobject_t    *object,
+xtls_certificate_get_property (xobject_t    *object,
 				xuint_t       prop_id,
-				GValue     *value,
-				GParamSpec *pspec)
+				xvalue_t     *value,
+				xparam_spec_t *pspec)
 {
   switch (prop_id)
     {
@@ -95,7 +95,7 @@ g_tls_certificate_get_property (xobject_t    *object,
     case PROP_PRIVATE_KEY_PEM:
     case PROP_PKCS11_URI:
     case PROP_PRIVATE_KEY_PKCS11_URI:
-      g_value_set_static_string (value, NULL);
+      xvalue_set_static_string (value, NULL);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -103,13 +103,13 @@ g_tls_certificate_get_property (xobject_t    *object,
 }
 
 static void
-g_tls_certificate_set_property (xobject_t      *object,
+xtls_certificate_set_property (xobject_t      *object,
 				xuint_t         prop_id,
-				const GValue *value,
-				GParamSpec   *pspec)
+				const xvalue_t *value,
+				xparam_spec_t   *pspec)
 {
-  GTlsCertificate *cert = (GTlsCertificate*)object;
-  GTlsCertificatePrivate *priv = g_tls_certificate_get_instance_private (cert);
+  xtls_certificate_t *cert = (xtls_certificate_t*)object;
+  GTlsCertificatePrivate *priv = xtls_certificate_get_instance_private (cert);
 
   switch (prop_id)
     {
@@ -128,23 +128,23 @@ g_tls_certificate_set_property (xobject_t      *object,
 }
 
 static void
-g_tls_certificate_class_init (GTlsCertificateClass *class)
+xtls_certificate_class_init (GTlsCertificateClass *class)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
 
-  gobject_class->set_property = g_tls_certificate_set_property;
-  gobject_class->get_property = g_tls_certificate_get_property;
+  gobject_class->set_property = xtls_certificate_set_property;
+  gobject_class->get_property = xtls_certificate_get_property;
 
   /**
-   * GTlsCertificate:pkcs12-data: (nullable)
+   * xtls_certificate_t:pkcs12-data: (nullable)
    *
    * The PKCS #12 formatted data used to construct the object.
    *
-   * See also: g_tls_certificate_new_from_pkcs12()
+   * See also: xtls_certificate_new_from_pkcs12()
    *
    * Since: 2.72
    */
-  g_object_class_install_property (gobject_class, PROP_PKCS12_DATA,
+  xobject_class_install_property (gobject_class, PROP_PKCS12_DATA,
 				   g_param_spec_boxed ("pkcs12-data",
 						       P_("PKCS #12 data"),
 						       P_("The PKCS #12 data used for construction"),
@@ -154,13 +154,13 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
 						       G_PARAM_STATIC_STRINGS));
 
   /**
-   * GTlsCertificate:password: (nullable)
+   * xtls_certificate_t:password: (nullable)
    *
-   * An optional password used when constructed with GTlsCertificate:pkcs12-data.
+   * An optional password used when constructed with xtls_certificate_t:pkcs12-data.
    *
    * Since: 2.72
    */
-  g_object_class_install_property (gobject_class, PROP_PASSWORD,
+  xobject_class_install_property (gobject_class, PROP_PASSWORD,
                                    g_param_spec_string ("password",
                                                         P_("Password"),
                                                         P_("Password used when constructing from bytes"),
@@ -169,15 +169,15 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
                                                           G_PARAM_CONSTRUCT_ONLY |
                                                           G_PARAM_STATIC_STRINGS));
   /**
-   * GTlsCertificate:certificate:
+   * xtls_certificate_t:certificate:
    *
    * The DER (binary) encoded representation of the certificate.
-   * This property and the #GTlsCertificate:certificate-pem property
+   * This property and the #xtls_certificate_t:certificate-pem property
    * represent the same data, just in different forms.
    *
    * Since: 2.28
    */
-  g_object_class_install_property (gobject_class, PROP_CERTIFICATE,
+  xobject_class_install_property (gobject_class, PROP_CERTIFICATE,
 				   g_param_spec_boxed ("certificate",
 						       P_("Certificate"),
 						       P_("The DER representation of the certificate"),
@@ -186,15 +186,15 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
 						       G_PARAM_CONSTRUCT_ONLY |
 						       G_PARAM_STATIC_STRINGS));
   /**
-   * GTlsCertificate:certificate-pem:
+   * xtls_certificate_t:certificate-pem:
    *
    * The PEM (ASCII) encoded representation of the certificate.
-   * This property and the #GTlsCertificate:certificate
+   * This property and the #xtls_certificate_t:certificate
    * property represent the same data, just in different forms.
    *
    * Since: 2.28
    */
-  g_object_class_install_property (gobject_class, PROP_CERTIFICATE_PEM,
+  xobject_class_install_property (gobject_class, PROP_CERTIFICATE_PEM,
 				   g_param_spec_string ("certificate-pem",
 							P_("Certificate (PEM)"),
 							P_("The PEM representation of the certificate"),
@@ -203,7 +203,7 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
 							G_PARAM_CONSTRUCT_ONLY |
 							G_PARAM_STATIC_STRINGS));
   /**
-   * GTlsCertificate:private-key: (nullable)
+   * xtls_certificate_t:private-key: (nullable)
    *
    * The DER (binary) encoded representation of the certificate's
    * private key, in either [PKCS \#1 format](https://datatracker.ietf.org/doc/html/rfc8017)
@@ -212,20 +212,20 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
    * support PKCS \#1. You can use the `openssl rsa` tool to convert
    * PKCS \#8 keys to PKCS \#1.
    *
-   * This property (or the #GTlsCertificate:private-key-pem property)
+   * This property (or the #xtls_certificate_t:private-key-pem property)
    * can be set when constructing a key (for example, from a file).
    * Since GLib 2.70, it is now also readable; however, be aware that if
    * the private key is backed by a PKCS \#11 URI – for example, if it
    * is stored on a smartcard – then this property will be %NULL. If so,
    * the private key must be referenced via its PKCS \#11 URI,
-   * #GTlsCertificate:private-key-pkcs11-uri. You must check both
+   * #xtls_certificate_t:private-key-pkcs11-uri. You must check both
    * properties to see if the certificate really has a private key.
    * When this property is read, the output format will be unencrypted
    * PKCS \#8.
    *
    * Since: 2.28
    */
-  g_object_class_install_property (gobject_class, PROP_PRIVATE_KEY,
+  xobject_class_install_property (gobject_class, PROP_PRIVATE_KEY,
 				   g_param_spec_boxed ("private-key",
 						       P_("Private key"),
 						       P_("The DER representation of the certificate’s private key"),
@@ -234,7 +234,7 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
 						       G_PARAM_CONSTRUCT_ONLY |
 						       G_PARAM_STATIC_STRINGS));
   /**
-   * GTlsCertificate:private-key-pem: (nullable)
+   * xtls_certificate_t:private-key-pem: (nullable)
    *
    * The PEM (ASCII) encoded representation of the certificate's
    * private key in either [PKCS \#1 format](https://datatracker.ietf.org/doc/html/rfc8017)
@@ -244,20 +244,20 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
    * earlier releases only support PKCS \#1. You can use the `openssl rsa`
    * tool to convert PKCS \#8 keys to PKCS \#1.
    *
-   * This property (or the #GTlsCertificate:private-key property)
+   * This property (or the #xtls_certificate_t:private-key property)
    * can be set when constructing a key (for example, from a file).
    * Since GLib 2.70, it is now also readable; however, be aware that if
    * the private key is backed by a PKCS \#11 URI - for example, if it
    * is stored on a smartcard - then this property will be %NULL. If so,
    * the private key must be referenced via its PKCS \#11 URI,
-   * #GTlsCertificate:private-key-pkcs11-uri. You must check both
+   * #xtls_certificate_t:private-key-pkcs11-uri. You must check both
    * properties to see if the certificate really has a private key.
    * When this property is read, the output format will be unencrypted
    * PKCS \#8.
    *
    * Since: 2.28
    */
-  g_object_class_install_property (gobject_class, PROP_PRIVATE_KEY_PEM,
+  xobject_class_install_property (gobject_class, PROP_PRIVATE_KEY_PEM,
 				   g_param_spec_string ("private-key-pem",
 							P_("Private key (PEM)"),
 							P_("The PEM representation of the certificate’s private key"),
@@ -266,9 +266,9 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
 							G_PARAM_CONSTRUCT_ONLY |
 							G_PARAM_STATIC_STRINGS));
   /**
-   * GTlsCertificate:issuer:
+   * xtls_certificate_t:issuer:
    *
-   * A #GTlsCertificate representing the entity that issued this
+   * A #xtls_certificate_t representing the entity that issued this
    * certificate. If %NULL, this means that the certificate is either
    * self-signed, or else the certificate of the issuer is not
    * available.
@@ -287,7 +287,7 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.28
    */
-  g_object_class_install_property (gobject_class, PROP_ISSUER,
+  xobject_class_install_property (gobject_class, PROP_ISSUER,
 				   g_param_spec_object ("issuer",
 							P_("Issuer"),
 							P_("The certificate for the issuing entity"),
@@ -297,17 +297,17 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
 							G_PARAM_STATIC_STRINGS));
 
   /**
-   * GTlsCertificate:pkcs11-uri: (nullable)
+   * xtls_certificate_t:pkcs11-uri: (nullable)
    *
    * A URI referencing the [PKCS \#11](https://docs.oasis-open.org/pkcs11/pkcs11-base/v3.0/os/pkcs11-base-v3.0-os.html)
    * objects containing an X.509 certificate and optionally a private key.
    *
    * If %NULL, the certificate is either not backed by PKCS \#11 or the
-   * #GTlsBackend does not support PKCS \#11.
+   * #xtls_backend_t does not support PKCS \#11.
    *
    * Since: 2.68
    */
-  g_object_class_install_property (gobject_class, PROP_PKCS11_URI,
+  xobject_class_install_property (gobject_class, PROP_PKCS11_URI,
                                    g_param_spec_string ("pkcs11-uri",
                                                         P_("PKCS #11 URI"),
                                                         P_("The PKCS #11 URI"),
@@ -317,14 +317,14 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
                                                           G_PARAM_STATIC_STRINGS));
 
   /**
-   * GTlsCertificate:private-key-pkcs11-uri: (nullable)
+   * xtls_certificate_t:private-key-pkcs11-uri: (nullable)
    *
    * A URI referencing a [PKCS \#11](https://docs.oasis-open.org/pkcs11/pkcs11-base/v3.0/os/pkcs11-base-v3.0-os.html)
    * object containing a private key.
    *
    * Since: 2.68
    */
-  g_object_class_install_property (gobject_class, PROP_PRIVATE_KEY_PKCS11_URI,
+  xobject_class_install_property (gobject_class, PROP_PRIVATE_KEY_PKCS11_URI,
                                    g_param_spec_string ("private-key-pkcs11-uri",
                                                         P_("PKCS #11 URI"),
                                                         P_("The PKCS #11 URI for a private key"),
@@ -334,14 +334,14 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
                                                           G_PARAM_STATIC_STRINGS));
 
   /**
-   * GTlsCertificate:not-valid-before: (nullable)
+   * xtls_certificate_t:not-valid-before: (nullable)
    *
    * The time at which this cert is considered to be valid,
    * %NULL if unavailable.
    *
    * Since: 2.70
    */
-  g_object_class_install_property (gobject_class, PROP_NOT_VALID_BEFORE,
+  xobject_class_install_property (gobject_class, PROP_NOT_VALID_BEFORE,
                                    g_param_spec_boxed ("not-valid-before",
                                                        P_("Not Valid Before"),
                                                        P_("Cert should not be considered valid before this time."),
@@ -350,14 +350,14 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
                                                          G_PARAM_STATIC_STRINGS));
 
   /**
-   * GTlsCertificate:not-valid-after: (nullable)
+   * xtls_certificate_t:not-valid-after: (nullable)
    *
    * The time at which this cert is no longer valid,
    * %NULL if unavailable.
    *
    * Since: 2.70
    */
-  g_object_class_install_property (gobject_class, PROP_NOT_VALID_AFTER,
+  xobject_class_install_property (gobject_class, PROP_NOT_VALID_AFTER,
                                    g_param_spec_boxed ("not-valid-after",
                                                        P_("Not Valid after"),
                                                        P_("Cert should not be considered valid after this time."),
@@ -366,14 +366,14 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
                                                          G_PARAM_STATIC_STRINGS));
 
   /**
-   * GTlsCertificate:subject-name: (nullable)
+   * xtls_certificate_t:subject-name: (nullable)
    *
    * The subject from the cert,
    * %NULL if unavailable.
    *
    * Since: 2.70
    */
-  g_object_class_install_property (gobject_class, PROP_SUBJECT_NAME,
+  xobject_class_install_property (gobject_class, PROP_SUBJECT_NAME,
                                    g_param_spec_string ("subject-name",
                                                         P_("Subject Name"),
                                                         P_("The subject name from the certificate."),
@@ -381,14 +381,14 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
                                                         G_PARAM_READABLE |
                                                           G_PARAM_STATIC_STRINGS));
   /**
-   * GTlsCertificate:issuer-name: (nullable)
+   * xtls_certificate_t:issuer-name: (nullable)
    *
    * The issuer from the certificate,
    * %NULL if unavailable.
    *
    * Since: 2.70
    */
-  g_object_class_install_property (gobject_class, PROP_ISSUER_NAME,
+  xobject_class_install_property (gobject_class, PROP_ISSUER_NAME,
                                    g_param_spec_string ("issuer-name",
                                                         P_("Issuer Name"),
                                                         P_("The issuer from the certificate."),
@@ -397,14 +397,14 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
                                                           G_PARAM_STATIC_STRINGS));
 
   /**
-   * GTlsCertificate:dns-names: (nullable) (element-type GBytes) (transfer container)
+   * xtls_certificate_t:dns-names: (nullable) (element-type xbytes_t) (transfer container)
    *
    * The DNS names from the certificate's Subject Alternative Names (SANs),
    * %NULL if unavailable.
    *
    * Since: 2.70
    */
-  g_object_class_install_property (gobject_class, PROP_DNS_NAMES,
+  xobject_class_install_property (gobject_class, PROP_DNS_NAMES,
                                    g_param_spec_boxed ("dns-names",
                                                        P_("DNS Names"),
                                                        P_("DNS Names listed on the cert."),
@@ -413,14 +413,14 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
                                                          G_PARAM_STATIC_STRINGS));
 
   /**
-   * GTlsCertificate:ip-addresses: (nullable) (element-type xinet_address_t) (transfer container)
+   * xtls_certificate_t:ip-addresses: (nullable) (element-type xinet_address_t) (transfer container)
    *
    * The IP addresses from the certificate's Subject Alternative Names (SANs),
    * %NULL if unavailable.
    *
    * Since: 2.70
    */
-  g_object_class_install_property (gobject_class, PROP_IP_ADDRESSES,
+  xobject_class_install_property (gobject_class, PROP_IP_ADDRESSES,
                                    g_param_spec_boxed ("ip-addresses",
                                                        P_("IP Addresses"),
                                                        P_("IP Addresses listed on the cert."),
@@ -429,18 +429,18 @@ g_tls_certificate_class_init (GTlsCertificateClass *class)
                                                          G_PARAM_STATIC_STRINGS));
 }
 
-static GTlsCertificate *
-g_tls_certificate_new_internal (const xchar_t      *certificate_pem,
+static xtls_certificate_t *
+xtls_certificate_new_internal (const xchar_t      *certificate_pem,
 				const xchar_t      *private_key_pem,
-				GTlsCertificate  *issuer,
+				xtls_certificate_t  *issuer,
 				xerror_t          **error)
 {
   xobject_t *cert;
-  GTlsBackend *backend;
+  xtls_backend_t *backend;
 
-  backend = g_tls_backend_get_default ();
+  backend = xtls_backend_get_default ();
 
-  cert = g_initable_new (g_tls_backend_get_certificate_type (backend),
+  cert = xinitable_new (xtls_backend_get_certificate_type (backend),
 			 NULL, error,
 			 "certificate-pem", certificate_pem,
 			 "private-key-pem", private_key_pem,
@@ -467,9 +467,9 @@ parse_private_key (const xchar_t *data,
   const xchar_t *header_start = NULL, *header_end, *footer_start = NULL, *footer_end;
   const xchar_t *data_end = data + data_len;
 
-  header_end = g_strstr_len (data, data_len, PEM_PRIVKEY_HEADER_END);
+  header_end = xstrstr_len (data, data_len, PEM_PRIVKEY_HEADER_END);
   if (header_end)
-    header_start = g_strrstr_len (data, header_end - data, PEM_PRIVKEY_HEADER_BEGIN);
+    header_start = xstrrstr_len (data, header_end - data, PEM_PRIVKEY_HEADER_BEGIN);
 
   if (!header_start)
     {
@@ -489,9 +489,9 @@ parse_private_key (const xchar_t *data,
       return NULL;
     }
 
-  footer_end = g_strstr_len (header_end, data_len - (header_end - data), PEM_PRIVKEY_FOOTER_END);
+  footer_end = xstrstr_len (header_end, data_len - (header_end - data), PEM_PRIVKEY_FOOTER_END);
   if (footer_end)
-    footer_start = g_strrstr_len (header_end, footer_end - header_end, PEM_PRIVKEY_FOOTER_BEGIN);
+    footer_start = xstrrstr_len (header_end, footer_end - header_end, PEM_PRIVKEY_FOOTER_BEGIN);
 
   if (!footer_start)
     {
@@ -505,7 +505,7 @@ parse_private_key (const xchar_t *data,
   while ((footer_end < data_end) && (*footer_end == '\r' || *footer_end == '\n'))
     footer_end++;
 
-  return g_strndup (header_start, footer_end - header_start);
+  return xstrndup (header_start, footer_end - header_start);
 }
 
 
@@ -517,7 +517,7 @@ parse_next_pem_certificate (const xchar_t **data,
 {
   const xchar_t *start, *end;
 
-  start = g_strstr_len (*data, data_end - *data, PEM_CERTIFICATE_HEADER);
+  start = xstrstr_len (*data, data_end - *data, PEM_CERTIFICATE_HEADER);
   if (!start)
     {
       if (required)
@@ -528,7 +528,7 @@ parse_next_pem_certificate (const xchar_t **data,
       return NULL;
     }
 
-  end = g_strstr_len (start, data_end - start, PEM_CERTIFICATE_FOOTER);
+  end = xstrstr_len (start, data_end - start, PEM_CERTIFICATE_FOOTER);
   if (!end)
     {
       g_set_error_literal (error, G_TLS_ERROR, G_TLS_ERROR_BAD_CERTIFICATE,
@@ -541,15 +541,15 @@ parse_next_pem_certificate (const xchar_t **data,
 
   *data = end;
 
-  return g_strndup (start, end - start);
+  return xstrndup (start, end - start);
 }
 
-static GSList *
+static xslist_t *
 parse_and_create_certificate_list (const xchar_t  *data,
                                    xsize_t         data_len,
                                    xerror_t      **error)
 {
-  GSList *first_pem_list = NULL, *pem_list = NULL;
+  xslist_t *first_pem_list = NULL, *pem_list = NULL;
   xchar_t *first_pem;
   const xchar_t *p, *end;
 
@@ -563,7 +563,7 @@ parse_and_create_certificate_list (const xchar_t  *data,
 
   /* Create a list with a single element. If we load more certificates
    * below, we will concatenate the two lists at the end. */
-  first_pem_list = g_slist_prepend (first_pem_list, first_pem);
+  first_pem_list = xslist_prepend (first_pem_list, first_pem);
 
   /* If we read one certificate successfully, let's see if we can read
    * some more. If not, we will simply return a list with the first one.
@@ -576,8 +576,8 @@ parse_and_create_certificate_list (const xchar_t  *data,
       cert_pem = parse_next_pem_certificate (&p, end, FALSE, &error);
       if (error)
         {
-          g_slist_free_full (pem_list, g_free);
-          g_error_free (error);
+          xslist_free_full (pem_list, g_free);
+          xerror_free (error);
           return first_pem_list;
         }
       else if (!cert_pem)
@@ -585,21 +585,21 @@ parse_and_create_certificate_list (const xchar_t  *data,
           break;
         }
 
-      pem_list = g_slist_prepend (pem_list, cert_pem);
+      pem_list = xslist_prepend (pem_list, cert_pem);
     }
 
-  pem_list = g_slist_concat (pem_list, first_pem_list);
+  pem_list = xslist_concat (pem_list, first_pem_list);
 
   return pem_list;
 }
 
-static GTlsCertificate *
-create_certificate_chain_from_list (GSList       *pem_list,
+static xtls_certificate_t *
+create_certificate_chain_from_list (xslist_t       *pem_list,
                                     const xchar_t  *key_pem)
 {
-  GTlsCertificate *cert = NULL, *issuer = NULL, *root = NULL;
+  xtls_certificate_t *cert = NULL, *issuer = NULL, *root = NULL;
   GTlsCertificateFlags flags;
-  GSList *pem;
+  xslist_t *pem;
 
   pem = pem_list;
   while (pem)
@@ -615,9 +615,9 @@ create_certificate_chain_from_list (GSList       *pem_list,
        * reverse order).
        */
       issuer = cert;
-      cert = g_tls_certificate_new_internal (pem->data, key, issuer, NULL);
+      cert = xtls_certificate_new_internal (pem->data, key, issuer, NULL);
       if (issuer)
-        g_object_unref (issuer);
+        xobject_unref (issuer);
 
       if (!cert)
         return NULL;
@@ -626,13 +626,13 @@ create_certificate_chain_from_list (GSList       *pem_list,
       if (!root)
         root = cert;
 
-      pem = g_slist_next (pem);
+      pem = xslist_next (pem);
     }
 
   /* Verify that the certificates form a chain. (We don't care at this
    * point if there are other problems with it.)
    */
-  flags = g_tls_certificate_verify (cert, NULL, root);
+  flags = xtls_certificate_verify (cert, NULL, root);
   if (flags & G_TLS_CERTIFICATE_UNKNOWN_CA)
     {
       /* It wasn't a chain, it's just a bunch of unrelated certs. */
@@ -642,15 +642,15 @@ create_certificate_chain_from_list (GSList       *pem_list,
   return cert;
 }
 
-static GTlsCertificate *
+static xtls_certificate_t *
 parse_and_create_certificate (const xchar_t  *data,
                               xsize_t         data_len,
                               const xchar_t  *key_pem,
                               xerror_t      **error)
 
 {
-  GSList *pem_list;
-  GTlsCertificate *cert;
+  xslist_t *pem_list;
+  xtls_certificate_t *cert;
 
   pem_list = parse_and_create_certificate_list (data, data_len, error);
   if (!pem_list)
@@ -662,38 +662,38 @@ parse_and_create_certificate (const xchar_t  *data,
   cert = create_certificate_chain_from_list (pem_list, key_pem);
   if (!cert)
     {
-      GSList *last = NULL;
+      xslist_t *last = NULL;
 
       /* Get the first certificate (which is the last one as the list is
        * in reverse order).
        */
-      last = g_slist_last (pem_list);
+      last = xslist_last (pem_list);
 
-      cert = g_tls_certificate_new_internal (last->data, key_pem, NULL, error);
+      cert = xtls_certificate_new_internal (last->data, key_pem, NULL, error);
     }
 
-  g_slist_free_full (pem_list, g_free);
+  xslist_free_full (pem_list, g_free);
 
   return cert;
 }
 
 /**
- * g_tls_certificate_new_from_pem:
+ * xtls_certificate_new_from_pem:
  * @data: PEM-encoded certificate data
  * @length: the length of @data, or -1 if it's 0-terminated.
  * @error: #xerror_t for error reporting, or %NULL to ignore.
  *
- * Creates a #GTlsCertificate from the PEM-encoded data in @data. If
+ * Creates a #xtls_certificate_t from the PEM-encoded data in @data. If
  * @data includes both a certificate and a private key, then the
  * returned certificate will include the private key data as well. (See
- * the #GTlsCertificate:private-key-pem property for information about
+ * the #xtls_certificate_t:private-key-pem property for information about
  * supported formats.)
  *
  * The returned certificate will be the first certificate found in
  * @data. As of GLib 2.44, if @data contains more certificates it will
  * try to load a certificate chain. All certificates will be verified in
  * the order found (top-level certificate should be the last one in the
- * file) and the #GTlsCertificate:issuer property of each certificate
+ * file) and the #xtls_certificate_t:issuer property of each certificate
  * will be set accordingly if the verification succeeds. If any
  * certificate in the chain cannot be verified, the first certificate in
  * the file will still be returned.
@@ -702,14 +702,14 @@ parse_and_create_certificate (const xchar_t  *data,
  *
  * Since: 2.28
  */
-GTlsCertificate *
-g_tls_certificate_new_from_pem  (const xchar_t  *data,
-				 gssize        length,
+xtls_certificate_t *
+xtls_certificate_new_from_pem  (const xchar_t  *data,
+				 xssize_t        length,
 				 xerror_t      **error)
 {
   xerror_t *child_error = NULL;
   xchar_t *key_pem;
-  GTlsCertificate *cert;
+  xtls_certificate_t *cert;
 
   g_return_val_if_fail (data != NULL, NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
@@ -731,17 +731,17 @@ g_tls_certificate_new_from_pem  (const xchar_t  *data,
 }
 
 /**
- * g_tls_certificate_new_from_pkcs12:
+ * xtls_certificate_new_from_pkcs12:
  * @data: (array length=length): DER-encoded PKCS #12 format certificate data
  * @length: the length of @data
  * @password: (nullable): optional password for encrypted certificate data
  * @error: #xerror_t for error reporting, or %NULL to ignore.
  *
- * Creates a #GTlsCertificate from the data in @data. It must contain
+ * Creates a #xtls_certificate_t from the data in @data. It must contain
  * a certificate and matching private key.
  *
  * If extra certificates are included they will be verified as a chain
- * and the #GTlsCertificate:issuer property will be set.
+ * and the #xtls_certificate_t:issuer property will be set.
  * All other data will be ignored.
  *
  * You can pass as single password for all of the data which will be
@@ -749,7 +749,7 @@ g_tls_certificate_new_from_pem  (const xchar_t  *data,
  * private keys. If decryption fails it will error with
  * %G_TLS_ERROR_BAD_CERTIFICATE_PASSWORD.
  *
- * This constructor requires support in the current #GTlsBackend.
+ * This constructor requires support in the current #xtls_backend_t.
  * If support is missing it will error with
  * %G_IO_ERROR_NOT_SUPPORTED.
  *
@@ -759,35 +759,35 @@ g_tls_certificate_new_from_pem  (const xchar_t  *data,
  *
  * Since: 2.72
  */
-GTlsCertificate *
-g_tls_certificate_new_from_pkcs12 (const guint8  *data,
+xtls_certificate_t *
+xtls_certificate_new_from_pkcs12 (const xuint8_t  *data,
                                    xsize_t          length,
                                    const xchar_t   *password,
                                    xerror_t       **error)
 {
   xobject_t *cert;
-  GTlsBackend *backend;
-  GByteArray *bytes;
+  xtls_backend_t *backend;
+  xbyte_array_t *bytes;
 
   g_return_val_if_fail (data != NULL || length == 0, NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  backend = g_tls_backend_get_default ();
+  backend = xtls_backend_get_default ();
 
-  bytes = g_byte_array_new ();
-  g_byte_array_append (bytes, data, length);
+  bytes = xbyte_array_new ();
+  xbyte_array_append (bytes, data, length);
 
-  cert = g_initable_new (g_tls_backend_get_certificate_type (backend),
+  cert = xinitable_new (xtls_backend_get_certificate_type (backend),
                          NULL, error,
                          "pkcs12-data", bytes,
                          "password", password,
                          NULL);
 
-  g_byte_array_unref (bytes);
+  xbyte_array_unref (bytes);
 
   if (cert)
     {
-      GTlsCertificatePrivate *priv = g_tls_certificate_get_instance_private (G_TLS_CERTIFICATE (cert));
+      GTlsCertificatePrivate *priv = xtls_certificate_get_instance_private (G_TLS_CERTIFICATE (cert));
 
       if (priv->pkcs12_properties_not_overridden)
         {
@@ -802,30 +802,30 @@ g_tls_certificate_new_from_pkcs12 (const guint8  *data,
 }
 
 /**
- * g_tls_certificate_new_from_file_with_password:
+ * xtls_certificate_new_from_file_with_password:
  * @file: (type filename): file containing a certificate to import
  * @password: (not nullable): password for PKCS #12 files
  * @error: #xerror_t for error reporting, or %NULL to ignore
  *
- * Creates a #GTlsCertificate from the data in @file.
+ * Creates a #xtls_certificate_t from the data in @file.
  *
  * If @file cannot be read or parsed, the function will return %NULL and
  * set @error.
  *
  * Any unknown file types will error with %G_IO_ERROR_NOT_SUPPORTED.
  * Currently only `.p12` and `.pfx` files are supported.
- * See g_tls_certificate_new_from_pkcs12() for more details.
+ * See xtls_certificate_new_from_pkcs12() for more details.
  *
  * Returns: the new certificate, or %NULL on error
  *
  * Since: 2.72
  */
-GTlsCertificate *
-g_tls_certificate_new_from_file_with_password (const xchar_t  *file,
+xtls_certificate_t *
+xtls_certificate_new_from_file_with_password (const xchar_t  *file,
                                                const xchar_t  *password,
                                                xerror_t      **error)
 {
-  GTlsCertificate *cert;
+  xtls_certificate_t *cert;
   xchar_t *contents;
   xsize_t length;
 
@@ -833,32 +833,32 @@ g_tls_certificate_new_from_file_with_password (const xchar_t  *file,
   g_return_val_if_fail (password != NULL, NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  if (!g_str_has_suffix (file, ".p12") && !g_str_has_suffix (file, ".pfx"))
+  if (!xstr_has_suffix (file, ".p12") && !xstr_has_suffix (file, ".pfx"))
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                    "The file type of \"%s\" is unknown. Only .p12 and .pfx files are supported currently.", file);
       return NULL;
     }
 
-  if (!g_file_get_contents (file, &contents, &length, error))
+  if (!xfile_get_contents (file, &contents, &length, error))
     return NULL;
 
-  cert = g_tls_certificate_new_from_pkcs12 ((guint8 *)contents, length, password, error);
+  cert = xtls_certificate_new_from_pkcs12 ((xuint8_t *)contents, length, password, error);
 
   g_free (contents);
   return cert;
 }
 
 /**
- * g_tls_certificate_new_from_file:
+ * xtls_certificate_new_from_file:
  * @file: (type filename): file containing a certificate to import
  * @error: #xerror_t for error reporting, or %NULL to ignore
  *
- * Creates a #GTlsCertificate from the data in @file.
+ * Creates a #xtls_certificate_t from the data in @file.
  *
  * As of 2.72, if the filename ends in `.p12` or `.pfx` the data is loaded by
- * g_tls_certificate_new_from_pkcs12() otherwise it is loaded by
- * g_tls_certificate_new_from_pem(). See those functions for
+ * xtls_certificate_new_from_pkcs12() otherwise it is loaded by
+ * xtls_certificate_new_from_pem(). See those functions for
  * exact details.
  *
  * If @file cannot be read or parsed, the function will return %NULL and
@@ -868,67 +868,67 @@ g_tls_certificate_new_from_file_with_password (const xchar_t  *file,
  *
  * Since: 2.28
  */
-GTlsCertificate *
-g_tls_certificate_new_from_file (const xchar_t  *file,
+xtls_certificate_t *
+xtls_certificate_new_from_file (const xchar_t  *file,
                                  xerror_t      **error)
 {
-  GTlsCertificate *cert;
+  xtls_certificate_t *cert;
   xchar_t *contents;
   xsize_t length;
 
   g_return_val_if_fail (file != NULL, NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  if (!g_file_get_contents (file, &contents, &length, error))
+  if (!xfile_get_contents (file, &contents, &length, error))
     return NULL;
 
-  if (g_str_has_suffix (file, ".p12") || g_str_has_suffix (file, ".pfx"))
-    cert = g_tls_certificate_new_from_pkcs12 ((guint8 *)contents, length, NULL, error);
+  if (xstr_has_suffix (file, ".p12") || xstr_has_suffix (file, ".pfx"))
+    cert = xtls_certificate_new_from_pkcs12 ((xuint8_t *)contents, length, NULL, error);
   else
-    cert = g_tls_certificate_new_from_pem (contents, length, error);
+    cert = xtls_certificate_new_from_pem (contents, length, error);
 
   g_free (contents);
   return cert;
 }
 
 /**
- * g_tls_certificate_new_from_files:
+ * xtls_certificate_new_from_files:
  * @cert_file: (type filename): file containing one or more PEM-encoded
  *     certificates to import
  * @key_file: (type filename): file containing a PEM-encoded private key
  *     to import
  * @error: #xerror_t for error reporting, or %NULL to ignore.
  *
- * Creates a #GTlsCertificate from the PEM-encoded data in @cert_file
+ * Creates a #xtls_certificate_t from the PEM-encoded data in @cert_file
  * and @key_file. The returned certificate will be the first certificate
  * found in @cert_file. As of GLib 2.44, if @cert_file contains more
  * certificates it will try to load a certificate chain. All
  * certificates will be verified in the order found (top-level
  * certificate should be the last one in the file) and the
- * #GTlsCertificate:issuer property of each certificate will be set
+ * #xtls_certificate_t:issuer property of each certificate will be set
  * accordingly if the verification succeeds. If any certificate in the
  * chain cannot be verified, the first certificate in the file will
  * still be returned.
  *
  * If either file cannot be read or parsed, the function will return
  * %NULL and set @error. Otherwise, this behaves like
- * g_tls_certificate_new_from_pem().
+ * xtls_certificate_new_from_pem().
  *
  * Returns: the new certificate, or %NULL on error
  *
  * Since: 2.28
  */
-GTlsCertificate *
-g_tls_certificate_new_from_files (const xchar_t  *cert_file,
+xtls_certificate_t *
+xtls_certificate_new_from_files (const xchar_t  *cert_file,
                                   const xchar_t  *key_file,
                                   xerror_t      **error)
 {
-  GTlsCertificate *cert;
+  xtls_certificate_t *cert;
   xchar_t *cert_data, *key_data;
   xsize_t cert_len, key_len;
   xchar_t *key_pem;
 
-  if (!g_file_get_contents (key_file, &key_data, &key_len, error))
+  if (!xfile_get_contents (key_file, &key_data, &key_len, error))
     return NULL;
 
   key_pem = parse_private_key (key_data, key_len, TRUE, error);
@@ -936,7 +936,7 @@ g_tls_certificate_new_from_files (const xchar_t  *cert_file,
   if (!key_pem)
     return NULL;
 
-  if (!g_file_get_contents (cert_file, &cert_data, &cert_len, error))
+  if (!xfile_get_contents (cert_file, &cert_data, &cert_len, error))
     {
       g_free (key_pem);
       return NULL;
@@ -949,12 +949,12 @@ g_tls_certificate_new_from_files (const xchar_t  *cert_file,
 }
 
 /**
- * g_tls_certificate_new_from_pkcs11_uris:
+ * xtls_certificate_new_from_pkcs11_uris:
  * @pkcs11_uri: A PKCS \#11 URI
  * @private_key_pkcs11_uri: (nullable): A PKCS \#11 URI
  * @error: #xerror_t for error reporting, or %NULL to ignore.
  *
- * Creates a #GTlsCertificate from a
+ * Creates a #xtls_certificate_t from a
  * [PKCS \#11](https://docs.oasis-open.org/pkcs11/pkcs11-base/v3.0/os/pkcs11-base-v3.0-os.html) URI.
  *
  * An example @pkcs11_uri would be `pkcs11:model=Model;manufacturer=Manufacture;serial=1;token=My%20Client%20Certificate;id=%01`
@@ -983,20 +983,20 @@ g_tls_certificate_new_from_files (const xchar_t  *cert_file,
  *
  * Since: 2.68
  */
-GTlsCertificate *
-g_tls_certificate_new_from_pkcs11_uris (const xchar_t  *pkcs11_uri,
+xtls_certificate_t *
+xtls_certificate_new_from_pkcs11_uris (const xchar_t  *pkcs11_uri,
                                         const xchar_t  *private_key_pkcs11_uri,
                                         xerror_t      **error)
 {
   xobject_t *cert;
-  GTlsBackend *backend;
+  xtls_backend_t *backend;
 
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
   g_return_val_if_fail (pkcs11_uri, NULL);
 
-  backend = g_tls_backend_get_default ();
+  backend = xtls_backend_get_default ();
 
-  cert = g_initable_new (g_tls_backend_get_certificate_type (backend),
+  cert = xinitable_new (xtls_backend_get_certificate_type (backend),
                          NULL, error,
                          "pkcs11-uri", pkcs11_uri,
                          "private-key-pkcs11-uri", private_key_pkcs11_uri,
@@ -1007,11 +1007,11 @@ g_tls_certificate_new_from_pkcs11_uris (const xchar_t  *pkcs11_uri,
       xchar_t *objects_uri;
 
       /* Old implementations might not override this property */
-      g_object_get (cert, "pkcs11-uri", &objects_uri, NULL);
+      xobject_get (cert, "pkcs11-uri", &objects_uri, NULL);
       if (objects_uri == NULL)
         {
-          g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("This GTlsBackend does not support creating PKCS #11 certificates"));
-          g_object_unref (cert);
+          g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, _("This xtls_backend_t does not support creating PKCS #11 certificates"));
+          xobject_unref (cert);
           return NULL;
         }
       g_free (objects_uri);
@@ -1021,7 +1021,7 @@ g_tls_certificate_new_from_pkcs11_uris (const xchar_t  *pkcs11_uri,
 }
 
 /**
- * g_tls_certificate_list_new_from_file:
+ * xtls_certificate_list_new_from_file:
  * @file: (type filename): file containing PEM-encoded certificates to import
  * @error: #xerror_t for error reporting, or %NULL to ignore.
  *
@@ -1032,21 +1032,21 @@ g_tls_certificate_new_from_pkcs11_uris (const xchar_t  *pkcs11_uri,
  * set @error.
  *
  * Returns: (element-type Gio.TlsCertificate) (transfer full): a
- * #xlist_t containing #GTlsCertificate objects. You must free the list
+ * #xlist_t containing #xtls_certificate_t objects. You must free the list
  * and its contents when you are done with it.
  *
  * Since: 2.28
  */
 xlist_t *
-g_tls_certificate_list_new_from_file (const xchar_t  *file,
+xtls_certificate_list_new_from_file (const xchar_t  *file,
 				      xerror_t      **error)
 {
-  GQueue queue = G_QUEUE_INIT;
+  xqueue_t queue = G_QUEUE_INIT;
   xchar_t *contents, *end;
   const xchar_t *p;
   xsize_t length;
 
-  if (!g_file_get_contents (file, &contents, &length, error))
+  if (!xfile_get_contents (file, &contents, &length, error))
     return NULL;
 
   end = contents + length;
@@ -1054,13 +1054,13 @@ g_tls_certificate_list_new_from_file (const xchar_t  *file,
   while (p && *p)
     {
       xchar_t *cert_pem;
-      GTlsCertificate *cert = NULL;
+      xtls_certificate_t *cert = NULL;
       xerror_t *parse_error = NULL;
 
       cert_pem = parse_next_pem_certificate (&p, end, FALSE, &parse_error);
       if (cert_pem)
         {
-          cert = g_tls_certificate_new_internal (cert_pem, NULL, NULL, &parse_error);
+          cert = xtls_certificate_new_internal (cert_pem, NULL, NULL, &parse_error);
           g_free (cert_pem);
         }
       if (!cert)
@@ -1068,7 +1068,7 @@ g_tls_certificate_list_new_from_file (const xchar_t  *file,
           if (parse_error)
             {
               g_propagate_error (error, parse_error);
-              g_list_free_full (queue.head, g_object_unref);
+              xlist_free_full (queue.head, xobject_unref);
               queue.head = NULL;
             }
           break;
@@ -1082,10 +1082,10 @@ g_tls_certificate_list_new_from_file (const xchar_t  *file,
 
 
 /**
- * g_tls_certificate_get_issuer:
- * @cert: a #GTlsCertificate
+ * xtls_certificate_get_issuer:
+ * @cert: a #xtls_certificate_t
  *
- * Gets the #GTlsCertificate representing @cert's issuer, if known
+ * Gets the #xtls_certificate_t representing @cert's issuer, if known
  *
  * Returns: (nullable) (transfer none): The certificate of @cert's issuer,
  * or %NULL if @cert is self-signed or signed with an unknown
@@ -1093,21 +1093,21 @@ g_tls_certificate_list_new_from_file (const xchar_t  *file,
  *
  * Since: 2.28
  */
-GTlsCertificate *
-g_tls_certificate_get_issuer (GTlsCertificate  *cert)
+xtls_certificate_t *
+xtls_certificate_get_issuer (xtls_certificate_t  *cert)
 {
-  GTlsCertificate *issuer;
+  xtls_certificate_t *issuer;
 
-  g_object_get (G_OBJECT (cert), "issuer", &issuer, NULL);
+  xobject_get (G_OBJECT (cert), "issuer", &issuer, NULL);
   if (issuer)
-    g_object_unref (issuer);
+    xobject_unref (issuer);
 
   return issuer;
 }
 
 /**
- * g_tls_certificate_verify:
- * @cert: a #GTlsCertificate
+ * xtls_certificate_verify:
+ * @cert: a #xtls_certificate_t
  * @identity: (nullable): the expected peer identity
  * @trusted_ca: (nullable): the certificate of a trusted authority
  *
@@ -1136,11 +1136,11 @@ g_tls_certificate_get_issuer (GTlsCertificate  *cert)
  * expired certificates, because this could potentially be the only
  * error flag set even if other problems exist with the certificate.
  *
- * Because TLS session context is not used, #GTlsCertificate may not
- * perform as many checks on the certificates as #GTlsConnection would.
+ * Because TLS session context is not used, #xtls_certificate_t may not
+ * perform as many checks on the certificates as #xtls_connection_t would.
  * For example, certificate constraints may not be honored, and
  * revocation checks may not be performed. The best way to verify TLS
- * certificates used by a TLS connection is to let #GTlsConnection
+ * certificates used by a TLS connection is to let #xtls_connection_t
  * handle the verification.
  *
  * Returns: the appropriate #GTlsCertificateFlags
@@ -1148,54 +1148,54 @@ g_tls_certificate_get_issuer (GTlsCertificate  *cert)
  * Since: 2.28
  */
 GTlsCertificateFlags
-g_tls_certificate_verify (GTlsCertificate     *cert,
-			  GSocketConnectable  *identity,
-			  GTlsCertificate     *trusted_ca)
+xtls_certificate_verify (xtls_certificate_t     *cert,
+			  xsocket_connectable_t  *identity,
+			  xtls_certificate_t     *trusted_ca)
 {
   return G_TLS_CERTIFICATE_GET_CLASS (cert)->verify (cert, identity, trusted_ca);
 }
 
 /**
- * g_tls_certificate_is_same:
+ * xtls_certificate_is_same:
  * @cert_one: first certificate to compare
  * @cert_two: second certificate to compare
  *
- * Check if two #GTlsCertificate objects represent the same certificate.
+ * Check if two #xtls_certificate_t objects represent the same certificate.
  * The raw DER byte data of the two certificates are checked for equality.
  * This has the effect that two certificates may compare equal even if
- * their #GTlsCertificate:issuer, #GTlsCertificate:private-key, or
- * #GTlsCertificate:private-key-pem properties differ.
+ * their #xtls_certificate_t:issuer, #xtls_certificate_t:private-key, or
+ * #xtls_certificate_t:private-key-pem properties differ.
  *
  * Returns: whether the same or not
  *
  * Since: 2.34
  */
 xboolean_t
-g_tls_certificate_is_same (GTlsCertificate     *cert_one,
-                           GTlsCertificate     *cert_two)
+xtls_certificate_is_same (xtls_certificate_t     *cert_one,
+                           xtls_certificate_t     *cert_two)
 {
-  GByteArray *b1, *b2;
+  xbyte_array_t *b1, *b2;
   xboolean_t equal;
 
   g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert_one), FALSE);
   g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert_two), FALSE);
 
-  g_object_get (cert_one, "certificate", &b1, NULL);
-  g_object_get (cert_two, "certificate", &b2, NULL);
+  xobject_get (cert_one, "certificate", &b1, NULL);
+  xobject_get (cert_two, "certificate", &b2, NULL);
 
   equal = (b1->len == b2->len &&
            memcmp (b1->data, b2->data, b1->len) == 0);
 
-  g_byte_array_unref (b1);
-  g_byte_array_unref (b2);
+  xbyte_array_unref (b1);
+  xbyte_array_unref (b2);
 
   return equal;
 }
 
 
 /**
- * g_tls_certificate_get_not_valid_before:
- * @cert: a #GTlsCertificate
+ * xtls_certificate_get_not_valid_before:
+ * @cert: a #xtls_certificate_t
  *
  * Returns the time at which the certificate became or will become valid.
  *
@@ -1203,21 +1203,21 @@ g_tls_certificate_is_same (GTlsCertificate     *cert_one,
  *
  * Since: 2.70
  */
-GDateTime *
-g_tls_certificate_get_not_valid_before (GTlsCertificate *cert)
+xdatetime_t *
+xtls_certificate_get_not_valid_before (xtls_certificate_t *cert)
 {
-  GDateTime *not_valid_before = NULL;
+  xdatetime_t *not_valid_before = NULL;
 
   g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
 
-  g_object_get (G_OBJECT (cert), "not-valid-before", &not_valid_before, NULL);
+  xobject_get (G_OBJECT (cert), "not-valid-before", &not_valid_before, NULL);
 
   return g_steal_pointer (&not_valid_before);
 }
 
 /**
- * g_tls_certificate_get_not_valid_after:
- * @cert: a #GTlsCertificate
+ * xtls_certificate_get_not_valid_after:
+ * @cert: a #xtls_certificate_t
  *
  * Returns the time at which the certificate became or will become invalid.
  *
@@ -1225,21 +1225,21 @@ g_tls_certificate_get_not_valid_before (GTlsCertificate *cert)
  *
  * Since: 2.70
  */
-GDateTime *
-g_tls_certificate_get_not_valid_after (GTlsCertificate *cert)
+xdatetime_t *
+xtls_certificate_get_not_valid_after (xtls_certificate_t *cert)
 {
-  GDateTime *not_valid_after = NULL;
+  xdatetime_t *not_valid_after = NULL;
 
   g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
 
-  g_object_get (G_OBJECT (cert), "not-valid-after", &not_valid_after, NULL);
+  xobject_get (G_OBJECT (cert), "not-valid-after", &not_valid_after, NULL);
 
   return g_steal_pointer (&not_valid_after);
 }
 
 /**
- * g_tls_certificate_get_subject_name:
- * @cert: a #GTlsCertificate
+ * xtls_certificate_get_subject_name:
+ * @cert: a #xtls_certificate_t
  *
  * Returns the subject name from the certificate.
  *
@@ -1248,20 +1248,20 @@ g_tls_certificate_get_not_valid_after (GTlsCertificate *cert)
  * Since: 2.70
  */
 xchar_t *
-g_tls_certificate_get_subject_name (GTlsCertificate *cert)
+xtls_certificate_get_subject_name (xtls_certificate_t *cert)
 {
   xchar_t *subject_name = NULL;
 
   g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
 
-  g_object_get (G_OBJECT (cert), "subject-name", &subject_name, NULL);
+  xobject_get (G_OBJECT (cert), "subject-name", &subject_name, NULL);
 
   return g_steal_pointer (&subject_name);
 }
 
 /**
- * g_tls_certificate_get_issuer_name:
- * @cert: a #GTlsCertificate
+ * xtls_certificate_get_issuer_name:
+ * @cert: a #xtls_certificate_t
  *
  * Returns the issuer name from the certificate.
  *
@@ -1270,59 +1270,59 @@ g_tls_certificate_get_subject_name (GTlsCertificate *cert)
  * Since: 2.70
  */
 xchar_t *
-g_tls_certificate_get_issuer_name (GTlsCertificate *cert)
+xtls_certificate_get_issuer_name (xtls_certificate_t *cert)
 {
   xchar_t *issuer_name = NULL;
 
   g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
 
-  g_object_get (G_OBJECT (cert), "issuer-name", &issuer_name, NULL);
+  xobject_get (G_OBJECT (cert), "issuer-name", &issuer_name, NULL);
 
   return g_steal_pointer (&issuer_name);
 }
 
 /**
- * g_tls_certificate_get_dns_names:
- * @cert: a #GTlsCertificate
+ * xtls_certificate_get_dns_names:
+ * @cert: a #xtls_certificate_t
  *
- * Gets the value of #GTlsCertificate:dns-names.
+ * Gets the value of #xtls_certificate_t:dns-names.
  *
- * Returns: (nullable) (element-type GBytes) (transfer container): A #GPtrArray of
- * #GBytes elements, or %NULL if it's not available.
+ * Returns: (nullable) (element-type xbytes_t) (transfer container): A #xptr_array_t of
+ * #xbytes_t elements, or %NULL if it's not available.
  *
  * Since: 2.70
  */
-GPtrArray *
-g_tls_certificate_get_dns_names (GTlsCertificate *cert)
+xptr_array_t *
+xtls_certificate_get_dns_names (xtls_certificate_t *cert)
 {
-  GPtrArray *dns_names = NULL;
+  xptr_array_t *dns_names = NULL;
 
   g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
 
-  g_object_get (G_OBJECT (cert), "dns-names", &dns_names, NULL);
+  xobject_get (G_OBJECT (cert), "dns-names", &dns_names, NULL);
 
   return g_steal_pointer (&dns_names);
 }
 
 /**
- * g_tls_certificate_get_ip_addresses:
- * @cert: a #GTlsCertificate
+ * xtls_certificate_get_ip_addresses:
+ * @cert: a #xtls_certificate_t
  *
- * Gets the value of #GTlsCertificate:ip-addresses.
+ * Gets the value of #xtls_certificate_t:ip-addresses.
  *
- * Returns: (nullable) (element-type xinet_address_t) (transfer container): A #GPtrArray
+ * Returns: (nullable) (element-type xinet_address_t) (transfer container): A #xptr_array_t
  * of #xinet_address_t elements, or %NULL if it's not available.
  *
  * Since: 2.70
  */
-GPtrArray *
-g_tls_certificate_get_ip_addresses (GTlsCertificate *cert)
+xptr_array_t *
+xtls_certificate_get_ip_addresses (xtls_certificate_t *cert)
 {
-  GPtrArray *ip_addresses = NULL;
+  xptr_array_t *ip_addresses = NULL;
 
   g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
 
-  g_object_get (G_OBJECT (cert), "ip-addresses", &ip_addresses, NULL);
+  xobject_get (G_OBJECT (cert), "ip-addresses", &ip_addresses, NULL);
 
   return g_steal_pointer (&ip_addresses);
 }

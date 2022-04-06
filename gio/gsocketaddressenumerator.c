@@ -27,34 +27,34 @@
  * @short_description: Enumerator for socket addresses
  * @include: gio/gio.h
  *
- * #GSocketAddressEnumerator is an enumerator type for #xsocket_address_t
+ * #xsocket_address_enumerator_t is an enumerator type for #xsocket_address_t
  * instances. It is returned by enumeration functions such as
- * xsocket_connectable_enumerate(), which returns a #GSocketAddressEnumerator
+ * xsocket_connectable_enumerate(), which returns a #xsocket_address_enumerator_t
  * to list each #xsocket_address_t which could be used to connect to that
- * #GSocketConnectable.
+ * #xsocket_connectable_t.
  *
  * Enumeration is typically a blocking operation, so the asynchronous methods
  * xsocket_address_enumerator_next_async() and
  * xsocket_address_enumerator_next_finish() should be used where possible.
  *
- * Each #GSocketAddressEnumerator can only be enumerated once. Once
+ * Each #xsocket_address_enumerator_t can only be enumerated once. Once
  * xsocket_address_enumerator_next() has returned %NULL, further
- * enumeration with that #GSocketAddressEnumerator is not possible, and it can
+ * enumeration with that #xsocket_address_enumerator_t is not possible, and it can
  * be unreffed.
  */
 
-G_DEFINE_ABSTRACT_TYPE (GSocketAddressEnumerator, xsocket_address_enumerator, XTYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE (xsocket_address_enumerator_t, xsocket_address_enumerator, XTYPE_OBJECT)
 
-static void            xsocket_address_enumerator_real_next_async  (GSocketAddressEnumerator  *enumerator,
+static void            xsocket_address_enumerator_real_next_async  (xsocket_address_enumerator_t  *enumerator,
 								     xcancellable_t              *cancellable,
 								     xasync_ready_callback_t        callback,
 								     xpointer_t                   user_data);
-static xsocket_address_t *xsocket_address_enumerator_real_next_finish (GSocketAddressEnumerator  *enumerator,
+static xsocket_address_t *xsocket_address_enumerator_real_next_finish (xsocket_address_enumerator_t  *enumerator,
 								     xasync_result_t              *result,
 								     xerror_t                   **error);
 
 static void
-xsocket_address_enumerator_init (GSocketAddressEnumerator *enumerator)
+xsocket_address_enumerator_init (xsocket_address_enumerator_t *enumerator)
 {
 }
 
@@ -67,12 +67,12 @@ xsocket_address_enumerator_class_init (GSocketAddressEnumeratorClass *enumerator
 
 /**
  * xsocket_address_enumerator_next:
- * @enumerator: a #GSocketAddressEnumerator
+ * @enumerator: a #xsocket_address_enumerator_t
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: a #xerror_t.
  *
  * Retrieves the next #xsocket_address_t from @enumerator. Note that this
- * may block for some amount of time. (Eg, a #GNetworkAddress may need
+ * may block for some amount of time. (Eg, a #xnetwork_address_t may need
  * to do a DNS lookup before it can return an address.) Use
  * xsocket_address_enumerator_next_async() if you need to avoid
  * blocking.
@@ -90,7 +90,7 @@ xsocket_address_enumerator_class_init (GSocketAddressEnumeratorClass *enumerator
  *     more addresses.
  */
 xsocket_address_t *
-xsocket_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
+xsocket_address_enumerator_next (xsocket_address_enumerator_t  *enumerator,
 				  xcancellable_t              *cancellable,
 				  xerror_t                   **error)
 {
@@ -108,30 +108,30 @@ xsocket_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
  * and so the synchronous method will never block.
  */
 static void
-xsocket_address_enumerator_real_next_async (GSocketAddressEnumerator *enumerator,
+xsocket_address_enumerator_real_next_async (xsocket_address_enumerator_t *enumerator,
 					     xcancellable_t             *cancellable,
 					     xasync_ready_callback_t       callback,
 					     xpointer_t                  user_data)
 {
-  GTask *task;
+  xtask_t *task;
   xsocket_address_t *address;
   xerror_t *error = NULL;
 
-  task = g_task_new (enumerator, NULL, callback, user_data);
-  g_task_set_source_tag (task, xsocket_address_enumerator_real_next_async);
+  task = xtask_new (enumerator, NULL, callback, user_data);
+  xtask_set_source_tag (task, xsocket_address_enumerator_real_next_async);
 
   address = xsocket_address_enumerator_next (enumerator, cancellable, &error);
   if (error)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_pointer (task, address, g_object_unref);
+    xtask_return_pointer (task, address, xobject_unref);
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 /**
  * xsocket_address_enumerator_next_async:
- * @enumerator: a #GSocketAddressEnumerator
+ * @enumerator: a #xsocket_address_enumerator_t
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @callback: (scope async): a #xasync_ready_callback_t to call when the request
  *     is satisfied
@@ -144,7 +144,7 @@ xsocket_address_enumerator_real_next_async (GSocketAddressEnumerator *enumerator
  * It is an error to call this multiple times before the previous callback has finished.
  */
 void
-xsocket_address_enumerator_next_async (GSocketAddressEnumerator *enumerator,
+xsocket_address_enumerator_next_async (xsocket_address_enumerator_t *enumerator,
 					xcancellable_t             *cancellable,
 					xasync_ready_callback_t       callback,
 					xpointer_t                  user_data)
@@ -159,18 +159,18 @@ xsocket_address_enumerator_next_async (GSocketAddressEnumerator *enumerator,
 }
 
 static xsocket_address_t *
-xsocket_address_enumerator_real_next_finish (GSocketAddressEnumerator  *enumerator,
+xsocket_address_enumerator_real_next_finish (xsocket_address_enumerator_t  *enumerator,
 					      xasync_result_t              *result,
 					      xerror_t                   **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, enumerator), NULL);
+  g_return_val_if_fail (xtask_is_valid (result, enumerator), NULL);
 
-  return g_task_propagate_pointer (G_TASK (result), error);
+  return xtask_propagate_pointer (XTASK (result), error);
 }
 
 /**
  * xsocket_address_enumerator_next_finish:
- * @enumerator: a #GSocketAddressEnumerator
+ * @enumerator: a #xsocket_address_enumerator_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t
  *
@@ -184,7 +184,7 @@ xsocket_address_enumerator_real_next_finish (GSocketAddressEnumerator  *enumerat
  *     more addresses.
  */
 xsocket_address_t *
-xsocket_address_enumerator_next_finish (GSocketAddressEnumerator  *enumerator,
+xsocket_address_enumerator_next_finish (xsocket_address_enumerator_t  *enumerator,
 					 xasync_result_t              *result,
 					 xerror_t                   **error)
 {

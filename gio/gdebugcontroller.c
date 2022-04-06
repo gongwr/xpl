@@ -52,7 +52,7 @@
  */
 
 G_DEFINE_INTERFACE_WITH_CODE (GDebugController, g_debug_controller, XTYPE_OBJECT,
-                              g_type_interface_add_prerequisite (g_define_type_id, XTYPE_INITABLE))
+                              xtype_interface_add_prerequisite (g_define_type_id, XTYPE_INITABLE))
 
 static void
 g_debug_controller_default_init (GDebugControllerInterface *iface)
@@ -65,7 +65,7 @@ g_debug_controller_default_init (GDebugControllerInterface *iface)
    *
    * Since: 2.72
    */
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
                                        g_param_spec_boolean ("debug-enabled",
                                                              "Debug Enabled",
                                                              "Whether to expose debug output",
@@ -91,7 +91,7 @@ g_debug_controller_get_debug_enabled (GDebugController *self)
 
   g_return_val_if_fail (X_IS_DEBUG_CONTROLLER (self), FALSE);
 
-  g_object_get (G_OBJECT (self),
+  xobject_get (G_OBJECT (self),
                 "debug-enabled", &enabled,
                 NULL);
 
@@ -113,7 +113,7 @@ g_debug_controller_set_debug_enabled (GDebugController *self,
 {
   g_return_if_fail (X_IS_DEBUG_CONTROLLER (self));
 
-  g_object_set (G_OBJECT (self),
+  xobject_set (G_OBJECT (self),
                 "debug-enabled", debug_enabled,
                 NULL);
 }

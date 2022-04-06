@@ -27,15 +27,15 @@
 #include "gfileinfo.h"
 
 
-static xboolean_t g_poll_file_monitor_cancel (GFileMonitor* monitor);
+static xboolean_t g_poll_file_monitor_cancel (xfile_monitor_t* monitor);
 static void schedule_poll_timeout (GPollFileMonitor* poll_monitor);
 
 struct _GPollFileMonitor
 {
-  GFileMonitor parent_instance;
+  xfile_monitor_t parent_instance;
   xfile_t *file;
-  GFileInfo *last_info;
-  GSource *timeout;
+  xfile_info_t *last_info;
+  xsource_t *timeout;
 };
 
 #define POLL_TIME_SECS 5
@@ -50,8 +50,8 @@ g_poll_file_monitor_finalize (xobject_t* object)
 
   poll_monitor = G_POLL_FILE_MONITOR (object);
 
-  g_poll_file_monitor_cancel (G_FILE_MONITOR (poll_monitor));
-  g_object_unref (poll_monitor->file);
+  g_poll_file_monitor_cancel (XFILE_MONITOR (poll_monitor));
+  xobject_unref (poll_monitor->file);
   g_clear_object (&poll_monitor->last_info);
 
   G_OBJECT_CLASS (g_poll_file_monitor_parent_class)->finalize (object);
@@ -62,7 +62,7 @@ static void
 g_poll_file_monitor_class_init (GPollFileMonitorClass* klass)
 {
   xobject_class_t* gobject_class = G_OBJECT_CLASS (klass);
-  GFileMonitorClass *file_monitor_class = G_FILE_MONITOR_CLASS (klass);
+  xfile_monitor_class_t *file_monitor_class = XFILE_MONITOR_CLASS (klass);
 
   gobject_class->finalize = g_poll_file_monitor_finalize;
 
@@ -75,23 +75,23 @@ g_poll_file_monitor_init (GPollFileMonitor* poll_monitor)
 }
 
 static int
-calc_event_type (GFileInfo *last,
-		 GFileInfo *new)
+calc_event_type (xfile_info_t *last,
+		 xfile_info_t *new)
 {
   if (last == NULL && new == NULL)
     return -1;
 
   if (last == NULL && new != NULL)
-    return G_FILE_MONITOR_EVENT_CREATED;
+    return XFILE_MONITOR_EVENT_CREATED;
 
   if (last != NULL && new == NULL)
-    return G_FILE_MONITOR_EVENT_DELETED;
+    return XFILE_MONITOR_EVENT_DELETED;
 
-  if (g_strcmp0 (g_file_info_get_etag (last), g_file_info_get_etag (new)))
-    return G_FILE_MONITOR_EVENT_CHANGED;
+  if (xstrcmp0 (xfile_info_get_etag (last), xfile_info_get_etag (new)))
+    return XFILE_MONITOR_EVENT_CHANGED;
 
-  if (g_file_info_get_size (last) != g_file_info_get_size (new))
-    return G_FILE_MONITOR_EVENT_CHANGED;
+  if (xfile_info_get_size (last) != xfile_info_get_size (new))
+    return XFILE_MONITOR_EVENT_CHANGED;
 
   return -1;
 }
@@ -102,44 +102,44 @@ got_new_info (xobject_t      *source_object,
               xpointer_t      user_data)
 {
   GPollFileMonitor* poll_monitor = user_data;
-  GFileInfo *info;
+  xfile_info_t *info;
   int event;
 
-  info = g_file_query_info_finish (poll_monitor->file, res, NULL);
+  info = xfile_query_info_finish (poll_monitor->file, res, NULL);
 
-  if (!g_file_monitor_is_cancelled (G_FILE_MONITOR (poll_monitor)))
+  if (!xfile_monitor_is_cancelled (XFILE_MONITOR (poll_monitor)))
     {
       event = calc_event_type (poll_monitor->last_info, info);
 
       if (event != -1)
 	{
-	  g_file_monitor_emit_event (G_FILE_MONITOR (poll_monitor),
+	  xfile_monitor_emit_event (XFILE_MONITOR (poll_monitor),
 				     poll_monitor->file,
 				     NULL, event);
 	  /* We're polling so slowly anyway, so always emit the done hint */
-	  if (!g_file_monitor_is_cancelled (G_FILE_MONITOR (poll_monitor)) &&
-             (event == G_FILE_MONITOR_EVENT_CHANGED || event == G_FILE_MONITOR_EVENT_CREATED))
-	    g_file_monitor_emit_event (G_FILE_MONITOR (poll_monitor),
+	  if (!xfile_monitor_is_cancelled (XFILE_MONITOR (poll_monitor)) &&
+             (event == XFILE_MONITOR_EVENT_CHANGED || event == XFILE_MONITOR_EVENT_CREATED))
+	    xfile_monitor_emit_event (XFILE_MONITOR (poll_monitor),
 				       poll_monitor->file,
-				       NULL, G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT);
+				       NULL, XFILE_MONITOR_EVENT_CHANGES_DONE_HINT);
 	}
 
       if (poll_monitor->last_info)
 	{
-	  g_object_unref (poll_monitor->last_info);
+	  xobject_unref (poll_monitor->last_info);
 	  poll_monitor->last_info = NULL;
 	}
 
       if (info)
-	poll_monitor->last_info = g_object_ref (info);
+	poll_monitor->last_info = xobject_ref (info);
 
       schedule_poll_timeout (poll_monitor);
     }
 
   if (info)
-    g_object_unref (info);
+    xobject_unref (info);
 
-  g_object_unref (poll_monitor);
+  xobject_unref (poll_monitor);
 }
 
 static xboolean_t
@@ -147,11 +147,11 @@ poll_file_timeout (xpointer_t data)
 {
   GPollFileMonitor* poll_monitor = data;
 
-  g_source_unref (poll_monitor->timeout);
+  xsource_unref (poll_monitor->timeout);
   poll_monitor->timeout = NULL;
 
-  g_file_query_info_async (poll_monitor->file, G_FILE_ATTRIBUTE_ETAG_VALUE "," G_FILE_ATTRIBUTE_STANDARD_SIZE,
-			 0, 0, NULL, got_new_info, g_object_ref (poll_monitor));
+  xfile_query_info_async (poll_monitor->file, XFILE_ATTRIBUTE_ETAG_VALUE "," XFILE_ATTRIBUTE_STANDARD_SIZE,
+			 0, 0, NULL, got_new_info, xobject_ref (poll_monitor));
 
   return G_SOURCE_REMOVE;
 }
@@ -160,8 +160,8 @@ static void
 schedule_poll_timeout (GPollFileMonitor* poll_monitor)
 {
   poll_monitor->timeout = g_timeout_source_new_seconds (POLL_TIME_SECS);
-  g_source_set_callback (poll_monitor->timeout, poll_file_timeout, poll_monitor, NULL);
-  g_source_attach (poll_monitor->timeout, g_main_context_get_thread_default ());
+  xsource_set_callback (poll_monitor->timeout, poll_file_timeout, poll_monitor, NULL);
+  xsource_attach (poll_monitor->timeout, xmain_context_get_thread_default ());
 }
 
 static void
@@ -170,16 +170,16 @@ got_initial_info (xobject_t      *source_object,
                   xpointer_t      user_data)
 {
   GPollFileMonitor* poll_monitor = user_data;
-  GFileInfo *info;
+  xfile_info_t *info;
 
-  info = g_file_query_info_finish (poll_monitor->file, res, NULL);
+  info = xfile_query_info_finish (poll_monitor->file, res, NULL);
 
   poll_monitor->last_info = info;
 
-  if (!g_file_monitor_is_cancelled (G_FILE_MONITOR (poll_monitor)))
+  if (!xfile_monitor_is_cancelled (XFILE_MONITOR (poll_monitor)))
     schedule_poll_timeout (poll_monitor);
 
-  g_object_unref (poll_monitor);
+  xobject_unref (poll_monitor);
 }
 
 /**
@@ -188,32 +188,32 @@ got_initial_info (xobject_t      *source_object,
  *
  * Polls @file for changes.
  *
- * Returns: a new #GFileMonitor for the given #xfile_t.
+ * Returns: a new #xfile_monitor_t for the given #xfile_t.
  **/
-GFileMonitor*
+xfile_monitor_t*
 _g_poll_file_monitor_new (xfile_t *file)
 {
   GPollFileMonitor* poll_monitor;
 
-  poll_monitor = g_object_new (XTYPE_POLL_FILE_MONITOR, NULL);
+  poll_monitor = xobject_new (XTYPE_POLL_FILE_MONITOR, NULL);
 
-  poll_monitor->file = g_object_ref (file);
+  poll_monitor->file = xobject_ref (file);
 
-  g_file_query_info_async (file, G_FILE_ATTRIBUTE_ETAG_VALUE "," G_FILE_ATTRIBUTE_STANDARD_SIZE,
-			   0, 0, NULL, got_initial_info, g_object_ref (poll_monitor));
+  xfile_query_info_async (file, XFILE_ATTRIBUTE_ETAG_VALUE "," XFILE_ATTRIBUTE_STANDARD_SIZE,
+			   0, 0, NULL, got_initial_info, xobject_ref (poll_monitor));
 
-  return G_FILE_MONITOR (poll_monitor);
+  return XFILE_MONITOR (poll_monitor);
 }
 
 static xboolean_t
-g_poll_file_monitor_cancel (GFileMonitor* monitor)
+g_poll_file_monitor_cancel (xfile_monitor_t* monitor)
 {
   GPollFileMonitor *poll_monitor = G_POLL_FILE_MONITOR (monitor);
 
   if (poll_monitor->timeout)
     {
-      g_source_destroy (poll_monitor->timeout);
-      g_source_unref (poll_monitor->timeout);
+      xsource_destroy (poll_monitor->timeout);
+      xsource_unref (poll_monitor->timeout);
       poll_monitor->timeout = NULL;
     }
 

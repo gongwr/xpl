@@ -108,7 +108,7 @@ struct _GMemChunk
   GMemArea *mem_areas;       /* a list of all the mem areas owned by this chunk */
   GMemArea *free_mem_area;   /* the free area...which is about to be destroyed */
   GFreeAtom *free_atoms;     /* the free atoms list */
-  GTree *mem_tree;           /* tree of mem areas sorted by memory address */
+  xtree_t *mem_tree;           /* tree of mem areas sorted by memory address */
   GMemChunk *next;           /* pointer to the next chunk */
   GMemChunk *prev;           /* pointer to the previous chunk */
 };
@@ -124,7 +124,7 @@ static xint_t   old_mem_chunk_area_search  (GMemArea *a,
 /* here we can't use StaticMutexes, as they depend upon a working
  * g_malloc, the same holds true for StaticPrivate
  */
-static GMutex         mem_chunks_lock;
+static xmutex_t         mem_chunks_lock;
 static GMemChunk     *mem_chunks = NULL;
 
 GMemChunk*
@@ -157,7 +157,7 @@ old_mem_chunk_new (const xchar_t  *name,
   mem_chunk->atom_size = atom_size;
 
   if (mem_chunk->type == G_ALLOC_AND_FREE)
-    mem_chunk->mem_tree = g_tree_new ((GCompareFunc) old_mem_chunk_area_compare);
+    mem_chunk->mem_tree = xtree_new ((GCompareFunc) old_mem_chunk_area_compare);
 
   if (mem_chunk->atom_size % G_MEM_ALIGN)
     mem_chunk->atom_size += G_MEM_ALIGN - (mem_chunk->atom_size % G_MEM_ALIGN);
@@ -208,7 +208,7 @@ old_mem_chunk_destroy (GMemChunk *mem_chunk)
   g_mutex_unlock (&mem_chunks_lock);
 
   if (mem_chunk->type == G_ALLOC_AND_FREE)
-    g_tree_destroy (mem_chunk->mem_tree);
+    xtree_destroy (mem_chunk->mem_tree);
 
   g_free (mem_chunk);
 
@@ -236,7 +236,7 @@ old_mem_chunk_alloc (GMemChunk *mem_chunk)
       mem_chunk->free_atoms = mem_chunk->free_atoms->next;
 
       /* Determine which area this piece of memory is allocated from */
-      temp_area = g_tree_search (mem_chunk->mem_tree,
+      temp_area = xtree_search (mem_chunk->mem_tree,
 				 (GCompareFunc) old_mem_chunk_area_search,
 				 mem);
 
@@ -274,7 +274,7 @@ old_mem_chunk_alloc (GMemChunk *mem_chunk)
                     mem_chunk->mem_areas = mem_chunk->mem_areas->next;
 
 		  if (mem_chunk->type == G_ALLOC_AND_FREE)
-		    g_tree_remove (mem_chunk->mem_tree, temp_area);
+		    xtree_remove (mem_chunk->mem_tree, temp_area);
                   g_free (temp_area);
                 }
               else
@@ -328,7 +328,7 @@ old_mem_chunk_alloc (GMemChunk *mem_chunk)
 	  mem_chunk->mem_areas = mem_chunk->mem_area;
 
 	  if (mem_chunk->type == G_ALLOC_AND_FREE)
-	    g_tree_insert (mem_chunk->mem_tree, mem_chunk->mem_area, mem_chunk->mem_area);
+	    xtree_insert (mem_chunk->mem_tree, mem_chunk->mem_area, mem_chunk->mem_area);
         }
 
       mem_chunk->mem_area->index = 0;
@@ -391,7 +391,7 @@ old_mem_chunk_free (GMemChunk *mem_chunk,
       free_atom->next = mem_chunk->free_atoms;
       mem_chunk->free_atoms = free_atom;
 
-      temp_area = g_tree_search (mem_chunk->mem_tree,
+      temp_area = xtree_search (mem_chunk->mem_tree,
 				 (GCompareFunc) old_mem_chunk_area_search,
 				 mem);
 
@@ -429,7 +429,7 @@ old_mem_chunk_clean (GMemChunk *mem_chunk)
 	{
 	  mem = (xpointer_t) temp_free_atom;
 
-	  mem_area = g_tree_search (mem_chunk->mem_tree,
+	  mem_area = xtree_search (mem_chunk->mem_tree,
 				    (GCompareFunc) old_mem_chunk_area_search,
 				    mem);
 
@@ -460,7 +460,7 @@ old_mem_chunk_clean (GMemChunk *mem_chunk)
 		    mem_chunk->mem_area = NULL;
 
 		  if (mem_chunk->type == G_ALLOC_AND_FREE)
-		    g_tree_remove (mem_chunk->mem_tree, mem_area);
+		    xtree_remove (mem_chunk->mem_tree, mem_area);
 		  g_free (mem_area);
 		}
 	    }
@@ -500,8 +500,8 @@ old_mem_chunk_reset (GMemChunk *mem_chunk)
 
   if (mem_chunk->mem_tree)
     {
-      g_tree_destroy (mem_chunk->mem_tree);
-      mem_chunk->mem_tree = g_tree_new ((GCompareFunc) old_mem_chunk_area_compare);
+      xtree_destroy (mem_chunk->mem_tree);
+      mem_chunk->mem_tree = xtree_new ((GCompareFunc) old_mem_chunk_area_compare);
     }
 
   LEAVE_MEM_CHUNK_ROUTINE ();

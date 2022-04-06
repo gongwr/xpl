@@ -32,7 +32,7 @@
 
 #include "gdbus-tests.h"
 
-static GMainLoop *loop = NULL;
+static xmain_loop_t *loop = NULL;
 
 /* ---------------------------------------------------------------------------------------------------- */
 #ifdef G_OS_UNIX
@@ -42,60 +42,60 @@ static GMainLoop *loop = NULL;
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static const GDBusArgInfo pokee_method_poke_out_arg0 = {
+static const xdbus_arg_info_t pokee_method_poke_out_arg0 = {
   -1,   /* ref_count */
   "result",
   "s",
   NULL  /* annotations */
 };
 
-static const GDBusArgInfo *pokee_method_poke_out_args[2] = {
+static const xdbus_arg_info_t *pokee_method_poke_out_args[2] = {
   &pokee_method_poke_out_arg0,
   NULL,
 };
 
-static const GDBusArgInfo pokee_method_poke_in_arg0 = {
+static const xdbus_arg_info_t pokee_method_poke_in_arg0 = {
   -1,   /* ref_count */
   "value",
   "s",
   NULL  /* annotations */
 };
 
-static const GDBusArgInfo *pokee_method_poke_in_args[2] = {
+static const xdbus_arg_info_t *pokee_method_poke_in_args[2] = {
   &pokee_method_poke_in_arg0,
   NULL,
 };
 
-static const GDBusMethodInfo pokee_method_poke = {
+static const xdbus_method_info_t pokee_method_poke = {
   -1,   /* ref_count */
   "Poke",
-  (GDBusArgInfo**) pokee_method_poke_in_args,
-  (GDBusArgInfo**) pokee_method_poke_out_args,
+  (xdbus_arg_info_t**) pokee_method_poke_in_args,
+  (xdbus_arg_info_t**) pokee_method_poke_out_args,
   NULL  /* annotations */
 };
 
-static const GDBusMethodInfo *pokee_methods[2] = {
+static const xdbus_method_info_t *pokee_methods[2] = {
   &pokee_method_poke,
   NULL
 };
 
-static const GDBusInterfaceInfo pokee_object_info = {
+static const xdbus_interface_info_t pokee_object_info = {
   -1,  /* ref_count */
   "org.gtk.GDBus.Pokee",
-  (GDBusMethodInfo**) pokee_methods,
+  (xdbus_method_info_t**) pokee_methods,
   NULL, /* signals */
   NULL, /* properties */
   NULL  /* annotations */
 };
 
 static void
-pokee_method_call (GDBusConnection       *connection,
+pokee_method_call (xdbus_connection_t       *connection,
                    const xchar_t           *sender,
                    const xchar_t           *object_path,
                    const xchar_t           *interface_name,
                    const xchar_t           *method_name,
                    xvariant_t              *parameters,
-                   GDBusMethodInvocation *invocation,
+                   xdbus_method_invocation_t *invocation,
                    xpointer_t               user_data)
 {
   const xchar_t *str;
@@ -103,13 +103,13 @@ pokee_method_call (GDBusConnection       *connection,
 
   g_assert_cmpstr (method_name, ==, "Poke");
 
-  g_variant_get (parameters, "(&s)", &str);
-  ret = g_strdup_printf ("You poked me with: '%s'", str);
-  g_dbus_method_invocation_return_value (invocation, g_variant_new ("(s)", ret));
+  xvariant_get (parameters, "(&s)", &str);
+  ret = xstrdup_printf ("You poked me with: '%s'", str);
+  xdbus_method_invocation_return_value (invocation, xvariant_new ("(s)", ret));
   g_free (ret);
 }
 
-static const GDBusInterfaceVTable pokee_vtable = {
+static const xdbus_interface_vtable_t pokee_vtable = {
   pokee_method_call,
   NULL, /* get_property */
   NULL, /* set_property */
@@ -130,7 +130,7 @@ static void
 test_non_socket (void)
 {
   xio_stream_t *streams[2];
-  GDBusConnection *connection;
+  xdbus_connection_t *connection;
   xerror_t *error;
   xchar_t *guid;
   pid_t first_child;
@@ -160,14 +160,14 @@ test_non_socket (void)
       /* first child */
 
       /* we shouldn't do this in the parent, because we shouldn't use a
-       * GMainContext both before and after fork
+       * xmain_context_t both before and after fork
        */
-      loop = g_main_loop_new (NULL, FALSE);
+      loop = xmain_loop_new (NULL, FALSE);
 
       ok = g_io_stream_close (streams[1], NULL, &error);
       g_assert_no_error (error);
       g_assert (ok);
-      g_object_unref (streams[1]);
+      xobject_unref (streams[1]);
 
       guid = g_dbus_generate_guid ();
       error = NULL;
@@ -185,12 +185,12 @@ test_non_socket (void)
                                                guid,
                                                G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER |
                                                G_DBUS_CONNECTION_FLAGS_DELAY_MESSAGE_PROCESSING,
-                                               NULL, /* GDBusAuthObserver */
+                                               NULL, /* xdbus_auth_observer_t */
                                                NULL,
                                                &error);
       g_free (guid);
       g_assert_no_error (error);
-      g_object_unref (streams[0]);
+      xobject_unref (streams[0]);
 
       /* make sure we exit along with the parent */
       g_dbus_connection_set_exit_on_close (connection, TRUE);
@@ -198,7 +198,7 @@ test_non_socket (void)
       error = NULL;
       g_dbus_connection_register_object (connection,
                                          "/pokee",
-                                         (GDBusInterfaceInfo *) &pokee_object_info,
+                                         (xdbus_interface_info_t *) &pokee_object_info,
                                          &pokee_vtable,
                                          NULL, /* user_data */
                                          NULL, /* user_data_free_func */
@@ -208,7 +208,7 @@ test_non_socket (void)
       /* and now start message processing */
       g_dbus_connection_start_message_processing (connection);
 
-      g_main_loop_run (loop);
+      xmain_loop_run (loop);
 
       g_assert_not_reached ();
       break;
@@ -223,8 +223,8 @@ test_non_socket (void)
   if (!g_test_trap_fork (0, 0))
     {
       /* parent */
-      g_object_unref (streams[0]);
-      g_object_unref (streams[1]);
+      xobject_unref (streams[0]);
+      xobject_unref (streams[1]);
 
       g_test_trap_assert_passed ();
       g_assert_cmpint (kill (first_child, SIGTERM), ==, 0);
@@ -235,23 +235,23 @@ test_non_socket (void)
   /* second child */
 
   /* we shouldn't do this in the parent, because we shouldn't use a
-   * GMainContext both before and after fork
+   * xmain_context_t both before and after fork
    */
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   ok = g_io_stream_close (streams[0], NULL, &error);
   g_assert_no_error (error);
   g_assert (ok);
-  g_object_unref (streams[0]);
+  xobject_unref (streams[0]);
 
   connection = g_dbus_connection_new_sync (streams[1],
                                            NULL, /* guid */
                                            G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
-                                           NULL, /* GDBusAuthObserver */
+                                           NULL, /* xdbus_auth_observer_t */
                                            NULL,
                                            &error);
   g_assert_no_error (error);
-  g_object_unref (streams[1]);
+  xobject_unref (streams[1]);
 
   /* poke the first child */
   error = NULL;
@@ -260,19 +260,19 @@ test_non_socket (void)
                                      "/pokee",
                                      "org.gtk.GDBus.Pokee",
                                      "Poke",
-                                     g_variant_new ("(s)", "I am the POKER!"),
+                                     xvariant_new ("(s)", "I am the POKER!"),
                                      G_VARIANT_TYPE ("(s)"), /* return type */
                                      G_DBUS_CALL_FLAGS_NONE,
                                      -1,
                                      NULL, /* cancellable */
                                      &error);
   g_assert_no_error (error);
-  g_variant_get (ret, "(&s)", &str);
+  xvariant_get (ret, "(&s)", &str);
   g_assert_cmpstr (str, ==, "You poked me with: 'I am the POKER!'");
-  g_variant_unref (ret);
+  xvariant_unref (ret);
 
-  g_object_unref (connection);
-  g_main_loop_unref (loop);
+  xobject_unref (connection);
+  xmain_loop_unref (loop);
   exit (0);
 }
 

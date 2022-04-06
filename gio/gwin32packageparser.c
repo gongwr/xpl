@@ -63,7 +63,7 @@ typedef HRESULT (STDAPICALLTYPE *CreateXmlReader_func)(REFIID riid, void **ppvOb
 #endif
 
 static xsize_t
-g_utf16_len (const gunichar2 *str)
+xutf16_len (const xunichar2_t *str)
 {
   xsize_t result;
 
@@ -73,8 +73,8 @@ g_utf16_len (const gunichar2 *str)
   return result;
 }
 
-static gunichar2 *
-g_wcsdup (const gunichar2 *str, gssize str_len)
+static xunichar2_t *
+g_wcsdup (const xunichar2_t *str, xssize_t str_len)
 {
   xsize_t str_len_unsigned;
   xsize_t str_size;
@@ -82,12 +82,12 @@ g_wcsdup (const gunichar2 *str, gssize str_len)
   g_return_val_if_fail (str != NULL, NULL);
 
   if (str_len < 0)
-    str_len_unsigned = g_utf16_len (str);
+    str_len_unsigned = xutf16_len (str);
   else
     str_len_unsigned = (xsize_t) str_len;
 
-  g_assert (str_len_unsigned <= G_MAXSIZE / sizeof (gunichar2) - 1);
-  str_size = (str_len_unsigned + 1) * sizeof (gunichar2);
+  g_assert (str_len_unsigned <= G_MAXSIZE / sizeof (xunichar2_t) - 1);
+  str_size = (str_len_unsigned + 1) * sizeof (xunichar2_t);
 
   return g_memdup2 (str, str_size);
 }
@@ -120,8 +120,8 @@ gio_error_from_hresult (HRESULT hresult)
 static void
 free_extgroup (GWin32PackageExtGroup *g)
 {
-  g_ptr_array_unref (g->verbs);
-  g_ptr_array_unref (g->extensions);
+  xptr_array_unref (g->verbs);
+  xptr_array_unref (g->extensions);
   g_free (g);
 }
 
@@ -154,10 +154,10 @@ struct _xml_sax_state
   UINT64         in_sfp;
   UINT64         in_filetype;
   UINT64         in_sv;
-  GPtrArray     *supported_extensions;
-  GPtrArray     *supported_protocols;
-  GPtrArray     *supported_verbs;
-  GPtrArray     *supported_extgroups;
+  xptr_array_t     *supported_extensions;
+  xptr_array_t     *supported_protocols;
+  xptr_array_t     *supported_verbs;
+  xptr_array_t     *supported_extgroups;
   wchar_t       *application_usermodelid;
 };
 
@@ -521,10 +521,10 @@ parse_manifest_file (struct _xml_sax_state *sax)
       return FALSE;
     }
 
-  sax->supported_extensions = g_ptr_array_new_full (0, (GDestroyNotify) g_free);
-  sax->supported_protocols = g_ptr_array_new_full (0, (GDestroyNotify) g_free);
-  sax->supported_verbs = g_ptr_array_new_full (0, (GDestroyNotify) g_free);
-  sax->supported_extgroups = g_ptr_array_new_full (0, (GDestroyNotify) free_extgroup);
+  sax->supported_extensions = xptr_array_new_full (0, (xdestroy_notify_t) g_free);
+  sax->supported_protocols = xptr_array_new_full (0, (xdestroy_notify_t) g_free);
+  sax->supported_verbs = xptr_array_new_full (0, (xdestroy_notify_t) g_free);
+  sax->supported_extgroups = xptr_array_new_full (0, (xdestroy_notify_t) free_extgroup);
 
   result = TRUE;
 
@@ -532,10 +532,10 @@ parse_manifest_file (struct _xml_sax_state *sax)
     result = xml_parser_iteration (sax, xml_reader);
 
   g_clear_pointer (&sax->application_usermodelid, g_free);
-  g_clear_pointer (&sax->supported_extensions, g_ptr_array_unref);
-  g_clear_pointer (&sax->supported_verbs, g_ptr_array_unref);
-  g_clear_pointer (&sax->supported_extgroups, g_ptr_array_unref);
-  g_clear_pointer (&sax->supported_protocols, g_ptr_array_unref);
+  g_clear_pointer (&sax->supported_extensions, xptr_array_unref);
+  g_clear_pointer (&sax->supported_verbs, xptr_array_unref);
+  g_clear_pointer (&sax->supported_extgroups, xptr_array_unref);
+  g_clear_pointer (&sax->supported_protocols, xptr_array_unref);
 
   (void) IXmlReader_Release (xml_reader);
   (void) IStream_Release (file_stream);
@@ -735,10 +735,10 @@ xml_parser_iteration (struct _xml_sax_state  *sax,
             sax->in_extension_fta += 1;
           else if (is_protocol &&
                    _wcsicmp (local_name, L"Name") == 0)
-            g_ptr_array_add (sax->supported_protocols, g_wcsdup (value, -1));
+            xptr_array_add (sax->supported_protocols, g_wcsdup (value, -1));
           else if (is_verb &&
                    _wcsicmp (local_name, L"Id") == 0)
-            g_ptr_array_add (sax->supported_verbs, g_wcsdup (value, -1));
+            xptr_array_add (sax->supported_verbs, g_wcsdup (value, -1));
 
           hr = IXmlReader_MoveToNextAttribute (xml_reader);
         }
@@ -747,7 +747,7 @@ xml_parser_iteration (struct _xml_sax_state  *sax,
       g_assert (value != NULL);
 
       if (sax->in_filetype && value[0] != 0)
-        g_ptr_array_add (sax->supported_extensions, g_wcsdup (value, -1));
+        xptr_array_add (sax->supported_extensions, g_wcsdup (value, -1));
       break;
     case XmlNodeType_EndElement:
       g_assert (local_name != NULL);
@@ -791,10 +791,10 @@ xml_parser_iteration (struct _xml_sax_state  *sax,
             sax->exit_early = !sax->callback (sax->user_data, sax->wcs_full_name, sax->wcs_name,
                                               sax->application_usermodelid, sax->applist,
                                               sax->supported_extgroups, sax->supported_protocols);
-          g_clear_pointer (&sax->supported_extgroups, g_ptr_array_unref);
-          g_clear_pointer (&sax->supported_protocols, g_ptr_array_unref);
-          sax->supported_protocols = g_ptr_array_new_full (0, (GDestroyNotify) g_free);
-          sax->supported_extgroups = g_ptr_array_new_full (0, (GDestroyNotify) free_extgroup);
+          g_clear_pointer (&sax->supported_extgroups, xptr_array_unref);
+          g_clear_pointer (&sax->supported_protocols, xptr_array_unref);
+          sax->supported_protocols = xptr_array_new_full (0, (xdestroy_notify_t) g_free);
+          sax->supported_extgroups = xptr_array_new_full (0, (xdestroy_notify_t) free_extgroup);
           sax->in_application -= 1;
         }
       else if (sax->in_extension_fta == 1 &&
@@ -803,10 +803,10 @@ xml_parser_iteration (struct _xml_sax_state  *sax,
         {
           GWin32PackageExtGroup *new_group = g_new0 (GWin32PackageExtGroup, 1);
           new_group->extensions = g_steal_pointer (&sax->supported_extensions);
-          sax->supported_extensions = g_ptr_array_new_full (0, (GDestroyNotify) g_free);
+          sax->supported_extensions = xptr_array_new_full (0, (xdestroy_notify_t) g_free);
           new_group->verbs = g_steal_pointer (&sax->supported_verbs);
-          sax->supported_verbs  = g_ptr_array_new_full (0, (GDestroyNotify) g_free);
-          g_ptr_array_add (sax->supported_extgroups, new_group);
+          sax->supported_verbs  = xptr_array_new_full (0, (xdestroy_notify_t) g_free);
+          xptr_array_add (sax->supported_extgroups, new_group);
           sax->in_fta_group -= 1;
         }
       break;

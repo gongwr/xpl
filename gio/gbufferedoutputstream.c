@@ -31,12 +31,12 @@
  * SECTION:gbufferedoutputstream
  * @short_description: Buffered Output Stream
  * @include: gio/gio.h
- * @see_also: #GFilterOutputStream, #xoutput_stream_t
+ * @see_also: #xfilter_output_stream_t, #xoutput_stream_t
  *
- * Buffered output stream implements #GFilterOutputStream and provides
+ * Buffered output stream implements #xfilter_output_stream_t and provides
  * for buffered writes.
  *
- * By default, #GBufferedOutputStream's buffer size is set at 4 kilobytes.
+ * By default, #xbuffered_output_stream_t's buffer size is set at 4 kilobytes.
  *
  * To create a buffered output stream, use g_buffered_output_stream_new(),
  * or g_buffered_output_stream_new_sized() to specify the buffer's size
@@ -52,9 +52,9 @@
 #define DEFAULT_BUFFER_SIZE 4096
 
 struct _GBufferedOutputStreamPrivate {
-  guint8 *buffer;
+  xuint8_t *buffer;
   xsize_t   len;
-  goffset pos;
+  xoffset_t pos;
   xboolean_t auto_grow;
 };
 
@@ -66,17 +66,17 @@ enum {
 
 static void     g_buffered_output_stream_set_property (xobject_t      *object,
                                                        xuint_t         prop_id,
-                                                       const GValue *value,
-                                                       GParamSpec   *pspec);
+                                                       const xvalue_t *value,
+                                                       xparam_spec_t   *pspec);
 
 static void     g_buffered_output_stream_get_property (xobject_t    *object,
                                                        xuint_t       prop_id,
-                                                       GValue     *value,
-                                                       GParamSpec *pspec);
+                                                       xvalue_t     *value,
+                                                       xparam_spec_t *pspec);
 static void     g_buffered_output_stream_finalize     (xobject_t *object);
 
 
-static gssize   g_buffered_output_stream_write        (xoutput_stream_t *stream,
+static xssize_t   g_buffered_output_stream_write        (xoutput_stream_t *stream,
                                                        const void    *buffer,
                                                        xsize_t          count,
                                                        xcancellable_t  *cancellable,
@@ -105,24 +105,24 @@ static xboolean_t g_buffered_output_stream_close_finish (xoutput_stream_t       
                                                        xasync_result_t         *result,
                                                        xerror_t              **error);
 
-static void     g_buffered_output_stream_seekable_iface_init (GSeekableIface  *iface);
-static goffset  g_buffered_output_stream_tell                (GSeekable       *seekable);
-static xboolean_t g_buffered_output_stream_can_seek            (GSeekable       *seekable);
-static xboolean_t g_buffered_output_stream_seek                (GSeekable       *seekable,
-							      goffset          offset,
+static void     g_buffered_output_stream_seekable_iface_init (xseekable_iface_t  *iface);
+static xoffset_t  g_buffered_output_stream_tell                (xseekable__t       *seekable);
+static xboolean_t g_buffered_output_stream_can_seek            (xseekable__t       *seekable);
+static xboolean_t g_buffered_output_stream_seek                (xseekable__t       *seekable,
+							      xoffset_t          offset,
 							      GSeekType        type,
 							      xcancellable_t    *cancellable,
 							      xerror_t         **error);
-static xboolean_t g_buffered_output_stream_can_truncate        (GSeekable       *seekable);
-static xboolean_t g_buffered_output_stream_truncate            (GSeekable       *seekable,
-							      goffset          offset,
+static xboolean_t g_buffered_output_stream_can_truncate        (xseekable__t       *seekable);
+static xboolean_t g_buffered_output_stream_truncate            (xseekable__t       *seekable,
+							      xoffset_t          offset,
 							      xcancellable_t    *cancellable,
 							      xerror_t         **error);
 
-G_DEFINE_TYPE_WITH_CODE (GBufferedOutputStream,
+G_DEFINE_TYPE_WITH_CODE (xbuffered_output_stream_t,
 			 g_buffered_output_stream,
 			 XTYPE_FILTER_OUTPUT_STREAM,
-                         G_ADD_PRIVATE (GBufferedOutputStream)
+                         G_ADD_PRIVATE (xbuffered_output_stream_t)
 			 G_IMPLEMENT_INTERFACE (XTYPE_SEEKABLE,
 						g_buffered_output_stream_seekable_iface_init))
 
@@ -147,7 +147,7 @@ g_buffered_output_stream_class_init (GBufferedOutputStreamClass *klass)
   ostream_class->close_async  = g_buffered_output_stream_close_async;
   ostream_class->close_finish = g_buffered_output_stream_close_finish;
 
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_BUFSIZE,
                                    g_param_spec_uint ("buffer-size",
                                                       P_("Buffer Size"),
@@ -158,7 +158,7 @@ g_buffered_output_stream_class_init (GBufferedOutputStreamClass *klass)
                                                       G_PARAM_READWRITE|G_PARAM_CONSTRUCT|
                                                       G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
 
-  g_object_class_install_property (object_class,
+  xobject_class_install_property (object_class,
                                    PROP_AUTO_GROW,
                                    g_param_spec_boolean ("auto-grow",
                                                          P_("Auto-grow"),
@@ -171,14 +171,14 @@ g_buffered_output_stream_class_init (GBufferedOutputStreamClass *klass)
 
 /**
  * g_buffered_output_stream_get_buffer_size:
- * @stream: a #GBufferedOutputStream.
+ * @stream: a #xbuffered_output_stream_t.
  *
  * Gets the size of the buffer in the @stream.
  *
  * Returns: the current size of the buffer.
  **/
 xsize_t
-g_buffered_output_stream_get_buffer_size (GBufferedOutputStream *stream)
+g_buffered_output_stream_get_buffer_size (xbuffered_output_stream_t *stream)
 {
   g_return_val_if_fail (X_IS_BUFFERED_OUTPUT_STREAM (stream), -1);
 
@@ -187,17 +187,17 @@ g_buffered_output_stream_get_buffer_size (GBufferedOutputStream *stream)
 
 /**
  * g_buffered_output_stream_set_buffer_size:
- * @stream: a #GBufferedOutputStream.
+ * @stream: a #xbuffered_output_stream_t.
  * @size: a #xsize_t.
  *
  * Sets the size of the internal buffer to @size.
  **/
 void
-g_buffered_output_stream_set_buffer_size (GBufferedOutputStream *stream,
+g_buffered_output_stream_set_buffer_size (xbuffered_output_stream_t *stream,
                                           xsize_t                  size)
 {
   GBufferedOutputStreamPrivate *priv;
-  guint8 *buffer;
+  xuint8_t *buffer;
 
   g_return_if_fail (X_IS_BUFFERED_OUTPUT_STREAM (stream));
 
@@ -224,12 +224,12 @@ g_buffered_output_stream_set_buffer_size (GBufferedOutputStream *stream,
       priv->pos = 0;
     }
 
-  g_object_notify (G_OBJECT (stream), "buffer-size");
+  xobject_notify (G_OBJECT (stream), "buffer-size");
 }
 
 /**
  * g_buffered_output_stream_get_auto_grow:
- * @stream: a #GBufferedOutputStream.
+ * @stream: a #xbuffered_output_stream_t.
  *
  * Checks if the buffer automatically grows as data is added.
  *
@@ -237,7 +237,7 @@ g_buffered_output_stream_set_buffer_size (GBufferedOutputStream *stream,
  * %FALSE otherwise.
  **/
 xboolean_t
-g_buffered_output_stream_get_auto_grow (GBufferedOutputStream *stream)
+g_buffered_output_stream_get_auto_grow (xbuffered_output_stream_t *stream)
 {
   g_return_val_if_fail (X_IS_BUFFERED_OUTPUT_STREAM (stream), FALSE);
 
@@ -246,7 +246,7 @@ g_buffered_output_stream_get_auto_grow (GBufferedOutputStream *stream)
 
 /**
  * g_buffered_output_stream_set_auto_grow:
- * @stream: a #GBufferedOutputStream.
+ * @stream: a #xbuffered_output_stream_t.
  * @auto_grow: a #xboolean_t.
  *
  * Sets whether or not the @stream's buffer should automatically grow.
@@ -255,7 +255,7 @@ g_buffered_output_stream_get_auto_grow (GBufferedOutputStream *stream)
  * the data to the underlying stream.
  **/
 void
-g_buffered_output_stream_set_auto_grow (GBufferedOutputStream *stream,
+g_buffered_output_stream_set_auto_grow (xbuffered_output_stream_t *stream,
                                         xboolean_t               auto_grow)
 {
   GBufferedOutputStreamPrivate *priv;
@@ -265,28 +265,28 @@ g_buffered_output_stream_set_auto_grow (GBufferedOutputStream *stream,
   if (priv->auto_grow != auto_grow)
     {
       priv->auto_grow = auto_grow;
-      g_object_notify (G_OBJECT (stream), "auto-grow");
+      xobject_notify (G_OBJECT (stream), "auto-grow");
     }
 }
 
 static void
 g_buffered_output_stream_set_property (xobject_t      *object,
                                        xuint_t         prop_id,
-                                       const GValue *value,
-                                       GParamSpec   *pspec)
+                                       const xvalue_t *value,
+                                       xparam_spec_t   *pspec)
 {
-  GBufferedOutputStream *stream;
+  xbuffered_output_stream_t *stream;
 
   stream = G_BUFFERED_OUTPUT_STREAM (object);
 
   switch (prop_id)
     {
     case PROP_BUFSIZE:
-      g_buffered_output_stream_set_buffer_size (stream, g_value_get_uint (value));
+      g_buffered_output_stream_set_buffer_size (stream, xvalue_get_uint (value));
       break;
 
     case PROP_AUTO_GROW:
-      g_buffered_output_stream_set_auto_grow (stream, g_value_get_boolean (value));
+      g_buffered_output_stream_set_auto_grow (stream, xvalue_get_boolean (value));
       break;
 
     default:
@@ -299,10 +299,10 @@ g_buffered_output_stream_set_property (xobject_t      *object,
 static void
 g_buffered_output_stream_get_property (xobject_t    *object,
                                        xuint_t       prop_id,
-                                       GValue     *value,
-                                       GParamSpec *pspec)
+                                       xvalue_t     *value,
+                                       xparam_spec_t *pspec)
 {
-  GBufferedOutputStream *buffered_stream;
+  xbuffered_output_stream_t *buffered_stream;
   GBufferedOutputStreamPrivate *priv;
 
   buffered_stream = G_BUFFERED_OUTPUT_STREAM (object);
@@ -311,11 +311,11 @@ g_buffered_output_stream_get_property (xobject_t    *object,
   switch (prop_id)
     {
     case PROP_BUFSIZE:
-      g_value_set_uint (value, priv->len);
+      xvalue_set_uint (value, priv->len);
       break;
 
     case PROP_AUTO_GROW:
-      g_value_set_boolean (value, priv->auto_grow);
+      xvalue_set_boolean (value, priv->auto_grow);
       break;
 
     default:
@@ -328,7 +328,7 @@ g_buffered_output_stream_get_property (xobject_t    *object,
 static void
 g_buffered_output_stream_finalize (xobject_t *object)
 {
-  GBufferedOutputStream *stream;
+  xbuffered_output_stream_t *stream;
   GBufferedOutputStreamPrivate *priv;
 
   stream = G_BUFFERED_OUTPUT_STREAM (object);
@@ -340,13 +340,13 @@ g_buffered_output_stream_finalize (xobject_t *object)
 }
 
 static void
-g_buffered_output_stream_init (GBufferedOutputStream *stream)
+g_buffered_output_stream_init (xbuffered_output_stream_t *stream)
 {
   stream->priv = g_buffered_output_stream_get_instance_private (stream);
 }
 
 static void
-g_buffered_output_stream_seekable_iface_init (GSeekableIface *iface)
+g_buffered_output_stream_seekable_iface_init (xseekable_iface_t *iface)
 {
   iface->tell         = g_buffered_output_stream_tell;
   iface->can_seek     = g_buffered_output_stream_can_seek;
@@ -370,7 +370,7 @@ g_buffered_output_stream_new (xoutput_stream_t *base_stream)
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (base_stream), NULL);
 
-  stream = g_object_new (XTYPE_BUFFERED_OUTPUT_STREAM,
+  stream = xobject_new (XTYPE_BUFFERED_OUTPUT_STREAM,
                          "base-stream", base_stream,
                          NULL);
 
@@ -394,7 +394,7 @@ g_buffered_output_stream_new_sized (xoutput_stream_t *base_stream,
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (base_stream), NULL);
 
-  stream = g_object_new (XTYPE_BUFFERED_OUTPUT_STREAM,
+  stream = xobject_new (XTYPE_BUFFERED_OUTPUT_STREAM,
                          "base-stream", base_stream,
                          "buffer-size", size,
                          NULL);
@@ -403,7 +403,7 @@ g_buffered_output_stream_new_sized (xoutput_stream_t *base_stream,
 }
 
 static xboolean_t
-flush_buffer (GBufferedOutputStream  *stream,
+flush_buffer (xbuffered_output_stream_t  *stream,
               xcancellable_t           *cancellable,
               xerror_t                 **error)
 {
@@ -419,7 +419,7 @@ flush_buffer (GBufferedOutputStream  *stream,
 
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (base_stream), FALSE);
 
-  res = g_output_stream_write_all (base_stream,
+  res = xoutput_stream_write_all (base_stream,
                                    priv->buffer,
                                    priv->pos,
                                    &bytes_written,
@@ -436,14 +436,14 @@ flush_buffer (GBufferedOutputStream  *stream,
   return res;
 }
 
-static gssize
+static xssize_t
 g_buffered_output_stream_write  (xoutput_stream_t *stream,
                                  const void    *buffer,
                                  xsize_t          count,
                                  xcancellable_t  *cancellable,
                                  xerror_t       **error)
 {
-  GBufferedOutputStream        *bstream;
+  xbuffered_output_stream_t        *bstream;
   GBufferedOutputStreamPrivate *priv;
   xboolean_t res;
   xsize_t    n;
@@ -481,7 +481,7 @@ g_buffered_output_stream_flush (xoutput_stream_t  *stream,
                                 xcancellable_t   *cancellable,
                                 xerror_t        **error)
 {
-  GBufferedOutputStream *bstream;
+  xbuffered_output_stream_t *bstream;
   xoutput_stream_t                *base_stream;
   xboolean_t res;
 
@@ -493,7 +493,7 @@ g_buffered_output_stream_flush (xoutput_stream_t  *stream,
   if (res == FALSE)
     return FALSE;
 
-  res = g_output_stream_flush (base_stream, cancellable, error);
+  res = xoutput_stream_flush (base_stream, cancellable, error);
 
   return res;
 }
@@ -503,7 +503,7 @@ g_buffered_output_stream_close (xoutput_stream_t  *stream,
                                 xcancellable_t   *cancellable,
                                 xerror_t        **error)
 {
-  GBufferedOutputStream        *bstream;
+  xbuffered_output_stream_t        *bstream;
   xoutput_stream_t                *base_stream;
   xboolean_t                      res;
 
@@ -515,22 +515,22 @@ g_buffered_output_stream_close (xoutput_stream_t  *stream,
     {
       /* report the first error but still close the stream */
       if (res)
-        res = g_output_stream_close (base_stream, cancellable, error);
+        res = xoutput_stream_close (base_stream, cancellable, error);
       else
-        g_output_stream_close (base_stream, cancellable, NULL);
+        xoutput_stream_close (base_stream, cancellable, NULL);
     }
 
   return res;
 }
 
-static goffset
-g_buffered_output_stream_tell (GSeekable *seekable)
+static xoffset_t
+g_buffered_output_stream_tell (xseekable__t *seekable)
 {
-  GBufferedOutputStream        *bstream;
+  xbuffered_output_stream_t        *bstream;
   GBufferedOutputStreamPrivate *priv;
   xoutput_stream_t *base_stream;
-  GSeekable    *base_stream_seekable;
-  goffset base_offset;
+  xseekable__t    *base_stream_seekable;
+  xoffset_t base_offset;
 
   bstream = G_BUFFERED_OUTPUT_STREAM (seekable);
   priv = bstream->priv;
@@ -541,29 +541,29 @@ g_buffered_output_stream_tell (GSeekable *seekable)
 
   base_stream_seekable = G_SEEKABLE (base_stream);
 
-  base_offset = g_seekable_tell (base_stream_seekable);
+  base_offset = xseekable_tell (base_stream_seekable);
   return base_offset + priv->pos;
 }
 
 static xboolean_t
-g_buffered_output_stream_can_seek (GSeekable *seekable)
+g_buffered_output_stream_can_seek (xseekable__t *seekable)
 {
   xoutput_stream_t *base_stream;
 
   base_stream = G_FILTER_OUTPUT_STREAM (seekable)->base_stream;
-  return X_IS_SEEKABLE (base_stream) && g_seekable_can_seek (G_SEEKABLE (base_stream));
+  return X_IS_SEEKABLE (base_stream) && xseekable_can_seek (G_SEEKABLE (base_stream));
 }
 
 static xboolean_t
-g_buffered_output_stream_seek (GSeekable     *seekable,
-			       goffset        offset,
+g_buffered_output_stream_seek (xseekable__t     *seekable,
+			       xoffset_t        offset,
 			       GSeekType      type,
 			       xcancellable_t  *cancellable,
 			       xerror_t       **error)
 {
-  GBufferedOutputStream *bstream;
+  xbuffered_output_stream_t *bstream;
   xoutput_stream_t *base_stream;
-  GSeekable *base_stream_seekable;
+  xseekable__t *base_stream_seekable;
   xboolean_t flushed;
 
   bstream = G_BUFFERED_OUTPUT_STREAM (seekable);
@@ -581,27 +581,27 @@ g_buffered_output_stream_seek (GSeekable     *seekable,
   if (!flushed)
     return FALSE;
 
-  return g_seekable_seek (base_stream_seekable, offset, type, cancellable, error);
+  return xseekable_seek (base_stream_seekable, offset, type, cancellable, error);
 }
 
 static xboolean_t
-g_buffered_output_stream_can_truncate (GSeekable *seekable)
+g_buffered_output_stream_can_truncate (xseekable__t *seekable)
 {
   xoutput_stream_t *base_stream;
 
   base_stream = G_FILTER_OUTPUT_STREAM (seekable)->base_stream;
-  return X_IS_SEEKABLE (base_stream) && g_seekable_can_truncate (G_SEEKABLE (base_stream));
+  return X_IS_SEEKABLE (base_stream) && xseekable_can_truncate (G_SEEKABLE (base_stream));
 }
 
 static xboolean_t
-g_buffered_output_stream_truncate (GSeekable     *seekable,
-				   goffset        offset,
+g_buffered_output_stream_truncate (xseekable__t     *seekable,
+				   xoffset_t        offset,
 				   xcancellable_t  *cancellable,
 				   xerror_t       **error)
 {
-  GBufferedOutputStream        *bstream;
+  xbuffered_output_stream_t        *bstream;
   xoutput_stream_t *base_stream;
-  GSeekable *base_stream_seekable;
+  xseekable__t *base_stream_seekable;
   xboolean_t flushed;
 
   bstream = G_BUFFERED_OUTPUT_STREAM (seekable);
@@ -618,7 +618,7 @@ g_buffered_output_stream_truncate (GSeekable     *seekable,
   flushed = flush_buffer (bstream, cancellable, error);
   if (!flushed)
     return FALSE;
-  return g_seekable_truncate (base_stream_seekable, offset, cancellable, error);
+  return xseekable_truncate (base_stream_seekable, offset, cancellable, error);
 }
 
 /* ************************** */
@@ -646,12 +646,12 @@ free_flush_data (xpointer_t data)
  * and so closing and writing is just a special
  * case of flushing + some addition stuff */
 static void
-flush_buffer_thread (GTask        *task,
+flush_buffer_thread (xtask_t        *task,
                      xpointer_t      object,
                      xpointer_t      task_data,
                      xcancellable_t *cancellable)
 {
-  GBufferedOutputStream *stream;
+  xbuffered_output_stream_t *stream;
   xoutput_stream_t *base_stream;
   FlushData     *fdata;
   xboolean_t       res;
@@ -666,7 +666,7 @@ flush_buffer_thread (GTask        *task,
   /* if flushing the buffer didn't work don't even bother
    * to flush the stream but just report that error */
   if (res && fdata->flush_stream)
-    res = g_output_stream_flush (base_stream, cancellable, &error);
+    res = xoutput_stream_flush (base_stream, cancellable, &error);
 
   if (fdata->close_stream)
     {
@@ -677,16 +677,16 @@ flush_buffer_thread (GTask        *task,
       if (g_filter_output_stream_get_close_base_stream (G_FILTER_OUTPUT_STREAM (stream)))
         {
           if (res == FALSE)
-            g_output_stream_close (base_stream, cancellable, NULL);
+            xoutput_stream_close (base_stream, cancellable, NULL);
           else
-            res = g_output_stream_close (base_stream, cancellable, &error);
+            res = xoutput_stream_close (base_stream, cancellable, &error);
         }
     }
 
   if (res == FALSE)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_boolean (task, TRUE);
+    xtask_return_boolean (task, TRUE);
 }
 
 static void
@@ -696,20 +696,20 @@ g_buffered_output_stream_flush_async (xoutput_stream_t        *stream,
                                       xasync_ready_callback_t   callback,
                                       xpointer_t              data)
 {
-  GTask *task;
+  xtask_t *task;
   FlushData *fdata;
 
   fdata = g_slice_new0 (FlushData);
   fdata->flush_stream = TRUE;
   fdata->close_stream = FALSE;
 
-  task = g_task_new (stream, cancellable, callback, data);
-  g_task_set_source_tag (task, g_buffered_output_stream_flush_async);
-  g_task_set_task_data (task, fdata, free_flush_data);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (stream, cancellable, callback, data);
+  xtask_set_source_tag (task, g_buffered_output_stream_flush_async);
+  xtask_set_task_data (task, fdata, free_flush_data);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, flush_buffer_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, flush_buffer_thread);
+  xobject_unref (task);
 }
 
 static xboolean_t
@@ -717,9 +717,9 @@ g_buffered_output_stream_flush_finish (xoutput_stream_t        *stream,
                                        xasync_result_t         *result,
                                        xerror_t              **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 static void
@@ -729,19 +729,19 @@ g_buffered_output_stream_close_async (xoutput_stream_t        *stream,
                                       xasync_ready_callback_t   callback,
                                       xpointer_t              data)
 {
-  GTask *task;
+  xtask_t *task;
   FlushData *fdata;
 
   fdata = g_slice_new0 (FlushData);
   fdata->close_stream = TRUE;
 
-  task = g_task_new (stream, cancellable, callback, data);
-  g_task_set_source_tag (task, g_buffered_output_stream_close_async);
-  g_task_set_task_data (task, fdata, free_flush_data);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (stream, cancellable, callback, data);
+  xtask_set_source_tag (task, g_buffered_output_stream_close_async);
+  xtask_set_task_data (task, fdata, free_flush_data);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, flush_buffer_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, flush_buffer_thread);
+  xobject_unref (task);
 }
 
 static xboolean_t
@@ -749,7 +749,7 @@ g_buffered_output_stream_close_finish (xoutput_stream_t        *stream,
                                        xasync_result_t         *result,
                                        xerror_t              **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }

@@ -38,7 +38,7 @@ G_BEGIN_DECLS
  *
  * Note that this error domain is intended only for
  * returning errors from a remote message bus process. Errors
- * generated locally in-process by e.g. #GDBusConnection should use the
+ * generated locally in-process by e.g. #xdbus_connection_t should use the
  * %G_IO_ERROR domain.
  *
  * Since: 2.26
@@ -46,7 +46,7 @@ G_BEGIN_DECLS
 #define G_DBUS_ERROR g_dbus_error_quark()
 
 XPL_AVAILABLE_IN_ALL
-GQuark g_dbus_error_quark (void);
+xquark g_dbus_error_quark (void);
 
 /* Used by applications to check, get and strip the D-Bus error name */
 XPL_AVAILABLE_IN_ALL
@@ -57,7 +57,7 @@ XPL_AVAILABLE_IN_ALL
 xboolean_t g_dbus_error_strip_remote_error    (xerror_t          *error);
 
 /**
- * GDBusErrorEntry:
+ * xdbus_error_entry_t:
  * @error_code: An error code.
  * @dbus_error_name: The D-Bus error name to associate with @error_code.
  *
@@ -72,17 +72,17 @@ struct _GDBusErrorEntry
 };
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_dbus_error_register_error        (GQuark                 error_domain,
+xboolean_t g_dbus_error_register_error        (xquark                 error_domain,
                                              xint_t                   error_code,
                                              const xchar_t           *dbus_error_name);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_dbus_error_unregister_error      (GQuark                 error_domain,
+xboolean_t g_dbus_error_unregister_error      (xquark                 error_domain,
                                              xint_t                   error_code,
                                              const xchar_t           *dbus_error_name);
 XPL_AVAILABLE_IN_ALL
 void     g_dbus_error_register_error_domain (const xchar_t           *error_domain_quark_name,
                                              volatile xsize_t        *quark_volatile,
-                                             const GDBusErrorEntry *entries,
+                                             const xdbus_error_entry_t *entries,
                                              xuint_t                  num_entries);
 
 /* Only used by object mappings to map back and forth to xerror_t */

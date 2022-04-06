@@ -79,7 +79,7 @@ struct _GHook
   gulong	 hook_id;
   xuint_t		 flags;
   xpointer_t	 func;
-  GDestroyNotify destroy;
+  xdestroy_notify_t destroy;
 };
 
 

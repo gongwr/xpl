@@ -43,16 +43,16 @@
 #include "gnetworkmonitor.h"
 #include "gioerror.h"
 
-static GInitableIface *initable_parent_iface;
+static xinitable_iface_t *initable_parent_iface;
 static void g_win32_network_monitor_iface_init (GNetworkMonitorInterface *iface);
-static void g_win32_network_monitor_initable_iface_init (GInitableIface *iface);
+static void g_win32_network_monitor_initable_iface_init (xinitable_iface_t *iface);
 
 struct _GWin32NetworkMonitorPrivate
 {
   xboolean_t initialized;
   xerror_t *init_error;
-  GMainContext *main_context;
-  GSource *route_change_source;
+  xmain_context_t *main_context;
+  xsource_t *route_change_source;
   HANDLE handle;
 };
 
@@ -78,7 +78,7 @@ g_win32_network_monitor_init (GWin32NetworkMonitor *win)
 static xboolean_t
 win_network_monitor_get_ip_info (IP_ADDRESS_PREFIX  prefix,
                                  xsocket_family_t     *family,
-                                 const guint8     **dest,
+                                 const xuint8_t     **dest,
                                  xsize_t             *len)
 {
   switch (prefix.Prefix.si_family)
@@ -87,12 +87,12 @@ win_network_monitor_get_ip_info (IP_ADDRESS_PREFIX  prefix,
         /* Fall-through: AF_UNSPEC deliveres both IPV4 and IPV6 infos, let`s stick with IPV4 here */
       case AF_INET:
         *family = XSOCKET_FAMILY_IPV4;
-        *dest = (guint8 *) &prefix.Prefix.Ipv4.sin_addr;
+        *dest = (xuint8_t *) &prefix.Prefix.Ipv4.sin_addr;
         *len = prefix.PrefixLength;
         break;
       case AF_INET6:
         *family = XSOCKET_FAMILY_IPV6;
-        *dest = (guint8 *) &prefix.Prefix.Ipv6.sin6_addr;
+        *dest = (xuint8_t *) &prefix.Prefix.Ipv6.sin6_addr;
         *len = prefix.PrefixLength;
         break;
       default:
@@ -104,7 +104,7 @@ win_network_monitor_get_ip_info (IP_ADDRESS_PREFIX  prefix,
 
 static xinet_address_mask_t *
 get_network_mask (xsocket_family_t  family,
-                  const guint8  *dest,
+                  const xuint8_t  *dest,
                   xsize_t          len)
 {
   xinet_address_mask_t *network;
@@ -116,7 +116,7 @@ get_network_mask (xsocket_family_t  family,
     dest_addr = xinet_address_new_any (family);
 
   network = xinet_address_mask_new (dest_addr, len, NULL);
-  g_object_unref (dest_addr);
+  xobject_unref (dest_addr);
 
   return network;
 }
@@ -126,7 +126,7 @@ win_network_monitor_process_table (GWin32NetworkMonitor  *win,
                                    xerror_t                 **error)
 {
   DWORD ret = 0;
-  GPtrArray *networks;
+  xptr_array_t *networks;
   xsize_t i;
   MIB_IPFORWARD_TABLE2 *routes = NULL;
   MIB_IPFORWARD_ROW2 *route;
@@ -140,11 +140,11 @@ win_network_monitor_process_table (GWin32NetworkMonitor  *win,
       return FALSE;
     }
 
-  networks = g_ptr_array_new_full (routes->NumEntries, g_object_unref);
+  networks = xptr_array_new_full (routes->NumEntries, xobject_unref);
   for (i = 0; i < routes->NumEntries; i++)
     {
       xinet_address_mask_t *network;
-      const guint8 *dest;
+      const xuint8_t *dest;
       xsize_t len;
       xsocket_family_t family;
 
@@ -157,7 +157,7 @@ win_network_monitor_process_table (GWin32NetworkMonitor  *win,
       if (network == NULL)
         continue;
 
-      g_ptr_array_add (networks, network);
+      xptr_array_add (networks, network);
     }
 
   g_network_monitor_base_set_networks (G_NETWORK_MONITOR_BASE (win),
@@ -170,7 +170,7 @@ win_network_monitor_process_table (GWin32NetworkMonitor  *win,
 static void
 add_network (GWin32NetworkMonitor *win,
              xsocket_family_t         family,
-             const guint8         *dest,
+             const xuint8_t         *dest,
              xsize_t                 dest_len)
 {
   xinet_address_mask_t *network;
@@ -179,14 +179,14 @@ add_network (GWin32NetworkMonitor *win,
   if (network != NULL)
     {
       g_network_monitor_base_add_network (G_NETWORK_MONITOR_BASE (win), network);
-      g_object_unref (network);
+      xobject_unref (network);
     }
 }
 
 static void
 remove_network (GWin32NetworkMonitor *win,
                 xsocket_family_t         family,
-                const guint8         *dest,
+                const xuint8_t         *dest,
                 xsize_t                 dest_len)
 {
   xinet_address_mask_t *network;
@@ -195,7 +195,7 @@ remove_network (GWin32NetworkMonitor *win,
   if (network != NULL)
     {
       g_network_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (win), network);
-      g_object_unref (network);
+      xobject_unref (network);
     }
 }
 
@@ -210,7 +210,7 @@ win_network_monitor_invoke_route_changed (xpointer_t user_data)
 {
   xsocket_family_t family;
   RouteData *route_data = user_data;
-  const guint8 *dest;
+  const xuint8_t *dest;
   xsize_t len;
 
   switch (route_data->type)
@@ -249,17 +249,17 @@ win_network_monitor_route_changed_cb (PVOID                 context,
   route_data->win = win;
 
   win->priv->route_change_source = g_idle_source_new ();
-  g_source_set_priority (win->priv->route_change_source, G_PRIORITY_DEFAULT);
-  g_source_set_callback (win->priv->route_change_source,
+  xsource_set_priority (win->priv->route_change_source, G_PRIORITY_DEFAULT);
+  xsource_set_callback (win->priv->route_change_source,
                          win_network_monitor_invoke_route_changed,
                          route_data,
                          g_free);
 
-  g_source_attach (win->priv->route_change_source, win->priv->main_context);
+  xsource_attach (win->priv->route_change_source, win->priv->main_context);
 }
 
 static xboolean_t
-g_win32_network_monitor_initable_init (GInitable     *initable,
+g_win32_network_monitor_initable_init (xinitable_t     *initable,
                                        xcancellable_t  *cancellable,
                                        xerror_t       **error)
 {
@@ -269,7 +269,7 @@ g_win32_network_monitor_initable_init (GInitable     *initable,
 
   if (!win->priv->initialized)
     {
-      win->priv->main_context = g_main_context_ref_thread_default ();
+      win->priv->main_context = xmain_context_ref_thread_default ();
 
       /* Read current IP routing table. */
       read = win_network_monitor_process_table (win, &win->priv->init_error);
@@ -288,7 +288,7 @@ g_win32_network_monitor_initable_init (GInitable     *initable,
   /* Forward the results. */
   if (win->priv->init_error != NULL)
     {
-      g_propagate_error (error, g_error_copy (win->priv->init_error));
+      g_propagate_error (error, xerror_copy (win->priv->init_error));
       return FALSE;
     }
 
@@ -308,11 +308,11 @@ g_win32_network_monitor_finalize (xobject_t *object)
 
   if (win->priv->route_change_source != NULL)
     {
-      g_source_destroy (win->priv->route_change_source);
-      g_source_unref (win->priv->route_change_source);
+      xsource_destroy (win->priv->route_change_source);
+      xsource_unref (win->priv->route_change_source);
     }
 
-  g_main_context_unref (win->priv->main_context);
+  xmain_context_unref (win->priv->main_context);
 
   G_OBJECT_CLASS (g_win32_network_monitor_parent_class)->finalize (object);
 }
@@ -331,9 +331,9 @@ g_win32_network_monitor_iface_init (GNetworkMonitorInterface *monitor_iface)
 }
 
 static void
-g_win32_network_monitor_initable_iface_init (GInitableIface *iface)
+g_win32_network_monitor_initable_iface_init (xinitable_iface_t *iface)
 {
-  initable_parent_iface = g_type_interface_peek_parent (iface);
+  initable_parent_iface = xtype_interface_peek_parent (iface);
 
   iface->init = g_win32_network_monitor_initable_init;
 }

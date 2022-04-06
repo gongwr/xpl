@@ -34,15 +34,15 @@
  * @short_description: Object used for authenticating connections
  * @include: gio/gio.h
  *
- * The #GDBusAuthObserver type provides a mechanism for participating
- * in how a #GDBusServer (or a #GDBusConnection) authenticates remote
- * peers. Simply instantiate a #GDBusAuthObserver and connect to the
+ * The #xdbus_auth_observer_t type provides a mechanism for participating
+ * in how a #xdbus_server_t (or a #xdbus_connection_t) authenticates remote
+ * peers. Simply instantiate a #xdbus_auth_observer_t and connect to the
  * signals you are interested in. Note that new signals may be added
  * in the future
  *
  * ## Controlling Authentication Mechanisms
  *
- * By default, a #GDBusServer or server-side #GDBusConnection will allow
+ * By default, a #xdbus_server_t or server-side #xdbus_connection_t will allow
  * any authentication mechanism to be used. If you only
  * want to allow D-Bus connections with the `EXTERNAL` mechanism,
  * which makes use of credentials passing and is the recommended
@@ -51,11 +51,11 @@
  *
  * |[<!-- language="C" -->
  * static xboolean_t
- * on_allow_mechanism (GDBusAuthObserver *observer,
+ * on_allow_mechanism (xdbus_auth_observer_t *observer,
  *                     const xchar_t       *mechanism,
  *                     xpointer_t           user_data)
  * {
- *   if (g_strcmp0 (mechanism, "EXTERNAL") == 0)
+ *   if (xstrcmp0 (mechanism, "EXTERNAL") == 0)
  *     {
  *       return TRUE;
  *     }
@@ -66,7 +66,7 @@
  *
  * ## Controlling Authorization # {#auth-observer}
  *
- * By default, a #GDBusServer or server-side #GDBusConnection will accept
+ * By default, a #xdbus_server_t or server-side #xdbus_connection_t will accept
  * connections from any successfully authenticated user (but not from
  * anonymous connections using the `ANONYMOUS` mechanism). If you only
  * want to allow D-Bus connections from processes owned by the same uid
@@ -76,9 +76,9 @@
  *
  * |[<!-- language="C" -->
  * static xboolean_t
- * on_authorize_authenticated_peer (GDBusAuthObserver *observer,
+ * on_authorize_authenticated_peer (xdbus_auth_observer_t *observer,
  *                                  xio_stream_t         *stream,
- *                                  GCredentials      *credentials,
+ *                                  xcredentials_t      *credentials,
  *                                  xpointer_t           user_data)
  * {
  *   xboolean_t authorized;
@@ -86,11 +86,11 @@
  *   authorized = FALSE;
  *   if (credentials != NULL)
  *     {
- *       GCredentials *own_credentials;
- *       own_credentials = g_credentials_new ();
- *       if (g_credentials_is_same_user (credentials, own_credentials, NULL))
+ *       xcredentials_t *own_credentials;
+ *       own_credentials = xcredentials_new ();
+ *       if (xcredentials_is_same_user (credentials, own_credentials, NULL))
  *         authorized = TRUE;
- *       g_object_unref (own_credentials);
+ *       xobject_unref (own_credentials);
  *     }
  *
  *   return authorized;
@@ -102,7 +102,7 @@ typedef struct _GDBusAuthObserverClass GDBusAuthObserverClass;
 
 /**
  * GDBusAuthObserverClass:
- * @authorize_authenticated_peer: Signal class handler for the #GDBusAuthObserver::authorize-authenticated-peer signal.
+ * @authorize_authenticated_peer: Signal class handler for the #xdbus_auth_observer_t::authorize-authenticated-peer signal.
  *
  * Class structure for #GDBusAuthObserverClass.
  *
@@ -116,18 +116,18 @@ struct _GDBusAuthObserverClass
   /*< public >*/
 
   /* Signals */
-  xboolean_t (*authorize_authenticated_peer) (GDBusAuthObserver  *observer,
+  xboolean_t (*authorize_authenticated_peer) (xdbus_auth_observer_t  *observer,
                                             xio_stream_t          *stream,
-                                            GCredentials       *credentials);
+                                            xcredentials_t       *credentials);
 
-  xboolean_t (*allow_mechanism) (GDBusAuthObserver  *observer,
+  xboolean_t (*allow_mechanism) (xdbus_auth_observer_t  *observer,
                                const xchar_t        *mechanism);
 };
 
 /**
- * GDBusAuthObserver:
+ * xdbus_auth_observer_t:
  *
- * The #GDBusAuthObserver structure contains only private data and
+ * The #xdbus_auth_observer_t structure contains only private data and
  * should only be accessed using the provided API.
  *
  * Since: 2.26
@@ -146,45 +146,45 @@ enum
 
 static xuint_t signals[LAST_SIGNAL] = { 0 };
 
-G_DEFINE_TYPE (GDBusAuthObserver, g_dbus_auth_observer, XTYPE_OBJECT)
+G_DEFINE_TYPE (xdbus_auth_observer, xdbus_auth_observer, XTYPE_OBJECT)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-g_dbus_auth_observer_finalize (xobject_t *object)
+xdbus_auth_observer_finalize (xobject_t *object)
 {
-  G_OBJECT_CLASS (g_dbus_auth_observer_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xdbus_auth_observer_parent_class)->finalize (object);
 }
 
 static xboolean_t
-g_dbus_auth_observer_authorize_authenticated_peer_real (GDBusAuthObserver  *observer,
+xdbus_auth_observer_authorize_authenticated_peer_real (xdbus_auth_observer_t  *observer,
                                                         xio_stream_t          *stream,
-                                                        GCredentials       *credentials)
+                                                        xcredentials_t       *credentials)
 {
   return TRUE;
 }
 
 static xboolean_t
-g_dbus_auth_observer_allow_mechanism_real (GDBusAuthObserver  *observer,
+xdbus_auth_observer_allow_mechanism_real (xdbus_auth_observer_t  *observer,
                                            const xchar_t        *mechanism)
 {
   return TRUE;
 }
 
 static void
-g_dbus_auth_observer_class_init (GDBusAuthObserverClass *klass)
+xdbus_auth_observer_class_init (GDBusAuthObserverClass *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_dbus_auth_observer_finalize;
+  gobject_class->finalize = xdbus_auth_observer_finalize;
 
-  klass->authorize_authenticated_peer = g_dbus_auth_observer_authorize_authenticated_peer_real;
-  klass->allow_mechanism = g_dbus_auth_observer_allow_mechanism_real;
+  klass->authorize_authenticated_peer = xdbus_auth_observer_authorize_authenticated_peer_real;
+  klass->allow_mechanism = xdbus_auth_observer_allow_mechanism_real;
 
   /**
-   * GDBusAuthObserver::authorize-authenticated-peer:
-   * @observer: The #GDBusAuthObserver emitting the signal.
-   * @stream: A #xio_stream_t for the #GDBusConnection.
+   * xdbus_auth_observer_t::authorize-authenticated-peer:
+   * @observer: The #xdbus_auth_observer_t emitting the signal.
+   * @stream: A #xio_stream_t for the #xdbus_connection_t.
    * @credentials: (nullable): Credentials received from the peer or %NULL.
    *
    * Emitted to check if a peer that is successfully authenticated
@@ -211,8 +211,8 @@ g_dbus_auth_observer_class_init (GDBusAuthObserverClass *klass)
                               _g_cclosure_marshal_BOOLEAN__OBJECT_OBJECTv);
 
   /**
-   * GDBusAuthObserver::allow-mechanism:
-   * @observer: The #GDBusAuthObserver emitting the signal.
+   * xdbus_auth_observer_t::allow-mechanism:
+   * @observer: The #xdbus_auth_observer_t emitting the signal.
    * @mechanism: The name of the mechanism, e.g. `DBUS_COOKIE_SHA1`.
    *
    * Emitted to check if @mechanism is allowed to be used.
@@ -238,43 +238,43 @@ g_dbus_auth_observer_class_init (GDBusAuthObserverClass *klass)
 }
 
 static void
-g_dbus_auth_observer_init (GDBusAuthObserver *observer)
+xdbus_auth_observer_init (xdbus_auth_observer_t *observer)
 {
 }
 
 /**
- * g_dbus_auth_observer_new:
+ * xdbus_auth_observer_new:
  *
- * Creates a new #GDBusAuthObserver object.
+ * Creates a new #xdbus_auth_observer_t object.
  *
- * Returns: A #GDBusAuthObserver. Free with g_object_unref().
+ * Returns: A #xdbus_auth_observer_t. Free with xobject_unref().
  *
  * Since: 2.26
  */
-GDBusAuthObserver *
-g_dbus_auth_observer_new (void)
+xdbus_auth_observer_t *
+xdbus_auth_observer_new (void)
 {
-  return g_object_new (XTYPE_DBUS_AUTH_OBSERVER, NULL);
+  return xobject_new (XTYPE_DBUS_AUTH_OBSERVER, NULL);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * g_dbus_auth_observer_authorize_authenticated_peer:
- * @observer: A #GDBusAuthObserver.
- * @stream: A #xio_stream_t for the #GDBusConnection.
+ * xdbus_auth_observer_authorize_authenticated_peer:
+ * @observer: A #xdbus_auth_observer_t.
+ * @stream: A #xio_stream_t for the #xdbus_connection_t.
  * @credentials: (nullable): Credentials received from the peer or %NULL.
  *
- * Emits the #GDBusAuthObserver::authorize-authenticated-peer signal on @observer.
+ * Emits the #xdbus_auth_observer_t::authorize-authenticated-peer signal on @observer.
  *
  * Returns: %TRUE if the peer is authorized, %FALSE if not.
  *
  * Since: 2.26
  */
 xboolean_t
-g_dbus_auth_observer_authorize_authenticated_peer (GDBusAuthObserver  *observer,
+xdbus_auth_observer_authorize_authenticated_peer (xdbus_auth_observer_t  *observer,
                                                    xio_stream_t          *stream,
-                                                   GCredentials       *credentials)
+                                                   xcredentials_t       *credentials)
 {
   xboolean_t denied;
 
@@ -289,18 +289,18 @@ g_dbus_auth_observer_authorize_authenticated_peer (GDBusAuthObserver  *observer,
 }
 
 /**
- * g_dbus_auth_observer_allow_mechanism:
- * @observer: A #GDBusAuthObserver.
+ * xdbus_auth_observer_allow_mechanism:
+ * @observer: A #xdbus_auth_observer_t.
  * @mechanism: The name of the mechanism, e.g. `DBUS_COOKIE_SHA1`.
  *
- * Emits the #GDBusAuthObserver::allow-mechanism signal on @observer.
+ * Emits the #xdbus_auth_observer_t::allow-mechanism signal on @observer.
  *
  * Returns: %TRUE if @mechanism can be used to authenticate the other peer, %FALSE if not.
  *
  * Since: 2.34
  */
 xboolean_t
-g_dbus_auth_observer_allow_mechanism (GDBusAuthObserver  *observer,
+xdbus_auth_observer_allow_mechanism (xdbus_auth_observer_t  *observer,
                                       const xchar_t        *mechanism)
 {
   xboolean_t ret;

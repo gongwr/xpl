@@ -46,57 +46,57 @@ struct _GThreadPool
 };
 
 XPL_AVAILABLE_IN_ALL
-GThreadPool *   g_thread_pool_new               (GFunc            func,
+GThreadPool *   xthread_pool_new               (GFunc            func,
                                                  xpointer_t         user_data,
                                                  xint_t             max_threads,
                                                  xboolean_t         exclusive,
                                                  xerror_t         **error);
 XPL_AVAILABLE_IN_2_70
-GThreadPool *   g_thread_pool_new_full          (GFunc            func,
+GThreadPool *   xthread_pool_new_full          (GFunc            func,
                                                  xpointer_t         user_data,
-                                                 GDestroyNotify   item_free_func,
+                                                 xdestroy_notify_t   item_free_func,
                                                  xint_t             max_threads,
                                                  xboolean_t         exclusive,
                                                  xerror_t         **error);
 XPL_AVAILABLE_IN_ALL
-void            g_thread_pool_free              (GThreadPool     *pool,
+void            xthread_pool_free              (GThreadPool     *pool,
                                                  xboolean_t         immediate,
                                                  xboolean_t         wait_);
 XPL_AVAILABLE_IN_ALL
-xboolean_t        g_thread_pool_push              (GThreadPool     *pool,
+xboolean_t        xthread_pool_push              (GThreadPool     *pool,
                                                  xpointer_t         data,
                                                  xerror_t         **error);
 XPL_AVAILABLE_IN_ALL
-xuint_t           g_thread_pool_unprocessed       (GThreadPool     *pool);
+xuint_t           xthread_pool_unprocessed       (GThreadPool     *pool);
 XPL_AVAILABLE_IN_ALL
-void            g_thread_pool_set_sort_function (GThreadPool      *pool,
+void            xthread_pool_set_sort_function (GThreadPool      *pool,
                                                  GCompareDataFunc  func,
                                                  xpointer_t          user_data);
 XPL_AVAILABLE_IN_2_46
-xboolean_t        g_thread_pool_move_to_front     (GThreadPool      *pool,
+xboolean_t        xthread_pool_move_to_front     (GThreadPool      *pool,
                                                  xpointer_t          data);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t        g_thread_pool_set_max_threads   (GThreadPool     *pool,
+xboolean_t        xthread_pool_set_max_threads   (GThreadPool     *pool,
                                                  xint_t             max_threads,
                                                  xerror_t         **error);
 XPL_AVAILABLE_IN_ALL
-xint_t            g_thread_pool_get_max_threads   (GThreadPool     *pool);
+xint_t            xthread_pool_get_max_threads   (GThreadPool     *pool);
 XPL_AVAILABLE_IN_ALL
-xuint_t           g_thread_pool_get_num_threads   (GThreadPool     *pool);
+xuint_t           xthread_pool_get_num_threads   (GThreadPool     *pool);
 
 XPL_AVAILABLE_IN_ALL
-void            g_thread_pool_set_max_unused_threads (xint_t  max_threads);
+void            xthread_pool_set_max_unused_threads (xint_t  max_threads);
 XPL_AVAILABLE_IN_ALL
-xint_t            g_thread_pool_get_max_unused_threads (void);
+xint_t            xthread_pool_get_max_unused_threads (void);
 XPL_AVAILABLE_IN_ALL
-xuint_t           g_thread_pool_get_num_unused_threads (void);
+xuint_t           xthread_pool_get_num_unused_threads (void);
 XPL_AVAILABLE_IN_ALL
-void            g_thread_pool_stop_unused_threads    (void);
+void            xthread_pool_stop_unused_threads    (void);
 XPL_AVAILABLE_IN_ALL
-void            g_thread_pool_set_max_idle_time      (xuint_t interval);
+void            xthread_pool_set_max_idle_time      (xuint_t interval);
 XPL_AVAILABLE_IN_ALL
-xuint_t           g_thread_pool_get_max_idle_time      (void);
+xuint_t           xthread_pool_get_max_idle_time      (void);
 
 G_END_DECLS
 

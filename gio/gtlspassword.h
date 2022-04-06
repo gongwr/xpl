@@ -29,8 +29,8 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_TLS_PASSWORD         (g_tls_password_get_type ())
-#define G_TLS_PASSWORD(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_TLS_PASSWORD, GTlsPassword))
+#define XTYPE_TLS_PASSWORD         (xtls_password_get_type ())
+#define G_TLS_PASSWORD(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_TLS_PASSWORD, xtls_password))
 #define G_TLS_PASSWORD_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_TLS_PASSWORD, GTlsPasswordClass))
 #define X_IS_TLS_PASSWORD(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_TLS_PASSWORD))
 #define X_IS_TLS_PASSWORD_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_TLS_PASSWORD))
@@ -48,12 +48,12 @@ struct _GTlsPassword
 
 /**
  * GTlsPasswordClass:
- * @get_value: virtual method for g_tls_password_get_value()
- * @set_value: virtual method for g_tls_password_set_value()
- * @get_default_warning: virtual method for g_tls_password_get_warning() if no
- *  value has been set using g_tls_password_set_warning()
+ * @get_value: virtual method for xtls_password_get_value()
+ * @set_value: virtual method for xtls_password_set_value()
+ * @get_default_warning: virtual method for xtls_password_get_warning() if no
+ *  value has been set using xtls_password_set_warning()
  *
- * Class structure for #GTlsPassword.
+ * Class structure for #xtls_password_t.
  */
 struct _GTlsPasswordClass
 {
@@ -61,15 +61,15 @@ struct _GTlsPasswordClass
 
   /* methods */
 
-  const guchar *    ( *get_value)            (GTlsPassword  *password,
+  const guchar *    ( *get_value)            (xtls_password_t  *password,
                                               xsize_t         *length);
 
-  void              ( *set_value)            (GTlsPassword  *password,
+  void              ( *set_value)            (xtls_password_t  *password,
                                               guchar        *value,
-                                              gssize         length,
-                                              GDestroyNotify destroy);
+                                              xssize_t         length,
+                                              xdestroy_notify_t destroy);
 
-  const xchar_t*      ( *get_default_warning)  (GTlsPassword  *password);
+  const xchar_t*      ( *get_default_warning)  (xtls_password_t  *password);
 
   /*< private >*/
   /* Padding for future expansion */
@@ -77,41 +77,41 @@ struct _GTlsPasswordClass
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t             g_tls_password_get_type            (void) G_GNUC_CONST;
+xtype_t             xtls_password_get_type            (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GTlsPassword *    g_tls_password_new                 (GTlsPasswordFlags  flags,
+xtls_password_t *    xtls_password_new                 (GTlsPasswordFlags  flags,
                                                       const xchar_t       *description);
 
 XPL_AVAILABLE_IN_ALL
-const guchar *    g_tls_password_get_value           (GTlsPassword      *password,
+const guchar *    xtls_password_get_value           (xtls_password_t      *password,
                                                       xsize_t             *length);
 XPL_AVAILABLE_IN_ALL
-void              g_tls_password_set_value           (GTlsPassword      *password,
+void              xtls_password_set_value           (xtls_password_t      *password,
                                                       const guchar      *value,
-                                                      gssize             length);
+                                                      xssize_t             length);
 XPL_AVAILABLE_IN_ALL
-void              g_tls_password_set_value_full      (GTlsPassword      *password,
+void              xtls_password_set_value_full      (xtls_password_t      *password,
                                                       guchar            *value,
-                                                      gssize             length,
-                                                      GDestroyNotify     destroy);
+                                                      xssize_t             length,
+                                                      xdestroy_notify_t     destroy);
 
 XPL_AVAILABLE_IN_ALL
-GTlsPasswordFlags g_tls_password_get_flags           (GTlsPassword      *password);
+GTlsPasswordFlags xtls_password_get_flags           (xtls_password_t      *password);
 XPL_AVAILABLE_IN_ALL
-void              g_tls_password_set_flags           (GTlsPassword      *password,
+void              xtls_password_set_flags           (xtls_password_t      *password,
                                                       GTlsPasswordFlags  flags);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t*      g_tls_password_get_description     (GTlsPassword      *password);
+const xchar_t*      xtls_password_get_description     (xtls_password_t      *password);
 XPL_AVAILABLE_IN_ALL
-void              g_tls_password_set_description     (GTlsPassword      *password,
+void              xtls_password_set_description     (xtls_password_t      *password,
                                                       const xchar_t       *description);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t *     g_tls_password_get_warning         (GTlsPassword      *password);
+const xchar_t *     xtls_password_get_warning         (xtls_password_t      *password);
 XPL_AVAILABLE_IN_ALL
-void              g_tls_password_set_warning         (GTlsPassword      *password,
+void              xtls_password_set_warning         (xtls_password_t      *password,
                                                       const xchar_t       *warning);
 
 G_END_DECLS

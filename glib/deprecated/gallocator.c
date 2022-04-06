@@ -94,11 +94,11 @@ void g_mem_chunk_print          (GMemChunk *mem_chunk)  { }
 void g_mem_chunk_info           (void)                  { }
 void g_blow_chunks              (void)                  { }
 
-void g_list_push_allocator      (GAllocator *allocator) { }
-void g_list_pop_allocator       (void)                  { }
+void xlist_push_allocator      (GAllocator *allocator) { }
+void xlist_pop_allocator       (void)                  { }
 
-void g_slist_push_allocator     (GAllocator *allocator) { }
-void g_slist_pop_allocator      (void)                  { }
+void xslist_push_allocator     (GAllocator *allocator) { }
+void xslist_pop_allocator      (void)                  { }
 
 void g_node_push_allocator      (GAllocator *allocator) { }
 void g_node_pop_allocator       (void)                  { }

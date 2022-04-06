@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-GMainLoop *loop;
+xmain_loop_t *loop;
 
 int port = 7777;
 xboolean_t verbose = FALSE;
@@ -55,10 +55,10 @@ main (int argc,
   xsocket_type_t socket_type;
   xsocket_family_t socket_family;
   xerror_t *error = NULL;
-  GOptionContext *context;
+  xoption_context_t *context;
   xcancellable_t *cancellable;
   char *display_addr;
-  GTlsCertificate *tlscert = NULL;
+  xtls_certificate_t *tlscert = NULL;
   xio_stream_t *connection;
   xinput_stream_t *istream;
   xoutput_stream_t *ostream;
@@ -79,10 +79,10 @@ main (int argc,
 
   if (cancel_timeout)
     {
-      GThread *thread;
+      xthread_t *thread;
       cancellable = g_cancellable_new ();
-      thread = g_thread_new ("cancel", cancel_thread, cancellable);
-      g_thread_unref (thread);
+      thread = xthread_new ("cancel", cancel_thread, cancellable);
+      xthread_unref (thread);
     }
   else
     {
@@ -97,7 +97,7 @@ main (int argc,
 	  return 1;
 	}
 
-      tlscert = g_tls_certificate_new_from_file (tls_cert_file, &error);
+      tlscert = xtls_certificate_new_from_file (tls_cert_file, &error);
       if (!tlscert)
 	{
 	  g_printerr ("Could not read server certificate '%s': %s\n",
@@ -106,7 +106,7 @@ main (int argc,
 	}
     }
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   if (use_udp)
     socket_type = XSOCKET_TYPE_DATAGRAM;
@@ -148,7 +148,7 @@ main (int argc,
       g_printerr ("Can't bind socket: %s\n", error->message);
       return 1;
     }
-  g_object_unref (src_address);
+  xobject_unref (src_address);
 
   if (!use_udp)
     {
@@ -194,12 +194,12 @@ main (int argc,
       display_addr = socket_address_to_string (address);
       g_print ("got a new connection from %s\n", display_addr);
       g_free(display_addr);
-      g_object_unref (address);
+      xobject_unref (address);
 
       recv_socket = new_socket;
 
       connection = XIO_STREAM (xsocket_connection_factory_create_connection (recv_socket));
-      g_object_unref (new_socket);
+      xobject_unref (new_socket);
     }
   else
     {
@@ -211,7 +211,7 @@ main (int argc,
     {
       xio_stream_t *tls_conn;
 
-      tls_conn = g_tls_server_connection_new (connection, tlscert, &error);
+      tls_conn = xtls_server_connection_new (connection, tlscert, &error);
       if (!tls_conn)
 	{
 	  g_printerr ("Could not create TLS connection: %s\n",
@@ -219,7 +219,7 @@ main (int argc,
 	  return 1;
 	}
 
-      if (!g_tls_connection_handshake (G_TLS_CONNECTION (tls_conn),
+      if (!xtls_connection_handshake (G_TLS_CONNECTION (tls_conn),
 				       cancellable, &error))
 	{
 	  g_printerr ("Error during TLS handshake: %s\n",
@@ -227,7 +227,7 @@ main (int argc,
 	  return 1;
        }
 
-      g_object_unref (connection);
+      xobject_unref (connection);
       connection = tls_conn;
     }
 
@@ -246,7 +246,7 @@ main (int argc,
   while (TRUE)
     {
       xchar_t buffer[4096];
-      gssize size;
+      xssize_t size;
       xsize_t to_send;
 
       if (use_udp)
@@ -259,7 +259,7 @@ main (int argc,
       else
 	{
 	  ensure_connection_condition (connection, G_IO_IN, cancellable);
-	  size = g_input_stream_read (istream,
+	  size = xinput_stream_read (istream,
 				      buffer, sizeof buffer,
 				      cancellable, &error);
 	}
@@ -305,19 +305,19 @@ main (int argc,
 	  else
 	    {
 	      ensure_connection_condition (connection, G_IO_OUT, cancellable);
-	      size = g_output_stream_write (ostream,
+	      size = xoutput_stream_write (ostream,
 					    buffer, to_send,
 					    cancellable, &error);
 	    }
 
 	  if (size < 0)
 	    {
-	      if (g_error_matches (error,
+	      if (xerror_matches (error,
 				   G_IO_ERROR,
 				   G_IO_ERROR_WOULD_BLOCK))
 		{
 		  g_print ("socket send would block, handling\n");
-		  g_error_free (error);
+		  xerror_free (error);
 		  error = NULL;
 		  continue;
 		}
@@ -351,7 +351,7 @@ main (int argc,
 		      error->message);
 	  return 1;
 	}
-      g_object_unref (connection);
+      xobject_unref (connection);
     }
 
   if (!xsocket_close (socket, &error))
@@ -360,7 +360,7 @@ main (int argc,
 		  error->message);
       return 1;
     }
-  g_object_unref (socket);
+  xobject_unref (socket);
 
   return 0;
 }

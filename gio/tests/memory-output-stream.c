@@ -28,15 +28,15 @@ static void
 test_truncate (void)
 {
   xoutput_stream_t *mo;
-  GDataOutputStream *o;
+  xdata_output_stream_t *o;
   int i;
   xerror_t *error = NULL;
-  guint8 *data;
+  xuint8_t *data;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=540423");
 
   mo = g_memory_output_stream_new_resizable ();
-  g_assert (g_seekable_can_truncate (G_SEEKABLE (mo)));
+  g_assert (xseekable_can_truncate (G_SEEKABLE (mo)));
   o = g_data_output_stream_new (mo);
   for (i = 0; i < 1000; i++)
     {
@@ -44,8 +44,8 @@ test_truncate (void)
       g_assert_no_error (error);
     }
   g_assert_cmpint (g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mo)), ==, 1000);
-  g_seekable_truncate (G_SEEKABLE (mo), 0, NULL, &error);
-  g_assert_cmpuint (g_seekable_tell (G_SEEKABLE (mo)), ==, 1000);
+  xseekable_truncate (G_SEEKABLE (mo), 0, NULL, &error);
+  g_assert_cmpuint (xseekable_tell (G_SEEKABLE (mo)), ==, 1000);
 
   g_assert_no_error (error);
   g_assert_cmpint (g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mo)), ==, 0);
@@ -56,7 +56,7 @@ test_truncate (void)
     }
   g_assert_cmpint (g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mo)), ==, 3000);
 
-  data = (guint8 *)g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (mo));
+  data = (xuint8_t *)g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (mo));
 
   /* The 1's written initially were lost when we truncated to 0
    * and then started writing at position 1000.
@@ -68,15 +68,15 @@ test_truncate (void)
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=720080");
 
-  g_seekable_truncate (G_SEEKABLE (mo), 8192, NULL, &error);
+  xseekable_truncate (G_SEEKABLE (mo), 8192, NULL, &error);
   g_assert_cmpint (g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mo)), ==, 8192);
 
-  data = (guint8 *)g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (mo));
+  data = (xuint8_t *)g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (mo));
   for (i = 3000; i < 8192; i++)
     g_assert_cmpuint (data[i], ==, 0);
 
-  g_object_unref (o);
-  g_object_unref (mo);
+  xobject_unref (o);
+  xobject_unref (mo);
 }
 
 static void
@@ -88,42 +88,42 @@ test_seek_fixed (void)
   mo = g_memory_output_stream_new (g_new (xchar_t, 100), 100, NULL, g_free);
 
   g_assert (X_IS_SEEKABLE (mo));
-  g_assert (g_seekable_can_seek (G_SEEKABLE (mo)));
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 0);
+  g_assert (xseekable_can_seek (G_SEEKABLE (mo)));
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 0);
 
   error = NULL;
-  g_assert (!g_seekable_seek (G_SEEKABLE (mo), 222, G_SEEK_CUR, NULL, &error));
+  g_assert (!xseekable_seek (G_SEEKABLE (mo), 222, G_SEEK_CUR, NULL, &error));
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_clear_error (&error);
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 0);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 0);
 
-  g_assert (g_seekable_seek (G_SEEKABLE (mo), 26, G_SEEK_SET, NULL, &error));
+  g_assert (xseekable_seek (G_SEEKABLE (mo), 26, G_SEEK_SET, NULL, &error));
   g_assert_no_error (error);
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 26);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 26);
 
-  g_assert (g_seekable_seek (G_SEEKABLE (mo), 20, G_SEEK_CUR, NULL, &error));
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 46);
+  g_assert (xseekable_seek (G_SEEKABLE (mo), 20, G_SEEK_CUR, NULL, &error));
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 46);
   g_assert_no_error (error);
 
-  g_assert (!g_seekable_seek (G_SEEKABLE (mo), 200, G_SEEK_CUR, NULL, &error));
+  g_assert (!xseekable_seek (G_SEEKABLE (mo), 200, G_SEEK_CUR, NULL, &error));
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_clear_error (&error);
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 46);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 46);
 
-  g_assert (!g_seekable_seek (G_SEEKABLE (mo), 1, G_SEEK_END, NULL, &error));
+  g_assert (!xseekable_seek (G_SEEKABLE (mo), 1, G_SEEK_END, NULL, &error));
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_clear_error (&error);
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 46);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 46);
 
-  g_assert (g_seekable_seek (G_SEEKABLE (mo), 0, G_SEEK_END, NULL, &error));
+  g_assert (xseekable_seek (G_SEEKABLE (mo), 0, G_SEEK_END, NULL, &error));
   g_assert_no_error (error);
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 100);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 100);
 
-  g_assert (g_seekable_seek (G_SEEKABLE (mo), -1, G_SEEK_END, NULL, &error));
+  g_assert (xseekable_seek (G_SEEKABLE (mo), -1, G_SEEK_END, NULL, &error));
   g_assert_no_error (error);
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 99);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 99);
 
-  g_object_unref (mo);
+  xobject_unref (mo);
 }
 
 static void
@@ -132,39 +132,39 @@ test_seek_resizable_stream (xoutput_stream_t *mo)
   xerror_t *error;
 
   g_assert (X_IS_SEEKABLE (mo));
-  g_assert (g_seekable_can_seek (G_SEEKABLE (mo)));
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 0);
+  g_assert (xseekable_can_seek (G_SEEKABLE (mo)));
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 0);
 
   error = NULL;
-  g_assert (g_seekable_seek (G_SEEKABLE (mo), 222, G_SEEK_CUR, NULL, &error));
+  g_assert (xseekable_seek (G_SEEKABLE (mo), 222, G_SEEK_CUR, NULL, &error));
   g_assert_no_error (error);
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 222);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 222);
 
-  g_assert (g_seekable_seek (G_SEEKABLE (mo), 26, G_SEEK_SET, NULL, &error));
+  g_assert (xseekable_seek (G_SEEKABLE (mo), 26, G_SEEK_SET, NULL, &error));
   g_assert_no_error (error);
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 26);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 26);
 
-  g_assert (g_seekable_seek (G_SEEKABLE (mo), 20, G_SEEK_CUR, NULL, &error));
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 46);
-  g_assert_no_error (error);
-
-  g_assert (g_seekable_seek (G_SEEKABLE (mo), 200, G_SEEK_CUR, NULL, &error));
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 246);
+  g_assert (xseekable_seek (G_SEEKABLE (mo), 20, G_SEEK_CUR, NULL, &error));
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 46);
   g_assert_no_error (error);
 
-  g_assert (g_seekable_seek (G_SEEKABLE (mo), 1, G_SEEK_END, NULL, &error));
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 1);
+  g_assert (xseekable_seek (G_SEEKABLE (mo), 200, G_SEEK_CUR, NULL, &error));
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 246);
   g_assert_no_error (error);
 
-  g_assert (g_seekable_seek (G_SEEKABLE (mo), 0, G_SEEK_END, NULL, &error));
+  g_assert (xseekable_seek (G_SEEKABLE (mo), 1, G_SEEK_END, NULL, &error));
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 1);
   g_assert_no_error (error);
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 0);
+
+  g_assert (xseekable_seek (G_SEEKABLE (mo), 0, G_SEEK_END, NULL, &error));
+  g_assert_no_error (error);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 0);
 
   /* The 'end' is still zero, so this should fail */
-  g_assert (!g_seekable_seek (G_SEEKABLE (mo), -1, G_SEEK_END, NULL, &error));
+  g_assert (!xseekable_seek (G_SEEKABLE (mo), -1, G_SEEK_END, NULL, &error));
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_clear_error (&error);
-  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (mo)), ==, 0);
+  g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 0);
 }
 
 static void
@@ -188,7 +188,7 @@ test_seek_resizable (void)
       /* No writes = no resizes */
       g_assert_cmpint (g_memory_output_stream_get_size (G_MEMORY_OUTPUT_STREAM (mo)), ==, i);
 
-      g_object_unref (mo);
+      xobject_unref (mo);
     }
 }
 
@@ -196,7 +196,7 @@ static void
 test_data_size (void)
 {
   xoutput_stream_t *mo;
-  GDataOutputStream *o;
+  xdata_output_stream_t *o;
   int pos;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=540459");
@@ -207,14 +207,14 @@ test_data_size (void)
   pos = g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mo));
   g_assert_cmpint (pos, ==, 1);
 
-  g_seekable_seek (G_SEEKABLE (mo), 0, G_SEEK_CUR, NULL, NULL);
-  pos = g_seekable_tell (G_SEEKABLE (mo));
+  xseekable_seek (G_SEEKABLE (mo), 0, G_SEEK_CUR, NULL, NULL);
+  pos = xseekable_tell (G_SEEKABLE (mo));
   g_assert_cmpint (pos, ==, 1);
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=540461");
 
-  g_seekable_seek (G_SEEKABLE (mo), 0, G_SEEK_SET, NULL, NULL);
-  pos = g_seekable_tell (G_SEEKABLE (mo));
+  xseekable_seek (G_SEEKABLE (mo), 0, G_SEEK_SET, NULL, NULL);
+  pos = xseekable_tell (G_SEEKABLE (mo));
   g_assert_cmpint (pos, ==, 0);
 
   pos = g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mo));
@@ -222,15 +222,15 @@ test_data_size (void)
 
   g_assert_cmpint (g_memory_output_stream_get_size (G_MEMORY_OUTPUT_STREAM (mo)), ==, 16);
 
-  g_object_unref (o);
-  g_object_unref (mo);
+  xobject_unref (o);
+  xobject_unref (mo);
 }
 
 static void
 test_properties (void)
 {
   xoutput_stream_t *mo;
-  GDataOutputStream *o;
+  xdata_output_stream_t *o;
   int i;
   xerror_t *error = NULL;
   xsize_t data_size_fun;
@@ -241,7 +241,7 @@ test_properties (void)
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=605733");
 
-  mo = (xoutput_stream_t*) g_object_new (XTYPE_MEMORY_OUTPUT_STREAM,
+  mo = (xoutput_stream_t*) xobject_new (XTYPE_MEMORY_OUTPUT_STREAM,
                                       "realloc-function", g_realloc,
                                       "destroy-function", g_free,
                                       NULL);
@@ -254,50 +254,50 @@ test_properties (void)
     }
 
   data_size_fun = g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mo));
-  g_object_get (mo, "data-size", &data_size_prop, NULL);
+  xobject_get (mo, "data-size", &data_size_prop, NULL);
   g_assert_cmpint (data_size_fun, ==, data_size_prop);
 
   data_fun = g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (mo));
-  g_object_get (mo, "data", &data_prop, NULL);
+  xobject_get (mo, "data", &data_prop, NULL);
   g_assert_cmphex (GPOINTER_TO_SIZE (data_fun), ==, GPOINTER_TO_SIZE (data_prop));
 
-  g_object_get (mo, "realloc-function", &func, NULL);
+  xobject_get (mo, "realloc-function", &func, NULL);
   g_assert (func == g_realloc);
-  g_object_get (mo, "destroy-function", &func, NULL);
+  xobject_get (mo, "destroy-function", &func, NULL);
   g_assert (func == g_free);
 
   data_size_fun = g_memory_output_stream_get_size (G_MEMORY_OUTPUT_STREAM (mo));
-  g_object_get (mo, "size", &data_size_prop, NULL);
+  xobject_get (mo, "size", &data_size_prop, NULL);
   g_assert_cmpint (data_size_fun, ==, data_size_prop);
 
-  g_object_unref (o);
-  g_object_unref (mo);
+  xobject_unref (o);
+  xobject_unref (mo);
 }
 
 static void
 test_write_bytes (void)
 {
   xoutput_stream_t *mo;
-  GBytes *bytes, *bytes2;
+  xbytes_t *bytes, *bytes2;
   xerror_t *error = NULL;
 
-  mo = (xoutput_stream_t*) g_object_new (XTYPE_MEMORY_OUTPUT_STREAM,
+  mo = (xoutput_stream_t*) xobject_new (XTYPE_MEMORY_OUTPUT_STREAM,
                                       "realloc-function", g_realloc,
                                       "destroy-function", g_free,
                                       NULL);
-  bytes = g_bytes_new_static ("hello world!", strlen ("hello world!") + 1);
-  g_output_stream_write_bytes (mo, bytes, NULL, &error);
+  bytes = xbytes_new_static ("hello world!", strlen ("hello world!") + 1);
+  xoutput_stream_write_bytes (mo, bytes, NULL, &error);
   g_assert_no_error (error);
 
-  g_output_stream_close (mo, NULL, &error);
+  xoutput_stream_close (mo, NULL, &error);
   g_assert_no_error (error);
 
   bytes2 = g_memory_output_stream_steal_as_bytes (G_MEMORY_OUTPUT_STREAM (mo));
-  g_object_unref (mo);
-  g_assert (g_bytes_equal (bytes, bytes2));
+  xobject_unref (mo);
+  g_assert (xbytes_equal (bytes, bytes2));
 
-  g_bytes_unref (bytes);
-  g_bytes_unref (bytes2);
+  xbytes_unref (bytes);
+  xbytes_unref (bytes2);
 }
 
 static void
@@ -309,17 +309,17 @@ test_write_null (void)
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2471");
 
   mo = g_memory_output_stream_new_resizable ();
-  g_output_stream_write_all (mo, NULL, 0, NULL, NULL, &error);
+  xoutput_stream_write_all (mo, NULL, 0, NULL, NULL, &error);
   g_assert_no_error (error);
 
   g_assert_cmpint (0, ==, g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mo)));
 
-  g_output_stream_close (mo, NULL, &error);
+  xoutput_stream_close (mo, NULL, &error);
   g_assert_no_error (error);
-  g_object_unref (mo);
+  xobject_unref (mo);
 }
 
-/* Test that writev() works on #GMemoryOutputStream with a non-empty set of vectors. This
+/* Test that writev() works on #xmemory_output_stream_t with a non-empty set of vectors. This
  * covers the default writev() implementation around write(). */
 static void
 test_writev (void)
@@ -328,11 +328,11 @@ test_writev (void)
   xerror_t *error = NULL;
   xboolean_t res;
   xsize_t bytes_written;
-  GOutputVector vectors[3];
-  const guint8 buffer[] = {1, 2, 3, 4, 5,
+  xoutput_vector_t vectors[3];
+  const xuint8_t buffer[] = {1, 2, 3, 4, 5,
                            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                            1, 2, 3};
-  guint8 *output_buffer;
+  xuint8_t *output_buffer;
 
   vectors[0].buffer = buffer;
   vectors[0].size = 5;
@@ -343,26 +343,26 @@ test_writev (void)
   vectors[2].buffer = buffer + vectors[0].size + vectors[1].size;
   vectors[2].size = 3;
 
-  mo = (xoutput_stream_t*) g_object_new (XTYPE_MEMORY_OUTPUT_STREAM,
+  mo = (xoutput_stream_t*) xobject_new (XTYPE_MEMORY_OUTPUT_STREAM,
                                       "realloc-function", g_realloc,
                                       "destroy-function", g_free,
                                       NULL);
-  res = g_output_stream_writev_all (mo, vectors, G_N_ELEMENTS (vectors), &bytes_written, NULL, &error);
+  res = xoutput_stream_writev_all (mo, vectors, G_N_ELEMENTS (vectors), &bytes_written, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
   g_assert_cmpuint (bytes_written, ==, sizeof buffer);
 
-  g_output_stream_close (mo, NULL, &error);
+  xoutput_stream_close (mo, NULL, &error);
   g_assert_no_error (error);
 
   g_assert_cmpuint (g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mo)), ==, sizeof buffer);
   output_buffer = g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (mo));
   g_assert_cmpmem (output_buffer, sizeof buffer, buffer, sizeof buffer);
 
-  g_object_unref (mo);
+  xobject_unref (mo);
 }
 
-/* Test that writev_nonblocking() works on #GMemoryOutputStream with a non-empty set of vectors. This
+/* Test that writev_nonblocking() works on #xmemory_output_stream_t with a non-empty set of vectors. This
  * covers the default writev_nonblocking() implementation around write_nonblocking(). */
 static void
 test_writev_nonblocking (void)
@@ -371,11 +371,11 @@ test_writev_nonblocking (void)
   xerror_t *error = NULL;
   xboolean_t res;
   xsize_t bytes_written;
-  GOutputVector vectors[3];
-  const guint8 buffer[] = {1, 2, 3, 4, 5,
+  xoutput_vector_t vectors[3];
+  const xuint8_t buffer[] = {1, 2, 3, 4, 5,
                            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                            1, 2, 3};
-  guint8 *output_buffer;
+  xuint8_t *output_buffer;
 
   vectors[0].buffer = buffer;
   vectors[0].size = 5;
@@ -386,37 +386,37 @@ test_writev_nonblocking (void)
   vectors[2].buffer = buffer + vectors[0].size + vectors[1].size;
   vectors[2].size = 3;
 
-  mo = (xoutput_stream_t*) g_object_new (XTYPE_MEMORY_OUTPUT_STREAM,
+  mo = (xoutput_stream_t*) xobject_new (XTYPE_MEMORY_OUTPUT_STREAM,
                                       "realloc-function", g_realloc,
                                       "destroy-function", g_free,
                                       NULL);
-  res = g_pollable_output_stream_writev_nonblocking (G_POLLABLE_OUTPUT_STREAM (mo),
+  res = xpollable_output_stream_writev_nonblocking (G_POLLABLE_OUTPUT_STREAM (mo),
                                                      vectors, G_N_ELEMENTS (vectors),
                                                      &bytes_written, NULL, &error);
   g_assert_no_error (error);
   g_assert_cmpint (res, ==, G_POLLABLE_RETURN_OK);
   g_assert_cmpuint (bytes_written, ==, sizeof buffer);
 
-  g_output_stream_close (mo, NULL, &error);
+  xoutput_stream_close (mo, NULL, &error);
   g_assert_no_error (error);
 
   g_assert_cmpuint (g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (mo)), ==, sizeof buffer);
   output_buffer = g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (mo));
   g_assert_cmpmem (output_buffer, sizeof buffer, buffer, sizeof buffer);
 
-  g_object_unref (mo);
+  xobject_unref (mo);
 }
 
 static void
 test_steal_as_bytes (void)
 {
   xoutput_stream_t *mo;
-  GDataOutputStream *o;
+  xdata_output_stream_t *o;
   xerror_t *error = NULL;
-  GBytes *bytes;
+  xbytes_t *bytes;
   xsize_t size;
 
-  mo = (xoutput_stream_t*) g_object_new (XTYPE_MEMORY_OUTPUT_STREAM,
+  mo = (xoutput_stream_t*) xobject_new (XTYPE_MEMORY_OUTPUT_STREAM,
                                       "realloc-function", g_realloc,
                                       "destroy-function", g_free,
                                       NULL);
@@ -431,17 +431,17 @@ test_steal_as_bytes (void)
   g_data_output_stream_put_byte (o, '\0', NULL, &error);
   g_assert_no_error (error);
 
-  g_output_stream_close ((xoutput_stream_t*) o, NULL, &error);
+  xoutput_stream_close ((xoutput_stream_t*) o, NULL, &error);
   g_assert_no_error (error);
 
-  bytes = g_memory_output_stream_steal_as_bytes ((GMemoryOutputStream*)mo);
-  g_object_unref (mo);
+  bytes = g_memory_output_stream_steal_as_bytes ((xmemory_output_stream_t*)mo);
+  xobject_unref (mo);
 
-  g_assert_cmpint (g_bytes_get_size (bytes), ==, strlen ("hello world!") + 1);
-  g_assert_cmpstr (g_bytes_get_data (bytes, &size), ==, "hello world!");
+  g_assert_cmpint (xbytes_get_size (bytes), ==, strlen ("hello world!") + 1);
+  g_assert_cmpstr (xbytes_get_data (bytes, &size), ==, "hello world!");
 
-  g_bytes_unref (bytes);
-  g_object_unref (o);
+  xbytes_unref (bytes);
+  xobject_unref (o);
 }
 
 int

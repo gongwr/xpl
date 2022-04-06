@@ -3,16 +3,16 @@
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* The fixture contains a GTestDBus object and
+/* The fixture contains a xtest_dbus_t object and
  * a proxy to the service we're going to be testing.
  */
 typedef struct {
-  GTestDBus *dbus;
-  GDBusObjectManager *manager;
+  xtest_dbus_t *dbus;
+  xdbus_object_manager_t *manager;
 } TestFixture;
 
 static void
-fixture_setup (TestFixture *fixture, gconstpointer unused)
+fixture_setup (TestFixture *fixture, xconstpointer unused)
 {
   xerror_t *error = NULL;
   xchar_t *relative, *servicesdir;
@@ -44,21 +44,21 @@ fixture_setup (TestFixture *fixture, gconstpointer unused)
                                                     NULL, /* xcancellable_t */
                                                     &error);
   if (fixture->manager == NULL)
-    g_error ("Error getting object manager client: %s", error->message);
+    xerror ("Error getting object manager client: %s", error->message);
 }
 
 static void
-fixture_teardown (TestFixture *fixture, gconstpointer unused)
+fixture_teardown (TestFixture *fixture, xconstpointer unused)
 {
   /* Tear down the proxy
    */
   if (fixture->manager)
-    g_object_unref (fixture->manager);
+    xobject_unref (fixture->manager);
 
   /* Stop the private D-Bus daemon
    */
   g_test_dbus_down (fixture->dbus);
-  g_object_unref (fixture->dbus);
+  xobject_unref (fixture->dbus);
 }
 
 /* The gdbus-example-objectmanager-server exports 10 objects,
@@ -66,14 +66,14 @@ fixture_teardown (TestFixture *fixture, gconstpointer unused)
  * that 10 objects exist.
  */
 static void
-test_gtest_dbus (TestFixture *fixture, gconstpointer unused)
+test_gtest_dbus (TestFixture *fixture, xconstpointer unused)
 {
   xlist_t *objects;
 
   objects = g_dbus_object_manager_get_objects (fixture->manager);
 
-  g_assert_cmpint (g_list_length (objects), ==, 10);
-  g_list_free_full (objects, g_object_unref);
+  g_assert_cmpint (xlist_length (objects), ==, 10);
+  xlist_free_full (objects, xobject_unref);
 }
 
 int
@@ -82,18 +82,18 @@ main (int   argc,
 {
   g_test_init (&argc, &argv, NULL);
 
-  /* This test simply ensures that we can bring the GTestDBus up and down a hand
+  /* This test simply ensures that we can bring the xtest_dbus_t up and down a hand
    * full of times in a row, each time successfully activating the in-tree service
    */
-  g_test_add ("/GTestDBus/Cycle1", TestFixture, NULL,
+  g_test_add ("/xtest_dbus_t/Cycle1", TestFixture, NULL,
   	      fixture_setup, test_gtest_dbus, fixture_teardown);
-  g_test_add ("/GTestDBus/Cycle2", TestFixture, NULL,
+  g_test_add ("/xtest_dbus_t/Cycle2", TestFixture, NULL,
   	      fixture_setup, test_gtest_dbus, fixture_teardown);
-  g_test_add ("/GTestDBus/Cycle3", TestFixture, NULL,
+  g_test_add ("/xtest_dbus_t/Cycle3", TestFixture, NULL,
   	      fixture_setup, test_gtest_dbus, fixture_teardown);
-  g_test_add ("/GTestDBus/Cycle4", TestFixture, NULL,
+  g_test_add ("/xtest_dbus_t/Cycle4", TestFixture, NULL,
   	      fixture_setup, test_gtest_dbus, fixture_teardown);
-  g_test_add ("/GTestDBus/Cycle5", TestFixture, NULL,
+  g_test_add ("/xtest_dbus_t/Cycle5", TestFixture, NULL,
   	      fixture_setup, test_gtest_dbus, fixture_teardown);
 
   return g_test_run ();

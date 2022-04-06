@@ -37,7 +37,7 @@ skip_win32 (void)
 static void
 test_do_not_search (void)
 {
-  GPtrArray *argv = g_ptr_array_new_with_free_func (g_free);
+  xptr_array_t *argv = xptr_array_new_with_free_func (g_free);
   xchar_t *here = g_test_build_filename (G_TEST_BUILT, ".", NULL);
   xchar_t *subdir = g_test_build_filename (G_TEST_BUILT, "path-test-subdir", NULL);
   xchar_t **envp = g_get_environ ();
@@ -54,11 +54,11 @@ test_do_not_search (void)
 
   envp = g_environ_setenv (envp, "PATH", subdir, TRUE);
 
-  g_ptr_array_add (argv,
+  xptr_array_add (argv,
                    g_test_build_filename (G_TEST_BUILT, "spawn-path-search-helper", NULL));
-  g_ptr_array_add (argv, g_strdup ("--"));
-  g_ptr_array_add (argv, g_strdup ("spawn-test-helper"));
-  g_ptr_array_add (argv, NULL);
+  xptr_array_add (argv, xstrdup ("--"));
+  xptr_array_add (argv, xstrdup ("spawn-test-helper"));
+  xptr_array_add (argv, NULL);
 
   g_spawn_sync (here,
                 (char **) argv->pdata,
@@ -81,18 +81,18 @@ test_do_not_search (void)
   g_assert_cmpint (WEXITSTATUS (wait_status), ==, 0);
 #endif
 
-  g_strfreev (envp);
+  xstrfreev (envp);
   g_free (here);
   g_free (subdir);
   g_free (out);
   g_free (err);
-  g_ptr_array_unref (argv);
+  xptr_array_unref (argv);
 }
 
 static void
 test_search_path (void)
 {
-  GPtrArray *argv = g_ptr_array_new_with_free_func (g_free);
+  xptr_array_t *argv = xptr_array_new_with_free_func (g_free);
   xchar_t *here = g_test_build_filename (G_TEST_BUILT, ".", NULL);
   xchar_t *subdir = g_test_build_filename (G_TEST_BUILT, "path-test-subdir", NULL);
   xchar_t **envp = g_get_environ ();
@@ -109,12 +109,12 @@ test_search_path (void)
 
   envp = g_environ_setenv (envp, "PATH", subdir, TRUE);
 
-  g_ptr_array_add (argv,
+  xptr_array_add (argv,
                    g_test_build_filename (G_TEST_BUILT, "spawn-path-search-helper", NULL));
-  g_ptr_array_add (argv, g_strdup ("--search-path"));
-  g_ptr_array_add (argv, g_strdup ("--"));
-  g_ptr_array_add (argv, g_strdup ("spawn-test-helper"));
-  g_ptr_array_add (argv, NULL);
+  xptr_array_add (argv, xstrdup ("--search-path"));
+  xptr_array_add (argv, xstrdup ("--"));
+  xptr_array_add (argv, xstrdup ("spawn-test-helper"));
+  xptr_array_add (argv, NULL);
 
   g_spawn_sync (here,
                 (char **) argv->pdata,
@@ -137,18 +137,18 @@ test_search_path (void)
   g_assert_cmpint (WEXITSTATUS (wait_status), ==, 5);
 #endif
 
-  g_strfreev (envp);
+  xstrfreev (envp);
   g_free (here);
   g_free (subdir);
   g_free (out);
   g_free (err);
-  g_ptr_array_unref (argv);
+  xptr_array_unref (argv);
 }
 
 static void
 test_search_path_from_envp (void)
 {
-  GPtrArray *argv = g_ptr_array_new_with_free_func (g_free);
+  xptr_array_t *argv = xptr_array_new_with_free_func (g_free);
   xchar_t *here = g_test_build_filename (G_TEST_BUILT, ".", NULL);
   xchar_t *subdir = g_test_build_filename (G_TEST_BUILT, "path-test-subdir", NULL);
   xchar_t **envp = g_get_environ ();
@@ -165,14 +165,14 @@ test_search_path_from_envp (void)
 
   envp = g_environ_setenv (envp, "PATH", here, TRUE);
 
-  g_ptr_array_add (argv,
+  xptr_array_add (argv,
                    g_test_build_filename (G_TEST_BUILT, "spawn-path-search-helper", NULL));
-  g_ptr_array_add (argv, g_strdup ("--search-path-from-envp"));
-  g_ptr_array_add (argv, g_strdup ("--set-path-in-envp"));
-  g_ptr_array_add (argv, g_strdup (subdir));
-  g_ptr_array_add (argv, g_strdup ("--"));
-  g_ptr_array_add (argv, g_strdup ("spawn-test-helper"));
-  g_ptr_array_add (argv, NULL);
+  xptr_array_add (argv, xstrdup ("--search-path-from-envp"));
+  xptr_array_add (argv, xstrdup ("--set-path-in-envp"));
+  xptr_array_add (argv, xstrdup (subdir));
+  xptr_array_add (argv, xstrdup ("--"));
+  xptr_array_add (argv, xstrdup ("spawn-test-helper"));
+  xptr_array_add (argv, NULL);
 
   g_spawn_sync (here,
                 (char **) argv->pdata,
@@ -195,18 +195,18 @@ test_search_path_from_envp (void)
   g_assert_cmpint (WEXITSTATUS (wait_status), ==, 5);
 #endif
 
-  g_strfreev (envp);
+  xstrfreev (envp);
   g_free (here);
   g_free (subdir);
   g_free (out);
   g_free (err);
-  g_ptr_array_unref (argv);
+  xptr_array_unref (argv);
 }
 
 static void
 test_search_path_ambiguous (void)
 {
-  GPtrArray *argv = g_ptr_array_new_with_free_func (g_free);
+  xptr_array_t *argv = xptr_array_new_with_free_func (g_free);
   xchar_t *here = g_test_build_filename (G_TEST_BUILT, ".", NULL);
   xchar_t *subdir = g_test_build_filename (G_TEST_BUILT, "path-test-subdir", NULL);
   xchar_t **envp = g_get_environ ();
@@ -223,15 +223,15 @@ test_search_path_ambiguous (void)
 
   envp = g_environ_setenv (envp, "PATH", here, TRUE);
 
-  g_ptr_array_add (argv,
+  xptr_array_add (argv,
                    g_test_build_filename (G_TEST_BUILT, "spawn-path-search-helper", NULL));
-  g_ptr_array_add (argv, g_strdup ("--search-path"));
-  g_ptr_array_add (argv, g_strdup ("--search-path-from-envp"));
-  g_ptr_array_add (argv, g_strdup ("--set-path-in-envp"));
-  g_ptr_array_add (argv, g_strdup (subdir));
-  g_ptr_array_add (argv, g_strdup ("--"));
-  g_ptr_array_add (argv, g_strdup ("spawn-test-helper"));
-  g_ptr_array_add (argv, NULL);
+  xptr_array_add (argv, xstrdup ("--search-path"));
+  xptr_array_add (argv, xstrdup ("--search-path-from-envp"));
+  xptr_array_add (argv, xstrdup ("--set-path-in-envp"));
+  xptr_array_add (argv, xstrdup (subdir));
+  xptr_array_add (argv, xstrdup ("--"));
+  xptr_array_add (argv, xstrdup ("spawn-test-helper"));
+  xptr_array_add (argv, NULL);
 
   g_spawn_sync (here,
                 (char **) argv->pdata,
@@ -254,18 +254,18 @@ test_search_path_ambiguous (void)
   g_assert_cmpint (WEXITSTATUS (wait_status), ==, 5);
 #endif
 
-  g_strfreev (envp);
+  xstrfreev (envp);
   g_free (here);
   g_free (subdir);
   g_free (out);
   g_free (err);
-  g_ptr_array_unref (argv);
+  xptr_array_unref (argv);
 }
 
 static void
 test_search_path_fallback_in_environ (void)
 {
-  GPtrArray *argv = g_ptr_array_new_with_free_func (g_free);
+  xptr_array_t *argv = xptr_array_new_with_free_func (g_free);
   xchar_t *here = g_test_build_filename (G_TEST_BUILT, ".", NULL);
   xchar_t *subdir = g_test_build_filename (G_TEST_BUILT, "path-test-subdir", NULL);
   xchar_t **envp = g_get_environ ();
@@ -282,8 +282,8 @@ test_search_path_fallback_in_environ (void)
   /* We can't make a meaningful assertion about what the fallback *is*,
    * but we can assert that it *includes* the current working directory. */
 
-  if (g_file_test ("/usr/bin/spawn-test-helper", G_FILE_TEST_IS_EXECUTABLE) ||
-      g_file_test ("/bin/spawn-test-helper", G_FILE_TEST_IS_EXECUTABLE))
+  if (xfile_test ("/usr/bin/spawn-test-helper", XFILE_TEST_IS_EXECUTABLE) ||
+      xfile_test ("/bin/spawn-test-helper", XFILE_TEST_IS_EXECUTABLE))
     {
       g_test_skip ("Not testing fallback with unknown spawn-test-helper "
                    "executable in /usr/bin:/bin");
@@ -292,14 +292,14 @@ test_search_path_fallback_in_environ (void)
 
   envp = g_environ_unsetenv (envp, "PATH");
 
-  g_ptr_array_add (argv,
+  xptr_array_add (argv,
                    g_test_build_filename (G_TEST_BUILT, "spawn-path-search-helper", NULL));
-  g_ptr_array_add (argv, g_strdup ("--search-path"));
-  g_ptr_array_add (argv, g_strdup ("--set-path-in-envp"));
-  g_ptr_array_add (argv, g_strdup (subdir));
-  g_ptr_array_add (argv, g_strdup ("--"));
-  g_ptr_array_add (argv, g_strdup ("spawn-test-helper"));
-  g_ptr_array_add (argv, NULL);
+  xptr_array_add (argv, xstrdup ("--search-path"));
+  xptr_array_add (argv, xstrdup ("--set-path-in-envp"));
+  xptr_array_add (argv, xstrdup (subdir));
+  xptr_array_add (argv, xstrdup ("--"));
+  xptr_array_add (argv, xstrdup ("spawn-test-helper"));
+  xptr_array_add (argv, NULL);
 
   g_spawn_sync (here,
                 (char **) argv->pdata,
@@ -322,18 +322,18 @@ test_search_path_fallback_in_environ (void)
   g_assert_cmpint (WEXITSTATUS (wait_status), ==, 0);
 #endif
 
-  g_strfreev (envp);
+  xstrfreev (envp);
   g_free (here);
   g_free (subdir);
   g_free (out);
   g_free (err);
-  g_ptr_array_unref (argv);
+  xptr_array_unref (argv);
 }
 
 static void
 test_search_path_fallback_in_envp (void)
 {
-  GPtrArray *argv = g_ptr_array_new_with_free_func (g_free);
+  xptr_array_t *argv = xptr_array_new_with_free_func (g_free);
   xchar_t *here = g_test_build_filename (G_TEST_BUILT, ".", NULL);
   xchar_t *subdir = g_test_build_filename (G_TEST_BUILT, "path-test-subdir", NULL);
   xchar_t **envp = g_get_environ ();
@@ -349,8 +349,8 @@ test_search_path_fallback_in_envp (void)
   if (skip_win32 ())
     return;
 
-  if (g_file_test ("/usr/bin/spawn-test-helper", G_FILE_TEST_IS_EXECUTABLE) ||
-      g_file_test ("/bin/spawn-test-helper", G_FILE_TEST_IS_EXECUTABLE))
+  if (xfile_test ("/usr/bin/spawn-test-helper", XFILE_TEST_IS_EXECUTABLE) ||
+      xfile_test ("/bin/spawn-test-helper", XFILE_TEST_IS_EXECUTABLE))
     {
       g_test_skip ("Not testing fallback with unknown spawn-test-helper "
                    "executable in /usr/bin:/bin");
@@ -359,13 +359,13 @@ test_search_path_fallback_in_envp (void)
 
   envp = g_environ_setenv (envp, "PATH", subdir, TRUE);
 
-  g_ptr_array_add (argv,
+  xptr_array_add (argv,
                    g_test_build_filename (G_TEST_BUILT, "spawn-path-search-helper", NULL));
-  g_ptr_array_add (argv, g_strdup ("--search-path-from-envp"));
-  g_ptr_array_add (argv, g_strdup ("--unset-path-in-envp"));
-  g_ptr_array_add (argv, g_strdup ("--"));
-  g_ptr_array_add (argv, g_strdup ("spawn-test-helper"));
-  g_ptr_array_add (argv, NULL);
+  xptr_array_add (argv, xstrdup ("--search-path-from-envp"));
+  xptr_array_add (argv, xstrdup ("--unset-path-in-envp"));
+  xptr_array_add (argv, xstrdup ("--"));
+  xptr_array_add (argv, xstrdup ("spawn-test-helper"));
+  xptr_array_add (argv, NULL);
 
   g_spawn_sync (here,
                 (char **) argv->pdata,
@@ -388,18 +388,18 @@ test_search_path_fallback_in_envp (void)
   g_assert_cmpint (WEXITSTATUS (wait_status), ==, 0);
 #endif
 
-  g_strfreev (envp);
+  xstrfreev (envp);
   g_free (here);
   g_free (subdir);
   g_free (out);
   g_free (err);
-  g_ptr_array_unref (argv);
+  xptr_array_unref (argv);
 }
 
 static void
 test_search_path_heap_allocation (void)
 {
-  GPtrArray *argv = g_ptr_array_new_with_free_func (g_free);
+  xptr_array_t *argv = xptr_array_new_with_free_func (g_free);
   /* Must be longer than the arbitrary 4000 byte limit for stack allocation
    * in gspawn.c */
   char placeholder[4096];
@@ -420,24 +420,24 @@ test_search_path_heap_allocation (void)
   memset (placeholder, '_', sizeof (placeholder));
   /* Force search_path_buffer to be heap-allocated */
   long_dir = g_test_build_filename (G_TEST_BUILT, "path-test-subdir", placeholder, NULL);
-  long_path = g_strjoin (G_SEARCHPATH_SEPARATOR_S, subdir, long_dir, NULL);
+  long_path = xstrjoin (G_SEARCHPATH_SEPARATOR_S, subdir, long_dir, NULL);
   envp = g_environ_setenv (envp, "PATH", long_path, TRUE);
   g_free (long_path);
   g_free (long_dir);
 
-  g_ptr_array_add (argv,
+  xptr_array_add (argv,
                    g_test_build_filename (G_TEST_BUILT, "spawn-path-search-helper", NULL));
-  g_ptr_array_add (argv, g_strdup ("--search-path"));
-  g_ptr_array_add (argv, g_strdup ("--"));
-  g_ptr_array_add (argv, g_strdup ("spawn-test-helper"));
+  xptr_array_add (argv, xstrdup ("--search-path"));
+  xptr_array_add (argv, xstrdup ("--"));
+  xptr_array_add (argv, xstrdup ("spawn-test-helper"));
 
   /* Add enough arguments to make argv longer than the arbitrary 4000 byte
    * limit for stack allocation in gspawn.c.
    * This assumes sizeof (char *) >= 4. */
   for (i = 0; i < 1001; i++)
-    g_ptr_array_add (argv, g_strdup ("_"));
+    xptr_array_add (argv, xstrdup ("_"));
 
-  g_ptr_array_add (argv, NULL);
+  xptr_array_add (argv, NULL);
 
   g_spawn_sync (here,
                 (char **) argv->pdata,
@@ -460,12 +460,12 @@ test_search_path_heap_allocation (void)
   g_assert_cmpint (WEXITSTATUS (wait_status), ==, 5);
 #endif
 
-  g_strfreev (envp);
+  xstrfreev (envp);
   g_free (here);
   g_free (subdir);
   g_free (out);
   g_free (err);
-  g_ptr_array_unref (argv);
+  xptr_array_unref (argv);
 }
 
 int

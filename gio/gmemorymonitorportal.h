@@ -23,8 +23,8 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_MEMORY_MONITOR_PORTAL         (g_memory_monitor_portal_get_type ())
-G_DECLARE_FINAL_TYPE (GMemoryMonitorPortal, g_memory_monitor_portal, G, MEMORY_MONITOR_PORTAL, xobject_t)
+#define XTYPE_MEMORY_MONITOR_PORTAL         (xmemory_monitor_portal_get_type ())
+G_DECLARE_FINAL_TYPE (GMemoryMonitorPortal, xmemory_monitor_portal, G, MEMORY_MONITOR_PORTAL, xobject_t)
 
 G_END_DECLS
 

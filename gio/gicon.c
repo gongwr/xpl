@@ -36,7 +36,7 @@
 
 
 /* There versioning of this is implicit, version 1 would be ".1 " */
-#define G_ICON_SERIALIZATION_MAGIC0 ". "
+#define XICON_SERIALIZATION_MAGIC0 ". "
 
 /**
  * SECTION:gicon
@@ -49,62 +49,62 @@
  *
  * #xicon_t does not provide the actual pixmap for the icon as this is out
  * of GIO's scope, however implementations of #xicon_t may contain the name
- * of an icon (see #GThemedIcon), or the path to an icon (see #GLoadableIcon).
+ * of an icon (see #xthemed_icon_t), or the path to an icon (see #xloadable_icon_t).
  *
- * To obtain a hash of a #xicon_t, see g_icon_hash().
+ * To obtain a hash of a #xicon_t, see xicon_hash().
  *
- * To check if two #GIcons are equal, see g_icon_equal().
+ * To check if two #GIcons are equal, see xicon_equal().
  *
- * For serializing a #xicon_t, use g_icon_serialize() and
- * g_icon_deserialize().
+ * For serializing a #xicon_t, use xicon_serialize() and
+ * xicon_deserialize().
  *
  * If you want to consume #xicon_t (for example, in a toolkit) you must
  * be prepared to handle at least the three following cases:
- * #GLoadableIcon, #GThemedIcon and #GEmblemedIcon.  It may also make
+ * #xloadable_icon_t, #xthemed_icon_t and #xemblemed_icon_t.  It may also make
  * sense to have fast-paths for other cases (like handling #GdkPixbuf
  * directly, for example) but all compliant #xicon_t implementations
- * outside of GIO must implement #GLoadableIcon.
+ * outside of GIO must implement #xloadable_icon_t.
  *
  * If your application or library provides one or more #xicon_t
  * implementations you need to ensure that your new implementation also
- * implements #GLoadableIcon.  Additionally, you must provide an
- * implementation of g_icon_serialize() that gives a result that is
- * understood by g_icon_deserialize(), yielding one of the built-in icon
+ * implements #xloadable_icon_t.  Additionally, you must provide an
+ * implementation of xicon_serialize() that gives a result that is
+ * understood by xicon_deserialize(), yielding one of the built-in icon
  * types.
  **/
 
-typedef GIconIface GIconInterface;
-G_DEFINE_INTERFACE(xicon_t, g_icon, XTYPE_OBJECT)
+typedef xicon_iface_t GIconInterface;
+G_DEFINE_INTERFACE(xicon_t, xicon, XTYPE_OBJECT)
 
 static void
-g_icon_default_init (GIconInterface *iface)
+xicon_default_init (GIconInterface *iface)
 {
 }
 
 /**
- * g_icon_hash:
- * @icon: (not nullable): #gconstpointer to an icon object.
+ * xicon_hash:
+ * @icon: (not nullable): #xconstpointer to an icon object.
  *
  * Gets a hash for an icon.
  *
  * Virtual: hash
  * Returns: a #xuint_t containing a hash for the @icon, suitable for
- * use in a #GHashTable or similar data structure.
+ * use in a #xhashtable_t or similar data structure.
  **/
 xuint_t
-g_icon_hash (gconstpointer icon)
+xicon_hash (xconstpointer icon)
 {
-  GIconIface *iface;
+  xicon_iface_t *iface;
 
   g_return_val_if_fail (X_IS_ICON (icon), 0);
 
-  iface = G_ICON_GET_IFACE (icon);
+  iface = XICON_GET_IFACE (icon);
 
   return (* iface->hash) ((xicon_t *)icon);
 }
 
 /**
- * g_icon_equal:
+ * xicon_equal:
  * @icon1: (nullable): pointer to the first #xicon_t.
  * @icon2: (nullable): pointer to the second #xicon_t.
  *
@@ -113,10 +113,10 @@ g_icon_hash (gconstpointer icon)
  * Returns: %TRUE if @icon1 is equal to @icon2. %FALSE otherwise.
  **/
 xboolean_t
-g_icon_equal (xicon_t *icon1,
+xicon_equal (xicon_t *icon1,
 	      xicon_t *icon2)
 {
-  GIconIface *iface;
+  xicon_iface_t *iface;
 
   if (icon1 == NULL && icon2 == NULL)
     return TRUE;
@@ -127,30 +127,30 @@ g_icon_equal (xicon_t *icon1,
   if (XTYPE_FROM_INSTANCE (icon1) != XTYPE_FROM_INSTANCE (icon2))
     return FALSE;
 
-  iface = G_ICON_GET_IFACE (icon1);
+  iface = XICON_GET_IFACE (icon1);
 
   return (* iface->equal) (icon1, icon2);
 }
 
 static xboolean_t
-g_icon_to_string_tokenized (xicon_t *icon, GString *s)
+xicon_to_string_tokenized (xicon_t *icon, xstring_t *s)
 {
-  GPtrArray *tokens;
+  xptr_array_t *tokens;
   xint_t version;
-  GIconIface *icon_iface;
+  xicon_iface_t *icon_iface;
   xuint_t i;
 
   g_return_val_if_fail (icon != NULL, FALSE);
   g_return_val_if_fail (X_IS_ICON (icon), FALSE);
 
-  icon_iface = G_ICON_GET_IFACE (icon);
+  icon_iface = XICON_GET_IFACE (icon);
   if (icon_iface->to_tokens == NULL)
     return FALSE;
 
-  tokens = g_ptr_array_new ();
+  tokens = xptr_array_new ();
   if (!icon_iface->to_tokens (icon, tokens, &version))
     {
-      g_ptr_array_free (tokens, TRUE);
+      xptr_array_free (tokens, TRUE);
       return FALSE;
     }
 
@@ -158,48 +158,48 @@ g_icon_to_string_tokenized (xicon_t *icon, GString *s)
      version 0 is implicit and can be omitted
      all the tokens are url escaped to ensure they have no spaces in them */
 
-  g_string_append (s, g_type_name_from_instance ((GTypeInstance *)icon));
+  xstring_append (s, xtype_name_from_instance ((GTypeInstance *)icon));
   if (version != 0)
-    g_string_append_printf (s, ".%d", version);
+    xstring_append_printf (s, ".%d", version);
 
   for (i = 0; i < tokens->len; i++)
     {
       char *token;
 
-      token = g_ptr_array_index (tokens, i);
+      token = xptr_array_index (tokens, i);
 
-      g_string_append_c (s, ' ');
+      xstring_append_c (s, ' ');
       /* We really only need to escape spaces here, so allow lots of otherwise reserved chars */
-      g_string_append_uri_escaped (s, token,
-				   G_URI_RESERVED_CHARS_ALLOWED_IN_PATH, TRUE);
+      xstring_append_uri_escaped (s, token,
+				   XURI_RESERVED_CHARS_ALLOWED_IN_PATH, TRUE);
 
       g_free (token);
     }
 
-  g_ptr_array_free (tokens, TRUE);
+  xptr_array_free (tokens, TRUE);
 
   return TRUE;
 }
 
 /**
- * g_icon_to_string:
+ * xicon_to_string:
  * @icon: a #xicon_t.
  *
  * Generates a textual representation of @icon that can be used for
  * serialization such as when passing @icon to a different process or
- * saving it to persistent storage. Use g_icon_new_for_string() to
+ * saving it to persistent storage. Use xicon_new_for_string() to
  * get @icon back from the returned string.
  *
  * The encoding of the returned string is proprietary to #xicon_t except
  * in the following two cases
  *
- * - If @icon is a #GFileIcon, the returned string is a native path
+ * - If @icon is a #xfile_icon_t, the returned string is a native path
  *   (such as `/path/to/my icon.png`) without escaping
  *   if the #xfile_t for @icon is a native file.  If the file is not
- *   native, the returned string is the result of g_file_get_uri()
+ *   native, the returned string is the result of xfile_get_uri()
  *   (such as `sftp://path/to/my%20icon.png`).
  *
- * - If @icon is a #GThemedIcon with exactly one name and no fallbacks,
+ * - If @icon is a #xthemed_icon_t with exactly one name and no fallbacks,
  *   the encoding is simply the name (such as `network-server`).
  *
  * Virtual: to_tokens
@@ -209,7 +209,7 @@ g_icon_to_string_tokenized (xicon_t *icon, GString *s)
  * Since: 2.20
  */
 xchar_t *
-g_icon_to_string (xicon_t *icon)
+xicon_to_string (xicon_t *icon)
 {
   xchar_t *ret;
 
@@ -222,64 +222,64 @@ g_icon_to_string (xicon_t *icon)
     {
       xfile_t *file;
 
-      file = g_file_icon_get_file (G_FILE_ICON (icon));
-      if (g_file_is_native (file))
+      file = xfile_icon_get_file (XFILE_ICON (icon));
+      if (xfile_is_native (file))
 	{
-	  ret = g_file_get_path (file);
-	  if (!g_utf8_validate (ret, -1, NULL))
+	  ret = xfile_get_path (file);
+	  if (!xutf8_validate (ret, -1, NULL))
 	    {
 	      g_free (ret);
 	      ret = NULL;
 	    }
 	}
       else
-        ret = g_file_get_uri (file);
+        ret = xfile_get_uri (file);
     }
   else if (X_IS_THEMED_ICON (icon))
     {
       char     **names                 = NULL;
       xboolean_t   use_default_fallbacks = FALSE;
 
-      g_object_get (G_OBJECT (icon),
+      xobject_get (G_OBJECT (icon),
                     "names",                 &names,
                     "use-default-fallbacks", &use_default_fallbacks,
                     NULL);
       /* Themed icon initialized with a single name and no fallbacks. */
       if (names != NULL &&
 	  names[0] != NULL &&
-	  names[0][0] != '.' && /* Allowing icons starting with dot would break G_ICON_SERIALIZATION_MAGIC0 */
-	  g_utf8_validate (names[0], -1, NULL) && /* Only return utf8 strings */
+	  names[0][0] != '.' && /* Allowing icons starting with dot would break XICON_SERIALIZATION_MAGIC0 */
+	  xutf8_validate (names[0], -1, NULL) && /* Only return utf8 strings */
           names[1] == NULL &&
           ! use_default_fallbacks)
-	ret = g_strdup (names[0]);
+	ret = xstrdup (names[0]);
 
-      g_strfreev (names);
+      xstrfreev (names);
     }
 
   if (ret == NULL)
     {
-      GString *s;
+      xstring_t *s;
 
-      s = g_string_new (G_ICON_SERIALIZATION_MAGIC0);
+      s = xstring_new (XICON_SERIALIZATION_MAGIC0);
 
-      if (g_icon_to_string_tokenized (icon, s))
-	ret = g_string_free (s, FALSE);
+      if (xicon_to_string_tokenized (icon, s))
+	ret = xstring_free (s, FALSE);
       else
-	g_string_free (s, TRUE);
+	xstring_free (s, TRUE);
     }
 
   return ret;
 }
 
 static xicon_t *
-g_icon_new_from_tokens (char   **tokens,
+xicon_new_from_tokens (char   **tokens,
 			xerror_t **error)
 {
   xicon_t *icon;
   char *typename, *version_str;
   xtype_t type;
   xpointer_t klass;
-  GIconIface *icon_iface;
+  xicon_iface_t *icon_iface;
   xint_t version;
   char *endp;
   int num_tokens;
@@ -288,7 +288,7 @@ g_icon_new_from_tokens (char   **tokens,
   icon = NULL;
   klass = NULL;
 
-  num_tokens = g_strv_length (tokens);
+  num_tokens = xstrv_length (tokens);
 
   if (num_tokens < 1)
     {
@@ -309,7 +309,7 @@ g_icon_new_from_tokens (char   **tokens,
     }
 
 
-  type = g_type_from_name (tokens[0]);
+  type = xtype_from_name (tokens[0]);
   if (type == 0)
     {
       g_set_error (error,
@@ -320,7 +320,7 @@ g_icon_new_from_tokens (char   **tokens,
       goto out;
     }
 
-  if (!g_type_is_a (type, XTYPE_ICON))
+  if (!xtype_is_a (type, XTYPE_ICON))
     {
       g_set_error (error,
                    G_IO_ERROR,
@@ -330,7 +330,7 @@ g_icon_new_from_tokens (char   **tokens,
       goto out;
     }
 
-  klass = g_type_class_ref (type);
+  klass = xtype_class_ref (type);
   if (klass == NULL)
     {
       g_set_error (error,
@@ -356,7 +356,7 @@ g_icon_new_from_tokens (char   **tokens,
 	}
     }
 
-  icon_iface = g_type_interface_peek (klass, XTYPE_ICON);
+  icon_iface = xtype_interface_peek (klass, XTYPE_ICON);
   g_assert (icon_iface != NULL);
 
   if (icon_iface->from_tokens == NULL)
@@ -374,7 +374,7 @@ g_icon_new_from_tokens (char   **tokens,
       char *escaped;
 
       escaped = tokens[i];
-      tokens[i] = g_uri_unescape_string (escaped, NULL);
+      tokens[i] = xuri_unescape_string (escaped, NULL);
       g_free (escaped);
     }
 
@@ -382,22 +382,22 @@ g_icon_new_from_tokens (char   **tokens,
 
  out:
   if (klass != NULL)
-    g_type_class_unref (klass);
+    xtype_class_unref (klass);
   return icon;
 }
 
 static void
 ensure_builtin_icon_types (void)
 {
-  g_type_ensure (XTYPE_THEMED_ICON);
-  g_type_ensure (XTYPE_FILE_ICON);
-  g_type_ensure (XTYPE_EMBLEMED_ICON);
-  g_type_ensure (XTYPE_EMBLEM);
+  xtype_ensure (XTYPE_THEMED_ICON);
+  xtype_ensure (XTYPE_FILE_ICON);
+  xtype_ensure (XTYPE_EMBLEMED_ICON);
+  xtype_ensure (XTYPE_EMBLEM);
 }
 
-/* handles the 'simple' cases: GFileIcon and GThemedIcon */
+/* handles the 'simple' cases: xfile_icon_t and xthemed_icon_t */
 static xicon_t *
-g_icon_new_for_string_simple (const xchar_t *str)
+xicon_new_for_string_simple (const xchar_t *str)
 {
   xchar_t *scheme;
   xicon_t *icon;
@@ -405,14 +405,14 @@ g_icon_new_for_string_simple (const xchar_t *str)
   if (str[0] == '.')
     return NULL;
 
-  /* handle special GFileIcon and GThemedIcon cases */
-  scheme = g_uri_parse_scheme (str);
+  /* handle special xfile_icon_t and xthemed_icon_t cases */
+  scheme = xuri_parse_scheme (str);
   if (scheme != NULL || str[0] == '/' || str[0] == G_DIR_SEPARATOR)
     {
       xfile_t *location;
-      location = g_file_new_for_commandline_arg (str);
-      icon = g_file_icon_new (location);
-      g_object_unref (location);
+      location = xfile_new_for_commandline_arg (str);
+      icon = xfile_icon_new (location);
+      xobject_unref (location);
     }
   else
     icon = g_themed_icon_new (str);
@@ -423,16 +423,16 @@ g_icon_new_for_string_simple (const xchar_t *str)
 }
 
 /**
- * g_icon_new_for_string:
- * @str: A string obtained via g_icon_to_string().
+ * xicon_new_for_string:
+ * @str: A string obtained via xicon_to_string().
  * @error: Return location for error.
  *
  * Generate a #xicon_t instance from @str. This function can fail if
- * @str is not valid - see g_icon_to_string() for discussion.
+ * @str is not valid - see xicon_to_string() for discussion.
  *
  * If your application or library provides one or more #xicon_t
  * implementations you need to ensure that each #xtype_t is registered
- * with the type system prior to calling g_icon_new_for_string().
+ * with the type system prior to calling xicon_new_for_string().
  *
  * Returns: (transfer full): An object implementing the #xicon_t
  *          interface or %NULL if @error is set.
@@ -440,27 +440,27 @@ g_icon_new_for_string_simple (const xchar_t *str)
  * Since: 2.20
  **/
 xicon_t *
-g_icon_new_for_string (const xchar_t   *str,
+xicon_new_for_string (const xchar_t   *str,
                        xerror_t       **error)
 {
   xicon_t *icon = NULL;
 
   g_return_val_if_fail (str != NULL, NULL);
 
-  icon = g_icon_new_for_string_simple (str);
+  icon = xicon_new_for_string_simple (str);
   if (icon)
     return icon;
 
   ensure_builtin_icon_types ();
 
-  if (g_str_has_prefix (str, G_ICON_SERIALIZATION_MAGIC0))
+  if (xstr_has_prefix (str, XICON_SERIALIZATION_MAGIC0))
     {
       xchar_t **tokens;
 
       /* handle tokenized encoding */
-      tokens = g_strsplit (str + sizeof (G_ICON_SERIALIZATION_MAGIC0) - 1, " ", 0);
-      icon = g_icon_new_from_tokens (tokens, error);
-      g_strfreev (tokens);
+      tokens = xstrsplit (str + sizeof (XICON_SERIALIZATION_MAGIC0) - 1, " ", 0);
+      icon = xicon_new_from_tokens (tokens, error);
+      xstrfreev (tokens);
     }
   else
     g_set_error_literal (error,
@@ -471,58 +471,58 @@ g_icon_new_for_string (const xchar_t   *str,
   return icon;
 }
 
-static GEmblem *
-g_icon_deserialize_emblem (xvariant_t *value)
+static xemblem_t *
+xicon_deserialize_emblem (xvariant_t *value)
 {
   xvariant_t *emblem_metadata;
   xvariant_t *emblem_data;
   const xchar_t *origin_nick;
   xicon_t *emblem_icon;
-  GEmblem *emblem;
+  xemblem_t *emblem;
 
-  g_variant_get (value, "(v@a{sv})", &emblem_data, &emblem_metadata);
+  xvariant_get (value, "(v@a{sv})", &emblem_data, &emblem_metadata);
 
   emblem = NULL;
 
-  emblem_icon = g_icon_deserialize (emblem_data);
+  emblem_icon = xicon_deserialize (emblem_data);
   if (emblem_icon != NULL)
     {
       /* Check if we should create it with an origin. */
-      if (g_variant_lookup (emblem_metadata, "origin", "&s", &origin_nick))
+      if (xvariant_lookup (emblem_metadata, "origin", "&s", &origin_nick))
         {
-          GEnumClass *origin_class;
-          GEnumValue *origin_value;
+          xenum_class_t *origin_class;
+          xenum_value_t *origin_value;
 
-          origin_class = g_type_class_ref (XTYPE_EMBLEM_ORIGIN);
-          origin_value = g_enum_get_value_by_nick (origin_class, origin_nick);
+          origin_class = xtype_class_ref (XTYPE_EMBLEM_ORIGIN);
+          origin_value = xenum_get_value_by_nick (origin_class, origin_nick);
           if (origin_value)
-            emblem = g_emblem_new_with_origin (emblem_icon, origin_value->value);
-          g_type_class_unref (origin_class);
+            emblem = xemblem_new_with_origin (emblem_icon, origin_value->value);
+          xtype_class_unref (origin_class);
         }
 
       /* We didn't create it with an origin, so do it without. */
       if (emblem == NULL)
-        emblem = g_emblem_new (emblem_icon);
+        emblem = xemblem_new (emblem_icon);
 
-      g_object_unref (emblem_icon);
+      xobject_unref (emblem_icon);
     }
 
-  g_variant_unref (emblem_metadata);
-  g_variant_unref (emblem_data);
+  xvariant_unref (emblem_metadata);
+  xvariant_unref (emblem_data);
 
   return emblem;
 }
 
 static xicon_t *
-g_icon_deserialize_emblemed (xvariant_t *value)
+xicon_deserialize_emblemed (xvariant_t *value)
 {
-  GVariantIter *emblems;
+  xvariant_iter_t *emblems;
   xvariant_t *icon_data;
   xicon_t *main_icon;
   xicon_t *icon;
 
-  g_variant_get (value, "(va(va{sv}))", &icon_data, &emblems);
-  main_icon = g_icon_deserialize (icon_data);
+  xvariant_get (value, "(va(va{sv}))", &icon_data, &emblems);
+  main_icon = xicon_deserialize (icon_data);
 
   if (main_icon)
     {
@@ -530,125 +530,125 @@ g_icon_deserialize_emblemed (xvariant_t *value)
 
       icon = g_emblemed_icon_new (main_icon, NULL);
 
-      while ((emblem_data = g_variant_iter_next_value (emblems)))
+      while ((emblem_data = xvariant_iter_next_value (emblems)))
         {
-          GEmblem *emblem;
+          xemblem_t *emblem;
 
-          emblem = g_icon_deserialize_emblem (emblem_data);
+          emblem = xicon_deserialize_emblem (emblem_data);
 
           if (emblem)
             {
               g_emblemed_icon_add_emblem (G_EMBLEMED_ICON (icon), emblem);
-              g_object_unref (emblem);
+              xobject_unref (emblem);
             }
 
-          g_variant_unref (emblem_data);
+          xvariant_unref (emblem_data);
         }
 
-      g_object_unref (main_icon);
+      xobject_unref (main_icon);
     }
   else
     icon = NULL;
 
-  g_variant_iter_free (emblems);
-  g_variant_unref (icon_data);
+  xvariant_iter_free (emblems);
+  xvariant_unref (icon_data);
 
   return icon;
 }
 
 /**
- * g_icon_deserialize:
- * @value: (transfer none): a #xvariant_t created with g_icon_serialize()
+ * xicon_deserialize:
+ * @value: (transfer none): a #xvariant_t created with xicon_serialize()
  *
- * Deserializes a #xicon_t previously serialized using g_icon_serialize().
+ * Deserializes a #xicon_t previously serialized using xicon_serialize().
  *
  * Returns: (nullable) (transfer full): a #xicon_t, or %NULL when deserialization fails.
  *
  * Since: 2.38
  */
 xicon_t *
-g_icon_deserialize (xvariant_t *value)
+xicon_deserialize (xvariant_t *value)
 {
   const xchar_t *tag;
   xvariant_t *val;
   xicon_t *icon;
 
   g_return_val_if_fail (value != NULL, NULL);
-  g_return_val_if_fail (g_variant_is_of_type (value, G_VARIANT_TYPE_STRING) ||
-                        g_variant_is_of_type (value, G_VARIANT_TYPE ("(sv)")), NULL);
+  g_return_val_if_fail (xvariant_is_of_type (value, G_VARIANT_TYPE_STRING) ||
+                        xvariant_is_of_type (value, G_VARIANT_TYPE ("(sv)")), NULL);
 
   /* Handle some special cases directly so that people can hard-code
-   * stuff into GMenuModel xml files without resorting to using xvariant_t
+   * stuff into xmenu_model_t xml files without resorting to using xvariant_t
    * text format to describe one of the explicitly-tagged possibilities
    * below.
    */
-  if (g_variant_is_of_type (value, G_VARIANT_TYPE_STRING))
-    return g_icon_new_for_string_simple (g_variant_get_string (value, NULL));
+  if (xvariant_is_of_type (value, G_VARIANT_TYPE_STRING))
+    return xicon_new_for_string_simple (xvariant_get_string (value, NULL));
 
   /* Otherwise, use the tagged union format */
-  g_variant_get (value, "(&sv)", &tag, &val);
+  xvariant_get (value, "(&sv)", &tag, &val);
 
   icon = NULL;
 
-  if (g_str_equal (tag, "file") && g_variant_is_of_type (val, G_VARIANT_TYPE_STRING))
+  if (xstr_equal (tag, "file") && xvariant_is_of_type (val, G_VARIANT_TYPE_STRING))
     {
       xfile_t *file;
 
-      file = g_file_new_for_commandline_arg (g_variant_get_string (val, NULL));
-      icon = g_file_icon_new (file);
-      g_object_unref (file);
+      file = xfile_new_for_commandline_arg (xvariant_get_string (val, NULL));
+      icon = xfile_icon_new (file);
+      xobject_unref (file);
     }
-  else if (g_str_equal (tag, "themed") && g_variant_is_of_type (val, G_VARIANT_TYPE_STRING_ARRAY))
+  else if (xstr_equal (tag, "themed") && xvariant_is_of_type (val, G_VARIANT_TYPE_STRING_ARRAY))
     {
       const xchar_t **names;
       xsize_t size;
 
-      names = g_variant_get_strv (val, &size);
+      names = xvariant_get_strv (val, &size);
       icon = g_themed_icon_new_from_names ((xchar_t **) names, size);
       g_free (names);
     }
-  else if (g_str_equal (tag, "bytes") && g_variant_is_of_type (val, G_VARIANT_TYPE_BYTESTRING))
+  else if (xstr_equal (tag, "bytes") && xvariant_is_of_type (val, G_VARIANT_TYPE_BYTESTRING))
     {
-      GBytes *bytes;
+      xbytes_t *bytes;
 
-      bytes = g_variant_get_data_as_bytes (val);
-      icon = g_bytes_icon_new (bytes);
-      g_bytes_unref (bytes);
+      bytes = xvariant_get_data_as_bytes (val);
+      icon = xbytes_icon_new (bytes);
+      xbytes_unref (bytes);
     }
-  else if (g_str_equal (tag, "emblem") && g_variant_is_of_type (val, G_VARIANT_TYPE ("(va{sv})")))
+  else if (xstr_equal (tag, "emblem") && xvariant_is_of_type (val, G_VARIANT_TYPE ("(va{sv})")))
     {
-      GEmblem *emblem;
+      xemblem_t *emblem;
 
-      emblem = g_icon_deserialize_emblem (val);
+      emblem = xicon_deserialize_emblem (val);
       if (emblem)
-        icon = G_ICON (emblem);
+        icon = XICON (emblem);
     }
-  else if (g_str_equal (tag, "emblemed") && g_variant_is_of_type (val, G_VARIANT_TYPE ("(va(va{sv}))")))
+  else if (xstr_equal (tag, "emblemed") && xvariant_is_of_type (val, G_VARIANT_TYPE ("(va(va{sv}))")))
     {
-      icon = g_icon_deserialize_emblemed (val);
+      icon = xicon_deserialize_emblemed (val);
     }
-  else if (g_str_equal (tag, "gvfs"))
+  else if (xstr_equal (tag, "gvfs"))
     {
-      GVfsClass *class;
-      GVfs *vfs;
+      xvfs_class_t *class;
+      xvfs_t *vfs;
 
-      vfs = g_vfs_get_default ();
-      class = G_VFS_GET_CLASS (vfs);
+      vfs = xvfs_get_default ();
+      class = XVFS_GET_CLASS (vfs);
       if (class->deserialize_icon)
         icon = (* class->deserialize_icon) (vfs, val);
     }
 
-  g_variant_unref (val);
+  xvariant_unref (val);
 
   return icon;
 }
 
 /**
- * g_icon_serialize:
+ * xicon_serialize:
  * @icon: a #xicon_t
  *
  * Serializes a #xicon_t into a #xvariant_t. An equivalent #xicon_t can be retrieved
- * back by calling g_icon_deserialize() on the returned value.
+ * back by calling xicon_deserialize() on the returned value.
  * As serialization will avoid using raw icon data when possible, it only
  * makes sense to transfer the #xvariant_t between processes on the same machine,
  * (as opposed to over the network), and within the same file system namespace.
@@ -658,16 +658,16 @@ g_icon_deserialize (xvariant_t *value)
  * Since: 2.38
  */
 xvariant_t *
-g_icon_serialize (xicon_t *icon)
+xicon_serialize (xicon_t *icon)
 {
   GIconInterface *iface;
   xvariant_t *result;
 
-  iface = G_ICON_GET_IFACE (icon);
+  iface = XICON_GET_IFACE (icon);
 
   if (!iface->serialize)
     {
-      g_critical ("g_icon_serialize() on icon type '%s' is not implemented", G_OBJECT_TYPE_NAME (icon));
+      g_critical ("xicon_serialize() on icon type '%s' is not implemented", G_OBJECT_TYPE_NAME (icon));
       return NULL;
     }
 
@@ -675,13 +675,13 @@ g_icon_serialize (xicon_t *icon)
 
   if (result)
     {
-      g_variant_take_ref (result);
+      xvariant_take_ref (result);
 
-      if (!g_variant_is_of_type (result, G_VARIANT_TYPE ("(sv)")))
+      if (!xvariant_is_of_type (result, G_VARIANT_TYPE ("(sv)")))
         {
-          g_critical ("g_icon_serialize() on icon type '%s' returned xvariant_t of type '%s' but it must return "
-                      "one with type '(sv)'", G_OBJECT_TYPE_NAME (icon), g_variant_get_type_string (result));
-          g_variant_unref (result);
+          g_critical ("xicon_serialize() on icon type '%s' returned xvariant_t of type '%s' but it must return "
+                      "one with type '(sv)'", G_OBJECT_TYPE_NAME (icon), xvariant_get_type_string (result));
+          xvariant_unref (result);
           result = NULL;
         }
     }

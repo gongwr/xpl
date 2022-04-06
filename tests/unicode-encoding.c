@@ -45,7 +45,7 @@ typedef enum
 } Status;
 
 static xboolean_t
-ucs4_equal (gunichar *a, gunichar *b)
+ucs4_equal (xunichar_t *a, xunichar_t *b)
 {
   while (*a && *b && (*a == *b))
     {
@@ -57,7 +57,7 @@ ucs4_equal (gunichar *a, gunichar *b)
 }
 
 static xboolean_t
-utf16_equal (gunichar2 *a, gunichar2 *b)
+utf16_equal (xunichar2_t *a, xunichar2_t *b)
 {
   while (*a && *b && (*a == *b))
     {
@@ -69,7 +69,7 @@ utf16_equal (gunichar2 *a, gunichar2 *b)
 }
 
 static xint_t
-utf16_count (gunichar2 *a)
+utf16_count (xunichar2_t *a)
 {
   xint_t result = 0;
 
@@ -80,7 +80,7 @@ utf16_count (gunichar2 *a)
 }
 
 static void
-print_ucs4 (const xchar_t *prefix, gunichar *ucs4, xint_t ucs4_len)
+print_ucs4 (const xchar_t *prefix, xunichar_t *ucs4, xint_t ucs4_len)
 {
   xint_t i;
   g_print ("%s ", prefix);
@@ -93,20 +93,20 @@ static void
 process (xint_t      line,
 	 xchar_t    *utf8,
 	 Status    status,
-	 gunichar *ucs4,
+	 xunichar_t *ucs4,
 	 xint_t      ucs4_len)
 {
   const xchar_t *end;
-  xboolean_t is_valid = g_utf8_validate (utf8, -1, &end);
+  xboolean_t is_valid = xutf8_validate (utf8, -1, &end);
   xerror_t *error = NULL;
-  glong items_read, items_written;
+  xlong_t items_read, items_written;
 
   switch (status)
     {
     case VALID:
       if (!is_valid)
 	{
-	  fail ("line %d: valid but g_utf8_validate returned FALSE\n", line);
+	  fail ("line %d: valid but xutf8_validate returned FALSE\n", line);
 	  return;
 	}
       break;
@@ -116,7 +116,7 @@ process (xint_t      line,
     case MALFORMED:
       if (is_valid)
 	{
-	  fail ("line %d: invalid but g_utf8_validate returned TRUE\n", line);
+	  fail ("line %d: invalid but xutf8_validate returned TRUE\n", line);
 	  return;
 	}
       break;
@@ -124,20 +124,20 @@ process (xint_t      line,
 
   if (status == INCOMPLETE)
     {
-      gunichar *ucs4_result;
+      xunichar_t *ucs4_result;
 
-      ucs4_result = g_utf8_to_ucs4 (utf8, -1, NULL, NULL, &error);
+      ucs4_result = xutf8_to_ucs4 (utf8, -1, NULL, NULL, &error);
 
-      if (!error || !g_error_matches (error, G_CONVERT_ERROR, G_CONVERT_ERROR_PARTIAL_INPUT))
+      if (!error || !xerror_matches (error, G_CONVERT_ERROR, G_CONVERT_ERROR_PARTIAL_INPUT))
 	{
 	  fail ("line %d: incomplete input not properly detected\n", line);
 	  return;
 	}
       g_clear_error (&error);
 
-      ucs4_result = g_utf8_to_ucs4 (utf8, -1, &items_read, NULL, &error);
+      ucs4_result = xutf8_to_ucs4 (utf8, -1, &items_read, NULL, &error);
 
-      if (!ucs4_result || items_read == (glong) strlen (utf8))
+      if (!ucs4_result || items_read == (xlong_t) strlen (utf8))
 	{
 	  fail ("line %d: incomplete input not properly detected\n", line);
 	  return;
@@ -148,9 +148,9 @@ process (xint_t      line,
 
   if (status == VALID || status == NOTUNICODE)
     {
-      gunichar *ucs4_result;
+      xunichar_t *ucs4_result;
 
-      ucs4_result = g_utf8_to_ucs4 (utf8, -1, &items_read, &items_written, &error);
+      ucs4_result = xutf8_to_ucs4 (utf8, -1, &items_read, &items_written, &error);
       if (!ucs4_result)
 	{
 	  fail ("line %d: conversion with status %d to ucs4 failed: %s\n", line, status, error->message);
@@ -158,7 +158,7 @@ process (xint_t      line,
 	}
 
       if (!ucs4_equal (ucs4_result, ucs4) ||
-          items_read != (glong) strlen (utf8) ||
+          items_read != (xlong_t) strlen (utf8) ||
 	  items_written != ucs4_len)
 	{
 	  fail ("line %d: results of conversion with status %d to ucs4 do not match expected.\n", line, status);
@@ -172,10 +172,10 @@ process (xint_t      line,
 
   if (status == VALID)
      {
-      gunichar *ucs4_result;
+      xunichar_t *ucs4_result;
       xchar_t *utf8_result;
 
-      ucs4_result = g_utf8_to_ucs4_fast (utf8, -1, &items_written);
+      ucs4_result = xutf8_to_ucs4_fast (utf8, -1, &items_written);
 
       if (!ucs4_equal (ucs4_result, ucs4) ||
 	  items_written != ucs4_len)
@@ -195,7 +195,7 @@ process (xint_t      line,
 
       if (strcmp (utf8_result, utf8) != 0 ||
 	  items_read != ucs4_len ||
-          items_written != (glong) strlen (utf8))
+          items_written != (xlong_t) strlen (utf8))
 	{
 	  fail ("line %d: conversion back to utf8 did not match original\n", line);
 	  return;
@@ -207,11 +207,11 @@ process (xint_t      line,
 
   if (status == VALID)
     {
-      gunichar2 *utf16_expected_tmp;
-      gunichar2 *utf16_expected;
-      gunichar2 *utf16_from_utf8;
-      gunichar2 *utf16_from_ucs4;
-      gunichar *ucs4_result;
+      xunichar2_t *utf16_expected_tmp;
+      xunichar2_t *utf16_expected;
+      xunichar2_t *utf16_from_utf8;
+      xunichar2_t *utf16_from_ucs4;
+      xunichar_t *ucs4_result;
       xsize_t bytes_written;
       xint_t n_chars;
       xchar_t *utf8_result;
@@ -222,7 +222,7 @@ process (xint_t      line,
 #define TARGET "UTF-16"
 #endif
 
-      if (!(utf16_expected_tmp = (gunichar2 *)g_convert (utf8, -1, TARGET, "UTF-8",
+      if (!(utf16_expected_tmp = (xunichar2_t *)g_convert (utf8, -1, TARGET, "UTF-8",
 							 NULL, &bytes_written, NULL)))
 	{
 	  fail ("line %d: could not convert to UTF-16 via g_convert\n", line);
@@ -235,8 +235,8 @@ process (xint_t      line,
       if (utf16_expected_tmp[0] == 0xfeff) /* BOM */
 	{
 	  n_chars--;
-	  utf16_expected = g_new (gunichar2, n_chars + 1);
-	  memcpy (utf16_expected, utf16_expected_tmp + 1, sizeof(gunichar2) * n_chars);
+	  utf16_expected = g_new (xunichar2_t, n_chars + 1);
+	  memcpy (utf16_expected, utf16_expected_tmp + 1, sizeof(xunichar2_t) * n_chars);
 	}
       else if (utf16_expected_tmp[0] == 0xfffe) /* ANTI-BOM */
 	{
@@ -245,19 +245,19 @@ process (xint_t      line,
 	}
       else
 	{
-	  utf16_expected = g_new (gunichar2, n_chars + 1);
-	  memcpy (utf16_expected, utf16_expected_tmp, sizeof(gunichar2) * n_chars);
+	  utf16_expected = g_new (xunichar2_t, n_chars + 1);
+	  memcpy (utf16_expected, utf16_expected_tmp, sizeof(xunichar2_t) * n_chars);
 	}
 
       utf16_expected[n_chars] = '\0';
 
-      if (!(utf16_from_utf8 = g_utf8_to_utf16 (utf8, -1, &items_read, &items_written, &error)))
+      if (!(utf16_from_utf8 = xutf8_to_utf16 (utf8, -1, &items_read, &items_written, &error)))
 	{
 	  fail ("line %d: conversion to ucs16 failed: %s\n", line, error->message);
 	  return;
 	}
 
-      if (items_read != (glong) strlen (utf8) ||
+      if (items_read != (xlong_t) strlen (utf8) ||
 	  utf16_count (utf16_from_utf8) != items_written)
 	{
 	  fail ("line %d: length error in conversion to ucs16\n", line);
@@ -284,20 +284,20 @@ process (xint_t      line,
 	  return;
 	}
 
-      if (!(utf8_result = g_utf16_to_utf8 (utf16_from_utf8, -1, &items_read, &items_written, &error)))
+      if (!(utf8_result = xutf16_to_utf8 (utf16_from_utf8, -1, &items_read, &items_written, &error)))
 	{
 	  fail ("line %d: conversion back to utf8 failed: %s\n", line, error->message);
 	  return;
 	}
 
       if (items_read != utf16_count (utf16_from_utf8) ||
-          items_written != (glong) strlen (utf8))
+          items_written != (xlong_t) strlen (utf8))
 	{
 	  fail ("line %d: length error in conversion from ucs16 to utf8\n", line);
 	  return;
 	}
 
-      if (!(ucs4_result = g_utf16_to_ucs4 (utf16_from_ucs4, -1, &items_read, &items_written, &error)))
+      if (!(ucs4_result = xutf16_to_ucs4 (utf16_from_ucs4, -1, &items_read, &items_written, &error)))
 	{
 	  fail ("line %d: conversion back to utf8/ucs4 failed\n", line);
 	  return;
@@ -338,18 +338,18 @@ main (int argc, char **argv)
   xint_t line = 1;
   xint_t start_line = 0;		/* Quiet GCC */
   xchar_t *utf8 = NULL;		/* Quiet GCC */
-  GArray *ucs4;
+  xarray_t *ucs4;
   Status status = VALID;	/* Quiet GCC */
 
   g_test_init (&argc, &argv, NULL);
 
   testfile = g_test_build_filename (G_TEST_DIST, "utf8.txt", NULL);
 
-  g_file_get_contents (testfile, &contents, NULL, &error);
+  xfile_get_contents (testfile, &contents, NULL, &error);
   if (error)
     croak ("Cannot open utf8.txt: %s", error->message);
 
-  ucs4 = g_array_new (TRUE, FALSE, sizeof(gunichar));
+  ucs4 = g_array_new (TRUE, FALSE, sizeof(xunichar_t));
 
   p = contents;
 
@@ -366,7 +366,7 @@ main (int argc, char **argv)
       if (!*p || *p == '#' || *p == '\r' || *p == '\n')
 	goto next_line;
 
-      tmp = g_strstrip (g_strndup (p, end - p));
+      tmp = xstrstrip (xstrndup (p, end - p));
 
       switch (state)
 	{
@@ -405,7 +405,7 @@ main (int argc, char **argv)
 	    {
 	      xchar_t *endptr;
 
-	      gunichar ch = strtoul (p, &endptr, 16);
+	      xunichar_t ch = strtoul (p, &endptr, 16);
 	      if (*endptr != '\0')
 		croak ("Invalid UCS-4 character on line %d\n", line);
 
@@ -422,7 +422,7 @@ main (int argc, char **argv)
 
       if (state == 0)
 	{
-	  process (start_line, utf8, status, (gunichar *)ucs4->data, ucs4->len);
+	  process (start_line, utf8, status, (xunichar_t *)ucs4->data, ucs4->len);
 	  g_array_set_size (ucs4, 0);
 	  g_free (utf8);
 	}

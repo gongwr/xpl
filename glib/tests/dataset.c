@@ -4,7 +4,7 @@
 static void
 test_quark_basic (void)
 {
-  GQuark quark;
+  xquark quark;
   const xchar_t *orig = "blargh";
   xchar_t *copy;
   const xchar_t *str;
@@ -12,7 +12,7 @@ test_quark_basic (void)
   quark = g_quark_try_string ("no-such-quark");
   g_assert (quark == 0);
 
-  copy = g_strdup (orig);
+  copy = xstrdup (orig);
   quark = g_quark_from_static_string (orig);
   g_assert (quark != 0);
   g_assert (g_quark_from_string (orig) == quark);
@@ -33,7 +33,7 @@ test_quark_string (void)
   const xchar_t *str1;
   const xchar_t *str2;
 
-  copy = g_strdup (orig);
+  copy = xstrdup (orig);
 
   str1 = g_intern_static_string (orig);
   str2 = g_intern_string (copy);
@@ -107,7 +107,7 @@ test_dataset_full (void)
 }
 
 static void
-foreach (GQuark   id,
+foreach (xquark   id,
          xpointer_t data,
          xpointer_t user_data)
 {
@@ -152,7 +152,7 @@ test_dataset_id (void)
   xpointer_t other = (xpointer_t)test_quark_basic;
   xpointer_t data = "test1";
   xpointer_t ret;
-  GQuark quark;
+  xquark quark;
 
   quark = g_quark_from_string ("test1");
 

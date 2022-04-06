@@ -36,13 +36,13 @@
  * SECTION:gmemoryoutputstream
  * @short_description: Streaming output operations on memory chunks
  * @include: gio/gio.h
- * @see_also: #GMemoryInputStream
+ * @see_also: #xmemory_input_stream_t
  *
- * #GMemoryOutputStream is a class for using arbitrary
+ * #xmemory_output_stream_t is a class for using arbitrary
  * memory chunks as output for GIO streaming output operations.
  *
- * As of GLib 2.34, #GMemoryOutputStream trivially implements
- * #GPollableOutputStream: it always polls as ready.
+ * As of GLib 2.34, #xmemory_output_stream_t trivially implements
+ * #xpollable_output_stream_t: it always polls as ready.
  */
 
 #define MIN_ARRAY_SIZE  16
@@ -65,20 +65,20 @@ struct _GMemoryOutputStreamPrivate
                          because the stream is seekable. */
 
   GReallocFunc   realloc_fn;
-  GDestroyNotify destroy;
+  xdestroy_notify_t destroy;
 };
 
 static void     g_memory_output_stream_set_property (xobject_t      *object,
                                                      xuint_t         prop_id,
-                                                     const GValue *value,
-                                                     GParamSpec   *pspec);
+                                                     const xvalue_t *value,
+                                                     xparam_spec_t   *pspec);
 static void     g_memory_output_stream_get_property (xobject_t      *object,
                                                      xuint_t         prop_id,
-                                                     GValue       *value,
-                                                     GParamSpec   *pspec);
+                                                     xvalue_t       *value,
+                                                     xparam_spec_t   *pspec);
 static void     g_memory_output_stream_finalize     (xobject_t      *object);
 
-static gssize   g_memory_output_stream_write       (xoutput_stream_t *stream,
+static xssize_t   g_memory_output_stream_write       (xoutput_stream_t *stream,
                                                     const void    *buffer,
                                                     xsize_t          count,
                                                     xcancellable_t  *cancellable,
@@ -97,28 +97,28 @@ static xboolean_t g_memory_output_stream_close_finish (xoutput_stream_t        *
                                                      xasync_result_t         *result,
                                                      xerror_t              **error);
 
-static void     g_memory_output_stream_seekable_iface_init (GSeekableIface  *iface);
-static goffset  g_memory_output_stream_tell                (GSeekable       *seekable);
-static xboolean_t g_memory_output_stream_can_seek            (GSeekable       *seekable);
-static xboolean_t g_memory_output_stream_seek                (GSeekable       *seekable,
-                                                           goffset          offset,
+static void     g_memory_output_stream_seekable_iface_init (xseekable_iface_t  *iface);
+static xoffset_t  g_memory_output_stream_tell                (xseekable__t       *seekable);
+static xboolean_t g_memory_output_stream_can_seek            (xseekable__t       *seekable);
+static xboolean_t g_memory_output_stream_seek                (xseekable__t       *seekable,
+                                                           xoffset_t          offset,
                                                            GSeekType        type,
                                                            xcancellable_t    *cancellable,
                                                            xerror_t         **error);
-static xboolean_t g_memory_output_stream_can_truncate        (GSeekable       *seekable);
-static xboolean_t g_memory_output_stream_truncate            (GSeekable       *seekable,
-                                                           goffset          offset,
+static xboolean_t g_memory_output_stream_can_truncate        (xseekable__t       *seekable);
+static xboolean_t g_memory_output_stream_truncate            (xseekable__t       *seekable,
+                                                           xoffset_t          offset,
                                                            xcancellable_t    *cancellable,
                                                            xerror_t         **error);
 
-static xboolean_t g_memory_output_stream_is_writable       (GPollableOutputStream *stream);
-static GSource *g_memory_output_stream_create_source     (GPollableOutputStream *stream,
+static xboolean_t g_memory_output_stream_is_writable       (xpollable_output_stream_t *stream);
+static xsource_t *g_memory_output_stream_create_source     (xpollable_output_stream_t *stream,
                                                           xcancellable_t          *cancellable);
 
-static void g_memory_output_stream_pollable_iface_init (GPollableOutputStreamInterface *iface);
+static void g_memory_output_stream_pollable_iface_init (xpollable_output_stream_interface_t *iface);
 
-G_DEFINE_TYPE_WITH_CODE (GMemoryOutputStream, g_memory_output_stream, XTYPE_OUTPUT_STREAM,
-                         G_ADD_PRIVATE (GMemoryOutputStream)
+G_DEFINE_TYPE_WITH_CODE (xmemory_output_stream_t, g_memory_output_stream, XTYPE_OUTPUT_STREAM,
+                         G_ADD_PRIVATE (xmemory_output_stream_t)
                          G_IMPLEMENT_INTERFACE (XTYPE_SEEKABLE,
                                                 g_memory_output_stream_seekable_iface_init);
                          G_IMPLEMENT_INTERFACE (XTYPE_POLLABLE_OUTPUT_STREAM,
@@ -144,13 +144,13 @@ g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
   ostream_class->close_finish = g_memory_output_stream_close_finish;
 
   /**
-   * GMemoryOutputStream:data:
+   * xmemory_output_stream_t:data:
    *
    * Pointer to buffer where data will be written.
    *
    * Since: 2.24
    **/
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_DATA,
                                    g_param_spec_pointer ("data",
                                                          P_("Data Buffer"),
@@ -159,13 +159,13 @@ g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
                                                          G_PARAM_STATIC_STRINGS));
 
   /**
-   * GMemoryOutputStream:size:
+   * xmemory_output_stream_t:size:
    *
    * Current size of the data buffer.
    *
    * Since: 2.24
    **/
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_SIZE,
                                    g_param_spec_ulong ("size",
                                                        P_("Data Buffer Size"),
@@ -175,13 +175,13 @@ g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
                                                        G_PARAM_STATIC_STRINGS));
 
   /**
-   * GMemoryOutputStream:data-size:
+   * xmemory_output_stream_t:data-size:
    *
    * Size of data written to the buffer.
    *
    * Since: 2.24
    **/
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_DATA_SIZE,
                                    g_param_spec_ulong ("data-size",
                                                        P_("Data Size"),
@@ -191,13 +191,13 @@ g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
                                                        G_PARAM_STATIC_STRINGS));
 
   /**
-   * GMemoryOutputStream:realloc-function: (skip)
+   * xmemory_output_stream_t:realloc-function: (skip)
    *
    * Function with realloc semantics called to enlarge the buffer.
    *
    * Since: 2.24
    **/
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_REALLOC_FUNCTION,
                                    g_param_spec_pointer ("realloc-function",
                                                          P_("Memory Reallocation Function"),
@@ -206,13 +206,13 @@ g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
                                                          G_PARAM_STATIC_STRINGS));
 
   /**
-   * GMemoryOutputStream:destroy-function: (skip)
+   * xmemory_output_stream_t:destroy-function: (skip)
    *
    * Function called with the buffer as argument when the stream is destroyed.
    *
    * Since: 2.24
    **/
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
                                    PROP_DESTROY_FUNCTION,
                                    g_param_spec_pointer ("destroy-function",
                                                          P_("Destroy Notification Function"),
@@ -222,7 +222,7 @@ g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
 }
 
 static void
-g_memory_output_stream_pollable_iface_init (GPollableOutputStreamInterface *iface)
+g_memory_output_stream_pollable_iface_init (xpollable_output_stream_interface_t *iface)
 {
   iface->is_writable = g_memory_output_stream_is_writable;
   iface->create_source = g_memory_output_stream_create_source;
@@ -231,10 +231,10 @@ g_memory_output_stream_pollable_iface_init (GPollableOutputStreamInterface *ifac
 static void
 g_memory_output_stream_set_property (xobject_t      *object,
                                      xuint_t         prop_id,
-                                     const GValue *value,
-                                     GParamSpec   *pspec)
+                                     const xvalue_t *value,
+                                     xparam_spec_t   *pspec)
 {
-  GMemoryOutputStream        *stream;
+  xmemory_output_stream_t        *stream;
   GMemoryOutputStreamPrivate *priv;
 
   stream = G_MEMORY_OUTPUT_STREAM (object);
@@ -243,16 +243,16 @@ g_memory_output_stream_set_property (xobject_t      *object,
   switch (prop_id)
     {
     case PROP_DATA:
-      priv->data = g_value_get_pointer (value);
+      priv->data = xvalue_get_pointer (value);
       break;
     case PROP_SIZE:
-      priv->len = g_value_get_ulong (value);
+      priv->len = xvalue_get_ulong (value);
       break;
     case PROP_REALLOC_FUNCTION:
-      priv->realloc_fn = g_value_get_pointer (value);
+      priv->realloc_fn = xvalue_get_pointer (value);
       break;
     case PROP_DESTROY_FUNCTION:
-      priv->destroy = g_value_get_pointer (value);
+      priv->destroy = xvalue_get_pointer (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -263,10 +263,10 @@ g_memory_output_stream_set_property (xobject_t      *object,
 static void
 g_memory_output_stream_get_property (xobject_t      *object,
                                      xuint_t         prop_id,
-                                     GValue       *value,
-                                     GParamSpec   *pspec)
+                                     xvalue_t       *value,
+                                     xparam_spec_t   *pspec)
 {
-  GMemoryOutputStream        *stream;
+  xmemory_output_stream_t        *stream;
   GMemoryOutputStreamPrivate *priv;
 
   stream = G_MEMORY_OUTPUT_STREAM (object);
@@ -275,19 +275,19 @@ g_memory_output_stream_get_property (xobject_t      *object,
   switch (prop_id)
     {
     case PROP_DATA:
-      g_value_set_pointer (value, priv->data);
+      xvalue_set_pointer (value, priv->data);
       break;
     case PROP_SIZE:
-      g_value_set_ulong (value, priv->len);
+      xvalue_set_ulong (value, priv->len);
       break;
     case PROP_DATA_SIZE:
-      g_value_set_ulong (value, priv->valid_len);
+      xvalue_set_ulong (value, priv->valid_len);
       break;
     case PROP_REALLOC_FUNCTION:
-      g_value_set_pointer (value, priv->realloc_fn);
+      xvalue_set_pointer (value, priv->realloc_fn);
       break;
     case PROP_DESTROY_FUNCTION:
-      g_value_set_pointer (value, priv->destroy);
+      xvalue_set_pointer (value, priv->destroy);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -298,7 +298,7 @@ g_memory_output_stream_get_property (xobject_t      *object,
 static void
 g_memory_output_stream_finalize (xobject_t *object)
 {
-  GMemoryOutputStream        *stream;
+  xmemory_output_stream_t        *stream;
   GMemoryOutputStreamPrivate *priv;
 
   stream = G_MEMORY_OUTPUT_STREAM (object);
@@ -311,7 +311,7 @@ g_memory_output_stream_finalize (xobject_t *object)
 }
 
 static void
-g_memory_output_stream_seekable_iface_init (GSeekableIface *iface)
+g_memory_output_stream_seekable_iface_init (xseekable_iface_t *iface)
 {
   iface->tell         = g_memory_output_stream_tell;
   iface->can_seek     = g_memory_output_stream_can_seek;
@@ -322,7 +322,7 @@ g_memory_output_stream_seekable_iface_init (GSeekableIface *iface)
 
 
 static void
-g_memory_output_stream_init (GMemoryOutputStream *stream)
+g_memory_output_stream_init (xmemory_output_stream_t *stream)
 {
   stream->priv = g_memory_output_stream_get_instance_private (stream);
   stream->priv->pos = 0;
@@ -338,7 +338,7 @@ g_memory_output_stream_init (GMemoryOutputStream *stream)
  * @destroy_function: (nullable): a function to be called on @data when the stream is
  *     finalized, or %NULL
  *
- * Creates a new #GMemoryOutputStream.
+ * Creates a new #xmemory_output_stream_t.
  *
  * In most cases this is not the function you want.  See
  * g_memory_output_stream_new_resizable() instead.
@@ -365,7 +365,7 @@ g_memory_output_stream_init (GMemoryOutputStream *stream)
  * It is probably only meaningful to provide @data and @size in the case
  * that you want a fixed-sized stream.  Put another way: if @realloc_fn
  * is non-%NULL then it makes most sense to give @data as %NULL and
- * @size as 0 (allowing #GMemoryOutputStream to do the initial
+ * @size as 0 (allowing #xmemory_output_stream_t to do the initial
  * allocation for itself).
  *
  * |[<!-- language="C" -->
@@ -380,17 +380,17 @@ g_memory_output_stream_init (GMemoryOutputStream *stream)
  * stream3 = g_memory_output_stream_new (data, 200, NULL, free);
  * ]|
  *
- * Returns: A newly created #GMemoryOutputStream object.
+ * Returns: A newly created #xmemory_output_stream_t object.
  **/
 xoutput_stream_t *
 g_memory_output_stream_new (xpointer_t       data,
                             xsize_t          size,
                             GReallocFunc   realloc_function,
-                            GDestroyNotify destroy_function)
+                            xdestroy_notify_t destroy_function)
 {
   xoutput_stream_t *stream;
 
-  stream = g_object_new (XTYPE_MEMORY_OUTPUT_STREAM,
+  stream = xobject_new (XTYPE_MEMORY_OUTPUT_STREAM,
                          "data", data,
                          "size", size,
                          "realloc-function", realloc_function,
@@ -403,7 +403,7 @@ g_memory_output_stream_new (xpointer_t       data,
 /**
  * g_memory_output_stream_new_resizable:
  *
- * Creates a new #GMemoryOutputStream, using g_realloc() and g_free()
+ * Creates a new #xmemory_output_stream_t, using g_realloc() and g_free()
  * for memory allocation.
  *
  * Since: 2.36
@@ -416,7 +416,7 @@ g_memory_output_stream_new_resizable (void)
 
 /**
  * g_memory_output_stream_get_data:
- * @ostream: a #GMemoryOutputStream
+ * @ostream: a #xmemory_output_stream_t
  *
  * Gets any loaded data from the @ostream.
  *
@@ -427,7 +427,7 @@ g_memory_output_stream_new_resizable (void)
  *    has been stolen
  **/
 xpointer_t
-g_memory_output_stream_get_data (GMemoryOutputStream *ostream)
+g_memory_output_stream_get_data (xmemory_output_stream_t *ostream)
 {
   g_return_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), NULL);
 
@@ -436,7 +436,7 @@ g_memory_output_stream_get_data (GMemoryOutputStream *ostream)
 
 /**
  * g_memory_output_stream_get_size:
- * @ostream: a #GMemoryOutputStream
+ * @ostream: a #xmemory_output_stream_t
  *
  * Gets the size of the currently allocated data area (available from
  * g_memory_output_stream_get_data()).
@@ -457,7 +457,7 @@ g_memory_output_stream_get_data (GMemoryOutputStream *ostream)
  * Returns: the number of bytes allocated for the data buffer
  */
 xsize_t
-g_memory_output_stream_get_size (GMemoryOutputStream *ostream)
+g_memory_output_stream_get_size (xmemory_output_stream_t *ostream)
 {
   g_return_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), 0);
 
@@ -466,7 +466,7 @@ g_memory_output_stream_get_size (GMemoryOutputStream *ostream)
 
 /**
  * g_memory_output_stream_get_data_size:
- * @ostream: a #GMemoryOutputStream
+ * @ostream: a #xmemory_output_stream_t
  *
  * Returns the number of bytes from the start up to including the last
  * byte written in the stream that has not been truncated away.
@@ -476,7 +476,7 @@ g_memory_output_stream_get_size (GMemoryOutputStream *ostream)
  * Since: 2.18
  */
 xsize_t
-g_memory_output_stream_get_data_size (GMemoryOutputStream *ostream)
+g_memory_output_stream_get_data_size (xmemory_output_stream_t *ostream)
 {
   g_return_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), 0);
 
@@ -485,12 +485,12 @@ g_memory_output_stream_get_data_size (GMemoryOutputStream *ostream)
 
 /**
  * g_memory_output_stream_steal_data:
- * @ostream: a #GMemoryOutputStream
+ * @ostream: a #xmemory_output_stream_t
  *
  * Gets any loaded data from the @ostream. Ownership of the data
  * is transferred to the caller; when no longer needed it must be
  * freed using the free function set in @ostream's
- * #GMemoryOutputStream:destroy-function property.
+ * #xmemory_output_stream_t:destroy-function property.
  *
  * @ostream must be closed before calling this function.
  *
@@ -500,12 +500,12 @@ g_memory_output_stream_get_data_size (GMemoryOutputStream *ostream)
  * Since: 2.26
  **/
 xpointer_t
-g_memory_output_stream_steal_data (GMemoryOutputStream *ostream)
+g_memory_output_stream_steal_data (xmemory_output_stream_t *ostream)
 {
   xpointer_t data;
 
   g_return_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), NULL);
-  g_return_val_if_fail (g_output_stream_is_closed (G_OUTPUT_STREAM (ostream)), NULL);
+  g_return_val_if_fail (xoutput_stream_is_closed (G_OUTPUT_STREAM (ostream)), NULL);
 
   data = ostream->priv->data;
   ostream->priv->data = NULL;
@@ -515,24 +515,24 @@ g_memory_output_stream_steal_data (GMemoryOutputStream *ostream)
 
 /**
  * g_memory_output_stream_steal_as_bytes:
- * @ostream: a #GMemoryOutputStream
+ * @ostream: a #xmemory_output_stream_t
  *
- * Returns data from the @ostream as a #GBytes. @ostream must be
+ * Returns data from the @ostream as a #xbytes_t. @ostream must be
  * closed before calling this function.
  *
  * Returns: (transfer full): the stream's data
  *
  * Since: 2.34
  **/
-GBytes *
-g_memory_output_stream_steal_as_bytes (GMemoryOutputStream *ostream)
+xbytes_t *
+g_memory_output_stream_steal_as_bytes (xmemory_output_stream_t *ostream)
 {
-  GBytes *result;
+  xbytes_t *result;
 
   g_return_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), NULL);
-  g_return_val_if_fail (g_output_stream_is_closed (G_OUTPUT_STREAM (ostream)), NULL);
+  g_return_val_if_fail (xoutput_stream_is_closed (G_OUTPUT_STREAM (ostream)), NULL);
 
-  result = g_bytes_new_with_free_func (ostream->priv->data,
+  result = xbytes_new_with_free_func (ostream->priv->data,
                                        ostream->priv->valid_len,
                                        ostream->priv->destroy,
                                        ostream->priv->data);
@@ -542,7 +542,7 @@ g_memory_output_stream_steal_as_bytes (GMemoryOutputStream *ostream)
 }
 
 static xboolean_t
-array_resize (GMemoryOutputStream  *ostream,
+array_resize (xmemory_output_stream_t  *ostream,
               xsize_t                 size,
               xboolean_t              allow_partial,
               xerror_t              **error)
@@ -586,7 +586,7 @@ array_resize (GMemoryOutputStream  *ostream,
     }
 
   if (size > len)
-    memset ((guint8 *)data + len, 0, size - len);
+    memset ((xuint8_t *)data + len, 0, size - len);
 
   priv->data = data;
   priv->len = size;
@@ -597,16 +597,16 @@ array_resize (GMemoryOutputStream  *ostream,
   return TRUE;
 }
 
-static gssize
+static xssize_t
 g_memory_output_stream_write (xoutput_stream_t  *stream,
                               const void     *buffer,
                               xsize_t           count,
                               xcancellable_t   *cancellable,
                               xerror_t        **error)
 {
-  GMemoryOutputStream        *ostream;
+  xmemory_output_stream_t        *ostream;
   GMemoryOutputStreamPrivate *priv;
-  guint8   *dest;
+  xuint8_t   *dest;
   xsize_t new_size;
 
   ostream = G_MEMORY_OUTPUT_STREAM (stream);
@@ -646,7 +646,7 @@ g_memory_output_stream_write (xoutput_stream_t  *stream,
      only added part of the required memory */
   count = MIN (count, priv->len - priv->pos);
 
-  dest = (guint8 *)priv->data + priv->pos;
+  dest = (xuint8_t *)priv->data + priv->pos;
   memcpy (dest, buffer, count);
   priv->pos += count;
 
@@ -680,16 +680,16 @@ g_memory_output_stream_close_async (xoutput_stream_t       *stream,
                                     xasync_ready_callback_t  callback,
                                     xpointer_t             data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (stream, cancellable, callback, data);
-  g_task_set_source_tag (task, g_memory_output_stream_close_async);
+  task = xtask_new (stream, cancellable, callback, data);
+  xtask_set_source_tag (task, g_memory_output_stream_close_async);
 
   /* will always return TRUE */
   g_memory_output_stream_close (stream, cancellable, NULL);
 
-  g_task_return_boolean (task, TRUE);
-  g_object_unref (task);
+  xtask_return_boolean (task, TRUE);
+  xobject_unref (task);
 }
 
 static xboolean_t
@@ -697,15 +697,15 @@ g_memory_output_stream_close_finish (xoutput_stream_t  *stream,
                                      xasync_result_t   *result,
                                      xerror_t        **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
-static goffset
-g_memory_output_stream_tell (GSeekable *seekable)
+static xoffset_t
+g_memory_output_stream_tell (xseekable__t *seekable)
 {
-  GMemoryOutputStream *stream;
+  xmemory_output_stream_t *stream;
   GMemoryOutputStreamPrivate *priv;
 
   stream = G_MEMORY_OUTPUT_STREAM (seekable);
@@ -715,21 +715,21 @@ g_memory_output_stream_tell (GSeekable *seekable)
 }
 
 static xboolean_t
-g_memory_output_stream_can_seek (GSeekable *seekable)
+g_memory_output_stream_can_seek (xseekable__t *seekable)
 {
   return TRUE;
 }
 
 static xboolean_t
-g_memory_output_stream_seek (GSeekable    *seekable,
-                             goffset        offset,
+g_memory_output_stream_seek (xseekable__t    *seekable,
+                             xoffset_t        offset,
                              GSeekType      type,
                              xcancellable_t  *cancellable,
                              xerror_t       **error)
 {
-  GMemoryOutputStream        *stream;
+  xmemory_output_stream_t        *stream;
   GMemoryOutputStreamPrivate *priv;
-  goffset absolute;
+  xoffset_t absolute;
 
   stream = G_MEMORY_OUTPUT_STREAM (seekable);
   priv = stream->priv;
@@ -794,9 +794,9 @@ g_memory_output_stream_seek (GSeekable    *seekable,
 }
 
 static xboolean_t
-g_memory_output_stream_can_truncate (GSeekable *seekable)
+g_memory_output_stream_can_truncate (xseekable__t *seekable)
 {
-  GMemoryOutputStream *ostream;
+  xmemory_output_stream_t *ostream;
   GMemoryOutputStreamPrivate *priv;
 
   ostream = G_MEMORY_OUTPUT_STREAM (seekable);
@@ -807,12 +807,12 @@ g_memory_output_stream_can_truncate (GSeekable *seekable)
 }
 
 static xboolean_t
-g_memory_output_stream_truncate (GSeekable     *seekable,
-                                 goffset        offset,
+g_memory_output_stream_truncate (xseekable__t     *seekable,
+                                 xoffset_t        offset,
                                  xcancellable_t  *cancellable,
                                  xerror_t       **error)
 {
-  GMemoryOutputStream *ostream = G_MEMORY_OUTPUT_STREAM (seekable);
+  xmemory_output_stream_t *ostream = G_MEMORY_OUTPUT_STREAM (seekable);
 
   if (!array_resize (ostream, offset, FALSE, error))
     return FALSE;
@@ -823,20 +823,20 @@ g_memory_output_stream_truncate (GSeekable     *seekable,
 }
 
 static xboolean_t
-g_memory_output_stream_is_writable (GPollableOutputStream *stream)
+g_memory_output_stream_is_writable (xpollable_output_stream_t *stream)
 {
   return TRUE;
 }
 
-static GSource *
-g_memory_output_stream_create_source (GPollableOutputStream *stream,
+static xsource_t *
+g_memory_output_stream_create_source (xpollable_output_stream_t *stream,
                                       xcancellable_t          *cancellable)
 {
-  GSource *base_source, *pollable_source;
+  xsource_t *base_source, *pollable_source;
 
   base_source = g_timeout_source_new (0);
   pollable_source = g_pollable_source_new_full (stream, base_source, cancellable);
-  g_source_unref (base_source);
+  xsource_unref (base_source);
 
   return pollable_source;
 }

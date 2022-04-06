@@ -273,7 +273,7 @@ g_module_set_error_unduped (xchar_t *error)
 static inline void
 g_module_set_error (const xchar_t *error)
 {
-  g_module_set_error_unduped (g_strdup (error));
+  g_module_set_error_unduped (xstrdup (error));
 }
 
 
@@ -358,13 +358,13 @@ parse_libtool_archive (const xchar_t* libtool_name)
   xchar_t *lt_libdir = NULL;
   xchar_t *name;
   GTokenType token;
-  GScanner *scanner;
+  xscanner_t *scanner;
 
   int fd = g_open (libtool_name, O_RDONLY, 0);
   if (fd < 0)
     {
-      xchar_t *display_libtool_name = g_filename_display_name (libtool_name);
-      g_module_set_error_unduped (g_strdup_printf ("failed to open libtool archive \"%s\"", display_libtool_name));
+      xchar_t *display_libtool_name = xfilename_display_name (libtool_name);
+      g_module_set_error_unduped (xstrdup_printf ("failed to open libtool archive \"%s\"", display_libtool_name));
       g_free (display_libtool_name);
       return NULL;
     }
@@ -389,8 +389,8 @@ parse_libtool_archive (const xchar_t* libtool_name)
 	      (token == TOKEN_INSTALLED ?
 	       G_TOKEN_IDENTIFIER : G_TOKEN_STRING))
 	    {
-	      xchar_t *display_libtool_name = g_filename_display_name (libtool_name);
-	      g_module_set_error_unduped (g_strdup_printf ("unable to parse libtool archive \"%s\"", display_libtool_name));
+	      xchar_t *display_libtool_name = xfilename_display_name (libtool_name);
+	      g_module_set_error_unduped (xstrdup_printf ("unable to parse libtool archive \"%s\"", display_libtool_name));
 	      g_free (display_libtool_name);
 
 	      g_free (lt_dlname);
@@ -405,7 +405,7 @@ parse_libtool_archive (const xchar_t* libtool_name)
 	      if (token == TOKEN_DLNAME)
 		{
 		  g_free (lt_dlname);
-		  lt_dlname = g_strdup (scanner->value.v_string);
+		  lt_dlname = xstrdup (scanner->value.v_string);
 		}
 	      else if (token == TOKEN_INSTALLED)
 		lt_installed =
@@ -413,7 +413,7 @@ parse_libtool_archive (const xchar_t* libtool_name)
 	      else /* token == TOKEN_LIBDIR */
 		{
 		  g_free (lt_libdir);
-		  lt_libdir = g_strdup (scanner->value.v_string);
+		  lt_libdir = xstrdup (scanner->value.v_string);
 		}
 	    }
 	}
@@ -423,11 +423,11 @@ parse_libtool_archive (const xchar_t* libtool_name)
     {
       xchar_t *dir = g_path_get_dirname (libtool_name);
       g_free (lt_libdir);
-      lt_libdir = g_strconcat (dir, G_DIR_SEPARATOR_S ".libs", NULL);
+      lt_libdir = xstrconcat (dir, G_DIR_SEPARATOR_S ".libs", NULL);
       g_free (dir);
     }
 
-  name = g_strconcat (lt_libdir, G_DIR_SEPARATOR_S, lt_dlname, NULL);
+  name = xstrconcat (lt_libdir, G_DIR_SEPARATOR_S, lt_dlname, NULL);
 
   g_free (lt_dlname);
   g_free (lt_libdir);
@@ -455,7 +455,7 @@ _g_module_debug_init (void)
   env = g_getenv ("G_DEBUG");
 
   module_debug_flags =
-    !env ? 0 : g_parse_debug_string (env, keys, G_N_ELEMENTS (keys));
+    !env ? 0 : g_parse_debuxstring (env, keys, G_N_ELEMENTS (keys));
 
   module_debug_initialized = TRUE;
 }
@@ -546,13 +546,13 @@ g_module_open_full (const xchar_t   *file_name,
     }
 
   /* check whether we have a readable file right away */
-  if (g_file_test (file_name, G_FILE_TEST_IS_REGULAR))
-    name = g_strdup (file_name);
+  if (xfile_test (file_name, XFILE_TEST_IS_REGULAR))
+    name = xstrdup (file_name);
   /* try completing file name with standard library suffix */
   if (!name)
     {
-      name = g_strconcat (file_name, "." G_MODULE_SUFFIX, NULL);
-      if (!g_file_test (name, G_FILE_TEST_IS_REGULAR))
+      name = xstrconcat (file_name, "." G_MODULE_SUFFIX, NULL);
+      if (!xfile_test (name, XFILE_TEST_IS_REGULAR))
 	{
 	  g_free (name);
 	  name = NULL;
@@ -561,8 +561,8 @@ g_module_open_full (const xchar_t   *file_name,
   /* try completing by appending libtool suffix */
   if (!name)
     {
-      name = g_strconcat (file_name, ".la", NULL);
-      if (!g_file_test (name, G_FILE_TEST_IS_REGULAR))
+      name = xstrconcat (file_name, ".la", NULL);
+      if (!xfile_test (name, XFILE_TEST_IS_REGULAR))
 	{
 	  g_free (name);
 	  name = NULL;
@@ -578,16 +578,16 @@ g_module_open_full (const xchar_t   *file_name,
 
       /* make sure the name has a suffix */
       if (!dot || dot < slash)
-	name = g_strconcat (file_name, "." G_MODULE_SUFFIX, NULL);
+	name = xstrconcat (file_name, "." G_MODULE_SUFFIX, NULL);
       else
-	name = g_strdup (file_name);
+	name = xstrdup (file_name);
     }
 
   /* ok, try loading the module */
   g_assert (name != NULL);
 
   /* if it's a libtool archive, figure library file to load */
-  if (g_str_has_suffix (name, ".la")) /* libtool archive? */
+  if (xstr_has_suffix (name, ".la")) /* libtool archive? */
     {
       xchar_t *real_name = parse_libtool_archive (name);
 
@@ -621,11 +621,11 @@ g_module_open_full (const xchar_t   *file_name,
 	  return module;
 	}
 
-      saved_error = g_strdup (g_module_error ());
+      saved_error = xstrdup (g_module_error ());
       g_module_set_error (NULL);
 
       module = g_new (GModule, 1);
-      module->file_name = g_strdup (file_name);
+      module->file_name = xstrdup (file_name);
       module->handle = handle;
       module->ref_count = 1;
       module->is_resident = FALSE;
@@ -645,7 +645,7 @@ g_module_open_full (const xchar_t   *file_name,
 	{
 	  xchar_t *temp_error;
 
-          temp_error = g_strconcat ("GModule (", file_name, ") ",
+          temp_error = xstrconcat ("GModule (", file_name, ") ",
                                     "initialization check failed: ",
                                     check_failed, NULL);
 	  g_module_close (module);
@@ -807,7 +807,7 @@ g_module_symbol (GModule     *module,
   {
     xchar_t *name;
 
-    name = g_strconcat ("_", symbol_name, NULL);
+    name = xstrconcat ("_", symbol_name, NULL);
     *symbol = _g_module_symbol (module->handle, name);
     g_free (name);
   }
@@ -820,7 +820,7 @@ g_module_symbol (GModule     *module,
     {
       xchar_t *error;
 
-      error = g_strconcat ("'", symbol_name, "': ", module_error, NULL);
+      error = xstrconcat ("'", symbol_name, "': ", module_error, NULL);
       g_module_set_error (error);
       g_free (error);
       *symbol = NULL;

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General
  * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
  *
- * gvaluecollector.h: GValue varargs stubs
+ * gvaluecollector.h: xvalue_t varargs stubs
  */
 /**
  * SECTION:value_collection
@@ -22,7 +22,7 @@
  * @Title: Varargs Value Collection
  *
  * The macros in this section provide the varargs parsing support needed
- * in variadic xobject_t functions such as g_object_new() or g_object_set().
+ * in variadic xobject_t functions such as xobject_new() or xobject_set().
  *
  * They currently support the collection of integral types, floating point
  * types and pointers.
@@ -52,7 +52,7 @@ enum	/*< skip >*/
 /* vararg union holding actual values collected
  */
 /**
- * GTypeCValue:
+ * xtype_c_value_t:
  * @v_int: the field for holding integer values
  * @v_long: the field for holding long integer values
  * @v_int64: the field for holding 64 bit integer values
@@ -61,10 +61,10 @@ enum	/*< skip >*/
  *
  * A union holding one collected value.
  */
-union _GTypeCValue
+union _xtype_c_value
 {
   xint_t     v_int;
-  glong    v_long;
+  xlong_t    v_long;
   gint64   v_int64;
   xdouble_t  v_double;
   xpointer_t v_pointer;
@@ -72,11 +72,11 @@ union _GTypeCValue
 
 /**
  * G_VALUE_COLLECT_INIT:
- * @value: a #GValue return location. @value must contain only 0 bytes.
+ * @value: a #xvalue_t return location. @value must contain only 0 bytes.
  * @_value_type: the #xtype_t to use for @value.
  * @var_args: the va_list variable; it may be evaluated multiple times
  * @flags: flags which are passed on to the collect_value() function of
- *  the #GTypeValueTable of @value.
+ *  the #xtype_value_table_t of @value.
  * @__error: a #xchar_t** variable that will be modified to hold a g_new()
  *  allocated error messages if something fails
  *
@@ -89,17 +89,17 @@ union _GTypeCValue
  */
 #define G_VALUE_COLLECT_INIT(value, _value_type, var_args, flags, __error)		\
 G_STMT_START {										\
-  GValue *g_vci_val = (value);								\
+  xvalue_t *g_vci_val = (value);								\
   xuint_t g_vci_flags = (flags);								\
-  GTypeValueTable *g_vci_vtab = g_type_value_table_peek (_value_type);			\
+  xtype_value_table_t *g_vci_vtab = xtype_value_table_peek (_value_type);			\
   const xchar_t *g_vci_collect_format = g_vci_vtab->collect_format;					\
-  GTypeCValue g_vci_cvalues[G_VALUE_COLLECT_FORMAT_MAX_LENGTH] = { { 0, }, };		\
+  xtype_c_value_t g_vci_cvalues[G_VALUE_COLLECT_FORMAT_MAX_LENGTH] = { { 0, }, };		\
   xuint_t g_vci_n_values = 0;									\
                                                                                         \
   g_vci_val->g_type = _value_type;		/* value_meminit() from gvalue.c */		\
   while (*g_vci_collect_format)								\
     {											\
-      GTypeCValue *g_vci_cvalue = g_vci_cvalues + g_vci_n_values++;					\
+      xtype_c_value_t *g_vci_cvalue = g_vci_cvalues + g_vci_n_values++;					\
                                                                                         \
       switch (*g_vci_collect_format++)							\
 	{										\
@@ -107,7 +107,7 @@ G_STMT_START {										\
 	  g_vci_cvalue->v_int = va_arg ((var_args), xint_t);					\
 	  break;									\
 	case G_VALUE_COLLECT_LONG:							\
-	  g_vci_cvalue->v_long = va_arg ((var_args), glong);					\
+	  g_vci_cvalue->v_long = va_arg ((var_args), xlong_t);					\
 	  break;									\
 	case G_VALUE_COLLECT_INT64:							\
 	  g_vci_cvalue->v_int64 = va_arg ((var_args), gint64);				\
@@ -130,11 +130,11 @@ G_STMT_START {										\
 
 /**
  * G_VALUE_COLLECT:
- * @value: a #GValue return location. @value is supposed to be initialized
+ * @value: a #xvalue_t return location. @value is supposed to be initialized
  *  according to the value type to be collected
  * @var_args: the va_list variable; it may be evaluated multiple times
  * @flags: flags which are passed on to the collect_value() function of
- *  the #GTypeValueTable of @value.
+ *  the #xtype_value_table_t of @value.
  * @__error: a #xchar_t** variable that will be modified to hold a g_new()
  *  allocated error messages if something fails
  *
@@ -145,12 +145,12 @@ G_STMT_START {										\
  *
  * Note: If you are creating the @value argument just before calling this macro,
  * you should use the G_VALUE_COLLECT_INIT() variant and pass the uninitialized
- * #GValue. That variant is faster than G_VALUE_COLLECT().
+ * #xvalue_t. That variant is faster than G_VALUE_COLLECT().
  */
 #define G_VALUE_COLLECT(value, var_args, flags, __error) G_STMT_START {			\
-  GValue *g_vc_value = (value);								\
+  xvalue_t *g_vc_value = (value);								\
   xtype_t g_vc_value_type = G_VALUE_TYPE (g_vc_value);						\
-  GTypeValueTable *g_vc_vtable = g_type_value_table_peek (g_vc_value_type);			\
+  xtype_value_table_t *g_vc_vtable = xtype_value_table_peek (g_vc_value_type);			\
 											\
   if (g_vc_vtable->value_free)								\
     g_vc_vtable->value_free (g_vc_value);							\
@@ -168,7 +168,7 @@ G_STMT_START {										\
  */
 #define G_VALUE_COLLECT_SKIP(_value_type, var_args)					\
 G_STMT_START {										\
-  GTypeValueTable *g_vcs_vtable = g_type_value_table_peek (_value_type);			\
+  xtype_value_table_t *g_vcs_vtable = xtype_value_table_peek (_value_type);			\
   const xchar_t *g_vcs_collect_format = g_vcs_vtable->collect_format;				\
                                                                                         \
   while (*g_vcs_collect_format)								\
@@ -179,7 +179,7 @@ G_STMT_START {										\
 	  va_arg ((var_args), xint_t);							\
 	  break;									\
 	case G_VALUE_COLLECT_LONG:							\
-	  va_arg ((var_args), glong);							\
+	  va_arg ((var_args), xlong_t);							\
 	  break;									\
 	case G_VALUE_COLLECT_INT64:							\
 	  va_arg ((var_args), gint64);							\
@@ -198,11 +198,11 @@ G_STMT_START {										\
 
 /**
  * G_VALUE_LCOPY:
- * @value: a #GValue to store into the @var_args; this must be initialized
+ * @value: a #xvalue_t to store into the @var_args; this must be initialized
  *  and set
  * @var_args: the va_list variable; it may be evaluated multiple times
  * @flags: flags which are passed on to the lcopy_value() function of
- *  the #GTypeValueTable of @value.
+ *  the #xtype_value_table_t of @value.
  * @__error: a #xchar_t** variable that will be modified to hold a g_new()
  *  allocated error message if something fails
  *
@@ -212,17 +212,17 @@ G_STMT_START {										\
  */
 #define G_VALUE_LCOPY(value, var_args, flags, __error)					\
 G_STMT_START {										\
-  const GValue *g_vl_value = (value);							\
+  const xvalue_t *g_vl_value = (value);							\
   xuint_t g_vl_flags = (flags);								\
   xtype_t g_vl_value_type = G_VALUE_TYPE (g_vl_value);						\
-  GTypeValueTable *g_vl_vtable = g_type_value_table_peek (g_vl_value_type);			\
+  xtype_value_table_t *g_vl_vtable = xtype_value_table_peek (g_vl_value_type);			\
   const xchar_t *g_vl_lcopy_format = g_vl_vtable->lcopy_format;					\
-  GTypeCValue g_vl_cvalues[G_VALUE_COLLECT_FORMAT_MAX_LENGTH] = { { 0, }, };		\
+  xtype_c_value_t g_vl_cvalues[G_VALUE_COLLECT_FORMAT_MAX_LENGTH] = { { 0, }, };		\
   xuint_t g_vl_n_values = 0;									\
                                                                                         \
   while (*g_vl_lcopy_format)								\
     {											\
-      GTypeCValue *g_vl_cvalue = g_vl_cvalues + g_vl_n_values++;					\
+      xtype_c_value_t *g_vl_cvalue = g_vl_cvalues + g_vl_n_values++;					\
                                                                                         \
       switch (*g_vl_lcopy_format++)								\
 	{										\
@@ -230,7 +230,7 @@ G_STMT_START {										\
 	  g_vl_cvalue->v_int = va_arg ((var_args), xint_t);					\
 	  break;									\
 	case G_VALUE_COLLECT_LONG:							\
-	  g_vl_cvalue->v_long = va_arg ((var_args), glong);					\
+	  g_vl_cvalue->v_long = va_arg ((var_args), xlong_t);					\
 	  break;									\
 	case G_VALUE_COLLECT_INT64:							\
 	  g_vl_cvalue->v_int64 = va_arg ((var_args), gint64);				\
@@ -256,7 +256,7 @@ G_STMT_START {										\
  * G_VALUE_COLLECT_FORMAT_MAX_LENGTH:
  *
  * The maximal number of #GTypeCValues which can be collected for a
- * single #GValue.
+ * single #xvalue_t.
  */
 #define	G_VALUE_COLLECT_FORMAT_MAX_LENGTH	(8)
 

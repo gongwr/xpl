@@ -29,20 +29,20 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SEEKABLE            (g_seekable_get_type ())
-#define G_SEEKABLE(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SEEKABLE, GSeekable))
+#define XTYPE_SEEKABLE            (xseekable_get_type ())
+#define G_SEEKABLE(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SEEKABLE, xseekable_))
 #define X_IS_SEEKABLE(obj)         (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_SEEKABLE))
-#define G_SEEKABLE_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_SEEKABLE, GSeekableIface))
+#define G_SEEKABLE_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_SEEKABLE, xseekable_iface_t))
 
 /**
- * GSeekable:
+ * xseekable__t:
  *
  * Seek object for streaming operations.
  **/
-typedef struct _GSeekableIface   GSeekableIface;
+typedef struct _xseekable_iface   xseekable_iface_t;
 
 /**
- * GSeekableIface:
+ * xseekable_iface_t:
  * @x_iface: The parent interface.
  * @tell: Tells the current location within a stream.
  * @can_seek: Checks if seeking is supported by the stream.
@@ -52,24 +52,24 @@ typedef struct _GSeekableIface   GSeekableIface;
  *
  * Provides an interface for implementing seekable functionality on I/O Streams.
  **/
-struct _GSeekableIface
+struct _xseekable_iface
 {
   xtype_interface_t x_iface;
 
   /* Virtual Table */
 
-  goffset     (* tell)	         (GSeekable    *seekable);
+  xoffset_t     (* tell)	         (xseekable__t    *seekable);
 
-  xboolean_t    (* can_seek)       (GSeekable    *seekable);
-  xboolean_t    (* seek)	         (GSeekable    *seekable,
-				  goffset       offset,
+  xboolean_t    (* can_seek)       (xseekable__t    *seekable);
+  xboolean_t    (* seek)	         (xseekable__t    *seekable,
+				  xoffset_t       offset,
 				  GSeekType     type,
 				  xcancellable_t *cancellable,
 				  xerror_t      **error);
 
-  xboolean_t    (* can_truncate)   (GSeekable    *seekable);
-  xboolean_t    (* truncate_fn)    (GSeekable    *seekable,
-				  goffset       offset,
+  xboolean_t    (* can_truncate)   (xseekable__t    *seekable);
+  xboolean_t    (* truncate_fn)    (xseekable__t    *seekable,
+				  xoffset_t       offset,
 				  xcancellable_t *cancellable,
 				  xerror_t       **error);
 
@@ -77,23 +77,23 @@ struct _GSeekableIface
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t    g_seekable_get_type     (void) G_GNUC_CONST;
+xtype_t    xseekable_get_type     (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-goffset  g_seekable_tell         (GSeekable     *seekable);
+xoffset_t  xseekable_tell         (xseekable__t     *seekable);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_seekable_can_seek     (GSeekable     *seekable);
+xboolean_t xseekable_can_seek     (xseekable__t     *seekable);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_seekable_seek         (GSeekable     *seekable,
-				  goffset        offset,
+xboolean_t xseekable_seek         (xseekable__t     *seekable,
+				  xoffset_t        offset,
 				  GSeekType      type,
 				  xcancellable_t  *cancellable,
 				  xerror_t       **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_seekable_can_truncate (GSeekable     *seekable);
+xboolean_t xseekable_can_truncate (xseekable__t     *seekable);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_seekable_truncate     (GSeekable     *seekable,
-				  goffset        offset,
+xboolean_t xseekable_truncate     (xseekable__t     *seekable,
+				  xoffset_t        offset,
 				  xcancellable_t  *cancellable,
 				  xerror_t       **error);
 

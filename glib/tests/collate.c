@@ -30,7 +30,7 @@ compare_collate (const void *a, const void *b)
   const Line *line_a = a;
   const Line *line_b = b;
 
-  return g_utf8_collate (line_a->str, line_b->str);
+  return xutf8_collate (line_a->str, line_b->str);
 }
 
 static int
@@ -45,7 +45,7 @@ compare_key (const void *a, const void *b)
 static void
 do_collate (xboolean_t for_file, xboolean_t use_key, const CollateTest *test)
 {
-  GArray *line_array;
+  xarray_t *line_array;
   Line line;
   xint_t i;
 
@@ -56,15 +56,15 @@ do_collate (xboolean_t for_file, xboolean_t use_key, const CollateTest *test)
     }
 
   line_array = g_array_new (FALSE, FALSE, sizeof(Line));
-  g_array_set_clear_func (line_array, (GDestroyNotify)clear_line);
+  g_array_set_clear_func (line_array, (xdestroy_notify_t)clear_line);
 
   for (i = 0; test->input[i]; i++)
     {
       line.str = test->input[i];
       if (for_file)
-        line.key = g_utf8_collate_key_for_filename (line.str, -1);
+        line.key = xutf8_collate_key_for_filename (line.str, -1);
       else
-        line.key = g_utf8_collate_key (line.str, -1);
+        line.key = xutf8_collate_key (line.str, -1);
 
       g_array_append_val (line_array, line);
     }
@@ -85,21 +85,21 @@ do_collate (xboolean_t for_file, xboolean_t use_key, const CollateTest *test)
 }
 
 static void
-test_collate (gconstpointer d)
+test_collate (xconstpointer d)
 {
   const CollateTest *test = d;
   do_collate (FALSE, FALSE, test);
 }
 
 static void
-test_collate_key (gconstpointer d)
+test_collate_key (xconstpointer d)
 {
   const CollateTest *test = d;
   do_collate (FALSE, TRUE, test);
 }
 
 static void
-test_collate_file (gconstpointer d)
+test_collate_file (xconstpointer d)
 {
   const CollateTest *test = d;
   do_collate (TRUE, TRUE, test);
@@ -299,13 +299,13 @@ main (int argc, char *argv[])
 
   for (i = 0; i < G_N_ELEMENTS (test); i++)
     {
-      path = g_strdup_printf ("/unicode/collate/%d", i);
+      path = xstrdup_printf ("/unicode/collate/%d", i);
       g_test_add_data_func (path, &test[i], test_collate);
       g_free (path);
-      path = g_strdup_printf ("/unicode/collate-key/%d", i);
+      path = xstrdup_printf ("/unicode/collate-key/%d", i);
       g_test_add_data_func (path, &test[i], test_collate_key);
       g_free (path);
-      path = g_strdup_printf ("/unicode/collate-filename/%d", i);
+      path = xstrdup_printf ("/unicode/collate-filename/%d", i);
       g_test_add_data_func (path, &test[i], test_collate_file);
       g_free (path);
     }

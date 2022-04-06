@@ -39,7 +39,7 @@ G_BEGIN_DECLS
 #define G_IO_ERROR g_io_error_quark()
 
 XPL_AVAILABLE_IN_ALL
-GQuark       g_io_error_quark      (void);
+xquark       g_io_error_quark      (void);
 XPL_AVAILABLE_IN_ALL
 GIOErrorEnum g_io_error_from_errno (xint_t err_no);
 

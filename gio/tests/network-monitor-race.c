@@ -23,7 +23,7 @@
 static xboolean_t
 quit_loop (xpointer_t user_data)
 {
-  g_main_loop_quit (user_data);
+  xmain_loop_quit (user_data);
 
   return FALSE;
 }
@@ -40,10 +40,10 @@ thread_func (xpointer_t user_data)
 static xboolean_t
 call_func (xpointer_t user_data)
 {
-  GThread *thread;
+  xthread_t *thread;
 
-  thread = g_thread_new (NULL, thread_func, user_data);
-  g_thread_unref (thread);
+  thread = xthread_new (NULL, thread_func, user_data);
+  xthread_unref (thread);
 
   return FALSE;
 }
@@ -62,12 +62,12 @@ test_network_monitor (void)
 
   if (g_test_subprocess ())
     {
-       GMainLoop *main_loop;
+       xmain_loop_t *main_loop;
 
-       main_loop = g_main_loop_new (NULL, FALSE);
+       main_loop = xmain_loop_new (NULL, FALSE);
        g_timeout_add (1, call_func, main_loop);
-       g_main_loop_run (main_loop);
-       g_main_loop_unref (main_loop);
+       xmain_loop_run (main_loop);
+       xmain_loop_unref (main_loop);
 
        return;
     }

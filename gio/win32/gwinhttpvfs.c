@@ -92,7 +92,7 @@ G_DEFINE_TYPE_WITH_CODE (GWinHttpVfs, g_winhttp_vfs, XTYPE_VFS,
 			 {
 			   lookup_funcs ();
 			   if (funcs_found)
-			     g_io_extension_point_implement (G_VFS_EXTENSION_POINT_NAME,
+			     g_io_extension_point_implement (XVFS_EXTENSION_POINT_NAME,
 							     g_define_type_id,
 							     "winhttp",
 							     10);
@@ -111,7 +111,7 @@ g_winhttp_vfs_finalize (xobject_t *object)
   vfs->session = NULL;
 
   if (vfs->wrapped_vfs)
-    g_object_unref (vfs->wrapped_vfs);
+    xobject_unref (vfs->wrapped_vfs);
   vfs->wrapped_vfs = NULL;
 
   G_OBJECT_CLASS (g_winhttp_vfs_parent_class)->finalize (object);
@@ -123,12 +123,12 @@ g_winhttp_vfs_init (GWinHttpVfs *vfs)
   wchar_t *wagent;
   const xchar_t *prgname = g_get_prgname ();
 
-  vfs->wrapped_vfs = g_vfs_get_local ();
+  vfs->wrapped_vfs = xvfs_get_local ();
 
   if (prgname)
-    wagent = g_utf8_to_utf16 (prgname, -1, NULL, NULL, NULL);
+    wagent = xutf8_to_utf16 (prgname, -1, NULL, NULL, NULL);
   else
-    wagent = g_utf8_to_utf16 ("GWinHttpVfs", -1, NULL, NULL, NULL);
+    wagent = xutf8_to_utf16 ("GWinHttpVfs", -1, NULL, NULL, NULL);
 
   vfs->session = (G_WINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpOpen)
     (wagent,
@@ -143,25 +143,25 @@ g_winhttp_vfs_init (GWinHttpVfs *vfs)
 /**
  * g_winhttp_vfs_new:
  *
- * Returns a new #GVfs handle for a WinHttp vfs.
+ * Returns a new #xvfs_t handle for a WinHttp vfs.
  *
- * Returns: a new #GVfs handle.
+ * Returns: a new #xvfs_t handle.
  **/
-GVfs *
+xvfs_t *
 _g_winhttp_vfs_new (void)
 {
-  return g_object_new (XTYPE_WINHTTP_VFS, NULL);
+  return xobject_new (XTYPE_WINHTTP_VFS, NULL);
 }
 
 static xfile_t *
-g_winhttp_vfs_get_file_for_path (GVfs       *vfs,
+g_winhttp_vfs_get_file_for_path (xvfs_t       *vfs,
                                  const char *path)
 {
-  return g_vfs_get_file_for_path (G_WINHTTP_VFS (vfs)->wrapped_vfs, path);
+  return xvfs_get_file_for_path (G_WINHTTP_VFS (vfs)->wrapped_vfs, path);
 }
 
 static xfile_t *
-g_winhttp_vfs_get_file_for_uri (GVfs       *vfs,
+g_winhttp_vfs_get_file_for_uri (xvfs_t       *vfs,
                                 const char *uri)
 {
   GWinHttpVfs *winhttp_vfs = G_WINHTTP_VFS (vfs);
@@ -178,9 +178,9 @@ g_winhttp_vfs_get_file_for_uri (GVfs       *vfs,
         }
     }
 
-  /* For other URIs fallback to the wrapped GVfs */
+  /* For other URIs fallback to the wrapped xvfs_t */
   if (ret == NULL)
-    ret = g_vfs_get_file_for_uri (winhttp_vfs->wrapped_vfs, uri);
+    ret = xvfs_get_file_for_uri (winhttp_vfs->wrapped_vfs, uri);
 
   g_assert (ret != NULL);
 
@@ -188,10 +188,10 @@ g_winhttp_vfs_get_file_for_uri (GVfs       *vfs,
 }
 
 static const xchar_t * const *
-g_winhttp_vfs_get_supported_uri_schemes (GVfs *vfs)
+g_winhttp_vfs_get_supported_uri_schemes (xvfs_t *vfs)
 {
   GWinHttpVfs *winhttp_vfs = G_WINHTTP_VFS (vfs);
-  const xchar_t * const *wrapped_vfs_uri_schemes = g_vfs_get_supported_uri_schemes (winhttp_vfs->wrapped_vfs);
+  const xchar_t * const *wrapped_vfs_uri_schemes = xvfs_get_supported_uri_schemes (winhttp_vfs->wrapped_vfs);
   xsize_t i, n;
   const xchar_t **retval;
 
@@ -219,7 +219,7 @@ g_winhttp_vfs_get_supported_uri_schemes (GVfs *vfs)
 }
 
 static xfile_t *
-g_winhttp_vfs_parse_name (GVfs       *vfs,
+g_winhttp_vfs_parse_name (xvfs_t       *vfs,
                           const char *parse_name)
 {
   GWinHttpVfs *winhttp_vfs = G_WINHTTP_VFS (vfs);
@@ -227,9 +227,9 @@ g_winhttp_vfs_parse_name (GVfs       *vfs,
   g_return_val_if_fail (X_IS_VFS (vfs), NULL);
   g_return_val_if_fail (parse_name != NULL, NULL);
 
-  /* For plain file paths fallback to the wrapped GVfs */
+  /* For plain file paths fallback to the wrapped xvfs_t */
   if (g_path_is_absolute (parse_name))
-    return g_vfs_parse_name (winhttp_vfs->wrapped_vfs, parse_name);
+    return xvfs_parse_name (winhttp_vfs->wrapped_vfs, parse_name);
 
   /* Otherwise assume it is an URI, so pass on to
    * g_winhttp_vfs_get_file_for_uri().
@@ -238,7 +238,7 @@ g_winhttp_vfs_parse_name (GVfs       *vfs,
 }
 
 static xboolean_t
-g_winhttp_vfs_is_active (GVfs *vfs)
+g_winhttp_vfs_is_active (xvfs_t *vfs)
 {
   return TRUE;
 }
@@ -247,13 +247,13 @@ static void
 g_winhttp_vfs_class_init (GWinHttpVfsClass *class)
 {
   xobject_class_t *object_class;
-  GVfsClass *vfs_class;
+  xvfs_class_t *vfs_class;
 
   object_class = (xobject_class_t *) class;
 
   object_class->finalize = g_winhttp_vfs_finalize;
 
-  vfs_class = G_VFS_CLASS (class);
+  vfs_class = XVFS_CLASS (class);
 
   vfs_class->is_active = g_winhttp_vfs_is_active;
   vfs_class->get_file_for_path = g_winhttp_vfs_get_file_for_path;
@@ -279,7 +279,7 @@ _g_winhttp_error_message (DWORD error_code)
       switch (error_code)
         {
           /* FIXME: Use meaningful error messages */
-#define CASE(x) case ERROR_WINHTTP_##x: return g_strdup ("WinHttp error: " #x);
+#define CASE(x) case ERROR_WINHTTP_##x: return xstrdup ("WinHttp error: " #x);
           CASE (AUTO_PROXY_SERVICE_ERROR);
           CASE (AUTODETECTION_FAILED);
           CASE (BAD_AUTO_PROXY_SCRIPT);
@@ -326,7 +326,7 @@ _g_winhttp_error_message (DWORD error_code)
           CASE (UNRECOGNIZED_SCHEME);
           #undef CASE
         default:
-          return g_strdup_printf ("WinHttp error %ld", error_code);
+          return xstrdup_printf ("WinHttp error %ld", error_code);
         }
     }
   else

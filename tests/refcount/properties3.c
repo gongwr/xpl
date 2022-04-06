@@ -1,22 +1,22 @@
 #include <glib.h>
 #include <glib-object.h>
 
-#define XTYPE_TEST                (my_test_get_type ())
-#define MY_TEST(test)              (XTYPE_CHECK_INSTANCE_CAST ((test), XTYPE_TEST, GTest))
+#define XTYPE_TEST                (xtest_get_type ())
+#define XTEST(test)              (XTYPE_CHECK_INSTANCE_CAST ((test), XTYPE_TEST, xtest_t))
 #define MY_IS_TEST(test)           (XTYPE_CHECK_INSTANCE_TYPE ((test), XTYPE_TEST))
-#define MY_TEST_CLASS(tclass)      (XTYPE_CHECK_CLASS_CAST ((tclass), XTYPE_TEST, GTestClass))
+#define XTEST_CLASS(tclass)      (XTYPE_CHECK_CLASS_CAST ((tclass), XTYPE_TEST, xtest_class_t))
 #define MY_IS_TEST_CLASS(tclass)   (XTYPE_CHECK_CLASS_TYPE ((tclass), XTYPE_TEST))
-#define MY_TEST_GET_CLASS(test)    (XTYPE_INSTANCE_GET_CLASS ((test), XTYPE_TEST, GTestClass))
+#define XTEST_GET_CLASS(test)    (XTYPE_INSTANCE_GET_CLASS ((test), XTYPE_TEST, xtest_class_t))
 
 enum {
   PROP_0,
   PROP_DUMMY
 };
 
-typedef struct _GTest GTest;
-typedef struct _GTestClass GTestClass;
+typedef struct _xtest xtest_t;
+typedef struct _xtest_class xtest_class_t;
 
-struct _GTest
+struct _xtest
 {
   xobject_t object;
   xint_t id;
@@ -26,36 +26,36 @@ struct _GTest
   xint_t setcount;
 };
 
-struct _GTestClass
+struct _xtest_class
 {
   xobject_class_t parent_class;
 };
 
-static xtype_t my_test_get_type (void);
-G_DEFINE_TYPE (GTest, my_test, XTYPE_OBJECT)
+static xtype_t xtest_get_type (void);
+G_DEFINE_TYPE (xtest, xtest, XTYPE_OBJECT)
 
 static xint_t stopping;  /* (atomic) */
 
-static void my_test_get_property (xobject_t    *object,
+static void xtest_get_property (xobject_t    *object,
 				  xuint_t       prop_id,
-				  GValue     *value,
-				  GParamSpec *pspec);
-static void my_test_set_property (xobject_t      *object,
+				  xvalue_t     *value,
+				  xparam_spec_t *pspec);
+static void xtest_set_property (xobject_t      *object,
 				  xuint_t         prop_id,
-				  const GValue *value,
-				  GParamSpec   *pspec);
+				  const xvalue_t *value,
+				  xparam_spec_t   *pspec);
 
 static void
-my_test_class_init (GTestClass * klass)
+xtest_class_init (xtest_class_t * klass)
 {
   xobject_class_t *gobject_class;
 
   gobject_class = (xobject_class_t *) klass;
 
-  gobject_class->get_property = my_test_get_property;
-  gobject_class->set_property = my_test_set_property;
+  gobject_class->get_property = xtest_get_property;
+  gobject_class->set_property = xtest_set_property;
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
 				   PROP_DUMMY,
 				   g_param_spec_int ("dummy",
 						     NULL,
@@ -65,26 +65,26 @@ my_test_class_init (GTestClass * klass)
 }
 
 static void
-my_test_init (GTest * test)
+xtest_init (xtest_t * test)
 {
   static xuint_t static_id = 1;
   test->id = static_id++;
 }
 
 static void
-my_test_get_property (xobject_t    *object,
+xtest_get_property (xobject_t    *object,
 		      xuint_t       prop_id,
-		      GValue     *value,
-		      GParamSpec *pspec)
+		      xvalue_t     *value,
+		      xparam_spec_t *pspec)
 {
-  GTest *test;
+  xtest_t *test;
 
-  test = MY_TEST (object);
+  test = XTEST (object);
 
   switch (prop_id)
     {
     case PROP_DUMMY:
-      g_value_set_int (value, g_atomic_int_get (&test->dummy));
+      xvalue_set_int (value, g_atomic_int_get (&test->dummy));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -93,19 +93,19 @@ my_test_get_property (xobject_t    *object,
 }
 
 static void
-my_test_set_property (xobject_t      *object,
+xtest_set_property (xobject_t      *object,
 		      xuint_t         prop_id,
-		      const GValue *value,
-		      GParamSpec   *pspec)
+		      const xvalue_t *value,
+		      xparam_spec_t   *pspec)
 {
-  GTest *test;
+  xtest_t *test;
 
-  test = MY_TEST (object);
+  test = XTEST (object);
 
   switch (prop_id)
     {
     case PROP_DUMMY:
-      g_atomic_int_set (&test->dummy, g_value_get_int (value));
+      g_atomic_int_set (&test->dummy, xvalue_get_int (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -115,37 +115,37 @@ my_test_set_property (xobject_t      *object,
 
 static void
 dummy_notify (xobject_t    *object,
-	      GParamSpec *pspec)
+	      xparam_spec_t *pspec)
 {
-  GTest *test;
+  xtest_t *test;
 
-  test = MY_TEST (object);
+  test = XTEST (object);
 
   g_atomic_int_inc (&test->count);
 }
 
 static void
-my_test_do_property (GTest * test)
+xtest_do_property (xtest_t * test)
 {
   xint_t dummy;
 
   g_atomic_int_inc (&test->setcount);
 
-  g_object_get (test, "dummy", &dummy, NULL);
-  g_object_set (test, "dummy", dummy + 1, NULL);
+  xobject_get (test, "dummy", &dummy, NULL);
+  xobject_set (test, "dummy", dummy + 1, NULL);
 }
 
 static xpointer_t
-run_thread (GTest * test)
+run_thread (xtest_t * test)
 {
   xint_t i = 1;
 
   while (!g_atomic_int_get (&stopping)) {
-    my_test_do_property (test);
+    xtest_do_property (test);
     if ((i++ % 10000) == 0)
       {
 	g_print (".%c", 'a' + test->id);
-	g_thread_yield(); /* force context switch */
+	xthread_yield(); /* force context switch */
       }
   }
 
@@ -156,26 +156,26 @@ int
 main (int argc, char **argv)
 {
   xint_t i;
-  GTest *test;
-  GArray *test_threads;
+  xtest_t *test;
+  xarray_t *test_threads;
   const xint_t n_threads = 5;
 
   g_print ("START: %s\n", argv[0]);
   g_log_set_always_fatal (G_LOG_LEVEL_WARNING | G_LOG_LEVEL_CRITICAL | g_log_set_always_fatal (G_LOG_FATAL_MASK));
 
-  test = g_object_new (XTYPE_TEST, NULL);
+  test = xobject_new (XTYPE_TEST, NULL);
 
   g_assert (test->count == test->dummy);
   g_signal_connect (test, "notify::dummy", G_CALLBACK (dummy_notify), NULL);
 
-  test_threads = g_array_new (FALSE, FALSE, sizeof (GThread *));
+  test_threads = g_array_new (FALSE, FALSE, sizeof (xthread_t *));
 
   g_atomic_int_set (&stopping, 0);
 
   for (i = 0; i < n_threads; i++) {
-    GThread *thread;
+    xthread_t *thread;
 
-    thread = g_thread_create ((GThreadFunc) run_thread, test, TRUE, NULL);
+    thread = xthread_create ((GThreadFunc) run_thread, test, TRUE, NULL);
     g_array_append_val (test_threads, thread);
   }
   g_usleep (30000000);
@@ -185,10 +185,10 @@ main (int argc, char **argv)
 
   /* join all threads */
   for (i = 0; i < n_threads; i++) {
-    GThread *thread;
+    xthread_t *thread;
 
-    thread = g_array_index (test_threads, GThread *, i);
-    g_thread_join (thread);
+    thread = g_array_index (test_threads, xthread_t *, i);
+    xthread_join (thread);
   }
 
   g_print ("stopped\n");
@@ -196,7 +196,7 @@ main (int argc, char **argv)
   g_print ("%d %d\n", test->setcount, test->count);
 
   g_array_free (test_threads, TRUE);
-  g_object_unref (test);
+  xobject_unref (test);
 
   return 0;
 }

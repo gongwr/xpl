@@ -78,13 +78,13 @@ G_DEFINE_TYPE_WITH_CODE (GUnixInputStream, g_unix_input_stream, XTYPE_INPUT_STRE
 
 static void     g_unix_input_stream_set_property (xobject_t              *object,
 						  xuint_t                 prop_id,
-						  const GValue         *value,
-						  GParamSpec           *pspec);
+						  const xvalue_t         *value,
+						  xparam_spec_t           *pspec);
 static void     g_unix_input_stream_get_property (xobject_t              *object,
 						  xuint_t                 prop_id,
-						  GValue               *value,
-						  GParamSpec           *pspec);
-static gssize   g_unix_input_stream_read         (xinput_stream_t         *stream,
+						  xvalue_t               *value,
+						  xparam_spec_t           *pspec);
+static xssize_t   g_unix_input_stream_read         (xinput_stream_t         *stream,
 						  void                 *buffer,
 						  xsize_t                 count,
 						  xcancellable_t         *cancellable,
@@ -98,13 +98,13 @@ static void     g_unix_input_stream_skip_async   (xinput_stream_t         *strea
 						  xcancellable_t         *cancellable,
 						  xasync_ready_callback_t   callback,
 						  xpointer_t              data);
-static gssize   g_unix_input_stream_skip_finish  (xinput_stream_t         *stream,
+static xssize_t   g_unix_input_stream_skip_finish  (xinput_stream_t         *stream,
 						  xasync_result_t         *result,
 						  xerror_t              **error);
 
-static xboolean_t g_unix_input_stream_pollable_can_poll      (GPollableInputStream *stream);
-static xboolean_t g_unix_input_stream_pollable_is_readable   (GPollableInputStream *stream);
-static GSource *g_unix_input_stream_pollable_create_source (GPollableInputStream *stream,
+static xboolean_t g_unix_input_stream_pollable_can_poll      (xpollable_input_stream_t *stream);
+static xboolean_t g_unix_input_stream_pollable_is_readable   (xpollable_input_stream_t *stream);
+static xsource_t *g_unix_input_stream_pollable_create_source (xpollable_input_stream_t *stream,
 							    xcancellable_t         *cancellable);
 
 static void
@@ -132,7 +132,7 @@ g_unix_input_stream_class_init (GUnixInputStreamClass *klass)
    *
    * Since: 2.20
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
 				   PROP_FD,
 				   g_param_spec_int ("fd",
 						     P_("File descriptor"),
@@ -147,7 +147,7 @@ g_unix_input_stream_class_init (GUnixInputStreamClass *klass)
    *
    * Since: 2.20
    */
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
 				   PROP_CLOSE_FD,
 				   g_param_spec_boolean ("close-fd",
 							 P_("Close file descriptor"),
@@ -167,14 +167,14 @@ g_unix_input_stream_pollable_iface_init (GPollableInputStreamInterface *iface)
 static void
 g_unix_input_stream_file_descriptor_based_iface_init (GFileDescriptorBasedIface *iface)
 {
-  iface->get_fd = (int (*) (GFileDescriptorBased *))g_unix_input_stream_get_fd;
+  iface->get_fd = (int (*) (xfile_descriptor_based_t *))g_unix_input_stream_get_fd;
 }
 
 static void
 g_unix_input_stream_set_property (xobject_t         *object,
 				  xuint_t            prop_id,
-				  const GValue    *value,
-				  GParamSpec      *pspec)
+				  const xvalue_t    *value,
+				  xparam_spec_t      *pspec)
 {
   GUnixInputStream *unix_stream;
 
@@ -183,11 +183,11 @@ g_unix_input_stream_set_property (xobject_t         *object,
   switch (prop_id)
     {
     case PROP_FD:
-      unix_stream->priv->fd = g_value_get_int (value);
+      unix_stream->priv->fd = xvalue_get_int (value);
       unix_stream->priv->can_poll = _g_fd_is_pollable (unix_stream->priv->fd);
       break;
     case PROP_CLOSE_FD:
-      unix_stream->priv->close_fd = g_value_get_boolean (value);
+      unix_stream->priv->close_fd = xvalue_get_boolean (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -198,8 +198,8 @@ g_unix_input_stream_set_property (xobject_t         *object,
 static void
 g_unix_input_stream_get_property (xobject_t    *object,
 				  xuint_t       prop_id,
-				  GValue     *value,
-				  GParamSpec *pspec)
+				  xvalue_t     *value,
+				  xparam_spec_t *pspec)
 {
   GUnixInputStream *unix_stream;
 
@@ -208,10 +208,10 @@ g_unix_input_stream_get_property (xobject_t    *object,
   switch (prop_id)
     {
     case PROP_FD:
-      g_value_set_int (value, unix_stream->priv->fd);
+      xvalue_set_int (value, unix_stream->priv->fd);
       break;
     case PROP_CLOSE_FD:
-      g_value_set_boolean (value, unix_stream->priv->close_fd);
+      xvalue_set_boolean (value, unix_stream->priv->close_fd);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -246,7 +246,7 @@ g_unix_input_stream_new (xint_t     fd,
 
   g_return_val_if_fail (fd != -1, NULL);
 
-  stream = g_object_new (XTYPE_UNIX_INPUT_STREAM,
+  stream = xobject_new (XTYPE_UNIX_INPUT_STREAM,
 			 "fd", fd,
 			 "close-fd", close_fd,
 			 NULL);
@@ -274,7 +274,7 @@ g_unix_input_stream_set_close_fd (GUnixInputStream *stream,
   if (stream->priv->close_fd != close_fd)
     {
       stream->priv->close_fd = close_fd;
-      g_object_notify (G_OBJECT (stream), "close-fd");
+      xobject_notify (G_OBJECT (stream), "close-fd");
     }
 }
 
@@ -315,7 +315,7 @@ g_unix_input_stream_get_fd (GUnixInputStream *stream)
   return stream->priv->fd;
 }
 
-static gssize
+static xssize_t
 g_unix_input_stream_read (xinput_stream_t  *stream,
 			  void          *buffer,
 			  xsize_t          count,
@@ -323,8 +323,8 @@ g_unix_input_stream_read (xinput_stream_t  *stream,
 			  xerror_t       **error)
 {
   GUnixInputStream *unix_stream;
-  gssize res = -1;
-  GPollFD poll_fds[2];
+  xssize_t res = -1;
+  xpollfd_t poll_fds[2];
   int nfds;
   int poll_ret;
 
@@ -355,7 +355,7 @@ g_unix_input_stream_read (xinput_stream_t  *stream,
 	  g_set_error (error, G_IO_ERROR,
 		       g_io_error_from_errno (errsv),
 		       _("Error reading from file descriptor: %s"),
-		       g_strerror (errsv));
+		       xstrerror (errsv));
 	  break;
 	}
 
@@ -376,7 +376,7 @@ g_unix_input_stream_read (xinput_stream_t  *stream,
 	  g_set_error (error, G_IO_ERROR,
 		       g_io_error_from_errno (errsv),
 		       _("Error reading from file descriptor: %s"),
-		       g_strerror (errsv));
+		       xstrerror (errsv));
 	}
 
       break;
@@ -409,7 +409,7 @@ g_unix_input_stream_close (xinput_stream_t  *stream,
       g_set_error (error, G_IO_ERROR,
 		   g_io_error_from_errno (errsv),
 		   _("Error closing file descriptor: %s"),
-		   g_strerror (errsv));
+		   xstrerror (errsv));
     }
 
   return res != -1;
@@ -427,7 +427,7 @@ g_unix_input_stream_skip_async (xinput_stream_t        *stream,
   /* TODO: Not implemented */
 }
 
-static gssize
+static xssize_t
 g_unix_input_stream_skip_finish  (xinput_stream_t  *stream,
 				  xasync_result_t  *result,
 				  xerror_t       **error)
@@ -438,16 +438,16 @@ g_unix_input_stream_skip_finish  (xinput_stream_t  *stream,
 }
 
 static xboolean_t
-g_unix_input_stream_pollable_can_poll (GPollableInputStream *stream)
+g_unix_input_stream_pollable_can_poll (xpollable_input_stream_t *stream)
 {
   return G_UNIX_INPUT_STREAM (stream)->priv->can_poll;
 }
 
 static xboolean_t
-g_unix_input_stream_pollable_is_readable (GPollableInputStream *stream)
+g_unix_input_stream_pollable_is_readable (xpollable_input_stream_t *stream)
 {
   GUnixInputStream *unix_stream = G_UNIX_INPUT_STREAM (stream);
-  GPollFD poll_fd;
+  xpollfd_t poll_fd;
   xint_t result;
 
   poll_fd.fd = unix_stream->priv->fd;
@@ -461,26 +461,26 @@ g_unix_input_stream_pollable_is_readable (GPollableInputStream *stream)
   return poll_fd.revents != 0;
 }
 
-static GSource *
-g_unix_input_stream_pollable_create_source (GPollableInputStream *stream,
+static xsource_t *
+g_unix_input_stream_pollable_create_source (xpollable_input_stream_t *stream,
 					    xcancellable_t         *cancellable)
 {
   GUnixInputStream *unix_stream = G_UNIX_INPUT_STREAM (stream);
-  GSource *inner_source, *cancellable_source, *pollable_source;
+  xsource_t *inner_source, *cancellable_source, *pollable_source;
 
   pollable_source = g_pollable_source_new (G_OBJECT (stream));
 
   inner_source = g_unix_fd_source_new (unix_stream->priv->fd, G_IO_IN);
-  g_source_set_dummy_callback (inner_source);
-  g_source_add_child_source (pollable_source, inner_source);
-  g_source_unref (inner_source);
+  xsource_set_dummy_callback (inner_source);
+  xsource_add_child_source (pollable_source, inner_source);
+  xsource_unref (inner_source);
 
   if (cancellable)
     {
       cancellable_source = g_cancellable_source_new (cancellable);
-      g_source_set_dummy_callback (cancellable_source);
-      g_source_add_child_source (pollable_source, cancellable_source);
-      g_source_unref (cancellable_source);
+      xsource_set_dummy_callback (cancellable_source);
+      xsource_add_child_source (pollable_source, cancellable_source);
+      xsource_unref (cancellable_source);
     }
 
   return pollable_source;

@@ -57,14 +57,14 @@ static char *echo_prog_path;
 static char *echo_script_path;
 
 typedef struct {
-  GMainLoop *loop;
+  xmain_loop_t *loop;
   xboolean_t child_exited;
   xboolean_t stdout_done;
-  GString *stdout_buf;
+  xstring_t *stdout_buf;
 } SpawnAsyncMultithreadedData;
 
 static xboolean_t
-on_child_exited (GPid     pid,
+on_child_exited (xpid_t     pid,
 		 xint_t     status,
 		 xpointer_t datap)
 {
@@ -72,14 +72,14 @@ on_child_exited (GPid     pid,
 
   data->child_exited = TRUE;
   if (data->child_exited && data->stdout_done)
-    g_main_loop_quit (data->loop);
+    xmain_loop_quit (data->loop);
 
   return G_SOURCE_REMOVE;
 }
 
 static xboolean_t
-on_child_stdout (GIOChannel   *channel,
-		 GIOCondition  condition,
+on_child_stdout (xio_channel_t   *channel,
+		 xio_condition_t  condition,
 		 xpointer_t      datap)
 {
   char buf[1024];
@@ -92,17 +92,17 @@ on_child_stdout (GIOChannel   *channel,
       GIOStatus status;
       status = g_io_channel_read_chars (channel, buf, sizeof (buf), &bytes_read, &error);
       g_assert_no_error (error);
-      g_string_append_len (data->stdout_buf, buf, (gssize) bytes_read);
+      xstring_append_len (data->stdout_buf, buf, (xssize_t) bytes_read);
       if (status == G_IO_STATUS_EOF)
 	data->stdout_done = TRUE;
     }
   if (condition & G_IO_HUP)
     data->stdout_done = TRUE;
   if (condition & G_IO_ERR)
-    g_error ("Error reading from child stdin");
+    xerror ("Error reading from child stdin");
 
   if (data->child_exited && data->stdout_done)
-    g_main_loop_quit (data->loop);
+    xmain_loop_quit (data->loop);
 
   return !data->stdout_done;
 }
@@ -112,57 +112,57 @@ test_spawn_async (void)
 {
   int tnum = 1;
   xerror_t *error = NULL;
-  GPtrArray *argv;
+  xptr_array_t *argv;
   char *arg;
-  GPid pid;
-  GMainContext *context;
-  GMainLoop *loop;
-  GIOChannel *channel;
-  GSource *source;
+  xpid_t pid;
+  xmain_context_t *context;
+  xmain_loop_t *loop;
+  xio_channel_t *channel;
+  xsource_t *source;
   int child_stdout_fd;
   SpawnAsyncMultithreadedData data;
 
-  context = g_main_context_new ();
-  loop = g_main_loop_new (context, TRUE);
+  context = xmain_context_new ();
+  loop = xmain_loop_new (context, TRUE);
 
-  arg = g_strdup_printf ("thread %d", tnum);
+  arg = xstrdup_printf ("thread %d", tnum);
 
-  argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, echo_prog_path);
-  g_ptr_array_add (argv, arg);
-  g_ptr_array_add (argv, NULL);
+  argv = xptr_array_new ();
+  xptr_array_add (argv, echo_prog_path);
+  xptr_array_add (argv, arg);
+  xptr_array_add (argv, NULL);
 
   g_spawn_async_with_pipes (NULL, (char**)argv->pdata, NULL, G_SPAWN_DO_NOT_REAP_CHILD, NULL, NULL, &pid, NULL,
 			    &child_stdout_fd, NULL, &error);
   g_assert_no_error (error);
-  g_ptr_array_free (argv, TRUE);
+  xptr_array_free (argv, TRUE);
 
   data.loop = loop;
   data.stdout_done = FALSE;
   data.child_exited = FALSE;
-  data.stdout_buf = g_string_new (0);
+  data.stdout_buf = xstring_new (0);
 
   source = g_child_watch_source_new (pid);
-  g_source_set_callback (source, (GSourceFunc)on_child_exited, &data, NULL);
-  g_source_attach (source, context);
-  g_source_unref (source);
+  xsource_set_callback (source, (xsource_func_t)on_child_exited, &data, NULL);
+  xsource_attach (source, context);
+  xsource_unref (source);
 
   channel = g_io_channel_unix_new (child_stdout_fd);
   source = g_io_create_watch (channel, G_IO_IN | G_IO_HUP | G_IO_ERR);
-  g_source_set_callback (source, (GSourceFunc)on_child_stdout, &data, NULL);
-  g_source_attach (source, context);
-  g_source_unref (source);
+  xsource_set_callback (source, (xsource_func_t)on_child_stdout, &data, NULL);
+  xsource_attach (source, context);
+  xsource_unref (source);
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   g_assert (data.child_exited);
   g_assert (data.stdout_done);
   g_assert_cmpstr (data.stdout_buf->str, ==, arg);
-  g_string_free (data.stdout_buf, TRUE);
+  xstring_free (data.stdout_buf, TRUE);
 
   g_io_channel_unref (channel);
-  g_main_context_unref (context);
-  g_main_loop_unref (loop);
+  xmain_context_unref (context);
+  xmain_loop_unref (loop);
 
   g_free (arg);
 }
@@ -182,7 +182,7 @@ static void
 test_spawn_async_with_fds (void)
 {
   int tnum = 1;
-  GPtrArray *argv;
+  xptr_array_t *argv;
   char *arg;
   xsize_t i;
 
@@ -199,21 +199,21 @@ test_spawn_async_with_fds (void)
     { NO_FD, PIPE, STDOUT_PIPE },  /* Test the same fd for stdout + stderr */
   };
 
-  arg = g_strdup_printf ("thread %d", tnum);
+  arg = xstrdup_printf ("thread %d", tnum);
 
-  argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, echo_prog_path);
-  g_ptr_array_add (argv, arg);
-  g_ptr_array_add (argv, NULL);
+  argv = xptr_array_new ();
+  xptr_array_add (argv, echo_prog_path);
+  xptr_array_add (argv, arg);
+  xptr_array_add (argv, NULL);
 
   for (i = 0; i < G_N_ELEMENTS (tests); i++)
     {
       xerror_t *error = NULL;
-      GPid pid;
-      GMainContext *context;
-      GMainLoop *loop;
-      GIOChannel *channel = NULL;
-      GSource *source;
+      xpid_t pid;
+      xmain_context_t *context;
+      xmain_loop_t *loop;
+      xio_channel_t *channel = NULL;
+      xsource_t *source;
       SpawnAsyncMultithreadedData data;
       enum fd_type *fd_info = tests[i];
       xint_t test_pipe[3][2];
@@ -249,8 +249,8 @@ test_spawn_async_with_fds (void)
             }
         }
 
-      context = g_main_context_new ();
-      loop = g_main_loop_new (context, TRUE);
+      context = xmain_context_new ();
+      loop = xmain_loop_new (context, TRUE);
 
       g_spawn_async_with_fds (NULL, (char**)argv->pdata, NULL,
 			      G_SPAWN_DO_NOT_REAP_CHILD, NULL, NULL, &pid,
@@ -265,21 +265,21 @@ test_spawn_async_with_fds (void)
       data.loop = loop;
       data.stdout_done = FALSE;
       data.child_exited = FALSE;
-      data.stdout_buf = g_string_new (0);
+      data.stdout_buf = xstring_new (0);
 
       source = g_child_watch_source_new (pid);
-      g_source_set_callback (source, (GSourceFunc)on_child_exited, &data, NULL);
-      g_source_attach (source, context);
-      g_source_unref (source);
+      xsource_set_callback (source, (xsource_func_t)on_child_exited, &data, NULL);
+      xsource_attach (source, context);
+      xsource_unref (source);
 
       if (test_pipe[1][0] >= 0)
         {
           channel = g_io_channel_unix_new (test_pipe[1][0]);
           source = g_io_create_watch (channel, G_IO_IN | G_IO_HUP | G_IO_ERR);
-          g_source_set_callback (source, (GSourceFunc)on_child_stdout,
+          xsource_set_callback (source, (xsource_func_t)on_child_stdout,
                                  &data, NULL);
-          g_source_attach (source, context);
-          g_source_unref (source);
+          xsource_attach (source, context);
+          xsource_unref (source);
         }
       else
         {
@@ -287,7 +287,7 @@ test_spawn_async_with_fds (void)
           data.stdout_done = TRUE;
         }
 
-      g_main_loop_run (loop);
+      xmain_loop_run (loop);
 
       g_assert_true (data.child_exited);
 
@@ -298,17 +298,17 @@ test_spawn_async_with_fds (void)
           g_assert_cmpstr (data.stdout_buf->str, ==, arg);
           g_io_channel_unref (channel);
         }
-      g_string_free (data.stdout_buf, TRUE);
+      xstring_free (data.stdout_buf, TRUE);
 
-      g_main_context_unref (context);
-      g_main_loop_unref (loop);
+      xmain_context_unref (context);
+      xmain_loop_unref (loop);
       safe_close (test_pipe[0][1]);
       safe_close (test_pipe[1][0]);
       if (fd_info[2] != STDOUT_PIPE)
         safe_close (test_pipe[2][0]);
     }
 
-  g_ptr_array_free (argv, TRUE);
+  xptr_array_free (argv, TRUE);
   g_free (arg);
 }
 
@@ -317,7 +317,7 @@ test_spawn_sync (void)
 {
   int tnum = 1;
   xerror_t *error = NULL;
-  char *arg = g_strdup_printf ("thread %d", tnum);
+  char *arg = xstrdup_printf ("thread %d", tnum);
   /* Include arguments with special symbols to test that they are correctly passed to child.
    * This is tested on all platforms, but the most prone to failure is win32,
    * where args are specially escaped during spawning.
@@ -341,7 +341,7 @@ test_spawn_sync (void)
     "/odd spaced/slashes/",
     NULL
   };
-  char *joined_args_str = g_strjoinv ("", (char**)argv + 1);
+  char *joined_args_str = xstrjoinv ("", (char**)argv + 1);
   char *stdout_str;
   int estatus;
 
@@ -361,44 +361,44 @@ test_posix_spawn (void)
 {
   int tnum = 1;
   xerror_t *error = NULL;
-  GPtrArray *argv;
+  xptr_array_t *argv;
   char *arg;
   char *stdout_str;
   int estatus;
   GSpawnFlags flags = G_SPAWN_CLOEXEC_PIPES | G_SPAWN_LEAVE_DESCRIPTORS_OPEN;
 
-  arg = g_strdup_printf ("thread %d", tnum);
+  arg = xstrdup_printf ("thread %d", tnum);
 
-  argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, echo_prog_path);
-  g_ptr_array_add (argv, arg);
-  g_ptr_array_add (argv, NULL);
+  argv = xptr_array_new ();
+  xptr_array_add (argv, echo_prog_path);
+  xptr_array_add (argv, arg);
+  xptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char**)argv->pdata, NULL, flags, NULL, NULL, &stdout_str, NULL, &estatus, &error);
   g_assert_no_error (error);
   g_assert_cmpstr (arg, ==, stdout_str);
   g_free (arg);
   g_free (stdout_str);
-  g_ptr_array_free (argv, TRUE);
+  xptr_array_free (argv, TRUE);
 }
 
 static void
 test_spawn_script (void)
 {
   xerror_t *error = NULL;
-  GPtrArray *argv;
+  xptr_array_t *argv;
   char *stdout_str;
   int estatus;
 
-  argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, echo_script_path);
-  g_ptr_array_add (argv, NULL);
+  argv = xptr_array_new ();
+  xptr_array_add (argv, echo_script_path);
+  xptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char**)argv->pdata, NULL, 0, NULL, NULL, &stdout_str, NULL, &estatus, &error);
   g_assert_no_error (error);
   g_assert_cmpstr ("echo" LINEEND, ==, stdout_str);
   g_free (stdout_str);
-  g_ptr_array_free (argv, TRUE);
+  xptr_array_free (argv, TRUE);
 }
 
 /* Test that spawning a non-existent executable returns %G_SPAWN_ERROR_NOENT. */
@@ -406,13 +406,13 @@ static void
 test_spawn_nonexistent (void)
 {
   xerror_t *error = NULL;
-  GPtrArray *argv = NULL;
+  xptr_array_t *argv = NULL;
   xchar_t *stdout_str = NULL;
   xint_t wait_status = -1;
 
-  argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, "this does not exist");
-  g_ptr_array_add (argv, NULL);
+  argv = xptr_array_new ();
+  xptr_array_add (argv, "this does not exist");
+  xptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char**) argv->pdata, NULL, 0, NULL, NULL, &stdout_str,
                 NULL, &wait_status, &error);
@@ -420,7 +420,7 @@ test_spawn_nonexistent (void)
   g_assert_null (stdout_str);
   g_assert_cmpint (wait_status, ==, -1);
 
-  g_ptr_array_free (argv, TRUE);
+  xptr_array_free (argv, TRUE);
 
   g_clear_error (&error);
 }
@@ -445,7 +445,7 @@ test_spawn_fd_assignment_clash (void)
 
   /* Open a temporary file and duplicate its FD several times so we have several
    * FDs to remap in the child process. */
-  tmp_fd = g_file_open_tmp ("glib-spawn-test-XXXXXX", NULL, NULL);
+  tmp_fd = xfile_open_tmp ("glib-spawn-test-XXXXXX", NULL, NULL);
   g_assert_cmpint (tmp_fd, >=, 0);
 
   for (i = 0; i < (N_FDS - 1); ++i)
@@ -506,15 +506,15 @@ main (int   argc,
   dirname = g_path_get_dirname (argv[0]);
   echo_prog_path = g_build_filename (dirname, "test-spawn-echo" EXEEXT, NULL);
   echo_script_path = g_build_filename (dirname, "echo-script" SCRIPT_EXT, NULL);
-  if (!g_file_test (echo_script_path, G_FILE_TEST_EXISTS))
+  if (!xfile_test (echo_script_path, XFILE_TEST_EXISTS))
     {
       g_free (echo_script_path);
       echo_script_path = g_test_build_filename (G_TEST_DIST, "echo-script" SCRIPT_EXT, NULL);
     }
   g_free (dirname);
 
-  g_assert (g_file_test (echo_prog_path, G_FILE_TEST_EXISTS));
-  g_assert (g_file_test (echo_script_path, G_FILE_TEST_EXISTS));
+  g_assert (xfile_test (echo_prog_path, XFILE_TEST_EXISTS));
+  g_assert (xfile_test (echo_script_path, XFILE_TEST_EXISTS));
 
   g_test_add_func ("/gthread/spawn-single-sync", test_spawn_sync);
   g_test_add_func ("/gthread/spawn-single-async", test_spawn_async);

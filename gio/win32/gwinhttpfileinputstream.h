@@ -41,7 +41,7 @@ typedef struct _GWinHttpFileInputStreamClass    GWinHttpFileInputStreamClass;
 
 xtype_t _g_winhttp_file_input_stream_get_type (void) G_GNUC_CONST;
 
-GFileInputStream *_g_winhttp_file_input_stream_new (GWinHttpFile *file,
+xfile_input_stream_t *_g_winhttp_file_input_stream_new (GWinHttpFile *file,
                                                     HINTERNET     connection,
                                                     HINTERNET     request);
 

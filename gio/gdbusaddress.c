@@ -83,8 +83,8 @@ static xchar_t *get_session_address_dbus_launch       (xerror_t **error);
  * Checks if @string is a
  * [D-Bus address](https://dbus.freedesktop.org/doc/dbus-specification.html#addresses).
  *
- * This doesn't check if @string is actually supported by #GDBusServer
- * or #GDBusConnection - use g_dbus_is_supported_address() to do more
+ * This doesn't check if @string is actually supported by #xdbus_server_t
+ * or #xdbus_connection_t - use g_dbus_is_supported_address() to do more
  * checks.
  *
  * Returns: %TRUE if @string is a valid D-Bus address, %FALSE otherwise.
@@ -102,7 +102,7 @@ g_dbus_is_address (const xchar_t *string)
 
   g_return_val_if_fail (string != NULL, FALSE);
 
-  a = g_strsplit (string, ";", 0);
+  a = xstrsplit (string, ";", 0);
   if (a[0] == NULL)
     goto out;
 
@@ -118,13 +118,13 @@ g_dbus_is_address (const xchar_t *string)
   ret = TRUE;
 
  out:
-  g_strfreev (a);
+  xstrfreev (a);
   return ret;
 }
 
 static xboolean_t
 is_valid_unix (const xchar_t  *address_entry,
-               GHashTable   *key_value_pairs,
+               xhashtable_t   *key_value_pairs,
                xerror_t      **error)
 {
   xboolean_t ret;
@@ -142,19 +142,19 @@ is_valid_unix (const xchar_t  *address_entry,
   tmpdir = NULL;
   abstract = NULL;
 
-  keys = g_hash_table_get_keys (key_value_pairs);
+  keys = xhash_table_get_keys (key_value_pairs);
   for (l = keys; l != NULL; l = l->next)
     {
       const xchar_t *key = l->data;
-      if (g_strcmp0 (key, "path") == 0)
-        path = g_hash_table_lookup (key_value_pairs, key);
-      else if (g_strcmp0 (key, "dir") == 0)
-        dir = g_hash_table_lookup (key_value_pairs, key);
-      else if (g_strcmp0 (key, "tmpdir") == 0)
-        tmpdir = g_hash_table_lookup (key_value_pairs, key);
-      else if (g_strcmp0 (key, "abstract") == 0)
-        abstract = g_hash_table_lookup (key_value_pairs, key);
-      else if (g_strcmp0 (key, "guid") != 0)
+      if (xstrcmp0 (key, "path") == 0)
+        path = xhash_table_lookup (key_value_pairs, key);
+      else if (xstrcmp0 (key, "dir") == 0)
+        dir = xhash_table_lookup (key_value_pairs, key);
+      else if (xstrcmp0 (key, "tmpdir") == 0)
+        tmpdir = xhash_table_lookup (key_value_pairs, key);
+      else if (xstrcmp0 (key, "abstract") == 0)
+        abstract = xhash_table_lookup (key_value_pairs, key);
+      else if (xstrcmp0 (key, "guid") != 0)
         {
           g_set_error (error,
                        G_IO_ERROR,
@@ -189,14 +189,14 @@ is_valid_unix (const xchar_t  *address_entry,
   ret = TRUE;
 
  out:
-  g_list_free (keys);
+  xlist_free (keys);
 
   return ret;
 }
 
 static xboolean_t
 is_valid_nonce_tcp (const xchar_t  *address_entry,
-                    GHashTable   *key_value_pairs,
+                    xhashtable_t   *key_value_pairs,
                     xerror_t      **error)
 {
   xboolean_t ret;
@@ -216,19 +216,19 @@ is_valid_nonce_tcp (const xchar_t  *address_entry,
   family = NULL;
   nonce_file = NULL;
 
-  keys = g_hash_table_get_keys (key_value_pairs);
+  keys = xhash_table_get_keys (key_value_pairs);
   for (l = keys; l != NULL; l = l->next)
     {
       const xchar_t *key = l->data;
-      if (g_strcmp0 (key, "host") == 0)
-        host = g_hash_table_lookup (key_value_pairs, key);
-      else if (g_strcmp0 (key, "port") == 0)
-        port = g_hash_table_lookup (key_value_pairs, key);
-      else if (g_strcmp0 (key, "family") == 0)
-        family = g_hash_table_lookup (key_value_pairs, key);
-      else if (g_strcmp0 (key, "noncefile") == 0)
-        nonce_file = g_hash_table_lookup (key_value_pairs, key);
-      else if (g_strcmp0 (key, "guid") != 0)
+      if (xstrcmp0 (key, "host") == 0)
+        host = xhash_table_lookup (key_value_pairs, key);
+      else if (xstrcmp0 (key, "port") == 0)
+        port = xhash_table_lookup (key_value_pairs, key);
+      else if (xstrcmp0 (key, "family") == 0)
+        family = xhash_table_lookup (key_value_pairs, key);
+      else if (xstrcmp0 (key, "noncefile") == 0)
+        nonce_file = xhash_table_lookup (key_value_pairs, key);
+      else if (xstrcmp0 (key, "guid") != 0)
         {
           g_set_error (error,
                        G_IO_ERROR,
@@ -254,7 +254,7 @@ is_valid_nonce_tcp (const xchar_t  *address_entry,
         }
     }
 
-  if (family != NULL && !(g_strcmp0 (family, "ipv4") == 0 || g_strcmp0 (family, "ipv6") == 0))
+  if (family != NULL && !(xstrcmp0 (family, "ipv4") == 0 || xstrcmp0 (family, "ipv6") == 0))
     {
       g_set_error (error,
                    G_IO_ERROR,
@@ -282,14 +282,14 @@ is_valid_nonce_tcp (const xchar_t  *address_entry,
   ret = TRUE;
 
  out:
-  g_list_free (keys);
+  xlist_free (keys);
 
   return ret;
 }
 
 static xboolean_t
 is_valid_tcp (const xchar_t  *address_entry,
-              GHashTable   *key_value_pairs,
+              xhashtable_t   *key_value_pairs,
               xerror_t      **error)
 {
   xboolean_t ret;
@@ -307,17 +307,17 @@ is_valid_tcp (const xchar_t  *address_entry,
   port = NULL;
   family = NULL;
 
-  keys = g_hash_table_get_keys (key_value_pairs);
+  keys = xhash_table_get_keys (key_value_pairs);
   for (l = keys; l != NULL; l = l->next)
     {
       const xchar_t *key = l->data;
-      if (g_strcmp0 (key, "host") == 0)
-        host = g_hash_table_lookup (key_value_pairs, key);
-      else if (g_strcmp0 (key, "port") == 0)
-        port = g_hash_table_lookup (key_value_pairs, key);
-      else if (g_strcmp0 (key, "family") == 0)
-        family = g_hash_table_lookup (key_value_pairs, key);
-      else if (g_strcmp0 (key, "guid") != 0)
+      if (xstrcmp0 (key, "host") == 0)
+        host = xhash_table_lookup (key_value_pairs, key);
+      else if (xstrcmp0 (key, "port") == 0)
+        port = xhash_table_lookup (key_value_pairs, key);
+      else if (xstrcmp0 (key, "family") == 0)
+        family = xhash_table_lookup (key_value_pairs, key);
+      else if (xstrcmp0 (key, "guid") != 0)
         {
           g_set_error (error,
                        G_IO_ERROR,
@@ -343,7 +343,7 @@ is_valid_tcp (const xchar_t  *address_entry,
         }
     }
 
-  if (family != NULL && !(g_strcmp0 (family, "ipv4") == 0 || g_strcmp0 (family, "ipv6") == 0))
+  if (family != NULL && !(xstrcmp0 (family, "ipv4") == 0 || xstrcmp0 (family, "ipv6") == 0))
     {
       g_set_error (error,
                    G_IO_ERROR,
@@ -361,7 +361,7 @@ is_valid_tcp (const xchar_t  *address_entry,
   ret= TRUE;
 
  out:
-  g_list_free (keys);
+  xlist_free (keys);
 
   return ret;
 }
@@ -394,11 +394,11 @@ g_dbus_is_supported_address (const xchar_t  *string,
   g_return_val_if_fail (string != NULL, FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  a = g_strsplit (string, ";", 0);
+  a = xstrsplit (string, ";", 0);
   for (n = 0; a[n] != NULL; n++)
     {
       xchar_t *transport_name;
-      GHashTable *key_value_pairs;
+      xhashtable_t *key_value_pairs;
       xboolean_t supported;
 
       if (!_g_dbus_address_parse_entry (a[n],
@@ -408,13 +408,13 @@ g_dbus_is_supported_address (const xchar_t  *string,
         goto out;
 
       supported = FALSE;
-      if (g_strcmp0 (transport_name, "unix") == 0)
+      if (xstrcmp0 (transport_name, "unix") == 0)
         supported = is_valid_unix (a[n], key_value_pairs, error);
-      else if (g_strcmp0 (transport_name, "tcp") == 0)
+      else if (xstrcmp0 (transport_name, "tcp") == 0)
         supported = is_valid_tcp (a[n], key_value_pairs, error);
-      else if (g_strcmp0 (transport_name, "nonce-tcp") == 0)
+      else if (xstrcmp0 (transport_name, "nonce-tcp") == 0)
         supported = is_valid_nonce_tcp (a[n], key_value_pairs, error);
-      else if (g_strcmp0 (a[n], "autolaunch:") == 0)
+      else if (xstrcmp0 (a[n], "autolaunch:") == 0)
         supported = TRUE;
       else
         g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
@@ -422,7 +422,7 @@ g_dbus_is_supported_address (const xchar_t  *string,
                      transport_name, a[n]);
 
       g_free (transport_name);
-      g_hash_table_unref (key_value_pairs);
+      xhash_table_unref (key_value_pairs);
 
       if (!supported)
         goto out;
@@ -431,7 +431,7 @@ g_dbus_is_supported_address (const xchar_t  *string,
   ret = TRUE;
 
  out:
-  g_strfreev (a);
+  xstrfreev (a);
 
   g_assert (ret || (!ret && (error == NULL || *error != NULL)));
 
@@ -441,11 +441,11 @@ g_dbus_is_supported_address (const xchar_t  *string,
 xboolean_t
 _g_dbus_address_parse_entry (const xchar_t  *address_entry,
                              xchar_t       **out_transport_name,
-                             GHashTable  **out_key_value_pairs,
+                             xhashtable_t  **out_key_value_pairs,
                              xerror_t      **error)
 {
   xboolean_t ret;
-  GHashTable *key_value_pairs;
+  xhashtable_t *key_value_pairs;
   xchar_t *transport_name;
   xchar_t **kv_pairs;
   const xchar_t *s;
@@ -476,10 +476,10 @@ _g_dbus_address_parse_entry (const xchar_t  *address_entry,
       goto out;
     }
 
-  transport_name = g_strndup (address_entry, s - address_entry);
-  key_value_pairs = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+  transport_name = xstrndup (address_entry, s - address_entry);
+  key_value_pairs = xhash_table_new_full (xstr_hash, xstr_equal, g_free, g_free);
 
-  kv_pairs = g_strsplit (s + 1, ",", 0);
+  kv_pairs = xstrsplit (s + 1, ",", 0);
   for (n = 0; kv_pairs[n] != NULL; n++)
     {
       const xchar_t *kv_pair = kv_pairs[n];
@@ -510,8 +510,8 @@ _g_dbus_address_parse_entry (const xchar_t  *address_entry,
           goto out;
         }
 
-      key = g_uri_unescape_segment (kv_pair, s, NULL);
-      value = g_uri_unescape_segment (s + 1, kv_pair + strlen (kv_pair), NULL);
+      key = xuri_unescape_segment (kv_pair, s, NULL);
+      value = xuri_unescape_segment (s + 1, kv_pair + strlen (kv_pair), NULL);
       if (key == NULL || value == NULL)
         {
           g_set_error (error,
@@ -525,7 +525,7 @@ _g_dbus_address_parse_entry (const xchar_t  *address_entry,
           g_free (value);
           goto out;
         }
-      g_hash_table_insert (key_value_pairs, key, value);
+      xhash_table_insert (key_value_pairs, key, value);
     }
 
   ret = TRUE;
@@ -539,9 +539,9 @@ out:
         *out_key_value_pairs = g_steal_pointer (&key_value_pairs);
     }
 
-  g_clear_pointer (&key_value_pairs, g_hash_table_unref);
+  g_clear_pointer (&key_value_pairs, xhash_table_unref);
   g_free (transport_name);
-  g_strfreev (kv_pairs);
+  xstrfreev (kv_pairs);
 
   return ret;
 }
@@ -562,24 +562,24 @@ g_dbus_address_try_connect_one (const xchar_t   *address_entry,
 static xio_stream_t *
 g_dbus_address_connect (const xchar_t   *address_entry,
                         const xchar_t   *transport_name,
-                        GHashTable    *key_value_pairs,
+                        xhashtable_t    *key_value_pairs,
                         xcancellable_t  *cancellable,
                         xerror_t       **error)
 {
   xio_stream_t *ret;
-  GSocketConnectable *connectable;
+  xsocket_connectable_t *connectable;
   const xchar_t *nonce_file;
 
   connectable = NULL;
   ret = NULL;
   nonce_file = NULL;
 
-  if (g_strcmp0 (transport_name, "unix") == 0)
+  if (xstrcmp0 (transport_name, "unix") == 0)
     {
       const xchar_t *path;
       const xchar_t *abstract;
-      path = g_hash_table_lookup (key_value_pairs, "path");
-      abstract = g_hash_table_lookup (key_value_pairs, "abstract");
+      path = xhash_table_lookup (key_value_pairs, "path");
+      abstract = xhash_table_lookup (key_value_pairs, "abstract");
       if ((path == NULL && abstract == NULL) || (path != NULL && abstract != NULL))
         {
           g_set_error (error,
@@ -604,17 +604,17 @@ g_dbus_address_connect (const xchar_t   *address_entry,
           g_assert_not_reached ();
         }
     }
-  else if (g_strcmp0 (transport_name, "tcp") == 0 || g_strcmp0 (transport_name, "nonce-tcp") == 0)
+  else if (xstrcmp0 (transport_name, "tcp") == 0 || xstrcmp0 (transport_name, "nonce-tcp") == 0)
     {
       const xchar_t *s;
       const xchar_t *host;
-      glong port;
+      xlong_t port;
       xchar_t *endp;
       xboolean_t is_nonce;
 
-      is_nonce = (g_strcmp0 (transport_name, "nonce-tcp") == 0);
+      is_nonce = (xstrcmp0 (transport_name, "nonce-tcp") == 0);
 
-      host = g_hash_table_lookup (key_value_pairs, "host");
+      host = xhash_table_lookup (key_value_pairs, "host");
       if (host == NULL)
         {
           g_set_error (error,
@@ -625,7 +625,7 @@ g_dbus_address_connect (const xchar_t   *address_entry,
           goto out;
         }
 
-      s = g_hash_table_lookup (key_value_pairs, "port");
+      s = xhash_table_lookup (key_value_pairs, "port");
       if (s == NULL)
         s = "0";
       port = strtol (s, &endp, 10);
@@ -642,7 +642,7 @@ g_dbus_address_connect (const xchar_t   *address_entry,
 
       if (is_nonce)
         {
-          nonce_file = g_hash_table_lookup (key_value_pairs, "noncefile");
+          nonce_file = xhash_table_lookup (key_value_pairs, "noncefile");
           if (nonce_file == NULL)
             {
               g_set_error (error,
@@ -657,7 +657,7 @@ g_dbus_address_connect (const xchar_t   *address_entry,
       /* TODO: deal with family key/value-pair */
       connectable = g_network_address_new (host, port);
     }
-  else if (g_strcmp0 (address_entry, "autolaunch:") == 0)
+  else if (xstrcmp0 (address_entry, "autolaunch:") == 0)
     {
       xchar_t *autolaunch_address;
       autolaunch_address = get_session_address_dbus_launch (error);
@@ -684,7 +684,7 @@ g_dbus_address_connect (const xchar_t   *address_entry,
 
   if (connectable != NULL)
     {
-      GSocketClient *client;
+      xsocket_client_t *client;
       xsocket_connection_t *connection;
 
       g_assert (ret == NULL);
@@ -700,8 +700,8 @@ g_dbus_address_connect (const xchar_t   *address_entry,
                                             connectable,
                                             cancellable,
                                             error);
-      g_object_unref (connectable);
-      g_object_unref (client);
+      xobject_unref (connectable);
+      xobject_unref (client);
       if (connection == NULL)
         goto out;
 
@@ -724,8 +724,8 @@ g_dbus_address_connect (const xchar_t   *address_entry,
                            G_IO_ERROR_INVALID_ARGUMENT,
                            _("Error opening nonce file “%s”: %s"),
                            nonce_file,
-                           g_strerror (errsv));
-              g_object_unref (ret);
+                           xstrerror (errsv));
+              xobject_unref (ret);
               ret = NULL;
               goto out;
             }
@@ -743,7 +743,7 @@ g_dbus_address_connect (const xchar_t   *address_entry,
                                G_IO_ERROR_INVALID_ARGUMENT,
                                _("Error reading from nonce file “%s”: %s"),
                                nonce_file,
-                               g_strerror (errsv));
+                               xstrerror (errsv));
                 }
               else
                 {
@@ -754,14 +754,14 @@ g_dbus_address_connect (const xchar_t   *address_entry,
                                nonce_file,
                                (xint_t) num_bytes_read);
                 }
-              g_object_unref (ret);
+              xobject_unref (ret);
               ret = NULL;
               fclose (f);
               goto out;
             }
           fclose (f);
 
-          if (!g_output_stream_write_all (g_io_stream_get_output_stream (ret),
+          if (!xoutput_stream_write_all (g_io_stream_get_output_stream (ret),
                                           nonce_contents,
                                           16,
                                           NULL,
@@ -769,7 +769,7 @@ g_dbus_address_connect (const xchar_t   *address_entry,
                                           error))
             {
               g_prefix_error (error, _("Error writing contents of nonce file “%s” to stream:"), nonce_file);
-              g_object_unref (ret);
+              xobject_unref (ret);
               ret = NULL;
               goto out;
             }
@@ -788,7 +788,7 @@ g_dbus_address_try_connect_one (const xchar_t   *address_entry,
                                 xerror_t       **error)
 {
   xio_stream_t *ret;
-  GHashTable *key_value_pairs;
+  xhashtable_t *key_value_pairs;
   xchar_t *transport_name;
   const xchar_t *guid;
 
@@ -810,14 +810,14 @@ g_dbus_address_try_connect_one (const xchar_t   *address_entry,
   if (ret == NULL)
     goto out;
 
-  guid = g_hash_table_lookup (key_value_pairs, "guid");
+  guid = xhash_table_lookup (key_value_pairs, "guid");
   if (guid != NULL && out_guid != NULL)
-    *out_guid = g_strdup (guid);
+    *out_guid = xstrdup (guid);
 
 out:
   g_free (transport_name);
   if (key_value_pairs != NULL)
-    g_hash_table_unref (key_value_pairs);
+    xhash_table_unref (key_value_pairs);
   return ret;
 }
 
@@ -838,7 +838,7 @@ get_stream_data_free (GetStreamData *data)
 }
 
 static void
-get_stream_thread_func (GTask         *task,
+get_stream_thread_func (xtask_t         *task,
                         xpointer_t       source_object,
                         xpointer_t       task_data,
                         xcancellable_t  *cancellable)
@@ -852,9 +852,9 @@ get_stream_thread_func (GTask         *task,
                                            cancellable,
                                            &error);
   if (stream)
-    g_task_return_pointer (task, stream, g_object_unref);
+    xtask_return_pointer (task, stream, xobject_unref);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 /**
@@ -884,19 +884,19 @@ g_dbus_address_get_stream (const xchar_t         *address,
                            xasync_ready_callback_t  callback,
                            xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
   GetStreamData *data;
 
   g_return_if_fail (address != NULL);
 
   data = g_new0 (GetStreamData, 1);
-  data->address = g_strdup (address);
+  data->address = xstrdup (address);
 
-  task = g_task_new (NULL, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_dbus_address_get_stream);
-  g_task_set_task_data (task, data, (GDestroyNotify) get_stream_data_free);
-  g_task_run_in_thread (task, get_stream_thread_func);
-  g_object_unref (task);
+  task = xtask_new (NULL, cancellable, callback, user_data);
+  xtask_set_source_tag (task, g_dbus_address_get_stream);
+  xtask_set_task_data (task, data, (xdestroy_notify_t) get_stream_data_free);
+  xtask_run_in_thread (task, get_stream_thread_func);
+  xobject_unref (task);
 }
 
 /**
@@ -919,19 +919,19 @@ g_dbus_address_get_stream_finish (xasync_result_t        *res,
                                   xchar_t              **out_guid,
                                   xerror_t             **error)
 {
-  GTask *task;
+  xtask_t *task;
   GetStreamData *data;
   xio_stream_t *ret;
 
-  g_return_val_if_fail (g_task_is_valid (res, NULL), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, NULL), NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  task = G_TASK (res);
-  ret = g_task_propagate_pointer (task, error);
+  task = XTASK (res);
+  ret = xtask_propagate_pointer (task, error);
 
   if (ret != NULL && out_guid != NULL)
     {
-      data = g_task_get_task_data (task);
+      data = xtask_get_task_data (task);
       *out_guid = data->guid;
       data->guid = NULL;
     }
@@ -978,10 +978,10 @@ g_dbus_address_get_stream_sync (const xchar_t   *address,
   ret = NULL;
   last_error = NULL;
 
-  addr_array = g_strsplit (address, ";", 0);
+  addr_array = xstrsplit (address, ";", 0);
   if (addr_array[0] == NULL)
     {
-      last_error = g_error_new_literal (G_IO_ERROR,
+      last_error = xerror_new_literal (G_IO_ERROR,
                                         G_IO_ERROR_INVALID_ARGUMENT,
                                         _("The given address is empty"));
       goto out;
@@ -1005,7 +1005,7 @@ g_dbus_address_get_stream_sync (const xchar_t   *address,
         {
           g_assert (this_error != NULL);
           if (last_error != NULL)
-            g_error_free (last_error);
+            xerror_free (last_error);
           last_error = this_error;
         }
     }
@@ -1014,7 +1014,7 @@ g_dbus_address_get_stream_sync (const xchar_t   *address,
   if (ret != NULL)
     {
       if (last_error != NULL)
-        g_error_free (last_error);
+        xerror_free (last_error);
     }
   else
     {
@@ -1022,7 +1022,7 @@ g_dbus_address_get_stream_sync (const xchar_t   *address,
       g_propagate_error (error, last_error);
     }
 
-  g_strfreev (addr_array);
+  xstrfreev (addr_array);
   return ret;
 }
 
@@ -1058,7 +1058,7 @@ get_session_address_xdg (void)
     goto out;
 
   tmp = g_dbus_address_escape_value (bus);
-  ret = g_strconcat ("unix:path=", tmp, NULL);
+  ret = xstrconcat ("unix:path=", tmp, NULL);
   g_free (tmp);
 
 out:
@@ -1129,13 +1129,13 @@ get_session_address_dbus_launch (xerror_t **error)
    */
 
   /* TODO: maybe provide a variable for where to look for the dbus-launch binary? */
-  command_line = g_strdup_printf ("dbus-launch --autolaunch=%s --binary-syntax --close-stderr", machine_id);
+  command_line = xstrdup_printf ("dbus-launch --autolaunch=%s --binary-syntax --close-stderr", machine_id);
 
   if (G_UNLIKELY (_g_dbus_debug_address ()))
     {
       _g_dbus_debug_print_lock ();
       g_print ("GDBus-debug:Address: Running '%s' to get bus address (possibly autolaunching)\n", command_line);
-      old_dbus_verbose = g_strdup (g_getenv ("DBUS_VERBOSE"));
+      old_dbus_verbose = xstrdup (g_getenv ("DBUS_VERBOSE"));
       restore_dbus_verbose = TRUE;
       g_setenv ("DBUS_VERBOSE", "1", TRUE);
       _g_dbus_debug_print_unlock ();
@@ -1164,7 +1164,7 @@ get_session_address_dbus_launch (xerror_t **error)
    *   sizeof(long).  Integers are in the machine's byte order, not
    *   network byte order or any other canonical byte order.
    */
-  ret = g_strdup (launch_stdout);
+  ret = xstrdup (launch_stdout);
 
  out:
   if (G_UNLIKELY (_g_dbus_debug_address ()))
@@ -1331,11 +1331,11 @@ g_dbus_address_get_for_bus_sync (GBusType       bus_type,
       if (has_elevated_privileges)
         ret = NULL;
       else
-        ret = g_strdup (g_getenv ("DBUS_SYSTEM_BUS_ADDRESS"));
+        ret = xstrdup (g_getenv ("DBUS_SYSTEM_BUS_ADDRESS"));
 
       if (ret == NULL)
         {
-          ret = g_strdup ("unix:path=/var/run/dbus/system_bus_socket");
+          ret = xstrdup ("unix:path=/var/run/dbus/system_bus_socket");
         }
       break;
 
@@ -1343,7 +1343,7 @@ g_dbus_address_get_for_bus_sync (GBusType       bus_type,
       if (has_elevated_privileges)
         ret = NULL;
       else
-        ret = g_strdup (g_getenv ("DBUS_SESSION_BUS_ADDRESS"));
+        ret = xstrdup (g_getenv ("DBUS_SESSION_BUS_ADDRESS"));
 
       if (ret == NULL)
         {
@@ -1353,12 +1353,12 @@ g_dbus_address_get_for_bus_sync (GBusType       bus_type,
 
     case G_BUS_TYPE_STARTER:
       starter_bus = g_getenv ("DBUS_STARTER_BUS_TYPE");
-      if (g_strcmp0 (starter_bus, "session") == 0)
+      if (xstrcmp0 (starter_bus, "session") == 0)
         {
           ret = g_dbus_address_get_for_bus_sync (G_BUS_TYPE_SESSION, cancellable, &local_error);
           goto out;
         }
-      else if (g_strcmp0 (starter_bus, "system") == 0)
+      else if (xstrcmp0 (starter_bus, "system") == 0)
         {
           ret = g_dbus_address_get_for_bus_sync (G_BUS_TYPE_SYSTEM, cancellable, &local_error);
           goto out;
@@ -1440,16 +1440,16 @@ g_dbus_address_get_for_bus_sync (GBusType       bus_type,
 xchar_t *
 g_dbus_address_escape_value (const xchar_t *string)
 {
-  GString *s;
+  xstring_t *s;
   xsize_t i;
 
   g_return_val_if_fail (string != NULL, NULL);
 
   /* There will often not be anything needing escaping at all. */
-  s = g_string_sized_new (strlen (string));
+  s = xstring_sized_new (strlen (string));
 
   /* D-Bus address escaping is mostly the same as URI escaping... */
-  g_string_append_uri_escaped (s, string, "\\/", FALSE);
+  xstring_append_uri_escaped (s, string, "\\/", FALSE);
 
   /* ... but '~' is an unreserved character in URIs, but a
    * non-optionally-escaped character in D-Bus addresses. */
@@ -1458,10 +1458,10 @@ g_dbus_address_escape_value (const xchar_t *string)
       if (G_UNLIKELY (s->str[i] == '~'))
         {
           s->str[i] = '%';
-          g_string_insert (s, i + 1, "7E");
+          xstring_insert (s, i + 1, "7E");
           i += 2;
         }
     }
 
-  return g_string_free (s, FALSE);
+  return xstring_free (s, FALSE);
 }

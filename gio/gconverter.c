@@ -29,7 +29,7 @@
  * @include: gio/gio.h
  * @see_also: #xinput_stream_t, #xoutput_stream_t
  *
- * #GConverter is implemented by objects that convert
+ * #xconverter_t is implemented by objects that convert
  * binary data in various ways. The conversion can be
  * stateful and may fail at any place.
  *
@@ -42,7 +42,7 @@
 
 
 typedef GConverterIface GConverterInterface;
-G_DEFINE_INTERFACE (GConverter, g_converter, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (xconverter, g_converter, XTYPE_OBJECT)
 
 static void
 g_converter_default_init (GConverterInterface *iface)
@@ -51,11 +51,11 @@ g_converter_default_init (GConverterInterface *iface)
 
 /**
  * g_converter_convert:
- * @converter: a #GConverter.
- * @inbuf: (array length=inbuf_size) (element-type guint8): the buffer
+ * @converter: a #xconverter_t.
+ * @inbuf: (array length=inbuf_size) (element-type xuint8_t): the buffer
  *         containing the data to convert.
  * @inbuf_size: the number of bytes in @inbuf
- * @outbuf: (element-type guint8) (array length=outbuf_size): a buffer to write
+ * @outbuf: (element-type xuint8_t) (array length=outbuf_size): a buffer to write
  *    converted data in.
  * @outbuf_size: the number of bytes in @outbuf, must be at least one
  * @flags: a #GConverterFlags controlling the conversion details
@@ -151,7 +151,7 @@ g_converter_default_init (GConverterInterface *iface)
  * Since: 2.24
  **/
 GConverterResult
-g_converter_convert (GConverter *converter,
+g_converter_convert (xconverter_t *converter,
 		     const void *inbuf,
 		     xsize_t       inbuf_size,
 		     void       *outbuf,
@@ -180,7 +180,7 @@ g_converter_convert (GConverter *converter,
 
 /**
  * g_converter_reset:
- * @converter: a #GConverter.
+ * @converter: a #xconverter_t.
  *
  * Resets all internal state in the converter, making it behave
  * as if it was just created. If the converter has any internal
@@ -189,7 +189,7 @@ g_converter_convert (GConverter *converter,
  * Since: 2.24
  **/
 void
-g_converter_reset (GConverter *converter)
+g_converter_reset (xconverter_t *converter)
 {
   GConverterIface *iface;
 

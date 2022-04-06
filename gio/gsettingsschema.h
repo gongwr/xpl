@@ -23,34 +23,34 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GSettingsSchemaSource                       GSettingsSchemaSource;
-typedef struct _GSettingsSchema                             GSettingsSchema;
-typedef struct _GSettingsSchemaKey                          GSettingsSchemaKey;
+typedef struct _GSettingsSchemaSource                       xsettings_schema_source_t;
+typedef struct _GSettingsSchema                             xsettings_schema_t;
+typedef struct _GSettingsSchemaKey                          xsettings_schema_key_t;
 
 #define                 XTYPE_SETTINGS_SCHEMA_SOURCE                   (g_settings_schema_source_get_type ())
 XPL_AVAILABLE_IN_2_32
 xtype_t                   g_settings_schema_source_get_type               (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_2_32
-GSettingsSchemaSource * g_settings_schema_source_get_default            (void);
+xsettings_schema_source_t * g_settings_schema_source_get_default            (void);
 XPL_AVAILABLE_IN_2_32
-GSettingsSchemaSource * g_settings_schema_source_ref                    (GSettingsSchemaSource  *source);
+xsettings_schema_source_t * g_settings_schema_source_ref                    (xsettings_schema_source_t  *source);
 XPL_AVAILABLE_IN_2_32
-void                    g_settings_schema_source_unref                  (GSettingsSchemaSource  *source);
+void                    g_settings_schema_source_unref                  (xsettings_schema_source_t  *source);
 
 XPL_AVAILABLE_IN_2_32
-GSettingsSchemaSource * g_settings_schema_source_new_from_directory     (const xchar_t            *directory,
-                                                                         GSettingsSchemaSource  *parent,
+xsettings_schema_source_t * g_settings_schema_source_new_from_directory     (const xchar_t            *directory,
+                                                                         xsettings_schema_source_t  *parent,
                                                                          xboolean_t                trusted,
                                                                          xerror_t                **error);
 
 XPL_AVAILABLE_IN_2_32
-GSettingsSchema *       g_settings_schema_source_lookup                 (GSettingsSchemaSource  *source,
+xsettings_schema_t *       g_settings_schema_source_lookup                 (xsettings_schema_source_t  *source,
                                                                          const xchar_t            *schema_id,
                                                                          xboolean_t                recursive);
 
 XPL_AVAILABLE_IN_2_40
-void                    g_settings_schema_source_list_schemas           (GSettingsSchemaSource   *source,
+void                    g_settings_schema_source_list_schemas           (xsettings_schema_source_t   *source,
                                                                          xboolean_t                 recursive,
                                                                          xchar_t                 ***non_relocatable,
                                                                          xchar_t                 ***relocatable);
@@ -60,52 +60,52 @@ XPL_AVAILABLE_IN_2_32
 xtype_t                   g_settings_schema_get_type                      (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_2_32
-GSettingsSchema *       g_settings_schema_ref                           (GSettingsSchema        *schema);
+xsettings_schema_t *       g_settings_schema_ref                           (xsettings_schema_t        *schema);
 XPL_AVAILABLE_IN_2_32
-void                    g_settings_schema_unref                         (GSettingsSchema        *schema);
+void                    g_settings_schema_unref                         (xsettings_schema_t        *schema);
 
 XPL_AVAILABLE_IN_2_32
-const xchar_t *           g_settings_schema_get_id                        (GSettingsSchema        *schema);
+const xchar_t *           g_settings_schema_get_id                        (xsettings_schema_t        *schema);
 XPL_AVAILABLE_IN_2_32
-const xchar_t *           g_settings_schema_get_path                      (GSettingsSchema        *schema);
+const xchar_t *           g_settings_schema_get_path                      (xsettings_schema_t        *schema);
 XPL_AVAILABLE_IN_2_40
-GSettingsSchemaKey *    g_settings_schema_get_key                       (GSettingsSchema        *schema,
+xsettings_schema_key_t *    g_settings_schema_get_key                       (xsettings_schema_t        *schema,
                                                                          const xchar_t            *name);
 XPL_AVAILABLE_IN_2_40
-xboolean_t                g_settings_schema_has_key                       (GSettingsSchema        *schema,
+xboolean_t                g_settings_schema_has_key                       (xsettings_schema_t        *schema,
                                                                          const xchar_t            *name);
 XPL_AVAILABLE_IN_2_46
-xchar_t**                 g_settings_schema_list_keys                     (GSettingsSchema        *schema);
+xchar_t**                 g_settings_schema_list_keys                     (xsettings_schema_t        *schema);
 
 
 XPL_AVAILABLE_IN_2_44
-xchar_t **                g_settings_schema_list_children                 (GSettingsSchema        *schema);
+xchar_t **                g_settings_schema_list_children                 (xsettings_schema_t        *schema);
 
 #define                 XTYPE_SETTINGS_SCHEMA_KEY                      (g_settings_schema_key_get_type ())
 XPL_AVAILABLE_IN_2_40
 xtype_t                   g_settings_schema_key_get_type                  (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_2_40
-GSettingsSchemaKey *    g_settings_schema_key_ref                       (GSettingsSchemaKey     *key);
+xsettings_schema_key_t *    g_settings_schema_key_ref                       (xsettings_schema_key_t     *key);
 XPL_AVAILABLE_IN_2_40
-void                    g_settings_schema_key_unref                     (GSettingsSchemaKey     *key);
+void                    g_settings_schema_key_unref                     (xsettings_schema_key_t     *key);
 
 XPL_AVAILABLE_IN_2_40
-const xvariant_type_t *    g_settings_schema_key_get_value_type            (GSettingsSchemaKey     *key);
+const xvariant_type_t *    g_settings_schema_key_get_value_type            (xsettings_schema_key_t     *key);
 XPL_AVAILABLE_IN_2_40
-xvariant_t *              g_settings_schema_key_get_default_value         (GSettingsSchemaKey     *key);
+xvariant_t *              g_settings_schema_key_get_default_value         (xsettings_schema_key_t     *key);
 XPL_AVAILABLE_IN_2_40
-xvariant_t *              g_settings_schema_key_get_range                 (GSettingsSchemaKey     *key);
+xvariant_t *              g_settings_schema_key_get_range                 (xsettings_schema_key_t     *key);
 XPL_AVAILABLE_IN_2_40
-xboolean_t                g_settings_schema_key_range_check               (GSettingsSchemaKey     *key,
+xboolean_t                g_settings_schema_key_range_check               (xsettings_schema_key_t     *key,
                                                                          xvariant_t               *value);
 
 XPL_AVAILABLE_IN_2_44
-const xchar_t *           g_settings_schema_key_get_name                  (GSettingsSchemaKey     *key);
+const xchar_t *           g_settings_schema_key_get_name                  (xsettings_schema_key_t     *key);
 XPL_AVAILABLE_IN_2_40
-const xchar_t *           g_settings_schema_key_get_summary               (GSettingsSchemaKey     *key);
+const xchar_t *           g_settings_schema_key_get_summary               (xsettings_schema_key_t     *key);
 XPL_AVAILABLE_IN_2_40
-const xchar_t *           g_settings_schema_key_get_description           (GSettingsSchemaKey     *key);
+const xchar_t *           g_settings_schema_key_get_description           (xsettings_schema_key_t     *key);
 
 G_END_DECLS
 

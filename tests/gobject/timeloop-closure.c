@@ -14,17 +14,17 @@
 static int n_children = 3;
 static int n_active_children;
 static int n_iters = 10000;
-static GMainLoop *loop;
+static xmain_loop_t *loop;
 
 static void
-io_pipe (GIOChannel **channels)
+io_pipe (xio_channel_t **channels)
 {
   int fds[2];
 
   if (pipe(fds) < 0)
     {
       int errsv = errno;
-      fprintf (stderr, "Cannot create pipe %s\n", g_strerror (errsv));
+      fprintf (stderr, "Cannot create pipe %s\n", xstrerror (errsv));
       exit (1);
     }
 
@@ -33,7 +33,7 @@ io_pipe (GIOChannel **channels)
 }
 
 static xboolean_t
-read_all (GIOChannel *channel, char *buf, xsize_t len)
+read_all (xio_channel_t *channel, char *buf, xsize_t len)
 {
   xsize_t bytes_read = 0;
   xsize_t count;
@@ -57,7 +57,7 @@ read_all (GIOChannel *channel, char *buf, xsize_t len)
 }
 
 static xboolean_t
-write_all (GIOChannel *channel, char *buf, xsize_t len)
+write_all (xio_channel_t *channel, char *buf, xsize_t len)
 {
   xsize_t bytes_written = 0;
   xsize_t count;
@@ -76,11 +76,11 @@ write_all (GIOChannel *channel, char *buf, xsize_t len)
 }
 
 static void
-run_child (GIOChannel *in_channel, GIOChannel *out_channel)
+run_child (xio_channel_t *in_channel, xio_channel_t *out_channel)
 {
   int i;
   int val = 1;
-  GTimer *timer = g_timer_new();
+  xtimer_t *timer = g_timer_new();
 
   for (i = 0; i < n_iters; i++)
     {
@@ -100,12 +100,12 @@ run_child (GIOChannel *in_channel, GIOChannel *out_channel)
 }
 
 static xboolean_t
-input_callback (GIOChannel   *source,
-		GIOCondition  condition,
+input_callback (xio_channel_t   *source,
+		xio_condition_t  condition,
 		xpointer_t      data)
 {
   int val;
-  GIOChannel *dest = (GIOChannel *)data;
+  xio_channel_t *dest = (xio_channel_t *)data;
 
   if (!read_all (source, (char *)&val, sizeof(val)))
     {
@@ -126,7 +126,7 @@ input_callback (GIOChannel   *source,
 
       n_active_children--;
       if (n_active_children == 0)
-	g_main_loop_quit (loop);
+	xmain_loop_quit (loop);
 
       return FALSE;
     }
@@ -136,9 +136,9 @@ static void
 create_child (void)
 {
   int pid, errsv;
-  GIOChannel *in_channels[2];
-  GIOChannel *out_channels[2];
-  GSource *source;
+  xio_channel_t *in_channels[2];
+  xio_channel_t *out_channels[2];
+  xsource_t *source;
 
   io_pipe (in_channels);
   io_pipe (out_channels);
@@ -152,11 +152,11 @@ create_child (void)
       g_io_channel_close (out_channels[1]);
 
       source = g_io_create_watch (out_channels[0], G_IO_IN | G_IO_HUP);
-      g_source_set_closure (source,
+      xsource_set_closure (source,
                             g_cclosure_new (G_CALLBACK (input_callback), in_channels[1],
-                                            (GClosureNotify)g_io_channel_unref));
-      g_source_attach (source, NULL);
-      g_source_unref (source);
+                                            (xclosure_notify_t)g_io_channel_unref));
+      xsource_attach (source, NULL);
+      xsource_unref (source);
 
       g_io_channel_unref (in_channels[0]);
       g_io_channel_unref (out_channels[0]);
@@ -174,7 +174,7 @@ create_child (void)
     }
   else				/* Error */
     {
-      fprintf (stderr, "Cannot fork: %s\n", g_strerror (errsv));
+      fprintf (stderr, "Cannot fork: %s\n", xstrerror (errsv));
       exit (1);
     }
 }
@@ -206,8 +206,8 @@ main (int argc, char **argv)
     create_child ();
 
   getrusage (RUSAGE_SELF, &old_usage);
-  loop = g_main_loop_new (NULL, FALSE);
-  g_main_loop_run (loop);
+  loop = xmain_loop_new (NULL, FALSE);
+  xmain_loop_run (loop);
   getrusage (RUSAGE_SELF, &new_usage);
 
   printf ("Elapsed user: %g\n",
@@ -222,7 +222,7 @@ main (int argc, char **argv)
 	   difftimeval (&old_usage.ru_stime, &new_usage.ru_stime)) /
 	  (n_iters * n_children));
 
-  g_main_loop_unref (loop);
+  xmain_loop_unref (loop);
 
   return 0;
 }

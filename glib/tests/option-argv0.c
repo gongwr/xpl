@@ -31,7 +31,7 @@
 static void
 test_platform_argv0 (void)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xboolean_t arg;
   GOptionEntry entries [] =
     { { "test", 't', 0, G_OPTION_ARG_STRING, &arg, NULL, NULL },
@@ -74,7 +74,7 @@ test_platform_argv0 (void)
   if (fatal_errors)
     {
       g_assert_true (retval);
-      g_assert_true (g_strv_contains (expected_prgnames, g_get_prgname ()));
+      g_assert_true (xstrv_contains (expected_prgnames, g_get_prgname ()));
     }
   else
     {
@@ -85,7 +85,7 @@ test_platform_argv0 (void)
           g_print ("g_option_context_parse() failed\n");
           failed = TRUE;
         }
-      else if (!g_strv_contains (expected_prgnames, g_get_prgname ()))
+      else if (!xstrv_contains (expected_prgnames, g_get_prgname ()))
         {
           g_print ("program name `%s' is neither `option-argv0', nor `lt-option-argv0'\n", g_get_prgname());
           failed = TRUE;

@@ -16,8 +16,8 @@
  * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __G_TASK_H__
-#define __G_TASK_H__
+#ifndef __XTASK_H__
+#define __XTASK_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -27,156 +27,156 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_TASK         (g_task_get_type ())
-#define G_TASK(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_TASK, GTask))
-#define G_TASK_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_TASK, GTaskClass))
+#define XTYPE_TASK         (xtask_get_type ())
+#define XTASK(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_TASK, xtask_t))
+#define XTASK_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_TASK, xtask_class_t))
 #define X_IS_TASK(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_TASK))
 #define X_IS_TASK_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_TASK))
-#define G_TASK_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_TASK, GTaskClass))
+#define XTASK_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_TASK, xtask_class_t))
 
-typedef struct _GTaskClass   GTaskClass;
-
-XPL_AVAILABLE_IN_2_36
-xtype_t         g_task_get_type              (void) G_GNUC_CONST;
+typedef struct _xtask_class   xtask_class_t;
 
 XPL_AVAILABLE_IN_2_36
-GTask        *g_task_new                   (xpointer_t             source_object,
+xtype_t         xtask_get_type              (void) G_GNUC_CONST;
+
+XPL_AVAILABLE_IN_2_36
+xtask_t        *xtask_new                   (xpointer_t             source_object,
                                             xcancellable_t        *cancellable,
                                             xasync_ready_callback_t  callback,
                                             xpointer_t             callback_data);
 
 XPL_AVAILABLE_IN_2_36
-void          g_task_report_error          (xpointer_t             source_object,
+void          xtask_report_error          (xpointer_t             source_object,
                                             xasync_ready_callback_t  callback,
                                             xpointer_t             callback_data,
                                             xpointer_t             source_tag,
                                             xerror_t              *error);
 XPL_AVAILABLE_IN_2_36
-void          g_task_report_new_error      (xpointer_t             source_object,
+void          xtask_report_new_error      (xpointer_t             source_object,
                                             xasync_ready_callback_t  callback,
                                             xpointer_t             callback_data,
                                             xpointer_t             source_tag,
-                                            GQuark               domain,
+                                            xquark               domain,
                                             xint_t                 code,
                                             const char          *format,
                                             ...) G_GNUC_PRINTF(7, 8);
 
 XPL_AVAILABLE_IN_2_36
-void          g_task_set_task_data         (GTask               *task,
+void          xtask_set_task_data         (xtask_t               *task,
                                             xpointer_t             task_data,
-                                            GDestroyNotify       task_data_destroy);
+                                            xdestroy_notify_t       task_data_destroy);
 XPL_AVAILABLE_IN_2_36
-void          g_task_set_priority          (GTask               *task,
+void          xtask_set_priority          (xtask_t               *task,
                                             xint_t                 priority);
 XPL_AVAILABLE_IN_2_36
-void          g_task_set_check_cancellable (GTask               *task,
+void          xtask_set_check_cancellable (xtask_t               *task,
                                             xboolean_t             check_cancellable);
 XPL_AVAILABLE_IN_2_36
-void          g_task_set_source_tag        (GTask               *task,
+void          xtask_set_source_tag        (xtask_t               *task,
                                             xpointer_t             source_tag);
 XPL_AVAILABLE_IN_2_60
-void          g_task_set_name              (GTask               *task,
+void          xtask_set_name              (xtask_t               *task,
                                             const xchar_t         *name);
 
 /* Macro wrapper to set the task name when setting the source tag. */
 #if XPL_VERSION_MIN_REQUIRED >= XPL_VERSION_2_60
-#define g_task_set_source_tag(task, tag) G_STMT_START { \
-  GTask *_task = (task); \
-  (g_task_set_source_tag) (_task, tag); \
-  if (g_task_get_name (_task) == NULL) \
-    g_task_set_name (_task, G_STRINGIFY (tag)); \
+#define xtask_set_source_tag(task, tag) G_STMT_START { \
+  xtask_t *_task = (task); \
+  (xtask_set_source_tag) (_task, tag); \
+  if (xtask_get_name (_task) == NULL) \
+    xtask_set_name (_task, G_STRINGIFY (tag)); \
 } G_STMT_END
 #endif
 
 XPL_AVAILABLE_IN_2_36
-xpointer_t      g_task_get_source_object     (GTask               *task);
+xpointer_t      xtask_get_source_object     (xtask_t               *task);
 XPL_AVAILABLE_IN_2_36
-xpointer_t      g_task_get_task_data         (GTask               *task);
+xpointer_t      xtask_get_task_data         (xtask_t               *task);
 XPL_AVAILABLE_IN_2_36
-xint_t          g_task_get_priority          (GTask               *task);
+xint_t          xtask_get_priority          (xtask_t               *task);
 XPL_AVAILABLE_IN_2_36
-GMainContext *g_task_get_context           (GTask               *task);
+xmain_context_t *xtask_get_context           (xtask_t               *task);
 XPL_AVAILABLE_IN_2_36
-xcancellable_t *g_task_get_cancellable       (GTask               *task);
+xcancellable_t *xtask_get_cancellable       (xtask_t               *task);
 XPL_AVAILABLE_IN_2_36
-xboolean_t      g_task_get_check_cancellable (GTask               *task);
+xboolean_t      xtask_get_check_cancellable (xtask_t               *task);
 XPL_AVAILABLE_IN_2_36
-xpointer_t      g_task_get_source_tag        (GTask               *task);
+xpointer_t      xtask_get_source_tag        (xtask_t               *task);
 XPL_AVAILABLE_IN_2_60
-const xchar_t  *g_task_get_name              (GTask               *task);
+const xchar_t  *xtask_get_name              (xtask_t               *task);
 
 XPL_AVAILABLE_IN_2_36
-xboolean_t      g_task_is_valid              (xpointer_t             result,
+xboolean_t      xtask_is_valid              (xpointer_t             result,
                                             xpointer_t             source_object);
 
 
-typedef void (*GTaskThreadFunc)           (GTask           *task,
+typedef void (*xtask_thread_func_t)           (xtask_t           *task,
                                            xpointer_t         source_object,
                                            xpointer_t         task_data,
                                            xcancellable_t    *cancellable);
 XPL_AVAILABLE_IN_2_36
-void          g_task_run_in_thread        (GTask           *task,
-                                           GTaskThreadFunc  task_func);
+void          xtask_run_in_thread        (xtask_t           *task,
+                                           xtask_thread_func_t  task_func);
 XPL_AVAILABLE_IN_2_36
-void          g_task_run_in_thread_sync   (GTask           *task,
-                                           GTaskThreadFunc  task_func);
+void          xtask_run_in_thread_sync   (xtask_t           *task,
+                                           xtask_thread_func_t  task_func);
 XPL_AVAILABLE_IN_2_36
-xboolean_t      g_task_set_return_on_cancel (GTask           *task,
+xboolean_t      xtask_set_return_on_cancel (xtask_t           *task,
                                            xboolean_t         return_on_cancel);
 XPL_AVAILABLE_IN_2_36
-xboolean_t      g_task_get_return_on_cancel (GTask           *task);
+xboolean_t      xtask_get_return_on_cancel (xtask_t           *task);
 
 XPL_AVAILABLE_IN_2_36
-void          g_task_attach_source        (GTask           *task,
-                                           GSource         *source,
-                                           GSourceFunc      callback);
+void          xtask_attach_source        (xtask_t           *task,
+                                           xsource_t         *source,
+                                           xsource_func_t      callback);
 
 
 XPL_AVAILABLE_IN_2_36
-void          g_task_return_pointer            (GTask           *task,
+void          xtask_return_pointer            (xtask_t           *task,
                                                 xpointer_t         result,
-                                                GDestroyNotify   result_destroy);
+                                                xdestroy_notify_t   result_destroy);
 XPL_AVAILABLE_IN_2_36
-void          g_task_return_boolean            (GTask           *task,
+void          xtask_return_boolean            (xtask_t           *task,
                                                 xboolean_t         result);
 XPL_AVAILABLE_IN_2_36
-void          g_task_return_int                (GTask           *task,
-                                                gssize           result);
+void          xtask_return_int                (xtask_t           *task,
+                                                xssize_t           result);
 
 XPL_AVAILABLE_IN_2_36
-void          g_task_return_error              (GTask           *task,
+void          xtask_return_error              (xtask_t           *task,
                                                 xerror_t          *error);
 XPL_AVAILABLE_IN_2_36
-void          g_task_return_new_error          (GTask           *task,
-                                                GQuark           domain,
+void          xtask_return_new_error          (xtask_t           *task,
+                                                xquark           domain,
                                                 xint_t             code,
                                                 const char      *format,
                                                 ...) G_GNUC_PRINTF (4, 5);
 XPL_AVAILABLE_IN_2_64
-void          g_task_return_value              (GTask           *task,
-                                                GValue          *result);
+void          xtask_return_value              (xtask_t           *task,
+                                                xvalue_t          *result);
 
 XPL_AVAILABLE_IN_2_36
-xboolean_t      g_task_return_error_if_cancelled (GTask           *task);
+xboolean_t      xtask_return_error_if_cancelled (xtask_t           *task);
 
 XPL_AVAILABLE_IN_2_36
-xpointer_t      g_task_propagate_pointer         (GTask           *task,
+xpointer_t      xtask_propagate_pointer         (xtask_t           *task,
                                                 xerror_t         **error);
 XPL_AVAILABLE_IN_2_36
-xboolean_t      g_task_propagate_boolean         (GTask           *task,
+xboolean_t      xtask_propagate_boolean         (xtask_t           *task,
                                                 xerror_t         **error);
 XPL_AVAILABLE_IN_2_36
-gssize        g_task_propagate_int             (GTask           *task,
+xssize_t        xtask_propagate_int             (xtask_t           *task,
                                                 xerror_t         **error);
 XPL_AVAILABLE_IN_2_64
-xboolean_t      g_task_propagate_value           (GTask           *task,
-                                                GValue          *value,
+xboolean_t      xtask_propagate_value           (xtask_t           *task,
+                                                xvalue_t          *value,
                                                 xerror_t         **error);
 XPL_AVAILABLE_IN_2_36
-xboolean_t      g_task_had_error                 (GTask           *task);
+xboolean_t      xtask_had_error                 (xtask_t           *task);
 XPL_AVAILABLE_IN_2_44
-xboolean_t      g_task_get_completed             (GTask           *task);
+xboolean_t      xtask_get_completed             (xtask_t           *task);
 
 G_END_DECLS
 
-#endif /* __G_TASK_H__ */
+#endif /* __XTASK_H__ */

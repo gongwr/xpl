@@ -35,7 +35,7 @@ g_win32_fs_monitor_handle_event (GWin32FSMonitorPrivate   *monitor,
                                  const xchar_t              *filename,
                                  PFILE_NOTIFY_INFORMATION  pfni)
 {
-  GFileMonitorEvent fme;
+  xfile_monitor_event_t fme;
   PFILE_NOTIFY_INFORMATION pfni_next;
   WIN32_FILE_ATTRIBUTE_DATA attrib_data = {0, };
   xchar_t *renamed_file = NULL;
@@ -43,11 +43,11 @@ g_win32_fs_monitor_handle_event (GWin32FSMonitorPrivate   *monitor,
   switch (pfni->Action)
     {
     case FILE_ACTION_ADDED:
-      fme = G_FILE_MONITOR_EVENT_CREATED;
+      fme = XFILE_MONITOR_EVENT_CREATED;
       break;
 
     case FILE_ACTION_REMOVED:
-      fme = G_FILE_MONITOR_EVENT_DELETED;
+      fme = XFILE_MONITOR_EVENT_DELETED;
       break;
 
     case FILE_ACTION_MODIFIED:
@@ -59,9 +59,9 @@ g_win32_fs_monitor_handle_event (GWin32FSMonitorPrivate   *monitor,
         if (monitor->file_attribs != INVALID_FILE_ATTRIBUTES &&
             success_attribs &&
             attrib_data.dwFileAttributes != monitor->file_attribs)
-          fme = G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED;
+          fme = XFILE_MONITOR_EVENT_ATTRIBUTE_CHANGED;
         else
-          fme = G_FILE_MONITOR_EVENT_CHANGED;
+          fme = XFILE_MONITOR_EVENT_CHANGED;
 
         monitor->file_attribs = attrib_data.dwFileAttributes;
       }
@@ -74,17 +74,17 @@ g_win32_fs_monitor_handle_event (GWin32FSMonitorPrivate   *monitor,
            * FILE_ACTION_RENAMED_NEW_NAME action in the next FILE_NOTIFY_INFORMATION
            * structure.
            */
-          glong file_name_len = 0;
+          xlong_t file_name_len = 0;
 
           pfni_next = (PFILE_NOTIFY_INFORMATION) ((BYTE*)pfni + pfni->NextEntryOffset);
-          renamed_file = g_utf16_to_utf8 (pfni_next->FileName, pfni_next->FileNameLength / sizeof(WCHAR), NULL, &file_name_len, NULL);
+          renamed_file = xutf16_to_utf8 (pfni_next->FileName, pfni_next->FileNameLength / sizeof(WCHAR), NULL, &file_name_len, NULL);
           if (pfni_next->Action == FILE_ACTION_RENAMED_NEW_NAME)
-           fme = G_FILE_MONITOR_EVENT_RENAMED;
+           fme = XFILE_MONITOR_EVENT_RENAMED;
           else
-           fme = G_FILE_MONITOR_EVENT_MOVED_OUT;
+           fme = XFILE_MONITOR_EVENT_MOVED_OUT;
         }
       else
-        fme = G_FILE_MONITOR_EVENT_MOVED_OUT;
+        fme = XFILE_MONITOR_EVENT_MOVED_OUT;
       break;
 
     case FILE_ACTION_RENAMED_NEW_NAME:
@@ -92,10 +92,10 @@ g_win32_fs_monitor_handle_event (GWin32FSMonitorPrivate   *monitor,
           monitor->pfni_prev->Action == FILE_ACTION_RENAMED_OLD_NAME)
         {
           /* don't bother sending events, was already sent (rename) */
-          fme = (GFileMonitorEvent) -1;
+          fme = (xfile_monitor_event_t) -1;
         }
       else
-        fme = G_FILE_MONITOR_EVENT_MOVED_IN;
+        fme = XFILE_MONITOR_EVENT_MOVED_IN;
       break;
 
     default:
@@ -104,8 +104,8 @@ g_win32_fs_monitor_handle_event (GWin32FSMonitorPrivate   *monitor,
       break;
     }
 
-  if (fme != (GFileMonitorEvent) -1)
-    return g_file_monitor_source_handle_event (monitor->fms,
+  if (fme != (xfile_monitor_event_t) -1)
+    return xfile_monitor_source_handle_event (monitor->fms,
                                                fme,
                                                filename,
                                                renamed_file,
@@ -136,7 +136,7 @@ g_win32_fs_monitor_callback (DWORD        error,
 
   /* If monitor->self is NULL the GWin32FileMonitor object has been destroyed. */
   if (monitor->self == NULL ||
-      g_file_monitor_is_cancelled (monitor->self) ||
+      xfile_monitor_is_cancelled (monitor->self) ||
       monitor->file_notify_buffer == NULL)
     {
       g_free (monitor->file_notify_buffer);
@@ -151,16 +151,16 @@ g_win32_fs_monitor_callback (DWORD        error,
       pfile_notify_walker = (PFILE_NOTIFY_INFORMATION)((BYTE *)monitor->file_notify_buffer + offset);
       if (pfile_notify_walker->Action > 0)
         {
-          glong file_name_len;
+          xlong_t file_name_len;
           xchar_t *changed_file;
 
-          changed_file = g_utf16_to_utf8 (pfile_notify_walker->FileName,
+          changed_file = xutf16_to_utf8 (pfile_notify_walker->FileName,
                                           pfile_notify_walker->FileNameLength / sizeof(WCHAR),
                                           NULL, &file_name_len, NULL);
 
           if (monitor->isfile)
             {
-              xint_t long_filename_length = wcslen (monitor->wfilename_long);
+              xint_t lonxfilename_length = wcslen (monitor->wfilename_long);
               xint_t short_filename_length = wcslen (monitor->wfilename_short);
               enum GWin32FileMonitorFileAlias alias_state;
 
@@ -174,7 +174,7 @@ g_win32_fs_monitor_callback (DWORD        error,
 
               if (_wcsnicmp (pfile_notify_walker->FileName,
                              monitor->wfilename_long,
-                             long_filename_length) == 0)
+                             lonxfilename_length) == 0)
                 {
                   if (_wcsnicmp (pfile_notify_walker->FileName,
                                  monitor->wfilename_short,
@@ -202,12 +202,12 @@ g_win32_fs_monitor_callback (DWORD        error,
                   switch (alias_state)
                     {
                     case G_WIN32_FILE_MONITOR_NO_ALIAS:
-                      monitored_file = g_strdup (changed_file);
+                      monitored_file = xstrdup (changed_file);
                       break;
                     case G_WIN32_FILE_MONITOR_LONG_FILENAME:
                     case G_WIN32_FILE_MONITOR_SHORT_FILENAME:
                       monitored_file_w = wcsrchr (monitor->wfullpath_with_long_prefix, L'\\');
-                      monitored_file = g_utf16_to_utf8 (monitored_file_w + 1, -1, NULL, NULL, NULL);
+                      monitored_file = xutf16_to_utf8 (monitored_file_w + 1, -1, NULL, NULL, NULL);
                       break;
                     default:
                       g_assert_not_reached ();
@@ -263,8 +263,8 @@ g_win32_fs_monitor_init (GWin32FSMonitorPrivate *monitor,
 
   if (dirname != NULL)
     {
-      dirname_with_long_prefix = g_strconcat (LONGPFX, dirname, NULL);
-      wdirname_with_long_prefix = g_utf8_to_utf16 (dirname_with_long_prefix, -1, NULL, NULL, NULL);
+      dirname_with_long_prefix = xstrconcat (LONGPFX, dirname, NULL);
+      wdirname_with_long_prefix = xutf8_to_utf16 (dirname_with_long_prefix, -1, NULL, NULL, NULL);
 
       if (isfile)
         {
@@ -274,12 +274,12 @@ g_win32_fs_monitor_init (GWin32FSMonitorPrivate *monitor,
           wchar_t *wfullpath, *wbasename_long, *wbasename_short;
 
           fullpath = g_build_filename (dirname, filename, NULL);
-          fullpath_with_long_prefix = g_strconcat (LONGPFX, fullpath, NULL);
+          fullpath_with_long_prefix = xstrconcat (LONGPFX, fullpath, NULL);
 
-          wfullpath = g_utf8_to_utf16 (fullpath, -1, NULL, NULL, NULL);
+          wfullpath = xutf8_to_utf16 (fullpath, -1, NULL, NULL, NULL);
 
           monitor->wfullpath_with_long_prefix =
-            g_utf8_to_utf16 (fullpath_with_long_prefix, -1, NULL, NULL, NULL);
+            xutf8_to_utf16 (fullpath_with_long_prefix, -1, NULL, NULL, NULL);
 
           /* ReadDirectoryChangesW() can return the normal filename or the
            * "8.3" format filename, so we need to keep track of both these names
@@ -322,15 +322,15 @@ g_win32_fs_monitor_init (GWin32FSMonitorPrivate *monitor,
         {
           monitor->wfilename_short = NULL;
           monitor->wfilename_long = NULL;
-          monitor->wfullpath_with_long_prefix = g_utf8_to_utf16 (dirname_with_long_prefix, -1, NULL, NULL, NULL);
+          monitor->wfullpath_with_long_prefix = xutf8_to_utf16 (dirname_with_long_prefix, -1, NULL, NULL, NULL);
         }
 
       monitor->isfile = isfile;
     }
   else
     {
-      dirname_with_long_prefix = g_strconcat (LONGPFX, filename, NULL);
-      monitor->wfullpath_with_long_prefix = g_utf8_to_utf16 (dirname_with_long_prefix, -1, NULL, NULL, NULL);
+      dirname_with_long_prefix = xstrconcat (LONGPFX, filename, NULL);
+      monitor->wfullpath_with_long_prefix = xutf8_to_utf16 (dirname_with_long_prefix, -1, NULL, NULL, NULL);
       monitor->wfilename_long = NULL;
       monitor->wfilename_short = NULL;
       monitor->isfile = FALSE;

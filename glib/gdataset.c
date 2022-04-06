@@ -59,10 +59,10 @@
  *
  * There are two forms of most of the dataset functions. The first form
  * uses strings to identify the data elements associated with a
- * location. The second form uses #GQuark identifiers, which are
+ * location. The second form uses #xquark identifiers, which are
  * created with a call to g_quark_from_string() or
  * g_quark_from_static_string(). The second form is quicker, since it
- * does not require looking up the string in the hash table of #GQuark
+ * does not require looking up the string in the hash table of #xquark
  * identifiers.
  *
  * There is no function to create a dataset. It is automatically
@@ -88,17 +88,17 @@
  * SECTION:datalist
  * @title: Keyed Data Lists
  * @short_description: lists of data elements which are accessible by a
- *                     string or GQuark identifier
+ *                     string or xquark identifier
  *
  * Keyed data lists provide lists of arbitrary data elements which can
- * be accessed either with a string or with a #GQuark corresponding to
+ * be accessed either with a string or with a #xquark corresponding to
  * the string.
  *
- * The #GQuark methods are quicker, since the strings have to be
+ * The #xquark methods are quicker, since the strings have to be
  * converted to #GQuarks anyway.
  *
  * Data lists are used for associating arbitrary data with #GObjects,
- * using g_object_set_data() and related functions.
+ * using xobject_set_data() and related functions.
  *
  * To create a datalist, use g_datalist_init().
  *
@@ -127,7 +127,7 @@
  **/
 
 /**
- * GDestroyNotify:
+ * xdestroy_notify_t:
  * @data: the data element.
  *
  * Specifies the type of function which is called when a data element
@@ -151,34 +151,34 @@
 
 /* --- structures --- */
 typedef struct {
-  GQuark          key;
+  xquark          key;
   xpointer_t        data;
-  GDestroyNotify  destroy;
+  xdestroy_notify_t  destroy;
 } GDataElt;
 
 typedef struct _GDataset GDataset;
 struct _GData
 {
-  guint32  len;     /* Number of elements */
-  guint32  alloc;   /* Number of allocated elements */
+  xuint32_t  len;     /* Number of elements */
+  xuint32_t  alloc;   /* Number of allocated elements */
   GDataElt data[1]; /* Flexible array */
 };
 
 struct _GDataset
 {
-  gconstpointer location;
+  xconstpointer location;
   GData        *datalist;
 };
 
 
 /* --- prototypes --- */
-static inline GDataset*	g_dataset_lookup		(gconstpointer	  dataset_location);
+static inline GDataset*	g_dataset_lookup		(xconstpointer	  dataset_location);
 static inline void	g_datalist_clear_i		(GData		**datalist);
 static void		g_dataset_destroy_internal	(GDataset	 *dataset);
 static inline xpointer_t	g_data_set_internal		(GData     	**datalist,
-							 GQuark   	  key_id,
+							 xquark   	  key_id,
 							 xpointer_t         data,
-							 GDestroyNotify   destroy_func,
+							 xdestroy_notify_t   destroy_func,
 							 GDataset	 *dataset);
 static void		g_data_initialize		(void);
 
@@ -195,7 +195,7 @@ static void		g_data_initialize		(void);
 
 /* --- variables --- */
 G_LOCK_DEFINE_STATIC (g_dataset_global);
-static GHashTable   *g_dataset_location_ht = NULL;
+static xhashtable_t   *g_dataset_location_ht = NULL;
 static GDataset     *g_dataset_cached = NULL; /* should this be
 						 thread specific? */
 
@@ -279,14 +279,14 @@ g_datalist_clear (GData **datalist)
 
 /* HOLDS: g_dataset_global_lock */
 static inline GDataset*
-g_dataset_lookup (gconstpointer	dataset_location)
+g_dataset_lookup (xconstpointer	dataset_location)
 {
   GDataset *dataset;
 
   if (g_dataset_cached && g_dataset_cached->location == dataset_location)
     return g_dataset_cached;
 
-  dataset = g_hash_table_lookup (g_dataset_location_ht, dataset_location);
+  dataset = xhash_table_lookup (g_dataset_location_ht, dataset_location);
   if (dataset)
     g_dataset_cached = dataset;
 
@@ -297,7 +297,7 @@ g_dataset_lookup (gconstpointer	dataset_location)
 static void
 g_dataset_destroy_internal (GDataset *dataset)
 {
-  gconstpointer dataset_location;
+  xconstpointer dataset_location;
 
   dataset_location = dataset->location;
   while (dataset)
@@ -306,7 +306,7 @@ g_dataset_destroy_internal (GDataset *dataset)
 	{
 	  if (dataset == g_dataset_cached)
 	    g_dataset_cached = NULL;
-	  g_hash_table_remove (g_dataset_location_ht, dataset_location);
+	  xhash_table_remove (g_dataset_location_ht, dataset_location);
 	  g_slice_free (GDataset, dataset);
 	  break;
 	}
@@ -324,7 +324,7 @@ g_dataset_destroy_internal (GDataset *dataset)
  * destroy functions set for data elements.
  */
 void
-g_dataset_destroy (gconstpointer  dataset_location)
+g_dataset_destroy (xconstpointer  dataset_location)
 {
   g_return_if_fail (dataset_location != NULL);
 
@@ -343,9 +343,9 @@ g_dataset_destroy (gconstpointer  dataset_location)
 /* HOLDS: g_dataset_global_lock if dataset != null */
 static inline xpointer_t
 g_data_set_internal (GData	  **datalist,
-		     GQuark         key_id,
+		     xquark         key_id,
 		     xpointer_t       new_data,
-		     GDestroyNotify new_destroy_func,
+		     xdestroy_notify_t new_destroy_func,
 		     GDataset	   *dataset)
 {
   GData *d, *old_d;
@@ -488,14 +488,14 @@ g_data_set_internal (GData	  **datalist,
 /**
  * g_dataset_id_set_data_full: (skip)
  * @dataset_location: (not nullable): the location identifying the dataset.
- * @key_id: the #GQuark id to identify the data element.
+ * @key_id: the #xquark id to identify the data element.
  * @data: the data element.
  * @destroy_func: the function to call when the data element is
  *                removed. This function will be called with the data
  *                element and can be used to free any memory allocated
  *                for it.
  *
- * Sets the data element associated with the given #GQuark id, and also
+ * Sets the data element associated with the given #xquark id, and also
  * the function to call when the data element is destroyed. Any
  * previous data with the same key is removed, and its destroy function
  * is called.
@@ -515,10 +515,10 @@ g_data_set_internal (GData	  **datalist,
 /**
  * g_dataset_id_set_data:
  * @l: the location identifying the dataset.
- * @k: the #GQuark id to identify the data element.
+ * @k: the #xquark id to identify the data element.
  * @d: the data element.
  *
- * Sets the data element associated with the given #GQuark id. Any
+ * Sets the data element associated with the given #xquark id. Any
  * previous data with the same key is removed, and its destroy function
  * is called.
  **/
@@ -533,7 +533,7 @@ g_data_set_internal (GData	  **datalist,
 /**
  * g_dataset_id_remove_data:
  * @l: the location identifying the dataset.
- * @k: the #GQuark id identifying the data element.
+ * @k: the #xquark id identifying the data element.
  *
  * Removes a data element from a dataset. The data element's destroy
  * function is called if it has been set.
@@ -547,10 +547,10 @@ g_data_set_internal (GData	  **datalist,
  * function is called if it has been set.
  **/
 void
-g_dataset_id_set_data_full (gconstpointer  dataset_location,
-			    GQuark         key_id,
+g_dataset_id_set_data_full (xconstpointer  dataset_location,
+			    xquark         key_id,
 			    xpointer_t       data,
-			    GDestroyNotify destroy_func)
+			    xdestroy_notify_t destroy_func)
 {
   GDataset *dataset;
 
@@ -575,7 +575,7 @@ g_dataset_id_set_data_full (gconstpointer  dataset_location,
       dataset = g_slice_new (GDataset);
       dataset->location = dataset_location;
       g_datalist_init (&dataset->datalist);
-      g_hash_table_insert (g_dataset_location_ht,
+      xhash_table_insert (g_dataset_location_ht,
 			   (xpointer_t) dataset->location,
 			   dataset);
     }
@@ -587,7 +587,7 @@ g_dataset_id_set_data_full (gconstpointer  dataset_location,
 /**
  * g_datalist_id_set_data_full: (skip)
  * @datalist: a datalist.
- * @key_id: the #GQuark to identify the data element.
+ * @key_id: the #xquark to identify the data element.
  * @data: (nullable): the data element or %NULL to remove any previous element
  *        corresponding to @key_id.
  * @destroy_func: (nullable): the function to call when the data element is
@@ -596,7 +596,7 @@ g_dataset_id_set_data_full (gconstpointer  dataset_location,
  *                for it. If @data is %NULL, then @destroy_func must
  *                also be %NULL.
  *
- * Sets the data corresponding to the given #GQuark id, and the
+ * Sets the data corresponding to the given #xquark id, and the
  * function to be called when the element is removed from the datalist.
  * Any previous data with the same key is removed, and its destroy
  * function is called.
@@ -618,11 +618,11 @@ g_dataset_id_set_data_full (gconstpointer  dataset_location,
 /**
  * g_datalist_id_set_data:
  * @dl: a datalist.
- * @q: the #GQuark to identify the data element.
+ * @q: the #xquark to identify the data element.
  * @d: (nullable): the data element, or %NULL to remove any previous element
  *     corresponding to @q.
  *
- * Sets the data corresponding to the given #GQuark id. Any previous
+ * Sets the data corresponding to the given #xquark id. Any previous
  * data with the same key is removed, and its destroy function is
  * called.
  **/
@@ -638,9 +638,9 @@ g_dataset_id_set_data_full (gconstpointer  dataset_location,
 /**
  * g_datalist_id_remove_data:
  * @dl: a datalist.
- * @q: the #GQuark identifying the data element.
+ * @q: the #xquark identifying the data element.
  *
- * Removes an element, using its #GQuark identifier.
+ * Removes an element, using its #xquark identifier.
  **/
 /**
  * g_datalist_remove_data:
@@ -652,9 +652,9 @@ g_dataset_id_set_data_full (gconstpointer  dataset_location,
  **/
 void
 g_datalist_id_set_data_full (GData	  **datalist,
-			     GQuark         key_id,
+			     xquark         key_id,
 			     xpointer_t       data,
-			     GDestroyNotify destroy_func)
+			     xdestroy_notify_t destroy_func)
 {
   g_return_if_fail (datalist != NULL);
   if (!data)
@@ -673,7 +673,7 @@ g_datalist_id_set_data_full (GData	  **datalist,
 /**
  * g_dataset_id_remove_no_notify: (skip)
  * @dataset_location: (not nullable): the location identifying the dataset.
- * @key_id: the #GQuark ID identifying the data element.
+ * @key_id: the #xquark ID identifying the data element.
  *
  * Removes an element, without calling its destroy notification
  * function.
@@ -689,8 +689,8 @@ g_datalist_id_set_data_full (GData	  **datalist,
  * Removes an element, without calling its destroy notifier.
  **/
 xpointer_t
-g_dataset_id_remove_no_notify (gconstpointer  dataset_location,
-			       GQuark         key_id)
+g_dataset_id_remove_no_notify (xconstpointer  dataset_location,
+			       xquark         key_id)
 {
   xpointer_t ret_data = NULL;
 
@@ -703,7 +703,7 @@ g_dataset_id_remove_no_notify (gconstpointer  dataset_location,
 
       dataset = g_dataset_lookup (dataset_location);
       if (dataset)
-	ret_data = g_data_set_internal (&dataset->datalist, key_id, NULL, (GDestroyNotify) 42, dataset);
+	ret_data = g_data_set_internal (&dataset->datalist, key_id, NULL, (xdestroy_notify_t) 42, dataset);
     }
   G_UNLOCK (g_dataset_global);
 
@@ -713,7 +713,7 @@ g_dataset_id_remove_no_notify (gconstpointer  dataset_location,
 /**
  * g_datalist_id_remove_no_notify: (skip)
  * @datalist: a datalist.
- * @key_id: the #GQuark identifying a data element.
+ * @key_id: the #xquark identifying a data element.
  *
  * Removes an element, without calling its destroy notification
  * function.
@@ -730,14 +730,14 @@ g_dataset_id_remove_no_notify (gconstpointer  dataset_location,
  **/
 xpointer_t
 g_datalist_id_remove_no_notify (GData	**datalist,
-				GQuark    key_id)
+				xquark    key_id)
 {
   xpointer_t ret_data = NULL;
 
   g_return_val_if_fail (datalist != NULL, NULL);
 
   if (key_id)
-    ret_data = g_data_set_internal (datalist, key_id, NULL, (GDestroyNotify) 42, NULL);
+    ret_data = g_data_set_internal (datalist, key_id, NULL, (xdestroy_notify_t) 42, NULL);
 
   return ret_data;
 }
@@ -745,12 +745,12 @@ g_datalist_id_remove_no_notify (GData	**datalist,
 /**
  * g_dataset_id_get_data:
  * @dataset_location: (not nullable): the location identifying the dataset.
- * @key_id: the #GQuark id to identify the data element.
+ * @key_id: the #xquark id to identify the data element.
  *
- * Gets the data element corresponding to a #GQuark.
+ * Gets the data element corresponding to a #xquark.
  *
  * Returns: (transfer none) (nullable): the data element corresponding to
- *          the #GQuark, or %NULL if it is not found.
+ *          the #xquark, or %NULL if it is not found.
  **/
 /**
  * g_dataset_get_data:
@@ -763,8 +763,8 @@ g_datalist_id_remove_no_notify (GData	**datalist,
  *          the string, or %NULL if it is not found.
  **/
 xpointer_t
-g_dataset_id_get_data (gconstpointer  dataset_location,
-		       GQuark         key_id)
+g_dataset_id_get_data (xconstpointer  dataset_location,
+		       xquark         key_id)
 {
   xpointer_t retval = NULL;
 
@@ -787,7 +787,7 @@ g_dataset_id_get_data (gconstpointer  dataset_location,
 /**
  * g_datalist_id_get_data:
  * @datalist: a datalist.
- * @key_id: the #GQuark identifying a data element.
+ * @key_id: the #xquark identifying a data element.
  *
  * Retrieves the data element corresponding to @key_id.
  *
@@ -796,7 +796,7 @@ g_dataset_id_get_data (gconstpointer  dataset_location,
  */
 xpointer_t
 g_datalist_id_get_data (GData  **datalist,
-			GQuark   key_id)
+			xquark   key_id)
 {
   return g_datalist_id_dup_data (datalist, key_id, NULL, NULL);
 }
@@ -818,7 +818,7 @@ g_datalist_id_get_data (GData  **datalist,
 /**
  * g_datalist_id_dup_data: (skip)
  * @datalist: location of a datalist
- * @key_id: the #GQuark identifying a data element
+ * @key_id: the #xquark identifying a data element
  * @dup_func: (nullable) (scope call): function to duplicate the old value
  * @user_data: (closure): passed as user_data to @dup_func
  *
@@ -844,7 +844,7 @@ g_datalist_id_get_data (GData  **datalist,
  */
 xpointer_t
 g_datalist_id_dup_data (GData          **datalist,
-                        GQuark           key_id,
+                        xquark           key_id,
                         GDuplicateFunc   dup_func,
                         xpointer_t         user_data)
 {
@@ -885,7 +885,7 @@ g_datalist_id_dup_data (GData          **datalist,
 /**
  * g_datalist_id_replace_data: (skip)
  * @datalist: location of a datalist
- * @key_id: the #GQuark identifying a data element
+ * @key_id: the #xquark identifying a data element
  * @oldval: (nullable): the old value to compare against
  * @newval: (nullable): the new value to replace it with
  * @destroy: (nullable): destroy notify for the new value
@@ -912,11 +912,11 @@ g_datalist_id_dup_data (GData          **datalist,
  */
 xboolean_t
 g_datalist_id_replace_data (GData          **datalist,
-                            GQuark           key_id,
+                            xquark           key_id,
                             xpointer_t         oldval,
                             xpointer_t         newval,
-                            GDestroyNotify   destroy,
-                            GDestroyNotify  *old_destroy)
+                            xdestroy_notify_t   destroy,
+                            xdestroy_notify_t  *old_destroy)
 {
   xpointer_t val = NULL;
   GData *d;
@@ -1032,7 +1032,7 @@ g_datalist_get_data (GData	 **datalist,
       data_end = data + d->len;
       while (data < data_end)
 	{
-	  if (g_strcmp0 (g_quark_to_string (data->key), key) == 0)
+	  if (xstrcmp0 (g_quark_to_string (data->key), key) == 0)
 	    {
 	      res = data->data;
 	      break;
@@ -1048,12 +1048,12 @@ g_datalist_get_data (GData	 **datalist,
 
 /**
  * GDataForeachFunc:
- * @key_id: the #GQuark id to identifying the data element.
+ * @key_id: the #xquark id to identifying the data element.
  * @data: the data element.
  * @user_data: (closure): user data passed to g_dataset_foreach().
  *
  * Specifies the type of function passed to g_dataset_foreach(). It is
- * called with each #GQuark id and associated data element, together
+ * called with each #xquark id and associated data element, together
  * with the @user_data parameter supplied to g_dataset_foreach().
  **/
 
@@ -1073,7 +1073,7 @@ g_datalist_get_data (GData	 **datalist,
  * than skipping over elements that are removed.
  **/
 void
-g_dataset_foreach (gconstpointer    dataset_location,
+g_dataset_foreach (xconstpointer    dataset_location,
 		   GDataForeachFunc func,
 		   xpointer_t         user_data)
 {
@@ -1103,7 +1103,7 @@ g_dataset_foreach (gconstpointer    dataset_location,
  * @user_data: (closure): user data to pass to the function.
  *
  * Calls the given function for each data element of the datalist. The
- * function is called with each data element's #GQuark id and data,
+ * function is called with each data element's #xquark id and data,
  * together with the given @user_data parameter. Note that this
  * function is NOT thread-safe. So unless @datalist can be protected
  * from any modifications during invocation of this function, it should
@@ -1120,7 +1120,7 @@ g_datalist_foreach (GData	   **datalist,
 {
   GData *d;
   xuint_t i, j, len;
-  GQuark *keys;
+  xquark *keys;
 
   g_return_if_fail (datalist != NULL);
   g_return_if_fail (func != NULL);
@@ -1132,7 +1132,7 @@ g_datalist_foreach (GData	   **datalist,
   /* We make a copy of the keys so that we can handle it changing
      in the callback */
   len = d->len;
-  keys = g_new (GQuark, len);
+  keys = g_new (xquark, len);
   for (i = 0; i < len; i++)
     keys[i] = d->data[i].key;
 
@@ -1246,6 +1246,6 @@ g_data_initialize (void)
 {
   g_return_if_fail (g_dataset_location_ht == NULL);
 
-  g_dataset_location_ht = g_hash_table_new (g_direct_hash, NULL);
+  g_dataset_location_ht = xhash_table_new (g_direct_hash, NULL);
   g_dataset_cached = NULL;
 }

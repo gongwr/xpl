@@ -35,14 +35,14 @@ static const xchar_t DATA[] = "abcdefghijklmnopqrstuvwxyz";
 
 int writer_pipe[2], reader_pipe[2];
 xcancellable_t *writer_cancel, *reader_cancel, *main_cancel;
-GMainLoop *loop;
+xmain_loop_t *loop;
 
 
 static xpointer_t
 writer_thread (xpointer_t user_data)
 {
   xoutput_stream_t *out;
-  gssize nwrote, offset;
+  xssize_t nwrote, offset;
   xerror_t *err = NULL;
 
   out = g_unix_output_stream_new (writer_pipe[1], TRUE);
@@ -52,9 +52,9 @@ writer_thread (xpointer_t user_data)
       g_usleep (10);
 
       offset = 0;
-      while (offset < (gssize) sizeof (DATA))
+      while (offset < (xssize_t) sizeof (DATA))
 	{
-	  nwrote = g_output_stream_write (out, DATA + offset,
+	  nwrote = xoutput_stream_write (out, DATA + offset,
 					  sizeof (DATA) - offset,
 					  writer_cancel, &err);
 	  if (nwrote <= 0 || err != NULL)
@@ -70,7 +70,7 @@ writer_thread (xpointer_t user_data)
     {
       g_clear_error (&err);
       g_cancellable_cancel (main_cancel);
-      g_object_unref (out);
+      xobject_unref (out);
       return NULL;
     }
 
@@ -82,7 +82,7 @@ static xpointer_t
 reader_thread (xpointer_t user_data)
 {
   xinput_stream_t *in;
-  gssize nread = 0, total;
+  xssize_t nread = 0, total;
   xerror_t *err = NULL;
   char buf[sizeof (DATA)];
 
@@ -91,9 +91,9 @@ reader_thread (xpointer_t user_data)
   do
     {
       total = 0;
-      while (total < (gssize) sizeof (DATA))
+      while (total < (xssize_t) sizeof (DATA))
 	{
-	  nread = g_input_stream_read (in, buf + total, sizeof (buf) - total,
+	  nread = xinput_stream_read (in, buf + total, sizeof (buf) - total,
 				       reader_cancel, &err);
 	  if (nread <= 0 || err != NULL)
 	    break;
@@ -107,7 +107,7 @@ reader_thread (xpointer_t user_data)
 	{
 	  g_assert (err == NULL);
 	  /* pipe closed */
-	  g_object_unref (in);
+	  xobject_unref (in);
 	  return NULL;
 	}
 
@@ -121,7 +121,7 @@ reader_thread (xpointer_t user_data)
 }
 
 static char main_buf[sizeof (DATA)];
-static gssize main_len, main_offset;
+static xssize_t main_len, main_offset;
 
 static void main_thread_read (xobject_t *source, xasync_result_t *res, xpointer_t user_data);
 static void main_thread_skipped (xobject_t *source, xasync_result_t *res, xpointer_t user_data);
@@ -130,8 +130,8 @@ static void main_thread_wrote (xobject_t *source, xasync_result_t *res, xpointer
 static void
 do_main_cancel (xoutput_stream_t *out)
 {
-  g_output_stream_close (out, NULL, NULL);
-  g_main_loop_quit (loop);
+  xoutput_stream_close (out, NULL, NULL);
+  xmain_loop_quit (loop);
 }
 
 static void
@@ -140,9 +140,9 @@ main_thread_skipped (xobject_t *source, xasync_result_t *res, xpointer_t user_da
   xinput_stream_t *in = G_INPUT_STREAM (source);
   xoutput_stream_t *out = user_data;
   xerror_t *err = NULL;
-  gssize nskipped;
+  xssize_t nskipped;
 
-  nskipped = g_input_stream_skip_finish (in, res, &err);
+  nskipped = xinput_stream_skip_finish (in, res, &err);
 
   if (g_cancellable_is_cancelled (main_cancel))
     {
@@ -156,13 +156,13 @@ main_thread_skipped (xobject_t *source, xasync_result_t *res, xpointer_t user_da
   if (main_offset == main_len)
     {
       main_offset = 0;
-      g_output_stream_write_async (out, main_buf, main_len,
+      xoutput_stream_write_async (out, main_buf, main_len,
                                    G_PRIORITY_DEFAULT, main_cancel,
                                    main_thread_wrote, in);
     }
   else
     {
-      g_input_stream_skip_async (in, main_len - main_offset,
+      xinput_stream_skip_async (in, main_len - main_offset,
 				 G_PRIORITY_DEFAULT, main_cancel,
 				 main_thread_skipped, out);
     }
@@ -174,9 +174,9 @@ main_thread_read (xobject_t *source, xasync_result_t *res, xpointer_t user_data)
   xinput_stream_t *in = G_INPUT_STREAM (source);
   xoutput_stream_t *out = user_data;
   xerror_t *err = NULL;
-  gssize nread;
+  xssize_t nread;
 
-  nread = g_input_stream_read_finish (in, res, &err);
+  nread = xinput_stream_read_finish (in, res, &err);
 
   if (g_cancellable_is_cancelled (main_cancel))
     {
@@ -193,13 +193,13 @@ main_thread_read (xobject_t *source, xasync_result_t *res, xpointer_t user_data)
       main_len = main_offset;
       main_offset = 0;
       /* Now skip the same amount */
-      g_input_stream_skip_async (in, main_len,
+      xinput_stream_skip_async (in, main_len,
 				 G_PRIORITY_DEFAULT, main_cancel,
 				 main_thread_skipped, out);
     }
   else
     {
-      g_input_stream_read_async (in, main_buf, sizeof (main_buf),
+      xinput_stream_read_async (in, main_buf, sizeof (main_buf),
 				 G_PRIORITY_DEFAULT, main_cancel,
 				 main_thread_read, out);
     }
@@ -211,9 +211,9 @@ main_thread_wrote (xobject_t *source, xasync_result_t *res, xpointer_t user_data
   xoutput_stream_t *out = G_OUTPUT_STREAM (source);
   xinput_stream_t *in = user_data;
   xerror_t *err = NULL;
-  gssize nwrote;
+  xssize_t nwrote;
 
-  nwrote = g_output_stream_write_finish (out, res, &err);
+  nwrote = xoutput_stream_write_finish (out, res, &err);
 
   if (g_cancellable_is_cancelled (main_cancel))
     {
@@ -229,13 +229,13 @@ main_thread_wrote (xobject_t *source, xasync_result_t *res, xpointer_t user_data
   if (main_offset == main_len)
     {
       main_offset = 0;
-      g_input_stream_read_async (in, main_buf, sizeof (main_buf),
+      xinput_stream_read_async (in, main_buf, sizeof (main_buf),
 				 G_PRIORITY_DEFAULT, main_cancel,
 				 main_thread_read, out);
     }
   else
     {
-      g_output_stream_write_async (out, main_buf + main_offset,
+      xoutput_stream_write_async (out, main_buf + main_offset,
 				   main_len - main_offset,
 				   G_PRIORITY_DEFAULT, main_cancel,
 				   main_thread_wrote, in);
@@ -250,9 +250,9 @@ timeout (xpointer_t cancellable)
 }
 
 static void
-test_pipe_io (gconstpointer nonblocking)
+test_pipe_io (xconstpointer nonblocking)
 {
-  GThread *writer, *reader;
+  xthread_t *writer, *reader;
   xinput_stream_t *in;
   xoutput_stream_t *out;
 
@@ -287,30 +287,30 @@ test_pipe_io (gconstpointer nonblocking)
   reader_cancel = g_cancellable_new ();
   main_cancel = g_cancellable_new ();
 
-  writer = g_thread_new ("writer", writer_thread, NULL);
-  reader = g_thread_new ("reader", reader_thread, NULL);
+  writer = xthread_new ("writer", writer_thread, NULL);
+  reader = xthread_new ("reader", reader_thread, NULL);
 
   in = g_unix_input_stream_new (writer_pipe[0], TRUE);
   out = g_unix_output_stream_new (reader_pipe[1], TRUE);
 
-  g_input_stream_read_async (in, main_buf, sizeof (main_buf),
+  xinput_stream_read_async (in, main_buf, sizeof (main_buf),
 			     G_PRIORITY_DEFAULT, main_cancel,
 			     main_thread_read, out);
 
   g_timeout_add (500, timeout, writer_cancel);
 
-  loop = g_main_loop_new (NULL, TRUE);
-  g_main_loop_run (loop);
-  g_main_loop_unref (loop);
+  loop = xmain_loop_new (NULL, TRUE);
+  xmain_loop_run (loop);
+  xmain_loop_unref (loop);
 
-  g_thread_join (reader);
-  g_thread_join (writer);
+  xthread_join (reader);
+  xthread_join (writer);
 
-  g_object_unref (main_cancel);
-  g_object_unref (reader_cancel);
-  g_object_unref (writer_cancel);
-  g_object_unref (in);
-  g_object_unref (out);
+  xobject_unref (main_cancel);
+  xobject_unref (reader_cancel);
+  xobject_unref (writer_cancel);
+  xobject_unref (in);
+  xobject_unref (out);
 }
 
 static void
@@ -322,7 +322,7 @@ test_basic (void)
   xboolean_t close_fd;
 
   is = G_UNIX_INPUT_STREAM (g_unix_input_stream_new (0, TRUE));
-  g_object_get (is,
+  xobject_get (is,
                 "fd", &fd,
                 "close-fd", &close_fd,
                 NULL);
@@ -333,12 +333,12 @@ test_basic (void)
   g_assert (!g_unix_input_stream_get_close_fd (is));
   g_assert_cmpint (g_unix_input_stream_get_fd (is), ==, 0);
 
-  g_assert (!g_input_stream_has_pending (G_INPUT_STREAM (is)));
+  g_assert (!xinput_stream_has_pending (G_INPUT_STREAM (is)));
 
-  g_object_unref (is);
+  xobject_unref (is);
 
   os = G_UNIX_OUTPUT_STREAM (g_unix_output_stream_new (1, TRUE));
-  g_object_get (os,
+  xobject_get (os,
                 "fd", &fd,
                 "close-fd", &close_fd,
                 NULL);
@@ -349,16 +349,16 @@ test_basic (void)
   g_assert (!g_unix_output_stream_get_close_fd (os));
   g_assert_cmpint (g_unix_output_stream_get_fd (os), ==, 1);
 
-  g_assert (!g_output_stream_has_pending (G_OUTPUT_STREAM (os)));
+  g_assert (!xoutput_stream_has_pending (G_OUTPUT_STREAM (os)));
 
-  g_object_unref (os);
+  xobject_unref (os);
 }
 
 typedef struct {
   xinput_stream_t *is;
   xoutput_stream_t *os;
-  const guint8 *write_data;
-  guint8 *read_data;
+  const xuint8_t *write_data;
+  xuint8_t *read_data;
 } TestReadWriteData;
 
 static xpointer_t
@@ -369,7 +369,7 @@ test_read_write_write_thread (xpointer_t user_data)
   xerror_t *error = NULL;
   xboolean_t res;
 
-  res = g_output_stream_write_all (data->os, data->write_data, 1024, &bytes_written, NULL, &error);
+  res = xoutput_stream_write_all (data->os, data->write_data, 1024, &bytes_written, NULL, &error);
   g_assert_true (res);
   g_assert_no_error (error);
   g_assert_cmpuint (bytes_written, ==, 1024);
@@ -385,7 +385,7 @@ test_read_write_read_thread (xpointer_t user_data)
   xerror_t *error = NULL;
   xboolean_t res;
 
-  res = g_input_stream_read_all (data->is, data->read_data, 1024, &bytes_read, NULL, &error);
+  res = xinput_stream_read_all (data->is, data->read_data, 1024, &bytes_read, NULL, &error);
   g_assert_true (res);
   g_assert_no_error (error);
   g_assert_cmpuint (bytes_read, ==, 1024);
@@ -400,7 +400,7 @@ test_read_write_writev_thread (xpointer_t user_data)
   xsize_t bytes_written;
   xerror_t *error = NULL;
   xboolean_t res;
-  GOutputVector vectors[3];
+  xoutput_vector_t vectors[3];
 
   vectors[0].buffer = data->write_data;
   vectors[0].size = 256;
@@ -409,7 +409,7 @@ test_read_write_writev_thread (xpointer_t user_data)
   vectors[2].buffer = data->write_data + 512;
   vectors[2].size = 512;
 
-  res = g_output_stream_writev_all (data->os, vectors, G_N_ELEMENTS (vectors), &bytes_written, NULL, &error);
+  res = xoutput_stream_writev_all (data->os, vectors, G_N_ELEMENTS (vectors), &bytes_written, NULL, &error);
   g_assert_true (res);
   g_assert_no_error (error);
   g_assert_cmpuint (bytes_written, ==, 1024);
@@ -419,15 +419,15 @@ test_read_write_writev_thread (xpointer_t user_data)
 
 /* test if normal writing/reading from a pipe works */
 static void
-test_read_write (gconstpointer user_data)
+test_read_write (xconstpointer user_data)
 {
   xboolean_t writev = GPOINTER_TO_INT (user_data);
   GUnixInputStream *is;
   GUnixOutputStream *os;
   xint_t fd[2];
-  guint8 data_write[1024], data_read[1024];
+  xuint8_t data_write[1024], data_read[1024];
   xuint_t i;
-  GThread *write_thread, *read_thread;
+  xthread_t *write_thread, *read_thread;
   TestReadWriteData data;
 
   for (i = 0; i < sizeof (data_write); i++)
@@ -444,22 +444,22 @@ test_read_write (gconstpointer user_data)
   data.write_data = data_write;
 
   if (writev)
-    write_thread = g_thread_new ("writer", test_read_write_writev_thread, &data);
+    write_thread = xthread_new ("writer", test_read_write_writev_thread, &data);
   else
-    write_thread = g_thread_new ("writer", test_read_write_write_thread, &data);
-  read_thread = g_thread_new ("reader", test_read_write_read_thread, &data);
+    write_thread = xthread_new ("writer", test_read_write_write_thread, &data);
+  read_thread = xthread_new ("reader", test_read_write_read_thread, &data);
 
-  g_thread_join (write_thread);
-  g_thread_join (read_thread);
+  xthread_join (write_thread);
+  xthread_join (read_thread);
 
   g_assert_cmpmem (data_write, sizeof data_write, data_read, sizeof data_read);
 
-  g_object_unref (os);
-  g_object_unref (is);
+  xobject_unref (os);
+  xobject_unref (is);
 }
 
-/* test if g_pollable_output_stream_write_nonblocking() and
- * g_pollable_output_stream_read_nonblocking() correctly return WOULD_BLOCK
+/* test if xpollable_output_stream_write_nonblocking() and
+ * xpollable_output_stream_read_nonblocking() correctly return WOULD_BLOCK
  * and correctly reset their status afterwards again, and all data that is
  * written can also be read again.
  */
@@ -473,7 +473,7 @@ test_write_wouldblock (void)
   GUnixOutputStream *os;
   xint_t fd[2];
   xerror_t *err = NULL;
-  guint8 data_write[1024], data_read[1024];
+  xuint8_t data_write[1024], data_read[1024];
   xsize_t i;
   int retval;
   xsize_t pipe_capacity;
@@ -496,13 +496,13 @@ test_write_wouldblock (void)
   /* Run the whole thing three times to make sure that the streams
    * reset the writability/readability state again */
   for (i = 0; i < 3; i++) {
-    gssize written = 0, written_complete = 0;
-    gssize read = 0, read_complete = 0;
+    xssize_t written = 0, written_complete = 0;
+    xssize_t read = 0, read_complete = 0;
 
     do
       {
         written_complete += written;
-        written = g_pollable_output_stream_write_nonblocking (G_POLLABLE_OUTPUT_STREAM (os),
+        written = xpollable_output_stream_write_nonblocking (G_POLLABLE_OUTPUT_STREAM (os),
                                                               data_write,
                                                               sizeof (data_write),
                                                               NULL,
@@ -534,13 +534,13 @@ test_write_wouldblock (void)
     g_clear_error (&err);
   }
 
-  g_object_unref (os);
-  g_object_unref (is);
+  xobject_unref (os);
+  xobject_unref (is);
 #endif  /* if F_GETPIPE_SZ */
 }
 
-/* test if g_pollable_output_stream_writev_nonblocking() and
- * g_pollable_output_stream_read_nonblocking() correctly return WOULD_BLOCK
+/* test if xpollable_output_stream_writev_nonblocking() and
+ * xpollable_output_stream_read_nonblocking() correctly return WOULD_BLOCK
  * and correctly reset their status afterwards again, and all data that is
  * written can also be read again.
  */
@@ -554,11 +554,11 @@ test_writev_wouldblock (void)
   GUnixOutputStream *os;
   xint_t fd[2];
   xerror_t *err = NULL;
-  guint8 data_write[1024], data_read[1024];
+  xuint8_t data_write[1024], data_read[1024];
   xsize_t i;
   int retval;
   xsize_t pipe_capacity;
-  GOutputVector vectors[4];
+  xoutput_vector_t vectors[4];
   GPollableReturn res;
 
   for (i = 0; i < sizeof (data_write); i++)
@@ -580,7 +580,7 @@ test_writev_wouldblock (void)
    * reset the writability/readability state again */
   for (i = 0; i < 3; i++) {
     xsize_t written = 0, written_complete = 0;
-    gssize read = 0, read_complete = 0;
+    xssize_t read = 0, read_complete = 0;
 
     do
     {
@@ -595,7 +595,7 @@ test_writev_wouldblock (void)
         vectors[3].buffer = data_write + 768;
         vectors[3].size = 256;
 
-        res = g_pollable_output_stream_writev_nonblocking (G_POLLABLE_OUTPUT_STREAM (os),
+        res = xpollable_output_stream_writev_nonblocking (G_POLLABLE_OUTPUT_STREAM (os),
                                                            vectors,
                                                            G_N_ELEMENTS (vectors),
                                                            &written,
@@ -629,8 +629,8 @@ test_writev_wouldblock (void)
     g_clear_error (&err);
   }
 
-  g_object_unref (os);
-  g_object_unref (is);
+  xobject_unref (os);
+  xobject_unref (is);
 #endif  /* if F_GETPIPE_SZ */
 }
 
@@ -643,7 +643,7 @@ write_async_wouldblock_cb (GUnixOutputStream *os,
   xsize_t *bytes_written = user_data;
   xerror_t *err = NULL;
 
-  g_output_stream_write_all_finish (G_OUTPUT_STREAM (os), result, bytes_written, &err);
+  xoutput_stream_write_all_finish (G_OUTPUT_STREAM (os), result, bytes_written, &err);
   g_assert_no_error (err);
 }
 
@@ -655,7 +655,7 @@ read_async_wouldblock_cb (GUnixInputStream  *is,
   xsize_t *bytes_read = user_data;
   xerror_t *err = NULL;
 
-  g_input_stream_read_all_finish (G_INPUT_STREAM (is), result, bytes_read, &err);
+  xinput_stream_read_all_finish (G_INPUT_STREAM (is), result, bytes_read, &err);
   g_assert_no_error (err);
 }
 #endif  /* if F_GETPIPE_SZ */
@@ -672,7 +672,7 @@ test_write_async_wouldblock (void)
   GUnixInputStream *is;
   GUnixOutputStream *os;
   xint_t fd[2];
-  guint8 *data, *data_read;
+  xuint8_t *data, *data_read;
   xsize_t i;
   int retval;
   xsize_t pipe_capacity;
@@ -697,15 +697,15 @@ test_write_async_wouldblock (void)
   pipe_capacity = (xsize_t) retval;
   g_assert_cmpint (pipe_capacity, >=, 4096);
 
-  data = g_new (guint8, 4 * pipe_capacity);
+  data = g_new (xuint8_t, 4 * pipe_capacity);
   for (i = 0; i < 4 * pipe_capacity; i++)
     data[i] = i;
-  data_read = g_new (guint8, 4 * pipe_capacity);
+  data_read = g_new (xuint8_t, 4 * pipe_capacity);
 
   is = G_UNIX_INPUT_STREAM (g_unix_input_stream_new (fd[0], TRUE));
   os = G_UNIX_OUTPUT_STREAM (g_unix_output_stream_new (fd[1], TRUE));
 
-  g_output_stream_write_all_async (G_OUTPUT_STREAM (os),
+  xoutput_stream_write_all_async (G_OUTPUT_STREAM (os),
                                    data,
                                    4 * pipe_capacity,
                                    G_PRIORITY_DEFAULT,
@@ -713,7 +713,7 @@ test_write_async_wouldblock (void)
                                    (xasync_ready_callback_t) write_async_wouldblock_cb,
                                    &bytes_written);
 
-  g_input_stream_read_all_async (G_INPUT_STREAM (is),
+  xinput_stream_read_all_async (G_INPUT_STREAM (is),
                                  data_read,
                                  4 * pipe_capacity,
                                  G_PRIORITY_DEFAULT,
@@ -722,7 +722,7 @@ test_write_async_wouldblock (void)
                                  &bytes_read);
 
   while (bytes_written == 0 && bytes_read == 0)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   g_assert_cmpuint (bytes_written, ==, 4 * pipe_capacity);
   g_assert_cmpuint (bytes_read, ==, 4 * pipe_capacity);
@@ -731,8 +731,8 @@ test_write_async_wouldblock (void)
   g_free (data);
   g_free (data_read);
 
-  g_object_unref (os);
-  g_object_unref (is);
+  xobject_unref (os);
+  xobject_unref (is);
 #endif  /* if F_GETPIPE_SZ */
 }
 
@@ -745,7 +745,7 @@ writev_async_wouldblock_cb (GUnixOutputStream *os,
   xsize_t *bytes_written = user_data;
   xerror_t *err = NULL;
 
-  g_output_stream_writev_all_finish (G_OUTPUT_STREAM (os), result, bytes_written, &err);
+  xoutput_stream_writev_all_finish (G_OUTPUT_STREAM (os), result, bytes_written, &err);
   g_assert_no_error (err);
 }
 #endif  /* if F_GETPIPE_SZ */
@@ -762,12 +762,12 @@ test_writev_async_wouldblock (void)
   GUnixInputStream *is;
   GUnixOutputStream *os;
   xint_t fd[2];
-  guint8 *data, *data_read;
+  xuint8_t *data, *data_read;
   xsize_t i;
   int retval;
   xsize_t pipe_capacity;
   xsize_t bytes_written = 0, bytes_read = 0;
-  GOutputVector vectors[4];
+  xoutput_vector_t vectors[4];
 
   g_assert_cmpint (pipe (fd), ==, 0);
 
@@ -788,10 +788,10 @@ test_writev_async_wouldblock (void)
   pipe_capacity = (xsize_t) retval;
   g_assert_cmpint (pipe_capacity, >=, 4096);
 
-  data = g_new (guint8, 4 * pipe_capacity);
+  data = g_new (xuint8_t, 4 * pipe_capacity);
   for (i = 0; i < 4 * pipe_capacity; i++)
     data[i] = i;
-  data_read = g_new (guint8, 4 * pipe_capacity);
+  data_read = g_new (xuint8_t, 4 * pipe_capacity);
 
   vectors[0].buffer = data;
   vectors[0].size = 1024;
@@ -805,7 +805,7 @@ test_writev_async_wouldblock (void)
   is = G_UNIX_INPUT_STREAM (g_unix_input_stream_new (fd[0], TRUE));
   os = G_UNIX_OUTPUT_STREAM (g_unix_output_stream_new (fd[1], TRUE));
 
-  g_output_stream_writev_all_async (G_OUTPUT_STREAM (os),
+  xoutput_stream_writev_all_async (G_OUTPUT_STREAM (os),
                                     vectors,
                                     G_N_ELEMENTS (vectors),
                                     G_PRIORITY_DEFAULT,
@@ -813,7 +813,7 @@ test_writev_async_wouldblock (void)
                                     (xasync_ready_callback_t) writev_async_wouldblock_cb,
                                     &bytes_written);
 
-  g_input_stream_read_all_async (G_INPUT_STREAM (is),
+  xinput_stream_read_all_async (G_INPUT_STREAM (is),
                                  data_read,
                                  4 * pipe_capacity,
                                  G_PRIORITY_DEFAULT,
@@ -822,7 +822,7 @@ test_writev_async_wouldblock (void)
                                  &bytes_read);
 
   while (bytes_written == 0 && bytes_read == 0)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   g_assert_cmpuint (bytes_written, ==, 4 * pipe_capacity);
   g_assert_cmpuint (bytes_read, ==, 4 * pipe_capacity);
@@ -831,8 +831,8 @@ test_writev_async_wouldblock (void)
   g_free (data);
   g_free (data_read);
 
-  g_object_unref (os);
-  g_object_unref (is);
+  xobject_unref (os);
+  xobject_unref (is);
 #endif  /* F_GETPIPE_SZ */
 }
 

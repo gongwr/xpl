@@ -92,7 +92,7 @@ g_unix_connection_send_fd (GUnixConnection  *connection,
                            xerror_t          **error)
 {
 #ifdef G_OS_UNIX
-  GSocketControlMessage *scm;
+  xsocket_control_message_t *scm;
   xsocket_t *socket;
 
   g_return_val_if_fail (X_IS_UNIX_CONNECTION (connection), FALSE);
@@ -102,22 +102,22 @@ g_unix_connection_send_fd (GUnixConnection  *connection,
 
   if (!g_unix_fd_message_append_fd (G_UNIX_FD_MESSAGE (scm), fd, error))
     {
-      g_object_unref (scm);
+      xobject_unref (scm);
       return FALSE;
     }
 
-  g_object_get (connection, "socket", &socket, NULL);
+  xobject_get (connection, "socket", &socket, NULL);
   if (xsocket_send_message (socket, NULL, NULL, 0, &scm, 1, 0, cancellable, error) != 1)
     /* XXX could it 'fail' with zero? */
     {
-      g_object_unref (socket);
-      g_object_unref (scm);
+      xobject_unref (socket);
+      xobject_unref (scm);
 
       return FALSE;
     }
 
-  g_object_unref (socket);
-  g_object_unref (scm);
+  xobject_unref (socket);
+  xobject_unref (scm);
 
   return TRUE;
 #else
@@ -151,24 +151,24 @@ g_unix_connection_receive_fd (GUnixConnection  *connection,
                               xerror_t          **error)
 {
 #ifdef G_OS_UNIX
-  GSocketControlMessage **scms;
+  xsocket_control_message_t **scms;
   xint_t *fds, nfd, fd, nscm;
   GUnixFDMessage *fdmsg;
   xsocket_t *socket;
 
   g_return_val_if_fail (X_IS_UNIX_CONNECTION (connection), -1);
 
-  g_object_get (connection, "socket", &socket, NULL);
+  xobject_get (connection, "socket", &socket, NULL);
   if (xsocket_receive_message (socket, NULL, NULL, 0,
                                 &scms, &nscm, NULL, cancellable, error) != 1)
     /* XXX it _could_ 'fail' with zero. */
     {
-      g_object_unref (socket);
+      xobject_unref (socket);
 
       return -1;
     }
 
-  g_object_unref (socket);
+  xobject_unref (socket);
 
   if (nscm != 1)
     {
@@ -181,7 +181,7 @@ g_unix_connection_receive_fd (GUnixConnection  *connection,
         nscm);
 
       for (i = 0; i < nscm; i++)
-        g_object_unref (scms[i]);
+        xobject_unref (scms[i]);
 
       g_free (scms);
 
@@ -192,7 +192,7 @@ g_unix_connection_receive_fd (GUnixConnection  *connection,
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 			   _("Unexpected type of ancillary data"));
-      g_object_unref (scms[0]);
+      xobject_unref (scms[0]);
       g_free (scms);
 
       return -1;
@@ -202,7 +202,7 @@ g_unix_connection_receive_fd (GUnixConnection  *connection,
   g_free (scms);
 
   fds = g_unix_fd_message_steal_fds (fdmsg, &nfd);
-  g_object_unref (fdmsg);
+  xobject_unref (fdmsg);
 
   if (nfd != 1)
     {
@@ -282,14 +282,14 @@ xint_t                    g_unix_connection_receive_fd_finish             (GUnix
 
 
 xboolean_t                g_unix_connection_send_fake_credentials         (GUnixConnection      *connection,
-                                                                         guint64               pid,
-                                                                         guint64               uid,
-                                                                         guint64               gid,
+                                                                         xuint64_t               pid,
+                                                                         xuint64_t               uid,
+                                                                         xuint64_t               gid,
                                                                          xerror_t              **error);
 void                    g_unix_connection_send_fake_credentials_async   (GUnixConnection      *connection,
-                                                                         guint64               pid,
-                                                                         guint64               uid,
-                                                                         guint64               gid,
+                                                                         xuint64_t               pid,
+                                                                         xuint64_t               uid,
+                                                                         xuint64_t               gid,
                                                                          xint_t                  io_priority,
                                                                          xasync_ready_callback_t   callback,
                                                                          xpointer_t              user_data);
@@ -326,7 +326,7 @@ xboolean_t                g_unix_connection_create_pair                   (GUnix
  * - GNU/Hurd since GLib 2.40
  *
  * Other ways to exchange credentials with a foreign peer includes the
- * #GUnixCredentialsMessage type and xsocket_get_credentials() function.
+ * #xunix_credentials_message_t type and xsocket_get_credentials() function.
  *
  * Returns: %TRUE on success, %FALSE if @error is set.
  *
@@ -337,11 +337,11 @@ g_unix_connection_send_credentials (GUnixConnection      *connection,
                                     xcancellable_t         *cancellable,
                                     xerror_t              **error)
 {
-  GCredentials *credentials;
-  GSocketControlMessage *scm;
+  xcredentials_t *credentials;
+  xsocket_control_message_t *scm;
   xsocket_t *socket;
   xboolean_t ret;
-  GOutputVector vector;
+  xoutput_vector_t vector;
   guchar nul_byte[1] = {'\0'};
   xint_t num_messages;
 
@@ -350,7 +350,7 @@ g_unix_connection_send_credentials (GUnixConnection      *connection,
 
   ret = FALSE;
 
-  credentials = g_credentials_new ();
+  credentials = xcredentials_new ();
 
   vector.buffer = &nul_byte;
   vector.size = 1;
@@ -366,7 +366,7 @@ g_unix_connection_send_credentials (GUnixConnection      *connection,
       num_messages = 0;
     }
 
-  g_object_get (connection, "socket", &socket, NULL);
+  xobject_get (connection, "socket", &socket, NULL);
   if (xsocket_send_message (socket,
                              NULL, /* address */
                              &vector,
@@ -384,15 +384,15 @@ g_unix_connection_send_credentials (GUnixConnection      *connection,
   ret = TRUE;
 
  out:
-  g_object_unref (socket);
+  xobject_unref (socket);
   if (scm != NULL)
-    g_object_unref (scm);
-  g_object_unref (credentials);
+    xobject_unref (scm);
+  xobject_unref (credentials);
   return ret;
 }
 
 static void
-send_credentials_async_thread (GTask         *task,
+send_credentials_async_thread (xtask_t         *task,
 			       xpointer_t       source_object,
 			       xpointer_t       task_data,
 			       xcancellable_t  *cancellable)
@@ -402,10 +402,10 @@ send_credentials_async_thread (GTask         *task,
   if (g_unix_connection_send_credentials (G_UNIX_CONNECTION (source_object),
 					  cancellable,
 					  &error))
-    g_task_return_boolean (task, TRUE);
+    xtask_return_boolean (task, TRUE);
   else
-    g_task_return_error (task, error);
-  g_object_unref (task);
+    xtask_return_error (task, error);
+  xobject_unref (task);
 }
 
 /**
@@ -431,11 +431,11 @@ g_unix_connection_send_credentials_async (GUnixConnection      *connection,
                                           xasync_ready_callback_t   callback,
                                           xpointer_t              user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (connection, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_unix_connection_send_credentials_async);
-  g_task_run_in_thread (task, send_credentials_async_thread);
+  task = xtask_new (connection, cancellable, callback, user_data);
+  xtask_set_source_tag (task, g_unix_connection_send_credentials_async);
+  xtask_run_in_thread (task, send_credentials_async_thread);
 }
 
 /**
@@ -456,9 +456,9 @@ g_unix_connection_send_credentials_finish (GUnixConnection *connection,
                                            xasync_result_t    *result,
                                            xerror_t         **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, connection), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, connection), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 /**
@@ -484,24 +484,24 @@ g_unix_connection_send_credentials_finish (GUnixConnection *connection,
  * - GNU/Hurd since GLib 2.40
  *
  * Other ways to exchange credentials with a foreign peer includes the
- * #GUnixCredentialsMessage type and xsocket_get_credentials() function.
+ * #xunix_credentials_message_t type and xsocket_get_credentials() function.
  *
  * Returns: (transfer full): Received credentials on success (free with
- * g_object_unref()), %NULL if @error is set.
+ * xobject_unref()), %NULL if @error is set.
  *
  * Since: 2.26
  */
-GCredentials *
+xcredentials_t *
 g_unix_connection_receive_credentials (GUnixConnection      *connection,
                                        xcancellable_t         *cancellable,
                                        xerror_t              **error)
 {
-  GCredentials *ret;
-  GSocketControlMessage **scms;
+  xcredentials_t *ret;
+  xsocket_control_message_t **scms;
   xint_t nscm;
   xsocket_t *socket;
   xint_t n;
-  gssize num_bytes_read;
+  xssize_t num_bytes_read;
 #ifdef __linux__
   xboolean_t turn_off_so_passcreds;
 #endif
@@ -512,7 +512,7 @@ g_unix_connection_receive_credentials (GUnixConnection      *connection,
   ret = NULL;
   scms = NULL;
 
-  g_object_get (connection, "socket", &socket, NULL);
+  xobject_get (connection, "socket", &socket, NULL);
 
   /* On Linux, we need to turn on SO_PASSCRED if it isn't enabled
    * already. We also need to turn it off when we're done.  See
@@ -535,7 +535,7 @@ g_unix_connection_receive_credentials (GUnixConnection      *connection,
                      G_IO_ERROR,
                      g_io_error_from_errno (errsv),
                      _("Error checking if SO_PASSCRED is enabled for socket: %s"),
-                     g_strerror (errsv));
+                     xstrerror (errsv));
         goto out;
       }
     if (opt_val == 0)
@@ -551,7 +551,7 @@ g_unix_connection_receive_credentials (GUnixConnection      *connection,
                          G_IO_ERROR,
                          g_io_error_from_errno (errsv),
                          _("Error enabling SO_PASSCRED: %s"),
-                         g_strerror (errsv));
+                         xstrerror (errsv));
             goto out;
           }
         turn_off_so_passcreds = TRUE;
@@ -559,7 +559,7 @@ g_unix_connection_receive_credentials (GUnixConnection      *connection,
   }
 #endif
 
-  g_type_ensure (XTYPE_UNIX_CREDENTIALS_MESSAGE);
+  xtype_ensure (XTYPE_UNIX_CREDENTIALS_MESSAGE);
   num_bytes_read = xsocket_receive_message (socket,
                                              NULL, /* xsocket_address_t **address */
                                              NULL,
@@ -610,7 +610,7 @@ g_unix_connection_receive_credentials (GUnixConnection      *connection,
         }
 
       ret = g_unix_credentials_message_get_credentials (G_UNIX_CREDENTIALS_MESSAGE (scms[0]));
-      g_object_ref (ret);
+      xobject_ref (ret);
     }
   else
     {
@@ -645,7 +645,7 @@ g_unix_connection_receive_credentials (GUnixConnection      *connection,
                        G_IO_ERROR,
                        g_io_error_from_errno (errsv),
                        _("Error while disabling SO_PASSCRED: %s"),
-                       g_strerror (errsv));
+                       xstrerror (errsv));
           goto out;
         }
     }
@@ -654,30 +654,30 @@ g_unix_connection_receive_credentials (GUnixConnection      *connection,
   if (scms != NULL)
     {
       for (n = 0; n < nscm; n++)
-        g_object_unref (scms[n]);
+        xobject_unref (scms[n]);
       g_free (scms);
     }
-  g_object_unref (socket);
+  xobject_unref (socket);
   return ret;
 }
 
 static void
-receive_credentials_async_thread (GTask         *task,
+receive_credentials_async_thread (xtask_t         *task,
 				  xpointer_t       source_object,
 				  xpointer_t       task_data,
 				  xcancellable_t  *cancellable)
 {
-  GCredentials *creds;
+  xcredentials_t *creds;
   xerror_t *error = NULL;
 
   creds = g_unix_connection_receive_credentials (G_UNIX_CONNECTION (source_object),
                                                  cancellable,
                                                  &error);
   if (creds)
-    g_task_return_pointer (task, creds, g_object_unref);
+    xtask_return_pointer (task, creds, xobject_unref);
   else
-    g_task_return_error (task, error);
-  g_object_unref (task);
+    xtask_return_error (task, error);
+  xobject_unref (task);
 }
 
 /**
@@ -703,11 +703,11 @@ g_unix_connection_receive_credentials_async (GUnixConnection      *connection,
                                               xasync_ready_callback_t   callback,
                                               xpointer_t              user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (connection, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_unix_connection_receive_credentials_async);
-  g_task_run_in_thread (task, receive_credentials_async_thread);
+  task = xtask_new (connection, cancellable, callback, user_data);
+  xtask_set_source_tag (task, g_unix_connection_receive_credentials_async);
+  xtask_run_in_thread (task, receive_credentials_async_thread);
 }
 
 /**
@@ -719,17 +719,17 @@ g_unix_connection_receive_credentials_async (GUnixConnection      *connection,
  * Finishes an asynchronous receive credentials operation started with
  * g_unix_connection_receive_credentials_async().
  *
- * Returns: (transfer full): a #GCredentials, or %NULL on error.
- *     Free the returned object with g_object_unref().
+ * Returns: (transfer full): a #xcredentials_t, or %NULL on error.
+ *     Free the returned object with xobject_unref().
  *
  * Since: 2.32
  **/
-GCredentials *
+xcredentials_t *
 g_unix_connection_receive_credentials_finish (GUnixConnection *connection,
                                               xasync_result_t    *result,
                                               xerror_t         **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, connection), NULL);
+  g_return_val_if_fail (xtask_is_valid (result, connection), NULL);
 
-  return g_task_propagate_pointer (G_TASK (result), error);
+  return xtask_propagate_pointer (XTASK (result), error);
 }

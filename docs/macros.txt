@@ -47,7 +47,7 @@ G_ENABLE_DEBUG
 	macro, and since it is a globally visible define, third-party code may
 	be affected by it similar to G_DISABLE_ASSERT.
 	The additional code executed/compiled for this macro currently involve:
-	- extra validity checks for GDate
+	- extra validity checks for xdate_t
 	- memory profiling traps in gmem.c (consult debugging.txt for details)
 	- BREAKPOINT abortion for fatal log levels in gmessage.c instead of
 	  plain abort() to allow debuggers trapping and overriding them

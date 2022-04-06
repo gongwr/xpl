@@ -47,15 +47,15 @@ typedef struct _GWin32FileMonitorClass GWin32FileMonitorClass;
 typedef struct _GWin32FileMonitorPrivate GWin32FileMonitorPrivate;
 
 struct _GWin32FileMonitor {
-  GLocalFileMonitor parent_instance;
+  xlocal_file_monitor_t parent_instance;
   GWin32FSMonitorPrivate * priv;
 };
 struct _GWin32FileMonitorClass {
-  GLocalFileMonitorClass parent_class;
+  xlocal_file_monitor_class_t parent_class;
 };
 
 xtype_t g_win32_file_monitor_get_type (void);
-void g_win32_file_monitor_register (GIOModule *module);
+void g_win32_file_monitor_register (xio_module_t *module);
 
 G_END_DECLS
 

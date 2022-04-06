@@ -182,9 +182,9 @@ typedef enum
 } GSpawnFlags;
 
 XPL_AVAILABLE_IN_ALL
-GQuark g_spawn_error_quark (void);
+xquark g_spawn_error_quark (void);
 XPL_AVAILABLE_IN_ALL
-GQuark g_spawn_exit_error_quark (void);
+xquark g_spawn_exit_error_quark (void);
 
 XPL_AVAILABLE_IN_ALL
 xboolean_t g_spawn_async (const xchar_t           *working_directory,
@@ -193,7 +193,7 @@ xboolean_t g_spawn_async (const xchar_t           *working_directory,
                         GSpawnFlags            flags,
                         GSpawnChildSetupFunc   child_setup,
                         xpointer_t               user_data,
-                        GPid                  *child_pid,
+                        xpid_t                  *child_pid,
                         xerror_t               **error);
 
 
@@ -207,7 +207,7 @@ xboolean_t g_spawn_async_with_pipes (const xchar_t          *working_directory,
                                    GSpawnFlags           flags,
                                    GSpawnChildSetupFunc  child_setup,
                                    xpointer_t              user_data,
-                                   GPid                 *child_pid,
+                                   xpid_t                 *child_pid,
                                    xint_t                 *standard_input,
                                    xint_t                 *standard_output,
                                    xint_t                 *standard_error,
@@ -226,7 +226,7 @@ xboolean_t g_spawn_async_with_pipes_and_fds (const xchar_t          *working_dir
                                            const xint_t           *source_fds,
                                            const xint_t           *target_fds,
                                            xsize_t                 n_fds,
-                                           GPid                 *child_pid_out,
+                                           xpid_t                 *child_pid_out,
                                            xint_t                 *stdin_pipe_out,
                                            xint_t                 *stdout_pipe_out,
                                            xint_t                 *stderr_pipe_out,
@@ -240,7 +240,7 @@ xboolean_t g_spawn_async_with_fds (const xchar_t          *working_directory,
                                  GSpawnFlags           flags,
                                  GSpawnChildSetupFunc  child_setup,
                                  xpointer_t              user_data,
-                                 GPid                 *child_pid,
+                                 xpid_t                 *child_pid,
                                  xint_t                  stdin_fd,
                                  xint_t                  stdout_fd,
                                  xint_t                  stderr_fd,
@@ -281,7 +281,7 @@ xboolean_t g_spawn_check_exit_status (xint_t      wait_status,
 				    xerror_t  **error);
 
 XPL_AVAILABLE_IN_ALL
-void g_spawn_close_pid (GPid pid);
+void g_spawn_close_pid (xpid_t pid);
 
 G_END_DECLS
 

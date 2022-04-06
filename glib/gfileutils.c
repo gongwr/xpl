@@ -80,7 +80,7 @@
  *
  * The pathname argument should be in the GLib file name encoding.
  * On POSIX this is the actual on-disk encoding which might correspond
- * to the locale settings of the process (or the `G_FILENAME_ENCODING`
+ * to the locale settings of the process (or the `XFILENAME_ENCODING`
  * environment variable), or not.
  *
  * On Windows the GLib file name encoding is UTF-8. Note that the
@@ -96,70 +96,70 @@
 
 /**
  * GFileError:
- * @G_FILE_ERROR_EXIST: Operation not permitted; only the owner of
+ * @XFILE_ERROR_EXIST: Operation not permitted; only the owner of
  *     the file (or other resource) or processes with special privileges
  *     can perform the operation.
- * @G_FILE_ERROR_ISDIR: File is a directory; you cannot open a directory
+ * @XFILE_ERROR_ISDIR: File is a directory; you cannot open a directory
  *     for writing, or create or remove hard links to it.
- * @G_FILE_ERROR_ACCES: Permission denied; the file permissions do not
+ * @XFILE_ERROR_ACCES: Permission denied; the file permissions do not
  *     allow the attempted operation.
- * @G_FILE_ERROR_NAMETOOLONG: Filename too long.
- * @G_FILE_ERROR_NOENT: No such file or directory. This is a "file
+ * @XFILE_ERROR_NAMETOOLONG: Filename too long.
+ * @XFILE_ERROR_NOENT: No such file or directory. This is a "file
  *     doesn't exist" error for ordinary files that are referenced in
  *     contexts where they are expected to already exist.
- * @G_FILE_ERROR_NOTDIR: A file that isn't a directory was specified when
+ * @XFILE_ERROR_NOTDIR: A file that isn't a directory was specified when
  *     a directory is required.
- * @G_FILE_ERROR_NXIO: No such device or address. The system tried to
+ * @XFILE_ERROR_NXIO: No such device or address. The system tried to
  *     use the device represented by a file you specified, and it
  *     couldn't find the device. This can mean that the device file was
  *     installed incorrectly, or that the physical device is missing or
  *     not correctly attached to the computer.
- * @G_FILE_ERROR_NODEV: The underlying file system of the specified file
+ * @XFILE_ERROR_NODEV: The underlying file system of the specified file
  *     does not support memory mapping.
- * @G_FILE_ERROR_ROFS: The directory containing the new link can't be
+ * @XFILE_ERROR_ROFS: The directory containing the new link can't be
  *     modified because it's on a read-only file system.
- * @G_FILE_ERROR_TXTBSY: Text file busy.
- * @G_FILE_ERROR_FAULT: You passed in a pointer to bad memory.
+ * @XFILE_ERROR_TXTBSY: Text file busy.
+ * @XFILE_ERROR_FAULT: You passed in a pointer to bad memory.
  *     (GLib won't reliably return this, don't pass in pointers to bad
  *     memory.)
- * @G_FILE_ERROR_LOOP: Too many levels of symbolic links were encountered
+ * @XFILE_ERROR_LOOP: Too many levels of symbolic links were encountered
  *     in looking up a file name. This often indicates a cycle of symbolic
  *     links.
- * @G_FILE_ERROR_NOSPC: No space left on device; write operation on a
+ * @XFILE_ERROR_NOSPC: No space left on device; write operation on a
  *     file failed because the disk is full.
- * @G_FILE_ERROR_NOMEM: No memory available. The system cannot allocate
+ * @XFILE_ERROR_NOMEM: No memory available. The system cannot allocate
  *     more virtual memory because its capacity is full.
- * @G_FILE_ERROR_MFILE: The current process has too many files open and
+ * @XFILE_ERROR_MFILE: The current process has too many files open and
  *     can't open any more. Duplicate descriptors do count toward this
  *     limit.
- * @G_FILE_ERROR_NFILE: There are too many distinct file openings in the
+ * @XFILE_ERROR_NFILE: There are too many distinct file openings in the
  *     entire system.
- * @G_FILE_ERROR_BADF: Bad file descriptor; for example, I/O on a
+ * @XFILE_ERROR_BADF: Bad file descriptor; for example, I/O on a
  *     descriptor that has been closed or reading from a descriptor open
  *     only for writing (or vice versa).
- * @G_FILE_ERROR_INVAL: Invalid argument. This is used to indicate
+ * @XFILE_ERROR_INVAL: Invalid argument. This is used to indicate
  *     various kinds of problems with passing the wrong argument to a
  *     library function.
- * @G_FILE_ERROR_PIPE: Broken pipe; there is no process reading from the
+ * @XFILE_ERROR_PIPE: Broken pipe; there is no process reading from the
  *     other end of a pipe. Every library function that returns this
  *     error code also generates a 'SIGPIPE' signal; this signal
  *     terminates the program if not handled or blocked. Thus, your
  *     program will never actually see this code unless it has handled
  *     or blocked 'SIGPIPE'.
- * @G_FILE_ERROR_AGAIN: Resource temporarily unavailable; the call might
+ * @XFILE_ERROR_AGAIN: Resource temporarily unavailable; the call might
  *     work if you try again later.
- * @G_FILE_ERROR_INTR: Interrupted function call; an asynchronous signal
+ * @XFILE_ERROR_INTR: Interrupted function call; an asynchronous signal
  *     occurred and prevented completion of the call. When this
  *     happens, you should try the call again.
- * @G_FILE_ERROR_IO: Input/output error; usually used for physical read
+ * @XFILE_ERROR_IO: Input/output error; usually used for physical read
  *    or write errors. i.e. the disk or other physical device hardware
  *    is returning errors.
- * @G_FILE_ERROR_PERM: Operation not permitted; only the owner of the
+ * @XFILE_ERROR_PERM: Operation not permitted; only the owner of the
  *    file (or other resource) or processes with special privileges can
  *    perform the operation.
- * @G_FILE_ERROR_NOSYS: Function not implemented; this indicates that
+ * @XFILE_ERROR_NOSYS: Function not implemented; this indicates that
  *    the system is missing some functionality.
- * @G_FILE_ERROR_FAILED: Does not correspond to a UNIX error code; this
+ * @XFILE_ERROR_FAILED: Does not correspond to a UNIX error code; this
  *    is the standard "failed for unspecified reason" error code present
  *    in all #xerror_t error code enumerations. Returned if no specific
  *    code applies.
@@ -179,7 +179,7 @@
  */
 
 /**
- * G_FILE_ERROR:
+ * XFILE_ERROR:
  *
  * Error domain for file operations. Errors in this domain will
  * be from the #GFileError enumeration. See #xerror_t for information
@@ -188,16 +188,16 @@
 
 /**
  * GFileTest:
- * @G_FILE_TEST_IS_REGULAR: %TRUE if the file is a regular file
+ * @XFILE_TEST_IS_REGULAR: %TRUE if the file is a regular file
  *     (not a directory). Note that this test will also return %TRUE
  *     if the tested file is a symlink to a regular file.
- * @G_FILE_TEST_IS_SYMLINK: %TRUE if the file is a symlink.
- * @G_FILE_TEST_IS_DIR: %TRUE if the file is a directory.
- * @G_FILE_TEST_IS_EXECUTABLE: %TRUE if the file is executable.
- * @G_FILE_TEST_EXISTS: %TRUE if the file exists. It may or may not
+ * @XFILE_TEST_IS_SYMLINK: %TRUE if the file is a symlink.
+ * @XFILE_TEST_IS_DIR: %TRUE if the file is a directory.
+ * @XFILE_TEST_IS_EXECUTABLE: %TRUE if the file is executable.
+ * @XFILE_TEST_EXISTS: %TRUE if the file exists. It may or may not
  *     be a regular file.
  *
- * A test to perform on a file using g_file_test().
+ * A test to perform on a file using xfile_test().
  */
 
 /**
@@ -230,7 +230,7 @@ g_mkdir_with_parents (const xchar_t *pathname,
     return 0;
   else if (errno == EEXIST)
     {
-      if (!g_file_test (pathname, G_FILE_TEST_IS_DIR))
+      if (!xfile_test (pathname, XFILE_TEST_IS_DIR))
         {
           errno = ENOTDIR;
           return -1;
@@ -239,7 +239,7 @@ g_mkdir_with_parents (const xchar_t *pathname,
     }
 
   /* walk the full path and try creating each element */
-  fn = g_strdup (pathname);
+  fn = xstrdup (pathname);
 
   if (g_path_is_absolute (fn))
     p = (xchar_t *) g_path_skip_root (fn);
@@ -256,7 +256,7 @@ g_mkdir_with_parents (const xchar_t *pathname,
       else
 	*p = '\0';
 
-      if (!g_file_test (fn, G_FILE_TEST_EXISTS))
+      if (!xfile_test (fn, XFILE_TEST_EXISTS))
 	{
 	  if (g_mkdir (fn, mode) == -1 && errno != EEXIST)
 	    {
@@ -269,7 +269,7 @@ g_mkdir_with_parents (const xchar_t *pathname,
 		}
 	    }
 	}
-      else if (!g_file_test (fn, G_FILE_TEST_IS_DIR))
+      else if (!xfile_test (fn, XFILE_TEST_IS_DIR))
 	{
 	  g_free (fn);
 	  errno = ENOTDIR;
@@ -290,57 +290,57 @@ g_mkdir_with_parents (const xchar_t *pathname,
 }
 
 /**
- * g_file_test:
+ * xfile_test:
  * @filename: (type filename): a filename to test in the
  *     GLib file name encoding
  * @test: bitfield of #GFileTest flags
  *
  * Returns %TRUE if any of the tests in the bitfield @test are
- * %TRUE. For example, `(G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)`
+ * %TRUE. For example, `(XFILE_TEST_EXISTS | XFILE_TEST_IS_DIR)`
  * will return %TRUE if the file exists; the check whether it's a
  * directory doesn't matter since the existence test is %TRUE. With
  * the current set of available tests, there's no point passing in
  * more than one test at a time.
  *
- * Apart from %G_FILE_TEST_IS_SYMLINK all tests follow symbolic links,
- * so for a symbolic link to a regular file g_file_test() will return
- * %TRUE for both %G_FILE_TEST_IS_SYMLINK and %G_FILE_TEST_IS_REGULAR.
+ * Apart from %XFILE_TEST_IS_SYMLINK all tests follow symbolic links,
+ * so for a symbolic link to a regular file xfile_test() will return
+ * %TRUE for both %XFILE_TEST_IS_SYMLINK and %XFILE_TEST_IS_REGULAR.
  *
- * Note, that for a dangling symbolic link g_file_test() will return
- * %TRUE for %G_FILE_TEST_IS_SYMLINK and %FALSE for all other flags.
+ * Note, that for a dangling symbolic link xfile_test() will return
+ * %TRUE for %XFILE_TEST_IS_SYMLINK and %FALSE for all other flags.
  *
- * You should never use g_file_test() to test whether it is safe
+ * You should never use xfile_test() to test whether it is safe
  * to perform an operation, because there is always the possibility
  * of the condition changing before you actually perform the operation.
- * For example, you might think you could use %G_FILE_TEST_IS_SYMLINK
+ * For example, you might think you could use %XFILE_TEST_IS_SYMLINK
  * to know whether it is safe to write to a file without being
  * tricked into writing into a different location. It doesn't work!
  * |[<!-- language="C" -->
  *  // DON'T DO THIS
- *  if (!g_file_test (filename, G_FILE_TEST_IS_SYMLINK))
+ *  if (!xfile_test (filename, XFILE_TEST_IS_SYMLINK))
  *    {
  *      fd = g_open (filename, O_WRONLY);
  *      // write to fd
  *    }
  * ]|
  *
- * Another thing to note is that %G_FILE_TEST_EXISTS and
- * %G_FILE_TEST_IS_EXECUTABLE are implemented using the access()
+ * Another thing to note is that %XFILE_TEST_EXISTS and
+ * %XFILE_TEST_IS_EXECUTABLE are implemented using the access()
  * system call. This usually doesn't matter, but if your program
  * is setuid or setgid it means that these tests will give you
  * the answer for the real user ID and group ID, rather than the
  * effective user ID and group ID.
  *
  * On Windows, there are no symlinks, so testing for
- * %G_FILE_TEST_IS_SYMLINK will always return %FALSE. Testing for
- * %G_FILE_TEST_IS_EXECUTABLE will just check that the file exists and
+ * %XFILE_TEST_IS_SYMLINK will always return %FALSE. Testing for
+ * %XFILE_TEST_IS_EXECUTABLE will just check that the file exists and
  * its name indicates that it is executable, checking for well-known
  * extensions and those listed in the `PATHEXT` environment variable.
  *
  * Returns: whether a test was %TRUE
  **/
 xboolean_t
-g_file_test (const xchar_t *filename,
+xfile_test (const xchar_t *filename,
              GFileTest    test)
 {
 #ifdef G_OS_WIN32
@@ -358,7 +358,7 @@ g_file_test (const xchar_t *filename,
 #  ifndef FILE_ATTRIBUTE_DEVICE
 #    define FILE_ATTRIBUTE_DEVICE 64
 #  endif
-  wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+  wfilename = xutf8_to_utf16 (filename, -1, NULL, NULL, NULL);
 
   if (wfilename == NULL)
     return FALSE;
@@ -370,23 +370,23 @@ g_file_test (const xchar_t *filename,
   if (attributes == INVALID_FILE_ATTRIBUTES)
     return FALSE;
 
-  if (test & G_FILE_TEST_EXISTS)
+  if (test & XFILE_TEST_EXISTS)
     return TRUE;
 
-  if (test & G_FILE_TEST_IS_REGULAR)
+  if (test & XFILE_TEST_IS_REGULAR)
     {
       if ((attributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_DEVICE)) == 0)
 	return TRUE;
     }
 
-  if (test & G_FILE_TEST_IS_DIR)
+  if (test & XFILE_TEST_IS_DIR)
     {
       if ((attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
 	return TRUE;
     }
 
   /* "while" so that we can exit this "loop" with a simple "break" */
-  while (test & G_FILE_TEST_IS_EXECUTABLE)
+  while (test & XFILE_TEST_IS_EXECUTABLE)
     {
       const xchar_t *lastdot = strrchr (filename, '.');
       const xchar_t *pathext = NULL, *p;
@@ -407,9 +407,9 @@ g_file_test (const xchar_t *filename,
       if (pathext == NULL)
         break;
 
-      pathext = g_utf8_casefold (pathext, -1);
+      pathext = xutf8_casefold (pathext, -1);
 
-      lastdot = g_utf8_casefold (lastdot, -1);
+      lastdot = xutf8_casefold (lastdot, -1);
       extlen = strlen (lastdot);
 
       p = pathext;
@@ -438,10 +438,10 @@ g_file_test (const xchar_t *filename,
 
   return FALSE;
 #else
-  if ((test & G_FILE_TEST_EXISTS) && (access (filename, F_OK) == 0))
+  if ((test & XFILE_TEST_EXISTS) && (access (filename, F_OK) == 0))
     return TRUE;
 
-  if ((test & G_FILE_TEST_IS_EXECUTABLE) && (access (filename, X_OK) == 0))
+  if ((test & XFILE_TEST_IS_EXECUTABLE) && (access (filename, X_OK) == 0))
     {
       if (getuid () != 0)
 	return TRUE;
@@ -452,9 +452,9 @@ g_file_test (const xchar_t *filename,
        */
     }
   else
-    test &= ~G_FILE_TEST_IS_EXECUTABLE;
+    test &= ~XFILE_TEST_IS_EXECUTABLE;
 
-  if (test & G_FILE_TEST_IS_SYMLINK)
+  if (test & XFILE_TEST_IS_SYMLINK)
     {
       struct stat s;
 
@@ -462,23 +462,23 @@ g_file_test (const xchar_t *filename,
         return TRUE;
     }
 
-  if (test & (G_FILE_TEST_IS_REGULAR |
-	      G_FILE_TEST_IS_DIR |
-	      G_FILE_TEST_IS_EXECUTABLE))
+  if (test & (XFILE_TEST_IS_REGULAR |
+	      XFILE_TEST_IS_DIR |
+	      XFILE_TEST_IS_EXECUTABLE))
     {
       struct stat s;
 
       if (stat (filename, &s) == 0)
 	{
-	  if ((test & G_FILE_TEST_IS_REGULAR) && S_ISREG (s.st_mode))
+	  if ((test & XFILE_TEST_IS_REGULAR) && S_ISREG (s.st_mode))
 	    return TRUE;
 
-	  if ((test & G_FILE_TEST_IS_DIR) && S_ISDIR (s.st_mode))
+	  if ((test & XFILE_TEST_IS_DIR) && S_ISDIR (s.st_mode))
 	    return TRUE;
 
 	  /* The extra test for root when access (file, X_OK) succeeds.
 	   */
-	  if ((test & G_FILE_TEST_IS_EXECUTABLE) &&
+	  if ((test & XFILE_TEST_IS_EXECUTABLE) &&
 	      ((s.st_mode & S_IXOTH) ||
 	       (s.st_mode & S_IXUSR) ||
 	       (s.st_mode & S_IXGRP)))
@@ -490,151 +490,151 @@ g_file_test (const xchar_t *filename,
 #endif
 }
 
-G_DEFINE_QUARK (g-file-error-quark, g_file_error)
+G_DEFINE_QUARK (g-file-error-quark, xfile_error)
 
 /**
- * g_file_error_from_errno:
+ * xfile_error_from_errno:
  * @err_no: an "errno" value
  *
  * Gets a #GFileError constant based on the passed-in @err_no.
  *
  * For example, if you pass in `EEXIST` this function returns
- * %G_FILE_ERROR_EXIST. Unlike `errno` values, you can portably
+ * %XFILE_ERROR_EXIST. Unlike `errno` values, you can portably
  * assume that all #GFileError values will exist.
  *
  * Normally a #GFileError value goes into a #xerror_t returned
  * from a function that manipulates files. So you would use
- * g_file_error_from_errno() when constructing a #xerror_t.
+ * xfile_error_from_errno() when constructing a #xerror_t.
  *
  * Returns: #GFileError corresponding to the given @err_no
  **/
 GFileError
-g_file_error_from_errno (xint_t err_no)
+xfile_error_from_errno (xint_t err_no)
 {
   switch (err_no)
     {
 #ifdef EEXIST
     case EEXIST:
-      return G_FILE_ERROR_EXIST;
+      return XFILE_ERROR_EXIST;
 #endif
 
 #ifdef EISDIR
     case EISDIR:
-      return G_FILE_ERROR_ISDIR;
+      return XFILE_ERROR_ISDIR;
 #endif
 
 #ifdef EACCES
     case EACCES:
-      return G_FILE_ERROR_ACCES;
+      return XFILE_ERROR_ACCES;
 #endif
 
 #ifdef ENAMETOOLONG
     case ENAMETOOLONG:
-      return G_FILE_ERROR_NAMETOOLONG;
+      return XFILE_ERROR_NAMETOOLONG;
 #endif
 
 #ifdef ENOENT
     case ENOENT:
-      return G_FILE_ERROR_NOENT;
+      return XFILE_ERROR_NOENT;
 #endif
 
 #ifdef ENOTDIR
     case ENOTDIR:
-      return G_FILE_ERROR_NOTDIR;
+      return XFILE_ERROR_NOTDIR;
 #endif
 
 #ifdef ENXIO
     case ENXIO:
-      return G_FILE_ERROR_NXIO;
+      return XFILE_ERROR_NXIO;
 #endif
 
 #ifdef ENODEV
     case ENODEV:
-      return G_FILE_ERROR_NODEV;
+      return XFILE_ERROR_NODEV;
 #endif
 
 #ifdef EROFS
     case EROFS:
-      return G_FILE_ERROR_ROFS;
+      return XFILE_ERROR_ROFS;
 #endif
 
 #ifdef ETXTBSY
     case ETXTBSY:
-      return G_FILE_ERROR_TXTBSY;
+      return XFILE_ERROR_TXTBSY;
 #endif
 
 #ifdef EFAULT
     case EFAULT:
-      return G_FILE_ERROR_FAULT;
+      return XFILE_ERROR_FAULT;
 #endif
 
 #ifdef ELOOP
     case ELOOP:
-      return G_FILE_ERROR_LOOP;
+      return XFILE_ERROR_LOOP;
 #endif
 
 #ifdef ENOSPC
     case ENOSPC:
-      return G_FILE_ERROR_NOSPC;
+      return XFILE_ERROR_NOSPC;
 #endif
 
 #ifdef ENOMEM
     case ENOMEM:
-      return G_FILE_ERROR_NOMEM;
+      return XFILE_ERROR_NOMEM;
 #endif
 
 #ifdef EMFILE
     case EMFILE:
-      return G_FILE_ERROR_MFILE;
+      return XFILE_ERROR_MFILE;
 #endif
 
 #ifdef ENFILE
     case ENFILE:
-      return G_FILE_ERROR_NFILE;
+      return XFILE_ERROR_NFILE;
 #endif
 
 #ifdef EBADF
     case EBADF:
-      return G_FILE_ERROR_BADF;
+      return XFILE_ERROR_BADF;
 #endif
 
 #ifdef EINVAL
     case EINVAL:
-      return G_FILE_ERROR_INVAL;
+      return XFILE_ERROR_INVAL;
 #endif
 
 #ifdef EPIPE
     case EPIPE:
-      return G_FILE_ERROR_PIPE;
+      return XFILE_ERROR_PIPE;
 #endif
 
 #ifdef EAGAIN
     case EAGAIN:
-      return G_FILE_ERROR_AGAIN;
+      return XFILE_ERROR_AGAIN;
 #endif
 
 #ifdef EINTR
     case EINTR:
-      return G_FILE_ERROR_INTR;
+      return XFILE_ERROR_INTR;
 #endif
 
 #ifdef EIO
     case EIO:
-      return G_FILE_ERROR_IO;
+      return XFILE_ERROR_IO;
 #endif
 
 #ifdef EPERM
     case EPERM:
-      return G_FILE_ERROR_PERM;
+      return XFILE_ERROR_PERM;
 #endif
 
 #ifdef ENOSYS
     case ENOSYS:
-      return G_FILE_ERROR_NOSYS;
+      return XFILE_ERROR_NOSYS;
 #endif
 
     default:
-      return G_FILE_ERROR_FAILED;
+      return XFILE_ERROR_FAILED;
     }
 }
 
@@ -654,8 +654,8 @@ format_error_message (const xchar_t  *filename,
   xchar_t *display_name;
   xchar_t *msg;
 
-  display_name = g_filename_display_name (filename);
-  msg = g_strdup_printf (format_string, display_name, g_strerror (saved_errno));
+  display_name = xfilename_display_name (filename);
+  msg = xstrdup_printf (format_string, display_name, xstrerror (saved_errno));
   g_free (display_name);
 
   return msg;
@@ -676,7 +676,7 @@ set_file_error (xerror_t      **error,
 {
   char *msg = format_error_message (filename, format_string, saved_errno);
 
-  g_set_error_literal (error, G_FILE_ERROR, g_file_error_from_errno (saved_errno),
+  g_set_error_literal (error, XFILE_ERROR, xfile_error_from_errno (saved_errno),
                        msg);
   g_free (msg);
 }
@@ -726,10 +726,10 @@ get_contents_stdio (const xchar_t  *filename,
 
           if (tmp == NULL)
             {
-              display_filename = g_filename_display_name (filename);
+              display_filename = xfilename_display_name (filename);
               g_set_error (error,
-                           G_FILE_ERROR,
-                           G_FILE_ERROR_NOMEM,
+                           XFILE_ERROR,
+                           XFILE_ERROR_NOMEM,
                            g_dngettext (GETTEXT_PACKAGE, "Could not allocate %lu byte to read file “%s”", "Could not allocate %lu bytes to read file “%s”", (gulong)total_allocated),
                            (gulong) total_allocated,
 			   display_filename);
@@ -743,13 +743,13 @@ get_contents_stdio (const xchar_t  *filename,
 
       if (ferror (f))
         {
-          display_filename = g_filename_display_name (filename);
+          display_filename = xfilename_display_name (filename);
           g_set_error (error,
-                       G_FILE_ERROR,
-                       g_file_error_from_errno (save_errno),
+                       XFILE_ERROR,
+                       xfile_error_from_errno (save_errno),
                        _("Error reading file “%s”: %s"),
                        display_filename,
-		       g_strerror (save_errno));
+		       xstrerror (save_errno));
           g_free (display_filename);
 
           goto error;
@@ -779,10 +779,10 @@ get_contents_stdio (const xchar_t  *filename,
   return TRUE;
 
  file_too_large:
-  display_filename = g_filename_display_name (filename);
+  display_filename = xfilename_display_name (filename);
   g_set_error (error,
-               G_FILE_ERROR,
-               G_FILE_ERROR_FAILED,
+               XFILE_ERROR,
+               XFILE_ERROR_FAILED,
                _("File “%s” is too large"),
                display_filename);
   g_free (display_filename);
@@ -818,10 +818,10 @@ get_contents_regfile (const xchar_t  *filename,
 
   if (buf == NULL)
     {
-      display_filename = g_filename_display_name (filename);
+      display_filename = xfilename_display_name (filename);
       g_set_error (error,
-                   G_FILE_ERROR,
-                   G_FILE_ERROR_NOMEM,
+                   XFILE_ERROR,
+                   XFILE_ERROR_NOMEM,
                            g_dngettext (GETTEXT_PACKAGE, "Could not allocate %lu byte to read file “%s”", "Could not allocate %lu bytes to read file “%s”", (gulong)alloc_size),
                    (gulong) alloc_size,
 		   display_filename);
@@ -832,7 +832,7 @@ get_contents_regfile (const xchar_t  *filename,
   bytes_read = 0;
   while (bytes_read < size)
     {
-      gssize rc;
+      xssize_t rc;
 
       rc = read (fd, buf + bytes_read, size - bytes_read);
 
@@ -843,13 +843,13 @@ get_contents_regfile (const xchar_t  *filename,
 	      int save_errno = errno;
 
               g_free (buf);
-              display_filename = g_filename_display_name (filename);
+              display_filename = xfilename_display_name (filename);
               g_set_error (error,
-                           G_FILE_ERROR,
-                           g_file_error_from_errno (save_errno),
+                           XFILE_ERROR,
+                           xfile_error_from_errno (save_errno),
                            _("Failed to read from file “%s”: %s"),
                            display_filename,
-			   g_strerror (save_errno));
+			   xstrerror (save_errno));
               g_free (display_filename);
 	      goto error;
             }
@@ -986,9 +986,9 @@ get_contents_win32 (const xchar_t  *filename,
 #endif
 
 /**
- * g_file_get_contents:
+ * xfile_get_contents:
  * @filename: (type filename): name of a file to read contents from, in the GLib file name encoding
- * @contents: (out) (array length=length) (element-type guint8): location to store an allocated string, use g_free() to free
+ * @contents: (out) (array length=length) (element-type xuint8_t): location to store an allocated string, use g_free() to free
  *     the returned string
  * @length: (nullable): location to store length in bytes of the contents, or %NULL
  * @error: return location for a #xerror_t, or %NULL
@@ -1000,14 +1000,14 @@ get_contents_win32 (const xchar_t  *filename,
  * contents and @length to the length of the file contents in bytes. The string
  * stored in @contents will be nul-terminated, so for text files you can pass
  * %NULL for the @length argument. If the call was not successful, it returns
- * %FALSE and sets @error. The error domain is %G_FILE_ERROR. Possible error
+ * %FALSE and sets @error. The error domain is %XFILE_ERROR. Possible error
  * codes are those in the #GFileError enumeration. In the error case,
  * @contents is set to %NULL and @length is set to zero.
  *
  * Returns: %TRUE on success, %FALSE if an error occurred
  **/
 xboolean_t
-g_file_get_contents (const xchar_t  *filename,
+xfile_get_contents (const xchar_t  *filename,
                      xchar_t       **contents,
                      xsize_t        *length,
                      xerror_t      **error)
@@ -1036,16 +1036,16 @@ rename_file (const char  *old_name,
   if (g_rename (old_name, new_name) == -1)
     {
       int save_errno = errno;
-      xchar_t *display_old_name = g_filename_display_name (old_name);
-      xchar_t *display_new_name = g_filename_display_name (new_name);
+      xchar_t *display_old_name = xfilename_display_name (old_name);
+      xchar_t *display_new_name = xfilename_display_name (new_name);
 
       g_set_error (err,
-		   G_FILE_ERROR,
-		   g_file_error_from_errno (save_errno),
+		   XFILE_ERROR,
+		   xfile_error_from_errno (save_errno),
 		   _("Failed to rename file “%s” to “%s”: g_rename() failed: %s"),
 		   display_old_name,
 		   display_new_name,
-		   g_strerror (save_errno));
+		   xstrerror (save_errno));
 
       g_free (display_old_name);
       g_free (display_new_name);
@@ -1099,8 +1099,8 @@ fd_should_be_fsynced (int                    fd,
    * trashing files, the old file never exists, so it seems reasonable to avoid
    * the fsync(). This is not a widely applicable optimisation though.
    */
-  if ((flags & (G_FILE_SET_CONTENTS_CONSISTENT | G_FILE_SET_CONTENTS_DURABLE)) &&
-      (flags & G_FILE_SET_CONTENTS_ONLY_EXISTING))
+  if ((flags & (XFILE_SET_CONTENTS_CONSISTENT | XFILE_SET_CONTENTS_DURABLE)) &&
+      (flags & XFILE_SET_CONTENTS_ONLY_EXISTING))
     {
       errno = 0;
       if (g_lstat (test_file, &statbuf) == 0)
@@ -1112,7 +1112,7 @@ fd_should_be_fsynced (int                    fd,
     }
   else
     {
-      return (flags & (G_FILE_SET_CONTENTS_CONSISTENT | G_FILE_SET_CONTENTS_DURABLE));
+      return (flags & (XFILE_SET_CONTENTS_CONSISTENT | XFILE_SET_CONTENTS_DURABLE));
     }
 #else  /* if !HAVE_FSYNC */
   return FALSE;
@@ -1139,7 +1139,7 @@ write_to_file (const xchar_t  *contents,
 #endif
   while (length > 0)
     {
-      gssize s;
+      xssize_t s;
 
       s = write (fd, contents, MIN (length, G_MAXSSIZE));
 
@@ -1188,16 +1188,16 @@ write_to_file (const xchar_t  *contents,
 }
 
 /**
- * g_file_set_contents:
+ * xfile_set_contents:
  * @filename: (type filename): name of a file to write @contents to, in the GLib file name
  *   encoding
- * @contents: (array length=length) (element-type guint8): string to write to the file
+ * @contents: (array length=length) (element-type xuint8_t): string to write to the file
  * @length: length of @contents, or -1 if @contents is a nul-terminated string
  * @error: return location for a #xerror_t, or %NULL
  *
  * Writes all of @contents to a file named @filename. This is a convenience
- * wrapper around calling g_file_set_contents_full() with `flags` set to
- * `G_FILE_SET_CONTENTS_CONSISTENT | G_FILE_SET_CONTENTS_ONLY_EXISTING` and
+ * wrapper around calling xfile_set_contents_full() with `flags` set to
+ * `XFILE_SET_CONTENTS_CONSISTENT | XFILE_SET_CONTENTS_ONLY_EXISTING` and
  * `mode` set to `0666`.
  *
  * Returns: %TRUE on success, %FALSE if an error occurred
@@ -1205,22 +1205,22 @@ write_to_file (const xchar_t  *contents,
  * Since: 2.8
  */
 xboolean_t
-g_file_set_contents (const xchar_t  *filename,
+xfile_set_contents (const xchar_t  *filename,
                      const xchar_t  *contents,
-                     gssize        length,
+                     xssize_t        length,
                      xerror_t      **error)
 {
-  return g_file_set_contents_full (filename, contents, length,
-                                   G_FILE_SET_CONTENTS_CONSISTENT |
-                                   G_FILE_SET_CONTENTS_ONLY_EXISTING,
+  return xfile_set_contents_full (filename, contents, length,
+                                   XFILE_SET_CONTENTS_CONSISTENT |
+                                   XFILE_SET_CONTENTS_ONLY_EXISTING,
                                    0666, error);
 }
 
 /**
- * g_file_set_contents_full:
+ * xfile_set_contents_full:
  * @filename: (type filename): name of a file to write @contents to, in the GLib file name
  *   encoding
- * @contents: (array length=length) (element-type guint8): string to write to the file
+ * @contents: (array length=length) (element-type xuint8_t): string to write to the file
  * @length: length of @contents, or -1 if @contents is a nul-terminated string
  * @flags: flags controlling the safety vs speed of the operation
  * @mode: file mode, as passed to `open()`; typically this will be `0666`
@@ -1236,9 +1236,9 @@ g_file_set_contents (const xchar_t  *filename,
  * As this function performs file I/O, it is recommended to not call it anywhere
  * where blocking would cause problems, such as in the main loop of a graphical
  * application. In particular, if @flags has any value other than
- * %G_FILE_SET_CONTENTS_NONE then this function may call `fsync()`.
+ * %XFILE_SET_CONTENTS_NONE then this function may call `fsync()`.
  *
- * If %G_FILE_SET_CONTENTS_CONSISTENT is set in @flags, the operation is atomic
+ * If %XFILE_SET_CONTENTS_CONSISTENT is set in @flags, the operation is atomic
  * in the sense that it is first written to a temporary file which is then
  * renamed to the final name.
  *
@@ -1251,7 +1251,7 @@ g_file_set_contents (const xchar_t  *filename,
  *
  * - On UNIX, if @filename already exists and is non-empty, and if the system
  *   supports it (via a journalling filesystem or equivalent), and if
- *   %G_FILE_SET_CONTENTS_CONSISTENT is set in @flags, the `fsync()` call (or
+ *   %XFILE_SET_CONTENTS_CONSISTENT is set in @flags, the `fsync()` call (or
  *   equivalent) will be used to ensure atomic replacement: @filename
  *   will contain either its old contents or @contents, even in the face of
  *   system power loss, the disk being unsafely removed, etc.
@@ -1259,8 +1259,8 @@ g_file_set_contents (const xchar_t  *filename,
  * - On UNIX, if @filename does not already exist or is empty, there is a
  *   possibility that system power loss etc. after calling this function will
  *   leave @filename empty or full of NUL bytes, depending on the underlying
- *   filesystem, unless %G_FILE_SET_CONTENTS_DURABLE and
- *   %G_FILE_SET_CONTENTS_CONSISTENT are set in @flags.
+ *   filesystem, unless %XFILE_SET_CONTENTS_DURABLE and
+ *   %XFILE_SET_CONTENTS_CONSISTENT are set in @flags.
  *
  * - On Windows renaming a file will not remove an existing file with the
  *   new name, so on Windows there is a race condition between the existing
@@ -1271,7 +1271,7 @@ g_file_set_contents (const xchar_t  *filename,
  *   @filename already exists and is open.
  *
  * If the call was successful, it returns %TRUE. If the call was not successful,
- * it returns %FALSE and sets @error. The error domain is %G_FILE_ERROR.
+ * it returns %FALSE and sets @error. The error domain is %XFILE_ERROR.
  * Possible error codes are those in the #GFileError enumeration.
  *
  * Note that the name for the temporary file is constructed by appending up
@@ -1286,9 +1286,9 @@ g_file_set_contents (const xchar_t  *filename,
  * Since: 2.66
  */
 xboolean_t
-g_file_set_contents_full (const xchar_t            *filename,
+xfile_set_contents_full (const xchar_t            *filename,
                           const xchar_t            *contents,
-                          gssize                  length,
+                          xssize_t                  length,
                           GFileSetContentsFlags   flags,
                           int                     mode,
                           xerror_t                **error)
@@ -1299,23 +1299,23 @@ g_file_set_contents_full (const xchar_t            *filename,
   g_return_val_if_fail (length >= -1, FALSE);
 
   /* @flags are handled as follows:
-   *  - %G_FILE_SET_CONTENTS_NONE: write directly to @filename, no fsync()s
-   *  - %G_FILE_SET_CONTENTS_CONSISTENT: write to temp file, fsync() it, rename()
-   *  - %G_FILE_SET_CONTENTS_CONSISTENT | ONLY_EXISTING: as above, but skip the
+   *  - %XFILE_SET_CONTENTS_NONE: write directly to @filename, no fsync()s
+   *  - %XFILE_SET_CONTENTS_CONSISTENT: write to temp file, fsync() it, rename()
+   *  - %XFILE_SET_CONTENTS_CONSISTENT | ONLY_EXISTING: as above, but skip the
    *    fsync() if @filename doesn’t exist or is empty
-   *  - %G_FILE_SET_CONTENTS_DURABLE: write directly to @filename, fsync() it
-   *  - %G_FILE_SET_CONTENTS_DURABLE | ONLY_EXISTING: as above, but skip the
+   *  - %XFILE_SET_CONTENTS_DURABLE: write directly to @filename, fsync() it
+   *  - %XFILE_SET_CONTENTS_DURABLE | ONLY_EXISTING: as above, but skip the
    *    fsync() if @filename doesn’t exist or is empty
-   *  - %G_FILE_SET_CONTENTS_CONSISTENT | DURABLE: write to temp file, fsync()
+   *  - %XFILE_SET_CONTENTS_CONSISTENT | DURABLE: write to temp file, fsync()
    *    it, rename(), fsync() containing directory
-   *  - %G_FILE_SET_CONTENTS_CONSISTENT | DURABLE | ONLY_EXISTING: as above, but
+   *  - %XFILE_SET_CONTENTS_CONSISTENT | DURABLE | ONLY_EXISTING: as above, but
    *    skip both fsync()s if @filename doesn’t exist or is empty
    */
 
   if (length < 0)
     length = strlen (contents);
 
-  if (flags & G_FILE_SET_CONTENTS_CONSISTENT)
+  if (flags & XFILE_SET_CONTENTS_CONSISTENT)
     {
       xchar_t *tmp_filename = NULL;
       xerror_t *rename_error = NULL;
@@ -1323,7 +1323,7 @@ g_file_set_contents_full (const xchar_t            *filename,
       int fd;
       xboolean_t do_fsync;
 
-      tmp_filename = g_strdup_printf ("%s.XXXXXX", filename);
+      tmp_filename = xstrdup_printf ("%s.XXXXXX", filename);
 
       errno = 0;
       fd = g_mkstemp_full (tmp_filename, O_RDWR | O_BINARY, mode);
@@ -1362,7 +1362,7 @@ g_file_set_contents_full (const xchar_t            *filename,
            * the file already exists. So if the target file
            * exists, try deleting it and do the rename again.
            */
-          if (!g_file_test (filename, G_FILE_TEST_EXISTS))
+          if (!xfile_test (filename, XFILE_TEST_EXISTS))
             {
               g_unlink (tmp_filename);
               g_propagate_error (error, rename_error);
@@ -1370,7 +1370,7 @@ g_file_set_contents_full (const xchar_t            *filename,
               goto consistent_out;
             }
 
-          g_error_free (rename_error);
+          xerror_free (rename_error);
 
           if (g_unlink (filename) == -1)
             {
@@ -1424,7 +1424,7 @@ consistent_out:
           /* ELOOP indicates that @filename is a symlink, since we used
            * O_NOFOLLOW (alternately it could indicate that @filename contains
            * looping or too many symlinks). In either case, try again on the
-           * %G_FILE_SET_CONTENTS_CONSISTENT code path.
+           * %XFILE_SET_CONTENTS_CONSISTENT code path.
            *
            * FreeBSD uses EMLINK instead of ELOOP
            * (https://www.freebsd.org/cgi/man.cgi?query=open&sektion=2#STANDARDS),
@@ -1437,8 +1437,8 @@ consistent_out:
 #else
           if (saved_errno == ELOOP)
 #endif
-            return g_file_set_contents_full (filename, contents, length,
-                                             flags | G_FILE_SET_CONTENTS_CONSISTENT,
+            return xfile_set_contents_full (filename, contents, length,
+                                             flags | XFILE_SET_CONTENTS_CONSISTENT,
                                              mode, error);
 #endif  /* O_NOFOLLOW */
 
@@ -1475,14 +1475,14 @@ get_tmp_file (xchar_t            *tmpl,
   static const char letters[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   static const int NLETTERS = sizeof (letters) - 1;
-  glong value;
+  xlong_t value;
   gint64 now_us;
   static int counter = 0;
 
   g_return_val_if_fail (tmpl != NULL, -1);
 
   /* find the last occurrence of "XXXXXX" */
-  XXXXXX = g_strrstr (tmpl, "XXXXXX");
+  XXXXXX = xstrrstr (tmpl, "XXXXXX");
 
   if (!XXXXXX || strncmp (XXXXXX, "XXXXXX", 6))
     {
@@ -1496,7 +1496,7 @@ get_tmp_file (xchar_t            *tmpl,
 
   for (count = 0; count < 100; value += 7777, ++count)
     {
-      glong v = value;
+      xlong_t v = value;
 
       /* Fill in the random bits.  */
       XXXXXX[0] = letters[v % NLETTERS];
@@ -1705,14 +1705,14 @@ g_get_tmp_name (const xchar_t      *tmpl,
 #endif
       )
     {
-      xchar_t *display_tmpl = g_filename_display_name (tmpl);
+      xchar_t *display_tmpl = xfilename_display_name (tmpl);
       char c[2];
       c[0] = *slash;
       c[1] = '\0';
 
       g_set_error (error,
-                   G_FILE_ERROR,
-                   G_FILE_ERROR_FAILED,
+                   XFILE_ERROR,
+                   XFILE_ERROR_FAILED,
                    _("Template “%s” invalid, should not contain a “%s”"),
                    display_tmpl, c);
       g_free (display_tmpl);
@@ -1722,10 +1722,10 @@ g_get_tmp_name (const xchar_t      *tmpl,
 
   if (strstr (tmpl, "XXXXXX") == NULL)
     {
-      xchar_t *display_tmpl = g_filename_display_name (tmpl);
+      xchar_t *display_tmpl = xfilename_display_name (tmpl);
       g_set_error (error,
-                   G_FILE_ERROR,
-                   G_FILE_ERROR_FAILED,
+                   XFILE_ERROR,
+                   XFILE_ERROR_FAILED,
                    _("Template “%s” doesn’t contain XXXXXX"),
                    display_tmpl);
       g_free (display_tmpl);
@@ -1739,7 +1739,7 @@ g_get_tmp_name (const xchar_t      *tmpl,
   else
     sep = G_DIR_SEPARATOR_S;
 
-  fulltemplate = g_strconcat (tmpdir, sep, tmpl, NULL);
+  fulltemplate = xstrconcat (tmpdir, sep, tmpl, NULL);
 
   retval = get_tmp_file (fulltemplate, f, flags, mode);
   if (retval == -1)
@@ -1760,7 +1760,7 @@ g_get_tmp_name (const xchar_t      *tmpl,
 }
 
 /**
- * g_file_open_tmp:
+ * xfile_open_tmp:
  * @tmpl: (type filename) (nullable): Template for file name, as in
  *     g_mkstemp(), basename only, or %NULL for a default template
  * @name_used: (out) (type filename): location to store actual name used,
@@ -1790,7 +1790,7 @@ g_get_tmp_name (const xchar_t      *tmpl,
  *     close(). In case of errors, -1 is returned and @error will be set.
  */
 xint_t
-g_file_open_tmp (const xchar_t  *tmpl,
+xfile_open_tmp (const xchar_t  *tmpl,
                  xchar_t       **name_used,
                  xerror_t      **error)
 {
@@ -1860,7 +1860,7 @@ g_build_path_va (const xchar_t  *separator,
 		 va_list      *args,
 		 xchar_t       **str_array)
 {
-  GString *result;
+  xstring_t *result;
   xint_t separator_len = strlen (separator);
   xboolean_t is_first = TRUE;
   xboolean_t have_leading = FALSE;
@@ -1869,7 +1869,7 @@ g_build_path_va (const xchar_t  *separator,
   const xchar_t *last_trailing = NULL;
   xint_t i = 0;
 
-  result = g_string_new (NULL);
+  result = xstring_new (NULL);
 
   if (str_array)
     next_element = str_array[i++];
@@ -1926,7 +1926,7 @@ g_build_path_va (const xchar_t  *separator,
 	      if (last_trailing <= start)
 		single_element = element;
 
-	      g_string_append_len (result, element, start - element);
+	      xstring_append_len (result, element, start - element);
 	      have_leading = TRUE;
 	    }
 	  else
@@ -1937,23 +1937,23 @@ g_build_path_va (const xchar_t  *separator,
 	continue;
 
       if (!is_first)
-	g_string_append (result, separator);
+	xstring_append (result, separator);
 
-      g_string_append_len (result, start, end - start);
+      xstring_append_len (result, start, end - start);
       is_first = FALSE;
     }
 
   if (single_element)
     {
-      g_string_free (result, TRUE);
-      return g_strdup (single_element);
+      xstring_free (result, TRUE);
+      return xstrdup (single_element);
     }
   else
     {
       if (last_trailing)
-	g_string_append (result, last_trailing);
+	xstring_append (result, last_trailing);
 
-      return g_string_free (result, FALSE);
+      return xstring_free (result, FALSE);
     }
 }
 
@@ -2046,7 +2046,7 @@ g_build_pathname_va (const xchar_t  *first_element,
   /* Code copied from g_build_pathv(), and modified to use two
    * alternative single-character separators.
    */
-  GString *result;
+  xstring_t *result;
   xboolean_t is_first = TRUE;
   xboolean_t have_leading = FALSE;
   const xchar_t *single_element = NULL;
@@ -2055,7 +2055,7 @@ g_build_pathname_va (const xchar_t  *first_element,
   xchar_t current_separator = '\\';
   xint_t i = 0;
 
-  result = g_string_new (NULL);
+  result = xstring_new (NULL);
 
   if (str_array)
     next_element = str_array[i++];
@@ -2119,7 +2119,7 @@ g_build_pathname_va (const xchar_t  *first_element,
 	      if (last_trailing <= start)
 		single_element = element;
 
-	      g_string_append_len (result, element, start - element);
+	      xstring_append_len (result, element, start - element);
 	      have_leading = TRUE;
 	    }
 	  else
@@ -2130,23 +2130,23 @@ g_build_pathname_va (const xchar_t  *first_element,
 	continue;
 
       if (!is_first)
-	g_string_append_len (result, &current_separator, 1);
+	xstring_append_len (result, &current_separator, 1);
 
-      g_string_append_len (result, start, end - start);
+      xstring_append_len (result, start, end - start);
       is_first = FALSE;
     }
 
   if (single_element)
     {
-      g_string_free (result, TRUE);
-      return g_strdup (single_element);
+      xstring_free (result, TRUE);
+      return xstrdup (single_element);
     }
   else
     {
       if (last_trailing)
-	g_string_append (result, last_trailing);
+	xstring_append (result, last_trailing);
 
-      return g_string_free (result, FALSE);
+      return xstring_free (result, FALSE);
     }
 }
 
@@ -2249,13 +2249,13 @@ g_build_filename (const xchar_t *first_element,
 }
 
 /**
- * g_file_read_link:
+ * xfile_read_link:
  * @filename: (type filename): the symbolic link
  * @error: return location for a #xerror_t
  *
  * Reads the contents of the symbolic link @filename like the POSIX
  * readlink() function.  The returned string is in the encoding used
- * for filenames. Use g_filename_to_utf8() to convert it to UTF-8.
+ * for filenames. Use xfilename_to_utf8() to convert it to UTF-8.
  *
  * Returns: (type filename) (transfer full): A newly-allocated string with
  *     the contents of the symbolic link, or %NULL if an error occurred.
@@ -2263,13 +2263,13 @@ g_build_filename (const xchar_t *first_element,
  * Since: 2.4
  */
 xchar_t *
-g_file_read_link (const xchar_t  *filename,
+xfile_read_link (const xchar_t  *filename,
 	          xerror_t      **error)
 {
 #if defined (HAVE_READLINK)
   xchar_t *buffer;
   size_t size;
-  gssize read_size;
+  xssize_t read_size;
 
   g_return_val_if_fail (filename != NULL, NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
@@ -2303,7 +2303,7 @@ g_file_read_link (const xchar_t  *filename,
     }
 #elif defined (G_OS_WIN32)
   xchar_t *buffer;
-  gssize read_size;
+  xssize_t read_size;
 
   g_return_val_if_fail (filename != NULL, NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
@@ -2328,8 +2328,8 @@ g_file_read_link (const xchar_t  *filename,
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   g_set_error_literal (error,
-                       G_FILE_ERROR,
-                       G_FILE_ERROR_INVAL,
+                       XFILE_ERROR,
+                       XFILE_ERROR_INVAL,
                        _("Symbolic links not supported"));
 
   return NULL;
@@ -2518,15 +2518,15 @@ g_basename (const xchar_t *file_name)
 xchar_t *
 g_path_get_basename (const xchar_t *file_name)
 {
-  gssize base;
-  gssize last_nonslash;
+  xssize_t base;
+  xssize_t last_nonslash;
   xsize_t len;
   xchar_t *retval;
 
   g_return_val_if_fail (file_name != NULL, NULL);
 
   if (file_name[0] == '\0')
-    return g_strdup (".");
+    return xstrdup (".");
 
   last_nonslash = strlen (file_name) - 1;
 
@@ -2535,14 +2535,14 @@ g_path_get_basename (const xchar_t *file_name)
 
   if (last_nonslash == -1)
     /* string only containing slashes */
-    return g_strdup (G_DIR_SEPARATOR_S);
+    return xstrdup (G_DIR_SEPARATOR_S);
 
 #ifdef G_OS_WIN32
   if (last_nonslash == 1 &&
       g_ascii_isalpha (file_name[0]) &&
       file_name[1] == ':')
     /* string only containing slashes and a drive */
-    return g_strdup (G_DIR_SEPARATOR_S);
+    return xstrdup (G_DIR_SEPARATOR_S);
 #endif
   base = last_nonslash;
 
@@ -2622,10 +2622,10 @@ g_path_get_dirname (const xchar_t *file_name)
           drive_colon_dot[2] = '.';
           drive_colon_dot[3] = '\0';
 
-          return g_strdup (drive_colon_dot);
+          return xstrdup (drive_colon_dot);
         }
 #endif
-    return g_strdup (".");
+    return xstrdup (".");
     }
 
   while (base > file_name && X_IS_DIR_SEPARATOR (*base))
@@ -2733,7 +2733,7 @@ g_canonicalize_filename (const xchar_t *filename,
     }
   else
     {
-      canon = g_strdup (filename);
+      canon = xstrdup (filename);
     }
 
   after_root = (char *)g_path_skip_root (canon);
@@ -2867,12 +2867,12 @@ g_get_current_dir (void)
   wdir = g_new (wchar_t, len);
 
   if (GetCurrentDirectoryW (len, wdir) == len - 1)
-    dir = g_utf16_to_utf8 (wdir, -1, NULL, NULL, NULL);
+    dir = xutf16_to_utf8 (wdir, -1, NULL, NULL, NULL);
 
   g_free (wdir);
 
   if (dir == NULL)
-    dir = g_strdup ("\\");
+    dir = xstrdup ("\\");
 
   return dir;
 
@@ -2887,7 +2887,7 @@ g_get_current_dir (void)
   if (pwd != NULL &&
       g_stat (".", &dotbuf) == 0 && g_stat (pwd, &pwdbuf) == 0 &&
       dotbuf.st_dev == pwdbuf.st_dev && dotbuf.st_ino == pwdbuf.st_ino)
-    return g_strdup (pwd);
+    return xstrdup (pwd);
 
   if (max_len == 0)
     max_len = (G_PATH_LENGTH == -1) ? 2048 : G_PATH_LENGTH;
@@ -2907,14 +2907,14 @@ g_get_current_dir (void)
 
   if (!dir || !*buffer)
     {
-      /* hm, should we g_error() out here?
+      /* hm, should we xerror() out here?
        * this can happen if e.g. "./" has mode \0000
        */
       buffer[0] = G_DIR_SEPARATOR;
       buffer[1] = 0;
     }
 
-  dir = g_strdup (buffer);
+  dir = xstrdup (buffer);
   g_free (buffer);
 
   return dir;
@@ -2926,33 +2926,33 @@ g_get_current_dir (void)
 
 /* Binary compatibility versions. Not for newly compiled code. */
 
-_XPL_EXTERN xboolean_t g_file_test_utf8         (const xchar_t  *filename,
+_XPL_EXTERN xboolean_t xfile_test_utf8         (const xchar_t  *filename,
                                                 GFileTest     test);
-_XPL_EXTERN xboolean_t g_file_get_contents_utf8 (const xchar_t  *filename,
+_XPL_EXTERN xboolean_t xfile_get_contents_utf8 (const xchar_t  *filename,
                                                 xchar_t       **contents,
                                                 xsize_t        *length,
                                                 xerror_t      **error);
 _XPL_EXTERN xint_t     g_mkstemp_utf8           (xchar_t        *tmpl);
-_XPL_EXTERN xint_t     g_file_open_tmp_utf8     (const xchar_t  *tmpl,
+_XPL_EXTERN xint_t     xfile_open_tmp_utf8     (const xchar_t  *tmpl,
                                                 xchar_t       **name_used,
                                                 xerror_t      **error);
 _XPL_EXTERN xchar_t   *g_get_current_dir_utf8   (void);
 
 
 xboolean_t
-g_file_test_utf8 (const xchar_t *filename,
+xfile_test_utf8 (const xchar_t *filename,
                   GFileTest    test)
 {
-  return g_file_test (filename, test);
+  return xfile_test (filename, test);
 }
 
 xboolean_t
-g_file_get_contents_utf8 (const xchar_t  *filename,
+xfile_get_contents_utf8 (const xchar_t  *filename,
                           xchar_t       **contents,
                           xsize_t        *length,
                           xerror_t      **error)
 {
-  return g_file_get_contents (filename, contents, length, error);
+  return xfile_get_contents (filename, contents, length, error);
 }
 
 xint_t
@@ -2962,11 +2962,11 @@ g_mkstemp_utf8 (xchar_t *tmpl)
 }
 
 xint_t
-g_file_open_tmp_utf8 (const xchar_t  *tmpl,
+xfile_open_tmp_utf8 (const xchar_t  *tmpl,
                       xchar_t       **name_used,
                       xerror_t      **error)
 {
-  return g_file_open_tmp (tmpl, name_used, error);
+  return xfile_open_tmp (tmpl, name_used, error);
 }
 
 xchar_t *

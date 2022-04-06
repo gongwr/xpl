@@ -299,7 +299,7 @@ _g_win32_fill_statbuf_from_handle_info (const wchar_t                    *filena
 
   statbuf->st_nlink = handle_info->nNumberOfLinks;
   statbuf->st_uid = statbuf->st_gid = 0;
-  statbuf->st_size = (((guint64) handle_info->nFileSizeHigh) << 32) | handle_info->nFileSizeLow;
+  statbuf->st_size = (((xuint64_t) handle_info->nFileSizeHigh) << 32) | handle_info->nFileSizeLow;
   statbuf->st_ctime = _g_win32_filetime_to_unix_time (&handle_info->ftCreationTime, NULL);
   statbuf->st_mtime = _g_win32_filetime_to_unix_time (&handle_info->ftLastWriteTime, NULL);
   statbuf->st_atime = _g_win32_filetime_to_unix_time (&handle_info->ftLastAccessTime, NULL);
@@ -321,10 +321,10 @@ _g_win32_fill_privatestat (const struct __stat64            *statbuf,
   buf->st_ino = statbuf->st_ino;
   buf->st_mode = statbuf->st_mode;
   buf->volume_serial = handle_info->dwVolumeSerialNumber;
-  buf->file_index = (((guint64) handle_info->nFileIndexHigh) << 32) | handle_info->nFileIndexLow;
+  buf->file_index = (((xuint64_t) handle_info->nFileIndexHigh) << 32) | handle_info->nFileIndexLow;
   buf->attributes = handle_info->dwFileAttributes;
   buf->st_nlink = handle_info->nNumberOfLinks;
-  buf->st_size = (((guint64) handle_info->nFileSizeHigh) << 32) | handle_info->nFileSizeLow;
+  buf->st_size = (((xuint64_t) handle_info->nFileSizeHigh) << 32) | handle_info->nFileSizeLow;
   buf->allocated_size = std_info->AllocationSize.QuadPart;
 
   buf->reparse_tag = reparse_tag;
@@ -365,9 +365,9 @@ _g_win32_fill_privatestat (const struct __stat64            *statbuf,
 static int
 _g_win32_readlink_handle_raw (HANDLE      h,
                               DWORD      *reparse_tag,
-                              gunichar2  *buf,
+                              xunichar2_t  *buf,
                               xsize_t       buf_size,
-                              gunichar2 **alloc_buf,
+                              xunichar2_t **alloc_buf,
                               xboolean_t    terminate)
 {
   DWORD error_code;
@@ -447,11 +447,11 @@ _g_win32_readlink_handle_raw (HANDLE      h,
  * Returns -1 to indicate an error, sets errno.
  */
 static int
-_g_win32_readlink_utf16_raw (const gunichar2  *filename,
+_g_win32_readlink_utf16_raw (const xunichar2_t  *filename,
                              DWORD            *reparse_tag,
-                             gunichar2        *buf,
+                             xunichar2_t        *buf,
                              xsize_t             buf_size,
-                             gunichar2       **alloc_buf,
+                             xunichar2_t       **alloc_buf,
                              xboolean_t          terminate)
 {
   HANDLE h;
@@ -522,12 +522,12 @@ _g_win32_readlink_utf16_raw (const gunichar2  *filename,
  * Returns -1 to indicate an error, sets errno.
  */
 static int
-_g_win32_readlink_utf16_handle (const gunichar2  *filename,
+_g_win32_readlink_utf16_handle (const xunichar2_t  *filename,
                                 HANDLE            file_handle,
                                 DWORD            *reparse_tag,
-                                gunichar2        *buf,
+                                xunichar2_t        *buf,
                                 xsize_t             buf_size,
-                                gunichar2       **alloc_buf,
+                                xunichar2_t       **alloc_buf,
                                 xboolean_t          terminate)
 {
   int   result;
@@ -547,10 +547,10 @@ _g_win32_readlink_utf16_handle (const gunichar2  *filename,
   if (result <= 0)
     return result;
 
-  /* Ensure that output is a multiple of sizeof (gunichar2),
-   * cutting any trailing partial gunichar2, if present.
+  /* Ensure that output is a multiple of sizeof (xunichar2_t),
+   * cutting any trailing partial xunichar2_t, if present.
    */
-  result -= result % sizeof (gunichar2);
+  result -= result % sizeof (xunichar2_t);
 
   if (result <= 0)
     return result;
@@ -564,10 +564,10 @@ _g_win32_readlink_utf16_handle (const gunichar2  *filename,
    * the prefix will allow it to be confused with relative links
    * targeting "Volume{GUID}".
    */
-  string_size = result / sizeof (gunichar2);
+  string_size = result / sizeof (xunichar2_t);
   _g_win32_strip_extended_ntobjm_prefix (buf ? buf : *alloc_buf, &string_size);
 
-  return string_size * sizeof (gunichar2);
+  return string_size * sizeof (xunichar2_t);
 }
 
 /* Works like stat() or lstat(), depending on the value of @for_symlink,
@@ -575,7 +575,7 @@ _g_win32_readlink_utf16_handle (const gunichar2  *filename,
  * The @filename must not have trailing slashes.
  */
 static int
-_g_win32_stat_utf16_no_trailing_slashes (const gunichar2    *filename,
+_g_win32_stat_utf16_no_trailing_slashes (const xunichar2_t    *filename,
                                          GWin32PrivateStat  *buf,
                                          xboolean_t            for_symlink)
 {
@@ -763,7 +763,7 @@ _g_win32_stat_utf8 (const xchar_t       *filename,
       (g_path_is_absolute (filename) && len <= (xsize_t) (g_path_skip_root (filename) - filename)))
     len = strlen (filename);
 
-  wfilename = g_utf8_to_utf16 (filename, len, NULL, NULL, NULL);
+  wfilename = xutf8_to_utf16 (filename, len, NULL, NULL, NULL);
 
   if (wfilename == NULL)
     {
@@ -850,14 +850,14 @@ g_win32_readlink_utf8 (const xchar_t  *filename,
   wchar_t *wfilename;
   int result;
   wchar_t *buf_utf16;
-  glong tmp_len;
+  xlong_t tmp_len;
   xchar_t *tmp;
 
   g_return_val_if_fail ((buf != NULL || alloc_buf != NULL) &&
                         (buf == NULL || alloc_buf == NULL),
                         -1);
 
-  wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+  wfilename = xutf8_to_utf16 (filename, -1, NULL, NULL, NULL);
 
   if (wfilename == NULL)
     {
@@ -873,8 +873,8 @@ g_win32_readlink_utf8 (const xchar_t  *filename,
   if (result <= 0)
     return result;
 
-  tmp = g_utf16_to_utf8 (buf_utf16,
-                         result / sizeof (gunichar2),
+  tmp = xutf16_to_utf8 (buf_utf16,
+                         result / sizeof (xunichar2_t),
                          NULL,
                          &tmp_len,
                          NULL);
@@ -934,7 +934,7 @@ g_access (const xchar_t *filename,
 	  int          mode)
 {
 #ifdef G_OS_WIN32
-  wchar_t *wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+  wchar_t *wfilename = xutf8_to_utf16 (filename, -1, NULL, NULL, NULL);
   int retval;
   int save_errno;
 
@@ -986,7 +986,7 @@ g_chmod (const xchar_t *filename,
 	 int          mode)
 {
 #ifdef G_OS_WIN32
-  wchar_t *wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+  wchar_t *wfilename = xutf8_to_utf16 (filename, -1, NULL, NULL, NULL);
   int retval;
   int save_errno;
 
@@ -1045,7 +1045,7 @@ g_open (const xchar_t *filename,
 	int          mode)
 {
 #ifdef G_OS_WIN32
-  wchar_t *wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+  wchar_t *wfilename = xutf8_to_utf16 (filename, -1, NULL, NULL, NULL);
   int retval;
   int save_errno;
 
@@ -1108,7 +1108,7 @@ g_creat (const xchar_t *filename,
 	 int          mode)
 {
 #ifdef G_OS_WIN32
-  wchar_t *wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+  wchar_t *wfilename = xutf8_to_utf16 (filename, -1, NULL, NULL, NULL);
   int retval;
   int save_errno;
 
@@ -1152,7 +1152,7 @@ g_rename (const xchar_t *oldfilename,
 	  const xchar_t *newfilename)
 {
 #ifdef G_OS_WIN32
-  wchar_t *woldfilename = g_utf8_to_utf16 (oldfilename, -1, NULL, NULL, NULL);
+  wchar_t *woldfilename = xutf8_to_utf16 (oldfilename, -1, NULL, NULL, NULL);
   wchar_t *wnewfilename;
   int retval;
   int save_errno = 0;
@@ -1163,7 +1163,7 @@ g_rename (const xchar_t *oldfilename,
       return -1;
     }
 
-  wnewfilename = g_utf8_to_utf16 (newfilename, -1, NULL, NULL, NULL);
+  wnewfilename = xutf8_to_utf16 (newfilename, -1, NULL, NULL, NULL);
 
   if (wnewfilename == NULL)
     {
@@ -1212,7 +1212,7 @@ g_mkdir (const xchar_t *filename,
 	 int          mode)
 {
 #ifdef G_OS_WIN32
-  wchar_t *wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+  wchar_t *wfilename = xutf8_to_utf16 (filename, -1, NULL, NULL, NULL);
   int retval;
   int save_errno;
 
@@ -1252,7 +1252,7 @@ int
 g_chdir (const xchar_t *path)
 {
 #ifdef G_OS_WIN32
-  wchar_t *wpath = g_utf8_to_utf16 (path, -1, NULL, NULL, NULL);
+  wchar_t *wpath = xutf8_to_utf16 (path, -1, NULL, NULL, NULL);
   int retval;
   int save_errno;
 
@@ -1413,7 +1413,7 @@ int
 g_unlink (const xchar_t *filename)
 {
 #ifdef G_OS_WIN32
-  wchar_t *wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+  wchar_t *wfilename = xutf8_to_utf16 (filename, -1, NULL, NULL, NULL);
   int retval;
   int save_errno;
 
@@ -1466,7 +1466,7 @@ int
 g_remove (const xchar_t *filename)
 {
 #ifdef G_OS_WIN32
-  wchar_t *wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+  wchar_t *wfilename = xutf8_to_utf16 (filename, -1, NULL, NULL, NULL);
   int retval;
   int save_errno;
 
@@ -1510,7 +1510,7 @@ int
 g_rmdir (const xchar_t *filename)
 {
 #ifdef G_OS_WIN32
-  wchar_t *wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+  wchar_t *wfilename = xutf8_to_utf16 (filename, -1, NULL, NULL, NULL);
   int retval;
   int save_errno;
 
@@ -1552,7 +1552,7 @@ g_rmdir (const xchar_t *filename)
  *
  * As `close()` and `fclose()` are part of the C library, this implies that it is
  * currently impossible to close a file if the application C library and the C library
- * used by GLib are different. Convenience functions like g_file_set_contents_full()
+ * used by GLib are different. Convenience functions like xfile_set_contents_full()
  * avoid this problem.
  *
  * Returns: A `FILE*` if the file was successfully opened, or %NULL if
@@ -1565,7 +1565,7 @@ g_fopen (const xchar_t *filename,
 	 const xchar_t *mode)
 {
 #ifdef G_OS_WIN32
-  wchar_t *wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+  wchar_t *wfilename = xutf8_to_utf16 (filename, -1, NULL, NULL, NULL);
   wchar_t *wmode;
   FILE *retval;
   int save_errno;
@@ -1576,7 +1576,7 @@ g_fopen (const xchar_t *filename,
       return NULL;
     }
 
-  wmode = g_utf8_to_utf16 (mode, -1, NULL, NULL, NULL);
+  wmode = xutf8_to_utf16 (mode, -1, NULL, NULL, NULL);
 
   if (wmode == NULL)
     {
@@ -1622,7 +1622,7 @@ g_freopen (const xchar_t *filename,
 	   FILE        *stream)
 {
 #ifdef G_OS_WIN32
-  wchar_t *wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+  wchar_t *wfilename = xutf8_to_utf16 (filename, -1, NULL, NULL, NULL);
   wchar_t *wmode;
   FILE *retval;
   int save_errno;
@@ -1633,7 +1633,7 @@ g_freopen (const xchar_t *filename,
       return NULL;
     }
 
-  wmode = g_utf8_to_utf16 (mode, -1, NULL, NULL, NULL);
+  wmode = xutf8_to_utf16 (mode, -1, NULL, NULL, NULL);
 
   if (wmode == NULL)
     {
@@ -1715,7 +1715,7 @@ g_utime (const xchar_t    *filename,
 	 struct utimbuf *utb)
 {
 #ifdef G_OS_WIN32
-  wchar_t *wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+  wchar_t *wfilename = xutf8_to_utf16 (filename, -1, NULL, NULL, NULL);
   int retval;
   int save_errno;
 
@@ -1774,9 +1774,9 @@ g_close (xint_t       fd,
   else if (res == -1)
     {
       int errsv = errno;
-      g_set_error_literal (error, G_FILE_ERROR,
-                           g_file_error_from_errno (errsv),
-                           g_strerror (errsv));
+      g_set_error_literal (error, XFILE_ERROR,
+                           xfile_error_from_errno (errsv),
+                           xstrerror (errsv));
       errno = errsv;
       return FALSE;
     }

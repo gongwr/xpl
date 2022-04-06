@@ -33,7 +33,7 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GNode		GNode;
+typedef struct _GNode		xnode_t;
 
 /* Tree traverse flags */
 typedef enum
@@ -55,9 +55,9 @@ typedef enum
   G_LEVEL_ORDER
 } GTraverseType;
 
-typedef xboolean_t	(*GNodeTraverseFunc)	(GNode	       *node,
+typedef xboolean_t	(*GNodeTraverseFunc)	(xnode_t	       *node,
 						 xpointer_t	data);
-typedef void		(*GNodeForeachFunc)	(GNode	       *node,
+typedef void		(*GNodeForeachFunc)	(xnode_t	       *node,
 						 xpointer_t	data);
 
 /* N-way tree implementation
@@ -65,75 +65,75 @@ typedef void		(*GNodeForeachFunc)	(GNode	       *node,
 struct _GNode
 {
   xpointer_t data;
-  GNode	  *next;
-  GNode	  *prev;
-  GNode	  *parent;
-  GNode	  *children;
+  xnode_t	  *next;
+  xnode_t	  *prev;
+  xnode_t	  *parent;
+  xnode_t	  *children;
 };
 
 /**
  * G_NODE_IS_ROOT:
- * @node: a #GNode
+ * @node: a #xnode_t
  *
- * Returns %TRUE if a #GNode is the root of a tree.
+ * Returns %TRUE if a #xnode_t is the root of a tree.
  *
- * Returns: %TRUE if the #GNode is the root of a tree
+ * Returns: %TRUE if the #xnode_t is the root of a tree
  *     (i.e. it has no parent or siblings)
  */
-#define	 G_NODE_IS_ROOT(node)	(((GNode*) (node))->parent == NULL && \
-				 ((GNode*) (node))->prev == NULL && \
-				 ((GNode*) (node))->next == NULL)
+#define	 G_NODE_IS_ROOT(node)	(((xnode_t*) (node))->parent == NULL && \
+				 ((xnode_t*) (node))->prev == NULL && \
+				 ((xnode_t*) (node))->next == NULL)
 
 /**
  * G_NODE_IS_LEAF:
- * @node: a #GNode
+ * @node: a #xnode_t
  *
- * Returns %TRUE if a #GNode is a leaf node.
+ * Returns %TRUE if a #xnode_t is a leaf node.
  *
- * Returns: %TRUE if the #GNode is a leaf node
+ * Returns: %TRUE if the #xnode_t is a leaf node
  *     (i.e. it has no children)
  */
-#define	 G_NODE_IS_LEAF(node)	(((GNode*) (node))->children == NULL)
+#define	 G_NODE_IS_LEAF(node)	(((xnode_t*) (node))->children == NULL)
 
 XPL_AVAILABLE_IN_ALL
-GNode*	 g_node_new		(xpointer_t	   data);
+xnode_t*	 g_node_new		(xpointer_t	   data);
 XPL_AVAILABLE_IN_ALL
-void	 g_node_destroy		(GNode		  *root);
+void	 g_node_destroy		(xnode_t		  *root);
 XPL_AVAILABLE_IN_ALL
-void	 g_node_unlink		(GNode		  *node);
+void	 g_node_unlink		(xnode_t		  *node);
 XPL_AVAILABLE_IN_ALL
-GNode*   g_node_copy_deep       (GNode            *node,
+xnode_t*   g_node_copy_deep       (xnode_t            *node,
 				 GCopyFunc         copy_func,
 				 xpointer_t          data);
 XPL_AVAILABLE_IN_ALL
-GNode*   g_node_copy            (GNode            *node);
+xnode_t*   g_node_copy            (xnode_t            *node);
 XPL_AVAILABLE_IN_ALL
-GNode*	 g_node_insert		(GNode		  *parent,
+xnode_t*	 g_node_insert		(xnode_t		  *parent,
 				 xint_t		   position,
-				 GNode		  *node);
+				 xnode_t		  *node);
 XPL_AVAILABLE_IN_ALL
-GNode*	 g_node_insert_before	(GNode		  *parent,
-				 GNode		  *sibling,
-				 GNode		  *node);
+xnode_t*	 g_node_insert_before	(xnode_t		  *parent,
+				 xnode_t		  *sibling,
+				 xnode_t		  *node);
 XPL_AVAILABLE_IN_ALL
-GNode*   g_node_insert_after    (GNode            *parent,
-				 GNode            *sibling,
-				 GNode            *node);
+xnode_t*   g_node_insert_after    (xnode_t            *parent,
+				 xnode_t            *sibling,
+				 xnode_t            *node);
 XPL_AVAILABLE_IN_ALL
-GNode*	 g_node_prepend		(GNode		  *parent,
-				 GNode		  *node);
+xnode_t*	 g_node_prepend		(xnode_t		  *parent,
+				 xnode_t		  *node);
 XPL_AVAILABLE_IN_ALL
-xuint_t	 g_node_n_nodes		(GNode		  *root,
+xuint_t	 g_node_n_nodes		(xnode_t		  *root,
 				 GTraverseFlags	   flags);
 XPL_AVAILABLE_IN_ALL
-GNode*	 g_node_get_root	(GNode		  *node);
+xnode_t*	 g_node_get_root	(xnode_t		  *node);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_node_is_ancestor	(GNode		  *node,
-				 GNode		  *descendant);
+xboolean_t g_node_is_ancestor	(xnode_t		  *node,
+				 xnode_t		  *descendant);
 XPL_AVAILABLE_IN_ALL
-xuint_t	 g_node_depth		(GNode		  *node);
+xuint_t	 g_node_depth		(xnode_t		  *node);
 XPL_AVAILABLE_IN_ALL
-GNode*	 g_node_find		(GNode		  *root,
+xnode_t*	 g_node_find		(xnode_t		  *root,
 				 GTraverseType	   order,
 				 GTraverseFlags	   flags,
 				 xpointer_t	   data);
@@ -141,76 +141,76 @@ GNode*	 g_node_find		(GNode		  *root,
 /* convenience macros */
 /**
  * g_node_append:
- * @parent: the #GNode to place the new #GNode under
- * @node: the #GNode to insert
+ * @parent: the #xnode_t to place the new #xnode_t under
+ * @node: the #xnode_t to insert
  *
- * Inserts a #GNode as the last child of the given parent.
+ * Inserts a #xnode_t as the last child of the given parent.
  *
- * Returns: the inserted #GNode
+ * Returns: the inserted #xnode_t
  */
 #define g_node_append(parent, node)				\
      g_node_insert_before ((parent), NULL, (node))
 
 /**
  * g_node_insert_data:
- * @parent: the #GNode to place the new #GNode under
- * @position: the position to place the new #GNode at. If position is -1,
- *     the new #GNode is inserted as the last child of @parent
- * @data: the data for the new #GNode
+ * @parent: the #xnode_t to place the new #xnode_t under
+ * @position: the position to place the new #xnode_t at. If position is -1,
+ *     the new #xnode_t is inserted as the last child of @parent
+ * @data: the data for the new #xnode_t
  *
- * Inserts a new #GNode at the given position.
+ * Inserts a new #xnode_t at the given position.
  *
- * Returns: the new #GNode
+ * Returns: the new #xnode_t
  */
 #define	g_node_insert_data(parent, position, data)		\
      g_node_insert ((parent), (position), g_node_new (data))
 
 /**
  * g_node_insert_data_after:
- * @parent: the #GNode to place the new #GNode under
- * @sibling: the sibling #GNode to place the new #GNode after
- * @data: the data for the new #GNode
+ * @parent: the #xnode_t to place the new #xnode_t under
+ * @sibling: the sibling #xnode_t to place the new #xnode_t after
+ * @data: the data for the new #xnode_t
  *
- * Inserts a new #GNode after the given sibling.
+ * Inserts a new #xnode_t after the given sibling.
  *
- * Returns: the new #GNode
+ * Returns: the new #xnode_t
  */
 
 #define	g_node_insert_data_after(parent, sibling, data)	\
      g_node_insert_after ((parent), (sibling), g_node_new (data))
 /**
  * g_node_insert_data_before:
- * @parent: the #GNode to place the new #GNode under
- * @sibling: the sibling #GNode to place the new #GNode before
- * @data: the data for the new #GNode
+ * @parent: the #xnode_t to place the new #xnode_t under
+ * @sibling: the sibling #xnode_t to place the new #xnode_t before
+ * @data: the data for the new #xnode_t
  *
- * Inserts a new #GNode before the given sibling.
+ * Inserts a new #xnode_t before the given sibling.
  *
- * Returns: the new #GNode
+ * Returns: the new #xnode_t
  */
 #define	g_node_insert_data_before(parent, sibling, data)	\
      g_node_insert_before ((parent), (sibling), g_node_new (data))
 
 /**
  * g_node_prepend_data:
- * @parent: the #GNode to place the new #GNode under
- * @data: the data for the new #GNode
+ * @parent: the #xnode_t to place the new #xnode_t under
+ * @data: the data for the new #xnode_t
  *
- * Inserts a new #GNode as the first child of the given parent.
+ * Inserts a new #xnode_t as the first child of the given parent.
  *
- * Returns: the new #GNode
+ * Returns: the new #xnode_t
  */
 #define	g_node_prepend_data(parent, data)			\
      g_node_prepend ((parent), g_node_new (data))
 
 /**
  * g_node_append_data:
- * @parent: the #GNode to place the new #GNode under
- * @data: the data for the new #GNode
+ * @parent: the #xnode_t to place the new #xnode_t under
+ * @data: the data for the new #xnode_t
  *
- * Inserts a new #GNode as the last child of the given parent.
+ * Inserts a new #xnode_t as the last child of the given parent.
  *
- * Returns: the new #GNode
+ * Returns: the new #xnode_t
  */
 #define	g_node_append_data(parent, data)			\
      g_node_insert_before ((parent), NULL, g_node_new (data))
@@ -221,7 +221,7 @@ GNode*	 g_node_find		(GNode		  *root,
  * low level traversal functions, optimized for speed.
  */
 XPL_AVAILABLE_IN_ALL
-void	 g_node_traverse	(GNode		  *root,
+void	 g_node_traverse	(xnode_t		  *root,
 				 GTraverseType	   order,
 				 GTraverseFlags	   flags,
 				 xint_t		   max_depth,
@@ -234,73 +234,73 @@ void	 g_node_traverse	(GNode		  *root,
  * often needed, and would make g_node_insert() more time consuming.
  */
 XPL_AVAILABLE_IN_ALL
-xuint_t	 g_node_max_height	 (GNode *root);
+xuint_t	 g_node_max_height	 (xnode_t *root);
 
 XPL_AVAILABLE_IN_ALL
-void	 g_node_children_foreach (GNode		  *node,
+void	 g_node_children_foreach (xnode_t		  *node,
 				  GTraverseFlags   flags,
 				  GNodeForeachFunc func,
 				  xpointer_t	   data);
 XPL_AVAILABLE_IN_ALL
-void	 g_node_reverse_children (GNode		  *node);
+void	 g_node_reverse_children (xnode_t		  *node);
 XPL_AVAILABLE_IN_ALL
-xuint_t	 g_node_n_children	 (GNode		  *node);
+xuint_t	 g_node_n_children	 (xnode_t		  *node);
 XPL_AVAILABLE_IN_ALL
-GNode*	 g_node_nth_child	 (GNode		  *node,
+xnode_t*	 g_node_nth_child	 (xnode_t		  *node,
 				  xuint_t		   n);
 XPL_AVAILABLE_IN_ALL
-GNode*	 g_node_last_child	 (GNode		  *node);
+xnode_t*	 g_node_last_child	 (xnode_t		  *node);
 XPL_AVAILABLE_IN_ALL
-GNode*	 g_node_find_child	 (GNode		  *node,
+xnode_t*	 g_node_find_child	 (xnode_t		  *node,
 				  GTraverseFlags   flags,
 				  xpointer_t	   data);
 XPL_AVAILABLE_IN_ALL
-xint_t	 g_node_child_position	 (GNode		  *node,
-				  GNode		  *child);
+xint_t	 g_node_child_position	 (xnode_t		  *node,
+				  xnode_t		  *child);
 XPL_AVAILABLE_IN_ALL
-xint_t	 g_node_child_index	 (GNode		  *node,
+xint_t	 g_node_child_index	 (xnode_t		  *node,
 				  xpointer_t	   data);
 
 XPL_AVAILABLE_IN_ALL
-GNode*	 g_node_first_sibling	 (GNode		  *node);
+xnode_t*	 g_node_first_sibling	 (xnode_t		  *node);
 XPL_AVAILABLE_IN_ALL
-GNode*	 g_node_last_sibling	 (GNode		  *node);
+xnode_t*	 g_node_last_sibling	 (xnode_t		  *node);
 
 /**
  * g_node_prev_sibling:
- * @node: a #GNode
+ * @node: a #xnode_t
  *
- * Gets the previous sibling of a #GNode.
+ * Gets the previous sibling of a #xnode_t.
  *
  * Returns: the previous sibling of @node, or %NULL if @node is the first
  *     node or %NULL
  */
 #define	 g_node_prev_sibling(node)	((node) ? \
-					 ((GNode*) (node))->prev : NULL)
+					 ((xnode_t*) (node))->prev : NULL)
 
 /**
  * g_node_next_sibling:
- * @node: a #GNode
+ * @node: a #xnode_t
  *
- * Gets the next sibling of a #GNode.
+ * Gets the next sibling of a #xnode_t.
  *
  * Returns: the next sibling of @node, or %NULL if @node is the last node
  *     or %NULL
  */
 #define	 g_node_next_sibling(node)	((node) ? \
-					 ((GNode*) (node))->next : NULL)
+					 ((xnode_t*) (node))->next : NULL)
 
 /**
  * g_node_first_child:
- * @node: a #GNode
+ * @node: a #xnode_t
  *
- * Gets the first child of a #GNode.
+ * Gets the first child of a #xnode_t.
  *
  * Returns: the first child of @node, or %NULL if @node is %NULL
  *     or has no children
  */
 #define	 g_node_first_child(node)	((node) ? \
-					 ((GNode*) (node))->children : NULL)
+					 ((xnode_t*) (node))->children : NULL)
 
 G_END_DECLS
 

@@ -11,17 +11,17 @@ test_exact (void)
     "a::a,a::b,b::*"
   };
 
-  GFileAttributeMatcher *matcher;
+  xfile_attribute_matcher_t *matcher;
   char *s;
   xuint_t i;
 
   for (i = 0; i < G_N_ELEMENTS (exact_matches); i++)
     {
-      matcher = g_file_attribute_matcher_new (exact_matches[i]);
-      s = g_file_attribute_matcher_to_string (matcher);
+      matcher = xfile_attribute_matcher_new (exact_matches[i]);
+      s = xfile_attribute_matcher_to_string (matcher);
       g_assert_cmpstr (exact_matches[i], ==, s);
       g_free (s);
-      g_file_attribute_matcher_unref (matcher);
+      xfile_attribute_matcher_unref (matcher);
     }
 }
 
@@ -52,17 +52,17 @@ test_equality (void)
     { "a::*,b::*", "b::*,a::*" },
   };
 
-  GFileAttributeMatcher *matcher;
+  xfile_attribute_matcher_t *matcher;
   char *s;
   xuint_t i;
 
   for (i = 0; i < G_N_ELEMENTS (equals); i++)
     {
-      matcher = g_file_attribute_matcher_new (equals[i].actual);
-      s = g_file_attribute_matcher_to_string (matcher);
+      matcher = xfile_attribute_matcher_new (equals[i].actual);
+      s = xfile_attribute_matcher_to_string (matcher);
       g_assert_cmpstr (equals[i].expected, ==, s);
       g_free (s);
-      g_file_attribute_matcher_unref (matcher);
+      xfile_attribute_matcher_unref (matcher);
     }
 }
 
@@ -131,21 +131,21 @@ test_subtract (void)
     { "a::b,a::c,b::c", "a::b,b::c", "a::c" },
   };
 
-  GFileAttributeMatcher *matcher, *subtract, *result;
+  xfile_attribute_matcher_t *matcher, *subtract, *result;
   char *s;
   xuint_t i;
 
   for (i = 0; i < G_N_ELEMENTS (subtractions); i++)
     {
-      matcher = g_file_attribute_matcher_new (subtractions[i].attributes);
-      subtract = g_file_attribute_matcher_new (subtractions[i].subtract);
-      result = g_file_attribute_matcher_subtract (matcher, subtract);
-      s = g_file_attribute_matcher_to_string (result);
+      matcher = xfile_attribute_matcher_new (subtractions[i].attributes);
+      subtract = xfile_attribute_matcher_new (subtractions[i].subtract);
+      result = xfile_attribute_matcher_subtract (matcher, subtract);
+      s = xfile_attribute_matcher_to_string (result);
       g_assert_cmpstr (subtractions[i].result, ==, s);
       g_free (s);
-      g_file_attribute_matcher_unref (matcher);
-      g_file_attribute_matcher_unref (subtract);
-      g_file_attribute_matcher_unref (result);
+      xfile_attribute_matcher_unref (matcher);
+      xfile_attribute_matcher_unref (subtract);
+      xfile_attribute_matcher_unref (result);
     }
 }
 

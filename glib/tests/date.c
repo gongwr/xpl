@@ -23,240 +23,240 @@
 static void
 test_basic (void)
 {
-  GDate *d;
+  xdate_t *d;
   struct tm tm = { 0 };
 
-  /* g_date_valid (d) */
+  /* xdate_valid (d) */
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_false (g_date_valid (NULL));
+      g_assert_false (xdate_valid (NULL));
       g_test_assert_expected_messages ();
     }
 
-  /* g_date_new_dmy (d, m, y) */
+  /* xdate_new_dmy (d, m, y) */
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_null (g_date_new_dmy (0, 0, 0));
+      g_assert_null (xdate_new_dmy (0, 0, 0));
       g_test_assert_expected_messages ();
     }
 
-  d = g_date_new ();
+  d = xdate_new ();
   if (g_test_undefined ())
     {
-      /* g_date_get_weekday (d) */
+      /* xdate_get_weekday (d) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_get_weekday (d), ==, G_DATE_BAD_WEEKDAY);
+      g_assert_cmpint (xdate_get_weekday (d), ==, G_DATE_BAD_WEEKDAY);
       g_test_assert_expected_messages ();
 
-      /* g_date_get_day (d) */
+      /* xdate_get_day (d) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_get_day (d), ==, G_DATE_BAD_DAY);
+      g_assert_cmpint (xdate_get_day (d), ==, G_DATE_BAD_DAY);
       g_test_assert_expected_messages ();
 
-      /* g_date_get_month (d) */
+      /* xdate_get_month (d) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_get_month (d), ==, G_DATE_BAD_MONTH);
+      g_assert_cmpint (xdate_get_month (d), ==, G_DATE_BAD_MONTH);
       g_test_assert_expected_messages ();
 
-      /* g_date_get_year (d) */
+      /* xdate_get_year (d) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_get_year (d), ==, G_DATE_BAD_YEAR);
+      g_assert_cmpint (xdate_get_year (d), ==, G_DATE_BAD_YEAR);
       g_test_assert_expected_messages ();
 
-      /* g_date_to_struct_tm (d, tm) */
+      /* xdate_to_struct_tm (d, tm) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_to_struct_tm (d, &tm);
+      xdate_to_struct_tm (d, &tm);
       g_test_assert_expected_messages ();
 
       /* g_is_leap_year (y) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_false (g_date_is_leap_year (0));
+      g_assert_false (xdate_is_leap_year (0));
       g_test_assert_expected_messages ();
 
-      /* g_date_get_days_in_month (m, y) */
+      /* xdate_get_days_in_month (m, y) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_get_days_in_month (0, 1), ==, 0);
-      g_test_assert_expected_messages ();
-
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_assert_cmpint (g_date_get_days_in_month (1, 0), ==, 0);
-      g_test_assert_expected_messages ();
-
-      /* g_date_set_time_t (d, t) */
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_date_set_time_t (NULL, 1);
-      g_test_assert_expected_messages ();
-
-      /* g_date_is_first_of_month (d) */
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_assert_false (g_date_is_first_of_month (d));
-      g_test_assert_expected_messages ();
-
-      /* g_date_is_last_of_month (d) */
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_assert_false (g_date_is_last_of_month (d));
-      g_test_assert_expected_messages ();
-
-      /* g_date_add_days (d, n) */
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_date_add_days (d, 1);
-      g_test_assert_expected_messages ();
-
-      /* g_date_subtract_days (d, n) */
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_date_subtract_days (d, 1);
-      g_test_assert_expected_messages ();
-
-      /* g_date_add_months (d, n) */
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_date_add_months (d, 1);
-      g_test_assert_expected_messages ();
-
-      /* g_date_subtract_months (d, n) */
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_date_subtract_months (d, 1);
-      g_test_assert_expected_messages ();
-
-      /* g_date_add_years (d, y) */
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_date_add_years (d, 1);
-      g_test_assert_expected_messages ();
-
-      /* g_date_subtract_years (d, y) */
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_date_subtract_years (d, 1);
-      g_test_assert_expected_messages ();
-
-      /* g_date_set_month (d, m) */
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_date_set_month (NULL, 1);
+      g_assert_cmpint (xdate_get_days_in_month (0, 1), ==, 0);
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_set_month (d, 13);
+      g_assert_cmpint (xdate_get_days_in_month (1, 0), ==, 0);
       g_test_assert_expected_messages ();
 
-      /* g_date_set_day (d, day) */
+      /* xdate_set_time_t (d, t) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_set_day (NULL, 1);
+      xdate_set_time_t (NULL, 1);
+      g_test_assert_expected_messages ();
+
+      /* xdate_is_first_of_month (d) */
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      g_assert_false (xdate_is_first_of_month (d));
+      g_test_assert_expected_messages ();
+
+      /* xdate_is_last_of_month (d) */
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      g_assert_false (xdate_is_last_of_month (d));
+      g_test_assert_expected_messages ();
+
+      /* xdate_add_days (d, n) */
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      xdate_add_days (d, 1);
+      g_test_assert_expected_messages ();
+
+      /* xdate_subtract_days (d, n) */
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      xdate_subtract_days (d, 1);
+      g_test_assert_expected_messages ();
+
+      /* xdate_add_months (d, n) */
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      xdate_add_months (d, 1);
+      g_test_assert_expected_messages ();
+
+      /* xdate_subtract_months (d, n) */
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      xdate_subtract_months (d, 1);
+      g_test_assert_expected_messages ();
+
+      /* xdate_add_years (d, y) */
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      xdate_add_years (d, 1);
+      g_test_assert_expected_messages ();
+
+      /* xdate_subtract_years (d, y) */
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      xdate_subtract_years (d, 1);
+      g_test_assert_expected_messages ();
+
+      /* xdate_set_month (d, m) */
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      xdate_set_month (NULL, 1);
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_set_day (d, 32);
+      xdate_set_month (d, 13);
       g_test_assert_expected_messages ();
 
-      /* g_date_set_year (d, y) */
+      /* xdate_set_day (d, day) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_set_year (NULL, 1);
-      g_test_assert_expected_messages ();
-
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_date_set_year (d, (GDateYear) (G_MAXUINT16 + 1));
-      g_test_assert_expected_messages ();
-
-      /* g_date_set_dmy (date, d, m, y) */
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_date_set_dmy (NULL, 1, 1, 1);
+      xdate_set_day (NULL, 1);
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_set_dmy (d, 0, 0, 0);
+      xdate_set_day (d, 32);
       g_test_assert_expected_messages ();
 
-      /* g_date_set_julian (date, d) */
+      /* xdate_set_year (d, y) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_set_julian (NULL, 1);
-      g_test_assert_expected_messages ();
-
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_date_set_julian (d, 0);
-      g_test_assert_expected_messages ();
-
-      /* g_date_clear (d, n) */
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_date_clear (d, 0);
+      xdate_set_year (NULL, 1);
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_clear (NULL, 1);
+      xdate_set_year (d, (GDateYear) (G_MAXUINT16 + 1));
+      g_test_assert_expected_messages ();
+
+      /* xdate_set_dmy (date, d, m, y) */
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      xdate_set_dmy (NULL, 1, 1, 1);
+      g_test_assert_expected_messages ();
+
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      xdate_set_dmy (d, 0, 0, 0);
+      g_test_assert_expected_messages ();
+
+      /* xdate_set_julian (date, d) */
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      xdate_set_julian (NULL, 1);
+      g_test_assert_expected_messages ();
+
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      xdate_set_julian (d, 0);
+      g_test_assert_expected_messages ();
+
+      /* xdate_clear (d, n) */
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      xdate_clear (d, 0);
+      g_test_assert_expected_messages ();
+
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      xdate_clear (NULL, 1);
       g_test_assert_expected_messages ();
     }
 
-  g_date_set_dmy (d, 1, 1, 1);
+  xdate_set_dmy (d, 1, 1, 1);
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_to_struct_tm (d, NULL);
+      xdate_to_struct_tm (d, NULL);
       g_test_assert_expected_messages ();
    }
-  g_date_free (d);
+  xdate_free (d);
 
-  g_assert_cmpint (sizeof (GDate), <,  9);
-  g_assert_false (g_date_valid_month (G_DATE_BAD_MONTH));
-  g_assert_false (g_date_valid_month (13));
-  g_assert_false (g_date_valid_day (G_DATE_BAD_DAY));
-  g_assert_false (g_date_valid_day (32));
-  g_assert_false (g_date_valid_year (G_DATE_BAD_YEAR));
-  g_assert_false (g_date_valid_julian (G_DATE_BAD_JULIAN));
-  g_assert_false (g_date_valid_weekday (G_DATE_BAD_WEEKDAY));
-  g_assert_true (g_date_valid_weekday ((GDateWeekday) 1));
-  g_assert_false (g_date_valid_weekday ((GDateWeekday) 8));
-  g_assert_true (g_date_is_leap_year (2000));
-  g_assert_false (g_date_is_leap_year (1999));
-  g_assert_true (g_date_is_leap_year (1996));
-  g_assert_true (g_date_is_leap_year (1600));
-  g_assert_false (g_date_is_leap_year (2100));
-  g_assert_false (g_date_is_leap_year (1800));
+  g_assert_cmpint (sizeof (xdate_t), <,  9);
+  g_assert_false (xdate_valid_month (G_DATE_BAD_MONTH));
+  g_assert_false (xdate_valid_month (13));
+  g_assert_false (xdate_valid_day (G_DATE_BAD_DAY));
+  g_assert_false (xdate_valid_day (32));
+  g_assert_false (xdate_valid_year (G_DATE_BAD_YEAR));
+  g_assert_false (xdate_valid_julian (G_DATE_BAD_JULIAN));
+  g_assert_false (xdate_valid_weekday (G_DATE_BAD_WEEKDAY));
+  g_assert_true (xdate_valid_weekday ((GDateWeekday) 1));
+  g_assert_false (xdate_valid_weekday ((GDateWeekday) 8));
+  g_assert_true (xdate_is_leap_year (2000));
+  g_assert_false (xdate_is_leap_year (1999));
+  g_assert_true (xdate_is_leap_year (1996));
+  g_assert_true (xdate_is_leap_year (1600));
+  g_assert_false (xdate_is_leap_year (2100));
+  g_assert_false (xdate_is_leap_year (1800));
 }
 
 static void
 test_empty_constructor (void)
 {
-  GDate *d;
+  xdate_t *d;
 
-  d = g_date_new ();
-  g_assert_false (g_date_valid (d));
-  g_date_free (d);
+  d = xdate_new ();
+  g_assert_false (xdate_valid (d));
+  xdate_free (d);
 
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_free (NULL);
+      xdate_free (NULL);
       g_test_assert_expected_messages ();
     }
 
@@ -265,409 +265,409 @@ test_empty_constructor (void)
 static void
 test_dmy_constructor (void)
 {
-  GDate *d;
-  guint32 j;
+  xdate_t *d;
+  xuint32_t j;
 
-  d = g_date_new_dmy (1, 1, 1);
-  g_assert_true (g_date_valid (d));
+  d = xdate_new_dmy (1, 1, 1);
+  g_assert_true (xdate_valid (d));
 
-  j = g_date_get_julian (d);
+  j = xdate_get_julian (d);
   g_assert_cmpint (j, ==, 1);
-  g_assert_cmpint (g_date_get_month (d), ==, G_DATE_JANUARY);
-  g_assert_cmpint (g_date_get_day (d), ==, 1);
-  g_assert_cmpint (g_date_get_year (d), ==, 1);
-  g_date_free (d);
+  g_assert_cmpint (xdate_get_month (d), ==, G_DATE_JANUARY);
+  g_assert_cmpint (xdate_get_day (d), ==, 1);
+  g_assert_cmpint (xdate_get_year (d), ==, 1);
+  xdate_free (d);
 }
 
 static void
 test_date_compare (void)
 {
-  GDate *d1;
-  GDate *d2;
+  xdate_t *d1;
+  xdate_t *d2;
 
-  d1 = g_date_new ();
-  d2 = g_date_new ();
+  d1 = xdate_new ();
+  d2 = xdate_new ();
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_days_between (d1, d2), ==, 0);
+      g_assert_cmpint (xdate_days_between (d1, d2), ==, 0);
       g_test_assert_expected_messages ();
 
-      g_date_set_dmy (d1, 1, 1, 1);
+      xdate_set_dmy (d1, 1, 1, 1);
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_days_between (d1, d2), ==, 0);
+      g_assert_cmpint (xdate_days_between (d1, d2), ==, 0);
       g_test_assert_expected_messages ();
     }
-  g_date_free (d1);
-  g_date_free (d2);
+  xdate_free (d1);
+  xdate_free (d2);
 
-  d1 = g_date_new ();
-  d2 = g_date_new ();
+  d1 = xdate_new ();
+  d2 = xdate_new ();
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_compare (NULL, d2), ==, 0);
+      g_assert_cmpint (xdate_compare (NULL, d2), ==, 0);
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_compare (d1, NULL), ==, 0);
+      g_assert_cmpint (xdate_compare (d1, NULL), ==, 0);
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_compare (d1, d2), ==, 0);
+      g_assert_cmpint (xdate_compare (d1, d2), ==, 0);
       g_test_assert_expected_messages ();
 
-      g_date_set_dmy (d1, 1, 1, 1);
+      xdate_set_dmy (d1, 1, 1, 1);
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_compare (d1, d2), ==, 0);
+      g_assert_cmpint (xdate_compare (d1, d2), ==, 0);
       g_test_assert_expected_messages ();
     }
-  g_date_free (d1);
-  g_date_free (d2);
+  xdate_free (d1);
+  xdate_free (d2);
 
-  d1 = g_date_new ();
-  d2 = g_date_new ();
+  d1 = xdate_new ();
+  d2 = xdate_new ();
 
   /* DMY format */
-  g_date_set_dmy (d1, 1, 1, 1);
-  g_date_set_dmy (d2, 10, 1, 1);
+  xdate_set_dmy (d1, 1, 1, 1);
+  xdate_set_dmy (d2, 10, 1, 1);
 
-  g_assert_cmpint (g_date_compare (d1, d1), ==, 0);
+  g_assert_cmpint (xdate_compare (d1, d1), ==, 0);
 
-  g_assert_cmpint (g_date_compare (d1, d2), ==, -1);
-  g_assert_cmpint (g_date_compare (d2, d1), >, 0);
+  g_assert_cmpint (xdate_compare (d1, d2), ==, -1);
+  g_assert_cmpint (xdate_compare (d2, d1), >, 0);
 
-  g_date_set_dmy (d2, 1, 10, 1);
-  g_assert_cmpint (g_date_compare (d1, d2), ==, -1);
-  g_assert_cmpint (g_date_compare (d2, d1), >, 0);
+  xdate_set_dmy (d2, 1, 10, 1);
+  g_assert_cmpint (xdate_compare (d1, d2), ==, -1);
+  g_assert_cmpint (xdate_compare (d2, d1), >, 0);
 
-  g_date_set_dmy (d2, 1, 1, 10);
-  g_assert_cmpint (g_date_compare (d1, d2), ==, -1);
-  g_assert_cmpint (g_date_compare (d2, d1), >, 0);
+  xdate_set_dmy (d2, 1, 1, 10);
+  g_assert_cmpint (xdate_compare (d1, d2), ==, -1);
+  g_assert_cmpint (xdate_compare (d2, d1), >, 0);
 
   /* Julian format */
-  g_date_set_julian (d1, 1);
-  g_date_set_julian (d2, 10);
+  xdate_set_julian (d1, 1);
+  xdate_set_julian (d2, 10);
 
-  g_assert_cmpint (g_date_compare (d1, d1), ==, 0);
+  g_assert_cmpint (xdate_compare (d1, d1), ==, 0);
 
-  g_assert_cmpint (g_date_compare (d1, d2), ==, -1);
-  g_assert_cmpint (g_date_compare (d2, d1), >, 0);
+  g_assert_cmpint (xdate_compare (d1, d2), ==, -1);
+  g_assert_cmpint (xdate_compare (d2, d1), >, 0);
 
-  g_date_set_julian (d2, 32);
-  g_assert_cmpint (g_date_compare (d1, d2), ==, -1);
-  g_assert_cmpint (g_date_compare (d2, d1), >, 0);
+  xdate_set_julian (d2, 32);
+  g_assert_cmpint (xdate_compare (d1, d2), ==, -1);
+  g_assert_cmpint (xdate_compare (d2, d1), >, 0);
 
-  g_date_set_julian (d2, 366);
-  g_assert_cmpint (g_date_compare (d1, d2), ==, -1);
-  g_assert_cmpint (g_date_compare (d2, d1), >, 0);
+  xdate_set_julian (d2, 366);
+  g_assert_cmpint (xdate_compare (d1, d2), ==, -1);
+  g_assert_cmpint (xdate_compare (d2, d1), >, 0);
 
-  g_date_free (d1);
-  g_date_free (d2);
+  xdate_free (d1);
+  xdate_free (d2);
 }
 
 static void
 test_julian_constructor (void)
 {
-  GDate *d1;
-  GDate *d2;
+  xdate_t *d1;
+  xdate_t *d2;
 
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_null (g_date_new_julian (0));
+      g_assert_null (xdate_new_julian (0));
       g_test_assert_expected_messages ();
     }
 
-  d1 = g_date_new ();
+  d1 = xdate_new ();
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_get_julian (d1), ==, G_DATE_BAD_JULIAN);
+      g_assert_cmpint (xdate_get_julian (d1), ==, G_DATE_BAD_JULIAN);
       g_test_assert_expected_messages ();
     }
-  g_date_free (d1);
+  xdate_free (d1);
 
-  d1 = g_date_new_julian (4000);
-  d2 = g_date_new_julian (5000);
-  g_assert_cmpint (g_date_get_julian (d1), ==, 4000);
-  g_assert_cmpint (g_date_days_between (d1, d2), ==, 1000);
-  g_assert_cmpint (g_date_get_year (d1), ==, 11);
-  g_assert_cmpint (g_date_get_day (d2), ==, 9);
-  g_date_free (d1);
-  g_date_free (d2);
+  d1 = xdate_new_julian (4000);
+  d2 = xdate_new_julian (5000);
+  g_assert_cmpint (xdate_get_julian (d1), ==, 4000);
+  g_assert_cmpint (xdate_days_between (d1, d2), ==, 1000);
+  g_assert_cmpint (xdate_get_year (d1), ==, 11);
+  g_assert_cmpint (xdate_get_day (d2), ==, 9);
+  xdate_free (d1);
+  xdate_free (d2);
 }
 
 static void
 test_dates (void)
 {
-  GDate *d;
+  xdate_t *d;
   GTimeVal tv;
   time_t now;
 
-  d = g_date_new ();
+  d = xdate_new ();
 
   /* getters on empty date */
   if (g_test_undefined ())
     {
-      /* g_date_get_day_of_year (d) */
+      /* xdate_get_day_of_year (d) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_get_day_of_year (d), ==, 0);
+      g_assert_cmpint (xdate_get_day_of_year (d), ==, 0);
       g_test_assert_expected_messages ();
 
-      /* g_date_get_monday_week_of_year (d) */
+      /* xdate_get_monday_week_of_year (d) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_get_monday_week_of_year (d), ==, 0);
+      g_assert_cmpint (xdate_get_monday_week_of_year (d), ==, 0);
       g_test_assert_expected_messages ();
 
-      /* g_date_get_monday_weeks_in_year (y) */
+      /* xdate_get_monday_weeks_in_year (y) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_get_monday_weeks_in_year (0), ==, 0);
+      g_assert_cmpint (xdate_get_monday_weeks_in_year (0), ==, 0);
       g_test_assert_expected_messages ();
 
-      /* g_date_get_sunday_week_of_year (d) */
+      /* xdate_get_sunday_week_of_year (d) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_get_sunday_week_of_year (d), ==, 0);
+      g_assert_cmpint (xdate_get_sunday_week_of_year (d), ==, 0);
       g_test_assert_expected_messages ();
 
-      /* g_date_get_sunday_weeks_in_year (y) */
+      /* xdate_get_sunday_weeks_in_year (y) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_get_sunday_weeks_in_year (0), ==, 0);
+      g_assert_cmpint (xdate_get_sunday_weeks_in_year (0), ==, 0);
       g_test_assert_expected_messages ();
 
-      /* g_date_get_iso8601_week_of_year (d) */
+      /* xdate_get_iso8601_week_of_year (d) */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_cmpint (g_date_get_iso8601_week_of_year (d), ==, 0);
+      g_assert_cmpint (xdate_get_iso8601_week_of_year (d), ==, 0);
       g_test_assert_expected_messages ();
     }
 
-  g_date_free (d);
+  xdate_free (d);
 
   /* Remove more time than we have */
-  d = g_date_new_julian (1);
+  d = xdate_new_julian (1);
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_subtract_days (d, 103);
+      xdate_subtract_days (d, 103);
       g_test_assert_expected_messages ();
     }
-  g_date_free (d);
+  xdate_free (d);
 
-  d = g_date_new_julian (375);
+  d = xdate_new_julian (375);
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_subtract_months (d, 13);
+      xdate_subtract_months (d, 13);
       g_test_assert_expected_messages ();
     }
-  g_date_free (d);
+  xdate_free (d);
 
-  d = g_date_new_julian (375);
+  d = xdate_new_julian (375);
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_subtract_years (d, 2);
+      xdate_subtract_years (d, 2);
       g_test_assert_expected_messages ();
     }
-  g_date_free (d);
+  xdate_free (d);
 
   /* Test on leap years */
-  g_assert_cmpint (g_date_get_monday_weeks_in_year (1764), ==, 53);
-  g_assert_cmpint (g_date_get_monday_weeks_in_year (1776), ==, 53);
+  g_assert_cmpint (xdate_get_monday_weeks_in_year (1764), ==, 53);
+  g_assert_cmpint (xdate_get_monday_weeks_in_year (1776), ==, 53);
 
-  g_assert_cmpint (g_date_get_sunday_weeks_in_year (1792), ==, 53);
+  g_assert_cmpint (xdate_get_sunday_weeks_in_year (1792), ==, 53);
 
   /* Trigger the update of the dmy/julian parts */
-  d = g_date_new_julian (1);
-  g_assert_cmpint (g_date_get_day_of_year (d), ==, 1);
-  g_date_free (d);
+  d = xdate_new_julian (1);
+  g_assert_cmpint (xdate_get_day_of_year (d), ==, 1);
+  xdate_free (d);
 
-  d = g_date_new_julian (1);
-  g_assert_cmpint (g_date_get_monday_week_of_year (d), ==, 1);
-  g_date_free (d);
+  d = xdate_new_julian (1);
+  g_assert_cmpint (xdate_get_monday_week_of_year (d), ==, 1);
+  xdate_free (d);
 
-  d = g_date_new_julian (1);
-  g_assert_cmpint (g_date_get_sunday_week_of_year (d), ==, 0);
-  g_date_free (d);
+  d = xdate_new_julian (1);
+  g_assert_cmpint (xdate_get_sunday_week_of_year (d), ==, 0);
+  xdate_free (d);
 
-  d = g_date_new_julian (1);
-  g_assert_cmpint (g_date_is_first_of_month (d), ==, 1);
-  g_date_free (d);
+  d = xdate_new_julian (1);
+  g_assert_cmpint (xdate_is_first_of_month (d), ==, 1);
+  xdate_free (d);
 
-  d = g_date_new_dmy (31, 3, 8);
-  g_date_subtract_months (d, 1);
-  g_assert_cmpint (g_date_get_month (d), ==, 2);
-  g_assert_cmpint (g_date_get_day (d), ==, 29);
-  g_assert_cmpint (g_date_get_year (d), ==, 8);
-  g_date_free (d);
+  d = xdate_new_dmy (31, 3, 8);
+  xdate_subtract_months (d, 1);
+  g_assert_cmpint (xdate_get_month (d), ==, 2);
+  g_assert_cmpint (xdate_get_day (d), ==, 29);
+  g_assert_cmpint (xdate_get_year (d), ==, 8);
+  xdate_free (d);
 
-  d = g_date_new_julian (375);
-  g_date_add_months (d, 1);
-  g_assert_cmpint (g_date_get_month (d), ==, 2);
-  g_assert_cmpint (g_date_get_day (d), ==, 10);
-  g_assert_cmpint (g_date_get_year (d), ==, 2);
-  g_date_free (d);
+  d = xdate_new_julian (375);
+  xdate_add_months (d, 1);
+  g_assert_cmpint (xdate_get_month (d), ==, 2);
+  g_assert_cmpint (xdate_get_day (d), ==, 10);
+  g_assert_cmpint (xdate_get_year (d), ==, 2);
+  xdate_free (d);
 
-  d = g_date_new_julian (375);
-  g_date_subtract_months (d, 1);
-  g_assert_cmpint (g_date_get_month (d), ==, 12);
-  g_assert_cmpint (g_date_get_day (d), ==, 10);
-  g_assert_cmpint (g_date_get_year (d), ==, 1);
-  g_date_free (d);
+  d = xdate_new_julian (375);
+  xdate_subtract_months (d, 1);
+  g_assert_cmpint (xdate_get_month (d), ==, 12);
+  g_assert_cmpint (xdate_get_day (d), ==, 10);
+  g_assert_cmpint (xdate_get_year (d), ==, 1);
+  xdate_free (d);
 
-  d = g_date_new_julian (375);
-  g_date_add_years (d, 1);
-  g_assert_cmpint (g_date_get_month (d), ==, 1);
-  g_assert_cmpint (g_date_get_day (d), ==, 10);
-  g_assert_cmpint (g_date_get_year (d), ==, 3);
-  g_date_free (d);
+  d = xdate_new_julian (375);
+  xdate_add_years (d, 1);
+  g_assert_cmpint (xdate_get_month (d), ==, 1);
+  g_assert_cmpint (xdate_get_day (d), ==, 10);
+  g_assert_cmpint (xdate_get_year (d), ==, 3);
+  xdate_free (d);
 
-  d = g_date_new_julian (675);
-  g_date_subtract_years (d, 1);
-  g_assert_cmpint (g_date_get_month (d), ==, 11);
-  g_assert_cmpint (g_date_get_day (d), ==, 6);
-  g_assert_cmpint (g_date_get_year (d), ==, 1);
-  g_date_free (d);
+  d = xdate_new_julian (675);
+  xdate_subtract_years (d, 1);
+  g_assert_cmpint (xdate_get_month (d), ==, 11);
+  g_assert_cmpint (xdate_get_day (d), ==, 6);
+  g_assert_cmpint (xdate_get_year (d), ==, 1);
+  xdate_free (d);
 
-  d = g_date_new_dmy (28, 2, 7);
-  g_date_subtract_years (d, 1);
-  g_assert_cmpint (g_date_get_month (d), ==, 2);
-  g_assert_cmpint (g_date_get_day (d), ==, 28);
-  g_assert_cmpint (g_date_get_year (d), ==, 6);
-  g_date_free (d);
+  d = xdate_new_dmy (28, 2, 7);
+  xdate_subtract_years (d, 1);
+  g_assert_cmpint (xdate_get_month (d), ==, 2);
+  g_assert_cmpint (xdate_get_day (d), ==, 28);
+  g_assert_cmpint (xdate_get_year (d), ==, 6);
+  xdate_free (d);
 
-  d = g_date_new_dmy (29, 2, 8);
-  g_date_subtract_years (d, 1);
-  g_assert_cmpint (g_date_get_month (d), ==, 2);
-  g_assert_cmpint (g_date_get_day (d), ==, 28);
-  g_assert_cmpint (g_date_get_year (d), ==, 7);
-  g_date_free (d);
+  d = xdate_new_dmy (29, 2, 8);
+  xdate_subtract_years (d, 1);
+  g_assert_cmpint (xdate_get_month (d), ==, 2);
+  g_assert_cmpint (xdate_get_day (d), ==, 28);
+  g_assert_cmpint (xdate_get_year (d), ==, 7);
+  xdate_free (d);
 
-  d = g_date_new_dmy (1, 1, 1);
-  g_assert_cmpint (g_date_get_iso8601_week_of_year (d), ==, 1);
-  g_date_free (d);
+  d = xdate_new_dmy (1, 1, 1);
+  g_assert_cmpint (xdate_get_iso8601_week_of_year (d), ==, 1);
+  xdate_free (d);
 
-  d = g_date_new_julian (1);
-  g_date_set_year (d, 6);
-  g_assert_cmpint (g_date_get_month (d), ==, 1);
-  g_assert_cmpint (g_date_get_day (d), ==, 1);
-  g_assert_cmpint (g_date_get_year (d), ==, 6);
-  g_date_free (d);
+  d = xdate_new_julian (1);
+  xdate_set_year (d, 6);
+  g_assert_cmpint (xdate_get_month (d), ==, 1);
+  g_assert_cmpint (xdate_get_day (d), ==, 1);
+  g_assert_cmpint (xdate_get_year (d), ==, 6);
+  xdate_free (d);
 
-  d = g_date_new_dmy (1, 1, 1);
-  g_date_set_year (d, 6);
-  g_assert_cmpint (g_date_get_month (d), ==, 1);
-  g_assert_cmpint (g_date_get_day (d), ==, 1);
-  g_assert_cmpint (g_date_get_year (d), ==, 6);
-  g_date_free (d);
+  d = xdate_new_dmy (1, 1, 1);
+  xdate_set_year (d, 6);
+  g_assert_cmpint (xdate_get_month (d), ==, 1);
+  g_assert_cmpint (xdate_get_day (d), ==, 1);
+  g_assert_cmpint (xdate_get_year (d), ==, 6);
+  xdate_free (d);
 
-  d = g_date_new_julian (1);
-  g_date_set_month (d, 6);
-  g_assert_cmpint (g_date_get_month (d), ==, 6);
-  g_assert_cmpint (g_date_get_day (d), ==, 1);
-  g_assert_cmpint (g_date_get_year (d), ==, 1);
-  g_date_free (d);
+  d = xdate_new_julian (1);
+  xdate_set_month (d, 6);
+  g_assert_cmpint (xdate_get_month (d), ==, 6);
+  g_assert_cmpint (xdate_get_day (d), ==, 1);
+  g_assert_cmpint (xdate_get_year (d), ==, 1);
+  xdate_free (d);
 
-  d = g_date_new_dmy (1, 1, 1);
-  g_date_set_month (d, 6);
-  g_assert_cmpint (g_date_get_month (d), ==, 6);
-  g_assert_cmpint (g_date_get_day (d), ==, 1);
-  g_assert_cmpint (g_date_get_year (d), ==, 1);
-  g_date_free (d);
+  d = xdate_new_dmy (1, 1, 1);
+  xdate_set_month (d, 6);
+  g_assert_cmpint (xdate_get_month (d), ==, 6);
+  g_assert_cmpint (xdate_get_day (d), ==, 1);
+  g_assert_cmpint (xdate_get_year (d), ==, 1);
+  xdate_free (d);
 
-  d = g_date_new_julian (1);
-  g_date_set_day (d, 6);
-  g_assert_cmpint (g_date_get_month (d), ==, 1);
-  g_assert_cmpint (g_date_get_day (d), ==, 6);
-  g_assert_cmpint (g_date_get_year (d), ==, 1);
-  g_date_free (d);
+  d = xdate_new_julian (1);
+  xdate_set_day (d, 6);
+  g_assert_cmpint (xdate_get_month (d), ==, 1);
+  g_assert_cmpint (xdate_get_day (d), ==, 6);
+  g_assert_cmpint (xdate_get_year (d), ==, 1);
+  xdate_free (d);
 
-  d = g_date_new_dmy (1, 1, 1);
-  g_date_set_day (d, 6);
-  g_assert_cmpint (g_date_get_month (d), ==, 1);
-  g_assert_cmpint (g_date_get_day (d), ==, 6);
-  g_assert_cmpint (g_date_get_year (d), ==, 1);
-  g_date_free (d);
+  d = xdate_new_dmy (1, 1, 1);
+  xdate_set_day (d, 6);
+  g_assert_cmpint (xdate_get_month (d), ==, 1);
+  g_assert_cmpint (xdate_get_day (d), ==, 6);
+  g_assert_cmpint (xdate_get_year (d), ==, 1);
+  xdate_free (d);
 
-  d = g_date_new_julian (1);
-  g_assert_cmpint (g_date_get_month (d), ==, 1);
-  g_date_free (d);
+  d = xdate_new_julian (1);
+  g_assert_cmpint (xdate_get_month (d), ==, 1);
+  xdate_free (d);
 
   /* Correct usage */
-  d = g_date_new ();
+  d = xdate_new ();
 
   /* today */
   now = time (NULL);
   g_assert_cmpint (now, !=, (time_t) -1);
-  g_date_set_time (d, now);
-  g_assert_true (g_date_valid (d));
+  xdate_set_time (d, now);
+  g_assert_true (xdate_valid (d));
 
   /* Unix epoch */
-  g_date_set_time (d, 1);
-  g_assert_true (g_date_valid (d));
+  xdate_set_time (d, 1);
+  g_assert_true (xdate_valid (d));
 
   tv.tv_sec = 0;
   tv.tv_usec = 0;
-  g_date_set_time_val (d, &tv);
-  g_assert_true (g_date_valid (d));
+  xdate_set_time_val (d, &tv);
+  g_assert_true (xdate_valid (d));
 
   /* Julian day 1 */
-  g_date_set_julian (d, 1);
-  g_assert_true (g_date_valid (d));
+  xdate_set_julian (d, 1);
+  g_assert_true (xdate_valid (d));
 
-  g_date_set_year (d, 3);
-  g_date_set_day (d, 3);
-  g_date_set_month (d, 3);
-  g_assert_true (g_date_valid (d));
-  g_assert_cmpint (g_date_get_year (d), ==, 3);
-  g_assert_cmpint (g_date_get_month (d), ==, 3);
-  g_assert_cmpint (g_date_get_day (d), ==, 3);
-  g_assert_false (g_date_is_first_of_month (d));
-  g_assert_false (g_date_is_last_of_month (d));
-  g_date_set_day (d, 1);
-  g_assert_true (g_date_is_first_of_month (d));
-  g_date_subtract_days (d, 1);
-  g_assert_true (g_date_is_last_of_month (d));
+  xdate_set_year (d, 3);
+  xdate_set_day (d, 3);
+  xdate_set_month (d, 3);
+  g_assert_true (xdate_valid (d));
+  g_assert_cmpint (xdate_get_year (d), ==, 3);
+  g_assert_cmpint (xdate_get_month (d), ==, 3);
+  g_assert_cmpint (xdate_get_day (d), ==, 3);
+  g_assert_false (xdate_is_first_of_month (d));
+  g_assert_false (xdate_is_last_of_month (d));
+  xdate_set_day (d, 1);
+  g_assert_true (xdate_is_first_of_month (d));
+  xdate_subtract_days (d, 1);
+  g_assert_true (xdate_is_last_of_month (d));
 
   /* Testing some other corner cases */
-  g_date_set_dmy (d, 29, 2, 2000);
-  g_date_subtract_months (d, 2);
-  g_assert_cmpint (g_date_get_month (d), ==, 12);
-  g_assert_cmpint (g_date_get_day (d), ==, 29);
-  g_assert_cmpint (g_date_get_year (d), ==, 1999);
+  xdate_set_dmy (d, 29, 2, 2000);
+  xdate_subtract_months (d, 2);
+  g_assert_cmpint (xdate_get_month (d), ==, 12);
+  g_assert_cmpint (xdate_get_day (d), ==, 29);
+  g_assert_cmpint (xdate_get_year (d), ==, 1999);
 
   /* Attempt to assign a February 29 to a non-leap year */
-  g_date_set_month (d, 2);
-  g_date_set_day (d, 29);
-  g_assert_false (g_date_valid (d));
-  g_date_set_year (d, 3);
-  g_assert_false (g_date_valid (d));
+  xdate_set_month (d, 2);
+  xdate_set_day (d, 29);
+  g_assert_false (xdate_valid (d));
+  xdate_set_year (d, 3);
+  g_assert_false (xdate_valid (d));
 
-  g_date_free (d);
+  xdate_free (d);
 }
 
 static void
 test_strftime (void)
 {
   xsize_t i;
-  GDate *d;
+  xdate_t *d;
   xchar_t buf[101];
   const xchar_t invalid[] = "hello\xffworld%x";
   xchar_t *oldlocale;
@@ -755,7 +755,7 @@ test_strftime (void)
 #endif
   };
 
-  oldlocale = g_strdup (setlocale (LC_ALL, NULL));
+  oldlocale = xstrdup (setlocale (LC_ALL, NULL));
 #ifdef G_OS_WIN32
   old_lcid = GetThreadLocale ();
 #endif
@@ -766,13 +766,13 @@ test_strftime (void)
   SetThreadLocale (MAKELCID (MAKELANGID (LANG_ENGLISH, SUBLANG_ENGLISH_US), SORT_DEFAULT));
 #endif
 
-  d = g_date_new ();
+  d = xdate_new ();
 
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_strftime (buf, sizeof (buf), "%x", d);
+      xdate_strftime (buf, sizeof (buf), "%x", d);
       g_test_assert_expected_messages ();
     }
 
@@ -780,24 +780,24 @@ test_strftime (void)
 #ifndef G_OS_WIN32
   if (g_test_undefined ())
     {
-      g_date_set_dmy (d, 10, 1, 2000);
+      xdate_set_dmy (d, 10, 1, 2000);
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, "*Error*");
-      g_date_strftime (buf, sizeof (buf), invalid, d);
+      xdate_strftime (buf, sizeof (buf), invalid, d);
       g_test_assert_expected_messages ();
       g_assert_cmpstr (buf, ==, "");
     }
 #else
-  g_date_set_dmy (d, 10, 1, 2000);
-  g_date_strftime (buf, sizeof (buf), invalid, d);
+  xdate_set_dmy (d, 10, 1, 2000);
+  xdate_strftime (buf, sizeof (buf), invalid, d);
   g_assert_cmpstr (buf, ==, "");
 #endif
 
   /* Test positive cases */
-  g_date_set_dmy (d, 1, 1, 1);
+  xdate_set_dmy (d, 1, 1, 1);
 
   for (i = 0; i < G_N_ELEMENTS (strftime_checks); i++)
     {
-      g_date_strftime (buf, sizeof (buf), strftime_checks[i].format, d);
+      xdate_strftime (buf, sizeof (buf), strftime_checks[i].format, d);
       g_assert_cmpstr (buf, ==, strftime_checks[i].expect);
     }
 
@@ -808,10 +808,10 @@ test_strftime (void)
    * or time zone abbreviation, depending on registry settings; no characters
    * if time zone is unknown".
    */
-  g_assert_cmpint (g_date_strftime (buf, sizeof (buf), "%Z", d), !=, 0);
+  g_assert_cmpint (xdate_strftime (buf, sizeof (buf), "%Z", d), !=, 0);
 #endif
 
-  g_date_free (d);
+  xdate_free (d);
 
   setlocale (LC_ALL, oldlocale);
   g_free (oldlocale);
@@ -823,14 +823,14 @@ test_strftime (void)
 static void
 test_two_digit_years (void)
 {
-  GDate *d;
+  xdate_t *d;
   xchar_t buf[101];
   xchar_t *old_locale;
 #ifdef G_OS_WIN32
   LCID old_lcid;
 #endif
 
-  old_locale = g_strdup (setlocale (LC_ALL, NULL));
+  old_locale = xstrdup (setlocale (LC_ALL, NULL));
 #ifdef G_OS_WIN32
   old_lcid = GetThreadLocale ();
 #endif
@@ -841,29 +841,29 @@ test_two_digit_years (void)
   SetThreadLocale (MAKELCID (MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), SORT_DEFAULT));
 #endif
 
-  d = g_date_new ();
+  d = xdate_new ();
 
   /* Check two digit years */
-  g_date_set_dmy (d, 10, 10, 1976);
-  g_date_strftime (buf, sizeof (buf), "%D", d);
+  xdate_set_dmy (d, 10, 10, 1976);
+  xdate_strftime (buf, sizeof (buf), "%D", d);
   g_assert_cmpstr (buf, ==, "10/10/76");
-  g_date_set_parse (d, buf);
-  g_assert_cmpint (g_date_get_month (d), ==, 10);
-  g_assert_cmpint (g_date_get_day (d), ==, 10);
-  g_assert_true ((g_date_get_year (d) == 1976) ||
-                 (g_date_get_year (d) == 76));
+  xdate_set_parse (d, buf);
+  g_assert_cmpint (xdate_get_month (d), ==, 10);
+  g_assert_cmpint (xdate_get_day (d), ==, 10);
+  g_assert_true ((xdate_get_year (d) == 1976) ||
+                 (xdate_get_year (d) == 76));
 
   /* Check two digit years below 100 */
-  g_date_set_dmy (d, 10, 10, 29);
-  g_date_strftime (buf, sizeof (buf), "%D", d);
+  xdate_set_dmy (d, 10, 10, 29);
+  xdate_strftime (buf, sizeof (buf), "%D", d);
   g_assert_cmpstr (buf, ==, "10/10/29");
-  g_date_set_parse (d, buf);
-  g_assert_cmpint (g_date_get_month (d), ==, 10);
-  g_assert_cmpint (g_date_get_day (d), ==, 10);
-  g_assert_true ((g_date_get_year (d) == 2029) ||
-                 (g_date_get_year (d) == 29));
+  xdate_set_parse (d, buf);
+  g_assert_cmpint (xdate_get_month (d), ==, 10);
+  g_assert_cmpint (xdate_get_day (d), ==, 10);
+  g_assert_true ((xdate_get_year (d) == 2029) ||
+                 (xdate_get_year (d) == 29));
 
-  g_date_free (d);
+  xdate_free (d);
 
   setlocale (LC_ALL, old_locale);
   g_free (old_locale);
@@ -875,149 +875,149 @@ test_two_digit_years (void)
 static void
 test_parse (void)
 {
-  GDate *d;
+  xdate_t *d;
   xchar_t buf[101];
 
-  d = g_date_new ();
+  d = xdate_new ();
 
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_set_parse (NULL, "");
+      xdate_set_parse (NULL, "");
       g_test_assert_expected_messages ();
     }
 
-  g_date_set_time (d, 1);
-  g_assert_true (g_date_valid (d));
-  g_date_strftime (buf, sizeof (buf), "Today is a %A, in the month of %B, %x", d);
-  g_date_set_parse (d, buf);
+  xdate_set_time (d, 1);
+  g_assert_true (xdate_valid (d));
+  xdate_strftime (buf, sizeof (buf), "Today is a %A, in the month of %B, %x", d);
+  xdate_set_parse (d, buf);
 
   if (g_test_undefined ())
     {
-      /* g_date_strftime() */
+      /* xdate_strftime() */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_strftime (NULL, 100, "%x", d);
+      xdate_strftime (NULL, 100, "%x", d);
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_strftime (buf, 0, "%x", d);
+      xdate_strftime (buf, 0, "%x", d);
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_strftime (buf, sizeof (buf), NULL, d);
+      xdate_strftime (buf, sizeof (buf), NULL, d);
       g_test_assert_expected_messages ();
     }
 
-  g_date_set_julian (d, 1);
-  g_assert_true (g_date_valid (d));
+  xdate_set_julian (d, 1);
+  g_assert_true (xdate_valid (d));
 #ifndef G_OS_WIN32
   /* Windows FILETIME does not support dates before Jan 1 1601,
      so we can't strftime() the beginning of the "Julian" epoch. */
-  g_date_strftime (buf, sizeof (buf), "Today is a %A, in the month of %B, %x", d);
-  g_date_set_parse (d, buf);
+  xdate_strftime (buf, sizeof (buf), "Today is a %A, in the month of %B, %x", d);
+  xdate_set_parse (d, buf);
 #endif
 
-  g_date_set_dmy (d, 10, 1, 2000);
-  g_assert_true (g_date_valid (d));
-  g_date_strftime (buf, sizeof (buf), "%x", d);
-  g_date_set_parse (d, buf);
-  g_assert_cmpint (g_date_get_month (d), ==, 1);
-  g_assert_cmpint (g_date_get_day (d), ==, 10);
-  g_assert_cmpint (g_date_get_year (d), ==, 2000);
+  xdate_set_dmy (d, 10, 1, 2000);
+  g_assert_true (xdate_valid (d));
+  xdate_strftime (buf, sizeof (buf), "%x", d);
+  xdate_set_parse (d, buf);
+  g_assert_cmpint (xdate_get_month (d), ==, 1);
+  g_assert_cmpint (xdate_get_day (d), ==, 10);
+  g_assert_cmpint (xdate_get_year (d), ==, 2000);
 
-  g_date_set_parse (d, "2001 10 1");
-  g_assert_true (g_date_valid (d));
-  g_assert_cmpint (g_date_get_month (d), ==, 10);
-  g_assert_cmpint (g_date_get_day (d), ==, 1);
-  g_assert_cmpint (g_date_get_year (d), ==, 2001);
+  xdate_set_parse (d, "2001 10 1");
+  g_assert_true (xdate_valid (d));
+  g_assert_cmpint (xdate_get_month (d), ==, 10);
+  g_assert_cmpint (xdate_get_day (d), ==, 1);
+  g_assert_cmpint (xdate_get_year (d), ==, 2001);
 
-  g_date_set_parse (d, "2001 10");
-  g_assert_false (g_date_valid (d));
+  xdate_set_parse (d, "2001 10");
+  g_assert_false (xdate_valid (d));
 
-  g_date_set_parse (d, "2001 10 1 1");
-  g_assert_false (g_date_valid (d));
+  xdate_set_parse (d, "2001 10 1 1");
+  g_assert_false (xdate_valid (d));
 
-  g_date_set_parse (d, "2001-10-01");
-  g_assert_true (g_date_valid (d));
-  g_assert_cmpint (g_date_get_month (d), ==, 10);
-  g_assert_cmpint (g_date_get_day (d), ==, 1);
-  g_assert_cmpint (g_date_get_year (d), ==, 2001);
+  xdate_set_parse (d, "2001-10-01");
+  g_assert_true (xdate_valid (d));
+  g_assert_cmpint (xdate_get_month (d), ==, 10);
+  g_assert_cmpint (xdate_get_day (d), ==, 1);
+  g_assert_cmpint (xdate_get_year (d), ==, 2001);
 
-  g_date_set_parse (d, "March 1999");
-  g_assert_true (g_date_valid (d));
-  g_assert_cmpint (g_date_get_month (d), ==, 3);
-  g_assert_cmpint (g_date_get_day (d), ==, 1);
-  g_assert_cmpint (g_date_get_year (d), ==, 1999);
+  xdate_set_parse (d, "March 1999");
+  g_assert_true (xdate_valid (d));
+  g_assert_cmpint (xdate_get_month (d), ==, 3);
+  g_assert_cmpint (xdate_get_day (d), ==, 1);
+  g_assert_cmpint (xdate_get_year (d), ==, 1999);
 
-  g_date_set_parse (d, "October 98");
-  g_assert_true (g_date_valid (d));
-  g_assert_cmpint (g_date_get_month (d), ==, 10);
-  g_assert_cmpint (g_date_get_day (d), ==, 1);
-  g_assert_cmpint (g_date_get_year (d), ==, 98);
+  xdate_set_parse (d, "October 98");
+  g_assert_true (xdate_valid (d));
+  g_assert_cmpint (xdate_get_month (d), ==, 10);
+  g_assert_cmpint (xdate_get_day (d), ==, 1);
+  g_assert_cmpint (xdate_get_year (d), ==, 98);
 
-  g_date_set_parse (d, "oCT 98");
-  g_assert_true (g_date_valid (d));
-  g_assert_cmpint (g_date_get_month (d), ==, 10);
-  g_assert_cmpint (g_date_get_day (d), ==, 1);
-  g_assert_cmpint (g_date_get_year (d), ==, 98);
+  xdate_set_parse (d, "oCT 98");
+  g_assert_true (xdate_valid (d));
+  g_assert_cmpint (xdate_get_month (d), ==, 10);
+  g_assert_cmpint (xdate_get_day (d), ==, 1);
+  g_assert_cmpint (xdate_get_year (d), ==, 98);
 
-  g_date_set_parse (d, "10/24/98");
-  g_assert_true (g_date_valid (d));
-  g_assert_cmpint (g_date_get_month (d), ==, 10);
-  g_assert_cmpint (g_date_get_day (d), ==, 24);
-  g_assert_true (g_date_get_year (d) == 1998 ||
-                 g_date_get_year (d) == 98);
+  xdate_set_parse (d, "10/24/98");
+  g_assert_true (xdate_valid (d));
+  g_assert_cmpint (xdate_get_month (d), ==, 10);
+  g_assert_cmpint (xdate_get_day (d), ==, 24);
+  g_assert_true (xdate_get_year (d) == 1998 ||
+                 xdate_get_year (d) == 98);
 
-  g_date_set_parse (d, "10 -- 24 -- 98");
-  g_assert_true (g_date_valid (d));
-  g_assert_cmpint (g_date_get_month (d), ==, 10);
-  g_assert_cmpint (g_date_get_day (d), ==, 24);
-  g_assert_true (g_date_get_year (d) == 1998 ||
-                 g_date_get_year (d) == 98);
+  xdate_set_parse (d, "10 -- 24 -- 98");
+  g_assert_true (xdate_valid (d));
+  g_assert_cmpint (xdate_get_month (d), ==, 10);
+  g_assert_cmpint (xdate_get_day (d), ==, 24);
+  g_assert_true (xdate_get_year (d) == 1998 ||
+                 xdate_get_year (d) == 98);
 
-  g_date_set_parse (d, "10/24/1998");
-  g_assert_true (g_date_valid (d));
-  g_assert_cmpint (g_date_get_month (d), ==, 10);
-  g_assert_cmpint (g_date_get_day (d), ==, 24);
-  g_assert_cmpint (g_date_get_year (d), ==, 1998);
+  xdate_set_parse (d, "10/24/1998");
+  g_assert_true (xdate_valid (d));
+  g_assert_cmpint (xdate_get_month (d), ==, 10);
+  g_assert_cmpint (xdate_get_day (d), ==, 24);
+  g_assert_cmpint (xdate_get_year (d), ==, 1998);
 
-  g_date_set_parse (d, "October 24, 1998");
-  g_assert_true (g_date_valid (d));
-  g_assert_cmpint (g_date_get_month (d), ==, 10);
-  g_assert_cmpint (g_date_get_day (d), ==, 24);
-  g_assert_cmpint (g_date_get_year (d), ==, 1998);
+  xdate_set_parse (d, "October 24, 1998");
+  g_assert_true (xdate_valid (d));
+  g_assert_cmpint (xdate_get_month (d), ==, 10);
+  g_assert_cmpint (xdate_get_day (d), ==, 24);
+  g_assert_cmpint (xdate_get_year (d), ==, 1998);
 
-  g_date_set_parse (d, "10 Sep 1087");
-  g_assert_true (g_date_valid (d));
-  g_assert_cmpint (g_date_get_month (d), ==, 9);
-  g_assert_cmpint (g_date_get_day (d), ==, 10);
-  g_assert_cmpint (g_date_get_year (d), ==, 1087);
+  xdate_set_parse (d, "10 Sep 1087");
+  g_assert_true (xdate_valid (d));
+  g_assert_cmpint (xdate_get_month (d), ==, 9);
+  g_assert_cmpint (xdate_get_day (d), ==, 10);
+  g_assert_cmpint (xdate_get_year (d), ==, 1087);
 
-  g_date_set_parse (d, "19990301");
-  g_assert_true (g_date_valid (d));
-  g_assert_cmpint (g_date_get_month (d), ==, 3);
-  g_assert_cmpint (g_date_get_day (d), ==, 1);
-  g_assert_cmpint (g_date_get_year (d), ==, 1999);
+  xdate_set_parse (d, "19990301");
+  g_assert_true (xdate_valid (d));
+  g_assert_cmpint (xdate_get_month (d), ==, 3);
+  g_assert_cmpint (xdate_get_day (d), ==, 1);
+  g_assert_cmpint (xdate_get_year (d), ==, 1999);
 
-  g_date_set_parse (d, "981024");
-  g_assert_true (g_date_valid (d));
-  g_assert_cmpint (g_date_get_month (d), ==, 10);
-  g_assert_cmpint (g_date_get_day (d), ==, 24);
-  g_assert_true (g_date_get_year (d) == 1998 ||
-                 g_date_get_year (d) == 98);
+  xdate_set_parse (d, "981024");
+  g_assert_true (xdate_valid (d));
+  g_assert_cmpint (xdate_get_month (d), ==, 10);
+  g_assert_cmpint (xdate_get_day (d), ==, 24);
+  g_assert_true (xdate_get_year (d) == 1998 ||
+                 xdate_get_year (d) == 98);
 
   /* Catching some invalid dates */
-  g_date_set_parse (d, "20011320");
-  g_assert_false (g_date_valid (d));
+  xdate_set_parse (d, "20011320");
+  g_assert_false (xdate_valid (d));
 
-  g_date_set_parse (d, "19998 10 1");
-  g_assert_false (g_date_valid (d));
+  xdate_set_parse (d, "19998 10 1");
+  g_assert_false (xdate_valid (d));
 
-  g_date_free (d);
+  xdate_free (d);
 }
 
 static void
@@ -1036,25 +1036,25 @@ test_parse_invalid (void)
 
   for (i = 0; i < G_N_ELEMENTS (strs); i++)
     {
-      GDate *d = g_date_new ();
+      xdate_t *d = xdate_new ();
 
       g_test_message ("Test %" G_GSIZE_FORMAT, i);
-      g_date_set_parse (d, strs[i]);
+      xdate_set_parse (d, strs[i]);
 
-      g_assert_false (g_date_valid (d));
+      g_assert_false (xdate_valid (d));
 
-      g_date_free (d);
+      xdate_free (d);
     }
 }
 
 static void
 test_parse_locale_change (void)
 {
-  /* Checks that g_date_set_parse correctly changes locale specific data as
+  /* Checks that xdate_set_parse correctly changes locale specific data as
    * necessary. In this particular case year adjustment, as Thai calendar is
    * 543 years ahead of the Gregorian calendar. */
 
-  GDate date;
+  xdate_t date;
 
   if (setlocale (LC_ALL, "th_TH") == NULL)
     {
@@ -1062,19 +1062,19 @@ test_parse_locale_change (void)
       return;
     }
 
-  g_date_set_parse (&date, "04/07/2519");
+  xdate_set_parse (&date, "04/07/2519");
 
   setlocale (LC_ALL, "C");
-  g_date_set_parse (&date, "07/04/76");
-  g_assert_cmpint (g_date_get_day (&date), ==, 4);
-  g_assert_cmpint (g_date_get_month (&date), ==, 7);
+  xdate_set_parse (&date, "07/04/76");
+  g_assert_cmpint (xdate_get_day (&date), ==, 4);
+  g_assert_cmpint (xdate_get_month (&date), ==, 7);
 #ifdef G_OS_WIN32
-  /* Windows g_date_strftime() implementation doesn't use twodigit_years */
+  /* Windows xdate_strftime() implementation doesn't use twodigit_years */
   /* FIXME: check if the function can be changed to return 4 digit years instead
    * See https://gitlab.gnome.org/GNOME/glib/-/issues/2604 */
-  g_assert_cmpint (g_date_get_year (&date), ==, 76);
+  g_assert_cmpint (xdate_get_year (&date), ==, 76);
 #else
-  g_assert_cmpint (g_date_get_year (&date), ==, 1976);
+  g_assert_cmpint (xdate_get_year (&date), ==, 1976);
 #endif
 
   setlocale (LC_ALL, "");
@@ -1083,7 +1083,7 @@ test_parse_locale_change (void)
 static void
 test_month_substring (void)
 {
-  GDate date;
+  xdate_t date;
 #ifdef G_OS_WIN32
   LCID old_lcid;
 #endif
@@ -1107,17 +1107,17 @@ test_month_substring (void)
    * abbreviated as "sie". The former used to be confused with the latter
    * because "sie" is a substring of "wrzesień" and was matched first. */
 
-  g_date_set_parse (&date, "wrzesień 2018");
-  g_assert_true (g_date_valid (&date));
-  g_assert_cmpint (g_date_get_month (&date), ==, G_DATE_SEPTEMBER);
+  xdate_set_parse (&date, "wrzesień 2018");
+  g_assert_true (xdate_valid (&date));
+  g_assert_cmpint (xdate_get_month (&date), ==, G_DATE_SEPTEMBER);
 
-  g_date_set_parse (&date, "sie 2018");
-  g_assert_true (g_date_valid (&date));
-  g_assert_cmpint (g_date_get_month (&date), ==, G_DATE_AUGUST);
+  xdate_set_parse (&date, "sie 2018");
+  g_assert_true (xdate_valid (&date));
+  g_assert_cmpint (xdate_get_month (&date), ==, G_DATE_AUGUST);
 
-  g_date_set_parse (&date, "sierpień 2018");
-  g_assert_true (g_date_valid (&date));
-  g_assert_cmpint (g_date_get_month (&date), ==, G_DATE_AUGUST);
+  xdate_set_parse (&date, "sierpień 2018");
+  g_assert_true (xdate_valid (&date));
+  g_assert_cmpint (xdate_get_month (&date), ==, G_DATE_AUGUST);
 
 #ifdef G_OS_WIN32
   SetThreadLocale (old_lcid);
@@ -1130,7 +1130,7 @@ static void
 test_month_names (void)
 {
 #if defined(HAVE_LANGINFO_ABALTMON) || defined(G_OS_WIN32)
-  GDate *gdate;
+  xdate_t *gdate;
   xchar_t buf[101];
   xchar_t *oldlocale;
 #ifdef G_OS_WIN32
@@ -1153,11 +1153,11 @@ test_month_names (void)
 
   /* This test can only work (on non-Windows platforms) if libc supports
    * the %OB (etc.) format placeholders. If it doesn’t, strftime() (and hence
-   * g_date_strftime()) will return the placeholder unsubstituted.
-   * g_date_strftime() explicitly documents that it doesn’t provide any more
+   * xdate_strftime()) will return the placeholder unsubstituted.
+   * xdate_strftime() explicitly documents that it doesn’t provide any more
    * format placeholders than the system strftime(), so we should skip the test
    * in that case. If people need %OB support, they should depend on a suitable
-   * version of libc, or use g_date_time_format(). Note: a test for a support
+   * version of libc, or use xdate_time_format(). Note: a test for a support
    * of _NL_ABALTMON_* is not strictly the same as checking for %OB support.
    * Some platforms (BSD, OS X) support %OB while _NL_ABALTMON_* and %Ob
    * are supported only by glibc 2.27 and newer. But we don’t care about BSD
@@ -1171,29 +1171,29 @@ test_month_names (void)
   G_STMT_START                                         \
   {                                                    \
     xchar_t *o_casefold, *buf_casefold;                  \
-    g_date_set_dmy (gdate, d, m, y);                   \
-    g_date_strftime (buf, sizeof (buf), f, gdate);     \
-    buf_casefold = g_utf8_casefold (buf, -1);          \
-    o_casefold = g_utf8_casefold ((o), -1);            \
+    xdate_set_dmy (gdate, d, m, y);                   \
+    xdate_strftime (buf, sizeof (buf), f, gdate);     \
+    buf_casefold = xutf8_casefold (buf, -1);          \
+    o_casefold = xutf8_casefold ((o), -1);            \
     g_assert_cmpstr (buf_casefold, ==, o_casefold);    \
     g_free (buf_casefold);                             \
     g_free (o_casefold);                               \
-    g_date_set_parse (gdate, buf);                     \
-    g_assert_true (g_date_valid (gdate));              \
-    g_assert_cmpint (g_date_get_day (gdate), ==, d);   \
-    g_assert_cmpint (g_date_get_month (gdate), ==, m); \
-    g_assert_cmpint (g_date_get_year (gdate), ==, y);  \
+    xdate_set_parse (gdate, buf);                     \
+    g_assert_true (xdate_valid (gdate));              \
+    g_assert_cmpint (xdate_get_day (gdate), ==, d);   \
+    g_assert_cmpint (xdate_get_month (gdate), ==, m); \
+    g_assert_cmpint (xdate_get_year (gdate), ==, y);  \
   }                                                    \
   G_STMT_END
 
-  oldlocale = g_strdup (setlocale (LC_ALL, NULL));
+  oldlocale = xstrdup (setlocale (LC_ALL, NULL));
 #ifdef G_OS_WIN32
   old_lcid = GetThreadLocale ();
 #endif
 
-  gdate = g_date_new ();
+  gdate = xdate_new ();
 
-  /* Note: Windows implementation of g_date_strftime() does not support
+  /* Note: Windows implementation of xdate_strftime() does not support
    * "-" format modifier (e.g., "%-d", "%-e") so we will not use it.
    */
 
@@ -1368,7 +1368,7 @@ test_month_names (void)
   else
     g_test_skip ("locale ru_RU not available, skipping Russian month names test");
 
-  g_date_free (gdate);
+  xdate_free (gdate);
 
   setlocale (LC_ALL, oldlocale);
 #ifdef G_OS_WIN32
@@ -1379,25 +1379,25 @@ test_month_names (void)
 }
 
 static void
-test_year (gconstpointer t)
+test_year (xconstpointer t)
 {
   GDateYear y = GPOINTER_TO_INT (t);
   GDateMonth m;
   GDateDay day;
-  guint32 j;
-  GDate *d;
+  xuint32_t j;
+  xdate_t *d;
   xint_t i;
-  GDate tmp;
+  xdate_t tmp;
 
-  guint32 first_day_of_year = G_DATE_BAD_JULIAN;
-  guint16 days_in_year = g_date_is_leap_year (y) ? 366 : 365;
+  xuint32_t first_day_of_year = G_DATE_BAD_JULIAN;
+  xuint16_t days_in_year = xdate_is_leap_year (y) ? 366 : 365;
   xuint_t   sunday_week_of_year = 0;
-  xuint_t   sunday_weeks_in_year = g_date_get_sunday_weeks_in_year (y);
+  xuint_t   sunday_weeks_in_year = xdate_get_sunday_weeks_in_year (y);
   xuint_t   monday_week_of_year = 0;
-  xuint_t   monday_weeks_in_year = g_date_get_monday_weeks_in_year (y);
+  xuint_t   monday_weeks_in_year = xdate_get_monday_weeks_in_year (y);
   xuint_t   iso8601_week_of_year = 0;
 
-  g_assert_true (g_date_valid_year (y));
+  g_assert_true (xdate_valid_year (y));
   /* Years ought to have roundabout 52 weeks */
   g_assert (sunday_weeks_in_year == 52 || sunday_weeks_in_year == 53);
   g_assert (monday_weeks_in_year == 52 || monday_weeks_in_year == 53);
@@ -1405,132 +1405,132 @@ test_year (gconstpointer t)
   m = 1;
   while (m < 13)
     {
-      guint8 dim = g_date_get_days_in_month (m, y);
-      GDate days[31];
+      xuint8_t dim = xdate_get_days_in_month (m, y);
+      xdate_t days[31];
 
-      g_date_clear (days, 31);
+      xdate_clear (days, 31);
 
       g_assert (dim > 0 && dim < 32);
-      g_assert_true (g_date_valid_month (m));
+      g_assert_true (xdate_valid_month (m));
 
       day = 1;
       while (day <= dim)
         {
-          g_assert_true (g_date_valid_dmy (day, m, y));
+          g_assert_true (xdate_valid_dmy (day, m, y));
 
           d = &days[day - 1];
-          g_assert_false (g_date_valid (d));
+          g_assert_false (xdate_valid (d));
 
-          g_date_set_dmy (d, day, m, y);
+          xdate_set_dmy (d, day, m, y);
 
-          g_assert_true (g_date_valid (d));
+          g_assert_true (xdate_valid (d));
 
           if (m == G_DATE_JANUARY && day == 1)
-            first_day_of_year = g_date_get_julian (d);
+            first_day_of_year = xdate_get_julian (d);
 
           g_assert_cmpint (first_day_of_year, !=, G_DATE_BAD_JULIAN);
 
-          g_assert_cmpint (g_date_get_month (d), ==, m);
-          g_assert_cmpint (g_date_get_year (d), ==, y);
-          g_assert_cmpint (g_date_get_day (d), ==, day);
+          g_assert_cmpint (xdate_get_month (d), ==, m);
+          g_assert_cmpint (xdate_get_year (d), ==, y);
+          g_assert_cmpint (xdate_get_day (d), ==, day);
 
-          g_assert_cmpint (g_date_get_julian (d) + 1 - first_day_of_year,
+          g_assert_cmpint (xdate_get_julian (d) + 1 - first_day_of_year,
                            ==,
-                           g_date_get_day_of_year (d));
+                           xdate_get_day_of_year (d));
 
           if (m == G_DATE_DECEMBER && day == 31)
-            g_assert_cmpint (g_date_get_day_of_year (d), ==, days_in_year);
+            g_assert_cmpint (xdate_get_day_of_year (d), ==, days_in_year);
 
-          g_assert_cmpint (g_date_get_day_of_year (d), <=, days_in_year);
-          g_assert_cmpint (g_date_get_monday_week_of_year (d),
+          g_assert_cmpint (xdate_get_day_of_year (d), <=, days_in_year);
+          g_assert_cmpint (xdate_get_monday_week_of_year (d),
                            <=, monday_weeks_in_year);
-          g_assert_cmpint (g_date_get_monday_week_of_year (d),
+          g_assert_cmpint (xdate_get_monday_week_of_year (d),
                            >=, monday_week_of_year);
 
-          if (g_date_get_weekday(d) == G_DATE_MONDAY)
+          if (xdate_get_weekday(d) == G_DATE_MONDAY)
             {
-              g_assert_cmpint (g_date_get_monday_week_of_year (d) -
+              g_assert_cmpint (xdate_get_monday_week_of_year (d) -
                                    monday_week_of_year,
                                ==, 1);
               if ((m == G_DATE_JANUARY && day <= 4) ||
                   (m == G_DATE_DECEMBER && day >= 29))
-                g_assert_cmpint (g_date_get_iso8601_week_of_year (d),
+                g_assert_cmpint (xdate_get_iso8601_week_of_year (d),
                                  ==, 1);
               else
-                g_assert_cmpint (g_date_get_iso8601_week_of_year (d) -
+                g_assert_cmpint (xdate_get_iso8601_week_of_year (d) -
                                      iso8601_week_of_year,
                                  ==, 1);
             }
           else
             {
-              g_assert_cmpint (g_date_get_monday_week_of_year (d) -
+              g_assert_cmpint (xdate_get_monday_week_of_year (d) -
                                    monday_week_of_year,
                                ==, 0);
               if (!(day == 1 && m == G_DATE_JANUARY))
-                g_assert_cmpint (g_date_get_iso8601_week_of_year (d) -
+                g_assert_cmpint (xdate_get_iso8601_week_of_year (d) -
                                      iso8601_week_of_year,
                                  ==, 0);
             }
 
-          monday_week_of_year = g_date_get_monday_week_of_year (d);
-          iso8601_week_of_year = g_date_get_iso8601_week_of_year (d);
+          monday_week_of_year = xdate_get_monday_week_of_year (d);
+          iso8601_week_of_year = xdate_get_iso8601_week_of_year (d);
 
-          g_assert_cmpint (g_date_get_sunday_week_of_year (d),
+          g_assert_cmpint (xdate_get_sunday_week_of_year (d),
                            <=, sunday_weeks_in_year);
-          g_assert_cmpint (g_date_get_sunday_week_of_year (d),
+          g_assert_cmpint (xdate_get_sunday_week_of_year (d),
                            >=, sunday_week_of_year);
-          if (g_date_get_weekday(d) == G_DATE_SUNDAY)
-            g_assert_cmpint (g_date_get_sunday_week_of_year (d) -
+          if (xdate_get_weekday(d) == G_DATE_SUNDAY)
+            g_assert_cmpint (xdate_get_sunday_week_of_year (d) -
                                  sunday_week_of_year,
                              ==, 1);
           else
-            g_assert_cmpint (g_date_get_sunday_week_of_year (d) -
+            g_assert_cmpint (xdate_get_sunday_week_of_year (d) -
                                  sunday_week_of_year,
                              ==, 0);
 
-          sunday_week_of_year = g_date_get_sunday_week_of_year (d);
+          sunday_week_of_year = xdate_get_sunday_week_of_year (d);
 
-          g_assert_cmpint (g_date_compare (d, d), ==, 0);
+          g_assert_cmpint (xdate_compare (d, d), ==, 0);
 
           i = 1;
           while (i < 402) /* Need to get 400 year increments in */
             {
               tmp = *d;
-              g_date_add_days (d, i);
-              g_assert_cmpint (g_date_compare (d, &tmp), >, 0);
-              g_date_subtract_days (d, i);
-              g_assert_cmpint (g_date_get_day (d), ==, day);
-              g_assert_cmpint (g_date_get_month (d), ==, m);
-              g_assert_cmpint (g_date_get_year (d), ==, y);
+              xdate_add_days (d, i);
+              g_assert_cmpint (xdate_compare (d, &tmp), >, 0);
+              xdate_subtract_days (d, i);
+              g_assert_cmpint (xdate_get_day (d), ==, day);
+              g_assert_cmpint (xdate_get_month (d), ==, m);
+              g_assert_cmpint (xdate_get_year (d), ==, y);
 
               tmp = *d;
-              g_date_add_months (d, i);
-              g_assert_cmpint (g_date_compare (d, &tmp), >, 0);
-              g_date_subtract_months (d, i);
-              g_assert_cmpint (g_date_get_month (d), ==, m);
-              g_assert_cmpint (g_date_get_year (d), ==, y);
+              xdate_add_months (d, i);
+              g_assert_cmpint (xdate_compare (d, &tmp), >, 0);
+              xdate_subtract_months (d, i);
+              g_assert_cmpint (xdate_get_month (d), ==, m);
+              g_assert_cmpint (xdate_get_year (d), ==, y);
 
               if (day < 29)
-                g_assert_cmpint (g_date_get_day (d), ==, day);
+                g_assert_cmpint (xdate_get_day (d), ==, day);
               else
-                g_date_set_day (d, day);
+                xdate_set_day (d, day);
 
               tmp = *d;
-              g_date_add_years (d, i);
-              g_assert_cmpint (g_date_compare (d, &tmp), >, 0);
-              g_date_subtract_years (d, i);
-              g_assert_cmpint (g_date_get_month (d), ==, m);
-              g_assert_cmpint (g_date_get_year (d), ==, y);
+              xdate_add_years (d, i);
+              g_assert_cmpint (xdate_compare (d, &tmp), >, 0);
+              xdate_subtract_years (d, i);
+              g_assert_cmpint (xdate_get_month (d), ==, m);
+              g_assert_cmpint (xdate_get_year (d), ==, y);
 
               if (m != 2 && day != 29)
-                g_assert_cmpint (g_date_get_day (d), ==, day);
+                g_assert_cmpint (xdate_get_day (d), ==, day);
               else
-                g_date_set_day (d, day); /* reset */
+                xdate_set_day (d, day); /* reset */
 
               i += 10;
             }
 
-          j = g_date_get_julian (d);
+          j = xdate_get_julian (d);
 
           ++day;
         }
@@ -1538,157 +1538,157 @@ test_year (gconstpointer t)
    }
 
   /* at this point, d is the last day of year y */
-  g_date_set_dmy (&tmp, 1, 1, y + 1);
-  g_assert_cmpint (j + 1, ==, g_date_get_julian (&tmp));
+  xdate_set_dmy (&tmp, 1, 1, y + 1);
+  g_assert_cmpint (j + 1, ==, xdate_get_julian (&tmp));
 
-  g_date_add_days (&tmp, 1);
-  g_assert_cmpint (j + 2, ==, g_date_get_julian (&tmp));
+  xdate_add_days (&tmp, 1);
+  g_assert_cmpint (j + 2, ==, xdate_get_julian (&tmp));
 }
 
 static void
 test_clamp (void)
 {
-  GDate *d, *d1, *d2, *o;
+  xdate_t *d, *d1, *d2, *o;
 
-  d = g_date_new ();
-  d1 = g_date_new ();
-  d2 = g_date_new ();
+  d = xdate_new ();
+  d1 = xdate_new ();
+  d2 = xdate_new ();
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_clamp (d, d1, d2);
+      xdate_clamp (d, d1, d2);
       g_test_assert_expected_messages ();
     }
 
-  g_date_set_dmy (d, 1, 1, 1);
-  g_date_clamp (d, NULL, NULL);
+  xdate_set_dmy (d, 1, 1, 1);
+  xdate_clamp (d, NULL, NULL);
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_clamp (d, d1, NULL);
+      xdate_clamp (d, d1, NULL);
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_clamp (d, d1, d2);
+      xdate_clamp (d, d1, d2);
       g_test_assert_expected_messages ();
     }
 
-  g_date_set_dmy (d1, 1, 1, 1970);
+  xdate_set_dmy (d1, 1, 1, 1970);
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_clamp (d, d1, d2);
+      xdate_clamp (d, d1, d2);
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_clamp (d, NULL, d2);
+      xdate_clamp (d, NULL, d2);
       g_test_assert_expected_messages ();
     }
 
-  g_date_set_dmy (d2, 1, 1, 1980);
+  xdate_set_dmy (d2, 1, 1, 1980);
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_clamp (d, d2, d1);
+      xdate_clamp (d, d2, d1);
       g_test_assert_expected_messages ();
     }
 
-  o = g_date_copy (d);
-  g_date_clamp (o, NULL, NULL);
-  g_assert_cmpint (g_date_compare (o, d), ==, 0);
+  o = xdate_copy (d);
+  xdate_clamp (o, NULL, NULL);
+  g_assert_cmpint (xdate_compare (o, d), ==, 0);
 
-  g_date_clamp (o,  d1, d2);
-  g_assert_cmpint (g_date_compare (o, d1), ==, 0);
+  xdate_clamp (o,  d1, d2);
+  g_assert_cmpint (xdate_compare (o, d1), ==, 0);
 
-  g_date_set_dmy (o, 1, 1, 2000);
+  xdate_set_dmy (o, 1, 1, 2000);
 
-  g_date_clamp (o,  d1, d2);
-  g_assert_cmpint (g_date_compare (o, d2), ==, 0);
+  xdate_clamp (o,  d1, d2);
+  g_assert_cmpint (xdate_compare (o, d2), ==, 0);
 
-  g_date_free (d);
-  g_date_free (d1);
-  g_date_free (d2);
-  g_date_free (o);
+  xdate_free (d);
+  xdate_free (d1);
+  xdate_free (d2);
+  xdate_free (o);
 }
 
 static void
 test_order (void)
 {
-  GDate *d1, *d2;
+  xdate_t *d1, *d2;
 
-  d1 = g_date_new ();
-  d2 = g_date_new ();
-
-  if (g_test_undefined ())
-    {
-      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
-                             "*assertion *failed*");
-      g_date_order (d1, d2);
-      g_test_assert_expected_messages ();
-    }
-
-  g_date_set_dmy (d1, 1, 1, 1970);
+  d1 = xdate_new ();
+  d2 = xdate_new ();
 
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_date_order (d1, d2);
+      xdate_order (d1, d2);
       g_test_assert_expected_messages ();
     }
 
-  g_date_set_dmy (d2, 1, 1, 1980);
+  xdate_set_dmy (d1, 1, 1, 1970);
 
-  g_date_order (d1, d2);
-  g_assert_cmpint (g_date_compare (d1, d2), ==, -1);
-  g_date_order (d2, d1);
-  g_assert_cmpint (g_date_compare (d1, d2), ==, 1);
+  if (g_test_undefined ())
+    {
+      g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
+                             "*assertion *failed*");
+      xdate_order (d1, d2);
+      g_test_assert_expected_messages ();
+    }
 
-  g_date_free (d1);
-  g_date_free (d2);
+  xdate_set_dmy (d2, 1, 1, 1980);
+
+  xdate_order (d1, d2);
+  g_assert_cmpint (xdate_compare (d1, d2), ==, -1);
+  xdate_order (d2, d1);
+  g_assert_cmpint (xdate_compare (d1, d2), ==, 1);
+
+  xdate_free (d1);
+  xdate_free (d2);
 }
 
 static void
 test_copy (void)
 {
-  GDate *d;
-  GDate *c;
+  xdate_t *d;
+  xdate_t *c;
 
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion *failed*");
-      g_assert_null (g_date_copy (NULL));
+      g_assert_null (xdate_copy (NULL));
       g_test_assert_expected_messages ();
     }
 
-  d = g_date_new ();
-  g_assert_false (g_date_valid (d));
+  d = xdate_new ();
+  g_assert_false (xdate_valid (d));
 
-  c = g_date_copy (d);
+  c = xdate_copy (d);
   g_assert_nonnull (c);
-  g_assert_false (g_date_valid (c));
-  g_date_free (c);
+  g_assert_false (xdate_valid (c));
+  xdate_free (c);
 
-  g_date_set_day (d, 10);
+  xdate_set_day (d, 10);
 
-  c = g_date_copy (d);
-  g_date_set_month (c, 1);
-  g_date_set_year (c, 2015);
-  g_assert_true (g_date_valid (c));
-  g_assert_cmpuint (g_date_get_day (c), ==, 10);
-  g_date_free (c);
+  c = xdate_copy (d);
+  xdate_set_month (c, 1);
+  xdate_set_year (c, 2015);
+  g_assert_true (xdate_valid (c));
+  g_assert_cmpuint (xdate_get_day (c), ==, 10);
+  xdate_free (c);
 
-  g_date_free (d);
+  xdate_free (d);
 }
 
-/* Check the results of g_date_valid_dmy() for various inputs. */
+/* Check the results of xdate_valid_dmy() for various inputs. */
 static void
 test_valid_dmy (void)
 {
@@ -1721,7 +1721,7 @@ test_valid_dmy (void)
                       i, vectors[i].year, vectors[i].month, vectors[i].day,
                       vectors[i].expected_valid ? "valid" : "invalid");
 
-      valid = g_date_valid_dmy (vectors[i].day,
+      valid = xdate_valid_dmy (vectors[i].day,
                                 vectors[i].month,
                                 vectors[i].year);
 
@@ -1779,7 +1779,7 @@ main (int argc, char** argv)
   g_test_add_func ("/date/order", test_order);
   for (i = 0; i < G_N_ELEMENTS (check_years); i++)
     {
-      path = g_strdup_printf ("/date/year/%d", check_years[i]);
+      path = xstrdup_printf ("/date/year/%d", check_years[i]);
       g_test_add_data_func (path, GINT_TO_POINTER(check_years[i]), test_year);
       g_free (path);
     }

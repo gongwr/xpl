@@ -35,16 +35,16 @@ msgid "Setting application as last used for type not supported yet"
 msgstr "타입에 대해 최근 사용한 프로그램 설정은 아직 지원하지 않습니다"
 
 #: gio/gapplication.c:497
-msgid "GApplication options"
-msgstr "GApplication 옵션"
+msgid "xapplication_t options"
+msgstr "xapplication_t 옵션"
 
 #: gio/gapplication.c:497
-msgid "Show GApplication options"
-msgstr "GApplication 옵션을 표시합니다"
+msgid "Show xapplication_t options"
+msgstr "xapplication_t 옵션을 표시합니다"
 
 #: gio/gapplication.c:542
-msgid "Enter GApplication service mode (use from D-Bus service files)"
-msgstr "GApplication 서비스 모드로 들어갑니다 (D-버스 서비스 파일에서 사용)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgstr "xapplication_t 서비스 모드로 들어갑니다 (D-버스 서비스 파일에서 사용)"
 
 #: gio/gapplication.c:554
 msgid "Override the application’s ID"
@@ -280,7 +280,7 @@ msgid "Seek not supported on base stream"
 msgstr "기반 스트림에서 탐색을 지원하지 않습니다"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
 msgstr "GMemoryInputStream을 자를 수 없습니다"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
@@ -352,19 +352,19 @@ msgid "%s filetype"
 msgstr "%s 파일 형식"
 
 #: gio/gcredentials.c:335
-msgid "GCredentials contains invalid data"
+msgid "xcredentials_t contains invalid data"
 msgstr "GCredentials에 잘못된 데이터가 들어 있습니다"
 
 #: gio/gcredentials.c:395 gio/gcredentials.c:686
-msgid "GCredentials is not implemented on this OS"
+msgid "xcredentials_t is not implemented on this OS"
 msgstr "GCredentials는 이 OS에서 구현되지 않았습니다"
 
 #: gio/gcredentials.c:550 gio/gcredentials.c:568
-msgid "There is no GCredentials support for your platform"
+msgid "There is no xcredentials_t support for your platform"
 msgstr "이 플랫폼에서는 GCredentials를 지원하지 않습니다"
 
 #: gio/gcredentials.c:626
-msgid "GCredentials does not contain a process ID on this OS"
+msgid "xcredentials_t does not contain a process ID on this OS"
 msgstr "GCredentials는 이 OS에서 프로세스 ID가 없습니다"
 
 #: gio/gcredentials.c:680
@@ -556,8 +556,8 @@ msgid "User IDs must be the same for peer and server"
 msgstr "상대와 서버의 사용자 아이디는 같아야 합니다"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "GDBusAuthObserver::authorize-authenticated-peer를 통해 취소됨"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "xdbus_auth_observer_t::authorize-authenticated-peer를 통해 취소됨"
 
 #: gio/gdbusauthmechanismsha1.c:299
 #, c-format
@@ -1348,27 +1348,27 @@ msgstr "DTLS 기능을 사용할 수 없습니다"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of GEmblem encoding"
-msgstr "GEmblem 인코딩의 %d 버전을 처리할 수 없습니다"
+msgid "Can’t handle version %d of xemblem_t encoding"
+msgstr "xemblem_t 인코딩의 %d 버전을 처리할 수 없습니다"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "GEmblem 인코딩에서 토큰 수가(%d개) 잘못되었습니다"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "xemblem_t 인코딩에서 토큰 수가(%d개) 잘못되었습니다"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of GEmblemedIcon encoding"
-msgstr "GEmblemedIcon 인코딩의 %d 버전을 처리할 수 없습니다"
+msgid "Can’t handle version %d of xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t 인코딩의 %d 버전을 처리할 수 없습니다"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "GEmblemedIcon 인코딩에서 토큰 수가(%d개) 잘못되었습니다"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t 인코딩에서 토큰 수가(%d개) 잘못되었습니다"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "GEmblemedIcon에 GEmblem이 없습니다"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "xemblemed_icon_t에 GEmblem이 없습니다"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1460,12 +1460,12 @@ msgstr "파일 이뉴머레이터를 이미 닫았습니다"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of GFileIcon encoding"
-msgstr "GFileIcon 인코딩의 %d 버전을 처리할 수 없습니다"
+msgid "Can’t handle version %d of xfile_icon_t encoding"
+msgstr "xfile_icon_t 인코딩의 %d 버전을 처리할 수 없습니다"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for GFileIcon"
-msgstr "GFileIcon 입력 데이터의 형식이 잘못되었습니다"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "xfile_icon_t 입력 데이터의 형식이 잘못되었습니다"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -2949,11 +2949,11 @@ msgstr "키 이름을 제한하지 않습니다"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"모든 GSettings 스키마 파일을 스키마 캐시 하나로 컴파일합니다.\n"
+"모든 xsettings_t 스키마 파일을 스키마 캐시 하나로 컴파일합니다.\n"
 "스키마 파일 확장자는 .schema.xml이어야 하고,\n"
 "캐시 파일 이름은 gschemas.compile이어야 합니다."
 
@@ -3316,7 +3316,7 @@ msgid "Invalid seek request"
 msgstr "잘못된 탐색 요청"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
 msgstr "GMemoryInputStream은 자를 수 없습니다"
 
 #: gio/gmemoryoutputstream.c:568
@@ -3989,7 +3989,7 @@ msgid "Error sending message: %s"
 msgstr "메시지를 보내는 중 오류: %s"
 
 #: gio/gsocket.c:5032
-msgid "GSocketControlMessage not supported on Windows"
+msgid "xsocket_control_message_t not supported on Windows"
 msgstr "윈도우에서는 GSocketControlMessage를 지원하지 않습니다"
 
 #: gio/gsocket.c:5505 gio/gsocket.c:5581 gio/gsocket.c:5807
@@ -4134,8 +4134,8 @@ msgstr "이 플랫폼에서는 파이프를 지원하지 않습니다"
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of GThemedIcon encoding"
-msgstr "GThemedIcon 인코딩의 %d 버전을 처리할 수 없습니다"
+msgid "Can’t handle version %d of xthemed_icon_t encoding"
+msgstr "xthemed_icon_t 인코딩의 %d 버전을 처리할 수 없습니다"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4188,7 +4188,7 @@ msgid "The current TLS backend does not support PKCS #12"
 msgstr "현재 TLS 백엔드는 PKCS #12를 지원하지 않습니다"
 
 #: gio/gtlscertificate.c:1013
-msgid "This GTlsBackend does not support creating PKCS #11 certificates"
+msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
 msgstr "이 GTlsBackend는 PKCS #11 인증서 만들기를 지원하지 않습니다"
 
 #: gio/gtlspassword.c:111
@@ -4489,25 +4489,25 @@ msgstr "경로이름 “%s”은(는) 절대 경로가 아닙니다"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%Y년 %b %e일 (%a) %H:%M:%S"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%y/%m/%d"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%p %I:%M:%S"
 
@@ -4890,13 +4890,13 @@ msgstr "12월"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "오전"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "오후"
 

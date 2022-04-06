@@ -24,12 +24,12 @@
 /* keep enum and structure of gpattern.c and patterntest.c in sync */
 typedef enum
 {
-  G_MATCH_ALL,       /* "*A?A*" */
-  G_MATCH_ALL_TAIL,  /* "*A?AA" */
-  G_MATCH_HEAD,      /* "AAAA*" */
-  G_MATCH_TAIL,      /* "*AAAA" */
-  G_MATCH_EXACT,     /* "AAAAA" */
-  G_MATCH_LAST
+  XMATCH_ALL,       /* "*A?A*" */
+  XMATCH_ALL_TAIL,  /* "*A?AA" */
+  XMATCH_HEAD,      /* "AAAA*" */
+  XMATCH_TAIL,      /* "*AAAA" */
+  XMATCH_EXACT,     /* "AAAAA" */
+  XMATCH_LAST
 } GMatchType;
 
 struct _GPatternSpec
@@ -52,54 +52,54 @@ struct _CompileTest
 };
 
 static CompileTest compile_tests[] = {
-  { "*A?B*", G_MATCH_ALL, "*A?B*", 3 },
-  { "ABC*DEFGH", G_MATCH_ALL_TAIL, "HGFED*CBA", 8 },
-  { "ABCDEF*GH", G_MATCH_ALL, "ABCDEF*GH", 8 },
-  { "ABC**?***??**DEF*GH", G_MATCH_ALL, "ABC*???DEF*GH", 11 },
-  { "**ABC***?🤌DEF**", G_MATCH_ALL, "*ABC*?🤌DEF*", 11 },
-  { "*A?AA", G_MATCH_ALL_TAIL, "AA?A*", 4 },
-  { "ABCD*", G_MATCH_HEAD, "ABCD", 4 },
-  { "*ABCD", G_MATCH_TAIL, "ABCD", 4 },
-  { "ABCDE", G_MATCH_EXACT, "ABCDE", 5 },
-  { "A?C?E", G_MATCH_ALL, "A?C?E", 5 },
-  { "*?x", G_MATCH_ALL_TAIL, "x?*", 2 },
-  { "?*x", G_MATCH_ALL_TAIL, "x?*", 2 },
-  { "*?*x", G_MATCH_ALL_TAIL, "x?*", 2 },
-  { "x*??", G_MATCH_ALL_TAIL, "??*x", 3 }
+  { "*A?B*", XMATCH_ALL, "*A?B*", 3 },
+  { "ABC*DEFGH", XMATCH_ALL_TAIL, "HGFED*CBA", 8 },
+  { "ABCDEF*GH", XMATCH_ALL, "ABCDEF*GH", 8 },
+  { "ABC**?***??**DEF*GH", XMATCH_ALL, "ABC*???DEF*GH", 11 },
+  { "**ABC***?🤌DEF**", XMATCH_ALL, "*ABC*?🤌DEF*", 11 },
+  { "*A?AA", XMATCH_ALL_TAIL, "AA?A*", 4 },
+  { "ABCD*", XMATCH_HEAD, "ABCD", 4 },
+  { "*ABCD", XMATCH_TAIL, "ABCD", 4 },
+  { "ABCDE", XMATCH_EXACT, "ABCDE", 5 },
+  { "A?C?E", XMATCH_ALL, "A?C?E", 5 },
+  { "*?x", XMATCH_ALL_TAIL, "x?*", 2 },
+  { "?*x", XMATCH_ALL_TAIL, "x?*", 2 },
+  { "*?*x", XMATCH_ALL_TAIL, "x?*", 2 },
+  { "x*??", XMATCH_ALL_TAIL, "??*x", 3 }
 };
 
 static void
-test_compilation (gconstpointer d)
+test_compilation (xconstpointer d)
 {
   const CompileTest *test = d;
-  GPatternSpec *spec;
+  xpattern_spec_t *spec;
 
-  spec = g_pattern_spec_new (test->src);
+  spec = xpattern_spec_new (test->src);
 
   g_assert_cmpint (spec->match_type, ==, test->match_type);
   g_assert_cmpstr (spec->pattern, ==, test->pattern);
   g_assert_cmpint (spec->pattern_length, ==, strlen (spec->pattern));
   g_assert_cmpint (spec->min_length, ==, test->min);
 
-  g_pattern_spec_free (spec);
+  xpattern_spec_free (spec);
 }
 
 static void
-test_copy (gconstpointer d)
+test_copy (xconstpointer d)
 {
   const CompileTest *test = d;
-  GPatternSpec *p1, *p2;
+  xpattern_spec_t *p1, *p2;
 
-  p1 = g_pattern_spec_new (test->src);
-  p2 = g_pattern_spec_copy (p1);
+  p1 = xpattern_spec_new (test->src);
+  p2 = xpattern_spec_copy (p1);
 
   g_assert_cmpint (p2->match_type, ==, test->match_type);
   g_assert_cmpstr (p2->pattern, ==, test->pattern);
   g_assert_cmpint (p2->pattern_length, ==, strlen (p1->pattern));
   g_assert_cmpint (p2->min_length, ==, test->min);
 
-  g_pattern_spec_free (p1);
-  g_pattern_spec_free (p2);
+  xpattern_spec_free (p1);
+  xpattern_spec_free (p2);
 }
 
 typedef struct _MatchTest MatchTest;
@@ -167,28 +167,28 @@ static MatchTest match_tests[] =
 };
 
 static void
-test_match (gconstpointer d)
+test_match (xconstpointer d)
 {
   const MatchTest *test = d;
-  GPatternSpec *p;
+  xpattern_spec_t *p;
   xchar_t *r;
 
   g_assert_cmpint (g_pattern_match_simple (test->pattern, test->string), ==, test->match);
 
-  p = g_pattern_spec_new (test->pattern);
-  g_assert_cmpint (g_pattern_spec_match_string (p, test->string), ==, test->match);
+  p = xpattern_spec_new (test->pattern);
+  g_assert_cmpint (xpattern_spec_match_string (p, test->string), ==, test->match);
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   g_assert_cmpint (g_pattern_match_string (p, test->string), ==, test->match);
   G_GNUC_END_IGNORE_DEPRECATIONS
 
-  r = g_utf8_strreverse (test->string, -1);
-  g_assert_cmpint (g_pattern_spec_match (p, strlen (test->string), test->string, r), ==, test->match);
+  r = xutf8_strreverse (test->string, -1);
+  g_assert_cmpint (xpattern_spec_match (p, strlen (test->string), test->string, r), ==, test->match);
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   g_assert_cmpint (g_pattern_match (p, strlen (test->string), test->string, r), ==, test->match);
   G_GNUC_END_IGNORE_DEPRECATIONS
   g_free (r);
 
-  g_pattern_spec_free (p);
+  xpattern_spec_free (p);
 }
 
 typedef struct _EqualTest EqualTest;
@@ -216,18 +216,18 @@ static EqualTest equal_tests[] =
 };
 
 static void
-test_equal (gconstpointer d)
+test_equal (xconstpointer d)
 {
   const EqualTest *test = d;
-  GPatternSpec *p1, *p2;
+  xpattern_spec_t *p1, *p2;
 
-  p1 = g_pattern_spec_new (test->pattern1);
-  p2 = g_pattern_spec_new (test->pattern2);
+  p1 = xpattern_spec_new (test->pattern1);
+  p2 = xpattern_spec_new (test->pattern2);
 
-  g_assert_cmpint (g_pattern_spec_equal (p1, p2), ==, test->expected);
+  g_assert_cmpint (xpattern_spec_equal (p1, p2), ==, test->expected);
 
-  g_pattern_spec_free (p1);
-  g_pattern_spec_free (p2);
+  xpattern_spec_free (p1);
+  xpattern_spec_free (p2);
 }
 
 
@@ -241,28 +241,28 @@ main (int argc, char** argv)
 
   for (i = 0; i < G_N_ELEMENTS (compile_tests); i++)
     {
-      path = g_strdup_printf ("/pattern/compile/%" G_GSIZE_FORMAT, i);
+      path = xstrdup_printf ("/pattern/compile/%" G_GSIZE_FORMAT, i);
       g_test_add_data_func (path, &compile_tests[i], test_compilation);
       g_free (path);
     }
 
   for (i = 0; i < G_N_ELEMENTS (compile_tests); i++)
     {
-      path = g_strdup_printf ("/pattern/copy/%" G_GSIZE_FORMAT, i);
+      path = xstrdup_printf ("/pattern/copy/%" G_GSIZE_FORMAT, i);
       g_test_add_data_func (path, &compile_tests[i], test_copy);
       g_free (path);
     }
 
   for (i = 0; i < G_N_ELEMENTS (match_tests); i++)
     {
-      path = g_strdup_printf ("/pattern/match/%" G_GSIZE_FORMAT, i);
+      path = xstrdup_printf ("/pattern/match/%" G_GSIZE_FORMAT, i);
       g_test_add_data_func (path, &match_tests[i], test_match);
       g_free (path);
     }
 
   for (i = 0; i < G_N_ELEMENTS (equal_tests); i++)
     {
-      path = g_strdup_printf ("/pattern/equal/%" G_GSIZE_FORMAT, i);
+      path = xstrdup_printf ("/pattern/equal/%" G_GSIZE_FORMAT, i);
       g_test_add_data_func (path, &equal_tests[i], test_equal);
       g_free (path);
     }

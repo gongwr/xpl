@@ -4,14 +4,14 @@
 
 
 static xint_t
-handle_local_options (GApplication      *application,
-                      GVariantDict      *options,
+handle_local_options (xapplication_t      *application,
+                      xvariant_dict_t      *options,
                       xpointer_t           user_data)
 {
-  guint32 count;
+  xuint32_t count;
 
   /* Deal (locally) with version option */
-  if (g_variant_dict_lookup (options, "version", "b", &count))
+  if (xvariant_dict_lookup (options, "version", "b", &count))
     {
       g_print ("This is example-cmdline4, version 1.2.3\n");
       return EXIT_SUCCESS;
@@ -22,18 +22,18 @@ handle_local_options (GApplication      *application,
 }
 
 static xint_t
-command_line (GApplication                *application,
-              GApplicationCommandLine     *cmdline,
+command_line (xapplication_t                *application,
+              xapplication_command_line_t     *cmdline,
               xpointer_t                     user_data)
 {
-  guint32 count;
+  xuint32_t count;
 
-  GVariantDict *options = g_application_command_line_get_options_dict (cmdline);
+  xvariant_dict_t *options = xapplication_command_line_get_options_dict (cmdline);
 
   /* Deal with arg option */
-  if (g_variant_dict_lookup (options, "flag", "b", &count))
+  if (xvariant_dict_lookup (options, "flag", "b", &count))
     {
-      g_application_command_line_print (cmdline, "flag is set\n");
+      xapplication_command_line_print (cmdline, "flag is set\n");
     }
 
   return EXIT_SUCCESS;
@@ -43,7 +43,7 @@ command_line (GApplication                *application,
 int
 main (int argc, char **argv)
 {
-  GApplication *app;
+  xapplication_t *app;
   int status;
 
   GOptionEntry entries[] = {
@@ -56,19 +56,19 @@ main (int argc, char **argv)
     G_OPTION_ENTRY_NULL
   };
 
-  app = g_application_new ("org.gtk.TestApplication",
+  app = xapplication_new ("org.gtk.TestApplication",
                            G_APPLICATION_HANDLES_COMMAND_LINE);
 
-  g_application_add_main_option_entries (app, entries);
+  xapplication_add_main_option_entries (app, entries);
 
-  g_application_set_option_context_parameter_string (app, "- a simple command line example");
-  g_application_set_option_context_summary (app,
+  xapplication_set_option_context_parameter_string (app, "- a simple command line example");
+  xapplication_set_option_context_summary (app,
                                             "Summary:\n"
                                             "This is a simple command line --help example.");
-  g_application_set_option_context_description (app,
+  xapplication_set_option_context_description (app,
                                                 "Description:\n"
                                                 "This example illustrates the use of "
-                                                "g_application command line --help functionalities "
+                                                "xapplication command line --help functionalities "
                                                 "(parameter string, summary, description). "
                                                 "It does nothing at all except displaying information "
                                                 "when invoked with --help argument...\n");
@@ -77,9 +77,9 @@ main (int argc, char **argv)
   g_signal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
 
   /* This application does absolutely nothing, except if a command line is given */
-  status = g_application_run (app, argc, argv);
+  status = xapplication_run (app, argc, argv);
 
-  g_object_unref (app);
+  xobject_unref (app);
 
   return status;
 }

@@ -80,7 +80,7 @@
  * SECTION:gfile
  * @short_description: File and Directory Handling
  * @include: gio/gio.h
- * @see_also: #GFileInfo, #GFileEnumerator
+ * @see_also: #xfile_info_t, #xfile_enumerator_t
  *
  * #xfile_t is a high level abstraction for manipulating files on a
  * virtual file system. #GFiles are lightweight, immutable objects
@@ -90,12 +90,12 @@
  * (see #xinput_stream_t and #xoutput_stream_t).
  *
  * To construct a #xfile_t, you can use:
- * - g_file_new_for_path() if you have a path.
- * - g_file_new_for_uri() if you have a URI.
- * - g_file_new_for_commandline_arg() for a command line argument.
- * - g_file_new_tmp() to create a temporary file from a template.
- * - g_file_parse_name() from a UTF-8 string gotten from g_file_get_parse_name().
- * - g_file_new_build_filename() to create a file from path elements.
+ * - xfile_new_for_path() if you have a path.
+ * - xfile_new_for_uri() if you have a URI.
+ * - xfile_new_for_commandline_arg() for a command line argument.
+ * - xfile_new_tmp() to create a temporary file from a template.
+ * - xfile_parse_name() from a UTF-8 string gotten from xfile_get_parse_name().
+ * - xfile_new_build_filename() to create a file from path elements.
  *
  * One way to think of a #xfile_t is as an abstraction of a pathname. For
  * normal files the system pathname is what is stored internally, but as
@@ -104,20 +104,20 @@
  *
  * #GFiles make up hierarchies of directories and files that correspond to
  * the files on a filesystem. You can move through the file system with
- * #xfile_t using g_file_get_parent() to get an identifier for the parent
- * directory, g_file_get_child() to get a child within a directory,
- * g_file_resolve_relative_path() to resolve a relative path between two
+ * #xfile_t using xfile_get_parent() to get an identifier for the parent
+ * directory, xfile_get_child() to get a child within a directory,
+ * xfile_resolve_relative_path() to resolve a relative path between two
  * #GFiles. There can be multiple hierarchies, so you may not end up at
- * the same root if you repeatedly call g_file_get_parent() on two different
+ * the same root if you repeatedly call xfile_get_parent() on two different
  * files.
  *
- * All #GFiles have a basename (get with g_file_get_basename()). These names
+ * All #GFiles have a basename (get with xfile_get_basename()). These names
  * are byte strings that are used to identify the file on the filesystem
  * (relative to its parent directory) and there is no guarantees that they
  * have any particular charset encoding or even make any sense at all. If
  * you want to use filenames in a user interface you should use the display
  * name that you can get by requesting the
- * %G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME attribute with g_file_query_info().
+ * %XFILE_ATTRIBUTE_STANDARD_DISPLAY_NAME attribute with xfile_query_info().
  * This is guaranteed to be in UTF-8 and can be used in a user interface.
  * But always store the real basename or the #xfile_t to use to actually
  * access the file, because there is no way to go from a display name to
@@ -129,7 +129,7 @@
  * file. Other possible causes for aliases are: case insensitive filesystems,
  * short and long names on FAT/NTFS, or bind mounts in Linux. If you want to
  * check if two #GFiles point to the same file you can query for the
- * %G_FILE_ATTRIBUTE_ID_FILE attribute. Note that #xfile_t does some trivial
+ * %XFILE_ATTRIBUTE_ID_FILE attribute. Note that #xfile_t does some trivial
  * canonicalization of pathnames passed in, so that trivial differences in
  * the path string used at creation (duplicated slashes, slash at end of
  * path, "." or ".." path segments, etc) does not create different #GFiles.
@@ -150,9 +150,9 @@
  *
  * Some #xfile_t operations almost always take a noticeable amount of time, and
  * so do not have synchronous analogs. Notable cases include:
- * - g_file_mount_mountable() to mount a mountable file.
- * - g_file_unmount_mountable_with_operation() to unmount a mountable file.
- * - g_file_eject_mountable_with_operation() to eject a mountable file.
+ * - xfile_mount_mountable() to mount a mountable file.
+ * - xfile_unmount_mountable_with_operation() to unmount a mountable file.
+ * - xfile_eject_mountable_with_operation() to eject a mountable file.
  *
  * ## Entity Tags # {#gfile-etag}
  *
@@ -165,257 +165,257 @@
  * for HTTP Etag headers, which are a very similar concept.
  */
 
-static void               g_file_real_query_info_async            (xfile_t                  *file,
+static void               xfile_real_query_info_async            (xfile_t                  *file,
                                                                    const char             *attributes,
-                                                                   GFileQueryInfoFlags     flags,
+                                                                   xfile_query_info_flags_t     flags,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static GFileInfo *        g_file_real_query_info_finish           (xfile_t                  *file,
+static xfile_info_t *        xfile_real_query_info_finish           (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
-static void               g_file_real_query_filesystem_info_async (xfile_t                  *file,
+static void               xfile_real_query_filesystem_info_async (xfile_t                  *file,
                                                                    const char             *attributes,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static GFileInfo *        g_file_real_query_filesystem_info_finish (xfile_t                  *file,
+static xfile_info_t *        xfile_real_query_filesystem_info_finish (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
-static void               g_file_real_enumerate_children_async    (xfile_t                  *file,
+static void               xfile_real_enumerate_children_async    (xfile_t                  *file,
                                                                    const char             *attributes,
-                                                                   GFileQueryInfoFlags     flags,
+                                                                   xfile_query_info_flags_t     flags,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static GFileEnumerator *  g_file_real_enumerate_children_finish   (xfile_t                  *file,
+static xfile_enumerator_t *  xfile_real_enumerate_children_finish   (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
-static void               g_file_real_read_async                  (xfile_t                  *file,
+static void               xfile_real_read_async                  (xfile_t                  *file,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static GFileInputStream * g_file_real_read_finish                 (xfile_t                  *file,
+static xfile_input_stream_t * xfile_real_read_finish                 (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
-static void               g_file_real_append_to_async             (xfile_t                  *file,
-                                                                   GFileCreateFlags        flags,
+static void               xfile_real_append_to_async             (xfile_t                  *file,
+                                                                   xfile_create_flags_t        flags,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static GFileOutputStream *g_file_real_append_to_finish            (xfile_t                  *file,
+static xfile_output_stream_t *xfile_real_append_to_finish            (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
-static void               g_file_real_create_async                (xfile_t                  *file,
-                                                                   GFileCreateFlags        flags,
+static void               xfile_real_create_async                (xfile_t                  *file,
+                                                                   xfile_create_flags_t        flags,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static GFileOutputStream *g_file_real_create_finish               (xfile_t                  *file,
+static xfile_output_stream_t *xfile_real_create_finish               (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
-static void               g_file_real_replace_async               (xfile_t                  *file,
+static void               xfile_real_replace_async               (xfile_t                  *file,
                                                                    const char             *etag,
                                                                    xboolean_t                make_backup,
-                                                                   GFileCreateFlags        flags,
+                                                                   xfile_create_flags_t        flags,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static GFileOutputStream *g_file_real_replace_finish              (xfile_t                  *file,
+static xfile_output_stream_t *xfile_real_replace_finish              (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
-static void               g_file_real_delete_async                (xfile_t                  *file,
+static void               xfile_real_delete_async                (xfile_t                  *file,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static xboolean_t           g_file_real_delete_finish               (xfile_t                  *file,
+static xboolean_t           xfile_real_delete_finish               (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
-static void               g_file_real_trash_async                 (xfile_t                  *file,
+static void               xfile_real_trash_async                 (xfile_t                  *file,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static xboolean_t           g_file_real_trash_finish                (xfile_t                  *file,
+static xboolean_t           xfile_real_trash_finish                (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
-static void               g_file_real_move_async                  (xfile_t                  *source,
+static void               xfile_real_move_async                  (xfile_t                  *source,
                                                                    xfile_t                  *destination,
-                                                                   GFileCopyFlags          flags,
+                                                                   xfile_copy_flags_t          flags,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
-                                                                   GFileProgressCallback   progress_callback,
+                                                                   xfile_progress_callback_t   progress_callback,
                                                                    xpointer_t                progress_callback_data,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static xboolean_t           g_file_real_move_finish                 (xfile_t                  *file,
+static xboolean_t           xfile_real_move_finish                 (xfile_t                  *file,
                                                                    xasync_result_t           *result,
                                                                    xerror_t                **error);
-static void               g_file_real_make_directory_async        (xfile_t                  *file,
+static void               xfile_real_make_directory_async        (xfile_t                  *file,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static xboolean_t           g_file_real_make_directory_finish       (xfile_t                  *file,
+static xboolean_t           xfile_real_make_directory_finish       (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
-static void               g_file_real_open_readwrite_async        (xfile_t                  *file,
+static void               xfile_real_open_readwrite_async        (xfile_t                  *file,
                                                                    int                  io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static GFileIOStream *    g_file_real_open_readwrite_finish       (xfile_t                  *file,
+static xfile_io_stream_t *    xfile_real_open_readwrite_finish       (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
-static void               g_file_real_create_readwrite_async      (xfile_t                  *file,
-                                                                   GFileCreateFlags        flags,
+static void               xfile_real_create_readwrite_async      (xfile_t                  *file,
+                                                                   xfile_create_flags_t        flags,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static GFileIOStream *    g_file_real_create_readwrite_finish     (xfile_t                  *file,
+static xfile_io_stream_t *    xfile_real_create_readwrite_finish     (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
-static void               g_file_real_replace_readwrite_async     (xfile_t                  *file,
+static void               xfile_real_replace_readwrite_async     (xfile_t                  *file,
                                                                    const char             *etag,
                                                                    xboolean_t                make_backup,
-                                                                   GFileCreateFlags        flags,
+                                                                   xfile_create_flags_t        flags,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static GFileIOStream *    g_file_real_replace_readwrite_finish    (xfile_t                  *file,
+static xfile_io_stream_t *    xfile_real_replace_readwrite_finish    (xfile_t                  *file,
                                                                   xasync_result_t            *res,
                                                                   xerror_t                 **error);
-static xboolean_t           g_file_real_set_attributes_from_info    (xfile_t                  *file,
-                                                                   GFileInfo              *info,
-                                                                   GFileQueryInfoFlags     flags,
+static xboolean_t           xfile_real_set_attributes_from_info    (xfile_t                  *file,
+                                                                   xfile_info_t              *info,
+                                                                   xfile_query_info_flags_t     flags,
                                                                    xcancellable_t           *cancellable,
                                                                    xerror_t                **error);
-static void               g_file_real_set_display_name_async      (xfile_t                  *file,
+static void               xfile_real_set_display_name_async      (xfile_t                  *file,
                                                                    const char             *display_name,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static xfile_t *            g_file_real_set_display_name_finish     (xfile_t                  *file,
+static xfile_t *            xfile_real_set_display_name_finish     (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
-static void               g_file_real_set_attributes_async        (xfile_t                  *file,
-                                                                   GFileInfo              *info,
-                                                                   GFileQueryInfoFlags     flags,
+static void               xfile_real_set_attributes_async        (xfile_t                  *file,
+                                                                   xfile_info_t              *info,
+                                                                   xfile_query_info_flags_t     flags,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static xboolean_t           g_file_real_set_attributes_finish       (xfile_t                  *file,
+static xboolean_t           xfile_real_set_attributes_finish       (xfile_t                  *file,
                                                                    xasync_result_t           *res,
-                                                                   GFileInfo             **info,
+                                                                   xfile_info_t             **info,
                                                                    xerror_t                **error);
-static void               g_file_real_find_enclosing_mount_async  (xfile_t                  *file,
+static void               xfile_real_find_enclosing_mount_async  (xfile_t                  *file,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static GMount *           g_file_real_find_enclosing_mount_finish (xfile_t                  *file,
+static xmount_t *           xfile_real_find_enclosing_mount_finish (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
-static void               g_file_real_copy_async                  (xfile_t                  *source,
+static void               xfile_real_copy_async                  (xfile_t                  *source,
                                                                    xfile_t                  *destination,
-                                                                   GFileCopyFlags          flags,
+                                                                   xfile_copy_flags_t          flags,
                                                                    int                     io_priority,
                                                                    xcancellable_t           *cancellable,
-                                                                   GFileProgressCallback   progress_callback,
+                                                                   xfile_progress_callback_t   progress_callback,
                                                                    xpointer_t                progress_callback_data,
                                                                    xasync_ready_callback_t     callback,
                                                                    xpointer_t                user_data);
-static xboolean_t           g_file_real_copy_finish                 (xfile_t                  *file,
+static xboolean_t           xfile_real_copy_finish                 (xfile_t                  *file,
                                                                    xasync_result_t           *res,
                                                                    xerror_t                **error);
 
-static xboolean_t           g_file_real_measure_disk_usage          (xfile_t                         *file,
-                                                                   GFileMeasureFlags              flags,
+static xboolean_t           xfile_real_measure_disk_usage          (xfile_t                         *file,
+                                                                   xfile_measure_flags_t              flags,
                                                                    xcancellable_t                  *cancellable,
-                                                                   GFileMeasureProgressCallback   progress_callback,
+                                                                   xfile_measure_progress_callback_t   progress_callback,
                                                                    xpointer_t                       progress_data,
-                                                                   guint64                       *disk_usage,
-                                                                   guint64                       *num_dirs,
-                                                                   guint64                       *num_files,
+                                                                   xuint64_t                       *disk_usage,
+                                                                   xuint64_t                       *num_dirs,
+                                                                   xuint64_t                       *num_files,
                                                                    xerror_t                       **error);
-static void               g_file_real_measure_disk_usage_async    (xfile_t                         *file,
-                                                                   GFileMeasureFlags              flags,
+static void               xfile_real_measure_disk_usage_async    (xfile_t                         *file,
+                                                                   xfile_measure_flags_t              flags,
                                                                    xint_t                           io_priority,
                                                                    xcancellable_t                  *cancellable,
-                                                                   GFileMeasureProgressCallback   progress_callback,
+                                                                   xfile_measure_progress_callback_t   progress_callback,
                                                                    xpointer_t                       progress_data,
                                                                    xasync_ready_callback_t            callback,
                                                                    xpointer_t                       user_data);
-static xboolean_t           g_file_real_measure_disk_usage_finish   (xfile_t                         *file,
+static xboolean_t           xfile_real_measure_disk_usage_finish   (xfile_t                         *file,
                                                                    xasync_result_t                  *result,
-                                                                   guint64                       *disk_usage,
-                                                                   guint64                       *num_dirs,
-                                                                   guint64                       *num_files,
+                                                                   xuint64_t                       *disk_usage,
+                                                                   xuint64_t                       *num_dirs,
+                                                                   xuint64_t                       *num_files,
                                                                    xerror_t                       **error);
 
-typedef GFileIface GFileInterface;
-G_DEFINE_INTERFACE (xfile_t, g_file, XTYPE_OBJECT)
+typedef xfile_iface_t GFileInterface;
+G_DEFINE_INTERFACE (xfile, xfile, XTYPE_OBJECT)
 
 static void
-g_file_default_init (GFileIface *iface)
+xfile_default_init (xfile_iface_t *iface)
 {
-  iface->enumerate_children_async = g_file_real_enumerate_children_async;
-  iface->enumerate_children_finish = g_file_real_enumerate_children_finish;
-  iface->set_display_name_async = g_file_real_set_display_name_async;
-  iface->set_display_name_finish = g_file_real_set_display_name_finish;
-  iface->query_info_async = g_file_real_query_info_async;
-  iface->query_info_finish = g_file_real_query_info_finish;
-  iface->query_filesystem_info_async = g_file_real_query_filesystem_info_async;
-  iface->query_filesystem_info_finish = g_file_real_query_filesystem_info_finish;
-  iface->set_attributes_async = g_file_real_set_attributes_async;
-  iface->set_attributes_finish = g_file_real_set_attributes_finish;
-  iface->read_async = g_file_real_read_async;
-  iface->read_finish = g_file_real_read_finish;
-  iface->append_to_async = g_file_real_append_to_async;
-  iface->append_to_finish = g_file_real_append_to_finish;
-  iface->create_async = g_file_real_create_async;
-  iface->create_finish = g_file_real_create_finish;
-  iface->replace_async = g_file_real_replace_async;
-  iface->replace_finish = g_file_real_replace_finish;
-  iface->delete_file_async = g_file_real_delete_async;
-  iface->delete_file_finish = g_file_real_delete_finish;
-  iface->trash_async = g_file_real_trash_async;
-  iface->trash_finish = g_file_real_trash_finish;
-  iface->move_async = g_file_real_move_async;
-  iface->move_finish = g_file_real_move_finish;
-  iface->make_directory_async = g_file_real_make_directory_async;
-  iface->make_directory_finish = g_file_real_make_directory_finish;
-  iface->open_readwrite_async = g_file_real_open_readwrite_async;
-  iface->open_readwrite_finish = g_file_real_open_readwrite_finish;
-  iface->create_readwrite_async = g_file_real_create_readwrite_async;
-  iface->create_readwrite_finish = g_file_real_create_readwrite_finish;
-  iface->replace_readwrite_async = g_file_real_replace_readwrite_async;
-  iface->replace_readwrite_finish = g_file_real_replace_readwrite_finish;
-  iface->find_enclosing_mount_async = g_file_real_find_enclosing_mount_async;
-  iface->find_enclosing_mount_finish = g_file_real_find_enclosing_mount_finish;
-  iface->set_attributes_from_info = g_file_real_set_attributes_from_info;
-  iface->copy_async = g_file_real_copy_async;
-  iface->copy_finish = g_file_real_copy_finish;
-  iface->measure_disk_usage = g_file_real_measure_disk_usage;
-  iface->measure_disk_usage_async = g_file_real_measure_disk_usage_async;
-  iface->measure_disk_usage_finish = g_file_real_measure_disk_usage_finish;
+  iface->enumerate_children_async = xfile_real_enumerate_children_async;
+  iface->enumerate_children_finish = xfile_real_enumerate_children_finish;
+  iface->set_display_name_async = xfile_real_set_display_name_async;
+  iface->set_display_name_finish = xfile_real_set_display_name_finish;
+  iface->query_info_async = xfile_real_query_info_async;
+  iface->query_info_finish = xfile_real_query_info_finish;
+  iface->query_filesystem_info_async = xfile_real_query_filesystem_info_async;
+  iface->query_filesystem_info_finish = xfile_real_query_filesystem_info_finish;
+  iface->set_attributes_async = xfile_real_set_attributes_async;
+  iface->set_attributes_finish = xfile_real_set_attributes_finish;
+  iface->read_async = xfile_real_read_async;
+  iface->read_finish = xfile_real_read_finish;
+  iface->append_to_async = xfile_real_append_to_async;
+  iface->append_to_finish = xfile_real_append_to_finish;
+  iface->create_async = xfile_real_create_async;
+  iface->create_finish = xfile_real_create_finish;
+  iface->replace_async = xfile_real_replace_async;
+  iface->replace_finish = xfile_real_replace_finish;
+  iface->delete_file_async = xfile_real_delete_async;
+  iface->delete_file_finish = xfile_real_delete_finish;
+  iface->trash_async = xfile_real_trash_async;
+  iface->trash_finish = xfile_real_trash_finish;
+  iface->move_async = xfile_real_move_async;
+  iface->move_finish = xfile_real_move_finish;
+  iface->make_directory_async = xfile_real_make_directory_async;
+  iface->make_directory_finish = xfile_real_make_directory_finish;
+  iface->open_readwrite_async = xfile_real_open_readwrite_async;
+  iface->open_readwrite_finish = xfile_real_open_readwrite_finish;
+  iface->create_readwrite_async = xfile_real_create_readwrite_async;
+  iface->create_readwrite_finish = xfile_real_create_readwrite_finish;
+  iface->replace_readwrite_async = xfile_real_replace_readwrite_async;
+  iface->replace_readwrite_finish = xfile_real_replace_readwrite_finish;
+  iface->find_enclosing_mount_async = xfile_real_find_enclosing_mount_async;
+  iface->find_enclosing_mount_finish = xfile_real_find_enclosing_mount_finish;
+  iface->set_attributes_from_info = xfile_real_set_attributes_from_info;
+  iface->copy_async = xfile_real_copy_async;
+  iface->copy_finish = xfile_real_copy_finish;
+  iface->measure_disk_usage = xfile_real_measure_disk_usage;
+  iface->measure_disk_usage_async = xfile_real_measure_disk_usage_async;
+  iface->measure_disk_usage_finish = xfile_real_measure_disk_usage_finish;
 }
 
 
 /**
- * g_file_is_native:
+ * xfile_is_native:
  * @file: input #xfile_t
  *
  * Checks to see if a file is native to the platform.
@@ -426,27 +426,27 @@ g_file_default_init (GFileIface *iface)
  *
  * On some systems non-native files may be available using the native
  * filesystem via a userspace filesystem (FUSE), in these cases this call
- * will return %FALSE, but g_file_get_path() will still return a native path.
+ * will return %FALSE, but xfile_get_path() will still return a native path.
  *
  * This call does no blocking I/O.
  *
  * Returns: %TRUE if @file is native
  */
 xboolean_t
-g_file_is_native (xfile_t *file)
+xfile_is_native (xfile_t *file)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   return (* iface->is_native) (file);
 }
 
 
 /**
- * g_file_has_uri_scheme:
+ * xfile_has_uri_scheme:
  * @file: input #xfile_t
  * @uri_scheme: a string containing a URI scheme
  *
@@ -459,22 +459,22 @@ g_file_is_native (xfile_t *file)
  *   not supported, or #xfile_t is invalid.
  */
 xboolean_t
-g_file_has_uri_scheme (xfile_t      *file,
+xfile_has_uri_scheme (xfile_t      *file,
                        const char *uri_scheme)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (uri_scheme != NULL, FALSE);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   return (* iface->has_uri_scheme) (file, uri_scheme);
 }
 
 
 /**
- * g_file_get_uri_scheme:
+ * xfile_get_uri_scheme:
  * @file: input #xfile_t
  *
  * Gets the URI scheme for a #xfile_t.
@@ -494,20 +494,20 @@ g_file_has_uri_scheme (xfile_t      *file,
  *   returned string should be freed with g_free() when no longer needed.
  */
 char *
-g_file_get_uri_scheme (xfile_t *file)
+xfile_get_uri_scheme (xfile_t *file)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   return (* iface->get_uri_scheme) (file);
 }
 
 
 /**
- * g_file_get_basename: (virtual get_basename)
+ * xfile_get_basename: (virtual get_basename)
  * @file: input #xfile_t
  *
  * Gets the base name (the last component of the path) for a given #xfile_t.
@@ -519,8 +519,8 @@ g_file_get_uri_scheme (xfile_t *file)
  * The base name is a byte string (not UTF-8). It has no defined encoding
  * or rules other than it may not contain zero bytes.  If you want to use
  * filenames in a user interface you should use the display name that you
- * can get by requesting the %G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME
- * attribute with g_file_query_info().
+ * can get by requesting the %XFILE_ATTRIBUTE_STANDARD_DISPLAY_NAME
+ * attribute with xfile_query_info().
  *
  * This call does no blocking I/O.
  *
@@ -529,19 +529,19 @@ g_file_get_uri_scheme (xfile_t *file)
  *   should be freed with g_free() when no longer needed.
  */
 char *
-g_file_get_basename (xfile_t *file)
+xfile_get_basename (xfile_t *file)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   return (* iface->get_basename) (file);
 }
 
 /**
- * g_file_get_path: (virtual get_path)
+ * xfile_get_path: (virtual get_path)
  * @file: input #xfile_t
  *
  * Gets the local pathname for #xfile_t, if one exists. If non-%NULL, this is
@@ -554,13 +554,13 @@ g_file_get_basename (xfile_t *file)
  *   with g_free() when no longer needed.
  */
 char *
-g_file_get_path (xfile_t *file)
+xfile_get_path (xfile_t *file)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   return (* iface->get_path) (file);
 }
@@ -569,36 +569,36 @@ static const char *
 file_peek_path_generic (xfile_t *file)
 {
   const char *path;
-  static GQuark _file_path_quark = 0;
+  static xquark _file_path_quark = 0;
 
   if (G_UNLIKELY (_file_path_quark) == 0)
     _file_path_quark = g_quark_from_static_string ("gio-file-path");
 
   /* We need to be careful about threading, as two threads calling
-   * g_file_peek_path() on the same file could race: both would see
-   * (g_object_get_qdata(…) == NULL) to begin with, both would generate and add
+   * xfile_peek_path() on the same file could race: both would see
+   * (xobject_get_qdata(…) == NULL) to begin with, both would generate and add
    * the path, but the second thread to add it would end up freeing the path
    * set by the first thread. The first thread would still return the pointer
    * to that freed path, though, resulting an a read-after-free. Handle that
-   * with a compare-and-swap loop. The g_object_*_qdata() functions are atomic. */
+   * with a compare-and-swap loop. The xobject_*_qdata() functions are atomic. */
 
   while (TRUE)
     {
       xchar_t *new_path = NULL;
 
-      path = g_object_get_qdata ((xobject_t*)file, _file_path_quark);
+      path = xobject_get_qdata ((xobject_t*)file, _file_path_quark);
 
       if (path != NULL)
         break;
 
-      new_path = g_file_get_path (file);
+      new_path = xfile_get_path (file);
       if (new_path == NULL)
         return NULL;
 
       /* By passing NULL here, we ensure we never replace existing data: */
-      if (g_object_replace_qdata ((xobject_t *) file, _file_path_quark,
+      if (xobject_replace_qdata ((xobject_t *) file, _file_path_quark,
                                   NULL, (xpointer_t) new_path,
-                                  (GDestroyNotify) g_free, NULL))
+                                  (xdestroy_notify_t) g_free, NULL))
         {
           path = new_path;
           break;
@@ -611,12 +611,12 @@ file_peek_path_generic (xfile_t *file)
 }
 
 /**
- * g_file_peek_path:
+ * xfile_peek_path:
  * @file: input #xfile_t
  *
- * Exactly like g_file_get_path(), but caches the result via
- * g_object_set_qdata_full().  This is useful for example in C
- * applications which mix `g_file_*` APIs with native ones.  It
+ * Exactly like xfile_get_path(), but caches the result via
+ * xobject_set_qdata_full().  This is useful for example in C
+ * applications which mix `xfile_*` APIs with native ones.  It
  * also avoids an extra duplicated string when possible, so will be
  * generally more efficient.
  *
@@ -627,7 +627,7 @@ file_peek_path_generic (xfile_t *file)
  * Since: 2.56
  */
 const char *
-g_file_peek_path (xfile_t *file)
+xfile_peek_path (xfile_t *file)
 {
   if (X_IS_LOCAL_FILE (file))
     return _g_local_file_get_filename ((GLocalFile *) file);
@@ -635,7 +635,7 @@ g_file_peek_path (xfile_t *file)
 }
 
 /**
- * g_file_get_uri:
+ * xfile_get_uri:
  * @file: input #xfile_t
  *
  * Gets the URI for the @file.
@@ -648,25 +648,25 @@ g_file_peek_path (xfile_t *file)
  *   when no longer needed.
  */
 char *
-g_file_get_uri (xfile_t *file)
+xfile_get_uri (xfile_t *file)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   return (* iface->get_uri) (file);
 }
 
 /**
- * g_file_get_parse_name:
+ * xfile_get_parse_name:
  * @file: input #xfile_t
  *
  * Gets the parse name of the @file.
  * A parse name is a UTF-8 string that describes the
  * file such that one can get the #xfile_t back using
- * g_file_parse_name().
+ * xfile_parse_name().
  *
  * This is generally used to show the #xfile_t as a nice
  * full-pathname kind of string in a user interface,
@@ -683,28 +683,28 @@ g_file_get_uri (xfile_t *file)
  *   when no longer needed.
  */
 char *
-g_file_get_parse_name (xfile_t *file)
+xfile_get_parse_name (xfile_t *file)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   return (* iface->get_parse_name) (file);
 }
 
 /**
- * g_file_dup:
+ * xfile_dup:
  * @file: input #xfile_t
  *
  * Duplicates a #xfile_t handle. This operation does not duplicate
  * the actual file or directory represented by the #xfile_t; see
- * g_file_copy() if attempting to copy a file.
+ * xfile_copy() if attempting to copy a file.
  *
- * g_file_dup() is useful when a second handle is needed to the same underlying
+ * xfile_dup() is useful when a second handle is needed to the same underlying
  * file, for use in a separate thread (#xfile_t is not thread-safe). For use
- * within the same thread, use g_object_ref() to increment the existing object’s
+ * within the same thread, use xobject_ref() to increment the existing object’s
  * reference count.
  *
  * This call does no blocking I/O.
@@ -713,20 +713,20 @@ g_file_get_parse_name (xfile_t *file)
  *   of the given #xfile_t.
  */
 xfile_t *
-g_file_dup (xfile_t *file)
+xfile_dup (xfile_t *file)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   return (* iface->dup) (file);
 }
 
 /**
- * g_file_hash:
- * @file: (type xfile_t): #gconstpointer to a #xfile_t
+ * xfile_hash:
+ * @file: (type xfile_t): #xconstpointer to a #xfile_t
  *
  * Creates a hash value for a #xfile_t.
  *
@@ -736,22 +736,22 @@ g_file_dup (xfile_t *file)
  * Returns: 0 if @file is not a valid #xfile_t, otherwise an
  *   integer that can be used as hash value for the #xfile_t.
  *   This function is intended for easily hashing a #xfile_t to
- *   add to a #GHashTable or similar data structure.
+ *   add to a #xhashtable_t or similar data structure.
  */
 xuint_t
-g_file_hash (gconstpointer file)
+xfile_hash (xconstpointer file)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), 0);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   return (* iface->hash) ((xfile_t *)file);
 }
 
 /**
- * g_file_equal:
+ * xfile_equal:
  * @file1: the first #xfile_t
  * @file2: the second #xfile_t
  *
@@ -766,10 +766,10 @@ g_file_hash (gconstpointer file)
  * Returns: %TRUE if @file1 and @file2 are equal.
  */
 xboolean_t
-g_file_equal (xfile_t *file1,
+xfile_equal (xfile_t *file1,
               xfile_t *file2)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file1), FALSE);
   g_return_val_if_fail (X_IS_FILE (file2), FALSE);
@@ -780,14 +780,14 @@ g_file_equal (xfile_t *file1,
   if (XTYPE_FROM_INSTANCE (file1) != XTYPE_FROM_INSTANCE (file2))
     return FALSE;
 
-  iface = G_FILE_GET_IFACE (file1);
+  iface = XFILE_GET_IFACE (file1);
 
   return (* iface->equal) (file1, file2);
 }
 
 
 /**
- * g_file_get_parent:
+ * xfile_get_parent:
  * @file: input #xfile_t
  *
  * Gets the parent directory for the @file.
@@ -798,22 +798,22 @@ g_file_equal (xfile_t *file1,
  *
  * Returns: (nullable) (transfer full): a #xfile_t structure to the
  *   parent of the given #xfile_t or %NULL if there is no parent. Free
- *   the returned object with g_object_unref().
+ *   the returned object with xobject_unref().
  */
 xfile_t *
-g_file_get_parent (xfile_t *file)
+xfile_get_parent (xfile_t *file)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   return (* iface->get_parent) (file);
 }
 
 /**
- * g_file_has_parent:
+ * xfile_has_parent:
  * @file: input #xfile_t
  * @parent: (nullable): the parent to check for, or %NULL
  *
@@ -829,7 +829,7 @@ g_file_get_parent (xfile_t *file)
  * Since: 2.24
  */
 xboolean_t
-g_file_has_parent (xfile_t *file,
+xfile_has_parent (xfile_t *file,
                    xfile_t *parent)
 {
   xfile_t *actual_parent;
@@ -838,16 +838,16 @@ g_file_has_parent (xfile_t *file,
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (parent == NULL || X_IS_FILE (parent), FALSE);
 
-  actual_parent = g_file_get_parent (file);
+  actual_parent = xfile_get_parent (file);
 
   if (actual_parent != NULL)
     {
       if (parent != NULL)
-        result = g_file_equal (parent, actual_parent);
+        result = xfile_equal (parent, actual_parent);
       else
         result = TRUE;
 
-      g_object_unref (actual_parent);
+      xobject_unref (actual_parent);
     }
   else
     result = FALSE;
@@ -856,7 +856,7 @@ g_file_has_parent (xfile_t *file,
 }
 
 /**
- * g_file_get_child:
+ * xfile_get_child:
  * @file: input #xfile_t
  * @name: (type filename): string containing the child's basename
  *
@@ -869,21 +869,21 @@ g_file_has_parent (xfile_t *file,
  * This call does no blocking I/O.
  *
  * Returns: (transfer full): a #xfile_t to a child specified by @name.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
 xfile_t *
-g_file_get_child (xfile_t      *file,
+xfile_get_child (xfile_t      *file,
                   const char *name)
 {
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (name != NULL, NULL);
   g_return_val_if_fail (!g_path_is_absolute (name), NULL);
 
-  return g_file_resolve_relative_path (file, name);
+  return xfile_resolve_relative_path (file, name);
 }
 
 /**
- * g_file_get_child_for_display_name:
+ * xfile_get_child_for_display_name:
  * @file: input #xfile_t
  * @display_name: string to a possible child
  * @error: return location for an error
@@ -899,25 +899,25 @@ g_file_get_child (xfile_t      *file,
  *
  * Returns: (transfer full): a #xfile_t to the specified child, or
  *   %NULL if the display name couldn't be converted.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
 xfile_t *
-g_file_get_child_for_display_name (xfile_t      *file,
+xfile_get_child_for_display_name (xfile_t      *file,
                                    const char *display_name,
                                    xerror_t **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (display_name != NULL, NULL);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   return (* iface->get_child_for_display_name) (file, display_name, error);
 }
 
 /**
- * g_file_has_prefix:
+ * xfile_has_prefix:
  * @file: input #xfile_t
  * @prefix: input #xfile_t
  *
@@ -929,7 +929,7 @@ g_file_get_child_for_display_name (xfile_t      *file,
  * of /foo/bar.
  *
  * A #xfile_t is not a prefix of itself. If you want to check for
- * equality, use g_file_equal().
+ * equality, use xfile_equal().
  *
  * This call does no I/O, as it works purely on names. As such it can
  * sometimes return %FALSE even if @file is inside a @prefix (from a
@@ -941,10 +941,10 @@ g_file_get_child_for_display_name (xfile_t      *file,
  *   %FALSE otherwise.
  */
 xboolean_t
-g_file_has_prefix (xfile_t *file,
+xfile_has_prefix (xfile_t *file,
                    xfile_t *prefix)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_FILE (prefix), FALSE);
@@ -952,7 +952,7 @@ g_file_has_prefix (xfile_t *file,
   if (XTYPE_FROM_INSTANCE (file) != XTYPE_FROM_INSTANCE (prefix))
     return FALSE;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   /* The vtable function differs in arg order since
    * we're using the old contains_file call
@@ -961,7 +961,7 @@ g_file_has_prefix (xfile_t *file,
 }
 
 /**
- * g_file_get_relative_path: (virtual get_relative_path)
+ * xfile_get_relative_path: (virtual get_relative_path)
  * @parent: input #xfile_t
  * @descendant: input #xfile_t
  *
@@ -975,10 +975,10 @@ g_file_has_prefix (xfile_t *file,
  *   no longer needed.
  */
 char *
-g_file_get_relative_path (xfile_t *parent,
+xfile_get_relative_path (xfile_t *parent,
                           xfile_t *descendant)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (parent), NULL);
   g_return_val_if_fail (X_IS_FILE (descendant), NULL);
@@ -986,13 +986,13 @@ g_file_get_relative_path (xfile_t *parent,
   if (XTYPE_FROM_INSTANCE (parent) != XTYPE_FROM_INSTANCE (descendant))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (parent);
+  iface = XFILE_GET_IFACE (parent);
 
   return (* iface->get_relative_path) (parent, descendant);
 }
 
 /**
- * g_file_resolve_relative_path:
+ * xfile_resolve_relative_path:
  * @file: input #xfile_t
  * @relative_path: (type filename): a given relative path string
  *
@@ -1006,31 +1006,31 @@ g_file_get_relative_path (xfile_t *parent,
  * Returns: (transfer full): a #xfile_t for the resolved path.
  */
 xfile_t *
-g_file_resolve_relative_path (xfile_t      *file,
+xfile_resolve_relative_path (xfile_t      *file,
                               const char *relative_path)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (relative_path != NULL, NULL);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   return (* iface->resolve_relative_path) (file, relative_path);
 }
 
 /**
- * g_file_enumerate_children:
+ * xfile_enumerate_children:
  * @file: input #xfile_t
  * @attributes: an attribute query string
- * @flags: a set of #GFileQueryInfoFlags
+ * @flags: a set of #xfile_query_info_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: #xerror_t for error reporting
  *
  * Gets the requested information about the files in a directory.
- * The result is a #GFileEnumerator object that will give out
- * #GFileInfo objects for all the files in the directory.
+ * The result is a #xfile_enumerator_t object that will give out
+ * #xfile_info_t objects for all the files in the directory.
  *
  * The @attributes value is a string that specifies the file
  * attributes that should be gathered. It is not an error if
@@ -1041,9 +1041,9 @@ g_file_resolve_relative_path (xfile_t      *file,
  * "standard::*" means all attributes in the standard namespace.
  * An example attribute query be "standard::*,owner::user".
  * The standard attributes are available as defines, like
- * %G_FILE_ATTRIBUTE_STANDARD_NAME. %G_FILE_ATTRIBUTE_STANDARD_NAME should
- * always be specified if you plan to call g_file_enumerator_get_child() or
- * g_file_enumerator_iterate() on the returned enumerator.
+ * %XFILE_ATTRIBUTE_STANDARD_NAME. %XFILE_ATTRIBUTE_STANDARD_NAME should
+ * always be specified if you plan to call xfile_enumerator_get_child() or
+ * xfile_enumerator_iterate() on the returned enumerator.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled
  * by triggering the cancellable object from another thread. If the
@@ -1054,24 +1054,24 @@ g_file_resolve_relative_path (xfile_t      *file,
  * be returned. If the file is not a directory, the %G_IO_ERROR_NOT_DIRECTORY
  * error will be returned. Other errors are possible too.
  *
- * Returns: (transfer full): A #GFileEnumerator if successful,
- *   %NULL on error. Free the returned object with g_object_unref().
+ * Returns: (transfer full): A #xfile_enumerator_t if successful,
+ *   %NULL on error. Free the returned object with xobject_unref().
  */
-GFileEnumerator *
-g_file_enumerate_children (xfile_t                *file,
+xfile_enumerator_t *
+xfile_enumerate_children (xfile_t                *file,
                            const char           *attributes,
-                           GFileQueryInfoFlags   flags,
+                           xfile_query_info_flags_t   flags,
                            xcancellable_t         *cancellable,
                            xerror_t              **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->enumerate_children == NULL)
     {
@@ -1086,10 +1086,10 @@ g_file_enumerate_children (xfile_t                *file,
 }
 
 /**
- * g_file_enumerate_children_async:
+ * xfile_enumerate_children_async:
  * @file: input #xfile_t
  * @attributes: an attribute query string
- * @flags: a set of #GFileQueryInfoFlags
+ * @flags: a set of #xfile_query_info_flags_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -1098,30 +1098,30 @@ g_file_enumerate_children (xfile_t                *file,
  * @user_data: (closure): the data to pass to callback function
  *
  * Asynchronously gets the requested information about the files
- * in a directory. The result is a #GFileEnumerator object that will
- * give out #GFileInfo objects for all the files in the directory.
+ * in a directory. The result is a #xfile_enumerator_t object that will
+ * give out #xfile_info_t objects for all the files in the directory.
  *
- * For more details, see g_file_enumerate_children() which is
+ * For more details, see xfile_enumerate_children() which is
  * the synchronous version of this call.
  *
  * When the operation is finished, @callback will be called. You can
- * then call g_file_enumerate_children_finish() to get the result of
+ * then call xfile_enumerate_children_finish() to get the result of
  * the operation.
  */
 void
-g_file_enumerate_children_async (xfile_t               *file,
+xfile_enumerate_children_async (xfile_t               *file,
                                  const char          *attributes,
-                                 GFileQueryInfoFlags  flags,
+                                 xfile_query_info_flags_t  flags,
                                  int                  io_priority,
                                  xcancellable_t        *cancellable,
                                  xasync_ready_callback_t  callback,
                                  xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->enumerate_children_async) (file,
                                        attributes,
                                        flags,
@@ -1132,43 +1132,43 @@ g_file_enumerate_children_async (xfile_t               *file,
 }
 
 /**
- * g_file_enumerate_children_finish:
+ * xfile_enumerate_children_finish:
  * @file: input #xfile_t
  * @res: a #xasync_result_t
  * @error: a #xerror_t
  *
  * Finishes an async enumerate children operation.
- * See g_file_enumerate_children_async().
+ * See xfile_enumerate_children_async().
  *
- * Returns: (transfer full): a #GFileEnumerator or %NULL
+ * Returns: (transfer full): a #xfile_enumerator_t or %NULL
  *   if an error occurred.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
-GFileEnumerator *
-g_file_enumerate_children_finish (xfile_t         *file,
+xfile_enumerator_t *
+xfile_enumerate_children_finish (xfile_t         *file,
                                   xasync_result_t  *res,
                                   xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
-  if (g_async_result_legacy_propagate_error (res, error))
+  if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->enumerate_children_finish) (file, res, error);
 }
 
 /**
- * g_file_query_exists:
+ * xfile_query_exists:
  * @file: input #xfile_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  *
  * Utility function to check if a particular file exists. This is
- * implemented using g_file_query_info() and as such does blocking I/O.
+ * implemented using xfile_query_info() and as such does blocking I/O.
  *
  * Note that in many cases it is [racy to first check for file existence](https://en.wikipedia.org/wiki/Time_of_check_to_time_of_use)
  * and then execute something based on the outcome of that, because the
@@ -1181,7 +1181,7 @@ g_file_enumerate_children_finish (xfile_t         *file,
  * it, and on error create it; and: check if it exists, if not create it.
  * These can both result in two processes creating the file (with perhaps
  * a partially written file as the result). The correct approach is to
- * always try to create the file with g_file_create() which will either
+ * always try to create the file with xfile_create() which will either
  * atomically create the file or fail with a %G_IO_ERROR_EXISTS error.
  *
  * However, in many cases an existence check is useful in a user interface,
@@ -1194,18 +1194,18 @@ g_file_enumerate_children_finish (xfile_t         *file,
  *   %FALSE otherwise (or if cancelled).
  */
 xboolean_t
-g_file_query_exists (xfile_t        *file,
+xfile_query_exists (xfile_t        *file,
                      xcancellable_t *cancellable)
 {
-  GFileInfo *info;
+  xfile_info_t *info;
 
   g_return_val_if_fail (X_IS_FILE(file), FALSE);
 
-  info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_TYPE,
-                            G_FILE_QUERY_INFO_NONE, cancellable, NULL);
+  info = xfile_query_info (file, XFILE_ATTRIBUTE_STANDARD_TYPE,
+                            XFILE_QUERY_INFO_NONE, cancellable, NULL);
   if (info != NULL)
     {
-      g_object_unref (info);
+      xobject_unref (info);
       return TRUE;
     }
 
@@ -1213,56 +1213,56 @@ g_file_query_exists (xfile_t        *file,
 }
 
 /**
- * g_file_query_file_type:
+ * xfile_query_file_type:
  * @file: input #xfile_t
- * @flags: a set of #GFileQueryInfoFlags passed to g_file_query_info()
+ * @flags: a set of #xfile_query_info_flags_t passed to xfile_query_info()
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  *
- * Utility function to inspect the #GFileType of a file. This is
- * implemented using g_file_query_info() and as such does blocking I/O.
+ * Utility function to inspect the #xfile_type_t of a file. This is
+ * implemented using xfile_query_info() and as such does blocking I/O.
  *
  * The primary use case of this method is to check if a file is
  * a regular file, directory, or symlink.
  *
- * Returns: The #GFileType of the file and %G_FILE_TYPE_UNKNOWN
+ * Returns: The #xfile_type_t of the file and %XFILE_TYPE_UNKNOWN
  *   if the file does not exist
  *
  * Since: 2.18
  */
-GFileType
-g_file_query_file_type (xfile_t               *file,
-                        GFileQueryInfoFlags  flags,
+xfile_type_t
+xfile_query_file_type (xfile_t               *file,
+                        xfile_query_info_flags_t  flags,
                         xcancellable_t        *cancellable)
 {
-  GFileInfo *info;
-  GFileType file_type;
+  xfile_info_t *info;
+  xfile_type_t file_type;
 
-  g_return_val_if_fail (X_IS_FILE(file), G_FILE_TYPE_UNKNOWN);
-  info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_TYPE, flags,
+  g_return_val_if_fail (X_IS_FILE(file), XFILE_TYPE_UNKNOWN);
+  info = xfile_query_info (file, XFILE_ATTRIBUTE_STANDARD_TYPE, flags,
                             cancellable, NULL);
   if (info != NULL)
     {
-      file_type = g_file_info_get_file_type (info);
-      g_object_unref (info);
+      file_type = xfile_info_get_file_type (info);
+      xobject_unref (info);
     }
   else
-    file_type = G_FILE_TYPE_UNKNOWN;
+    file_type = XFILE_TYPE_UNKNOWN;
 
   return file_type;
 }
 
 /**
- * g_file_query_info:
+ * xfile_query_info:
  * @file: input #xfile_t
  * @attributes: an attribute query string
- * @flags: a set of #GFileQueryInfoFlags
+ * @flags: a set of #xfile_query_info_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t
  *
  * Gets the requested information about specified @file.
- * The result is a #GFileInfo object that contains key-value
+ * The result is a #xfile_info_t object that contains key-value
  * attributes (such as the type or size of the file).
  *
  * The @attributes value is a string that specifies the file
@@ -1274,7 +1274,7 @@ g_file_query_file_type (xfile_t               *file,
  * "standard::*" means all attributes in the standard namespace.
  * An example attribute query be "standard::*,owner::user".
  * The standard attributes are available as defines, like
- * %G_FILE_ATTRIBUTE_STANDARD_NAME.
+ * %XFILE_ATTRIBUTE_STANDARD_NAME.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled
  * by triggering the cancellable object from another thread. If the
@@ -1283,7 +1283,7 @@ g_file_query_file_type (xfile_t               *file,
  *
  * For symlinks, normally the information about the target of the
  * symlink is returned, rather than information about the symlink
- * itself. However if you pass %G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS
+ * itself. However if you pass %XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS
  * in @flags the information about the symlink itself will be returned.
  * Also, for symlinks that point to non-existing files the information
  * about the symlink itself will be returned.
@@ -1292,24 +1292,24 @@ g_file_query_file_type (xfile_t               *file,
  * returned. Other errors are possible too, and depend on what kind of
  * filesystem the file is on.
  *
- * Returns: (transfer full): a #GFileInfo for the given @file, or %NULL
- *   on error. Free the returned object with g_object_unref().
+ * Returns: (transfer full): a #xfile_info_t for the given @file, or %NULL
+ *   on error. Free the returned object with xobject_unref().
  */
-GFileInfo *
-g_file_query_info (xfile_t                *file,
+xfile_info_t *
+xfile_query_info (xfile_t                *file,
                    const char           *attributes,
-                   GFileQueryInfoFlags   flags,
+                   xfile_query_info_flags_t   flags,
                    xcancellable_t         *cancellable,
                    xerror_t              **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->query_info == NULL)
     {
@@ -1323,10 +1323,10 @@ g_file_query_info (xfile_t                *file,
 }
 
 /**
- * g_file_query_info_async:
+ * xfile_query_info_async:
  * @file: input #xfile_t
  * @attributes: an attribute query string
- * @flags: a set of #GFileQueryInfoFlags
+ * @flags: a set of #xfile_query_info_flags_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -1335,29 +1335,29 @@ g_file_query_info (xfile_t                *file,
  * @user_data: (closure): the data to pass to callback function
  *
  * Asynchronously gets the requested information about specified @file.
- * The result is a #GFileInfo object that contains key-value attributes
+ * The result is a #xfile_info_t object that contains key-value attributes
  * (such as type or size for the file).
  *
- * For more details, see g_file_query_info() which is the synchronous
+ * For more details, see xfile_query_info() which is the synchronous
  * version of this call.
  *
  * When the operation is finished, @callback will be called. You can
- * then call g_file_query_info_finish() to get the result of the operation.
+ * then call xfile_query_info_finish() to get the result of the operation.
  */
 void
-g_file_query_info_async (xfile_t               *file,
+xfile_query_info_async (xfile_t               *file,
                          const char          *attributes,
-                         GFileQueryInfoFlags  flags,
+                         xfile_query_info_flags_t  flags,
                          int                  io_priority,
                          xcancellable_t        *cancellable,
                          xasync_ready_callback_t  callback,
                          xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->query_info_async) (file,
                                attributes,
                                flags,
@@ -1368,44 +1368,44 @@ g_file_query_info_async (xfile_t               *file,
 }
 
 /**
- * g_file_query_info_finish:
+ * xfile_query_info_finish:
  * @file: input #xfile_t
  * @res: a #xasync_result_t
  * @error: a #xerror_t
  *
  * Finishes an asynchronous file info query.
- * See g_file_query_info_async().
+ * See xfile_query_info_async().
  *
- * Returns: (transfer full): #GFileInfo for given @file
+ * Returns: (transfer full): #xfile_info_t for given @file
  *   or %NULL on error. Free the returned object with
- *   g_object_unref().
+ *   xobject_unref().
  */
-GFileInfo *
-g_file_query_info_finish (xfile_t         *file,
+xfile_info_t *
+xfile_query_info_finish (xfile_t         *file,
                           xasync_result_t  *res,
                           xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
-  if (g_async_result_legacy_propagate_error (res, error))
+  if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->query_info_finish) (file, res, error);
 }
 
 /**
- * g_file_query_filesystem_info:
+ * xfile_query_filesystem_info:
  * @file: input #xfile_t
  * @attributes:  an attribute query string
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t
  *
- * Similar to g_file_query_info(), but obtains information
+ * Similar to xfile_query_info(), but obtains information
  * about the filesystem the @file is on, rather than the file itself.
  * For instance the amount of space available and the type of
  * the filesystem.
@@ -1418,9 +1418,9 @@ g_file_query_info_finish (xfile_t         *file,
  * attributes, and a wildcard like "filesystem::*" means all attributes
  * in the filesystem namespace. The standard namespace for filesystem
  * attributes is "filesystem". Common attributes of interest are
- * %G_FILE_ATTRIBUTE_FILESYSTEM_SIZE (the total size of the filesystem
- * in bytes), %G_FILE_ATTRIBUTE_FILESYSTEM_FREE (number of bytes available),
- * and %G_FILE_ATTRIBUTE_FILESYSTEM_TYPE (type of the filesystem).
+ * %XFILE_ATTRIBUTE_FILESYSTEM_SIZE (the total size of the filesystem
+ * in bytes), %XFILE_ATTRIBUTE_FILESYSTEM_FREE (number of bytes available),
+ * and %XFILE_ATTRIBUTE_FILESYSTEM_TYPE (type of the filesystem).
  *
  * If @cancellable is not %NULL, then the operation can be cancelled
  * by triggering the cancellable object from another thread. If the
@@ -1431,23 +1431,23 @@ g_file_query_info_finish (xfile_t         *file,
  * be returned. Other errors are possible too, and depend on what
  * kind of filesystem the file is on.
  *
- * Returns: (transfer full): a #GFileInfo or %NULL if there was an error.
- *   Free the returned object with g_object_unref().
+ * Returns: (transfer full): a #xfile_info_t or %NULL if there was an error.
+ *   Free the returned object with xobject_unref().
  */
-GFileInfo *
-g_file_query_filesystem_info (xfile_t         *file,
+xfile_info_t *
+xfile_query_filesystem_info (xfile_t         *file,
                               const char    *attributes,
                               xcancellable_t  *cancellable,
                               xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->query_filesystem_info == NULL)
     {
@@ -1461,7 +1461,7 @@ g_file_query_filesystem_info (xfile_t         *file,
 }
 
 /**
- * g_file_query_filesystem_info_async:
+ * xfile_query_filesystem_info_async:
  * @file: input #xfile_t
  * @attributes: an attribute query string
  * @io_priority: the [I/O priority][io-priority] of the request
@@ -1472,30 +1472,30 @@ g_file_query_filesystem_info (xfile_t         *file,
  * @user_data: (closure): the data to pass to callback function
  *
  * Asynchronously gets the requested information about the filesystem
- * that the specified @file is on. The result is a #GFileInfo object
+ * that the specified @file is on. The result is a #xfile_info_t object
  * that contains key-value attributes (such as type or size for the
  * file).
  *
- * For more details, see g_file_query_filesystem_info() which is the
+ * For more details, see xfile_query_filesystem_info() which is the
  * synchronous version of this call.
  *
  * When the operation is finished, @callback will be called. You can
- * then call g_file_query_info_finish() to get the result of the
+ * then call xfile_query_info_finish() to get the result of the
  * operation.
  */
 void
-g_file_query_filesystem_info_async (xfile_t               *file,
+xfile_query_filesystem_info_async (xfile_t               *file,
                                     const char          *attributes,
                                     int                  io_priority,
                                     xcancellable_t        *cancellable,
                                     xasync_ready_callback_t  callback,
                                     xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->query_filesystem_info_async) (file,
                                           attributes,
                                           io_priority,
@@ -1505,69 +1505,69 @@ g_file_query_filesystem_info_async (xfile_t               *file,
 }
 
 /**
- * g_file_query_filesystem_info_finish:
+ * xfile_query_filesystem_info_finish:
  * @file: input #xfile_t
  * @res: a #xasync_result_t
  * @error: a #xerror_t
  *
  * Finishes an asynchronous filesystem info query.
- * See g_file_query_filesystem_info_async().
+ * See xfile_query_filesystem_info_async().
  *
- * Returns: (transfer full): #GFileInfo for given @file
+ * Returns: (transfer full): #xfile_info_t for given @file
  *   or %NULL on error.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
-GFileInfo *
-g_file_query_filesystem_info_finish (xfile_t         *file,
+xfile_info_t *
+xfile_query_filesystem_info_finish (xfile_t         *file,
                                      xasync_result_t  *res,
                                      xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
-  if (g_async_result_legacy_propagate_error (res, error))
+  if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->query_filesystem_info_finish) (file, res, error);
 }
 
 /**
- * g_file_find_enclosing_mount:
+ * xfile_find_enclosing_mount:
  * @file: input #xfile_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t
  *
- * Gets a #GMount for the #xfile_t.
+ * Gets a #xmount_t for the #xfile_t.
  *
- * #GMount is returned only for user interesting locations, see
- * #GVolumeMonitor. If the #GFileIface for @file does not have a #mount,
+ * #xmount_t is returned only for user interesting locations, see
+ * #xvolume_monitor_t. If the #xfile_iface_t for @file does not have a #mount,
  * @error will be set to %G_IO_ERROR_NOT_FOUND and %NULL #will be returned.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
- * Returns: (transfer full): a #GMount where the @file is located
+ * Returns: (transfer full): a #xmount_t where the @file is located
  *   or %NULL on error.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
-GMount *
-g_file_find_enclosing_mount (xfile_t         *file,
+xmount_t *
+xfile_find_enclosing_mount (xfile_t         *file,
                              xcancellable_t  *cancellable,
                              xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   if (iface->find_enclosing_mount == NULL)
     {
 
@@ -1584,7 +1584,7 @@ g_file_find_enclosing_mount (xfile_t         *file,
 }
 
 /**
- * g_file_find_enclosing_mount_async:
+ * xfile_find_enclosing_mount_async:
  * @file: a #xfile_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
@@ -1595,25 +1595,25 @@ g_file_find_enclosing_mount (xfile_t         *file,
  *
  * Asynchronously gets the mount for the file.
  *
- * For more details, see g_file_find_enclosing_mount() which is
+ * For more details, see xfile_find_enclosing_mount() which is
  * the synchronous version of this call.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_find_enclosing_mount_finish() to
+ * You can then call xfile_find_enclosing_mount_finish() to
  * get the result of the operation.
  */
 void
-g_file_find_enclosing_mount_async (xfile_t              *file,
+xfile_find_enclosing_mount_async (xfile_t              *file,
                                    int                   io_priority,
                                    xcancellable_t         *cancellable,
                                    xasync_ready_callback_t   callback,
                                    xpointer_t              user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->find_enclosing_mount_async) (file,
                                          io_priority,
                                          cancellable,
@@ -1622,42 +1622,42 @@ g_file_find_enclosing_mount_async (xfile_t              *file,
 }
 
 /**
- * g_file_find_enclosing_mount_finish:
+ * xfile_find_enclosing_mount_finish:
  * @file: a #xfile_t
  * @res: a #xasync_result_t
  * @error: a #xerror_t
  *
  * Finishes an asynchronous find mount request.
- * See g_file_find_enclosing_mount_async().
+ * See xfile_find_enclosing_mount_async().
  *
- * Returns: (transfer full): #GMount for given @file or %NULL on error.
- *   Free the returned object with g_object_unref().
+ * Returns: (transfer full): #xmount_t for given @file or %NULL on error.
+ *   Free the returned object with xobject_unref().
  */
-GMount *
-g_file_find_enclosing_mount_finish (xfile_t         *file,
+xmount_t *
+xfile_find_enclosing_mount_finish (xfile_t         *file,
                                     xasync_result_t  *res,
                                     xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
-  if (g_async_result_legacy_propagate_error (res, error))
+  if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->find_enclosing_mount_finish) (file, res, error);
 }
 
 
 /**
- * g_file_read:
+ * xfile_read:
  * @file: #xfile_t to read
  * @cancellable: (nullable): a #xcancellable_t
  * @error: a #xerror_t, or %NULL
  *
- * Opens a file for reading. The result is a #GFileInputStream that
+ * Opens a file for reading. The result is a #xfile_input_stream_t that
  * can be used to read the contents of the file.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
@@ -1670,22 +1670,22 @@ g_file_find_enclosing_mount_finish (xfile_t         *file,
  * on what kind of filesystem the file is on.
  *
  * Virtual: read_fn
- * Returns: (transfer full): #GFileInputStream or %NULL on error.
- *   Free the returned object with g_object_unref().
+ * Returns: (transfer full): #xfile_input_stream_t or %NULL on error.
+ *   Free the returned object with xobject_unref().
  */
-GFileInputStream *
-g_file_read (xfile_t         *file,
+xfile_input_stream_t *
+xfile_read (xfile_t         *file,
              xcancellable_t  *cancellable,
              xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->read_fn == NULL)
     {
@@ -1699,9 +1699,9 @@ g_file_read (xfile_t         *file,
 }
 
 /**
- * g_file_append_to:
+ * xfile_append_to:
  * @file: input #xfile_t
- * @flags: a set of #GFileCreateFlags
+ * @flags: a set of #xfile_create_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, or %NULL
@@ -1710,7 +1710,7 @@ g_file_read (xfile_t         *file,
  * If the file doesn't already exist it is created.
  *
  * By default files created are generally readable by everyone,
- * but if you pass %G_FILE_CREATE_PRIVATE in @flags the file
+ * but if you pass %XFILE_CREATE_PRIVATE in @flags the file
  * will be made readable only to the current user, to the level that
  * is supported on the target filesystem.
  *
@@ -1724,23 +1724,23 @@ g_file_read (xfile_t         *file,
  * %G_IO_ERROR_IS_DIRECTORY error will be returned. Other errors are
  * possible too, and depend on what kind of filesystem the file is on.
  *
- * Returns: (transfer full): a #GFileOutputStream, or %NULL on error.
- *   Free the returned object with g_object_unref().
+ * Returns: (transfer full): a #xfile_output_stream_t, or %NULL on error.
+ *   Free the returned object with xobject_unref().
  */
-GFileOutputStream *
-g_file_append_to (xfile_t             *file,
-                  GFileCreateFlags   flags,
+xfile_output_stream_t *
+xfile_append_to (xfile_t             *file,
+                  xfile_create_flags_t   flags,
                   xcancellable_t      *cancellable,
                   xerror_t           **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->append_to == NULL)
     {
@@ -1754,9 +1754,9 @@ g_file_append_to (xfile_t             *file,
 }
 
 /**
- * g_file_create:
+ * xfile_create:
  * @file: input #xfile_t
- * @flags: a set of #GFileCreateFlags
+ * @flags: a set of #xfile_create_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, or %NULL
@@ -1765,7 +1765,7 @@ g_file_append_to (xfile_t             *file,
  * The file must not already exist.
  *
  * By default files created are generally readable by everyone,
- * but if you pass %G_FILE_CREATE_PRIVATE in @flags the file
+ * but if you pass %XFILE_CREATE_PRIVATE in @flags the file
  * will be made readable only to the current user, to the level
  * that is supported on the target filesystem.
  *
@@ -1781,24 +1781,24 @@ g_file_append_to (xfile_t             *file,
  * be returned. Other errors are possible too, and depend on what kind
  * of filesystem the file is on.
  *
- * Returns: (transfer full): a #GFileOutputStream for the newly created
+ * Returns: (transfer full): a #xfile_output_stream_t for the newly created
  *   file, or %NULL on error.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
-GFileOutputStream *
-g_file_create (xfile_t             *file,
-               GFileCreateFlags   flags,
+xfile_output_stream_t *
+xfile_create (xfile_t             *file,
+               xfile_create_flags_t   flags,
                xcancellable_t      *cancellable,
                xerror_t           **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->create == NULL)
     {
@@ -1812,12 +1812,12 @@ g_file_create (xfile_t             *file,
 }
 
 /**
- * g_file_replace:
+ * xfile_replace:
  * @file: input #xfile_t
  * @etag: (nullable): an optional [entity tag][gfile-etag]
  *   for the current #xfile_t, or #NULL to ignore
  * @make_backup: %TRUE if a backup should be created
- * @flags: a set of #GFileCreateFlags
+ * @flags: a set of #xfile_create_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, or %NULL
@@ -1833,7 +1833,7 @@ g_file_create (xfile_t             *file,
  * the destination when the stream is closed.
  *
  * By default files created are generally readable by everyone,
- * but if you pass %G_FILE_CREATE_PRIVATE in @flags the file
+ * but if you pass %XFILE_CREATE_PRIVATE in @flags the file
  * will be made readable only to the current user, to the level that
  * is supported on the target filesystem.
  *
@@ -1846,9 +1846,9 @@ g_file_create (xfile_t             *file,
  * this value is compared to the current entity tag of the file, and if
  * they differ an %G_IO_ERROR_WRONG_ETAG error is returned. This
  * generally means that the file has been changed since you last read
- * it. You can get the new etag from g_file_output_stream_get_etag()
- * after you've finished writing and closed the #GFileOutputStream. When
- * you load a new file you can use g_file_input_stream_query_info() to
+ * it. You can get the new etag from xfile_output_stream_get_etag()
+ * after you've finished writing and closed the #xfile_output_stream_t. When
+ * you load a new file you can use xfile_input_stream_query_info() to
  * get the etag of the file.
  *
  * If @make_backup is %TRUE, this function will attempt to make a
@@ -1864,25 +1864,25 @@ g_file_create (xfile_t             *file,
  * %G_IO_ERROR_FILENAME_TOO_LONG will be returned. Other errors are
  * possible too, and depend on what kind of filesystem the file is on.
  *
- * Returns: (transfer full): a #GFileOutputStream or %NULL on error.
- *   Free the returned object with g_object_unref().
+ * Returns: (transfer full): a #xfile_output_stream_t or %NULL on error.
+ *   Free the returned object with xobject_unref().
  */
-GFileOutputStream *
-g_file_replace (xfile_t             *file,
+xfile_output_stream_t *
+xfile_replace (xfile_t             *file,
                 const char        *etag,
                 xboolean_t           make_backup,
-                GFileCreateFlags   flags,
+                xfile_create_flags_t   flags,
                 xcancellable_t      *cancellable,
                 xerror_t           **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->replace == NULL)
     {
@@ -1900,13 +1900,13 @@ g_file_replace (xfile_t             *file,
 }
 
 /**
- * g_file_open_readwrite:
+ * xfile_open_readwrite:
  * @file: #xfile_t to open
  * @cancellable: (nullable): a #xcancellable_t
  * @error: a #xerror_t, or %NULL
  *
  * Opens an existing file for reading and writing. The result is
- * a #GFileIOStream that can be used to read and write the contents
+ * a #xfile_io_stream_t that can be used to read and write the contents
  * of the file.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled
@@ -1922,24 +1922,24 @@ g_file_replace (xfile_t             *file,
  * really need to do read and write streaming, rather than just opening
  * for reading or writing.
  *
- * Returns: (transfer full): #GFileIOStream or %NULL on error.
- *   Free the returned object with g_object_unref().
+ * Returns: (transfer full): #xfile_io_stream_t or %NULL on error.
+ *   Free the returned object with xobject_unref().
  *
  * Since: 2.22
  */
-GFileIOStream *
-g_file_open_readwrite (xfile_t         *file,
+xfile_io_stream_t *
+xfile_open_readwrite (xfile_t         *file,
                        xcancellable_t  *cancellable,
                        xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->open_readwrite == NULL)
     {
@@ -1953,9 +1953,9 @@ g_file_open_readwrite (xfile_t         *file,
 }
 
 /**
- * g_file_create_readwrite:
+ * xfile_create_readwrite:
  * @file: a #xfile_t
- * @flags: a set of #GFileCreateFlags
+ * @flags: a set of #xfile_create_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: return location for a #xerror_t, or %NULL
@@ -1964,7 +1964,7 @@ g_file_open_readwrite (xfile_t         *file,
  * writing to it. The file must not already exist.
  *
  * By default files created are generally readable by everyone,
- * but if you pass %G_FILE_CREATE_PRIVATE in @flags the file
+ * but if you pass %XFILE_CREATE_PRIVATE in @flags the file
  * will be made readable only to the current user, to the level
  * that is supported on the target filesystem.
  *
@@ -1984,26 +1984,26 @@ g_file_open_readwrite (xfile_t         *file,
  * not supported, so make sure you really need to do read and write
  * streaming, rather than just opening for reading or writing.
  *
- * Returns: (transfer full): a #GFileIOStream for the newly created
+ * Returns: (transfer full): a #xfile_io_stream_t for the newly created
  *   file, or %NULL on error.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  *
  * Since: 2.22
  */
-GFileIOStream *
-g_file_create_readwrite (xfile_t             *file,
-                         GFileCreateFlags   flags,
+xfile_io_stream_t *
+xfile_create_readwrite (xfile_t             *file,
+                         xfile_create_flags_t   flags,
                          xcancellable_t      *cancellable,
                          xerror_t           **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->create_readwrite == NULL)
     {
@@ -2017,12 +2017,12 @@ g_file_create_readwrite (xfile_t             *file,
 }
 
 /**
- * g_file_replace_readwrite:
+ * xfile_replace_readwrite:
  * @file: a #xfile_t
  * @etag: (nullable): an optional [entity tag][gfile-etag]
  *   for the current #xfile_t, or #NULL to ignore
  * @make_backup: %TRUE if a backup should be created
- * @flags: a set of #GFileCreateFlags
+ * @flags: a set of #xfile_create_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: return location for a #xerror_t, or %NULL
@@ -2031,34 +2031,34 @@ g_file_create_readwrite (xfile_t             *file,
  * possibly creating a backup copy of the file first. If the file doesn't
  * exist, it will be created.
  *
- * For details about the behaviour, see g_file_replace() which does the
+ * For details about the behaviour, see xfile_replace() which does the
  * same thing but returns an output stream only.
  *
  * Note that in many non-local file cases read and write streams are not
  * supported, so make sure you really need to do read and write streaming,
  * rather than just opening for reading or writing.
  *
- * Returns: (transfer full): a #GFileIOStream or %NULL on error.
- *   Free the returned object with g_object_unref().
+ * Returns: (transfer full): a #xfile_io_stream_t or %NULL on error.
+ *   Free the returned object with xobject_unref().
  *
  * Since: 2.22
  */
-GFileIOStream *
-g_file_replace_readwrite (xfile_t             *file,
+xfile_io_stream_t *
+xfile_replace_readwrite (xfile_t             *file,
                           const char        *etag,
                           xboolean_t           make_backup,
-                          GFileCreateFlags   flags,
+                          xfile_create_flags_t   flags,
                           xcancellable_t      *cancellable,
                           xerror_t           **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->replace_readwrite == NULL)
     {
@@ -2072,7 +2072,7 @@ g_file_replace_readwrite (xfile_t             *file,
 }
 
 /**
- * g_file_read_async:
+ * xfile_read_async:
  * @file: input #xfile_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
@@ -2083,25 +2083,25 @@ g_file_replace_readwrite (xfile_t             *file,
  *
  * Asynchronously opens @file for reading.
  *
- * For more details, see g_file_read() which is
+ * For more details, see xfile_read() which is
  * the synchronous version of this call.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_read_finish() to get the result
+ * You can then call xfile_read_finish() to get the result
  * of the operation.
  */
 void
-g_file_read_async (xfile_t               *file,
+xfile_read_async (xfile_t               *file,
                    int                  io_priority,
                    xcancellable_t        *cancellable,
                    xasync_ready_callback_t  callback,
                    xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->read_async) (file,
                          io_priority,
                          cancellable,
@@ -2110,38 +2110,38 @@ g_file_read_async (xfile_t               *file,
 }
 
 /**
- * g_file_read_finish:
+ * xfile_read_finish:
  * @file: input #xfile_t
  * @res: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an asynchronous file read operation started with
- * g_file_read_async().
+ * xfile_read_async().
  *
- * Returns: (transfer full): a #GFileInputStream or %NULL on error.
- *   Free the returned object with g_object_unref().
+ * Returns: (transfer full): a #xfile_input_stream_t or %NULL on error.
+ *   Free the returned object with xobject_unref().
  */
-GFileInputStream *
-g_file_read_finish (xfile_t         *file,
+xfile_input_stream_t *
+xfile_read_finish (xfile_t         *file,
                     xasync_result_t  *res,
                     xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
-  if (g_async_result_legacy_propagate_error (res, error))
+  if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->read_finish) (file, res, error);
 }
 
 /**
- * g_file_append_to_async:
+ * xfile_append_to_async:
  * @file: input #xfile_t
- * @flags: a set of #GFileCreateFlags
+ * @flags: a set of #xfile_create_flags_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -2151,26 +2151,26 @@ g_file_read_finish (xfile_t         *file,
  *
  * Asynchronously opens @file for appending.
  *
- * For more details, see g_file_append_to() which is
+ * For more details, see xfile_append_to() which is
  * the synchronous version of this call.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_append_to_finish() to get the result
+ * You can then call xfile_append_to_finish() to get the result
  * of the operation.
  */
 void
-g_file_append_to_async (xfile_t               *file,
-                        GFileCreateFlags     flags,
+xfile_append_to_async (xfile_t               *file,
+                        xfile_create_flags_t     flags,
                         int                  io_priority,
                         xcancellable_t        *cancellable,
                         xasync_ready_callback_t  callback,
                         xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->append_to_async) (file,
                               flags,
                               io_priority,
@@ -2180,39 +2180,39 @@ g_file_append_to_async (xfile_t               *file,
 }
 
 /**
- * g_file_append_to_finish:
+ * xfile_append_to_finish:
  * @file: input #xfile_t
  * @res: #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an asynchronous file append operation started with
- * g_file_append_to_async().
+ * xfile_append_to_async().
  *
- * Returns: (transfer full): a valid #GFileOutputStream
+ * Returns: (transfer full): a valid #xfile_output_stream_t
  *   or %NULL on error.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
-GFileOutputStream *
-g_file_append_to_finish (xfile_t         *file,
+xfile_output_stream_t *
+xfile_append_to_finish (xfile_t         *file,
                          xasync_result_t  *res,
                          xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
-  if (g_async_result_legacy_propagate_error (res, error))
+  if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->append_to_finish) (file, res, error);
 }
 
 /**
- * g_file_create_async:
+ * xfile_create_async:
  * @file: input #xfile_t
- * @flags: a set of #GFileCreateFlags
+ * @flags: a set of #xfile_create_flags_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -2223,26 +2223,26 @@ g_file_append_to_finish (xfile_t         *file,
  * Asynchronously creates a new file and returns an output stream
  * for writing to it. The file must not already exist.
  *
- * For more details, see g_file_create() which is
+ * For more details, see xfile_create() which is
  * the synchronous version of this call.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_create_finish() to get the result
+ * You can then call xfile_create_finish() to get the result
  * of the operation.
  */
 void
-g_file_create_async (xfile_t               *file,
-                     GFileCreateFlags     flags,
+xfile_create_async (xfile_t               *file,
+                     xfile_create_flags_t     flags,
                      int                  io_priority,
                      xcancellable_t        *cancellable,
                      xasync_ready_callback_t  callback,
                      xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->create_async) (file,
                            flags,
                            io_priority,
@@ -2252,41 +2252,41 @@ g_file_create_async (xfile_t               *file,
 }
 
 /**
- * g_file_create_finish:
+ * xfile_create_finish:
  * @file: input #xfile_t
  * @res: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an asynchronous file create operation started with
- * g_file_create_async().
+ * xfile_create_async().
  *
- * Returns: (transfer full): a #GFileOutputStream or %NULL on error.
- *   Free the returned object with g_object_unref().
+ * Returns: (transfer full): a #xfile_output_stream_t or %NULL on error.
+ *   Free the returned object with xobject_unref().
  */
-GFileOutputStream *
-g_file_create_finish (xfile_t         *file,
+xfile_output_stream_t *
+xfile_create_finish (xfile_t         *file,
                       xasync_result_t  *res,
                       xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
-  if (g_async_result_legacy_propagate_error (res, error))
+  if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->create_finish) (file, res, error);
 }
 
 /**
- * g_file_replace_async:
+ * xfile_replace_async:
  * @file: input #xfile_t
  * @etag: (nullable): an [entity tag][gfile-etag] for the current #xfile_t,
  *   or %NULL to ignore
  * @make_backup: %TRUE if a backup should be created
- * @flags: a set of #GFileCreateFlags
+ * @flags: a set of #xfile_create_flags_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -2297,28 +2297,28 @@ g_file_create_finish (xfile_t         *file,
  * Asynchronously overwrites the file, replacing the contents,
  * possibly creating a backup copy of the file first.
  *
- * For more details, see g_file_replace() which is
+ * For more details, see xfile_replace() which is
  * the synchronous version of this call.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_replace_finish() to get the result
+ * You can then call xfile_replace_finish() to get the result
  * of the operation.
  */
 void
-g_file_replace_async (xfile_t               *file,
+xfile_replace_async (xfile_t               *file,
                       const char          *etag,
                       xboolean_t             make_backup,
-                      GFileCreateFlags     flags,
+                      xfile_create_flags_t     flags,
                       int                  io_priority,
                       xcancellable_t        *cancellable,
                       xasync_ready_callback_t  callback,
                       xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->replace_async) (file,
                             etag,
                             make_backup,
@@ -2330,36 +2330,36 @@ g_file_replace_async (xfile_t               *file,
 }
 
 /**
- * g_file_replace_finish:
+ * xfile_replace_finish:
  * @file: input #xfile_t
  * @res: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an asynchronous file replace operation started with
- * g_file_replace_async().
+ * xfile_replace_async().
  *
- * Returns: (transfer full): a #GFileOutputStream, or %NULL on error.
- *   Free the returned object with g_object_unref().
+ * Returns: (transfer full): a #xfile_output_stream_t, or %NULL on error.
+ *   Free the returned object with xobject_unref().
  */
-GFileOutputStream *
-g_file_replace_finish (xfile_t         *file,
+xfile_output_stream_t *
+xfile_replace_finish (xfile_t         *file,
                        xasync_result_t  *res,
                        xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
-  if (g_async_result_legacy_propagate_error (res, error))
+  if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->replace_finish) (file, res, error);
 }
 
 /**
- * g_file_open_readwrite_async
+ * xfile_open_readwrite_async
  * @file: input #xfile_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
@@ -2370,27 +2370,27 @@ g_file_replace_finish (xfile_t         *file,
  *
  * Asynchronously opens @file for reading and writing.
  *
- * For more details, see g_file_open_readwrite() which is
+ * For more details, see xfile_open_readwrite() which is
  * the synchronous version of this call.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_open_readwrite_finish() to get
+ * You can then call xfile_open_readwrite_finish() to get
  * the result of the operation.
  *
  * Since: 2.22
  */
 void
-g_file_open_readwrite_async (xfile_t               *file,
+xfile_open_readwrite_async (xfile_t               *file,
                              int                  io_priority,
                              xcancellable_t        *cancellable,
                              xasync_ready_callback_t  callback,
                              xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->open_readwrite_async) (file,
                                    io_priority,
                                    cancellable,
@@ -2399,40 +2399,40 @@ g_file_open_readwrite_async (xfile_t               *file,
 }
 
 /**
- * g_file_open_readwrite_finish:
+ * xfile_open_readwrite_finish:
  * @file: input #xfile_t
  * @res: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an asynchronous file read operation started with
- * g_file_open_readwrite_async().
+ * xfile_open_readwrite_async().
  *
- * Returns: (transfer full): a #GFileIOStream or %NULL on error.
- *   Free the returned object with g_object_unref().
+ * Returns: (transfer full): a #xfile_io_stream_t or %NULL on error.
+ *   Free the returned object with xobject_unref().
  *
  * Since: 2.22
  */
-GFileIOStream *
-g_file_open_readwrite_finish (xfile_t         *file,
+xfile_io_stream_t *
+xfile_open_readwrite_finish (xfile_t         *file,
                               xasync_result_t  *res,
                               xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
-  if (g_async_result_legacy_propagate_error (res, error))
+  if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->open_readwrite_finish) (file, res, error);
 }
 
 /**
- * g_file_create_readwrite_async:
+ * xfile_create_readwrite_async:
  * @file: input #xfile_t
- * @flags: a set of #GFileCreateFlags
+ * @flags: a set of #xfile_create_flags_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -2443,28 +2443,28 @@ g_file_open_readwrite_finish (xfile_t         *file,
  * Asynchronously creates a new file and returns a stream
  * for reading and writing to it. The file must not already exist.
  *
- * For more details, see g_file_create_readwrite() which is
+ * For more details, see xfile_create_readwrite() which is
  * the synchronous version of this call.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_create_readwrite_finish() to get
+ * You can then call xfile_create_readwrite_finish() to get
  * the result of the operation.
  *
  * Since: 2.22
  */
 void
-g_file_create_readwrite_async (xfile_t               *file,
-                               GFileCreateFlags     flags,
+xfile_create_readwrite_async (xfile_t               *file,
+                               xfile_create_flags_t     flags,
                                int                  io_priority,
                                xcancellable_t        *cancellable,
                                xasync_ready_callback_t  callback,
                                xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->create_readwrite_async) (file,
                                      flags,
                                      io_priority,
@@ -2474,43 +2474,43 @@ g_file_create_readwrite_async (xfile_t               *file,
 }
 
 /**
- * g_file_create_readwrite_finish:
+ * xfile_create_readwrite_finish:
  * @file: input #xfile_t
  * @res: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an asynchronous file create operation started with
- * g_file_create_readwrite_async().
+ * xfile_create_readwrite_async().
  *
- * Returns: (transfer full): a #GFileIOStream or %NULL on error.
- *   Free the returned object with g_object_unref().
+ * Returns: (transfer full): a #xfile_io_stream_t or %NULL on error.
+ *   Free the returned object with xobject_unref().
  *
  * Since: 2.22
  */
-GFileIOStream *
-g_file_create_readwrite_finish (xfile_t         *file,
+xfile_io_stream_t *
+xfile_create_readwrite_finish (xfile_t         *file,
                                 xasync_result_t  *res,
                                 xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
-  if (g_async_result_legacy_propagate_error (res, error))
+  if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->create_readwrite_finish) (file, res, error);
 }
 
 /**
- * g_file_replace_readwrite_async:
+ * xfile_replace_readwrite_async:
  * @file: input #xfile_t
  * @etag: (nullable): an [entity tag][gfile-etag] for the current #xfile_t,
  *   or %NULL to ignore
  * @make_backup: %TRUE if a backup should be created
- * @flags: a set of #GFileCreateFlags
+ * @flags: a set of #xfile_create_flags_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -2522,30 +2522,30 @@ g_file_create_readwrite_finish (xfile_t         *file,
  * replacing the contents, possibly creating a backup copy
  * of the file first.
  *
- * For more details, see g_file_replace_readwrite() which is
+ * For more details, see xfile_replace_readwrite() which is
  * the synchronous version of this call.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_replace_readwrite_finish() to get
+ * You can then call xfile_replace_readwrite_finish() to get
  * the result of the operation.
  *
  * Since: 2.22
  */
 void
-g_file_replace_readwrite_async (xfile_t               *file,
+xfile_replace_readwrite_async (xfile_t               *file,
                                 const char          *etag,
                                 xboolean_t             make_backup,
-                                GFileCreateFlags     flags,
+                                xfile_create_flags_t     flags,
                                 int                  io_priority,
                                 xcancellable_t        *cancellable,
                                 xasync_ready_callback_t  callback,
                                 xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->replace_readwrite_async) (file,
                                       etag,
                                       make_backup,
@@ -2557,70 +2557,70 @@ g_file_replace_readwrite_async (xfile_t               *file,
 }
 
 /**
- * g_file_replace_readwrite_finish:
+ * xfile_replace_readwrite_finish:
  * @file: input #xfile_t
  * @res: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an asynchronous file replace operation started with
- * g_file_replace_readwrite_async().
+ * xfile_replace_readwrite_async().
  *
- * Returns: (transfer full): a #GFileIOStream, or %NULL on error.
- *   Free the returned object with g_object_unref().
+ * Returns: (transfer full): a #xfile_io_stream_t, or %NULL on error.
+ *   Free the returned object with xobject_unref().
  *
  * Since: 2.22
  */
-GFileIOStream *
-g_file_replace_readwrite_finish (xfile_t         *file,
+xfile_io_stream_t *
+xfile_replace_readwrite_finish (xfile_t         *file,
                                  xasync_result_t  *res,
                                  xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
-  if (g_async_result_legacy_propagate_error (res, error))
+  if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->replace_readwrite_finish) (file, res, error);
 }
 
 static xboolean_t
 copy_symlink (xfile_t           *destination,
-              GFileCopyFlags   flags,
+              xfile_copy_flags_t   flags,
               xcancellable_t    *cancellable,
               const char      *target,
               xerror_t         **error)
 {
   xerror_t *my_error;
   xboolean_t tried_delete;
-  GFileInfo *info;
-  GFileType file_type;
+  xfile_info_t *info;
+  xfile_type_t file_type;
 
   tried_delete = FALSE;
 
  retry:
   my_error = NULL;
-  if (!g_file_make_symbolic_link (destination, target, cancellable, &my_error))
+  if (!xfile_make_symbolic_link (destination, target, cancellable, &my_error))
     {
       /* Maybe it already existed, and we want to overwrite? */
-      if (!tried_delete && (flags & G_FILE_COPY_OVERWRITE) &&
+      if (!tried_delete && (flags & XFILE_COPY_OVERWRITE) &&
           my_error->domain == G_IO_ERROR && my_error->code == G_IO_ERROR_EXISTS)
         {
           g_clear_error (&my_error);
 
           /* Don't overwrite if the destination is a directory */
-          info = g_file_query_info (destination, G_FILE_ATTRIBUTE_STANDARD_TYPE,
-                                    G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+          info = xfile_query_info (destination, XFILE_ATTRIBUTE_STANDARD_TYPE,
+                                    XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                     cancellable, &my_error);
           if (info != NULL)
             {
-              file_type = g_file_info_get_file_type (info);
-              g_object_unref (info);
+              file_type = xfile_info_get_file_type (info);
+              xobject_unref (info);
 
-              if (file_type == G_FILE_TYPE_DIRECTORY)
+              if (file_type == XFILE_TYPE_DIRECTORY)
                 {
                   g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
                                        _("Can’t copy over directory"));
@@ -2628,7 +2628,7 @@ copy_symlink (xfile_t           *destination,
                 }
             }
 
-          if (!g_file_delete (destination, cancellable, error))
+          if (!xfile_delete (destination, cancellable, error))
             return FALSE;
 
           tried_delete = TRUE;
@@ -2642,20 +2642,20 @@ copy_symlink (xfile_t           *destination,
   return TRUE;
 }
 
-static GFileInputStream *
+static xfile_input_stream_t *
 open_source_for_copy (xfile_t           *source,
                       xfile_t           *destination,
-                      GFileCopyFlags   flags,
+                      xfile_copy_flags_t   flags,
                       xcancellable_t    *cancellable,
                       xerror_t         **error)
 {
   xerror_t *my_error;
-  GFileInputStream *ret;
-  GFileInfo *info;
-  GFileType file_type;
+  xfile_input_stream_t *ret;
+  xfile_info_t *info;
+  xfile_type_t file_type;
 
   my_error = NULL;
-  ret = g_file_read (source, cancellable, &my_error);
+  ret = xfile_read (source, cancellable, &my_error);
   if (ret != NULL)
     return ret;
 
@@ -2666,21 +2666,21 @@ open_source_for_copy (xfile_t           *source,
        * as that is less useful to the app. Better check for errors on the
        * target instead.
        */
-      g_error_free (my_error);
+      xerror_free (my_error);
       my_error = NULL;
 
-      info = g_file_query_info (destination, G_FILE_ATTRIBUTE_STANDARD_TYPE,
-                                G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+      info = xfile_query_info (destination, XFILE_ATTRIBUTE_STANDARD_TYPE,
+                                XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                 cancellable, &my_error);
       if (info != NULL &&
-          g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_TYPE))
+          xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_TYPE))
         {
-          file_type = g_file_info_get_file_type (info);
-          g_object_unref (info);
+          file_type = xfile_info_get_file_type (info);
+          xobject_unref (info);
 
-          if (flags & G_FILE_COPY_OVERWRITE)
+          if (flags & XFILE_COPY_OVERWRITE)
             {
-              if (file_type == G_FILE_TYPE_DIRECTORY)
+              if (file_type == XFILE_TYPE_DIRECTORY)
                 {
                   g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
                                        _("Can’t copy directory over directory"));
@@ -2701,7 +2701,7 @@ open_source_for_copy (xfile_t           *source,
            * (except for NOT_FOUND, which is no error here)
            */
           g_clear_object (&info);
-          if (my_error != NULL && !g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+          if (my_error != NULL && !xerror_matches (my_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
             {
               g_propagate_error (error, my_error);
               return NULL;
@@ -2719,7 +2719,7 @@ open_source_for_copy (xfile_t           *source,
 }
 
 static xboolean_t
-should_copy (GFileAttributeInfo *info,
+should_copy (xfile_attribute_info_t *info,
              xboolean_t            copy_all_attributes,
              xboolean_t            skip_perms)
 {
@@ -2727,14 +2727,14 @@ should_copy (GFileAttributeInfo *info,
         return FALSE;
 
   if (copy_all_attributes)
-    return info->flags & G_FILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED;
-  return info->flags & G_FILE_ATTRIBUTE_INFO_COPY_WITH_FILE;
+    return info->flags & XFILE_ATTRIBUTE_INFO_COPY_WHEN_MOVED;
+  return info->flags & XFILE_ATTRIBUTE_INFO_COPY_WITH_FILE;
 }
 
 /**
- * g_file_build_attribute_list_for_copy:
+ * xfile_build_attribute_list_for_copy:
  * @file: a #xfile_t to copy attributes to
- * @flags: a set of #GFileCopyFlags
+ * @flags: a set of #xfile_copy_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, %NULL to ignore
@@ -2742,27 +2742,27 @@ should_copy (GFileAttributeInfo *info,
  * Prepares the file attribute query string for copying to @file.
  *
  * This function prepares an attribute query string to be
- * passed to g_file_query_info() to get a list of attributes
- * normally copied with the file (see g_file_copy_attributes()
+ * passed to xfile_query_info() to get a list of attributes
+ * normally copied with the file (see xfile_copy_attributes()
  * for the detailed description). This function is used by the
- * implementation of g_file_copy_attributes() and is useful
+ * implementation of xfile_copy_attributes() and is useful
  * when one needs to query and set the attributes in two
  * stages (e.g., for recursive move of a directory).
  *
- * Returns: an attribute query string for g_file_query_info(),
+ * Returns: an attribute query string for xfile_query_info(),
  *   or %NULL if an error occurs.
  *
  * Since: 2.68
  */
 char *
-g_file_build_attribute_list_for_copy (xfile_t                  *file,
-                                      GFileCopyFlags          flags,
+xfile_build_attribute_list_for_copy (xfile_t                  *file,
+                                      xfile_copy_flags_t          flags,
                                       xcancellable_t           *cancellable,
                                       xerror_t                **error)
 {
   char *ret = NULL;
-  GFileAttributeInfoList *attributes = NULL, *namespaces = NULL;
-  GString *s = NULL;
+  xfile_attribute_info_list_t *attributes = NULL, *namespaces = NULL;
+  xstring_t *s = NULL;
   xboolean_t first;
   int i;
   xboolean_t copy_all_attributes;
@@ -2772,17 +2772,17 @@ g_file_build_attribute_list_for_copy (xfile_t                  *file,
   g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  copy_all_attributes = flags & G_FILE_COPY_ALL_METADATA;
-  skip_perms = (flags & G_FILE_COPY_TARGET_DEFAULT_PERMS) != 0;
+  copy_all_attributes = flags & XFILE_COPY_ALL_METADATA;
+  skip_perms = (flags & XFILE_COPY_TARGET_DEFAULT_PERMS) != 0;
 
   /* Ignore errors here, if the target supports no attributes there is
    * nothing to copy.  We still honor the cancellable though.
    */
-  attributes = g_file_query_settable_attributes (file, cancellable, NULL);
+  attributes = xfile_query_settable_attributes (file, cancellable, NULL);
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     goto out;
 
-  namespaces = g_file_query_writable_namespaces (file, cancellable, NULL);
+  namespaces = xfile_query_writable_namespaces (file, cancellable, NULL);
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     goto out;
 
@@ -2790,7 +2790,7 @@ g_file_build_attribute_list_for_copy (xfile_t                  *file,
     goto out;
 
   first = TRUE;
-  s = g_string_new ("");
+  s = xstring_new ("");
 
   if (attributes)
     {
@@ -2801,9 +2801,9 @@ g_file_build_attribute_list_for_copy (xfile_t                  *file,
               if (first)
                 first = FALSE;
               else
-                g_string_append_c (s, ',');
+                xstring_append_c (s, ',');
 
-              g_string_append (s, attributes->infos[i].name);
+              xstring_append (s, attributes->infos[i].name);
             }
         }
     }
@@ -2817,32 +2817,32 @@ g_file_build_attribute_list_for_copy (xfile_t                  *file,
               if (first)
                 first = FALSE;
               else
-                g_string_append_c (s, ',');
+                xstring_append_c (s, ',');
 
-              g_string_append (s, namespaces->infos[i].name);
-              g_string_append (s, "::*");
+              xstring_append (s, namespaces->infos[i].name);
+              xstring_append (s, "::*");
             }
         }
     }
 
-  ret = g_string_free (s, FALSE);
+  ret = xstring_free (s, FALSE);
   s = NULL;
  out:
   if (s)
-    g_string_free (s, TRUE);
+    xstring_free (s, TRUE);
   if (attributes)
-    g_file_attribute_info_list_unref (attributes);
+    xfile_attribute_info_list_unref (attributes);
   if (namespaces)
-    g_file_attribute_info_list_unref (namespaces);
+    xfile_attribute_info_list_unref (namespaces);
 
   return ret;
 }
 
 /**
- * g_file_copy_attributes:
+ * xfile_copy_attributes:
  * @source: a #xfile_t with attributes
  * @destination: a #xfile_t to copy attributes to
- * @flags: a set of #GFileCopyFlags
+ * @flags: a set of #xfile_copy_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, %NULL to ignore
@@ -2852,7 +2852,7 @@ g_file_build_attribute_list_for_copy (xfile_t                  *file,
  * Normally only a subset of the file attributes are copied,
  * those that are copies in a normal file copy operation
  * (which for instance does not include e.g. owner). However
- * if %G_FILE_COPY_ALL_METADATA is specified in @flags, then
+ * if %XFILE_COPY_ALL_METADATA is specified in @flags, then
  * all the metadata that is possible to copy is copied. This
  * is useful when implementing move by copy + delete source.
  *
@@ -2860,29 +2860,29 @@ g_file_build_attribute_list_for_copy (xfile_t                  *file,
  *   %FALSE otherwise.
  */
 xboolean_t
-g_file_copy_attributes (xfile_t           *source,
+xfile_copy_attributes (xfile_t           *source,
                         xfile_t           *destination,
-                        GFileCopyFlags   flags,
+                        xfile_copy_flags_t   flags,
                         xcancellable_t    *cancellable,
                         xerror_t         **error)
 {
   char *attrs_to_read;
   xboolean_t res;
-  GFileInfo *info;
+  xfile_info_t *info;
   xboolean_t source_nofollow_symlinks;
 
-  attrs_to_read = g_file_build_attribute_list_for_copy (destination, flags,
+  attrs_to_read = xfile_build_attribute_list_for_copy (destination, flags,
                                                         cancellable, error);
   if (!attrs_to_read)
     return FALSE;
 
-  source_nofollow_symlinks = flags & G_FILE_COPY_NOFOLLOW_SYMLINKS;
+  source_nofollow_symlinks = flags & XFILE_COPY_NOFOLLOW_SYMLINKS;
 
   /* Ignore errors here, if we can't read some info (e.g. if it doesn't exist)
    * we just don't copy it.
    */
-  info = g_file_query_info (source, attrs_to_read,
-                            source_nofollow_symlinks ? G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS:0,
+  info = xfile_query_info (source, attrs_to_read,
+                            source_nofollow_symlinks ? XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS:0,
                             cancellable,
                             NULL);
 
@@ -2891,12 +2891,12 @@ g_file_copy_attributes (xfile_t           *source,
   res = TRUE;
   if  (info)
     {
-      res = g_file_set_attributes_from_info (destination,
+      res = xfile_set_attributes_from_info (destination,
                                              info,
-                                             G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                             XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                              cancellable,
                                              error);
-      g_object_unref (info);
+      xobject_unref (info);
     }
 
   return res;
@@ -2910,43 +2910,43 @@ copy_stream_with_progress (xinput_stream_t           *in,
                            xoutput_stream_t          *out,
                            xfile_t                  *source,
                            xcancellable_t           *cancellable,
-                           GFileProgressCallback   progress_callback,
+                           xfile_progress_callback_t   progress_callback,
                            xpointer_t                progress_callback_data,
                            xerror_t                **error)
 {
-  gssize n_read;
+  xssize_t n_read;
   xsize_t n_written;
-  goffset current_size;
+  xoffset_t current_size;
   char *buffer;
   xboolean_t res;
-  goffset total_size;
-  GFileInfo *info;
+  xoffset_t total_size;
+  xfile_info_t *info;
 
   total_size = -1;
   /* avoid performance impact of querying total size when it's not needed */
   if (progress_callback)
     {
-      info = g_file_input_stream_query_info (G_FILE_INPUT_STREAM (in),
-                                             G_FILE_ATTRIBUTE_STANDARD_SIZE,
+      info = xfile_input_stream_query_info (XFILE_INPUT_STREAM (in),
+                                             XFILE_ATTRIBUTE_STANDARD_SIZE,
                                              cancellable, NULL);
       if (info)
         {
-          if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_SIZE))
-            total_size = g_file_info_get_size (info);
-          g_object_unref (info);
+          if (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_SIZE))
+            total_size = xfile_info_get_size (info);
+          xobject_unref (info);
         }
 
       if (total_size == -1)
         {
-          info = g_file_query_info (source,
-                                    G_FILE_ATTRIBUTE_STANDARD_SIZE,
-                                    G_FILE_QUERY_INFO_NONE,
+          info = xfile_query_info (source,
+                                    XFILE_ATTRIBUTE_STANDARD_SIZE,
+                                    XFILE_QUERY_INFO_NONE,
                                     cancellable, NULL);
           if (info)
             {
-              if (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_SIZE))
-                total_size = g_file_info_get_size (info);
-              g_object_unref (info);
+              if (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_SIZE))
+                total_size = xfile_info_get_size (info);
+              xobject_unref (info);
             }
         }
     }
@@ -2959,7 +2959,7 @@ copy_stream_with_progress (xinput_stream_t           *in,
   res = TRUE;
   while (TRUE)
     {
-      n_read = g_input_stream_read (in, buffer, STREAM_BUFFER_SIZE, cancellable, error);
+      n_read = xinput_stream_read (in, buffer, STREAM_BUFFER_SIZE, cancellable, error);
       if (n_read == -1)
         {
           res = FALSE;
@@ -2971,7 +2971,7 @@ copy_stream_with_progress (xinput_stream_t           *in,
 
       current_size += n_read;
 
-      res = g_output_stream_write_all (out, buffer, n_read, &n_written, cancellable, error);
+      res = xoutput_stream_write_all (out, buffer, n_read, &n_written, cancellable, error);
       if (!res)
         break;
 
@@ -3016,7 +3016,7 @@ retry:
         g_set_error (error, G_IO_ERROR,
                      g_io_error_from_errno (errsv),
                      _("Error splicing file: %s"),
-                     g_strerror (errsv));
+                     xstrerror (errsv));
 
       return FALSE;
     }
@@ -3029,20 +3029,20 @@ static xboolean_t
 splice_stream_with_progress (xinput_stream_t           *in,
                              xoutput_stream_t          *out,
                              xcancellable_t           *cancellable,
-                             GFileProgressCallback   progress_callback,
+                             xfile_progress_callback_t   progress_callback,
                              xpointer_t                progress_callback_data,
                              xerror_t                **error)
 {
   int buffer[2] = { -1, -1 };
   int buffer_size;
   xboolean_t res;
-  goffset total_size;
+  xoffset_t total_size;
   loff_t offset_in;
   loff_t offset_out;
   int fd_in, fd_out;
 
-  fd_in = g_file_descriptor_based_get_fd (G_FILE_DESCRIPTOR_BASED (in));
-  fd_out = g_file_descriptor_based_get_fd (G_FILE_DESCRIPTOR_BASED (out));
+  fd_in = xfile_descriptor_based_get_fd (XFILE_DESCRIPTOR_BASED (in));
+  fd_out = xfile_descriptor_based_get_fd (XFILE_DESCRIPTOR_BASED (out));
 
   if (!g_unix_open_pipe (buffer, FD_CLOEXEC, error))
     return FALSE;
@@ -3137,21 +3137,21 @@ splice_stream_with_progress (xinput_stream_t           *in,
 static xboolean_t
 btrfs_reflink_with_progress (xinput_stream_t           *in,
                              xoutput_stream_t          *out,
-                             GFileInfo              *info,
+                             xfile_info_t              *info,
                              xcancellable_t           *cancellable,
-                             GFileProgressCallback   progress_callback,
+                             xfile_progress_callback_t   progress_callback,
                              xpointer_t                progress_callback_data,
                              xerror_t                **error)
 {
-  goffset source_size;
+  xoffset_t source_size;
   int fd_in, fd_out;
   int ret, errsv;
 
-  fd_in = g_file_descriptor_based_get_fd (G_FILE_DESCRIPTOR_BASED (in));
-  fd_out = g_file_descriptor_based_get_fd (G_FILE_DESCRIPTOR_BASED (out));
+  fd_in = xfile_descriptor_based_get_fd (XFILE_DESCRIPTOR_BASED (in));
+  fd_out = xfile_descriptor_based_get_fd (XFILE_DESCRIPTOR_BASED (out));
 
   if (progress_callback)
-    source_size = g_file_info_get_size (info);
+    source_size = xfile_info_get_size (info);
 
   /* Btrfs clone ioctl properties:
    *  - Works at the inode level
@@ -3195,37 +3195,37 @@ btrfs_reflink_with_progress (xinput_stream_t           *in,
 static xboolean_t
 file_copy_fallback (xfile_t                  *source,
                     xfile_t                  *destination,
-                    GFileCopyFlags          flags,
+                    xfile_copy_flags_t          flags,
                     xcancellable_t           *cancellable,
-                    GFileProgressCallback   progress_callback,
+                    xfile_progress_callback_t   progress_callback,
                     xpointer_t                progress_callback_data,
                     xerror_t                **error)
 {
   xboolean_t ret = FALSE;
-  GFileInputStream *file_in = NULL;
+  xfile_input_stream_t *file_in = NULL;
   xinput_stream_t *in = NULL;
   xoutput_stream_t *out = NULL;
-  GFileInfo *info = NULL;
+  xfile_info_t *info = NULL;
   const char *target;
   char *attrs_to_read;
   xboolean_t do_set_attributes = FALSE;
-  GFileCreateFlags create_flags;
+  xfile_create_flags_t create_flags;
   xerror_t *tmp_error = NULL;
 
   /* need to know the file type */
-  info = g_file_query_info (source,
-                            G_FILE_ATTRIBUTE_STANDARD_TYPE "," G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET,
-                            G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+  info = xfile_query_info (source,
+                            XFILE_ATTRIBUTE_STANDARD_TYPE "," XFILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET,
+                            XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                             cancellable,
                             error);
   if (!info)
     goto out;
 
   /* Maybe copy the symlink? */
-  if ((flags & G_FILE_COPY_NOFOLLOW_SYMLINKS) &&
-      g_file_info_get_file_type (info) == G_FILE_TYPE_SYMBOLIC_LINK)
+  if ((flags & XFILE_COPY_NOFOLLOW_SYMLINKS) &&
+      xfile_info_get_file_type (info) == XFILE_TYPE_SYMBOLIC_LINK)
     {
-      target = g_file_info_get_symlink_target (info);
+      target = xfile_info_get_symlink_target (info);
       if (target)
         {
           if (!copy_symlink (destination, flags, cancellable, target, error))
@@ -3237,7 +3237,7 @@ file_copy_fallback (xfile_t                  *source,
         /* ... else fall back on a regular file copy */
     }
   /* Handle "special" files (pipes, device nodes, ...)? */
-  else if (g_file_info_get_file_type (info) == G_FILE_TYPE_SPECIAL)
+  else if (xfile_info_get_file_type (info) == XFILE_TYPE_SPECIAL)
     {
       /* FIXME: could try to recreate device nodes and others? */
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
@@ -3252,7 +3252,7 @@ file_copy_fallback (xfile_t                  *source,
     goto out;
   in = G_INPUT_STREAM (file_in);
 
-  attrs_to_read = g_file_build_attribute_list_for_copy (destination, flags,
+  attrs_to_read = xfile_build_attribute_list_for_copy (destination, flags,
                                                         cancellable, error);
   if (!attrs_to_read)
     goto out;
@@ -3261,9 +3261,9 @@ file_copy_fallback (xfile_t                  *source,
    * called lstat()); at this point we gather all the information
    * we need about the source from the opened file descriptor.
    */
-  g_object_unref (info);
+  xobject_unref (info);
 
-  info = g_file_input_stream_query_info (file_in, attrs_to_read,
+  info = xfile_input_stream_query_info (file_in, attrs_to_read,
                                          cancellable, &tmp_error);
   if (!info)
     {
@@ -3271,10 +3271,10 @@ file_copy_fallback (xfile_t                  *source,
        * can just fall back to the pathname again.
        * https://bugzilla.gnome.org/706254
        */
-      if (g_error_matches (tmp_error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
+      if (xerror_matches (tmp_error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
         {
           g_clear_error (&tmp_error);
-          info = g_file_query_info (source, attrs_to_read, G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+          info = xfile_query_info (source, attrs_to_read, XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                     cancellable, error);
         }
       else
@@ -3294,10 +3294,10 @@ file_copy_fallback (xfile_t                  *source,
    * includes things like unix::mode, to ensure that the target file
    * is not created with different permissions from the source file.
    *
-   * If a future API like g_file_replace_with_info() is added, switch
+   * If a future API like xfile_replace_with_info() is added, switch
    * this code to use that.
    *
-   * Use %G_FILE_CREATE_PRIVATE unless
+   * Use %XFILE_CREATE_PRIVATE unless
    *  - we were told to create the file with default permissions (i.e. the
    *    process’ umask),
    *  - or if the source file is on a file system which doesn’t support
@@ -3307,40 +3307,40 @@ file_copy_fallback (xfile_t                  *source,
    *  - or if the destination file is a `GLocalFile`, in which case we can
    *    directly open() it with the permissions from the source file.
    */
-  create_flags = G_FILE_CREATE_NONE;
-  if (!(flags & G_FILE_COPY_TARGET_DEFAULT_PERMS) &&
-      g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_UNIX_MODE) &&
+  create_flags = XFILE_CREATE_NONE;
+  if (!(flags & XFILE_COPY_TARGET_DEFAULT_PERMS) &&
+      xfile_info_has_attribute (info, XFILE_ATTRIBUTE_UNIX_MODE) &&
       !X_IS_LOCAL_FILE (destination))
-    create_flags |= G_FILE_CREATE_PRIVATE;
-  if (flags & G_FILE_COPY_OVERWRITE)
-    create_flags |= G_FILE_CREATE_REPLACE_DESTINATION;
+    create_flags |= XFILE_CREATE_PRIVATE;
+  if (flags & XFILE_COPY_OVERWRITE)
+    create_flags |= XFILE_CREATE_REPLACE_DESTINATION;
 
   if (X_IS_LOCAL_FILE (destination))
     {
-      if (flags & G_FILE_COPY_OVERWRITE)
+      if (flags & XFILE_COPY_OVERWRITE)
         out = (xoutput_stream_t*)_g_local_file_output_stream_replace (_g_local_file_get_filename (G_LOCAL_FILE (destination)),
                                                                    FALSE, NULL,
-                                                                   flags & G_FILE_COPY_BACKUP,
+                                                                   flags & XFILE_COPY_BACKUP,
                                                                    create_flags,
-                                                                   (flags & G_FILE_COPY_TARGET_DEFAULT_PERMS) ? NULL : info,
+                                                                   (flags & XFILE_COPY_TARGET_DEFAULT_PERMS) ? NULL : info,
                                                                    cancellable, error);
       else
         out = (xoutput_stream_t*)_g_local_file_output_stream_create (_g_local_file_get_filename (G_LOCAL_FILE (destination)),
                                                                   FALSE, create_flags,
-                                                                  (flags & G_FILE_COPY_TARGET_DEFAULT_PERMS) ? NULL : info,
+                                                                  (flags & XFILE_COPY_TARGET_DEFAULT_PERMS) ? NULL : info,
                                                                   cancellable, error);
     }
-  else if (flags & G_FILE_COPY_OVERWRITE)
+  else if (flags & XFILE_COPY_OVERWRITE)
     {
-      out = (xoutput_stream_t *)g_file_replace (destination,
+      out = (xoutput_stream_t *)xfile_replace (destination,
                                              NULL,
-                                             flags & G_FILE_COPY_BACKUP,
+                                             flags & XFILE_COPY_BACKUP,
                                              create_flags,
                                              cancellable, error);
     }
   else
     {
-      out = (xoutput_stream_t *)g_file_create (destination, create_flags, cancellable, error);
+      out = (xoutput_stream_t *)xfile_create (destination, create_flags, cancellable, error);
     }
 
   if (!out)
@@ -3355,7 +3355,7 @@ file_copy_fallback (xfile_t                  *source,
                                         progress_callback, progress_callback_data,
                                         &reflink_err))
         {
-          if (g_error_matches (reflink_err, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
+          if (xerror_matches (reflink_err, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
             {
               g_clear_error (&reflink_err);
             }
@@ -3382,7 +3382,7 @@ file_copy_fallback (xfile_t                  *source,
                                         progress_callback, progress_callback_data,
                                         &splice_err))
         {
-          if (g_error_matches (splice_err, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
+          if (xerror_matches (splice_err, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
             {
               g_clear_error (&splice_err);
             }
@@ -3412,25 +3412,25 @@ file_copy_fallback (xfile_t                  *source,
   if (in)
     {
       /* Don't care about errors in source here */
-      (void) g_input_stream_close (in, cancellable, NULL);
-      g_object_unref (in);
+      (void) xinput_stream_close (in, cancellable, NULL);
+      xobject_unref (in);
     }
 
   if (out)
     {
       /* But write errors on close are bad! */
-      if (!g_output_stream_close (out, cancellable, ret ? error : NULL))
+      if (!xoutput_stream_close (out, cancellable, ret ? error : NULL))
         ret = FALSE;
-      g_object_unref (out);
+      xobject_unref (out);
     }
 
   /* Ignore errors here. Failure to copy metadata is not a hard error */
   /* TODO: set these attributes /before/ we do the rename() on Unix */
   if (ret && do_set_attributes)
     {
-      g_file_set_attributes_from_info (destination,
+      xfile_set_attributes_from_info (destination,
                                        info,
-                                       G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                       XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                        cancellable,
                                        NULL);
     }
@@ -3441,10 +3441,10 @@ file_copy_fallback (xfile_t                  *source,
 }
 
 /**
- * g_file_copy:
+ * xfile_copy:
  * @source: input #xfile_t
  * @destination: destination #xfile_t
- * @flags: set of #GFileCopyFlags
+ * @flags: set of #xfile_copy_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @progress_callback: (nullable) (scope call): function to callback with
@@ -3455,23 +3455,23 @@ file_copy_fallback (xfile_t                  *source,
  * Copies the file @source to the location specified by @destination.
  * Can not handle recursive copies of directories.
  *
- * If the flag %G_FILE_COPY_OVERWRITE is specified an already
+ * If the flag %XFILE_COPY_OVERWRITE is specified an already
  * existing @destination file is overwritten.
  *
- * If the flag %G_FILE_COPY_NOFOLLOW_SYMLINKS is specified then symlinks
+ * If the flag %XFILE_COPY_NOFOLLOW_SYMLINKS is specified then symlinks
  * will be copied as symlinks, otherwise the target of the
  * @source symlink will be copied.
  *
- * If the flag %G_FILE_COPY_ALL_METADATA is specified then all the metadata
+ * If the flag %XFILE_COPY_ALL_METADATA is specified then all the metadata
  * that is possible to copy is copied, not just the default subset (which,
- * for instance, does not include the owner, see #GFileInfo).
+ * for instance, does not include the owner, see #xfile_info_t).
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
  * If @progress_callback is not %NULL, then the operation can be monitored
- * by setting this to a #GFileProgressCallback function.
+ * by setting this to a #xfile_progress_callback_t function.
  * @progress_callback_data will be passed to this function. It is guaranteed
  * that this callback will be called after all data has been transferred with
  * the total number of bytes copied during the operation.
@@ -3479,7 +3479,7 @@ file_copy_fallback (xfile_t                  *source,
  * If the @source file does not exist, then the %G_IO_ERROR_NOT_FOUND error
  * is returned, independent on the status of the @destination.
  *
- * If %G_FILE_COPY_OVERWRITE is not specified and the target exists, then
+ * If %XFILE_COPY_OVERWRITE is not specified and the target exists, then
  * the error %G_IO_ERROR_EXISTS is returned.
  *
  * If trying to overwrite a file over a directory, the %G_IO_ERROR_IS_DIRECTORY
@@ -3487,24 +3487,24 @@ file_copy_fallback (xfile_t                  *source,
  * %G_IO_ERROR_WOULD_MERGE error is returned.
  *
  * If the source is a directory and the target does not exist, or
- * %G_FILE_COPY_OVERWRITE is specified and the target is a file, then the
+ * %XFILE_COPY_OVERWRITE is specified and the target is a file, then the
  * %G_IO_ERROR_WOULD_RECURSE error is returned.
  *
  * If you are interested in copying the #xfile_t object itself (not the on-disk
- * file), see g_file_dup().
+ * file), see xfile_dup().
  *
  * Returns: %TRUE on success, %FALSE otherwise.
  */
 xboolean_t
-g_file_copy (xfile_t                  *source,
+xfile_copy (xfile_t                  *source,
              xfile_t                  *destination,
-             GFileCopyFlags          flags,
+             xfile_copy_flags_t          flags,
              xcancellable_t           *cancellable,
-             GFileProgressCallback   progress_callback,
+             xfile_progress_callback_t   progress_callback,
              xpointer_t                progress_callback_data,
              xerror_t                **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
   xerror_t *my_error;
   xboolean_t res;
 
@@ -3514,7 +3514,7 @@ g_file_copy (xfile_t                  *source,
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
-  iface = G_FILE_GET_IFACE (destination);
+  iface = XFILE_GET_IFACE (destination);
   if (iface->copy)
     {
       my_error = NULL;
@@ -3540,7 +3540,7 @@ g_file_copy (xfile_t                  *source,
    */
   if (G_OBJECT_TYPE (source) != G_OBJECT_TYPE (destination))
     {
-      iface = G_FILE_GET_IFACE (source);
+      iface = XFILE_GET_IFACE (source);
 
       if (iface->copy)
         {
@@ -3569,10 +3569,10 @@ g_file_copy (xfile_t                  *source,
 }
 
 /**
- * g_file_copy_async:
+ * xfile_copy_async:
  * @source: input #xfile_t
  * @destination: destination #xfile_t
- * @flags: set of #GFileCopyFlags
+ * @flags: set of #xfile_copy_flags_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -3583,33 +3583,33 @@ g_file_copy (xfile_t                  *source,
  * @user_data: (closure callback): the data to pass to callback function
  *
  * Copies the file @source to the location specified by @destination
- * asynchronously. For details of the behaviour, see g_file_copy().
+ * asynchronously. For details of the behaviour, see xfile_copy().
  *
  * If @progress_callback is not %NULL, then that function that will be called
- * just like in g_file_copy(). The callback will run in the default main context
- * of the thread calling g_file_copy_async() — the same context as @callback is
+ * just like in xfile_copy(). The callback will run in the default main context
+ * of the thread calling xfile_copy_async() — the same context as @callback is
  * run in.
  *
  * When the operation is finished, @callback will be called. You can then call
- * g_file_copy_finish() to get the result of the operation.
+ * xfile_copy_finish() to get the result of the operation.
  */
 void
-g_file_copy_async (xfile_t                  *source,
+xfile_copy_async (xfile_t                  *source,
                    xfile_t                  *destination,
-                   GFileCopyFlags          flags,
+                   xfile_copy_flags_t          flags,
                    int                     io_priority,
                    xcancellable_t           *cancellable,
-                   GFileProgressCallback   progress_callback,
+                   xfile_progress_callback_t   progress_callback,
                    xpointer_t                progress_callback_data,
                    xasync_ready_callback_t     callback,
                    xpointer_t                user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (source));
   g_return_if_fail (X_IS_FILE (destination));
 
-  iface = G_FILE_GET_IFACE (source);
+  iface = XFILE_GET_IFACE (source);
   (* iface->copy_async) (source,
                          destination,
                          flags,
@@ -3622,40 +3622,40 @@ g_file_copy_async (xfile_t                  *source,
 }
 
 /**
- * g_file_copy_finish:
+ * xfile_copy_finish:
  * @file: input #xfile_t
  * @res: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
- * Finishes copying the file started with g_file_copy_async().
+ * Finishes copying the file started with xfile_copy_async().
  *
  * Returns: a %TRUE on success, %FALSE on error.
  */
 xboolean_t
-g_file_copy_finish (xfile_t         *file,
+xfile_copy_finish (xfile_t         *file,
                     xasync_result_t  *res,
                     xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), FALSE);
 
-  if (g_async_result_legacy_propagate_error (res, error))
+  if (xasync_result_legacy_propagate_error (res, error))
     return FALSE;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->copy_finish) (file, res, error);
 }
 
 /**
- * g_file_move:
+ * xfile_move:
  * @source: #xfile_t pointing to the source location
  * @destination: #xfile_t pointing to the destination location
- * @flags: set of #GFileCopyFlags
+ * @flags: set of #xfile_copy_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
- * @progress_callback: (nullable) (scope call): #GFileProgressCallback
+ * @progress_callback: (nullable) (scope call): #xfile_progress_callback_t
  *   function for updates
  * @progress_callback_data: (closure): xpointer_t to user data for
  *   the callback function
@@ -3667,7 +3667,7 @@ g_file_copy_finish (xfile_t         *file,
  * implementation may support moving directories (for instance on moves
  * inside the same filesystem), but the fallback code does not.
  *
- * If the flag %G_FILE_COPY_OVERWRITE is specified an already
+ * If the flag %XFILE_COPY_OVERWRITE is specified an already
  * existing @destination file is overwritten.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
@@ -3675,7 +3675,7 @@ g_file_copy_finish (xfile_t         *file,
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
  * If @progress_callback is not %NULL, then the operation can be monitored
- * by setting this to a #GFileProgressCallback function.
+ * by setting this to a #xfile_progress_callback_t function.
  * @progress_callback_data will be passed to this function. It is
  * guaranteed that this callback will be called after all data has been
  * transferred with the total number of bytes copied during the operation.
@@ -3683,7 +3683,7 @@ g_file_copy_finish (xfile_t         *file,
  * If the @source file does not exist, then the %G_IO_ERROR_NOT_FOUND
  * error is returned, independent on the status of the @destination.
  *
- * If %G_FILE_COPY_OVERWRITE is not specified and the target exists,
+ * If %XFILE_COPY_OVERWRITE is not specified and the target exists,
  * then the error %G_IO_ERROR_EXISTS is returned.
  *
  * If trying to overwrite a file over a directory, the %G_IO_ERROR_IS_DIRECTORY
@@ -3691,22 +3691,22 @@ g_file_copy_finish (xfile_t         *file,
  * %G_IO_ERROR_WOULD_MERGE error is returned.
  *
  * If the source is a directory and the target does not exist, or
- * %G_FILE_COPY_OVERWRITE is specified and the target is a file, then
+ * %XFILE_COPY_OVERWRITE is specified and the target is a file, then
  * the %G_IO_ERROR_WOULD_RECURSE error may be returned (if the native
  * move operation isn't available).
  *
  * Returns: %TRUE on successful move, %FALSE otherwise.
  */
 xboolean_t
-g_file_move (xfile_t                  *source,
+xfile_move (xfile_t                  *source,
              xfile_t                  *destination,
-             GFileCopyFlags          flags,
+             xfile_copy_flags_t          flags,
              xcancellable_t           *cancellable,
-             GFileProgressCallback   progress_callback,
+             xfile_progress_callback_t   progress_callback,
              xpointer_t                progress_callback_data,
              xerror_t                **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
   xerror_t *my_error;
   xboolean_t res;
 
@@ -3716,7 +3716,7 @@ g_file_move (xfile_t                  *source,
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
-  iface = G_FILE_GET_IFACE (destination);
+  iface = XFILE_GET_IFACE (destination);
   if (iface->move)
     {
       my_error = NULL;
@@ -3742,7 +3742,7 @@ g_file_move (xfile_t                  *source,
    */
   if (G_OBJECT_TYPE (source) != G_OBJECT_TYPE (destination))
     {
-      iface = G_FILE_GET_IFACE (source);
+      iface = XFILE_GET_IFACE (source);
 
       if (iface->move)
         {
@@ -3765,7 +3765,7 @@ g_file_move (xfile_t                  *source,
         }
     }
 
-  if (flags & G_FILE_COPY_NO_FALLBACK_FOR_MOVE)
+  if (flags & XFILE_COPY_NO_FALLBACK_FOR_MOVE)
     {
       g_set_error_literal (error, G_IO_ERROR,
                            G_IO_ERROR_NOT_SUPPORTED,
@@ -3773,24 +3773,24 @@ g_file_move (xfile_t                  *source,
       return FALSE;
     }
 
-  flags |= G_FILE_COPY_ALL_METADATA | G_FILE_COPY_NOFOLLOW_SYMLINKS;
-  if (!g_file_copy (source, destination, flags, cancellable,
+  flags |= XFILE_COPY_ALL_METADATA | XFILE_COPY_NOFOLLOW_SYMLINKS;
+  if (!xfile_copy (source, destination, flags, cancellable,
                     progress_callback, progress_callback_data,
                     error))
     return FALSE;
 
-  return g_file_delete (source, cancellable, error);
+  return xfile_delete (source, cancellable, error);
 }
 
 /**
- * g_file_move_async:
+ * xfile_move_async:
  * @source: #xfile_t pointing to the source location
  * @destination: #xfile_t pointing to the destination location
- * @flags: set of #GFileCopyFlags
+ * @flags: set of #xfile_copy_flags_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
- * @progress_callback: (nullable) (scope call): #GFileProgressCallback
+ * @progress_callback: (nullable) (scope call): #xfile_progress_callback_t
  *   function for updates
  * @progress_callback_data: (closure): xpointer_t to user data for
  *   the callback function
@@ -3798,36 +3798,36 @@ g_file_move (xfile_t                  *source,
  *   when the request is satisfied
  * @user_data: the data to pass to callback function
  *
- * Asynchronously moves a file @source to the location of @destination. For details of the behaviour, see g_file_move().
+ * Asynchronously moves a file @source to the location of @destination. For details of the behaviour, see xfile_move().
  *
  * If @progress_callback is not %NULL, then that function that will be called
- * just like in g_file_move(). The callback will run in the default main context
- * of the thread calling g_file_move_async() — the same context as @callback is
+ * just like in xfile_move(). The callback will run in the default main context
+ * of the thread calling xfile_move_async() — the same context as @callback is
  * run in.
  *
  * When the operation is finished, @callback will be called. You can then call
- * g_file_move_finish() to get the result of the operation.
+ * xfile_move_finish() to get the result of the operation.
  *
  * Since: 2.72
  */
 void
-g_file_move_async (xfile_t                *source,
+xfile_move_async (xfile_t                *source,
                    xfile_t                *destination,
-                   GFileCopyFlags        flags,
+                   xfile_copy_flags_t        flags,
                    int                   io_priority,
                    xcancellable_t         *cancellable,
-                   GFileProgressCallback progress_callback,
+                   xfile_progress_callback_t progress_callback,
                    xpointer_t              progress_callback_data,
                    xasync_ready_callback_t   callback,
                    xpointer_t              user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (source));
   g_return_if_fail (X_IS_FILE (destination));
   g_return_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
 
-  iface = G_FILE_GET_IFACE (source);
+  iface = XFILE_GET_IFACE (source);
   (* iface->move_async) (source,
                          destination,
                          flags,
@@ -3840,35 +3840,35 @@ g_file_move_async (xfile_t                *source,
 }
 
 /**
- * g_file_move_finish:
+ * xfile_move_finish:
  * @file: input source #xfile_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an asynchronous file movement, started with
- * g_file_move_async().
+ * xfile_move_async().
  *
  * Returns: %TRUE on successful file move, %FALSE otherwise.
  *
  * Since: 2.72
  */
 xboolean_t
-g_file_move_finish (xfile_t         *file,
+xfile_move_finish (xfile_t         *file,
                     xasync_result_t  *result,
                     xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->move_finish) (file, result, error);
 }
 
 /**
- * g_file_make_directory:
+ * xfile_make_directory:
  * @file: input #xfile_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -3876,7 +3876,7 @@ g_file_move_finish (xfile_t         *file,
  *
  * Creates a directory. Note that this will only create a child directory
  * of the immediate parent directory of the path or URI given by the #xfile_t.
- * To recursively create directories, see g_file_make_directory_with_parents().
+ * To recursively create directories, see xfile_make_directory_with_parents().
  * This function will fail if the parent directory does not exist, setting
  * @error to %G_IO_ERROR_NOT_FOUND. If the file system doesn't support
  * creating directories, this function will fail, setting @error to
@@ -3892,18 +3892,18 @@ g_file_move_finish (xfile_t         *file,
  * Returns: %TRUE on successful creation, %FALSE otherwise.
  */
 xboolean_t
-g_file_make_directory (xfile_t         *file,
+xfile_make_directory (xfile_t         *file,
                        xcancellable_t  *cancellable,
                        xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->make_directory == NULL)
     {
@@ -3917,7 +3917,7 @@ g_file_make_directory (xfile_t         *file,
 }
 
 /**
- * g_file_make_directory_async:
+ * xfile_make_directory_async:
  * @file: input #xfile_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
@@ -3932,17 +3932,17 @@ g_file_make_directory (xfile_t         *file,
  * Since: 2.38
  */
 void
-g_file_make_directory_async (xfile_t               *file,
+xfile_make_directory_async (xfile_t               *file,
                              int                  io_priority,
                              xcancellable_t        *cancellable,
                              xasync_ready_callback_t  callback,
                              xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->make_directory_async) (file,
                                    io_priority,
                                    cancellable,
@@ -3951,34 +3951,34 @@ g_file_make_directory_async (xfile_t               *file,
 }
 
 /**
- * g_file_make_directory_finish:
+ * xfile_make_directory_finish:
  * @file: input #xfile_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an asynchronous directory creation, started with
- * g_file_make_directory_async().
+ * xfile_make_directory_async().
  *
  * Virtual: make_directory_finish
  * Returns: %TRUE on successful directory creation, %FALSE otherwise.
  * Since: 2.38
  */
 xboolean_t
-g_file_make_directory_finish (xfile_t         *file,
+xfile_make_directory_finish (xfile_t         *file,
                               xasync_result_t  *result,
                               xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->make_directory_finish) (file, result, error);
 }
 
 /**
- * g_file_make_directory_with_parents:
+ * xfile_make_directory_with_parents:
  * @file: input #xfile_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -4004,7 +4004,7 @@ g_file_make_directory_finish (xfile_t         *file,
  * Since: 2.18
  */
 xboolean_t
-g_file_make_directory_with_parents (xfile_t         *file,
+xfile_make_directory_with_parents (xfile_t         *file,
                                     xcancellable_t  *cancellable,
                                     xerror_t       **error)
 {
@@ -4022,15 +4022,15 @@ g_file_make_directory_with_parents (xfile_t         *file,
    * call will fail with NOT_FOUND. If that happens, then that value of
    * my_error persists into the while loop below.
    */
-  g_file_make_directory (file, cancellable, &my_error);
-  if (!g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+  xfile_make_directory (file, cancellable, &my_error);
+  if (!xerror_matches (my_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
     {
       if (my_error)
         g_propagate_error (error, my_error);
       return my_error == NULL;
     }
 
-  work_file = g_object_ref (file);
+  work_file = xobject_ref (file);
 
   /* Creates the parent directories as needed. In case any particular
    * creation operation fails for lack of other parent directories
@@ -4039,29 +4039,29 @@ g_file_make_directory_with_parents (xfile_t         *file,
    * iteration of the loop.  After the loop my_error should either be
    * empty or contain a real failure condition.
    */
-  while (g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+  while (xerror_matches (my_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
     {
       xfile_t *parent_file;
 
-      parent_file = g_file_get_parent (work_file);
+      parent_file = xfile_get_parent (work_file);
       if (parent_file == NULL)
         break;
 
       g_clear_error (&my_error);
-      g_file_make_directory (parent_file, cancellable, &my_error);
+      xfile_make_directory (parent_file, cancellable, &my_error);
       /* Another process may have created the directory in between the
        * G_IO_ERROR_NOT_FOUND and now
        */
-      if (g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_EXISTS))
+      if (xerror_matches (my_error, G_IO_ERROR, G_IO_ERROR_EXISTS))
         g_clear_error (&my_error);
 
-      g_object_unref (work_file);
-      work_file = g_object_ref (parent_file);
+      xobject_unref (work_file);
+      work_file = xobject_ref (parent_file);
 
-      if (g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
-        list = g_list_prepend (list, parent_file);  /* Transfer ownership of ref */
+      if (xerror_matches (my_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+        list = xlist_prepend (list, parent_file);  /* Transfer ownership of ref */
       else
-        g_object_unref (parent_file);
+        xobject_unref (parent_file);
     }
 
   /* All directories should be able to be created now, so an error at
@@ -4071,19 +4071,19 @@ g_file_make_directory_with_parents (xfile_t         *file,
    */
   for (l = list; my_error == NULL && l; l = l->next)
     {
-      g_file_make_directory ((xfile_t *) l->data, cancellable, &my_error);
-      if (g_error_matches (my_error, G_IO_ERROR, G_IO_ERROR_EXISTS))
+      xfile_make_directory ((xfile_t *) l->data, cancellable, &my_error);
+      if (xerror_matches (my_error, G_IO_ERROR, G_IO_ERROR_EXISTS))
         g_clear_error (&my_error);
     }
 
   if (work_file)
-    g_object_unref (work_file);
+    xobject_unref (work_file);
 
   /* Clean up */
   while (list != NULL)
     {
-      g_object_unref ((xfile_t *) list->data);
-      list = g_list_remove (list, list->data);
+      xobject_unref ((xfile_t *) list->data);
+      list = xlist_remove (list, list->data);
     }
 
   /* At this point an error in my_error means a that something
@@ -4096,11 +4096,11 @@ g_file_make_directory_with_parents (xfile_t         *file,
       return FALSE;
     }
 
-  return g_file_make_directory (file, cancellable, error);
+  return xfile_make_directory (file, cancellable, error);
 }
 
 /**
- * g_file_make_symbolic_link:
+ * xfile_make_symbolic_link:
  * @file: a #xfile_t with the name of the symlink to create
  * @symlink_value: (type filename): a string with the path for the target
  *   of the new symlink
@@ -4118,12 +4118,12 @@ g_file_make_directory_with_parents (xfile_t         *file,
  * Returns: %TRUE on the creation of a new symlink, %FALSE otherwise.
  */
 xboolean_t
-g_file_make_symbolic_link (xfile_t         *file,
+xfile_make_symbolic_link (xfile_t         *file,
                            const char    *symlink_value,
                            xcancellable_t  *cancellable,
                            xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (symlink_value != NULL, FALSE);
@@ -4139,7 +4139,7 @@ g_file_make_symbolic_link (xfile_t         *file,
       return FALSE;
     }
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->make_symbolic_link == NULL)
     {
@@ -4153,7 +4153,7 @@ g_file_make_symbolic_link (xfile_t         *file,
 }
 
 /**
- * g_file_delete:
+ * xfile_delete:
  * @file: input #xfile_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -4166,14 +4166,14 @@ g_file_make_symbolic_link (xfile_t         *file,
  * for deletion to be implemented avoiding
  * [time-of-check to time-of-use races](https://en.wikipedia.org/wiki/Time-of-check_to_time-of-use):
  * |[
- * g_autoptr(xerror_t) local_error = NULL;
- * if (!g_file_delete (my_file, my_cancellable, &local_error) &&
- *     !g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+ * x_autoptr(xerror) local_error = NULL;
+ * if (!xfile_delete (my_file, my_cancellable, &local_error) &&
+ *     !xerror_matches (local_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
  *   {
  *     // deletion failed for some reason other than the file not existing:
  *     // so report the error
  *     g_warning ("Failed to delete %s: %s",
- *                g_file_peek_path (my_file), local_error->message);
+ *                xfile_peek_path (my_file), local_error->message);
  *   }
  * ]|
  *
@@ -4185,18 +4185,18 @@ g_file_make_symbolic_link (xfile_t         *file,
  * Returns: %TRUE if the file was deleted. %FALSE otherwise.
  */
 xboolean_t
-g_file_delete (xfile_t         *file,
+xfile_delete (xfile_t         *file,
                xcancellable_t  *cancellable,
                xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->delete_file == NULL)
     {
@@ -4210,7 +4210,7 @@ g_file_delete (xfile_t         *file,
 }
 
 /**
- * g_file_delete_async:
+ * xfile_delete_async:
  * @file: input #xfile_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
@@ -4227,17 +4227,17 @@ g_file_delete (xfile_t         *file,
  * Since: 2.34
  */
 void
-g_file_delete_async (xfile_t               *file,
+xfile_delete_async (xfile_t               *file,
                      int                  io_priority,
                      xcancellable_t        *cancellable,
                      xasync_ready_callback_t  callback,
                      xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->delete_file_async) (file,
                                 io_priority,
                                 cancellable,
@@ -4246,36 +4246,36 @@ g_file_delete_async (xfile_t               *file,
 }
 
 /**
- * g_file_delete_finish:
+ * xfile_delete_finish:
  * @file: input #xfile_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
- * Finishes deleting a file started with g_file_delete_async().
+ * Finishes deleting a file started with xfile_delete_async().
  *
  * Virtual: delete_file_finish
  * Returns: %TRUE if the file was deleted. %FALSE otherwise.
  * Since: 2.34
  **/
 xboolean_t
-g_file_delete_finish (xfile_t         *file,
+xfile_delete_finish (xfile_t         *file,
                       xasync_result_t  *result,
                       xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->delete_file_finish) (file, result, error);
 }
 
 /**
- * g_file_trash:
+ * xfile_trash:
  * @file: #xfile_t to send to trash
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -4285,7 +4285,7 @@ g_file_delete_finish (xfile_t         *file,
  * deleting it, but the user can recover it before emptying the trashcan.
  * Not all file systems support trashing, so this call can return the
  * %G_IO_ERROR_NOT_SUPPORTED error. Since GLib 2.66, the `x-gvfs-notrash` unix
- * mount option can be used to disable g_file_trash() support for certain
+ * mount option can be used to disable xfile_trash() support for certain
  * mounts, the %G_IO_ERROR_NOT_SUPPORTED error will be returned in that case.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
@@ -4296,18 +4296,18 @@ g_file_delete_finish (xfile_t         *file,
  * Returns: %TRUE on successful trash, %FALSE otherwise.
  */
 xboolean_t
-g_file_trash (xfile_t         *file,
+xfile_trash (xfile_t         *file,
               xcancellable_t  *cancellable,
               xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->trash == NULL)
     {
@@ -4321,7 +4321,7 @@ g_file_trash (xfile_t         *file,
 }
 
 /**
- * g_file_trash_async:
+ * xfile_trash_async:
  * @file: input #xfile_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
@@ -4336,17 +4336,17 @@ g_file_trash (xfile_t         *file,
  * Since: 2.38
  */
 void
-g_file_trash_async (xfile_t               *file,
+xfile_trash_async (xfile_t               *file,
                     int                  io_priority,
                     xcancellable_t        *cancellable,
                     xasync_ready_callback_t  callback,
                     xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->trash_async) (file,
                           io_priority,
                           cancellable,
@@ -4355,34 +4355,34 @@ g_file_trash_async (xfile_t               *file,
 }
 
 /**
- * g_file_trash_finish:
+ * xfile_trash_finish:
  * @file: input #xfile_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an asynchronous file trashing operation, started with
- * g_file_trash_async().
+ * xfile_trash_async().
  *
  * Virtual: trash_finish
  * Returns: %TRUE on successful trash, %FALSE otherwise.
  * Since: 2.38
  */
 xboolean_t
-g_file_trash_finish (xfile_t         *file,
+xfile_trash_finish (xfile_t         *file,
                      xasync_result_t  *result,
                      xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->trash_finish) (file, result, error);
 }
 
 /**
- * g_file_set_display_name:
+ * xfile_set_display_name:
  * @file: input #xfile_t
  * @display_name: a string
  * @cancellable: (nullable): optional #xcancellable_t object,
@@ -4395,9 +4395,9 @@ g_file_trash_finish (xfile_t         *file,
  * for the target filesystem if possible and the @file is renamed to this.
  *
  * If you want to implement a rename operation in the user interface the
- * edit name (%G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME) should be used as the
+ * edit name (%XFILE_ATTRIBUTE_STANDARD_EDIT_NAME) should be used as the
  * initial value in the rename widget, and then the result after editing
- * should be passed to g_file_set_display_name().
+ * should be passed to xfile_set_display_name().
  *
  * On success the resulting converted filename is returned.
  *
@@ -4407,15 +4407,15 @@ g_file_trash_finish (xfile_t         *file,
  *
  * Returns: (transfer full): a #xfile_t specifying what @file was renamed to,
  *   or %NULL if there was an error.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
 xfile_t *
-g_file_set_display_name (xfile_t         *file,
+xfile_set_display_name (xfile_t         *file,
                          const xchar_t   *display_name,
                          xcancellable_t  *cancellable,
                          xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (display_name != NULL, NULL);
@@ -4432,13 +4432,13 @@ g_file_set_display_name (xfile_t         *file,
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   return (* iface->set_display_name) (file, display_name, cancellable, error);
 }
 
 /**
- * g_file_set_display_name_async:
+ * xfile_set_display_name_async:
  * @file: input #xfile_t
  * @display_name: a string
  * @io_priority: the [I/O priority][io-priority] of the request
@@ -4450,27 +4450,27 @@ g_file_set_display_name (xfile_t         *file,
  *
  * Asynchronously sets the display name for a given #xfile_t.
  *
- * For more details, see g_file_set_display_name() which is
+ * For more details, see xfile_set_display_name() which is
  * the synchronous version of this call.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_set_display_name_finish() to get
+ * You can then call xfile_set_display_name_finish() to get
  * the result of the operation.
  */
 void
-g_file_set_display_name_async (xfile_t               *file,
+xfile_set_display_name_async (xfile_t               *file,
                                const xchar_t         *display_name,
                                xint_t                 io_priority,
                                xcancellable_t        *cancellable,
                                xasync_ready_callback_t  callback,
                                xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
   g_return_if_fail (display_name != NULL);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->set_display_name_async) (file,
                                      display_name,
                                      io_priority,
@@ -4480,36 +4480,36 @@ g_file_set_display_name_async (xfile_t               *file,
 }
 
 /**
- * g_file_set_display_name_finish:
+ * xfile_set_display_name_finish:
  * @file: input #xfile_t
  * @res: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
  * Finishes setting a display name started with
- * g_file_set_display_name_async().
+ * xfile_set_display_name_async().
  *
  * Returns: (transfer full): a #xfile_t or %NULL on error.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
 xfile_t *
-g_file_set_display_name_finish (xfile_t         *file,
+xfile_set_display_name_finish (xfile_t         *file,
                                 xasync_result_t  *res,
                                 xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
-  if (g_async_result_legacy_propagate_error (res, error))
+  if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->set_display_name_finish) (file, res, error);
 }
 
 /**
- * g_file_query_settable_attributes:
+ * xfile_query_settable_attributes:
  * @file: input #xfile_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -4526,28 +4526,28 @@ g_file_set_display_name_finish (xfile_t         *file,
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
- * Returns: (transfer full): a #GFileAttributeInfoList describing the settable attributes.
+ * Returns: (transfer full): a #xfile_attribute_info_list_t describing the settable attributes.
  *   When you are done with it, release it with
- *   g_file_attribute_info_list_unref()
+ *   xfile_attribute_info_list_unref()
  */
-GFileAttributeInfoList *
-g_file_query_settable_attributes (xfile_t         *file,
+xfile_attribute_info_list_t *
+xfile_query_settable_attributes (xfile_t         *file,
                                   xcancellable_t  *cancellable,
                                   xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
   xerror_t *my_error;
-  GFileAttributeInfoList *list;
+  xfile_attribute_info_list_t *list;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->query_settable_attributes == NULL)
-    return g_file_attribute_info_list_new ();
+    return xfile_attribute_info_list_new ();
 
   my_error = NULL;
   list = (* iface->query_settable_attributes) (file, cancellable, &my_error);
@@ -4556,8 +4556,8 @@ g_file_query_settable_attributes (xfile_t         *file,
     {
       if (my_error->domain == G_IO_ERROR && my_error->code == G_IO_ERROR_NOT_SUPPORTED)
         {
-          list = g_file_attribute_info_list_new ();
-          g_error_free (my_error);
+          list = xfile_attribute_info_list_new ();
+          xerror_free (my_error);
         }
       else
         g_propagate_error (error, my_error);
@@ -4567,7 +4567,7 @@ g_file_query_settable_attributes (xfile_t         *file,
 }
 
 /**
- * g_file_query_writable_namespaces:
+ * xfile_query_writable_namespaces:
  * @file: input #xfile_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -4581,28 +4581,28 @@ g_file_query_settable_attributes (xfile_t         *file,
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
- * Returns: (transfer full): a #GFileAttributeInfoList describing the writable namespaces.
+ * Returns: (transfer full): a #xfile_attribute_info_list_t describing the writable namespaces.
  *   When you are done with it, release it with
- *   g_file_attribute_info_list_unref()
+ *   xfile_attribute_info_list_unref()
  */
-GFileAttributeInfoList *
-g_file_query_writable_namespaces (xfile_t         *file,
+xfile_attribute_info_list_t *
+xfile_query_writable_namespaces (xfile_t         *file,
                                   xcancellable_t  *cancellable,
                                   xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
   xerror_t *my_error;
-  GFileAttributeInfoList *list;
+  xfile_attribute_info_list_t *list;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->query_writable_namespaces == NULL)
-    return g_file_attribute_info_list_new ();
+    return xfile_attribute_info_list_new ();
 
   my_error = NULL;
   list = (* iface->query_writable_namespaces) (file, cancellable, &my_error);
@@ -4610,14 +4610,14 @@ g_file_query_writable_namespaces (xfile_t         *file,
   if (list == NULL)
     {
       g_warn_if_reached();
-      list = g_file_attribute_info_list_new ();
+      list = xfile_attribute_info_list_new ();
     }
 
   if (my_error != NULL)
     {
       if (my_error->domain == G_IO_ERROR && my_error->code == G_IO_ERROR_NOT_SUPPORTED)
         {
-          g_error_free (my_error);
+          xerror_free (my_error);
         }
       else
         g_propagate_error (error, my_error);
@@ -4627,13 +4627,13 @@ g_file_query_writable_namespaces (xfile_t         *file,
 }
 
 /**
- * g_file_set_attribute:
+ * xfile_set_attribute:
  * @file: input #xfile_t
  * @attribute: a string containing the attribute's name
  * @type: The type of the attribute
  * @value_p: (nullable): a pointer to the value (or the pointer
  *   itself if the type is a pointer type)
- * @flags: a set of #GFileQueryInfoFlags
+ * @flags: a set of #xfile_query_info_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, or %NULL
@@ -4641,7 +4641,7 @@ g_file_query_writable_namespaces (xfile_t         *file,
  * Sets an attribute in the file with attribute name @attribute to @value_p.
  *
  * Some attributes can be unset by setting @type to
- * %G_FILE_ATTRIBUTE_TYPE_INVALID and @value_p to %NULL.
+ * %XFILE_ATTRIBUTE_TYPE_INVALID and @value_p to %NULL.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
@@ -4650,15 +4650,15 @@ g_file_query_writable_namespaces (xfile_t         *file,
  * Returns: %TRUE if the attribute was set, %FALSE otherwise.
  */
 xboolean_t
-g_file_set_attribute (xfile_t                *file,
+xfile_set_attribute (xfile_t                *file,
                       const xchar_t          *attribute,
-                      GFileAttributeType    type,
+                      xfile_attribute_type_t    type,
                       xpointer_t              value_p,
-                      GFileQueryInfoFlags   flags,
+                      xfile_query_info_flags_t   flags,
                       xcancellable_t         *cancellable,
                       xerror_t              **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
@@ -4666,7 +4666,7 @@ g_file_set_attribute (xfile_t                *file,
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->set_attribute == NULL)
     {
@@ -4680,21 +4680,21 @@ g_file_set_attribute (xfile_t                *file,
 }
 
 /**
- * g_file_set_attributes_from_info:
+ * xfile_set_attributes_from_info:
  * @file: input #xfile_t
- * @info: a #GFileInfo
- * @flags: #GFileQueryInfoFlags
+ * @info: a #xfile_info_t
+ * @flags: #xfile_query_info_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, or %NULL
  *
- * Tries to set all attributes in the #GFileInfo on the target
+ * Tries to set all attributes in the #xfile_info_t on the target
  * values, not stopping on the first error.
  *
  * If there is any error during this operation then @error will
  * be set to the first error. Error on particular fields are flagged
  * by setting the "status" field in the attribute value to
- * %G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING, which means you can
+ * %XFILE_ATTRIBUTE_STATUS_ERROR_SETTING, which means you can
  * also detect further errors.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
@@ -4704,13 +4704,13 @@ g_file_set_attribute (xfile_t                *file,
  * Returns: %FALSE if there was any error, %TRUE otherwise.
  */
 xboolean_t
-g_file_set_attributes_from_info (xfile_t                *file,
-                                 GFileInfo            *info,
-                                 GFileQueryInfoFlags   flags,
+xfile_set_attributes_from_info (xfile_t                *file,
+                                 xfile_info_t            *info,
+                                 xfile_query_info_flags_t   flags,
                                  xcancellable_t         *cancellable,
                                  xerror_t              **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_FILE_INFO (info), FALSE);
@@ -4718,9 +4718,9 @@ g_file_set_attributes_from_info (xfile_t                *file,
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
-  g_file_info_clear_status (info);
+  xfile_info_clear_status (info);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   return (* iface->set_attributes_from_info) (file,
                                               info,
@@ -4730,9 +4730,9 @@ g_file_set_attributes_from_info (xfile_t                *file,
 }
 
 static xboolean_t
-g_file_real_set_attributes_from_info (xfile_t                *file,
-                                      GFileInfo            *info,
-                                      GFileQueryInfoFlags   flags,
+xfile_real_set_attributes_from_info (xfile_t                *file,
+                                      xfile_info_t            *info,
+                                      xfile_query_info_flags_t   flags,
                                       xcancellable_t         *cancellable,
                                       xerror_t              **error)
 {
@@ -4743,38 +4743,38 @@ g_file_real_set_attributes_from_info (xfile_t                *file,
 
   res = TRUE;
 
-  attributes = g_file_info_list_attributes (info, NULL);
+  attributes = xfile_info_list_attributes (info, NULL);
 
   for (i = 0; attributes[i] != NULL; i++)
     {
-      value = _g_file_info_get_attribute_value (info, attributes[i]);
+      value = _xfile_info_get_attribute_value (info, attributes[i]);
 
-      if (value->status != G_FILE_ATTRIBUTE_STATUS_UNSET)
+      if (value->status != XFILE_ATTRIBUTE_STATUS_UNSET)
         continue;
 
-      if (!g_file_set_attribute (file, attributes[i],
-                                 value->type, _g_file_attribute_value_peek_as_pointer (value),
+      if (!xfile_set_attribute (file, attributes[i],
+                                 value->type, _xfile_attribute_value_peek_as_pointer (value),
                                  flags, cancellable, error))
         {
-          value->status = G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING;
+          value->status = XFILE_ATTRIBUTE_STATUS_ERROR_SETTING;
           res = FALSE;
           /* Don't set error multiple times */
           error = NULL;
         }
       else
-        value->status = G_FILE_ATTRIBUTE_STATUS_SET;
+        value->status = XFILE_ATTRIBUTE_STATUS_SET;
     }
 
-  g_strfreev (attributes);
+  xstrfreev (attributes);
 
   return res;
 }
 
 /**
- * g_file_set_attributes_async:
+ * xfile_set_attributes_async:
  * @file: input #xfile_t
- * @info: a #GFileInfo
- * @flags: a #GFileQueryInfoFlags
+ * @info: a #xfile_info_t
+ * @flags: a #xfile_query_info_flags_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
@@ -4783,28 +4783,28 @@ g_file_real_set_attributes_from_info (xfile_t                *file,
  *
  * Asynchronously sets the attributes of @file with @info.
  *
- * For more details, see g_file_set_attributes_from_info(),
+ * For more details, see xfile_set_attributes_from_info(),
  * which is the synchronous version of this call.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_set_attributes_finish() to get
+ * You can then call xfile_set_attributes_finish() to get
  * the result of the operation.
  */
 void
-g_file_set_attributes_async (xfile_t               *file,
-                             GFileInfo           *info,
-                             GFileQueryInfoFlags  flags,
+xfile_set_attributes_async (xfile_t               *file,
+                             xfile_info_t           *info,
+                             xfile_query_info_flags_t  flags,
                              int                  io_priority,
                              xcancellable_t        *cancellable,
                              xasync_ready_callback_t  callback,
                              xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
   g_return_if_fail (X_IS_FILE_INFO (info));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   (* iface->set_attributes_async) (file,
                                    info,
                                    flags,
@@ -4815,23 +4815,23 @@ g_file_set_attributes_async (xfile_t               *file,
 }
 
 /**
- * g_file_set_attributes_finish:
+ * xfile_set_attributes_finish:
  * @file: input #xfile_t
  * @result: a #xasync_result_t
- * @info: (out) (transfer full): a #GFileInfo
+ * @info: (out) (transfer full): a #xfile_info_t
  * @error: a #xerror_t, or %NULL
  *
- * Finishes setting an attribute started in g_file_set_attributes_async().
+ * Finishes setting an attribute started in xfile_set_attributes_async().
  *
  * Returns: %TRUE if the attributes were set correctly, %FALSE otherwise.
  */
 xboolean_t
-g_file_set_attributes_finish (xfile_t         *file,
+xfile_set_attributes_finish (xfile_t         *file,
                               xasync_result_t  *result,
-                              GFileInfo    **info,
+                              xfile_info_t    **info,
                               xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
@@ -4839,21 +4839,21 @@ g_file_set_attributes_finish (xfile_t         *file,
   /* No standard handling of errors here, as we must set info even
    * on errors
    */
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->set_attributes_finish) (file, result, info, error);
 }
 
 /**
- * g_file_set_attribute_string:
+ * xfile_set_attribute_string:
  * @file: input #xfile_t
  * @attribute: a string containing the attribute's name
  * @value: a string containing the attribute's value
- * @flags: #GFileQueryInfoFlags
+ * @flags: #xfile_query_info_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, or %NULL
  *
- * Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_STRING to @value.
+ * Sets @attribute of type %XFILE_ATTRIBUTE_TYPE_STRING to @value.
  * If @attribute is of a different type, this operation will fail.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
@@ -4863,29 +4863,29 @@ g_file_set_attributes_finish (xfile_t         *file,
  * Returns: %TRUE if the @attribute was successfully set, %FALSE otherwise.
  */
 xboolean_t
-g_file_set_attribute_string (xfile_t                *file,
+xfile_set_attribute_string (xfile_t                *file,
                              const char           *attribute,
                              const char           *value,
-                             GFileQueryInfoFlags   flags,
+                             xfile_query_info_flags_t   flags,
                              xcancellable_t         *cancellable,
                              xerror_t              **error)
 {
-  return g_file_set_attribute (file, attribute,
-                               G_FILE_ATTRIBUTE_TYPE_STRING, (xpointer_t)value,
+  return xfile_set_attribute (file, attribute,
+                               XFILE_ATTRIBUTE_TYPE_STRING, (xpointer_t)value,
                                flags, cancellable, error);
 }
 
 /**
- * g_file_set_attribute_byte_string:
+ * xfile_set_attribute_byte_string:
  * @file: input #xfile_t
  * @attribute: a string containing the attribute's name
  * @value: a string containing the attribute's new value
- * @flags: a #GFileQueryInfoFlags
+ * @flags: a #xfile_query_info_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, or %NULL
  *
- * Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_BYTE_STRING to @value.
+ * Sets @attribute of type %XFILE_ATTRIBUTE_TYPE_BYTE_STRING to @value.
  * If @attribute is of a different type, this operation will fail,
  * returning %FALSE.
  *
@@ -4897,29 +4897,29 @@ g_file_set_attribute_string (xfile_t                *file,
  *   in the @file, %FALSE otherwise.
  */
 xboolean_t
-g_file_set_attribute_byte_string  (xfile_t                *file,
+xfile_set_attribute_byte_string  (xfile_t                *file,
                                    const xchar_t          *attribute,
                                    const xchar_t          *value,
-                                   GFileQueryInfoFlags   flags,
+                                   xfile_query_info_flags_t   flags,
                                    xcancellable_t         *cancellable,
                                    xerror_t              **error)
 {
-  return g_file_set_attribute (file, attribute,
-                               G_FILE_ATTRIBUTE_TYPE_BYTE_STRING, (xpointer_t)value,
+  return xfile_set_attribute (file, attribute,
+                               XFILE_ATTRIBUTE_TYPE_BYTE_STRING, (xpointer_t)value,
                                flags, cancellable, error);
 }
 
 /**
- * g_file_set_attribute_uint32:
+ * xfile_set_attribute_uint32:
  * @file: input #xfile_t
  * @attribute: a string containing the attribute's name
- * @value: a #guint32 containing the attribute's new value
- * @flags: a #GFileQueryInfoFlags
+ * @value: a #xuint32_t containing the attribute's new value
+ * @flags: a #xfile_query_info_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, or %NULL
  *
- * Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_UINT32 to @value.
+ * Sets @attribute of type %XFILE_ATTRIBUTE_TYPE_UINT32 to @value.
  * If @attribute is of a different type, this operation will fail.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
@@ -4930,29 +4930,29 @@ g_file_set_attribute_byte_string  (xfile_t                *file,
  *   in the @file, %FALSE otherwise.
  */
 xboolean_t
-g_file_set_attribute_uint32 (xfile_t                *file,
+xfile_set_attribute_uint32 (xfile_t                *file,
                              const xchar_t          *attribute,
-                             guint32               value,
-                             GFileQueryInfoFlags   flags,
+                             xuint32_t               value,
+                             xfile_query_info_flags_t   flags,
                              xcancellable_t         *cancellable,
                              xerror_t              **error)
 {
-  return g_file_set_attribute (file, attribute,
-                               G_FILE_ATTRIBUTE_TYPE_UINT32, &value,
+  return xfile_set_attribute (file, attribute,
+                               XFILE_ATTRIBUTE_TYPE_UINT32, &value,
                                flags, cancellable, error);
 }
 
 /**
- * g_file_set_attribute_int32:
+ * xfile_set_attribute_int32:
  * @file: input #xfile_t
  * @attribute: a string containing the attribute's name
  * @value: a #gint32 containing the attribute's new value
- * @flags: a #GFileQueryInfoFlags
+ * @flags: a #xfile_query_info_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, or %NULL
  *
- * Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_INT32 to @value.
+ * Sets @attribute of type %XFILE_ATTRIBUTE_TYPE_INT32 to @value.
  * If @attribute is of a different type, this operation will fail.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
@@ -4963,29 +4963,29 @@ g_file_set_attribute_uint32 (xfile_t                *file,
  *   in the @file, %FALSE otherwise.
  */
 xboolean_t
-g_file_set_attribute_int32 (xfile_t                *file,
+xfile_set_attribute_int32 (xfile_t                *file,
                             const xchar_t          *attribute,
                             gint32                value,
-                            GFileQueryInfoFlags   flags,
+                            xfile_query_info_flags_t   flags,
                             xcancellable_t         *cancellable,
                             xerror_t              **error)
 {
-  return g_file_set_attribute (file, attribute,
-                               G_FILE_ATTRIBUTE_TYPE_INT32, &value,
+  return xfile_set_attribute (file, attribute,
+                               XFILE_ATTRIBUTE_TYPE_INT32, &value,
                                flags, cancellable, error);
 }
 
 /**
- * g_file_set_attribute_uint64:
+ * xfile_set_attribute_uint64:
  * @file: input #xfile_t
  * @attribute: a string containing the attribute's name
- * @value: a #guint64 containing the attribute's new value
- * @flags: a #GFileQueryInfoFlags
+ * @value: a #xuint64_t containing the attribute's new value
+ * @flags: a #xfile_query_info_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, or %NULL
  *
- * Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_UINT64 to @value.
+ * Sets @attribute of type %XFILE_ATTRIBUTE_TYPE_UINT64 to @value.
  * If @attribute is of a different type, this operation will fail.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
@@ -4996,29 +4996,29 @@ g_file_set_attribute_int32 (xfile_t                *file,
  *   in the @file, %FALSE otherwise.
  */
 xboolean_t
-g_file_set_attribute_uint64 (xfile_t                *file,
+xfile_set_attribute_uint64 (xfile_t                *file,
                              const xchar_t          *attribute,
-                             guint64               value,
-                             GFileQueryInfoFlags   flags,
+                             xuint64_t               value,
+                             xfile_query_info_flags_t   flags,
                              xcancellable_t         *cancellable,
                              xerror_t              **error)
  {
-  return g_file_set_attribute (file, attribute,
-                               G_FILE_ATTRIBUTE_TYPE_UINT64, &value,
+  return xfile_set_attribute (file, attribute,
+                               XFILE_ATTRIBUTE_TYPE_UINT64, &value,
                                flags, cancellable, error);
 }
 
 /**
- * g_file_set_attribute_int64:
+ * xfile_set_attribute_int64:
  * @file: input #xfile_t
  * @attribute: a string containing the attribute's name
- * @value: a #guint64 containing the attribute's new value
- * @flags: a #GFileQueryInfoFlags
+ * @value: a #xuint64_t containing the attribute's new value
+ * @flags: a #xfile_query_info_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, or %NULL
  *
- * Sets @attribute of type %G_FILE_ATTRIBUTE_TYPE_INT64 to @value.
+ * Sets @attribute of type %XFILE_ATTRIBUTE_TYPE_INT64 to @value.
  * If @attribute is of a different type, this operation will fail.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
@@ -5028,20 +5028,20 @@ g_file_set_attribute_uint64 (xfile_t                *file,
  * Returns: %TRUE if the @attribute was successfully set, %FALSE otherwise.
  */
 xboolean_t
-g_file_set_attribute_int64 (xfile_t                *file,
+xfile_set_attribute_int64 (xfile_t                *file,
                             const xchar_t          *attribute,
                             gint64                value,
-                            GFileQueryInfoFlags   flags,
+                            xfile_query_info_flags_t   flags,
                             xcancellable_t         *cancellable,
                             xerror_t              **error)
 {
-  return g_file_set_attribute (file, attribute,
-                               G_FILE_ATTRIBUTE_TYPE_INT64, &value,
+  return xfile_set_attribute (file, attribute,
+                               XFILE_ATTRIBUTE_TYPE_INT64, &value,
                                flags, cancellable, error);
 }
 
 /**
- * g_file_mount_mountable:
+ * xfile_mount_mountable:
  * @file: input #xfile_t
  * @flags: flags affecting the operation
  * @mount_operation: (nullable): a #xmount_operation_t,
@@ -5052,7 +5052,7 @@ g_file_set_attribute_int64 (xfile_t                *file,
  *   when the request is satisfied, or %NULL
  * @user_data: (closure): the data to pass to callback function
  *
- * Mounts a file of type G_FILE_TYPE_MOUNTABLE.
+ * Mounts a file of type XFILE_TYPE_MOUNTABLE.
  * Using @mount_operation, you can request callbacks when, for instance,
  * passwords are needed during authentication.
  *
@@ -5061,27 +5061,27 @@ g_file_set_attribute_int64 (xfile_t                *file,
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_mount_mountable_finish() to get
+ * You can then call xfile_mount_mountable_finish() to get
  * the result of the operation.
  */
 void
-g_file_mount_mountable (xfile_t               *file,
+xfile_mount_mountable (xfile_t               *file,
                         GMountMountFlags     flags,
                         xmount_operation_t     *mount_operation,
                         xcancellable_t        *cancellable,
                         xasync_ready_callback_t  callback,
                         xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->mount_mountable == NULL)
     {
-      g_task_report_new_error (file, callback, user_data,
-                               g_file_mount_mountable,
+      xtask_report_new_error (file, callback, user_data,
+                               xfile_mount_mountable,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("Operation not supported"));
       return;
@@ -5096,40 +5096,40 @@ g_file_mount_mountable (xfile_t               *file,
 }
 
 /**
- * g_file_mount_mountable_finish:
+ * xfile_mount_mountable_finish:
  * @file: input #xfile_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
- * Finishes a mount operation. See g_file_mount_mountable() for details.
+ * Finishes a mount operation. See xfile_mount_mountable() for details.
  *
  * Finish an asynchronous mount operation that was started
- * with g_file_mount_mountable().
+ * with xfile_mount_mountable().
  *
  * Returns: (transfer full): a #xfile_t or %NULL on error.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
 xfile_t *
-g_file_mount_mountable_finish (xfile_t         *file,
+xfile_mount_mountable_finish (xfile_t         *file,
                                xasync_result_t  *result,
                                xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return NULL;
-  else if (g_async_result_is_tagged (result, g_file_mount_mountable))
-    return g_task_propagate_pointer (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xfile_mount_mountable))
+    return xtask_propagate_pointer (XTASK (result), error);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->mount_mountable_finish) (file, result, error);
 }
 
 /**
- * g_file_unmount_mountable:
+ * xfile_unmount_mountable:
  * @file: input #xfile_t
  * @flags: flags affecting the operation
  * @cancellable: (nullable): optional #xcancellable_t object,
@@ -5138,35 +5138,35 @@ g_file_mount_mountable_finish (xfile_t         *file,
  *   when the request is satisfied, or %NULL
  * @user_data: (closure): the data to pass to callback function
  *
- * Unmounts a file of type G_FILE_TYPE_MOUNTABLE.
+ * Unmounts a file of type XFILE_TYPE_MOUNTABLE.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_unmount_mountable_finish() to get
+ * You can then call xfile_unmount_mountable_finish() to get
  * the result of the operation.
  *
- * Deprecated: 2.22: Use g_file_unmount_mountable_with_operation() instead.
+ * Deprecated: 2.22: Use xfile_unmount_mountable_with_operation() instead.
  */
 void
-g_file_unmount_mountable (xfile_t               *file,
+xfile_unmount_mountable (xfile_t               *file,
                           xmount_unmount_flags_t   flags,
                           xcancellable_t        *cancellable,
                           xasync_ready_callback_t  callback,
                           xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->unmount_mountable == NULL)
     {
-      g_task_report_new_error (file, callback, user_data,
-                               g_file_unmount_mountable_with_operation,
+      xtask_report_new_error (file, callback, user_data,
+                               xfile_unmount_mountable_with_operation,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("Operation not supported"));
       return;
@@ -5180,43 +5180,43 @@ g_file_unmount_mountable (xfile_t               *file,
 }
 
 /**
- * g_file_unmount_mountable_finish:
+ * xfile_unmount_mountable_finish:
  * @file: input #xfile_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
- * Finishes an unmount operation, see g_file_unmount_mountable() for details.
+ * Finishes an unmount operation, see xfile_unmount_mountable() for details.
  *
  * Finish an asynchronous unmount operation that was started
- * with g_file_unmount_mountable().
+ * with xfile_unmount_mountable().
  *
  * Returns: %TRUE if the operation finished successfully.
  *   %FALSE otherwise.
  *
- * Deprecated: 2.22: Use g_file_unmount_mountable_with_operation_finish()
+ * Deprecated: 2.22: Use xfile_unmount_mountable_with_operation_finish()
  *   instead.
  */
 xboolean_t
-g_file_unmount_mountable_finish (xfile_t         *file,
+xfile_unmount_mountable_finish (xfile_t         *file,
                                  xasync_result_t  *result,
                                  xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_file_unmount_mountable_with_operation))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xfile_unmount_mountable_with_operation))
+    return xtask_propagate_boolean (XTASK (result), error);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->unmount_mountable_finish) (file, result, error);
 }
 
 /**
- * g_file_unmount_mountable_with_operation:
+ * xfile_unmount_mountable_with_operation:
  * @file: input #xfile_t
  * @flags: flags affecting the operation
  * @mount_operation: (nullable): a #xmount_operation_t,
@@ -5227,36 +5227,36 @@ g_file_unmount_mountable_finish (xfile_t         *file,
  *   when the request is satisfied, or %NULL
  * @user_data: (closure): the data to pass to callback function
  *
- * Unmounts a file of type %G_FILE_TYPE_MOUNTABLE.
+ * Unmounts a file of type %XFILE_TYPE_MOUNTABLE.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_unmount_mountable_finish() to get
+ * You can then call xfile_unmount_mountable_finish() to get
  * the result of the operation.
  *
  * Since: 2.22
  */
 void
-g_file_unmount_mountable_with_operation (xfile_t               *file,
+xfile_unmount_mountable_with_operation (xfile_t               *file,
                                          xmount_unmount_flags_t   flags,
                                          xmount_operation_t     *mount_operation,
                                          xcancellable_t        *cancellable,
                                          xasync_ready_callback_t  callback,
                                          xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->unmount_mountable == NULL && iface->unmount_mountable_with_operation == NULL)
     {
-      g_task_report_new_error (file, callback, user_data,
-                               g_file_unmount_mountable_with_operation,
+      xtask_report_new_error (file, callback, user_data,
+                               xfile_unmount_mountable_with_operation,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("Operation not supported"));
       return;
@@ -5278,16 +5278,16 @@ g_file_unmount_mountable_with_operation (xfile_t               *file,
 }
 
 /**
- * g_file_unmount_mountable_with_operation_finish:
+ * xfile_unmount_mountable_with_operation_finish:
  * @file: input #xfile_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an unmount operation,
- * see g_file_unmount_mountable_with_operation() for details.
+ * see xfile_unmount_mountable_with_operation() for details.
  *
  * Finish an asynchronous unmount operation that was started
- * with g_file_unmount_mountable_with_operation().
+ * with xfile_unmount_mountable_with_operation().
  *
  * Returns: %TRUE if the operation finished successfully.
  *   %FALSE otherwise.
@@ -5295,21 +5295,21 @@ g_file_unmount_mountable_with_operation (xfile_t               *file,
  * Since: 2.22
  */
 xboolean_t
-g_file_unmount_mountable_with_operation_finish (xfile_t         *file,
+xfile_unmount_mountable_with_operation_finish (xfile_t         *file,
                                                 xasync_result_t  *result,
                                                 xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_file_unmount_mountable_with_operation))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xfile_unmount_mountable_with_operation))
+    return xtask_propagate_boolean (XTASK (result), error);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   if (iface->unmount_mountable_with_operation_finish != NULL)
     return (* iface->unmount_mountable_with_operation_finish) (file, result, error);
   else
@@ -5317,7 +5317,7 @@ g_file_unmount_mountable_with_operation_finish (xfile_t         *file,
 }
 
 /**
- * g_file_eject_mountable:
+ * xfile_eject_mountable:
  * @file: input #xfile_t
  * @flags: flags affecting the operation
  * @cancellable: (nullable): optional #xcancellable_t object,
@@ -5329,31 +5329,31 @@ g_file_unmount_mountable_with_operation_finish (xfile_t         *file,
  * Starts an asynchronous eject on a mountable.
  * When this operation has completed, @callback will be called with
  * @user_user data, and the operation can be finalized with
- * g_file_eject_mountable_finish().
+ * xfile_eject_mountable_finish().
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
- * Deprecated: 2.22: Use g_file_eject_mountable_with_operation() instead.
+ * Deprecated: 2.22: Use xfile_eject_mountable_with_operation() instead.
  */
 void
-g_file_eject_mountable (xfile_t               *file,
+xfile_eject_mountable (xfile_t               *file,
                         xmount_unmount_flags_t   flags,
                         xcancellable_t        *cancellable,
                         xasync_ready_callback_t  callback,
                         xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->eject_mountable == NULL)
     {
-      g_task_report_new_error (file, callback, user_data,
-                               g_file_eject_mountable_with_operation,
+      xtask_report_new_error (file, callback, user_data,
+                               xfile_eject_mountable_with_operation,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("Operation not supported"));
       return;
@@ -5367,41 +5367,41 @@ g_file_eject_mountable (xfile_t               *file,
 }
 
 /**
- * g_file_eject_mountable_finish:
+ * xfile_eject_mountable_finish:
  * @file: input #xfile_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an asynchronous eject operation started by
- * g_file_eject_mountable().
+ * xfile_eject_mountable().
  *
  * Returns: %TRUE if the @file was ejected successfully.
  *   %FALSE otherwise.
  *
- * Deprecated: 2.22: Use g_file_eject_mountable_with_operation_finish()
+ * Deprecated: 2.22: Use xfile_eject_mountable_with_operation_finish()
  *   instead.
  */
 xboolean_t
-g_file_eject_mountable_finish (xfile_t         *file,
+xfile_eject_mountable_finish (xfile_t         *file,
                                xasync_result_t  *result,
                                xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_file_eject_mountable_with_operation))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xfile_eject_mountable_with_operation))
+    return xtask_propagate_boolean (XTASK (result), error);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->eject_mountable_finish) (file, result, error);
 }
 
 /**
- * g_file_eject_mountable_with_operation:
+ * xfile_eject_mountable_with_operation:
  * @file: input #xfile_t
  * @flags: flags affecting the operation
  * @mount_operation: (nullable): a #xmount_operation_t,
@@ -5415,7 +5415,7 @@ g_file_eject_mountable_finish (xfile_t         *file,
  * Starts an asynchronous eject on a mountable.
  * When this operation has completed, @callback will be called with
  * @user_user data, and the operation can be finalized with
- * g_file_eject_mountable_with_operation_finish().
+ * xfile_eject_mountable_with_operation_finish().
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
@@ -5424,23 +5424,23 @@ g_file_eject_mountable_finish (xfile_t         *file,
  * Since: 2.22
  */
 void
-g_file_eject_mountable_with_operation (xfile_t               *file,
+xfile_eject_mountable_with_operation (xfile_t               *file,
                                        xmount_unmount_flags_t   flags,
                                        xmount_operation_t     *mount_operation,
                                        xcancellable_t        *cancellable,
                                        xasync_ready_callback_t  callback,
                                        xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->eject_mountable == NULL && iface->eject_mountable_with_operation == NULL)
     {
-      g_task_report_new_error (file, callback, user_data,
-                               g_file_eject_mountable_with_operation,
+      xtask_report_new_error (file, callback, user_data,
+                               xfile_eject_mountable_with_operation,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("Operation not supported"));
       return;
@@ -5462,13 +5462,13 @@ g_file_eject_mountable_with_operation (xfile_t               *file,
 }
 
 /**
- * g_file_eject_mountable_with_operation_finish:
+ * xfile_eject_mountable_with_operation_finish:
  * @file: input #xfile_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an asynchronous eject operation started by
- * g_file_eject_mountable_with_operation().
+ * xfile_eject_mountable_with_operation().
  *
  * Returns: %TRUE if the @file was ejected successfully.
  *   %FALSE otherwise.
@@ -5476,21 +5476,21 @@ g_file_eject_mountable_with_operation (xfile_t               *file,
  * Since: 2.22
  */
 xboolean_t
-g_file_eject_mountable_with_operation_finish (xfile_t         *file,
+xfile_eject_mountable_with_operation_finish (xfile_t         *file,
                                               xasync_result_t  *result,
                                               xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_file_eject_mountable_with_operation))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xfile_eject_mountable_with_operation))
+    return xtask_propagate_boolean (XTASK (result), error);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   if (iface->eject_mountable_with_operation_finish != NULL)
     return (* iface->eject_mountable_with_operation_finish) (file, result, error);
   else
@@ -5498,9 +5498,9 @@ g_file_eject_mountable_with_operation_finish (xfile_t         *file,
 }
 
 /**
- * g_file_monitor_directory:
+ * xfile_monitor_directory:
  * @file: input #xfile_t
- * @flags: a set of #GFileMonitorFlags
+ * @flags: a set of #xfile_monitor_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, or %NULL
@@ -5513,31 +5513,31 @@ g_file_eject_mountable_with_operation_finish (xfile_t         *file,
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
  * It does not make sense for @flags to contain
- * %G_FILE_MONITOR_WATCH_HARD_LINKS, since hard links can not be made to
+ * %XFILE_MONITOR_WATCH_HARD_LINKS, since hard links can not be made to
  * directories.  It is not possible to monitor all the files in a
  * directory for changes made via hard links; if you want to do this then
- * you must register individual watches with g_file_monitor().
+ * you must register individual watches with xfile_monitor().
  *
  * Virtual: monitor_dir
- * Returns: (transfer full): a #GFileMonitor for the given @file,
+ * Returns: (transfer full): a #xfile_monitor_t for the given @file,
  *   or %NULL on error.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
-GFileMonitor *
-g_file_monitor_directory (xfile_t              *file,
-                          GFileMonitorFlags   flags,
+xfile_monitor_t *
+xfile_monitor_directory (xfile_t              *file,
+                          xfile_monitor_flags_t   flags,
                           xcancellable_t       *cancellable,
                           xerror_t            **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (~flags & G_FILE_MONITOR_WATCH_HARD_LINKS, NULL);
+  g_return_val_if_fail (~flags & XFILE_MONITOR_WATCH_HARD_LINKS, NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->monitor_dir == NULL)
     {
@@ -5551,9 +5551,9 @@ g_file_monitor_directory (xfile_t              *file,
 }
 
 /**
- * g_file_monitor_file:
+ * xfile_monitor_file:
  * @file: input #xfile_t
- * @flags: a set of #GFileMonitorFlags
+ * @flags: a set of #xfile_monitor_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, or %NULL
@@ -5565,33 +5565,33 @@ g_file_monitor_directory (xfile_t              *file,
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
- * If @flags contains %G_FILE_MONITOR_WATCH_HARD_LINKS then the monitor
+ * If @flags contains %XFILE_MONITOR_WATCH_HARD_LINKS then the monitor
  * will also attempt to report changes made to the file via another
  * filename (ie, a hard link). Without this flag, you can only rely on
  * changes made through the filename contained in @file to be
  * reported. Using this flag may result in an increase in resource
- * usage, and may not have any effect depending on the #GFileMonitor
+ * usage, and may not have any effect depending on the #xfile_monitor_t
  * backend and/or filesystem type.
  *
- * Returns: (transfer full): a #GFileMonitor for the given @file,
+ * Returns: (transfer full): a #xfile_monitor_t for the given @file,
  *   or %NULL on error.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
-GFileMonitor *
-g_file_monitor_file (xfile_t              *file,
-                     GFileMonitorFlags   flags,
+xfile_monitor_t *
+xfile_monitor_file (xfile_t              *file,
+                     xfile_monitor_flags_t   flags,
                      xcancellable_t       *cancellable,
                      xerror_t            **error)
 {
-  GFileIface *iface;
-  GFileMonitor *monitor;
+  xfile_iface_t *iface;
+  xfile_monitor_t *monitor;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   monitor = NULL;
 
@@ -5606,9 +5606,9 @@ g_file_monitor_file (xfile_t              *file,
 }
 
 /**
- * g_file_monitor:
+ * xfile_monitor:
  * @file: input #xfile_t
- * @flags: a set of #GFileMonitorFlags
+ * @flags: a set of #xfile_monitor_flags_t
  * @cancellable: (nullable): optional #xcancellable_t object,
  *   %NULL to ignore
  * @error: a #xerror_t, or %NULL
@@ -5620,24 +5620,24 @@ g_file_monitor_file (xfile_t              *file,
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
- * Returns: (transfer full): a #GFileMonitor for the given @file,
+ * Returns: (transfer full): a #xfile_monitor_t for the given @file,
  *   or %NULL on error.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  *
  * Since: 2.18
  */
-GFileMonitor *
-g_file_monitor (xfile_t              *file,
-                GFileMonitorFlags   flags,
+xfile_monitor_t *
+xfile_monitor (xfile_t              *file,
+                xfile_monitor_flags_t   flags,
                 xcancellable_t       *cancellable,
                 xerror_t            **error)
 {
-  if (g_file_query_file_type (file, 0, cancellable) == G_FILE_TYPE_DIRECTORY)
-    return g_file_monitor_directory (file,
-                                     flags & ~G_FILE_MONITOR_WATCH_HARD_LINKS,
+  if (xfile_query_file_type (file, 0, cancellable) == XFILE_TYPE_DIRECTORY)
+    return xfile_monitor_directory (file,
+                                     flags & ~XFILE_MONITOR_WATCH_HARD_LINKS,
                                      cancellable, error);
   else
-    return g_file_monitor_file (file, flags, cancellable, error);
+    return xfile_monitor_file (file, flags, cancellable, error);
 }
 
 /********************************************
@@ -5646,7 +5646,7 @@ g_file_monitor (xfile_t              *file,
 
 typedef struct {
   char *attributes;
-  GFileQueryInfoFlags flags;
+  xfile_query_info_flags_t flags;
 } QueryInfoAsyncData;
 
 static void
@@ -5657,321 +5657,321 @@ query_info_data_free (QueryInfoAsyncData *data)
 }
 
 static void
-query_info_async_thread (GTask         *task,
+query_info_async_thread (xtask_t         *task,
                          xpointer_t       object,
                          xpointer_t       task_data,
                          xcancellable_t  *cancellable)
 {
   QueryInfoAsyncData *data = task_data;
-  GFileInfo *info;
+  xfile_info_t *info;
   xerror_t *error = NULL;
 
-  info = g_file_query_info (G_FILE (object), data->attributes, data->flags, cancellable, &error);
+  info = xfile_query_info (XFILE (object), data->attributes, data->flags, cancellable, &error);
   if (info)
-    g_task_return_pointer (task, info, g_object_unref);
+    xtask_return_pointer (task, info, xobject_unref);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 static void
-g_file_real_query_info_async (xfile_t               *file,
+xfile_real_query_info_async (xfile_t               *file,
                               const char          *attributes,
-                              GFileQueryInfoFlags  flags,
+                              xfile_query_info_flags_t  flags,
                               int                  io_priority,
                               xcancellable_t        *cancellable,
                               xasync_ready_callback_t  callback,
                               xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
   QueryInfoAsyncData *data;
 
   data = g_new0 (QueryInfoAsyncData, 1);
-  data->attributes = g_strdup (attributes);
+  data->attributes = xstrdup (attributes);
   data->flags = flags;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_query_info_async);
-  g_task_set_task_data (task, data, (GDestroyNotify)query_info_data_free);
-  g_task_set_priority (task, io_priority);
-  g_task_run_in_thread (task, query_info_async_thread);
-  g_object_unref (task);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_query_info_async);
+  xtask_set_task_data (task, data, (xdestroy_notify_t)query_info_data_free);
+  xtask_set_priority (task, io_priority);
+  xtask_run_in_thread (task, query_info_async_thread);
+  xobject_unref (task);
 }
 
-static GFileInfo *
-g_file_real_query_info_finish (xfile_t         *file,
+static xfile_info_t *
+xfile_real_query_info_finish (xfile_t         *file,
                                xasync_result_t  *res,
                                xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
 
-  return g_task_propagate_pointer (G_TASK (res), error);
+  return xtask_propagate_pointer (XTASK (res), error);
 }
 
 static void
-query_filesystem_info_async_thread (GTask         *task,
+query_filesystem_info_async_thread (xtask_t         *task,
                                     xpointer_t       object,
                                     xpointer_t       task_data,
                                     xcancellable_t  *cancellable)
 {
   const char *attributes = task_data;
-  GFileInfo *info;
+  xfile_info_t *info;
   xerror_t *error = NULL;
 
-  info = g_file_query_filesystem_info (G_FILE (object), attributes, cancellable, &error);
+  info = xfile_query_filesystem_info (XFILE (object), attributes, cancellable, &error);
   if (info)
-    g_task_return_pointer (task, info, g_object_unref);
+    xtask_return_pointer (task, info, xobject_unref);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 static void
-g_file_real_query_filesystem_info_async (xfile_t               *file,
+xfile_real_query_filesystem_info_async (xfile_t               *file,
                                          const char          *attributes,
                                          int                  io_priority,
                                          xcancellable_t        *cancellable,
                                          xasync_ready_callback_t  callback,
                                          xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_query_filesystem_info_async);
-  g_task_set_task_data (task, g_strdup (attributes), g_free);
-  g_task_set_priority (task, io_priority);
-  g_task_run_in_thread (task, query_filesystem_info_async_thread);
-  g_object_unref (task);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_query_filesystem_info_async);
+  xtask_set_task_data (task, xstrdup (attributes), g_free);
+  xtask_set_priority (task, io_priority);
+  xtask_run_in_thread (task, query_filesystem_info_async_thread);
+  xobject_unref (task);
 }
 
-static GFileInfo *
-g_file_real_query_filesystem_info_finish (xfile_t         *file,
+static xfile_info_t *
+xfile_real_query_filesystem_info_finish (xfile_t         *file,
                                           xasync_result_t  *res,
                                           xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
 
-  return g_task_propagate_pointer (G_TASK (res), error);
+  return xtask_propagate_pointer (XTASK (res), error);
 }
 
 static void
-enumerate_children_async_thread (GTask         *task,
+enumerate_children_async_thread (xtask_t         *task,
                                  xpointer_t       object,
                                  xpointer_t       task_data,
                                  xcancellable_t  *cancellable)
 {
   QueryInfoAsyncData *data = task_data;
-  GFileEnumerator *enumerator;
+  xfile_enumerator_t *enumerator;
   xerror_t *error = NULL;
 
-  enumerator = g_file_enumerate_children (G_FILE (object), data->attributes, data->flags, cancellable, &error);
+  enumerator = xfile_enumerate_children (XFILE (object), data->attributes, data->flags, cancellable, &error);
   if (error)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_pointer (task, enumerator, g_object_unref);
+    xtask_return_pointer (task, enumerator, xobject_unref);
 }
 
 static void
-g_file_real_enumerate_children_async (xfile_t               *file,
+xfile_real_enumerate_children_async (xfile_t               *file,
                                       const char          *attributes,
-                                      GFileQueryInfoFlags  flags,
+                                      xfile_query_info_flags_t  flags,
                                       int                  io_priority,
                                       xcancellable_t        *cancellable,
                                       xasync_ready_callback_t  callback,
                                       xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
   QueryInfoAsyncData *data;
 
   data = g_new0 (QueryInfoAsyncData, 1);
-  data->attributes = g_strdup (attributes);
+  data->attributes = xstrdup (attributes);
   data->flags = flags;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_enumerate_children_async);
-  g_task_set_task_data (task, data, (GDestroyNotify)query_info_data_free);
-  g_task_set_priority (task, io_priority);
-  g_task_run_in_thread (task, enumerate_children_async_thread);
-  g_object_unref (task);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_enumerate_children_async);
+  xtask_set_task_data (task, data, (xdestroy_notify_t)query_info_data_free);
+  xtask_set_priority (task, io_priority);
+  xtask_run_in_thread (task, enumerate_children_async_thread);
+  xobject_unref (task);
 }
 
-static GFileEnumerator *
-g_file_real_enumerate_children_finish (xfile_t         *file,
+static xfile_enumerator_t *
+xfile_real_enumerate_children_finish (xfile_t         *file,
                                        xasync_result_t  *res,
                                        xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
 
-  return g_task_propagate_pointer (G_TASK (res), error);
+  return xtask_propagate_pointer (XTASK (res), error);
 }
 
 static void
-open_read_async_thread (GTask         *task,
+open_read_async_thread (xtask_t         *task,
                         xpointer_t       object,
                         xpointer_t       task_data,
                         xcancellable_t  *cancellable)
 {
-  GFileInputStream *stream;
+  xfile_input_stream_t *stream;
   xerror_t *error = NULL;
 
-  stream = g_file_read (G_FILE (object), cancellable, &error);
+  stream = xfile_read (XFILE (object), cancellable, &error);
   if (stream)
-    g_task_return_pointer (task, stream, g_object_unref);
+    xtask_return_pointer (task, stream, xobject_unref);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 static void
-g_file_real_read_async (xfile_t               *file,
+xfile_real_read_async (xfile_t               *file,
                         int                  io_priority,
                         xcancellable_t        *cancellable,
                         xasync_ready_callback_t  callback,
                         xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_read_async);
-  g_task_set_priority (task, io_priority);
-  g_task_run_in_thread (task, open_read_async_thread);
-  g_object_unref (task);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_read_async);
+  xtask_set_priority (task, io_priority);
+  xtask_run_in_thread (task, open_read_async_thread);
+  xobject_unref (task);
 }
 
-static GFileInputStream *
-g_file_real_read_finish (xfile_t         *file,
+static xfile_input_stream_t *
+xfile_real_read_finish (xfile_t         *file,
                          xasync_result_t  *res,
                          xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
 
-  return g_task_propagate_pointer (G_TASK (res), error);
+  return xtask_propagate_pointer (XTASK (res), error);
 }
 
 static void
-append_to_async_thread (GTask         *task,
+append_to_async_thread (xtask_t         *task,
                         xpointer_t       source_object,
                         xpointer_t       task_data,
                         xcancellable_t  *cancellable)
 {
-  GFileCreateFlags *data = task_data;
-  GFileOutputStream *stream;
+  xfile_create_flags_t *data = task_data;
+  xfile_output_stream_t *stream;
   xerror_t *error = NULL;
 
-  stream = g_file_append_to (G_FILE (source_object), *data, cancellable, &error);
+  stream = xfile_append_to (XFILE (source_object), *data, cancellable, &error);
   if (stream)
-    g_task_return_pointer (task, stream, g_object_unref);
+    xtask_return_pointer (task, stream, xobject_unref);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 static void
-g_file_real_append_to_async (xfile_t               *file,
-                             GFileCreateFlags     flags,
+xfile_real_append_to_async (xfile_t               *file,
+                             xfile_create_flags_t     flags,
                              int                  io_priority,
                              xcancellable_t        *cancellable,
                              xasync_ready_callback_t  callback,
                              xpointer_t             user_data)
 {
-  GFileCreateFlags *data;
-  GTask *task;
+  xfile_create_flags_t *data;
+  xtask_t *task;
 
-  data = g_new0 (GFileCreateFlags, 1);
+  data = g_new0 (xfile_create_flags_t, 1);
   *data = flags;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_append_to_async);
-  g_task_set_task_data (task, data, g_free);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_append_to_async);
+  xtask_set_task_data (task, data, g_free);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, append_to_async_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, append_to_async_thread);
+  xobject_unref (task);
 }
 
-static GFileOutputStream *
-g_file_real_append_to_finish (xfile_t         *file,
+static xfile_output_stream_t *
+xfile_real_append_to_finish (xfile_t         *file,
                               xasync_result_t  *res,
                               xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
 
-  return g_task_propagate_pointer (G_TASK (res), error);
+  return xtask_propagate_pointer (XTASK (res), error);
 }
 
 static void
-create_async_thread (GTask         *task,
+create_async_thread (xtask_t         *task,
                      xpointer_t       source_object,
                      xpointer_t       task_data,
                      xcancellable_t  *cancellable)
 {
-  GFileCreateFlags *data = task_data;
-  GFileOutputStream *stream;
+  xfile_create_flags_t *data = task_data;
+  xfile_output_stream_t *stream;
   xerror_t *error = NULL;
 
-  stream = g_file_create (G_FILE (source_object), *data, cancellable, &error);
+  stream = xfile_create (XFILE (source_object), *data, cancellable, &error);
   if (stream)
-    g_task_return_pointer (task, stream, g_object_unref);
+    xtask_return_pointer (task, stream, xobject_unref);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 static void
-g_file_real_create_async (xfile_t               *file,
-                          GFileCreateFlags     flags,
+xfile_real_create_async (xfile_t               *file,
+                          xfile_create_flags_t     flags,
                           int                  io_priority,
                           xcancellable_t        *cancellable,
                           xasync_ready_callback_t  callback,
                           xpointer_t             user_data)
 {
-  GFileCreateFlags *data;
-  GTask *task;
+  xfile_create_flags_t *data;
+  xtask_t *task;
 
-  data = g_new0 (GFileCreateFlags, 1);
+  data = g_new0 (xfile_create_flags_t, 1);
   *data = flags;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_create_async);
-  g_task_set_task_data (task, data, g_free);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_create_async);
+  xtask_set_task_data (task, data, g_free);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, create_async_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, create_async_thread);
+  xobject_unref (task);
 }
 
-static GFileOutputStream *
-g_file_real_create_finish (xfile_t         *file,
+static xfile_output_stream_t *
+xfile_real_create_finish (xfile_t         *file,
                            xasync_result_t  *res,
                            xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
 
-  return g_task_propagate_pointer (G_TASK (res), error);
+  return xtask_propagate_pointer (XTASK (res), error);
 }
 
 typedef struct {
-  GFileOutputStream *stream;
+  xfile_output_stream_t *stream;
   char *etag;
   xboolean_t make_backup;
-  GFileCreateFlags flags;
+  xfile_create_flags_t flags;
 } ReplaceAsyncData;
 
 static void
 replace_async_data_free (ReplaceAsyncData *data)
 {
   if (data->stream)
-    g_object_unref (data->stream);
+    xobject_unref (data->stream);
   g_free (data->etag);
   g_free (data);
 }
 
 static void
-replace_async_thread (GTask         *task,
+replace_async_thread (xtask_t         *task,
                       xpointer_t       source_object,
                       xpointer_t       task_data,
                       xcancellable_t  *cancellable)
 {
-  GFileOutputStream *stream;
+  xfile_output_stream_t *stream;
   ReplaceAsyncData *data = task_data;
   xerror_t *error = NULL;
 
-  stream = g_file_replace (G_FILE (source_object),
+  stream = xfile_replace (XFILE (source_object),
                            data->etag,
                            data->make_backup,
                            data->flags,
@@ -5979,149 +5979,149 @@ replace_async_thread (GTask         *task,
                            &error);
 
   if (stream)
-    g_task_return_pointer (task, stream, g_object_unref);
+    xtask_return_pointer (task, stream, xobject_unref);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 static void
-g_file_real_replace_async (xfile_t               *file,
+xfile_real_replace_async (xfile_t               *file,
                            const char          *etag,
                            xboolean_t             make_backup,
-                           GFileCreateFlags     flags,
+                           xfile_create_flags_t     flags,
                            int                  io_priority,
                            xcancellable_t        *cancellable,
                            xasync_ready_callback_t  callback,
                            xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
   ReplaceAsyncData *data;
 
   data = g_new0 (ReplaceAsyncData, 1);
-  data->etag = g_strdup (etag);
+  data->etag = xstrdup (etag);
   data->make_backup = make_backup;
   data->flags = flags;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_replace_async);
-  g_task_set_task_data (task, data, (GDestroyNotify)replace_async_data_free);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_replace_async);
+  xtask_set_task_data (task, data, (xdestroy_notify_t)replace_async_data_free);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, replace_async_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, replace_async_thread);
+  xobject_unref (task);
 }
 
-static GFileOutputStream *
-g_file_real_replace_finish (xfile_t         *file,
+static xfile_output_stream_t *
+xfile_real_replace_finish (xfile_t         *file,
                             xasync_result_t  *res,
                             xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
 
-  return g_task_propagate_pointer (G_TASK (res), error);
+  return xtask_propagate_pointer (XTASK (res), error);
 }
 
 static void
-delete_async_thread (GTask        *task,
+delete_async_thread (xtask_t        *task,
                      xpointer_t      object,
                      xpointer_t      task_data,
                      xcancellable_t *cancellable)
 {
   xerror_t *error = NULL;
 
-  if (g_file_delete (G_FILE (object), cancellable, &error))
-    g_task_return_boolean (task, TRUE);
+  if (xfile_delete (XFILE (object), cancellable, &error))
+    xtask_return_boolean (task, TRUE);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 static void
-g_file_real_delete_async (xfile_t               *file,
+xfile_real_delete_async (xfile_t               *file,
                           int                  io_priority,
                           xcancellable_t        *cancellable,
                           xasync_ready_callback_t  callback,
                           xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_delete_async);
-  g_task_set_priority (task, io_priority);
-  g_task_run_in_thread (task, delete_async_thread);
-  g_object_unref (task);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_delete_async);
+  xtask_set_priority (task, io_priority);
+  xtask_run_in_thread (task, delete_async_thread);
+  xobject_unref (task);
 }
 
 static xboolean_t
-g_file_real_delete_finish (xfile_t         *file,
+xfile_real_delete_finish (xfile_t         *file,
                            xasync_result_t  *res,
                            xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), FALSE);
+  g_return_val_if_fail (xtask_is_valid (res, file), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (res), error);
+  return xtask_propagate_boolean (XTASK (res), error);
 }
 
 static void
-trash_async_thread (GTask        *task,
+trash_async_thread (xtask_t        *task,
                     xpointer_t      object,
                     xpointer_t      task_data,
                     xcancellable_t *cancellable)
 {
   xerror_t *error = NULL;
 
-  if (g_file_trash (G_FILE (object), cancellable, &error))
-    g_task_return_boolean (task, TRUE);
+  if (xfile_trash (XFILE (object), cancellable, &error))
+    xtask_return_boolean (task, TRUE);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 static void
-g_file_real_trash_async (xfile_t               *file,
+xfile_real_trash_async (xfile_t               *file,
                          int                  io_priority,
                          xcancellable_t        *cancellable,
                          xasync_ready_callback_t  callback,
                          xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_trash_async);
-  g_task_set_priority (task, io_priority);
-  g_task_run_in_thread (task, trash_async_thread);
-  g_object_unref (task);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_trash_async);
+  xtask_set_priority (task, io_priority);
+  xtask_run_in_thread (task, trash_async_thread);
+  xobject_unref (task);
 }
 
 static xboolean_t
-g_file_real_trash_finish (xfile_t         *file,
+xfile_real_trash_finish (xfile_t         *file,
                           xasync_result_t  *res,
                           xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), FALSE);
+  g_return_val_if_fail (xtask_is_valid (res, file), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (res), error);
+  return xtask_propagate_boolean (XTASK (res), error);
 }
 
 
 typedef struct {
   xfile_t *source;  /* (owned) */
   xfile_t *destination;  /* (owned) */
-  GFileCopyFlags flags;
-  GFileProgressCallback progress_cb;
+  xfile_copy_flags_t flags;
+  xfile_progress_callback_t progress_cb;
   xpointer_t progress_cb_data;
 } MoveAsyncData;
 
 static void
 move_async_data_free (MoveAsyncData *data)
 {
-  g_object_unref (data->source);
-  g_object_unref (data->destination);
+  xobject_unref (data->source);
+  xobject_unref (data->destination);
   g_slice_free (MoveAsyncData, data);
 }
 
 typedef struct {
   MoveAsyncData *data;  /* (unowned) */
-  goffset current_num_bytes;
-  goffset total_num_bytes;
+  xoffset_t current_num_bytes;
+  xoffset_t total_num_bytes;
 } MoveProgressData;
 
 static xboolean_t
@@ -6138,12 +6138,12 @@ move_async_progress_in_main (xpointer_t user_data)
 }
 
 static void
-move_async_progress_callback (goffset  current_num_bytes,
-                              goffset  total_num_bytes,
+move_async_progress_callback (xoffset_t  current_num_bytes,
+                              xoffset_t  total_num_bytes,
                               xpointer_t user_data)
 {
-  GTask *task = user_data;
-  MoveAsyncData *data = g_task_get_task_data (task);
+  xtask_t *task = user_data;
+  MoveAsyncData *data = xtask_get_task_data (task);
   MoveProgressData *progress;
 
   progress = g_new0 (MoveProgressData, 1);
@@ -6151,15 +6151,15 @@ move_async_progress_callback (goffset  current_num_bytes,
   progress->current_num_bytes = current_num_bytes;
   progress->total_num_bytes = total_num_bytes;
 
-  g_main_context_invoke_full (g_task_get_context (task),
-                              g_task_get_priority (task),
+  xmain_context_invoke_full (xtask_get_context (task),
+                              xtask_get_priority (task),
                               move_async_progress_in_main,
                               g_steal_pointer (&progress),
                               g_free);
 }
 
 static void
-move_async_thread (GTask        *task,
+move_async_thread (xtask_t        *task,
                    xpointer_t      source,
                    xpointer_t      task_data,
                    xcancellable_t *cancellable)
@@ -6168,7 +6168,7 @@ move_async_thread (GTask        *task,
   xboolean_t result;
   xerror_t *error = NULL;
 
-  result = g_file_move (data->source,
+  result = xfile_move (data->source,
                         data->destination,
                         data->flags,
                         cancellable,
@@ -6176,189 +6176,189 @@ move_async_thread (GTask        *task,
                         task,
                         &error);
   if (result)
-    g_task_return_boolean (task, TRUE);
+    xtask_return_boolean (task, TRUE);
   else
-    g_task_return_error (task, g_steal_pointer (&error));
+    xtask_return_error (task, g_steal_pointer (&error));
 }
 
 static void
-g_file_real_move_async (xfile_t                  *source,
+xfile_real_move_async (xfile_t                  *source,
                         xfile_t                  *destination,
-                        GFileCopyFlags          flags,
+                        xfile_copy_flags_t          flags,
                         int                     io_priority,
                         xcancellable_t           *cancellable,
-                        GFileProgressCallback   progress_callback,
+                        xfile_progress_callback_t   progress_callback,
                         xpointer_t                progress_callback_data,
                         xasync_ready_callback_t     callback,
                         xpointer_t                user_data)
 {
-  GTask *task;
+  xtask_t *task;
   MoveAsyncData *data;
 
   data = g_slice_new0 (MoveAsyncData);
-  data->source = g_object_ref (source);
-  data->destination = g_object_ref (destination);
+  data->source = xobject_ref (source);
+  data->destination = xobject_ref (destination);
   data->flags = flags;
   data->progress_cb = progress_callback;
   data->progress_cb_data = progress_callback_data;
 
-  task = g_task_new (source, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_move_async);
-  g_task_set_task_data (task, g_steal_pointer (&data), (GDestroyNotify) move_async_data_free);
-  g_task_set_priority (task, io_priority);
-  g_task_run_in_thread (task, move_async_thread);
-  g_object_unref (task);
+  task = xtask_new (source, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_move_async);
+  xtask_set_task_data (task, g_steal_pointer (&data), (xdestroy_notify_t) move_async_data_free);
+  xtask_set_priority (task, io_priority);
+  xtask_run_in_thread (task, move_async_thread);
+  xobject_unref (task);
 }
 
 static xboolean_t
-g_file_real_move_finish (xfile_t        *file,
+xfile_real_move_finish (xfile_t        *file,
                          xasync_result_t *result,
                          xerror_t      **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, file), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, file), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 static void
-make_directory_async_thread (GTask        *task,
+make_directory_async_thread (xtask_t        *task,
                              xpointer_t      object,
                              xpointer_t      task_data,
                              xcancellable_t *cancellable)
 {
   xerror_t *error = NULL;
 
-  if (g_file_make_directory (G_FILE (object), cancellable, &error))
-    g_task_return_boolean (task, TRUE);
+  if (xfile_make_directory (XFILE (object), cancellable, &error))
+    xtask_return_boolean (task, TRUE);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 static void
-g_file_real_make_directory_async (xfile_t               *file,
+xfile_real_make_directory_async (xfile_t               *file,
                                   int                  io_priority,
                                   xcancellable_t        *cancellable,
                                   xasync_ready_callback_t  callback,
                                   xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_make_directory_async);
-  g_task_set_priority (task, io_priority);
-  g_task_run_in_thread (task, make_directory_async_thread);
-  g_object_unref (task);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_make_directory_async);
+  xtask_set_priority (task, io_priority);
+  xtask_run_in_thread (task, make_directory_async_thread);
+  xobject_unref (task);
 }
 
 static xboolean_t
-g_file_real_make_directory_finish (xfile_t         *file,
+xfile_real_make_directory_finish (xfile_t         *file,
                                    xasync_result_t  *res,
                                    xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), FALSE);
+  g_return_val_if_fail (xtask_is_valid (res, file), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (res), error);
+  return xtask_propagate_boolean (XTASK (res), error);
 }
 
 static void
-open_readwrite_async_thread (GTask        *task,
+open_readwrite_async_thread (xtask_t        *task,
                              xpointer_t      object,
                              xpointer_t      task_data,
                              xcancellable_t *cancellable)
 {
-  GFileIOStream *stream;
+  xfile_io_stream_t *stream;
   xerror_t *error = NULL;
 
-  stream = g_file_open_readwrite (G_FILE (object), cancellable, &error);
+  stream = xfile_open_readwrite (XFILE (object), cancellable, &error);
 
   if (stream == NULL)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_pointer (task, stream, g_object_unref);
+    xtask_return_pointer (task, stream, xobject_unref);
 }
 
 static void
-g_file_real_open_readwrite_async (xfile_t               *file,
+xfile_real_open_readwrite_async (xfile_t               *file,
                                   int                  io_priority,
                                   xcancellable_t        *cancellable,
                                   xasync_ready_callback_t  callback,
                                   xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_open_readwrite_async);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_open_readwrite_async);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, open_readwrite_async_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, open_readwrite_async_thread);
+  xobject_unref (task);
 }
 
-static GFileIOStream *
-g_file_real_open_readwrite_finish (xfile_t         *file,
+static xfile_io_stream_t *
+xfile_real_open_readwrite_finish (xfile_t         *file,
                                    xasync_result_t  *res,
                                    xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
 
-  return g_task_propagate_pointer (G_TASK (res), error);
+  return xtask_propagate_pointer (XTASK (res), error);
 }
 
 static void
-create_readwrite_async_thread (GTask        *task,
+create_readwrite_async_thread (xtask_t        *task,
                                xpointer_t      object,
                                xpointer_t      task_data,
                                xcancellable_t *cancellable)
 {
-  GFileCreateFlags *data = task_data;
-  GFileIOStream *stream;
+  xfile_create_flags_t *data = task_data;
+  xfile_io_stream_t *stream;
   xerror_t *error = NULL;
 
-  stream = g_file_create_readwrite (G_FILE (object), *data, cancellable, &error);
+  stream = xfile_create_readwrite (XFILE (object), *data, cancellable, &error);
 
   if (stream == NULL)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_pointer (task, stream, g_object_unref);
+    xtask_return_pointer (task, stream, xobject_unref);
 }
 
 static void
-g_file_real_create_readwrite_async (xfile_t               *file,
-                                    GFileCreateFlags     flags,
+xfile_real_create_readwrite_async (xfile_t               *file,
+                                    xfile_create_flags_t     flags,
                                     int                  io_priority,
                                     xcancellable_t        *cancellable,
                                     xasync_ready_callback_t  callback,
                                     xpointer_t             user_data)
 {
-  GFileCreateFlags *data;
-  GTask *task;
+  xfile_create_flags_t *data;
+  xtask_t *task;
 
-  data = g_new0 (GFileCreateFlags, 1);
+  data = g_new0 (xfile_create_flags_t, 1);
   *data = flags;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_create_readwrite_async);
-  g_task_set_task_data (task, data, g_free);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_create_readwrite_async);
+  xtask_set_task_data (task, data, g_free);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, create_readwrite_async_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, create_readwrite_async_thread);
+  xobject_unref (task);
 }
 
-static GFileIOStream *
-g_file_real_create_readwrite_finish (xfile_t         *file,
+static xfile_io_stream_t *
+xfile_real_create_readwrite_finish (xfile_t         *file,
                                      xasync_result_t  *res,
                                      xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
 
-  return g_task_propagate_pointer (G_TASK (res), error);
+  return xtask_propagate_pointer (XTASK (res), error);
 }
 
 typedef struct {
   char *etag;
   xboolean_t make_backup;
-  GFileCreateFlags flags;
+  xfile_create_flags_t flags;
 } ReplaceRWAsyncData;
 
 static void
@@ -6369,16 +6369,16 @@ replace_rw_async_data_free (ReplaceRWAsyncData *data)
 }
 
 static void
-replace_readwrite_async_thread (GTask        *task,
+replace_readwrite_async_thread (xtask_t        *task,
                                 xpointer_t      object,
                                 xpointer_t      task_data,
                                 xcancellable_t *cancellable)
 {
-  GFileIOStream *stream;
+  xfile_io_stream_t *stream;
   xerror_t *error = NULL;
   ReplaceRWAsyncData *data = task_data;
 
-  stream = g_file_replace_readwrite (G_FILE (object),
+  stream = xfile_replace_readwrite (XFILE (object),
                                      data->etag,
                                      data->make_backup,
                                      data->flags,
@@ -6386,50 +6386,50 @@ replace_readwrite_async_thread (GTask        *task,
                                      &error);
 
   if (stream == NULL)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_pointer (task, stream, g_object_unref);
+    xtask_return_pointer (task, stream, xobject_unref);
 }
 
 static void
-g_file_real_replace_readwrite_async (xfile_t               *file,
+xfile_real_replace_readwrite_async (xfile_t               *file,
                                      const char          *etag,
                                      xboolean_t             make_backup,
-                                     GFileCreateFlags     flags,
+                                     xfile_create_flags_t     flags,
                                      int                  io_priority,
                                      xcancellable_t        *cancellable,
                                      xasync_ready_callback_t  callback,
                                      xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
   ReplaceRWAsyncData *data;
 
   data = g_new0 (ReplaceRWAsyncData, 1);
-  data->etag = g_strdup (etag);
+  data->etag = xstrdup (etag);
   data->make_backup = make_backup;
   data->flags = flags;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_replace_readwrite_async);
-  g_task_set_task_data (task, data, (GDestroyNotify)replace_rw_async_data_free);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_replace_readwrite_async);
+  xtask_set_task_data (task, data, (xdestroy_notify_t)replace_rw_async_data_free);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, replace_readwrite_async_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, replace_readwrite_async_thread);
+  xobject_unref (task);
 }
 
-static GFileIOStream *
-g_file_real_replace_readwrite_finish (xfile_t         *file,
+static xfile_io_stream_t *
+xfile_real_replace_readwrite_finish (xfile_t         *file,
                                       xasync_result_t  *res,
                                       xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
 
-  return g_task_propagate_pointer (G_TASK (res), error);
+  return xtask_propagate_pointer (XTASK (res), error);
 }
 
 static void
-set_display_name_async_thread (GTask        *task,
+set_display_name_async_thread (xtask_t        *task,
                                xpointer_t      object,
                                xpointer_t      task_data,
                                xcancellable_t *cancellable)
@@ -6438,46 +6438,46 @@ set_display_name_async_thread (GTask        *task,
   char *name = task_data;
   xfile_t *file;
 
-  file = g_file_set_display_name (G_FILE (object), name, cancellable, &error);
+  file = xfile_set_display_name (XFILE (object), name, cancellable, &error);
 
   if (file == NULL)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_pointer (task, file, g_object_unref);
+    xtask_return_pointer (task, file, xobject_unref);
 }
 
 static void
-g_file_real_set_display_name_async (xfile_t               *file,
+xfile_real_set_display_name_async (xfile_t               *file,
                                     const char          *display_name,
                                     int                  io_priority,
                                     xcancellable_t        *cancellable,
                                     xasync_ready_callback_t  callback,
                                     xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_set_display_name_async);
-  g_task_set_task_data (task, g_strdup (display_name), g_free);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_set_display_name_async);
+  xtask_set_task_data (task, xstrdup (display_name), g_free);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, set_display_name_async_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, set_display_name_async_thread);
+  xobject_unref (task);
 }
 
 static xfile_t *
-g_file_real_set_display_name_finish (xfile_t         *file,
+xfile_real_set_display_name_finish (xfile_t         *file,
                                      xasync_result_t  *res,
                                      xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
 
-  return g_task_propagate_pointer (G_TASK (res), error);
+  return xtask_propagate_pointer (XTASK (res), error);
 }
 
 typedef struct {
-  GFileQueryInfoFlags flags;
-  GFileInfo *info;
+  xfile_query_info_flags_t flags;
+  xfile_info_t *info;
   xboolean_t res;
   xerror_t *error;
 } SetInfoAsyncData;
@@ -6486,14 +6486,14 @@ static void
 set_info_data_free (SetInfoAsyncData *data)
 {
   if (data->info)
-    g_object_unref (data->info);
+    xobject_unref (data->info);
   if (data->error)
-    g_error_free (data->error);
+    xerror_free (data->error);
   g_free (data);
 }
 
 static void
-set_info_async_thread (GTask        *task,
+set_info_async_thread (xtask_t        *task,
                        xpointer_t      object,
                        xpointer_t      task_data,
                        xcancellable_t *cancellable)
@@ -6501,7 +6501,7 @@ set_info_async_thread (GTask        *task,
   SetInfoAsyncData *data = task_data;
 
   data->error = NULL;
-  data->res = g_file_set_attributes_from_info (G_FILE (object),
+  data->res = xfile_set_attributes_from_info (XFILE (object),
                                                data->info,
                                                data->flags,
                                                cancellable,
@@ -6509,116 +6509,116 @@ set_info_async_thread (GTask        *task,
 }
 
 static void
-g_file_real_set_attributes_async (xfile_t               *file,
-                                  GFileInfo           *info,
-                                  GFileQueryInfoFlags  flags,
+xfile_real_set_attributes_async (xfile_t               *file,
+                                  xfile_info_t           *info,
+                                  xfile_query_info_flags_t  flags,
                                   int                  io_priority,
                                   xcancellable_t        *cancellable,
                                   xasync_ready_callback_t  callback,
                                   xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
   SetInfoAsyncData *data;
 
   data = g_new0 (SetInfoAsyncData, 1);
-  data->info = g_file_info_dup (info);
+  data->info = xfile_info_dup (info);
   data->flags = flags;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_set_attributes_async);
-  g_task_set_task_data (task, data, (GDestroyNotify)set_info_data_free);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_set_attributes_async);
+  xtask_set_task_data (task, data, (xdestroy_notify_t)set_info_data_free);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, set_info_async_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, set_info_async_thread);
+  xobject_unref (task);
 }
 
 static xboolean_t
-g_file_real_set_attributes_finish (xfile_t         *file,
+xfile_real_set_attributes_finish (xfile_t         *file,
                                    xasync_result_t  *res,
-                                   GFileInfo    **info,
+                                   xfile_info_t    **info,
                                    xerror_t       **error)
 {
   SetInfoAsyncData *data;
 
-  g_return_val_if_fail (g_task_is_valid (res, file), FALSE);
+  g_return_val_if_fail (xtask_is_valid (res, file), FALSE);
 
-  data = g_task_get_task_data (G_TASK (res));
+  data = xtask_get_task_data (XTASK (res));
 
   if (info)
-    *info = g_object_ref (data->info);
+    *info = xobject_ref (data->info);
 
   if (error != NULL && data->error)
-    *error = g_error_copy (data->error);
+    *error = xerror_copy (data->error);
 
   return data->res;
 }
 
 static void
-find_enclosing_mount_async_thread (GTask        *task,
+find_enclosing_mount_async_thread (xtask_t        *task,
                                    xpointer_t      object,
                                    xpointer_t      task_data,
                                    xcancellable_t *cancellable)
 {
   xerror_t *error = NULL;
-  GMount *mount;
+  xmount_t *mount;
 
-  mount = g_file_find_enclosing_mount (G_FILE (object), cancellable, &error);
+  mount = xfile_find_enclosing_mount (XFILE (object), cancellable, &error);
 
   if (mount == NULL)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_pointer (task, mount, g_object_unref);
+    xtask_return_pointer (task, mount, xobject_unref);
 }
 
 static void
-g_file_real_find_enclosing_mount_async (xfile_t               *file,
+xfile_real_find_enclosing_mount_async (xfile_t               *file,
                                         int                  io_priority,
                                         xcancellable_t        *cancellable,
                                         xasync_ready_callback_t  callback,
                                         xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_find_enclosing_mount_async);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_find_enclosing_mount_async);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, find_enclosing_mount_async_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, find_enclosing_mount_async_thread);
+  xobject_unref (task);
 }
 
-static GMount *
-g_file_real_find_enclosing_mount_finish (xfile_t         *file,
+static xmount_t *
+xfile_real_find_enclosing_mount_finish (xfile_t         *file,
                                          xasync_result_t  *res,
                                          xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
 
-  return g_task_propagate_pointer (G_TASK (res), error);
+  return xtask_propagate_pointer (XTASK (res), error);
 }
 
 
 typedef struct {
   xfile_t *source;
   xfile_t *destination;
-  GFileCopyFlags flags;
-  GFileProgressCallback progress_cb;
+  xfile_copy_flags_t flags;
+  xfile_progress_callback_t progress_cb;
   xpointer_t progress_cb_data;
 } CopyAsyncData;
 
 static void
 copy_async_data_free (CopyAsyncData *data)
 {
-  g_object_unref (data->source);
-  g_object_unref (data->destination);
+  xobject_unref (data->source);
+  xobject_unref (data->destination);
   g_slice_free (CopyAsyncData, data);
 }
 
 typedef struct {
   CopyAsyncData *data;
-  goffset current_num_bytes;
-  goffset total_num_bytes;
+  xoffset_t current_num_bytes;
+  xoffset_t total_num_bytes;
 } CopyProgressData;
 
 static xboolean_t
@@ -6635,12 +6635,12 @@ copy_async_progress_in_main (xpointer_t user_data)
 }
 
 static void
-copy_async_progress_callback (goffset  current_num_bytes,
-                              goffset  total_num_bytes,
+copy_async_progress_callback (xoffset_t  current_num_bytes,
+                              xoffset_t  total_num_bytes,
                               xpointer_t user_data)
 {
-  GTask *task = user_data;
-  CopyAsyncData *data = g_task_get_task_data (task);
+  xtask_t *task = user_data;
+  CopyAsyncData *data = xtask_get_task_data (task);
   CopyProgressData *progress;
 
   progress = g_new (CopyProgressData, 1);
@@ -6648,15 +6648,15 @@ copy_async_progress_callback (goffset  current_num_bytes,
   progress->current_num_bytes = current_num_bytes;
   progress->total_num_bytes = total_num_bytes;
 
-  g_main_context_invoke_full (g_task_get_context (task),
-                              g_task_get_priority (task),
+  xmain_context_invoke_full (xtask_get_context (task),
+                              xtask_get_priority (task),
                               copy_async_progress_in_main,
                               progress,
                               g_free);
 }
 
 static void
-copy_async_thread (GTask        *task,
+copy_async_thread (xtask_t        *task,
                    xpointer_t      source,
                    xpointer_t      task_data,
                    xcancellable_t *cancellable)
@@ -6665,7 +6665,7 @@ copy_async_thread (GTask        *task,
   xboolean_t result;
   xerror_t *error = NULL;
 
-  result = g_file_copy (data->source,
+  result = xfile_copy (data->source,
                         data->destination,
                         data->flags,
                         cancellable,
@@ -6673,48 +6673,48 @@ copy_async_thread (GTask        *task,
                         task,
                         &error);
   if (result)
-    g_task_return_boolean (task, TRUE);
+    xtask_return_boolean (task, TRUE);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 static void
-g_file_real_copy_async (xfile_t                  *source,
+xfile_real_copy_async (xfile_t                  *source,
                         xfile_t                  *destination,
-                        GFileCopyFlags          flags,
+                        xfile_copy_flags_t          flags,
                         int                     io_priority,
                         xcancellable_t           *cancellable,
-                        GFileProgressCallback   progress_callback,
+                        xfile_progress_callback_t   progress_callback,
                         xpointer_t                progress_callback_data,
                         xasync_ready_callback_t     callback,
                         xpointer_t                user_data)
 {
-  GTask *task;
+  xtask_t *task;
   CopyAsyncData *data;
 
   data = g_slice_new (CopyAsyncData);
-  data->source = g_object_ref (source);
-  data->destination = g_object_ref (destination);
+  data->source = xobject_ref (source);
+  data->destination = xobject_ref (destination);
   data->flags = flags;
   data->progress_cb = progress_callback;
   data->progress_cb_data = progress_callback_data;
 
-  task = g_task_new (source, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_copy_async);
-  g_task_set_task_data (task, data, (GDestroyNotify)copy_async_data_free);
-  g_task_set_priority (task, io_priority);
-  g_task_run_in_thread (task, copy_async_thread);
-  g_object_unref (task);
+  task = xtask_new (source, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_copy_async);
+  xtask_set_task_data (task, data, (xdestroy_notify_t)copy_async_data_free);
+  xtask_set_priority (task, io_priority);
+  xtask_run_in_thread (task, copy_async_thread);
+  xobject_unref (task);
 }
 
 static xboolean_t
-g_file_real_copy_finish (xfile_t        *file,
+xfile_real_copy_finish (xfile_t        *file,
                          xasync_result_t *res,
                          xerror_t      **error)
 {
-  g_return_val_if_fail (g_task_is_valid (res, file), FALSE);
+  g_return_val_if_fail (xtask_is_valid (res, file), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (res), error);
+  return xtask_propagate_boolean (XTASK (res), error);
 }
 
 
@@ -6723,7 +6723,7 @@ g_file_real_copy_finish (xfile_t        *file,
  ********************************************/
 
 /**
- * g_file_new_for_path:
+ * xfile_new_for_path:
  * @path: (type filename): a string containing a relative or absolute path.
  *   The string must be encoded in the glib filename encoding.
  *
@@ -6732,18 +6732,18 @@ g_file_real_copy_finish (xfile_t        *file,
  * operation if @path is malformed.
  *
  * Returns: (transfer full): a new #xfile_t for the given @path.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
 xfile_t *
-g_file_new_for_path (const char *path)
+xfile_new_for_path (const char *path)
 {
   g_return_val_if_fail (path != NULL, NULL);
 
-  return g_vfs_get_file_for_path (g_vfs_get_default (), path);
+  return xvfs_get_file_for_path (xvfs_get_default (), path);
 }
 
 /**
- * g_file_new_for_uri:
+ * xfile_new_for_uri:
  * @uri: a UTF-8 string containing a URI
  *
  * Constructs a #xfile_t for a given URI. This operation never
@@ -6752,26 +6752,26 @@ g_file_new_for_path (const char *path)
  * not supported.
  *
  * Returns: (transfer full): a new #xfile_t for the given @uri.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
 xfile_t *
-g_file_new_for_uri (const char *uri)
+xfile_new_for_uri (const char *uri)
 {
   g_return_val_if_fail (uri != NULL, NULL);
 
-  return g_vfs_get_file_for_uri (g_vfs_get_default (), uri);
+  return xvfs_get_file_for_uri (xvfs_get_default (), uri);
 }
 
 /**
- * g_file_new_tmp:
+ * xfile_new_tmp:
  * @tmpl: (type filename) (nullable): Template for the file
- *   name, as in g_file_open_tmp(), or %NULL for a default template
- * @iostream: (out): on return, a #GFileIOStream for the created file
+ *   name, as in xfile_open_tmp(), or %NULL for a default template
+ * @iostream: (out): on return, a #xfile_io_stream_t for the created file
  * @error: a #xerror_t, or %NULL
  *
  * Opens a file in the preferred directory for temporary files (as
  * returned by g_get_tmp_dir()) and returns a #xfile_t and
- * #GFileIOStream pointing to it.
+ * #xfile_io_stream_t pointing to it.
  *
  * @tmpl should be a string in the GLib file name encoding
  * containing a sequence of six 'X' characters, and containing no
@@ -6781,58 +6781,58 @@ g_file_new_for_uri (const char *uri)
  * a temporary file could not be created.
  *
  * Returns: (transfer full): a new #xfile_t.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  *
  * Since: 2.32
  */
 xfile_t *
-g_file_new_tmp (const char     *tmpl,
-                GFileIOStream **iostream,
+xfile_new_tmp (const char     *tmpl,
+                xfile_io_stream_t **iostream,
                 xerror_t        **error)
 {
   xint_t fd;
   xchar_t *path;
   xfile_t *file;
-  GFileOutputStream *output;
+  xfile_output_stream_t *output;
 
   g_return_val_if_fail (iostream != NULL, NULL);
 
-  fd = g_file_open_tmp (tmpl, &path, error);
+  fd = xfile_open_tmp (tmpl, &path, error);
   if (fd == -1)
     return NULL;
 
-  file = g_file_new_for_path (path);
+  file = xfile_new_for_path (path);
 
   output = _g_local_file_output_stream_new (fd);
-  *iostream = _g_local_file_io_stream_new (G_LOCAL_FILE_OUTPUT_STREAM (output));
+  *iostream = _xlocal_file_io_stream_new (G_LOCAL_FILE_OUTPUT_STREAM (output));
 
-  g_object_unref (output);
+  xobject_unref (output);
   g_free (path);
 
   return file;
 }
 
 /**
- * g_file_parse_name:
+ * xfile_parse_name:
  * @parse_name: a file name or path to be parsed
  *
  * Constructs a #xfile_t with the given @parse_name (i.e. something
- * given by g_file_get_parse_name()). This operation never fails,
+ * given by xfile_get_parse_name()). This operation never fails,
  * but the returned object might not support any I/O operation if
  * the @parse_name cannot be parsed.
  *
  * Returns: (transfer full): a new #xfile_t.
  */
 xfile_t *
-g_file_parse_name (const char *parse_name)
+xfile_parse_name (const char *parse_name)
 {
   g_return_val_if_fail (parse_name != NULL, NULL);
 
-  return g_vfs_parse_name (g_vfs_get_default (), parse_name);
+  return xvfs_parse_name (xvfs_get_default (), parse_name);
 }
 
 /**
- * g_file_new_build_filename:
+ * xfile_new_build_filename:
  * @first_element: (type filename): the first element in the path
  * @...: remaining elements in path, terminated by %NULL
  *
@@ -6840,14 +6840,14 @@ g_file_parse_name (const char *parse_name)
  * separator for filenames.
  *
  * Using this function is equivalent to calling g_build_filename(),
- * followed by g_file_new_for_path() on the result.
+ * followed by xfile_new_for_path() on the result.
  *
  * Returns: (transfer full): a new #xfile_t
  *
  * Since: 2.56
  */
 xfile_t *
-g_file_new_build_filename (const xchar_t *first_element,
+xfile_new_build_filename (const xchar_t *first_element,
                            ...)
 {
   xchar_t *str;
@@ -6860,7 +6860,7 @@ g_file_new_build_filename (const xchar_t *first_element,
   str = g_build_filename_valist (first_element, &args);
   va_end (args);
 
-  file = g_file_new_for_path (str);
+  file = xfile_new_for_path (str);
   g_free (str);
 
   return file;
@@ -6900,10 +6900,10 @@ new_for_cmdline_arg (const xchar_t *arg,
   char *filename;
 
   if (g_path_is_absolute (arg))
-    return g_file_new_for_path (arg);
+    return xfile_new_for_path (arg);
 
   if (has_valid_scheme (arg))
-    return g_file_new_for_uri (arg);
+    return xfile_new_for_uri (arg);
 
   if (cwd == NULL)
     {
@@ -6916,14 +6916,14 @@ new_for_cmdline_arg (const xchar_t *arg,
   else
     filename = g_build_filename (cwd, arg, NULL);
 
-  file = g_file_new_for_path (filename);
+  file = xfile_new_for_path (filename);
   g_free (filename);
 
   return file;
 }
 
 /**
- * g_file_new_for_commandline_arg:
+ * xfile_new_for_commandline_arg:
  * @arg: (type filename): a command line string
  *
  * Creates a #xfile_t with the given argument from the command line.
@@ -6936,16 +6936,16 @@ new_for_cmdline_arg (const xchar_t *arg,
  * UTF-8 -- not the system code page.  This means that you
  * should not use this function with string from argv as it is passed
  * to main().  g_win32_get_command_line() will return a UTF-8 version of
- * the commandline.  #GApplication also uses UTF-8 but
- * g_application_command_line_create_file_for_arg() may be more useful
+ * the commandline.  #xapplication_t also uses UTF-8 but
+ * xapplication_command_line_create_file_for_arg() may be more useful
  * for you there.  It is also always possible to use this function with
- * #GOptionContext arguments of type %G_OPTION_ARG_FILENAME.
+ * #xoption_context_t arguments of type %G_OPTION_ARXFILENAME.
  *
  * Returns: (transfer full): a new #xfile_t.
- *   Free the returned object with g_object_unref().
+ *   Free the returned object with xobject_unref().
  */
 xfile_t *
-g_file_new_for_commandline_arg (const char *arg)
+xfile_new_for_commandline_arg (const char *arg)
 {
   g_return_val_if_fail (arg != NULL, NULL);
 
@@ -6953,13 +6953,13 @@ g_file_new_for_commandline_arg (const char *arg)
 }
 
 /**
- * g_file_new_for_commandline_arg_and_cwd:
+ * xfile_new_for_commandline_arg_and_cwd:
  * @arg: (type filename): a command line string
  * @cwd: (type filename): the current working directory of the commandline
  *
  * Creates a #xfile_t with the given argument from the command line.
  *
- * This function is similar to g_file_new_for_commandline_arg() except
+ * This function is similar to xfile_new_for_commandline_arg() except
  * that it allows for passing the current working directory as an
  * argument instead of using the current working directory of the
  * process.
@@ -6967,14 +6967,14 @@ g_file_new_for_commandline_arg (const char *arg)
  * This is useful if the commandline argument was given in a context
  * other than the invocation of the current process.
  *
- * See also g_application_command_line_create_file_for_arg().
+ * See also xapplication_command_line_create_file_for_arg().
  *
  * Returns: (transfer full): a new #xfile_t
  *
  * Since: 2.36
  **/
 xfile_t *
-g_file_new_for_commandline_arg_and_cwd (const xchar_t *arg,
+xfile_new_for_commandline_arg_and_cwd (const xchar_t *arg,
                                         const xchar_t *cwd)
 {
   g_return_val_if_fail (arg != NULL, NULL);
@@ -6984,7 +6984,7 @@ g_file_new_for_commandline_arg_and_cwd (const xchar_t *arg,
 }
 
 /**
- * g_file_mount_enclosing_volume:
+ * xfile_mount_enclosing_volume:
  * @location: input #xfile_t
  * @flags: flags affecting the operation
  * @mount_operation: (nullable): a #xmount_operation_t
@@ -7000,30 +7000,30 @@ g_file_new_for_commandline_arg_and_cwd (const xchar_t *arg,
  *
  * When this operation has completed, @callback will be called with
  * @user_user data, and the operation can be finalized with
- * g_file_mount_enclosing_volume_finish().
+ * xfile_mount_enclosing_volume_finish().
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  */
 void
-g_file_mount_enclosing_volume (xfile_t               *location,
+xfile_mount_enclosing_volume (xfile_t               *location,
                                GMountMountFlags     flags,
                                xmount_operation_t     *mount_operation,
                                xcancellable_t        *cancellable,
                                xasync_ready_callback_t  callback,
                                xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (location));
 
-  iface = G_FILE_GET_IFACE (location);
+  iface = XFILE_GET_IFACE (location);
 
   if (iface->mount_enclosing_volume == NULL)
     {
-      g_task_report_new_error (location, callback, user_data,
-                               g_file_mount_enclosing_volume,
+      xtask_report_new_error (location, callback, user_data,
+                               xfile_mount_enclosing_volume,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("volume doesn’t implement mount"));
       return;
@@ -7034,33 +7034,33 @@ g_file_mount_enclosing_volume (xfile_t               *location,
 }
 
 /**
- * g_file_mount_enclosing_volume_finish:
+ * xfile_mount_enclosing_volume_finish:
  * @location: input #xfile_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
- * Finishes a mount operation started by g_file_mount_enclosing_volume().
+ * Finishes a mount operation started by xfile_mount_enclosing_volume().
  *
  * Returns: %TRUE if successful. If an error has occurred,
  *   this function will return %FALSE and set @error
  *   appropriately if present.
  */
 xboolean_t
-g_file_mount_enclosing_volume_finish (xfile_t         *location,
+xfile_mount_enclosing_volume_finish (xfile_t         *location,
                                       xasync_result_t  *result,
                                       xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (location), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_file_mount_enclosing_volume))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xfile_mount_enclosing_volume))
+    return xtask_propagate_boolean (XTASK (result), error);
 
-  iface = G_FILE_GET_IFACE (location);
+  iface = XFILE_GET_IFACE (location);
 
   return (* iface->mount_enclosing_volume_finish) (location, result, error);
 }
@@ -7070,37 +7070,37 @@ g_file_mount_enclosing_volume_finish (xfile_t         *location,
  ********************************************/
 
 /**
- * g_file_query_default_handler:
+ * xfile_query_default_handler:
  * @file: a #xfile_t to open
  * @cancellable: optional #xcancellable_t object, %NULL to ignore
  * @error: a #xerror_t, or %NULL
  *
- * Returns the #GAppInfo that is registered as the default
+ * Returns the #xapp_info_t that is registered as the default
  * application to handle the file specified by @file.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
- * Returns: (transfer full): a #GAppInfo if the handle was found,
+ * Returns: (transfer full): a #xapp_info_t if the handle was found,
  *   %NULL if there were errors.
- *   When you are done with it, release it with g_object_unref()
+ *   When you are done with it, release it with xobject_unref()
  */
-GAppInfo *
-g_file_query_default_handler (xfile_t         *file,
+xapp_info_t *
+xfile_query_default_handler (xfile_t         *file,
                               xcancellable_t  *cancellable,
                               xerror_t       **error)
 {
   char *uri_scheme;
   const char *content_type;
-  GAppInfo *appinfo;
-  GFileInfo *info;
+  xapp_info_t *appinfo;
+  xfile_info_t *info;
   char *path;
 
-  uri_scheme = g_file_get_uri_scheme (file);
+  uri_scheme = xfile_get_uri_scheme (file);
   if (uri_scheme && uri_scheme[0] != '\0')
     {
-      appinfo = g_app_info_get_default_for_uri_scheme (uri_scheme);
+      appinfo = xapp_info_get_default_for_uri_scheme (uri_scheme);
       g_free (uri_scheme);
 
       if (appinfo != NULL)
@@ -7109,9 +7109,9 @@ g_file_query_default_handler (xfile_t         *file,
   else
     g_free (uri_scheme);
 
-  info = g_file_query_info (file,
-                            G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE ","
-                            G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
+  info = xfile_query_info (file,
+                            XFILE_ATTRIBUTE_STANDARD_CONTENT_TYPE ","
+                            XFILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
                             0,
                             cancellable,
                             error);
@@ -7120,19 +7120,19 @@ g_file_query_default_handler (xfile_t         *file,
 
   appinfo = NULL;
 
-  content_type = g_file_info_get_content_type (info);
+  content_type = xfile_info_get_content_type (info);
   if (content_type == NULL)
-    content_type = g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
+    content_type = xfile_info_get_attribute_string (info, XFILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
   if (content_type)
     {
       /* Don't use is_native(), as we want to support fuse paths if available */
-      path = g_file_get_path (file);
-      appinfo = g_app_info_get_default_for_type (content_type,
+      path = xfile_get_path (file);
+      appinfo = xapp_info_get_default_for_type (content_type,
                                                  path == NULL);
       g_free (path);
     }
 
-  g_object_unref (info);
+  xobject_unref (info);
 
   if (appinfo != NULL)
     return appinfo;
@@ -7148,96 +7148,96 @@ query_default_handler_query_info_cb (xobject_t      *object,
                                      xasync_result_t *result,
                                      xpointer_t      user_data)
 {
-  xfile_t *file = G_FILE (object);
-  GTask *task = G_TASK (user_data);
+  xfile_t *file = XFILE (object);
+  xtask_t *task = XTASK (user_data);
   xerror_t *error = NULL;
-  GFileInfo *info;
+  xfile_info_t *info;
   const char *content_type;
-  GAppInfo *appinfo = NULL;
+  xapp_info_t *appinfo = NULL;
 
-  info = g_file_query_info_finish (file, result, &error);
+  info = xfile_query_info_finish (file, result, &error);
   if (info == NULL)
     {
-      g_task_return_error (task, g_steal_pointer (&error));
-      g_object_unref (task);
+      xtask_return_error (task, g_steal_pointer (&error));
+      xobject_unref (task);
       return;
     }
 
-  content_type = g_file_info_get_content_type (info);
+  content_type = xfile_info_get_content_type (info);
   if (content_type == NULL)
-    content_type = g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
+    content_type = xfile_info_get_attribute_string (info, XFILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE);
   if (content_type)
     {
       char *path;
 
       /* Don't use is_native(), as we want to support fuse paths if available */
-      path = g_file_get_path (file);
+      path = xfile_get_path (file);
 
       /* FIXME: The following still uses blocking calls. */
-      appinfo = g_app_info_get_default_for_type (content_type,
+      appinfo = xapp_info_get_default_for_type (content_type,
                                                  path == NULL);
       g_free (path);
     }
 
-  g_object_unref (info);
+  xobject_unref (info);
 
   if (appinfo != NULL)
-    g_task_return_pointer (task, g_steal_pointer (&appinfo), g_object_unref);
+    xtask_return_pointer (task, g_steal_pointer (&appinfo), xobject_unref);
   else
-    g_task_return_new_error (task,
+    xtask_return_new_error (task,
                              G_IO_ERROR,
                              G_IO_ERROR_NOT_SUPPORTED,
                              _("No application is registered as handling this file"));
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 /**
- * g_file_query_default_handler_async:
+ * xfile_query_default_handler_async:
  * @file: a #xfile_t to open
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: optional #xcancellable_t object, %NULL to ignore
  * @callback: (nullable): a #xasync_ready_callback_t to call when the request is done
  * @user_data: (nullable): data to pass to @callback
  *
- * Async version of g_file_query_default_handler().
+ * Async version of xfile_query_default_handler().
  *
  * Since: 2.60
  */
 void
-g_file_query_default_handler_async (xfile_t              *file,
+xfile_query_default_handler_async (xfile_t              *file,
                                     int                 io_priority,
                                     xcancellable_t       *cancellable,
                                     xasync_ready_callback_t callback,
                                     xpointer_t            user_data)
 {
-  GTask *task;
+  xtask_t *task;
   char *uri_scheme;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_query_default_handler_async);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_query_default_handler_async);
 
-  uri_scheme = g_file_get_uri_scheme (file);
+  uri_scheme = xfile_get_uri_scheme (file);
   if (uri_scheme && uri_scheme[0] != '\0')
     {
-      GAppInfo *appinfo;
+      xapp_info_t *appinfo;
 
       /* FIXME: The following still uses blocking calls. */
-      appinfo = g_app_info_get_default_for_uri_scheme (uri_scheme);
+      appinfo = xapp_info_get_default_for_uri_scheme (uri_scheme);
       g_free (uri_scheme);
 
       if (appinfo != NULL)
         {
-          g_task_return_pointer (task, g_steal_pointer (&appinfo), g_object_unref);
-          g_object_unref (task);
+          xtask_return_pointer (task, g_steal_pointer (&appinfo), xobject_unref);
+          xobject_unref (task);
           return;
         }
     }
   else
     g_free (uri_scheme);
 
-  g_file_query_info_async (file,
-                           G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE ","
-                           G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
+  xfile_query_info_async (file,
+                           XFILE_ATTRIBUTE_STANDARD_CONTENT_TYPE ","
+                           XFILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE,
                            0,
                            io_priority,
                            cancellable,
@@ -7246,37 +7246,37 @@ g_file_query_default_handler_async (xfile_t              *file,
 }
 
 /**
- * g_file_query_default_handler_finish:
+ * xfile_query_default_handler_finish:
  * @file: a #xfile_t to open
  * @result: a #xasync_result_t
  * @error: (nullable): a #xerror_t
  *
- * Finishes a g_file_query_default_handler_async() operation.
+ * Finishes a xfile_query_default_handler_async() operation.
  *
- * Returns: (transfer full): a #GAppInfo if the handle was found,
+ * Returns: (transfer full): a #xapp_info_t if the handle was found,
  *   %NULL if there were errors.
- *   When you are done with it, release it with g_object_unref()
+ *   When you are done with it, release it with xobject_unref()
  *
  * Since: 2.60
  */
-GAppInfo *
-g_file_query_default_handler_finish (xfile_t        *file,
+xapp_info_t *
+xfile_query_default_handler_finish (xfile_t        *file,
                                      xasync_result_t *result,
                                      xerror_t      **error)
 {
   g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (g_task_is_valid (result, file), NULL);
+  g_return_val_if_fail (xtask_is_valid (result, file), NULL);
 
-  return g_task_propagate_pointer (G_TASK (result), error);
+  return xtask_propagate_pointer (XTASK (result), error);
 }
 
 #define GET_CONTENT_BLOCK_SIZE 8192
 
 /**
- * g_file_load_contents:
+ * xfile_load_contents:
  * @file: input #xfile_t
  * @cancellable: optional #xcancellable_t object, %NULL to ignore
- * @contents: (out) (transfer full) (element-type guint8) (array length=length): a location to place the contents of the file
+ * @contents: (out) (transfer full) (element-type xuint8_t) (array length=length): a location to place the contents of the file
  * @length: (out) (optional): a location to place the length of the contents of the file,
  *   or %NULL if the length is not needed
  * @etag_out: (out) (optional) (nullable): a location to place the current entity tag for the file,
@@ -7296,62 +7296,62 @@ g_file_query_default_handler_finish (xfile_t        *file,
  *   %FALSE if there were errors.
  */
 xboolean_t
-g_file_load_contents (xfile_t         *file,
+xfile_load_contents (xfile_t         *file,
                       xcancellable_t  *cancellable,
                       char         **contents,
                       xsize_t         *length,
                       char         **etag_out,
                       xerror_t       **error)
 {
-  GFileInputStream *in;
-  GByteArray *content;
+  xfile_input_stream_t *in;
+  xbyte_array_t *content;
   xsize_t pos;
-  gssize res;
-  GFileInfo *info;
+  xssize_t res;
+  xfile_info_t *info;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (contents != NULL, FALSE);
 
-  in = g_file_read (file, cancellable, error);
+  in = xfile_read (file, cancellable, error);
   if (in == NULL)
     return FALSE;
 
-  content = g_byte_array_new ();
+  content = xbyte_array_new ();
   pos = 0;
 
-  g_byte_array_set_size (content, pos + GET_CONTENT_BLOCK_SIZE + 1);
-  while ((res = g_input_stream_read (G_INPUT_STREAM (in),
+  xbyte_array_set_size (content, pos + GET_CONTENT_BLOCK_SIZE + 1);
+  while ((res = xinput_stream_read (G_INPUT_STREAM (in),
                                      content->data + pos,
                                      GET_CONTENT_BLOCK_SIZE,
                                      cancellable, error)) > 0)
     {
       pos += res;
-      g_byte_array_set_size (content, pos + GET_CONTENT_BLOCK_SIZE + 1);
+      xbyte_array_set_size (content, pos + GET_CONTENT_BLOCK_SIZE + 1);
     }
 
   if (etag_out)
     {
       *etag_out = NULL;
 
-      info = g_file_input_stream_query_info (in,
-                                             G_FILE_ATTRIBUTE_ETAG_VALUE,
+      info = xfile_input_stream_query_info (in,
+                                             XFILE_ATTRIBUTE_ETAG_VALUE,
                                              cancellable,
                                              NULL);
       if (info)
         {
-          *etag_out = g_strdup (g_file_info_get_etag (info));
-          g_object_unref (info);
+          *etag_out = xstrdup (xfile_info_get_etag (info));
+          xobject_unref (info);
         }
     }
 
   /* Ignore errors on close */
-  g_input_stream_close (G_INPUT_STREAM (in), cancellable, NULL);
-  g_object_unref (in);
+  xinput_stream_close (G_INPUT_STREAM (in), cancellable, NULL);
+  xobject_unref (in);
 
   if (res < 0)
     {
       /* error is set already */
-      g_byte_array_free (content, TRUE);
+      xbyte_array_free (content, TRUE);
       return FALSE;
     }
 
@@ -7361,15 +7361,15 @@ g_file_load_contents (xfile_t         *file,
   /* Zero terminate (we got an extra byte allocated for this */
   content->data[pos] = 0;
 
-  *contents = (char *)g_byte_array_free (content, FALSE);
+  *contents = (char *)xbyte_array_free (content, FALSE);
 
   return TRUE;
 }
 
 typedef struct {
-  GTask *task;
-  GFileReadMoreCallback read_more_callback;
-  GByteArray *content;
+  xtask_t *task;
+  xfile_read_more_callback_t read_more_callback;
+  xbyte_array_t *content;
   xsize_t pos;
   char *etag;
 } LoadContentsData;
@@ -7379,7 +7379,7 @@ static void
 load_contents_data_free (LoadContentsData *data)
 {
   if (data->content)
-    g_byte_array_free (data->content, TRUE);
+    xbyte_array_free (data->content, TRUE);
   g_free (data->etag);
   g_free (data);
 }
@@ -7393,11 +7393,11 @@ load_contents_close_callback (xobject_t      *obj,
   LoadContentsData *data = user_data;
 
   /* Ignore errors here, we're only reading anyway */
-  g_input_stream_close_finish (stream, close_res, NULL);
-  g_object_unref (stream);
+  xinput_stream_close_finish (stream, close_res, NULL);
+  xobject_unref (stream);
 
-  g_task_return_boolean (data->task, TRUE);
-  g_object_unref (data->task);
+  xtask_return_boolean (data->task, TRUE);
+  xobject_unref (data->task);
 }
 
 static void
@@ -7407,18 +7407,18 @@ load_contents_fstat_callback (xobject_t      *obj,
 {
   xinput_stream_t *stream = G_INPUT_STREAM (obj);
   LoadContentsData *data = user_data;
-  GFileInfo *info;
+  xfile_info_t *info;
 
-  info = g_file_input_stream_query_info_finish (G_FILE_INPUT_STREAM (stream),
+  info = xfile_input_stream_query_info_finish (XFILE_INPUT_STREAM (stream),
                                                 stat_res, NULL);
   if (info)
     {
-      data->etag = g_strdup (g_file_info_get_etag (info));
-      g_object_unref (info);
+      data->etag = xstrdup (xfile_info_get_etag (info));
+      xobject_unref (info);
     }
 
-  g_input_stream_close_async (stream, 0,
-                              g_task_get_cancellable (data->task),
+  xinput_stream_close_async (stream, 0,
+                              xtask_get_cancellable (data->task),
                               load_contents_close_callback, data);
 }
 
@@ -7430,25 +7430,25 @@ load_contents_read_callback (xobject_t      *obj,
   xinput_stream_t *stream = G_INPUT_STREAM (obj);
   LoadContentsData *data = user_data;
   xerror_t *error = NULL;
-  gssize read_size;
+  xssize_t read_size;
 
-  read_size = g_input_stream_read_finish (stream, read_res, &error);
+  read_size = xinput_stream_read_finish (stream, read_res, &error);
 
   if (read_size < 0)
     {
-      g_task_return_error (data->task, error);
-      g_object_unref (data->task);
+      xtask_return_error (data->task, error);
+      xobject_unref (data->task);
 
       /* Close the file ignoring any error */
-      g_input_stream_close_async (stream, 0, NULL, NULL, NULL);
-      g_object_unref (stream);
+      xinput_stream_close_async (stream, 0, NULL, NULL, NULL);
+      xobject_unref (stream);
     }
   else if (read_size == 0)
     {
-      g_file_input_stream_query_info_async (G_FILE_INPUT_STREAM (stream),
-                                            G_FILE_ATTRIBUTE_ETAG_VALUE,
+      xfile_input_stream_query_info_async (XFILE_INPUT_STREAM (stream),
+                                            XFILE_ATTRIBUTE_ETAG_VALUE,
                                             0,
-                                            g_task_get_cancellable (data->task),
+                                            xtask_get_cancellable (data->task),
                                             load_contents_fstat_callback,
                                             data);
     }
@@ -7456,25 +7456,25 @@ load_contents_read_callback (xobject_t      *obj,
     {
       data->pos += read_size;
 
-      g_byte_array_set_size (data->content,
+      xbyte_array_set_size (data->content,
                              data->pos + GET_CONTENT_BLOCK_SIZE);
 
 
       if (data->read_more_callback &&
           !data->read_more_callback ((char *)data->content->data, data->pos,
-                                     g_async_result_get_user_data (G_ASYNC_RESULT (data->task))))
-        g_file_input_stream_query_info_async (G_FILE_INPUT_STREAM (stream),
-                                              G_FILE_ATTRIBUTE_ETAG_VALUE,
+                                     xasync_result_get_user_data (G_ASYNC_RESULT (data->task))))
+        xfile_input_stream_query_info_async (XFILE_INPUT_STREAM (stream),
+                                              XFILE_ATTRIBUTE_ETAG_VALUE,
                                               0,
-                                              g_task_get_cancellable (data->task),
+                                              xtask_get_cancellable (data->task),
                                               load_contents_fstat_callback,
                                               data);
       else
-        g_input_stream_read_async (stream,
+        xinput_stream_read_async (stream,
                                    data->content->data + data->pos,
                                    GET_CONTENT_BLOCK_SIZE,
                                    0,
-                                   g_task_get_cancellable (data->task),
+                                   xtask_get_cancellable (data->task),
                                    load_contents_read_callback,
                                    data);
     }
@@ -7485,47 +7485,47 @@ load_contents_open_callback (xobject_t      *obj,
                              xasync_result_t *open_res,
                              xpointer_t      user_data)
 {
-  xfile_t *file = G_FILE (obj);
-  GFileInputStream *stream;
+  xfile_t *file = XFILE (obj);
+  xfile_input_stream_t *stream;
   LoadContentsData *data = user_data;
   xerror_t *error = NULL;
 
-  stream = g_file_read_finish (file, open_res, &error);
+  stream = xfile_read_finish (file, open_res, &error);
 
   if (stream)
     {
-      g_byte_array_set_size (data->content,
+      xbyte_array_set_size (data->content,
                              data->pos + GET_CONTENT_BLOCK_SIZE);
-      g_input_stream_read_async (G_INPUT_STREAM (stream),
+      xinput_stream_read_async (G_INPUT_STREAM (stream),
                                  data->content->data + data->pos,
                                  GET_CONTENT_BLOCK_SIZE,
                                  0,
-                                 g_task_get_cancellable (data->task),
+                                 xtask_get_cancellable (data->task),
                                  load_contents_read_callback,
                                  data);
     }
   else
     {
-      g_task_return_error (data->task, error);
-      g_object_unref (data->task);
+      xtask_return_error (data->task, error);
+      xobject_unref (data->task);
     }
 }
 
 /**
- * g_file_load_partial_contents_async: (skip)
+ * xfile_load_partial_contents_async: (skip)
  * @file: input #xfile_t
  * @cancellable: optional #xcancellable_t object, %NULL to ignore
  * @read_more_callback: (scope call) (closure user_data): a
- *   #GFileReadMoreCallback to receive partial data
+ *   #xfile_read_more_callback_t to receive partial data
  *   and to specify whether further data should be read
  * @callback: (scope async) (closure user_data): a #xasync_ready_callback_t to call
  *   when the request is satisfied
  * @user_data: the data to pass to the callback functions
  *
- * Reads the partial contents of a file. A #GFileReadMoreCallback should
+ * Reads the partial contents of a file. A #xfile_read_more_callback_t should
  * be used to stop reading from the file when appropriate, else this
- * function will behave exactly as g_file_load_contents_async(). This
- * operation can be finished by g_file_load_partial_contents_finish().
+ * function will behave exactly as xfile_load_contents_async(). This
+ * operation can be finished by xfile_load_partial_contents_finish().
  *
  * Users of this function should be aware that @user_data is passed to
  * both the @read_more_callback and the @callback.
@@ -7535,9 +7535,9 @@ load_contents_open_callback (xobject_t      *obj,
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  */
 void
-g_file_load_partial_contents_async (xfile_t                 *file,
+xfile_load_partial_contents_async (xfile_t                 *file,
                                     xcancellable_t          *cancellable,
-                                    GFileReadMoreCallback  read_more_callback,
+                                    xfile_read_more_callback_t  read_more_callback,
                                     xasync_ready_callback_t    callback,
                                     xpointer_t               user_data)
 {
@@ -7547,24 +7547,24 @@ g_file_load_partial_contents_async (xfile_t                 *file,
 
   data = g_new0 (LoadContentsData, 1);
   data->read_more_callback = read_more_callback;
-  data->content = g_byte_array_new ();
+  data->content = xbyte_array_new ();
 
-  data->task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (data->task, g_file_load_partial_contents_async);
-  g_task_set_task_data (data->task, data, (GDestroyNotify)load_contents_data_free);
+  data->task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (data->task, xfile_load_partial_contents_async);
+  xtask_set_task_data (data->task, data, (xdestroy_notify_t)load_contents_data_free);
 
-  g_file_read_async (file,
+  xfile_read_async (file,
                      0,
-                     g_task_get_cancellable (data->task),
+                     xtask_get_cancellable (data->task),
                      load_contents_open_callback,
                      data);
 }
 
 /**
- * g_file_load_partial_contents_finish:
+ * xfile_load_partial_contents_finish:
  * @file: input #xfile_t
  * @res: a #xasync_result_t
- * @contents: (out) (transfer full) (element-type guint8) (array length=length): a location to place the contents of the file
+ * @contents: (out) (transfer full) (element-type xuint8_t) (array length=length): a location to place the contents of the file
  * @length: (out) (optional): a location to place the length of the contents of the file,
  *   or %NULL if the length is not needed
  * @etag_out: (out) (optional) (nullable): a location to place the current entity tag for the file,
@@ -7572,7 +7572,7 @@ g_file_load_partial_contents_async (xfile_t                 *file,
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an asynchronous partial load operation that was started
- * with g_file_load_partial_contents_async(). The data is always
+ * with xfile_load_partial_contents_async(). The data is always
  * zero-terminated, but this is not included in the resultant @length.
  * The returned @contents should be freed with g_free() when no longer
  * needed.
@@ -7581,30 +7581,30 @@ g_file_load_partial_contents_async (xfile_t                 *file,
  *   present, it will be set appropriately.
  */
 xboolean_t
-g_file_load_partial_contents_finish (xfile_t         *file,
+xfile_load_partial_contents_finish (xfile_t         *file,
                                      xasync_result_t  *res,
                                      char         **contents,
                                      xsize_t         *length,
                                      char         **etag_out,
                                      xerror_t       **error)
 {
-  GTask *task;
+  xtask_t *task;
   LoadContentsData *data;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (g_task_is_valid (res, file), FALSE);
+  g_return_val_if_fail (xtask_is_valid (res, file), FALSE);
   g_return_val_if_fail (contents != NULL, FALSE);
 
-  task = G_TASK (res);
+  task = XTASK (res);
 
-  if (!g_task_propagate_boolean (task, error))
+  if (!xtask_propagate_boolean (task, error))
     {
       if (length)
         *length = 0;
       return FALSE;
     }
 
-  data = g_task_get_task_data (task);
+  data = xtask_get_task_data (task);
 
   if (length)
     *length = data->pos;
@@ -7616,17 +7616,17 @@ g_file_load_partial_contents_finish (xfile_t         *file,
     }
 
   /* Zero terminate */
-  g_byte_array_set_size (data->content, data->pos + 1);
+  xbyte_array_set_size (data->content, data->pos + 1);
   data->content->data[data->pos] = 0;
 
-  *contents = (char *)g_byte_array_free (data->content, FALSE);
+  *contents = (char *)xbyte_array_free (data->content, FALSE);
   data->content = NULL;
 
   return TRUE;
 }
 
 /**
- * g_file_load_contents_async:
+ * xfile_load_contents_async:
  * @file: input #xfile_t
  * @cancellable: optional #xcancellable_t object, %NULL to ignore
  * @callback: a #xasync_ready_callback_t to call when the request is satisfied
@@ -7634,12 +7634,12 @@ g_file_load_partial_contents_finish (xfile_t         *file,
  *
  * Starts an asynchronous load of the @file's contents.
  *
- * For more details, see g_file_load_contents() which is
+ * For more details, see xfile_load_contents() which is
  * the synchronous version of this call.
  *
  * When the load operation has completed, @callback will be called
  * with @user data. To finish the operation, call
- * g_file_load_contents_finish() with the #xasync_result_t returned by
+ * xfile_load_contents_finish() with the #xasync_result_t returned by
  * the @callback.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
@@ -7647,22 +7647,22 @@ g_file_load_partial_contents_finish (xfile_t         *file,
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  */
 void
-g_file_load_contents_async (xfile_t               *file,
+xfile_load_contents_async (xfile_t               *file,
                            xcancellable_t        *cancellable,
                            xasync_ready_callback_t  callback,
                            xpointer_t             user_data)
 {
-  g_file_load_partial_contents_async (file,
+  xfile_load_partial_contents_async (file,
                                       cancellable,
                                       NULL,
                                       callback, user_data);
 }
 
 /**
- * g_file_load_contents_finish:
+ * xfile_load_contents_finish:
  * @file: input #xfile_t
  * @res: a #xasync_result_t
- * @contents: (out) (transfer full) (element-type guint8) (array length=length): a location to place the contents of the file
+ * @contents: (out) (transfer full) (element-type xuint8_t) (array length=length): a location to place the contents of the file
  * @length: (out) (optional): a location to place the length of the contents of the file,
  *   or %NULL if the length is not needed
  * @etag_out: (out) (optional) (nullable): a location to place the current entity tag for the file,
@@ -7679,14 +7679,14 @@ g_file_load_contents_async (xfile_t               *file,
  *   present, it will be set appropriately.
  */
 xboolean_t
-g_file_load_contents_finish (xfile_t         *file,
+xfile_load_contents_finish (xfile_t         *file,
                              xasync_result_t  *res,
                              char         **contents,
                              xsize_t         *length,
                              char         **etag_out,
                              xerror_t       **error)
 {
-  return g_file_load_partial_contents_finish (file,
+  return xfile_load_partial_contents_finish (file,
                                               res,
                                               contents,
                                               length,
@@ -7695,14 +7695,14 @@ g_file_load_contents_finish (xfile_t         *file,
 }
 
 /**
- * g_file_replace_contents:
+ * xfile_replace_contents:
  * @file: input #xfile_t
- * @contents: (element-type guint8) (array length=length): a string containing the new contents for @file
+ * @contents: (element-type xuint8_t) (array length=length): a string containing the new contents for @file
  * @length: the length of @contents in bytes
  * @etag: (nullable): the old [entity-tag][gfile-etag] for the document,
  *   or %NULL
  * @make_backup: %TRUE if a backup should be created
- * @flags: a set of #GFileCreateFlags
+ * @flags: a set of #xfile_create_flags_t
  * @new_etag: (out) (optional) (nullable): a location to a new [entity tag][gfile-etag]
  *   for the document. This should be freed with g_free() when no longer
  *   needed, or %NULL
@@ -7715,7 +7715,7 @@ g_file_load_contents_finish (xfile_t         *file,
  * or the error %G_IO_ERROR_WRONG_ETAG will be returned.
  *
  * If @make_backup is %TRUE, this function will attempt to make a backup
- * of @file. Internally, it uses g_file_replace(), so will try to replace the
+ * of @file. Internally, it uses xfile_replace(), so will try to replace the
  * file contents in the safest way possible. For example, atomic renames are
  * used when replacing local files’ contents.
  *
@@ -7730,32 +7730,32 @@ g_file_load_contents_finish (xfile_t         *file,
  *   will return %FALSE and set @error appropriately if present.
  */
 xboolean_t
-g_file_replace_contents (xfile_t             *file,
+xfile_replace_contents (xfile_t             *file,
                          const char        *contents,
                          xsize_t              length,
                          const char        *etag,
                          xboolean_t           make_backup,
-                         GFileCreateFlags   flags,
+                         xfile_create_flags_t   flags,
                          char             **new_etag,
                          xcancellable_t      *cancellable,
                          xerror_t           **error)
 {
-  GFileOutputStream *out;
+  xfile_output_stream_t *out;
   xsize_t pos, remainder;
-  gssize res;
+  xssize_t res;
   xboolean_t ret;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (contents != NULL, FALSE);
 
-  out = g_file_replace (file, etag, make_backup, flags, cancellable, error);
+  out = xfile_replace (file, etag, make_backup, flags, cancellable, error);
   if (out == NULL)
     return FALSE;
 
   pos = 0;
   remainder = length;
   while (remainder > 0 &&
-         (res = g_output_stream_write (G_OUTPUT_STREAM (out),
+         (res = xoutput_stream_write (G_OUTPUT_STREAM (out),
                                        contents + pos,
                                        MIN (remainder, GET_CONTENT_BLOCK_SIZE),
                                        cancellable,
@@ -7768,26 +7768,26 @@ g_file_replace_contents (xfile_t             *file,
   if (remainder > 0 && res < 0)
     {
       /* Ignore errors on close */
-      g_output_stream_close (G_OUTPUT_STREAM (out), cancellable, NULL);
-      g_object_unref (out);
+      xoutput_stream_close (G_OUTPUT_STREAM (out), cancellable, NULL);
+      xobject_unref (out);
 
       /* error is set already */
       return FALSE;
     }
 
-  ret = g_output_stream_close (G_OUTPUT_STREAM (out), cancellable, error);
+  ret = xoutput_stream_close (G_OUTPUT_STREAM (out), cancellable, error);
 
   if (new_etag)
-    *new_etag = g_file_output_stream_get_etag (out);
+    *new_etag = xfile_output_stream_get_etag (out);
 
-  g_object_unref (out);
+  xobject_unref (out);
 
   return ret;
 }
 
 typedef struct {
-  GTask *task;
-  GBytes *content;
+  xtask_t *task;
+  xbytes_t *content;
   xsize_t pos;
   char *etag;
   xboolean_t failed;
@@ -7796,7 +7796,7 @@ typedef struct {
 static void
 replace_contents_data_free (ReplaceContentsData *data)
 {
-  g_bytes_unref (data->content);
+  xbytes_unref (data->content);
   g_free (data->etag);
   g_free (data);
 }
@@ -7810,14 +7810,14 @@ replace_contents_close_callback (xobject_t      *obj,
   ReplaceContentsData *data = user_data;
 
   /* Ignore errors here, we're only reading anyway */
-  g_output_stream_close_finish (stream, close_res, NULL);
+  xoutput_stream_close_finish (stream, close_res, NULL);
 
   if (!data->failed)
     {
-      data->etag = g_file_output_stream_get_etag (G_FILE_OUTPUT_STREAM (stream));
-      g_task_return_boolean (data->task, TRUE);
+      data->etag = xfile_output_stream_get_etag (XFILE_OUTPUT_STREAM (stream));
+      xtask_return_boolean (data->task, TRUE);
     }
-  g_object_unref (data->task);
+  xobject_unref (data->task);
 }
 
 static void
@@ -7828,9 +7828,9 @@ replace_contents_write_callback (xobject_t      *obj,
   xoutput_stream_t *stream = G_OUTPUT_STREAM (obj);
   ReplaceContentsData *data = user_data;
   xerror_t *error = NULL;
-  gssize write_size;
+  xssize_t write_size;
 
-  write_size = g_output_stream_write_finish (stream, read_res, &error);
+  write_size = xoutput_stream_write_finish (stream, read_res, &error);
 
   if (write_size <= 0)
     {
@@ -7838,10 +7838,10 @@ replace_contents_write_callback (xobject_t      *obj,
       if (write_size < 0)
         {
           data->failed = TRUE;
-          g_task_return_error (data->task, error);
+          xtask_return_error (data->task, error);
         }
-      g_output_stream_close_async (stream, 0,
-                                   g_task_get_cancellable (data->task),
+      xoutput_stream_close_async (stream, 0,
+                                   xtask_get_cancellable (data->task),
                                    replace_contents_close_callback, data);
     }
   else if (write_size > 0)
@@ -7849,19 +7849,19 @@ replace_contents_write_callback (xobject_t      *obj,
       const xchar_t *content;
       xsize_t length;
 
-      content = g_bytes_get_data (data->content, &length);
+      content = xbytes_get_data (data->content, &length);
       data->pos += write_size;
 
       if (data->pos >= length)
-        g_output_stream_close_async (stream, 0,
-                                     g_task_get_cancellable (data->task),
+        xoutput_stream_close_async (stream, 0,
+                                     xtask_get_cancellable (data->task),
                                      replace_contents_close_callback, data);
       else
-        g_output_stream_write_async (stream,
+        xoutput_stream_write_async (stream,
                                      content + data->pos,
                                      length - data->pos,
                                      0,
-                                     g_task_get_cancellable (data->task),
+                                     xtask_get_cancellable (data->task),
                                      replace_contents_write_callback,
                                      data);
     }
@@ -7872,43 +7872,43 @@ replace_contents_open_callback (xobject_t      *obj,
                                 xasync_result_t *open_res,
                                 xpointer_t      user_data)
 {
-  xfile_t *file = G_FILE (obj);
-  GFileOutputStream *stream;
+  xfile_t *file = XFILE (obj);
+  xfile_output_stream_t *stream;
   ReplaceContentsData *data = user_data;
   xerror_t *error = NULL;
 
-  stream = g_file_replace_finish (file, open_res, &error);
+  stream = xfile_replace_finish (file, open_res, &error);
 
   if (stream)
     {
       const xchar_t *content;
       xsize_t length;
 
-      content = g_bytes_get_data (data->content, &length);
-      g_output_stream_write_async (G_OUTPUT_STREAM (stream),
+      content = xbytes_get_data (data->content, &length);
+      xoutput_stream_write_async (G_OUTPUT_STREAM (stream),
                                    content + data->pos,
                                    length - data->pos,
                                    0,
-                                   g_task_get_cancellable (data->task),
+                                   xtask_get_cancellable (data->task),
                                    replace_contents_write_callback,
                                    data);
-      g_object_unref (stream);  /* ownership is transferred to the write_async() call above */
+      xobject_unref (stream);  /* ownership is transferred to the write_async() call above */
     }
   else
     {
-      g_task_return_error (data->task, error);
-      g_object_unref (data->task);
+      xtask_return_error (data->task, error);
+      xobject_unref (data->task);
     }
 }
 
 /**
- * g_file_replace_contents_async:
+ * xfile_replace_contents_async:
  * @file: input #xfile_t
- * @contents: (element-type guint8) (array length=length): string of contents to replace the file with
+ * @contents: (element-type xuint8_t) (array length=length): string of contents to replace the file with
  * @length: the length of @contents in bytes
  * @etag: (nullable): a new [entity tag][gfile-etag] for the @file, or %NULL
  * @make_backup: %TRUE if a backup should be created
- * @flags: a set of #GFileCreateFlags
+ * @flags: a set of #xfile_create_flags_t
  * @cancellable: optional #xcancellable_t object, %NULL to ignore
  * @callback: a #xasync_ready_callback_t to call when the request is satisfied
  * @user_data: the data to pass to callback function
@@ -7919,7 +7919,7 @@ replace_contents_open_callback (xobject_t      *obj,
  *
  * When this operation has completed, @callback will be called with
  * @user_user data, and the operation can be finalized with
- * g_file_replace_contents_finish().
+ * xfile_replace_contents_finish().
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
@@ -7929,57 +7929,57 @@ replace_contents_open_callback (xobject_t      *obj,
  * make a backup of @file.
  *
  * Note that no copy of @contents will be made, so it must stay valid
- * until @callback is called. See g_file_replace_contents_bytes_async()
- * for a #GBytes version that will automatically hold a reference to the
+ * until @callback is called. See xfile_replace_contents_bytes_async()
+ * for a #xbytes_t version that will automatically hold a reference to the
  * contents (without copying) for the duration of the call.
  */
 void
-g_file_replace_contents_async  (xfile_t               *file,
+xfile_replace_contents_async  (xfile_t               *file,
                                 const char          *contents,
                                 xsize_t                length,
                                 const char          *etag,
                                 xboolean_t             make_backup,
-                                GFileCreateFlags     flags,
+                                xfile_create_flags_t     flags,
                                 xcancellable_t        *cancellable,
                                 xasync_ready_callback_t  callback,
                                 xpointer_t             user_data)
 {
-  GBytes *bytes;
+  xbytes_t *bytes;
 
-  bytes = g_bytes_new_static (contents, length);
-  g_file_replace_contents_bytes_async (file, bytes, etag, make_backup, flags,
+  bytes = xbytes_new_static (contents, length);
+  xfile_replace_contents_bytes_async (file, bytes, etag, make_backup, flags,
       cancellable, callback, user_data);
-  g_bytes_unref (bytes);
+  xbytes_unref (bytes);
 }
 
 /**
- * g_file_replace_contents_bytes_async:
+ * xfile_replace_contents_bytes_async:
  * @file: input #xfile_t
- * @contents: a #GBytes
+ * @contents: a #xbytes_t
  * @etag: (nullable): a new [entity tag][gfile-etag] for the @file, or %NULL
  * @make_backup: %TRUE if a backup should be created
- * @flags: a set of #GFileCreateFlags
+ * @flags: a set of #xfile_create_flags_t
  * @cancellable: optional #xcancellable_t object, %NULL to ignore
  * @callback: a #xasync_ready_callback_t to call when the request is satisfied
  * @user_data: the data to pass to callback function
  *
- * Same as g_file_replace_contents_async() but takes a #GBytes input instead.
+ * Same as xfile_replace_contents_async() but takes a #xbytes_t input instead.
  * This function will keep a ref on @contents until the operation is done.
- * Unlike g_file_replace_contents_async() this allows forgetting about the
+ * Unlike xfile_replace_contents_async() this allows forgetting about the
  * content without waiting for the callback.
  *
  * When this operation has completed, @callback will be called with
  * @user_user data, and the operation can be finalized with
- * g_file_replace_contents_finish().
+ * xfile_replace_contents_finish().
  *
  * Since: 2.40
  */
 void
-g_file_replace_contents_bytes_async  (xfile_t               *file,
-                                      GBytes              *contents,
+xfile_replace_contents_bytes_async  (xfile_t               *file,
+                                      xbytes_t              *contents,
                                       const char          *etag,
                                       xboolean_t             make_backup,
-                                      GFileCreateFlags     flags,
+                                      xfile_create_flags_t     flags,
                                       xcancellable_t        *cancellable,
                                       xasync_ready_callback_t  callback,
                                       xpointer_t             user_data)
@@ -7991,24 +7991,24 @@ g_file_replace_contents_bytes_async  (xfile_t               *file,
 
   data = g_new0 (ReplaceContentsData, 1);
 
-  data->content = g_bytes_ref (contents);
+  data->content = xbytes_ref (contents);
 
-  data->task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (data->task, g_file_replace_contents_bytes_async);
-  g_task_set_task_data (data->task, data, (GDestroyNotify)replace_contents_data_free);
+  data->task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (data->task, xfile_replace_contents_bytes_async);
+  xtask_set_task_data (data->task, data, (xdestroy_notify_t)replace_contents_data_free);
 
-  g_file_replace_async (file,
+  xfile_replace_async (file,
                         etag,
                         make_backup,
                         flags,
                         0,
-                        g_task_get_cancellable (data->task),
+                        xtask_get_cancellable (data->task),
                         replace_contents_open_callback,
                         data);
 }
 
 /**
- * g_file_replace_contents_finish:
+ * xfile_replace_contents_finish:
  * @file: input #xfile_t
  * @res: a #xasync_result_t
  * @new_etag: (out) (optional) (nullable): a location of a new [entity tag][gfile-etag]
@@ -8017,29 +8017,29 @@ g_file_replace_contents_bytes_async  (xfile_t               *file,
  * @error: a #xerror_t, or %NULL
  *
  * Finishes an asynchronous replace of the given @file. See
- * g_file_replace_contents_async(). Sets @new_etag to the new entity
+ * xfile_replace_contents_async(). Sets @new_etag to the new entity
  * tag for the document, if present.
  *
  * Returns: %TRUE on success, %FALSE on failure.
  */
 xboolean_t
-g_file_replace_contents_finish (xfile_t         *file,
+xfile_replace_contents_finish (xfile_t         *file,
                                 xasync_result_t  *res,
                                 char         **new_etag,
                                 xerror_t       **error)
 {
-  GTask *task;
+  xtask_t *task;
   ReplaceContentsData *data;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (g_task_is_valid (res, file), FALSE);
+  g_return_val_if_fail (xtask_is_valid (res, file), FALSE);
 
-  task = G_TASK (res);
+  task = XTASK (res);
 
-  if (!g_task_propagate_boolean (task, error))
+  if (!xtask_propagate_boolean (task, error))
     return FALSE;
 
-  data = g_task_get_task_data (task);
+  data = xtask_get_task_data (task);
 
   if (new_etag)
     {
@@ -8051,14 +8051,14 @@ g_file_replace_contents_finish (xfile_t         *file,
 }
 
 xboolean_t
-g_file_real_measure_disk_usage (xfile_t                         *file,
-                                GFileMeasureFlags              flags,
+xfile_real_measure_disk_usage (xfile_t                         *file,
+                                xfile_measure_flags_t              flags,
                                 xcancellable_t                  *cancellable,
-                                GFileMeasureProgressCallback   progress_callback,
+                                xfile_measure_progress_callback_t   progress_callback,
                                 xpointer_t                       progress_data,
-                                guint64                       *disk_usage,
-                                guint64                       *num_dirs,
-                                guint64                       *num_files,
+                                xuint64_t                       *disk_usage,
+                                xuint64_t                       *num_dirs,
+                                xuint64_t                       *num_files,
                                 xerror_t                       **error)
 {
   g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
@@ -8068,26 +8068,26 @@ g_file_real_measure_disk_usage (xfile_t                         *file,
 
 typedef struct
 {
-  GFileMeasureFlags             flags;
-  GFileMeasureProgressCallback  progress_callback;
+  xfile_measure_flags_t             flags;
+  xfile_measure_progress_callback_t  progress_callback;
   xpointer_t                      progress_data;
 } MeasureTaskData;
 
 typedef struct
 {
-  guint64 disk_usage;
-  guint64 num_dirs;
-  guint64 num_files;
+  xuint64_t disk_usage;
+  xuint64_t num_dirs;
+  xuint64_t num_files;
 } MeasureResult;
 
 typedef struct
 {
-  GFileMeasureProgressCallback callback;
+  xfile_measure_progress_callback_t callback;
   xpointer_t                     user_data;
   xboolean_t                     reporting;
-  guint64                      current_size;
-  guint64                      num_dirs;
-  guint64                      num_files;
+  xuint64_t                      current_size;
+  xuint64_t                      num_dirs;
+  xuint64_t                      num_files;
 } MeasureProgress;
 
 static xboolean_t
@@ -8104,16 +8104,16 @@ measure_disk_usage_invoke_progress (xpointer_t user_data)
 
 static void
 measure_disk_usage_progress (xboolean_t reporting,
-                             guint64  current_size,
-                             guint64  num_dirs,
-                             guint64  num_files,
+                             xuint64_t  current_size,
+                             xuint64_t  num_dirs,
+                             xuint64_t  num_files,
                              xpointer_t user_data)
 {
   MeasureProgress progress;
-  GTask *task = user_data;
+  xtask_t *task = user_data;
   MeasureTaskData *data;
 
-  data = g_task_get_task_data (task);
+  data = xtask_get_task_data (task);
 
   progress.callback = data->progress_callback;
   progress.user_data = data->progress_data;
@@ -8122,15 +8122,15 @@ measure_disk_usage_progress (xboolean_t reporting,
   progress.num_dirs = num_dirs;
   progress.num_files = num_files;
 
-  g_main_context_invoke_full (g_task_get_context (task),
-                              g_task_get_priority (task),
+  xmain_context_invoke_full (xtask_get_context (task),
+                              xtask_get_priority (task),
                               measure_disk_usage_invoke_progress,
                               g_memdup2 (&progress, sizeof progress),
                               g_free);
 }
 
 static void
-measure_disk_usage_thread (GTask        *task,
+measure_disk_usage_thread (xtask_t        *task,
                            xpointer_t      source_object,
                            xpointer_t      task_data,
                            xcancellable_t *cancellable)
@@ -8139,54 +8139,54 @@ measure_disk_usage_thread (GTask        *task,
   xerror_t *error = NULL;
   MeasureResult result = { 0, };
 
-  if (g_file_measure_disk_usage (source_object, data->flags, cancellable,
+  if (xfile_measure_disk_usage (source_object, data->flags, cancellable,
                                  data->progress_callback ? measure_disk_usage_progress : NULL, task,
                                  &result.disk_usage, &result.num_dirs, &result.num_files,
                                  &error))
-    g_task_return_pointer (task, g_memdup2 (&result, sizeof result), g_free);
+    xtask_return_pointer (task, g_memdup2 (&result, sizeof result), g_free);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 static void
-g_file_real_measure_disk_usage_async (xfile_t                        *file,
-                                      GFileMeasureFlags             flags,
+xfile_real_measure_disk_usage_async (xfile_t                        *file,
+                                      xfile_measure_flags_t             flags,
                                       xint_t                          io_priority,
                                       xcancellable_t                 *cancellable,
-                                      GFileMeasureProgressCallback  progress_callback,
+                                      xfile_measure_progress_callback_t  progress_callback,
                                       xpointer_t                      progress_data,
                                       xasync_ready_callback_t           callback,
                                       xpointer_t                      user_data)
 {
   MeasureTaskData data;
-  GTask *task;
+  xtask_t *task;
 
   data.flags = flags;
   data.progress_callback = progress_callback;
   data.progress_data = progress_data;
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_real_measure_disk_usage_async);
-  g_task_set_task_data (task, g_memdup2 (&data, sizeof data), g_free);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_real_measure_disk_usage_async);
+  xtask_set_task_data (task, g_memdup2 (&data, sizeof data), g_free);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, measure_disk_usage_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, measure_disk_usage_thread);
+  xobject_unref (task);
 }
 
 static xboolean_t
-g_file_real_measure_disk_usage_finish (xfile_t         *file,
+xfile_real_measure_disk_usage_finish (xfile_t         *file,
                                        xasync_result_t  *result,
-                                       guint64       *disk_usage,
-                                       guint64       *num_dirs,
-                                       guint64       *num_files,
+                                       xuint64_t       *disk_usage,
+                                       xuint64_t       *num_dirs,
+                                       xuint64_t       *num_files,
                                        xerror_t       **error)
 {
   MeasureResult *measure_result;
 
-  g_return_val_if_fail (g_task_is_valid (result, file), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, file), FALSE);
 
-  measure_result = g_task_propagate_pointer (G_TASK (result), error);
+  measure_result = xtask_propagate_pointer (XTASK (result), error);
 
   if (measure_result == NULL)
     return FALSE;
@@ -8206,11 +8206,11 @@ g_file_real_measure_disk_usage_finish (xfile_t         *file,
 }
 
 /**
- * g_file_measure_disk_usage:
+ * xfile_measure_disk_usage:
  * @file: a #xfile_t
- * @flags: #GFileMeasureFlags
+ * @flags: #xfile_measure_flags_t
  * @cancellable: (nullable): optional #xcancellable_t
- * @progress_callback: (nullable): a #GFileMeasureProgressCallback
+ * @progress_callback: (nullable): a #xfile_measure_progress_callback_t
  * @progress_data: user_data for @progress_callback
  * @disk_usage: (out) (optional): the number of bytes of disk space used
  * @num_dirs: (out) (optional): the number of directories encountered
@@ -8225,7 +8225,7 @@ g_file_real_measure_disk_usage_finish (xfile_t         *file,
  *
  * By default, errors are only reported against the toplevel file
  * itself.  Errors found while recursing are silently ignored, unless
- * %G_FILE_MEASURE_REPORT_ANY_ERROR is given in @flags.
+ * %XFILE_MEASURE_REPORT_ANY_ERROR is given in @flags.
  *
  * The returned size, @disk_usage, is in bytes and should be formatted
  * with g_format_size() in order to get something reasonable for showing
@@ -8233,7 +8233,7 @@ g_file_real_measure_disk_usage_finish (xfile_t         *file,
  *
  * @progress_callback and @progress_data can be given to request
  * periodic progress updates while scanning.  See the documentation for
- * #GFileMeasureProgressCallback for information about when and how the
+ * #xfile_measure_progress_callback_t for information about when and how the
  * callback will be invoked.
  *
  * Returns: %TRUE if successful, with the out parameters set.
@@ -8242,50 +8242,50 @@ g_file_real_measure_disk_usage_finish (xfile_t         *file,
  * Since: 2.38
  **/
 xboolean_t
-g_file_measure_disk_usage (xfile_t                         *file,
-                           GFileMeasureFlags              flags,
+xfile_measure_disk_usage (xfile_t                         *file,
+                           xfile_measure_flags_t              flags,
                            xcancellable_t                  *cancellable,
-                           GFileMeasureProgressCallback   progress_callback,
+                           xfile_measure_progress_callback_t   progress_callback,
                            xpointer_t                       progress_data,
-                           guint64                       *disk_usage,
-                           guint64                       *num_dirs,
-                           guint64                       *num_files,
+                           xuint64_t                       *disk_usage,
+                           xuint64_t                       *num_dirs,
+                           xuint64_t                       *num_files,
                            xerror_t                       **error)
 {
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  return G_FILE_GET_IFACE (file)->measure_disk_usage (file, flags, cancellable,
+  return XFILE_GET_IFACE (file)->measure_disk_usage (file, flags, cancellable,
                                                       progress_callback, progress_data,
                                                       disk_usage, num_dirs, num_files,
                                                       error);
 }
 
 /**
- * g_file_measure_disk_usage_async:
+ * xfile_measure_disk_usage_async:
  * @file: a #xfile_t
- * @flags: #GFileMeasureFlags
+ * @flags: #xfile_measure_flags_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t
- * @progress_callback: (nullable): a #GFileMeasureProgressCallback
+ * @progress_callback: (nullable): a #xfile_measure_progress_callback_t
  * @progress_data: user_data for @progress_callback
  * @callback: (nullable): a #xasync_ready_callback_t to call when complete
  * @user_data: the data to pass to callback function
  *
  * Recursively measures the disk usage of @file.
  *
- * This is the asynchronous version of g_file_measure_disk_usage().  See
+ * This is the asynchronous version of xfile_measure_disk_usage().  See
  * there for more information.
  *
  * Since: 2.38
  **/
 void
-g_file_measure_disk_usage_async (xfile_t                        *file,
-                                 GFileMeasureFlags             flags,
+xfile_measure_disk_usage_async (xfile_t                        *file,
+                                 xfile_measure_flags_t             flags,
                                  xint_t                          io_priority,
                                  xcancellable_t                 *cancellable,
-                                 GFileMeasureProgressCallback  progress_callback,
+                                 xfile_measure_progress_callback_t  progress_callback,
                                  xpointer_t                      progress_data,
                                  xasync_ready_callback_t           callback,
                                  xpointer_t                      user_data)
@@ -8293,13 +8293,13 @@ g_file_measure_disk_usage_async (xfile_t                        *file,
   g_return_if_fail (X_IS_FILE (file));
   g_return_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
 
-  G_FILE_GET_IFACE (file)->measure_disk_usage_async (file, flags, io_priority, cancellable,
+  XFILE_GET_IFACE (file)->measure_disk_usage_async (file, flags, io_priority, cancellable,
                                                      progress_callback, progress_data,
                                                      callback, user_data);
 }
 
 /**
- * g_file_measure_disk_usage_finish:
+ * xfile_measure_disk_usage_finish:
  * @file: a #xfile_t
  * @result: the #xasync_result_t passed to your #xasync_ready_callback_t
  * @disk_usage: (out) (optional): the number of bytes of disk space used
@@ -8308,7 +8308,7 @@ g_file_measure_disk_usage_async (xfile_t                        *file,
  * @error: (nullable): %NULL, or a pointer to a %NULL #xerror_t pointer
  *
  * Collects the results from an earlier call to
- * g_file_measure_disk_usage_async().  See g_file_measure_disk_usage() for
+ * xfile_measure_disk_usage_async().  See xfile_measure_disk_usage() for
  * more information.
  *
  * Returns: %TRUE if successful, with the out parameters set.
@@ -8317,21 +8317,21 @@ g_file_measure_disk_usage_async (xfile_t                        *file,
  * Since: 2.38
  **/
 xboolean_t
-g_file_measure_disk_usage_finish (xfile_t         *file,
+xfile_measure_disk_usage_finish (xfile_t         *file,
                                   xasync_result_t  *result,
-                                  guint64       *disk_usage,
-                                  guint64       *num_dirs,
-                                  guint64       *num_files,
+                                  xuint64_t       *disk_usage,
+                                  xuint64_t       *num_dirs,
+                                  xuint64_t       *num_files,
                                   xerror_t       **error)
 {
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  return G_FILE_GET_IFACE (file)->measure_disk_usage_finish (file, result, disk_usage, num_dirs, num_files, error);
+  return XFILE_GET_IFACE (file)->measure_disk_usage_finish (file, result, disk_usage, num_dirs, num_files, error);
 }
 
 /**
- * g_file_start_mountable:
+ * xfile_start_mountable:
  * @file: input #xfile_t
  * @flags: flags affecting the operation
  * @start_operation: (nullable): a #xmount_operation_t, or %NULL to avoid user interaction
@@ -8339,7 +8339,7 @@ g_file_measure_disk_usage_finish (xfile_t         *file,
  * @callback: (nullable): a #xasync_ready_callback_t to call when the request is satisfied, or %NULL
  * @user_data: the data to pass to callback function
  *
- * Starts a file of type %G_FILE_TYPE_MOUNTABLE.
+ * Starts a file of type %XFILE_TYPE_MOUNTABLE.
  * Using @start_operation, you can request callbacks when, for instance,
  * passwords are needed during authentication.
  *
@@ -8348,29 +8348,29 @@ g_file_measure_disk_usage_finish (xfile_t         *file,
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_mount_mountable_finish() to get
+ * You can then call xfile_mount_mountable_finish() to get
  * the result of the operation.
  *
  * Since: 2.22
  */
 void
-g_file_start_mountable (xfile_t               *file,
+xfile_start_mountable (xfile_t               *file,
                         GDriveStartFlags     flags,
                         xmount_operation_t     *start_operation,
                         xcancellable_t        *cancellable,
                         xasync_ready_callback_t  callback,
                         xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->start_mountable == NULL)
     {
-      g_task_report_new_error (file, callback, user_data,
-                               g_file_start_mountable,
+      xtask_report_new_error (file, callback, user_data,
+                               xfile_start_mountable,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("Operation not supported"));
       return;
@@ -8385,15 +8385,15 @@ g_file_start_mountable (xfile_t               *file,
 }
 
 /**
- * g_file_start_mountable_finish:
+ * xfile_start_mountable_finish:
  * @file: input #xfile_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
- * Finishes a start operation. See g_file_start_mountable() for details.
+ * Finishes a start operation. See xfile_start_mountable() for details.
  *
  * Finish an asynchronous start operation that was started
- * with g_file_start_mountable().
+ * with xfile_start_mountable().
  *
  * Returns: %TRUE if the operation finished successfully. %FALSE
  * otherwise.
@@ -8401,26 +8401,26 @@ g_file_start_mountable (xfile_t               *file,
  * Since: 2.22
  */
 xboolean_t
-g_file_start_mountable_finish (xfile_t         *file,
+xfile_start_mountable_finish (xfile_t         *file,
                                xasync_result_t  *result,
                                xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_file_start_mountable))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xfile_start_mountable))
+    return xtask_propagate_boolean (XTASK (result), error);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->start_mountable_finish) (file, result, error);
 }
 
 /**
- * g_file_stop_mountable:
+ * xfile_stop_mountable:
  * @file: input #xfile_t
  * @flags: flags affecting the operation
  * @mount_operation: (nullable): a #xmount_operation_t,
@@ -8431,36 +8431,36 @@ g_file_start_mountable_finish (xfile_t         *file,
  *   when the request is satisfied, or %NULL
  * @user_data: the data to pass to callback function
  *
- * Stops a file of type %G_FILE_TYPE_MOUNTABLE.
+ * Stops a file of type %XFILE_TYPE_MOUNTABLE.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_stop_mountable_finish() to get
+ * You can then call xfile_stop_mountable_finish() to get
  * the result of the operation.
  *
  * Since: 2.22
  */
 void
-g_file_stop_mountable (xfile_t               *file,
+xfile_stop_mountable (xfile_t               *file,
                        xmount_unmount_flags_t   flags,
                        xmount_operation_t     *mount_operation,
                        xcancellable_t        *cancellable,
                        xasync_ready_callback_t  callback,
                        xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->stop_mountable == NULL)
     {
-      g_task_report_new_error (file, callback, user_data,
-                               g_file_stop_mountable,
+      xtask_report_new_error (file, callback, user_data,
+                               xfile_stop_mountable,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("Operation not supported"));
       return;
@@ -8475,15 +8475,15 @@ g_file_stop_mountable (xfile_t               *file,
 }
 
 /**
- * g_file_stop_mountable_finish:
+ * xfile_stop_mountable_finish:
  * @file: input #xfile_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
- * Finishes a stop operation, see g_file_stop_mountable() for details.
+ * Finishes a stop operation, see xfile_stop_mountable() for details.
  *
  * Finish an asynchronous stop operation that was started
- * with g_file_stop_mountable().
+ * with xfile_stop_mountable().
  *
  * Returns: %TRUE if the operation finished successfully.
  *   %FALSE otherwise.
@@ -8491,60 +8491,60 @@ g_file_stop_mountable (xfile_t               *file,
  * Since: 2.22
  */
 xboolean_t
-g_file_stop_mountable_finish (xfile_t         *file,
+xfile_stop_mountable_finish (xfile_t         *file,
                               xasync_result_t  *result,
                               xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_file_stop_mountable))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xfile_stop_mountable))
+    return xtask_propagate_boolean (XTASK (result), error);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->stop_mountable_finish) (file, result, error);
 }
 
 /**
- * g_file_poll_mountable:
+ * xfile_poll_mountable:
  * @file: input #xfile_t
  * @cancellable: optional #xcancellable_t object, %NULL to ignore
  * @callback: (nullable): a #xasync_ready_callback_t to call
  *   when the request is satisfied, or %NULL
  * @user_data: the data to pass to callback function
  *
- * Polls a file of type %G_FILE_TYPE_MOUNTABLE.
+ * Polls a file of type %XFILE_TYPE_MOUNTABLE.
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
  *
  * When the operation is finished, @callback will be called.
- * You can then call g_file_mount_mountable_finish() to get
+ * You can then call xfile_mount_mountable_finish() to get
  * the result of the operation.
  *
  * Since: 2.22
  */
 void
-g_file_poll_mountable (xfile_t               *file,
+xfile_poll_mountable (xfile_t               *file,
                        xcancellable_t        *cancellable,
                        xasync_ready_callback_t  callback,
                        xpointer_t             user_data)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_if_fail (X_IS_FILE (file));
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
 
   if (iface->poll_mountable == NULL)
     {
-      g_task_report_new_error (file, callback, user_data,
-                               g_file_poll_mountable,
+      xtask_report_new_error (file, callback, user_data,
+                               xfile_poll_mountable,
                                G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                _("Operation not supported"));
       return;
@@ -8557,15 +8557,15 @@ g_file_poll_mountable (xfile_t               *file,
 }
 
 /**
- * g_file_poll_mountable_finish:
+ * xfile_poll_mountable_finish:
  * @file: input #xfile_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t, or %NULL
  *
- * Finishes a poll operation. See g_file_poll_mountable() for details.
+ * Finishes a poll operation. See xfile_poll_mountable() for details.
  *
  * Finish an asynchronous poll operation that was polled
- * with g_file_poll_mountable().
+ * with xfile_poll_mountable().
  *
  * Returns: %TRUE if the operation finished successfully. %FALSE
  * otherwise.
@@ -8573,26 +8573,26 @@ g_file_poll_mountable (xfile_t               *file,
  * Since: 2.22
  */
 xboolean_t
-g_file_poll_mountable_finish (xfile_t         *file,
+xfile_poll_mountable_finish (xfile_t         *file,
                               xasync_result_t  *result,
                               xerror_t       **error)
 {
-  GFileIface *iface;
+  xfile_iface_t *iface;
 
   g_return_val_if_fail (X_IS_FILE (file), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_file_poll_mountable))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xfile_poll_mountable))
+    return xtask_propagate_boolean (XTASK (result), error);
 
-  iface = G_FILE_GET_IFACE (file);
+  iface = XFILE_GET_IFACE (file);
   return (* iface->poll_mountable_finish) (file, result, error);
 }
 
 /**
- * g_file_supports_thread_contexts:
+ * xfile_supports_thread_contexts:
  * @file: a #xfile_t
  *
  * Checks if @file supports
@@ -8605,42 +8605,42 @@ g_file_poll_mountable_finish (xfile_t         *file,
  * Since: 2.22
  */
 xboolean_t
-g_file_supports_thread_contexts (xfile_t *file)
+xfile_supports_thread_contexts (xfile_t *file)
 {
- GFileIface *iface;
+ xfile_iface_t *iface;
 
  g_return_val_if_fail (X_IS_FILE (file), FALSE);
 
- iface = G_FILE_GET_IFACE (file);
+ iface = XFILE_GET_IFACE (file);
  return iface->supports_thread_contexts;
 }
 
 /**
- * g_file_load_bytes:
+ * xfile_load_bytes:
  * @file: a #xfile_t
  * @cancellable: (nullable): a #xcancellable_t or %NULL
  * @etag_out: (out) (nullable) (optional): a location to place the current
  *   entity tag for the file, or %NULL if the entity tag is not needed
  * @error: a location for a #xerror_t or %NULL
  *
- * Loads the contents of @file and returns it as #GBytes.
+ * Loads the contents of @file and returns it as #xbytes_t.
  *
  * If @file is a resource:// based URI, the resulting bytes will reference the
  * embedded resource instead of a copy. Otherwise, this is equivalent to calling
- * g_file_load_contents() and g_bytes_new_take().
+ * xfile_load_contents() and xbytes_new_take().
  *
  * For resources, @etag_out will be set to %NULL.
  *
- * The data contained in the resulting #GBytes is always zero-terminated, but
- * this is not included in the #GBytes length. The resulting #GBytes should be
- * freed with g_bytes_unref() when no longer in use.
+ * The data contained in the resulting #xbytes_t is always zero-terminated, but
+ * this is not included in the #xbytes_t length. The resulting #xbytes_t should be
+ * freed with xbytes_unref() when no longer in use.
  *
- * Returns: (transfer full): a #GBytes or %NULL and @error is set
+ * Returns: (transfer full): a #xbytes_t or %NULL and @error is set
  *
  * Since: 2.56
  */
-GBytes *
-g_file_load_bytes (xfile_t         *file,
+xbytes_t *
+xfile_load_bytes (xfile_t         *file,
                    xcancellable_t  *cancellable,
                    xchar_t        **etag_out,
                    xerror_t       **error)
@@ -8655,13 +8655,13 @@ g_file_load_bytes (xfile_t         *file,
   if (etag_out != NULL)
     *etag_out = NULL;
 
-  if (g_file_has_uri_scheme (file, "resource"))
+  if (xfile_has_uri_scheme (file, "resource"))
     {
-      GBytes *bytes;
+      xbytes_t *bytes;
       xchar_t *uri, *unescaped;
 
-      uri = g_file_get_uri (file);
-      unescaped = g_uri_unescape_string (uri + strlen ("resource://"), NULL);
+      uri = xfile_get_uri (file);
+      unescaped = xuri_unescape_string (uri + strlen ("resource://"), NULL);
       g_free (uri);
 
       bytes = g_resources_lookup_data (unescaped, G_RESOURCE_LOOKUP_FLAGS_NONE, error);
@@ -8671,134 +8671,134 @@ g_file_load_bytes (xfile_t         *file,
     }
 
   /* contents is guaranteed to be \0 terminated */
-  if (g_file_load_contents (file, cancellable, &contents, &len, etag_out, error))
-    return g_bytes_new_take (g_steal_pointer (&contents), len);
+  if (xfile_load_contents (file, cancellable, &contents, &len, etag_out, error))
+    return xbytes_new_take (g_steal_pointer (&contents), len);
 
   return NULL;
 }
 
 static void
-g_file_load_bytes_cb (xobject_t      *object,
+xfile_load_bytes_cb (xobject_t      *object,
                       xasync_result_t *result,
                       xpointer_t      user_data)
 {
-  xfile_t *file = G_FILE (object);
-  GTask *task = user_data;
+  xfile_t *file = XFILE (object);
+  xtask_t *task = user_data;
   xerror_t *error = NULL;
   xchar_t *etag = NULL;
   xchar_t *contents = NULL;
   xsize_t len = 0;
 
-  g_file_load_contents_finish (file, result, &contents, &len, &etag, &error);
-  g_task_set_task_data (task, g_steal_pointer (&etag), g_free);
+  xfile_load_contents_finish (file, result, &contents, &len, &etag, &error);
+  xtask_set_task_data (task, g_steal_pointer (&etag), g_free);
 
   if (error != NULL)
-    g_task_return_error (task, g_steal_pointer (&error));
+    xtask_return_error (task, g_steal_pointer (&error));
   else
-    g_task_return_pointer (task,
-                           g_bytes_new_take (g_steal_pointer (&contents), len),
-                           (GDestroyNotify)g_bytes_unref);
+    xtask_return_pointer (task,
+                           xbytes_new_take (g_steal_pointer (&contents), len),
+                           (xdestroy_notify_t)xbytes_unref);
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 /**
- * g_file_load_bytes_async:
+ * xfile_load_bytes_async:
  * @file: a #xfile_t
  * @cancellable: (nullable): a #xcancellable_t or %NULL
  * @callback: (scope async): a #xasync_ready_callback_t to call when the
  *   request is satisfied
  * @user_data: (closure): the data to pass to callback function
  *
- * Asynchronously loads the contents of @file as #GBytes.
+ * Asynchronously loads the contents of @file as #xbytes_t.
  *
  * If @file is a resource:// based URI, the resulting bytes will reference the
  * embedded resource instead of a copy. Otherwise, this is equivalent to calling
- * g_file_load_contents_async() and g_bytes_new_take().
+ * xfile_load_contents_async() and xbytes_new_take().
  *
- * @callback should call g_file_load_bytes_finish() to get the result of this
+ * @callback should call xfile_load_bytes_finish() to get the result of this
  * asynchronous operation.
  *
- * See g_file_load_bytes() for more information.
+ * See xfile_load_bytes() for more information.
  *
  * Since: 2.56
  */
 void
-g_file_load_bytes_async (xfile_t               *file,
+xfile_load_bytes_async (xfile_t               *file,
                          xcancellable_t        *cancellable,
                          xasync_ready_callback_t  callback,
                          xpointer_t             user_data)
 {
   xerror_t *error = NULL;
-  GBytes *bytes;
-  GTask *task;
+  xbytes_t *bytes;
+  xtask_t *task;
 
   g_return_if_fail (X_IS_FILE (file));
   g_return_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
 
-  task = g_task_new (file, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_load_bytes_async);
+  task = xtask_new (file, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_load_bytes_async);
 
-  if (!g_file_has_uri_scheme (file, "resource"))
+  if (!xfile_has_uri_scheme (file, "resource"))
     {
-      g_file_load_contents_async (file,
+      xfile_load_contents_async (file,
                                   cancellable,
-                                  g_file_load_bytes_cb,
+                                  xfile_load_bytes_cb,
                                   g_steal_pointer (&task));
       return;
     }
 
-  bytes = g_file_load_bytes (file, cancellable, NULL, &error);
+  bytes = xfile_load_bytes (file, cancellable, NULL, &error);
 
   if (bytes == NULL)
-    g_task_return_error (task, g_steal_pointer (&error));
+    xtask_return_error (task, g_steal_pointer (&error));
   else
-    g_task_return_pointer (task,
+    xtask_return_pointer (task,
                            g_steal_pointer (&bytes),
-                           (GDestroyNotify)g_bytes_unref);
+                           (xdestroy_notify_t)xbytes_unref);
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 /**
- * g_file_load_bytes_finish:
+ * xfile_load_bytes_finish:
  * @file: a #xfile_t
  * @result: a #xasync_result_t provided to the callback
  * @etag_out: (out) (nullable) (optional): a location to place the current
  *   entity tag for the file, or %NULL if the entity tag is not needed
  * @error: a location for a #xerror_t, or %NULL
  *
- * Completes an asynchronous request to g_file_load_bytes_async().
+ * Completes an asynchronous request to xfile_load_bytes_async().
  *
  * For resources, @etag_out will be set to %NULL.
  *
- * The data contained in the resulting #GBytes is always zero-terminated, but
- * this is not included in the #GBytes length. The resulting #GBytes should be
- * freed with g_bytes_unref() when no longer in use.
+ * The data contained in the resulting #xbytes_t is always zero-terminated, but
+ * this is not included in the #xbytes_t length. The resulting #xbytes_t should be
+ * freed with xbytes_unref() when no longer in use.
  *
- * See g_file_load_bytes() for more information.
+ * See xfile_load_bytes() for more information.
  *
- * Returns: (transfer full): a #GBytes or %NULL and @error is set
+ * Returns: (transfer full): a #xbytes_t or %NULL and @error is set
  *
  * Since: 2.56
  */
-GBytes *
-g_file_load_bytes_finish (xfile_t         *file,
+xbytes_t *
+xfile_load_bytes_finish (xfile_t         *file,
                           xasync_result_t  *result,
                           xchar_t        **etag_out,
                           xerror_t       **error)
 {
-  GBytes *bytes;
+  xbytes_t *bytes;
 
   g_return_val_if_fail (X_IS_FILE (file), NULL);
   g_return_val_if_fail (X_IS_TASK (result), NULL);
-  g_return_val_if_fail (g_task_is_valid (G_TASK (result), file), NULL);
+  g_return_val_if_fail (xtask_is_valid (XTASK (result), file), NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  bytes = g_task_propagate_pointer (G_TASK (result), error);
+  bytes = xtask_propagate_pointer (XTASK (result), error);
 
   if (etag_out != NULL)
-    *etag_out = g_strdup (g_task_get_task_data (G_TASK (result)));
+    *etag_out = xstrdup (xtask_get_task_data (XTASK (result)));
 
   return bytes;
 }

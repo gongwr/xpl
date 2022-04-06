@@ -77,12 +77,12 @@
     </para>
     <para>
       A useful tool in debugging reference counting problems is to
-      set breakpoints in gdb on g_object_ref() and g_object_unref().
+      set breakpoints in gdb on xobject_ref() and xobject_unref().
       Once you know the address of the object you are interested in,
       you can make the breakpoints conditional:
       <programlisting>
-break g_object_ref if _object == 0xcafebabe
-break g_object_unref if _object == 0xcafebabe
+break xobject_ref if _object == 0xcafebabe
+break xobject_unref if _object == 0xcafebabe
       </programlisting>
     </para>
   </chapter>
@@ -107,7 +107,7 @@ break g_object_unref if _object == 0xcafebabe
  * Stops emission of "child-notify" signals on @widget. The signals are
  * queued until gtk_widget_thaw_child_notify() is called on @widget.
  *
- * This is the analogue of g_object_freeze_notify() for child properties.
+ * This is the analogue of xobject_freeze_notify() for child properties.
  **/
 void
 gtk_widget_freeze_child_notify (GtkWidget *widget)

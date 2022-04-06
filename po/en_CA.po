@@ -160,37 +160,37 @@ msgstr "Invalid hostname"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:202
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "AM"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:204
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "PM"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:207
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %d %b %Y %r %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:210
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%F"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:213
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%r"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:216
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -1464,12 +1464,12 @@ msgid "%s type"
 msgstr "%s type"
 
 #: ../gio/gcredentials.c:273 ../gio/gcredentials.c:495
-msgid "GCredentials is not implemented on this OS"
-msgstr "GCredentials is not implemented on this OS"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "xcredentials_t is not implemented on this OS"
 
 #: ../gio/gcredentials.c:447
-msgid "There is no GCredentials support for your platform"
-msgstr "There is no GCredentials support for your platform"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "There is no xcredentials_t support for your platform"
 
 #: ../gio/gdatainputstream.c:311
 msgid "Unexpected early end-of-stream"
@@ -1646,8 +1646,8 @@ msgstr ""
 "Exhausted all available authentication mechanisms (tried: %s) (available: %s)"
 
 #: ../gio/gdbusauth.c:1159
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
 
 #: ../gio/gdbusauthmechanismsha1.c:266
 #, c-format
@@ -2322,27 +2322,27 @@ msgstr "TLS support is not available"
 
 #: ../gio/gemblem.c:324
 #, c-format
-msgid "Can't handle version %d of GEmblem encoding"
-msgstr "Can't handle version %d of GEmblem encoding"
+msgid "Can't handle version %d of xemblem_t encoding"
+msgstr "Can't handle version %d of xemblem_t encoding"
 
 #: ../gio/gemblem.c:334
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "Malformed number of tokens (%d) in GEmblem encoding"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "Malformed number of tokens (%d) in xemblem_t encoding"
 
 #: ../gio/gemblemedicon.c:368
 #, c-format
-msgid "Can't handle version %d of GEmblemedIcon encoding"
-msgstr "Can't handle version %d of GEmblemedIcon encoding"
+msgid "Can't handle version %d of xemblemed_icon_t encoding"
+msgstr "Can't handle version %d of xemblemed_icon_t encoding"
 
 #: ../gio/gemblemedicon.c:378
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
 
 #: ../gio/gemblemedicon.c:401
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "Expected a GEmblem for GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "Expected a xemblem_t for xemblemed_icon_t"
 
 #: ../gio/gfile.c:871 ../gio/gfile.c:1102 ../gio/gfile.c:1237
 #: ../gio/gfile.c:1474 ../gio/gfile.c:1528 ../gio/gfile.c:1585
@@ -2435,12 +2435,12 @@ msgstr "File enumerator is already closed"
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can't handle version %d of GFileIcon encoding"
-msgstr "Can't handle version %d of GFileIcon encoding"
+msgid "Can't handle version %d of xfile_icon_t encoding"
+msgstr "Can't handle version %d of xfile_icon_t encoding"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for GFileIcon"
-msgstr "Malformed input data for GFileIcon"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "Malformed input data for xfile_icon_t"
 
 #: ../gio/gfileinputstream.c:154 ../gio/gfileinputstream.c:420
 #: ../gio/gfileiostream.c:170 ../gio/gfileoutputstream.c:169
@@ -2771,11 +2771,11 @@ msgstr "Do not enforce key name restrictions"
 
 #: ../gio/glib-compile-schemas.c:1973
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 
@@ -3090,8 +3090,8 @@ msgid "Invalid seek request"
 msgstr "Invalid seek request"
 
 #: ../gio/gmemoryinputstream.c:520
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "Cannot truncate GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "Cannot truncate xmemory_input_stream_t"
 
 #: ../gio/gmemoryoutputstream.c:496
 msgid "Memory output stream not resizable"
@@ -3539,8 +3539,8 @@ msgid "Error sending message: %s"
 msgstr "Error sending message: %s"
 
 #: ../gio/gsocket.c:3081
-msgid "GSocketControlMessage not supported on windows"
-msgstr "GSocketControlMessage not supported on windows"
+msgid "xsocket_control_message_t not supported on windows"
+msgstr "xsocket_control_message_t not supported on windows"
 
 #: ../gio/gsocket.c:3358 ../gio/gsocket.c:3494
 #, c-format
@@ -3664,8 +3664,8 @@ msgstr "Unknown SOCKSv5 proxy error."
 
 #: ../gio/gthemedicon.c:498
 #, c-format
-msgid "Can't handle version %d of GThemedIcon encoding"
-msgstr "Can't handle version %d of GThemedIcon encoding"
+msgid "Can't handle version %d of xthemed_icon_t encoding"
+msgstr "Can't handle version %d of xthemed_icon_t encoding"
 
 #: ../gio/gtlscertificate.c:226
 msgid "No PEM-encoded private key found"

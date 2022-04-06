@@ -36,18 +36,18 @@ msgstr ""
 "\n"
 
 #: ../gio/gapplication.c:514
-msgid "Enter GApplication service mode (use from D-Bus service files)"
-msgstr "GApplication सर्विस मोड डालें (use from D-Bus service files)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgstr "xapplication_t सर्विस मोड डालें (use from D-Bus service files)"
 
 #: ../gio/gapplication.c:519
 #| msgid "Application Options:"
-msgid "GApplication options"
-msgstr "GApplication विकल्प:"
+msgid "xapplication_t options"
+msgstr "xapplication_t विकल्प:"
 
 #: ../gio/gapplication.c:519
 #| msgid "Application Options:"
-msgid "Show GApplication options"
-msgstr "GApplication विकल्प दिखाएँ:"
+msgid "Show xapplication_t options"
+msgstr "xapplication_t विकल्प दिखाएँ:"
 
 #: ../gio/gapplication-tool.c:45 ../gio/gapplication-tool.c:46
 #: ../gio/gresource-tool.c:485 ../gio/gsettings-tool.c:508
@@ -296,8 +296,8 @@ msgid "Seek not supported on base stream"
 msgstr "खोज बेस स्ट्रीम पर समर्थित नहीं है"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "GBufferedInputStream काट नहीं सकता है"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "xbuffered_input_stream काट नहीं सकता है"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1017
 #: ../gio/giostream.c:277 ../gio/goutputstream.c:1464
@@ -371,19 +371,19 @@ msgid "%s filetype"
 msgstr "%s फ़ाइल प्रकार"
 
 #: ../gio/gcredentials.c:312 ../gio/gcredentials.c:571
-msgid "GCredentials is not implemented on this OS"
-msgstr "GCredentials इस OS पर लागू नहीं है"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "xcredentials_t इस OS पर लागू नहीं है"
 
 #: ../gio/gcredentials.c:467
-msgid "There is no GCredentials support for your platform"
-msgstr "आपके प्लेटफ़ार्म के लिए कोई GCredentials समर्थन नहीं है"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "आपके प्लेटफ़ार्म के लिए कोई xcredentials_t समर्थन नहीं है"
 
 #: ../gio/gcredentials.c:513
-msgid "GCredentials does not contain a process ID on this OS"
-msgstr "GCredentials में प्रक्रिया आईडी इस OS पर समाहित नहीं है"
+msgid "xcredentials_t does not contain a process ID on this OS"
+msgstr "xcredentials_t में प्रक्रिया आईडी इस OS पर समाहित नहीं है"
 
 #: ../gio/gcredentials.c:565
-#| msgid "GCredentials is not implemented on this OS"
+#| msgid "xcredentials_t is not implemented on this OS"
 msgid "Credentials spoofing is not possible on this OS"
 msgstr "क्रेडेंशियल स्पूफिंग इस OS पर संभव नहीं है"
 
@@ -565,8 +565,8 @@ msgid ""
 msgstr "सभी उपलब्ध प्रमाणीकरण तंत्र समाप्त (कोशिश: %s) (उपलब्ध: %s)"
 
 #: ../gio/gdbusauth.c:1170
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "GDBusAuthObserver के माध्यम से रद्द :: अधिकृत प्रमाणीकृत - सहकर्मी "
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "xdbus_auth_observer_t के माध्यम से रद्द :: अधिकृत प्रमाणीकृत - सहकर्मी "
 
 #: ../gio/gdbusauthmechanismsha1.c:261
 #, c-format
@@ -1265,27 +1265,27 @@ msgstr "TLS समर्थन उपलब्ध नहीं है"
 
 #: ../gio/gemblem.c:323
 #, c-format
-msgid "Can't handle version %d of GEmblem encoding"
-msgstr "GEmblem एन्कोडिंग का %d संस्करण नियंत्रित नहीं कर सकता है"
+msgid "Can't handle version %d of xemblem_t encoding"
+msgstr "xemblem_t एन्कोडिंग का %d संस्करण नियंत्रित नहीं कर सकता है"
 
 #: ../gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "GEmblem एन्कोडिंग में (%d) टोकन की विरूपित संख्या"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "xemblem_t एन्कोडिंग में (%d) टोकन की विरूपित संख्या"
 
 #: ../gio/gemblemedicon.c:362
 #, c-format
-msgid "Can't handle version %d of GEmblemedIcon encoding"
-msgstr "GEmblemedIcon एन्कोडिंग का %d संस्करण नियंत्रित नहीं कर सकता है"
+msgid "Can't handle version %d of xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t एन्कोडिंग का %d संस्करण नियंत्रित नहीं कर सकता है"
 
 #: ../gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "GEmblemedIcon एन्कोडिंग में (%d) टोकन की विरूपित संख्या"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t एन्कोडिंग में (%d) टोकन की विरूपित संख्या"
 
 #: ../gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "GEmblemedIcon के लिए एक GEmblem प्रत्याशित"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "xemblemed_icon_t के लिए एक xemblem_t प्रत्याशित"
 
 #: ../gio/gfile.c:956 ../gio/gfile.c:1194 ../gio/gfile.c:1332
 #: ../gio/gfile.c:1570 ../gio/gfile.c:1625 ../gio/gfile.c:1683
@@ -1391,12 +1391,12 @@ msgstr "फ़ाइल इन्यूमेरेटर पहले से �
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can't handle version %d of GFileIcon encoding"
-msgstr "GFileIcon एन्कोडिंग का %d संस्करण नियंत्रित नहीं कर सकता है"
+msgid "Can't handle version %d of xfile_icon_t encoding"
+msgstr "xfile_icon_t एन्कोडिंग का %d संस्करण नियंत्रित नहीं कर सकता है"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for GFileIcon"
-msgstr "GFileIcon के लिए विरूपित इनपुट आँकड़ा"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "xfile_icon_t के लिए विरूपित इनपुट आँकड़ा"
 
 #: ../gio/gfileinputstream.c:149 ../gio/gfileinputstream.c:394
 #: ../gio/gfileiostream.c:167 ../gio/gfileoutputstream.c:164
@@ -1847,11 +1847,11 @@ msgstr "कुंजी नाम प्रतिबंध लागू नह�
 
 #: ../gio/glib-compile-schemas.c:2026
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"स्कीमा कैश में सभी GSettings स्कीमा फ़ाइलों को संकलित करें.\n"
+"स्कीमा कैश में सभी xsettings_t स्कीमा फ़ाइलों को संकलित करें.\n"
 "स्कीमा फ़ाइलों के लिए विस्तार करने के लिए आवश्यक हैं .gschema.xml,\n"
 "और कैश फ़ाइल नामक gschemas.compiled है."
 
@@ -2173,8 +2173,8 @@ msgid "Invalid seek request"
 msgstr "अवैध प्राप्ति आग्रह"
 
 #: ../gio/gmemoryinputstream.c:505
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "GMemoryInputStream काट नहीं सकता है"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "xmemory_input_stream_t काट नहीं सकता है"
 
 #: ../gio/gmemoryoutputstream.c:565
 msgid "Memory output stream not resizable"
@@ -2793,8 +2793,8 @@ msgid "Error sending message: %s"
 msgstr "संदेश भेजने में त्रुटि: %s"
 
 #: ../gio/gsocket.c:3922
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "GSocketControlMessage विंडोज़ पर समर्थित नहीं"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "xsocket_control_message_t विंडोज़ पर समर्थित नहीं"
 
 #: ../gio/gsocket.c:4259 ../gio/gsocket.c:4394
 #, c-format
@@ -2936,8 +2936,8 @@ msgstr "अज्ञात SOCKSv5 प्रॉक्सी त्रुटि."
 
 #: ../gio/gthemedicon.c:518
 #, c-format
-msgid "Can't handle version %d of GThemedIcon encoding"
-msgstr "GThemedIcon एन्कोडिंग का %d संस्करण नियंत्रित नहीं कर सकता है"
+msgid "Can't handle version %d of xthemed_icon_t encoding"
+msgstr "xthemed_icon_t एन्कोडिंग का %d संस्करण नियंत्रित नहीं कर सकता है"
 
 #: ../gio/gthreadedresolver.c:118
 msgid "No valid addresses were found"
@@ -3289,37 +3289,37 @@ msgstr "अवैध होस्ट-नाम"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:201
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "पूर्वाह्न"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:203
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "अपराह्न"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:206
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%A %d %b %Y %I:%M:%S %p %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:209
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%A %d %b %Y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:212
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%I:%M:%S  %Z"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:215
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p %Z"
 

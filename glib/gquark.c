@@ -45,10 +45,10 @@
 #define QUARK_BLOCK_SIZE         2048
 #define QUARK_STRING_BLOCK_SIZE (4096 - sizeof (xsize_t))
 
-static inline GQuark  quark_new (xchar_t *string);
+static inline xquark  quark_new (xchar_t *string);
 
 G_LOCK_DEFINE_STATIC (quark_global);
-static GHashTable    *quark_ht = NULL;
+static xhashtable_t    *quark_ht = NULL;
 static xchar_t        **quarks = NULL;
 static xint_t           quark_seq_id = 0;
 static xchar_t         *quark_block = NULL;
@@ -58,7 +58,7 @@ void
 g_quark_init (void)
 {
   g_assert (quark_seq_id == 0);
-  quark_ht = g_hash_table_new (g_str_hash, g_str_equal);
+  quark_ht = xhash_table_new (xstr_hash, xstr_equal);
   quarks = g_new (xchar_t*, QUARK_BLOCK_SIZE);
   quarks[0] = NULL;
   quark_seq_id = 1;
@@ -71,7 +71,7 @@ g_quark_init (void)
  *     unique integer identifier
  *
  * Quarks are associations between strings and integer identifiers.
- * Given either the string or the #GQuark identifier it is possible to
+ * Given either the string or the #xquark identifier it is possible to
  * retrieve the other.
  *
  * Quarks are used for both [datasets][glib-Datasets] and
@@ -80,10 +80,10 @@ g_quark_init (void)
  * To create a new quark from a string, use g_quark_from_string() or
  * g_quark_from_static_string().
  *
- * To find the string corresponding to a given #GQuark, use
+ * To find the string corresponding to a given #xquark, use
  * g_quark_to_string().
  *
- * To find the #GQuark corresponding to a given string, use
+ * To find the #xquark corresponding to a given string, use
  * g_quark_try_string().
  *
  * Another use for the string pool maintained for the quark functions
@@ -95,19 +95,19 @@ g_quark_init (void)
  */
 
 /**
- * GQuark:
+ * xquark:
  *
- * A GQuark is a non-zero integer which uniquely identifies a
- * particular string. A GQuark value of zero is associated to %NULL.
+ * A xquark is a non-zero integer which uniquely identifies a
+ * particular string. A xquark value of zero is associated to %NULL.
  */
 
 /**
  * G_DEFINE_QUARK:
- * @QN: the name to return a #GQuark for
+ * @QN: the name to return a #xquark for
  * @q_n: prefix for the function name
  *
  * A convenience macro which defines a function returning the
- * #GQuark for the name @QN. The function will be named
+ * #xquark for the name @QN. The function will be named
  * @q_n_quark().
  *
  * Note that the quark name will be stringified automatically
@@ -120,28 +120,28 @@ g_quark_init (void)
  * g_quark_try_string:
  * @string: (nullable): a string
  *
- * Gets the #GQuark associated with the given string, or 0 if string is
- * %NULL or it has no associated #GQuark.
+ * Gets the #xquark associated with the given string, or 0 if string is
+ * %NULL or it has no associated #xquark.
  *
- * If you want the GQuark to be created if it doesn't already exist,
+ * If you want the xquark to be created if it doesn't already exist,
  * use g_quark_from_string() or g_quark_from_static_string().
  *
  * This function must not be used before library constructors have finished
  * running.
  *
- * Returns: the #GQuark associated with the string, or 0 if @string is
- *     %NULL or there is no #GQuark associated with it
+ * Returns: the #xquark associated with the string, or 0 if @string is
+ *     %NULL or there is no #xquark associated with it
  */
-GQuark
+xquark
 g_quark_try_string (const xchar_t *string)
 {
-  GQuark quark = 0;
+  xquark quark = 0;
 
   if (string == NULL)
     return 0;
 
   G_LOCK (quark_global);
-  quark = GPOINTER_TO_UINT (g_hash_table_lookup (quark_ht, string));
+  quark = GPOINTER_TO_UINT (xhash_table_lookup (quark_ht, string));
   G_UNLOCK (quark_global);
 
   return quark;
@@ -159,7 +159,7 @@ quark_strdup (const xchar_t *string)
   /* For strings longer than half the block size, fall back
      to strdup so that we fill our blocks at least 50%. */
   if (len > QUARK_STRING_BLOCK_SIZE / 2)
-    return g_strdup (string);
+    return xstrdup (string);
 
   if (quark_block == NULL ||
       QUARK_STRING_BLOCK_SIZE - quark_block_offset < len)
@@ -176,13 +176,13 @@ quark_strdup (const xchar_t *string)
 }
 
 /* HOLDS: quark_global_lock */
-static inline GQuark
+static inline xquark
 quark_from_string (const xchar_t *string,
                    xboolean_t     duplicate)
 {
-  GQuark quark = 0;
+  xquark quark = 0;
 
-  quark = GPOINTER_TO_UINT (g_hash_table_lookup (quark_ht, string));
+  quark = GPOINTER_TO_UINT (xhash_table_lookup (quark_ht, string));
 
   if (!quark)
     {
@@ -193,11 +193,11 @@ quark_from_string (const xchar_t *string,
   return quark;
 }
 
-static inline GQuark
+static inline xquark
 quark_from_string_locked (const xchar_t   *string,
                           xboolean_t       duplicate)
 {
-  GQuark quark = 0;
+  xquark quark = 0;
 
   if (!string)
     return 0;
@@ -213,17 +213,17 @@ quark_from_string_locked (const xchar_t   *string,
  * g_quark_from_string:
  * @string: (nullable): a string
  *
- * Gets the #GQuark identifying the given string. If the string does
- * not currently have an associated #GQuark, a new #GQuark is created,
+ * Gets the #xquark identifying the given string. If the string does
+ * not currently have an associated #xquark, a new #xquark is created,
  * using a copy of the string.
  *
  * This function must not be used before library constructors have finished
  * running. In particular, this means it cannot be used to initialize global
  * variables in C++.
  *
- * Returns: the #GQuark identifying the string, or 0 if @string is %NULL
+ * Returns: the #xquark identifying the string, or 0 if @string is %NULL
  */
-GQuark
+xquark
 g_quark_from_string (const xchar_t *string)
 {
   return quark_from_string_locked (string, TRUE);
@@ -233,12 +233,12 @@ g_quark_from_string (const xchar_t *string)
  * g_quark_from_static_string:
  * @string: (nullable): a string
  *
- * Gets the #GQuark identifying the given (static) string. If the
- * string does not currently have an associated #GQuark, a new #GQuark
+ * Gets the #xquark identifying the given (static) string. If the
+ * string does not currently have an associated #xquark, a new #xquark
  * is created, linked to the given string.
  *
  * Note that this function is identical to g_quark_from_string() except
- * that if a new #GQuark is created the string itself is used rather
+ * that if a new #xquark is created the string itself is used rather
  * than a copy. This saves memory, but can only be used if the string
  * will continue to exist until the program terminates. It can be used
  * with statically allocated strings in the main program, but not with
@@ -250,9 +250,9 @@ g_quark_from_string (const xchar_t *string)
  * running. In particular, this means it cannot be used to initialize global
  * variables in C++.
  *
- * Returns: the #GQuark identifying the string, or 0 if @string is %NULL
+ * Returns: the #xquark identifying the string, or 0 if @string is %NULL
  */
-GQuark
+xquark
 g_quark_from_static_string (const xchar_t *string)
 {
   return quark_from_string_locked (string, FALSE);
@@ -260,14 +260,14 @@ g_quark_from_static_string (const xchar_t *string)
 
 /**
  * g_quark_to_string:
- * @quark: a #GQuark.
+ * @quark: a #xquark.
  *
- * Gets the string associated with the given #GQuark.
+ * Gets the string associated with the given #xquark.
  *
- * Returns: the string associated with the #GQuark
+ * Returns: the string associated with the #xquark
  */
 const xchar_t *
-g_quark_to_string (GQuark quark)
+g_quark_to_string (xquark quark)
 {
   xchar_t* result = NULL;
   xchar_t **strings;
@@ -283,10 +283,10 @@ g_quark_to_string (GQuark quark)
 }
 
 /* HOLDS: g_quark_global_lock */
-static inline GQuark
+static inline xquark
 quark_new (xchar_t *string)
 {
-  GQuark quark;
+  xquark quark;
   xchar_t **quarks_new;
 
   if (quark_seq_id % QUARK_BLOCK_SIZE == 0)
@@ -304,7 +304,7 @@ quark_new (xchar_t *string)
 
   quark = quark_seq_id;
   g_atomic_pointer_set (&quarks[quark], string);
-  g_hash_table_insert (quark_ht, string, GUINT_TO_POINTER (quark));
+  xhash_table_insert (quark_ht, string, GUINT_TO_POINTER (quark));
   g_atomic_int_inc (&quark_seq_id);
 
   return quark;
@@ -315,7 +315,7 @@ quark_intern_string_locked (const xchar_t   *string,
                             xboolean_t       duplicate)
 {
   const xchar_t *result;
-  GQuark quark;
+  xquark quark;
 
   if (!string)
     return NULL;

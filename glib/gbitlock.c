@@ -36,8 +36,8 @@
 #endif
 
 #ifndef HAVE_FUTEX
-static GMutex g_futex_mutex;
-static GSList *g_futex_address_list = NULL;
+static xmutex_t g_futex_mutex;
+static xslist_t *g_futex_address_list = NULL;
 #endif
 
 #ifdef HAVE_FUTEX
@@ -106,13 +106,13 @@ typedef struct
 {
   const xint_t *address;
   xint_t ref_count;
-  GCond wait_queue;
+  xcond_t wait_queue;
 } WaitAddress;
 
 static WaitAddress *
 g_futex_find_address (const xint_t *address)
 {
-  GSList *node;
+  xslist_t *node;
 
   for (node = g_futex_address_list; node; node = node->next)
     {
@@ -141,7 +141,7 @@ g_futex_wait (const xint_t *address,
           g_cond_init (&waiter->wait_queue);
           waiter->ref_count = 0;
           g_futex_address_list =
-            g_slist_prepend (g_futex_address_list, waiter);
+            xslist_prepend (g_futex_address_list, waiter);
         }
 
       waiter->ref_count++;
@@ -150,7 +150,7 @@ g_futex_wait (const xint_t *address,
       if (!--waiter->ref_count)
         {
           g_futex_address_list =
-            g_slist_remove (g_futex_address_list, waiter);
+            xslist_remove (g_futex_address_list, waiter);
           g_cond_clear (&waiter->wait_queue);
           g_slice_free (WaitAddress, waiter);
         }

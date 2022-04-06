@@ -9,12 +9,12 @@
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static GDBusNodeInfo *introspection_data = NULL;
+static xdbus_node_info_t *introspection_data = NULL;
 
 /* Introspection data for the service we are exporting */
 static const xchar_t introspection_xml[] =
   "<node>"
-  "  <interface name='org.gtk.GDBus.TestInterface'>"
+  "  <interface name='org.gtk.GDBus.test_interface_t'>"
   "    <annotation name='org.gtk.GDBus.Annotation' value='OnInterface'/>"
   "    <annotation name='org.gtk.GDBus.Annotation' value='AlsoOnInterface'/>"
   "    <method name='HelloWorld'>"
@@ -44,7 +44,7 @@ static const xchar_t introspection_xml[] =
   "    <property type='s' name='ReadingAlwaysThrowsError' access='read'/>"
   "    <property type='s' name='WritingAlwaysThrowsError' access='readwrite'/>"
   "    <property type='s' name='OnlyWritable' access='write'/>"
-  "    <property type='s' name='Foo' access='read'/>"
+  "    <property type='s' name='foo_t' access='read'/>"
   "    <property type='s' name='Bar' access='read'/>"
   "  </interface>"
   "</node>";
@@ -52,58 +52,58 @@ static const xchar_t introspection_xml[] =
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-handle_method_call (GDBusConnection       *connection,
+handle_method_call (xdbus_connection_t       *connection,
                     const xchar_t           *sender,
                     const xchar_t           *object_path,
                     const xchar_t           *interface_name,
                     const xchar_t           *method_name,
                     xvariant_t              *parameters,
-                    GDBusMethodInvocation *invocation,
+                    xdbus_method_invocation_t *invocation,
                     xpointer_t               user_data)
 {
-  if (g_strcmp0 (method_name, "HelloWorld") == 0)
+  if (xstrcmp0 (method_name, "HelloWorld") == 0)
     {
       const xchar_t *greeting;
 
-      g_variant_get (parameters, "(&s)", &greeting);
+      xvariant_get (parameters, "(&s)", &greeting);
 
-      if (g_strcmp0 (greeting, "Return Unregistered") == 0)
+      if (xstrcmp0 (greeting, "Return Unregistered") == 0)
         {
-          g_dbus_method_invocation_return_error (invocation,
+          xdbus_method_invocation_return_error (invocation,
                                                  G_IO_ERROR,
                                                  G_IO_ERROR_FAILED_HANDLED,
                                                  "As requested, here's a xerror_t not registered (G_IO_ERROR_FAILED_HANDLED)");
         }
-      else if (g_strcmp0 (greeting, "Return Registered") == 0)
+      else if (xstrcmp0 (greeting, "Return Registered") == 0)
         {
-          g_dbus_method_invocation_return_error (invocation,
+          xdbus_method_invocation_return_error (invocation,
                                                  G_DBUS_ERROR,
                                                  G_DBUS_ERROR_MATCH_RULE_NOT_FOUND,
                                                  "As requested, here's a xerror_t that is registered (G_DBUS_ERROR_MATCH_RULE_NOT_FOUND)");
         }
-      else if (g_strcmp0 (greeting, "Return Raw") == 0)
+      else if (xstrcmp0 (greeting, "Return Raw") == 0)
         {
-          g_dbus_method_invocation_return_dbus_error (invocation,
+          xdbus_method_invocation_return_dbus_error (invocation,
                                                       "org.gtk.GDBus.SomeErrorName",
                                                       "As requested, here's a raw D-Bus error");
         }
       else
         {
           xchar_t *response;
-          response = g_strdup_printf ("You greeted me with '%s'. Thanks!", greeting);
-          g_dbus_method_invocation_return_value (invocation,
-                                                 g_variant_new ("(s)", response));
+          response = xstrdup_printf ("You greeted me with '%s'. Thanks!", greeting);
+          xdbus_method_invocation_return_value (invocation,
+                                                 xvariant_new ("(s)", response));
           g_free (response);
         }
     }
-  else if (g_strcmp0 (method_name, "EmitSignal") == 0)
+  else if (xstrcmp0 (method_name, "EmitSignal") == 0)
     {
       xerror_t *local_error;
       xdouble_t speed_in_mph;
       xchar_t *speed_as_string;
 
-      g_variant_get (parameters, "(d)", &speed_in_mph);
-      speed_as_string = g_strdup_printf ("%g mph!", speed_in_mph);
+      xvariant_get (parameters, "(d)", &speed_in_mph);
+      speed_as_string = xstrdup_printf ("%g mph!", speed_in_mph);
 
       local_error = NULL;
       g_dbus_connection_emit_signal (connection,
@@ -111,22 +111,22 @@ handle_method_call (GDBusConnection       *connection,
                                      object_path,
                                      interface_name,
                                      "VelocityChanged",
-                                     g_variant_new ("(ds)",
+                                     xvariant_new ("(ds)",
                                                     speed_in_mph,
                                                     speed_as_string),
                                      &local_error);
       g_assert_no_error (local_error);
       g_free (speed_as_string);
 
-      g_dbus_method_invocation_return_value (invocation, NULL);
+      xdbus_method_invocation_return_value (invocation, NULL);
     }
-  else if (g_strcmp0 (method_name, "GimmeStdout") == 0)
+  else if (xstrcmp0 (method_name, "GimmeStdout") == 0)
     {
 #ifdef G_OS_UNIX
       if (g_dbus_connection_get_capabilities (connection) & G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING)
         {
-          GDBusMessage *reply;
-          GUnixFDList *fd_list;
+          xdbus_message_t *reply;
+          xunix_fd_list_t *fd_list;
           xerror_t *error;
 
           fd_list = g_unix_fd_list_new ();
@@ -134,8 +134,8 @@ handle_method_call (GDBusConnection       *connection,
           g_unix_fd_list_append (fd_list, STDOUT_FILENO, &error);
           g_assert_no_error (error);
 
-          reply = g_dbus_message_new_method_reply (g_dbus_method_invocation_get_message (invocation));
-          g_dbus_message_set_unix_fd_list (reply, fd_list);
+          reply = xdbus_message_new_method_reply (xdbus_method_invocation_get_message (invocation));
+          xdbus_message_set_unix_fd_list (reply, fd_list);
 
           error = NULL;
           g_dbus_connection_send_message (connection,
@@ -145,18 +145,18 @@ handle_method_call (GDBusConnection       *connection,
                                           &error);
           g_assert_no_error (error);
 
-          g_object_unref (invocation);
-          g_object_unref (fd_list);
-          g_object_unref (reply);
+          xobject_unref (invocation);
+          xobject_unref (fd_list);
+          xobject_unref (reply);
         }
       else
         {
-          g_dbus_method_invocation_return_dbus_error (invocation,
+          xdbus_method_invocation_return_dbus_error (invocation,
                                                       "org.gtk.GDBus.Failed",
                                                       "Your message bus daemon does not support file descriptor passing (need D-Bus >= 1.3.0)");
         }
 #else
-      g_dbus_method_invocation_return_dbus_error (invocation,
+      xdbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.GDBus.NotOnUnix",
                                                   "Your OS does not support file descriptor passing");
 #endif
@@ -168,7 +168,7 @@ static xchar_t *_global_title = NULL;
 static xboolean_t swap_a_and_b = FALSE;
 
 static xvariant_t *
-handle_get_property (GDBusConnection  *connection,
+handle_get_property (xdbus_connection_t  *connection,
                      const xchar_t      *sender,
                      const xchar_t      *object_path,
                      const xchar_t      *interface_name,
@@ -179,17 +179,17 @@ handle_get_property (GDBusConnection  *connection,
   xvariant_t *ret;
 
   ret = NULL;
-  if (g_strcmp0 (property_name, "FluxCapicitorName") == 0)
+  if (xstrcmp0 (property_name, "FluxCapicitorName") == 0)
     {
-      ret = g_variant_new_string ("DeLorean");
+      ret = xvariant_new_string ("DeLorean");
     }
-  else if (g_strcmp0 (property_name, "Title") == 0)
+  else if (xstrcmp0 (property_name, "Title") == 0)
     {
       if (_global_title == NULL)
-        _global_title = g_strdup ("Back To C!");
-      ret = g_variant_new_string (_global_title);
+        _global_title = xstrdup ("Back To C!");
+      ret = xvariant_new_string (_global_title);
     }
-  else if (g_strcmp0 (property_name, "ReadingAlwaysThrowsError") == 0)
+  else if (xstrcmp0 (property_name, "ReadingAlwaysThrowsError") == 0)
     {
       g_set_error (error,
                    G_IO_ERROR,
@@ -198,24 +198,24 @@ handle_get_property (GDBusConnection  *connection,
                    "always results in an error. kthxbye",
                    sender);
     }
-  else if (g_strcmp0 (property_name, "WritingAlwaysThrowsError") == 0)
+  else if (xstrcmp0 (property_name, "WritingAlwaysThrowsError") == 0)
     {
-      ret = g_variant_new_string ("There's no home like home");
+      ret = xvariant_new_string ("There's no home like home");
     }
-  else if (g_strcmp0 (property_name, "Foo") == 0)
+  else if (xstrcmp0 (property_name, "foo_t") == 0)
     {
-      ret = g_variant_new_string (swap_a_and_b ? "Tock" : "Tick");
+      ret = xvariant_new_string (swap_a_and_b ? "Tock" : "Tick");
     }
-  else if (g_strcmp0 (property_name, "Bar") == 0)
+  else if (xstrcmp0 (property_name, "Bar") == 0)
     {
-      ret = g_variant_new_string (swap_a_and_b ? "Tick" : "Tock");
+      ret = xvariant_new_string (swap_a_and_b ? "Tick" : "Tock");
     }
 
   return ret;
 }
 
 static xboolean_t
-handle_set_property (GDBusConnection  *connection,
+handle_set_property (xdbus_connection_t  *connection,
                      const xchar_t      *sender,
                      const xchar_t      *object_path,
                      const xchar_t      *interface_name,
@@ -224,28 +224,28 @@ handle_set_property (GDBusConnection  *connection,
                      xerror_t          **error,
                      xpointer_t          user_data)
 {
-  if (g_strcmp0 (property_name, "Title") == 0)
+  if (xstrcmp0 (property_name, "Title") == 0)
     {
-      if (g_strcmp0 (_global_title, g_variant_get_string (value, NULL)) != 0)
+      if (xstrcmp0 (_global_title, xvariant_get_string (value, NULL)) != 0)
         {
-          GVariantBuilder *builder;
+          xvariant_builder_t *builder;
           xerror_t *local_error;
 
           g_free (_global_title);
-          _global_title = g_variant_dup_string (value, NULL);
+          _global_title = xvariant_dup_string (value, NULL);
 
           local_error = NULL;
-          builder = g_variant_builder_new (G_VARIANT_TYPE_ARRAY);
-          g_variant_builder_add (builder,
+          builder = xvariant_builder_new (G_VARIANT_TYPE_ARRAY);
+          xvariant_builder_add (builder,
                                  "{sv}",
                                  "Title",
-                                 g_variant_new_string (_global_title));
+                                 xvariant_new_string (_global_title));
           g_dbus_connection_emit_signal (connection,
                                          NULL,
                                          object_path,
                                          "org.freedesktop.DBus.Properties",
                                          "PropertiesChanged",
-                                         g_variant_new ("(sa{sv}as)",
+                                         xvariant_new ("(sa{sv}as)",
                                                         interface_name,
                                                         builder,
                                                         NULL),
@@ -253,11 +253,11 @@ handle_set_property (GDBusConnection  *connection,
           g_assert_no_error (local_error);
         }
     }
-  else if (g_strcmp0 (property_name, "ReadingAlwaysThrowsError") == 0)
+  else if (xstrcmp0 (property_name, "ReadingAlwaysThrowsError") == 0)
     {
       /* do nothing - they can't read it after all! */
     }
-  else if (g_strcmp0 (property_name, "WritingAlwaysThrowsError") == 0)
+  else if (xstrcmp0 (property_name, "WritingAlwaysThrowsError") == 0)
     {
       g_set_error (error,
                    G_IO_ERROR,
@@ -272,7 +272,7 @@ handle_set_property (GDBusConnection  *connection,
 
 
 /* for now */
-static const GDBusInterfaceVTable interface_vtable =
+static const xdbus_interface_vtable_t interface_vtable =
 {
   handle_method_call,
   handle_get_property,
@@ -285,31 +285,31 @@ static const GDBusInterfaceVTable interface_vtable =
 static xboolean_t
 on_timeout_cb (xpointer_t user_data)
 {
-  GDBusConnection *connection = G_DBUS_CONNECTION (user_data);
-  GVariantBuilder *builder;
-  GVariantBuilder *invalidated_builder;
+  xdbus_connection_t *connection = G_DBUS_CONNECTION (user_data);
+  xvariant_builder_t *builder;
+  xvariant_builder_t *invalidated_builder;
   xerror_t *error;
 
   swap_a_and_b = !swap_a_and_b;
 
   error = NULL;
-  builder = g_variant_builder_new (G_VARIANT_TYPE_ARRAY);
-  invalidated_builder = g_variant_builder_new (G_VARIANT_TYPE ("as"));
-  g_variant_builder_add (builder,
+  builder = xvariant_builder_new (G_VARIANT_TYPE_ARRAY);
+  invalidated_builder = xvariant_builder_new (G_VARIANT_TYPE ("as"));
+  xvariant_builder_add (builder,
                          "{sv}",
-                         "Foo",
-                         g_variant_new_string (swap_a_and_b ? "Tock" : "Tick"));
-  g_variant_builder_add (builder,
+                         "foo_t",
+                         xvariant_new_string (swap_a_and_b ? "Tock" : "Tick"));
+  xvariant_builder_add (builder,
                          "{sv}",
                          "Bar",
-                         g_variant_new_string (swap_a_and_b ? "Tick" : "Tock"));
+                         xvariant_new_string (swap_a_and_b ? "Tick" : "Tock"));
   g_dbus_connection_emit_signal (connection,
                                  NULL,
-                                 "/org/gtk/GDBus/TestObject",
+                                 "/org/gtk/GDBus/test_object_t",
                                  "org.freedesktop.DBus.Properties",
                                  "PropertiesChanged",
-                                 g_variant_new ("(sa{sv}as)",
-                                                "org.gtk.GDBus.TestInterface",
+                                 xvariant_new ("(sa{sv}as)",
+                                                "org.gtk.GDBus.test_interface_t",
                                                 builder,
                                                 invalidated_builder),
                                  &error);
@@ -322,14 +322,14 @@ on_timeout_cb (xpointer_t user_data)
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-on_bus_acquired (GDBusConnection *connection,
+on_bus_acquired (xdbus_connection_t *connection,
                  const xchar_t     *name,
                  xpointer_t         user_data)
 {
   xuint_t registration_id;
 
   registration_id = g_dbus_connection_register_object (connection,
-                                                       "/org/gtk/GDBus/TestObject",
+                                                       "/org/gtk/GDBus/test_object_t",
                                                        introspection_data->interfaces[0],
                                                        &interface_vtable,
                                                        NULL,  /* user_data */
@@ -337,21 +337,21 @@ on_bus_acquired (GDBusConnection *connection,
                                                        NULL); /* xerror_t** */
   g_assert (registration_id > 0);
 
-  /* swap value of properties Foo and Bar every two seconds */
+  /* swap value of properties foo_t and Bar every two seconds */
   g_timeout_add_seconds (2,
                          on_timeout_cb,
                          connection);
 }
 
 static void
-on_name_acquired (GDBusConnection *connection,
+on_name_acquired (xdbus_connection_t *connection,
                   const xchar_t     *name,
                   xpointer_t         user_data)
 {
 }
 
 static void
-on_name_lost (GDBusConnection *connection,
+on_name_lost (xdbus_connection_t *connection,
               const xchar_t     *name,
               xpointer_t         user_data)
 {
@@ -362,7 +362,7 @@ int
 main (int argc, char *argv[])
 {
   xuint_t owner_id;
-  GMainLoop *loop;
+  xmain_loop_t *loop;
 
   /* We are lazy here - we don't want to manually provide
    * the introspection data structures - so we just build
@@ -380,8 +380,8 @@ main (int argc, char *argv[])
                              NULL,
                              NULL);
 
-  loop = g_main_loop_new (NULL, FALSE);
-  g_main_loop_run (loop);
+  loop = xmain_loop_new (NULL, FALSE);
+  xmain_loop_run (loop);
 
   g_bus_unown_name (owner_id);
 

@@ -32,25 +32,25 @@
 #include "glib/glib-private.h"
 
 static void
-strip_string (GString *string)
+strip_string (xstring_t *string)
 {
   xint_t i;
 
   for (i = 0; g_ascii_isspace (string->str[i]); i++);
-  g_string_erase (string, 0, i);
+  xstring_erase (string, 0, i);
 
   if (string->len > 0)
     {
       /* len > 0, so there must be at least one non-whitespace character */
       for (i = string->len - 1; g_ascii_isspace (string->str[i]); i--);
-      g_string_truncate (string, i + 1);
+      xstring_truncate (string, i + 1);
     }
 }
 
 /* Handling of <enum> {{{1 */
 typedef struct
 {
-  GString *strinfo;
+  xstring_t *strinfo;
 
   xboolean_t is_flags;
 } EnumState;
@@ -60,7 +60,7 @@ enum_state_free (xpointer_t data)
 {
   EnumState *state = data;
 
-  g_string_free (state->strinfo, TRUE);
+  xstring_free (state->strinfo, TRUE);
   g_slice_free (EnumState, state);
 }
 
@@ -70,7 +70,7 @@ enum_state_new (xboolean_t is_flags)
   EnumState *state;
 
   state = g_slice_new (EnumState);
-  state->strinfo = g_string_new (NULL);
+  state->strinfo = xstring_new (NULL);
   state->is_flags = is_flags;
 
   return state;
@@ -173,12 +173,12 @@ typedef struct
 
   xchar_t         l10n;
   xchar_t        *l10n_context;
-  GString      *unparsed_default_value;
+  xstring_t      *unparsed_default_value;
   xvariant_t     *default_value;
 
-  GVariantDict *desktop_overrides;
+  xvariant_dict_t *desktop_overrides;
 
-  GString      *strinfo;
+  xstring_t      *strinfo;
   xboolean_t      is_enum;
   xboolean_t      is_flags;
 
@@ -201,12 +201,12 @@ key_state_new (const xchar_t *type_string,
                const xchar_t *gettext_domain,
                xboolean_t     is_enum,
                xboolean_t     is_flags,
-               GString     *strinfo)
+               xstring_t     *strinfo)
 {
   KeyState *state;
 
   state = g_slice_new0 (KeyState);
-  state->type = g_variant_type_new (type_string);
+  state->type = xvariant_type_new (type_string);
   state->have_gettext_domain = gettext_domain != NULL;
   state->is_enum = is_enum;
   state->is_flags = is_flags;
@@ -214,9 +214,9 @@ key_state_new (const xchar_t *type_string,
   state->description_seen = FALSE;
 
   if (strinfo)
-    state->strinfo = g_string_new_len (strinfo->str, strinfo->len);
+    state->strinfo = xstring_new_len (strinfo->str, strinfo->len);
   else
-    state->strinfo = g_string_new (NULL);
+    state->strinfo = xstring_new (NULL);
 
   return state;
 }
@@ -228,9 +228,9 @@ key_state_override (KeyState    *state,
   KeyState *copy;
 
   copy = g_slice_new0 (KeyState);
-  copy->type = g_variant_type_copy (state->type);
+  copy->type = xvariant_type_copy (state->type);
   copy->have_gettext_domain = gettext_domain != NULL;
-  copy->strinfo = g_string_new_len (state->strinfo->str,
+  copy->strinfo = xstring_new_len (state->strinfo->str,
                                     state->strinfo->len);
   copy->is_enum = state->is_enum;
   copy->is_flags = state->is_flags;
@@ -238,8 +238,8 @@ key_state_override (KeyState    *state,
 
   if (state->minimum)
     {
-      copy->minimum = g_variant_ref (state->minimum);
-      copy->maximum = g_variant_ref (state->maximum);
+      copy->minimum = xvariant_ref (state->minimum);
+      copy->maximum = xvariant_ref (state->maximum);
     }
 
   return copy;
@@ -251,38 +251,38 @@ key_state_new_child (const xchar_t *child_schema)
   KeyState *state;
 
   state = g_slice_new0 (KeyState);
-  state->child_schema = g_strdup (child_schema);
+  state->child_schema = xstrdup (child_schema);
 
   return state;
 }
 
 static xboolean_t
 is_valid_choices (xvariant_t *variant,
-                  GString  *strinfo)
+                  xstring_t  *strinfo)
 {
-  switch (g_variant_classify (variant))
+  switch (xvariant_classify (variant))
     {
-      case G_VARIANT_CLASS_MAYBE:
-      case G_VARIANT_CLASS_ARRAY:
+      case XVARIANT_CLASS_MAYBE:
+      case XVARIANT_CLASS_ARRAY:
         {
           xboolean_t valid = TRUE;
-          GVariantIter iter;
+          xvariant_iter_t iter;
 
-          g_variant_iter_init (&iter, variant);
+          xvariant_iter_init (&iter, variant);
 
-          while (valid && (variant = g_variant_iter_next_value (&iter)))
+          while (valid && (variant = xvariant_iter_next_value (&iter)))
             {
               valid = is_valid_choices (variant, strinfo);
-              g_variant_unref (variant);
+              xvariant_unref (variant);
             }
 
           return valid;
         }
 
-      case G_VARIANT_CLASS_STRING:
-        return strinfo_is_string_valid ((const guint32 *) strinfo->str,
+      case XVARIANT_CLASS_STRING:
+        return strinfo_is_string_valid ((const xuint32_t *) strinfo->str,
                                         strinfo->len / 4,
-                                        g_variant_get_string (variant, NULL));
+                                        xvariant_get_string (variant, NULL));
 
       default:
         g_assert_not_reached ();
@@ -306,8 +306,8 @@ key_state_check_range (KeyState  *state,
 
       if (state->minimum)
         {
-          if (g_variant_compare (state->default_value, state->minimum) < 0 ||
-              g_variant_compare (state->default_value, state->maximum) > 0)
+          if (xvariant_compare (state->default_value, state->minimum) < 0 ||
+              xvariant_compare (state->default_value, state->maximum) > 0)
             {
               g_set_error (error, G_MARKUP_ERROR,
                            G_MARKUP_ERROR_INVALID_CONTENT,
@@ -384,7 +384,7 @@ key_state_set_range (KeyState     *state,
 
   if (!type_ok)
     {
-      xchar_t *type = g_variant_type_dup_string (state->type);
+      xchar_t *type = xvariant_type_dup_string (state->type);
       g_set_error (error, G_MARKUP_ERROR,
                   G_MARKUP_ERROR_INVALID_CONTENT,
                   _("<range> not allowed for keys of type “%s”"), type);
@@ -392,15 +392,15 @@ key_state_set_range (KeyState     *state,
       return;
     }
 
-  state->minimum = g_variant_parse (state->type, min_str, NULL, NULL, error);
+  state->minimum = xvariant_parse (state->type, min_str, NULL, NULL, error);
   if (state->minimum == NULL)
     return;
 
-  state->maximum = g_variant_parse (state->type, max_str, NULL, NULL, error);
+  state->maximum = xvariant_parse (state->type, max_str, NULL, NULL, error);
   if (state->maximum == NULL)
     return;
 
-  if (g_variant_compare (state->minimum, state->maximum) > 0)
+  if (xvariant_compare (state->minimum, state->maximum) > 0)
     {
       g_set_error (error, G_MARKUP_ERROR,
                    G_MARKUP_ERROR_INVALID_CONTENT,
@@ -411,7 +411,7 @@ key_state_set_range (KeyState     *state,
   key_state_check_range (state, error);
 }
 
-static GString *
+static xstring_t *
 key_state_start_default (KeyState     *state,
                          const xchar_t  *l10n,
                          const xchar_t  *context,
@@ -442,7 +442,7 @@ key_state_start_default (KeyState     *state,
           return NULL;
         }
 
-      state->l10n_context = g_strdup (context);
+      state->l10n_context = xstrdup (context);
     }
 
   else if (context != NULL)
@@ -454,23 +454,23 @@ key_state_start_default (KeyState     *state,
       return NULL;
     }
 
-  return g_string_new (NULL);
+  return xstring_new (NULL);
 }
 
 static void
 key_state_end_default (KeyState  *state,
-                       GString  **string,
+                       xstring_t  **string,
                        xerror_t   **error)
 {
   state->unparsed_default_value = *string;
   *string = NULL;
 
-  state->default_value = g_variant_parse (state->type,
+  state->default_value = xvariant_parse (state->type,
                                           state->unparsed_default_value->str,
                                           NULL, NULL, error);
   if (!state->default_value)
     {
-      xchar_t *type = g_variant_type_dup_string (state->type);
+      xchar_t *type = xvariant_type_dup_string (state->type);
       g_prefix_error (error, _("Failed to parse <default> value of type “%s”: "), type);
       g_free (type);
     }
@@ -501,12 +501,12 @@ key_state_start_choices (KeyState  *state,
       return;
     }
 
-  while (g_variant_type_is_maybe (type) || g_variant_type_is_array (type))
-    type = g_variant_type_element (type);
+  while (xvariant_type_is_maybe (type) || xvariant_type_is_array (type))
+    type = xvariant_type_element (type);
 
-  if (!g_variant_type_equal (type, G_VARIANT_TYPE_STRING))
+  if (!xvariant_type_equal (type, G_VARIANT_TYPE_STRING))
     {
-      xchar_t *type_string = g_variant_type_dup_string (state->type);
+      xchar_t *type_string = xvariant_type_dup_string (state->type);
       g_set_error (error, G_MARKUP_ERROR,
                    G_MARKUP_ERROR_INVALID_CONTENT,
                    _("<choices> not allowed for keys of type “%s”"),
@@ -570,7 +570,7 @@ key_state_add_alias (KeyState     *state,
 {
   if (strinfo_builder_contains (state->strinfo, alias))
     {
-      if (strinfo_is_string_valid ((guint32 *) state->strinfo->str,
+      if (strinfo_is_string_valid ((xuint32_t *) state->strinfo->str,
                                    state->strinfo->len / 4,
                                    alias))
         {
@@ -639,21 +639,21 @@ key_state_serialise (KeyState *state)
     {
       if (state->child_schema)
         {
-          state->serialised = g_variant_new_string (state->child_schema);
+          state->serialised = xvariant_new_string (state->child_schema);
         }
 
       else
         {
-          GVariantBuilder builder;
+          xvariant_builder_t builder;
           xboolean_t checked G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
 
           checked = key_state_check (state, NULL);
           g_assert (checked);
 
-          g_variant_builder_init (&builder, G_VARIANT_TYPE_TUPLE);
+          xvariant_builder_init (&builder, G_VARIANT_TYPE_TUPLE);
 
           /* default value */
-          g_variant_builder_add_value (&builder, state->default_value);
+          xvariant_builder_add_value (&builder, state->default_value);
 
           /* translation */
           if (state->l10n)
@@ -681,20 +681,20 @@ key_state_serialise (KeyState *state)
 
                   /* Contextified messages are supported by prepending
                    * the context, followed by '\004' to the start of the
-                   * message string.  We do that here to save GSettings
+                   * message string.  We do that here to save xsettings_t
                    * the work later on.
                    */
                   len = strlen (state->l10n_context);
                   state->l10n_context[len] = '\004';
-                  g_string_prepend_len (state->unparsed_default_value,
+                  xstring_prepend_len (state->unparsed_default_value,
                                         state->l10n_context, len + 1);
                   g_free (state->l10n_context);
                   state->l10n_context = NULL;
                 }
 
-              g_variant_builder_add (&builder, "(y(y&s))", 'l', state->l10n,
+              xvariant_builder_add (&builder, "(y(y&s))", 'l', state->l10n,
                                      state->unparsed_default_value->str);
-              g_string_free (state->unparsed_default_value, TRUE);
+              xstring_free (state->unparsed_default_value, TRUE);
               state->unparsed_default_value = NULL;
             }
 
@@ -702,7 +702,7 @@ key_state_serialise (KeyState *state)
           if (state->strinfo->len)
             {
               xvariant_t *array;
-              guint32 *words;
+              xuint32_t *words;
               xpointer_t data;
               xsize_t size;
               xsize_t i;
@@ -711,17 +711,17 @@ key_state_serialise (KeyState *state)
               size = state->strinfo->len;
 
               words = data;
-              for (i = 0; i < size / sizeof (guint32); i++)
+              for (i = 0; i < size / sizeof (xuint32_t); i++)
                 words[i] = GUINT32_TO_LE (words[i]);
 
-              array = g_variant_new_from_data (G_VARIANT_TYPE ("au"),
+              array = xvariant_new_from_data (G_VARIANT_TYPE ("au"),
                                                data, size, TRUE,
                                                g_free, data);
 
-              g_string_free (state->strinfo, FALSE);
+              xstring_free (state->strinfo, FALSE);
               state->strinfo = NULL;
 
-              g_variant_builder_add (&builder, "(y@au)",
+              xvariant_builder_add (&builder, "(y@au)",
                                      state->is_flags ? 'f' :
                                      state->is_enum ? 'e' : 'c',
                                      array);
@@ -729,21 +729,21 @@ key_state_serialise (KeyState *state)
 
           /* range */
           if (state->minimum || state->maximum)
-            g_variant_builder_add (&builder, "(y(**))", 'r',
+            xvariant_builder_add (&builder, "(y(**))", 'r',
                                    state->minimum, state->maximum);
 
           /* per-desktop overrides */
           if (state->desktop_overrides)
-            g_variant_builder_add (&builder, "(y@a{sv})", 'd',
-                                   g_variant_dict_end (state->desktop_overrides));
+            xvariant_builder_add (&builder, "(y@a{sv})", 'd',
+                                   xvariant_dict_end (state->desktop_overrides));
 
-          state->serialised = g_variant_builder_end (&builder);
+          state->serialised = xvariant_builder_end (&builder);
         }
 
-      g_variant_ref_sink (state->serialised);
+      xvariant_ref_sink (state->serialised);
     }
 
-  return g_variant_ref (state->serialised);
+  return xvariant_ref (state->serialised);
 }
 
 static void
@@ -754,30 +754,30 @@ key_state_free (xpointer_t data)
   g_free (state->child_schema);
 
   if (state->type)
-    g_variant_type_free (state->type);
+    xvariant_type_free (state->type);
 
   g_free (state->l10n_context);
 
   if (state->unparsed_default_value)
-    g_string_free (state->unparsed_default_value, TRUE);
+    xstring_free (state->unparsed_default_value, TRUE);
 
   if (state->default_value)
-    g_variant_unref (state->default_value);
+    xvariant_unref (state->default_value);
 
   if (state->strinfo)
-    g_string_free (state->strinfo, TRUE);
+    xstring_free (state->strinfo, TRUE);
 
   if (state->minimum)
-    g_variant_unref (state->minimum);
+    xvariant_unref (state->minimum);
 
   if (state->maximum)
-    g_variant_unref (state->maximum);
+    xvariant_unref (state->maximum);
 
   if (state->serialised)
-    g_variant_unref (state->serialised);
+    xvariant_unref (state->serialised);
 
   if (state->desktop_overrides)
-    g_variant_dict_unref (state->desktop_overrides);
+    xvariant_dict_unref (state->desktop_overrides);
 
   g_slice_free (KeyState, state);
 }
@@ -860,7 +860,7 @@ struct _SchemaState
   xchar_t       *extends_name;
   xchar_t       *list_of;
 
-  GHashTable  *keys;
+  xhashtable_t  *keys;
 };
 
 static SchemaState *
@@ -873,12 +873,12 @@ schema_state_new (const xchar_t  *path,
   SchemaState *state;
 
   state = g_slice_new (SchemaState);
-  state->path = g_strdup (path);
-  state->gettext_domain = g_strdup (gettext_domain);
+  state->path = xstrdup (path);
+  state->gettext_domain = xstrdup (gettext_domain);
   state->extends = extends;
-  state->extends_name = g_strdup (extends_name);
-  state->list_of = g_strdup (list_of);
-  state->keys = g_hash_table_new_full (g_str_hash, g_str_equal,
+  state->extends_name = xstrdup (extends_name);
+  state->list_of = xstrdup (list_of);
+  state->keys = xhash_table_new_full (xstr_hash, xstr_equal,
                                        g_free, key_state_free);
 
   return state;
@@ -893,7 +893,7 @@ schema_state_free (xpointer_t data)
   g_free (state->gettext_domain);
   g_free (state->extends_name);
   g_free (state->list_of);
-  g_hash_table_unref (state->keys);
+  xhash_table_unref (state->keys);
   g_slice_free (SchemaState, state);
 }
 
@@ -908,9 +908,9 @@ schema_state_add_child (SchemaState  *state,
   if (!is_valid_keyname (name, error))
     return;
 
-  childname = g_strconcat (name, "/", NULL);
+  childname = xstrconcat (name, "/", NULL);
 
-  if (g_hash_table_lookup (state->keys, childname))
+  if (xhash_table_lookup (state->keys, childname))
     {
       g_set_error (error, G_MARKUP_ERROR,
                    G_MARKUP_ERROR_INVALID_CONTENT,
@@ -918,14 +918,14 @@ schema_state_add_child (SchemaState  *state,
       return;
     }
 
-  g_hash_table_insert (state->keys, childname,
+  xhash_table_insert (state->keys, childname,
                        key_state_new_child (schema));
 }
 
 static KeyState *
 schema_state_add_key (SchemaState  *state,
-                      GHashTable   *enum_table,
-                      GHashTable   *flags_table,
+                      xhashtable_t   *enum_table,
+                      xhashtable_t   *flags_table,
                       const xchar_t  *name,
                       const xchar_t  *type_string,
                       const xchar_t  *enum_type,
@@ -933,7 +933,7 @@ schema_state_add_key (SchemaState  *state,
                       xerror_t      **error)
 {
   SchemaState *node;
-  GString *strinfo;
+  xstring_t *strinfo;
   KeyState *key;
 
   if (state->list_of)
@@ -947,7 +947,7 @@ schema_state_add_key (SchemaState  *state,
   if (!is_valid_keyname (name, error))
     return NULL;
 
-  if (g_hash_table_lookup (state->keys, name))
+  if (xhash_table_lookup (state->keys, name))
     {
       g_set_error (error, G_MARKUP_ERROR,
                    G_MARKUP_ERROR_INVALID_CONTENT,
@@ -960,7 +960,7 @@ schema_state_add_key (SchemaState  *state,
       {
         KeyState *shadow;
 
-        shadow = g_hash_table_lookup (node->extends->keys, name);
+        shadow = xhash_table_lookup (node->extends->keys, name);
 
         /* in case of <key> <override> <key> make sure we report the
          * location of the original <key>, not the <override>.
@@ -990,9 +990,9 @@ schema_state_add_key (SchemaState  *state,
       EnumState *enum_state;
 
       if (enum_type)
-        enum_state = g_hash_table_lookup (enum_table, enum_type);
+        enum_state = xhash_table_lookup (enum_table, enum_type);
       else
-        enum_state = g_hash_table_lookup (flags_table, flags_type);
+        enum_state = xhash_table_lookup (flags_table, flags_type);
 
 
       if (enum_state == NULL)
@@ -1010,7 +1010,7 @@ schema_state_add_key (SchemaState  *state,
     }
   else
     {
-      if (!g_variant_type_string_is_valid (type_string))
+      if (!xvariant_type_string_is_valid (type_string))
         {
           g_set_error (error, G_MARKUP_ERROR,
                        G_MARKUP_ERROR_INVALID_CONTENT,
@@ -1023,7 +1023,7 @@ schema_state_add_key (SchemaState  *state,
 
   key = key_state_new (type_string, state->gettext_domain,
                        enum_type != NULL, flags_type != NULL, strinfo);
-  g_hash_table_insert (state->keys, g_strdup (name), key);
+  xhash_table_insert (state->keys, xstrdup (name), key);
 
   return key;
 }
@@ -1031,7 +1031,7 @@ schema_state_add_key (SchemaState  *state,
 static void
 schema_state_add_override (SchemaState  *state,
                            KeyState    **key_state,
-                           GString     **string,
+                           xstring_t     **string,
                            const xchar_t  *key,
                            const xchar_t  *l10n,
                            const xchar_t  *context,
@@ -1050,7 +1050,7 @@ schema_state_add_override (SchemaState  *state,
     }
 
   for (parent = state->extends; parent; parent = parent->extends)
-    if ((original = g_hash_table_lookup (parent->keys, key)))
+    if ((original = xhash_table_lookup (parent->keys, key)))
       break;
 
   if (original == NULL)
@@ -1061,7 +1061,7 @@ schema_state_add_override (SchemaState  *state,
       return;
     }
 
-  if (g_hash_table_lookup (state->keys, key))
+  if (xhash_table_lookup (state->keys, key))
     {
       g_set_error (error, G_MARKUP_ERROR,
                    G_MARKUP_ERROR_INVALID_CONTENT,
@@ -1071,12 +1071,12 @@ schema_state_add_override (SchemaState  *state,
 
   *key_state = key_state_override (original, state->gettext_domain);
   *string = key_state_start_default (*key_state, l10n, context, error);
-  g_hash_table_insert (state->keys, g_strdup (key), *key_state);
+  xhash_table_insert (state->keys, xstrdup (key), *key_state);
 }
 
 static void
 override_state_end (KeyState **key_state,
-                    GString  **string,
+                    xstring_t  **string,
                     xerror_t   **error)
 {
   key_state_end_default (*key_state, string, error);
@@ -1088,13 +1088,13 @@ typedef struct
 {
   xboolean_t     strict;                  /* TRUE if --strict was given */
 
-  GHashTable  *schema_table;            /* string -> SchemaState */
-  GHashTable  *flags_table;             /* string -> EnumState */
-  GHashTable  *enum_table;              /* string -> EnumState */
+  xhashtable_t  *schema_table;            /* string -> SchemaState */
+  xhashtable_t  *flags_table;             /* string -> EnumState */
+  xhashtable_t  *enum_table;              /* string -> EnumState */
 
-  GSList      *this_file_schemas;       /* strings: <schema>s in this file */
-  GSList      *this_file_flagss;        /* strings: <flags>s in this file */
-  GSList      *this_file_enums;         /* strings: <enum>s in this file */
+  xslist_t      *this_file_schemas;       /* strings: <schema>s in this file */
+  xslist_t      *this_file_flagss;        /* strings: <flags>s in this file */
+  xslist_t      *this_file_enums;         /* strings: <enum>s in this file */
 
   xchar_t       *schemalist_domain;       /* the <schemalist> gettext domain */
 
@@ -1102,20 +1102,20 @@ typedef struct
   KeyState    *key_state;               /* non-NULL when inside <key> */
   EnumState   *enum_state;              /* non-NULL when inside <enum> */
 
-  GString     *string;                  /* non-NULL when accepting text */
+  xstring_t     *string;                  /* non-NULL when accepting text */
 } ParseState;
 
 static xboolean_t
 is_subclass (const xchar_t *class_name,
              const xchar_t *possible_parent,
-             GHashTable  *schema_table)
+             xhashtable_t  *schema_table)
 {
   SchemaState *class;
 
   if (strcmp (class_name, possible_parent) == 0)
     return TRUE;
 
-  class = g_hash_table_lookup (schema_table, class_name);
+  class = xhash_table_lookup (schema_table, class_name);
   g_assert (class != NULL);
 
   return class->extends_name &&
@@ -1134,7 +1134,7 @@ parse_state_start_schema (ParseState  *state,
   SchemaState *extends;
   xchar_t *my_id;
 
-  if (g_hash_table_lookup (state->schema_table, id))
+  if (xhash_table_lookup (state->schema_table, id))
     {
       g_set_error (error, G_MARKUP_ERROR,
                    G_MARKUP_ERROR_INVALID_CONTENT,
@@ -1144,7 +1144,7 @@ parse_state_start_schema (ParseState  *state,
 
   if (extends_name)
     {
-      extends = g_hash_table_lookup (state->schema_table, extends_name);
+      extends = xhash_table_lookup (state->schema_table, extends_name);
 
       if (extends == NULL)
         {
@@ -1162,7 +1162,7 @@ parse_state_start_schema (ParseState  *state,
     {
       SchemaState *tmp;
 
-      if (!(tmp = g_hash_table_lookup (state->schema_table, list_of)))
+      if (!(tmp = xhash_table_lookup (state->schema_table, list_of)))
         {
           g_set_error (error, G_MARKUP_ERROR,
                        G_MARKUP_ERROR_INVALID_CONTENT,
@@ -1218,26 +1218,26 @@ parse_state_start_schema (ParseState  *state,
         list_of = extends->list_of;
     }
 
-  if (path && !(g_str_has_prefix (path, "/") && g_str_has_suffix (path, "/")))
+  if (path && !(xstr_has_prefix (path, "/") && xstr_has_suffix (path, "/")))
     {
       g_set_error (error, G_MARKUP_ERROR, G_MARKUP_ERROR_INVALID_CONTENT,
                    _("A path, if given, must begin and end with a slash"));
       return;
     }
 
-  if (path && list_of && !g_str_has_suffix (path, ":/"))
+  if (path && list_of && !xstr_has_suffix (path, ":/"))
     {
       g_set_error (error, G_MARKUP_ERROR, G_MARKUP_ERROR_INVALID_CONTENT,
                    _("The path of a list must end with “:/”"));
       return;
     }
 
-  if (path && (g_str_has_prefix (path, "/apps/") ||
-               g_str_has_prefix (path, "/desktop/") ||
-               g_str_has_prefix (path, "/system/")))
+  if (path && (xstr_has_prefix (path, "/apps/") ||
+               xstr_has_prefix (path, "/desktop/") ||
+               xstr_has_prefix (path, "/system/")))
     {
       xchar_t *message = NULL;
-      message = g_strdup_printf (_("Warning: Schema “%s” has path “%s”.  "
+      message = xstrdup_printf (_("Warning: Schema “%s” has path “%s”.  "
                                    "Paths starting with "
                                    "“/apps/”, “/desktop/” or “/system/” are deprecated."),
                                  id, path);
@@ -1248,9 +1248,9 @@ parse_state_start_schema (ParseState  *state,
   state->schema_state = schema_state_new (path, gettext_domain,
                                           extends, extends_name, list_of);
 
-  my_id = g_strdup (id);
-  state->this_file_schemas = g_slist_prepend (state->this_file_schemas, my_id);
-  g_hash_table_insert (state->schema_table, my_id, state->schema_state);
+  my_id = xstrdup (id);
+  state->this_file_schemas = xslist_prepend (state->this_file_schemas, my_id);
+  xhash_table_insert (state->schema_table, my_id, state->schema_state);
 }
 
 static void
@@ -1259,11 +1259,11 @@ parse_state_start_enum (ParseState   *state,
                         xboolean_t      is_flags,
                         xerror_t      **error)
 {
-  GSList **list = is_flags ? &state->this_file_flagss : &state->this_file_enums;
-  GHashTable *table = is_flags ? state->flags_table : state->enum_table;
+  xslist_t **list = is_flags ? &state->this_file_flagss : &state->this_file_enums;
+  xhashtable_t *table = is_flags ? state->flags_table : state->enum_table;
   xchar_t *my_id;
 
-  if (g_hash_table_lookup (table, id))
+  if (xhash_table_lookup (table, id))
     {
       g_set_error (error, G_MARKUP_ERROR,
                    G_MARKUP_ERROR_INVALID_CONTENT,
@@ -1274,16 +1274,16 @@ parse_state_start_enum (ParseState   *state,
 
   state->enum_state = enum_state_new (is_flags);
 
-  my_id = g_strdup (id);
-  *list = g_slist_prepend (*list, my_id);
-  g_hash_table_insert (table, my_id, state->enum_state);
+  my_id = xstrdup (id);
+  *list = xslist_prepend (*list, my_id);
+  xhash_table_insert (table, my_id, state->enum_state);
 }
 
 /* GMarkup Parser Functions {{{1 */
 
 /* Start element {{{2 */
 static void
-start_element (GMarkupParseContext  *context,
+start_element (xmarkup_parse_context_t  *context,
                const xchar_t          *element_name,
                const xchar_t         **attribute_names,
                const xchar_t         **attribute_values,
@@ -1291,10 +1291,10 @@ start_element (GMarkupParseContext  *context,
                xerror_t              **error)
 {
   ParseState *state = user_data;
-  const GSList *element_stack;
+  const xslist_t *element_stack;
   const xchar_t *container;
 
-  element_stack = g_markup_parse_context_get_element_stack (context);
+  element_stack = xmarkup_parse_context_get_element_stack (context);
   container = element_stack->next ? element_stack->next->data : NULL;
 
 #define COLLECT(first, ...) \
@@ -1420,7 +1420,7 @@ start_element (GMarkupParseContext  *context,
                              _("Only one <%s> element allowed inside <%s>"),
                              element_name, container);
               else
-                state->string = g_string_new (NULL);
+                state->string = xstring_new (NULL);
 
               state->key_state->summary_seen = TRUE;
             }
@@ -1436,7 +1436,7 @@ start_element (GMarkupParseContext  *context,
                              _("Only one <%s> element allowed inside <%s>"),
                              element_name, container);
               else
-                state->string = g_string_new (NULL);
+                state->string = xstring_new (NULL);
 
             state->key_state->description_seen = TRUE;
             }
@@ -1546,7 +1546,7 @@ schema_state_end (SchemaState **state_ptr,
 }
 
 static void
-end_element (GMarkupParseContext  *context,
+end_element (xmarkup_parse_context_t  *context,
              const xchar_t          *element_name,
              xpointer_t              user_data,
              xerror_t              **error)
@@ -1583,13 +1583,13 @@ end_element (GMarkupParseContext  *context,
 
   if (state->string)
     {
-      g_string_free (state->string, TRUE);
+      xstring_free (state->string, TRUE);
       state->string = NULL;
     }
 }
 /* Text {{{2 */
 static void
-text (GMarkupParseContext  *context,
+text (xmarkup_parse_context_t  *context,
       const xchar_t          *text,
       xsize_t                 text_len,
       xpointer_t              user_data,
@@ -1612,7 +1612,7 @@ text (GMarkupParseContext  *context,
        *     trailing whitespace, we have no idea if there is another
        *     text() call coming or not.
        */
-      g_string_append_len (state->string, text, text_len);
+      xstring_append_len (state->string, text, text_len);
     }
   else
     {
@@ -1624,7 +1624,7 @@ text (GMarkupParseContext  *context,
           {
             g_set_error (error, G_MARKUP_ERROR, G_MARKUP_ERROR_INVALID_CONTENT,
                          _("Text may not appear inside <%s>"),
-                         g_markup_parse_context_get_element (context));
+                         xmarkup_parse_context_get_element (context));
             break;
           }
     }
@@ -1633,7 +1633,7 @@ text (GMarkupParseContext  *context,
 /* Write to GVDB {{{1 */
 typedef struct
 {
-  GHashTable *table;
+  xhashtable_t *table;
   GvdbItem *root;
 } GvdbPair;
 
@@ -1647,18 +1647,18 @@ gvdb_pair_init (GvdbPair *pair)
 static void
 gvdb_pair_clear (GvdbPair *pair)
 {
-  g_hash_table_unref (pair->table);
+  xhash_table_unref (pair->table);
 }
 
 typedef struct
 {
-  GHashTable *schema_table;
+  xhashtable_t *schema_table;
   GvdbPair root_pair;
 } WriteToFileData;
 
 typedef struct
 {
-  GHashTable *schema_table;
+  xhashtable_t *schema_table;
   GvdbPair pair;
   xboolean_t l10n;
 } OutputSchemaData;
@@ -1682,16 +1682,16 @@ output_key (xpointer_t key,
   gvdb_item_set_parent (item, data->pair.root);
   serialised = key_state_serialise (state);
   gvdb_item_set_value (item, serialised);
-  g_variant_unref (serialised);
+  xvariant_unref (serialised);
 
   if (state->l10n)
     data->l10n = TRUE;
 
   if (state->child_schema &&
-      !g_hash_table_lookup (data->schema_table, state->child_schema))
+      !xhash_table_lookup (data->schema_table, state->child_schema))
     {
       xchar_t *message = NULL;
-      message = g_strdup_printf (_("Warning: undefined reference to <schema id='%s'/>"),
+      message = xstrdup_printf (_("Warning: undefined reference to <schema id='%s'/>"),
                                  state->child_schema);
       g_printerr ("%s\n", message);
       g_free (message);
@@ -1722,7 +1722,7 @@ output_schema (xpointer_t key,
   gvdb_item_set_parent (item, root_pair->root);
   gvdb_item_set_hash_table (item, data.pair.table);
 
-  g_hash_table_foreach (state->keys, output_key, &data);
+  xhash_table_foreach (state->keys, output_key, &data);
 
   if (state->path)
     gvdb_hash_table_insert_string (data.pair.table, ".path", state->path);
@@ -1744,7 +1744,7 @@ output_schema (xpointer_t key,
 }
 
 static xboolean_t
-write_to_file (GHashTable   *schema_table,
+write_to_file (xhashtable_t   *schema_table,
                const xchar_t  *filename,
                xerror_t      **error)
 {
@@ -1755,18 +1755,18 @@ write_to_file (GHashTable   *schema_table,
 
   gvdb_pair_init (&data.root_pair);
 
-  g_hash_table_foreach (schema_table, output_schema, &data);
+  xhash_table_foreach (schema_table, output_schema, &data);
 
   success = gvdb_table_write_contents (data.root_pair.table, filename,
                                        G_BYTE_ORDER != G_LITTLE_ENDIAN,
                                        error);
-  g_hash_table_unref (data.root_pair.table);
+  xhash_table_unref (data.root_pair.table);
 
   return success;
 }
 
 /* Parser driver {{{1 */
-static GHashTable *
+static xhashtable_t *
 parse_gschema_files (xchar_t    **files,
                      xboolean_t   strict)
 {
@@ -1777,53 +1777,53 @@ parse_gschema_files (xchar_t    **files,
 
   state.strict = strict;
 
-  state.enum_table = g_hash_table_new_full (g_str_hash, g_str_equal,
+  state.enum_table = xhash_table_new_full (xstr_hash, xstr_equal,
                                             g_free, enum_state_free);
 
-  state.flags_table = g_hash_table_new_full (g_str_hash, g_str_equal,
+  state.flags_table = xhash_table_new_full (xstr_hash, xstr_equal,
                                              g_free, enum_state_free);
 
-  state.schema_table = g_hash_table_new_full (g_str_hash, g_str_equal,
+  state.schema_table = xhash_table_new_full (xstr_hash, xstr_equal,
                                               g_free, schema_state_free);
 
   while ((filename = *files++) != NULL)
     {
-      GMarkupParseContext *context;
+      xmarkup_parse_context_t *context;
       xchar_t *contents;
       xsize_t size;
       xint_t line, col;
 
-      if (!g_file_get_contents (filename, &contents, &size, &error))
+      if (!xfile_get_contents (filename, &contents, &size, &error))
         {
           fprintf (stderr, "%s\n", error->message);
           g_clear_error (&error);
           continue;
         }
 
-      context = g_markup_parse_context_new (&parser,
+      context = xmarkup_parse_context_new (&parser,
                                             G_MARKUP_TREAT_CDATA_AS_TEXT |
                                             G_MARKUP_PREFIX_ERROR_POSITION |
                                             G_MARKUP_IGNORE_QUALIFIED,
                                             &state, NULL);
 
 
-      if (!g_markup_parse_context_parse (context, contents, size, &error) ||
-          !g_markup_parse_context_end_parse (context, &error))
+      if (!xmarkup_parse_context_parse (context, contents, size, &error) ||
+          !xmarkup_parse_context_end_parse (context, &error))
         {
-          GSList *item;
+          xslist_t *item;
 
           /* back out any changes from this file */
           for (item = state.this_file_schemas; item; item = item->next)
-            g_hash_table_remove (state.schema_table, item->data);
+            xhash_table_remove (state.schema_table, item->data);
 
           for (item = state.this_file_flagss; item; item = item->next)
-            g_hash_table_remove (state.flags_table, item->data);
+            xhash_table_remove (state.flags_table, item->data);
 
           for (item = state.this_file_enums; item; item = item->next)
-            g_hash_table_remove (state.enum_table, item->data);
+            xhash_table_remove (state.enum_table, item->data);
 
           /* let them know */
-          g_markup_parse_context_get_position (context, &line, &col);
+          xmarkup_parse_context_get_position (context, &line, &col);
           fprintf (stderr, "%s:%d:%d  %s.  ", filename, line, col, error->message);
           g_clear_error (&error);
 
@@ -1832,9 +1832,9 @@ parse_gschema_files (xchar_t    **files,
               /* Translators: Do not translate "--strict". */
               fprintf (stderr, "%s\n", _("--strict was specified; exiting."));
 
-              g_hash_table_unref (state.schema_table);
-              g_hash_table_unref (state.flags_table);
-              g_hash_table_unref (state.enum_table);
+              xhash_table_unref (state.schema_table);
+              xhash_table_unref (state.flags_table);
+              xhash_table_unref (state.enum_table);
 
               g_free (contents);
 
@@ -1848,31 +1848,31 @@ parse_gschema_files (xchar_t    **files,
 
       /* cleanup */
       g_free (contents);
-      g_markup_parse_context_free (context);
-      g_slist_free (state.this_file_schemas);
-      g_slist_free (state.this_file_flagss);
-      g_slist_free (state.this_file_enums);
+      xmarkup_parse_context_free (context);
+      xslist_free (state.this_file_schemas);
+      xslist_free (state.this_file_flagss);
+      xslist_free (state.this_file_enums);
       state.this_file_schemas = NULL;
       state.this_file_flagss = NULL;
       state.this_file_enums = NULL;
     }
 
-  g_hash_table_unref (state.flags_table);
-  g_hash_table_unref (state.enum_table);
+  xhash_table_unref (state.flags_table);
+  xhash_table_unref (state.enum_table);
 
   return state.schema_table;
 }
 
 static xint_t
-compare_strings (gconstpointer a,
-                 gconstpointer b)
+compare_strings (xconstpointer a,
+                 xconstpointer b)
 {
   xchar_t *one = *(xchar_t **) a;
   xchar_t *two = *(xchar_t **) b;
   xint_t cmp;
 
-  cmp = g_str_has_suffix (two, ".enums.xml") -
-        g_str_has_suffix (one, ".enums.xml");
+  cmp = xstr_has_suffix (two, ".enums.xml") -
+        xstr_has_suffix (one, ".enums.xml");
 
   if (!cmp)
     cmp = strcmp (one, two);
@@ -1881,7 +1881,7 @@ compare_strings (gconstpointer a,
 }
 
 static xboolean_t
-set_overrides (GHashTable  *schema_table,
+set_overrides (xhashtable_t  *schema_table,
                xchar_t      **files,
                xboolean_t     strict)
 {
@@ -1890,17 +1890,17 @@ set_overrides (GHashTable  *schema_table,
 
   while ((filename = *files++))
     {
-      GKeyFile *key_file;
+      xkey_file_t *key_file;
       xchar_t **groups;
       xint_t i;
 
       g_debug ("Processing override file '%s'", filename);
 
-      key_file = g_key_file_new ();
-      if (!g_key_file_load_from_file (key_file, filename, 0, &error))
+      key_file = xkey_file_new ();
+      if (!xkey_file_load_from_file (key_file, filename, 0, &error))
         {
           fprintf (stderr, "%s: %s.  ", filename, error->message);
-          g_key_file_free (key_file);
+          xkey_file_free (key_file);
           g_clear_error (&error);
 
           if (!strict)
@@ -1913,7 +1913,7 @@ set_overrides (GHashTable  *schema_table,
           return FALSE;
         }
 
-      groups = g_key_file_get_groups (key_file, NULL);
+      groups = xkey_file_get_groups (key_file, NULL);
 
       for (i = 0; groups[i]; i++)
         {
@@ -1925,14 +1925,14 @@ set_overrides (GHashTable  *schema_table,
           xchar_t **keys;
           xint_t j;
 
-          pieces = g_strsplit (group, ":", 2);
+          pieces = xstrsplit (group, ":", 2);
           schema_name = pieces[0];
           desktop_id = pieces[1];
 
           g_debug ("Processing group '%s' (schema '%s', %s)",
                    group, schema_name, desktop_id ? desktop_id : "all desktops");
 
-          schema = g_hash_table_lookup (schema_table, schema_name);
+          schema = xhash_table_lookup (schema_table, schema_name);
 
           if (schema == NULL)
             {
@@ -1940,11 +1940,11 @@ set_overrides (GHashTable  *schema_table,
                * common case.  Don't even emit an error message about
                * that.
                */
-              g_strfreev (pieces);
+              xstrfreev (pieces);
               continue;
             }
 
-          keys = g_key_file_get_keys (key_file, group, NULL, NULL);
+          keys = xkey_file_get_keys (key_file, group, NULL, NULL);
           g_assert (keys != NULL);
 
           for (j = 0; keys[j]; j++)
@@ -1954,7 +1954,7 @@ set_overrides (GHashTable  *schema_table,
               xvariant_t *value;
               xchar_t *string;
 
-              state = g_hash_table_lookup (schema->keys, key);
+              state = xhash_table_lookup (schema->keys, key);
 
               if (state == NULL)
                 {
@@ -1974,10 +1974,10 @@ set_overrides (GHashTable  *schema_table,
                            key, group, filename);
                   fprintf (stderr, "\n");
 
-                  g_key_file_free (key_file);
-                  g_strfreev (pieces);
-                  g_strfreev (groups);
-                  g_strfreev (keys);
+                  xkey_file_free (key_file);
+                  xstrfreev (pieces);
+                  xstrfreev (groups);
+                  xstrfreev (keys);
 
                   return FALSE;
                 }
@@ -2005,18 +2005,18 @@ set_overrides (GHashTable  *schema_table,
                            key, group, filename);
                   fprintf (stderr, "\n");
 
-                  g_key_file_free (key_file);
-                  g_strfreev (pieces);
-                  g_strfreev (groups);
-                  g_strfreev (keys);
+                  xkey_file_free (key_file);
+                  xstrfreev (pieces);
+                  xstrfreev (groups);
+                  xstrfreev (keys);
 
                   return FALSE;
                 }
 
-              string = g_key_file_get_value (key_file, group, key, NULL);
+              string = xkey_file_get_value (key_file, group, key, NULL);
               g_assert (string != NULL);
 
-              value = g_variant_parse (state->type, string,
+              value = xvariant_parse (state->type, string,
                                        NULL, NULL, &error);
 
               if (value == NULL)
@@ -2043,20 +2043,20 @@ set_overrides (GHashTable  *schema_table,
 
                   g_clear_error (&error);
                   g_free (string);
-                  g_key_file_free (key_file);
-                  g_strfreev (pieces);
-                  g_strfreev (groups);
-                  g_strfreev (keys);
+                  xkey_file_free (key_file);
+                  xstrfreev (pieces);
+                  xstrfreev (groups);
+                  xstrfreev (keys);
 
                   return FALSE;
                 }
 
               if (state->minimum)
                 {
-                  if (g_variant_compare (value, state->minimum) < 0 ||
-                      g_variant_compare (value, state->maximum) > 0)
+                  if (xvariant_compare (value, state->minimum) < 0 ||
+                      xvariant_compare (value, state->maximum) > 0)
                     {
-                      g_variant_unref (value);
+                      xvariant_unref (value);
                       g_free (string);
 
                       if (!strict)
@@ -2079,10 +2079,10 @@ set_overrides (GHashTable  *schema_table,
                                key, group, filename);
                       fprintf (stderr, "\n");
 
-                      g_key_file_free (key_file);
-                      g_strfreev (pieces);
-                      g_strfreev (groups);
-                      g_strfreev (keys);
+                      xkey_file_free (key_file);
+                      xstrfreev (pieces);
+                      xstrfreev (groups);
+                      xstrfreev (keys);
 
                       return FALSE;
                     }
@@ -2092,7 +2092,7 @@ set_overrides (GHashTable  *schema_table,
                 {
                   if (!is_valid_choices (value, state->strinfo))
                     {
-                      g_variant_unref (value);
+                      xvariant_unref (value);
                       g_free (string);
 
                       if (!strict)
@@ -2114,10 +2114,10 @@ set_overrides (GHashTable  *schema_table,
                                  "exiting."),
                                key, group, filename);
                       fprintf (stderr, "\n");
-                      g_key_file_free (key_file);
-                      g_strfreev (pieces);
-                      g_strfreev (groups);
-                      g_strfreev (keys);
+                      xkey_file_free (key_file);
+                      xstrfreev (pieces);
+                      xstrfreev (groups);
+                      xstrfreev (keys);
 
                       return FALSE;
                     }
@@ -2126,26 +2126,26 @@ set_overrides (GHashTable  *schema_table,
               if (desktop_id != NULL)
                 {
                   if (state->desktop_overrides == NULL)
-                    state->desktop_overrides = g_variant_dict_new (NULL);
+                    state->desktop_overrides = xvariant_dict_new (NULL);
 
-                  g_variant_dict_insert_value (state->desktop_overrides, desktop_id, value);
-                  g_variant_unref (value);
+                  xvariant_dict_insert_value (state->desktop_overrides, desktop_id, value);
+                  xvariant_unref (value);
                 }
               else
                 {
-                  g_variant_unref (state->default_value);
+                  xvariant_unref (state->default_value);
                   state->default_value = value;
                 }
 
               g_free (string);
             }
 
-          g_strfreev (pieces);
-          g_strfreev (keys);
+          xstrfreev (pieces);
+          xstrfreev (keys);
         }
 
-      g_strfreev (groups);
-      g_key_file_free (key_file);
+      xstrfreev (groups);
+      xkey_file_free (key_file);
     }
 
   return TRUE;
@@ -2155,8 +2155,8 @@ int
 main (int argc, char **argv)
 {
   xerror_t *error = NULL;
-  GHashTable *table = NULL;
-  GDir *dir = NULL;
+  xhashtable_t *table = NULL;
+  xdir_t *dir = NULL;
   const xchar_t *file;
   const xchar_t *srcdir;
   xboolean_t show_version_and_exit = FALSE;
@@ -2166,18 +2166,18 @@ main (int argc, char **argv)
   xboolean_t strict = FALSE;
   xchar_t **schema_files = NULL;
   xchar_t **override_files = NULL;
-  GOptionContext *context = NULL;
+  xoption_context_t *context = NULL;
   xint_t retval;
   GOptionEntry entries[] = {
     { "version", 0, 0, G_OPTION_ARG_NONE, &show_version_and_exit, N_("Show program version and exit"), NULL },
-    { "targetdir", 0, 0, G_OPTION_ARG_FILENAME, &targetdir, N_("Where to store the gschemas.compiled file"), N_("DIRECTORY") },
+    { "targetdir", 0, 0, G_OPTION_ARXFILENAME, &targetdir, N_("Where to store the gschemas.compiled file"), N_("DIRECTORY") },
     { "strict", 0, 0, G_OPTION_ARG_NONE, &strict, N_("Abort on any errors in schemas"), NULL },
     { "dry-run", 0, 0, G_OPTION_ARG_NONE, &dry_run, N_("Do not write the gschema.compiled file"), NULL },
     { "allow-any-name", 0, 0, G_OPTION_ARG_NONE, &allow_any_name, N_("Do not enforce key name restrictions"), NULL },
 
     /* These options are only for use in the gschema-compile tests */
-    { "schema-file", 0, G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_FILENAME_ARRAY, &schema_files, NULL, NULL },
-    { "override-file", 0, G_OPTION_FLAG_HIDDEN, G_OPTION_ARG_FILENAME_ARRAY, &override_files, NULL, NULL },
+    { "schema-file", 0, G_OPTION_FLAG_HIDDEN, G_OPTION_ARXFILENAME_ARRAY, &schema_files, NULL, NULL },
+    { "override-file", 0, G_OPTION_FLAG_HIDDEN, G_OPTION_ARXFILENAME_ARRAY, &override_files, NULL, NULL },
     G_OPTION_ENTRY_NULL
   };
 
@@ -2202,7 +2202,7 @@ main (int argc, char **argv)
   context = g_option_context_new (N_("DIRECTORY"));
   g_option_context_set_translation_domain (context, GETTEXT_PACKAGE);
   g_option_context_set_summary (context,
-    N_("Compile all GSettings schema files into a schema cache.\n"
+    N_("Compile all xsettings_t schema files into a schema cache.\n"
        "Schema files are required to have the extension .gschema.xml,\n"
        "and the cache file is called gschemas.compiled."));
   g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
@@ -2234,19 +2234,19 @@ main (int argc, char **argv)
 
   if (!schema_files)
     {
-      GPtrArray *overrides;
-      GPtrArray *files;
+      xptr_array_t *overrides;
+      xptr_array_t *files;
 
-      files = g_ptr_array_new ();
-      overrides = g_ptr_array_new ();
+      files = xptr_array_new ();
+      overrides = xptr_array_new ();
 
       dir = g_dir_open (srcdir, 0, &error);
       if (dir == NULL)
         {
           fprintf (stderr, "%s\n", error->message);
 
-          g_ptr_array_unref (files);
-          g_ptr_array_unref (overrides);
+          xptr_array_unref (files);
+          xptr_array_unref (overrides);
 
           retval = 1;
           goto done;
@@ -2254,12 +2254,12 @@ main (int argc, char **argv)
 
       while ((file = g_dir_read_name (dir)) != NULL)
         {
-          if (g_str_has_suffix (file, ".gschema.xml") ||
-              g_str_has_suffix (file, ".enums.xml"))
-            g_ptr_array_add (files, g_build_filename (srcdir, file, NULL));
+          if (xstr_has_suffix (file, ".gschema.xml") ||
+              xstr_has_suffix (file, ".enums.xml"))
+            xptr_array_add (files, g_build_filename (srcdir, file, NULL));
 
-          else if (g_str_has_suffix (file, ".gschema.override"))
-            g_ptr_array_add (overrides,
+          else if (xstr_has_suffix (file, ".gschema.override"))
+            xptr_array_add (overrides,
                              g_build_filename (srcdir, file, NULL));
         }
 
@@ -2270,20 +2270,20 @@ main (int argc, char **argv)
           else
             fprintf (stdout, "%s\n", _("No schema files found: removed existing output file."));
 
-          g_ptr_array_unref (files);
-          g_ptr_array_unref (overrides);
+          xptr_array_unref (files);
+          xptr_array_unref (overrides);
 
           retval = 0;
           goto done;
         }
-      g_ptr_array_sort (files, compare_strings);
-      g_ptr_array_add (files, NULL);
+      xptr_array_sort (files, compare_strings);
+      xptr_array_add (files, NULL);
 
-      g_ptr_array_sort (overrides, compare_strings);
-      g_ptr_array_add (overrides, NULL);
+      xptr_array_sort (overrides, compare_strings);
+      xptr_array_add (overrides, NULL);
 
-      schema_files = (char **) g_ptr_array_free (files, FALSE);
-      override_files = (xchar_t **) g_ptr_array_free (overrides, FALSE);
+      schema_files = (char **) xptr_array_free (files, FALSE);
+      override_files = (xchar_t **) xptr_array_free (overrides, FALSE);
     }
 
   if ((table = parse_gschema_files (schema_files, strict)) == NULL)
@@ -2311,12 +2311,12 @@ main (int argc, char **argv)
 
 done:
   g_clear_error (&error);
-  g_clear_pointer (&table, g_hash_table_unref);
+  g_clear_pointer (&table, xhash_table_unref);
   g_clear_pointer (&dir, g_dir_close);
   g_free (targetdir);
   g_free (target);
-  g_strfreev (schema_files);
-  g_strfreev (override_files);
+  xstrfreev (schema_files);
+  xstrfreev (override_files);
   g_option_context_free (context);
 
 #ifdef G_OS_WIN32

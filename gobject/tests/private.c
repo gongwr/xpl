@@ -7,79 +7,79 @@
 
 typedef struct {
   xobject_t parent_instance;
-} TestObject;
+} test_object_t;
 
 typedef struct {
   int dummy_0;
   float dummy_1;
-} TestObjectPrivate;
+} test_object_private_t;
 
 typedef struct {
   xobject_class_t parent_class;
-} TestObjectClass;
+} test_object_class_t;
 
 xtype_t test_object_get_type (void);
 
-G_DEFINE_TYPE_WITH_CODE (TestObject, test_object, XTYPE_OBJECT,
-                         G_ADD_PRIVATE (TestObject))
+G_DEFINE_TYPE_WITH_CODE (test_object_t, test_object, XTYPE_OBJECT,
+                         G_ADD_PRIVATE (test_object_t))
 
 static void
-test_object_class_init (TestObjectClass *klass)
+test_object_class_init (test_object_class_t *klass)
 {
 }
 
 static void
-test_object_init (TestObject *self)
+test_object_init (test_object_t *self)
 {
-  TestObjectPrivate *priv = test_object_get_instance_private (self);
+  test_object_private_t *priv = test_object_get_instance_private (self);
 
   if (g_test_verbose ())
     g_printerr ("Offset of %sPrivate for type '%s': %d\n",
              G_OBJECT_TYPE_NAME (self),
              G_OBJECT_TYPE_NAME (self),
-             TestObject_private_offset);
+             test_object_private_offset);
 
   priv->dummy_0 = 42;
   priv->dummy_1 = 3.14159f;
 }
 
 static int
-test_object_get_dummy_0 (TestObject *self)
+test_object_get_dummy_0 (test_object_t *self)
 {
-  TestObjectPrivate *priv = test_object_get_instance_private (self);
+  test_object_private_t *priv = test_object_get_instance_private (self);
 
   return priv->dummy_0;
 }
 
 static float
-test_object_get_dummy_1 (TestObject *self)
+test_object_get_dummy_1 (test_object_t *self)
 {
-  TestObjectPrivate *priv = test_object_get_instance_private (self);
+  test_object_private_t *priv = test_object_get_instance_private (self);
 
   return priv->dummy_1;
 }
 
 typedef struct {
-  TestObject parent_instance;
-} TestDerived;
+  test_object_t parent_instance;
+} test_derived_t;
 
 typedef struct {
   char *dummy_2;
-} TestDerivedPrivate;
+} test_derived_private_t;
 
 typedef struct {
-  TestObjectClass parent_class;
-} TestDerivedClass;
+  test_object_class_t parent_class;
+} test_derived_class_t;
 
 xtype_t test_derived_get_type (void);
 
-G_DEFINE_TYPE_WITH_CODE (TestDerived, test_derived, test_object_get_type (),
-                         G_ADD_PRIVATE (TestDerived))
+G_DEFINE_TYPE_WITH_CODE (test_derived, test_derived, test_object_get_type (),
+                         G_ADD_PRIVATE (test_derived))
 
 static void
 test_derived_finalize (xobject_t *obj)
 {
-  TestDerivedPrivate *priv = test_derived_get_instance_private ((TestDerived *) obj);
+  test_derived_private_t *priv = test_derived_get_instance_private ((test_derived_t *) obj);
 
   g_free (priv->dummy_2);
 
@@ -87,15 +87,15 @@ test_derived_finalize (xobject_t *obj)
 }
 
 static void
-test_derived_class_init (TestDerivedClass *klass)
+test_derived_class_init (test_derived_class_t *klass)
 {
   G_OBJECT_CLASS (klass)->finalize = test_derived_finalize;
 }
 
 static void
-test_derived_init (TestDerived *self)
+test_derived_init (test_derived_t *self)
 {
-  TestDerivedPrivate *priv = test_derived_get_instance_private (self);
+  test_derived_private_t *priv = test_derived_get_instance_private (self);
 
   if (g_test_verbose ())
     g_printerr ("Offset of %sPrivate for type '%s': %d\n",
@@ -103,45 +103,45 @@ test_derived_init (TestDerived *self)
              G_OBJECT_TYPE_NAME (self),
              TestDerived_private_offset);
 
-  priv->dummy_2 = g_strdup ("Hello");
+  priv->dummy_2 = xstrdup ("Hello");
 }
 
 static const char *
-test_derived_get_dummy_2 (TestDerived *self)
+test_derived_get_dummy_2 (test_derived_t *self)
 {
-  TestDerivedPrivate *priv = test_derived_get_instance_private (self);
+  test_derived_private_t *priv = test_derived_get_instance_private (self);
 
   return priv->dummy_2;
 }
 
 typedef struct {
-  TestObject parent_instance;
-} TestMixed;
+  test_object_t parent_instance;
+} test_mixed_t;
 
 typedef struct {
   xint_t dummy_3;
-} TestMixedPrivate;
+} test_mixed_private_t;
 
 typedef struct {
-  TestObjectClass parent_class;
-} TestMixedClass;
+  test_object_class_t parent_class;
+} test_mixed_class_t;
 
 xtype_t test_mixed_get_type (void);
 
-G_DEFINE_TYPE (TestMixed, test_mixed, test_object_get_type ())
+G_DEFINE_TYPE (test_mixed, test_mixed, test_object_get_type ())
 
 static void
-test_mixed_class_init (TestMixedClass *klass)
+test_mixed_class_init (test_mixed_class_t *klass)
 {
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-  g_type_class_add_private (klass, sizeof (TestMixedPrivate));
+  xtype_class_add_private (klass, sizeof (test_mixed_private_t));
 G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 static void
-test_mixed_init (TestMixed *self)
+test_mixed_init (test_mixed_t *self)
 {
-  TestMixedPrivate *priv = XTYPE_INSTANCE_GET_PRIVATE (self, test_mixed_get_type (), TestMixedPrivate);
+  test_mixed_private_t *priv = XTYPE_INSTANCE_GET_PRIVATE (self, test_mixed_get_type (), test_mixed_private_t);
 
   if (g_test_verbose ())
     g_printerr ("Offset of %sPrivate for type '%s': %d\n",
@@ -153,53 +153,53 @@ test_mixed_init (TestMixed *self)
 }
 
 static xint_t
-test_mixed_get_dummy_3 (TestMixed *self)
+test_mixed_get_dummy_3 (test_mixed_t *self)
 {
-  TestMixedPrivate *priv = XTYPE_INSTANCE_GET_PRIVATE (self, test_mixed_get_type (), TestMixedPrivate);
+  test_mixed_private_t *priv = XTYPE_INSTANCE_GET_PRIVATE (self, test_mixed_get_type (), test_mixed_private_t);
 
   return priv->dummy_3;
 }
 
 typedef struct {
-  TestMixed parent_instance;
-} TestMixedDerived;
+  test_mixed_t parent_instance;
+} test_mixed_derived_t;
 
 typedef struct {
   gint64 dummy_4;
-} TestMixedDerivedPrivate;
+} test_mixed_derived_private_t;
 
 typedef struct {
-  TestMixedClass parent_class;
-} TestMixedDerivedClass;
+  test_mixed_class_t parent_class;
+} test_mixed_derived_class_t;
 
 xtype_t test_mixed_derived_get_type (void);
 
-G_DEFINE_TYPE_WITH_CODE (TestMixedDerived, test_mixed_derived, test_mixed_get_type (),
-                         G_ADD_PRIVATE (TestMixedDerived))
+G_DEFINE_TYPE_WITH_CODE (test_mixed_derived_t, test_mixed_derived, test_mixed_get_type (),
+                         G_ADD_PRIVATE (test_mixed_derived_t))
 
 static void
-test_mixed_derived_class_init (TestMixedDerivedClass *klass)
+test_mixed_derived_class_init (test_mixed_derived_class_t *klass)
 {
 }
 
 static void
-test_mixed_derived_init (TestMixedDerived *self)
+test_mixed_derived_init (test_mixed_derived_t *self)
 {
-  TestMixedDerivedPrivate *priv = test_mixed_derived_get_instance_private (self);
+  test_mixed_derived_private_t *priv = test_mixed_derived_get_instance_private (self);
 
   if (g_test_verbose ())
     g_printerr ("Offset of %sPrivate for type '%s': %d\n",
              G_OBJECT_TYPE_NAME (self),
              G_OBJECT_TYPE_NAME (self),
-             TestMixedDerived_private_offset);
+             test_mixed_derived_private_offset);
 
   priv->dummy_4 = g_get_monotonic_time ();
 }
 
 static gint64
-test_mixed_derived_get_dummy_4 (TestMixedDerived *self)
+test_mixed_derived_get_dummy_4 (test_mixed_derived_t *self)
 {
-  TestMixedDerivedPrivate *priv = test_mixed_derived_get_instance_private (self);
+  test_mixed_derived_private_t *priv = test_mixed_derived_get_instance_private (self);
 
   return priv->dummy_4;
 }
@@ -207,44 +207,44 @@ test_mixed_derived_get_dummy_4 (TestMixedDerived *self)
 static void
 private_instance (void)
 {
-  TestObject *obj = g_object_new (test_object_get_type (), NULL);
+  test_object_t *obj = xobject_new (test_object_get_type (), NULL);
   xpointer_t class;
   xint_t offset;
 
   g_assert_cmpint (test_object_get_dummy_0 (obj), ==, 42);
   g_assert_cmpfloat (test_object_get_dummy_1 (obj), ==, 3.14159f);
 
-  class = g_type_class_ref (test_object_get_type ());
-  offset = g_type_class_get_instance_private_offset (class);
-  g_type_class_unref (class);
+  class = xtype_class_ref (test_object_get_type ());
+  offset = xtype_class_get_instance_private_offset (class);
+  xtype_class_unref (class);
 
-  g_assert (offset == TestObject_private_offset);
+  g_assert (offset == test_object_private_offset);
 
-  g_object_unref (obj);
+  xobject_unref (obj);
 }
 
 static void
 private_derived_instance (void)
 {
-  TestDerived *obj = g_object_new (test_derived_get_type (), NULL);
+  test_derived_t *obj = xobject_new (test_derived_get_type (), NULL);
 
   g_assert_cmpstr (test_derived_get_dummy_2 (obj), ==, "Hello");
-  g_assert_cmpint (test_object_get_dummy_0 ((TestObject *) obj), ==, 42);
+  g_assert_cmpint (test_object_get_dummy_0 ((test_object_t *) obj), ==, 42);
 
-  g_object_unref (obj);
+  xobject_unref (obj);
 }
 
 static void
 private_mixed_derived_instance (void)
 {
-  TestMixedDerived *derived = g_object_new (test_mixed_derived_get_type (), NULL);
-  TestMixed *mixed = g_object_new (test_mixed_get_type (), NULL);
+  test_mixed_derived_t *derived = xobject_new (test_mixed_derived_get_type (), NULL);
+  test_mixed_t *mixed = xobject_new (test_mixed_get_type (), NULL);
 
   g_assert_cmpint (test_mixed_get_dummy_3 (mixed), ==, 47);
   g_assert (test_mixed_derived_get_dummy_4 (derived) <= g_get_monotonic_time ());
 
-  g_object_unref (derived);
-  g_object_unref (mixed);
+  xobject_unref (derived);
+  xobject_unref (mixed);
 }
 
 int

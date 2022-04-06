@@ -53,7 +53,7 @@
  * going to be deallocated.
  */
 static inline void
-g_ignore_leak (gconstpointer p)
+g_ignore_leak (xconstpointer p)
 {
 #ifdef _XPL_ADDRESS_SANITIZER
   if (p != NULL)
@@ -69,7 +69,7 @@ g_ignore_leak (gconstpointer p)
  * and for each element of @strv.
  */
 static inline void
-g_ignore_strv_leak (GStrv strv)
+g_ignore_strv_leak (xstrv_t strv)
 {
 #ifdef _XPL_ADDRESS_SANITIZER
   xchar_t **item;
@@ -115,17 +115,17 @@ g_end_ignore_leaks (void)
 #endif
 }
 
-GMainContext *          g_get_worker_context            (void);
+xmain_context_t *          g_get_worker_context            (void);
 xboolean_t                g_check_setuid                  (void);
-GMainContext *          g_main_context_new_with_next_id (xuint_t next_id);
+xmain_context_t *          xmain_context_new_with_next_id (xuint_t next_id);
 
 #ifdef G_OS_WIN32
 XPL_AVAILABLE_IN_ALL
 xchar_t *_glib_get_locale_dir    (void);
 #endif
 
-GDir * g_dir_open_with_errno (const xchar_t *path, xuint_t flags);
-GDir * g_dir_new_from_dirp (xpointer_t dirp);
+xdir_t * g_dir_open_with_errno (const xchar_t *path, xuint_t flags);
+xdir_t * g_dir_new_from_dirp (xpointer_t dirp);
 
 #define XPL_PRIVATE_CALL(symbol) (glib__private__()->symbol)
 
@@ -134,19 +134,19 @@ typedef struct {
   GWakeup *             (* g_wakeup_new)                (void);
   void                  (* g_wakeup_free)               (GWakeup *wakeup);
   void                  (* g_wakeup_get_pollfd)         (GWakeup *wakeup,
-                                                        GPollFD *poll_fd);
+                                                        xpollfd_t *poll_fd);
   void                  (* g_wakeup_signal)             (GWakeup *wakeup);
   void                  (* g_wakeup_acknowledge)        (GWakeup *wakeup);
 
   /* See gmain.c */
-  GMainContext *        (* g_get_worker_context)        (void);
+  xmain_context_t *        (* g_get_worker_context)        (void);
 
   xboolean_t              (* g_check_setuid)              (void);
-  GMainContext *        (* g_main_context_new_with_next_id) (xuint_t next_id);
+  xmain_context_t *        (* xmain_context_new_with_next_id) (xuint_t next_id);
 
-  GDir *                (* g_dir_open_with_errno)       (const xchar_t *path,
+  xdir_t *                (* g_dir_open_with_errno)       (const xchar_t *path,
                                                          xuint_t        flags);
-  GDir *                (* g_dir_new_from_dirp)         (xpointer_t dirp);
+  xdir_t *                (* g_dir_new_from_dirp)         (xpointer_t dirp);
 
   /* See glib-init.c */
   void                  (* glib_init)                   (void);

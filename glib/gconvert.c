@@ -102,16 +102,16 @@
  * ISO-8859-1. In this case, for compatibility reasons, you may want
  * to instruct GLib to use that particular encoding for file names
  * rather than UTF-8. You can do this by specifying the encoding for
- * file names in the [`G_FILENAME_ENCODING`][G_FILENAME_ENCODING]
+ * file names in the [`XFILENAME_ENCODING`][XFILENAME_ENCODING]
  * environment variable. For example, if your installation uses
  * ISO-8859-1 for file names, you can put this in your `~/.profile`:
  * |[
- * export G_FILENAME_ENCODING=ISO-8859-1
+ * export XFILENAME_ENCODING=ISO-8859-1
  * ]|
- * GLib provides the functions g_filename_to_utf8() and
- * g_filename_from_utf8() to perform the necessary conversions.
+ * GLib provides the functions xfilename_to_utf8() and
+ * xfilename_from_utf8() to perform the necessary conversions.
  * These functions convert file names from the encoding specified
- * in `G_FILENAME_ENCODING` to UTF-8 and vice-versa. This
+ * in `XFILENAME_ENCODING` to UTF-8 and vice-versa. This
  * [diagram][file-name-encodings-diagram] illustrates how
  * these functions are used to convert between UTF-8 and the
  * encoding for file names in the file system.
@@ -133,7 +133,7 @@
  *    file names which the file system understands.
  *
  * 2. If you need to display a file name, convert it to UTF-8 first
- *    by using g_filename_to_utf8(). If conversion fails, display a
+ *    by using xfilename_to_utf8(). If conversion fails, display a
  *    string like "Unknown file name". Do not convert this string back
  *    into the encoding used for file names if you wish to pass it to
  *    the file system; use the original file name instead.
@@ -141,16 +141,16 @@
  *    For example, the document window of a word processor could display
  *    "Unknown file name" in its title bar but still let the user save
  *    the file, as it would keep the raw file name internally. This
- *    can happen if the user has not set the `G_FILENAME_ENCODING`
+ *    can happen if the user has not set the `XFILENAME_ENCODING`
  *    environment variable even though they have files whose names are
  *    not encoded in UTF-8.
  *
  * 3. If your user interface lets the user type a file name for saving
  *    or renaming, convert it to the encoding used for file names in
- *    the file system by using g_filename_from_utf8(). Pass the converted
+ *    the file system by using xfilename_from_utf8(). Pass the converted
  *    file name to functions like fopen(). If conversion fails, ask the
  *    user to enter a different file name. This can happen if the user
- *    types Japanese characters when `G_FILENAME_ENCODING` is set to
+ *    types Japanese characters when `XFILENAME_ENCODING` is set to
  *    `ISO-8859-1`, for example.
  */
 
@@ -342,7 +342,7 @@ close_converter (GIConv cd)
 
 /**
  * g_convert_with_iconv: (skip)
- * @str:           (array length=len) (element-type guint8):
+ * @str:           (array length=len) (element-type xuint8_t):
  *                 the string to convert.
  * @len:           the length of the string in bytes, or -1 if the string is
  *                 nul-terminated (Note that some encodings may allow nul
@@ -382,14 +382,14 @@ close_converter (GIConv cd)
  * the input character set. To get defined behaviour for conversion of
  * unrepresentable characters, use g_convert_with_fallback().
  *
- * Returns: (array length=bytes_written) (element-type guint8) (transfer full):
+ * Returns: (array length=bytes_written) (element-type xuint8_t) (transfer full):
  *               If the conversion was successful, a newly allocated buffer
  *               containing the converted string, which must be freed with
  *               g_free(). Otherwise %NULL and @error will be set.
  **/
 xchar_t*
 g_convert_with_iconv (const xchar_t *str,
-		      gssize       len,
+		      xssize_t       len,
 		      GIConv       converter,
 		      xsize_t       *bytes_read,
 		      xsize_t       *bytes_written,
@@ -455,7 +455,7 @@ g_convert_with_iconv (const xchar_t *str,
 
                 g_set_error (error, G_CONVERT_ERROR, G_CONVERT_ERROR_FAILED,
                              _("Error during conversion: %s"),
-                             g_strerror (errsv));
+                             xstrerror (errsv));
               }
 	      have_error = TRUE;
 	      break;
@@ -512,7 +512,7 @@ g_convert_with_iconv (const xchar_t *str,
 
 /**
  * g_convert:
- * @str:           (array length=len) (element-type guint8):
+ * @str:           (array length=len) (element-type xuint8_t):
  *                 the string to convert.
  * @len:           the length of the string in bytes, or -1 if the string is
  *                 nul-terminated (Note that some encodings may allow nul
@@ -546,16 +546,16 @@ g_convert_with_iconv (const xchar_t *str,
  * could combine with the base character.)
  *
  * Using extensions such as "//TRANSLIT" may not work (or may not work
- * well) on many platforms.  Consider using g_str_to_ascii() instead.
+ * well) on many platforms.  Consider using xstr_to_ascii() instead.
  *
- * Returns: (array length=bytes_written) (element-type guint8) (transfer full):
+ * Returns: (array length=bytes_written) (element-type xuint8_t) (transfer full):
  *          If the conversion was successful, a newly allocated buffer
  *          containing the converted string, which must be freed with g_free().
  *          Otherwise %NULL and @error will be set.
  **/
 xchar_t*
 g_convert (const xchar_t *str,
-           gssize       len,
+           xssize_t       len,
            const xchar_t *to_codeset,
            const xchar_t *from_codeset,
            xsize_t       *bytes_read,
@@ -593,7 +593,7 @@ g_convert (const xchar_t *str,
 
 /**
  * g_convert_with_fallback:
- * @str:          (array length=len) (element-type guint8):
+ * @str:          (array length=len) (element-type xuint8_t):
  *                the string to convert.
  * @len:          the length of the string in bytes, or -1 if the string is
  *                 nul-terminated (Note that some encodings may allow nul
@@ -634,14 +634,14 @@ g_convert (const xchar_t *str,
  * character until it knows that the next character is not a mark that
  * could combine with the base character.)
  *
- * Returns: (array length=bytes_written) (element-type guint8) (transfer full):
+ * Returns: (array length=bytes_written) (element-type xuint8_t) (transfer full):
  *          If the conversion was successful, a newly allocated buffer
  *          containing the converted string, which must be freed with g_free().
  *          Otherwise %NULL and @error will be set.
  **/
 xchar_t*
 g_convert_with_fallback (const xchar_t *str,
-			 gssize       len,
+			 xssize_t       len,
 			 const xchar_t *to_codeset,
 			 const xchar_t *from_codeset,
 			 const xchar_t *fallback,
@@ -681,13 +681,13 @@ g_convert_with_fallback (const xchar_t *str,
   if (!local_error)
     return dest;
 
-  if (!g_error_matches (local_error, G_CONVERT_ERROR, G_CONVERT_ERROR_ILLEGAL_SEQUENCE))
+  if (!xerror_matches (local_error, G_CONVERT_ERROR, G_CONVERT_ERROR_ILLEGAL_SEQUENCE))
     {
       g_propagate_error (error, local_error);
       return NULL;
     }
   else
-    g_error_free (local_error);
+    xerror_free (local_error);
 
   local_error = NULL;
 
@@ -770,14 +770,14 @@ g_convert_with_fallback (const xchar_t *str,
 		{
 		  if (!fallback)
 		    {
-		      gunichar ch = g_utf8_get_char (p);
-		      insert_str = g_strdup_printf (ch < 0x10000 ? "\\u%04x" : "\\U%08x",
+		      xunichar_t ch = xutf8_get_char (p);
+		      insert_str = xstrdup_printf (ch < 0x10000 ? "\\u%04x" : "\\U%08x",
 						    ch);
 		    }
 		  else
 		    insert_str = fallback;
 
-		  save_p = g_utf8_next_char (p);
+		  save_p = xutf8_next_char (p);
 		  save_inbytes = inbytes_remaining - (save_p - p);
 		  p = insert_str;
 		  inbytes_remaining = strlen (p);
@@ -791,7 +791,7 @@ g_convert_with_fallback (const xchar_t *str,
 
                 g_set_error (error, G_CONVERT_ERROR, G_CONVERT_ERROR_FAILED,
                              _("Error during conversion: %s"),
-                             g_strerror (errsv));
+                             xstrerror (errsv));
               }
 
 	      have_error = TRUE;
@@ -860,7 +860,7 @@ g_convert_with_fallback (const xchar_t *str,
  */
 static xchar_t *
 strdup_len (const xchar_t *string,
-	    gssize       len,
+	    xssize_t       len,
 	    xsize_t       *bytes_read,
 	    xsize_t       *bytes_written,
 	    xerror_t     **error)
@@ -868,7 +868,7 @@ strdup_len (const xchar_t *string,
   xsize_t real_len;
   const xchar_t *end_valid;
 
-  if (!g_utf8_validate (string, len, &end_valid))
+  if (!xutf8_validate (string, len, &end_valid))
     {
       if (bytes_read)
 	*bytes_read = end_valid - string;
@@ -887,7 +887,7 @@ strdup_len (const xchar_t *string,
   if (bytes_written)
     *bytes_written = real_len;
 
-  return g_strndup (string, real_len);
+  return xstrndup (string, real_len);
 }
 
 typedef enum
@@ -911,7 +911,7 @@ typedef enum
  */
 static xchar_t *
 convert_checked (const xchar_t      *string,
-                 gssize            len,
+                 xssize_t            len,
                  const xchar_t      *to_codeset,
                  const xchar_t      *from_codeset,
                  ConvertCheckFlags flags,
@@ -965,7 +965,7 @@ convert_checked (const xchar_t      *string,
 
 /**
  * g_locale_to_utf8:
- * @opsysstring:   (array length=len) (element-type guint8): a string in the
+ * @opsysstring:   (array length=len) (element-type xuint8_t): a string in the
  *                 encoding of the current locale. On Windows
  *                 this means the system codepage.
  * @len:           the length of the string, or -1 if the string is
@@ -1001,7 +1001,7 @@ convert_checked (const xchar_t      *string,
  **/
 xchar_t *
 g_locale_to_utf8 (const xchar_t  *opsysstring,
-		  gssize        len,
+		  xssize_t        len,
 		  xsize_t        *bytes_read,
 		  xsize_t        *bytes_written,
 		  xerror_t      **error)
@@ -1024,7 +1024,7 @@ g_locale_to_utf8 (const xchar_t  *opsysstring,
  */
 xchar_t *
 _g_time_locale_to_utf8 (const xchar_t *opsysstring,
-                        gssize       len,
+                        xssize_t       len,
                         xsize_t       *bytes_read,
                         xsize_t       *bytes_written,
                         xerror_t     **error)
@@ -1047,7 +1047,7 @@ _g_time_locale_to_utf8 (const xchar_t *opsysstring,
  */
 xchar_t *
 _g_ctype_locale_to_utf8 (const xchar_t *opsysstring,
-                         gssize       len,
+                         xssize_t       len,
                          xsize_t       *bytes_read,
                          xsize_t       *bytes_written,
                          xerror_t     **error)
@@ -1090,13 +1090,13 @@ _g_ctype_locale_to_utf8 (const xchar_t *opsysstring,
  * in error %G_CONVERT_ERROR_ILLEGAL_SEQUENCE. Use g_convert() to convert
  * input that may contain embedded nul characters.
  *
- * Returns: (array length=bytes_written) (element-type guint8) (transfer full):
+ * Returns: (array length=bytes_written) (element-type xuint8_t) (transfer full):
  *          A newly-allocated buffer containing the converted string,
  *          or %NULL on an error, and error will be set.
  **/
 xchar_t *
 g_locale_from_utf8 (const xchar_t *utf8string,
-		    gssize       len,
+		    xssize_t       len,
 		    xsize_t       *bytes_read,
 		    xsize_t       *bytes_written,
 		    xerror_t     **error)
@@ -1126,7 +1126,7 @@ filename_charset_cache_free (xpointer_t data)
 {
   GFilenameCharsetCache *cache = data;
   g_free (cache->charset);
-  g_strfreev (cache->filename_charsets);
+  xstrfreev (cache->filename_charsets);
   g_free (cache);
 }
 
@@ -1138,17 +1138,17 @@ filename_charset_cache_free (xpointer_t data)
  * Determines the preferred character sets used for filenames.
  * The first character set from the @charsets is the filename encoding, the
  * subsequent character sets are used when trying to generate a displayable
- * representation of a filename, see g_filename_display_name().
+ * representation of a filename, see xfilename_display_name().
  *
  * On Unix, the character sets are determined by consulting the
- * environment variables `G_FILENAME_ENCODING` and `G_BROKEN_FILENAMES`.
+ * environment variables `XFILENAME_ENCODING` and `G_BROKEN_FILENAMES`.
  * On Windows, the character set used in the GLib API is always UTF-8
  * and said environment variables have no effect.
  *
- * `G_FILENAME_ENCODING` may be set to a comma-separated list of
+ * `XFILENAME_ENCODING` may be set to a comma-separated list of
  * character set names. The special token "\@locale" is taken
  * to  mean the character set for the [current locale][setlocale].
- * If `G_FILENAME_ENCODING` is not set, but `G_BROKEN_FILENAMES` is,
+ * If `XFILENAME_ENCODING` is not set, but `G_BROKEN_FILENAMES` is,
  * the character set of the current locale is taken as the filename
  * encoding. If neither environment variable  is set, UTF-8 is taken
  * as the filename encoding, but the character set of the current locale
@@ -1157,7 +1157,7 @@ filename_charset_cache_free (xpointer_t data)
  * The returned @charsets belong to GLib and must not be freed.
  *
  * Note that on Unix, regardless of the locale character set or
- * `G_FILENAME_ENCODING` value, the actual file names present
+ * `XFILENAME_ENCODING` value, the actual file names present
  * on a system might be in any random encoding or just gibberish.
  *
  * Returns: %TRUE if the filename encoding is UTF-8.
@@ -1183,13 +1183,13 @@ g_get_filename_charsets (const xchar_t ***filename_charsets)
       xint_t i;
 
       g_free (cache->charset);
-      g_strfreev (cache->filename_charsets);
-      cache->charset = g_strdup (charset);
+      xstrfreev (cache->filename_charsets);
+      cache->charset = xstrdup (charset);
 
-      p = g_getenv ("G_FILENAME_ENCODING");
+      p = g_getenv ("XFILENAME_ENCODING");
       if (p != NULL && p[0] != '\0')
 	{
-	  cache->filename_charsets = g_strsplit (p, ",", 0);
+	  cache->filename_charsets = xstrsplit (p, ",", 0);
 	  cache->is_utf8 = (strcmp (cache->filename_charsets[0], "UTF-8") == 0);
 
 	  for (i = 0; cache->filename_charsets[i]; i++)
@@ -1198,7 +1198,7 @@ g_get_filename_charsets (const xchar_t ***filename_charsets)
 		{
 		  g_get_charset (&new_charset);
 		  g_free (cache->filename_charsets[i]);
-		  cache->filename_charsets[i] = g_strdup (new_charset);
+		  cache->filename_charsets[i] = xstrdup (new_charset);
 		}
 	    }
 	}
@@ -1206,15 +1206,15 @@ g_get_filename_charsets (const xchar_t ***filename_charsets)
 	{
 	  cache->filename_charsets = g_new0 (xchar_t *, 2);
 	  cache->is_utf8 = g_get_charset (&new_charset);
-	  cache->filename_charsets[0] = g_strdup (new_charset);
+	  cache->filename_charsets[0] = xstrdup (new_charset);
 	}
       else
 	{
 	  cache->filename_charsets = g_new0 (xchar_t *, 3);
 	  cache->is_utf8 = TRUE;
-	  cache->filename_charsets[0] = g_strdup ("UTF-8");
+	  cache->filename_charsets[0] = xstrdup ("UTF-8");
 	  if (!g_get_charset (&new_charset))
-	    cache->filename_charsets[1] = g_strdup (new_charset);
+	    cache->filename_charsets[1] = xstrdup (new_charset);
 	}
     }
 
@@ -1270,7 +1270,7 @@ get_filename_charset (const xchar_t **filename_charset)
 }
 
 /**
- * g_filename_to_utf8:
+ * xfilename_to_utf8:
  * @opsysstring: (type filename): a string in the encoding for filenames
  * @len:           the length of the string, or -1 if the string is
  *                 nul-terminated (Note that some encodings may allow nul
@@ -1305,8 +1305,8 @@ get_filename_charset (const xchar_t **filename_charset)
  * Returns: (type utf8): The converted string, or %NULL on an error.
  **/
 xchar_t*
-g_filename_to_utf8 (const xchar_t *opsysstring,
-		    gssize       len,
+xfilename_to_utf8 (const xchar_t *opsysstring,
+		    xssize_t       len,
 		    xsize_t       *bytes_read,
 		    xsize_t       *bytes_written,
 		    xerror_t     **error)
@@ -1325,7 +1325,7 @@ g_filename_to_utf8 (const xchar_t *opsysstring,
 }
 
 /**
- * g_filename_from_utf8:
+ * xfilename_from_utf8:
  * @utf8string:    (type utf8): a UTF-8 encoded string.
  * @len:           the length of the string, or -1 if the string is
  *                 nul-terminated.
@@ -1357,8 +1357,8 @@ g_filename_to_utf8 (const xchar_t *opsysstring,
  *               The converted string, or %NULL on an error.
  **/
 xchar_t*
-g_filename_from_utf8 (const xchar_t *utf8string,
-		      gssize       len,
+xfilename_from_utf8 (const xchar_t *utf8string,
+		      xssize_t       len,
 		      xsize_t       *bytes_read,
 		      xsize_t       *bytes_written,
 		      xerror_t     **error)
@@ -1490,7 +1490,7 @@ g_escape_file_uri (const xchar_t *hostname,
    * does, and they are actually more or less equivalent in Windows.
    */
 
-  pathname = g_strdup (pathname);
+  pathname = xstrdup (pathname);
   p = (char *) pathname;
 
   while ((backslash = strchr (p, '\\')) != NULL)
@@ -1507,7 +1507,7 @@ g_escape_file_uri (const xchar_t *hostname,
 
   escaped_path = g_escape_uri_string (pathname, UNSAFE_PATH);
 
-  res = g_strconcat ("file://",
+  res = xstrconcat ("file://",
 		     (escaped_hostname) ? escaped_hostname : "",
 		     (*escaped_path != '/') ? "/" : "",
 		     escaped_path,
@@ -1602,13 +1602,13 @@ g_unescape_uri_string (const char *escaped,
 }
 
 static xboolean_t
-is_asciialphanum (gunichar c)
+is_asciialphanum (xunichar_t c)
 {
   return c <= 0x7F && g_ascii_isalnum (c);
 }
 
 static xboolean_t
-is_asciialpha (gunichar c)
+is_asciialpha (xunichar_t c)
 {
   return c <= 0x7F && g_ascii_isalpha (c);
 }
@@ -1618,7 +1618,7 @@ static xboolean_t
 hostname_validate (const char *hostname)
 {
   const char *p;
-  gunichar c, first_char, last_char;
+  xunichar_t c, first_char, last_char;
 
   p = hostname;
   if (*p == '\0')
@@ -1626,16 +1626,16 @@ hostname_validate (const char *hostname)
   do
     {
       /* read in a label */
-      c = g_utf8_get_char (p);
-      p = g_utf8_next_char (p);
+      c = xutf8_get_char (p);
+      p = xutf8_next_char (p);
       if (!is_asciialphanum (c))
 	return FALSE;
       first_char = c;
       do
 	{
 	  last_char = c;
-	  c = g_utf8_get_char (p);
-	  p = g_utf8_next_char (p);
+	  c = xutf8_get_char (p);
+	  p = xutf8_next_char (p);
 	}
       while (is_asciialphanum (c) || c == '-');
       if (last_char == '-')
@@ -1650,7 +1650,7 @@ hostname_validate (const char *hostname)
 }
 
 /**
- * g_filename_from_uri:
+ * xfilename_from_uri:
  * @uri: a uri describing a filename (escaped, encoded in ASCII).
  * @hostname: (out) (optional) (nullable): Location to store hostname for the URI.
  *            If there is no hostname in the URI, %NULL will be
@@ -1665,7 +1665,7 @@ hostname_validate (const char *hostname)
  *               the resulting filename, or %NULL on an error.
  **/
 xchar_t *
-g_filename_from_uri (const xchar_t *uri,
+xfilename_from_uri (const xchar_t *uri,
 		     xchar_t      **hostname,
 		     xerror_t     **error)
 {
@@ -1779,14 +1779,14 @@ g_filename_from_uri (const xchar_t *uri,
     }
 #endif
 
-  result = g_strdup (filename + offs);
+  result = xstrdup (filename + offs);
   g_free (filename);
 
   return result;
 }
 
 /**
- * g_filename_to_uri:
+ * xfilename_to_uri:
  * @filename: (type filename): an absolute filename specified in the GLib file
  *     name encoding, which is the on-disk file name bytes on Unix, and UTF-8
  *     on Windows
@@ -1801,7 +1801,7 @@ g_filename_from_uri (const xchar_t *uri,
  *               URI, or %NULL on an error.
  **/
 xchar_t *
-g_filename_to_uri (const xchar_t *filename,
+xfilename_to_uri (const xchar_t *filename,
 		   const xchar_t *hostname,
 		   xerror_t     **error)
 {
@@ -1818,7 +1818,7 @@ g_filename_to_uri (const xchar_t *filename,
     }
 
   if (hostname &&
-      !(g_utf8_validate (hostname, -1, NULL)
+      !(xutf8_validate (hostname, -1, NULL)
 	&& hostname_validate (hostname)))
     {
       g_set_error_literal (error, G_CONVERT_ERROR, G_CONVERT_ERROR_ILLEGAL_SEQUENCE,
@@ -1838,7 +1838,7 @@ g_filename_to_uri (const xchar_t *filename,
 }
 
 /**
- * g_uri_list_extract_uris:
+ * xuri_list_extract_uris:
  * @uri_list: an URI list
  *
  * Splits an URI list conforming to the text/uri-list
@@ -1847,17 +1847,17 @@ g_filename_to_uri (const xchar_t *filename,
  *
  * Returns: (transfer full): a newly allocated %NULL-terminated list
  *   of strings holding the individual URIs. The array should be freed
- *   with g_strfreev().
+ *   with xstrfreev().
  *
  * Since: 2.6
  */
 xchar_t **
-g_uri_list_extract_uris (const xchar_t *uri_list)
+xuri_list_extract_uris (const xchar_t *uri_list)
 {
-  GPtrArray *uris;
+  xptr_array_t *uris;
   const xchar_t *p, *q;
 
-  uris = g_ptr_array_new ();
+  uris = xptr_array_new ();
 
   p = uri_list;
 
@@ -1886,7 +1886,7 @@ g_uri_list_extract_uris (const xchar_t *uri_list)
 		q--;
 
 	      if (q > p)
-                g_ptr_array_add (uris, g_strndup (p, q - p + 1));
+                xptr_array_add (uris, xstrndup (p, q - p + 1));
             }
         }
       p = strchr (p, '\n');
@@ -1894,13 +1894,13 @@ g_uri_list_extract_uris (const xchar_t *uri_list)
 	p++;
     }
 
-  g_ptr_array_add (uris, NULL);
+  xptr_array_add (uris, NULL);
 
-  return (xchar_t **) g_ptr_array_free (uris, FALSE);
+  return (xchar_t **) xptr_array_free (uris, FALSE);
 }
 
 /**
- * g_filename_display_basename:
+ * xfilename_display_basename:
  * @filename: (type filename): an absolute pathname in the
  *     GLib file name encoding
  *
@@ -1918,7 +1918,7 @@ g_uri_list_extract_uris (const xchar_t *uri_list)
  * You must pass the whole absolute pathname to this functions so that
  * translation of well known locations can be done.
  *
- * This function is preferred over g_filename_display_name() if you know the
+ * This function is preferred over xfilename_display_name() if you know the
  * whole path, as it allows translation.
  *
  * Returns: a newly allocated string containing
@@ -1927,7 +1927,7 @@ g_uri_list_extract_uris (const xchar_t *uri_list)
  * Since: 2.6
  **/
 xchar_t *
-g_filename_display_basename (const xchar_t *filename)
+xfilename_display_basename (const xchar_t *filename)
 {
   char *basename;
   char *display_name;
@@ -1935,20 +1935,20 @@ g_filename_display_basename (const xchar_t *filename)
   g_return_val_if_fail (filename != NULL, NULL);
 
   basename = g_path_get_basename (filename);
-  display_name = g_filename_display_name (basename);
+  display_name = xfilename_display_name (basename);
   g_free (basename);
   return display_name;
 }
 
 /**
- * g_filename_display_name:
+ * xfilename_display_name:
  * @filename: (type filename): a pathname hopefully in the
  *     GLib file name encoding
  *
  * Converts a filename into a valid UTF-8 string. The conversion is
  * not necessarily reversible, so you should keep the original around
  * and use the return value of this function only for display purposes.
- * Unlike g_filename_to_utf8(), the result is guaranteed to be non-%NULL
+ * Unlike xfilename_to_utf8(), the result is guaranteed to be non-%NULL
  * even if the filename actually isn't in the GLib file name encoding.
  *
  * If GLib cannot make sense of the encoding of @filename, as a last resort it
@@ -1958,7 +1958,7 @@ g_filename_display_basename (const xchar_t *filename)
  * encoding.
  *
  * If you know the whole pathname of the file you should use
- * g_filename_display_basename(), since that allows location-based
+ * xfilename_display_basename(), since that allows location-based
  * translation of filenames.
  *
  * Returns: a newly allocated string containing
@@ -1967,7 +1967,7 @@ g_filename_display_basename (const xchar_t *filename)
  * Since: 2.6
  **/
 xchar_t *
-g_filename_display_name (const xchar_t *filename)
+xfilename_display_name (const xchar_t *filename)
 {
   xint_t i;
   const xchar_t **charsets;
@@ -1978,8 +1978,8 @@ g_filename_display_name (const xchar_t *filename)
 
   if (is_utf8)
     {
-      if (g_utf8_validate (filename, -1, NULL))
-	display_name = g_strdup (filename);
+      if (xutf8_validate (filename, -1, NULL))
+	display_name = xstrdup (filename);
     }
 
   if (!display_name)
@@ -2001,7 +2001,7 @@ g_filename_display_name (const xchar_t *filename)
    * by a question mark
    */
   if (!display_name)
-    display_name = g_utf8_make_valid (filename, -1);
+    display_name = xutf8_make_valid (filename, -1);
 
   return display_name;
 }
@@ -2010,57 +2010,57 @@ g_filename_display_name (const xchar_t *filename)
 
 /* Binary compatibility versions. Not for newly compiled code. */
 
-_XPL_EXTERN xchar_t *g_filename_to_utf8_utf8   (const xchar_t  *opsysstring,
-                                               gssize        len,
+_XPL_EXTERN xchar_t *xfilename_to_utf8_utf8   (const xchar_t  *opsysstring,
+                                               xssize_t        len,
                                                xsize_t        *bytes_read,
                                                xsize_t        *bytes_written,
                                                xerror_t      **error) G_GNUC_MALLOC;
-_XPL_EXTERN xchar_t *g_filename_from_utf8_utf8 (const xchar_t  *utf8string,
-                                               gssize        len,
+_XPL_EXTERN xchar_t *xfilename_from_utf8_utf8 (const xchar_t  *utf8string,
+                                               xssize_t        len,
                                                xsize_t        *bytes_read,
                                                xsize_t        *bytes_written,
                                                xerror_t      **error) G_GNUC_MALLOC;
-_XPL_EXTERN xchar_t *g_filename_from_uri_utf8  (const xchar_t  *uri,
+_XPL_EXTERN xchar_t *xfilename_from_uri_utf8  (const xchar_t  *uri,
                                                xchar_t       **hostname,
                                                xerror_t      **error) G_GNUC_MALLOC;
-_XPL_EXTERN xchar_t *g_filename_to_uri_utf8    (const xchar_t  *filename,
+_XPL_EXTERN xchar_t *xfilename_to_uri_utf8    (const xchar_t  *filename,
                                                const xchar_t  *hostname,
                                                xerror_t      **error) G_GNUC_MALLOC;
 
 xchar_t *
-g_filename_to_utf8_utf8 (const xchar_t *opsysstring,
-                         gssize       len,
+xfilename_to_utf8_utf8 (const xchar_t *opsysstring,
+                         xssize_t       len,
                          xsize_t       *bytes_read,
                          xsize_t       *bytes_written,
                          xerror_t     **error)
 {
-  return g_filename_to_utf8 (opsysstring, len, bytes_read, bytes_written, error);
+  return xfilename_to_utf8 (opsysstring, len, bytes_read, bytes_written, error);
 }
 
 xchar_t *
-g_filename_from_utf8_utf8 (const xchar_t *utf8string,
-                           gssize       len,
+xfilename_from_utf8_utf8 (const xchar_t *utf8string,
+                           xssize_t       len,
                            xsize_t       *bytes_read,
                            xsize_t       *bytes_written,
                            xerror_t     **error)
 {
-  return g_filename_from_utf8 (utf8string, len, bytes_read, bytes_written, error);
+  return xfilename_from_utf8 (utf8string, len, bytes_read, bytes_written, error);
 }
 
 xchar_t *
-g_filename_from_uri_utf8 (const xchar_t *uri,
+xfilename_from_uri_utf8 (const xchar_t *uri,
                           xchar_t      **hostname,
                           xerror_t     **error)
 {
-  return g_filename_from_uri (uri, hostname, error);
+  return xfilename_from_uri (uri, hostname, error);
 }
 
 xchar_t *
-g_filename_to_uri_utf8 (const xchar_t *filename,
+xfilename_to_uri_utf8 (const xchar_t *filename,
                         const xchar_t *hostname,
                         xerror_t     **error)
 {
-  return g_filename_to_uri (filename, hostname, error);
+  return xfilename_to_uri (filename, hostname, error);
 }
 
 #endif

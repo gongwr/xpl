@@ -214,11 +214,11 @@ g_shell_quote (const xchar_t *unquoted_string)
    */
 
   const xchar_t *p;
-  GString *dest;
+  xstring_t *dest;
 
   g_return_val_if_fail (unquoted_string != NULL, NULL);
 
-  dest = g_string_new ("'");
+  dest = xstring_new ("'");
 
   p = unquoted_string;
 
@@ -229,17 +229,17 @@ g_shell_quote (const xchar_t *unquoted_string)
     {
       /* Replace literal ' with a close ', a \', and an open ' */
       if (*p == '\'')
-        g_string_append (dest, "'\\''");
+        xstring_append (dest, "'\\''");
       else
-        g_string_append_c (dest, *p);
+        xstring_append_c (dest, *p);
 
       ++p;
     }
 
   /* close the quote */
-  g_string_append_c (dest, '\'');
+  xstring_append_c (dest, '\'');
 
-  return g_string_free (dest, FALSE);
+  return xstring_free (dest, FALSE);
 }
 
 /**
@@ -284,15 +284,15 @@ g_shell_unquote (const xchar_t *quoted_string,
   xchar_t *unquoted;
   xchar_t *end;
   xchar_t *start;
-  GString *retval;
+  xstring_t *retval;
 
   g_return_val_if_fail (quoted_string != NULL, NULL);
 
-  unquoted = g_strdup (quoted_string);
+  unquoted = xstrdup (quoted_string);
 
   start = unquoted;
   end = unquoted;
-  retval = g_string_new (NULL);
+  retval = xstring_new (NULL);
 
   /* The loop allows cases such as
    * "foo"blah blah'bar'woo foo"baz"la la la\'\''foo'
@@ -315,13 +315,13 @@ g_shell_unquote (const xchar_t *quoted_string,
               if (*start)
                 {
                   if (*start != '\n')
-                    g_string_append_c (retval, *start);
+                    xstring_append_c (retval, *start);
                   ++start;
                 }
             }
           else
             {
-              g_string_append_c (retval, *start);
+              xstring_append_c (retval, *start);
               ++start;
             }
         }
@@ -334,20 +334,20 @@ g_shell_unquote (const xchar_t *quoted_string,
             }
           else
             {
-              g_string_append (retval, start);
+              xstring_append (retval, start);
               start = end;
             }
         }
     }
 
   g_free (unquoted);
-  return g_string_free (retval, FALSE);
+  return xstring_free (retval, FALSE);
 
  error:
   g_assert (error == NULL || *error != NULL);
 
   g_free (unquoted);
-  g_string_free (retval, TRUE);
+  xstring_free (retval, TRUE);
   return NULL;
 }
 
@@ -421,32 +421,32 @@ g_shell_unquote (const xchar_t *quoted_string,
  */
 
 static inline void
-ensure_token (GString **token)
+ensure_token (xstring_t **token)
 {
   if (*token == NULL)
-    *token = g_string_new (NULL);
+    *token = xstring_new (NULL);
 }
 
 static void
-delimit_token (GString **token,
-               GSList **retval)
+delimit_token (xstring_t **token,
+               xslist_t **retval)
 {
   if (*token == NULL)
     return;
 
-  *retval = g_slist_prepend (*retval, g_string_free (*token, FALSE));
+  *retval = xslist_prepend (*retval, xstring_free (*token, FALSE));
 
   *token = NULL;
 }
 
-static GSList*
+static xslist_t*
 tokenize_command_line (const xchar_t *command_line,
                        xerror_t **error)
 {
   xchar_t current_quote;
   const xchar_t *p;
-  GString *current_token = NULL;
-  GSList *retval = NULL;
+  xstring_t *current_token = NULL;
+  xslist_t *retval = NULL;
   xboolean_t quoted;
 
   current_quote = '\0';
@@ -467,8 +467,8 @@ tokenize_command_line (const xchar_t *command_line,
                * to be interpreted later after tokenization
                */
               ensure_token (&current_token);
-              g_string_append_c (current_token, '\\');
-              g_string_append_c (current_token, *p);
+              xstring_append_c (current_token, '\\');
+              xstring_append_c (current_token, *p);
             }
 
           current_quote = '\0';
@@ -499,7 +499,7 @@ tokenize_command_line (const xchar_t *command_line,
            */
 
           ensure_token (&current_token);
-          g_string_append_c (current_token, *p);
+          xstring_append_c (current_token, *p);
         }
       else
         {
@@ -533,7 +533,7 @@ tokenize_command_line (const xchar_t *command_line,
             case '\'':
             case '"':
               ensure_token (&current_token);
-              g_string_append_c (current_token, *p);
+              xstring_append_c (current_token, *p);
 
               G_GNUC_FALLTHROUGH;
             case '\\':
@@ -555,7 +555,7 @@ tokenize_command_line (const xchar_t *command_line,
                     break;
                   default:
                     ensure_token (&current_token);
-                    g_string_append_c (current_token, *p);
+                    xstring_append_c (current_token, *p);
 		    break;
                 }
               break;
@@ -565,7 +565,7 @@ tokenize_command_line (const xchar_t *command_line,
                * otherwise create a new token.
                */
               ensure_token (&current_token);
-              g_string_append_c (current_token, *p);
+              xstring_append_c (current_token, *p);
               break;
             }
         }
@@ -614,14 +614,14 @@ tokenize_command_line (const xchar_t *command_line,
     }
 
   /* we appended backward */
-  retval = g_slist_reverse (retval);
+  retval = xslist_reverse (retval);
 
   return retval;
 
  error:
   g_assert (error == NULL || *error != NULL);
 
-  g_slist_free_full (retval, g_free);
+  xslist_free_full (retval, g_free);
 
   return NULL;
 }
@@ -651,7 +651,7 @@ tokenize_command_line (const xchar_t *command_line,
  * guaranteed that @argvp will be a non-empty array if this function returns
  * successfully.
  *
- * Free the returned vector with g_strfreev().
+ * Free the returned vector with xstrfreev().
  *
  * Returns: %TRUE on success, %FALSE if error set
  **/
@@ -664,9 +664,9 @@ g_shell_parse_argv (const xchar_t *command_line,
   /* Code based on poptParseArgvString() from libpopt */
   xint_t argc = 0;
   xchar_t **argv = NULL;
-  GSList *tokens = NULL;
+  xslist_t *tokens = NULL;
   xint_t i;
-  GSList *tmp_list;
+  xslist_t *tmp_list;
 
   g_return_val_if_fail (command_line != NULL, FALSE);
 
@@ -688,7 +688,7 @@ g_shell_parse_argv (const xchar_t *command_line,
    * such things.
    */
 
-  argc = g_slist_length (tokens);
+  argc = xslist_length (tokens);
   argv = g_new0 (xchar_t*, argc + 1);
   i = 0;
   tmp_list = tokens;
@@ -702,11 +702,11 @@ g_shell_parse_argv (const xchar_t *command_line,
       if (argv[i] == NULL)
         goto failed;
 
-      tmp_list = g_slist_next (tmp_list);
+      tmp_list = xslist_next (tmp_list);
       ++i;
     }
 
-  g_slist_free_full (tokens, g_free);
+  xslist_free_full (tokens, g_free);
 
   g_assert (argc > 0);
   g_assert (argv != NULL && argv[0] != NULL);
@@ -717,15 +717,15 @@ g_shell_parse_argv (const xchar_t *command_line,
   if (argvp)
     *argvp = argv;
   else
-    g_strfreev (argv);
+    xstrfreev (argv);
 
   return TRUE;
 
  failed:
 
   g_assert (error == NULL || *error != NULL);
-  g_strfreev (argv);
-  g_slist_free_full (tokens, g_free);
+  xstrfreev (argv);
+  xslist_free_full (tokens, g_free);
 
   return FALSE;
 }

@@ -29,21 +29,21 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_AUTH_OBSERVER         (g_dbus_auth_observer_get_type ())
-#define G_DBUS_AUTH_OBSERVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_AUTH_OBSERVER, GDBusAuthObserver))
+#define XTYPE_DBUS_AUTH_OBSERVER         (xdbus_auth_observer_get_type ())
+#define G_DBUS_AUTH_OBSERVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_AUTH_OBSERVER, xdbus_auth_observer))
 #define X_IS_DBUS_AUTH_OBSERVER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_AUTH_OBSERVER))
 
 XPL_AVAILABLE_IN_ALL
-xtype_t              g_dbus_auth_observer_get_type                     (void) G_GNUC_CONST;
+xtype_t              xdbus_auth_observer_get_type                     (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-GDBusAuthObserver *g_dbus_auth_observer_new                          (void);
+xdbus_auth_observer_t *xdbus_auth_observer_new                          (void);
 XPL_AVAILABLE_IN_ALL
-xboolean_t           g_dbus_auth_observer_authorize_authenticated_peer (GDBusAuthObserver  *observer,
+xboolean_t           xdbus_auth_observer_authorize_authenticated_peer (xdbus_auth_observer_t  *observer,
                                                                       xio_stream_t          *stream,
-                                                                      GCredentials       *credentials);
+                                                                      xcredentials_t       *credentials);
 
 XPL_AVAILABLE_IN_2_34
-xboolean_t           g_dbus_auth_observer_allow_mechanism (GDBusAuthObserver  *observer,
+xboolean_t           xdbus_auth_observer_allow_mechanism (xdbus_auth_observer_t  *observer,
                                                          const xchar_t        *mechanism);
 
 G_END_DECLS

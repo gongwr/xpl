@@ -42,11 +42,11 @@ typedef enum
 } InteropFlags;
 
 static xboolean_t
-allow_external_cb (G_GNUC_UNUSED GDBusAuthObserver *observer,
+allow_external_cb (G_GNUC_UNUSED xdbus_auth_observer_t *observer,
                    const char *mechanism,
                    G_GNUC_UNUSED xpointer_t user_data)
 {
-  if (g_strcmp0 (mechanism, "EXTERNAL") == 0)
+  if (xstrcmp0 (mechanism, "EXTERNAL") == 0)
     {
       g_debug ("Accepting EXTERNAL authentication");
       return TRUE;
@@ -59,11 +59,11 @@ allow_external_cb (G_GNUC_UNUSED GDBusAuthObserver *observer,
 }
 
 static xboolean_t
-allow_anonymous_cb (G_GNUC_UNUSED GDBusAuthObserver *observer,
+allow_anonymous_cb (G_GNUC_UNUSED xdbus_auth_observer_t *observer,
                     const char *mechanism,
                     G_GNUC_UNUSED xpointer_t user_data)
 {
-  if (g_strcmp0 (mechanism, "ANONYMOUS") == 0)
+  if (xstrcmp0 (mechanism, "ANONYMOUS") == 0)
     {
       g_debug ("Accepting ANONYMOUS authentication");
       return TRUE;
@@ -76,11 +76,11 @@ allow_anonymous_cb (G_GNUC_UNUSED GDBusAuthObserver *observer,
 }
 
 static xboolean_t
-allow_sha1_cb (G_GNUC_UNUSED GDBusAuthObserver *observer,
+allow_sha1_cb (G_GNUC_UNUSED xdbus_auth_observer_t *observer,
                const char *mechanism,
                G_GNUC_UNUSED xpointer_t user_data)
 {
-  if (g_strcmp0 (mechanism, "DBUS_COOKIE_SHA1") == 0)
+  if (xstrcmp0 (mechanism, "DBUS_COOKIE_SHA1") == 0)
     {
       g_debug ("Accepting DBUS_COOKIE_SHA1 authentication");
       return TRUE;
@@ -94,7 +94,7 @@ allow_sha1_cb (G_GNUC_UNUSED GDBusAuthObserver *observer,
 }
 
 static xboolean_t
-allow_any_mechanism_cb (G_GNUC_UNUSED GDBusAuthObserver *observer,
+allow_any_mechanism_cb (G_GNUC_UNUSED xdbus_auth_observer_t *observer,
                         const char *mechanism,
                         G_GNUC_UNUSED xpointer_t user_data)
 {
@@ -103,9 +103,9 @@ allow_any_mechanism_cb (G_GNUC_UNUSED GDBusAuthObserver *observer,
 }
 
 static xboolean_t
-authorize_any_authenticated_peer_cb (G_GNUC_UNUSED GDBusAuthObserver *observer,
+authorize_any_authenticated_peer_cb (G_GNUC_UNUSED xdbus_auth_observer_t *observer,
                                      G_GNUC_UNUSED xio_stream_t *stream,
-                                     GCredentials *credentials,
+                                     xcredentials_t *credentials,
                                      G_GNUC_UNUSED xpointer_t user_data)
 {
   if (credentials == NULL)
@@ -114,7 +114,7 @@ authorize_any_authenticated_peer_cb (G_GNUC_UNUSED GDBusAuthObserver *observer,
     }
   else
     {
-      xchar_t *str = g_credentials_to_string (credentials);
+      xchar_t *str = xcredentials_to_string (credentials);
 
       g_debug ("Authorizing peer with credentials: %s", str);
       g_free (str);
@@ -123,40 +123,40 @@ authorize_any_authenticated_peer_cb (G_GNUC_UNUSED GDBusAuthObserver *observer,
   return TRUE;
 }
 
-static GDBusMessage *
-whoami_filter_cb (GDBusConnection *connection,
-                  GDBusMessage *message,
+static xdbus_message_t *
+whoami_filter_cb (xdbus_connection_t *connection,
+                  xdbus_message_t *message,
                   xboolean_t incoming,
                   G_GNUC_UNUSED xpointer_t user_data)
 {
   if (!incoming)
     return message;
 
-  if (g_dbus_message_get_message_type (message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL &&
-      g_strcmp0 (g_dbus_message_get_member (message), "WhoAmI") == 0)
+  if (xdbus_message_get_message_type (message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL &&
+      xstrcmp0 (xdbus_message_get_member (message), "WhoAmI") == 0)
     {
-      GDBusMessage *reply = g_dbus_message_new_method_reply (message);
+      xdbus_message_t *reply = xdbus_message_new_method_reply (message);
       gint64 uid = -1;
       gint64 pid = -1;
 #ifdef G_OS_UNIX
-      GCredentials *credentials = g_dbus_connection_get_peer_credentials (connection);
+      xcredentials_t *credentials = g_dbus_connection_get_peer_credentials (connection);
 
       if (credentials != NULL)
         {
-          uid = (gint64) g_credentials_get_unix_user (credentials, NULL);
-          pid = (gint64) g_credentials_get_unix_pid (credentials, NULL);
+          uid = (gint64) xcredentials_get_unix_user (credentials, NULL);
+          pid = (gint64) xcredentials_get_unix_pid (credentials, NULL);
         }
 #endif
 
-      g_dbus_message_set_body (reply,
-                               g_variant_new ("(xx)", uid, pid));
+      xdbus_message_set_body (reply,
+                               xvariant_new ("(xx)", uid, pid));
       g_dbus_connection_send_message (connection, reply,
                                       G_DBUS_SEND_MESSAGE_FLAGS_NONE,
                                       NULL, NULL);
-      g_object_unref (reply);
+      xobject_unref (reply);
 
       /* handled */
-      g_object_unref (message);
+      xobject_unref (message);
       return NULL;
     }
 
@@ -164,11 +164,11 @@ whoami_filter_cb (GDBusConnection *connection,
 }
 
 static xboolean_t
-new_connection_cb (G_GNUC_UNUSED GDBusServer *server,
-                   GDBusConnection *connection,
+new_connection_cb (G_GNUC_UNUSED xdbus_server_t *server,
+                   xdbus_connection_t *connection,
                    G_GNUC_UNUSED xpointer_t user_data)
 {
-  GCredentials *credentials = g_dbus_connection_get_peer_credentials (connection);
+  xcredentials_t *credentials = g_dbus_connection_get_peer_credentials (connection);
 
   if (credentials == NULL)
     {
@@ -176,13 +176,13 @@ new_connection_cb (G_GNUC_UNUSED GDBusServer *server,
     }
   else
     {
-      xchar_t *str = g_credentials_to_string (credentials);
+      xchar_t *str = xcredentials_to_string (credentials);
 
       g_debug ("New connection from peer with credentials: %s", str);
       g_free (str);
     }
 
-  g_object_ref (connection);
+  xobject_ref (connection);
   g_dbus_connection_add_filter (connection, whoami_filter_cb, NULL, NULL);
   return TRUE;
 }
@@ -197,7 +197,7 @@ typedef struct
 } LibdbusCall;
 
 static void
-libdbus_call_task_cb (GTask *task,
+libdbus_call_task_cb (xtask_t *task,
                       G_GNUC_UNUSED xpointer_t source_object,
                       xpointer_t task_data,
                       G_GNUC_UNUSED xcancellable_t *cancellable)
@@ -220,7 +220,7 @@ store_result_cb (G_GNUC_UNUSED xobject_t *source_object,
 
   g_assert_nonnull (result);
   g_assert_null (*result);
-  *result = g_object_ref (res);
+  *result = xobject_ref (res);
 }
 
 static void
@@ -264,12 +264,12 @@ do_test_server_auth (InteropFlags flags)
   xerror_t *error = NULL;
   xchar_t *tmpdir = NULL;
   xchar_t *listenable_address = NULL;
-  GDBusServer *server = NULL;
-  GDBusAuthObserver *observer = NULL;
+  xdbus_server_t *server = NULL;
+  xdbus_auth_observer_t *observer = NULL;
   GDBusServerFlags server_flags = G_DBUS_SERVER_FLAGS_RUN_IN_THREAD;
   xchar_t *guid = NULL;
   const char *connectable_address;
-  GDBusConnection *client = NULL;
+  xdbus_connection_t *client = NULL;
   xasync_result_t *result = NULL;
   xvariant_t *tuple = NULL;
   gint64 uid, pid;
@@ -282,7 +282,7 @@ do_test_server_auth (InteropFlags flags)
 
   if (flags & INTEROP_FLAGS_TCP)
     {
-      listenable_address = g_strdup ("tcp:host=127.0.0.1");
+      listenable_address = xstrdup ("tcp:host=127.0.0.1");
     }
   else
     {
@@ -292,7 +292,7 @@ do_test_server_auth (InteropFlags flags)
       tmpdir = g_dir_make_tmp ("gdbus-server-auth-XXXXXX", &error);
       g_assert_no_error (error);
       escaped = g_dbus_address_escape_value (tmpdir);
-      listenable_address = g_strdup_printf ("unix:%s=%s",
+      listenable_address = xstrdup_printf ("unix:%s=%s",
                                             (flags & INTEROP_FLAGS_ABSTRACT) ? "tmpdir" : "dir",
                                             escaped);
       g_free (escaped);
@@ -329,7 +329,7 @@ do_test_server_auth (InteropFlags flags)
   if (flags & INTEROP_FLAGS_REQUIRE_SAME_USER)
     server_flags |= G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER;
 
-  observer = g_dbus_auth_observer_new ();
+  observer = xdbus_auth_observer_new ();
 
   if (flags & INTEROP_FLAGS_EXTERNAL)
     g_signal_connect (observer, "allow-mechanism",
@@ -368,7 +368,7 @@ do_test_server_auth (InteropFlags flags)
                                      NULL, NULL, store_result_cb, &result);
 
   while (result == NULL)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   client = g_dbus_connection_new_for_address_finish (result, &error);
   g_assert_no_error (error);
@@ -381,7 +381,7 @@ do_test_server_auth (InteropFlags flags)
                           &result);
 
   while (result == NULL)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   tuple = g_dbus_connection_call_finish (client, result, &error);
   g_assert_no_error (error);
@@ -391,20 +391,20 @@ do_test_server_auth (InteropFlags flags)
 
   uid = -2;
   pid = -2;
-  g_variant_get (tuple, "(xx)", &uid, &pid);
+  xvariant_get (tuple, "(xx)", &uid, &pid);
 
   g_debug ("Server says GDBus client is uid %" G_GINT64_FORMAT ", pid %" G_GINT64_FORMAT,
            uid, pid);
 
   assert_expected_uid_pid (flags, uid, pid);
 
-  g_clear_pointer (&tuple, g_variant_unref);
+  g_clear_pointer (&tuple, xvariant_unref);
 
 #ifdef HAVE_DBUS1
   for (i = 0; i < n; i++)
     {
       LibdbusCall libdbus_call = { DBUS_ERROR_INIT, NULL, NULL, NULL };
-      GTask *task;
+      xtask_t *task;
 
       /* The test suite uses %G_TEST_OPTION_ISOLATE_DIRS, which sets
        * `HOME=/dev/null` and leaves g_get_home_dir() pointing to the per-test
@@ -424,15 +424,15 @@ do_test_server_auth (InteropFlags flags)
                                                         "WhoAmI");
 
       if (libdbus_call.call == NULL)
-        g_error ("Out of memory");
+        xerror ("Out of memory");
 
       result = NULL;
-      task = g_task_new (NULL, NULL, store_result_cb, &result);
-      g_task_set_task_data (task, &libdbus_call, NULL);
-      g_task_run_in_thread (task, libdbus_call_task_cb);
+      task = xtask_new (NULL, NULL, store_result_cb, &result);
+      xtask_set_task_data (task, &libdbus_call, NULL);
+      xtask_run_in_thread (task, libdbus_call_task_cb);
 
       while (result == NULL)
-        g_main_context_iteration (NULL, TRUE);
+        xmain_context_iteration (NULL, TRUE);
 
       g_clear_object (&result);
 
@@ -470,7 +470,7 @@ out:
     g_dbus_server_stop (server);
 
   if (tmpdir != NULL)
-    g_assert_cmpstr (g_rmdir (tmpdir) == 0 ? "OK" : g_strerror (errno),
+    g_assert_cmpstr (g_rmdir (tmpdir) == 0 ? "OK" : xstrerror (errno),
                      ==, "OK");
 
   g_clear_object (&server);

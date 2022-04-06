@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 
 #define XTYPE_SIMPLE_ACTION_GROUP                          (g_simple_action_group_get_type ())
 #define G_SIMPLE_ACTION_GROUP(inst)                         (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_SIMPLE_ACTION_GROUP, GSimpleActionGroup))
+                                                             XTYPE_SIMPLE_ACTION_GROUP, xsimple_action_group))
 #define G_SIMPLE_ACTION_GROUP_CLASS(class)                  (XTYPE_CHECK_CLASS_CAST ((class),                       \
                                                              XTYPE_SIMPLE_ACTION_GROUP, GSimpleActionGroupClass))
 #define X_IS_SIMPLE_ACTION_GROUP(inst)                      (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
@@ -45,9 +45,9 @@ typedef struct _GSimpleActionGroupPrivate                   GSimpleActionGroupPr
 typedef struct _GSimpleActionGroupClass                     GSimpleActionGroupClass;
 
 /**
- * GSimpleActionGroup:
+ * xsimple_action_group_t:
  *
- * The #GSimpleActionGroup structure contains private data and should only be accessed using the provided API.
+ * The #xsimple_action_group_t structure contains private data and should only be accessed using the provided API.
  *
  * Since: 2.28
  */
@@ -72,23 +72,23 @@ XPL_AVAILABLE_IN_ALL
 xtype_t                   g_simple_action_group_get_type                  (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GSimpleActionGroup *    g_simple_action_group_new                       (void);
+xsimple_action_group_t *    g_simple_action_group_new                       (void);
 
-XPL_DEPRECATED_IN_2_38_FOR (g_action_map_lookup_action)
-GAction *               g_simple_action_group_lookup                    (GSimpleActionGroup *simple,
+XPL_DEPRECATED_IN_2_38_FOR (xaction_map_lookup_action)
+xaction_t *               g_simple_action_group_lookup                    (xsimple_action_group_t *simple,
                                                                          const xchar_t        *action_name);
 
-XPL_DEPRECATED_IN_2_38_FOR (g_action_map_add_action)
-void                    g_simple_action_group_insert                    (GSimpleActionGroup *simple,
-                                                                         GAction            *action);
+XPL_DEPRECATED_IN_2_38_FOR (xaction_map_add_action)
+void                    g_simple_action_group_insert                    (xsimple_action_group_t *simple,
+                                                                         xaction_t            *action);
 
-XPL_DEPRECATED_IN_2_38_FOR (g_action_map_remove_action)
-void                    g_simple_action_group_remove                    (GSimpleActionGroup *simple,
+XPL_DEPRECATED_IN_2_38_FOR (xaction_map_remove_action)
+void                    g_simple_action_group_remove                    (xsimple_action_group_t *simple,
                                                                          const xchar_t        *action_name);
 
-XPL_DEPRECATED_IN_2_38_FOR (g_action_map_add_action_entries)
-void                    g_simple_action_group_add_entries               (GSimpleActionGroup *simple,
-                                                                         const GActionEntry *entries,
+XPL_DEPRECATED_IN_2_38_FOR (xaction_map_add_action_entries)
+void                    g_simple_action_group_add_entries               (xsimple_action_group_t *simple,
+                                                                         const xaction_entry_t *entries,
                                                                          xint_t                n_entries,
                                                                          xpointer_t            user_data);
 

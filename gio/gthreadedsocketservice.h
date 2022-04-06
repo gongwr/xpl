@@ -31,10 +31,10 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_THREADED_SOCKET_SERVICE                      (g_threaded_socket_service_get_type ())
+#define XTYPE_THREADED_SOCKET_SERVICE                      (xthreaded_socket_service_get_type ())
 #define G_THREADED_SOCKET_SERVICE(inst)                     (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
                                                              XTYPE_THREADED_SOCKET_SERVICE,                         \
-                                                             GThreadedSocketService))
+                                                             xthreaded_socket_service))
 #define G_THREADED_SOCKET_SERVICE_CLASS(class)              (XTYPE_CHECK_CLASS_CAST ((class),                       \
                                                              XTYPE_THREADED_SOCKET_SERVICE,                         \
                                                              GThreadedSocketServiceClass))
@@ -53,7 +53,7 @@ struct _GThreadedSocketServiceClass
 {
   GSocketServiceClass parent_class;
 
-  xboolean_t (* run) (GThreadedSocketService *service,
+  xboolean_t (* run) (xthreaded_socket_service_t *service,
                     xsocket_connection_t      *connection,
                     xobject_t                *source_object);
 
@@ -67,14 +67,14 @@ struct _GThreadedSocketServiceClass
 
 struct _GThreadedSocketService
 {
-  GSocketService parent_instance;
+  xsocket_service_t parent_instance;
   GThreadedSocketServicePrivate *priv;
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t                   g_threaded_socket_service_get_type              (void);
+xtype_t                   xthreaded_socket_service_get_type              (void);
 XPL_AVAILABLE_IN_ALL
-GSocketService *        g_threaded_socket_service_new                   (int max_threads);
+xsocket_service_t *        xthreaded_socket_service_new                   (int max_threads);
 
 G_END_DECLS
 

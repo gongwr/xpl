@@ -58,52 +58,52 @@ typedef struct _GIOUnixWatch GIOUnixWatch;
 
 struct _GIOUnixChannel
 {
-  GIOChannel channel;
+  xio_channel_t channel;
   xint_t fd;
 };
 
 struct _GIOUnixWatch
 {
-  GSource       source;
-  GPollFD       pollfd;
-  GIOChannel   *channel;
-  GIOCondition  condition;
+  xsource_t       source;
+  xpollfd_t       pollfd;
+  xio_channel_t   *channel;
+  xio_condition_t  condition;
 };
 
 
-static GIOStatus	g_io_unix_read		(GIOChannel   *channel,
+static GIOStatus	g_io_unix_read		(xio_channel_t   *channel,
 						 xchar_t        *buf,
 						 xsize_t         count,
 						 xsize_t        *bytes_read,
 						 xerror_t      **err);
-static GIOStatus	g_io_unix_write		(GIOChannel   *channel,
+static GIOStatus	g_io_unix_write		(xio_channel_t   *channel,
 						 const xchar_t  *buf,
 						 xsize_t         count,
 						 xsize_t        *bytes_written,
 						 xerror_t      **err);
-static GIOStatus	g_io_unix_seek		(GIOChannel   *channel,
+static GIOStatus	g_io_unix_seek		(xio_channel_t   *channel,
 						 gint64        offset,
 						 GSeekType     type,
 						 xerror_t      **err);
-static GIOStatus	g_io_unix_close		(GIOChannel   *channel,
+static GIOStatus	g_io_unix_close		(xio_channel_t   *channel,
 						 xerror_t      **err);
-static void		g_io_unix_free		(GIOChannel   *channel);
-static GSource*		g_io_unix_create_watch	(GIOChannel   *channel,
-						 GIOCondition  condition);
-static GIOStatus	g_io_unix_set_flags	(GIOChannel   *channel,
+static void		g_io_unix_free		(xio_channel_t   *channel);
+static xsource_t*		g_io_unix_create_watch	(xio_channel_t   *channel,
+						 xio_condition_t  condition);
+static GIOStatus	g_io_unix_set_flags	(xio_channel_t   *channel,
                        				 GIOFlags      flags,
 						 xerror_t      **err);
-static GIOFlags 	g_io_unix_get_flags	(GIOChannel   *channel);
+static GIOFlags 	g_io_unix_get_flags	(xio_channel_t   *channel);
 
-static xboolean_t g_io_unix_prepare  (GSource     *source,
+static xboolean_t g_io_unix_prepare  (xsource_t     *source,
 				    xint_t        *timeout);
-static xboolean_t g_io_unix_check    (GSource     *source);
-static xboolean_t g_io_unix_dispatch (GSource     *source,
-				    GSourceFunc  callback,
+static xboolean_t g_io_unix_check    (xsource_t     *source);
+static xboolean_t g_io_unix_dispatch (xsource_t     *source,
+				    xsource_func_t  callback,
 				    xpointer_t     user_data);
-static void     g_io_unix_finalize (GSource     *source);
+static void     g_io_unix_finalize (xsource_t     *source);
 
-GSourceFuncs g_io_watch_funcs = {
+xsource_funcs_t g_io_watch_funcs = {
   g_io_unix_prepare,
   g_io_unix_check,
   g_io_unix_dispatch,
@@ -123,11 +123,11 @@ static GIOFuncs unix_channel_funcs = {
 };
 
 static xboolean_t
-g_io_unix_prepare (GSource  *source,
+g_io_unix_prepare (xsource_t  *source,
 		   xint_t     *timeout)
 {
   GIOUnixWatch *watch = (GIOUnixWatch *)source;
-  GIOCondition buffer_condition = g_io_channel_get_buffer_condition (watch->channel);
+  xio_condition_t buffer_condition = g_io_channel_get_buffer_condition (watch->channel);
 
   *timeout = -1;
 
@@ -137,29 +137,29 @@ g_io_unix_prepare (GSource  *source,
 }
 
 static xboolean_t
-g_io_unix_check (GSource  *source)
+g_io_unix_check (xsource_t  *source)
 {
   GIOUnixWatch *watch = (GIOUnixWatch *)source;
-  GIOCondition buffer_condition = g_io_channel_get_buffer_condition (watch->channel);
-  GIOCondition poll_condition = watch->pollfd.revents;
+  xio_condition_t buffer_condition = g_io_channel_get_buffer_condition (watch->channel);
+  xio_condition_t poll_condition = watch->pollfd.revents;
 
   return ((poll_condition | buffer_condition) & watch->condition);
 }
 
 static xboolean_t
-g_io_unix_dispatch (GSource     *source,
-		    GSourceFunc  callback,
+g_io_unix_dispatch (xsource_t     *source,
+		    xsource_func_t  callback,
 		    xpointer_t     user_data)
 
 {
   GIOFunc func = (GIOFunc)callback;
   GIOUnixWatch *watch = (GIOUnixWatch *)source;
-  GIOCondition buffer_condition = g_io_channel_get_buffer_condition (watch->channel);
+  xio_condition_t buffer_condition = g_io_channel_get_buffer_condition (watch->channel);
 
   if (!func)
     {
       g_warning ("IO watch dispatched without callback. "
-		 "You must call g_source_connect().");
+		 "You must call xsource_connect().");
       return FALSE;
     }
 
@@ -169,7 +169,7 @@ g_io_unix_dispatch (GSource     *source,
 }
 
 static void
-g_io_unix_finalize (GSource *source)
+g_io_unix_finalize (xsource_t *source)
 {
   GIOUnixWatch *watch = (GIOUnixWatch *)source;
 
@@ -177,14 +177,14 @@ g_io_unix_finalize (GSource *source)
 }
 
 static GIOStatus
-g_io_unix_read (GIOChannel *channel,
+g_io_unix_read (xio_channel_t *channel,
 		xchar_t      *buf,
 		xsize_t       count,
 		xsize_t      *bytes_read,
 		xerror_t    **err)
 {
   GIOUnixChannel *unix_channel = (GIOUnixChannel *)channel;
-  gssize result;
+  xssize_t result;
 
   if (count > SSIZE_MAX) /* At least according to the Debian manpage for read */
     count = SSIZE_MAX;
@@ -210,7 +210,7 @@ g_io_unix_read (GIOChannel *channel,
           default:
             g_set_error_literal (err, G_IO_CHANNEL_ERROR,
                                  g_io_channel_error_from_errno (errsv),
-                                 g_strerror (errsv));
+                                 xstrerror (errsv));
             return G_IO_STATUS_ERROR;
         }
     }
@@ -221,14 +221,14 @@ g_io_unix_read (GIOChannel *channel,
 }
 
 static GIOStatus
-g_io_unix_write (GIOChannel  *channel,
+g_io_unix_write (xio_channel_t  *channel,
 		 const xchar_t *buf,
 		 xsize_t       count,
 		 xsize_t      *bytes_written,
 		 xerror_t    **err)
 {
   GIOUnixChannel *unix_channel = (GIOUnixChannel *)channel;
-  gssize result;
+  xssize_t result;
 
  retry:
   result = write (unix_channel->fd, buf, count);
@@ -251,7 +251,7 @@ g_io_unix_write (GIOChannel  *channel,
           default:
             g_set_error_literal (err, G_IO_CHANNEL_ERROR,
                                  g_io_channel_error_from_errno (errsv),
-                                 g_strerror (errsv));
+                                 xstrerror (errsv));
             return G_IO_STATUS_ERROR;
         }
     }
@@ -262,7 +262,7 @@ g_io_unix_write (GIOChannel  *channel,
 }
 
 static GIOStatus
-g_io_unix_seek (GIOChannel *channel,
+g_io_unix_seek (xio_channel_t *channel,
 		gint64      offset,
 		GSeekType   type,
                 xerror_t    **err)
@@ -293,7 +293,7 @@ g_io_unix_seek (GIOChannel *channel,
     {
       g_set_error_literal (err, G_IO_CHANNEL_ERROR,
                            g_io_channel_error_from_errno (EINVAL),
-                           g_strerror (EINVAL));
+                           xstrerror (EINVAL));
       return G_IO_STATUS_ERROR;
     }
 
@@ -304,7 +304,7 @@ g_io_unix_seek (GIOChannel *channel,
       int errsv = errno;
       g_set_error_literal (err, G_IO_CHANNEL_ERROR,
                            g_io_channel_error_from_errno (errsv),
-                           g_strerror (errsv));
+                           xstrerror (errsv));
       return G_IO_STATUS_ERROR;
     }
 
@@ -313,7 +313,7 @@ g_io_unix_seek (GIOChannel *channel,
 
 
 static GIOStatus
-g_io_unix_close (GIOChannel *channel,
+g_io_unix_close (xio_channel_t *channel,
 		 xerror_t    **err)
 {
   GIOUnixChannel *unix_channel = (GIOUnixChannel *)channel;
@@ -323,7 +323,7 @@ g_io_unix_close (GIOChannel *channel,
       int errsv = errno;
       g_set_error_literal (err, G_IO_CHANNEL_ERROR,
                            g_io_channel_error_from_errno (errsv),
-                           g_strerror (errsv));
+                           xstrerror (errsv));
       return G_IO_STATUS_ERROR;
     }
 
@@ -331,24 +331,24 @@ g_io_unix_close (GIOChannel *channel,
 }
 
 static void
-g_io_unix_free (GIOChannel *channel)
+g_io_unix_free (xio_channel_t *channel)
 {
   GIOUnixChannel *unix_channel = (GIOUnixChannel *)channel;
 
   g_free (unix_channel);
 }
 
-static GSource *
-g_io_unix_create_watch (GIOChannel   *channel,
-			GIOCondition  condition)
+static xsource_t *
+g_io_unix_create_watch (xio_channel_t   *channel,
+			xio_condition_t  condition)
 {
   GIOUnixChannel *unix_channel = (GIOUnixChannel *)channel;
-  GSource *source;
+  xsource_t *source;
   GIOUnixWatch *watch;
 
 
-  source = g_source_new (&g_io_watch_funcs, sizeof (GIOUnixWatch));
-  g_source_set_static_name (source, "GIOChannel (Unix)");
+  source = xsource_new (&g_io_watch_funcs, sizeof (GIOUnixWatch));
+  xsource_set_static_name (source, "xio_channel_t (Unix)");
   watch = (GIOUnixWatch *)source;
 
   watch->channel = channel;
@@ -359,17 +359,17 @@ g_io_unix_create_watch (GIOChannel   *channel,
   watch->pollfd.fd = unix_channel->fd;
   watch->pollfd.events = condition;
 
-  g_source_add_poll (source, &watch->pollfd);
+  xsource_add_poll (source, &watch->pollfd);
 
   return source;
 }
 
 static GIOStatus
-g_io_unix_set_flags (GIOChannel *channel,
+g_io_unix_set_flags (xio_channel_t *channel,
                      GIOFlags    flags,
                      xerror_t    **err)
 {
-  glong fcntl_flags;
+  xlong_t fcntl_flags;
   GIOUnixChannel *unix_channel = (GIOUnixChannel *) channel;
 
   fcntl_flags = 0;
@@ -388,7 +388,7 @@ g_io_unix_set_flags (GIOChannel *channel,
       int errsv = errno;
       g_set_error_literal (err, G_IO_CHANNEL_ERROR,
                            g_io_channel_error_from_errno (errsv),
-                           g_strerror (errsv));
+                           xstrerror (errsv));
       return G_IO_STATUS_ERROR;
     }
 
@@ -396,10 +396,10 @@ g_io_unix_set_flags (GIOChannel *channel,
 }
 
 static GIOFlags
-g_io_unix_get_flags (GIOChannel *channel)
+g_io_unix_get_flags (xio_channel_t *channel)
 {
   GIOFlags flags = 0;
-  glong fcntl_flags;
+  xlong_t fcntl_flags;
   GIOUnixChannel *unix_channel = (GIOUnixChannel *) channel;
 
   fcntl_flags = fcntl (unix_channel->fd, F_GETFL);
@@ -408,7 +408,7 @@ g_io_unix_get_flags (GIOChannel *channel)
     {
       int err = errno;
       g_warning (G_STRLOC "Error while getting flags for FD: %s (%d)",
-		 g_strerror (err), err);
+		 xstrerror (err), err);
       return 0;
     }
 
@@ -442,14 +442,14 @@ g_io_unix_get_flags (GIOChannel *channel)
   return flags;
 }
 
-GIOChannel *
+xio_channel_t *
 g_io_channel_new_file (const xchar_t *filename,
                        const xchar_t *mode,
                        xerror_t     **error)
 {
   int fid, flags;
   mode_t create_mode;
-  GIOChannel *channel;
+  xio_channel_t *channel;
   enum { /* Cheesy hack */
     MODE_R = 1 << 0,
     MODE_W = 1 << 1,
@@ -529,23 +529,23 @@ g_io_channel_new_file (const xchar_t *filename,
   if (fid == -1)
     {
       int err = errno;
-      g_set_error_literal (error, G_FILE_ERROR,
-                           g_file_error_from_errno (err),
-                           g_strerror (err));
-      return (GIOChannel *)NULL;
+      g_set_error_literal (error, XFILE_ERROR,
+                           xfile_error_from_errno (err),
+                           xstrerror (err));
+      return (xio_channel_t *)NULL;
     }
 
   if (fstat (fid, &buffer) == -1) /* In case someone opens a FIFO */
     {
       int err = errno;
       close (fid);
-      g_set_error_literal (error, G_FILE_ERROR,
-                           g_file_error_from_errno (err),
-                           g_strerror (err));
-      return (GIOChannel *)NULL;
+      g_set_error_literal (error, XFILE_ERROR,
+                           xfile_error_from_errno (err),
+                           xstrerror (err));
+      return (xio_channel_t *)NULL;
     }
 
-  channel = (GIOChannel *) g_new (GIOUnixChannel, 1);
+  channel = (xio_channel_t *) g_new (GIOUnixChannel, 1);
 
   channel->is_seekable = S_ISREG (buffer.st_mode) || S_ISCHR (buffer.st_mode)
                          || S_ISBLK (buffer.st_mode);
@@ -584,17 +584,17 @@ g_io_channel_new_file (const xchar_t *filename,
  * g_io_channel_unix_new:
  * @fd: a file descriptor.
  *
- * Creates a new #GIOChannel given a file descriptor. On UNIX systems
+ * Creates a new #xio_channel_t given a file descriptor. On UNIX systems
  * this works for plain files, pipes, and sockets.
  *
- * The returned #GIOChannel has a reference count of 1.
+ * The returned #xio_channel_t has a reference count of 1.
  *
- * The default encoding for #GIOChannel is UTF-8. If your application
+ * The default encoding for #xio_channel_t is UTF-8. If your application
  * is reading output from a command using via pipe, you may need to set
  * the encoding to the encoding of the current locale (see
  * g_get_charset()) with the g_io_channel_set_encoding() function.
  * By default, the fd passed will not be closed when the final reference
- * to the #GIOChannel data structure is dropped.
+ * to the #xio_channel_t data structure is dropped.
  *
  * If you want to read raw binary data without interpretation, then
  * call the g_io_channel_set_encoding() function with %NULL for the
@@ -607,14 +607,14 @@ g_io_channel_new_file (const xchar_t *filename,
  * valid file descriptor and socket. If that happens a warning is
  * issued, and GLib assumes that it is the file descriptor you mean.
  *
- * Returns: a new #GIOChannel.
+ * Returns: a new #xio_channel_t.
  **/
-GIOChannel *
+xio_channel_t *
 g_io_channel_unix_new (xint_t fd)
 {
   struct stat buffer;
   GIOUnixChannel *unix_channel = g_new (GIOUnixChannel, 1);
-  GIOChannel *channel = (GIOChannel *)unix_channel;
+  xio_channel_t *channel = (xio_channel_t *)unix_channel;
 
   g_io_channel_init (channel);
   channel->funcs = &unix_channel_funcs;
@@ -640,17 +640,17 @@ g_io_channel_unix_new (xint_t fd)
 
 /**
  * g_io_channel_unix_get_fd:
- * @channel: a #GIOChannel, created with g_io_channel_unix_new().
+ * @channel: a #xio_channel_t, created with g_io_channel_unix_new().
  *
- * Returns the file descriptor of the #GIOChannel.
+ * Returns the file descriptor of the #xio_channel_t.
  *
  * On Windows this function returns the file descriptor or socket of
- * the #GIOChannel.
+ * the #xio_channel_t.
  *
- * Returns: the file descriptor of the #GIOChannel.
+ * Returns: the file descriptor of the #xio_channel_t.
  **/
 xint_t
-g_io_channel_unix_get_fd (GIOChannel *channel)
+g_io_channel_unix_get_fd (xio_channel_t *channel)
 {
   GIOUnixChannel *unix_channel = (GIOUnixChannel *)channel;
   return unix_channel->fd;

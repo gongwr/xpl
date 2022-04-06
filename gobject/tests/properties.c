@@ -2,27 +2,27 @@
 #include <gstdio.h>
 #include <glib-object.h>
 
-typedef struct _TestObject {
+typedef struct _test_object {
   xobject_t parent_instance;
   xint_t foo;
   xboolean_t bar;
   xchar_t *baz;
   xchar_t *quux;
-} TestObject;
+} test_object_t;
 
-typedef struct _TestObjectClass {
+typedef struct _test_object_class {
   xobject_class_t parent_class;
-} TestObjectClass;
+} test_object_class_t;
 
 enum { PROP_0, PROP_FOO, PROP_BAR, PROP_BAZ, PROP_QUUX, N_PROPERTIES };
 
-static GParamSpec *properties[N_PROPERTIES] = { NULL, };
+static xparam_spec_t *properties[N_PROPERTIES] = { NULL, };
 
 static xtype_t test_object_get_type (void);
-G_DEFINE_TYPE (TestObject, test_object, XTYPE_OBJECT)
+G_DEFINE_TYPE (test_object, test_object, XTYPE_OBJECT)
 
 static void
-test_object_set_foo (TestObject *obj,
+test_object_set_foo (test_object_t *obj,
                      xint_t        foo)
 {
   if (obj->foo != foo)
@@ -30,12 +30,12 @@ test_object_set_foo (TestObject *obj,
       obj->foo = foo;
 
       g_assert (properties[PROP_FOO] != NULL);
-      g_object_notify_by_pspec (G_OBJECT (obj), properties[PROP_FOO]);
+      xobject_notify_by_pspec (G_OBJECT (obj), properties[PROP_FOO]);
     }
 }
 
 static void
-test_object_set_bar (TestObject *obj,
+test_object_set_bar (test_object_t *obj,
                      xboolean_t    bar)
 {
   bar = !!bar;
@@ -45,42 +45,42 @@ test_object_set_bar (TestObject *obj,
       obj->bar = bar;
 
       g_assert (properties[PROP_BAR] != NULL);
-      g_object_notify_by_pspec (G_OBJECT (obj), properties[PROP_BAR]);
+      xobject_notify_by_pspec (G_OBJECT (obj), properties[PROP_BAR]);
     }
 }
 
 static void
-test_object_set_baz (TestObject  *obj,
+test_object_set_baz (test_object_t  *obj,
                      const xchar_t *baz)
 {
-  if (g_strcmp0 (obj->baz, baz) != 0)
+  if (xstrcmp0 (obj->baz, baz) != 0)
     {
       g_free (obj->baz);
-      obj->baz = g_strdup (baz);
+      obj->baz = xstrdup (baz);
 
       g_assert (properties[PROP_BAZ] != NULL);
-      g_object_notify_by_pspec (G_OBJECT (obj), properties[PROP_BAZ]);
+      xobject_notify_by_pspec (G_OBJECT (obj), properties[PROP_BAZ]);
     }
 }
 
 static void
-test_object_set_quux (TestObject  *obj,
+test_object_set_quux (test_object_t  *obj,
                       const xchar_t *quux)
 {
-  if (g_strcmp0 (obj->quux, quux) != 0)
+  if (xstrcmp0 (obj->quux, quux) != 0)
     {
       g_free (obj->quux);
-      obj->quux = g_strdup (quux);
+      obj->quux = xstrdup (quux);
 
       g_assert (properties[PROP_QUUX] != NULL);
-      g_object_notify_by_pspec (G_OBJECT (obj), properties[PROP_QUUX]);
+      xobject_notify_by_pspec (G_OBJECT (obj), properties[PROP_QUUX]);
     }
 }
 
 static void
 test_object_finalize (xobject_t *gobject)
 {
-  TestObject *self = (TestObject *) gobject;
+  test_object_t *self = (test_object_t *) gobject;
 
   g_free (self->baz);
   g_free (self->quux);
@@ -89,8 +89,8 @@ test_object_finalize (xobject_t *gobject)
    * possible to notify the property, but it should do
    * nothing and silently quit (bug #705570)
    */
-  g_object_notify (gobject, "foo");
-  g_object_notify_by_pspec (gobject, properties[PROP_BAR]);
+  xobject_notify (gobject, "foo");
+  xobject_notify_by_pspec (gobject, properties[PROP_BAR]);
 
   G_OBJECT_CLASS (test_object_parent_class)->finalize (gobject);
 }
@@ -98,10 +98,10 @@ test_object_finalize (xobject_t *gobject)
 static void
 test_object_set_property (xobject_t *gobject,
                           xuint_t prop_id,
-                          const GValue *value,
-                          GParamSpec *pspec)
+                          const xvalue_t *value,
+                          xparam_spec_t *pspec)
 {
-  TestObject *tobj = (TestObject *) gobject;
+  test_object_t *tobj = (test_object_t *) gobject;
 
   g_assert_cmpint (prop_id, !=, 0);
   g_assert_cmpint (prop_id, !=, N_PROPERTIES);
@@ -110,19 +110,19 @@ test_object_set_property (xobject_t *gobject,
   switch (prop_id)
     {
     case PROP_FOO:
-      test_object_set_foo (tobj, g_value_get_int (value));
+      test_object_set_foo (tobj, xvalue_get_int (value));
       break;
 
     case PROP_BAR:
-      test_object_set_bar (tobj, g_value_get_boolean (value));
+      test_object_set_bar (tobj, xvalue_get_boolean (value));
       break;
 
     case PROP_BAZ:
-      test_object_set_baz (tobj, g_value_get_string (value));
+      test_object_set_baz (tobj, xvalue_get_string (value));
       break;
 
     case PROP_QUUX:
-      test_object_set_quux (tobj, g_value_get_string (value));
+      test_object_set_quux (tobj, xvalue_get_string (value));
       break;
 
     default:
@@ -133,10 +133,10 @@ test_object_set_property (xobject_t *gobject,
 static void
 test_object_get_property (xobject_t *gobject,
                           xuint_t prop_id,
-                          GValue *value,
-                          GParamSpec *pspec)
+                          xvalue_t *value,
+                          xparam_spec_t *pspec)
 {
-  TestObject *tobj = (TestObject *) gobject;
+  test_object_t *tobj = (test_object_t *) gobject;
 
   g_assert_cmpint (prop_id, !=, 0);
   g_assert_cmpint (prop_id, !=, N_PROPERTIES);
@@ -145,19 +145,19 @@ test_object_get_property (xobject_t *gobject,
   switch (prop_id)
     {
     case PROP_FOO:
-      g_value_set_int (value, tobj->foo);
+      xvalue_set_int (value, tobj->foo);
       break;
 
     case PROP_BAR:
-      g_value_set_boolean (value, tobj->bar);
+      xvalue_set_boolean (value, tobj->bar);
       break;
 
     case PROP_BAZ:
-      g_value_set_string (value, tobj->baz);
+      xvalue_set_string (value, tobj->baz);
       break;
 
     case PROP_QUUX:
-      g_value_set_string (value, tobj->quux);
+      xvalue_set_string (value, tobj->quux);
       break;
 
     default:
@@ -166,18 +166,18 @@ test_object_get_property (xobject_t *gobject,
 }
 
 static void
-test_object_class_init (TestObjectClass *klass)
+test_object_class_init (test_object_class_t *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
-  properties[PROP_FOO] = g_param_spec_int ("foo", "Foo", "Foo",
+  properties[PROP_FOO] = g_param_spec_int ("foo", "foo_t", "foo_t",
                                            -1, G_MAXINT,
                                            0,
                                            G_PARAM_READWRITE);
   properties[PROP_BAR] = g_param_spec_boolean ("bar", "Bar", "Bar",
                                                FALSE,
                                                G_PARAM_READWRITE);
-  properties[PROP_BAZ] = g_param_spec_string ("baz", "Baz", "Baz",
+  properties[PROP_BAZ] = g_param_spec_string ("baz", "baz_t", "baz_t",
                                               NULL,
                                               G_PARAM_READWRITE);
   properties[PROP_QUUX] = g_param_spec_string ("quux", "quux", "quux",
@@ -188,41 +188,41 @@ test_object_class_init (TestObjectClass *klass)
   gobject_class->get_property = test_object_get_property;
   gobject_class->finalize = test_object_finalize;
 
-  g_object_class_install_properties (gobject_class, N_PROPERTIES, properties);
+  xobject_class_install_properties (gobject_class, N_PROPERTIES, properties);
 }
 
 static void
-test_object_init (TestObject *self)
+test_object_init (test_object_t *self)
 {
   self->foo = 42;
   self->bar = TRUE;
-  self->baz = g_strdup ("Hello");
+  self->baz = xstrdup ("Hello");
   self->quux = NULL;
 }
 
 static void
 properties_install (void)
 {
-  TestObject *obj = g_object_new (test_object_get_type (), NULL);
-  GParamSpec *pspec;
+  test_object_t *obj = xobject_new (test_object_get_type (), NULL);
+  xparam_spec_t *pspec;
 
   g_assert (properties[PROP_FOO] != NULL);
 
-  pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (obj), "foo");
+  pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (obj), "foo");
   g_assert (properties[PROP_FOO] == pspec);
 
-  g_object_unref (obj);
+  xobject_unref (obj);
 }
 
 typedef struct {
   const xchar_t *name;
-  GParamSpec *pspec;
+  xparam_spec_t *pspec;
   xboolean_t    fired;
 } TestNotifyClosure;
 
 static void
 on_notify (xobject_t           *gobject,
-           GParamSpec        *pspec,
+           xparam_spec_t        *pspec,
            TestNotifyClosure *closure)
 {
   g_assert (closure->pspec == pspec);
@@ -233,7 +233,7 @@ on_notify (xobject_t           *gobject,
 static void
 properties_notify (void)
 {
-  TestObject *obj = g_object_new (test_object_get_type (), NULL);
+  test_object_t *obj = xobject_new (test_object_get_type (), NULL);
   TestNotifyClosure closure;
 
   g_assert (properties[PROP_FOO] != NULL);
@@ -244,19 +244,19 @@ properties_notify (void)
   closure.pspec = properties[PROP_FOO];
 
   closure.fired = FALSE;
-  g_object_set (obj, "foo", 47, NULL);
+  xobject_set (obj, "foo", 47, NULL);
   g_assert (closure.fired);
 
   closure.name = "baz";
   closure.pspec = properties[PROP_BAZ];
 
   closure.fired = FALSE;
-  g_object_set (obj, "baz", "something new", NULL);
+  xobject_set (obj, "baz", "something new", NULL);
   g_assert (closure.fired);
 
   /* baz lacks explicit notify, so we will see this twice */
   closure.fired = FALSE;
-  g_object_set (obj, "baz", "something new", NULL);
+  xobject_set (obj, "baz", "something new", NULL);
   g_assert (closure.fired);
 
   /* quux on the other hand, ... */
@@ -264,26 +264,26 @@ properties_notify (void)
   closure.pspec = properties[PROP_QUUX];
 
   closure.fired = FALSE;
-  g_object_set (obj, "quux", "something new", NULL);
+  xobject_set (obj, "quux", "something new", NULL);
   g_assert (closure.fired);
 
   /* no change; no notify */
   closure.fired = FALSE;
-  g_object_set (obj, "quux", "something new", NULL);
+  xobject_set (obj, "quux", "something new", NULL);
   g_assert (!closure.fired);
 
 
-  g_object_unref (obj);
+  xobject_unref (obj);
 }
 
 typedef struct {
-  GParamSpec *pspec[3];
+  xparam_spec_t *pspec[3];
   xint_t pos;
 } Notifys;
 
 static void
 on_notify2 (xobject_t    *gobject,
-            GParamSpec *pspec,
+            xparam_spec_t *pspec,
             Notifys    *n)
 {
   g_assert (n->pspec[n->pos] == pspec);
@@ -293,7 +293,7 @@ on_notify2 (xobject_t    *gobject,
 static void
 properties_notify_queue (void)
 {
-  TestObject *obj = g_object_new (test_object_get_type (), NULL);
+  test_object_t *obj = xobject_new (test_object_get_type (), NULL);
   Notifys n;
 
   g_assert (properties[PROP_FOO] != NULL);
@@ -305,27 +305,27 @@ properties_notify_queue (void)
 
   g_signal_connect (obj, "notify", G_CALLBACK (on_notify2), &n);
 
-  g_object_freeze_notify (G_OBJECT (obj));
-  g_object_set (obj, "foo", 47, NULL);
-  g_object_set (obj, "bar", TRUE, "foo", 42, "baz", "abc", NULL);
-  g_object_thaw_notify (G_OBJECT (obj));
+  xobject_freeze_notify (G_OBJECT (obj));
+  xobject_set (obj, "foo", 47, NULL);
+  xobject_set (obj, "bar", TRUE, "foo", 42, "baz", "abc", NULL);
+  xobject_thaw_notify (G_OBJECT (obj));
   g_assert (n.pos == 3);
 
-  g_object_unref (obj);
+  xobject_unref (obj);
 }
 
 static void
 properties_construct (void)
 {
-  TestObject *obj;
+  test_object_t *obj;
   xint_t val;
   xboolean_t b;
   xchar_t *s;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=630357");
 
-  /* more than 16 args triggers a realloc in g_object_new_valist() */
-  obj = g_object_new (test_object_get_type (),
+  /* more than 16 args triggers a realloc in xobject_new_valist() */
+  obj = xobject_new (test_object_get_type (),
                       "foo", 1,
                       "foo", 2,
                       "foo", 3,
@@ -348,95 +348,95 @@ properties_construct (void)
                       "foo", 18,
                       NULL);
 
-  g_object_get (obj, "foo", &val, NULL);
+  xobject_get (obj, "foo", &val, NULL);
   g_assert (val == 18);
-  g_object_get (obj, "bar", &b, NULL);
+  xobject_get (obj, "bar", &b, NULL);
   g_assert (!b);
-  g_object_get (obj, "baz", &s, NULL);
+  xobject_get (obj, "baz", &s, NULL);
   g_assert_cmpstr (s, ==, "boo");
   g_free (s);
 
-  g_object_unref (obj);
+  xobject_unref (obj);
 }
 
 static void
 properties_testv_with_no_properties (void)
 {
-  TestObject *test_obj;
+  test_object_t *test_obj;
   const char *prop_names[4] = { "foo", "bar", "baz", "quux" };
-  GValue values_out[4] = { G_VALUE_INIT };
+  xvalue_t values_out[4] = { G_VALUE_INIT };
   xuint_t i;
 
   /* Test newv_with_properties && getv */
-  test_obj = (TestObject *) g_object_new_with_properties (
+  test_obj = (test_object_t *) xobject_new_with_properties (
       test_object_get_type (), 0, NULL, NULL);
-  g_object_getv (G_OBJECT (test_obj), 4, prop_names, values_out);
+  xobject_getv (G_OBJECT (test_obj), 4, prop_names, values_out);
 
   /* It should have init values */
-  g_assert_cmpint (g_value_get_int (&values_out[0]), ==, 42);
-  g_assert_true (g_value_get_boolean (&values_out[1]));
-  g_assert_cmpstr (g_value_get_string (&values_out[2]), ==, "Hello");
-  g_assert_cmpstr (g_value_get_string (&values_out[3]), ==, NULL);
+  g_assert_cmpint (xvalue_get_int (&values_out[0]), ==, 42);
+  g_assert_true (xvalue_get_boolean (&values_out[1]));
+  g_assert_cmpstr (xvalue_get_string (&values_out[2]), ==, "Hello");
+  g_assert_cmpstr (xvalue_get_string (&values_out[3]), ==, NULL);
 
   for (i = 0; i < 4; i++)
-    g_value_unset (&values_out[i]);
-  g_object_unref (test_obj);
+    xvalue_unset (&values_out[i]);
+  xobject_unref (test_obj);
 }
 
 static void
 properties_testv_with_valid_properties (void)
 {
-  TestObject *test_obj;
+  test_object_t *test_obj;
   const char *prop_names[4] = { "foo", "bar", "baz", "quux" };
 
-  GValue values_in[4] = { G_VALUE_INIT };
-  GValue values_out[4] = { G_VALUE_INIT };
+  xvalue_t values_in[4] = { G_VALUE_INIT };
+  xvalue_t values_out[4] = { G_VALUE_INIT };
   xuint_t i;
 
-  g_value_init (&(values_in[0]), XTYPE_INT);
-  g_value_set_int (&(values_in[0]), 100);
+  xvalue_init (&(values_in[0]), XTYPE_INT);
+  xvalue_set_int (&(values_in[0]), 100);
 
-  g_value_init (&(values_in[1]), XTYPE_BOOLEAN);
-  g_value_set_boolean (&(values_in[1]), TRUE);
+  xvalue_init (&(values_in[1]), XTYPE_BOOLEAN);
+  xvalue_set_boolean (&(values_in[1]), TRUE);
 
-  g_value_init (&(values_in[2]), XTYPE_STRING);
-  g_value_set_string (&(values_in[2]), "pigs");
+  xvalue_init (&(values_in[2]), XTYPE_STRING);
+  xvalue_set_string (&(values_in[2]), "pigs");
 
-  g_value_init (&(values_in[3]), XTYPE_STRING);
-  g_value_set_string (&(values_in[3]), "fly");
+  xvalue_init (&(values_in[3]), XTYPE_STRING);
+  xvalue_set_string (&(values_in[3]), "fly");
 
   /* Test newv_with_properties && getv */
-  test_obj = (TestObject *) g_object_new_with_properties (
+  test_obj = (test_object_t *) xobject_new_with_properties (
       test_object_get_type (), 4, prop_names, values_in);
-  g_object_getv (G_OBJECT (test_obj), 4, prop_names, values_out);
+  xobject_getv (G_OBJECT (test_obj), 4, prop_names, values_out);
 
-  g_assert_cmpint (g_value_get_int (&values_out[0]), ==, 100);
-  g_assert_true (g_value_get_boolean (&values_out[1]));
-  g_assert_cmpstr (g_value_get_string (&values_out[2]), ==, "pigs");
-  g_assert_cmpstr (g_value_get_string (&values_out[3]), ==, "fly");
+  g_assert_cmpint (xvalue_get_int (&values_out[0]), ==, 100);
+  g_assert_true (xvalue_get_boolean (&values_out[1]));
+  g_assert_cmpstr (xvalue_get_string (&values_out[2]), ==, "pigs");
+  g_assert_cmpstr (xvalue_get_string (&values_out[3]), ==, "fly");
 
   for (i = 0; i < G_N_ELEMENTS (values_out); i++)
-    g_value_unset (&values_out[i]);
+    xvalue_unset (&values_out[i]);
 
   /* Test newv2 && getv */
-  g_value_set_string (&(values_in[2]), "Elmo knows");
-  g_value_set_string (&(values_in[3]), "where you live");
-  g_object_setv (G_OBJECT (test_obj), 4, prop_names, values_in);
+  xvalue_set_string (&(values_in[2]), "Elmo knows");
+  xvalue_set_string (&(values_in[3]), "where you live");
+  xobject_setv (G_OBJECT (test_obj), 4, prop_names, values_in);
 
-  g_object_getv (G_OBJECT (test_obj), 4, prop_names, values_out);
+  xobject_getv (G_OBJECT (test_obj), 4, prop_names, values_out);
 
-  g_assert_cmpint (g_value_get_int (&values_out[0]), ==, 100);
-  g_assert_true (g_value_get_boolean (&values_out[1]));
+  g_assert_cmpint (xvalue_get_int (&values_out[0]), ==, 100);
+  g_assert_true (xvalue_get_boolean (&values_out[1]));
 
-  g_assert_cmpstr (g_value_get_string (&values_out[2]), ==, "Elmo knows");
-  g_assert_cmpstr (g_value_get_string (&values_out[3]), ==, "where you live");
+  g_assert_cmpstr (xvalue_get_string (&values_out[2]), ==, "Elmo knows");
+  g_assert_cmpstr (xvalue_get_string (&values_out[3]), ==, "where you live");
 
   for (i = 0; i < G_N_ELEMENTS (values_in); i++)
-    g_value_unset (&values_in[i]);
+    xvalue_unset (&values_in[i]);
   for (i = 0; i < G_N_ELEMENTS (values_out); i++)
-    g_value_unset (&values_out[i]);
+    xvalue_unset (&values_out[i]);
 
-  g_object_unref (test_obj);
+  xobject_unref (test_obj);
 }
 
 static void
@@ -444,18 +444,18 @@ properties_testv_with_invalid_property_type (void)
 {
   if (g_test_subprocess ())
     {
-      TestObject *test_obj;
+      test_object_t *test_obj;
       const char *invalid_prop_names[1] = { "foo" };
-      GValue values_in[1] = { G_VALUE_INIT };
+      xvalue_t values_in[1] = { G_VALUE_INIT };
 
-      g_value_init (&(values_in[0]), XTYPE_STRING);
-      g_value_set_string (&(values_in[0]), "fly");
+      xvalue_init (&(values_in[0]), XTYPE_STRING);
+      xvalue_set_string (&(values_in[0]), "fly");
 
-      test_obj = (TestObject *) g_object_new_with_properties (
+      test_obj = (test_object_t *) xobject_new_with_properties (
           test_object_get_type (), 1, invalid_prop_names, values_in);
       /* should give a warning */
 
-      g_object_unref (test_obj);
+      xobject_unref (test_obj);
     }
   g_test_trap_subprocess (NULL, 0, 0);
   g_test_trap_assert_failed ();
@@ -468,87 +468,87 @@ properties_testv_with_invalid_property_names (void)
 {
   if (g_test_subprocess ())
     {
-      TestObject *test_obj;
+      test_object_t *test_obj;
       const char *invalid_prop_names[4] = { "foo", "boo", "moo", "poo" };
-      GValue values_in[4] = { G_VALUE_INIT };
+      xvalue_t values_in[4] = { G_VALUE_INIT };
 
-      g_value_init (&(values_in[0]), XTYPE_INT);
-      g_value_set_int (&(values_in[0]), 100);
+      xvalue_init (&(values_in[0]), XTYPE_INT);
+      xvalue_set_int (&(values_in[0]), 100);
 
-      g_value_init (&(values_in[1]), XTYPE_BOOLEAN);
-      g_value_set_boolean (&(values_in[1]), TRUE);
+      xvalue_init (&(values_in[1]), XTYPE_BOOLEAN);
+      xvalue_set_boolean (&(values_in[1]), TRUE);
 
-      g_value_init (&(values_in[2]), XTYPE_STRING);
-      g_value_set_string (&(values_in[2]), "pigs");
+      xvalue_init (&(values_in[2]), XTYPE_STRING);
+      xvalue_set_string (&(values_in[2]), "pigs");
 
-      g_value_init (&(values_in[3]), XTYPE_STRING);
-      g_value_set_string (&(values_in[3]), "fly");
+      xvalue_init (&(values_in[3]), XTYPE_STRING);
+      xvalue_set_string (&(values_in[3]), "fly");
 
-      test_obj = (TestObject *) g_object_new_with_properties (
+      test_obj = (test_object_t *) xobject_new_with_properties (
           test_object_get_type (), 4, invalid_prop_names, values_in);
       /* This call should give 3 Critical warnings. Actually, a critical warning
-       * shouldn't make g_object_new_with_properties to fail when a bad named
+       * shouldn't make xobject_new_with_properties to fail when a bad named
        * property is given, because, it will just ignore that property. However,
        * for test purposes, it is considered that the test doesn't pass.
        */
 
-      g_object_unref (test_obj);
+      xobject_unref (test_obj);
     }
 
   g_test_trap_subprocess (NULL, 0, 0);
   g_test_trap_assert_failed ();
-  g_test_trap_assert_stderr ("*CRITICAL*g_object_new_is_valid_property*boo*");
+  g_test_trap_assert_stderr ("*CRITICAL*xobject_new_is_valid_property*boo*");
 }
 
 static void
 properties_testv_getv (void)
 {
-  TestObject *test_obj;
+  test_object_t *test_obj;
   const char *prop_names[4] = { "foo", "bar", "baz", "quux" };
-  GValue values_out_initialized[4] = { G_VALUE_INIT };
-  GValue values_out_uninitialized[4] = { G_VALUE_INIT };
+  xvalue_t values_out_initialized[4] = { G_VALUE_INIT };
+  xvalue_t values_out_uninitialized[4] = { G_VALUE_INIT };
   xuint_t i;
 
-  g_value_init (&(values_out_initialized[0]), XTYPE_INT);
-  g_value_init (&(values_out_initialized[1]), XTYPE_BOOLEAN);
-  g_value_init (&(values_out_initialized[2]), XTYPE_STRING);
-  g_value_init (&(values_out_initialized[3]), XTYPE_STRING);
+  xvalue_init (&(values_out_initialized[0]), XTYPE_INT);
+  xvalue_init (&(values_out_initialized[1]), XTYPE_BOOLEAN);
+  xvalue_init (&(values_out_initialized[2]), XTYPE_STRING);
+  xvalue_init (&(values_out_initialized[3]), XTYPE_STRING);
 
-  test_obj = (TestObject *) g_object_new_with_properties (
+  test_obj = (test_object_t *) xobject_new_with_properties (
       test_object_get_type (), 0, NULL, NULL);
 
-  /* Test g_object_getv for an initialized values array */
-  g_object_getv (G_OBJECT (test_obj), 4, prop_names, values_out_initialized);
+  /* Test xobject_getv for an initialized values array */
+  xobject_getv (G_OBJECT (test_obj), 4, prop_names, values_out_initialized);
   /* It should have init values */
-  g_assert_cmpint (g_value_get_int (&values_out_initialized[0]), ==, 42);
-  g_assert_true (g_value_get_boolean (&values_out_initialized[1]));
-  g_assert_cmpstr (g_value_get_string (&values_out_initialized[2]), ==, "Hello");
-  g_assert_cmpstr (g_value_get_string (&values_out_initialized[3]), ==, NULL);
+  g_assert_cmpint (xvalue_get_int (&values_out_initialized[0]), ==, 42);
+  g_assert_true (xvalue_get_boolean (&values_out_initialized[1]));
+  g_assert_cmpstr (xvalue_get_string (&values_out_initialized[2]), ==, "Hello");
+  g_assert_cmpstr (xvalue_get_string (&values_out_initialized[3]), ==, NULL);
 
-  /* Test g_object_getv for an uninitialized values array */
-  g_object_getv (G_OBJECT (test_obj), 4, prop_names, values_out_uninitialized);
+  /* Test xobject_getv for an uninitialized values array */
+  xobject_getv (G_OBJECT (test_obj), 4, prop_names, values_out_uninitialized);
   /* It should have init values */
-  g_assert_cmpint (g_value_get_int (&values_out_uninitialized[0]), ==, 42);
-  g_assert_true (g_value_get_boolean (&values_out_uninitialized[1]));
-  g_assert_cmpstr (g_value_get_string (&values_out_uninitialized[2]), ==, "Hello");
-  g_assert_cmpstr (g_value_get_string (&values_out_uninitialized[3]), ==, NULL);
+  g_assert_cmpint (xvalue_get_int (&values_out_uninitialized[0]), ==, 42);
+  g_assert_true (xvalue_get_boolean (&values_out_uninitialized[1]));
+  g_assert_cmpstr (xvalue_get_string (&values_out_uninitialized[2]), ==, "Hello");
+  g_assert_cmpstr (xvalue_get_string (&values_out_uninitialized[3]), ==, NULL);
 
   for (i = 0; i < 4; i++)
     {
-      g_value_unset (&values_out_initialized[i]);
-      g_value_unset (&values_out_uninitialized[i]);
+      xvalue_unset (&values_out_initialized[i]);
+      xvalue_unset (&values_out_uninitialized[i]);
     }
-  g_object_unref (test_obj);
+  xobject_unref (test_obj);
 }
 
 static void
 properties_get_property (void)
 {
-  TestObject *test_obj;
+  test_object_t *test_obj;
   struct {
     const char *name;
     xtype_t gtype;
-    GValue value;
+    xvalue_t value;
   } test_props[] = {
     { "foo", XTYPE_INT, G_VALUE_INIT },
     { "bar", XTYPE_INVALID, G_VALUE_INIT },
@@ -556,56 +556,56 @@ properties_get_property (void)
   };
   xsize_t i;
 
-  g_test_summary ("g_object_get_property() accepts uninitialized, "
+  g_test_summary ("xobject_get_property() accepts uninitialized, "
                   "initialized, and transformable values");
 
   for (i = 0; i < G_N_ELEMENTS (test_props); i++)
     {
       if (test_props[i].gtype != XTYPE_INVALID)
-        g_value_init (&(test_props[i].value), test_props[i].gtype);
+        xvalue_init (&(test_props[i].value), test_props[i].gtype);
     }
 
-  test_obj = (TestObject *) g_object_new_with_properties (test_object_get_type (), 0, NULL, NULL);
+  test_obj = (test_object_t *) xobject_new_with_properties (test_object_get_type (), 0, NULL, NULL);
 
-  g_test_message ("Test g_object_get_property with an initialized value");
-  g_object_get_property (G_OBJECT (test_obj), test_props[0].name, &(test_props[0].value));
-  g_assert_cmpint (g_value_get_int (&(test_props[0].value)), ==, 42);
+  g_test_message ("Test xobject_get_property with an initialized value");
+  xobject_get_property (G_OBJECT (test_obj), test_props[0].name, &(test_props[0].value));
+  g_assert_cmpint (xvalue_get_int (&(test_props[0].value)), ==, 42);
 
-  g_test_message ("Test g_object_get_property with an uninitialized value");
-  g_object_get_property (G_OBJECT (test_obj), test_props[1].name, &(test_props[1].value));
-  g_assert_true (g_value_get_boolean (&(test_props[1].value)));
+  g_test_message ("Test xobject_get_property with an uninitialized value");
+  xobject_get_property (G_OBJECT (test_obj), test_props[1].name, &(test_props[1].value));
+  g_assert_true (xvalue_get_boolean (&(test_props[1].value)));
 
-  g_test_message ("Test g_object_get_property with a transformable value");
-  g_object_get_property (G_OBJECT (test_obj), test_props[2].name, &(test_props[2].value));
+  g_test_message ("Test xobject_get_property with a transformable value");
+  xobject_get_property (G_OBJECT (test_obj), test_props[2].name, &(test_props[2].value));
   g_assert_true (G_VALUE_HOLDS_STRING (&(test_props[2].value)));
-  g_assert_cmpstr (g_value_get_string (&(test_props[2].value)), ==, "TRUE");
+  g_assert_cmpstr (xvalue_get_string (&(test_props[2].value)), ==, "TRUE");
 
   for (i = 0; i < G_N_ELEMENTS (test_props); i++)
-    g_value_unset (&(test_props[i].value));
+    xvalue_unset (&(test_props[i].value));
 
-  g_object_unref (test_obj);
+  xobject_unref (test_obj);
 }
 
 static void
 properties_testv_notify_queue (void)
 {
-  TestObject *test_obj;
+  test_object_t *test_obj;
   const char *prop_names[3] = { "foo", "bar", "baz" };
-  GValue values_in[3] = { G_VALUE_INIT };
+  xvalue_t values_in[3] = { G_VALUE_INIT };
   Notifys n;
   xuint_t i;
 
-  g_value_init (&(values_in[0]), XTYPE_INT);
-  g_value_set_int (&(values_in[0]), 100);
+  xvalue_init (&(values_in[0]), XTYPE_INT);
+  xvalue_set_int (&(values_in[0]), 100);
 
-  g_value_init (&(values_in[1]), XTYPE_BOOLEAN);
-  g_value_set_boolean (&(values_in[1]), TRUE);
+  xvalue_init (&(values_in[1]), XTYPE_BOOLEAN);
+  xvalue_set_boolean (&(values_in[1]), TRUE);
 
-  g_value_init (&(values_in[2]), XTYPE_STRING);
-  g_value_set_string (&(values_in[2]), "");
+  xvalue_init (&(values_in[2]), XTYPE_STRING);
+  xvalue_set_string (&(values_in[2]), "");
 
   /* Test newv_with_properties && getv */
-  test_obj = (TestObject *) g_object_new_with_properties (
+  test_obj = (test_object_t *) xobject_new_with_properties (
       test_object_get_type (), 0, NULL, NULL);
 
   g_assert_nonnull (properties[PROP_FOO]);
@@ -617,20 +617,20 @@ properties_testv_notify_queue (void)
 
   g_signal_connect (test_obj, "notify", G_CALLBACK (on_notify2), &n);
 
-  g_object_freeze_notify (G_OBJECT (test_obj));
+  xobject_freeze_notify (G_OBJECT (test_obj));
   {
-    g_object_setv (G_OBJECT (test_obj), 3, prop_names, values_in);
+    xobject_setv (G_OBJECT (test_obj), 3, prop_names, values_in);
 
     /* Set "foo" to 70 */
-    g_value_set_int (&(values_in[0]), 100);
-    g_object_setv (G_OBJECT (test_obj), 1, prop_names, values_in);
+    xvalue_set_int (&(values_in[0]), 100);
+    xobject_setv (G_OBJECT (test_obj), 1, prop_names, values_in);
   }
-  g_object_thaw_notify (G_OBJECT (test_obj));
+  xobject_thaw_notify (G_OBJECT (test_obj));
   g_assert_cmpint (n.pos, ==, 3);
 
   for (i = 0; i < 3; i++)
-    g_value_unset (&values_in[i]);
-  g_object_unref (test_obj);
+    xvalue_unset (&values_in[i]);
+  xobject_unref (test_obj);
 }
 
 int

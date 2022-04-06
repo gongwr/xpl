@@ -72,7 +72,7 @@ static void
 error (void)
 {
   if (g_test_subprocess ())
-    g_error ("this is a regular g_error() from the test suite");
+    xerror ("this is a regular xerror() from the test suite");
 }
 
 static void
@@ -83,8 +83,8 @@ gtest_message (void)
 }
 
 static xboolean_t
-test_message_cb1 (GIOChannel  * channel,
-                  GIOCondition  condition,
+test_message_cb1 (xio_channel_t  * channel,
+                  xio_condition_t  condition,
                   xpointer_t      user_data)
 {
   GIOStatus  status;
@@ -106,13 +106,13 @@ test_message_cb1 (GIOChannel  * channel,
 }
 
 static void
-test_message_cb2 (GPid      pid,
+test_message_cb2 (xpid_t      pid,
                   xint_t      status,
                   xpointer_t  user_data)
 {
   g_spawn_close_pid (pid);
 
-  g_main_loop_quit (user_data);
+  xmain_loop_quit (user_data);
 }
 
 static void
@@ -129,12 +129,12 @@ test_message (void)
   };
   GTestLogBuffer* tlb;
   GTestLogMsg   * msg;
-  GIOChannel    * channel;
-  GMainLoop     * loop;
+  xio_channel_t    * channel;
+  xmain_loop_t     * loop;
   xerror_t        * error = NULL;
   gulong          child_source;
   gulong          io_source;
-  GPid            pid = 0;
+  xpid_t            pid = 0;
   int             pipes[2];
   int             passed = 0;
   int             messages = 0;
@@ -144,10 +144,10 @@ test_message (void)
   if (0 > pipe (pipes))
     {
       int errsv = errno;
-      g_error ("error creating pipe: %s", g_strerror (errsv));
+      xerror ("error creating pipe: %s", xstrerror (errsv));
     }
 
-  argv[1] = g_strdup_printf ("--GTestLogFD=%u", pipes[1]);
+  argv[1] = xstrdup_printf ("--GTestLogFD=%u", pipes[1]);
 
   if (!g_spawn_async (NULL,
                       argv, NULL,
@@ -156,11 +156,11 @@ test_message (void)
                       NULL, NULL, &pid,
                       &error))
     {
-      g_error ("error spawning the test: %s", error->message);
+      xerror ("error spawning the test: %s", error->message);
     }
 
   tlb = g_test_log_buffer_new ();
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
 #ifdef G_OS_WIN32
   channel = g_io_channel_win32_new_fd (pipes[0]);
@@ -184,14 +184,14 @@ test_message (void)
   io_source = g_io_add_watch (channel, G_IO_IN, test_message_cb1, tlb);
   child_source = g_child_watch_add (pid, test_message_cb2, loop);
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   test_message_cb1 (channel, G_IO_IN, tlb);
 
   g_test_expect_message ("GLib", G_LOG_LEVEL_CRITICAL, "Source ID*");
-  g_assert (!g_source_remove (child_source));
+  g_assert (!xsource_remove (child_source));
   g_test_assert_expected_messages ();
-  g_assert (g_source_remove (io_source));
+  g_assert (xsource_remove (io_source));
   g_io_channel_unref (channel);
 
   for (msg = g_test_log_buffer_pop (tlb);
@@ -225,7 +225,7 @@ test_message (void)
           g_assert_not_reached ();
           break;
         default:
-          g_error ("unexpected log message type: %s", g_test_log_type_name (msg->log_type));
+          xerror ("unexpected log message type: %s", g_test_loxtype_name (msg->log_type));
         }
        g_test_log_msg_free (msg);
     }
@@ -234,7 +234,7 @@ test_message (void)
   g_assert_cmpint (messages, ==, 3);
 
   g_free (argv[1]);
-  g_main_loop_unref (loop);
+  xmain_loop_unref (loop);
   g_test_log_buffer_free (tlb);
 }
 
@@ -260,21 +260,21 @@ test_error (void)
       };
       GTestLogBuffer* tlb;
       GTestLogMsg   * msg;
-      GIOChannel    * channel;
-      GMainLoop     * loop;
+      xio_channel_t    * channel;
+      xmain_loop_t     * loop;
       xerror_t        * error = NULL;
       gulong          child_source;
       gulong          io_source;
-      GPid            pid = 0;
+      xpid_t            pid = 0;
       int             pipes[2];
 
       if (0 > pipe (pipes))
         {
           int errsv = errno;
-          g_error ("error creating pipe: %s", g_strerror (errsv));
+          xerror ("error creating pipe: %s", xstrerror (errsv));
         }
 
-      argv[1] = g_strdup_printf ("--GTestLogFD=%u", pipes[1]);
+      argv[1] = xstrdup_printf ("--GTestLogFD=%u", pipes[1]);
 
       if (!g_spawn_async (NULL,
                           argv, NULL,
@@ -283,11 +283,11 @@ test_error (void)
                           NULL, NULL, &pid,
                           &error))
         {
-          g_error ("error spawning the test: %s", error->message);
+          xerror ("error spawning the test: %s", error->message);
         }
 
       tlb = g_test_log_buffer_new ();
-      loop = g_main_loop_new (NULL, FALSE);
+      loop = xmain_loop_new (NULL, FALSE);
 
 #ifdef G_OS_WIN32
       channel = g_io_channel_win32_new_fd (pipes[0]);
@@ -302,14 +302,14 @@ test_error (void)
       io_source = g_io_add_watch (channel, G_IO_IN, test_message_cb1, tlb);
       child_source = g_child_watch_add (pid, test_message_cb2, loop);
 
-      g_main_loop_run (loop);
+      xmain_loop_run (loop);
 
       test_message_cb1 (channel, G_IO_IN, tlb);
 
       g_test_expect_message ("GLib", G_LOG_LEVEL_CRITICAL, "Source ID*");
-      g_assert (!g_source_remove (child_source));
+      g_assert (!xsource_remove (child_source));
       g_test_assert_expected_messages ();
-      g_assert (g_source_remove (io_source));
+      g_assert (xsource_remove (io_source));
       g_io_channel_unref (channel);
 
       for (msg = g_test_log_buffer_pop (tlb);
@@ -333,7 +333,7 @@ test_error (void)
                   xchar_t const* known_messages[] = {
                           "GLib-FATAL-WARNING: this is a regular g_warning() from the test suite",
                           "GLib-FATAL-CRITICAL: this is a regular g_critical() from the test suite",
-                          "GLib-FATAL-ERROR: this is a regular g_error() from the test suite"
+                          "GLib-FATAL-ERROR: this is a regular xerror() from the test suite"
                   };
                   g_assert_cmpint (messages, <, G_N_ELEMENTS (known_messages));
                   g_assert_cmpstr (msg->strings[0], ==, known_messages[messages]);
@@ -341,13 +341,13 @@ test_error (void)
                 }
               break;
             default:
-              g_error ("unexpected log message type: %s", g_test_log_type_name (msg->log_type));
+              xerror ("unexpected log message type: %s", g_test_loxtype_name (msg->log_type));
             }
             g_test_log_msg_free (msg);
         }
 
       g_free (argv[1]);
-      g_main_loop_unref (loop);
+      xmain_loop_unref (loop);
       g_test_log_buffer_free (tlb);
     }
 

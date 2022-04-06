@@ -35,47 +35,47 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_CREDENTIALS         (g_credentials_get_type ())
-#define G_CREDENTIALS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CREDENTIALS, GCredentials))
-#define G_CREDENTIALS_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CREDENTIALS, GCredentialsClass))
-#define G_CREDENTIALS_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_CREDENTIALS, GCredentialsClass))
+#define XTYPE_CREDENTIALS         (xcredentials_get_type ())
+#define G_CREDENTIALS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CREDENTIALS, xcredentials))
+#define G_CREDENTIALS_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CREDENTIALS, xcredentials_class))
+#define G_CREDENTIALS_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_CREDENTIALS, xcredentials_class))
 #define X_IS_CREDENTIALS(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_CREDENTIALS))
 #define X_IS_CREDENTIALS_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_CREDENTIALS))
 
-typedef struct _GCredentialsClass   GCredentialsClass;
+typedef struct _xcredentials_class   xcredentials_class_t;
 
 XPL_AVAILABLE_IN_ALL
-xtype_t            g_credentials_get_type           (void) G_GNUC_CONST;
+xtype_t            xcredentials_get_type           (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GCredentials    *g_credentials_new                (void);
+xcredentials_t    *xcredentials_new                (void);
 
 XPL_AVAILABLE_IN_ALL
-xchar_t           *g_credentials_to_string          (GCredentials    *credentials);
+xchar_t           *xcredentials_to_string          (xcredentials_t    *credentials);
 
 XPL_AVAILABLE_IN_ALL
-xpointer_t         g_credentials_get_native         (GCredentials    *credentials,
+xpointer_t         xcredentials_get_native         (xcredentials_t    *credentials,
                                                    GCredentialsType native_type);
 
 XPL_AVAILABLE_IN_ALL
-void             g_credentials_set_native         (GCredentials    *credentials,
+void             xcredentials_set_native         (xcredentials_t    *credentials,
                                                    GCredentialsType native_type,
                                                    xpointer_t         native);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t         g_credentials_is_same_user       (GCredentials    *credentials,
-                                                   GCredentials    *other_credentials,
+xboolean_t         xcredentials_is_same_user       (xcredentials_t    *credentials,
+                                                   xcredentials_t    *other_credentials,
                                                    xerror_t         **error);
 
 #ifdef G_OS_UNIX
 XPL_AVAILABLE_IN_2_36
-pid_t            g_credentials_get_unix_pid       (GCredentials    *credentials,
+pid_t            xcredentials_get_unix_pid       (xcredentials_t    *credentials,
                                                    xerror_t         **error);
 XPL_AVAILABLE_IN_ALL
-uid_t            g_credentials_get_unix_user      (GCredentials    *credentials,
+uid_t            xcredentials_get_unix_user      (xcredentials_t    *credentials,
                                                    xerror_t         **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t         g_credentials_set_unix_user      (GCredentials    *credentials,
+xboolean_t         xcredentials_set_unix_user      (xcredentials_t    *credentials,
                                                    uid_t           uid,
                                                    xerror_t         **error);
 #endif

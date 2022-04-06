@@ -30,17 +30,17 @@ G_BEGIN_DECLS
 
 #define XTYPE_DATAGRAM_BASED             (g_datagram_based_get_type ())
 #define G_DATAGRAM_BASED(inst)            (XTYPE_CHECK_INSTANCE_CAST ((inst), \
-                                           XTYPE_DATAGRAM_BASED, GDatagramBased))
+                                           XTYPE_DATAGRAM_BASED, xdatagram_based))
 #define X_IS_DATAGRAM_BASED(inst)         (XTYPE_CHECK_INSTANCE_TYPE ((inst), \
                                            XTYPE_DATAGRAM_BASED))
 #define G_DATAGRAM_BASED_GET_IFACE(inst)  (XTYPE_INSTANCE_GET_INTERFACE ((inst), \
                                            XTYPE_DATAGRAM_BASED, \
                                            GDatagramBasedInterface))
-#define XTYPE_IS_DATAGRAM_BASED(type)    (g_type_is_a ((type), \
+#define XTYPE_IS_DATAGRAM_BASED(type)    (xtype_is_a ((type), \
                                            XTYPE_DATAGRAM_BASED))
 
 /**
- * GDatagramBased:
+ * xdatagram_based_t:
  *
  * Interface for socket-like objects with datagram semantics.
  *
@@ -71,28 +71,28 @@ struct _GDatagramBasedInterface
   xtype_interface_t x_iface;
 
   /* Virtual table */
-  xint_t          (*receive_messages)     (GDatagramBased       *datagram_based,
-                                         GInputMessage        *messages,
+  xint_t          (*receive_messages)     (xdatagram_based_t       *datagram_based,
+                                         xinput_message_t        *messages,
                                          xuint_t                 num_messages,
                                          xint_t                  flags,
                                          gint64                timeout,
                                          xcancellable_t         *cancellable,
                                          xerror_t              **error);
-  xint_t          (*send_messages)        (GDatagramBased       *datagram_based,
-                                         GOutputMessage       *messages,
+  xint_t          (*send_messages)        (xdatagram_based_t       *datagram_based,
+                                         xoutput_message_t       *messages,
                                          xuint_t                 num_messages,
                                          xint_t                  flags,
                                          gint64                timeout,
                                          xcancellable_t         *cancellable,
                                          xerror_t              **error);
 
-  GSource      *(*create_source)        (GDatagramBased       *datagram_based,
-                                         GIOCondition          condition,
+  xsource_t      *(*create_source)        (xdatagram_based_t       *datagram_based,
+                                         xio_condition_t          condition,
                                          xcancellable_t         *cancellable);
-  GIOCondition  (*condition_check)      (GDatagramBased       *datagram_based,
-                                         GIOCondition          condition);
-  xboolean_t      (*condition_wait)       (GDatagramBased       *datagram_based,
-                                         GIOCondition          condition,
+  xio_condition_t  (*condition_check)      (xdatagram_based_t       *datagram_based,
+                                         xio_condition_t          condition);
+  xboolean_t      (*condition_wait)       (xdatagram_based_t       *datagram_based,
+                                         xio_condition_t          condition,
                                          gint64                timeout,
                                          xcancellable_t         *cancellable,
                                          xerror_t              **error);
@@ -104,8 +104,8 @@ g_datagram_based_get_type             (void);
 
 XPL_AVAILABLE_IN_2_48
 xint_t
-g_datagram_based_receive_messages     (GDatagramBased       *datagram_based,
-                                       GInputMessage        *messages,
+g_datagram_based_receive_messages     (xdatagram_based_t       *datagram_based,
+                                       xinput_message_t        *messages,
                                        xuint_t                 num_messages,
                                        xint_t                  flags,
                                        gint64                timeout,
@@ -114,8 +114,8 @@ g_datagram_based_receive_messages     (GDatagramBased       *datagram_based,
 
 XPL_AVAILABLE_IN_2_48
 xint_t
-g_datagram_based_send_messages        (GDatagramBased       *datagram_based,
-                                       GOutputMessage       *messages,
+g_datagram_based_send_messages        (xdatagram_based_t       *datagram_based,
+                                       xoutput_message_t       *messages,
                                        xuint_t                 num_messages,
                                        xint_t                  flags,
                                        gint64                timeout,
@@ -123,18 +123,18 @@ g_datagram_based_send_messages        (GDatagramBased       *datagram_based,
                                        xerror_t              **error);
 
 XPL_AVAILABLE_IN_2_48
-GSource *
-g_datagram_based_create_source        (GDatagramBased       *datagram_based,
-                                       GIOCondition          condition,
+xsource_t *
+g_datagram_based_create_source        (xdatagram_based_t       *datagram_based,
+                                       xio_condition_t          condition,
                                        xcancellable_t         *cancellable);
 XPL_AVAILABLE_IN_2_48
-GIOCondition
-g_datagram_based_condition_check      (GDatagramBased       *datagram_based,
-                                       GIOCondition          condition);
+xio_condition_t
+g_datagram_based_condition_check      (xdatagram_based_t       *datagram_based,
+                                       xio_condition_t          condition);
 XPL_AVAILABLE_IN_2_48
 xboolean_t
-g_datagram_based_condition_wait       (GDatagramBased       *datagram_based,
-                                       GIOCondition          condition,
+g_datagram_based_condition_wait       (xdatagram_based_t       *datagram_based,
+                                       xio_condition_t          condition,
                                        gint64                timeout,
                                        xcancellable_t         *cancellable,
                                        xerror_t              **error);

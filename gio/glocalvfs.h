@@ -37,7 +37,7 @@ typedef struct _GLocalVfsClass  GLocalVfsClass;
 
 xtype_t   _g_local_vfs_get_type  (void) G_GNUC_CONST;
 
-GVfs  * _g_local_vfs_new       (void);
+xvfs_t  * _g_local_vfs_new       (void);
 
 G_END_DECLS
 

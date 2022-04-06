@@ -30,7 +30,7 @@ G_BEGIN_DECLS
 
 #define XTYPE_PROPERTY_ACTION                              (g_property_action_get_type ())
 #define G_PROPERTY_ACTION(inst)                             (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_PROPERTY_ACTION, GPropertyAction))
+                                                             XTYPE_PROPERTY_ACTION, xproperty_action))
 #define X_IS_PROPERTY_ACTION(inst)                          (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
                                                              XTYPE_PROPERTY_ACTION))
 
@@ -38,7 +38,7 @@ XPL_AVAILABLE_IN_2_38
 xtype_t                   g_property_action_get_type                      (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_2_38
-GPropertyAction *       g_property_action_new                           (const xchar_t *name,
+xproperty_action_t *       g_property_action_new                           (const xchar_t *name,
                                                                          xpointer_t     object,
                                                                          const xchar_t *property_name);
 

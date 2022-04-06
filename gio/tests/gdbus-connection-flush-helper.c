@@ -24,7 +24,7 @@ int
 main (int   argc,
       char *argv[])
 {
-  GDBusConnection *c;
+  xdbus_connection_t *c;
   xerror_t *error;
   xboolean_t ret;
 

@@ -23,7 +23,7 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_THREADED_RESOLVER         (g_threaded_resolver_get_type ())
+#define XTYPE_THREADED_RESOLVER         (xthreaded_resolver_get_type ())
 #define G_THREADED_RESOLVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_THREADED_RESOLVER, GThreadedResolver))
 #define G_THREADED_RESOLVER_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_THREADED_RESOLVER, GThreadedResolverClass))
 #define X_IS_THREADED_RESOLVER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_THREADED_RESOLVER))
@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 #define G_THREADED_RESOLVER_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_THREADED_RESOLVER, GThreadedResolverClass))
 
 typedef struct {
-  GResolver parent_instance;
+  xresolver_t parent_instance;
 } GThreadedResolver;
 
 typedef struct {
@@ -40,14 +40,14 @@ typedef struct {
 } GThreadedResolverClass;
 
 XPL_AVAILABLE_IN_ALL
-xtype_t g_threaded_resolver_get_type (void) G_GNUC_CONST;
+xtype_t xthreaded_resolver_get_type (void) G_GNUC_CONST;
 
 /* Used for a private test API */
 XPL_AVAILABLE_IN_ALL
 xlist_t *g_resolver_records_from_res_query (const xchar_t      *rrname,
                                           xint_t              rrtype,
-                                          const guint8     *answer,
-                                          gssize            len,
+                                          const xuint8_t     *answer,
+                                          xssize_t            len,
                                           xint_t              herr,
                                           xerror_t          **error);
 

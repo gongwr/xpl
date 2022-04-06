@@ -31,7 +31,7 @@ return_type function_callback (… , xpointer_t user_data);
     </para>
 
     <para>
-      The <link linkend="GClosure"><type>GClosure</type></link> structure represents the common functionality of all
+      The <link linkend="xclosure_t"><type>xclosure_t</type></link> structure represents the common functionality of all
       closure implementations: there exists a different closure implementation for
       each separate runtime which wants to use the xobject_t type system.
       <footnote><para>
@@ -46,23 +46,23 @@ return_type function_callback (… , xpointer_t user_data);
       is a specific implementation of closures to be used with C/C++ callbacks.
     </para>
     <para>
-      A <link linkend="GClosure"><type>GClosure</type></link> provides simple services:
+      A <link linkend="xclosure_t"><type>xclosure_t</type></link> provides simple services:
       <itemizedlist>
         <listitem><para>
-          Invocation (<function><link linkend="g-closure-invoke">g_closure_invoke</link></function>): this is what closures
+          Invocation (<function><link linkend="g-closure-invoke">xclosure_invoke</link></function>): this is what closures
           were created for: they hide the details of callback invocation from the
           callback invoker.</para>
         </listitem>
         <listitem><para>
           Notification: the closure notifies listeners of certain events such as
           closure invocation, closure invalidation and closure finalization. Listeners
-          can be registered with <function><link linkend="g-closure-add-finalize-notifier">g_closure_add_finalize_notifier</link></function>
-          (finalization notification), <function><link linkend="g-closure-add-invalidate-notifier">g_closure_add_invalidate_notifier</link></function>
+          can be registered with <function><link linkend="g-closure-add-finalize-notifier">xclosure_add_finalize_notifier</link></function>
+          (finalization notification), <function><link linkend="g-closure-add-invalidate-notifier">xclosure_add_invalidate_notifier</link></function>
           (invalidation notification) and
-          <function><link linkend="g-closure-add-marshal-guards">g_closure_add_marshal_guards</link></function> (invocation notification).
+          <function><link linkend="g-closure-add-marshal-guards">xclosure_add_marshal_guards</link></function> (invocation notification).
           There exist symmetric deregistration functions for finalization and invalidation
-          events (<function><link linkend="g-closure-remove-finalize-notifier">g_closure_remove_finalize_notifier</link></function> and
-          <function><link linkend="g-closure-remove-invalidate-notifier">g_closure_remove_invalidate_notifier</link></function>) but not for the invocation
+          events (<function><link linkend="g-closure-remove-finalize-notifier">xclosure_remove_finalize_notifier</link></function> and
+          <function><link linkend="g-closure-remove-invalidate-notifier">xclosure_remove_invalidate_notifier</link></function>) but not for the invocation
           process.
           <footnote><para>
             Closures are reference counted and notify listeners of their destruction in a two-stage
@@ -117,7 +117,7 @@ return_type function_callback (… , xpointer_t user_data);
         C closure marshallers transform the array of GValues which represent
         the parameters to the target function into a C-style function parameter list, invoke
         the user-supplied C function with this new parameter list, get the return value of the
-        function, transform it into a GValue and return this GValue to the marshaller caller.
+        function, transform it into a xvalue_t and return this xvalue_t to the marshaller caller.
       </para>
 
       <para>
@@ -130,14 +130,14 @@ return_type function_callback (… , xpointer_t user_data);
 
       <para>
         An example of a custom marshaller is given below, illustrating how
-        <type>GValue</type>s can be converted to a C function call. The
+        <type>xvalue_t</type>s can be converted to a C function call. The
         marshaller is for a C function which takes an integer as its first
         parameter and returns void.
 <informalexample><programlisting>
-g_cclosure_marshal_VOID__INT (GClosure     *closure,
-                              GValue       *return_value,
+g_cclosure_marshal_VOID__INT (xclosure_t     *closure,
+                              xvalue_t       *return_value,
                               xuint_t         n_param_values,
-                              const GValue *param_values,
+                              const xvalue_t *param_values,
                               xpointer_t      invocation_hint,
                               xpointer_t      marshal_data)
 {
@@ -150,7 +150,7 @@ g_cclosure_marshal_VOID__INT (GClosure     *closure,
 
   g_return_if_fail (n_param_values == 2);
 
-  data1 = g_value_peek_pointer (param_values + 0);
+  data1 = xvalue_peek_pointer (param_values + 0);
   data2 = closure->data;
 
   callback = (GMarshalFunc_VOID__INT) (marshal_data ? marshal_data : cc->callback);
@@ -166,7 +166,7 @@ g_cclosure_marshal_VOID__INT (GClosure     *closure,
         There exist other kinds of marshallers, for example there is a generic
         Python marshaller which is used by all Python closures (a Python closure
         is used to invoke a callback written in Python). This Python marshaller
-        transforms the input GValue list representing the function parameters
+        transforms the input xvalue_t list representing the function parameters
         into a Python tuple which is the equivalent structure in Python.
       </para>
 
@@ -212,7 +212,7 @@ return_type function_callback (xpointer_t instance, …, xpointer_t user_data);
 xuint_t g_signal_newv (const xchar_t        *signal_name,
                      xtype_t               itype,
                      GSignalFlags        signal_flags,
-                     GClosure           *class_closure,
+                     xclosure_t           *class_closure,
                      GSignalAccumulator  accumulator,
                      xpointer_t            accu_data,
                      GSignalCMarshaller  c_marshaller,
@@ -318,10 +318,10 @@ xuint_t g_signal_newv (const xchar_t        *signal_name,
 		Signal emission is done through the use of the <function><link linkend="g-signal-emit">g_signal_emit</link></function> family
 		of functions.
 <informalexample><programlisting>
-void g_signal_emitv (const GValue *instance_and_params,
+void g_signal_emitv (const xvalue_t *instance_and_params,
                      xuint_t         signal_id,
-                     GQuark        detail,
-                     GValue       *return_value);
+                     xquark        detail,
+                     xvalue_t       *return_value);
 </programlisting></informalexample>
 		<itemizedlist>
 		  <listitem><para>
@@ -429,10 +429,10 @@ void g_signal_emitv (const GValue *instance_and_params,
 
 	  <para>
 	    Of the three main connection functions,
-		only one has an explicit detail parameter as a <link linkend="GQuark"><type>GQuark</type></link>:
+		only one has an explicit detail parameter as a <link linkend="xquark"><type>xquark</type></link>:
 		<link linkend="g-signal-connect-closure-by-id"><function>g_signal_connect_closure_by_id</function></link>.
 		<footnote>
-		  <para>A GQuark is an integer which uniquely represents a string. It is possible to transform
+		  <para>A xquark is an integer which uniquely represents a string. It is possible to transform
 		   back and forth between the integer and string representations with the functions
 		   <function><link linkend="g-quark-from-string">g_quark_from_string</link></function> and <function><link linkend="g-quark-to-string">g_quark_to_string</link></function>.
 		  </para>
@@ -451,7 +451,7 @@ void g_signal_emitv (const GValue *instance_and_params,
 		<emphasis>notify::cursor_position</emphasis> will actually
 		connect to the signal named <emphasis>notify</emphasis> with the
 		<emphasis>cursor_position</emphasis> detail.
-		Internally, the detail string is transformed to a GQuark if it is present.
+		Internally, the detail string is transformed to a xquark if it is present.
 	  </para>
 
 	  <para>
@@ -459,7 +459,7 @@ void g_signal_emitv (const GValue *instance_and_params,
 	    signal name parameter:
 	    <link linkend="g-signal-connect"><function>g_signal_connect</function></link>.
 	    The other three have an explicit detail parameter as a
-	    <link linkend="GQuark"><type>GQuark</type></link> again:
+	    <link linkend="xquark"><type>xquark</type></link> again:
 	    <link linkend="g-signal-emit"><function>g_signal_emit</function></link>,
 	    <link linkend="g-signal-emitv"><function>g_signal_emitv</function></link> and
 	    <link linkend="g-signal-emit-valist"><function>g_signal_emit_valist</function></link>.
@@ -477,7 +477,7 @@ void g_signal_emitv (const GValue *instance_and_params,
 		This completely optional filtering mechanism is mainly used as an optimization for signals
 		which are often emitted for many different reasons: the clients can filter out which events they are
 		interested in before the closure's marshalling code runs. For example, this is used extensively
-		by the <link linkend="xobject_t-notify"><structfield>notify</structfield></link> signal of xobject_t: whenever a property is modified on a xobject_t,
+		by the <link linkend="xobject-notify"><structfield>notify</structfield></link> signal of xobject_t: whenever a property is modified on a xobject_t,
 		instead of just emitting the <emphasis>notify</emphasis> signal, xobject_t associates as a detail to this
 		signal emission the name of the property modified. This allows clients who wish to be notified of changes
 		to only one property to filter most events before receiving them.

@@ -29,20 +29,20 @@ on_connected (xobject_t      *source_object,
   conn = xsocket_client_connect_to_uri_finish (XSOCKET_CLIENT (source_object), result, &error);
   g_assert_no_error (error);
 
-  g_object_unref (conn);
-  g_main_loop_quit (user_data);
+  xobject_unref (conn);
+  xmain_loop_quit (user_data);
 }
 
 static void
 test_happy_eyeballs (void)
 {
-  GSocketClient *client;
-  GSocketService *service;
+  xsocket_client_t *client;
+  xsocket_service_t *service;
   xerror_t *error = NULL;
-  guint16 port;
-  GMainLoop *loop;
+  xuint16_t port;
+  xmain_loop_t *loop;
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   service = xsocket_service_new ();
   port = xsocket_listener_add_any_inet_port (XSOCKET_LISTENER (service), NULL, &error);
@@ -56,11 +56,11 @@ test_happy_eyeballs (void)
    */
   client = xsocket_client_new ();
   xsocket_client_connect_to_host_async (client, "localhost", port, NULL, on_connected, loop);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
-  g_main_loop_unref (loop);
-  g_object_unref (service);
-  g_object_unref (client);
+  xmain_loop_unref (loop);
+  xobject_unref (service);
+  xobject_unref (client);
 }
 
 static void
@@ -75,8 +75,8 @@ on_connected_cancelled (xobject_t      *source_object,
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
   g_assert_null (conn);
 
-  g_error_free (error);
-  g_main_loop_quit (user_data);
+  xerror_free (error);
+  xmain_loop_quit (user_data);
 }
 
 typedef struct
@@ -86,9 +86,9 @@ typedef struct
 } EventCallbackData;
 
 static void
-on_event (GSocketClient      *client,
+on_event (xsocket_client_t      *client,
           GSocketClientEvent  event,
-          GSocketConnectable *connectable,
+          xsocket_connectable_t *connectable,
           xio_stream_t          *connection,
           EventCallbackData  *data)
 {
@@ -106,17 +106,17 @@ on_event (GSocketClient      *client,
 static void
 test_happy_eyeballs_cancel_delayed (void)
 {
-  GSocketClient *client;
-  GSocketService *service;
+  xsocket_client_t *client;
+  xsocket_service_t *service;
   xerror_t *error = NULL;
-  guint16 port;
-  GMainLoop *loop;
+  xuint16_t port;
+  xmain_loop_t *loop;
   EventCallbackData data = { NULL, FALSE };
 
   /* This just tests that cancellation works as expected, still emits the completed signal,
    * and never returns a connection */
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   service = xsocket_service_new ();
   port = xsocket_listener_add_any_inet_port (XSOCKET_LISTENER (service), NULL, &error);
@@ -127,30 +127,30 @@ test_happy_eyeballs_cancel_delayed (void)
   data.cancellable = g_cancellable_new ();
   xsocket_client_connect_to_host_async (client, "localhost", port, data.cancellable, on_connected_cancelled, loop);
   g_signal_connect (client, "event", G_CALLBACK (on_event), &data);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   g_assert_true (data.completed);
-  g_main_loop_unref (loop);
-  g_object_unref (service);
-  g_object_unref (client);
-  g_object_unref (data.cancellable);
+  xmain_loop_unref (loop);
+  xobject_unref (service);
+  xobject_unref (client);
+  xobject_unref (data.cancellable);
 }
 
 static void
 test_happy_eyeballs_cancel_instant (void)
 {
-  GSocketClient *client;
-  GSocketService *service;
+  xsocket_client_t *client;
+  xsocket_service_t *service;
   xerror_t *error = NULL;
-  guint16 port;
-  GMainLoop *loop;
+  xuint16_t port;
+  xmain_loop_t *loop;
   xcancellable_t *cancel;
   EventCallbackData data = { NULL, FALSE };
 
   /* This tests the same things as above, test_happy_eyeballs_cancel_delayed(), but
    * with different timing since it sends an already cancelled cancellable */
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   service = xsocket_service_new ();
   port = xsocket_listener_add_any_inet_port (XSOCKET_LISTENER (service), NULL, &error);
@@ -162,13 +162,13 @@ test_happy_eyeballs_cancel_instant (void)
   g_cancellable_cancel (cancel);
   xsocket_client_connect_to_host_async (client, "localhost", port, cancel, on_connected_cancelled, loop);
   g_signal_connect (client, "event", G_CALLBACK (on_event), &data);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   g_assert_true (data.completed);
-  g_main_loop_unref (loop);
-  g_object_unref (service);
-  g_object_unref (client);
-  g_object_unref (cancel);
+  xmain_loop_unref (loop);
+  xobject_unref (service);
+  xobject_unref (client);
+  xobject_unref (cancel);
 }
 
 int

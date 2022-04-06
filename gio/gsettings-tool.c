@@ -27,21 +27,21 @@
 
 #include "glib/glib-private.h"
 
-static GSettingsSchemaSource   *global_schema_source;
-static GSettings               *global_settings;
-static GSettingsSchema         *global_schema;
-static GSettingsSchemaKey      *global_schema_key;
+static xsettings_schema_source_t   *global_schema_source;
+static xsettings_t               *global_settings;
+static xsettings_schema_t         *global_schema;
+static xsettings_schema_key_t      *global_schema_key;
 const xchar_t                    *global_key;
 const xchar_t                    *global_value;
 
 static xboolean_t
-is_relocatable_schema (GSettingsSchema *schema)
+is_relocatable_schema (xsettings_schema_t *schema)
 {
   return g_settings_schema_get_path (schema) == NULL;
 }
 
 static xboolean_t
-check_relocatable_schema (GSettingsSchema *schema,
+check_relocatable_schema (xsettings_schema_t *schema,
                           const xchar_t     *schema_id)
 {
   if (schema == NULL)
@@ -62,7 +62,7 @@ check_relocatable_schema (GSettingsSchema *schema,
 }
 
 static xboolean_t
-check_schema (GSettingsSchema *schema,
+check_schema (xsettings_schema_t *schema,
               const xchar_t *schema_id)
 {
   if (schema == NULL)
@@ -97,7 +97,7 @@ check_path (const xchar_t *path)
       return FALSE;
     }
 
-  if (!g_str_has_suffix (path, "/"))
+  if (!xstr_has_suffix (path, "/"))
     {
       g_printerr (_("Path must end with a slash (/)\n"));
       return FALSE;
@@ -116,7 +116,7 @@ static int
 qsort_cmp (const void *a,
            const void *b)
 {
-  return g_strcmp0 (*(xchar_t* const*)a, *(xchar_t* const*)b);
+  return xstrcmp0 (*(xchar_t* const*)a, *(xchar_t* const*)b);
 }
 
 static void
@@ -124,7 +124,7 @@ output_list (xchar_t **list)
 {
   xint_t i;
 
-  qsort (list, g_strv_length (list), sizeof (xchar_t*), qsort_cmp);
+  qsort (list, xstrv_length (list), sizeof (xchar_t*), qsort_cmp);
   for (i = 0; list[i]; i++)
     g_print ("%s\n", list[i]);
 }
@@ -143,7 +143,7 @@ gsettings_list_schemas (void)
 
   g_settings_schema_source_list_schemas (global_schema_source, TRUE, &schemas, NULL);
   output_list (schemas);
-  g_strfreev (schemas);
+  xstrfreev (schemas);
 }
 
 static void
@@ -156,7 +156,7 @@ gsettings_list_schemas_with_paths (void)
 
   for (i = 0; schemas[i] != NULL; i++)
     {
-      GSettingsSchema *schema;
+      xsettings_schema_t *schema;
       xchar_t *schema_name;
       const xchar_t *schema_path;
 
@@ -165,14 +165,14 @@ gsettings_list_schemas_with_paths (void)
       schema = g_settings_schema_source_lookup (global_schema_source, schema_name, TRUE);
       schema_path = g_settings_schema_get_path (schema);
 
-      schemas[i] = g_strconcat (schema_name, " ", schema_path, NULL);
+      schemas[i] = xstrconcat (schema_name, " ", schema_path, NULL);
 
       g_settings_schema_unref (schema);
       g_free (schema_name);
     }
 
   output_list (schemas);
-  g_strfreev (schemas);
+  xstrfreev (schemas);
 }
 
 static void
@@ -182,7 +182,7 @@ gsettings_list_relocatable_schemas (void)
 
   g_settings_schema_source_list_schemas (global_schema_source, TRUE, NULL, &schemas);
   output_list (schemas);
-  g_strfreev (schemas);
+  xstrfreev (schemas);
 }
 
 static void
@@ -192,7 +192,7 @@ gsettings_list_keys (void)
 
   keys = g_settings_schema_list_keys (global_schema);
   output_list (keys);
-  g_strfreev (keys);
+  xstrfreev (keys);
 }
 
 static void
@@ -203,7 +203,7 @@ gsettings_list_children (void)
   xint_t i;
 
   children = g_settings_list_children (global_settings);
-  qsort (children, g_strv_length (children), sizeof (xchar_t*), qsort_cmp);
+  qsort (children, xstrv_length (children), sizeof (xchar_t*), qsort_cmp);
   for (i = 0; children[i]; i++)
     {
       xsize_t len = strlen (children[i]);
@@ -213,12 +213,12 @@ gsettings_list_children (void)
 
   for (i = 0; children[i]; i++)
     {
-      GSettings *child;
-      GSettingsSchema *schema;
+      xsettings_t *child;
+      xsettings_schema_t *schema;
       xchar_t *path;
 
       child = g_settings_get_child (global_settings, children[i]);
-      g_object_get (child,
+      xobject_get (child,
                     "settings-schema", &schema,
                     "path", &path,
                     NULL);
@@ -230,54 +230,54 @@ gsettings_list_children (void)
         g_print ("%-*s   %s:%s\n", (int) MIN (max, G_MAXINT), children[i],
                  g_settings_schema_get_id (schema), path);
 
-      g_object_unref (child);
+      xobject_unref (child);
       g_settings_schema_unref (schema);
       g_free (path);
     }
 
-  g_strfreev (children);
+  xstrfreev (children);
 }
 
 static void
-enumerate (GSettings *settings)
+enumerate (xsettings_t *settings)
 {
   xchar_t **keys;
-  GSettingsSchema *schema;
+  xsettings_schema_t *schema;
   xint_t i;
 
-  g_object_get (settings, "settings-schema", &schema, NULL);
+  xobject_get (settings, "settings-schema", &schema, NULL);
 
   keys = g_settings_schema_list_keys (schema);
-  qsort (keys, g_strv_length (keys), sizeof (xchar_t*), qsort_cmp);
+  qsort (keys, xstrv_length (keys), sizeof (xchar_t*), qsort_cmp);
   for (i = 0; keys[i]; i++)
     {
       xvariant_t *value;
       xchar_t *printed;
 
       value = g_settings_get_value (settings, keys[i]);
-      printed = g_variant_print (value, TRUE);
+      printed = xvariant_print (value, TRUE);
       g_print ("%s %s %s\n", g_settings_schema_get_id (schema), keys[i], printed);
-      g_variant_unref (value);
+      xvariant_unref (value);
       g_free (printed);
     }
 
   g_settings_schema_unref (schema);
-  g_strfreev (keys);
+  xstrfreev (keys);
 }
 
 static void
-list_recursively (GSettings *settings)
+list_recursively (xsettings_t *settings)
 {
   xchar_t **children;
   xint_t i;
 
   enumerate (settings);
   children = g_settings_list_children (settings);
-  qsort (children, g_strv_length (children), sizeof (xchar_t*), qsort_cmp);
+  qsort (children, xstrv_length (children), sizeof (xchar_t*), qsort_cmp);
   for (i = 0; children[i]; i++)
     {
       xboolean_t will_see_elsewhere = FALSE;
-      GSettings *child;
+      xsettings_t *child;
 
       child = g_settings_get_child (settings, children[i]);
 
@@ -288,9 +288,9 @@ list_recursively (GSettings *settings)
 	   * because we will pick it up later on.
 	   */
 
-	  GSettingsSchema *child_schema;
+	  xsettings_schema_t *child_schema;
 
-	  g_object_get (child, "settings-schema", &child_schema, NULL);
+	  xobject_get (child, "settings-schema", &child_schema, NULL);
 	  will_see_elsewhere = !is_relocatable_schema (child_schema);
 	  g_settings_schema_unref (child_schema);
         }
@@ -298,10 +298,10 @@ list_recursively (GSettings *settings)
       if (!will_see_elsewhere)
         list_recursively (child);
 
-      g_object_unref (child);
+      xobject_unref (child);
     }
 
-  g_strfreev (children);
+  xstrfreev (children);
 }
 
 static void
@@ -317,18 +317,18 @@ gsettings_list_recursively (void)
       xint_t i;
 
       g_settings_schema_source_list_schemas (global_schema_source, TRUE, &schemas, NULL);
-      qsort (schemas, g_strv_length (schemas), sizeof (xchar_t*), qsort_cmp);
+      qsort (schemas, xstrv_length (schemas), sizeof (xchar_t*), qsort_cmp);
 
       for (i = 0; schemas[i]; i++)
         {
-          GSettings *settings;
+          xsettings_t *settings;
 
           settings = g_settings_new (schemas[i]);
           list_recursively (settings);
-          g_object_unref (settings);
+          xobject_unref (settings);
         }
 
-      g_strfreev (schemas);
+      xstrfreev (schemas);
     }
 }
 
@@ -349,48 +349,48 @@ gsettings_range (void)
   const xchar_t *type;
 
   range = g_settings_schema_key_get_range (global_schema_key);
-  g_variant_get (range, "(&sv)", &type, &detail);
+  xvariant_get (range, "(&sv)", &type, &detail);
 
   if (strcmp (type, "type") == 0)
-    g_print ("type %s\n", g_variant_get_type_string (detail) + 1);
+    g_print ("type %s\n", xvariant_get_type_string (detail) + 1);
 
   else if (strcmp (type, "range") == 0)
     {
       xvariant_t *min, *max;
       xchar_t *smin, *smax;
 
-      g_variant_get (detail, "(**)", &min, &max);
-      smin = g_variant_print (min, FALSE);
-      smax = g_variant_print (max, FALSE);
+      xvariant_get (detail, "(**)", &min, &max);
+      smin = xvariant_print (min, FALSE);
+      smax = xvariant_print (max, FALSE);
 
       g_print ("range %s %s %s\n",
-               g_variant_get_type_string (min), smin, smax);
-      g_variant_unref (min);
-      g_variant_unref (max);
+               xvariant_get_type_string (min), smin, smax);
+      xvariant_unref (min);
+      xvariant_unref (max);
       g_free (smin);
       g_free (smax);
     }
 
   else if (strcmp (type, "enum") == 0 || strcmp (type, "flags") == 0)
     {
-      GVariantIter iter;
+      xvariant_iter_t iter;
       xvariant_t *item;
 
       g_print ("%s\n", type);
 
-      g_variant_iter_init (&iter, detail);
-      while (g_variant_iter_loop (&iter, "*", &item))
+      xvariant_iter_init (&iter, detail);
+      while (xvariant_iter_loop (&iter, "*", &item))
         {
           xchar_t *printed;
 
-          printed = g_variant_print (item, FALSE);
+          printed = xvariant_print (item, FALSE);
           g_print ("%s\n", printed);
           g_free (printed);
         }
     }
 
-  g_variant_unref (detail);
-  g_variant_unref (range);
+  xvariant_unref (detail);
+  xvariant_unref (range);
 }
 
 static void
@@ -400,9 +400,9 @@ gsettings_get (void)
   xchar_t *printed;
 
   value = g_settings_get_value (global_settings, global_key);
-  printed = g_variant_print (value, TRUE);
+  printed = xvariant_print (value, TRUE);
   g_print ("%s\n", printed);
-  g_variant_unref (value);
+  xvariant_unref (value);
   g_free (printed);
 }
 
@@ -414,13 +414,13 @@ gsettings_reset (void)
 }
 
 static void
-reset_all_keys (GSettings *settings)
+reset_all_keys (xsettings_t *settings)
 {
-  GSettingsSchema *schema;
+  xsettings_schema_t *schema;
   xchar_t **keys;
   xint_t i;
 
-  g_object_get (settings, "settings-schema", &schema, NULL);
+  xobject_get (settings, "settings-schema", &schema, NULL);
 
   keys = g_settings_schema_list_keys (schema);
   for (i = 0; keys[i]; i++)
@@ -429,7 +429,7 @@ reset_all_keys (GSettings *settings)
     }
 
   g_settings_schema_unref (schema);
-  g_strfreev (keys);
+  xstrfreev (keys);
 }
 
 static void
@@ -444,15 +444,15 @@ gsettings_reset_recursively (void)
   children = g_settings_list_children (global_settings);
   for (i = 0; children[i]; i++)
     {
-      GSettings *child;
+      xsettings_t *child;
       child = g_settings_get_child (global_settings, children[i]);
 
       reset_all_keys (child);
 
-      g_object_unref (child);
+      xobject_unref (child);
     }
 
-  g_strfreev (children);
+  xstrfreev (children);
 
   g_settings_apply (global_settings);
   g_settings_sync ();
@@ -467,7 +467,7 @@ gsettings_writable (void)
 }
 
 static void
-value_changed (GSettings   *settings,
+value_changed (xsettings_t   *settings,
                const xchar_t *key,
                xpointer_t     user_data)
 {
@@ -475,9 +475,9 @@ value_changed (GSettings   *settings,
   xchar_t *printed;
 
   value = g_settings_get_value (settings, key);
-  printed = g_variant_print (value, TRUE);
+  printed = xvariant_print (value, TRUE);
   g_print ("%s: %s\n", key, printed);
-  g_variant_unref (value);
+  xvariant_unref (value);
   g_free (printed);
 }
 
@@ -488,14 +488,14 @@ gsettings_monitor (void)
     {
       xchar_t *name;
 
-      name = g_strdup_printf ("changed::%s", global_key);
+      name = xstrdup_printf ("changed::%s", global_key);
       g_signal_connect (global_settings, name, G_CALLBACK (value_changed), NULL);
     }
   else
     g_signal_connect (global_settings, "changed", G_CALLBACK (value_changed), NULL);
 
   for (;;)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 }
 
 static void
@@ -508,7 +508,7 @@ gsettings_set (void)
 
   type = g_settings_schema_key_get_value_type (global_schema_key);
 
-  new = g_variant_parse (type, global_value, NULL, NULL, &error);
+  new = xvariant_parse (type, global_value, NULL, NULL, &error);
 
   /* If that didn't work and the type is string then we should assume
    * that the user is just trying to set a string directly and forgot
@@ -529,21 +529,21 @@ gsettings_set (void)
    *
    * A similar example could be given for double quotes.
    *
-   * Avoid that whole mess by just using g_variant_new_string().
+   * Avoid that whole mess by just using xvariant_new_string().
    */
   if (new == NULL &&
-      g_variant_type_equal (type, G_VARIANT_TYPE_STRING) &&
+      xvariant_type_equal (type, G_VARIANT_TYPE_STRING) &&
       global_value[0] != '\'' && global_value[0] != '"')
     {
       g_clear_error (&error);
-      new = g_variant_new_string (global_value);
+      new = xvariant_new_string (global_value);
     }
 
   if (new == NULL)
     {
       xchar_t *context;
 
-      context = g_variant_parse_error_print_context (error, global_value);
+      context = xvariant_parse_error_print_context (error, global_value);
       g_printerr ("%s", context);
       exit (1);
     }
@@ -551,7 +551,7 @@ gsettings_set (void)
   if (!g_settings_schema_key_range_check (global_schema_key, new))
     {
       g_printerr (_("The provided value is outside of the valid range\n"));
-      g_variant_unref (new);
+      xvariant_unref (new);
       exit (1);
     }
 
@@ -572,9 +572,9 @@ gsettings_help (xboolean_t     requested,
 {
   const xchar_t *description;
   const xchar_t *synopsis;
-  GString *string;
+  xstring_t *string;
 
-  string = g_string_new (NULL);
+  string = xstring_new (NULL);
 
   if (command == NULL)
     ;
@@ -673,14 +673,14 @@ gsettings_help (xboolean_t     requested,
     }
   else
     {
-      g_string_printf (string, _("Unknown command %s\n\n"), command);
+      xstring_printf (string, _("Unknown command %s\n\n"), command);
       requested = FALSE;
       command = NULL;
     }
 
   if (command == NULL)
     {
-      g_string_append (string,
+      xstring_append (string,
       _("Usage:\n"
         "  gsettings --version\n"
         "  gsettings [--schemadir SCHEMADIR] COMMAND [ARGS…]\n"
@@ -705,36 +705,36 @@ gsettings_help (xboolean_t     requested,
     }
   else
     {
-      g_string_append_printf (string, _("Usage:\n  gsettings [--schemadir SCHEMADIR] %s %s\n\n%s\n\n"),
+      xstring_append_printf (string, _("Usage:\n  gsettings [--schemadir SCHEMADIR] %s %s\n\n%s\n\n"),
                               command, synopsis[0] ? _(synopsis) : "", description);
 
-      g_string_append (string, _("Arguments:\n"));
+      xstring_append (string, _("Arguments:\n"));
 
-      g_string_append (string,
+      xstring_append (string,
                        _("  SCHEMADIR A directory to search for additional schemas\n"));
 
       if (strstr (synopsis, "[COMMAND]"))
-        g_string_append (string,
+        xstring_append (string,
                        _("  COMMAND   The (optional) command to explain\n"));
 
       else if (strstr (synopsis, "SCHEMA"))
-        g_string_append (string,
+        xstring_append (string,
                        _("  SCHEMA    The name of the schema\n"
                          "  PATH      The path, for relocatable schemas\n"));
 
       if (strstr (synopsis, "[KEY]"))
-        g_string_append (string,
+        xstring_append (string,
                        _("  KEY       The (optional) key within the schema\n"));
 
       else if (strstr (synopsis, "KEY"))
-        g_string_append (string,
+        xstring_append (string,
                        _("  KEY       The key within the schema\n"));
 
       if (strstr (synopsis, "VALUE"))
-        g_string_append (string,
+        xstring_append (string,
                        _("  VALUE     The value to set\n"));
 
-      g_string_append (string, "\n");
+      xstring_append (string, "\n");
     }
 
   if (requested)
@@ -742,7 +742,7 @@ gsettings_help (xboolean_t     requested,
   else
     g_printerr ("%s\n", string->str);
 
-  g_string_free (string, TRUE);
+  xstring_free (string, TRUE);
 
   return requested ? 0 : 1;
 }
@@ -778,9 +778,9 @@ main (int argc, char **argv)
 
   global_schema_source = g_settings_schema_source_get_default ();
 
-  if (argc > 3 && g_str_equal (argv[1], "--schemadir"))
+  if (argc > 3 && xstr_equal (argv[1], "--schemadir"))
     {
-      GSettingsSchemaSource *parent = global_schema_source;
+      xsettings_schema_source_t *parent = global_schema_source;
       xerror_t *error = NULL;
 
       global_schema_source = g_settings_schema_source_new_from_directory (argv[2], parent, FALSE, &error);
@@ -882,7 +882,7 @@ main (int argc, char **argv)
           return 1;
         }
 
-      parts = g_strsplit (argv[2], ":", 2);
+      parts = xstrsplit (argv[2], ":", 2);
 
       global_schema = g_settings_schema_source_lookup (global_schema_source, parts[0], TRUE);
 
@@ -926,7 +926,7 @@ main (int argc, char **argv)
             }
         }
 
-      g_strfreev (parts);
+      xstrfreev (parts);
     }
 
   if (argc > 3)

@@ -30,14 +30,14 @@
 G_BEGIN_DECLS
 
 #define XTYPE_THEMED_ICON         (g_themed_icon_get_type ())
-#define G_THEMED_ICON(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_THEMED_ICON, GThemedIcon))
+#define G_THEMED_ICON(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_THEMED_ICON, xthemed_icon))
 #define G_THEMED_ICON_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_THEMED_ICON, GThemedIconClass))
 #define X_IS_THEMED_ICON(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_THEMED_ICON))
 #define X_IS_THEMED_ICON_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_THEMED_ICON))
 #define G_THEMED_ICON_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_THEMED_ICON, GThemedIconClass))
 
 /**
- * GThemedIcon:
+ * xthemed_icon_t:
  *
  * An implementation of #xicon_t for themed icons.
  **/
@@ -54,14 +54,14 @@ XPL_AVAILABLE_IN_ALL
 xicon_t *g_themed_icon_new_from_names             (char       **iconnames,
                                                  int          len);
 XPL_AVAILABLE_IN_ALL
-void   g_themed_icon_prepend_name               (GThemedIcon *icon,
+void   g_themed_icon_prepend_name               (xthemed_icon_t *icon,
                                                  const char  *iconname);
 XPL_AVAILABLE_IN_ALL
-void   g_themed_icon_append_name                (GThemedIcon *icon,
+void   g_themed_icon_append_name                (xthemed_icon_t *icon,
                                                  const char  *iconname);
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t* const * g_themed_icon_get_names     (GThemedIcon *icon);
+const xchar_t* const * g_themed_icon_get_names     (xthemed_icon_t *icon);
 
 G_END_DECLS
 

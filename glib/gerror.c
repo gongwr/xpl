@@ -40,8 +40,8 @@
  * First and foremost: #xerror_t should only be used to report recoverable
  * runtime errors, never to report programming errors. If the programmer
  * has screwed up, then you should use g_warning(), g_return_if_fail(),
- * g_assert(), g_error(), or some similar facility. (Incidentally,
- * remember that the g_error() function should only be used for
+ * g_assert(), xerror(), or some similar facility. (Incidentally,
+ * remember that the xerror() function should only be used for
  * programming errors, it should not be used to print any error
  * reportable via #xerror_t.)
  *
@@ -57,7 +57,7 @@
  * last argument. On error, a new #xerror_t instance will be allocated and
  * returned to the caller via this argument. For example:
  * |[<!-- language="C" -->
- * xboolean_t g_file_get_contents (const xchar_t  *filename,
+ * xboolean_t xfile_get_contents (const xchar_t  *filename,
  *                               xchar_t       **contents,
  *                               xsize_t        *length,
  *                               xerror_t      **error);
@@ -68,14 +68,14 @@
  * xchar_t *contents;
  * xerror_t *err = NULL;
  *
- * g_file_get_contents ("foo.txt", &contents, NULL, &err);
+ * xfile_get_contents ("foo.txt", &contents, NULL, &err);
  * g_assert ((contents == NULL && err != NULL) || (contents != NULL && err == NULL));
  * if (err != NULL)
  *   {
  *     // Report error to user, and free error
  *     g_assert (contents == NULL);
  *     fprintf (stderr, "Unable to read file: %s\n", err->message);
- *     g_error_free (err);
+ *     xerror_free (err);
  *   }
  * else
  *   {
@@ -84,15 +84,15 @@
  *   }
  * ]|
  * Note that `err != NULL` in this example is a reliable indicator
- * of whether g_file_get_contents() failed. Additionally,
- * g_file_get_contents() returns a boolean which
+ * of whether xfile_get_contents() failed. Additionally,
+ * xfile_get_contents() returns a boolean which
  * indicates whether it was successful.
  *
- * Because g_file_get_contents() returns %FALSE on failure, if you
+ * Because xfile_get_contents() returns %FALSE on failure, if you
  * are only interested in whether it failed and don't need to display
  * an error message, you can pass %NULL for the @error argument:
  * |[<!-- language="C" -->
- * if (g_file_get_contents ("foo.txt", &contents, NULL, NULL)) // ignore errors
+ * if (xfile_get_contents ("foo.txt", &contents, NULL, NULL)) // ignore errors
  *   // no error occurred
  *   ;
  * else
@@ -104,7 +104,7 @@
  * the error-reporting function is located in, @code indicates the specific
  * error that occurred, and @message is a user-readable error message with
  * as many details as possible. Several functions are provided to deal
- * with an error received from a called function: g_error_matches()
+ * with an error received from a called function: xerror_matches()
  * returns %TRUE if the error matches a given domain and code,
  * g_propagate_error() copies an error into an error location (so the
  * calling function will receive it), and g_clear_error() clears an
@@ -112,16 +112,16 @@
  * %NULL. To display an error to the user, simply display the @message,
  * perhaps along with additional context known only to the calling
  * function (the file being opened, or whatever - though in the
- * g_file_get_contents() case, the @message already contains a filename).
+ * xfile_get_contents() case, the @message already contains a filename).
  *
  * Since error messages may be displayed to the user, they need to be valid
  * UTF-8 (all GTK widgets expect text to be UTF-8). Keep this in mind in
  * particular when formatting error messages with filenames, which are in
  * the 'filename encoding', and need to be turned into UTF-8 using
- * g_filename_to_utf8(), g_filename_display_name() or g_utf8_make_valid().
+ * xfilename_to_utf8(), xfilename_display_name() or xutf8_make_valid().
  *
  * Note, however, that many error messages are too technical to display to the
- * user in an application, so prefer to use g_error_matches() to categorize errors
+ * user in an application, so prefer to use xerror_matches() to categorize errors
  * from called functions, and build an appropriate error message for the context
  * within your application. Error messages from a #xerror_t are more appropriate
  * to be printed in system logs or on the command line. They are typically
@@ -150,7 +150,7 @@
  *                    FOO_ERROR,                 // error domain
  *                    FOO_ERROR_BLAH,            // error code
  *                    "Failed to open file: %s", // error message format string
- *                    g_strerror (saved_errno));
+ *                    xstrerror (saved_errno));
  *       return -1;
  *     }
  *   else
@@ -199,7 +199,7 @@
  *   if (tmp_error != NULL)
  *     {
  *       // store tmp_error in err, if err != NULL,
- *       // otherwise call g_error_free() on tmp_error
+ *       // otherwise call xerror_free() on tmp_error
  *       g_propagate_error (err, tmp_error);
  *       return FALSE;
  *     }
@@ -275,7 +275,7 @@
  *
  * - The quark function for the error domain is called
  *   <namespace>_<module>_error_quark,
- *   for example g_spawn_error_quark() or g_thread_error_quark().
+ *   for example g_spawn_error_quark() or xthread_error_quark().
  *
  * - The error codes are in an enumeration called
  *   <Namespace><Module>Error;
@@ -361,7 +361,7 @@
  *   but where the boolean does something other than signal whether the
  *   #xerror_t is set.  Among other problems, it requires C callers to allocate
  *   a temporary error.  Instead, provide a `xboolean_t *` out parameter.
- *   There are functions in GLib itself such as g_key_file_has_key() that
+ *   There are functions in GLib itself such as xkey_file_has_key() that
  *   are hard to use because of this. If %FALSE is returned, the error must
  *   be set to a non-%NULL value.  One exception to this is that in situations
  *   that are already considered to be undefined behaviour (such as when a
@@ -392,7 +392,7 @@
  *   MY_ERROR_BAD_REQUEST,
  * } MyError;
  * #define MY_ERROR (my_error_quark ())
- * GQuark my_error_quark (void);
+ * xquark my_error_quark (void);
  * int
  * my_error_get_parse_error_id (xerror_t *error);
  * const char *
@@ -418,7 +418,7 @@
  * my_error_private_copy (const MyErrorPrivate *src_priv, MyErrorPrivate *dest_priv)
  * {
  *   dest_priv->parse_error_id = src_priv->parse_error_id;
- *   dest_priv->bad_request_details = g_strdup (src_priv->bad_request_details);
+ *   dest_priv->bad_request_details = xstrdup (src_priv->bad_request_details);
  * }
  *
  * static void
@@ -460,14 +460,14 @@
  *       priv = my_error_get_private (error);
  *       g_return_val_if_fail (priv != NULL, NULL);
  *       priv->parse_error_id = error_id;
- *       priv->bad_request_details = g_strdup (details);
+ *       priv->bad_request_details = xstrdup (details);
  *     }
  * }
  * ]|
  * An example of use of the error could be:
  * |[<!-- language="C" -->
  * xboolean_t
- * send_request (GBytes *request, xerror_t **error)
+ * send_request (xbytes_t *request, xerror_t **error)
  * {
  *   ParseFailedStatus *failure = validate_request (request);
  *   if (failure != NULL)
@@ -485,9 +485,9 @@
  * exposes an existing error domain, then you can't make this error
  * domain an extended one without breaking ABI. This is because
  * earlier it was possible to create an error with this error domain
- * on the stack and then copy it with g_error_copy(). If the new
+ * on the stack and then copy it with xerror_copy(). If the new
  * version of your library makes the error domain an extended one,
- * then g_error_copy() called by code that allocated the error on the
+ * then xerror_copy() called by code that allocated the error on the
  * stack will try to copy more data than it used to, which will lead
  * to undefined behavior. You must not stack-allocate errors with an
  * extended error domain, and it is bad practice to stack-allocate any
@@ -515,12 +515,12 @@ static GRWLock error_domain_global;
 /* error_domain_ht must be accessed with error_domain_global
  * locked.
  */
-static GHashTable *error_domain_ht = NULL;
+static xhashtable_t *error_domain_ht = NULL;
 
 void
-g_error_init (void)
+xerror_init (void)
 {
-  error_domain_ht = g_hash_table_new (NULL, NULL);
+  error_domain_ht = xhash_table_new (NULL, NULL);
 }
 
 typedef struct
@@ -535,9 +535,9 @@ typedef struct
 /* Must be called with error_domain_global locked.
  */
 static inline ErrorDomainInfo *
-error_domain_lookup (GQuark domain)
+error_domain_lookup (xquark domain)
 {
-  return g_hash_table_lookup (error_domain_ht,
+  return xhash_table_lookup (error_domain_ht,
                               GUINT_TO_POINTER (domain));
 }
 
@@ -547,7 +547,7 @@ error_domain_lookup (GQuark domain)
       ((offset + (STRUCT_ALIGNMENT - 1)) & -STRUCT_ALIGNMENT)
 
 static void
-error_domain_register (GQuark            error_quark,
+error_domain_register (xquark            error_quark,
                        xsize_t             error_type_private_size,
                        GErrorInitFunc    error_type_init,
                        GErrorCopyFunc    error_type_copy,
@@ -562,7 +562,7 @@ error_domain_register (GQuark            error_quark,
       info->copy = error_type_copy;
       info->clear = error_type_clear;
 
-      g_hash_table_insert (error_domain_ht,
+      xhash_table_insert (error_domain_ht,
                            GUINT_TO_POINTER (error_quark),
                            info);
     }
@@ -576,8 +576,8 @@ error_domain_register (GQuark            error_quark,
 }
 
 /**
- * g_error_domain_register_static:
- * @error_type_name: static string to create a #GQuark from
+ * xerror_domain_register_static:
+ * @error_type_name: static string to create a #xquark from
  * @error_type_private_size: size of the private error data in bytes
  * @error_type_init: function initializing fields of the private error data
  * @error_type_copy: function copying fields of the private error data
@@ -601,17 +601,17 @@ error_domain_register (GQuark            error_quark,
  * Normally, it is better to use G_DEFINE_EXTENDED_ERROR(), as it
  * already takes care of passing valid information to this function.
  *
- * Returns: #GQuark representing the error domain
+ * Returns: #xquark representing the error domain
  * Since: 2.68
  */
-GQuark
-g_error_domain_register_static (const char        *error_type_name,
+xquark
+xerror_domain_register_static (const char        *error_type_name,
                                 xsize_t              error_type_private_size,
                                 GErrorInitFunc     error_type_init,
                                 GErrorCopyFunc     error_type_copy,
                                 GErrorClearFunc    error_type_clear)
 {
-  GQuark error_quark;
+  xquark error_quark;
 
   g_return_val_if_fail (error_type_name != NULL, 0);
   g_return_val_if_fail (error_type_private_size > 0, 0);
@@ -629,8 +629,8 @@ g_error_domain_register_static (const char        *error_type_name,
 }
 
 /**
- * g_error_domain_register:
- * @error_type_name: string to create a #GQuark from
+ * xerror_domain_register:
+ * @error_type_name: string to create a #xquark from
  * @error_type_private_size: size of the private error data in bytes
  * @error_type_init: function initializing fields of the private error data
  * @error_type_copy: function copying fields of the private error data
@@ -638,19 +638,19 @@ g_error_domain_register_static (const char        *error_type_name,
  *
  * This function registers an extended #xerror_t domain.
  * @error_type_name will be duplicated. Otherwise does the same as
- * g_error_domain_register_static().
+ * xerror_domain_register_static().
  *
- * Returns: #GQuark representing the error domain
+ * Returns: #xquark representing the error domain
  * Since: 2.68
  */
-GQuark
-g_error_domain_register (const char        *error_type_name,
+xquark
+xerror_domain_register (const char        *error_type_name,
                          xsize_t              error_type_private_size,
                          GErrorInitFunc     error_type_init,
                          GErrorCopyFunc     error_type_copy,
                          GErrorClearFunc    error_type_clear)
 {
-  GQuark error_quark;
+  xquark error_quark;
 
   g_return_val_if_fail (error_type_name != NULL, 0);
   g_return_val_if_fail (error_type_private_size > 0, 0);
@@ -668,9 +668,9 @@ g_error_domain_register (const char        *error_type_name,
 }
 
 static xerror_t *
-g_error_allocate (GQuark domain, ErrorDomainInfo *out_info)
+xerror_allocate (xquark domain, ErrorDomainInfo *out_info)
 {
-  guint8 *allocated;
+  xuint8_t *allocated;
   xerror_t *error;
   ErrorDomainInfo *info;
   xsize_t private_size;
@@ -691,7 +691,7 @@ g_error_allocate (GQuark domain, ErrorDomainInfo *out_info)
         memset (out_info, 0, sizeof (*out_info));
       private_size = 0;
     }
-  /* See comments in g_type_create_instance in gtype.c to see what
+  /* See comments in xtype_create_instance in gtype.c to see what
    * this magic is about.
    */
 #ifdef ENABLE_VALGRIND
@@ -713,13 +713,13 @@ g_error_allocate (GQuark domain, ErrorDomainInfo *out_info)
 
 /* This function takes ownership of @message. */
 static xerror_t *
-g_error_new_steal (GQuark           domain,
+xerror_new_steal (xquark           domain,
                    xint_t             code,
                    xchar_t           *message,
                    ErrorDomainInfo *out_info)
 {
   ErrorDomainInfo info;
-  xerror_t *error = g_error_allocate (domain, &info);
+  xerror_t *error = xerror_allocate (domain, &info);
 
   error->domain = domain;
   error->code = code;
@@ -734,7 +734,7 @@ g_error_new_steal (GQuark           domain,
 }
 
 /**
- * g_error_new_valist:
+ * xerror_new_valist:
  * @domain: error domain
  * @code: error code
  * @format: printf()-style format for error message
@@ -748,7 +748,7 @@ g_error_new_steal (GQuark           domain,
  * Since: 2.22
  */
 xerror_t*
-g_error_new_valist (GQuark       domain,
+xerror_new_valist (xquark       domain,
                     xint_t         code,
                     const xchar_t *format,
                     va_list      args)
@@ -761,11 +761,11 @@ g_error_new_valist (GQuark       domain,
   g_warn_if_fail (domain != 0);
   g_warn_if_fail (format != NULL);
 
-  return g_error_new_steal (domain, code, g_strdup_vprintf (format, args), NULL);
+  return xerror_new_steal (domain, code, xstrdup_vprintf (format, args), NULL);
 }
 
 /**
- * g_error_new:
+ * xerror_new:
  * @domain: error domain
  * @code: error code
  * @format: printf()-style format for error message
@@ -777,7 +777,7 @@ g_error_new_valist (GQuark       domain,
  * Returns: a new #xerror_t
  */
 xerror_t*
-g_error_new (GQuark       domain,
+xerror_new (xquark       domain,
              xint_t         code,
              const xchar_t *format,
              ...)
@@ -789,19 +789,19 @@ g_error_new (GQuark       domain,
   g_return_val_if_fail (domain != 0, NULL);
 
   va_start (args, format);
-  error = g_error_new_valist (domain, code, format, args);
+  error = xerror_new_valist (domain, code, format, args);
   va_end (args);
 
   return error;
 }
 
 /**
- * g_error_new_literal:
+ * xerror_new_literal:
  * @domain: error domain
  * @code: error code
  * @message: error message
  *
- * Creates a new #xerror_t; unlike g_error_new(), @message is
+ * Creates a new #xerror_t; unlike xerror_new(), @message is
  * not a printf()-style format string. Use this function if
  * @message contains text you don't have control over,
  * that could include printf() escape sequences.
@@ -809,28 +809,28 @@ g_error_new (GQuark       domain,
  * Returns: a new #xerror_t
  **/
 xerror_t*
-g_error_new_literal (GQuark         domain,
+xerror_new_literal (xquark         domain,
                      xint_t           code,
                      const xchar_t   *message)
 {
   g_return_val_if_fail (message != NULL, NULL);
   g_return_val_if_fail (domain != 0, NULL);
 
-  return g_error_new_steal (domain, code, g_strdup (message), NULL);
+  return xerror_new_steal (domain, code, xstrdup (message), NULL);
 }
 
 /**
- * g_error_free:
+ * xerror_free:
  * @error: a #xerror_t
  *
  * Frees a #xerror_t and associated resources.
  */
 void
-g_error_free (xerror_t *error)
+xerror_free (xerror_t *error)
 {
   xsize_t private_size;
   ErrorDomainInfo *info;
-  guint8 *allocated;
+  xuint8_t *allocated;
 
   g_return_if_fail (error != NULL);
 
@@ -851,8 +851,8 @@ g_error_free (xerror_t *error)
     }
 
   g_free (error->message);
-  allocated = ((guint8 *) error) - private_size;
-  /* See comments in g_type_free_instance in gtype.c to see what this
+  allocated = ((xuint8_t *) error) - private_size;
+  /* See comments in xtype_free_instance in gtype.c to see what this
    * magic is about.
    */
 #ifdef ENABLE_VALGRIND
@@ -871,7 +871,7 @@ g_error_free (xerror_t *error)
 }
 
 /**
- * g_error_copy:
+ * xerror_copy:
  * @error: a #xerror_t
  *
  * Makes a copy of @error.
@@ -879,19 +879,19 @@ g_error_free (xerror_t *error)
  * Returns: a new #xerror_t
  */
 xerror_t*
-g_error_copy (const xerror_t *error)
+xerror_copy (const xerror_t *error)
 {
   xerror_t *copy;
   ErrorDomainInfo info;
 
   g_return_val_if_fail (error != NULL, NULL);
-  /* See g_error_new_valist for why these don't return */
+  /* See xerror_new_valist for why these don't return */
   g_warn_if_fail (error->domain != 0);
   g_warn_if_fail (error->message != NULL);
 
-  copy = g_error_new_steal (error->domain,
+  copy = xerror_new_steal (error->domain,
                             error->code,
-                            g_strdup (error->message),
+                            xstrdup (error->message),
                             &info);
   if (info.copy != NULL)
     info.copy (error, copy);
@@ -900,7 +900,7 @@ g_error_copy (const xerror_t *error)
 }
 
 /**
- * g_error_matches:
+ * xerror_matches:
  * @error: (nullable): a #xerror_t
  * @domain: an error domain
  * @code: an error code
@@ -919,8 +919,8 @@ g_error_copy (const xerror_t *error)
  * Returns: whether @error has @domain and @code
  */
 xboolean_t
-g_error_matches (const xerror_t *error,
-                 GQuark        domain,
+xerror_matches (const xerror_t *error,
+                 xquark        domain,
                  xint_t          code)
 {
   return error &&
@@ -945,7 +945,7 @@ g_error_matches (const xerror_t *error,
  */
 void
 g_set_error (xerror_t      **err,
-             GQuark        domain,
+             xquark        domain,
              xint_t          code,
              const xchar_t  *format,
              ...)
@@ -958,7 +958,7 @@ g_set_error (xerror_t      **err,
     return;
 
   va_start (args, format);
-  new = g_error_new_valist (domain, code, format, args);
+  new = xerror_new_valist (domain, code, format, args);
   va_end (args);
 
   if (*err == NULL)
@@ -966,7 +966,7 @@ g_set_error (xerror_t      **err,
   else
     {
       g_warning (ERROR_OVERWRITTEN_WARNING, new->message);
-      g_error_free (new);
+      xerror_free (new);
     }
 }
 
@@ -987,7 +987,7 @@ g_set_error (xerror_t      **err,
  */
 void
 g_set_error_literal (xerror_t      **err,
-                     GQuark        domain,
+                     xquark        domain,
                      xint_t          code,
                      const xchar_t  *message)
 {
@@ -995,7 +995,7 @@ g_set_error_literal (xerror_t      **err,
     return;
 
   if (*err == NULL)
-    *err = g_error_new_literal (domain, code, message);
+    *err = xerror_new_literal (domain, code, message);
   else
     g_warning (ERROR_OVERWRITTEN_WARNING, message);
 }
@@ -1022,7 +1022,7 @@ g_propagate_error (xerror_t **dest,
 
   if (dest == NULL)
     {
-      g_error_free (src);
+      xerror_free (src);
       return;
     }
   else
@@ -1030,7 +1030,7 @@ g_propagate_error (xerror_t **dest,
       if (*dest != NULL)
         {
           g_warning (ERROR_OVERWRITTEN_WARNING, src->message);
-          g_error_free (src);
+          xerror_free (src);
         }
       else
         *dest = src;
@@ -1042,30 +1042,30 @@ g_propagate_error (xerror_t **dest,
  * @err: a #xerror_t return location
  *
  * If @err or *@err is %NULL, does nothing. Otherwise,
- * calls g_error_free() on *@err and sets *@err to %NULL.
+ * calls xerror_free() on *@err and sets *@err to %NULL.
  */
 void
 g_clear_error (xerror_t **err)
 {
   if (err && *err)
     {
-      g_error_free (*err);
+      xerror_free (*err);
       *err = NULL;
     }
 }
 
 G_GNUC_PRINTF(2, 0)
 static void
-g_error_add_prefix (xchar_t       **string,
+xerror_add_prefix (xchar_t       **string,
                     const xchar_t  *format,
                     va_list       ap)
 {
   xchar_t *oldstring;
   xchar_t *prefix;
 
-  prefix = g_strdup_vprintf (format, ap);
+  prefix = xstrdup_vprintf (format, ap);
   oldstring = *string;
-  *string = g_strconcat (prefix, oldstring, NULL);
+  *string = xstrconcat (prefix, oldstring, NULL);
   g_free (oldstring);
   g_free (prefix);
 }
@@ -1095,7 +1095,7 @@ g_prefix_error (xerror_t      **err,
       va_list ap;
 
       va_start (ap, format);
-      g_error_add_prefix (&(*err)->message, format, ap);
+      xerror_add_prefix (&(*err)->message, format, ap);
       va_end (ap);
     }
 }
@@ -1119,7 +1119,7 @@ g_prefix_error_literal (xerror_t      **err,
       xchar_t *oldstring;
 
       oldstring = (*err)->message;
-      (*err)->message = g_strconcat (prefix, oldstring, NULL);
+      (*err)->message = xstrconcat (prefix, oldstring, NULL);
       g_free (oldstring);
     }
 }
@@ -1151,7 +1151,7 @@ g_propagate_prefixed_error (xerror_t      **dest,
 
       g_assert (*dest != NULL);
       va_start (ap, format);
-      g_error_add_prefix (&(*dest)->message, format, ap);
+      xerror_add_prefix (&(*dest)->message, format, ap);
       va_end (ap);
     }
 }

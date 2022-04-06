@@ -36,15 +36,15 @@ G_BEGIN_DECLS
 
 #define XTYPE_SOCKET_CONNECTION                            (xsocket_connection_get_type ())
 #define XSOCKET_CONNECTION(inst)                           (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_SOCKET_CONNECTION, xsocket_connection_t))
+                                                             XTYPE_SOCKET_CONNECTION, xsocket_connection))
 #define XSOCKET_CONNECTION_CLASS(class)                    (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                             XTYPE_SOCKET_CONNECTION, xsocket_connection_class_t))
+                                                             XTYPE_SOCKET_CONNECTION, xsocket_connection_class))
 #define X_IS_SOCKET_CONNECTION(inst)                        (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
                                                              XTYPE_SOCKET_CONNECTION))
 #define X_IS_SOCKET_CONNECTION_CLASS(class)                 (XTYPE_CHECK_CLASS_TYPE ((class),                       \
                                                              XTYPE_SOCKET_CONNECTION))
 #define XSOCKET_CONNECTION_GET_CLASS(inst)                 (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                             XTYPE_SOCKET_CONNECTION, xsocket_connection_class_t))
+                                                             XTYPE_SOCKET_CONNECTION, xsocket_connection_class))
 
 typedef struct _xsocket_connection_private_t                    xsocket_connection_private_t;
 typedef struct _xsocket_connection_class                      xsocket_connection_class_t;

@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __G_FILE_H__
-#define __G_FILE_H__
+#ifndef __XFILE_H__
+#define __XFILE_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,26 +29,26 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_FILE            (g_file_get_type ())
-#define G_FILE(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_FILE, xfile_t))
+#define XTYPE_FILE            (xfile_get_type ())
+#define XFILE(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_FILE, xfile))
 #define X_IS_FILE(obj)	       (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_FILE))
-#define G_FILE_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_FILE, GFileIface))
+#define XFILE_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_FILE, xfile_iface_t))
 
 #if 0
 /**
  * xfile_t:
  *
- * A handle to an object implementing the #GFileIface interface.
+ * A handle to an object implementing the #xfile_iface_t interface.
  * Generally stores a location within the file system. Handles do not
  * necessarily represent files or directories that currently exist.
  **/
 typedef struct _GFile         		xfile_t; /* Dummy typedef */
 #endif
-typedef struct _GFileIface    		GFileIface;
+typedef struct _GFileIface    		xfile_iface_t;
 
 
 /**
- * GFileIface:
+ * xfile_iface_t:
  * @x_iface: The parent interface.
  * @dup: Duplicates a #xfile_t.
  * @hash: Creates a hash of a #xfile_t.
@@ -65,17 +65,17 @@ typedef struct _GFileIface    		GFileIface;
  * @get_relative_path: Gets the path for a #xfile_t relative to a given path.
  * @resolve_relative_path: Resolves a relative path for a #xfile_t to an absolute path.
  * @get_child_for_display_name: Gets the child #xfile_t for a given display name.
- * @enumerate_children: Gets a #GFileEnumerator with the children of a #xfile_t.
- * @enumerate_children_async: Asynchronously gets a #GFileEnumerator with the children of a #xfile_t.
+ * @enumerate_children: Gets a #xfile_enumerator_t with the children of a #xfile_t.
+ * @enumerate_children_async: Asynchronously gets a #xfile_enumerator_t with the children of a #xfile_t.
  * @enumerate_children_finish: Finishes asynchronously enumerating the children.
- * @query_info: Gets the #GFileInfo for a #xfile_t.
- * @query_info_async: Asynchronously gets the #GFileInfo for a #xfile_t.
+ * @query_info: Gets the #xfile_info_t for a #xfile_t.
+ * @query_info_async: Asynchronously gets the #xfile_info_t for a #xfile_t.
  * @query_info_finish: Finishes an asynchronous query info operation.
- * @query_filesystem_info: Gets a #GFileInfo for the file system #xfile_t is on.
- * @query_filesystem_info_async: Asynchronously gets a #GFileInfo for the file system #xfile_t is on.
+ * @query_filesystem_info: Gets a #xfile_info_t for the file system #xfile_t is on.
+ * @query_filesystem_info_async: Asynchronously gets a #xfile_info_t for the file system #xfile_t is on.
  * @query_filesystem_info_finish: Finishes asynchronously getting the file system info.
- * @find_enclosing_mount: Gets a #GMount for the #xfile_t.
- * @find_enclosing_mount_async: Asynchronously gets the #GMount for a #xfile_t.
+ * @find_enclosing_mount: Gets a #xmount_t for the #xfile_t.
+ * @find_enclosing_mount_async: Asynchronously gets the #xmount_t for a #xfile_t.
  * @find_enclosing_mount_finish: Finishes asynchronously getting the volume.
  * @set_display_name: Sets the display name for a #xfile_t.
  * @set_display_name_async: Asynchronously sets a #xfile_t's display name.
@@ -83,11 +83,11 @@ typedef struct _GFileIface    		GFileIface;
  * @query_settable_attributes: Returns a list of #GFileAttributeInfos that can be set.
  * @_query_settable_attributes_async: Asynchronously gets a list of #GFileAttributeInfos that can be set.
  * @_query_settable_attributes_finish: Finishes asynchronously querying settable attributes.
- * @query_writable_namespaces: Returns a list of #GFileAttributeInfo namespaces that are writable.
- * @_query_writable_namespaces_async: Asynchronously gets a list of #GFileAttributeInfo namespaces that are writable.
+ * @query_writable_namespaces: Returns a list of #xfile_attribute_info_t namespaces that are writable.
+ * @_query_writable_namespaces_async: Asynchronously gets a list of #xfile_attribute_info_t namespaces that are writable.
  * @_query_writable_namespaces_finish: Finishes asynchronously querying the writable namespaces.
- * @set_attribute: Sets a #GFileAttributeInfo.
- * @set_attributes_from_info: Sets a #GFileAttributeInfo with information from a #GFileInfo.
+ * @set_attribute: Sets a #xfile_attribute_info_t.
+ * @set_attributes_from_info: Sets a #xfile_attribute_info_t with information from a #xfile_info_t.
  * @set_attributes_async: Asynchronously sets a file's attributes.
  * @set_attributes_finish: Finishes setting a file's attributes asynchronously.
  * @read_fn: Reads a file asynchronously.
@@ -131,8 +131,8 @@ typedef struct _GFileIface    		GFileIface;
  * @eject_mountable_finish: Finishes an eject operation.
  * @mount_enclosing_volume: Mounts a specified location.
  * @mount_enclosing_volume_finish: Finishes mounting a specified location.
- * @monitor_dir: Creates a #GFileMonitor for the location.
- * @monitor_file: Creates a #GFileMonitor for the location.
+ * @monitor_dir: Creates a #xfile_monitor_t for the location.
+ * @monitor_file: Creates a #xfile_monitor_t for the location.
  * @open_readwrite: Open file read/write. Since 2.22.
  * @open_readwrite_async: Asynchronously opens file read/write. Since 2.22.
  * @open_readwrite_finish: Finishes an asynchronous open read/write. Since 2.22.
@@ -188,39 +188,39 @@ struct _GFileIface
                                                        const char   *display_name,
                                                        xerror_t      **error);
 
-  GFileEnumerator *   (* enumerate_children)          (xfile_t                *file,
+  xfile_enumerator_t *   (* enumerate_children)          (xfile_t                *file,
                                                        const char           *attributes,
-                                                       GFileQueryInfoFlags   flags,
+                                                       xfile_query_info_flags_t   flags,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
   void                (* enumerate_children_async)    (xfile_t                *file,
                                                        const char           *attributes,
-                                                       GFileQueryInfoFlags   flags,
+                                                       xfile_query_info_flags_t   flags,
                                                        int                   io_priority,
                                                        xcancellable_t         *cancellable,
                                                        xasync_ready_callback_t   callback,
                                                        xpointer_t              user_data);
-  GFileEnumerator *   (* enumerate_children_finish)   (xfile_t                *file,
+  xfile_enumerator_t *   (* enumerate_children_finish)   (xfile_t                *file,
                                                        xasync_result_t         *res,
                                                        xerror_t              **error);
 
-  GFileInfo *         (* query_info)                  (xfile_t                *file,
+  xfile_info_t *         (* query_info)                  (xfile_t                *file,
                                                        const char           *attributes,
-                                                       GFileQueryInfoFlags   flags,
+                                                       xfile_query_info_flags_t   flags,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
   void                (* query_info_async)            (xfile_t                *file,
                                                        const char           *attributes,
-                                                       GFileQueryInfoFlags   flags,
+                                                       xfile_query_info_flags_t   flags,
                                                        int                   io_priority,
                                                        xcancellable_t         *cancellable,
                                                        xasync_ready_callback_t   callback,
                                                        xpointer_t              user_data);
-  GFileInfo *         (* query_info_finish)           (xfile_t                *file,
+  xfile_info_t *         (* query_info_finish)           (xfile_t                *file,
                                                        xasync_result_t         *res,
                                                        xerror_t              **error);
 
-  GFileInfo *         (* query_filesystem_info)       (xfile_t                *file,
+  xfile_info_t *         (* query_filesystem_info)       (xfile_t                *file,
                                                        const char           *attributes,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
@@ -230,11 +230,11 @@ struct _GFileIface
                                                        xcancellable_t         *cancellable,
                                                        xasync_ready_callback_t   callback,
                                                        xpointer_t              user_data);
-  GFileInfo *         (* query_filesystem_info_finish)(xfile_t                *file,
+  xfile_info_t *         (* query_filesystem_info_finish)(xfile_t                *file,
                                                        xasync_result_t         *res,
                                                        xerror_t              **error);
 
-  GMount *            (* find_enclosing_mount)        (xfile_t                *file,
+  xmount_t *            (* find_enclosing_mount)        (xfile_t                *file,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
   void                (* find_enclosing_mount_async)  (xfile_t                *file,
@@ -242,7 +242,7 @@ struct _GFileIface
                                                        xcancellable_t         *cancellable,
                                                        xasync_ready_callback_t   callback,
                                                        xpointer_t              user_data);
-  GMount *            (* find_enclosing_mount_finish) (xfile_t                *file,
+  xmount_t *            (* find_enclosing_mount_finish) (xfile_t                *file,
                                                        xasync_result_t         *res,
                                                        xerror_t              **error);
 
@@ -260,13 +260,13 @@ struct _GFileIface
                                                        xasync_result_t         *res,
                                                        xerror_t              **error);
 
-  GFileAttributeInfoList * (* query_settable_attributes)    (xfile_t          *file,
+  xfile_attribute_info_list_t * (* query_settable_attributes)    (xfile_t          *file,
                                                              xcancellable_t   *cancellable,
                                                              xerror_t        **error);
   void                (* _query_settable_attributes_async)  (void);
   void                (* _query_settable_attributes_finish) (void);
 
-  GFileAttributeInfoList * (* query_writable_namespaces)    (xfile_t          *file,
+  xfile_attribute_info_list_t * (* query_writable_namespaces)    (xfile_t          *file,
                                                              xcancellable_t   *cancellable,
                                                              xerror_t        **error);
   void                (* _query_writable_namespaces_async)  (void);
@@ -274,29 +274,29 @@ struct _GFileIface
 
   xboolean_t            (* set_attribute)               (xfile_t                *file,
                                                        const char           *attribute,
-                                                       GFileAttributeType    type,
+                                                       xfile_attribute_type_t    type,
                                                        xpointer_t              value_p,
-                                                       GFileQueryInfoFlags   flags,
+                                                       xfile_query_info_flags_t   flags,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
   xboolean_t            (* set_attributes_from_info)    (xfile_t                *file,
-                                                       GFileInfo            *info,
-                                                       GFileQueryInfoFlags   flags,
+                                                       xfile_info_t            *info,
+                                                       xfile_query_info_flags_t   flags,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
   void                (* set_attributes_async)        (xfile_t                *file,
-                                                       GFileInfo            *info,
-                                                       GFileQueryInfoFlags   flags,
+                                                       xfile_info_t            *info,
+                                                       xfile_query_info_flags_t   flags,
                                                        int                   io_priority,
                                                        xcancellable_t         *cancellable,
                                                        xasync_ready_callback_t   callback,
                                                        xpointer_t              user_data);
   xboolean_t            (* set_attributes_finish)       (xfile_t                *file,
                                                        xasync_result_t         *result,
-                                                       GFileInfo           **info,
+                                                       xfile_info_t           **info,
                                                        xerror_t              **error);
 
-  GFileInputStream *  (* read_fn)                     (xfile_t                *file,
+  xfile_input_stream_t *  (* read_fn)                     (xfile_t                *file,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
   void                (* read_async)                  (xfile_t                *file,
@@ -304,53 +304,53 @@ struct _GFileIface
                                                        xcancellable_t         *cancellable,
                                                        xasync_ready_callback_t   callback,
                                                        xpointer_t              user_data);
-  GFileInputStream *  (* read_finish)                 (xfile_t                *file,
+  xfile_input_stream_t *  (* read_finish)                 (xfile_t                *file,
                                                        xasync_result_t         *res,
                                                        xerror_t              **error);
 
-  GFileOutputStream * (* append_to)                   (xfile_t                *file,
-                                                       GFileCreateFlags      flags,
+  xfile_output_stream_t * (* append_to)                   (xfile_t                *file,
+                                                       xfile_create_flags_t      flags,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
   void                (* append_to_async)             (xfile_t                *file,
-                                                       GFileCreateFlags      flags,
+                                                       xfile_create_flags_t      flags,
                                                        int                   io_priority,
                                                        xcancellable_t         *cancellable,
                                                        xasync_ready_callback_t   callback,
                                                        xpointer_t              user_data);
-  GFileOutputStream * (* append_to_finish)            (xfile_t                *file,
+  xfile_output_stream_t * (* append_to_finish)            (xfile_t                *file,
                                                        xasync_result_t         *res,
                                                        xerror_t              **error);
 
-  GFileOutputStream * (* create)                      (xfile_t                *file,
-                                                       GFileCreateFlags      flags,
+  xfile_output_stream_t * (* create)                      (xfile_t                *file,
+                                                       xfile_create_flags_t      flags,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
   void                (* create_async)                (xfile_t                *file,
-                                                       GFileCreateFlags      flags,
+                                                       xfile_create_flags_t      flags,
                                                        int                   io_priority,
                                                        xcancellable_t         *cancellable,
                                                        xasync_ready_callback_t   callback,
                                                        xpointer_t              user_data);
-  GFileOutputStream * (* create_finish)               (xfile_t                *file,
+  xfile_output_stream_t * (* create_finish)               (xfile_t                *file,
                                                        xasync_result_t         *res,
                                                        xerror_t              **error);
 
-  GFileOutputStream * (* replace)                     (xfile_t                *file,
+  xfile_output_stream_t * (* replace)                     (xfile_t                *file,
                                                        const char           *etag,
                                                        xboolean_t              make_backup,
-                                                       GFileCreateFlags      flags,
+                                                       xfile_create_flags_t      flags,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
   void                (* replace_async)               (xfile_t                *file,
                                                        const char           *etag,
                                                        xboolean_t              make_backup,
-                                                       GFileCreateFlags      flags,
+                                                       xfile_create_flags_t      flags,
                                                        int                   io_priority,
                                                        xcancellable_t         *cancellable,
                                                        xasync_ready_callback_t   callback,
                                                        xpointer_t              user_data);
-  GFileOutputStream * (* replace_finish)              (xfile_t                *file,
+  xfile_output_stream_t * (* replace_finish)              (xfile_t                *file,
                                                        xasync_result_t         *res,
                                                        xerror_t              **error);
 
@@ -399,17 +399,17 @@ struct _GFileIface
 
   xboolean_t            (* copy)                        (xfile_t                *source,
                                                        xfile_t                *destination,
-                                                       GFileCopyFlags        flags,
+                                                       xfile_copy_flags_t        flags,
                                                        xcancellable_t         *cancellable,
-                                                       GFileProgressCallback progress_callback,
+                                                       xfile_progress_callback_t progress_callback,
                                                        xpointer_t              progress_callback_data,
                                                        xerror_t              **error);
   void                (* copy_async)                  (xfile_t                *source,
                                                        xfile_t                *destination,
-                                                       GFileCopyFlags        flags,
+                                                       xfile_copy_flags_t        flags,
                                                        int                   io_priority,
                                                        xcancellable_t         *cancellable,
-                                                       GFileProgressCallback progress_callback,
+                                                       xfile_progress_callback_t progress_callback,
                                                        xpointer_t              progress_callback_data,
                                                        xasync_ready_callback_t   callback,
                                                        xpointer_t              user_data);
@@ -419,17 +419,17 @@ struct _GFileIface
 
   xboolean_t            (* move)                        (xfile_t                *source,
                                                        xfile_t                *destination,
-                                                       GFileCopyFlags        flags,
+                                                       xfile_copy_flags_t        flags,
                                                        xcancellable_t         *cancellable,
-                                                       GFileProgressCallback progress_callback,
+                                                       xfile_progress_callback_t progress_callback,
                                                        xpointer_t              progress_callback_data,
                                                        xerror_t              **error);
   void                (* move_async)                  (xfile_t                *source,
                                                        xfile_t                *destination,
-                                                       GFileCopyFlags        flags,
+                                                       xfile_copy_flags_t        flags,
                                                        int                   io_priority,
                                                        xcancellable_t         *cancellable,
-                                                       GFileProgressCallback progress_callback,
+                                                       xfile_progress_callback_t progress_callback,
                                                        xpointer_t              progress_callback_data,
                                                        xasync_ready_callback_t   callback,
                                                        xpointer_t              user_data);
@@ -475,16 +475,16 @@ struct _GFileIface
                                                        xasync_result_t         *result,
                                                        xerror_t              **error);
 
-  GFileMonitor *      (* monitor_dir)                 (xfile_t                *file,
-                                                       GFileMonitorFlags     flags,
+  xfile_monitor_t *      (* monitor_dir)                 (xfile_t                *file,
+                                                       xfile_monitor_flags_t     flags,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
-  GFileMonitor *      (* monitor_file)                (xfile_t                *file,
-                                                       GFileMonitorFlags     flags,
+  xfile_monitor_t *      (* monitor_file)                (xfile_t                *file,
+                                                       xfile_monitor_flags_t     flags,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
 
-  GFileIOStream *     (* open_readwrite)              (xfile_t                *file,
+  xfile_io_stream_t *     (* open_readwrite)              (xfile_t                *file,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
   void                (* open_readwrite_async)        (xfile_t                *file,
@@ -492,37 +492,37 @@ struct _GFileIface
                                                        xcancellable_t         *cancellable,
                                                        xasync_ready_callback_t   callback,
                                                        xpointer_t              user_data);
-  GFileIOStream *     (* open_readwrite_finish)       (xfile_t                *file,
+  xfile_io_stream_t *     (* open_readwrite_finish)       (xfile_t                *file,
                                                        xasync_result_t         *res,
                                                        xerror_t              **error);
-  GFileIOStream *     (* create_readwrite)            (xfile_t                *file,
-						       GFileCreateFlags      flags,
+  xfile_io_stream_t *     (* create_readwrite)            (xfile_t                *file,
+						       xfile_create_flags_t      flags,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
   void                (* create_readwrite_async)      (xfile_t                *file,
-						       GFileCreateFlags      flags,
+						       xfile_create_flags_t      flags,
                                                        int                   io_priority,
                                                        xcancellable_t         *cancellable,
                                                        xasync_ready_callback_t   callback,
                                                        xpointer_t              user_data);
-  GFileIOStream *     (* create_readwrite_finish)      (xfile_t                *file,
+  xfile_io_stream_t *     (* create_readwrite_finish)      (xfile_t                *file,
                                                        xasync_result_t         *res,
                                                        xerror_t              **error);
-  GFileIOStream *     (* replace_readwrite)           (xfile_t                *file,
+  xfile_io_stream_t *     (* replace_readwrite)           (xfile_t                *file,
                                                        const char           *etag,
                                                        xboolean_t              make_backup,
-                                                       GFileCreateFlags      flags,
+                                                       xfile_create_flags_t      flags,
                                                        xcancellable_t         *cancellable,
                                                        xerror_t              **error);
   void                (* replace_readwrite_async)     (xfile_t                *file,
                                                        const char           *etag,
                                                        xboolean_t              make_backup,
-                                                       GFileCreateFlags      flags,
+                                                       xfile_create_flags_t      flags,
                                                        int                   io_priority,
                                                        xcancellable_t         *cancellable,
                                                        xasync_ready_callback_t   callback,
                                                        xpointer_t              user_data);
-  GFileIOStream *     (* replace_readwrite_finish)    (xfile_t                *file,
+  xfile_io_stream_t *     (* replace_readwrite_finish)    (xfile_t                *file,
                                                        xasync_result_t         *res,
                                                        xerror_t              **error);
 
@@ -577,742 +577,742 @@ struct _GFileIface
                                                        xerror_t              **error);
 
   xboolean_t            (* measure_disk_usage)          (xfile_t                         *file,
-                                                       GFileMeasureFlags              flags,
+                                                       xfile_measure_flags_t              flags,
                                                        xcancellable_t                  *cancellable,
-                                                       GFileMeasureProgressCallback   progress_callback,
+                                                       xfile_measure_progress_callback_t   progress_callback,
                                                        xpointer_t                       progress_data,
-                                                       guint64                       *disk_usage,
-                                                       guint64                       *num_dirs,
-                                                       guint64                       *num_files,
+                                                       xuint64_t                       *disk_usage,
+                                                       xuint64_t                       *num_dirs,
+                                                       xuint64_t                       *num_files,
                                                        xerror_t                       **error);
   void                (* measure_disk_usage_async)    (xfile_t                         *file,
-                                                       GFileMeasureFlags              flags,
+                                                       xfile_measure_flags_t              flags,
                                                        xint_t                           io_priority,
                                                        xcancellable_t                  *cancellable,
-                                                       GFileMeasureProgressCallback   progress_callback,
+                                                       xfile_measure_progress_callback_t   progress_callback,
                                                        xpointer_t                       progress_data,
                                                        xasync_ready_callback_t            callback,
                                                        xpointer_t                       user_data);
   xboolean_t            (* measure_disk_usage_finish)   (xfile_t                         *file,
                                                        xasync_result_t                  *result,
-                                                       guint64                       *disk_usage,
-                                                       guint64                       *num_dirs,
-                                                       guint64                       *num_files,
+                                                       xuint64_t                       *disk_usage,
+                                                       xuint64_t                       *num_dirs,
+                                                       xuint64_t                       *num_files,
                                                        xerror_t                       **error);
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t                   g_file_get_type                   (void) G_GNUC_CONST;
+xtype_t                   xfile_get_type                   (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-xfile_t *                 g_file_new_for_path               (const char                 *path);
+xfile_t *                 xfile_new_for_path               (const char                 *path);
 XPL_AVAILABLE_IN_ALL
-xfile_t *                 g_file_new_for_uri                (const char                 *uri);
+xfile_t *                 xfile_new_for_uri                (const char                 *uri);
 XPL_AVAILABLE_IN_ALL
-xfile_t *                 g_file_new_for_commandline_arg    (const char                 *arg);
+xfile_t *                 xfile_new_for_commandline_arg    (const char                 *arg);
 XPL_AVAILABLE_IN_2_36
-xfile_t *                 g_file_new_for_commandline_arg_and_cwd (const xchar_t           *arg,
+xfile_t *                 xfile_new_for_commandline_arg_and_cwd (const xchar_t           *arg,
                                                                 const xchar_t           *cwd);
 XPL_AVAILABLE_IN_2_32
-xfile_t *                 g_file_new_tmp                    (const char                 *tmpl,
-                                                           GFileIOStream             **iostream,
+xfile_t *                 xfile_new_tmp                    (const char                 *tmpl,
+                                                           xfile_io_stream_t             **iostream,
                                                            xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xfile_t *                 g_file_parse_name                 (const char                 *parse_name);
+xfile_t *                 xfile_parse_name                 (const char                 *parse_name);
 XPL_AVAILABLE_IN_2_56
-xfile_t *                 g_file_new_build_filename         (const xchar_t                *first_element,
+xfile_t *                 xfile_new_build_filename         (const xchar_t                *first_element,
                                                            ...) G_GNUC_NULL_TERMINATED;
 XPL_AVAILABLE_IN_ALL
-xfile_t *                 g_file_dup                        (xfile_t                      *file);
+xfile_t *                 xfile_dup                        (xfile_t                      *file);
 XPL_AVAILABLE_IN_ALL
-xuint_t                   g_file_hash                       (gconstpointer               file);
+xuint_t                   xfile_hash                       (xconstpointer               file);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_equal                      (xfile_t                      *file1,
+xboolean_t                xfile_equal                      (xfile_t                      *file1,
 							   xfile_t                      *file2);
 XPL_AVAILABLE_IN_ALL
-char *                  g_file_get_basename               (xfile_t                      *file);
+char *                  xfile_get_basename               (xfile_t                      *file);
 XPL_AVAILABLE_IN_ALL
-char *                  g_file_get_path                   (xfile_t                      *file);
+char *                  xfile_get_path                   (xfile_t                      *file);
 XPL_AVAILABLE_IN_2_56
-const char *            g_file_peek_path                  (xfile_t                      *file);
+const char *            xfile_peek_path                  (xfile_t                      *file);
 XPL_AVAILABLE_IN_ALL
-char *                  g_file_get_uri                    (xfile_t                      *file);
+char *                  xfile_get_uri                    (xfile_t                      *file);
 XPL_AVAILABLE_IN_ALL
-char *                  g_file_get_parse_name             (xfile_t                      *file);
+char *                  xfile_get_parse_name             (xfile_t                      *file);
 XPL_AVAILABLE_IN_ALL
-xfile_t *                 g_file_get_parent                 (xfile_t                      *file);
+xfile_t *                 xfile_get_parent                 (xfile_t                      *file);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_has_parent                 (xfile_t                      *file,
+xboolean_t                xfile_has_parent                 (xfile_t                      *file,
                                                            xfile_t                      *parent);
 XPL_AVAILABLE_IN_ALL
-xfile_t *                 g_file_get_child                  (xfile_t                      *file,
+xfile_t *                 xfile_get_child                  (xfile_t                      *file,
 							   const char                 *name);
 XPL_AVAILABLE_IN_ALL
-xfile_t *                 g_file_get_child_for_display_name (xfile_t                      *file,
+xfile_t *                 xfile_get_child_for_display_name (xfile_t                      *file,
 							   const char                 *display_name,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_has_prefix                 (xfile_t                      *file,
+xboolean_t                xfile_has_prefix                 (xfile_t                      *file,
 							   xfile_t                      *prefix);
 XPL_AVAILABLE_IN_ALL
-char *                  g_file_get_relative_path          (xfile_t                      *parent,
+char *                  xfile_get_relative_path          (xfile_t                      *parent,
 							   xfile_t                      *descendant);
 XPL_AVAILABLE_IN_ALL
-xfile_t *                 g_file_resolve_relative_path      (xfile_t                      *file,
+xfile_t *                 xfile_resolve_relative_path      (xfile_t                      *file,
 							   const char                 *relative_path);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_is_native                  (xfile_t                      *file);
+xboolean_t                xfile_is_native                  (xfile_t                      *file);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_has_uri_scheme             (xfile_t                      *file,
+xboolean_t                xfile_has_uri_scheme             (xfile_t                      *file,
 							   const char                 *uri_scheme);
 XPL_AVAILABLE_IN_ALL
-char *                  g_file_get_uri_scheme             (xfile_t                      *file);
+char *                  xfile_get_uri_scheme             (xfile_t                      *file);
 XPL_AVAILABLE_IN_ALL
-GFileInputStream *      g_file_read                       (xfile_t                      *file,
+xfile_input_stream_t *      xfile_read                       (xfile_t                      *file,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_read_async                 (xfile_t                      *file,
+void                    xfile_read_async                 (xfile_t                      *file,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-GFileInputStream *      g_file_read_finish                (xfile_t                      *file,
+xfile_input_stream_t *      xfile_read_finish                (xfile_t                      *file,
 							   xasync_result_t               *res,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-GFileOutputStream *     g_file_append_to                  (xfile_t                      *file,
-							   GFileCreateFlags             flags,
+xfile_output_stream_t *     xfile_append_to                  (xfile_t                      *file,
+							   xfile_create_flags_t             flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-GFileOutputStream *     g_file_create                     (xfile_t                      *file,
-							   GFileCreateFlags             flags,
+xfile_output_stream_t *     xfile_create                     (xfile_t                      *file,
+							   xfile_create_flags_t             flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-GFileOutputStream *     g_file_replace                    (xfile_t                      *file,
+xfile_output_stream_t *     xfile_replace                    (xfile_t                      *file,
 							   const char                 *etag,
 							   xboolean_t                    make_backup,
-							   GFileCreateFlags            flags,
+							   xfile_create_flags_t            flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_append_to_async            (xfile_t                      *file,
-							   GFileCreateFlags            flags,
+void                    xfile_append_to_async            (xfile_t                      *file,
+							   xfile_create_flags_t            flags,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-GFileOutputStream *     g_file_append_to_finish           (xfile_t                      *file,
+xfile_output_stream_t *     xfile_append_to_finish           (xfile_t                      *file,
 							   xasync_result_t               *res,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_create_async               (xfile_t                      *file,
-							   GFileCreateFlags            flags,
+void                    xfile_create_async               (xfile_t                      *file,
+							   xfile_create_flags_t            flags,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-GFileOutputStream *     g_file_create_finish              (xfile_t                      *file,
+xfile_output_stream_t *     xfile_create_finish              (xfile_t                      *file,
 							   xasync_result_t               *res,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_replace_async              (xfile_t                      *file,
+void                    xfile_replace_async              (xfile_t                      *file,
 							   const char                 *etag,
 							   xboolean_t                    make_backup,
-							   GFileCreateFlags            flags,
+							   xfile_create_flags_t            flags,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-GFileOutputStream *     g_file_replace_finish             (xfile_t                      *file,
+xfile_output_stream_t *     xfile_replace_finish             (xfile_t                      *file,
 							   xasync_result_t               *res,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-GFileIOStream *         g_file_open_readwrite             (xfile_t                      *file,
+xfile_io_stream_t *         xfile_open_readwrite             (xfile_t                      *file,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_open_readwrite_async       (xfile_t                      *file,
+void                    xfile_open_readwrite_async       (xfile_t                      *file,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-GFileIOStream *         g_file_open_readwrite_finish      (xfile_t                      *file,
+xfile_io_stream_t *         xfile_open_readwrite_finish      (xfile_t                      *file,
 							   xasync_result_t               *res,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-GFileIOStream *         g_file_create_readwrite           (xfile_t                      *file,
-							   GFileCreateFlags            flags,
+xfile_io_stream_t *         xfile_create_readwrite           (xfile_t                      *file,
+							   xfile_create_flags_t            flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_create_readwrite_async     (xfile_t                      *file,
-							   GFileCreateFlags            flags,
+void                    xfile_create_readwrite_async     (xfile_t                      *file,
+							   xfile_create_flags_t            flags,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-GFileIOStream *         g_file_create_readwrite_finish    (xfile_t                      *file,
+xfile_io_stream_t *         xfile_create_readwrite_finish    (xfile_t                      *file,
 							   xasync_result_t               *res,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-GFileIOStream *         g_file_replace_readwrite          (xfile_t                      *file,
+xfile_io_stream_t *         xfile_replace_readwrite          (xfile_t                      *file,
 							   const char                 *etag,
 							   xboolean_t                    make_backup,
-							   GFileCreateFlags            flags,
+							   xfile_create_flags_t            flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_replace_readwrite_async    (xfile_t                      *file,
+void                    xfile_replace_readwrite_async    (xfile_t                      *file,
 							   const char                 *etag,
 							   xboolean_t                    make_backup,
-							   GFileCreateFlags            flags,
+							   xfile_create_flags_t            flags,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-GFileIOStream *         g_file_replace_readwrite_finish   (xfile_t                      *file,
+xfile_io_stream_t *         xfile_replace_readwrite_finish   (xfile_t                      *file,
 							   xasync_result_t               *res,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_query_exists               (xfile_t                      *file,
+xboolean_t                xfile_query_exists               (xfile_t                      *file,
 							   xcancellable_t               *cancellable);
 XPL_AVAILABLE_IN_ALL
-GFileType               g_file_query_file_type            (xfile_t                      *file,
-                                                           GFileQueryInfoFlags         flags,
+xfile_type_t               xfile_query_file_type            (xfile_t                      *file,
+                                                           xfile_query_info_flags_t         flags,
                                                            xcancellable_t               *cancellable);
 XPL_AVAILABLE_IN_ALL
-GFileInfo *             g_file_query_info                 (xfile_t                      *file,
+xfile_info_t *             xfile_query_info                 (xfile_t                      *file,
 							   const char                 *attributes,
-							   GFileQueryInfoFlags         flags,
+							   xfile_query_info_flags_t         flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_query_info_async           (xfile_t                      *file,
+void                    xfile_query_info_async           (xfile_t                      *file,
 							   const char                 *attributes,
-							   GFileQueryInfoFlags         flags,
+							   xfile_query_info_flags_t         flags,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-GFileInfo *             g_file_query_info_finish          (xfile_t                      *file,
+xfile_info_t *             xfile_query_info_finish          (xfile_t                      *file,
 							   xasync_result_t               *res,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-GFileInfo *             g_file_query_filesystem_info      (xfile_t                      *file,
+xfile_info_t *             xfile_query_filesystem_info      (xfile_t                      *file,
 							   const char                 *attributes,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_query_filesystem_info_async (xfile_t                      *file,
+void                    xfile_query_filesystem_info_async (xfile_t                      *file,
 							   const char                 *attributes,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-GFileInfo *             g_file_query_filesystem_info_finish (xfile_t                      *file,
+xfile_info_t *             xfile_query_filesystem_info_finish (xfile_t                      *file,
                                                            xasync_result_t               *res,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-GMount *                g_file_find_enclosing_mount       (xfile_t                      *file,
+xmount_t *                xfile_find_enclosing_mount       (xfile_t                      *file,
                                                            xcancellable_t               *cancellable,
                                                            xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_find_enclosing_mount_async (xfile_t                      *file,
+void                    xfile_find_enclosing_mount_async (xfile_t                      *file,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-GMount *                g_file_find_enclosing_mount_finish (xfile_t                     *file,
+xmount_t *                xfile_find_enclosing_mount_finish (xfile_t                     *file,
 							    xasync_result_t              *res,
 							    xerror_t                   **error);
 XPL_AVAILABLE_IN_ALL
-GFileEnumerator *       g_file_enumerate_children         (xfile_t                      *file,
+xfile_enumerator_t *       xfile_enumerate_children         (xfile_t                      *file,
 							   const char                 *attributes,
-							   GFileQueryInfoFlags         flags,
+							   xfile_query_info_flags_t         flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_enumerate_children_async   (xfile_t                      *file,
+void                    xfile_enumerate_children_async   (xfile_t                      *file,
 							   const char                 *attributes,
-							   GFileQueryInfoFlags         flags,
+							   xfile_query_info_flags_t         flags,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-GFileEnumerator *       g_file_enumerate_children_finish  (xfile_t                      *file,
+xfile_enumerator_t *       xfile_enumerate_children_finish  (xfile_t                      *file,
 							   xasync_result_t               *res,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xfile_t *                 g_file_set_display_name           (xfile_t                      *file,
+xfile_t *                 xfile_set_display_name           (xfile_t                      *file,
 							   const char                 *display_name,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_set_display_name_async     (xfile_t                      *file,
+void                    xfile_set_display_name_async     (xfile_t                      *file,
 							   const char                 *display_name,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-xfile_t *                 g_file_set_display_name_finish    (xfile_t                      *file,
+xfile_t *                 xfile_set_display_name_finish    (xfile_t                      *file,
 							   xasync_result_t               *res,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_delete                     (xfile_t                      *file,
+xboolean_t                xfile_delete                     (xfile_t                      *file,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 
 XPL_AVAILABLE_IN_2_34
-void                    g_file_delete_async               (xfile_t                      *file,
+void                    xfile_delete_async               (xfile_t                      *file,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 
 XPL_AVAILABLE_IN_2_34
-xboolean_t                g_file_delete_finish              (xfile_t                      *file,
+xboolean_t                xfile_delete_finish              (xfile_t                      *file,
 							   xasync_result_t               *result,
 							   xerror_t                    **error);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_trash                      (xfile_t                      *file,
+xboolean_t                xfile_trash                      (xfile_t                      *file,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 
 XPL_AVAILABLE_IN_2_38
-void                    g_file_trash_async                (xfile_t                      *file,
+void                    xfile_trash_async                (xfile_t                      *file,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 
 XPL_AVAILABLE_IN_2_38
-xboolean_t                g_file_trash_finish               (xfile_t                      *file,
+xboolean_t                xfile_trash_finish               (xfile_t                      *file,
 							   xasync_result_t               *result,
 							   xerror_t                    **error);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_copy                       (xfile_t                      *source,
+xboolean_t                xfile_copy                       (xfile_t                      *source,
 							   xfile_t                      *destination,
-							   GFileCopyFlags              flags,
+							   xfile_copy_flags_t              flags,
 							   xcancellable_t               *cancellable,
-							   GFileProgressCallback       progress_callback,
+							   xfile_progress_callback_t       progress_callback,
 							   xpointer_t                    progress_callback_data,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_copy_async                 (xfile_t                      *source,
+void                    xfile_copy_async                 (xfile_t                      *source,
 							   xfile_t                      *destination,
-							   GFileCopyFlags              flags,
+							   xfile_copy_flags_t              flags,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
-							   GFileProgressCallback       progress_callback,
+							   xfile_progress_callback_t       progress_callback,
 							   xpointer_t                    progress_callback_data,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_copy_finish                (xfile_t                      *file,
+xboolean_t                xfile_copy_finish                (xfile_t                      *file,
 							   xasync_result_t               *res,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_move                       (xfile_t                      *source,
+xboolean_t                xfile_move                       (xfile_t                      *source,
 							   xfile_t                      *destination,
-							   GFileCopyFlags              flags,
+							   xfile_copy_flags_t              flags,
 							   xcancellable_t               *cancellable,
-							   GFileProgressCallback       progress_callback,
+							   xfile_progress_callback_t       progress_callback,
 							   xpointer_t                    progress_callback_data,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_2_72
-void                    g_file_move_async                 (xfile_t                      *source,
+void                    xfile_move_async                 (xfile_t                      *source,
 							                                             xfile_t                      *destination,
-							                                             GFileCopyFlags              flags,
+							                                             xfile_copy_flags_t              flags,
 							                                             int                         io_priority,
 							                                             xcancellable_t               *cancellable,
-							                                             GFileProgressCallback       progress_callback,
+							                                             xfile_progress_callback_t       progress_callback,
 							                                             xpointer_t                    progress_callback_data,
 							                                             xasync_ready_callback_t         callback,
 							                                             xpointer_t                    user_data);
 XPL_AVAILABLE_IN_2_72
-xboolean_t                g_file_move_finish                (xfile_t                      *file,
+xboolean_t                xfile_move_finish                (xfile_t                      *file,
 							                                             xasync_result_t               *result,
 							                                             xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_make_directory             (xfile_t                      *file,
+xboolean_t                xfile_make_directory             (xfile_t                      *file,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_2_38
-void                    g_file_make_directory_async       (xfile_t                      *file,
+void                    xfile_make_directory_async       (xfile_t                      *file,
                                                            int                         io_priority,
                                                            xcancellable_t               *cancellable,
                                                            xasync_ready_callback_t         callback,
                                                            xpointer_t                    user_data);
 XPL_AVAILABLE_IN_2_38
-xboolean_t                g_file_make_directory_finish      (xfile_t                      *file,
+xboolean_t                xfile_make_directory_finish      (xfile_t                      *file,
                                                            xasync_result_t               *result,
                                                            xerror_t                    **error);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_make_directory_with_parents (xfile_t                     *file,
+xboolean_t                xfile_make_directory_with_parents (xfile_t                     *file,
 		                                           xcancellable_t               *cancellable,
 		                                           xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_make_symbolic_link         (xfile_t                      *file,
+xboolean_t                xfile_make_symbolic_link         (xfile_t                      *file,
 							   const char                 *symlink_value,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-GFileAttributeInfoList *g_file_query_settable_attributes  (xfile_t                      *file,
+xfile_attribute_info_list_t *xfile_query_settable_attributes  (xfile_t                      *file,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-GFileAttributeInfoList *g_file_query_writable_namespaces  (xfile_t                      *file,
+xfile_attribute_info_list_t *xfile_query_writable_namespaces  (xfile_t                      *file,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_set_attribute              (xfile_t                      *file,
+xboolean_t                xfile_set_attribute              (xfile_t                      *file,
 							   const char                 *attribute,
-							   GFileAttributeType          type,
+							   xfile_attribute_type_t          type,
 							   xpointer_t                    value_p,
-							   GFileQueryInfoFlags         flags,
+							   xfile_query_info_flags_t         flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_set_attributes_from_info   (xfile_t                      *file,
-							   GFileInfo                  *info,
-							   GFileQueryInfoFlags         flags,
+xboolean_t                xfile_set_attributes_from_info   (xfile_t                      *file,
+							   xfile_info_t                  *info,
+							   xfile_query_info_flags_t         flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_set_attributes_async       (xfile_t                      *file,
-							   GFileInfo                  *info,
-							   GFileQueryInfoFlags         flags,
+void                    xfile_set_attributes_async       (xfile_t                      *file,
+							   xfile_info_t                  *info,
+							   xfile_query_info_flags_t         flags,
 							   int                         io_priority,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_set_attributes_finish      (xfile_t                      *file,
+xboolean_t                xfile_set_attributes_finish      (xfile_t                      *file,
 							   xasync_result_t               *result,
-							   GFileInfo                 **info,
+							   xfile_info_t                 **info,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_set_attribute_string       (xfile_t                      *file,
+xboolean_t                xfile_set_attribute_string       (xfile_t                      *file,
 							   const char                 *attribute,
 							   const char                 *value,
-							   GFileQueryInfoFlags         flags,
+							   xfile_query_info_flags_t         flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_set_attribute_byte_string  (xfile_t                      *file,
+xboolean_t                xfile_set_attribute_byte_string  (xfile_t                      *file,
 							   const char                 *attribute,
 							   const char                 *value,
-							   GFileQueryInfoFlags         flags,
+							   xfile_query_info_flags_t         flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_set_attribute_uint32       (xfile_t                      *file,
+xboolean_t                xfile_set_attribute_uint32       (xfile_t                      *file,
 							   const char                 *attribute,
-							   guint32                     value,
-							   GFileQueryInfoFlags         flags,
+							   xuint32_t                     value,
+							   xfile_query_info_flags_t         flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_set_attribute_int32        (xfile_t                      *file,
+xboolean_t                xfile_set_attribute_int32        (xfile_t                      *file,
 							   const char                 *attribute,
 							   gint32                      value,
-							   GFileQueryInfoFlags         flags,
+							   xfile_query_info_flags_t         flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_set_attribute_uint64       (xfile_t                      *file,
+xboolean_t                xfile_set_attribute_uint64       (xfile_t                      *file,
 							   const char                 *attribute,
-							   guint64                     value,
-							   GFileQueryInfoFlags         flags,
+							   xuint64_t                     value,
+							   xfile_query_info_flags_t         flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_set_attribute_int64        (xfile_t                      *file,
+xboolean_t                xfile_set_attribute_int64        (xfile_t                      *file,
 							   const char                 *attribute,
 							   gint64                      value,
-							   GFileQueryInfoFlags         flags,
+							   xfile_query_info_flags_t         flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_mount_enclosing_volume     (xfile_t                      *location,
+void                    xfile_mount_enclosing_volume     (xfile_t                      *location,
 							   GMountMountFlags            flags,
 							   xmount_operation_t            *mount_operation,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_mount_enclosing_volume_finish (xfile_t                      *location,
+xboolean_t                xfile_mount_enclosing_volume_finish (xfile_t                      *location,
 							   xasync_result_t               *result,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_mount_mountable            (xfile_t                      *file,
+void                    xfile_mount_mountable            (xfile_t                      *file,
 							   GMountMountFlags            flags,
 							   xmount_operation_t            *mount_operation,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-xfile_t *                 g_file_mount_mountable_finish     (xfile_t                      *file,
+xfile_t *                 xfile_mount_mountable_finish     (xfile_t                      *file,
 							   xasync_result_t               *result,
 							   xerror_t                    **error);
-XPL_DEPRECATED_FOR(g_file_unmount_mountable_with_operation)
-void                    g_file_unmount_mountable          (xfile_t                      *file,
+XPL_DEPRECATED_FOR(xfile_unmount_mountable_with_operation)
+void                    xfile_unmount_mountable          (xfile_t                      *file,
                                                            xmount_unmount_flags_t          flags,
                                                            xcancellable_t               *cancellable,
                                                            xasync_ready_callback_t         callback,
                                                            xpointer_t                    user_data);
 
-XPL_DEPRECATED_FOR(g_file_unmount_mountable_with_operation_finish)
-xboolean_t                g_file_unmount_mountable_finish   (xfile_t                      *file,
+XPL_DEPRECATED_FOR(xfile_unmount_mountable_with_operation_finish)
+xboolean_t                xfile_unmount_mountable_finish   (xfile_t                      *file,
                                                            xasync_result_t               *result,
                                                            xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_unmount_mountable_with_operation (xfile_t                *file,
+void                    xfile_unmount_mountable_with_operation (xfile_t                *file,
 							   xmount_unmount_flags_t          flags,
 							   xmount_operation_t            *mount_operation,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_unmount_mountable_with_operation_finish (xfile_t         *file,
+xboolean_t                xfile_unmount_mountable_with_operation_finish (xfile_t         *file,
 							   xasync_result_t               *result,
 							   xerror_t                    **error);
-XPL_DEPRECATED_FOR(g_file_eject_mountable_with_operation)
-void                    g_file_eject_mountable            (xfile_t                      *file,
+XPL_DEPRECATED_FOR(xfile_eject_mountable_with_operation)
+void                    xfile_eject_mountable            (xfile_t                      *file,
                                                            xmount_unmount_flags_t          flags,
                                                            xcancellable_t               *cancellable,
                                                            xasync_ready_callback_t         callback,
                                                            xpointer_t                    user_data);
 
-XPL_DEPRECATED_FOR(g_file_eject_mountable_with_operation_finish)
-xboolean_t                g_file_eject_mountable_finish     (xfile_t                      *file,
+XPL_DEPRECATED_FOR(xfile_eject_mountable_with_operation_finish)
+xboolean_t                xfile_eject_mountable_finish     (xfile_t                      *file,
                                                            xasync_result_t               *result,
                                                            xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_eject_mountable_with_operation (xfile_t                  *file,
+void                    xfile_eject_mountable_with_operation (xfile_t                  *file,
 							   xmount_unmount_flags_t          flags,
 							   xmount_operation_t            *mount_operation,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_eject_mountable_with_operation_finish (xfile_t           *file,
+xboolean_t                xfile_eject_mountable_with_operation_finish (xfile_t           *file,
 							   xasync_result_t               *result,
 							   xerror_t                    **error);
 
 XPL_AVAILABLE_IN_2_68
-char *			g_file_build_attribute_list_for_copy (xfile_t                   *file,
-							   GFileCopyFlags              flags,
+char *			xfile_build_attribute_list_for_copy (xfile_t                   *file,
+							   xfile_copy_flags_t              flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_copy_attributes            (xfile_t                      *source,
+xboolean_t                xfile_copy_attributes            (xfile_t                      *source,
 							   xfile_t                      *destination,
-							   GFileCopyFlags              flags,
+							   xfile_copy_flags_t              flags,
 							   xcancellable_t               *cancellable,
 							   xerror_t                    **error);
 
 
 XPL_AVAILABLE_IN_ALL
-GFileMonitor*           g_file_monitor_directory          (xfile_t                  *file,
-							   GFileMonitorFlags       flags,
+xfile_monitor_t*           xfile_monitor_directory          (xfile_t                  *file,
+							   xfile_monitor_flags_t       flags,
 							   xcancellable_t           *cancellable,
 							   xerror_t                **error);
 XPL_AVAILABLE_IN_ALL
-GFileMonitor*           g_file_monitor_file               (xfile_t                  *file,
-							   GFileMonitorFlags       flags,
+xfile_monitor_t*           xfile_monitor_file               (xfile_t                  *file,
+							   xfile_monitor_flags_t       flags,
 							   xcancellable_t           *cancellable,
 							   xerror_t                **error);
 XPL_AVAILABLE_IN_ALL
-GFileMonitor*           g_file_monitor                    (xfile_t                  *file,
-							   GFileMonitorFlags       flags,
+xfile_monitor_t*           xfile_monitor                    (xfile_t                  *file,
+							   xfile_monitor_flags_t       flags,
 							   xcancellable_t           *cancellable,
 							   xerror_t                **error);
 
 XPL_AVAILABLE_IN_2_38
-xboolean_t                g_file_measure_disk_usage         (xfile_t                         *file,
-                                                           GFileMeasureFlags              flags,
+xboolean_t                xfile_measure_disk_usage         (xfile_t                         *file,
+                                                           xfile_measure_flags_t              flags,
                                                            xcancellable_t                  *cancellable,
-                                                           GFileMeasureProgressCallback   progress_callback,
+                                                           xfile_measure_progress_callback_t   progress_callback,
                                                            xpointer_t                       progress_data,
-                                                           guint64                       *disk_usage,
-                                                           guint64                       *num_dirs,
-                                                           guint64                       *num_files,
+                                                           xuint64_t                       *disk_usage,
+                                                           xuint64_t                       *num_dirs,
+                                                           xuint64_t                       *num_files,
                                                            xerror_t                       **error);
 
 XPL_AVAILABLE_IN_2_38
-void                    g_file_measure_disk_usage_async   (xfile_t                         *file,
-                                                           GFileMeasureFlags              flags,
+void                    xfile_measure_disk_usage_async   (xfile_t                         *file,
+                                                           xfile_measure_flags_t              flags,
                                                            xint_t                           io_priority,
                                                            xcancellable_t                  *cancellable,
-                                                           GFileMeasureProgressCallback   progress_callback,
+                                                           xfile_measure_progress_callback_t   progress_callback,
                                                            xpointer_t                       progress_data,
                                                            xasync_ready_callback_t            callback,
                                                            xpointer_t                       user_data);
 
 XPL_AVAILABLE_IN_2_38
-xboolean_t                g_file_measure_disk_usage_finish  (xfile_t                         *file,
+xboolean_t                xfile_measure_disk_usage_finish  (xfile_t                         *file,
                                                            xasync_result_t                  *result,
-                                                           guint64                       *disk_usage,
-                                                           guint64                       *num_dirs,
-                                                           guint64                       *num_files,
+                                                           xuint64_t                       *disk_usage,
+                                                           xuint64_t                       *num_dirs,
+                                                           xuint64_t                       *num_files,
                                                            xerror_t                       **error);
 
 XPL_AVAILABLE_IN_ALL
-void                    g_file_start_mountable            (xfile_t                      *file,
+void                    xfile_start_mountable            (xfile_t                      *file,
 							   GDriveStartFlags            flags,
 							   xmount_operation_t            *start_operation,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_start_mountable_finish     (xfile_t                      *file,
+xboolean_t                xfile_start_mountable_finish     (xfile_t                      *file,
 							   xasync_result_t               *result,
 							   xerror_t                    **error);
 XPL_AVAILABLE_IN_ALL
-void                    g_file_stop_mountable             (xfile_t                      *file,
+void                    xfile_stop_mountable             (xfile_t                      *file,
 							   xmount_unmount_flags_t          flags,
                                                            xmount_operation_t            *mount_operation,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_stop_mountable_finish      (xfile_t                      *file,
+xboolean_t                xfile_stop_mountable_finish      (xfile_t                      *file,
 							   xasync_result_t               *result,
 							   xerror_t                    **error);
 
 XPL_AVAILABLE_IN_ALL
-void                    g_file_poll_mountable             (xfile_t                      *file,
+void                    xfile_poll_mountable             (xfile_t                      *file,
 							   xcancellable_t               *cancellable,
 							   xasync_ready_callback_t         callback,
 							   xpointer_t                    user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t                g_file_poll_mountable_finish      (xfile_t                      *file,
+xboolean_t                xfile_poll_mountable_finish      (xfile_t                      *file,
 							   xasync_result_t               *result,
 							   xerror_t                    **error);
 
 /* Utilities */
 
 XPL_AVAILABLE_IN_ALL
-GAppInfo *g_file_query_default_handler       (xfile_t                  *file,
+xapp_info_t *xfile_query_default_handler       (xfile_t                  *file,
 					      xcancellable_t           *cancellable,
 					      xerror_t                **error);
 XPL_AVAILABLE_IN_2_60
-void      g_file_query_default_handler_async (xfile_t                  *file,
+void      xfile_query_default_handler_async (xfile_t                  *file,
                                               int                     io_priority,
                                               xcancellable_t           *cancellable,
                                               xasync_ready_callback_t     callback,
                                               xpointer_t                user_data);
 XPL_AVAILABLE_IN_2_60
-GAppInfo *g_file_query_default_handler_finish (xfile_t                 *file,
+xapp_info_t *xfile_query_default_handler_finish (xfile_t                 *file,
                                                xasync_result_t          *result,
                                                xerror_t               **error);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_file_load_contents                (xfile_t                  *file,
+xboolean_t xfile_load_contents                (xfile_t                  *file,
 					      xcancellable_t           *cancellable,
 					      char                  **contents,
 					      xsize_t                  *length,
 					      char                  **etag_out,
 					      xerror_t                **error);
 XPL_AVAILABLE_IN_ALL
-void     g_file_load_contents_async          (xfile_t                  *file,
+void     xfile_load_contents_async          (xfile_t                  *file,
 					      xcancellable_t           *cancellable,
 					      xasync_ready_callback_t     callback,
 					      xpointer_t                user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_file_load_contents_finish         (xfile_t                  *file,
+xboolean_t xfile_load_contents_finish         (xfile_t                  *file,
 					      xasync_result_t           *res,
 					      char                  **contents,
 					      xsize_t                  *length,
 					      char                  **etag_out,
 					      xerror_t                **error);
 XPL_AVAILABLE_IN_ALL
-void     g_file_load_partial_contents_async  (xfile_t                  *file,
+void     xfile_load_partial_contents_async  (xfile_t                  *file,
 					      xcancellable_t           *cancellable,
-					      GFileReadMoreCallback   read_more_callback,
+					      xfile_read_more_callback_t   read_more_callback,
 					      xasync_ready_callback_t     callback,
 					      xpointer_t                user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_file_load_partial_contents_finish (xfile_t                  *file,
+xboolean_t xfile_load_partial_contents_finish (xfile_t                  *file,
 					      xasync_result_t           *res,
 					      char                  **contents,
 					      xsize_t                  *length,
 					      char                  **etag_out,
 					      xerror_t                **error);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_file_replace_contents             (xfile_t                  *file,
+xboolean_t xfile_replace_contents             (xfile_t                  *file,
 					      const char             *contents,
 					      xsize_t                   length,
 					      const char             *etag,
 					      xboolean_t                make_backup,
-					      GFileCreateFlags        flags,
+					      xfile_create_flags_t        flags,
 					      char                  **new_etag,
 					      xcancellable_t           *cancellable,
 					      xerror_t                **error);
 XPL_AVAILABLE_IN_ALL
-void     g_file_replace_contents_async       (xfile_t                  *file,
+void     xfile_replace_contents_async       (xfile_t                  *file,
 					      const char             *contents,
 					      xsize_t                   length,
 					      const char             *etag,
 					      xboolean_t                make_backup,
-					      GFileCreateFlags        flags,
+					      xfile_create_flags_t        flags,
 					      xcancellable_t           *cancellable,
 					      xasync_ready_callback_t     callback,
 					      xpointer_t                user_data);
 XPL_AVAILABLE_IN_2_40
-void     g_file_replace_contents_bytes_async (xfile_t                  *file,
-					      GBytes                 *contents,
+void     xfile_replace_contents_bytes_async (xfile_t                  *file,
+					      xbytes_t                 *contents,
 					      const char             *etag,
 					      xboolean_t                make_backup,
-					      GFileCreateFlags        flags,
+					      xfile_create_flags_t        flags,
 					      xcancellable_t           *cancellable,
 					      xasync_ready_callback_t     callback,
 					      xpointer_t                user_data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_file_replace_contents_finish      (xfile_t                  *file,
+xboolean_t xfile_replace_contents_finish      (xfile_t                  *file,
 					      xasync_result_t           *res,
 					      char                  **new_etag,
 					      xerror_t                **error);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_file_supports_thread_contexts     (xfile_t                  *file);
+xboolean_t xfile_supports_thread_contexts     (xfile_t                  *file);
 
 XPL_AVAILABLE_IN_2_56
-GBytes  *g_file_load_bytes                   (xfile_t                  *file,
+xbytes_t  *xfile_load_bytes                   (xfile_t                  *file,
                                               xcancellable_t           *cancellable,
                                               xchar_t                 **etag_out,
                                               xerror_t                **error);
 XPL_AVAILABLE_IN_2_56
-void     g_file_load_bytes_async             (xfile_t                  *file,
+void     xfile_load_bytes_async             (xfile_t                  *file,
                                               xcancellable_t           *cancellable,
                                               xasync_ready_callback_t     callback,
                                               xpointer_t                user_data);
 XPL_AVAILABLE_IN_2_56
-GBytes  *g_file_load_bytes_finish            (xfile_t                  *file,
+xbytes_t  *xfile_load_bytes_finish            (xfile_t                  *file,
                                               xasync_result_t           *result,
                                               xchar_t                 **etag_out,
                                               xerror_t                **error);
 
 G_END_DECLS
 
-#endif /* __G_FILE_H__ */
+#endif /* __XFILE_H__ */

@@ -42,11 +42,11 @@ typedef struct _GUnixFDMessagePrivate                       GUnixFDMessagePrivat
 typedef struct _GUnixFDMessageClass                         GUnixFDMessageClass;
 typedef struct _GUnixFDMessage                              GUnixFDMessage;
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixFDMessage, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixFDMessage, xobject_unref)
 
 struct _GUnixFDMessageClass
 {
-  GSocketControlMessageClass parent_class;
+  xsocket_control_message_class_t parent_class;
 
   /*< private >*/
 
@@ -57,19 +57,19 @@ struct _GUnixFDMessageClass
 
 struct _GUnixFDMessage
 {
-  GSocketControlMessage parent_instance;
+  xsocket_control_message_t parent_instance;
   GUnixFDMessagePrivate *priv;
 };
 
 XPL_AVAILABLE_IN_ALL
 xtype_t                   g_unix_fd_message_get_type                      (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-GSocketControlMessage * g_unix_fd_message_new_with_fd_list              (GUnixFDList     *fd_list);
+xsocket_control_message_t * g_unix_fd_message_new_with_fd_list              (xunix_fd_list_t     *fd_list);
 XPL_AVAILABLE_IN_ALL
-GSocketControlMessage * g_unix_fd_message_new                           (void);
+xsocket_control_message_t * g_unix_fd_message_new                           (void);
 
 XPL_AVAILABLE_IN_ALL
-GUnixFDList *           g_unix_fd_message_get_fd_list                   (GUnixFDMessage  *message);
+xunix_fd_list_t *           g_unix_fd_message_get_fd_list                   (GUnixFDMessage  *message);
 
 XPL_AVAILABLE_IN_ALL
 xint_t *                  g_unix_fd_message_steal_fds                     (GUnixFDMessage  *message,

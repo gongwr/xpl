@@ -21,15 +21,15 @@ msgstr ""
 "X-Generator: Lokalize 1.5\n"
 
 #: ../gio/gapplication.c:531
-msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
 msgstr ""
 
 #: ../gio/gapplication.c:536
-msgid "GApplication options"
+msgid "xapplication_t options"
 msgstr ""
 
 #: ../gio/gapplication.c:536
-msgid "Show GApplication options"
+msgid "Show xapplication_t options"
 msgstr ""
 
 #: ../gio/gapplication-tool.c:45 ../gio/gapplication-tool.c:46
@@ -253,7 +253,7 @@ msgid "Seek not supported on base stream"
 msgstr "Tákntengi eru ekki studd"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
 msgstr ""
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1202
@@ -330,15 +330,15 @@ msgid "%s filetype"
 msgstr ""
 
 #: ../gio/gcredentials.c:312 ../gio/gcredentials.c:571
-msgid "GCredentials is not implemented on this OS"
+msgid "xcredentials_t is not implemented on this OS"
 msgstr ""
 
 #: ../gio/gcredentials.c:467
-msgid "There is no GCredentials support for your platform"
+msgid "There is no xcredentials_t support for your platform"
 msgstr ""
 
 #: ../gio/gcredentials.c:513
-msgid "GCredentials does not contain a process ID on this OS"
+msgid "xcredentials_t does not contain a process ID on this OS"
 msgstr ""
 
 #: ../gio/gcredentials.c:565
@@ -513,7 +513,7 @@ msgid ""
 msgstr ""
 
 #: ../gio/gdbusauth.c:1170
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
 msgstr ""
 
 #: ../gio/gdbusauthmechanismsha1.c:261
@@ -1181,26 +1181,26 @@ msgstr ""
 
 #: ../gio/gemblem.c:323
 #, c-format
-msgid "Can't handle version %d of GEmblem encoding"
+msgid "Can't handle version %d of xemblem_t encoding"
 msgstr ""
 
 #: ../gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:362
 #, c-format
-msgid "Can't handle version %d of GEmblemedIcon encoding"
+msgid "Can't handle version %d of xemblemed_icon_t encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
 msgstr ""
 
 #: ../gio/gfile.c:968 ../gio/gfile.c:1206 ../gio/gfile.c:1344
@@ -1310,11 +1310,11 @@ msgstr ""
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can't handle version %d of GFileIcon encoding"
+msgid "Can't handle version %d of xfile_icon_t encoding"
 msgstr ""
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for GFileIcon"
+msgid "Malformed input data for xfile_icon_t"
 msgstr ""
 
 #: ../gio/gfileinputstream.c:149 ../gio/gfileinputstream.c:394
@@ -1771,7 +1771,7 @@ msgstr ""
 
 #: ../gio/glib-compile-schemas.c:2059
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
@@ -2093,7 +2093,7 @@ msgid "Invalid seek request"
 msgstr "Ógilt vélarheiti"
 
 #: ../gio/gmemoryinputstream.c:505
-msgid "Cannot truncate GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
 msgstr ""
 
 #: ../gio/gmemoryoutputstream.c:565
@@ -2638,7 +2638,7 @@ msgid "Error sending message: %s"
 msgstr "Villa við lestur skráarinnar '%s': %s"
 
 #: ../gio/gsocket.c:3935
-msgid "GSocketControlMessage not supported on Windows"
+msgid "xsocket_control_message_t not supported on Windows"
 msgstr ""
 
 #: ../gio/gsocket.c:4549 ../gio/gsocket.c:4687
@@ -2779,7 +2779,7 @@ msgstr ""
 
 #: ../gio/gthemedicon.c:518
 #, c-format
-msgid "Can't handle version %d of GThemedIcon encoding"
+msgid "Can't handle version %d of xthemed_icon_t encoding"
 msgstr ""
 
 #: ../gio/gthreadedresolver.c:118
@@ -3121,37 +3121,37 @@ msgstr "Ógilt vélarheiti"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:201
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "fh"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:203
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "eh"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:206
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %e.%b %Y, %T %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:209
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%d/%m/%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:212
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:215
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 

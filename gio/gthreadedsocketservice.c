@@ -22,25 +22,25 @@
 
 /**
  * SECTION:gthreadedsocketservice
- * @title: GThreadedSocketService
- * @short_description: A threaded GSocketService
+ * @title: xthreaded_socket_service_t
+ * @short_description: A threaded xsocket_service_t
  * @include: gio/gio.h
- * @see_also: #GSocketService.
+ * @see_also: #xsocket_service_t.
  *
- * A #GThreadedSocketService is a simple subclass of #GSocketService
+ * A #xthreaded_socket_service_t is a simple subclass of #xsocket_service_t
  * that handles incoming connections by creating a worker thread and
  * dispatching the connection to it by emitting the
- * #GThreadedSocketService::run signal in the new thread.
+ * #xthreaded_socket_service_t::run signal in the new thread.
  *
  * The signal handler may perform blocking IO and need not return
  * until the connection is closed.
  *
  * The service is implemented using a thread pool, so there is a
  * limited amount of threads available to serve incoming requests.
- * The service automatically stops the #GSocketService from accepting
+ * The service automatically stops the #xsocket_service_t from accepting
  * new connections when all threads are busy.
  *
- * As with #GSocketService, you may connect to #GThreadedSocketService::run,
+ * As with #xsocket_service_t, you may connect to #xthreaded_socket_service_t::run,
  * or subclass and override the default handler.
  */
 
@@ -57,10 +57,10 @@ struct _GThreadedSocketServicePrivate
   xint_t job_count;
 };
 
-static xuint_t g_threaded_socket_service_run_signal;
+static xuint_t xthreaded_socket_service_run_signal;
 
-G_DEFINE_TYPE_WITH_PRIVATE (GThreadedSocketService,
-                            g_threaded_socket_service,
+G_DEFINE_TYPE_WITH_PRIVATE (xthreaded_socket_service_t,
+                            xthreaded_socket_service,
                             XTYPE_SOCKET_SERVICE)
 
 typedef enum
@@ -72,13 +72,13 @@ G_LOCK_DEFINE_STATIC(job_count);
 
 typedef struct
 {
-  GThreadedSocketService *service;  /* (owned) */
+  xthreaded_socket_service_t *service;  /* (owned) */
   xsocket_connection_t *connection;  /* (owned) */
   xobject_t *source_object;  /* (owned) (nullable) */
 } GThreadedSocketServiceData;
 
 static void
-g_threaded_socket_service_data_free (GThreadedSocketServiceData *data)
+xthreaded_socket_service_data_free (GThreadedSocketServiceData *data)
 {
   g_clear_object (&data->service);
   g_clear_object (&data->connection);
@@ -87,13 +87,13 @@ g_threaded_socket_service_data_free (GThreadedSocketServiceData *data)
 }
 
 static void
-g_threaded_socket_service_func (xpointer_t job_data,
+xthreaded_socket_service_func (xpointer_t job_data,
                                 xpointer_t user_data)
 {
   GThreadedSocketServiceData *data = job_data;
   xboolean_t result;
 
-  g_signal_emit (data->service, g_threaded_socket_service_run_signal,
+  g_signal_emit (data->service, xthreaded_socket_service_run_signal,
                  0, data->connection, data->source_object, &result);
 
   G_LOCK (job_count);
@@ -101,34 +101,34 @@ g_threaded_socket_service_func (xpointer_t job_data,
     xsocket_service_start (XSOCKET_SERVICE (data->service));
   G_UNLOCK (job_count);
 
-  g_threaded_socket_service_data_free (data);
+  xthreaded_socket_service_data_free (data);
 }
 
 static xboolean_t
-g_threaded_socket_service_incoming (GSocketService    *service,
+xthreaded_socket_service_incoming (xsocket_service_t    *service,
                                     xsocket_connection_t *connection,
                                     xobject_t           *source_object)
 {
-  GThreadedSocketService *threaded;
+  xthreaded_socket_service_t *threaded;
   GThreadedSocketServiceData *data;
   xerror_t *local_error = NULL;
 
   threaded = G_THREADED_SOCKET_SERVICE (service);
 
   data = g_slice_new0 (GThreadedSocketServiceData);
-  data->service = g_object_ref (threaded);
-  data->connection = g_object_ref (connection);
-  data->source_object = (source_object != NULL) ? g_object_ref (source_object) : NULL;
+  data->service = xobject_ref (threaded);
+  data->connection = xobject_ref (connection);
+  data->source_object = (source_object != NULL) ? xobject_ref (source_object) : NULL;
 
   G_LOCK (job_count);
   if (++threaded->priv->job_count == threaded->priv->max_threads)
     xsocket_service_stop (service);
   G_UNLOCK (job_count);
 
-  if (!g_thread_pool_push (threaded->priv->thread_pool, data, &local_error))
+  if (!xthread_pool_push (threaded->priv->thread_pool, data, &local_error))
     {
       g_warning ("Error handling incoming socket: %s", local_error->message);
-      g_threaded_socket_service_data_free (data);
+      xthreaded_socket_service_data_free (data);
     }
 
   g_clear_error (&local_error);
@@ -137,19 +137,19 @@ g_threaded_socket_service_incoming (GSocketService    *service,
 }
 
 static void
-g_threaded_socket_service_init (GThreadedSocketService *service)
+xthreaded_socket_service_init (xthreaded_socket_service_t *service)
 {
-  service->priv = g_threaded_socket_service_get_instance_private (service);
+  service->priv = xthreaded_socket_service_get_instance_private (service);
   service->priv->max_threads = 10;
 }
 
 static void
-g_threaded_socket_service_constructed (xobject_t *object)
+xthreaded_socket_service_constructed (xobject_t *object)
 {
-  GThreadedSocketService *service = G_THREADED_SOCKET_SERVICE (object);
+  xthreaded_socket_service_t *service = G_THREADED_SOCKET_SERVICE (object);
 
   service->priv->thread_pool =
-    g_thread_pool_new  (g_threaded_socket_service_func,
+    xthread_pool_new  (xthreaded_socket_service_func,
 			NULL,
 			service->priv->max_threads,
 			FALSE,
@@ -158,30 +158,30 @@ g_threaded_socket_service_constructed (xobject_t *object)
 
 
 static void
-g_threaded_socket_service_finalize (xobject_t *object)
+xthreaded_socket_service_finalize (xobject_t *object)
 {
-  GThreadedSocketService *service = G_THREADED_SOCKET_SERVICE (object);
+  xthreaded_socket_service_t *service = G_THREADED_SOCKET_SERVICE (object);
 
-  /* All jobs in the pool hold a reference to this #GThreadedSocketService, so
+  /* All jobs in the pool hold a reference to this #xthreaded_socket_service_t, so
    * this should only be called once the pool is empty: */
-  g_thread_pool_free (service->priv->thread_pool, FALSE, FALSE);
+  xthread_pool_free (service->priv->thread_pool, FALSE, FALSE);
 
-  G_OBJECT_CLASS (g_threaded_socket_service_parent_class)
+  G_OBJECT_CLASS (xthreaded_socket_service_parent_class)
     ->finalize (object);
 }
 
 static void
-g_threaded_socket_service_get_property (xobject_t    *object,
+xthreaded_socket_service_get_property (xobject_t    *object,
 					xuint_t       prop_id,
-					GValue     *value,
-					GParamSpec *pspec)
+					xvalue_t     *value,
+					xparam_spec_t *pspec)
 {
-  GThreadedSocketService *service = G_THREADED_SOCKET_SERVICE (object);
+  xthreaded_socket_service_t *service = G_THREADED_SOCKET_SERVICE (object);
 
   switch ((GThreadedSocketServiceProperty) prop_id)
     {
       case PROP_MAX_THREADS:
-	g_value_set_int (value, service->priv->max_threads);
+	xvalue_set_int (value, service->priv->max_threads);
 	break;
 
       default:
@@ -190,17 +190,17 @@ g_threaded_socket_service_get_property (xobject_t    *object,
 }
 
 static void
-g_threaded_socket_service_set_property (xobject_t      *object,
+xthreaded_socket_service_set_property (xobject_t      *object,
 					xuint_t         prop_id,
-					const GValue *value,
-					GParamSpec   *pspec)
+					const xvalue_t *value,
+					xparam_spec_t   *pspec)
 {
-  GThreadedSocketService *service = G_THREADED_SOCKET_SERVICE (object);
+  xthreaded_socket_service_t *service = G_THREADED_SOCKET_SERVICE (object);
 
   switch ((GThreadedSocketServiceProperty) prop_id)
     {
       case PROP_MAX_THREADS:
-	service->priv->max_threads = g_value_get_int (value);
+	service->priv->max_threads = xvalue_get_int (value);
 	break;
 
       default:
@@ -210,21 +210,21 @@ g_threaded_socket_service_set_property (xobject_t      *object,
 
 
 static void
-g_threaded_socket_service_class_init (GThreadedSocketServiceClass *class)
+xthreaded_socket_service_class_init (GThreadedSocketServiceClass *class)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
   GSocketServiceClass *ss_class = &class->parent_class;
 
-  gobject_class->constructed = g_threaded_socket_service_constructed;
-  gobject_class->finalize = g_threaded_socket_service_finalize;
-  gobject_class->set_property = g_threaded_socket_service_set_property;
-  gobject_class->get_property = g_threaded_socket_service_get_property;
+  gobject_class->constructed = xthreaded_socket_service_constructed;
+  gobject_class->finalize = xthreaded_socket_service_finalize;
+  gobject_class->set_property = xthreaded_socket_service_set_property;
+  gobject_class->get_property = xthreaded_socket_service_get_property;
 
-  ss_class->incoming = g_threaded_socket_service_incoming;
+  ss_class->incoming = xthreaded_socket_service_incoming;
 
   /**
-   * GThreadedSocketService::run:
-   * @service: the #GThreadedSocketService.
+   * xthreaded_socket_service_t::run:
+   * @service: the #xthreaded_socket_service_t.
    * @connection: a new #xsocket_connection_t object.
    * @source_object: (nullable): the source_object passed to xsocket_listener_add_address().
    *
@@ -235,18 +235,18 @@ g_threaded_socket_service_class_init (GThreadedSocketServiceClass *class)
    *
    * Returns: %TRUE to stop further signal handlers from being called
    */
-  g_threaded_socket_service_run_signal =
+  xthreaded_socket_service_run_signal =
     g_signal_new (I_("run"), XTYPE_FROM_CLASS (class), G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GThreadedSocketServiceClass, run),
 		  g_signal_accumulator_true_handled, NULL,
 		  _g_cclosure_marshal_BOOLEAN__OBJECT_OBJECT,
 		  XTYPE_BOOLEAN,
 		  2, XTYPE_SOCKET_CONNECTION, XTYPE_OBJECT);
-  g_signal_set_va_marshaller (g_threaded_socket_service_run_signal,
+  g_signal_set_va_marshaller (xthreaded_socket_service_run_signal,
 			      XTYPE_FROM_CLASS (class),
 			      _g_cclosure_marshal_BOOLEAN__OBJECT_OBJECTv);
 
-  g_object_class_install_property (gobject_class, PROP_MAX_THREADS,
+  xobject_class_install_property (gobject_class, PROP_MAX_THREADS,
 				   g_param_spec_int ("max-threads",
 						     P_("Max threads"),
 						     P_("The max number of threads handling clients for this service"),
@@ -257,21 +257,21 @@ g_threaded_socket_service_class_init (GThreadedSocketServiceClass *class)
 }
 
 /**
- * g_threaded_socket_service_new:
+ * xthreaded_socket_service_new:
  * @max_threads: the maximal number of threads to execute concurrently
  *   handling incoming clients, -1 means no limit
  *
- * Creates a new #GThreadedSocketService with no listeners. Listeners
- * must be added with one of the #GSocketListener "add" methods.
+ * Creates a new #xthreaded_socket_service_t with no listeners. Listeners
+ * must be added with one of the #xsocket_listener_t "add" methods.
  *
- * Returns: a new #GSocketService.
+ * Returns: a new #xsocket_service_t.
  *
  * Since: 2.22
  */
-GSocketService *
-g_threaded_socket_service_new (int max_threads)
+xsocket_service_t *
+xthreaded_socket_service_new (int max_threads)
 {
-  return g_object_new (XTYPE_THREADED_SOCKET_SERVICE,
+  return xobject_new (XTYPE_THREADED_SOCKET_SERVICE,
 		       "max-threads", max_threads,
 		       NULL);
 }

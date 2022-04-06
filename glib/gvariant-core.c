@@ -53,7 +53,7 @@
  *
  * Since: 2.24
  **/
-struct _GVariant
+struct _xvariant
 /* see below for field member documentation */
 {
   GVariantTypeInfo *type_info;
@@ -63,8 +63,8 @@ struct _GVariant
   {
     struct
     {
-      GBytes *bytes;
-      gconstpointer data;
+      xbytes_t *bytes;
+      xconstpointer data;
     } serialised;
 
     struct
@@ -96,7 +96,7 @@ struct _GVariant
  *
  * It is possible for an instance to transition from tree form to
  * serialized form.  This happens, implicitly, if the serialized data is
- * requested (eg: via g_variant_get_data()).  Serialized form instances
+ * requested (eg: via xvariant_get_data()).  Serialized form instances
  * never transition into tree form.
  *
  *
@@ -104,7 +104,7 @@ struct _GVariant
  *
  * type_info: this is a reference to a GVariantTypeInfo describing the
  *            type of the instance.  When the instance is freed, this
- *            reference must be released with g_variant_type_info_unref().
+ *            reference must be released with xvariant_type_info_unref().
  *
  *            The type_info field never changes during the life of the
  *            instance, so it can be accessed without a lock.
@@ -114,14 +114,14 @@ struct _GVariant
  *       definition, known.  If the instance is in tree form then it may
  *       be unknown (in which case it is -1).  It is possible for the
  *       size to be known when in tree form if, for example, the user
- *       has called g_variant_get_size() without calling
- *       g_variant_get_data().  Additionally, even when the user calls
- *       g_variant_get_data() the size of the data must first be
+ *       has called xvariant_get_size() without calling
+ *       xvariant_get_data().  Additionally, even when the user calls
+ *       xvariant_get_data() the size of the data must first be
  *       determined so that a large enough buffer can be allocated for
  *       the data.
  *
  *       Once the size is known, it can never become unknown again.
- *       g_variant_ensure_size() is used to ensure that the size is in
+ *       xvariant_ensure_size() is used to ensure that the size is in
  *       the known state -- it calculates the size if needed.  After
  *       that, the size field can be accessed without a lock.
  *
@@ -136,16 +136,16 @@ struct _GVariant
  *                never be changed.  It is therefore valid to access
  *                them without holding a lock.
  *
- *     .bytes:  the #GBytes that contains the memory pointed to by
+ *     .bytes:  the #xbytes_t that contains the memory pointed to by
  *              .data, or %NULL if .data is %NULL.  In the event that
  *              the instance was deserialized from another instance,
  *              then the bytes will be shared by both of them.  When
  *              the instance is freed, this reference must be released
- *              with g_bytes_unref().
+ *              with xbytes_unref().
  *
  *     .data: the serialized data (of size 'size') of the instance.
  *            This pointer should not be freed or modified in any way.
- *            #GBytes is responsible for memory management.
+ *            #xbytes_t is responsible for memory management.
  *
  *            This pointer may be %NULL in two cases:
  *
@@ -157,7 +157,7 @@ struct _GVariant
  *                entire proper fixed-size of this instance.  In this
  *                case, 'size' will still be equal to the proper fixed
  *                size, but this pointer will be %NULL.  This is exactly
- *                the reason that g_variant_get_data() sometimes returns
+ *                the reason that xvariant_get_data() sometimes returns
  *                %NULL.  For all other calls, the effect should be as
  *                if .data pointed to the appropriate number of nul
  *                bytes.
@@ -171,7 +171,7 @@ struct _GVariant
  *
  *     .children: the array of the child instances of this instance.
  *                When the instance is freed (or converted to serialized
- *                form) then each child must have g_variant_unref()
+ *                form) then each child must have xvariant_unref()
  *                called on it and the array must be freed using
  *                g_free().
  *
@@ -199,10 +199,10 @@ struct _GVariant
  *
  *                   If this flag is unset it does not imply that the
  *                   data is corrupted.  It merely means that we're not
- *                   sure that it's valid.  See g_variant_is_trusted().
+ *                   sure that it's valid.  See xvariant_is_trusted().
  *
  *    STATE_FLOATING: if this flag is set then the object has a floating
- *                    reference.  See g_variant_ref_sink().
+ *                    reference.  See xvariant_ref_sink().
  *
  * ref_count: the reference count of the instance
  *
@@ -218,31 +218,31 @@ struct _GVariant
 
 /* -- private -- */
 /* < private >
- * g_variant_lock:
+ * xvariant_lock:
  * @value: a #xvariant_t
  *
  * Locks @value for performing sensitive operations.
  */
 static void
-g_variant_lock (xvariant_t *value)
+xvariant_lock (xvariant_t *value)
 {
   g_bit_lock (&value->state, 0);
 }
 
 /* < private >
- * g_variant_unlock:
+ * xvariant_unlock:
  * @value: a #xvariant_t
  *
  * Unlocks @value after performing sensitive operations.
  */
 static void
-g_variant_unlock (xvariant_t *value)
+xvariant_unlock (xvariant_t *value)
 {
   g_bit_unlock (&value->state, 0);
 }
 
 /* < private >
- * g_variant_release_children:
+ * xvariant_release_children:
  * @value: a #xvariant_t
  *
  * Releases the reference held on each child in the 'children' array of
@@ -254,7 +254,7 @@ g_variant_unlock (xvariant_t *value)
  * The current thread must hold the lock on @value.
  */
 static void
-g_variant_release_children (xvariant_t *value)
+xvariant_release_children (xvariant_t *value)
 {
   xsize_t i;
 
@@ -262,7 +262,7 @@ g_variant_release_children (xvariant_t *value)
   g_assert (~value->state & STATE_SERIALISED);
 
   for (i = 0; i < value->contents.tree.n_children; i++)
-    g_variant_unref (value->contents.tree.children[i]);
+    xvariant_unref (value->contents.tree.children[i]);
 
   g_free (value->contents.tree.children);
 }
@@ -270,13 +270,13 @@ g_variant_release_children (xvariant_t *value)
 /* This begins the main body of the recursive serializer.
  *
  * There are 3 functions here that work as a team with the serializer to
- * get things done.  g_variant_store() has a trivial role, but as a
+ * get things done.  xvariant_store() has a trivial role, but as a
  * public API function, it has its definition elsewhere.
  *
  * Note that "serialization" of an instance does not mean that the
  * instance is converted to serialized form -- it means that the
  * serialized form of an instance is written to an external buffer.
- * g_variant_ensure_serialised() (which is not part of this set of
+ * xvariant_ensure_serialised() (which is not part of this set of
  * functions) is the function that is responsible for converting an
  * instance to serialized form.
  *
@@ -291,38 +291,38 @@ g_variant_release_children (xvariant_t *value)
  *
  * Determining the size:
  *   The process of determining the size is triggered by a call to
- *   g_variant_ensure_size() on a container.  This invokes the
+ *   xvariant_ensure_size() on a container.  This invokes the
  *   serializer code to determine the size.  The serializer is passed
- *   g_variant_fill_gvs() as a callback.
+ *   xvariant_fill_gvs() as a callback.
  *
- *   g_variant_fill_gvs() is called by the serializer on each child of
- *   the container which, in turn, calls g_variant_ensure_size() on
+ *   xvariant_fill_gvs() is called by the serializer on each child of
+ *   the container which, in turn, calls xvariant_ensure_size() on
  *   itself and fills in the result of its own size calculation.
  *
  *   The serializer uses the size information from the children to
  *   calculate the size needed for the entire container.
  *
  * Writing the data:
- *   After the buffer has been allocated, g_variant_serialise() is
+ *   After the buffer has been allocated, xvariant_serialise() is
  *   called on the container.  This invokes the serializer code to write
  *   the bytes to the container.  The serializer is, again, passed
- *   g_variant_fill_gvs() as a callback.
+ *   xvariant_fill_gvs() as a callback.
  *
- *   This time, when g_variant_fill_gvs() is called for each child, the
+ *   This time, when xvariant_fill_gvs() is called for each child, the
  *   child is given a pointer to a sub-region of the allocated buffer
  *   where it should write its data.  This is done by calling
- *   g_variant_store().  In the event that the instance is in serialized
+ *   xvariant_store().  In the event that the instance is in serialized
  *   form this means a memcpy() of the serialized data into the
  *   allocated buffer.  In the event that the instance is in tree form
- *   this means a recursive call back into g_variant_serialise().
+ *   this means a recursive call back into xvariant_serialise().
  *
  *
  * The forward declaration here allows corecursion via callback:
  */
-static void g_variant_fill_gvs (GVariantSerialised *, xpointer_t);
+static void xvariant_fill_gvs (GVariantSerialised *, xpointer_t);
 
 /* < private >
- * g_variant_ensure_size:
+ * xvariant_ensure_size:
  * @value: a #xvariant_t
  *
  * Ensures that the ->size field of @value is filled in properly.  This
@@ -332,7 +332,7 @@ static void g_variant_fill_gvs (GVariantSerialised *, xpointer_t);
  * The current thread must hold the lock on @value.
  */
 static void
-g_variant_ensure_size (xvariant_t *value)
+xvariant_ensure_size (xvariant_t *value)
 {
   g_assert (value->state & STATE_LOCKED);
 
@@ -343,14 +343,14 @@ g_variant_ensure_size (xvariant_t *value)
 
       children = (xpointer_t *) value->contents.tree.children;
       n_children = value->contents.tree.n_children;
-      value->size = g_variant_serialiser_needed_size (value->type_info,
-                                                      g_variant_fill_gvs,
+      value->size = xvariant_serialiser_needed_size (value->type_info,
+                                                      xvariant_fill_gvs,
                                                       children, n_children);
     }
 }
 
 /* < private >
- * g_variant_serialise:
+ * xvariant_serialise:
  * @value: a #xvariant_t
  * @data: an appropriately-sized buffer
  *
@@ -361,7 +361,7 @@ g_variant_ensure_size (xvariant_t *value)
  * The current thread must hold the lock on @value.
  */
 static void
-g_variant_serialise (xvariant_t *value,
+xvariant_serialise (xvariant_t *value,
                      xpointer_t  data)
 {
   GVariantSerialised serialised = { 0, };
@@ -379,12 +379,12 @@ g_variant_serialise (xvariant_t *value,
   children = (xpointer_t *) value->contents.tree.children;
   n_children = value->contents.tree.n_children;
 
-  g_variant_serialiser_serialise (serialised, g_variant_fill_gvs,
+  xvariant_serialiser_serialise (serialised, xvariant_fill_gvs,
                                   children, n_children);
 }
 
 /* < private >
- * g_variant_fill_gvs:
+ * xvariant_fill_gvs:
  * @serialised: a pointer to a #GVariantSerialised
  * @data: a #xvariant_t instance
  *
@@ -400,14 +400,14 @@ g_variant_serialise (xvariant_t *value,
  *  - possibly storing its serialized form into the provided buffer
  */
 static void
-g_variant_fill_gvs (GVariantSerialised *serialised,
+xvariant_fill_gvs (GVariantSerialised *serialised,
                     xpointer_t            data)
 {
   xvariant_t *value = data;
 
-  g_variant_lock (value);
-  g_variant_ensure_size (value);
-  g_variant_unlock (value);
+  xvariant_lock (value);
+  xvariant_ensure_size (value);
+  xvariant_unlock (value);
 
   if (serialised->type_info == NULL)
     serialised->type_info = value->type_info;
@@ -419,16 +419,16 @@ g_variant_fill_gvs (GVariantSerialised *serialised,
   serialised->depth = value->depth;
 
   if (serialised->data)
-    /* g_variant_store() is a public API, so it
+    /* xvariant_store() is a public API, so it
      * it will reacquire the lock if it needs to.
      */
-    g_variant_store (value, serialised->data);
+    xvariant_store (value, serialised->data);
 }
 
 /* this ends the main body of the recursive serializer */
 
 /* < private >
- * g_variant_ensure_serialised:
+ * xvariant_ensure_serialised:
  * @value: a #xvariant_t
  *
  * Ensures that @value is in serialized form.
@@ -442,30 +442,30 @@ g_variant_fill_gvs (GVariantSerialised *serialised,
  * The current thread must hold the lock on @value.
  */
 static void
-g_variant_ensure_serialised (xvariant_t *value)
+xvariant_ensure_serialised (xvariant_t *value)
 {
   g_assert (value->state & STATE_LOCKED);
 
   if (~value->state & STATE_SERIALISED)
     {
-      GBytes *bytes;
+      xbytes_t *bytes;
       xpointer_t data;
 
-      g_variant_ensure_size (value);
+      xvariant_ensure_size (value);
       data = g_malloc (value->size);
-      g_variant_serialise (value, data);
+      xvariant_serialise (value, data);
 
-      g_variant_release_children (value);
+      xvariant_release_children (value);
 
-      bytes = g_bytes_new_take (data, value->size);
-      value->contents.serialised.data = g_bytes_get_data (bytes, NULL);
+      bytes = xbytes_new_take (data, value->size);
+      value->contents.serialised.data = xbytes_get_data (bytes, NULL);
       value->contents.serialised.bytes = bytes;
       value->state |= STATE_SERIALISED;
     }
 }
 
 /* < private >
- * g_variant_alloc:
+ * xvariant_alloc:
  * @type: the type of the new instance
  * @serialised: if the instance will be in serialised form
  * @trusted: if the instance will be trusted
@@ -477,18 +477,18 @@ g_variant_ensure_serialised (xvariant_t *value)
  * Returns: a new #xvariant_t with a floating reference
  */
 static xvariant_t *
-g_variant_alloc (const xvariant_type_t *type,
+xvariant_alloc (const xvariant_type_t *type,
                  xboolean_t            serialised,
                  xboolean_t            trusted)
 {
   xvariant_t *value;
 
   value = g_slice_new (xvariant_t);
-  value->type_info = g_variant_type_info_get (type);
+  value->type_info = xvariant_type_info_get (type);
   value->state = (serialised ? STATE_SERIALISED : 0) |
                  (trusted ? STATE_TRUSTED : 0) |
                  STATE_FLOATING;
-  value->size = (gssize) -1;
+  value->size = (xssize_t) -1;
   g_atomic_ref_count_init (&value->ref_count);
   value->depth = 0;
 
@@ -496,9 +496,9 @@ g_variant_alloc (const xvariant_type_t *type,
 }
 
 /**
- * g_variant_new_from_bytes:
+ * xvariant_new_from_bytes:
  * @type: a #xvariant_type_t
- * @bytes: a #GBytes
+ * @bytes: a #xbytes_t
  * @trusted: if the contents of @bytes are trusted
  *
  * Constructs a new serialized-mode #xvariant_t instance.  This is the
@@ -516,19 +516,19 @@ g_variant_alloc (const xvariant_type_t *type,
  * Since: 2.36
  */
 xvariant_t *
-g_variant_new_from_bytes (const xvariant_type_t *type,
-                          GBytes             *bytes,
+xvariant_new_from_bytes (const xvariant_type_t *type,
+                          xbytes_t             *bytes,
                           xboolean_t            trusted)
 {
   xvariant_t *value;
   xuint_t alignment;
   xsize_t size;
-  GBytes *owned_bytes = NULL;
+  xbytes_t *owned_bytes = NULL;
   GVariantSerialised serialised;
 
-  value = g_variant_alloc (type, TRUE, trusted);
+  value = xvariant_alloc (type, TRUE, trusted);
 
-  g_variant_type_info_query (value->type_info,
+  xvariant_type_info_query (value->type_info,
                              &alignment, &size);
 
   /* Ensure the alignment is correct. This is a huge performance hit if it’s
@@ -538,26 +538,26 @@ g_variant_new_from_bytes (const xvariant_type_t *type,
    * in testing). Callers can always actively ensure they use the correct
    * alignment to avoid the performance hit. */
   serialised.type_info = value->type_info;
-  serialised.data = (guchar *) g_bytes_get_data (bytes, &serialised.size);
+  serialised.data = (guchar *) xbytes_get_data (bytes, &serialised.size);
   serialised.depth = 0;
 
-  if (!g_variant_serialised_check (serialised))
+  if (!xvariant_serialised_check (serialised))
     {
 #ifdef HAVE_POSIX_MEMALIGN
       xpointer_t aligned_data = NULL;
-      xsize_t aligned_size = g_bytes_get_size (bytes);
+      xsize_t aligned_size = xbytes_get_size (bytes);
 
       /* posix_memalign() requires the alignment to be a multiple of
-       * sizeof(void*), and a power of 2. See g_variant_type_info_query() for
+       * sizeof(void*), and a power of 2. See xvariant_type_info_query() for
        * details on the alignment format. */
       if (posix_memalign (&aligned_data, MAX (sizeof (void *), alignment + 1),
                           aligned_size) != 0)
-        g_error ("posix_memalign failed");
+        xerror ("posix_memalign failed");
 
       if (aligned_size != 0)
-        memcpy (aligned_data, g_bytes_get_data (bytes, NULL), aligned_size);
+        memcpy (aligned_data, xbytes_get_data (bytes, NULL), aligned_size);
 
-      bytes = owned_bytes = g_bytes_new_with_free_func (aligned_data,
+      bytes = owned_bytes = xbytes_new_with_free_func (aligned_data,
                                                         aligned_size,
                                                         free, aligned_data);
       aligned_data = NULL;
@@ -566,14 +566,14 @@ g_variant_new_from_bytes (const xvariant_type_t *type,
        * have malloc() that returns non-8-aligned.  if so, we need to try
        * harder here.
        */
-      bytes = owned_bytes = g_bytes_new (g_bytes_get_data (bytes, NULL),
-                                         g_bytes_get_size (bytes));
+      bytes = owned_bytes = xbytes_new (xbytes_get_data (bytes, NULL),
+                                         xbytes_get_size (bytes));
 #endif
     }
 
-  value->contents.serialised.bytes = g_bytes_ref (bytes);
+  value->contents.serialised.bytes = xbytes_ref (bytes);
 
-  if (size && g_bytes_get_size (bytes) != size)
+  if (size && xbytes_get_size (bytes) != size)
     {
       /* Creating a fixed-sized xvariant_t with a bytes of the wrong
        * size.
@@ -587,10 +587,10 @@ g_variant_new_from_bytes (const xvariant_type_t *type,
     }
   else
     {
-      value->contents.serialised.data = g_bytes_get_data (bytes, &value->size);
+      value->contents.serialised.data = xbytes_get_data (bytes, &value->size);
     }
 
-  g_clear_pointer (&owned_bytes, g_bytes_unref);
+  g_clear_pointer (&owned_bytes, xbytes_unref);
 
   return value;
 }
@@ -598,7 +598,7 @@ g_variant_new_from_bytes (const xvariant_type_t *type,
 /* -- internal -- */
 
 /* < internal >
- * g_variant_new_from_children:
+ * xvariant_new_from_children:
  * @type: a #xvariant_type_t
  * @children: an array of #xvariant_t pointers.  Consumed.
  * @n_children: the length of @children
@@ -614,14 +614,14 @@ g_variant_new_from_bytes (const xvariant_type_t *type,
  * Returns: a new #xvariant_t with a floating reference
  */
 xvariant_t *
-g_variant_new_from_children (const xvariant_type_t  *type,
+xvariant_new_from_children (const xvariant_type_t  *type,
                              xvariant_t           **children,
                              xsize_t                n_children,
                              xboolean_t             trusted)
 {
   xvariant_t *value;
 
-  value = g_variant_alloc (type, FALSE, trusted);
+  value = xvariant_alloc (type, FALSE, trusted);
   value->contents.tree.children = children;
   value->contents.tree.n_children = n_children;
 
@@ -629,7 +629,7 @@ g_variant_new_from_children (const xvariant_type_t  *type,
 }
 
 /* < internal >
- * g_variant_get_type_info:
+ * xvariant_get_type_info:
  * @value: a #xvariant_t
  *
  * Returns the #GVariantTypeInfo corresponding to the type of @value.  A
@@ -639,13 +639,13 @@ g_variant_new_from_children (const xvariant_type_t  *type,
  * Returns: the #GVariantTypeInfo for @value
  */
 GVariantTypeInfo *
-g_variant_get_type_info (xvariant_t *value)
+xvariant_get_type_info (xvariant_t *value)
 {
   return value->type_info;
 }
 
 /* < internal >
- * g_variant_is_trusted:
+ * xvariant_is_trusted:
  * @value: a #xvariant_t
  *
  * Determines if @value is trusted by #xvariant_t to contain only
@@ -661,13 +661,13 @@ g_variant_get_type_info (xvariant_t *value)
  * Returns: if @value is trusted
  */
 xboolean_t
-g_variant_is_trusted (xvariant_t *value)
+xvariant_is_trusted (xvariant_t *value)
 {
   return (value->state & STATE_TRUSTED) != 0;
 }
 
 /* < internal >
- * g_variant_get_depth:
+ * xvariant_get_depth:
  * @value: a #xvariant_t
  *
  * Gets the nesting depth of a #xvariant_t. This is 0 for a #xvariant_t with no
@@ -676,7 +676,7 @@ g_variant_is_trusted (xvariant_t *value)
  * Returns: nesting depth of @value
  */
 xsize_t
-g_variant_get_depth (xvariant_t *value)
+xvariant_get_depth (xvariant_t *value)
 {
   return value->depth;
 }
@@ -684,7 +684,7 @@ g_variant_get_depth (xvariant_t *value)
 /* -- public -- */
 
 /**
- * g_variant_unref:
+ * xvariant_unref:
  * @value: a #xvariant_t
  *
  * Decreases the reference count of @value.  When its reference count
@@ -693,7 +693,7 @@ g_variant_get_depth (xvariant_t *value)
  * Since: 2.24
  **/
 void
-g_variant_unref (xvariant_t *value)
+xvariant_unref (xvariant_t *value)
 {
   g_return_if_fail (value != NULL);
 
@@ -705,12 +705,12 @@ g_variant_unref (xvariant_t *value)
 
       value->state |= STATE_LOCKED;
 
-      g_variant_type_info_unref (value->type_info);
+      xvariant_type_info_unref (value->type_info);
 
       if (value->state & STATE_SERIALISED)
-        g_bytes_unref (value->contents.serialised.bytes);
+        xbytes_unref (value->contents.serialised.bytes);
       else
-        g_variant_release_children (value);
+        xvariant_release_children (value);
 
       memset (value, 0, sizeof (xvariant_t));
       g_slice_free (xvariant_t, value);
@@ -718,7 +718,7 @@ g_variant_unref (xvariant_t *value)
 }
 
 /**
- * g_variant_ref:
+ * xvariant_ref:
  * @value: a #xvariant_t
  *
  * Increases the reference count of @value.
@@ -728,7 +728,7 @@ g_variant_unref (xvariant_t *value)
  * Since: 2.24
  **/
 xvariant_t *
-g_variant_ref (xvariant_t *value)
+xvariant_ref (xvariant_t *value)
 {
   g_return_val_if_fail (value != NULL, NULL);
 
@@ -738,16 +738,16 @@ g_variant_ref (xvariant_t *value)
 }
 
 /**
- * g_variant_ref_sink:
+ * xvariant_ref_sink:
  * @value: a #xvariant_t
  *
  * #xvariant_t uses a floating reference count system.  All functions with
- * names starting with `g_variant_new_` return floating
+ * names starting with `xvariant_new_` return floating
  * references.
  *
- * Calling g_variant_ref_sink() on a #xvariant_t with a floating reference
+ * Calling xvariant_ref_sink() on a #xvariant_t with a floating reference
  * will convert the floating reference into a full reference.  Calling
- * g_variant_ref_sink() on a non-floating #xvariant_t results in an
+ * xvariant_ref_sink() on a non-floating #xvariant_t results in an
  * additional normal reference being added.
  *
  * In other words, if the @value is floating, then this call "assumes
@@ -756,7 +756,7 @@ g_variant_ref (xvariant_t *value)
  * new normal reference increasing the reference count by one.
  *
  * All calls that result in a #xvariant_t instance being inserted into a
- * container will call g_variant_ref_sink() on the instance.  This means
+ * container will call xvariant_ref_sink() on the instance.  This means
  * that if the value was just created (and has only its floating
  * reference) then the container will assume sole ownership of the value
  * at that point and the caller will not need to unreference it.  This
@@ -769,30 +769,30 @@ g_variant_ref (xvariant_t *value)
  * Since: 2.24
  **/
 xvariant_t *
-g_variant_ref_sink (xvariant_t *value)
+xvariant_ref_sink (xvariant_t *value)
 {
   g_return_val_if_fail (value != NULL, NULL);
   g_return_val_if_fail (!g_atomic_ref_count_compare (&value->ref_count, 0), NULL);
 
-  g_variant_lock (value);
+  xvariant_lock (value);
 
   if (~value->state & STATE_FLOATING)
-    g_variant_ref (value);
+    xvariant_ref (value);
   else
     value->state &= ~STATE_FLOATING;
 
-  g_variant_unlock (value);
+  xvariant_unlock (value);
 
   return value;
 }
 
 /**
- * g_variant_take_ref:
+ * xvariant_take_ref:
  * @value: a #xvariant_t
  *
  * If @value is floating, sink it.  Otherwise, do nothing.
  *
- * Typically you want to use g_variant_ref_sink() in order to
+ * Typically you want to use xvariant_ref_sink() in order to
  * automatically do the correct thing with respect to floating or
  * non-floating references, but there is one specific scenario where
  * this function is helpful.
@@ -815,10 +815,10 @@ g_variant_ref_sink (xvariant_t *value)
  * that has been converted to a full reference.
  *
  * This function has an odd interaction when combined with
- * g_variant_ref_sink() running at the same time in another thread on
- * the same #xvariant_t instance.  If g_variant_ref_sink() runs first then
+ * xvariant_ref_sink() running at the same time in another thread on
+ * the same #xvariant_t instance.  If xvariant_ref_sink() runs first then
  * the result will be that the floating reference is converted to a hard
- * reference.  If g_variant_take_ref() runs first then the result will
+ * reference.  If xvariant_take_ref() runs first then the result will
  * be that the floating reference is converted to a hard reference and
  * an additional reference on top of that one is added.  It is best to
  * avoid this situation.
@@ -826,7 +826,7 @@ g_variant_ref_sink (xvariant_t *value)
  * Returns: the same @value
  **/
 xvariant_t *
-g_variant_take_ref (xvariant_t *value)
+xvariant_take_ref (xvariant_t *value)
 {
   g_return_val_if_fail (value != NULL, NULL);
   g_return_val_if_fail (!g_atomic_ref_count_compare (&value->ref_count, 0), NULL);
@@ -837,17 +837,17 @@ g_variant_take_ref (xvariant_t *value)
 }
 
 /**
- * g_variant_is_floating:
+ * xvariant_is_floating:
  * @value: a #xvariant_t
  *
  * Checks whether @value has a floating reference count.
  *
  * This function should only ever be used to assert that a given variant
  * is or is not floating, or for debug purposes. To acquire a reference
- * to a variant that might be floating, always use g_variant_ref_sink()
- * or g_variant_take_ref().
+ * to a variant that might be floating, always use xvariant_ref_sink()
+ * or xvariant_take_ref().
  *
- * See g_variant_ref_sink() for more information about floating reference
+ * See xvariant_ref_sink() for more information about floating reference
  * counts.
  *
  * Returns: whether @value is floating
@@ -855,7 +855,7 @@ g_variant_take_ref (xvariant_t *value)
  * Since: 2.26
  **/
 xboolean_t
-g_variant_is_floating (xvariant_t *value)
+xvariant_is_floating (xvariant_t *value)
 {
   g_return_val_if_fail (value != NULL, FALSE);
 
@@ -863,11 +863,11 @@ g_variant_is_floating (xvariant_t *value)
 }
 
 /**
- * g_variant_get_size:
+ * xvariant_get_size:
  * @value: a #xvariant_t instance
  *
  * Determines the number of bytes that would be required to store @value
- * with g_variant_store().
+ * with xvariant_store().
  *
  * If @value has a fixed-sized type then this function always returned
  * that fixed size.
@@ -883,17 +883,17 @@ g_variant_is_floating (xvariant_t *value)
  * Since: 2.24
  **/
 xsize_t
-g_variant_get_size (xvariant_t *value)
+xvariant_get_size (xvariant_t *value)
 {
-  g_variant_lock (value);
-  g_variant_ensure_size (value);
-  g_variant_unlock (value);
+  xvariant_lock (value);
+  xvariant_ensure_size (value);
+  xvariant_unlock (value);
 
   return value->size;
 }
 
 /**
- * g_variant_get_data:
+ * xvariant_get_data:
  * @value: a #xvariant_t instance
  *
  * Returns a pointer to the serialized form of a #xvariant_t instance.
@@ -926,42 +926,42 @@ g_variant_get_size (xvariant_t *value)
  *
  * Since: 2.24
  **/
-gconstpointer
-g_variant_get_data (xvariant_t *value)
+xconstpointer
+xvariant_get_data (xvariant_t *value)
 {
-  g_variant_lock (value);
-  g_variant_ensure_serialised (value);
-  g_variant_unlock (value);
+  xvariant_lock (value);
+  xvariant_ensure_serialised (value);
+  xvariant_unlock (value);
 
   return value->contents.serialised.data;
 }
 
 /**
- * g_variant_get_data_as_bytes:
+ * xvariant_get_data_as_bytes:
  * @value: a #xvariant_t
  *
  * Returns a pointer to the serialized form of a #xvariant_t instance.
  * The semantics of this function are exactly the same as
- * g_variant_get_data(), except that the returned #GBytes holds
+ * xvariant_get_data(), except that the returned #xbytes_t holds
  * a reference to the variant data.
  *
- * Returns: (transfer full): A new #GBytes representing the variant data
+ * Returns: (transfer full): A new #xbytes_t representing the variant data
  *
  * Since: 2.36
  */
-GBytes *
-g_variant_get_data_as_bytes (xvariant_t *value)
+xbytes_t *
+xvariant_get_data_as_bytes (xvariant_t *value)
 {
   const xchar_t *bytes_data;
   const xchar_t *data;
   xsize_t bytes_size;
   xsize_t size;
 
-  g_variant_lock (value);
-  g_variant_ensure_serialised (value);
-  g_variant_unlock (value);
+  xvariant_lock (value);
+  xvariant_ensure_serialised (value);
+  xvariant_unlock (value);
 
-  bytes_data = g_bytes_get_data (value->contents.serialised.bytes, &bytes_size);
+  bytes_data = xbytes_get_data (value->contents.serialised.bytes, &bytes_size);
   data = value->contents.serialised.data;
   size = value->size;
 
@@ -972,15 +972,15 @@ g_variant_get_data_as_bytes (xvariant_t *value)
     }
 
   if (data == bytes_data && size == bytes_size)
-    return g_bytes_ref (value->contents.serialised.bytes);
+    return xbytes_ref (value->contents.serialised.bytes);
   else
-    return g_bytes_new_from_bytes (value->contents.serialised.bytes,
+    return xbytes_new_from_bytes (value->contents.serialised.bytes,
                                    data - bytes_data, size);
 }
 
 
 /**
- * g_variant_n_children:
+ * xvariant_n_children:
  * @value: a container #xvariant_t
  *
  * Determines the number of children in a container #xvariant_t instance.
@@ -1000,11 +1000,11 @@ g_variant_get_data_as_bytes (xvariant_t *value)
  * Since: 2.24
  **/
 xsize_t
-g_variant_n_children (xvariant_t *value)
+xvariant_n_children (xvariant_t *value)
 {
   xsize_t n_children;
 
-  g_variant_lock (value);
+  xvariant_lock (value);
 
   if (value->state & STATE_SERIALISED)
     {
@@ -1015,18 +1015,18 @@ g_variant_n_children (xvariant_t *value)
         value->depth,
       };
 
-      n_children = g_variant_serialised_n_children (serialised);
+      n_children = xvariant_serialised_n_children (serialised);
     }
   else
     n_children = value->contents.tree.n_children;
 
-  g_variant_unlock (value);
+  xvariant_unlock (value);
 
   return n_children;
 }
 
 /**
- * g_variant_get_child_value:
+ * xvariant_get_child_value:
  * @value: a container #xvariant_t
  * @index_: the index of the child to fetch
  *
@@ -1036,16 +1036,16 @@ g_variant_n_children (xvariant_t *value)
  * #xvariant_t.
  *
  * It is an error if @index_ is greater than the number of child items
- * in the container.  See g_variant_n_children().
+ * in the container.  See xvariant_n_children().
  *
  * The returned value is never floating.  You should free it with
- * g_variant_unref() when you're done with it.
+ * xvariant_unref() when you're done with it.
  *
  * Note that values borrowed from the returned child are not guaranteed to
  * still be valid after the child is freed even if you still hold a reference
  * to @value, if @value has not been serialized at the time this function is
  * called. To avoid this, you can serialize @value by calling
- * g_variant_get_data() and optionally ignoring the return value.
+ * xvariant_get_data() and optionally ignoring the return value.
  *
  * There may be implementation specific restrictions on deeply nested values,
  * which would result in the unit tuple being returned as the child value,
@@ -1059,27 +1059,27 @@ g_variant_n_children (xvariant_t *value)
  * Since: 2.24
  **/
 xvariant_t *
-g_variant_get_child_value (xvariant_t *value,
+xvariant_get_child_value (xvariant_t *value,
                            xsize_t     index_)
 {
-  g_return_val_if_fail (index_ < g_variant_n_children (value), NULL);
+  g_return_val_if_fail (index_ < xvariant_n_children (value), NULL);
   g_return_val_if_fail (value->depth < G_MAXSIZE, NULL);
 
   if (~g_atomic_int_get (&value->state) & STATE_SERIALISED)
     {
-      g_variant_lock (value);
+      xvariant_lock (value);
 
       if (~value->state & STATE_SERIALISED)
         {
           xvariant_t *child;
 
-          child = g_variant_ref (value->contents.tree.children[index_]);
-          g_variant_unlock (value);
+          child = xvariant_ref (value->contents.tree.children[index_]);
+          xvariant_unlock (value);
 
           return child;
         }
 
-      g_variant_unlock (value);
+      xvariant_unlock (value);
     }
 
   {
@@ -1095,7 +1095,7 @@ g_variant_get_child_value (xvariant_t *value,
     /* get the serializer to extract the serialized data for the child
      * from the serialized data for the container
      */
-    s_child = g_variant_serialised_get_child (serialised, index_);
+    s_child = xvariant_serialised_get_child (serialised, index_);
 
     /* Check whether this would cause nesting too deep. If so, return a fake
      * child. The only situation we expect this to happen in is with a variant,
@@ -1104,11 +1104,11 @@ g_variant_get_child_value (xvariant_t *value,
      * the depth of its child is too great, return a unit variant () instead of
      * the real child. */
     if (!(value->state & STATE_TRUSTED) &&
-        g_variant_type_info_query_depth (s_child.type_info) >=
+        xvariant_type_info_query_depth (s_child.type_info) >=
         G_VARIANT_MAX_RECURSION_DEPTH - value->depth)
       {
-        g_assert (g_variant_is_of_type (value, G_VARIANT_TYPE_VARIANT));
-        return g_variant_new_tuple (NULL, 0);
+        g_assert (xvariant_is_of_type (value, G_VARIANT_TYPE_VARIANT));
+        return xvariant_new_tuple (NULL, 0);
       }
 
     /* create a new serialized instance out of it */
@@ -1120,7 +1120,7 @@ g_variant_get_child_value (xvariant_t *value,
     g_atomic_ref_count_init (&child->ref_count);
     child->depth = value->depth + 1;
     child->contents.serialised.bytes =
-      g_bytes_ref (value->contents.serialised.bytes);
+      xbytes_ref (value->contents.serialised.bytes);
     child->contents.serialised.data = s_child.data;
 
     return child;
@@ -1128,18 +1128,18 @@ g_variant_get_child_value (xvariant_t *value,
 }
 
 /**
- * g_variant_store:
+ * xvariant_store:
  * @value: the #xvariant_t to store
  * @data: (not nullable): the location to store the serialized data at
  *
  * Stores the serialized form of @value at @data.  @data should be
- * large enough.  See g_variant_get_size().
+ * large enough.  See xvariant_get_size().
  *
  * The stored data is in machine native byte order but may not be in
  * fully-normalised form if read from an untrusted source.  See
- * g_variant_get_normal_form() for a solution.
+ * xvariant_get_normal_form() for a solution.
  *
- * As with g_variant_get_data(), to be able to deserialize the
+ * As with xvariant_get_data(), to be able to deserialize the
  * serialized variant successfully, its type and (if the destination
  * machine might be different) its endianness must also be available.
  *
@@ -1148,10 +1148,10 @@ g_variant_get_child_value (xvariant_t *value,
  * Since: 2.24
  **/
 void
-g_variant_store (xvariant_t *value,
+xvariant_store (xvariant_t *value,
                  xpointer_t  data)
 {
-  g_variant_lock (value);
+  xvariant_lock (value);
 
   if (value->state & STATE_SERIALISED)
     {
@@ -1161,20 +1161,20 @@ g_variant_store (xvariant_t *value,
         memset (data, 0, value->size);
     }
   else
-    g_variant_serialise (value, data);
+    xvariant_serialise (value, data);
 
-  g_variant_unlock (value);
+  xvariant_unlock (value);
 }
 
 /**
- * g_variant_is_normal_form:
+ * xvariant_is_normal_form:
  * @value: a #xvariant_t instance
  *
  * Checks if @value is in normal form.
  *
  * The main reason to do this is to detect if a given chunk of
  * serialized data is in normal form: load the data into a #xvariant_t
- * using g_variant_new_from_data() and then use this function to
+ * using xvariant_new_from_data() and then use this function to
  * check.
  *
  * If @value is found to be in normal form then it will be marked as
@@ -1189,12 +1189,12 @@ g_variant_store (xvariant_t *value,
  * Since: 2.24
  **/
 xboolean_t
-g_variant_is_normal_form (xvariant_t *value)
+xvariant_is_normal_form (xvariant_t *value)
 {
   if (value->state & STATE_TRUSTED)
     return TRUE;
 
-  g_variant_lock (value);
+  xvariant_lock (value);
 
   if (value->depth >= G_VARIANT_MAX_RECURSION_DEPTH)
     return FALSE;
@@ -1208,7 +1208,7 @@ g_variant_is_normal_form (xvariant_t *value)
         value->depth
       };
 
-      if (g_variant_serialised_is_normal (serialised))
+      if (xvariant_serialised_is_normal (serialised))
         value->state |= STATE_TRUSTED;
     }
   else
@@ -1217,13 +1217,13 @@ g_variant_is_normal_form (xvariant_t *value)
       xsize_t i;
 
       for (i = 0; i < value->contents.tree.n_children; i++)
-        normal &= g_variant_is_normal_form (value->contents.tree.children[i]);
+        normal &= xvariant_is_normal_form (value->contents.tree.children[i]);
 
       if (normal)
         value->state |= STATE_TRUSTED;
     }
 
-  g_variant_unlock (value);
+  xvariant_unlock (value);
 
   return (value->state & STATE_TRUSTED) != 0;
 }

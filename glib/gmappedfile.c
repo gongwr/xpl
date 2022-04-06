@@ -70,10 +70,10 @@
 #endif
 
 /**
- * GMappedFile:
+ * xmapped_file_t:
  *
- * The #GMappedFile represents a file mapping created with
- * g_mapped_file_new(). It has only private members and should
+ * The #xmapped_file_t represents a file mapping created with
+ * xmapped_file_new(). It has only private members and should
  * not be accessed directly.
  */
 
@@ -89,7 +89,7 @@ struct _GMappedFile
 };
 
 static void
-g_mapped_file_destroy (GMappedFile *file)
+xmapped_file_destroy (xmapped_file_t *file)
 {
   if (file->length)
     {
@@ -102,36 +102,36 @@ g_mapped_file_destroy (GMappedFile *file)
 #endif
     }
 
-  g_slice_free (GMappedFile, file);
+  g_slice_free (xmapped_file_t, file);
 }
 
-static GMappedFile*
+static xmapped_file_t*
 mapped_file_new_from_fd (int           fd,
 			 xboolean_t      writable,
                          const xchar_t  *filename,
                          xerror_t      **error)
 {
-  GMappedFile *file;
+  xmapped_file_t *file;
   struct stat st;
 
-  file = g_slice_new0 (GMappedFile);
+  file = g_slice_new0 (xmapped_file_t);
   file->ref_count = 1;
-  file->free_func = g_mapped_file_destroy;
+  file->free_func = xmapped_file_destroy;
 
   if (fstat (fd, &st) == -1)
     {
       int save_errno = errno;
-      xchar_t *display_filename = filename ? g_filename_display_name (filename) : NULL;
+      xchar_t *display_filename = filename ? xfilename_display_name (filename) : NULL;
 
       g_set_error (error,
-                   G_FILE_ERROR,
-                   g_file_error_from_errno (save_errno),
+                   XFILE_ERROR,
+                   xfile_error_from_errno (save_errno),
                    _("Failed to get attributes of file “%s%s%s%s”: fstat() failed: %s"),
 		   display_filename ? display_filename : "fd",
 		   display_filename ? "' " : "",
 		   display_filename ? display_filename : "",
 		   display_filename ? "'" : "",
-		   g_strerror (save_errno));
+		   xstrerror (save_errno));
       g_free (display_filename);
       goto out;
     }
@@ -187,17 +187,17 @@ mapped_file_new_from_fd (int           fd,
   if (file->contents == MAP_FAILED)
     {
       int save_errno = errno;
-      xchar_t *display_filename = filename ? g_filename_display_name (filename) : NULL;
+      xchar_t *display_filename = filename ? xfilename_display_name (filename) : NULL;
 
       g_set_error (error,
-		   G_FILE_ERROR,
-		   g_file_error_from_errno (save_errno),
+		   XFILE_ERROR,
+		   xfile_error_from_errno (save_errno),
 		   _("Failed to map %s%s%s%s: mmap() failed: %s"),
 		   display_filename ? display_filename : "fd",
 		   display_filename ? "' " : "",
 		   display_filename ? display_filename : "",
 		   display_filename ? "'" : "",
-		   g_strerror (save_errno));
+		   xstrerror (save_errno));
       g_free (display_filename);
       goto out;
     }
@@ -205,13 +205,13 @@ mapped_file_new_from_fd (int           fd,
   return file;
 
  out:
-  g_slice_free (GMappedFile, file);
+  g_slice_free (xmapped_file_t, file);
 
   return NULL;
 }
 
 /**
- * g_mapped_file_new:
+ * xmapped_file_new:
  * @filename: (type filename): The path of the file to load, in the GLib
  *     filename encoding
  * @writable: whether the mapping should be writable
@@ -225,26 +225,26 @@ mapped_file_new_from_fd (int           fd,
  * written back to the file.
  *
  * Note that modifications of the underlying file might affect the contents
- * of the #GMappedFile. Therefore, mapping should only be used if the file
+ * of the #xmapped_file_t. Therefore, mapping should only be used if the file
  * will not be modified, or if all modifications of the file are done
- * atomically (e.g. using g_file_set_contents()).
+ * atomically (e.g. using xfile_set_contents()).
  *
  * If @filename is the name of an empty, regular file, the function
- * will successfully return an empty #GMappedFile. In other cases of
+ * will successfully return an empty #xmapped_file_t. In other cases of
  * size 0 (e.g. device files such as /dev/null), @error will be set
- * to the #GFileError value %G_FILE_ERROR_INVAL.
+ * to the #GFileError value %XFILE_ERROR_INVAL.
  *
- * Returns: a newly allocated #GMappedFile which must be unref'd
- *    with g_mapped_file_unref(), or %NULL if the mapping failed.
+ * Returns: a newly allocated #xmapped_file_t which must be unref'd
+ *    with xmapped_file_unref(), or %NULL if the mapping failed.
  *
  * Since: 2.8
  */
-GMappedFile *
-g_mapped_file_new (const xchar_t  *filename,
+xmapped_file_t *
+xmapped_file_new (const xchar_t  *filename,
 		   xboolean_t      writable,
 		   xerror_t      **error)
 {
-  GMappedFile *file;
+  xmapped_file_t *file;
   int fd;
 
   g_return_val_if_fail (filename != NULL, NULL);
@@ -254,14 +254,14 @@ g_mapped_file_new (const xchar_t  *filename,
   if (fd == -1)
     {
       int save_errno = errno;
-      xchar_t *display_filename = g_filename_display_name (filename);
+      xchar_t *display_filename = xfilename_display_name (filename);
 
       g_set_error (error,
-                   G_FILE_ERROR,
-                   g_file_error_from_errno (save_errno),
+                   XFILE_ERROR,
+                   xfile_error_from_errno (save_errno),
                    _("Failed to open file “%s”: open() failed: %s"),
                    display_filename,
-		   g_strerror (save_errno));
+		   xstrerror (save_errno));
       g_free (display_filename);
       return NULL;
     }
@@ -275,7 +275,7 @@ g_mapped_file_new (const xchar_t  *filename,
 
 
 /**
- * g_mapped_file_new_from_fd:
+ * xmapped_file_new_from_fd:
  * @fd: The file descriptor of the file to load
  * @writable: whether the mapping should be writable
  * @error: return location for a #xerror_t, or %NULL
@@ -288,17 +288,17 @@ g_mapped_file_new (const xchar_t  *filename,
  * written back to the file.
  *
  * Note that modifications of the underlying file might affect the contents
- * of the #GMappedFile. Therefore, mapping should only be used if the file
+ * of the #xmapped_file_t. Therefore, mapping should only be used if the file
  * will not be modified, or if all modifications of the file are done
- * atomically (e.g. using g_file_set_contents()).
+ * atomically (e.g. using xfile_set_contents()).
  *
- * Returns: a newly allocated #GMappedFile which must be unref'd
- *    with g_mapped_file_unref(), or %NULL if the mapping failed.
+ * Returns: a newly allocated #xmapped_file_t which must be unref'd
+ *    with xmapped_file_unref(), or %NULL if the mapping failed.
  *
  * Since: 2.32
  */
-GMappedFile *
-g_mapped_file_new_from_fd (xint_t          fd,
+xmapped_file_t *
+xmapped_file_new_from_fd (xint_t          fd,
 			   xboolean_t      writable,
 			   xerror_t      **error)
 {
@@ -306,17 +306,17 @@ g_mapped_file_new_from_fd (xint_t          fd,
 }
 
 /**
- * g_mapped_file_get_length:
- * @file: a #GMappedFile
+ * xmapped_file_get_length:
+ * @file: a #xmapped_file_t
  *
- * Returns the length of the contents of a #GMappedFile.
+ * Returns the length of the contents of a #xmapped_file_t.
  *
  * Returns: the length of the contents of @file.
  *
  * Since: 2.8
  */
 xsize_t
-g_mapped_file_get_length (GMappedFile *file)
+xmapped_file_get_length (xmapped_file_t *file)
 {
   g_return_val_if_fail (file != NULL, 0);
 
@@ -324,13 +324,13 @@ g_mapped_file_get_length (GMappedFile *file)
 }
 
 /**
- * g_mapped_file_get_contents:
- * @file: a #GMappedFile
+ * xmapped_file_get_contents:
+ * @file: a #xmapped_file_t
  *
- * Returns the contents of a #GMappedFile.
+ * Returns the contents of a #xmapped_file_t.
  *
  * Note that the contents may not be zero-terminated,
- * even if the #GMappedFile is backed by a text file.
+ * even if the #xmapped_file_t is backed by a text file.
  *
  * If the file is empty then %NULL is returned.
  *
@@ -339,7 +339,7 @@ g_mapped_file_get_length (GMappedFile *file)
  * Since: 2.8
  */
 xchar_t *
-g_mapped_file_get_contents (GMappedFile *file)
+xmapped_file_get_contents (xmapped_file_t *file)
 {
   g_return_val_if_fail (file != NULL, NULL);
 
@@ -347,34 +347,34 @@ g_mapped_file_get_contents (GMappedFile *file)
 }
 
 /**
- * g_mapped_file_free:
- * @file: a #GMappedFile
+ * xmapped_file_free:
+ * @file: a #xmapped_file_t
  *
- * This call existed before #GMappedFile had refcounting and is currently
- * exactly the same as g_mapped_file_unref().
+ * This call existed before #xmapped_file_t had refcounting and is currently
+ * exactly the same as xmapped_file_unref().
  *
  * Since: 2.8
- * Deprecated:2.22: Use g_mapped_file_unref() instead.
+ * Deprecated:2.22: Use xmapped_file_unref() instead.
  */
 void
-g_mapped_file_free (GMappedFile *file)
+xmapped_file_free (xmapped_file_t *file)
 {
-  g_mapped_file_unref (file);
+  xmapped_file_unref (file);
 }
 
 /**
- * g_mapped_file_ref:
- * @file: a #GMappedFile
+ * xmapped_file_ref:
+ * @file: a #xmapped_file_t
  *
  * Increments the reference count of @file by one.  It is safe to call
  * this function from any thread.
  *
- * Returns: the passed in #GMappedFile.
+ * Returns: the passed in #xmapped_file_t.
  *
  * Since: 2.22
  **/
-GMappedFile *
-g_mapped_file_ref (GMappedFile *file)
+xmapped_file_t *
+xmapped_file_ref (xmapped_file_t *file)
 {
   g_return_val_if_fail (file != NULL, NULL);
 
@@ -384,8 +384,8 @@ g_mapped_file_ref (GMappedFile *file)
 }
 
 /**
- * g_mapped_file_unref:
- * @file: a #GMappedFile
+ * xmapped_file_unref:
+ * @file: a #xmapped_file_t
  *
  * Decrements the reference count of @file by one.  If the reference count
  * drops to 0, unmaps the buffer of @file and frees it.
@@ -395,34 +395,34 @@ g_mapped_file_ref (GMappedFile *file)
  * Since 2.22
  **/
 void
-g_mapped_file_unref (GMappedFile *file)
+xmapped_file_unref (xmapped_file_t *file)
 {
   g_return_if_fail (file != NULL);
 
   if (g_atomic_int_dec_and_test (&file->ref_count))
-    g_mapped_file_destroy (file);
+    xmapped_file_destroy (file);
 }
 
 /**
- * g_mapped_file_get_bytes:
- * @file: a #GMappedFile
+ * xmapped_file_get_bytes:
+ * @file: a #xmapped_file_t
  *
- * Creates a new #GBytes which references the data mapped from @file.
+ * Creates a new #xbytes_t which references the data mapped from @file.
  * The mapped contents of the file must not be modified after creating this
- * bytes object, because a #GBytes should be immutable.
+ * bytes object, because a #xbytes_t should be immutable.
  *
- * Returns: (transfer full): A newly allocated #GBytes referencing data
+ * Returns: (transfer full): A newly allocated #xbytes_t referencing data
  *     from @file
  *
  * Since: 2.34
  **/
-GBytes *
-g_mapped_file_get_bytes (GMappedFile *file)
+xbytes_t *
+xmapped_file_get_bytes (xmapped_file_t *file)
 {
   g_return_val_if_fail (file != NULL, NULL);
 
-  return g_bytes_new_with_free_func (file->contents,
+  return xbytes_new_with_free_func (file->contents,
 				     file->length,
-				     (GDestroyNotify) g_mapped_file_unref,
-				     g_mapped_file_ref (file));
+				     (xdestroy_notify_t) xmapped_file_unref,
+				     xmapped_file_ref (file));
 }

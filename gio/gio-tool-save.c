@@ -65,28 +65,28 @@ static xboolean_t
 save (xfile_t *file)
 {
   xoutput_stream_t *out;
-  GFileCreateFlags flags;
+  xfile_create_flags_t flags;
   char *buffer;
-  gssize res;
+  xssize_t res;
   xboolean_t close_res;
   xerror_t *error;
   xboolean_t save_res;
 
   error = NULL;
 
-  flags = priv ? G_FILE_CREATE_PRIVATE : G_FILE_CREATE_NONE;
-  flags |= replace_dest ? G_FILE_CREATE_REPLACE_DESTINATION : 0;
+  flags = priv ? XFILE_CREATE_PRIVATE : XFILE_CREATE_NONE;
+  flags |= replace_dest ? XFILE_CREATE_REPLACE_DESTINATION : 0;
 
   if (create)
-    out = (xoutput_stream_t *)g_file_create (file, flags, NULL, &error);
+    out = (xoutput_stream_t *)xfile_create (file, flags, NULL, &error);
   else if (append)
-    out = (xoutput_stream_t *)g_file_append_to (file, flags, NULL, &error);
+    out = (xoutput_stream_t *)xfile_append_to (file, flags, NULL, &error);
   else
-    out = (xoutput_stream_t *)g_file_replace (file, etag, backup, flags, NULL, &error);
+    out = (xoutput_stream_t *)xfile_replace (file, etag, backup, flags, NULL, &error);
   if (out == NULL)
     {
       print_file_error (file, error->message);
-      g_error_free (error);
+      xerror_free (error);
       return FALSE;
     }
 
@@ -98,7 +98,7 @@ save (xfile_t *file)
       res = read (STDIN_FILENO, buffer, STREAM_BUFFER_SIZE);
       if (res > 0)
 	{
-          g_output_stream_write_all (out, buffer, res, NULL, NULL, &error);
+          xoutput_stream_write_all (out, buffer, res, NULL, NULL, &error);
           if (error != NULL)
             {
               save_res = FALSE;
@@ -119,18 +119,18 @@ save (xfile_t *file)
 
  out:
 
-  close_res = g_output_stream_close (out, NULL, &error);
+  close_res = xoutput_stream_close (out, NULL, &error);
   if (!close_res)
     {
       save_res = FALSE;
       print_file_error (file, error->message);
-      g_error_free (error);
+      xerror_free (error);
     }
 
   if (close_res && print_etag)
     {
       char *etag;
-      etag = g_file_output_stream_get_etag (G_FILE_OUTPUT_STREAM (out));
+      etag = xfile_output_stream_get_etag (XFILE_OUTPUT_STREAM (out));
 
       if (etag)
 	g_print ("Etag: %s\n", etag);
@@ -140,7 +140,7 @@ save (xfile_t *file)
       g_free (etag);
     }
 
-  g_object_unref (out);
+  xobject_unref (out);
   g_free (buffer);
 
   return save_res;
@@ -149,7 +149,7 @@ save (xfile_t *file)
 int
 handle_save (int argc, char *argv[], xboolean_t do_help)
 {
-  GOptionContext *context;
+  xoption_context_t *context;
   xerror_t *error = NULL;
   xfile_t *file;
   xboolean_t res;
@@ -173,7 +173,7 @@ handle_save (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      g_error_free (error);
+      xerror_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -194,9 +194,9 @@ handle_save (int argc, char *argv[], xboolean_t do_help)
 
   g_option_context_free (context);
 
-  file = g_file_new_for_commandline_arg (argv[1]);
+  file = xfile_new_for_commandline_arg (argv[1]);
   res = save (file);
-  g_object_unref (file);
+  xobject_unref (file);
 
   return res ? 0 : 2;
 }

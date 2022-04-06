@@ -14,17 +14,17 @@ test_basic_for_file (xfile_t       *file,
 {
   xchar_t *s;
 
-  s = g_file_get_basename (file);
+  s = xfile_get_basename (file);
   g_assert_cmpstr (s, ==, "testfile");
   g_free (s);
 
-  s = g_file_get_uri (file);
-  g_assert_true (g_str_has_prefix (s, "file://"));
-  g_assert_true (g_str_has_suffix (s, suffix));
+  s = xfile_get_uri (file);
+  g_assert_true (xstr_has_prefix (s, "file://"));
+  g_assert_true (xstr_has_suffix (s, suffix));
   g_free (s);
 
-  g_assert_true (g_file_has_uri_scheme (file, "file"));
-  s = g_file_get_uri_scheme (file);
+  g_assert_true (xfile_has_uri_scheme (file, "file"));
+  s = xfile_get_uri_scheme (file);
   g_assert_cmpstr (s, ==, "file");
   g_free (s);
 }
@@ -34,9 +34,9 @@ test_basic (void)
 {
   xfile_t *file;
 
-  file = g_file_new_for_path ("./some/directory/testfile");
+  file = xfile_new_for_path ("./some/directory/testfile");
   test_basic_for_file (file, "/some/directory/testfile");
-  g_object_unref (file);
+  xobject_unref (file);
 }
 
 static void
@@ -44,13 +44,13 @@ test_build_filename (void)
 {
   xfile_t *file;
 
-  file = g_file_new_build_filename (".", "some", "directory", "testfile", NULL);
+  file = xfile_new_build_filename (".", "some", "directory", "testfile", NULL);
   test_basic_for_file (file, "/some/directory/testfile");
-  g_object_unref (file);
+  xobject_unref (file);
 
-  file = g_file_new_build_filename ("testfile", NULL);
+  file = xfile_new_build_filename ("testfile", NULL);
   test_basic_for_file (file, "/testfile");
-  g_object_unref (file);
+  xobject_unref (file);
 }
 
 static void
@@ -61,21 +61,21 @@ test_parent (void)
   xfile_t *parent;
   xfile_t *root;
 
-  file = g_file_new_for_path ("./some/directory/testfile");
-  file2 = g_file_new_for_path ("./some/directory");
-  root = g_file_new_for_path ("/");
+  file = xfile_new_for_path ("./some/directory/testfile");
+  file2 = xfile_new_for_path ("./some/directory");
+  root = xfile_new_for_path ("/");
 
-  g_assert_true (g_file_has_parent (file, file2));
+  g_assert_true (xfile_has_parent (file, file2));
 
-  parent = g_file_get_parent (file);
-  g_assert_true (g_file_equal (parent, file2));
-  g_object_unref (parent);
+  parent = xfile_get_parent (file);
+  g_assert_true (xfile_equal (parent, file2));
+  xobject_unref (parent);
 
-  g_assert_null (g_file_get_parent (root));
+  g_assert_null (xfile_get_parent (root));
 
-  g_object_unref (file);
-  g_object_unref (file2);
-  g_object_unref (root);
+  xobject_unref (file);
+  xobject_unref (file2);
+  xobject_unref (root);
 }
 
 static void
@@ -85,16 +85,16 @@ test_child (void)
   xfile_t *child;
   xfile_t *child2;
 
-  file = g_file_new_for_path ("./some/directory");
-  child = g_file_get_child (file, "child");
-  g_assert_true (g_file_has_parent (child, file));
+  file = xfile_new_for_path ("./some/directory");
+  child = xfile_get_child (file, "child");
+  g_assert_true (xfile_has_parent (child, file));
 
-  child2 = g_file_get_child_for_display_name (file, "child2", NULL);
-  g_assert_true (g_file_has_parent (child2, file));
+  child2 = xfile_get_child_for_display_name (file, "child2", NULL);
+  g_assert_true (xfile_has_parent (child2, file));
 
-  g_object_unref (child);
-  g_object_unref (child2);
-  g_object_unref (file);
+  xobject_unref (child);
+  xobject_unref (child2);
+  xobject_unref (file);
 }
 
 static void
@@ -106,15 +106,15 @@ test_empty_path (void)
   g_test_summary ("Check that creating a file with an empty path results in errors");
 
   /* Creating the file must always succeed. */
-  file = g_file_new_for_path ("");
+  file = xfile_new_for_path ("");
   g_assert_nonnull (file);
 
   /* But then querying its path should indicate it’s invalid. */
-  g_assert_null (g_file_get_path (file));
-  g_assert_null (g_file_get_basename (file));
-  g_assert_null (g_file_get_parent (file));
+  g_assert_null (xfile_get_path (file));
+  g_assert_null (xfile_get_basename (file));
+  g_assert_null (xfile_get_parent (file));
 
-  g_object_unref (file);
+  xobject_unref (file);
 }
 
 static void
@@ -122,26 +122,26 @@ test_type (void)
 {
   xfile_t *datapath_f;
   xfile_t *file;
-  GFileType type;
+  xfile_type_t type;
   xerror_t *error = NULL;
 
-  datapath_f = g_file_new_for_path (g_test_get_dir (G_TEST_DIST));
+  datapath_f = xfile_new_for_path (g_test_get_dir (G_TEST_DIST));
 
-  file = g_file_get_child (datapath_f, "g-icon.c");
-  type = g_file_query_file_type (file, 0, NULL);
-  g_assert_cmpint (type, ==, G_FILE_TYPE_REGULAR);
-  g_object_unref (file);
+  file = xfile_get_child (datapath_f, "g-icon.c");
+  type = xfile_query_file_type (file, 0, NULL);
+  g_assert_cmpint (type, ==, XFILE_TYPE_REGULAR);
+  xobject_unref (file);
 
-  file = g_file_get_child (datapath_f, "cert-tests");
-  type = g_file_query_file_type (file, 0, NULL);
-  g_assert_cmpint (type, ==, G_FILE_TYPE_DIRECTORY);
+  file = xfile_get_child (datapath_f, "cert-tests");
+  type = xfile_query_file_type (file, 0, NULL);
+  g_assert_cmpint (type, ==, XFILE_TYPE_DIRECTORY);
 
-  g_file_read (file, NULL, &error);
+  xfile_read (file, NULL, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY);
-  g_error_free (error);
-  g_object_unref (file);
+  xerror_free (error);
+  xobject_unref (file);
 
-  g_object_unref (datapath_f);
+  xobject_unref (datapath_f);
 }
 
 static void
@@ -150,24 +150,24 @@ test_parse_name (void)
   xfile_t *file;
   xchar_t *name;
 
-  file = g_file_new_for_uri ("file://somewhere");
-  name = g_file_get_parse_name (file);
+  file = xfile_new_for_uri ("file://somewhere");
+  name = xfile_get_parse_name (file);
   g_assert_cmpstr (name, ==, "file://somewhere");
-  g_object_unref (file);
+  xobject_unref (file);
   g_free (name);
 
-  file = g_file_parse_name ("~foo");
-  name = g_file_get_parse_name (file);
+  file = xfile_parse_name ("~foo");
+  name = xfile_get_parse_name (file);
   g_assert_nonnull (name);
-  g_object_unref (file);
+  xobject_unref (file);
   g_free (name);
 }
 
 typedef struct
 {
-  GMainContext *context;
+  xmain_context_t *context;
   xfile_t *file;
-  GFileMonitor *monitor;
+  xfile_monitor_t *monitor;
   xoutput_stream_t *ostream;
   xinput_stream_t *istream;
   xint_t buffersize;
@@ -184,30 +184,30 @@ typedef struct
 } CreateDeleteData;
 
 static void
-monitor_changed (GFileMonitor      *monitor,
+monitor_changed (xfile_monitor_t      *monitor,
                  xfile_t             *file,
                  xfile_t             *other_file,
-                 GFileMonitorEvent  event_type,
+                 xfile_monitor_event_t  event_type,
                  xpointer_t           user_data)
 {
   CreateDeleteData *data = user_data;
   xchar_t *path;
   const xchar_t *peeked_path;
 
-  path = g_file_get_path (file);
-  peeked_path = g_file_peek_path (file);
+  path = xfile_get_path (file);
+  peeked_path = xfile_peek_path (file);
   g_assert_cmpstr (data->monitor_path, ==, path);
   g_assert_cmpstr (path, ==, peeked_path);
   g_free (path);
 
-  if (event_type == G_FILE_MONITOR_EVENT_CREATED)
+  if (event_type == XFILE_MONITOR_EVENT_CREATED)
     data->monitor_created++;
-  if (event_type == G_FILE_MONITOR_EVENT_DELETED)
+  if (event_type == XFILE_MONITOR_EVENT_DELETED)
     data->monitor_deleted++;
-  if (event_type == G_FILE_MONITOR_EVENT_CHANGED)
+  if (event_type == XFILE_MONITOR_EVENT_CHANGED)
     data->monitor_changed++;
 
-  g_main_context_wakeup (data->context);
+  xmain_context_wakeup (data->context);
 }
 
 static void
@@ -220,18 +220,18 @@ iclosed_cb (xobject_t      *source,
   xboolean_t ret;
 
   error = NULL;
-  ret = g_input_stream_close_finish (data->istream, res, &error);
+  ret = xinput_stream_close_finish (data->istream, res, &error);
   g_assert_no_error (error);
   g_assert_true (ret);
 
-  g_assert_true (g_input_stream_is_closed (data->istream));
+  g_assert_true (xinput_stream_is_closed (data->istream));
 
-  ret = g_file_delete (data->file, NULL, &error);
+  ret = xfile_delete (data->file, NULL, &error);
   g_assert_true (ret);
   g_assert_no_error (error);
 
   data->file_deleted = TRUE;
-  g_main_context_wakeup (data->context);
+  xmain_context_wakeup (data->context);
 }
 
 static void
@@ -241,16 +241,16 @@ read_cb (xobject_t      *source,
 {
   CreateDeleteData *data = user_data;
   xerror_t *error;
-  gssize size;
+  xssize_t size;
 
   error = NULL;
-  size = g_input_stream_read_finish (data->istream, res, &error);
+  size = xinput_stream_read_finish (data->istream, res, &error);
   g_assert_no_error (error);
 
   data->pos += size;
   if (data->pos < strlen (data->data))
     {
-      g_input_stream_read_async (data->istream,
+      xinput_stream_read_async (data->istream,
                                  data->buffer + data->pos,
                                  strlen (data->data) - data->pos,
                                  0,
@@ -261,8 +261,8 @@ read_cb (xobject_t      *source,
   else
     {
       g_assert_cmpstr (data->buffer, ==, data->data);
-      g_assert_false (g_input_stream_is_closed (data->istream));
-      g_input_stream_close_async (data->istream, 0, NULL, iclosed_cb, data);
+      g_assert_false (xinput_stream_is_closed (data->istream));
+      xinput_stream_close_async (data->istream, 0, NULL, iclosed_cb, data);
     }
 }
 
@@ -275,9 +275,9 @@ ipending_cb (xobject_t      *source,
   xerror_t *error;
 
   error = NULL;
-  g_input_stream_read_finish (data->istream, res, &error);
+  xinput_stream_read_finish (data->istream, res, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_PENDING);
-  g_error_free (error);
+  xerror_free (error);
 }
 
 static void
@@ -287,14 +287,14 @@ skipped_cb (xobject_t      *source,
 {
   CreateDeleteData *data = user_data;
   xerror_t *error;
-  gssize size;
+  xssize_t size;
 
   error = NULL;
-  size = g_input_stream_skip_finish (data->istream, res, &error);
+  size = xinput_stream_skip_finish (data->istream, res, &error);
   g_assert_no_error (error);
   g_assert_cmpint (size, ==, data->pos);
 
-  g_input_stream_read_async (data->istream,
+  xinput_stream_read_async (data->istream,
                              data->buffer + data->pos,
                              strlen (data->data) - data->pos,
                              0,
@@ -302,7 +302,7 @@ skipped_cb (xobject_t      *source,
                              read_cb,
                              data);
   /* check that we get a pending error */
-  g_input_stream_read_async (data->istream,
+  xinput_stream_read_async (data->istream,
                              data->buffer + data->pos,
                              strlen (data->data) - data->pos,
                              0,
@@ -316,19 +316,19 @@ opened_cb (xobject_t      *source,
            xasync_result_t *res,
            xpointer_t      user_data)
 {
-  GFileInputStream *base;
+  xfile_input_stream_t *base;
   CreateDeleteData *data = user_data;
   xerror_t *error;
 
   error = NULL;
-  base = g_file_read_finish (data->file, res, &error);
+  base = xfile_read_finish (data->file, res, &error);
   g_assert_no_error (error);
 
   if (data->buffersize == 0)
-    data->istream = G_INPUT_STREAM (g_object_ref (base));
+    data->istream = G_INPUT_STREAM (xobject_ref (base));
   else
-    data->istream = g_buffered_input_stream_new_sized (G_INPUT_STREAM (base), data->buffersize);
-  g_object_unref (base);
+    data->istream = xbuffered_input_stream_new_sized (G_INPUT_STREAM (base), data->buffersize);
+  xobject_unref (base);
 
   data->buffer = g_new0 (xchar_t, strlen (data->data) + 1);
 
@@ -336,7 +336,7 @@ opened_cb (xobject_t      *source,
   memcpy (data->buffer, data->data, 10);
   data->pos = 10;
 
-  g_input_stream_skip_async (data->istream,
+  xinput_stream_skip_async (data->istream,
                              10,
                              0,
                              NULL,
@@ -354,12 +354,12 @@ oclosed_cb (xobject_t      *source,
   xboolean_t ret;
 
   error = NULL;
-  ret = g_output_stream_close_finish (data->ostream, res, &error);
+  ret = xoutput_stream_close_finish (data->ostream, res, &error);
   g_assert_no_error (error);
   g_assert_true (ret);
-  g_assert_true (g_output_stream_is_closed (data->ostream));
+  g_assert_true (xoutput_stream_is_closed (data->ostream));
 
-  g_file_read_async (data->file, 0, NULL, opened_cb, data);
+  xfile_read_async (data->file, 0, NULL, opened_cb, data);
 }
 
 static void
@@ -368,17 +368,17 @@ written_cb (xobject_t      *source,
             xpointer_t      user_data)
 {
   CreateDeleteData *data = user_data;
-  gssize size;
+  xssize_t size;
   xerror_t *error;
 
   error = NULL;
-  size = g_output_stream_write_finish (data->ostream, res, &error);
+  size = xoutput_stream_write_finish (data->ostream, res, &error);
   g_assert_no_error (error);
 
   data->pos += size;
   if (data->pos < strlen (data->data))
     {
-      g_output_stream_write_async (data->ostream,
+      xoutput_stream_write_async (data->ostream,
                                    data->data + data->pos,
                                    strlen (data->data) - data->pos,
                                    0,
@@ -388,8 +388,8 @@ written_cb (xobject_t      *source,
     }
   else
     {
-      g_assert_false (g_output_stream_is_closed (data->ostream));
-      g_output_stream_close_async (data->ostream, 0, NULL, oclosed_cb, data);
+      g_assert_false (xoutput_stream_is_closed (data->ostream));
+      xoutput_stream_close_async (data->ostream, 0, NULL, oclosed_cb, data);
     }
 }
 
@@ -402,9 +402,9 @@ opending_cb (xobject_t      *source,
   xerror_t *error;
 
   error = NULL;
-  g_output_stream_write_finish (data->ostream, res, &error);
+  xoutput_stream_write_finish (data->ostream, res, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_PENDING);
-  g_error_free (error);
+  xerror_free (error);
 }
 
 static void
@@ -412,22 +412,22 @@ created_cb (xobject_t      *source,
             xasync_result_t *res,
             xpointer_t      user_data)
 {
-  GFileOutputStream *base;
+  xfile_output_stream_t *base;
   CreateDeleteData *data = user_data;
   xerror_t *error;
 
   error = NULL;
-  base = g_file_create_finish (G_FILE (source), res, &error);
+  base = xfile_create_finish (XFILE (source), res, &error);
   g_assert_no_error (error);
-  g_assert_true (g_file_query_exists (data->file, NULL));
+  g_assert_true (xfile_query_exists (data->file, NULL));
 
   if (data->buffersize == 0)
-    data->ostream = G_OUTPUT_STREAM (g_object_ref (base));
+    data->ostream = G_OUTPUT_STREAM (xobject_ref (base));
   else
     data->ostream = g_buffered_output_stream_new_sized (G_OUTPUT_STREAM (base), data->buffersize);
-  g_object_unref (base);
+  xobject_unref (base);
 
-  g_output_stream_write_async (data->ostream,
+  xoutput_stream_write_async (data->ostream,
                                data->data,
                                strlen (data->data),
                                0,
@@ -435,7 +435,7 @@ created_cb (xobject_t      *source,
                                written_cb,
                                data);
   /* check that we get a pending error */
-  g_output_stream_write_async (data->ostream,
+  xoutput_stream_write_async (data->ostream,
                                data->data,
                                strlen (data->data),
                                0,
@@ -450,7 +450,7 @@ stop_timeout (xpointer_t user_data)
   CreateDeleteData *data = user_data;
 
   data->timed_out = TRUE;
-  g_main_context_wakeup (data->context);
+  xmain_context_wakeup (data->context);
 
   return G_SOURCE_REMOVE;
 }
@@ -460,11 +460,11 @@ stop_timeout (xpointer_t user_data)
  * Callbackistan.
  */
 static void
-test_create_delete (gconstpointer d)
+test_create_delete (xconstpointer d)
 {
   xerror_t *error;
   CreateDeleteData *data;
-  GFileIOStream *iostream;
+  xfile_io_stream_t *iostream;
 
   data = g_new0 (CreateDeleteData, 1);
 
@@ -472,18 +472,18 @@ test_create_delete (gconstpointer d)
   data->data = "abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVXYZ0123456789";
   data->pos = 0;
 
-  data->file = g_file_new_tmp ("g_file_create_delete_XXXXXX",
+  data->file = xfile_new_tmp ("xfile_create_delete_XXXXXX",
 			       &iostream, NULL);
   g_assert_nonnull (data->file);
-  g_object_unref (iostream);
+  xobject_unref (iostream);
 
-  data->monitor_path = g_file_get_path (data->file);
+  data->monitor_path = xfile_get_path (data->file);
   remove (data->monitor_path);
 
-  g_assert_false (g_file_query_exists (data->file, NULL));
+  g_assert_false (xfile_query_exists (data->file, NULL));
 
   error = NULL;
-  data->monitor = g_file_monitor_file (data->file, 0, NULL, &error);
+  data->monitor = xfile_monitor_file (data->file, 0, NULL, &error);
   g_assert_no_error (error);
 
   /* This test doesn't work with GPollFileMonitor, because it assumes
@@ -500,11 +500,11 @@ test_create_delete (gconstpointer d)
   if (strcmp (G_OBJECT_TYPE_NAME (data->monitor), "GPollFileMonitor") == 0 ||
       strcmp (G_OBJECT_TYPE_NAME (data->monitor), "GKqueueFileMonitor") == 0)
     {
-      g_test_skip ("skipping test for this GFileMonitor implementation");
+      g_test_skip ("skipping test for this xfile_monitor_t implementation");
       goto skip;
     }
 
-  g_file_monitor_set_rate_limit (data->monitor, 100);
+  xfile_monitor_set_rate_limit (data->monitor, 100);
 
   g_signal_connect (data->monitor, "changed", G_CALLBACK (monitor_changed), data);
 
@@ -512,16 +512,16 @@ test_create_delete (gconstpointer d)
   data->context = NULL;
   data->timeout = g_timeout_add_seconds (10, stop_timeout, data);
 
-  g_file_create_async (data->file, 0, 0, NULL, created_cb, data);
+  xfile_create_async (data->file, 0, 0, NULL, created_cb, data);
 
   while (!data->timed_out &&
          (data->monitor_created == 0 ||
           data->monitor_deleted == 0 ||
           data->monitor_changed == 0 ||
           !data->file_deleted))
-    g_main_context_iteration (data->context, TRUE);
+    xmain_context_iteration (data->context, TRUE);
 
-  g_source_remove (data->timeout);
+  xsource_remove (data->timeout);
 
   g_assert_false (data->timed_out);
   g_assert_true (data->file_deleted);
@@ -529,17 +529,17 @@ test_create_delete (gconstpointer d)
   g_assert_cmpint (data->monitor_deleted, ==, 1);
   g_assert_cmpint (data->monitor_changed, >, 0);
 
-  g_assert_false (g_file_monitor_is_cancelled (data->monitor));
-  g_file_monitor_cancel (data->monitor);
-  g_assert_true (g_file_monitor_is_cancelled (data->monitor));
+  g_assert_false (xfile_monitor_is_cancelled (data->monitor));
+  xfile_monitor_cancel (data->monitor);
+  g_assert_true (xfile_monitor_is_cancelled (data->monitor));
 
-  g_clear_pointer (&data->context, g_main_context_unref);
-  g_object_unref (data->ostream);
-  g_object_unref (data->istream);
+  g_clear_pointer (&data->context, xmain_context_unref);
+  xobject_unref (data->ostream);
+  xobject_unref (data->istream);
 
  skip:
-  g_object_unref (data->monitor);
-  g_object_unref (data->file);
+  xobject_unref (data->monitor);
+  xobject_unref (data->file);
   g_free (data->monitor_path);
   g_free (data->buffer);
   g_free (data);
@@ -547,18 +547,18 @@ test_create_delete (gconstpointer d)
 
 static const xchar_t *original_data =
     "/**\n"
-    " * g_file_replace_contents_async:\n"
+    " * xfile_replace_contents_async:\n"
     "**/\n";
 
 static const xchar_t *replace_data =
     "/**\n"
-    " * g_file_replace_contents_async:\n"
+    " * xfile_replace_contents_async:\n"
     " * @file: input #xfile_t.\n"
     " * @contents: string of contents to replace the file with.\n"
     " * @length: the length of @contents in bytes.\n"
     " * @etag: (nullable): a new <link linkend=\"gfile-etag\">entity tag</link> for the @file, or %NULL\n"
     " * @make_backup: %TRUE if a backup should be created.\n"
-    " * @flags: a set of #GFileCreateFlags.\n"
+    " * @flags: a set of #xfile_create_flags_t.\n"
     " * @cancellable: optional #xcancellable_t object, %NULL to ignore.\n"
     " * @callback: a #xasync_ready_callback_t to call when the request is satisfied\n"
     " * @user_data: the data to pass to callback function\n"
@@ -569,7 +569,7 @@ static const xchar_t *replace_data =
     " * \n"
     " * When this operation has completed, @callback will be called with\n"
     " * @user_user data, and the operation can be finalized with \n"
-    " * g_file_replace_contents_finish().\n"
+    " * xfile_replace_contents_finish().\n"
     " * \n"
     " * If @cancellable is not %NULL, then the operation can be cancelled by\n"
     " * triggering the cancellable object from another thread. If the operation\n"
@@ -583,7 +583,7 @@ typedef struct
 {
   xfile_t *file;
   const xchar_t *data;
-  GMainLoop *loop;
+  xmain_loop_t *loop;
   xboolean_t again;
 } ReplaceLoadData;
 
@@ -603,7 +603,7 @@ loaded_cb (xobject_t      *source,
   xsize_t length;
 
   error = NULL;
-  ret = g_file_load_contents_finish (data->file, res, &contents, &length, NULL, &error);
+  ret = xfile_load_contents_finish (data->file, res, &contents, &length, NULL, &error);
   g_assert_true (ret);
   g_assert_no_error (error);
   g_assert_cmpint (length, ==, strlen (data->data));
@@ -616,7 +616,7 @@ loaded_cb (xobject_t      *source,
       data->again = FALSE;
       data->data = "pi pa po";
 
-      g_file_replace_contents_async (data->file,
+      xfile_replace_contents_async (data->file,
                                      data->data,
                                      strlen (data->data),
                                      NULL,
@@ -629,12 +629,12 @@ loaded_cb (xobject_t      *source,
   else
     {
        error = NULL;
-       ret = g_file_delete (data->file, NULL, &error);
+       ret = xfile_delete (data->file, NULL, &error);
        g_assert_no_error (error);
        g_assert_true (ret);
-       g_assert_false (g_file_query_exists (data->file, NULL));
+       g_assert_false (xfile_query_exists (data->file, NULL));
 
-       g_main_loop_quit (data->loop);
+       xmain_loop_quit (data->loop);
     }
 }
 
@@ -647,10 +647,10 @@ replaced_cb (xobject_t      *source,
   xerror_t *error;
 
   error = NULL;
-  g_file_replace_contents_finish (data->file, res, NULL, &error);
+  xfile_replace_contents_finish (data->file, res, NULL, &error);
   g_assert_no_error (error);
 
-  g_file_load_contents_async (data->file, NULL, loaded_cb, data);
+  xfile_load_contents_async (data->file, NULL, loaded_cb, data);
 }
 
 static void
@@ -658,25 +658,25 @@ test_replace_load (void)
 {
   ReplaceLoadData *data;
   const xchar_t *path;
-  GFileIOStream *iostream;
+  xfile_io_stream_t *iostream;
 
   data = g_new0 (ReplaceLoadData, 1);
   data->again = TRUE;
   data->data = replace_data;
 
-  data->file = g_file_new_tmp ("g_file_replace_load_XXXXXX",
+  data->file = xfile_new_tmp ("xfile_replace_load_XXXXXX",
 			       &iostream, NULL);
   g_assert_nonnull (data->file);
-  g_object_unref (iostream);
+  xobject_unref (iostream);
 
-  path = g_file_peek_path (data->file);
+  path = xfile_peek_path (data->file);
   remove (path);
 
-  g_assert_false (g_file_query_exists (data->file, NULL));
+  g_assert_false (xfile_query_exists (data->file, NULL));
 
-  data->loop = g_main_loop_new (NULL, FALSE);
+  data->loop = xmain_loop_new (NULL, FALSE);
 
-  g_file_replace_contents_async (data->file,
+  xfile_replace_contents_async (data->file,
                                  data->data,
                                  strlen (data->data),
                                  NULL,
@@ -686,10 +686,10 @@ test_replace_load (void)
                                  replaced_cb,
                                  data);
 
-  g_main_loop_run (data->loop);
+  xmain_loop_run (data->loop);
 
-  g_main_loop_unref (data->loop);
-  g_object_unref (data->file);
+  xmain_loop_unref (data->loop);
+  xobject_unref (data->file);
   g_free (data);
 }
 
@@ -697,9 +697,9 @@ static void
 test_replace_cancel (void)
 {
   xfile_t *tmpdir, *file;
-  GFileOutputStream *ostream;
-  GFileEnumerator *fenum;
-  GFileInfo *info;
+  xfile_output_stream_t *ostream;
+  xfile_enumerator_t *fenum;
+  xfile_info_t *info;
   xcancellable_t *cancellable;
   xchar_t *path;
   xchar_t *contents;
@@ -709,23 +709,23 @@ test_replace_cancel (void)
 
   g_test_bug ("https://bugzilla.gnome.org/629301");
 
-  path = g_dir_make_tmp ("g_file_replace_cancel_XXXXXX", &error);
+  path = g_dir_make_tmp ("xfile_replace_cancel_XXXXXX", &error);
   g_assert_no_error (error);
-  tmpdir = g_file_new_for_path (path);
+  tmpdir = xfile_new_for_path (path);
   g_free (path);
 
-  file = g_file_get_child (tmpdir, "file");
-  g_file_replace_contents (file,
+  file = xfile_get_child (tmpdir, "file");
+  xfile_replace_contents (file,
                            original_data,
                            strlen (original_data),
                            NULL, FALSE, 0, NULL,
                            NULL, &error);
   g_assert_no_error (error);
 
-  ostream = g_file_replace (file, NULL, TRUE, 0, NULL, &error);
+  ostream = xfile_replace (file, NULL, TRUE, 0, NULL, &error);
   g_assert_no_error (error);
 
-  g_output_stream_write_all (G_OUTPUT_STREAM (ostream),
+  xoutput_stream_write_all (G_OUTPUT_STREAM (ostream),
                              replace_data, strlen (replace_data),
                              &nwrote, NULL, &error);
   g_assert_no_error (error);
@@ -734,30 +734,30 @@ test_replace_cancel (void)
   /* At this point there should be two files; the original and the
    * temporary.
    */
-  fenum = g_file_enumerate_children (tmpdir, NULL, 0, NULL, &error);
+  fenum = xfile_enumerate_children (tmpdir, NULL, 0, NULL, &error);
   g_assert_no_error (error);
 
-  info = g_file_enumerator_next_file (fenum, NULL, &error);
+  info = xfile_enumerator_next_file (fenum, NULL, &error);
   g_assert_no_error (error);
   g_assert_nonnull (info);
-  g_object_unref (info);
-  info = g_file_enumerator_next_file (fenum, NULL, &error);
+  xobject_unref (info);
+  info = xfile_enumerator_next_file (fenum, NULL, &error);
   g_assert_no_error (error);
   g_assert_nonnull (info);
-  g_object_unref (info);
+  xobject_unref (info);
 
-  g_file_enumerator_close (fenum, NULL, &error);
+  xfile_enumerator_close (fenum, NULL, &error);
   g_assert_no_error (error);
-  g_object_unref (fenum);
+  xobject_unref (fenum);
 
-  /* Also test the g_file_enumerator_iterate() API */
-  fenum = g_file_enumerate_children (tmpdir, NULL, 0, NULL, &error);
+  /* Also test the xfile_enumerator_iterate() API */
+  fenum = xfile_enumerate_children (tmpdir, NULL, 0, NULL, &error);
   g_assert_no_error (error);
   count = 0;
 
   while (TRUE)
     {
-      xboolean_t ret = g_file_enumerator_iterate (fenum, &info, NULL, NULL, &error);
+      xboolean_t ret = xfile_enumerator_iterate (fenum, &info, NULL, NULL, &error);
       g_assert_true (ret);
       g_assert_no_error (error);
       if (!info)
@@ -766,19 +766,19 @@ test_replace_cancel (void)
     }
   g_assert_cmpint (count, ==, 2);
 
-  g_file_enumerator_close (fenum, NULL, &error);
+  xfile_enumerator_close (fenum, NULL, &error);
   g_assert_no_error (error);
-  g_object_unref (fenum);
+  xobject_unref (fenum);
 
-  /* Now test just getting child from the g_file_enumerator_iterate() API */
-  fenum = g_file_enumerate_children (tmpdir, "standard::name", 0, NULL, &error);
+  /* Now test just getting child from the xfile_enumerator_iterate() API */
+  fenum = xfile_enumerate_children (tmpdir, "standard::name", 0, NULL, &error);
   g_assert_no_error (error);
   count = 0;
 
   while (TRUE)
     {
       xfile_t *child;
-      xboolean_t ret = g_file_enumerator_iterate (fenum, NULL, &child, NULL, &error);
+      xboolean_t ret = xfile_enumerator_iterate (fenum, NULL, &child, NULL, &error);
 
       g_assert_true (ret);
       g_assert_no_error (error);
@@ -791,22 +791,22 @@ test_replace_cancel (void)
     }
   g_assert_cmpint (count, ==, 2);
 
-  g_file_enumerator_close (fenum, NULL, &error);
+  xfile_enumerator_close (fenum, NULL, &error);
   g_assert_no_error (error);
-  g_object_unref (fenum);
+  xobject_unref (fenum);
 
   /* Make sure the temporary gets deleted even if we cancel. */
   cancellable = g_cancellable_new ();
   g_cancellable_cancel (cancellable);
-  g_output_stream_close (G_OUTPUT_STREAM (ostream), cancellable, &error);
+  xoutput_stream_close (G_OUTPUT_STREAM (ostream), cancellable, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
   g_clear_error (&error);
 
-  g_object_unref (cancellable);
-  g_object_unref (ostream);
+  xobject_unref (cancellable);
+  xobject_unref (ostream);
 
   /* Make sure that file contents wasn't actually replaced. */
-  g_file_load_contents (file,
+  xfile_load_contents (file,
                         NULL,
                         &contents,
                         &length,
@@ -816,14 +816,14 @@ test_replace_cancel (void)
   g_assert_cmpstr (contents, ==, original_data);
   g_free (contents);
 
-  g_file_delete (file, NULL, &error);
+  xfile_delete (file, NULL, &error);
   g_assert_no_error (error);
-  g_object_unref (file);
+  xobject_unref (file);
 
   /* This will only succeed if the temp file was deleted. */
-  g_file_delete (tmpdir, NULL, &error);
+  xfile_delete (tmpdir, NULL, &error);
   g_assert_no_error (error);
-  g_object_unref (tmpdir);
+  xobject_unref (tmpdir);
 }
 
 static void
@@ -832,82 +832,82 @@ test_replace_symlink (void)
 #ifdef G_OS_UNIX
   xchar_t *tmpdir_path = NULL;
   xfile_t *tmpdir = NULL, *source_file = NULL, *target_file = NULL;
-  GFileOutputStream *stream = NULL;
+  xfile_output_stream_t *stream = NULL;
   const xchar_t *new_contents = "this is a test message which should be written to source and not target";
   xsize_t n_written;
-  GFileEnumerator *enumerator = NULL;
-  GFileInfo *info = NULL;
+  xfile_enumerator_t *enumerator = NULL;
+  xfile_info_t *info = NULL;
   xchar_t *contents = NULL;
   xsize_t length = 0;
   xerror_t *local_error = NULL;
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2325");
-  g_test_summary ("Test that G_FILE_CREATE_REPLACE_DESTINATION doesn’t follow symlinks");
+  g_test_summary ("Test that XFILE_CREATE_REPLACE_DESTINATION doesn’t follow symlinks");
 
   /* Create a fresh, empty working directory. */
-  tmpdir_path = g_dir_make_tmp ("g_file_replace_symlink_XXXXXX", &local_error);
+  tmpdir_path = g_dir_make_tmp ("xfile_replace_symlink_XXXXXX", &local_error);
   g_assert_no_error (local_error);
-  tmpdir = g_file_new_for_path (tmpdir_path);
+  tmpdir = xfile_new_for_path (tmpdir_path);
 
   g_test_message ("Using temporary directory %s", tmpdir_path);
   g_free (tmpdir_path);
 
   /* Create symlink `source` which points to `target`. */
-  source_file = g_file_get_child (tmpdir, "source");
-  target_file = g_file_get_child (tmpdir, "target");
-  g_file_make_symbolic_link (source_file, "target", NULL, &local_error);
+  source_file = xfile_get_child (tmpdir, "source");
+  target_file = xfile_get_child (tmpdir, "target");
+  xfile_make_symbolic_link (source_file, "target", NULL, &local_error);
   g_assert_no_error (local_error);
 
   /* Ensure that `target` doesn’t exist */
-  g_assert_false (g_file_query_exists (target_file, NULL));
+  g_assert_false (xfile_query_exists (target_file, NULL));
 
   /* Replace the `source` symlink with a regular file using
-   * %G_FILE_CREATE_REPLACE_DESTINATION, which should replace it *without*
+   * %XFILE_CREATE_REPLACE_DESTINATION, which should replace it *without*
    * following the symlink */
-  stream = g_file_replace (source_file, NULL, FALSE  /* no backup */,
-                           G_FILE_CREATE_REPLACE_DESTINATION, NULL, &local_error);
+  stream = xfile_replace (source_file, NULL, FALSE  /* no backup */,
+                           XFILE_CREATE_REPLACE_DESTINATION, NULL, &local_error);
   g_assert_no_error (local_error);
 
-  g_output_stream_write_all (G_OUTPUT_STREAM (stream), new_contents, strlen (new_contents),
+  xoutput_stream_write_all (G_OUTPUT_STREAM (stream), new_contents, strlen (new_contents),
                              &n_written, NULL, &local_error);
   g_assert_no_error (local_error);
   g_assert_cmpint (n_written, ==, strlen (new_contents));
 
-  g_output_stream_close (G_OUTPUT_STREAM (stream), NULL, &local_error);
+  xoutput_stream_close (G_OUTPUT_STREAM (stream), NULL, &local_error);
   g_assert_no_error (local_error);
 
   g_clear_object (&stream);
 
   /* At this point, there should still only be one file: `source`. It should
    * now be a regular file. `target` should not exist. */
-  enumerator = g_file_enumerate_children (tmpdir,
-                                          G_FILE_ATTRIBUTE_STANDARD_NAME ","
-                                          G_FILE_ATTRIBUTE_STANDARD_TYPE,
-                                          G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, &local_error);
+  enumerator = xfile_enumerate_children (tmpdir,
+                                          XFILE_ATTRIBUTE_STANDARD_NAME ","
+                                          XFILE_ATTRIBUTE_STANDARD_TYPE,
+                                          XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, &local_error);
   g_assert_no_error (local_error);
 
-  info = g_file_enumerator_next_file (enumerator, NULL, &local_error);
+  info = xfile_enumerator_next_file (enumerator, NULL, &local_error);
   g_assert_no_error (local_error);
   g_assert_nonnull (info);
 
-  g_assert_cmpstr (g_file_info_get_name (info), ==, "source");
-  g_assert_cmpint (g_file_info_get_file_type (info), ==, G_FILE_TYPE_REGULAR);
+  g_assert_cmpstr (xfile_info_get_name (info), ==, "source");
+  g_assert_cmpint (xfile_info_get_file_type (info), ==, XFILE_TYPE_REGULAR);
 
   g_clear_object (&info);
 
-  info = g_file_enumerator_next_file (enumerator, NULL, &local_error);
+  info = xfile_enumerator_next_file (enumerator, NULL, &local_error);
   g_assert_no_error (local_error);
   g_assert_null (info);
 
-  g_file_enumerator_close (enumerator, NULL, &local_error);
+  xfile_enumerator_close (enumerator, NULL, &local_error);
   g_assert_no_error (local_error);
   g_clear_object (&enumerator);
 
   /* Double-check that `target` doesn’t exist */
-  g_assert_false (g_file_query_exists (target_file, NULL));
+  g_assert_false (xfile_query_exists (target_file, NULL));
 
   /* Check the content of `source`. */
-  g_file_load_contents (source_file,
+  xfile_load_contents (source_file,
                         NULL,
                         &contents,
                         &length,
@@ -919,10 +919,10 @@ test_replace_symlink (void)
   g_free (contents);
 
   /* Tidy up. */
-  g_file_delete (source_file, NULL, &local_error);
+  xfile_delete (source_file, NULL, &local_error);
   g_assert_no_error (local_error);
 
-  g_file_delete (tmpdir, NULL, &local_error);
+  xfile_delete (tmpdir, NULL, &local_error);
   g_assert_no_error (local_error);
 
   g_clear_object (&target_file);
@@ -939,31 +939,31 @@ test_replace_symlink_using_etag (void)
 #ifdef G_OS_UNIX
   xchar_t *tmpdir_path = NULL;
   xfile_t *tmpdir = NULL, *source_file = NULL, *target_file = NULL;
-  GFileOutputStream *stream = NULL;
+  xfile_output_stream_t *stream = NULL;
   const xchar_t *old_contents = "this is a test message which should be written to target and then overwritten";
   xchar_t *old_etag = NULL;
   const xchar_t *new_contents = "this is an updated message";
   xsize_t n_written;
   xchar_t *contents = NULL;
   xsize_t length = 0;
-  GFileInfo *info = NULL;
+  xfile_info_t *info = NULL;
   xerror_t *local_error = NULL;
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2417");
   g_test_summary ("Test that ETag checks work when replacing a file through a symlink");
 
   /* Create a fresh, empty working directory. */
-  tmpdir_path = g_dir_make_tmp ("g_file_replace_symlink_using_etag_XXXXXX", &local_error);
+  tmpdir_path = g_dir_make_tmp ("xfile_replace_symlink_using_etag_XXXXXX", &local_error);
   g_assert_no_error (local_error);
-  tmpdir = g_file_new_for_path (tmpdir_path);
+  tmpdir = xfile_new_for_path (tmpdir_path);
 
   g_test_message ("Using temporary directory %s", tmpdir_path);
   g_free (tmpdir_path);
 
   /* Create symlink `source` which points to `target`. */
-  source_file = g_file_get_child (tmpdir, "source");
-  target_file = g_file_get_child (tmpdir, "target");
-  g_file_make_symbolic_link (source_file, "target", NULL, &local_error);
+  source_file = xfile_get_child (tmpdir, "source");
+  target_file = xfile_get_child (tmpdir, "target");
+  xfile_make_symbolic_link (source_file, "target", NULL, &local_error);
   g_assert_no_error (local_error);
 
   /* Sleep for at least 1s to ensure the mtimes of `source` and `target` differ,
@@ -973,17 +973,17 @@ test_replace_symlink_using_etag (void)
   sleep (1);
 
   /* Create `target` with some arbitrary content. */
-  stream = g_file_create (target_file, G_FILE_CREATE_NONE, NULL, &local_error);
+  stream = xfile_create (target_file, XFILE_CREATE_NONE, NULL, &local_error);
   g_assert_no_error (local_error);
-  g_output_stream_write_all (G_OUTPUT_STREAM (stream), old_contents, strlen (old_contents),
+  xoutput_stream_write_all (G_OUTPUT_STREAM (stream), old_contents, strlen (old_contents),
                              &n_written, NULL, &local_error);
   g_assert_no_error (local_error);
   g_assert_cmpint (n_written, ==, strlen (old_contents));
 
-  g_output_stream_close (G_OUTPUT_STREAM (stream), NULL, &local_error);
+  xoutput_stream_close (G_OUTPUT_STREAM (stream), NULL, &local_error);
   g_assert_no_error (local_error);
 
-  old_etag = g_file_output_stream_get_etag (stream);
+  old_etag = xfile_output_stream_get_etag (stream);
   g_assert_nonnull (old_etag);
   g_assert_cmpstr (old_etag, !=, "");
 
@@ -994,27 +994,27 @@ test_replace_symlink_using_etag (void)
 
   /* Write out a new copy of the `target`, checking its ETag first. This should
    * replace `target` by following the symlink. */
-  stream = g_file_replace (source_file, old_etag, FALSE  /* no backup */,
-                           G_FILE_CREATE_NONE, NULL, &local_error);
+  stream = xfile_replace (source_file, old_etag, FALSE  /* no backup */,
+                           XFILE_CREATE_NONE, NULL, &local_error);
   g_assert_no_error (local_error);
 
-  g_output_stream_write_all (G_OUTPUT_STREAM (stream), new_contents, strlen (new_contents),
+  xoutput_stream_write_all (G_OUTPUT_STREAM (stream), new_contents, strlen (new_contents),
                              &n_written, NULL, &local_error);
   g_assert_no_error (local_error);
   g_assert_cmpint (n_written, ==, strlen (new_contents));
 
-  g_output_stream_close (G_OUTPUT_STREAM (stream), NULL, &local_error);
+  xoutput_stream_close (G_OUTPUT_STREAM (stream), NULL, &local_error);
   g_assert_no_error (local_error);
 
   g_clear_object (&stream);
 
   /* At this point, there should be a regular file, `target`, containing
    * @new_contents; and a symlink `source` which points to `target`. */
-  g_assert_cmpint (g_file_query_file_type (source_file, G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL), ==, G_FILE_TYPE_SYMBOLIC_LINK);
-  g_assert_cmpint (g_file_query_file_type (target_file, G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL), ==, G_FILE_TYPE_REGULAR);
+  g_assert_cmpint (xfile_query_file_type (source_file, XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL), ==, XFILE_TYPE_SYMBOLIC_LINK);
+  g_assert_cmpint (xfile_query_file_type (target_file, XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL), ==, XFILE_TYPE_REGULAR);
 
   /* Check the content of `target`. */
-  g_file_load_contents (target_file,
+  xfile_load_contents (target_file,
                         NULL,
                         &contents,
                         &length,
@@ -1026,22 +1026,22 @@ test_replace_symlink_using_etag (void)
   g_free (contents);
 
   /* And check its ETag value has changed. */
-  info = g_file_query_info (target_file, G_FILE_ATTRIBUTE_ETAG_VALUE,
-                            G_FILE_QUERY_INFO_NONE, NULL, &local_error);
+  info = xfile_query_info (target_file, XFILE_ATTRIBUTE_ETAG_VALUE,
+                            XFILE_QUERY_INFO_NONE, NULL, &local_error);
   g_assert_no_error (local_error);
-  g_assert_cmpstr (g_file_info_get_etag (info), !=, old_etag);
+  g_assert_cmpstr (xfile_info_get_etag (info), !=, old_etag);
 
   g_clear_object (&info);
   g_free (old_etag);
 
   /* Tidy up. */
-  g_file_delete (target_file, NULL, &local_error);
+  xfile_delete (target_file, NULL, &local_error);
   g_assert_no_error (local_error);
 
-  g_file_delete (source_file, NULL, &local_error);
+  xfile_delete (source_file, NULL, &local_error);
   g_assert_no_error (local_error);
 
-  g_file_delete (tmpdir, NULL, &local_error);
+  xfile_delete (tmpdir, NULL, &local_error);
   g_assert_no_error (local_error);
 
   g_clear_object (&target_file);
@@ -1077,9 +1077,9 @@ create_test_file (xfile_t             *tmpdir,
                   FileTestSetupType  setup_type,
                   xuint_t              setup_mode)
 {
-  xfile_t *test_file = g_file_get_child (tmpdir, basename);
-  xchar_t *target_basename = g_strdup_printf ("%s-target", basename);  /* for symlinks */
-  xfile_t *target_file = g_file_get_child (tmpdir, target_basename);
+  xfile_t *test_file = xfile_get_child (tmpdir, basename);
+  xchar_t *target_basename = xstrdup_printf ("%s-target", basename);  /* for symlinks */
+  xfile_t *target_file = xfile_get_child (tmpdir, target_basename);
   xerror_t *local_error = NULL;
 
   switch (setup_type)
@@ -1094,15 +1094,15 @@ create_test_file (xfile_t             *tmpdir,
           xchar_t *contents = NULL;
 
           if (setup_type == FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY)
-            contents = g_strdup_printf ("this is some test content in %s", basename);
+            contents = xstrdup_printf ("this is some test content in %s", basename);
           else
-            contents = g_strdup ("");
+            contents = xstrdup ("");
 
-          g_file_set_contents (g_file_peek_path (test_file), contents, -1, &local_error);
+          xfile_set_contents (xfile_peek_path (test_file), contents, -1, &local_error);
           g_assert_no_error (local_error);
 
-          g_file_set_attribute_uint32 (test_file, G_FILE_ATTRIBUTE_UNIX_MODE,
-                                       setup_mode, G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+          xfile_set_attribute_uint32 (test_file, XFILE_ATTRIBUTE_UNIX_MODE,
+                                       setup_mode, XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                        NULL, &local_error);
           g_assert_no_error (local_error);
 
@@ -1112,14 +1112,14 @@ create_test_file (xfile_t             *tmpdir,
     case FILE_TEST_SETUP_TYPE_DIRECTORY:
       g_assert (setup_mode == 0);
 
-      g_file_make_directory (test_file, NULL, &local_error);
+      xfile_make_directory (test_file, NULL, &local_error);
       g_assert_no_error (local_error);
       break;
     case FILE_TEST_SETUP_TYPE_SOCKET:
-      g_assert_no_errno (mknod (g_file_peek_path (test_file), S_IFSOCK | setup_mode, 0));
+      g_assert_no_errno (mknod (xfile_peek_path (test_file), S_IFSOCK | setup_mode, 0));
       break;
     case FILE_TEST_SETUP_TYPE_SYMLINK_VALID:
-      g_file_set_contents (g_file_peek_path (target_file), "target file", -1, &local_error);
+      xfile_set_contents (xfile_peek_path (target_file), "target file", -1, &local_error);
       g_assert_no_error (local_error);
       G_GNUC_FALLTHROUGH;
     case FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING:
@@ -1127,13 +1127,13 @@ create_test_file (xfile_t             *tmpdir,
        * applicable if the symlink is valid (and are applied to the target) */
       g_assert (setup_type != FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING || setup_mode == 0);
 
-      g_file_make_symbolic_link (test_file, target_basename, NULL, &local_error);
+      xfile_make_symbolic_link (test_file, target_basename, NULL, &local_error);
       g_assert_no_error (local_error);
 
       if (setup_type == FILE_TEST_SETUP_TYPE_SYMLINK_VALID)
         {
-          g_file_set_attribute_uint32 (test_file, G_FILE_ATTRIBUTE_UNIX_MODE,
-                                       setup_mode, G_FILE_QUERY_INFO_NONE,
+          xfile_set_attribute_uint32 (test_file, XFILE_ATTRIBUTE_UNIX_MODE,
+                                       setup_mode, XFILE_QUERY_INFO_NONE,
                                        NULL, &local_error);
           g_assert_no_error (local_error);
         }
@@ -1141,7 +1141,7 @@ create_test_file (xfile_t             *tmpdir,
       if (setup_type == FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING)
         {
           /* Ensure that the target doesn’t exist */
-          g_assert_false (g_file_query_exists (target_file, NULL));
+          g_assert_false (xfile_query_exists (target_file, NULL));
         }
       break;
     default:
@@ -1170,10 +1170,10 @@ check_test_file (xfile_t             *test_file,
                  xuint_t              expected_mode,
                  const xchar_t       *expected_contents)
 {
-  xchar_t *target_basename = g_strdup_printf ("%s-target", basename);  /* for symlinks */
-  xfile_t *target_file = g_file_get_child (tmpdir, target_basename);
-  GFileType test_file_type = g_file_query_file_type (test_file, G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL);
-  GFileInfo *info = NULL;
+  xchar_t *target_basename = xstrdup_printf ("%s-target", basename);  /* for symlinks */
+  xfile_t *target_file = xfile_get_child (tmpdir, target_basename);
+  xfile_type_t test_file_type = xfile_query_file_type (test_file, XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL);
+  xfile_info_t *info = NULL;
   xerror_t *local_error = NULL;
 
   switch (expected_type)
@@ -1182,59 +1182,59 @@ check_test_file (xfile_t             *test_file,
       g_assert (expected_mode == 0);
       g_assert (expected_contents == NULL);
 
-      g_assert_false (g_file_query_exists (test_file, NULL));
-      g_assert_cmpint (test_file_type, ==, G_FILE_TYPE_UNKNOWN);
+      g_assert_false (xfile_query_exists (test_file, NULL));
+      g_assert_cmpint (test_file_type, ==, XFILE_TYPE_UNKNOWN);
       break;
     case FILE_TEST_SETUP_TYPE_REGULAR_EMPTY:
     case FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY:
       g_assert (expected_type != FILE_TEST_SETUP_TYPE_REGULAR_EMPTY || expected_contents == NULL);
       g_assert (expected_type != FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY || expected_contents != NULL);
 
-      g_assert_cmpint (test_file_type, ==, G_FILE_TYPE_REGULAR);
+      g_assert_cmpint (test_file_type, ==, XFILE_TYPE_REGULAR);
 
-      info = g_file_query_info (test_file,
-                                G_FILE_ATTRIBUTE_STANDARD_SIZE ","
-                                G_FILE_ATTRIBUTE_UNIX_MODE,
-                                G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, &local_error);
+      info = xfile_query_info (test_file,
+                                XFILE_ATTRIBUTE_STANDARD_SIZE ","
+                                XFILE_ATTRIBUTE_UNIX_MODE,
+                                XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, &local_error);
       g_assert_no_error (local_error);
 
       if (expected_type == FILE_TEST_SETUP_TYPE_REGULAR_EMPTY)
-        g_assert_cmpint (g_file_info_get_size (info), ==, 0);
+        g_assert_cmpint (xfile_info_get_size (info), ==, 0);
       else
-        g_assert_cmpint (g_file_info_get_size (info), >, 0);
+        g_assert_cmpint (xfile_info_get_size (info), >, 0);
 
       if (expected_contents != NULL)
         {
           xchar_t *contents = NULL;
           xsize_t length = 0;
 
-          g_file_get_contents (g_file_peek_path (test_file), &contents, &length, &local_error);
+          xfile_get_contents (xfile_peek_path (test_file), &contents, &length, &local_error);
           g_assert_no_error (local_error);
 
           g_assert_cmpstr (contents, ==, expected_contents);
           g_free (contents);
         }
 
-      g_assert_cmpuint (g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE) & 0777, ==, expected_mode);
+      g_assert_cmpuint (xfile_info_get_attribute_uint32 (info, XFILE_ATTRIBUTE_UNIX_MODE) & 0777, ==, expected_mode);
 
       break;
     case FILE_TEST_SETUP_TYPE_DIRECTORY:
       g_assert (expected_mode == 0);
       g_assert (expected_contents == NULL);
 
-      g_assert_cmpint (test_file_type, ==, G_FILE_TYPE_DIRECTORY);
+      g_assert_cmpint (test_file_type, ==, XFILE_TYPE_DIRECTORY);
       break;
     case FILE_TEST_SETUP_TYPE_SOCKET:
       g_assert (expected_contents == NULL);
 
-      g_assert_cmpint (test_file_type, ==, G_FILE_TYPE_SPECIAL);
+      g_assert_cmpint (test_file_type, ==, XFILE_TYPE_SPECIAL);
 
-      info = g_file_query_info (test_file,
-                                G_FILE_ATTRIBUTE_UNIX_MODE,
-                                G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, &local_error);
+      info = xfile_query_info (test_file,
+                                XFILE_ATTRIBUTE_UNIX_MODE,
+                                XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, &local_error);
       g_assert_no_error (local_error);
 
-      g_assert_cmpuint (g_file_info_get_attribute_uint32 (info, G_FILE_ATTRIBUTE_UNIX_MODE) & 0777, ==, expected_mode);
+      g_assert_cmpuint (xfile_info_get_attribute_uint32 (info, XFILE_ATTRIBUTE_UNIX_MODE) & 0777, ==, expected_mode);
       break;
     case FILE_TEST_SETUP_TYPE_SYMLINK_VALID:
     case FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING:
@@ -1246,32 +1246,32 @@ check_test_file (xfile_t             *test_file,
           g_assert (expected_type != FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING || expected_mode == 0);
           g_assert (expected_contents != NULL);
 
-          g_assert_cmpint (test_file_type, ==, G_FILE_TYPE_SYMBOLIC_LINK);
+          g_assert_cmpint (test_file_type, ==, XFILE_TYPE_SYMBOLIC_LINK);
 
-          info = g_file_query_info (test_file,
-                                    G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET,
-                                    G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, &local_error);
+          info = xfile_query_info (test_file,
+                                    XFILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET,
+                                    XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, &local_error);
           g_assert_no_error (local_error);
 
-          g_assert_cmpstr (g_file_info_get_symlink_target (info), ==, expected_contents);
+          g_assert_cmpstr (xfile_info_get_symlink_target (info), ==, expected_contents);
 
-          symlink_target_file = g_file_get_child (tmpdir, g_file_info_get_symlink_target (info));
+          symlink_target_file = xfile_get_child (tmpdir, xfile_info_get_symlink_target (info));
           if (expected_type == FILE_TEST_SETUP_TYPE_SYMLINK_VALID)
-            g_assert_true (g_file_query_exists (symlink_target_file, NULL));
+            g_assert_true (xfile_query_exists (symlink_target_file, NULL));
           else
-            g_assert_false (g_file_query_exists (symlink_target_file, NULL));
+            g_assert_false (xfile_query_exists (symlink_target_file, NULL));
 
           if (expected_type == FILE_TEST_SETUP_TYPE_SYMLINK_VALID)
             {
-              GFileInfo *target_info = NULL;
+              xfile_info_t *target_info = NULL;
 
               /* Need to re-query the info so we follow symlinks */
-              target_info = g_file_query_info (test_file,
-                                               G_FILE_ATTRIBUTE_UNIX_MODE,
-                                               G_FILE_QUERY_INFO_NONE, NULL, &local_error);
+              target_info = xfile_query_info (test_file,
+                                               XFILE_ATTRIBUTE_UNIX_MODE,
+                                               XFILE_QUERY_INFO_NONE, NULL, &local_error);
               g_assert_no_error (local_error);
 
-              g_assert_cmpuint (g_file_info_get_attribute_uint32 (target_info, G_FILE_ATTRIBUTE_UNIX_MODE) & 0777, ==, expected_mode);
+              g_assert_cmpuint (xfile_info_get_attribute_uint32 (target_info, XFILE_ATTRIBUTE_UNIX_MODE) & 0777, ==, expected_mode);
 
               g_clear_object (&target_info);
             }
@@ -1290,24 +1290,24 @@ check_test_file (xfile_t             *test_file,
 
 #endif  /* __linux__ */
 
-/* A big test for g_file_replace() and g_file_replace_readwrite(). The
- * @test_data is a boolean: %TRUE to test g_file_replace_readwrite(), %FALSE to
- * test g_file_replace(). The test setup and checks are identical for both
- * functions; in the case of testing g_file_replace_readwrite(), only the output
+/* A big test for xfile_replace() and xfile_replace_readwrite(). The
+ * @test_data is a boolean: %TRUE to test xfile_replace_readwrite(), %FALSE to
+ * test xfile_replace(). The test setup and checks are identical for both
+ * functions; in the case of testing xfile_replace_readwrite(), only the output
  * stream side of the returned #xio_stream_t is tested. i.e. We test the write
  * behaviour of both functions is identical.
  *
  * This is intended to test all static behaviour of the function: for each test
  * scenario, a temporary directory is set up with a source file (and maybe some
- * other files) in a set configuration, g_file_replace{,_readwrite}() is called,
+ * other files) in a set configuration, xfile_replace{,_readwrite}() is called,
  * and the final state of the directory is checked.
  *
  * This test does not check dynamic behaviour or race conditions. For example,
  * it does not test what happens if the source file is deleted from another
- * process half-way through a call to g_file_replace().
+ * process half-way through a call to xfile_replace().
  */
 static void
-test_replace (gconstpointer test_data)
+test_replace (xconstpointer test_data)
 {
 #ifdef __linux__
   xboolean_t read_write = GPOINTER_TO_UINT (test_data);
@@ -1315,14 +1315,14 @@ test_replace (gconstpointer test_data)
   const xchar_t *original_source_contents = "this is some test content in source";
   const xchar_t *original_backup_contents = "this is some test content in source~";
   mode_t current_umask = umask (0);
-  guint32 default_public_mode = 0666 & ~current_umask;
-  guint32 default_private_mode = 0600;
+  xuint32_t default_public_mode = 0666 & ~current_umask;
+  xuint32_t default_private_mode = 0600;
 
   const struct
     {
-      /* Arguments to pass to g_file_replace(). */
+      /* Arguments to pass to xfile_replace(). */
       xboolean_t replace_make_backup;
-      GFileCreateFlags replace_flags;
+      xfile_create_flags_t replace_flags;
       const xchar_t *replace_etag;  /* (nullable) */
 
       /* File system setup. */
@@ -1333,7 +1333,7 @@ test_replace (gconstpointer test_data)
 
       /* Expected results. */
       xboolean_t expected_success;
-      GQuark expected_error_domain;
+      xquark expected_error_domain;
       xint_t expected_error_code;
 
       /* Expected final file system state. */
@@ -1351,7 +1351,7 @@ test_replace (gconstpointer test_data)
        * all the different values of setup_source_type, mostly with a backup
        * file created to check it’s not modified */
       {
-        FALSE, G_FILE_CREATE_NONE, NULL,
+        FALSE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         TRUE, 0, 0,
@@ -1359,7 +1359,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0, NULL,
       },
       {
-        FALSE, G_FILE_CREATE_NONE, NULL,
+        FALSE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_EMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1367,7 +1367,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_backup_contents,
       },
       {
-        FALSE, G_FILE_CREATE_NONE, NULL,
+        FALSE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1375,7 +1375,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_backup_contents,
       },
       {
-        FALSE, G_FILE_CREATE_NONE, NULL,
+        FALSE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_DIRECTORY, 0,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FALSE, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
@@ -1383,7 +1383,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_backup_contents,
       },
       {
-        FALSE, G_FILE_CREATE_NONE, NULL,
+        FALSE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_SOCKET, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FALSE, G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
@@ -1391,7 +1391,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_backup_contents,
       },
       {
-        FALSE, G_FILE_CREATE_NONE, NULL,
+        FALSE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING, 0,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1399,7 +1399,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_backup_contents,
       },
       {
-        FALSE, G_FILE_CREATE_NONE, NULL,
+        FALSE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_SYMLINK_VALID, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1410,7 +1410,7 @@ test_replace (gconstpointer test_data)
       /* replace_etag set to an invalid value, with setup_source_type as a
        * regular non-empty file; replacement should fail */
       {
-        FALSE, G_FILE_CREATE_NONE, "incorrect etag",
+        FALSE, XFILE_CREATE_NONE, "incorrect etag",
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FALSE, G_IO_ERROR, G_IO_ERROR_WRONG_ETAG,
@@ -1422,7 +1422,7 @@ test_replace (gconstpointer test_data)
        * all the different values of setup_source_type, with a backup
        * file created to check it’s either replaced or the operation fails */
       {
-        TRUE, G_FILE_CREATE_NONE, NULL,
+        TRUE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         TRUE, 0, 0,
@@ -1430,7 +1430,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0, NULL,
       },
       {
-        TRUE, G_FILE_CREATE_NONE, NULL,
+        TRUE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_EMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1438,7 +1438,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_EMPTY, default_public_mode, NULL,
       },
       {
-        TRUE, G_FILE_CREATE_NONE, NULL,
+        TRUE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1446,7 +1446,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_source_contents,
       },
       {
-        TRUE, G_FILE_CREATE_NONE, NULL,
+        TRUE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_DIRECTORY, 0,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FALSE, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
@@ -1454,7 +1454,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_backup_contents,
       },
       {
-        TRUE, G_FILE_CREATE_NONE, NULL,
+        TRUE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_SOCKET, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FALSE, G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
@@ -1462,7 +1462,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_backup_contents,
       },
       {
-        TRUE, G_FILE_CREATE_NONE, NULL,
+        TRUE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING, 0,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1478,7 +1478,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_EMPTY, 0777 & ~current_umask, NULL,
       },
       {
-        TRUE, G_FILE_CREATE_NONE, NULL,
+        TRUE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_SYMLINK_VALID, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1494,7 +1494,7 @@ test_replace (gconstpointer test_data)
        * setup_source_type is a regular file, with a backup file of every type
        * created to check it’s either replaced or the operation fails */
       {
-        TRUE, G_FILE_CREATE_NONE, NULL,
+        TRUE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         TRUE, 0, 0,
@@ -1502,7 +1502,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_source_contents,
       },
       {
-        TRUE, G_FILE_CREATE_NONE, NULL,
+        TRUE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_EMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1510,7 +1510,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_source_contents,
       },
       {
-        TRUE, G_FILE_CREATE_NONE, NULL,
+        TRUE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1518,7 +1518,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_source_contents,
       },
       {
-        TRUE, G_FILE_CREATE_NONE, NULL,
+        TRUE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_DIRECTORY, 0,
         FALSE, G_IO_ERROR, G_IO_ERROR_CANT_CREATE_BACKUP,
@@ -1526,7 +1526,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_DIRECTORY, 0, NULL,
       },
       {
-        TRUE, G_FILE_CREATE_NONE, NULL,
+        TRUE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_SOCKET, default_public_mode,
         TRUE, 0, 0,
@@ -1534,7 +1534,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_source_contents,
       },
       {
-        TRUE, G_FILE_CREATE_NONE, NULL,
+        TRUE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING, 0,
         TRUE, 0, 0,
@@ -1542,7 +1542,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_source_contents,
       },
       {
-        TRUE, G_FILE_CREATE_NONE, NULL,
+        TRUE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_SYMLINK_VALID, default_public_mode,
         TRUE, 0, 0,
@@ -1556,7 +1556,7 @@ test_replace (gconstpointer test_data)
        * replace_etag == NULL, all the different values of setup_source_type,
        * mostly with a backup file created to check it’s not modified */
       {
-        FALSE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        FALSE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         TRUE, 0, 0,
@@ -1564,7 +1564,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0, NULL,
       },
       {
-        FALSE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        FALSE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_EMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1572,7 +1572,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_backup_contents,
       },
       {
-        FALSE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        FALSE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1580,7 +1580,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_backup_contents,
       },
       {
-        FALSE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        FALSE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_DIRECTORY, 0,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FALSE, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
@@ -1588,7 +1588,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_backup_contents,
       },
       {
-        FALSE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        FALSE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_SOCKET, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FALSE, G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
@@ -1596,7 +1596,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_backup_contents,
       },
       {
-        FALSE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        FALSE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING, 0,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1604,7 +1604,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_backup_contents,
       },
       {
-        FALSE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        FALSE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_SYMLINK_VALID, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1618,7 +1618,7 @@ test_replace (gconstpointer test_data)
        * value, with setup_source_type as a regular non-empty file; replacement
        * should fail */
       {
-        FALSE, G_FILE_CREATE_REPLACE_DESTINATION, "incorrect etag",
+        FALSE, XFILE_CREATE_REPLACE_DESTINATION, "incorrect etag",
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FALSE, G_IO_ERROR, G_IO_ERROR_WRONG_ETAG,
@@ -1631,7 +1631,7 @@ test_replace (gconstpointer test_data)
        * with a backup file created to check it’s either replaced or the
        * operation fails */
       {
-        TRUE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        TRUE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         TRUE, 0, 0,
@@ -1639,7 +1639,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0, NULL,
       },
       {
-        TRUE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        TRUE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_EMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1647,7 +1647,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_EMPTY, default_public_mode, NULL,
       },
       {
-        TRUE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        TRUE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1655,7 +1655,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_source_contents,
       },
       {
-        TRUE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        TRUE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_DIRECTORY, 0,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FALSE, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
@@ -1663,7 +1663,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_backup_contents,
       },
       {
-        TRUE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        TRUE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_SOCKET, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FALSE, G_IO_ERROR, G_IO_ERROR_NOT_REGULAR_FILE,
@@ -1671,7 +1671,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_backup_contents,
       },
       {
-        TRUE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        TRUE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING, 0,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1679,7 +1679,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING, 0, "source-target",
       },
       {
-        TRUE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        TRUE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_SYMLINK_VALID, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1694,7 +1694,7 @@ test_replace (gconstpointer test_data)
        * backup file of every type created to check it’s either replaced or the
        * operation fails */
       {
-        TRUE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        TRUE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         TRUE, 0, 0,
@@ -1702,7 +1702,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_source_contents,
       },
       {
-        TRUE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        TRUE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_EMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1710,7 +1710,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_source_contents,
       },
       {
-        TRUE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        TRUE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         TRUE, 0, 0,
@@ -1718,7 +1718,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_source_contents,
       },
       {
-        TRUE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        TRUE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_DIRECTORY, 0,
         FALSE, G_IO_ERROR, G_IO_ERROR_CANT_CREATE_BACKUP,
@@ -1726,7 +1726,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_DIRECTORY, 0, NULL,
       },
       {
-        TRUE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        TRUE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_SOCKET, default_public_mode,
         TRUE, 0, 0,
@@ -1734,7 +1734,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_source_contents,
       },
       {
-        TRUE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        TRUE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING, 0,
         TRUE, 0, 0,
@@ -1742,7 +1742,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode, original_source_contents,
       },
       {
-        TRUE, G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        TRUE, XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_SYMLINK_VALID, default_public_mode,
         TRUE, 0, 0,
@@ -1754,7 +1754,7 @@ test_replace (gconstpointer test_data)
 
       /* several different setups with replace_flags == PRIVATE */
       {
-        FALSE, G_FILE_CREATE_PRIVATE, NULL,
+        FALSE, XFILE_CREATE_PRIVATE, NULL,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         TRUE, 0, 0,
@@ -1762,7 +1762,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0, NULL,
       },
       {
-        FALSE, G_FILE_CREATE_PRIVATE, NULL,
+        FALSE, XFILE_CREATE_PRIVATE, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         TRUE, 0, 0,
@@ -1771,7 +1771,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0, NULL,
       },
       {
-        FALSE, G_FILE_CREATE_PRIVATE | G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        FALSE, XFILE_CREATE_PRIVATE | XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         TRUE, 0, 0,
@@ -1779,7 +1779,7 @@ test_replace (gconstpointer test_data)
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0, NULL,
       },
       {
-        FALSE, G_FILE_CREATE_PRIVATE | G_FILE_CREATE_REPLACE_DESTINATION, NULL,
+        FALSE, XFILE_CREATE_PRIVATE | XFILE_CREATE_REPLACE_DESTINATION, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY, default_public_mode,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         TRUE, 0, 0,
@@ -1790,7 +1790,7 @@ test_replace (gconstpointer test_data)
       /* make the initial source file unreadable, so the replace operation
        * should fail */
       {
-        FALSE, G_FILE_CREATE_NONE, NULL,
+        FALSE, XFILE_CREATE_NONE, NULL,
         FILE_TEST_SETUP_TYPE_REGULAR_EMPTY, 0  /* most restrictive permissions */,
         FILE_TEST_SETUP_TYPE_NONEXISTENT, 0,
         FALSE, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
@@ -1800,7 +1800,7 @@ test_replace (gconstpointer test_data)
     };
   xsize_t i;
 
-  g_test_summary ("Test various situations for g_file_replace()");
+  g_test_summary ("Test various situations for xfile_replace()");
 
   /* Reset the umask after querying it above. There’s no way to query it without
    * changing it. */
@@ -1811,17 +1811,17 @@ test_replace (gconstpointer test_data)
     {
       xchar_t *tmpdir_path = NULL;
       xfile_t *tmpdir = NULL, *source_file = NULL, *backup_file = NULL;
-      GFileOutputStream *output_stream = NULL;
-      GFileIOStream *io_stream = NULL;
-      GFileEnumerator *enumerator = NULL;
-      GFileInfo *info = NULL;
+      xfile_output_stream_t *output_stream = NULL;
+      xfile_io_stream_t *io_stream = NULL;
+      xfile_enumerator_t *enumerator = NULL;
+      xfile_info_t *info = NULL;
       xuint_t n_files;
       xerror_t *local_error = NULL;
 
       /* Create a fresh, empty working directory. */
-      tmpdir_path = g_dir_make_tmp ("g_file_replace_XXXXXX", &local_error);
+      tmpdir_path = g_dir_make_tmp ("xfile_replace_XXXXXX", &local_error);
       g_assert_no_error (local_error);
-      tmpdir = g_file_new_for_path (tmpdir_path);
+      tmpdir = xfile_new_for_path (tmpdir_path);
 
       g_test_message ("Test %" G_GSIZE_FORMAT ", using temporary directory %s", i, tmpdir_path);
       g_free (tmpdir_path);
@@ -1831,17 +1831,17 @@ test_replace (gconstpointer test_data)
       backup_file = create_test_file (tmpdir, "source~", tests[i].setup_backup_type, tests[i].setup_backup_mode);
 
       /* Replace the source file. Check the error state only after finishing
-       * writing, as the replace operation is split across g_file_replace() and
-       * g_output_stream_close(). */
+       * writing, as the replace operation is split across xfile_replace() and
+       * xoutput_stream_close(). */
       if (read_write)
-        io_stream = g_file_replace_readwrite (source_file,
+        io_stream = xfile_replace_readwrite (source_file,
                                               tests[i].replace_etag,
                                               tests[i].replace_make_backup,
                                               tests[i].replace_flags,
                                               NULL,
                                               &local_error);
       else
-        output_stream = g_file_replace (source_file,
+        output_stream = xfile_replace (source_file,
                                         tests[i].replace_etag,
                                         tests[i].replace_make_backup,
                                         tests[i].replace_flags,
@@ -1863,7 +1863,7 @@ test_replace (gconstpointer test_data)
           xoutput_stream_t *io_output_stream = g_io_stream_get_output_stream (XIO_STREAM (io_stream));
           xsize_t n_written;
 
-          g_output_stream_write_all (G_OUTPUT_STREAM (io_output_stream), new_contents, strlen (new_contents),
+          xoutput_stream_write_all (G_OUTPUT_STREAM (io_output_stream), new_contents, strlen (new_contents),
                                      &n_written, NULL, &local_error);
 
           if (tests[i].expected_success)
@@ -1881,7 +1881,7 @@ test_replace (gconstpointer test_data)
         {
           xsize_t n_written;
 
-          g_output_stream_write_all (G_OUTPUT_STREAM (output_stream), new_contents, strlen (new_contents),
+          xoutput_stream_write_all (G_OUTPUT_STREAM (output_stream), new_contents, strlen (new_contents),
                                      &n_written, NULL, &local_error);
 
           if (tests[i].expected_success)
@@ -1890,7 +1890,7 @@ test_replace (gconstpointer test_data)
               g_assert_cmpint (n_written, ==, strlen (new_contents));
             }
 
-          g_output_stream_close (G_OUTPUT_STREAM (output_stream), NULL, (local_error == NULL) ? &local_error : NULL);
+          xoutput_stream_close (G_OUTPUT_STREAM (output_stream), NULL, (local_error == NULL) ? &local_error : NULL);
 
           if (tests[i].expected_success)
             g_assert_no_error (local_error);
@@ -1906,15 +1906,15 @@ test_replace (gconstpointer test_data)
       g_clear_object (&output_stream);
 
       /* Verify the final state of the directory. */
-      enumerator = g_file_enumerate_children (tmpdir,
-                                              G_FILE_ATTRIBUTE_STANDARD_NAME,
-                                              G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, &local_error);
+      enumerator = xfile_enumerate_children (tmpdir,
+                                              XFILE_ATTRIBUTE_STANDARD_NAME,
+                                              XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL, &local_error);
       g_assert_no_error (local_error);
 
       n_files = 0;
       do
         {
-          g_file_enumerator_iterate (enumerator, &info, NULL, NULL, &local_error);
+          xfile_enumerator_iterate (enumerator, &info, NULL, NULL, &local_error);
           g_assert_no_error (local_error);
 
           if (info != NULL)
@@ -1931,22 +1931,22 @@ test_replace (gconstpointer test_data)
 
       /* Tidy up. Ignore failure apart from when deleting the directory, which
        * should be empty. */
-      g_file_delete (source_file, NULL, NULL);
-      g_file_delete (backup_file, NULL, NULL);
+      xfile_delete (source_file, NULL, NULL);
+      xfile_delete (backup_file, NULL, NULL);
 
       /* Other files which are occasionally generated by the tests. */
         {
-          xfile_t *backup_target_file = g_file_get_child (tmpdir, "source~-target");
-          g_file_delete (backup_target_file, NULL, NULL);
+          xfile_t *backup_target_file = xfile_get_child (tmpdir, "source~-target");
+          xfile_delete (backup_target_file, NULL, NULL);
           g_clear_object (&backup_target_file);
         }
         {
-          xfile_t *backup_target_file = g_file_get_child (tmpdir, "source-target");
-          g_file_delete (backup_target_file, NULL, NULL);
+          xfile_t *backup_target_file = xfile_get_child (tmpdir, "source-target");
+          xfile_delete (backup_target_file, NULL, NULL);
           g_clear_object (&backup_target_file);
         }
 
-      g_file_delete (tmpdir, NULL, &local_error);
+      xfile_delete (tmpdir, NULL, &local_error);
       g_assert_no_error (local_error);
 
       g_clear_object (&backup_file);
@@ -1964,40 +1964,40 @@ on_file_deleted (xobject_t      *object,
 		 xpointer_t      user_data)
 {
   xerror_t *local_error = NULL;
-  GMainLoop *loop = user_data;
+  xmain_loop_t *loop = user_data;
 
-  (void) g_file_delete_finish ((xfile_t*)object, result, &local_error);
+  (void) xfile_delete_finish ((xfile_t*)object, result, &local_error);
   g_assert_no_error (local_error);
 
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static void
 test_async_delete (void)
 {
   xfile_t *file;
-  GFileIOStream *iostream;
+  xfile_io_stream_t *iostream;
   xerror_t *local_error = NULL;
   xerror_t **error = &local_error;
-  GMainLoop *loop;
+  xmain_loop_t *loop;
 
-  file = g_file_new_tmp ("g_file_delete_XXXXXX",
+  file = xfile_new_tmp ("xfile_delete_XXXXXX",
 			 &iostream, error);
   g_assert_no_error (local_error);
-  g_object_unref (iostream);
+  xobject_unref (iostream);
 
-  g_assert_true (g_file_query_exists (file, NULL));
+  g_assert_true (xfile_query_exists (file, NULL));
 
-  loop = g_main_loop_new (NULL, TRUE);
+  loop = xmain_loop_new (NULL, TRUE);
 
-  g_file_delete_async (file, G_PRIORITY_DEFAULT, NULL, on_file_deleted, loop);
+  xfile_delete_async (file, G_PRIORITY_DEFAULT, NULL, on_file_deleted, loop);
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
-  g_assert_false (g_file_query_exists (file, NULL));
+  g_assert_false (xfile_query_exists (file, NULL));
 
-  g_main_loop_unref (loop);
-  g_object_unref (file);
+  xmain_loop_unref (loop);
+  xobject_unref (file);
 }
 
 static void
@@ -2007,27 +2007,27 @@ test_copy_preserve_mode (void)
   mode_t current_umask = umask (0);
   const struct
     {
-      guint32 source_mode;
-      guint32 expected_destination_mode;
+      xuint32_t source_mode;
+      xuint32_t expected_destination_mode;
       xboolean_t create_destination_before_copy;
-      GFileCopyFlags copy_flags;
+      xfile_copy_flags_t copy_flags;
     }
   vectors[] =
     {
       /* Overwriting the destination file should copy the permissions from the
-       * source file, even if %G_FILE_COPY_ALL_METADATA is set: */
-      { 0600, 0600, TRUE, G_FILE_COPY_OVERWRITE | G_FILE_COPY_NOFOLLOW_SYMLINKS | G_FILE_COPY_ALL_METADATA },
-      { 0600, 0600, TRUE, G_FILE_COPY_OVERWRITE | G_FILE_COPY_NOFOLLOW_SYMLINKS },
+       * source file, even if %XFILE_COPY_ALL_METADATA is set: */
+      { 0600, 0600, TRUE, XFILE_COPY_OVERWRITE | XFILE_COPY_NOFOLLOW_SYMLINKS | XFILE_COPY_ALL_METADATA },
+      { 0600, 0600, TRUE, XFILE_COPY_OVERWRITE | XFILE_COPY_NOFOLLOW_SYMLINKS },
       /* The same behaviour should hold if the destination file is not being
        * overwritten because it doesn’t already exist: */
-      { 0600, 0600, FALSE, G_FILE_COPY_NOFOLLOW_SYMLINKS | G_FILE_COPY_ALL_METADATA },
-      { 0600, 0600, FALSE, G_FILE_COPY_NOFOLLOW_SYMLINKS },
-      /* Anything with %G_FILE_COPY_TARGET_DEFAULT_PERMS should use the current
+      { 0600, 0600, FALSE, XFILE_COPY_NOFOLLOW_SYMLINKS | XFILE_COPY_ALL_METADATA },
+      { 0600, 0600, FALSE, XFILE_COPY_NOFOLLOW_SYMLINKS },
+      /* Anything with %XFILE_COPY_TARGET_DEFAULT_PERMS should use the current
        * umask for the destination file: */
-      { 0600, 0666 & ~current_umask, TRUE, G_FILE_COPY_TARGET_DEFAULT_PERMS | G_FILE_COPY_OVERWRITE | G_FILE_COPY_NOFOLLOW_SYMLINKS | G_FILE_COPY_ALL_METADATA },
-      { 0600, 0666 & ~current_umask, TRUE, G_FILE_COPY_TARGET_DEFAULT_PERMS | G_FILE_COPY_OVERWRITE | G_FILE_COPY_NOFOLLOW_SYMLINKS },
-      { 0600, 0666 & ~current_umask, FALSE, G_FILE_COPY_TARGET_DEFAULT_PERMS | G_FILE_COPY_NOFOLLOW_SYMLINKS | G_FILE_COPY_ALL_METADATA },
-      { 0600, 0666 & ~current_umask, FALSE, G_FILE_COPY_TARGET_DEFAULT_PERMS | G_FILE_COPY_NOFOLLOW_SYMLINKS },
+      { 0600, 0666 & ~current_umask, TRUE, XFILE_COPY_TARGET_DEFAULT_PERMS | XFILE_COPY_OVERWRITE | XFILE_COPY_NOFOLLOW_SYMLINKS | XFILE_COPY_ALL_METADATA },
+      { 0600, 0666 & ~current_umask, TRUE, XFILE_COPY_TARGET_DEFAULT_PERMS | XFILE_COPY_OVERWRITE | XFILE_COPY_NOFOLLOW_SYMLINKS },
+      { 0600, 0666 & ~current_umask, FALSE, XFILE_COPY_TARGET_DEFAULT_PERMS | XFILE_COPY_NOFOLLOW_SYMLINKS | XFILE_COPY_ALL_METADATA },
+      { 0600, 0666 & ~current_umask, FALSE, XFILE_COPY_TARGET_DEFAULT_PERMS | XFILE_COPY_NOFOLLOW_SYMLINKS },
     };
   xsize_t i;
 
@@ -2040,27 +2040,27 @@ test_copy_preserve_mode (void)
     {
       xfile_t *tmpfile;
       xfile_t *dest_tmpfile;
-      GFileInfo *dest_info;
-      GFileIOStream *iostream;
+      xfile_info_t *dest_info;
+      xfile_io_stream_t *iostream;
       xerror_t *local_error = NULL;
-      guint32 romode = vectors[i].source_mode;
-      guint32 dest_mode;
+      xuint32_t romode = vectors[i].source_mode;
+      xuint32_t dest_mode;
 
       g_test_message ("Vector %" G_GSIZE_FORMAT, i);
 
-      tmpfile = g_file_new_tmp ("tmp-copy-preserve-modeXXXXXX",
+      tmpfile = xfile_new_tmp ("tmp-copy-preserve-modeXXXXXX",
                                 &iostream, &local_error);
       g_assert_no_error (local_error);
       g_io_stream_close ((xio_stream_t*)iostream, NULL, &local_error);
       g_assert_no_error (local_error);
       g_clear_object (&iostream);
 
-      g_file_set_attribute (tmpfile, G_FILE_ATTRIBUTE_UNIX_MODE, G_FILE_ATTRIBUTE_TYPE_UINT32,
-                            &romode, G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+      xfile_set_attribute (tmpfile, XFILE_ATTRIBUTE_UNIX_MODE, XFILE_ATTRIBUTE_TYPE_UINT32,
+                            &romode, XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                             NULL, &local_error);
       g_assert_no_error (local_error);
 
-      dest_tmpfile = g_file_new_tmp ("tmp-copy-preserve-modeXXXXXX",
+      dest_tmpfile = xfile_new_tmp ("tmp-copy-preserve-modeXXXXXX",
                                      &iostream, &local_error);
       g_assert_no_error (local_error);
       g_io_stream_close ((xio_stream_t*)iostream, NULL, &local_error);
@@ -2069,25 +2069,25 @@ test_copy_preserve_mode (void)
 
       if (!vectors[i].create_destination_before_copy)
         {
-          g_file_delete (dest_tmpfile, NULL, &local_error);
+          xfile_delete (dest_tmpfile, NULL, &local_error);
           g_assert_no_error (local_error);
         }
 
-      g_file_copy (tmpfile, dest_tmpfile, vectors[i].copy_flags,
+      xfile_copy (tmpfile, dest_tmpfile, vectors[i].copy_flags,
                    NULL, NULL, NULL, &local_error);
       g_assert_no_error (local_error);
 
-      dest_info = g_file_query_info (dest_tmpfile, G_FILE_ATTRIBUTE_UNIX_MODE, G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+      dest_info = xfile_query_info (dest_tmpfile, XFILE_ATTRIBUTE_UNIX_MODE, XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                      NULL, &local_error);
       g_assert_no_error (local_error);
 
-      dest_mode = g_file_info_get_attribute_uint32 (dest_info, G_FILE_ATTRIBUTE_UNIX_MODE);
+      dest_mode = xfile_info_get_attribute_uint32 (dest_info, XFILE_ATTRIBUTE_UNIX_MODE);
 
       g_assert_cmpint (dest_mode & ~S_IFMT, ==, vectors[i].expected_destination_mode);
       g_assert_cmpint (dest_mode & S_IFMT, ==, S_IFREG);
 
-      (void) g_file_delete (tmpfile, NULL, NULL);
-      (void) g_file_delete (dest_tmpfile, NULL, NULL);
+      (void) xfile_delete (tmpfile, NULL, NULL);
+      (void) xfile_delete (dest_tmpfile, NULL, NULL);
 
       g_clear_object (&tmpfile);
       g_clear_object (&dest_tmpfile);
@@ -2102,17 +2102,17 @@ static xchar_t *
 splice_to_string (xinput_stream_t   *stream,
                   xerror_t        **error)
 {
-  GMemoryOutputStream *buffer = NULL;
+  xmemory_output_stream_t *buffer = NULL;
   char *ret = NULL;
 
-  buffer = (GMemoryOutputStream*)g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
-  if (g_output_stream_splice ((xoutput_stream_t*)buffer, stream, 0, NULL, error) < 0)
+  buffer = (xmemory_output_stream_t*)g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
+  if (xoutput_stream_splice ((xoutput_stream_t*)buffer, stream, 0, NULL, error) < 0)
     goto out;
 
-  if (!g_output_stream_write ((xoutput_stream_t*)buffer, "\0", 1, NULL, error))
+  if (!xoutput_stream_write ((xoutput_stream_t*)buffer, "\0", 1, NULL, error))
     goto out;
 
-  if (!g_output_stream_close ((xoutput_stream_t*)buffer, NULL, error))
+  if (!xoutput_stream_close ((xoutput_stream_t*)buffer, NULL, error))
     goto out;
 
   ret = g_memory_output_stream_steal_data (buffer);
@@ -2122,9 +2122,9 @@ splice_to_string (xinput_stream_t   *stream,
 }
 
 static xboolean_t
-get_size_from_du (const xchar_t *path, guint64 *size)
+get_size_from_du (const xchar_t *path, xuint64_t *size)
 {
-  GSubprocess *du;
+  xsubprocess_t *du;
   xboolean_t ok;
   xchar_t *result;
   xchar_t *endptr;
@@ -2137,22 +2137,22 @@ get_size_from_du (const xchar_t *path, guint64 *size)
     return FALSE;
   g_free (du_path);
 
-  du = g_subprocess_new (G_SUBPROCESS_FLAGS_STDOUT_PIPE,
+  du = xsubprocess_new (G_SUBPROCESS_FLAGS_STDOUT_PIPE,
                          &error,
                          "du", "--bytes", "-s", path, NULL);
   g_assert_no_error (error);
 
-  result = splice_to_string (g_subprocess_get_stdout_pipe (du), &error);
+  result = splice_to_string (xsubprocess_get_stdout_pipe (du), &error);
   g_assert_no_error (error);
 
   *size = g_ascii_strtoll (result, &endptr, 10);
 
-  g_subprocess_wait (du, NULL, &error);
+  xsubprocess_wait (du, NULL, &error);
   g_assert_no_error (error);
 
-  ok = g_subprocess_get_successful (du);
+  ok = xsubprocess_get_successful (du);
 
-  g_object_unref (du);
+  xobject_unref (du);
   g_free (result);
 
   return ok;
@@ -2162,16 +2162,16 @@ static void
 test_measure (void)
 {
   xfile_t *file;
-  guint64 size;
-  guint64 num_bytes;
-  guint64 num_dirs;
-  guint64 num_files;
+  xuint64_t size;
+  xuint64_t num_bytes;
+  xuint64_t num_dirs;
+  xuint64_t num_files;
   xerror_t *error = NULL;
   xboolean_t ok;
   xchar_t *path;
 
   path = g_test_build_filename (G_TEST_DIST, "desktop-files", NULL);
-  file = g_file_new_for_path (path);
+  file = xfile_new_for_path (path);
 
   if (!get_size_from_du (path, &size))
     {
@@ -2179,8 +2179,8 @@ test_measure (void)
       size = 0;
     }
 
-  ok = g_file_measure_disk_usage (file,
-                                  G_FILE_MEASURE_APPARENT_SIZE,
+  ok = xfile_measure_disk_usage (file,
+                                  XFILE_MEASURE_APPARENT_SIZE,
                                   NULL,
                                   NULL,
                                   NULL,
@@ -2196,25 +2196,25 @@ test_measure (void)
   g_assert_cmpuint (num_dirs, ==, 6);
   g_assert_cmpuint (num_files, ==, 32);
 
-  g_object_unref (file);
+  xobject_unref (file);
   g_free (path);
 }
 
 typedef struct {
-  guint64 expected_bytes;
-  guint64 expected_dirs;
-  guint64 expected_files;
+  xuint64_t expected_bytes;
+  xuint64_t expected_dirs;
+  xuint64_t expected_files;
   xint_t progress_count;
-  guint64 progress_bytes;
-  guint64 progress_dirs;
-  guint64 progress_files;
+  xuint64_t progress_bytes;
+  xuint64_t progress_dirs;
+  xuint64_t progress_files;
 } MeasureData;
 
 static void
 measure_progress (xboolean_t reporting,
-                  guint64  current_size,
-                  guint64  num_dirs,
-                  guint64  num_files,
+                  xuint64_t  current_size,
+                  xuint64_t  num_dirs,
+                  xuint64_t  num_files,
                   xpointer_t user_data)
 {
   MeasureData *data = user_data;
@@ -2236,11 +2236,11 @@ measure_done (xobject_t      *source,
               xpointer_t      user_data)
 {
   MeasureData *data = user_data;
-  guint64 num_bytes, num_dirs, num_files;
+  xuint64_t num_bytes, num_dirs, num_files;
   xerror_t *error = NULL;
   xboolean_t ok;
 
-  ok = g_file_measure_disk_usage_finish (G_FILE (source), res, &num_bytes, &num_dirs, &num_files, &error);
+  ok = xfile_measure_disk_usage_finish (XFILE (source), res, &num_bytes, &num_dirs, &num_files, &error);
   g_assert_true (ok);
   g_assert_no_error (error);
 
@@ -2255,7 +2255,7 @@ measure_done (xobject_t      *source,
   g_assert_cmpuint (num_files, >=, data->progress_files);
 
   g_free (data);
-  g_object_unref (source);
+  xobject_unref (source);
 }
 
 static void
@@ -2273,7 +2273,7 @@ test_measure_async (void)
   data->progress_dirs = 0;
 
   path = g_test_build_filename (G_TEST_DIST, "desktop-files", NULL);
-  file = g_file_new_for_path (path);
+  file = xfile_new_for_path (path);
 
   if (!get_size_from_du (path, &data->expected_bytes))
     {
@@ -2286,8 +2286,8 @@ test_measure_async (void)
   data->expected_dirs = 6;
   data->expected_files = 32;
 
-  g_file_measure_disk_usage_async (file,
-                                   G_FILE_MEASURE_APPARENT_SIZE,
+  xfile_measure_disk_usage_async (file,
+                                   XFILE_MEASURE_APPARENT_SIZE,
                                    0, NULL,
                                    measure_progress, data,
                                    measure_done, data);
@@ -2296,9 +2296,9 @@ test_measure_async (void)
 static void
 test_load_bytes (void)
 {
-  xchar_t filename[] = "g_file_load_bytes_XXXXXX";
+  xchar_t filename[] = "xfile_load_bytes_XXXXXX";
   xerror_t *error = NULL;
-  GBytes *bytes;
+  xbytes_t *bytes;
   xfile_t *file;
   int len;
   int fd;
@@ -2311,24 +2311,24 @@ test_load_bytes (void)
   g_assert_cmpint (ret, ==, len);
   close (fd);
 
-  file = g_file_new_for_path (filename);
-  bytes = g_file_load_bytes (file, NULL, NULL, &error);
+  file = xfile_new_for_path (filename);
+  bytes = xfile_load_bytes (file, NULL, NULL, &error);
   g_assert_no_error (error);
   g_assert_nonnull (bytes);
-  g_assert_cmpint (len, ==, g_bytes_get_size (bytes));
-  g_assert_cmpstr ("test_load_bytes", ==, (xchar_t *)g_bytes_get_data (bytes, NULL));
+  g_assert_cmpint (len, ==, xbytes_get_size (bytes));
+  g_assert_cmpstr ("test_load_bytes", ==, (xchar_t *)xbytes_get_data (bytes, NULL));
 
-  g_file_delete (file, NULL, NULL);
+  xfile_delete (file, NULL, NULL);
 
-  g_bytes_unref (bytes);
-  g_object_unref (file);
+  xbytes_unref (bytes);
+  xobject_unref (file);
 }
 
 typedef struct
 {
-  GMainLoop *main_loop;
+  xmain_loop_t *main_loop;
   xfile_t *file;
-  GBytes *bytes;
+  xbytes_t *bytes;
 } LoadBytesAsyncData;
 
 static void
@@ -2336,22 +2336,22 @@ test_load_bytes_cb (xobject_t      *object,
                     xasync_result_t *result,
                     xpointer_t      user_data)
 {
-  xfile_t *file = G_FILE (object);
+  xfile_t *file = XFILE (object);
   LoadBytesAsyncData *data = user_data;
   xerror_t *error = NULL;
 
-  data->bytes = g_file_load_bytes_finish (file, result, NULL, &error);
+  data->bytes = xfile_load_bytes_finish (file, result, NULL, &error);
   g_assert_no_error (error);
   g_assert_nonnull (data->bytes);
 
-  g_main_loop_quit (data->main_loop);
+  xmain_loop_quit (data->main_loop);
 }
 
 static void
 test_load_bytes_async (void)
 {
   LoadBytesAsyncData data = { 0 };
-  xchar_t filename[] = "g_file_load_bytes_XXXXXX";
+  xchar_t filename[] = "xfile_load_bytes_XXXXXX";
   int len;
   int fd;
   int ret;
@@ -2363,45 +2363,45 @@ test_load_bytes_async (void)
   g_assert_cmpint (ret, ==, len);
   close (fd);
 
-  data.main_loop = g_main_loop_new (NULL, FALSE);
-  data.file = g_file_new_for_path (filename);
+  data.main_loop = xmain_loop_new (NULL, FALSE);
+  data.file = xfile_new_for_path (filename);
 
-  g_file_load_bytes_async (data.file, NULL, test_load_bytes_cb, &data);
-  g_main_loop_run (data.main_loop);
+  xfile_load_bytes_async (data.file, NULL, test_load_bytes_cb, &data);
+  xmain_loop_run (data.main_loop);
 
-  g_assert_cmpint (len, ==, g_bytes_get_size (data.bytes));
-  g_assert_cmpstr ("test_load_bytes_async", ==, (xchar_t *)g_bytes_get_data (data.bytes, NULL));
+  g_assert_cmpint (len, ==, xbytes_get_size (data.bytes));
+  g_assert_cmpstr ("test_load_bytes_async", ==, (xchar_t *)xbytes_get_data (data.bytes, NULL));
 
-  g_file_delete (data.file, NULL, NULL);
-  g_object_unref (data.file);
-  g_bytes_unref (data.bytes);
-  g_main_loop_unref (data.main_loop);
+  xfile_delete (data.file, NULL, NULL);
+  xobject_unref (data.file);
+  xbytes_unref (data.bytes);
+  xmain_loop_unref (data.main_loop);
 }
 
 static void
-test_writev_helper (GOutputVector *vectors,
+test_writev_helper (xoutput_vector_t *vectors,
                     xsize_t          n_vectors,
                     xboolean_t       use_bytes_written,
-                    const guint8  *expected_contents,
+                    const xuint8_t  *expected_contents,
                     xsize_t          expected_length)
 {
   xfile_t *file;
-  GFileIOStream *iostream = NULL;
+  xfile_io_stream_t *iostream = NULL;
   xoutput_stream_t *ostream;
   xerror_t *error = NULL;
   xsize_t bytes_written = 0;
   xboolean_t res;
-  guint8 *contents;
+  xuint8_t *contents;
   xsize_t length;
 
-  file = g_file_new_tmp ("g_file_writev_XXXXXX",
+  file = xfile_new_tmp ("xfile_writev_XXXXXX",
                          &iostream, NULL);
   g_assert_nonnull (file);
   g_assert_nonnull (iostream);
 
   ostream = g_io_stream_get_output_stream (XIO_STREAM (iostream));
 
-  res = g_output_stream_writev_all (ostream, vectors, n_vectors, use_bytes_written ? &bytes_written : NULL, NULL, &error);
+  res = xoutput_stream_writev_all (ostream, vectors, n_vectors, use_bytes_written ? &bytes_written : NULL, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
   if (use_bytes_written)
@@ -2410,9 +2410,9 @@ test_writev_helper (GOutputVector *vectors,
   res = g_io_stream_close (XIO_STREAM (iostream), NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
-  g_object_unref (iostream);
+  xobject_unref (iostream);
 
-  res = g_file_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
+  res = xfile_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
 
@@ -2420,16 +2420,16 @@ test_writev_helper (GOutputVector *vectors,
 
   g_free (contents);
 
-  g_file_delete (file, NULL, NULL);
-  g_object_unref (file);
+  xfile_delete (file, NULL, NULL);
+  xobject_unref (file);
 }
 
 /* Test that writev() on local file output streams works on a non-empty vector */
 static void
 test_writev (void)
 {
-  GOutputVector vectors[3];
-  const guint8 buffer[] = {1, 2, 3, 4, 5,
+  xoutput_vector_t vectors[3];
+  const xuint8_t buffer[] = {1, 2, 3, 4, 5,
                            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                            1, 2, 3};
 
@@ -2449,8 +2449,8 @@ test_writev (void)
 static void
 test_writev_no_bytes_written (void)
 {
-  GOutputVector vectors[3];
-  const guint8 buffer[] = {1, 2, 3, 4, 5,
+  xoutput_vector_t vectors[3];
+  const xuint8_t buffer[] = {1, 2, 3, 4, 5,
                            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                            1, 2, 3};
 
@@ -2477,7 +2477,7 @@ test_writev_no_vectors (void)
 static void
 test_writev_empty_vectors (void)
 {
-  GOutputVector vectors[3];
+  xoutput_vector_t vectors[3];
 
   vectors[0].buffer = NULL;
   vectors[0].size = 0;
@@ -2494,14 +2494,14 @@ static void
 test_writev_too_big_vectors (void)
 {
   xfile_t *file;
-  GFileIOStream *iostream = NULL;
+  xfile_io_stream_t *iostream = NULL;
   xoutput_stream_t *ostream;
   xerror_t *error = NULL;
   xsize_t bytes_written = 0;
   xboolean_t res;
-  guint8 *contents;
+  xuint8_t *contents;
   xsize_t length;
-  GOutputVector vectors[3];
+  xoutput_vector_t vectors[3];
 
   vectors[0].buffer = (void*) 1;
   vectors[0].size = G_MAXSIZE / 2;
@@ -2512,14 +2512,14 @@ test_writev_too_big_vectors (void)
   vectors[2].buffer = (void*) 1;
   vectors[2].size = G_MAXSIZE / 2;
 
-  file = g_file_new_tmp ("g_file_writev_XXXXXX",
+  file = xfile_new_tmp ("xfile_writev_XXXXXX",
                          &iostream, NULL);
   g_assert_nonnull (file);
   g_assert_nonnull (iostream);
 
   ostream = g_io_stream_get_output_stream (XIO_STREAM (iostream));
 
-  res = g_output_stream_writev_all (ostream, vectors, G_N_ELEMENTS (vectors), &bytes_written, NULL, &error);
+  res = xoutput_stream_writev_all (ostream, vectors, G_N_ELEMENTS (vectors), &bytes_written, NULL, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpuint (bytes_written, ==, 0);
   g_assert_false (res);
@@ -2528,9 +2528,9 @@ test_writev_too_big_vectors (void)
   res = g_io_stream_close (XIO_STREAM (iostream), NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
-  g_object_unref (iostream);
+  xobject_unref (iostream);
 
-  res = g_file_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
+  res = xfile_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
 
@@ -2538,14 +2538,14 @@ test_writev_too_big_vectors (void)
 
   g_free (contents);
 
-  g_file_delete (file, NULL, NULL);
-  g_object_unref (file);
+  xfile_delete (file, NULL, NULL);
+  xobject_unref (file);
 }
 
 typedef struct
 {
   xsize_t bytes_written;
-  GOutputVector *vectors;
+  xoutput_vector_t *vectors;
   xsize_t n_vectors;
   xerror_t *error;
   xboolean_t done;
@@ -2562,7 +2562,7 @@ test_writev_async_cb (xobject_t      *object,
   xsize_t bytes_written;
   xboolean_t res;
 
-  res = g_output_stream_writev_finish (ostream, result, &bytes_written, &error);
+  res = xoutput_stream_writev_finish (ostream, result, &bytes_written, &error);
   g_assert_true (res);
   g_assert_no_error (error);
   data->bytes_written += bytes_written;
@@ -2578,11 +2578,11 @@ test_writev_async_cb (xobject_t      *object,
   if (bytes_written > 0 && data->n_vectors > 0)
     {
       data->vectors[0].size -= bytes_written;
-      data->vectors[0].buffer = ((guint8 *) data->vectors[0].buffer) + bytes_written;
+      data->vectors[0].buffer = ((xuint8_t *) data->vectors[0].buffer) + bytes_written;
     }
 
   if (data->n_vectors > 0)
-    g_output_stream_writev_async (ostream, data->vectors, data->n_vectors, 0, NULL, test_writev_async_cb, &data);
+    xoutput_stream_writev_async (ostream, data->vectors, data->n_vectors, 0, NULL, test_writev_async_cb, &data);
 }
 
 /* Test that writev_async() on local file output streams works on a non-empty vector */
@@ -2591,15 +2591,15 @@ test_writev_async (void)
 {
   WritevAsyncData data = { 0 };
   xfile_t *file;
-  GFileIOStream *iostream = NULL;
-  GOutputVector vectors[3];
-  const guint8 buffer[] = {1, 2, 3, 4, 5,
+  xfile_io_stream_t *iostream = NULL;
+  xoutput_vector_t vectors[3];
+  const xuint8_t buffer[] = {1, 2, 3, 4, 5,
                            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                            1, 2, 3};
   xoutput_stream_t *ostream;
   xerror_t *error = NULL;
   xboolean_t res;
-  guint8 *contents;
+  xuint8_t *contents;
   xsize_t length;
 
   vectors[0].buffer = buffer;
@@ -2611,7 +2611,7 @@ test_writev_async (void)
   vectors[2].buffer = buffer + 5  + 12;
   vectors[2].size = 3;
 
-  file = g_file_new_tmp ("g_file_writev_XXXXXX",
+  file = xfile_new_tmp ("xfile_writev_XXXXXX",
                          &iostream, NULL);
   g_assert_nonnull (file);
   g_assert_nonnull (iostream);
@@ -2621,19 +2621,19 @@ test_writev_async (void)
 
   ostream = g_io_stream_get_output_stream (XIO_STREAM (iostream));
 
-  g_output_stream_writev_async (ostream, data.vectors, data.n_vectors, 0, NULL, test_writev_async_cb, &data);
+  xoutput_stream_writev_async (ostream, data.vectors, data.n_vectors, 0, NULL, test_writev_async_cb, &data);
 
   while (data.n_vectors > 0)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   g_assert_cmpuint (data.bytes_written, ==, sizeof buffer);
 
   res = g_io_stream_close (XIO_STREAM (iostream), NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
-  g_object_unref (iostream);
+  xobject_unref (iostream);
 
-  res = g_file_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
+  res = xfile_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
 
@@ -2641,8 +2641,8 @@ test_writev_async (void)
 
   g_free (contents);
 
-  g_file_delete (file, NULL, NULL);
-  g_object_unref (file);
+  xfile_delete (file, NULL, NULL);
+  xobject_unref (file);
 }
 
 static void
@@ -2653,7 +2653,7 @@ test_writev_all_cb (xobject_t      *object,
   xoutput_stream_t *ostream = G_OUTPUT_STREAM (object);
   WritevAsyncData *data = user_data;
 
-  g_output_stream_writev_all_finish (ostream, result, &data->bytes_written, &data->error);
+  xoutput_stream_writev_all_finish (ostream, result, &data->bytes_written, &data->error);
   data->done = TRUE;
 }
 
@@ -2663,15 +2663,15 @@ test_writev_async_all (void)
 {
   WritevAsyncData data = { 0 };
   xfile_t *file;
-  GFileIOStream *iostream = NULL;
+  xfile_io_stream_t *iostream = NULL;
   xoutput_stream_t *ostream;
-  GOutputVector vectors[3];
-  const guint8 buffer[] = {1, 2, 3, 4, 5,
+  xoutput_vector_t vectors[3];
+  const xuint8_t buffer[] = {1, 2, 3, 4, 5,
                            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                            1, 2, 3};
   xerror_t *error = NULL;
   xboolean_t res;
-  guint8 *contents;
+  xuint8_t *contents;
   xsize_t length;
 
   vectors[0].buffer = buffer;
@@ -2683,17 +2683,17 @@ test_writev_async_all (void)
   vectors[2].buffer = buffer + 5  + 12;
   vectors[2].size = 3;
 
-  file = g_file_new_tmp ("g_file_writev_XXXXXX",
+  file = xfile_new_tmp ("xfile_writev_XXXXXX",
                          &iostream, NULL);
   g_assert_nonnull (file);
   g_assert_nonnull (iostream);
 
   ostream = g_io_stream_get_output_stream (XIO_STREAM (iostream));
 
-  g_output_stream_writev_all_async (ostream, vectors, G_N_ELEMENTS (vectors), 0, NULL, test_writev_all_cb, &data);
+  xoutput_stream_writev_all_async (ostream, vectors, G_N_ELEMENTS (vectors), 0, NULL, test_writev_all_cb, &data);
 
   while (!data.done)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   g_assert_cmpuint (data.bytes_written, ==, sizeof buffer);
   g_assert_no_error (data.error);
@@ -2701,9 +2701,9 @@ test_writev_async_all (void)
   res = g_io_stream_close (XIO_STREAM (iostream), NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
-  g_object_unref (iostream);
+  xobject_unref (iostream);
 
-  res = g_file_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
+  res = xfile_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
 
@@ -2711,8 +2711,8 @@ test_writev_async_all (void)
 
   g_free (contents);
 
-  g_file_delete (file, NULL, NULL);
-  g_object_unref (file);
+  xfile_delete (file, NULL, NULL);
+  xobject_unref (file);
 }
 
 /* Test that writev_async_all() on local file output streams handles cancellation correctly */
@@ -2721,15 +2721,15 @@ test_writev_async_all_cancellation (void)
 {
   WritevAsyncData data = { 0 };
   xfile_t *file;
-  GFileIOStream *iostream = NULL;
-  GOutputVector vectors[3];
-  const guint8 buffer[] = {1, 2, 3, 4, 5,
+  xfile_io_stream_t *iostream = NULL;
+  xoutput_vector_t vectors[3];
+  const xuint8_t buffer[] = {1, 2, 3, 4, 5,
                            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                            1, 2, 3};
   xoutput_stream_t *ostream;
   xerror_t *error = NULL;
   xboolean_t res;
-  guint8 *contents;
+  xuint8_t *contents;
   xsize_t length;
   xcancellable_t *cancellable;
 
@@ -2742,7 +2742,7 @@ test_writev_async_all_cancellation (void)
   vectors[2].buffer = buffer + 5  + 12;
   vectors[2].size = 3;
 
-  file = g_file_new_tmp ("g_file_writev_XXXXXX",
+  file = xfile_new_tmp ("xfile_writev_XXXXXX",
                          &iostream, NULL);
   g_assert_nonnull (file);
   g_assert_nonnull (iostream);
@@ -2752,10 +2752,10 @@ test_writev_async_all_cancellation (void)
   cancellable = g_cancellable_new ();
   g_cancellable_cancel (cancellable);
 
-  g_output_stream_writev_all_async (ostream, vectors, G_N_ELEMENTS (vectors), 0, cancellable, test_writev_all_cb, &data);
+  xoutput_stream_writev_all_async (ostream, vectors, G_N_ELEMENTS (vectors), 0, cancellable, test_writev_all_cb, &data);
 
   while (!data.done)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   g_assert_cmpuint (data.bytes_written, ==, 0);
   g_assert_error (data.error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
@@ -2764,18 +2764,18 @@ test_writev_async_all_cancellation (void)
   res = g_io_stream_close (XIO_STREAM (iostream), NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
-  g_object_unref (iostream);
+  xobject_unref (iostream);
 
-  res = g_file_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
+  res = xfile_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
   g_assert_cmpuint (length, ==, 0);
 
   g_free (contents);
 
-  g_file_delete (file, NULL, NULL);
-  g_object_unref (file);
-  g_object_unref (cancellable);
+  xfile_delete (file, NULL, NULL);
+  xobject_unref (file);
+  xobject_unref (cancellable);
 }
 
 /* Test that writev_async_all() with empty vectors is handled correctly */
@@ -2784,12 +2784,12 @@ test_writev_async_all_empty_vectors (void)
 {
   WritevAsyncData data = { 0 };
   xfile_t *file;
-  GFileIOStream *iostream = NULL;
-  GOutputVector vectors[3];
+  xfile_io_stream_t *iostream = NULL;
+  xoutput_vector_t vectors[3];
   xoutput_stream_t *ostream;
   xerror_t *error = NULL;
   xboolean_t res;
-  guint8 *contents;
+  xuint8_t *contents;
   xsize_t length;
 
   vectors[0].buffer = NULL;
@@ -2801,17 +2801,17 @@ test_writev_async_all_empty_vectors (void)
   vectors[2].buffer = NULL;
   vectors[2].size = 0;
 
-  file = g_file_new_tmp ("g_file_writev_XXXXXX",
+  file = xfile_new_tmp ("xfile_writev_XXXXXX",
                          &iostream, NULL);
   g_assert_nonnull (file);
   g_assert_nonnull (iostream);
 
   ostream = g_io_stream_get_output_stream (XIO_STREAM (iostream));
 
-  g_output_stream_writev_all_async (ostream, vectors, G_N_ELEMENTS (vectors), 0, NULL, test_writev_all_cb, &data);
+  xoutput_stream_writev_all_async (ostream, vectors, G_N_ELEMENTS (vectors), 0, NULL, test_writev_all_cb, &data);
 
   while (!data.done)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   g_assert_cmpuint (data.bytes_written, ==, 0);
   g_assert_no_error (data.error);
@@ -2820,17 +2820,17 @@ test_writev_async_all_empty_vectors (void)
   res = g_io_stream_close (XIO_STREAM (iostream), NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
-  g_object_unref (iostream);
+  xobject_unref (iostream);
 
-  res = g_file_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
+  res = xfile_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
   g_assert_cmpuint (length, ==, 0);
 
   g_free (contents);
 
-  g_file_delete (file, NULL, NULL);
-  g_object_unref (file);
+  xfile_delete (file, NULL, NULL);
+  xobject_unref (file);
 }
 
 /* Test that writev_async_all() with no vectors is handled correctly */
@@ -2839,24 +2839,24 @@ test_writev_async_all_no_vectors (void)
 {
   WritevAsyncData data = { 0 };
   xfile_t *file;
-  GFileIOStream *iostream = NULL;
+  xfile_io_stream_t *iostream = NULL;
   xoutput_stream_t *ostream;
   xerror_t *error = NULL;
   xboolean_t res;
-  guint8 *contents;
+  xuint8_t *contents;
   xsize_t length;
 
-  file = g_file_new_tmp ("g_file_writev_XXXXXX",
+  file = xfile_new_tmp ("xfile_writev_XXXXXX",
                          &iostream, NULL);
   g_assert_nonnull (file);
   g_assert_nonnull (iostream);
 
   ostream = g_io_stream_get_output_stream (XIO_STREAM (iostream));
 
-  g_output_stream_writev_all_async (ostream, NULL, 0, 0, NULL, test_writev_all_cb, &data);
+  xoutput_stream_writev_all_async (ostream, NULL, 0, 0, NULL, test_writev_all_cb, &data);
 
   while (!data.done)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   g_assert_cmpuint (data.bytes_written, ==, 0);
   g_assert_no_error (data.error);
@@ -2865,17 +2865,17 @@ test_writev_async_all_no_vectors (void)
   res = g_io_stream_close (XIO_STREAM (iostream), NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
-  g_object_unref (iostream);
+  xobject_unref (iostream);
 
-  res = g_file_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
+  res = xfile_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
   g_assert_cmpuint (length, ==, 0);
 
   g_free (contents);
 
-  g_file_delete (file, NULL, NULL);
-  g_object_unref (file);
+  xfile_delete (file, NULL, NULL);
+  xobject_unref (file);
 }
 
 /* Test that writev_async_all() with too big vectors is handled correctly */
@@ -2884,12 +2884,12 @@ test_writev_async_all_too_big_vectors (void)
 {
   WritevAsyncData data = { 0 };
   xfile_t *file;
-  GFileIOStream *iostream = NULL;
-  GOutputVector vectors[3];
+  xfile_io_stream_t *iostream = NULL;
+  xoutput_vector_t vectors[3];
   xoutput_stream_t *ostream;
   xerror_t *error = NULL;
   xboolean_t res;
-  guint8 *contents;
+  xuint8_t *contents;
   xsize_t length;
 
   vectors[0].buffer = (void*) 1;
@@ -2901,17 +2901,17 @@ test_writev_async_all_too_big_vectors (void)
   vectors[2].buffer = (void*) 1;
   vectors[2].size = G_MAXSIZE / 2;
 
-  file = g_file_new_tmp ("g_file_writev_XXXXXX",
+  file = xfile_new_tmp ("xfile_writev_XXXXXX",
                          &iostream, NULL);
   g_assert_nonnull (file);
   g_assert_nonnull (iostream);
 
   ostream = g_io_stream_get_output_stream (XIO_STREAM (iostream));
 
-  g_output_stream_writev_all_async (ostream, vectors, G_N_ELEMENTS (vectors), 0, NULL, test_writev_all_cb, &data);
+  xoutput_stream_writev_all_async (ostream, vectors, G_N_ELEMENTS (vectors), 0, NULL, test_writev_all_cb, &data);
 
   while (!data.done)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   g_assert_cmpuint (data.bytes_written, ==, 0);
   g_assert_error (data.error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -2920,37 +2920,37 @@ test_writev_async_all_too_big_vectors (void)
   res = g_io_stream_close (XIO_STREAM (iostream), NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
-  g_object_unref (iostream);
+  xobject_unref (iostream);
 
-  res = g_file_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
+  res = xfile_load_contents (file, NULL, (xchar_t **) &contents, &length, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
   g_assert_cmpuint (length, ==, 0);
 
   g_free (contents);
 
-  g_file_delete (file, NULL, NULL);
-  g_object_unref (file);
+  xfile_delete (file, NULL, NULL);
+  xobject_unref (file);
 }
 
 static void
 test_build_attribute_list_for_copy (void)
 {
   xfile_t *tmpfile;
-  GFileIOStream *iostream;
+  xfile_io_stream_t *iostream;
   xerror_t *error = NULL;
-  const GFileCopyFlags test_flags[] =
+  const xfile_copy_flags_t test_flags[] =
     {
-      G_FILE_COPY_NONE,
-      G_FILE_COPY_TARGET_DEFAULT_PERMS,
-      G_FILE_COPY_ALL_METADATA,
-      G_FILE_COPY_ALL_METADATA | G_FILE_COPY_TARGET_DEFAULT_PERMS,
+      XFILE_COPY_NONE,
+      XFILE_COPY_TARGET_DEFAULT_PERMS,
+      XFILE_COPY_ALL_METADATA,
+      XFILE_COPY_ALL_METADATA | XFILE_COPY_TARGET_DEFAULT_PERMS,
     };
   xsize_t i;
   char *attrs;
   xchar_t *attrs_with_commas;
 
-  tmpfile = g_file_new_tmp ("tmp-build-attribute-list-for-copyXXXXXX",
+  tmpfile = xfile_new_tmp ("tmp-build-attribute-list-for-copyXXXXXX",
                             &iostream, &error);
   g_assert_no_error (error);
   g_io_stream_close ((xio_stream_t*)iostream, NULL, &error);
@@ -2959,50 +2959,50 @@ test_build_attribute_list_for_copy (void)
 
   for (i = 0; i < G_N_ELEMENTS (test_flags); i++)
     {
-      GFileCopyFlags flags = test_flags[i];
+      xfile_copy_flags_t flags = test_flags[i];
 
-      attrs = g_file_build_attribute_list_for_copy (tmpfile, flags, NULL, &error);
+      attrs = xfile_build_attribute_list_for_copy (tmpfile, flags, NULL, &error);
       g_test_message ("Attributes for copy: %s", attrs);
       g_assert_no_error (error);
       g_assert_nonnull (attrs);
-      attrs_with_commas = g_strconcat (",", attrs, ",", NULL);
+      attrs_with_commas = xstrconcat (",", attrs, ",", NULL);
       g_free (attrs);
 
       /* See g_local_file_class_init for reference. */
-      if (flags & G_FILE_COPY_TARGET_DEFAULT_PERMS)
-        g_assert_null (g_strstr_len (attrs_with_commas, -1, "," G_FILE_ATTRIBUTE_UNIX_MODE ","));
+      if (flags & XFILE_COPY_TARGET_DEFAULT_PERMS)
+        g_assert_null (xstrstr_len (attrs_with_commas, -1, "," XFILE_ATTRIBUTE_UNIX_MODE ","));
       else
-        g_assert_nonnull (g_strstr_len (attrs_with_commas, -1, "," G_FILE_ATTRIBUTE_UNIX_MODE ","));
+        g_assert_nonnull (xstrstr_len (attrs_with_commas, -1, "," XFILE_ATTRIBUTE_UNIX_MODE ","));
 #ifdef G_OS_UNIX
-      if (flags & G_FILE_COPY_ALL_METADATA)
+      if (flags & XFILE_COPY_ALL_METADATA)
         {
-          g_assert_nonnull (g_strstr_len (attrs_with_commas, -1, "," G_FILE_ATTRIBUTE_UNIX_UID ","));
-          g_assert_nonnull (g_strstr_len (attrs_with_commas, -1, "," G_FILE_ATTRIBUTE_UNIX_GID ","));
+          g_assert_nonnull (xstrstr_len (attrs_with_commas, -1, "," XFILE_ATTRIBUTE_UNIX_UID ","));
+          g_assert_nonnull (xstrstr_len (attrs_with_commas, -1, "," XFILE_ATTRIBUTE_UNIX_GID ","));
         }
       else
         {
-          g_assert_null (g_strstr_len (attrs_with_commas, -1, "," G_FILE_ATTRIBUTE_UNIX_UID ","));
-          g_assert_null (g_strstr_len (attrs_with_commas, -1, "," G_FILE_ATTRIBUTE_UNIX_GID ","));
+          g_assert_null (xstrstr_len (attrs_with_commas, -1, "," XFILE_ATTRIBUTE_UNIX_UID ","));
+          g_assert_null (xstrstr_len (attrs_with_commas, -1, "," XFILE_ATTRIBUTE_UNIX_GID ","));
         }
 #endif
 #ifdef HAVE_UTIMES
-      g_assert_nonnull (g_strstr_len (attrs_with_commas, -1, "," G_FILE_ATTRIBUTE_TIME_MODIFIED ","));
-      g_assert_nonnull (g_strstr_len (attrs_with_commas, -1, "," G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC ","));
-      if (flags & G_FILE_COPY_ALL_METADATA)
+      g_assert_nonnull (xstrstr_len (attrs_with_commas, -1, "," XFILE_ATTRIBUTE_TIME_MODIFIED ","));
+      g_assert_nonnull (xstrstr_len (attrs_with_commas, -1, "," XFILE_ATTRIBUTE_TIME_MODIFIED_USEC ","));
+      if (flags & XFILE_COPY_ALL_METADATA)
         {
-          g_assert_nonnull (g_strstr_len (attrs_with_commas, -1, "," G_FILE_ATTRIBUTE_TIME_ACCESS ","));
-          g_assert_nonnull (g_strstr_len (attrs_with_commas, -1, "," G_FILE_ATTRIBUTE_TIME_ACCESS_USEC ","));
+          g_assert_nonnull (xstrstr_len (attrs_with_commas, -1, "," XFILE_ATTRIBUTE_TIME_ACCESS ","));
+          g_assert_nonnull (xstrstr_len (attrs_with_commas, -1, "," XFILE_ATTRIBUTE_TIME_ACCESS_USEC ","));
         }
       else
         {
-          g_assert_null (g_strstr_len (attrs_with_commas, -1, "," G_FILE_ATTRIBUTE_TIME_ACCESS ","));
-          g_assert_null (g_strstr_len (attrs_with_commas, -1, "," G_FILE_ATTRIBUTE_TIME_ACCESS_USEC ","));
+          g_assert_null (xstrstr_len (attrs_with_commas, -1, "," XFILE_ATTRIBUTE_TIME_ACCESS ","));
+          g_assert_null (xstrstr_len (attrs_with_commas, -1, "," XFILE_ATTRIBUTE_TIME_ACCESS_USEC ","));
         }
 #endif
       g_free (attrs_with_commas);
     }
 
-  (void) g_file_delete (tmpfile, NULL, NULL);
+  (void) xfile_delete (tmpfile, NULL, NULL);
   g_clear_object (&tmpfile);
 }
 
@@ -3018,23 +3018,23 @@ test_move_async_cb (xobject_t      *object,
                     xasync_result_t *result,
                     xpointer_t      user_data)
 {
-  xfile_t *file = G_FILE (object);
+  xfile_t *file = XFILE (object);
   MoveAsyncData *data = user_data;
   xerror_t *error = NULL;
 
-  data->res = g_file_move_finish (file, result, &error);
+  data->res = xfile_move_finish (file, result, &error);
   data->error = error;
   data->done = TRUE;
 }
 
 typedef struct
 {
-  goffset total_num_bytes;
+  xoffset_t total_num_bytes;
 } MoveAsyncProgressData;
 
 static void
-test_move_async_progress_cb (goffset  current_num_bytes,
-                             goffset  total_num_bytes,
+test_move_async_progress_cb (xoffset_t  current_num_bytes,
+                             xoffset_t  total_num_bytes,
                              xpointer_t user_data)
 {
   MoveAsyncProgressData *data = user_data;
@@ -3048,35 +3048,35 @@ test_move_async (void)
   MoveAsyncData data = { 0 };
   MoveAsyncProgressData progress_data = { 0 };
   xfile_t *source;
-  GFileIOStream *iostream;
+  xfile_io_stream_t *iostream;
   xoutput_stream_t *ostream;
   xfile_t *destination;
   xchar_t *destination_path;
   xerror_t *error = NULL;
   xboolean_t res;
-  const guint8 buffer[] = {1, 2, 3, 4, 5};
+  const xuint8_t buffer[] = {1, 2, 3, 4, 5};
 
-  source = g_file_new_tmp ("g_file_move_XXXXXX", &iostream, NULL);
+  source = xfile_new_tmp ("xfile_move_XXXXXX", &iostream, NULL);
 
-  destination_path = g_build_path (G_DIR_SEPARATOR_S, g_get_tmp_dir (), "g_file_move_target", NULL);
-  destination = g_file_new_for_path (destination_path);
+  destination_path = g_build_path (G_DIR_SEPARATOR_S, g_get_tmp_dir (), "xfile_move_target", NULL);
+  destination = xfile_new_for_path (destination_path);
 
   g_assert_nonnull (source);
   g_assert_nonnull (iostream);
 
-  res = g_file_query_exists (source, NULL);
+  res = xfile_query_exists (source, NULL);
   g_assert_true (res);
-  res = g_file_query_exists (destination, NULL);
+  res = xfile_query_exists (destination, NULL);
   g_assert_false (res);
 
   // Write a known amount of bytes to the file, so we can test the progress callback against it
   ostream = g_io_stream_get_output_stream (XIO_STREAM (iostream));
-  g_output_stream_write (ostream, buffer, sizeof (buffer), NULL, &error);
+  xoutput_stream_write (ostream, buffer, sizeof (buffer), NULL, &error);
   g_assert_no_error (error);
 
-  g_file_move_async (source,
+  xfile_move_async (source,
                      destination,
-                     G_FILE_COPY_NONE,
+                     XFILE_COPY_NONE,
                      0,
                      NULL,
                      test_move_async_progress_cb,
@@ -3085,28 +3085,28 @@ test_move_async (void)
                      &data);
 
   while (!data.done)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   g_assert_no_error (data.error);
   g_assert_true (data.res);
   g_assert_cmpuint (progress_data.total_num_bytes, ==, sizeof (buffer));
 
-  res = g_file_query_exists (source, NULL);
+  res = xfile_query_exists (source, NULL);
   g_assert_false (res);
-  res = g_file_query_exists (destination, NULL);
+  res = xfile_query_exists (destination, NULL);
   g_assert_true (res);
 
   res = g_io_stream_close (XIO_STREAM (iostream), NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
-  g_object_unref (iostream);
+  xobject_unref (iostream);
 
-  res = g_file_delete (destination, NULL, &error);
+  res = xfile_delete (destination, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
 
-  g_object_unref (source);
-  g_object_unref (destination);
+  xobject_unref (source);
+  xobject_unref (destination);
 
   g_free (destination_path);
 }

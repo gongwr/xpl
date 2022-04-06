@@ -28,20 +28,20 @@
 
 struct mapping_entry
 {
-  guint16 src;
-  guint16 ascii;
+  xuint16_t src;
+  xuint16_t ascii;
 };
 
 struct mapping_range
 {
-  guint16 start;
-  guint16 length;
+  xuint16_t start;
+  xuint16_t length;
 };
 
 struct locale_entry
 {
-  guint8 name_offset;
-  guint8 item_id;
+  xuint8_t name_offset;
+  xuint8_t item_id;
 };
 
 #include "gtranslit-data.h"
@@ -56,17 +56,17 @@ struct locale_entry
 #endif
 
 static const xchar_t * lookup_in_item (xuint_t           item_id,
-                                     const gunichar *key,
+                                     const xunichar_t *key,
                                      xint_t           *result_len,
                                      xint_t           *key_consumed);
 
 static xint_t
-compare_mapping_entry (gconstpointer user_data,
-                       gconstpointer data)
+compare_mapping_entry (xconstpointer user_data,
+                       xconstpointer data)
 {
   const struct mapping_entry *entry = data;
-  const gunichar *key = user_data;
-  gunichar src_0;
+  const xunichar_t *key = user_data;
+  xunichar_t src_0;
 
   G_STATIC_ASSERT(MAX_KEY_SIZE == 2);
 
@@ -79,7 +79,7 @@ compare_mapping_entry (gconstpointer user_data,
 
   if (get_length (entry->src) > 1)
     {
-      gunichar src_1;
+      xunichar_t src_1;
 
       src_1 = get_src_char (src_table, entry->src, 1);
 
@@ -97,7 +97,7 @@ compare_mapping_entry (gconstpointer user_data,
 static const xchar_t *
 lookup_in_mapping (const struct mapping_entry *mapping,
                    xint_t                        mapping_size,
-                   const gunichar             *key,
+                   const xunichar_t             *key,
                    xint_t                       *result_len,
                    xint_t                       *key_consumed)
 {
@@ -115,8 +115,8 @@ lookup_in_mapping (const struct mapping_entry *mapping,
 }
 
 static const xchar_t *
-lookup_in_chain (const guint8   *chain,
-                 const gunichar *key,
+lookup_in_chain (const xuint8_t   *chain,
+                 const xunichar_t *key,
                  xint_t           *result_len,
                  xint_t           *key_consumed)
 {
@@ -137,13 +137,13 @@ lookup_in_chain (const guint8   *chain,
 
 static const xchar_t *
 lookup_in_item (xuint_t           item_id,
-                const gunichar *key,
+                const xunichar_t *key,
                 xint_t           *result_len,
                 xint_t           *key_consumed)
 {
   if (item_id & 0x80)
     {
-      const guint8 *chain = chains_table + chain_starts[item_id & 0x7f];
+      const xuint8_t *chain = chains_table + chain_starts[item_id & 0x7f];
 
       return lookup_in_chain (chain, key, result_len, key_consumed);
     }
@@ -156,8 +156,8 @@ lookup_in_item (xuint_t           item_id,
 }
 
 static xint_t
-compare_locale_entry (gconstpointer user_data,
-                      gconstpointer data)
+compare_locale_entry (xconstpointer user_data,
+                      xconstpointer data)
 {
   const struct locale_entry *entry = data;
   const xchar_t *key = user_data;
@@ -299,7 +299,7 @@ get_default_item_id (void)
 }
 
 /**
- * g_str_to_ascii:
+ * xstr_to_ascii:
  * @str: a string, in UTF-8
  * @from_locale: (nullable): the source locale, if known
  *
@@ -327,49 +327,49 @@ get_default_item_id (void)
  * Since: 2.40
  **/
 xchar_t *
-g_str_to_ascii (const xchar_t *str,
+xstr_to_ascii (const xchar_t *str,
                 const xchar_t *from_locale)
 {
-  GString *result;
+  xstring_t *result;
   xuint_t item_id;
 
   g_return_val_if_fail (str != NULL, NULL);
 
-  if (g_str_is_ascii (str))
-    return g_strdup (str);
+  if (xstr_is_ascii (str))
+    return xstrdup (str);
 
   if (from_locale)
     item_id = lookup_item_id_for_locale (from_locale);
   else
     item_id = get_default_item_id ();
 
-  result = g_string_sized_new (strlen (str));
+  result = xstring_sized_new (strlen (str));
 
   while (*str)
     {
       /* We only need to transliterate non-ASCII values... */
       if (*str & 0x80)
         {
-          gunichar key[MAX_KEY_SIZE];
+          xunichar_t key[MAX_KEY_SIZE];
           const xchar_t *r;
           xint_t consumed;
           xint_t r_len;
-          gunichar c;
+          xunichar_t c;
 
           G_STATIC_ASSERT(MAX_KEY_SIZE == 2);
 
-          c = g_utf8_get_char (str);
+          c = xutf8_get_char (str);
 
           /* This is where it gets evil...
            *
            * We know that MAX_KEY_SIZE is 2.  We also know that we
            * only want to try another character if it's non-ascii.
            */
-          str = g_utf8_next_char (str);
+          str = xutf8_next_char (str);
 
           key[0] = c;
           if (*str & 0x80)
-            key[1] = g_utf8_get_char (str);
+            key[1] = xutf8_get_char (str);
           else
             key[1] = 0;
 
@@ -392,17 +392,17 @@ g_str_to_ascii (const xchar_t *str,
 
           if (r != NULL)
             {
-              g_string_append_len (result, r, r_len);
+              xstring_append_len (result, r, r_len);
               if (consumed == 2)
                 /* If it took both then skip again */
-                str = g_utf8_next_char (str);
+                str = xutf8_next_char (str);
             }
           else /* no match found */
-            g_string_append_c (result, '?');
+            xstring_append_c (result, '?');
         }
       else /* ASCII case */
-        g_string_append_c (result, *str++);
+        xstring_append_c (result, *str++);
     }
 
-  return g_string_free (result, FALSE);
+  return xstring_free (result, FALSE);
 }

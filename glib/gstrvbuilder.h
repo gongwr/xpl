@@ -29,38 +29,38 @@
 G_BEGIN_DECLS
 
 /**
- * GStrvBuilder:
+ * xstrv_builder_t:
  *
  * A helper object to build a %NULL-terminated string array
- * by appending. See g_strv_builder_new().
+ * by appending. See xstrv_builder_new().
  *
  * Since: 2.68
  */
-typedef struct _GStrvBuilder GStrvBuilder;
+typedef struct _xstrv_builder xstrv_builder_t;
 
 XPL_AVAILABLE_IN_2_68
-GStrvBuilder *g_strv_builder_new (void);
+xstrv_builder_t *xstrv_builder_new (void);
 
 XPL_AVAILABLE_IN_2_68
-void g_strv_builder_unref (GStrvBuilder *builder);
+void xstrv_builder_unref (xstrv_builder_t *builder);
 
 XPL_AVAILABLE_IN_2_68
-GStrvBuilder *g_strv_builder_ref (GStrvBuilder *builder);
+xstrv_builder_t *xstrv_builder_ref (xstrv_builder_t *builder);
 
 XPL_AVAILABLE_IN_2_68
-void g_strv_builder_add (GStrvBuilder *builder,
+void xstrv_builder_add (xstrv_builder_t *builder,
                          const char *value);
 
 XPL_AVAILABLE_IN_2_70
-void g_strv_builder_addv (GStrvBuilder *builder,
+void xstrv_builder_addv (xstrv_builder_t *builder,
                           const char **value);
 
 XPL_AVAILABLE_IN_2_70
-void g_strv_builder_add_many (GStrvBuilder *builder,
+void xstrv_builder_add_many (xstrv_builder_t *builder,
                               ...) G_GNUC_NULL_TERMINATED;
 
 XPL_AVAILABLE_IN_2_68
-GStrv g_strv_builder_end (GStrvBuilder *builder);
+xstrv_t xstrv_builder_end (xstrv_builder_t *builder);
 
 G_END_DECLS
 

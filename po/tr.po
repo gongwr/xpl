@@ -38,16 +38,16 @@ msgstr ""
 "Uygulamayı tür için son kullanılan olarak belirleme henüz desteklenmiyor"
 
 #: gio/gapplication.c:497
-msgid "GApplication options"
-msgstr "GApplication seçenekleri"
+msgid "xapplication_t options"
+msgstr "xapplication_t seçenekleri"
 
 #: gio/gapplication.c:497
-msgid "Show GApplication options"
-msgstr "GApplication seçeneklerini göster"
+msgid "Show xapplication_t options"
+msgstr "xapplication_t seçeneklerini göster"
 
 #: gio/gapplication.c:542
-msgid "Enter GApplication service mode (use from D-Bus service files)"
-msgstr "GApplication servis kipi girin (D-Bus servis dosyalarından kullan)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgstr "xapplication_t servis kipi girin (D-Bus servis dosyalarından kullan)"
 
 #: gio/gapplication.c:554
 msgid "Override the application’s ID"
@@ -283,7 +283,7 @@ msgid "Seek not supported on base stream"
 msgstr "Taban akış üzerinde arama desteklenmez"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
 msgstr "GBufferedInputStreamsonu kesilemiyor"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
@@ -355,20 +355,20 @@ msgid "%s filetype"
 msgstr "%s dosya türü"
 
 #: gio/gcredentials.c:335
-msgid "GCredentials contains invalid data"
-msgstr "GCredentials geçersiz veri içeriyor"
+msgid "xcredentials_t contains invalid data"
+msgstr "xcredentials_t geçersiz veri içeriyor"
 
 #: gio/gcredentials.c:395 gio/gcredentials.c:686
-msgid "GCredentials is not implemented on this OS"
-msgstr "Bu işletim sisteminde GCredentials sağlanmamış"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "Bu işletim sisteminde xcredentials_t sağlanmamış"
 
 #: gio/gcredentials.c:550 gio/gcredentials.c:568
-msgid "There is no GCredentials support for your platform"
-msgstr "Platformunuz için GCredentials desteği yok"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "Platformunuz için xcredentials_t desteği yok"
 
 #: gio/gcredentials.c:626
-msgid "GCredentials does not contain a process ID on this OS"
-msgstr "Bu işletim sisteminde GCredentials bir süreç kimliği içermez"
+msgid "xcredentials_t does not contain a process ID on this OS"
+msgstr "Bu işletim sisteminde xcredentials_t bir süreç kimliği içermez"
 
 #: gio/gcredentials.c:680
 msgid "Credentials spoofing is not possible on this OS"
@@ -566,8 +566,8 @@ msgid "User IDs must be the same for peer and server"
 msgstr "Kullanıcı kimlikleri eş ve sunucu için aynı olmalıdır"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "GDBusAuthObserver::authorize-authenticated-peer yolu ile iptal edildi"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "xdbus_auth_observer_t::authorize-authenticated-peer yolu ile iptal edildi"
 
 #: gio/gdbusauthmechanismsha1.c:299
 #, c-format
@@ -1362,27 +1362,27 @@ msgstr "DTLS desteği kullanılabilir değil"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of GEmblem encoding"
-msgstr "GEmblem kodlamasının %d sürümü işlenemiyor"
+msgid "Can’t handle version %d of xemblem_t encoding"
+msgstr "xemblem_t kodlamasının %d sürümü işlenemiyor"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "GEmblem kodlaması içerisinde bozuk sayıda token (%d)"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "xemblem_t kodlaması içerisinde bozuk sayıda token (%d)"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of GEmblemedIcon encoding"
-msgstr "GEmblemedIcon kodlamasının %d sürümü işlenemiyor"
+msgid "Can’t handle version %d of xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t kodlamasının %d sürümü işlenemiyor"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "GEmblemedIcon kodlaması içerisinde bozuk sayıda token (%d)"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t kodlaması içerisinde bozuk sayıda token (%d)"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "GEmblemedIcon için bir Gemblem beklendi"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "xemblemed_icon_t için bir Gemblem beklendi"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1475,12 +1475,12 @@ msgstr "Dosya numaralandırıcı zaten kapalı"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of GFileIcon encoding"
-msgstr "GFileIcon kodlamasının %d sürümü işlenemiyor"
+msgid "Can’t handle version %d of xfile_icon_t encoding"
+msgstr "xfile_icon_t kodlamasının %d sürümü işlenemiyor"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for GFileIcon"
-msgstr "GFileIcon için bozuk girdi verisi"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "xfile_icon_t için bozuk girdi verisi"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -2968,11 +2968,11 @@ msgstr "Anahtar adı kısıtlamalarını zorlama"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Tüm GSettings şema dosyalarını bir şema önbelleği içerisine derle.\n"
+"Tüm xsettings_t şema dosyalarını bir şema önbelleği içerisine derle.\n"
 "Şema dosyalarının .gschema.xml uzantısına sahip olmaları gerekir,\n"
 "ve önbellek dosyası gschemas.compiled olarak anılır."
 
@@ -3334,8 +3334,8 @@ msgid "Invalid seek request"
 msgstr "Geçersiz atlama isteği"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "GMemoryInputStream sonu silinemiyor"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "xmemory_input_stream_t sonu silinemiyor"
 
 #: gio/gmemoryoutputstream.c:568
 msgid "Memory output stream not resizable"
@@ -4011,8 +4011,8 @@ msgid "Error sending message: %s"
 msgstr "İleti gönderme hatası: %s"
 
 #: gio/gsocket.c:5032
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "GSocketControlMessage Windows işletim sisteminde desteklenmiyor"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "xsocket_control_message_t Windows işletim sisteminde desteklenmiyor"
 
 #: gio/gsocket.c:5505 gio/gsocket.c:5581 gio/gsocket.c:5807
 #, c-format
@@ -4160,8 +4160,8 @@ msgstr "Borular bu platformda desteklenmiyor"
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of GThemedIcon encoding"
-msgstr "GThemedIcon kodlaması %d sürümü işlenemiyor"
+msgid "Can’t handle version %d of xthemed_icon_t encoding"
+msgstr "xthemed_icon_t kodlaması %d sürümü işlenemiyor"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4214,8 +4214,8 @@ msgid "The current TLS backend does not support PKCS #12"
 msgstr "Var olan TLS arka ucu PKCS #12 desteklemiyor"
 
 #: gio/gtlscertificate.c:1013
-msgid "This GTlsBackend does not support creating PKCS #11 certificates"
-msgstr "GTlsBackend, PKCS #11 sertifikası yaratmayı desteklemiyor"
+msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
+msgstr "xtls_backend_t, PKCS #11 sertifikası yaratmayı desteklemiyor"
 
 #: gio/gtlspassword.c:111
 msgid ""
@@ -4519,25 +4519,25 @@ msgstr "Yol adı “%s”, kesin bir yol değil"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %d %b %Y %T %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%d/%m/%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -4920,13 +4920,13 @@ msgstr "Ara"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "ÖÖ"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "ÖS"
 
@@ -6458,11 +6458,11 @@ msgstr "%.1f EB"
 #~ msgid "Error writing to unix: %s"
 #~ msgstr "Unix'e yazılırken hata: %s"
 
-#~ msgctxt "GDateTime"
+#~ msgctxt "xdatetime_t"
 #~ msgid "am"
 #~ msgstr "öö"
 
-#~ msgctxt "GDateTime"
+#~ msgctxt "xdatetime_t"
 #~ msgid "pm"
 #~ msgstr "ös"
 

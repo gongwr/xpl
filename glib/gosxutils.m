@@ -37,7 +37,7 @@ find_folder (NSSearchPathDirectory type)
       return NULL;
     }
 
-  filename = g_strdup ([path UTF8String]);
+  filename = xstrdup ([path UTF8String]);
 
   return filename;
 }

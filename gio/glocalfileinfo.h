@@ -51,7 +51,7 @@ typedef struct
   dev_t    device;
   ino_t    inode;
   xpointer_t extra_data;
-  GDestroyNotify free_extra_data;
+  xdestroy_notify_t free_extra_data;
 } GLocalParentFileInfo;
 
 #ifdef HAVE_STATX
@@ -145,25 +145,25 @@ g_local_file_stat (const char          *path,
 
 inline static xboolean_t _g_stat_has_field  (const GLocalFileStat *buf, GLocalFileStatField field) { return buf->stx_mask & field; }
 
-inline static guint16 _g_stat_mode        (const GLocalFileStat *buf) { return buf->stx_mode; }
-inline static guint32 _g_stat_nlink       (const GLocalFileStat *buf) { return buf->stx_nlink; }
+inline static xuint16_t _g_stat_mode        (const GLocalFileStat *buf) { return buf->stx_mode; }
+inline static xuint32_t _g_stat_nlink       (const GLocalFileStat *buf) { return buf->stx_nlink; }
 inline static dev_t   _g_stat_dev         (const GLocalFileStat *buf) { return makedev (buf->stx_dev_major, buf->stx_dev_minor); }
-inline static guint64 _g_stat_ino         (const GLocalFileStat *buf) { return buf->stx_ino; }
-inline static guint64 _g_stat_size        (const GLocalFileStat *buf) { return buf->stx_size; }
+inline static xuint64_t _g_stat_ino         (const GLocalFileStat *buf) { return buf->stx_ino; }
+inline static xuint64_t _g_stat_size        (const GLocalFileStat *buf) { return buf->stx_size; }
 
-inline static guint32 _g_stat_uid         (const GLocalFileStat *buf) { return buf->stx_uid; }
-inline static guint32 _g_stat_gid         (const GLocalFileStat *buf) { return buf->stx_gid; }
+inline static xuint32_t _g_stat_uid         (const GLocalFileStat *buf) { return buf->stx_uid; }
+inline static xuint32_t _g_stat_gid         (const GLocalFileStat *buf) { return buf->stx_gid; }
 inline static dev_t   _g_stat_rdev        (const GLocalFileStat *buf) { return makedev (buf->stx_rdev_major, buf->stx_rdev_minor); }
-inline static guint32 _g_stat_blksize     (const GLocalFileStat *buf) { return buf->stx_blksize; }
+inline static xuint32_t _g_stat_blksize     (const GLocalFileStat *buf) { return buf->stx_blksize; }
 
-inline static guint64 _g_stat_blocks      (const GLocalFileStat *buf) { return buf->stx_blocks; }
+inline static xuint64_t _g_stat_blocks      (const GLocalFileStat *buf) { return buf->stx_blocks; }
 
 inline static gint64  _g_stat_atime       (const GLocalFileStat *buf) { return buf->stx_atime.tv_sec; }
 inline static gint64  _g_stat_ctime       (const GLocalFileStat *buf) { return buf->stx_ctime.tv_sec; }
 inline static gint64  _g_stat_mtime       (const GLocalFileStat *buf) { return buf->stx_mtime.tv_sec; }
-inline static guint32 _g_stat_atim_nsec   (const GLocalFileStat *buf) { return buf->stx_atime.tv_nsec; }
-inline static guint32 _g_stat_ctim_nsec   (const GLocalFileStat *buf) { return buf->stx_ctime.tv_nsec; }
-inline static guint32 _g_stat_mtim_nsec   (const GLocalFileStat *buf) { return buf->stx_mtime.tv_nsec; }
+inline static xuint32_t _g_stat_atim_nsec   (const GLocalFileStat *buf) { return buf->stx_atime.tv_nsec; }
+inline static xuint32_t _g_stat_ctim_nsec   (const GLocalFileStat *buf) { return buf->stx_ctime.tv_nsec; }
+inline static xuint32_t _g_stat_mtim_nsec   (const GLocalFileStat *buf) { return buf->stx_mtime.tv_nsec; }
 
 #else  /* if !HAVE_STATX */
 
@@ -292,12 +292,12 @@ inline static xboolean_t  _g_stat_has_field  (const GLocalFileStat *buf, GLocalF
 inline static mode_t    _g_stat_mode      (const GLocalFileStat *buf) { return buf->st_mode; }
 inline static nlink_t   _g_stat_nlink     (const GLocalFileStat *buf) { return buf->st_nlink; }
 #else
-inline static guint16   _g_stat_mode      (const GLocalFileStat *buf) { return buf->st_mode; }
-inline static guint32   _g_stat_nlink     (const GLocalFileStat *buf) { return buf->st_nlink; }
+inline static xuint16_t   _g_stat_mode      (const GLocalFileStat *buf) { return buf->st_mode; }
+inline static xuint32_t   _g_stat_nlink     (const GLocalFileStat *buf) { return buf->st_nlink; }
 #endif
 inline static dev_t     _g_stat_dev       (const GLocalFileStat *buf) { return buf->st_dev; }
 inline static ino_t     _g_stat_ino       (const GLocalFileStat *buf) { return buf->st_ino; }
-inline static goffset   _g_stat_size      (const GLocalFileStat *buf) { return buf->st_size; }
+inline static xoffset_t   _g_stat_size      (const GLocalFileStat *buf) { return buf->st_size; }
 
 #ifndef G_OS_WIN32
 inline static uid_t     _g_stat_uid       (const GLocalFileStat *buf) { return buf->st_uid; }
@@ -305,8 +305,8 @@ inline static gid_t     _g_stat_gid       (const GLocalFileStat *buf) { return b
 inline static dev_t     _g_stat_rdev      (const GLocalFileStat *buf) { return buf->st_rdev; }
 inline static blksize_t _g_stat_blksize   (const GLocalFileStat *buf) { return buf->st_blksize; }
 #else
-inline static guint16   _g_stat_uid       (const GLocalFileStat *buf) { return buf->st_uid; }
-inline static guint16   _g_stat_gid       (const GLocalFileStat *buf) { return buf->st_gid; }
+inline static xuint16_t   _g_stat_uid       (const GLocalFileStat *buf) { return buf->st_uid; }
+inline static xuint16_t   _g_stat_gid       (const GLocalFileStat *buf) { return buf->st_gid; }
 #endif
 
 #ifdef HAVE_STRUCT_STAT_ST_BLOCKS
@@ -323,22 +323,22 @@ inline static time_t    _g_stat_ctime     (const GLocalFileStat *buf) { return b
 inline static time_t    _g_stat_mtime     (const GLocalFileStat *buf) { return buf->st_mtim.tv_sec; }
 #endif
 #if defined(HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC) || defined(G_OS_WIN32)
-inline static guint32   _g_stat_atim_nsec (const GLocalFileStat *buf) { return buf->st_atim.tv_nsec; }
-inline static guint32   _g_stat_ctim_nsec (const GLocalFileStat *buf) { return buf->st_ctim.tv_nsec; }
-inline static guint32   _g_stat_mtim_nsec (const GLocalFileStat *buf) { return buf->st_mtim.tv_nsec; }
+inline static xuint32_t   _g_stat_atim_nsec (const GLocalFileStat *buf) { return buf->st_atim.tv_nsec; }
+inline static xuint32_t   _g_stat_ctim_nsec (const GLocalFileStat *buf) { return buf->st_ctim.tv_nsec; }
+inline static xuint32_t   _g_stat_mtim_nsec (const GLocalFileStat *buf) { return buf->st_mtim.tv_nsec; }
 #else
-inline static guint32   _g_stat_atim_nsec (const GLocalFileStat *buf) { return 0; }
-inline static guint32   _g_stat_ctim_nsec (const GLocalFileStat *buf) { return 0; }
-inline static guint32   _g_stat_mtim_nsec (const GLocalFileStat *buf) { return 0; }
+inline static xuint32_t   _g_stat_atim_nsec (const GLocalFileStat *buf) { return 0; }
+inline static xuint32_t   _g_stat_ctim_nsec (const GLocalFileStat *buf) { return 0; }
+inline static xuint32_t   _g_stat_mtim_nsec (const GLocalFileStat *buf) { return 0; }
 #endif
 
 #endif  /* !HAVE_STATX */
 
 #define G_LOCAL_FILE_INFO_NOSTAT_ATTRIBUTES \
-    G_FILE_ATTRIBUTE_STANDARD_NAME "," \
-    G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME "," \
-    G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME "," \
-    G_FILE_ATTRIBUTE_STANDARD_COPY_NAME
+    XFILE_ATTRIBUTE_STANDARD_NAME "," \
+    XFILE_ATTRIBUTE_STANDARD_DISPLAY_NAME "," \
+    XFILE_ATTRIBUTE_STANDARD_EDIT_NAME "," \
+    XFILE_ATTRIBUTE_STANDARD_COPY_NAME
 
 xboolean_t   _g_local_file_has_trash_dir        (const char             *dirname,
                                                dev_t                   dir_dev);
@@ -347,36 +347,36 @@ xboolean_t   _g_local_file_is_lost_found_dir    (const char             *path,
                                                dev_t                   path_dev);
 #endif
 void       _g_local_file_info_get_parent_info (const char             *dir,
-                                               GFileAttributeMatcher  *attribute_matcher,
+                                               xfile_attribute_matcher_t  *attribute_matcher,
                                                GLocalParentFileInfo   *parent_info);
 void       _g_local_file_info_free_parent_info (GLocalParentFileInfo   *parent_info);
-void       _g_local_file_info_get_nostat      (GFileInfo              *info,
+void       _g_local_file_info_get_nostat      (xfile_info_t              *info,
                                                const char             *basename,
                                                const char             *path,
-                                               GFileAttributeMatcher  *attribute_matcher);
-GFileInfo *_g_local_file_info_get             (const char             *basename,
+                                               xfile_attribute_matcher_t  *attribute_matcher);
+xfile_info_t *_g_local_file_info_get             (const char             *basename,
                                                const char             *path,
-                                               GFileAttributeMatcher  *attribute_matcher,
-                                               GFileQueryInfoFlags     flags,
+                                               xfile_attribute_matcher_t  *attribute_matcher,
+                                               xfile_query_info_flags_t     flags,
                                                GLocalParentFileInfo   *parent_info,
                                                xerror_t                **error);
-GFileInfo *_g_local_file_info_get_from_fd     (int                     fd,
+xfile_info_t *_g_local_file_info_get_from_fd     (int                     fd,
                                                const char             *attributes,
                                                xerror_t                **error);
 char *     _g_local_file_info_create_etag     (GLocalFileStat         *statbuf);
 xboolean_t   _g_local_file_info_set_attribute   (char                   *filename,
                                                const char             *attribute,
-                                               GFileAttributeType      type,
+                                               xfile_attribute_type_t      type,
                                                xpointer_t                value_p,
-                                               GFileQueryInfoFlags     flags,
+                                               xfile_query_info_flags_t     flags,
                                                xcancellable_t           *cancellable,
                                                xerror_t                **error);
 xboolean_t   _g_local_file_info_set_attributes  (char                   *filename,
-                                               GFileInfo              *info,
-                                               GFileQueryInfoFlags     flags,
+                                               xfile_info_t              *info,
+                                               xfile_query_info_flags_t     flags,
                                                xcancellable_t           *cancellable,
                                                xerror_t                **error);
 
 G_END_DECLS
 
-#endif /* __G_FILE_LOCAL_FILE_INFO_H__ */
+#endif /* __XFILE_LOCAL_FILE_INFO_H__ */

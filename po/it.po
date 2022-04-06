@@ -41,16 +41,16 @@ msgstr ""
 "ancora supportata"
 
 #: gio/gapplication.c:500
-msgid "GApplication options"
-msgstr "Opzioni GApplication"
+msgid "xapplication_t options"
+msgstr "Opzioni xapplication_t"
 
 #: gio/gapplication.c:500
-msgid "Show GApplication options"
-msgstr "Mostra opzioni GApplication"
+msgid "Show xapplication_t options"
+msgstr "Mostra opzioni xapplication_t"
 
 #: gio/gapplication.c:545
-msgid "Enter GApplication service mode (use from D-Bus service files)"
-msgstr "Avvia modalità di servizio GApplication (da file di servizio D-Bus)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgstr "Avvia modalità di servizio xapplication_t (da file di servizio D-Bus)"
 
 #: gio/gapplication.c:557
 msgid "Override the application’s ID"
@@ -274,7 +274,7 @@ msgstr ""
 "comando sconosciuto: %s\n"
 "\n"
 
-# count (gssize) è un parametro delle funzione
+# count (xssize_t) è un parametro delle funzione
 #: gio/gbufferedinputstream.c:420 gio/gbufferedinputstream.c:498
 #: gio/ginputstream.c:179 gio/ginputstream.c:379 gio/ginputstream.c:648
 #: gio/ginputstream.c:1050 gio/goutputstream.c:223 gio/goutputstream.c:1049
@@ -289,8 +289,8 @@ msgid "Seek not supported on base stream"
 msgstr "Posizionamento non supportato sullo stream di base"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "Impossibile troncare GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "Impossibile troncare xbuffered_input_stream"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -361,20 +361,20 @@ msgid "%s filetype"
 msgstr "Tipo di file %s"
 
 #: gio/gcredentials.c:335
-msgid "GCredentials contains invalid data"
-msgstr "GCredentials contiene data non validi"
+msgid "xcredentials_t contains invalid data"
+msgstr "xcredentials_t contiene data non validi"
 
 #: gio/gcredentials.c:395 gio/gcredentials.c:686
-msgid "GCredentials is not implemented on this OS"
-msgstr "GCredentials non è implementato su questo SO"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "xcredentials_t non è implementato su questo SO"
 
 #: gio/gcredentials.c:550 gio/gcredentials.c:568
-msgid "There is no GCredentials support for your platform"
-msgstr "Non c'è alcun supporto a GCredentials per la piattaforma in uso"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "Non c'è alcun supporto a xcredentials_t per la piattaforma in uso"
 
 #: gio/gcredentials.c:626
-msgid "GCredentials does not contain a process ID on this OS"
-msgstr "GCredentials non contiene un ID di processo su questo SO"
+msgid "xcredentials_t does not contain a process ID on this OS"
+msgstr "xcredentials_t non contiene un ID di processo su questo SO"
 
 #: gio/gcredentials.c:680
 msgid "Credentials spoofing is not possible on this OS"
@@ -584,8 +584,8 @@ msgid "User IDs must be the same for peer and server"
 msgstr "Gli ID utente devono essere gli stessi per nodo e server"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "Annullato attraverso GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "Annullato attraverso xdbus_auth_observer_t::authorize-authenticated-peer"
 
 #: gio/gdbusauthmechanismsha1.c:300
 #, c-format
@@ -1425,27 +1425,27 @@ msgstr "Non è disponibile il supporto a DTLS"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of GEmblem encoding"
-msgstr "Impossibile gestire la versione %d della codifica GEmblem"
+msgid "Can’t handle version %d of xemblem_t encoding"
+msgstr "Impossibile gestire la versione %d della codifica xemblem_t"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "Numero di token non valido (%d) nella codifica GEmblem"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "Numero di token non valido (%d) nella codifica xemblem_t"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of GEmblemedIcon encoding"
-msgstr "Impossibile gestire la versione %d della codifica GEmblemedIcon"
+msgid "Can’t handle version %d of xemblemed_icon_t encoding"
+msgstr "Impossibile gestire la versione %d della codifica xemblemed_icon_t"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "Numero di token non valido (%d) nella codifica GEmblemedIcon"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "Numero di token non valido (%d) nella codifica xemblemed_icon_t"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "Atteso un GEmblem per GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "Atteso un xemblem_t per xemblemed_icon_t"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1538,12 +1538,12 @@ msgstr "L'enumeratore di file è già chiuso"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of GFileIcon encoding"
-msgstr "Impossibile gestire la versione %d della codifica GFileIcon"
+msgid "Can’t handle version %d of xfile_icon_t encoding"
+msgstr "Impossibile gestire la versione %d della codifica xfile_icon_t"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for GFileIcon"
-msgstr "Dati di input malformati per GFileIcon"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "Dati di input malformati per xfile_icon_t"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -3056,11 +3056,11 @@ msgstr "Non forza le limitazioni sui nomi di chiave"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Compila tutti i file schema GSettings in una cache schema.\n"
+"Compila tutti i file schema xsettings_t in una cache schema.\n"
 "I file schema devo avere estensione .gschema.xml,\n"
 "e il file cache è chiamato gschemas.compiled."
 
@@ -3437,8 +3437,8 @@ msgid "Invalid seek request"
 msgstr "Richiesta di posizionamento non valida"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "Impossibile troncare GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "Impossibile troncare xmemory_input_stream_t"
 
 #: gio/gmemoryoutputstream.c:568
 msgid "Memory output stream not resizable"
@@ -4120,8 +4120,8 @@ msgid "Error sending message: %s"
 msgstr "Errore nell'inviare il messaggio: %s"
 
 #: gio/gsocket.c:5032
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "GSocketControlMessage non supportato su Windows"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "xsocket_control_message_t non supportato su Windows"
 
 #: gio/gsocket.c:5505 gio/gsocket.c:5581 gio/gsocket.c:5807
 #, c-format
@@ -4259,7 +4259,7 @@ msgstr "Il proxy SOCKSv5 non supporta il tipo di indirizzo fornito."
 msgid "Unknown SOCKSv5 proxy error."
 msgstr "Errore sconosciuto del proxy SOCKSv5."
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: gio/gtestdbus.c:612 glib/gspawn-win32.c:314
 #, c-format
 msgid "Failed to create pipe for communicating with child process (%s)"
@@ -4273,8 +4273,8 @@ msgstr "Le pipe non sono supportate su questa piattaforma"
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of GThemedIcon encoding"
-msgstr "Impossibile gestire la versione %d della codifica GThemedIcon"
+msgid "Can’t handle version %d of xthemed_icon_t encoding"
+msgstr "Impossibile gestire la versione %d della codifica xthemed_icon_t"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4327,8 +4327,8 @@ msgid "The current TLS backend does not support PKCS #12"
 msgstr "L'attuale sistema TLS non supporta PKCS #12"
 
 #: gio/gtlscertificate.c:1013
-msgid "This GTlsBackend does not support creating PKCS #11 certificates"
-msgstr "Questo GTlsBackend non supporta la creazione di certificati PKCS #11"
+msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
+msgstr "Questo xtls_backend_t non supporta la creazione di certificati PKCS #11"
 
 #: gio/gtlspassword.c:111
 msgid ""
@@ -4648,25 +4648,25 @@ msgstr "Il nome di percorso «%s» non è un percorso assoluto"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %e %b %Y %H:%M:%S"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%d/%m/%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %P"
 
@@ -5049,13 +5049,13 @@ msgstr "dic"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "am"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "pm"
 
@@ -6008,13 +6008,13 @@ msgstr ""
 msgid "Text was empty (or contained only whitespace)"
 msgstr "Il testo era vuoto (oppure conteneva unicamente spazi bianchi)"
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: glib/gspawn.c:310
 #, c-format
 msgid "Failed to read data from child process (%s)"
 msgstr "Lettura dei dati dal processo figlio non riuscita (%s)"
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: glib/gspawn.c:462
 #, c-format
 msgid "Unexpected error in reading data from a child process (%s)"
@@ -6045,31 +6045,31 @@ msgstr "Processo figlio fermato dal segnale %ld"
 msgid "Child process exited abnormally"
 msgstr "Il processo figlio è uscito in modo anomalo"
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: glib/gspawn.c:1890 glib/gspawn-win32.c:353 glib/gspawn-win32.c:361
 #, c-format
 msgid "Failed to read from child pipe (%s)"
 msgstr "Lettura dalla pipe figlia non riuscita (%s)"
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: glib/gspawn.c:2253
 #, c-format
 msgid "Failed to spawn child process “%s” (%s)"
 msgstr "Esecuzione del processo figlio «%s» non riuscita (%s)"
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: glib/gspawn.c:2370
 #, c-format
 msgid "Failed to fork (%s)"
 msgstr "Esecuzione di fork non riuscita (%s)"
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: glib/gspawn.c:2530 glib/gspawn-win32.c:384
 #, c-format
 msgid "Failed to change to directory “%s” (%s)"
 msgstr "Cambio della directory in «%s» non riuscito (%s)"
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: glib/gspawn.c:2540
 #, c-format
 msgid "Failed to execute child process “%s” (%s)"
@@ -6080,20 +6080,20 @@ msgstr "Esecuzione del processo figlio «%s» non riuscita (%s)"
 msgid "Failed to open file to remap file descriptor (%s)"
 msgstr "Apertura del file per rimappare il descrittore file non riuscita (%s)"
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: glib/gspawn.c:2558
 #, c-format
 msgid "Failed to duplicate file descriptor for child process (%s)"
 msgstr ""
 "Duplicazione del descrittore file per il processo figlio non riuscita (%s)"
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: glib/gspawn.c:2567
 #, c-format
 msgid "Failed to fork child process (%s)"
 msgstr "Esecuzione del fork per processo figlio non riuscita (%s)"
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: glib/gspawn.c:2575
 #, c-format
 msgid "Failed to close file descriptor for child process (%s)"
@@ -6104,7 +6104,7 @@ msgstr "Chiusura del descrittore file per il processo figlio non riuscita (%s)"
 msgid "Unknown error executing child process “%s”"
 msgstr "Errore sconosciuto nell'eseguire il processo figlio «%s»"
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: glib/gspawn.c:2607
 #, c-format
 msgid "Failed to read enough data from child pid pipe (%s)"
@@ -6116,13 +6116,13 @@ msgstr ""
 msgid "Failed to read data from child process"
 msgstr "Lettura di dati dal processo figlio non riuscita"
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: glib/gspawn-win32.c:390 glib/gspawn-win32.c:395 glib/gspawn-win32.c:521
 #, c-format
 msgid "Failed to execute child process (%s)"
 msgstr "Esecuzione del processo figlio non riuscita (%s)"
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: glib/gspawn-win32.c:400
 #, c-format
 msgid "Failed to dup() in child process (%s)"
@@ -6148,7 +6148,7 @@ msgstr "Stringa non valida nell'ambiente: %s"
 msgid "Invalid working directory: %s"
 msgstr "Directory di lavoro non valida: %s"
 
-# (%s) è in fondo perché risolto in g_strerror (xint_t)
+# (%s) è in fondo perché risolto in xstrerror (xint_t)
 #: glib/gspawn-win32.c:868
 #, c-format
 msgid "Failed to execute helper program (%s)"

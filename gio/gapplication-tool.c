@@ -81,39 +81,39 @@ app_help (xboolean_t     requested,
           const xchar_t *command)
 {
   const struct help_topic *topic = NULL;
-  GString *string;
+  xstring_t *string;
 
-  string = g_string_new (NULL);
+  string = xstring_new (NULL);
 
   if (command)
     {
       xsize_t i;
 
       for (i = 0; i < G_N_ELEMENTS (topics); i++)
-        if (g_str_equal (topics[i].command, command))
+        if (xstr_equal (topics[i].command, command))
           topic = &topics[i];
 
       if (!topic)
         {
-          g_string_printf (string, _("Unknown command %s\n\n"), command);
+          xstring_printf (string, _("Unknown command %s\n\n"), command);
           requested = FALSE;
         }
     }
 
-  g_string_append (string, _("Usage:\n"));
+  xstring_append (string, _("Usage:\n"));
 
   if (topic)
     {
       xuint_t maxwidth;
       xsize_t i;
 
-      g_string_append_printf (string, "\n  %s %s %s\n\n", "gapplication",
+      xstring_append_printf (string, "\n  %s %s %s\n\n", "gapplication",
                               topic->command, topic->synopsis ? _(topic->synopsis) : "");
-      g_string_append_printf (string, "%s\n\n", _(topic->description));
+      xstring_append_printf (string, "%s\n\n", _(topic->description));
 
       if (topic->synopsis)
         {
-          g_string_append (string, _("Arguments:\n"));
+          xstring_append (string, _("Arguments:\n"));
 
           maxwidth = 0;
           for (i = 0; i < G_N_ELEMENTS (substvars); i++)
@@ -122,9 +122,9 @@ app_help (xboolean_t     requested,
 
           for (i = 0; i < G_N_ELEMENTS (substvars); i++)
             if (strstr (topic->synopsis, substvars[i].var))
-              g_string_append_printf (string, "  %-*.*s   %s\n", maxwidth, maxwidth,
+              xstring_append_printf (string, "  %-*.*s   %s\n", maxwidth, maxwidth,
                                       _(substvars[i].var), _(substvars[i].description));
-          g_string_append (string, "\n");
+          xstring_append (string, "\n");
         }
     }
   else
@@ -132,20 +132,20 @@ app_help (xboolean_t     requested,
       xuint_t maxwidth;
       xsize_t i;
 
-      g_string_append_printf (string, "\n  %s %s %s\n\n", "gapplication", _("COMMAND"), _("[ARGS…]"));
-      g_string_append_printf (string, _("Commands:\n"));
+      xstring_append_printf (string, "\n  %s %s %s\n\n", "gapplication", _("COMMAND"), _("[ARGS…]"));
+      xstring_append_printf (string, _("Commands:\n"));
 
       maxwidth = 0;
       for (i = 0; i < G_N_ELEMENTS (topics); i++)
         maxwidth = MAX(maxwidth, strlen (topics[i].command));
 
       for (i = 0; i < G_N_ELEMENTS (topics); i++)
-        g_string_append_printf (string, "  %-*.*s   %s\n", maxwidth, maxwidth,
+        xstring_append_printf (string, "  %-*.*s   %s\n", maxwidth, maxwidth,
                                 topics[i].command, _(topics[i].summary));
 
-      g_string_append (string, "\n");
+      xstring_append (string, "\n");
       /* Translators: do not translate 'help', but please translate 'COMMAND'. */
-      g_string_append_printf (string, _("Use “%s help COMMAND” to get detailed help.\n\n"), "gapplication");
+      xstring_append_printf (string, _("Use “%s help COMMAND” to get detailed help.\n\n"), "gapplication");
     }
 
   if (requested)
@@ -153,7 +153,7 @@ app_help (xboolean_t     requested,
   else
     g_printerr ("%s\n", string->str);
 
-  g_string_free (string, TRUE);
+  xstring_free (string, TRUE);
 
   return requested ? 0 : 1;
 }
@@ -188,7 +188,7 @@ app_no_args (const xchar_t *command)
 static int
 app_version (xchar_t **args)
 {
-  if (g_strv_length (args))
+  if (xstrv_length (args))
     return app_no_args ("version");
 
   g_print (PACKAGE_VERSION "\n");
@@ -200,10 +200,10 @@ app_list (xchar_t **args)
 {
   xlist_t *apps;
 
-  if (g_strv_length (args))
+  if (xstrv_length (args))
     return app_no_args ("list");
 
-  apps = g_app_info_get_all ();
+  apps = xapp_info_get_all ();
 
   while (apps)
     {
@@ -214,19 +214,19 @@ app_list (xchar_t **args)
           {
             const xchar_t *filename;
 
-            filename = g_app_info_get_id (G_APP_INFO (info));
-            if (g_str_has_suffix (filename, ".desktop"))
+            filename = xapp_info_get_id (G_APP_INFO (info));
+            if (xstr_has_suffix (filename, ".desktop"))
               {
                 xchar_t *id;
 
-                id = g_strndup (filename, strlen (filename) - 8);
+                id = xstrndup (filename, strlen (filename) - 8);
                 g_print ("%s\n", id);
                 g_free (id);
               }
           }
 
-      apps = g_list_delete_link (apps, apps);
-      g_object_unref (info);
+      apps = xlist_delete_link (apps, apps);
+      xobject_unref (info);
     }
 
   return 0;
@@ -238,7 +238,7 @@ app_path_for_id (const xchar_t *app_id)
   xchar_t *path;
   xint_t i;
 
-  path = g_strconcat ("/", app_id, NULL);
+  path = xstrconcat ("/", app_id, NULL);
   for (i = 0; path[i]; i++)
     {
       if (path[i] == '.')
@@ -255,7 +255,7 @@ app_call (const xchar_t *app_id,
           const xchar_t *method_name,
           xvariant_t    *parameters)
 {
-  GDBusConnection *session;
+  xdbus_connection_t *session;
   xerror_t *error = NULL;
   xchar_t *object_path;
   xvariant_t *result;
@@ -264,9 +264,9 @@ app_call (const xchar_t *app_id,
   session = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   if (!session)
     {
-      g_variant_unref (g_variant_ref_sink (parameters));
+      xvariant_unref (xvariant_ref_sink (parameters));
       g_printerr (_("unable to connect to D-Bus: %s\n"), error->message);
-      g_error_free (error);
+      xerror_free (error);
       return 1;
     }
 
@@ -280,13 +280,13 @@ app_call (const xchar_t *app_id,
 
   if (result)
     {
-      g_variant_unref (result);
+      xvariant_unref (result);
       return 0;
     }
   else
     {
       g_printerr (_("error sending %s message to application: %s\n"), method_name, error->message);
-      g_error_free (error);
+      xerror_free (error);
       return 1;
     }
 }
@@ -294,21 +294,21 @@ app_call (const xchar_t *app_id,
 static xvariant_t *
 app_get_platform_data (void)
 {
-  GVariantBuilder builder;
+  xvariant_builder_t builder;
   const xchar_t *startup_id;
 
-  g_variant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
+  xvariant_builder_init (&builder, G_VARIANT_TYPE_VARDICT);
 
   if ((startup_id = g_getenv ("DESKTOP_STARTUP_ID")))
-    g_variant_builder_add (&builder, "{sv}", "desktop-startup-id", g_variant_new_string (startup_id));
+    xvariant_builder_add (&builder, "{sv}", "desktop-startup-id", xvariant_new_string (startup_id));
 
-  return g_variant_builder_end (&builder);
+  return xvariant_builder_end (&builder);
 }
 
 static int
 app_action (xchar_t **args)
 {
-  GVariantBuilder params;
+  xvariant_builder_t params;
   const xchar_t *name;
 
   if (!app_check_name (args, "action"))
@@ -329,51 +329,51 @@ app_action (xchar_t **args)
       return 1;
     }
 
-  g_variant_builder_init (&params, G_VARIANT_TYPE ("av"));
+  xvariant_builder_init (&params, G_VARIANT_TYPE ("av"));
 
   if (args[2])
     {
       xerror_t *error = NULL;
       xvariant_t *parameter;
 
-      parameter = g_variant_parse (NULL, args[2], NULL, NULL, &error);
+      parameter = xvariant_parse (NULL, args[2], NULL, NULL, &error);
 
       if (!parameter)
         {
           xchar_t *context;
 
-          context = g_variant_parse_error_print_context (error, args[2]);
+          context = xvariant_parse_error_print_context (error, args[2]);
           g_printerr (_("error parsing action parameter: %s\n"), context);
-          g_variant_builder_clear (&params);
-          g_error_free (error);
+          xvariant_builder_clear (&params);
+          xerror_free (error);
           g_free (context);
           return 1;
         }
 
-      g_variant_builder_add (&params, "v", parameter);
-      g_variant_unref (parameter);
+      xvariant_builder_add (&params, "v", parameter);
+      xvariant_unref (parameter);
 
       if (args[3])
         {
           g_printerr (_("actions accept a maximum of one parameter\n"));
-          g_variant_builder_clear (&params);
+          xvariant_builder_clear (&params);
           return 1;
         }
     }
 
-  return app_call (args[0], "ActivateAction", g_variant_new ("(sav@a{sv})", name, &params, app_get_platform_data ()));
+  return app_call (args[0], "ActivateAction", xvariant_new ("(sav@a{sv})", name, &params, app_get_platform_data ()));
 }
 
 static int
 app_activate (const xchar_t *app_id)
 {
-  return app_call (app_id, "Activate", g_variant_new ("(@a{sv})", app_get_platform_data ()));
+  return app_call (app_id, "Activate", xvariant_new ("(@a{sv})", app_get_platform_data ()));
 }
 
 static int
 app_launch (xchar_t **args)
 {
-  GVariantBuilder files;
+  xvariant_builder_t files;
   xint_t i;
 
   if (!app_check_name (args, "launch"))
@@ -382,19 +382,19 @@ app_launch (xchar_t **args)
   if (args[1] == NULL)
     return app_activate (args[0]);
 
-  g_variant_builder_init (&files, G_VARIANT_TYPE_STRING_ARRAY);
+  xvariant_builder_init (&files, G_VARIANT_TYPE_STRING_ARRAY);
 
   for (i = 1; args[i]; i++)
     {
       xfile_t *file;
 
       /* "This operation never fails" */
-      file = g_file_new_for_commandline_arg (args[i]);
-      g_variant_builder_add_value (&files, g_variant_new_take_string (g_file_get_uri (file)));
-      g_object_unref (file);
+      file = xfile_new_for_commandline_arg (args[i]);
+      xvariant_builder_add_value (&files, xvariant_new_take_string (xfile_get_uri (file)));
+      xobject_unref (file);
     }
 
-  return app_call (args[0], "Open", g_variant_new ("(as@a{sv})", &files, app_get_platform_data ()));
+  return app_call (args[0], "Open", xvariant_new ("(as@a{sv})", &files, app_get_platform_data ()));
 }
 
 static int
@@ -414,7 +414,7 @@ app_list_actions (xchar_t **args)
       app_help (FALSE, "list-actions");
     }
 
-  filename = g_strconcat (args[0], ".desktop", NULL);
+  filename = xstrconcat (args[0], ".desktop", NULL);
   app_info = g_desktop_app_info_new (filename);
   g_free (filename);
 
@@ -429,7 +429,7 @@ app_list_actions (xchar_t **args)
   for (i = 0; actions[i]; i++)
     g_print ("%s\n", actions[i]);
 
-  g_object_unref (app_info);
+  xobject_unref (app_info);
 
   return 0;
 }
@@ -447,22 +447,22 @@ main (int argc, char **argv)
   if (argc < 2)
     return app_help (TRUE, NULL);
 
-  if (g_str_equal (argv[1], "help"))
+  if (xstr_equal (argv[1], "help"))
     return app_help (TRUE, argv[2]);
 
-  if (g_str_equal (argv[1], "version"))
+  if (xstr_equal (argv[1], "version"))
     return app_version (argv + 2);
 
-  if (g_str_equal (argv[1], "list-apps"))
+  if (xstr_equal (argv[1], "list-apps"))
     return app_list (argv + 2);
 
-  if (g_str_equal (argv[1], "launch"))
+  if (xstr_equal (argv[1], "launch"))
     return app_launch (argv + 2);
 
-  if (g_str_equal (argv[1], "action"))
+  if (xstr_equal (argv[1], "action"))
     return app_action (argv + 2);
 
-  if (g_str_equal (argv[1], "list-actions"))
+  if (xstr_equal (argv[1], "list-actions"))
     return app_list_actions (argv + 2);
 
   g_printerr (_("unrecognised command: %s\n\n"), argv[1]);

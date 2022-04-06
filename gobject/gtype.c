@@ -39,7 +39,7 @@
 #endif
 
 #ifdef	G_ENABLE_DEBUG
-#define	IF_DEBUG(debug_type)	if (_g_type_debug_flags & XTYPE_DEBUG_ ## debug_type)
+#define	IF_DEBUG(debug_type)	if (_xtype_debug_flags & XTYPE_DEBUG_ ## debug_type)
 #endif
 
 /**
@@ -55,13 +55,13 @@
  * For type creation and registration purposes, all types fall into one of
  * two categories: static or dynamic.  Static types are never loaded or
  * unloaded at run-time as dynamic types may be.  Static types are created
- * with g_type_register_static() that gets type specific information passed
- * in via a #GTypeInfo structure.
+ * with xtype_register_static() that gets type specific information passed
+ * in via a #xtype_info_t structure.
  *
- * Dynamic types are created with g_type_register_dynamic() which takes a
+ * Dynamic types are created with xtype_register_dynamic() which takes a
  * #GTypePlugin structure instead. The remaining type information (the
- * #GTypeInfo structure) is retrieved during runtime through #GTypePlugin
- * and the g_type_plugin_*() API.
+ * #xtype_info_t structure) is retrieved during runtime through #GTypePlugin
+ * and the xtype_plugin_*() API.
  *
  * These registration functions are usually called only once from a
  * function whose only purpose is to return the type identifier for a
@@ -70,7 +70,7 @@
  * what sort of type it is.
  *
  * There is also a third registration function for registering fundamental
- * types called g_type_register_fundamental() which requires both a #GTypeInfo
+ * types called xtype_register_fundamental() which requires both a #xtype_info_t
  * structure and a #GTypeFundamentalInfo structure but it is seldom used
  * since most fundamental types are predefined rather than user-defined.
  *
@@ -78,7 +78,7 @@
  * including all parent types. Similarly, type instances' private data
  * (as created by G_ADD_PRIVATE()) are limited to a total of
  * 64 KiB. If a type instance needs a large static buffer, allocate it
- * separately (typically by using #GArray or #GPtrArray) and put a pointer
+ * separately (typically by using #xarray_t or #xptr_array_t) and put a pointer
  * to the buffer in the structure.
  *
  * As mentioned in the [xtype_t conventions][gtype-conventions], type names must
@@ -132,9 +132,9 @@
     static const xchar_t _action[] = " invalidly modified type ";  \
     xpointer_t _arg = (xpointer_t) (arg); const xchar_t *_tname = (type_name), *_fname = (func); \
     if (_arg) \
-      g_error ("%s(%p)%s'%s'", _fname, _arg, _action, _tname); \
+      xerror ("%s(%p)%s'%s'", _fname, _arg, _action, _tname); \
     else \
-      g_error ("%s()%s'%s'", _fname, _action, _tname); \
+      xerror ("%s()%s'%s'", _fname, _action, _tname); \
 }G_STMT_END
 #define g_assert_type_system_initialized() \
   g_assert (static_quark_type_flags)
@@ -144,9 +144,9 @@
 				    XTYPE_FLAG_DERIVABLE | \
 				    XTYPE_FLAG_DEEP_DERIVABLE)
 #define	TYPE_FLAG_MASK		   (XTYPE_FLAG_ABSTRACT | XTYPE_FLAG_VALUE_ABSTRACT | XTYPE_FLAG_FINAL)
-#define	SIZEOF_FUNDAMENTAL_INFO	   ((gssize) MAX (MAX (sizeof (GTypeFundamentalInfo), \
+#define	SIZEOF_FUNDAMENTAL_INFO	   ((xssize_t) MAX (MAX (sizeof (GTypeFundamentalInfo), \
 						       sizeof (xpointer_t)), \
-                                                  sizeof (glong)))
+                                                  sizeof (xlong_t)))
 
 /* The 2*sizeof(size_t) alignment here is borrowed from
  * GNU libc, so it should be good most everywhere.
@@ -177,19 +177,19 @@ typedef struct _IFaceHolder	IFaceHolder;
 /* --- prototypes --- */
 static inline GTypeFundamentalInfo*	type_node_fundamental_info_I	(TypeNode		*node);
 static	      void			type_add_flags_W		(TypeNode		*node,
-									 GTypeFlags		 flags);
+									 xtype_flags_t		 flags);
 static	      void			type_data_make_W		(TypeNode		*node,
-									 const GTypeInfo	*info,
-									 const GTypeValueTable	*value_table);
+									 const xtype_info_t	*info,
+									 const xtype_value_table_t	*value_table);
 static inline void			type_data_ref_Wm		(TypeNode		*node);
 static inline void			type_data_unref_U               (TypeNode		*node,
 									 xboolean_t		 uncached);
 static void				type_data_last_unref_Wm		(TypeNode *              node,
 									 xboolean_t		 uncached);
 static inline xpointer_t			type_get_qdata_L		(TypeNode		*node,
-									 GQuark			 quark);
+									 xquark			 quark);
 static inline void			type_set_qdata_W		(TypeNode		*node,
-									 GQuark			 quark,
+									 xquark			 quark,
 									 xpointer_t		 data);
 static IFaceHolder*			type_iface_peek_holder_L	(TypeNode		*iface,
 									 xtype_t			 instance_type);
@@ -234,7 +234,7 @@ struct _TypeNode
   xuint_t        mutatable_check_cache : 1;	/* combines some common path checks */
   xtype_t       *children; /* writable with lock */
   TypeData    *data;
-  GQuark       qname;
+  xquark       qname;
   GData       *global_gdata;
   union {
     GAtomicArray iface_entries;		/* for !iface types */
@@ -273,7 +273,7 @@ struct _TypeNode
 struct _IFaceHolder
 {
   xtype_t           instance_type;
-  GInterfaceInfo *info;
+  xinterface_info_t *info;
   GTypePlugin    *plugin;
   IFaceHolder    *next;
 };
@@ -295,7 +295,7 @@ struct _IFaceEntries {
 
 struct _CommonData
 {
-  GTypeValueTable  *value_table;
+  xtype_value_table_t  *value_table;
 };
 
 struct _BoxedData
@@ -308,45 +308,45 @@ struct _BoxedData
 struct _IFaceData
 {
   CommonData         common;
-  guint16            vtable_size;
-  GBaseInitFunc      vtable_init_base;
-  GBaseFinalizeFunc  vtable_finalize_base;
-  GClassInitFunc     dflt_init;
-  GClassFinalizeFunc dflt_finalize;
-  gconstpointer      dflt_data;
+  xuint16_t            vtable_size;
+  xbase_init_func_t      vtable_init_base;
+  xbase_finalize_func_t  vtable_finalize_base;
+  xclass_init_func_t     dflt_init;
+  xclass_finalize_func_t dflt_finalize;
+  xconstpointer      dflt_data;
   xpointer_t           dflt_vtable;
 };
 
 struct _ClassData
 {
   CommonData         common;
-  guint16            class_size;
-  guint16            class_private_size;
-  int                init_state;  /* (atomic) - g_type_class_ref reads it unlocked */
-  GBaseInitFunc      class_init_base;
-  GBaseFinalizeFunc  class_finalize_base;
-  GClassInitFunc     class_init;
-  GClassFinalizeFunc class_finalize;
-  gconstpointer      class_data;
+  xuint16_t            class_size;
+  xuint16_t            class_private_size;
+  int                init_state;  /* (atomic) - xtype_class_ref reads it unlocked */
+  xbase_init_func_t      class_init_base;
+  xbase_finalize_func_t  class_finalize_base;
+  xclass_init_func_t     class_init;
+  xclass_finalize_func_t class_finalize;
+  xconstpointer      class_data;
   xpointer_t           class;
 };
 
 struct _InstanceData
 {
   CommonData         common;
-  guint16            class_size;
-  guint16            class_private_size;
-  int                init_state;  /* (atomic) - g_type_class_ref reads it unlocked */
-  GBaseInitFunc      class_init_base;
-  GBaseFinalizeFunc  class_finalize_base;
-  GClassInitFunc     class_init;
-  GClassFinalizeFunc class_finalize;
-  gconstpointer      class_data;
+  xuint16_t            class_size;
+  xuint16_t            class_private_size;
+  int                init_state;  /* (atomic) - xtype_class_ref reads it unlocked */
+  xbase_init_func_t      class_init_base;
+  xbase_finalize_func_t  class_finalize_base;
+  xclass_init_func_t     class_init;
+  xclass_finalize_func_t class_finalize;
+  xconstpointer      class_data;
   xpointer_t           class;
-  guint16            instance_size;
-  guint16            private_size;
-  guint16            n_preallocs;
-  GInstanceInitFunc  instance_init;
+  xuint16_t            instance_size;
+  xuint16_t            private_size;
+  xuint16_t            n_preallocs;
+  xinstance_init_func_t  instance_init;
 };
 
 union _TypeData
@@ -376,17 +376,17 @@ static xuint_t           static_n_class_cache_funcs = 0;
 static ClassCacheFunc *static_class_cache_funcs = NULL;
 static xuint_t           static_n_iface_check_funcs = 0;
 static IFaceCheckFunc *static_iface_check_funcs = NULL;
-static GQuark          static_quark_type_flags = 0;
-static GQuark          static_quark_iface_holder = 0;
-static GQuark          static_quark_dependants_array = 0;
+static xquark          static_quark_type_flags = 0;
+static xquark          static_quark_iface_holder = 0;
+static xquark          static_quark_dependants_array = 0;
 static xuint_t           type_registration_serial = 0;
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-GTypeDebugFlags	       _g_type_debug_flags = 0;
+GTypeDebugFlags	       _xtype_debug_flags = 0;
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 /* --- type nodes --- */
-static GHashTable       *static_type_nodes_ht = NULL;
+static xhashtable_t       *static_type_nodes_ht = NULL;
 static TypeNode		*static_fundamental_type_nodes[(XTYPE_FUNDAMENTAL_MAX >> XTYPE_FUNDAMENTAL_SHIFT) + 1] = { NULL, };
 static xtype_t		 static_fundamental_next = XTYPE_RESERVED_USER_FIRST;
 
@@ -400,12 +400,12 @@ lookup_type_node_I (xtype_t utype)
 }
 
 /**
- * g_type_get_type_registration_serial:
+ * xtype_get_type_registration_serial:
  *
  * Returns an opaque serial number that represents the state of the set
  * of registered types. Any time a type is registered this serial changes,
  * which means you can cache information based on type lookups (such as
- * g_type_from_name()) and know if the cache is still valid at a later
+ * xtype_from_name()) and know if the cache is still valid at a later
  * time by comparing the current serial with the one at the type lookup.
  *
  * Since: 2.36
@@ -413,7 +413,7 @@ lookup_type_node_I (xtype_t utype)
  * Returns: An unsigned int, representing the state of type registrations
  */
 xuint_t
-g_type_get_type_registration_serial (void)
+xtype_get_type_registration_serial (void)
 {
   return (xuint_t)g_atomic_int_get ((xint_t *)&type_registration_serial);
 }
@@ -515,7 +515,7 @@ type_node_any_new_W (TypeNode             *pnode,
   node->data = NULL;
   node->qname = g_quark_from_string (name);
   node->global_gdata = NULL;
-  g_hash_table_insert (static_type_nodes_ht,
+  xhash_table_insert (static_type_nodes_ht,
 		       (xpointer_t) g_quark_to_string (node->qname),
 		       (xpointer_t) type);
 
@@ -576,7 +576,7 @@ static inline IFaceEntry*
 lookup_iface_entry_I (IFaceEntries *entries,
                       TypeNode     *iface_node)
 {
-  guint8 *offsets;
+  xuint8_t *offsets;
   xsize_t offset_index;
   IFaceEntry *check;
   xsize_t index;
@@ -586,7 +586,7 @@ lookup_iface_entry_I (IFaceEntries *entries,
     return NULL;
 
   G_ATOMIC_ARRAY_DO_TRANSACTION
-    (&iface_node->_prot.offsets, guint8,
+    (&iface_node->_prot.offsets, xuint8_t,
 
      entry = NULL;
      offsets = transaction_data;
@@ -762,7 +762,7 @@ check_type_name_I (const xchar_t *type_name)
       g_warning ("type name '%s' contains invalid characters", type_name);
       return FALSE;
     }
-  if (g_type_from_name (type_name))
+  if (xtype_from_name (type_name))
     {
       g_warning ("cannot register existing type '%s'", type_name);
       return FALSE;
@@ -831,7 +831,7 @@ check_collect_format_I (const xchar_t *collect_format)
 
 static xboolean_t
 check_value_table_I (const xchar_t           *type_name,
-		     const GTypeValueTable *value_table)
+		     const xtype_value_table_t *value_table)
 {
   if (!value_table)
     return FALSE;
@@ -895,7 +895,7 @@ static xboolean_t
 check_type_info_I (TypeNode        *pnode,
 		   xtype_t            ftype,
 		   const xchar_t     *type_name,
-		   const GTypeInfo *info)
+		   const xtype_info_t *info)
 {
   GTypeFundamentalInfo *finfo = type_node_fundamental_info_I (lookup_type_node_I (ftype));
   xboolean_t is_interface = ftype == XTYPE_INTERFACE;
@@ -939,9 +939,9 @@ check_type_info_I (TypeNode        *pnode,
   /* check class size */
   if (finfo->type_flags & XTYPE_FLAG_CLASSED)
     {
-      if (info->class_size < sizeof (GTypeClass))
+      if (info->class_size < sizeof (xtype_class_t))
 	{
-	  g_warning ("specified class size for type '%s' is smaller than 'GTypeClass' size",
+	  g_warning ("specified class size for type '%s' is smaller than 'xtype_class_t' size",
 		     type_name);
 	  return FALSE;
 	}
@@ -1074,7 +1074,7 @@ check_add_interface_L (xtype_t instance_type,
 static xboolean_t
 check_interface_info_I (TypeNode             *iface,
 			xtype_t                 instance_type,
-			const GInterfaceInfo *info)
+			const xinterface_info_t *info)
 {
   if ((info->interface_finalize || info->interface_data) && !info->interface_init)
     {
@@ -1090,11 +1090,11 @@ check_interface_info_I (TypeNode             *iface,
 /* --- type info (type node data) --- */
 static void
 type_data_make_W (TypeNode              *node,
-		  const GTypeInfo       *info,
-		  const GTypeValueTable *value_table)
+		  const xtype_info_t       *info,
+		  const xtype_value_table_t *value_table)
 {
   TypeData *data;
-  GTypeValueTable *vtable = NULL;
+  xtype_value_table_t *vtable = NULL;
   xuint_t vtable_size = 0;
 
   g_assert (node->data == NULL && info != NULL);
@@ -1107,7 +1107,7 @@ type_data_make_W (TypeNode              *node,
 	vtable = pnode->data->common.value_table;
       else
 	{
-          static const GTypeValueTable zero_vtable =
+          static const xtype_value_table_t zero_vtable =
             { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 	  value_table = &zero_vtable;
@@ -1116,7 +1116,7 @@ type_data_make_W (TypeNode              *node,
   if (value_table)
     {
       /* need to setup vtable_size since we have to allocate it with data in one chunk */
-      vtable_size = sizeof (GTypeValueTable);
+      vtable_size = sizeof (xtype_value_table_t);
       if (value_table->collect_format)
 	vtable_size += strlen (value_table->collect_format);
       if (value_table->lcopy_format)
@@ -1236,8 +1236,8 @@ type_data_ref_Wm (TypeNode *node)
   if (!node->data)
     {
       TypeNode *pnode = lookup_type_node_I (NODE_PARENT_TYPE (node));
-      GTypeInfo tmp_info;
-      GTypeValueTable tmp_value_table;
+      xtype_info_t tmp_info;
+      xtype_value_table_t tmp_value_table;
 
       g_assert (node->plugin != NULL);
 
@@ -1245,18 +1245,18 @@ type_data_ref_Wm (TypeNode *node)
 	{
 	  type_data_ref_Wm (pnode);
 	  if (node->data)
-	    INVALID_RECURSION ("g_type_plugin_*", node->plugin, NODE_NAME (node));
+	    INVALID_RECURSION ("xtype_plugin_*", node->plugin, NODE_NAME (node));
 	}
 
       memset (&tmp_info, 0, sizeof (tmp_info));
       memset (&tmp_value_table, 0, sizeof (tmp_value_table));
 
       G_WRITE_UNLOCK (&type_rw_lock);
-      g_type_plugin_use (node->plugin);
-      g_type_plugin_complete_type_info (node->plugin, NODE_TYPE (node), &tmp_info, &tmp_value_table);
+      xtype_plugin_use (node->plugin);
+      xtype_plugin_complete_type_info (node->plugin, NODE_TYPE (node), &tmp_info, &tmp_value_table);
       G_WRITE_LOCK (&type_rw_lock);
       if (node->data)
-	INVALID_RECURSION ("g_type_plugin_*", node->plugin, NODE_NAME (node));
+	INVALID_RECURSION ("xtype_plugin_*", node->plugin, NODE_NAME (node));
 
       check_type_info_I (pnode, NODE_FUNDAMENTAL_TYPE (node), NODE_NAME (node), &tmp_info);
       type_data_make_W (node, &tmp_info,
@@ -1291,9 +1291,9 @@ iface_node_has_available_offset_L (TypeNode *iface_node,
 				   xsize_t offset,
 				   int for_index)
 {
-  guint8 *offsets;
+  xuint8_t *offsets;
 
-  offsets = G_ATOMIC_ARRAY_GET_LOCKED (&iface_node->_prot.offsets, guint8);
+  offsets = G_ATOMIC_ARRAY_GET_LOCKED (&iface_node->_prot.offsets, xuint8_t);
   if (offsets == NULL)
     return TRUE;
 
@@ -1342,11 +1342,11 @@ iface_node_set_offset_L (TypeNode *iface_node,
 			 xsize_t offset,
 			 int index)
 {
-  guint8 *offsets, *old_offsets;
+  xuint8_t *offsets, *old_offsets;
   xsize_t new_size, old_size;
   xsize_t i;
 
-  old_offsets = G_ATOMIC_ARRAY_GET_LOCKED (&iface_node->_prot.offsets, guint8);
+  old_offsets = G_ATOMIC_ARRAY_GET_LOCKED (&iface_node->_prot.offsets, xuint8_t);
   if (old_offsets == NULL)
     old_size = 0;
   else
@@ -1472,7 +1472,7 @@ type_node_add_iface_entry_W (TypeNode   *node,
 static void
 type_add_interface_Wm (TypeNode             *node,
                        TypeNode             *iface,
-                       const GInterfaceInfo *info,
+                       const xinterface_info_t *info,
                        GTypePlugin          *plugin)
 {
   IFaceHolder *iholder = g_new0 (IFaceHolder, 1);
@@ -1557,7 +1557,7 @@ type_iface_add_prerequisite_W (TypeNode *iface,
 }
 
 /**
- * g_type_interface_add_prerequisite:
+ * xtype_interface_add_prerequisite:
  * @interface_type: #xtype_t value of an interface type
  * @prerequisite_type: #xtype_t value of an interface or instantiatable type
  *
@@ -1568,15 +1568,15 @@ type_iface_add_prerequisite_W (TypeNode *iface,
  * at most one instantiatable prerequisite type.
  */
 void
-g_type_interface_add_prerequisite (xtype_t interface_type,
+xtype_interface_add_prerequisite (xtype_t interface_type,
 				   xtype_t prerequisite_type)
 {
   TypeNode *iface, *prerequisite_node;
   IFaceHolder *holders;
 
   g_return_if_fail (XTYPE_IS_INTERFACE (interface_type));	/* XTYPE_IS_INTERFACE() is an external call: _U */
-  g_return_if_fail (!g_type_is_a (interface_type, prerequisite_type));
-  g_return_if_fail (!g_type_is_a (prerequisite_type, interface_type));
+  g_return_if_fail (!xtype_is_a (interface_type, prerequisite_type));
+  g_return_if_fail (!xtype_is_a (prerequisite_type, interface_type));
 
   iface = lookup_type_node_I (interface_type);
   prerequisite_node = lookup_type_node_I (prerequisite_type);
@@ -1643,7 +1643,7 @@ g_type_interface_add_prerequisite (xtype_t interface_type,
 }
 
 /**
- * g_type_interface_prerequisites:
+ * xtype_interface_prerequisites:
  * @interface_type: an interface type
  * @n_prerequisites: (out) (optional): location to return the number
  *     of prerequisites, or %NULL
@@ -1657,7 +1657,7 @@ g_type_interface_add_prerequisite (xtype_t interface_type,
  *     the prerequisites of @interface_type
  */
 xtype_t*
-g_type_interface_prerequisites (xtype_t  interface_type,
+xtype_interface_prerequisites (xtype_t  interface_type,
 				xuint_t *n_prerequisites)
 {
   TypeNode *iface;
@@ -1704,14 +1704,14 @@ g_type_interface_prerequisites (xtype_t  interface_type,
 }
 
 /**
- * g_type_interface_instantiatable_prerequisite:
+ * xtype_interface_instantiatable_prerequisite:
  * @interface_type: an interface type
  *
  * Returns the most specific instantiatable prerequisite of an
  * interface type. If the interface type has no instantiatable
  * prerequisite, %XTYPE_INVALID is returned.
  *
- * See g_type_interface_add_prerequisite() for more information
+ * See xtype_interface_add_prerequisite() for more information
  * about prerequisites.
  *
  * Returns: the instantiatable prerequisite type or %XTYPE_INVALID if none
@@ -1719,7 +1719,7 @@ g_type_interface_prerequisites (xtype_t  interface_type,
  * Since: 2.68
  **/
 xtype_t
-g_type_interface_instantiatable_prerequisite (xtype_t interface_type)
+xtype_interface_instantiatable_prerequisite (xtype_t interface_type)
 {
   TypeNode *inode = NULL;
   TypeNode *iface;
@@ -1775,22 +1775,22 @@ type_iface_retrieve_holder_info_Wm (TypeNode *iface,
 
   if (iholder && !iholder->info && need_info)
     {
-      GInterfaceInfo tmp_info;
+      xinterface_info_t tmp_info;
 
       g_assert (iholder->plugin != NULL);
 
       type_data_ref_Wm (iface);
       if (iholder->info)
-	INVALID_RECURSION ("g_type_plugin_*", iface->plugin, NODE_NAME (iface));
+	INVALID_RECURSION ("xtype_plugin_*", iface->plugin, NODE_NAME (iface));
 
       memset (&tmp_info, 0, sizeof (tmp_info));
 
       G_WRITE_UNLOCK (&type_rw_lock);
-      g_type_plugin_use (iholder->plugin);
-      g_type_plugin_complete_interface_info (iholder->plugin, instance_type, NODE_TYPE (iface), &tmp_info);
+      xtype_plugin_use (iholder->plugin);
+      xtype_plugin_complete_interface_info (iholder->plugin, instance_type, NODE_TYPE (iface), &tmp_info);
       G_WRITE_LOCK (&type_rw_lock);
       if (iholder->info)
-        INVALID_RECURSION ("g_type_plugin_*", iholder->plugin, NODE_NAME (iface));
+        INVALID_RECURSION ("xtype_plugin_*", iholder->plugin, NODE_NAME (iface));
 
       check_interface_info_I (iface, instance_type, &tmp_info);
       iholder->info = g_memdup2 (&tmp_info, sizeof (tmp_info));
@@ -1816,24 +1816,24 @@ type_iface_blow_holder_info_Wm (TypeNode *iface,
       iholder->info = NULL;
 
       G_WRITE_UNLOCK (&type_rw_lock);
-      g_type_plugin_unuse (iholder->plugin);
+      xtype_plugin_unuse (iholder->plugin);
       type_data_unref_U (iface, FALSE);
       G_WRITE_LOCK (&type_rw_lock);
     }
 }
 
 /**
- * g_type_create_instance: (skip)
+ * xtype_create_instance: (skip)
  * @type: an instantiatable type to create an instance for
  *
  * Creates and initializes an instance of @type if @type is valid and
  * can be instantiated. The type system only performs basic allocation
  * and structure setups for instances: actual instance creation should
  * happen through functions supplied by the type's fundamental type
- * implementation.  So use of g_type_create_instance() is reserved for
+ * implementation.  So use of xtype_create_instance() is reserved for
  * implementers of fundamental types only. E.g. instances of the
- * #xobject_t hierarchy should be created via g_object_new() and never
- * directly through g_type_create_instance() which doesn't handle things
+ * #xobject_t hierarchy should be created via xobject_new() and never
+ * directly through xtype_create_instance() which doesn't handle things
  * like singleton objects or object construction.
  *
  * The extended members of the returned instance are guaranteed to be filled
@@ -1841,17 +1841,17 @@ type_iface_blow_holder_info_Wm (TypeNode *iface,
  *
  * Note: Do not use this function, unless you're implementing a
  * fundamental type. Also language bindings should not use this
- * function, but g_object_new() instead.
+ * function, but xobject_new() instead.
  *
  * Returns: an allocated and initialized instance, subject to further
  *     treatment by the fundamental type implementation
  */
 GTypeInstance*
-g_type_create_instance (xtype_t type)
+xtype_create_instance (xtype_t type)
 {
   TypeNode *node;
   GTypeInstance *instance;
-  GTypeClass *class;
+  xtype_class_t *class;
   xchar_t *allocated;
   xint_t private_size;
   xint_t ivar_size;
@@ -1860,17 +1860,17 @@ g_type_create_instance (xtype_t type)
   node = lookup_type_node_I (type);
   if (!node || !node->is_instantiatable)
     {
-      g_error ("cannot create new instance of invalid (non-instantiatable) type '%s'",
+      xerror ("cannot create new instance of invalid (non-instantiatable) type '%s'",
 		 type_descriptive_name_I (type));
     }
   /* XTYPE_IS_ABSTRACT() is an external call: _U */
   if (!node->mutatable_check_cache && XTYPE_IS_ABSTRACT (type))
     {
-      g_error ("cannot create instance of abstract (non-instantiatable) type '%s'",
+      xerror ("cannot create instance of abstract (non-instantiatable) type '%s'",
 		 type_descriptive_name_I (type));
     }
 
-  class = g_type_class_ref (type);
+  class = xtype_class_ref (type);
 
   /* We allocate the 'private' areas before the normal instance data, in
    * reverse order.  This allows the private area of a particular class
@@ -1941,20 +1941,20 @@ g_type_create_instance (xtype_t type)
 }
 
 /**
- * g_type_free_instance:
+ * xtype_free_instance:
  * @instance: an instance of a type
  *
  * Frees an instance of a type, returning it to the instance pool for
  * the type, if there is one.
  *
- * Like g_type_create_instance(), this function is reserved for
+ * Like xtype_create_instance(), this function is reserved for
  * implementors of fundamental types.
  */
 void
-g_type_free_instance (GTypeInstance *instance)
+xtype_free_instance (GTypeInstance *instance)
 {
   TypeNode *node;
-  GTypeClass *class;
+  xtype_class_t *class;
   xchar_t *allocated;
   xint_t private_size;
   xint_t ivar_size;
@@ -1987,7 +1987,7 @@ g_type_free_instance (GTypeInstance *instance)
 #endif
 
 #ifdef ENABLE_VALGRIND
-  /* See comment in g_type_create_instance() about what's going on here.
+  /* See comment in xtype_create_instance() about what's going on here.
    * We're basically unwinding what we put into motion there.
    */
   if (private_size && RUNNING_ON_VALGRIND)
@@ -2014,7 +2014,7 @@ g_type_free_instance (GTypeInstance *instance)
     }
 #endif
 
-  g_type_class_unref (class);
+  xtype_class_unref (class);
 }
 
 static void
@@ -2099,7 +2099,7 @@ type_iface_vtable_base_init_Wm (TypeNode *iface,
  * calling the interface init function.
  * this function may only be called for types with their
  * own interface holder info, i.e. types for which
- * g_type_add_interface*() was called and not children thereof.
+ * xtype_add_interface*() was called and not children thereof.
  */
 static void
 type_iface_vtable_iface_init_Wm (TypeNode *iface,
@@ -2174,10 +2174,10 @@ type_iface_vtable_finalize_Wm (TypeNode       *iface,
 
 static void
 type_class_init_Wm (TypeNode   *node,
-		    GTypeClass *pclass)
+		    xtype_class_t *pclass)
 {
-  GSList *slist, *init_slist = NULL;
-  GTypeClass *class;
+  xslist_t *slist, *init_slist = NULL;
+  xtype_class_t *class;
   IFaceEntries *entries;
   IFaceEntry *entry;
   TypeNode *bnode, *pnode;
@@ -2222,14 +2222,14 @@ type_class_init_Wm (TypeNode   *node,
    */
   for (bnode = node; bnode; bnode = lookup_type_node_I (NODE_PARENT_TYPE (bnode)))
     if (bnode->data->class.class_init_base)
-      init_slist = g_slist_prepend (init_slist, (xpointer_t) bnode->data->class.class_init_base);
+      init_slist = xslist_prepend (init_slist, (xpointer_t) bnode->data->class.class_init_base);
   for (slist = init_slist; slist; slist = slist->next)
     {
-      GBaseInitFunc class_init_base = (GBaseInitFunc) slist->data;
+      xbase_init_func_t class_init_base = (xbase_init_func_t) slist->data;
 
       class_init_base (class);
     }
-  g_slist_free (init_slist);
+  xslist_free (init_slist);
 
   G_WRITE_LOCK (&type_rw_lock);
 
@@ -2368,7 +2368,7 @@ static void
 type_data_finalize_class_U (TypeNode  *node,
 			    ClassData *cdata)
 {
-  GTypeClass *class = cdata->class;
+  xtype_class_t *class = cdata->class;
   TypeNode *bnode;
 
   g_assert (cdata->class && NODE_REFCOUNT (node) == 0);
@@ -2474,7 +2474,7 @@ type_data_last_unref_Wm (TypeNode *node,
       g_free (tdata);
 
       G_WRITE_UNLOCK (&type_rw_lock);
-      g_type_plugin_unuse (node->plugin);
+      xtype_plugin_unuse (node->plugin);
       if (ptype)
 	type_data_unref_U (lookup_type_node_I (ptype), FALSE);
       G_WRITE_LOCK (&type_rw_lock);
@@ -2520,7 +2520,7 @@ type_data_unref_U (TypeNode *node,
 }
 
 /**
- * g_type_add_class_cache_func: (skip)
+ * xtype_add_class_cache_func: (skip)
  * @cache_data: data to be passed to @cache_func
  * @cache_func: a #GTypeClassCacheFunc
  *
@@ -2533,7 +2533,7 @@ type_data_unref_U (TypeNode *node,
  * chain.
  */
 void
-g_type_add_class_cache_func (xpointer_t            cache_data,
+xtype_add_class_cache_func (xpointer_t            cache_data,
 			     GTypeClassCacheFunc cache_func)
 {
   xuint_t i;
@@ -2549,16 +2549,16 @@ g_type_add_class_cache_func (xpointer_t            cache_data,
 }
 
 /**
- * g_type_remove_class_cache_func: (skip)
+ * xtype_remove_class_cache_func: (skip)
  * @cache_data: data that was given when adding @cache_func
  * @cache_func: a #GTypeClassCacheFunc
  *
  * Removes a previously installed #GTypeClassCacheFunc. The cache
  * maintained by @cache_func has to be empty when calling
- * g_type_remove_class_cache_func() to avoid leaks.
+ * xtype_remove_class_cache_func() to avoid leaks.
  */
 void
-g_type_remove_class_cache_func (xpointer_t            cache_data,
+xtype_remove_class_cache_func (xpointer_t            cache_data,
 				GTypeClassCacheFunc cache_func)
 {
   xboolean_t found_it = FALSE;
@@ -2588,14 +2588,14 @@ g_type_remove_class_cache_func (xpointer_t            cache_data,
 
 
 /**
- * g_type_add_interface_check: (skip)
+ * xtype_add_interface_check: (skip)
  * @check_data: data to pass to @check_func
  * @check_func: function to be called after each interface
  *     is initialized
  *
  * Adds a function to be called after an interface vtable is
  * initialized for any class (i.e. after the @interface_init
- * member of #GInterfaceInfo has been called).
+ * member of #xinterface_info_t has been called).
  *
  * This function is useful when you want to check an invariant
  * that depends on the interfaces of a class. For instance, the
@@ -2606,7 +2606,7 @@ g_type_remove_class_cache_func (xpointer_t            cache_data,
  * Since: 2.4
  */
 void
-g_type_add_interface_check (xpointer_t	            check_data,
+xtype_add_interface_check (xpointer_t	            check_data,
 			    GTypeInterfaceCheckFunc check_func)
 {
   xuint_t i;
@@ -2622,17 +2622,17 @@ g_type_add_interface_check (xpointer_t	            check_data,
 }
 
 /**
- * g_type_remove_interface_check: (skip)
- * @check_data: callback data passed to g_type_add_interface_check()
- * @check_func: callback function passed to g_type_add_interface_check()
+ * xtype_remove_interface_check: (skip)
+ * @check_data: callback data passed to xtype_add_interface_check()
+ * @check_func: callback function passed to xtype_add_interface_check()
  *
  * Removes an interface check function added with
- * g_type_add_interface_check().
+ * xtype_add_interface_check().
  *
  * Since: 2.4
  */
 void
-g_type_remove_interface_check (xpointer_t                check_data,
+xtype_remove_interface_check (xpointer_t                check_data,
 			       GTypeInterfaceCheckFunc check_func)
 {
   xboolean_t found_it = FALSE;
@@ -2662,17 +2662,17 @@ g_type_remove_interface_check (xpointer_t                check_data,
 
 /* --- type registration --- */
 /**
- * g_type_register_fundamental:
+ * xtype_register_fundamental:
  * @type_id: a predefined type identifier
  * @type_name: 0-terminated string used as the name of the new type
- * @info: #GTypeInfo structure for this type
+ * @info: #xtype_info_t structure for this type
  * @finfo: #GTypeFundamentalInfo structure for this type
- * @flags: bitwise combination of #GTypeFlags values
+ * @flags: bitwise combination of #xtype_flags_t values
  *
  * Registers @type_id as the predefined identifier and @type_name as the
  * name of a fundamental type. If @type_id is already registered, or a
  * type named @type_name is already registered, the behaviour is undefined.
- * The type system uses the information contained in the #GTypeInfo structure
+ * The type system uses the information contained in the #xtype_info_t structure
  * pointed to by @info and the #GTypeFundamentalInfo structure pointed to by
  * @finfo to manage the type and its instances. The value of @flags determines
  * additional characteristics of the fundamental type.
@@ -2680,11 +2680,11 @@ g_type_remove_interface_check (xpointer_t                check_data,
  * Returns: the predefined type identifier
  */
 xtype_t
-g_type_register_fundamental (xtype_t                       type_id,
+xtype_register_fundamental (xtype_t                       type_id,
 			     const xchar_t                *type_name,
-			     const GTypeInfo            *info,
+			     const xtype_info_t            *info,
 			     const GTypeFundamentalInfo *finfo,
-			     GTypeFlags			 flags)
+			     xtype_flags_t			 flags)
 {
   TypeNode *node;
 
@@ -2732,34 +2732,34 @@ g_type_register_fundamental (xtype_t                       type_id,
 }
 
 /**
- * g_type_register_static_simple: (skip)
+ * xtype_register_static_simple: (skip)
  * @parent_type: type from which this type will be derived
  * @type_name: 0-terminated string used as the name of the new type
- * @class_size: size of the class structure (see #GTypeInfo)
- * @class_init: location of the class initialization function (see #GTypeInfo)
- * @instance_size: size of the instance structure (see #GTypeInfo)
- * @instance_init: location of the instance initialization function (see #GTypeInfo)
- * @flags: bitwise combination of #GTypeFlags values
+ * @class_size: size of the class structure (see #xtype_info_t)
+ * @class_init: location of the class initialization function (see #xtype_info_t)
+ * @instance_size: size of the instance structure (see #xtype_info_t)
+ * @instance_init: location of the instance initialization function (see #xtype_info_t)
+ * @flags: bitwise combination of #xtype_flags_t values
  *
  * Registers @type_name as the name of a new static type derived from
  * @parent_type.  The value of @flags determines the nature (e.g.
- * abstract or not) of the type. It works by filling a #GTypeInfo
- * struct and calling g_type_register_static().
+ * abstract or not) of the type. It works by filling a #xtype_info_t
+ * struct and calling xtype_register_static().
  *
  * Since: 2.12
  *
  * Returns: the new type identifier
  */
 xtype_t
-g_type_register_static_simple (xtype_t             parent_type,
+xtype_register_static_simple (xtype_t             parent_type,
 			       const xchar_t      *type_name,
 			       xuint_t             class_size,
-			       GClassInitFunc    class_init,
+			       xclass_init_func_t    class_init,
 			       xuint_t             instance_size,
-			       GInstanceInitFunc instance_init,
-			       GTypeFlags	 flags)
+			       xinstance_init_func_t instance_init,
+			       xtype_flags_t	 flags)
 {
-  GTypeInfo info;
+  xtype_info_t info;
 
   /* Instances are not allowed to be larger than this. If you have a big
    * fixed-length array or something, point to it instead.
@@ -2778,29 +2778,29 @@ g_type_register_static_simple (xtype_t             parent_type,
   info.instance_init = instance_init;
   info.value_table = NULL;
 
-  return g_type_register_static (parent_type, type_name, &info, flags);
+  return xtype_register_static (parent_type, type_name, &info, flags);
 }
 
 /**
- * g_type_register_static:
+ * xtype_register_static:
  * @parent_type: type from which this type will be derived
  * @type_name: 0-terminated string used as the name of the new type
- * @info: #GTypeInfo structure for this type
- * @flags: bitwise combination of #GTypeFlags values
+ * @info: #xtype_info_t structure for this type
+ * @flags: bitwise combination of #xtype_flags_t values
  *
  * Registers @type_name as the name of a new static type derived from
  * @parent_type. The type system uses the information contained in the
- * #GTypeInfo structure pointed to by @info to manage the type and its
+ * #xtype_info_t structure pointed to by @info to manage the type and its
  * instances (if not abstract). The value of @flags determines the nature
  * (e.g. abstract or not) of the type.
  *
  * Returns: the new type identifier
  */
 xtype_t
-g_type_register_static (xtype_t            parent_type,
+xtype_register_static (xtype_t            parent_type,
 			const xchar_t     *type_name,
-			const GTypeInfo *info,
-			GTypeFlags	 flags)
+			const xtype_info_t *info,
+			xtype_flags_t	 flags)
 {
   TypeNode *pnode, *node;
   xtype_t type = 0;
@@ -2837,11 +2837,11 @@ g_type_register_static (xtype_t            parent_type,
 }
 
 /**
- * g_type_register_dynamic:
+ * xtype_register_dynamic:
  * @parent_type: type from which this type will be derived
  * @type_name: 0-terminated string used as the name of the new type
- * @plugin: #GTypePlugin structure to retrieve the #GTypeInfo from
- * @flags: bitwise combination of #GTypeFlags values
+ * @plugin: #GTypePlugin structure to retrieve the #xtype_info_t from
+ * @flags: bitwise combination of #xtype_flags_t values
  *
  * Registers @type_name as the name of a new dynamic type derived from
  * @parent_type.  The type system uses the information contained in the
@@ -2852,10 +2852,10 @@ g_type_register_static (xtype_t            parent_type,
  * Returns: the new type identifier or %XTYPE_INVALID if registration failed
  */
 xtype_t
-g_type_register_dynamic (xtype_t        parent_type,
+xtype_register_dynamic (xtype_t        parent_type,
 			 const xchar_t *type_name,
 			 GTypePlugin *plugin,
-			 GTypeFlags   flags)
+			 xtype_flags_t   flags)
 {
   TypeNode *pnode, *node;
   xtype_t type;
@@ -2881,24 +2881,24 @@ g_type_register_dynamic (xtype_t        parent_type,
 }
 
 /**
- * g_type_add_interface_static:
+ * xtype_add_interface_static:
  * @instance_type: #xtype_t value of an instantiatable type
  * @interface_type: #xtype_t value of an interface type
- * @info: #GInterfaceInfo structure for this
+ * @info: #xinterface_info_t structure for this
  *        (@instance_type, @interface_type) combination
  *
  * Adds @interface_type to the static @instance_type.
- * The information contained in the #GInterfaceInfo structure
+ * The information contained in the #xinterface_info_t structure
  * pointed to by @info is used to manage the relationship.
  */
 void
-g_type_add_interface_static (xtype_t                 instance_type,
+xtype_add_interface_static (xtype_t                 instance_type,
 			     xtype_t                 interface_type,
-			     const GInterfaceInfo *info)
+			     const xinterface_info_t *info)
 {
   /* XTYPE_IS_INSTANTIATABLE() is an external call: _U */
   g_return_if_fail (XTYPE_IS_INSTANTIATABLE (instance_type));
-  g_return_if_fail (g_type_parent (interface_type) == XTYPE_INTERFACE);
+  g_return_if_fail (xtype_parent (interface_type) == XTYPE_INTERFACE);
 
   /* we only need to lock class_init_rec_mutex if instance_type already has its
    * class initialized, however this function is rarely enough called to take
@@ -2918,30 +2918,30 @@ g_type_add_interface_static (xtype_t                 instance_type,
 }
 
 /**
- * g_type_add_interface_dynamic:
+ * xtype_add_interface_dynamic:
  * @instance_type: #xtype_t value of an instantiatable type
  * @interface_type: #xtype_t value of an interface type
- * @plugin: #GTypePlugin structure to retrieve the #GInterfaceInfo from
+ * @plugin: #GTypePlugin structure to retrieve the #xinterface_info_t from
  *
  * Adds @interface_type to the dynamic @instance_type. The information
  * contained in the #GTypePlugin structure pointed to by @plugin
  * is used to manage the relationship.
  */
 void
-g_type_add_interface_dynamic (xtype_t        instance_type,
+xtype_add_interface_dynamic (xtype_t        instance_type,
 			      xtype_t        interface_type,
 			      GTypePlugin *plugin)
 {
   TypeNode *node;
   /* XTYPE_IS_INSTANTIATABLE() is an external call: _U */
   g_return_if_fail (XTYPE_IS_INSTANTIATABLE (instance_type));
-  g_return_if_fail (g_type_parent (interface_type) == XTYPE_INTERFACE);
+  g_return_if_fail (xtype_parent (interface_type) == XTYPE_INTERFACE);
 
   node = lookup_type_node_I (instance_type);
   if (!check_plugin_U (plugin, FALSE, TRUE, NODE_NAME (node)))
     return;
 
-  /* see comment in g_type_add_interface_static() about class_init_rec_mutex */
+  /* see comment in xtype_add_interface_static() about class_init_rec_mutex */
   g_rec_mutex_lock (&class_init_rec_mutex); /* required locking order: 1) class_init_rec_mutex, 2) type_rw_lock */
   G_WRITE_LOCK (&type_rw_lock);
   if (check_add_interface_L (instance_type, interface_type))
@@ -2956,23 +2956,23 @@ g_type_add_interface_dynamic (xtype_t        instance_type,
 
 /* --- public API functions --- */
 /**
- * g_type_class_ref:
+ * xtype_class_ref:
  * @type: type ID of a classed type
  *
  * Increments the reference count of the class structure belonging to
  * @type. This function will demand-create the class if it doesn't
  * exist already.
  *
- * Returns: (type xobject_t.TypeClass) (transfer none): the #GTypeClass
+ * Returns: (type xobject_t.TypeClass) (transfer none): the #xtype_class_t
  *     structure for the given type ID
  */
 xpointer_t
-g_type_class_ref (xtype_t type)
+xtype_class_ref (xtype_t type)
 {
   TypeNode *node;
   xtype_t ptype;
   xboolean_t holds_ref;
-  GTypeClass *pclass;
+  xtype_class_t *pclass;
 
   /* optimize for common code path */
   node = lookup_type_node_I (type);
@@ -2993,7 +2993,7 @@ g_type_class_ref (xtype_t type)
     holds_ref = FALSE;
 
   /* here, we either have node->data->class.class == NULL, or a recursive
-   * call to g_type_class_ref() with a partly initialized class, or
+   * call to xtype_class_ref() with a partly initialized class, or
    * node->data->class.init_state == INITIALIZED, because any
    * concurrently running initialization was guarded by class_init_rec_mutex.
    */
@@ -3001,7 +3001,7 @@ g_type_class_ref (xtype_t type)
 
   /* we need an initialized parent class for initializing derived classes */
   ptype = NODE_PARENT_TYPE (node);
-  pclass = ptype ? g_type_class_ref (ptype) : NULL;
+  pclass = ptype ? xtype_class_ref (ptype) : NULL;
 
   G_WRITE_LOCK (&type_rw_lock);
 
@@ -3014,7 +3014,7 @@ g_type_class_ref (xtype_t type)
   G_WRITE_UNLOCK (&type_rw_lock);
 
   if (pclass)
-    g_type_class_unref (pclass);
+    xtype_class_unref (pclass);
 
   g_rec_mutex_unlock (&class_init_rec_mutex);
 
@@ -3022,19 +3022,19 @@ g_type_class_ref (xtype_t type)
 }
 
 /**
- * g_type_class_unref:
- * @g_class: (type xobject_t.TypeClass): a #GTypeClass structure to unref
+ * xtype_class_unref:
+ * @g_class: (type xobject_t.TypeClass): a #xtype_class_t structure to unref
  *
  * Decrements the reference count of the class structure being passed in.
  * Once the last reference count of a class has been released, classes
  * may be finalized by the type system, so further dereferencing of a
- * class pointer after g_type_class_unref() are invalid.
+ * class pointer after xtype_class_unref() are invalid.
  */
 void
-g_type_class_unref (xpointer_t g_class)
+xtype_class_unref (xpointer_t g_class)
 {
   TypeNode *node;
-  GTypeClass *class = g_class;
+  xtype_class_t *class = g_class;
 
   g_return_if_fail (g_class != NULL);
 
@@ -3047,19 +3047,19 @@ g_type_class_unref (xpointer_t g_class)
 }
 
 /**
- * g_type_class_unref_uncached: (skip)
- * @g_class: (type xobject_t.TypeClass): a #GTypeClass structure to unref
+ * xtype_class_unref_uncached: (skip)
+ * @g_class: (type xobject_t.TypeClass): a #xtype_class_t structure to unref
  *
- * A variant of g_type_class_unref() for use in #GTypeClassCacheFunc
+ * A variant of xtype_class_unref() for use in #GTypeClassCacheFunc
  * implementations. It unreferences a class without consulting the chain
  * of #GTypeClassCacheFuncs, avoiding the recursion which would occur
  * otherwise.
  */
 void
-g_type_class_unref_uncached (xpointer_t g_class)
+xtype_class_unref_uncached (xpointer_t g_class)
 {
   TypeNode *node;
-  GTypeClass *class = g_class;
+  xtype_class_t *class = g_class;
 
   g_return_if_fail (g_class != NULL);
 
@@ -3072,21 +3072,21 @@ g_type_class_unref_uncached (xpointer_t g_class)
 }
 
 /**
- * g_type_class_peek:
+ * xtype_class_peek:
  * @type: type ID of a classed type
  *
- * This function is essentially the same as g_type_class_ref(),
+ * This function is essentially the same as xtype_class_ref(),
  * except that the classes reference count isn't incremented.
  * As a consequence, this function may return %NULL if the class
  * of the type passed in does not currently exist (hasn't been
  * referenced before).
  *
- * Returns: (type xobject_t.TypeClass) (transfer none): the #GTypeClass
+ * Returns: (type xobject_t.TypeClass) (transfer none): the #xtype_class_t
  *     structure for the given type ID or %NULL if the class does not
  *     currently exist
  */
 xpointer_t
-g_type_class_peek (xtype_t type)
+xtype_class_peek (xtype_t type)
 {
   TypeNode *node;
   xpointer_t class;
@@ -3103,20 +3103,20 @@ g_type_class_peek (xtype_t type)
 }
 
 /**
- * g_type_class_peek_static:
+ * xtype_class_peek_static:
  * @type: type ID of a classed type
  *
- * A more efficient version of g_type_class_peek() which works only for
+ * A more efficient version of xtype_class_peek() which works only for
  * static types.
  *
- * Returns: (type xobject_t.TypeClass) (transfer none): the #GTypeClass
+ * Returns: (type xobject_t.TypeClass) (transfer none): the #xtype_class_t
  *     structure for the given type ID or %NULL if the class does not
  *     currently exist or is dynamically loaded
  *
  * Since: 2.4
  */
 xpointer_t
-g_type_class_peek_static (xtype_t type)
+xtype_class_peek_static (xtype_t type)
 {
   TypeNode *node;
   xpointer_t class;
@@ -3134,8 +3134,8 @@ g_type_class_peek_static (xtype_t type)
 }
 
 /**
- * g_type_class_peek_parent:
- * @g_class: (type xobject_t.TypeClass): the #GTypeClass structure to
+ * xtype_class_peek_parent:
+ * @g_class: (type xobject_t.TypeClass): the #xtype_class_t structure to
  *     retrieve the parent class for
  *
  * This is a convenience function often needed in class initializers.
@@ -3145,13 +3145,13 @@ g_type_class_peek_static (xtype_t type)
  * class will always exist.
  *
  * This function is essentially equivalent to:
- * g_type_class_peek (g_type_parent (XTYPE_FROM_CLASS (g_class)))
+ * xtype_class_peek (xtype_parent (XTYPE_FROM_CLASS (g_class)))
  *
  * Returns: (type xobject_t.TypeClass) (transfer none): the parent class
  *     of @g_class
  */
 xpointer_t
-g_type_class_peek_parent (xpointer_t g_class)
+xtype_class_peek_parent (xpointer_t g_class)
 {
   TypeNode *node;
   xpointer_t class = NULL;
@@ -3178,8 +3178,8 @@ g_type_class_peek_parent (xpointer_t g_class)
 }
 
 /**
- * g_type_interface_peek:
- * @instance_class: (type xobject_t.TypeClass): a #GTypeClass structure
+ * xtype_interface_peek:
+ * @instance_class: (type xobject_t.TypeClass): a #xtype_class_t structure
  * @iface_type: an interface ID which this class conforms to
  *
  * Returns the #xtype_interface_t structure of an interface to which the
@@ -3190,13 +3190,13 @@ g_type_class_peek_parent (xpointer_t g_class)
  *     otherwise
  */
 xpointer_t
-g_type_interface_peek (xpointer_t instance_class,
+xtype_interface_peek (xpointer_t instance_class,
 		       xtype_t    iface_type)
 {
   TypeNode *node;
   TypeNode *iface;
   xpointer_t vtable = NULL;
-  GTypeClass *class = instance_class;
+  xtype_class_t *class = instance_class;
 
   g_return_val_if_fail (instance_class != NULL, NULL);
 
@@ -3211,7 +3211,7 @@ g_type_interface_peek (xpointer_t instance_class,
 }
 
 /**
- * g_type_interface_peek_parent:
+ * xtype_interface_peek_parent:
  * @x_iface: (type xobject_t.TypeInterface): a #xtype_interface_t structure
  *
  * Returns the corresponding #xtype_interface_t structure of the parent type
@@ -3225,7 +3225,7 @@ g_type_interface_peek (xpointer_t instance_class,
  *     type doesn't conform to the interface
  */
 xpointer_t
-g_type_interface_peek_parent (xpointer_t x_iface)
+xtype_interface_peek_parent (xpointer_t x_iface)
 {
   TypeNode *node;
   TypeNode *iface;
@@ -3247,7 +3247,7 @@ g_type_interface_peek_parent (xpointer_t x_iface)
 }
 
 /**
- * g_type_default_interface_ref:
+ * xtype_default_interface_ref:
  * @g_type: an interface type
  *
  * Increments the reference count for the interface type @g_type,
@@ -3256,19 +3256,19 @@ g_type_interface_peek_parent (xpointer_t x_iface)
  * If the type is not currently in use, then the default vtable
  * for the type will be created and initialized by calling
  * the base interface init and default vtable init functions for
- * the type (the @base_init and @class_init members of #GTypeInfo).
- * Calling g_type_default_interface_ref() is useful when you
+ * the type (the @base_init and @class_init members of #xtype_info_t).
+ * Calling xtype_default_interface_ref() is useful when you
  * want to make sure that signals and properties for an interface
  * have been installed.
  *
  * Since: 2.4
  *
  * Returns: (type xobject_t.TypeInterface) (transfer none): the default
- *     vtable for the interface; call g_type_default_interface_unref()
+ *     vtable for the interface; call xtype_default_interface_unref()
  *     when you are done using the interface.
  */
 xpointer_t
-g_type_default_interface_ref (xtype_t g_type)
+xtype_default_interface_ref (xtype_t g_type)
 {
   TypeNode *node;
   xpointer_t dflt_vtable;
@@ -3305,7 +3305,7 @@ g_type_default_interface_ref (xtype_t g_type)
 }
 
 /**
- * g_type_default_interface_peek:
+ * xtype_default_interface_peek:
  * @g_type: an interface type
  *
  * If the interface type @g_type is currently in use, returns its
@@ -3318,7 +3318,7 @@ g_type_default_interface_ref (xtype_t g_type)
  *     in use
  */
 xpointer_t
-g_type_default_interface_peek (xtype_t g_type)
+xtype_default_interface_peek (xtype_t g_type)
 {
   TypeNode *node;
   xpointer_t vtable;
@@ -3333,20 +3333,20 @@ g_type_default_interface_peek (xtype_t g_type)
 }
 
 /**
- * g_type_default_interface_unref:
+ * xtype_default_interface_unref:
  * @x_iface: (type xobject_t.TypeInterface): the default vtable
- *     structure for an interface, as returned by g_type_default_interface_ref()
+ *     structure for an interface, as returned by xtype_default_interface_ref()
  *
  * Decrements the reference count for the type corresponding to the
  * interface default vtable @x_iface. If the type is dynamic, then
  * when no one is using the interface and all references have
  * been released, the finalize function for the interface's default
- * vtable (the @class_finalize member of #GTypeInfo) will be called.
+ * vtable (the @class_finalize member of #xtype_info_t) will be called.
  *
  * Since: 2.4
  */
 void
-g_type_default_interface_unref (xpointer_t x_iface)
+xtype_default_interface_unref (xpointer_t x_iface)
 {
   TypeNode *node;
   xtype_interface_t *vtable = x_iface;
@@ -3362,7 +3362,7 @@ g_type_default_interface_unref (xpointer_t x_iface)
 }
 
 /**
- * g_type_name:
+ * xtype_name:
  * @type: type to return name for
  *
  * Get the unique name that is assigned to a type ID.  Note that this
@@ -3374,7 +3374,7 @@ g_type_default_interface_unref (xpointer_t x_iface)
  * Returns: static type name or %NULL
  */
 const xchar_t *
-g_type_name (xtype_t type)
+xtype_name (xtype_t type)
 {
   TypeNode *node;
 
@@ -3386,15 +3386,15 @@ g_type_name (xtype_t type)
 }
 
 /**
- * g_type_qname:
+ * xtype_qname:
  * @type: type to return quark of type name for
  *
  * Get the corresponding quark of the type IDs name.
  *
  * Returns: the type names quark or 0
  */
-GQuark
-g_type_qname (xtype_t type)
+xquark
+xtype_qname (xtype_t type)
 {
   TypeNode *node;
 
@@ -3404,7 +3404,7 @@ g_type_qname (xtype_t type)
 }
 
 /**
- * g_type_from_name:
+ * xtype_from_name:
  * @name: type name to look up
  *
  * Look up the type ID from a given type name, returning 0 if no type
@@ -3415,21 +3415,21 @@ g_type_qname (xtype_t type)
  * Returns: corresponding type ID or 0
  */
 xtype_t
-g_type_from_name (const xchar_t *name)
+xtype_from_name (const xchar_t *name)
 {
   xtype_t type = 0;
 
   g_return_val_if_fail (name != NULL, 0);
 
   G_READ_LOCK (&type_rw_lock);
-  type = (xtype_t) g_hash_table_lookup (static_type_nodes_ht, name);
+  type = (xtype_t) xhash_table_lookup (static_type_nodes_ht, name);
   G_READ_UNLOCK (&type_rw_lock);
 
   return type;
 }
 
 /**
- * g_type_parent:
+ * xtype_parent:
  * @type: the derived type
  *
  * Return the direct parent type of the passed in type. If the passed
@@ -3438,7 +3438,7 @@ g_type_from_name (const xchar_t *name)
  * Returns: the parent type
  */
 xtype_t
-g_type_parent (xtype_t type)
+xtype_parent (xtype_t type)
 {
   TypeNode *node;
 
@@ -3448,7 +3448,7 @@ g_type_parent (xtype_t type)
 }
 
 /**
- * g_type_depth:
+ * xtype_depth:
  * @type: a #xtype_t
  *
  * Returns the length of the ancestry of the passed in type. This
@@ -3457,7 +3457,7 @@ g_type_parent (xtype_t type)
  * Returns: the depth of @type
  */
 xuint_t
-g_type_depth (xtype_t type)
+xtype_depth (xtype_t type)
 {
   TypeNode *node;
 
@@ -3467,7 +3467,7 @@ g_type_depth (xtype_t type)
 }
 
 /**
- * g_type_next_base:
+ * xtype_next_base:
  * @leaf_type: descendant of @root_type and the type to be returned
  * @root_type: immediate parent of the returned type
  *
@@ -3482,7 +3482,7 @@ g_type_depth (xtype_t type)
  * Returns: immediate child of @root_type and ancestor of @leaf_type
  */
 xtype_t
-g_type_next_base (xtype_t type,
+xtype_next_base (xtype_t type,
 		  xtype_t base_type)
 {
   xtype_t atype = 0;
@@ -3565,7 +3565,7 @@ type_node_conforms_to_U (TypeNode *node,
 }
 
 /**
- * g_type_is_a:
+ * xtype_is_a:
  * @type: type to check ancestry for
  * @is_a_type: possible ancestor of @type or interface that @type
  *     could conform to
@@ -3577,7 +3577,7 @@ type_node_conforms_to_U (TypeNode *node,
  * Returns: %TRUE if @type is a @is_a_type
  */
 xboolean_t
-g_type_is_a (xtype_t type,
+xtype_is_a (xtype_t type,
 	     xtype_t iface_type)
 {
   TypeNode *node, *iface_node;
@@ -3594,7 +3594,7 @@ g_type_is_a (xtype_t type,
 }
 
 /**
- * g_type_children:
+ * xtype_children:
  * @type: the parent type
  * @n_children: (out) (optional): location to store the length of
  *     the returned array, or %NULL
@@ -3606,7 +3606,7 @@ g_type_is_a (xtype_t type,
  *     and 0-terminated array of child types, free with g_free()
  */
 xtype_t*
-g_type_children (xtype_t  type,
+xtype_children (xtype_t  type,
 		 xuint_t *n_children)
 {
   TypeNode *node;
@@ -3638,7 +3638,7 @@ g_type_children (xtype_t  type,
 }
 
 /**
- * g_type_interfaces:
+ * xtype_interfaces:
  * @type: the type to list interface types for
  * @n_interfaces: (out) (optional): location to store the length of
  *     the returned array, or %NULL
@@ -3650,7 +3650,7 @@ g_type_children (xtype_t  type,
  *     and 0-terminated array of interface types, free with g_free()
  */
 xtype_t*
-g_type_interfaces (xtype_t  type,
+xtype_interfaces (xtype_t  type,
 		   xuint_t *n_interfaces)
 {
   TypeNode *node;
@@ -3700,13 +3700,13 @@ struct _GData
 };
 struct _QData
 {
-  GQuark   quark;
+  xquark   quark;
   xpointer_t data;
 };
 
 static inline xpointer_t
 type_get_qdata_L (TypeNode *node,
-		  GQuark    quark)
+		  xquark    quark)
 {
   GData *gdata = node->global_gdata;
 
@@ -3738,22 +3738,22 @@ type_get_qdata_L (TypeNode *node,
 }
 
 /**
- * g_type_get_qdata:
+ * xtype_get_qdata:
  * @type: a #xtype_t
- * @quark: a #GQuark id to identify the data
+ * @quark: a #xquark id to identify the data
  *
  * Obtains data which has previously been attached to @type
- * with g_type_set_qdata().
+ * with xtype_set_qdata().
  *
  * Note that this does not take subtyping into account; data
- * attached to one type with g_type_set_qdata() cannot
- * be retrieved from a subtype using g_type_get_qdata().
+ * attached to one type with xtype_set_qdata() cannot
+ * be retrieved from a subtype using xtype_get_qdata().
  *
  * Returns: (transfer none): the data, or %NULL if no data was found
  */
 xpointer_t
-g_type_get_qdata (xtype_t  type,
-		  GQuark quark)
+xtype_get_qdata (xtype_t  type,
+		  xquark quark)
 {
   TypeNode *node;
   xpointer_t data;
@@ -3775,7 +3775,7 @@ g_type_get_qdata (xtype_t  type,
 
 static inline void
 type_set_qdata_W (TypeNode *node,
-		  GQuark    quark,
+		  xquark    quark,
 		  xpointer_t  data)
 {
   GData *gdata;
@@ -3809,16 +3809,16 @@ type_set_qdata_W (TypeNode *node,
 }
 
 /**
- * g_type_set_qdata:
+ * xtype_set_qdata:
  * @type: a #xtype_t
- * @quark: a #GQuark id to identify the data
+ * @quark: a #xquark id to identify the data
  * @data: the data
  *
  * Attaches arbitrary data to a type.
  */
 void
-g_type_set_qdata (xtype_t    type,
-		  GQuark   quark,
+xtype_set_qdata (xtype_t    type,
+		  xquark   quark,
 		  xpointer_t data)
 {
   TypeNode *node;
@@ -3838,7 +3838,7 @@ g_type_set_qdata (xtype_t    type,
 
 static void
 type_add_flags_W (TypeNode  *node,
-		  GTypeFlags flags)
+		  xtype_flags_t flags)
 {
   xuint_t dflags;
 
@@ -3853,7 +3853,7 @@ type_add_flags_W (TypeNode  *node,
 }
 
 /**
- * g_type_query:
+ * xtype_query:
  * @type: #xtype_t of a static, classed type
  * @query: (out caller-allocates): a user provided structure that is
  *     filled in with constant values upon success
@@ -3866,7 +3866,7 @@ type_add_flags_W (TypeNode  *node,
  * left untouched.
  */
 void
-g_type_query (xtype_t       type,
+xtype_query (xtype_t       type,
 	      GTypeQuery *query)
 {
   TypeNode *node;
@@ -3892,7 +3892,7 @@ g_type_query (xtype_t       type,
 }
 
 /**
- * g_type_get_instance_count:
+ * xtype_get_instance_count:
  * @type: a #xtype_t
  *
  * Returns the number of instances allocated of the particular type;
@@ -3906,7 +3906,7 @@ g_type_query (xtype_t       type,
  * Since: 2.44
  */
 int
-g_type_get_instance_count (xtype_t type)
+xtype_get_instance_count (xtype_t type)
 {
 #ifdef G_ENABLE_DEBUG
   TypeNode *node;
@@ -3922,7 +3922,7 @@ g_type_get_instance_count (xtype_t type)
 
 /* --- implementation details --- */
 xboolean_t
-g_type_test_flags (xtype_t type,
+xtype_test_flags (xtype_t type,
 		   xuint_t flags)
 {
   TypeNode *node;
@@ -3959,7 +3959,7 @@ g_type_test_flags (xtype_t type,
 }
 
 /**
- * g_type_get_plugin:
+ * xtype_get_plugin:
  * @type: #xtype_t to retrieve the plugin for
  *
  * Returns the #GTypePlugin structure for @type.
@@ -3968,7 +3968,7 @@ g_type_test_flags (xtype_t type,
  *     if @type is a dynamic type, %NULL otherwise
  */
 GTypePlugin*
-g_type_get_plugin (xtype_t type)
+xtype_get_plugin (xtype_t type)
 {
   TypeNode *node;
 
@@ -3978,20 +3978,20 @@ g_type_get_plugin (xtype_t type)
 }
 
 /**
- * g_type_interface_get_plugin:
+ * xtype_interface_get_plugin:
  * @instance_type: #xtype_t of an instantiatable type
  * @interface_type: #xtype_t of an interface type
  *
  * Returns the #GTypePlugin structure for the dynamic interface
  * @interface_type which has been added to @instance_type, or %NULL
  * if @interface_type has not been added to @instance_type or does
- * not have a #GTypePlugin structure. See g_type_add_interface_dynamic().
+ * not have a #GTypePlugin structure. See xtype_add_interface_dynamic().
  *
  * Returns: (transfer none): the #GTypePlugin for the dynamic
  *     interface @interface_type of @instance_type
  */
 GTypePlugin*
-g_type_interface_get_plugin (xtype_t instance_type,
+xtype_interface_get_plugin (xtype_t instance_type,
 			     xtype_t interface_type)
 {
   TypeNode *node;
@@ -4027,10 +4027,10 @@ g_type_interface_get_plugin (xtype_t instance_type,
 }
 
 /**
- * g_type_fundamental_next:
+ * xtype_fundamental_next:
  *
  * Returns the next free fundamental type id which can be used to
- * register a new fundamental type with g_type_register_fundamental().
+ * register a new fundamental type with xtype_register_fundamental().
  * The returned type ID represents the highest currently registered
  * fundamental type identifier.
  *
@@ -4038,7 +4038,7 @@ g_type_interface_get_plugin (xtype_t instance_type,
  *     or 0 if the type system ran out of fundamental type IDs
  */
 xtype_t
-g_type_fundamental_next (void)
+xtype_fundamental_next (void)
 {
   xtype_t type;
 
@@ -4050,7 +4050,7 @@ g_type_fundamental_next (void)
 }
 
 /**
- * g_type_fundamental:
+ * xtype_fundamental:
  * @type_id: valid type ID
  *
  * Internal function, used to extract the fundamental type ID portion.
@@ -4059,7 +4059,7 @@ g_type_fundamental_next (void)
  * Returns: fundamental type ID
  */
 xtype_t
-g_type_fundamental (xtype_t type_id)
+xtype_fundamental (xtype_t type_id)
 {
   TypeNode *node = lookup_type_node_I (type_id);
 
@@ -4067,7 +4067,7 @@ g_type_fundamental (xtype_t type_id)
 }
 
 xboolean_t
-g_type_check_instance_is_a (GTypeInstance *type_instance,
+xtype_check_instance_is_a (GTypeInstance *type_instance,
 			    xtype_t          iface_type)
 {
   TypeNode *node, *iface;
@@ -4084,7 +4084,7 @@ g_type_check_instance_is_a (GTypeInstance *type_instance,
 }
 
 xboolean_t
-g_type_check_instance_is_fundamentally_a (GTypeInstance *type_instance,
+xtype_check_instance_is_fundamentally_a (GTypeInstance *type_instance,
                                           xtype_t          fundamental_type)
 {
   TypeNode *node;
@@ -4095,7 +4095,7 @@ g_type_check_instance_is_fundamentally_a (GTypeInstance *type_instance,
 }
 
 xboolean_t
-g_type_check_class_is_a (GTypeClass *type_class,
+xtype_check_class_is_a (xtype_class_t *type_class,
 			 xtype_t       is_a_type)
 {
   TypeNode *node, *iface;
@@ -4112,7 +4112,7 @@ g_type_check_class_is_a (GTypeClass *type_class,
 }
 
 GTypeInstance*
-g_type_check_instance_cast (GTypeInstance *type_instance,
+xtype_check_instance_cast (GTypeInstance *type_instance,
 			    xtype_t          iface_type)
 {
   if (type_instance)
@@ -4146,8 +4146,8 @@ g_type_check_instance_cast (GTypeInstance *type_instance,
   return type_instance;
 }
 
-GTypeClass*
-g_type_check_class_cast (GTypeClass *type_class,
+xtype_class_t*
+xtype_check_class_cast (xtype_class_t *type_class,
 			 xtype_t       is_a_type)
 {
   if (type_class)
@@ -4178,7 +4178,7 @@ g_type_check_class_cast (GTypeClass *type_class,
 }
 
 /**
- * g_type_check_instance:
+ * xtype_check_instance:
  * @instance: a valid #GTypeInstance structure
  *
  * Private helper function to aid implementation of the
@@ -4187,7 +4187,7 @@ g_type_check_class_cast (GTypeClass *type_class,
  * Returns: %TRUE if @instance is valid, %FALSE otherwise
  */
 xboolean_t
-g_type_check_instance (GTypeInstance *type_instance)
+xtype_check_instance (GTypeInstance *type_instance)
 {
   /* this function is just here to make the signal system
    * conveniently elaborated on instance checks
@@ -4216,7 +4216,7 @@ g_type_check_instance (GTypeInstance *type_instance)
 static inline xboolean_t
 type_check_is_value_type_U (xtype_t type)
 {
-  GTypeFlags tflags = XTYPE_FLAG_VALUE_ABSTRACT;
+  xtype_flags_t tflags = XTYPE_FLAG_VALUE_ABSTRACT;
   TypeNode *node;
 
   /* common path speed up */
@@ -4255,41 +4255,41 @@ type_check_is_value_type_U (xtype_t type)
 }
 
 xboolean_t
-g_type_check_is_value_type (xtype_t type)
+xtype_check_is_value_type (xtype_t type)
 {
   return type_check_is_value_type_U (type);
 }
 
 xboolean_t
-g_type_check_value (const GValue *value)
+xtype_check_value (const xvalue_t *value)
 {
   return value && type_check_is_value_type_U (value->g_type);
 }
 
 xboolean_t
-g_type_check_value_holds (const GValue *value,
+xtype_check_value_holds (const xvalue_t *value,
 			  xtype_t         type)
 {
-  return value && type_check_is_value_type_U (value->g_type) && g_type_is_a (value->g_type, type);
+  return value && type_check_is_value_type_U (value->g_type) && xtype_is_a (value->g_type, type);
 }
 
 /**
- * g_type_value_table_peek: (skip)
+ * xtype_value_table_peek: (skip)
  * @type: a #xtype_t
  *
- * Returns the location of the #GTypeValueTable associated with @type.
+ * Returns the location of the #xtype_value_table_t associated with @type.
  *
  * Note that this function should only be used from source code
  * that implements or has internal knowledge of the implementation of
  * @type.
  *
- * Returns: location of the #GTypeValueTable associated with @type or
- *     %NULL if there is no #GTypeValueTable associated with @type
+ * Returns: location of the #xtype_value_table_t associated with @type or
+ *     %NULL if there is no #xtype_value_table_t associated with @type
  */
-GTypeValueTable*
-g_type_value_table_peek (xtype_t type)
+xtype_value_table_t*
+xtype_value_table_peek (xtype_t type)
 {
-  GTypeValueTable *vtable = NULL;
+  xtype_value_table_t *vtable = NULL;
   TypeNode *node = lookup_type_node_I (type);
   xboolean_t has_refed_data, has_table;
 
@@ -4339,27 +4339,27 @@ g_type_value_table_peek (xtype_t type)
 }
 
 const xchar_t *
-g_type_name_from_instance (GTypeInstance *instance)
+xtype_name_from_instance (GTypeInstance *instance)
 {
   if (!instance)
     return "<NULL-instance>";
   else
-    return g_type_name_from_class (instance->g_class);
+    return xtype_name_from_class (instance->g_class);
 }
 
 const xchar_t *
-g_type_name_from_class (GTypeClass *g_class)
+xtype_name_from_class (xtype_class_t *g_class)
 {
   if (!g_class)
     return "<NULL-class>";
   else
-    return g_type_name (g_class->g_type);
+    return xtype_name (g_class->g_type);
 }
 
 
 /* --- private api for gboxed.c --- */
 xpointer_t
-_g_type_boxed_copy (xtype_t type, xpointer_t value)
+_xtype_boxed_copy (xtype_t type, xpointer_t value)
 {
   TypeNode *node = lookup_type_node_I (type);
 
@@ -4367,7 +4367,7 @@ _g_type_boxed_copy (xtype_t type, xpointer_t value)
 }
 
 void
-_g_type_boxed_free (xtype_t type, xpointer_t value)
+_xtype_boxed_free (xtype_t type, xpointer_t value)
 {
   TypeNode *node = lookup_type_node_I (type);
 
@@ -4375,7 +4375,7 @@ _g_type_boxed_free (xtype_t type, xpointer_t value)
 }
 
 void
-_g_type_boxed_init (xtype_t          type,
+_xtype_boxed_init (xtype_t          type,
                     GBoxedCopyFunc copy_func,
                     GBoxedFreeFunc free_func)
 {
@@ -4387,7 +4387,7 @@ _g_type_boxed_init (xtype_t          type,
 
 /* --- initialization --- */
 /**
- * g_type_init_with_debug_flags:
+ * xtype_init_with_debug_flags:
  * @debug_flags: bitwise combination of #GTypeDebugFlags values for
  *     debugging purposes
  *
@@ -4402,17 +4402,17 @@ _g_type_boxed_init (xtype_t          type,
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 void
-g_type_init_with_debug_flags (GTypeDebugFlags debug_flags)
+xtype_init_with_debug_flags (GTypeDebugFlags debug_flags)
 {
   g_assert_type_system_initialized ();
 
   if (debug_flags)
-    g_message ("g_type_init_with_debug_flags() is no longer supported.  Use the GOBJECT_DEBUG environment variable.");
+    g_message ("xtype_init_with_debug_flags() is no longer supported.  Use the GOBJECT_DEBUG environment variable.");
 }
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
- * g_type_init:
+ * xtype_init:
  *
  * This function used to initialise the type system.  Since GLib 2.36,
  * the type system is initialised automatically and this function does
@@ -4421,7 +4421,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * Deprecated: 2.36: the type system is now initialised automatically
  */
 void
-g_type_init (void)
+xtype_init (void)
 {
   g_assert_type_system_initialized ();
 }
@@ -4430,7 +4430,7 @@ static void
 gobject_init (void)
 {
   const xchar_t *env_string;
-  GTypeInfo info;
+  xtype_info_t info;
   TypeNode *node;
   xtype_t type G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
 
@@ -4451,16 +4451,16 @@ gobject_init (void)
         { "signals", XTYPE_DEBUG_SIGNALS },
       };
 
-      _g_type_debug_flags = g_parse_debug_string (env_string, debug_keys, G_N_ELEMENTS (debug_keys));
+      _xtype_debug_flags = g_parse_debuxstring (env_string, debug_keys, G_N_ELEMENTS (debug_keys));
     }
 
   /* quarks */
-  static_quark_type_flags = g_quark_from_static_string ("-g-type-private--GTypeFlags");
+  static_quark_type_flags = g_quark_from_static_string ("-g-type-private--xtype_flags_t");
   static_quark_iface_holder = g_quark_from_static_string ("-g-type-private--IFaceHolder");
   static_quark_dependants_array = g_quark_from_static_string ("-g-type-private--dependants-array");
 
   /* type qname hash table */
-  static_type_nodes_ht = g_hash_table_new (g_str_hash, g_str_equal);
+  static_type_nodes_ht = xhash_table_new (xstr_hash, xstr_equal);
 
   /* invalid type XTYPE_INVALID (0)
    */
@@ -4482,23 +4482,23 @@ gobject_init (void)
 
   G_WRITE_UNLOCK (&type_rw_lock);
 
-  _g_value_c_init ();
+  _xvalue_c_init ();
 
   /* XTYPE_TYPE_PLUGIN
    */
-  g_type_ensure (g_type_plugin_get_type ());
+  xtype_ensure (xtype_plugin_get_type ());
 
   /* XTYPE_* value types
    */
-  _g_value_types_init ();
+  _xvalue_types_init ();
 
   /* XTYPE_ENUM & XTYPE_FLAGS
    */
-  _g_enum_types_init ();
+  _xenum_types_init ();
 
   /* XTYPE_BOXED
    */
-  _g_boxed_type_init ();
+  _xboxed_type_init ();
 
   /* XTYPE_PARAM
    */
@@ -4506,7 +4506,7 @@ gobject_init (void)
 
   /* XTYPE_OBJECT
    */
-  _g_object_type_init ();
+  _xobject_type_init ();
 
   /* XTYPE_PARAM_* pspec types
    */
@@ -4514,7 +4514,7 @@ gobject_init (void)
 
   /* Value Transformations
    */
-  _g_value_transforms_init ();
+  _xvalue_transforms_init ();
 
   /* Signal system
    */
@@ -4613,7 +4613,7 @@ gobject_init_ctor (void)
 #endif /* XPLATFORM_WIN32 */
 
 /**
- * g_type_class_add_private:
+ * xtype_class_add_private:
  * @g_class: (type xobject_t.TypeClass): class structure for an instantiatable
  *    type
  * @private_size: size of private structure
@@ -4633,20 +4633,20 @@ gobject_init_ctor (void)
  * XTYPE_INSTANCE_GET_PRIVATE() macro.
  *
  * The following example shows attaching a private structure
- * MyObjectPrivate to an object MyObject defined in the standard
+ * xobject_private_t to an object xobject_t defined in the standard
  * xobject_t fashion in the type's class_init() function.
  *
  * Note the use of a structure member "priv" to avoid the overhead
  * of repeatedly calling MY_OBJECT_GET_PRIVATE().
  *
  * |[<!-- language="C" -->
- * typedef struct _MyObject        MyObject;
- * typedef struct _MyObjectPrivate MyObjectPrivate;
+ * typedef struct _xobject        xobject_t;
+ * typedef struct _MyObjectPrivate xobject_private_t;
  *
- * struct _MyObject {
+ * struct _xobject {
  *  xobject_t parent;
  *
- *  MyObjectPrivate *priv;
+ *  xobject_private_t *priv;
  * };
  *
  * struct _MyObjectPrivate {
@@ -4654,24 +4654,24 @@ gobject_init_ctor (void)
  * };
  *
  * static void
- * my_object_class_init (MyObjectClass *klass)
+ * my_object_class_init (xobject_class_t *klass)
  * {
- *   g_type_class_add_private (klass, sizeof (MyObjectPrivate));
+ *   xtype_class_add_private (klass, sizeof (xobject_private_t));
  * }
  *
  * static void
- * my_object_init (MyObject *my_object)
+ * my_object_init (xobject_t *my_object)
  * {
  *   my_object->priv = XTYPE_INSTANCE_GET_PRIVATE (my_object,
  *                                                  MY_TYPE_OBJECT,
- *                                                  MyObjectPrivate);
+ *                                                  xobject_private_t);
  *   // my_object->priv->some_field will be automatically initialised to 0
  * }
  *
  * static int
- * my_object_get_some_field (MyObject *my_object)
+ * my_object_get_some_field (xobject_t *my_object)
  * {
- *   MyObjectPrivate *priv;
+ *   xobject_private_t *priv;
  *
  *   g_return_val_if_fail (MY_IS_OBJECT (my_object), 0);
  *
@@ -4686,10 +4686,10 @@ gobject_init_ctor (void)
  *   family of macros to add instance private data to a type
  */
 void
-g_type_class_add_private (xpointer_t g_class,
+xtype_class_add_private (xpointer_t g_class,
 			  xsize_t    private_size)
 {
-  xtype_t instance_type = ((GTypeClass *)g_class)->g_type;
+  xtype_t instance_type = ((xtype_class_t *)g_class)->g_type;
   TypeNode *node = lookup_type_node_I (instance_type);
 
   g_return_if_fail (private_size > 0);
@@ -4707,7 +4707,7 @@ g_type_class_add_private (xpointer_t g_class,
       TypeNode *pnode = lookup_type_node_I (NODE_PARENT_TYPE (node));
       if (node->data->instance.private_size != pnode->data->instance.private_size)
 	{
-	  g_warning ("g_type_class_add_private() called multiple times for the same type");
+	  g_warning ("xtype_class_add_private() called multiple times for the same type");
 	  return;
 	}
     }
@@ -4723,7 +4723,7 @@ g_type_class_add_private (xpointer_t g_class,
 
 /* semi-private, called only by the G_ADD_PRIVATE macro */
 xint_t
-g_type_add_instance_private (xtype_t class_gtype,
+xtype_add_instance_private (xtype_t class_gtype,
                              xsize_t private_size)
 {
   TypeNode *node = lookup_type_node_I (class_gtype);
@@ -4740,7 +4740,7 @@ g_type_add_instance_private (xtype_t class_gtype,
 
   if (node->plugin != NULL)
     {
-      g_warning ("cannot use g_type_add_instance_private() with dynamic type '%s'",
+      g_warning ("cannot use xtype_add_instance_private() with dynamic type '%s'",
                  type_descriptive_name_I (class_gtype));
       return 0;
     }
@@ -4760,16 +4760,16 @@ g_type_add_instance_private (xtype_t class_gtype,
    * hide it behind a macro. the function will return the private size, instead
    * of the offset, which will be stored inside a static variable defined by
    * the G_DEFINE_TYPE_EXTENDED() macro. the G_DEFINE_TYPE_EXTENDED() macro will
-   * check the variable and call g_type_class_add_instance_private(), which
+   * check the variable and call xtype_class_add_instance_private(), which
    * will use the data size and actually register the private data, then
    * return the computed offset of the private data, which will be stored
    * inside the static variable, so we can use it to retrieve the pointer
    * to the private data structure.
    *
    * once all our code has been migrated to the new idiomatic form of private
-   * data registration, we will change the g_type_add_instance_private()
+   * data registration, we will change the xtype_add_instance_private()
    * function to actually perform the registration and return the offset
-   * of the private data; g_type_class_add_instance_private() already checks
+   * of the private data; xtype_class_add_instance_private() already checks
    * if the passed argument is negative (meaning that it's an offset in the
    * GTypeInstance allocation) and becomes a no-op if that's the case. this
    * should make the migration fully transparent even if we're effectively
@@ -4780,18 +4780,18 @@ g_type_add_instance_private (xtype_t class_gtype,
 
 /* semi-private function, should only be used by G_DEFINE_TYPE_EXTENDED */
 void
-g_type_class_adjust_private_offset (xpointer_t  g_class,
+xtype_class_adjust_private_offset (xpointer_t  g_class,
                                     xint_t     *private_size_or_offset)
 {
-  xtype_t class_gtype = ((GTypeClass *) g_class)->g_type;
+  xtype_t class_gtype = ((xtype_class_t *) g_class)->g_type;
   TypeNode *node = lookup_type_node_I (class_gtype);
-  gssize private_size;
+  xssize_t private_size;
 
   g_return_if_fail (private_size_or_offset != NULL);
 
   /* if we have been passed the offset instead of the private data size,
    * then we consider this as a no-op, and just return the value. see the
-   * comment in g_type_add_instance_private() for the full explanation.
+   * comment in xtype_add_instance_private() for the full explanation.
    */
   if (*private_size_or_offset > 0)
     g_return_if_fail (*private_size_or_offset <= 0xffff);
@@ -4811,7 +4811,7 @@ g_type_class_adjust_private_offset (xpointer_t  g_class,
       TypeNode *pnode = lookup_type_node_I (NODE_PARENT_TYPE (node));
       if (node->data->instance.private_size != pnode->data->instance.private_size)
 	{
-	  g_warning ("g_type_add_instance_private() called multiple times for the same type");
+	  g_warning ("xtype_add_instance_private() called multiple times for the same type");
           *private_size_or_offset = 0;
 	  return;
 	}
@@ -4829,7 +4829,7 @@ g_type_class_adjust_private_offset (xpointer_t  g_class,
 }
 
 xpointer_t
-g_type_instance_get_private (GTypeInstance *instance,
+xtype_instance_get_private (GTypeInstance *instance,
 			     xtype_t          private_type)
 {
   TypeNode *node;
@@ -4848,8 +4848,8 @@ g_type_instance_get_private (GTypeInstance *instance,
 }
 
 /**
- * g_type_class_get_instance_private_offset: (skip)
- * @g_class: (type xobject_t.TypeClass): a #GTypeClass
+ * xtype_class_get_instance_private_offset: (skip)
+ * @g_class: (type xobject_t.TypeClass): a #xtype_class_t
  *
  * Gets the offset of the private data for instances of @g_class.
  *
@@ -4858,22 +4858,22 @@ g_type_instance_get_private (GTypeInstance *instance,
  * @g_class.
  *
  * You can only call this function after you have registered a private
- * data area for @g_class using g_type_class_add_private().
+ * data area for @g_class using xtype_class_add_private().
  *
  * Returns: the offset, in bytes
  *
  * Since: 2.38
  **/
 xint_t
-g_type_class_get_instance_private_offset (xpointer_t g_class)
+xtype_class_get_instance_private_offset (xpointer_t g_class)
 {
   xtype_t instance_type;
-  guint16 parent_size;
+  xuint16_t parent_size;
   TypeNode *node;
 
   g_assert (g_class != NULL);
 
-  instance_type = ((GTypeClass *) g_class)->g_type;
+  instance_type = ((xtype_class_t *) g_class)->g_type;
   node = lookup_type_node_I (instance_type);
 
   g_assert (node != NULL);
@@ -4889,14 +4889,14 @@ g_type_class_get_instance_private_offset (xpointer_t g_class)
     parent_size = 0;
 
   if (node->data->instance.private_size == parent_size)
-    g_error ("g_type_class_get_instance_private_offset() called on class %s but it has no private data",
-             g_type_name (instance_type));
+    xerror ("xtype_class_get_instance_private_offset() called on class %s but it has no private data",
+             xtype_name (instance_type));
 
   return -(xint_t) node->data->instance.private_size;
 }
 
 /**
- * g_type_add_class_private:
+ * xtype_add_class_private:
  * @class_type: xtype_t of a classed type
  * @private_size: size of private structure
  *
@@ -4914,7 +4914,7 @@ g_type_class_get_instance_private_offset (xpointer_t g_class)
  * Since: 2.24
  */
 void
-g_type_add_class_private (xtype_t    class_type,
+xtype_add_class_private (xtype_t    class_type,
 			  xsize_t    private_size)
 {
   TypeNode *node = lookup_type_node_I (class_type);
@@ -4934,7 +4934,7 @@ g_type_add_class_private (xtype_t    class_type,
       TypeNode *pnode = lookup_type_node_I (NODE_PARENT_TYPE (node));
       if (node->data->class.class_private_size != pnode->data->class.class_private_size)
 	{
-	  g_warning ("g_type_add_class_private() called multiple times for the same type");
+	  g_warning ("xtype_add_class_private() called multiple times for the same type");
 	  return;
 	}
     }
@@ -4948,7 +4948,7 @@ g_type_add_class_private (xtype_t    class_type,
 }
 
 xpointer_t
-g_type_class_get_private (GTypeClass *klass,
+xtype_class_get_private (xtype_class_t *klass,
 			  xtype_t       private_type)
 {
   TypeNode *class_node;
@@ -4983,7 +4983,7 @@ g_type_class_get_private (GTypeClass *klass,
 
       if (G_UNLIKELY (private_node->data->class.class_private_size == parent_node->data->class.class_private_size))
 	{
-	  g_warning ("g_type_instance_get_class_private() requires a prior call to g_type_add_class_private()");
+	  g_warning ("xtype_instance_get_class_private() requires a prior call to xtype_add_class_private()");
 	  return NULL;
 	}
 
@@ -4994,7 +4994,7 @@ g_type_class_get_private (GTypeClass *klass,
 }
 
 /**
- * g_type_ensure:
+ * xtype_ensure:
  * @type: a #xtype_t
  *
  * Ensures that the indicated @type has been registered with the
@@ -5007,18 +5007,18 @@ g_type_class_get_private (GTypeClass *klass,
  * %G_GNUC_CONST requires that the function not have side effects,
  * which _get_type() methods do on the first call). As a result, if
  * you write a bare call to a _get_type() macro, it may get optimized
- * out by the compiler. Using g_type_ensure() guarantees that the
+ * out by the compiler. Using xtype_ensure() guarantees that the
  * type's _get_type() method is called.
  *
  * Since: 2.34
  */
 void
-g_type_ensure (xtype_t type)
+xtype_ensure (xtype_t type)
 {
   /* In theory, @type has already been resolved and so there's nothing
    * to do here. But this protects us in the case where the function
    * gets inlined (as it might in gobject_init_ctor() above).
    */
   if (G_UNLIKELY (type == (xtype_t)-1))
-    g_error ("can't happen");
+    xerror ("can't happen");
 }

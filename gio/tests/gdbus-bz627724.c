@@ -24,31 +24,31 @@
 
 #include "gdbus-tests.h"
 
-static GDBusConnection *the_connection = NULL;
+static xdbus_connection_t *the_connection = NULL;
 
 #define MY_TYPE_OBJECT   (my_object_get_type ())
-#define MY_OBJECT(o)     (XTYPE_CHECK_INSTANCE_CAST ((o), MY_TYPE_OBJECT, MyObject))
+#define MY_OBJECT(o)     (XTYPE_CHECK_INSTANCE_CAST ((o), MY_TYPE_OBJECT, xobject_t))
 #define MY_IS_OBJECT(o)  (XTYPE_CHECK_INSTANCE_TYPE ((o), MY_TYPE_OBJECT))
 
 typedef struct {
   xobject_t parent_instance;
-} MyObject;
+} xobject_t;
 
 typedef struct {
   xobject_class_t parent_class;
-} MyObjectClass;
+} xobject_class_t;
 
 xtype_t my_object_get_type (void) G_GNUC_CONST;
 
-G_DEFINE_TYPE (MyObject, my_object, XTYPE_OBJECT)
+G_DEFINE_TYPE (xobject_t, my_object, XTYPE_OBJECT)
 
 static void
-my_object_init (MyObject *object)
+my_object_init (xobject_t *object)
 {
 }
 
 static void
-my_object_class_init (MyObjectClass *klass)
+my_object_class_init (xobject_class_t *klass)
 {
   xerror_t *error;
   error = NULL;
@@ -62,14 +62,14 @@ my_object_class_init (MyObjectClass *klass)
 static void
 test_bz627724 (void)
 {
-  MyObject *object;
+  xobject_t *object;
 
   session_bus_up ();
   g_assert (the_connection == NULL);
-  object = g_object_new (MY_TYPE_OBJECT, NULL);
+  object = xobject_new (MY_TYPE_OBJECT, NULL);
   g_assert (the_connection != NULL);
-  g_object_unref (the_connection);
-  g_object_unref (object);
+  xobject_unref (the_connection);
+  xobject_unref (object);
   session_bus_down ();
 }
 

@@ -29,8 +29,8 @@
 
 static int mtsafe_call_counter = 0; /* multi thread safe call counter, must be accessed atomically */
 static int unsafe_call_counter = 0; /* single-threaded call counter */
-static GCond sync_cond;
-static GMutex sync_mutex;
+static xcond_t sync_cond;
+static xmutex_t sync_mutex;
 
 #define NUM_COUNTER_INCREMENTS 100000
 
@@ -42,7 +42,7 @@ call_counter_init (xpointer_t tclass)
     {
       int saved_unsafe_call_counter = unsafe_call_counter;
       g_atomic_int_add (&mtsafe_call_counter, 1); /* real call count update */
-      g_thread_yield(); /* let concurrent threads corrupt the unsafe_call_counter state */
+      xthread_yield(); /* let concurrent threads corrupt the unsafe_call_counter state */
       unsafe_call_counter = 1 + saved_unsafe_call_counter; /* non-atomic counter update */
     }
 }
@@ -50,53 +50,53 @@ call_counter_init (xpointer_t tclass)
 static void interface_per_class_init (void) { call_counter_init (NULL); }
 
 /* define 3 test interfaces */
-typedef xtype_interface_t MyFace0Interface;
+typedef xtype_interface_t my_face0_interface_t;
 static xtype_t my_face0_get_type (void);
-G_DEFINE_INTERFACE (MyFace0, my_face0, XTYPE_OBJECT)
-static void my_face0_default_init (MyFace0Interface *iface) { call_counter_init (iface); }
-typedef xtype_interface_t MyFace1Interface;
+G_DEFINE_INTERFACE (my_face0, my_face0, XTYPE_OBJECT)
+static void my_face0_default_init (my_face0_interface_t *iface) { call_counter_init (iface); }
+typedef xtype_interface_t my_face1_interface_t;
 static xtype_t my_face1_get_type (void);
-G_DEFINE_INTERFACE (MyFace1, my_face1, XTYPE_OBJECT)
-static void my_face1_default_init (MyFace1Interface *iface) { call_counter_init (iface); }
+G_DEFINE_INTERFACE (my_face1, my_face1, XTYPE_OBJECT)
+static void my_face1_default_init (my_face1_interface_t *iface) { call_counter_init (iface); }
 
 /* define 3 test objects, adding interfaces 0 & 1, and adding interface 2 after class initialization */
-typedef xobject_t         MyTester0;
-typedef xobject_class_t    MyTester0Class;
-static xtype_t my_tester0_get_type (void);
-G_DEFINE_TYPE_WITH_CODE (MyTester0, my_tester0, XTYPE_OBJECT,
+typedef xobject_t         my_tester0_t;
+typedef xobject_class_t    my_tester0_class_t;
+static xtype_t xtester0_get_type (void);
+G_DEFINE_TYPE_WITH_CODE(my_tester0, xtester0, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (my_face0_get_type(), interface_per_class_init)
                          G_IMPLEMENT_INTERFACE (my_face1_get_type(), interface_per_class_init))
-static void my_tester0_init (MyTester0*t) {}
-static void my_tester0_class_init (MyTester0Class*c) { call_counter_init (c); }
+static void xtester0_init (my_tester0_t*t) {}
+static void xtester0_class_init (my_tester0_class_t*c) { call_counter_init (c); }
 typedef xobject_t         MyTester1;
 typedef xobject_class_t    MyTester1Class;
 
 /* Disabled for now (see https://bugzilla.gnome.org/show_bug.cgi?id=687659) */
 #if 0
-typedef xtype_interface_t MyFace2Interface;
+typedef xtype_interface_t my_face2_interface_t;
 static xtype_t my_face2_get_type (void);
-G_DEFINE_INTERFACE (MyFace2, my_face2, XTYPE_OBJECT)
-static void my_face2_default_init (MyFace2Interface *iface) { call_counter_init (iface); }
+G_DEFINE_INTERFACE (my_face2, my_face2, XTYPE_OBJECT)
+static void my_face2_default_init (my_face2_interface_t *iface) { call_counter_init (iface); }
 
-static xtype_t my_tester1_get_type (void);
-G_DEFINE_TYPE_WITH_CODE (MyTester1, my_tester1, XTYPE_OBJECT,
+static xtype_t xtester1_get_type (void);
+G_DEFINE_TYPE_WITH_CODE (MyTester1, xtester1, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (my_face0_get_type(), interface_per_class_init)
                          G_IMPLEMENT_INTERFACE (my_face1_get_type(), interface_per_class_init))
-static void my_tester1_init (MyTester1*t) {}
-static void my_tester1_class_init (MyTester1Class*c) { call_counter_init (c); }
+static void xtester1_init (MyTester1*t) {}
+static void xtester1_class_init (MyTester1Class*c) { call_counter_init (c); }
 typedef xobject_t         MyTester2;
 typedef xobject_class_t    MyTester2Class;
-static xtype_t my_tester2_get_type (void);
-G_DEFINE_TYPE_WITH_CODE (MyTester2, my_tester2, XTYPE_OBJECT,
+static xtype_t xtester2_get_type (void);
+G_DEFINE_TYPE_WITH_CODE (MyTester2, xtester2, XTYPE_OBJECT,
                          G_IMPLEMENT_INTERFACE (my_face0_get_type(), interface_per_class_init)
                          G_IMPLEMENT_INTERFACE (my_face1_get_type(), interface_per_class_init))
-static void my_tester2_init (MyTester2*t) {}
-static void my_tester2_class_init (MyTester2Class*c) { call_counter_init (c); }
+static void xtester2_init (MyTester2*t) {}
+static void xtester2_class_init (MyTester2Class*c) { call_counter_init (c); }
 
 static xpointer_t
 tester_init_thread (xpointer_t data)
 {
-  const GInterfaceInfo face2_interface_info = { (GInterfaceInitFunc) interface_per_class_init, NULL, NULL };
+  const xinterface_info_t face2_interface_info = { (GInterfaceInitFunc) interface_per_class_init, NULL, NULL };
   xpointer_t klass;
   /* first, synchronize with other threads,
    * then run interface and class initializers,
@@ -105,28 +105,28 @@ tester_init_thread (xpointer_t data)
   g_mutex_lock (&sync_mutex);
   g_mutex_unlock (&sync_mutex);
   /* test default interface initialization for face0 */
-  g_type_default_interface_unref (g_type_default_interface_ref (my_face0_get_type()));
+  xtype_default_interface_unref (xtype_default_interface_ref (my_face0_get_type()));
   /* test class initialization, face0 per-class initializer, face1 default and per-class initializer */
-  klass = g_type_class_ref ((xtype_t) data);
+  klass = xtype_class_ref ((xtype_t) data);
   /* test face2 default and per-class initializer, after class_init */
-  g_type_add_interface_static (XTYPE_FROM_CLASS (klass), my_face2_get_type(), &face2_interface_info);
+  xtype_add_interface_static (XTYPE_FROM_CLASS (klass), my_face2_get_type(), &face2_interface_info);
   /* cleanups */
-  g_type_class_unref (klass);
+  xtype_class_unref (klass);
   return NULL;
 }
 
 static void
 test_threaded_class_init (void)
 {
-  GThread *t1, *t2, *t3;
+  xthread_t *t1, *t2, *t3;
 
   /* pause newly created threads */
   g_mutex_lock (&sync_mutex);
 
   /* create threads */
-  t1 = g_thread_create (tester_init_thread, (xpointer_t) my_tester0_get_type(), TRUE, NULL);
-  t2 = g_thread_create (tester_init_thread, (xpointer_t) my_tester1_get_type(), TRUE, NULL);
-  t3 = g_thread_create (tester_init_thread, (xpointer_t) my_tester2_get_type(), TRUE, NULL);
+  t1 = xthread_create (tester_init_thread, (xpointer_t) xtester0_get_type(), TRUE, NULL);
+  t2 = xthread_create (tester_init_thread, (xpointer_t) xtester1_get_type(), TRUE, NULL);
+  t3 = xthread_create (tester_init_thread, (xpointer_t) xtester2_get_type(), TRUE, NULL);
 
   /* execute threads */
   g_mutex_unlock (&sync_mutex);
@@ -141,22 +141,22 @@ test_threaded_class_init (void)
   /* ensure non-corrupted counter updates */
   g_assert_cmpint (g_atomic_int_get (&mtsafe_call_counter), ==, unsafe_call_counter);
 
-  g_thread_join (t1);
-  g_thread_join (t2);
-  g_thread_join (t3);
+  xthread_join (t1);
+  xthread_join (t2);
+  xthread_join (t3);
 }
 #endif
 
 typedef struct {
   xobject_t parent;
   char   *name;
-} PropTester;
-typedef xobject_class_t    PropTesterClass;
+} prop_tester_t;
+typedef xobject_class_t    prop_tester_class_t;
 static xtype_t prop_tester_get_type (void);
-G_DEFINE_TYPE (PropTester, prop_tester, XTYPE_OBJECT)
+G_DEFINE_TYPE (prop_tester, prop_tester, XTYPE_OBJECT)
 #define PROP_NAME 1
 static void
-prop_tester_init (PropTester* t)
+prop_tester_init (prop_tester_t* t)
 {
   if (t->name == NULL)
     { } /* needs unit test framework initialization: g_test_bug ("race initializing properties"); */
@@ -164,14 +164,14 @@ prop_tester_init (PropTester* t)
 static void
 prop_tester_set_property (xobject_t        *object,
                           xuint_t           property_id,
-                          const GValue   *value,
-                          GParamSpec     *pspec)
+                          const xvalue_t   *value,
+                          xparam_spec_t     *pspec)
 {}
 static void
-prop_tester_class_init (PropTesterClass *c)
+prop_tester_class_init (prop_tester_class_t *c)
 {
   int i;
-  GParamSpec *param;
+  xparam_spec_t *param;
   xobject_class_t *gobject_class = G_OBJECT_CLASS (c);
 
   gobject_class->set_property = prop_tester_set_property; /* silence xobject_t checks */
@@ -181,7 +181,7 @@ prop_tester_class_init (PropTesterClass *c)
   g_mutex_unlock (&sync_mutex);
 
   for (i = 0; i < 100; i++) /* wait a bit. */
-    g_thread_yield();
+    xthread_yield();
 
   call_counter_init (c);
   param = g_param_spec_string ("name", "name_i18n",
@@ -190,35 +190,35 @@ prop_tester_class_init (PropTesterClass *c)
 			       G_PARAM_CONSTRUCT_ONLY | G_PARAM_WRITABLE |
 			       G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB |
 			       G_PARAM_STATIC_NICK);
-  g_object_class_install_property (gobject_class, PROP_NAME, param);
+  xobject_class_install_property (gobject_class, PROP_NAME, param);
 }
 
 static xpointer_t
 object_create (xpointer_t data)
 {
-  xobject_t *obj = g_object_new (prop_tester_get_type(), "name", "fish", NULL);
-  g_object_unref (obj);
+  xobject_t *obj = xobject_new (prop_tester_get_type(), "name", "fish", NULL);
+  xobject_unref (obj);
   return NULL;
 }
 
 static void
 test_threaded_object_init (void)
 {
-  GThread *creator;
+  xthread_t *creator;
   g_mutex_lock (&sync_mutex);
 
-  creator = g_thread_create (object_create, NULL, TRUE, NULL);
+  creator = xthread_create (object_create, NULL, TRUE, NULL);
   /* really provoke the race */
   g_cond_wait (&sync_cond, &sync_mutex);
 
   object_create (NULL);
   g_mutex_unlock (&sync_mutex);
 
-  g_thread_join (creator);
+  xthread_join (creator);
 }
 
 typedef struct {
-    MyTester0 *strong;
+    my_tester0_t *strong;
     xuint_t unref_delay;
 } UnrefInThreadData;
 
@@ -228,7 +228,7 @@ unref_in_thread (xpointer_t p)
   UnrefInThreadData *data = p;
 
   g_usleep (data->unref_delay);
-  g_object_unref (data->strong);
+  xobject_unref (data->strong);
 
   return NULL;
 }
@@ -261,27 +261,27 @@ test_threaded_weak_ref (void)
     {
       UnrefInThreadData data;
 #ifdef HAVE_G_WEAK_REF
-      /* GWeakRef<MyTester0> in C++ terms */
+      /* GWeakRef<my_tester0_t> in C++ terms */
       GWeakRef weak;
 #else
       xpointer_t weak;
 #endif
-      MyTester0 *strengthened;
+      my_tester0_t *strengthened;
       xuint_t get_delay;
-      GThread *thread;
+      xthread_t *thread;
       xerror_t *error = NULL;
 
       if (g_test_verbose () && (i % (n/20)) == 0)
         g_printerr ("%u%%\n", ((i * 100) / n));
 
       /* Have an object and a weak ref to it */
-      data.strong = g_object_new (my_tester0_get_type (), NULL);
+      data.strong = xobject_new (xtester0_get_type (), NULL);
 
 #ifdef HAVE_G_WEAK_REF
       g_weak_ref_init (&weak, data.strong);
 #else
       weak = data.strong;
-      g_object_add_weak_pointer ((xobject_t *) weak, &weak);
+      xobject_add_weak_pointer ((xobject_t *) weak, &weak);
 #endif
 
       /* Delay for a random time on each side of the race, to perturb the
@@ -292,7 +292,7 @@ test_threaded_weak_ref (void)
       get_delay = g_random_int_range (SLEEP_MIN_USEC, SLEEP_MAX_USEC);
 
       /* One half of the race is to unref the shared object */
-      thread = g_thread_create (unref_in_thread, &data, TRUE, &error);
+      thread = xthread_create (unref_in_thread, &data, TRUE, &error);
       g_assert_no_error (error);
 
       /* The other half of the race is to get the object from the "global
@@ -303,27 +303,27 @@ test_threaded_weak_ref (void)
 #ifdef HAVE_G_WEAK_REF
       strengthened = g_weak_ref_get (&weak);
 #else
-      /* Spot the unsafe pointer access! In GDBusConnection this is rather
+      /* Spot the unsafe pointer access! In xdbus_connection_t this is rather
        * better-hidden, but ends up with essentially the same thing, albeit
        * cleared in dispose() rather than by a traditional weak pointer
        */
       strengthened = weak;
 
       if (strengthened != NULL)
-        g_object_ref (strengthened);
+        xobject_ref (strengthened);
 #endif
 
       if (strengthened != NULL)
         g_assert (X_IS_OBJECT (strengthened));
 
       /* Wait for the thread to run */
-      g_thread_join (thread);
+      xthread_join (thread);
 
       if (strengthened != NULL)
         {
           get_wins++;
           g_assert (X_IS_OBJECT (strengthened));
-          g_object_unref (strengthened);
+          xobject_unref (strengthened);
         }
       else
         {
@@ -334,7 +334,7 @@ test_threaded_weak_ref (void)
       g_weak_ref_clear (&weak);
 #else
       if (weak != NULL)
-        g_object_remove_weak_pointer (weak, &weak);
+        xobject_remove_weak_pointer (weak, &weak);
 #endif
     }
 
@@ -383,9 +383,9 @@ on_other_thread_weak_ref (xpointer_t user_data)
   while (!g_atomic_int_get (&thread_data->disposing))
     continue;
 
-  g_object_ref (object);
+  xobject_ref (object);
   g_weak_ref_set (thread_data->weak, object);
-  g_object_unref (object);
+  xobject_unref (object);
 
   g_assert_cmpint (thread_data->disposing, ==, 1);
   g_atomic_int_set (&thread_data->finished, 1);
@@ -396,7 +396,7 @@ on_other_thread_weak_ref (xpointer_t user_data)
 static void
 test_threaded_weak_ref_finalization (void)
 {
-  xobject_t *obj = g_object_new (XTYPE_OBJECT, NULL);
+  xobject_t *obj = xobject_new (XTYPE_OBJECT, NULL);
   GWeakRef weak = { { GUINT_TO_POINTER (0xDEADBEEFU) } };
   ThreadedWeakRefData thread_data = {
     .object = obj, .weak = &weak, .started = 0, .finished = 0
@@ -409,13 +409,13 @@ test_threaded_weak_ref_finalization (void)
                   "with the dispose vfunc.");
 
   g_weak_ref_init (&weak, NULL);
-  g_object_weak_ref (obj, on_weak_ref_disposed, &thread_data);
+  xobject_weak_ref (obj, on_weak_ref_disposed, &thread_data);
 
   g_assert_cmpint (obj->ref_count, ==, 1);
-  g_thread_unref (g_thread_new ("on_other_thread",
+  xthread_unref (xthread_new ("on_other_thread",
                                 on_other_thread_weak_ref,
                                 &thread_data));
-  g_object_unref (obj);
+  xobject_unref (obj);
 
   /* This is what this test is about: at this point the weak reference
    * should have been unset (and not point to a dead object either). */
@@ -436,8 +436,8 @@ on_reffer_thread (xpointer_t user_data)
 
   while (!g_atomic_int_get (&thread_data->done))
     {
-      g_object_ref (thread_data->object);
-      g_object_unref (thread_data->object);
+      xobject_ref (thread_data->object);
+      xobject_unref (thread_data->object);
     }
 
   return NULL;
@@ -461,10 +461,10 @@ on_toggler_thread (xpointer_t user_data)
 
   while (!g_atomic_int_get (&thread_data->done))
     {
-      g_object_ref (thread_data->object);
-      g_object_remove_toggle_ref (thread_data->object, on_toggle_notify, thread_data);
-      g_object_add_toggle_ref (thread_data->object, on_toggle_notify, thread_data);
-      g_object_unref (thread_data->object);
+      xobject_ref (thread_data->object);
+      xobject_remove_toggle_ref (thread_data->object, on_toggle_notify, thread_data);
+      xobject_add_toggle_ref (thread_data->object, on_toggle_notify, thread_data);
+      xobject_unref (thread_data->object);
       g_atomic_int_add (&thread_data->toggles, 1);
     }
 
@@ -474,9 +474,9 @@ on_toggler_thread (xpointer_t user_data)
 static void
 test_threaded_toggle_notify (void)
 {
-  xobject_t *object = g_object_new (XTYPE_OBJECT, NULL);
+  xobject_t *object = xobject_new (XTYPE_OBJECT, NULL);
   ToggleNotifyThreadData data = { object, FALSE, 0 };
-  GThread *threads[3];
+  xthread_t *threads[3];
   xsize_t i;
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/issues/2394");
@@ -484,13 +484,13 @@ test_threaded_toggle_notify (void)
                   "safely from another (the main) thread without causing the "
                   "notifying thread to abort");
 
-  g_object_add_toggle_ref (object, on_toggle_notify, &data);
-  g_object_unref (object);
+  xobject_add_toggle_ref (object, on_toggle_notify, &data);
+  xobject_unref (object);
 
   g_assert_cmpint (object->ref_count, ==, 1);
-  threads[0] = g_thread_new ("on_reffer_thread", on_reffer_thread, &data);
-  threads[1] = g_thread_new ("on_another_reffer_thread", on_reffer_thread, &data);
-  threads[2] = g_thread_new ("on_main_toggler_thread", on_toggler_thread, &data);
+  threads[0] = xthread_new ("on_reffer_thread", on_reffer_thread, &data);
+  threads[1] = xthread_new ("on_another_reffer_thread", on_reffer_thread, &data);
+  threads[2] = xthread_new ("on_main_toggler_thread", on_toggler_thread, &data);
 
   /* We need to wait here for the threads to run for a bit in order to make the
    * race to happen, so we wait for an high number of toggle changes to be met
@@ -501,7 +501,7 @@ test_threaded_toggle_notify (void)
   g_atomic_int_set (&data.done, TRUE);
 
   for (i = 0; i < G_N_ELEMENTS (threads); i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 
   g_assert_cmpint (object->ref_count, ==, 1);
   g_clear_object (&object);

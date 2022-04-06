@@ -32,7 +32,7 @@
 #include "guuid.h"
 
 typedef struct {
-  guint8 bytes[16];
+  xuint8_t bytes[16];
 } GUuid;
 
 /**
@@ -71,13 +71,13 @@ typedef struct {
 static xchar_t *
 g_uuid_to_string (const GUuid *uuid)
 {
-  const guint8 *bytes;
+  const xuint8_t *bytes;
 
   g_return_val_if_fail (uuid != NULL, NULL);
 
   bytes = uuid->bytes;
 
-  return g_strdup_printf ("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x"
+  return xstrdup_printf ("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x"
                           "-%02x%02x%02x%02x%02x%02x",
                           bytes[0], bytes[1], bytes[2], bytes[3],
                           bytes[4], bytes[5], bytes[6], bytes[7],
@@ -90,7 +90,7 @@ uuid_parse_string (const xchar_t *str,
                    GUuid       *uuid)
 {
   GUuid tmp;
-  guint8 *bytes = tmp.bytes;
+  xuint8_t *bytes = tmp.bytes;
   xint_t i, j, hi, lo;
   xuint_t expected_len = 36;
 
@@ -149,7 +149,7 @@ g_uuid_string_is_valid (const xchar_t *str)
 static void
 uuid_set_version (GUuid *uuid, xuint_t version)
 {
-  guint8 *bytes = uuid->bytes;
+  xuint8_t *bytes = uuid->bytes;
 
   /*
    * Set the four most significant bits (bits 12 through 15) of the
@@ -177,13 +177,13 @@ static void
 g_uuid_generate_v4 (GUuid *uuid)
 {
   int i;
-  guint8 *bytes;
-  guint32 *ints;
+  xuint8_t *bytes;
+  xuint32_t *ints;
 
   g_return_if_fail (uuid != NULL);
 
   bytes = uuid->bytes;
-  ints = (guint32 *) bytes;
+  ints = (xuint32_t *) bytes;
   for (i = 0; i < 4; i++)
     ints[i] = g_random_int ();
 
@@ -194,7 +194,7 @@ g_uuid_generate_v4 (GUuid *uuid)
  * g_uuid_string_random:
  *
  * Generates a random UUID (RFC 4122 version 4) as a string. It has the same
- * randomness guarantees as #GRand, so must not be used for cryptographic
+ * randomness guarantees as #xrand_t, so must not be used for cryptographic
  * purposes such as key generation, nonces, salts or one-time pads.
  *
  * Returns: (transfer full): A string that should be freed with g_free().

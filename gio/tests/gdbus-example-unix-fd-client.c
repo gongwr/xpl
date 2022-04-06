@@ -11,22 +11,22 @@
 
 /* see gdbus-example-server.c for the server implementation */
 static xint_t
-get_server_stdout (GDBusConnection  *connection,
+get_server_stdout (xdbus_connection_t  *connection,
                    const xchar_t      *name_owner,
                    xerror_t          **error)
 {
-  GDBusMessage *method_call_message;
-  GDBusMessage *method_reply_message;
-  GUnixFDList *fd_list;
+  xdbus_message_t *method_call_message;
+  xdbus_message_t *method_reply_message;
+  xunix_fd_list_t *fd_list;
   xint_t fd;
 
   fd = -1;
   method_call_message = NULL;
   method_reply_message = NULL;
 
-  method_call_message = g_dbus_message_new_method_call (name_owner,
-                                                        "/org/gtk/GDBus/TestObject",
-                                                        "org.gtk.GDBus.TestInterface",
+  method_call_message = xdbus_message_new_method_call (name_owner,
+                                                        "/org/gtk/GDBus/test_object_t",
+                                                        "org.gtk.GDBus.test_interface_t",
                                                         "GimmeStdout");
   method_reply_message = g_dbus_connection_send_message_with_reply_sync (connection,
                                                                          method_call_message,
@@ -38,24 +38,24 @@ get_server_stdout (GDBusConnection  *connection,
   if (method_reply_message == NULL)
       goto out;
 
-  if (g_dbus_message_get_message_type (method_reply_message) == G_DBUS_MESSAGE_TYPE_ERROR)
+  if (xdbus_message_get_message_type (method_reply_message) == G_DBUS_MESSAGE_TYPE_ERROR)
     {
-      g_dbus_message_to_gerror (method_reply_message, error);
+      xdbus_message_to_gerror (method_reply_message, error);
       goto out;
     }
 
-  fd_list = g_dbus_message_get_unix_fd_list (method_reply_message);
+  fd_list = xdbus_message_get_unix_fd_list (method_reply_message);
   fd = g_unix_fd_list_get (fd_list, 0, error);
 
  out:
-  g_object_unref (method_call_message);
-  g_object_unref (method_reply_message);
+  xobject_unref (method_call_message);
+  xobject_unref (method_reply_message);
 
   return fd;
 }
 
 static void
-on_name_appeared (GDBusConnection *connection,
+on_name_appeared (xdbus_connection_t *connection,
                   const xchar_t     *name,
                   const xchar_t     *name_owner,
                   xpointer_t         user_data)
@@ -69,21 +69,21 @@ on_name_appeared (GDBusConnection *connection,
     {
       g_printerr ("Error invoking GimmeStdout(): %s\n",
                   error->message);
-      g_error_free (error);
+      xerror_free (error);
       exit (1);
     }
   else
     {
       xchar_t *now_buf = NULL;
-      gssize len;
+      xssize_t len;
       xchar_t *str;
-      GDateTime *now = g_date_time_new_now_local ();
+      xdatetime_t *now = xdate_time_new_now_local ();
 
       g_assert_nonnull (now);
-      now_buf = g_date_time_format (now, "%Y-%m-%d %H:%M:%S");
-      g_date_time_unref (now);
+      now_buf = xdate_time_format (now, "%Y-%m-%d %H:%M:%S");
+      xdate_time_unref (now);
 
-      str = g_strdup_printf ("On %s, gdbus-example-unix-fd-client with pid %d was here!\n",
+      str = xstrdup_printf ("On %s, gdbus-example-unix-fd-client with pid %d was here!\n",
                              now_buf,
                              (xint_t) getpid ());
       len = strlen (str);
@@ -99,7 +99,7 @@ on_name_appeared (GDBusConnection *connection,
 }
 
 static void
-on_name_vanished (GDBusConnection *connection,
+on_name_vanished (xdbus_connection_t *connection,
                   const xchar_t     *name,
                   xpointer_t         user_data)
 {
@@ -113,7 +113,7 @@ int
 main (int argc, char *argv[])
 {
   xuint_t watcher_id;
-  GMainLoop *loop;
+  xmain_loop_t *loop;
 
   watcher_id = g_bus_watch_name (G_BUS_TYPE_SESSION,
                                  "org.gtk.GDBus.TestServer",
@@ -123,8 +123,8 @@ main (int argc, char *argv[])
                                  NULL,
                                  NULL);
 
-  loop = g_main_loop_new (NULL, FALSE);
-  g_main_loop_run (loop);
+  loop = xmain_loop_new (NULL, FALSE);
+  xmain_loop_run (loop);
 
   g_bus_unwatch_name (watcher_id);
   return 0;

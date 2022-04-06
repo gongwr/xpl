@@ -40,7 +40,7 @@ typedef struct
 static ChildStatus child_status = { -1, FALSE };
 
 static void
-child_watch_cb (GPid pid,
+child_watch_cb (xpid_t pid,
                 xint_t status,
                 xpointer_t user_data)
 {
@@ -62,7 +62,7 @@ main (int    argc,
   GOptionEntry entries[] =
   {
     { "chdir-child", '\0',
-      G_OPTION_FLAG_NONE, G_OPTION_ARG_FILENAME, &chdir_child,
+      G_OPTION_FLAG_NONE, G_OPTION_ARXFILENAME, &chdir_child,
       "Run PROGRAM in this working directory", NULL },
     { "search-path", '\0',
       G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &search_path,
@@ -71,7 +71,7 @@ main (int    argc,
       G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &search_path_from_envp,
       "Search PATH from specified environment", NULL },
     { "set-path-in-envp", '\0',
-      G_OPTION_FLAG_NONE, G_OPTION_ARG_FILENAME, &set_path_in_envp,
+      G_OPTION_FLAG_NONE, G_OPTION_ARXFILENAME, &set_path_in_envp,
       "Set PATH in specified environment to this value", "PATH", },
     { "unset-path-in-envp", '\0',
       G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &unset_path_in_envp,
@@ -84,8 +84,8 @@ main (int    argc,
   xerror_t *error = NULL;
   int ret = 1;
   GSpawnFlags spawn_flags = G_SPAWN_DO_NOT_REAP_CHILD;
-  GPid pid;
-  GOptionContext *context = NULL;
+  xpid_t pid;
+  xoption_context_t *context = NULL;
 
   context = g_option_context_new ("PROGRAM [ARGS...]");
   g_option_context_add_main_entries (context, entries, NULL);
@@ -145,7 +145,7 @@ main (int    argc,
   g_child_watch_add (pid, child_watch_cb, NULL);
 
   while (!child_status.done)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   g_spawn_close_pid (pid);
 
@@ -165,7 +165,7 @@ out:
   g_free (set_path_in_envp);
   g_free (chdir_child);
   g_clear_error (&error);
-  g_strfreev (envp);
+  xstrfreev (envp);
   g_option_context_free (context);
   return ret;
 }

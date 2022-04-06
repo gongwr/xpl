@@ -11,34 +11,34 @@ typedef struct
   xvariant_t     *state;
 } RemoteActionInfo;
 
-void                    g_application_impl_destroy                      (GApplicationImpl   *impl);
+void                    xapplication_impl_destroy                      (GApplicationImpl   *impl);
 
-GApplicationImpl *      g_application_impl_register                     (GApplication        *application,
+GApplicationImpl *      xapplication_impl_register                     (xapplication_t        *application,
                                                                          const xchar_t         *appid,
                                                                          GApplicationFlags    flags,
                                                                          xaction_group_t        *exported_actions,
-                                                                         GRemoteActionGroup **remote_actions,
+                                                                         xremote_action_group_t **remote_actions,
                                                                          xcancellable_t        *cancellable,
                                                                          xerror_t             **error);
 
-void                    g_application_impl_activate                     (GApplicationImpl   *impl,
+void                    xapplication_impl_activate                     (GApplicationImpl   *impl,
                                                                          xvariant_t           *platform_data);
 
-void                    g_application_impl_open                         (GApplicationImpl   *impl,
+void                    xapplication_impl_open                         (GApplicationImpl   *impl,
                                                                          xfile_t             **files,
                                                                          xint_t                n_files,
                                                                          const xchar_t        *hint,
                                                                          xvariant_t           *platform_data);
 
-int                     g_application_impl_command_line                 (GApplicationImpl   *impl,
+int                     xapplication_impl_command_line                 (GApplicationImpl   *impl,
                                                                          const xchar_t *const *arguments,
                                                                          xvariant_t           *platform_data);
 
-void                    g_application_impl_flush                        (GApplicationImpl   *impl);
+void                    xapplication_impl_flush                        (GApplicationImpl   *impl);
 
-GDBusConnection *       g_application_impl_get_dbus_connection          (GApplicationImpl   *impl);
+xdbus_connection_t *       xapplication_impl_get_dbus_connection          (GApplicationImpl   *impl);
 
-const xchar_t *           g_application_impl_get_dbus_object_path         (GApplicationImpl   *impl);
+const xchar_t *           xapplication_impl_get_dbus_object_path         (GApplicationImpl   *impl);
 
-void                    g_application_impl_set_busy_state               (GApplicationImpl   *impl,
+void                    xapplication_impl_set_busy_state               (GApplicationImpl   *impl,
                                                                          xboolean_t            busy);

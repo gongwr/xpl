@@ -31,11 +31,11 @@
 
 struct _GWinHttpFileOutputStream
 {
-  GFileOutputStream parent_instance;
+  xfile_output_stream_t parent_instance;
 
   GWinHttpFile *file;
   HINTERNET connection;
-  goffset offset;
+  xoffset_t offset;
 };
 
 struct _GWinHttpFileOutputStreamClass
@@ -46,7 +46,7 @@ struct _GWinHttpFileOutputStreamClass
 #define g_winhttp_file_output_stream_get_type _g_winhttp_file_output_stream_get_type
 G_DEFINE_TYPE (GWinHttpFileOutputStream, g_winhttp_file_output_stream, XTYPE_FILE_OUTPUT_STREAM)
 
-static gssize     g_winhttp_file_output_stream_write      (xoutput_stream_t     *stream,
+static xssize_t     g_winhttp_file_output_stream_write      (xoutput_stream_t     *stream,
                                                            const void        *buffer,
                                                            xsize_t              count,
                                                            xcancellable_t      *cancellable,
@@ -87,24 +87,24 @@ g_winhttp_file_output_stream_init (GWinHttpFileOutputStream *info)
  * @connection: handle to the HTTP connection, as from WinHttpConnect()
  * @request: handle to the HTTP request, as from WinHttpOpenRequest
  *
- * Returns: #GFileOutputStream for the given request
+ * Returns: #xfile_output_stream_t for the given request
  */
-GFileOutputStream *
+xfile_output_stream_t *
 _g_winhttp_file_output_stream_new (GWinHttpFile *file,
                                    HINTERNET     connection)
 {
   GWinHttpFileOutputStream *stream;
 
-  stream = g_object_new (XTYPE_WINHTTP_FILE_OUTPUT_STREAM, NULL);
+  stream = xobject_new (XTYPE_WINHTTP_FILE_OUTPUT_STREAM, NULL);
 
   stream->file = file;
   stream->connection = connection;
   stream->offset = 0;
 
-  return G_FILE_OUTPUT_STREAM (stream);
+  return XFILE_OUTPUT_STREAM (stream);
 }
 
-static gssize
+static xssize_t
 g_winhttp_file_output_stream_write (xoutput_stream_t  *stream,
                                     const void     *buffer,
                                     xsize_t           count,
@@ -133,9 +133,9 @@ g_winhttp_file_output_stream_write (xoutput_stream_t  *stream,
       return -1;
     }
 
-  headers = g_strdup_printf ("Content-Range: bytes %" G_GINT64_FORMAT "-%" G_GINT64_FORMAT "/*\r\n",
+  headers = xstrdup_printf ("Content-Range: bytes %" G_GINT64_FORMAT "-%" G_GINT64_FORMAT "/*\r\n",
                              winhttp_stream->offset, winhttp_stream->offset + count);
-  wheaders = g_utf8_to_utf16 (headers, -1, NULL, NULL, NULL);
+  wheaders = xutf8_to_utf16 (headers, -1, NULL, NULL, NULL);
   g_free (headers);
 
   if (!G_WINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpSendRequest

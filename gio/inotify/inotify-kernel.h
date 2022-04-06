@@ -23,10 +23,10 @@
 
 typedef struct ik_event_s {
   gint32 wd;
-  guint32 mask;
-  guint32 original_mask;
-  guint32 cookie;
-  guint32 len;
+  xuint32_t mask;
+  xuint32_t original_mask;
+  xuint32_t cookie;
+  xuint32_t len;
   char *  name;
   /* TRUE if this event is the last element of a pair
    * (e.g., MOVE_TO in a pair of MOVE_FROM, MOVE_TO events) */
@@ -43,20 +43,20 @@ xboolean_t _ik_startup (xboolean_t (*cb) (ik_event_t *event));
 
 ik_event_t *_ik_event_new_dummy (const char *name,
 				 gint32      wd,
-				 guint32     mask);
+				 xuint32_t     mask);
 void        _ik_event_free      (ik_event_t *event);
 
 gint32      _ik_watch           (const char *path,
-				 guint32     mask,
+				 xuint32_t     mask,
 				 int        *err);
 int         _ik_ignore          (const char *path,
 				 gint32      wd);
 
 
 /* The miss count will probably be enflated */
-void        _ik_move_stats     (guint32 *matches,
-				guint32 *misses);
-const char *_ik_mask_to_string (guint32  mask);
+void        _ik_move_stats     (xuint32_t *matches,
+				xuint32_t *misses);
+const char *_ik_mask_to_string (xuint32_t  mask);
 
 
 #endif

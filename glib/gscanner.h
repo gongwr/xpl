@@ -34,15 +34,15 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GScanner	GScanner;
+typedef struct _GScanner	xscanner_t;
 typedef struct _GScannerConfig	GScannerConfig;
 typedef union  _GTokenValue     GTokenValue;
 
-typedef void		(*GScannerMsgFunc)	(GScanner      *scanner,
+typedef void		(*GScannerMsgFunc)	(xscanner_t      *scanner,
 						 xchar_t	       *message,
 						 xboolean_t	error);
 
-/* GScanner: Flexible lexical scanner for general purpose.
+/* xscanner_t: Flexible lexical scanner for general purpose.
  */
 
 /* Character sets */
@@ -115,7 +115,7 @@ union	_GTokenValue
   gulong	v_binary;
   gulong	v_octal;
   gulong	v_int;
-  guint64       v_int64;
+  xuint64_t       v_int64;
   xdouble_t	v_float;
   gulong	v_hex;
   xchar_t		*v_string;
@@ -198,7 +198,7 @@ struct	_GScanner
 
   /*< private >*/
   /* to be considered private */
-  GHashTable		*symbol_table;
+  xhashtable_t		*symbol_table;
   xint_t			input_fd;
   const xchar_t		*text;
   const xchar_t		*text_end;
@@ -211,58 +211,58 @@ struct	_GScanner
 };
 
 XPL_AVAILABLE_IN_ALL
-GScanner*	g_scanner_new			(const GScannerConfig *config_templ);
+xscanner_t*	g_scanner_new			(const GScannerConfig *config_templ);
 XPL_AVAILABLE_IN_ALL
-void		g_scanner_destroy		(GScanner	*scanner);
+void		g_scanner_destroy		(xscanner_t	*scanner);
 XPL_AVAILABLE_IN_ALL
-void		g_scanner_input_file		(GScanner	*scanner,
+void		g_scanner_input_file		(xscanner_t	*scanner,
 						 xint_t		input_fd);
 XPL_AVAILABLE_IN_ALL
-void		g_scanner_sync_file_offset	(GScanner	*scanner);
+void		g_scanner_sync_file_offset	(xscanner_t	*scanner);
 XPL_AVAILABLE_IN_ALL
-void		g_scanner_input_text		(GScanner	*scanner,
+void		g_scanner_input_text		(xscanner_t	*scanner,
 						 const	xchar_t	*text,
 						 xuint_t		text_len);
 XPL_AVAILABLE_IN_ALL
-GTokenType	g_scanner_get_next_token	(GScanner	*scanner);
+GTokenType	g_scanner_get_next_token	(xscanner_t	*scanner);
 XPL_AVAILABLE_IN_ALL
-GTokenType	g_scanner_peek_next_token	(GScanner	*scanner);
+GTokenType	g_scanner_peek_next_token	(xscanner_t	*scanner);
 XPL_AVAILABLE_IN_ALL
-GTokenType	g_scanner_cur_token		(GScanner	*scanner);
+GTokenType	g_scanner_cur_token		(xscanner_t	*scanner);
 XPL_AVAILABLE_IN_ALL
-GTokenValue	g_scanner_cur_value		(GScanner	*scanner);
+GTokenValue	g_scanner_cur_value		(xscanner_t	*scanner);
 XPL_AVAILABLE_IN_ALL
-xuint_t		g_scanner_cur_line		(GScanner	*scanner);
+xuint_t		g_scanner_cur_line		(xscanner_t	*scanner);
 XPL_AVAILABLE_IN_ALL
-xuint_t		g_scanner_cur_position		(GScanner	*scanner);
+xuint_t		g_scanner_cur_position		(xscanner_t	*scanner);
 XPL_AVAILABLE_IN_ALL
-xboolean_t	g_scanner_eof			(GScanner	*scanner);
+xboolean_t	g_scanner_eof			(xscanner_t	*scanner);
 XPL_AVAILABLE_IN_ALL
-xuint_t		g_scanner_set_scope		(GScanner	*scanner,
+xuint_t		g_scanner_set_scope		(xscanner_t	*scanner,
 						 xuint_t		 scope_id);
 XPL_AVAILABLE_IN_ALL
-void		g_scanner_scope_add_symbol	(GScanner	*scanner,
+void		g_scanner_scope_add_symbol	(xscanner_t	*scanner,
 						 xuint_t		 scope_id,
 						 const xchar_t	*symbol,
 						 xpointer_t	value);
 XPL_AVAILABLE_IN_ALL
-void		g_scanner_scope_remove_symbol	(GScanner	*scanner,
+void		g_scanner_scope_remove_symbol	(xscanner_t	*scanner,
 						 xuint_t		 scope_id,
 						 const xchar_t	*symbol);
 XPL_AVAILABLE_IN_ALL
-xpointer_t	g_scanner_scope_lookup_symbol	(GScanner	*scanner,
+xpointer_t	g_scanner_scope_lookup_symbol	(xscanner_t	*scanner,
 						 xuint_t		 scope_id,
 						 const xchar_t	*symbol);
 XPL_AVAILABLE_IN_ALL
-void		g_scanner_scope_foreach_symbol	(GScanner	*scanner,
+void		g_scanner_scope_foreach_symbol	(xscanner_t	*scanner,
 						 xuint_t		 scope_id,
 						 GHFunc		 func,
 						 xpointer_t	 user_data);
 XPL_AVAILABLE_IN_ALL
-xpointer_t	g_scanner_lookup_symbol		(GScanner	*scanner,
+xpointer_t	g_scanner_lookup_symbol		(xscanner_t	*scanner,
 						 const xchar_t	*symbol);
 XPL_AVAILABLE_IN_ALL
-void		g_scanner_unexp_token		(GScanner	*scanner,
+void		g_scanner_unexp_token		(xscanner_t	*scanner,
 						 GTokenType	expected_token,
 						 const xchar_t	*identifier_spec,
 						 const xchar_t	*symbol_spec,
@@ -270,11 +270,11 @@ void		g_scanner_unexp_token		(GScanner	*scanner,
 						 const xchar_t	*message,
 						 xint_t		 is_error);
 XPL_AVAILABLE_IN_ALL
-void		g_scanner_error			(GScanner	*scanner,
+void		g_scanner_error			(xscanner_t	*scanner,
 						 const xchar_t	*format,
 						 ...) G_GNUC_PRINTF (2,3);
 XPL_AVAILABLE_IN_ALL
-void		g_scanner_warn			(GScanner	*scanner,
+void		g_scanner_warn			(xscanner_t	*scanner,
 						 const xchar_t	*format,
 						 ...) G_GNUC_PRINTF (2,3);
 

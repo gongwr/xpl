@@ -32,7 +32,7 @@
 static void
 test_small_writes (void)
 {
-  GIOChannel *io;
+  xio_channel_t *io;
   GIOStatus status = G_IO_STATUS_ERROR;
   xuint_t bytes_remaining;
   xchar_t tmp;
@@ -64,12 +64,12 @@ test_small_writes (void)
 static void
 test_read_write (void)
 {
-  GIOChannel *gio_r, *gio_w ;
+  xio_channel_t *gio_r, *gio_w ;
   xerror_t *local_error = NULL;
-  GString *buffer;
+  xstring_t *buffer;
   char *filename;
   xint_t rlength = 0;
-  glong wlength = 0;
+  xlong_t wlength = 0;
   xsize_t length_out;
   const xchar_t *encoding = "EUC-JP";
   GIOStatus status;
@@ -97,7 +97,7 @@ test_read_write (void)
       g_assert_no_error (local_error);
       g_clear_error (&local_error);
     }
-  buffer = g_string_sized_new (buffer_size_bytes);
+  buffer = xstring_sized_new (buffer_size_bytes);
 
   while (TRUE)
     {
@@ -122,7 +122,7 @@ test_read_write (void)
       g_assert_cmpuint (length_out, ==, buffer->len);
 
       g_test_message ("%s", buffer->str);
-      g_string_truncate (buffer, 0);
+      xstring_truncate (buffer, 0);
     }
 
   switch (status)
@@ -158,16 +158,16 @@ test_read_write (void)
   test_small_writes ();
 
   g_free (filename);
-  g_string_free (buffer, TRUE);
+  xstring_free (buffer, TRUE);
 }
 
 static void
 test_read_line_embedded_nuls (void)
 {
-  const guint8 test_data[] = { 'H', 'i', '!', '\0', 'y', 'o', 'u', '\n', ':', ')', '\n' };
+  const xuint8_t test_data[] = { 'H', 'i', '!', '\0', 'y', 'o', 'u', '\n', ':', ')', '\n' };
   xint_t fd;
   xchar_t *filename = NULL;
-  GIOChannel *channel = NULL;
+  xio_channel_t *channel = NULL;
   xerror_t *local_error = NULL;
   xchar_t *line = NULL;
   xsize_t line_length, terminator_pos;
@@ -177,12 +177,12 @@ test_read_line_embedded_nuls (void)
                   "when using non-standard line terminators.");
 
   /* Write out a temporary file. */
-  fd = g_file_open_tmp ("glib-test-io-channel-XXXXXX", &filename, &local_error);
+  fd = xfile_open_tmp ("glib-test-io-channel-XXXXXX", &filename, &local_error);
   g_assert_no_error (local_error);
   g_close (fd, NULL);
   fd = -1;
 
-  g_file_set_contents (filename, (const xchar_t *) test_data, sizeof (test_data), &local_error);
+  xfile_set_contents (filename, (const xchar_t *) test_data, sizeof (test_data), &local_error);
   g_assert_no_error (local_error);
 
   /* Create the channel. */

@@ -38,25 +38,25 @@ test_basic (void)
   base_stream = g_memory_input_stream_new ();
   stream = G_INPUT_STREAM (g_data_input_stream_new (base_stream));
 
-  g_object_get (stream, "byte-order", &val, NULL);
+  xobject_get (stream, "byte-order", &val, NULL);
   g_assert_cmpint (val, ==, G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN);
-  g_object_set (stream, "byte-order", G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN, NULL);
+  xobject_set (stream, "byte-order", G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN, NULL);
   g_assert_cmpint (g_data_input_stream_get_byte_order (G_DATA_INPUT_STREAM (stream)), ==, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
 
-  g_object_get (stream, "newline-type", &val, NULL);
+  xobject_get (stream, "newline-type", &val, NULL);
   g_assert_cmpint (val, ==, G_DATA_STREAM_NEWLINE_TYPE_LF);
-  g_object_set (stream, "newline-type", G_DATA_STREAM_NEWLINE_TYPE_CR_LF, NULL);
+  xobject_set (stream, "newline-type", G_DATA_STREAM_NEWLINE_TYPE_CR_LF, NULL);
   g_assert_cmpint (g_data_input_stream_get_newline_type (G_DATA_INPUT_STREAM (stream)), ==, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
 
-  g_object_unref (stream);
-  g_object_unref (base_stream);
+  xobject_unref (stream);
+  xobject_unref (base_stream);
 }
 
 static void
 test_seek_to_start (xinput_stream_t *stream)
 {
   xerror_t *error = NULL;
-  xboolean_t res = g_seekable_seek (G_SEEKABLE (stream), 0, G_SEEK_SET, NULL, &error);
+  xboolean_t res = xseekable_seek (G_SEEKABLE (stream), 0, G_SEEK_SET, NULL, &error);
   g_assert_cmpint (res, ==, TRUE);
   g_assert_no_error (error);
 }
@@ -96,7 +96,7 @@ test_read_lines (GDataStreamNewlineType newline_type)
   /*  Add sample data */
   for (i = 0; i < MAX_LINES; i++)
     g_memory_input_stream_add_data (G_MEMORY_INPUT_STREAM (base_stream),
-				    g_strconcat (lines[i], endl[newline_type], NULL), -1, g_free);
+				    xstrconcat (lines[i], endl[newline_type], NULL), -1, g_free);
 
   /*  Seek to the start */
   test_seek_to_start (base_stream);
@@ -117,13 +117,13 @@ test_read_lines (GDataStreamNewlineType newline_type)
 	  line++;
 	}
       if (error)
-        g_error_free (error);
+        xerror_free (error);
     }
   g_assert_cmpint (line, ==, MAX_LINES);
 
 
-  g_object_unref (base_stream);
-  g_object_unref (stream);
+  xobject_unref (base_stream);
+  xobject_unref (stream);
 }
 
 static void
@@ -179,8 +179,8 @@ test_read_lines_LF_valid_utf8 (void)
     }
   g_assert_cmpint (n_lines, ==, 3);
 
-  g_object_unref (base_stream);
-  g_object_unref (stream);
+  xobject_unref (base_stream);
+  xobject_unref (stream);
 }
 
 static void
@@ -218,8 +218,8 @@ test_read_lines_LF_invalid_utf8 (void)
     }
   g_assert_cmpint (n_lines, ==, 1);
 
-  g_object_unref (base_stream);
-  g_object_unref (stream);
+  xobject_unref (base_stream);
+  xobject_unref (stream);
 }
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
@@ -266,8 +266,8 @@ test_read_until (void)
   g_assert_no_error (error);
   g_assert_cmpint (line, ==, DATA_PARTS_NUM);
 
-  g_object_unref (base_stream);
-  g_object_unref (stream);
+  xobject_unref (base_stream);
+  xobject_unref (stream);
 }
 
 G_GNUC_END_IGNORE_DEPRECATIONS
@@ -324,8 +324,8 @@ test_read_upto (void)
   g_assert_no_error (error);
   g_assert_cmpint (line, ==, DATA_PARTS_NUM);
 
-  g_object_unref (base_stream);
-  g_object_unref (stream);
+  xobject_unref (base_stream);
+  xobject_unref (stream);
 }
 enum TestDataType {
   TEST_DATA_BYTE = 0,
@@ -339,11 +339,11 @@ enum TestDataType {
 
 /* The order is reversed to avoid -Wduplicated-branches. */
 #define TEST_DATA_RETYPE_BUFF(a, t, v)	\
-	 (a == TEST_DATA_UINT64	? (t) *(guint64*)v :	\
+	 (a == TEST_DATA_UINT64	? (t) *(xuint64_t*)v :	\
 	 (a == TEST_DATA_INT64	? (t) *(gint64*)v :	\
-	 (a == TEST_DATA_UINT32	? (t) *(guint32*)v :	\
+	 (a == TEST_DATA_UINT32	? (t) *(xuint32_t*)v :	\
 	 (a == TEST_DATA_INT32	? (t) *(gint32*)v :	\
-	 (a == TEST_DATA_UINT16	? (t) *(guint16*)v :	\
+	 (a == TEST_DATA_UINT16	? (t) *(xuint16_t*)v :	\
 	 (a == TEST_DATA_INT16	? (t) *(gint16*)v :	\
 	 (t) *(guchar*)v ))))))
 
@@ -406,7 +406,7 @@ test_data_array (xinput_stream_t *stream, xinput_stream_t *base_stream,
 	case TEST_DATA_UINT16:
 	  data = g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (stream), NULL, &error);
 	  if (swap)
-	    data = (guint16)GUINT16_SWAP_LE_BE((guint16)data);
+	    data = (xuint16_t)GUINT16_SWAP_LE_BE((xuint16_t)data);
 	  break;
 	case TEST_DATA_INT32:
 	  data = g_data_input_stream_read_int32 (G_DATA_INPUT_STREAM (stream), NULL, &error);
@@ -416,7 +416,7 @@ test_data_array (xinput_stream_t *stream, xinput_stream_t *base_stream,
 	case TEST_DATA_UINT32:
 	  data = g_data_input_stream_read_uint32 (G_DATA_INPUT_STREAM (stream), NULL, &error);
 	  if (swap)
-	    data = (guint32)GUINT32_SWAP_LE_BE((guint32)data);
+	    data = (xuint32_t)GUINT32_SWAP_LE_BE((xuint32_t)data);
 	  break;
 	case TEST_DATA_INT64:
 	  data = g_data_input_stream_read_int64 (G_DATA_INPUT_STREAM (stream), NULL, &error);
@@ -426,7 +426,7 @@ test_data_array (xinput_stream_t *stream, xinput_stream_t *base_stream,
 	case TEST_DATA_UINT64:
 	  data = g_data_input_stream_read_uint64 (G_DATA_INPUT_STREAM (stream), NULL, &error);
 	  if (swap)
-	    data = (guint64)GUINT64_SWAP_LE_BE((guint64)data);
+	    data = (xuint64_t)GUINT64_SWAP_LE_BE((xuint64_t)data);
 	  break;
         default:
           g_assert_not_reached ();
@@ -440,7 +440,7 @@ test_data_array (xinput_stream_t *stream, xinput_stream_t *base_stream,
   if (pos < len + 1)
     g_assert_no_error (error);
   if (error)
-    g_error_free (error);
+    xerror_free (error);
   g_assert_cmpint (pos - data_size, ==, len);
 }
 
@@ -449,7 +449,7 @@ test_read_int (void)
 {
   xinput_stream_t *stream;
   xinput_stream_t *base_stream;
-  GRand *randomizer;
+  xrand_t *randomizer;
   int i;
   xpointer_t buffer;
 
@@ -479,8 +479,8 @@ test_read_int (void)
 	test_data_array (stream, base_stream, buffer, MAX_BYTES, j, i);
     }
 
-  g_object_unref (base_stream);
-  g_object_unref (stream);
+  xobject_unref (base_stream);
+  xobject_unref (stream);
   g_rand_free (randomizer);
   g_free (buffer);
 }

@@ -26,7 +26,7 @@
 #include "gdbus-tests.h"
 
 /* all tests rely on a shared mainloop */
-static GMainLoop *loop = NULL;
+static xmain_loop_t *loop = NULL;
 
 /* ---------------------------------------------------------------------------------------------------- */
 
@@ -55,13 +55,13 @@ static const TestData cases[] = {
 static xboolean_t
 quit_later_cb (xpointer_t data G_GNUC_UNUSED)
 {
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 
   return G_SOURCE_REMOVE;
 }
 
 static void
-closed_cb (GDBusConnection  *c G_GNUC_UNUSED,
+closed_cb (xdbus_connection_t  *c G_GNUC_UNUSED,
            xboolean_t          remote_peer_vanished,
            xerror_t           *error,
            xpointer_t          test_data)
@@ -105,12 +105,12 @@ close_async_cb (xobject_t *source G_GNUC_UNUSED,
 }
 
 static void
-test_exit_on_close_subprocess (gconstpointer test_data)
+test_exit_on_close_subprocess (xconstpointer test_data)
 {
   const TestData *td = test_data;
-  GDBusConnection *c;
+  xdbus_connection_t *c;
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   session_bus_up ();
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
@@ -126,7 +126,7 @@ test_exit_on_close_subprocess (gconstpointer test_data)
   g_assert (!g_dbus_connection_is_closed (c));
 
   g_timeout_add (50, quit_later_cb, NULL);
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   g_signal_connect (c, "closed", G_CALLBACK (closed_cb), (xpointer_t) td);
 
@@ -147,7 +147,7 @@ test_exit_on_close_subprocess (gconstpointer test_data)
                                        &error);
       g_assert_no_error (error);
       g_assert (v != NULL);
-      g_variant_unref (v);
+      xvariant_unref (v);
 
       g_dbus_connection_close (c, NULL, close_async_cb, NULL);
     }
@@ -156,10 +156,10 @@ test_exit_on_close_subprocess (gconstpointer test_data)
       session_bus_stop ();
     }
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
   /* this is only reached when we turn off exit-on-close */
-  g_main_loop_unref (loop);
-  g_object_unref (c);
+  xmain_loop_unref (loop);
+  xobject_unref (c);
 
   session_bus_down ();
 
@@ -167,7 +167,7 @@ test_exit_on_close_subprocess (gconstpointer test_data)
 }
 
 static void
-test_exit_on_close (gconstpointer test_data)
+test_exit_on_close (xconstpointer test_data)
 {
   const TestData *td = test_data;
   GTestSubprocessFlags flags;
@@ -180,7 +180,7 @@ test_exit_on_close (gconstpointer test_data)
   else
     flags = 0;
 
-  child_name = g_strdup_printf ("/gdbus/exit-on-close/%s/subprocess", td->name);
+  child_name = xstrdup_printf ("/gdbus/exit-on-close/%s/subprocess", td->name);
   g_test_trap_subprocess (child_name, 0, flags);
   g_free (child_name);
 
@@ -205,11 +205,11 @@ main (int   argc,
     {
       xchar_t *name;
 
-      name = g_strdup_printf ("/gdbus/exit-on-close/%s", cases[i].name);
+      name = xstrdup_printf ("/gdbus/exit-on-close/%s", cases[i].name);
       g_test_add_data_func (name, &cases[i], test_exit_on_close);
       g_free (name);
 
-      name = g_strdup_printf ("/gdbus/exit-on-close/%s/subprocess", cases[i].name);
+      name = xstrdup_printf ("/gdbus/exit-on-close/%s/subprocess", cases[i].name);
       g_test_add_data_func (name, &cases[i], test_exit_on_close_subprocess);
       g_free (name);
     }

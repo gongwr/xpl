@@ -33,9 +33,9 @@ G_BEGIN_DECLS
 #define XTYPE_IS_BOXED(type)      (XTYPE_FUNDAMENTAL (type) == XTYPE_BOXED)
 /**
  * G_VALUE_HOLDS_BOXED:
- * @value: a valid #GValue structure
+ * @value: a valid #xvalue_t structure
  *
- * Checks whether the given #GValue can hold values derived
+ * Checks whether the given #xvalue_t can hold values derived
  * from type %XTYPE_BOXED.
  *
  * Returns: %TRUE on success.
@@ -67,32 +67,32 @@ typedef void (*GBoxedFreeFunc) (xpointer_t boxed);
 
 /* --- prototypes --- */
 XPL_AVAILABLE_IN_ALL
-xpointer_t g_boxed_copy                     (xtype_t boxed_type,
-                                           gconstpointer  src_boxed);
+xpointer_t xboxed_copy                     (xtype_t boxed_type,
+                                           xconstpointer  src_boxed);
 XPL_AVAILABLE_IN_ALL
-void     g_boxed_free                     (xtype_t          boxed_type,
+void     xboxed_free                     (xtype_t          boxed_type,
                                            xpointer_t       boxed);
 XPL_AVAILABLE_IN_ALL
-void     g_value_set_boxed                (GValue        *value,
-                                           gconstpointer  v_boxed);
+void     xvalue_set_boxed                (xvalue_t        *value,
+                                           xconstpointer  v_boxed);
 XPL_AVAILABLE_IN_ALL
-void     g_value_set_static_boxed         (GValue        *value,
-                                           gconstpointer  v_boxed);
+void     xvalue_set_static_boxed         (xvalue_t        *value,
+                                           xconstpointer  v_boxed);
 XPL_AVAILABLE_IN_ALL
-void     g_value_take_boxed               (GValue        *value,
-                                           gconstpointer  v_boxed);
-XPL_DEPRECATED_FOR(g_value_take_boxed)
-void     g_value_set_boxed_take_ownership (GValue        *value,
-                                           gconstpointer  v_boxed);
+void     xvalue_take_boxed               (xvalue_t        *value,
+                                           xconstpointer  v_boxed);
+XPL_DEPRECATED_FOR(xvalue_take_boxed)
+void     xvalue_set_boxed_take_ownership (xvalue_t        *value,
+                                           xconstpointer  v_boxed);
 XPL_AVAILABLE_IN_ALL
-xpointer_t g_value_get_boxed                (const GValue  *value);
+xpointer_t xvalue_get_boxed                (const xvalue_t  *value);
 XPL_AVAILABLE_IN_ALL
-xpointer_t g_value_dup_boxed                (const GValue  *value);
+xpointer_t xvalue_dup_boxed                (const xvalue_t  *value);
 
 
 /* --- convenience --- */
 XPL_AVAILABLE_IN_ALL
-xtype_t    g_boxed_type_register_static     (const xchar_t   *name,
+xtype_t    xboxed_type_register_static     (const xchar_t   *name,
                                            GBoxedCopyFunc boxed_copy,
                                            GBoxedFreeFunc boxed_free);
 
@@ -100,22 +100,22 @@ xtype_t    g_boxed_type_register_static     (const xchar_t   *name,
 /**
  * XTYPE_CLOSURE:
  *
- * The #xtype_t for #GClosure.
+ * The #xtype_t for #xclosure_t.
  */
-#define XTYPE_CLOSURE (g_closure_get_type ())
+#define XTYPE_CLOSURE (xclosure_get_type ())
 
 /**
  * XTYPE_VALUE:
  *
- * The type ID of the "GValue" type which is a boxed type,
+ * The type ID of the "xvalue_t" type which is a boxed type,
  * used to pass around pointers to GValues.
  */
-#define XTYPE_VALUE (g_value_get_type ())
+#define XTYPE_VALUE (xvalue_get_type ())
 
 XPL_AVAILABLE_IN_ALL
-xtype_t   g_closure_get_type         (void) G_GNUC_CONST;
+xtype_t   xclosure_get_type         (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xtype_t   g_value_get_type           (void) G_GNUC_CONST;
+xtype_t   xvalue_get_type           (void) G_GNUC_CONST;
 
 G_END_DECLS
 

@@ -36,7 +36,7 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GString         GString;
+typedef struct _GString         xstring_t;
 
 struct _GString
 {
@@ -46,146 +46,146 @@ struct _GString
 };
 
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_new               (const xchar_t     *init);
+xstring_t*     xstring_new               (const xchar_t     *init);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_new_len           (const xchar_t     *init,
-                                         gssize           len);
+xstring_t*     xstring_new_len           (const xchar_t     *init,
+                                         xssize_t           len);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_sized_new         (xsize_t            dfl_size);
+xstring_t*     xstring_sized_new         (xsize_t            dfl_size);
 XPL_AVAILABLE_IN_ALL
-xchar_t*       g_string_free              (GString         *string,
+xchar_t*       xstring_free              (xstring_t         *string,
                                          xboolean_t         free_segment);
 XPL_AVAILABLE_IN_2_34
-GBytes*      g_string_free_to_bytes     (GString         *string);
+xbytes_t*      xstring_free_to_bytes     (xstring_t         *string);
 XPL_AVAILABLE_IN_ALL
-xboolean_t     g_string_equal             (const GString   *v,
-                                         const GString   *v2);
+xboolean_t     xstring_equal             (const xstring_t   *v,
+                                         const xstring_t   *v2);
 XPL_AVAILABLE_IN_ALL
-xuint_t        g_string_hash              (const GString   *str);
+xuint_t        xstring_hash              (const xstring_t   *str);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_assign            (GString         *string,
+xstring_t*     xstring_assign            (xstring_t         *string,
                                          const xchar_t     *rval);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_truncate          (GString         *string,
+xstring_t*     xstring_truncate          (xstring_t         *string,
                                          xsize_t            len);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_set_size          (GString         *string,
+xstring_t*     xstring_set_size          (xstring_t         *string,
                                          xsize_t            len);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_insert_len        (GString         *string,
-                                         gssize           pos,
+xstring_t*     xstring_insert_len        (xstring_t         *string,
+                                         xssize_t           pos,
                                          const xchar_t     *val,
-                                         gssize           len);
+                                         xssize_t           len);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_append            (GString         *string,
+xstring_t*     xstring_append            (xstring_t         *string,
                                          const xchar_t     *val);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_append_len        (GString         *string,
+xstring_t*     xstring_append_len        (xstring_t         *string,
                                          const xchar_t     *val,
-                                         gssize           len);
+                                         xssize_t           len);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_append_c          (GString         *string,
+xstring_t*     xstring_append_c          (xstring_t         *string,
                                          xchar_t            c);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_append_unichar    (GString         *string,
-                                         gunichar         wc);
+xstring_t*     xstring_append_unichar    (xstring_t         *string,
+                                         xunichar_t         wc);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_prepend           (GString         *string,
+xstring_t*     xstring_prepend           (xstring_t         *string,
                                          const xchar_t     *val);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_prepend_c         (GString         *string,
+xstring_t*     xstring_prepend_c         (xstring_t         *string,
                                          xchar_t            c);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_prepend_unichar   (GString         *string,
-                                         gunichar         wc);
+xstring_t*     xstring_prepend_unichar   (xstring_t         *string,
+                                         xunichar_t         wc);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_prepend_len       (GString         *string,
+xstring_t*     xstring_prepend_len       (xstring_t         *string,
                                          const xchar_t     *val,
-                                         gssize           len);
+                                         xssize_t           len);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_insert            (GString         *string,
-                                         gssize           pos,
+xstring_t*     xstring_insert            (xstring_t         *string,
+                                         xssize_t           pos,
                                          const xchar_t     *val);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_insert_c          (GString         *string,
-                                         gssize           pos,
+xstring_t*     xstring_insert_c          (xstring_t         *string,
+                                         xssize_t           pos,
                                          xchar_t            c);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_insert_unichar    (GString         *string,
-                                         gssize           pos,
-                                         gunichar         wc);
+xstring_t*     xstring_insert_unichar    (xstring_t         *string,
+                                         xssize_t           pos,
+                                         xunichar_t         wc);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_overwrite         (GString         *string,
+xstring_t*     xstring_overwrite         (xstring_t         *string,
                                          xsize_t            pos,
                                          const xchar_t     *val);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_overwrite_len     (GString         *string,
+xstring_t*     xstring_overwrite_len     (xstring_t         *string,
                                          xsize_t            pos,
                                          const xchar_t     *val,
-                                         gssize           len);
+                                         xssize_t           len);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_erase             (GString         *string,
-                                         gssize           pos,
-                                         gssize           len);
+xstring_t*     xstring_erase             (xstring_t         *string,
+                                         xssize_t           pos,
+                                         xssize_t           len);
 XPL_AVAILABLE_IN_2_68
-xuint_t         g_string_replace          (GString         *string,
+xuint_t         xstring_replace          (xstring_t         *string,
                                          const xchar_t     *find,
                                          const xchar_t     *replace,
                                          xuint_t            limit);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_ascii_down        (GString         *string);
+xstring_t*     xstring_ascii_down        (xstring_t         *string);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_ascii_up          (GString         *string);
+xstring_t*     xstring_ascii_up          (xstring_t         *string);
 XPL_AVAILABLE_IN_ALL
-void         g_string_vprintf           (GString         *string,
+void         xstring_vprintf           (xstring_t         *string,
                                          const xchar_t     *format,
                                          va_list          args)
                                          G_GNUC_PRINTF(2, 0);
 XPL_AVAILABLE_IN_ALL
-void         g_string_printf            (GString         *string,
+void         xstring_printf            (xstring_t         *string,
                                          const xchar_t     *format,
                                          ...) G_GNUC_PRINTF (2, 3);
 XPL_AVAILABLE_IN_ALL
-void         g_string_append_vprintf    (GString         *string,
+void         xstring_append_vprintf    (xstring_t         *string,
                                          const xchar_t     *format,
                                          va_list          args)
                                          G_GNUC_PRINTF(2, 0);
 XPL_AVAILABLE_IN_ALL
-void         g_string_append_printf     (GString         *string,
+void         xstring_append_printf     (xstring_t         *string,
                                          const xchar_t     *format,
                                          ...) G_GNUC_PRINTF (2, 3);
 XPL_AVAILABLE_IN_ALL
-GString*     g_string_append_uri_escaped (GString         *string,
+xstring_t*     xstring_append_uri_escaped (xstring_t         *string,
                                           const xchar_t     *unescaped,
                                           const xchar_t     *reserved_chars_allowed,
                                           xboolean_t         allow_utf8);
 
-/* -- optimize g_strig_append_c --- */
+/* -- optimize xstrig_append_c --- */
 #ifdef G_CAN_INLINE
-static inline GString*
-g_string_append_c_inline (GString *gstring,
+static inline xstring_t*
+xstring_append_c_inline (xstring_t *xstring,
                           xchar_t    c)
 {
-  if (gstring->len + 1 < gstring->allocated_len)
+  if (xstring->len + 1 < xstring->allocated_len)
     {
-      gstring->str[gstring->len++] = c;
-      gstring->str[gstring->len] = 0;
+      xstring->str[xstring->len++] = c;
+      xstring->str[xstring->len] = 0;
     }
   else
-    g_string_insert_c (gstring, -1, c);
-  return gstring;
+    xstring_insert_c (xstring, -1, c);
+  return xstring;
 }
-#define g_string_append_c(gstr,c)       g_string_append_c_inline (gstr, c)
+#define xstring_append_c(gstr,c)       xstring_append_c_inline (gstr, c)
 #endif /* G_CAN_INLINE */
 
 
 XPL_DEPRECATED
-GString *g_string_down (GString *string);
+xstring_t *xstring_down (xstring_t *string);
 XPL_DEPRECATED
-GString *g_string_up   (GString *string);
+xstring_t *xstring_up   (xstring_t *string);
 
-#define  g_string_sprintf  g_string_printf XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_string_printf)
-#define  g_string_sprintfa g_string_append_printf XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_string_append_printf)
+#define  xstring_sprintf  xstring_printf XPL_DEPRECATED_MACRO_IN_2_26_FOR(xstring_printf)
+#define  xstring_sprintfa xstring_append_printf XPL_DEPRECATED_MACRO_IN_2_26_FOR(xstring_append_printf)
 
 G_END_DECLS
 

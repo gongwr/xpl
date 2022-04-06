@@ -27,7 +27,7 @@ XPL_AVAILABLE_IN_2_58
 char *  g_ref_string_new        (const char *str);
 XPL_AVAILABLE_IN_2_58
 char *  g_ref_string_new_len    (const char *str,
-                                 gssize      len);
+                                 xssize_t      len);
 XPL_AVAILABLE_IN_2_58
 char *  g_ref_string_new_intern (const char *str);
 
@@ -40,18 +40,18 @@ XPL_AVAILABLE_IN_2_58
 xsize_t   g_ref_string_length     (char       *str);
 
 /**
- * GRefString:
+ * xref_string_t:
  *
- * A typedef for a reference-counted string. A pointer to a #GRefString can be
+ * A typedef for a reference-counted string. A pointer to a #xref_string_t can be
  * treated like a standard `char*` array by all code, but can additionally have
  * `g_ref_string_*()` methods called on it. `g_ref_string_*()` methods cannot be
  * called on `char*` arrays not allocated using g_ref_string_new().
  *
- * If using #GRefString with autocleanups, g_autoptr() must be used rather than
+ * If using #xref_string_t with autocleanups, x_autoptr() must be used rather than
  * g_autofree(), so that the reference counting metadata is also freed.
  *
  * Since: 2.58
  */
-typedef char GRefString;
+typedef char xref_string_t;
 
 G_END_DECLS

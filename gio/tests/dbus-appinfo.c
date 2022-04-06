@@ -29,17 +29,17 @@ static xboolean_t requested_startup_id;
 
 
 static xtype_t test_app_launch_context_get_type (void);
-typedef GAppLaunchContext TestAppLaunchContext;
-typedef GAppLaunchContextClass TestAppLaunchContextClass;
+typedef xapp_launch_context_t TestAppLaunchContext;
+typedef xapp_launch_context_class_t TestAppLaunchContextClass;
 G_DEFINE_TYPE (TestAppLaunchContext, test_app_launch_context, XTYPE_APP_LAUNCH_CONTEXT)
 
 static xchar_t *
-test_app_launch_context_get_startup_notify_id (GAppLaunchContext *context,
-                                               GAppInfo          *info,
+test_app_launch_context_get_startup_notify_id (xapp_launch_context_t *context,
+                                               xapp_info_t          *info,
                                                xlist_t             *uris)
 {
   requested_startup_id = TRUE;
-  return g_strdup ("expected startup id");
+  return xstrdup ("expected startup id");
 }
 
 static void
@@ -48,14 +48,14 @@ test_app_launch_context_init (TestAppLaunchContext *ctx)
 }
 
 static void
-test_app_launch_context_class_init (GAppLaunchContextClass *class)
+test_app_launch_context_class_init (xapp_launch_context_class_t *class)
 {
   class->get_startup_notify_id = test_app_launch_context_get_startup_notify_id;
 }
 
 static xtype_t test_application_get_type (void);
-typedef GApplication TestApplication;
-typedef GApplicationClass TestApplicationClass;
+typedef xapplication_t TestApplication;
+typedef xapplication_class_t TestApplicationClass;
 G_DEFINE_TYPE (TestApplication, test_application, XTYPE_APPLICATION)
 
 static void
@@ -77,7 +77,7 @@ saw_action (const xchar_t *action)
       case 0: g_assert_cmpstr (action, ==, "activate");
 
       /* Let's try another activation... */
-      g_app_info_launch (G_APP_INFO (appinfo), NULL, NULL, NULL);
+      xapp_info_launch (G_APP_INFO (appinfo), NULL, NULL, NULL);
       current_state = 1; return; case 1: g_assert_cmpstr (action, ==, "activate");
 
 
@@ -85,10 +85,10 @@ saw_action (const xchar_t *action)
       {
         xlist_t *files;
 
-        files = g_list_prepend (NULL, g_file_new_for_uri ("file:///a/b"));
-        files = g_list_append (files, g_file_new_for_uri ("file:///c/d"));
-        g_app_info_launch (G_APP_INFO (appinfo), files, NULL, NULL);
-        g_list_free_full (files, g_object_unref);
+        files = xlist_prepend (NULL, xfile_new_for_uri ("file:///a/b"));
+        files = xlist_append (files, xfile_new_for_uri ("file:///c/d"));
+        xapp_info_launch (G_APP_INFO (appinfo), files, NULL, NULL);
+        xlist_free_full (files, xobject_unref);
       }
       current_state = 2; return; case 2: g_assert_cmpstr (action, ==, "open");
 
@@ -104,28 +104,28 @@ saw_action (const xchar_t *action)
 
       /* Now launch the app with startup notification */
       {
-        GAppLaunchContext *ctx;
+        xapp_launch_context_t *ctx;
 
         g_assert (saw_startup_id == FALSE);
-        ctx = g_object_new (test_app_launch_context_get_type (), NULL);
-        g_app_info_launch (G_APP_INFO (appinfo), NULL, ctx, NULL);
+        ctx = xobject_new (test_app_launch_context_get_type (), NULL);
+        xapp_info_launch (G_APP_INFO (appinfo), NULL, ctx, NULL);
         g_assert (requested_startup_id);
         requested_startup_id = FALSE;
-        g_object_unref (ctx);
+        xobject_unref (ctx);
       }
       current_state = 6; return; case 6: g_assert_cmpstr (action, ==, "activate"); g_assert (saw_startup_id);
       saw_startup_id = FALSE;
 
       /* Now do the same for an action */
       {
-        GAppLaunchContext *ctx;
+        xapp_launch_context_t *ctx;
 
         g_assert (saw_startup_id == FALSE);
-        ctx = g_object_new (test_app_launch_context_get_type (), NULL);
+        ctx = xobject_new (test_app_launch_context_get_type (), NULL);
         g_desktop_app_info_launch_action (appinfo, "frob", ctx);
         g_assert (requested_startup_id);
         requested_startup_id = FALSE;
-        g_object_unref (ctx);
+        xobject_unref (ctx);
       }
       current_state = 7; return; case 7: g_assert_cmpstr (action, ==, "frob"); g_assert (saw_startup_id);
       saw_startup_id = FALSE;
@@ -137,7 +137,7 @@ saw_action (const xchar_t *action)
 }
 
 static void
-test_application_frob (GSimpleAction *action,
+test_application_frob (xsimple_action_t *action,
                        xvariant_t      *parameter,
                        xpointer_t       user_data)
 {
@@ -146,7 +146,7 @@ test_application_frob (GSimpleAction *action,
 }
 
 static void
-test_application_tweak (GSimpleAction *action,
+test_application_tweak (xsimple_action_t *action,
                         xvariant_t      *parameter,
                         xpointer_t       user_data)
 {
@@ -155,7 +155,7 @@ test_application_tweak (GSimpleAction *action,
 }
 
 static void
-test_application_twiddle (GSimpleAction *action,
+test_application_twiddle (xsimple_action_t *action,
                           xvariant_t      *parameter,
                           xpointer_t       user_data)
 {
@@ -164,16 +164,16 @@ test_application_twiddle (GSimpleAction *action,
 }
 
 static void
-test_application_quit (GSimpleAction *action,
+test_application_quit (xsimple_action_t *action,
                        xvariant_t      *parameter,
                        xpointer_t       user_data)
 {
-  GApplication *application = user_data;
+  xapplication_t *application = user_data;
 
-  g_application_quit (application);
+  xapplication_quit (application);
 }
 
-static const GActionEntry app_actions[] = {
+static const xaction_entry_t app_actions[] = {
   { "frob",         test_application_frob,    NULL, NULL, NULL, { 0 } },
   { "tweak",        test_application_tweak,   NULL, NULL, NULL, { 0 } },
   { "twiddle",      test_application_twiddle, NULL, NULL, NULL, { 0 } },
@@ -181,16 +181,16 @@ static const GActionEntry app_actions[] = {
 };
 
 static void
-test_application_activate (GApplication *application)
+test_application_activate (xapplication_t *application)
 {
   /* Unbalanced, but that's OK because we will quit() */
-  g_application_hold (application);
+  xapplication_hold (application);
 
   saw_action ("activate");
 }
 
 static void
-test_application_open (GApplication  *application,
+test_application_open (xapplication_t  *application,
                        xfile_t        **files,
                        xint_t           n_files,
                        const xchar_t   *hint)
@@ -200,34 +200,34 @@ test_application_open (GApplication  *application,
   g_assert_cmpstr (hint, ==, "");
 
   g_assert_cmpint (n_files, ==, 2);
-  f = g_file_new_for_uri ("file:///a/b");
-  g_assert (g_file_equal (files[0], f));
-  g_object_unref (f);
-  f = g_file_new_for_uri ("file:///c/d");
-  g_assert (g_file_equal (files[1], f));
-  g_object_unref (f);
+  f = xfile_new_for_uri ("file:///a/b");
+  g_assert (xfile_equal (files[0], f));
+  xobject_unref (f);
+  f = xfile_new_for_uri ("file:///c/d");
+  g_assert (xfile_equal (files[1], f));
+  xobject_unref (f);
 
   saw_action ("open");
 }
 
 static void
-test_application_startup (GApplication *application)
+test_application_startup (xapplication_t *application)
 {
   G_APPLICATION_CLASS (test_application_parent_class)
     ->startup (application);
 
-  g_action_map_add_action_entries (G_ACTION_MAP (application), app_actions, G_N_ELEMENTS (app_actions), application);
+  xaction_map_add_action_entries (G_ACTION_MAP (application), app_actions, G_N_ELEMENTS (app_actions), application);
 }
 
 static void
-test_application_before_emit (GApplication *application,
+test_application_before_emit (xapplication_t *application,
                               xvariant_t     *platform_data)
 {
   const xchar_t *startup_id;
 
   g_assert (!saw_startup_id);
 
-  if (!g_variant_lookup (platform_data, "desktop-startup-id", "&s", &startup_id))
+  if (!xvariant_lookup (platform_data, "desktop-startup-id", "&s", &startup_id))
     return;
 
   g_assert_cmpstr (startup_id, ==, "expected startup id");
@@ -240,7 +240,7 @@ test_application_init (TestApplication *app)
 }
 
 static void
-test_application_class_init (GApplicationClass *class)
+test_application_class_init (xapplication_class_t *class)
 {
   class->before_emit = test_application_before_emit;
   class->startup = test_application_startup;
@@ -263,17 +263,17 @@ test_dbus_appinfo (void)
   g_assert (appinfo != NULL);
   g_free (desktop_file);
 
-  app = g_object_new (test_application_get_type (),
+  app = xobject_new (test_application_get_type (),
                       "application-id", "org.gtk.test.dbusappinfo",
                       "flags", G_APPLICATION_HANDLES_OPEN,
                       NULL);
-  status = g_application_run (app, 1, (xchar_t **) argv);
+  status = xapplication_run (app, 1, (xchar_t **) argv);
 
   g_assert_cmpint (status, ==, 0);
   g_assert_cmpint (current_state, ==, 8);
 
-  g_object_unref (appinfo);
-  g_object_unref (app);
+  xobject_unref (appinfo);
+  xobject_unref (app);
 }
 
 static void
@@ -281,17 +281,17 @@ on_flatpak_launch_uris_finish (xobject_t *object,
                                xasync_result_t *result,
                                xpointer_t user_data)
 {
-  GApplication *app = user_data;
+  xapplication_t *app = user_data;
   xerror_t *error = NULL;
 
-  g_app_info_launch_uris_finish (G_APP_INFO (object), result, &error);
+  xapp_info_launch_uris_finish (G_APP_INFO (object), result, &error);
   g_assert_no_error (error);
 
-  g_application_release (app);
+  xapplication_release (app);
 }
 
 static void
-on_flatpak_activate (GApplication *app,
+on_flatpak_activate (xapplication_t *app,
                      xpointer_t user_data)
 {
   GDesktopAppInfo *flatpak_appinfo = user_data;
@@ -299,19 +299,19 @@ on_flatpak_activate (GApplication *app,
   xlist_t *uris;
 
   /* The app will be released in on_flatpak_launch_uris_finish */
-  g_application_hold (app);
+  xapplication_hold (app);
 
-  uri = g_filename_to_uri (g_desktop_app_info_get_filename (flatpak_appinfo), NULL, NULL);
+  uri = xfilename_to_uri (g_desktop_app_info_get_filename (flatpak_appinfo), NULL, NULL);
   g_assert_nonnull (uri);
-  uris = g_list_prepend (NULL, uri);
-  g_app_info_launch_uris_async (G_APP_INFO (flatpak_appinfo), uris, NULL,
+  uris = xlist_prepend (NULL, uri);
+  xapp_info_launch_uris_async (G_APP_INFO (flatpak_appinfo), uris, NULL,
                                 NULL, on_flatpak_launch_uris_finish, app);
-  g_list_free (uris);
+  xlist_free (uris);
   g_free (uri);
 }
 
 static void
-on_flatpak_open (GApplication  *app,
+on_flatpak_open (xapplication_t  *app,
                  xfile_t        **files,
                  xint_t           n_files,
                  const char    *hint)
@@ -319,12 +319,12 @@ on_flatpak_open (GApplication  *app,
   xfile_t *f;
 
   g_assert_cmpint (n_files, ==, 1);
-  g_test_message ("on_flatpak_open received file '%s'", g_file_peek_path (files[0]));
+  g_test_message ("on_flatpak_open received file '%s'", xfile_peek_path (files[0]));
 
   /* The file has been exported via the document portal */
-  f = g_file_new_for_uri ("file:///document-portal/document-id/org.gtk.test.dbusappinfo.flatpak.desktop");
-  g_assert_true (g_file_equal (files[0], f));
-  g_object_unref (f);
+  f = xfile_new_for_uri ("file:///document-portal/document-id/org.gtk.test.dbusappinfo.flatpak.desktop");
+  g_assert_true (xfile_equal (files[0], f));
+  xobject_unref (f);
 }
 
 static void
@@ -333,7 +333,7 @@ test_flatpak_doc_export (void)
   const xchar_t *argv[] = { "myapp", NULL };
   xchar_t *desktop_file = NULL;
   GDesktopAppInfo *flatpak_appinfo;
-  GApplication *app;
+  xapplication_t *app;
   int status;
 
   g_test_summary ("Test that files launched via Flatpak apps are made available via the document portal.");
@@ -345,17 +345,17 @@ test_flatpak_doc_export (void)
   g_assert_nonnull (flatpak_appinfo);
   g_free (desktop_file);
 
-  app = g_application_new ("org.gtk.test.dbusappinfo.flatpak",
+  app = xapplication_new ("org.gtk.test.dbusappinfo.flatpak",
                            G_APPLICATION_HANDLES_OPEN);
   g_signal_connect (app, "activate", G_CALLBACK (on_flatpak_activate),
                     flatpak_appinfo);
   g_signal_connect (app, "open", G_CALLBACK (on_flatpak_open), NULL);
 
-  status = g_application_run (app, 1, (xchar_t **) argv);
+  status = xapplication_run (app, 1, (xchar_t **) argv);
   g_assert_cmpint (status, ==, 0);
 
-  g_object_unref (app);
-  g_object_unref (flatpak_appinfo);
+  xobject_unref (app);
+  xobject_unref (flatpak_appinfo);
 }
 
 int

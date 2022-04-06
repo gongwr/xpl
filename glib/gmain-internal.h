@@ -26,7 +26,7 @@
 
 G_BEGIN_DECLS
 
-GSource *_g_main_create_unix_signal_watch (int signum);
+xsource_t *_g_main_create_unix_signal_watch (int signum);
 
 G_END_DECLS
 

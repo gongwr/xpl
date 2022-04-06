@@ -41,15 +41,15 @@ enum {
  * @short_description: Convert between charsets
  * @include: gio/gio.h
  *
- * #GCharsetConverter is an implementation of #GConverter based on
+ * #xcharset_converter_t is an implementation of #xconverter_t based on
  * GIConv.
  */
 
 static void g_charset_converter_iface_init          (GConverterIface *iface);
-static void g_charset_converter_initable_iface_init (GInitableIface  *iface);
+static void g_charset_converter_initable_iface_init (xinitable_iface_t  *iface);
 
 /**
- * GCharsetConverter:
+ * xcharset_converter_t:
  *
  * Conversions between character sets.
  */
@@ -64,7 +64,7 @@ struct _GCharsetConverter
   xuint_t n_fallback_errors;
 };
 
-G_DEFINE_TYPE_WITH_CODE (GCharsetConverter, g_charset_converter, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (xcharset_converter, g_charset_converter, XTYPE_OBJECT,
 			 G_IMPLEMENT_INTERFACE (XTYPE_CONVERTER,
 						g_charset_converter_iface_init);
 			 G_IMPLEMENT_INTERFACE (XTYPE_INITABLE,
@@ -73,7 +73,7 @@ G_DEFINE_TYPE_WITH_CODE (GCharsetConverter, g_charset_converter, XTYPE_OBJECT,
 static void
 g_charset_converter_finalize (xobject_t *object)
 {
-  GCharsetConverter *conv;
+  xcharset_converter_t *conv;
 
   conv = G_CHARSET_CONVERTER (object);
 
@@ -88,10 +88,10 @@ g_charset_converter_finalize (xobject_t *object)
 static void
 g_charset_converter_set_property (xobject_t      *object,
 				  xuint_t         prop_id,
-				  const GValue *value,
-				  GParamSpec   *pspec)
+				  const xvalue_t *value,
+				  xparam_spec_t   *pspec)
 {
-  GCharsetConverter *conv;
+  xcharset_converter_t *conv;
 
   conv = G_CHARSET_CONVERTER (object);
 
@@ -99,16 +99,16 @@ g_charset_converter_set_property (xobject_t      *object,
     {
     case PROP_TO_CHARSET:
       g_free (conv->to);
-      conv->to = g_value_dup_string (value);
+      conv->to = xvalue_dup_string (value);
       break;
 
     case PROP_FROM_CHARSET:
       g_free (conv->from);
-      conv->from = g_value_dup_string (value);
+      conv->from = xvalue_dup_string (value);
       break;
 
     case PROP_USE_FALLBACK:
-      conv->use_fallback = g_value_get_boolean (value);
+      conv->use_fallback = xvalue_get_boolean (value);
       break;
 
     default:
@@ -121,25 +121,25 @@ g_charset_converter_set_property (xobject_t      *object,
 static void
 g_charset_converter_get_property (xobject_t    *object,
 				  xuint_t       prop_id,
-				  GValue     *value,
-				  GParamSpec *pspec)
+				  xvalue_t     *value,
+				  xparam_spec_t *pspec)
 {
-  GCharsetConverter *conv;
+  xcharset_converter_t *conv;
 
   conv = G_CHARSET_CONVERTER (object);
 
   switch (prop_id)
     {
     case PROP_TO_CHARSET:
-      g_value_set_string (value, conv->to);
+      xvalue_set_string (value, conv->to);
       break;
 
     case PROP_FROM_CHARSET:
-      g_value_set_string (value, conv->from);
+      xvalue_set_string (value, conv->from);
       break;
 
     case PROP_USE_FALLBACK:
-      g_value_set_boolean (value, conv->use_fallback);
+      xvalue_set_boolean (value, conv->use_fallback);
       break;
 
     default:
@@ -157,7 +157,7 @@ g_charset_converter_class_init (GCharsetConverterClass *klass)
   gobject_class->get_property = g_charset_converter_get_property;
   gobject_class->set_property = g_charset_converter_set_property;
 
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
 				   PROP_TO_CHARSET,
 				   g_param_spec_string ("to-charset",
 							P_("To Charset"),
@@ -165,7 +165,7 @@ g_charset_converter_class_init (GCharsetConverterClass *klass)
 							NULL,
 							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
 							G_PARAM_STATIC_STRINGS));
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
 				   PROP_FROM_CHARSET,
 				   g_param_spec_string ("from-charset",
 							P_("From Charset"),
@@ -173,7 +173,7 @@ g_charset_converter_class_init (GCharsetConverterClass *klass)
 							NULL,
 							G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
 							G_PARAM_STATIC_STRINGS));
-  g_object_class_install_property (gobject_class,
+  xobject_class_install_property (gobject_class,
 				   PROP_USE_FALLBACK,
 				   g_param_spec_boolean ("use-fallback",
 							 P_("Fallback enabled"),
@@ -185,7 +185,7 @@ g_charset_converter_class_init (GCharsetConverterClass *klass)
 }
 
 static void
-g_charset_converter_init (GCharsetConverter *local)
+g_charset_converter_init (xcharset_converter_t *local)
 {
 }
 
@@ -196,20 +196,20 @@ g_charset_converter_init (GCharsetConverter *local)
  * @from_charset: source charset
  * @error: #xerror_t for error reporting, or %NULL to ignore.
  *
- * Creates a new #GCharsetConverter.
+ * Creates a new #xcharset_converter_t.
  *
- * Returns: a new #GCharsetConverter or %NULL on error.
+ * Returns: a new #xcharset_converter_t or %NULL on error.
  *
  * Since: 2.24
  **/
-GCharsetConverter *
+xcharset_converter_t *
 g_charset_converter_new (const xchar_t *to_charset,
 			 const xchar_t *from_charset,
 			 xerror_t      **error)
 {
-  GCharsetConverter *conv;
+  xcharset_converter_t *conv;
 
-  conv = g_initable_new (XTYPE_CHARSET_CONVERTER,
+  conv = xinitable_new (XTYPE_CHARSET_CONVERTER,
 			 NULL, error,
 			 "to-charset", to_charset,
 			 "from-charset", from_charset,
@@ -219,9 +219,9 @@ g_charset_converter_new (const xchar_t *to_charset,
 }
 
 static void
-g_charset_converter_reset (GConverter *converter)
+g_charset_converter_reset (xconverter_t *converter)
 {
-  GCharsetConverter *conv = G_CHARSET_CONVERTER (converter);
+  xcharset_converter_t *conv = G_CHARSET_CONVERTER (converter);
 
   if (conv->iconv == NULL)
     {
@@ -234,7 +234,7 @@ g_charset_converter_reset (GConverter *converter)
 }
 
 static GConverterResult
-g_charset_converter_convert (GConverter       *converter,
+g_charset_converter_convert (xconverter_t       *converter,
 			     const void       *inbuf,
 			     xsize_t             inbuf_size,
 			     void             *outbuf,
@@ -244,7 +244,7 @@ g_charset_converter_convert (GConverter       *converter,
 			     xsize_t            *bytes_written,
 			     xerror_t          **error)
 {
-  GCharsetConverter  *conv;
+  xcharset_converter_t  *conv;
   xsize_t res;
   GConverterResult ret;
   xchar_t *inbufp, *outbufp;
@@ -325,8 +325,8 @@ g_charset_converter_convert (GConverter       *converter,
 	      else
 		{
 		  const char hex[] = "0123456789ABCDEF";
-		  guint8 v = *(guint8 *)inbuf;
-		  guint8 *out = (guint8 *)outbuf;
+		  xuint8_t v = *(xuint8_t *)inbuf;
+		  xuint8_t *out = (xuint8_t *)outbuf;
 		  out[0] = '\\';
 		  out[1] = hex[(v & 0xf0) >> 4];
 		  out[2] = hex[(v & 0x0f) >> 0];
@@ -345,7 +345,7 @@ g_charset_converter_convert (GConverter       *converter,
 	default:
 	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		       _("Error during conversion: %s"),
-		       g_strerror (errsv));
+		       xstrerror (errsv));
 	  break;
 	}
       ret = G_CONVERTER_ERROR;
@@ -368,15 +368,15 @@ g_charset_converter_convert (GConverter       *converter,
 
 /**
  * g_charset_converter_set_use_fallback:
- * @converter: a #GCharsetConverter
+ * @converter: a #xcharset_converter_t
  * @use_fallback: %TRUE to use fallbacks
  *
- * Sets the #GCharsetConverter:use-fallback property.
+ * Sets the #xcharset_converter_t:use-fallback property.
  *
  * Since: 2.24
  */
 void
-g_charset_converter_set_use_fallback (GCharsetConverter *converter,
+g_charset_converter_set_use_fallback (xcharset_converter_t *converter,
 				      xboolean_t           use_fallback)
 {
   use_fallback = !!use_fallback;
@@ -384,29 +384,29 @@ g_charset_converter_set_use_fallback (GCharsetConverter *converter,
   if (converter->use_fallback != use_fallback)
     {
       converter->use_fallback = use_fallback;
-      g_object_notify (G_OBJECT (converter), "use-fallback");
+      xobject_notify (G_OBJECT (converter), "use-fallback");
     }
 }
 
 /**
  * g_charset_converter_get_use_fallback:
- * @converter: a #GCharsetConverter
+ * @converter: a #xcharset_converter_t
  *
- * Gets the #GCharsetConverter:use-fallback property.
+ * Gets the #xcharset_converter_t:use-fallback property.
  *
  * Returns: %TRUE if fallbacks are used by @converter
  *
  * Since: 2.24
  */
 xboolean_t
-g_charset_converter_get_use_fallback (GCharsetConverter *converter)
+g_charset_converter_get_use_fallback (xcharset_converter_t *converter)
 {
   return converter->use_fallback;
 }
 
 /**
  * g_charset_converter_get_num_fallbacks:
- * @converter: a #GCharsetConverter
+ * @converter: a #xcharset_converter_t
  *
  * Gets the number of fallbacks that @converter has applied so far.
  *
@@ -415,7 +415,7 @@ g_charset_converter_get_use_fallback (GCharsetConverter *converter)
  * Since: 2.24
  */
 xuint_t
-g_charset_converter_get_num_fallbacks (GCharsetConverter *converter)
+g_charset_converter_get_num_fallbacks (xcharset_converter_t *converter)
 {
   return converter->n_fallback_errors;
 }
@@ -428,11 +428,11 @@ g_charset_converter_iface_init (GConverterIface *iface)
 }
 
 static xboolean_t
-g_charset_converter_initable_init (GInitable     *initable,
+g_charset_converter_initable_init (xinitable_t     *initable,
 				   xcancellable_t  *cancellable,
 				   xerror_t       **error)
 {
-  GCharsetConverter  *conv;
+  xcharset_converter_t  *conv;
   int errsv;
 
   g_return_val_if_fail (X_IS_CHARSET_CONVERTER (initable), FALSE);
@@ -466,7 +466,7 @@ g_charset_converter_initable_init (GInitable     *initable,
 }
 
 static void
-g_charset_converter_initable_iface_init (GInitableIface *iface)
+g_charset_converter_initable_iface_init (xinitable_iface_t *iface)
 {
   iface->init = g_charset_converter_initable_init;
 }

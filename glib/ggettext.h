@@ -34,7 +34,7 @@
 G_BEGIN_DECLS
 
 XPL_AVAILABLE_IN_ALL
-const xchar_t *g_strip_context (const xchar_t *msgid,
+const xchar_t *xstrip_context (const xchar_t *msgid,
                               const xchar_t *msgval) G_GNUC_FORMAT(1);
 
 XPL_AVAILABLE_IN_ALL

@@ -20,7 +20,7 @@
 
 #include "gdbus-sessionbus.h"
 
-static GTestDBus *singleton = NULL;
+static xtest_dbus_t *singleton = NULL;
 
 void
 session_bus_up (void)

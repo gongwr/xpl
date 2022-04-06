@@ -20,8 +20,8 @@
 #include <gio/gio.h>
 
 static void
-active_notify_cb (GSocketService *service,
-                  GParamSpec     *pspec,
+active_notify_cb (xsocket_service_t *service,
+                  xparam_spec_t     *pspec,
                   xpointer_t        data)
 {
   xboolean_t *success = (xboolean_t *)data;
@@ -35,7 +35,7 @@ connected_cb (xobject_t      *client,
               xasync_result_t *result,
               xpointer_t      user_data)
 {
-  GSocketService *service = XSOCKET_SERVICE (user_data);
+  xsocket_service_t *service = XSOCKET_SERVICE (user_data);
   xsocket_connection_t *conn;
   xerror_t *error = NULL;
 
@@ -43,7 +43,7 @@ connected_cb (xobject_t      *client,
 
   conn = xsocket_client_connect_finish (XSOCKET_CLIENT (client), result, &error);
   g_assert_no_error (error);
-  g_object_unref (conn);
+  xobject_unref (conn);
 
   xsocket_service_stop (service);
   g_assert_false (xsocket_service_is_active (service));
@@ -55,16 +55,16 @@ test_start_stop (void)
   xboolean_t success = FALSE;
   xinet_address_t *iaddr;
   xsocket_address_t *saddr, *listening_addr;
-  GSocketService *service;
+  xsocket_service_t *service;
   xerror_t *error = NULL;
-  GSocketClient *client;
+  xsocket_client_t *client;
 
   iaddr = xinet_address_new_loopback (XSOCKET_FAMILY_IPV4);
   saddr = g_inet_socket_address_new (iaddr, 0);
-  g_object_unref (iaddr);
+  xobject_unref (iaddr);
 
-  /* instantiate with g_object_new so we can pass active = false */
-  service = g_object_new (XTYPE_SOCKET_SERVICE, "active", FALSE, NULL);
+  /* instantiate with xobject_new so we can pass active = false */
+  service = xobject_new (XTYPE_SOCKET_SERVICE, "active", FALSE, NULL);
   g_assert_false (xsocket_service_is_active (service));
 
   g_signal_connect (service, "notify::active", G_CALLBACK (active_notify_cb), &success);
@@ -77,32 +77,32 @@ test_start_stop (void)
                                  &listening_addr,
                                  &error);
   g_assert_no_error (error);
-  g_object_unref (saddr);
+  xobject_unref (saddr);
 
   client = xsocket_client_new ();
   xsocket_client_connect_async (client,
                                  XSOCKET_CONNECTABLE (listening_addr),
                                  NULL,
                                  connected_cb, service);
-  g_object_unref (client);
-  g_object_unref (listening_addr);
+  xobject_unref (client);
+  xobject_unref (listening_addr);
 
   xsocket_service_start (service);
   g_assert_true (xsocket_service_is_active (service));
 
   do
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
   while (!success);
 
-  g_object_unref (service);
+  xobject_unref (service);
 }
 
-GMutex mutex_712570;
-GCond cond_712570;
+xmutex_t mutex_712570;
+xcond_t cond_712570;
 xboolean_t finalized;  /* (atomic) */
 
 xtype_t test_threaded_socket_service_get_type (void);
-typedef GThreadedSocketService TestThreadedSocketService;
+typedef xthreaded_socket_service_t TestThreadedSocketService;
 typedef GThreadedSocketServiceClass TestThreadedSocketServiceClass;
 
 G_DEFINE_TYPE (TestThreadedSocketService, test_threaded_socket_service, XTYPE_THREADED_SOCKET_SERVICE)
@@ -134,16 +134,16 @@ test_threaded_socket_service_class_init (TestThreadedSocketServiceClass *klass)
 }
 
 static xboolean_t
-connection_cb (GThreadedSocketService *service,
+connection_cb (xthreaded_socket_service_t *service,
                xsocket_connection_t      *connection,
                xobject_t                *source_object,
                xpointer_t                user_data)
 {
-  GMainLoop *loop = user_data;
+  xmain_loop_t *loop = user_data;
 
   /* Since the connection attempt has come through to be handled, stop the main
-   * thread waiting for it; this causes the #GSocketService to be stopped. */
-  g_main_loop_quit (loop);
+   * thread waiting for it; this causes the #xsocket_service_t to be stopped. */
+  xmain_loop_quit (loop);
 
   /* Block until the main thread has dropped its ref to @service, so that we
    * will drop the final ref from this thread.
@@ -151,7 +151,7 @@ connection_cb (GThreadedSocketService *service,
   g_mutex_lock (&mutex_712570);
 
   /* The service should now have 1 ref owned by the current "run"
-   * signal emission, and another added by GThreadedSocketService for
+   * signal emission, and another added by xthreaded_socket_service_t for
    * this thread. Both will be dropped after we return.
    */
   g_assert_cmpint (G_OBJECT (service)->ref_count, ==, 2);
@@ -170,23 +170,23 @@ client_connected_cb (xobject_t      *client,
   conn = xsocket_client_connect_finish (XSOCKET_CLIENT (client), result, &error);
   g_assert_no_error (error);
 
-  g_object_unref (conn);
+  xobject_unref (conn);
 }
 
 static void
 test_threaded_712570 (void)
 {
-  GSocketService *service;
+  xsocket_service_t *service;
   xsocket_address_t *addr, *listening_addr;
-  GMainLoop *loop;
-  GSocketClient *client;
+  xmain_loop_t *loop;
+  xsocket_client_t *client;
   xerror_t *error = NULL;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=712570");
 
   g_mutex_lock (&mutex_712570);
 
-  service = g_object_new (test_threaded_socket_service_get_type (), NULL);
+  service = xobject_new (test_threaded_socket_service_get_type (), NULL);
 
   addr = g_inet_socket_address_new_from_string ("127.0.0.1", 0);
   xsocket_listener_add_address (XSOCKET_LISTENER (service),
@@ -197,9 +197,9 @@ test_threaded_712570 (void)
                                  &listening_addr,
                                  &error);
   g_assert_no_error (error);
-  g_object_unref (addr);
+  xobject_unref (addr);
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
   g_signal_connect (service, "run", G_CALLBACK (connection_cb), loop);
 
   client = xsocket_client_new ();
@@ -207,11 +207,11 @@ test_threaded_712570 (void)
                                  XSOCKET_CONNECTABLE (listening_addr),
                                  NULL,
                                  client_connected_cb, loop);
-  g_object_unref (client);
-  g_object_unref (listening_addr);
+  xobject_unref (client);
+  xobject_unref (listening_addr);
 
-  g_main_loop_run (loop);
-  g_main_loop_unref (loop);
+  xmain_loop_run (loop);
+  xmain_loop_unref (loop);
 
   /* Stop the service and then wait for it to asynchronously cancel
    * its outstanding accept() call (and drop the associated ref).
@@ -222,18 +222,18 @@ test_threaded_712570 (void)
   g_assert_false (xsocket_service_is_active (XSOCKET_SERVICE (service)));
 
   do
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
   while (G_OBJECT (service)->ref_count > 3);
 
-  /* Wait some more iterations, as #GTask results are deferred to the next
-   * #GMainContext iteration, and propagation of a #GTask result takes an
+  /* Wait some more iterations, as #xtask_t results are deferred to the next
+   * #xmain_context_t iteration, and propagation of a #xtask_t result takes an
    * additional ref on the source object. */
-  g_main_context_iteration (NULL, FALSE);
+  xmain_context_iteration (NULL, FALSE);
 
   /* Drop our ref, then unlock the mutex and wait for the service to be
    * finalized. (Without the fix for 712570 it would hang forever here.)
    */
-  g_object_unref (service);
+  xobject_unref (service);
 
   while (!g_atomic_int_get (&finalized))
     g_cond_wait (&cond_712570, &mutex_712570);
@@ -255,7 +255,7 @@ closed_read_write_async_cb (xsocket_connection_t *conn,
 
 typedef struct {
   xsocket_connection_t *conn;
-  guint8 *data;
+  xuint8_t *data;
 } WriteAsyncData;
 
 static void
@@ -274,7 +274,7 @@ written_read_write_async_cb (xoutput_stream_t *ostream,
   g_free (data->data);
   g_free (data);
 
-  res = g_output_stream_write_all_finish (ostream, result, &bytes_written, &error);
+  res = xoutput_stream_write_all_finish (ostream, result, &bytes_written, &error);
   g_assert_no_error (error);
   g_assert_true (res);
   g_assert_cmpuint (bytes_written, ==, 20);
@@ -284,7 +284,7 @@ written_read_write_async_cb (xoutput_stream_t *ostream,
                            NULL,
                            (xasync_ready_callback_t) closed_read_write_async_cb,
                            NULL);
-  g_object_unref (conn);
+  xobject_unref (conn);
 }
 
 static void
@@ -307,11 +307,11 @@ connected_read_write_async_cb (xobject_t      *client,
 
   data = g_new0 (WriteAsyncData, 1);
   data->conn = conn;
-  data->data = g_new0 (guint8, 20);
+  data->data = g_new0 (xuint8_t, 20);
   for (i = 0; i < 20; i++)
     data->data[i] = i;
 
-  g_output_stream_write_all_async (ostream,
+  xoutput_stream_write_all_async (ostream,
                                    data->data,
                                    20,
                                    G_PRIORITY_DEFAULT,
@@ -319,14 +319,14 @@ connected_read_write_async_cb (xobject_t      *client,
                                    (xasync_ready_callback_t) written_read_write_async_cb,
                                    data /* stolen */);
 
-  *sconn = g_object_ref (conn);
+  *sconn = xobject_ref (conn);
 }
 
 typedef struct {
   xsocket_connection_t *conn;
-  GOutputVector *vectors;
+  xoutput_vector_t *vectors;
   xuint_t n_vectors;
-  guint8 *data;
+  xuint8_t *data;
 } WritevAsyncData;
 
 static void
@@ -345,7 +345,7 @@ writtenv_read_write_async_cb (xoutput_stream_t *ostream,
   g_free (data->vectors);
   g_free (data);
 
-  res = g_output_stream_writev_all_finish (ostream, result, &bytes_written, &error);
+  res = xoutput_stream_writev_all_finish (ostream, result, &bytes_written, &error);
   g_assert_no_error (error);
   g_assert_true (res);
   g_assert_cmpuint (bytes_written, ==, 20);
@@ -355,7 +355,7 @@ writtenv_read_write_async_cb (xoutput_stream_t *ostream,
                            NULL,
                            (xasync_ready_callback_t) closed_read_write_async_cb,
                            NULL);
-  g_object_unref (conn);
+  xobject_unref (conn);
 }
 
 static void
@@ -378,9 +378,9 @@ connected_read_writev_async_cb (xobject_t      *client,
 
   data = g_new0 (WritevAsyncData, 1);
   data->conn = conn;
-  data->vectors = g_new0 (GOutputVector, 3);
+  data->vectors = g_new0 (xoutput_vector_t, 3);
   data->n_vectors = 3;
-  data->data = g_new0 (guint8, 20);
+  data->data = g_new0 (xuint8_t, 20);
   for (i = 0; i < 20; i++)
     data->data[i] = i;
 
@@ -391,7 +391,7 @@ connected_read_writev_async_cb (xobject_t      *client,
   data->vectors[2].buffer = data->data + 15;
   data->vectors[2].size = 5;
 
-  g_output_stream_writev_all_async (ostream,
+  xoutput_stream_writev_all_async (ostream,
                                     data->vectors,
                                     data->n_vectors,
                                     G_PRIORITY_DEFAULT,
@@ -399,12 +399,12 @@ connected_read_writev_async_cb (xobject_t      *client,
                                     (xasync_ready_callback_t) writtenv_read_write_async_cb,
                                     data /* stolen */);
 
-  *sconn = g_object_ref (conn);
+  *sconn = xobject_ref (conn);
 }
 
 typedef struct {
   xsocket_connection_t *conn;
-  guint8 *data;
+  xuint8_t *data;
 } ReadAsyncData;
 
 static void
@@ -417,16 +417,16 @@ read_read_write_async_cb (xinput_stream_t *istream,
   xboolean_t res;
   xsize_t bytes_read;
   xsocket_connection_t *conn;
-  const guint8 expected_data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+  const xuint8_t expected_data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
 
-  res = g_input_stream_read_all_finish (istream, result, &bytes_read, &error);
+  res = xinput_stream_read_all_finish (istream, result, &bytes_read, &error);
   g_assert_no_error (error);
   g_assert_true (res);
 
   g_assert_cmpmem (expected_data, sizeof expected_data, data->data, bytes_read);
 
   conn = data->conn;
-  g_object_set_data (G_OBJECT (conn), "test-data-read", GINT_TO_POINTER (TRUE));
+  xobject_set_data (G_OBJECT (conn), "test-data-read", GINT_TO_POINTER (TRUE));
 
   g_free (data->data);
   g_free (data);
@@ -436,11 +436,11 @@ read_read_write_async_cb (xinput_stream_t *istream,
                            NULL,
                            (xasync_ready_callback_t) closed_read_write_async_cb,
                            NULL);
-  g_object_unref (conn);
+  xobject_unref (conn);
 }
 
 static void
-incoming_read_write_async_cb (GSocketService    *service,
+incoming_read_write_async_cb (xsocket_service_t    *service,
                               xsocket_connection_t *conn,
                               xobject_t           *source_object,
                               xpointer_t           user_data)
@@ -452,10 +452,10 @@ incoming_read_write_async_cb (GSocketService    *service,
   istream = g_io_stream_get_input_stream (XIO_STREAM (conn));
 
   data = g_new0 (ReadAsyncData, 1);
-  data->conn = g_object_ref (conn);
-  data->data = g_new0 (guint8, 20);
+  data->conn = xobject_ref (conn);
+  data->data = g_new0 (xuint8_t, 20);
 
-  g_input_stream_read_all_async (istream,
+  xinput_stream_read_all_async (istream,
                                  data->data,
                                  20,
                                  G_PRIORITY_DEFAULT,
@@ -463,7 +463,7 @@ incoming_read_write_async_cb (GSocketService    *service,
                                  (xasync_ready_callback_t) read_read_write_async_cb,
                                  data /* stolen */);
 
-  *cconn = g_object_ref (conn);
+  *cconn = xobject_ref (conn);
 }
 
 static void
@@ -471,14 +471,14 @@ test_read_write_async_internal (xboolean_t writev)
 {
   xinet_address_t *iaddr;
   xsocket_address_t *saddr, *listening_addr;
-  GSocketService *service;
+  xsocket_service_t *service;
   xerror_t *error = NULL;
-  GSocketClient *client;
+  xsocket_client_t *client;
   xsocket_connection_t *sconn = NULL, *cconn = NULL;
 
   iaddr = xinet_address_new_loopback (XSOCKET_FAMILY_IPV4);
   saddr = g_inet_socket_address_new (iaddr, 0);
-  g_object_unref (iaddr);
+  xobject_unref (iaddr);
 
   service = xsocket_service_new ();
 
@@ -490,7 +490,7 @@ test_read_write_async_internal (xboolean_t writev)
                                  &listening_addr,
                                  &error);
   g_assert_no_error (error);
-  g_object_unref (saddr);
+  xobject_unref (saddr);
 
   g_signal_connect (service, "incoming", G_CALLBACK (incoming_read_write_async_cb), &sconn);
 
@@ -509,25 +509,25 @@ test_read_write_async_internal (xboolean_t writev)
                                    connected_read_write_async_cb,
                                    &cconn);
 
-  g_object_unref (client);
-  g_object_unref (listening_addr);
+  xobject_unref (client);
+  xobject_unref (listening_addr);
 
   xsocket_service_start (service);
   g_assert_true (xsocket_service_is_active (service));
 
   do
     {
-      g_main_context_iteration (NULL, TRUE);
+      xmain_context_iteration (NULL, TRUE);
     }
   while (!sconn || !cconn ||
          !g_io_stream_is_closed (XIO_STREAM (sconn)) ||
          !g_io_stream_is_closed (XIO_STREAM (cconn)));
 
-  g_assert_true (GPOINTER_TO_INT (g_object_get_data (G_OBJECT (sconn), "test-data-read")));
+  g_assert_true (GPOINTER_TO_INT (xobject_get_data (G_OBJECT (sconn), "test-data-read")));
 
-  g_object_unref (sconn);
-  g_object_unref (cconn);
-  g_object_unref (service);
+  xobject_unref (sconn);
+  xobject_unref (cconn);
+  xobject_unref (service);
 }
 
 /* Test if connecting to a socket service and asynchronously writing data on

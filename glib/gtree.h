@@ -35,12 +35,12 @@ G_BEGIN_DECLS
 
 #undef G_TREE_DEBUG
 
-typedef struct _GTree  GTree;
+typedef struct _GTree  xtree_t;
 
 /**
  * GTreeNode:
  *
- * An opaque type which identifies a specific node in a #GTree.
+ * An opaque type which identifies a specific node in a #xtree_t.
  *
  * Since: 2.68
  */
@@ -53,11 +53,11 @@ typedef xboolean_t (*GTraverseFunc) (xpointer_t  key,
 /**
  * GTraverseNodeFunc:
  * @node: a #GTreeNode
- * @data: user data passed to g_tree_foreach_node()
+ * @data: user data passed to xtree_foreach_node()
  *
- * Specifies the type of function passed to g_tree_foreach_node(). It is
+ * Specifies the type of function passed to xtree_foreach_node(). It is
  * passed each node, together with the @user_data parameter passed to
- * g_tree_foreach_node(). If the function returns %TRUE, the traversal is
+ * xtree_foreach_node(). If the function returns %TRUE, the traversal is
  * stopped.
  *
  * Returns: %TRUE to stop the traversal
@@ -69,108 +69,108 @@ typedef xboolean_t (*GTraverseNodeFunc) (GTreeNode *node,
 /* Balanced binary trees
  */
 XPL_AVAILABLE_IN_ALL
-GTree*   g_tree_new             (GCompareFunc      key_compare_func);
+xtree_t*   xtree_new             (GCompareFunc      key_compare_func);
 XPL_AVAILABLE_IN_ALL
-GTree*   g_tree_new_with_data   (GCompareDataFunc  key_compare_func,
+xtree_t*   xtree_new_with_data   (GCompareDataFunc  key_compare_func,
                                  xpointer_t          key_compare_data);
 XPL_AVAILABLE_IN_ALL
-GTree*   g_tree_new_full        (GCompareDataFunc  key_compare_func,
+xtree_t*   xtree_new_full        (GCompareDataFunc  key_compare_func,
                                  xpointer_t          key_compare_data,
-                                 GDestroyNotify    key_destroy_func,
-                                 GDestroyNotify    value_destroy_func);
+                                 xdestroy_notify_t    key_destroy_func,
+                                 xdestroy_notify_t    value_destroy_func);
 XPL_AVAILABLE_IN_2_68
-GTreeNode *g_tree_node_first (GTree *tree);
+GTreeNode *xtree_node_first (xtree_t *tree);
 XPL_AVAILABLE_IN_2_68
-GTreeNode *g_tree_node_last (GTree *tree);
+GTreeNode *xtree_node_last (xtree_t *tree);
 XPL_AVAILABLE_IN_2_68
-GTreeNode *g_tree_node_previous (GTreeNode *node);
+GTreeNode *xtree_node_previous (GTreeNode *node);
 XPL_AVAILABLE_IN_2_68
-GTreeNode *g_tree_node_next (GTreeNode *node);
+GTreeNode *xtree_node_next (GTreeNode *node);
 XPL_AVAILABLE_IN_ALL
-GTree*   g_tree_ref             (GTree            *tree);
+xtree_t*   xtree_ref             (xtree_t            *tree);
 XPL_AVAILABLE_IN_ALL
-void     g_tree_unref           (GTree            *tree);
+void     xtree_unref           (xtree_t            *tree);
 XPL_AVAILABLE_IN_ALL
-void     g_tree_destroy         (GTree            *tree);
+void     xtree_destroy         (xtree_t            *tree);
 XPL_AVAILABLE_IN_2_68
-GTreeNode *g_tree_insert_node (GTree *tree,
+GTreeNode *xtree_insert_node (xtree_t *tree,
                                xpointer_t key,
                                xpointer_t value);
 XPL_AVAILABLE_IN_ALL
-void     g_tree_insert          (GTree            *tree,
+void     xtree_insert          (xtree_t            *tree,
                                  xpointer_t          key,
                                  xpointer_t          value);
 XPL_AVAILABLE_IN_2_68
-GTreeNode *g_tree_replace_node (GTree *tree,
+GTreeNode *xtree_replace_node (xtree_t *tree,
                                 xpointer_t key,
                                 xpointer_t value);
 XPL_AVAILABLE_IN_ALL
-void     g_tree_replace         (GTree            *tree,
+void     xtree_replace         (xtree_t            *tree,
                                  xpointer_t          key,
                                  xpointer_t          value);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_tree_remove          (GTree            *tree,
-                                 gconstpointer     key);
+xboolean_t xtree_remove          (xtree_t            *tree,
+                                 xconstpointer     key);
 
 XPL_AVAILABLE_IN_2_70
-void     g_tree_remove_all      (GTree            *tree);
+void     xtree_remove_all      (xtree_t            *tree);
 
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_tree_steal           (GTree            *tree,
-                                 gconstpointer     key);
+xboolean_t xtree_steal           (xtree_t            *tree,
+                                 xconstpointer     key);
 XPL_AVAILABLE_IN_2_68
-xpointer_t g_tree_node_key (GTreeNode *node);
+xpointer_t xtree_node_key (GTreeNode *node);
 XPL_AVAILABLE_IN_2_68
-xpointer_t g_tree_node_value (GTreeNode *node);
+xpointer_t xtree_node_value (GTreeNode *node);
 XPL_AVAILABLE_IN_2_68
-GTreeNode *g_tree_lookup_node (GTree *tree,
-                               gconstpointer key);
+GTreeNode *xtree_lookup_node (xtree_t *tree,
+                               xconstpointer key);
 XPL_AVAILABLE_IN_ALL
-xpointer_t g_tree_lookup          (GTree            *tree,
-                                 gconstpointer     key);
+xpointer_t xtree_lookup          (xtree_t            *tree,
+                                 xconstpointer     key);
 XPL_AVAILABLE_IN_ALL
-xboolean_t g_tree_lookup_extended (GTree            *tree,
-                                 gconstpointer     lookup_key,
+xboolean_t xtree_lookup_extended (xtree_t            *tree,
+                                 xconstpointer     lookup_key,
                                  xpointer_t         *orig_key,
                                  xpointer_t         *value);
 XPL_AVAILABLE_IN_ALL
-void     g_tree_foreach         (GTree            *tree,
+void     xtree_foreach         (xtree_t            *tree,
                                  GTraverseFunc	   func,
                                  xpointer_t	   user_data);
 XPL_AVAILABLE_IN_2_68
-void g_tree_foreach_node (GTree *tree,
+void xtree_foreach_node (xtree_t *tree,
                           GTraverseNodeFunc func,
                           xpointer_t user_data);
 
 XPL_DEPRECATED
-void     g_tree_traverse        (GTree            *tree,
+void     xtree_traverse        (xtree_t            *tree,
                                  GTraverseFunc     traverse_func,
                                  GTraverseType     traverse_type,
                                  xpointer_t          user_data);
 
 XPL_AVAILABLE_IN_2_68
-GTreeNode *g_tree_search_node (GTree *tree,
+GTreeNode *xtree_search_node (xtree_t *tree,
                                GCompareFunc search_func,
-                               gconstpointer user_data);
+                               xconstpointer user_data);
 XPL_AVAILABLE_IN_ALL
-xpointer_t g_tree_search          (GTree            *tree,
+xpointer_t xtree_search          (xtree_t            *tree,
                                  GCompareFunc      search_func,
-                                 gconstpointer     user_data);
+                                 xconstpointer     user_data);
 XPL_AVAILABLE_IN_2_68
-GTreeNode *g_tree_lower_bound (GTree *tree,
-                               gconstpointer key);
+GTreeNode *xtree_lower_bound (xtree_t *tree,
+                               xconstpointer key);
 XPL_AVAILABLE_IN_2_68
-GTreeNode *g_tree_upper_bound (GTree *tree,
-                               gconstpointer key);
+GTreeNode *xtree_upper_bound (xtree_t *tree,
+                               xconstpointer key);
 XPL_AVAILABLE_IN_ALL
-xint_t     g_tree_height          (GTree            *tree);
+xint_t     xtree_height          (xtree_t            *tree);
 XPL_AVAILABLE_IN_ALL
-xint_t     g_tree_nnodes          (GTree            *tree);
+xint_t     xtree_nnodes          (xtree_t            *tree);
 
 #ifdef G_TREE_DEBUG
 /*< private >*/
 #ifndef __GTK_DOC_IGNORE__
-void g_tree_dump (GTree *tree);
+void xtree_dump (xtree_t *tree);
 #endif  /* !__GTK_DOC_IGNORE__ */
 #endif  /* G_TREE_DEBUG */
 

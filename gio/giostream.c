@@ -41,7 +41,7 @@
  * seekable streams, both streams may use the same position.
  *
  * Examples of #xio_stream_t objects are #xsocket_connection_t, which represents
- * a two-way network connection; and #GFileIOStream, which represents a
+ * a two-way network connection; and #xfile_io_stream_t, which represents a
  * file handle opened in read-write mode.
  *
  * To do the actual reading and writing you need to get the substreams
@@ -70,13 +70,13 @@
  * while there is a #xio_stream_t operation in progress.
  *
  * This is a product of individual stream operations being associated with a
- * given #GMainContext (the thread-default context at the time the operation was
+ * given #xmain_context_t (the thread-default context at the time the operation was
  * started), rather than entire streams being associated with a single
- * #GMainContext.
+ * #xmain_context_t.
  *
  * GIO may run operations on #GIOStreams from other (worker) threads, and this
  * may be exposed to application code in the behaviour of wrapper streams, such
- * as #GBufferedInputStream or #GTlsConnection. With such wrapper APIs,
+ * as #xbuffered_input_stream or #xtls_connection_t. With such wrapper APIs,
  * application code may only run operations on the base (wrapped) stream when
  * the wrapper stream is idle. Note that the semantics of such operations may
  * not be well-defined due to the state the wrapper stream leaves the base
@@ -134,23 +134,23 @@ g_io_stream_init (xio_stream_t *stream)
 static void
 g_io_stream_get_property (xobject_t    *object,
 			  xuint_t       prop_id,
-			  GValue     *value,
-			  GParamSpec *pspec)
+			  xvalue_t     *value,
+			  xparam_spec_t *pspec)
 {
   xio_stream_t *stream = XIO_STREAM (object);
 
   switch (prop_id)
     {
       case PROP_CLOSED:
-        g_value_set_boolean (value, stream->priv->closed);
+        xvalue_set_boolean (value, stream->priv->closed);
         break;
 
       case PROP_INPUT_STREAM:
-        g_value_set_object (value, g_io_stream_get_input_stream (stream));
+        xvalue_set_object (value, g_io_stream_get_input_stream (stream));
         break;
 
       case PROP_OUTPUT_STREAM:
-        g_value_set_object (value, g_io_stream_get_output_stream (stream));
+        xvalue_set_object (value, g_io_stream_get_output_stream (stream));
         break;
 
       default:
@@ -170,20 +170,20 @@ g_io_stream_class_init (xio_stream_class_t *klass)
   klass->close_async = g_io_stream_real_close_async;
   klass->close_finish = g_io_stream_real_close_finish;
 
-  g_object_class_install_property (gobject_class, PROP_CLOSED,
+  xobject_class_install_property (gobject_class, PROP_CLOSED,
                                    g_param_spec_boolean ("closed",
                                                          P_("Closed"),
                                                          P_("Is the stream closed"),
                                                          FALSE,
                                                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class, PROP_INPUT_STREAM,
+  xobject_class_install_property (gobject_class, PROP_INPUT_STREAM,
 				   g_param_spec_object ("input-stream",
 							P_("Input stream"),
 							P_("The xinput_stream_t to read from"),
 							XTYPE_INPUT_STREAM,
 							G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-  g_object_class_install_property (gobject_class, PROP_OUTPUT_STREAM,
+  xobject_class_install_property (gobject_class, PROP_OUTPUT_STREAM,
 				   g_param_spec_object ("output-stream",
 							P_("Output stream"),
 							P_("The xoutput_stream_t to write to"),
@@ -338,7 +338,7 @@ g_io_stream_real_close (xio_stream_t     *stream,
 {
   xboolean_t res;
 
-  res = g_output_stream_close (g_io_stream_get_output_stream (stream),
+  res = xoutput_stream_close (g_io_stream_get_output_stream (stream),
 			       cancellable, error);
 
   /* If this errored out, unset error so that we don't report
@@ -346,7 +346,7 @@ g_io_stream_real_close (xio_stream_t     *stream,
   if (error != NULL && *error != NULL)
     error = NULL;
 
-  res &= g_input_stream_close (g_io_stream_get_input_stream (stream),
+  res &= xinput_stream_close (g_io_stream_get_input_stream (stream),
 			       cancellable, error);
 
   return res;
@@ -437,24 +437,24 @@ async_ready_close_callback_wrapper (xobject_t      *source_object,
 {
   xio_stream_t *stream = XIO_STREAM (source_object);
   xio_stream_class_t *klass = XIO_STREAM_GET_CLASS (stream);
-  GTask *task = user_data;
+  xtask_t *task = user_data;
   xerror_t *error = NULL;
   xboolean_t success;
 
   stream->priv->closed = TRUE;
   g_io_stream_clear_pending (stream);
 
-  if (g_async_result_legacy_propagate_error (res, &error))
+  if (xasync_result_legacy_propagate_error (res, &error))
     success = FALSE;
   else
     success = klass->close_finish (stream, res, &error);
 
   if (error)
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
   else
-    g_task_return_boolean (task, success);
+    xtask_return_boolean (task, success);
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 /**
@@ -487,24 +487,24 @@ g_io_stream_close_async (xio_stream_t           *stream,
 {
   xio_stream_class_t *class;
   xerror_t *error = NULL;
-  GTask *task;
+  xtask_t *task;
 
   g_return_if_fail (X_IS_IO_STREAM (stream));
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_io_stream_close_async);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, g_io_stream_close_async);
 
   if (stream->priv->closed)
     {
-      g_task_return_boolean (task, TRUE);
-      g_object_unref (task);
+      xtask_return_boolean (task, TRUE);
+      xobject_unref (task);
       return;
     }
 
   if (!g_io_stream_set_pending (stream, &error))
     {
-      g_task_return_error (task, error);
-      g_object_unref (task);
+      xtask_return_error (task, error);
+      xobject_unref (task);
       return;
     }
 
@@ -533,14 +533,14 @@ g_io_stream_close_finish (xio_stream_t     *stream,
 			  xerror_t       **error)
 {
   g_return_val_if_fail (X_IS_IO_STREAM (stream), FALSE);
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 
 static void
-close_async_thread (GTask        *task,
+close_async_thread (xtask_t        *task,
                     xpointer_t      source_object,
                     xpointer_t      task_data,
                     xcancellable_t *cancellable)
@@ -554,16 +554,16 @@ close_async_thread (GTask        *task,
   if (class->close_fn)
     {
       result = class->close_fn (stream,
-                                g_task_get_cancellable (task),
+                                xtask_get_cancellable (task),
                                 &error);
       if (!result)
         {
-          g_task_return_error (task, error);
+          xtask_return_error (task, error);
           return;
         }
     }
 
-  g_task_return_boolean (task, TRUE);
+  xtask_return_boolean (task, TRUE);
 }
 
 typedef struct
@@ -577,10 +577,10 @@ stream_close_complete (xobject_t      *source,
                        xasync_result_t *result,
                        xpointer_t      user_data)
 {
-  GTask *task = user_data;
+  xtask_t *task = user_data;
   CloseAsyncData *data;
 
-  data = g_task_get_task_data (task);
+  data = xtask_get_task_data (task);
   data->pending--;
 
   if (X_IS_OUTPUT_STREAM (source))
@@ -590,26 +590,26 @@ stream_close_complete (xobject_t      *source,
       /* Match behaviour with the sync route and give precedent to the
        * error returned from closing the output stream.
        */
-      g_output_stream_close_finish (G_OUTPUT_STREAM (source), result, &error);
+      xoutput_stream_close_finish (G_OUTPUT_STREAM (source), result, &error);
       if (error)
         {
           if (data->error)
-            g_error_free (data->error);
+            xerror_free (data->error);
           data->error = error;
         }
     }
   else
-    g_input_stream_close_finish (G_INPUT_STREAM (source), result, data->error ? NULL : &data->error);
+    xinput_stream_close_finish (G_INPUT_STREAM (source), result, data->error ? NULL : &data->error);
 
   if (data->pending == 0)
     {
       if (data->error)
-        g_task_return_error (task, data->error);
+        xtask_return_error (task, data->error);
       else
-        g_task_return_boolean (task, TRUE);
+        xtask_return_boolean (task, TRUE);
 
       g_slice_free (CloseAsyncData, data);
-      g_object_unref (task);
+      xobject_unref (task);
     }
 }
 
@@ -622,23 +622,23 @@ g_io_stream_real_close_async (xio_stream_t           *stream,
 {
   xinput_stream_t *input;
   xoutput_stream_t *output;
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (stream, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_io_stream_real_close_async);
-  g_task_set_check_cancellable (task, FALSE);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (stream, cancellable, callback, user_data);
+  xtask_set_source_tag (task, g_io_stream_real_close_async);
+  xtask_set_check_cancellable (task, FALSE);
+  xtask_set_priority (task, io_priority);
 
   input = g_io_stream_get_input_stream (stream);
   output = g_io_stream_get_output_stream (stream);
 
-  if (g_input_stream_async_close_is_via_threads (input) && g_output_stream_async_close_is_via_threads (output))
+  if (xinput_stream_async_close_is_via_threads (input) && xoutput_stream_async_close_is_via_threads (output))
     {
       /* No sense in dispatching to the thread twice -- just do it all
        * in one go.
        */
-      g_task_run_in_thread (task, close_async_thread);
-      g_object_unref (task);
+      xtask_run_in_thread (task, close_async_thread);
+      xobject_unref (task);
     }
   else
     {
@@ -652,9 +652,9 @@ g_io_stream_real_close_async (xio_stream_t           *stream,
       data->error = NULL;
       data->pending = 2;
 
-      g_task_set_task_data (task, data, NULL);
-      g_input_stream_close_async (input, io_priority, cancellable, stream_close_complete, task);
-      g_output_stream_close_async (output, io_priority, cancellable, stream_close_complete, task);
+      xtask_set_task_data (task, data, NULL);
+      xinput_stream_close_async (input, io_priority, cancellable, stream_close_complete, task);
+      xoutput_stream_close_async (output, io_priority, cancellable, stream_close_complete, task);
     }
 }
 
@@ -663,9 +663,9 @@ g_io_stream_real_close_finish (xio_stream_t     *stream,
 			       xasync_result_t  *result,
 			       xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, stream), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }
 
 typedef struct
@@ -685,18 +685,18 @@ typedef struct
 static void
 splice_context_free (SpliceContext *ctx)
 {
-  g_object_unref (ctx->stream1);
-  g_object_unref (ctx->stream2);
+  xobject_unref (ctx->stream1);
+  xobject_unref (ctx->stream2);
   if (ctx->cancellable != NULL)
-    g_object_unref (ctx->cancellable);
-  g_object_unref (ctx->op1_cancellable);
-  g_object_unref (ctx->op2_cancellable);
+    xobject_unref (ctx->cancellable);
+  xobject_unref (ctx->op1_cancellable);
+  xobject_unref (ctx->op2_cancellable);
   g_clear_error (&ctx->error);
   g_slice_free (SpliceContext, ctx);
 }
 
 static void
-splice_complete (GTask         *task,
+splice_complete (xtask_t         *task,
                  SpliceContext *ctx)
 {
   if (ctx->cancelled_id != 0)
@@ -705,11 +705,11 @@ splice_complete (GTask         *task,
 
   if (ctx->error != NULL)
     {
-      g_task_return_error (task, ctx->error);
+      xtask_return_error (task, ctx->error);
       ctx->error = NULL;
     }
   else
-    g_task_return_boolean (task, TRUE);
+    xtask_return_boolean (task, TRUE);
 }
 
 static void
@@ -717,8 +717,8 @@ splice_close_cb (xobject_t      *iostream,
                  xasync_result_t *res,
                  xpointer_t      user_data)
 {
-  GTask *task = user_data;
-  SpliceContext *ctx = g_task_get_task_data (task);
+  xtask_t *task = user_data;
+  SpliceContext *ctx = xtask_get_task_data (task);
   xerror_t *error = NULL;
 
   g_io_stream_close_finish (XIO_STREAM (iostream), res, &error);
@@ -735,7 +735,7 @@ splice_close_cb (xobject_t      *iostream,
   if (ctx->completed == 4)
     splice_complete (task, ctx);
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 static void
@@ -743,17 +743,17 @@ splice_cb (xobject_t      *ostream,
            xasync_result_t *res,
            xpointer_t      user_data)
 {
-  GTask *task = user_data;
-  SpliceContext *ctx = g_task_get_task_data (task);
+  xtask_t *task = user_data;
+  SpliceContext *ctx = xtask_get_task_data (task);
   xerror_t *error = NULL;
 
-  g_output_stream_splice_finish (G_OUTPUT_STREAM (ostream), res, &error);
+  xoutput_stream_splice_finish (G_OUTPUT_STREAM (ostream), res, &error);
 
   ctx->completed++;
 
   /* ignore cancellation error if it was not requested by the user */
   if (error != NULL &&
-      g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED) &&
+      xerror_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED) &&
       (ctx->cancellable == NULL ||
        !g_cancellable_is_cancelled (ctx->cancellable)))
     g_clear_error (&error);
@@ -784,9 +784,9 @@ splice_cb (xobject_t      *ostream,
       if ((ctx->flags & G_IO_STREAM_SPLICE_CLOSE_STREAM1) != 0)
 	{
 	  g_io_stream_close_async (ctx->stream1,
-                                   g_task_get_priority (task),
+                                   xtask_get_priority (task),
                                    ctx->op1_cancellable,
-                                   splice_close_cb, g_object_ref (task));
+                                   splice_close_cb, xobject_ref (task));
 	}
       else
         ctx->completed++;
@@ -794,9 +794,9 @@ splice_cb (xobject_t      *ostream,
       if ((ctx->flags & G_IO_STREAM_SPLICE_CLOSE_STREAM2) != 0)
 	{
 	  g_io_stream_close_async (ctx->stream2,
-                                   g_task_get_priority (task),
+                                   xtask_get_priority (task),
                                    ctx->op2_cancellable,
-                                   splice_close_cb, g_object_ref (task));
+                                   splice_close_cb, xobject_ref (task));
 	}
       else
         ctx->completed++;
@@ -806,16 +806,16 @@ splice_cb (xobject_t      *ostream,
         splice_complete (task, ctx);
     }
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 static void
 splice_cancelled_cb (xcancellable_t *cancellable,
-                     GTask        *task)
+                     xtask_t        *task)
 {
   SpliceContext *ctx;
 
-  ctx = g_task_get_task_data (task);
+  ctx = xtask_get_task_data (task);
   g_cancellable_cancel (ctx->op1_cancellable);
   g_cancellable_cancel (ctx->op2_cancellable);
 }
@@ -849,14 +849,14 @@ g_io_stream_splice_async (xio_stream_t            *stream1,
                           xasync_ready_callback_t   callback,
                           xpointer_t              user_data)
 {
-  GTask *task;
+  xtask_t *task;
   SpliceContext *ctx;
   xinput_stream_t *istream;
   xoutput_stream_t *ostream;
 
   if (cancellable != NULL && g_cancellable_is_cancelled (cancellable))
     {
-      g_task_report_new_error (NULL, callback, user_data,
+      xtask_report_new_error (NULL, callback, user_data,
                                g_io_stream_splice_async,
                                G_IO_ERROR, G_IO_ERROR_CANCELLED,
                                "Operation has been cancelled");
@@ -864,38 +864,38 @@ g_io_stream_splice_async (xio_stream_t            *stream1,
     }
 
   ctx = g_slice_new0 (SpliceContext);
-  ctx->stream1 = g_object_ref (stream1);
-  ctx->stream2 = g_object_ref (stream2);
+  ctx->stream1 = xobject_ref (stream1);
+  ctx->stream2 = xobject_ref (stream2);
   ctx->flags = flags;
   ctx->op1_cancellable = g_cancellable_new ();
   ctx->op2_cancellable = g_cancellable_new ();
   ctx->completed = 0;
 
-  task = g_task_new (NULL, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_io_stream_splice_async);
-  g_task_set_task_data (task, ctx, (GDestroyNotify) splice_context_free);
+  task = xtask_new (NULL, cancellable, callback, user_data);
+  xtask_set_source_tag (task, g_io_stream_splice_async);
+  xtask_set_task_data (task, ctx, (xdestroy_notify_t) splice_context_free);
 
   if (cancellable != NULL)
     {
-      ctx->cancellable = g_object_ref (cancellable);
+      ctx->cancellable = xobject_ref (cancellable);
       ctx->cancelled_id = g_cancellable_connect (cancellable,
-          G_CALLBACK (splice_cancelled_cb), g_object_ref (task),
-          g_object_unref);
+          G_CALLBACK (splice_cancelled_cb), xobject_ref (task),
+          xobject_unref);
     }
 
   istream = g_io_stream_get_input_stream (stream1);
   ostream = g_io_stream_get_output_stream (stream2);
-  g_output_stream_splice_async (ostream, istream, G_OUTPUT_STREAM_SPLICE_NONE,
+  xoutput_stream_splice_async (ostream, istream, G_OUTPUT_STREAM_SPLICE_NONE,
       io_priority, ctx->op1_cancellable, splice_cb,
-      g_object_ref (task));
+      xobject_ref (task));
 
   istream = g_io_stream_get_input_stream (stream2);
   ostream = g_io_stream_get_output_stream (stream1);
-  g_output_stream_splice_async (ostream, istream, G_OUTPUT_STREAM_SPLICE_NONE,
+  xoutput_stream_splice_async (ostream, istream, G_OUTPUT_STREAM_SPLICE_NONE,
       io_priority, ctx->op2_cancellable, splice_cb,
-      g_object_ref (task));
+      xobject_ref (task));
 
-  g_object_unref (task);
+  xobject_unref (task);
 }
 
 /**
@@ -914,7 +914,7 @@ xboolean_t
 g_io_stream_splice_finish (xasync_result_t  *result,
                            xerror_t       **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, NULL), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, NULL), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }

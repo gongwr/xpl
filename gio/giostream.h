@@ -29,11 +29,11 @@
 G_BEGIN_DECLS
 
 #define XTYPE_IO_STREAM         (xio_stream_get_type ())
-#define XIO_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_IO_STREAM, xio_stream_t))
-#define XIO_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_IO_STREAM, xio_stream_class_t))
+#define XIO_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_IO_STREAM, xio_stream))
+#define XIO_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_IO_STREAM, xio_stream_class))
 #define X_IS_IO_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_IO_STREAM))
 #define X_IS_IO_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_IO_STREAM))
-#define XIO_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_IO_STREAM, xio_stream_class_t))
+#define XIO_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_IO_STREAM, xio_stream_class))
 
 typedef struct _xio_stream_private                            xio_stream_private_t;
 typedef struct _xio_stream_class                              xio_stream_class_t;

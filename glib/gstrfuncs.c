@@ -47,7 +47,7 @@
 #include <windows.h>
 #endif
 
-/* do not include <unistd.h> here, it may interfere with g_strsignal() */
+/* do not include <unistd.h> here, it may interfere with xstrsignal() */
 
 #include "gstrfuncs.h"
 
@@ -83,7 +83,7 @@
  * UTF-8 locale or your know your text is restricted to ASCII, avoid
  * using \%Ns. If your intention is to format strings for a
  * certain number of columns, then \%Ns is not a correct solution
- * anyway, since it fails to take wide characters (see g_unichar_iswide())
+ * anyway, since it fails to take wide characters (see xunichar_iswide())
  * into account.
  *
  * Note also that there are various printf() parameters which are platform
@@ -280,11 +280,11 @@
  */
 
 /**
- * g_strstrip:
+ * xstrstrip:
  * @string: a string to remove the leading and trailing whitespace from
  *
  * Removes leading and trailing whitespace from a string.
- * See g_strchomp() and g_strchug().
+ * See xstrchomp() and xstrchug().
  *
  * Returns: @string
  */
@@ -292,10 +292,10 @@
 /**
  * G_STR_DELIMITERS:
  *
- * The standard delimiters, used in g_strdelimit().
+ * The standard delimiters, used in xstrdelimit().
  */
 
-static const guint16 ascii_table_data[256] = {
+static const xuint16_t ascii_table_data[256] = {
   0x004, 0x004, 0x004, 0x004, 0x004, 0x004, 0x004, 0x004,
   0x004, 0x104, 0x104, 0x004, 0x104, 0x104, 0x004, 0x004,
   0x004, 0x004, 0x004, 0x004, 0x004, 0x004, 0x004, 0x004,
@@ -315,7 +315,7 @@ static const guint16 ascii_table_data[256] = {
   /* the upper 128 are all zeroes */
 };
 
-const guint16 * const g_ascii_table = ascii_table_data;
+const xuint16_t * const g_ascii_table = ascii_table_data;
 
 #if defined(HAVE_NEWLOCALE) && \
     defined(HAVE_USELOCALE)
@@ -340,7 +340,7 @@ get_C_locale (void)
 #endif
 
 /**
- * g_strdup:
+ * xstrdup:
  * @str: (nullable): the string to duplicate
  *
  * Duplicates a string. If @str is %NULL it returns %NULL.
@@ -350,7 +350,7 @@ get_C_locale (void)
  * Returns: a newly-allocated copy of @str
  */
 xchar_t*
-g_strdup (const xchar_t *str)
+xstrdup (const xchar_t *str)
 {
   xchar_t *new_str;
   xsize_t length;
@@ -382,7 +382,7 @@ g_strdup (const xchar_t *str)
  *     conversion
  */
 xpointer_t
-g_memdup (gconstpointer mem,
+g_memdup (xconstpointer mem,
           xuint_t         byte_size)
 {
   xpointer_t new_mem;
@@ -414,7 +414,7 @@ g_memdup (gconstpointer mem,
  * Since: 2.68
  */
 xpointer_t
-g_memdup2 (gconstpointer mem,
+g_memdup2 (xconstpointer mem,
            xsize_t         byte_size)
 {
   xpointer_t new_mem;
@@ -431,7 +431,7 @@ g_memdup2 (gconstpointer mem,
 }
 
 /**
- * g_strndup:
+ * xstrndup:
  * @str: the string to duplicate
  * @n: the maximum number of bytes to copy from @str
  *
@@ -442,13 +442,13 @@ g_memdup2 (gconstpointer mem,
  * needed.
  *
  * To copy a number of characters from a UTF-8 encoded string,
- * use g_utf8_strncpy() instead.
+ * use xutf8_strncpy() instead.
  *
  * Returns: a newly-allocated buffer containing the first @n bytes
  *     of @str, nul-terminated
  */
 xchar_t*
-g_strndup (const xchar_t *str,
+xstrndup (const xchar_t *str,
            xsize_t        n)
 {
   xchar_t *new_str;
@@ -466,7 +466,7 @@ g_strndup (const xchar_t *str,
 }
 
 /**
- * g_strnfill:
+ * xstrnfill:
  * @length: the length of the new string
  * @fill_char: the byte to fill the string with
  *
@@ -476,7 +476,7 @@ g_strndup (const xchar_t *str,
  * Returns: a newly-allocated string filled the @fill_char
  */
 xchar_t*
-g_strnfill (xsize_t length,
+xstrnfill (xsize_t length,
             xchar_t fill_char)
 {
   xchar_t *str;
@@ -523,7 +523,7 @@ g_stpcpy (xchar_t       *dest,
 }
 
 /**
- * g_strdup_vprintf:
+ * xstrdup_vprintf:
  * @format: (not nullable): a standard printf() format string, but notice
  *     [string precision pitfalls][string-precision]
  * @args: the list of parameters to insert into the format string
@@ -543,7 +543,7 @@ g_stpcpy (xchar_t       *dest,
  * Returns: a newly-allocated string holding the result
  */
 xchar_t*
-g_strdup_vprintf (const xchar_t *format,
+xstrdup_vprintf (const xchar_t *format,
                   va_list      args)
 {
   xchar_t *string = NULL;
@@ -554,7 +554,7 @@ g_strdup_vprintf (const xchar_t *format,
 }
 
 /**
- * g_strdup_printf:
+ * xstrdup_printf:
  * @format: (not nullable): a standard printf() format string, but notice
  *     [string precision pitfalls][string-precision]
  * @...: the parameters to insert into the format string
@@ -571,21 +571,21 @@ g_strdup_vprintf (const xchar_t *format,
  * Returns: a newly-allocated string holding the result
  */
 xchar_t*
-g_strdup_printf (const xchar_t *format,
+xstrdup_printf (const xchar_t *format,
                  ...)
 {
   xchar_t *buffer;
   va_list args;
 
   va_start (args, format);
-  buffer = g_strdup_vprintf (format, args);
+  buffer = xstrdup_vprintf (format, args);
   va_end (args);
 
   return buffer;
 }
 
 /**
- * g_strconcat:
+ * xstrconcat:
  * @string1: the first string to add, which must not be %NULL
  * @...: a %NULL-terminated list of strings to append to the string
  *
@@ -593,7 +593,7 @@ g_strdup_printf (const xchar_t *format,
  * returned string should be freed with g_free() when no longer needed.
  *
  * The variable argument list must end with %NULL. If you forget the %NULL,
- * g_strconcat() will start appending random memory junk to your string.
+ * xstrconcat() will start appending random memory junk to your string.
  *
  * Note that this function is usually not the right function to use to
  * assemble a translated message from pieces, since proper translation
@@ -602,7 +602,7 @@ g_strdup_printf (const xchar_t *format,
  * Returns: a newly-allocated string containing all the string arguments
  */
 xchar_t*
-g_strconcat (const xchar_t *string1, ...)
+xstrconcat (const xchar_t *string1, ...)
 {
   xsize_t   l;
   va_list args;
@@ -640,7 +640,7 @@ g_strconcat (const xchar_t *string1, ...)
 }
 
 /**
- * g_strtod:
+ * xstrtod:
  * @nptr:    the string to convert to a numeric value.
  * @endptr:  (out) (transfer none) (optional): if non-%NULL, it returns the
  *           character after the last character used in the conversion.
@@ -660,7 +660,7 @@ g_strconcat (const xchar_t *string1, ...)
  * Returns: the #xdouble_t value.
  **/
 xdouble_t
-g_strtod (const xchar_t *nptr,
+xstrtod (const xchar_t *nptr,
           xchar_t      **endptr)
 {
   xchar_t *fail_pos_1;
@@ -1050,7 +1050,7 @@ g_ascii_formatd (xchar_t       *buffer,
 
 #if !defined(USE_XLOCALE) || !defined(HAVE_STRTOULL_L) || !defined(HAVE_STRTOLL_L)
 
-static guint64
+static xuint64_t
 g_parse_long_long (const xchar_t  *nptr,
                    const xchar_t **endptr,
                    xuint_t         base,
@@ -1063,9 +1063,9 @@ g_parse_long_long (const xchar_t  *nptr,
    *        Free Software Foundation, Inc.
    */
   xboolean_t overflow;
-  guint64 cutoff;
-  guint64 cutlim;
-  guint64 ui64;
+  xuint64_t cutoff;
+  xuint64_t cutlim;
+  xuint64_t ui64;
   const xchar_t *s, *save;
   guchar c;
 
@@ -1182,14 +1182,14 @@ g_parse_long_long (const xchar_t  *nptr,
  *           character after the last character used in the conversion.
  * @base:    to be used for the conversion, 2..36 or 0
  *
- * Converts a string to a #guint64 value.
+ * Converts a string to a #xuint64_t value.
  * This function behaves like the standard strtoull() function
  * does in the C locale. It does this without actually
  * changing the current locale, since that would not be
  * thread-safe.
  *
  * Note that input with a leading minus sign (`-`) is accepted, and will return
- * the negation of the parsed number, unless that would overflow a #guint64.
+ * the negation of the parsed number, unless that would overflow a #xuint64_t.
  * Critically, this means you cannot assume that a short fixed length input will
  * never result in a low return value, as the input could have a leading `-`.
  *
@@ -1205,11 +1205,11 @@ g_parse_long_long (const xchar_t  *nptr,
  * If the string conversion fails, zero is returned, and @endptr returns
  * @nptr (if @endptr is non-%NULL).
  *
- * Returns: the #guint64 value or zero on error.
+ * Returns: the #xuint64_t value or zero on error.
  *
  * Since: 2.2
  */
-guint64
+xuint64_t
 g_ascii_strtoull (const xchar_t *nptr,
                   xchar_t      **endptr,
                   xuint_t        base)
@@ -1218,7 +1218,7 @@ g_ascii_strtoull (const xchar_t *nptr,
   return strtoull_l (nptr, endptr, base, get_C_locale ());
 #else
   xboolean_t negative;
-  guint64 result;
+  xuint64_t result;
 
   result = g_parse_long_long (nptr, (const xchar_t **) endptr, base, &negative);
 
@@ -1265,16 +1265,16 @@ g_ascii_strtoll (const xchar_t *nptr,
   return strtoll_l (nptr, endptr, base, get_C_locale ());
 #else
   xboolean_t negative;
-  guint64 result;
+  xuint64_t result;
 
   result = g_parse_long_long (nptr, (const xchar_t **) endptr, base, &negative);
 
-  if (negative && result > (guint64) G_MININT64)
+  if (negative && result > (xuint64_t) G_MININT64)
     {
       errno = ERANGE;
       return G_MININT64;
     }
-  else if (!negative && result > (guint64) G_MAXINT64)
+  else if (!negative && result > (xuint64_t) G_MAXINT64)
     {
       errno = ERANGE;
       return G_MAXINT64;
@@ -1287,7 +1287,7 @@ g_ascii_strtoll (const xchar_t *nptr,
 }
 
 /**
- * g_strerror:
+ * xstrerror:
  * @errnum: the system error number. See the standard C %errno
  *     documentation
  *
@@ -1307,26 +1307,26 @@ g_ascii_strtoll (const xchar_t *nptr,
  *   ret = read (blah);
  *   saved_errno = errno;
  *
- *   g_strerror (saved_errno);
+ *   xstrerror (saved_errno);
  * ]|
  *
  * Returns: a UTF-8 string describing the error code. If the error code
  *     is unknown, it returns a string like "unknown error (<code>)".
  */
 const xchar_t *
-g_strerror (xint_t errnum)
+xstrerror (xint_t errnum)
 {
-  static GHashTable *errors;
+  static xhashtable_t *errors;
   G_LOCK_DEFINE_STATIC (errors);
   const xchar_t *msg;
   xint_t saved_errno = errno;
 
   G_LOCK (errors);
   if (errors)
-    msg = g_hash_table_lookup (errors, GINT_TO_POINTER (errnum));
+    msg = xhash_table_lookup (errors, GINT_TO_POINTER (errnum));
   else
     {
-      errors = g_hash_table_new (NULL, NULL);
+      errors = xhash_table_new (NULL, NULL);
       msg = NULL;
     }
 
@@ -1347,7 +1347,7 @@ g_strerror (xint_t errnum)
       msg = buf;
 #  endif /* HAVE_STRERROR_R */
 #else
-      g_strlcpy (buf, strerror (errnum), sizeof (buf));
+      xstrlcpy (buf, strerror (errnum), sizeof (buf));
       msg = buf;
 #endif
       if (!g_get_console_charset (NULL))
@@ -1357,9 +1357,9 @@ g_strerror (xint_t errnum)
             g_print ("%s\n", error->message);
         }
       else if (msg == (const xchar_t *)buf)
-        msg = g_strdup (buf);
+        msg = xstrdup (buf);
 
-      g_hash_table_insert (errors, GINT_TO_POINTER (errnum), (char *) msg);
+      xhash_table_insert (errors, GINT_TO_POINTER (errnum), (char *) msg);
     }
   G_UNLOCK (errors);
 
@@ -1368,7 +1368,7 @@ g_strerror (xint_t errnum)
 }
 
 /**
- * g_strsignal:
+ * xstrsignal:
  * @signum: the signal number. See the `signal` documentation
  *
  * Returns a string describing the given signal, e.g. "Segmentation fault".
@@ -1380,7 +1380,7 @@ g_strerror (xint_t errnum)
  *     it returns "unknown signal (<signum>)".
  */
 const xchar_t *
-g_strsignal (xint_t signum)
+xstrsignal (xint_t signum)
 {
   xchar_t *msg;
   xchar_t *tofree;
@@ -1395,14 +1395,14 @@ g_strsignal (xint_t signum)
 #endif
 
   if (!msg)
-    msg = tofree = g_strdup_printf ("unknown signal (%d)", signum);
+    msg = tofree = xstrdup_printf ("unknown signal (%d)", signum);
   ret = g_intern_string (msg);
   g_free (tofree);
 
   return ret;
 }
 
-/* Functions g_strlcpy and g_strlcat were originally developed by
+/* Functions xstrlcpy and xstrlcat were originally developed by
  * Todd C. Miller <Todd.Miller@courtesan.com> to simplify writing secure code.
  * See http://www.openbsd.org/cgi-bin/man.cgi?query=strlcpy
  * for more information.
@@ -1411,7 +1411,7 @@ g_strsignal (xint_t signum)
 #ifdef HAVE_STRLCPY
 /* Use the native ones, if available; they might be implemented in assembly */
 xsize_t
-g_strlcpy (xchar_t       *dest,
+xstrlcpy (xchar_t       *dest,
            const xchar_t *src,
            xsize_t        dest_size)
 {
@@ -1422,7 +1422,7 @@ g_strlcpy (xchar_t       *dest,
 }
 
 xsize_t
-g_strlcat (xchar_t       *dest,
+xstrlcat (xchar_t       *dest,
            const xchar_t *src,
            xsize_t        dest_size)
 {
@@ -1434,7 +1434,7 @@ g_strlcat (xchar_t       *dest,
 
 #else /* ! HAVE_STRLCPY */
 /**
- * g_strlcpy:
+ * xstrlcpy:
  * @dest: destination buffer
  * @src: source buffer
  * @dest_size: length of @dest in bytes
@@ -1451,13 +1451,13 @@ g_strlcat (xchar_t       *dest,
  * @retval >= @dest_size, truncation occurred.
  *
  * Caveat: strlcpy() is supposedly more secure than strcpy() or strncpy(),
- * but if you really want to avoid screwups, g_strdup() is an even better
+ * but if you really want to avoid screwups, xstrdup() is an even better
  * idea.
  *
  * Returns: length of @src
  */
 xsize_t
-g_strlcpy (xchar_t       *dest,
+xstrlcpy (xchar_t       *dest,
            const xchar_t *src,
            xsize_t        dest_size)
 {
@@ -1493,7 +1493,7 @@ g_strlcpy (xchar_t       *dest,
 }
 
 /**
- * g_strlcat:
+ * xstrlcat:
  * @dest: destination buffer, already containing one nul-terminated string
  * @src: source buffer
  * @dest_size: length of @dest buffer in bytes (not length of existing string
@@ -1511,14 +1511,14 @@ g_strlcpy (xchar_t       *dest,
  * characters of dest to start with).
  *
  * Caveat: this is supposedly a more secure alternative to strcat() or
- * strncat(), but for real security g_strconcat() is harder to mess up.
+ * strncat(), but for real security xstrconcat() is harder to mess up.
  *
  * Returns: size of attempted result, which is MIN (dest_size, strlen
  *     (original dest)) + strlen (src), so if retval >= dest_size,
  *     truncation occurred.
  */
 xsize_t
-g_strlcat (xchar_t       *dest,
+xstrlcat (xchar_t       *dest,
            const xchar_t *src,
            xsize_t        dest_size)
 {
@@ -1564,20 +1564,20 @@ g_strlcat (xchar_t       *dest,
  * Returns: a newly-allocated string, with all the upper case
  *     characters in @str converted to lower case, with semantics that
  *     exactly match g_ascii_tolower(). (Note that this is unlike the
- *     old g_strdown(), which modified the string in place.)
+ *     old xstrdown(), which modified the string in place.)
  */
 xchar_t*
 g_ascii_strdown (const xchar_t *str,
-                 gssize       len)
+                 xssize_t       len)
 {
   xchar_t *result, *s;
 
   g_return_val_if_fail (str != NULL, NULL);
 
   if (len < 0)
-    len = (gssize) strlen (str);
+    len = (xssize_t) strlen (str);
 
-  result = g_strndup (str, (xsize_t) len);
+  result = xstrndup (str, (xsize_t) len);
   for (s = result; *s; s++)
     *s = g_ascii_tolower (*s);
 
@@ -1594,20 +1594,20 @@ g_ascii_strdown (const xchar_t *str,
  * Returns: a newly allocated string, with all the lower case
  *     characters in @str converted to upper case, with semantics that
  *     exactly match g_ascii_toupper(). (Note that this is unlike the
- *     old g_strup(), which modified the string in place.)
+ *     old xstrup(), which modified the string in place.)
  */
 xchar_t*
 g_ascii_strup (const xchar_t *str,
-               gssize       len)
+               xssize_t       len)
 {
   xchar_t *result, *s;
 
   g_return_val_if_fail (str != NULL, NULL);
 
   if (len < 0)
-    len = (gssize) strlen (str);
+    len = (xssize_t) strlen (str);
 
-  result = g_strndup (str, (xsize_t) len);
+  result = xstrndup (str, (xsize_t) len);
   for (s = result; *s; s++)
     *s = g_ascii_toupper (*s);
 
@@ -1615,7 +1615,7 @@ g_ascii_strup (const xchar_t *str,
 }
 
 /**
- * g_str_is_ascii:
+ * xstr_is_ascii:
  * @str: a string
  *
  * Determines if a string is pure ASCII. A string is pure ASCII if it
@@ -1626,7 +1626,7 @@ g_ascii_strup (const xchar_t *str,
  * Since: 2.40
  */
 xboolean_t
-g_str_is_ascii (const xchar_t *str)
+xstr_is_ascii (const xchar_t *str)
 {
   xsize_t i;
 
@@ -1638,7 +1638,7 @@ g_str_is_ascii (const xchar_t *str)
 }
 
 /**
- * g_strdown:
+ * xstrdown:
  * @string: the string to convert.
  *
  * Converts a string to lower case.
@@ -1646,11 +1646,11 @@ g_str_is_ascii (const xchar_t *str)
  * Returns: the string
  *
  * Deprecated:2.2: This function is totally broken for the reasons discussed
- * in the g_strncasecmp() docs - use g_ascii_strdown() or g_utf8_strdown()
+ * in the xstrncasecmp() docs - use g_ascii_strdown() or xutf8_strdown()
  * instead.
  **/
 xchar_t*
-g_strdown (xchar_t *string)
+xstrdown (xchar_t *string)
 {
   guchar *s;
 
@@ -1669,7 +1669,7 @@ g_strdown (xchar_t *string)
 }
 
 /**
- * g_strup:
+ * xstrup:
  * @string: the string to convert
  *
  * Converts a string to upper case.
@@ -1677,11 +1677,11 @@ g_strdown (xchar_t *string)
  * Returns: the string
  *
  * Deprecated:2.2: This function is totally broken for the reasons
- *     discussed in the g_strncasecmp() docs - use g_ascii_strup()
- *     or g_utf8_strup() instead.
+ *     discussed in the xstrncasecmp() docs - use g_ascii_strup()
+ *     or xutf8_strup() instead.
  */
 xchar_t*
-g_strup (xchar_t *string)
+xstrup (xchar_t *string)
 {
   guchar *s;
 
@@ -1700,20 +1700,20 @@ g_strup (xchar_t *string)
 }
 
 /**
- * g_strreverse:
+ * xstrreverse:
  * @string: the string to reverse
  *
  * Reverses all of the bytes in a string. For example,
- * `g_strreverse ("abcdef")` will result in "fedcba".
+ * `xstrreverse ("abcdef")` will result in "fedcba".
  *
- * Note that g_strreverse() doesn't work on UTF-8 strings
+ * Note that xstrreverse() doesn't work on UTF-8 strings
  * containing multibyte characters. For that purpose, use
- * g_utf8_strreverse().
+ * xutf8_strreverse().
  *
  * Returns: the same pointer passed in as @string
  */
 xchar_t*
-g_strreverse (xchar_t *string)
+xstrreverse (xchar_t *string)
 {
   g_return_val_if_fail (string != NULL, NULL);
 
@@ -1790,7 +1790,7 @@ g_ascii_toupper (xchar_t c)
  * @c: an ASCII character
  *
  * Determines the numeric value of a character as a decimal digit.
- * Differs from g_unichar_digit_value() because it takes a char, so
+ * Differs from xunichar_digit_value() because it takes a char, so
  * there's no worry about sign extension if characters are signed.
  *
  * Returns: If @c is a decimal digit (according to g_ascii_isdigit()),
@@ -1809,7 +1809,7 @@ g_ascii_digit_value (xchar_t c)
  * @c: an ASCII character.
  *
  * Determines the numeric value of a character as a hexadecimal
- * digit. Differs from g_unichar_xdigit_value() because it takes
+ * digit. Differs from xunichar_xdigit_value() because it takes
  * a char, so there's no worry about sign extension if characters
  * are signed.
  *
@@ -1920,7 +1920,7 @@ g_ascii_strncasecmp (const xchar_t *s1,
 }
 
 /**
- * g_strcasecmp:
+ * xstrcasecmp:
  * @s1: a string
  * @s2: a string to compare with @s1
  *
@@ -1930,11 +1930,11 @@ g_ascii_strncasecmp (const xchar_t *s1,
  * Returns: 0 if the strings match, a negative value if @s1 < @s2,
  *     or a positive value if @s1 > @s2.
  *
- * Deprecated:2.2: See g_strncasecmp() for a discussion of why this
+ * Deprecated:2.2: See xstrncasecmp() for a discussion of why this
  *     function is deprecated and how to replace it.
  */
 xint_t
-g_strcasecmp (const xchar_t *s1,
+xstrcasecmp (const xchar_t *s1,
               const xchar_t *s2)
 {
 #ifdef HAVE_STRCASECMP
@@ -1965,36 +1965,36 @@ g_strcasecmp (const xchar_t *s1,
 }
 
 /**
- * g_strncasecmp:
+ * xstrncasecmp:
  * @s1: a string
  * @s2: a string to compare with @s1
  * @n: the maximum number of characters to compare
  *
  * A case-insensitive string comparison, corresponding to the standard
  * strncasecmp() function on platforms which support it. It is similar
- * to g_strcasecmp() except it only compares the first @n characters of
+ * to xstrcasecmp() except it only compares the first @n characters of
  * the strings.
  *
  * Returns: 0 if the strings match, a negative value if @s1 < @s2,
  *     or a positive value if @s1 > @s2.
  *
- * Deprecated:2.2: The problem with g_strncasecmp() is that it does
+ * Deprecated:2.2: The problem with xstrncasecmp() is that it does
  *     the comparison by calling toupper()/tolower(). These functions
  *     are locale-specific and operate on single bytes. However, it is
  *     impossible to handle things correctly from an internationalization
  *     standpoint by operating on bytes, since characters may be multibyte.
- *     Thus g_strncasecmp() is broken if your string is guaranteed to be
+ *     Thus xstrncasecmp() is broken if your string is guaranteed to be
  *     ASCII, since it is locale-sensitive, and it's broken if your string
  *     is localized, since it doesn't work on many encodings at all,
  *     including UTF-8, EUC-JP, etc.
  *
  *     There are therefore two replacement techniques: g_ascii_strncasecmp(),
  *     which only works on ASCII and is not locale-sensitive, and
- *     g_utf8_casefold() followed by strcmp() on the resulting strings,
+ *     xutf8_casefold() followed by strcmp() on the resulting strings,
  *     which is good for case-insensitive sorting of UTF-8.
  */
 xint_t
-g_strncasecmp (const xchar_t *s1,
+xstrncasecmp (const xchar_t *s1,
                const xchar_t *s2,
                xuint_t n)
 {
@@ -2027,7 +2027,7 @@ g_strncasecmp (const xchar_t *s1,
 }
 
 /**
- * g_strdelimit:
+ * xstrdelimit:
  * @string: the string to convert
  * @delimiters: (nullable): a string containing the current delimiters,
  *     or %NULL to use the standard delimiters defined in %G_STR_DELIMITERS
@@ -2042,13 +2042,13 @@ g_strncasecmp (const xchar_t *s1,
  * The return value is to allow nesting such as:
  *
  * |[<!-- language="C" -->
- *   g_ascii_strup (g_strdelimit (str, "abc", '?'))
+ *   g_ascii_strup (xstrdelimit (str, "abc", '?'))
  * ]|
  *
- * In order to modify a copy, you may use g_strdup():
+ * In order to modify a copy, you may use xstrdup():
  *
  * |[<!-- language="C" -->
- *   reformatted = g_strdelimit (g_strdup (const_str), "abc", '?');
+ *   reformatted = xstrdelimit (xstrdup (const_str), "abc", '?');
  *   ...
  *   g_free (reformatted);
  * ]|
@@ -2056,7 +2056,7 @@ g_strncasecmp (const xchar_t *s1,
  * Returns: the modified @string
  */
 xchar_t *
-g_strdelimit (xchar_t       *string,
+xstrdelimit (xchar_t       *string,
               const xchar_t *delimiters,
               xchar_t        new_delim)
 {
@@ -2077,7 +2077,7 @@ g_strdelimit (xchar_t       *string,
 }
 
 /**
- * g_strcanon:
+ * xstrcanon:
  * @string: a nul-terminated array of bytes
  * @valid_chars: bytes permitted in @string
  * @substitutor: replacement character for disallowed bytes
@@ -2089,13 +2089,13 @@ g_strdelimit (xchar_t       *string,
  * return value is to allow nesting such as:
  *
  * |[<!-- language="C" -->
- *   g_ascii_strup (g_strcanon (str, "abc", '?'))
+ *   g_ascii_strup (xstrcanon (str, "abc", '?'))
  * ]|
  *
- * In order to modify a copy, you may use g_strdup():
+ * In order to modify a copy, you may use xstrdup():
  *
  * |[<!-- language="C" -->
- *   reformatted = g_strcanon (g_strdup (const_str), "abc", '?');
+ *   reformatted = xstrcanon (xstrdup (const_str), "abc", '?');
  *   ...
  *   g_free (reformatted);
  * ]|
@@ -2103,7 +2103,7 @@ g_strdelimit (xchar_t       *string,
  * Returns: the modified @string
  */
 xchar_t *
-g_strcanon (xchar_t       *string,
+xstrcanon (xchar_t       *string,
             const xchar_t *valid_chars,
             xchar_t        substitutor)
 {
@@ -2122,18 +2122,18 @@ g_strcanon (xchar_t       *string,
 }
 
 /**
- * g_strcompress:
+ * xstrcompress:
  * @source: a string to compress
  *
  * Replaces all escaped characters with their one byte equivalent.
  *
- * This function does the reverse conversion of g_strescape().
+ * This function does the reverse conversion of xstrescape().
  *
  * Returns: a newly-allocated copy of @source with all escaped
  *     character compressed
  */
 xchar_t *
-g_strcompress (const xchar_t *source)
+xstrcompress (const xchar_t *source)
 {
   const xchar_t *p = source, *octal;
   xchar_t *dest;
@@ -2152,7 +2152,7 @@ g_strcompress (const xchar_t *source)
           switch (*p)
             {
             case '\0':
-              g_warning ("g_strcompress: trailing \\");
+              g_warning ("xstrcompress: trailing \\");
               goto out;
             case '0':  case '1':  case '2':  case '3':  case '4':
             case '5':  case '6':  case '7':
@@ -2200,7 +2200,7 @@ out:
 }
 
 /**
- * g_strescape:
+ * xstrescape:
  * @source: a string to escape
  * @exceptions: (nullable): a string of characters not to escape in @source
  *
@@ -2211,13 +2211,13 @@ out:
  * replaced with a '\' followed by their octal representation.
  * Characters supplied in @exceptions are not escaped.
  *
- * g_strcompress() does the reverse conversion.
+ * xstrcompress() does the reverse conversion.
  *
  * Returns: a newly-allocated copy of @source with certain
  *     characters escaped. See above.
  */
 xchar_t *
-g_strescape (const xchar_t *source,
+xstrescape (const xchar_t *source,
              const xchar_t *exceptions)
 {
   const guchar *p;
@@ -2303,7 +2303,7 @@ g_strescape (const xchar_t *source,
 }
 
 /**
- * g_strchug:
+ * xstrchug:
  * @string: a string to remove the leading whitespace from
  *
  * Removes leading whitespace from a string, by moving the rest
@@ -2315,12 +2315,12 @@ g_strescape (const xchar_t *source,
  *
  * The pointer to @string is returned to allow the nesting of functions.
  *
- * Also see g_strchomp() and g_strstrip().
+ * Also see xstrchomp() and xstrstrip().
  *
  * Returns: @string
  */
 xchar_t *
-g_strchug (xchar_t *string)
+xstrchug (xchar_t *string)
 {
   guchar *start;
 
@@ -2335,7 +2335,7 @@ g_strchug (xchar_t *string)
 }
 
 /**
- * g_strchomp:
+ * xstrchomp:
  * @string: a string to remove the trailing whitespace from
  *
  * Removes trailing whitespace from a string.
@@ -2346,12 +2346,12 @@ g_strchug (xchar_t *string)
  *
  * The pointer to @string is returned to allow the nesting of functions.
  *
- * Also see g_strchug() and g_strstrip().
+ * Also see xstrchug() and xstrstrip().
  *
  * Returns: @string
  */
 xchar_t *
-g_strchomp (xchar_t *string)
+xstrchomp (xchar_t *string)
 {
   xsize_t len;
 
@@ -2370,7 +2370,7 @@ g_strchomp (xchar_t *string)
 }
 
 /**
- * g_strsplit:
+ * xstrsplit:
  * @string: a string to split
  * @delimiter: a string which specifies the places at which to split
  *     the string. The delimiter is not included in any of the resulting
@@ -2382,7 +2382,7 @@ g_strchomp (xchar_t *string)
  * @delimiter. If @max_tokens is reached, the remainder of @string is
  * appended to the last token.
  *
- * As an example, the result of g_strsplit (":a:bc::d:", ":", -1) is a
+ * As an example, the result of xstrsplit (":a:bc::d:", ":", -1) is a
  * %NULL-terminated vector containing the six strings "", "a", "bc", "", "d"
  * and "".
  *
@@ -2391,19 +2391,19 @@ g_strchomp (xchar_t *string)
  * special case is that being able to represent an empty vector is typically
  * more useful than consistent handling of empty elements. If you do need
  * to represent empty elements, you'll need to check for the empty string
- * before calling g_strsplit().
+ * before calling xstrsplit().
  *
  * Returns: a newly-allocated %NULL-terminated array of strings. Use
- *    g_strfreev() to free it.
+ *    xstrfreev() to free it.
  */
 xchar_t**
-g_strsplit (const xchar_t *string,
+xstrsplit (const xchar_t *string,
             const xchar_t *delimiter,
             xint_t         max_tokens)
 {
   char *s;
   const xchar_t *remainder;
-  GPtrArray *string_list;
+  xptr_array_t *string_list;
 
   g_return_val_if_fail (string != NULL, NULL);
   g_return_val_if_fail (delimiter != NULL, NULL);
@@ -2412,7 +2412,7 @@ g_strsplit (const xchar_t *string,
   if (max_tokens < 1)
     max_tokens = G_MAXINT;
 
-  string_list = g_ptr_array_new ();
+  string_list = xptr_array_new ();
   remainder = string;
   s = strstr (remainder, delimiter);
   if (s)
@@ -2424,21 +2424,21 @@ g_strsplit (const xchar_t *string,
           xsize_t len;
 
           len = s - remainder;
-          g_ptr_array_add (string_list, g_strndup (remainder, len));
+          xptr_array_add (string_list, xstrndup (remainder, len));
           remainder = s + delimiter_len;
           s = strstr (remainder, delimiter);
         }
     }
   if (*string)
-    g_ptr_array_add (string_list, g_strdup (remainder));
+    xptr_array_add (string_list, xstrdup (remainder));
 
-  g_ptr_array_add (string_list, NULL);
+  xptr_array_add (string_list, NULL);
 
-  return (char **) g_ptr_array_free (string_list, FALSE);
+  return (char **) xptr_array_free (string_list, FALSE);
 }
 
 /**
- * g_strsplit_set:
+ * xstrsplit_set:
  * @string: The string to be tokenized
  * @delimiters: A nul-terminated string containing bytes that are used
  *     to split the string (it can accept an empty string, which will result
@@ -2451,11 +2451,11 @@ g_strsplit (const xchar_t *string,
  * contain any of the characters in @delimiters. If @max_tokens is reached, the
  * remainder is appended to the last token.
  *
- * For example the result of g_strsplit_set ("abc:def/ghi", ":/", -1) is a
+ * For example the result of xstrsplit_set ("abc:def/ghi", ":/", -1) is a
  * %NULL-terminated vector containing the three strings "abc", "def",
  * and "ghi".
  *
- * The result of g_strsplit_set (":def/ghi:", ":/", -1) is a %NULL-terminated
+ * The result of xstrsplit_set (":def/ghi:", ":/", -1) is a %NULL-terminated
  * vector containing the four strings "", "def", "ghi", and "".
  *
  * As a special case, the result of splitting the empty string "" is an empty
@@ -2463,23 +2463,23 @@ g_strsplit (const xchar_t *string,
  * special case is that being able to represent an empty vector is typically
  * more useful than consistent handling of empty elements. If you do need
  * to represent empty elements, you'll need to check for the empty string
- * before calling g_strsplit_set().
+ * before calling xstrsplit_set().
  *
  * Note that this function works on bytes not characters, so it can't be used
  * to delimit UTF-8 strings for anything but ASCII characters.
  *
  * Returns: a newly-allocated %NULL-terminated array of strings. Use
- *    g_strfreev() to free it.
+ *    xstrfreev() to free it.
  *
  * Since: 2.4
  **/
 xchar_t **
-g_strsplit_set (const xchar_t *string,
+xstrsplit_set (const xchar_t *string,
                 const xchar_t *delimiters,
                 xint_t         max_tokens)
 {
-  guint8 delim_table[256]; /* 1 = index is a separator; 0 otherwise */
-  GSList *tokens, *list;
+  xuint8_t delim_table[256]; /* 1 = index is a separator; 0 otherwise */
+  xslist_t *tokens, *list;
   xint_t n_tokens;
   const xchar_t *s;
   const xchar_t *current;
@@ -2514,8 +2514,8 @@ g_strsplit_set (const xchar_t *string,
     {
       if (delim_table[*(guchar *)s] && n_tokens + 1 < max_tokens)
         {
-          token = g_strndup (current, s - current);
-          tokens = g_slist_prepend (tokens, token);
+          token = xstrndup (current, s - current);
+          tokens = xslist_prepend (tokens, token);
           ++n_tokens;
 
           current = s + 1;
@@ -2524,8 +2524,8 @@ g_strsplit_set (const xchar_t *string,
       ++s;
     }
 
-  token = g_strndup (current, s - current);
-  tokens = g_slist_prepend (tokens, token);
+  token = xstrndup (current, s - current);
+  tokens = xslist_prepend (tokens, token);
   ++n_tokens;
 
   result = g_new (xchar_t *, n_tokens + 1);
@@ -2534,20 +2534,20 @@ g_strsplit_set (const xchar_t *string,
   for (list = tokens; list != NULL; list = list->next)
     result[--n_tokens] = list->data;
 
-  g_slist_free (tokens);
+  xslist_free (tokens);
 
   return result;
 }
 
 /**
- * GStrv:
+ * xstrv_t:
  *
  * A typedef alias for xchar_t**. This is mostly useful when used together with
- * g_auto().
+ * x_auto().
  */
 
 /**
- * g_strfreev:
+ * xstrfreev:
  * @str_array: (nullable): a %NULL-terminated array of strings to free
  *
  * Frees a %NULL-terminated array of strings, as well as each
@@ -2556,7 +2556,7 @@ g_strsplit_set (const xchar_t *string,
  * If @str_array is %NULL, this function simply returns.
  */
 void
-g_strfreev (xchar_t **str_array)
+xstrfreev (xchar_t **str_array)
 {
   if (str_array)
     {
@@ -2570,18 +2570,18 @@ g_strfreev (xchar_t **str_array)
 }
 
 /**
- * g_strdupv:
+ * xstrdupv:
  * @str_array: (nullable): a %NULL-terminated array of strings
  *
  * Copies %NULL-terminated array of strings. The copy is a deep copy;
  * the new array should be freed by first freeing each string, then
- * the array itself. g_strfreev() does this for you. If called
- * on a %NULL value, g_strdupv() simply returns %NULL.
+ * the array itself. xstrfreev() does this for you. If called
+ * on a %NULL value, xstrdupv() simply returns %NULL.
  *
  * Returns: (nullable): a new %NULL-terminated array of strings.
  */
 xchar_t**
-g_strdupv (xchar_t **str_array)
+xstrdupv (xchar_t **str_array)
 {
   if (str_array)
     {
@@ -2597,7 +2597,7 @@ g_strdupv (xchar_t **str_array)
       i = 0;
       while (str_array[i])
         {
-          retval[i] = g_strdup (str_array[i]);
+          retval[i] = xstrdup (str_array[i]);
           ++i;
         }
       retval[i] = NULL;
@@ -2609,7 +2609,7 @@ g_strdupv (xchar_t **str_array)
 }
 
 /**
- * g_strjoinv:
+ * xstrjoinv:
  * @separator: (nullable): a string to insert between each of the
  *     strings, or %NULL
  * @str_array: a %NULL-terminated array of strings to join
@@ -2626,7 +2626,7 @@ g_strdupv (xchar_t **str_array)
  *     together, with @separator between them
  */
 xchar_t*
-g_strjoinv (const xchar_t  *separator,
+xstrjoinv (const xchar_t  *separator,
             xchar_t       **str_array)
 {
   xchar_t *string;
@@ -2660,13 +2660,13 @@ g_strjoinv (const xchar_t  *separator,
         }
       }
   else
-    string = g_strdup ("");
+    string = xstrdup ("");
 
   return string;
 }
 
 /**
- * g_strjoin:
+ * xstrjoin:
  * @separator: (nullable): a string to insert between each of the
  *     strings, or %NULL
  * @...: a %NULL-terminated list of strings to join
@@ -2679,7 +2679,7 @@ g_strjoinv (const xchar_t  *separator,
  *     together, with @separator between them
  */
 xchar_t*
-g_strjoin (const xchar_t *separator,
+xstrjoin (const xchar_t *separator,
            ...)
 {
   xchar_t *string, *s;
@@ -2727,7 +2727,7 @@ g_strjoin (const xchar_t *separator,
         }
     }
   else
-    string = g_strdup ("");
+    string = xstrdup ("");
 
   va_end (args);
 
@@ -2736,7 +2736,7 @@ g_strjoin (const xchar_t *separator,
 
 
 /**
- * g_strstr_len:
+ * xstrstr_len:
  * @haystack: a nul-terminated string
  * @haystack_len: the maximum length of @haystack in bytes. A length of -1
  *     can be used to mean "search the entire string", like `strstr()`.
@@ -2750,8 +2750,8 @@ g_strjoin (const xchar_t *separator,
  *    %NULL if not found.
  */
 xchar_t *
-g_strstr_len (const xchar_t *haystack,
-              gssize       haystack_len,
+xstrstr_len (const xchar_t *haystack,
+              xssize_t       haystack_len,
               const xchar_t *needle)
 {
   g_return_val_if_fail (haystack != NULL, NULL);
@@ -2792,7 +2792,7 @@ g_strstr_len (const xchar_t *haystack,
 }
 
 /**
- * g_strrstr:
+ * xstrrstr:
  * @haystack: a nul-terminated string
  * @needle: the nul-terminated string to search for
  *
@@ -2803,7 +2803,7 @@ g_strstr_len (const xchar_t *haystack,
  *    %NULL if not found.
  */
 xchar_t *
-g_strrstr (const xchar_t *haystack,
+xstrrstr (const xchar_t *haystack,
            const xchar_t *needle)
 {
   xsize_t i;
@@ -2841,10 +2841,10 @@ g_strrstr (const xchar_t *haystack,
 }
 
 /**
- * g_strrstr_len:
+ * xstrrstr_len:
  * @haystack: a nul-terminated string
  * @haystack_len: the maximum length of @haystack in bytes. A length of -1
- *     can be used to mean "search the entire string", like g_strrstr().
+ *     can be used to mean "search the entire string", like xstrrstr().
  * @needle: the nul-terminated string to search for
  *
  * Searches the string @haystack for the last occurrence
@@ -2855,15 +2855,15 @@ g_strrstr (const xchar_t *haystack,
  *    %NULL if not found.
  */
 xchar_t *
-g_strrstr_len (const xchar_t *haystack,
-               gssize        haystack_len,
+xstrrstr_len (const xchar_t *haystack,
+               xssize_t        haystack_len,
                const xchar_t *needle)
 {
   g_return_val_if_fail (haystack != NULL, NULL);
   g_return_val_if_fail (needle != NULL, NULL);
 
   if (haystack_len < 0)
-    return g_strrstr (haystack, needle);
+    return xstrrstr (haystack, needle);
   else
     {
       xsize_t needle_len = strlen (needle);
@@ -2897,7 +2897,7 @@ g_strrstr_len (const xchar_t *haystack,
 
 
 /**
- * g_str_has_suffix:
+ * xstr_has_suffix:
  * @str: a nul-terminated string
  * @suffix: the nul-terminated suffix to look for
  *
@@ -2908,7 +2908,7 @@ g_strrstr_len (const xchar_t *haystack,
  * Since: 2.2
  */
 xboolean_t
-g_str_has_suffix (const xchar_t *str,
+xstr_has_suffix (const xchar_t *str,
                   const xchar_t *suffix)
 {
   xsize_t str_len;
@@ -2927,7 +2927,7 @@ g_str_has_suffix (const xchar_t *str,
 }
 
 /**
- * g_str_has_prefix:
+ * xstr_has_prefix:
  * @str: a nul-terminated string
  * @prefix: the nul-terminated prefix to look for
  *
@@ -2938,7 +2938,7 @@ g_str_has_suffix (const xchar_t *str,
  * Since: 2.2
  */
 xboolean_t
-g_str_has_prefix (const xchar_t *str,
+xstr_has_prefix (const xchar_t *str,
                   const xchar_t *prefix)
 {
   g_return_val_if_fail (str != NULL, FALSE);
@@ -2948,7 +2948,7 @@ g_str_has_prefix (const xchar_t *str,
 }
 
 /**
- * g_strv_length:
+ * xstrv_length:
  * @str_array: a %NULL-terminated array of strings
  *
  * Returns the length of the given %NULL-terminated
@@ -2959,7 +2959,7 @@ g_str_has_prefix (const xchar_t *str,
  * Since: 2.6
  */
 xuint_t
-g_strv_length (xchar_t **str_array)
+xstrv_length (xchar_t **str_array)
 {
   xuint_t i = 0;
 
@@ -2972,21 +2972,21 @@ g_strv_length (xchar_t **str_array)
 }
 
 static void
-index_add_folded (GPtrArray   *array,
+index_add_folded (xptr_array_t   *array,
                   const xchar_t *start,
                   const xchar_t *end)
 {
   xchar_t *normal;
 
-  normal = g_utf8_normalize (start, end - start, G_NORMALIZE_ALL_COMPOSE);
+  normal = xutf8_normalize (start, end - start, XNORMALIZE_ALL_COMPOSE);
 
   /* TODO: Invent time machine.  Converse with Mustafa Ataturk... */
   if (strstr (normal, "ı") || strstr (normal, "İ"))
     {
       xchar_t *s = normal;
-      GString *tmp;
+      xstring_t *tmp;
 
-      tmp = g_string_new (NULL);
+      tmp = xstring_new (NULL);
 
       while (*s)
         {
@@ -3006,17 +3006,17 @@ index_add_folded (GPtrArray   *array,
           else
             e = I;
 
-          g_string_append_len (tmp, s, e - s);
-          g_string_append_c (tmp, 'i');
-          s = g_utf8_next_char (e);
+          xstring_append_len (tmp, s, e - s);
+          xstring_append_c (tmp, 'i');
+          s = xutf8_next_char (e);
         }
 
-      g_string_append (tmp, s);
+      xstring_append (tmp, s);
       g_free (normal);
-      normal = g_string_free (tmp, FALSE);
+      normal = xstring_free (tmp, FALSE);
     }
 
-  g_ptr_array_add (array, g_utf8_casefold (normal, -1));
+  xptr_array_add (array, xutf8_casefold (normal, -1));
   g_free (normal);
 }
 
@@ -3024,23 +3024,23 @@ static xchar_t **
 split_words (const xchar_t *value)
 {
   const xchar_t *start = NULL;
-  GPtrArray *result;
+  xptr_array_t *result;
   const xchar_t *s;
 
-  result = g_ptr_array_new ();
+  result = xptr_array_new ();
 
-  for (s = value; *s; s = g_utf8_next_char (s))
+  for (s = value; *s; s = xutf8_next_char (s))
     {
-      gunichar c = g_utf8_get_char (s);
+      xunichar_t c = xutf8_get_char (s);
 
       if (start == NULL)
         {
-          if (g_unichar_isalnum (c) || g_unichar_ismark (c))
+          if (xunichar_isalnum (c) || xunichar_ismark (c))
             start = s;
         }
       else
         {
-          if (!g_unichar_isalnum (c) && !g_unichar_ismark (c))
+          if (!xunichar_isalnum (c) && !xunichar_ismark (c))
             {
               index_add_folded (result, start, s);
               start = NULL;
@@ -3051,13 +3051,13 @@ split_words (const xchar_t *value)
   if (start)
     index_add_folded (result, start, s);
 
-  g_ptr_array_add (result, NULL);
+  xptr_array_add (result, NULL);
 
-  return (xchar_t **) g_ptr_array_free (result, FALSE);
+  return (xchar_t **) xptr_array_free (result, FALSE);
 }
 
 /**
- * g_str_tokenize_and_fold:
+ * xstr_tokenize_and_fold:
  * @string: a string
  * @translit_locale: (nullable): the language code (like 'de' or
  *   'en_GB') from which @string originates
@@ -3069,7 +3069,7 @@ split_words (const xchar_t *value)
  * A token is a non-empty sequence of alphanumeric characters in the
  * source string, separated by non-alphanumeric characters.  An
  * "alphanumeric" character for this purpose is one that matches
- * g_unichar_isalnum() or g_unichar_ismark().
+ * xunichar_isalnum() or xunichar_ismark().
  *
  * Each token is then (Unicode) normalised and case-folded.  If
  * @ascii_alternates is non-%NULL and some of the returned tokens
@@ -3085,7 +3085,7 @@ split_words (const xchar_t *value)
  * Since: 2.40
  **/
 xchar_t **
-g_str_tokenize_and_fold (const xchar_t   *string,
+xstr_tokenize_and_fold (const xchar_t   *string,
                          const xchar_t   *translit_locale,
                          xchar_t       ***ascii_alternates)
 {
@@ -3093,7 +3093,7 @@ g_str_tokenize_and_fold (const xchar_t   *string,
 
   g_return_val_if_fail (string != NULL, NULL);
 
-  if (ascii_alternates && g_str_is_ascii (string))
+  if (ascii_alternates && xstr_is_ascii (string))
     {
       *ascii_alternates = g_new0 (xchar_t *, 0 + 1);
       ascii_alternates = NULL;
@@ -3105,21 +3105,21 @@ g_str_tokenize_and_fold (const xchar_t   *string,
     {
       xint_t i, j, n;
 
-      n = g_strv_length (result);
+      n = xstrv_length (result);
       *ascii_alternates = g_new (xchar_t *, n + 1);
       j = 0;
 
       for (i = 0; i < n; i++)
         {
-          if (!g_str_is_ascii (result[i]))
+          if (!xstr_is_ascii (result[i]))
             {
               xchar_t *composed;
               xchar_t *ascii;
               xint_t k;
 
-              composed = g_utf8_normalize (result[i], -1, G_NORMALIZE_ALL_COMPOSE);
+              composed = xutf8_normalize (result[i], -1, XNORMALIZE_ALL_COMPOSE);
 
-              ascii = g_str_to_ascii (composed, translit_locale);
+              ascii = xstr_to_ascii (composed, translit_locale);
 
               /* Only accept strings that are now entirely alnums */
               for (k = 0; ascii[k]; k++)
@@ -3143,7 +3143,7 @@ g_str_tokenize_and_fold (const xchar_t   *string,
 }
 
 /**
- * g_str_match_string:
+ * xstr_match_string:
  * @search_term: the search term from the user
  * @potential_hit: the text that may be a hit
  * @accept_alternates: %TRUE to accept ASCII alternates
@@ -3151,7 +3151,7 @@ g_str_tokenize_and_fold (const xchar_t   *string,
  * Checks if a search conducted for @search_term should match
  * @potential_hit.
  *
- * This function calls g_str_tokenize_and_fold() on both
+ * This function calls xstr_tokenize_and_fold() on both
  * @search_term and @potential_hit.  ASCII alternates are never taken
  * for @search_term but will be taken for @potential_hit according to
  * the value of @accept_alternates.
@@ -3160,23 +3160,23 @@ g_str_tokenize_and_fold (const xchar_t   *string,
  * folded token from @potential_hit.
  *
  * Depending on how you're performing the search, it will typically be
- * faster to call g_str_tokenize_and_fold() on each string in
+ * faster to call xstr_tokenize_and_fold() on each string in
  * your corpus and build an index on the returned folded tokens, then
- * call g_str_tokenize_and_fold() on the search term and
+ * call xstr_tokenize_and_fold() on the search term and
  * perform lookups into that index.
  *
  * As some examples, searching for ‘fred’ would match the potential hit
  * ‘Smith, Fred’ and also ‘Frédéric’.  Searching for ‘Fréd’ would match
  * ‘Frédéric’ but not ‘Frederic’ (due to the one-directional nature of
- * accent matching).  Searching ‘fo’ would match ‘Foo’ and ‘Bar Foo
- * Baz’, but not ‘SFO’ (because no word has ‘fo’ as a prefix).
+ * accent matching).  Searching ‘fo’ would match ‘foo_t’ and ‘Bar foo_t
+ * baz_t’, but not ‘SFO’ (because no word has ‘fo’ as a prefix).
  *
  * Returns: %TRUE if @potential_hit is a hit
  *
  * Since: 2.40
  **/
 xboolean_t
-g_str_match_string (const xchar_t *search_term,
+xstr_match_string (const xchar_t *search_term,
                     const xchar_t *potential_hit,
                     xboolean_t     accept_alternates)
 {
@@ -3189,20 +3189,20 @@ g_str_match_string (const xchar_t *search_term,
   g_return_val_if_fail (search_term != NULL, FALSE);
   g_return_val_if_fail (potential_hit != NULL, FALSE);
 
-  term_tokens = g_str_tokenize_and_fold (search_term, NULL, NULL);
-  hit_tokens = g_str_tokenize_and_fold (potential_hit, NULL, accept_alternates ? &alternates : NULL);
+  term_tokens = xstr_tokenize_and_fold (search_term, NULL, NULL);
+  hit_tokens = xstr_tokenize_and_fold (potential_hit, NULL, accept_alternates ? &alternates : NULL);
 
   matched = TRUE;
 
   for (i = 0; term_tokens[i]; i++)
     {
       for (j = 0; hit_tokens[j]; j++)
-        if (g_str_has_prefix (hit_tokens[j], term_tokens[i]))
+        if (xstr_has_prefix (hit_tokens[j], term_tokens[i]))
           goto one_matched;
 
       if (accept_alternates)
         for (j = 0; alternates[j]; j++)
-          if (g_str_has_prefix (alternates[j], term_tokens[i]))
+          if (xstr_has_prefix (alternates[j], term_tokens[i]))
             goto one_matched;
 
       matched = FALSE;
@@ -3212,26 +3212,26 @@ one_matched:
       continue;
     }
 
-  g_strfreev (term_tokens);
-  g_strfreev (hit_tokens);
-  g_strfreev (alternates);
+  xstrfreev (term_tokens);
+  xstrfreev (hit_tokens);
+  xstrfreev (alternates);
 
   return matched;
 }
 
 /**
- * g_strv_contains:
+ * xstrv_contains:
  * @strv: a %NULL-terminated array of strings
  * @str: a string
  *
  * Checks if @strv contains @str. @strv must not be %NULL.
  *
- * Returns: %TRUE if @str is an element of @strv, according to g_str_equal().
+ * Returns: %TRUE if @str is an element of @strv, according to xstr_equal().
  *
  * Since: 2.44
  */
 xboolean_t
-g_strv_contains (const xchar_t * const *strv,
+xstrv_contains (const xchar_t * const *strv,
                  const xchar_t         *str)
 {
   g_return_val_if_fail (strv != NULL, FALSE);
@@ -3239,7 +3239,7 @@ g_strv_contains (const xchar_t * const *strv,
 
   for (; *strv != NULL; strv++)
     {
-      if (g_str_equal (str, *strv))
+      if (xstr_equal (str, *strv))
         return TRUE;
     }
 
@@ -3247,12 +3247,12 @@ g_strv_contains (const xchar_t * const *strv,
 }
 
 /**
- * g_strv_equal:
+ * xstrv_equal:
  * @strv1: a %NULL-terminated array of strings
  * @strv2: another %NULL-terminated array of strings
  *
  * Checks if @strv1 and @strv2 contain exactly the same elements in exactly the
- * same order. Elements are compared using g_str_equal(). To match independently
+ * same order. Elements are compared using xstr_equal(). To match independently
  * of order, sort the arrays first (using g_qsort_with_data() or similar).
  *
  * Two empty arrays are considered equal. Neither @strv1 not @strv2 may be
@@ -3262,7 +3262,7 @@ g_strv_contains (const xchar_t * const *strv,
  * Since: 2.60
  */
 xboolean_t
-g_strv_equal (const xchar_t * const *strv1,
+xstrv_equal (const xchar_t * const *strv1,
               const xchar_t * const *strv2)
 {
   g_return_val_if_fail (strv1 != NULL, FALSE);
@@ -3273,7 +3273,7 @@ g_strv_equal (const xchar_t * const *strv1,
 
   for (; *strv1 != NULL && *strv2 != NULL; strv1++, strv2++)
     {
-      if (!g_str_equal (*strv1, *strv2))
+      if (!xstr_equal (*strv1, *strv2))
         return FALSE;
     }
 
@@ -3377,8 +3377,8 @@ g_ascii_string_to_signed (const xchar_t  *str,
     }
   if (saved_errno == ERANGE || number < min || number > max)
     {
-      xchar_t *min_str = g_strdup_printf ("%" G_GINT64_FORMAT, min);
-      xchar_t *max_str = g_strdup_printf ("%" G_GINT64_FORMAT, max);
+      xchar_t *min_str = xstrdup_printf ("%" G_GINT64_FORMAT, min);
+      xchar_t *max_str = xstrdup_printf ("%" G_GINT64_FORMAT, max);
 
       g_set_error (error,
                    G_NUMBER_PARSER_ERROR, G_NUMBER_PARSER_ERROR_OUT_OF_BOUNDS,
@@ -3432,12 +3432,12 @@ g_ascii_string_to_signed (const xchar_t  *str,
 xboolean_t
 g_ascii_string_to_unsigned (const xchar_t  *str,
                             xuint_t         base,
-                            guint64       min,
-                            guint64       max,
-                            guint64      *out_num,
+                            xuint64_t       min,
+                            xuint64_t       max,
+                            xuint64_t      *out_num,
                             xerror_t      **error)
 {
-  guint64 number;
+  xuint64_t number;
   const xchar_t *end_ptr = NULL;
   xint_t saved_errno = 0;
 
@@ -3481,8 +3481,8 @@ g_ascii_string_to_unsigned (const xchar_t  *str,
     }
   if (saved_errno == ERANGE || number < min || number > max)
     {
-      xchar_t *min_str = g_strdup_printf ("%" G_GUINT64_FORMAT, min);
-      xchar_t *max_str = g_strdup_printf ("%" G_GUINT64_FORMAT, max);
+      xchar_t *min_str = xstrdup_printf ("%" G_GUINT64_FORMAT, min);
+      xchar_t *max_str = xstrdup_printf ("%" G_GUINT64_FORMAT, max);
 
       g_set_error (error,
                    G_NUMBER_PARSER_ERROR, G_NUMBER_PARSER_ERROR_OUT_OF_BOUNDS,

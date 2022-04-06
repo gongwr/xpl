@@ -25,10 +25,10 @@
 #include "gdbus-tests.h"
 
 /* all tests rely on a global connection */
-static GDBusConnection *c = NULL;
+static xdbus_connection_t *c = NULL;
 
 /* all tests rely on a shared mainloop */
-static GMainLoop *loop = NULL;
+static xmain_loop_t *loop = NULL;
 
 /* ---------------------------------------------------------------------------------------------------- */
 /* Check that pending calls fail with G_IO_ERROR_CLOSED if the connection is closed  */
@@ -45,7 +45,7 @@ sleep_cb (xobject_t      *source_object,
 
   result = g_dbus_proxy_call_finish (G_DBUS_PROXY (source_object), res, error);
   g_assert (result == NULL);
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static xboolean_t
@@ -59,15 +59,15 @@ on_timeout (xpointer_t user_data)
 static void
 test_connection_loss (void)
 {
-  GDBusProxy *proxy;
+  xdbus_proxy_t *proxy;
   xerror_t *error;
 
   error = NULL;
   proxy = g_dbus_proxy_new_sync (c,
                                  G_DBUS_PROXY_FLAGS_NONE,
-                                 NULL,                      /* GDBusInterfaceInfo */
+                                 NULL,                      /* xdbus_interface_info_t */
                                  "com.example.TestService", /* name */
-                                 "/com/example/TestObject", /* object path */
+                                 "/com/example/test_object_t", /* object path */
                                  "com.example.Frob",        /* interface */
                                  NULL, /* xcancellable_t */
                                  &error);
@@ -76,7 +76,7 @@ test_connection_loss (void)
   error = NULL;
   g_dbus_proxy_call (proxy,
                      "Sleep",
-                     g_variant_new ("(i)", 100 * 1000 /* msec */),
+                     xvariant_new ("(i)", 100 * 1000 /* msec */),
                      G_DBUS_CALL_FLAGS_NONE,
                      10 * 1000 /* msec */,
                      NULL, /* xcancellable_t */
@@ -89,7 +89,7 @@ test_connection_loss (void)
   /* Nuke the connection to the bus */
   g_timeout_add (100 /* ms */, on_timeout, NULL);
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   /* If we didn't act on connection-loss we'd be getting G_IO_ERROR_TIMEOUT
    * generated locally. So if we get G_IO_ERROR_CLOSED it means that we
@@ -99,7 +99,7 @@ test_connection_loss (void)
   g_assert (!g_dbus_error_is_remote_error (error));
   g_clear_error (&error);
 
-  g_object_unref (proxy);
+  xobject_unref (proxy);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -115,7 +115,7 @@ main (int   argc,
   g_test_init (&argc, &argv, NULL);
 
   /* all the tests rely on a shared main loop */
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   session_bus_up ();
 
@@ -136,11 +136,11 @@ main (int   argc,
 
   ret = g_test_run();
 
-  g_object_unref (c);
+  xobject_unref (c);
 
   session_bus_down ();
 
-  g_main_loop_unref (loop);
+  xmain_loop_unref (loop);
 
   return ret;
 }

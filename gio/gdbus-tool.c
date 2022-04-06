@@ -65,7 +65,7 @@ completion_debug (const xchar_t *format, ...)
   static FILE *f = NULL;
 
   va_start (var_args, format);
-  s = g_strdup_vprintf (format, var_args);
+  s = xstrdup_vprintf (format, var_args);
   if (f == NULL)
     {
       f = fopen ("/tmp/gdbus-completion-debug.txt", "a+");
@@ -99,7 +99,7 @@ remove_arg (xint_t num, xint_t *argc, xchar_t **argv[])
 static void
 usage (xint_t *argc, xchar_t **argv[], xboolean_t use_stdout)
 {
-  GOptionContext *o;
+  xoption_context_t *o;
   xchar_t *s;
   xchar_t *program_name;
 
@@ -107,8 +107,8 @@ usage (xint_t *argc, xchar_t **argv[], xboolean_t use_stdout)
   g_option_context_set_help_enabled (o, FALSE);
   /* Ignore parsing result */
   g_option_context_parse (o, argc, argv, NULL);
-  program_name = (*argc > 0) ? g_path_get_basename ((*argv)[0]) : g_strdup ("gdbus-tool");
-  s = g_strdup_printf (_("Commands:\n"
+  program_name = (*argc > 0) ? g_path_get_basename ((*argv)[0]) : xstrdup ("gdbus-tool");
+  s = xstrdup_printf (_("Commands:\n"
                          "  help         Shows this information\n"
                          "  introspect   Introspect a remote object\n"
                          "  monitor      Monitor a remote object\n"
@@ -142,22 +142,22 @@ modify_argv0_for_command (xint_t *argc, xchar_t **argv[], const xchar_t *command
    */
 
   g_assert (*argc > 1);
-  g_assert (g_strcmp0 ((*argv)[1], command) == 0);
+  g_assert (xstrcmp0 ((*argv)[1], command) == 0);
   remove_arg (1, argc, argv);
 
   program_name = g_path_get_basename ((*argv)[0]);
-  s = g_strdup_printf ("%s %s", program_name, command);
+  s = xstrdup_printf ("%s %s", program_name, command);
   (*argv)[0] = s;
   g_free (program_name);
 }
 
-static GOptionContext *
+static xoption_context_t *
 command_option_context_new (const xchar_t        *parameter_string,
                             const xchar_t        *summary,
                             const GOptionEntry *entries,
                             xboolean_t            request_completion)
 {
-  GOptionContext *o = NULL;
+  xoption_context_t *o = NULL;
 
   o = g_option_context_new (parameter_string);
   if (request_completion)
@@ -172,7 +172,7 @@ command_option_context_new (const xchar_t        *parameter_string,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-print_methods_and_signals (GDBusConnection *c,
+print_methods_and_signals (xdbus_connection_t *c,
                            const xchar_t     *name,
                            const xchar_t     *path,
                            xboolean_t         print_methods,
@@ -181,7 +181,7 @@ print_methods_and_signals (GDBusConnection *c,
   xvariant_t *result;
   xerror_t *error;
   const xchar_t *xml_data;
-  GDBusNodeInfo *node;
+  xdbus_node_info_t *node;
   xuint_t n;
   xuint_t m;
 
@@ -200,32 +200,32 @@ print_methods_and_signals (GDBusConnection *c,
   if (result == NULL)
     {
       g_printerr (_("Error: %s\n"), error->message);
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
-  g_variant_get (result, "(&s)", &xml_data);
+  xvariant_get (result, "(&s)", &xml_data);
 
   error = NULL;
   node = g_dbus_node_info_new_for_xml (xml_data, &error);
-  g_variant_unref (result);
+  xvariant_unref (result);
   if (node == NULL)
     {
       g_printerr (_("Error parsing introspection XML: %s\n"), error->message);
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
 
   for (n = 0; node->interfaces != NULL && node->interfaces[n] != NULL; n++)
     {
-      const GDBusInterfaceInfo *iface = node->interfaces[n];
+      const xdbus_interface_info_t *iface = node->interfaces[n];
       for (m = 0; print_methods && iface->methods != NULL && iface->methods[m] != NULL; m++)
         {
-          const GDBusMethodInfo *method = iface->methods[m];
+          const xdbus_method_info_t *method = iface->methods[m];
           g_print ("%s.%s \n", iface->name, method->name);
         }
       for (m = 0; print_signals && iface->signals != NULL && iface->signals[m] != NULL; m++)
         {
-          const GDBusSignalInfo *signal = iface->signals[m];
+          const xdbus_signalInfo_t *signal = iface->signals[m];
           g_print ("%s.%s \n", iface->name, signal->name);
         }
     }
@@ -236,14 +236,14 @@ print_methods_and_signals (GDBusConnection *c,
 }
 
 static void
-print_paths (GDBusConnection *c,
+print_paths (xdbus_connection_t *c,
              const xchar_t *name,
              const xchar_t *path)
 {
   xvariant_t *result;
   xerror_t *error;
   const xchar_t *xml_data;
-  GDBusNodeInfo *node;
+  xdbus_node_info_t *node;
   xuint_t n;
 
   if (!g_dbus_is_name (name))
@@ -251,7 +251,7 @@ print_paths (GDBusConnection *c,
       g_printerr (_("Error: %s is not a valid name\n"), name);
       goto out;
     }
-  if (!g_variant_is_object_path (path))
+  if (!xvariant_is_object_path (path))
     {
       g_printerr (_("Error: %s is not a valid object path\n"), path);
       goto out;
@@ -272,20 +272,20 @@ print_paths (GDBusConnection *c,
   if (result == NULL)
     {
       g_printerr (_("Error: %s\n"), error->message);
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
-  g_variant_get (result, "(&s)", &xml_data);
+  xvariant_get (result, "(&s)", &xml_data);
 
   //g_printerr ("xml='%s'", xml_data);
 
   error = NULL;
   node = g_dbus_node_info_new_for_xml (xml_data, &error);
-  g_variant_unref (result);
+  xvariant_unref (result);
   if (node == NULL)
     {
       g_printerr (_("Error parsing introspection XML: %s\n"), error->message);
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
 
@@ -300,10 +300,10 @@ print_paths (GDBusConnection *c,
 
       //g_printerr ("foo '%s'\n", node->nodes[n].path);
 
-      if (g_strcmp0 (path, "/") == 0)
-        s = g_strdup_printf ("/%s", node->nodes[n]->path);
+      if (xstrcmp0 (path, "/") == 0)
+        s = xstrdup_printf ("/%s", node->nodes[n]->path);
       else
-        s = g_strdup_printf ("%s/%s", path, node->nodes[n]->path);
+        s = xstrdup_printf ("%s/%s", path, node->nodes[n]->path);
 
       print_paths (c, name, s);
 
@@ -316,18 +316,18 @@ print_paths (GDBusConnection *c,
 }
 
 static void
-print_names (GDBusConnection *c,
+print_names (xdbus_connection_t *c,
              xboolean_t         include_unique_names)
 {
   xvariant_t *result;
   xerror_t *error;
-  GVariantIter *iter;
+  xvariant_iter_t *iter;
   xchar_t *str;
-  GHashTable *name_set;
+  xhashtable_t *name_set;
   xlist_t *keys;
   xlist_t *l;
 
-  name_set = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+  name_set = xhash_table_new_full (xstr_hash, xstr_equal, g_free, NULL);
 
   error = NULL;
   result = g_dbus_connection_call_sync (c,
@@ -344,14 +344,14 @@ print_names (GDBusConnection *c,
   if (result == NULL)
     {
       g_printerr (_("Error: %s\n"), error->message);
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
-  g_variant_get (result, "(as)", &iter);
-  while (g_variant_iter_loop (iter, "s", &str))
-    g_hash_table_add (name_set, g_strdup (str));
-  g_variant_iter_free (iter);
-  g_variant_unref (result);
+  xvariant_get (result, "(as)", &iter);
+  while (xvariant_iter_loop (iter, "s", &str))
+    xhash_table_add (name_set, xstrdup (str));
+  xvariant_iter_free (iter);
+  xvariant_unref (result);
 
   error = NULL;
   result = g_dbus_connection_call_sync (c,
@@ -368,29 +368,29 @@ print_names (GDBusConnection *c,
   if (result == NULL)
     {
       g_printerr (_("Error: %s\n"), error->message);
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
-  g_variant_get (result, "(as)", &iter);
-  while (g_variant_iter_loop (iter, "s", &str))
-    g_hash_table_add (name_set, g_strdup (str));
-  g_variant_iter_free (iter);
-  g_variant_unref (result);
+  xvariant_get (result, "(as)", &iter);
+  while (xvariant_iter_loop (iter, "s", &str))
+    xhash_table_add (name_set, xstrdup (str));
+  xvariant_iter_free (iter);
+  xvariant_unref (result);
 
-  keys = g_hash_table_get_keys (name_set);
-  keys = g_list_sort (keys, (GCompareFunc) g_strcmp0);
+  keys = xhash_table_get_keys (name_set);
+  keys = xlist_sort (keys, (GCompareFunc) xstrcmp0);
   for (l = keys; l != NULL; l = l->next)
     {
       const xchar_t *name = l->data;
-      if (!include_unique_names && g_str_has_prefix (name, ":"))
+      if (!include_unique_names && xstr_has_prefix (name, ":"))
         continue;
 
       g_print ("%s \n", name);
     }
-  g_list_free (keys);
+  xlist_free (keys);
 
  out:
-  g_hash_table_unref (name_set);
+  xhash_table_unref (name_set);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -407,27 +407,27 @@ static const GOptionEntry connection_entries[] =
   G_OPTION_ENTRY_NULL
 };
 
-static GOptionGroup *
+static xoption_group_t *
 connection_get_group (void)
 {
-  static GOptionGroup *g;
+  static xoption_group_t *g;
 
-  g = g_option_group_new ("connection",
+  g = xoption_group_new ("connection",
                           N_("Connection Endpoint Options:"),
                           N_("Options specifying the connection endpoint"),
                           NULL,
                           NULL);
-  g_option_group_set_translation_domain (g, GETTEXT_PACKAGE);
-  g_option_group_add_entries (g, connection_entries);
+  xoption_group_set_translation_domain (g, GETTEXT_PACKAGE);
+  xoption_group_add_entries (g, connection_entries);
 
   return g;
 }
 
-static GDBusConnection *
+static xdbus_connection_t *
 connection_get_dbus_connection (xboolean_t   require_message_bus,
                                 xerror_t   **error)
 {
-  GDBusConnection *c;
+  xdbus_connection_t *c;
 
   c = NULL;
 
@@ -466,7 +466,7 @@ connection_get_dbus_connection (xboolean_t   require_message_bus,
         flags |= G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION;
       c = g_dbus_connection_new_for_address_sync (opt_connection_address,
                                                   flags,
-                                                  NULL, /* GDBusAuthObserver */
+                                                  NULL, /* xdbus_auth_observer_t */
                                                   NULL, /* xcancellable_t */
                                                   error);
     }
@@ -477,20 +477,20 @@ connection_get_dbus_connection (xboolean_t   require_message_bus,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static GPtrArray *
-call_helper_get_method_in_signature (GDBusConnection  *c,
+static xptr_array_t *
+call_helper_get_method_in_signature (xdbus_connection_t  *c,
                                      const xchar_t      *dest,
                                      const xchar_t      *path,
                                      const xchar_t      *interface_name,
                                      const xchar_t      *method_name,
                                      xerror_t          **error)
 {
-  GPtrArray *ret;
+  xptr_array_t *ret;
   xvariant_t *result;
-  GDBusNodeInfo *node_info;
+  xdbus_node_info_t *node_info;
   const xchar_t *xml_data;
-  GDBusInterfaceInfo *interface_info;
-  GDBusMethodInfo *method_info;
+  xdbus_interface_info_t *interface_info;
+  xdbus_method_info_t *method_info;
   xuint_t n;
 
   ret = NULL;
@@ -511,7 +511,7 @@ call_helper_get_method_in_signature (GDBusConnection  *c,
   if (result == NULL)
     goto out;
 
-  g_variant_get (result, "(&s)", &xml_data);
+  xvariant_get (result, "(&s)", &xml_data);
   node_info = g_dbus_node_info_new_for_xml (xml_data, error);
   if (node_info == NULL)
       goto out;
@@ -535,17 +535,17 @@ call_helper_get_method_in_signature (GDBusConnection  *c,
       goto out;
     }
 
-  ret = g_ptr_array_new_with_free_func ((GDestroyNotify) g_variant_type_free);
+  ret = xptr_array_new_with_free_func ((xdestroy_notify_t) xvariant_type_free);
   for (n = 0; method_info->in_args != NULL && method_info->in_args[n] != NULL; n++)
     {
-      g_ptr_array_add (ret, g_variant_type_new (method_info->in_args[n]->signature));
+      xptr_array_add (ret, xvariant_type_new (method_info->in_args[n]->signature));
     }
 
  out:
   if (node_info != NULL)
     g_dbus_node_info_unref (node_info);
   if (result != NULL)
-    g_variant_unref (result);
+    xvariant_unref (result);
 
   return ret;
 }
@@ -553,27 +553,27 @@ call_helper_get_method_in_signature (GDBusConnection  *c,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static xvariant_t *
-_g_variant_parse_me_harder (xvariant_type_t   *type,
+_xvariant_parse_me_harder (xvariant_type_t   *type,
                             const xchar_t    *given_str,
                             xerror_t        **error)
 {
   xvariant_t *value;
   xchar_t *s;
   xuint_t n;
-  GString *str;
+  xstring_t *str;
 
-  str = g_string_new ("\"");
+  str = xstring_new ("\"");
   for (n = 0; given_str[n] != '\0'; n++)
     {
       if (G_UNLIKELY (given_str[n] == '\"'))
-        g_string_append (str, "\\\"");
+        xstring_append (str, "\\\"");
       else
-        g_string_append_c (str, given_str[n]);
+        xstring_append_c (str, given_str[n]);
     }
-  g_string_append_c (str, '"');
-  s = g_string_free (str, FALSE);
+  xstring_append_c (str, '"');
+  s = xstring_free (str, FALSE);
 
-  value = g_variant_parse (type,
+  value = xvariant_parse (type,
                            s,
                            NULL,
                            NULL,
@@ -605,14 +605,14 @@ handle_emit (xint_t        *argc,
              const xchar_t *completion_prev)
 {
   xint_t ret;
-  GOptionContext *o;
+  xoption_context_t *o;
   xchar_t *s;
   xerror_t *error;
-  GDBusConnection *c;
+  xdbus_connection_t *c;
   xvariant_t *parameters;
   xchar_t *interface_name;
   xchar_t *signal_name;
-  GVariantBuilder builder;
+  xvariant_builder_t builder;
   xboolean_t skip_dashes;
   xuint_t parm;
   xuint_t n;
@@ -631,21 +631,21 @@ handle_emit (xint_t        *argc,
   g_option_context_add_group (o, connection_get_group ());
 
   complete_names = FALSE;
-  if (request_completion && *argc > 1 && g_strcmp0 ((*argv)[(*argc)-1], "--dest") == 0)
+  if (request_completion && *argc > 1 && xstrcmp0 ((*argv)[(*argc)-1], "--dest") == 0)
     {
       complete_names = TRUE;
       remove_arg ((*argc) - 1, argc, argv);
     }
 
   complete_paths = FALSE;
-  if (request_completion && *argc > 1 && g_strcmp0 ((*argv)[(*argc)-1], "--object-path") == 0)
+  if (request_completion && *argc > 1 && xstrcmp0 ((*argv)[(*argc)-1], "--object-path") == 0)
     {
       complete_paths = TRUE;
       remove_arg ((*argc) - 1, argc, argv);
     }
 
   complete_signals = FALSE;
-  if (request_completion && *argc > 1 && g_strcmp0 ((*argv)[(*argc)-1], "--signal") == 0)
+  if (request_completion && *argc > 1 && xstrcmp0 ((*argv)[(*argc)-1], "--signal") == 0)
     {
       complete_signals = TRUE;
       remove_arg ((*argc) - 1, argc, argv);
@@ -668,7 +668,7 @@ handle_emit (xint_t        *argc,
     {
       if (request_completion)
         {
-          if (g_strcmp0 (completion_prev, "--address") == 0)
+          if (xstrcmp0 (completion_prev, "--address") == 0)
             {
               g_print ("unix:\n"
                        "tcp:\n"
@@ -683,7 +683,7 @@ handle_emit (xint_t        *argc,
         {
           g_printerr (_("Error connecting: %s\n"), error->message);
         }
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
 
@@ -693,9 +693,9 @@ handle_emit (xint_t        *argc,
       print_names (c, FALSE);
       goto out;
     }
-  if (request_completion && opt_emit_dest != NULL && g_strcmp0 ("--dest", completion_prev) == 0)
+  if (request_completion && opt_emit_dest != NULL && xstrcmp0 ("--dest", completion_prev) == 0)
     {
-      print_names (c, g_str_has_prefix (opt_emit_dest, ":"));
+      print_names (c, xstr_has_prefix (opt_emit_dest, ":"));
       goto out;
     }
 
@@ -723,12 +723,12 @@ handle_emit (xint_t        *argc,
         g_printerr (_("Error: Object path is not specified\n"));
       goto out;
     }
-  if (request_completion && g_strcmp0 ("--object-path", completion_prev) == 0)
+  if (request_completion && xstrcmp0 ("--object-path", completion_prev) == 0)
     {
       if (opt_emit_dest != NULL)
         {
           xchar_t *p;
-          s = g_strdup (opt_emit_object_path);
+          s = xstrdup (opt_emit_object_path);
           p = strrchr (s, '/');
           if (p != NULL)
             {
@@ -741,7 +741,7 @@ handle_emit (xint_t        *argc,
         }
       goto out;
     }
-  if (!request_completion && !g_variant_is_object_path (opt_emit_object_path))
+  if (!request_completion && !xvariant_is_object_path (opt_emit_object_path))
     {
       g_printerr (_("Error: %s is not a valid object path\n"), opt_emit_object_path);
       goto out;
@@ -758,7 +758,7 @@ handle_emit (xint_t        *argc,
       /* don't keep repeatedly completing --signal */
       if (request_completion)
         {
-          if (g_strcmp0 ("--signal", completion_prev) != 0)
+          if (xstrcmp0 ("--signal", completion_prev) != 0)
             g_print ("--signal \n");
         }
       else
@@ -769,7 +769,7 @@ handle_emit (xint_t        *argc,
       goto out;
     }
   if (request_completion && opt_emit_dest != NULL && opt_emit_object_path != NULL &&
-      g_strcmp0 ("--signal", completion_prev) == 0)
+      xstrcmp0 ("--signal", completion_prev) == 0)
     {
       print_methods_and_signals (c, opt_emit_dest, opt_emit_object_path, FALSE, TRUE);
       goto out;
@@ -780,8 +780,8 @@ handle_emit (xint_t        *argc,
       g_printerr (_("Error: Signal name “%s” is invalid\n"), opt_emit_signal);
       goto out;
     }
-  signal_name = g_strdup (s + 1);
-  interface_name = g_strndup (opt_emit_signal, s - opt_emit_signal);
+  signal_name = xstrdup (s + 1);
+  interface_name = xstrndup (opt_emit_signal, s - opt_emit_signal);
 
   /* All done with completion now */
   if (request_completion)
@@ -800,7 +800,7 @@ handle_emit (xint_t        *argc,
     }
 
   /* Read parameters */
-  g_variant_builder_init (&builder, G_VARIANT_TYPE_TUPLE);
+  xvariant_builder_init (&builder, G_VARIANT_TYPE_TUPLE);
   skip_dashes = TRUE;
   parm = 0;
   for (n = 1; n < (xuint_t) *argc; n++)
@@ -809,14 +809,14 @@ handle_emit (xint_t        *argc,
 
       /* Under certain conditions, g_option_context_parse returns the "--"
          itself (setting off unparsed arguments), too: */
-      if (skip_dashes && g_strcmp0 ((*argv)[n], "--") == 0)
+      if (skip_dashes && xstrcmp0 ((*argv)[n], "--") == 0)
         {
           skip_dashes = FALSE;
           continue;
         }
 
       error = NULL;
-      value = g_variant_parse (NULL,
+      value = xvariant_parse (NULL,
                                (*argv)[n],
                                NULL,
                                NULL,
@@ -825,30 +825,30 @@ handle_emit (xint_t        *argc,
         {
           xchar_t *context;
 
-          context = g_variant_parse_error_print_context (error, (*argv)[n]);
-          g_error_free (error);
+          context = xvariant_parse_error_print_context (error, (*argv)[n]);
+          xerror_free (error);
           error = NULL;
-          value = _g_variant_parse_me_harder (NULL, (*argv)[n], &error);
+          value = _xvariant_parse_me_harder (NULL, (*argv)[n], &error);
           if (value == NULL)
             {
               /* Use the original non-"parse-me-harder" error */
               g_printerr (_("Error parsing parameter %d: %s\n"),
                           parm + 1,
                           context);
-              g_error_free (error);
+              xerror_free (error);
               g_free (context);
-              g_variant_builder_clear (&builder);
+              xvariant_builder_clear (&builder);
               goto out;
             }
           g_free (context);
         }
-      g_variant_builder_add_value (&builder, value);
+      xvariant_builder_add_value (&builder, value);
       ++parm;
     }
-  parameters = g_variant_builder_end (&builder);
+  parameters = xvariant_builder_end (&builder);
 
   if (parameters != NULL)
-    parameters = g_variant_ref_sink (parameters);
+    parameters = xvariant_ref_sink (parameters);
   if (!g_dbus_connection_emit_signal (c,
                                       opt_emit_dest,
                                       opt_emit_object_path,
@@ -858,14 +858,14 @@ handle_emit (xint_t        *argc,
                                       &error))
     {
       g_printerr (_("Error: %s\n"), error->message);
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
 
   if (!g_dbus_connection_flush_sync (c, NULL, &error))
     {
       g_printerr (_("Error flushing connection: %s\n"), error->message);
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
 
@@ -873,9 +873,9 @@ handle_emit (xint_t        *argc,
 
  out:
   if (c != NULL)
-    g_object_unref (c);
+    xobject_unref (c);
   if (parameters != NULL)
-    g_variant_unref (parameters);
+    xvariant_unref (parameters);
   g_free (interface_name);
   g_free (signal_name);
   g_option_context_free (o);
@@ -908,23 +908,23 @@ handle_call (xint_t        *argc,
              const xchar_t *completion_prev)
 {
   xint_t ret;
-  GOptionContext *o;
+  xoption_context_t *o;
   xchar_t *s;
   xerror_t *error;
-  GDBusConnection *c;
+  xdbus_connection_t *c;
   xvariant_t *parameters;
   xchar_t *interface_name;
   xchar_t *method_name;
   xvariant_t *result;
-  GPtrArray *in_signature_types;
+  xptr_array_t *in_signature_types;
 #ifdef G_OS_UNIX
-  GUnixFDList *fd_list;
+  xunix_fd_list_t *fd_list;
   xint_t fd_id;
 #endif
   xboolean_t complete_names;
   xboolean_t complete_paths;
   xboolean_t complete_methods;
-  GVariantBuilder builder;
+  xvariant_builder_t builder;
   xboolean_t skip_dashes;
   xuint_t parm;
   xuint_t n;
@@ -948,21 +948,21 @@ handle_call (xint_t        *argc,
   g_option_context_add_group (o, connection_get_group ());
 
   complete_names = FALSE;
-  if (request_completion && *argc > 1 && g_strcmp0 ((*argv)[(*argc)-1], "--dest") == 0)
+  if (request_completion && *argc > 1 && xstrcmp0 ((*argv)[(*argc)-1], "--dest") == 0)
     {
       complete_names = TRUE;
       remove_arg ((*argc) - 1, argc, argv);
     }
 
   complete_paths = FALSE;
-  if (request_completion && *argc > 1 && g_strcmp0 ((*argv)[(*argc)-1], "--object-path") == 0)
+  if (request_completion && *argc > 1 && xstrcmp0 ((*argv)[(*argc)-1], "--object-path") == 0)
     {
       complete_paths = TRUE;
       remove_arg ((*argc) - 1, argc, argv);
     }
 
   complete_methods = FALSE;
-  if (request_completion && *argc > 1 && g_strcmp0 ((*argv)[(*argc)-1], "--method") == 0)
+  if (request_completion && *argc > 1 && xstrcmp0 ((*argv)[(*argc)-1], "--method") == 0)
     {
       complete_methods = TRUE;
       remove_arg ((*argc) - 1, argc, argv);
@@ -985,7 +985,7 @@ handle_call (xint_t        *argc,
     {
       if (request_completion)
         {
-          if (g_strcmp0 (completion_prev, "--address") == 0)
+          if (xstrcmp0 (completion_prev, "--address") == 0)
             {
               g_print ("unix:\n"
                        "tcp:\n"
@@ -1000,7 +1000,7 @@ handle_call (xint_t        *argc,
         {
           g_printerr (_("Error connecting: %s\n"), error->message);
         }
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
 
@@ -1018,9 +1018,9 @@ handle_call (xint_t        *argc,
         g_printerr (_("Error: Destination is not specified\n"));
       goto out;
     }
-  if (request_completion && g_strcmp0 ("--dest", completion_prev) == 0)
+  if (request_completion && xstrcmp0 ("--dest", completion_prev) == 0)
     {
-      print_names (c, g_str_has_prefix (opt_call_dest, ":"));
+      print_names (c, xstr_has_prefix (opt_call_dest, ":"));
       goto out;
     }
 
@@ -1044,10 +1044,10 @@ handle_call (xint_t        *argc,
         g_printerr (_("Error: Object path is not specified\n"));
       goto out;
     }
-  if (request_completion && g_strcmp0 ("--object-path", completion_prev) == 0)
+  if (request_completion && xstrcmp0 ("--object-path", completion_prev) == 0)
     {
       xchar_t *p;
-      s = g_strdup (opt_call_object_path);
+      s = xstrdup (opt_call_object_path);
       p = strrchr (s, '/');
       if (p != NULL)
         {
@@ -1059,7 +1059,7 @@ handle_call (xint_t        *argc,
       g_free (s);
       goto out;
     }
-  if (!request_completion && !g_variant_is_object_path (opt_call_object_path))
+  if (!request_completion && !xvariant_is_object_path (opt_call_object_path))
     {
       g_printerr (_("Error: %s is not a valid object path\n"), opt_call_object_path);
       goto out;
@@ -1079,7 +1079,7 @@ handle_call (xint_t        *argc,
         g_printerr (_("Error: Method name is not specified\n"));
       goto out;
     }
-  if (request_completion && g_strcmp0 ("--method", completion_prev) == 0)
+  if (request_completion && xstrcmp0 ("--method", completion_prev) == 0)
     {
       print_methods_and_signals (c, opt_call_dest, opt_call_object_path, TRUE, FALSE);
       goto out;
@@ -1090,8 +1090,8 @@ handle_call (xint_t        *argc,
       g_printerr (_("Error: Method name “%s” is invalid\n"), opt_call_method);
       goto out;
     }
-  method_name = g_strdup (s + 1);
-  interface_name = g_strndup (opt_call_method, s - opt_call_method);
+  method_name = xstrdup (s + 1);
+  interface_name = xstrndup (opt_call_method, s - opt_call_method);
 
   /* All done with completion now */
   if (request_completion)
@@ -1107,12 +1107,12 @@ handle_call (xint_t        *argc,
   if (in_signature_types == NULL)
     {
       //g_printerr ("Error getting introspection data: %s\n", error->message);
-      g_error_free (error);
+      xerror_free (error);
       error = NULL;
     }
 
   /* Read parameters */
-  g_variant_builder_init (&builder, G_VARIANT_TYPE_TUPLE);
+  xvariant_builder_init (&builder, G_VARIANT_TYPE_TUPLE);
   skip_dashes = TRUE;
   parm = 0;
   for (n = 1; n < (xuint_t) *argc; n++)
@@ -1122,7 +1122,7 @@ handle_call (xint_t        *argc,
 
       /* Under certain conditions, g_option_context_parse returns the "--"
          itself (setting off unparsed arguments), too: */
-      if (skip_dashes && g_strcmp0 ((*argv)[n], "--") == 0)
+      if (skip_dashes && xstrcmp0 ((*argv)[n], "--") == 0)
         {
           skip_dashes = FALSE;
           continue;
@@ -1147,7 +1147,7 @@ handle_call (xint_t        *argc,
         }
 
       error = NULL;
-      value = g_variant_parse (type,
+      value = xvariant_parse (type,
                                (*argv)[n],
                                NULL,
                                NULL,
@@ -1156,15 +1156,15 @@ handle_call (xint_t        *argc,
         {
           xchar_t *context;
 
-          context = g_variant_parse_error_print_context (error, (*argv)[n]);
-          g_error_free (error);
+          context = xvariant_parse_error_print_context (error, (*argv)[n]);
+          xerror_free (error);
           error = NULL;
-          value = _g_variant_parse_me_harder (type, (*argv)[n], &error);
+          value = _xvariant_parse_me_harder (type, (*argv)[n], &error);
           if (value == NULL)
             {
               if (type != NULL)
                 {
-                  s = g_variant_type_dup_string (type);
+                  s = xvariant_type_dup_string (type);
                   g_printerr (_("Error parsing parameter %d of type “%s”: %s\n"),
                               parm + 1,
                               s,
@@ -1177,37 +1177,37 @@ handle_call (xint_t        *argc,
                               parm + 1,
                               context);
                 }
-              g_error_free (error);
-              g_variant_builder_clear (&builder);
+              xerror_free (error);
+              xvariant_builder_clear (&builder);
               g_free (context);
               goto out;
             }
           g_free (context);
         }
 #ifdef G_OS_UNIX
-      if (g_variant_is_of_type (value, G_VARIANT_TYPE_HANDLE))
+      if (xvariant_is_of_type (value, G_VARIANT_TYPE_HANDLE))
         {
           if (!fd_list)
             fd_list = g_unix_fd_list_new ();
-          if ((fd_id = g_unix_fd_list_append (fd_list, g_variant_get_handle (value), &error)) == -1)
+          if ((fd_id = g_unix_fd_list_append (fd_list, xvariant_get_handle (value), &error)) == -1)
             {
               g_printerr (_("Error adding handle %d: %s\n"),
-                          g_variant_get_handle (value), error->message);
-              g_variant_builder_clear (&builder);
-              g_error_free (error);
+                          xvariant_get_handle (value), error->message);
+              xvariant_builder_clear (&builder);
+              xerror_free (error);
               goto out;
             }
-	  g_variant_unref (value);
-          value = g_variant_new_handle (fd_id);
+	  xvariant_unref (value);
+          value = xvariant_new_handle (fd_id);
       	}
 #endif
-      g_variant_builder_add_value (&builder, value);
+      xvariant_builder_add_value (&builder, value);
       ++parm;
     }
-  parameters = g_variant_builder_end (&builder);
+  parameters = xvariant_builder_end (&builder);
 
   if (parameters != NULL)
-    parameters = g_variant_ref_sink (parameters);
+    parameters = xvariant_ref_sink (parameters);
 
   flags = G_DBUS_CALL_FLAGS_NONE;
   if (opt_call_interactive)
@@ -1244,33 +1244,33 @@ handle_call (xint_t        *argc,
     {
       g_printerr (_("Error: %s\n"), error->message);
 
-      if (g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS) && in_signature_types != NULL)
+      if (xerror_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS) && in_signature_types != NULL)
         {
           if (in_signature_types->len > 0)
             {
-              GString *s;
-              s = g_string_new (NULL);
+              xstring_t *s;
+              s = xstring_new (NULL);
 
               for (n = 0; n < in_signature_types->len; n++)
                 {
                   xvariant_type_t *type = in_signature_types->pdata[n];
-                  g_string_append_len (s,
-                                       g_variant_type_peek_string (type),
-                                       g_variant_type_get_string_length (type));
+                  xstring_append_len (s,
+                                       xvariant_type_peek_string (type),
+                                       xvariant_type_get_string_length (type));
                 }
 
               g_printerr ("(According to introspection data, you need to pass '%s')\n", s->str);
-              g_string_free (s, TRUE);
+              xstring_free (s, TRUE);
             }
           else
             g_printerr ("(According to introspection data, you need to pass no arguments)\n");
         }
 
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
 
-  s = g_variant_print (result, TRUE);
+  s = xvariant_print (result, TRUE);
   g_print ("%s\n", s);
   g_free (s);
 
@@ -1278,13 +1278,13 @@ handle_call (xint_t        *argc,
 
  out:
   if (in_signature_types != NULL)
-    g_ptr_array_unref (in_signature_types);
+    xptr_array_unref (in_signature_types);
   if (result != NULL)
-    g_variant_unref (result);
+    xvariant_unref (result);
   if (c != NULL)
-    g_object_unref (c);
+    xobject_unref (c);
   if (parameters != NULL)
-    g_variant_unref (parameters);
+    xvariant_unref (parameters);
   g_free (interface_name);
   g_free (method_name);
   g_option_context_free (o);
@@ -1315,7 +1315,7 @@ static xboolean_t opt_introspect_only_properties = FALSE;
 #define INTROSPECT_ANNOTATION_COLOR (use_colors? RESET_COLOR: "")
 
 static void
-dump_annotation (const GDBusAnnotationInfo *o,
+dump_annotation (const xdbus_annotation_info_t *o,
                  xuint_t indent,
                  xboolean_t ignore_indent,
                  xboolean_t use_colors)
@@ -1329,7 +1329,7 @@ dump_annotation (const GDBusAnnotationInfo *o,
 }
 
 static void
-dump_arg (const GDBusArgInfo *o,
+dump_arg (const xdbus_arg_info_t *o,
           xuint_t indent,
           const xchar_t *direction,
           xboolean_t ignore_indent,
@@ -1353,7 +1353,7 @@ dump_arg (const GDBusArgInfo *o,
 }
 
 static xuint_t
-count_args (GDBusArgInfo **args)
+count_args (xdbus_arg_info_t **args)
 {
   xuint_t n;
   n = 0;
@@ -1366,7 +1366,7 @@ count_args (GDBusArgInfo **args)
 }
 
 static void
-dump_method (const GDBusMethodInfo *o,
+dump_method (const xdbus_method_info_t *o,
              xuint_t                  indent,
              xboolean_t               use_colors)
 {
@@ -1410,7 +1410,7 @@ dump_method (const GDBusMethodInfo *o,
 }
 
 static void
-dump_signal (const GDBusSignalInfo *o,
+dump_signal (const xdbus_signalInfo_t *o,
              xuint_t                  indent,
              xboolean_t               use_colors)
 {
@@ -1441,7 +1441,7 @@ dump_signal (const GDBusSignalInfo *o,
 }
 
 static void
-dump_property (const GDBusPropertyInfo *o,
+dump_property (const xdbus_property_info_t *o,
                xuint_t                    indent,
                xboolean_t                 use_colors,
                xvariant_t                *value)
@@ -1463,7 +1463,7 @@ dump_property (const GDBusPropertyInfo *o,
 
   if (value != NULL)
     {
-      xchar_t *s = g_variant_print (value, FALSE);
+      xchar_t *s = xvariant_print (value, FALSE);
       g_print ("%*s%s %s%s%s %s%s%s = %s;\n", indent, "", access,
                INTROSPECT_TYPE_COLOR, o->signature, RESET_COLOR,
                INTROSPECT_PROPERTY_COLOR, o->name, RESET_COLOR,
@@ -1477,20 +1477,20 @@ dump_property (const GDBusPropertyInfo *o,
 }
 
 static void
-dump_interface (GDBusConnection          *c,
+dump_interface (xdbus_connection_t          *c,
                 const xchar_t              *name,
-                const GDBusInterfaceInfo *o,
+                const xdbus_interface_info_t *o,
                 xuint_t                     indent,
                 xboolean_t                  use_colors,
                 const xchar_t              *object_path)
 {
   xuint_t n;
-  GHashTable *properties;
+  xhashtable_t *properties;
 
-  properties = g_hash_table_new_full (g_str_hash,
-                                      g_str_equal,
+  properties = xhash_table_new_full (xstr_hash,
+                                      xstr_equal,
                                       g_free,
-                                      (GDestroyNotify) g_variant_unref);
+                                      (xdestroy_notify_t) xvariant_unref);
 
   /* Try to get properties */
   if (c != NULL && name != NULL && object_path != NULL && o->properties != NULL)
@@ -1501,7 +1501,7 @@ dump_interface (GDBusConnection          *c,
                                             object_path,
                                             "org.freedesktop.DBus.Properties",
                                             "GetAll",
-                                            g_variant_new ("(s)", o->name),
+                                            xvariant_new ("(s)", o->name),
                                             NULL,
                                             G_DBUS_CALL_FLAGS_NONE,
                                             3000,
@@ -1509,26 +1509,26 @@ dump_interface (GDBusConnection          *c,
                                             NULL);
       if (result != NULL)
         {
-          if (g_variant_is_of_type (result, G_VARIANT_TYPE ("(a{sv})")))
+          if (xvariant_is_of_type (result, G_VARIANT_TYPE ("(a{sv})")))
             {
-              GVariantIter *iter;
+              xvariant_iter_t *iter;
               xvariant_t *item;
-              g_variant_get (result,
+              xvariant_get (result,
                              "(a{sv})",
                              &iter);
-              while ((item = g_variant_iter_next_value (iter)))
+              while ((item = xvariant_iter_next_value (iter)))
                 {
                   xchar_t *key;
                   xvariant_t *value;
-                  g_variant_get (item,
+                  xvariant_get (item,
                                  "{sv}",
                                  &key,
                                  &value);
 
-                  g_hash_table_insert (properties, key, g_variant_ref (value));
+                  xhash_table_insert (properties, key, xvariant_ref (value));
                 }
             }
-          g_variant_unref (result);
+          xvariant_unref (result);
         }
       else
         {
@@ -1540,7 +1540,7 @@ dump_interface (GDBusConnection          *c,
                                                     object_path,
                                                     "org.freedesktop.DBus.Properties",
                                                     "Get",
-                                                    g_variant_new ("(ss)", o->name, o->properties[n]->name),
+                                                    xvariant_new ("(ss)", o->name, o->properties[n]->name),
                                                     G_VARIANT_TYPE ("(v)"),
                                                     G_DBUS_CALL_FLAGS_NONE,
                                                     3000,
@@ -1549,13 +1549,13 @@ dump_interface (GDBusConnection          *c,
               if (result != NULL)
                 {
                   xvariant_t *property_value;
-                  g_variant_get (result,
+                  xvariant_get (result,
                                  "(v)",
                                  &property_value);
-                  g_hash_table_insert (properties,
-                                       g_strdup (o->properties[n]->name),
-                                       g_variant_ref (property_value));
-                  g_variant_unref (result);
+                  xhash_table_insert (properties,
+                                       xstrdup (o->properties[n]->name),
+                                       xvariant_ref (property_value));
+                  xvariant_unref (result);
                 }
             }
         }
@@ -1593,25 +1593,25 @@ dump_interface (GDBusConnection          *c,
           dump_property (o->properties[n],
                          indent + 4,
                          use_colors,
-                         g_hash_table_lookup (properties, (o->properties[n])->name));
+                         xhash_table_lookup (properties, (o->properties[n])->name));
         }
     }
   g_print ("%*s};\n",
            indent, "");
 
-  g_hash_table_unref (properties);
+  xhash_table_unref (properties);
 }
 
 static xboolean_t
-introspect_do (GDBusConnection *c,
+introspect_do (xdbus_connection_t *c,
                const xchar_t     *object_path,
                xuint_t            indent,
                xboolean_t         use_colors);
 
 static void
-dump_node (GDBusConnection      *c,
+dump_node (xdbus_connection_t      *c,
            const xchar_t          *name,
-           const GDBusNodeInfo  *o,
+           const xdbus_node_info_t  *o,
            xuint_t                 indent,
            xboolean_t              use_colors,
            const xchar_t          *object_path,
@@ -1652,11 +1652,11 @@ dump_node (GDBusConnection      *c,
           if (recurse)
             {
               xchar_t *child_path;
-              if (g_variant_is_object_path (o->nodes[n]->path))
+              if (xvariant_is_object_path (o->nodes[n]->path))
                 {
-                  child_path = g_strdup (o->nodes[n]->path);
+                  child_path = xstrdup (o->nodes[n]->path);
                   /* avoid infinite loops */
-                  if (g_str_has_prefix (child_path, object_path))
+                  if (xstr_has_prefix (child_path, object_path))
                     {
                       introspect_do (c, child_path, indent + 2, use_colors);
                     }
@@ -1668,10 +1668,10 @@ dump_node (GDBusConnection      *c,
                 }
               else
                 {
-                  if (g_strcmp0 (object_path, "/") == 0)
-                    child_path = g_strdup_printf ("/%s", o->nodes[n]->path);
+                  if (xstrcmp0 (object_path, "/") == 0)
+                    child_path = xstrdup_printf ("/%s", o->nodes[n]->path);
                   else
-                    child_path = g_strdup_printf ("%s/%s", object_path, o->nodes[n]->path);
+                    child_path = xstrdup_printf ("%s/%s", object_path, o->nodes[n]->path);
                   introspect_do (c, child_path, indent + 2, use_colors);
                 }
               g_free (child_path);
@@ -1701,14 +1701,14 @@ static const GOptionEntry introspect_entries[] =
 };
 
 static xboolean_t
-introspect_do (GDBusConnection *c,
+introspect_do (xdbus_connection_t *c,
                const xchar_t     *object_path,
                xuint_t            indent,
                xboolean_t         use_colors)
 {
   xerror_t *error;
   xvariant_t *result;
-  GDBusNodeInfo *node;
+  xdbus_node_info_t *node;
   xboolean_t ret;
   const xchar_t *xml_data;
 
@@ -1731,10 +1731,10 @@ introspect_do (GDBusConnection *c,
   if (result == NULL)
     {
       g_printerr (_("Error: %s\n"), error->message);
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
-  g_variant_get (result, "(&s)", &xml_data);
+  xvariant_get (result, "(&s)", &xml_data);
 
   if (opt_introspect_xml)
     {
@@ -1747,7 +1747,7 @@ introspect_do (GDBusConnection *c,
       if (node == NULL)
         {
           g_printerr (_("Error parsing introspection XML: %s\n"), error->message);
-          g_error_free (error);
+          xerror_free (error);
           goto out;
         }
 
@@ -1760,7 +1760,7 @@ introspect_do (GDBusConnection *c,
   if (node != NULL)
     g_dbus_node_info_unref (node);
   if (result != NULL)
-    g_variant_unref (result);
+    xvariant_unref (result);
   return ret;
 }
 
@@ -1772,10 +1772,10 @@ handle_introspect (xint_t        *argc,
                    const xchar_t *completion_prev)
 {
   xint_t ret;
-  GOptionContext *o;
+  xoption_context_t *o;
   xchar_t *s;
   xerror_t *error;
-  GDBusConnection *c;
+  xdbus_connection_t *c;
   xboolean_t complete_names;
   xboolean_t complete_paths;
   xboolean_t color_support;
@@ -1790,14 +1790,14 @@ handle_introspect (xint_t        *argc,
   g_option_context_add_group (o, connection_get_group ());
 
   complete_names = FALSE;
-  if (request_completion && *argc > 1 && g_strcmp0 ((*argv)[(*argc)-1], "--dest") == 0)
+  if (request_completion && *argc > 1 && xstrcmp0 ((*argv)[(*argc)-1], "--dest") == 0)
     {
       complete_names = TRUE;
       remove_arg ((*argc) - 1, argc, argv);
     }
 
   complete_paths = FALSE;
-  if (request_completion && *argc > 1 && g_strcmp0 ((*argv)[(*argc)-1], "--object-path") == 0)
+  if (request_completion && *argc > 1 && xstrcmp0 ((*argv)[(*argc)-1], "--object-path") == 0)
     {
       complete_paths = TRUE;
       remove_arg ((*argc) - 1, argc, argv);
@@ -1820,7 +1820,7 @@ handle_introspect (xint_t        *argc,
     {
       if (request_completion)
         {
-          if (g_strcmp0 (completion_prev, "--address") == 0)
+          if (xstrcmp0 (completion_prev, "--address") == 0)
             {
               g_print ("unix:\n"
                        "tcp:\n"
@@ -1835,7 +1835,7 @@ handle_introspect (xint_t        *argc,
         {
           g_printerr (_("Error connecting: %s\n"), error->message);
         }
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
 
@@ -1853,9 +1853,9 @@ handle_introspect (xint_t        *argc,
         g_printerr (_("Error: Destination is not specified\n"));
       goto out;
     }
-  if (request_completion && g_strcmp0 ("--dest", completion_prev) == 0)
+  if (request_completion && xstrcmp0 ("--dest", completion_prev) == 0)
     {
-      print_names (c, g_str_has_prefix (opt_introspect_dest, ":"));
+      print_names (c, xstr_has_prefix (opt_introspect_dest, ":"));
       goto out;
     }
 
@@ -1879,10 +1879,10 @@ handle_introspect (xint_t        *argc,
         g_printerr (_("Error: Object path is not specified\n"));
       goto out;
     }
-  if (request_completion && g_strcmp0 ("--object-path", completion_prev) == 0)
+  if (request_completion && xstrcmp0 ("--object-path", completion_prev) == 0)
     {
       xchar_t *p;
-      s = g_strdup (opt_introspect_object_path);
+      s = xstrdup (opt_introspect_object_path);
       p = strrchr (s, '/');
       if (p != NULL)
         {
@@ -1894,7 +1894,7 @@ handle_introspect (xint_t        *argc,
       g_free (s);
       goto out;
     }
-  if (!request_completion && !g_variant_is_object_path (opt_introspect_object_path))
+  if (!request_completion && !xvariant_is_object_path (opt_introspect_object_path))
     {
       g_printerr (_("Error: %s is not a valid object path\n"), opt_introspect_object_path);
       goto out;
@@ -1924,7 +1924,7 @@ handle_introspect (xint_t        *argc,
 
  out:
   if (c != NULL)
-    g_object_unref (c);
+    xobject_unref (c);
   g_option_context_free (o);
   return ret;
 }
@@ -1937,7 +1937,7 @@ static xchar_t *opt_monitor_object_path = NULL;
 static xuint_t monitor_filter_id = 0;
 
 static void
-monitor_signal_cb (GDBusConnection *connection,
+monitor_signal_cb (xdbus_connection_t *connection,
                    const xchar_t     *sender_name,
                    const xchar_t     *object_path,
                    const xchar_t     *interface_name,
@@ -1946,7 +1946,7 @@ monitor_signal_cb (GDBusConnection *connection,
                    xpointer_t         user_data)
 {
   xchar_t *s;
-  s = g_variant_print (parameters, TRUE);
+  s = xvariant_print (parameters, TRUE);
   g_print ("%s: %s.%s %s\n",
            object_path,
            interface_name,
@@ -1956,7 +1956,7 @@ monitor_signal_cb (GDBusConnection *connection,
 }
 
 static void
-monitor_on_name_appeared (GDBusConnection *connection,
+monitor_on_name_appeared (xdbus_connection_t *connection,
                           const xchar_t *name,
                           const xchar_t *name_owner,
                           xpointer_t user_data)
@@ -1976,7 +1976,7 @@ monitor_on_name_appeared (GDBusConnection *connection,
 }
 
 static void
-monitor_on_name_vanished (GDBusConnection *connection,
+monitor_on_name_vanished (xdbus_connection_t *connection,
                           const xchar_t *name,
                           xpointer_t user_data)
 {
@@ -2004,13 +2004,13 @@ handle_monitor (xint_t        *argc,
                 const xchar_t *completion_prev)
 {
   xint_t ret;
-  GOptionContext *o;
+  xoption_context_t *o;
   xchar_t *s;
   xerror_t *error;
-  GDBusConnection *c;
+  xdbus_connection_t *c;
   xboolean_t complete_names;
   xboolean_t complete_paths;
-  GMainLoop *loop;
+  xmain_loop_t *loop;
 
   ret = FALSE;
   c = NULL;
@@ -2022,14 +2022,14 @@ handle_monitor (xint_t        *argc,
   g_option_context_add_group (o, connection_get_group ());
 
   complete_names = FALSE;
-  if (request_completion && *argc > 1 && g_strcmp0 ((*argv)[(*argc)-1], "--dest") == 0)
+  if (request_completion && *argc > 1 && xstrcmp0 ((*argv)[(*argc)-1], "--dest") == 0)
     {
       complete_names = TRUE;
       remove_arg ((*argc) - 1, argc, argv);
     }
 
   complete_paths = FALSE;
-  if (request_completion && *argc > 1 && g_strcmp0 ((*argv)[(*argc)-1], "--object-path") == 0)
+  if (request_completion && *argc > 1 && xstrcmp0 ((*argv)[(*argc)-1], "--object-path") == 0)
     {
       complete_paths = TRUE;
       remove_arg ((*argc) - 1, argc, argv);
@@ -2052,7 +2052,7 @@ handle_monitor (xint_t        *argc,
     {
       if (request_completion)
         {
-          if (g_strcmp0 (completion_prev, "--address") == 0)
+          if (xstrcmp0 (completion_prev, "--address") == 0)
             {
               g_print ("unix:\n"
                        "tcp:\n"
@@ -2067,7 +2067,7 @@ handle_monitor (xint_t        *argc,
         {
           g_printerr (_("Error connecting: %s\n"), error->message);
         }
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
 
@@ -2093,9 +2093,9 @@ handle_monitor (xint_t        *argc,
         g_printerr (_("Error: Destination is not specified\n"));
       goto out;
     }
-  if (request_completion && g_strcmp0 ("--dest", completion_prev) == 0)
+  if (request_completion && xstrcmp0 ("--dest", completion_prev) == 0)
     {
-      print_names (c, g_str_has_prefix (opt_monitor_dest, ":"));
+      print_names (c, xstr_has_prefix (opt_monitor_dest, ":"));
       goto out;
     }
 
@@ -2119,10 +2119,10 @@ handle_monitor (xint_t        *argc,
         }
       /* it's fine to not have an object path */
     }
-  if (request_completion && g_strcmp0 ("--object-path", completion_prev) == 0)
+  if (request_completion && xstrcmp0 ("--object-path", completion_prev) == 0)
     {
       xchar_t *p;
-      s = g_strdup (opt_monitor_object_path);
+      s = xstrdup (opt_monitor_object_path);
       p = strrchr (s, '/');
       if (p != NULL)
         {
@@ -2134,7 +2134,7 @@ handle_monitor (xint_t        *argc,
       g_free (s);
       goto out;
     }
-  if (!request_completion && (opt_monitor_object_path != NULL && !g_variant_is_object_path (opt_monitor_object_path)))
+  if (!request_completion && (opt_monitor_object_path != NULL && !xvariant_is_object_path (opt_monitor_object_path)))
     {
       g_printerr (_("Error: %s is not a valid object path\n"), opt_monitor_object_path);
       goto out;
@@ -2149,7 +2149,7 @@ handle_monitor (xint_t        *argc,
   else
     g_print ("Monitoring signals from all objects owned by %s\n", opt_monitor_dest);
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
   g_bus_watch_name_on_connection (c,
                                   opt_monitor_dest,
                                   G_BUS_NAME_WATCHER_FLAGS_AUTO_START,
@@ -2158,14 +2158,14 @@ handle_monitor (xint_t        *argc,
                                   NULL,
                                   NULL);
 
-  g_main_loop_run (loop);
-  g_main_loop_unref (loop);
+  xmain_loop_run (loop);
+  xmain_loop_unref (loop);
 
   ret = TRUE;
 
  out:
   if (c != NULL)
-    g_object_unref (c);
+    xobject_unref (c);
   g_option_context_free (o);
   return ret;
 }
@@ -2190,7 +2190,7 @@ opt_wait_activate_cb (const xchar_t  *option_name,
 {
   /* @value may be NULL */
   opt_wait_activate_set = TRUE;
-  opt_wait_activate_name = g_strdup (value);
+  opt_wait_activate_name = xstrdup (value);
 
   return TRUE;
 }
@@ -2208,7 +2208,7 @@ static const GOptionEntry wait_entries[] =
 };
 
 static void
-wait_name_appeared_cb (GDBusConnection *connection,
+wait_name_appeared_cb (xdbus_connection_t *connection,
                        const xchar_t     *name,
                        const xchar_t     *name_owner,
                        xpointer_t         user_data)
@@ -2237,10 +2237,10 @@ handle_wait (xint_t        *argc,
              const xchar_t *completion_prev)
 {
   xint_t ret;
-  GOptionContext *o;
+  xoption_context_t *o;
   xchar_t *s;
   xerror_t *error;
-  GDBusConnection *c;
+  xdbus_connection_t *c;
   xuint_t watch_id, timer_id = 0, activate_watch_id;
   const xchar_t *activate_service, *wait_service;
   WaitState wait_state = WAIT_STATE_RUNNING;
@@ -2272,7 +2272,7 @@ handle_wait (xint_t        *argc,
     {
       if (request_completion)
         {
-          if (g_strcmp0 (completion_prev, "--address") == 0)
+          if (xstrcmp0 (completion_prev, "--address") == 0)
             {
               g_print ("unix:\n"
                        "tcp:\n"
@@ -2287,7 +2287,7 @@ handle_wait (xint_t        *argc,
         {
           g_printerr (_("Error connecting: %s\n"), error->message);
         }
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
 
@@ -2382,11 +2382,11 @@ handle_wait (xint_t        *argc,
     timer_id = g_timeout_add_seconds (opt_wait_timeout_secs, wait_timeout_cb, &wait_state);
 
   while (wait_state == WAIT_STATE_RUNNING)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   g_bus_unwatch_name (watch_id);
   if (timer_id != 0)
-      g_source_remove (timer_id);
+      xsource_remove (timer_id);
   if (activate_watch_id != 0)
       g_bus_unwatch_name (activate_watch_id);
 
@@ -2422,7 +2422,7 @@ pick_word_at (const xchar_t  *s,
     {
       if (out_word_begins_at != NULL)
         *out_word_begins_at = cursor;
-      return g_strdup ("");
+      return xstrdup ("");
     }
 
   while (!g_ascii_isspace (s[cursor - 1]) && cursor > 0)
@@ -2436,7 +2436,7 @@ pick_word_at (const xchar_t  *s,
   if (out_word_begins_at != NULL)
     *out_word_begins_at = begin;
 
-  return g_strndup (s + begin, end - begin);
+  return xstrndup (s + begin, end - begin);
 }
 
 xint_t
@@ -2482,7 +2482,7 @@ main (xint_t argc, xchar_t *argv[])
 
  again:
   command = argv[1];
-  if (g_strcmp0 (command, "help") == 0)
+  if (xstrcmp0 (command, "help") == 0)
     {
       if (request_completion)
         {
@@ -2495,7 +2495,7 @@ main (xint_t argc, xchar_t *argv[])
         }
       goto out;
     }
-  else if (g_strcmp0 (command, "emit") == 0)
+  else if (xstrcmp0 (command, "emit") == 0)
     {
       if (handle_emit (&argc,
                        &argv,
@@ -2505,7 +2505,7 @@ main (xint_t argc, xchar_t *argv[])
         ret = 0;
       goto out;
     }
-  else if (g_strcmp0 (command, "call") == 0)
+  else if (xstrcmp0 (command, "call") == 0)
     {
       if (handle_call (&argc,
                        &argv,
@@ -2515,7 +2515,7 @@ main (xint_t argc, xchar_t *argv[])
         ret = 0;
       goto out;
     }
-  else if (g_strcmp0 (command, "introspect") == 0)
+  else if (xstrcmp0 (command, "introspect") == 0)
     {
       if (handle_introspect (&argc,
                              &argv,
@@ -2525,7 +2525,7 @@ main (xint_t argc, xchar_t *argv[])
         ret = 0;
       goto out;
     }
-  else if (g_strcmp0 (command, "monitor") == 0)
+  else if (xstrcmp0 (command, "monitor") == 0)
     {
       if (handle_monitor (&argc,
                           &argv,
@@ -2535,7 +2535,7 @@ main (xint_t argc, xchar_t *argv[])
         ret = 0;
       goto out;
     }
-  else if (g_strcmp0 (command, "wait") == 0)
+  else if (xstrcmp0 (command, "wait") == 0)
     {
       if (handle_wait (&argc,
                        &argv,
@@ -2546,14 +2546,14 @@ main (xint_t argc, xchar_t *argv[])
       goto out;
     }
 #ifdef G_OS_WIN32
-  else if (g_strcmp0 (command, _GDBUS_ARG_WIN32_RUN_SESSION_BUS) == 0)
+  else if (xstrcmp0 (command, _GDBUS_ARG_WIN32_RUN_SESSION_BUS) == 0)
     {
       g_win32_run_session_bus (NULL, NULL, NULL, 0);
       ret = 0;
       goto out;
     }
 #endif
-  else if (g_strcmp0 (command, "complete") == 0 && argc == 4 && !request_completion)
+  else if (xstrcmp0 (command, "complete") == 0 && argc == 4 && !request_completion)
     {
       const xchar_t *completion_line;
       xchar_t **completion_argv;

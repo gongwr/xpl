@@ -40,23 +40,23 @@ static xboolean_t toggle_ref3_weakened;
 static xboolean_t toggle_ref3_strengthened;
 
 /*
- * TestObject, a parent class for TestObject
+ * test_object_t, a parent class for test_object_t
  */
 static xtype_t test_object_get_type (void);
 #define TEST_TYPE_OBJECT          (test_object_get_type ())
-typedef struct _TestObject        TestObject;
-typedef struct _TestObjectClass   TestObjectClass;
+typedef struct _test_object        test_object_t;
+typedef struct _test_object_class   test_object_class_t;
 
-struct _TestObject
+struct _test_object
 {
   xobject_t parent_instance;
 };
-struct _TestObjectClass
+struct _test_object_class
 {
   xobject_class_t parent_class;
 };
 
-G_DEFINE_TYPE (TestObject, test_object, XTYPE_OBJECT)
+G_DEFINE_TYPE (test_object, test_object, XTYPE_OBJECT)
 
 static void
 test_object_finalize (xobject_t *object)
@@ -67,7 +67,7 @@ test_object_finalize (xobject_t *object)
 }
 
 static void
-test_object_class_init (TestObjectClass *class)
+test_object_class_init (test_object_class_t *class)
 {
   xobject_class_t *object_class = G_OBJECT_CLASS (class);
 
@@ -75,7 +75,7 @@ test_object_class_init (TestObjectClass *class)
 }
 
 static void
-test_object_init (TestObject *test_object)
+test_object_init (test_object_t *test_object)
 {
 }
 
@@ -152,7 +152,7 @@ toggle_ref3 (xpointer_t data,
   if (is_last_ref)
     {
       toggle_ref3_weakened = TRUE;
-      g_object_remove_toggle_ref (object, toggle_ref3, GUINT_TO_POINTER (34));
+      xobject_remove_toggle_ref (object, toggle_ref3, GUINT_TO_POINTER (34));
     }
   else
     toggle_ref3_strengthened = TRUE;
@@ -170,77 +170,77 @@ main (int   argc,
 
   /* Test basic weak reference operation
    */
-  global_object = object = g_object_new (TEST_TYPE_OBJECT, NULL);
+  global_object = object = xobject_new (TEST_TYPE_OBJECT, NULL);
 
-  g_object_weak_ref (object, weak_ref1, GUINT_TO_POINTER (42));
+  xobject_weak_ref (object, weak_ref1, GUINT_TO_POINTER (42));
 
   clear_flags ();
-  g_object_unref (object);
+  xobject_unref (object);
   g_assert (weak_ref1_notified == TRUE);
   g_assert (object_destroyed == TRUE);
 
   /* Test two weak references at once
    */
-  global_object = object = g_object_new (TEST_TYPE_OBJECT, NULL);
+  global_object = object = xobject_new (TEST_TYPE_OBJECT, NULL);
 
-  g_object_weak_ref (object, weak_ref1, GUINT_TO_POINTER (42));
-  g_object_weak_ref (object, weak_ref2, GUINT_TO_POINTER (24));
+  xobject_weak_ref (object, weak_ref1, GUINT_TO_POINTER (42));
+  xobject_weak_ref (object, weak_ref2, GUINT_TO_POINTER (24));
 
   clear_flags ();
-  g_object_unref (object);
+  xobject_unref (object);
   g_assert (weak_ref1_notified == TRUE);
   g_assert (weak_ref2_notified == TRUE);
   g_assert (object_destroyed == TRUE);
 
   /* Test remove weak references
    */
-  global_object = object = g_object_new (TEST_TYPE_OBJECT, NULL);
+  global_object = object = xobject_new (TEST_TYPE_OBJECT, NULL);
 
-  g_object_weak_ref (object, weak_ref1, GUINT_TO_POINTER (42));
-  g_object_weak_ref (object, weak_ref2, GUINT_TO_POINTER (24));
-  g_object_weak_unref (object, weak_ref1, GUINT_TO_POINTER (42));
+  xobject_weak_ref (object, weak_ref1, GUINT_TO_POINTER (42));
+  xobject_weak_ref (object, weak_ref2, GUINT_TO_POINTER (24));
+  xobject_weak_unref (object, weak_ref1, GUINT_TO_POINTER (42));
 
   clear_flags ();
-  g_object_unref (object);
+  xobject_unref (object);
   g_assert (weak_ref1_notified == FALSE);
   g_assert (weak_ref2_notified == TRUE);
   g_assert (object_destroyed == TRUE);
 
   /* Test basic toggle reference operation
    */
-  global_object = object = g_object_new (TEST_TYPE_OBJECT, NULL);
+  global_object = object = xobject_new (TEST_TYPE_OBJECT, NULL);
 
-  g_object_add_toggle_ref (object, toggle_ref1, GUINT_TO_POINTER (42));
+  xobject_add_toggle_ref (object, toggle_ref1, GUINT_TO_POINTER (42));
 
   clear_flags ();
-  g_object_unref (object);
+  xobject_unref (object);
   g_assert (toggle_ref1_weakened == TRUE);
   g_assert (toggle_ref1_strengthened == FALSE);
   g_assert (object_destroyed == FALSE);
 
   clear_flags ();
-  g_object_ref (object);
+  xobject_ref (object);
   g_assert (toggle_ref1_weakened == FALSE);
   g_assert (toggle_ref1_strengthened == TRUE);
   g_assert (object_destroyed == FALSE);
 
-  g_object_unref (object);
+  xobject_unref (object);
 
   clear_flags ();
-  g_object_remove_toggle_ref (object, toggle_ref1, GUINT_TO_POINTER (42));
+  xobject_remove_toggle_ref (object, toggle_ref1, GUINT_TO_POINTER (42));
   g_assert (toggle_ref1_weakened == FALSE);
   g_assert (toggle_ref1_strengthened == FALSE);
   g_assert (object_destroyed == TRUE);
 
-  global_object = object = g_object_new (TEST_TYPE_OBJECT, NULL);
+  global_object = object = xobject_new (TEST_TYPE_OBJECT, NULL);
 
   /* Test two toggle references at once
    */
-  g_object_add_toggle_ref (object, toggle_ref1, GUINT_TO_POINTER (42));
-  g_object_add_toggle_ref (object, toggle_ref2, GUINT_TO_POINTER (24));
+  xobject_add_toggle_ref (object, toggle_ref1, GUINT_TO_POINTER (42));
+  xobject_add_toggle_ref (object, toggle_ref2, GUINT_TO_POINTER (24));
 
   clear_flags ();
-  g_object_unref (object);
+  xobject_unref (object);
   g_assert (toggle_ref1_weakened == FALSE);
   g_assert (toggle_ref1_strengthened == FALSE);
   g_assert (toggle_ref2_weakened == FALSE);
@@ -248,7 +248,7 @@ main (int   argc,
   g_assert (object_destroyed == FALSE);
 
   clear_flags ();
-  g_object_remove_toggle_ref (object, toggle_ref1, GUINT_TO_POINTER (42));
+  xobject_remove_toggle_ref (object, toggle_ref1, GUINT_TO_POINTER (42));
   g_assert (toggle_ref1_weakened == FALSE);
   g_assert (toggle_ref1_strengthened == FALSE);
   g_assert (toggle_ref2_weakened == TRUE);
@@ -257,7 +257,7 @@ main (int   argc,
 
   clear_flags ();
   /* Check that removing a toggle ref with %NULL data works fine. */
-  g_object_remove_toggle_ref (object, toggle_ref2, NULL);
+  xobject_remove_toggle_ref (object, toggle_ref2, NULL);
   g_assert (toggle_ref1_weakened == FALSE);
   g_assert (toggle_ref1_strengthened == FALSE);
   g_assert (toggle_ref2_weakened == FALSE);
@@ -266,12 +266,12 @@ main (int   argc,
 
   /* Test a toggle reference that removes itself
    */
-  global_object = object = g_object_new (TEST_TYPE_OBJECT, NULL);
+  global_object = object = xobject_new (TEST_TYPE_OBJECT, NULL);
 
-  g_object_add_toggle_ref (object, toggle_ref3, GUINT_TO_POINTER (34));
+  xobject_add_toggle_ref (object, toggle_ref3, GUINT_TO_POINTER (34));
 
   clear_flags ();
-  g_object_unref (object);
+  xobject_unref (object);
   g_assert (toggle_ref3_weakened == TRUE);
   g_assert (toggle_ref3_strengthened == FALSE);
   g_assert (object_destroyed == TRUE);

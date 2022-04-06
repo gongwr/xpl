@@ -16,8 +16,8 @@
  * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __G_SIMPLE_PROXY_RESOLVER_H__
-#define __G_SIMPLE_PROXY_RESOLVER_H__
+#ifndef __XSIMPLE_PROXY_RESOLVER_H__
+#define __XSIMPLE_PROXY_RESOLVER_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -27,31 +27,31 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SIMPLE_PROXY_RESOLVER         (g_simple_proxy_resolver_get_type ())
-#define G_SIMPLE_PROXY_RESOLVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_SIMPLE_PROXY_RESOLVER, GSimpleProxyResolver))
-#define G_SIMPLE_PROXY_RESOLVER_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_SIMPLE_PROXY_RESOLVER, GSimpleProxyResolverClass))
+#define XTYPE_SIMPLE_PROXY_RESOLVER         (xsimple_proxy_resolver_get_type ())
+#define XSIMPLE_PROXY_RESOLVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_SIMPLE_PROXY_RESOLVER, xsimple_proxy_resolver))
+#define XSIMPLE_PROXY_RESOLVER_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_SIMPLE_PROXY_RESOLVER, xsimple_proxy_resolver_class_t))
 #define X_IS_SIMPLE_PROXY_RESOLVER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_SIMPLE_PROXY_RESOLVER))
 #define X_IS_SIMPLE_PROXY_RESOLVER_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_SIMPLE_PROXY_RESOLVER))
-#define G_SIMPLE_PROXY_RESOLVER_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_SIMPLE_PROXY_RESOLVER, GSimpleProxyResolverClass))
+#define XSIMPLE_PROXY_RESOLVER_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_SIMPLE_PROXY_RESOLVER, xsimple_proxy_resolver_class_t))
 
 /**
- * GSimpleProxyResolver:
+ * xsimple_proxy_resolver_t:
  *
- * A #GProxyResolver implementation for using a fixed set of proxies.
+ * A #xproxy_resolver_t implementation for using a fixed set of proxies.
  **/
-typedef struct _GSimpleProxyResolver GSimpleProxyResolver;
-typedef struct _GSimpleProxyResolverPrivate GSimpleProxyResolverPrivate;
-typedef struct _GSimpleProxyResolverClass GSimpleProxyResolverClass;
+typedef struct _GSimpleProxyResolver xsimple_proxy_resolver_t;
+typedef struct _xsimple_proxy_resolver_private xsimple_proxy_resolver_private_t;
+typedef struct _xsimple_proxy_resolver_class xsimple_proxy_resolver_class_t;
 
 struct _GSimpleProxyResolver
 {
   xobject_t parent_instance;
 
   /*< private >*/
-  GSimpleProxyResolverPrivate *priv;
+  xsimple_proxy_resolver_private_t *priv;
 };
 
-struct _GSimpleProxyResolverClass
+struct _xsimple_proxy_resolver_class
 {
   xobject_class_t parent_class;
 
@@ -65,25 +65,25 @@ struct _GSimpleProxyResolverClass
 };
 
 XPL_AVAILABLE_IN_2_36
-xtype_t           g_simple_proxy_resolver_get_type          (void) G_GNUC_CONST;
+xtype_t           xsimple_proxy_resolver_get_type          (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_2_36
-GProxyResolver *g_simple_proxy_resolver_new               (const xchar_t           *default_proxy,
+xproxy_resolver_t *xsimple_proxy_resolver_new               (const xchar_t           *default_proxy,
                                                            xchar_t                **ignore_hosts);
 
 XPL_AVAILABLE_IN_2_36
-void            g_simple_proxy_resolver_set_default_proxy (GSimpleProxyResolver  *resolver,
+void            xsimple_proxy_resolver_set_default_proxy (xsimple_proxy_resolver_t  *resolver,
                                                            const xchar_t           *default_proxy);
 
 XPL_AVAILABLE_IN_2_36
-void            g_simple_proxy_resolver_set_ignore_hosts  (GSimpleProxyResolver  *resolver,
+void            xsimple_proxy_resolver_set_ignore_hosts  (xsimple_proxy_resolver_t  *resolver,
                                                            xchar_t                **ignore_hosts);
 
 XPL_AVAILABLE_IN_2_36
-void            g_simple_proxy_resolver_set_uri_proxy     (GSimpleProxyResolver  *resolver,
+void            xsimple_proxy_resolver_set_uri_proxy     (xsimple_proxy_resolver_t  *resolver,
                                                            const xchar_t           *uri_scheme,
                                                            const xchar_t           *proxy);
 
 G_END_DECLS
 
-#endif /* __G_SIMPLE_PROXY_RESOLVER_H__ */
+#endif /* __XSIMPLE_PROXY_RESOLVER_H__ */

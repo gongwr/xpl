@@ -30,24 +30,24 @@
 G_BEGIN_DECLS
 
 
-XPL_DEPRECATED_IN_2_36_FOR ("GThreadPool or g_task_run_in_thread")
+XPL_DEPRECATED_IN_2_36_FOR ("GThreadPool or xtask_run_in_thread")
 void     g_io_scheduler_push_job                   (GIOSchedulerJobFunc  job_func,
 						    xpointer_t             user_data,
-						    GDestroyNotify       notify,
+						    xdestroy_notify_t       notify,
 						    xint_t                 io_priority,
 						    xcancellable_t        *cancellable);
 XPL_DEPRECATED_IN_2_36
 void     g_io_scheduler_cancel_all_jobs            (void);
-XPL_DEPRECATED_IN_2_36_FOR (g_main_context_invoke)
-xboolean_t g_io_scheduler_job_send_to_mainloop       (GIOSchedulerJob     *job,
-						    GSourceFunc          func,
+XPL_DEPRECATED_IN_2_36_FOR (xmain_context_invoke)
+xboolean_t g_io_scheduler_job_send_to_mainloop       (xio_scheduler_job_t     *job,
+						    xsource_func_t          func,
 						    xpointer_t             user_data,
-						    GDestroyNotify       notify);
-XPL_DEPRECATED_IN_2_36_FOR (g_main_context_invoke)
-void     g_io_scheduler_job_send_to_mainloop_async (GIOSchedulerJob     *job,
-						    GSourceFunc          func,
+						    xdestroy_notify_t       notify);
+XPL_DEPRECATED_IN_2_36_FOR (xmain_context_invoke)
+void     g_io_scheduler_job_send_to_mainloop_async (xio_scheduler_job_t     *job,
+						    xsource_func_t          func,
 						    xpointer_t             user_data,
-						    GDestroyNotify       notify);
+						    xdestroy_notify_t       notify);
 
 G_END_DECLS
 

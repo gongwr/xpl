@@ -5,13 +5,13 @@ test_parse (const xchar_t   *data,
             size_t         size,
             GKeyFileFlags  flags)
 {
-  GKeyFile *key = NULL;
+  xkey_file_t *key = NULL;
 
-  key = g_key_file_new ();
-  g_key_file_load_from_data (key, (const xchar_t*) data, size, G_KEY_FILE_NONE,
+  key = xkey_file_new ();
+  xkey_file_load_from_data (key, (const xchar_t*) data, size, G_KEY_FILE_NONE,
                              NULL);
 
-  g_key_file_free (key);
+  xkey_file_free (key);
 }
 
 int

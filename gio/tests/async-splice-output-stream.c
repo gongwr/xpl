@@ -38,7 +38,7 @@ typedef enum
 
 typedef struct
 {
-  GMainLoop *main_loop;
+  xmain_loop_t *main_loop;
   const xchar_t *data;
   xinput_stream_t *istream;
   xoutput_stream_t *ostream;
@@ -55,16 +55,16 @@ test_copy_chunks_splice_cb (xobject_t      *source,
   TestCopyChunksData *data = user_data;
   xchar_t *received_data;
   xerror_t *error = NULL;
-  gssize bytes_spliced;
+  xssize_t bytes_spliced;
 
-  bytes_spliced = g_output_stream_splice_finish (G_OUTPUT_STREAM (source),
+  bytes_spliced = xoutput_stream_splice_finish (G_OUTPUT_STREAM (source),
                                                  res, &error);
 
   if (data->flags & TEST_CANCEL)
     {
       g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
-      g_error_free (error);
-      g_main_loop_quit (data->main_loop);
+      xerror_free (error);
+      xmain_loop_quit (data->main_loop);
       return;
     }
 
@@ -75,7 +75,7 @@ test_copy_chunks_splice_cb (xobject_t      *source,
     {
       xsize_t length = 0;
 
-      g_file_get_contents (data->output_path, &received_data,
+      xfile_get_contents (data->output_path, &received_data,
                            &length, &error);
       g_assert_no_error (error);
       g_assert_cmpstr (received_data, ==, data->data);
@@ -87,8 +87,8 @@ test_copy_chunks_splice_cb (xobject_t      *source,
       g_assert_cmpstr (received_data, ==, data->data);
     }
 
-  g_assert (g_input_stream_is_closed (data->istream));
-  g_assert (g_output_stream_is_closed (data->ostream));
+  g_assert (xinput_stream_is_closed (data->istream));
+  g_assert (xoutput_stream_is_closed (data->ostream));
 
   if (data->flags & TEST_THREADED_ISTREAM)
     {
@@ -102,7 +102,7 @@ test_copy_chunks_splice_cb (xobject_t      *source,
       g_free (data->output_path);
     }
 
-  g_main_loop_quit (data->main_loop);
+  xmain_loop_quit (data->main_loop);
 }
 
 static void
@@ -112,7 +112,7 @@ test_copy_chunks_start (TestThreadedFlags flags)
   xerror_t *error = NULL;
   xcancellable_t *cancellable = NULL;
 
-  data.main_loop = g_main_loop_new (NULL, FALSE);
+  data.main_loop = xmain_loop_new (NULL, FALSE);
   data.data = "abcdefghijklmnopqrstuvwxyz";
   data.flags = flags;
 
@@ -125,19 +125,19 @@ test_copy_chunks_start (TestThreadedFlags flags)
   if (data.flags & TEST_THREADED_ISTREAM)
     {
       xfile_t *file;
-      GFileIOStream *stream;
+      xfile_io_stream_t *stream;
 
-      file = g_file_new_tmp ("test-inputXXXXXX", &stream, &error);
+      file = xfile_new_tmp ("test-inputXXXXXX", &stream, &error);
       g_assert_no_error (error);
-      g_object_unref (stream);
-      data.input_path = g_file_get_path (file);
-      g_file_set_contents (data.input_path,
+      xobject_unref (stream);
+      data.input_path = xfile_get_path (file);
+      xfile_set_contents (data.input_path,
                            data.data, strlen (data.data),
                            &error);
       g_assert_no_error (error);
-      data.istream = G_INPUT_STREAM (g_file_read (file, NULL, &error));
+      data.istream = G_INPUT_STREAM (xfile_read (file, NULL, &error));
       g_assert_no_error (error);
-      g_object_unref (file);
+      xobject_unref (file);
     }
   else
     {
@@ -147,24 +147,24 @@ test_copy_chunks_start (TestThreadedFlags flags)
   if (data.flags & TEST_THREADED_OSTREAM)
     {
       xfile_t *file;
-      GFileIOStream *stream;
+      xfile_io_stream_t *stream;
 
-      file = g_file_new_tmp ("test-outputXXXXXX", &stream, &error);
+      file = xfile_new_tmp ("test-outputXXXXXX", &stream, &error);
       g_assert_no_error (error);
-      g_object_unref (stream);
-      data.output_path = g_file_get_path (file);
-      data.ostream = G_OUTPUT_STREAM (g_file_replace (file, NULL, FALSE,
-                                                      G_FILE_CREATE_NONE,
+      xobject_unref (stream);
+      data.output_path = xfile_get_path (file);
+      data.ostream = G_OUTPUT_STREAM (xfile_replace (file, NULL, FALSE,
+                                                      XFILE_CREATE_NONE,
                                                       NULL, &error));
       g_assert_no_error (error);
-      g_object_unref (file);
+      xobject_unref (file);
     }
   else
     {
       data.ostream = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
     }
 
-  g_output_stream_splice_async (data.ostream, data.istream,
+  xoutput_stream_splice_async (data.ostream, data.istream,
                                 G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE |
                                 G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET,
                                 G_PRIORITY_DEFAULT, cancellable,
@@ -173,12 +173,12 @@ test_copy_chunks_start (TestThreadedFlags flags)
   /* We do not hold a ref in data struct, this is to make sure the operation
    * keeps the iostream objects alive until it finishes
    */
-  g_object_unref (data.istream);
-  g_object_unref (data.ostream);
+  xobject_unref (data.istream);
+  xobject_unref (data.ostream);
   g_clear_object (&cancellable);
 
-  g_main_loop_run (data.main_loop);
-  g_main_loop_unref (data.main_loop);
+  xmain_loop_run (data.main_loop);
+  xmain_loop_unref (data.main_loop);
 }
 
 static void

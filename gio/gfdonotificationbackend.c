@@ -37,16 +37,16 @@
 #define G_FDO_NOTIFICATION_BACKEND(o)    (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FDO_NOTIFICATION_BACKEND, GFdoNotificationBackend))
 
 typedef struct _GFdoNotificationBackend GFdoNotificationBackend;
-typedef GNotificationBackendClass       GFdoNotificationBackendClass;
+typedef xnotification_backend_class_t       GFdoNotificationBackendClass;
 
 struct _GFdoNotificationBackend
 {
-  GNotificationBackend parent;
+  xnotification_backend_t parent;
 
   xuint_t   bus_name_id;
 
   xuint_t   notify_subscription;
-  GSList *notifications;
+  xslist_t *notifications;
 };
 
 xtype_t g_fdo_notification_backend_get_type (void);
@@ -60,7 +60,7 @@ typedef struct
 {
   GFdoNotificationBackend *backend;
   xchar_t *id;
-  guint32 notify_id;
+  xuint32_t notify_id;
   xchar_t *default_action;
   xvariant_t *default_action_target;
 } FreedesktopNotification;
@@ -70,11 +70,11 @@ freedesktop_notification_free (xpointer_t data)
 {
   FreedesktopNotification *n = data;
 
-  g_object_unref (n->backend);
+  xobject_unref (n->backend);
   g_free (n->id);
   g_free (n->default_action);
   if (n->default_action_target)
-    g_variant_unref (n->default_action_target);
+    xvariant_unref (n->default_action_target);
 
   g_slice_free (FreedesktopNotification, n);
 }
@@ -82,15 +82,15 @@ freedesktop_notification_free (xpointer_t data)
 static FreedesktopNotification *
 freedesktop_notification_new (GFdoNotificationBackend *backend,
                               const xchar_t             *id,
-                              GNotification           *notification)
+                              xnotification_t           *notification)
 {
   FreedesktopNotification *n;
 
   n = g_slice_new0 (FreedesktopNotification);
-  n->backend = g_object_ref (backend);
-  n->id = g_strdup (id);
+  n->backend = xobject_ref (backend);
+  n->id = xstrdup (id);
   n->notify_id = 0;
-  g_notification_get_default_action (notification,
+  xnotification_get_default_action (notification,
                                      &n->default_action,
                                      &n->default_action_target);
 
@@ -101,12 +101,12 @@ static FreedesktopNotification *
 g_fdo_notification_backend_find_notification (GFdoNotificationBackend *backend,
                                               const xchar_t             *id)
 {
-  GSList *it;
+  xslist_t *it;
 
   for (it = backend->notifications; it != NULL; it = it->next)
     {
       FreedesktopNotification *n = it->data;
-      if (g_str_equal (n->id, id))
+      if (xstr_equal (n->id, id))
         return n;
     }
 
@@ -115,9 +115,9 @@ g_fdo_notification_backend_find_notification (GFdoNotificationBackend *backend,
 
 static FreedesktopNotification *
 g_fdo_notification_backend_find_notification_by_notify_id (GFdoNotificationBackend *backend,
-                                                           guint32                  id)
+                                                           xuint32_t                  id)
 {
-  GSList *it;
+  xslist_t *it;
 
   for (it = backend->notifications; it != NULL; it = it->next)
     {
@@ -134,21 +134,21 @@ activate_action (GFdoNotificationBackend *backend,
                  const xchar_t             *name,
                  xvariant_t                *parameter)
 {
-  GNotificationBackend *g_backend = G_NOTIFICATION_BACKEND (backend);
+  xnotification_backend_t *g_backend = G_NOTIFICATION_BACKEND (backend);
 
   if (name)
     {
-      if (g_str_has_prefix (name, "app."))
+      if (xstr_has_prefix (name, "app."))
         xaction_group_activate_action (XACTION_GROUP (g_backend->application), name + 4, parameter);
     }
   else
     {
-      g_application_activate (g_backend->application);
+      xapplication_activate (g_backend->application);
     }
 }
 
 static void
-notify_signal (GDBusConnection *connection,
+notify_signal (xdbus_connection_t *connection,
                const xchar_t     *sender_name,
                const xchar_t     *object_path,
                const xchar_t     *interface_name,
@@ -157,19 +157,19 @@ notify_signal (GDBusConnection *connection,
                xpointer_t         user_data)
 {
   GFdoNotificationBackend *backend = user_data;
-  guint32 id = 0;
+  xuint32_t id = 0;
   const xchar_t *action = NULL;
   FreedesktopNotification *n;
 
-  if (g_str_equal (signal_name, "NotificationClosed") &&
-      g_variant_is_of_type (parameters, G_VARIANT_TYPE ("(uu)")))
+  if (xstr_equal (signal_name, "NotificationClosed") &&
+      xvariant_is_of_type (parameters, G_VARIANT_TYPE ("(uu)")))
     {
-      g_variant_get (parameters, "(uu)", &id, NULL);
+      xvariant_get (parameters, "(uu)", &id, NULL);
     }
-  else if (g_str_equal (signal_name, "ActionInvoked") &&
-           g_variant_is_of_type (parameters, G_VARIANT_TYPE ("(us)")))
+  else if (xstr_equal (signal_name, "ActionInvoked") &&
+           xvariant_is_of_type (parameters, G_VARIANT_TYPE ("(us)")))
     {
-      g_variant_get (parameters, "(u&s)", &id, &action);
+      xvariant_get (parameters, "(u&s)", &id, &action);
     }
   else
     return;
@@ -180,7 +180,7 @@ notify_signal (GDBusConnection *connection,
 
   if (action)
     {
-      if (g_str_equal (action, "default"))
+      if (xstr_equal (action, "default"))
         {
           activate_action (backend, n->default_action, n->default_action_target);
         }
@@ -194,7 +194,7 @@ notify_signal (GDBusConnection *connection,
               activate_action (backend, name, target);
               g_free (name);
               if (target)
-                g_variant_unref (target);
+                xvariant_unref (target);
             }
         }
     }
@@ -203,13 +203,13 @@ notify_signal (GDBusConnection *connection,
   n = g_fdo_notification_backend_find_notification_by_notify_id (backend, id);
   if (n != NULL)
     {
-      backend->notifications = g_slist_remove (backend->notifications, n);
+      backend->notifications = xslist_remove (backend->notifications, n);
       freedesktop_notification_free (n);
     }
 }
 
 static void
-name_vanished_handler_cb (GDBusConnection *connection,
+name_vanished_handler_cb (xdbus_connection_t *connection,
                           const xchar_t     *name,
                           xpointer_t         user_data)
 {
@@ -217,7 +217,7 @@ name_vanished_handler_cb (GDBusConnection *connection,
 
   if (backend->notifications)
     {
-      g_slist_free_full (backend->notifications, freedesktop_notification_free);
+      xslist_free_full (backend->notifications, freedesktop_notification_free);
       backend->notifications = NULL;
     }
 }
@@ -244,31 +244,31 @@ urgency_from_priority (GNotificationPriority priority)
 }
 
 static void
-call_notify (GDBusConnection     *con,
-             GApplication        *app,
-             guint32              replace_id,
-             GNotification       *notification,
+call_notify (xdbus_connection_t     *con,
+             xapplication_t        *app,
+             xuint32_t              replace_id,
+             xnotification_t       *notification,
              xasync_ready_callback_t  callback,
              xpointer_t             user_data)
 {
-  GVariantBuilder action_builder;
+  xvariant_builder_t action_builder;
   xuint_t n_buttons;
   xuint_t i;
-  GVariantBuilder hints_builder;
+  xvariant_builder_t hints_builder;
   xicon_t *icon;
   xvariant_t *parameters;
   const xchar_t *app_name;
   const xchar_t *body;
   guchar urgency;
 
-  g_variant_builder_init (&action_builder, G_VARIANT_TYPE_STRING_ARRAY);
-  if (g_notification_get_default_action (notification, NULL, NULL))
+  xvariant_builder_init (&action_builder, G_VARIANT_TYPE_STRING_ARRAY);
+  if (xnotification_get_default_action (notification, NULL, NULL))
     {
-      g_variant_builder_add (&action_builder, "s", "default");
-      g_variant_builder_add (&action_builder, "s", "");
+      xvariant_builder_add (&action_builder, "s", "default");
+      xvariant_builder_add (&action_builder, "s", "");
     }
 
-  n_buttons = g_notification_get_n_buttons (notification);
+  n_buttons = xnotification_get_n_buttons (notification);
   for (i = 0; i < n_buttons; i++)
     {
       xchar_t *label;
@@ -276,7 +276,7 @@ call_notify (GDBusConnection     *con,
       xvariant_t *target;
       xchar_t *detailed_name;
 
-      g_notification_get_button (notification, i, &label, &action, &target);
+      xnotification_get_button (notification, i, &label, &action, &target);
       detailed_name = g_action_print_detailed_name (action, target);
 
       /* Actions named 'default' collide with libnotify's naming of the
@@ -284,59 +284,59 @@ call_notify (GDBusConnection     *con,
        * because those actions can never be activated (they aren't
        * prefixed with 'app.').
        */
-      if (g_str_equal (detailed_name, "default"))
+      if (xstr_equal (detailed_name, "default"))
         {
           g_free (detailed_name);
           detailed_name = g_dbus_generate_guid ();
         }
 
-      g_variant_builder_add_value (&action_builder, g_variant_new_take_string (detailed_name));
-      g_variant_builder_add_value (&action_builder, g_variant_new_take_string (label));
+      xvariant_builder_add_value (&action_builder, xvariant_new_take_string (detailed_name));
+      xvariant_builder_add_value (&action_builder, xvariant_new_take_string (label));
 
       g_free (action);
       if (target)
-        g_variant_unref (target);
+        xvariant_unref (target);
     }
 
-  g_variant_builder_init (&hints_builder, G_VARIANT_TYPE ("a{sv}"));
-  g_variant_builder_add (&hints_builder, "{sv}", "desktop-entry",
-                         g_variant_new_string (g_application_get_application_id (app)));
-  urgency = urgency_from_priority (g_notification_get_priority (notification));
-  g_variant_builder_add (&hints_builder, "{sv}", "urgency", g_variant_new_byte (urgency));
-  if (g_notification_get_category (notification))
+  xvariant_builder_init (&hints_builder, G_VARIANT_TYPE ("a{sv}"));
+  xvariant_builder_add (&hints_builder, "{sv}", "desktop-entry",
+                         xvariant_new_string (xapplication_get_application_id (app)));
+  urgency = urgency_from_priority (xnotification_get_priority (notification));
+  xvariant_builder_add (&hints_builder, "{sv}", "urgency", xvariant_new_byte (urgency));
+  if (xnotification_get_category (notification))
     {
-      g_variant_builder_add (&hints_builder, "{sv}", "category",
-                             g_variant_new_string (g_notification_get_category (notification)));
+      xvariant_builder_add (&hints_builder, "{sv}", "category",
+                             xvariant_new_string (xnotification_get_category (notification)));
     }
 
-  icon = g_notification_get_icon (notification);
+  icon = xnotification_get_icon (notification);
   if (icon != NULL)
     {
       if (X_IS_FILE_ICON (icon))
         {
            xfile_t *file;
 
-           file = g_file_icon_get_file (G_FILE_ICON (icon));
-           g_variant_builder_add (&hints_builder, "{sv}", "image-path",
-                                  g_variant_new_take_string (g_file_get_path (file)));
+           file = xfile_icon_get_file (XFILE_ICON (icon));
+           xvariant_builder_add (&hints_builder, "{sv}", "image-path",
+                                  xvariant_new_take_string (xfile_get_path (file)));
         }
       else if (X_IS_THEMED_ICON (icon))
         {
            const xchar_t* const* icon_names = g_themed_icon_get_names(G_THEMED_ICON (icon));
-           /* Take first name from GThemedIcon */
-           g_variant_builder_add (&hints_builder, "{sv}", "image-path",
-                                  g_variant_new_string (icon_names[0]));
+           /* Take first name from xthemed_icon_t */
+           xvariant_builder_add (&hints_builder, "{sv}", "image-path",
+                                  xvariant_new_string (icon_names[0]));
         }
     }
 
   app_name = g_get_application_name ();
-  body = g_notification_get_body (notification);
+  body = xnotification_get_body (notification);
 
-  parameters = g_variant_new ("(susssasa{sv}i)",
+  parameters = xvariant_new ("(susssasa{sv}i)",
                               app_name ? app_name : "",
                               replace_id,
                               "",           /* app icon */
-                              g_notification_get_title (notification),
+                              xnotification_get_title (notification),
                               body ? body : "",
                               &action_builder,
                               &hints_builder,
@@ -365,16 +365,16 @@ notification_sent (xobject_t      *source_object,
       GFdoNotificationBackend *backend = n->backend;
       FreedesktopNotification *match;
 
-      g_variant_get (val, "(u)", &n->notify_id);
-      g_variant_unref (val);
+      xvariant_get (val, "(u)", &n->notify_id);
+      xvariant_unref (val);
 
       match = g_fdo_notification_backend_find_notification_by_notify_id (backend, n->notify_id);
       if (match != NULL)
         {
-          backend->notifications = g_slist_remove (backend->notifications, match);
+          backend->notifications = xslist_remove (backend->notifications, match);
           freedesktop_notification_free (match);
         }
-      backend->notifications = g_slist_prepend (backend->notifications, n);
+      backend->notifications = xslist_prepend (backend->notifications, n);
     }
   else
     {
@@ -386,7 +386,7 @@ notification_sent (xobject_t      *source_object,
         }
 
       freedesktop_notification_free (n);
-      g_error_free (error);
+      xerror_free (error);
     }
 }
 
@@ -403,7 +403,7 @@ g_fdo_notification_backend_dispose (xobject_t *object)
 
   if (backend->notify_subscription)
     {
-      GDBusConnection *session_bus;
+      xdbus_connection_t *session_bus;
 
       session_bus = G_NOTIFICATION_BACKEND (backend)->dbus_connection;
       g_dbus_connection_signal_unsubscribe (session_bus, backend->notify_subscription);
@@ -412,7 +412,7 @@ g_fdo_notification_backend_dispose (xobject_t *object)
 
   if (backend->notifications)
     {
-      g_slist_free_full (backend->notifications, freedesktop_notification_free);
+      xslist_free_full (backend->notifications, freedesktop_notification_free);
       backend->notifications = NULL;
     }
 
@@ -431,9 +431,9 @@ g_fdo_notification_backend_is_supported (void)
 }
 
 static void
-g_fdo_notification_backend_send_notification (GNotificationBackend *backend,
+g_fdo_notification_backend_send_notification (xnotification_backend_t *backend,
                                               const xchar_t          *id,
-                                              GNotification        *notification)
+                                              xnotification_t        *notification)
 {
   GFdoNotificationBackend *self = G_FDO_NOTIFICATION_BACKEND (backend);
   FreedesktopNotification *n, *tmp;
@@ -470,7 +470,7 @@ g_fdo_notification_backend_send_notification (GNotificationBackend *backend,
 }
 
 static void
-g_fdo_notification_backend_withdraw_notification (GNotificationBackend *backend,
+g_fdo_notification_backend_withdraw_notification (xnotification_backend_t *backend,
                                                   const xchar_t          *id)
 {
   GFdoNotificationBackend *self = G_FDO_NOTIFICATION_BACKEND (backend);
@@ -485,11 +485,11 @@ g_fdo_notification_backend_withdraw_notification (GNotificationBackend *backend,
                                   "org.freedesktop.Notifications",
                                   "/org/freedesktop/Notifications",
                                   "org.freedesktop.Notifications", "CloseNotification",
-                                  g_variant_new ("(u)", n->notify_id), NULL,
+                                  xvariant_new ("(u)", n->notify_id), NULL,
                                   G_DBUS_CALL_FLAGS_NONE, -1, NULL, NULL, NULL);
         }
 
-      self->notifications = g_slist_remove (self->notifications, n);
+      self->notifications = xslist_remove (self->notifications, n);
       freedesktop_notification_free (n);
     }
 }
@@ -503,7 +503,7 @@ static void
 g_fdo_notification_backend_class_init (GFdoNotificationBackendClass *class)
 {
   xobject_class_t *object_class = G_OBJECT_CLASS (class);
-  GNotificationBackendClass *backend_class = G_NOTIFICATION_BACKEND_CLASS (class);
+  xnotification_backend_class_t *backend_class = G_NOTIFICATION_BACKEND_CLASS (class);
 
   object_class->dispose = g_fdo_notification_backend_dispose;
 

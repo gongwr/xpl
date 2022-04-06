@@ -27,28 +27,28 @@
 
 /* Test conversions between offsets and pointers */
 
-static void test_utf8 (gconstpointer d)
+static void test_utf8 (xconstpointer d)
 {
   xint_t num_chars;
   const xchar_t **p;
   xint_t i, j;
   const xchar_t *string = d;
 
-  g_assert (g_utf8_validate (string, -1, NULL));
+  g_assert (xutf8_validate (string, -1, NULL));
 
-  num_chars = g_utf8_strlen (string, -1);
+  num_chars = xutf8_strlen (string, -1);
 
   p = (const xchar_t **) g_malloc (num_chars * sizeof (xchar_t *));
 
   p[0] = string;
   for (i = 1; i < num_chars; i++)
-    p[i] = g_utf8_next_char (p[i-1]);
+    p[i] = xutf8_next_char (p[i-1]);
 
   for (i = 0; i < num_chars; i++)
     for (j = 0; j < num_chars; j++)
       {
-        g_assert (g_utf8_offset_to_pointer (p[i], j - i) == p[j]);
-        g_assert (g_utf8_pointer_to_offset (p[i], p[j]) == j - i);
+        g_assert (xutf8_offset_to_pointer (p[i], j - i) == p[j]);
+        g_assert (xutf8_pointer_to_offset (p[i], p[j]) == j - i);
       }
 
   g_free (p);
@@ -67,26 +67,26 @@ xchar_t *longline = "asdasdas dsaf asfd as fdasdf asfd asdf as dfas dfasdf a"
 static void
 test_length (void)
 {
-  g_assert (g_utf8_strlen ("1234", -1) == 4);
-  g_assert (g_utf8_strlen ("1234", 0) == 0);
-  g_assert (g_utf8_strlen ("1234", 1) == 1);
-  g_assert (g_utf8_strlen ("1234", 2) == 2);
-  g_assert (g_utf8_strlen ("1234", 3) == 3);
-  g_assert (g_utf8_strlen ("1234", 4) == 4);
-  g_assert (g_utf8_strlen ("1234", 5) == 4);
+  g_assert (xutf8_strlen ("1234", -1) == 4);
+  g_assert (xutf8_strlen ("1234", 0) == 0);
+  g_assert (xutf8_strlen ("1234", 1) == 1);
+  g_assert (xutf8_strlen ("1234", 2) == 2);
+  g_assert (xutf8_strlen ("1234", 3) == 3);
+  g_assert (xutf8_strlen ("1234", 4) == 4);
+  g_assert (xutf8_strlen ("1234", 5) == 4);
 
-  g_assert (g_utf8_strlen (longline, -1) == 762);
-  g_assert (g_utf8_strlen (longline, strlen (longline)) == 762);
-  g_assert (g_utf8_strlen (longline, 1024) == 762);
+  g_assert (xutf8_strlen (longline, -1) == 762);
+  g_assert (xutf8_strlen (longline, strlen (longline)) == 762);
+  g_assert (xutf8_strlen (longline, 1024) == 762);
 
-  g_assert (g_utf8_strlen (NULL, 0) == 0);
+  g_assert (xutf8_strlen (NULL, 0) == 0);
 
-  g_assert (g_utf8_strlen ("a\340\250\201c", -1) == 3);
-  g_assert (g_utf8_strlen ("a\340\250\201c", 1) == 1);
-  g_assert (g_utf8_strlen ("a\340\250\201c", 2) == 1);
-  g_assert (g_utf8_strlen ("a\340\250\201c", 3) == 1);
-  g_assert (g_utf8_strlen ("a\340\250\201c", 4) == 2);
-  g_assert (g_utf8_strlen ("a\340\250\201c", 5) == 3);
+  g_assert (xutf8_strlen ("a\340\250\201c", -1) == 3);
+  g_assert (xutf8_strlen ("a\340\250\201c", 1) == 1);
+  g_assert (xutf8_strlen ("a\340\250\201c", 2) == 1);
+  g_assert (xutf8_strlen ("a\340\250\201c", 3) == 1);
+  g_assert (xutf8_strlen ("a\340\250\201c", 4) == 2);
+  g_assert (xutf8_strlen ("a\340\250\201c", 5) == 3);
 }
 
 static void
@@ -112,53 +112,53 @@ test_find (void)
   G_STMT_START { \
     p = STR + (str_size - 1); \
     \
-    q = g_utf8_find_prev_char (STR, p); \
+    q = xutf8_find_prev_char (STR, p); \
     g_assert (q == STR + 12); \
-    q = g_utf8_find_prev_char (STR, q); \
+    q = xutf8_find_prev_char (STR, q); \
     g_assert (q == STR + 11); \
-    q = g_utf8_find_prev_char (STR, q); \
+    q = xutf8_find_prev_char (STR, q); \
     g_assert (q == STR + 8); \
-    q = g_utf8_find_prev_char (STR, q); \
+    q = xutf8_find_prev_char (STR, q); \
     g_assert (q == STR + 7); \
-    q = g_utf8_find_prev_char (STR, q); \
+    q = xutf8_find_prev_char (STR, q); \
     g_assert (q == STR + 3); \
-    q = g_utf8_find_prev_char (STR, q); \
+    q = xutf8_find_prev_char (STR, q); \
     g_assert (q == STR); \
-    q = g_utf8_find_prev_char (STR, q); \
+    q = xutf8_find_prev_char (STR, q); \
     g_assert_null (q); \
     \
     p = STR + 4; \
-    q = g_utf8_find_prev_char (STR, p); \
+    q = xutf8_find_prev_char (STR, p); \
     g_assert (q == STR + 3); \
     \
     p = STR + 2; \
-    q = g_utf8_find_prev_char (STR, p); \
+    q = xutf8_find_prev_char (STR, p); \
     g_assert (q == STR); \
     \
     p = STR + 2; \
-    q = g_utf8_find_next_char (p, NULL); \
+    q = xutf8_find_next_char (p, NULL); \
     g_assert (q == STR + 3); \
-    q = g_utf8_find_next_char (q, NULL); \
+    q = xutf8_find_next_char (q, NULL); \
     g_assert (q == STR + 7); \
     \
-    q = g_utf8_find_next_char (p, STR + 6); \
+    q = xutf8_find_next_char (p, STR + 6); \
     g_assert (q == STR + 3); \
-    q = g_utf8_find_next_char (q, STR + 6); \
+    q = xutf8_find_next_char (q, STR + 6); \
     g_assert_null (q); \
     \
-    q = g_utf8_find_next_char (STR, STR); \
+    q = xutf8_find_next_char (STR, STR); \
     g_assert_null (q); \
     \
-    q = g_utf8_find_next_char (STR + strlen (STR), NULL); \
+    q = xutf8_find_next_char (STR + strlen (STR), NULL); \
     g_assert (q == STR + strlen (STR) + 1); \
     \
     /* Check return values when reaching the end of the string, \
      * with @end set and unset. */ \
-    q = g_utf8_find_next_char (STR + 10, NULL); \
+    q = xutf8_find_next_char (STR + 10, NULL); \
     g_assert_nonnull (q); \
     g_assert (*q == '\0'); \
     \
-    q = g_utf8_find_next_char (STR + 10, STR + 11); \
+    q = xutf8_find_next_char (STR + 10, STR + 11); \
     g_assert_null (q); \
   } G_STMT_END
 
@@ -166,7 +166,7 @@ test_find (void)
   TEST_SET(str_copy);
   TEST_SET(str_volatile);
   /* Starting with GCC 8 tests on @str with "-O2 -flto" in CFLAGS fail due to
-   * (incorrect?) constant propagation of @str into @g_utf8_find_prev_char. It
+   * (incorrect?) constant propagation of @str into @xutf8_find_prev_char. It
    * doesn't happen if @TEST_STR doesn't contain \0 in the middle but the tests
    * should cover all corner cases.
    * For instance, see https://gitlab.gnome.org/GNOME/glib/issues/1917 */

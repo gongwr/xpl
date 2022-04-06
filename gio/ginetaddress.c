@@ -55,7 +55,7 @@ struct _GInetAddressPrivate
  * #xinet_address_t.
  *
  * To actually connect to a remote host, you will need a
- * #GInetSocketAddress (which includes a #xinet_address_t as well as a
+ * #xinet_socket_address_t (which includes a #xinet_address_t as well as a
  * port number).
  */
 
@@ -65,7 +65,7 @@ struct _GInetAddressPrivate
  * An IPv4 or IPv6 internet address.
  */
 
-G_DEFINE_TYPE_WITH_CODE (xinet_address_t, g_inet_address, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (xinet_address, g_inet_address, XTYPE_OBJECT,
                          G_ADD_PRIVATE (xinet_address_t)
 			 g_networking_init ();)
 
@@ -89,26 +89,26 @@ enum
 static void
 xinet_address_set_property (xobject_t      *object,
 			     xuint_t         prop_id,
-			     const GValue *value,
-			     GParamSpec   *pspec)
+			     const xvalue_t *value,
+			     xparam_spec_t   *pspec)
 {
   xinet_address_t *address = G_INET_ADDRESS (object);
 
   switch (prop_id)
     {
     case PROP_FAMILY:
-      address->priv->family = g_value_get_enum (value);
+      address->priv->family = xvalue_get_enum (value);
       break;
 
     case PROP_BYTES:
 #ifdef HAVE_IPV6
-      memcpy (&address->priv->addr, g_value_get_pointer (value),
+      memcpy (&address->priv->addr, xvalue_get_pointer (value),
 	      address->priv->family == AF_INET ?
 	      sizeof (address->priv->addr.ipv4) :
 	      sizeof (address->priv->addr.ipv6));
 #else
       g_assert (address->priv->family == AF_INET);
-      memcpy (&address->priv->addr, g_value_get_pointer (value),
+      memcpy (&address->priv->addr, xvalue_get_pointer (value),
               sizeof (address->priv->addr.ipv4));
 #endif
       break;
@@ -123,59 +123,59 @@ xinet_address_set_property (xobject_t      *object,
 static void
 xinet_address_get_property (xobject_t    *object,
                              xuint_t       prop_id,
-                             GValue     *value,
-                             GParamSpec *pspec)
+                             xvalue_t     *value,
+                             xparam_spec_t *pspec)
 {
   xinet_address_t *address = G_INET_ADDRESS (object);
 
   switch (prop_id)
     {
     case PROP_FAMILY:
-      g_value_set_enum (value, address->priv->family);
+      xvalue_set_enum (value, address->priv->family);
       break;
 
     case PROP_BYTES:
-      g_value_set_pointer (value, &address->priv->addr);
+      xvalue_set_pointer (value, &address->priv->addr);
       break;
 
     case PROP_IS_ANY:
-      g_value_set_boolean (value, xinet_address_get_is_any (address));
+      xvalue_set_boolean (value, xinet_address_get_is_any (address));
       break;
 
     case PROP_IS_LOOPBACK:
-      g_value_set_boolean (value, xinet_address_get_is_loopback (address));
+      xvalue_set_boolean (value, xinet_address_get_is_loopback (address));
       break;
 
     case PROP_IS_LINK_LOCAL:
-      g_value_set_boolean (value, xinet_address_get_is_link_local (address));
+      xvalue_set_boolean (value, xinet_address_get_is_link_local (address));
       break;
 
     case PROP_IS_SITE_LOCAL:
-      g_value_set_boolean (value, xinet_address_get_is_site_local (address));
+      xvalue_set_boolean (value, xinet_address_get_is_site_local (address));
       break;
 
     case PROP_IS_MULTICAST:
-      g_value_set_boolean (value, xinet_address_get_is_multicast (address));
+      xvalue_set_boolean (value, xinet_address_get_is_multicast (address));
       break;
 
     case PROP_IS_MC_GLOBAL:
-      g_value_set_boolean (value, xinet_address_get_is_mc_global (address));
+      xvalue_set_boolean (value, xinet_address_get_is_mc_global (address));
       break;
 
     case PROP_IS_MC_LINK_LOCAL:
-      g_value_set_boolean (value, xinet_address_get_is_mc_link_local (address));
+      xvalue_set_boolean (value, xinet_address_get_is_mc_link_local (address));
       break;
 
     case PROP_IS_MC_NODE_LOCAL:
-      g_value_set_boolean (value, xinet_address_get_is_mc_node_local (address));
+      xvalue_set_boolean (value, xinet_address_get_is_mc_node_local (address));
       break;
 
     case PROP_IS_MC_ORG_LOCAL:
-      g_value_set_boolean (value, xinet_address_get_is_mc_org_local (address));
+      xvalue_set_boolean (value, xinet_address_get_is_mc_org_local (address));
       break;
 
     case PROP_IS_MC_SITE_LOCAL:
-      g_value_set_boolean (value, xinet_address_get_is_mc_site_local (address));
+      xvalue_set_boolean (value, xinet_address_get_is_mc_site_local (address));
       break;
 
     default:
@@ -191,7 +191,7 @@ xinet_address_class_init (GInetAddressClass *klass)
   gobject_class->set_property = xinet_address_set_property;
   gobject_class->get_property = xinet_address_get_property;
 
-  g_object_class_install_property (gobject_class, PROP_FAMILY,
+  xobject_class_install_property (gobject_class, PROP_FAMILY,
                                    g_param_spec_enum ("family",
 						      P_("Address family"),
 						      P_("The address family (IPv4 or IPv6)"),
@@ -201,7 +201,7 @@ xinet_address_class_init (GInetAddressClass *klass)
                                                       G_PARAM_CONSTRUCT_ONLY |
                                                       G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class, PROP_BYTES,
+  xobject_class_install_property (gobject_class, PROP_BYTES,
                                    g_param_spec_pointer ("bytes",
 							 P_("Bytes"),
 							 P_("The raw address data"),
@@ -217,7 +217,7 @@ xinet_address_class_init (GInetAddressClass *klass)
    *
    * Since: 2.22
    */
-  g_object_class_install_property (gobject_class, PROP_IS_ANY,
+  xobject_class_install_property (gobject_class, PROP_IS_ANY,
                                    g_param_spec_boolean ("is-any",
                                                          P_("Is any"),
                                                          P_("Whether this is the \"any\" address for its family"),
@@ -233,7 +233,7 @@ xinet_address_class_init (GInetAddressClass *klass)
    *
    * Since: 2.22
    */
-  g_object_class_install_property (gobject_class, PROP_IS_LINK_LOCAL,
+  xobject_class_install_property (gobject_class, PROP_IS_LINK_LOCAL,
                                    g_param_spec_boolean ("is-link-local",
                                                          P_("Is link-local"),
                                                          P_("Whether this is a link-local address"),
@@ -249,7 +249,7 @@ xinet_address_class_init (GInetAddressClass *klass)
    *
    * Since: 2.22
    */
-  g_object_class_install_property (gobject_class, PROP_IS_LOOPBACK,
+  xobject_class_install_property (gobject_class, PROP_IS_LOOPBACK,
                                    g_param_spec_boolean ("is-loopback",
                                                          P_("Is loopback"),
                                                          P_("Whether this is the loopback address for its family"),
@@ -265,7 +265,7 @@ xinet_address_class_init (GInetAddressClass *klass)
    *
    * Since: 2.22
    */
-  g_object_class_install_property (gobject_class, PROP_IS_SITE_LOCAL,
+  xobject_class_install_property (gobject_class, PROP_IS_SITE_LOCAL,
                                    g_param_spec_boolean ("is-site-local",
                                                          P_("Is site-local"),
                                                          P_("Whether this is a site-local address"),
@@ -281,7 +281,7 @@ xinet_address_class_init (GInetAddressClass *klass)
    *
    * Since: 2.22
    */
-  g_object_class_install_property (gobject_class, PROP_IS_MULTICAST,
+  xobject_class_install_property (gobject_class, PROP_IS_MULTICAST,
                                    g_param_spec_boolean ("is-multicast",
                                                          P_("Is multicast"),
                                                          P_("Whether this is a multicast address"),
@@ -297,7 +297,7 @@ xinet_address_class_init (GInetAddressClass *klass)
    *
    * Since: 2.22
    */
-  g_object_class_install_property (gobject_class, PROP_IS_MC_GLOBAL,
+  xobject_class_install_property (gobject_class, PROP_IS_MC_GLOBAL,
                                    g_param_spec_boolean ("is-mc-global",
                                                          P_("Is multicast global"),
                                                          P_("Whether this is a global multicast address"),
@@ -314,7 +314,7 @@ xinet_address_class_init (GInetAddressClass *klass)
    *
    * Since: 2.22
    */
-  g_object_class_install_property (gobject_class, PROP_IS_MC_LINK_LOCAL,
+  xobject_class_install_property (gobject_class, PROP_IS_MC_LINK_LOCAL,
                                    g_param_spec_boolean ("is-mc-link-local",
                                                          P_("Is multicast link-local"),
                                                          P_("Whether this is a link-local multicast address"),
@@ -330,7 +330,7 @@ xinet_address_class_init (GInetAddressClass *klass)
    *
    * Since: 2.22
    */
-  g_object_class_install_property (gobject_class, PROP_IS_MC_NODE_LOCAL,
+  xobject_class_install_property (gobject_class, PROP_IS_MC_NODE_LOCAL,
                                    g_param_spec_boolean ("is-mc-node-local",
                                                          P_("Is multicast node-local"),
                                                          P_("Whether this is a node-local multicast address"),
@@ -346,7 +346,7 @@ xinet_address_class_init (GInetAddressClass *klass)
    *
    * Since: 2.22
    */
-  g_object_class_install_property (gobject_class, PROP_IS_MC_ORG_LOCAL,
+  xobject_class_install_property (gobject_class, PROP_IS_MC_ORG_LOCAL,
                                    g_param_spec_boolean ("is-mc-org-local",
                                                          P_("Is multicast org-local"),
                                                          P_("Whether this is an organization-local multicast address"),
@@ -362,7 +362,7 @@ xinet_address_class_init (GInetAddressClass *klass)
    *
    * Since: 2.22
    */
-  g_object_class_install_property (gobject_class, PROP_IS_MC_SITE_LOCAL,
+  xobject_class_install_property (gobject_class, PROP_IS_MC_SITE_LOCAL,
                                    g_param_spec_boolean ("is-mc-site-local",
                                                          P_("Is multicast site-local"),
                                                          P_("Whether this is a site-local multicast address"),
@@ -385,7 +385,7 @@ xinet_address_init (xinet_address_t *address)
  *
  * Returns: (nullable) (transfer full): a new #xinet_address_t corresponding
  * to @string, or %NULL if @string could not be parsed.
- *     Free the returned object with g_object_unref().
+ *     Free the returned object with xobject_unref().
  *
  * Since: 2.22
  */
@@ -406,10 +406,10 @@ xinet_address_new_from_string (const xchar_t *string)
   g_networking_init ();
 
   if (inet_pton (AF_INET, string, &in_addr) > 0)
-    return xinet_address_new_from_bytes ((guint8 *)&in_addr, AF_INET);
+    return xinet_address_new_from_bytes ((xuint8_t *)&in_addr, AF_INET);
 #ifdef HAVE_IPV6
   else if (inet_pton (AF_INET6, string, &in6_addr) > 0)
-    return xinet_address_new_from_bytes ((guint8 *)&in6_addr, AF_INET6);
+    return xinet_address_new_from_bytes ((xuint8_t *)&in6_addr, AF_INET6);
 #endif
 
   return NULL;
@@ -419,7 +419,7 @@ xinet_address_new_from_string (const xchar_t *string)
 
 /**
  * xinet_address_new_from_bytes:
- * @bytes: (array) (element-type guint8): raw address data
+ * @bytes: (array) (element-type xuint8_t): raw address data
  * @family: the address family of @bytes
  *
  * Creates a new #xinet_address_t from the given @family and @bytes.
@@ -427,17 +427,17 @@ xinet_address_new_from_string (const xchar_t *string)
  * %XSOCKET_FAMILY_IPV6.
  *
  * Returns: a new #xinet_address_t corresponding to @family and @bytes.
- *     Free the returned object with g_object_unref().
+ *     Free the returned object with xobject_unref().
  *
  * Since: 2.22
  */
 xinet_address_t *
-xinet_address_new_from_bytes (const guint8         *bytes,
+xinet_address_new_from_bytes (const xuint8_t         *bytes,
 			       xsocket_family_t  family)
 {
   g_return_val_if_fail (XINET_ADDRESS_FAMILY_IS_VALID (family), NULL);
 
-  return g_object_new (XTYPE_INET_ADDRESS,
+  return xobject_new (XTYPE_INET_ADDRESS,
 		       "family", family,
 		       "bytes", bytes,
 		       NULL);
@@ -451,7 +451,7 @@ xinet_address_new_from_bytes (const guint8         *bytes,
  *
  * Returns: a new #xinet_address_t corresponding to the loopback address
  * for @family.
- *     Free the returned object with g_object_unref().
+ *     Free the returned object with xobject_unref().
  *
  * Since: 2.22
  */
@@ -462,7 +462,7 @@ xinet_address_new_loopback (xsocket_family_t family)
 
   if (family == AF_INET)
     {
-      guint8 addr[4] = {127, 0, 0, 1};
+      xuint8_t addr[4] = {127, 0, 0, 1};
 
       return xinet_address_new_from_bytes (addr, family);
     }
@@ -483,7 +483,7 @@ xinet_address_new_loopback (xsocket_family_t family)
  *
  * Returns: a new #xinet_address_t corresponding to the "any" address
  * for @family.
- *     Free the returned object with g_object_unref().
+ *     Free the returned object with xobject_unref().
  *
  * Since: 2.22
  */
@@ -494,7 +494,7 @@ xinet_address_new_any (xsocket_family_t family)
 
   if (family == AF_INET)
     {
-      guint8 addr[4] = {0, 0, 0, 0};
+      xuint8_t addr[4] = {0, 0, 0, 0};
 
       return xinet_address_new_from_bytes (addr, family);
     }
@@ -528,13 +528,13 @@ xinet_address_to_string (xinet_address_t *address)
   if (address->priv->family == AF_INET)
     {
       inet_ntop (AF_INET, &address->priv->addr.ipv4, buffer, sizeof (buffer));
-      return g_strdup (buffer);
+      return xstrdup (buffer);
     }
   else
     {
 #ifdef HAVE_IPV6
       inet_ntop (AF_INET6, &address->priv->addr.ipv6, buffer, sizeof (buffer));
-      return g_strdup (buffer);
+      return xstrdup (buffer);
 #else
       g_assert_not_reached ();
 #endif
@@ -553,12 +553,12 @@ xinet_address_to_string (xinet_address_t *address)
  *
  * Since: 2.22
  */
-const guint8 *
+const xuint8_t *
 xinet_address_to_bytes (xinet_address_t *address)
 {
   g_return_val_if_fail (X_IS_INET_ADDRESS (address), NULL);
 
-  return (guint8 *)&address->priv->addr;
+  return (xuint8_t *)&address->priv->addr;
 }
 
 /**
@@ -619,7 +619,7 @@ xinet_address_get_is_any (xinet_address_t *address)
 
   if (address->priv->family == AF_INET)
     {
-      guint32 addr4 = g_ntohl (address->priv->addr.ipv4.s_addr);
+      xuint32_t addr4 = g_ntohl (address->priv->addr.ipv4.s_addr);
 
       return addr4 == INADDR_ANY;
     }
@@ -648,7 +648,7 @@ xinet_address_get_is_loopback (xinet_address_t *address)
 
   if (address->priv->family == AF_INET)
     {
-      guint32 addr4 = g_ntohl (address->priv->addr.ipv4.s_addr);
+      xuint32_t addr4 = g_ntohl (address->priv->addr.ipv4.s_addr);
 
       /* 127.0.0.0/8 */
       return ((addr4 & 0xff000000) == 0x7f000000);
@@ -680,7 +680,7 @@ xinet_address_get_is_link_local (xinet_address_t *address)
 
   if (address->priv->family == AF_INET)
     {
-      guint32 addr4 = g_ntohl (address->priv->addr.ipv4.s_addr);
+      xuint32_t addr4 = g_ntohl (address->priv->addr.ipv4.s_addr);
 
       /* 169.254.0.0/16 */
       return ((addr4 & 0xffff0000) == 0xa9fe0000);
@@ -713,7 +713,7 @@ xinet_address_get_is_site_local (xinet_address_t *address)
 
   if (address->priv->family == AF_INET)
     {
-      guint32 addr4 = g_ntohl (address->priv->addr.ipv4.s_addr);
+      xuint32_t addr4 = g_ntohl (address->priv->addr.ipv4.s_addr);
 
       /* 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 */
       return ((addr4 & 0xff000000) == 0x0a000000 ||
@@ -745,7 +745,7 @@ xinet_address_get_is_multicast (xinet_address_t *address)
 
   if (address->priv->family == AF_INET)
     {
-      guint32 addr4 = g_ntohl (address->priv->addr.ipv4.s_addr);
+      xuint32_t addr4 = g_ntohl (address->priv->addr.ipv4.s_addr);
 
       return IN_MULTICAST (addr4);
     }

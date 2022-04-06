@@ -79,7 +79,7 @@ probe gobject.object_unref = process("@ABS_XPL_RUNTIME_LIBDIR@/libgobject-2.0.so
 }
 
 /**
- * probe gobject.object_dispose - Called when a g_object_dispose() run for a #xobject_t is initiated
+ * probe gobject.object_dispose - Called when a xobject_dispose() run for a #xobject_t is initiated
  * @object: Raw pointer to object
  * @gtype: #xtype_t for this object
  * @type: String name of object type
@@ -95,7 +95,7 @@ probe gobject.object_dispose = process("@ABS_XPL_RUNTIME_LIBDIR@/libgobject-2.0.
 }
 
 /**
- * probe gobject.object_dispose_end - Called when a g_object_dispose() run for a #xobject_t is completed
+ * probe gobject.object_dispose_end - Called when a xobject_dispose() run for a #xobject_t is completed
  * @object: Raw pointer to object
  * @gtype: #xtype_t for this object
  * @type: String name of object type

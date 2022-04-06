@@ -26,7 +26,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_DBUS_OBJECT         (g_dbus_object_get_type())
-#define G_DBUS_OBJECT(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_OBJECT, GDBusObject))
+#define G_DBUS_OBJECT(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_OBJECT, xdbus_object))
 #define X_IS_DBUS_OBJECT(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_OBJECT))
 #define G_DBUS_OBJECT_GET_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE((o), XTYPE_DBUS_OBJECT, GDBusObjectIface))
 
@@ -38,8 +38,8 @@ typedef struct _GDBusObjectIface GDBusObjectIface;
  * @get_object_path: Returns the object path. See g_dbus_object_get_object_path().
  * @get_interfaces: Returns all interfaces. See g_dbus_object_get_interfaces().
  * @get_interface: Returns an interface by name. See g_dbus_object_get_interface().
- * @interface_added: Signal handler for the #GDBusObject::interface-added signal.
- * @interface_removed: Signal handler for the #GDBusObject::interface-removed signal.
+ * @interface_added: Signal handler for the #xdbus_object_t::interface-added signal.
+ * @interface_removed: Signal handler for the #xdbus_object_t::interface-removed signal.
  *
  * Base object type for D-Bus objects.
  *
@@ -50,27 +50,27 @@ struct _GDBusObjectIface
   xtype_interface_t parent_iface;
 
   /* Virtual Functions */
-  const xchar_t     *(*get_object_path) (GDBusObject  *object);
-  xlist_t           *(*get_interfaces)  (GDBusObject  *object);
-  GDBusInterface  *(*get_interface)   (GDBusObject  *object,
+  const xchar_t     *(*get_object_path) (xdbus_object_t  *object);
+  xlist_t           *(*get_interfaces)  (xdbus_object_t  *object);
+  xdbus_interface_t  *(*get_interface)   (xdbus_object_t  *object,
                                        const xchar_t  *interface_name);
 
   /* Signals */
-  void (*interface_added)   (GDBusObject     *object,
-                             GDBusInterface  *interface_);
-  void (*interface_removed) (GDBusObject     *object,
-                             GDBusInterface  *interface_);
+  void (*interface_added)   (xdbus_object_t     *object,
+                             xdbus_interface_t  *interface_);
+  void (*interface_removed) (xdbus_object_t     *object,
+                             xdbus_interface_t  *interface_);
 
 };
 
 XPL_AVAILABLE_IN_ALL
 xtype_t            g_dbus_object_get_type        (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-const xchar_t     *g_dbus_object_get_object_path (GDBusObject  *object);
+const xchar_t     *g_dbus_object_get_object_path (xdbus_object_t  *object);
 XPL_AVAILABLE_IN_ALL
-xlist_t           *g_dbus_object_get_interfaces  (GDBusObject  *object);
+xlist_t           *g_dbus_object_get_interfaces  (xdbus_object_t  *object);
 XPL_AVAILABLE_IN_ALL
-GDBusInterface  *g_dbus_object_get_interface   (GDBusObject  *object,
+xdbus_interface_t  *g_dbus_object_get_interface   (xdbus_object_t  *object,
                                                 const xchar_t  *interface_name);
 
 G_END_DECLS

@@ -62,7 +62,7 @@ typedef struct _GUnixMountMonitorClass GUnixMountMonitorClass;
 #define G_UNIX_MOUNT_MONITOR_CLASS(k)    (XTYPE_CHECK_CLASS_CAST((k), XTYPE_UNIX_MOUNT_MONITOR, GUnixMountMonitorClass))
 #define X_IS_UNIX_MOUNT_MONITOR(o)       (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_UNIX_MOUNT_MONITOR))
 #define X_IS_UNIX_MOUNT_MONITOR_CLASS(k) (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_UNIX_MOUNT_MONITOR))
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixMountMonitor, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixMountMonitor, xobject_unref)
 
 XPL_AVAILABLE_IN_ALL
 void           g_unix_mount_free                    (GUnixMountEntry    *mount_entry);
@@ -131,22 +131,22 @@ xicon_t *        g_unix_mount_point_guess_symbolic_icon (GUnixMountPoint    *mou
 
 
 XPL_AVAILABLE_IN_ALL
-xlist_t *        g_unix_mount_points_get              (guint64            *time_read);
+xlist_t *        g_unix_mount_points_get              (xuint64_t            *time_read);
 XPL_AVAILABLE_IN_2_66
 GUnixMountPoint *g_unix_mount_point_at              (const char         *mount_path,
-                                                     guint64            *time_read);
+                                                     xuint64_t            *time_read);
 XPL_AVAILABLE_IN_ALL
-xlist_t *        g_unix_mounts_get                    (guint64            *time_read);
+xlist_t *        g_unix_mounts_get                    (xuint64_t            *time_read);
 XPL_AVAILABLE_IN_ALL
 GUnixMountEntry *g_unix_mount_at                    (const char         *mount_path,
-						     guint64            *time_read);
+						     xuint64_t            *time_read);
 XPL_AVAILABLE_IN_2_52
 GUnixMountEntry *g_unix_mount_for                   (const char         *file_path,
-                                                     guint64            *time_read);
+                                                     xuint64_t            *time_read);
 XPL_AVAILABLE_IN_ALL
-xboolean_t       g_unix_mounts_changed_since          (guint64             time);
+xboolean_t       g_unix_mounts_changed_since          (xuint64_t             time);
 XPL_AVAILABLE_IN_ALL
-xboolean_t       g_unix_mount_points_changed_since    (guint64             time);
+xboolean_t       g_unix_mount_points_changed_since    (xuint64_t             time);
 
 XPL_AVAILABLE_IN_ALL
 xtype_t              g_unix_mount_monitor_get_type       (void) G_GNUC_CONST;

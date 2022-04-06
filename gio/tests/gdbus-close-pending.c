@@ -69,8 +69,8 @@ static void
 my_io_stream_finalize (xobject_t *object)
 {
   MyIOStream *stream = MY_IO_STREAM (object);
-  g_object_unref (stream->input_stream);
-  g_object_unref (stream->output_stream);
+  xobject_unref (stream->input_stream);
+  xobject_unref (stream->output_stream);
   G_OBJECT_CLASS (my_io_stream_parent_class)->finalize (object);
 }
 
@@ -114,9 +114,9 @@ my_io_stream_new (xinput_stream_t  *input_stream,
   MyIOStream *stream;
   g_return_val_if_fail (X_IS_INPUT_STREAM (input_stream), NULL);
   g_return_val_if_fail (X_IS_OUTPUT_STREAM (output_stream), NULL);
-  stream = MY_IO_STREAM (g_object_new (MY_TYPE_IO_STREAM, NULL));
-  stream->input_stream = g_object_ref (input_stream);
-  stream->output_stream = g_object_ref (output_stream);
+  stream = MY_IO_STREAM (xobject_new (MY_TYPE_IO_STREAM, NULL));
+  stream->input_stream = xobject_ref (input_stream);
+  stream->output_stream = xobject_ref (output_stream);
   return XIO_STREAM (stream);
 }
 
@@ -124,7 +124,7 @@ my_io_stream_new (xinput_stream_t  *input_stream,
 
 typedef struct
 {
-  GFilterOutputStream parent_instance;
+  xfilter_output_stream_t parent_instance;
 } MySlowCloseOutputStream;
 
 typedef struct
@@ -173,9 +173,9 @@ delayed_close_free (xpointer_t data)
 {
   DelayedClose *df = data;
 
-  g_object_unref (df->stream);
+  xobject_unref (df->stream);
   if (df->cancellable)
-    g_object_unref (df->cancellable);
+    xobject_unref (df->cancellable);
   g_free (df);
 }
 
@@ -198,19 +198,19 @@ my_slow_close_output_stream_close_async  (xoutput_stream_t            *stream,
                                           xasync_ready_callback_t       callback,
                                           xpointer_t                  user_data)
 {
-  GSource *later;
+  xsource_t *later;
   DelayedClose *df;
 
   df = g_new0 (DelayedClose, 1);
-  df->stream = g_object_ref (stream);
+  df->stream = xobject_ref (stream);
   df->io_priority = io_priority;
-  df->cancellable = (cancellable != NULL ? g_object_ref (cancellable) : NULL);
+  df->cancellable = (cancellable != NULL ? xobject_ref (cancellable) : NULL);
   df->callback = callback;
   df->user_data = user_data;
 
   later = g_timeout_source_new (CLOSE_TIME_MS);
-  g_source_set_callback (later, delayed_close_cb, df, delayed_close_free);
-  g_source_attach (later, g_main_context_get_thread_default ());
+  xsource_set_callback (later, delayed_close_cb, df, delayed_close_free);
+  xsource_attach (later, xmain_context_get_thread_default ());
 }
 
 static xboolean_t
@@ -243,13 +243,13 @@ my_io_stream_new_for_fds (xint_t fd_in, xint_t fd_out)
 
   input_stream = g_unix_input_stream_new (fd_in, TRUE);
   real_output_stream = g_unix_output_stream_new (fd_out, TRUE);
-  output_stream = g_object_new (MY_TYPE_SLOW_CLOSE_OUTPUT_STREAM,
+  output_stream = xobject_new (MY_TYPE_SLOW_CLOSE_OUTPUT_STREAM,
                                 "base-stream", real_output_stream,
                                 NULL);
   stream = my_io_stream_new (input_stream, output_stream);
-  g_object_unref (input_stream);
-  g_object_unref (output_stream);
-  g_object_unref (real_output_stream);
+  xobject_unref (input_stream);
+  xobject_unref (output_stream);
+  xobject_unref (real_output_stream);
   return stream;
 }
 
@@ -259,23 +259,23 @@ typedef struct {
   xint_t server_to_client[2];
   xint_t client_to_server[2];
   xio_stream_t *server_iostream;
-  GDBusConnection *server_conn;
+  xdbus_connection_t *server_conn;
   xio_stream_t *iostream;
-  GDBusConnection *connection;
+  xdbus_connection_t *connection;
   xchar_t *guid;
   xerror_t *error;
 } Fixture;
 
 static void
 setup (Fixture       *f,
-       gconstpointer  context)
+       xconstpointer  context)
 {
   f->guid = g_dbus_generate_guid ();
 }
 
 static void
 teardown (Fixture       *f,
-          gconstpointer  context)
+          xconstpointer  context)
 {
   g_clear_object (&f->server_iostream);
   g_clear_object (&f->server_conn);
@@ -290,7 +290,7 @@ on_new_conn (xobject_t      *source,
              xasync_result_t *res,
              xpointer_t      user_data)
 {
-  GDBusConnection **connection = user_data;
+  xdbus_connection_t **connection = user_data;
   xerror_t *error = NULL;
 
   *connection = g_dbus_connection_new_for_address_finish (res, &error);
@@ -299,9 +299,9 @@ on_new_conn (xobject_t      *source,
 
 static void
 test_once (Fixture       *f,
-           gconstpointer  context)
+           xconstpointer  context)
 {
-  GDBusMessage *message;
+  xdbus_message_t *message;
   xboolean_t pipe_res;
 
   pipe_res = g_unix_open_pipe (f->server_to_client, FD_CLOEXEC, &f->error);
@@ -330,19 +330,19 @@ test_once (Fixture       *f,
                          on_new_conn, &f->connection);
 
   while (f->server_conn == NULL || f->connection == NULL)
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   /*
    * queue a message - it'll sometimes be sent while the close is pending,
    * triggering the bug
    */
-  message = g_dbus_message_new_signal ("/", "com.example.Foo", "Bar");
+  message = xdbus_message_new_signal ("/", "com.example.foo_t", "Bar");
   g_dbus_connection_send_message (f->connection, message, 0, NULL, &f->error);
   g_assert_no_error (f->error);
-  g_object_unref (message);
+  xobject_unref (message);
 
   /* close the connection (deliberately or via last-unref) */
-  if (g_strcmp0 (context, "unref") == 0)
+  if (xstrcmp0 (context, "unref") == 0)
     {
       g_clear_object (&f->connection);
     }
@@ -354,7 +354,7 @@ test_once (Fixture       *f,
 
   /* either way, wait for the connection to close */
   while (!g_dbus_connection_is_closed (f->server_conn))
-    g_main_context_iteration (NULL, TRUE);
+    xmain_context_iteration (NULL, TRUE);
 
   /* clean up before the next run */
   g_clear_object (&f->iostream);
@@ -366,7 +366,7 @@ test_once (Fixture       *f,
 
 static void
 test_many_times (Fixture       *f,
-                 gconstpointer  context)
+                 xconstpointer  context)
 {
   xuint_t i, n_repeats;
 

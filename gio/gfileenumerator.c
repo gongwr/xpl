@@ -27,13 +27,13 @@
 #include "gioerror.h"
 #include "glibintl.h"
 
-struct _GFileEnumeratorPrivate {
+struct _xfile_enumerator_private_t {
   /* TODO: Should be public for subclasses? */
   xfile_t *container;
   xuint_t closed : 1;
   xuint_t pending : 1;
   xasync_ready_callback_t outstanding_callback;
-  xerror_t *outstanding_error;
+  xerror_t *outstandinxerror;
 };
 
 /**
@@ -41,14 +41,14 @@ struct _GFileEnumeratorPrivate {
  * @short_description: Enumerated Files Routines
  * @include: gio/gio.h
  *
- * #GFileEnumerator allows you to operate on a set of #GFiles,
- * returning a #GFileInfo structure for each file enumerated (e.g.
- * g_file_enumerate_children() will return a #GFileEnumerator for each
+ * #xfile_enumerator_t allows you to operate on a set of #GFiles,
+ * returning a #xfile_info_t structure for each file enumerated (e.g.
+ * xfile_enumerate_children() will return a #xfile_enumerator_t for each
  * of the children within a directory).
  *
- * To get the next file's information from a #GFileEnumerator, use
- * g_file_enumerator_next_file() or its asynchronous version,
- * g_file_enumerator_next_files_async(). Note that the asynchronous
+ * To get the next file's information from a #xfile_enumerator_t, use
+ * xfile_enumerator_next_file() or its asynchronous version,
+ * xfile_enumerator_next_files_async(). Note that the asynchronous
  * version will return a list of #GFileInfos, whereas the
  * synchronous will only return the next file in the enumerator.
  *
@@ -63,51 +63,51 @@ struct _GFileEnumeratorPrivate {
  * modification time, you will have to implement that in your
  * application code.
  *
- * To close a #GFileEnumerator, use g_file_enumerator_close(), or
- * its asynchronous version, g_file_enumerator_close_async(). Once
- * a #GFileEnumerator is closed, no further actions may be performed
- * on it, and it should be freed with g_object_unref().
+ * To close a #xfile_enumerator_t, use xfile_enumerator_close(), or
+ * its asynchronous version, xfile_enumerator_close_async(). Once
+ * a #xfile_enumerator_t is closed, no further actions may be performed
+ * on it, and it should be freed with xobject_unref().
  *
  **/
 
-G_DEFINE_TYPE_WITH_PRIVATE (GFileEnumerator, g_file_enumerator, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (xfile_enumerator_t, xfile_enumerator, XTYPE_OBJECT)
 
 enum {
   PROP_0,
   PROP_CONTAINER
 };
 
-static void     g_file_enumerator_real_next_files_async  (GFileEnumerator      *enumerator,
+static void     xfile_enumerator_real_next_files_async  (xfile_enumerator_t      *enumerator,
 							  int                   num_files,
 							  int                   io_priority,
 							  xcancellable_t         *cancellable,
 							  xasync_ready_callback_t   callback,
 							  xpointer_t              user_data);
-static xlist_t *  g_file_enumerator_real_next_files_finish (GFileEnumerator      *enumerator,
+static xlist_t *  xfile_enumerator_real_next_files_finish (xfile_enumerator_t      *enumerator,
 							  xasync_result_t         *res,
 							  xerror_t              **error);
-static void     g_file_enumerator_real_close_async       (GFileEnumerator      *enumerator,
+static void     xfile_enumerator_real_close_async       (xfile_enumerator_t      *enumerator,
 							  int                   io_priority,
 							  xcancellable_t         *cancellable,
 							  xasync_ready_callback_t   callback,
 							  xpointer_t              user_data);
-static xboolean_t g_file_enumerator_real_close_finish      (GFileEnumerator      *enumerator,
+static xboolean_t xfile_enumerator_real_close_finish      (xfile_enumerator_t      *enumerator,
 							  xasync_result_t         *res,
 							  xerror_t              **error);
 
 static void
-g_file_enumerator_set_property (xobject_t      *object,
+xfile_enumerator_set_property (xobject_t      *object,
                                 xuint_t         property_id,
-                                const GValue *value,
-                                GParamSpec   *pspec)
+                                const xvalue_t *value,
+                                xparam_spec_t   *pspec)
 {
-  GFileEnumerator *enumerator;
+  xfile_enumerator_t *enumerator;
 
-  enumerator = G_FILE_ENUMERATOR (object);
+  enumerator = XFILE_ENUMERATOR (object);
 
   switch (property_id) {
   case PROP_CONTAINER:
-    enumerator->priv->container = g_value_dup_object (value);
+    enumerator->priv->container = xvalue_dup_object (value);
     break;
   default:
     G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -116,48 +116,48 @@ g_file_enumerator_set_property (xobject_t      *object,
 }
 
 static void
-g_file_enumerator_dispose (xobject_t *object)
+xfile_enumerator_dispose (xobject_t *object)
 {
-  GFileEnumerator *enumerator;
+  xfile_enumerator_t *enumerator;
 
-  enumerator = G_FILE_ENUMERATOR (object);
+  enumerator = XFILE_ENUMERATOR (object);
 
   if (enumerator->priv->container) {
-    g_object_unref (enumerator->priv->container);
+    xobject_unref (enumerator->priv->container);
     enumerator->priv->container = NULL;
   }
 
-  G_OBJECT_CLASS (g_file_enumerator_parent_class)->dispose (object);
+  G_OBJECT_CLASS (xfile_enumerator_parent_class)->dispose (object);
 }
 
 static void
-g_file_enumerator_finalize (xobject_t *object)
+xfile_enumerator_finalize (xobject_t *object)
 {
-  GFileEnumerator *enumerator;
+  xfile_enumerator_t *enumerator;
 
-  enumerator = G_FILE_ENUMERATOR (object);
+  enumerator = XFILE_ENUMERATOR (object);
 
   if (!enumerator->priv->closed)
-    g_file_enumerator_close (enumerator, NULL, NULL);
+    xfile_enumerator_close (enumerator, NULL, NULL);
 
-  G_OBJECT_CLASS (g_file_enumerator_parent_class)->finalize (object);
+  G_OBJECT_CLASS (xfile_enumerator_parent_class)->finalize (object);
 }
 
 static void
-g_file_enumerator_class_init (GFileEnumeratorClass *klass)
+xfile_enumerator_class_init (xfile_enumerator_class_t *klass)
 {
   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->set_property = g_file_enumerator_set_property;
-  gobject_class->dispose = g_file_enumerator_dispose;
-  gobject_class->finalize = g_file_enumerator_finalize;
+  gobject_class->set_property = xfile_enumerator_set_property;
+  gobject_class->dispose = xfile_enumerator_dispose;
+  gobject_class->finalize = xfile_enumerator_finalize;
 
-  klass->next_files_async = g_file_enumerator_real_next_files_async;
-  klass->next_files_finish = g_file_enumerator_real_next_files_finish;
-  klass->close_async = g_file_enumerator_real_close_async;
-  klass->close_finish = g_file_enumerator_real_close_finish;
+  klass->next_files_async = xfile_enumerator_real_next_files_async;
+  klass->next_files_finish = xfile_enumerator_real_next_files_finish;
+  klass->close_async = xfile_enumerator_real_close_async;
+  klass->close_finish = xfile_enumerator_real_close_finish;
 
-  g_object_class_install_property
+  xobject_class_install_property
     (gobject_class, PROP_CONTAINER,
      g_param_spec_object ("container", P_("Container"),
                           P_("The container that is being enumerated"),
@@ -168,40 +168,40 @@ g_file_enumerator_class_init (GFileEnumeratorClass *klass)
 }
 
 static void
-g_file_enumerator_init (GFileEnumerator *enumerator)
+xfile_enumerator_init (xfile_enumerator_t *enumerator)
 {
-  enumerator->priv = g_file_enumerator_get_instance_private (enumerator);
+  enumerator->priv = xfile_enumerator_get_instance_private (enumerator);
 }
 
 /**
- * g_file_enumerator_next_file:
- * @enumerator: a #GFileEnumerator.
+ * xfile_enumerator_next_file:
+ * @enumerator: a #xfile_enumerator_t.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: location to store the error occurring, or %NULL to ignore
  *
  * Returns information for the next file in the enumerated object.
- * Will block until the information is available. The #GFileInfo
+ * Will block until the information is available. The #xfile_info_t
  * returned from this function will contain attributes that match the
- * attribute string that was passed when the #GFileEnumerator was created.
+ * attribute string that was passed when the #xfile_enumerator_t was created.
  *
- * See the documentation of #GFileEnumerator for information about the
+ * See the documentation of #xfile_enumerator_t for information about the
  * order of returned files.
  *
  * On error, returns %NULL and sets @error to the error. If the
  * enumerator is at the end, %NULL will be returned and @error will
  * be unset.
  *
- * Returns: (nullable) (transfer full): A #GFileInfo or %NULL on error
+ * Returns: (nullable) (transfer full): A #xfile_info_t or %NULL on error
  *    or end of enumerator.  Free the returned object with
- *    g_object_unref() when no longer needed.
+ *    xobject_unref() when no longer needed.
  **/
-GFileInfo *
-g_file_enumerator_next_file (GFileEnumerator *enumerator,
+xfile_info_t *
+xfile_enumerator_next_file (xfile_enumerator_t *enumerator,
 			     xcancellable_t *cancellable,
 			     xerror_t **error)
 {
-  GFileEnumeratorClass *class;
-  GFileInfo *info;
+  xfile_enumerator_class_t *class;
+  xfile_info_t *info;
 
   g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), NULL);
   g_return_val_if_fail (enumerator != NULL, NULL);
@@ -220,14 +220,14 @@ g_file_enumerator_next_file (GFileEnumerator *enumerator,
       return NULL;
     }
 
-  if (enumerator->priv->outstanding_error)
+  if (enumerator->priv->outstandinxerror)
     {
-      g_propagate_error (error, enumerator->priv->outstanding_error);
-      enumerator->priv->outstanding_error = NULL;
+      g_propagate_error (error, enumerator->priv->outstandinxerror);
+      enumerator->priv->outstandinxerror = NULL;
       return NULL;
     }
 
-  class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
+  class = XFILE_ENUMERATOR_GET_CLASS (enumerator);
 
   if (cancellable)
     g_cancellable_push_current (cancellable);
@@ -243,8 +243,8 @@ g_file_enumerator_next_file (GFileEnumerator *enumerator,
 }
 
 /**
- * g_file_enumerator_close:
- * @enumerator: a #GFileEnumerator.
+ * xfile_enumerator_close:
+ * @enumerator: a #xfile_enumerator_t.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: location to store the error occurring, or %NULL to ignore
  *
@@ -258,16 +258,16 @@ g_file_enumerator_next_file (GFileEnumerator *enumerator,
  * Returns: #TRUE on success or #FALSE on error.
  **/
 xboolean_t
-g_file_enumerator_close (GFileEnumerator  *enumerator,
+xfile_enumerator_close (xfile_enumerator_t  *enumerator,
 			 xcancellable_t     *cancellable,
 			 xerror_t          **error)
 {
-  GFileEnumeratorClass *class;
+  xfile_enumerator_class_t *class;
 
   g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), FALSE);
   g_return_val_if_fail (enumerator != NULL, FALSE);
 
-  class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
+  class = XFILE_ENUMERATOR_GET_CLASS (enumerator);
 
   if (enumerator->priv->closed)
     return TRUE;
@@ -298,17 +298,17 @@ next_async_callback_wrapper (xobject_t      *source_object,
 			     xasync_result_t *res,
 			     xpointer_t      user_data)
 {
-  GFileEnumerator *enumerator = G_FILE_ENUMERATOR (source_object);
+  xfile_enumerator_t *enumerator = XFILE_ENUMERATOR (source_object);
 
   enumerator->priv->pending = FALSE;
   if (enumerator->priv->outstanding_callback)
     (*enumerator->priv->outstanding_callback) (source_object, res, user_data);
-  g_object_unref (enumerator);
+  xobject_unref (enumerator);
 }
 
 /**
- * g_file_enumerator_next_files_async:
- * @enumerator: a #GFileEnumerator.
+ * xfile_enumerator_next_files_async:
+ * @enumerator: a #xfile_enumerator_t.
  * @num_files: the number of file info objects to request
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
@@ -319,7 +319,7 @@ next_async_callback_wrapper (xobject_t      *source_object,
  * When all i/o for the operation is finished the @callback will be called with
  * the requested information.
  *
- * See the documentation of #GFileEnumerator for information about the
+ * See the documentation of #xfile_enumerator_t for information about the
  * order of returned files.
  *
  * The callback can be called with less than @num_files files in case of error
@@ -336,14 +336,14 @@ next_async_callback_wrapper (xobject_t      *source_object,
  * priority is %G_PRIORITY_DEFAULT.
  **/
 void
-g_file_enumerator_next_files_async (GFileEnumerator     *enumerator,
+xfile_enumerator_next_files_async (xfile_enumerator_t     *enumerator,
 				    int                  num_files,
 				    int                  io_priority,
 				    xcancellable_t        *cancellable,
 				    xasync_ready_callback_t  callback,
 				    xpointer_t             user_data)
 {
-  GFileEnumeratorClass *class;
+  xfile_enumerator_class_t *class;
 
   g_return_if_fail (X_IS_FILE_ENUMERATOR (enumerator));
   g_return_if_fail (enumerator != NULL);
@@ -351,19 +351,19 @@ g_file_enumerator_next_files_async (GFileEnumerator     *enumerator,
 
   if (num_files == 0)
     {
-      GTask *task;
+      xtask_t *task;
 
-      task = g_task_new (enumerator, cancellable, callback, user_data);
-      g_task_set_source_tag (task, g_file_enumerator_next_files_async);
-      g_task_return_pointer (task, NULL, NULL);
-      g_object_unref (task);
+      task = xtask_new (enumerator, cancellable, callback, user_data);
+      xtask_set_source_tag (task, xfile_enumerator_next_files_async);
+      xtask_return_pointer (task, NULL, NULL);
+      xobject_unref (task);
       return;
     }
 
   if (enumerator->priv->closed)
     {
-      g_task_report_new_error (enumerator, callback, user_data,
-                               g_file_enumerator_next_files_async,
+      xtask_report_new_error (enumerator, callback, user_data,
+                               xfile_enumerator_next_files_async,
                                G_IO_ERROR, G_IO_ERROR_CLOSED,
                                _("File enumerator is already closed"));
       return;
@@ -371,51 +371,51 @@ g_file_enumerator_next_files_async (GFileEnumerator     *enumerator,
 
   if (enumerator->priv->pending)
     {
-      g_task_report_new_error (enumerator, callback, user_data,
-                               g_file_enumerator_next_files_async,
+      xtask_report_new_error (enumerator, callback, user_data,
+                               xfile_enumerator_next_files_async,
                                G_IO_ERROR, G_IO_ERROR_PENDING,
                                _("File enumerator has outstanding operation"));
       return;
     }
 
-  class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
+  class = XFILE_ENUMERATOR_GET_CLASS (enumerator);
 
   enumerator->priv->pending = TRUE;
   enumerator->priv->outstanding_callback = callback;
-  g_object_ref (enumerator);
+  xobject_ref (enumerator);
   (* class->next_files_async) (enumerator, num_files, io_priority, cancellable,
 			       next_async_callback_wrapper, user_data);
 }
 
 /**
- * g_file_enumerator_next_files_finish:
- * @enumerator: a #GFileEnumerator.
+ * xfile_enumerator_next_files_finish:
+ * @enumerator: a #xfile_enumerator_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  * ignore.
  *
- * Finishes the asynchronous operation started with g_file_enumerator_next_files_async().
+ * Finishes the asynchronous operation started with xfile_enumerator_next_files_async().
  *
  * Returns: (transfer full) (element-type Gio.FileInfo): a #xlist_t of #GFileInfos. You must free the list with
- *     g_list_free() and unref the infos with g_object_unref() when you're
+ *     xlist_free() and unref the infos with xobject_unref() when you're
  *     done with them.
  **/
 xlist_t *
-g_file_enumerator_next_files_finish (GFileEnumerator  *enumerator,
+xfile_enumerator_next_files_finish (xfile_enumerator_t  *enumerator,
 				     xasync_result_t     *result,
 				     xerror_t          **error)
 {
-  GFileEnumeratorClass *class;
+  xfile_enumerator_class_t *class;
 
   g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return NULL;
-  else if (g_async_result_is_tagged (result, g_file_enumerator_next_files_async))
-    return g_task_propagate_pointer (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xfile_enumerator_next_files_async))
+    return xtask_propagate_pointer (XTASK (result), error);
 
-  class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
+  class = XFILE_ENUMERATOR_GET_CLASS (enumerator);
   return class->next_files_finish (enumerator, result, error);
 }
 
@@ -424,18 +424,18 @@ close_async_callback_wrapper (xobject_t      *source_object,
 			      xasync_result_t *res,
 			      xpointer_t      user_data)
 {
-  GFileEnumerator *enumerator = G_FILE_ENUMERATOR (source_object);
+  xfile_enumerator_t *enumerator = XFILE_ENUMERATOR (source_object);
 
   enumerator->priv->pending = FALSE;
   enumerator->priv->closed = TRUE;
   if (enumerator->priv->outstanding_callback)
     (*enumerator->priv->outstanding_callback) (source_object, res, user_data);
-  g_object_unref (enumerator);
+  xobject_unref (enumerator);
 }
 
 /**
- * g_file_enumerator_close_async:
- * @enumerator: a #GFileEnumerator.
+ * xfile_enumerator_close_async:
+ * @enumerator: a #xfile_enumerator_t.
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @callback: (scope async): a #xasync_ready_callback_t to call when the request is satisfied
@@ -446,23 +446,23 @@ close_async_callback_wrapper (xobject_t      *source_object,
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned in
- * g_file_enumerator_close_finish().
+ * xfile_enumerator_close_finish().
  **/
 void
-g_file_enumerator_close_async (GFileEnumerator     *enumerator,
+xfile_enumerator_close_async (xfile_enumerator_t     *enumerator,
 			       int                  io_priority,
 			       xcancellable_t        *cancellable,
 			       xasync_ready_callback_t  callback,
 			       xpointer_t             user_data)
 {
-  GFileEnumeratorClass *class;
+  xfile_enumerator_class_t *class;
 
   g_return_if_fail (X_IS_FILE_ENUMERATOR (enumerator));
 
   if (enumerator->priv->closed)
     {
-      g_task_report_new_error (enumerator, callback, user_data,
-                               g_file_enumerator_close_async,
+      xtask_report_new_error (enumerator, callback, user_data,
+                               xfile_enumerator_close_async,
                                G_IO_ERROR, G_IO_ERROR_CLOSED,
                                _("File enumerator is already closed"));
       return;
@@ -470,32 +470,32 @@ g_file_enumerator_close_async (GFileEnumerator     *enumerator,
 
   if (enumerator->priv->pending)
     {
-      g_task_report_new_error (enumerator, callback, user_data,
-                               g_file_enumerator_close_async,
+      xtask_report_new_error (enumerator, callback, user_data,
+                               xfile_enumerator_close_async,
                                G_IO_ERROR, G_IO_ERROR_PENDING,
                                _("File enumerator has outstanding operation"));
       return;
     }
 
-  class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
+  class = XFILE_ENUMERATOR_GET_CLASS (enumerator);
 
   enumerator->priv->pending = TRUE;
   enumerator->priv->outstanding_callback = callback;
-  g_object_ref (enumerator);
+  xobject_ref (enumerator);
   (* class->close_async) (enumerator, io_priority, cancellable,
 			  close_async_callback_wrapper, user_data);
 }
 
 /**
- * g_file_enumerator_close_finish:
- * @enumerator: a #GFileEnumerator.
+ * xfile_enumerator_close_finish:
+ * @enumerator: a #xfile_enumerator_t.
  * @result: a #xasync_result_t.
  * @error: a #xerror_t location to store the error occurring, or %NULL to
  * ignore.
  *
- * Finishes closing a file enumerator, started from g_file_enumerator_close_async().
+ * Finishes closing a file enumerator, started from xfile_enumerator_close_async().
  *
- * If the file enumerator was already closed when g_file_enumerator_close_async()
+ * If the file enumerator was already closed when xfile_enumerator_close_async()
  * was called, then this function will report %G_IO_ERROR_CLOSED in @error, and
  * return %FALSE. If the file enumerator had pending operation when the close
  * operation was started, then this function will report %G_IO_ERROR_PENDING, and
@@ -507,34 +507,34 @@ g_file_enumerator_close_async (GFileEnumerator     *enumerator,
  * Returns: %TRUE if the close operation has finished successfully.
  **/
 xboolean_t
-g_file_enumerator_close_finish (GFileEnumerator  *enumerator,
+xfile_enumerator_close_finish (xfile_enumerator_t  *enumerator,
 				xasync_result_t     *result,
 				xerror_t          **error)
 {
-  GFileEnumeratorClass *class;
+  xfile_enumerator_class_t *class;
 
   g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), FALSE);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
-  if (g_async_result_legacy_propagate_error (result, error))
+  if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
-  else if (g_async_result_is_tagged (result, g_file_enumerator_close_async))
-    return g_task_propagate_boolean (G_TASK (result), error);
+  else if (xasync_result_is_tagged (result, xfile_enumerator_close_async))
+    return xtask_propagate_boolean (XTASK (result), error);
 
-  class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
+  class = XFILE_ENUMERATOR_GET_CLASS (enumerator);
   return class->close_finish (enumerator, result, error);
 }
 
 /**
- * g_file_enumerator_is_closed:
- * @enumerator: a #GFileEnumerator.
+ * xfile_enumerator_is_closed:
+ * @enumerator: a #xfile_enumerator_t.
  *
  * Checks if the file enumerator has been closed.
  *
  * Returns: %TRUE if the @enumerator is closed.
  **/
 xboolean_t
-g_file_enumerator_is_closed (GFileEnumerator *enumerator)
+xfile_enumerator_is_closed (xfile_enumerator_t *enumerator)
 {
   g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), TRUE);
 
@@ -542,15 +542,15 @@ g_file_enumerator_is_closed (GFileEnumerator *enumerator)
 }
 
 /**
- * g_file_enumerator_has_pending:
- * @enumerator: a #GFileEnumerator.
+ * xfile_enumerator_has_pending:
+ * @enumerator: a #xfile_enumerator_t.
  *
  * Checks if the file enumerator has pending operations.
  *
  * Returns: %TRUE if the @enumerator has pending operations.
  **/
 xboolean_t
-g_file_enumerator_has_pending (GFileEnumerator *enumerator)
+xfile_enumerator_has_pending (xfile_enumerator_t *enumerator)
 {
   g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), TRUE);
 
@@ -558,14 +558,14 @@ g_file_enumerator_has_pending (GFileEnumerator *enumerator)
 }
 
 /**
- * g_file_enumerator_set_pending:
- * @enumerator: a #GFileEnumerator.
+ * xfile_enumerator_set_pending:
+ * @enumerator: a #xfile_enumerator_t.
  * @pending: a boolean value.
  *
  * Sets the file enumerator as having pending operations.
  **/
 void
-g_file_enumerator_set_pending (GFileEnumerator *enumerator,
+xfile_enumerator_set_pending (xfile_enumerator_t *enumerator,
 			       xboolean_t         pending)
 {
   g_return_if_fail (X_IS_FILE_ENUMERATOR (enumerator));
@@ -574,20 +574,20 @@ g_file_enumerator_set_pending (GFileEnumerator *enumerator,
 }
 
 /**
- * g_file_enumerator_iterate:
- * @direnum: an open #GFileEnumerator
- * @out_info: (out) (transfer none) (optional): Output location for the next #GFileInfo, or %NULL
+ * xfile_enumerator_iterate:
+ * @direnum: an open #xfile_enumerator_t
+ * @out_info: (out) (transfer none) (optional): Output location for the next #xfile_info_t, or %NULL
  * @out_child: (out) (transfer none) (optional): Output location for the next #xfile_t, or %NULL
  * @cancellable: a #xcancellable_t
  * @error: a #xerror_t
  *
- * This is a version of g_file_enumerator_next_file() that's easier to
- * use correctly from C programs.  With g_file_enumerator_next_file(),
+ * This is a version of xfile_enumerator_next_file() that's easier to
+ * use correctly from C programs.  With xfile_enumerator_next_file(),
  * the xboolean_t return value signifies "end of iteration or error", which
  * requires allocation of a temporary #xerror_t.
  *
  * In contrast, with this function, a %FALSE return from
- * g_file_enumerator_iterate() *always* means
+ * xfile_enumerator_iterate() *always* means
  * "error".  End of iteration is signaled by @out_info or @out_child being %NULL.
  *
  * Another crucial difference is that the references for @out_info and
@@ -601,15 +601,15 @@ g_file_enumerator_set_pending (GFileEnumerator *enumerator,
  *
  * You must specify at least one of @out_info or @out_child.
  *
- * The code pattern for correctly using g_file_enumerator_iterate() from C
+ * The code pattern for correctly using xfile_enumerator_iterate() from C
  * is:
  *
  * |[
- * direnum = g_file_enumerate_children (file, ...);
+ * direnum = xfile_enumerate_children (file, ...);
  * while (TRUE)
  *   {
- *     GFileInfo *info;
- *     if (!g_file_enumerator_iterate (direnum, &info, NULL, cancellable, error))
+ *     xfile_info_t *info;
+ *     if (!xfile_enumerator_iterate (direnum, &info, NULL, cancellable, error))
  *       goto out;
  *     if (!info)
  *       break;
@@ -617,25 +617,25 @@ g_file_enumerator_set_pending (GFileEnumerator *enumerator,
  *   }
  *
  * out:
- *   g_object_unref (direnum); // Note: frees the last @info
+ *   xobject_unref (direnum); // Note: frees the last @info
  * ]|
  *
  *
  * Since: 2.44
  */
 xboolean_t
-g_file_enumerator_iterate (GFileEnumerator  *direnum,
-                           GFileInfo       **out_info,
+xfile_enumerator_iterate (xfile_enumerator_t  *direnum,
+                           xfile_info_t       **out_info,
                            xfile_t           **out_child,
                            xcancellable_t     *cancellable,
                            xerror_t          **error)
 {
   xboolean_t ret = FALSE;
   xerror_t *temp_error = NULL;
-  GFileInfo *ret_info = NULL;
+  xfile_info_t *ret_info = NULL;
 
-  static GQuark cached_info_quark;
-  static GQuark cached_child_quark;
+  static xquark cached_info_quark;
+  static xquark cached_child_quark;
   static xsize_t quarks_initialized;
 
   g_return_val_if_fail (direnum != NULL, FALSE);
@@ -648,7 +648,7 @@ g_file_enumerator_iterate (GFileEnumerator  *direnum,
       g_once_init_leave (&quarks_initialized, 1);
     }
 
-  ret_info = g_file_enumerator_next_file (direnum, cancellable, &temp_error);
+  ret_info = xfile_enumerator_next_file (direnum, cancellable, &temp_error);
   if (temp_error != NULL)
     {
       g_propagate_error (error, temp_error);
@@ -659,26 +659,26 @@ g_file_enumerator_iterate (GFileEnumerator  *direnum,
     {
       if (out_child != NULL)
         {
-          const char *name = g_file_info_get_name (ret_info);
+          const char *name = xfile_info_get_name (ret_info);
 
           if (G_UNLIKELY (name == NULL))
             {
-              g_critical ("g_file_enumerator_iterate() created without standard::name");
+              g_critical ("xfile_enumerator_iterate() created without standard::name");
               g_return_val_if_reached (FALSE);
             }
           else
             {
-              *out_child = g_file_get_child (g_file_enumerator_get_container (direnum), name);
-              g_object_set_qdata_full ((xobject_t*)direnum, cached_child_quark, *out_child, (GDestroyNotify)g_object_unref);
+              *out_child = xfile_get_child (xfile_enumerator_get_container (direnum), name);
+              xobject_set_qdata_full ((xobject_t*)direnum, cached_child_quark, *out_child, (xdestroy_notify_t)xobject_unref);
             }
         }
       if (out_info != NULL)
         {
-          g_object_set_qdata_full ((xobject_t*)direnum, cached_info_quark, ret_info, (GDestroyNotify)g_object_unref);
+          xobject_set_qdata_full ((xobject_t*)direnum, cached_info_quark, ret_info, (xdestroy_notify_t)xobject_unref);
           *out_info = ret_info;
         }
       else
-        g_object_unref (ret_info);
+        xobject_unref (ret_info);
     }
   else
     {
@@ -694,8 +694,8 @@ g_file_enumerator_iterate (GFileEnumerator  *direnum,
 }
 
 /**
- * g_file_enumerator_get_container:
- * @enumerator: a #GFileEnumerator
+ * xfile_enumerator_get_container:
+ * @enumerator: a #xfile_enumerator_t
  *
  * Get the #xfile_t container which is being enumerated.
  *
@@ -704,7 +704,7 @@ g_file_enumerator_iterate (GFileEnumerator  *direnum,
  * Since: 2.18
  */
 xfile_t *
-g_file_enumerator_get_container (GFileEnumerator *enumerator)
+xfile_enumerator_get_container (xfile_enumerator_t *enumerator)
 {
   g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), NULL);
 
@@ -712,70 +712,70 @@ g_file_enumerator_get_container (GFileEnumerator *enumerator)
 }
 
 /**
- * g_file_enumerator_get_child:
- * @enumerator: a #GFileEnumerator
- * @info: a #GFileInfo gotten from g_file_enumerator_next_file()
+ * xfile_enumerator_get_child:
+ * @enumerator: a #xfile_enumerator_t
+ * @info: a #xfile_info_t gotten from xfile_enumerator_next_file()
  *   or the async equivalents.
  *
  * Return a new #xfile_t which refers to the file named by @info in the source
  * directory of @enumerator.  This function is primarily intended to be used
- * inside loops with g_file_enumerator_next_file().
+ * inside loops with xfile_enumerator_next_file().
  *
- * To use this, %G_FILE_ATTRIBUTE_STANDARD_NAME must have been listed in the
- * attributes list used when creating the #GFileEnumerator.
+ * To use this, %XFILE_ATTRIBUTE_STANDARD_NAME must have been listed in the
+ * attributes list used when creating the #xfile_enumerator_t.
  *
  * This is a convenience method that's equivalent to:
  * |[<!-- language="C" -->
- *   xchar_t *name = g_file_info_get_name (info);
- *   xfile_t *child = g_file_get_child (g_file_enumerator_get_container (enumr),
+ *   xchar_t *name = xfile_info_get_name (info);
+ *   xfile_t *child = xfile_get_child (xfile_enumerator_get_container (enumr),
  *                                    name);
  * ]|
  *
- * Returns: (transfer full): a #xfile_t for the #GFileInfo passed it.
+ * Returns: (transfer full): a #xfile_t for the #xfile_info_t passed it.
  *
  * Since: 2.36
  */
 xfile_t *
-g_file_enumerator_get_child (GFileEnumerator *enumerator,
-                             GFileInfo       *info)
+xfile_enumerator_get_child (xfile_enumerator_t *enumerator,
+                             xfile_info_t       *info)
 {
   const xchar_t *name;
 
   g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), NULL);
   g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
 
-  name = g_file_info_get_name (info);
+  name = xfile_info_get_name (info);
 
   if (G_UNLIKELY (name == NULL))
     {
-      g_critical ("GFileEnumerator created without standard::name");
+      g_critical ("xfile_enumerator_t created without standard::name");
       g_return_val_if_reached (NULL);
     }
 
-  return g_file_get_child (enumerator->priv->container, name);
+  return xfile_get_child (enumerator->priv->container, name);
 }
 
 static void
 next_async_op_free (xlist_t *files)
 {
-  g_list_free_full (files, g_object_unref);
+  xlist_free_full (files, xobject_unref);
 }
 
 static void
-next_files_thread (GTask        *task,
+next_files_thread (xtask_t        *task,
                    xpointer_t      source_object,
                    xpointer_t      task_data,
                    xcancellable_t *cancellable)
 {
-  GFileEnumerator *enumerator = source_object;
+  xfile_enumerator_t *enumerator = source_object;
   int num_files = GPOINTER_TO_INT (task_data);
-  GFileEnumeratorClass *class;
+  xfile_enumerator_class_t *class;
   xlist_t *files = NULL;
   xerror_t *error = NULL;
-  GFileInfo *info;
+  xfile_info_t *info;
   int i;
 
-  class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
+  class = XFILE_ENUMERATOR_GET_CLASS (enumerator);
 
   for (i = 0; i < num_files; i++)
     {
@@ -789,99 +789,99 @@ next_files_thread (GTask        *task,
 	  /* If we get an error after first file, return that on next operation */
 	  if (error != NULL && i > 0)
 	    {
-	      if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-		g_error_free (error); /* Never propagate cancel errors to other call */
+	      if (xerror_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+		xerror_free (error); /* Never propagate cancel errors to other call */
 	      else
-		enumerator->priv->outstanding_error = error;
+		enumerator->priv->outstandinxerror = error;
 	      error = NULL;
 	    }
 
 	  break;
 	}
       else
-	files = g_list_prepend (files, info);
+	files = xlist_prepend (files, info);
     }
 
   if (error)
     {
-      g_list_free_full (files, g_object_unref);
-      g_task_return_error (task, error);
+      xlist_free_full (files, xobject_unref);
+      xtask_return_error (task, error);
     }
   else
-    g_task_return_pointer (task, files, (GDestroyNotify)next_async_op_free);
+    xtask_return_pointer (task, files, (xdestroy_notify_t)next_async_op_free);
 }
 
 static void
-g_file_enumerator_real_next_files_async (GFileEnumerator     *enumerator,
+xfile_enumerator_real_next_files_async (xfile_enumerator_t     *enumerator,
 					 int                  num_files,
 					 int                  io_priority,
 					 xcancellable_t        *cancellable,
 					 xasync_ready_callback_t  callback,
 					 xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (enumerator, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_enumerator_real_next_files_async);
-  g_task_set_task_data (task, GINT_TO_POINTER (num_files), NULL);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (enumerator, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_enumerator_real_next_files_async);
+  xtask_set_task_data (task, GINT_TO_POINTER (num_files), NULL);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, next_files_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, next_files_thread);
+  xobject_unref (task);
 }
 
 static xlist_t *
-g_file_enumerator_real_next_files_finish (GFileEnumerator                *enumerator,
+xfile_enumerator_real_next_files_finish (xfile_enumerator_t                *enumerator,
 					  xasync_result_t                   *result,
 					  xerror_t                        **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, enumerator), NULL);
+  g_return_val_if_fail (xtask_is_valid (result, enumerator), NULL);
 
-  return g_task_propagate_pointer (G_TASK (result), error);
+  return xtask_propagate_pointer (XTASK (result), error);
 }
 
 static void
-close_async_thread (GTask        *task,
+close_async_thread (xtask_t        *task,
                     xpointer_t      source_object,
                     xpointer_t      task_data,
                     xcancellable_t *cancellable)
 {
-  GFileEnumerator *enumerator = source_object;
-  GFileEnumeratorClass *class;
+  xfile_enumerator_t *enumerator = source_object;
+  xfile_enumerator_class_t *class;
   xerror_t *error = NULL;
   xboolean_t result;
 
-  class = G_FILE_ENUMERATOR_GET_CLASS (enumerator);
+  class = XFILE_ENUMERATOR_GET_CLASS (enumerator);
   result = class->close_fn (enumerator, cancellable, &error);
   if (result)
-    g_task_return_boolean (task, TRUE);
+    xtask_return_boolean (task, TRUE);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 static void
-g_file_enumerator_real_close_async (GFileEnumerator     *enumerator,
+xfile_enumerator_real_close_async (xfile_enumerator_t     *enumerator,
 				    int                  io_priority,
 				    xcancellable_t        *cancellable,
 				    xasync_ready_callback_t  callback,
 				    xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
 
-  task = g_task_new (enumerator, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_file_enumerator_real_close_async);
-  g_task_set_priority (task, io_priority);
+  task = xtask_new (enumerator, cancellable, callback, user_data);
+  xtask_set_source_tag (task, xfile_enumerator_real_close_async);
+  xtask_set_priority (task, io_priority);
 
-  g_task_run_in_thread (task, close_async_thread);
-  g_object_unref (task);
+  xtask_run_in_thread (task, close_async_thread);
+  xobject_unref (task);
 }
 
 static xboolean_t
-g_file_enumerator_real_close_finish (GFileEnumerator  *enumerator,
+xfile_enumerator_real_close_finish (xfile_enumerator_t  *enumerator,
                                      xasync_result_t     *result,
                                      xerror_t          **error)
 {
-  g_return_val_if_fail (g_task_is_valid (result, enumerator), FALSE);
+  g_return_val_if_fail (xtask_is_valid (result, enumerator), FALSE);
 
-  return g_task_propagate_boolean (G_TASK (result), error);
+  return xtask_propagate_boolean (XTASK (result), error);
 }

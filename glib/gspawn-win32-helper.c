@@ -200,7 +200,7 @@ int
 main (int ignored_argc, char **ignored_argv)
 #endif
 {
-  GHashTable *fds;  /* (element-type int int) */
+  xhashtable_t *fds;  /* (element-type int int) */
   int child_err_report_fd = -1;
   int helper_sync_fd = -1;
   int saved_stderr_fd = -1;
@@ -236,7 +236,7 @@ main (int ignored_argc, char **ignored_argv)
   /* Convert unicode wargs to utf8 */
   argv = g_new(char *, argc + 1);
   for (i = 0; i < argc; i++)
-    argv[i] = g_utf16_to_utf8(wargv[i], -1, NULL, NULL, NULL);
+    argv[i] = xutf16_to_utf8(wargv[i], -1, NULL, NULL, NULL);
   argv[i] = NULL;
 
   /* argv[ARG_CHILD_ERR_REPORT] is the file descriptor number onto
@@ -319,10 +319,10 @@ main (int ignored_argc, char **ignored_argv)
   else if (_wchdir (wargv[ARG_WORKING_DIRECTORY]) < 0)
     write_err_and_exit (child_err_report_fd, CHILD_CHDIR_FAILED);
 
-  fds = g_hash_table_new (NULL, NULL);
+  fds = xhash_table_new (NULL, NULL);
   if (argv[ARG_FDS][0] != '-')
     {
-      xchar_t **fdsv = g_strsplit (argv[ARG_FDS], ",", -1);
+      xchar_t **fdsv = xstrsplit (argv[ARG_FDS], ",", -1);
       xsize_t i;
 
       for (i = 0; fdsv[i]; i++)
@@ -344,10 +344,10 @@ main (int ignored_argc, char **ignored_argv)
           maxfd = MAX (maxfd, sourcefd);
           maxfd = MAX (maxfd, targetfd);
 
-          g_hash_table_insert (fds, GINT_TO_POINTER (targetfd), GINT_TO_POINTER (sourcefd));
+          xhash_table_insert (fds, GINT_TO_POINTER (targetfd), GINT_TO_POINTER (sourcefd));
         }
 
-      g_strfreev (fdsv);
+      xstrfreev (fdsv);
     }
 
   maxfd++;
@@ -358,11 +358,11 @@ main (int ignored_argc, char **ignored_argv)
   saved_stderr_fd = checked_dup2 (saved_stderr_fd, maxfd, child_err_report_fd);
 
   {
-    GHashTableIter iter;
+    xhash_table_iter_t iter;
     xpointer_t sourcefd, targetfd;
 
-    g_hash_table_iter_init (&iter, fds);
-    while (g_hash_table_iter_next (&iter, &targetfd, &sourcefd))
+    xhash_table_iter_init (&iter, fds);
+    while (xhash_table_iter_next (&iter, &targetfd, &sourcefd))
       {
         /* If we're doing remapping fd assignments, we need to handle
          * the case where the user has specified e.g. 5 -> 4, 4 -> 6.
@@ -371,24 +371,24 @@ main (int ignored_argc, char **ignored_argv)
          */
         maxfd++;
         checked_dup2 (GPOINTER_TO_INT (sourcefd), maxfd, child_err_report_fd);
-        g_hash_table_iter_replace (&iter, GINT_TO_POINTER (maxfd));
+        xhash_table_iter_replace (&iter, GINT_TO_POINTER (maxfd));
       }
 
-    g_hash_table_iter_init (&iter, fds);
-    while (g_hash_table_iter_next (&iter, &targetfd, &sourcefd))
+    xhash_table_iter_init (&iter, fds);
+    while (xhash_table_iter_next (&iter, &targetfd, &sourcefd))
       checked_dup2 (GPOINTER_TO_INT (sourcefd), GPOINTER_TO_INT (targetfd), child_err_report_fd);
   }
 
-  g_hash_table_add (fds, GINT_TO_POINTER (child_err_report_fd));
-  g_hash_table_add (fds, GINT_TO_POINTER (helper_sync_fd));
-  g_hash_table_add (fds, GINT_TO_POINTER (saved_stderr_fd));
+  xhash_table_add (fds, GINT_TO_POINTER (child_err_report_fd));
+  xhash_table_add (fds, GINT_TO_POINTER (helper_sync_fd));
+  xhash_table_add (fds, GINT_TO_POINTER (saved_stderr_fd));
 
   /* argv[ARG_CLOSE_DESCRIPTORS] is "y" if file descriptors from 3
    *  upwards should be closed
    */
   if (argv[ARG_CLOSE_DESCRIPTORS][0] == 'y')
     for (i = 3; i < 1000; i++)	/* FIXME real limit? */
-      if (!g_hash_table_contains (fds, GINT_TO_POINTER (i)))
+      if (!xhash_table_contains (fds, GINT_TO_POINTER (i)))
         if (_get_osfhandle (i) != -1)
           close (i);
 
@@ -445,8 +445,8 @@ main (int ignored_argc, char **ignored_argv)
   read (helper_sync_fd, &c, 1);
 
   LocalFree (wargv);
-  g_strfreev (argv);
-  g_hash_table_unref (fds);
+  xstrfreev (argv);
+  xhash_table_unref (fds);
 
   return 0;
 }

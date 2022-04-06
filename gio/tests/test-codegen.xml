@@ -132,7 +132,7 @@
   </interface>
 
   <!-- Empty -->
-  <interface name="org.project.Baz">
+  <interface name="org.project.baz_t">
   </interface>
 
   <!-- Outside D-Bus prefix -->
@@ -313,7 +313,7 @@
     -->
     <property name="Property4" type="s" access="read"/>
 
-    <!-- Property5: Foo
+    <!-- Property5: foo_t
          First line (second paragraph). With trailing whitespace.
          Second line (same paragraph).
 <programlisting>
@@ -439,7 +439,7 @@
   <interface name="OldieInterface">
     <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
 
-    <method name="Foo">
+    <method name="foo_t">
       <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
     </method>
 

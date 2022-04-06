@@ -49,8 +49,8 @@ How to run and debug your GLib application
   </para>
 </formalpara>
 
-<formalpara id="G_FILENAME_ENCODING">
-  <title><envar>G_FILENAME_ENCODING</envar></title>
+<formalpara id="XFILENAME_ENCODING">
+  <title><envar>XFILENAME_ENCODING</envar></title>
 
   <para>
     This environment variable can be set to a comma-separated list of character
@@ -65,7 +65,7 @@ How to run and debug your GLib application
 
   <para>
     If this environment variable is set, GLib assumes that filenames are in
-    the locale encoding rather than in UTF-8. G_FILENAME_ENCODING takes
+    the locale encoding rather than in UTF-8. XFILENAME_ENCODING takes
     priority over G_BROKEN_FILENAMES.
   </para>
 </formalpara>
@@ -202,10 +202,10 @@ How to run and debug your GLib application
           be caught by <literal>G_SLICE=debug-blocks</literal> is as follows:
           <programlisting>
             /* void* gives up type-safety */
-            void *slist = g_slist_alloc ();
+            void *slist = xslist_alloc ();
 
-            /* corruption: sizeof (GSList) != sizeof (xlist_t) */
-            g_list_free (slist);
+            /* corruption: sizeof (xslist_t) != sizeof (xlist_t) */
+            xlist_free (slist);
           </programlisting></para>
         </listitem>
       </varlistentry>
@@ -243,7 +243,7 @@ How to run and debug your GLib application
 
   <para>
     Allows to specify a nonstandard location for the timezone data files
-    that are used by the #GDateTime API. The default location is under
+    that are used by the #xdatetime_t API. The default location is under
     <filename>/usr/share/zoneinfo</filename>. For more information,
     also look at the <command>tzset</command> manual page.
   </para>
@@ -405,7 +405,7 @@ profiling has been enabled by calling
 
 <para>
 If GLib has been configured with <option>--enable-debug=yes</option>,
-then g_slice_debug_tree_statistics() can be called in a debugger to
+then g_slice_debuxtree_statistics() can be called in a debugger to
 output details about the memory usage of the slice allocator.
 </para>
 

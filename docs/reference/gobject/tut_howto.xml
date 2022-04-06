@@ -37,7 +37,7 @@
       type's header which contains the needed type, function and macro
       definitions. Each of these elements is nothing but a convention which
       is followed by almost all users of xobject_t, and has been refined over
-      multiple years of experience developing xobject_t-based code. If you are
+      multiple years of experience developing xobject-based code. If you are
       writing a library, it is particularly important for you to adhere closely
       to these conventions; users of your library will assume that you have.
       Even if not writing a library, it will help other people who want to work
@@ -289,15 +289,15 @@ G_DEFINE_TYPE_WITH_PRIVATE (ViewerFile, viewer_file, XTYPE_OBJECT)
     <para>
       Construction properties will be set only after all
       <function>instance_init</function> functions have run.
-      No object reference will be returned to the client of <function><link linkend="g-object-new">g_object_new</link></function>
+      No object reference will be returned to the client of <function><link linkend="g-object-new">xobject_new</link></function>
       until all the construction properties have been set.
     </para>
 
     <para>
       It is important to note that object construction cannot <emphasis>ever</emphasis>
       fail. If you require a fallible xobject_t construction, you can use the
-      <link linkend="GInitable"><type>GInitable</type></link> and
-      <link linkend="GAsyncInitable"><type>GAsyncInitable</type></link>
+      <link linkend="xinitable_t"><type>xinitable_t</type></link> and
+      <link linkend="xasync_initable_t"><type>xasync_initable_t</type></link>
       interfaces provided by the GIO library.
     </para>
 
@@ -342,7 +342,7 @@ enum
   N_PROPERTIES
 };
 
-static GParamSpec *obj_properties[N_PROPERTIES] = { NULL, };
+static xparam_spec_t *obj_properties[N_PROPERTIES] = { NULL, };
 
 static void
 viewer_file_class_init (ViewerFileClass *klass)
@@ -368,7 +368,7 @@ viewer_file_class_init (ViewerFileClass *klass)
                        2  /* default value */,
                        G_PARAM_READWRITE);
 
-  g_object_class_install_properties (object_class,
+  xobject_class_install_properties (object_class,
                                      N_PROPERTIES,
                                      obj_properties);
 }
@@ -388,7 +388,7 @@ viewer_file_class_init (ViewerFileClass *klass)
       virtual function will only be invoked after the properties marked as
       <function>G_PARAM_CONSTRUCT_ONLY</function> or
       <function>G_PARAM_CONSTRUCT</function> have been consumed, but
-      before the regular properties passed to <function>g_object_new()</function>
+      before the regular properties passed to <function>xobject_new()</function>
       have been set.
     </para>
   </sect1>
@@ -399,7 +399,7 @@ viewer_file_class_init (ViewerFileClass *klass)
     <para>
       Again, it is often difficult to figure out which mechanism to use to
       hook into the object's destruction process: when the last
-      <function><link linkend="g-object-unref">g_object_unref</link></function>
+      <function><link linkend="g-object-unref">xobject_unref</link></function>
       function call is made, a lot of things happen as described in
       <xref linkend="gobject-destruction-table"/>.
     </para>
@@ -434,7 +434,7 @@ viewer_file_dispose (xobject_t *gobject)
    */
 
   /* dispose() might be called multiple times, so we must guard against
-   * calling g_object_unref() on an invalid xobject_t by setting the member
+   * calling xobject_unref() on an invalid xobject_t by setting the member
    * NULL; g_clear_object() does this for us.
    */
   g_clear_object (&amp;priv->input_stream);
@@ -473,7 +473,7 @@ viewer_file_init (ViewerFile *self);
 {
   ViewerFilePrivate *priv = viewer_file_get_instance_private (self);
 
-  priv->input_stream = g_object_new (VIEWER_TYPE_INPUT_STREAM, NULL);
+  priv->input_stream = xobject_new (VIEWER_TYPE_INPUT_STREAM, NULL);
   priv->filename = /* would be set as a property */;
 }
 </programlisting></informalexample>
@@ -1188,7 +1188,7 @@ G_DEFINE_TYPE_WITH_CODE (ViewerFile, viewer_file, XTYPE_OBJECT,
 </programlisting></informalexample>
       It is very important to notice that the order in which interface
       implementations are added to the main object is not random:
-      <function><link linkend="g-type-add-interface-static">g_type_add_interface_static</link></function>,
+      <function><link linkend="g-type-add-interface-static">xtype_add_interface_static</link></function>,
       which is called by
       <function><link linkend="G-DEFINE-INTERFACE:CAPS">G_IMPLEMENT_INTERFACE</link></function>,
       must be invoked first on the interfaces which have no prerequisites and then on
@@ -1204,9 +1204,9 @@ G_DEFINE_TYPE_WITH_CODE (ViewerFile, viewer_file, XTYPE_OBJECT,
       properties. Declaration of the interface properties is similar to
       declaring the properties of ordinary xobject_t types as explained in
       <xref linkend="gobject-properties"/>, except that
-      <function><link linkend="g-object-interface-install-property">g_object_interface_install_property</link></function>
+      <function><link linkend="g-object-interface-install-property">xobject_interface_install_property</link></function>
       is used to declare the properties instead of
-      <function><link linkend="g-object-class-install-property">g_object_class_install_property</link></function>.
+      <function><link linkend="g-object-class-install-property">xobject_class_install_property</link></function>.
     </para>
 
     <para>
@@ -1218,7 +1218,7 @@ G_DEFINE_TYPE_WITH_CODE (ViewerFile, viewer_file, XTYPE_OBJECT,
 static void
 viewer_editable_default_init (ViewerEditableInterface *iface)
 {
-  g_object_interface_install_property (iface,
+  xobject_interface_install_property (iface,
                                        g_param_spec_double ("autosave-frequency",
                                                             "Autosave frequency",
                                                             "Frequency (in per-seconds) to autosave backups of the editable content at. "
@@ -1244,8 +1244,8 @@ viewer_editable_default_init (ViewerEditableInterface *iface)
       An implementation declares and defines its properties in the usual
       way as explained in <xref linkend="gobject-properties"/>, except for one
       small change: it can declare the properties of the interface it
-      implements using <function><link linkend="g-object-class-override-property">g_object_class_override_property</link></function>
-      instead of <function><link linkend="g-object-class-install-property">g_object_class_install_property</link></function>.
+      implements using <function><link linkend="g-object-class-override-property">xobject_class_override_property</link></function>
+      instead of <function><link linkend="g-object-class-install-property">xobject_class_install_property</link></function>.
       The following code snippet shows the modifications needed in the
       <type>ViewerFile</type> declaration and implementation above:
 <informalexample><programlisting>
@@ -1265,15 +1265,15 @@ enum
 static void
 viewer_file_set_property (xobject_t      *object,
                           xuint_t         prop_id,
-                          const GValue *value,
-                          GParamSpec   *pspec)
+                          const xvalue_t *value,
+                          xparam_spec_t   *pspec)
 {
   ViewerFile *file = VIEWER_FILE (object);
 
   switch (prop_id)
     {
     case PROP_AUTOSAVE_FREQUENCY:
-      file->autosave_frequency = g_value_get_double (value);
+      file->autosave_frequency = xvalue_get_double (value);
       break;
 
     default:
@@ -1285,15 +1285,15 @@ viewer_file_set_property (xobject_t      *object,
 static void
 viewer_file_get_property (xobject_t    *object,
                           xuint_t       prop_id,
-                          GValue     *value,
-                          GParamSpec *pspec)
+                          xvalue_t     *value,
+                          xparam_spec_t *pspec)
 {
   ViewerFile *file = VIEWER_FILE (object);
 
   switch (prop_id)
     {
     case PROP_AUTOSAVE_FREQUENCY:
-      g_value_set_double (value, file->autosave_frequency);
+      xvalue_set_double (value, file->autosave_frequency);
       break;
 
     default:
@@ -1310,7 +1310,7 @@ viewer_file_class_init (ViewerFileClass *klass)
   object_class->set_property = viewer_file_set_property;
   object_class->get_property = viewer_file_get_property;
 
-  g_object_class_override_property (object_class, PROP_AUTOSAVE_FREQUENCY, "autosave-frequency");
+  xobject_class_override_property (object_class, PROP_AUTOSAVE_FREQUENCY, "autosave-frequency");
 }
 </programlisting></informalexample>
     </para>
@@ -1375,7 +1375,7 @@ viewer_audio_file_init (ViewerAudioFile *self)
 
     <para>
       To access the base class interface implementation use
-      <function><link linkend="g-type-interface-peek-parent">g_type_interface_peek_parent</link></function>
+      <function><link linkend="g-type-interface-peek-parent">xtype_interface_peek_parent</link></function>
       from within an interface's <function>default_init</function> function.
     </para>
 
@@ -1383,7 +1383,7 @@ viewer_audio_file_init (ViewerAudioFile *self)
       To call the base class implementation of an interface
       method from a derived class where than interface method has been
       overridden, stash away the pointer returned from
-      <function><link linkend="g-type-interface-peek-parent">g_type_interface_peek_parent</link></function>
+      <function><link linkend="g-type-interface-peek-parent">xtype_interface_peek_parent</link></function>
       in a global variable.
     </para>
 
@@ -1409,7 +1409,7 @@ viewer_audio_file_editable_save (ViewerEditable  *editable,
 static void
 viewer_audio_file_editable_interface_init (ViewerEditableInterface *iface)
 {
-  viewer_editable_parent_interface = g_type_interface_peek_parent (iface);
+  viewer_editable_parent_interface = xtype_interface_peek_parent (iface);
 
   iface->save = viewer_audio_file_editable_save;
 }
@@ -1467,9 +1467,9 @@ viewer_audio_file_init (ViewerAudioFile *self)
       The code below shows how the user can connect a callback to the
       "changed" signal.
 <informalexample><programlisting>
-file = g_object_new (VIEWER_FILE_TYPE, NULL);
+file = xobject_new (VIEWER_FILE_TYPE, NULL);
 
-g_signal_connect (file, "changed", (GCallback) changed_event, NULL);
+g_signal_connect (file, "changed", (xcallback_t) changed_event, NULL);
 
 viewer_file_write (file, buffer, strlen (buffer));
 </programlisting></informalexample>
@@ -1495,7 +1495,7 @@ file_signals[CHANGED] =
 <informalexample><programlisting>
 void
 viewer_file_write (ViewerFile   *self,
-                   const guint8 *buffer,
+                   const xuint8_t *buffer,
                    xsize_t         size)
 {
   g_return_if_fail (VIEWER_IS_FILE (self));

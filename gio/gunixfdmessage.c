@@ -15,11 +15,11 @@
 /**
  * SECTION:gunixfdmessage
  * @title: GUnixFDMessage
- * @short_description: A GSocketControlMessage containing a GUnixFDList
+ * @short_description: A xsocket_control_message_t containing a xunix_fd_list_t
  * @include: gio/gunixfdmessage.h
- * @see_also: #GUnixConnection, #GUnixFDList, #GSocketControlMessage
+ * @see_also: #GUnixConnection, #xunix_fd_list_t, #xsocket_control_message_t
  *
- * This #GSocketControlMessage contains a #GUnixFDList.
+ * This #xsocket_control_message_t contains a #xunix_fd_list_t.
  * It may be sent using xsocket_send_message() and received using
  * xsocket_receive_message() over UNIX sockets (ie: sockets in the
  * %XSOCKET_FAMILY_UNIX family). The file descriptors are copied
@@ -55,13 +55,13 @@
 
 struct _GUnixFDMessagePrivate
 {
-  GUnixFDList *list;
+  xunix_fd_list_t *list;
 };
 
 G_DEFINE_TYPE_WITH_PRIVATE (GUnixFDMessage, g_unix_fd_message, XTYPE_SOCKET_CONTROL_MESSAGE)
 
 static xsize_t
-g_unix_fd_message_get_size (GSocketControlMessage *message)
+g_unix_fd_message_get_size (xsocket_control_message_t *message)
 {
   GUnixFDMessage *fd_message = G_UNIX_FD_MESSAGE (message);
 
@@ -69,25 +69,25 @@ g_unix_fd_message_get_size (GSocketControlMessage *message)
 }
 
 static int
-g_unix_fd_message_get_level (GSocketControlMessage *message)
+g_unix_fd_message_get_level (xsocket_control_message_t *message)
 {
   return SOL_SOCKET;
 }
 
 static int
-g_unix_fd_message_get_msg_type (GSocketControlMessage *message)
+g_unix_fd_message_get_msg_type (xsocket_control_message_t *message)
 {
   return SCM_RIGHTS;
 }
 
-static GSocketControlMessage *
+static xsocket_control_message_t *
 g_unix_fd_message_deserialize (int      level,
 			       int      type,
 			       xsize_t    size,
 			       xpointer_t data)
 {
-  GSocketControlMessage *message;
-  GUnixFDList *list;
+  xsocket_control_message_t *message;
+  xunix_fd_list_t *list;
   xint_t n, s, i;
   xint_t *fds;
 
@@ -122,20 +122,20 @@ g_unix_fd_message_deserialize (int      level,
       if (s < 0)
         {
           g_warning ("Error setting close-on-exec flag on incoming fd: %s",
-                     g_strerror (errsv));
+                     xstrerror (errsv));
           return NULL;
         }
     }
 
   list = g_unix_fd_list_new_from_array (fds, n);
   message = g_unix_fd_message_new_with_fd_list (list);
-  g_object_unref (list);
+  xobject_unref (list);
 
   return message;
 }
 
 static void
-g_unix_fd_message_serialize (GSocketControlMessage *message,
+g_unix_fd_message_serialize (xsocket_control_message_t *message,
 			     xpointer_t               data)
 {
   GUnixFDMessage *fd_message = G_UNIX_FD_MESSAGE (message);
@@ -148,14 +148,14 @@ g_unix_fd_message_serialize (GSocketControlMessage *message,
 
 static void
 g_unix_fd_message_set_property (xobject_t *object, xuint_t prop_id,
-                                const GValue *value, GParamSpec *pspec)
+                                const xvalue_t *value, xparam_spec_t *pspec)
 {
   GUnixFDMessage *message = G_UNIX_FD_MESSAGE (object);
 
   g_assert (message->priv->list == NULL);
   g_assert_cmpint (prop_id, ==, 1);
 
-  message->priv->list = g_value_dup_object (value);
+  message->priv->list = xvalue_dup_object (value);
 
   if (message->priv->list == NULL)
     message->priv->list = g_unix_fd_list_new ();
@@ -165,15 +165,15 @@ g_unix_fd_message_set_property (xobject_t *object, xuint_t prop_id,
  * g_unix_fd_message_get_fd_list:
  * @message: a #GUnixFDMessage
  *
- * Gets the #GUnixFDList contained in @message.  This function does not
+ * Gets the #xunix_fd_list_t contained in @message.  This function does not
  * return a reference to the caller, but the returned list is valid for
  * the lifetime of @message.
  *
- * Returns: (transfer none): the #GUnixFDList from @message
+ * Returns: (transfer none): the #xunix_fd_list_t from @message
  *
  * Since: 2.24
  **/
-GUnixFDList *
+xunix_fd_list_t *
 g_unix_fd_message_get_fd_list (GUnixFDMessage *message)
 {
   return message->priv->list;
@@ -181,13 +181,13 @@ g_unix_fd_message_get_fd_list (GUnixFDMessage *message)
 
 static void
 g_unix_fd_message_get_property (xobject_t *object, xuint_t prop_id,
-                                GValue *value, GParamSpec *pspec)
+                                xvalue_t *value, xparam_spec_t *pspec)
 {
   GUnixFDMessage *message = G_UNIX_FD_MESSAGE (object);
 
   g_assert_cmpint (prop_id, ==, 1);
 
-  g_value_set_object (value, g_unix_fd_message_get_fd_list (message));
+  xvalue_set_object (value, g_unix_fd_message_get_fd_list (message));
 }
 
 static void
@@ -201,7 +201,7 @@ g_unix_fd_message_finalize (xobject_t *object)
 {
   GUnixFDMessage *message = G_UNIX_FD_MESSAGE (object);
 
-  g_object_unref (message->priv->list);
+  xobject_unref (message->priv->list);
 
   G_OBJECT_CLASS (g_unix_fd_message_parent_class)
     ->finalize (object);
@@ -210,7 +210,7 @@ g_unix_fd_message_finalize (xobject_t *object)
 static void
 g_unix_fd_message_class_init (GUnixFDMessageClass *class)
 {
-  GSocketControlMessageClass *scm_class = XSOCKET_CONTROL_MESSAGE_CLASS (class);
+  xsocket_control_message_class_t *scm_class = XSOCKET_CONTROL_MESSAGE_CLASS (class);
   xobject_class_t *object_class = G_OBJECT_CLASS (class);
 
   scm_class->get_size = g_unix_fd_message_get_size;
@@ -222,9 +222,9 @@ g_unix_fd_message_class_init (GUnixFDMessageClass *class)
   object_class->set_property = g_unix_fd_message_set_property;
   object_class->get_property = g_unix_fd_message_get_property;
 
-  g_object_class_install_property (object_class, 1,
+  xobject_class_install_property (object_class, 1,
     g_param_spec_object ("fd-list", "file descriptor list",
-                         "The GUnixFDList object to send with the message",
+                         "The xunix_fd_list_t object to send with the message",
                          XTYPE_UNIX_FD_LIST, G_PARAM_STATIC_STRINGS |
                          G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 }
@@ -239,15 +239,15 @@ g_unix_fd_message_class_init (GUnixFDMessageClass *class)
  *
  * Since: 2.22
  **/
-GSocketControlMessage *
+xsocket_control_message_t *
 g_unix_fd_message_new (void)
 {
-  return g_object_new (XTYPE_UNIX_FD_MESSAGE, NULL);
+  return xobject_new (XTYPE_UNIX_FD_MESSAGE, NULL);
 }
 
 /**
  * g_unix_fd_message_new_with_fd_list:
- * @fd_list: a #GUnixFDList
+ * @fd_list: a #xunix_fd_list_t
  *
  * Creates a new #GUnixFDMessage containing @list.
  *
@@ -255,10 +255,10 @@ g_unix_fd_message_new (void)
  *
  * Since: 2.24
  **/
-GSocketControlMessage *
-g_unix_fd_message_new_with_fd_list (GUnixFDList *fd_list)
+xsocket_control_message_t *
+g_unix_fd_message_new_with_fd_list (xunix_fd_list_t *fd_list)
 {
-  return g_object_new (XTYPE_UNIX_FD_MESSAGE,
+  return xobject_new (XTYPE_UNIX_FD_MESSAGE,
                        "fd-list", fd_list,
                        NULL);
 }

@@ -31,7 +31,7 @@
 
 
 typedef GSettingsBackendClass GNullSettingsBackendClass;
-typedef GSettingsBackend      GNullSettingsBackend;
+typedef xsettings_backend_t      GNullSettingsBackend;
 
 G_DEFINE_TYPE_WITH_CODE (GNullSettingsBackend,
                          g_null_settings_backend,
@@ -40,7 +40,7 @@ G_DEFINE_TYPE_WITH_CODE (GNullSettingsBackend,
                                                          g_define_type_id, "null", 10))
 
 static xvariant_t *
-g_null_settings_backend_read (GSettingsBackend   *backend,
+g_null_settings_backend_read (xsettings_backend_t   *backend,
                               const xchar_t        *key,
                               const xvariant_type_t *expected_type,
                               xboolean_t            default_value)
@@ -49,13 +49,13 @@ g_null_settings_backend_read (GSettingsBackend   *backend,
 }
 
 static xboolean_t
-g_null_settings_backend_write (GSettingsBackend *backend,
+g_null_settings_backend_write (xsettings_backend_t *backend,
                                const xchar_t      *key,
                                xvariant_t         *value,
                                xpointer_t          origin_tag)
 {
   if (value)
-    g_variant_unref (g_variant_ref_sink (value));
+    xvariant_unref (xvariant_ref_sink (value));
   return FALSE;
 }
 
@@ -65,35 +65,35 @@ g_null_settings_backend_write_one (xpointer_t key,
                                    xpointer_t data)
 {
   if (value)
-    g_variant_unref (g_variant_ref_sink (value));
+    xvariant_unref (xvariant_ref_sink (value));
   return FALSE;
 }
 
 static xboolean_t
-g_null_settings_backend_write_tree (GSettingsBackend *backend,
-                                    GTree            *tree,
+g_null_settings_backend_write_tree (xsettings_backend_t *backend,
+                                    xtree_t            *tree,
                                     xpointer_t          origin_tag)
 {
-  g_tree_foreach (tree, g_null_settings_backend_write_one, backend);
+  xtree_foreach (tree, g_null_settings_backend_write_one, backend);
   return FALSE;
 }
 
 static void
-g_null_settings_backend_reset (GSettingsBackend *backend,
+g_null_settings_backend_reset (xsettings_backend_t *backend,
                                const xchar_t      *key,
                                xpointer_t          origin_tag)
 {
 }
 
 static xboolean_t
-g_null_settings_backend_get_writable (GSettingsBackend *backend,
+g_null_settings_backend_get_writable (xsettings_backend_t *backend,
                                       const xchar_t      *name)
 {
   return FALSE;
 }
 
-static GPermission *
-g_null_settings_backend_get_permission (GSettingsBackend *backend,
+static xpermission_t *
+g_null_settings_backend_get_permission (xsettings_backend_t *backend,
                                         const xchar_t      *path)
 {
   return g_simple_permission_new (FALSE);
@@ -121,17 +121,17 @@ g_null_settings_backend_class_init (GNullSettingsBackendClass *class)
  * g_null_settings_backend_new:
  *
  *
- * Creates a readonly #GSettingsBackend.
+ * Creates a readonly #xsettings_backend_t.
  *
  * This backend does not allow changes to settings, so all settings
  * will always have their default values.
  *
- * Returns: (transfer full): a newly created #GSettingsBackend
+ * Returns: (transfer full): a newly created #xsettings_backend_t
  *
  * Since: 2.28
  */
-GSettingsBackend *
+xsettings_backend_t *
 g_null_settings_backend_new (void)
 {
-  return g_object_new (XTYPE_NULL_SETTINGS_BACKEND, NULL);
+  return xobject_new (XTYPE_NULL_SETTINGS_BACKEND, NULL);
 }

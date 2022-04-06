@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 
 #define XTYPE_DBUS_ACTION_GROUP                            (g_dbus_action_group_get_type ())
 #define G_DBUS_ACTION_GROUP(inst)                           (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_DBUS_ACTION_GROUP, GDBusActionGroup))
+                                                             XTYPE_DBUS_ACTION_GROUP, xdbus_action_group))
 #define G_DBUS_ACTION_GROUP_CLASS(class)                    (XTYPE_CHECK_CLASS_CAST ((class),                       \
                                                              XTYPE_DBUS_ACTION_GROUP, GDBusActionGroupClass))
 #define X_IS_DBUS_ACTION_GROUP(inst)                        (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
@@ -45,7 +45,7 @@ XPL_AVAILABLE_IN_ALL
 xtype_t                   g_dbus_action_group_get_type                  (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_2_32
-GDBusActionGroup *      g_dbus_action_group_get                       (GDBusConnection        *connection,
+xdbus_action_group_t *      g_dbus_action_group_get                       (xdbus_connection_t        *connection,
                                                                        const xchar_t            *bus_name,
                                                                        const xchar_t            *object_path);
 

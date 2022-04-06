@@ -29,7 +29,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_DTLS_CLIENT_CONNECTION                (g_dtls_client_connection_get_type ())
-#define G_DTLS_CLIENT_CONNECTION(inst)               (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_DTLS_CLIENT_CONNECTION, GDtlsClientConnection))
+#define G_DTLS_CLIENT_CONNECTION(inst)               (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_DTLS_CLIENT_CONNECTION, xdtls_client_connection))
 #define X_IS_DTLS_CLIENT_CONNECTION(inst)            (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_DTLS_CLIENT_CONNECTION))
 #define G_DTLS_CLIENT_CONNECTION_GET_INTERFACE(inst) (XTYPE_INSTANCE_GET_INTERFACE ((inst), XTYPE_DTLS_CLIENT_CONNECTION, GDtlsClientConnectionInterface))
 
@@ -39,7 +39,7 @@ typedef struct _GDtlsClientConnectionInterface GDtlsClientConnectionInterface;
  * GDtlsClientConnectionInterface:
  * @x_iface: The parent interface.
  *
- * vtable for a #GDtlsClientConnection implementation.
+ * vtable for a #xdtls_client_connection_t implementation.
  *
  * Since: 2.48
  */
@@ -52,22 +52,22 @@ XPL_AVAILABLE_IN_2_48
 xtype_t                g_dtls_client_connection_get_type             (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_2_48
-GDatagramBased      *g_dtls_client_connection_new                  (GDatagramBased         *base_socket,
-                                                                    GSocketConnectable     *server_identity,
+xdatagram_based_t      *g_dtls_client_connection_new                  (xdatagram_based_t         *base_socket,
+                                                                    xsocket_connectable_t     *server_identity,
                                                                     xerror_t                **error);
 
 XPL_AVAILABLE_IN_2_48
-GTlsCertificateFlags g_dtls_client_connection_get_validation_flags (GDtlsClientConnection  *conn);
+GTlsCertificateFlags g_dtls_client_connection_get_validation_flags (xdtls_client_connection_t  *conn);
 XPL_AVAILABLE_IN_2_48
-void                 g_dtls_client_connection_set_validation_flags (GDtlsClientConnection  *conn,
+void                 g_dtls_client_connection_set_validation_flags (xdtls_client_connection_t  *conn,
                                                                     GTlsCertificateFlags    flags);
 XPL_AVAILABLE_IN_2_48
-GSocketConnectable  *g_dtls_client_connection_get_server_identity  (GDtlsClientConnection  *conn);
+xsocket_connectable_t  *g_dtls_client_connection_get_server_identity  (xdtls_client_connection_t  *conn);
 XPL_AVAILABLE_IN_2_48
-void                 g_dtls_client_connection_set_server_identity  (GDtlsClientConnection  *conn,
-                                                                    GSocketConnectable     *identity);
+void                 g_dtls_client_connection_set_server_identity  (xdtls_client_connection_t  *conn,
+                                                                    xsocket_connectable_t     *identity);
 XPL_AVAILABLE_IN_2_48
-xlist_t *              g_dtls_client_connection_get_accepted_cas     (GDtlsClientConnection  *conn);
+xlist_t *              g_dtls_client_connection_get_accepted_cas     (xdtls_client_connection_t  *conn);
 
 
 G_END_DECLS

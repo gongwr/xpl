@@ -8,7 +8,7 @@ typedef struct
 
 static void
 setup (Fixture       *fixture,
-       gconstpointer  user_data)
+       xconstpointer  user_data)
 {
   fixture->applications_dir = g_build_filename (g_get_user_data_dir (), "applications", NULL);
   g_assert_no_errno (g_mkdir_with_parents (fixture->applications_dir, 0755));
@@ -18,7 +18,7 @@ setup (Fixture       *fixture,
 
 static void
 teardown (Fixture       *fixture,
-          gconstpointer  user_data)
+          xconstpointer  user_data)
 {
   g_assert_no_errno (g_rmdir (fixture->applications_dir));
   g_clear_pointer (&fixture->applications_dir, g_free);
@@ -36,7 +36,7 @@ create_app (xpointer_t data)
     "Type=Application\n"
     "Exec=true\n";
 
-  g_file_set_contents (path, contents, -1, &error);
+  xfile_set_contents (path, contents, -1, &error);
   g_assert_no_error (error);
 
   return G_SOURCE_REMOVE;
@@ -53,63 +53,63 @@ delete_app (xpointer_t data)
 static xboolean_t changed_fired;
 
 static void
-changed_cb (GAppInfoMonitor *monitor, GMainLoop *loop)
+changed_cb (xapp_info_monitor_t *monitor, xmain_loop_t *loop)
 {
   changed_fired = TRUE;
-  g_main_loop_quit (loop);
+  xmain_loop_quit (loop);
 }
 
 static xboolean_t
 quit_loop (xpointer_t data)
 {
-  GMainLoop *loop = data;
+  xmain_loop_t *loop = data;
 
-  if (g_main_loop_is_running (loop))
-    g_main_loop_quit (loop);
+  if (xmain_loop_is_running (loop))
+    xmain_loop_quit (loop);
 
   return G_SOURCE_REMOVE;
 }
 
 static void
 test_app_monitor (Fixture       *fixture,
-                  gconstpointer  user_data)
+                  xconstpointer  user_data)
 {
   xchar_t *app_path;
-  GAppInfoMonitor *monitor;
-  GMainLoop *loop;
+  xapp_info_monitor_t *monitor;
+  xmain_loop_t *loop;
 
   app_path = g_build_filename (fixture->applications_dir, "app.desktop", NULL);
 
   /* FIXME: this shouldn't be required */
-  g_list_free_full (g_app_info_get_all (), g_object_unref);
+  xlist_free_full (xapp_info_get_all (), xobject_unref);
 
-  monitor = g_app_info_monitor_get ();
-  loop = g_main_loop_new (NULL, FALSE);
+  monitor = xapp_info_monitor_get ();
+  loop = xmain_loop_new (NULL, FALSE);
 
   g_signal_connect (monitor, "changed", G_CALLBACK (changed_cb), loop);
 
   g_idle_add (create_app, app_path);
   g_timeout_add_seconds (3, quit_loop, loop);
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
   g_assert (changed_fired);
   changed_fired = FALSE;
 
   /* FIXME: this shouldn't be required */
-  g_list_free_full (g_app_info_get_all (), g_object_unref);
+  xlist_free_full (xapp_info_get_all (), xobject_unref);
 
   g_timeout_add_seconds (3, quit_loop, loop);
 
   delete_app (app_path);
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
   g_assert (changed_fired);
 
-  g_main_loop_unref (loop);
+  xmain_loop_unref (loop);
   g_remove (app_path);
 
-  g_object_unref (monitor);
+  xobject_unref (monitor);
 
   g_free (app_path);
 }

@@ -23,16 +23,16 @@ msgstr ""
 "X-Generator: Poedit 1.6.5\n"
 
 #: ../gio/gapplication.c:514
-msgid "Enter GApplication service mode (use from D-Bus service files)"
-msgstr "進入 GApplication 服務模式 (用於來自 D-Bus 服務檔案)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgstr "進入 xapplication_t 服務模式 (用於來自 D-Bus 服務檔案)"
 
 #: ../gio/gapplication.c:519
-msgid "GApplication options"
-msgstr "GApplication 選項"
+msgid "xapplication_t options"
+msgstr "xapplication_t 選項"
 
 #: ../gio/gapplication.c:519
-msgid "Show GApplication options"
-msgstr "顯示 GApplication  選項"
+msgid "Show xapplication_t options"
+msgstr "顯示 xapplication_t  選項"
 
 #: ../gio/gapplication-tool.c:45 ../gio/gapplication-tool.c:46
 #: ../gio/gresource-tool.c:481 ../gio/gsettings-tool.c:508
@@ -265,8 +265,8 @@ msgid "Seek not supported on base stream"
 msgstr "不支援在基礎串流中搜尋"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "不能截短 GBufferedInputStream"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "不能截短 xbuffered_input_stream"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1017
 #: ../gio/giostream.c:277 ../gio/goutputstream.c:1464
@@ -340,16 +340,16 @@ msgid "%s filetype"
 msgstr "%s 檔案類型"
 
 #: ../gio/gcredentials.c:312 ../gio/gcredentials.c:571
-msgid "GCredentials is not implemented on this OS"
-msgstr "GCredentials 沒有在這個 OS 上實作"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "xcredentials_t 沒有在這個 OS 上實作"
 
 #: ../gio/gcredentials.c:467
-msgid "There is no GCredentials support for your platform"
-msgstr "你的平臺沒有 GCredentials 支援"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "你的平臺沒有 xcredentials_t 支援"
 
 #: ../gio/gcredentials.c:513
-msgid "GCredentials does not contain a process ID on this OS"
-msgstr "GCredentials 沒有包含在這個 OS 上的程序 ID"
+msgid "xcredentials_t does not contain a process ID on this OS"
+msgstr "xcredentials_t 沒有包含在這個 OS 上的程序 ID"
 
 #: ../gio/gcredentials.c:565
 msgid "Credentials spoofing is not possible on this OS"
@@ -522,8 +522,8 @@ msgid ""
 msgstr "竭盡所有可用的核對機制 (已嘗試：%s) (可用：%s)"
 
 #: ../gio/gdbusauth.c:1170
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "已透過 GDBusAuthObserver::authorize-authenticated-peer 取消"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "已透過 xdbus_auth_observer_t::authorize-authenticated-peer 取消"
 
 #: ../gio/gdbusauthmechanismsha1.c:261
 #, c-format
@@ -1183,27 +1183,27 @@ msgstr "TLS 支援無法使用"
 
 #: ../gio/gemblem.c:323
 #, c-format
-msgid "Can't handle version %d of GEmblem encoding"
-msgstr "不能處理版本為 %d 的 GEmblem 編碼"
+msgid "Can't handle version %d of xemblem_t encoding"
+msgstr "不能處理版本為 %d 的 xemblem_t 編碼"
 
 #: ../gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "GEmblem 編碼中記號 (%d) 的數量格式不正確"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "xemblem_t 編碼中記號 (%d) 的數量格式不正確"
 
 #: ../gio/gemblemedicon.c:362
 #, c-format
-msgid "Can't handle version %d of GEmblemedIcon encoding"
-msgstr "不能處理版本為 %d 的 GEmblemedIcon 編碼"
+msgid "Can't handle version %d of xemblemed_icon_t encoding"
+msgstr "不能處理版本為 %d 的 xemblemed_icon_t 編碼"
 
 #: ../gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "GEmblemedIcon 編碼中記號 (%d) 的數量格式不正確"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "xemblemed_icon_t 編碼中記號 (%d) 的數量格式不正確"
 
 #: ../gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "預期為 GEmblemedIcon 的 GEmblem"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "預期為 xemblemed_icon_t 的 xemblem_t"
 
 #: ../gio/gfile.c:956 ../gio/gfile.c:1194 ../gio/gfile.c:1332
 #: ../gio/gfile.c:1570 ../gio/gfile.c:1625 ../gio/gfile.c:1683
@@ -1309,12 +1309,12 @@ msgstr "檔案列舉器(enumerator)已經關閉"
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can't handle version %d of GFileIcon encoding"
-msgstr "不能處理版本為 %d 的 GFileIcon 編碼"
+msgid "Can't handle version %d of xfile_icon_t encoding"
+msgstr "不能處理版本為 %d 的 xfile_icon_t 編碼"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for GFileIcon"
-msgstr "給 GFileIcon 的輸入資料格式不良"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "給 xfile_icon_t 的輸入資料格式不良"
 
 #: ../gio/gfileinputstream.c:149 ../gio/gfileinputstream.c:394
 #: ../gio/gfileiostream.c:167 ../gio/gfileoutputstream.c:164
@@ -1738,11 +1738,11 @@ msgstr "不要強制設定鍵名稱限制"
 
 #: ../gio/glib-compile-schemas.c:2026
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"將所有的 GSettings schema 檔案編譯為 schema 快取。\n"
+"將所有的 xsettings_t schema 檔案編譯為 schema 快取。\n"
 "Schema 檔案的延伸檔名必須為 .gschema.xml，\n"
 "而快取檔案叫做 gschemas.compiled。"
 
@@ -2063,8 +2063,8 @@ msgid "Invalid seek request"
 msgstr "無效的搜尋要求"
 
 #: ../gio/gmemoryinputstream.c:505
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "不能截短 GMemoryInputStream"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "不能截短 xmemory_input_stream_t"
 
 #: ../gio/gmemoryoutputstream.c:565
 msgid "Memory output stream not resizable"
@@ -2660,8 +2660,8 @@ msgid "Error sending message: %s"
 msgstr "傳送訊息時發生錯誤：%s"
 
 #: ../gio/gsocket.c:3922
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "視窗不支援 GSocketControlMessage"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "視窗不支援 xsocket_control_message_t"
 
 #: ../gio/gsocket.c:4259 ../gio/gsocket.c:4394
 #, c-format
@@ -2800,8 +2800,8 @@ msgstr "不明的 SOCKSv5 代理伺服器錯誤。"
 
 #: ../gio/gthemedicon.c:518
 #, c-format
-msgid "Can't handle version %d of GThemedIcon encoding"
-msgstr "不能處理版本為 %d 的 GThemedIcon 編碼"
+msgid "Can't handle version %d of xthemed_icon_t encoding"
+msgstr "不能處理版本為 %d 的 xthemed_icon_t 編碼"
 
 #: ../gio/gthreadedresolver.c:118
 msgid "No valid addresses were found"
@@ -3141,37 +3141,37 @@ msgstr "主機名稱無效"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:201
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "上午"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:203
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "下午"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:206
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "西元%Y年%m月%d日 (%A) %H時%M分%S秒"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:209
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%y/%m/%d"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:212
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:215
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%p %I時%M分%S秒"
 

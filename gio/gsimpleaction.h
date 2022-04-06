@@ -30,7 +30,7 @@ G_BEGIN_DECLS
 
 #define XTYPE_SIMPLE_ACTION                                (g_simple_action_get_type ())
 #define G_SIMPLE_ACTION(inst)                               (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_SIMPLE_ACTION, GSimpleAction))
+                                                             XTYPE_SIMPLE_ACTION, xsimple_action))
 #define X_IS_SIMPLE_ACTION(inst)                            (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
                                                              XTYPE_SIMPLE_ACTION))
 
@@ -38,24 +38,24 @@ XPL_AVAILABLE_IN_ALL
 xtype_t                   g_simple_action_get_type                        (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GSimpleAction *         g_simple_action_new                             (const xchar_t        *name,
+xsimple_action_t *         g_simple_action_new                             (const xchar_t        *name,
                                                                          const xvariant_type_t *parameter_type);
 
 XPL_AVAILABLE_IN_ALL
-GSimpleAction *         g_simple_action_new_stateful                    (const xchar_t        *name,
+xsimple_action_t *         g_simple_action_new_stateful                    (const xchar_t        *name,
                                                                          const xvariant_type_t *parameter_type,
                                                                          xvariant_t           *state);
 
 XPL_AVAILABLE_IN_ALL
-void                    g_simple_action_set_enabled                     (GSimpleAction      *simple,
+void                    g_simple_action_set_enabled                     (xsimple_action_t      *simple,
                                                                          xboolean_t            enabled);
 
 XPL_AVAILABLE_IN_2_30
-void                    g_simple_action_set_state                       (GSimpleAction      *simple,
+void                    g_simple_action_set_state                       (xsimple_action_t      *simple,
                                                                          xvariant_t           *value);
 
 XPL_AVAILABLE_IN_2_44
-void                    g_simple_action_set_state_hint                  (GSimpleAction      *simple,
+void                    g_simple_action_set_state_hint                  (xsimple_action_t      *simple,
                                                                          xvariant_t           *state_hint);
 
 G_END_DECLS

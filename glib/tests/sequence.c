@@ -8,15 +8,15 @@ typedef struct _GSequenceNode GSequenceNode;
 struct _GSequence
 {
   GSequenceNode *       end_node;
-  GDestroyNotify        data_destroy_notify;
+  xdestroy_notify_t        data_destroy_notify;
   xboolean_t              access_prohibited;
-  GSequence *           real_sequence;
+  xsequence_t *           real_sequence;
 };
 
 struct _GSequenceNode
 {
   xint_t                  n_nodes;
-  guint32               priority;
+  xuint32_t               priority;
   GSequenceNode *       parent;
   GSequenceNode *       left;
   GSequenceNode *       right;
@@ -51,7 +51,7 @@ check_node (GSequenceNode *node)
 }
 
 static void
-g_sequence_check (GSequence *seq)
+g_sequence_check (xsequence_t *seq)
 {
   GSequenceNode *node = seq->end_node;
 
@@ -92,8 +92,8 @@ enum {
 
 typedef struct SequenceInfo
 {
-  GQueue *      queue;
-  GSequence *   sequence;
+  xqueue_t *      queue;
+  xsequence_t *   sequence;
   xuint_t         n_items;
 } SequenceInfo;
 
@@ -103,10 +103,10 @@ typedef struct
   int             number;
 } Item;
 
-void g_sequence_check (GSequence *sequence);
+void g_sequence_check (xsequence_t *sequence);
 
 static Item *
-fix_pointer (gconstpointer data)
+fix_pointer (xconstpointer data)
 {
   return (Item *)((char *)data - 1);
 }
@@ -161,7 +161,7 @@ new_item (SequenceInfo *seq)
   item->seq = seq;
   item->number = g_random_int ();
 
-  /* There have been bugs in the past where the GSequence would
+  /* There have been bugs in the past where the xsequence_t would
    * dereference the user pointers. This will make sure such
    * behavior causes crashes
    */
@@ -196,8 +196,8 @@ seq_foreach (xpointer_t data,
 }
 
 static xint_t
-simple_items_cmp (gconstpointer a,
-	          gconstpointer b,
+simple_items_cmp (xconstpointer a,
+	          xconstpointer b,
 	          xpointer_t data)
 {
   const Item *item_a = fix_pointer (a);
@@ -212,11 +212,11 @@ simple_items_cmp (gconstpointer a,
 }
 
 static xint_t
-simple_iters_cmp (gconstpointer a,
-	          gconstpointer b,
+simple_iters_cmp (xconstpointer a,
+	          xconstpointer b,
 	          xpointer_t data)
 {
-  GSequence *seq = data;
+  xsequence_t *seq = data;
   GSequenceIter *iter_a = (GSequenceIter *)a;
   GSequenceIter *iter_b = (GSequenceIter *)b;
   xpointer_t item_a = g_sequence_get (iter_a);
@@ -232,8 +232,8 @@ simple_iters_cmp (gconstpointer a,
 }
 
 static xint_t
-compare_items (gconstpointer a,
-               gconstpointer b,
+compare_items (xconstpointer a,
+               xconstpointer b,
                xpointer_t      data)
 {
   const Item *item_a = fix_pointer (a);
@@ -293,11 +293,11 @@ check_sorted (SequenceInfo *info)
 }
 
 static xint_t
-compare_iters (gconstpointer a,
-               gconstpointer b,
+compare_iters (xconstpointer a,
+               xconstpointer b,
                xpointer_t      data)
 {
-  GSequence *seq = data;
+  xsequence_t *seq = data;
   GSequenceIter *iter_a = (GSequenceIter *)a;
   GSequenceIter *iter_b = (GSequenceIter *)b;
   /* compare_items() will fix up the pointers */
@@ -406,9 +406,9 @@ dump_info (SequenceInfo *seq)
 }
 
 static void
-run_random_tests (gconstpointer d)
+run_random_tests (xconstpointer d)
 {
-  guint32 seed = GPOINTER_TO_UINT (d);
+  xuint32_t seed = GPOINTER_TO_UINT (d);
 #define N_ITERATIONS 60000
 #define N_SEQUENCES 8
 #define N_TIMES 24
@@ -1184,7 +1184,7 @@ static gulong seeds[] =
 static void
 test_out_of_range_jump (void)
 {
-  GSequence *seq = g_sequence_new (NULL);
+  xsequence_t *seq = g_sequence_new (NULL);
   GSequenceIter *iter = g_sequence_get_begin_iter (seq);
 
   g_sequence_iter_move (iter, 5);
@@ -1198,7 +1198,7 @@ test_out_of_range_jump (void)
 static void
 test_iter_move (void)
 {
-  GSequence *seq = g_sequence_new (NULL);
+  xsequence_t *seq = g_sequence_new (NULL);
   GSequenceIter *iter;
   xint_t i;
 
@@ -1223,7 +1223,7 @@ test_iter_move (void)
 }
 
 static int
-compare (gconstpointer a, gconstpointer b, xpointer_t userdata)
+compare (xconstpointer a, xconstpointer b, xpointer_t userdata)
 {
   int ai, bi;
 
@@ -1255,7 +1255,7 @@ test_insert_sorted_non_pointer (void)
 
   for (i = 0; i < 10; i++)
     {
-      GSequence *seq = g_sequence_new (NULL);
+      xsequence_t *seq = g_sequence_new (NULL);
       int j;
 
       for (j = 0; j < 10000; j++)
@@ -1277,7 +1277,7 @@ static void
 test_stable_sort (void)
 {
   int i;
-  GSequence *seq = g_sequence_new (NULL);
+  xsequence_t *seq = g_sequence_new (NULL);
 
 #define N_ITEMS 1000
 
@@ -1343,7 +1343,7 @@ test_stable_sort (void)
 static void
 test_empty (void)
 {
-  GSequence *seq;
+  xsequence_t *seq;
   int i;
 
   seq = g_sequence_new (NULL);
@@ -1372,7 +1372,7 @@ main (int argc,
       char **argv)
 {
   xsize_t i;
-  guint32 seed;
+  xuint32_t seed;
   xchar_t *path;
 
   g_test_init (&argc, &argv, NULL);
@@ -1387,14 +1387,14 @@ main (int argc,
   /* Regression tests */
   for (i = 0; i < G_N_ELEMENTS (seeds); ++i)
     {
-      path = g_strdup_printf ("/sequence/random/seed:%lu", seeds[i]);
+      path = xstrdup_printf ("/sequence/random/seed:%lu", seeds[i]);
       g_test_add_data_func (path, GUINT_TO_POINTER (seeds[i]), run_random_tests);
       g_free (path);
     }
 
   /* New random seed */
   seed = g_test_rand_int_range (0, G_MAXINT);
-  path = g_strdup_printf ("/sequence/random/seed:%u", seed);
+  path = xstrdup_printf ("/sequence/random/seed:%u", seed);
   g_test_add_data_func (path, GUINT_TO_POINTER (seed), run_random_tests);
   g_free (path);
 

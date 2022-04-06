@@ -31,7 +31,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_INET_ADDRESS         (xinet_address_get_type ())
-#define G_INET_ADDRESS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_INET_ADDRESS, xinet_address_t))
+#define G_INET_ADDRESS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_INET_ADDRESS, xinet_address))
 #define XINET_ADDRESS_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_INET_ADDRESS, GInetAddressClass))
 #define X_IS_INET_ADDRESS(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_INET_ADDRESS))
 #define X_IS_INET_ADDRESS_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_INET_ADDRESS))
@@ -53,7 +53,7 @@ struct _GInetAddressClass
   xobject_class_t parent_class;
 
   xchar_t *        (*to_string) (xinet_address_t *address);
-  const guint8 * (*to_bytes)  (xinet_address_t *address);
+  const xuint8_t * (*to_bytes)  (xinet_address_t *address);
 };
 
 XPL_AVAILABLE_IN_ALL
@@ -63,7 +63,7 @@ XPL_AVAILABLE_IN_ALL
 xinet_address_t *        xinet_address_new_from_string      (const xchar_t          *string);
 
 XPL_AVAILABLE_IN_ALL
-xinet_address_t *        xinet_address_new_from_bytes       (const guint8         *bytes,
+xinet_address_t *        xinet_address_new_from_bytes       (const xuint8_t         *bytes,
 							   xsocket_family_t         family);
 
 XPL_AVAILABLE_IN_ALL
@@ -80,7 +80,7 @@ XPL_AVAILABLE_IN_ALL
 xchar_t *               xinet_address_to_string            (xinet_address_t         *address);
 
 XPL_AVAILABLE_IN_ALL
-const guint8 *        xinet_address_to_bytes             (xinet_address_t         *address);
+const xuint8_t *        xinet_address_to_bytes             (xinet_address_t         *address);
 
 XPL_AVAILABLE_IN_ALL
 xsize_t                 xinet_address_get_native_size      (xinet_address_t         *address);

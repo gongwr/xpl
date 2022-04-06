@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __G_FILE_ATTRIBUTE_H__
-#define __G_FILE_ATTRIBUTE_H__
+#ifndef __XFILE_ATTRIBUTE_H__
+#define __XFILE_ATTRIBUTE_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -30,22 +30,22 @@
 G_BEGIN_DECLS
 
 /**
- * GFileAttributeInfo:
+ * xfile_attribute_info_t:
  * @name: the name of the attribute.
- * @type: the #GFileAttributeType type of the attribute.
- * @flags: a set of #GFileAttributeInfoFlags.
+ * @type: the #xfile_attribute_type_t type of the attribute.
+ * @flags: a set of #xfile_attribute_info_flags_t.
  *
  * Information about a specific attribute.
  **/
 struct _GFileAttributeInfo
 {
   char                    *name;
-  GFileAttributeType       type;
-  GFileAttributeInfoFlags  flags;
+  xfile_attribute_type_t       type;
+  xfile_attribute_info_flags_t  flags;
 };
 
 /**
- * GFileAttributeInfoList:
+ * xfile_attribute_info_list_t:
  * @infos: an array of #GFileAttributeInfos.
  * @n_infos: the number of values in the array.
  *
@@ -54,31 +54,31 @@ struct _GFileAttributeInfo
  **/
 struct _GFileAttributeInfoList
 {
-  GFileAttributeInfo *infos;
+  xfile_attribute_info_t *infos;
   int                 n_infos;
 };
 
-#define XTYPE_FILE_ATTRIBUTE_INFO_LIST (g_file_attribute_info_list_get_type ())
+#define XTYPE_FILE_ATTRIBUTE_INFO_LIST (xfile_attribute_info_list_get_type ())
 XPL_AVAILABLE_IN_ALL
-xtype_t g_file_attribute_info_list_get_type (void);
+xtype_t xfile_attribute_info_list_get_type (void);
 
 XPL_AVAILABLE_IN_ALL
-GFileAttributeInfoList *  g_file_attribute_info_list_new    (void);
+xfile_attribute_info_list_t *  xfile_attribute_info_list_new    (void);
 XPL_AVAILABLE_IN_ALL
-GFileAttributeInfoList *  g_file_attribute_info_list_ref    (GFileAttributeInfoList *list);
+xfile_attribute_info_list_t *  xfile_attribute_info_list_ref    (xfile_attribute_info_list_t *list);
 XPL_AVAILABLE_IN_ALL
-void                      g_file_attribute_info_list_unref  (GFileAttributeInfoList *list);
+void                      xfile_attribute_info_list_unref  (xfile_attribute_info_list_t *list);
 XPL_AVAILABLE_IN_ALL
-GFileAttributeInfoList *  g_file_attribute_info_list_dup    (GFileAttributeInfoList *list);
+xfile_attribute_info_list_t *  xfile_attribute_info_list_dup    (xfile_attribute_info_list_t *list);
 XPL_AVAILABLE_IN_ALL
-const GFileAttributeInfo *g_file_attribute_info_list_lookup (GFileAttributeInfoList *list,
+const xfile_attribute_info_t *xfile_attribute_info_list_lookup (xfile_attribute_info_list_t *list,
 							     const char             *name);
 XPL_AVAILABLE_IN_ALL
-void                      g_file_attribute_info_list_add    (GFileAttributeInfoList *list,
+void                      xfile_attribute_info_list_add    (xfile_attribute_info_list_t *list,
 							     const char             *name,
-							     GFileAttributeType      type,
-							     GFileAttributeInfoFlags flags);
+							     xfile_attribute_type_t      type,
+							     xfile_attribute_info_flags_t flags);
 
 G_END_DECLS
 
-#endif /* __G_FILE_INFO_H__ */
+#endif /* __XFILE_INFO_H__ */

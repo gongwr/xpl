@@ -30,51 +30,51 @@
  * @include: gio/gio.h
  *
  * As of GLib 2.36, #GIOScheduler is deprecated in favor of
- * #GThreadPool and #GTask.
+ * #GThreadPool and #xtask_t.
  *
  * Schedules asynchronous I/O operations. #GIOScheduler integrates
- * into the main event loop (#GMainLoop) and uses threads.
+ * into the main event loop (#xmain_loop_t) and uses threads.
  */
 
 struct _GIOSchedulerJob {
   xlist_t *active_link;
-  GTask *task;
+  xtask_t *task;
 
   GIOSchedulerJobFunc job_func;
   xpointer_t data;
-  GDestroyNotify destroy_notify;
+  xdestroy_notify_t destroy_notify;
 
   xcancellable_t *cancellable;
   gulong cancellable_id;
-  GMainContext *context;
+  xmain_context_t *context;
 };
 
 G_LOCK_DEFINE_STATIC(active_jobs);
 static xlist_t *active_jobs = NULL;
 
 static void
-g_io_job_free (GIOSchedulerJob *job)
+g_io_job_free (xio_scheduler_job_t *job)
 {
   if (job->destroy_notify)
     job->destroy_notify (job->data);
 
   G_LOCK (active_jobs);
-  active_jobs = g_list_delete_link (active_jobs, job->active_link);
+  active_jobs = xlist_delete_link (active_jobs, job->active_link);
   G_UNLOCK (active_jobs);
 
   if (job->cancellable)
-    g_object_unref (job->cancellable);
-  g_main_context_unref (job->context);
-  g_slice_free (GIOSchedulerJob, job);
+    xobject_unref (job->cancellable);
+  xmain_context_unref (job->context);
+  g_slice_free (xio_scheduler_job_t, job);
 }
 
 static void
-io_job_thread (GTask         *task,
+io_job_thread (xtask_t         *task,
                xpointer_t       source_object,
                xpointer_t       task_data,
                xcancellable_t  *cancellable)
 {
-  GIOSchedulerJob *job = task_data;
+  xio_scheduler_job_t *job = task_data;
   xboolean_t result;
 
   if (job->cancellable)
@@ -94,7 +94,7 @@ io_job_thread (GTask         *task,
  * g_io_scheduler_push_job:
  * @job_func: a #GIOSchedulerJobFunc.
  * @user_data: data to pass to @job_func
- * @notify: (nullable): a #GDestroyNotify for @user_data, or %NULL
+ * @notify: (nullable): a #xdestroy_notify_t for @user_data, or %NULL
  * @io_priority: the [I/O priority][io-priority]
  * of the request.
  * @cancellable: optional #xcancellable_t object, %NULL to ignore.
@@ -108,43 +108,43 @@ io_job_thread (GTask         *task,
  * by calling g_cancellable_cancel() or by calling
  * g_io_scheduler_cancel_all_jobs().
  *
- * Deprecated: use #GThreadPool or g_task_run_in_thread()
+ * Deprecated: use #GThreadPool or xtask_run_in_thread()
  **/
 void
 g_io_scheduler_push_job (GIOSchedulerJobFunc  job_func,
 			 xpointer_t             user_data,
-			 GDestroyNotify       notify,
+			 xdestroy_notify_t       notify,
 			 xint_t                 io_priority,
 			 xcancellable_t        *cancellable)
 {
-  GIOSchedulerJob *job;
-  GTask *task;
+  xio_scheduler_job_t *job;
+  xtask_t *task;
 
   g_return_if_fail (job_func != NULL);
 
-  job = g_slice_new0 (GIOSchedulerJob);
+  job = g_slice_new0 (xio_scheduler_job_t);
   job->job_func = job_func;
   job->data = user_data;
   job->destroy_notify = notify;
 
   if (cancellable)
-    job->cancellable = g_object_ref (cancellable);
+    job->cancellable = xobject_ref (cancellable);
 
-  job->context = g_main_context_ref_thread_default ();
+  job->context = xmain_context_ref_thread_default ();
 
   G_LOCK (active_jobs);
-  active_jobs = g_list_prepend (active_jobs, job);
+  active_jobs = xlist_prepend (active_jobs, job);
   job->active_link = active_jobs;
   G_UNLOCK (active_jobs);
 
-  task = g_task_new (NULL, cancellable, NULL, NULL);
+  task = xtask_new (NULL, cancellable, NULL, NULL);
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-  g_task_set_source_tag (task, g_io_scheduler_push_job);
+  xtask_set_source_tag (task, g_io_scheduler_push_job);
 G_GNUC_END_IGNORE_DEPRECATIONS
-  g_task_set_task_data (task, job, (GDestroyNotify)g_io_job_free);
-  g_task_set_priority (task, io_priority);
-  g_task_run_in_thread (task, io_job_thread);
-  g_object_unref (task);
+  xtask_set_task_data (task, job, (xdestroy_notify_t)g_io_job_free);
+  xtask_set_priority (task, io_priority);
+  xtask_run_in_thread (task, io_job_thread);
+  xobject_unref (task);
 }
 
 /**
@@ -168,10 +168,10 @@ g_io_scheduler_cancel_all_jobs (void)
   cancellable_list = NULL;
   for (l = active_jobs; l != NULL; l = l->next)
     {
-      GIOSchedulerJob *job = l->data;
+      xio_scheduler_job_t *job = l->data;
       if (job->cancellable)
-	cancellable_list = g_list_prepend (cancellable_list,
-					   g_object_ref (job->cancellable));
+	cancellable_list = xlist_prepend (cancellable_list,
+					   xobject_ref (job->cancellable));
     }
   G_UNLOCK (active_jobs);
 
@@ -179,19 +179,19 @@ g_io_scheduler_cancel_all_jobs (void)
     {
       xcancellable_t *c = l->data;
       g_cancellable_cancel (c);
-      g_object_unref (c);
+      xobject_unref (c);
     }
-  g_list_free (cancellable_list);
+  xlist_free (cancellable_list);
 }
 
 typedef struct {
-  GSourceFunc func;
+  xsource_func_t func;
   xboolean_t ret_val;
   xpointer_t data;
-  GDestroyNotify notify;
+  xdestroy_notify_t notify;
 
-  GMutex ack_lock;
-  GCond ack_condition;
+  xmutex_t ack_lock;
+  xcond_t ack_condition;
   xboolean_t ack;
 } MainLoopProxy;
 
@@ -223,10 +223,10 @@ mainloop_proxy_free (MainLoopProxy *proxy)
 
 /**
  * g_io_scheduler_job_send_to_mainloop:
- * @job: a #GIOSchedulerJob
- * @func: a #GSourceFunc callback that will be called in the original thread
+ * @job: a #xio_scheduler_job_t
+ * @func: a #xsource_func_t callback that will be called in the original thread
  * @user_data: data to pass to @func
- * @notify: (nullable): a #GDestroyNotify for @user_data, or %NULL
+ * @notify: (nullable): a #xdestroy_notify_t for @user_data, or %NULL
  *
  * Used from an I/O job to send a callback to be run in the thread
  * that the job was started from, waiting for the result (and thus
@@ -234,15 +234,15 @@ mainloop_proxy_free (MainLoopProxy *proxy)
  *
  * Returns: The return value of @func
  *
- * Deprecated: Use g_main_context_invoke().
+ * Deprecated: Use xmain_context_invoke().
  **/
 xboolean_t
-g_io_scheduler_job_send_to_mainloop (GIOSchedulerJob *job,
-				     GSourceFunc      func,
+g_io_scheduler_job_send_to_mainloop (xio_scheduler_job_t *job,
+				     xsource_func_t      func,
 				     xpointer_t         user_data,
-				     GDestroyNotify   notify)
+				     xdestroy_notify_t   notify)
 {
-  GSource *source;
+  xsource_t *source;
   MainLoopProxy *proxy;
   xboolean_t ret_val;
 
@@ -258,13 +258,13 @@ g_io_scheduler_job_send_to_mainloop (GIOSchedulerJob *job,
   g_mutex_lock (&proxy->ack_lock);
 
   source = g_idle_source_new ();
-  g_source_set_priority (source, G_PRIORITY_DEFAULT);
-  g_source_set_callback (source, mainloop_proxy_func, proxy,
+  xsource_set_priority (source, G_PRIORITY_DEFAULT);
+  xsource_set_callback (source, mainloop_proxy_func, proxy,
 			 NULL);
-  g_source_set_static_name (source, "[gio] mainloop_proxy_func");
+  xsource_set_static_name (source, "[gio] mainloop_proxy_func");
 
-  g_source_attach (source, job->context);
-  g_source_unref (source);
+  xsource_attach (source, job->context);
+  xsource_unref (source);
 
   while (!proxy->ack)
     g_cond_wait (&proxy->ack_condition, &proxy->ack_lock);
@@ -278,10 +278,10 @@ g_io_scheduler_job_send_to_mainloop (GIOSchedulerJob *job,
 
 /**
  * g_io_scheduler_job_send_to_mainloop_async:
- * @job: a #GIOSchedulerJob
- * @func: a #GSourceFunc callback that will be called in the original thread
+ * @job: a #xio_scheduler_job_t
+ * @func: a #xsource_func_t callback that will be called in the original thread
  * @user_data: data to pass to @func
- * @notify: (nullable): a #GDestroyNotify for @user_data, or %NULL
+ * @notify: (nullable): a #xdestroy_notify_t for @user_data, or %NULL
  *
  * Used from an I/O job to send a callback to be run asynchronously in
  * the thread that the job was started from. The callback will be run
@@ -293,15 +293,15 @@ g_io_scheduler_job_send_to_mainloop (GIOSchedulerJob *job,
  * @func is called, either by passing %NULL as @notify to
  * g_io_scheduler_push_job() or by using refcounting for @user_data.
  *
- * Deprecated: Use g_main_context_invoke().
+ * Deprecated: Use xmain_context_invoke().
  **/
 void
-g_io_scheduler_job_send_to_mainloop_async (GIOSchedulerJob *job,
-					   GSourceFunc      func,
+g_io_scheduler_job_send_to_mainloop_async (xio_scheduler_job_t *job,
+					   xsource_func_t      func,
 					   xpointer_t         user_data,
-					   GDestroyNotify   notify)
+					   xdestroy_notify_t   notify)
 {
-  GSource *source;
+  xsource_t *source;
   MainLoopProxy *proxy;
 
   g_return_if_fail (job != NULL);
@@ -315,11 +315,11 @@ g_io_scheduler_job_send_to_mainloop_async (GIOSchedulerJob *job,
   g_cond_init (&proxy->ack_condition);
 
   source = g_idle_source_new ();
-  g_source_set_priority (source, G_PRIORITY_DEFAULT);
-  g_source_set_callback (source, mainloop_proxy_func, proxy,
-			 (GDestroyNotify)mainloop_proxy_free);
-  g_source_set_static_name (source, "[gio] mainloop_proxy_func");
+  xsource_set_priority (source, G_PRIORITY_DEFAULT);
+  xsource_set_callback (source, mainloop_proxy_func, proxy,
+			 (xdestroy_notify_t)mainloop_proxy_free);
+  xsource_set_static_name (source, "[gio] mainloop_proxy_func");
 
-  g_source_attach (source, job->context);
-  g_source_unref (source);
+  xsource_attach (source, job->context);
+  xsource_unref (source);
 }

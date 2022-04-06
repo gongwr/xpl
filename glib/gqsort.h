@@ -34,7 +34,7 @@
 G_BEGIN_DECLS
 
 XPL_AVAILABLE_IN_ALL
-void g_qsort_with_data (gconstpointer    pbase,
+void g_qsort_with_data (xconstpointer    pbase,
 			xint_t             total_elems,
 			xsize_t            size,
 			GCompareDataFunc compare_func,

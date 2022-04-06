@@ -1,4 +1,4 @@
-/* Unit tests for GMutex
+/* Unit tests for xmutex_t
  * Copyright (C) 2011 Red Hat, Inc
  * Author: Matthias Clasen
  *
@@ -32,7 +32,7 @@
 static void
 test_mutex1 (void)
 {
-  GMutex mutex;
+  xmutex_t mutex;
 
   g_mutex_init (&mutex);
   g_mutex_lock (&mutex);
@@ -45,7 +45,7 @@ test_mutex1 (void)
 static void
 test_mutex2 (void)
 {
-  static GMutex mutex;
+  static xmutex_t mutex;
 
   g_mutex_lock (&mutex);
   g_mutex_unlock (&mutex);
@@ -56,7 +56,7 @@ test_mutex2 (void)
 static void
 test_mutex3 (void)
 {
-  GMutex *mutex;
+  xmutex_t *mutex;
 
   mutex = g_mutex_new ();
   g_mutex_lock (mutex);
@@ -69,7 +69,7 @@ test_mutex3 (void)
 static void
 test_mutex4 (void)
 {
-  static GMutex mutex;
+  static xmutex_t mutex;
   xboolean_t ret;
 
   ret = g_mutex_trylock (&mutex);
@@ -87,15 +87,15 @@ test_mutex4 (void)
 #define THREADS    100
 
 
-GThread *owners[LOCKS];
-GMutex   locks[LOCKS];
+xthread_t *owners[LOCKS];
+xmutex_t   locks[LOCKS];
 
 static void
 acquire (xint_t nr)
 {
-  GThread *self;
+  xthread_t *self;
 
-  self = g_thread_self ();
+  self = xthread_self ();
 
   if (!g_mutex_trylock (&locks[nr]))
     {
@@ -109,9 +109,9 @@ acquire (xint_t nr)
   owners[nr] = self;
 
   /* let some other threads try to ruin our day */
-  g_thread_yield ();
-  g_thread_yield ();
-  g_thread_yield ();
+  xthread_yield ();
+  xthread_yield ();
+  xthread_yield ();
 
   g_assert (owners[nr] == self);   /* hopefully this is still us... */
   owners[nr] = NULL;               /* make way for the next guy */
@@ -123,7 +123,7 @@ static xpointer_t
 thread_func (xpointer_t data)
 {
   xint_t i;
-  GRand *rand;
+  xrand_t *rand;
 
   rand = g_rand_new ();
 
@@ -139,16 +139,16 @@ static void
 test_mutex5 (void)
 {
   xint_t i;
-  GThread *threads[THREADS];
+  xthread_t *threads[THREADS];
 
   for (i = 0; i < LOCKS; i++)
     g_mutex_init (&locks[i]);
 
   for (i = 0; i < THREADS; i++)
-    threads[i] = g_thread_create (thread_func, NULL, TRUE, NULL);
+    threads[i] = xthread_create (thread_func, NULL, TRUE, NULL);
 
   for (i = 0; i < THREADS; i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 
   for (i = 0; i < LOCKS; i++)
     g_mutex_clear (&locks[i]);
@@ -162,7 +162,7 @@ test_mutex5 (void)
 static xboolean_t
 do_addition (xint_t *value)
 {
-  static GMutex lock;
+  static xmutex_t lock;
   xboolean_t more;
 
   /* test performance of "good" cases (ie: short critical sections) */
@@ -184,10 +184,10 @@ addition_thread (xpointer_t value)
 }
 
 static void
-test_mutex_perf (gconstpointer data)
+test_mutex_perf (xconstpointer data)
 {
   xuint_t n_threads = GPOINTER_TO_UINT (data);
-  GThread *threads[THREADS];
+  xthread_t *threads[THREADS];
   gint64 start_time;
   xdouble_t rate;
   xint_t x = -1;
@@ -196,7 +196,7 @@ test_mutex_perf (gconstpointer data)
   g_assert (n_threads <= G_N_ELEMENTS (threads));
 
   for (i = 0; n_threads > 0 && i < n_threads - 1; i++)
-    threads[i] = g_thread_create (addition_thread, &x, TRUE, NULL);
+    threads[i] = xthread_create (addition_thread, &x, TRUE, NULL);
 
   /* avoid measuring thread setup/teardown time */
   start_time = g_get_monotonic_time ();
@@ -207,7 +207,7 @@ test_mutex_perf (gconstpointer data)
   rate = x / rate;
 
   for (i = 0; n_threads > 0 && i < n_threads - 1; i++)
-    g_thread_join (threads[i]);
+    xthread_join (threads[i]);
 
   g_test_maximized_result (rate, "%f mips", rate);
 }

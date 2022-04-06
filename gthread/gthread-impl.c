@@ -34,15 +34,15 @@
 #include <glib.h>
 
 void
-g_thread_init (xpointer_t init)
+xthread_init (xpointer_t init)
 {
   if (init != NULL)
-    g_warning ("GThread system no longer supports custom thread implementations.");
+    g_warning ("xthread_t system no longer supports custom thread implementations.");
 }
 
 void
-g_thread_init_with_errorcheck_mutexes (xpointer_t vtable)
+xthread_init_with_errorcheck_mutexes (xpointer_t vtable)
 {
   g_assert (vtable == NULL);
-  g_warning ("GThread system no longer supports errorcheck mutexes.");
+  g_warning ("xthread_t system no longer supports errorcheck mutexes.");
 }

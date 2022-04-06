@@ -7,30 +7,30 @@
 static void
 test_basic (void)
 {
-  GNetworkAddress *address;
+  xnetwork_address_t *address;
   xuint_t port;
   xchar_t *hostname;
   xchar_t *scheme;
 
-  address = (GNetworkAddress*)g_network_address_new ("www.gnome.org", 8080);
+  address = (xnetwork_address_t*)g_network_address_new ("www.gnome.org", 8080);
 
   g_assert_cmpstr (g_network_address_get_hostname (address), ==, "www.gnome.org");
   g_assert_cmpint (g_network_address_get_port (address), ==, 8080);
 
-  g_object_get (address, "hostname", &hostname, "port", &port, "scheme", &scheme, NULL);
+  xobject_get (address, "hostname", &hostname, "port", &port, "scheme", &scheme, NULL);
   g_assert_cmpstr (hostname, ==, "www.gnome.org");
   g_assert_cmpint (port, ==, 8080);
   g_assert_null (scheme);
   g_free (hostname);
 
-  g_object_unref (address);
+  xobject_unref (address);
 }
 
 typedef struct {
   const xchar_t *input;
   const xchar_t *scheme;
   const xchar_t *hostname;
-  guint16 port;
+  xuint16_t port;
   xint_t error_code;
 } ParseTest;
 
@@ -48,14 +48,14 @@ static ParseTest uri_tests[] = {
 };
 
 static void
-test_parse_uri (gconstpointer d)
+test_parse_uri (xconstpointer d)
 {
   const ParseTest *test = d;
-  GNetworkAddress *address;
+  xnetwork_address_t *address;
   xerror_t *error;
 
   error = NULL;
-  address = (GNetworkAddress*)g_network_address_parse_uri (test->input, 8080, &error);
+  address = (xnetwork_address_t*)g_network_address_parse_uri (test->input, 8080, &error);
 
   if (address)
     {
@@ -68,9 +68,9 @@ test_parse_uri (gconstpointer d)
     g_assert_error (error, G_IO_ERROR, test->error_code);
 
   if (address)
-    g_object_unref (address);
+    xobject_unref (address);
   if (error)
-    g_error_free (error);
+    xerror_free (error);
 }
 
 static ParseTest host_tests[] =
@@ -89,14 +89,14 @@ static ParseTest host_tests[] =
 };
 
 static void
-test_parse_host (gconstpointer d)
+test_parse_host (xconstpointer d)
 {
   const ParseTest *test = d;
-  GNetworkAddress *address;
+  xnetwork_address_t *address;
   xerror_t *error;
 
   error = NULL;
-  address = (GNetworkAddress*)g_network_address_parse (test->input, 1234, &error);
+  address = (xnetwork_address_t*)g_network_address_parse (test->input, 1234, &error);
 
   if (address)
     {
@@ -111,9 +111,9 @@ test_parse_host (gconstpointer d)
     }
 
   if (address)
-    g_object_unref (address);
+    xobject_unref (address);
   if (error)
-    g_error_free (error);
+    xerror_free (error);
 }
 
 typedef struct {
@@ -143,11 +143,11 @@ static ResolveTest address_tests[] = {
 };
 
 static void
-test_resolve_address (gconstpointer d)
+test_resolve_address (xconstpointer d)
 {
   const ResolveTest *test = d;
-  GSocketConnectable *connectable;
-  GSocketAddressEnumerator *addr_enum;
+  xsocket_connectable_t *connectable;
+  xsocket_address_enumerator_t *addr_enum;
   xsocket_address_t *addr;
   xerror_t *error = NULL;
 
@@ -160,33 +160,33 @@ test_resolve_address (gconstpointer d)
 
   addr_enum = xsocket_connectable_enumerate (connectable);
   addr = xsocket_address_enumerator_next (addr_enum, NULL, &error);
-  g_object_unref (addr_enum);
-  g_object_unref (connectable);
+  xobject_unref (addr_enum);
+  xobject_unref (connectable);
 
   if (addr)
     {
       g_assert_true (test->valid_parse);
       g_assert_true (X_IS_INET_SOCKET_ADDRESS (addr));
-      g_object_unref (addr);
+      xobject_unref (addr);
     }
   else
     {
       g_assert_false (test->valid_parse);
       g_assert_error (error, G_RESOLVER_ERROR, G_RESOLVER_ERROR_NOT_FOUND);
-      g_error_free (error);
+      xerror_free (error);
       return;
     }
 }
 
-/* Technically this should be in a GResolver test program, but we don't
+/* Technically this should be in a xresolver_t test program, but we don't
  * have one of those since it's mostly impossible to test programmatically.
  * So it goes here so it can share the tests.
  */
 static void
-test_resolve_address_gresolver (gconstpointer d)
+test_resolve_address_gresolver (xconstpointer d)
 {
   const ResolveTest *test = d;
-  GResolver *resolver;
+  xresolver_t *resolver;
   xlist_t *addrs;
   xinet_address_t *iaddr;
   xerror_t *error = NULL;
@@ -195,18 +195,18 @@ test_resolve_address_gresolver (gconstpointer d)
 
   resolver = g_resolver_get_default ();
   addrs = g_resolver_lookup_by_name (resolver, test->input, NULL, &error);
-  g_object_unref (resolver);
+  xobject_unref (resolver);
 
   if (addrs)
     {
       g_assert_true (test->valid_resolve);
-      g_assert_cmpint (g_list_length (addrs), ==, 1);
+      g_assert_cmpint (xlist_length (addrs), ==, 1);
 
       iaddr = addrs->data;
       g_assert_true (X_IS_INET_ADDRESS (iaddr));
 
-      g_object_unref (iaddr);
-      g_list_free (addrs);
+      xobject_unref (iaddr);
+      xlist_free (addrs);
     }
   else
     {
@@ -216,14 +216,14 @@ test_resolve_address_gresolver (gconstpointer d)
 
       if (!test->valid_parse)
         {
-          /* GResolver should have rejected the address internally, in
+          /* xresolver_t should have rejected the address internally, in
            * which case we're guaranteed to get G_RESOLVER_ERROR_NOT_FOUND.
            */
           g_assert_error (error, G_RESOLVER_ERROR, G_RESOLVER_ERROR_NOT_FOUND);
         }
       else
         {
-          /* If GResolver didn't reject the string itself, then we
+          /* If xresolver_t didn't reject the string itself, then we
            * might have attempted to send it over the network. If that
            * attempt succeeded, we'd get back NOT_FOUND, but if
            * there's no network available we might have gotten some
@@ -231,7 +231,7 @@ test_resolve_address_gresolver (gconstpointer d)
            */
         }
 
-      g_error_free (error);
+      xerror_free (error);
       return;
     }
 }
@@ -257,7 +257,7 @@ find_ifname_and_index (void)
   SCOPE_ID_TEST_INDEX = if_nametoindex ("lo");
   if (SCOPE_ID_TEST_INDEX != 0)
     {
-      g_strlcpy (SCOPE_ID_TEST_IFNAME, "lo", sizeof (SCOPE_ID_TEST_IFNAME));
+      xstrlcpy (SCOPE_ID_TEST_IFNAME, "lo", sizeof (SCOPE_ID_TEST_IFNAME));
       return;
     }
 
@@ -270,12 +270,12 @@ find_ifname_and_index (void)
 }
 
 static void
-test_scope_id (GSocketConnectable *addr)
+test_scope_id (xsocket_connectable_t *addr)
 {
 #ifndef G_OS_WIN32
-  GSocketAddressEnumerator *addr_enum;
+  xsocket_address_enumerator_t *addr_enum;
   xsocket_address_t *saddr;
-  GInetSocketAddress *isaddr;
+  xinet_socket_address_t *isaddr;
   xinet_address_t *iaddr;
   char *tostring;
   xerror_t *error = NULL;
@@ -296,12 +296,12 @@ test_scope_id (GSocketConnectable *addr)
   g_assert_cmpstr (tostring, ==, SCOPE_ID_TEST_ADDR);
   g_free (tostring);
 
-  g_object_unref (saddr);
+  xobject_unref (saddr);
   saddr = xsocket_address_enumerator_next (addr_enum, NULL, &error);
   g_assert_no_error (error);
   g_assert_null (saddr);
 
-  g_object_unref (addr_enum);
+  xobject_unref (addr_enum);
 #else
   g_test_skip ("winsock2 getaddrinfo() can’t understand scope IDs");
 #endif
@@ -310,29 +310,29 @@ test_scope_id (GSocketConnectable *addr)
 static void
 test_host_scope_id (void)
 {
-  GSocketConnectable *addr;
+  xsocket_connectable_t *addr;
   char *str;
 
   find_ifname_and_index ();
 
-  str = g_strdup_printf ("%s%%%s", SCOPE_ID_TEST_ADDR, SCOPE_ID_TEST_IFNAME);
+  str = xstrdup_printf ("%s%%%s", SCOPE_ID_TEST_ADDR, SCOPE_ID_TEST_IFNAME);
   addr = g_network_address_new (str, SCOPE_ID_TEST_PORT);
   g_free (str);
 
   test_scope_id (addr);
-  g_object_unref (addr);
+  xobject_unref (addr);
 }
 
 static void
 test_uri_scope_id (void)
 {
-  GSocketConnectable *addr;
+  xsocket_connectable_t *addr;
   char *uri;
   xerror_t *error = NULL;
 
   find_ifname_and_index ();
 
-  uri = g_strdup_printf ("http://[%s%%%s]:%d/foo",
+  uri = xstrdup_printf ("http://[%s%%%s]:%d/foo",
                          SCOPE_ID_TEST_ADDR,
                          SCOPE_ID_TEST_IFNAME,
                          SCOPE_ID_TEST_PORT);
@@ -342,7 +342,7 @@ test_uri_scope_id (void)
   g_assert_null (addr);
   g_clear_error (&error);
 
-  uri = g_strdup_printf ("http://[%s%%25%s]:%d/foo",
+  uri = xstrdup_printf ("http://[%s%%25%s]:%d/foo",
                          SCOPE_ID_TEST_ADDR,
                          SCOPE_ID_TEST_IFNAME,
                          SCOPE_ID_TEST_PORT);
@@ -351,13 +351,13 @@ test_uri_scope_id (void)
   g_assert_no_error (error);
 
   test_scope_id (addr);
-  g_object_unref (addr);
+  xobject_unref (addr);
 }
 
 static void
 test_loopback_basic (void)
 {
-  GNetworkAddress *addr;  /* owned */
+  xnetwork_address_t *addr;  /* owned */
 
   addr = G_NETWORK_ADDRESS (g_network_address_new_loopback (666));
 
@@ -366,15 +366,15 @@ test_loopback_basic (void)
   g_assert_cmpuint (g_network_address_get_port (addr), ==, 666);
   g_assert_null (g_network_address_get_scheme (addr));
 
-  g_object_unref (addr);
+  xobject_unref (addr);
 }
 
 static void
 assert_socket_address_matches (xsocket_address_t *a,
                                const xchar_t    *expected_address,
-                               guint16         expected_port)
+                               xuint16_t         expected_port)
 {
-  GInetSocketAddress *sa;
+  xinet_socket_address_t *sa;
   xchar_t *str;  /* owned */
 
   g_assert_true (X_IS_INET_SOCKET_ADDRESS (a));
@@ -390,8 +390,8 @@ assert_socket_address_matches (xsocket_address_t *a,
 static void
 test_loopback_sync (void)
 {
-  GSocketConnectable *addr;  /* owned */
-  GSocketAddressEnumerator *enumerator;  /* owned */
+  xsocket_connectable_t *addr;  /* owned */
+  xsocket_address_enumerator_t *enumerator;  /* owned */
   xsocket_address_t *a;  /* owned */
   xerror_t *error = NULL;
 
@@ -402,30 +402,30 @@ test_loopback_sync (void)
   a = xsocket_address_enumerator_next (enumerator, NULL, &error);
   g_assert_no_error (error);
   assert_socket_address_matches (a, "::1", 616);
-  g_object_unref (a);
+  xobject_unref (a);
 
   /* IPv4 address. */
   a = xsocket_address_enumerator_next (enumerator, NULL, &error);
   g_assert_no_error (error);
   assert_socket_address_matches (a, "127.0.0.1", 616);
-  g_object_unref (a);
+  xobject_unref (a);
 
   /* End of results. */
   g_assert_null (xsocket_address_enumerator_next (enumerator, NULL, &error));
   g_assert_no_error (error);
 
-  g_object_unref (enumerator);
-  g_object_unref (addr);
+  xobject_unref (enumerator);
+  xobject_unref (addr);
 }
 
 static void
 test_localhost_sync (void)
 {
-  GSocketConnectable *addr;  /* owned */
-  GSocketAddressEnumerator *enumerator;  /* owned */
+  xsocket_connectable_t *addr;  /* owned */
+  xsocket_address_enumerator_t *enumerator;  /* owned */
   xsocket_address_t *a;  /* owned */
   xerror_t *error = NULL;
-  GResolver *original_resolver; /* owned */
+  xresolver_t *original_resolver; /* owned */
   MockResolver *mock_resolver; /* owned */
   xlist_t *ipv4_results = NULL; /* owned */
 
@@ -435,7 +435,7 @@ test_localhost_sync (void)
   original_resolver = g_resolver_get_default ();
   mock_resolver = mock_resolver_new ();
   g_resolver_set_default (G_RESOLVER (mock_resolver));
-  ipv4_results = g_list_append (ipv4_results, xinet_address_new_from_string ("123.123.123.123"));
+  ipv4_results = xlist_append (ipv4_results, xinet_address_new_from_string ("123.123.123.123"));
   mock_resolver_set_ipv4_results (mock_resolver, ipv4_results);
 
   addr = g_network_address_new ("localhost.", 616);
@@ -445,19 +445,19 @@ test_localhost_sync (void)
   a = xsocket_address_enumerator_next (enumerator, NULL, &error);
   g_assert_no_error (error);
   assert_socket_address_matches (a, "::1", 616);
-  g_object_unref (a);
+  xobject_unref (a);
 
   /* IPv4 address. */
   a = xsocket_address_enumerator_next (enumerator, NULL, &error);
   g_assert_no_error (error);
   assert_socket_address_matches (a, "127.0.0.1", 616);
-  g_object_unref (a);
+  xobject_unref (a);
 
   /* End of results. */
   g_assert_null (xsocket_address_enumerator_next (enumerator, NULL, &error));
   g_assert_no_error (error);
-  g_object_unref (enumerator);
-  g_object_unref (addr);
+  xobject_unref (enumerator);
+  xobject_unref (addr);
 
   addr = g_network_address_new (".localhost", 616);
   enumerator = xsocket_connectable_enumerate (addr);
@@ -466,19 +466,19 @@ test_localhost_sync (void)
   a = xsocket_address_enumerator_next (enumerator, NULL, &error);
   g_assert_no_error (error);
   assert_socket_address_matches (a, "::1", 616);
-  g_object_unref (a);
+  xobject_unref (a);
 
   /* IPv4 address. */
   a = xsocket_address_enumerator_next (enumerator, NULL, &error);
   g_assert_no_error (error);
   assert_socket_address_matches (a, "127.0.0.1", 616);
-  g_object_unref (a);
+  xobject_unref (a);
 
   /* End of results. */
   g_assert_null (xsocket_address_enumerator_next (enumerator, NULL, &error));
   g_assert_no_error (error);
-  g_object_unref (enumerator);
-  g_object_unref (addr);
+  xobject_unref (enumerator);
+  xobject_unref (addr);
 
   addr = g_network_address_new ("foo.localhost", 616);
   enumerator = xsocket_connectable_enumerate (addr);
@@ -487,19 +487,19 @@ test_localhost_sync (void)
   a = xsocket_address_enumerator_next (enumerator, NULL, &error);
   g_assert_no_error (error);
   assert_socket_address_matches (a, "::1", 616);
-  g_object_unref (a);
+  xobject_unref (a);
 
   /* IPv4 address. */
   a = xsocket_address_enumerator_next (enumerator, NULL, &error);
   g_assert_no_error (error);
   assert_socket_address_matches (a, "127.0.0.1", 616);
-  g_object_unref (a);
+  xobject_unref (a);
 
   /* End of results. */
   g_assert_null (xsocket_address_enumerator_next (enumerator, NULL, &error));
   g_assert_no_error (error);
-  g_object_unref (enumerator);
-  g_object_unref (addr);
+  xobject_unref (enumerator);
+  xobject_unref (addr);
 
   addr = g_network_address_new (".localhost.", 616);
   enumerator = xsocket_connectable_enumerate (addr);
@@ -508,19 +508,19 @@ test_localhost_sync (void)
   a = xsocket_address_enumerator_next (enumerator, NULL, &error);
   g_assert_no_error (error);
   assert_socket_address_matches (a, "::1", 616);
-  g_object_unref (a);
+  xobject_unref (a);
 
   /* IPv4 address. */
   a = xsocket_address_enumerator_next (enumerator, NULL, &error);
   g_assert_no_error (error);
   assert_socket_address_matches (a, "127.0.0.1", 616);
-  g_object_unref (a);
+  xobject_unref (a);
 
   /* End of results. */
   g_assert_null (xsocket_address_enumerator_next (enumerator, NULL, &error));
   g_assert_no_error (error);
-  g_object_unref (enumerator);
-  g_object_unref (addr);
+  xobject_unref (enumerator);
+  xobject_unref (addr);
 
   addr = g_network_address_new ("invalid", 616);
   enumerator = xsocket_connectable_enumerate (addr);
@@ -529,24 +529,24 @@ test_localhost_sync (void)
   a = xsocket_address_enumerator_next (enumerator, NULL, &error);
   g_assert_no_error (error);
   assert_socket_address_matches (a, "123.123.123.123", 616);
-  g_object_unref (a);
+  xobject_unref (a);
 
   /* End of results. */
   g_assert_null (xsocket_address_enumerator_next (enumerator, NULL, &error));
   g_assert_no_error (error);
-  g_object_unref (enumerator);
-  g_object_unref (addr);
+  xobject_unref (enumerator);
+  xobject_unref (addr);
 
   g_resolver_set_default (original_resolver);
-  g_list_free_full (ipv4_results, (GDestroyNotify) g_object_unref);
-  g_object_unref (original_resolver);
-  g_object_unref (mock_resolver);
+  xlist_free_full (ipv4_results, (xdestroy_notify_t) xobject_unref);
+  xobject_unref (original_resolver);
+  xobject_unref (mock_resolver);
 }
 
 typedef struct {
   xlist_t/*<owned xsocket_address_t> */ *addrs;  /* owned */
-  GMainLoop *loop;  /* owned */
-  GSocketAddressEnumerator *enumerator; /* unowned */
+  xmain_loop_t *loop;  /* owned */
+  xsocket_address_enumerator_t *enumerator; /* unowned */
   xuint_t delay_ms;
   xint_t expected_error_code;
 } AsyncData;
@@ -567,7 +567,7 @@ got_addr (xobject_t      *source_object,
           xasync_result_t *result,
           xpointer_t      user_data)
 {
-  GSocketAddressEnumerator *enumerator;
+  xsocket_address_enumerator_t *enumerator;
   AsyncData *data;
   xsocket_address_t *a;  /* owned */
   xerror_t *error = NULL;
@@ -588,13 +588,13 @@ got_addr (xobject_t      *source_object,
   if (a == NULL)
     {
       /* End of results. */
-      data->addrs = g_list_reverse (data->addrs);
-      g_main_loop_quit (data->loop);
+      data->addrs = xlist_reverse (data->addrs);
+      xmain_loop_quit (data->loop);
     }
   else
     {
       g_assert_true (X_IS_INET_SOCKET_ADDRESS (a));
-      data->addrs = g_list_prepend (data->addrs, a);
+      data->addrs = xlist_prepend (data->addrs, a);
 
       if (!data->delay_ms)
         xsocket_address_enumerator_next_async (enumerator, NULL,
@@ -612,7 +612,7 @@ got_addr_ignored (xobject_t      *source_object,
                   xasync_result_t *result,
                   xpointer_t      user_data)
 {
-  GSocketAddressEnumerator *enumerator;
+  xsocket_address_enumerator_t *enumerator;
   xsocket_address_t *a;  /* owned */
   xerror_t *error = NULL;
 
@@ -624,7 +624,7 @@ got_addr_ignored (xobject_t      *source_object,
   g_assert_no_error (error);
   if (a != NULL)
     {
-      g_object_unref (a);
+      xobject_unref (a);
       xsocket_address_enumerator_next_async (enumerator, NULL,
                                               got_addr_ignored, user_data);
     }
@@ -634,8 +634,8 @@ got_addr_ignored (xobject_t      *source_object,
 static void
 test_loopback_async (void)
 {
-  GSocketConnectable *addr;  /* owned */
-  GSocketAddressEnumerator *enumerator;  /* owned */
+  xsocket_connectable_t *addr;  /* owned */
+  xsocket_address_enumerator_t *enumerator;  /* owned */
   AsyncData data = { 0, };
 
   addr = g_network_address_new_loopback (610);
@@ -643,31 +643,31 @@ test_loopback_async (void)
 
   /* Get all the addresses. */
   data.addrs = NULL;
-  data.loop = g_main_loop_new (NULL, FALSE);
+  data.loop = xmain_loop_new (NULL, FALSE);
 
   xsocket_address_enumerator_next_async (enumerator, NULL, got_addr, &data);
 
-  g_main_loop_run (data.loop);
-  g_main_loop_unref (data.loop);
+  xmain_loop_run (data.loop);
+  xmain_loop_unref (data.loop);
 
   /* Check results. */
-  g_assert_cmpuint (g_list_length (data.addrs), ==, 2);
+  g_assert_cmpuint (xlist_length (data.addrs), ==, 2);
   assert_socket_address_matches (data.addrs->data, "::1", 610);
   assert_socket_address_matches (data.addrs->next->data, "127.0.0.1", 610);
 
-  g_list_free_full (data.addrs, (GDestroyNotify) g_object_unref);
+  xlist_free_full (data.addrs, (xdestroy_notify_t) xobject_unref);
 
-  g_object_unref (enumerator);
-  g_object_unref (addr);
+  xobject_unref (enumerator);
+  xobject_unref (addr);
 }
 
 static void
 test_localhost_async (void)
 {
-  GSocketConnectable *addr;  /* owned */
-  GSocketAddressEnumerator *enumerator;  /* owned */
+  xsocket_connectable_t *addr;  /* owned */
+  xsocket_address_enumerator_t *enumerator;  /* owned */
   AsyncData data = { 0, };
-  GResolver *original_resolver; /* owned */
+  xresolver_t *original_resolver; /* owned */
   MockResolver *mock_resolver; /* owned */
   xlist_t *ipv4_results = NULL; /* owned */
 
@@ -677,7 +677,7 @@ test_localhost_async (void)
   original_resolver = g_resolver_get_default ();
   mock_resolver = mock_resolver_new ();
   g_resolver_set_default (G_RESOLVER (mock_resolver));
-  ipv4_results = g_list_append (ipv4_results, xinet_address_new_from_string ("123.123.123.123"));
+  ipv4_results = xlist_append (ipv4_results, xinet_address_new_from_string ("123.123.123.123"));
   mock_resolver_set_ipv4_results (mock_resolver, ipv4_results);
 
   addr = g_network_address_new ("localhost", 610);
@@ -686,30 +686,30 @@ test_localhost_async (void)
   /* Get all the addresses. */
   data.addrs = NULL;
   data.delay_ms = 1;
-  data.loop = g_main_loop_new (NULL, FALSE);
+  data.loop = xmain_loop_new (NULL, FALSE);
 
   xsocket_address_enumerator_next_async (enumerator, NULL, got_addr, &data);
-  g_main_loop_run (data.loop);
+  xmain_loop_run (data.loop);
 
   /* Check results. */
-  g_assert_cmpuint (g_list_length (data.addrs), ==, 2);
+  g_assert_cmpuint (xlist_length (data.addrs), ==, 2);
   assert_socket_address_matches (data.addrs->data, "::1", 610);
   assert_socket_address_matches (data.addrs->next->data, "127.0.0.1", 610);
 
   g_resolver_set_default (original_resolver);
-  g_list_free_full (data.addrs, (GDestroyNotify) g_object_unref);
-  g_list_free_full (ipv4_results, (GDestroyNotify) g_object_unref);
-  g_object_unref (original_resolver);
-  g_object_unref (mock_resolver);
-  g_object_unref (enumerator);
-  g_object_unref (addr);
-  g_main_loop_unref (data.loop);
+  xlist_free_full (data.addrs, (xdestroy_notify_t) xobject_unref);
+  xlist_free_full (ipv4_results, (xdestroy_notify_t) xobject_unref);
+  xobject_unref (original_resolver);
+  xobject_unref (mock_resolver);
+  xobject_unref (enumerator);
+  xobject_unref (addr);
+  xmain_loop_unref (data.loop);
 }
 
 static void
 test_to_string (void)
 {
-  GSocketConnectable *addr = NULL;
+  xsocket_connectable_t *addr = NULL;
   xchar_t *str = NULL;
   xerror_t *error = NULL;
 
@@ -718,14 +718,14 @@ test_to_string (void)
   str = xsocket_connectable_to_string (addr);
   g_assert_cmpstr (str, ==, "some-hostname");
   g_free (str);
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   /* With port. */
   addr = g_network_address_new ("some-hostname", 123);
   str = xsocket_connectable_to_string (addr);
   g_assert_cmpstr (str, ==, "some-hostname:123");
   g_free (str);
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   /* With scheme and port. */
   addr = g_network_address_parse_uri ("http://some-hostname:123", 80, &error);
@@ -733,18 +733,18 @@ test_to_string (void)
   str = xsocket_connectable_to_string (addr);
   g_assert_cmpstr (str, ==, "http:some-hostname:123");
   g_free (str);
-  g_object_unref (addr);
+  xobject_unref (addr);
 
   /* Loopback. */
   addr = g_network_address_new ("localhost", 456);
   str = xsocket_connectable_to_string (addr);
   g_assert_cmpstr (str, ==, "localhost:456");
   g_free (str);
-  g_object_unref (addr);
+  xobject_unref (addr);
 }
 
 static int
-sort_addresses (gconstpointer a, gconstpointer b)
+sort_addresses (xconstpointer a, xconstpointer b)
 {
   xsocket_family_t family_a = xinet_address_get_family (G_INET_ADDRESS (a));
   xsocket_family_t family_b = xinet_address_get_family (G_INET_ADDRESS (b));
@@ -758,7 +758,7 @@ sort_addresses (gconstpointer a, gconstpointer b)
 }
 
 static int
-sort_socket_addresses (gconstpointer a, gconstpointer b)
+sort_socket_addresses (xconstpointer a, xconstpointer b)
 {
   xinet_address_t *addr_a = g_inet_socket_address_get_address (G_INET_SOCKET_ADDRESS (a));
   xinet_address_t *addr_b = g_inet_socket_address_get_address (G_INET_SOCKET_ADDRESS (b));
@@ -770,12 +770,12 @@ assert_list_matches_expected (xlist_t *result, xlist_t *expected)
 {
   xlist_t *result_copy = NULL;
 
-  g_assert_cmpint (g_list_length (result), ==, g_list_length (expected));
+  g_assert_cmpint (xlist_length (result), ==, xlist_length (expected));
 
   /* Sort by ipv4 first which matches the expected list. Do this on a copy of
    * @result to avoid modifying the original. */
-  result_copy = g_list_copy (result);
-  result = result_copy = g_list_sort (result_copy, sort_socket_addresses);
+  result_copy = xlist_copy (result);
+  result = result_copy = xlist_sort (result_copy, sort_socket_addresses);
 
   for (; result != NULL; result = result->next, expected = expected->next)
     {
@@ -783,23 +783,23 @@ assert_list_matches_expected (xlist_t *result, xlist_t *expected)
       g_assert_true (xinet_address_equal (address, expected->data));
     }
 
-  g_list_free (result_copy);
+  xlist_free (result_copy);
 }
 
 typedef struct {
   MockResolver *mock_resolver;
-  GResolver *original_resolver;
+  xresolver_t *original_resolver;
   xlist_t *input_ipv4_results;
   xlist_t *input_ipv6_results;
   xlist_t *input_all_results;
-  GSocketConnectable *addr;
-  GSocketAddressEnumerator *enumerator;
-  GMainLoop *loop;
+  xsocket_connectable_t *addr;
+  xsocket_address_enumerator_t *enumerator;
+  xmain_loop_t *loop;
 } HappyEyeballsFixture;
 
 static void
 happy_eyeballs_setup (HappyEyeballsFixture *fixture,
-                      gconstpointer         data)
+                      xconstpointer         data)
 {
   static const char * const ipv4_address_strings[] = { "1.1.1.1", "2.2.2.2" };
   static const char * const ipv6_address_strings[] = { "ff::11", "ff::22" };
@@ -813,34 +813,34 @@ happy_eyeballs_setup (HappyEyeballsFixture *fixture,
     {
       xinet_address_t *ipv4_addr = xinet_address_new_from_string (ipv4_address_strings[i]);
       xinet_address_t *ipv6_addr = xinet_address_new_from_string (ipv6_address_strings[i]);
-      fixture->input_ipv4_results = g_list_append (fixture->input_ipv4_results, ipv4_addr);
-      fixture->input_ipv6_results = g_list_append (fixture->input_ipv6_results, ipv6_addr);
-      fixture->input_all_results = g_list_append (fixture->input_all_results, ipv4_addr);
-      fixture->input_all_results = g_list_append (fixture->input_all_results, ipv6_addr);
+      fixture->input_ipv4_results = xlist_append (fixture->input_ipv4_results, ipv4_addr);
+      fixture->input_ipv6_results = xlist_append (fixture->input_ipv6_results, ipv6_addr);
+      fixture->input_all_results = xlist_append (fixture->input_all_results, ipv4_addr);
+      fixture->input_all_results = xlist_append (fixture->input_all_results, ipv6_addr);
     }
-  fixture->input_all_results = g_list_sort (fixture->input_all_results, sort_addresses);
+  fixture->input_all_results = xlist_sort (fixture->input_all_results, sort_addresses);
   mock_resolver_set_ipv4_results (fixture->mock_resolver, fixture->input_ipv4_results);
   mock_resolver_set_ipv6_results (fixture->mock_resolver, fixture->input_ipv6_results);
 
   fixture->addr = g_network_address_new ("test.fake", 80);
   fixture->enumerator = xsocket_connectable_enumerate (fixture->addr);
 
-  fixture->loop = g_main_loop_new (NULL, FALSE);
+  fixture->loop = xmain_loop_new (NULL, FALSE);
 }
 
 static void
 happy_eyeballs_teardown (HappyEyeballsFixture *fixture,
-                         gconstpointer         data)
+                         xconstpointer         data)
 {
-  g_object_unref (fixture->addr);
-  g_object_unref (fixture->enumerator);
+  xobject_unref (fixture->addr);
+  xobject_unref (fixture->enumerator);
   g_resolver_free_addresses (fixture->input_all_results);
-  g_list_free (fixture->input_ipv4_results);
-  g_list_free (fixture->input_ipv6_results);
+  xlist_free (fixture->input_ipv4_results);
+  xlist_free (fixture->input_ipv6_results);
   g_resolver_set_default (fixture->original_resolver);
-  g_object_unref (fixture->original_resolver);
-  g_object_unref (fixture->mock_resolver);
-  g_main_loop_unref (fixture->loop);
+  xobject_unref (fixture->original_resolver);
+  xobject_unref (fixture->mock_resolver);
+  xmain_loop_unref (fixture->loop);
 }
 
 static const xuint_t FAST_DELAY_LESS_THAN_TIMEOUT = 25;
@@ -848,7 +848,7 @@ static const xuint_t SLOW_DELAY_MORE_THAN_TIMEOUT = 100;
 
 static void
 test_happy_eyeballs_basic (HappyEyeballsFixture *fixture,
-                           gconstpointer         user_data)
+                           xconstpointer         user_data)
 {
   AsyncData data = { 0 };
 
@@ -858,19 +858,19 @@ test_happy_eyeballs_basic (HappyEyeballsFixture *fixture,
   /* This just tests in the common case it gets all results */
 
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   assert_list_matches_expected (data.addrs, fixture->input_all_results);
 
-  g_list_free_full (data.addrs, (GDestroyNotify) g_object_unref);
+  xlist_free_full (data.addrs, (xdestroy_notify_t) xobject_unref);
 }
 
 static void
 test_happy_eyeballs_parallel (HappyEyeballsFixture *fixture,
-                              gconstpointer         user_data)
+                              xconstpointer         user_data)
 {
   AsyncData data = { 0 };
-  GSocketAddressEnumerator *enumerator2;
+  xsocket_address_enumerator_t *enumerator2;
 
   enumerator2 = xsocket_connectable_enumerate (fixture->addr);
 
@@ -881,29 +881,29 @@ test_happy_eyeballs_parallel (HappyEyeballsFixture *fixture,
 
   xsocket_address_enumerator_next_async (enumerator2, NULL, got_addr_ignored, &data);
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   assert_list_matches_expected (data.addrs, fixture->input_all_results);
 
   /* Run again to ensure the cache from the previous one is correct */
 
-  g_list_free_full (data.addrs, (GDestroyNotify) g_object_unref);
+  xlist_free_full (data.addrs, (xdestroy_notify_t) xobject_unref);
   data.addrs = NULL;
-  g_object_unref (enumerator2);
+  xobject_unref (enumerator2);
 
   enumerator2 = xsocket_connectable_enumerate (fixture->addr);
   xsocket_address_enumerator_next_async (enumerator2, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   assert_list_matches_expected (data.addrs, fixture->input_all_results);
 
-  g_object_unref (enumerator2);
-  g_list_free_full (data.addrs, (GDestroyNotify) g_object_unref);
+  xobject_unref (enumerator2);
+  xlist_free_full (data.addrs, (xdestroy_notify_t) xobject_unref);
 }
 
 static void
 test_happy_eyeballs_slow_ipv4 (HappyEyeballsFixture *fixture,
-                               gconstpointer         user_data)
+                               xconstpointer         user_data)
 {
   AsyncData data = { 0 };
 
@@ -913,16 +913,16 @@ test_happy_eyeballs_slow_ipv4 (HappyEyeballsFixture *fixture,
   mock_resolver_set_ipv4_delay_ms (fixture->mock_resolver, FAST_DELAY_LESS_THAN_TIMEOUT);
 
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   assert_list_matches_expected (data.addrs, fixture->input_all_results);
 
-  g_list_free_full (data.addrs, (GDestroyNotify) g_object_unref);
+  xlist_free_full (data.addrs, (xdestroy_notify_t) xobject_unref);
 }
 
 static void
 test_happy_eyeballs_slow_ipv6 (HappyEyeballsFixture *fixture,
-                               gconstpointer         user_data)
+                               xconstpointer         user_data)
 {
   AsyncData data = { 0 };
 
@@ -932,16 +932,16 @@ test_happy_eyeballs_slow_ipv6 (HappyEyeballsFixture *fixture,
   mock_resolver_set_ipv6_delay_ms (fixture->mock_resolver, FAST_DELAY_LESS_THAN_TIMEOUT);
 
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   assert_list_matches_expected (data.addrs, fixture->input_all_results);
 
-  g_list_free_full (data.addrs, (GDestroyNotify) g_object_unref);
+  xlist_free_full (data.addrs, (xdestroy_notify_t) xobject_unref);
 }
 
 static void
 test_happy_eyeballs_very_slow_ipv6 (HappyEyeballsFixture *fixture,
-                                    gconstpointer         user_data)
+                                    xconstpointer         user_data)
 {
   AsyncData data = { 0 };
 
@@ -951,16 +951,16 @@ test_happy_eyeballs_very_slow_ipv6 (HappyEyeballsFixture *fixture,
   mock_resolver_set_ipv6_delay_ms (fixture->mock_resolver, SLOW_DELAY_MORE_THAN_TIMEOUT);
 
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   assert_list_matches_expected (data.addrs, fixture->input_all_results);
 
-  g_list_free_full (data.addrs, (GDestroyNotify) g_object_unref);
+  xlist_free_full (data.addrs, (xdestroy_notify_t) xobject_unref);
 }
 
 static void
 test_happy_eyeballs_slow_connection_and_ipv4 (HappyEyeballsFixture *fixture,
-                                              gconstpointer         user_data)
+                                              xconstpointer         user_data)
 {
   AsyncData data = { 0 };
 
@@ -972,16 +972,16 @@ test_happy_eyeballs_slow_connection_and_ipv4 (HappyEyeballsFixture *fixture,
   mock_resolver_set_ipv4_delay_ms (fixture->mock_resolver, SLOW_DELAY_MORE_THAN_TIMEOUT);
 
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   assert_list_matches_expected (data.addrs, fixture->input_all_results);
 
-  g_list_free_full (data.addrs, (GDestroyNotify) g_object_unref);
+  xlist_free_full (data.addrs, (xdestroy_notify_t) xobject_unref);
 }
 
 static void
 test_happy_eyeballs_ipv6_error_ipv4_first (HappyEyeballsFixture *fixture,
-                                           gconstpointer         user_data)
+                                           xconstpointer         user_data)
 {
   AsyncData data = { 0 };
   xerror_t *ipv6_error;
@@ -989,22 +989,22 @@ test_happy_eyeballs_ipv6_error_ipv4_first (HappyEyeballsFixture *fixture,
   /* If ipv6 fails, ensuring that ipv4 finishes before ipv6 errors, we still get ipv4. */
 
   data.loop = fixture->loop;
-  ipv6_error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv6 Broken");
+  ipv6_error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv6 Broken");
   mock_resolver_set_ipv6_error (fixture->mock_resolver, ipv6_error);
   mock_resolver_set_ipv6_delay_ms (fixture->mock_resolver, FAST_DELAY_LESS_THAN_TIMEOUT);
 
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   assert_list_matches_expected (data.addrs, fixture->input_ipv4_results);
 
-  g_list_free_full (data.addrs, (GDestroyNotify) g_object_unref);
-  g_error_free (ipv6_error);
+  xlist_free_full (data.addrs, (xdestroy_notify_t) xobject_unref);
+  xerror_free (ipv6_error);
 }
 
 static void
 test_happy_eyeballs_ipv6_error_ipv6_first (HappyEyeballsFixture *fixture,
-                                           gconstpointer         user_data)
+                                           xconstpointer         user_data)
 {
   AsyncData data = { 0 };
   xerror_t *ipv6_error;
@@ -1012,22 +1012,22 @@ test_happy_eyeballs_ipv6_error_ipv6_first (HappyEyeballsFixture *fixture,
   /* If ipv6 fails, ensuring that ipv6 errors before ipv4 finishes, we still get ipv4. */
 
   data.loop = fixture->loop;
-  ipv6_error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv6 Broken");
+  ipv6_error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv6 Broken");
   mock_resolver_set_ipv6_error (fixture->mock_resolver, ipv6_error);
   mock_resolver_set_ipv4_delay_ms (fixture->mock_resolver, FAST_DELAY_LESS_THAN_TIMEOUT);
 
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   assert_list_matches_expected (data.addrs, fixture->input_ipv4_results);
 
-  g_list_free_full (data.addrs, (GDestroyNotify) g_object_unref);
-  g_error_free (ipv6_error);
+  xlist_free_full (data.addrs, (xdestroy_notify_t) xobject_unref);
+  xerror_free (ipv6_error);
 }
 
 static void
 test_happy_eyeballs_ipv6_error_ipv4_very_slow (HappyEyeballsFixture *fixture,
-                                               gconstpointer         user_data)
+                                               xconstpointer         user_data)
 {
   AsyncData data = { 0 };
   xerror_t *ipv6_error;
@@ -1038,22 +1038,22 @@ test_happy_eyeballs_ipv6_error_ipv4_very_slow (HappyEyeballsFixture *fixture,
   /* If ipv6 fails, ensuring that ipv6 errors before ipv4 finishes, we still get ipv4. */
 
   data.loop = fixture->loop;
-  ipv6_error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv6 Broken");
+  ipv6_error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv6 Broken");
   mock_resolver_set_ipv6_error (fixture->mock_resolver, ipv6_error);
   mock_resolver_set_ipv4_delay_ms (fixture->mock_resolver, SLOW_DELAY_MORE_THAN_TIMEOUT);
 
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   assert_list_matches_expected (data.addrs, fixture->input_ipv4_results);
 
-  g_list_free_full (data.addrs, (GDestroyNotify) g_object_unref);
-  g_error_free (ipv6_error);
+  xlist_free_full (data.addrs, (xdestroy_notify_t) xobject_unref);
+  xerror_free (ipv6_error);
 }
 
 static void
 test_happy_eyeballs_ipv4_error_ipv4_first (HappyEyeballsFixture *fixture,
-                                           gconstpointer         user_data)
+                                           xconstpointer         user_data)
 {
   AsyncData data = { 0 };
   xerror_t *ipv4_error;
@@ -1061,22 +1061,22 @@ test_happy_eyeballs_ipv4_error_ipv4_first (HappyEyeballsFixture *fixture,
   /* If ipv4 fails, ensuring that ipv4 errors before ipv6 finishes, we still get ipv6. */
 
   data.loop = fixture->loop;
-  ipv4_error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv4 Broken");
+  ipv4_error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv4 Broken");
   mock_resolver_set_ipv4_error (fixture->mock_resolver, ipv4_error);
   mock_resolver_set_ipv6_delay_ms (fixture->mock_resolver, FAST_DELAY_LESS_THAN_TIMEOUT);
 
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   assert_list_matches_expected (data.addrs, fixture->input_ipv6_results);
 
-  g_list_free_full (data.addrs, (GDestroyNotify) g_object_unref);
-  g_error_free (ipv4_error);
+  xlist_free_full (data.addrs, (xdestroy_notify_t) xobject_unref);
+  xerror_free (ipv4_error);
 }
 
 static void
 test_happy_eyeballs_ipv4_error_ipv6_first (HappyEyeballsFixture *fixture,
-                                           gconstpointer         user_data)
+                                           xconstpointer         user_data)
 {
   AsyncData data = { 0 };
   xerror_t *ipv4_error;
@@ -1084,22 +1084,22 @@ test_happy_eyeballs_ipv4_error_ipv6_first (HappyEyeballsFixture *fixture,
   /* If ipv4 fails, ensuring that ipv6 finishes before ipv4 errors, we still get ipv6. */
 
   data.loop = fixture->loop;
-  ipv4_error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv4 Broken");
+  ipv4_error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv4 Broken");
   mock_resolver_set_ipv4_error (fixture->mock_resolver, ipv4_error);
   mock_resolver_set_ipv4_delay_ms (fixture->mock_resolver, FAST_DELAY_LESS_THAN_TIMEOUT);
 
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   assert_list_matches_expected (data.addrs, fixture->input_ipv6_results);
 
-  g_list_free_full (data.addrs, (GDestroyNotify) g_object_unref);
-  g_error_free (ipv4_error);
+  xlist_free_full (data.addrs, (xdestroy_notify_t) xobject_unref);
+  xerror_free (ipv4_error);
 }
 
 static void
 test_happy_eyeballs_both_error (HappyEyeballsFixture *fixture,
-                                gconstpointer         user_data)
+                                xconstpointer         user_data)
 {
   AsyncData data = { 0 };
   xerror_t *ipv4_error, *ipv6_error;
@@ -1108,24 +1108,24 @@ test_happy_eyeballs_both_error (HappyEyeballsFixture *fixture,
 
   data.loop = fixture->loop;
   data.expected_error_code = G_IO_ERROR_TIMED_OUT;
-  ipv4_error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv4 Broken");
-  ipv6_error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv6 Broken");
+  ipv4_error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv4 Broken");
+  ipv6_error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv6 Broken");
 
   mock_resolver_set_ipv4_error (fixture->mock_resolver, ipv4_error);
   mock_resolver_set_ipv6_error (fixture->mock_resolver, ipv6_error);
 
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   g_assert_null (data.addrs);
 
-  g_error_free (ipv4_error);
-  g_error_free (ipv6_error);
+  xerror_free (ipv4_error);
+  xerror_free (ipv6_error);
 }
 
 static void
 test_happy_eyeballs_both_error_delays_1 (HappyEyeballsFixture *fixture,
-                                         gconstpointer         user_data)
+                                         xconstpointer         user_data)
 {
   AsyncData data = { 0 };
   xerror_t *ipv4_error, *ipv6_error;
@@ -1134,25 +1134,25 @@ test_happy_eyeballs_both_error_delays_1 (HappyEyeballsFixture *fixture,
 
   data.loop = fixture->loop;
   data.expected_error_code = G_IO_ERROR_TIMED_OUT;
-  ipv4_error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv4 Broken");
-  ipv6_error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv6 Broken");
+  ipv4_error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv4 Broken");
+  ipv6_error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv6 Broken");
 
   mock_resolver_set_ipv4_error (fixture->mock_resolver, ipv4_error);
   mock_resolver_set_ipv4_delay_ms (fixture->mock_resolver, FAST_DELAY_LESS_THAN_TIMEOUT);
   mock_resolver_set_ipv6_error (fixture->mock_resolver, ipv6_error);
 
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   g_assert_null (data.addrs);
 
-  g_error_free (ipv4_error);
-  g_error_free (ipv6_error);
+  xerror_free (ipv4_error);
+  xerror_free (ipv6_error);
 }
 
 static void
 test_happy_eyeballs_both_error_delays_2 (HappyEyeballsFixture *fixture,
-                                         gconstpointer         user_data)
+                                         xconstpointer         user_data)
 {
   AsyncData data = { 0 };
   xerror_t *ipv4_error, *ipv6_error;
@@ -1161,25 +1161,25 @@ test_happy_eyeballs_both_error_delays_2 (HappyEyeballsFixture *fixture,
 
   data.loop = fixture->loop;
   data.expected_error_code = G_IO_ERROR_TIMED_OUT;
-  ipv4_error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv4 Broken");
-  ipv6_error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv6 Broken");
+  ipv4_error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv4 Broken");
+  ipv6_error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv6 Broken");
 
   mock_resolver_set_ipv4_error (fixture->mock_resolver, ipv4_error);
   mock_resolver_set_ipv6_error (fixture->mock_resolver, ipv6_error);
   mock_resolver_set_ipv6_delay_ms (fixture->mock_resolver, FAST_DELAY_LESS_THAN_TIMEOUT);
 
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   g_assert_null (data.addrs);
 
-  g_error_free (ipv4_error);
-  g_error_free (ipv6_error);
+  xerror_free (ipv4_error);
+  xerror_free (ipv6_error);
 }
 
 static void
 test_happy_eyeballs_both_error_delays_3 (HappyEyeballsFixture *fixture,
-                                         gconstpointer         user_data)
+                                         xconstpointer         user_data)
 {
   AsyncData data = { 0 };
   xerror_t *ipv4_error, *ipv6_error;
@@ -1188,20 +1188,20 @@ test_happy_eyeballs_both_error_delays_3 (HappyEyeballsFixture *fixture,
 
   data.loop = fixture->loop;
   data.expected_error_code = G_IO_ERROR_TIMED_OUT;
-  ipv4_error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv4 Broken");
-  ipv6_error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv6 Broken");
+  ipv4_error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv4 Broken");
+  ipv6_error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_TIMED_OUT, "IPv6 Broken");
 
   mock_resolver_set_ipv4_error (fixture->mock_resolver, ipv4_error);
   mock_resolver_set_ipv6_error (fixture->mock_resolver, ipv6_error);
   mock_resolver_set_ipv6_delay_ms (fixture->mock_resolver, SLOW_DELAY_MORE_THAN_TIMEOUT);
 
   xsocket_address_enumerator_next_async (fixture->enumerator, NULL, got_addr, &data);
-  g_main_loop_run (fixture->loop);
+  xmain_loop_run (fixture->loop);
 
   g_assert_null (data.addrs);
 
-  g_error_free (ipv4_error);
-  g_error_free (ipv6_error);
+  xerror_free (ipv4_error);
+  xerror_free (ipv6_error);
 }
 
 int
@@ -1216,28 +1216,28 @@ main (int argc, char *argv[])
 
   for (i = 0; i < G_N_ELEMENTS (host_tests); i++)
     {
-      path = g_strdup_printf ("/network-address/parse-host/%" G_GSIZE_FORMAT, i);
+      path = xstrdup_printf ("/network-address/parse-host/%" G_GSIZE_FORMAT, i);
       g_test_add_data_func (path, &host_tests[i], test_parse_host);
       g_free (path);
     }
 
   for (i = 0; i < G_N_ELEMENTS (uri_tests); i++)
     {
-      path = g_strdup_printf ("/network-address/parse-uri/%" G_GSIZE_FORMAT, i);
+      path = xstrdup_printf ("/network-address/parse-uri/%" G_GSIZE_FORMAT, i);
       g_test_add_data_func (path, &uri_tests[i], test_parse_uri);
       g_free (path);
     }
 
   for (i = 0; i < G_N_ELEMENTS (address_tests); i++)
     {
-      path = g_strdup_printf ("/network-address/resolve-address/%" G_GSIZE_FORMAT, i);
+      path = xstrdup_printf ("/network-address/resolve-address/%" G_GSIZE_FORMAT, i);
       g_test_add_data_func (path, &address_tests[i], test_resolve_address);
       g_free (path);
     }
 
   for (i = 0; i < G_N_ELEMENTS (address_tests); i++)
     {
-      path = g_strdup_printf ("/gresolver/resolve-address/%" G_GSIZE_FORMAT, i);
+      path = xstrdup_printf ("/gresolver/resolve-address/%" G_GSIZE_FORMAT, i);
       g_test_add_data_func (path, &address_tests[i], test_resolve_address_gresolver);
       g_free (path);
     }

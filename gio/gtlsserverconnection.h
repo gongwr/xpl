@@ -27,41 +27,41 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_TLS_SERVER_CONNECTION                (g_tls_server_connection_get_type ())
-#define G_TLS_SERVER_CONNECTION(inst)               (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_TLS_SERVER_CONNECTION, GTlsServerConnection))
+#define XTYPE_TLS_SERVER_CONNECTION                (xtls_server_connection_get_type ())
+#define G_TLS_SERVER_CONNECTION(inst)               (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_TLS_SERVER_CONNECTION, xtls_server_connection))
 #define X_IS_TLS_SERVER_CONNECTION(inst)            (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_TLS_SERVER_CONNECTION))
-#define G_TLS_SERVER_CONNECTION_GET_INTERFACE(inst) (XTYPE_INSTANCE_GET_INTERFACE ((inst), XTYPE_TLS_SERVER_CONNECTION, GTlsServerConnectionInterface))
+#define G_TLS_SERVER_CONNECTION_GET_INTERFACE(inst) (XTYPE_INSTANCE_GET_INTERFACE ((inst), XTYPE_TLS_SERVER_CONNECTION, xtls_server_connection_interface_t))
 
 /**
- * GTlsServerConnection:
+ * xtls_server_connection_t:
  *
  * TLS server-side connection. This is the server-side implementation
- * of a #GTlsConnection.
+ * of a #xtls_connection_t.
  *
  * Since: 2.28
  */
-typedef struct _GTlsServerConnectionInterface GTlsServerConnectionInterface;
+typedef struct _xtls_server_connection_interface xtls_server_connection_interface_t;
 
 /**
- * GTlsServerConnectionInterface:
+ * xtls_server_connection_interface_t:
  * @x_iface: The parent interface.
  *
- * vtable for a #GTlsServerConnection implementation.
+ * vtable for a #xtls_server_connection_t implementation.
  *
  * Since: 2.26
  */
-struct _GTlsServerConnectionInterface
+struct _xtls_server_connection_interface
 {
   xtype_interface_t x_iface;
 
 };
 
 XPL_AVAILABLE_IN_ALL
-xtype_t                 g_tls_server_connection_get_type                 (void) G_GNUC_CONST;
+xtype_t                 xtls_server_connection_get_type                 (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-xio_stream_t *           g_tls_server_connection_new                      (xio_stream_t        *base_io_stream,
-									GTlsCertificate  *certificate,
+xio_stream_t *           xtls_server_connection_new                      (xio_stream_t        *base_io_stream,
+									xtls_certificate_t  *certificate,
 									xerror_t          **error);
 
 G_END_DECLS

@@ -168,8 +168,8 @@ g_atexit (GVoidFunc func)
   errsv = errno;
   if (result)
     {
-      g_error ("Could not register atexit() function: %s",
-               g_strerror (errsv));
+      xerror ("Could not register atexit() function: %s",
+               xstrerror (errsv));
     }
 }
 G_GNUC_END_IGNORE_DEPRECATIONS
@@ -298,13 +298,13 @@ g_find_program_in_path (const xchar_t *program)
 #endif
       )
     {
-      if (g_file_test (program, G_FILE_TEST_IS_EXECUTABLE) &&
-	  !g_file_test (program, G_FILE_TEST_IS_DIR))
+      if (xfile_test (program, XFILE_TEST_IS_EXECUTABLE) &&
+	  !xfile_test (program, XFILE_TEST_IS_DIR))
         {
           xchar_t *out = NULL, *cwd = NULL;
 
           if (g_path_is_absolute (program))
-            return g_strdup (program);
+            return xstrdup (program);
 
           cwd = g_get_current_dir ();
           out = g_build_filename (cwd, program, NULL);
@@ -334,15 +334,15 @@ g_find_program_in_path (const xchar_t *program)
 #else
   n = GetModuleFileNameW (NULL, wfilename, MAXPATHLEN);
   if (n > 0 && n < MAXPATHLEN)
-    filename = g_utf16_to_utf8 (wfilename, -1, NULL, NULL, NULL);
+    filename = xutf16_to_utf8 (wfilename, -1, NULL, NULL, NULL);
 
   n = GetSystemDirectoryW (wsysdir, MAXPATHLEN);
   if (n > 0 && n < MAXPATHLEN)
-    sysdir = g_utf16_to_utf8 (wsysdir, -1, NULL, NULL, NULL);
+    sysdir = xutf16_to_utf8 (wsysdir, -1, NULL, NULL, NULL);
 
   n = GetWindowsDirectoryW (wwindir, MAXPATHLEN);
   if (n > 0 && n < MAXPATHLEN)
-    windir = g_utf16_to_utf8 (wwindir, -1, NULL, NULL, NULL);
+    windir = xutf16_to_utf8 (wwindir, -1, NULL, NULL, NULL);
 
   if (filename)
     {
@@ -350,12 +350,12 @@ g_find_program_in_path (const xchar_t *program)
       g_free (filename);
     }
 
-  path = g_strdup (path);
+  path = xstrdup (path);
 
   if (windir)
     {
       const xchar_t *tem = path;
-      path = g_strconcat (windir, ";", path, NULL);
+      path = xstrconcat (windir, ";", path, NULL);
       g_free ((xchar_t *) tem);
       g_free (windir);
     }
@@ -363,21 +363,21 @@ g_find_program_in_path (const xchar_t *program)
   if (sysdir)
     {
       const xchar_t *tem = path;
-      path = g_strconcat (sysdir, ";", path, NULL);
+      path = xstrconcat (sysdir, ";", path, NULL);
       g_free ((xchar_t *) tem);
       g_free (sysdir);
     }
 
   {
     const xchar_t *tem = path;
-    path = g_strconcat (".;", path, NULL);
+    path = xstrconcat (".;", path, NULL);
     g_free ((xchar_t *) tem);
   }
 
   if (appdir)
     {
       const xchar_t *tem = path;
-      path = g_strconcat (appdir, ";", path, NULL);
+      path = xstrconcat (appdir, ";", path, NULL);
       g_free ((xchar_t *) tem);
       g_free (appdir);
     }
@@ -411,12 +411,12 @@ g_find_program_in_path (const xchar_t *program)
       else
         startp = memcpy (name - (p - path), path, p - path);
 
-      if (g_file_test (startp, G_FILE_TEST_IS_EXECUTABLE) &&
-	  !g_file_test (startp, G_FILE_TEST_IS_DIR))
+      if (xfile_test (startp, XFILE_TEST_IS_EXECUTABLE) &&
+	  !xfile_test (startp, XFILE_TEST_IS_DIR))
         {
           xchar_t *ret;
           if (g_path_is_absolute (startp)) {
-            ret = g_strdup (startp);
+            ret = xstrdup (startp);
           } else {
             xchar_t *cwd = NULL;
             cwd = g_get_current_dir ();
@@ -535,7 +535,7 @@ get_special_folder (REFKNOWNFOLDERID known_folder_guid_ptr)
   hr = SHGetKnownFolderPath (known_folder_guid_ptr, 0, NULL, &wcp);
 
   if (SUCCEEDED (hr))
-    result = g_utf16_to_utf8 (wcp, -1, NULL, NULL, NULL);
+    result = xutf16_to_utf8 (wcp, -1, NULL, NULL, NULL);
 
   CoTaskMemFree (wcp);
 
@@ -552,11 +552,11 @@ get_windows_directory_root (void)
       /* Usually X:\Windows, but in terminal server environments
        * might be an UNC path, AFAIK.
        */
-      char *windowsdir = g_utf16_to_utf8 (wwindowsdir, -1, NULL, NULL, NULL);
+      char *windowsdir = xutf16_to_utf8 (wwindowsdir, -1, NULL, NULL, NULL);
       char *p;
 
       if (windowsdir == NULL)
-	return g_strdup ("C:\\");
+	return xstrdup ("C:\\");
 
       p = (char *) g_path_skip_root (windowsdir);
       if (X_IS_DIR_SEPARATOR (p[-1]) && p[-2] != ':')
@@ -565,7 +565,7 @@ get_windows_directory_root (void)
       return windowsdir;
     }
   else
-    return g_strdup ("C:\\");
+    return xstrdup ("C:\\");
 }
 
 #endif
@@ -591,12 +591,12 @@ g_get_user_database_entry (void)
         struct passwd pwd;
 #    ifdef _SC_GETPW_R_SIZE_MAX
         /* This reurns the maximum length */
-        glong bufsize = sysconf (_SC_GETPW_R_SIZE_MAX);
+        xlong_t bufsize = sysconf (_SC_GETPW_R_SIZE_MAX);
 
         if (bufsize < 0)
           bufsize = 64;
 #    else /* _SC_GETPW_R_SIZE_MAX */
-        glong bufsize = 64;
+        xlong_t bufsize = 64;
 #    endif /* _SC_GETPW_R_SIZE_MAX */
 
         logname = (xchar_t *) g_getenv ("LOGNAME");
@@ -637,7 +637,7 @@ g_get_user_database_entry (void)
                 if (bufsize > 32 * 1024)
                   {
                     g_warning ("getpwuid_r(): failed due to: %s.",
-                               g_strerror (error));
+                               xstrerror (error));
                     break;
                   }
 
@@ -653,7 +653,7 @@ g_get_user_database_entry (void)
           }
         if (pw)
           {
-            e.user_name = g_strdup (pw->pw_name);
+            e.user_name = xstrdup (pw->pw_name);
 
 #ifndef __BIONIC__
             if (pw->pw_gecos && *pw->pw_gecos != '\0' && pw->pw_name)
@@ -663,19 +663,19 @@ g_get_user_database_entry (void)
                 xchar_t *uppercase_pw_name;
 
                 /* split the gecos field and substitute '&' */
-                gecos_fields = g_strsplit (pw->pw_gecos, ",", 0);
-                name_parts = g_strsplit (gecos_fields[0], "&", 0);
-                uppercase_pw_name = g_strdup (pw->pw_name);
+                gecos_fields = xstrsplit (pw->pw_gecos, ",", 0);
+                name_parts = xstrsplit (gecos_fields[0], "&", 0);
+                uppercase_pw_name = xstrdup (pw->pw_name);
                 uppercase_pw_name[0] = g_ascii_toupper (uppercase_pw_name[0]);
-                e.real_name = g_strjoinv (uppercase_pw_name, name_parts);
-                g_strfreev (gecos_fields);
-                g_strfreev (name_parts);
+                e.real_name = xstrjoinv (uppercase_pw_name, name_parts);
+                xstrfreev (gecos_fields);
+                xstrfreev (name_parts);
                 g_free (uppercase_pw_name);
               }
 #endif
 
             if (!e.home_dir)
-              e.home_dir = g_strdup (pw->pw_dir);
+              e.home_dir = xstrdup (pw->pw_dir);
           }
         g_free (buffer);
       }
@@ -689,16 +689,16 @@ g_get_user_database_entry (void)
 
         if (GetUserNameW (buffer, (LPDWORD) &len))
           {
-            e.user_name = g_utf16_to_utf8 (buffer, -1, NULL, NULL, NULL);
-            e.real_name = g_strdup (e.user_name);
+            e.user_name = xutf16_to_utf8 (buffer, -1, NULL, NULL, NULL);
+            e.real_name = xstrdup (e.user_name);
           }
       }
 #endif /* G_OS_WIN32 */
 
       if (!e.user_name)
-        e.user_name = g_strdup ("somebody");
+        e.user_name = xstrdup ("somebody");
       if (!e.real_name)
-        e.real_name = g_strdup ("Unknown");
+        e.real_name = xstrdup ("Unknown");
 
       g_once_init_leave (&entry, &e);
     }
@@ -756,7 +756,7 @@ g_build_home_dir (void)
   xchar_t *home_dir;
 
   /* We first check HOME and use it if it is set */
-  home_dir = g_strdup (g_getenv ("HOME"));
+  home_dir = xstrdup (g_getenv ("HOME"));
 
 #ifdef G_OS_WIN32
   /* Only believe HOME if it is an absolute path and exists.
@@ -770,7 +770,7 @@ g_build_home_dir (void)
   if (home_dir != NULL)
     {
       if (!(g_path_is_absolute (home_dir) &&
-            g_file_test (home_dir, G_FILE_TEST_IS_DIR)))
+            xfile_test (home_dir, XFILE_TEST_IS_DIR)))
         g_clear_pointer (&home_dir, g_free);
     }
 
@@ -788,7 +788,7 @@ g_build_home_dir (void)
     {
       /* USERPROFILE is probably the closest equivalent to $HOME? */
       if (g_getenv ("USERPROFILE") != NULL)
-        home_dir = g_strdup (g_getenv ("USERPROFILE"));
+        home_dir = xstrdup (g_getenv ("USERPROFILE"));
     }
 
   if (home_dir == NULL)
@@ -804,7 +804,7 @@ g_build_home_dir (void)
        * to read the user database entry.
        */
       UserDatabaseEntry *entry = g_get_user_database_entry ();
-      home_dir = g_strdup (entry->home_dir);
+      home_dir = xstrdup (entry->home_dir);
     }
 
   /* If we have been denied access to /etc/passwd (for example, by an
@@ -814,7 +814,7 @@ g_build_home_dir (void)
     {
       g_warning ("Could not find home directory: $HOME is not set, and "
                  "user database could not be read.");
-      home_dir = g_strdup ("/");
+      home_dir = xstrdup ("/");
     }
 
   return g_steal_pointer (&home_dir);
@@ -892,7 +892,7 @@ g_get_tmp_dir (void)
       xchar_t *tmp;
 
 #ifdef G_OS_WIN32
-      tmp = g_strdup (g_getenv ("TEMP"));
+      tmp = xstrdup (g_getenv ("TEMP"));
 
       if (tmp == NULL || *tmp == '\0')
         {
@@ -900,14 +900,14 @@ g_get_tmp_dir (void)
           tmp = get_windows_directory_root ();
         }
 #else /* G_OS_WIN32 */
-      tmp = g_strdup (g_getenv ("TMPDIR"));
+      tmp = xstrdup (g_getenv ("TMPDIR"));
 
 #ifdef P_tmpdir
       if (tmp == NULL || *tmp == '\0')
         {
           xsize_t k;
           g_free (tmp);
-          tmp = g_strdup (P_tmpdir);
+          tmp = xstrdup (P_tmpdir);
           k = strlen (tmp);
           if (k > 1 && X_IS_DIR_SEPARATOR (tmp[k - 1]))
             tmp[k - 1] = '\0';
@@ -917,7 +917,7 @@ g_get_tmp_dir (void)
       if (tmp == NULL || *tmp == '\0')
         {
           g_free (tmp);
-          tmp = g_strdup ("/tmp");
+          tmp = xstrdup ("/tmp");
         }
 #endif /* !G_OS_WIN32 */
 
@@ -972,7 +972,7 @@ g_get_host_name (void)
 
 #ifdef _SC_HOST_NAME_MAX
       {
-        glong max;
+        xlong_t max;
 
         max = sysconf (_SC_HOST_NAME_MAX);
         if (max > 0 && (xsize_t) max <= G_MAXSIZE - 1)
@@ -1006,12 +1006,12 @@ g_get_host_name (void)
       DWORD size = sizeof (tmp) / sizeof (tmp[0]);
       failed = (!GetComputerNameW (tmp, &size));
       if (!failed)
-        utmp = g_utf16_to_utf8 (tmp, size, NULL, NULL, NULL);
+        utmp = xutf16_to_utf8 (tmp, size, NULL, NULL, NULL);
       if (utmp == NULL)
         failed = TRUE;
 #endif
 
-      g_once_init_leave (&hostname, failed ? g_strdup ("localhost") : utmp);
+      g_once_init_leave (&hostname, failed ? xstrdup ("localhost") : utmp);
     }
 
   return hostname;
@@ -1026,8 +1026,8 @@ static const xchar_t *g_prgname = NULL; /* always a quark */
  * Gets the name of the program. This name should not be localized,
  * in contrast to g_get_application_name().
  *
- * If you are using #GApplication the program name is set in
- * g_application_run(). In case of GDK or GTK+ it is set in
+ * If you are using #xapplication_t the program name is set in
+ * xapplication_run(). In case of GDK or GTK+ it is set in
  * gdk_init(), which is called by gtk_init() and the
  * #GtkApplication::startup handler. The program name is found by
  * taking the last component of @argv[0].
@@ -1055,8 +1055,8 @@ g_get_prgname (void)
  * Sets the name of the program. This name should not be localized,
  * in contrast to g_set_application_name().
  *
- * If you are using #GApplication the program name is set in
- * g_application_run(). In case of GDK or GTK+ it is set in
+ * If you are using #xapplication_t the program name is set in
+ * xapplication_run(). In case of GDK or GTK+ it is set in
  * gdk_init(), which is called by gtk_init() and the
  * #GtkApplication::startup handler. The program name is found by
  * taking the last component of @argv[0].
@@ -1068,14 +1068,14 @@ g_get_prgname (void)
 void
 g_set_prgname (const xchar_t *prgname)
 {
-  GQuark qprgname = g_quark_from_string (prgname);
+  xquark qprgname = g_quark_from_string (prgname);
   G_LOCK (g_prgname);
   g_prgname = g_quark_to_string (qprgname);
   G_UNLOCK (g_prgname);
 }
 
-G_LOCK_DEFINE_STATIC (g_application_name);
-static xchar_t *g_application_name = NULL;
+G_LOCK_DEFINE_STATIC (xapplication_name);
+static xchar_t *xapplication_name = NULL;
 
 /**
  * g_get_application_name:
@@ -1098,9 +1098,9 @@ g_get_application_name (void)
 {
   xchar_t* retval;
 
-  G_LOCK (g_application_name);
-  retval = g_application_name;
-  G_UNLOCK (g_application_name);
+  G_LOCK (xapplication_name);
+  retval = xapplication_name;
+  G_UNLOCK (xapplication_name);
 
   if (retval == NULL)
     return g_get_prgname ();
@@ -1131,12 +1131,12 @@ g_set_application_name (const xchar_t *application_name)
 {
   xboolean_t already_set = FALSE;
 
-  G_LOCK (g_application_name);
-  if (g_application_name)
+  G_LOCK (xapplication_name);
+  if (xapplication_name)
     already_set = TRUE;
   else
-    g_application_name = g_strdup (application_name);
-  G_UNLOCK (g_application_name);
+    xapplication_name = xstrdup (application_name);
+  G_UNLOCK (xapplication_name);
 
   if (already_set)
     g_warning ("g_set_application_name() called multiple times");
@@ -1212,8 +1212,8 @@ get_registry_str (HKEY root_key, const wchar_t *path, const wchar_t *value_name)
   result = NULL;
 
   if (status == ERROR_SUCCESS && value_type_w2 == REG_SZ)
-    result = g_utf16_to_utf8 ((gunichar2 *) req_value_data,
-                              req_value_data_size / sizeof (gunichar2),
+    result = xutf16_to_utf8 ((xunichar2_t *) req_value_data,
+                              req_value_data_size / sizeof (xunichar2_t),
                               NULL,
                               NULL,
                               NULL);
@@ -1251,7 +1251,7 @@ get_windows_8_1_update (void)
           *end == L'\0')
         {
           if (build >= 9600)
-            result = g_strdup ("Update 1");
+            result = xstrdup ("Update 1");
         }
     }
 
@@ -1263,7 +1263,7 @@ get_windows_8_1_update (void)
 static xchar_t *
 get_windows_version (xboolean_t with_windows)
 {
-  GString *version = g_string_new (NULL);
+  xstring_t *version = xstring_new (NULL);
   xboolean_t is_win_server = FALSE;
 
   if (g_win32_check_windows_version (10, 0, 0, G_WIN32_OS_ANY))
@@ -1299,19 +1299,19 @@ get_windows_version (xboolean_t with_windows)
            * Windows 2016 Server is actually Windows 10.0.14393+,
            * so look at the build number
            */
-          g_string_append (version, "Server");
+          xstring_append (version, "Server");
           if (osinfo.dwBuildNumber >= 20348)
-            g_string_append (version, " 2022");
+            xstring_append (version, " 2022");
           else if (osinfo.dwBuildNumber >= 17763)
-            g_string_append (version, " 2019");
+            xstring_append (version, " 2019");
           else
-            g_string_append (version, " 2016");
+            xstring_append (version, " 2016");
         }
 
       if (is_win11)
-        g_string_append (version, "11");
+        xstring_append (version, "11");
       else if (!is_win_server)
-        g_string_append (version, "10");
+        xstring_append (version, "10");
 
       /* Windows 10/Server 2016+ is identified by its ReleaseId or
        * DisplayVersion (since 20H2), such as
@@ -1327,8 +1327,8 @@ get_windows_version (xboolean_t with_windows)
 
       if (win10_release != NULL)
         {
-          if (g_strcmp0 (win10_release, "2009") != 0)
-            g_string_append_printf (version, " %s", win10_release);
+          if (xstrcmp0 (win10_release, "2009") != 0)
+            xstring_append_printf (version, " %s", win10_release);
           else
             {
               g_free (win10_release);
@@ -1341,9 +1341,9 @@ get_windows_version (xboolean_t with_windows)
                                                 L"DisplayVersion");
 
               if (win10_release != NULL)
-                g_string_append_printf (version, " %s", win10_release);
+                xstring_append_printf (version, " %s", win10_release);
               else
-                g_string_append_printf (version, " 2009");
+                xstring_append_printf (version, " 2009");
             }
         }
 
@@ -1354,14 +1354,14 @@ get_windows_version (xboolean_t with_windows)
       xchar_t *win81_update;
 
       if (g_win32_check_windows_version (6, 3, 0, G_WIN32_OS_WORKSTATION))
-        g_string_append (version, "8.1");
+        xstring_append (version, "8.1");
       else
-        g_string_append (version, "Server 2012 R2");
+        xstring_append (version, "Server 2012 R2");
 
       win81_update = get_windows_8_1_update ();
 
       if (win81_update != NULL)
-        g_string_append_printf (version, " %s", win81_update);
+        xstring_append_printf (version, " %s", win81_update);
 
       g_free (win81_update);
     }
@@ -1374,7 +1374,7 @@ get_windows_version (xboolean_t with_windows)
           if (!g_win32_check_windows_version (versions[i].major, versions[i].minor, versions[i].sp, G_WIN32_OS_ANY))
             continue;
 
-          g_string_append (version, versions[i].version);
+          xstring_append (version, versions[i].version);
 
           if (g_win32_check_windows_version (versions[i].major, versions[i].minor, versions[i].sp, G_WIN32_OS_SERVER))
             {
@@ -1384,31 +1384,31 @@ get_windows_version (xboolean_t with_windows)
                */
               if (versions[i].major == 6)
                 {
-                  g_string_append (version, "Server");
+                  xstring_append (version, "Server");
                   if (versions[i].minor == 2)
-                    g_string_append (version, " 2012");
+                    xstring_append (version, " 2012");
                   else if (versions[i].minor == 1)
-                    g_string_append (version, " 2008 R2");
+                    xstring_append (version, " 2008 R2");
                   else
-                    g_string_append (version, " 2008");
+                    xstring_append (version, " 2008");
                 }
             }
 
-          g_string_append (version, versions[i].spversion);
+          xstring_append (version, versions[i].spversion);
         }
     }
 
   if (version->len == 0)
     {
-      g_string_free (version, TRUE);
+      xstring_free (version, TRUE);
 
       return NULL;
     }
 
   if (with_windows)
-    g_string_prepend (version, "Windows ");
+    xstring_prepend (version, "Windows ");
 
-  return g_string_free (version, FALSE);
+  return xstring_free (version, FALSE);
 }
 #endif
 
@@ -1417,40 +1417,40 @@ static xchar_t *
 get_os_info_from_os_release (const xchar_t *key_name,
                              const xchar_t *buffer)
 {
-  GStrv lines;
+  xstrv_t lines;
   xchar_t *prefix;
   size_t i;
   xchar_t *result = NULL;
 
-  lines = g_strsplit (buffer, "\n", -1);
-  prefix = g_strdup_printf ("%s=", key_name);
+  lines = xstrsplit (buffer, "\n", -1);
+  prefix = xstrdup_printf ("%s=", key_name);
   for (i = 0; lines[i] != NULL; i++)
     {
       const xchar_t *line = lines[i];
       const xchar_t *value;
 
-      if (g_str_has_prefix (line, prefix))
+      if (xstr_has_prefix (line, prefix))
         {
           value = line + strlen (prefix);
           result = g_shell_unquote (value, NULL);
           if (result == NULL)
-            result = g_strdup (value);
+            result = xstrdup (value);
           break;
         }
     }
-  g_strfreev (lines);
+  xstrfreev (lines);
   g_free (prefix);
 
 #ifdef __linux__
   /* Default values in spec */
   if (result == NULL)
     {
-      if (g_str_equal (key_name, G_OS_INFO_KEY_NAME))
-        return g_strdup ("Linux");
-      if (g_str_equal (key_name, G_OS_INFO_KEY_ID))
-        return g_strdup ("linux");
-      if (g_str_equal (key_name, G_OS_INFO_KEY_PRETTY_NAME))
-        return g_strdup ("Linux");
+      if (xstr_equal (key_name, G_OS_INFO_KEY_NAME))
+        return xstrdup ("Linux");
+      if (xstr_equal (key_name, G_OS_INFO_KEY_ID))
+        return xstrdup ("linux");
+      if (xstr_equal (key_name, G_OS_INFO_KEY_PRETTY_NAME))
+        return xstrdup ("Linux");
     }
 #endif
 
@@ -1466,16 +1466,16 @@ get_os_info_from_uname (const xchar_t *key_name)
     return NULL;
 
   if (strcmp (key_name, G_OS_INFO_KEY_NAME) == 0)
-    return g_strdup (info.sysname);
+    return xstrdup (info.sysname);
   else if (strcmp (key_name, G_OS_INFO_KEY_VERSION) == 0)
-    return g_strdup (info.release);
+    return xstrdup (info.release);
   else if (strcmp (key_name, G_OS_INFO_KEY_PRETTY_NAME) == 0)
-    return g_strdup_printf ("%s %s", info.sysname, info.release);
+    return xstrdup_printf ("%s %s", info.sysname, info.release);
   else if (strcmp (key_name, G_OS_INFO_KEY_ID) == 0)
     {
       xchar_t *result = g_ascii_strdown (info.sysname, -1);
 
-      g_strcanon (result, "abcdefghijklmnopqrstuvwxyz0123456789_-.", '_');
+      xstrcanon (result, "abcdefghijklmnopqrstuvwxyz0123456789_-.", '_');
       return g_steal_pointer (&result);
     }
   else if (strcmp (key_name, G_OS_INFO_KEY_VERSION_ID) == 0)
@@ -1492,7 +1492,7 @@ get_os_info_from_uname (const xchar_t *key_name)
       if (strcmp (info.sysname, "NetBSD") == 0)
         {
           /* sed -e 's,[-_].*,,' */
-          gssize len = G_MAXSSIZE;
+          xssize_t len = G_MAXSSIZE;
           const xchar_t *c;
 
           if ((c = strchr (info.release, '-')) != NULL)
@@ -1507,7 +1507,7 @@ get_os_info_from_uname (const xchar_t *key_name)
       else if (strcmp (info.sysname, "GNU") == 0)
         {
           /* sed -e 's,/.*$,,' */
-          gssize len = -1;
+          xssize_t len = -1;
           const xchar_t *c = strchr (info.release, '/');
 
           if (c != NULL)
@@ -1515,12 +1515,12 @@ get_os_info_from_uname (const xchar_t *key_name)
 
           result = g_ascii_strdown (info.release, len);
         }
-      else if (g_str_has_prefix (info.sysname, "GNU/") ||
+      else if (xstr_has_prefix (info.sysname, "GNU/") ||
                strcmp (info.sysname, "FreeBSD") == 0 ||
                strcmp (info.sysname, "DragonFly") == 0)
         {
           /* sed -e 's,[-(].*,,' */
-          gssize len = G_MAXSSIZE;
+          xssize_t len = G_MAXSSIZE;
           const xchar_t *c;
 
           if ((c = strchr (info.release, '-')) != NULL)
@@ -1535,7 +1535,7 @@ get_os_info_from_uname (const xchar_t *key_name)
       else
         result = g_ascii_strdown (info.release, -1);
 
-      g_strcanon (result, "abcdefghijklmnopqrstuvwxyz0123456789_-.", '_');
+      xstrcanon (result, "abcdefghijklmnopqrstuvwxyz0123456789_-.", '_');
       return g_steal_pointer (&result);
     }
   else
@@ -1565,8 +1565,8 @@ xchar_t *
 g_get_os_info (const xchar_t *key_name)
 {
 #if defined (__APPLE__)
-  if (g_strcmp0 (key_name, G_OS_INFO_KEY_NAME) == 0)
-    return g_strdup ("macOS");
+  if (xstrcmp0 (key_name, G_OS_INFO_KEY_NAME) == 0)
+    return xstrdup ("macOS");
   else
     return NULL;
 #elif defined (G_OS_UNIX)
@@ -1582,10 +1582,10 @@ g_get_os_info (const xchar_t *key_name)
       xerror_t *error = NULL;
       xboolean_t file_missing;
 
-      if (g_file_get_contents (os_release_files[i], &buffer, NULL, &error))
+      if (xfile_get_contents (os_release_files[i], &buffer, NULL, &error))
         break;
 
-      file_missing = g_error_matches (error, G_FILE_ERROR, G_FILE_ERROR_NOENT);
+      file_missing = xerror_matches (error, XFILE_ERROR, XFILE_ERROR_NOENT);
       g_clear_error (&error);
 
       if (!file_missing)
@@ -1600,17 +1600,17 @@ g_get_os_info (const xchar_t *key_name)
   g_free (buffer);
   return g_steal_pointer (&result);
 #elif defined (G_OS_WIN32)
-  if (g_strcmp0 (key_name, G_OS_INFO_KEY_NAME) == 0)
-    return g_strdup ("Windows");
-  else if (g_strcmp0 (key_name, G_OS_INFO_KEY_ID) == 0)
-    return g_strdup ("windows");
-  else if (g_strcmp0 (key_name, G_OS_INFO_KEY_PRETTY_NAME) == 0)
+  if (xstrcmp0 (key_name, G_OS_INFO_KEY_NAME) == 0)
+    return xstrdup ("Windows");
+  else if (xstrcmp0 (key_name, G_OS_INFO_KEY_ID) == 0)
+    return xstrdup ("windows");
+  else if (xstrcmp0 (key_name, G_OS_INFO_KEY_PRETTY_NAME) == 0)
     /* Windows XP SP2 or Windows 10 1903 or Windows 7 Server SP1 */
     return get_windows_version (TRUE);
-  else if (g_strcmp0 (key_name, G_OS_INFO_KEY_VERSION) == 0)
+  else if (xstrcmp0 (key_name, G_OS_INFO_KEY_VERSION) == 0)
     /* XP SP2 or 10 1903 or 7 Server SP1 */
     return get_windows_version (FALSE);
-  else if (g_strcmp0 (key_name, G_OS_INFO_KEY_VERSION_ID) == 0)
+  else if (xstrcmp0 (key_name, G_OS_INFO_KEY_VERSION_ID) == 0)
     {
       /* xp_sp2 or 10_1903 or 7_server_sp1 */
       xchar_t *result;
@@ -1622,18 +1622,18 @@ g_get_os_info (const xchar_t *key_name)
       result = g_ascii_strdown (version, -1);
       g_free (version);
 
-      return g_strcanon (result, "abcdefghijklmnopqrstuvwxyz0123456789_-.", '_');
+      return xstrcanon (result, "abcdefghijklmnopqrstuvwxyz0123456789_-.", '_');
     }
-  else if (g_strcmp0 (key_name, G_OS_INFO_KEY_HOME_URL) == 0)
-    return g_strdup ("https://microsoft.com/windows/");
-  else if (g_strcmp0 (key_name, G_OS_INFO_KEY_DOCUMENTATION_URL) == 0)
-    return g_strdup ("https://docs.microsoft.com/");
-  else if (g_strcmp0 (key_name, G_OS_INFO_KEY_SUPPORT_URL) == 0)
-    return g_strdup ("https://support.microsoft.com/");
-  else if (g_strcmp0 (key_name, G_OS_INFO_KEY_BUG_REPORT_URL) == 0)
-    return g_strdup ("https://support.microsoft.com/contactus/");
-  else if (g_strcmp0 (key_name, G_OS_INFO_KEY_PRIVACY_POLICY_URL) == 0)
-    return g_strdup ("https://privacy.microsoft.com/");
+  else if (xstrcmp0 (key_name, G_OS_INFO_KEY_HOME_URL) == 0)
+    return xstrdup ("https://microsoft.com/windows/");
+  else if (xstrcmp0 (key_name, G_OS_INFO_KEY_DOCUMENTATION_URL) == 0)
+    return xstrdup ("https://docs.microsoft.com/");
+  else if (xstrcmp0 (key_name, G_OS_INFO_KEY_SUPPORT_URL) == 0)
+    return xstrdup ("https://support.microsoft.com/");
+  else if (xstrcmp0 (key_name, G_OS_INFO_KEY_BUG_REPORT_URL) == 0)
+    return xstrdup ("https://support.microsoft.com/contactus/");
+  else if (xstrcmp0 (key_name, G_OS_INFO_KEY_PRIVACY_POLICY_URL) == 0)
+    return xstrdup ("https://privacy.microsoft.com/");
   else
     return NULL;
 #endif
@@ -1649,14 +1649,14 @@ set_str_if_different (xchar_t       **global_str,
                       const xchar_t  *new_value)
 {
   if (*global_str == NULL ||
-      !g_str_equal (new_value, *global_str))
+      !xstr_equal (new_value, *global_str))
     {
       g_debug ("g_set_user_dirs: Setting %s to %s", type, new_value);
 
       /* We have to leak the old value, as user code could be retaining pointers
        * to it. */
       g_ignore_leak (*global_str);
-      *global_str = g_strdup (new_value);
+      *global_str = xstrdup (new_value);
     }
 }
 
@@ -1666,16 +1666,16 @@ set_strv_if_different (xchar_t                ***global_strv,
                        const xchar_t  * const   *new_value)
 {
   if (*global_strv == NULL ||
-      !g_strv_equal (new_value, (const xchar_t * const *) *global_strv))
+      !xstrv_equal (new_value, (const xchar_t * const *) *global_strv))
     {
-      xchar_t *new_value_str = g_strjoinv (":", (xchar_t **) new_value);
+      xchar_t *new_value_str = xstrjoinv (":", (xchar_t **) new_value);
       g_debug ("g_set_user_dirs: Setting %s to %s", type, new_value_str);
       g_free (new_value_str);
 
       /* We have to leak the old value, as user code could be retaining pointers
        * to it. */
       g_ignore_strv_leak (*global_strv);
-      *global_strv = g_strdupv ((xchar_t **) new_value);
+      *global_strv = xstrdupv ((xchar_t **) new_value);
     }
 }
 
@@ -1722,24 +1722,24 @@ g_set_user_dirs (const xchar_t *first_dir_type,
 
   for (dir_type = first_dir_type; dir_type != NULL; dir_type = va_arg (args, const xchar_t *))
     {
-      gconstpointer dir_value = va_arg (args, gconstpointer);
+      xconstpointer dir_value = va_arg (args, xconstpointer);
       g_assert (dir_value != NULL);
 
-      if (g_str_equal (dir_type, "HOME"))
+      if (xstr_equal (dir_type, "HOME"))
         set_str_if_different (&g_home_dir, dir_type, dir_value);
-      else if (g_str_equal (dir_type, "XDG_CACHE_HOME"))
+      else if (xstr_equal (dir_type, "XDG_CACHE_HOME"))
         set_str_if_different (&g_user_cache_dir, dir_type, dir_value);
-      else if (g_str_equal (dir_type, "XDG_CONFIG_DIRS"))
+      else if (xstr_equal (dir_type, "XDG_CONFIG_DIRS"))
         set_strv_if_different (&g_system_config_dirs, dir_type, dir_value);
-      else if (g_str_equal (dir_type, "XDG_CONFIG_HOME"))
+      else if (xstr_equal (dir_type, "XDG_CONFIG_HOME"))
         set_str_if_different (&g_user_config_dir, dir_type, dir_value);
-      else if (g_str_equal (dir_type, "XDG_DATA_DIRS"))
+      else if (xstr_equal (dir_type, "XDG_DATA_DIRS"))
         set_strv_if_different (&g_system_data_dirs, dir_type, dir_value);
-      else if (g_str_equal (dir_type, "XDG_DATA_HOME"))
+      else if (xstr_equal (dir_type, "XDG_DATA_HOME"))
         set_str_if_different (&g_user_data_dir, dir_type, dir_value);
-      else if (g_str_equal (dir_type, "XDG_STATE_HOME"))
+      else if (xstr_equal (dir_type, "XDG_STATE_HOME"))
         set_str_if_different (&g_user_state_dir, dir_type, dir_value);
-      else if (g_str_equal (dir_type, "XDG_RUNTIME_DIR"))
+      else if (xstr_equal (dir_type, "XDG_RUNTIME_DIR"))
         set_str_if_different (&g_user_runtime_dir, dir_type, dir_value);
       else
         g_assert_not_reached ();
@@ -1757,7 +1757,7 @@ g_build_user_data_dir (void)
   const xchar_t *data_dir_env = g_getenv ("XDG_DATA_HOME");
 
   if (data_dir_env && data_dir_env[0])
-    data_dir = g_strdup (data_dir_env);
+    data_dir = xstrdup (data_dir_env);
 #ifdef G_OS_WIN32
   else
     data_dir = get_special_folder (&FOLDERID_LocalAppData);
@@ -1821,7 +1821,7 @@ g_build_user_config_dir (void)
   const xchar_t *config_dir_env = g_getenv ("XDG_CONFIG_HOME");
 
   if (config_dir_env && config_dir_env[0])
-    config_dir = g_strdup (config_dir_env);
+    config_dir = xstrdup (config_dir_env);
 #ifdef G_OS_WIN32
   else
     config_dir = get_special_folder (&FOLDERID_LocalAppData);
@@ -1884,7 +1884,7 @@ g_build_user_cache_dir (void)
   const xchar_t *cache_dir_env = g_getenv ("XDG_CACHE_HOME");
 
   if (cache_dir_env && cache_dir_env[0])
-    cache_dir = g_strdup (cache_dir_env);
+    cache_dir = xstrdup (cache_dir_env);
 #ifdef G_OS_WIN32
   else
     cache_dir = get_special_folder (&FOLDERID_InternetCache);
@@ -1946,7 +1946,7 @@ g_build_user_state_dir (void)
   const xchar_t *state_dir_env = g_getenv ("XDG_STATE_HOME");
 
   if (state_dir_env && state_dir_env[0])
-    state_dir = g_strdup (state_dir_env);
+    state_dir = xstrdup (state_dir_env);
 #ifdef G_OS_WIN32
   else
     state_dir = get_special_folder (&FOLDERID_LocalAppData);
@@ -2011,7 +2011,7 @@ g_build_user_runtime_dir (void)
 
   if (runtime_dir_env && runtime_dir_env[0])
     {
-      runtime_dir = g_strdup (runtime_dir_env);
+      runtime_dir = xstrdup (runtime_dir_env);
 
       /* If the XDG_RUNTIME_DIR environment variable is set, we are being told by
        * the OS that this directory exists and is appropriately configured
@@ -2153,14 +2153,14 @@ load_user_special_dirs (void)
                                   NULL);
   g_free (config_dir);
 
-  if (!g_file_get_contents (config_file, &data, NULL, NULL))
+  if (!xfile_get_contents (config_file, &data, NULL, NULL))
     {
       g_free (config_file);
       return;
     }
 
-  lines = g_strsplit (data, "\n", -1);
-  n_lines = g_strv_length (lines);
+  lines = xstrsplit (data, "\n", -1);
+  n_lines = xstrv_length (lines);
   g_free (data);
 
   for (i = 0; i < n_lines; i++)
@@ -2264,10 +2264,10 @@ load_user_special_dirs (void)
           g_free (home_dir);
         }
       else
-	g_user_special_dirs[directory] = g_strdup (d);
+	g_user_special_dirs[directory] = xstrdup (d);
     }
 
-  g_strfreev (lines);
+  xstrfreev (lines);
   g_free (config_file);
 }
 
@@ -2313,7 +2313,7 @@ g_reload_user_special_dirs_cache (void)
             {
               g_user_special_dirs[i] = old_val;
             }
-          else if (g_strcmp0 (old_val, g_user_special_dirs[i]) == 0)
+          else if (xstrcmp0 (old_val, g_user_special_dirs[i]) == 0)
             {
               /* don't leak */
               g_free (g_user_special_dirs[i]);
@@ -2387,7 +2387,7 @@ g_get_user_special_dir (GUserDirectory directory)
 #undef g_get_system_data_dirs
 
 static HMODULE
-get_module_for_address (gconstpointer address)
+get_module_for_address (xconstpointer address)
 {
   /* Holds the g_utils_global lock */
 
@@ -2409,7 +2409,7 @@ get_module_for_address (gconstpointer address)
 }
 
 static xchar_t *
-get_module_share_dir (gconstpointer address)
+get_module_share_dir (xconstpointer address)
 {
   HMODULE hmodule;
   xchar_t *filename;
@@ -2429,9 +2429,9 @@ get_module_share_dir (gconstpointer address)
 static const xchar_t * const *
 g_win32_get_system_data_dirs_for_module_real (void (*address_of_function)(void))
 {
-  GArray *data_dirs;
+  xarray_t *data_dirs;
   HMODULE hmodule;
-  static GHashTable *per_module_data_dirs = NULL;
+  static xhashtable_t *per_module_data_dirs = NULL;
   xchar_t **retval;
   xchar_t *p;
   xchar_t *exe_root;
@@ -2444,10 +2444,10 @@ g_win32_get_system_data_dirs_for_module_real (void (*address_of_function)(void))
       if (hmodule != NULL)
 	{
 	  if (per_module_data_dirs == NULL)
-	    per_module_data_dirs = g_hash_table_new (NULL, NULL);
+	    per_module_data_dirs = xhash_table_new (NULL, NULL);
 	  else
 	    {
-	      retval = g_hash_table_lookup (per_module_data_dirs, hmodule);
+	      retval = xhash_table_lookup (per_module_data_dirs, hmodule);
 
 	      if (retval != NULL)
 		{
@@ -2516,7 +2516,7 @@ g_win32_get_system_data_dirs_for_module_real (void (*address_of_function)(void))
   if (address_of_function)
     {
       if (hmodule != NULL)
-	g_hash_table_insert (per_module_data_dirs, hmodule, retval);
+	xhash_table_insert (per_module_data_dirs, hmodule, retval);
       G_UNLOCK (g_utils_global);
     }
 
@@ -2586,12 +2586,12 @@ g_build_system_data_dirs (void)
   if (!data_dirs || !data_dirs[0])
     data_dirs = "/usr/local/share/:/usr/share/";
 
-  data_dir_vector = g_strsplit (data_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
+  data_dir_vector = xstrsplit (data_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
 #else
   if (!data_dirs || !data_dirs[0])
-    data_dir_vector = g_strdupv ((xchar_t **) g_win32_get_system_data_dirs_for_module_real (NULL));
+    data_dir_vector = xstrdupv ((xchar_t **) g_win32_get_system_data_dirs_for_module_real (NULL));
   else
-    data_dir_vector = g_strsplit (data_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
+    data_dir_vector = xstrsplit (data_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
 #endif
 
   return g_steal_pointer (&data_dir_vector);
@@ -2665,17 +2665,17 @@ g_build_system_config_dirs (void)
 #ifdef G_OS_WIN32
   if (conf_dirs)
     {
-      conf_dir_vector = g_strsplit (conf_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
+      conf_dir_vector = xstrsplit (conf_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
     }
   else
     {
       xchar_t *special_conf_dirs = get_special_folder (&FOLDERID_ProgramData);
 
       if (special_conf_dirs)
-        conf_dir_vector = g_strsplit (special_conf_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
+        conf_dir_vector = xstrsplit (special_conf_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
       else
         /* Return empty list */
-        conf_dir_vector = g_strsplit ("", G_SEARCHPATH_SEPARATOR_S, 0);
+        conf_dir_vector = xstrsplit ("", G_SEARCHPATH_SEPARATOR_S, 0);
 
       g_free (special_conf_dirs);
     }
@@ -2683,7 +2683,7 @@ g_build_system_config_dirs (void)
   if (!conf_dirs || !conf_dirs[0])
     conf_dirs = "/etc/xdg";
 
-  conf_dir_vector = g_strsplit (conf_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
+  conf_dir_vector = xstrsplit (conf_dirs, G_SEARCHPATH_SEPARATOR_S, 0);
 #endif
 
   return g_steal_pointer (&conf_dir_vector);
@@ -2787,7 +2787,7 @@ g_nullify_pointer (xpointer_t *nullify_location)
  * Since: 2.30
  */
 xchar_t *
-g_format_size (guint64 size)
+g_format_size (xuint64_t size)
 {
   return g_format_size_full (size, G_FORMAT_SIZE_DEFAULT);
 }
@@ -2826,12 +2826,12 @@ g_format_size (guint64 size)
  * Since: 2.30
  */
 xchar_t *
-g_format_size_full (guint64          size,
+g_format_size_full (xuint64_t          size,
                     GFormatSizeFlags flags)
 {
   struct Format
   {
-    guint64 factor;
+    xuint64_t factor;
     char string[10];
   };
 
@@ -2902,10 +2902,10 @@ g_format_size_full (guint64          size,
     }
   };
 
-  GString *string;
+  xstring_t *string;
   FormatIndex index;
 
-  string = g_string_new (NULL);
+  string = xstring_new (NULL);
 
   switch (flags & ~G_FORMAT_SIZE_LONG_FORMAT)
     {
@@ -2939,7 +2939,7 @@ g_format_size_full (guint64          size,
           format = g_dngettext (GETTEXT_PACKAGE, "%u bit", "%u bits", (xuint_t) size);
         }
 
-      g_string_printf (string, format, (xuint_t) size);
+      xstring_printf (string, format, (xuint_t) size);
 
       flags &= ~G_FORMAT_SIZE_LONG_FORMAT;
     }
@@ -2964,7 +2964,7 @@ g_format_size_full (guint64          size,
             }
         }
 
-      g_string_printf (string, _(f->string), (xdouble_t) size / (xdouble_t) f->factor);
+      xstring_printf (string, _(f->string), (xdouble_t) size / (xdouble_t) f->factor);
     }
 
   if (flags & G_FORMAT_SIZE_LONG_FORMAT)
@@ -3010,15 +3010,15 @@ g_format_size_full (guint64          size,
           /* Translators: the %s in "%s bits" will always be replaced by a number. */
           translated_format = g_dngettext (GETTEXT_PACKAGE, "%s bit", "%s bits", plural_form);
         }
-      formatted_number = g_strdup_printf ("%'"G_GUINT64_FORMAT, size);
+      formatted_number = xstrdup_printf ("%'"G_GUINT64_FORMAT, size);
 
-      g_string_append (string, " (");
-      g_string_append_printf (string, translated_format, formatted_number);
+      xstring_append (string, " (");
+      xstring_append_printf (string, translated_format, formatted_number);
       g_free (formatted_number);
-      g_string_append (string, ")");
+      xstring_append (string, ")");
     }
 
-  return g_string_free (string, FALSE);
+  return xstring_free (string, FALSE);
 }
 
 #pragma GCC diagnostic pop
@@ -3046,15 +3046,15 @@ g_format_size_full (guint64          size,
  *     suffixes to denote IEC units. Use g_format_size() instead.
  */
 xchar_t *
-g_format_size_for_display (goffset size)
+g_format_size_for_display (xoffset_t size)
 {
-  if (size < (goffset) KIBIBYTE_FACTOR)
-    return g_strdup_printf (g_dngettext(GETTEXT_PACKAGE, "%u byte", "%u bytes",(xuint_t) size), (xuint_t) size);
+  if (size < (xoffset_t) KIBIBYTE_FACTOR)
+    return xstrdup_printf (g_dngettext(GETTEXT_PACKAGE, "%u byte", "%u bytes",(xuint_t) size), (xuint_t) size);
   else
     {
       xdouble_t displayed_size;
 
-      if (size < (goffset) MEBIBYTE_FACTOR)
+      if (size < (xoffset_t) MEBIBYTE_FACTOR)
         {
           displayed_size = (xdouble_t) size / (xdouble_t) KIBIBYTE_FACTOR;
           /* Translators: this is from the deprecated function g_format_size_for_display() which uses 'KB' to
@@ -3062,32 +3062,32 @@ g_format_size_for_display (goffset size)
            * compatibility.  Users will not see this string unless a program is using this deprecated function.
            * Please translate as literally as possible.
            */
-          return g_strdup_printf (_("%.1f KB"), displayed_size);
+          return xstrdup_printf (_("%.1f KB"), displayed_size);
         }
-      else if (size < (goffset) GIBIBYTE_FACTOR)
+      else if (size < (xoffset_t) GIBIBYTE_FACTOR)
         {
           displayed_size = (xdouble_t) size / (xdouble_t) MEBIBYTE_FACTOR;
-          return g_strdup_printf (_("%.1f MB"), displayed_size);
+          return xstrdup_printf (_("%.1f MB"), displayed_size);
         }
-      else if (size < (goffset) TEBIBYTE_FACTOR)
+      else if (size < (xoffset_t) TEBIBYTE_FACTOR)
         {
           displayed_size = (xdouble_t) size / (xdouble_t) GIBIBYTE_FACTOR;
-          return g_strdup_printf (_("%.1f GB"), displayed_size);
+          return xstrdup_printf (_("%.1f GB"), displayed_size);
         }
-      else if (size < (goffset) PEBIBYTE_FACTOR)
+      else if (size < (xoffset_t) PEBIBYTE_FACTOR)
         {
           displayed_size = (xdouble_t) size / (xdouble_t) TEBIBYTE_FACTOR;
-          return g_strdup_printf (_("%.1f TB"), displayed_size);
+          return xstrdup_printf (_("%.1f TB"), displayed_size);
         }
-      else if (size < (goffset) EXBIBYTE_FACTOR)
+      else if (size < (xoffset_t) EXBIBYTE_FACTOR)
         {
           displayed_size = (xdouble_t) size / (xdouble_t) PEBIBYTE_FACTOR;
-          return g_strdup_printf (_("%.1f PB"), displayed_size);
+          return xstrdup_printf (_("%.1f PB"), displayed_size);
         }
       else
         {
           displayed_size = (xdouble_t) size / (xdouble_t) EXBIBYTE_FACTOR;
-          return g_strdup_printf (_("%.1f EB"), displayed_size);
+          return xstrdup_printf (_("%.1f EB"), displayed_size);
         }
     }
 }
@@ -3130,7 +3130,7 @@ g_check_setuid (void)
   value = getauxval (AT_SECURE);
   errsv = errno;
   if (errsv)
-    g_error ("getauxval () failed: %s", g_strerror (errsv));
+    xerror ("getauxval () failed: %s", xstrerror (errsv));
   return value;
 #elif defined(HAVE_ISSETUGID) && !defined(__BIONIC__)
   /* BSD: http://www.freebsd.org/cgi/man.cgi?query=issetugid&sektion=2 */

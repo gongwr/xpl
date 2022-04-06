@@ -46,7 +46,7 @@ my_singleton_constructor (xtype_t                  type,
                           GObjectConstructParam *construct_properties)
 {
   if (the_one_and_only)
-    return g_object_ref (G_OBJECT (the_one_and_only));
+    return xobject_ref (G_OBJECT (the_one_and_only));
   else
     return G_OBJECT_CLASS (my_singleton_parent_class)->constructor (type, n_construct_properties, construct_properties);
 }
@@ -72,13 +72,13 @@ main (int   argc,
   MySingleton *singleton, *obj;
 
   /* create the singleton */
-  singleton = g_object_new (MY_TYPE_SINGLETON, NULL);
+  singleton = xobject_new (MY_TYPE_SINGLETON, NULL);
   g_assert (singleton != NULL);
   /* assert _singleton_ creation */
-  obj = g_object_new (MY_TYPE_SINGLETON, NULL);
+  obj = xobject_new (MY_TYPE_SINGLETON, NULL);
   g_assert (singleton == obj);
-  g_object_unref (obj);
+  xobject_unref (obj);
   /* shutdown */
-  g_object_unref (singleton);
+  xobject_unref (singleton);
   return 0;
 }

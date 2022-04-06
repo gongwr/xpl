@@ -27,7 +27,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_UNIX_CREDENTIALS_MESSAGE         (g_unix_credentials_message_get_type ())
-#define G_UNIX_CREDENTIALS_MESSAGE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_UNIX_CREDENTIALS_MESSAGE, GUnixCredentialsMessage))
+#define G_UNIX_CREDENTIALS_MESSAGE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_UNIX_CREDENTIALS_MESSAGE, xunix_credentials_message))
 #define G_UNIX_CREDENTIALS_MESSAGE_CLASS(c)     (XTYPE_CHECK_CLASS_CAST ((c), XTYPE_UNIX_CREDENTIALS_MESSAGE, GUnixCredentialsMessageClass))
 #define X_IS_UNIX_CREDENTIALS_MESSAGE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_UNIX_CREDENTIALS_MESSAGE))
 #define X_IS_UNIX_CREDENTIALS_MESSAGE_CLASS(c)  (XTYPE_CHECK_CLASS_TYPE ((c), XTYPE_UNIX_CREDENTIALS_MESSAGE))
@@ -36,18 +36,18 @@ G_BEGIN_DECLS
 typedef struct _GUnixCredentialsMessagePrivate  GUnixCredentialsMessagePrivate;
 typedef struct _GUnixCredentialsMessageClass    GUnixCredentialsMessageClass;
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixCredentialsMessage, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(xunix_credentials_message, xobject_unref)
 
 /**
  * GUnixCredentialsMessageClass:
  *
- * Class structure for #GUnixCredentialsMessage.
+ * Class structure for #xunix_credentials_message_t.
  *
  * Since: 2.26
  */
 struct _GUnixCredentialsMessageClass
 {
-  GSocketControlMessageClass parent_class;
+  xsocket_control_message_class_t parent_class;
 
   /*< private >*/
 
@@ -57,27 +57,27 @@ struct _GUnixCredentialsMessageClass
 };
 
 /**
- * GUnixCredentialsMessage:
+ * xunix_credentials_message_t:
  *
- * The #GUnixCredentialsMessage structure contains only private data
+ * The #xunix_credentials_message_t structure contains only private data
  * and should only be accessed using the provided API.
  *
  * Since: 2.26
  */
 struct _GUnixCredentialsMessage
 {
-  GSocketControlMessage parent_instance;
+  xsocket_control_message_t parent_instance;
   GUnixCredentialsMessagePrivate *priv;
 };
 
 XPL_AVAILABLE_IN_ALL
 xtype_t                  g_unix_credentials_message_get_type             (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-GSocketControlMessage *g_unix_credentials_message_new                  (void);
+xsocket_control_message_t *g_unix_credentials_message_new                  (void);
 XPL_AVAILABLE_IN_ALL
-GSocketControlMessage *g_unix_credentials_message_new_with_credentials (GCredentials *credentials);
+xsocket_control_message_t *g_unix_credentials_message_new_with_credentials (xcredentials_t *credentials);
 XPL_AVAILABLE_IN_ALL
-GCredentials          *g_unix_credentials_message_get_credentials      (GUnixCredentialsMessage *message);
+xcredentials_t          *g_unix_credentials_message_get_credentials      (xunix_credentials_message_t *message);
 
 XPL_AVAILABLE_IN_ALL
 xboolean_t               g_unix_credentials_message_is_supported         (void);

@@ -26,30 +26,30 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_LOCAL_FILE_ENUMERATOR         (_g_local_file_enumerator_get_type ())
-#define G_LOCAL_FILE_ENUMERATOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_LOCAL_FILE_ENUMERATOR, GLocalFileEnumerator))
-#define G_LOCAL_FILE_ENUMERATOR_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_LOCAL_FILE_ENUMERATOR, GLocalFileEnumeratorClass))
+#define XTYPE_LOCAL_FILE_ENUMERATOR         (_xlocal_file_enumerator_get_type ())
+#define G_LOCAL_FILE_ENUMERATOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_LOCAL_FILE_ENUMERATOR, xlocal_file_enumerator))
+#define G_LOCAL_FILE_ENUMERATOR_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_LOCAL_FILE_ENUMERATOR, xlocal_file_enumerator_class))
 #define X_IS_LOCAL_FILE_ENUMERATOR(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_LOCAL_FILE_ENUMERATOR))
 #define X_IS_LOCAL_FILE_ENUMERATOR_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_LOCAL_FILE_ENUMERATOR))
-#define G_LOCAL_FILE_ENUMERATOR_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_LOCAL_FILE_ENUMERATOR, GLocalFileEnumeratorClass))
+#define G_LOCAL_FILE_ENUMERATOR_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_LOCAL_FILE_ENUMERATOR, xlocal_file_enumerator_class))
 
-typedef struct _GLocalFileEnumerator         GLocalFileEnumerator;
-typedef struct _GLocalFileEnumeratorClass    GLocalFileEnumeratorClass;
+typedef struct _xlocal_file_enumerator         xlocal_file_enumerator_t;
+typedef struct _xlocal_file_enumerator_class    xlocal_file_enumerator_class_t;
 typedef struct _GLocalFileEnumeratorPrivate  GLocalFileEnumeratorPrivate;
 
-struct _GLocalFileEnumeratorClass
+struct _xlocal_file_enumerator_class
 {
-  GFileEnumeratorClass parent_class;
+  xfile_enumerator_class_t parent_class;
 };
 
-xtype_t             _g_local_file_enumerator_get_type (void) G_GNUC_CONST;
+xtype_t             _xlocal_file_enumerator_get_type (void) G_GNUC_CONST;
 
-GFileEnumerator * _g_local_file_enumerator_new      (GLocalFile           *file,
+xfile_enumerator_t * _xlocal_file_enumerator_new      (GLocalFile           *file,
                                                      const char           *attributes,
-                                                     GFileQueryInfoFlags   flags,
+                                                     xfile_query_info_flags_t   flags,
                                                      xcancellable_t         *cancellable,
                                                      xerror_t              **error);
 
 G_END_DECLS
 
-#endif /* __G_FILE_LOCAL_FILE_ENUMERATOR_H__ */
+#endif /* __XFILE_LOCAL_FILE_ENUMERATOR_H__ */

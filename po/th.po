@@ -21,16 +21,16 @@ msgstr ""
 "X-Generator: Gtranslator 2.91.6\n"
 
 #: ../gio/gapplication.c:493
-msgid "GApplication options"
-msgstr "ตัวเลือกของ GApplication:"
+msgid "xapplication_t options"
+msgstr "ตัวเลือกของ xapplication_t:"
 
 #: ../gio/gapplication.c:493
-msgid "Show GApplication options"
-msgstr "แสดงตัวเลือกของ GApplication"
+msgid "Show xapplication_t options"
+msgstr "แสดงตัวเลือกของ xapplication_t"
 
 #: ../gio/gapplication.c:538
-msgid "Enter GApplication service mode (use from D-Bus service files)"
-msgstr "เข้าสู่โหมดบริการ GApplication (ใช้จากแฟ้มบริการ D-Bus)"
+msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgstr "เข้าสู่โหมดบริการ xapplication_t (ใช้จากแฟ้มบริการ D-Bus)"
 
 #: ../gio/gapplication.c:550
 msgid "Override the application's ID"
@@ -268,8 +268,8 @@ msgid "Seek not supported on base stream"
 msgstr "สตรีมฐานไม่รองรับการเลื่อนตำแหน่งอ่านเขียน"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate GBufferedInputStream"
-msgstr "ไม่สามารถตัดท้าย GBufferedInputStream ทิ้ง"
+msgid "Cannot truncate xbuffered_input_stream"
+msgstr "ไม่สามารถตัดท้าย xbuffered_input_stream ทิ้ง"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1208
 #: ../gio/giostream.c:300 ../gio/goutputstream.c:1660
@@ -342,16 +342,16 @@ msgid "%s filetype"
 msgstr "ชนิดแฟ้ม %s"
 
 #: ../gio/gcredentials.c:312 ../gio/gcredentials.c:571
-msgid "GCredentials is not implemented on this OS"
-msgstr "ยังไม่รองรับ GCredentials ในระบบปฏิบัติการนี้"
+msgid "xcredentials_t is not implemented on this OS"
+msgstr "ยังไม่รองรับ xcredentials_t ในระบบปฏิบัติการนี้"
 
 #: ../gio/gcredentials.c:467
-msgid "There is no GCredentials support for your platform"
-msgstr "ไม่รองรับ GCredentials สำหรับแพลตฟอร์มของคุณ"
+msgid "There is no xcredentials_t support for your platform"
+msgstr "ไม่รองรับ xcredentials_t สำหรับแพลตฟอร์มของคุณ"
 
 #: ../gio/gcredentials.c:513
-msgid "GCredentials does not contain a process ID on this OS"
-msgstr "GCredentials ไม่มีข้อมูล ID ของโพรเซสในระบบปฏิบัติการนี้"
+msgid "xcredentials_t does not contain a process ID on this OS"
+msgstr "xcredentials_t ไม่มีข้อมูล ID ของโพรเซสในระบบปฏิบัติการนี้"
 
 #: ../gio/gcredentials.c:565
 msgid "Credentials spoofing is not possible on this OS"
@@ -535,8 +535,8 @@ msgid ""
 msgstr "ได้ลองกลไกการยืนยันตัวบุคคลที่มีทั้งหมดแล้ว (ที่ลอง: %s) (ที่มี: %s)"
 
 #: ../gio/gdbusauth.c:1173
-msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
-msgstr "ถูกยกเลิกผ่าน GDBusAuthObserver::authorize-authenticated-peer"
+msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgstr "ถูกยกเลิกผ่าน xdbus_auth_observer_t::authorize-authenticated-peer"
 
 #: ../gio/gdbusauthmechanismsha1.c:261
 #, c-format
@@ -1228,27 +1228,27 @@ msgstr "ไม่มีการรองรับ DTLS"
 
 #: ../gio/gemblem.c:323
 #, c-format
-msgid "Can't handle version %d of GEmblem encoding"
-msgstr "ไม่สามารถจัดการกับรหัสของ GEmblem รุ่น %d ได้"
+msgid "Can't handle version %d of xemblem_t encoding"
+msgstr "ไม่สามารถจัดการกับรหัสของ xemblem_t รุ่น %d ได้"
 
 #: ../gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblem encoding"
-msgstr "จำนวนโทเคนในรหัสของ GEmblem (%d) ไม่ถูกต้อง"
+msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgstr "จำนวนโทเคนในรหัสของ xemblem_t (%d) ไม่ถูกต้อง"
 
 #: ../gio/gemblemedicon.c:362
 #, c-format
-msgid "Can't handle version %d of GEmblemedIcon encoding"
-msgstr "ไม่สามารถจัดการกับรหัสของ GEmblemedIcon รุ่น %d ได้"
+msgid "Can't handle version %d of xemblemed_icon_t encoding"
+msgstr "ไม่สามารถจัดการกับรหัสของ xemblemed_icon_t รุ่น %d ได้"
 
 #: ../gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
-msgstr "จำนวนโทเคนในรหัสของ GEmblemedIcon (%d) ไม่ถูกต้อง"
+msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgstr "จำนวนโทเคนในรหัสของ xemblemed_icon_t (%d) ไม่ถูกต้อง"
 
 #: ../gio/gemblemedicon.c:395
-msgid "Expected a GEmblem for GEmblemedIcon"
-msgstr "ต้องการข้อมูล GEmblem สำหรับ GEmblemedIcon"
+msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgstr "ต้องการข้อมูล xemblem_t สำหรับ xemblemed_icon_t"
 
 #: ../gio/gfile.c:969 ../gio/gfile.c:1207 ../gio/gfile.c:1345
 #: ../gio/gfile.c:1583 ../gio/gfile.c:1638 ../gio/gfile.c:1696
@@ -1347,12 +1347,12 @@ msgstr "ตัวแจงนับแฟ้มถูกปิดไปแล้
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can't handle version %d of GFileIcon encoding"
-msgstr "ไม่สามารถจัดการกับรหัสของ GFileIcon รุ่น %d ได้"
+msgid "Can't handle version %d of xfile_icon_t encoding"
+msgstr "ไม่สามารถจัดการกับรหัสของ xfile_icon_t รุ่น %d ได้"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for GFileIcon"
-msgstr "ข้อมูลเข้าของ GFileIcon ผิดรูปแบบ"
+msgid "Malformed input data for xfile_icon_t"
+msgstr "ข้อมูลเข้าของ xfile_icon_t ผิดรูปแบบ"
 
 #: ../gio/gfileinputstream.c:149 ../gio/gfileinputstream.c:394
 #: ../gio/gfileiostream.c:167 ../gio/gfileoutputstream.c:164
@@ -2510,11 +2510,11 @@ msgstr "ไม่ต้องบังคับใช้ข้อกำหนด
 
 #: ../gio/glib-compile-schemas.c:2068
 msgid ""
-"Compile all GSettings schema files into a schema cache.\n"
+"Compile all xsettings_t schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"คอมไพล์แฟ้ม schema ของ GSettings ทั้งหมดลงในแคชของ schema\n"
+"คอมไพล์แฟ้ม schema ของ xsettings_t ทั้งหมดลงในแคชของ schema\n"
 "แฟ้ม schema ต้องมีนามสกุลเป็น .gschema.xml\n"
 "และแฟ้มแคชจะมีชื่อเป็น gschemas.compiled"
 
@@ -2843,8 +2843,8 @@ msgid "Invalid seek request"
 msgstr "คำสั่งเลื่อนตำแหน่งอ่านเขียนผิดเงื่อนไข"
 
 #: ../gio/gmemoryinputstream.c:508
-msgid "Cannot truncate GMemoryInputStream"
-msgstr "ไม่สามารถตัดท้าย GMemoryInputStream ทิ้ง"
+msgid "Cannot truncate xmemory_input_stream_t"
+msgstr "ไม่สามารถตัดท้าย xmemory_input_stream_t ทิ้ง"
 
 #: ../gio/gmemoryoutputstream.c:567
 msgid "Memory output stream not resizable"
@@ -3469,8 +3469,8 @@ msgid "Error sending message: %s"
 msgstr "เกิดข้อผิดพลาดขณะส่งข้อความ: %s"
 
 #: ../gio/gsocket.c:4386
-msgid "GSocketControlMessage not supported on Windows"
-msgstr "ไม่รองรับ GSocketControlMessage บนวินโดวส์"
+msgid "xsocket_control_message_t not supported on Windows"
+msgstr "ไม่รองรับ xsocket_control_message_t บนวินโดวส์"
 
 #: ../gio/gsocket.c:4839 ../gio/gsocket.c:4912 ../gio/gsocket.c:5139
 #, c-format
@@ -3609,8 +3609,8 @@ msgstr "เกิดข้อผิดพลาดไม่ทราบสาเ
 
 #: ../gio/gthemedicon.c:518
 #, c-format
-msgid "Can't handle version %d of GThemedIcon encoding"
-msgstr "ไม่สามารถจัดการกับรหัสของ GThemedIcon รุ่น %d ได้"
+msgid "Can't handle version %d of xthemed_icon_t encoding"
+msgstr "ไม่สามารถจัดการกับรหัสของ xthemed_icon_t รุ่น %d ได้"
 
 #: ../gio/gthreadedresolver.c:118
 msgid "No valid addresses were found"
@@ -3930,37 +3930,37 @@ msgstr "ชื่อโฮสต์ผิดรูปแบบ"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:201
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "AM"
 msgstr "AM"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:203
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "PM"
 msgstr "PM"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:206
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %e %b %Ey, %H:%M:%S"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:209
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%m/%d/%y"
 msgstr "%d/%m/%Ey"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:212
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:215
-msgctxt "GDateTime"
+msgctxt "xdatetime_t"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -5482,20 +5482,20 @@ msgstr "ธ.ค."
 #~ msgid "Target file already exists"
 #~ msgstr "มีแฟ้มปลายทางชื่อนี้อยู่ก่อนแล้ว"
 
-#~ msgid "Too large count value passed to g_input_stream_read_async"
-#~ msgstr "มีการส่งค่า count ที่สูงเกินไปมาให้ g_input_stream_read_async"
+#~ msgid "Too large count value passed to xinput_stream_read_async"
+#~ msgstr "มีการส่งค่า count ที่สูงเกินไปมาให้ xinput_stream_read_async"
 
-#~ msgid "Too large count value passed to g_input_stream_skip"
-#~ msgstr "มีการส่งค่า count ที่สูงเกินไปมาให้ g_input_stream_skip"
+#~ msgid "Too large count value passed to xinput_stream_skip"
+#~ msgstr "มีการส่งค่า count ที่สูงเกินไปมาให้ xinput_stream_skip"
 
-#~ msgid "Too large count value passed to g_input_stream_skip_async"
-#~ msgstr "มีการส่งค่า count ที่สูงเกินไปมาให้ g_input_stream_skip_async"
+#~ msgid "Too large count value passed to xinput_stream_skip_async"
+#~ msgstr "มีการส่งค่า count ที่สูงเกินไปมาให้ xinput_stream_skip_async"
 
-#~ msgid "Too large count value passed to g_output_stream_write"
-#~ msgstr "มีการส่งค่า count ที่สูงเกินไปมาให้ g_output_stream_write"
+#~ msgid "Too large count value passed to xoutput_stream_write"
+#~ msgstr "มีการส่งค่า count ที่สูงเกินไปมาให้ xoutput_stream_write"
 
-#~ msgid "Too large count value passed to g_output_stream_write_async"
-#~ msgstr "มีการส่งค่า count ที่สูงเกินไปมาให้ g_output_stream_write_async"
+#~ msgid "Too large count value passed to xoutput_stream_write_async"
+#~ msgstr "มีการส่งค่า count ที่สูงเกินไปมาให้ xoutput_stream_write_async"
 
 #~ msgid "Could not change file mode: fork() failed: %s"
 #~ msgstr "ไม่สามารถเปลี่ยนโหมดของแฟ้มได้: fork() ล้มเหลว: %s"

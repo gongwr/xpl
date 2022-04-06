@@ -180,7 +180,7 @@ static void
 default_finalize_hook (GHookList *hook_list,
 		       GHook     *hook)
 {
-  GDestroyNotify destroy = hook->destroy;
+  xdestroy_notify_t destroy = hook->destroy;
 
   if (destroy)
     {

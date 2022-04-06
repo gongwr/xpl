@@ -26,16 +26,16 @@
 #include "glibintl.h"
 #include "gmarshal-internal.h"
 
-G_DEFINE_INTERFACE (GListModel, g_list_model, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (xlist_model_t, xlist_model, XTYPE_OBJECT)
 
 /**
  * SECTION:glistmodel
- * @title: GListModel
+ * @title: xlist_model_t
  * @short_description: An interface describing a dynamic list of objects
  * @include: gio/gio.h
- * @see_also: #GListStore
+ * @see_also: #xlist_store_t
  *
- * #GListModel is an interface that represents a mutable list of
+ * #xlist_model_t is an interface that represents a mutable list of
  * #GObjects. Its main intention is as a model for various widgets in
  * user interfaces, such as list views, but it can also be used as a
  * convenient method of returning lists of data, with support for
@@ -43,7 +43,7 @@ G_DEFINE_INTERFACE (GListModel, g_list_model, XTYPE_OBJECT)
  *
  * Each object in the list may also report changes in itself via some
  * mechanism (normally the #xobject_t::notify signal).  Taken together
- * with the #GListModel::items-changed signal, this provides for a list
+ * with the #xlist_model_t::items-changed signal, this provides for a list
  * that can change its membership, and in which the members can change
  * their individual properties.
  *
@@ -51,22 +51,22 @@ G_DEFINE_INTERFACE (GListModel, g_list_model, XTYPE_OBJECT)
  * points, where each access point can report dynamic properties such as
  * signal strength.
  *
- * It is important to note that the #GListModel itself does not report
+ * It is important to note that the #xlist_model_t itself does not report
  * changes to the individual items.  It only reports changes to the list
  * membership.  If you want to observe changes to the objects themselves
  * then you need to connect signals to the objects that you are
  * interested in.
  *
- * All items in a #GListModel are of (or derived from) the same type.
- * g_list_model_get_item_type() returns that type.  The type may be an
+ * All items in a #xlist_model_t are of (or derived from) the same type.
+ * xlist_model_get_item_type() returns that type.  The type may be an
  * interface, in which case all objects in the list must implement it.
  *
  * The semantics are close to that of an array:
- * g_list_model_get_n_items() returns the number of items in the list and
- * g_list_model_get_item() returns an item at a (0-based) position. In
+ * xlist_model_get_n_items() returns the number of items in the list and
+ * xlist_model_get_item() returns an item at a (0-based) position. In
  * order to allow implementations to calculate the list length lazily,
  * you can also iterate over items: starting from 0, repeatedly call
- * g_list_model_get_item() until it returns %NULL.
+ * xlist_model_get_item() until it returns %NULL.
  *
  * An implementation may create objects lazily, but must take care to
  * return the same object for a given position until all references to
@@ -85,27 +85,27 @@ G_DEFINE_INTERFACE (GListModel, g_list_model, XTYPE_OBJECT)
  */
 
 /**
- * GListModelInterface:
+ * xlist_model_interface_t:
  * @x_iface: parent #xtype_interface_t
- * @get_item_type: the virtual function pointer for g_list_model_get_item_type()
- * @get_n_items: the virtual function pointer for g_list_model_get_n_items()
- * @get_item: the virtual function pointer for g_list_model_get_item()
+ * @get_item_type: the virtual function pointer for xlist_model_get_item_type()
+ * @get_n_items: the virtual function pointer for xlist_model_get_n_items()
+ * @get_item: the virtual function pointer for xlist_model_get_item()
  *
- * The virtual function table for #GListModel.
+ * The virtual function table for #xlist_model_t.
  *
  * Since: 2.44
  */
 
 /**
- * GListModelInterface::get_item:
- * @list: a #GListModel
+ * xlist_model_interface_t::get_item:
+ * @list: a #xlist_model_t
  * @position: the position of the item to fetch
  *
  * Get the item at @position. If @position is greater than the number of
  * items in @list, %NULL is returned.
  *
  * %NULL is never returned for an index that is smaller than the length
- * of the list.  See g_list_model_get_n_items().
+ * of the list.  See xlist_model_get_n_items().
  *
  * Returns: (type xobject_t) (transfer full) (nullable): the object at @position.
  *
@@ -113,20 +113,20 @@ G_DEFINE_INTERFACE (GListModel, g_list_model, XTYPE_OBJECT)
  */
 
 /**
- * GListModel:
+ * xlist_model_t:
  *
- * #GListModel is an opaque data structure and can only be accessed
+ * #xlist_model_t is an opaque data structure and can only be accessed
  * using the following functions.
  **/
 
-static xuint_t g_list_model_changed_signal;
+static xuint_t xlist_model_changed_signal;
 
 static void
-g_list_model_default_init (GListModelInterface *iface)
+xlist_model_default_init (xlist_model_interface_t *iface)
 {
   /**
-   * GListModel::items-changed:
-   * @list: the #GListModel that changed
+   * xlist_model_t::items-changed:
+   * @list: the #xlist_model_t that changed
    * @position: the position at which @list changed
    * @removed: the number of items removed
    * @added: the number of items added
@@ -140,7 +140,7 @@ g_list_model_default_init (GListModelInterface *iface)
    *
    * Since: 2.44
    */
-  g_list_model_changed_signal = g_signal_new (I_("items-changed"),
+  xlist_model_changed_signal = g_signal_new (I_("items-changed"),
                                               XTYPE_LIST_MODEL,
                                               G_SIGNAL_RUN_LAST,
                                               0,
@@ -148,22 +148,22 @@ g_list_model_default_init (GListModelInterface *iface)
                                               _g_cclosure_marshal_VOID__UINT_UINT_UINT,
                                               XTYPE_NONE,
                                               3, XTYPE_UINT, XTYPE_UINT, XTYPE_UINT);
-  g_signal_set_va_marshaller (g_list_model_changed_signal,
+  g_signal_set_va_marshaller (xlist_model_changed_signal,
                               XTYPE_FROM_INTERFACE (iface),
                               _g_cclosure_marshal_VOID__UINT_UINT_UINTv);
 }
 
 /**
- * g_list_model_get_item_type:
- * @list: a #GListModel
+ * xlist_model_get_item_type:
+ * @list: a #xlist_model_t
  *
  * Gets the type of the items in @list.
  *
- * All items returned from g_list_model_get_item() are of the type
+ * All items returned from xlist_model_get_item() are of the type
  * returned by this function, or a subtype, or if the type is an
  * interface, they are an implementation of that interface.
  *
- * The item type of a #GListModel can not change during the life of the
+ * The item type of a #xlist_model_t can not change during the life of the
  * model.
  *
  * Returns: the #xtype_t of the items contained in @list.
@@ -171,38 +171,38 @@ g_list_model_default_init (GListModelInterface *iface)
  * Since: 2.44
  */
 xtype_t
-g_list_model_get_item_type (GListModel *list)
+xlist_model_get_item_type (xlist_model_t *list)
 {
   g_return_val_if_fail (X_IS_LIST_MODEL (list), XTYPE_NONE);
 
-  return G_LIST_MODEL_GET_IFACE (list)->get_item_type (list);
+  return XLIST_MODEL_GET_IFACE (list)->get_item_type (list);
 }
 
 /**
- * g_list_model_get_n_items:
- * @list: a #GListModel
+ * xlist_model_get_n_items:
+ * @list: a #xlist_model_t
  *
  * Gets the number of items in @list.
  *
  * Depending on the model implementation, calling this function may be
  * less efficient than iterating the list with increasing values for
- * @position until g_list_model_get_item() returns %NULL.
+ * @position until xlist_model_get_item() returns %NULL.
  *
  * Returns: the number of items in @list.
  *
  * Since: 2.44
  */
 xuint_t
-g_list_model_get_n_items (GListModel *list)
+xlist_model_get_n_items (xlist_model_t *list)
 {
   g_return_val_if_fail (X_IS_LIST_MODEL (list), 0);
 
-  return G_LIST_MODEL_GET_IFACE (list)->get_n_items (list);
+  return XLIST_MODEL_GET_IFACE (list)->get_n_items (list);
 }
 
 /**
- * g_list_model_get_item: (skip)
- * @list: a #GListModel
+ * xlist_model_get_item: (skip)
+ * @list: a #xlist_model_t
  * @position: the position of the item to fetch
  *
  * Get the item at @position.
@@ -213,24 +213,24 @@ g_list_model_get_n_items (GListModel *list)
  * %NULL is never returned for an index that is smaller than the length
  * of the list.
  *
- * See also: g_list_model_get_n_items()
+ * See also: xlist_model_get_n_items()
  *
  * Returns: (transfer full) (nullable): the item at @position.
  *
  * Since: 2.44
  */
 xpointer_t
-g_list_model_get_item (GListModel *list,
+xlist_model_get_item (xlist_model_t *list,
                        xuint_t       position)
 {
   g_return_val_if_fail (X_IS_LIST_MODEL (list), NULL);
 
-  return G_LIST_MODEL_GET_IFACE (list)->get_item (list, position);
+  return XLIST_MODEL_GET_IFACE (list)->get_item (list, position);
 }
 
 /**
- * g_list_model_get_object: (rename-to g_list_model_get_item)
- * @list: a #GListModel
+ * xlist_model_get_object: (rename-to xlist_model_get_item)
+ * @list: a #xlist_model_t
  * @position: the position of the item to fetch
  *
  * Get the item at @position.
@@ -242,48 +242,48 @@ g_list_model_get_item (GListModel *list,
  * of the list.
  *
  * This function is meant to be used by language bindings in place
- * of g_list_model_get_item().
+ * of xlist_model_get_item().
  *
- * See also: g_list_model_get_n_items()
+ * See also: xlist_model_get_n_items()
  *
  * Returns: (transfer full) (nullable): the object at @position.
  *
  * Since: 2.44
  */
 xobject_t *
-g_list_model_get_object (GListModel *list,
+xlist_model_get_object (xlist_model_t *list,
                          xuint_t       position)
 {
   xpointer_t item;
 
   g_return_val_if_fail (X_IS_LIST_MODEL (list), NULL);
 
-  item = g_list_model_get_item (list, position);
+  item = xlist_model_get_item (list, position);
 
   return G_OBJECT (item);
 }
 
 /**
- * g_list_model_items_changed:
- * @list: a #GListModel
+ * xlist_model_items_changed:
+ * @list: a #xlist_model_t
  * @position: the position at which @list changed
  * @removed: the number of items removed
  * @added: the number of items added
  *
- * Emits the #GListModel::items-changed signal on @list.
+ * Emits the #xlist_model_t::items-changed signal on @list.
  *
  * This function should only be called by classes implementing
- * #GListModel. It has to be called after the internal representation
+ * #xlist_model_t. It has to be called after the internal representation
  * of @list has been updated, because handlers connected to this signal
  * might query the new state of the list.
  *
  * Implementations must only make changes to the model (as visible to
  * its consumer) in places that will not cause problems for that
  * consumer.  For models that are driven directly by a write API (such
- * as #GListStore), changes can be reported in response to uses of that
+ * as #xlist_store_t), changes can be reported in response to uses of that
  * API.  For models that represent remote data, changes should only be
  * made from a fresh mainloop dispatch.  It is particularly not
- * permitted to make changes in response to a call to the #GListModel
+ * permitted to make changes in response to a call to the #xlist_model_t
  * consumer API.
  *
  * Stated another way: in general, it is assumed that code making a
@@ -294,12 +294,12 @@ g_list_model_get_object (GListModel *list,
  * Since: 2.44
  */
 void
-g_list_model_items_changed (GListModel *list,
+xlist_model_items_changed (xlist_model_t *list,
                             xuint_t       position,
                             xuint_t       removed,
                             xuint_t       added)
 {
   g_return_if_fail (X_IS_LIST_MODEL (list));
 
-  g_signal_emit (list, g_list_model_changed_signal, 0, position, removed, added);
+  g_signal_emit (list, xlist_model_changed_signal, 0, position, removed, added);
 }

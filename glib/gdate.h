@@ -36,7 +36,7 @@
 
 G_BEGIN_DECLS
 
-/* GDate
+/* xdate_t
  *
  * Date calculations (not time for now, to be resolved). These are a
  * mutant combination of Steffen Beyer's DateCalc routines
@@ -45,10 +45,10 @@ G_BEGIN_DECLS
  * Pennington <hp@pobox.com>
  */
 
-typedef gint32  GTime XPL_DEPRECATED_TYPE_IN_2_62_FOR(GDateTime);
-typedef guint16 GDateYear;
-typedef guint8  GDateDay;   /* day of the month */
-typedef struct _GDate GDate;
+typedef gint32  GTime XPL_DEPRECATED_TYPE_IN_2_62_FOR(xdatetime_t);
+typedef xuint16_t GDateYear;
+typedef xuint8_t  GDateDay;   /* day of the month */
+typedef struct _GDate xdate_t;
 
 /* enum used to specify order of appearance in parsed date strings */
 typedef enum
@@ -113,57 +113,57 @@ struct _GDate
   xuint_t year   : 16;
 };
 
-/* g_date_new() returns an invalid date, you then have to _set() stuff
- * to get a usable object. You can also allocate a GDate statically,
- * then call g_date_clear() to initialize.
+/* xdate_new() returns an invalid date, you then have to _set() stuff
+ * to get a usable object. You can also allocate a xdate_t statically,
+ * then call xdate_clear() to initialize.
  */
 XPL_AVAILABLE_IN_ALL
-GDate*       g_date_new                   (void);
+xdate_t*       xdate_new                   (void);
 XPL_AVAILABLE_IN_ALL
-GDate*       g_date_new_dmy               (GDateDay     day,
+xdate_t*       xdate_new_dmy               (GDateDay     day,
                                            GDateMonth   month,
                                            GDateYear    year);
 XPL_AVAILABLE_IN_ALL
-GDate*       g_date_new_julian            (guint32      julian_day);
+xdate_t*       xdate_new_julian            (xuint32_t      julian_day);
 XPL_AVAILABLE_IN_ALL
-void         g_date_free                  (GDate       *date);
+void         xdate_free                  (xdate_t       *date);
 XPL_AVAILABLE_IN_2_56
-GDate*       g_date_copy                  (const GDate *date);
+xdate_t*       xdate_copy                  (const xdate_t *date);
 
-/* check g_date_valid() after doing an operation that might fail, like
- * _parse.  Almost all g_date operations are undefined on invalid
+/* check xdate_valid() after doing an operation that might fail, like
+ * _parse.  Almost all xdate operations are undefined on invalid
  * dates (the exceptions are the mutators, since you need those to
  * return to validity).
  */
 XPL_AVAILABLE_IN_ALL
-xboolean_t     g_date_valid                 (const GDate *date);
+xboolean_t     xdate_valid                 (const xdate_t *date);
 XPL_AVAILABLE_IN_ALL
-xboolean_t     g_date_valid_day             (GDateDay     day) G_GNUC_CONST;
+xboolean_t     xdate_valid_day             (GDateDay     day) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t     g_date_valid_month           (GDateMonth month) G_GNUC_CONST;
+xboolean_t     xdate_valid_month           (GDateMonth month) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t     g_date_valid_year            (GDateYear  year) G_GNUC_CONST;
+xboolean_t     xdate_valid_year            (GDateYear  year) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t     g_date_valid_weekday         (GDateWeekday weekday) G_GNUC_CONST;
+xboolean_t     xdate_valid_weekday         (GDateWeekday weekday) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t     g_date_valid_julian          (guint32 julian_date) G_GNUC_CONST;
+xboolean_t     xdate_valid_julian          (xuint32_t julian_date) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-xboolean_t     g_date_valid_dmy             (GDateDay     day,
+xboolean_t     xdate_valid_dmy             (GDateDay     day,
                                            GDateMonth   month,
                                            GDateYear    year) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GDateWeekday g_date_get_weekday           (const GDate *date);
+GDateWeekday xdate_get_weekday           (const xdate_t *date);
 XPL_AVAILABLE_IN_ALL
-GDateMonth   g_date_get_month             (const GDate *date);
+GDateMonth   xdate_get_month             (const xdate_t *date);
 XPL_AVAILABLE_IN_ALL
-GDateYear    g_date_get_year              (const GDate *date);
+GDateYear    xdate_get_year              (const xdate_t *date);
 XPL_AVAILABLE_IN_ALL
-GDateDay     g_date_get_day               (const GDate *date);
+GDateDay     xdate_get_day               (const xdate_t *date);
 XPL_AVAILABLE_IN_ALL
-guint32      g_date_get_julian            (const GDate *date);
+xuint32_t      xdate_get_julian            (const xdate_t *date);
 XPL_AVAILABLE_IN_ALL
-xuint_t        g_date_get_day_of_year       (const GDate *date);
+xuint_t        xdate_get_day_of_year       (const xdate_t *date);
 /* First monday/sunday is the start of week 1; if we haven't reached
  * that day, return 0. These are not ISO weeks of the year; that
  * routine needs to be added.
@@ -171,18 +171,18 @@ xuint_t        g_date_get_day_of_year       (const GDate *date);
  * corrsponding day
  */
 XPL_AVAILABLE_IN_ALL
-xuint_t        g_date_get_monday_week_of_year (const GDate *date);
+xuint_t        xdate_get_monday_week_of_year (const xdate_t *date);
 XPL_AVAILABLE_IN_ALL
-xuint_t        g_date_get_sunday_week_of_year (const GDate *date);
+xuint_t        xdate_get_sunday_week_of_year (const xdate_t *date);
 XPL_AVAILABLE_IN_ALL
-xuint_t        g_date_get_iso8601_week_of_year (const GDate *date);
+xuint_t        xdate_get_iso8601_week_of_year (const xdate_t *date);
 
 /* If you create a static date struct you need to clear it to get it
  * in a safe state before use. You can clear a whole array at
  * once with the ndates argument.
  */
 XPL_AVAILABLE_IN_ALL
-void         g_date_clear                 (GDate       *date,
+void         xdate_clear                 (xdate_t       *date,
                                            xuint_t        n_dates);
 
 /* The parse routine is meant for dates typed in by a user, so it
@@ -190,117 +190,117 @@ void         g_date_clear                 (GDate       *date,
  * needs to be strictly validated, it is not an appropriate function.
  */
 XPL_AVAILABLE_IN_ALL
-void         g_date_set_parse             (GDate       *date,
+void         xdate_set_parse             (xdate_t       *date,
                                            const xchar_t *str);
 XPL_AVAILABLE_IN_ALL
-void         g_date_set_time_t            (GDate       *date,
+void         xdate_set_time_t            (xdate_t       *date,
 					   time_t       timet);
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-XPL_DEPRECATED_IN_2_62_FOR(g_date_set_time_t)
-void         g_date_set_time_val          (GDate       *date,
+XPL_DEPRECATED_IN_2_62_FOR(xdate_set_time_t)
+void         xdate_set_time_val          (xdate_t       *date,
 					   GTimeVal    *timeval);
-XPL_DEPRECATED_FOR(g_date_set_time_t)
-void         g_date_set_time              (GDate       *date,
+XPL_DEPRECATED_FOR(xdate_set_time_t)
+void         xdate_set_time              (xdate_t       *date,
                                            GTime        time_);
 G_GNUC_END_IGNORE_DEPRECATIONS
 XPL_AVAILABLE_IN_ALL
-void         g_date_set_month             (GDate       *date,
+void         xdate_set_month             (xdate_t       *date,
                                            GDateMonth   month);
 XPL_AVAILABLE_IN_ALL
-void         g_date_set_day               (GDate       *date,
+void         xdate_set_day               (xdate_t       *date,
                                            GDateDay     day);
 XPL_AVAILABLE_IN_ALL
-void         g_date_set_year              (GDate       *date,
+void         xdate_set_year              (xdate_t       *date,
                                            GDateYear    year);
 XPL_AVAILABLE_IN_ALL
-void         g_date_set_dmy               (GDate       *date,
+void         xdate_set_dmy               (xdate_t       *date,
                                            GDateDay     day,
                                            GDateMonth   month,
                                            GDateYear    y);
 XPL_AVAILABLE_IN_ALL
-void         g_date_set_julian            (GDate       *date,
-                                           guint32      julian_date);
+void         xdate_set_julian            (xdate_t       *date,
+                                           xuint32_t      julian_date);
 XPL_AVAILABLE_IN_ALL
-xboolean_t     g_date_is_first_of_month     (const GDate *date);
+xboolean_t     xdate_is_first_of_month     (const xdate_t *date);
 XPL_AVAILABLE_IN_ALL
-xboolean_t     g_date_is_last_of_month      (const GDate *date);
+xboolean_t     xdate_is_last_of_month      (const xdate_t *date);
 
 /* To go forward by some number of weeks just go forward weeks*7 days */
 XPL_AVAILABLE_IN_ALL
-void         g_date_add_days              (GDate       *date,
+void         xdate_add_days              (xdate_t       *date,
                                            xuint_t        n_days);
 XPL_AVAILABLE_IN_ALL
-void         g_date_subtract_days         (GDate       *date,
+void         xdate_subtract_days         (xdate_t       *date,
                                            xuint_t        n_days);
 
 /* If you add/sub months while day > 28, the day might change */
 XPL_AVAILABLE_IN_ALL
-void         g_date_add_months            (GDate       *date,
+void         xdate_add_months            (xdate_t       *date,
                                            xuint_t        n_months);
 XPL_AVAILABLE_IN_ALL
-void         g_date_subtract_months       (GDate       *date,
+void         xdate_subtract_months       (xdate_t       *date,
                                            xuint_t        n_months);
 
 /* If it's feb 29, changing years can move you to the 28th */
 XPL_AVAILABLE_IN_ALL
-void         g_date_add_years             (GDate       *date,
+void         xdate_add_years             (xdate_t       *date,
                                            xuint_t        n_years);
 XPL_AVAILABLE_IN_ALL
-void         g_date_subtract_years        (GDate       *date,
+void         xdate_subtract_years        (xdate_t       *date,
                                            xuint_t        n_years);
 XPL_AVAILABLE_IN_ALL
-xboolean_t     g_date_is_leap_year          (GDateYear    year) G_GNUC_CONST;
+xboolean_t     xdate_is_leap_year          (GDateYear    year) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-guint8       g_date_get_days_in_month     (GDateMonth   month,
+xuint8_t       xdate_get_days_in_month     (GDateMonth   month,
                                            GDateYear    year) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-guint8       g_date_get_monday_weeks_in_year  (GDateYear    year) G_GNUC_CONST;
+xuint8_t       xdate_get_monday_weeks_in_year  (GDateYear    year) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
-guint8       g_date_get_sunday_weeks_in_year  (GDateYear    year) G_GNUC_CONST;
+xuint8_t       xdate_get_sunday_weeks_in_year  (GDateYear    year) G_GNUC_CONST;
 
 /* Returns the number of days between the two dates.  If date2 comes
    before date1, a negative value is return. */
 XPL_AVAILABLE_IN_ALL
-xint_t         g_date_days_between          (const GDate *date1,
-					   const GDate *date2);
+xint_t         xdate_days_between          (const xdate_t *date1,
+					   const xdate_t *date2);
 
 /* qsort-friendly (with a cast...) */
 XPL_AVAILABLE_IN_ALL
-xint_t         g_date_compare               (const GDate *lhs,
-                                           const GDate *rhs);
+xint_t         xdate_compare               (const xdate_t *lhs,
+                                           const xdate_t *rhs);
 XPL_AVAILABLE_IN_ALL
-void         g_date_to_struct_tm          (const GDate *date,
+void         xdate_to_struct_tm          (const xdate_t *date,
                                            struct tm   *tm);
 
 XPL_AVAILABLE_IN_ALL
-void         g_date_clamp                 (GDate *date,
-					   const GDate *min_date,
-					   const GDate *max_date);
+void         xdate_clamp                 (xdate_t *date,
+					   const xdate_t *min_date,
+					   const xdate_t *max_date);
 
 /* Swap date1 and date2's values if date1 > date2. */
 XPL_AVAILABLE_IN_ALL
-void         g_date_order                 (GDate *date1, GDate *date2);
+void         xdate_order                 (xdate_t *date1, xdate_t *date2);
 
 /* Just like strftime() except you can only use date-related formats.
  *   Using a time format is undefined.
  */
 XPL_AVAILABLE_IN_ALL
-xsize_t        g_date_strftime              (xchar_t       *s,
+xsize_t        xdate_strftime              (xchar_t       *s,
                                            xsize_t        slen,
                                            const xchar_t *format,
-                                           const GDate *date);
+                                           const xdate_t *date);
 
-#define g_date_weekday 			g_date_get_weekday XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_date_get_weekday)
-#define g_date_month 			g_date_get_month XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_date_get_month)
-#define g_date_year 			g_date_get_year XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_date_get_year)
-#define g_date_day 			g_date_get_day XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_date_get_day)
-#define g_date_julian 			g_date_get_julian XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_date_get_julian)
-#define g_date_day_of_year 		g_date_get_day_of_year XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_date_get_day_of_year)
-#define g_date_monday_week_of_year 	g_date_get_monday_week_of_year XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_date_get_monday_week_of_year)
-#define g_date_sunday_week_of_year 	g_date_get_sunday_week_of_year XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_date_get_sunday_week_of_year)
-#define g_date_days_in_month 		g_date_get_days_in_month XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_date_get_days_in_month)
-#define g_date_monday_weeks_in_year 	g_date_get_monday_weeks_in_year XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_date_get_monday_weeks_in_year)
-#define g_date_sunday_weeks_in_year	g_date_get_sunday_weeks_in_year XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_date_get_sunday_weeks_in_year)
+#define xdate_weekday 			xdate_get_weekday XPL_DEPRECATED_MACRO_IN_2_26_FOR(xdate_get_weekday)
+#define xdate_month 			xdate_get_month XPL_DEPRECATED_MACRO_IN_2_26_FOR(xdate_get_month)
+#define xdate_year 			xdate_get_year XPL_DEPRECATED_MACRO_IN_2_26_FOR(xdate_get_year)
+#define xdate_day 			xdate_get_day XPL_DEPRECATED_MACRO_IN_2_26_FOR(xdate_get_day)
+#define xdate_julian 			xdate_get_julian XPL_DEPRECATED_MACRO_IN_2_26_FOR(xdate_get_julian)
+#define xdate_day_of_year 		xdate_get_day_of_year XPL_DEPRECATED_MACRO_IN_2_26_FOR(xdate_get_day_of_year)
+#define xdate_monday_week_of_year 	xdate_get_monday_week_of_year XPL_DEPRECATED_MACRO_IN_2_26_FOR(xdate_get_monday_week_of_year)
+#define xdate_sunday_week_of_year 	xdate_get_sunday_week_of_year XPL_DEPRECATED_MACRO_IN_2_26_FOR(xdate_get_sunday_week_of_year)
+#define xdate_days_in_month 		xdate_get_days_in_month XPL_DEPRECATED_MACRO_IN_2_26_FOR(xdate_get_days_in_month)
+#define xdate_monday_weeks_in_year 	xdate_get_monday_weeks_in_year XPL_DEPRECATED_MACRO_IN_2_26_FOR(xdate_get_monday_weeks_in_year)
+#define xdate_sunday_weeks_in_year	xdate_get_sunday_weeks_in_year XPL_DEPRECATED_MACRO_IN_2_26_FOR(xdate_get_sunday_weeks_in_year)
 
 G_END_DECLS
 

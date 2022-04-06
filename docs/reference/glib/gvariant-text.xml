@@ -14,8 +14,8 @@
 
   <para>
    This page attempts to document the xvariant_t text format as produced by
-   <link linkend='g-variant-print'><function>g_variant_print()</function></link> and parsed by the
-   <link linkend='g-variant-parse'><function>g_variant_parse()</function></link> family of functions.  In most
+   <link linkend='g-variant-print'><function>xvariant_print()</function></link> and parsed by the
+   <link linkend='g-variant-parse'><function>xvariant_parse()</function></link> family of functions.  In most
    cases the style closely resembles the formatting of literals in Python but there are some additions and
    exceptions.
   </para>
@@ -52,7 +52,7 @@
   <para>
    What the parser accepts as valid input is dependent on context.  The API permits for out-of-band type
    information to be supplied to the parser (which will change its behaviour).  This can be seen in the
-   GSettings and GDBus command line utilities where the type information is available from the schema or the
+   xsettings_t and GDBus command line utilities where the type information is available from the schema or the
    remote introspection information.  The additional information can cause parses to succeed when they would not
    otherwise have been able to (by resolving ambiguous type information) or can cause them to fail (due to
    conflicting type information).  Unless stated otherwise, the examples given in this section assume that no
@@ -574,7 +574,7 @@
    </para>
    <para>
     Bytestrings support the full range of escapes that you would expect (ie: those supported by
-    <link linkend='g-strcompress'><function>g_strcompress()</function></link>.  This includes the normal control
+    <link linkend='g-strcompress'><function>xstrcompress()</function></link>.  This includes the normal control
     sequence escapes (as mentioned in the section on strings) as well as octal and hexadecimal escapes of the
     forms <literal>\0nnn</literal> and <literal>\xnn</literal>.
    </para>
@@ -591,7 +591,7 @@
    <title>Positional Parameters</title>
    <para>
     Positional parameters are not a part of the normal xvariant_t text format, but they are mentioned here because
-    they can be used with <link linkend='g-variant-new-parsed'><function>g_variant_new_parsed()</function></link>.
+    they can be used with <link linkend='g-variant-new-parsed'><function>xvariant_new_parsed()</function></link>.
    </para>
    <para>
     A positional parameter is indicated with a <literal>%</literal> followed by any valid
@@ -605,7 +605,7 @@
 xboolean_t en = false;
 xvariant_t *value;
 
-value = g_variant_new_parsed ("{'title': <%s>, 'enabled': <%b>}", t, en);]]></programlisting></informalexample>
+value = xvariant_new_parsed ("{'title': <%s>, 'enabled': <%b>}", t, en);]]></programlisting></informalexample>
    <para>
     This constructs a dictionary mapping strings to variants (type '<literal>a{sv}</literal>') with two items in
     it.  The key names are parsed from the string and the values for those keys are taken as variable arguments

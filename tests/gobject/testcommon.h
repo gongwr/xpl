@@ -20,7 +20,7 @@
 
 G_BEGIN_DECLS
 
-#define DEFINE_TYPE_FULL(name, prefix,				\
+#define DEFINE_TYPE_FULL(nameNoT, prefix,				\
 		         class_init, base_init, instance_init,	\
 		         parent_type, interface_decl)		\
 xtype_t								\
@@ -30,22 +30,22 @@ prefix ## _get_type (void)					\
 								\
   if (!object_type)						\
     {								\
-      const GTypeInfo object_info =			\
+      const xtype_info_t object_info =			\
 	{							\
-	  sizeof (name ## Class),				\
-	  (GBaseInitFunc) base_init,				\
-	  (GBaseFinalizeFunc) NULL,				\
-	  (GClassInitFunc) class_init,				\
-	  (GClassFinalizeFunc) NULL,				\
+	  sizeof (nameNoT ## _class_t),				\
+	  (xbase_init_func_t) base_init,				\
+	  (xbase_finalize_func_t) NULL,				\
+	  (xclass_init_func_t) class_init,				\
+	  (xclass_finalize_func_t) NULL,				\
 	  NULL,           /* class_data */			\
-	  sizeof (name),					\
+	  sizeof (nameNoT ## _t),					\
 	  0,             /* n_prelocs */			\
-	  (GInstanceInitFunc) instance_init,                    \
-          (const GTypeValueTable *) NULL,			\
+	  (xinstance_init_func_t) instance_init,                    \
+          (const xtype_value_table_t *) NULL,			\
 	};							\
 								\
-      object_type = g_type_register_static (parent_type,	\
-					    # name,		\
+      object_type = xtype_register_static (parent_type,	\
+					    # nameNoT,		\
 					    &object_info, 0);	\
       interface_decl						\
     }								\
@@ -53,13 +53,13 @@ prefix ## _get_type (void)					\
   return object_type;						\
 }
 
-#define DEFINE_TYPE(name, prefix,				\
+#define DEFINE_TYPE(nameNoT, prefix,				\
 		    class_init, base_init, instance_init,	\
 		    parent_type)				\
-  DEFINE_TYPE_FULL(name, prefix, class_init, base_init,		\
+  DEFINE_TYPE_FULL(nameNoT, prefix, class_init, base_init,		\
 		   instance_init, parent_type, {})
 
-#define DEFINE_IFACE(name, prefix, base_init, dflt_init)	\
+#define DEFINE_IFACE(nameNoT, prefix, base_init, dflt_init)	\
 xtype_t								\
 prefix ## _get_type (void)					\
 {								\
@@ -67,22 +67,22 @@ prefix ## _get_type (void)					\
 								\
   if (!iface_type)						\
     {								\
-      const GTypeInfo iface_info =			\
+      const xtype_info_t iface_info =			\
       {								\
-	sizeof (name ## Class),					\
-	(GBaseInitFunc)	base_init,				\
-	(GBaseFinalizeFunc) NULL,				\
-	(GClassInitFunc) dflt_init,				\
-        (GClassFinalizeFunc) NULL,                              \
-        (gconstpointer) NULL,                                   \
-        (guint16) 0,                                            \
-        (guint16) 0,                                            \
-        (GInstanceInitFunc) NULL,                               \
-        (const GTypeValueTable*) NULL,                          \
+	sizeof (nameNoT ## _class_t),					\
+	(xbase_init_func_t)	base_init,				\
+	(xbase_finalize_func_t) NULL,				\
+	(xclass_init_func_t) dflt_init,				\
+        (xclass_finalize_func_t) NULL,                              \
+        (xconstpointer) NULL,                                   \
+        (xuint16_t) 0,                                            \
+        (xuint16_t) 0,                                            \
+        (xinstance_init_func_t) NULL,                               \
+        (const xtype_value_table_t*) NULL,                          \
       };							\
 								\
-      iface_type = g_type_register_static (XTYPE_INTERFACE,	\
-					    # name,		\
+      iface_type = xtype_register_static (XTYPE_INTERFACE,	\
+					    # nameNoT,		\
 					    &iface_info, 0);	\
     }								\
   return iface_type;						\
@@ -90,12 +90,12 @@ prefix ## _get_type (void)					\
 
 #define INTERFACE_FULL(type, init_func, iface_type)		\
 {								\
-  GInterfaceInfo const iface =				\
+  xinterface_info_t const iface =				\
     {								\
       (GInterfaceInitFunc) init_func, NULL, NULL		\
     };								\
 								\
-  g_type_add_interface_static (type, iface_type, &iface);	\
+  xtype_add_interface_static (type, iface_type, &iface);	\
 }
 #define INTERFACE(init_func, iface_type)	\
   INTERFACE_FULL(object_type, init_func, iface_type)

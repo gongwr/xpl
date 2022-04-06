@@ -18,10 +18,10 @@ static GOptionEntry opt_entries[] =
   G_OPTION_ENTRY_NULL
 };
 
-static GMainLoop *loop = NULL;
+static xmain_loop_t *loop = NULL;
 
 static void
-print_properties (GDBusProxy *proxy)
+print_properties (xdbus_proxy_t *proxy)
 {
   xchar_t **property_names;
   xuint_t n;
@@ -35,16 +35,16 @@ print_properties (GDBusProxy *proxy)
       xvariant_t *value;
       xchar_t *value_str;
       value = g_dbus_proxy_get_cached_property (proxy, key);
-      value_str = g_variant_print (value, TRUE);
+      value_str = xvariant_print (value, TRUE);
       g_print ("      %s -> %s\n", key, value_str);
-      g_variant_unref (value);
+      xvariant_unref (value);
       g_free (value_str);
     }
-  g_strfreev (property_names);
+  xstrfreev (property_names);
 }
 
 static void
-on_properties_changed (GDBusProxy          *proxy,
+on_properties_changed (xdbus_proxy_t          *proxy,
                        xvariant_t            *changed_properties,
                        const xchar_t* const  *invalidated_properties,
                        xpointer_t             user_data)
@@ -53,27 +53,27 @@ on_properties_changed (GDBusProxy          *proxy,
    * invalidated_properties are never NULL
    */
 
-  if (g_variant_n_children (changed_properties) > 0)
+  if (xvariant_n_children (changed_properties) > 0)
     {
-      GVariantIter *iter;
+      xvariant_iter_t *iter;
       const xchar_t *key;
       xvariant_t *value;
 
       g_print (" *** Properties Changed:\n");
-      g_variant_get (changed_properties,
+      xvariant_get (changed_properties,
                      "a{sv}",
                      &iter);
-      while (g_variant_iter_loop (iter, "{&sv}", &key, &value))
+      while (xvariant_iter_loop (iter, "{&sv}", &key, &value))
         {
           xchar_t *value_str;
-          value_str = g_variant_print (value, TRUE);
+          value_str = xvariant_print (value, TRUE);
           g_print ("      %s -> %s\n", key, value_str);
           g_free (value_str);
         }
-      g_variant_iter_free (iter);
+      xvariant_iter_free (iter);
     }
 
-  if (g_strv_length ((GStrv) invalidated_properties) > 0)
+  if (xstrv_length ((xstrv_t) invalidated_properties) > 0)
     {
       xuint_t n;
       g_print (" *** Properties Invalidated:\n");
@@ -86,7 +86,7 @@ on_properties_changed (GDBusProxy          *proxy,
 }
 
 static void
-on_signal (GDBusProxy *proxy,
+on_signal (xdbus_proxy_t *proxy,
            xchar_t      *sender_name,
            xchar_t      *signal_name,
            xvariant_t   *parameters,
@@ -94,7 +94,7 @@ on_signal (GDBusProxy *proxy,
 {
   xchar_t *parameters_str;
 
-  parameters_str = g_variant_print (parameters, TRUE);
+  parameters_str = xvariant_print (parameters, TRUE);
   g_print (" *** Received Signal: %s: %s\n",
            signal_name,
            parameters_str);
@@ -102,7 +102,7 @@ on_signal (GDBusProxy *proxy,
 }
 
 static void
-print_proxy (GDBusProxy *proxy)
+print_proxy (xdbus_proxy_t *proxy)
 {
   xchar_t *name_owner;
 
@@ -138,20 +138,20 @@ print_proxy (GDBusProxy *proxy)
 
 static void
 on_name_owner_notify (xobject_t    *object,
-                      GParamSpec *pspec,
+                      xparam_spec_t *pspec,
                       xpointer_t    user_data)
 {
-  GDBusProxy *proxy = G_DBUS_PROXY (object);
+  xdbus_proxy_t *proxy = G_DBUS_PROXY (object);
   print_proxy (proxy);
 }
 
 int
 main (int argc, char *argv[])
 {
-  GOptionContext *opt_context;
+  xoption_context_t *opt_context;
   xerror_t *error;
   GDBusProxyFlags flags;
-  GDBusProxy *proxy;
+  xdbus_proxy_t *proxy;
 
   loop = NULL;
   proxy = NULL;
@@ -161,8 +161,8 @@ main (int argc, char *argv[])
                                 "Example: to watch the object of gdbus-example-server, use:\n"
                                 "\n"
                                 "  ./gdbus-example-watch-proxy -n org.gtk.GDBus.TestServer  \\\n"
-                                "                              -o /org/gtk/GDBus/TestObject \\\n"
-                                "                              -i org.gtk.GDBus.TestInterface");
+                                "                              -o /org/gtk/GDBus/test_object_t \\\n"
+                                "                              -i org.gtk.GDBus.test_interface_t");
   g_option_context_add_main_entries (opt_context, opt_entries, NULL);
   error = NULL;
   if (!g_option_context_parse (opt_context, &argc, &argv, &error))
@@ -182,12 +182,12 @@ main (int argc, char *argv[])
   if (opt_no_auto_start)
     flags |= G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START;
 
-  loop = g_main_loop_new (NULL, FALSE);
+  loop = xmain_loop_new (NULL, FALSE);
 
   error = NULL;
   proxy = g_dbus_proxy_new_for_bus_sync (opt_system_bus ? G_BUS_TYPE_SYSTEM : G_BUS_TYPE_SESSION,
                                          flags,
-                                         NULL, /* GDBusInterfaceInfo */
+                                         NULL, /* xdbus_interface_info_t */
                                          opt_name,
                                          opt_object_path,
                                          opt_interface,
@@ -196,7 +196,7 @@ main (int argc, char *argv[])
   if (proxy == NULL)
     {
       g_printerr ("Error creating proxy: %s\n", error->message);
-      g_error_free (error);
+      xerror_free (error);
       goto out;
     }
 
@@ -214,13 +214,13 @@ main (int argc, char *argv[])
                     NULL);
   print_proxy (proxy);
 
-  g_main_loop_run (loop);
+  xmain_loop_run (loop);
 
  out:
   if (proxy != NULL)
-    g_object_unref (proxy);
+    xobject_unref (proxy);
   if (loop != NULL)
-    g_main_loop_unref (loop);
+    xmain_loop_unref (loop);
   g_option_context_free (opt_context);
   g_free (opt_name);
   g_free (opt_object_path);

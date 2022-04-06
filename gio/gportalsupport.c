@@ -33,28 +33,28 @@ read_flatpak_info (void)
   if (!g_once_init_enter (&flatpak_info_read))
     return;
 
-  if (g_file_test (path, G_FILE_TEST_EXISTS))
+  if (xfile_test (path, XFILE_TEST_EXISTS))
     {
-      GKeyFile *keyfile;
+      xkey_file_t *keyfile;
 
       use_portal = TRUE;
       network_available = FALSE;
       dconf_access = FALSE;
 
-      keyfile = g_key_file_new ();
-      if (g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, NULL))
+      keyfile = xkey_file_new ();
+      if (xkey_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, NULL))
         {
           char **shared = NULL;
           char *dconf_policy = NULL;
 
-          shared = g_key_file_get_string_list (keyfile, "Context", "shared", NULL, NULL);
+          shared = xkey_file_get_string_list (keyfile, "Context", "shared", NULL, NULL);
           if (shared)
             {
-              network_available = g_strv_contains ((const char * const *)shared, "network");
-              g_strfreev (shared);
+              network_available = xstrv_contains ((const char * const *)shared, "network");
+              xstrfreev (shared);
             }
 
-          dconf_policy = g_key_file_get_string (keyfile, "Session Bus Policy", "ca.desrt.dconf", NULL);
+          dconf_policy = xkey_file_get_string (keyfile, "Session Bus Policy", "ca.desrt.dconf", NULL);
           if (dconf_policy)
             {
               if (strcmp (dconf_policy, "talk") == 0)
@@ -63,7 +63,7 @@ read_flatpak_info (void)
             }
         }
 
-      g_key_file_unref (keyfile);
+      xkey_file_unref (keyfile);
     }
   else
     {

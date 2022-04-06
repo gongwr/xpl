@@ -33,10 +33,10 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GBytes          GBytes;
-typedef struct _GArray		GArray;
-typedef struct _GByteArray	GByteArray;
-typedef struct _GPtrArray	GPtrArray;
+typedef struct _GBytes          xbytes_t;
+typedef struct _GArray		xarray_t;
+typedef struct _GByteArray	xbyte_array_t;
+typedef struct _GPtrArray	xptr_array_t;
 
 struct _GArray
 {
@@ -46,7 +46,7 @@ struct _GArray
 
 struct _GByteArray
 {
-  guint8 *data;
+  xuint8_t *data;
   xuint_t	  len;
 };
 
@@ -67,212 +67,212 @@ struct _GPtrArray
 #define g_array_index(a,t,i)      (((t*) (void *) (a)->data) [(i)])
 
 XPL_AVAILABLE_IN_ALL
-GArray* g_array_new               (xboolean_t          zero_terminated,
+xarray_t* g_array_new               (xboolean_t          zero_terminated,
 				   xboolean_t          clear_,
 				   xuint_t             element_size);
 XPL_AVAILABLE_IN_2_64
-xpointer_t g_array_steal            (GArray           *array,
+xpointer_t g_array_steal            (xarray_t           *array,
                                    xsize_t            *len);
 XPL_AVAILABLE_IN_ALL
-GArray* g_array_sized_new         (xboolean_t          zero_terminated,
+xarray_t* g_array_sized_new         (xboolean_t          zero_terminated,
 				   xboolean_t          clear_,
 				   xuint_t             element_size,
 				   xuint_t             reserved_size);
 XPL_AVAILABLE_IN_2_62
-GArray* g_array_copy              (GArray           *array);
+xarray_t* g_array_copy              (xarray_t           *array);
 XPL_AVAILABLE_IN_ALL
-xchar_t*  g_array_free              (GArray           *array,
+xchar_t*  g_array_free              (xarray_t           *array,
 				   xboolean_t          free_segment);
 XPL_AVAILABLE_IN_ALL
-GArray *g_array_ref               (GArray           *array);
+xarray_t *g_array_ref               (xarray_t           *array);
 XPL_AVAILABLE_IN_ALL
-void    g_array_unref             (GArray           *array);
+void    g_array_unref             (xarray_t           *array);
 XPL_AVAILABLE_IN_ALL
-xuint_t   g_array_get_element_size  (GArray           *array);
+xuint_t   g_array_get_element_size  (xarray_t           *array);
 XPL_AVAILABLE_IN_ALL
-GArray* g_array_append_vals       (GArray           *array,
-				   gconstpointer     data,
+xarray_t* g_array_append_vals       (xarray_t           *array,
+				   xconstpointer     data,
 				   xuint_t             len);
 XPL_AVAILABLE_IN_ALL
-GArray* g_array_prepend_vals      (GArray           *array,
-				   gconstpointer     data,
+xarray_t* g_array_prepend_vals      (xarray_t           *array,
+				   xconstpointer     data,
 				   xuint_t             len);
 XPL_AVAILABLE_IN_ALL
-GArray* g_array_insert_vals       (GArray           *array,
+xarray_t* g_array_insert_vals       (xarray_t           *array,
 				   xuint_t             index_,
-				   gconstpointer     data,
+				   xconstpointer     data,
 				   xuint_t             len);
 XPL_AVAILABLE_IN_ALL
-GArray* g_array_set_size          (GArray           *array,
+xarray_t* g_array_set_size          (xarray_t           *array,
 				   xuint_t             length);
 XPL_AVAILABLE_IN_ALL
-GArray* g_array_remove_index      (GArray           *array,
+xarray_t* g_array_remove_index      (xarray_t           *array,
 				   xuint_t             index_);
 XPL_AVAILABLE_IN_ALL
-GArray* g_array_remove_index_fast (GArray           *array,
+xarray_t* g_array_remove_index_fast (xarray_t           *array,
 				   xuint_t             index_);
 XPL_AVAILABLE_IN_ALL
-GArray* g_array_remove_range      (GArray           *array,
+xarray_t* g_array_remove_range      (xarray_t           *array,
 				   xuint_t             index_,
 				   xuint_t             length);
 XPL_AVAILABLE_IN_ALL
-void    g_array_sort              (GArray           *array,
+void    g_array_sort              (xarray_t           *array,
 				   GCompareFunc      compare_func);
 XPL_AVAILABLE_IN_ALL
-void    g_array_sort_with_data    (GArray           *array,
+void    g_array_sort_with_data    (xarray_t           *array,
 				   GCompareDataFunc  compare_func,
 				   xpointer_t          user_data);
 XPL_AVAILABLE_IN_2_62
-xboolean_t g_array_binary_search    (GArray           *array,
-                                   gconstpointer     target,
+xboolean_t g_array_binary_search    (xarray_t           *array,
+                                   xconstpointer     target,
                                    GCompareFunc      compare_func,
                                    xuint_t            *out_match_index);
 XPL_AVAILABLE_IN_ALL
-void    g_array_set_clear_func    (GArray           *array,
-                                   GDestroyNotify    clear_func);
+void    g_array_set_clear_func    (xarray_t           *array,
+                                   xdestroy_notify_t    clear_func);
 
 /* Resizable pointer array.  This interface is much less complicated
  * than the above.  Add appends a pointer.  Remove fills any cleared
  * spot and shortens the array. remove_fast will again distort order.
  */
-#define    g_ptr_array_index(array,index_) ((array)->pdata)[index_]
+#define    xptr_array_index(array,index_) ((array)->pdata)[index_]
 XPL_AVAILABLE_IN_ALL
-GPtrArray* g_ptr_array_new                (void);
+xptr_array_t* xptr_array_new                (void);
 XPL_AVAILABLE_IN_ALL
-GPtrArray* g_ptr_array_new_with_free_func (GDestroyNotify    element_free_func);
+xptr_array_t* xptr_array_new_with_free_func (xdestroy_notify_t    element_free_func);
 XPL_AVAILABLE_IN_2_64
-xpointer_t*   g_ptr_array_steal              (GPtrArray        *array,
+xpointer_t*   xptr_array_steal              (xptr_array_t        *array,
                                             xsize_t            *len);
 XPL_AVAILABLE_IN_2_62
-GPtrArray *g_ptr_array_copy               (GPtrArray        *array,
+xptr_array_t *xptr_array_copy               (xptr_array_t        *array,
                                            GCopyFunc         func,
                                            xpointer_t          user_data);
 XPL_AVAILABLE_IN_ALL
-GPtrArray* g_ptr_array_sized_new          (xuint_t             reserved_size);
+xptr_array_t* xptr_array_sized_new          (xuint_t             reserved_size);
 XPL_AVAILABLE_IN_ALL
-GPtrArray* g_ptr_array_new_full           (xuint_t             reserved_size,
-					   GDestroyNotify    element_free_func);
+xptr_array_t* xptr_array_new_full           (xuint_t             reserved_size,
+					   xdestroy_notify_t    element_free_func);
 XPL_AVAILABLE_IN_ALL
-xpointer_t*  g_ptr_array_free               (GPtrArray        *array,
+xpointer_t*  xptr_array_free               (xptr_array_t        *array,
 					   xboolean_t          free_seg);
 XPL_AVAILABLE_IN_ALL
-GPtrArray* g_ptr_array_ref                (GPtrArray        *array);
+xptr_array_t* xptr_array_ref                (xptr_array_t        *array);
 XPL_AVAILABLE_IN_ALL
-void       g_ptr_array_unref              (GPtrArray        *array);
+void       xptr_array_unref              (xptr_array_t        *array);
 XPL_AVAILABLE_IN_ALL
-void       g_ptr_array_set_free_func      (GPtrArray        *array,
-                                           GDestroyNotify    element_free_func);
+void       xptr_array_set_free_func      (xptr_array_t        *array,
+                                           xdestroy_notify_t    element_free_func);
 XPL_AVAILABLE_IN_ALL
-void       g_ptr_array_set_size           (GPtrArray        *array,
+void       xptr_array_set_size           (xptr_array_t        *array,
 					   xint_t              length);
 XPL_AVAILABLE_IN_ALL
-xpointer_t   g_ptr_array_remove_index       (GPtrArray        *array,
+xpointer_t   xptr_array_remove_index       (xptr_array_t        *array,
 					   xuint_t             index_);
 XPL_AVAILABLE_IN_ALL
-xpointer_t   g_ptr_array_remove_index_fast  (GPtrArray        *array,
+xpointer_t   xptr_array_remove_index_fast  (xptr_array_t        *array,
 					   xuint_t             index_);
 XPL_AVAILABLE_IN_2_58
-xpointer_t   g_ptr_array_steal_index        (GPtrArray        *array,
+xpointer_t   xptr_array_steal_index        (xptr_array_t        *array,
                                            xuint_t             index_);
 XPL_AVAILABLE_IN_2_58
-xpointer_t   g_ptr_array_steal_index_fast   (GPtrArray        *array,
+xpointer_t   xptr_array_steal_index_fast   (xptr_array_t        *array,
                                            xuint_t             index_);
 XPL_AVAILABLE_IN_ALL
-xboolean_t   g_ptr_array_remove             (GPtrArray        *array,
+xboolean_t   xptr_array_remove             (xptr_array_t        *array,
 					   xpointer_t          data);
 XPL_AVAILABLE_IN_ALL
-xboolean_t   g_ptr_array_remove_fast        (GPtrArray        *array,
+xboolean_t   xptr_array_remove_fast        (xptr_array_t        *array,
 					   xpointer_t          data);
 XPL_AVAILABLE_IN_ALL
-GPtrArray *g_ptr_array_remove_range       (GPtrArray        *array,
+xptr_array_t *xptr_array_remove_range       (xptr_array_t        *array,
 					   xuint_t             index_,
 					   xuint_t             length);
 XPL_AVAILABLE_IN_ALL
-void       g_ptr_array_add                (GPtrArray        *array,
+void       xptr_array_add                (xptr_array_t        *array,
 					   xpointer_t          data);
 XPL_AVAILABLE_IN_2_62
-void g_ptr_array_extend                   (GPtrArray        *array_to_extend,
-                                           GPtrArray        *array,
+void xptr_array_extend                   (xptr_array_t        *array_to_extend,
+                                           xptr_array_t        *array,
                                            GCopyFunc         func,
                                            xpointer_t          user_data);
 XPL_AVAILABLE_IN_2_62
-void g_ptr_array_extend_and_steal         (GPtrArray        *array_to_extend,
-                                           GPtrArray        *array);
+void xptr_array_extend_and_steal         (xptr_array_t        *array_to_extend,
+                                           xptr_array_t        *array);
 XPL_AVAILABLE_IN_2_40
-void       g_ptr_array_insert             (GPtrArray        *array,
+void       xptr_array_insert             (xptr_array_t        *array,
                                            xint_t              index_,
                                            xpointer_t          data);
 XPL_AVAILABLE_IN_ALL
-void       g_ptr_array_sort               (GPtrArray        *array,
+void       xptr_array_sort               (xptr_array_t        *array,
 					   GCompareFunc      compare_func);
 XPL_AVAILABLE_IN_ALL
-void       g_ptr_array_sort_with_data     (GPtrArray        *array,
+void       xptr_array_sort_with_data     (xptr_array_t        *array,
 					   GCompareDataFunc  compare_func,
 					   xpointer_t          user_data);
 XPL_AVAILABLE_IN_ALL
-void       g_ptr_array_foreach            (GPtrArray        *array,
+void       xptr_array_foreach            (xptr_array_t        *array,
 					   GFunc             func,
 					   xpointer_t          user_data);
 XPL_AVAILABLE_IN_2_54
-xboolean_t   g_ptr_array_find               (GPtrArray        *haystack,
-                                           gconstpointer     needle,
+xboolean_t   xptr_array_find               (xptr_array_t        *haystack,
+                                           xconstpointer     needle,
                                            xuint_t            *index_);
 XPL_AVAILABLE_IN_2_54
-xboolean_t   g_ptr_array_find_with_equal_func (GPtrArray     *haystack,
-                                             gconstpointer  needle,
+xboolean_t   xptr_array_find_with_equal_func (xptr_array_t     *haystack,
+                                             xconstpointer  needle,
                                              GEqualFunc     equal_func,
                                              xuint_t         *index_);
 
 
-/* Byte arrays, an array of guint8.  Implemented as a GArray,
+/* Byte arrays, an array of xuint8_t.  Implemented as a xarray_t,
  * but type-safe.
  */
 
 XPL_AVAILABLE_IN_ALL
-GByteArray* g_byte_array_new               (void);
+xbyte_array_t* xbyte_array_new               (void);
 XPL_AVAILABLE_IN_ALL
-GByteArray* g_byte_array_new_take          (guint8           *data,
+xbyte_array_t* xbyte_array_new_take          (xuint8_t           *data,
                                             xsize_t             len);
 XPL_AVAILABLE_IN_2_64
-guint8*     g_byte_array_steal             (GByteArray       *array,
+xuint8_t*     xbyte_array_steal             (xbyte_array_t       *array,
                                             xsize_t            *len);
 XPL_AVAILABLE_IN_ALL
-GByteArray* g_byte_array_sized_new         (xuint_t             reserved_size);
+xbyte_array_t* xbyte_array_sized_new         (xuint_t             reserved_size);
 XPL_AVAILABLE_IN_ALL
-guint8*     g_byte_array_free              (GByteArray       *array,
+xuint8_t*     xbyte_array_free              (xbyte_array_t       *array,
 					    xboolean_t          free_segment);
 XPL_AVAILABLE_IN_ALL
-GBytes*     g_byte_array_free_to_bytes     (GByteArray       *array);
+xbytes_t*     xbyte_array_free_to_bytes     (xbyte_array_t       *array);
 XPL_AVAILABLE_IN_ALL
-GByteArray *g_byte_array_ref               (GByteArray       *array);
+xbyte_array_t *xbyte_array_ref               (xbyte_array_t       *array);
 XPL_AVAILABLE_IN_ALL
-void        g_byte_array_unref             (GByteArray       *array);
+void        xbyte_array_unref             (xbyte_array_t       *array);
 XPL_AVAILABLE_IN_ALL
-GByteArray* g_byte_array_append            (GByteArray       *array,
-					    const guint8     *data,
+xbyte_array_t* xbyte_array_append            (xbyte_array_t       *array,
+					    const xuint8_t     *data,
 					    xuint_t             len);
 XPL_AVAILABLE_IN_ALL
-GByteArray* g_byte_array_prepend           (GByteArray       *array,
-					    const guint8     *data,
+xbyte_array_t* xbyte_array_prepend           (xbyte_array_t       *array,
+					    const xuint8_t     *data,
 					    xuint_t             len);
 XPL_AVAILABLE_IN_ALL
-GByteArray* g_byte_array_set_size          (GByteArray       *array,
+xbyte_array_t* xbyte_array_set_size          (xbyte_array_t       *array,
 					    xuint_t             length);
 XPL_AVAILABLE_IN_ALL
-GByteArray* g_byte_array_remove_index      (GByteArray       *array,
+xbyte_array_t* xbyte_array_remove_index      (xbyte_array_t       *array,
 					    xuint_t             index_);
 XPL_AVAILABLE_IN_ALL
-GByteArray* g_byte_array_remove_index_fast (GByteArray       *array,
+xbyte_array_t* xbyte_array_remove_index_fast (xbyte_array_t       *array,
 					    xuint_t             index_);
 XPL_AVAILABLE_IN_ALL
-GByteArray* g_byte_array_remove_range      (GByteArray       *array,
+xbyte_array_t* xbyte_array_remove_range      (xbyte_array_t       *array,
 					    xuint_t             index_,
 					    xuint_t             length);
 XPL_AVAILABLE_IN_ALL
-void        g_byte_array_sort              (GByteArray       *array,
+void        xbyte_array_sort              (xbyte_array_t       *array,
 					    GCompareFunc      compare_func);
 XPL_AVAILABLE_IN_ALL
-void        g_byte_array_sort_with_data    (GByteArray       *array,
+void        xbyte_array_sort_with_data    (xbyte_array_t       *array,
 					    GCompareDataFunc  compare_func,
 					    xpointer_t          user_data);
 

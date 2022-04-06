@@ -30,24 +30,24 @@
  * SECTION:gloadableicon
  * @short_description: Loadable Icons
  * @include: gio/gio.h
- * @see_also: #xicon_t, #GThemedIcon
+ * @see_also: #xicon_t, #xthemed_icon_t
  *
  * Extends the #xicon_t interface and adds the ability to
  * load icons from streams.
  **/
 
-static void          g_loadable_icon_real_load_async  (GLoadableIcon        *icon,
+static void          g_loadable_icon_real_load_async  (xloadable_icon_t        *icon,
 						       int                   size,
 						       xcancellable_t         *cancellable,
 						       xasync_ready_callback_t   callback,
 						       xpointer_t              user_data);
-static xinput_stream_t *g_loadable_icon_real_load_finish (GLoadableIcon        *icon,
+static xinput_stream_t *g_loadable_icon_real_load_finish (xloadable_icon_t        *icon,
 						       xasync_result_t         *res,
 						       char                **type,
 						       xerror_t              **error);
 
 typedef GLoadableIconIface GLoadableIconInterface;
-G_DEFINE_INTERFACE(GLoadableIcon, g_loadable_icon, XTYPE_ICON)
+G_DEFINE_INTERFACE(xloadable_icon_t, g_loadable_icon, XTYPE_ICON)
 
 static void
 g_loadable_icon_default_init (GLoadableIconIface *iface)
@@ -58,7 +58,7 @@ g_loadable_icon_default_init (GLoadableIconIface *iface)
 
 /**
  * g_loadable_icon_load:
- * @icon: a #GLoadableIcon.
+ * @icon: a #xloadable_icon_t.
  * @size: an integer.
  * @type: (out) (optional): a location to store the type of the loaded
  * icon, %NULL to ignore.
@@ -73,7 +73,7 @@ g_loadable_icon_default_init (GLoadableIconIface *iface)
  * Returns: (transfer full): a #xinput_stream_t to read the icon from.
  **/
 xinput_stream_t *
-g_loadable_icon_load (GLoadableIcon  *icon,
+g_loadable_icon_load (xloadable_icon_t  *icon,
 		      int             size,
 		      char          **type,
 		      xcancellable_t   *cancellable,
@@ -90,7 +90,7 @@ g_loadable_icon_load (GLoadableIcon  *icon,
 
 /**
  * g_loadable_icon_load_async:
- * @icon: a #GLoadableIcon.
+ * @icon: a #xloadable_icon_t.
  * @size: an integer.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @callback: (scope async): a #xasync_ready_callback_t to call when the
@@ -102,7 +102,7 @@ g_loadable_icon_load (GLoadableIcon  *icon,
  * version of this function, see g_loadable_icon_load().
  **/
 void
-g_loadable_icon_load_async (GLoadableIcon       *icon,
+g_loadable_icon_load_async (xloadable_icon_t       *icon,
                             int                  size,
                             xcancellable_t        *cancellable,
                             xasync_ready_callback_t  callback,
@@ -119,7 +119,7 @@ g_loadable_icon_load_async (GLoadableIcon       *icon,
 
 /**
  * g_loadable_icon_load_finish:
- * @icon: a #GLoadableIcon.
+ * @icon: a #xloadable_icon_t.
  * @res: a #xasync_result_t.
  * @type: (out) (optional): a location to store the type of the loaded
  *        icon, %NULL to ignore.
@@ -131,7 +131,7 @@ g_loadable_icon_load_async (GLoadableIcon       *icon,
  * Returns: (transfer full): a #xinput_stream_t to read the icon from.
  **/
 xinput_stream_t *
-g_loadable_icon_load_finish (GLoadableIcon  *icon,
+g_loadable_icon_load_finish (xloadable_icon_t  *icon,
 			     xasync_result_t   *res,
 			     char          **type,
 			     xerror_t        **error)
@@ -141,7 +141,7 @@ g_loadable_icon_load_finish (GLoadableIcon  *icon,
   g_return_val_if_fail (X_IS_LOADABLE_ICON (icon), NULL);
   g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
-  if (g_async_result_legacy_propagate_error (res, error))
+  if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
 
   iface = G_LOADABLE_ICON_GET_IFACE (icon);
@@ -166,12 +166,12 @@ load_data_free (LoadData *data)
 }
 
 static void
-load_async_thread (GTask        *task,
+load_async_thread (xtask_t        *task,
                    xpointer_t      source_object,
                    xpointer_t      task_data,
                    xcancellable_t *cancellable)
 {
-  GLoadableIcon *icon = source_object;
+  xloadable_icon_t *icon = source_object;
   LoadData *data = task_data;
   GLoadableIconIface *iface;
   xinput_stream_t *stream;
@@ -182,47 +182,47 @@ load_async_thread (GTask        *task,
                         cancellable, &error);
 
   if (stream)
-    g_task_return_pointer (task, stream, g_object_unref);
+    xtask_return_pointer (task, stream, xobject_unref);
   else
-    g_task_return_error (task, error);
+    xtask_return_error (task, error);
 }
 
 
 
 static void
-g_loadable_icon_real_load_async (GLoadableIcon       *icon,
+g_loadable_icon_real_load_async (xloadable_icon_t       *icon,
 				 int                  size,
 				 xcancellable_t        *cancellable,
 				 xasync_ready_callback_t  callback,
 				 xpointer_t             user_data)
 {
-  GTask *task;
+  xtask_t *task;
   LoadData *data;
 
-  task = g_task_new (icon, cancellable, callback, user_data);
-  g_task_set_source_tag (task, g_loadable_icon_real_load_async);
+  task = xtask_new (icon, cancellable, callback, user_data);
+  xtask_set_source_tag (task, g_loadable_icon_real_load_async);
   data = g_new0 (LoadData, 1);
-  g_task_set_task_data (task, data, (GDestroyNotify) load_data_free);
-  g_task_run_in_thread (task, load_async_thread);
-  g_object_unref (task);
+  xtask_set_task_data (task, data, (xdestroy_notify_t) load_data_free);
+  xtask_run_in_thread (task, load_async_thread);
+  xobject_unref (task);
 }
 
 static xinput_stream_t *
-g_loadable_icon_real_load_finish (GLoadableIcon        *icon,
+g_loadable_icon_real_load_finish (xloadable_icon_t        *icon,
 				  xasync_result_t         *res,
 				  char                **type,
 				  xerror_t              **error)
 {
-  GTask *task;
+  xtask_t *task;
   LoadData *data;
   xinput_stream_t *stream;
 
-  g_return_val_if_fail (g_task_is_valid (res, icon), NULL);
+  g_return_val_if_fail (xtask_is_valid (res, icon), NULL);
 
-  task = G_TASK (res);
-  data = g_task_get_task_data (task);
+  task = XTASK (res);
+  data = xtask_get_task_data (task);
 
-  stream = g_task_propagate_pointer (task, error);
+  stream = xtask_propagate_pointer (task, error);
   if (stream && type)
     {
       *type = data->type;

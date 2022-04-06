@@ -33,7 +33,7 @@ G_BEGIN_DECLS
 
 #define XTYPE_SOCKET_SERVICE                               (xsocket_service_get_type ())
 #define XSOCKET_SERVICE(inst)                              (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_SOCKET_SERVICE, GSocketService))
+                                                             XTYPE_SOCKET_SERVICE, xsocket_service))
 #define XSOCKET_SERVICE_CLASS(class)                       (XTYPE_CHECK_CLASS_CAST ((class),                       \
                                                              XTYPE_SOCKET_SERVICE, GSocketServiceClass))
 #define X_IS_SOCKET_SERVICE(inst)                           (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
@@ -50,13 +50,13 @@ typedef struct _GSocketServiceClass                         GSocketServiceClass;
  * GSocketServiceClass:
  * @incoming: signal emitted when new connections are accepted
  *
- * Class structure for #GSocketService.
+ * Class structure for #xsocket_service_t.
  */
 struct _GSocketServiceClass
 {
   GSocketListenerClass parent_class;
 
-  xboolean_t (* incoming) (GSocketService    *service,
+  xboolean_t (* incoming) (xsocket_service_t    *service,
                          xsocket_connection_t *connection,
 			 xobject_t           *source_object);
 
@@ -71,7 +71,7 @@ struct _GSocketServiceClass
 
 struct _GSocketService
 {
-  GSocketListener parent_instance;
+  xsocket_listener_t parent_instance;
   GSocketServicePrivate *priv;
 };
 
@@ -79,13 +79,13 @@ XPL_AVAILABLE_IN_ALL
 xtype_t           xsocket_service_get_type  (void);
 
 XPL_AVAILABLE_IN_ALL
-GSocketService *xsocket_service_new       (void);
+xsocket_service_t *xsocket_service_new       (void);
 XPL_AVAILABLE_IN_ALL
-void            xsocket_service_start     (GSocketService *service);
+void            xsocket_service_start     (xsocket_service_t *service);
 XPL_AVAILABLE_IN_ALL
-void            xsocket_service_stop      (GSocketService *service);
+void            xsocket_service_stop      (xsocket_service_t *service);
 XPL_AVAILABLE_IN_ALL
-xboolean_t        xsocket_service_is_active (GSocketService *service);
+xboolean_t        xsocket_service_is_active (xsocket_service_t *service);
 
 
 G_END_DECLS

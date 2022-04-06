@@ -26,7 +26,7 @@
 
 /**
  * _xio_module_extract_name:
- * @filename: filename of a GIOModule
+ * @filename: filename of a xio_module_t
  *
  * Extract the plugin name from its filename. It removes optional "lib" or
  * "libgio" prefix, and removes everything after the first dot. For example:
@@ -49,10 +49,10 @@ _xio_module_extract_name (const char *filename)
         bname[i] = '_';
     }
 
-  if (g_str_has_prefix (bname, "libgio"))
+  if (xstr_has_prefix (bname, "libgio"))
     prefix_len = 6;
   /* DLLs built with MSVC generally do not have the 'lib' prefix */
-  else if (g_str_has_prefix (bname, "lib") || g_str_has_prefix (bname, "gio"))
+  else if (xstr_has_prefix (bname, "lib") || xstr_has_prefix (bname, "gio"))
     prefix_len = 3;
   else
     prefix_len = 0; /* use whole name (minus suffix) as plugin name */
@@ -63,7 +63,7 @@ _xio_module_extract_name (const char *filename)
   else
     len = strlen (bname + prefix_len);
 
-  name = g_strndup (bname + prefix_len, len);
+  name = xstrndup (bname + prefix_len, len);
   g_free (bname);
 
   return name;

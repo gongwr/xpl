@@ -31,16 +31,16 @@
 G_BEGIN_DECLS
 
 #define XTYPE_CONVERTER_INPUT_STREAM         (g_converter_input_stream_get_type ())
-#define G_CONVERTER_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CONVERTER_INPUT_STREAM, GConverterInputStream))
+#define G_CONVERTER_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CONVERTER_INPUT_STREAM, xconverter_input_stream))
 #define G_CONVERTER_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CONVERTER_INPUT_STREAM, GConverterInputStreamClass))
 #define X_IS_CONVERTER_INPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_CONVERTER_INPUT_STREAM))
 #define X_IS_CONVERTER_INPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_CONVERTER_INPUT_STREAM))
 #define G_CONVERTER_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_CONVERTER_INPUT_STREAM, GConverterInputStreamClass))
 
 /**
- * GConverterInputStream:
+ * xconverter_input_stream_t:
  *
- * An implementation of #GFilterInputStream that allows data
+ * An implementation of #xfilter_input_stream_t that allows data
  * conversion.
  **/
 typedef struct _GConverterInputStreamClass    GConverterInputStreamClass;
@@ -48,7 +48,7 @@ typedef struct _GConverterInputStreamPrivate  GConverterInputStreamPrivate;
 
 struct _GConverterInputStream
 {
-  GFilterInputStream parent_instance;
+  xfilter_input_stream_t parent_instance;
 
   /*< private >*/
   GConverterInputStreamPrivate *priv;
@@ -71,9 +71,9 @@ XPL_AVAILABLE_IN_ALL
 xtype_t                  g_converter_input_stream_get_type      (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_ALL
 xinput_stream_t          *g_converter_input_stream_new           (xinput_stream_t          *base_stream,
-                                                               GConverter            *converter);
+                                                               xconverter_t            *converter);
 XPL_AVAILABLE_IN_ALL
-GConverter            *g_converter_input_stream_get_converter (GConverterInputStream *converter_stream);
+xconverter_t            *g_converter_input_stream_get_converter (xconverter_input_stream_t *converter_stream);
 
 G_END_DECLS
 

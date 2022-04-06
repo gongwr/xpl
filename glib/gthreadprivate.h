@@ -28,7 +28,7 @@
 typedef struct _GRealThread GRealThread;
 struct  _GRealThread
 {
-  GThread thread;
+  xthread_t thread;
 
   xint_t ref_count;
   xboolean_t ours;
@@ -69,7 +69,7 @@ void            g_system_thread_set_name        (const xchar_t  *name);
 xboolean_t        g_system_thread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_settings);
 
 /* gthread.c */
-GThread *g_thread_new_internal (const xchar_t *name,
+xthread_t *xthread_new_internal (const xchar_t *name,
                                 GThreadFunc proxy,
                                 GThreadFunc func,
                                 xpointer_t data,
@@ -77,11 +77,11 @@ GThread *g_thread_new_internal (const xchar_t *name,
                                 const GThreadSchedulerSettings *scheduler_settings,
                                 xerror_t **error);
 
-xboolean_t g_thread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_settings);
+xboolean_t xthread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_settings);
 
-xpointer_t        g_thread_proxy                  (xpointer_t      thread);
+xpointer_t        xthread_proxy                  (xpointer_t      thread);
 
-xuint_t           g_thread_n_created              (void);
+xuint_t           xthread_n_created              (void);
 
 xpointer_t        g_private_set_alloc0            (GPrivate       *key,
                                                  xsize_t           size);
